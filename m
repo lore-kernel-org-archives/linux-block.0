@@ -1,209 +1,110 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mail64.out.titan.email (mail64.out.titan.email [44.205.83.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831FC207A02
-	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 10:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1FD20102C
+	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 10:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.205.83.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740134691; cv=none; b=L02yyHB4YOZihei+rEbsKwZi4spKaS4ceF7ZuiTFOkaO71dhIF+iSapXP0UFiBrcvEQulViST6WFu8AVZ1j3FiVjV6vd6RPiv6hQuRvkMVjw5k/lHMS5a+uFvm+FM/q8T1Avr0IJKNbGiP/Hn7aylOVYMcUoP2F7/tlIK3gYalg=
+	t=1740134906; cv=none; b=cog0RTfmjVmoo184uP2UQEHTDL0J72Ei48X+6jNlBJWbD6uefyySD2aVj1TUuQyFNCvls4riZaDiwZ47Ft2Ui+7CIt9dzVymx42MI4uSQQXwCZGnzchO934wFqVPBkpflHRi05Zfh5MuZosB7fLV2Znw2Aun6FW6IQAwzy9sRd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740134691; c=relaxed/simple;
-	bh=UUdEecgDqSQ3SckRw+rCo/MjrBAF0Kh1OxWA5Kqg7hY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=DzKTccM10VZIy/YLICv0Y+XCK4LRSoTS2rNV105Dw7+2R4G1GawUM6LBr8H4XLFZKeOY9buuNlYVxeiVBtHJHPvVJrtUWoRoKQo2fJqfu1w0aO1ylBjFPaVnjxCQIfPhalQYczdl6jdspQh8wTMP7IiWVI9Lo1FzMPW0klk/Mls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=gR85HG77; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1740134906; c=relaxed/simple;
+	bh=p+2rsaQ4FhCWyfKQl3y+ihQwoGzxuywBqGvV8Qy4oro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XAwtB3qrburaSnLRO/2mPyeL6T0CKijckP+X0lk9cnMY8XBq19flF6eVER5YvICQ5I9n9DnimEp+RCgPK9pANBOolfJOhCnDNP7kVVtlFHPXvqwct0vO6T+AaQytGVoqVSFqin+IqeD2xwWry2PSrhEJrBVWWOxALFa5WyMcY1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=JYWW2Grh; arc=none smtp.client-ip=44.205.83.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gR85HG77"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250221104441epoutp010d94556f8bbdc20bcb433b122113d95f~mM0X3g5NW0050800508epoutp01T
-	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 10:44:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250221104441epoutp010d94556f8bbdc20bcb433b122113d95f~mM0X3g5NW0050800508epoutp01T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1740134681;
-	bh=zq2OvmombF/nmjIv8d+NCP6My+EYDfaxUFB90IcnD0c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gR85HG770K8U6Ihp65qDxI/1hlL65U/OlnDi0Qm2+OFXknrlnI3WkWxDer23EMu2H
-	 zrw4J9IkmOZXXXAMKPMcE/bV/tro81BsrcGCRg0OFKQhKLmQHc0Laq+cUWQnrXcxrO
-	 vm75V6Xl1FFZAQhOIulhchSPqZ0UnL7Tj7x6Q8E0=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20250221104441epcas5p2457463accd4a08408833736bca205105~mM0XczCh01679816798epcas5p2J;
-	Fri, 21 Feb 2025 10:44:41 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4YzmwQ70B1z4x9Pr; Fri, 21 Feb
-	2025 10:44:38 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	43.65.19933.61958B76; Fri, 21 Feb 2025 19:44:38 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250221104410epcas5p384409475a9ae988d52d04c424fe70df3~mMz6cUQ_A0563805638epcas5p3E;
-	Fri, 21 Feb 2025 10:44:10 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250221104410epsmtrp1b1ff0c3a4683e6b3dad47bf9642e04b0~mMz6bjF5z0516605166epsmtrp1a;
-	Fri, 21 Feb 2025 10:44:10 +0000 (GMT)
-X-AuditID: b6c32a4a-c1fda70000004ddd-38-67b85916a399
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	DD.16.18949.9F858B76; Fri, 21 Feb 2025 19:44:09 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250221104408epsmtip2fbc853b37f2f4278a1203c413b5d60ce~mMz4jcIUj1068210682epsmtip2x;
-	Fri, 21 Feb 2025 10:44:07 +0000 (GMT)
-Date: Fri, 21 Feb 2025 16:05:54 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Anuj gupta <anuj1072538@gmail.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig
-	<hch@lst.de>, M Nikhil <nikh1092@linux.ibm.com>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-scsi@vger.kernel.org, hare@suse.de, steffen Maier
-	<maier@linux.ibm.com>, Benjamin Block <bblock@linux.ibm.com>, Nihar Panda
-	<niharp@linux.ibm.com>
-Subject: Re: Change in reported values of some block integrity sysfs
- attributes
-Message-ID: <20250221103554.GA28830@green245>
+	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="JYWW2Grh"
+Received: from smtp-out.flockmail.com (localhost [127.0.0.1])
+	by smtp-out.flockmail.com (Postfix) with ESMTP id 6898F140047;
+	Fri, 21 Feb 2025 10:08:48 +0000 (UTC)
+DKIM-Signature: a=rsa-sha256; bh=cqetpmvMD/jN/5sZxj0Bd7e9Bah0FkeGurb936MERnc=;
+	c=relaxed/relaxed; d=t12smtp-sign004.email;
+	h=message-id:references:mime-version:from:cc:subject:to:date:in-reply-to:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
+	q=dns/txt; s=titan1; t=1740132528; v=1;
+	b=JYWW2GrhxrD87R/6VDrIuznv0wXZf8RZQe9zr+sTIISV6NXdTYjOutiXUk70VsmWxiGBZ75f
+	JSOQGAG1c9IBCwtHhIbTpRLV+kr/914VH6Adg+XcNwILI0S88RbLgTGjzj6Vr1U9rmkWekwKYoS
+	DAb9B9d42RFRyglmgNlcYs2k=
+Received: from studio.local (unknown [141.11.218.23])
+	by smtp-out.flockmail.com (Postfix) with ESMTPA id 65BF0140108;
+	Fri, 21 Feb 2025 10:08:38 +0000 (UTC)
+Date: Fri, 21 Feb 2025 18:08:36 +0800
+Feedback-ID: :i@coly.li:coly.li:flockmailId
+From: Coly Li <i@coly.li>
+To: Zheng Qixing <zhengqixing@huaweicloud.com>
+Cc: axboe@kernel.dk, song@kernel.org, colyli@kernel.org, 
+	yukuai3@huawei.com, dan.j.williams@intel.com, vishal.l.verma@intel.com, 
+	dave.jiang@intel.com, ira.weiny@intel.com, dlemoal@kernel.org, yanjun.zhu@linux.dev, 
+	kch@nvidia.com, hare@suse.de, zhengqixing@huawei.com, john.g.garry@oracle.com, 
+	geliang@kernel.org, xni@redhat.com, colyli@suse.de, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
+	yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH 03/12] badblocks: attempt to merge adjacent badblocks
+ during ack_all_badblocks
+Message-ID: <w527neyzlfzjxzhxge2pmip7qxzwrumn5bvztjtuonu3opoyf6@7umwkulb6eeb>
+References: <20250221081109.734170-1-zhengqixing@huaweicloud.com>
+ <20250221081109.734170-4-zhengqixing@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CACzX3AvbM4qG+ZOWJoCTNMMgSz8gMjoRcQ10_HJbMyi0Nv9qvQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmuq5Y5I50gy9tFhYfv/5msbi07gKz
-	xYJFc1ks9iyaxGSxcvVRJou9t7Qt2ufvYrTovr6DzeJi71dmi+XH/zFZfOv4yG5x9+JTZouV
-	P/6wOvB67Jx1l91jwqIDjB4vNs9k9Nh9s4HN4+PTWywem09Xe3zeJBfAHpVtk5GamJJapJCa
-	l5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0rJJCWWJOKVAoILG4WEnf
-	zqYov7QkVSEjv7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO2PKylNsBRclK3b2
-	f2JpYDwn0sXIwSEhYCKx4IF2FyMXh5DAbkaJV++vMEM4nxglDv+4wwbhfGOUmPptOXsXIydY
-	x/+t01kgEnsZJW70tkJVPWOU2HDkCitIFYuAqsSPJwvAOtgE1CWOPG9lBLFFBNQknm7bDtbA
-	LNDJLDGtcwobSEJYIFDi64bfYEW8AroSy+5shLIFJU7OfMICYnMC1Xz53swMYosKKEsc2Hac
-	CWSQhMAODoklby6wQdznIjH11AEmCFtY4tXxLVB3S0m87G+DstMlflx+ClVTINF8bB8jhG0v
-	0XqqH2wBs0CGxJnWO1A1skAz1zFBxPkken8/gYrzSuyYB2MrSbSvnANlS0jsPdcAZXtIfNl9
-	EWymkEALk0TTdaYJjPKzkPw2C8k6CFtHYsHuT2yzgBHELCAtsfwfB4SpKbF+l/4CRtZVjJKp
-	BcW56anFpgVGeanl8BhPzs/dxAhOzFpeOxgfPvigd4iRiYPxEKMEB7OSCG9b/ZZ0Id6UxMqq
-	1KL8+KLSnNTiQ4ymwMiayCwlmpwPzA15JfGGJpYGJmZmZiaWxmaGSuK8zTtb0oUE0hNLUrNT
-	UwtSi2D6mDg4pRqY4j4/5ncud7LMVXZ2YuzsXOv1qv/BSp4767M2PL14X1CXh/FjusCHjtSK
-	LVcfT5+4sZ5pT1iBStKlLZ5s3qd2WPrVcnMVnLlwnPNyRI+phQ6b7P+2T6x2K5ZLpzG8YXh1
-	94OvxoKYl6J+9yrsH7j6GRmpKobfFJ85jX8qr+92N9vj+wzeLVvKfaStftfEqa/3v0wKmD0x
-	qbpsqs+RZuP2HYzn5KY0CuSyl+SpaFo26Io4vLb13HnVVaw2tV7tYtP+8LC0j482rGWsSmR9
-	qFRXlNqZbhzuw3RP63rON/F5s17kp3F/y5/2SD1xkZOv4/Fz9uETwvvcutyrY262KW7J/yO5
-	vfFc6uGonzMVrimxFGckGmoxFxUnAgDXBQJ2VQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplkeLIzCtJLcpLzFFi42LZdlhJXvdnxI50gwm7TS0+fv3NYnFp3QVm
-	iwWL5rJY7Fk0icli5eqjTBZ7b2lbtM/fxWjRfX0Hm8XF3q/MFsuP/2Oy+Nbxkd3i7sWnzBYr
-	f/xhdeD12DnrLrvHhEUHGD1ebJ7J6LH7ZgObx8ent1g8Np+u9vi8SS6APYrLJiU1J7MstUjf
-	LoEr48GxWWwFE8UrNvX0MTcwLhfqYuTkkBAwkfi/dTpLFyMXh5DAbkaJIz/72SASEhKnXi5j
-	hLCFJVb+e84OUfSEUeLP5QZWkASLgKrEjycL2EFsNgF1iSPPW8EaRATUJJ5u284G0sAs0M0s
-	sXTzfhaQhLBAoMTXDb/BingFdCWW3dnICDG1hUli+6YbrBAJQYmTM5+ANTALaEnc+PeSqYuR
-	A8iWllj+jwMkzAk058v3ZmYQW1RAWeLAtuNMExgFZyHpnoWkexZC9wJG5lWMkqkFxbnpucWG
-	BUZ5qeV6xYm5xaV56XrJ+bmbGMExpaW1g3HPqg96hxiZOBgPMUpwMCuJ8LbVb0kX4k1JrKxK
-	LcqPLyrNSS0+xCjNwaIkzvvtdW+KkEB6YklqdmpqQWoRTJaJg1OqgWlZhm/JQ2udY28LzZZY
-	Cu/gv7F4kvTaFqbvTnpnBZTdi/d01iQeeXFPM7BqUtOXuohKE7HMgmUK3w+LzP8zx69RMzdh
-	zSl7tT1zE7a8jth+ze3txt/aOcw/5256fZzvwmLL558O2LeFKDKFBk3T0n5stvXm6V2rI4TD
-	F8tp+ZyQfSPMacbCmeMf8chakW1lddXa+HvH124MuuKclMeUsf1Ddv6rr1FZnxyXFn1K5JFJ
-	LP4/b+Mdt26tjIlnFS/W2mgGfpdPSLR91tM3QSvClyHixNn0qtfMyeyNrBMer9skXDW/lE2/
-	df4p7lOsRX+qLMJ3s22peXI+uMX1S/eV809kApbMdts3ozv3pILadyWW4oxEQy3mouJEAJRQ
-	CnwYAwAA
-X-CMS-MailID: 20250221104410epcas5p384409475a9ae988d52d04c424fe70df3
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_7482b_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250221103836epcas5p2158071e3449f10b80b44b43595d18704
-References: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com>
-	<yq18qsjdz0r.fsf@ca-mkp.ca.oracle.com>
-	<CGME20250221103836epcas5p2158071e3449f10b80b44b43595d18704@epcas5p2.samsung.com>
-	<CACzX3AvbM4qG+ZOWJoCTNMMgSz8gMjoRcQ10_HJbMyi0Nv9qvQ@mail.gmail.com>
-
-------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_7482b_
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20250221081109.734170-4-zhengqixing@huaweicloud.com>
+X-F-Verdict: SPFVALID
+X-Titan-Src-Out: 1740132528291528194.32605.5719148889041607543@prod-use1-smtp-out1003.
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.4 cv=bq22BFai c=1 sm=1 tr=0 ts=67b850b0
+	a=USBFZE4A2Ag4MGBBroF6Xg==:117 a=USBFZE4A2Ag4MGBBroF6Xg==:17
+	a=IkcTkHD0fZMA:10 a=CEWIc4RMnpUA:10 a=i0EeH86SAAAA:8 a=VwQbUJbxAAAA:8
+	a=ZuRJGKQMYiGAcWkIlfYA:9 a=QEXdDO2ut3YA:10
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Fri, Feb 21, 2025 at 04:07:55PM +0530, Anuj gupta wrote:
-> > I don't see any change in what's reported with block/for-next in a
-> > regular SCSI HBA/disk setup. Will have to look at whether there is a
-> > stacking issue wrt. multipathing.
+On Fri, Feb 21, 2025 at 04:11:00PM +0800, Zheng Qixing wrote:
+> From: Li Nan <linan122@huawei.com>
 > 
-> Hi Martin, Christoph,
+> If ack and unack badblocks are adjacent, they will not be merged and will
+> remain as two separate badblocks. Even after the bad blocks are written
+> to disk and both become ack, they will still remain as two independent
+> bad blocks. This is not ideal as it wastes the limited space for
+> badblocks. Therefore, during ack_all_badblocks(), attempt to merge
+> badblocks if they are adjacent.
 > 
-> It seems this change in behaviour is not limited to SCSI only. As Nikhil
-> mentioned an earlier commit
-> [9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")]
-> causes this change in behaviour. On my setup with a NVMe drive not formatted
-> with PI, I see that:
+> Fixes: aa511ff8218b ("badblocks: switch to the improved badblock handling code")
+> Signed-off-by: Li Nan <linan122@huawei.com>
+
+Looks good to me.
+
+Acked-by: Coly Li <colyli@kernel.org>
+
+Thanks.
+
+> ---
+>  block/badblocks.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> Without this commit:
-> Value reported by read_verify and write_generate sysfs entries is 0.
+> diff --git a/block/badblocks.c b/block/badblocks.c
+> index f069c93e986d..ad8652fbe1c8 100644
+> --- a/block/badblocks.c
+> +++ b/block/badblocks.c
+> @@ -1491,6 +1491,11 @@ void ack_all_badblocks(struct badblocks *bb)
+>  				p[i] = BB_MAKE(start, len, 1);
+>  			}
+>  		}
+> +
+> +		for (i = 0; i < bb->count ; i++)
+> +			while (try_adjacent_combine(bb, i))
+> +				;
+> +
+>  		bb->unacked_exist = 0;
+>  	}
+>  	write_sequnlock_irq(&bb->lock);
+> -- 
+> 2.39.2
 > 
-> With this commit:
-> Value reported by read_verify and write_generate sysfs entries is 1.
-> 
-> Diving a bit deeper, both these flags got inverted due to this commit.
-> But during init (in nvme_init_integrity) these values get initialized to 0,
-> inturn setting the sysfs entries to 1. In order to fix this, the driver has to
-> initialize both these flags to 1 in nvme_init_integrity if PI is not supported.
-> That way, the value in sysfs for these entries would become 0 again. Tried this
-> approach in my setup, and I am able to see the right values now. Then something
-> like this would also need to be done for SCSI too.
 
-This is the patch that I used:
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 818d4e49aab5..6cd9f57131cc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1799,6 +1799,7 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 
- 	memset(bi, 0, sizeof(*bi));
- 
-+	bi->flags |= BLK_INTEGRITY_NOGENERATE | BLK_INTEGRITY_NOVERIFY;
- 	if (!head->ms)
- 		return true;
- 
-@@ -1817,11 +1818,15 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 			bi->csum_type = BLK_INTEGRITY_CSUM_CRC;
- 			bi->tag_size = sizeof(u16) + sizeof(u32);
- 			bi->flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
-+				       BLK_INTEGRITY_NOVERIFY);
- 			break;
- 		case NVME_NVM_NS_64B_GUARD:
- 			bi->csum_type = BLK_INTEGRITY_CSUM_CRC64;
- 			bi->tag_size = sizeof(u16) + 6;
- 			bi->flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
-+				       BLK_INTEGRITY_NOVERIFY);
- 			break;
- 		default:
- 			break;
-@@ -1835,12 +1840,16 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 			bi->tag_size = sizeof(u16);
- 			bi->flags |= BLK_INTEGRITY_DEVICE_CAPABLE |
- 				     BLK_INTEGRITY_REF_TAG;
-+			bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
-+				       BLK_INTEGRITY_NOVERIFY);
- 			break;
- 		case NVME_NVM_NS_64B_GUARD:
- 			bi->csum_type = BLK_INTEGRITY_CSUM_CRC64;
- 			bi->tag_size = sizeof(u16);
- 			bi->flags |= BLK_INTEGRITY_DEVICE_CAPABLE |
- 				     BLK_INTEGRITY_REF_TAG;
-+			bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
-+				       BLK_INTEGRITY_NOVERIFY);
- 			break;
- 		default:
- 			break;
-
-
-------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_7482b_
-Content-Type: text/plain; charset="utf-8"
-
-
-------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_7482b_--
+-- 
+Coly Li
