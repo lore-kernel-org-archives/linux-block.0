@@ -1,106 +1,94 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B7D2397BF;
-	Fri, 21 Feb 2025 22:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21415684
+	for <linux-block@vger.kernel.org>; Sat, 22 Feb 2025 00:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740177513; cv=none; b=DKlUf7bywhspU7b/fybLWqQ6F0WQjMq/QT0HxZbQYeTmBUduIuW1oevXHFRTR35aaBjqgg2cKy1j1mTbVtAVxXLDl6YnSkeRreMYxSLNqi2ACOhtaIfidfTpvtfOm3hpNqAtySMb3x+jXVZP6MGdb80NVTZ4n47/GT8vlHrrEVw=
+	t=1740183186; cv=none; b=f7APb9/oBaYdmR4eSu+gYjOlDSK5XsrRxqagWmompqePpexWGGIxD5w8mAh0j2vjjRixScUtSqzlmU+ZoRnklrUB1WbIncxDVrgINjSQbOUuSp4J0kusjshBI79uUZaKw9nRn5l8Vm2IndBfLR/+IPZdIWTYwnrNgFjgNXyQMkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740177513; c=relaxed/simple;
-	bh=hh+kjJOX3Lo3l4ILL+fbseEofYE8t0mReKLbQTa2XbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CL2T6s2NEFXu9NIJae8Q1ypxPD9Ed+Jx3LQC+NUjoutmKNDGBNSPl9T1XTofIJpgMikWR8hyLHeFy0ov/RiVHFHczrIUg+s9KrCimm9JIpuvjPotDGEa9snNUXD8p3TBOTX1XjOTXqokLamGkXODZZ6nMQNCO4MyTRl/L0XfUoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=j0PYVvwX; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1740183186; c=relaxed/simple;
+	bh=51yncecrfj0RsMPvBHqMPp58DR3VmCsbq0CeL73I5lE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=R5sq3KAapmfVrA5qyphbgikMnqWpFFhXIoaWUtkKmaIMo3MRHSDecm7/3wtmaC7K6GaNdG5D3o7eNXrOK2W4rBai9RqPESlimgwR7jn0vVRSYZgSWiDTp4qgrit/TyQDE56b2Cmc8VmOWbAtfqV7TJIDyJLneyWD527Crw3up+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OHXfJPE0; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j0PYVvwX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=GoCon0Fq6X63chDqWaV9ZGQ+ZBO2iIy6otYzhff4lOE=; b=j0PYVvwXI7eCRUoi3gZOV2na2H
-	Bj98iRzd1YMF4Lz6r9LwSxt53op4Q5kXHZRxGptgTBnpTPcgVrjtVTzNrCNH9l6rWodcKn1uzPvD9
-	5Ugsk0CiQqBqoK3Z1WXfrcTsqQ4lWh+ibde8Kyn/b37D0hn79Jyk5ikSCLn85SAI3yk2Siu3h8Rcn
-	WBQJFYEGyP08H9hJUa6NJvNezR+bLm0zKeLxDXBLYKEHGofvghjAj8odarDyzARiJBcNYIk34HXt5
-	p8plBqyKTGkpOZtRcaOYmBc4TH/6BHg024qY5gApNVtEJBdUVAa+0WQsf/4QcJHNgJe3/pdPjNLkg
-	Y+5JFOAA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tlbf7-000000073D5-3Plg;
-	Fri, 21 Feb 2025 22:38:25 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: brauner@kernel.org,
-	akpm@linux-foundation.org,
-	hare@suse.de,
-	willy@infradead.org,
-	dave@stgolabs.net,
-	david@fromorbit.com,
-	djwong@kernel.org,
-	kbusch@kernel.org
-Cc: john.g.garry@oracle.com,
-	hch@lst.de,
-	ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	gost.dev@samsung.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	kernel@pankajraghav.com,
-	mcgrof@kernel.org,
-	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH v3 3/8] fs/mpage: avoid negative shift for large blocksize
-Date: Fri, 21 Feb 2025 14:38:18 -0800
-Message-ID: <20250221223823.1680616-4-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250221223823.1680616-1-mcgrof@kernel.org>
-References: <20250221223823.1680616-1-mcgrof@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OHXfJPE0"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d2b3811513so10321765ab.1
+        for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 16:13:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740183182; x=1740787982; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GsufKr0NGP3tYvsFVv0EO/2yZiZEnUNT84I1RxYAoyM=;
+        b=OHXfJPE0LlToVRPlme+GzfHuTUe8byvdNZxm9x0O7BvfagIwPNGSx/4l1psKSGvoNv
+         pXaJyb49NII7hiQxCIKJTx1YvVmrne2KlbQX/RqK5izMbKwrKI2/9GBUQEC+TwyoAmrR
+         N2wtrR+m6onpIGxT2QtaEDpukz4cU17UU+U1X9Ivi52JeUtHTZB5Lc4J9X9frdOJMXyX
+         SKsMajYx8j9wzplr07W6NmU4sRkPyw6UZEmzIyefPpHRIrZDAuZu1LT+rbn4/6RV+1mP
+         ylpXf38934eS1J1RBAz+dQMKMojXl3/ST1wkHwcczOgTLHx5ISJdAIdEmNjRSTYEfTED
+         U9Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740183182; x=1740787982;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GsufKr0NGP3tYvsFVv0EO/2yZiZEnUNT84I1RxYAoyM=;
+        b=Ojp5DXKxj5bPgGlKnsoGQHxxSzO414w34/PINwnj4p8VCOfAbKIy96eUWK4Vw7gNwk
+         KD2icTQS7HiE8UnqSURylp6vgeCOQeZ7NCz7eQEGQIkUlyMjSlBYE25WSwyvzke7ekd+
+         7lD62tgIexN3axFzTcgD1kVJt26VTN5vQj/ESUhrhhJWfgKD9WooPDG8o9LO/psLKYuC
+         nkNRpjYjJxRZKEfLlJFUeDEDTHF85Fmck76MBnz8nO9MCAECc65hQTFT6IBqmesJmBPe
+         C+Z0wQ4F3k5dCtPKNQQehi5L7Wjcef75iBmA9Q9fYHsd7491/My7wF0/zc3ydYQ5fPcj
+         VB3A==
+X-Gm-Message-State: AOJu0Yyy6ZXr9BsW8i1ajd5CYRDkcUKwRdJGD6htxmWxo70EtfXTD009
+	FXFEaI2NXB/4G9n718RCIZRdI7pS3UmDxysfCTkF9IqvaaTDfmc9q591MLEHzt3WG5HRbeDG294
+	7
+X-Gm-Gg: ASbGnctDn1L0LC7tsEyEzcgWGSJS1hp4RB2nl/4Kx1VrE7FaHAqjWLsm69YuXucdDOP
+	o0bBviSwtaH/i03A0cf82mjXvp7zatvOnKVmORB7p+aiMIlE32GNd6pXFSSEgWNZkfGQyh/rtKf
+	tTjgCGntj/OMoEyorbKENGb4HnxzE2c0nVpmKxB3nhFLNvdB3Vl1ki8AgUv9enDvuIJrzuHzvIs
+	NG8ok1VcdDwaogFpOjxb8SRzRoJKHIE9LqzEYyq9Xk7zVxMYPX04c6CSvFYqVSinmiMbU+6amaD
+	LwvLj11XBS0e5tXrng==
+X-Google-Smtp-Source: AGHT+IEUUpAfwedrwX8Z7yqaUa0AGKI0ihxBNgw80Nems7KCQtXMFtFcx2HmpwlG19S5/FlE2ikssQ==
+X-Received: by 2002:a05:6e02:3dc4:b0:3cf:b2ca:39b7 with SMTP id e9e14a558f8ab-3d2cacb0022mr52274585ab.3.1740183182418;
+        Fri, 21 Feb 2025 16:13:02 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d2bc19dbe3sm13388665ab.9.2025.02.21.16.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 16:13:01 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20250219205328.28462-2-thorsten.blum@linux.dev>
+References: <20250219205328.28462-2-thorsten.blum@linux.dev>
+Subject: Re: [PATCH] block: Remove commented out code
+Message-Id: <174018318140.1822587.9741571517838734087.b4-ty@kernel.dk>
+Date: Fri, 21 Feb 2025 17:13:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-94c79
 
-From: Hannes Reinecke <hare@kernel.org>
 
-For large blocksizes the number of block bits is larger than PAGE_SHIFT,
-so calculate the sector number from the byte offset instead. This is
-required to enable large folios with buffer-heads.
+On Wed, 19 Feb 2025 21:53:25 +0100, Thorsten Blum wrote:
+> Remove commented out code.
+> 
+> 
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Signed-off-by: Hannes Reinecke <hare@kernel.org>
----
- fs/mpage.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Applied, thanks!
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index 82aecf372743..a3c82206977f 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -181,7 +181,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	if (folio_buffers(folio))
- 		goto confused;
- 
--	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
-+	block_in_file = folio_pos(folio) >> blkbits;
- 	last_block = block_in_file + args->nr_pages * blocks_per_page;
- 	last_block_in_file = (i_size_read(inode) + blocksize - 1) >> blkbits;
- 	if (last_block > last_block_in_file)
-@@ -527,7 +527,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 	 * The page has no buffers: map it to disk
- 	 */
- 	BUG_ON(!folio_test_uptodate(folio));
--	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
-+	block_in_file = folio_pos(folio) >> blkbits;
- 	/*
- 	 * Whole page beyond EOF? Skip allocating blocks to avoid leaking
- 	 * space.
+[1/1] block: Remove commented out code
+      commit: 8985c4298733a56d38c11948dc3b1dd24f4fcd6b
+
+Best regards,
 -- 
-2.47.2
+Jens Axboe
+
+
 
