@@ -1,81 +1,80 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBCF18B46C
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 07:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA8021D3F2
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 08:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740383052; cv=none; b=BhOCnxmFHP95idjnryzB4kWSnMzGvErYOsr16bQ0JmXiBOpr3WPbH5e8FZ37Iulmln0Zd+TYEpxM9IX9VCKH+shixmfUZVRUN1p3ZQUCUss2d43aCpPyxMdx0BJP1s7ea+o9B6mNyoUSkKEHz1MkDq5cw1E777nhoS65QbA9HbM=
+	t=1740386487; cv=none; b=BucRS6KZbPTwTCm2Ihyywj9k6fhsx1ppRQU8wZ1rkj1Zd5jVlnMA/nTOCSO2jRzsR1duoMsn3BdBYcX0ESR4kD//JPY5Zqyt+S5VOLO+NICb4Agb8+9CMPPeZIFpfOUNbMmwE3gUHDCtfygNifommvE4y4u2PIM72TwiLVGV8OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740383052; c=relaxed/simple;
-	bh=EXipg85uWZvkSImx0/5SzPw6cIZutn+VWVHdenJ6bTM=;
+	s=arc-20240116; t=1740386487; c=relaxed/simple;
+	bh=A+5Y/m2+jiPK5T4teDsilQyQLUtR1KAW34QkIVoImZ8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D4Y+kBVd19JeV0vozSKfD2nOwAThkRMlGNGXOm8Gk5DA6ZVo0dXe7f9teYYvJ//UIOpkMYmvXocpSNKpZGX12Eaf8IQKAOD3XHz53Q9RsAJ2CDdNYEeCuBbiTOz5Bzr3xLhAnGf+F6pJp4/2DbLIl7mnmb6hmVj/lxnCex5Pjsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=m1spmCwf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BabmiIEP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IJxaAq2p; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y8bf96hv; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=KeSrvX6xTSUMAfaw0YaLXFA5Ld7O/2+NqozF1lw0T7kbKuNu6WLyDg8P7PjbvJhHoyw5YePvGkfnuZtFNibjm6kXh58xuHNETX6DwzNGMiviwpPOD31ba6w6xTk5alrDMBuyfnyZfLxB0XEevmOMaSHdirJab/njKZbo0awrO3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=giGYXgLe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tBy7cUIF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=giGYXgLe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tBy7cUIF; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="m1spmCwf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BabmiIEP";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IJxaAq2p";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y8bf96hv"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="giGYXgLe";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tBy7cUIF";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="giGYXgLe";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tBy7cUIF"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CEF7021171;
-	Mon, 24 Feb 2025 07:44:07 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 04AB521179;
+	Mon, 24 Feb 2025 08:41:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740383048; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1740386484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kWXS8JmPOEyuTcSWXxAAIEFmUJk1QrnZ6ccr5EFg9zM=;
-	b=m1spmCwfs7XNK/xA9cFjLwDZe+HsdFMuqEa4pkN+MGehEJZJtSQL6VDdX63dKpyvZYujxa
-	/71gPQLGNnQu/aCbS/qQRWqkE6RqfVmggSLGN/1+AEe2B0fNnf43NN0BvyiTxXiodzCJGH
-	W+VXV1wKV6u0mrntOjKRCJNWaLqYhLY=
+	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
+	b=giGYXgLexQxHmYXG7kHFKbM3ozEojotmUgoV1l/2vzm8XLLRwL/2n1GEaJuNYkZW2kYpK3
+	L1p9n/lcNXxUdNVfpQZzqUi1iojUZbpYtnVXl3XeS0P72PPr9/MLHRfptUmjOSv9C4yger
+	+6WlJe6ykKtddXm0BpAecATNHCVXlTI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740383048;
+	s=susede2_ed25519; t=1740386484;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kWXS8JmPOEyuTcSWXxAAIEFmUJk1QrnZ6ccr5EFg9zM=;
-	b=BabmiIEPgs4ysbQewC3UCd4Qg73P/gx5CbxtTcJVAKosCBrsNjWMvxd847TrEAXh7RILNx
-	8xXUJ0MnaORg7BBA==
+	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
+	b=tBy7cUIFQXZqLTBhAaF0wjVs55OBUckX3XU6AZwsm+H70AzyfEtEcDFvpmRA+Msqq3r6lw
+	rGq1N3uMsaCCftCw==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=IJxaAq2p;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y8bf96hv
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740383047; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1740386484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kWXS8JmPOEyuTcSWXxAAIEFmUJk1QrnZ6ccr5EFg9zM=;
-	b=IJxaAq2pgu8YU+W1MCKZDIrFaob9C67qUn0+dB3KATsoryuI22qTLO6I/yljXStod4Bklu
-	EeteFNsysIVkf0dF6odCBhL30eLW6lAtLUPtsuH6lNWlqnhCDqkbmLwuMd9RrgOGK9lbel
-	1aoubYrcwmgQ1K7ZnYCPZb+dCYaXcPs=
+	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
+	b=giGYXgLexQxHmYXG7kHFKbM3ozEojotmUgoV1l/2vzm8XLLRwL/2n1GEaJuNYkZW2kYpK3
+	L1p9n/lcNXxUdNVfpQZzqUi1iojUZbpYtnVXl3XeS0P72PPr9/MLHRfptUmjOSv9C4yger
+	+6WlJe6ykKtddXm0BpAecATNHCVXlTI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740383047;
+	s=susede2_ed25519; t=1740386484;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kWXS8JmPOEyuTcSWXxAAIEFmUJk1QrnZ6ccr5EFg9zM=;
-	b=y8bf96hvjfIDovcNjOZ82J0TsSB2vrvf6IlI7DQA2xoJ5ZJ++twfO41l0iGYSTjOHgcsxB
-	FFivQo43wz3LB5Bg==
+	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
+	b=tBy7cUIFQXZqLTBhAaF0wjVs55OBUckX3XU6AZwsm+H70AzyfEtEcDFvpmRA+Msqq3r6lw
+	rGq1N3uMsaCCftCw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2426113707;
-	Mon, 24 Feb 2025 07:44:07 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B87D813332;
+	Mon, 24 Feb 2025 08:41:23 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id aQrkBkcjvGf1QwAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 24 Feb 2025 07:44:07 +0000
-Message-ID: <934358f5-ec6b-41b6-ae2c-09e9fb10fbb1@suse.de>
-Date: Mon, 24 Feb 2025 08:44:06 +0100
+	id oZtSK7MwvGfsVQAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 24 Feb 2025 08:41:23 +0000
+Message-ID: <6084e145-0347-4dd5-83c7-2704a846896d@suse.de>
+Date: Mon, 24 Feb 2025 09:41:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,73 +82,97 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/8] fs/mpage: use blocks_per_folio instead of
- blocks_per_page
-To: Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org,
- akpm@linux-foundation.org, willy@infradead.org, dave@stgolabs.net,
- david@fromorbit.com, djwong@kernel.org, kbusch@kernel.org
-Cc: john.g.garry@oracle.com, hch@lst.de, ritesh.list@gmail.com,
- linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
- p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
-References: <20250221223823.1680616-1-mcgrof@kernel.org>
- <20250221223823.1680616-5-mcgrof@kernel.org>
+Subject: Re: [PATCHv2 1/6] blk-sysfs: remove q->sysfs_lock for attributes
+ which don't need it
+To: Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
+ axboe@kernel.dk, gjoyce@ibm.com
+References: <20250218082908.265283-1-nilay@linux.ibm.com>
+ <20250218082908.265283-2-nilay@linux.ibm.com> <20250218084622.GA11405@lst.de>
+ <00742db2-08b3-4582-b741-8c9197ffaced@linux.ibm.com>
+ <cecc5d49-9a54-4285-a0d2-32699cb1f908@linux.ibm.com>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250221223823.1680616-5-mcgrof@kernel.org>
+In-Reply-To: <cecc5d49-9a54-4285-a0d2-32699cb1f908@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CEF7021171
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[oracle.com,lst.de,gmail.com,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -4.30
 X-Spam-Flag: NO
-X-Spam-Level: 
 
-On 2/21/25 23:38, Luis Chamberlain wrote:
-> Convert mpage to folios and adjust accounting for the number of blocks
-> within a folio instead of a single page. This also adjusts the number
-> of pages we should process to be the size of the folio to ensure we
-> always read a full folio.
+On 2/21/25 15:02, Nilay Shroff wrote:
 > 
-> Note that the page cache code already ensures do_mpage_readpage() will
-> work with folios respecting the address space min order, this ensures
-> that so long as folio_size() is used for our requirements mpage will
-> also now be able to process block sizes larger than the page size.
+> Hi Christoph, Ming and others,
 > 
-> Originally-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---by: H
->   fs/mpage.c | 42 +++++++++++++++++++++---------------------
->   1 file changed, 21 insertions(+), 21 deletions(-)
+> On 2/18/25 4:56 PM, Nilay Shroff wrote:
+>>
+>>
+>> On 2/18/25 2:16 PM, Christoph Hellwig wrote:
+>>> On Tue, Feb 18, 2025 at 01:58:54PM +0530, Nilay Shroff wrote:
+>>>> There're few sysfs attributes in block layer which don't really need
+>>>> acquiring q->sysfs_lock while accessing it. The reason being, writing
+>>>> a value to such attributes are either atomic or could be easily
+>>>> protected using WRITE_ONCE()/READ_ONCE(). Moreover, sysfs attributes
+>>>> are inherently protected with sysfs/kernfs internal locking.
+>>>>
+>>>> So this change help segregate all existing sysfs attributes for which
+>>>> we could avoid acquiring q->sysfs_lock. We group all such attributes,
+>>>> which don't require any sorts of locking, using macro QUEUE_RO_ENTRY_
+>>>> NOLOCK() or QUEUE_RW_ENTRY_NOLOCK(). The newly introduced show/store
+>>>> method (show_nolock/store_nolock) is assigned to attributes using these
+>>>> new macros. The show_nolock/store_nolock run without holding q->sysfs_
+>>>> lock.
+>>>
+>>> Can you add the analys why they don't need sysfs_lock to this commit
+>>> message please?
+>> Sure will do it in next patchset.
+>>>
+>>> With that:
+>>>
+>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>>
+>>
+> I think we discussed about all attributes which don't require locking,
+> however there's one which I was looking at "nr_zones" which we haven't
+> discussed. This is read-only attribute and currently protected with
+> q->sysfs_lock.
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Write to this attribute (nr_zones) mostly happens in the driver probe
+> method (except nvme) before disk is added and outside of q->sysfs_lock
+> or any other lock. But in case of nvme it could be updated from disk
+> scan.
+> nvme_validate_ns
+>    -> nvme_update_ns_info_block
+>      -> blk_revalidate_disk_zones
+>        -> disk_update_zone_resources
+> 
+> The update to disk->nr_zones is done outside of queue freeze or any
+> other lock today. So do you agree if we could use READ_ONCE/WRITE_ONCE
+> to protect this attribute and remove q->sysfs_lock? I think, it'd be
+> great if we could agree upon this one before I send the next patchset.
+> 
+READ_ONCE should be fine here. 'nr_zones' is unlikely to change, and
+if that is updated we've done a full disk revalidation including a read
+of all zones. So not a critical operation, and nothing which needs to be
+protected.
 
 Cheers,
 
