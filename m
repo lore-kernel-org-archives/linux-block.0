@@ -1,189 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D73624A070;
-	Mon, 24 Feb 2025 09:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A04255E21
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 10:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740390913; cv=none; b=D7vtUUDqSyRSw2Q2lTSncOJK02QyNBDoBAYuAaVLaMAbL9bi904VyQGcEOKQkuCGoZuO8mU86OG5hXJP6g0FWhUuDrRuHvSvXscMLopEcPzfhRSHOOhSDbenY+vq18v9IUwGByQoFt6cLZZeM3LmqW3prf4wn4NlEr2GVtW1jgo=
+	t=1740391203; cv=none; b=mGqzpIxSLfhUibvP7pm9v41gr7aSOAbGrepEcnpgQWGYO3OhQ4xpvpqpLTNnPRu8lJdohURWVAsEQjiSoL5C9D65mfuVP92IOq1FnzEWxjCLxUm2HQ8XWNZ7mHl2AXTA4AeMYiHyr/xSOVWSsrorQ/yAEARDMg/zx/o/p5lr4/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740390913; c=relaxed/simple;
-	bh=byIhktOyiyjAT4tz5qNe5uSyIyc4GSH4aaX66A2Opd8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GglxrGZ2cV005dA/aFvVritQqdqSeVfJXlEDwTihbTwBFxC2wuPH8VLaAmxMD00FR6OBMFjE4mz1ojf5JLnJd4nJ2UpFnDkKCECr47SCGZYBfGd4FwtGGGX1yVV2miEtHz2JJY9lJEd10ew1Fe9/S0MYr4c6ZKVp1wYKGEmgbCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5Q0fC/g; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740391203; c=relaxed/simple;
+	bh=gm+yihZCzgde+pWWjtds6/mCNUCGRa0PDZ1471s986I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q/czyRFZCgmJEC3LT2BOBb0NgF50yKaCz2SvhagVwfRPHl5vdd2P6rPHefEe5PrZiGzxTefaCDDArFJXdsL4URybvzOHQxBWoEtw6UX7Aus3HVCls+QZ6xTakd8Y+0v/+7lntC/rhvLP/EmDctNwECCOR1R6V1IbZeoGNNQx9yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CnXCsxc8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5Q0fC/g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80D3CC4CEE6;
-	Mon, 24 Feb 2025 09:55:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740390912;
-	bh=byIhktOyiyjAT4tz5qNe5uSyIyc4GSH4aaX66A2Opd8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S5Q0fC/gA7kzvRu6w33dKn2qtGQ4PIrfEeniWR6yVVJrhZno+oR71sMIy1kLJ5zqf
-	 /nJ4QoO73WIjis/PRRRwbyPqhJ0gLn6dN512THTJipWnmMYhs8xGJU0OAnVW9CaRau
-	 wU0t2rAMbOURzOgMojHHQiBPqROIUvGnZZLcXeUW4jmEfS3T4Is19ZfQ++sJprqIyk
-	 lH1l+aYD62ROqxOF6H0bw3DzeOFKMgsRi/6PMdQi6OnGYcO922UA63Ap2nah09nbvn
-	 Wzeisb1uP2IDGXpkJpCdk5c7TWmISfI6oV8b6QQZbiw0D2hVCrOHBQB6iytZOo6nBa
-	 FdPKh46w0A/pA==
-Date: Mon, 24 Feb 2025 20:25:08 +1030
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH 1/8][next] block: blk_types.h: Use struct_group_tagged() in
- flex struct bio
-Message-ID: <ccf673b997e771430b7570fb8a6dfc11d07a2bde.1739957534.git.gustavoars@kernel.org>
-References: <cover.1739957534.git.gustavoars@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CnXCsxc8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740391200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6L+Qyy0sQBzRDx6vB86O556jHBJgVJTblXX5aPNNvqE=;
+	b=CnXCsxc8h9jhQDhFg9UgyQ9Xmg2jGNtZzJh3mBTSg9HqH35zasC4QXBxObmtpbnpvCSTCH
+	+kZGiPdolm/enCu0RyAVTxCKGTqVY9pETpNYbwvCRAR9TMlmUsTSxzgUX/K5cazgIkCl94
+	UDWOGLJdnf3j7OMksHSoHon02cxPvg4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-549-VBz1cQ5gPiyThw5xFXiRMA-1; Mon,
+ 24 Feb 2025 04:59:54 -0500
+X-MC-Unique: VBz1cQ5gPiyThw5xFXiRMA-1
+X-Mimecast-MFC-AGG-ID: VBz1cQ5gPiyThw5xFXiRMA_1740391194
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF0001800570;
+	Mon, 24 Feb 2025 09:59:53 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.33])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5827D1800366;
+	Mon, 24 Feb 2025 09:59:51 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>
+Subject: [PATCH] tests/throtl: add a new test 006
+Date: Mon, 24 Feb 2025 17:59:45 +0800
+Message-ID: <20250224095945.1994997-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1739957534.git.gustavoars@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Use the `struct_group_tagged()` helper to create a new tagged
-`struct bio_hdr`. This structure groups together all the members of
-the flexible `struct bio` except the flexible array `bi_inline_vecs`.
-As a result, the array is effectively separated from the rest of the
-members without modifying the memory layout of the flexible structure.
+Add test for covering prioritized meta IO when throttling, regression
+test for commit 29390bb5661d ("blk-throttle: support prioritized processing
+of metadata").
 
-This new tagged struct will be used to fix problematic declarations
-of middle-flex-arrays in composite structs, like these[1][2][3], for
-instance.
-
-[1] https://git.kernel.org/linus/a7e8997ae18c42d3
-[2] https://git.kernel.org/linus/c1ddb29709e675ea
-[3] https://git.kernel.org/linus/57be3d3562ca4aa6
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/blk_types.h | 84 ++++++++++++++++++++-------------------
- 1 file changed, 44 insertions(+), 40 deletions(-)
+ tests/throtl/006     | 58 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/006.out |  4 +++
+ tests/throtl/rc      | 19 +++++++++++++++
+ 3 files changed, 81 insertions(+)
+ create mode 100755 tests/throtl/006
+ create mode 100644 tests/throtl/006.out
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index dce7615c35e7..9182750457a8 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -212,62 +212,65 @@ typedef unsigned int blk_qc_t;
-  * stacking drivers)
-  */
- struct bio {
--	struct bio		*bi_next;	/* request queue link */
--	struct block_device	*bi_bdev;
--	blk_opf_t		bi_opf;		/* bottom bits REQ_OP, top bits
--						 * req_flags.
--						 */
--	unsigned short		bi_flags;	/* BIO_* below */
--	unsigned short		bi_ioprio;
--	enum rw_hint		bi_write_hint;
--	blk_status_t		bi_status;
--	atomic_t		__bi_remaining;
--
--	struct bvec_iter	bi_iter;
--
--	union {
--		/* for polled bios: */
--		blk_qc_t		bi_cookie;
--		/* for plugged zoned writes only: */
--		unsigned int		__bi_nr_segments;
--	};
--	bio_end_io_t		*bi_end_io;
--	void			*bi_private;
-+	/* New members MUST be added within the struct_group() macro below. */
-+	struct_group_tagged(bio_hdr, __hdr,
-+		struct bio		*bi_next;	/* request queue link */
-+		struct block_device	*bi_bdev;
-+		blk_opf_t		bi_opf;		/* bottom bits REQ_OP, top bits
-+							 * req_flags.
-+							 */
-+		unsigned short		bi_flags;	/* BIO_* below */
-+		unsigned short		bi_ioprio;
-+		enum rw_hint		bi_write_hint;
-+		blk_status_t		bi_status;
-+		atomic_t		__bi_remaining;
+diff --git a/tests/throtl/006 b/tests/throtl/006
+new file mode 100755
+index 0000000..4baadaf
+--- /dev/null
++++ b/tests/throtl/006
+@@ -0,0 +1,58 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Ming Lei
++#
++# Test prioritized meta IO when IO throttling, regression test for
++# commit 29390bb5661d ("blk-throttle: support prioritized processing of metadata")
 +
-+		struct bvec_iter	bi_iter;
++. tests/throtl/rc
 +
-+		union {
-+			/* for polled bios: */
-+			blk_qc_t		bi_cookie;
-+			/* for plugged zoned writes only: */
-+			unsigned int		__bi_nr_segments;
-+		};
-+		bio_end_io_t		*bi_end_io;
-+		void			*bi_private;
- #ifdef CONFIG_BLK_CGROUP
--	/*
--	 * Represents the association of the css and request_queue for the bio.
--	 * If a bio goes direct to device, it will not have a blkg as it will
--	 * not have a request_queue associated with it.  The reference is put
--	 * on release of the bio.
--	 */
--	struct blkcg_gq		*bi_blkg;
--	struct bio_issue	bi_issue;
-+		/*
-+		 * Represents the association of the css and request_queue for the bio.
-+		 * If a bio goes direct to device, it will not have a blkg as it will
-+		 * not have a request_queue associated with it.  The reference is put
-+		 * on release of the bio.
-+		 */
-+		struct blkcg_gq		*bi_blkg;
-+		struct bio_issue	bi_issue;
- #ifdef CONFIG_BLK_CGROUP_IOCOST
--	u64			bi_iocost_cost;
-+		u64			bi_iocost_cost;
- #endif
- #endif
++DESCRIPTION="test if meta IO has higher priority than data IO"
++QUICK=1
++
++requires() {
++	_have_program mkfs.ext4
++}
++
++test_meta_io() {
++	local path="$1"
++	local start_time
++	local end_time
++	local elapsed
++
++	start_time=$(date +%s.%N)
++	mkdir "${path}"/xxx
++	touch "${path}"/xxx/1
++	sync "${path}"/xxx
++
++	end_time=$(date +%s.%N)
++	elapsed=$(echo "$end_time - $start_time" | bc)
++	printf "%.0f\n" "$elapsed"
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _set_up_throtl memory_backed=1; then
++		return 1;
++	fi
++
++	mkdir -p "${TMPDIR}/mnt"
++	mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 -F "/dev/${THROTL_DEV}" >> "$FULL" 2>&1
++	mount "/dev/${THROTL_DEV}" "${TMPDIR}/mnt" >> "$FULL" 2>&1
++
++	_throtl_set_limits wbps=$((1024 * 1024))
++	{
++		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
++		_throtl_issue_fs_io  "${TMPDIR}/mnt/test.img" write 64K 64 &
++		sleep 2
++		test_meta_io "${TMPDIR}/mnt"
++		wait
++	} &
++	wait $!
++
++	umount "${TMPDIR}/mnt" || return $?
++	_throtl_remove_limits
++	_clean_up_throtl
++	echo "Test complete"
++}
+diff --git a/tests/throtl/006.out b/tests/throtl/006.out
+new file mode 100644
+index 0000000..8c3d176
+--- /dev/null
++++ b/tests/throtl/006.out
+@@ -0,0 +1,4 @@
++Running throtl/006
++0
++4
++Test complete
+diff --git a/tests/throtl/rc b/tests/throtl/rc
+index df54cb9..327084b 100644
+--- a/tests/throtl/rc
++++ b/tests/throtl/rc
+@@ -75,6 +75,25 @@ _throtl_get_max_io_size() {
+ 	cat "/sys/block/$THROTL_DEV/queue/max_sectors_kb"
+ }
  
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
--	struct bio_crypt_ctx	*bi_crypt_context;
-+		struct bio_crypt_ctx	*bi_crypt_context;
- #endif
- 
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
--	struct bio_integrity_payload *bi_integrity; /* data integrity */
-+		struct bio_integrity_payload *bi_integrity; /* data integrity */
- #endif
- 
--	unsigned short		bi_vcnt;	/* how many bio_vec's */
-+		unsigned short		bi_vcnt;	/* how many bio_vec's */
- 
--	/*
--	 * Everything starting with bi_max_vecs will be preserved by bio_reset()
--	 */
-+		/*
-+		 * Everything starting with bi_max_vecs will be preserved by bio_reset()
-+		 */
- 
--	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
-+		unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
- 
--	atomic_t		__bi_cnt;	/* pin count */
-+		atomic_t		__bi_cnt;	/* pin count */
- 
--	struct bio_vec		*bi_io_vec;	/* the actual vec list */
-+		struct bio_vec		*bi_io_vec;	/* the actual vec list */
- 
--	struct bio_set		*bi_pool;
-+		struct bio_set		*bi_pool;
-+	);
- 
- 	/*
- 	 * We can inline a number of vecs at the end of the bio, to avoid
-@@ -276,6 +279,8 @@ struct bio {
- 	 */
- 	struct bio_vec		bi_inline_vecs[];
- };
-+static_assert(offsetof(struct bio, bi_inline_vecs) == sizeof(struct bio_hdr),
-+	      "struct member likely outside of struct_group_tagged()");
- 
- #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
- #define BIO_MAX_SECTORS		(UINT_MAX >> SECTOR_SHIFT)
++_throtl_issue_fs_io() {
++	local path=$1
++	local start_time
++	local end_time
++	local elapsed
++
++	start_time=$(date +%s.%N)
++
++	if [ "$2" == "read" ]; then
++		dd if="${path}" of=/dev/null bs="$3" count="$4" iflag=direct status=none
++	elif [ "$2" == "write" ]; then
++		dd of="${path}" if=/dev/zero bs="$3" count="$4" oflag=direct conv=fdatasync status=none
++	fi
++
++	end_time=$(date +%s.%N)
++	elapsed=$(echo "$end_time - $start_time" | bc)
++	printf "%.0f\n" "$elapsed"
++}
++
+ _throtl_issue_io() {
+ 	local start_time
+ 	local end_time
 -- 
-2.43.0
+2.47.1
 
