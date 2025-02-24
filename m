@@ -1,184 +1,175 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA8021D3F2
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 08:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4121223C8C5
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 08:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740386487; cv=none; b=BucRS6KZbPTwTCm2Ihyywj9k6fhsx1ppRQU8wZ1rkj1Zd5jVlnMA/nTOCSO2jRzsR1duoMsn3BdBYcX0ESR4kD//JPY5Zqyt+S5VOLO+NICb4Agb8+9CMPPeZIFpfOUNbMmwE3gUHDCtfygNifommvE4y4u2PIM72TwiLVGV8OM=
+	t=1740387413; cv=none; b=h4hDJZV9wAiKVfX3JMMDGEzDyPhDmOfTGdr8duM9fhQrLoxjo7EUMwuaW+dN0ABlwLatEpis6VvZzZofTVxkA5Zc7fxg52bEHXk2RKpHUsLVBipoWzME9zQwSrnlSS+p0JD963m6fx9CgImqR5OHGv306Fv+PpxOYbVlge7w5m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740386487; c=relaxed/simple;
-	bh=A+5Y/m2+jiPK5T4teDsilQyQLUtR1KAW34QkIVoImZ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KeSrvX6xTSUMAfaw0YaLXFA5Ld7O/2+NqozF1lw0T7kbKuNu6WLyDg8P7PjbvJhHoyw5YePvGkfnuZtFNibjm6kXh58xuHNETX6DwzNGMiviwpPOD31ba6w6xTk5alrDMBuyfnyZfLxB0XEevmOMaSHdirJab/njKZbo0awrO3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=giGYXgLe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tBy7cUIF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=giGYXgLe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tBy7cUIF; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1740387413; c=relaxed/simple;
+	bh=xq0dUbIsObricEpN11IBCCHbKywJQ6xYZeXU20Lj/+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=etfwPxWSKL/tKpiog6C3u4jaA80EeWFtFLlZ4VTRDg+FomIOZE4wCxdUNuVLwW0z40ULYCEEhZdHL5t0F8N6mPsqUiAs00hKGxWa/qpM9hcMTOG04lnx1i1zEWlRRSUrf0i/NuBQWdTiuUW0F+yiJcqbYakedYG5EOg0X8YOWT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bZxFmtOu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="giGYXgLe";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tBy7cUIF";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="giGYXgLe";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tBy7cUIF"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZxFmtOu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740387410;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uIqgti8JhQLr3gDPSlEgz2+yjZL8zWhP7BiX1sRX38w=;
+	b=bZxFmtOu9Wfb9xf0Bk3+qFCi8MichUaEIfakG2TfibpKHCJmG4dYhdR/n+N8IuAR/jDm9z
+	c0QS21SMu37XegZTT4oif4ltHaSzw0VjHcjN+yYiPTnoDFD/338Yq37Okph8ebVM4T6q7m
+	Pinr+nN5KH8PWCbvDxfJuGA2VQqKePw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-201-OwCJXigTMgC20E-ONEoOvA-1; Mon,
+ 24 Feb 2025 03:56:48 -0500
+X-MC-Unique: OwCJXigTMgC20E-ONEoOvA-1
+X-Mimecast-MFC-AGG-ID: OwCJXigTMgC20E-ONEoOvA_1740387407
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 04AB521179;
-	Mon, 24 Feb 2025 08:41:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740386484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
-	b=giGYXgLexQxHmYXG7kHFKbM3ozEojotmUgoV1l/2vzm8XLLRwL/2n1GEaJuNYkZW2kYpK3
-	L1p9n/lcNXxUdNVfpQZzqUi1iojUZbpYtnVXl3XeS0P72PPr9/MLHRfptUmjOSv9C4yger
-	+6WlJe6ykKtddXm0BpAecATNHCVXlTI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740386484;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
-	b=tBy7cUIFQXZqLTBhAaF0wjVs55OBUckX3XU6AZwsm+H70AzyfEtEcDFvpmRA+Msqq3r6lw
-	rGq1N3uMsaCCftCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740386484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
-	b=giGYXgLexQxHmYXG7kHFKbM3ozEojotmUgoV1l/2vzm8XLLRwL/2n1GEaJuNYkZW2kYpK3
-	L1p9n/lcNXxUdNVfpQZzqUi1iojUZbpYtnVXl3XeS0P72PPr9/MLHRfptUmjOSv9C4yger
-	+6WlJe6ykKtddXm0BpAecATNHCVXlTI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740386484;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9etipGH8eNuomhBm5+BI8+sTlj+1x/z7gaT5JIUby1c=;
-	b=tBy7cUIFQXZqLTBhAaF0wjVs55OBUckX3XU6AZwsm+H70AzyfEtEcDFvpmRA+Msqq3r6lw
-	rGq1N3uMsaCCftCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B87D813332;
-	Mon, 24 Feb 2025 08:41:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oZtSK7MwvGfsVQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 24 Feb 2025 08:41:23 +0000
-Message-ID: <6084e145-0347-4dd5-83c7-2704a846896d@suse.de>
-Date: Mon, 24 Feb 2025 09:41:23 +0100
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 31E171800871;
+	Mon, 24 Feb 2025 08:56:46 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.33])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D38351800358;
+	Mon, 24 Feb 2025 08:56:37 +0000 (UTC)
+Date: Mon, 24 Feb 2025 16:56:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 2/2] blk-throttle: fix off-by-one jiffies wait_time
+Message-ID: <Z7w0P8ImJiZhRsPD@fedora>
+References: <20250222092823.210318-1-yukuai1@huaweicloud.com>
+ <20250222092823.210318-3-yukuai1@huaweicloud.com>
+ <Z7nAJSKGANoC0Glb@fedora>
+ <f2f54206-b5c0-7486-d607-337d29e9c145@huaweicloud.com>
+ <Z7vnTyk6Y6X4JWQB@fedora>
+ <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 1/6] blk-sysfs: remove q->sysfs_lock for attributes
- which don't need it
-To: Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
- axboe@kernel.dk, gjoyce@ibm.com
-References: <20250218082908.265283-1-nilay@linux.ibm.com>
- <20250218082908.265283-2-nilay@linux.ibm.com> <20250218084622.GA11405@lst.de>
- <00742db2-08b3-4582-b741-8c9197ffaced@linux.ibm.com>
- <cecc5d49-9a54-4285-a0d2-32699cb1f908@linux.ibm.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <cecc5d49-9a54-4285-a0d2-32699cb1f908@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_DN_SOME(0.00)[]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+In-Reply-To: <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 2/21/25 15:02, Nilay Shroff wrote:
+On Mon, Feb 24, 2025 at 03:03:18PM +0800, Yu Kuai wrote:
+> Hi, Ming!
 > 
-> Hi Christoph, Ming and others,
+> 在 2025/02/24 11:28, Ming Lei 写道:
+> > throtl_trim_slice() returns immediately if throtl_slice_used()
+> > is true.
+> > 
+> > And throtl_slice_used() checks jiffies in [start, end] via time_in_range(),
+> > so if `start <= jiffies <= end', it still returns false.
 > 
-> On 2/18/25 4:56 PM, Nilay Shroff wrote:
->>
->>
->> On 2/18/25 2:16 PM, Christoph Hellwig wrote:
->>> On Tue, Feb 18, 2025 at 01:58:54PM +0530, Nilay Shroff wrote:
->>>> There're few sysfs attributes in block layer which don't really need
->>>> acquiring q->sysfs_lock while accessing it. The reason being, writing
->>>> a value to such attributes are either atomic or could be easily
->>>> protected using WRITE_ONCE()/READ_ONCE(). Moreover, sysfs attributes
->>>> are inherently protected with sysfs/kernfs internal locking.
->>>>
->>>> So this change help segregate all existing sysfs attributes for which
->>>> we could avoid acquiring q->sysfs_lock. We group all such attributes,
->>>> which don't require any sorts of locking, using macro QUEUE_RO_ENTRY_
->>>> NOLOCK() or QUEUE_RW_ENTRY_NOLOCK(). The newly introduced show/store
->>>> method (show_nolock/store_nolock) is assigned to attributes using these
->>>> new macros. The show_nolock/store_nolock run without holding q->sysfs_
->>>> lock.
->>>
->>> Can you add the analys why they don't need sysfs_lock to this commit
->>> message please?
->> Sure will do it in next patchset.
->>>
->>> With that:
->>>
->>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>
->>
-> I think we discussed about all attributes which don't require locking,
-> however there's one which I was looking at "nr_zones" which we haven't
-> discussed. This is read-only attribute and currently protected with
-> q->sysfs_lock.
+> Yes, I misread the code, by thinking throtl_slice_used() will return
+> true if the slice is still used. :(
 > 
-> Write to this attribute (nr_zones) mostly happens in the driver probe
-> method (except nvme) before disk is added and outside of q->sysfs_lock
-> or any other lock. But in case of nvme it could be updated from disk
-> scan.
-> nvme_validate_ns
->    -> nvme_update_ns_info_block
->      -> blk_revalidate_disk_zones
->        -> disk_update_zone_resources
 > 
-> The update to disk->nr_zones is done outside of queue freeze or any
-> other lock today. So do you agree if we could use READ_ONCE/WRITE_ONCE
-> to protect this attribute and remove q->sysfs_lock? I think, it'd be
-> great if we could agree upon this one before I send the next patchset.
-> 
-READ_ONCE should be fine here. 'nr_zones' is unlikely to change, and
-if that is updated we've done a full disk revalidation including a read
-of all zones. So not a critical operation, and nothing which needs to be
-protected.
+> > > BTW, throtl_trim_slice() looks like problematic:
+> > > 
+> > > -       if (bytes_trim <= 0 && io_trim <= 0)
+> > > +       if (bytes_trim <= 0 || io_trim <= 0 ||
+> > > +           tg->bytes_disp[rw] < bytes_trim || tg->io_disp[rw] < io_trim)
+> > >                  return;
+> > That is exactly what my patch is doing, just taking deviation and
+> > timeout into account, also U64_MAX limit has to be excluded.
+> Yes, perhaps you can add some comments in the last two conditions of
+> your patch.
 
-Cheers,
+Yes, we need to add comment on the check, how about the following words?
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+```
+
+If actually rate doesn't match with expected rate, do not trim slice
+otherwise the present rate control info is lost, we don't have chance
+to compensate it in the following period of this slice any more.
+
+Add one deviation threshold since bio size is usually not divisible by
+present rate, and bio dispatch should be done or nothing
+
+Also limit max slice size for avoiding to extend the window too big.
+
+```
+
+
+> I think maybe you're concerned about the case IO is
+> throttled by IOs and bytes_disp should really erase extra bytes that
+> does not reach bps_limit.
+> 
+> > 
+> > If you test the patch, it works just fine. My patch controls bytes_exp
+> > <= 1.5 * disp, then throtl/001 can be completed in 1.5sec, and if it is
+> > changed to 1.25 * disp, the test can be completed in 1.25sec.
+> > 
+> > With this fix, why do we have to play the complicated carryover
+> > trick?
+> > 
+> 
+> I understand your code now. carryover_bytes in this case is wrong, as
+> long as new slice is not started, and trim slice doesn't erase extra
+> bytes by mistake, throttle time should be accurate over time because
+> bytes_disp is accurate.
+
+Yes.
+
+More or less wait for handling single bio can just affect instantaneous rate,
+but the algorithm is adaptive so it can adjust the following wait if the
+slice isn't over.
+
+> 
+> And root cause really is throtl_trim_slice().
+> 
+> However, by code review, I think throtl_start_new_slice() should be
+> handled as well, the same as throtl_trim_slice(), if the old bio is
+> dispatched with one more jiffies wait time, issue a new bio in the same
+> jiffies will have the same problem. For example:
+
+throtl_start_new_slice() is called when nothing is queued and the current
+slice is used, so probably it is fine.
+
+throtl_start_new_slice_with_credit() is called when dispatching one
+bio, and it is still called when the current slice is used.
+
+> 
+> Caller do sync IO, with io size: (bps_limit / (HZ / throtl_slice) + 1),
+
+This will cause wait for every single IO.
+
+But once the IO is throttled because of the wait, throtl_start_new_slice()
+won't succeed any more, meantime throtl_trim_slice() will try to fix the
+rate control for the extra 1 jiffies.
+
+So in-tree code with trim fix works just fine if consecutive IOs are
+coming.
+
+> and caller will issue new IO when old IO is done. Then in this case,
+> each IO will start a new slice and wait for throtl_slice + 1 jiffies. I
+> believe this can be fixed as well so that BIOs after the first one will
+> only wait for throtl_silce jiffies.
+
+I guess the above case only exists in theory when you submit new IO
+after the old IO is dispatched immediately. Not sure this case is really
+meaningful because submission period/latency is added/faked by user.
+
+
+Thanks,
+Ming
+
