@@ -1,109 +1,94 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750CF2571AD
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 23:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECC91F941
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 23:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740439106; cv=none; b=H+QFBDteoQQxXVXhwXeSJK+nxtbbEXLX0NZ5BD17dGrRCuZKZf94QIF2ceWO8lGSb1NAZSScO2jfP3J+zGUofpHagF6sVsh6iQCS+G6F8zeCYvh97jI211BABEeQu0NLGt68j1c/BMTGup9VXkpG/w6BttpeeCcjUbAAXjBerOM=
+	t=1740439852; cv=none; b=r/JgTnmz60o2AEKwuO3HCUMqzzceOGcafNa89NnAveioMhhAaoVHDc6nPq4MfiFWIsOkY77L6tdXjJ0FoZmT9cw6SUA9ui+/3oZZGrhqLSjoj0GJkY3bN1s+sNLX0UaWXKQOeAWNRwPmTsJMjjTa/cAq2yNFB+pmMiOIU8SRKQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740439106; c=relaxed/simple;
-	bh=XD9bbo30uut2Rxt8J59fFtONQhxKdq/YUtfTVnvejJU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=A6aL3+nvC1DQknfSPWLyIIGTuVXkoLkVYnTqbnvbdEz92xAIwMDu1Mu6qQUd8PtDktUYX/0QZmnp9J4bPbUu/nH8rGRW97dZC8j9FlbRrTrS8xMTzwEy9JeL035Hc06OA0I/yduvC0LvrChHBvdEWmJ+BMgGE024HkUgOrqPom4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b4+2lPcN; arc=none smtp.client-ip=209.85.166.51
+	s=arc-20240116; t=1740439852; c=relaxed/simple;
+	bh=R/SFmzKMQaClZ6ac3+FS1o2WSMthwJHwexFRGbXqiWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FQG/oUdQxdcB6prpkjAlZv93f+a0AffSMNxmZknivSQwlwoqd/1AFwKIDpGU2/qio+Dq9wy0+GGAQnT6JQ0VS6LWjDrdHt4CIo5bpR6N4mk/bYPoWi2TN6lKdONKpGRuJ9YFwTz0lThkpqXSPO3GIw1QwUmlIu+R5mpjclXRuQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0+OI89Zb; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b4+2lPcN"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-855a5aa9360so368275739f.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 15:18:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0+OI89Zb"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce886a2d5bso43934175ab.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 15:30:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740439102; x=1741043902; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AM0eTbGjAXeGLJUlqCGDKcVkeHfdIvFuvL0ZJQFPvWI=;
-        b=b4+2lPcNXKC/hcW34J//fxPGZFFWzAyWF0kIeAPS6Eq9XaFo+1Rlcoyyi/r/phKSmz
-         HYb6K5VsnAWfZ4xcniVl5p49i85v7opWmTAFqepJLIu7HuIUgrGI4dBG+ASgyKWL8fXu
-         IGUc/AQhrBsxcf8/aUoakJxLkw+8XV+ak1dvzW/r4GKthYI672GAma4t7Fb4zX9BLEEx
-         gxcSFn7IRc/v8dkhV+AXuWICuJ0gUGuWu7pQkJ5O2zD2qJRLzngGfcRdlwHrTf2TbgXH
-         r/mxhpzCa/PJp7GHOz95IZEuxuCkg4b0U5/0m/B7wnAqzETIuDkRxyv5jItAumbmAewt
-         XphA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740439850; x=1741044650; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BlabqSiF+gaIVSAaNLOzEjzZt+feYIrttInKlJG4jQc=;
+        b=0+OI89ZbbGAb3C9EcwlVF3MMRZ1pR9/duTF3eWvS5TpJk+XumotaxIvfQ1mIRxT6L4
+         RC7G6SdBgr+b2ukfMgCNyDsE5/K7CLL0naysH4TfaAL8Xm8pF+K39MlDwkQiRqjlZYpG
+         NLSKsFOgv4YDX32uNCOdRH0hk4dk4Zpkx73sV+HSAB5fEaeV7V+tTGlV6rGdYksiALAI
+         3PizLOB31ncnjDRIeY+buR3OXxGVLRoJAwCgKwzzFA+ZIolggsKAcSO9j3X5eHy33uch
+         9tuz+mWHcPwib93Mu0bScUVx06o5B72FM1MQmOKgfUTeSlZudDzJU8+lHAXIxVCc7/Rb
+         guDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740439102; x=1741043902;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AM0eTbGjAXeGLJUlqCGDKcVkeHfdIvFuvL0ZJQFPvWI=;
-        b=CQNeqhcqsgGLRfLrbHjyCc752jr/1NdmD4TdkP9cldUfCRQC79YLTu8KRdbyzgJ13A
-         pRb1vpvQS5NH+H5s5USS9EhSUl44+UCPvJl27mbKFCiEkHakesypiH/w6gh7P868sfgw
-         +XsuyvK1mjr2RFth0sDTej4Mh44p2h383LzdL0yi5pDIaVPtnLmPDGLJS+hTnDrcC9XZ
-         vHchA/6kAqBflpb3y7moDE/V5k7dBVFEgev2oyFGiLCBZbLhUVSqBMayK/ScLSQwGHTH
-         FFmlnRQ/4cZNMYzfvnUPFhtLOBiC/4/ECP8d4i38hUv0L/ZJbcogLZMgu7ep1u6O+UqW
-         zhCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwoAjYHWJS9um4A3WBQQZCb5M9GeZpLhVbfojKS+ImKjhiwFjocminMd0cGQMDMq2Pa8qdxfwZ7Y55xA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWjG52iPYpxYagjCtkKiPU65TzYPCfylL15ZTRrw7d2Bm/XYBp
-	Cnd54URbYzZYemugLRUyPNDF3oIt71iVkTgFlQSIwy8bBxDsRmjkY11Qb3f5sDdQIox98BDXWJa
-	O
-X-Gm-Gg: ASbGncv3B6TkRX+ByUEmS4UdpbyPQfIMQSJVZU6jSug6nLVqiQg1PiZJSj/AnA/qZUm
-	dRGNiHyxEgX8wqCQ4wMU7exOpB4SfaAxfYzEUquEZXMu6stxxBrnlkRGL9Y9+uJgh2Oj8+3mfzw
-	An5Tju27FhXYRsNv93vJ6OetOfVgUmkKm4gNKCug4JSq1AcyEEF/Kl9d4veCTgiwrjphaXdy9kA
-	qNFOXNrj0NVpQCPg0zqbtWYc75Vy+tohFUMGH27V2GpHUDqgZ1Houan1oTT/Ina74X+BWBxqMeg
-	F5JxkO2OMkk+M3T0+Q==
-X-Google-Smtp-Source: AGHT+IFvFVTGRzgc0KiCRJ1rUY9VBu2Azc23fWqESL9L9lETWIhPDitPQnINL2VSAPa1z9ecrLErxA==
-X-Received: by 2002:a05:6602:3423:b0:855:b3f6:c89f with SMTP id ca18e2360f4ac-856203b287fmr132749339f.10.1740439102420;
-        Mon, 24 Feb 2025 15:18:22 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85620a3073dsm9481139f.24.2025.02.24.15.18.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 15:18:21 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-In-Reply-To: <20250131120120.1315125-1-hch@lst.de>
-References: <20250131120120.1315125-1-hch@lst.de>
-Subject: Re: loop: take the file system minimum dio alignment into account
- v2
-Message-Id: <174043910107.2070348.11146556322408560811.b4-ty@kernel.dk>
-Date: Mon, 24 Feb 2025 16:18:21 -0700
+        d=1e100.net; s=20230601; t=1740439850; x=1741044650;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlabqSiF+gaIVSAaNLOzEjzZt+feYIrttInKlJG4jQc=;
+        b=m7F7eJdLriHn14K1B3UOME1miysrclIsXk/7ak1vgYQoK5ESbrsRrfZmU/LTUROUEB
+         9Q5Myl0Lt6CcJTvbZyrpyky2CygAN8XyTWzUWb77eO1p3u4Wi2Qyp6JObcvLzZtA8BhJ
+         eBoM2A3cE3bE9oSyqxWetAZgQnhzdz7xGmbG942UrObIzx9g6ud/CnKmaC8vl8fRAf7L
+         i0f5FWZ/3JGWDEha3o2pNRTNFT5zkVNGOMzr5f6c/ibdzE33HZldkqfIvB9IIhDQTImy
+         JU3kW8aix2TWXAj8sVh5P/j4Gop3dCP5Q26b+6JiObj1dBmPuKqtfrZ0WhDTaF/3KtVA
+         Dshg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvQRALv/LpCT5+5ccNP2GcTTC4kz4SZkxp1S0Jh955gStre37f+292Utta6O1Rd75DMmCvQt+fohy+uQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHa0ubPhCwfJdpMpoi4xZ3ocZ5lsSNfC6Zd56HKxfL2NYhoG4H
+	+hP99bHFFHE+qEGgJfocU7XFe1MNv1wMc/vv+Opkgexqo2LtxKdReWh0XcdCZbU=
+X-Gm-Gg: ASbGncsbMa1OuXQv1v3sCde8s5bowdScOXK3xNwxq8ffcv5w0DUrpBJRUeTCWkuwW4D
+	SAaiXf9ssiT2X4fsmkwPVTKXcqN6Bowp42EaQ2TWQdL850WFeLp2yndy8rEYtgJ7b9F5GZ8anSN
+	wSMBrEBJ0K41ISdLcZKGMf7GbmuusUkjAwejsopFZusw10uIjBp6xcGuBC5zhTU7oays3XcaMf3
+	CA3w/EFr+gzNUnPFMQlwTOL2jtpA1evc/P5bzsk62NjDpwpkRDgqBGVC3AlAT9pXM8M1KMcy2P2
+	HHa1hr5yCIrZlRFV7c2P24Q=
+X-Google-Smtp-Source: AGHT+IHjAdmF70MFm5stdQrkzlR7rmei8bejitg9as7edXpa/8I6sFYvUuMceshIDQ3INEI+4auImg==
+X-Received: by 2002:a05:6e02:194b:b0:3d0:10a6:99aa with SMTP id e9e14a558f8ab-3d2cae4e70dmr136608695ab.4.1740439849909;
+        Mon, 24 Feb 2025 15:30:49 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f047530b3bsm125641173.132.2025.02.24.15.30.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Feb 2025 15:30:49 -0800 (PST)
+Message-ID: <54284f45-b597-415a-a954-5ab282747704@kernel.dk>
+Date: Mon, 24 Feb 2025 16:30:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv5 02/11] io_uring/nop: reuse req->buf_index
+To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
+ asml.silence@gmail.com, linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc: bernd@bsbernd.com, csander@purestorage.com,
+ Keith Busch <kbusch@kernel.org>
+References: <20250224213116.3509093-1-kbusch@meta.com>
+ <20250224213116.3509093-3-kbusch@meta.com>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <20250224213116.3509093-3-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-94c79
 
-
-On Fri, 31 Jan 2025 13:00:37 +0100, Christoph Hellwig wrote:
-> this series ensures that the loop device blocksize default also works on
-> file systems that require a bigger direct I/O alignment than the logical
-> block size of sb->s_bdev.
+On 2/24/25 2:31 PM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> Changes since v1:
->  - also do the right thing when direct I/O is enabled through loop flag
->    and not by passing in a O_DIRECT FD
->  - minor cleanups to the calling convention of a helper
-> 
-> [...]
+> There is already a field in io_kiocb that can store a registered buffer
+> index, use that instead of stashing the value into struct io_nop.
 
-Applied, thanks!
+Only reason it was done this way is that ->buf_index is initially the
+buffer group ID, and then the buffer ID when a buffer is selected. But I
+_think_ we always restore that and hence we don't need to do this
+anymore, should be checked. Maybe you already did?
 
-[1/4] loop: factor out a loop_assign_backing_file helper
-      commit: d278164832618bf2775c6a89e6434e2633de1eed
-[2/4] loop: set LO_FLAGS_DIRECT_IO in loop_assign_backing_file
-      commit: 984c2ab4b87c0db7c53c3b6a42be95f79f2aae89
-[3/4] loop: check in LO_FLAGS_DIRECT_IO in loop_default_blocksize
-      commit: f6f9e32fe1e454ae8ac0190b2c2bd6074914beec
-[4/4] loop: take the file system minimum dio alignment into account
-      commit: f4774e92aab85d9bb5c76463f220ad7ba535bb1c
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
