@@ -1,53 +1,53 @@
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3B41DE3D1
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 21:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F10E1A072C
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 21:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740432692; cv=none; b=jajjQhcsF36uzZKej9M23JYsiwzT3diU85sBxaQhuzT3wYCTFMSs3hX2ZK7ulYRb0Evj/CnJFqZ+mvoV6hdDuw1nOLTGjuJgnyUt0cRpNvRRMKH/812AZhQHjc3ffsepIE6z4tNx4YNNAOboqFZyFyqX0eW4kqw2efb7wkSxpe8=
+	t=1740432693; cv=none; b=GpB9BlkEyOKSf5opq1oFql8mzk9BCJj3kRQj3txqlzUagRYs06IQaV2DpgL2XwhWbJb2BSBieDB29GHN2ZljOesoznTfiahf6j4W04cjl4Fd+2nHEdpSBV3PBy2dYb1lEu9kBreJC6+ix+OipqED2m5TbIix5hZBCVsIMgOZRcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740432692; c=relaxed/simple;
-	bh=LW1kgTOAVjw7bfyBhK06dkc9l4d8chusojr5bZpVtv0=;
+	s=arc-20240116; t=1740432693; c=relaxed/simple;
+	bh=msnv5ixlJXHgTVk2ZhdjW4xwo3TrRPzTaG5653PlwzY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MNC4LaeBvIz6iz7PlkNc/BFTaQ/iM3WwHLS6tYiaCPTq1pjt6oTbnEGwZ4AepWLHj7Jw8Sh/sptfMZcDegccNmsmtLgvFMtpuAzHzPTQYBsjCf41Fj9gTzIEzJonwZW1f/1toAY4zu+yHDUgdRMPVS1agnTG2HAk1o5i8bLQgO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Gs5by91E; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=spKazIuF+Ij9FwxLvF2bBw8xHdiNdCRkGNKBWz4HzdB79aN7gfERsX90L7tpy0FLim1JSCM97fRIvh8OV5bakhftgTJODBc9ATkjMLvxw4F406Vj5DhNPJYb1fADlninZUkGiIekM91jtsRSNgIKqYQdZzZx//7Jzyo2JY99UrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=dYW5VXvF; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Gs5by91E"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51OFDHRf023683
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="dYW5VXvF"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51OIueGg016585
 	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:31:30 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=NMzl8MMdACNuLkhkecw/0spruZ4BE8hsOxbXOlcyQnI=; b=Gs5by91EjFyD
-	63Hk5sALlN6ESCEtm1RmOScK9sc9DJmWadBD9nYhGNCV3DReKqRoxaDpaD5pT+ck
-	5RnoEFu207Wqt6IKcheEUPybt0HLjn44xYcqjjUd0xCoVjPJDXQ4MEsS661+vTu2
-	gJW9m8qhU7HmgaEg+uoOSZCDWCN0ulUz4NmjOfm3DgZEw3G4IMxB/lWTpSqtQNVD
-	UXVmLrkOlgmWCN9v58e99Mmh/2xNrxZHs6PpX3hh6L1+epACNYHuib7DxOFewVoR
-	TnnD6nszCRaS8dewNZo/ctmnTtqCJR+PaRVCKbtNQ/V9ZxSV6y1UBeRND0z3P0gv
-	uPVl3jyRuQ==
+	 bh=94u2lzh7F9+idaGxxa+athVNXo0yzGVKXssnIpJIMQM=; b=dYW5VXvFv7AB
+	yzRcEyTf1fJZRxrFLxtAJwCEMY7Ix8JKo0fVgI4QIbqewT5UXObqZj53HB3y6E9Q
+	5g8dMziytAFdnO2F3Rh+yoE9m8YSPnQa+ztSdAhOLOcib5S3p7ecLtlbGcQngH6m
+	xTwla11x9wXLsCnc+TMUlqCtyy6jaQkMUmjXzEN5as8H+R6KBjAgLgQnBoSMB6H5
+	EAH+R5nPlBwXwBeKOusbpyFaPwzOrW0EKlMWyEi061jLZR9TGyM4vpKBug2Cn0K0
+	dHqdar0lHdoz7UR9V8rs65ddEhpAZ0VVt4ftuYLjdKS+X6gPkI81Z67yWCTGrIQa
+	Buq/j/NUkQ==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 450tdcufr4-12
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 450xg0s6s4-15
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:31:29 -0800 (PST)
-Received: from twshared29376.33.frc3.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:31:30 -0800 (PST)
+Received: from twshared29376.33.frc3.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.1544.14; Mon, 24 Feb 2025 21:31:16 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 68D4F1868C4EE; Mon, 24 Feb 2025 13:31:17 -0800 (PST)
+	id 99B231868C4F8; Mon, 24 Feb 2025 13:31:17 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <ming.lei@redhat.com>, <asml.silence@gmail.com>, <axboe@kernel.dk>,
         <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
 CC: <bernd@bsbernd.com>, <csander@purestorage.com>,
         Keith Busch
 	<kbusch@kernel.org>
-Subject: [PATCHv5 04/11] io_uring/nvme: pass issue_flags to io_uring_cmd_import_fixed()
-Date: Mon, 24 Feb 2025 13:31:09 -0800
-Message-ID: <20250224213116.3509093-5-kbusch@meta.com>
+Subject: [PATCHv5 09/11] ublk: zc register/unregister bvec
+Date: Mon, 24 Feb 2025 13:31:14 -0800
+Message-ID: <20250224213116.3509093-10-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250224213116.3509093-1-kbusch@meta.com>
 References: <20250224213116.3509093-1-kbusch@meta.com>
@@ -60,115 +60,229 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: CJPAVKR2XB4A3FCm10J-G_XmICNXqWNV
-X-Proofpoint-ORIG-GUID: CJPAVKR2XB4A3FCm10J-G_XmICNXqWNV
+X-Proofpoint-ORIG-GUID: 0N8vi-FiKqVUUImePRO19WhyP6ZihjIs
+X-Proofpoint-GUID: 0N8vi-FiKqVUUImePRO19WhyP6ZihjIs
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-24_10,2025-02-24_02,2024-11-22_01
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+From: Keith Busch <kbusch@kernel.org>
 
-io_uring_cmd_import_fixed() will need to know the io_uring execution
-state in following commits, for now just pass issue_flags into it
-without actually using.
+Provide new operations for the user to request mapping an active request
+to an io uring instance's buf_table. The user has to provide the index
+it wants to install the buffer.
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+A reference count is taken on the request to ensure it can't be
+completed while it is active in a ring's buf_table.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/ioctl.c    | 10 ++++++----
- include/linux/io_uring/cmd.h |  6 ++++--
- io_uring/uring_cmd.c         |  3 ++-
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/block/ublk_drv.c      | 117 +++++++++++++++++++++++-----------
+ include/uapi/linux/ublk_cmd.h |   4 ++
+ 2 files changed, 85 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index e8930146847af..e0876bc9aacde 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -114,7 +114,8 @@ static struct request *nvme_alloc_user_request(struct=
- request_queue *q,
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 529085181f355..a719d873e3882 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -51,6 +51,9 @@
+ /* private ioctl command mirror */
+ #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
 =20
- static int nvme_map_user_request(struct request *req, u64 ubuffer,
- 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
--		struct io_uring_cmd *ioucmd, unsigned int flags)
-+		struct io_uring_cmd *ioucmd, unsigned int flags,
-+		unsigned int iou_issue_flags)
++#define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
++#define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
++
+ /* All UBLK_F_* have to be included into UBLK_F_ALL */
+ #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+ 		| UBLK_F_URING_CMD_COMP_IN_TASK \
+@@ -201,7 +204,7 @@ static inline struct ublksrv_io_desc *ublk_get_iod(st=
+ruct ublk_queue *ubq,
+ 						   int tag);
+ static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
  {
- 	struct request_queue *q =3D req->q;
- 	struct nvme_ns *ns =3D q->queuedata;
-@@ -142,7 +143,8 @@ static int nvme_map_user_request(struct request *req,=
- u64 ubuffer,
- 		if (WARN_ON_ONCE(flags & NVME_IOCTL_VEC))
- 			return -EINVAL;
- 		ret =3D io_uring_cmd_import_fixed(ubuffer, bufflen,
--				rq_data_dir(req), &iter, ioucmd);
-+				rq_data_dir(req), &iter, ioucmd,
-+				iou_issue_flags);
- 		if (ret < 0)
- 			goto out;
- 		ret =3D blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
-@@ -194,7 +196,7 @@ static int nvme_submit_user_cmd(struct request_queue =
-*q,
- 	req->timeout =3D timeout;
- 	if (ubuffer && bufflen) {
- 		ret =3D nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
--				meta_len, NULL, flags);
-+				meta_len, NULL, flags, 0);
- 		if (ret)
- 			return ret;
- 	}
-@@ -514,7 +516,7 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, =
-struct nvme_ns *ns,
- 	if (d.addr && d.data_len) {
- 		ret =3D nvme_map_user_request(req, d.addr,
- 			d.data_len, nvme_to_user_ptr(d.metadata),
--			d.metadata_len, ioucmd, vec);
-+			d.metadata_len, ioucmd, vec, issue_flags);
- 		if (ret)
- 			return ret;
- 	}
-diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-index abd0c8bd950ba..87150dc0a07cf 100644
---- a/include/linux/io_uring/cmd.h
-+++ b/include/linux/io_uring/cmd.h
-@@ -39,7 +39,8 @@ static inline void io_uring_cmd_private_sz_check(size_t=
- cmd_sz)
-=20
- #if defined(CONFIG_IO_URING)
- int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
--			      struct iov_iter *iter, void *ioucmd);
-+			      struct iov_iter *iter, void *ioucmd,
-+			      unsigned int issue_flags);
-=20
- /*
-  * Completes the request, i.e. posts an io_uring CQE and deallocates @io=
-ucmd
-@@ -67,7 +68,8 @@ void io_uring_cmd_issue_blocking(struct io_uring_cmd *i=
-oucmd);
-=20
- #else
- static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len,=
- int rw,
--			      struct iov_iter *iter, void *ioucmd)
-+			      struct iov_iter *iter, void *ioucmd,
-+			      unsigned int issue_flags)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index 14086a2664611..28ed69c40756e 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -257,7 +257,8 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int i=
-ssue_flags)
+-	return ub->dev_info.flags & UBLK_F_USER_COPY;
++	return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COP=
+Y);
  }
 =20
- int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
--			      struct iov_iter *iter, void *ioucmd)
-+			      struct iov_iter *iter, void *ioucmd,
-+			      unsigned int issue_flags)
+ static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
+@@ -581,7 +584,7 @@ static void ublk_apply_params(struct ublk_device *ub)
+=20
+ static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
  {
- 	struct io_kiocb *req =3D cmd_to_io_kiocb(ioucmd);
- 	struct io_rsrc_node *node =3D req->buf_node;
+-	return ubq->flags & UBLK_F_USER_COPY;
++	return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
+ }
+=20
+ static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
+@@ -1747,6 +1750,77 @@ static inline void ublk_prep_cancel(struct io_urin=
+g_cmd *cmd,
+ 	io_uring_cmd_mark_cancelable(cmd, issue_flags);
+ }
+=20
++static inline struct request *__ublk_check_and_get_req(struct ublk_devic=
+e *ub,
++		struct ublk_queue *ubq, int tag, size_t offset)
++{
++	struct request *req;
++
++	if (!ublk_need_req_ref(ubq))
++		return NULL;
++
++	req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
++	if (!req)
++		return NULL;
++
++	if (!ublk_get_req_ref(ubq, req))
++		return NULL;
++
++	if (unlikely(!blk_mq_request_started(req) || req->tag !=3D tag))
++		goto fail_put;
++
++	if (!ublk_rq_has_data(req))
++		goto fail_put;
++
++	if (offset > blk_rq_bytes(req))
++		goto fail_put;
++
++	return req;
++fail_put:
++	ublk_put_req_ref(ubq, req);
++	return NULL;
++}
++
++static void ublk_io_release(void *priv)
++{
++	struct request *rq =3D priv;
++	struct ublk_queue *ubq =3D rq->mq_hctx->driver_data;
++
++	ublk_put_req_ref(ubq, rq);
++}
++
++static int ublk_register_io_buf(struct io_uring_cmd *cmd,
++				struct ublk_queue *ubq, unsigned int tag,
++				const struct ublksrv_io_cmd *ub_cmd,
++				unsigned int issue_flags)
++{
++	struct ublk_device *ub =3D cmd->file->private_data;
++	int index =3D (int)ub_cmd->addr, ret;
++	struct request *req;
++
++	req =3D __ublk_check_and_get_req(ub, ubq, tag, 0);
++	if (!req)
++		return -EINVAL;
++
++	ret =3D io_buffer_register_bvec(cmd, req, ublk_io_release, index,
++				      issue_flags);
++	if (ret) {
++		ublk_put_req_ref(ubq, req);
++		return ret;
++	}
++
++	return 0;
++}
++
++static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
++				  const struct ublksrv_io_cmd *ub_cmd,
++				  unsigned int issue_flags)
++{
++	int index =3D (int)ub_cmd->addr;
++
++	io_buffer_unregister_bvec(cmd, index, issue_flags);
++	return 0;
++}
++
+ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			       unsigned int issue_flags,
+ 			       const struct ublksrv_io_cmd *ub_cmd)
+@@ -1798,6 +1872,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+=20
+ 	ret =3D -EINVAL;
+ 	switch (_IOC_NR(cmd_op)) {
++	case UBLK_IO_REGISTER_IO_BUF:
++		return ublk_register_io_buf(cmd, ubq, tag, ub_cmd, issue_flags);
++	case UBLK_IO_UNREGISTER_IO_BUF:
++		return ublk_unregister_io_buf(cmd, ub_cmd, issue_flags);
+ 	case UBLK_IO_FETCH_REQ:
+ 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
+ 		if (ublk_queue_ready(ubq)) {
+@@ -1872,36 +1950,6 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+ 	return -EIOCBQUEUED;
+ }
+=20
+-static inline struct request *__ublk_check_and_get_req(struct ublk_devic=
+e *ub,
+-		struct ublk_queue *ubq, int tag, size_t offset)
+-{
+-	struct request *req;
+-
+-	if (!ublk_need_req_ref(ubq))
+-		return NULL;
+-
+-	req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+-	if (!req)
+-		return NULL;
+-
+-	if (!ublk_get_req_ref(ubq, req))
+-		return NULL;
+-
+-	if (unlikely(!blk_mq_request_started(req) || req->tag !=3D tag))
+-		goto fail_put;
+-
+-	if (!ublk_rq_has_data(req))
+-		goto fail_put;
+-
+-	if (offset > blk_rq_bytes(req))
+-		goto fail_put;
+-
+-	return req;
+-fail_put:
+-	ublk_put_req_ref(ubq, req);
+-	return NULL;
+-}
+-
+ static inline int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags)
+ {
+@@ -2527,9 +2575,6 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *c=
+md)
+ 		goto out_free_dev_number;
+ 	}
+=20
+-	/* We are not ready to support zero copy */
+-	ub->dev_info.flags &=3D ~UBLK_F_SUPPORT_ZERO_COPY;
+-
+ 	ub->dev_info.nr_hw_queues =3D min_t(unsigned int,
+ 			ub->dev_info.nr_hw_queues, nr_cpu_ids);
+ 	ublk_align_max_io_size(ub);
+@@ -2860,7 +2905,7 @@ static int ublk_ctrl_get_features(struct io_uring_c=
+md *cmd)
+ {
+ 	const struct ublksrv_ctrl_cmd *header =3D io_uring_sqe_cmd(cmd->sqe);
+ 	void __user *argp =3D (void __user *)(unsigned long)header->addr;
+-	u64 features =3D UBLK_F_ALL & ~UBLK_F_SUPPORT_ZERO_COPY;
++	u64 features =3D UBLK_F_ALL;
+=20
+ 	if (header->len !=3D UBLK_FEATURES_LEN || !header->addr)
+ 		return -EINVAL;
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+index a8bc98bb69fce..74246c926b55f 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -94,6 +94,10 @@
+ 	_IOWR('u', UBLK_IO_COMMIT_AND_FETCH_REQ, struct ublksrv_io_cmd)
+ #define	UBLK_U_IO_NEED_GET_DATA		\
+ 	_IOWR('u', UBLK_IO_NEED_GET_DATA, struct ublksrv_io_cmd)
++#define	UBLK_U_IO_REGISTER_IO_BUF	\
++	_IOWR('u', 0x23, struct ublksrv_io_cmd)
++#define	UBLK_U_IO_UNREGISTER_IO_BUF	\
++	_IOWR('u', 0x24, struct ublksrv_io_cmd)
+=20
+ /* only ABORT means that no re-fetch */
+ #define UBLK_IO_RES_OK			0
 --=20
 2.43.5
 
