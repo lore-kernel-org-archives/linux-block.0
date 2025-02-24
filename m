@@ -1,175 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4121223C8C5
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 08:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B0423F439;
+	Mon, 24 Feb 2025 09:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740387413; cv=none; b=h4hDJZV9wAiKVfX3JMMDGEzDyPhDmOfTGdr8duM9fhQrLoxjo7EUMwuaW+dN0ABlwLatEpis6VvZzZofTVxkA5Zc7fxg52bEHXk2RKpHUsLVBipoWzME9zQwSrnlSS+p0JD963m6fx9CgImqR5OHGv306Fv+PpxOYbVlge7w5m8=
+	t=1740390830; cv=none; b=FKo9mgqjY5DPjz/gh96jJuiBMyjiece+/hyoKr3LQZv69WTM64kqLLXsrATFFPGXFTA0tpmBof6z7dHfiaiS1DuZEzlh5++Y0W69UgzHcpukkZ9peNTFEN7giUq6kKlSg3e7AtrGkmQi9x7cfQTdPe2aVe0ni/2nPJhPFmjlIBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740387413; c=relaxed/simple;
-	bh=xq0dUbIsObricEpN11IBCCHbKywJQ6xYZeXU20Lj/+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=etfwPxWSKL/tKpiog6C3u4jaA80EeWFtFLlZ4VTRDg+FomIOZE4wCxdUNuVLwW0z40ULYCEEhZdHL5t0F8N6mPsqUiAs00hKGxWa/qpM9hcMTOG04lnx1i1zEWlRRSUrf0i/NuBQWdTiuUW0F+yiJcqbYakedYG5EOg0X8YOWT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bZxFmtOu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740390830; c=relaxed/simple;
+	bh=g6VMlunQlRDJng03dDx4fAmN66ot/J1KNDpnUBk3Uyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ulWgXpaoEulCWbVBF5Kty8v9E4VqgC7qZ4FSKPfInZenQ9negH3nbeiP1lXQq/1zmdIcBpvrPW8JTieXVHqbZbyElyOI9q1ZHTkFtcEr/8H5qE1jwNEZxE4B3eIdfRrIgFy/RqxlrfrJDCPOnI+VNwzXOJgikTcgeDhL4iq2pHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u0usiYCP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZxFmtOu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740387410;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uIqgti8JhQLr3gDPSlEgz2+yjZL8zWhP7BiX1sRX38w=;
-	b=bZxFmtOu9Wfb9xf0Bk3+qFCi8MichUaEIfakG2TfibpKHCJmG4dYhdR/n+N8IuAR/jDm9z
-	c0QS21SMu37XegZTT4oif4ltHaSzw0VjHcjN+yYiPTnoDFD/338Yq37Okph8ebVM4T6q7m
-	Pinr+nN5KH8PWCbvDxfJuGA2VQqKePw=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-201-OwCJXigTMgC20E-ONEoOvA-1; Mon,
- 24 Feb 2025 03:56:48 -0500
-X-MC-Unique: OwCJXigTMgC20E-ONEoOvA-1
-X-Mimecast-MFC-AGG-ID: OwCJXigTMgC20E-ONEoOvA_1740387407
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 31E171800871;
-	Mon, 24 Feb 2025 08:56:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.33])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D38351800358;
-	Mon, 24 Feb 2025 08:56:37 +0000 (UTC)
-Date: Mon, 24 Feb 2025 16:56:31 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 2/2] blk-throttle: fix off-by-one jiffies wait_time
-Message-ID: <Z7w0P8ImJiZhRsPD@fedora>
-References: <20250222092823.210318-1-yukuai1@huaweicloud.com>
- <20250222092823.210318-3-yukuai1@huaweicloud.com>
- <Z7nAJSKGANoC0Glb@fedora>
- <f2f54206-b5c0-7486-d607-337d29e9c145@huaweicloud.com>
- <Z7vnTyk6Y6X4JWQB@fedora>
- <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u0usiYCP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 349C1C4CED6;
+	Mon, 24 Feb 2025 09:53:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740390829;
+	bh=g6VMlunQlRDJng03dDx4fAmN66ot/J1KNDpnUBk3Uyk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=u0usiYCPpGjJz7W/r+tTDedwSQMO7Lzj2OGrQ7vpI1I6Ni/J58p4fjs01N0vVrCAy
+	 CupqoMmeyJpmyBT33Swem7HP4O4OA6qZfthw2HnsZgFr0H9T56aiYr5z8HSIvhJ3wo
+	 ILS61Ps7NSn2v37GJTsxM5FAS2tS1WmZhYCJYPxRjxaqBATn6A3KKZsis22HoJbvBC
+	 y5bUAgcJHr9xYjQfadxhzbrj9AfhEsQrt1QeJxY+PA7PsZYrl0y2GkNEOsO7eMJumX
+	 eTDcPsCHnH8iIhJ75t4YE7EeEjvUZNPoyVSCrYXZ1Xo9lYedRKjQFhXI8schHBm7m7
+	 B5W68rNG+/KDA==
+Date: Mon, 24 Feb 2025 20:23:38 +1030
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>, Carlos Maiolino <cem@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, Gao Xiang <xiang@kernel.org>,
+	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>, Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, Coly Li <colyli@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-btrfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-bcache@vger.kernel.org
+Subject: [PATCH 0/8][next] Avoid a couple hundred
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <cover.1739957534.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Feb 24, 2025 at 03:03:18PM +0800, Yu Kuai wrote:
-> Hi, Ming!
-> 
-> 在 2025/02/24 11:28, Ming Lei 写道:
-> > throtl_trim_slice() returns immediately if throtl_slice_used()
-> > is true.
-> > 
-> > And throtl_slice_used() checks jiffies in [start, end] via time_in_range(),
-> > so if `start <= jiffies <= end', it still returns false.
-> 
-> Yes, I misread the code, by thinking throtl_slice_used() will return
-> true if the slice is still used. :(
-> 
-> 
-> > > BTW, throtl_trim_slice() looks like problematic:
-> > > 
-> > > -       if (bytes_trim <= 0 && io_trim <= 0)
-> > > +       if (bytes_trim <= 0 || io_trim <= 0 ||
-> > > +           tg->bytes_disp[rw] < bytes_trim || tg->io_disp[rw] < io_trim)
-> > >                  return;
-> > That is exactly what my patch is doing, just taking deviation and
-> > timeout into account, also U64_MAX limit has to be excluded.
-> Yes, perhaps you can add some comments in the last two conditions of
-> your patch.
+This patch series aims to fix a couple hundred -Wflex-array-member-not-at-end
+warnings by creating a new tagged struct `struct bio_hdr` within flexible
+structure `struct bio`.
 
-Yes, we need to add comment on the check, how about the following words?
+This new tagged struct will be used to fix problematic declarations
+of middle-flex-arrays in composite structs, like these[1][2][3], for
+instance.
 
-```
+[1] https://git.kernel.org/linus/a7e8997ae18c42d3
+[2] https://git.kernel.org/linus/c1ddb29709e675ea
+[3] https://git.kernel.org/linus/57be3d3562ca4aa6
 
-If actually rate doesn't match with expected rate, do not trim slice
-otherwise the present rate control info is lost, we don't have chance
-to compensate it in the following period of this slice any more.
+Gustavo A. R. Silva (8):
+  block: blk_types.h: Use struct_group_tagged() in flex struct bio
+  md/raid5-ppl: Avoid -Wflex-array-member-not-at-end warning
+  xfs: Avoid -Wflex-array-member-not-at-end warnings
+  erofs: Avoid -Wflex-array-member-not-at-end warnings
+  btrfs: Avoid -Wflex-array-member-not-at-end warnings
+  nvme: target: Avoid -Wflex-array-member-not-at-end warnings
+  md/raid5: Avoid -Wflex-array-member-not-at-end warnings
+  bcache: Avoid -Wflex-array-member-not-at-end warnings
 
-Add one deviation threshold since bio size is usually not divisible by
-present rate, and bio dispatch should be done or nothing
+ drivers/md/bcache/bcache.h     |  4 +-
+ drivers/md/bcache/journal.c    | 10 ++--
+ drivers/md/bcache/journal.h    |  4 +-
+ drivers/md/bcache/super.c      |  8 ++--
+ drivers/md/raid5-ppl.c         |  8 ++--
+ drivers/md/raid5.c             | 10 ++--
+ drivers/md/raid5.h             |  2 +-
+ drivers/nvme/target/nvmet.h    |  4 +-
+ drivers/nvme/target/passthru.c |  2 +-
+ drivers/nvme/target/zns.c      |  2 +-
+ fs/btrfs/disk-io.c             |  4 +-
+ fs/btrfs/volumes.h             |  2 +-
+ fs/erofs/fileio.c              | 25 ++++++----
+ fs/erofs/fscache.c             | 13 +++---
+ fs/xfs/xfs_log.c               | 15 +++---
+ fs/xfs/xfs_log_priv.h          |  2 +-
+ include/linux/blk_types.h      | 84 ++++++++++++++++++----------------
+ 17 files changed, 107 insertions(+), 92 deletions(-)
 
-Also limit max slice size for avoiding to extend the window too big.
-
-```
-
-
-> I think maybe you're concerned about the case IO is
-> throttled by IOs and bytes_disp should really erase extra bytes that
-> does not reach bps_limit.
-> 
-> > 
-> > If you test the patch, it works just fine. My patch controls bytes_exp
-> > <= 1.5 * disp, then throtl/001 can be completed in 1.5sec, and if it is
-> > changed to 1.25 * disp, the test can be completed in 1.25sec.
-> > 
-> > With this fix, why do we have to play the complicated carryover
-> > trick?
-> > 
-> 
-> I understand your code now. carryover_bytes in this case is wrong, as
-> long as new slice is not started, and trim slice doesn't erase extra
-> bytes by mistake, throttle time should be accurate over time because
-> bytes_disp is accurate.
-
-Yes.
-
-More or less wait for handling single bio can just affect instantaneous rate,
-but the algorithm is adaptive so it can adjust the following wait if the
-slice isn't over.
-
-> 
-> And root cause really is throtl_trim_slice().
-> 
-> However, by code review, I think throtl_start_new_slice() should be
-> handled as well, the same as throtl_trim_slice(), if the old bio is
-> dispatched with one more jiffies wait time, issue a new bio in the same
-> jiffies will have the same problem. For example:
-
-throtl_start_new_slice() is called when nothing is queued and the current
-slice is used, so probably it is fine.
-
-throtl_start_new_slice_with_credit() is called when dispatching one
-bio, and it is still called when the current slice is used.
-
-> 
-> Caller do sync IO, with io size: (bps_limit / (HZ / throtl_slice) + 1),
-
-This will cause wait for every single IO.
-
-But once the IO is throttled because of the wait, throtl_start_new_slice()
-won't succeed any more, meantime throtl_trim_slice() will try to fix the
-rate control for the extra 1 jiffies.
-
-So in-tree code with trim fix works just fine if consecutive IOs are
-coming.
-
-> and caller will issue new IO when old IO is done. Then in this case,
-> each IO will start a new slice and wait for throtl_slice + 1 jiffies. I
-> believe this can be fixed as well so that BIOs after the first one will
-> only wait for throtl_silce jiffies.
-
-I guess the above case only exists in theory when you submit new IO
-after the old IO is dispatched immediately. Not sure this case is really
-meaningful because submission period/latency is added/faked by user.
-
-
-Thanks,
-Ming
+-- 
+2.43.0
 
