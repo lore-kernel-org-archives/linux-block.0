@@ -1,115 +1,204 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26651DF969
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 21:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4261C8621
+	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 21:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740432705; cv=none; b=FQo+aTDlwUeT82mNQh0Afb6CqfKWGUhrwmfM8CKlaff6L2ATs3CkclPE5GDT0H/pRLju3oFcRpKxPtQcVo3mvf7d+3lurlI8u0VCJnNT9wACTb+xpq5wE44gC0i8VQRb5gjurXyoYMfc3AoAvmfvMLuTHzP3MiURAAz+QZ68sn4=
+	t=1740433061; cv=none; b=QQfSDUVASGBEvtjA4El3UvQDyek9GqEh0FiOXwJsgir/UsweZ+hiTZWDZczQis3iamXdD6rQofMLjPP2+OqStEgRB+PMFlaOEBf2llJ9OGhMb+OrY4kB9R4PaNPNiSkb9ttLyQkax5g7iSTJYpf/Z0pmlUuhb8zK3C7RZJHC1c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740432705; c=relaxed/simple;
-	bh=OhH73J9J+vByXQd0nSIiVg8cPPHIHgcXH0YZ6SZvhoI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DCq+HiN7wALluNkrEkXnME/1jbrXmOHZ6JikTC+Gc5+59ER0wefTKWcfgE+x2Xhc20urdgmbMBqbjYT0AEwXnf/7/CQX9Gn9bdXpsTfbgtdaPI1P6k2LFi5EjmlQSxZKoqer3/pvNk2EcPb4lGwN49oWwJKcBbI1JDS5ZU9OWC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=cv774OZn; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1740433061; c=relaxed/simple;
+	bh=WDOBWl1sMkKgUNmWDFSxppjd/IWKtGa4uvrGTm/miu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MOxYvCx4K6SRadHiSehEp9bOLwJ3nJcy7bD0hqhFXq5cIcp667EUpbjl2UrSRb3wmBTZo4aDTFjE/12XNK2rrZApLSm7HCRk8NO092YtzfMTp10/jafLk75Q1IX61eSHuJr8V+dmh9PGs0ZnfntoCMqezW4lDiUJqNT0zahpnPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OJQNXb2d; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="cv774OZn"
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 51OKXrHf017915
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:31:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=z3zE/JpygxHalJZkRBF5AYpcbJa/t5fQiwdoTI91yjM=; b=cv774OZnFZJJ
-	xaT3mzejKLW50qQ1lsvvYwAnJRN0XwtwgzevbrVdil0QRtk7O03rimJqAgVWNl/p
-	Iln3qoVBQGHBJyPNO48EHJJvZ3VwfT6JjfrBp3Fr+p485fIGSx4giXcrvUWRlZEu
-	o85Z1w5rNzyY6yX8PxiuxpUqLTVesNgJ6wiV5MQexfWYlAfFSmPMm2EWdypNVtuB
-	xaOa3XmnLve0Re72ZPq51/OB0XMgYqSWjdiYwI/XsJp89rL5BKW046lg9t6d2T1o
-	MD924ZW6h7+jFDsNpi61X9SUDv0pwf++QS1rg+3n5l9AQi/TBtoUcXinG092IlJ2
-	xuu9DPcPcA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 450ywj8dbc-18
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:31:41 -0800 (PST)
-Received: from twshared11082.06.ash8.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Mon, 24 Feb 2025 21:31:24 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 64C8E1868C4ED; Mon, 24 Feb 2025 13:31:17 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <ming.lei@redhat.com>, <asml.silence@gmail.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
-CC: <bernd@bsbernd.com>, <csander@purestorage.com>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv5 03/11] io_uring/net: reuse req->buf_index for sendzc
-Date: Mon, 24 Feb 2025 13:31:08 -0800
-Message-ID: <20250224213116.3509093-4-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250224213116.3509093-1-kbusch@meta.com>
-References: <20250224213116.3509093-1-kbusch@meta.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJQNXb2d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740433058;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6V2M27vpsQ9gTyks7D6yUY1ng9ahm9dI23s803ex/g=;
+	b=OJQNXb2dA24US3Gn/7ngHbz7WG2bvFiaHP9N4TQklLjIl/YKQW4enGirUoSp1qY+hEsrjz
+	QlRAUSM98S/0w7fxfxp9ICOEXUpWRHF+l3VP09+iQkK76lwOF7/49VSKzIgLrsSfa4vEP5
+	ruLOpB1hOJumm7vVA4RVy0UJ8t66zJU=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-OnG2xsR8PeeEDDNZ9cuf7g-1; Mon, 24 Feb 2025 16:37:36 -0500
+X-MC-Unique: OnG2xsR8PeeEDDNZ9cuf7g-1
+X-Mimecast-MFC-AGG-ID: OnG2xsR8PeeEDDNZ9cuf7g_1740433055
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ab39f65dc10so531540066b.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 13:37:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740433055; x=1741037855;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M6V2M27vpsQ9gTyks7D6yUY1ng9ahm9dI23s803ex/g=;
+        b=rVGHSV6nxHn7ZhjQOWHN15mHpWOZxZpJE0JSf+oPpT5y4dujFF2dXBxHjezDszpJsJ
+         KLdCNTd98gCx+45+GswYOlvD2vl78omf4C+vvLxeIrZnqA4LTzHCGE0XXAkvrjyQgGJJ
+         3Lcw21TJ3VKHijg94wkNl46R9lNpv6IyIkh/XtS4mw9L5shkwDx63mB1aFyNhIPXAZA5
+         lEfePL9V8uINGvpga3cgcjiotoEwozEh3QCHDeLCg2J0susNP57edBEaeTjFYDrK/0D4
+         dbc7bU87KGpoI+eCGhEl5MsrgZ3mJfVxac/1Tl0uE/5VXBqtf1Qt+WOQ0fpTDkAtsgtr
+         sBhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtpp2cRoVXtrt0ZjhrlATcXOZPbxnymmphODyLKjfzXGKPidhD9n9+fTfvFuRKGk3dv2rPMh8kQtJVpQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzspLlD5+9fqD/Ua9pmUw3W8R11vllXJ8QqUp7FJf2ME77qUxM+
+	gQmiX6GnSjI+ckXHhSscgcx3jTwnblfGVp6eBV2140P/9IC+VlCx407T1OzSwIfZWsydkd62Mcv
+	p8XWKVqUOVFfvoRk85Y4o7ajF6r/w1kEzbOjYw4oZK2ResoHj89kimT5AWiv7
+X-Gm-Gg: ASbGnctwyASpSE6PwSeOGnHSWjMt6pbJza0F+4aqKKgQxyo3strDCbYi4QSDt4Pc791
+	A+OXfKaJDJ90DifOi/3g7hLjz7o/vGiF5hADBsHn95yo+xVvdXdQ7iUdc/sTis3hpEib5QgAyLM
+	Bswr6VJLH9Lh42sUx+jZV4V0siTyJb8joOpbmqxi9oqhTKbByu+lf2LvlgiqWvDXcX+NSPY+gvQ
+	onmiwm5gBgxMsx1DJsdIGDLzshRgtIYYwLCTYA15pg6NxXpPlun4aG7wWyWx/XnRcfY4dtHCwbH
+	1dXijRCW4Q==
+X-Received: by 2002:a17:907:d407:b0:abb:a8bb:5da0 with SMTP id a640c23a62f3a-abed0d762damr72543366b.26.1740433055411;
+        Mon, 24 Feb 2025 13:37:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHLx8zttoX9X6XdwqGGj4vktbpOYpC8f1Gz1u7RfvclZ761C7U56MVWUAyaydF6nH/gt6yf5g==
+X-Received: by 2002:a17:907:d407:b0:abb:a8bb:5da0 with SMTP id a640c23a62f3a-abed0d762damr72541466b.26.1740433054971;
+        Mon, 24 Feb 2025 13:37:34 -0800 (PST)
+Received: from redhat.com ([2a0d:6fc7:441:1929:22c5:4595:d9bc:489e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed204f677sm24664866b.126.2025.02.24.13.37.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 13:37:34 -0800 (PST)
+Date: Mon, 24 Feb 2025 16:37:30 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Boyer, Andrew" <Andrew.Boyer@amd.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio Perez <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"Nelson, Shannon" <Shannon.Nelson@amd.com>,
+	"Creeley, Brett" <Brett.Creeley@amd.com>,
+	"Hubbe, Allen" <Allen.Hubbe@amd.com>
+Subject: Re: [PATCH] virtio_blk: always post notifications under the lock
+Message-ID: <20250224163258-mutt-send-email-mst@kernel.org>
+References: <20250107182516.48723-1-andrew.boyer@amd.com>
+ <7a4f03a0-9640-4d15-9f0d-4e1ceb82aa8c@linux.ibm.com>
+ <20250109083907-mutt-send-email-mst@kernel.org>
+ <FE77DD4F-AB39-4781-9D24-06F171F47FED@amd.com>
+ <dcbce68c-f448-4bbf-8db9-c3cd3231b5dd@linux.ibm.com>
+ <20250122165854-mutt-send-email-mst@kernel.org>
+ <5952f58f-9b80-4706-adb4-555f1489f2cf@linux.ibm.com>
+ <20250224160208-mutt-send-email-mst@kernel.org>
+ <575C32BA-63C3-4A2A-BC95-0E4F910DFA67@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: ATB8Y4T0vwA4-rBBKhow5gtD-DoBHPiy
-X-Proofpoint-ORIG-GUID: ATB8Y4T0vwA4-rBBKhow5gtD-DoBHPiy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-24_10,2025-02-24_02,2024-11-22_01
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <575C32BA-63C3-4A2A-BC95-0E4F910DFA67@amd.com>
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+On Mon, Feb 24, 2025 at 09:31:24PM +0000, Boyer, Andrew wrote:
+> 
+> > On Feb 24, 2025, at 4:03 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > 
+> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> > 
+> > 
+> > On Thu, Jan 23, 2025 at 09:39:44AM +0100, Christian Borntraeger wrote:
+> >> 
+> >> Am 22.01.25 um 23:07 schrieb Michael S. Tsirkin:
+> >>> On Wed, Jan 22, 2025 at 06:33:04PM +0100, Christian Borntraeger wrote:
+> >>>> Am 22.01.25 um 15:44 schrieb Boyer, Andrew:
+> >>>> [...]
+> >>>> 
+> >>>>>>>> --- a/drivers/block/virtio_blk.c
+> >>>>>>>> +++ b/drivers/block/virtio_blk.c
+> >>>>>>>> @@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> >>>>>>>>  {
+> >>>>>>>>    struct virtio_blk *vblk = hctx->queue->queuedata;
+> >>>>>>>>    struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
+> >>>>>>>> -   bool kick;
+> >>>>>>>>    spin_lock_irq(&vq->lock);
+> >>>>>>>> -   kick = virtqueue_kick_prepare(vq->vq);
+> >>>>>>>> +   virtqueue_kick(vq->vq);
+> >>>>>>>>    spin_unlock_irq(&vq->lock);
+> >>>>>>>> -
+> >>>>>>>> -   if (kick)
+> >>>>>>>> -           virtqueue_notify(vq->vq);
+> >>>>>>>>  }
+> >>>>>>> 
+> >>>>>>> I would assume this will be a performance nightmare for normal IO.
+> >>>>>> 
+> >>>>> 
+> >>>>> Hello Michael and Christian and Jason,
+> >>>>> Thank you for taking a look.
+> >>>>> 
+> >>>>> Is the performance concern that the vmexit might lead to the underlying virtual storage stack doing the work immediately? Any other job posting to the same queue would presumably be blocked on a vmexit when it goes to attempt its own notification. That would be almost the same as having the other job block on a lock during the operation, although I guess if you are skipping notifications somehow it would look different.
+> >>>> 
+> >>>> The performance concern is that you hold a lock and then exit. Exits are expensive and can schedule so you will increase the lock holding time significantly. This is begging for lock holder preemption.
+> >>>> Really, dont do it.
+> >>> 
+> >>> 
+> >>> The issue is with hardware that wants a copy of an index sent to
+> >>> it in a notification. Now, you have a race:
+> >>> 
+> >>> 
+> >>> thread 1:
+> >>> 
+> >>>    index = 1
+> >>>            ->                      -> send 1 to hardware
+> >>> 
+> >>> thread 2:
+> >>> 
+> >>>    index = 2
+> >>>            -> send 2 to hardware
+> >>> 
+> >>> 
+> >>> 
+> >>> 
+> >>> the spec unfortunately does not say whether that is legal.
+> >>> 
+> >>> As far as I could tell, the device can easily use the
+> >>> wrap counter inside the notification to detect this
+> >>> and simply discard the "1" notification.
+> >>> 
+> >>> 
+> >>> If not, I'd like to understand why.
+> >> 
+> >> Yes I agree with you here.
+> >> I just want to emphasize that holding a lock during notify is not a workable solution.
+> > 
+> > 
+> > Andrew, what do you say?
+> > 
+> > --
+> > MST
+> > 
+> 
+> "can *easily* use" -> No.
+> 
+> Our doorbell hardware is configurable, but not infinitely programmable. None of the suggested workarounds are feasible for hardware in the face of incorrect driver behavior. We have marked the feature as broken in the linux kernel driver and moved on.
+> 
+> Thanks,
+> Andrew
+> 
 
-There is already a field in io_kiocb that can store a registered buffer
-index, use that instead of stashing the value into struct io_sr_msg.
+Thanks Andrew, I understand.
+My question would be, is the feature worth it for you?
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/net.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+I see two way to move forward
+1.- amend spec to say notifications can be reordered
+2.- amend spec to say they can not be reordered and add a new feature bit
+    saying they can be
+    add a new lock for driver to hold in case the feature is off
 
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 173546415ed17..fa35a6b58d472 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -76,7 +76,6 @@ struct io_sr_msg {
- 	u16				flags;
- 	/* initialised and used only by !msg send variants */
- 	u16				buf_group;
--	u16				buf_index;
- 	bool				retry;
- 	void __user			*msg_control;
- 	/* used only for send zerocopy */
-@@ -1371,7 +1370,7 @@ int io_send_zc_prep(struct io_kiocb *req, const str=
-uct io_uring_sqe *sqe)
-=20
- 	zc->len =3D READ_ONCE(sqe->len);
- 	zc->msg_flags =3D READ_ONCE(sqe->msg_flags) | MSG_NOSIGNAL | MSG_ZEROCO=
-PY;
--	zc->buf_index =3D READ_ONCE(sqe->buf_index);
-+	req->buf_index =3D READ_ONCE(sqe->buf_index);
- 	if (zc->msg_flags & MSG_DONTWAIT)
- 		req->flags |=3D REQ_F_NOWAIT;
-=20
-@@ -1447,7 +1446,7 @@ static int io_send_zc_import(struct io_kiocb *req, =
-unsigned int issue_flags)
-=20
- 		ret =3D -EFAULT;
- 		io_ring_submit_lock(ctx, issue_flags);
--		node =3D io_rsrc_node_lookup(&ctx->buf_table, sr->buf_index);
-+		node =3D io_rsrc_node_lookup(&ctx->buf_table, req->buf_index);
- 		if (node) {
- 			io_req_assign_buf_node(sr->notif, node);
- 			ret =3D 0;
---=20
-2.43.5
+
+1 is less work but if 2 gives you a big performance advantage, I can do it.
+
+-- 
+MST
 
