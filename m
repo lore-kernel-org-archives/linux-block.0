@@ -1,94 +1,163 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2056.outbound.protection.outlook.com [40.107.237.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECC91F941
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 23:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740439852; cv=none; b=r/JgTnmz60o2AEKwuO3HCUMqzzceOGcafNa89NnAveioMhhAaoVHDc6nPq4MfiFWIsOkY77L6tdXjJ0FoZmT9cw6SUA9ui+/3oZZGrhqLSjoj0GJkY3bN1s+sNLX0UaWXKQOeAWNRwPmTsJMjjTa/cAq2yNFB+pmMiOIU8SRKQo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740439852; c=relaxed/simple;
-	bh=R/SFmzKMQaClZ6ac3+FS1o2WSMthwJHwexFRGbXqiWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FQG/oUdQxdcB6prpkjAlZv93f+a0AffSMNxmZknivSQwlwoqd/1AFwKIDpGU2/qio+Dq9wy0+GGAQnT6JQ0VS6LWjDrdHt4CIo5bpR6N4mk/bYPoWi2TN6lKdONKpGRuJ9YFwTz0lThkpqXSPO3GIw1QwUmlIu+R5mpjclXRuQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0+OI89Zb; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9668E1C860F;
+	Mon, 24 Feb 2025 23:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740439898; cv=fail; b=WvqDBESVnzldMuWVLJYcNxmibHK9t9lAEtZzAqQJGJrsXOCUpsYRfCfS0EeXdNgPYE3YGqGXsK/ytzAOCuC8ZQmlEZiHTlMfcqlNDEMZJZ3qrVs02GcXls/6FnQr2cY2tduHmlOmOkRFfnJoPgLfbo2nC8ScfOki7OB8DP9v0bQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740439898; c=relaxed/simple;
+	bh=rUfunpQsqTtWdJsomTh0QemcwYvR8d1AYrIrQA3wpNw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=txSHS/ryf+9iYATJZ5C7PakljgedQQl+ShDMvBF22fZ2J6Eda/ZsC8VapxeKCGgu8tXpi/eYYyoHEfOrHy6zuYZGARpCOH2D3fVvK6PDNT8xKoBJeHpO8X5vL9O3utWLaJ2N+Erhz30l4YjyMiomYDB7hCQtRZRdhMs0RQ7JXsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=T/Ln+hIt; arc=fail smtp.client-ip=40.107.237.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0+OI89Zb"
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce886a2d5bso43934175ab.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 15:30:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740439850; x=1741044650; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BlabqSiF+gaIVSAaNLOzEjzZt+feYIrttInKlJG4jQc=;
-        b=0+OI89ZbbGAb3C9EcwlVF3MMRZ1pR9/duTF3eWvS5TpJk+XumotaxIvfQ1mIRxT6L4
-         RC7G6SdBgr+b2ukfMgCNyDsE5/K7CLL0naysH4TfaAL8Xm8pF+K39MlDwkQiRqjlZYpG
-         NLSKsFOgv4YDX32uNCOdRH0hk4dk4Zpkx73sV+HSAB5fEaeV7V+tTGlV6rGdYksiALAI
-         3PizLOB31ncnjDRIeY+buR3OXxGVLRoJAwCgKwzzFA+ZIolggsKAcSO9j3X5eHy33uch
-         9tuz+mWHcPwib93Mu0bScUVx06o5B72FM1MQmOKgfUTeSlZudDzJU8+lHAXIxVCc7/Rb
-         guDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740439850; x=1741044650;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BlabqSiF+gaIVSAaNLOzEjzZt+feYIrttInKlJG4jQc=;
-        b=m7F7eJdLriHn14K1B3UOME1miysrclIsXk/7ak1vgYQoK5ESbrsRrfZmU/LTUROUEB
-         9Q5Myl0Lt6CcJTvbZyrpyky2CygAN8XyTWzUWb77eO1p3u4Wi2Qyp6JObcvLzZtA8BhJ
-         eBoM2A3cE3bE9oSyqxWetAZgQnhzdz7xGmbG942UrObIzx9g6ud/CnKmaC8vl8fRAf7L
-         i0f5FWZ/3JGWDEha3o2pNRTNFT5zkVNGOMzr5f6c/ibdzE33HZldkqfIvB9IIhDQTImy
-         JU3kW8aix2TWXAj8sVh5P/j4Gop3dCP5Q26b+6JiObj1dBmPuKqtfrZ0WhDTaF/3KtVA
-         Dshg==
-X-Forwarded-Encrypted: i=1; AJvYcCXvQRALv/LpCT5+5ccNP2GcTTC4kz4SZkxp1S0Jh955gStre37f+292Utta6O1Rd75DMmCvQt+fohy+uQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHa0ubPhCwfJdpMpoi4xZ3ocZ5lsSNfC6Zd56HKxfL2NYhoG4H
-	+hP99bHFFHE+qEGgJfocU7XFe1MNv1wMc/vv+Opkgexqo2LtxKdReWh0XcdCZbU=
-X-Gm-Gg: ASbGncsbMa1OuXQv1v3sCde8s5bowdScOXK3xNwxq8ffcv5w0DUrpBJRUeTCWkuwW4D
-	SAaiXf9ssiT2X4fsmkwPVTKXcqN6Bowp42EaQ2TWQdL850WFeLp2yndy8rEYtgJ7b9F5GZ8anSN
-	wSMBrEBJ0K41ISdLcZKGMf7GbmuusUkjAwejsopFZusw10uIjBp6xcGuBC5zhTU7oays3XcaMf3
-	CA3w/EFr+gzNUnPFMQlwTOL2jtpA1evc/P5bzsk62NjDpwpkRDgqBGVC3AlAT9pXM8M1KMcy2P2
-	HHa1hr5yCIrZlRFV7c2P24Q=
-X-Google-Smtp-Source: AGHT+IHjAdmF70MFm5stdQrkzlR7rmei8bejitg9as7edXpa/8I6sFYvUuMceshIDQ3INEI+4auImg==
-X-Received: by 2002:a05:6e02:194b:b0:3d0:10a6:99aa with SMTP id e9e14a558f8ab-3d2cae4e70dmr136608695ab.4.1740439849909;
-        Mon, 24 Feb 2025 15:30:49 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f047530b3bsm125641173.132.2025.02.24.15.30.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2025 15:30:49 -0800 (PST)
-Message-ID: <54284f45-b597-415a-a954-5ab282747704@kernel.dk>
-Date: Mon, 24 Feb 2025 16:30:48 -0700
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="T/Ln+hIt"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wzjc/dLqAqRcxLmUCeecLoW3qeNII30eVafUAvPFXdimGZwt505nCT3Bh+CVVYm0wSlr9oZ/b84mTI7RCDj2AYReSDIUaOG2SRUDrvBVegEfbqtmk05VbMpmV1JOL9qpOIuyvKBAKZuFuKVsZGPoKWQDpB5lMpFIpeDc2SIa9i4rHzJH08LTpvKP19n6rLnU1DTp9WprmIVvfIiGZgGaK+vp/a/nkUUhSfWeWZ7dPdizkStLHw418s7B5dJgtwJE+QzBu0Sk/IU0TiUAKMxp/n+CVl3hiiywDKvIHr5AdCMM+lZGVkhAVDfIYldPrU4/e1uXiDhkZkqRU392dhK23A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NrNLgSpyn6uSR7DW0g5zjHzrVANNFNRFlkP9E9uu1v8=;
+ b=ShWcpoZHtYTfNdFzYLJlVwMLLa4dVyPzSCtkY/pdsw8Sq/8Zh7Gg+HfSGTlDnLMb2nftI8GHPXG/ULB8RP8QoIUTxIOJqpsEIZ5daSr80YX4hoHwDGfBTwyBf2OHu3Uqdnqp9QdDXGyGAqzYCP5dtqIM3zpaEtKOMAlFKR+1Rokss10Sqbv0wfSGz4RxPJpr8cz+00SazQxu7LGTU10ws8PUFrZRwpSNG0A8tkWNxfxxlFkxal5pY6l3n8n9J+t3d7N/7WVgOm1iMWNw7AOqbVIYjFlxUVr8ZBFdZCsXYJCJBV4mm17d/jyWys2B7ouMxwpLWvVuy/WSzI+rGG28Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NrNLgSpyn6uSR7DW0g5zjHzrVANNFNRFlkP9E9uu1v8=;
+ b=T/Ln+hIt77KziUJup1RSUMLDmkUzr1qS58RPb6xzVw0AJL2o15Iym8SFpiAikU0x0tR5DfS6UW8s4HXJKW4DaRegHfn7hI+WagFPPxL8Xf7Cps7uUHHddp+CDN8PQQpMwfCraKM95FkP3t7teLmCxIhb3ZYJmBchcPvxRi1qeCjZaXp89b/5lfzZW8QMPDx5W0usCcv3M8Zuw9yTGAUztojQtrFqlV1w2s/iQz9ZAq9NWNuhxLrH5jZ8GOKTj4omn+LhLHp+RXN2pSBbfT36JNXY+xNqMFnEBmcgsQxE5nkQisZG5K1sZE7s1GETwA02uQUGxufovvQYKEMTudg39g==
+Received: from BN9PR03CA0085.namprd03.prod.outlook.com (2603:10b6:408:fc::30)
+ by DS0PR12MB6485.namprd12.prod.outlook.com (2603:10b6:8:c6::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.19; Mon, 24 Feb 2025 23:31:29 +0000
+Received: from MN1PEPF0000F0E0.namprd04.prod.outlook.com
+ (2603:10b6:408:fc:cafe::51) by BN9PR03CA0085.outlook.office365.com
+ (2603:10b6:408:fc::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.20 via Frontend Transport; Mon,
+ 24 Feb 2025 23:31:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000F0E0.mail.protection.outlook.com (10.167.242.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8489.16 via Frontend Transport; Mon, 24 Feb 2025 23:31:28 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Feb
+ 2025 15:31:10 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 24 Feb
+ 2025 15:31:10 -0800
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Mon, 24 Feb 2025 15:31:06 -0800
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+To: <israelr@nvidia.com>, <stefanha@redhat.com>,
+	<virtualization@lists.linux.dev>, <mst@redhat.com>,
+	<linux-block@vger.kernel.org>
+CC: <oren@nvidia.com>, <nitzanc@nvidia.com>, <dbenbasat@nvidia.com>,
+	<smalin@nvidia.com>, <larora@nvidia.com>, <izach@nvidia.com>,
+	<aaptel@nvidia.com>, <parav@nvidia.com>, <kvm@vger.kernel.org>, Max Gurtovoy
+	<mgurtovoy@nvidia.com>
+Subject: [PATCH v1 0/2] virtio: Add length checks for device writable portions
+Date: Tue, 25 Feb 2025 01:31:04 +0200
+Message-ID: <20250224233106.8519-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 02/11] io_uring/nop: reuse req->buf_index
-To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
- asml.silence@gmail.com, linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: bernd@bsbernd.com, csander@purestorage.com,
- Keith Busch <kbusch@kernel.org>
-References: <20250224213116.3509093-1-kbusch@meta.com>
- <20250224213116.3509093-3-kbusch@meta.com>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20250224213116.3509093-3-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E0:EE_|DS0PR12MB6485:EE_
+X-MS-Office365-Filtering-Correlation-Id: ee36eec9-7c9c-4eb2-c39d-08dd552b5d0e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?S3MQA7oplWAWqXATnJd3Lw33O6v9wseWho5rvwnUAsAQ2Pk7hI2QKxKQ6QBR?=
+ =?us-ascii?Q?R+1Ehs16fwU28B6wTbki9DSqi1NgVh9t6PaGIcQZ6veFwrSutdLhtjHcafy2?=
+ =?us-ascii?Q?Wr8Ov2/LH6IM4wjwoy4/dTDqByeP4rXD+xSBDeoV6t3qiBSu2sgZ3xecRvwZ?=
+ =?us-ascii?Q?fyXTVpP2t+SJPZaBh3Vy9oSsEyZvy6L75UJ/RCHjsksAbjZqfEGiqzZzWXnm?=
+ =?us-ascii?Q?85GjJyW5vJ5LI7L38iC9MMpnLtq0n2W4jAhmi1mAIDWwbKFmW6FCpS3TX44v?=
+ =?us-ascii?Q?WRDSbeW97q5bCBxUMULeK9I6N0ysBl5Wu4CCn62uduEN/4hIik8xHUGWENWL?=
+ =?us-ascii?Q?cUewFK3iu3s83Da3ViURGAOgRW99rJzplfX2sazl7sdXP4b3apHMgbNg7vJT?=
+ =?us-ascii?Q?ilhoguevvMDybgPGGvjx/7G/MnlRTDn0Bm37gYzSnKjYs+r0VTCa7u2DI/rd?=
+ =?us-ascii?Q?aB4wcJm4EErJ4tPPBMRmRbNOmXkCdr4jhjLMqnqddR55fF5gMAhN4vOKLrRC?=
+ =?us-ascii?Q?LPwqDDx7a/FTdyW9+I45xOizUhxcSqOM3+tbdXD+vvOi+fiwhOw9Obl+XolO?=
+ =?us-ascii?Q?0CiQp5ofxc9Cze/e2Gx/LS1Qd17KRG7iHsOABQHLVcZfY0rXR1+6Hyo4lZ46?=
+ =?us-ascii?Q?vf0dgNCP/fgmPiwKvHLQws1pdc0cZimPJ2jxFMtXRrkZfYPHkeIMbQTju9DR?=
+ =?us-ascii?Q?E5kYoSDaJ9cNS4FCY/v7pfpUKSYIQ5ee73J2KH/fq80tP0Big3g7CCdmPDL6?=
+ =?us-ascii?Q?iSd4QSfFU/zbhrYjEqz2w8fG3oGDoDsuRnSIszYj6uWNFtKFqRDUzZfRot9c?=
+ =?us-ascii?Q?VQGP0qw6aKSjeEI7qoaMqMdmd4LaXXpUThzPJWTMgMGx7Ny6HKHJ1WLmXORz?=
+ =?us-ascii?Q?8QkKNYF8nYp92sN5JJQbWSDBVBgpaCfLp7erR7/Xh/mGBtOg7L11E3m0gx/3?=
+ =?us-ascii?Q?zXMEP6+7F9A1oyswQlsrRL7zWTJAMjoJG/9YO2k9TdSsqfmPWTmI9K0I3JpE?=
+ =?us-ascii?Q?nLpRnSRIlFlTG93RleINSQ9zyT+09M9shOtmxWt2hmCKQUIl0VyxLXGphRuB?=
+ =?us-ascii?Q?IqKJJuEWEioyKkbl8ZI4J8iA1JzXICAK6wcHFlAs35CiYaJgXt6K0zcbrh3b?=
+ =?us-ascii?Q?YwFZ+eqfZ1mCugfBfKzeftssM++Iwje9zh0JD6l0QMuigUn6uXzdMr4W6uAq?=
+ =?us-ascii?Q?/bDN7SesIgUZR8IMbPC45q+MN5k67+48yyadZ5mlSSbiLm99/iaqyWNVswqh?=
+ =?us-ascii?Q?MeGjmPMsIyX5sK4PGiTjxpLP7jFlf5WJXX/Kin5xftKJSq4L+mj+36q//r2Z?=
+ =?us-ascii?Q?D1+/g1AufcQv4Qfy0XVUAs5+eShEB7WmlRH7hdHpQELYaSGsorb2kvO5mtgF?=
+ =?us-ascii?Q?IZOPpFkJDFc3oqrDDvhyW0Pp+39NfKqe0UFYw2wmO/k0YRsDsts2eZ03wbgN?=
+ =?us-ascii?Q?xu/++FuSy8vVRd++ZOaBovNDRjS1cKKxw1BGkPQmBMBJEWk+vFIo9QvbxRo8?=
+ =?us-ascii?Q?fchLZkYtP/SBY7U=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 23:31:28.7650
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee36eec9-7c9c-4eb2-c39d-08dd552b5d0e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E0.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6485
 
-On 2/24/25 2:31 PM, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> There is already a field in io_kiocb that can store a registered buffer
-> index, use that instead of stashing the value into struct io_nop.
+Hi,
 
-Only reason it was done this way is that ->buf_index is initially the
-buffer group ID, and then the buffer ID when a buffer is selected. But I
-_think_ we always restore that and hence we don't need to do this
-anymore, should be checked. Maybe you already did?
+This patch series introduces safety checks in virtio-blk and virtio-fs
+drivers to ensure proper handling of device-writable buffer lengths as
+specified by the virtio specification.
+
+The virtio specification states:
+"The driver MUST NOT make assumptions about data in device-writable
+buffers beyond the first len bytes, and SHOULD ignore this data."
+
+To align with this requirement, we introduce checks in both drivers to
+verify that the length of data written by the device is at least as
+large as the expected/needed payload.
+
+If this condition is not met, we set an I/O error status to prevent
+processing of potentially invalid or incomplete data.
+
+These changes improve the robustness of the drivers and ensure better
+compliance with the virtio specification.
+
+Max Gurtovoy (2):
+  virtio_blk: add length check for device writable portion
+  virtio_fs: add length check for device writable portion
+
+ drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
+ fs/fuse/virtio_fs.c        |  9 +++++++++
+ 2 files changed, 29 insertions(+)
 
 -- 
-Jens Axboe
+2.18.1
+
