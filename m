@@ -1,180 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A04255E21
-	for <linux-block@vger.kernel.org>; Mon, 24 Feb 2025 10:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89F1D90DF;
+	Mon, 24 Feb 2025 10:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740391203; cv=none; b=mGqzpIxSLfhUibvP7pm9v41gr7aSOAbGrepEcnpgQWGYO3OhQ4xpvpqpLTNnPRu8lJdohURWVAsEQjiSoL5C9D65mfuVP92IOq1FnzEWxjCLxUm2HQ8XWNZ7mHl2AXTA4AeMYiHyr/xSOVWSsrorQ/yAEARDMg/zx/o/p5lr4/U=
+	t=1740393936; cv=none; b=NEnVxLdXFoI3sVzGGDe47L6MoOHZPF68grwCaNsXjQVTX7IYnOj5WSUvJzlZ4oUNfec0Jbu4Wy3W/6OHapLXz8vMjdxWM7cPy3yjHnLcBDPYSZVWXblBmKB//fMzGG9wWjbmBoAn9CD74+wqPMA+RIkda5JByYv/dabs+UEXf/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740391203; c=relaxed/simple;
-	bh=gm+yihZCzgde+pWWjtds6/mCNUCGRa0PDZ1471s986I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q/czyRFZCgmJEC3LT2BOBb0NgF50yKaCz2SvhagVwfRPHl5vdd2P6rPHefEe5PrZiGzxTefaCDDArFJXdsL4URybvzOHQxBWoEtw6UX7Aus3HVCls+QZ6xTakd8Y+0v/+7lntC/rhvLP/EmDctNwECCOR1R6V1IbZeoGNNQx9yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CnXCsxc8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740393936; c=relaxed/simple;
+	bh=vGaIzPMkHQEEWfhRyvbGfCJxIL93A6HKSBMqc9lpVJE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hnp7v00eGqCXhe30CsLHzM9vzEG0x3V1Fih4hGbAizffsVamwaPkJEeTB74KmRUiMs7wSNvj3XXwEcxueiBJQYX0bXMP1FqM7pm22OUdNnHg14Hb14lOBxf4riTljetIn3Wx0XgZP+69DtK0aX9orHdbRM5eQOwIEOCNwraJpT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KdGY/V6m; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CnXCsxc8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740391200;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6L+Qyy0sQBzRDx6vB86O556jHBJgVJTblXX5aPNNvqE=;
-	b=CnXCsxc8h9jhQDhFg9UgyQ9Xmg2jGNtZzJh3mBTSg9HqH35zasC4QXBxObmtpbnpvCSTCH
-	+kZGiPdolm/enCu0RyAVTxCKGTqVY9pETpNYbwvCRAR9TMlmUsTSxzgUX/K5cazgIkCl94
-	UDWOGLJdnf3j7OMksHSoHon02cxPvg4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-549-VBz1cQ5gPiyThw5xFXiRMA-1; Mon,
- 24 Feb 2025 04:59:54 -0500
-X-MC-Unique: VBz1cQ5gPiyThw5xFXiRMA-1
-X-Mimecast-MFC-AGG-ID: VBz1cQ5gPiyThw5xFXiRMA_1740391194
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF0001800570;
-	Mon, 24 Feb 2025 09:59:53 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.33])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5827D1800366;
-	Mon, 24 Feb 2025 09:59:51 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Yu Kuai <yukuai1@huaweicloud.com>
-Subject: [PATCH] tests/throtl: add a new test 006
-Date: Mon, 24 Feb 2025 17:59:45 +0800
-Message-ID: <20250224095945.1994997-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdGY/V6m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC544C4CED6;
+	Mon, 24 Feb 2025 10:45:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740393934;
+	bh=vGaIzPMkHQEEWfhRyvbGfCJxIL93A6HKSBMqc9lpVJE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KdGY/V6mJfr+RWCq7refHM+XLmstl04/DVun4m3qEIG2ZcDbFE6byCXO6uCf3pUS2
+	 w1oiPcLrd2x8HQ74MUYjPRL7co5wl4ydq18yJ9TGz3/XmLROt08ZVBfdMavW2ZaO3l
+	 GYD6dvofy3RLhgZUEM2wucVGAccX+PdRCNmrWYWYyrzckSIF5aGzyWvz7hOOLppjMU
+	 eqaxl0GX1JHZUt8k689WURD+1qB+f+7aE6UH2WUQQv5aFddrNdiyeUL/7D47XztuLs
+	 j0qe5W4uwq2cSeycN/z1Kyze9J6A8keIezMhCjHFdLNQ6pf5MLQrHQz5Ky/1mG5dGn
+	 UxDCShzFWJRRg==
+From: Christian Brauner <brauner@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	john.g.garry@oracle.com,
+	hch@lst.de,
+	ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	gost.dev@samsung.com,
+	p.raghav@samsung.com,
+	da.gomez@samsung.com,
+	kernel@pankajraghav.com,
+	akpm@linux-foundation.org,
+	hare@suse.de,
+	willy@infradead.org,
+	dave@stgolabs.net,
+	david@fromorbit.com,
+	djwong@kernel.org,
+	kbusch@kernel.org
+Subject: Re: [PATCH v3 0/8] enable bs > ps for block devices
+Date: Mon, 24 Feb 2025 11:45:19 +0100
+Message-ID: <20250224-sehtest-messbar-784a08cdaf75@brauner>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250221223823.1680616-1-mcgrof@kernel.org>
+References: <20250221223823.1680616-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2078; i=brauner@kernel.org; h=from:subject:message-id; bh=vGaIzPMkHQEEWfhRyvbGfCJxIL93A6HKSBMqc9lpVJE=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaTv8T2awHa4gCNY5ujH72qyZ4LU1K+I3DbxCy7ibGlgS LYL/67dUcrCIMbFICumyOLQbhIut5ynYrNRpgbMHFYmkCEMXJwCMJHQe4wMxz7c1tgifeHfC9H/ S4W3fTU73vafva1M+2juifPNZq1FvYwMu2/sOT/9zK279+afL+1fa3rMscvQ7ELmpSZxpm9/jiw 3YAAA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add test for covering prioritized meta IO when throttling, regression
-test for commit 29390bb5661d ("blk-throttle: support prioritized processing
-of metadata").
+On Fri, 21 Feb 2025 14:38:15 -0800, Luis Chamberlain wrote:
+> Christian, Andrew,
+> 
+> This v3 series addresses the feedback from the v2 series [0]. The only
+> patch which was mofified was the patch titled "fs/mpage: use blocks_per_folio
+> instead of blocks_per_page". The motivation for this series is to mainly
+> start supporting block devices with logical block sizes larger than 4k,
+> we do this by addressing buffer-head support required for the block
+> device cache.
+> 
+> [...]
 
-Cc: Yu Kuai <yukuai1@huaweicloud.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tests/throtl/006     | 58 ++++++++++++++++++++++++++++++++++++++++++++
- tests/throtl/006.out |  4 +++
- tests/throtl/rc      | 19 +++++++++++++++
- 3 files changed, 81 insertions(+)
- create mode 100755 tests/throtl/006
- create mode 100644 tests/throtl/006.out
+Applied to the vfs-6.15.pagesize branch of the vfs/vfs.git tree.
+Patches in the vfs-6.15.pagesize branch should appear in linux-next soon.
 
-diff --git a/tests/throtl/006 b/tests/throtl/006
-new file mode 100755
-index 0000000..4baadaf
---- /dev/null
-+++ b/tests/throtl/006
-@@ -0,0 +1,58 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Ming Lei
-+#
-+# Test prioritized meta IO when IO throttling, regression test for
-+# commit 29390bb5661d ("blk-throttle: support prioritized processing of metadata")
-+
-+. tests/throtl/rc
-+
-+DESCRIPTION="test if meta IO has higher priority than data IO"
-+QUICK=1
-+
-+requires() {
-+	_have_program mkfs.ext4
-+}
-+
-+test_meta_io() {
-+	local path="$1"
-+	local start_time
-+	local end_time
-+	local elapsed
-+
-+	start_time=$(date +%s.%N)
-+	mkdir "${path}"/xxx
-+	touch "${path}"/xxx/1
-+	sync "${path}"/xxx
-+
-+	end_time=$(date +%s.%N)
-+	elapsed=$(echo "$end_time - $start_time" | bc)
-+	printf "%.0f\n" "$elapsed"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _set_up_throtl memory_backed=1; then
-+		return 1;
-+	fi
-+
-+	mkdir -p "${TMPDIR}/mnt"
-+	mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 -F "/dev/${THROTL_DEV}" >> "$FULL" 2>&1
-+	mount "/dev/${THROTL_DEV}" "${TMPDIR}/mnt" >> "$FULL" 2>&1
-+
-+	_throtl_set_limits wbps=$((1024 * 1024))
-+	{
-+		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
-+		_throtl_issue_fs_io  "${TMPDIR}/mnt/test.img" write 64K 64 &
-+		sleep 2
-+		test_meta_io "${TMPDIR}/mnt"
-+		wait
-+	} &
-+	wait $!
-+
-+	umount "${TMPDIR}/mnt" || return $?
-+	_throtl_remove_limits
-+	_clean_up_throtl
-+	echo "Test complete"
-+}
-diff --git a/tests/throtl/006.out b/tests/throtl/006.out
-new file mode 100644
-index 0000000..8c3d176
---- /dev/null
-+++ b/tests/throtl/006.out
-@@ -0,0 +1,4 @@
-+Running throtl/006
-+0
-+4
-+Test complete
-diff --git a/tests/throtl/rc b/tests/throtl/rc
-index df54cb9..327084b 100644
---- a/tests/throtl/rc
-+++ b/tests/throtl/rc
-@@ -75,6 +75,25 @@ _throtl_get_max_io_size() {
- 	cat "/sys/block/$THROTL_DEV/queue/max_sectors_kb"
- }
- 
-+_throtl_issue_fs_io() {
-+	local path=$1
-+	local start_time
-+	local end_time
-+	local elapsed
-+
-+	start_time=$(date +%s.%N)
-+
-+	if [ "$2" == "read" ]; then
-+		dd if="${path}" of=/dev/null bs="$3" count="$4" iflag=direct status=none
-+	elif [ "$2" == "write" ]; then
-+		dd of="${path}" if=/dev/zero bs="$3" count="$4" oflag=direct conv=fdatasync status=none
-+	fi
-+
-+	end_time=$(date +%s.%N)
-+	elapsed=$(echo "$end_time - $start_time" | bc)
-+	printf "%.0f\n" "$elapsed"
-+}
-+
- _throtl_issue_io() {
- 	local start_time
- 	local end_time
--- 
-2.47.1
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.15.pagesize
+
+[1/8] fs/buffer: simplify block_read_full_folio() with bh_offset()
+      https://git.kernel.org/vfs/vfs/c/753aadebf2e3
+[2/8] fs/buffer: remove batching from async read
+      https://git.kernel.org/vfs/vfs/c/b72e591f74de
+[3/8] fs/mpage: avoid negative shift for large blocksize
+      https://git.kernel.org/vfs/vfs/c/86c60efd7c0e
+[4/8] fs/mpage: use blocks_per_folio instead of blocks_per_page
+      https://git.kernel.org/vfs/vfs/c/8b45a4f4133d
+[5/8] fs/buffer fs/mpage: remove large folio restriction
+      https://git.kernel.org/vfs/vfs/c/e59e97d42b05
+[6/8] block/bdev: enable large folio support for large logical block sizes
+      https://git.kernel.org/vfs/vfs/c/3c20917120ce
+[7/8] block/bdev: lift block size restrictions to 64k
+      https://git.kernel.org/vfs/vfs/c/47dd67532303
+[8/8] bdev: use bdev_io_min() for statx block size
+      https://git.kernel.org/vfs/vfs/c/425fbcd62d2e
