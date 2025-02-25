@@ -1,64 +1,60 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134801EBFE6;
-	Tue, 25 Feb 2025 13:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660D71917D0
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 13:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740489200; cv=none; b=gUBsbi8nkqCGm8Q9judZIQ8ohodc+eqmMLGXfXRpDBQPXOLavxmwm9xvuKw4CrjvBW5o1VAO5cnU9Z9Mu1GsBnsACh1iPe3JhD70ssB6AewT3xA3di/VI0jodS21OwOLLJhsUopdcoHyJA8MMr8r2c4HzRXF23ADS4nXcHCRkSY=
+	t=1740490118; cv=none; b=P8dq9tY3jibzZPp602T9GhM7oUvlU9OogaQXfWkQ7M9R8PPN1/ekFvmrqTJOTn2/IQqsROuQx4kiidcgNP8WiEuotJcq1IG0XtxxEek3oblH5vkbne3uZ/61HG8Itr8sYvBffpwA7ktrMjRQf/fr7V1CocYx7aB8t0l4jMG3Z7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740489200; c=relaxed/simple;
-	bh=LkcvZBBAVGIN2IfjJ9Db4YSurQjzKxThJfqQ1RPTeKY=;
+	s=arc-20240116; t=1740490118; c=relaxed/simple;
+	bh=o8qgVeFBxwU4DsPWC6jsR1++kBlYMG7H4Ai0OYV7aNo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dg936M/iyjkAWqXf8fAAqlAbd7iuZNZFN4wOl5f3hKuXUn1g94y5wTtyKYvYpguBMBEiCNC4U+lziSl7Ynz9Vl3OhVd7jSgyTir75Z+d8L4ZIasbhqmt7gb7AFf5iPyBXbELGqKeLqDeutMj3spmH1Y6O9T/BZew+oqm8qByRxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gx3WgeNN; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=SNmoBPbVDwAQ7gwEHf4gvXm0A36Yi1e66auFgzx2nT4i59cpd2eUdUm3pJkAGkd4pyUt2/IKEhwCPRDEmjV7ef40S4gn1o5Ytp5YhaZFMsnwxdG95EqnNpeWwFBo48N5BUInNLCyS9oa5rG/IPEvvPw0qsYyIMWKe/QIvMptQqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kJCsJu0M; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gx3WgeNN"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-abb7a6ee2deso859011166b.0;
-        Tue, 25 Feb 2025 05:13:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740489197; x=1741093997; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7PBK3O3tdSRhcOkt0ha8iyCtRnojRmo1gdiyiZtDdyw=;
-        b=gx3WgeNNG1PNg/0a4lVgKF7cgNn5z/rxwycQzaWXX6C8VNA4Yu0qqKur5JTtGuNwRb
-         yzuAkmqz5t88Xt3Ha3Pn0/nZpNjA1DLHtJN8kLKCgx5dTBFf42weXMqsIvICWmcc/OXW
-         PkxmoJ2eK2Rf6i3BbBFq9CpXByqGvj+jqQWjRrLqDMrLkoXXwfvyjX0TXYeEsZSrwn4o
-         ITS2jZj2Fo/jFd/lBpr4Tl68t3zHr0X2umxe7/I6zZUhCT03SfwoVz43vR4yM7G+XYPC
-         hSSxnBXmHcDfem9ZBX5HUuV6FQKwPTN16UC11dCjk1maQotsN1F2NoczAUmzSza5HbAJ
-         oqbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740489197; x=1741093997;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7PBK3O3tdSRhcOkt0ha8iyCtRnojRmo1gdiyiZtDdyw=;
-        b=Do9G6+nsRnhJFZHHGDYTx/S56ffd+TpBJtAPjdJiWGitod5QPn7R7b58aq8t5I1obI
-         PbLiT8vKgz2omXpustvfF0MEuRbWKTRpeqH4Um0FA9uHyBg2FsL2BXbA1DdkFhX5Siax
-         FmkIIpb1OQrTJ/UyQBgMASyphSn9gE8JuTpSY9tx784wjcEIwoOWqf6qsfV4ApwEPWx+
-         5x0orgXa187qzwubEkOqztPo5d3cbi5y6SGwA9uSfpsQMX6gQnieWQS0D8fQC/tdZPAY
-         X6IbaLIfFpNBYj/8e7FuWpw2VD0IjM490NLmu2F9GMPkjdejj+AI0pavGLL1FjYvQslB
-         Aa3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVq3LJLkje470SgRJImI25whMQS1g7W9tQBuEo8RjU/QcjyS5dE2mMfoOpQqrrzzKuVvgC4d8+pVg==@vger.kernel.org, AJvYcCWwPi+DtxPBx3RU/vjlUKzHaA+y3TWYME33o1H/tEenxAd32At7K1Ox8abOBDm6o70HIrnJ4CXeIY8d/7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+F2yvoDIsXwCd5bJZvD04CnskU4xo1F+byTSFB04tIkD/sSGM
-	GUhRUnpMc/N9id+Hysnzv1blpQ2Kf33Zc0klseP72u2JSPMAjVCt
-X-Gm-Gg: ASbGncsOezzUaF7pg3ro4QAmTrj10/Wh2uc1G3TPjdzOaViBtBlVO2U4ypkK9KUcG5h
-	FnrXylq4UdAQje7IkHmGv7lFlC5oLX5yn70crGWJngd1ddFB4n9mZX9SMLE/4GfG4vL6n8fFO2s
-	ftip+U9JamxQXvN7J00b2Bs3PFzRysE3DTs4MMLKw5adk0wGxwkd5Bs9RgTeEMsGZDGvq0v4mhe
-	o7GvvZbyL8em7+SC2ZNvN0yzkCBktddgAXe0NbVkFAjVkOIJR0AhbQiyAytx7LkqgHW3cOHIf98
-	ZRyMJEi8NNRN3HAHwYSOwgNaRJUanvjBJtX/E5TD2SQcdQ/MPjXQXSFTTCc=
-X-Google-Smtp-Source: AGHT+IEk/Svcb7oxFdmEELdjnsskkGG5uZYkkA9xFmFG+K5GR0VwsYCVaZ0bRM07b+Fg/bVWJQm+wQ==
-X-Received: by 2002:a17:907:7254:b0:ab7:bcf9:34f with SMTP id a640c23a62f3a-abc09a4c539mr1827299866b.15.1740489197091;
-        Tue, 25 Feb 2025 05:13:17 -0800 (PST)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:9e08])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1da2ef0sm139599966b.81.2025.02.25.05.13.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 05:13:16 -0800 (PST)
-Message-ID: <94476efd-0565-4331-9cf4-989307c6b4ce@gmail.com>
-Date: Tue, 25 Feb 2025 13:14:17 +0000
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kJCsJu0M"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51PBSLJC013099;
+	Tue, 25 Feb 2025 13:28:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CCeIG1
+	6zALeikKjiyFX/OOBzbnVC5wwtfhU3wpwBqus=; b=kJCsJu0MdttvlrGNifv0vk
+	ZZlZy0zBQiUhruabKYn6WLTmZxM8GhBNgtQCPyQAAGh0/dYFvOGp4x7299tSKEJZ
+	zgY6YXikr0aM9EMs+MxT8NbW6tatZCd0MBKyVB0CvMQsD4E4TCbH9bYyEuDRuoTv
+	RywyTwigvCUFOAyZC0kVw6pSQGFPUOJyS/hub3fNag+11D/5UFGmUQZFj6ufIOXG
+	G/8JbOVyYbLEaOreSNXzFcj3NIxwsicvAZeGd3HxEnZqQG1JPkAaUBDAHd6YMV3i
+	TeT8PkcL9uQ7VyGbQi520e1jI3uu+TVWQ0yVOlSDyZbE0x/ahj8KB8JFboJM/8yg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4511wabg42-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 13:28:25 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51PAPNB2026354;
+	Tue, 25 Feb 2025 13:28:24 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44yswnd2j8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Feb 2025 13:28:24 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51PDSNq633030734
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Feb 2025 13:28:23 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F2945805B;
+	Tue, 25 Feb 2025 13:28:23 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 915C558055;
+	Tue, 25 Feb 2025 13:28:20 +0000 (GMT)
+Received: from [9.61.156.112] (unknown [9.61.156.112])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 25 Feb 2025 13:28:20 +0000 (GMT)
+Message-ID: <dd93c10c-d947-48f9-8e19-e7ea5b19eb3d@linux.ibm.com>
+Date: Tue, 25 Feb 2025 18:58:18 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,65 +62,55 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 03/11] io_uring/net: reuse req->buf_index for sendzc
-To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: bernd@bsbernd.com, csander@purestorage.com,
- Keith Busch <kbusch@kernel.org>
-References: <20250224213116.3509093-1-kbusch@meta.com>
- <20250224213116.3509093-4-kbusch@meta.com>
+Subject: Re: [PATCHv3 4/7] block: Introduce a dedicated lock for protecting
+ queue elevator updates
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        hare@suse.de, axboe@kernel.dk, gjoyce@ibm.com
+References: <20250224133102.1240146-1-nilay@linux.ibm.com>
+ <20250224133102.1240146-5-nilay@linux.ibm.com> <20250224163356.GB5560@lst.de>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250224213116.3509093-4-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250224163356.GB5560@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: UhoqRu4frmSY_HTGD47jUNv2pJkvPh3M
+X-Proofpoint-ORIG-GUID: UhoqRu4frmSY_HTGD47jUNv2pJkvPh3M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-25_04,2025-02-25_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=742 mlxscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502250090
 
-On 2/24/25 21:31, Keith Busch wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
+
+
+On 2/24/25 10:03 PM, Christoph Hellwig wrote:
+> There's weird upper case for the first character after block.  I know
+> some subsystems like this, but in general try to at least be consistent
+> for the series.
 > 
-> There is already a field in io_kiocb that can store a registered buffer
-> index, use that instead of stashing the value into struct io_sr_msg.
-
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
-
+>> +	/*
+>> +	 * attributes which require some form of locking
+>> +	 * other than q->sysfs_lock
 > 
-> Reviewed-by: Keith Busch <kbusch@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->   io_uring/net.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
+> Make that a proper sentence:
 > 
-> diff --git a/io_uring/net.c b/io_uring/net.c
-> index 173546415ed17..fa35a6b58d472 100644
-> --- a/io_uring/net.c
-> +++ b/io_uring/net.c
-> @@ -76,7 +76,6 @@ struct io_sr_msg {
->   	u16				flags;
->   	/* initialised and used only by !msg send variants */
->   	u16				buf_group;
-> -	u16				buf_index;
->   	bool				retry;
->   	void __user			*msg_control;
->   	/* used only for send zerocopy */
-> @@ -1371,7 +1370,7 @@ int io_send_zc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->   
->   	zc->len = READ_ONCE(sqe->len);
->   	zc->msg_flags = READ_ONCE(sqe->msg_flags) | MSG_NOSIGNAL | MSG_ZEROCOPY;
-> -	zc->buf_index = READ_ONCE(sqe->buf_index);
-> +	req->buf_index = READ_ONCE(sqe->buf_index);
->   	if (zc->msg_flags & MSG_DONTWAIT)
->   		req->flags |= REQ_F_NOWAIT;
->   
-> @@ -1447,7 +1446,7 @@ static int io_send_zc_import(struct io_kiocb *req, unsigned int issue_flags)
->   
->   		ret = -EFAULT;
->   		io_ring_submit_lock(ctx, issue_flags);
-> -		node = io_rsrc_node_lookup(&ctx->buf_table, sr->buf_index);
-> +		node = io_rsrc_node_lookup(&ctx->buf_table, req->buf_index);
->   		if (node) {
->   			io_req_assign_buf_node(sr->notif, node);
->   			ret = 0;
+> 	 * Attributes which require some form of locking
+> 	 * other than q->sysfs_lock.
+> 
+>> +	/*
+>> +	 * protects elevator switch/update
+>> +	 */
+> 
+> Also make this a full sentence, and mention which fields this protects.
+> 
+> Otherwise looks good.
 
--- 
-Pavel Begunkov
+Okay, I'll incorporate above comments in the next patchset.
 
+Thanks,
+--Nilay
