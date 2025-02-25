@@ -1,108 +1,112 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B207266B6A
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D30267F77
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 11:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740480708; cv=none; b=CyN4S4xOgUpWuKGL6RaTzqMU3qwf+Mu85zY1D86EWvERcERJqcfOENUZoQ+wg4MIOaxZRRjyg0qTsxCNkWPTbUSVVMPH2Umi3vZ8E7XTQpXC7VUPy0tD8M639ED7uY9MUJtzYrKXoHnnjG2CrJHCuwgduFEMC4T3QCh5TDZ8xZw=
+	t=1740481232; cv=none; b=hRuHAEHjFEub0/+beBsNxFIqbjLirCe+Ku0TMCJ135QwGAFH8+3VI7RR8hSAttpL5X/iYS81qVAY3lV1QjROkVW/FxC5vR82YVUEgya7P0CQEZjmqKvc/FOQBSrpWTxCYtPr2hnThXCq+dPOE8UTf/W7gLOQr8pPz8u74DdZghA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740480708; c=relaxed/simple;
-	bh=U2Fxrw+ZWnZroV2gtVWjbt2Q37s+7jT2hIUi1TH42vA=;
+	s=arc-20240116; t=1740481232; c=relaxed/simple;
+	bh=/9V1fxk2dEGCKZKFBlBO1UY7GGQ4gf7rz3pfp5JbqHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a8Wy9YV3rEVMczBX0aSVn5oW3N6sRhmoyfUWYg77uwyIYo/bBIzT+wECuJAUK3289VSGQpjBpdV54edG/ilfTSEO5A1W+PVcd6VN211Gv2pz8sccttKawNqNvUK2EaUVcn1SZnlTL3Tuzf1WyH++/AgStJQ/2twwZ5ui+ovoa+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fB6zkoia; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=rf/6/gwe8qK2lrGGm3f9nj/xDN+PtaPTliFhvK2GQXtO2W+MZq2oeotCmbpwPCRajJzFBDku21bQEUlA1AtinPrhiWEB0Ax+ewnLh3qPqjmOGgiTgE46/oLC3KCGoDSUb8GQbzaJK0KoY9clcHFMbeXWVwVw+sI1f51LSbLIgP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qwjl2mEB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fB6zkoia"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abbdf897503so1119451666b.0
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 02:51:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1740480704; x=1741085504; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mv1GjtLH9p6AAgaKLJdaYv1valnjqWPg00vkxZOmddk=;
-        b=fB6zkoiaIdMgbfeIGodOK3Bc5hooKM6K1xm0XsoLN2PzPWLcJ0JpZ1FGbt9tU+fZj1
-         cbH+/LkcoTXyyH7sdIjr+yizafF491qtIPOiJBtHMj6O7v5KdfCiPEpkgq4VYaUEdFbR
-         RCzrlNVkOSokkiFb5dyCsTLf4Wo10/c4HE0cI+EvhHLduwLr1oATaVQlrIRvp8QZAnxx
-         ZYVlsRJQlJkn8IL5m2vQ8ikz8w7Oy7eKBfSaYewdZL7UUZ0c7QntQTruTzMxqFlCnQg3
-         ZOUBl6Rho1SsPEjNqrZKLsDD7Y19DsUiV3DC17C2pjx9XmasY/krW9B41OJFhoW6wpH4
-         IyBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740480704; x=1741085504;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mv1GjtLH9p6AAgaKLJdaYv1valnjqWPg00vkxZOmddk=;
-        b=TKj31bzNkjI8YGZVPdb6kuSTTKKTjtKTY6HCAArhzcSfVACTT7FfD387AqcH3K6ztX
-         lVtUvxONaqL6GaAx0W6loxRhP25mYRn5QrrvbwGzVVv4X1S/ZZ0fNU+6mA/R03SLUcId
-         tDXGw4gtM9NR44Cqq1YQF16HIJgwwi9Ev8mBiUgdat8SvimpIavkA6U8a2FW0HYJCLtO
-         pioZB3ZjoU+61MOQfrJ2XHkOQXrMG/XdLR86yLmpDGiqZ//5CCkH5D9b8h2dXBQM19A7
-         9CqksPV9/JMLuAuDJRmDJGpUKUULU6aJq85PTuLYSstAl5uy0f3dS1n7jbsOFWBhZiWs
-         taHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSHwybeOxr6avbRThTFZI8mahY4lm+aOoJzLO9y03GPsZNc1W5jK9cacpDN401lyO7R2tvoaFxmFhGTA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfJIAX/Kc4f4HADOQi+amogi58SDMSLnf4Jbf6PZd4STIlcdHJ
-	dpt373Wrz+c96S+WhKcUB86Bj4Eq/1eEfkJ1ppqm0jKqq8WgXtYqO+8w2zXNHdg=
-X-Gm-Gg: ASbGnctT6JYl8q4asy9tVtvTvyCw7nwN2pZyC8s4AB8xP0e7++8ATWpzsEfmoYkwwFH
-	Ve1nvGdq+JfaV5bDOhcR5sjLj6DXkOb3WfYcG9kh80ildWobBOlQ3zy5d7kkm7ai68A+KSAx6Gb
-	tIDNL2s0y3AOzVe1n4VrzPIvqI+6IYbp/26kZf1pbauHPn8WNUpbhuh4VaAJeM3gqIe4OJYE+B9
-	3q/44Z+TY+gpDZDgrkbVUXlXeL/dAaUq4ZtIuBIHz1K6C7HQEWK7Tnd2sTCfe2P71Z8ZG2sHOTf
-	NYFum1AXS4EkFLYY0mIDLKk2HOJ+
-X-Google-Smtp-Source: AGHT+IHUS8m9al3aYpp9dTro/BoJsAzrTMGGeZSSdFhetcpWcy+SNbbUKcmiFFvP72TdtmWFR4s3Zg==
-X-Received: by 2002:a17:907:3e0b:b0:aba:620a:acf7 with SMTP id a640c23a62f3a-abc0ae5728bmr1777898866b.10.1740480704381;
-        Tue, 25 Feb 2025 02:51:44 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1da1c2dsm121396366b.77.2025.02.25.02.51.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 02:51:43 -0800 (PST)
-Date: Tue, 25 Feb 2025 11:51:41 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, 
-	axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH 0/2] blk-throttle: fix off-by-one jiffies wait_time
-Message-ID: <igzfzkwbbdywdvkbjzi624fgrc2jopnb6c4dpcrac644lazgbp@k63ht5r5ue4x>
-References: <20250222092823.210318-1-yukuai1@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qwjl2mEB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740481228;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uWOJcVI2y4VAoTGOX/WAROLgGbME7ad1Bieg4/4sn9I=;
+	b=Qwjl2mEBgPd+OcDkapGI0orTZLvwS1w5NEvG4E57w3NlPPUB6spDKAz5TqOHgyoA2YFTWP
+	Xzs6haYH8dgrbUZ+zIQpxfbnpfcrOiTRTynVAZKqMMVbGUUh5RlIbye+9/ET23L89VdWmp
+	oD5riMACePu8UtDjZIhXud0t3jnlB7c=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-2TxgdbmoMQOJ19HkzQlaZg-1; Tue,
+ 25 Feb 2025 06:00:23 -0500
+X-MC-Unique: 2TxgdbmoMQOJ19HkzQlaZg-1
+X-Mimecast-MFC-AGG-ID: 2TxgdbmoMQOJ19HkzQlaZg_1740481219
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 429D51800998;
+	Tue, 25 Feb 2025 11:00:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.31])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51F183000197;
+	Tue, 25 Feb 2025 11:00:12 +0000 (UTC)
+Date: Tue, 25 Feb 2025 19:00:05 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <kbusch@meta.com>
+Cc: asml.silence@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org, bernd@bsbernd.com,
+	csander@purestorage.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv5 09/11] ublk: zc register/unregister bvec
+Message-ID: <Z72itckfQq5p6xC2@fedora>
+References: <20250224213116.3509093-1-kbusch@meta.com>
+ <20250224213116.3509093-10-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="teg6osmgnl3qwlc4"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250222092823.210318-1-yukuai1@huaweicloud.com>
+In-Reply-To: <20250224213116.3509093-10-kbusch@meta.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+
+On Mon, Feb 24, 2025 at 01:31:14PM -0800, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Provide new operations for the user to request mapping an active request
+> to an io uring instance's buf_table. The user has to provide the index
+> it wants to install the buffer.
+> 
+> A reference count is taken on the request to ensure it can't be
+> completed while it is active in a ring's buf_table.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/block/ublk_drv.c      | 117 +++++++++++++++++++++++-----------
+>  include/uapi/linux/ublk_cmd.h |   4 ++
+>  2 files changed, 85 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 529085181f355..a719d873e3882 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -51,6 +51,9 @@
+>  /* private ioctl command mirror */
+>  #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>  
+> +#define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+> +#define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+> +
+>  /* All UBLK_F_* have to be included into UBLK_F_ALL */
+>  #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+>  		| UBLK_F_URING_CMD_COMP_IN_TASK \
+> @@ -201,7 +204,7 @@ static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
+>  						   int tag);
+>  static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
+>  {
+> -	return ub->dev_info.flags & UBLK_F_USER_COPY;
+> +	return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
+>  }
+
+I'd suggest to set UBLK_F_USER_COPY explicitly either from userspace or
+kernel side.
+
+One reason is that UBLK_F_UNPRIVILEGED_DEV mode can't work for both.
 
 
---teg6osmgnl3qwlc4
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH 0/2] blk-throttle: fix off-by-one jiffies wait_time
-MIME-Version: 1.0
-
-On Sat, Feb 22, 2025 at 05:28:21PM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> Yu Kuai (2):
->   blk-throttle: cleanup throtl_extend_slice()
->   blk-throttle: fix off-by-one jiffies wait_time
-
-(I haven't read through all of the 2/2 discussion but) if the 1/2 patch
-is only a cleanup, it's more backport friendly to put it after the fix.
 
 Thanks,
-Michal
+Ming
 
---teg6osmgnl3qwlc4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ72guwAKCRAt3Wney77B
-SXOwAP9fngBMH4Xn+ahF0Zv0RzYoYnjox8PuSgoFd8VeVVyVIgD9EMg0p69jzpqn
-RGSQPrygGqTm1vbVYBMl+rzVsdR5Sgo=
-=bd7s
------END PGP SIGNATURE-----
-
---teg6osmgnl3qwlc4--
