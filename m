@@ -1,159 +1,174 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A70254AEB
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 05:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FA9189F36
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 07:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740460329; cv=none; b=m7oWxUUw90FXVU+dilLz+W85ubTElO2kNHUymeNTQYM9CavzfYbzzyMYpGcRmwXopwuZxy+LhJBjt814iyelbyVInFTndKEEE7RRyNE09aZtiPlM685JgjFiI01nx65ztsPl5WQ0/7QAFG+WGsx3zdPDcYpHbeDkNWEiNKBdflM=
+	t=1740469108; cv=none; b=HL6GjxSSU632LFwkFk1E7Rppe4inFoUHo0fakTKr7fjQLMz6FJRwuUXNtwd3PFF07AggKuPd9bMA3yFH/U23eu1IIilsDuT15z4iSm+MAZ8A0SUb/GgnYZn14dOsK7T17oZ39tmtI4C5f688smej4Dw9jErAXLcc9L8Sm3Alh38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740460329; c=relaxed/simple;
-	bh=NKgcEijRW/Zh1cwjLKZ7Ou4LGFsGZ0EOpmzd2R6IRSA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=p8vBePs2Pu50MgFJBznXaYUGCG2tN9GX45l14ss5/tydTDMOfDAuSY8RRo6c/4bBM1wzFfykjH+Ip6oy5vr1zPEepy/3rOVoedcCo+5pwn/Vne3xw4mmopJytxN7363WwXN6X4gWi4oE/sx5lcQK9J46OoD/iHzCtB7XVrVMGlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=viy43hXo; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1740469108; c=relaxed/simple;
+	bh=+myyec9fstgP7F3nui5vZFKB+z8SJ29afXUXsd/qTmU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ux6n+3W1Y0dDrb+Rx7Pw29DuF9tnEm1UgYlwKddAr81p8TXCjfcnGXLAkdD+Edx7Pw1p5M3uWFu4B7Skw7uYh0RHxRd2xTUz6HGo44eGoLrnoF7TNlhPBesWLobx1/SutJ6UPcM80P0kE+0/gMheOPczHldv03KkoH/9jRU96D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vOkXxkWc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xWHPtHQM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vOkXxkWc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xWHPtHQM; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="viy43hXo"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250225051205epoutp039ac54a57f1309cc4f0b85d715dd74a39~nW3HU9pZG2785727857epoutp03V
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 05:12:05 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250225051205epoutp039ac54a57f1309cc4f0b85d715dd74a39~nW3HU9pZG2785727857epoutp03V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1740460325;
-	bh=WW5dHa7+uFgb2GgCT612fikzvZkwWoYKaCZBUFEuV44=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=viy43hXoIYg+cJUTZHfh+EMgEZCTo/dHIkqBdP4R3Rjm676NveiJ2DBHOQXdRmcVR
-	 DEmWplCWqYmGhPeYnp1/bMuiuG7mzMOtwYuIDszrgaDfqlPONvK0Fk2iZ6TgSpPiFE
-	 MeeZ1SY43sj5vta3plsqPhGcLyWWgQqJlaiN/Y/w=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20250225051204epcas5p3b53c8df5b0a9a1767e2b0d1b8ccca76b~nW3Gn-70Y0616406164epcas5p3R;
-	Tue, 25 Feb 2025 05:12:04 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4Z25Ll0rv9z4x9Pt; Tue, 25 Feb
-	2025 05:11:59 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	34.E6.19933.E115DB76; Tue, 25 Feb 2025 14:11:59 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250225045516epcas5p3fa5712152300bf976d1bc0ab26211633~nWocCz3Mo3038830388epcas5p3w;
-	Tue, 25 Feb 2025 04:55:16 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250225045516epsmtrp11422abd21c4b46eb83fabce65c9d7e79~nWocB-QNy1661216612epsmtrp1r;
-	Tue, 25 Feb 2025 04:55:16 +0000 (GMT)
-X-AuditID: b6c32a4a-b87c770000004ddd-3e-67bd511eb825
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	1A.BC.18729.43D4DB76; Tue, 25 Feb 2025 13:55:16 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250225045514epsmtip24c33748a5236887fa8051cab6e307c55~nWoaCaXLr3049830498epsmtip2N;
-	Tue, 25 Feb 2025 04:55:14 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-	martin.petersen@oracle.com
-Cc: anuj1072538@gmail.com, nikh1092@linux.ibm.com,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, Anuj Gupta
-	<anuj20.g@samsung.com>
-Subject: [PATCH v1 2/3] nvme: Fix incorrect block integrity sysfs values for
- non-PI namespaces
-Date: Tue, 25 Feb 2025 10:16:52 +0530
-Message-Id: <20250225044653.6867-3-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250225044653.6867-1-anuj20.g@samsung.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vOkXxkWc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xWHPtHQM";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vOkXxkWc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xWHPtHQM"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 083521F44F;
+	Tue, 25 Feb 2025 07:38:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740469105; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b8yndWxMjcl+lcKx0y9LUj9XFTr9tgBHyvX7IKz4Brg=;
+	b=vOkXxkWcWviY2gYDoJ9Sv02PSsNLk0Ib63a3dxFlovhCwXBJINBx8bo/anKrMbGdlRr/VQ
+	hOFrLu+uErb8SSfkTiVlvABrbPshCdkc9YuLDRkNaHuhipl13plOL+4tJ5mWYGFCFwufsy
+	tIvGIdfzs/EZx6R5+jbH7PHpKG381zs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740469105;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b8yndWxMjcl+lcKx0y9LUj9XFTr9tgBHyvX7IKz4Brg=;
+	b=xWHPtHQMHC1RDFMHbeDE83QzybuJi0RgryEtciErC8294Zn75rMEVlsemmrlWKS7YQJa5F
+	UnBsVgLnoby1xLBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vOkXxkWc;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=xWHPtHQM
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740469105; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b8yndWxMjcl+lcKx0y9LUj9XFTr9tgBHyvX7IKz4Brg=;
+	b=vOkXxkWcWviY2gYDoJ9Sv02PSsNLk0Ib63a3dxFlovhCwXBJINBx8bo/anKrMbGdlRr/VQ
+	hOFrLu+uErb8SSfkTiVlvABrbPshCdkc9YuLDRkNaHuhipl13plOL+4tJ5mWYGFCFwufsy
+	tIvGIdfzs/EZx6R5+jbH7PHpKG381zs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740469105;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b8yndWxMjcl+lcKx0y9LUj9XFTr9tgBHyvX7IKz4Brg=;
+	b=xWHPtHQMHC1RDFMHbeDE83QzybuJi0RgryEtciErC8294Zn75rMEVlsemmrlWKS7YQJa5F
+	UnBsVgLnoby1xLBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B68A413332;
+	Tue, 25 Feb 2025 07:38:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QpR4KnBzvWecbgAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 25 Feb 2025 07:38:24 +0000
+Message-ID: <ab4e899f-83d8-4f05-a592-122a445bff69@suse.de>
+Date: Tue, 25 Feb 2025 08:38:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 1/7] block: acquire q->limits_lock while reading sysfs
+ attributes
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
+ gjoyce@ibm.com
+References: <20250224133102.1240146-1-nilay@linux.ibm.com>
+ <20250224133102.1240146-2-nilay@linux.ibm.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250224133102.1240146-2-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmlq584N50g1VfmS0+fv3NYtE04S+z
-	xeq7/WwWCxbNZbFYufook8WkQ9cYLfbe0raYv+wpu0X39R1sFsuP/2OyuHvxKbMDt8fOWXfZ
-	PS6fLfXYtKqTzWPCogOMHpuX1Hu82DyT0WP3zQY2j49Pb7F49G1ZxejxeZNcAFdUtk1GamJK
-	apFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0MFKCmWJOaVAoYDE
-	4mIlfTubovzSklSFjPziElul1IKUnAKTAr3ixNzi0rx0vbzUEitDAwMjU6DChOyMx90v2AsW
-	clW83n2buYHxBEcXIyeHhICJxJI13exdjFwcQgK7GSVu72hmgXA+MUrcmzkDyvnGKNG4aC0T
-	TMvMp5dZIRJ7GSUmfnwD1f+ZUWLRg/tsIFVsAuoSR563MoLYIgIBErNOX2EEKWIWOMso8bfx
-	PwtIQlggQeLD7l9AYzk4WARUJd6/KgIJ8wpYSGy8d4QNYpu8xMxL39lBbE4BS4kJh3pZIWoE
-	JU7OfAI2hhmopnnrbGaQ+RICKzkk9p6+xgrR7CLx7ecXqLOFJV4d38IOYUtJvOxvg7LTJX5c
-	fgpVUyDRfGwfI4RtL9F6qp8Z5DZmAU2J9bv0IcKyElNPrWOC2Msn0fv7CVQrr8SOeTC2kkT7
-	yjlQtoTE3nMNULaHxOzjPxkhgdXDKPFg8yGmCYwKs5D8MwvJP7MQVi9gZF7FKJlaUJybnlps
-	WmCUl1oOj+bk/NxNjOBUrOW1g/Hhgw96hxiZOBgPMUpwMCuJ8HJm7kkX4k1JrKxKLcqPLyrN
-	SS0+xGgKDO+JzFKiyfnAbJBXEm9oYmlgYmZmZmJpbGaoJM7bvLMlXUggPbEkNTs1tSC1CKaP
-	iYNTqoFpXr/95kMlj5/N3fO0a7rLarcP0ebiT3gjTTLsr1VXqfn7STWINO6PVROanlS9tfrA
-	1rWuF+/Xnnrn87Gz8fPuzjN1nVMrJi1+vjlBX62g40HBL5sXqke/rntWrvFk36aT55v4A7d/
-	cHWOunJR+na3tVj8PaEVfdvFPjY7PMk4pXreqWd2/lXF5/9KXqm53loUpSsRs/P2vhuPnk14
-	ML18xgL+zw4c7Ey8/B+vb7wwe/4ZiQ83uk6e2G6zsHid5BvfrdL7N1pf6xA7fSLnVn2HNtv9
-	wr+aq8p6nLZt+yN8SJvv1s4Kh0sFu5uPpfmarSvxNvmw5qK9+QU1h9bDB1MXH2DadPUxi4/f
-	hhKrsnyRNCWW4oxEQy3mouJEAMEBpCdOBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPLMWRmVeSWpSXmKPExsWy7bCSvK6J7950gzMvDS0+fv3NYtE04S+z
-	xeq7/WwWCxbNZbFYufook8WkQ9cYLfbe0raYv+wpu0X39R1sFsuP/2OyuHvxKbMDt8fOWXfZ
-	PS6fLfXYtKqTzWPCogOMHpuX1Hu82DyT0WP3zQY2j49Pb7F49G1ZxejxeZNcAFcUl01Kak5m
-	WWqRvl0CV8bj7hfsBQu5Kl7vvs3cwHiCo4uRk0NCwERi5tPLrF2MXBxCArsZJY7/OcUKkZCQ
-	OPVyGSOELSyx8t9zdoiij4wSW8/MZgNJsAmoSxx53gpUxMEhIhAi0XPEBKSGWeAyo8SUV1/A
-	BgkLxEksOn2CGaSGRUBV4v2rIpAwr4CFxMZ7R9gg5stLzLz0nR3E5hSwlJhwqJcVpFwIqObC
-	ymiIckGJkzOfsIDYzEDlzVtnM09gFJiFJDULSWoBI9MqRsnUguLc9NxiwwLDvNRyveLE3OLS
-	vHS95PzcTYzgONHS3MG4fdUHvUOMTByMhxglOJiVRHg5M/ekC/GmJFZWpRblxxeV5qQWH2KU
-	5mBREucVf9GbIiSQnliSmp2aWpBaBJNl4uCUamAScxWV1VyY3nwm0O+T/OnZcdPO9bWo1n1c
-	+GiWr+0ZZ1eeOqMnMi+29CZmVMh8WbptHefrPVXZHbMdVt15sifg0CvV1duY3l2eLP1Lfs87
-	I7cGm316arPuMqXt7XaWfvGwj+Nit+ubq2+VVr0SmpByynDStSbzI9M9Wxf+4dAOjbjhN09K
-	bY7wvktlKzZZz91ub3bPyuqL/pFPH1Vzi7LC5Z9IbNw/1Xa6VO/bxjvFcyK8WKNWtfoc2rVk
-	7d0Fqn++tnNX3ij9fM3Mts16s8aWDdfX2Cf9d/XdOuOlW2qt5WINE9bdoSZR4QX6Hn0PTGwf
-	8G8vv64yv1H8s6i0VVYwZ/aZBbx8C7M4GDfNztNWYinOSDTUYi4qTgQAsp+yOwIDAAA=
-X-CMS-MailID: 20250225045516epcas5p3fa5712152300bf976d1bc0ab26211633
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250225045516epcas5p3fa5712152300bf976d1bc0ab26211633
-References: <20250225044653.6867-1-anuj20.g@samsung.com>
-	<CGME20250225045516epcas5p3fa5712152300bf976d1bc0ab26211633@epcas5p3.samsung.com>
+X-Rspamd-Queue-Id: 083521F44F
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-Commit 9f4aa46f2a74
-("block: invert the BLK_INTEGRITY{GENERATE,VERIFY} flags") caused
-read_verify and write_generate to report 1 for NVMe namespaces
-without PI support. This happens because BLK_INTEGRITY_NOGENERATE and
-BLK_INTEGRITY_NOVERIFY were not explicitly set.
+On 2/24/25 14:30, Nilay Shroff wrote:
+> There're few sysfs attributes(RW) whose store method is protected
+> with q->limits_lock, however the corresponding show method of these
+> attributes run holding q->sysfs_lock and that doesn't make sense
+> as ideally the show method of these attributes should also run
+> holding q->limits_lock instead of q->sysfs_lock. Hence update the
+> show method of these sysfs attributes so that reading of these
+> attributes acquire q->limits_lock instead of q->sysfs_lock.
+> 
+> Similarly, there're few sysfs attributes(RO) whose show method is
+> currently protected with q->sysfs_lock however updates to these
+> attributes could occur using atomic limit update APIs such as queue_
+> limits_start_update() and queue_limits_commit_update() which run
+> holding q->limits_lock. So that means that reading these attributes
+> holding q->sysfs_lock doesn't make sense. Hence update the show method
+> of these sysfs attributes(RO) such that they run with holding q->
+> limits_lock instead of q->sysfs_lock.
+> 
+> We have defined a new macro QUEUE_LIM_RO_ENTRY() which uses new ->show_
+> limit() method and it runs holding q->limits_lock. All existing sysfs
+> attributes(RO) which needs protection using q->limits_lock while
+> reading have been now updated to use this new macro for initialization.
+> 
+> Also, the existing QUEUE_LIM_RW_ENTRY() is updated to use new ->show_
+> limit() method for reading attributes instead of existing ->show()
+> method. As ->show_limit() runs holding q->limits_lock, the existing
+> sysfs attributes(RW) requiring protection are now inherently protected
+> using q->limits_lock instead of q->sysfs_lock.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+>   block/blk-sysfs.c | 102 +++++++++++++++++++++++++++++-----------------
+>   1 file changed, 65 insertions(+), 37 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Fix this by initializing these flags by default and clearing them only
-when the namespace supports PI.
+Cheers,
 
-Fixes: 9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
----
- drivers/nvme/host/core.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 818d4e49aab5..fe599a811d38 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1799,6 +1799,7 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 
- 	memset(bi, 0, sizeof(*bi));
- 
-+	bi->flags = BLK_INTEGRITY_NOGENERATE | BLK_INTEGRITY_NOVERIFY;
- 	if (!head->ms)
- 		return true;
- 
-@@ -1850,6 +1851,9 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 		break;
- 	}
- 
-+	if (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)
-+		bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
-+			       BLK_INTEGRITY_NOVERIFY);
- 	bi->tuple_size = head->ms;
- 	bi->pi_offset = info->pi_offset;
- 	return true;
+Hannes
 -- 
-2.25.1
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
