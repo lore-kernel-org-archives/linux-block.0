@@ -1,186 +1,137 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A365526A1BA
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 11:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23892676F7;
+	Tue, 25 Feb 2025 11:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740481387; cv=none; b=ass9dfZGmQ/+HZW1H7bFB47qXjCPYMbOGEGZROC3Fffwc253ysiUYrWc3iPrF+3ueR/3FBfc3YlbqJUJbMsSMI7WKx6nsjDPeIFoDebp1G8EB6X/GRKzwcD/p3FZTbvYRrsQOayA/KUcaXve5mzpG5K+44TFgVreDHm9tj8A/gM=
+	t=1740481780; cv=none; b=V6ZuS+P5bCXKP3TBv8K6hh2MeTBZ+a2mN1LcuTzpTLMBggk0a4fNKn0a9V5GqqEue+CEunqFX+9SnDW991cOyKKNPsPa9b3rduGfKrHhEZGGC3KS+dY3N94MVa4bD0qt3hH2zOghSeHsLz9/oceYYwrmkrVyWYW5kKoXnnLo7ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740481387; c=relaxed/simple;
-	bh=LHbv0ySp7xfDxrK4xHapFhpfYe+OzWaL/Jp6LJ1qBUw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gZFKSauQUPz7zRY40aufsxpdZ9ZlXNzqTpUF3nF8N73F/qczqWZTB2Y1ZfeCx6qTvyctG3nSAnfP2i6bXnuGGc4tABnu6xYAyHUQIPmaR7X92/Sd59XXghjwW4It7XIOPVVIwsUVJJS35AhDIbe3P/iA7HVv6wU53ooboMdBvBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQv5ZqLm; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQv5ZqLm"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e0505275b7so8763144a12.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 03:03:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740481384; x=1741086184; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9PhBCHuwMSAmBjmzYgRXFDACJ3K4AQ8Leyj9gnJygE=;
-        b=HQv5ZqLmCSmiW35GF5ZykS13vZD+YsNifriP7cP0TGe+xHP7MZLVqNlrJSKV39ACRc
-         sTn76FrWQHgmCaojCbgOfEVmww3Hqu3n8VkrANmYcF58hKPJtqnplD7lIJuO9Dy/Zixf
-         4x45lbpk9RCFNH79fk3S3qPuCJF046n5hCH3IXW1bT0Ve4bSm6PlmGbcIXx2w0vVHNzz
-         f4Y6yMXkiDvkoIhgOacSwne28fxUpi5Kcn4bBfkwQx9AiaNaxVCqZpchsFFs8LKsaQzb
-         ZoJLGf4kflPjjMJGO//cU8DFKhWtHJuQgGojAQPXbeJnBiQrKacUr/HKzPNYdmEiXIEy
-         Sf2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740481384; x=1741086184;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X9PhBCHuwMSAmBjmzYgRXFDACJ3K4AQ8Leyj9gnJygE=;
-        b=F7dGMUWHeoh3YhLtSGVbfNpbZ9O/r7Pv5T41GDwStgMU5ZXN2JF/SYOV9YOSgy++vt
-         ckLDVq/JMb+vxyI6A4lhp26yJM9Y/P9yPSOYjgS/z7MO8EvhmZ0G6+CbLoM/6UWlHnzN
-         X+Soi6lhkqnIJVGYh7f5NXEacaTfmcw2QRmb2CnOWYgc66fADlK0UoD20b6vOzdutFLW
-         flgptuozwNQblLxa/YrrsuAjmaLyQe+3/25PdNkgkS2WF4zKN1m4AWuBg0GE5cBi6Epb
-         44b23U0vzsM10UfLeIHvlWvQeECtRbPU3pNvr6dK8ZCgNYaEjuFIEK31Nb6QDf4TZmZa
-         XLYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVk5FUlj7abMuCll1ZHZfWA65apvoYPWRYN8qbOcTScHRC2mryqeOuQRCBbeu27Pmy4Jqw/ple7K8/qw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8bRM07gcyfS0BiKFoZigdiJUcwgd2Csl+99CyxbBA2Eg4bm0r
-	u6kKTGYuAl0USG0Ls6a8xkVnvZQjX6IFvFAB1+QLnBBkiq9JHKamAJ7iVqPmY1fXFQ==
-X-Gm-Gg: ASbGncs4IbfRKKXlVx688pe93iBulDcUuk1j5U5Yt6Zxnihe3PJJTlvGxl4+nJNDrUw
-	vt5V2P0QNTpTIUuE6u6/rclXWkBvS4yeGnOuTpsnQfYCOMyVvzSueNcEnCLIuzpo25AhKPmW4lN
-	VJ8waKo5kUPmpWHY3fT7cP1+5bn0ljpNkMCNoZreK3ruSPUn5/nMzjN0xcBfZqVLuWFmZOXvl6R
-	L0RjJ7VumDZFPLiFJMdHy2U3rpZUTRuNWmzN64RmAglZXbFWS5EUXPW7weh6OR3qC9/fpJpQnLl
-	huHRwOa7tq0yXVlKhZ7y9ot8v5P3CetLXv3gP3hIfHWWio1GRA==
-X-Google-Smtp-Source: AGHT+IEfWZbLPMPl4xzpoUMh28dOs0f97cyZOw21N18EzeoLdRVruBnMgEdxH2T6RxcFsIF+5yrnJA==
-X-Received: by 2002:a05:6402:2b88:b0:5de:d6c3:111a with SMTP id 4fb4d7f45d1cf-5e0b70d034bmr14495875a12.3.1740481383698;
-        Tue, 25 Feb 2025 03:03:03 -0800 (PST)
-Received: from [147.251.42.106] (fosforos.fi.muni.cz. [147.251.42.106])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e460d1bcb6sm1042969a12.55.2025.02.25.03.03.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 03:03:03 -0800 (PST)
-Message-ID: <ba3840dd-e3a7-4896-89c9-0f131bb46fa5@gmail.com>
-Date: Tue, 25 Feb 2025 12:03:02 +0100
+	s=arc-20240116; t=1740481780; c=relaxed/simple;
+	bh=d1JecBOd39KaxgofY9dObpdwKr5wka7PaavQk7GYTxo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=YuGP3Bc/ChnLvFAy7nI3H1bXXZgwlPsB0qUuuj/D1Z3iwLo98m7Rg1A7N91RhveecVSQCxaxB8218GrB+URVJrE5FBMtctElyGheQxZUI/PtVLUBsajGoyQynDdN0uFi/YJEgSeT6OQoCDc7WUYSehVS85ZymUhgd3WOhSzLJMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z2FH00sZCz4f3jt0;
+	Tue, 25 Feb 2025 19:09:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 9294A1A0DE0;
+	Tue, 25 Feb 2025 19:09:32 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgB321_qpL1nVnlrEw--.6688S3;
+	Tue, 25 Feb 2025 19:09:32 +0800 (CST)
+Subject: Re: [PATCH 2/2] blk-throttle: fix off-by-one jiffies wait_time
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <Z7nAJSKGANoC0Glb@fedora>
+ <f2f54206-b5c0-7486-d607-337d29e9c145@huaweicloud.com>
+ <Z7vnTyk6Y6X4JWQB@fedora>
+ <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
+ <Z7w0P8ImJiZhRsPD@fedora>
+ <611f02a8-8430-16cf-46e5-e9417982b077@huaweicloud.com>
+ <Z70btzRaN83FbTJp@fedora>
+ <8473fca2-16ab-b2a6-ede7-d1449aa7d463@huaweicloud.com>
+ <Z70qvZEBdq6L3-Yb@fedora>
+ <084e25a1-5ed7-3097-5bae-b87addeaf01f@huaweicloud.com>
+ <Z719gj8GOl0itRwV@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <dc2b3a40-b33b-0bc5-3a73-18b288b4283f@huaweicloud.com>
+Date: Tue, 25 Feb 2025 19:09:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: sysfs integrity fields use
-To: Kanchan Joshi <joshi.k@samsung.com>,
- linux-block <linux-block@vger.kernel.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@infradead.org>,
- "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
-References: <CGME20250225092525epcas5p31dd0a19ffdfb39f3f2ce4acd1c6da7ee@epcas5p3.samsung.com>
- <67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
- <823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <Z719gj8GOl0itRwV@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgB321_qpL1nVnlrEw--.6688S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFW3WF4rGr13KrW3Jw47urg_yoW8Zr4DpF
+	Waqrn0kr4YqFn7KF4Fv3Z8Wa48AayDWr98Gw4DJrWxA3WDCw1xtF12kFs0kF9ayFn7Cr4j
+	va4rXFy3AFy8ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 2/25/25 11:10 AM, Kanchan Joshi wrote:
-> On 2/25/2025 2:53 PM, Milan Broz wrote:
->> Hi,
+Hi,
+
+在 2025/02/25 16:21, Ming Lei 写道:
+> On Tue, Feb 25, 2025 at 11:12:24AM +0800, Yu Kuai wrote:
+>> Hi, Ming!
 >>
->> I tried to add some support for using devices with PI/DIF metadata
->> and checked (through sysfs) how large metadata space per sector
->> is available.
+>> 在 2025/02/25 10:28, Ming Lei 写道:
+>>> Can you explain in details why it signals that the rate is expected now?
+>>>
+>>> If rate isn't expected, it will cause trouble to trim, even just the
+>>> previous part.
 >>
->> The problem is that some values behave differently than I expected.
+>> Ok, for example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
+>> slice is 20ms(2 jiffies).
 >>
->> For an NVMe drive, reformatted to 4096 + 64 profile, I see this:
->>
->> - /sys/block/<disk>/integrity/device_is_integrity_capable
->>     Contains 0 (?)
->>     According to docs, this field
->>    "Indicates whether a storage device is capable of storing integrity
->> metadata.
->>    Set if the device is T10 PI-capable."
->>
->> - /sys/block/<disk>/integrity/format
->>    Contains expected "nop" (not "none")
->>
->> - /sys/block/<disk>/integrity/tag_size
->>     Contains 0 (?)
 > 
-> This and "nop" indicates that pi-type was configured to be 0?
-> Maybe you can share the nvme format command as well.
-
-Sure, it is formatted to 4k data + 64 bytes metadata profile:
-
-# nvme id-ns -H /dev/nvme0n1
-...
-
-LBA Format  0 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0 Best
-LBA Format  1 : Metadata Size: 8   bytes - Data Size: 512 bytes - Relative Performance: 0 Best
-LBA Format  2 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0 Best
-LBA Format  3 : Metadata Size: 64  bytes - Data Size: 4096 bytes - Relative Performance: 0 Best (in use)
-
-formatted with
-# nvme format --lbaf=3 --force /dev/nvme0n1
-
->>     According to docs, this is "Number of bytes of integrity tag space
->>     available per 512 bytes of data."
->>     (I think 512 bytes is incorrect; it should be sector size, or perhaps
->>      value in protection_interval_bytes, though.)
->>
->> Then we have new (undocumented) value for NVMe in
->> - /sys/block/<nvme>/integrity/metadata_bytes
->>     This contains the correct 64.
+> We all know how it works, but I didn't understand the behind idea why it
+> is correct. Now I figured it out:
 > 
-> Maybe you mean "/sys/block/>/metadata_bytes"?
+> 1) increase default slice window to 2 * td->throttle_slice
+> 
+> 2) slice window is set as [jiffies - td->throttle_slice, jiffies + td->throttle_slice]
+> 
+> 3) initialize td->bytes_disp[]/td->io_dis[] as actual dispatched bytes/ios
+> done [jiffies - td->throttle_slice, 0]
+> 
+> This approach looks smart, and it should work well for any deviation which is <= 1
+> throttle_slice.
+> 
+> Probably it is enough for fixing the issue in throtl/001, even though 2 jiffies
+> timer drift still may be observed, see the below log collected in my VM(HZ_100)
+> by just running one time of blktests './check throtl':
+> 
+> @timer_expire_delay:
+> [1, 2)               387 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [2, 3)                11 |@                                                   |
+> 
+> bpftrace -e 'kfunc:throtl_pending_timer_fn { @timer_expire_delay = lhist(jiffies - args->t->expires, 0, 16, 1);}'
+> 
+> 
+> Also I'd suggest to remove ->carryover_bytes/ios since blk-throttle algorithm is
+> supposed to be adaptive, and the approach I suggested may cover this area,
+> what do you think of this cleanup? I have one local patchset, which can
+> pass all blktest throtl tests with removing ->carryover_bytes/ios.
+> 
 
-Yes, it is not under integrity subdir, just copy& paste error, sorry.
+It's always welcome for such cleanup. BTW, do you have plans to support
+bio merge for iops limit in blk-throttle? Since bio split is handled. I
+was thinking about using carryover_ios, perhaps you can handle this as
+well.
 
-Just to add - I would like to add these integrity fields also to lsblk, but there we need exact
-specification where to get integrity info.
-
-Milan
+Thanks,
+Kuai
+> 
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
