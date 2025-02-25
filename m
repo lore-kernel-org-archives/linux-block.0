@@ -1,137 +1,191 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23892676F7;
-	Tue, 25 Feb 2025 11:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1D5267B71
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 11:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740481780; cv=none; b=V6ZuS+P5bCXKP3TBv8K6hh2MeTBZ+a2mN1LcuTzpTLMBggk0a4fNKn0a9V5GqqEue+CEunqFX+9SnDW991cOyKKNPsPa9b3rduGfKrHhEZGGC3KS+dY3N94MVa4bD0qt3hH2zOghSeHsLz9/oceYYwrmkrVyWYW5kKoXnnLo7ek=
+	t=1740483833; cv=none; b=SdRMKjF2MFZDoUECgVy9Lr0QMVcz8nJb3xGIBa+eG5BllT0woziqBYJ6WrFe3B61QkTsnS5R2hBztuXvVW5ImzuoeAo2JsGbLOIbaTWPoiuDzgABVpaiLaMOQB2hI4BKSGrjnKHntE8bMmdp0KySFYz4QhCeeyLSTj1jZd7/tOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740481780; c=relaxed/simple;
-	bh=d1JecBOd39KaxgofY9dObpdwKr5wka7PaavQk7GYTxo=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YuGP3Bc/ChnLvFAy7nI3H1bXXZgwlPsB0qUuuj/D1Z3iwLo98m7Rg1A7N91RhveecVSQCxaxB8218GrB+URVJrE5FBMtctElyGheQxZUI/PtVLUBsajGoyQynDdN0uFi/YJEgSeT6OQoCDc7WUYSehVS85ZymUhgd3WOhSzLJMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z2FH00sZCz4f3jt0;
-	Tue, 25 Feb 2025 19:09:16 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 9294A1A0DE0;
-	Tue, 25 Feb 2025 19:09:32 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgB321_qpL1nVnlrEw--.6688S3;
-	Tue, 25 Feb 2025 19:09:32 +0800 (CST)
-Subject: Re: [PATCH 2/2] blk-throttle: fix off-by-one jiffies wait_time
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <Z7nAJSKGANoC0Glb@fedora>
- <f2f54206-b5c0-7486-d607-337d29e9c145@huaweicloud.com>
- <Z7vnTyk6Y6X4JWQB@fedora>
- <e6a29a6a-f5ec-7953-14e9-2550a549f955@huaweicloud.com>
- <Z7w0P8ImJiZhRsPD@fedora>
- <611f02a8-8430-16cf-46e5-e9417982b077@huaweicloud.com>
- <Z70btzRaN83FbTJp@fedora>
- <8473fca2-16ab-b2a6-ede7-d1449aa7d463@huaweicloud.com>
- <Z70qvZEBdq6L3-Yb@fedora>
- <084e25a1-5ed7-3097-5bae-b87addeaf01f@huaweicloud.com>
- <Z719gj8GOl0itRwV@fedora>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <dc2b3a40-b33b-0bc5-3a73-18b288b4283f@huaweicloud.com>
-Date: Tue, 25 Feb 2025 19:09:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1740483833; c=relaxed/simple;
+	bh=oTcq3N/TfuQzz5sSYO/guMrWwslbUVmu1iYBmsMp14c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M5kTmFAk0ZdaDjTqCtmCJM1q+ELJ5MbsJDTk2JbBrejFWfxSZBM7VJKRJzl50N6fZxTV6AvVJxo4er4BXa4qnT3hjDyrWYceyuIMaw9GO/SbLJUdGxUW8/hV3E9QnrJptsYr/iTOnGLJdbo3QCfQOhmaVCPckm5zpYMwYON9G0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gY1kI1RS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cxxJEXI/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gY1kI1RS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cxxJEXI/; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gY1kI1RS";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cxxJEXI/";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gY1kI1RS";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cxxJEXI/"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 88A992116B;
+	Tue, 25 Feb 2025 11:43:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740483830; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Av+0hUn2C2u4m0wg+qf81HJW3QK4PW3/3BalFtzZtw=;
+	b=gY1kI1RScj2sWx7oTl0e4NHkfAHozYX7CZAV6lqMevl3RU3ET2wKo6KALAIxOrTCK7fWZI
+	LfP5akJY63cS2kI0w3zbal4Ye7kXQEPkj+V7JHxqvrAaCvaerniNz3Rr6gQrSppbZzd673
+	Cb78gOR37Y2MT1r3mDitXB7QEnfPQq4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740483830;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Av+0hUn2C2u4m0wg+qf81HJW3QK4PW3/3BalFtzZtw=;
+	b=cxxJEXI/P1owtHWHycXQqYr+nh3oFnNM78axPc680nt8kgC9MUAHGR8R0QLsvXxEjOoXwV
+	FpaurTgugo1Ow2Cw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740483830; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Av+0hUn2C2u4m0wg+qf81HJW3QK4PW3/3BalFtzZtw=;
+	b=gY1kI1RScj2sWx7oTl0e4NHkfAHozYX7CZAV6lqMevl3RU3ET2wKo6KALAIxOrTCK7fWZI
+	LfP5akJY63cS2kI0w3zbal4Ye7kXQEPkj+V7JHxqvrAaCvaerniNz3Rr6gQrSppbZzd673
+	Cb78gOR37Y2MT1r3mDitXB7QEnfPQq4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740483830;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Av+0hUn2C2u4m0wg+qf81HJW3QK4PW3/3BalFtzZtw=;
+	b=cxxJEXI/P1owtHWHycXQqYr+nh3oFnNM78axPc680nt8kgC9MUAHGR8R0QLsvXxEjOoXwV
+	FpaurTgugo1Ow2Cw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6EE9F13332;
+	Tue, 25 Feb 2025 11:43:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id BfCjGvasvWeRQQAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 25 Feb 2025 11:43:50 +0000
+Message-ID: <8cc8a5ee-1bd6-4656-9688-3993dfc942ea@suse.de>
+Date: Tue, 25 Feb 2025 12:43:50 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z719gj8GOl0itRwV@fedora>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 7/7] block: protect read_ahead_kb using q->limits_lock
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
+ gjoyce@ibm.com
+References: <20250224133102.1240146-1-nilay@linux.ibm.com>
+ <20250224133102.1240146-8-nilay@linux.ibm.com>
+ <4e1feba0-e4c4-44fa-a6fa-437a927dbd60@suse.de>
+ <14742723-0699-4bf1-8dae-c0b9dd077c76@linux.ibm.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <14742723-0699-4bf1-8dae-c0b9dd077c76@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB321_qpL1nVnlrEw--.6688S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFW3WF4rGr13KrW3Jw47urg_yoW8Zr4DpF
-	Waqrn0kr4YqFn7KF4Fv3Z8Wa48AayDWr98Gw4DJrWxA3WDCw1xtF12kFs0kF9ayFn7Cr4j
-	va4rXFy3AFy8ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.990];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Hi,
-
-在 2025/02/25 16:21, Ming Lei 写道:
-> On Tue, Feb 25, 2025 at 11:12:24AM +0800, Yu Kuai wrote:
->> Hi, Ming!
->>
->> 在 2025/02/25 10:28, Ming Lei 写道:
->>> Can you explain in details why it signals that the rate is expected now?
+On 2/25/25 11:18, Nilay Shroff wrote:
+> 
+> 
+> On 2/25/25 1:28 PM, Hannes Reinecke wrote:
+>> On 2/24/25 14:30, Nilay Shroff wrote:
+>>> The bdi->ra_pages could be updated under q->limits_lock because it's
+>>> usually calculated from the queue limits by queue_limits_commit_update.
+>>> So protect reading/writing the sysfs attribute read_ahead_kb using
+>>> q->limits_lock instead of q->sysfs_lock.
 >>>
->>> If rate isn't expected, it will cause trouble to trim, even just the
->>> previous part.
+>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>>> ---
+>>>    block/blk-sysfs.c | 16 ++++++++++------
+>>>    1 file changed, 10 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>>> index 8f47d9f30fbf..228f81a9060f 100644
+>>> --- a/block/blk-sysfs.c
+>>> +++ b/block/blk-sysfs.c
+>>> @@ -93,9 +93,9 @@ static ssize_t queue_ra_show(struct gendisk *disk, char *page)
+>>>    {
+>>>        ssize_t ret;
+>>>    -    mutex_lock(&disk->queue->sysfs_lock);
+>>> +    mutex_lock(&disk->queue->limits_lock);
+>>>        ret = queue_var_show(disk->bdi->ra_pages << (PAGE_SHIFT - 10), page);
+>>> -    mutex_unlock(&disk->queue->sysfs_lock);
+>>> +    mutex_unlock(&disk->queue->limits_lock);
+>>>          return ret;
+>>>    }
+>>> @@ -111,12 +111,15 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
+>>>        ret = queue_var_store(&ra_kb, page, count);
+>>>        if (ret < 0)
+>>>            return ret;
+>>> -
+>>> -    mutex_lock(&q->sysfs_lock);
+>>> +    /*
+>>> +     * ->ra_pages is protected by ->limits_lock because it is usually
+>>> +     * calculated from the queue limits by queue_limits_commit_update.
+>>> +     */
+>>> +    mutex_lock(&q->limits_lock);
+>>>        memflags = blk_mq_freeze_queue(q);
+>>>        disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
+>>> +    mutex_unlock(&q->limits_lock);
+>>>        blk_mq_unfreeze_queue(q, memflags);
+>>> -    mutex_unlock(&q->sysfs_lock);
+>>>    
 >>
->> Ok, for example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
->> slice is 20ms(2 jiffies).
+>> Cf my comments to the previous patch: Ordering.
 >>
+>> Here we take the lock _before_ 'freeze', with the previous patch we took
+>> the lock _after_ 'freeze'.
+>> Why?
+>>
+> Yes this is ->limits_lock which is different from ->elevator_lock. The ->limits_lock
+> is used by atomic update APIs queue_limits_start_update() and helpers. Here, the
+> order we follow is : acquire ->limits_lock followed by queue-freeze.
 > 
-> We all know how it works, but I didn't understand the behind idea why it
-> is correct. Now I figured it out:
+> So even here in sysfs attribute store method we follow the same locking order.
 > 
-> 1) increase default slice window to 2 * td->throttle_slice
-> 
-> 2) slice window is set as [jiffies - td->throttle_slice, jiffies + td->throttle_slice]
-> 
-> 3) initialize td->bytes_disp[]/td->io_dis[] as actual dispatched bytes/ios
-> done [jiffies - td->throttle_slice, 0]
-> 
-> This approach looks smart, and it should work well for any deviation which is <= 1
-> throttle_slice.
-> 
-> Probably it is enough for fixing the issue in throtl/001, even though 2 jiffies
-> timer drift still may be observed, see the below log collected in my VM(HZ_100)
-> by just running one time of blktests './check throtl':
-> 
-> @timer_expire_delay:
-> [1, 2)               387 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [2, 3)                11 |@                                                   |
-> 
-> bpftrace -e 'kfunc:throtl_pending_timer_fn { @timer_expire_delay = lhist(jiffies - args->t->expires, 0, 16, 1);}'
-> 
-> 
-> Also I'd suggest to remove ->carryover_bytes/ios since blk-throttle algorithm is
-> supposed to be adaptive, and the approach I suggested may cover this area,
-> what do you think of this cleanup? I have one local patchset, which can
-> pass all blktest throtl tests with removing ->carryover_bytes/ios.
-> 
+Ah. Okay.
 
-It's always welcome for such cleanup. BTW, do you have plans to support
-bio merge for iops limit in blk-throttle? Since bio split is handled. I
-was thinking about using carryover_ios, perhaps you can handle this as
-well.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Thanks,
-Kuai
-> 
-> 
-> Thanks,
-> Ming
-> 
-> 
-> .
-> 
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
