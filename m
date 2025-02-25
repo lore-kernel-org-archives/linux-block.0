@@ -1,104 +1,104 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3053021ABBB;
-	Tue, 25 Feb 2025 15:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982CE14AD0D
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 15:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740497936; cv=none; b=qLT6ZEEEcsqIlhtuJKVIcRfUXXlKDHYbo8C7yikA8YarucXIBX5QL6za+TAHzY7ZgmGAmr+1AWMdkXluD868OckuekD8ncDyX96gG+IXJlb+Fv1HsIFujQPisQxNwvRdAguL4Qh0RMk9mVh+9AHpi/yCHdCCob6wuFbZxyT2bI8=
+	t=1740498202; cv=none; b=KD556J3OOwp6cBUSMtqUFEyRVmQtx4orG1LPu6kAkyFOASSxgOAtQOOUlRp1bJt4X+6xZIf2tDMM82ngVHTDZmdS7bz1bi0+atYLuQF8n5OuVSgA3aMQFlQTZeyN3S5REKzoQjc7own4v4XGjCoQhI6jDlomAwnudbZ6NIMDl78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740497936; c=relaxed/simple;
-	bh=wOGorsBJJZl6+/+eDQn3Pcl8r9rTnpJ74+h7RPc2OXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHDY/7KGcXZesX4HdavJTwha45Zqa3PUe/uBtfXWilHYqT2YcHqvgGyJEdHrAAzWRnA9lJEsmWUWFRwnYFycS8yiFAZcnQ7mTABlzm0hBuClCx1WEl+zV59Us8SoHNb9ZikOjKg0Z4AU3GqtG5J4E+VpO9Yum9fexYoXMeuAeBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ckWPmLsp; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1740498202; c=relaxed/simple;
+	bh=XBo2b8Y/XjGfeS2W60jlAc7RF0pRoC+2UgUyNhf7d7g=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=f4M903zeTaJvWT/M+auuWtOOc1DYWE+8ZjOAoiXsnDvWai0+RWiSFYAsbX+gbrHT1x/gKt8GBq3UdOvSpVguXyknTqcrc/F5ueUlCoZnkcKitM5TwfTCpxEYVEuKxnxd7/DhlmG2FbOpJRGbxVR156oXEojxoa8Dcrt4iIAOQUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=geBU0Ieb; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ckWPmLsp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=k31hCZL2vjeapwXR82N1NDkjPN+BLgfual8VES9awHM=; b=ckWPmLspCq/7CnnacQW7ArwZEA
-	7QAjlsC+p7jpnqxKGScfXQDw1yAUho/WBoG4XyF3IpqnvjaweVhcdt9olxBxmcfx08k32O7nbBTuv
-	JXa8ezIA2PNSEQFh9e4EA4s0HtxpIfy/vb6zV0AWTMmS6HNCP+7bes9p6POpudc5mRcOC+8xX3Iuv
-	VvzRtDue4LAoEdv3i3LpHQX1Vv7EPQrJRO113OMnqs+30Pox0w2deRDUVVNOIiKIfUKek0TaKePpX
-	FMTEHXEIbRdXJT/7Ek1bf569A2CmGSotwJjuzwduCALYMMzRh/PoMU4xW0T02r63xuqJPI5ALITeW
-	w8lVYEew==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tmx1J-000000005ts-2Xvj;
-	Tue, 25 Feb 2025 15:38:53 +0000
-Date: Tue, 25 Feb 2025 07:38:53 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Milan Broz <gmazyland@gmail.com>
-Cc: linux-block <linux-block@vger.kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
-Subject: Re: sysfs integrity fields use
-Message-ID: <Z73kDfIkgu4v-c9W@infradead.org>
-References: <67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="geBU0Ieb"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d2a869d016so15585315ab.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 07:43:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740498198; x=1741102998; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tl25CRJLWpT7WhGCxrWJw/fYo0yTqJ1b9Z+lF5nq91k=;
+        b=geBU0IebH3hsdN1D8JwHlbPJDD1bVmpSNNd62ycUU6rlxJx/3WYWfKo5F+aZ04niuC
+         fegXXJj4/5HcpEFFj3D3WQlyL822Ejvv94CRz0gM6AJhdLYgbrCV+Gf9RtkJ7Krpj6Ml
+         nEXE5m8iuL3fk0PXDxlbcPXtQpprlNfQ9LaqWsPN7KOV5GvNrO2Xw8WGs8HCz0FfwZqI
+         BO53vNBwE9KgqieQSW9n1eBVbBasatRzHQ9PKZr4Dyofy5L5+wtMAq/w4vcRHYLVD/LX
+         3l2tYlXwitONReFefJf1Gsom0CqMIPL7zjICO4Cuegp7KZ5DmC+GX9HbsFcY99eSI2iv
+         /2FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740498198; x=1741102998;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tl25CRJLWpT7WhGCxrWJw/fYo0yTqJ1b9Z+lF5nq91k=;
+        b=fLHBQlUSQmEveH+Bfny1HIrxOKdPCdVeZDa+Fz5kY9IEkcQ+Wvw8/n6ugqRvTmh6pa
+         FeDpEsi155agXEcE+cJVonOipYcBtqcSggjM0clFIgB6M+cNT6UXuwvPNOXMt8P+FEWU
+         2Sk204iNGycYq9xEkcBXIOEhSlyPGa+3lmUfF2mTKVWS44t40OvUnU18BbDViTGx/Y1R
+         HD8U4fzkyAboZxR0+33RI/rrGie6hGOAU52VJu3gFRHhlj7vdsszsQbqu5agYuSQAtxa
+         gqYTzOCcK+iJAK7Ty1Ui9ZdkC+Y7K1lGNn/2hf9h96wjPp+mcq6du/9AGOWBmel+ip9B
+         7H6g==
+X-Gm-Message-State: AOJu0YzIT7OhsGR0ufx5+FTSRkRgb047fxVIBONH55hCatDa6jBbuTbq
+	ajqXbl2jznXmLlh8aSD42cHIXcPzKTH77m3f6gwUnWP2gktnrS6niePlehklKyJjx/ouQtBvn+w
+	D
+X-Gm-Gg: ASbGncv3tTTNHRjLJPvLMA40ojtzanjNhe9Wq6s86V1ZfLdZvEY4ClKC17g6yndgpY3
+	OnjJZc5cSfosSI53i/ejXVQYgp4PuebRNMXj+SVI8ENXkczwhCV3dxESfDwa4luyhlGGRrRZvo1
+	YgRzqgW9iBbEv5lfQLwfU/b3PtFal5ddcvMt4JVCE0erQcKakpT7b1L8iq2FtmUWPeV5NHBNgsB
+	LcZj5U4f09MDcZQHFvcQsZPjKAU/6+41SUe8ne2odKhcL8r9asrGSKtZf1qC0hbxJn71GJ4dXIn
+	eXItM8GdbX99jOIw
+X-Google-Smtp-Source: AGHT+IG4rwhFXrfhIMOAmsi1aiu231lRFp5Dq/dUnQQEyJ3pavhYWb2UFeK/ljuzQiuaNkhCO/X8gA==
+X-Received: by 2002:a05:6e02:2148:b0:3d1:99bd:5503 with SMTP id e9e14a558f8ab-3d3d1f9882emr50935ab.14.1740498198145;
+        Tue, 25 Feb 2025 07:43:18 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d361653505sm3795245ab.23.2025.02.25.07.43.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 07:43:17 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Yi Zhang <yi.zhang@redhat.com>, John Garry <john.g.garry@oracle.com>, 
+ Keith Busch <kbusch@kernel.org>, Paul Bunyan <pbunyan@redhat.com>, 
+ Daniel Gomez <da.gomez@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250225022141.2154581-1-ming.lei@redhat.com>
+References: <20250225022141.2154581-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V5] block: make segment size limit workable for > 4K
+ PAGE_SIZE
+Message-Id: <174049819700.2142921.1446847727971657823.b4-ty@kernel.dk>
+Date: Tue, 25 Feb 2025 08:43:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-94c79
 
-On Tue, Feb 25, 2025 at 10:23:49AM +0100, Milan Broz wrote:
-> Hi,
+
+On Tue, 25 Feb 2025 10:21:41 +0800, Ming Lei wrote:
+> Using PAGE_SIZE as a minimum expected DMA segment size in consideration
+> of devices which have a max DMA segment size of < 64k when used on 64k
+> PAGE_SIZE systems leads to devices not being able to probe such as
+> eMMC and Exynos UFS controller [0] [1] you can end up with a probe failure
+> as follows:
 > 
-> I tried to add some support for using devices with PI/DIF metadata
-> For an NVMe drive, reformatted to 4096 + 64 profile, I see this:
-
-Based on everything below you have no formatted it with PI and you
-also don't plan to use PI, just plain non-integrity metadata.
-
+> WARNING: CPU: 2 PID: 397 at block/blk-settings.c:339 blk_validate_limits+0x364/0x3c0
 > 
-> - /sys/block/<disk>/integrity/device_is_integrity_capable
->   Contains 0 (?)
->   According to docs, this field
->  "Indicates whether a storage device is capable of storing integrity metadata.
->  Set if the device is T10 PI-capable."
+> [...]
 
-this is only 1 if protection information is enabled, and 0
-for non-PI metadata.
+Applied, thanks!
 
-> - /sys/block/<disk>/integrity/tag_size
->   Contains 0 (?)
->   According to docs, this is "Number of bytes of integrity tag space
->   available per 512 bytes of data."
->   (I think 512 bytes is incorrect; it should be sector size, or perhaps
->    value in protection_interval_bytes, though.)
+[1/1] block: make segment size limit workable for > 4K PAGE_SIZE
+      commit: 889c57066ceee5e9172232da0608a8ac053bb6e5
 
-Yes, it should be an integrity interval.  Which for all current drivers
-is the LBA size.  And the tag_size is the size of the PI metadata, so
-0 is expected.
+Best regards,
+-- 
+Jens Axboe
 
-> Then we have new (undocumented) value for NVMe in
-> - /sys/block/<nvme>/integrity/metadata_bytes
->   This contains the correct 64.
 
-Yes, this contains the full size of the metadata.  And besides
-documenting it we should probably also lift it to the block layer.
-
-> Anyway, when I try to use it (for authentication tags in dm-crypt), it works.
-> 
-> Should tag_size and device_is_integrity_capable be set even for the "nop" format?
-> Is it a bug or a feature? :-)
-
-It is expected.  The only issue is that the block support for metadata
-is called integrity all over because it was initially added for PI only
-and then extended for non-PI metadata, which makes things a little
-confusing.
-
-> If not, what is the correct way to read per-sector metadata size (not only for NVMe
-> as metadata_bytes is not available for other block devices)?
-
-Right now the nvme specific attribute is the only way.
 
