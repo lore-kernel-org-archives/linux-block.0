@@ -1,60 +1,60 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E10266562
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD2119C54F
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740478720; cv=none; b=sO5Eu4vX7tk6cZ4o+Xu2nzV63gEe8VepdjpAT21T6iruH+6wRaK7deC76UjhfMnAb/5w697JCLenTktQTPj9ZfjxBggvm9nqJUZAFq8dL4iwdUZ8wPRXtaG1LdjYHj3Gm0Y2Qi1q1CzmoikEjKZIWlcHV5lanB2+oe/7VfKEOsg=
+	t=1740480257; cv=none; b=etpfq/I0CdJOJDWgX9bHQ9cIqaQYWSUH/CSeuy9sgNyqF+YagpUIyXPv/5Mg6HbkU1mzsRmp7scizCUFw9d6gHQO4w/5h5rwODIKY/g+gjN+vHniSAVyMvYu8ttVfts4QQyVRXvUrSmjg4Q9HpAIMwDH6UEbEtrBBQydzLz/n2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740478720; c=relaxed/simple;
-	bh=HZStv4nFJL+GC7BkP7OKumlPpM8azqypUtumzCoy+ZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ExlkhExQRxqO8PjQoNouVI4wFp6FRKUTRaD7rTYY+t6+Y1paSepdP5JlUfqWxyXH3K3FVeh7WED6o2KOBWmAasyGaIy/DbP6DnvIHAxmEwlfcsVN4egiDlh53jE/pdY08DSwPnD59CT7l6m918FG3FCrkwclSTxzpIXYL0CxRWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=B98E23lA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1740480257; c=relaxed/simple;
+	bh=+YCvgfJY8kmdCGckU3ZYn9jaBRDU4SyDgXCEvstDpWo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:In-Reply-To:
+	 Content-Type:References; b=M9hO+k+iAPZ7eWCuawDbkokfrms6C20+Snep3DwOcLFQNf4j1SiqDUgbfO8qzsqC9utEkifIn52wu8ip0jB7fOwPMe9ZojIUwyrL40aPmI3ey9BmSwuDGDTtx/gRulzkfZ9XXGv3VVDxRzBUBMX2Vn7zlwXYEUONZyPNn5pEFlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qWZu7bA3; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B98E23lA"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51P18mhS011408;
-	Tue, 25 Feb 2025 10:18:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=awMLli
-	djEFsZPkfYqxmNMZPxo6yzcDF9ROT/Pp2IhFk=; b=B98E23lA/Ox5I9T5JKXsmX
-	B5iFWM3IyRn1LaNreWzkdHNPCIkXvu+/q2Sevia3amYe5Zn3R98zoxTrLO4bbfg3
-	FIgzngLemPr25Z7qwBwQEeViWX9PsuXztViwnsD6A/ohygXL0o45D2rLIzb5pfF0
-	zGcRGxp5zTZWRV0elSF7nmaVvW2ZEQnGYbZrHEMWSsnKpgathOCt+8eu2Fve9agQ
-	6iTFCpPqfrmysR4wzprvU5r0+qfgQRBlREp/9zl0RoQIl7cLJa4kCzK0zooJtZgn
-	qfhmTj3+MCwGZ60Fz1ioziBckjQUcAZFa19BcalZX3NKQhHl9JgRv0narhJHEGxw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4513x9t2hx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Feb 2025 10:18:27 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51P7P62M027390;
-	Tue, 25 Feb 2025 10:18:26 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44ytdkc4ct-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Feb 2025 10:18:26 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51PAIPZL22479590
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Feb 2025 10:18:25 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6F39158056;
-	Tue, 25 Feb 2025 10:18:25 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1849658067;
-	Tue, 25 Feb 2025 10:18:23 +0000 (GMT)
-Received: from [9.61.156.112] (unknown [9.61.156.112])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Feb 2025 10:18:22 +0000 (GMT)
-Message-ID: <14742723-0699-4bf1-8dae-c0b9dd077c76@linux.ibm.com>
-Date: Tue, 25 Feb 2025 15:48:21 +0530
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qWZu7bA3"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250225104412epoutp02ebfe9f1587ef80a470872c993d742110~nbZGOHBYZ2359923599epoutp02o
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:44:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250225104412epoutp02ebfe9f1587ef80a470872c993d742110~nbZGOHBYZ2359923599epoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1740480252;
+	bh=RSnoOOU6uHj4f6zITlTwry2XlgyGNMAfQvzi7dVo7o0=;
+	h=Date:Subject:From:To:Cc:In-Reply-To:References:From;
+	b=qWZu7bA3sESQMI5HQx3HILT2CU6gSDYgsQ6ndxxm2SkMWgPp379YZSObOAdL/Kj3e
+	 BOIQWXwMtk+qsqUEJnl8u3dcEuqVlvFh7FLTIytQJGayhVhKkDxIbDZimiIcA8nG4X
+	 TeZNfYs9ERc/1tBEoHr74BgURaiktTSKuyyIpkVw=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20250225104412epcas5p1f4ab699d4c248d3d4bf273a57039ca77~nbZGC7F3I1439714397epcas5p1l;
+	Tue, 25 Feb 2025 10:44:12 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4Z2Dk32SJsz4x9Q2; Tue, 25 Feb
+	2025 10:44:11 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9B.17.19956.BFE9DB76; Tue, 25 Feb 2025 19:44:11 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250225104411epcas5p2ffaf2c1ed42c9df33ce1188d205bf8fc~nbZEgnNY11012510125epcas5p2o;
+	Tue, 25 Feb 2025 10:44:11 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250225104411epsmtrp1ed34d150aef35e25a6a1466a94882170~nbZEgApoj2829528295epsmtrp1a;
+	Tue, 25 Feb 2025 10:44:11 +0000 (GMT)
+X-AuditID: b6c32a4b-fe9f470000004df4-ca-67bd9efbe13d
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	05.98.23488.AFE9DB76; Tue, 25 Feb 2025 19:44:10 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250225104405epsmtip1094d4f1c2bd87a459a9a52020f9e4ec6~nbY-Si5eP1574915749epsmtip1g;
+	Tue, 25 Feb 2025 10:44:04 +0000 (GMT)
+Message-ID: <f6949dd3-220a-4ae8-93aa-d2dd90a3abbd@samsung.com>
+Date: Tue, 25 Feb 2025 16:14:03 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,90 +62,67 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 7/7] block: protect read_ahead_kb using q->limits_lock
-To: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
-        gjoyce@ibm.com
-References: <20250224133102.1240146-1-nilay@linux.ibm.com>
- <20250224133102.1240146-8-nilay@linux.ibm.com>
- <4e1feba0-e4c4-44fa-a6fa-437a927dbd60@suse.de>
+Subject: Re: sysfs integrity fields use
+From: Kanchan Joshi <joshi.k@samsung.com>
+To: Milan Broz <gmazyland@gmail.com>, linux-block
+	<linux-block@vger.kernel.org>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig
+	<hch@infradead.org>, "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <4e1feba0-e4c4-44fa-a6fa-437a927dbd60@suse.de>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eT8F-XGVmOJ27q0HXrmZpq6Cny6ZLyFw
-X-Proofpoint-GUID: eT8F-XGVmOJ27q0HXrmZpq6Cny6ZLyFw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-25_03,2025-02-24_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
- mlxlogscore=999 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2502100000 definitions=main-2502250069
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupjk+LIzCtJLcpLzFFi42LZdlhTQ/f3vL3pBmsmC1ksWDSXxeLY/lns
+	FqcnLGKy2HtL22L58X9MDqweO2fdZffYvELL48XmmYweH5/eYvH4vEkugDUq2yYjNTEltUgh
+	NS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnFJ0DXLTMHaLWSQlliTilQKCCxuFhJ
+	386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj0dLHrAUTWSrW
+	TL7C0sC4jrmLkZNDQsBE4uG9HywgtpDAbkaJ190qXYxcQPYnRokj53+yQzjfGCUaJ55kgel4
+	s2ANK0RiL6PErcbJUM5bRomzm3ewgVTxCthJTL34EcxmEVCVODrhCxNEXFDi5MwnYJNEBeQl
+	7t+awQ5iCwuoSzzY+oCxi5GDg01AU+LC5FKQsIhAoETjzjtgVzALTGWUWPL9CNgcZgFxiVtP
+	5oPZnAL2En0377BDxOUlmrfOZgZpkBD4yS6xa3YrE8TZLhKtG36zQtjCEq+Ob2GHsKUkXva3
+	QdnZEg8ePYB6s0Zix+Y+qHp7iYY/N1hBjmMGOm79Ln2IXXwSvb+fMIGEJQR4JTrahCCqFSXu
+	TXoK1Sku8XDGEijbQ+L6mdNMkKA+yijxYwrjBEaFWUihMgvJZ7OQfDMLYfECRpZVjJKpBcW5
+	6anFpgXGeanl8PhOzs/dxAhOmFreOxgfPfigd4iRiYPxEKMEB7OSCC9n5p50Id6UxMqq1KL8
+	+KLSnNTiQ4ymwOiZyCwlmpwPTNl5JfGGJpYGJmZmZiaWxmaGSuK8zTtb0oUE0hNLUrNTUwtS
+	i2D6mDg4pRqYttpJSm5Uar/mX/7QySNJ//x10S0GfffurV1WseVJ+xbzfzNY5HZJftrhUqM/
+	/5NNI9ebF1U8gtybfjpsPF2k5KymMm/N3U0LFY0z7vf+qFUPsFleXJn5pe2m2nd1ow1qWdyJ
+	gaqTXua2b3m/3Vvmy6qe5RGOHZnzHs9TuXdpm6flf4O4xgjlxcubL2Yc2JRmfPcr27omddn5
+	bRUX8o4W1u2wlDZcP+OfumvKAb+3V57yLJtqyLP6UFzYiuMXWeadmGHiWig/aY3IwYZzoUyy
+	U65WrEh5lnx/w+KiWHHJrRn/smW/B+0qy1AV+5z/7/XdNZ4Lt/tOepCqaTa7hlVWW32ugqIu
+	j0j4kWTRIm5fJZbijERDLeai4kQAAhi6UCEEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsWy7bCSnO7veXvTDZ4mWixYNJfF4tj+WewW
+	pycsYrLYe0vbYvnxf0wOrB47Z91l99i8QsvjxeaZjB4fn95i8fi8SS6ANYrLJiU1J7MstUjf
+	LoErY9HSx6wFE1kq1ky+wtLAuI65i5GTQ0LAROLNgjWsXYxcHEICuxklNh1bxgqREJdovvaD
+	HcIWllj57zk7RNFrRolJD+aDdfMK2ElMvfiRDcRmEVCVODrhCxNEXFDi5MwnLCC2qIC8xP1b
+	M8AGCQuoSzzY+oCxi5GDg01AU+LC5FKQsIhAoMS/ufPB5jMLTGeU2H9tFRvEsqNAzoH3YIOY
+	gS669WQ+2AJOAXuJvpt32CHiZhJdW7sYIWx5ieats5knMArNQnLHLCTts5C0zELSsoCRZRWj
+	ZGpBcW56brJhgWFearlecWJucWleul5yfu4mRnB8aGnsYHz3rUn/ECMTB+MhRgkOZiURXs7M
+	PelCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeVcaRqQLCaQnlqRmp6YWpBbBZJk4OKUamJQ+2BZ1
+	t+T/2rVMWarMZ4bEm5ym6dzFi5+/2FOxWsHcPGOe9HtBlQ1ns/Yd5++3FhB2XcB9+oOi99q8
+	S42rp8hxeOsclzxt6xmylTOyvlLmNpvEu287P5Yc+Rm3VSyjgvfqlhivH84RT/p+hUw7GM7m
+	X3+f4b0C4yYhVpf0P2d4Si9FTIhnfyU4b7XAehXrLtFIz9m3j0Tqdtznq0k7envTifbcTBWl
+	SxXd96UXcjJLPZifwzb/eIyh/YWFqQllG1oa0zk15LIXHNAUP7DE83ff31MxhzeeuHH3d+Od
+	IwUL59xlXlLPtOIwe6Jl0t+Ena2tS1xDuNYX5s+Illg2Y470uxdBMh0bXt/RkWcTUGIpzkg0
+	1GIuKk4EAHKXfur+AgAA
+X-CMS-MailID: 20250225104411epcas5p2ffaf2c1ed42c9df33ce1188d205bf8fc
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250225092525epcas5p31dd0a19ffdfb39f3f2ce4acd1c6da7ee
+References: <CGME20250225092525epcas5p31dd0a19ffdfb39f3f2ce4acd1c6da7ee@epcas5p3.samsung.com>
+	<67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
+	<823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
 
-
-
-On 2/25/25 1:28 PM, Hannes Reinecke wrote:
-> On 2/24/25 14:30, Nilay Shroff wrote:
->> The bdi->ra_pages could be updated under q->limits_lock because it's
->> usually calculated from the queue limits by queue_limits_commit_update.
->> So protect reading/writing the sysfs attribute read_ahead_kb using
->> q->limits_lock instead of q->sysfs_lock.
+On 2/25/2025 3:40 PM, Kanchan Joshi wrote:
+>>     According to docs, this is "Number of bytes of integrity tag space
+>>     available per 512 bytes of data."
+>>     (I think 512 bytes is incorrect; it should be sector size, or perhaps
+>>      value in protection_interval_bytes, though.)
 >>
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
->>   block/blk-sysfs.c | 16 ++++++++++------
->>   1 file changed, 10 insertions(+), 6 deletions(-)
->>
->> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->> index 8f47d9f30fbf..228f81a9060f 100644
->> --- a/block/blk-sysfs.c
->> +++ b/block/blk-sysfs.c
->> @@ -93,9 +93,9 @@ static ssize_t queue_ra_show(struct gendisk *disk, char *page)
->>   {
->>       ssize_t ret;
->>   -    mutex_lock(&disk->queue->sysfs_lock);
->> +    mutex_lock(&disk->queue->limits_lock);
->>       ret = queue_var_show(disk->bdi->ra_pages << (PAGE_SHIFT - 10), page);
->> -    mutex_unlock(&disk->queue->sysfs_lock);
->> +    mutex_unlock(&disk->queue->limits_lock);
->>         return ret;
->>   }
->> @@ -111,12 +111,15 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
->>       ret = queue_var_store(&ra_kb, page, count);
->>       if (ret < 0)
->>           return ret;
->> -
->> -    mutex_lock(&q->sysfs_lock);
->> +    /*
->> +     * ->ra_pages is protected by ->limits_lock because it is usually
->> +     * calculated from the queue limits by queue_limits_commit_update.
->> +     */
->> +    mutex_lock(&q->limits_lock);
->>       memflags = blk_mq_freeze_queue(q);
->>       disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
->> +    mutex_unlock(&q->limits_lock);
->>       blk_mq_unfreeze_queue(q, memflags);
->> -    mutex_unlock(&q->sysfs_lock);
->>   
-> 
-> Cf my comments to the previous patch: Ordering.
-> 
-> Here we take the lock _before_ 'freeze', with the previous patch we took
-> the lock _after_ 'freeze'.
-> Why?
-> 
-Yes this is ->limits_lock which is different from ->elevator_lock. The ->limits_lock
-is used by atomic update APIs queue_limits_start_update() and helpers. Here, the
-order we follow is : acquire ->limits_lock followed by queue-freeze. 
+>> Then we have new (undocumented) value for NVMe in
+>> -/sys/block/<nvme>/integrity/metadata_bytes
+>>     This contains the correct 64.
+> Maybe you mean "/sys/block/>/metadata_bytes"?
 
-So even here in sysfs attribute store method we follow the same locking order.
-
-Thanks,
---Nilay
-
-
-
+/sys/block/<nvme>/metadata_bytes.
