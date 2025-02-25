@@ -1,33 +1,34 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C32322256B;
-	Tue, 25 Feb 2025 20:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85A0221F30;
+	Tue, 25 Feb 2025 20:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740514649; cv=none; b=kDK0T91+4Q3dO4cz+TyF5/SJSuuHLQxlh1BIizZEHqiPVraQLNUEnDucFUR2aC7/kGmVjHDRsZjXgQ4f4Z6HQPTgyMDpzs2qkQc1L1oECkmDLcs8AiJVAcxv5W7XhX8927FVideBeOn33Hq6j1kpzGjZ2zCUEmyh8M6ymMTYcaU=
+	t=1740514649; cv=none; b=B2UhJDVmbkho6klVqVLKGKnQh8j3sOTqOxVbGABbgcPQZHnLxc0HfiSzIu00tdtXY61KuWxQHbw4YWSMPy46AwIWDR4CJg45CZPCsGwnE159WzVaTn9ll6I43QKBGVLetjYXDV3bDsZNN2keufuxJj8Z+QpWGki1lvC1IyEeGT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740514649; c=relaxed/simple;
-	bh=b17XZAvzaTH046mwhaHNwAtpVlTJZaGNfVU9xuXcyTM=;
+	bh=KSAOuoGTz+O9ZgwVf/pgLeWufW1w2Rhj2jlYz7oitqg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NxitxL0deb3o2vt7Ia4yqOUQP8ExlM2zOLAvrYfwsMYnae9elB7LdMAoaDjdhzMUZRFftCx0Wv9PjWWMHL2bHEwDMT4YI6qB5CYCehk+iJxuiY3L7Bn0PMCLDV4861T8u45TOl+HVsmdRqncSujnqh9g/mclyXZUxrRlyzXgYcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=rY57gui/; arc=none smtp.client-ip=13.77.154.182
+	 In-Reply-To:To:Cc; b=VnyD61uPhVbuK0lclL4RzJndkFVRs6T3kpiJ2Vf0Pb/V+UbfXgMqdVdUtSaErV6v7RTf/CmM2k82itGiiLS9iYr8fcZaj3MWYYMvyBPt52YerpeTTz0C2BoN6CSzHAkp2wOk5rmmtGdeS4ZqIpCX7C9Xa7AIah/2ThCBUUSSiEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VF2S71Fr; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rY57gui/"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VF2S71Fr"
 Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 75931206AB6C;
-	Tue, 25 Feb 2025 12:17:21 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 75931206AB6C
+	by linux.microsoft.com (Postfix) with ESMTPSA id 01AC6206ADC0;
+	Tue, 25 Feb 2025 12:17:22 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 01AC6206ADC0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1740514641;
-	bh=/rdlqcTwv5mN/sc7m2KrDg4m+dKAQX2yY+t0CXok2oY=;
+	s=default; t=1740514642;
+	bh=ikev2rH24pVz9CRPhvH6wDJ7r0PdVdeh8ytItRqAYQs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=rY57gui/I5s3opnKpMkUiVz2c8KEinkfrPoI4a0X58a/iSSS8lb6zsgJqkOKu7xOq
-	 seorPBf8U1Bj+VcZjFfcO6jdNkWNML7i48hryZFC0g73WPEObXszX5QqDSiVWRpKsR
-	 xhTzpQnxfRVcu8e8QVi+FGZLfxmNCa9p9IBg3p6A=
+	b=VF2S71FrpuJed9xqKlYjg6lEPxmNDlkKwcxVkdTlYjNNx9YTd26L3cLC5hHpjrpZI
+	 2Dcf45plhzYMI20gpqO2W6u6L+54iQinCmEbfV8FhZAV43vQCSYecMlSiK0b6lZyyq
+	 PFhZHeiZEzXh/3EEyPzIdAVSQzmM2Ysr+6ndIEjw=
 From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Date: Tue, 25 Feb 2025 20:17:25 +0000
-Subject: [PATCH v3 11/16] nvme: convert timeouts to secs_to_jiffies()
+Date: Tue, 25 Feb 2025 20:17:28 +0000
+Subject: [PATCH v3 14/16] platform/x86/amd/pmf: convert timeouts to
+ secs_to_jiffies()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250225-converge-secs-to-jiffies-part-two-v3-11-a43967e36c88@linux.microsoft.com>
+Message-Id: <20250225-converge-secs-to-jiffies-part-two-v3-14-a43967e36c88@linux.microsoft.com>
 References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
 In-Reply-To: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -95,30 +96,24 @@ expression E;
 - * \( 1000 \| MSEC_PER_SEC \)
 )
 
-Acked-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 ---
- drivers/nvme/host/core.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/platform/x86/amd/pmf/acpi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f028913e2e622ee348e88879c6e6b7e8f8a1cc82..24c3e1765d491daf8fd600f96788bf5765946f54 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4466,11 +4466,9 @@ static void nvme_fw_act_work(struct work_struct *work)
- 	nvme_auth_stop(ctrl);
+diff --git a/drivers/platform/x86/amd/pmf/acpi.c b/drivers/platform/x86/amd/pmf/acpi.c
+index dd5780a1d06e1dc979fcff5bafd6729bc4937eab..f75f7ecd8cd91c9d55abc38ce6e46eed7fe69fc0 100644
+--- a/drivers/platform/x86/amd/pmf/acpi.c
++++ b/drivers/platform/x86/amd/pmf/acpi.c
+@@ -220,7 +220,7 @@ static void apmf_sbios_heartbeat_notify(struct work_struct *work)
+ 	if (!info)
+ 		return;
  
- 	if (ctrl->mtfa)
--		fw_act_timeout = jiffies +
--				msecs_to_jiffies(ctrl->mtfa * 100);
-+		fw_act_timeout = jiffies + msecs_to_jiffies(ctrl->mtfa * 100);
- 	else
--		fw_act_timeout = jiffies +
--				msecs_to_jiffies(admin_timeout * 1000);
-+		fw_act_timeout = jiffies + secs_to_jiffies(admin_timeout);
+-	schedule_delayed_work(&dev->heart_beat, msecs_to_jiffies(dev->hb_interval * 1000));
++	schedule_delayed_work(&dev->heart_beat, secs_to_jiffies(dev->hb_interval));
+ 	kfree(info);
+ }
  
- 	nvme_quiesce_io_queues(ctrl);
- 	while (nvme_ctrl_pp_status(ctrl)) {
 
 -- 
 2.43.0
