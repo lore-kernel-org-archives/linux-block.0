@@ -1,113 +1,61 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0B726A1AA
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 15:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14F126A1C1;
+	Tue, 25 Feb 2025 15:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740496028; cv=none; b=gk/8z8TpPooViRUsFkUg0a5ZwOvXlRujYv/FOygnXkApQ/Fxvi/UeQzQRe6+9mkd3MMIzxuVgCzAHL9QOP4KPdPYNBrowcMwA+l8L72hYia4wKGvPkYlqtFjK+c6cwqxQxNOqNEbOXHgBEFcOeoWiVNr2VexwLEHQXcYxSsS9W8=
+	t=1740496080; cv=none; b=E1UhHMIK4Lq8NY1BQORRy6N8n6r3kNhcfkblNzvvDwk5Y2HM4IZY27HzzWttRBXrkydnvGrk62VnnMEPEeUGl4s7RsdDmztZmSdU+UvjdsECjaS+l+rToSEx365lJqaBFPb8zzL5wYT+qtEp/L0Q+ZsLFQG6pQc6X0gwXF8gR7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740496028; c=relaxed/simple;
-	bh=B009efDPZygZyxJVOw4K+czmRA9Exrb2Qa97Ni5jlPg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=UJfFxstXV3te/rtR//DBV4TJugAno2EThlpXoJTr2IvGZldJE8XHP2VoCy+2/yapDY4zPznZFYmy4wsEEdIyVcwSI0ibzVifAYWDpcUABuHcvfiYQr5yW6IbnM9Y65l9oEeSXmj37ODBtH9yUlFoW3yBKJzXtak0D/t6a4x8u34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=y7IFYxzS; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="y7IFYxzS"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-855a8c1ffe9so169819639f.1
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 07:07:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740496025; x=1741100825; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=deTsz6vaPYf3sDSf//6kgc+SRaxAQgKuaPfuRfkDB18=;
-        b=y7IFYxzSTypHDo2++RL122sfZX8W8McCZPf8eMux7eEf8BtimuHioIQYZGtN0br4E+
-         mukWZs4ST1XkyZ2WJVy6et4QW67y8LHBuQjTjaeJ+nIu48t9yextxr47JnPU5NaiAmn2
-         5lXMBEcMJo29fuzitVNt3ZxUsVN0UfQDytDepk3uR/P0+XiNibrVKhCGhcw74Pg10syy
-         LuVb8GtSujYKnAFDrCuxrCHFGxSYnRy/AJGCZPbDriwoGNUvY/HYUqRJlppmroYICfpB
-         54Wj1a8//SFqBEVt3hSynvNBPQAvK7IkbnOAW1zrFlhJxlAu+QpYcqlur1byHVcFWgT/
-         wdnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740496025; x=1741100825;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=deTsz6vaPYf3sDSf//6kgc+SRaxAQgKuaPfuRfkDB18=;
-        b=h5dUpij9tXng4cacbWm1YpCL1PPoq1YtHlQcc5Uz1jyWHy5DXDm0Jdp0Qc/u7fsmXn
-         CSPsDCleBpy4anuJZn/45BN8ll+IlqB92xhj5pgOTF5/lBgT0rQBAhKvh+SxLenHRQCb
-         dShlY1NRzkCqd0QFxu40jJWLEFM/DWjpZmidoh7EXKL4ZyEWJHYy0wXT4oj44AunYWQ4
-         VMLHnk3GnhH/kpvUexkj3xc4ko3KQqbPVwA776VRLzY68HcQ17i/evMZ0d9QcZ8vfk5w
-         eEwXua5f9mtFIQItBWQQyL0rzk6tn8HOT0R4oyPhofio0+7MoKWblVFi3WkW/V9sPAIT
-         2HCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUX1XXm7aoaudWXhh/oP8bRUBO6mMX07JcI5Yv+usWtwxSHRzLW46AFoFpS9p60ZjDvWqA9KMmH77Ro3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSFEMZSbkMpLexs7yy9dqf6b2RDa/eMmG37b0wkUdxSQiU47a3
-	YsAKjzn0ENdqNeRELSIezduWwWlGfogdIv3sWFkEShVCFqxMy6yFlo3Z3qUX4Xg=
-X-Gm-Gg: ASbGnctZtQfB5a1z7Bm7OQIa3605Vsp3jLHyEEaezbJgIVKYAVUQPe8/FpKkyxv/y+9
-	hw7e3fgpeKh9GqRPVkiW/pcYDHtXSMRdfpIKKJHFF736RD4NPqZyByb071bC1JH+MxAsD/hTomF
-	7YH6dUFDVwbxmt+y/GSc57Qd1Xzl05ezIM5umvqHt/gXNdYCydOi9Caly1fwoXc+15yyFYK+a3u
-	3087cu1LuPAvkCpB0LWNUk2zOrTMhiK5BEQ2TXpAzHDhhoHKgrDR7068pkCzMc3BtpvUzkVjSzI
-	/ewbWBk9yJgrSR8d
-X-Google-Smtp-Source: AGHT+IEljIBkpApQgkYcq8zFrUakPE3hYS5jFm3Tnmq5CM5VHY6XZWLhxEu6NYet7gZ7xOt6Xk2Rfw==
-X-Received: by 2002:a05:6e02:b2a:b0:3ce:78e5:d36d with SMTP id e9e14a558f8ab-3d2fc0ea5camr39683735ab.12.1740496024806;
-        Tue, 25 Feb 2025 07:07:04 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f04750fcd6sm435827173.94.2025.02.25.07.07.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 07:07:04 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, asml.silence@gmail.com, 
- linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
- Keith Busch <kbusch@meta.com>
-Cc: bernd@bsbernd.com, csander@purestorage.com, 
- Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20250224213116.3509093-1-kbusch@meta.com>
-References: <20250224213116.3509093-1-kbusch@meta.com>
-Subject: Re: (subset) [PATCHv5 00/11] ublk zero copy support
-Message-Id: <174049602370.2137789.11659945725792344397.b4-ty@kernel.dk>
-Date: Tue, 25 Feb 2025 08:07:03 -0700
+	s=arc-20240116; t=1740496080; c=relaxed/simple;
+	bh=XOZtUF0f3op4qCgTNJ7ufH2wcZyTZQaZySaKmdTYvuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MCHKZXWuUB124IvdoSszSrsCsvYpsVuLIwTF00FyzoLRwE06dAz1JIla74VWnaBFQ/MBXkuK9k7u7NumjOOPB7Ww2QXgvNss/1QqWcwKRQ8BjewY01nbeUu69y8kuo4invc8XbM1ZKd+VjrhJHBE25ehs2YLuTT3XSz1wLWh5Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5899C68D05; Tue, 25 Feb 2025 16:07:54 +0100 (CET)
+Date: Tue, 25 Feb 2025 16:07:53 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	martin.petersen@oracle.com, anuj1072538@gmail.com,
+	nikh1092@linux.ibm.com, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: Re: [PATCH v1 2/3] nvme: Fix incorrect block integrity sysfs
+ values for non-PI namespaces
+Message-ID: <20250225150753.GB6099@lst.de>
+References: <20250225044653.6867-1-anuj20.g@samsung.com> <CGME20250225045516epcas5p3fa5712152300bf976d1bc0ab26211633@epcas5p3.samsung.com> <20250225044653.6867-3-anuj20.g@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-94c79
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225044653.6867-3-anuj20.g@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
+On Tue, Feb 25, 2025 at 10:16:52AM +0530, Anuj Gupta wrote:
+>  	memset(bi, 0, sizeof(*bi));
+>  
+> +	bi->flags = BLK_INTEGRITY_NOGENERATE | BLK_INTEGRITY_NOVERIFY;
+>  	if (!head->ms)
+>  		return true;
+>  
+> @@ -1850,6 +1851,9 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
+>  		break;
+>  	}
+>  
+> +	if (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)
+> +		bi->flags &= ~(BLK_INTEGRITY_NOGENERATE |
+> +			       BLK_INTEGRITY_NOVERIFY);
 
-On Mon, 24 Feb 2025 13:31:05 -0800, Keith Busch wrote:
-> Changes from v4:
-> 
->   A few cleanup prep patches from me and Pavel are at the beginning of
->   this series.
-> 
->   Uses Pavel's combined buffer lookup and import. This simplifies
->   utilizing fixed buffers a bit later in the series, and obviates any
->   need to generically handle fixed buffers. This also fixes up the net
->   zero-copy notif assignemnet that Ming pointed out.
-> 
-> [...]
-
-Applied, thanks!
-
-[01/11] io_uring/rsrc: remove redundant check for valid imu
-        commit: 559d80da74a0d61a92fffa085db165eea6431ee8
-[02/11] io_uring/nop: reuse req->buf_index
-        commit: ee993fe7a5f6641d0e02fbc5d6378d77b2f39d08
-[03/11] io_uring/net: reuse req->buf_index for sendzc
-        commit: 1a917a2d5c7ea5ea1640b260c280c2f805c94854
-[04/11] io_uring/nvme: pass issue_flags to io_uring_cmd_import_fixed()
-        commit: 7323341f44c17b27e5622d66460fa9726e44321a
-[05/11] io_uring: combine buffer lookup and import
-        commit: 82cbf420496cffbb8e228ebd065851155978bab6
-
-Best regards,
--- 
-Jens Axboe
-
-
+I don't think the driver is the proper place to do this, this should
+be done in blk_validate_integrity_limits.  That should also take care
+or the stacked devices and remove the need for the last hunk in the
+previous patch.
 
