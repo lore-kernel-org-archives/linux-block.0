@@ -1,81 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE30F26389C
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 08:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128ED267AE3;
+	Tue, 25 Feb 2025 09:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740473771; cv=none; b=tcf3N+jvH8fC2dBqfY6FUOvgDtSZViXtRu0qGiNDfIaw11BLMfzUUxy7Da5Z+dqxhelbBWdDQlLfeEkbkys0SWWCQcNUOUTL434QNYNaEzy3rsujoT8oZYdnLUkY2pnjsgNlnAD3MFJYXH8VGg0F3Y4++x7gjnzkvm5X60uwQq8=
+	t=1740474740; cv=none; b=KiYoyiDHpWY0DNphq9631V7md6orsGcKo5QwLUTY8YPs74FoD58TQs7e9kdVfkS1U0Aqcev5kpUZGZueciBazJUARLTxPdca/MaY1n7Fy1UNldYVLlCbwTewRMwO/r+oyp5LaA/07srbJuxaZSWmJcgJF4v4XZTv5zooLqIR8j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740473771; c=relaxed/simple;
-	bh=NPKL41k5BNMZlbjYP8haqkRZom0Tuw2ud89Cd4ecX+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LsiNMlIdDIAkrfnzBuzayMK7BNS/ui7YCY6+OU7r/vh5MvQ6nhw1TttNOnPcgLAUDZfWdIL1bWpNSKUxFj6C3uSD+oEM/Ve6ZCILJoYB6pGNDwUjFAxtVq8Kkppr2uxJvog496Hl+CtZ00J8SRFu8uBwNGbotO31ImDr+kNiK1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/rkIfpK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/rkIfpK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740473768;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FpV0Gb9w1szOvUDIfK5T9ecv7mT6drF4hLfD7prsLgw=;
-	b=Z/rkIfpKAlNG0NL4EwAVQ0Bz+SikLmmW/YRET+5B/J1OnZh731S9nnafH4Fb8cqVIptLlS
-	mLnb4QDYSW31K9dMGkiLcJAmilgsZoHDDNTsrtLaZpxwBjZ+y4ecEe+cFkaUALWe5+vqFy
-	Z7xHNmeQQs7GQii2oYc0oTO9Hnk7r4I=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-199-1roj5FpZOWOR89E_UDD_Bg-1; Tue,
- 25 Feb 2025 03:56:04 -0500
-X-MC-Unique: 1roj5FpZOWOR89E_UDD_Bg-1
-X-Mimecast-MFC-AGG-ID: 1roj5FpZOWOR89E_UDD_Bg_1740473763
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C63C18D95E0;
-	Tue, 25 Feb 2025 08:56:03 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.31])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E03E41800358;
-	Tue, 25 Feb 2025 08:55:57 +0000 (UTC)
-Date: Tue, 25 Feb 2025 16:55:50 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: asml.silence@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org, bernd@bsbernd.com,
-	csander@purestorage.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv5 05/11] io_uring: combine buffer lookup and import
-Message-ID: <Z72FloDakU1EJPCZ@fedora>
-References: <20250224213116.3509093-1-kbusch@meta.com>
- <20250224213116.3509093-6-kbusch@meta.com>
+	s=arc-20240116; t=1740474740; c=relaxed/simple;
+	bh=jSfr0DnZJRt/ciNTHE0XDHV5JQ8wzrnyJ3cQBG5h2r0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AsPDeh+Dzia7NK8uLuJOsiBK7qaT1MQhIxI2i1edEduvL6hXOj6RakvP3hJ3BG5DGOzVPetw9EsRl00jvFR1xMIfBnnxwu+8Am0J3LYs0W9EJIaM/uDS4fxzGXTAoLNAM0u6W+43JDlpdlf2FEy4Ftb2upfakhkCqhsGuQl5eOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z2BgX4NRQz4f3js9;
+	Tue, 25 Feb 2025 17:11:52 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 673BA1A058E;
+	Tue, 25 Feb 2025 17:12:14 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP3 (Coremail) with SMTP id _Ch0CgAne8Vrib1nMy0hEw--.30895S3;
+	Tue, 25 Feb 2025 17:12:14 +0800 (CST)
+Message-ID: <b9fee454-54e0-d07f-44eb-74bfc588abeb@huaweicloud.com>
+Date: Tue, 25 Feb 2025 17:12:11 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224213116.3509093-6-kbusch@meta.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 05/12] badblocks: return error if any badblock set fails
+To: Coly Li <colyli@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Coly Li <i@coly.li>, Zheng Qixing <zhengqixing@huaweicloud.com>,
+ axboe@kernel.dk, song@kernel.org, dan.j.williams@intel.com,
+ vishal.l.verma@intel.com, dave.jiang@intel.com, ira.weiny@intel.com,
+ dlemoal@kernel.org, yanjun.zhu@linux.dev, kch@nvidia.com,
+ Hannes Reinecke <hare@suse.de>, zhengqixing@huawei.com,
+ john.g.garry@oracle.com, geliang@kernel.org, xni@redhat.com, colyli@suse.de,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250221081109.734170-1-zhengqixing@huaweicloud.com>
+ <20250221081109.734170-6-zhengqixing@huaweicloud.com>
+ <4qo5qliidycbjmauq22tqgv6nbw2dus2xlhg2qvfss7nawdr27@arztxmrwdhzb>
+ <272e37ea-886c-8a44-fd6b-96940a268906@huaweicloud.com>
+ <70D2392E-4F75-43C6-8C34-498AACC78E0C@coly.li>
+ <a3c74c7c-44b6-c4c0-872d-0de7e29214c0@huaweicloud.com>
+ <vdd6yaz3opuhufbfhbkhwtfj4a3oiskem7o23n3axtzy5e74xp@fibgbwxospom>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <vdd6yaz3opuhufbfhbkhwtfj4a3oiskem7o23n3axtzy5e74xp@fibgbwxospom>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgAne8Vrib1nMy0hEw--.30895S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUOo7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvE
+	ncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I
+	8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0E
+	jII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbI
+	xvr21l42xK82IYc2Ij64vIr41l4c8EcI0Ec7CjxVAaw2AFwI0_GFv_Wryl4I8I3I0E4IkC
+	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
+	C2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
+	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+	WUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
+	CTnIWIevJa73UjIFyTuYvjfUOyCJUUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On Mon, Feb 24, 2025 at 01:31:10PM -0800, Keith Busch wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
+
+
+在 2025/2/22 14:16, Coly Li 写道:
+> On Sat, Feb 22, 2025 at 09:12:53AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/02/21 18:12, Coly Li 写道:
+>>> So we don’t need to add a negative return value for partial success/failure?
+>>>
+>>> Coly Li.
+>>
+>> Yes, I think so. No one really use this value, and patch 10 clean this
+>> up by changing return type to bool.
 > 
-> Registered buffer are currently imported in two steps, first we lookup
-> a rsrc node and then use it to set up the iterator. The first part is
-> usually done at the prep stage, and import happens whenever it's needed.
-> As we want to defer binding to a node so that it works with linked
-> requests, combine both steps into a single helper.
+> OK, then it is fine to me.
 > 
-> Reviewed-by: Keith Busch <kbusch@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> It will be good to add a code comment that parital setting will be treated as failure.
+> 
+> Thanks.
+> 
+> 
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Thank you for your review. I will add comment in the next version.
 
+-- 
 Thanks,
-Ming
+Nan
 
