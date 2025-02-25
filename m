@@ -1,128 +1,108 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD2119C54F
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B207266B6A
+	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740480257; cv=none; b=etpfq/I0CdJOJDWgX9bHQ9cIqaQYWSUH/CSeuy9sgNyqF+YagpUIyXPv/5Mg6HbkU1mzsRmp7scizCUFw9d6gHQO4w/5h5rwODIKY/g+gjN+vHniSAVyMvYu8ttVfts4QQyVRXvUrSmjg4Q9HpAIMwDH6UEbEtrBBQydzLz/n2w=
+	t=1740480708; cv=none; b=CyN4S4xOgUpWuKGL6RaTzqMU3qwf+Mu85zY1D86EWvERcERJqcfOENUZoQ+wg4MIOaxZRRjyg0qTsxCNkWPTbUSVVMPH2Umi3vZ8E7XTQpXC7VUPy0tD8M639ED7uY9MUJtzYrKXoHnnjG2CrJHCuwgduFEMC4T3QCh5TDZ8xZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740480257; c=relaxed/simple;
-	bh=+YCvgfJY8kmdCGckU3ZYn9jaBRDU4SyDgXCEvstDpWo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:In-Reply-To:
-	 Content-Type:References; b=M9hO+k+iAPZ7eWCuawDbkokfrms6C20+Snep3DwOcLFQNf4j1SiqDUgbfO8qzsqC9utEkifIn52wu8ip0jB7fOwPMe9ZojIUwyrL40aPmI3ey9BmSwuDGDTtx/gRulzkfZ9XXGv3VVDxRzBUBMX2Vn7zlwXYEUONZyPNn5pEFlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qWZu7bA3; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1740480708; c=relaxed/simple;
+	bh=U2Fxrw+ZWnZroV2gtVWjbt2Q37s+7jT2hIUi1TH42vA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a8Wy9YV3rEVMczBX0aSVn5oW3N6sRhmoyfUWYg77uwyIYo/bBIzT+wECuJAUK3289VSGQpjBpdV54edG/ilfTSEO5A1W+PVcd6VN211Gv2pz8sccttKawNqNvUK2EaUVcn1SZnlTL3Tuzf1WyH++/AgStJQ/2twwZ5ui+ovoa+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fB6zkoia; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qWZu7bA3"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250225104412epoutp02ebfe9f1587ef80a470872c993d742110~nbZGOHBYZ2359923599epoutp02o
-	for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 10:44:12 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250225104412epoutp02ebfe9f1587ef80a470872c993d742110~nbZGOHBYZ2359923599epoutp02o
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1740480252;
-	bh=RSnoOOU6uHj4f6zITlTwry2XlgyGNMAfQvzi7dVo7o0=;
-	h=Date:Subject:From:To:Cc:In-Reply-To:References:From;
-	b=qWZu7bA3sESQMI5HQx3HILT2CU6gSDYgsQ6ndxxm2SkMWgPp379YZSObOAdL/Kj3e
-	 BOIQWXwMtk+qsqUEJnl8u3dcEuqVlvFh7FLTIytQJGayhVhKkDxIbDZimiIcA8nG4X
-	 TeZNfYs9ERc/1tBEoHr74BgURaiktTSKuyyIpkVw=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20250225104412epcas5p1f4ab699d4c248d3d4bf273a57039ca77~nbZGC7F3I1439714397epcas5p1l;
-	Tue, 25 Feb 2025 10:44:12 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4Z2Dk32SJsz4x9Q2; Tue, 25 Feb
-	2025 10:44:11 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	9B.17.19956.BFE9DB76; Tue, 25 Feb 2025 19:44:11 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250225104411epcas5p2ffaf2c1ed42c9df33ce1188d205bf8fc~nbZEgnNY11012510125epcas5p2o;
-	Tue, 25 Feb 2025 10:44:11 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250225104411epsmtrp1ed34d150aef35e25a6a1466a94882170~nbZEgApoj2829528295epsmtrp1a;
-	Tue, 25 Feb 2025 10:44:11 +0000 (GMT)
-X-AuditID: b6c32a4b-fe9f470000004df4-ca-67bd9efbe13d
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	05.98.23488.AFE9DB76; Tue, 25 Feb 2025 19:44:10 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250225104405epsmtip1094d4f1c2bd87a459a9a52020f9e4ec6~nbY-Si5eP1574915749epsmtip1g;
-	Tue, 25 Feb 2025 10:44:04 +0000 (GMT)
-Message-ID: <f6949dd3-220a-4ae8-93aa-d2dd90a3abbd@samsung.com>
-Date: Tue, 25 Feb 2025 16:14:03 +0530
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fB6zkoia"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abbdf897503so1119451666b.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 02:51:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1740480704; x=1741085504; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mv1GjtLH9p6AAgaKLJdaYv1valnjqWPg00vkxZOmddk=;
+        b=fB6zkoiaIdMgbfeIGodOK3Bc5hooKM6K1xm0XsoLN2PzPWLcJ0JpZ1FGbt9tU+fZj1
+         cbH+/LkcoTXyyH7sdIjr+yizafF491qtIPOiJBtHMj6O7v5KdfCiPEpkgq4VYaUEdFbR
+         RCzrlNVkOSokkiFb5dyCsTLf4Wo10/c4HE0cI+EvhHLduwLr1oATaVQlrIRvp8QZAnxx
+         ZYVlsRJQlJkn8IL5m2vQ8ikz8w7Oy7eKBfSaYewdZL7UUZ0c7QntQTruTzMxqFlCnQg3
+         ZOUBl6Rho1SsPEjNqrZKLsDD7Y19DsUiV3DC17C2pjx9XmasY/krW9B41OJFhoW6wpH4
+         IyBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740480704; x=1741085504;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mv1GjtLH9p6AAgaKLJdaYv1valnjqWPg00vkxZOmddk=;
+        b=TKj31bzNkjI8YGZVPdb6kuSTTKKTjtKTY6HCAArhzcSfVACTT7FfD387AqcH3K6ztX
+         lVtUvxONaqL6GaAx0W6loxRhP25mYRn5QrrvbwGzVVv4X1S/ZZ0fNU+6mA/R03SLUcId
+         tDXGw4gtM9NR44Cqq1YQF16HIJgwwi9Ev8mBiUgdat8SvimpIavkA6U8a2FW0HYJCLtO
+         pioZB3ZjoU+61MOQfrJ2XHkOQXrMG/XdLR86yLmpDGiqZ//5CCkH5D9b8h2dXBQM19A7
+         9CqksPV9/JMLuAuDJRmDJGpUKUULU6aJq85PTuLYSstAl5uy0f3dS1n7jbsOFWBhZiWs
+         taHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXSHwybeOxr6avbRThTFZI8mahY4lm+aOoJzLO9y03GPsZNc1W5jK9cacpDN401lyO7R2tvoaFxmFhGTA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfJIAX/Kc4f4HADOQi+amogi58SDMSLnf4Jbf6PZd4STIlcdHJ
+	dpt373Wrz+c96S+WhKcUB86Bj4Eq/1eEfkJ1ppqm0jKqq8WgXtYqO+8w2zXNHdg=
+X-Gm-Gg: ASbGnctT6JYl8q4asy9tVtvTvyCw7nwN2pZyC8s4AB8xP0e7++8ATWpzsEfmoYkwwFH
+	Ve1nvGdq+JfaV5bDOhcR5sjLj6DXkOb3WfYcG9kh80ildWobBOlQ3zy5d7kkm7ai68A+KSAx6Gb
+	tIDNL2s0y3AOzVe1n4VrzPIvqI+6IYbp/26kZf1pbauHPn8WNUpbhuh4VaAJeM3gqIe4OJYE+B9
+	3q/44Z+TY+gpDZDgrkbVUXlXeL/dAaUq4ZtIuBIHz1K6C7HQEWK7Tnd2sTCfe2P71Z8ZG2sHOTf
+	NYFum1AXS4EkFLYY0mIDLKk2HOJ+
+X-Google-Smtp-Source: AGHT+IHUS8m9al3aYpp9dTro/BoJsAzrTMGGeZSSdFhetcpWcy+SNbbUKcmiFFvP72TdtmWFR4s3Zg==
+X-Received: by 2002:a17:907:3e0b:b0:aba:620a:acf7 with SMTP id a640c23a62f3a-abc0ae5728bmr1777898866b.10.1740480704381;
+        Tue, 25 Feb 2025 02:51:44 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1da1c2dsm121396366b.77.2025.02.25.02.51.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 02:51:43 -0800 (PST)
+Date: Tue, 25 Feb 2025 11:51:41 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, 
+	axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH 0/2] blk-throttle: fix off-by-one jiffies wait_time
+Message-ID: <igzfzkwbbdywdvkbjzi624fgrc2jopnb6c4dpcrac644lazgbp@k63ht5r5ue4x>
+References: <20250222092823.210318-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: sysfs integrity fields use
-From: Kanchan Joshi <joshi.k@samsung.com>
-To: Milan Broz <gmazyland@gmail.com>, linux-block
-	<linux-block@vger.kernel.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig
-	<hch@infradead.org>, "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
-Content-Language: en-US
-In-Reply-To: <823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupjk+LIzCtJLcpLzFFi42LZdlhTQ/f3vL3pBmsmC1ksWDSXxeLY/lns
-	FqcnLGKy2HtL22L58X9MDqweO2fdZffYvELL48XmmYweH5/eYvH4vEkugDUq2yYjNTEltUgh
-	NS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnFJ0DXLTMHaLWSQlliTilQKCCxuFhJ
-	386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj0dLHrAUTWSrW
-	TL7C0sC4jrmLkZNDQsBE4uG9HywgtpDAbkaJ190qXYxcQPYnRokj53+yQzjfGCUaJ55kgel4
-	s2ANK0RiL6PErcbJUM5bRomzm3ewgVTxCthJTL34EcxmEVCVODrhCxNEXFDi5MwnYJNEBeQl
-	7t+awQ5iCwuoSzzY+oCxi5GDg01AU+LC5FKQsIhAoETjzjtgVzALTGWUWPL9CNgcZgFxiVtP
-	5oPZnAL2En0377BDxOUlmrfOZgZpkBD4yS6xa3YrE8TZLhKtG36zQtjCEq+Ob2GHsKUkXva3
-	QdnZEg8ePYB6s0Zix+Y+qHp7iYY/N1hBjmMGOm79Ln2IXXwSvb+fMIGEJQR4JTrahCCqFSXu
-	TXoK1Sku8XDGEijbQ+L6mdNMkKA+yijxYwrjBEaFWUihMgvJZ7OQfDMLYfECRpZVjJKpBcW5
-	6anFpgXGeanl8PhOzs/dxAhOmFreOxgfPfigd4iRiYPxEKMEB7OSCC9n5p50Id6UxMqq1KL8
-	+KLSnNTiQ4ymwOiZyCwlmpwPTNl5JfGGJpYGJmZmZiaWxmaGSuK8zTtb0oUE0hNLUrNTUwtS
-	i2D6mDg4pRqYttpJSm5Uar/mX/7QySNJ//x10S0GfffurV1WseVJ+xbzfzNY5HZJftrhUqM/
-	/5NNI9ebF1U8gtybfjpsPF2k5KymMm/N3U0LFY0z7vf+qFUPsFleXJn5pe2m2nd1ow1qWdyJ
-	gaqTXua2b3m/3Vvmy6qe5RGOHZnzHs9TuXdpm6flf4O4xgjlxcubL2Yc2JRmfPcr27omddn5
-	bRUX8o4W1u2wlDZcP+OfumvKAb+3V57yLJtqyLP6UFzYiuMXWeadmGHiWig/aY3IwYZzoUyy
-	U65WrEh5lnx/w+KiWHHJrRn/smW/B+0qy1AV+5z/7/XdNZ4Lt/tOepCqaTa7hlVWW32ugqIu
-	j0j4kWTRIm5fJZbijERDLeai4kQAAhi6UCEEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsWy7bCSnO7veXvTDZ4mWixYNJfF4tj+WewW
-	pycsYrLYe0vbYvnxf0wOrB47Z91l99i8QsvjxeaZjB4fn95i8fi8SS6ANYrLJiU1J7MstUjf
-	LoErY9HSx6wFE1kq1ky+wtLAuI65i5GTQ0LAROLNgjWsXYxcHEICuxklNh1bxgqREJdovvaD
-	HcIWllj57zk7RNFrRolJD+aDdfMK2ElMvfiRDcRmEVCVODrhCxNEXFDi5MwnLCC2qIC8xP1b
-	M8AGCQuoSzzY+oCxi5GDg01AU+LC5FKQsIhAoMS/ufPB5jMLTGeU2H9tFRvEsqNAzoH3YIOY
-	gS669WQ+2AJOAXuJvpt32CHiZhJdW7sYIWx5ieats5knMArNQnLHLCTts5C0zELSsoCRZRWj
-	ZGpBcW56brJhgWFearlecWJucWleul5yfu4mRnB8aGnsYHz3rUn/ECMTB+MhRgkOZiURXs7M
-	PelCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeVcaRqQLCaQnlqRmp6YWpBbBZJk4OKUamJQ+2BZ1
-	t+T/2rVMWarMZ4bEm5ym6dzFi5+/2FOxWsHcPGOe9HtBlQ1ns/Yd5++3FhB2XcB9+oOi99q8
-	S42rp8hxeOsclzxt6xmylTOyvlLmNpvEu287P5Yc+Rm3VSyjgvfqlhivH84RT/p+hUw7GM7m
-	X3+f4b0C4yYhVpf0P2d4Si9FTIhnfyU4b7XAehXrLtFIz9m3j0Tqdtznq0k7envTifbcTBWl
-	SxXd96UXcjJLPZifwzb/eIyh/YWFqQllG1oa0zk15LIXHNAUP7DE83ff31MxhzeeuHH3d+Od
-	IwUL59xlXlLPtOIwe6Jl0t+Ena2tS1xDuNYX5s+Illg2Y470uxdBMh0bXt/RkWcTUGIpzkg0
-	1GIuKk4EAHKXfur+AgAA
-X-CMS-MailID: 20250225104411epcas5p2ffaf2c1ed42c9df33ce1188d205bf8fc
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250225092525epcas5p31dd0a19ffdfb39f3f2ce4acd1c6da7ee
-References: <CGME20250225092525epcas5p31dd0a19ffdfb39f3f2ce4acd1c6da7ee@epcas5p3.samsung.com>
-	<67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
-	<823d3261-671d-41cb-ab15-10a361c48bca@samsung.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="teg6osmgnl3qwlc4"
+Content-Disposition: inline
+In-Reply-To: <20250222092823.210318-1-yukuai1@huaweicloud.com>
 
-On 2/25/2025 3:40 PM, Kanchan Joshi wrote:
->>     According to docs, this is "Number of bytes of integrity tag space
->>     available per 512 bytes of data."
->>     (I think 512 bytes is incorrect; it should be sector size, or perhaps
->>      value in protection_interval_bytes, though.)
->>
->> Then we have new (undocumented) value for NVMe in
->> -/sys/block/<nvme>/integrity/metadata_bytes
->>     This contains the correct 64.
-> Maybe you mean "/sys/block/>/metadata_bytes"?
 
-/sys/block/<nvme>/metadata_bytes.
+--teg6osmgnl3qwlc4
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [PATCH 0/2] blk-throttle: fix off-by-one jiffies wait_time
+MIME-Version: 1.0
+
+On Sat, Feb 22, 2025 at 05:28:21PM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> Yu Kuai (2):
+>   blk-throttle: cleanup throtl_extend_slice()
+>   blk-throttle: fix off-by-one jiffies wait_time
+
+(I haven't read through all of the 2/2 discussion but) if the 1/2 patch
+is only a cleanup, it's more backport friendly to put it after the fix.
+
+Thanks,
+Michal
+
+--teg6osmgnl3qwlc4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ72guwAKCRAt3Wney77B
+SXOwAP9fngBMH4Xn+ahF0Zv0RzYoYnjox8PuSgoFd8VeVVyVIgD9EMg0p69jzpqn
+RGSQPrygGqTm1vbVYBMl+rzVsdR5Sgo=
+=bd7s
+-----END PGP SIGNATURE-----
+
+--teg6osmgnl3qwlc4--
