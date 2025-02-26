@@ -1,203 +1,154 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C0221506A
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 12:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8275C80BEC
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 14:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740573772; cv=none; b=jeDoJpXfLj/EtgJzS1myNG7XsSq0eAIxRkcVHUBm5GJxqeIdrdv5cXXG6frZn6kidVHBU7VMM7ywnZsdXnAT3ikaQu5CqRXIX9xK8igS+Uqo6NY/Ze3lpbt/QV/r/dfAmm2hvnN0zgzGLuR7akU4/Zf7fGKE3by7d8Qd/Ywpyks=
+	t=1740578563; cv=none; b=FORav0u9GIE0w/AGMNSuit6FZRvS+AgutZpcmG7m7FAx/RfZ2r4JfWCtPoIPZURlMOBO6NrHjN378bolvBY/r46kIqOTcXMezxMhCE12GB8ZT/unUxktErWdGi+Qz1QFMLiDGWVJ6YSwAy94smh8lmr0yLy5Gu6tkykwO52oWT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740573772; c=relaxed/simple;
-	bh=PtAOfHyfrjd0LrqBGdVDUxkQhHekm29uGUjIFTtuVP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ckZMfOP1e133H1a874QgsY3cYHyJ0BQq+jZZKCvDo49NRmYO9Youket6K6bkJ7FlROD198N7mVsZv12rfvxuypxepszWlY2TkHD9JO1hOoqnfj2yT+70ATI2hswh/cXVXuhe1nLD2cmLKHtB6amwU9pkC2kC51IalagZcd8OTx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M3bTwVSd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1740578563; c=relaxed/simple;
+	bh=S1lHlyUQafAmKbfboeIeWCRRxWZDIdnxB101v6/key4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MFhIFh7fbUu2wXx2jC5tmcMGKYp0MOO4LWFEjql8Fa/TqezCFqnNqMBPWeg9ov+DU1yWp2HGM4nilzMsyIJDkH6JIuvVb1iPyJ8aMNy9kxNLbP23M6o5s4M7G4FNCshNcI/8hEboM+MUaPaJzlO2Z3fOJEoA46+XyTaruzOnh2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YcpDMw2H; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M3bTwVSd"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51Q7WiVY005931;
-	Wed, 26 Feb 2025 12:40:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=hY+4KegWEWw1DMz+h
-	fH/0wULhmuXfP71/r4H3UJc36Q=; b=M3bTwVSd4gybO0iRR+W7T7PXtOEp+B164
-	FCx6bCEG/A4tXKtGb9GtMAUeLkaeZgsT/9I8q8onzz71hqb/AENJk2n2uRJeF1no
-	yjNEbjodnt8sjJEncUmmoLT6/J7+5aDvnw3ZEOZ7vzRSa0w9z5zVVEAEPnsPR1at
-	51CBX7GViKQHFcL4Zyhdl1IxHtZiDhW4bgr6gPjCWJA4NlbxURWoqFuyIrc63rPC
-	hLc7zlsSFIY7GTVvQZZ8gn2dfc+j48PaW1MZ9UUC7dyfumFKC+pUhIgbQ0MOW4lG
-	myejh5U8A9EaHDVjr1I9xp7uhTj+4E8ajnRN/ajH4RrVKvU/0ZzFw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 451xnp19jj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Feb 2025 12:40:40 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51QASJJr012465;
-	Wed, 26 Feb 2025 12:40:39 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yrwstv2a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Feb 2025 12:40:39 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51QCecdE41877962
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Feb 2025 12:40:38 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E45FA20043;
-	Wed, 26 Feb 2025 12:40:37 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7BBFA20040;
-	Wed, 26 Feb 2025 12:40:34 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.61.110.139])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Feb 2025 12:40:34 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de,
-        axboe@kernel.dk, gjoyce@ibm.com
-Subject: [PATCHv5 6/7] block: protect wbt_lat_usec using q->elevator_lock
-Date: Wed, 26 Feb 2025 18:09:59 +0530
-Message-ID: <20250226124006.1593985-7-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250226124006.1593985-1-nilay@linux.ibm.com>
-References: <20250226124006.1593985-1-nilay@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcpDMw2H"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5462ea9691cso7575349e87.2
+        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 06:02:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740578559; x=1741183359; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=y7JxiN7/EaEpIk9akFz/BbN5BWXCHDt089MmPz7SjqU=;
+        b=YcpDMw2H1jD97AKgBnt6BwXmTGhbJpcGjrHiS0VfRbkwSssUgNV8ZMLGIXW91F/TnP
+         Z8AUEO5PrVga5jlyXr0EcVaSJGTsArJbxNyGQbxudVx9Y9jdaY2wpmGjyrboGb6/+Arg
+         3XjB+BaDYl3UBYicOpZ0ieoNmpUqtqjbrmrsM8V4paHxHVRJ7Fr1OuBXKH7nWhYFJXK/
+         5I/mjeeCShs4DIyRemk2TKkTFK+OPY520vQ0MMSQZ9tOr10JzZt5sgu7SInN2M3TxM15
+         yz4Mxu0cqZcc26wkhkZkz7+hoMO9Bo2g+YYqGHdX7Zh1oGscpACmfutB+pjS8DmSlOaC
+         Qhyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740578559; x=1741183359;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y7JxiN7/EaEpIk9akFz/BbN5BWXCHDt089MmPz7SjqU=;
+        b=tJUrCeismJbuPAZIRqJYVFa78X6vbK8d0b/5ydOkKT1395YxWwAOFl6pW9zGa112w7
+         by+RU19a5fL5Yt3ny72aV0KAJsK2CRy5deNVCmKWRZfLoLtUHeK6Ys4Kc9dBHrBzk2H8
+         aBWZUFOVi0nrKjExj3OCJIFApFE5pYToQ6RAmREDbpoq2ODmII7r7nXTGXIkwz2PdRZq
+         jhj4ctVQJnDi5IDnY+zkU/rc5AaFb0OGm/nTKg2MWHZJGM3OVYCPWdAoHy/OlW5VsUy9
+         A4ULbU2s6EW+jghuDUvBV9sWTTqR1Q5pc25Np1J4WUf0NoI1Gdchjq7MI4Cqi/db+dL/
+         KLbg==
+X-Gm-Message-State: AOJu0YwTJDdZSkfdRsFGs1Po6CH3LTLHG23MSf9r6Jf3VXK+bjwhS13m
+	EHadmnxjtFdmTwVEE0JRM+S11ghQjPzlXmUPq2uGfo7E27ru60BOAco4GxlZ
+X-Gm-Gg: ASbGncu4RB9uu9R1yA1nDSOmTE8zXbR2jap7KOYh6pfj9S0OZaRb0kdGibaqZfyfXGt
+	gMEygU+E/dVwEdN/BO9+0lXre03HZlMjBfYEJE/z9phgWJx8u5MVQfvW9jek8cZp/EWmisy5CQH
+	5aYD6l1eb1sgF0GW3oH05I0LF51HqZS0MK1Wge6oXlobqT1cyWgr/wgw9I1CptBAPuUhvB3QCUZ
+	a7/hsIoOnEwsjWPbMVuwf5isBqOWyBBsK53lqfGfunOL5U2oR+fbJhuzRWUihkmacWXMgs8zRal
+	8uUlJ00XkO0HAFISM/G3dAn6xGZqLH3kDZS2s9wEd2yhJ2Sj2A==
+X-Google-Smtp-Source: AGHT+IGXWamPbQPXS3dI8k6M6UXIynN28WUm/uuCdIbiS5UuEnsUgJoVw3J96Lagzn8R1Hqjf9cG3w==
+X-Received: by 2002:a05:6512:31c9:b0:545:243e:e2dc with SMTP id 2adb3069b0e04-5493c5b88f2mr2832301e87.39.1740578558987;
+        Wed, 26 Feb 2025 06:02:38 -0800 (PST)
+Received: from [147.251.42.106] (fosforos.fi.muni.cz. [147.251.42.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abefe713bbesm47387366b.69.2025.02.26.06.02.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Feb 2025 06:02:38 -0800 (PST)
+Message-ID: <bc9d0c28-3712-4315-a582-9dbce9f9f05d@gmail.com>
+Date: Wed, 26 Feb 2025 15:02:37 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ddYkTTOgDABREmeX2cx8Ma_KKu6cktsE
-X-Proofpoint-GUID: ddYkTTOgDABREmeX2cx8Ma_KKu6cktsE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_02,2025-02-26_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 suspectscore=0 mlxlogscore=999 spamscore=0 phishscore=0
- mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502260100
+User-Agent: Mozilla Thunderbird
+Subject: Re: sysfs integrity fields use
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block <linux-block@vger.kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
+References: <67795955-93a4-405b-b0b7-e6b5d921f35e@gmail.com>
+ <Z73kDfIkgu4v-c9W@infradead.org>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <Z73kDfIkgu4v-c9W@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The wbt latency and state could be updated while initializing the
-elevator or exiting the elevator. It could be also updated while
-configuring IO latency QoS parameters using cgroup. The elevator
-code path is now protected with q->elevator_lock. So we should
-protect the access to sysfs attribute wbt_lat_usec using q->elevator
-_lock instead of q->sysfs_lock. White we're at it, also protect
-ioc_qos_write(), which configures wbt parameters via cgroup, using
-q->elevator_lock.
+Hi,
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
- block/blk-iocost.c     |  2 ++
- block/blk-sysfs.c      | 14 ++++++++------
- include/linux/blkdev.h |  4 ++--
- 3 files changed, 12 insertions(+), 8 deletions(-)
+On 2/25/25 4:38 PM, Christoph Hellwig wrote:
+...
+> 
+>> Then we have new (undocumented) value for NVMe in
+>> - /sys/block/<nvme>/integrity/metadata_bytes
+>>    This contains the correct 64.
+> 
+> Yes, this contains the full size of the metadata.  And besides
+> documenting it we should probably also lift it to the block layer.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 65a1d4427ccf..c68373361301 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3249,6 +3249,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	}
- 
- 	memflags = blk_mq_freeze_queue(disk->queue);
-+	mutex_lock(&disk->queue->elevator_lock);
- 	blk_mq_quiesce_queue(disk->queue);
- 
- 	spin_lock_irq(&ioc->lock);
-@@ -3356,6 +3357,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	spin_unlock_irq(&ioc->lock);
- 
- 	blk_mq_unquiesce_queue(disk->queue);
-+	mutex_unlock(&disk->queue->elevator_lock);
- 	blk_mq_unfreeze_queue(disk->queue, memflags);
- 
- 	ret = -EINVAL;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f1fa57de29ed..46033d640e30 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -557,7 +557,7 @@ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
- 	ssize_t ret;
- 	struct request_queue *q = disk->queue;
- 
--	mutex_lock(&q->sysfs_lock);
-+	mutex_lock(&q->elevator_lock);
- 	if (!wbt_rq_qos(q)) {
- 		ret = -EINVAL;
- 		goto out;
-@@ -570,7 +570,7 @@ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
- 
- 	ret = sysfs_emit(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
- out:
--	mutex_unlock(&q->sysfs_lock);
-+	mutex_unlock(&q->elevator_lock);
- 	return ret;
- }
- 
-@@ -589,8 +589,8 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
- 	if (val < -1)
- 		return -EINVAL;
- 
--	mutex_lock(&q->sysfs_lock);
- 	memflags = blk_mq_freeze_queue(q);
-+	mutex_lock(&q->elevator_lock);
- 
- 	rqos = wbt_rq_qos(q);
- 	if (!rqos) {
-@@ -619,8 +619,8 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
- 
- 	blk_mq_unquiesce_queue(q);
- out:
-+	mutex_unlock(&q->elevator_lock);
- 	blk_mq_unfreeze_queue(q, memflags);
--	mutex_unlock(&q->sysfs_lock);
- 
- 	return ret;
- }
-@@ -701,7 +701,9 @@ static struct attribute *blk_mq_queue_attrs[] = {
- 	 */
- 	&elv_iosched_entry.attr,
- 	&queue_requests_entry.attr,
--
-+#ifdef CONFIG_BLK_WBT
-+	&queue_wb_lat_entry.attr,
-+#endif
- 	/*
- 	 * Attributes which don't require locking.
- 	 */
-@@ -882,10 +884,10 @@ int blk_register_queue(struct gendisk *disk)
- 			goto out_crypto_sysfs_unregister;
- 		}
- 	}
-+	wbt_enable_default(disk);
- 	mutex_unlock(&q->elevator_lock);
- 
- 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
--	wbt_enable_default(disk);
- 
- 	/* Now everything is ready and send out KOBJ_ADD uevent */
- 	kobject_uevent(&disk->queue_kobj, KOBJ_ADD);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3e66ad016a23..0ee3b5c9388e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -563,8 +563,8 @@ struct request_queue {
- 	/*
- 	 * Protects against I/O scheduler switching, particularly when
- 	 * updating q->elevator. Since the elevator update code path may
--	 * also modify q->nr_requests, this lock also protects the sysfs
--	 * attribute nr_requests.
-+	 * also modify q->nr_requests and wbt latency, this lock also
-+	 * protects the sysfs attributes nr_requests and wbt_lat_usec.
- 	 * To ensure proper locking order during an elevator update, first
- 	 * freeze the queue, then acquire ->elevator_lock.
- 	 */
--- 
-2.47.1
+yes, this is exactly what I need, just it should be present
+for all block devices.
+  
+>> Anyway, when I try to use it (for authentication tags in dm-crypt), it works.
+>>
+>> Should tag_size and device_is_integrity_capable be set even for the "nop" format?
+>> Is it a bug or a feature? :-)
+> 
+> It is expected.  The only issue is that the block support for metadata
+> is called integrity all over because it was initially added for PI only
+> and then extended for non-PI metadata, which makes things a little
+> confusing.
+
+ok, that make sense. Maybe the note should be added to sysfs doc too.
+
+Thanks,
+Milan
 
