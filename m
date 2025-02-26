@@ -1,131 +1,147 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1FB1E1E1E;
-	Wed, 26 Feb 2025 11:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA11721517C
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 11:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740569316; cv=none; b=Nir649zNTbFrxa2dMcoLM6IJGLhEoxdnxIH2mHQg8Qu0EV5VA+s6auCk+sGSdROVJdujq9OtjqJfeWo/U3Cp0FMHpY9HnFZHbePqGGLSF24bq4QzVZZUWoswb7DXyZewZpRUkQuNb/oUya0Y2ijKA5lVSrJygVJn+uvgvevU4xQ=
+	t=1740569372; cv=none; b=UgidmYXRySfRtus6ayXyiWWNPs8gB4KpFu7SQArBbEvSrI/PlukQw1NkkPyTo9Blh3M6ZLukKpB/Jq5iLLQEdeAMNL2A5eR10piqpllwB9x/MH0zqme+AWTUPPOGfCnpsSv52jZPqKEfOTP0Xg+dFF/6Sq0eZUEHWeRhthHieDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740569316; c=relaxed/simple;
-	bh=IHVV0VEiY51JiQMba95CWP2QqrEyuH8K6cJYGrV0vxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d7e+ex6OYjRBlZiSkmRK+ejut4b1zT2MsiEf8HjurNcE19Yx5QzgqtbAKc+vr1RvadPFESHlYw/TNnfeJpLJRsQHY6DM30dKEEztkWOKS3T01mzsY0L372IYPlRITkTmtgoOkhUQd9Mh9/VMSq3cL57GRWUsu/QBPD5rWqEcXQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ae3TUF/P; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740569372; c=relaxed/simple;
+	bh=OO22PG7Gvf9nzlzRb8I9FCyuwmfc+9U3YUKWUC6LDkM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=hPoJWMzJGjR3O8TLcIKPYI0Rjt+aNZa+06FmAfpB1ZEy08NzYnfHwT/hb+7+zr/ZBVZr+Cw7OEhBZKB77CNV7HceNYK8U32WBYuLKCsxllpiHoZ4UHIUTZ3dNo0z6JM/HQRUm937uW0hW36nMbVRv4caSBAp1kr/zdpyHxbwaTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=GaVvvIbm; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ae3TUF/P"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5461a485a72so6464439e87.0;
-        Wed, 26 Feb 2025 03:28:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740569313; x=1741174113; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TGWA47ydXjPk/ArJwGLRdTzUR2JDCR2yxtlUSj8iJJU=;
-        b=ae3TUF/PiW02DvsiQGb9jif232/VR/I7kVGPbteOEcrJ5nDMrc1gufPipy51ywYF7c
-         RW8kwB7HjPts5U6rbT0IXwiE5h0shcYTNOiJHjB6MGKfBDTO2fd2iV+9ZRS+Z88gBzuK
-         7yam4RPAu7/SzH5mx9KGB1qZNHskHT/e32jG2BC1m1I3gyF/eBP5VP4sfS98rJMb45JG
-         9xrkLOPY19wb+a7fNvc3288frTP0goYTNDI4dDMVJ5cDdq8O6MOc5muIGAJMepLLalcD
-         Mpcpy8hau6tTWq9iw7WcEILSfKphQKKjX90G2udk1lp0qKXdPxfEHY1vGcgwu1FUARnl
-         YiPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740569313; x=1741174113;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TGWA47ydXjPk/ArJwGLRdTzUR2JDCR2yxtlUSj8iJJU=;
-        b=nWr3+Co3iyNIu24NToFnUtP+TLn5xKczkCKGOxJK8G4NEaDW6IsVkX9zfSTLglNsVb
-         ubyZqVOgNfHeVBK6h1qA+F2gA167JreaHWWnbnXZWyzEYolCg1uRK2/IhyfDatCw/+1k
-         GO9mR6gFaX91KP62G9VEusJ7Odw72cSYOkJub9vICUaEUl4zU+oyo7QgHZjgDHpufkWB
-         IhTuJ6lHf4u4nJIGRXHVsQfEW1wFUes+FfzdTQz/3rzlav8SHRbp1D/UcVlWGKmSy7pA
-         lzcPh3hUMYrxxKshaDWnsGPyqyWPcLjD2XGQVU8Tl9YJ4gq5EZhjWkvtUL5rkA6vj0Xi
-         xDEg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2xDD+qdFrVcEFjbw4/jOxmlP9aEL5DkpsVeqUxYJa5LwEJDo675rbVcZVbAPuBR3g7tryXCtQ34LYww==@vger.kernel.org, AJvYcCXnujLpR4KoHvHhF+qTwMl03KQ1xefXD7rglzS0uzw3r/0UOdLMaHGLPpgtYWzIJh0eP5FWrITaeOny8Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIeATV46jbFaqlVx9MG3YbTqzCRN2XqrNBTF6IWTXxMm91QgwE
-	p2JvTL3NPgBAWJ9DthKcz9uFX38Xfwf70qoZE8kLNDN/qz1Yuj/r61SiqZxD2Z+JID1rplKttGn
-	KAUPc0IkiX92TDnS8Hz7XpZ3kxGbXWE4=
-X-Gm-Gg: ASbGncu4h5+QCCTRvVQXCz9J7bZzPHmLimLAAeCEaGKj6iB7qrgV6VzppHMER2/GIY2
-	3n7cNDiVZ2Wj+t5FECAtkiEJ8+zaxokgPlVvTNyrKrk9W1GngiSVoTUCT0PiCi46hdROGd0WFQa
-	6niv9EYbY=
-X-Google-Smtp-Source: AGHT+IH+Zjc+bSh26ZsVjU3bqp76TTCLT0O7VaVEWFGY3H7jTf7GiuF0ZJl8GQK9eeazQ/KZTqZRV1mtBf3J32sedzA=
-X-Received: by 2002:a05:6402:254f:b0:5e0:b542:fb32 with SMTP id
- 4fb4d7f45d1cf-5e4a0d88ac4mr3401857a12.19.1740569301171; Wed, 26 Feb 2025
- 03:28:21 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GaVvvIbm"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250226112927epoutp030371cfdde19698d760dd3034e7ca79b0~nvp4_-Xzi0116901169epoutp03f
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 11:29:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250226112927epoutp030371cfdde19698d760dd3034e7ca79b0~nvp4_-Xzi0116901169epoutp03f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1740569367;
+	bh=mqgBPc87/veZwgYQ39rtpd2Wha3wUtr/2HbfNGY2nfg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GaVvvIbmGUbAH4niVnY4UHZ4xEEQALsRPQV9LYmD6bHDwqm66vSaxg0R031cI9+E4
+	 d8H08xtWIdqG30GqCcY+ol+5EXDXHCFugGp+5rGK4KPvxhXbDqBNRnDOwQ+1tuTmD8
+	 A5jPixvDhs9oV1vX6ekQisb1fxRZr7wibalQN86A=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20250226112927epcas5p2cb70d4a075b7c2c496490ff391976efb~nvp4YM6Yf2550425504epcas5p2N;
+	Wed, 26 Feb 2025 11:29:27 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4Z2sgn2ByTz4x9Pw; Wed, 26 Feb
+	2025 11:29:25 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E0.27.19933.51BFEB76; Wed, 26 Feb 2025 20:29:25 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250226112859epcas5p2b97647182f58b4c6514326cf497e3fdb~nvpeGCpGc0272102721epcas5p25;
+	Wed, 26 Feb 2025 11:28:58 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250226112858epsmtrp2f9555b3484131139f2b8cddbb06de9c3~nvpeFS6Td0959209592epsmtrp2Y;
+	Wed, 26 Feb 2025 11:28:58 +0000 (GMT)
+X-AuditID: b6c32a4a-b87c770000004ddd-96-67befb15147b
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A0.C9.23488.AFAFEB76; Wed, 26 Feb 2025 20:28:58 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250226112857epsmtip2b993069096e73abbc96687892d393a4a~nvpccxNis0945909459epsmtip2A;
+	Wed, 26 Feb 2025 11:28:57 +0000 (GMT)
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
+Cc: anuj1072538@gmail.com, nikh1092@linux.ibm.com,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, Anuj Gupta
+	<anuj20.g@samsung.com>, M Nikhil <nikhilm@linux.ibm.com>
+Subject: [PATCH v2 2/2] block: Correctly initialize BLK_INTEGRITY_NOGENERATE
+ and BLK_INTEGRITY_NOVERIFY
+Date: Wed, 26 Feb 2025 16:50:35 +0530
+Message-Id: <20250226112035.2571-3-anuj20.g@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250226112035.2571-1-anuj20.g@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225044653.6867-1-anuj20.g@samsung.com> <CGME20250225045514epcas5p10d06ab361a4125a94933fa8235fe3fa8@epcas5p1.samsung.com>
- <20250225044653.6867-2-anuj20.g@samsung.com> <20250225150626.GA6099@lst.de>
-In-Reply-To: <20250225150626.GA6099@lst.de>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Wed, 26 Feb 2025 16:57:42 +0530
-X-Gm-Features: AQ5f1JrVzXdezh5PQ5o_BGjgjz3qnhupiyvcy-dL-1mUwfQLc2HYvilNGs8wJSU
-Message-ID: <CACzX3AupuX0NYqBxq-7hBxU5E1v3BhHeYoeuWxYuyXqu++iMcg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] block: Fix incorrect integrity sysfs reporting for
- DM devices
-To: Christoph Hellwig <hch@lst.de>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, kbusch@kernel.org, 
-	martin.petersen@oracle.com, nikh1092@linux.ibm.com, 
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, 
-	M Nikhil <nikhilm@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrEJsWRmVeSWpSXmKPExsWy7bCmuq7o733pBueW8lh8/PqbxaJpwl9m
+	i9V3+9ksFiyay2KxcvVRJou9t7Qt5i97ym7RfX0Hm8Xy4/+YLO5efMpssbP9GKMDt8fOWXfZ
+	PS6fLfWYsOgAo8fmJfUeLzbPZPTYfbOBzePj01ssHn1bVjF6fN4kF8AZlW2TkZqYklqkkJqX
+	nJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3SrkkJZYk4pUCggsbhYSd/O
+	pii/tCRVISO/uMRWKbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSoMCE748N+lYKTHBVHjp5l
+	a2Bcyd7FyMkhIWAi0dQ0i7GLkYtDSGA3o0Rn7ylmCOcTo8TMiz9YQaqEBL4xSqztr4HpOPrq
+	DBtE0V5GiWsTn0A5nxklHsw6yQJSxSagLnHkeSvQXA4OEQFrifevxUFqmAXeM0q87u9iA4kL
+	C2RKzGo2BSlnEVCVaJrzDOwkXgELiebGc1DnyUvMvPQdzOYUsJToWLiCEaJGUOLkzCdgq5iB
+	apq3zga7WkJgIYfEnf/PWUDmSwi4SLyeJwExR1ji1fEtUDOlJD6/28sGYadL/Lj8lAnCLpBo
+	PraPEcK2l2g91c8MMoZZQFNi/S59iLCsxNRT65gg1vJJ9P5+AtXKK7FjHoytJNG+cg6ULSGx
+	91wDlO0hcfrqIVZIUPUwStxrOMM4gVFhFpJ3ZiF5ZxbC6gWMzKsYJVMLinPTU4tNC4zyUsvh
+	UZycn7uJEZx4tbx2MD588EHvECMTB+MhRgkOZiURXs7MPelCvCmJlVWpRfnxRaU5qcWHGE2B
+	4T2RWUo0OR+Y+vNK4g1NLA1MzMzMTCyNzQyVxHmbd7akCwmkJ5akZqemFqQWwfQxcXBKNTD1
+	Ldne9J89bOaT99eP/OjT8Epv3/HnU2C2muVbz2chdqt+/lurHvrXU2GfmkLKs/M7w9drMyTW
+	O5z1EWT6IuX8zWNGcgVbuyP330+L5h1xOF/Fp72c4XTM9XUel4SemR06t+3SzylK7EwnF92p
+	nj67oCd644bi6n1mW1cr7PTafDTZZSnjX7H3CmXy8+/bX196TmHWrtJ0s4DtZ9cy7UzgtqwI
+	WfHwmKqEWe6u2dlaCds235R5cOer+BOdXpsdjVZKFi1PtEIYlaz+p20+9HfO1hTNpVezQhoT
+	vrT7uh03Vmj5yzvh7bWL7QsDzheFibJPi7j/jjXFu3QHc5cw70cTiQmp2copa18t7tbSfGio
+	xFKckWioxVxUnAgAkgwUuEUEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsWy7bCSvO6vX/vSDZY8NrT4+PU3i0XThL/M
+	Fqvv9rNZLFg0l8Vi5eqjTBZ7b2lbzF/2lN2i+/oONovlx/8xWdy9+JTZYmf7MUYHbo+ds+6y
+	e1w+W+oxYdEBRo/NS+o9Xmyeyeix+2YDm8fHp7dYPPq2rGL0+LxJLoAzissmJTUnsyy1SN8u
+	gSvjw36VgpMcFUeOnmVrYFzJ3sXIySEhYCJx9NUZti5GLg4hgd2MEn8mTmSGSEhInHq5jBHC
+	FpZY+e85O0TRR0aJmwuvsoIk2ATUJY48bwUq4uAQEbCXuPejAqSGWeA7o8SJlutsIDXCAukS
+	l46cYQKxWQRUJZrmPAPbzCtgIdHceA7qCnmJmZe+g9mcApYSHQtXgC0WAqrZuWcLE0S9oMTJ
+	mU9YQGxmoPrmrbOZJzAKzEKSmoUktYCRaRWjZGpBcW56brJhgWFearlecWJucWleul5yfu4m
+	RnB8aGnsYHz3rUn/ECMTB+MhRgkOZiURXs7MPelCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeVca
+	RqQLCaQnlqRmp6YWpBbBZJk4OKUamBLeN0Y/+rCrme9AgdPOorru4GUvDV6E9slxqxz50XSZ
+	98Tz7x++bMhhXbHoH6NkKY/CGVMnp7yn/x6uDZT22Gq0WfHuw80Tzp5Ju2k8V2vP762tMyJY
+	NJJjlvdYPX7qtnfV7tvMnskcFmu3tB+ff/dcv5PkxZo/JXpCM+yVfQ86dIa86jmm4LXbMJqr
+	8N7MFV/vd/uWiG65HWzUOEH8QIqg5JpMiQUcMX+61i5gUVc2Liq+ODVvA/8mCVnTvasVJFe1
+	rLx8cM1sq1xr0ebly77K9HzTP33j9eyoctPDb5xWLH2n8K5835pZnHaHUjyi20rsKosubH34
+	UkXmw0+JN0yBT1QVmxOr4sOZd76TPKTEUpyRaKjFXFScCAC4uFMB/gIAAA==
+X-CMS-MailID: 20250226112859epcas5p2b97647182f58b4c6514326cf497e3fdb
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250226112859epcas5p2b97647182f58b4c6514326cf497e3fdb
+References: <20250226112035.2571-1-anuj20.g@samsung.com>
+	<CGME20250226112859epcas5p2b97647182f58b4c6514326cf497e3fdb@epcas5p2.samsung.com>
 
-> > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> > index c44dadc35e1e..c32517c8bc2e 100644
-> > --- a/block/blk-settings.c
-> > +++ b/block/blk-settings.c
-> > @@ -861,7 +861,8 @@ bool queue_limits_stack_integrity(struct queue_limits *t,
-> >
-> >       if (!ti->tuple_size) {
-> >               /* inherit the settings from the first underlying device */
-> > -             if (!(ti->flags & BLK_INTEGRITY_STACKED)) {
-> > +             if (!(ti->flags & BLK_INTEGRITY_STACKED) &&
-> > +                 (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)) {
-> >                       ti->flags = BLK_INTEGRITY_DEVICE_CAPABLE |
-> >                               (bi->flags & BLK_INTEGRITY_REF_TAG);
-> >                       ti->csum_type = bi->csum_type;
->
-> Hmm.  I wonder if this is the correct logic.  Basically we do not want to
-> allow mixing integrity capable and not integrity devices, do we?
+Currently, BLK_INTEGRITY_NOGENERATE and BLK_INTEGRITY_NOVERIFY are not
+explicitly set during integrity initialization. This can lead to incorrect
+reporting of read_verify and write_generate sysfs values, particularly when
+a device does not support integrity. This patch ensures that these flags
+are correctly initialized by default.
 
-It is about a situation where a non-integrity-capable device incorrectly
-reports integrity capability due to improper flag propagation. The issue
-is that BLK_INTEGRITY_DEVICE_CAPABLE is set incorrectly even when the
-first underlying device does not support integrity. This part of the patch
-tries to fix that.
-For example, when I create a dm-linear device using an integrity-incapable
-device, the resulting DM device wrongly reports integrity capability [1]
+Reported-by: M Nikhil <nikhilm@linux.ibm.com>
+Link: https://lore.kernel.org/linux-block/f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com/
+Fixes: 9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+---
+ block/blk-settings.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Rest of the handling in this patch would not be required once we correctly
-initialize in blk_validate_integrity_limits as you suggested in the other
-reply [2]
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 8bd0d0f1479c..bee4007b2eeb 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -114,6 +114,7 @@ static int blk_validate_integrity_limits(struct queue_limits *lim)
+ 			pr_warn("invalid PI settings.\n");
+ 			return -EINVAL;
+ 		}
++		bi->flags |= BLK_INTEGRITY_NOGENERATE | BLK_INTEGRITY_NOVERIFY;
+ 		return 0;
+ 	}
+ 
+-- 
+2.25.1
 
-[1]
-# cat /sys/block/nvme0n1/integrity/device_is_integrity_capable
-0
-# echo 0 409600 linear /dev/nvme0n1 0 > /tmp/table
-# echo 409600 409600 linear /dev/nvme0n1 0 >> /tmp/table
-# dmsetup create two /tmp/table
-# cat /sys/block/dm-0/integrity/device_is_integrity_capable
-1
-
-[2]
-https://lore.kernel.org/linux-block/20250225150753.GB6099@lst.de/
-
-> So maybe the logic should be more something like:
->
->         if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY))
->                 return true;
->
->         if (ti->flags & BLK_INTEGRITY_STACKED) {
->                 /* check blk_integrity compatibility */
->         } else {
->                 ti->flags = BLK_INTEGRITY_STACKED;
->                 /* inherit blk_integrity, including the empty one  */
->         }
->
