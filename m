@@ -1,87 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout.web.de (mout.web.de [217.72.192.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF48258CF8
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 08:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB88258CC5;
+	Wed, 26 Feb 2025 08:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740557760; cv=none; b=SsGqASpMtxzFJJTJolfEL6nXU6YD9GWPc8x/BmY3WSr2bQGOrnQM3imWLQwpIkoRcFW6VqrNa4/9up5SQlS0Zhet/WBiErqgWA19Mn8b+BAX9gGGbFYstks0o+yzLrXvW3the1dpjCYqnnKwK9mG7BG1I+fBhSGZJhT6TvZ+L10=
+	t=1740558386; cv=none; b=Li48OXh53uyyaByunXEV58gmvSNczpAqpVWEKnchvl/zrN9eSvkAzpQN92dPPImzb+yFFNrOoRjyeW0wGZZgJOmRUtsGdPLCP4d/yoTFmoVUIkEeQnv/Mp6FXs/S2Ig5WwQWpw3nLflkECOSgOG0VZclDHfvFLc5gd+uk6dLVds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740557760; c=relaxed/simple;
-	bh=nALpxznmBhzULFmfDkpB8aWVcJCEE83NjjXYdSRCF6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KCTZ5P0OYRRzYQEDNGZLCuL6umFSmrz8DffRB7b/n/sPLXsCLkJ6TRJnm7U/i5wAyekvP+tI09cSyo6Y+Fdw4ep6siJK+R0TyX4dPOJhnlwq6WQFNH9FWZQk+EdOQK+YmcdTiLvo1YcrwZS0YE1p1yMxKfi9Ec4EZlU5mMaraMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZaBbh77O; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740558386; c=relaxed/simple;
+	bh=njsILLkZkjyzEv/vKowZpeaDQvMRXfnUx5wck86CXdw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=qMUPC1xwV7gs3LPaZEHQuOj+Uefn+Paw6YooZZcK5m77ppkM1AIupJ4ZqMi/wKDskP5ilh2G1sFcO4hd1tturMvlZmExwQMBASFdsEr0x11ouB5hfDAAmEeorNsgtCZXthu3ojvZ7ceBh0qEgaeL1iz8Ik2rc542InpxXvJUkGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=SIvRvmLn; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZaBbh77O"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740557758;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IkUcDBu8Qo7NTXBR3iH6KjBpPvAxntcf8hHlhE3zaYc=;
-	b=ZaBbh77OEK8DqzSsEes3o/yhEALST8vc0aDTxd9sOGDCUnkHtgt4yB53BzSe2zU9vBncIm
-	v4y8FyKu/r0PBB1muS5xUCbWBDALmzrERHPSTxvblS03czPMtL58b6QsmG6YlwwfMeNHyb
-	2EstFZvtWMGghpq7vApUKUp+FEFS5ss=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-313-lMLmeSYlPcSKOrHiRuniNw-1; Wed,
- 26 Feb 2025 03:15:53 -0500
-X-MC-Unique: lMLmeSYlPcSKOrHiRuniNw-1
-X-Mimecast-MFC-AGG-ID: lMLmeSYlPcSKOrHiRuniNw_1740557752
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7455219039C2;
-	Wed, 26 Feb 2025 08:15:52 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.27])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F7FA1800359;
-	Wed, 26 Feb 2025 08:15:45 +0000 (UTC)
-Date: Wed, 26 Feb 2025 16:15:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: asml.silence@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org, bernd@bsbernd.com,
-	csander@purestorage.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv5 09/11] ublk: zc register/unregister bvec
-Message-ID: <Z77Nq_5ZGxUjxkau@fedora>
-References: <20250224213116.3509093-1-kbusch@meta.com>
- <20250224213116.3509093-10-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="SIvRvmLn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1740558375; x=1741163175; i=markus.elfring@web.de;
+	bh=JKZ0hhA194JzGtLnAGjE7Tna8UgHB+lZSaCvTNzqLik=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:
+	 References:Cc:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=SIvRvmLn8flUsGl5JcfolgQVFctLE8OIoa7MSA8VqUzJwiwUljIzskLbousNrkq+
+	 s6YCNQz7zIL9+lFqI5WSe7vUrJx0Yo77ScqwzShmSwXuPbW+uHdWmsvfkClFpA7rK
+	 usGxux+2O3/m/sH2Ol+aALD3UBAn0eLdYMCB/Zmhd8AxelKc6OigP+h1alFew5Dnc
+	 gPrustT65hY/Zl11lrJKD1kY3sy1JITGeTQFZwFBRfct+lEaKac+97UB4gEf52sZf
+	 Dfbezpt6AbuUfdntRPve72587MBApZwGt5tNaM+4croKEmsOyTmKlyMXy/PZQ37Cl
+	 n5TfjKV2NzLDX+X+gA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.70.43]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MLzn1-1u50kB3RC5-00JCvd; Wed, 26
+ Feb 2025 09:26:14 +0100
+Message-ID: <3abf9e69-77bc-40eb-b84e-a84726c693a4@web.de>
+Date: Wed, 26 Feb 2025 09:26:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224213116.3509093-10-kbusch@meta.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [cocci] [PATCH v3 01/16] coccinelle: misc: secs_to_jiffies: Patch
+ expressions too
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, cocci@inria.fr,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Dongsheng Yang <dongsheng.yang@easystack.cn>,
+ Ilya Dryomov <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Ricardo Ribalda <ribalda@chromium.org>, Xiubo Li <xiubli@redhat.com>
+References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
+ <20250225-converge-secs-to-jiffies-part-two-v3-1-a43967e36c88@linux.microsoft.com>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250225-converge-secs-to-jiffies-part-two-v3-1-a43967e36c88@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:8T0doJfXh5Xn7cF2aNYOOKjzaCLuQ6TqMSMuzhfQJClOkTbtxxb
+ WwwOPp7N2qlsBqQ00o23C3N3aVcUZY4TjAGA+UrRfMjxNPTKTdOiNBOQwZ9VQNsUmd6mbZy
+ KL9u5kffTfvv716Cs7afT5khYDw06LMDjCV3+bzJsgWJ4vukB2wup+YsixbEw0HAWd2IhUU
+ sgp5ksKAElGs1EpqGW8jA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:OGs6+r90pjI=;Xp1eJI63N70NI9WqtvgfsrbPcjm
+ rejW+UAjPV4MCQgv3/dxOZAaJVFE+L7EourFK4xAa//fhfqZ0btf2C18nTt3onMh/ij/Yb9Eb
+ T0H359kFvwQMR64ul87fexPZIwayUvLL4EMgSbNeZ4Bo99udJSEfTvfapfE8PfdgejwtYtkGC
+ vBgpCoA3d3unI7qRXRh9YVLc8njdbqop93SzJzAXXuvQkY0pr2isUFQYfceEEqHyZYUkasX/9
+ hjnd9clqawcls/NWlpBzXvnXAdgWWjHcE4IMujQQ/PpeLAbn3IsfKZgbpv6eiTGG+Z7fqQqsZ
+ dIR+iTAi+3sMw+MjNa0C/apJS83+HJ+uAVk+cEpMJCm8tp/OGvqnfUVvP4kbrGnEN5pjijKkq
+ IuTDQ3D1VHOXo8aXYnRji0Z3C4oY7e1YAEwjE5PWdfkcCNxS7t6u87myzzJfNEsmWEs9jMW2+
+ H0rnQaffodiEOSgUHrwEbtuLlWq4GpxSOc6Q/ZlC1jMNPSut2vd3xZ+dtmQv1Nl488cpPmwsS
+ JKXdlIqpS/Uh+8ESz1Yl6L5lUJAqnFvBfMa65+cs1cjTgeHKmVDHZ8g0uMWqjjnwmcaWeGLrb
+ icCBUjV9O5/YLaNVaiKyHShsLusR+U8qRmV4wk8XR7ZYZj5OeB1vpgawSCQfNexSQRRJsOXXJ
+ I2QXL4g/1jt1QlapifmgrxUa6CaIzPZWYYBAm2hdaWdRzA+oSysm37nVGM2HwP+yrvthOwDo/
+ 5nfI0R6Tp9iaevpPpq92IfJpBCmdKka/vd3uhPaera4sRHUu+SkehtOOc+kzWtp9JMB2bmJ08
+ uneEpTPQTfnJijuPS8zw91Fp41AUNHad7+GYTKS8oi7ZilDK9MgcmZDqh2yEJn8LtqKnkqY0V
+ b4FrlZkeeBIJ+ZoMrM9VligtBsZQrWT/hSFTPgKF4RnMWr/xsEbIjyr7VnuDQ6W6mc/KqkvMR
+ T/Z1p7RMnlXqMVMdEG/RUPfCbNqkA37xnqclEC99lb2otbZ6V5hBEsFVSIF2u4RS0wTottnz1
+ ebZ4KPntTuP1H8yR8EXRi43bm0/vIb3H52E9qW0y8ZBngoivBNQ0LwyHIq2aGZ++SHVHolGOJ
+ juiTRD1tRMxCHnAA8RpZVJ51z8mhkoCut4QkOKTIsG5g6DPDxGr7uIpfJIuzwFY3TBmWI4bA4
+ TQ1OGIFfyt9jpEYH7mNoq2q9TF9CZly0rFAUedyRYm5LpBSHPwp6TGCjI1WAe8yJ6pbSvJoa6
+ 56jQAESh71iph7QxwpzQKoasaQuoeRBkQeCxh9NnE3lsHLTMCcuw3u7tn/F6wHdFCdoLcOyU3
+ vnEpf/g3ha4eTjBE/N6jOgPnPN6P+USvCp0rn9Mb5kdujiLqyNfr1MmGc4W9EtG+aONjj5kGG
+ pjlaod0Xin9HArUw2MYbXOw+oJWHaP1O6KCEzJV5TC9zhidAR4gDh4NUGv+eU8QBzOLaYpBOE
+ 0S9XESzAIgZgr0noSVz8XSbEay1E=
 
-On Mon, Feb 24, 2025 at 01:31:14PM -0800, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Provide new operations for the user to request mapping an active request
-> to an io uring instance's buf_table. The user has to provide the index
-> it wants to install the buffer.
-> 
-> A reference count is taken on the request to ensure it can't be
-> completed while it is active in a ring's buf_table.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Teach the script to suggest conversions for timeout patterns where the
+> arguments to msecs_to_jiffies() are expressions as well.
+=E2=80=A6
 > ---
+>  scripts/coccinelle/misc/secs_to_jiffies.cocci | 10 ++++++++++
+=E2=80=A6
 
-Looks IO_LINK doesn't work, and UNREG_BUF cqe can be received from userspace.
+Will any information from previous patch review approaches trigger more de=
+sirable effects
+also for such an SmPL script?
 
-It is triggered reliably in the ublk selftests(test_loop_03.sh) I just post out:
-
-https://lore.kernel.org/linux-block/20250226081136.2410001-4-ming.lei@redhat.com/T/#m3adfecbfa33de9f9f728ccb4ab1185091be34797
-
-
-Thanks,
-Ming
-
+Regards,
+Markus
