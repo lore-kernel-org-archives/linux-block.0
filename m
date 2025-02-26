@@ -1,198 +1,155 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE7723F412
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 18:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BB621E096
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 18:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740594090; cv=none; b=QTjcQlh139ysvBaCyKQmtkNMRyhNcng5M3+/3/nqh2/enn4UafmEVxxYSr2fYO7AfTiCeKl0dtuEVAUh95Qn1H4LwzSyesEp9sZf3Q6ED7Wj5Cf73JSGh22REOX70QwQL920xgOis/4DODRvmJhvWzDGFJyCHCZ6fyiz624YY90=
+	t=1740595230; cv=none; b=gc6d7qrfekuHgp5hpWk3cEj4LZX4ZdjIJdubgHTJ8VpRN+F4WG7bRbcwnIp9fRCw7YJe+5b5/Gg5KxPrNGZs9gH86+ZfW8uoCN8Dfr9nP0FpbW8fuDRpUUyxV7WGvCER/fus7yU3AkL0sxWK8UAtQ47URcxKu0zcv2DLMhD5qtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740594090; c=relaxed/simple;
-	bh=ACrMtJ48BLf0lS9Oq2SBzkvrIp8x6BzOepzTjwKE+MU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r54yE0kAgEUQ8uqKNWhg+DbLdQKzmn/qMifCktGxdRk+YV0DpBtEtBIYqj215UOVwM7C0bVrb4od7F46ilDROCf/1INtuQ0hVjKuILhvKWVHxXMafZkR7+nJn9ZjM2gNkyU07Ru2DdYo4fOt+9bMashAUYAVNnIOBCOq0dGS+U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=XP4jziY3; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1740595230; c=relaxed/simple;
+	bh=SDS0zwcWP2Bd6umi8vdUr3ksCcJLy0HftJFhDpHch6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EGAhxRQzB73EwL+wLX4ZeYKyY5NTKrdT70HkNZkzHnvIeyJpERFPsgM99My5fQkZZ5RPIQ7oBSv0mUO/+gPVsxuZTpBTpiGB0lykxcAGCeKUbCUD8cUyvwyxpxdl9aqgoX/fYtCCBm8N2rrZY4wKcYm2S7fgTLeDBfTqIRsXn1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HUaa5P1B; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="XP4jziY3"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51QEmouc004006
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 10:21:28 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=VdThkb+RRcWXrvMKEbaOWgaU8H96LXHKVFz/+nZDMjc=; b=XP4jziY3Q87+
-	P3grrcK0pZ7iiQJKXM7Pv0iVTphmp5yLx8MB/TIS9AtwNpUsMjNe4Rm6ViPS24qo
-	NTopb7a7sYY1vnD+7gwxi3sl8XUVEWjk3ePKof7RBk7YtrDNXedJYgqc0EdrAn1x
-	cPe4QUr3+q63mURgnSk7wbmWGQkBDm73To/Hch4+JS8Oy3fGdAM9ASxP2xF0LIYg
-	wA8byfVHNiQKpm8ZHCk5BNZ3Le0VD7EIkeEWOdwUNoIW9VtwNxnsTvH4gFvNbaWd
-	vc/3fykJTKqbUIO+tPg7vCj4PbUbwq1QeLPsJKESYqB4JvlOShSHIX3ju/GHLj3C
-	TaoIPp8ysw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 45251shpd8-9
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 10:21:27 -0800 (PST)
-Received: from twshared8234.09.ash9.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 26 Feb 2025 18:21:09 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id AE672187C82C4; Wed, 26 Feb 2025 10:21:04 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <ming.lei@redhat.com>, <asml.silence@gmail.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
-CC: <bernd@bsbernd.com>, <csander@purestorage.com>,
-        <linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv7 1/6] io_uring/rw: move fixed buffer import to issue path
-Date: Wed, 26 Feb 2025 10:20:56 -0800
-Message-ID: <20250226182102.2631321-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250226182102.2631321-1-kbusch@meta.com>
-References: <20250226182102.2631321-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HUaa5P1B"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3cda56e1dffso523225ab.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 10:40:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740595227; x=1741200027; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=symdU9EMvj/OBJzqzheNQbsiM+qkoxN4bra1Wzcsq1I=;
+        b=HUaa5P1B61CeVR4yzIeb40L4W1lNYAMP+Ls0sQLoCvEKekHVSS3NG5NNZ5FG+PW57I
+         U2iS+eJrulNo2wAG7Uq1JIbmzyI5Dy3kAUgimN7wRg8giPpvfFyA2FlcZXnNmnTxSM0h
+         U+5hPcP3iJms3aKcKlhgEdc+fi9ZvKnTg3sAJ0xWlo4WqZt0eitaj0Nr+qEr5nYXOE2G
+         eXfTf+R3xMtaHT8GQ3DDIrv+Lmt9NEacNM/o38jYvDfezXlNFsZn6tfOnEQpFKcloECu
+         pYrKdZogP1VT4h21LFMuCq65yZsFzQ7d6L0w4xj+EywQRrlfk6jl5tWrY3HRjknfrCAi
+         nzTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740595227; x=1741200027;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=symdU9EMvj/OBJzqzheNQbsiM+qkoxN4bra1Wzcsq1I=;
+        b=f21D/W6+oUHHOWfUES4rdUtu409zT1Xg4956PJjIrGJxKmpOK+Hbin0SpIjCzefNfx
+         fFgcWzrSMJrL9ij/5qC6IXSF30+IWVC6CPzw1u+tmV/Q/ZoICK/lirg21SFi4JSleFyd
+         46Zl+haFqEnS7yH2p0FS+RCD3XVTkfZlnshaSnzUUbAoT46fEL18pcuIuEzRmHWZXfhN
+         c1aPS2SbMHGy7nSIfgrOQLHBuUXdliqya+/anNGZtGYpFeLOa/otTNh7dnGMIWPDnsy+
+         pmsvGhtWaEol6VvU5Mndoces/3ShufAcNQHLsMHM2ZO5Mynn0pJOAVNToBBhd50W5NuT
+         fmbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVb5FYTE374zh9vu24yePhWKo8taCEvVh5xORWK5ixTji+TzbdbGfMclfa7TD0TVwtR8jJm/C2wqKEt4A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPGBuqDfLqdRpq1B5O6aNVd+bdq2AjahfKqZJPPI2A4oNvnOkx
+	AeJnYRRDkjbtaqw8F3j3TB2+TSDtG2s28uINqRpY893xW63+DLcY63+2YvNnz6yXu5FOBZZMvRi
+	5
+X-Gm-Gg: ASbGncv8rFTO+YDrIEYOX9c3dVP44JCiuHnraEdffIckn7TdvEGlu58UmAraSwrkNQb
+	HYSDEe5nh7V7DKMP7Z3i4tHw86w4C3GpZxxvISlVE4WIDx+tjFDTgS+2i4XC1VoLrnGU0OJNz8J
+	qRMHYpoNJsZAo/DTVfkzSbgZxoz6bfHrlMGAYu9CVCUzwmPTskdmclzPjaYVfWYLuM3Y2cWIb2F
+	M3R77r5s1sMfrPc8h0I59gF1hbvr85zTV/zsj6mdN61RC5/9ttTtvacGFImuEsx7IkCDCzjznBn
+	4tI+fKIMQglWt4pLL/4akw==
+X-Google-Smtp-Source: AGHT+IEcVGZxj+MZL024go/7Ek44HCywTu0ZTaoD2vxe2DtY/vJ/oJ+MqLDaGS+x97+xAMqCCyDQ4g==
+X-Received: by 2002:a05:6e02:339f:b0:3d3:d23b:21f7 with SMTP id e9e14a558f8ab-3d3d23b23a8mr56142825ab.18.1740595226635;
+        Wed, 26 Feb 2025 10:40:26 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f047530650sm1033139173.117.2025.02.26.10.40.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Feb 2025 10:40:26 -0800 (PST)
+Message-ID: <f987f9da-4aa0-47d0-b906-8790afe6be60@kernel.dk>
+Date: Wed, 26 Feb 2025 11:40:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: uRJkchk5Jfzfz2s9BtrU_VZ84bIL2ND7
-X-Proofpoint-ORIG-GUID: uRJkchk5Jfzfz2s9BtrU_VZ84bIL2ND7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_04,2025-02-26_01,2024-11-22_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv7 4/6] ublk: zc register/unregister bvec
+To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
+ asml.silence@gmail.com, linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc: bernd@bsbernd.com, csander@purestorage.com,
+ linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>
+References: <20250226182102.2631321-1-kbusch@meta.com>
+ <20250226182102.2631321-5-kbusch@meta.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250226182102.2631321-5-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 2/26/25 11:20 AM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Provide new operations for the user to request mapping an active request
+> to an io uring instance's buf_table. The user has to provide the index
+> it wants to install the buffer.
+> 
+> A reference count is taken on the request to ensure it can't be
+> completed while it is active in a ring's buf_table.
 
-Registered buffers may depend on a linked command, which makes the prep
-path too early to import. Move to the issue path when the node is
-actually needed like all the other users of fixed buffers.
+Looks pretty sane to me, just a few minor nits below where only one of
+them actually is required to change.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- io_uring/opdef.c |  4 ++--
- io_uring/rw.c    | 39 ++++++++++++++++++++++++++++++---------
- io_uring/rw.h    |  2 ++
- 3 files changed, 34 insertions(+), 11 deletions(-)
+> +static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+> +				  const struct ublksrv_io_cmd *ub_cmd,
+> +				  unsigned int issue_flags)
+> +{
+> +	int index = (int)ub_cmd->addr;
+> +
+> +	io_buffer_unregister_bvec(cmd, index, issue_flags);
+> +	return 0;
+> +}
+> +
 
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index 9344534780a02..db77df513d55b 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -105,7 +105,7 @@ const struct io_issue_def io_issue_defs[] =3D {
- 		.iopoll_queue		=3D 1,
- 		.async_size		=3D sizeof(struct io_async_rw),
- 		.prep			=3D io_prep_read_fixed,
--		.issue			=3D io_read,
-+		.issue			=3D io_read_fixed,
- 	},
- 	[IORING_OP_WRITE_FIXED] =3D {
- 		.needs_file		=3D 1,
-@@ -119,7 +119,7 @@ const struct io_issue_def io_issue_defs[] =3D {
- 		.iopoll_queue		=3D 1,
- 		.async_size		=3D sizeof(struct io_async_rw),
- 		.prep			=3D io_prep_write_fixed,
--		.issue			=3D io_write,
-+		.issue			=3D io_write_fixed,
- 	},
- 	[IORING_OP_POLL_ADD] =3D {
- 		.needs_file		=3D 1,
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index eb369142d64ad..728d695d2552a 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -346,31 +346,30 @@ int io_prep_writev(struct io_kiocb *req, const stru=
-ct io_uring_sqe *sqe)
- 	return io_prep_rwv(req, sqe, ITER_SOURCE);
- }
-=20
--static int io_prep_rw_fixed(struct io_kiocb *req, const struct io_uring_=
-sqe *sqe,
-+static int io_init_rw_fixed(struct io_kiocb *req, unsigned int issue_fla=
-gs,
- 			    int ddir)
- {
- 	struct io_rw *rw =3D io_kiocb_to_cmd(req, struct io_rw);
--	struct io_async_rw *io;
-+	struct io_async_rw *io =3D req->async_data;
- 	int ret;
-=20
--	ret =3D io_prep_rw(req, sqe, ddir, false);
--	if (unlikely(ret))
--		return ret;
-+	if (io->bytes_done)
-+		return 0;
-=20
--	io =3D req->async_data;
--	ret =3D io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir, 0);
-+	ret =3D io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
-+				issue_flags);
- 	iov_iter_save_state(&io->iter, &io->iter_state);
- 	return ret;
- }
-=20
- int io_prep_read_fixed(struct io_kiocb *req, const struct io_uring_sqe *=
-sqe)
- {
--	return io_prep_rw_fixed(req, sqe, ITER_DEST);
-+	return io_prep_rw(req, sqe, ITER_DEST, false);
- }
-=20
- int io_prep_write_fixed(struct io_kiocb *req, const struct io_uring_sqe =
-*sqe)
- {
--	return io_prep_rw_fixed(req, sqe, ITER_SOURCE);
-+	return io_prep_rw(req, sqe, ITER_SOURCE, false);
- }
-=20
- /*
-@@ -1136,6 +1135,28 @@ int io_write(struct io_kiocb *req, unsigned int is=
-sue_flags)
- 	}
- }
-=20
-+int io_read_fixed(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	int ret;
-+
-+	ret =3D io_init_rw_fixed(req, issue_flags, ITER_DEST);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return io_read(req, issue_flags);
-+}
-+
-+int io_write_fixed(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	int ret;
-+
-+	ret =3D io_init_rw_fixed(req, issue_flags, ITER_SOURCE);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return io_write(req, issue_flags);
-+}
-+
- void io_rw_fail(struct io_kiocb *req)
- {
- 	int res;
-diff --git a/io_uring/rw.h b/io_uring/rw.h
-index a45e0c71b59d6..bf121b81ebe84 100644
---- a/io_uring/rw.h
-+++ b/io_uring/rw.h
-@@ -38,6 +38,8 @@ int io_prep_read(struct io_kiocb *req, const struct io_=
-uring_sqe *sqe);
- int io_prep_write(struct io_kiocb *req, const struct io_uring_sqe *sqe);
- int io_read(struct io_kiocb *req, unsigned int issue_flags);
- int io_write(struct io_kiocb *req, unsigned int issue_flags);
-+int io_read_fixed(struct io_kiocb *req, unsigned int issue_flags);
-+int io_write_fixed(struct io_kiocb *req, unsigned int issue_flags);
- void io_readv_writev_cleanup(struct io_kiocb *req);
- void io_rw_fail(struct io_kiocb *req);
- void io_req_rw_complete(struct io_kiocb *req, io_tw_token_t tw);
---=20
-2.43.5
+Minor nit here too, I'd drop 'index' and just cast it in the argument.
 
+> -static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+> -		struct ublk_queue *ubq, int tag, size_t offset)
+> -{
+> -	struct request *req;
+> -
+> -	if (!ublk_need_req_ref(ubq))
+> -		return NULL;
+> -
+> -	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> -	if (!req)
+> -		return NULL;
+> -
+> -	if (!ublk_get_req_ref(ubq, req))
+> -		return NULL;
+> -
+> -	if (unlikely(!blk_mq_request_started(req) || req->tag != tag))
+> -		goto fail_put;
+> -
+> -	if (!ublk_rq_has_data(req))
+> -		goto fail_put;
+> -
+> -	if (offset > blk_rq_bytes(req))
+> -		goto fail_put;
+> -
+> -	return req;
+> -fail_put:
+> -	ublk_put_req_ref(ubq, req);
+> -	return NULL;
+> -}
+> -
+
+This could be a prep patch to cut down on unrelated changes, but not
+really important.
+
+> @@ -2459,7 +2507,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+>  		 * buffer by pwrite() to ublk char device, which can't be
+>  		 * used for unprivileged device
+>  		 */
+> -		if (info.flags & UBLK_F_USER_COPY)
+> +		if (info.flags & UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY)
+>  			return -EINVAL;
+>  	}
+
+Missing parens here around mask.
+
+-- 
+Jens Axboe
