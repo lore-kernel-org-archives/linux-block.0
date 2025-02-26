@@ -1,146 +1,131 @@
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A820B213E87;
-	Wed, 26 Feb 2025 11:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1FB1E1E1E;
+	Wed, 26 Feb 2025 11:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740568248; cv=none; b=S8pTOgrw/m0SiQ38YSOL7fR4yFhwuyIaVmjV3Q9NVQlqyjcel9lCqivbmKfi+qAD+lPNH8nU2wlsUjuGC1FvnMHrJQvZEY9+ujN5lCIpOURjjbiLOvE9e3qF05Nz4cN4khyvIg4xfBt8UUdhtgl3rl8sHHGzL5a0hW2FM0ZtttM=
+	t=1740569316; cv=none; b=Nir649zNTbFrxa2dMcoLM6IJGLhEoxdnxIH2mHQg8Qu0EV5VA+s6auCk+sGSdROVJdujq9OtjqJfeWo/U3Cp0FMHpY9HnFZHbePqGGLSF24bq4QzVZZUWoswb7DXyZewZpRUkQuNb/oUya0Y2ijKA5lVSrJygVJn+uvgvevU4xQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740568248; c=relaxed/simple;
-	bh=4I7omasySoZo/JUrFqUPmohfcJJOJWXiXsJQizCs3DE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DUea2mBUy2D7psLjB5gLpjaXDnh5EsmAJ5xypBHL3EcWUPoLofqUS7/52SOoXNYHpyvZJoDevxlYsTJUDkk7V1uvX1g9FwBOiu/H5jgNaVnEe3VvOQXAIEY9iyAoKjIVhzrmayPz4SUzwXQ271qJzcA/0dDQLvZlwyNI2NS/VqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X7FSIOYi; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1740569316; c=relaxed/simple;
+	bh=IHVV0VEiY51JiQMba95CWP2QqrEyuH8K6cJYGrV0vxI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d7e+ex6OYjRBlZiSkmRK+ejut4b1zT2MsiEf8HjurNcE19Yx5QzgqtbAKc+vr1RvadPFESHlYw/TNnfeJpLJRsQHY6DM30dKEEztkWOKS3T01mzsY0L372IYPlRITkTmtgoOkhUQd9Mh9/VMSq3cL57GRWUsu/QBPD5rWqEcXQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ae3TUF/P; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X7FSIOYi"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1740568240; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=vpAtcTJM/EJCDxxy2WMQ1RGo3EUw0Xe3GtPnY0G1MaE=;
-	b=X7FSIOYiW7AQXN6HaL0cIs7ZBQGdggEOG+3rwVAF2jfu9W17aoLsBFHyvYXNVJeH9OD4ACZV87APtHPAGvp+UdOqIuQQ+aNwQC24R5ixXBTVl8IvXqwB60m9Lqe+5GwLMGggNvvxFqKRdHCy7Db+owu2W2AQPz7tFP9gO7DyhtE=
-Received: from 30.221.130.195(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0WQI5T1B_1740568238 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 26 Feb 2025 19:10:38 +0800
-Message-ID: <be8704b0-81a4-403b-8b42-d3612099279f@linux.alibaba.com>
-Date: Wed, 26 Feb 2025 19:10:36 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ae3TUF/P"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5461a485a72so6464439e87.0;
+        Wed, 26 Feb 2025 03:28:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740569313; x=1741174113; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=TGWA47ydXjPk/ArJwGLRdTzUR2JDCR2yxtlUSj8iJJU=;
+        b=ae3TUF/PiW02DvsiQGb9jif232/VR/I7kVGPbteOEcrJ5nDMrc1gufPipy51ywYF7c
+         RW8kwB7HjPts5U6rbT0IXwiE5h0shcYTNOiJHjB6MGKfBDTO2fd2iV+9ZRS+Z88gBzuK
+         7yam4RPAu7/SzH5mx9KGB1qZNHskHT/e32jG2BC1m1I3gyF/eBP5VP4sfS98rJMb45JG
+         9xrkLOPY19wb+a7fNvc3288frTP0goYTNDI4dDMVJ5cDdq8O6MOc5muIGAJMepLLalcD
+         Mpcpy8hau6tTWq9iw7WcEILSfKphQKKjX90G2udk1lp0qKXdPxfEHY1vGcgwu1FUARnl
+         YiPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740569313; x=1741174113;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TGWA47ydXjPk/ArJwGLRdTzUR2JDCR2yxtlUSj8iJJU=;
+        b=nWr3+Co3iyNIu24NToFnUtP+TLn5xKczkCKGOxJK8G4NEaDW6IsVkX9zfSTLglNsVb
+         ubyZqVOgNfHeVBK6h1qA+F2gA167JreaHWWnbnXZWyzEYolCg1uRK2/IhyfDatCw/+1k
+         GO9mR6gFaX91KP62G9VEusJ7Odw72cSYOkJub9vICUaEUl4zU+oyo7QgHZjgDHpufkWB
+         IhTuJ6lHf4u4nJIGRXHVsQfEW1wFUes+FfzdTQz/3rzlav8SHRbp1D/UcVlWGKmSy7pA
+         lzcPh3hUMYrxxKshaDWnsGPyqyWPcLjD2XGQVU8Tl9YJ4gq5EZhjWkvtUL5rkA6vj0Xi
+         xDEg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2xDD+qdFrVcEFjbw4/jOxmlP9aEL5DkpsVeqUxYJa5LwEJDo675rbVcZVbAPuBR3g7tryXCtQ34LYww==@vger.kernel.org, AJvYcCXnujLpR4KoHvHhF+qTwMl03KQ1xefXD7rglzS0uzw3r/0UOdLMaHGLPpgtYWzIJh0eP5FWrITaeOny8Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIeATV46jbFaqlVx9MG3YbTqzCRN2XqrNBTF6IWTXxMm91QgwE
+	p2JvTL3NPgBAWJ9DthKcz9uFX38Xfwf70qoZE8kLNDN/qz1Yuj/r61SiqZxD2Z+JID1rplKttGn
+	KAUPc0IkiX92TDnS8Hz7XpZ3kxGbXWE4=
+X-Gm-Gg: ASbGncu4h5+QCCTRvVQXCz9J7bZzPHmLimLAAeCEaGKj6iB7qrgV6VzppHMER2/GIY2
+	3n7cNDiVZ2Wj+t5FECAtkiEJ8+zaxokgPlVvTNyrKrk9W1GngiSVoTUCT0PiCi46hdROGd0WFQa
+	6niv9EYbY=
+X-Google-Smtp-Source: AGHT+IH+Zjc+bSh26ZsVjU3bqp76TTCLT0O7VaVEWFGY3H7jTf7GiuF0ZJl8GQK9eeazQ/KZTqZRV1mtBf3J32sedzA=
+X-Received: by 2002:a05:6402:254f:b0:5e0:b542:fb32 with SMTP id
+ 4fb4d7f45d1cf-5e4a0d88ac4mr3401857a12.19.1740569301171; Wed, 26 Feb 2025
+ 03:28:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/3] virtio-blk: add io_uring passthrough support.
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Joseph Qi <joseph.qi@linux.alibaba.com>,
- Jeffle Xu <jefflexu@linux.alibaba.com>
-References: <20241218092435.21671-1-mengferry@linux.alibaba.com>
- <20250219020112.GB38164@fedora>
-Content-Language: en-US
-From: Ferry Meng <mengferry@linux.alibaba.com>
-In-Reply-To: <20250219020112.GB38164@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250225044653.6867-1-anuj20.g@samsung.com> <CGME20250225045514epcas5p10d06ab361a4125a94933fa8235fe3fa8@epcas5p1.samsung.com>
+ <20250225044653.6867-2-anuj20.g@samsung.com> <20250225150626.GA6099@lst.de>
+In-Reply-To: <20250225150626.GA6099@lst.de>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Wed, 26 Feb 2025 16:57:42 +0530
+X-Gm-Features: AQ5f1JrVzXdezh5PQ5o_BGjgjz3qnhupiyvcy-dL-1mUwfQLc2HYvilNGs8wJSU
+Message-ID: <CACzX3AupuX0NYqBxq-7hBxU5E1v3BhHeYoeuWxYuyXqu++iMcg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] block: Fix incorrect integrity sysfs reporting for
+ DM devices
+To: Christoph Hellwig <hch@lst.de>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, kbusch@kernel.org, 
+	martin.petersen@oracle.com, nikh1092@linux.ibm.com, 
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, 
+	M Nikhil <nikhilm@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-On 2/19/25 10:01 AM, Stefan Hajnoczi wrote:
-> On Wed, Dec 18, 2024 at 05:24:32PM +0800, Ferry Meng wrote:
->> This patchset implements io_uring passthrough surppot in virtio-blk
->> driver, bypass vfs and part of block layer logic, resulting in lower
->> submit latency and increased flexibility when utilizing virtio-blk.
-> Hi,
-> What is the status of this patch series?
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index c44dadc35e1e..c32517c8bc2e 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -861,7 +861,8 @@ bool queue_limits_stack_integrity(struct queue_limits *t,
+> >
+> >       if (!ti->tuple_size) {
+> >               /* inherit the settings from the first underlying device */
+> > -             if (!(ti->flags & BLK_INTEGRITY_STACKED)) {
+> > +             if (!(ti->flags & BLK_INTEGRITY_STACKED) &&
+> > +                 (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)) {
+> >                       ti->flags = BLK_INTEGRITY_DEVICE_CAPABLE |
+> >                               (bi->flags & BLK_INTEGRITY_REF_TAG);
+> >                       ti->csum_type = bi->csum_type;
 >
-> Stefan
+> Hmm.  I wonder if this is the correct logic.  Basically we do not want to
+> allow mixing integrity capable and not integrity devices, do we?
 
-I apologize for the delayed response. It seems that the maintainer has 
-not yet provided feedback on this patch series, and I was actually 
-waiting for his comments before proceeding. I have received the feedback 
-from the other reviewers & have already discovered some obvious mistakes 
-in v1 series.
+It is about a situation where a non-integrity-capable device incorrectly
+reports integrity capability due to improper flag propagation. The issue
+is that BLK_INTEGRITY_DEVICE_CAPABLE is set incorrectly even when the
+first underlying device does not support integrity. This part of the patch
+tries to fix that.
+For example, when I create a dm-linear device using an integrity-incapable
+device, the resulting DM device wrongly reports integrity capability [1]
 
+Rest of the handling in this patch would not be required once we correctly
+initialize in blk_validate_integrity_limits as you suggested in the other
+reply [2]
 
-Although I'm occupied with other tasks recently, I expect to send out v2 
-patches *in a week*.
+[1]
+# cat /sys/block/nvme0n1/integrity/device_is_integrity_capable
+0
+# echo 0 409600 linear /dev/nvme0n1 0 > /tmp/table
+# echo 409600 409600 linear /dev/nvme0n1 0 >> /tmp/table
+# dmsetup create two /tmp/table
+# cat /sys/block/dm-0/integrity/device_is_integrity_capable
+1
 
+[2]
+https://lore.kernel.org/linux-block/20250225150753.GB6099@lst.de/
 
-Thanks.
-
->> In this version, currently only supports READ/WRITE vec/no-vec operations,
->> others like discard or zoned ops not considered in. So the userspace-related
->> struct is not complicated.
->>
->> struct virtblk_uring_cmd {
->> 	__u32 type;
->> 	__u32 ioprio;
->> 	__u64 sector;
->> 	/* above is related to out_hdr */
->> 	__u64 data;  // user buffer addr or iovec base addr.
->> 	__u32 data_len; // user buffer length or iovec count.
->> 	__u32 flag;  // only contains whether a vector rw or not.
->> };
->>
->> To test this patch series, I changed fio's code:
->> 1. Added virtio-blk support to engines/io_uring.c.
->> 2. Added virtio-blk support to the t/io_uring.c testing tool.
->> Link: https://github.com/jdmfr/fio
->>
->>
->> ===========
->> Performance
->> ===========
->>
->> Using t/io_uring-vblk, the performance of virtio-blk based on uring-cmd
->> scales better than block device access. (such as below, Virtio-Blk with QEMU,
->> 1-depth fio)
->> (passthru) read: IOPS=17.2k, BW=67.4MiB/s (70.6MB/s)
->> slat (nsec): min=2907, max=43592, avg=3981.87, stdev=595.10
->> clat (usec): min=38, max=285,avg=53.47, stdev= 8.28
->> lat (usec): min=44, max=288, avg=57.45, stdev= 8.28
->> (block) read: IOPS=15.3k, BW=59.8MiB/s (62.7MB/s)
->> slat (nsec): min=3408, max=35366, avg=5102.17, stdev=790.79
->> clat (usec): min=35, max=343, avg=59.63, stdev=10.26
->> lat (usec): min=43, max=349, avg=64.73, stdev=10.21
->>
->> Testing the virtio-blk device with fio using 'engines=io_uring_cmd'
->> and 'engines=io_uring' also demonstrates improvements in submit latency.
->> (passthru) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u1 /dev/vdcc0
->> IOPS=189.80K, BW=741MiB/s, IOS/call=4/3
->> IOPS=187.68K, BW=733MiB/s, IOS/call=4/3
->> (block) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u0 /dev/vdc
->> IOPS=101.51K, BW=396MiB/s, IOS/call=4/3
->> IOPS=100.01K, BW=390MiB/s, IOS/call=4/4
->>
->> =======
->> Changes
->> =======
->>
->> Changes in v1:
->> --------------
->> * remove virtblk_is_write() helper
->> * fix rq_flags type definition (blk_opf_t), add REQ_ALLOC_CACHE flag.
->> https://lore.kernel.org/io-uring/202412042324.uKQ5KdkE-lkp@intel.com/
->>
->> RFC discussion:
->> ---------------
->> https://lore.kernel.org/io-uring/20241203121424.19887-1-mengferry@linux.alibaba.com/
->>
->> Ferry Meng (3):
->>    virtio-blk: add virtio-blk chardev support.
->>    virtio-blk: add uring_cmd support for I/O passthru on chardev.
->>    virtio-blk: add uring_cmd iopoll support.
->>
->>   drivers/block/virtio_blk.c      | 320 +++++++++++++++++++++++++++++++-
->>   include/uapi/linux/virtio_blk.h |  16 ++
->>   2 files changed, 331 insertions(+), 5 deletions(-)
->>
->> -- 
->> 2.43.5
->>
+> So maybe the logic should be more something like:
+>
+>         if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY))
+>                 return true;
+>
+>         if (ti->flags & BLK_INTEGRITY_STACKED) {
+>                 /* check blk_integrity compatibility */
+>         } else {
+>                 ti->flags = BLK_INTEGRITY_STACKED;
+>                 /* inherit blk_integrity, including the empty one  */
+>         }
+>
