@@ -1,72 +1,73 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F95821D3FE
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 14:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885C621D3FE
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 14:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740580328; cv=none; b=G/Wi3ARx9/G1wJDjVHmrs6voTdLznH/aPkg+P2GE6RCdgwYRXj5tz5gDSkKmkmAjZ16pQOw3p8rY8JFEZpuxMTCaoHzjrWu/vbLErkTjBq0RxaLA6z9r74V+zZI+CMFBOiVZ5/DGVU1cl0/RF1CrnVFDyw5eGlJM7zaIZ4Zs/gM=
+	t=1740580430; cv=none; b=enNFYKHnp6+cd0+2tmaMz/iyc6eXHrntddLl95rYvdl3R3T66KFBbFYtl+qUUB2XskIgb2mGnLMDX4eU2XDKvk47ELE2Sg8xhx6hu5dbxuVw/LKLF55p51wFqb4+VKurr/YlIuPA8IcG9lcjrx3W5zYs2xGwtQEpNi7/AqWELVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740580328; c=relaxed/simple;
-	bh=fMVSvdO9Qk7XWWOU/kG7NyzMG+VeN5WdRjOKq8C7m9M=;
+	s=arc-20240116; t=1740580430; c=relaxed/simple;
+	bh=prWiZbnGcwJTlqT7tRnT+lT82MX8tKvsOTrWPuZQYYs=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jh8j8jHRmEs4TISBhDfU/Dj15B3iDt573CaPxMZbmPkDJ4eLmP9B6HMMgWaNG/UM96Qqv0h2P85+YlULwtUYqIPJpkNZzY8KZprYAv0ulbsDgTT8ZSLt7fvvfT/u15yeCB7Cxjm+Zq/bxZu7QwS+ywye8ueHD10wdd4TYEdj5G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MUqMlJkL; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version:Content-Type; b=DcABGIHg8kVErVi7K0PvZTD07bxsnm0Bq36ikhe2PdjZjOWCFKHyIG0NYduKqQqXHcsu5yY3cSBwt/i/e6/aItvyFefL9LQD8V4A5CI6bfr6tqK/fu/hLUYIhPHIIiD4NWXL4eq8QD59SOVHlD8FfFnZLvPT0R2j7K1Z0hkVjbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1+7cEk71; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MUqMlJkL"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3d2b3811513so3159495ab.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 06:32:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1+7cEk71"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d3db3b682fso527385ab.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 06:33:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740580325; x=1741185125; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740580427; x=1741185227; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=trZK1Q0XJm3EAQhjNCUlku9wqjbsls2X+EuichAbMRQ=;
-        b=MUqMlJkLnXRu2zadwbmb28wbke+nzPeyqUKHL4eHpRUy81Szhy2oeYrFFX2Ig/FuKh
-         3i0pUJcrUdsCEqZJNGK3OkUFiweEPOVLCeloT/Nvk+Qsmq/7AQ3y3Fr9Vet5orTiFkP4
-         CQu2MLeurK2yIGcWNZQlWScGsulXD6gKxXfPDDvuPO69LPx3OhD5N07+feV+Gt9DuH1o
-         GTCGKnGUPEItwSzuCc+sp552y2UNpQrWY0icbB6qEU3lgSPBqqlYAoyxr2SxygX873EM
-         es6Zvi0iIUXgRJomuSddnLzfbfv+T2a/ZI4W0Hxpe/jHLXVHwaUrpHije/RU1jfAJI1p
-         KIdA==
+        bh=UIsK2qAwqiQqZ7mCWulg5zaGHbluZh4C7orSxuEv/2g=;
+        b=1+7cEk71qxoUKuBemt8rc4QMNNkydYGMeJI+lqJnx1NaD7B8Dp4kwVMt57E+f91UXT
+         gO6HREXKKAuRsD9rCT1ozzMl3ZNvmLj/qXs39cPpONsBYUDMtrTdB/HKGoQ/jfNOmPcT
+         6z9qKwK0rjO7tEQ+Fm3l8KU0qjGQvwWjUfr/MTmsqVzg7I9dwwJYDnVoDLW+OjovXcLW
+         fNOa3O730CzLr1x2t732ZuB7LzMsppKyozo4HDn6Vi2CUEpBkTrwRrqUL0mChSAwClae
+         3VD9TJKlOxYBw8LszRHazxiCOFJKzsm/4KVs7WxoDbi/vbs9RHy0nYToqtHsLeaUPRW4
+         VdgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740580325; x=1741185125;
+        d=1e100.net; s=20230601; t=1740580427; x=1741185227;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=trZK1Q0XJm3EAQhjNCUlku9wqjbsls2X+EuichAbMRQ=;
-        b=Ym9VKG6HfM5xiEp1XtxedegCkxflHISoXorKdySztU1ePZQCs20Z9eyYYTvf2Dk8Ay
-         C7QVfgWZXxMOeCqWTR4pi0qEkZVBK1LCthN/N9NVvYYBUEeTKNBXAgYrhFuwIgTCiIWe
-         ndLQIN9hs2p/QHwAHnxRDElj+pFSTggRoxI/9EVH50lT21OYpFg8CF9AugDGSMTCTwI4
-         WlKQ1wTQ7aWwGQYZkoUR5zFlBzxi3lkfOV4Td1khNvmhNeOX0VQlPRuj/GWa9EnhDJW7
-         Cz9XlZC4JUAUeBPaz20vMCfQIioEiKFq2EY2L6zeEO6KKEHEIGIWyiUfKNBMhoDtH+oy
-         ou/A==
-X-Forwarded-Encrypted: i=1; AJvYcCX8LVZJfawSByX+G53ImlueWMW45Qkbk+M+2Wyad22otvxZJVKQ55Jif/Nv+9mUpVRZr02toK+HpRjy1Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX9rXUd3F7GMA9Y1iq2l+i7wOKbyASSndZMrO+m98TBM73yX/x
-	hvd7g4/SXwFAAQi5i5TyqSXNgKR7effaH76rdFsFOzrzq7/M9O4q1EBR+f45o5Y=
-X-Gm-Gg: ASbGncvQcU5JICWB7FrYimgu+yrJZA/9e8A7F772tIollh2oXRhAtEYhXtb0cs5A2P9
-	S7F5mKIHm0obOm6r8/lZJ7j8GCTFHQigdqMPGFjeLJ9cNTJf25Mn9u1tkooIyBTzT/V8V2gJgE1
-	9qy8yLcZNsFL27T+00KKzOmrRxJpZri+ItoXopoGB4OdslClSKV6s5+CnCoHDAnOC6QIjZi3SvV
-	LqcleVgh5dFpjaG5uLQ5AxD/EUFCiJvwFU2rNiwZ4MEX2QTINDXV6H4kkFwo8lTzTLdiT7Rf18K
-	+kGqrkPt2ewdHB+b
-X-Google-Smtp-Source: AGHT+IHabXtiuY9p9FWUehezndCWyS3XMFRLX6LH+PTKhkqUOLGI+DxXj2jxDHmMWTb/jH8LLzzPVw==
-X-Received: by 2002:a05:6e02:791:b0:3d1:9bca:cf28 with SMTP id e9e14a558f8ab-3d2c0239750mr196114715ab.8.1740580325652;
-        Wed, 26 Feb 2025 06:32:05 -0800 (PST)
+        bh=UIsK2qAwqiQqZ7mCWulg5zaGHbluZh4C7orSxuEv/2g=;
+        b=gcAnkiakCwZS6DvNjRIF4u3wq3RkJ8JKfm301Wt0lkh23/dd5YuNNPfGozkSxXkbDC
+         xo6aTh3xCOFIcQ/P1/BNl8IDfTtjf0T0f4/pzHwNnYD+0QA9BBtbZoRzcALZshRIQJ0Q
+         5nipBMv505hmOOC1nOjRmwBORz50KNikYhQji/Cvc0qINrD6D0tEMr083ZJuXeuTpRSb
+         26QCJpwl59J2IoU+q5OzwyKREFSRb8qka9EjlTGnqifMVqsSuxvbhh4EUcNAAS2dW9Pt
+         6vAhYoO9j8wEl1ZPGtOJnPu7JlT483sxW5rS5IKIsl3wblYn8XhsJ+BzQnkkfEtFMtNl
+         t+6w==
+X-Gm-Message-State: AOJu0Yx3icqP6SUsN5avLNW7E8VsGfpo96FPv8TpXLEPBIqVY6NBsQF2
+	6YU8z8uqNkUZMT8pIKo9Jg23JH/KeZQWRAaDtPfJ7cdhQwCoi8qwuC4WAKKfNjA=
+X-Gm-Gg: ASbGncvvYrXAXARLJDjyiS4iTlUJvZXxXuixgK7EZ7yOYUBopFLyQF2fi3yDnB9XF5m
+	gdlBoHqod+JkHTHMUdTw7yaZAIokuF8F1NmRSm4jdQpKuzOqW+/MmitwReB3d7HNZhhswCBALtN
+	O6kzGb242EZv0yblSPqA+p4pYUXylerVsKLe2qqgB0/qjolrxe0g8rKpGoQwHzR4n8CdRJi+3cC
+	i7roiSjpvSSTkrN1G/2+UQcEocSbOW4bKLpO225G4bw8O7Dolm7+I/jvc52W/eVtBbsOX7a19D8
+	OLnF72487Njs5tU9
+X-Google-Smtp-Source: AGHT+IGJt0tpQESzSIamlIYHMziTHyVu1L4KxVd0NUmitmwxYdveN2F+h6RN6Jyvemvc+p66HHOxCw==
+X-Received: by 2002:a05:6e02:b4d:b0:3d0:101e:4609 with SMTP id e9e14a558f8ab-3d3d1fa689amr40214985ab.15.1740580427607;
+        Wed, 26 Feb 2025 06:33:47 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f04744daebsm908534173.27.2025.02.26.06.32.04
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f04752e026sm901059173.107.2025.02.26.06.33.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 06:32:05 -0800 (PST)
+        Wed, 26 Feb 2025 06:33:46 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20250225212456.2902549-1-csander@purestorage.com>
-References: <20250225212456.2902549-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: complete command synchronously on error
-Message-Id: <174058032466.2230500.13734000197859662068.b4-ty@kernel.dk>
-Date: Wed, 26 Feb 2025 07:32:04 -0700
+To: linux-block@vger.kernel.org, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, 
+ Bart Van Assche <bvanassche@acm.org>, Chaitanya Kulkarni <kch@nvidia.com>, 
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>
+In-Reply-To: <20250226100613.1622564-1-shinichiro.kawasaki@wdc.com>
+References: <20250226100613.1622564-1-shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH for-next v7 0/5] null_blk: improve write failure
+ simulation
+Message-Id: <174058042665.2231223.3462421622003797911.b4-ty@kernel.dk>
+Date: Wed, 26 Feb 2025 07:33:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,21 +79,34 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-94c79
 
 
-On Tue, 25 Feb 2025 14:24:55 -0700, Caleb Sander Mateos wrote:
-> In case of an error, ublk's ->uring_cmd() functions currently return
-> -EIOCBQUEUED and immediately call io_uring_cmd_done(). -EIOCBQUEUED and
-> io_uring_cmd_done() are intended for asynchronous completions. For
-> synchronous completions, the ->uring_cmd() function can just return the
-> negative return code directly. This skips io_uring_cmd_del_cancelable(),
-> and deferring the completion to task work. So return the error code
-> directly from __ublk_ch_uring_cmd() and ublk_ctrl_uring_cmd().
+On Wed, 26 Feb 2025 19:06:08 +0900, Shin'ichiro Kawasaki wrote:
+> Jens, please consider to apply this series to v6.15/block.
+> 
+> Currently, null_blk has 'badblocks' parameter to simulate IO failures
+> for broken blocks. This helps checking if userland tools can handle IO
+> failures. However, this badblocks feature has two differences from the
+> IO failures on real storage devices. Firstly, when write operations fail
+> for the badblocks, null_blk does not write any data, while real storage
+> devices sometimes do partial data write. Secondly, null_blk always make
+> write operations fail for the specified badblocks, while real storage
+> devices can recover the bad blocks so that next write operations can
+> succeed after failure. Hence, real storage devices are required to check
+> if userland tools support such partial writes or bad blocks recovery.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] ublk: complete command synchronously on error
-      commit: 6376ef2b6af3bbcb7c50dc657bdfb83aba467aef
+[1/5] null_blk: generate null_blk configfs features string
+      commit: d8ae0061afb8bbdb0cf6b2cd4b5be5c54e42b228
+[2/5] null_blk: introduce badblocks_once parameter
+      commit: 6b87fa3245a93913efb3d8b858f6750d655d5db9
+[3/5] null_blk: replace null_process_cmd() call in null_zone_write()
+      commit: 7859d042b0954f843d2e97c1324bb04bf28df2f6
+[4/5] null_blk: pass transfer size to null_handle_rq()
+      commit: 6d9725d1000a0bc4e41fbe2db51181e80e4260eb
+[5/5] null_blk: do partial IO for bad blocks
+      commit: 386d7f4be4cdfb0b3a937f26fe674818394f795e
 
 Best regards,
 -- 
