@@ -1,141 +1,156 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02E528E8;
-	Wed, 26 Feb 2025 00:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634A3EEBB;
+	Wed, 26 Feb 2025 01:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740528167; cv=none; b=opcS9GhYrIJbKaAGKePEeT8lAG1Fmj2jmWI+SKlYvw3RhcKYs4tg69X9sDdIC85PwihLFu4tyd4h0UZggVswkUDBUSxb8Szp4RhieeCR1YRbJs/QgOM9d6zlln1/W/z/T+Qvbu2YoOm0wK1W/Xs+SnLDN4fpc27zWpdIs2cr6xk=
+	t=1740532838; cv=none; b=iEpcerMbNYeDSqR5JNimtm7D07HAgXKjB2dtCjjwoXFOsHWAAiT/pF5rOuWiJ+JSiRUtT0JWkgcl1/KFX4GDWnQmf4hXjvKENEcqTk5ofpHLBedBVCIzh6kw5D1UsZNZHi/xhwlCckIt0emtnuZxBCEOTll1YCgib79X4enrr14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740528167; c=relaxed/simple;
-	bh=SQMRA5N+jXvNo2T5JsKh4b8XY33eotbHHZmlw5h9oWs=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=RaBKuWdhwuSRseaF1F6MRy511PlfcfVr5Drz+DAm9GV/YqASfOZ83zAEwdCKinSCLUH9z/JC85EqFdMOgpEcFYPiVFmPdKc+/VID7jAEt5ozcOhnuHgBYhqo5E5zPx7b2a318ahFro9DKBdoo3CssxEYC3b6bGgSjtEBHBwcH64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HuaKl3qd; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HuaKl3qd"
-Received: from [100.65.162.92] (unknown [20.236.10.206])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A62F5203CDFE;
-	Tue, 25 Feb 2025 16:02:43 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A62F5203CDFE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1740528165;
-	bh=BFPE5nqMT5TV/F32YTt+Q2sFqdqX3HzV4emGmVK7HJw=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=HuaKl3qdKUi413qXmLg1j75aNN8MijOcIeKtJu18EQJFDjoRXls3deulMv1TJVsSW
-	 65ILxLiYMFv1sS1yCqPvEvTeMb7w5g4ew6OAxy2dKtMZrrLZYy7Kf0E371zAONpm5r
-	 c4JAQrpBSBxtsQowW5sxR9dgfpM5kWSNcx4MfN/8=
-Message-ID: <df0c2400-147c-4104-a2e6-d1038ff31524@linux.microsoft.com>
-Date: Tue, 25 Feb 2025 16:02:42 -0800
+	s=arc-20240116; t=1740532838; c=relaxed/simple;
+	bh=1y+CsCuTNBZX2g/3ocZNhC6n59KFuU6Pz+bZyclOKXY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bTS0SoLj3sl2sRNunxTJ1Wi9PkgmN4X/i/rDC9z7L6XyWgumYys5lFr4RWWrbY9k/mM5uKBClFdFot1iI8Nom63lupLoJ8gHo6cm2UeG0TXCgqTTI3v4c9GdfppqtBM8h295Jd3NnS83iustI3xxHf6/ZENJOg0q4J/YtS6TTW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z2c8m06hZz4f3l2C;
+	Wed, 26 Feb 2025 09:20:08 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 43BF11A06DC;
+	Wed, 26 Feb 2025 09:20:31 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2BbbL5nY96kEw--.12272S4;
+	Wed, 26 Feb 2025 09:20:29 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: ming.lei@redhat.com,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	vgoyal@redhat.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] blk-throttle: fix lower bps rate by throtl_trim_slice()
+Date: Wed, 26 Feb 2025 09:16:27 +0800
+Message-Id: <20250226011627.242912-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Frank.Li@nxp.com,
- James.Bottomley@HansenPartnership.com, Julia.Lawall@inria.fr,
- Shyam-sundar.S-k@amd.com, akpm@linux-foundation.org, axboe@kernel.dk,
- broonie@kernel.org, cassel@kernel.org, cem@kernel.org,
- ceph-devel@vger.kernel.org, clm@fb.com, cocci@inria.fr,
- dick.kennedy@broadcom.com, djwong@kernel.org, dlemoal@kernel.org,
- dongsheng.yang@easystack.cn, dri-devel@lists.freedesktop.org,
- dsterba@suse.com, festevam@gmail.com, hch@lst.de, hdegoede@redhat.com,
- hmh@hmh.eng.br, ibm-acpi-devel@lists.sourceforge.net, idryomov@gmail.com,
- ilpo.jarvinen@linux.intel.com, imx@lists.linux.dev,
- james.smart@broadcom.com, jgg@ziepe.ca, josef@toxicpanda.com,
- kalesh-anakkur.purayil@broadcom.com, kbusch@kernel.org,
- kernel@pengutronix.de, leon@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-xfs@vger.kernel.org,
- martin.petersen@oracle.com, nicolas.palix@imag.fr, ogabbay@kernel.org,
- perex@perex.cz, platform-driver-x86@vger.kernel.org, s.hauer@pengutronix.de,
- sagi@grimberg.me, selvin.xavier@broadcom.com, shawnguo@kernel.org,
- sre@kernel.org, tiwai@suse.com, xiubli@redhat.com, yaron.avizrat@intel.com
-Subject: Re: [PATCH v3 06/16] rbd: convert timeouts to secs_to_jiffies()
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
- <20250225-converge-secs-to-jiffies-part-two-v3-6-a43967e36c88@linux.microsoft.com>
- <e53d7586-b278-4338-95a2-fa768d5d8b5e@wanadoo.fr>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <e53d7586-b278-4338-95a2-fa768d5d8b5e@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3W2BbbL5nY96kEw--.12272S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZF4DCr4UArWfGF1fuw18Grg_yoW5Cw13pF
+	W3Ar4agFWUXFy2kFW3X3Z3Jay0k3yrGFy5Gwn5ur4rAa45Cr1fKFnxAr4Yka43A3s3ur4a
+	v3WqvryxCF1jyrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 2/25/2025 1:09 PM, Christophe JAILLET wrote:
-> Le 25/02/2025 à 21:17, Easwar Hariharan a écrit :
->> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
->> secs_to_jiffies().  As the value here is a multiple of 1000, use
->> secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplication
->>
->> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
->> the following Coccinelle rules:
->>
->> @depends on patch@ expression E; @@
->>
->> -msecs_to_jiffies(E * 1000)
->> +secs_to_jiffies(E)
->>
->> @depends on patch@ expression E; @@
->>
->> -msecs_to_jiffies(E * MSEC_PER_SEC)
->> +secs_to_jiffies(E)
->>
->> While here, remove the no-longer necessary check for range since there's
->> no multiplication involved.
-> 
-> I'm not sure this is correct.
-> Now you multiply by HZ and things can still overflow.
-> 
-> 
-> Hoping I got casting right:
-> 
-> #define MSEC_PER_SEC    1000L
-> #define HZ 100
-> 
-> 
-> #define secs_to_jiffies(_secs) (unsigned long)((_secs) * HZ)
-> 
-> static inline unsigned long _msecs_to_jiffies(const unsigned int m)
-> {
->     return (m + (MSEC_PER_SEC / HZ) - 1) / (MSEC_PER_SEC / HZ);
-> }
-> 
-> int main() {
-> 
->     int n = INT_MAX - 5;
-> 
->     printf("res  = %ld\n", secs_to_jiffies(n));
->     printf("res  = %ld\n", _msecs_to_jiffies(1000 * n));
-> 
->     return 0;
-> }
-> 
-> 
-> gives :
-> 
-> res  = -600
-> res  = 429496130
-> 
-> with msec, the previous code would catch the overflow, now it overflows silently.
-> 
-> untested, but maybe:
->     if (result.uint_32 > INT_MAX / HZ)
->         goto out_of_range;
-> 
-> ?
-> 
-> CJ
-> 
+From: Yu Kuai <yukuai3@huawei.com>
 
-Thanks for the review! I was able to replicate your results, I'll try this range check
-and get back.
+The bio submission time may be a few jiffies more than the expected
+waiting time, due to 'extra_bytes' can't be divided in
+tg_within_bps_limit(), and also due to timer wakeup delay. In this
+case, adjust slice_start to jiffies will discard the extra wait time,
+causing lower rate than expected.
 
-Thanks,
-Easwar (he/him)
+This problem will cause blktests throtl/001 failure in case of
+CONFIG_HZ_100=y, fix it by preserving one finished slice in
+throtl_trim_slice() and allowing deviation between [0, 2 slices).
+
+For example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
+slice is 20ms(2 jiffies), expected rate is 1000 / 1000 * 20 = 20 bytes
+per slice.
+
+If user issues two 21 bytes IO, then wait time will be 30ms for the
+first IO:
+
+bytes_allowed = 20, extra_bytes = 1;
+jiffy_wait = 1 + 2 = 3 jiffies
+
+and consider
+extra 1 jiffies by timer, throtl_trim_slice() will be called at:
+
+jiffies = 40ms
+slice_start = 0ms, slice_end= 40ms
+bytes_disp = 21
+
+In this case, before the patch, real rate in the first two slices is
+10.5 bytes per slice, and slice will be updated to:
+
+jiffies = 40ms
+slice_start = 40ms, slice_end = 60ms,
+bytes_disp = 0;
+
+Hence the second IO will have to wait another 30ms;
+
+With the patch, the real rate in the first slice is 20 bytes per slice,
+which is the same as expected, and slice will be updated:
+
+jiffies=40ms,
+slice_start = 20ms, slice_end = 60ms,
+bytes_disp = 1;
+
+And now, there is still 19 bytes allowed in the second slice, and the
+second IO will only have to wait 10ms;
+
+Fixes: e43473b7f223 ("blkio: Core implementation of throttle policy")
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Closes: https://lore.kernel.org/linux-block/20250222092823.210318-3-yukuai1@huaweicloud.com/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 8d149aff9fd0..cb472cf7b6b6 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -599,14 +599,23 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	 * sooner, then we need to reduce slice_end. A high bogus slice_end
+ 	 * is bad because it does not allow new slice to start.
+ 	 */
+-
+ 	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
+ 
+ 	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
+ 				 tg->td->throtl_slice);
+-	if (!time_elapsed)
++	/* Don't trim slice until at least 2 slices are used */
++	if (time_elapsed < tg->td->throtl_slice * 2)
+ 		return;
+ 
++	/*
++	 * The bio submission time may be a few jiffies more than the expected
++	 * waiting time, due to 'extra_bytes' can't be divided in
++	 * tg_within_bps_limit(), and also due to timer wakeup delay. In this
++	 * case, adjust slice_start to jiffies will discard the extra wait time,
++	 * causing lower rate than expected. Therefore, one slice is preserved,
++	 * allowing deviation that is less than two slices.
++	 */
++	time_elapsed -= tg->td->throtl_slice;
+ 	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
+ 					     time_elapsed) +
+ 		     tg->carryover_bytes[rw];
+-- 
+2.39.2
+
