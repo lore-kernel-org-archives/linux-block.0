@@ -1,54 +1,40 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BE523717C
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 18:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA75F235368;
+	Wed, 26 Feb 2025 18:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740593435; cv=none; b=S9Z1Oo+Bg8kOrQ2QCvKigU67XmIjN7Bl44aSyHdMSviT9NaCAt4F9zKUOaf3266RurnaHhwPzHiaFCvXy0LixsDDeFfLvkvzE+OGGEItbGQwe8El4iCTQK3iO9Q+N7wJPdc6D8H/une6cr1aH/fVYTWBiZBX6o669PwjA179t4E=
+	t=1740593854; cv=none; b=NXUVqppLQkVIAJpBlB/O5x+URZ+kPbd3RY+By0SzYtqAjje96y16XitjqW7qtOPZ3a6LSaZtU/wIFQU4kc2UnFtQMdqx4LTamkE6GoSQHJhty6VvKPBk/75cFnSGjgmeGQ/6mWTK+XdpLNC5V7r5SiwaFz8mk2FhC10WwYB/kb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740593435; c=relaxed/simple;
-	bh=ACrMtJ48BLf0lS9Oq2SBzkvrIp8x6BzOepzTjwKE+MU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mTkRc8VbMOyV5sghV6I8v8v1qjGJ6fQoPvL9oDT0ZbgP5CECLJu5vJXBuhS9Z9OLyQpZjhWT1rR5PDaLKuDlWgfHLCOIr+uf/ndRxmzM5vb2bsF1kIz2q+vLkhJOMEZoE6S2715yFJZ8GUg87c+Ox4ATAKrDIhC8neYpdSjDJl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=XvEfXI1T; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1740593854; c=relaxed/simple;
+	bh=lHjb7cprCWmCiSQDWLFIs9PflfliVjGgCgC+q4i5VRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qIsJBT1SNCYdoD+t9gAxznX2HngTdd3uQmmhj9nAVhlqNjTl2kxG6Ch9Lztm/EelO2xRlIXHs/P/xW1l914nCv5AeG769+mL/48a7dJtA//IsiUgICDwA17U0upTGB1t2q/kYgZqLWGlonfb8TOLuXP2L/rPjfxZ3bmymQF+emc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f4OChAa4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="XvEfXI1T"
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 51QF150D008877
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 10:10:33 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=VdThkb+RRcWXrvMKEbaOWgaU8H96LXHKVFz/+nZDMjc=; b=XvEfXI1TxAeb
-	N+3sxhH8LDJOLYcou2LHonRe+QnUAq9OAkoHVojbq9CPCexNwW+dMR0JEoW0qAqI
-	fM/YNQVHFmcv+fVfjvKPTbTtUP2jycC1nccX9PZrNGf+NW0amNW9Kpyd9BReCq8W
-	i55GxgP2XhpVdLyszDj7UmrvtbU+K/KQek5DrxhEq+onfaLOgZDOHEGTfjo00ZJF
-	Eh9AHeBBqpGiggCjVYsfhtu2MGJ9r9K2lLavwCnXNzoCUG1dAgsrVyMW09+ratFY
-	GMgPvXML7aReC42ja/hieXbpuXiCpLu6GQyVyXUhunRjg74uq0rBJlvcaWCozAQ2
-	GIiGKi8Z9w==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 45257r9fsh-5
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 10:10:32 -0800 (PST)
-Received: from twshared18153.09.ash9.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 26 Feb 2025 18:10:05 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id B0B7E187C4AD6; Wed, 26 Feb 2025 10:10:05 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <ming.lei@redhat.com>, <asml.silence@gmail.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
-CC: <bernd@bsbernd.com>, <csander@purestorage.com>,
-        <linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv6 1/6] io_uring/rw: move fixed buffer import to issue path
-Date: Wed, 26 Feb 2025 10:09:53 -0800
-Message-ID: <20250226181002.2574148-3-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250226181002.2574148-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f4OChAa4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E3A2C4CED6;
+	Wed, 26 Feb 2025 18:17:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740593853;
+	bh=lHjb7cprCWmCiSQDWLFIs9PflfliVjGgCgC+q4i5VRg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f4OChAa47qOxVn4GDFrav27LqCAOEyAgXnEmUqqAi7smtqWzYs1zerN0diDGFYTnS
+	 DfrfV7cgT7n1QgUavHmBtyid+1DGSSR2NxfswtTXyEs7Nuu3lTV7hZHd1QZTI7lisa
+	 EPxPR1z4ZW4LuC9yM5MlGcNwNjhToNRjGIoJqqbGt7ekfqljtC+oJGMkXKKbvsUBpd
+	 MUO5pHKJKfLNk3x6Dh3BXSdKhF1NbmmUzS7TYbJmAj0UilAkoPrjNLMKPlbNDDv27y
+	 ogXuyp9Ic9ES4zBxb+hOZizKxsjsEROmxnD2pSM3OPQMVygShsfESk3LPTBChbK0Ye
+	 KRWLZNTi7BwPQ==
+Date: Wed, 26 Feb 2025 11:17:30 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: ming.lei@redhat.com, asml.silence@gmail.com, axboe@kernel.dk,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	bernd@bsbernd.com, csander@purestorage.com,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCHv6 0/6] ublk zero copy support
+Message-ID: <Z79auss5rprO8Dwp@kbusch-mbp>
 References: <20250226181002.2574148-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -56,143 +42,10 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: zxo3mw0kRNIeOy097LiA86kskD4rB2hX
-X-Proofpoint-ORIG-GUID: zxo3mw0kRNIeOy097LiA86kskD4rB2hX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_04,2025-02-26_01,2024-11-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226181002.2574148-1-kbusch@meta.com>
 
-From: Keith Busch <kbusch@kernel.org>
-
-Registered buffers may depend on a linked command, which makes the prep
-path too early to import. Move to the issue path when the node is
-actually needed like all the other users of fixed buffers.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- io_uring/opdef.c |  4 ++--
- io_uring/rw.c    | 39 ++++++++++++++++++++++++++++++---------
- io_uring/rw.h    |  2 ++
- 3 files changed, 34 insertions(+), 11 deletions(-)
-
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index 9344534780a02..db77df513d55b 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -105,7 +105,7 @@ const struct io_issue_def io_issue_defs[] =3D {
- 		.iopoll_queue		=3D 1,
- 		.async_size		=3D sizeof(struct io_async_rw),
- 		.prep			=3D io_prep_read_fixed,
--		.issue			=3D io_read,
-+		.issue			=3D io_read_fixed,
- 	},
- 	[IORING_OP_WRITE_FIXED] =3D {
- 		.needs_file		=3D 1,
-@@ -119,7 +119,7 @@ const struct io_issue_def io_issue_defs[] =3D {
- 		.iopoll_queue		=3D 1,
- 		.async_size		=3D sizeof(struct io_async_rw),
- 		.prep			=3D io_prep_write_fixed,
--		.issue			=3D io_write,
-+		.issue			=3D io_write_fixed,
- 	},
- 	[IORING_OP_POLL_ADD] =3D {
- 		.needs_file		=3D 1,
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index eb369142d64ad..728d695d2552a 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -346,31 +346,30 @@ int io_prep_writev(struct io_kiocb *req, const stru=
-ct io_uring_sqe *sqe)
- 	return io_prep_rwv(req, sqe, ITER_SOURCE);
- }
-=20
--static int io_prep_rw_fixed(struct io_kiocb *req, const struct io_uring_=
-sqe *sqe,
-+static int io_init_rw_fixed(struct io_kiocb *req, unsigned int issue_fla=
-gs,
- 			    int ddir)
- {
- 	struct io_rw *rw =3D io_kiocb_to_cmd(req, struct io_rw);
--	struct io_async_rw *io;
-+	struct io_async_rw *io =3D req->async_data;
- 	int ret;
-=20
--	ret =3D io_prep_rw(req, sqe, ddir, false);
--	if (unlikely(ret))
--		return ret;
-+	if (io->bytes_done)
-+		return 0;
-=20
--	io =3D req->async_data;
--	ret =3D io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir, 0);
-+	ret =3D io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
-+				issue_flags);
- 	iov_iter_save_state(&io->iter, &io->iter_state);
- 	return ret;
- }
-=20
- int io_prep_read_fixed(struct io_kiocb *req, const struct io_uring_sqe *=
-sqe)
- {
--	return io_prep_rw_fixed(req, sqe, ITER_DEST);
-+	return io_prep_rw(req, sqe, ITER_DEST, false);
- }
-=20
- int io_prep_write_fixed(struct io_kiocb *req, const struct io_uring_sqe =
-*sqe)
- {
--	return io_prep_rw_fixed(req, sqe, ITER_SOURCE);
-+	return io_prep_rw(req, sqe, ITER_SOURCE, false);
- }
-=20
- /*
-@@ -1136,6 +1135,28 @@ int io_write(struct io_kiocb *req, unsigned int is=
-sue_flags)
- 	}
- }
-=20
-+int io_read_fixed(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	int ret;
-+
-+	ret =3D io_init_rw_fixed(req, issue_flags, ITER_DEST);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return io_read(req, issue_flags);
-+}
-+
-+int io_write_fixed(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	int ret;
-+
-+	ret =3D io_init_rw_fixed(req, issue_flags, ITER_SOURCE);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return io_write(req, issue_flags);
-+}
-+
- void io_rw_fail(struct io_kiocb *req)
- {
- 	int res;
-diff --git a/io_uring/rw.h b/io_uring/rw.h
-index a45e0c71b59d6..bf121b81ebe84 100644
---- a/io_uring/rw.h
-+++ b/io_uring/rw.h
-@@ -38,6 +38,8 @@ int io_prep_read(struct io_kiocb *req, const struct io_=
-uring_sqe *sqe);
- int io_prep_write(struct io_kiocb *req, const struct io_uring_sqe *sqe);
- int io_read(struct io_kiocb *req, unsigned int issue_flags);
- int io_write(struct io_kiocb *req, unsigned int issue_flags);
-+int io_read_fixed(struct io_kiocb *req, unsigned int issue_flags);
-+int io_write_fixed(struct io_kiocb *req, unsigned int issue_flags);
- void io_readv_writev_cleanup(struct io_kiocb *req);
- void io_rw_fail(struct io_kiocb *req);
- void io_req_rw_complete(struct io_kiocb *req, io_tw_token_t tw);
---=20
-2.43.5
-
+I duplicated the format-patch command into the same directory, so I
+completely screwed up this patch thread. Please disregard this one, and
+we'll start a new one. Sorry for the noise.
