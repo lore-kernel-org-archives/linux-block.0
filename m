@@ -1,64 +1,64 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9999919DF52
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 19:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D6F245006
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 19:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740598575; cv=none; b=Rmm1GHFDAn3ImctN9R1BwoLv9EaxYW0XJV6WakJtrtihtARFGF/GL2SIyxGdKprO3rCZ2g/ZkMo4fE42sSlDtoeWgcrB3DT6epdN3XJDk66hXjuPSRiblqOfVNBd9NulhM8PJISjS90a3uz17ksUz//Gr05XsUO06bwBHCLSsgU=
+	t=1740599039; cv=none; b=PXoKuPdvB9dkD9wNrt8lyNXLiRMUNI7kA3qmZsVkarz/ca8uefPR3351yOWGxYQncCt6l2H1OxZKxDuhHdjLjwUJQYzUlvJLKRNL9bpZsQ0enxDoQQTYYIblP8Wm/xpZmh+XZPdxl+qBAgGTQ901YHlEHKv9VcDQLIpf+ghhCKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740598575; c=relaxed/simple;
-	bh=7bcO+2fNVcIn6QQh8s6i3Sv8pSilFCdjl4g43H0pfVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lybwLg1CAr2pnhedQC3DCiPb7EGbS1aPnZHXVNxtqesISsKoHjXplfnTgqG9T96nsctnnYXaRH8CrLITx3wqThXoCAwtChLzGkv4aWm60myiYkGGTYwn+RWhob0oRh5Q7MDiiEBZ8N93C4oWIl8FLFV2dr1+xC2NDhUZx6Z9klQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3U8oErE5; arc=none smtp.client-ip=209.85.166.171
+	s=arc-20240116; t=1740599039; c=relaxed/simple;
+	bh=d+3Xa90kEP/tvphor+5LeyeLnqS9aMCkcfd5dDXJ66g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=r8hcfL/PQ3J+CoFIWh8HbvqR5e9Umwb5mVm/Kq1EVoPtWH4wckxR7vy+SLHmJG1pmmgFOCoogq67Q5E+amVCHzkG30bnk/RQJUXWO544iqatzPUdP6G5vAH2L7A41zRM0ldi75oYtiW6WFd/XSR4EVPvJW8y6WxGpl46ia7T0GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZlKg+EE8; arc=none smtp.client-ip=209.85.166.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3U8oErE5"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so771475ab.2
-        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 11:36:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZlKg+EE8"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-855183fdcafso39046339f.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 11:43:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740598573; x=1741203373; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZO9STZ95sF/hThjh2V4XP8IUCqoQU8S45+6Tzt1P4U=;
-        b=3U8oErE5utlheiIpRIHDijiwKxsHx2JYJ7YG0AXd9sxbcd2BcWlQFHRzT2H4PcRkR2
-         0DQqvST3zuJSNo+YJmHFkrMmYLt6BhOCHd/kyOh6cltwLiJ5c84+5uPslirO9FFSOJQ5
-         RsoJB1FoXxPv28//1k8JLoMKKkzXUHWX58RmRBmdJD/2WKlO9m9YHPbMRlCFbWWX8E0G
-         dObGwqoGe3DUgvDG4Q7VVHpWgTcIVjCbKuBXunMdA1ymsOPhqEfS30IzP5+RewPOUtex
-         33qLN2RPooKv439Z8uCP9qX8Defaor2+yI5MxJuQoE0cMcgWT6vmOB/T+FV6lVm9+kzx
-         meKA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740599037; x=1741203837; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sLDeLKPUoOShmf1w7pHGv7wy9rSrQDySNHUSOVnEJhk=;
+        b=ZlKg+EE8N8eqYeH9wXrcfO5nSpCee8QIPpKMJYA3GoEXRMrlKObWkoXcUQY88Y1lIB
+         yCQc8BTuWR20OxPElp6n0GncNvBbBpoNxasW87I+/YU0xv6VG9ld1X+DgP52f7ryeQya
+         venVBsR4EJd9WScGKfkXm0cuiOMfFi7lSHdmpwnZUbBh2mgKiGsLeDAcKIuffh8L1hMT
+         8FSXBAtpxq33orxmqMYZ3CS5vMMW2uArRyJP6Ay5iNf7JXjjGBIN7rtCc6WuddYVgb6w
+         6lv+cLVB1gN7xqPd4J5iJ6ihBzlZh/2dej26lVzfWlmvsqLCVv47kNebad/YAz+nnwBj
+         vA5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740598573; x=1741203373;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1740599037; x=1741203837;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZO9STZ95sF/hThjh2V4XP8IUCqoQU8S45+6Tzt1P4U=;
-        b=nP2t7ujcGiVaw+SE/iIWTPX1BFgOS5ra9usOVnrvnraS3njX4384iO75WswE3+YPdT
-         sU1zCrQ7lzk6j9Ug0woHALetpNWEeL6V95n7Bf5eTrr9sW4osrzoJCFgwqt6DMAX3X/A
-         Zcw5MnlTAbgYp8dM3zlW8UYT/mbSiSrxMWJYqd8qLyUOPpuF99FJmYHwcpjEFQ1iEwbS
-         P4W2O78MLjMxnu+YPSTf+FtZNqGMrlmMY4li8Q8ck7KfM5ZLvcp9NdyfM9t2YrC/jVhr
-         1iDUHi5mk/T3ZJyaZaIb9e9JoX/dbdEoXYoWegP616ZEUKW7g6QWBoNT1bUL6U+QIzi5
-         tB6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXcF94JD9zibv43KOjd+SA5Nw21raDiGyg8oJMH6GxrDI8PuWvFcFSuwCCBKV8E0EpztD92lerwxgVLkQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh4gAGFrzbd+pYLx2paM8Dcrf6ciqpQ4lwBdt3cTlcA7WaBZ+0
-	gKFQ99N1YNIGcJWuSGH3cAxQXiAalJJIlu64BRo16zmwp18PUD7FEmY70C+pDcU=
-X-Gm-Gg: ASbGncua/38Z/mUpBrxKyl1QJfYZtjeudjQIDoktxPJh6RK+eVG15o3yTUNHJMMpeBA
-	KUCbLX8xm8ZEdhw2MOswqd1wjyKojBX9pVogZHNXQYh1tQc/2qdRpF9hflHA1+GDUhMiTagykyd
-	j99P/xTTJSjlh6A8iTELHi2/wcwTG2K8TaOXbA7w6vZtwGckuuqrmtaSg2C3oz+dyquvuSYOaJW
-	t2vHy+Ca4WgD+ZzRtcF9o1thuq99oEQAj2Amn9XvRExX1/T1vd0gkjgTrAwT8A/kfm3xS6etlpx
-	Qfck9zw2sEB/c3Emu+djkQ==
-X-Google-Smtp-Source: AGHT+IEbyL3881tCFlSZe9P+BIU2SFkXwfwwPxd72T/h1DgwPnDSWSN6qbGSXbtQaoY0apPWHhil4A==
-X-Received: by 2002:a05:6e02:2148:b0:3d2:1206:cabe with SMTP id e9e14a558f8ab-3d2cb52f7cbmr218812255ab.22.1740598572682;
-        Wed, 26 Feb 2025 11:36:12 -0800 (PST)
+        bh=sLDeLKPUoOShmf1w7pHGv7wy9rSrQDySNHUSOVnEJhk=;
+        b=vExk2ZMSqusjXXJkr6IEtKrQBmJBPJ6Ttzt2kME4uwOiH19z1oGh4SgHlPrFH5FdWN
+         7sZyiSpTk73cVsGtkjm8COi1CuXql14Ld5j0SocfBye/8x7RSrilek/uRLr9GHmUnIzh
+         nkAPiQVBvLKmXjMxYwRU5/ybNlMsMNo0CZkDAkhA5yaLqb/DMP9oydMD592WKvJYarNc
+         dKitwJXGkcIuPsjbaXfZONYU79E+QONTGyfAHhBok69U8vakBgOBSHqIjXk8IBJQz48H
+         IUfPVfUuJj0Er5IgV4SGMUu7wVZ7D/ASIpsVOXmf+xm/VbAN5c6O2Xktp5CWJKnNzrf4
+         Xlkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXs+w62GC3//J0ZPR7+nNouXwz3zVGvGMESkFqe+fXayP6ejEMckv0vYJBgduvbVRoxhhlvdd+Eov/SBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTuRlYG860W2SyHvAIyeUegtI+uMcZwGq36Kiwq/zWGALKZkip
+	J4pRX+Zr2iPrA+lmnQ4zB24+lOWG67IKhYEv+k65la50xBjWGLW8LgQ/OB0cuKA=
+X-Gm-Gg: ASbGncuQA4+QHPtollyi+jFgj2dl5JaAICeR/qCeCgeJRXAJOC4FtOSCNv/rgTr7hTy
+	0ir83DUJha7PAPftKAMxgQVVctPW14f54qTxSHSRVS8m5nDipbmMUMy4dn8sGJGrgTsQ01ojZgh
+	hQBN9Y9+TTfqlswLgtB/KNnBCDDCAMFdBHqB1bDWl7FyiK0bj99q+d4OIFRbLB2Kp4JakxCPuRv
+	tGJtoG0PPJifdCM4zTkMqeVdj1DaL2fF6qPtfZQLBW1MK7i2KOG61Ht3DwDhnJg/7ZSx5L5qoz/
+	4dwqee9L959TVZ44f1PHdg==
+X-Google-Smtp-Source: AGHT+IEHXu4Adf4k7lWreSj75gITEDxxBueHs8E5ge9AqxuGDEfV9yiPcdGZf2s42AauL5pJO3vumQ==
+X-Received: by 2002:a5e:8a0a:0:b0:856:290e:6399 with SMTP id ca18e2360f4ac-85870ec35fbmr60644539f.3.1740599037569;
+        Wed, 26 Feb 2025 11:43:57 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f04752dd55sm1043887173.113.2025.02.26.11.36.11
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-856209f8868sm86187539f.1.2025.02.26.11.43.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Feb 2025 11:36:12 -0800 (PST)
-Message-ID: <83b85824-ddef-475e-ba83-b311f1a7b98f@kernel.dk>
-Date: Wed, 26 Feb 2025 12:36:11 -0700
+        Wed, 26 Feb 2025 11:43:56 -0800 (PST)
+Message-ID: <e20b3f2f-9842-49a8-9f78-c469957e66f5@kernel.dk>
+Date: Wed, 26 Feb 2025 12:43:56 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,38 +67,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCHv7 6/6] io_uring: cache nodes and mapped buffers
+From: Jens Axboe <axboe@kernel.dk>
 To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
  asml.silence@gmail.com, linux-block@vger.kernel.org, io-uring@vger.kernel.org
 Cc: bernd@bsbernd.com, csander@purestorage.com,
  linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>
 References: <20250226182102.2631321-1-kbusch@meta.com>
  <20250226182102.2631321-7-kbusch@meta.com>
+ <83b85824-ddef-475e-ba83-b311f1a7b98f@kernel.dk>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250226182102.2631321-7-kbusch@meta.com>
+In-Reply-To: <83b85824-ddef-475e-ba83-b311f1a7b98f@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/26/25 11:21 AM, Keith Busch wrote:
-> +	return 0;
-> +free_cache:
-> +	io_alloc_cache_free(&table->node_cache, kfree);
-
-kvfree?
-
-> @@ -548,11 +607,19 @@ int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
->  	return ret;
->  }
->  
-> +static void io_rsrc_buffer_free(struct io_ring_ctx *ctx,
-> +				struct io_buf_table *table)
-> +{
-> +	io_rsrc_data_free(ctx, &table->data);
-> +	io_alloc_cache_free(&table->node_cache, kfree);
-> +	io_alloc_cache_free(&table->imu_cache, kfree);
-> +}
-
-Ditto
+Ignore this one, that was bogus. Trying to understand a crash in here.
 
 -- 
 Jens Axboe
+
