@@ -1,122 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF34719005F;
-	Wed, 26 Feb 2025 16:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EBC21D594;
+	Wed, 26 Feb 2025 16:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740588501; cv=none; b=I+mQysjTGt4b+S7ACdPplboWQPFwdFh1NXs5S0a5TIPd1e5xyNVfhk1/82M2cqw9FyMl32KC1RVMx4JIkFzckWNYE0FIapAPrLdqUwSBcLFjwGDJWB/xEyJhXUIamR34TU+iV9Iye5dgVnYSFinr0Ux7qIrVZIWFNYwxK7mpYw0=
+	t=1740588524; cv=none; b=OgQfPPJzhzGcRuU3zLCHEUeMlRatE47IrB2I5FzLGbPZaS9vyEjtj52vWKE25lX8lOM4P4RGnXsOshxtJaH97Rp8w6gUSrYsnt83UT37TVVKH+Y7KMHI2WFJSyR0GGEj8I6RsWmzsVhGNbfsyubGMNZFvOw47EKJyv1Z8babpGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740588501; c=relaxed/simple;
-	bh=FxcvaHDtQk+aPNgLOpA1kKCuwEvZ/n4I9xwMBDMNjMM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=G6cSdDMH+kKrbp5h0yk1/gCnKsMqBxy2ckyOK9U5FReF51pl1TRRtgEi8hceP1PT8BoHYJM7KML1QUFdCbKVqbDxCdUL7k8WtzTp1mFA8hge8eeWLlQoWYdv1YrAFSwsX/mVMe57ZNeR+84hCtsjDVfs1nwI3tfyw2Jf0saa3X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJBntMAW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740588524; c=relaxed/simple;
+	bh=cudwfSFk+04xxJC0BxMm+5FmyfHUG/wZm2fscloKh1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EIZiVTGRvAbVeyCQI2oXAKTrHhcUW3FWWJZGkRc7vsOQBknJhUFv9oC+CcsgwPXLJ2LW/HCapBwPMNQefhLE6CMiSBuuU8v3+s/SxQ907F9X7FVb1vMLQk4uPEFrrlOhVZSz+r7jxUCqUyWu61wQfxIXzJBHwWEgrUrsbDHoaSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLxnVBLw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJBntMAW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F78BC4CED6;
-	Wed, 26 Feb 2025 16:48:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLxnVBLw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B523C4CED6;
+	Wed, 26 Feb 2025 16:48:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740588501;
-	bh=FxcvaHDtQk+aPNgLOpA1kKCuwEvZ/n4I9xwMBDMNjMM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=gJBntMAWa9qiB6go6MBAYuIpUQmIV8zM3P7hOz/BcMP2byX2P+MCVmwTOF8y59cTA
-	 /dmsi2YnkvFk7WCs/BqmuQVZJqyuuK6B2L34n/nlGh5Fb/IjbLtuJF7xfHrd7ckNHI
-	 3aOmoTcDg9MwCwDV+lRzSbk3kKgtk7sY2T2rRnxcQXeSOKkWWTO2TN5iDQ7y45VEK4
-	 FrA2VRbWMMiI+WJDNW4z9L9r47+ekdDK20fY6zi5lQvVIKVd30Jsj0qJQM2+iV2vYy
-	 04RjgTb6SA4Au/0pUEMYaZh350XZsbrokrKevACKRy5XTZGyf9486J5GRsNNv9vMzQ
-	 71NtfIvQwN7Lw==
-From: Mark Brown <broonie@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- Yaron Avizrat <yaron.avizrat@intel.com>, Oded Gabbay <ogabbay@kernel.org>, 
- Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
- James Smart <james.smart@broadcom.com>, 
- Dick Kennedy <dick.kennedy@broadcom.com>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
- David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>, 
- Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>, 
- Xiubo Li <xiubli@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, 
- Niklas Cassel <cassel@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
- "Darrick J. Wong" <djwong@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, Frank Li <Frank.Li@nxp.com>, 
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, 
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, 
- Hans de Goede <hdegoede@redhat.com>, 
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
- Henrique de Moraes Holschuh <hmh@hmh.eng.br>, 
- Selvin Xavier <selvin.xavier@broadcom.com>, 
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
- Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: cocci@inria.fr, linux-kernel@vger.kernel.org, 
- linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- linux-sound@vger.kernel.org, linux-btrfs@vger.kernel.org, 
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-ide@vger.kernel.org, linux-xfs@vger.kernel.org, 
- linux-pm@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-spi@vger.kernel.org, imx@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
- ibm-acpi-devel@lists.sourceforge.net, linux-rdma@vger.kernel.org, 
- Takashi Iwai <tiwai@suse.de>, Carlos Maiolino <cmaiolino@redhat.com>
-In-Reply-To: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
-References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
-Subject: Re: (subset) [PATCH v3 00/16] Converge on using secs_to_jiffies()
- part two
-Message-Id: <174058848717.58970.18340675342808865020.b4-ty@kernel.org>
-Date: Wed, 26 Feb 2025 16:48:07 +0000
+	s=k20201202; t=1740588524;
+	bh=cudwfSFk+04xxJC0BxMm+5FmyfHUG/wZm2fscloKh1k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MLxnVBLwIzYmWNnND9nldb0LrWIDDYx/QB9Y26joWfuhvXEklTTbYl2orqF6JtrH8
+	 61dh3G0GT+mhLPcLVWDoMdrw91KWrlDQAmLu+N46Y2puzex5GikBkgXD3SZ/0oIPRV
+	 zZ2Pj9/bq3JnVuYVKOwZRKXTIPUxiYOZVzR3Zlia/2OQJO9z1rtcroKOChFA+cyYad
+	 PWCZpbG2rDrwHGr12GOhkLS+v6QxMybkIiO/MF1QUOHOuXlsxFvT6FG2JXQEzMd6gF
+	 6iGP7MNLhH4TzrXC/l4TjAa0WaK8n+clQjrCxaaVgtxBrb4D72mQSBvWRq9Twhdpio
+	 OEp4T90UUhKtQ==
+Date: Wed, 26 Feb 2025 06:48:43 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, josef@toxicpanda.com, axboe@kernel.dk,
+	vgoyal@redhat.com, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] blk-throttle: fix lower bps rate by throtl_trim_slice()
+Message-ID: <Z79F6xfDbwVJ4psU@slm.duckdns.org>
+References: <20250226011627.242912-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-1b0d6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226011627.242912-1-yukuai1@huaweicloud.com>
 
-On Tue, 25 Feb 2025 20:17:14 +0000, Easwar Hariharan wrote:
-> This is the second series (part 1*) that converts users of msecs_to_jiffies() that
-> either use the multiply pattern of either of:
-> - msecs_to_jiffies(N*1000) or
-> - msecs_to_jiffies(N*MSEC_PER_SEC)
+On Wed, Feb 26, 2025 at 09:16:27AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> where N is a constant or an expression, to avoid the multiplication.
+> The bio submission time may be a few jiffies more than the expected
+> waiting time, due to 'extra_bytes' can't be divided in
+> tg_within_bps_limit(), and also due to timer wakeup delay. In this
+> case, adjust slice_start to jiffies will discard the extra wait time,
+> causing lower rate than expected.
 > 
-> [...]
+> This problem will cause blktests throtl/001 failure in case of
+> CONFIG_HZ_100=y, fix it by preserving one finished slice in
+> throtl_trim_slice() and allowing deviation between [0, 2 slices).
+> 
+> For example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
+> slice is 20ms(2 jiffies), expected rate is 1000 / 1000 * 20 = 20 bytes
+> per slice.
+> 
+> If user issues two 21 bytes IO, then wait time will be 30ms for the
+> first IO:
+> 
+> bytes_allowed = 20, extra_bytes = 1;
+> jiffy_wait = 1 + 2 = 3 jiffies
+> 
+> and consider
+> extra 1 jiffies by timer, throtl_trim_slice() will be called at:
+> 
+> jiffies = 40ms
+> slice_start = 0ms, slice_end= 40ms
+> bytes_disp = 21
+> 
+> In this case, before the patch, real rate in the first two slices is
+> 10.5 bytes per slice, and slice will be updated to:
+> 
+> jiffies = 40ms
+> slice_start = 40ms, slice_end = 60ms,
+> bytes_disp = 0;
+> 
+> Hence the second IO will have to wait another 30ms;
+> 
+> With the patch, the real rate in the first slice is 20 bytes per slice,
+> which is the same as expected, and slice will be updated:
+> 
+> jiffies=40ms,
+> slice_start = 20ms, slice_end = 60ms,
+> bytes_disp = 1;
+> 
+> And now, there is still 19 bytes allowed in the second slice, and the
+> second IO will only have to wait 10ms;
+> 
+> Fixes: e43473b7f223 ("blkio: Core implementation of throttle policy")
+> Reported-by: Ming Lei <ming.lei@redhat.com>
+> Closes: https://lore.kernel.org/linux-block/20250222092823.210318-3-yukuai1@huaweicloud.com/
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Applied to
+Acked-by: Tejun Heo <tj@kernel.org>
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+Thanks.
 
-Thanks!
-
-[12/16] spi: spi-fsl-lpspi: convert timeouts to secs_to_jiffies()
-        commit: 32fcd1b9c397ccca7fde2fcbcf4fc7e0ec8f34aa
-[13/16] spi: spi-imx: convert timeouts to secs_to_jiffies()
-        commit: 1d2e01d53a8ebfffb49e8cc656f8c85239121b26
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+-- 
+tejun
