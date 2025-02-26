@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC38F204C0E;
-	Wed, 26 Feb 2025 02:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7D110A1F
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 02:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740535254; cv=none; b=Ac8bv3WFnuTt+qAefCTBDyBEwesrrFTkPJOTWpIOXzgnqq5uXZV7HOpStZ/d5oSdU6Ko3OG+QvUCKs1qNIaVpOtUcopO98p9hj1wG4phE5Tt4JXyGDZ3H1wifqNWdOzupzXRHzQz84e8V1LeWMFECPND2zwue/QWRe8ldZ9FppY=
+	t=1740536429; cv=none; b=RP7vGKlz47YZhbYoQ3e0VimTEyi9GjHw2ScguO6sTmJ+NXLmQe4QTRlNqNqtL6F4jBBaY5D3Bk8/kTyexeqR3+45cPMlWMxM5NpbVA2HMDoBy119DUAchKYM4wdUf8KXeVQ/zq56KoHIqfijgVu/4IaqgTJru4uxIUZLE92jVPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740535254; c=relaxed/simple;
-	bh=QOAgMMGKbnJ6hZHvx6ZJYTRK+iZXq18TAlHT3acDveU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GfO2ZztXI0yR4SOtWmiMQuv2Miry7HPEoSwkKM5fHVWBj3q2p3eBEVkJZHQlOM7vs2hrEG273wOgSP80vhC0d7LYHKkdMLPOuR9lJVurP96SLc/GCyV1MaG9WKzlgij04TdeSDC9fSAyRDkE7VaZgT86tR+k5I1zbftL+L9n/bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbvJaOgP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740536429; c=relaxed/simple;
+	bh=NY2E3fu66zs6xXULILF6n4/vfzbw4NB4Dsa83b/tcNA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Ly0gnOa42mKrhTypwUw4HjjxAqENmP32mH51kKdqY/M5I5TIiP2EHs4erLcFOTXy9VrpvduFqY1NNYnKvVRcVla0caENuW1y/imWh7TmAsiFuits1+5jLtNdL8AwPeHZE8fI4+d3cDQtMEE0fZ/0S/XZjG49kximohFghXsl1RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlqjMiZz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbvJaOgP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E76A4C4CEDD;
-	Wed, 26 Feb 2025 02:00:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlqjMiZz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F41C4CEDD;
+	Wed, 26 Feb 2025 02:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740535253;
-	bh=QOAgMMGKbnJ6hZHvx6ZJYTRK+iZXq18TAlHT3acDveU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lbvJaOgPkZbnkOP5hNZv3kt8F37sM5wVNdz5pQoKBOvWJpcWyMv2mVC7qw0zww0FC
-	 tw0rFBZp3tLMdImqLCpGhcY34tv8uho+Lu2q/YVztsAQwyT0nOq0d2HlE+yumDi+2G
-	 NnGD4V7HBDpFdEYrgDp0+8hLWBlWldNGcN9+JQ1uf7k8Z8tTkCxsl34NLWQ8Vawbdb
-	 K9795FHlijgsdEKshsQNQoxr3/DEjO/bi0eHV3p1/sO3PbUu61pZGpWQwOCIptZowS
-	 rIy49xymFJKzj4FXwPSz54+5ZyqnT56OBQv1abO0kJMDp0bQ7XnwlRxW3/2snteMgS
-	 vdipJDYHPyQ2Q==
-Message-ID: <2632bed9-4e4a-494a-bb89-d5aac64f854e@kernel.org>
-Date: Wed, 26 Feb 2025 11:00:37 +0900
+	s=k20201202; t=1740536429;
+	bh=NY2E3fu66zs6xXULILF6n4/vfzbw4NB4Dsa83b/tcNA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=YlqjMiZzIfHhzKUZaxpCXVvVQOyI17Z3ww1k29yyEquapLvMWzDrzB60yEZoEhbIa
+	 Juwervt3meqYeIMiDOMhXcohTIW14d3AXZT6tCdX9QlhMIe0KLYA5gzjN/OV/kKb0Q
+	 Ih6HYeIYTX98UQUJwAz6mN7mjKGWrDxojUjwH7hcbRkU5QZD+9exK3f6TM9C4+as6K
+	 OG4avDvz8Ry/lPKLGqHMJDg7hCCYFAjtpYA6vSyK6kUKPqK8eaB+w7ks70FphbqA5z
+	 tLCmdeXJoJ6axUhGuY/WiuPJbuiTZvegshzgBx+SOR9WkSpofp5taEk9YX4xkMLxO8
+	 M2LfGAc4W5bFw==
+Message-ID: <d6effa6e-914d-471d-823b-f6395cf96546@kernel.org>
+Date: Wed, 26 Feb 2025 11:20:21 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,83 +35,248 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 08/16] ata: libata-zpodd: convert timeouts to
- secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Yaron Avizrat <yaron.avizrat@intel.com>, Oded Gabbay
- <ogabbay@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>, James Smart
- <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>,
- Xiubo Li <xiubli@redhat.com>, Niklas Cassel <cassel@kernel.org>,
- Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
- Sebastian Reichel <sre@kernel.org>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Frank Li <Frank.Li@nxp.com>, Mark Brown <broonie@kernel.org>,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
- Selvin Xavier <selvin.xavier@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- cocci@inria.fr, linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org,
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-spi@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- platform-driver-x86@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
- linux-rdma@vger.kernel.org
-References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
- <20250225-converge-secs-to-jiffies-part-two-v3-8-a43967e36c88@linux.microsoft.com>
- <ff51bcfc-10c8-4461-9f82-ea1d5ed784f8@linux.microsoft.com>
+Subject: Re: [PATCH] block: Remove zone write plugs when handling native zone
+ append writes
 From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Jorgen Hansen <Jorgen.Hansen@wdc.com>
+References: <20250214041434.82564-1-dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <ff51bcfc-10c8-4461-9f82-ea1d5ed784f8@linux.microsoft.com>
+In-Reply-To: <20250214041434.82564-1-dlemoal@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/26/25 5:24 AM, Easwar Hariharan wrote:
-> On 2/25/2025 12:17 PM, Easwar Hariharan wrote:
->> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
->> secs_to_jiffies().  As the value here is a multiple of 1000, use
->> secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplication
->>
->> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
->> the following Coccinelle rules:
->>
->> @depends on patch@
->> expression E;
->> @@
->>
->> -msecs_to_jiffies
->> +secs_to_jiffies
->> (E
->> - * \( 1000 \| MSEC_PER_SEC \)
->> )
->>
->> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->> ---
+On 2/14/25 1:14 PM, Damien Le Moal wrote:
+> For devices that natively support zone append operations,
+> REQ_OP_ZONE_APPEND BIOs are not processed through zone write plugging
+> and are immediately issued to the zoned device. This means that there is
+> no write pointer offset tracking done for these operations and that a
+> zone write plug is not necessary.
+
+Jens,
+
+Ping ?
+
+> However, when receiving a zone append BIO, we may already have a zone
+> write plug for the target zone if that zone was previously partially
+> written using regular write operations. In such case, since the write
+> pointer offset of the zone write plug is not incremented by the amount
+> of sectors appended to the zone, 2 issues arise:
+> 1) we risk leaving the plug in the disk hash table if the zone is fully
+>    written using zone append or regular write operations, because the
+>    write pointer offset will never reach the "zone full" state.
+> 2) Regular write operations that are issued after zone append operations
+>    will always be failed by blk_zone_wplug_prepare_bio() as the write
+>    pointer alignment check will fail, even if the user correctly
+>    accounted for the zone append operations and issued the regular
+>    writes with a correct sector.
 > 
-> This was meant to carry Damien's ack once the subject line was fixed[1], but I fixed
-> the subject line and missed adding the ack in. Damien, would you like to ack again?
-
-Looks like Andrew already applied the patch, which is fine.
-But nevertheless:
-
-Acked-by: Damien Le Moal <dlemoal@kernel.org>
+> Avoid these issues by immediately removing the zone write plug of zones
+> that are the target of zone append operations when blk_zone_plug_bio()
+> is called. The new function blk_zone_wplug_handle_native_zone_append()
+> implements this for devices that natively support zone append. The
+> removal of the zone write plug using disk_remove_zone_wplug() requires
+> aborting all plugged regular write using disk_zone_wplug_abort() as
+> otherwise the plugged write BIOs would never be executed (with the plug
+> removed, the completion path will never see again the zone write plug as
+> disk_get_zone_wplug() will return NULL). Rate-limited warnings are added
+> to blk_zone_wplug_handle_native_zone_append() and to
+> disk_zone_wplug_abort() to signal this.
+> 
+> Since blk_zone_wplug_handle_native_zone_append() is called in the hot
+> path for operations that will not be plugged, disk_get_zone_wplug() is
+> optimized under the assumption that a user issuing zone append
+> operations is not at the same time issuing regular writes and that there
+> are no hashed zone write plugs. The struct gendisk atomic counter
+> nr_zone_wplugs is added to check this, with this counter incremented in
+> disk_insert_zone_wplug() and decremented in disk_remove_zone_wplug().
+> 
+> To be consistent with this fix, we do not need to fill the zone write
+> plug hash table with zone write plugs for zones that are partially
+> written for a device that supports native zone append operations.
+> So modify blk_revalidate_seq_zone() to return early to avoid allocating
+> and inserting a zone write plug for partially written sequential zones
+> if the device natively supports zone append.
+> 
+> Reported-by: Jorgen Hansen <Jorgen.Hansen@wdc.com>
+> Fixes: 9b1ce7f0c6f8 ("block: Implement zone append emulation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>  block/blk-zoned.c      | 76 ++++++++++++++++++++++++++++++++++++++----
+>  include/linux/blkdev.h |  7 ++--
+>  2 files changed, 73 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 761ea662ddc3..0c77244a35c9 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -410,13 +410,14 @@ static bool disk_insert_zone_wplug(struct gendisk *disk,
+>  		}
+>  	}
+>  	hlist_add_head_rcu(&zwplug->node, &disk->zone_wplugs_hash[idx]);
+> +	atomic_inc(&disk->nr_zone_wplugs);
+>  	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>  
+>  	return true;
+>  }
+>  
+> -static struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
+> -						  sector_t sector)
+> +static struct blk_zone_wplug *disk_get_hashed_zone_wplug(struct gendisk *disk,
+> +							 sector_t sector)
+>  {
+>  	unsigned int zno = disk_zone_no(disk, sector);
+>  	unsigned int idx = hash_32(zno, disk->zone_wplugs_hash_bits);
+> @@ -437,6 +438,15 @@ static struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
+>  	return NULL;
+>  }
+>  
+> +static inline struct blk_zone_wplug *disk_get_zone_wplug(struct gendisk *disk,
+> +							 sector_t sector)
+> +{
+> +	if (!atomic_read(&disk->nr_zone_wplugs))
+> +		return NULL;
+> +
+> +	return disk_get_hashed_zone_wplug(disk, sector);
+> +}
+> +
+>  static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
+>  {
+>  	struct blk_zone_wplug *zwplug =
+> @@ -503,6 +513,7 @@ static void disk_remove_zone_wplug(struct gendisk *disk,
+>  	zwplug->flags |= BLK_ZONE_WPLUG_UNHASHED;
+>  	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
+>  	hlist_del_init_rcu(&zwplug->node);
+> +	atomic_dec(&disk->nr_zone_wplugs);
+>  	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>  	disk_put_zone_wplug(zwplug);
+>  }
+> @@ -593,6 +604,11 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
+>  {
+>  	struct bio *bio;
+>  
+> +	if (bio_list_empty(&zwplug->bio_list))
+> +		return;
+> +
+> +	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
+> +			    zwplug->disk->disk_name, zwplug->zone_no);
+>  	while ((bio = bio_list_pop(&zwplug->bio_list)))
+>  		blk_zone_wplug_bio_io_error(zwplug, bio);
+>  }
+> @@ -1040,6 +1056,47 @@ static bool blk_zone_wplug_handle_write(struct bio *bio, unsigned int nr_segs)
+>  	return true;
+>  }
+>  
+> +static void blk_zone_wplug_handle_native_zone_append(struct bio *bio)
+> +{
+> +	struct gendisk *disk = bio->bi_bdev->bd_disk;
+> +	struct blk_zone_wplug *zwplug;
+> +	unsigned long flags;
+> +
+> +	/*
+> +	 * We have native support for zone append operations, so we are not
+> +	 * going to handle @bio through plugging. However, we may already have a
+> +	 * zone write plug for the target zone if that zone was previously
+> +	 * partially written using regular writes. In such case, we risk leaving
+> +	 * the plug in the disk hash table if the zone is fully written using
+> +	 * zone append operations. Avoid this by removing the zone write plug.
+> +	 */
+> +	zwplug = disk_get_zone_wplug(disk, bio->bi_iter.bi_sector);
+> +	if (likely(!zwplug))
+> +		return;
+> +
+> +	spin_lock_irqsave(&zwplug->lock, flags);
+> +
+> +	/*
+> +	 * We are about to remove the zone write plug. But if the user
+> +	 * (mistakenly) has issued regular writes together with native zone
+> +	 * append, we must aborts the writes as otherwise the plugged BIOs would
+> +	 * not be executed by the plug BIO work as disk_get_zone_wplug() will
+> +	 * return NULL after the plug is removed. Aborting the plugged write
+> +	 * BIOs is consistent with the fact that these writes will most likely
+> +	 * fail anyway as there is no ordering guarantees between zone append
+> +	 * operations and regular write operations.
+> +	 */
+> +	if (!bio_list_empty(&zwplug->bio_list)) {
+> +		pr_warn_ratelimited("%s: zone %u: Invalid mix of zone append and regular writes\n",
+> +				    disk->disk_name, zwplug->zone_no);
+> +		disk_zone_wplug_abort(zwplug);
+> +	}
+> +	disk_remove_zone_wplug(disk, zwplug);
+> +	spin_unlock_irqrestore(&zwplug->lock, flags);
+> +
+> +	disk_put_zone_wplug(zwplug);
+> +}
+> +
+>  /**
+>   * blk_zone_plug_bio - Handle a zone write BIO with zone write plugging
+>   * @bio: The BIO being submitted
+> @@ -1096,8 +1153,10 @@ bool blk_zone_plug_bio(struct bio *bio, unsigned int nr_segs)
+>  	 */
+>  	switch (bio_op(bio)) {
+>  	case REQ_OP_ZONE_APPEND:
+> -		if (!bdev_emulates_zone_append(bdev))
+> +		if (!bdev_emulates_zone_append(bdev)) {
+> +			blk_zone_wplug_handle_native_zone_append(bio);
+>  			return false;
+> +		}
+>  		fallthrough;
+>  	case REQ_OP_WRITE:
+>  	case REQ_OP_WRITE_ZEROES:
+> @@ -1284,6 +1343,7 @@ static int disk_alloc_zone_resources(struct gendisk *disk,
+>  {
+>  	unsigned int i;
+>  
+> +	atomic_set(&disk->nr_zone_wplugs, 0);
+>  	disk->zone_wplugs_hash_bits =
+>  		min(ilog2(pool_size) + 1, BLK_ZONE_WPLUG_MAX_HASH_BITS);
+>  
+> @@ -1338,6 +1398,7 @@ static void disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
+>  		}
+>  	}
+>  
+> +	WARN_ON_ONCE(atomic_read(&disk->nr_zone_wplugs));
+>  	kfree(disk->zone_wplugs_hash);
+>  	disk->zone_wplugs_hash = NULL;
+>  	disk->zone_wplugs_hash_bits = 0;
+> @@ -1550,11 +1611,12 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
+>  	}
+>  
+>  	/*
+> -	 * We need to track the write pointer of all zones that are not
+> -	 * empty nor full. So make sure we have a zone write plug for
+> -	 * such zone if the device has a zone write plug hash table.
+> +	 * If the device needs zone append emulation, we need to track the
+> +	 * write pointer of all zones that are not empty nor full. So make sure
+> +	 * we have a zone write plug for such zone if the device has a zone
+> +	 * write plug hash table.
+>  	 */
+> -	if (!disk->zone_wplugs_hash)
+> +	if (!queue_emulates_zone_append(disk->queue) || !disk->zone_wplugs_hash)
+>  		return 0;
+>  
+>  	disk_zone_wplug_sync_wp_offset(disk, zone);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 248416ecd01c..39cc5862cc48 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -196,10 +196,11 @@ struct gendisk {
+>  	unsigned int		zone_capacity;
+>  	unsigned int		last_zone_capacity;
+>  	unsigned long __rcu	*conv_zones_bitmap;
+> -	unsigned int            zone_wplugs_hash_bits;
+> -	spinlock_t              zone_wplugs_lock;
+> +	unsigned int		zone_wplugs_hash_bits;
+> +	atomic_t		nr_zone_wplugs;
+> +	spinlock_t		zone_wplugs_lock;
+>  	struct mempool_s	*zone_wplugs_pool;
+> -	struct hlist_head       *zone_wplugs_hash;
+> +	struct hlist_head	*zone_wplugs_hash;
+>  	struct workqueue_struct *zone_wplugs_wq;
+>  #endif /* CONFIG_BLK_DEV_ZONED */
+>  
 
 
 -- 
