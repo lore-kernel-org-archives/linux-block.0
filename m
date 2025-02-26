@@ -1,113 +1,102 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E064218AB5
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 02:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4222C25D537
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 06:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740537935; cv=none; b=A6hhE4fnjqDvQpFL+1PQQIWBYXPgMjAGsXXISsCgJygF04T3tm8kw5868QLulgLy40l0eaqwTZ75GFA6GTTCeYN+YKsZ/90qjj1WxchqLBhHYlDGwIm4oulvEQDsjjZHMJUXr+a3NUE+LHHoKKVLFUy4hX+IpD7iYFoaABK8MyM=
+	t=1740550825; cv=none; b=LdceSQpLiThypZ69zhbkWzduW+BdDQbefGCEo3XkTc7+fC8VAV17G6On4BxBLW/DsmGuIpIQClkPuSF0VfbSRcOQ/1NW+4/G8tMvSxqjNAayS/p0cC2T7fCXI9pbXuP50zuDNwqwp2fY84yD6XBlCUdq77YVzUsfXsQqs00S1r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740537935; c=relaxed/simple;
-	bh=eQV6gPWwFTgh8YfHieTjl9zyRPPVldsLh11Xx8E4TpE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=XPzhVGxJByxjt6EqliGaZnb3AP4nIwD+evHEk/VuCvLETRh6V1/PMdQIhjO7rID5rfF07lH47oFhELvSL+o92Ojbk4tEurIy4QHK1kk1B8kKfjEV9lZQMyd6NvZr8UMNAKcs0Ps148GrGLLqo2ep0xRrrt2gR/MasYYTiR3LYa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AaKfaa1W; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1740550825; c=relaxed/simple;
+	bh=s9PEzissdmP5tjxcso79iidbFGJX3Pyz9B8vKM+8ulg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nmepVCBZ+HsDDtrvFN3vzFiPwiqMWh0pCEsmTBnIy83lDglK5e1Suw5iQsKy25bmd7lWUG6ySi/pjFZzS+Yyg/j7VKVtKO/ciOSXt+UU5hJIUtv3JFgcYhFP3bzWiewZimhf9xdYY9O6UFBvw6i1Llw/fi2DX+FT06QHrCxZWYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=fg+MMG6b; arc=none smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AaKfaa1W"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3cf8e017abcso22335705ab.1
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 18:45:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740537930; x=1741142730; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZVauboCEQD0GSkm2N582o8R4XiWoEllcCs3786n3A58=;
-        b=AaKfaa1W4gPJ32GJSjv04o83Hi2olRvTSjqPnH2PttAiJ0w/Ks5EFV6uOs+TTIxs/C
-         eT3DrfJDj7U4urFUGa40e622h92Sb5puofSJBDDlFL/pB5Yzre5UWCuOsvswOGL9UQFd
-         b6p/dewP5Pwez7v1YxCU6+v56wfyp6rg8sDJm+CZr/keZdB+PJIk2kqEEWSqCgmOufq9
-         k/B0cv+NAw0/zo51/pmGmEFsBsY8AdZ6Y4bYP4hoHKo6J3TSKE6KxnuR99NDXh8aJrXy
-         NYtAt1zkQ0RWRPOzn4dif8ozsvAzEWyNsf/FGr4MvwugPCBJMrnrOKbnbasDYUmDFi1w
-         yw6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740537930; x=1741142730;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZVauboCEQD0GSkm2N582o8R4XiWoEllcCs3786n3A58=;
-        b=HQ6G91GZlcSuil2Fn45wk+d3LX2DjPOdcOtzyy+3XVZxqrtrQk2P5vibp2LLPCZp0S
-         Ca/Wy/OD2rSMVzUiUMOsWmppNZLq7DGlWy4PbhVKXkD0nZ3gb4wdiBCKPIAdxArdPMdG
-         SoaDQCIV94DZvhkYIwN3WB2pNuH1TbWOdvjrrhqui26P2Ng2Nl+2dsAm5uP604Ab8HZQ
-         nqGV486O55TC/6/JuX2QP2qph89LkXtqca6K9g1HPys3pL9Rd2O0DGbRmlsiSx31f20j
-         uYKcK3FzsXk0Gqjz0H3JlUIYZ2xWTrpAgpueLwI61CChT9QGTrIhlXSDidgdBQMEOzAD
-         5BVw==
-X-Gm-Message-State: AOJu0YyyGRprFkd2f7tu1pKYgxpp+JOQtcReIAWL1/xs89ylV89gliXA
-	4t1IqQs3GhylKB36nRETdlAhIwwAjoczdXoBMqdetyVlw2nJmzNl4dM5GyNE+CvCyuI5HEhOS/a
-	z
-X-Gm-Gg: ASbGncsGXXbmGj04clLjADzz8aG0jYUHEi9EGNrKrROAsDuhLT9iRlLbwGOk2ceYHoj
-	iqJaWjPFvlgHJj9SVmVeTIOXnrCSTLKEbOEDE3+k/iRcwps40SNaWAxr1ak5CUgwZ3qe5ZWi95T
-	9lXbydIK/bXGgADHvn1UTqK8wf95iv1bUrSxuu3IuSsou1kH/2LQhykic1a2BWbVmqzSd1jqa4G
-	46YfQm30AdEgxg1tmhPoQ0GLs4tC5GiaV4yuMhnYMmVuLvOUGFFm41TySAa76nVFa4gHxQRjgNs
-	YqTMXeC3LdXxneJF0Q==
-X-Google-Smtp-Source: AGHT+IHxSSIivA05VD61veW5lbj8YBxRnnzf9wH7zFYiR8aL8y1W7SKHXU5JcXzikTzo+i0cyuoOyQ==
-X-Received: by 2002:a05:6e02:388e:b0:3d3:d132:2cf3 with SMTP id e9e14a558f8ab-3d3d1322ee7mr25933955ab.7.1740537930533;
-        Tue, 25 Feb 2025 18:45:30 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f047514fbfsm684013173.100.2025.02.25.18.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 18:45:29 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-Cc: Jorgen Hansen <Jorgen.Hansen@wdc.com>
-In-Reply-To: <20250214041434.82564-1-dlemoal@kernel.org>
-References: <20250214041434.82564-1-dlemoal@kernel.org>
-Subject: Re: [PATCH] block: Remove zone write plugs when handling native
- zone append writes
-Message-Id: <174053792948.2207090.6341081854722602259.b4-ty@kernel.dk>
-Date: Tue, 25 Feb 2025 19:45:29 -0700
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fg+MMG6b"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1740550823; x=1772086823;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=s9PEzissdmP5tjxcso79iidbFGJX3Pyz9B8vKM+8ulg=;
+  b=fg+MMG6bIOSRfkoNjY62GytQcxMLeZFwnfREnBkZFSKhQn7RPNctpqK9
+   8gTxczT0QOvmOZmfQmpNCuYh4EB6fPKTdmpcOBpGSM4JhGPuRbrCSmt/S
+   YuPSqaTSdtGHpzW+uFr1MTBh3WdC7Bkwllz+BmQU8qK6aT/5wI3+KshIo
+   VX2SuDX/YFBVADn4YaRw5iQ+TA8b9PpancxO4GwxnKoRojOvKqu7wqvAu
+   kz7rBSGyyL+ZLYlVyIATIRA8yTccOD7f1i+NEHsNlnOilUYnPLC5J27kM
+   8EBzynkLp0IDGw1vK6Bg6wIA5kkjlODmiYCnTM4BID8QedTmSfBThR3wz
+   A==;
+X-CSE-ConnectionGUID: x5ftM4I4TjSb+br7YyBYgQ==
+X-CSE-MsgGUID: hV9sl8x/TqqFxZAXsJPaAA==
+X-IronPort-AV: E=Sophos;i="6.13,316,1732550400"; 
+   d="scan'208";a="39464584"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Feb 2025 14:20:16 +0800
+IronPort-SDR: 67bea4dc_Nf2y/rbAELAkgijSbP7AkW4AzFECYNxSjgdrQ3fk7tO4iuj
+ D9AzfyhdrIyY31D81N5UxOnPpMreTQpJdfitR4Q==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Feb 2025 21:21:33 -0800
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 25 Feb 2025 22:20:16 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] zbd/012: avoid fio stop by I/O scheduler set failure
+Date: Wed, 26 Feb 2025 15:20:15 +0900
+Message-ID: <20250226062015.1620612-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-94c79
+Content-Transfer-Encoding: 8bit
 
+The test case zbd/012 fails occasionally due to a sudden fio stop. At
+the fio stop, fio outputs the following error message:
 
-On Fri, 14 Feb 2025 13:14:34 +0900, Damien Le Moal wrote:
-> For devices that natively support zone append operations,
-> REQ_OP_ZONE_APPEND BIOs are not processed through zone write plugging
-> and are immediately issued to the zoned device. This means that there is
-> no write pointer offset tracking done for these operations and that a
-> zone write plug is not necessary.
-> 
-> However, when receiving a zone append BIO, we may already have a zone
-> write plug for the target zone if that zone was previously partially
-> written using regular write operations. In such case, since the write
-> pointer offset of the zone write plug is not incremented by the amount
-> of sectors appended to the zone, 2 issues arise:
-> 1) we risk leaving the plug in the disk hash table if the zone is fully
->    written using zone append or regular write operations, because the
->    write pointer offset will never reach the "zone full" state.
-> 2) Regular write operations that are issued after zone append operations
->    will always be failed by blk_zone_wplug_prepare_bio() as the write
->    pointer alignment check will fail, even if the user correctly
->    accounted for the zone append operations and issued the regular
->    writes with a correct sector.
-> 
-> [...]
+ fio: unable to set io scheduler to none
+ fio: pid=119786, err=22/file:backend.c:1485, func=iosched_switch, error=Invalid argument
 
-Applied, thanks!
+The test case specifies --scheduler=none option to the fio command. At
+the workload start, fio sets I/O scheduler of the test target device to
+"none" by writing to the sysfs "queue/scheduler" attribute. Subsequently,
+fio verifies this action by reading the attribute, expecting to find the
+string "[none]". However, it instead finds "[mq-deadline]", leading to
+the error.
 
-[1/1] block: Remove zone write plugs when handling native zone append writes
-      commit: a6aa36e957a1bfb5341986dec32d013d23228fe1
+The test case runs another process to switch the I/O scheduler of the
+test target device between "none" and "mq-deadline" every 0.1 seconds.
+When the switch to "mq-deadline" occurs in the interim between the sysfs
+attribute write and read by fio, fio encounters the "[mq-deadline]"
+value, resulting in the error.
 
-Best regards,
+To avoid the failure, drop the --scheduler=none option from the fio
+command in the test case zbd/012. I confirmed that the test case still
+can recreate the hang with this fix, using the kernel v6.12.
+
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/zbd/012 | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/zbd/012 b/tests/zbd/012
+index 42ca351..2a93d59 100755
+--- a/tests/zbd/012
++++ b/tests/zbd/012
+@@ -59,7 +59,6 @@ test() {
+ 				--filename="${zdev}"
+ 				--iodepth="${qd}"
+ 				--ioengine="${ioengine}"
+-				--ioscheduler=none
+ 				--name="requeuing-and-queue-freezing-${qd}"
+ 				--runtime=$((${TIMEOUT:-30}/5))
+ 				--rw=randwrite
 -- 
-Jens Axboe
-
-
+2.47.0
 
