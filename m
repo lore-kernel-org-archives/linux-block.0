@@ -1,56 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A031E1DEC
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 08:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89E0258CFB
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 09:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740558871; cv=none; b=qum+sUQvmTacoLUpRAknd5VGW+XMAmYrTF/Kzn5LmpE8WRl8Nc2K0UwsD2l8fVU7Aq/v+8X9ebCpFsowyfN93Y3F63wIdYrappu0CcCJmrJSDuuBie0I9LPamn2iv1EVaSJw1CrDGQ1M3fAsD3C6q7spCZK/HAz/SCfZo9O5JtA=
+	t=1740561362; cv=none; b=HWvwHtOvu9sDXJLTG3cbyJawtuP63Hy/CCrgvu1RD1PFofsl6Q3i4tj+r0CTT3HfddKljUU4l81i4EqtrfgHploe3dSYzFHGPHJKcv5Vn4FPaKzW+F/yTJGb9kT3qgIO/dPeFxKO3EgRt+/DM/3nbCUMcVDfLHsw9IaovtyKiqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740558871; c=relaxed/simple;
-	bh=nNK3eON7sgCfOoj/gz1hzVi92eFm3usqdnxBzxGqZKY=;
+	s=arc-20240116; t=1740561362; c=relaxed/simple;
+	bh=CDKpoa6JYhdNvryR/KXhQpYi2Cao8mIK0AzdB0jv3no=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aN6roxFCbLf0kkfCQNkBYPoxeSvhpjjQfszAEsnVsU2mgFEaAYewBoAagMGlGerAMCofIsXG2Pu4puGjAYdRHz/LzjuhqwXU/8KNybipEagyrBPx9YGfoQny+GJrI7d7vKglwNo0XEt8MGZnn5jbw2/t7iQ9WDuUQNhq5VrSbbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWqftYYp; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCS2vUKH+CjVDXUe8y7JC0VeWcBn81eJuf1W+Kc6CoitObkKyGD4M/hCubgssH+3yBn50NkoclAoJ4WpVgtNOo97hFn13Eu83T4rmNzepJ0jh7XV2+Dmpk9sUzx8JdVGu1DTJYymlZ1Mz2hcR9MuFLkNfQyfyUiqjIuJ1gsYZWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y6T+7QkX; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWqftYYp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6T+7QkX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740558867;
+	s=mimecast20190719; t=1740561359;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fImwG0gjP1kPfa1qAhDHGLxTqLh4BuZ+7fvJaclJjHc=;
-	b=iWqftYYpSPtqKKsIo5E1qK+YDk3/lyMIIlB4tvClZtYnNx9GdJbGoZ+0KfKrJ1bWbTfWkC
-	kwmLtM5ER3GNivLTo4DMMgHUg7jtWOzbgEdtjES8ZB4ea6apN/FIBzc7P7KI1pd05ByArj
-	24IF3YQYfBXNRFKQjz9fhJsktjUkCeQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=XojtBCcr5w0szdy1IeAG4QZH1lkn1vekvukihxM9RAk=;
+	b=Y6T+7QkXkxjQEmpTFQXpleuaEk3VGgodyg4FIxHSdvGxGJ/tAOLQW6ZgRK1fYhm3JpnnZA
+	yIZKzRyS1uOAeVCl1CXQCMD53HO9uDq8NGoiqNhUn93b80RgPO0aUKB5A4ld/PQBXWp+iD
+	2ne8Blx8rNlKsh/xXzSq5RnSBuoiVJA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-eLi501WYORugUbouz1XuFw-1; Wed,
- 26 Feb 2025 03:34:23 -0500
-X-MC-Unique: eLi501WYORugUbouz1XuFw-1
-X-Mimecast-MFC-AGG-ID: eLi501WYORugUbouz1XuFw_1740558862
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-d5N_Dd6iMXi-VpZZyq1Rgg-1; Wed,
+ 26 Feb 2025 04:15:56 -0500
+X-MC-Unique: d5N_Dd6iMXi-VpZZyq1Rgg-1
+X-Mimecast-MFC-AGG-ID: d5N_Dd6iMXi-VpZZyq1Rgg_1740561355
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00E4519373DC;
-	Wed, 26 Feb 2025 08:34:22 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 011B4196E078;
+	Wed, 26 Feb 2025 09:15:55 +0000 (UTC)
 Received: from fedora (unknown [10.72.120.27])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 226E11800352;
-	Wed, 26 Feb 2025 08:34:12 +0000 (UTC)
-Date: Wed, 26 Feb 2025 16:34:06 +0800
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E71EB300018D;
+	Wed, 26 Feb 2025 09:15:49 +0000 (UTC)
+Date: Wed, 26 Feb 2025 17:15:43 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, vgoyal@redhat.com,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH] blk-throttle: fix lower bps rate by throtl_trim_slice()
-Message-ID: <Z77R_rqgDdAvFVgP@fedora>
-References: <20250226011627.242912-1-yukuai1@huaweicloud.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: complete command synchronously on error
+Message-ID: <Z77bv8CNoPiwaf1o@fedora>
+References: <20250225212456.2902549-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,103 +58,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250226011627.242912-1-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250225212456.2902549-1-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Feb 26, 2025 at 09:16:27AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Tue, Feb 25, 2025 at 02:24:55PM -0700, Caleb Sander Mateos wrote:
+> In case of an error, ublk's ->uring_cmd() functions currently return
+> -EIOCBQUEUED and immediately call io_uring_cmd_done(). -EIOCBQUEUED and
+> io_uring_cmd_done() are intended for asynchronous completions. For
+> synchronous completions, the ->uring_cmd() function can just return the
+> negative return code directly. This skips io_uring_cmd_del_cancelable(),
+> and deferring the completion to task work. So return the error code
+> directly from __ublk_ch_uring_cmd() and ublk_ctrl_uring_cmd().
 > 
-> The bio submission time may be a few jiffies more than the expected
-> waiting time, due to 'extra_bytes' can't be divided in
-> tg_within_bps_limit(), and also due to timer wakeup delay. In this
-> case, adjust slice_start to jiffies will discard the extra wait time,
-> causing lower rate than expected.
+> Update ublk_ch_uring_cmd_cb(), which currently ignores the return value
+> from __ublk_ch_uring_cmd(), to call io_uring_cmd_done() for synchronous
+> completions.
 > 
-> This problem will cause blktests throtl/001 failure in case of
-> CONFIG_HZ_100=y, fix it by preserving one finished slice in
-> throtl_trim_slice() and allowing deviation between [0, 2 slices).
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-I think it only can cover single default slice deviation, since
-throtl_trim_slice() just keeps dispatch data in the previous single
-default slice. Or can you add words on how to allow 2 default slices
-deviation?
-
-> 
-> For example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
-> slice is 20ms(2 jiffies), expected rate is 1000 / 1000 * 20 = 20 bytes
-> per slice.
-> 
-> If user issues two 21 bytes IO, then wait time will be 30ms for the
-> first IO:
-> 
-> bytes_allowed = 20, extra_bytes = 1;
-> jiffy_wait = 1 + 2 = 3 jiffies
-> 
-> and consider
-> extra 1 jiffies by timer, throtl_trim_slice() will be called at:
-> 
-> jiffies = 40ms
-> slice_start = 0ms, slice_end= 40ms
-> bytes_disp = 21
-> 
-> In this case, before the patch, real rate in the first two slices is
-> 10.5 bytes per slice, and slice will be updated to:
-> 
-> jiffies = 40ms
-> slice_start = 40ms, slice_end = 60ms,
-> bytes_disp = 0;
-> 
-> Hence the second IO will have to wait another 30ms;
-> 
-> With the patch, the real rate in the first slice is 20 bytes per slice,
-> which is the same as expected, and slice will be updated:
-> 
-> jiffies=40ms,
-> slice_start = 20ms, slice_end = 60ms,
-> bytes_disp = 1;
-> 
-> And now, there is still 19 bytes allowed in the second slice, and the
-> second IO will only have to wait 10ms;
-> 
-> Fixes: e43473b7f223 ("blkio: Core implementation of throttle policy")
-> Reported-by: Ming Lei <ming.lei@redhat.com>
-> Closes: https://lore.kernel.org/linux-block/20250222092823.210318-3-yukuai1@huaweicloud.com/
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/blk-throttle.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 8d149aff9fd0..cb472cf7b6b6 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -599,14 +599,23 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
->  	 * sooner, then we need to reduce slice_end. A high bogus slice_end
->  	 * is bad because it does not allow new slice to start.
->  	 */
-> -
->  	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
->  
->  	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
->  				 tg->td->throtl_slice);
-> -	if (!time_elapsed)
-> +	/* Don't trim slice until at least 2 slices are used */
-> +	if (time_elapsed < tg->td->throtl_slice * 2)
->  		return;
->  
-> +	/*
-> +	 * The bio submission time may be a few jiffies more than the expected
-> +	 * waiting time, due to 'extra_bytes' can't be divided in
-> +	 * tg_within_bps_limit(), and also due to timer wakeup delay. In this
-> +	 * case, adjust slice_start to jiffies will discard the extra wait time,
-> +	 * causing lower rate than expected. Therefore, one slice is preserved,
-> +	 * allowing deviation that is less than two slices.
-> +	 */
-> +	time_elapsed -= tg->td->throtl_slice;
-
-Please document that default slice window size is doubled actually in
-this way.
-
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 Thanks,
 Ming
