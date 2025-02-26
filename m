@@ -1,211 +1,107 @@
-Received: from smtp.smtpout.orange.fr (smtp-65.smtpout.orange.fr [80.12.242.65])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91EF1E1DF8;
-	Wed, 26 Feb 2025 08:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78834224228
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 08:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740557496; cv=none; b=gQQwKZqBkZcBk/KDWg9OuaWXa6uejj8HSbP9sr1fBFpY87RPl04EIf3XYq0lKwXWQK2X4hEkxOewzCIAJlTN780ruVw8O33PoEQqbrHAfbnhLXHacKdHG+dBQEHazdgeVgGYNNVD//VIyhCJnwYlPsOBm6KpniG56wRtD72pAQg=
+	t=1740557517; cv=none; b=FXUDn+kPcszP0Jc5mYLv6vQx8zbLYE65SaqhNFpSzcbJqxSccoCecdRv0U/govMov8R9ny4SJsZU17cHYPsyDexCxY/10rgWRnaB0ke7jRBhnG4r2U6VuGf7iDSvjqDHnMJeVtSti4KmLWnk+IwHVkN3V61keWhgNeYJmJ+TIMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740557496; c=relaxed/simple;
-	bh=awSOf5Uptv5ylK84gNxEQtXQbjceSW4sC06B5EGXwTo=;
-	h=Message-ID:Date:MIME-Version:Subject:References:From:Cc:To:
-	 In-Reply-To:Content-Type; b=UARJ0LvEX9I2lRuv9JPsmI0Pz0FR1j2BbDtjUsvZI+zxm3JIxy1WmYxBA7xL8TK39G5ecAxv6W8vkoD2GvKWNnhtAXmxka+Y4lhm8r43OKbLlv2G8tAUao2Xkc4kqU0HI4KCuMdWKWTEEOI7VGf+JjGC7F1jRRPnVsUvtbGh4EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=eN5Aq4eo; arc=none smtp.client-ip=80.12.242.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1740557517; c=relaxed/simple;
+	bh=thYh+kh7bmm/Oc94RL2kLofYZlOwZzJbL65XyKbsJuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kgw+FtEe/JWMlbLc5NxqjtYMOrd85WaiRWViQQbwUb9QVupMo2pB96dZ4ABbggBoU65eKlfwn3sj+ttuEEBUdfDSB/knaGkoVwhIrwLl0iOWE8qQoc9WzKTGmLsTSpaKXVN9WmYkh1b8yE6/tBcL50dPybo06A11CrUOQTWpXhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R/1IKAFH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="eN5Aq4eo"
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id nCUZttGc7xgLFnCUctj4sa; Wed, 26 Feb 2025 09:10:22 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1740557422;
-	bh=ZqGB3dHEkHXDAW5t23ZRy/tk7CvQyYHBVX5yXFeysoI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To;
-	b=eN5Aq4eovmdL2fTfqQhqmyNlSDtRmJIyRo9BV90ujHdViAKnbjtHr7qbLtUGcLRlZ
-	 sm6a7gFroiFb3USkdQ363fe5J2nBAhWrC7vKq9Gr98LlhArejaCxQtmS/g1lQfI49r
-	 0aIAOKfoRo4tNDooG9At7xMG826jfO8nyaZlknhJmJI7Jeype1X6hRb1E9umLPEZG2
-	 XbWU654Orv/crOsdG/XuK2GvaB+YBDki8U4i31RNmbRUpE2c+df/ckkinYznub6VnQ
-	 yhVMeiNx7yCwm+qgQ83RKYb4GoAOEUYS84Jpg4YkW7VlX71dQkYv0MO6jlmI4MTa2U
-	 +sFJCwiWciqJQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 26 Feb 2025 09:10:22 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <7b8346a1-8a7d-4fcf-a026-119d77f2ca85@wanadoo.fr>
-Date: Wed, 26 Feb 2025 09:10:07 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/1IKAFH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740557514;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Vgs1HUfMfS7u6IO6Rd6mvAHnQHEYNah2vIPRERXqkZ4=;
+	b=R/1IKAFHHvvNx40GnwvMNCbruhaIvsIz8LBsy6lzcFF3o4EvtHT/B9HKw0LPJNtzNyrmgm
+	Ghn6VaDAM8Qd8MMUJusWYKiMpbh2+er2tKX6MDHvas9sNj+SA8ErnPcimOs0+w2vWukmhJ
+	myXyQnnNa7GJt51RcUGRmZpVOii2No8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-563-eRZJ6sUWPXiup3tA418EIg-1; Wed,
+ 26 Feb 2025 03:11:48 -0500
+X-MC-Unique: eRZJ6sUWPXiup3tA418EIg-1
+X-Mimecast-MFC-AGG-ID: eRZJ6sUWPXiup3tA418EIg_1740557508
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F4881800264;
+	Wed, 26 Feb 2025 08:11:47 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.27])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DAFE41800367;
+	Wed, 26 Feb 2025 08:11:44 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/3] selftests: add ublk selftests
+Date: Wed, 26 Feb 2025 16:11:31 +0800
+Message-ID: <20250226081136.2410001-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/16] rbd: convert timeouts to secs_to_jiffies()
-References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
- <20250225-converge-secs-to-jiffies-part-two-v3-6-a43967e36c88@linux.microsoft.com>
- <e53d7586-b278-4338-95a2-fa768d5d8b5e@wanadoo.fr>
- <CAPjX3Fcr+BoMRgZGbqqgpF+w-sHU+SqGT8QJ3QCp8uvJbnaFsQ@mail.gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Frank.Li@nxp.com, James.Bottomley@hansenpartnership.com,
- Julia.Lawall@inria.fr, Shyam-sundar.S-k@amd.com, akpm@linux-foundation.org,
- axboe@kernel.dk, broonie@kernel.org, cassel@kernel.org, cem@kernel.org,
- ceph-devel@vger.kernel.org, christophe.jaillet@wanadoo.fr, clm@fb.com,
- cocci@inria.fr, dick.kennedy@broadcom.com, djwong@kernel.org,
- dlemoal@kernel.org, dongsheng.yang@easystack.cn,
- dri-devel@lists.freedesktop.org, dsterba@suse.com,
- eahariha@linux.microsoft.com, festevam@gmail.com, hch@lst.de,
- hdegoede@redhat.com, hmh@hmh.eng.br, ibm-acpi-devel@lists.sourceforge.net,
- idryomov@gmail.com, ilpo.jarvinen@linux.intel.com, imx@lists.linux.dev,
- james.smart@broadcom.com, jgg@ziepe.ca, josef@toxicpanda.com,
- kalesh-anakkur.purayil@broadcom.com, kbusch@kernel.org,
- kernel@pengutronix.de, leon@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-xfs@vger.kernel.org,
- martin.petersen@oracle.com, nicolas.palix@imag.fr, ogabbay@kernel.org,
- perex@perex.cz, platform-driver-x86@vger.kernel.org, s.hauer@pengutronix.de,
- sagi@grimberg.me, selvin.xavier@broadcom.com, shawnguo@kernel.org,
- sre@kernel.org, tiwai@suse.com, xiubli@redhat.com, yaron.avizrat@intel.com
-To: neelx@suse.com
-In-Reply-To: <CAPjX3Fcr+BoMRgZGbqqgpF+w-sHU+SqGT8QJ3QCp8uvJbnaFsQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Le 26/02/2025 à 08:28, Daniel Vacek a écrit :
-> On Tue, 25 Feb 2025 at 22:10, Christophe JAILLET
-> <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org> wrote:
->>
->> Le 25/02/2025 à 21:17, Easwar Hariharan a écrit :
->>> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
->>> secs_to_jiffies().  As the value here is a multiple of 1000, use
->>> secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplication
->>>
->>> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
->>> the following Coccinelle rules:
->>>
->>> @depends on patch@ expression E; @@
->>>
->>> -msecs_to_jiffies(E * 1000)
->>> +secs_to_jiffies(E)
->>>
->>> @depends on patch@ expression E; @@
->>>
->>> -msecs_to_jiffies(E * MSEC_PER_SEC)
->>> +secs_to_jiffies(E)
->>>
->>> While here, remove the no-longer necessary check for range since there's
->>> no multiplication involved.
->>
->> I'm not sure this is correct.
->> Now you multiply by HZ and things can still overflow.
-> 
-> This does not deal with any additional multiplications. If there is an
-> overflow, it was already there before to begin with, IMO.
-> 
->> Hoping I got casting right:
-> 
-> Maybe not exactly? See below...
-> 
->> #define MSEC_PER_SEC    1000L
->> #define HZ 100
->>
->>
->> #define secs_to_jiffies(_secs) (unsigned long)((_secs) * HZ)
->>
->> static inline unsigned long _msecs_to_jiffies(const unsigned int m)
->> {
->>          return (m + (MSEC_PER_SEC / HZ) - 1) / (MSEC_PER_SEC / HZ);
->> }
->>
->> int main() {
->>
->>          int n = INT_MAX - 5;
->>
->>          printf("res  = %ld\n", secs_to_jiffies(n));
->>          printf("res  = %ld\n", _msecs_to_jiffies(1000 * n));
-> 
-> I think the format should actually be %lu giving the below results:
-> 
-> res  = 18446744073709551016
-> res  = 429496130
-> 
-> Which is still wrong nonetheless. But here, *both* results are wrong
-> as the expected output should be 214748364200 which you'll get with
-> the correct helper/macro.
-> 
-> But note another thing, the 1000 * (INT_MAX - 5) already overflows
-> even before calling _msecs_to_jiffies(). See?
+Hello Guys,
 
-Agreed and intentional in my test C code.
+The 1st patch adds one ublk utility and one entry test.
 
-That is the point.
+The 2nd patch adds test over file backed ublk.
 
-The "if (result.uint_32 > INT_MAX / 1000)" in the original code was 
-handling such values.
+The 3rd patch adds test for ublk zero copy.
 
-> 
-> Now, you'll get that mentioned correct result with:
-> 
-> #define secs_to_jiffies(_secs) ((unsigned long)(_secs) * HZ)
+How to run:
 
-Not looked in details, but I think I would second on you on this, in 
-this specific example. Not sure if it would handle all possible uses of 
-secs_to_jiffies().
+	- make install
+	- make headers_install INSTALL_HDR_PATH=/usr
+	- reboot
+	- make -C tools/testing/selftests TARGETS=ublk run_test
 
-But it is not how secs_to_jiffies() is defined up to now. See [1].
+Thanks,
 
-[1]: 
-https://elixir.bootlin.com/linux/v6.14-rc4/source/include/linux/jiffies.h#L540
+Ming Lei (3):
+  selftests: ublk: add kernel selftests for ublk
+  selftests: ublk: add file backed ublk
+  selftests: ublk: add ublk zero copy test
 
-> 
-> Still, why unsigned? What if you wanted to convert -5 seconds to jiffies?
+ MAINTAINERS                                  |    1 +
+ tools/testing/selftests/Makefile             |    1 +
+ tools/testing/selftests/ublk/.gitignore      |    3 +
+ tools/testing/selftests/ublk/Makefile        |   14 +
+ tools/testing/selftests/ublk/config          |    1 +
+ tools/testing/selftests/ublk/kublk.c         | 1671 ++++++++++++++++++
+ tools/testing/selftests/ublk/test_common.sh  |  112 ++
+ tools/testing/selftests/ublk/test_loop_01.sh |   30 +
+ tools/testing/selftests/ublk/test_loop_02.sh |   21 +
+ tools/testing/selftests/ublk/test_loop_03.sh |   32 +
+ tools/testing/selftests/ublk/test_null_01.sh |   18 +
+ 11 files changed, 1904 insertions(+)
+ create mode 100644 tools/testing/selftests/ublk/.gitignore
+ create mode 100644 tools/testing/selftests/ublk/Makefile
+ create mode 100644 tools/testing/selftests/ublk/config
+ create mode 100644 tools/testing/selftests/ublk/kublk.c
+ create mode 100755 tools/testing/selftests/ublk/test_common.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_01.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_02.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_03.sh
+ create mode 100755 tools/testing/selftests/ublk/test_null_01.sh
 
-See commit bb2784d9ab495 which added the cast.
+-- 
+2.47.0
 
-> 
->>          return 0;
->> }
->>
->>
->> gives :
->>
->> res  = -600
->> res  = 429496130
->>
->> with msec, the previous code would catch the overflow, now it overflows
->> silently.
-> 
-> What compiler options are you using? I'm not getting any warnings.
-
-I mean, with:
-	if (result.uint_32 > INT_MAX / 1000)
-		goto out_of_range;
-the overflow would be handled *at runtime*.
-
-Without such a check, an unexpected value could be stored in 
-opt->lock_timeout.
-
-I think that a test is needed and with secs_to_jiffies(), I tentatively 
-proposed:
-	if (result.uint_32 > INT_MAX / HZ)
-		goto out_of_range;
-
-CJ
-
-> 
->> untested, but maybe:
->>          if (result.uint_32 > INT_MAX / HZ)
->>                  goto out_of_range;
->>
->> ?
->>
->> CJ
->>
-
-...
