@@ -1,102 +1,242 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4222C25D537
-	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 06:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89AA33997
+	for <linux-block@vger.kernel.org>; Wed, 26 Feb 2025 07:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740550825; cv=none; b=LdceSQpLiThypZ69zhbkWzduW+BdDQbefGCEo3XkTc7+fC8VAV17G6On4BxBLW/DsmGuIpIQClkPuSF0VfbSRcOQ/1NW+4/G8tMvSxqjNAayS/p0cC2T7fCXI9pbXuP50zuDNwqwp2fY84yD6XBlCUdq77YVzUsfXsQqs00S1r0=
+	t=1740554943; cv=none; b=rSUig09h6Bss8rSCpNsPAbDxuuBPtw/S6CquYMTRPUxvmFcjapkzjGtg/J+Eol0SM6nlQnPhlM86SzmVVJ2Hj+cwshcgNnwWyGQV48aDxbC8ZwHMqGBJE14nmG8rE4DW2fqkgqV56JG4MzjYMtUyftcjJpuML2Dbjxavt16vyYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740550825; c=relaxed/simple;
-	bh=s9PEzissdmP5tjxcso79iidbFGJX3Pyz9B8vKM+8ulg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nmepVCBZ+HsDDtrvFN3vzFiPwiqMWh0pCEsmTBnIy83lDglK5e1Suw5iQsKy25bmd7lWUG6ySi/pjFZzS+Yyg/j7VKVtKO/ciOSXt+UU5hJIUtv3JFgcYhFP3bzWiewZimhf9xdYY9O6UFBvw6i1Llw/fi2DX+FT06QHrCxZWYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=fg+MMG6b; arc=none smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1740554943; c=relaxed/simple;
+	bh=6zbN5jOaaksOEj+lbfcyYF58FVbBR2uEiZ1U9Xm0Q7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MKtw7E30jVvebcV3AEZTQS9lWypdu075VOwLJLeMjV+8LCnebNupyuaGEegmr6xBE1po0MkQB8BAcsOUgvSOqdEPRvuIpjnH+dHqf6jfFO8cJE2ZScq6L3cf9y8rkroxBoHb1ZROyfw/sGKvZLKc8ldgy/FVnOY+Q+CNtAUpSPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DPnzDNfL; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fg+MMG6b"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1740550823; x=1772086823;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=s9PEzissdmP5tjxcso79iidbFGJX3Pyz9B8vKM+8ulg=;
-  b=fg+MMG6bIOSRfkoNjY62GytQcxMLeZFwnfREnBkZFSKhQn7RPNctpqK9
-   8gTxczT0QOvmOZmfQmpNCuYh4EB6fPKTdmpcOBpGSM4JhGPuRbrCSmt/S
-   YuPSqaTSdtGHpzW+uFr1MTBh3WdC7Bkwllz+BmQU8qK6aT/5wI3+KshIo
-   VX2SuDX/YFBVADn4YaRw5iQ+TA8b9PpancxO4GwxnKoRojOvKqu7wqvAu
-   kz7rBSGyyL+ZLYlVyIATIRA8yTccOD7f1i+NEHsNlnOilUYnPLC5J27kM
-   8EBzynkLp0IDGw1vK6Bg6wIA5kkjlODmiYCnTM4BID8QedTmSfBThR3wz
-   A==;
-X-CSE-ConnectionGUID: x5ftM4I4TjSb+br7YyBYgQ==
-X-CSE-MsgGUID: hV9sl8x/TqqFxZAXsJPaAA==
-X-IronPort-AV: E=Sophos;i="6.13,316,1732550400"; 
-   d="scan'208";a="39464584"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Feb 2025 14:20:16 +0800
-IronPort-SDR: 67bea4dc_Nf2y/rbAELAkgijSbP7AkW4AzFECYNxSjgdrQ3fk7tO4iuj
- D9AzfyhdrIyY31D81N5UxOnPpMreTQpJdfitR4Q==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Feb 2025 21:21:33 -0800
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 25 Feb 2025 22:20:16 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] zbd/012: avoid fio stop by I/O scheduler set failure
-Date: Wed, 26 Feb 2025 15:20:15 +0900
-Message-ID: <20250226062015.1620612-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DPnzDNfL"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aaec111762bso484832766b.2
+        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2025 23:29:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1740554939; x=1741159739; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jy5UzyKzocsSx5cSXomfjfFL//CTemBkcuebkephmC0=;
+        b=DPnzDNfLR7XZTTtbDw+DuW1lx1StRSsipS09fizN5cRrJGW7tcTHqO5NSG7xYdoHX2
+         o6tzx9bfAow0wJAO8wvFqoZHbs4mPyUkYNJ6p4x4X2XVpneFKc09+/l/Yb7I0rXWNvZf
+         59PADbwRVs1Z2Ld7EANg+3GvujiSVL9sTJFNAfRUgh+fg6qGE9wORi/b9D6BsDA1wVBw
+         nERAEUIHLAgGAaFUFnLURjg/tr13IDXYc82dy/A6pzvk+xS3FFlJBWRs/jLhn1DVfYvd
+         oBGL2zkNNM7XMhVb58ZA7Zr8kDt7ripM7lDqQoP5adxc4THLPzMH4Ps/LDy2jBnSEDqQ
+         ZvWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740554939; x=1741159739;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jy5UzyKzocsSx5cSXomfjfFL//CTemBkcuebkephmC0=;
+        b=UcxUa1sa3YIpY+jgvIiCw1gLLSSrdQPQTbk2huD0hh8OyciAad/BiN1P94Ll2Y6uWi
+         UlfdMe2YDX4wcNSQLfJk7hX463KqgNUt4r25RS39uO9TrP5jSXUD3VzrLzo+iLL9jAB5
+         QfNfDO82cJehKuqnlGYOryjZtgqNLsfb6o38q1p5uIcm0vzlAiZDKNdA0ryUB/Yooq1R
+         uDMyHo5XiElsq8ZSscDrELBWQKga3PNuJj+a4s1ULGNcNI5hfNhV3SeJzl9SjnBxZHi3
+         HsgCmZjcl5GXgkXGADfJ2SDKd9SA52OCC+naqKC1Q+wjozH5huhqEUXC6jpmJw7wDDYG
+         d0JA==
+X-Forwarded-Encrypted: i=1; AJvYcCUolHVmyD599AG9obZwQRvltucwOwI7UdjVxj/BhKSuBbSca79X5hWysm2w4yRee5q7AutEK2z0doO1ew==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwahxJctkuoyH0ezaaUQH62FqwVJhRWynSEK5fVKdpMLpdNQnOF
+	02wid5D0oWj+vYzCE5zlyjHrECYwFV37Qw73NCfxphs5D/u74Yjxk0sktK8rmQvWRgoNb4EtH63
+	SRYyZDbOxSxE48lDli1BrgWNO22BHKXHKDNURwQ==
+X-Gm-Gg: ASbGnctmp2pt/wJ/pH0LNI4sIUl2yE0kEIO35sWyjnTxhcU39txhP4InA8UN/ozKKKW
+	k2kwuzdXB+ihdxS0A0Ey4gW+EeuunUnYSBy6qSgZt7CcU91QprS6US50n//97yx74ybhX33GJQZ
+	IHt/pnxQ==
+X-Google-Smtp-Source: AGHT+IFYP8Tba+z3P6zhrfLVohTtXs/BwRHQBKKRVXu59ZSzqEPbWtjoPmnK2n59Ee5Tugvqu0RIdPnu12lt6iEjWaU=
+X-Received: by 2002:a17:906:18b1:b0:ab6:ed8a:601f with SMTP id
+ a640c23a62f3a-abeeed1123amr202024966b.12.1740554939189; Tue, 25 Feb 2025
+ 23:28:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
+ <20250225-converge-secs-to-jiffies-part-two-v3-6-a43967e36c88@linux.microsoft.com>
+ <e53d7586-b278-4338-95a2-fa768d5d8b5e@wanadoo.fr>
+In-Reply-To: <e53d7586-b278-4338-95a2-fa768d5d8b5e@wanadoo.fr>
+From: Daniel Vacek <neelx@suse.com>
+Date: Wed, 26 Feb 2025 08:28:48 +0100
+X-Gm-Features: AQ5f1JpekOKemtGu2BHsnbGs6fr563e7jHjxxRB5HZ2bESNce9YNZRbPCIKk9Cc
+Message-ID: <CAPjX3Fcr+BoMRgZGbqqgpF+w-sHU+SqGT8QJ3QCp8uvJbnaFsQ@mail.gmail.com>
+Subject: Re: [PATCH v3 06/16] rbd: convert timeouts to secs_to_jiffies()
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>, Frank.Li@nxp.com, 
+	James.Bottomley@hansenpartnership.com, Julia.Lawall@inria.fr, 
+	Shyam-sundar.S-k@amd.com, akpm@linux-foundation.org, axboe@kernel.dk, 
+	broonie@kernel.org, cassel@kernel.org, cem@kernel.org, 
+	ceph-devel@vger.kernel.org, clm@fb.com, cocci@inria.fr, 
+	dick.kennedy@broadcom.com, djwong@kernel.org, dlemoal@kernel.org, 
+	dongsheng.yang@easystack.cn, dri-devel@lists.freedesktop.org, 
+	dsterba@suse.com, festevam@gmail.com, hch@lst.de, hdegoede@redhat.com, 
+	hmh@hmh.eng.br, ibm-acpi-devel@lists.sourceforge.net, idryomov@gmail.com, 
+	ilpo.jarvinen@linux.intel.com, imx@lists.linux.dev, james.smart@broadcom.com, 
+	jgg@ziepe.ca, josef@toxicpanda.com, kalesh-anakkur.purayil@broadcom.com, 
+	kbusch@kernel.org, kernel@pengutronix.de, leon@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-ide@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	martin.petersen@oracle.com, nicolas.palix@imag.fr, ogabbay@kernel.org, 
+	perex@perex.cz, platform-driver-x86@vger.kernel.org, s.hauer@pengutronix.de, 
+	sagi@grimberg.me, selvin.xavier@broadcom.com, shawnguo@kernel.org, 
+	sre@kernel.org, tiwai@suse.com, xiubli@redhat.com, yaron.avizrat@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The test case zbd/012 fails occasionally due to a sudden fio stop. At
-the fio stop, fio outputs the following error message:
+On Tue, 25 Feb 2025 at 22:10, Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> Le 25/02/2025 =C3=A0 21:17, Easwar Hariharan a =C3=A9crit :
+> > Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> > secs_to_jiffies().  As the value here is a multiple of 1000, use
+> > secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplica=
+tion
+> >
+> > This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci w=
+ith
+> > the following Coccinelle rules:
+> >
+> > @depends on patch@ expression E; @@
+> >
+> > -msecs_to_jiffies(E * 1000)
+> > +secs_to_jiffies(E)
+> >
+> > @depends on patch@ expression E; @@
+> >
+> > -msecs_to_jiffies(E * MSEC_PER_SEC)
+> > +secs_to_jiffies(E)
+> >
+> > While here, remove the no-longer necessary check for range since there'=
+s
+> > no multiplication involved.
+>
+> I'm not sure this is correct.
+> Now you multiply by HZ and things can still overflow.
 
- fio: unable to set io scheduler to none
- fio: pid=119786, err=22/file:backend.c:1485, func=iosched_switch, error=Invalid argument
+This does not deal with any additional multiplications. If there is an
+overflow, it was already there before to begin with, IMO.
 
-The test case specifies --scheduler=none option to the fio command. At
-the workload start, fio sets I/O scheduler of the test target device to
-"none" by writing to the sysfs "queue/scheduler" attribute. Subsequently,
-fio verifies this action by reading the attribute, expecting to find the
-string "[none]". However, it instead finds "[mq-deadline]", leading to
-the error.
+> Hoping I got casting right:
 
-The test case runs another process to switch the I/O scheduler of the
-test target device between "none" and "mq-deadline" every 0.1 seconds.
-When the switch to "mq-deadline" occurs in the interim between the sysfs
-attribute write and read by fio, fio encounters the "[mq-deadline]"
-value, resulting in the error.
+Maybe not exactly? See below...
 
-To avoid the failure, drop the --scheduler=none option from the fio
-command in the test case zbd/012. I confirmed that the test case still
-can recreate the hang with this fix, using the kernel v6.12.
+> #define MSEC_PER_SEC    1000L
+> #define HZ 100
+>
+>
+> #define secs_to_jiffies(_secs) (unsigned long)((_secs) * HZ)
+>
+> static inline unsigned long _msecs_to_jiffies(const unsigned int m)
+> {
+>         return (m + (MSEC_PER_SEC / HZ) - 1) / (MSEC_PER_SEC / HZ);
+> }
+>
+> int main() {
+>
+>         int n =3D INT_MAX - 5;
+>
+>         printf("res  =3D %ld\n", secs_to_jiffies(n));
+>         printf("res  =3D %ld\n", _msecs_to_jiffies(1000 * n));
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/zbd/012 | 1 -
- 1 file changed, 1 deletion(-)
+I think the format should actually be %lu giving the below results:
 
-diff --git a/tests/zbd/012 b/tests/zbd/012
-index 42ca351..2a93d59 100755
---- a/tests/zbd/012
-+++ b/tests/zbd/012
-@@ -59,7 +59,6 @@ test() {
- 				--filename="${zdev}"
- 				--iodepth="${qd}"
- 				--ioengine="${ioengine}"
--				--ioscheduler=none
- 				--name="requeuing-and-queue-freezing-${qd}"
- 				--runtime=$((${TIMEOUT:-30}/5))
- 				--rw=randwrite
--- 
-2.47.0
+res  =3D 18446744073709551016
+res  =3D 429496130
 
+Which is still wrong nonetheless. But here, *both* results are wrong
+as the expected output should be 214748364200 which you'll get with
+the correct helper/macro.
+
+But note another thing, the 1000 * (INT_MAX - 5) already overflows
+even before calling _msecs_to_jiffies(). See?
+
+Now, you'll get that mentioned correct result with:
+
+#define secs_to_jiffies(_secs) ((unsigned long)(_secs) * HZ)
+
+Still, why unsigned? What if you wanted to convert -5 seconds to jiffies?
+
+>         return 0;
+> }
+>
+>
+> gives :
+>
+> res  =3D -600
+> res  =3D 429496130
+>
+> with msec, the previous code would catch the overflow, now it overflows
+> silently.
+
+What compiler options are you using? I'm not getting any warnings.
+
+> untested, but maybe:
+>         if (result.uint_32 > INT_MAX / HZ)
+>                 goto out_of_range;
+>
+> ?
+>
+> CJ
+>
+>
+> >
+> > Acked-by: Ilya Dryomov <idryomov-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.or=
+g>
+> > Signed-off-by: Easwar Hariharan <eahariha-1pm0nblsJy7Jp67UH1NAhkEOCMrvL=
+tNR@public.gmane.org>
+> > ---
+> >   drivers/block/rbd.c | 8 +++-----
+> >   1 file changed, 3 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> > index faafd7ff43d6ef53110ab3663cc7ac322214cc8c..41207133e21e9203192adf3=
+b92390818e8fa5a58 100644
+> > --- a/drivers/block/rbd.c
+> > +++ b/drivers/block/rbd.c
+> > @@ -108,7 +108,7 @@ static int atomic_dec_return_safe(atomic_t *v)
+> >   #define RBD_OBJ_PREFIX_LEN_MAX      64
+> >
+> >   #define RBD_NOTIFY_TIMEOUT  5       /* seconds */
+> > -#define RBD_RETRY_DELAY              msecs_to_jiffies(1000)
+> > +#define RBD_RETRY_DELAY              secs_to_jiffies(1)
+> >
+> >   /* Feature bits */
+> >
+> > @@ -4162,7 +4162,7 @@ static void rbd_acquire_lock(struct work_struct *=
+work)
+> >               dout("%s rbd_dev %p requeuing lock_dwork\n", __func__,
+> >                    rbd_dev);
+> >               mod_delayed_work(rbd_dev->task_wq, &rbd_dev->lock_dwork,
+> > -                 msecs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT * MSEC_PER_SE=
+C));
+> > +                 secs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT));
+> >       }
+> >   }
+> >
+> > @@ -6283,9 +6283,7 @@ static int rbd_parse_param(struct fs_parameter *p=
+aram,
+> >               break;
+> >       case Opt_lock_timeout:
+> >               /* 0 is "wait forever" (i.e. infinite timeout) */
+> > -             if (result.uint_32 > INT_MAX / 1000)
+> > -                     goto out_of_range;
+> > -             opt->lock_timeout =3D msecs_to_jiffies(result.uint_32 * 1=
+000);
+> > +             opt->lock_timeout =3D secs_to_jiffies(result.uint_32);
+> >               break;
+> >       case Opt_pool_ns:
+> >               kfree(pctx->spec->pool_ns);
+> >
+>
+>
