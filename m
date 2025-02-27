@@ -1,252 +1,124 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52D242C0B;
-	Thu, 27 Feb 2025 13:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740664423; cv=fail; b=TCO71i/zP1jScEAkxX18YuoNmUtA7swsfahPtvkeMzAoyITi6nHOngQyDzucfFELn3+vpGrhTsZ90vIbovGIhLlyqpnZ6TvjWo22lHNxetQn5ysZs7NEoriYtzv6vQXVvvbwlm7aviObNChWAN3oZHi5rQGWftEODpDXx4KFg/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740664423; c=relaxed/simple;
-	bh=AZiz1hAI855MDJC9CWK41C0DSMn3qagpxeoPFaWuAo0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PoPxeN//4I1obI6wvlF6XcRB7qH9OlLs7LFohFu3oeN+VpC4sOXtW18jiN/r2WOdCocmLj+/dF0ZsHpDC2UE5ktkkGPrA7eGmgKn6at9E1CLMzophxWS3Pl5UdhkH13iCI8BTl5y1AdWMG/JmnHHEr4HEhLN+kFuQIHE1qxT7OA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MZ9B4p1Y; arc=fail smtp.client-ip=40.107.243.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6C1248874
+	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 14:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740667590; cv=none; b=sP23PewnJDZE+Smd96TOh5FnAQkUnK7iwzMFkAXtk3tHdBoyvxNIsttMJt18pXeLFA6YclXcxkrNsrJW17ElGD66Fb5QfBfFCl210PupFOBHOiSFANELXr2SasysRLO4/UXmerjaPnQw9MM7S1m5/yezNJ/FzCojKoSEOLPiIKE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740667590; c=relaxed/simple;
+	bh=/WzRNava1wGbrF+euis7IhRCW967BKae9ei0XMNzKJw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fPhoKBz/TNomm0HKK7fGwcFEe0AXk0ieH0D75WJwv/m3A6hADnLMbTnNY6lRuEIGl559Uxv5tsNv/I8WAecQtwL0RIUjOhFYbWSbRJxqp06Bb4mqKM8zUkWTKp+BHKaXloDIPBHtMsXzYQ4H0waQDm6UtXDLDev0DZ5H20Eqij0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8//aom9; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MZ9B4p1Y"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A+IhWJxrh0q/82WqBhA/i7/5/ilJ5fab0x3X5fzqkyrKvzY14wiXCoubx61KOxVFr0hA8X6jHzDIabqgf6GfKrg428zuXlGElI5gM6wF360JrlIFvMzAkoHAcfIhF5VF73TfFUpRkGKDxVWoZmVaMT1iA153zZmRinoLwfSzezZif36P8DblKLPPViKOK/ZvMl3suduuNLSWOyTlLA4FsUhkCIp/kkChYq3NFvTBUdJYkVGar/H0LUl1oyzKdBtxl0PyvbCaPIwD0g2TIr/9vam9Hux72VP1sld5aBdct4LfjRhotEqrJych0K+pBsPN1MVAI9AIgfAldeXLY+dRxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BPnTLLrEs9FFBkQUkMLCrLimEzkDGK2CMM7DfHlRgR0=;
- b=PnvPZgxUADwHvzW8HutWpQtkXmDQBmtYnZdKZwGk9VwY/uGfcm4Y7Rm4kO90DnirR8i5DglhpgEpl8mJPMgYm0GpSJd0FY5Q6KK6LWzwoqLFekHDsiXmA7m4uNP9WKucTEaRu5se2fInt2d4hLBDsgblmZfry4SvAOHK06wpERA5RlRxDP/pHwZN60dQ6iDlco4tWFhKWmA6MDogtE+cOJxNsXR1t+e1DUKXb9jtOnn+83v5w5IqgHJGyg2O7C6b8vlnglJkyfSmk04BXbSvDmApkUirszvs7nUA1lAU8VhYxijv7wujIEcw1rLnIzXHgaEj2YZJuFFdSvBt9W5TBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BPnTLLrEs9FFBkQUkMLCrLimEzkDGK2CMM7DfHlRgR0=;
- b=MZ9B4p1Ycx+8REhHPwIZhWhWt2JevFdR+mbuTFfWTbaKIEJiFn70hpB42EE7Ibddss88YmroBy9FyMStOw/rvhBlE16KneCbxm+rygEFjKRjjHt6u9LGVjveYxCn0GKErTKeiuAf41mQIbmubvbIUflAqpSuN+A91Zo+GoILOwe+NhPDj2Cjb897Kj3b+Am7wF0Vmy7bNT/g/zmQxlFtqFPzf25JD86IVlWaIDN2dOaRlibsLQsppT/NuxKrvMmNVnwdtNTYeRv2fh4KD5PrbdBu0kC8gM2LvzawDlKQ6m5q+lspTdyc86Nm0reAsBhRmYOcYomGWbxs4wfphTfAgw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6369.namprd12.prod.outlook.com (2603:10b6:930:21::10)
- by IA0PR12MB8206.namprd12.prod.outlook.com (2603:10b6:208:403::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.22; Thu, 27 Feb
- 2025 13:53:38 +0000
-Received: from CY5PR12MB6369.namprd12.prod.outlook.com
- ([fe80::d4c1:1fcc:3bff:eea6]) by CY5PR12MB6369.namprd12.prod.outlook.com
- ([fe80::d4c1:1fcc:3bff:eea6%6]) with mapi id 15.20.8489.021; Thu, 27 Feb 2025
- 13:53:38 +0000
-Message-ID: <2d2dafdc-7a7d-44f1-8814-20eedbe220ec@nvidia.com>
-Date: Thu, 27 Feb 2025 15:53:31 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/2] virtio: Add length checks for device writable
- portions
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Cc: israelr@nvidia.com, virtualization@lists.linux.dev,
- linux-block@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
- dbenbasat@nvidia.com, smalin@nvidia.com, larora@nvidia.com,
- izach@nvidia.com, aaptel@nvidia.com, parav@nvidia.com, kvm@vger.kernel.org
-References: <20250224233106.8519-1-mgurtovoy@nvidia.com>
- <20250227081747.GE85709@fedora>
- <20250227034434-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20250227034434-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0099.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2bc::20) To CY5PR12MB6369.namprd12.prod.outlook.com
- (2603:10b6:930:21::10)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8//aom9"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5dee07e51aaso1695847a12.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 06:46:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740667587; x=1741272387; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EiRoTscXGtX3cCVM3ed5pfYsHD1AeCyjRBViPb7jDh4=;
+        b=V8//aom9crJbin6YuUJqyiu9/LhLfbWcbaxef+j1CvDPHMD+LCDvKmDXd36UMEwsNg
+         wqSHw/gH33UDz0vge5760F4Ir1OZ0B2puNKLZOHbECwVQAk40jGwhP2C5ZFF0xdeXf1I
+         jEToL2+MYQc8ywRmbSD/+nBqIiXeg3vT/GjTzzbE3fuGbpwujPJ/rK3fwSGt16spvXp1
+         6uMKwtq83TV/639L1RU5l7Mbifm2g+XRRI56KWjfsfQKxffRHhYVLO+MpdRKGl7HwO1g
+         sS0LUYGhmh4UmxkjIkXUkpReyF+wGAw1FQ8/qg7t53lW13Mc6FDxotSphJKLITDTPSLv
+         Tshw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740667587; x=1741272387;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EiRoTscXGtX3cCVM3ed5pfYsHD1AeCyjRBViPb7jDh4=;
+        b=uLCgylZSpt70bSc3dd16gh+2d9XvnYwTxPMIv6frmzVEuSjj3nT7qkd4U4ULaYtV84
+         Qyc+c2yXlrMnTyaz3MBFnacLXkeaSBiHzgmmgGRFIr2jjYTkeNLpz8NdbeOeHiOnAiZt
+         RC4ZOkdGMmbK4JsZQU7E+XpEfA1YdlCgvyemQxkA0pUU3zm6pOTcOEG7ZVpEOcEsqmdA
+         knRJLCJt6ls8tHBi5RVRUn6GtPpAL62NJ6jTbNh3ZepplBu0YE3AKkM5HlJ0Nf5FiAKj
+         SfUmwxvPws01twn/hoXSASOZd1TKZ61wAFsMVPsSJ4fP91yCKajBCO/bs7fD/F8EhTM/
+         csdg==
+X-Gm-Message-State: AOJu0Yw469c6VBIo0x9VUIQgtW0ufOtLdSMFDW02yMZ1gNWswD0onXA2
+	r/iX8NaMEZZYxrDGrQYR6wR4PeevRAzD0o+yd7PqmrOdP1+AynkJJFHmGk3/
+X-Gm-Gg: ASbGncvX3A7+j1iaYFpLZABbblWDU01QOl0xYObz9VA9W/l5VXXjACCJlTbeGbu29/T
+	YubvjFmJaJYOLk6iXMay6dfuAbYWSzCkTTqYEoH5A5pENDRBAUQh5/Tvorg2RbGm7NN/eheCr5C
+	JGWCS3KazKWwH0s0Q9E9QQk/SAnFIkz7clRkZbUwae9pMWEVEFET6i85Si9LokkW0cVc/clW8IJ
+	eM2XCeiOQuCJj+B874VkBtsMhqZmY6KU/res8MAbju0sVquT5jbM7oWZLxk8Pw45a4VdZEgj/Rq
+	QRaD+X7psjgbzvPchN9lY59maxls0FVV
+X-Google-Smtp-Source: AGHT+IGyzPFFiycDeXpjpKZWMIhyJjYsg40cJNtBh1oPPODtSImXEGJkxZK5AwXVFTgZUUtpYR1VkQ==
+X-Received: by 2002:a17:907:c29:b0:ab7:86ae:4bb8 with SMTP id a640c23a62f3a-abc09a0bc37mr2779186466b.23.1740667586768;
+        Thu, 27 Feb 2025 06:46:26 -0800 (PST)
+Received: from syrah.fi.muni.cz ([2001:718:801:22c:1369:c402:50e6:7236])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c6ee70fsm132310866b.116.2025.02.27.06.46.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 06:46:26 -0800 (PST)
+From: Milan Broz <gmazyland@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	hch@infradead.org,
+	Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH] docs: sysfs-block: Clarify integrity sysfs attributes for non-PI metadata
+Date: Thu, 27 Feb 2025 15:46:09 +0100
+Message-ID: <20250227144609.35568-1-gmazyland@gmail.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <Z73kDfIkgu4v-c9W@infradead.org>
+References: <Z73kDfIkgu4v-c9W@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6369:EE_|IA0PR12MB8206:EE_
-X-MS-Office365-Filtering-Correlation-Id: e2d83a86-d5a8-41be-ea0a-08dd5736229c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?T0IyYVY2Qmx2eGVhSmovVFgxY1ZMeUZ5dmFDc0ZvTUk2R0I4Q1hJam4ra2Q2?=
- =?utf-8?B?YkpBUEU3YVFOVWhTS3NlT3Q2UTZrOElROEFJTDZ3SUtYU2NZV0dLOUI4OGhL?=
- =?utf-8?B?SGdHa1hwTWdUQ28yVDRZZUdCL1RYbWdlaThZWlRBMXMrcTdubWFIeUtETjF4?=
- =?utf-8?B?ODVWVmt6VWk3ZXNsUmQwOG5WOUxHMENpQncxM3F3VzRTMTJLajNaWnVlV0t2?=
- =?utf-8?B?RnFpTVkwNnVMMW1WbFBUeFFTb0Fydmk2QjFVeVJmMTQ1WVVjSUJGU0NZcHAw?=
- =?utf-8?B?ZTk2UDYyNlI0UDFLb0R4NGsrQTRXU2V5Z01JU000T1pETW9IRnV3cEhXK1hV?=
- =?utf-8?B?SXdUbU9QeGFWV0lhQXFsRFZMYmk0ZkJ6YmQ1eTZZUTJ2ZFRVTUd6M3lJbklT?=
- =?utf-8?B?YzcyME1qWW9rMElwajl4dllqMVQ5U3JVLzYwS2lyMzdrbkx4eG52andKUkZS?=
- =?utf-8?B?TVpFRlBsQ0liYzdCckdrejJHNFFMcTcvZVJCNTJ1SEFaRWdWV1VORzZDZ1ow?=
- =?utf-8?B?T283WlkwWjRSY01wMUY2dGZPbldrTW43eUFtNTN3SGUvVEZMa2ZQVVhwZzli?=
- =?utf-8?B?LzVxM2szMkFYM2x5cUxjcXVzU0V1NTdjS0JPRXRSZTNJMHYvMzA3RVBPZEc1?=
- =?utf-8?B?MDVaOWJ0eW5mdmNNZm51cW9wRU9DNko3U1BtSWMyQlNwb3VMZnlYYUIxVjAx?=
- =?utf-8?B?SEhGQWdGRGZSNU9teVlwN3VPWnhHb3VncFFOT1BMU3V0dVlSbWZldnVYdlQv?=
- =?utf-8?B?QUxpMnQ5eWxwWUo1QmQ4c2xSeUtoclRXSE1zbjNUNnBMRnJ0eG1qSUVrcW55?=
- =?utf-8?B?NjBuV2Q2QnBWallJTGlBMWhQWlF4bHI0M0YxWWV1UDEwclZvZ2xXVTZhRjFT?=
- =?utf-8?B?M1FQMEltNHdoWEladkVpODZrUUpGZ3NuZkV4ZzhJcndmYWRHZVZ0YkJMbktz?=
- =?utf-8?B?Mkp3UmZxS0lpOXh6SUNRamgyNm5BQ3FBRmZ0MXZITHRwbklVWFdBZXdjQmlH?=
- =?utf-8?B?SVRzYnVZcmRnT01xK3RQYUptcVhJNTNFUjJuaGNYMXNndFlUaFA2amFCVlJR?=
- =?utf-8?B?b05iZHByYVRxMlNya014SFFnTzFTK3FOZUxDYXg1aHVDRGRSY1NtOUJQWnJM?=
- =?utf-8?B?dy9kQ3BnU0V4UVIrWVdBWTFXZ3ExeS9wQVJjWGUxQlJYTFhYSzV4ZldLTnZ6?=
- =?utf-8?B?eWZRTEt0TlVoWkFLbXdEK1N3cjNvUkl2WmNpVzVOU09RdjFCaEpUdFdCcmc4?=
- =?utf-8?B?NTBuZTNoa3BncmpVY3JkcDJMMGRwRmhCMi8yUUdJVGlmWFR0SDhJQkVpSUdv?=
- =?utf-8?B?cks3ZXdLNmluRFhIUXUvZ09ENFBuSGNkdDk3YzcwS3pXbXduMEdiOWw4OFZQ?=
- =?utf-8?B?TExXcnhyd2hjdEtaY05Kb3pLd2tUU1ltVURPQ3d5VDFTUjRVelVKK0VMNGwz?=
- =?utf-8?B?emxDMko0d3J0WUlIU0wzTnJlSE5DWnlxYzRuT3FPeDBJVGYvSEl6MjZZc1px?=
- =?utf-8?B?S2R1ZXl6Vm53MzVqVGxwbFZxcDVuRitzNG9DUTMzbVMrMDRaUGloZFo1dFU3?=
- =?utf-8?B?ZUcwL0lzdjNHeDZDMkkwa2hvWjFSbGpyNlBMSVZCN3BVZHRQMi82RmxHV0xm?=
- =?utf-8?B?NlBBSlRmSklocEZTSXJPdzJ3TWgvSStra2tEYUVkQW9rTE9Ydzl5Q3ZoUFRP?=
- =?utf-8?B?RUdHc2lsa2NJQk5OZUJaYi9LZUJDR29DUlE2UERyckFuVzBZYUUyelZmaWhV?=
- =?utf-8?B?ZFhUWkcyZW9ETVk1UktpVi9tTVJqM1dCYlB5OW5IcWJWbm9rNVhsUUJQV1Fz?=
- =?utf-8?B?eVBIYkZOUHNMUXRGd2xtMWVwaFUzOXVlSUtHY3Z4dFlQTFAxWm03REtPYjEz?=
- =?utf-8?Q?Xg8pisyW+BRbM?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6369.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TDN3bEpTbG5raGQxYy9yTC9QWlNTNm5NejZxbk80Z2ZKcEhzQko2TkN0dSs5?=
- =?utf-8?B?dFVlbDEwR2hmQmk2bC9zYjk0UzErTVlDVkFYVDgzV1ZNK2hnRmFkZlRJdlJZ?=
- =?utf-8?B?RlRqamdRZklXWDdMYUNFTEtHbGRKNHZpOFNxZWtaNEo2aVBtVGVZcUkyTExp?=
- =?utf-8?B?NHBrRFQzM2dmaW5BZlA1d2c3Y2p3MDRnK2NSaWgzcVRwWFowTFdkVHpLaCt4?=
- =?utf-8?B?dVNrV2lFNS83WVlEUktEcnpFTjdSZjNJUVUyZldxZmVNUzRKRlpCYjNBWnJa?=
- =?utf-8?B?VHdiNElNbHBlc3NQQ3FFM1VjMEJVWndUOGxVaU4rKzZRdWk5MzB0Rk41T2VF?=
- =?utf-8?B?ejg4TFpwY3B4OEV5ajdYZXVPeFMyUVdMZGxkV1ltUWtTb2ljWlY4aWsxMDAv?=
- =?utf-8?B?bGVabEU1YzFiODNqNzQyMWpzWHFFc2c0bWpQMzlnczZFeUdxVEVHaDBNY0JZ?=
- =?utf-8?B?d05MejBJbUVGQzVaZGdqUHQ1Z24wK0l0MDNjazQzYjJKSy9KUXgxOUxubHZN?=
- =?utf-8?B?OGNia2hRWWU0NFE4WUUxSnJZWHc3cmQ5cGxvZFdUR2dJd21KdHpWeFMvRDN4?=
- =?utf-8?B?SVdoZk5wa0VhMTFyZlQrTjAzQWlMZGNGdVNFU1ZSTXRrNUV6ZWEzbXA0a0dG?=
- =?utf-8?B?SjQrTTR0OXUvNGZlSVYwaFNXV1ZoMTlwbk9kenpWQUh6ZE0yZGRTSC9RNFpB?=
- =?utf-8?B?UUFuMGpxR1RDSmtLSlUvVHRNb3AwOG9FSEpIUk1Fdi9hdUpCWEtVeUZ2TFky?=
- =?utf-8?B?SEkvSkN5eXJobDB5cXQwT1IzMWhLY2cwU1JzbXMwMVgvQU5meTJvOFVrd2t1?=
- =?utf-8?B?ZWoxdjhkUkI5eWs0UHFCYVdNTC9ZODA3VGFwcFdMUkpReU9ZcVVUNnd2dTdh?=
- =?utf-8?B?Q3FraG1NUERhZ2cxbmVjZW1GY1dkdHZaRVNFRkRaYnJYeG1aeVhIaEJnaG9h?=
- =?utf-8?B?eTUvQWpVU0h4ZWhTR3VmRGF0Z0J5c2NHQU1pNnU1cXVyNllLL2lJakpnQVZz?=
- =?utf-8?B?ZE1SRURLa2gwbm9QTVp5bnFrUXZlbmVIUWtaUk9waFYyYmt4ak9aQm5JQ1Az?=
- =?utf-8?B?V2ZJeVB4eGo5RUMyMlJCMmIwVm9KYTNicUJ5c0xZNXhKWnd2Z012dk9sSHVZ?=
- =?utf-8?B?bmJ5NW45VEk2RjRCR1NNc2pacW1UczFGaHFEMVZKVG5sdjdvOTBMWEZ0R1dZ?=
- =?utf-8?B?V0V4OGdUeEJmZWYyMlByRjhBNXBJazZROVNMWDlZZmZKZld0dHJKL1hEeEk4?=
- =?utf-8?B?V0ZHSE85QUdRaEZ1MXZOdlFYVWlraHRWNWdaV0VaMjA5ZXA3TFk0bS9qN2pF?=
- =?utf-8?B?a2hsbXpSR0J2TGRiZC8weE5yakJ0dTA4Q2JhbmhoOXdoWW1TR25yRVI5S0gz?=
- =?utf-8?B?QUNqVFB1Y29xZUhEOVI0ckFLZVhHdmFleHRIV1ZXM1NDVmxyOWpjSmhpUDRs?=
- =?utf-8?B?WnNzRS9aKzFMdDNuZUJXbkZNRFFKdTZGd2pJalhKcyswK05KNnJsc3lWak9C?=
- =?utf-8?B?QzdYMElKVHk2VFpWbGxuK3QyNDlaYis5VmVyRERpcm14TUMvTjVSZFdqQ1FN?=
- =?utf-8?B?MDZoVmxjaE1jV2xpSnJtRzZZVDlWS1ppa2NrMHNlQ2h5NEVqRGQzdjNUZGk4?=
- =?utf-8?B?V2NRWmFXQ1p0eTNqd2Fnb21XaURsUWorV040T2s1Wk1CMFdWaFBuOEhKZ3Vp?=
- =?utf-8?B?UVZ1L1kzN1hNRC9YQzRmcTgzeDZEZzZEY0Zpb003dUxYRGt0WHEzUkZ0Skhy?=
- =?utf-8?B?aGdsTjdwVG1RMGpaWm1ITjBJazc1U3UzdmJweXNRNTEzMUNiZWZFL2NjazdU?=
- =?utf-8?B?bkwrN3FlWGFESzdiUURSaS8yU05XNlBCcGFzOTZEWU5NcTNQQUNPYS9IYTZn?=
- =?utf-8?B?c0xaRFN5UnlKYXNUTFphYUp1M2pLYkozbFpYbHBSUURNU3g3c0JudzZtTlUv?=
- =?utf-8?B?bXMzT2lCbDV6WGJtOTFEbzYyckNPM1UyUy9lcTB0OERUQ290R0xHdjYzWGRR?=
- =?utf-8?B?MDRZNkZNT3pnVHFIZWFRUEFmMTVDY2FZSDdkQXdLN283ZCtKMUVnOExCRnJY?=
- =?utf-8?B?WEMzZkpJV0xCNzBpRGh2YU12Sk1jN2ZPMDdZTzhXNmZHV2NrY3h2M1ZPMDFi?=
- =?utf-8?B?aG10MTZkbFRlVVFPZHA3cXZaRVBXRWExb0pYOTRUK2RrNDVkK2lid3cwUDF4?=
- =?utf-8?B?M0E9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2d83a86-d5a8-41be-ea0a-08dd5736229c
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6369.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2025 13:53:37.9826
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TvHiMioEDjKNCyWyJOPXMkdNJr8oePh4fbDEgESQ8h2nsZjZ66IFpY+fQ6EZVF/pHJabIrD3YV++bum9M3FeAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8206
+Content-Transfer-Encoding: 8bit
 
+The /sys/block/<disk>/integrity fields are historically set if PI
+is enabled. It is not set if some upper layer uses integrity metadata
+for non-PI format.
+Document it.
 
-On 27/02/2025 10:53, Michael S. Tsirkin wrote:
-> On Thu, Feb 27, 2025 at 04:17:47PM +0800, Stefan Hajnoczi wrote:
->> On Tue, Feb 25, 2025 at 01:31:04AM +0200, Max Gurtovoy wrote:
->>> Hi,
->>>
->>> This patch series introduces safety checks in virtio-blk and virtio-fs
->>> drivers to ensure proper handling of device-writable buffer lengths as
->>> specified by the virtio specification.
->>>
->>> The virtio specification states:
->>> "The driver MUST NOT make assumptions about data in device-writable
->>> buffers beyond the first len bytes, and SHOULD ignore this data."
->>>
->>> To align with this requirement, we introduce checks in both drivers to
->>> verify that the length of data written by the device is at least as
->>> large as the expected/needed payload.
->>>
->>> If this condition is not met, we set an I/O error status to prevent
->>> processing of potentially invalid or incomplete data.
->>>
->>> These changes improve the robustness of the drivers and ensure better
->>> compliance with the virtio specification.
->>>
->>> Max Gurtovoy (2):
->>>    virtio_blk: add length check for device writable portion
->>>    virtio_fs: add length check for device writable portion
->>>
->>>   drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
->>>   fs/fuse/virtio_fs.c        |  9 +++++++++
->>>   2 files changed, 29 insertions(+)
->>>
->>> -- 
->>> 2.18.1
->>>
->> There are 3 cases:
->> 1. The device reports len correctly.
->> 2. The device reports len incorrectly, but the in buffers contain valid
->>     data.
->> 3. The device reports len incorrectly and the in buffers contain invalid
->>     data.
->>
->> Case 1 does not change behavior.
->>
->> Case 3 never worked in the first place. This patch might produce an
->> error now where garbage was returned in the past.
->>
->> It's case 2 that I'm worried about: users won't be happy if the driver
->> stops working with a device that previously worked.
->>
->> Should we really risk breakage for little benefit?
->>
->> I remember there were cases of invalid len values reported by devices in
->> the past. Michael might have thoughts about this.
->>
->> Stefan
->
-> Indeed, there were. This is where Jason's efforts to validate
-> length stalled.
->
-> See message id 20230526063041.18359-1-jasowang@redhat.com
->
-> I am not sure I get the motivation for this patch. And yes, seems to
-> risky especially for blk. If it's to help device validation, I suggest a
-> Kconfig option.
+Signed-off-by: Milan Broz <gmazyland@gmail.com>
+---
+ Documentation/ABI/stable/sysfs-block | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-The primary motivation for this patch is to improve spec compliance and 
-enhance driver robustness.
-You're right that there are different cases to consider:
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 0cceb2badc83..f67fd46f15b6 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -109,6 +109,8 @@ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
+ Description:
+ 		Indicates whether a storage device is capable of storing
+ 		integrity metadata. Set if the device is T10 PI-capable.
++		This flag is set if a PI profile is enabled.
++		It is not set when non-PI metadata are used.
+ 
+ 
+ What:		/sys/block/<disk>/integrity/format
+@@ -117,6 +119,8 @@ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
+ Description:
+ 		Metadata format for integrity capable block device.
+ 		E.g. T10-DIF-TYPE1-CRC.
++		If the storage device supports metadata but no PI
++		is used, this field will contain "nop".
+ 
+ 
+ What:		/sys/block/<disk>/integrity/protection_interval_bytes
+@@ -142,7 +146,10 @@ Date:		June 2008
+ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
+ Description:
+ 		Number of bytes of integrity tag space available per
+-		512 bytes of data.
++		protection_interval_bytes, which is typically
++		the device's logical block size.
++		If the storage device supports metadata but no PI
++		is used, this field will contain 0.
+ 
+ 
+ What:		/sys/block/<disk>/integrity/write_generate
+-- 
+2.47.2
 
-     1. For correctly behaving devices (Case 1) and fully incorrectly 
-behaving devices (Case 3), there's no change in behavior (Case 3 never 
-worked anyway).
-     2. For devices reporting incorrect lengths but with valid data 
-(Case 2), I understand the concern about breaking existing setups.
-
-To address the concerns about Case 2 while still moving towards better 
-spec compliance,we can make them configurable, as Michael suggested.
-Some configuration options:
-
-     1. Via a Kconfig
-     2. Via module param
-     3. Via adding quirks for known non-compliant devices (identified by 
-subsystem dev/vendor ids) that are otherwise functional.
-     4. Via virtio_has_feature(vdev, VIRTIO_F_VERSION_1)
-
-
->
