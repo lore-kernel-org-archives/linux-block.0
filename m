@@ -1,165 +1,252 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B0A22DF9A;
-	Thu, 27 Feb 2025 12:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740658259; cv=none; b=ShTXwz9RDo5BegenSdS10R241G6PdK42gdJATnjoMs8HIjA3jmWDQQMwn4N6N0EJctj3gkVuvjKQpCduYQLw/K1JXqMYRUBXgsOVQ/r00sY38QoCxlGsBWbT7WYu0Gvoy4KNfCM8UxQc8o9Pa5y6BkchGIC6A4YgmesBkZL1lA0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740658259; c=relaxed/simple;
-	bh=DL5WQ/m06BulIBUSol3oaMpPWqLdB+Y4lNopS+hQ/F8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iSi5w8BUDWXoEqIwWtKZRI8QaUzGRg9g6cpBnIZHy2I7xgZu5SsXkAiLtTgnCgbQoBO8DBAbo6MKCMmJkyTHH7qN8yWqgSjfEm+KsHsc47WFBx3vp/mY8ILy34yEP4MaSMFZ4rAGe+6XGhCNpfHplvSjBO8P7ksBl+SHYtnmbso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z3VXm140tz4f3js9;
-	Thu, 27 Feb 2025 20:10:32 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 07D981A06DC;
-	Thu, 27 Feb 2025 20:10:54 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgB3219KVsBnUNAxFA--.41103S4;
-	Thu, 27 Feb 2025 20:10:51 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: ming.lei@redhat.com,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	vgoyal@redhat.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2] blk-throttle: fix lower bps rate by throtl_trim_slice()
-Date: Thu, 27 Feb 2025 20:06:45 +0800
-Message-Id: <20250227120645.812815-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52D242C0B;
+	Thu, 27 Feb 2025 13:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740664423; cv=fail; b=TCO71i/zP1jScEAkxX18YuoNmUtA7swsfahPtvkeMzAoyITi6nHOngQyDzucfFELn3+vpGrhTsZ90vIbovGIhLlyqpnZ6TvjWo22lHNxetQn5ysZs7NEoriYtzv6vQXVvvbwlm7aviObNChWAN3oZHi5rQGWftEODpDXx4KFg/M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740664423; c=relaxed/simple;
+	bh=AZiz1hAI855MDJC9CWK41C0DSMn3qagpxeoPFaWuAo0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PoPxeN//4I1obI6wvlF6XcRB7qH9OlLs7LFohFu3oeN+VpC4sOXtW18jiN/r2WOdCocmLj+/dF0ZsHpDC2UE5ktkkGPrA7eGmgKn6at9E1CLMzophxWS3Pl5UdhkH13iCI8BTl5y1AdWMG/JmnHHEr4HEhLN+kFuQIHE1qxT7OA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MZ9B4p1Y; arc=fail smtp.client-ip=40.107.243.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MZ9B4p1Y"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=A+IhWJxrh0q/82WqBhA/i7/5/ilJ5fab0x3X5fzqkyrKvzY14wiXCoubx61KOxVFr0hA8X6jHzDIabqgf6GfKrg428zuXlGElI5gM6wF360JrlIFvMzAkoHAcfIhF5VF73TfFUpRkGKDxVWoZmVaMT1iA153zZmRinoLwfSzezZif36P8DblKLPPViKOK/ZvMl3suduuNLSWOyTlLA4FsUhkCIp/kkChYq3NFvTBUdJYkVGar/H0LUl1oyzKdBtxl0PyvbCaPIwD0g2TIr/9vam9Hux72VP1sld5aBdct4LfjRhotEqrJych0K+pBsPN1MVAI9AIgfAldeXLY+dRxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BPnTLLrEs9FFBkQUkMLCrLimEzkDGK2CMM7DfHlRgR0=;
+ b=PnvPZgxUADwHvzW8HutWpQtkXmDQBmtYnZdKZwGk9VwY/uGfcm4Y7Rm4kO90DnirR8i5DglhpgEpl8mJPMgYm0GpSJd0FY5Q6KK6LWzwoqLFekHDsiXmA7m4uNP9WKucTEaRu5se2fInt2d4hLBDsgblmZfry4SvAOHK06wpERA5RlRxDP/pHwZN60dQ6iDlco4tWFhKWmA6MDogtE+cOJxNsXR1t+e1DUKXb9jtOnn+83v5w5IqgHJGyg2O7C6b8vlnglJkyfSmk04BXbSvDmApkUirszvs7nUA1lAU8VhYxijv7wujIEcw1rLnIzXHgaEj2YZJuFFdSvBt9W5TBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BPnTLLrEs9FFBkQUkMLCrLimEzkDGK2CMM7DfHlRgR0=;
+ b=MZ9B4p1Ycx+8REhHPwIZhWhWt2JevFdR+mbuTFfWTbaKIEJiFn70hpB42EE7Ibddss88YmroBy9FyMStOw/rvhBlE16KneCbxm+rygEFjKRjjHt6u9LGVjveYxCn0GKErTKeiuAf41mQIbmubvbIUflAqpSuN+A91Zo+GoILOwe+NhPDj2Cjb897Kj3b+Am7wF0Vmy7bNT/g/zmQxlFtqFPzf25JD86IVlWaIDN2dOaRlibsLQsppT/NuxKrvMmNVnwdtNTYeRv2fh4KD5PrbdBu0kC8gM2LvzawDlKQ6m5q+lspTdyc86Nm0reAsBhRmYOcYomGWbxs4wfphTfAgw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6369.namprd12.prod.outlook.com (2603:10b6:930:21::10)
+ by IA0PR12MB8206.namprd12.prod.outlook.com (2603:10b6:208:403::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.22; Thu, 27 Feb
+ 2025 13:53:38 +0000
+Received: from CY5PR12MB6369.namprd12.prod.outlook.com
+ ([fe80::d4c1:1fcc:3bff:eea6]) by CY5PR12MB6369.namprd12.prod.outlook.com
+ ([fe80::d4c1:1fcc:3bff:eea6%6]) with mapi id 15.20.8489.021; Thu, 27 Feb 2025
+ 13:53:38 +0000
+Message-ID: <2d2dafdc-7a7d-44f1-8814-20eedbe220ec@nvidia.com>
+Date: Thu, 27 Feb 2025 15:53:31 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/2] virtio: Add length checks for device writable
+ portions
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Cc: israelr@nvidia.com, virtualization@lists.linux.dev,
+ linux-block@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
+ dbenbasat@nvidia.com, smalin@nvidia.com, larora@nvidia.com,
+ izach@nvidia.com, aaptel@nvidia.com, parav@nvidia.com, kvm@vger.kernel.org
+References: <20250224233106.8519-1-mgurtovoy@nvidia.com>
+ <20250227081747.GE85709@fedora>
+ <20250227034434-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+In-Reply-To: <20250227034434-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P265CA0099.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2bc::20) To CY5PR12MB6369.namprd12.prod.outlook.com
+ (2603:10b6:930:21::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3219KVsBnUNAxFA--.41103S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZF4DCr1fZFyDXw1kXry3XFb_yoW5tF43pF
-	W3Ar43WFW7XFy2kF43X3Z3Cay8C3yrGFy5Gwn5Cr4rA345Cr1xKFnxAr4Yya47A3s3uw4F
-	v3ZFvryxCr12yrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUFg4SDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6369:EE_|IA0PR12MB8206:EE_
+X-MS-Office365-Filtering-Correlation-Id: e2d83a86-d5a8-41be-ea0a-08dd5736229c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?T0IyYVY2Qmx2eGVhSmovVFgxY1ZMeUZ5dmFDc0ZvTUk2R0I4Q1hJam4ra2Q2?=
+ =?utf-8?B?YkpBUEU3YVFOVWhTS3NlT3Q2UTZrOElROEFJTDZ3SUtYU2NZV0dLOUI4OGhL?=
+ =?utf-8?B?SGdHa1hwTWdUQ28yVDRZZUdCL1RYbWdlaThZWlRBMXMrcTdubWFIeUtETjF4?=
+ =?utf-8?B?ODVWVmt6VWk3ZXNsUmQwOG5WOUxHMENpQncxM3F3VzRTMTJLajNaWnVlV0t2?=
+ =?utf-8?B?RnFpTVkwNnVMMW1WbFBUeFFTb0Fydmk2QjFVeVJmMTQ1WVVjSUJGU0NZcHAw?=
+ =?utf-8?B?ZTk2UDYyNlI0UDFLb0R4NGsrQTRXU2V5Z01JU000T1pETW9IRnV3cEhXK1hV?=
+ =?utf-8?B?SXdUbU9QeGFWV0lhQXFsRFZMYmk0ZkJ6YmQ1eTZZUTJ2ZFRVTUd6M3lJbklT?=
+ =?utf-8?B?YzcyME1qWW9rMElwajl4dllqMVQ5U3JVLzYwS2lyMzdrbkx4eG52andKUkZS?=
+ =?utf-8?B?TVpFRlBsQ0liYzdCckdrejJHNFFMcTcvZVJCNTJ1SEFaRWdWV1VORzZDZ1ow?=
+ =?utf-8?B?T283WlkwWjRSY01wMUY2dGZPbldrTW43eUFtNTN3SGUvVEZMa2ZQVVhwZzli?=
+ =?utf-8?B?LzVxM2szMkFYM2x5cUxjcXVzU0V1NTdjS0JPRXRSZTNJMHYvMzA3RVBPZEc1?=
+ =?utf-8?B?MDVaOWJ0eW5mdmNNZm51cW9wRU9DNko3U1BtSWMyQlNwb3VMZnlYYUIxVjAx?=
+ =?utf-8?B?SEhGQWdGRGZSNU9teVlwN3VPWnhHb3VncFFOT1BMU3V0dVlSbWZldnVYdlQv?=
+ =?utf-8?B?QUxpMnQ5eWxwWUo1QmQ4c2xSeUtoclRXSE1zbjNUNnBMRnJ0eG1qSUVrcW55?=
+ =?utf-8?B?NjBuV2Q2QnBWallJTGlBMWhQWlF4bHI0M0YxWWV1UDEwclZvZ2xXVTZhRjFT?=
+ =?utf-8?B?M1FQMEltNHdoWEladkVpODZrUUpGZ3NuZkV4ZzhJcndmYWRHZVZ0YkJMbktz?=
+ =?utf-8?B?Mkp3UmZxS0lpOXh6SUNRamgyNm5BQ3FBRmZ0MXZITHRwbklVWFdBZXdjQmlH?=
+ =?utf-8?B?SVRzYnVZcmRnT01xK3RQYUptcVhJNTNFUjJuaGNYMXNndFlUaFA2amFCVlJR?=
+ =?utf-8?B?b05iZHByYVRxMlNya014SFFnTzFTK3FOZUxDYXg1aHVDRGRSY1NtOUJQWnJM?=
+ =?utf-8?B?dy9kQ3BnU0V4UVIrWVdBWTFXZ3ExeS9wQVJjWGUxQlJYTFhYSzV4ZldLTnZ6?=
+ =?utf-8?B?eWZRTEt0TlVoWkFLbXdEK1N3cjNvUkl2WmNpVzVOU09RdjFCaEpUdFdCcmc4?=
+ =?utf-8?B?NTBuZTNoa3BncmpVY3JkcDJMMGRwRmhCMi8yUUdJVGlmWFR0SDhJQkVpSUdv?=
+ =?utf-8?B?cks3ZXdLNmluRFhIUXUvZ09ENFBuSGNkdDk3YzcwS3pXbXduMEdiOWw4OFZQ?=
+ =?utf-8?B?TExXcnhyd2hjdEtaY05Kb3pLd2tUU1ltVURPQ3d5VDFTUjRVelVKK0VMNGwz?=
+ =?utf-8?B?emxDMko0d3J0WUlIU0wzTnJlSE5DWnlxYzRuT3FPeDBJVGYvSEl6MjZZc1px?=
+ =?utf-8?B?S2R1ZXl6Vm53MzVqVGxwbFZxcDVuRitzNG9DUTMzbVMrMDRaUGloZFo1dFU3?=
+ =?utf-8?B?ZUcwL0lzdjNHeDZDMkkwa2hvWjFSbGpyNlBMSVZCN3BVZHRQMi82RmxHV0xm?=
+ =?utf-8?B?NlBBSlRmSklocEZTSXJPdzJ3TWgvSStra2tEYUVkQW9rTE9Ydzl5Q3ZoUFRP?=
+ =?utf-8?B?RUdHc2lsa2NJQk5OZUJaYi9LZUJDR29DUlE2UERyckFuVzBZYUUyelZmaWhV?=
+ =?utf-8?B?ZFhUWkcyZW9ETVk1UktpVi9tTVJqM1dCYlB5OW5IcWJWbm9rNVhsUUJQV1Fz?=
+ =?utf-8?B?eVBIYkZOUHNMUXRGd2xtMWVwaFUzOXVlSUtHY3Z4dFlQTFAxWm03REtPYjEz?=
+ =?utf-8?Q?Xg8pisyW+BRbM?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6369.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TDN3bEpTbG5raGQxYy9yTC9QWlNTNm5NejZxbk80Z2ZKcEhzQko2TkN0dSs5?=
+ =?utf-8?B?dFVlbDEwR2hmQmk2bC9zYjk0UzErTVlDVkFYVDgzV1ZNK2hnRmFkZlRJdlJZ?=
+ =?utf-8?B?RlRqamdRZklXWDdMYUNFTEtHbGRKNHZpOFNxZWtaNEo2aVBtVGVZcUkyTExp?=
+ =?utf-8?B?NHBrRFQzM2dmaW5BZlA1d2c3Y2p3MDRnK2NSaWgzcVRwWFowTFdkVHpLaCt4?=
+ =?utf-8?B?dVNrV2lFNS83WVlEUktEcnpFTjdSZjNJUVUyZldxZmVNUzRKRlpCYjNBWnJa?=
+ =?utf-8?B?VHdiNElNbHBlc3NQQ3FFM1VjMEJVWndUOGxVaU4rKzZRdWk5MzB0Rk41T2VF?=
+ =?utf-8?B?ejg4TFpwY3B4OEV5ajdYZXVPeFMyUVdMZGxkV1ltUWtTb2ljWlY4aWsxMDAv?=
+ =?utf-8?B?bGVabEU1YzFiODNqNzQyMWpzWHFFc2c0bWpQMzlnczZFeUdxVEVHaDBNY0JZ?=
+ =?utf-8?B?d05MejBJbUVGQzVaZGdqUHQ1Z24wK0l0MDNjazQzYjJKSy9KUXgxOUxubHZN?=
+ =?utf-8?B?OGNia2hRWWU0NFE4WUUxSnJZWHc3cmQ5cGxvZFdUR2dJd21KdHpWeFMvRDN4?=
+ =?utf-8?B?SVdoZk5wa0VhMTFyZlQrTjAzQWlMZGNGdVNFU1ZSTXRrNUV6ZWEzbXA0a0dG?=
+ =?utf-8?B?SjQrTTR0OXUvNGZlSVYwaFNXV1ZoMTlwbk9kenpWQUh6ZE0yZGRTSC9RNFpB?=
+ =?utf-8?B?UUFuMGpxR1RDSmtLSlUvVHRNb3AwOG9FSEpIUk1Fdi9hdUpCWEtVeUZ2TFky?=
+ =?utf-8?B?SEkvSkN5eXJobDB5cXQwT1IzMWhLY2cwU1JzbXMwMVgvQU5meTJvOFVrd2t1?=
+ =?utf-8?B?ZWoxdjhkUkI5eWs0UHFCYVdNTC9ZODA3VGFwcFdMUkpReU9ZcVVUNnd2dTdh?=
+ =?utf-8?B?Q3FraG1NUERhZ2cxbmVjZW1GY1dkdHZaRVNFRkRaYnJYeG1aeVhIaEJnaG9h?=
+ =?utf-8?B?eTUvQWpVU0h4ZWhTR3VmRGF0Z0J5c2NHQU1pNnU1cXVyNllLL2lJakpnQVZz?=
+ =?utf-8?B?ZE1SRURLa2gwbm9QTVp5bnFrUXZlbmVIUWtaUk9waFYyYmt4ak9aQm5JQ1Az?=
+ =?utf-8?B?V2ZJeVB4eGo5RUMyMlJCMmIwVm9KYTNicUJ5c0xZNXhKWnd2Z012dk9sSHVZ?=
+ =?utf-8?B?bmJ5NW45VEk2RjRCR1NNc2pacW1UczFGaHFEMVZKVG5sdjdvOTBMWEZ0R1dZ?=
+ =?utf-8?B?V0V4OGdUeEJmZWYyMlByRjhBNXBJazZROVNMWDlZZmZKZld0dHJKL1hEeEk4?=
+ =?utf-8?B?V0ZHSE85QUdRaEZ1MXZOdlFYVWlraHRWNWdaV0VaMjA5ZXA3TFk0bS9qN2pF?=
+ =?utf-8?B?a2hsbXpSR0J2TGRiZC8weE5yakJ0dTA4Q2JhbmhoOXdoWW1TR25yRVI5S0gz?=
+ =?utf-8?B?QUNqVFB1Y29xZUhEOVI0ckFLZVhHdmFleHRIV1ZXM1NDVmxyOWpjSmhpUDRs?=
+ =?utf-8?B?WnNzRS9aKzFMdDNuZUJXbkZNRFFKdTZGd2pJalhKcyswK05KNnJsc3lWak9C?=
+ =?utf-8?B?QzdYMElKVHk2VFpWbGxuK3QyNDlaYis5VmVyRERpcm14TUMvTjVSZFdqQ1FN?=
+ =?utf-8?B?MDZoVmxjaE1jV2xpSnJtRzZZVDlWS1ppa2NrMHNlQ2h5NEVqRGQzdjNUZGk4?=
+ =?utf-8?B?V2NRWmFXQ1p0eTNqd2Fnb21XaURsUWorV040T2s1Wk1CMFdWaFBuOEhKZ3Vp?=
+ =?utf-8?B?UVZ1L1kzN1hNRC9YQzRmcTgzeDZEZzZEY0Zpb003dUxYRGt0WHEzUkZ0Skhy?=
+ =?utf-8?B?aGdsTjdwVG1RMGpaWm1ITjBJazc1U3UzdmJweXNRNTEzMUNiZWZFL2NjazdU?=
+ =?utf-8?B?bkwrN3FlWGFESzdiUURSaS8yU05XNlBCcGFzOTZEWU5NcTNQQUNPYS9IYTZn?=
+ =?utf-8?B?c0xaRFN5UnlKYXNUTFphYUp1M2pLYkozbFpYbHBSUURNU3g3c0JudzZtTlUv?=
+ =?utf-8?B?bXMzT2lCbDV6WGJtOTFEbzYyckNPM1UyUy9lcTB0OERUQ290R0xHdjYzWGRR?=
+ =?utf-8?B?MDRZNkZNT3pnVHFIZWFRUEFmMTVDY2FZSDdkQXdLN283ZCtKMUVnOExCRnJY?=
+ =?utf-8?B?WEMzZkpJV0xCNzBpRGh2YU12Sk1jN2ZPMDdZTzhXNmZHV2NrY3h2M1ZPMDFi?=
+ =?utf-8?B?aG10MTZkbFRlVVFPZHA3cXZaRVBXRWExb0pYOTRUK2RrNDVkK2lid3cwUDF4?=
+ =?utf-8?B?M0E9PQ==?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2d83a86-d5a8-41be-ea0a-08dd5736229c
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6369.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2025 13:53:37.9826
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TvHiMioEDjKNCyWyJOPXMkdNJr8oePh4fbDEgESQ8h2nsZjZ66IFpY+fQ6EZVF/pHJabIrD3YV++bum9M3FeAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8206
 
-From: Yu Kuai <yukuai3@huawei.com>
 
-The bio submission time may be a few jiffies more than the expected
-waiting time, due to 'extra_bytes' can't be divided in
-tg_within_bps_limit(), and also due to timer wakeup delay.
-In this case, adjust slice_start to jiffies will discard the extra wait time,
-causing lower rate than expected.
+On 27/02/2025 10:53, Michael S. Tsirkin wrote:
+> On Thu, Feb 27, 2025 at 04:17:47PM +0800, Stefan Hajnoczi wrote:
+>> On Tue, Feb 25, 2025 at 01:31:04AM +0200, Max Gurtovoy wrote:
+>>> Hi,
+>>>
+>>> This patch series introduces safety checks in virtio-blk and virtio-fs
+>>> drivers to ensure proper handling of device-writable buffer lengths as
+>>> specified by the virtio specification.
+>>>
+>>> The virtio specification states:
+>>> "The driver MUST NOT make assumptions about data in device-writable
+>>> buffers beyond the first len bytes, and SHOULD ignore this data."
+>>>
+>>> To align with this requirement, we introduce checks in both drivers to
+>>> verify that the length of data written by the device is at least as
+>>> large as the expected/needed payload.
+>>>
+>>> If this condition is not met, we set an I/O error status to prevent
+>>> processing of potentially invalid or incomplete data.
+>>>
+>>> These changes improve the robustness of the drivers and ensure better
+>>> compliance with the virtio specification.
+>>>
+>>> Max Gurtovoy (2):
+>>>    virtio_blk: add length check for device writable portion
+>>>    virtio_fs: add length check for device writable portion
+>>>
+>>>   drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
+>>>   fs/fuse/virtio_fs.c        |  9 +++++++++
+>>>   2 files changed, 29 insertions(+)
+>>>
+>>> -- 
+>>> 2.18.1
+>>>
+>> There are 3 cases:
+>> 1. The device reports len correctly.
+>> 2. The device reports len incorrectly, but the in buffers contain valid
+>>     data.
+>> 3. The device reports len incorrectly and the in buffers contain invalid
+>>     data.
+>>
+>> Case 1 does not change behavior.
+>>
+>> Case 3 never worked in the first place. This patch might produce an
+>> error now where garbage was returned in the past.
+>>
+>> It's case 2 that I'm worried about: users won't be happy if the driver
+>> stops working with a device that previously worked.
+>>
+>> Should we really risk breakage for little benefit?
+>>
+>> I remember there were cases of invalid len values reported by devices in
+>> the past. Michael might have thoughts about this.
+>>
+>> Stefan
+>
+> Indeed, there were. This is where Jason's efforts to validate
+> length stalled.
+>
+> See message id 20230526063041.18359-1-jasowang@redhat.com
+>
+> I am not sure I get the motivation for this patch. And yes, seems to
+> risky especially for blk. If it's to help device validation, I suggest a
+> Kconfig option.
 
-Current in-tree code already covers deviation by rounddown(), but turns
-out it is not enough, because jiffies - slice_start can be a multiple of
-throtl_slice.
+The primary motivation for this patch is to improve spec compliance and 
+enhance driver robustness.
+You're right that there are different cases to consider:
 
-For example, assume bps_limit is 1000bytes, 1 jiffes is 10ms, and
-slice is 20ms(2 jiffies), expected rate is 1000 / 1000 * 20 = 20 bytes
-per slice.
+     1. For correctly behaving devices (Case 1) and fully incorrectly 
+behaving devices (Case 3), there's no change in behavior (Case 3 never 
+worked anyway).
+     2. For devices reporting incorrect lengths but with valid data 
+(Case 2), I understand the concern about breaking existing setups.
 
-If user issues two 21 bytes IO, then wait time will be 30ms for the
-first IO:
+To address the concerns about Case 2 while still moving towards better 
+spec compliance,we can make them configurable, as Michael suggested.
+Some configuration options:
 
-bytes_allowed = 20, extra_bytes = 1;
-jiffy_wait = 1 + 2 = 3 jiffies
+     1. Via a Kconfig
+     2. Via module param
+     3. Via adding quirks for known non-compliant devices (identified by 
+subsystem dev/vendor ids) that are otherwise functional.
+     4. Via virtio_has_feature(vdev, VIRTIO_F_VERSION_1)
 
-and consider
-extra 1 jiffies by timer, throtl_trim_slice() will be called at:
 
-jiffies = 40ms
-slice_start = 0ms, slice_end= 40ms
-bytes_disp = 21
-
-In this case, before the patch, real rate in the first two slices is
-10.5 bytes per slice, and slice will be updated to:
-
-jiffies = 40ms
-slice_start = 40ms, slice_end = 60ms,
-bytes_disp = 0;
-
-Hence the second IO will have to wait another 30ms;
-
-With the patch, the real rate in the first slice is 20 bytes per slice,
-which is the same as expected, and slice will be updated:
-
-jiffies=40ms,
-slice_start = 20ms, slice_end = 60ms,
-bytes_disp = 1;
-
-And now, there is still 19 bytes allowed in the second slice, and the
-second IO will only have to wait 10ms;
-
-This problem will cause blktests throtl/001 failure in case of
-CONFIG_HZ_100=y, fix it by preserving one extra finished slice in
-throtl_trim_slice().
-
-Fixes: e43473b7f223 ("blkio: Core implementation of throttle policy")
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Closes: https://lore.kernel.org/linux-block/20250222092823.210318-3-yukuai1@huaweicloud.com/
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-Changes from v1:
- - update commit message and comment, to mention rounddown().
- - add review tag by Ming, and ack tag by Tejun.
- block/blk-throttle.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8d149aff9fd0..a52f0d6b40ad 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -599,14 +599,23 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	 * sooner, then we need to reduce slice_end. A high bogus slice_end
- 	 * is bad because it does not allow new slice to start.
- 	 */
--
- 	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
- 
- 	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
- 				 tg->td->throtl_slice);
--	if (!time_elapsed)
-+	/* Don't trim slice until at least 2 slices are used */
-+	if (time_elapsed < tg->td->throtl_slice * 2)
- 		return;
- 
-+	/*
-+	 * The bio submission time may be a few jiffies more than the expected
-+	 * waiting time, due to 'extra_bytes' can't be divided in
-+	 * tg_within_bps_limit(), and also due to timer wakeup delay. In this
-+	 * case, adjust slice_start will discard the extra wait time, causing
-+	 * lower rate than expected. Therefore, other than the above rounddown,
-+	 * one extra slice is preserved for deviation.
-+	 */
-+	time_elapsed -= tg->td->throtl_slice;
- 	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
- 					     time_elapsed) +
- 		     tg->carryover_bytes[rw];
--- 
-2.39.2
-
+>
