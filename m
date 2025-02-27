@@ -1,70 +1,98 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3C01B043F
-	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 16:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2729C1CEAA3;
+	Thu, 27 Feb 2025 21:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740674041; cv=none; b=ib5XKfDj9Lt3moS0T6hdtQSjYFv5NJ7uMSu4v0/YznqstdQZVoTWnAUDqaK9sefJFnrLE8F1aktwaQmJ5ONeQyzI/SVoGVdj7ZOYeDDW2i+SP/pr3juhbFERPH0inR9+AQGI4aPqYnUSXZOz+EQoWecTJkEKFaaOqwhFInp/6Lk=
+	t=1740692790; cv=none; b=eIoZWt0pH54Wa402k2kbC8JuM7pRKYo3xxB0lt8oTLaA1xe3xjYP0u9YdJtnpA67DmE4up3UcmFzfzWaP/h24D8s8q6RocwlViBm8pT7rekywg1as+WaxXvMvKNJD9ndjjfLphT5Q4+zvc1CQEdVfj21vfPc47AT6BYAkwv2Za8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740674041; c=relaxed/simple;
-	bh=pLIf7xsLXbThXSxmzfd4KnR7+2f+v/4wvN2ZmzRGna8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P2glWS96KjATw1kjJMDGsgMv2SWABjVyUHHFiBLiS+d96Ht2b1Cj4mRBHxdf48EaIXk6jqwPNovq7ApT1m0ZYY1H5jzmDdd1SDIKNq0IdIN5b7gWrGq/cYKdUh5yyv5UhJHdVHD5pCdqzRFfDFTh+1Cd/hQcHpx1irQNbS5yqbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VQH4TPYk; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740692790; c=relaxed/simple;
+	bh=/nEA92N9pwlqDw/LpZqyfnJstLMztmSrMkJcI7BZnHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NDOFlSwP3vuaGYWpfQsKLwzrPxyUPWPgPKMY6Xp5r8c0SArJKIyWh9/xSSbtU+6E/wXFJH95o9cVdrTcUgb5dm8mOeRflCwkMSPfBhJzl5zI69VCg8eOR7vpXupYS5d5N8DQ7pGhUYt8or6znJsWAWJdM8e7lSrCgR4b59KrNDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dvPKRT5X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VQH4TPYk"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740674036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oZcxjI4+7P21B+uedoPfIm/5MklCtv1CyQ28To44/3c=;
-	b=VQH4TPYk3wOqqp6W3EjEAJePcfhMiusO7TDgripYPSl3fpsJu/e5JAyZbJvmafEfVOO+tO
-	ya9U6D+JdDg5Dcqpn2ZfvUbEXItSdFelsiTzlKUUTrOouYbH7kewymhKhxR2J2JM9C9RbG
-	lq4ztv06TkdsnT4FZbmhgSWougkKQ/Q=
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: [PATCH 1/1] loop: Remove struct loop_func_table
-Date: Thu, 27 Feb 2025 17:33:43 +0100
-Message-Id: <20250227163343.55952-1-yanjun.zhu@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dvPKRT5X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5796C4CEDD;
+	Thu, 27 Feb 2025 21:46:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740692789;
+	bh=/nEA92N9pwlqDw/LpZqyfnJstLMztmSrMkJcI7BZnHM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dvPKRT5XKK86/yRCU7aGSRVF27Udij5AYbKVsRnHG6PUTWKHtcOSZDPFVar/JcZnl
+	 yI2O72/iRm/uWkTxyqukHDz42HyvYTdT1ePpe83e2VZBl7oblC8giZJiQy9LKcuqCO
+	 jy40JQgHG9VAO8fI/ShTXr4lxoaqrCZaKjuS1E6WUf/sjNJ1kvMTYDbivrkQCPJyhT
+	 T7MDIGAsJkFd6Cej7EeboSyF7jkAVdbCoQTRkw22bby8sSJBcTXItn+70S/EaW/1DQ
+	 C4FYt8vlwiLzjOVop89VMtMWuisR3lspQCEB4QUzM0j4YX3DeL1VuWqWTBpbVhZvX+
+	 7IU+5xeEjSujg==
+Date: Thu, 27 Feb 2025 14:46:26 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
+	asml.silence@gmail.com, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org, bernd@bsbernd.com,
+	csander@purestorage.com, linux-nvme@lists.infradead.org
+Subject: Re: [PATCHv7 1/6] io_uring/rw: move fixed buffer import to issue path
+Message-ID: <Z8DdMoScpHMzYrrh@kbusch-mbp>
+References: <20250226182102.2631321-1-kbusch@meta.com>
+ <20250226182102.2631321-2-kbusch@meta.com>
+ <8b65adec-8888-40ae-b6c8-358fa836bcc6@kernel.dk>
+ <d1ff0d23-07a4-4123-b30f-446cf849814a@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d1ff0d23-07a4-4123-b30f-446cf849814a@kernel.dk>
 
-The struct is introduced in the commit 754d96798fab
-("loop: remove loop.h"), but it is not used now.
-So remove it.
+On Wed, Feb 26, 2025 at 01:20:24PM -0700, Jens Axboe wrote:
+> +static int io_rw_do_import(struct io_kiocb *req, int ddir)
+> +{
+> +	if (!io_do_buffer_select(req)) {
+> +		struct io_async_rw *io = req->async_data;
+> +		int ret;
+> +
+> +		ret = io_import_rw_buffer(ddir, req, io, 0);
+> +		if (unlikely(ret))
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+> +		      int ddir)
+> +{
+> +	int ret;
+> +
+> +	ret = __io_prep_rw(req, sqe, ddir);
+> +	if (unlikely(ret))
+> +		return ret;
+> +
+> +	return io_rw_do_import(req, ddir);
+> +}
 
-No functional changes.
+...
 
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
- drivers/block/loop.c | 2 --
- 1 file changed, 2 deletions(-)
+>  static int io_prep_rwv(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>  		       int ddir)
+>  {
+> -	const bool do_import = !(req->flags & REQ_F_BUFFER_SELECT);
+>  	int ret;
+>  
+> -	ret = io_prep_rw(req, sqe, ddir, do_import);
+> +	ret = io_prep_rw(req, sqe, ddir);
+>  	if (unlikely(ret))
+>  		return ret;
+> -	if (do_import)
+> -		return 0;
+> +	if (!(req->flags & REQ_F_BUFFER_SELECT))
+> +		return io_rw_do_import(req, ddir);
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c05fe27a96b6..aea84b57891a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -45,8 +45,6 @@ enum {
- 	Lo_deleting,
- };
- 
--struct loop_func_table;
--
- struct loop_device {
- 	int		lo_number;
- 	loff_t		lo_offset;
--- 
-2.39.5
-
+Not sure if I'm missing something subtle here, but wanted to point out
+I've changed the above in the version I'm about to send: io_prep_rw()
+already calls io_rw_do_import(), so we can just return 0 here.
