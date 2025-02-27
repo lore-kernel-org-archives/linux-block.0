@@ -1,153 +1,230 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C872021ABB4
-	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 10:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB6B6FB0;
+	Thu, 27 Feb 2025 11:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740652654; cv=none; b=qB1brEJ4gKfzqIoyLB21wSXDH4Iw7ym3s/5orttiYhYszm1QKWoGgjuegg1yf8h2AF/OQ9QdfisOWojUO27D1Uuioy3vawGOJ2CdB/NQB234w1RxWBtJpJ4A1LGrYjRd6mvAjLg4bjHRuUrZJQCgdCBtQLaoEZwqvEw0oz/+WOE=
+	t=1740656901; cv=none; b=N2HK4zyESDtyoP8O5fhVQIl5m8BVW3T2P+PLVUf68SdZZfJJN/Mu2itt+sEByuuPRZ3yBxJ4b+yJ8sVHmjEk71dmD6XatDQnEzyBGig2JyCarnQ3I1ZYAk6tDSf3W2cmML9cGxw/YJ2b1LxmgEAuVicnEl33ieANjxm4GDhFgSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740652654; c=relaxed/simple;
-	bh=dylsZggBFHrEm8rHUD08cwp+uS1KmHDfUp6fqALEjIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=olnuMYpEpwbPFw3GIbaIsBy9QE+Hcv815O42DYfuXCSxKunLiOWsssAK+VF2cV70ULXbY0l5kOvLxaCl333odyY7yw1CQlE4i//8KBDDDgQ7Lv97Od5QHHEFGlfYMAQ2+itbqbxr38WyX+J6YD332GymiEkmnH4ZGXLgf0A2Q0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQZqiBzA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQZqiBzA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740652650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=n1hmVroAFKtLZJxMWVffN1oCG+Um7XEbMW0OAFY4aOQ=;
-	b=dQZqiBzA+UBE7P1GwtOMWc7zMCj2j4xaxXLWrav8lv1iZpi994nlRGXFP2XKLZcWwGMf7t
-	b+t/6oLVW7cizhifqUMjEfOhUEN+9+qXDz0ZJejNJ2bi6Y1vPf0pTeS1202zmpEcHSUsPQ
-	6nW/o7Yk29OAjYAgYQZRhLDe9mPDWYo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-138-ONZvO3dfOuy_NTqCgNLMAQ-1; Thu,
- 27 Feb 2025 05:37:27 -0500
-X-MC-Unique: ONZvO3dfOuy_NTqCgNLMAQ-1
-X-Mimecast-MFC-AGG-ID: ONZvO3dfOuy_NTqCgNLMAQ_1740652646
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD9C6180036F;
-	Thu, 27 Feb 2025 10:37:25 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.5])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9A1CE1800359;
-	Thu, 27 Feb 2025 10:37:24 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] ublk: add DMA alignment limit
-Date: Thu, 27 Feb 2025 18:37:07 +0800
-Message-ID: <20250227103707.2640014-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1740656901; c=relaxed/simple;
+	bh=mbwARO7SYwI4j7mnR1JVJpy9jpdNB2B3SO+uovp03XA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QHW+ZS2vgDR6sMD4UqlDbTlOgFlVMR7sb+BN8fNpZDqYMie/1LCokBLK5K4ClIZjebnrHcRdu9klStKJbbxpXh4zhcSaqNHxlUD7szlBp5I7BpIb2MRe7Wuey/GL1BSSWUBKYC+wUXyaBP+6ilrnOxSOmTj0vItXARJPBdo2js4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z3V2X09rzz4f3lDK;
+	Thu, 27 Feb 2025 19:47:48 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 55D2D1A10F3;
+	Thu, 27 Feb 2025 19:48:11 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDHKl_4UMBnlVUwFA--.34292S3;
+	Thu, 27 Feb 2025 19:48:10 +0800 (CST)
+Subject: Re: [PATCH V2 11/12] md: improve return types of badblocks handling
+ functions
+To: Zheng Qixing <zhengqixing@huaweicloud.com>, axboe@kernel.dk,
+ song@kernel.org, dan.j.williams@intel.com, vishal.l.verma@intel.com,
+ dave.jiang@intel.com, ira.weiny@intel.com, dlemoal@kernel.org,
+ kch@nvidia.com, yanjun.zhu@linux.dev, hare@suse.de, zhengqixing@huawei.com,
+ colyli@kernel.org, geliang@kernel.org, xni@redhat.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250227075507.151331-1-zhengqixing@huaweicloud.com>
+ <20250227075507.151331-12-zhengqixing@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <25cce813-7e4e-b82b-48fa-b0ff0b3f3bb2@huaweicloud.com>
+Date: Thu, 27 Feb 2025 19:48:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20250227075507.151331-12-zhengqixing@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-CM-TRANSID:gCh0CgDHKl_4UMBnlVUwFA--.34292S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Aw15uw4DZrW7GFyUXFy3XFb_yoW7Aryrp3
+	yUJFyfJ3y0g34Fg3WUXrWDC3WF9w1fKFWIyrW3W34Ik3s7Kr95KF18XryYvFyvkF9xuF12
+	q3W5WF4Duw1kWrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x07jIksgUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-The in-tree ublk driver doesn't need DMA alignment limit because there
-is one data copy between request pages and the userspace buffer.
+ÔÚ 2025/02/27 15:55, Zheng Qixing Ð´µÀ:
+> From: Zheng Qixing <zhengqixing@huawei.com>
+> 
+> rdev_set_badblocks() only indicates success/failure, so convert its return
+> type from int to boolean for better semantic clarity.
+> 
+> rdev_clear_badblocks() return value is never used by any caller, convert it
+> to void. This removes unnecessary value returns.
+> 
+> Also update narrow_write_error() in both raid1 and raid10 to use boolean
+> return type to match rdev_set_badblocks().
+> 
+> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+> ---
+>   drivers/md/md.c     | 19 +++++++++----------
+>   drivers/md/md.h     |  8 ++++----
+>   drivers/md/raid1.c  |  6 +++---
+>   drivers/md/raid10.c |  6 +++---
+>   4 files changed, 19 insertions(+), 20 deletions(-)
+> 
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-However, ublk is going to support zero copy, then DMA alignment limit
-is required, because same IO buffer is forwarded to backend which may
-have specific buffer DMA alignment limit, so the limit has to be exposed
-from the frontend driver to client application.
-
-Cc: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-
-It is helpful to provide segment limit for avoiding extra
-IO split, but that shouldn't a must for zero copy.
-
- drivers/block/ublk_drv.c      | 16 +++++++++++++++-
- include/uapi/linux/ublk_cmd.h |  7 +++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4f291b55c876..c505b14989cf 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -73,7 +73,8 @@
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL                                \
- 	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
--	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
-+	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
-+	 UBLK_PARAM_TYPE_DMA_ALIGN)
- 
- struct ublk_rq_data {
- 	struct llist_node node;
-@@ -571,6 +572,16 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 	else if (ublk_dev_is_zoned(ub))
- 		return -EINVAL;
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN) {
-+		const struct ublk_param_dma_align *p = &ub->params.dma;
-+
-+		if (p->alignment >= PAGE_SIZE)
-+			return -EINVAL;
-+
-+		if (!is_power_of_2(p->alignment + 1))
-+			return -EINVAL;
-+	}
-+
- 	return 0;
- }
- 
-@@ -2348,6 +2359,9 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- 	if (ub->params.basic.attrs & UBLK_ATTR_ROTATIONAL)
- 		lim.features |= BLK_FEAT_ROTATIONAL;
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN)
-+		lim.dma_alignment = ub->params.dma.alignment;
-+
- 	if (wait_for_completion_interruptible(&ub->completion) != 0)
- 		return -EINTR;
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 74246c926b55..7255b36b5cf6 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -405,6 +405,11 @@ struct ublk_param_zoned {
- 	__u8	reserved[20];
- };
- 
-+struct ublk_param_dma_align {
-+	__u32	alignment;
-+	__u8	pad[4];
-+};
-+
- struct ublk_params {
- 	/*
- 	 * Total length of parameters, userspace has to set 'len' for both
-@@ -417,12 +422,14 @@ struct ublk_params {
- #define UBLK_PARAM_TYPE_DISCARD         (1 << 1)
- #define UBLK_PARAM_TYPE_DEVT            (1 << 2)
- #define UBLK_PARAM_TYPE_ZONED           (1 << 3)
-+#define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
- 	__u32	types;			/* types of parameter included */
- 
- 	struct ublk_param_basic		basic;
- 	struct ublk_param_discard	discard;
- 	struct ublk_param_devt		devt;
- 	struct ublk_param_zoned	zoned;
-+	struct ublk_param_dma_align	dma;
- };
- 
- #endif
--- 
-2.47.1
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 49d826e475cb..9b9b2b4131d0 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -9841,9 +9841,9 @@ EXPORT_SYMBOL(md_finish_reshape);
+>   
+>   /* Bad block management */
+>   
+> -/* Returns 1 on success, 0 on failure */
+> -int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> -		       int is_new)
+> +/* Returns true on success, false on failure */
+> +bool rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> +			int is_new)
+>   {
+>   	struct mddev *mddev = rdev->mddev;
+>   
+> @@ -9855,7 +9855,7 @@ int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+>   	 * avoid it.
+>   	 */
+>   	if (test_bit(Faulty, &rdev->flags))
+> -		return 1;
+> +		return true;
+>   
+>   	if (is_new)
+>   		s += rdev->new_data_offset;
+> @@ -9863,7 +9863,7 @@ int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+>   		s += rdev->data_offset;
+>   
+>   	if (!badblocks_set(&rdev->badblocks, s, sectors, 0))
+> -		return 0;
+> +		return false;
+>   
+>   	/* Make sure they get written out promptly */
+>   	if (test_bit(ExternalBbl, &rdev->flags))
+> @@ -9872,12 +9872,12 @@ int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+>   	set_mask_bits(&mddev->sb_flags, 0,
+>   		      BIT(MD_SB_CHANGE_CLEAN) | BIT(MD_SB_CHANGE_PENDING));
+>   	md_wakeup_thread(rdev->mddev->thread);
+> -	return 1;
+> +	return true;
+>   }
+>   EXPORT_SYMBOL_GPL(rdev_set_badblocks);
+>   
+> -int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> -			 int is_new)
+> +void rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> +			  int is_new)
+>   {
+>   	if (is_new)
+>   		s += rdev->new_data_offset;
+> @@ -9885,11 +9885,10 @@ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+>   		s += rdev->data_offset;
+>   
+>   	if (!badblocks_clear(&rdev->badblocks, s, sectors))
+> -		return 0;
+> +		return;
+>   
+>   	if (test_bit(ExternalBbl, &rdev->flags))
+>   		sysfs_notify_dirent_safe(rdev->sysfs_badblocks);
+> -	return 1;
+>   }
+>   EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
+>   
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index def808064ad8..923a0ef51efe 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -289,10 +289,10 @@ static inline int rdev_has_badblock(struct md_rdev *rdev, sector_t s,
+>   	return is_badblock(rdev, s, sectors, &first_bad, &bad_sectors);
+>   }
+>   
+> -extern int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> -			      int is_new);
+> -extern int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> -				int is_new);
+> +extern bool rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> +			       int is_new);
+> +extern void rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+> +				 int is_new);
+>   struct md_cluster_info;
+>   
+>   /**
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index 10ea3af40991..8e9f303c5603 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -2486,7 +2486,7 @@ static void fix_read_error(struct r1conf *conf, struct r1bio *r1_bio)
+>   	}
+>   }
+>   
+> -static int narrow_write_error(struct r1bio *r1_bio, int i)
+> +static bool narrow_write_error(struct r1bio *r1_bio, int i)
+>   {
+>   	struct mddev *mddev = r1_bio->mddev;
+>   	struct r1conf *conf = mddev->private;
+> @@ -2507,10 +2507,10 @@ static int narrow_write_error(struct r1bio *r1_bio, int i)
+>   	sector_t sector;
+>   	int sectors;
+>   	int sect_to_write = r1_bio->sectors;
+> -	int ok = 1;
+> +	bool ok = true;
+>   
+>   	if (rdev->badblocks.shift < 0)
+> -		return 0;
+> +		return false;
+>   
+>   	block_sectors = roundup(1 << rdev->badblocks.shift,
+>   				bdev_logical_block_size(rdev->bdev) >> 9);
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index 15b9ae5bf84d..45faa34f0be8 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -2786,7 +2786,7 @@ static void fix_read_error(struct r10conf *conf, struct mddev *mddev, struct r10
+>   	}
+>   }
+>   
+> -static int narrow_write_error(struct r10bio *r10_bio, int i)
+> +static bool narrow_write_error(struct r10bio *r10_bio, int i)
+>   {
+>   	struct bio *bio = r10_bio->master_bio;
+>   	struct mddev *mddev = r10_bio->mddev;
+> @@ -2807,10 +2807,10 @@ static int narrow_write_error(struct r10bio *r10_bio, int i)
+>   	sector_t sector;
+>   	int sectors;
+>   	int sect_to_write = r10_bio->sectors;
+> -	int ok = 1;
+> +	bool ok = true;
+>   
+>   	if (rdev->badblocks.shift < 0)
+> -		return 0;
+> +		return false;
+>   
+>   	block_sectors = roundup(1 << rdev->badblocks.shift,
+>   				bdev_logical_block_size(rdev->bdev) >> 9);
+> 
 
