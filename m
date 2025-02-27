@@ -1,121 +1,79 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D6F2563
-	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 00:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A66A13AA31;
+	Thu, 27 Feb 2025 02:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740615923; cv=none; b=jSAG4NVrGZeITmDnu3o+1mOhiaFmN3iA75tWWiQGrA+4z/MJTEpCVOZRizLFdm0kircO61URz1bOrzLTRQrQEoc5RHXYhuCa9HSouhSfA9u5ZvX3bdBs1ok3HS6vshbEKhhFl/peMkrTLlRBTjIotS+RJLX72eaQT4poP9uI9Yc=
+	t=1740624599; cv=none; b=MHeyKcM7VUTgaKJzRs99F97cjJWgAz/jymBs0AeOpRYbR8xOQ8DmVvxnNOXYBII2vteN0r7MZV6XLacwx5Prfo+ouyHf2FIY2zkZ1fti29ecQAd3qoEywC1JwJbOAGZ48ylQyeiQaCwBL8DzwCh/mVTxJdATMiN/eZFm5YvPi24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740615923; c=relaxed/simple;
-	bh=xfxO5f3SaaWSCzedr4Qrpy5t3DN3009tDqOgDwP1BiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n7BoI9WtY7fkE80X8Frt5+fEM2JfkcNUqrvvrIvodbL84YsB4NK1jvcFNZ2oABDk/MoKSxa8d+qEMH66l+4zuLt4sO7JF6S+z9vdkKM98TzUCJJ0S8jxKjngpHQE7wr5LiLKY7pXPQUEUIsnSbWczkvACfk12crHQb62LdkIoBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X+YKHTnu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+YKHTnu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740615920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uNjZSG9VYIK67lUJC2qFm+MVqGoqkKRhIJoW7H5gEqA=;
-	b=X+YKHTnu2G0gyxUWxMU5tQebTsJgDVYMj7+eec6fXusETMibMTry6ctBn2xS9L8DWUL/fR
-	Yeg/FT0D2R2hTnI1y4mhYHs8ouOotVrU9xcilfIXno9YcwzBt79BDtytiIJdoZsztu27aV
-	MjcaQGAmUnmGEz8eLNQcA/CUW2WycVo=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-jS_HZGrhPKKgbX9Hye7kww-1; Wed,
- 26 Feb 2025 19:25:15 -0500
-X-MC-Unique: jS_HZGrhPKKgbX9Hye7kww-1
-X-Mimecast-MFC-AGG-ID: jS_HZGrhPKKgbX9Hye7kww_1740615914
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E90CA18EAA85;
-	Thu, 27 Feb 2025 00:25:13 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.7])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 651D7180094B;
-	Thu, 27 Feb 2025 00:25:08 +0000 (UTC)
-Date: Thu, 27 Feb 2025 08:25:00 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: Re: [PATCH V2 3/3] selftests: ublk: add ublk zero copy test
-Message-ID: <Z7-w3PAczKYn-d6s@fedora>
-References: <20250226155841.2489284-1-ming.lei@redhat.com>
- <20250226155841.2489284-4-ming.lei@redhat.com>
- <Z79SV8gD1hah9PVD@kbusch-mbp>
+	s=arc-20240116; t=1740624599; c=relaxed/simple;
+	bh=Ab7eo57PFCFC9WhnnwSJx1S7OQ+3hKFiHMvngc6cB+A=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=IRb03ZovsJa1mnGUS8KDj81FvxfOtR4bM7VsaUu3fjjqBBP+0eURbsehiybVf+kprj86Wm94QtT6gfM4wfCINA1Mxek3G14V3/S7DdcnNIL3kFbNrwZd1HPeDGpcn06l533rkNwIV6lL5E71jEkQ8MU2MqeDffonkRvv+9fHs2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z3G5Y66mGz4f3jt8;
+	Thu, 27 Feb 2025 10:49:37 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 620251A0FA5;
+	Thu, 27 Feb 2025 10:49:54 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCH61_R0r9nxjIMFA--.28039S3;
+	Thu, 27 Feb 2025 10:49:54 +0800 (CST)
+Subject: Re: [PATCH] blk-throttle: fix lower bps rate by throtl_trim_slice()
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, vgoyal@redhat.com,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250226011627.242912-1-yukuai1@huaweicloud.com>
+ <Z77R_rqgDdAvFVgP@fedora>
+ <021e6495-11e5-3b39-2786-d69cc4bf24f7@huaweicloud.com>
+ <Z77uID36yIvWDQEj@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6ce659d4-460d-b8bc-4834-8ad0702e7bdc@huaweicloud.com>
+Date: Thu, 27 Feb 2025 10:49:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z79SV8gD1hah9PVD@kbusch-mbp>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <Z77uID36yIvWDQEj@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCH61_R0r9nxjIMFA--.28039S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	F9a9DUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Feb 26, 2025 at 10:41:43AM -0700, Keith Busch wrote:
-> On Wed, Feb 26, 2025 at 11:58:38PM +0800, Ming Lei wrote:
-> > +	struct io_uring_sqe *reg;
-> > +	struct io_uring_sqe *rw;
-> > +	struct io_uring_sqe *ureg;
-> > +
-> > +	if (!zc) {
-> > +		rw = ublk_queue_alloc_sqe(q);
-> > +		if (!rw)
-> > +			return -ENOMEM;
-> > +
-> > +		io_uring_prep_rw(op, rw, 1 /*fds[1]*/,
-> > +				(void *)iod->addr,
-> > +				iod->nr_sectors << 9,
-> > +				iod->start_sector << 9);
-> > +		io_uring_sqe_set_flags(rw, IOSQE_FIXED_FILE);
-> > +		q->io_inflight++;
-> > +		/* bit63 marks us as tgt io */
-> > +		rw->user_data = build_user_data(tag, op, UBLK_IO_TGT_NORMAL, 1);
-> > +		return 0;
-> > +	}
-> > +
-> > +	ublk_queue_alloc_sqe3(q, &reg, &rw, &ureg);
-> > +
-> > +	io_uring_prep_buf_register(reg, 0, tag, q->q_id, tag);
-> > +	reg->user_data = build_user_data(tag, 0xfe, 1, 1);
-> > +	reg->flags |= IOSQE_CQE_SKIP_SUCCESS;
-> > +	reg->flags |= IOSQE_IO_LINK;
-> > +
-> > +	io_uring_prep_rw(op, rw, 1 /*fds[1]*/, 0,
-> > +		iod->nr_sectors << 9,
-> > +		iod->start_sector << 9);
-> > +	rw->buf_index = tag;
-> > +	rw->flags |= IOSQE_FIXED_FILE;
-> > +	rw->flags |= IOSQE_IO_LINK;
-> > +	rw->user_data = build_user_data(tag, op, UBLK_IO_TGT_ZC_OP, 1);
-> > +	q->io_inflight++;
-> > +
-> > +	io_uring_prep_buf_unregister(ureg, 0, tag, q->q_id, tag);
-> > +	ureg->user_data = build_user_data(tag, 0xff, UBLK_IO_TGT_ZC_BUF, 1);
+Hi,
+
+在 2025/02/26 18:34, Ming Lei 写道:
+> Actually the in-tree code already covers deviation from the rounddown(),
+> but turns out it is still not enough, so this patch increases one extra
+> def slice size. With this thing is documented, feel free to add:
 > 
-> You don't have anything handling the unregister command's completion so
-> I think you want the IOSQE_CQE_SKIP_SUCCESS flag on it otherwise you get
-> an unexpected CQE for it.
+> Reviewed-by: Ming Lei<ming.lei@redhat.com>
 
-Please see ublk_loop_io_done() which does handle unregister command by
-the flag of UBLK_IO_TGT_ZC_BUF. And it is reasonable to complete the
-io command after the whole link is done.
-
-BTW, with this way, one ublk bug is actually triggered, and Caleb's patch
-fixes it.
-
-
-Thanks,
-Ming
+Thanks for the review, will send a new verion.
+Kuai
 
