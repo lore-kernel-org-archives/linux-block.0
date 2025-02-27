@@ -1,80 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93D7225412
-	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 08:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4BA22576C;
+	Thu, 27 Feb 2025 09:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740646412; cv=none; b=t5L0PM2gaKen1oWjtFGAVjGc9WDOn88GE4ED55jCHH8o7C+XUhDp0oAmeGEBebwFmWSgZ3btA9X7l5O6ulXlfAEkKteQqn9FjvHGkEdWlLwv9FN2IXjVWFtHPeb9omWG9VtE4RxiDsmgxCma/wvE0Dnd+pLOs0qjmKgKBbbk0ds=
+	t=1740646985; cv=none; b=SXR8cJvgeK28GNoIUbBSC2CPnlCrYcK/9dVqrQpjDaOGIlyGtuwOtFQzhJipfNsUeKFa/BIMsHrA1G2R803n1cQaxQVYJz9d+QJehmR/Yf+HaVqdBnH8oJyFsNBBR3+r4BDXyug7fcHXuRTj/6ijAVIDeeyMWCfqhxBC2jokAUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740646412; c=relaxed/simple;
-	bh=3GpRrQB1DypQLUYLxyCLDjQ561KIZeotsWfmMyEWDf4=;
+	s=arc-20240116; t=1740646985; c=relaxed/simple;
+	bh=NVCpCk+nbSUsNJ/EU7EEuGOPqCNbb7okhZbn+Sil+6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCiWAXUQ8PwBsRiU2hxZGUkEdtwmNWoh3yrzCnw+S2DJqj6onG8b5NVDohFf1ZxDVx9yeDn1jfkBgJGzCFbYOTGY8/VpAb0i+cfdhMd5lamPEtwKjN+q0D+mpNzioDiQw6YTzEVRxZ9NnNFZp9BPYewMlH7xClV5RqssHJ7nQuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ErPzERDz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=tiKcbViOayNAePsy0pUklxZwqZAKz5ZhJDjiW/QdW5lHGaxT+Vo5tfm0VqNhLPVFOMwAeAQi6wKqh5GEy+E3dflZVAGVaC6KcIWdzpA9FRLlTu4DM+sBdi+mk0OWcEJ+q7823JMaOAgky+oPyeIZyWfWStoybPumk/gacdR9Byw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLspYqEw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErPzERDz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740646409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EyvlqtbZaeJM3spFnINaDI06hIqM+bBC6L0QBlOLKJ8=;
-	b=ErPzERDz9Ehomo75oNOQC13uCLqDsk4gPCzH9XZBvlarszCXnS24sOBBNQjpA0fKUnhMEz
-	aSeeOrDd8IbcMB96+lJXoVYKz3YnYpYIPKKmw+KmNpvz8VGtYLCu9WVV84/NjXB4N17F/E
-	ds221IMnfHcJcsrQhXvL3OJauMCl7bo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-6yagQB45M9-4qXxYQ94Ejw-1; Thu, 27 Feb 2025 03:53:27 -0500
-X-MC-Unique: 6yagQB45M9-4qXxYQ94Ejw-1
-X-Mimecast-MFC-AGG-ID: 6yagQB45M9-4qXxYQ94Ejw_1740646406
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38f31e96292so401104f8f.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 00:53:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740646406; x=1741251206;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyvlqtbZaeJM3spFnINaDI06hIqM+bBC6L0QBlOLKJ8=;
-        b=g/M10UJnHyOzaY+b9t+bxcR+nrvxxM0KiVuuX0nQLlstrWcepfvZ0I+z6MsAi0nvga
-         ptZakzlQn/gzRHgg5rLL0JLtnJf1Nd0T1CKpqlWMnM0z0mkE8GoOmpzcJkyzIi1FmcGK
-         USf6eyuyo/NIcl3wH15zK5djOAAL4asAg8gfIS607tgdgg8YdL/fhCrmVnDqNo+OeY+A
-         ukwp+YoAkgDFSzHKrjDs4PD8g6nWJRSLEMvkny2ReBYCrjm/HgzFphUtmr9EjP5nf5bN
-         BYdontUTxDXnOxvGBta4CJNk/f9LjEOufNj6BVulBqw3pfHq6L7qzkz8IGFeRhvrjy5t
-         gSFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhksTI9hwcESDcVG7dKnzhx9z4BVG30NzuiW+iKLx62QRwj9ADg6/5dai/xf3Nf1H9FY+x9ftqZr4c1w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvYSKy6xbfzd/4FZj6On5kYyx9DxPvjtf/US5hRrZFSvilsWqL
-	aLtQX4D9MZjW5wGiTbiMHDdtYaXXNp3JhMxWmi91XuI2petwHmONQOdIiqw8oDdWm6Gh7FxQPMG
-	vKZz36dR21qIl2DlJVop7AcQy0cevIOa2ZqUQMLDrVDAmSwK992dfEdW7TUw/
-X-Gm-Gg: ASbGncuvKm3ZzWtyJjx0PkueesTjGy9qDZ+yyIbTiZ9kmE4p9YDHeLAndYO9ZZTPLfs
-	Updmb7Ybo5nm0TRC0EH3Vv/fgxAeaKcGI8LesOTRT50d2VwcTgHG8N00oRSY7ooRzb9ScoFsUAI
-	IU4eZnp7UB0j5KxJW8RY4MDWssZeGyDYHMQFI9Exv2LB7hDVwGb+c59VSxGl7+o3w+ejMB0aDgS
-	XzfzQRBgPbt2D3p0J/DSUm10s2T9uon8DvrnzGp1vXNVK84wsQyXp6oYJh1ap0bvi2XH/sYyPa4
-X-Received: by 2002:a05:6000:188d:b0:390:de67:2661 with SMTP id ffacd0b85a97d-390de672726mr3623245f8f.14.1740646405856;
-        Thu, 27 Feb 2025 00:53:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGZtPZ71xXc3/ezwCo25Ggz6REeCkcCkX8Y7Z6psxHYAImpw+ef4XDuShBy1cgFq9Op/H86MA==
-X-Received: by 2002:a05:6000:188d:b0:390:de67:2661 with SMTP id ffacd0b85a97d-390de672726mr3623228f8f.14.1740646405519;
-        Thu, 27 Feb 2025 00:53:25 -0800 (PST)
-Received: from redhat.com ([2.52.7.97])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47b7d12sm1361883f8f.58.2025.02.27.00.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 00:53:24 -0800 (PST)
-Date: Thu, 27 Feb 2025 03:53:20 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Max Gurtovoy <mgurtovoy@nvidia.com>, israelr@nvidia.com,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	oren@nvidia.com, nitzanc@nvidia.com, dbenbasat@nvidia.com,
-	smalin@nvidia.com, larora@nvidia.com, izach@nvidia.com,
-	aaptel@nvidia.com, parav@nvidia.com, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 0/2] virtio: Add length checks for device writable
- portions
-Message-ID: <20250227034434-mutt-send-email-mst@kernel.org>
-References: <20250224233106.8519-1-mgurtovoy@nvidia.com>
- <20250227081747.GE85709@fedora>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLspYqEw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7E3C4CEDD;
+	Thu, 27 Feb 2025 09:02:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740646984;
+	bh=NVCpCk+nbSUsNJ/EU7EEuGOPqCNbb7okhZbn+Sil+6M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nLspYqEw609cIT0ad0o594ZSe9+944oOqgtsX4PvzoyBCh2CjxvcaZKHcRlfZbkg3
+	 o98sgutNPNtNQvtB1V2TWfdkxk0jvPKNau6dHa8OKjnpZRzHC9C6ErL5o2r0XNXfYe
+	 ynD51HJPuofVM3zovm3pWhAZDAaeGPoIRj6tCVyu8o4t7sFTQlvipwFQwyRdAzsR2d
+	 B6voWJuIrlI+Cf1lPSYN2ZjYhqS7rvygaip7lyyFeeh6HBrO8Q/DpezIvl2iQUtyVl
+	 OXwKmfMuglQQ5kuzM1Q6kxE36HyfrIokC3I3woeNs2DsuZou71wXc13B0RkvyLg9Ys
+	 NykE1mhZbbdJQ==
+Date: Thu, 27 Feb 2025 10:02:45 +0100
+From: Carlos Maiolino <cem@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Mark Brown <broonie@kernel.org>, 
+	Easwar Hariharan <eahariha@linux.microsoft.com>, Yaron Avizrat <yaron.avizrat@intel.com>, 
+	Oded Gabbay <ogabbay@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>, 
+	Nicolas Palix <nicolas.palix@imag.fr>, James Smart <james.smart@broadcom.com>, 
+	Dick Kennedy <dick.kennedy@broadcom.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+	David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+	"Darrick J. Wong" <djwong@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Frank Li <Frank.Li@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, 
+	Hans de Goede <hdegoede@redhat.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>, Selvin Xavier <selvin.xavier@broadcom.com>, 
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, cocci@inria.fr, linux-kernel@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-ide@vger.kernel.org, linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-spi@vger.kernel.org, imx@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
+	ibm-acpi-devel@lists.sourceforge.net, linux-rdma@vger.kernel.org, Takashi Iwai <tiwai@suse.de>, 
+	Carlos Maiolino <cmaiolino@redhat.com>
+Subject: Re: [PATCH v3 00/16] Converge on using secs_to_jiffies() part two
+Message-ID: <3apo7evpkvcy5mafw7zdatr3n7lytugvfmumq2zou4nifyptnc@ucbu4c5g5jrq>
+References: <20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com>
+ <79b24031-5776-4eb3-960b-32b0530647fb@sirena.org.uk>
+ <hJl1qb89zCHWejINoRSGGIO0m7NNi3wAmY9N_VC7royLnZoyL-ZozLkmLO-vCPlYc55-IPh76PIB_2_aKKjp1A==@protonmail.internalid>
+ <20250226123851.a50e727d0a1bfe639ece4a72@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,75 +69,44 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250227081747.GE85709@fedora>
+In-Reply-To: <20250226123851.a50e727d0a1bfe639ece4a72@linux-foundation.org>
 
-On Thu, Feb 27, 2025 at 04:17:47PM +0800, Stefan Hajnoczi wrote:
-> On Tue, Feb 25, 2025 at 01:31:04AM +0200, Max Gurtovoy wrote:
-> > Hi,
-> > 
-> > This patch series introduces safety checks in virtio-blk and virtio-fs
-> > drivers to ensure proper handling of device-writable buffer lengths as
-> > specified by the virtio specification.
-> > 
-> > The virtio specification states:
-> > "The driver MUST NOT make assumptions about data in device-writable
-> > buffers beyond the first len bytes, and SHOULD ignore this data."
-> > 
-> > To align with this requirement, we introduce checks in both drivers to
-> > verify that the length of data written by the device is at least as
-> > large as the expected/needed payload.
-> > 
-> > If this condition is not met, we set an I/O error status to prevent
-> > processing of potentially invalid or incomplete data.
-> > 
-> > These changes improve the robustness of the drivers and ensure better
-> > compliance with the virtio specification.
-> > 
-> > Max Gurtovoy (2):
-> >   virtio_blk: add length check for device writable portion
-> >   virtio_fs: add length check for device writable portion
-> > 
-> >  drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
-> >  fs/fuse/virtio_fs.c        |  9 +++++++++
-> >  2 files changed, 29 insertions(+)
-> > 
-> > -- 
-> > 2.18.1
-> > 
+On Wed, Feb 26, 2025 at 12:38:51PM -0800, Andrew Morton wrote:
+> On Wed, 26 Feb 2025 11:29:53 +0000 Mark Brown <broonie@kernel.org> wrote:
 > 
-> There are 3 cases:
-> 1. The device reports len correctly.
-> 2. The device reports len incorrectly, but the in buffers contain valid
->    data.
-> 3. The device reports len incorrectly and the in buffers contain invalid
->    data.
+> > On Tue, Feb 25, 2025 at 08:17:14PM +0000, Easwar Hariharan wrote:
+> > > This is the second series (part 1*) that converts users of msecs_to_jiffies() that
+> > > either use the multiply pattern of either of:
+> > > - msecs_to_jiffies(N*1000) or
+> > > - msecs_to_jiffies(N*MSEC_PER_SEC)
+> > >
+> > > where N is a constant or an expression, to avoid the multiplication.
+> >
+> > Please don't combine patches for multiple subsystems into a single
+> > series if there's no dependencies between them, it just creates
+> > confusion about how things get merged, problems for tooling and makes
+> > everything more noisy.  It's best to split things up per subsystem in
+> > that case.
 > 
-> Case 1 does not change behavior.
+> I asked for this.  I'll merge everything, spend a few weeks gathering
+> up maintainer acks.  Anything which a subsystem maintainer merges will
+> be reported by Stephen and I'll drop that particular patch.
+
+I'm removing this from my queue then and let it go through your tree.
+Cheers,
+
+Carlos
+
 > 
-> Case 3 never worked in the first place. This patch might produce an
-> error now where garbage was returned in the past.
+> This way, nothing gets lost.  I take this approach often and it works.
 > 
-> It's case 2 that I'm worried about: users won't be happy if the driver
-> stops working with a device that previously worked.
+> If these were sent as a bunch of individual patches then it would be up
+> to the sender to keep track of what has been merged and what hasn't.
+> That person will be resending some stragglers many times.  Until they
+> give up and some patches get permanently lost.
 > 
-> Should we really risk breakage for little benefit?
+> Scale all that across many senders and the whole process becomes costly
+> and unreliable.  Whereas centralizing it on akpm is more efficient,
+> more reliable, more scalable, lower latency and less frustrating for
+> senders.
 > 
-> I remember there were cases of invalid len values reported by devices in
-> the past. Michael might have thoughts about this.
-> 
-> Stefan
-
-
-Indeed, there were. This is where Jason's efforts to validate
-length stalled.
-
-See message id 20230526063041.18359-1-jasowang@redhat.com
-
-I am not sure I get the motivation for this patch. And yes, seems to
-risky especially for blk. If it's to help device validation, I suggest a
-Kconfig option.
-
-
--- 
-MST
-
