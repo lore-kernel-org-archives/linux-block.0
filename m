@@ -1,97 +1,100 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A4126E17D
-	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 14:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019FF26E63B
+	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 14:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740751732; cv=none; b=s0U+CgtZJOA8oYeo6rlWwyx4mm66IiNtJrPX5CoBJyNetqdB7d5Qsl48yKQDvP2kieZVks5Jb+SECTJC9x1ct1cptQh8wuQzJ92LXQOnkMwVyh/i9iGUSs05wApHWRrDX6retOt/Xt1HXa7fnMPqKVRmOggw+mgT83QhSil6jwA=
+	t=1740751744; cv=none; b=iWr5AOGhkWPWeSykfqOY6tEcvzab9wqUq9fijIsOInn/q02wYMvK5w2oHcLxPxyKrIHBi14V5vd2Y3WsllNmGJNzmUrpIHStTFSPTiyEPVPdiFcR8ZBXQ26TfecSsjcYRsbDMcBTJ90lry73ZKXlpakgR7FNgAueddkVfkCpLIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740751732; c=relaxed/simple;
-	bh=7DWNdt/2v2uJzfa9a4Lu3gm3NbTQQQo0EG0KhdAX1p0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PlTM2+CVZ/WNj5JpAHG2AN7O8n4Zj+jc8ahBkz4so7fp6qkTPXWsWXaTcoKWhDu15vGpxJklUhNPvi9zM9/6izggXqpW80emvwg5TOalJmv+FnTbu8+kIwMLKvV4hNYj++m2v9LauVk2MFpmsGOZ04ZjkU4M14z/CqNPFQMO8OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZGDpCYWp; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1740751744; c=relaxed/simple;
+	bh=wtRdQIjxj8oZDybNP77Rq60JK6MGRMlW4ONrnA4kUE0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=T+6QYFRLlRUxotXJfJ9RSRDllj5MkmyzUXA4xboQHYyQ2diuFLrqqIQ5i1wXqglxfMPTwlx9KIClrYD/jY08DDUe8eRawB+NOva3Q/utAHIV58UYM1JRz908ONYJi4eoLj4nEFX7Ui4kqRvRJ69Bdaj1ozm2MjGTcUIvnLUnaQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=e2ah0PCs; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZGDpCYWp"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-223785beedfso6715365ad.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 06:08:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="e2ah0PCs"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2fea795bafeso3108926a91.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 06:09:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740751729; x=1741356529; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7CILUScLE0hBWAgWre2/oKndCrDoF+/2Wtd3L87a/bg=;
-        b=ZGDpCYWpL7tz64mCYW/e91XqrjAuRkdLotJw4zbLKr9JP0BdkdBedK3Idj2RUYIOlT
-         CG8SsJU6cGFHk1sQrQhaL4U+pdTdEWyrRl+vx4A9ZG3B/sxyRdoSZSeAAZ/IT2/aFmwu
-         JU/BOUOQ7QpJ56r82F9Wl34ou9gQEL8rQ6uKJyhQ9tBIE0ni7OBsGJBXu4+wemJyDaLy
-         ednGAbFImLVa12q2gIgOj0l0XEVQUMYpztk7q4NHihRecluv/jyfACvCijKcmBSdZ364
-         CBX8AinS1XaLLfi2A0oTZNWNNhwpV55ekc20NDS06uudAS9p9rN+lKkOe0ChSw2wfQKu
-         G9tg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740751742; x=1741356542; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VCyggvZ+qYQ4ZCnU7Xp1kRSxJbXbRg3JdPjepYpK/lE=;
+        b=e2ah0PCs+wr2qmzvciqPgnmj1Iemew/GQRBI3Wx05A9+EiJPrap+/Igh20YC8tyPO+
+         JyJz1HGDNKZW85cF7adG4Jz/ffF1EkPRDtt5xSERVzmZDw6iurDVIXFWj0j1phfjddHh
+         kPSLQsaCDFQcmh1cYpMyxbg+p6nUuKI5x6JJzJJxxz0EY87/iD4tJWQ1/XaTx4GcLhIX
+         /ETUnSBNqLQBWSnoCec9YouvRtniimlY0adY5Lmip3vbtElp/+T3QFbZWUfOq9soYf0F
+         JXCtzM1oIkukM7UQFJ8Hzl/WlVR1aZMmOXZ1Di+LIAyLxY4JotFMebCdYz5xGA2CxyNM
+         EUJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740751729; x=1741356529;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7CILUScLE0hBWAgWre2/oKndCrDoF+/2Wtd3L87a/bg=;
-        b=Hao2RdpMZQ2l8AY6+uLl9OP6g2/YEzi7w6KrLDojrpVh5sbV6ixFoMRQ9Q9z0FPMtt
-         FAFNSG6S4LOOPMWJjMRrl0nmcXWRj/cKXxkD1keJ6M20Y/cG5IoJyRtNmSeoBin2Sca7
-         gC0Wt80+NjZGs6LQxvkkghEX42HDTu2vPirfbol3enDj+RtjTKJVMYEEE+/Hyd/oIju1
-         dxBV2eguskfuy1hTieKiSfA/is8Rzc+0cGwPGiQKp9TmlVe9iqJF+JGNGTBdMVdGSdxG
-         EyhjoK77nShrexFKd47v+XpQ87fT93RLk2jHRFoAdsuduKu5CedqlBvT/Ax/1GLJP4ng
-         4/Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCVG7Nl9pCRgjyaZHcusMpY/quVwSILU+FGdfhr93X+uUeQCgGrt3K0IklqlyvqfIyZnQnr8nXQBg05VVw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlvV0IyARMAqPyaNQAQI9RNk0HSpfSP7xFhlVFw9XtdUs3s1sP
-	IdEo7ar8sMe53yv8NNbm43e+FlusE9f4xBYxjaLd5yKn+PSHitMarwkY38oHNTZzrKTIBfrL+g3
-	3
-X-Gm-Gg: ASbGncu2FlPjSRuVEMnCDZnaB76xCDdUDDSqYVH45xqJZmHUWt17hg5IJNVC9FGka9q
-	UbK5YSS5iXbl9BvS3mPX0HQU7pfmEbUgGhxTf9Sg5kWeqw7qiFmZL6XpGxDnVj3kD/wba3Opkcv
-	VBmcVwUV/gZsX+d3loBd5Ggl6ERyzpdB8Itca0eiJdK/P00EHLqp4cOnRWgXjhPiScoW1W6Cp69
-	ufrybB9wbv1acVIZ4M5YovNT03nsXus8ngRLbVo3rKf10S9NTJfJ0RJflFDAdYJB8IUGFFSj1VR
-	f1bpoG9NnnLG5Fh6jbw=
-X-Google-Smtp-Source: AGHT+IH0RvwNCYwa6/BYzvW095Ti4mOLDCGElcS+QZXC85+fl4rOlbbZ3z3pilQKgJLmbSgtB5MatA==
-X-Received: by 2002:a17:902:da91:b0:223:5c33:56a2 with SMTP id d9443c01a7336-223690e1aafmr59671725ad.28.1740751729331;
-        Fri, 28 Feb 2025 06:08:49 -0800 (PST)
-Received: from [172.16.2.60] ([4.96.84.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235050b123sm33495085ad.197.2025.02.28.06.08.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2025 06:08:48 -0800 (PST)
-Message-ID: <459b9c3b-0d5e-4797-86f7-4237406608ff@kernel.dk>
-Date: Fri, 28 Feb 2025 07:08:47 -0700
+        d=1e100.net; s=20230601; t=1740751742; x=1741356542;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VCyggvZ+qYQ4ZCnU7Xp1kRSxJbXbRg3JdPjepYpK/lE=;
+        b=JnghpSqIsZQLh1p9ji6PRUATKQehOn3XpwPktxqyKcBJvqyPvMQzhajkxOjDOcxeqE
+         48jCmTYykRAqbqKsmXcDYp47N9O8UmkSgwWloAFZ1226Wnzpevf/Ovhwl2i+ZRgAppVG
+         n6zs6DdM97tiV2nID1p6hlTEq7AM2k4YssKFh4UiyckDDP3hzyiCPjgOpGswi1xG0J96
+         KgF/Zxiv1OdoS9+CfIGhcwvaewfN9XOYOwG2KLz7ty4Kt/rSAoV+8XugsaJRVYH1otRz
+         izXcxCXOAk5J/YMlieQWBZ2rYc9R+jZfIqf5LOHHegXiaB2znOZsJmhbbWIC1l5bSzzH
+         v6vg==
+X-Gm-Message-State: AOJu0YznCbOHbLTumQJ/s+krqoKth0FLhmwWq/y8N+ffwujsX/SdfKJP
+	arqMtzZwoWTa2n5Ya/uG/LgOolcrPIaedCJQ5vAf3rXDE25LmOqfzQBOxVt8jqu8aAV9mh19diu
+	C
+X-Gm-Gg: ASbGncskNQFfhpLdveFD+HsLfXDk8Ys5ShPYSnMCcrBo7Jm3A3U0lIlYL5MoICXyL/a
+	BlGI5HQMQWabDnJ0jc0POxLAKVnD/Yk9ty5zQKZM8BhqRmGNrtW14UBrk3S7AP3DlI5SqNRQOk8
+	XBQtXoMulFDRr2AHUNZU03c/bH3BIFiMGI4alBWmRTY65QflDe3q8VAhRRBmnxnaO2g2+qgPhSD
+	tEHf8zwDTkIoz50JQxP3uUwBJZZ7dXbv+vc/ui1zodmOtyKawlcx57wfmkJbSIHFi9NtLKTyJJJ
+	UvhfdvE5Ce3pR7WF
+X-Google-Smtp-Source: AGHT+IGobyxbKAOO5giozHDIDDDpXcAGwJs3wqyfFTHuo8h99K3Ye2ToYfGFBTcDMlOgfftTl45uUg==
+X-Received: by 2002:a05:6a21:99aa:b0:1ea:f941:8d8e with SMTP id adf61e73a8af0-1f2f3dec2abmr6337284637.16.1740751741716;
+        Fri, 28 Feb 2025 06:09:01 -0800 (PST)
+Received: from [127.0.0.1] ([63.78.1.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af14cd45d19sm671001a12.35.2025.02.28.06.09.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 06:09:01 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Guangwu Zhang <guazhang@redhat.com>
+In-Reply-To: <20250228132656.2838008-1-ming.lei@redhat.com>
+References: <20250228132656.2838008-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: fix 'kmem_cache of name 'bio-108' already
+ exists'
+Message-Id: <174075174078.2560460.4128921786328385965.b4-ty@kernel.dk>
+Date: Fri, 28 Feb 2025 07:09:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: cleanup and fix batch completion adding conditions
-To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
-Cc: gmazyland@gmail.com, regressions@lists.linux.dev
-References: <20575f0a-656e-4bb3-9d82-dec6c7e3a35c@kernel.dk>
- <71bbd596-a3a0-4e37-baae-19f02c6997be@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <71bbd596-a3a0-4e37-baae-19f02c6997be@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-94c79
 
-On 2/28/25 4:59 AM, Ondrej Kozina wrote:
-> Hi Jens,
-> 
-> this patch introduced regression to locked SED OPAL2 devices. The locked region no longer returns -EIO upon IO. On read the caller receives block of zeroes, on write it does not report any error either. In both cases, previous to this patch, the caller would get IO error (expected) with locked device.
-> 
-> It was discovered by cryptsetup testsuite specifically https://gitlab.com/cryptsetup/cryptsetup/-/blob/main/tests/compat-test-opal
-> 
-> I've attached a simple patch that changes the ioerror condition and it fixed the problem with SED OPAL2 devices for me.
-> 
-> #regzbot introduced: 1f47ed294a2bd577d5ae43e6e28e1c9a3be4a833
 
-Oops thanks - does someone want to send a "real" patch with commit message
-etc, or do you just want me to queue something up?
+On Fri, 28 Feb 2025 21:26:56 +0800, Ming Lei wrote:
+> Device mapper bioset often has big bio_slab size, which can be more than
+> 1000, then 8byte can't hold the slab name any more, cause the kmem_cache
+> allocation warning of 'kmem_cache of name 'bio-108' already exists'.
+> 
+> Fix the warning by extending bio_slab->name to 12 bytes, but fix output
+> of /proc/slabinfo
+> 
+> [...]
 
+Applied, thanks!
+
+[1/1] block: fix 'kmem_cache of name 'bio-108' already exists'
+      (no commit info)
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
