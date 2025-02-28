@@ -1,112 +1,97 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD6B25F984
-	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A4126E17D
+	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 14:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740751578; cv=none; b=uvOiLlUJIr96XCtXhmMhPQN7B6aHIyItZhbYNv/vwUY5vmEAE3rhWeGfLsgS+YhkArXPKrqfB/kAUNi+M8RJe5iZtzAbWFIrA0QMlYek7pqupMOUJYrQjfbtExaJ9Pma94T6/crAaYGrInA5MjH0NzIpy+AzhsIB+kKRNQ2pao0=
+	t=1740751732; cv=none; b=s0U+CgtZJOA8oYeo6rlWwyx4mm66IiNtJrPX5CoBJyNetqdB7d5Qsl48yKQDvP2kieZVks5Jb+SECTJC9x1ct1cptQh8wuQzJ92LXQOnkMwVyh/i9iGUSs05wApHWRrDX6retOt/Xt1HXa7fnMPqKVRmOggw+mgT83QhSil6jwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740751578; c=relaxed/simple;
-	bh=+Ws/a2TVyhGsR8GBCEetRNGRZC8CzU6l0Gi+3IWYu/I=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=FP/mqJySPoci/DJz0ImoFqtzI+8WSbLxFlmo86RtDvx3r2+Z9HjXCpC3brTdSYBndwbK5BZwv31rw2E+sENXWT6wXJMKoKWKhVQKqoGUldlGUVViLng9kR0xfW0NWQa6fAkt8E3Oq3U5VM+tPv26uk7r2PJi1Ds8AHRDGgt/1Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IWW0hqCj; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1740751732; c=relaxed/simple;
+	bh=7DWNdt/2v2uJzfa9a4Lu3gm3NbTQQQo0EG0KhdAX1p0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PlTM2+CVZ/WNj5JpAHG2AN7O8n4Zj+jc8ahBkz4so7fp6qkTPXWsWXaTcoKWhDu15vGpxJklUhNPvi9zM9/6izggXqpW80emvwg5TOalJmv+FnTbu8+kIwMLKvV4hNYj++m2v9LauVk2MFpmsGOZ04ZjkU4M14z/CqNPFQMO8OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZGDpCYWp; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IWW0hqCj"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2feae794508so2625533a91.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 06:06:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZGDpCYWp"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-223785beedfso6715365ad.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 06:08:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740751575; x=1741356375; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wejv4BYNHQOXgDDBtI+W8fsgrcH5ND5AwtMfHnIPJBw=;
-        b=IWW0hqCjzClGZxlZDTEy4pxJSapjl7r8TU1soCpyEhzvESCGvrLPA97Ae3GZ7TOoWV
-         +Mj6CmU4SZ9B4ni99Jna/o15t3uniUYNJx+2J2CFjgDOgLzZurXQ3XRBgHuL5fX4hteG
-         7NXSAIlWC0sF7e4lldCWonz0js2IfidPDzFmPdnM2mFUC+wBrSORxV+g/RF5NZS+B9uB
-         QnGwRqKG3TGVm6SrftkjL9+WRkrzxJhT26csdZYJanphcnpc5SZmr06HJEz71NTbZE5W
-         LINjnPX8g6MDgHHcG0a51+YtrOwJDeNiEt/VrNuLMei52wR21Yu0g8hCw543VfgTvPzx
-         DtqQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740751729; x=1741356529; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7CILUScLE0hBWAgWre2/oKndCrDoF+/2Wtd3L87a/bg=;
+        b=ZGDpCYWpL7tz64mCYW/e91XqrjAuRkdLotJw4zbLKr9JP0BdkdBedK3Idj2RUYIOlT
+         CG8SsJU6cGFHk1sQrQhaL4U+pdTdEWyrRl+vx4A9ZG3B/sxyRdoSZSeAAZ/IT2/aFmwu
+         JU/BOUOQ7QpJ56r82F9Wl34ou9gQEL8rQ6uKJyhQ9tBIE0ni7OBsGJBXu4+wemJyDaLy
+         ednGAbFImLVa12q2gIgOj0l0XEVQUMYpztk7q4NHihRecluv/jyfACvCijKcmBSdZ364
+         CBX8AinS1XaLLfi2A0oTZNWNNhwpV55ekc20NDS06uudAS9p9rN+lKkOe0ChSw2wfQKu
+         G9tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740751575; x=1741356375;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wejv4BYNHQOXgDDBtI+W8fsgrcH5ND5AwtMfHnIPJBw=;
-        b=caLGXag02Y4vsA22dfHqFGzYamejzLShoxZXH1wENgjoSOcxVB6dID7BWMGyeHCsgU
-         hVuHx1P5usLXzdzs2ILVS6vbaCEWp6XeHQhAPRQzc5JkjoY5WGKU3qykG0at+K54bMFd
-         j6+FDr53kR0B+e6y1gw0Xq6GcPs8bpRA/yrCDiBF9w9GJkZNnz+R6Qssk+gvGwAwu8Ka
-         haHwrWMUev6s/VUw9/1wuShRVQ5M+1vGW3TmLhDbhAgZCdV9U8pKzSYZa9+/MT51cNcJ
-         q70kmjLbQ0muKbTFcVpM1/qwVtbKGUk3dCqryiUksUGfkY+0HOt+PmeHLT7sXTgeNBbA
-         mBoA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2DenqWwiLlMYo8Lna+vKvfdRt9H23kRX0SBhHasBSW3IRFqbqR4LE9aWENGho85twZLyzeFvP9ATdHg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx97Ob3KkYXCX8LY9t5x5lSpDz9bJeaecLgh7iO2fawafdl7mnS
-	dkWj8SJEgIMdIl5bZSAit9v2XoSocWOWx9/YFWve4MCmtdV5+SB90VaPGD3reMw=
-X-Gm-Gg: ASbGncsFneXy2YNXcVhPs9cuM3dFGxl0Phn8PKtEodzAnNWjmuyj3zveGVPXuP9ijik
-	LGMA8P0L6trMCAEgiE4Zz0h+GAY1Q64lQZ2VYuIyY4cTJrjyTaG5ylzjXl34A9F7PhWdfrJePWs
-	raiSd6SdMenmN4krOWuIr3NUA70x2FyDAQdIMKlmIuHP/cvn/RadQ712t8bgAMx3lPZ7AefmHSj
-	FrfKBMIqA4I4HpoJCpWWJvN0IByMLkIdD3KOAoe4oRONPHip562z5DNoBQ7lQ8BX+zSigsLOrLM
-	Z+pmkhhKPCBAqfBk
-X-Google-Smtp-Source: AGHT+IH8m6B9bONZtggc5TOaP8SNcq84OAlI7zJ06gGNTlOvv8IU6LI+DzSn+79wPg5Fd/r58sopOA==
-X-Received: by 2002:a17:90b:4990:b0:2f9:cf97:56ac with SMTP id 98e67ed59e1d1-2febaa8b67fmr7061106a91.0.1740751574773;
-        Fri, 28 Feb 2025 06:06:14 -0800 (PST)
-Received: from [127.0.0.1] ([63.78.1.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504c5de5sm33062875ad.134.2025.02.28.06.06.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 06:06:14 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, asml.silence@gmail.com, 
- linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
- Keith Busch <kbusch@meta.com>
-Cc: linux-nvme@lists.infradead.org, csander@purestorage.com, 
- Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20250227223916.143006-1-kbusch@meta.com>
-References: <20250227223916.143006-1-kbusch@meta.com>
-Subject: Re: [PATCHv8 0/6] ublk zero copy support
-Message-Id: <174075157357.2559329.8032266585029864578.b4-ty@kernel.dk>
-Date: Fri, 28 Feb 2025 07:06:13 -0700
+        d=1e100.net; s=20230601; t=1740751729; x=1741356529;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7CILUScLE0hBWAgWre2/oKndCrDoF+/2Wtd3L87a/bg=;
+        b=Hao2RdpMZQ2l8AY6+uLl9OP6g2/YEzi7w6KrLDojrpVh5sbV6ixFoMRQ9Q9z0FPMtt
+         FAFNSG6S4LOOPMWJjMRrl0nmcXWRj/cKXxkD1keJ6M20Y/cG5IoJyRtNmSeoBin2Sca7
+         gC0Wt80+NjZGs6LQxvkkghEX42HDTu2vPirfbol3enDj+RtjTKJVMYEEE+/Hyd/oIju1
+         dxBV2eguskfuy1hTieKiSfA/is8Rzc+0cGwPGiQKp9TmlVe9iqJF+JGNGTBdMVdGSdxG
+         EyhjoK77nShrexFKd47v+XpQ87fT93RLk2jHRFoAdsuduKu5CedqlBvT/Ax/1GLJP4ng
+         4/Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVG7Nl9pCRgjyaZHcusMpY/quVwSILU+FGdfhr93X+uUeQCgGrt3K0IklqlyvqfIyZnQnr8nXQBg05VVw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlvV0IyARMAqPyaNQAQI9RNk0HSpfSP7xFhlVFw9XtdUs3s1sP
+	IdEo7ar8sMe53yv8NNbm43e+FlusE9f4xBYxjaLd5yKn+PSHitMarwkY38oHNTZzrKTIBfrL+g3
+	3
+X-Gm-Gg: ASbGncu2FlPjSRuVEMnCDZnaB76xCDdUDDSqYVH45xqJZmHUWt17hg5IJNVC9FGka9q
+	UbK5YSS5iXbl9BvS3mPX0HQU7pfmEbUgGhxTf9Sg5kWeqw7qiFmZL6XpGxDnVj3kD/wba3Opkcv
+	VBmcVwUV/gZsX+d3loBd5Ggl6ERyzpdB8Itca0eiJdK/P00EHLqp4cOnRWgXjhPiScoW1W6Cp69
+	ufrybB9wbv1acVIZ4M5YovNT03nsXus8ngRLbVo3rKf10S9NTJfJ0RJflFDAdYJB8IUGFFSj1VR
+	f1bpoG9NnnLG5Fh6jbw=
+X-Google-Smtp-Source: AGHT+IH0RvwNCYwa6/BYzvW095Ti4mOLDCGElcS+QZXC85+fl4rOlbbZ3z3pilQKgJLmbSgtB5MatA==
+X-Received: by 2002:a17:902:da91:b0:223:5c33:56a2 with SMTP id d9443c01a7336-223690e1aafmr59671725ad.28.1740751729331;
+        Fri, 28 Feb 2025 06:08:49 -0800 (PST)
+Received: from [172.16.2.60] ([4.96.84.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235050b123sm33495085ad.197.2025.02.28.06.08.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Feb 2025 06:08:48 -0800 (PST)
+Message-ID: <459b9c3b-0d5e-4797-86f7-4237406608ff@kernel.dk>
+Date: Fri, 28 Feb 2025 07:08:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: cleanup and fix batch completion adding conditions
+To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
+Cc: gmazyland@gmail.com, regressions@lists.linux.dev
+References: <20575f0a-656e-4bb3-9d82-dec6c7e3a35c@kernel.dk>
+ <71bbd596-a3a0-4e37-baae-19f02c6997be@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <71bbd596-a3a0-4e37-baae-19f02c6997be@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-94c79
 
-
-On Thu, 27 Feb 2025 14:39:10 -0800, Keith Busch wrote:
-> This one completed liburing 'make runtests' successfully.
+On 2/28/25 4:59 AM, Ondrej Kozina wrote:
+> Hi Jens,
 > 
-> Changes from v7:
+> this patch introduced regression to locked SED OPAL2 devices. The locked region no longer returns -EIO upon IO. On read the caller receives block of zeroes, on write it does not report any error either. In both cases, previous to this patch, the caller would get IO error (expected) with locked device.
 > 
->   Prep patch, mostly from Jens, that removes the "do_import" parameter
->   from the generic rw prep.
+> It was discovered by cryptsetup testsuite specifically https://gitlab.com/cryptsetup/cryptsetup/-/blob/main/tests/compat-test-opal
 > 
-> [...]
+> I've attached a simple patch that changes the ioerror condition and it fixed the problem with SED OPAL2 devices for me.
+> 
+> #regzbot introduced: 1f47ed294a2bd577d5ae43e6e28e1c9a3be4a833
 
-Applied, thanks!
+Oops thanks - does someone want to send a "real" patch with commit message
+etc, or do you just want me to queue something up?
 
-[1/6] io_uring/rw: move buffer_select outside generic prep
-      commit: 2a61e63891add7817e35a2323347ed8d354acf84
-[2/6] io_uring/rw: move fixed buffer import to issue path
-      commit: ff92d824d0b55e35ed2ee77021cbd2ed3e7ae7a2
-[3/6] nvme: map uring_cmd data even if address is 0
-      commit: 99fde895ff56ac2241e7b7b4566731d72f2fdaa7
-[4/6] io_uring: add support for kernel registered bvecs
-      commit: 27cb27b6d5ea401143ca3648983342bb820c4be9
-[5/6] ublk: zc register/unregister bvec
-      commit: 1f6540e2aabb7372e68223a3669019589c3e30ad
-[6/6] io_uring: cache nodes and mapped buffers
-      commit: ed9f3112a8a8f6e6919d3b9da2651fa302df7be3
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
