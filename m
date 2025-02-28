@@ -1,95 +1,93 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DB21AA1E4
-	for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 23:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07F71A28D
+	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 02:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740700236; cv=none; b=ASc7n2fshjeYwdsq8Ac84k0BgXuJGBAoGSbZLqp7wXq4nrAs9FO7aQr2/gKyZDvzYgfLcDeY5gKU0JLGTnLQ0e0LJx7bz/z+FoEca+dhSh7u+qT8TEsslNZY8MxG6aB/w2F5mIeNt6Bb96GvvCL1NGHFB5GU5B+kPnYI8NPSxzU=
+	t=1740709358; cv=none; b=gR2uJKLs+9bjw1dHtDkwYDpv56/xyzkevpUFzeQlQEAHxu0HZhzLtHNfG5uWEL938WxG4lPva/WgCRMLxxPCwKoKF9bE79lptlZxI/kIUCRwgcC1Fl27l7HQ2PNJg56LtDazJhnPmWuhyWuP6BkEefRRK3Do9Y4+/aZSHieoews=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740700236; c=relaxed/simple;
-	bh=5+iXgmLlQmW2LmSgyiBuDpzfwEE+8yVTlBsst65W1zM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PLKd6yBbqVbopQiOZLMNvc6spNCPfyWudVt8VyTZTrRMpk1dPMLEcNEwFheCwf+wnbcPrIO3CeQcODA1iWsw5ipHuo2H7SVnG9BxpZf47sYz71599LPe1oV8t//cf0Gw0gEL/1zogCy5NcRZJ9h7GXQEMFz09kiTjIUPW4/pASM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nFTUKvGc; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nFTUKvGc"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3ce886a2d5bso13188275ab.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Feb 2025 15:50:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740700232; x=1741305032; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/MrW9oYu7MINLs/fTPWfiPiv9Pd0BlSPYSGo4GMsrr0=;
-        b=nFTUKvGci2j1kLgKouJhNafbr9llxWfbrrdlFg/UI4BIZkcQMfWJHkUOQN5OOya43B
-         14gW8Y+9a9kSDaAq/jKbah8t0KpTfmOq1hJ8c8WZFY/rBKlQtuNX09+rjSKANLwUkeyD
-         6xi1EQdqTn/Kzg+fTmidVqsMjI7Tn1WWkkqVtEMrnaokI/77t1JG9mrB5FjX7OzAVO58
-         LvVjWUAZ68wIfpPY1qhvRgz6e+1J3ugfoGTWRWBr1SbqOLMZKeOaYXM9cQyQ9oB9rFBY
-         yjcJBGG7zv0k46ho3HzXovPcpiF9zXDg9g2DfkB/LlgTAYdDWogir261aPkeneobj7mA
-         Jszw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740700232; x=1741305032;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MrW9oYu7MINLs/fTPWfiPiv9Pd0BlSPYSGo4GMsrr0=;
-        b=caGvoWIt8NasoSCDoewavAeYHHkHXuNT7POqeVrXzuOI51t+gxJPZR2Z/QUL44rYL3
-         udzfHrbkwqzEuUykQwBke8ABnhwRM7m4hjP5BOfnpvL1LPAxQfZL+V41A8vux8pEO824
-         1PL3hCEEIO8OX/LXlF7MTUpvfxWKg6T6CSgf8c/YqSAeAJfV7R9FnQDcc4AWqqiRbNbS
-         VrYtGsmFBkZ8c4v/oVqpmcrMNIJWd513u1dvC+Hx1pkPX5zinIy9a+Br+2nKPFQOVba/
-         Z2xqvTKWupqGUQvcrrwrnGJXeHk76dQT0JQ9pqkgqJ+va+owLnOAM/rIWQnr32Ji0FH5
-         Ob+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVfl9JeAQmKA6AOiHo3SlZ4jJ4aLy9alaZsJCDYFYln0Lij1YIGIjAjASaFFmtXTaR5vLGGetZ5QtEKXw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmM0PDEhqLbVC2CxonW21YWXH4Z0t1lGEuM6R086Ed5HbpRCjc
-	iCq1o5dUtVixDeZkvhmViOgPcQWWMX4r54hTbj1DBZGj53BzvUMK1NJWogbs6lg=
-X-Gm-Gg: ASbGncvIT2zIEhop0IIjZDVWArW32Z+Ehyfdjl72Dbk9OLrEi3YuNnY1mocuPzp/dx3
-	2Au/p7Cgkbo5kCKpdQQ24OJc6fs2naZqUoVwsF9+skOOgAqsG+pBJ7boC85DCbXXY1zEFesbaaV
-	ZQR7XEfRPheCpc5sJ4hvZqCHwq1ocNuZo6rw4QpDwmUjmew+Lc5Y13VqWdW/CWnToCGa7PC5vcV
-	4TV6YGroNJ0UiYyhNBE8392+mGW5GtwHNQRu3MeHoO9iFedkNfWNBgUcZFGAjFiNtdFGL28+6Sj
-	H1XflXwrxKQXpzOZmtg06T0=
-X-Google-Smtp-Source: AGHT+IHSRlM3w45VHLLMK6HPiygexZv4dV4SqmsXYaIZxGsowPQTTGBfz1MH1pCv0maLCVB8fNpkuw==
-X-Received: by 2002:a05:6e02:1a6b:b0:3d0:405d:e94f with SMTP id e9e14a558f8ab-3d3e6f51b7fmr14092215ab.17.1740700232541;
-        Thu, 27 Feb 2025 15:50:32 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f061c5053bsm601823173.38.2025.02.27.15.50.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Feb 2025 15:50:31 -0800 (PST)
-Message-ID: <1855c57b-13c9-49fe-b7af-a277f8c8b2c6@kernel.dk>
-Date: Thu, 27 Feb 2025 16:50:31 -0700
+	s=arc-20240116; t=1740709358; c=relaxed/simple;
+	bh=x9w1Ut/fnhHpblsUDSYibRgelltoD7TmJPq23xzc09o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=EIpZ+CEqB64L3WjNkcpOEv0DEMbjK+kPPcJU9kN1/SpeqD1eotJkGlCl2o+olrnkIDMl5yEgdYeez3GGLkc6bqDVQBQcEM2yqxGyickc4SfSOOB00UFSsQkTfMrBaG5jx9+iPSzYxaTswaokdayAvTSooXeECxbfgGzK5yGXghM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Z3sRM5f6zz4f3jLG
+	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 10:22:07 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 25CBF1A16EF
+	for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 10:22:31 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP4 (Coremail) with SMTP id gCh0CgBHrGDlHcFnZwRrFA--.49268S3;
+	Fri, 28 Feb 2025 10:22:31 +0800 (CST)
+Message-ID: <0ef71f91-eaec-f268-7d29-521fdcecc5ca@huaweicloud.com>
+Date: Fri, 28 Feb 2025 10:22:29 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv8 6/6] io_uring: cache nodes and mapped buffers
-To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
- asml.silence@gmail.com, linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, csander@purestorage.com,
- Keith Busch <kbusch@kernel.org>
-References: <20250227223916.143006-1-kbusch@meta.com>
- <20250227223916.143006-7-kbusch@meta.com>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20250227223916.143006-7-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+To: linux-block <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>,
+ "wanghai (M)" <wanghai38@huawei.com>
+From: Li Nan <linan666@huaweicloud.com>
+Subject: [BUG report] WARNING of sysfs in __blk_mq_update_nr_hw_queues()
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBHrGDlHcFnZwRrFA--.49268S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7JFy7Cr1kArW7ZF1DZw48Xrb_yoWDKwb_Cr
+	yFk3sYqw1Ygr43KFnFk3Z5Xr9FyrZ2v3yYga95XFZYyrn7tw4rGw47urnxWr40g3yIgFsI
+	yr43Ga40yw4fujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3xYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l
+	5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67
+	AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07Al
+	zVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
+	C2KfnxnUUI43ZEXa7IU8Y0P3UUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On 2/27/25 3:39 PM, Keith Busch wrote:
-> @@ -119,22 +137,44 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_mapped_ubuf *imu)
->  	if (imu->acct_pages)
->  		io_unaccount_mem(ctx, imu->acct_pages);
->  	imu->release(imu->priv);
-> -	kvfree(imu);
->  }
+Hi,
 
-io_free_imu(ctx, imu);
+In __blk_mq_update_nr_hw_queues(), we don't check the return value of
+blk_mq_sysfs_register_hctxs(). When sysfs creation fails, there's no
+proper error handling. This leads to a kernel warning during subsequent
+__blk_mq_update_nr_hw_queues() calls or disk removal:
 
-?
+```
+kernfs: can not remove 'nr_tags', no directory
+WARNING: CPU: 2 PID: 805 at fs/kernfs/dir.c:1703 
+kernfs_remove_by_name_ns+0x12e/0x140
+Call Trace:
+  <TASK>
+  remove_files+0x39/0xb0
+  sysfs_remove_group+0x48/0xf0
+  sysfs_remove_groups+0x31/0x60
+  __kobject_del+0x23/0xf0
+  kobject_del+0x17/0x40
+  blk_mq_unregister_hctx+0x5d/0x80
+  blk_mq_sysfs_unregister_hctxs+0x89/0xd0
+  blk_mq_update_nr_hw_queues+0x31c/0x820
+  nullb_update_nr_hw_queues+0x71/0xe0 [null_blk]
+  nullb_device_submit_queues_store+0xa4/0x130 [null_blk]
+```
+
+Should we add error checking for blk_mq_sysfs_register_hctxs() and
+propagate the error to abort the update operation when it fails? This
+would prevent subsequent operations from hitting invalid sysfs entries.
 
 -- 
-Jens Axboe
+Thanks,
+Nan
+
