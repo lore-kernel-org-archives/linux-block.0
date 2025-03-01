@@ -1,152 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51D963A9
-	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 01:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFF286333
+	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 01:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740792412; cv=none; b=ocix8YHtv1qTps9h56XupVrleisM8nf8rMa94QrCtX/bz7it9HsavbW0j+XINZV+XhbjjgZv4tmgfDy0C1CrH61OEnJUO9/pAddarMr2Z4xY0bFbNHPPO4lylOAieC7w7//dZ89UKcdiWn+S9MnCfFd8VXwhwP7W6ltyThV0xPU=
+	t=1740793245; cv=none; b=msKhe5px0bEY2s14CFY24EqIJpkAZUc3LbX3MqvEBq5iVk7NQjbD5Y1bKCqOVe1Sy8w8dnLbNRGM2IlJ9i8+ZbH90xsLQdjfJQByPJ+3U3mKtsbzzrW1liQ0542MtTR1jFV9Fa4MGMRbK6jqOdNihgIMzDjXEjQvzG6akMmkw3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740792412; c=relaxed/simple;
-	bh=GJRdH7Py2r4TCQURAl8QCe4ysMucIaXY8Z8uqx8/VG8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VwQXHYzjJm6Jjtl7BD/5ZjTAUM3O7Ngi3vXknmtsEt7AKSMhtIdnl97WIngPUX9vrYOH8yIsmmngW2VKhwB1SLZJKnAUOhDdQ3SY46eC50KXWSIZTX+L4BqKNx4jpwErrwDGnnfvvLTFUZZzWbrAFIkgEqDNHKZusbwYuANUor8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MHeGYUMT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHeGYUMT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740792409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w6dnxp9WYsNQwZ9vI6v1G24aXs3uhHVto8Xb5zEf7MI=;
-	b=MHeGYUMT8DYeJ2c4l/n9g/iKHIWgcSRW8NEA9t5TbLbqMyjSy87c/fF5g1KEAxr4zEBnY3
-	0OMl/YEnJEpWissG1lV/X0+1LmFp7Hib45k1BE4B98Lz9NBcMgi2OKvXu/ey3Wt56g8/yX
-	uJWEYD7pn8S2sxhlBkPuiYmKOUrjOQc=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-SfSh6rU6OUO2J50z4yqYLA-1; Fri, 28 Feb 2025 20:26:47 -0500
-X-MC-Unique: SfSh6rU6OUO2J50z4yqYLA-1
-X-Mimecast-MFC-AGG-ID: SfSh6rU6OUO2J50z4yqYLA_1740792407
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-8617b6c6d03so806098241.3
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 17:26:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740792407; x=1741397207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w6dnxp9WYsNQwZ9vI6v1G24aXs3uhHVto8Xb5zEf7MI=;
-        b=e5gupjDmxGWXlJbQvklQUU0nEGQuLgEEAtYn2uqJrcJNXLfpVOEYwYE9VC32HLB6v5
-         loKAn3Rf2D7R+Or8OREgXJTUeVQiZXSw7yF4W7v6hBTQWGAz2KZXPQbY0obH/+8swQGb
-         u+PtgxM3YjJBTxOK2PzTDRwXimLVKNDxXOSjeYGHXfp/WKgmrZ+f1DiLE4npOiw+/9F8
-         Z811wTTP5Ay1uP988KHQqBiMIrXnoHCSkQnawU9WZSYUb2ShSCIegY+Q7XXPP8hHK3my
-         hMS7uISoph7Xgbl8zShP0J3ip7acK6oDOSFlR8DO6pPzqnucEpAs7U5qRPSEtWn7Cmsp
-         Nsvg==
-X-Forwarded-Encrypted: i=1; AJvYcCU27uxGdrPioqb6FOC35rZWdmIny6I18IXi50feCr0kky71HNqIU+M6UeSCifs7KSpVlNJG+hJEnjxuJQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgiV9OQ9c0tnlGuL1SvgqgZN1vPMcXqJRJGycZMRX1NexUwmNq
-	U1TIc7LIh8jiMXGjhJ/IU7FIenwaC10kvtapkniQZ+xqEC5nZ1rfe1tVBigJCI3lI3DxfA+Gnhz
-	qoCC8cuPPXhy48nasrstkqHNFrh+r/XyLIKIjXw9rz1JuOMj6P9XHQrm/wezTv9/RRp2pvncn7V
-	6hSCHwh/24Eyf4PpVAi4gejP+hSzvBx+/vgtM=
-X-Gm-Gg: ASbGncvufvwNPETjcXj6Kl548ToNwh+qpDg9rWlkltIt4vITTlriYyBN94HBdSX8yn7
-	CwHCIUnftnJlYjAYOWMTouH0Pra8pspRNqrtg0Bdy2vYgjMX1f5LFQXMR9JrWFJXz88zN41WMBA
-	==
-X-Received: by 2002:a05:6122:8293:b0:520:51a4:b819 with SMTP id 71dfb90a1353d-5235b519b28mr3507237e0c.1.1740792407168;
-        Fri, 28 Feb 2025 17:26:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGO3+RRkopwHC744q1bF4z/l7fKpr6okBzyltA/RQWqBy18J327LdjsIFzinZgD1ijE/BP+TkrCT/6/4YPSDv4=
-X-Received: by 2002:a05:6122:8293:b0:520:51a4:b819 with SMTP id
- 71dfb90a1353d-5235b519b28mr3507233e0c.1.1740792406855; Fri, 28 Feb 2025
- 17:26:46 -0800 (PST)
+	s=arc-20240116; t=1740793245; c=relaxed/simple;
+	bh=obIbRwkWgsRKIPADwNtADTMKBM5+UMFM9KyNy8asg/s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rPzU1Ngz51xtYfA9bzwTseGuMreYmrdflKRrCEL8fXOZvNPcp5QlgNFRzcWZClZpC7YW7sP8Ls9kx9T7DdYC6NogISMCwWGmswyvcKr5JteeUJJlNOMg8y1QG8obe8OlcShRS5+1lQ+Ise3HcF1HgUia0QnpnpDA7RagEhWLwfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z4SSc2RHgz4f3knt
+	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 09:40:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 49A701A06DC
+	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 09:40:38 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP4 (Coremail) with SMTP id gCh0CgCH61+UZcJnzpTHFA--.57036S3;
+	Sat, 01 Mar 2025 09:40:38 +0800 (CST)
+Message-ID: <bd8d7664-fc1d-767a-cceb-9381af688ba4@huaweicloud.com>
+Date: Sat, 1 Mar 2025 09:40:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4ae6d363-2f9b-5028-db1a-061b6f1e8fbe@canonical.com> <892c7de5-d257-d4d6-2bfc-62f543965cff@canonical.com>
-In-Reply-To: <892c7de5-d257-d4d6-2bfc-62f543965cff@canonical.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 1 Mar 2025 09:26:35 +0800
-X-Gm-Features: AQ5f1JrkB2tCsFeunXfn4giFbw2Z7oo7kEk_rkiaUrID7LrQOCtJb0ha_haUg04
-Message-ID: <CAFj5m9JEDW0kLfnDhF4xNFzMTpHBH6Xpdb+XVLf73oq3vzCjQg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] block: fix conversion of GPT partition name to 7-bit
-To: Olivier Gayot <olivier.gayot@canonical.com>
-Cc: linux-kernel@vger.kernel.org, 
-	Daniel Bungert <daniel.bungert@canonical.com>, linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [BUG report] WARNING of sysfs in __blk_mq_update_nr_hw_queues()
+To: Nilay Shroff <nilay@linux.ibm.com>, Li Nan <linan666@huaweicloud.com>,
+ linux-block <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>,
+ "wanghai (M)" <wanghai38@huawei.com>
+References: <0ef71f91-eaec-f268-7d29-521fdcecc5ca@huaweicloud.com>
+ <7f0a3ae7-9659-426d-9595-fff9b14149fe@linux.ibm.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <7f0a3ae7-9659-426d-9595-fff9b14149fe@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCH61+UZcJnzpTHFA--.57036S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1DCrWDAF1xGw1rAFW5ZFb_yoW8Cr1xpF
+	W5Wa9Igw1DG3y8Zw4xAanFgFyYy3Z5Cas8Xrsaqr129w1jy3s5Jr48AF1qvFW8CrZavF4I
+	q3W0vrZ3C3WkuaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v
+	4I1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwI
+	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbsYFJUUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On Tue, May 23, 2023 at 6:53=E2=80=AFAM Olivier Gayot
-<olivier.gayot@canonical.com> wrote:
->
-> The utf16_le_to_7bit function claims to, naively, convert a UTF-16
-> string to a 7-bit ASCII string. By naively, we mean that it:
->  * drops the first byte of every character in the original UTF-16 string
->  * checks if all characters are printable, and otherwise replaces them
->    by exclamation mark "!".
->
-> This means that theoretically, all characters outside the 7-bit ASCII
-> range should be replaced by another character. Examples:
->
->  * lower-case alpha (=C9=92) 0x0252 becomes 0x52 (R)
->  * ligature OE (=C5=93) 0x0153 becomes 0x53 (S)
->  * hangul letter pieup (=E3=85=82) 0x3142 becomes 0x42 (B)
->  * upper-case gamma (=C6=94) 0x0194 becomes 0x94 (not printable) so gets
->    replaced by "!"
->
-> The result of this conversion for the GPT partition name is passed to
-> user-space as PARTNAME via udev, which is confusing and feels questionabl=
-e.
->
-> However, there is a flaw in the conversion function itself. By dropping
-> one byte of each character and using isprint() to check if the remaining
-> byte corresponds to a printable character, we do not actually guarantee
-> that the resulting character is 7-bit ASCII.
->
-> This happens because we pass 8-bit characters to isprint(), which
-> in the kernel returns 1 for many values > 0x7f - as defined in ctype.c.
->
-> This results in many values which should be replaced by "!" to be kept
-> as-is, despite not being valid 7-bit ASCII. Examples:
->
->  * e with acute accent (=C3=A9) 0x00E9 becomes 0xE9 - kept as-is because
->    isprint(0xE9) returns 1.
->  * euro sign (=E2=82=AC) 0x20AC becomes 0xAC - kept as-is because isprint=
-(0xAC)
->    returns 1.
->
-> Fixed by using a mask of 7 bits instead of 8 bits before calling
-> isprint.
->
-> Signed-off-by: Olivier Gayot <olivier.gayot@canonical.com>
-> ---
->  block/partitions/efi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-> index 5e9be13a56a8..7acba66eed48 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -682,7 +682,7 @@ static void utf16_le_to_7bit(const __le16 *in, unsign=
-ed int size, u8 *out)
->         out[size] =3D 0;
->
->         while (i < size) {
-> -               u8 c =3D le16_to_cpu(in[i]) & 0xff;
-> +               u8 c =3D le16_to_cpu(in[i]) & 0x7f;
->
->                 if (c && !isprint(c))
->                         c =3D '!';
 
-Hello Olivier,
 
-Looks like you didn't Cc linux-block maillist and Jens, can you
-re-send the patch to
-linux-block for review?
+在 2025/2/28 15:13, Nilay Shroff 写道:
+> 
+> 
+> On 2/28/25 7:52 AM, Li Nan wrote:
+>> Hi,
+>>
+>> In __blk_mq_update_nr_hw_queues(), we don't check the return value of
+>> blk_mq_sysfs_register_hctxs(). When sysfs creation fails, there's no
+>> proper error handling. This leads to a kernel warning during subsequent
+>> __blk_mq_update_nr_hw_queues() calls or disk removal:
+>>
+>> ```
+>> kernfs: can not remove 'nr_tags', no directory
+>> WARNING: CPU: 2 PID: 805 at fs/kernfs/dir.c:1703 kernfs_remove_by_name_ns+0x12e/0x140
+>> Call Trace:
+>>   <TASK>
+>>   remove_files+0x39/0xb0
+>>   sysfs_remove_group+0x48/0xf0
+>>   sysfs_remove_groups+0x31/0x60
+>>   __kobject_del+0x23/0xf0
+>>   kobject_del+0x17/0x40
+>>   blk_mq_unregister_hctx+0x5d/0x80
+>>   blk_mq_sysfs_unregister_hctxs+0x89/0xd0
+>>   blk_mq_update_nr_hw_queues+0x31c/0x820
+>>   nullb_update_nr_hw_queues+0x71/0xe0 [null_blk]
+>>   nullb_device_submit_queues_store+0xa4/0x130 [null_blk]
+>> ```
+>>
+>> Should we add error checking for blk_mq_sysfs_register_hctxs() and
+>> propagate the error to abort the update operation when it fails? This
+>> would prevent subsequent operations from hitting invalid sysfs entries.
+>>
+> IMO, yes error checking should be added here. However it will be tricky
+> to undo everything as the error might have happened deep inside loop. We
+> need to carefully delete all sysfs objects added under each hctx->kobj.
+> BTW, typically, we don't abort the nr_hw_queue update operation but
+> instead fallback to the previously configured number of hw queues.
+> 
+> Thanks,
+> --Nilay
+> 
+> .
 
+Yes, this is troublesome and cannot simply return an error because the old
+kobj has already been released, and re-alloc is likely to fail again due to
+insufficient memory.
+
+-- 
 Thanks,
-Ming
+Nan
 
