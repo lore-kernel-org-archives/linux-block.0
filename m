@@ -1,33 +1,33 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B8A1519BE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64AF16F858;
 	Sat,  1 Mar 2025 04:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740802986; cv=none; b=EGXKrEZ84nErlhBBHHNQU3nbl8WMm5yawvS0+QGnhC57+vZCX+h1LFUAIKyk+VJemveMXqwp39JyW6mfu4nwzyFytyUb1WlFVS9ydLrVQoy7suwk6qQMfItIGY7G7QDAO/WXXJ9gJp2IXYPDINJaWzS1EWpZIW0rPN8aIY2lhy4=
+	t=1740802986; cv=none; b=ACD69u7xrEOJlXcwhodRhcGVYhwcerszGxKlYwfNbWPv4U22AmQMEhM7p3rWqYmrb4y4st+bMU4NsDuzbzP9x5ZybZM3Tg5tnLoYs/E5IEMffNcshTmSStHxYXLcy8MIwIGwVkD4e6xyXIOjSnrpRz4JhO34tVmV6bKWPxt+REk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740802986; c=relaxed/simple;
-	bh=yseNamwDxaZtO0KtuMWvy0i8Osu9fsrGhdEX7PvrknE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JCs1hDPjygsX4YZp9RhGh8B5PiT/mlqGdc2iAB4FFeyl23n+qnB97fYOqeg7XlPcNu/4QvmTLnWip3SPHATS25bmPOG6wYCeYXmmqhpZB7gIZEPXsjrRTXcRQU1W0AocbXOP0hdj/gZCPVz4tDMbbF1Pzxn5DkinREhHEBJW1O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Tic0cecF; arc=none smtp.client-ip=13.77.154.182
+	bh=XArbmJZdbBMg9qGsiGEE7sni6MOxX5PA0DU/Xto11R4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Q0hfqgfvpiQWmzAf0LgC2ZXU0+lSpEo6ZK7x6LBnvyt59AA3M0Ibnb7p6AV5NsJ36pGTYE4vwTvyRATVx0qvmo/V+x0zUZ3Jejxda/fhDoepbmm+Egi/Lzu9XAsfpU0ikYSoTe6aHFE5m3QchL2SG61+P2QJcUSRxZZsghBB9G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dCNDU0bP; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Tic0cecF"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dCNDU0bP"
 Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 3AA842038A25;
+	by linux.microsoft.com (Postfix) with ESMTPSA id 6D7992038A29;
 	Fri, 28 Feb 2025 20:23:04 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3AA842038A25
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6D7992038A29
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1740802984;
-	bh=PgYb7240sgPq/L5w2oKC7klJ5k6Fow9TNpoUkzNGK1k=;
-	h=From:Subject:Date:To:Cc:From;
-	b=Tic0cecF/21Kg594q1CO/eg5+QgiwPz4LgD/n3MMHP2O9FfWF99KZzvmupgYjfLmY
-	 kKC2iohVgVPu30uDrBrUvlKGueIlVHYFXCQHgQjO2hELzw+/4iCNbOl8VIVFWOPAzC
-	 WINPoDOvtacWuCzAjkiPENuSeaZYK/qJx1E103wU=
+	bh=kuSyaGsK8xjvWVKJHBcTuVFDF/vLxtEYezbaQdS5+RQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=dCNDU0bPC2dMwZCrDMI6INg8KDSYCDyp0t+G7prkFFKLkTpjqCkn9xUv0w2EhcZ10
+	 Y8X18OU8CaJ4/jPClZ6EDchj61aeGgEB5Clipx4NTwX/DOuNMCpCeq16GdZPAptE6b
+	 z58xgck8n2XQgZZh/S/mDc7NSHDEu1aBOrClDPnI=
 From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Subject: [PATCH v4 0/2] Converge on using secs_to_jiffies() part two
-Date: Sat, 01 Mar 2025 04:22:51 +0000
-Message-Id: <20250301-converge-secs-to-jiffies-part-two-v4-0-c9226df9e4ed@linux.microsoft.com>
+Date: Sat, 01 Mar 2025 04:22:53 +0000
+Subject: [PATCH v4 2/2] libceph: convert timeouts to secs_to_jiffies()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,12 +36,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJuLwmcC/43OsW4DIRAE0F+xqLPWsnBwdpX/iFIQbomJ4sMCQ
- hxZ9+/h3CSNpStnijdzE4Vz5CKOu5vI3GKJae5BP+2EP7n5nSFOPQtC0pKkBZ/mxrn3hX2BmuA
- jhtAFuLhcoX4nCFqjtM6ZYKzoziVziNf7xstrz6dYaso/98km13bVB5Q0btCbBISDM+wDvpHC8
- fkzzl/X/Tn6nEoKde/TWaw7jf5sQrXFpm5PFofRoQwT8mNb/bNp2GKrbjutDsayMn588HtZll8
- Wd1FLlAEAAA==
-X-Change-ID: 20241217-converge-secs-to-jiffies-part-two-f44017aa6f67
+Message-Id: <20250301-converge-secs-to-jiffies-part-two-v4-2-c9226df9e4ed@linux.microsoft.com>
+References: <20250301-converge-secs-to-jiffies-part-two-v4-0-c9226df9e4ed@linux.microsoft.com>
+In-Reply-To: <20250301-converge-secs-to-jiffies-part-two-v4-0-c9226df9e4ed@linux.microsoft.com>
 To: Andrew Morton <akpm@linux-foundation.org>, 
  Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
  Daniel Vacek <neelx@suse.com>, Ilya Dryomov <idryomov@gmail.com>, 
@@ -52,61 +49,116 @@ Cc: ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
  Easwar Hariharan <eahariha@linux.microsoft.com>
 X-Mailer: b4 0.14.2
 
-This is the second series (part 1*) that converts users of msecs_to_jiffies() that
-either use the multiply pattern of either of:
-- msecs_to_jiffies(N*1000) or
-- msecs_to_jiffies(N*MSEC_PER_SEC)
+Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+secs_to_jiffies().  As the value here is a multiple of 1000, use
+secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplication
 
-where N is a constant or an expression, to avoid the multiplication.
+This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+the following Coccinelle rules:
 
-The conversion is made with Coccinelle with the secs_to_jiffies() script
-in scripts/coccinelle/misc. Attention is paid to what the best change
-can be rather than restricting to what the tool provides.
+@depends on patch@ expression E; @@
 
-Andrew has kindly agreed to take the series through mm.git modulo the
-patches maintainers want to pick through their own trees.
+-msecs_to_jiffies(E * 1000)
++secs_to_jiffies(E)
 
-This series is based on next-20250225
+@depends on patch@ expression E; @@
 
+-msecs_to_jiffies(E * MSEC_PER_SEC)
++secs_to_jiffies(E)
+
+Change the checks for range to check against HZ.
+
+Acked-by: Ilya Dryomov <idryomov@gmail.com>
 Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-
-* https://lore.kernel.org/all/20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com/
-
 ---
-Changes in v4:
-- Restore correct range checks for rbd and libceph (Christophe J)
-- Link to v3: https://lore.kernel.org/r/20250225-converge-secs-to-jiffies-part-two-v3-0-a43967e36c88@linux.microsoft.com
-
-Changes in v3:
-- Change commit message prefix from libata: zpodd to ata: libata-zpodd: in patch 8 (Damien)
-- Split up overly long line in patch 9 (Christoph)
-- Fixup unnecessary line break in patch 14 (Ilpo)
-- Combine v1 and v2
-- Fix some additional hunks in patch 2 (scsi: lpfc) which the more concise script missed
-- msecs_to_jiffies -> msecs_to_jiffies() in commit messages throughout
-- Bug in secs_to_jiffies() uncovered by LKP merged in 6.14-rc2: bb2784d9ab4958 ("jiffies: Cast to unsigned long in secs_to_jiffies() conversion")
-- Link to v2: https://lore.kernel.org/r/20250203-converge-secs-to-jiffies-part-two-v2-0-d7058a01fd0e@linux.microsoft.com
-
-Changes in v2:
-- Remove unneeded range checks in rbd and libceph. While there, convert some timeouts that should have been fixed in part 1. (Ilya)
-- Fixup secs_to_jiffies.cocci to be a bit more verbose
-- Link to v1: https://lore.kernel.org/r/20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com
-
----
-Easwar Hariharan (2):
-      rbd: convert timeouts to secs_to_jiffies()
-      libceph: convert timeouts to secs_to_jiffies()
-
- drivers/block/rbd.c          |  8 ++++----
  include/linux/ceph/libceph.h | 12 ++++++------
  net/ceph/ceph_common.c       | 18 ++++++++----------
  net/ceph/osd_client.c        |  3 +--
- 4 files changed, 19 insertions(+), 22 deletions(-)
----
-base-commit: 0226d0ce98a477937ed295fb7df4cc30b46fc304
-change-id: 20241217-converge-secs-to-jiffies-part-two-f44017aa6f67
+ 3 files changed, 15 insertions(+), 18 deletions(-)
 
-Best regards,
+diff --git a/include/linux/ceph/libceph.h b/include/linux/ceph/libceph.h
+index 733e7f93db66a7a29a4a8eba97e9ebf2c49da1f9..5f57128ef0c7d018341c15cc59288aa47edec646 100644
+--- a/include/linux/ceph/libceph.h
++++ b/include/linux/ceph/libceph.h
+@@ -72,15 +72,15 @@ struct ceph_options {
+ /*
+  * defaults
+  */
+-#define CEPH_MOUNT_TIMEOUT_DEFAULT	msecs_to_jiffies(60 * 1000)
+-#define CEPH_OSD_KEEPALIVE_DEFAULT	msecs_to_jiffies(5 * 1000)
+-#define CEPH_OSD_IDLE_TTL_DEFAULT	msecs_to_jiffies(60 * 1000)
++#define CEPH_MOUNT_TIMEOUT_DEFAULT	secs_to_jiffies(60)
++#define CEPH_OSD_KEEPALIVE_DEFAULT	secs_to_jiffies(5)
++#define CEPH_OSD_IDLE_TTL_DEFAULT	secs_to_jiffies(60)
+ #define CEPH_OSD_REQUEST_TIMEOUT_DEFAULT 0  /* no timeout */
+ #define CEPH_READ_FROM_REPLICA_DEFAULT	0  /* read from primary */
+ 
+-#define CEPH_MONC_HUNT_INTERVAL		msecs_to_jiffies(3 * 1000)
+-#define CEPH_MONC_PING_INTERVAL		msecs_to_jiffies(10 * 1000)
+-#define CEPH_MONC_PING_TIMEOUT		msecs_to_jiffies(30 * 1000)
++#define CEPH_MONC_HUNT_INTERVAL		secs_to_jiffies(3)
++#define CEPH_MONC_PING_INTERVAL		secs_to_jiffies(10)
++#define CEPH_MONC_PING_TIMEOUT		secs_to_jiffies(30)
+ #define CEPH_MONC_HUNT_BACKOFF		2
+ #define CEPH_MONC_HUNT_MAX_MULT		10
+ 
+diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
+index 4c6441536d55b6323f4b9d93b5d4837cd4ec880c..ee701b39960e1c9778db91936ac7503467ee1162 100644
+--- a/net/ceph/ceph_common.c
++++ b/net/ceph/ceph_common.c
+@@ -527,29 +527,27 @@ int ceph_parse_param(struct fs_parameter *param, struct ceph_options *opt,
+ 
+ 	case Opt_osdkeepalivetimeout:
+ 		/* 0 isn't well defined right now, reject it */
+-		if (result.uint_32 < 1 || result.uint_32 > INT_MAX / 1000)
++		if (result.uint_32 < 1 || result.uint32 > INT_MAX / HZ)
+ 			goto out_of_range;
+-		opt->osd_keepalive_timeout =
+-		    msecs_to_jiffies(result.uint_32 * 1000);
++		opt->osd_keepalive_timeout = secs_to_jiffies(result.uint_32);
+ 		break;
+ 	case Opt_osd_idle_ttl:
+ 		/* 0 isn't well defined right now, reject it */
+-		if (result.uint_32 < 1 || result.uint_32 > INT_MAX / 1000)
++		if (result.uint_32 < 1 || result.uint32 > INT_MAX / HZ)
+ 			goto out_of_range;
+-		opt->osd_idle_ttl = msecs_to_jiffies(result.uint_32 * 1000);
++		opt->osd_idle_ttl = secs_to_jiffies(result.uint_32);
+ 		break;
+ 	case Opt_mount_timeout:
+ 		/* 0 is "wait forever" (i.e. infinite timeout) */
+-		if (result.uint_32 > INT_MAX / 1000)
++		if (result.uint32 > INT_MAX / HZ)
+ 			goto out_of_range;
+-		opt->mount_timeout = msecs_to_jiffies(result.uint_32 * 1000);
++		opt->mount_timeout = secs_to_jiffies(result.uint_32);
+ 		break;
+ 	case Opt_osd_request_timeout:
+ 		/* 0 is "wait forever" (i.e. infinite timeout) */
+-		if (result.uint_32 > INT_MAX / 1000)
++		if (result.uint32 > INT_MAX / HZ)
+ 			goto out_of_range;
+-		opt->osd_request_timeout =
+-		    msecs_to_jiffies(result.uint_32 * 1000);
++		opt->osd_request_timeout = secs_to_jiffies(result.uint_32);
+ 		break;
+ 
+ 	case Opt_share:
+diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
+index b24afec241382b60d775dd12a6561fa23a7eca45..ba61a48b4388c2eceb5b7a299906e7f90191dd5d 100644
+--- a/net/ceph/osd_client.c
++++ b/net/ceph/osd_client.c
+@@ -4989,8 +4989,7 @@ int ceph_osdc_notify(struct ceph_osd_client *osdc,
+ 	linger_submit(lreq);
+ 	ret = linger_reg_commit_wait(lreq);
+ 	if (!ret)
+-		ret = linger_notify_finish_wait(lreq,
+-				 msecs_to_jiffies(2 * timeout * MSEC_PER_SEC));
++		ret = linger_notify_finish_wait(lreq, secs_to_jiffies(2 * timeout));
+ 	else
+ 		dout("lreq %p failed to initiate notify %d\n", lreq, ret);
+ 
+
 -- 
-Easwar Hariharan <eahariha@linux.microsoft.com>
+2.43.0
 
