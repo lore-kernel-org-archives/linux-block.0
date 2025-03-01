@@ -1,158 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f225.google.com (mail-qk1-f225.google.com [209.85.222.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961B32FC23
-	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 13:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6861BFE00
+	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 19:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740836971; cv=none; b=cZ0zbLPy8FHFbHKkKfaj3BYYtacrDo3UqTKe64v7oxlKHpFCdTnfXC8HI4FEviqCVcLkDrK/alLtYDZpWq+CQzjoEfhKx832KfWoZL+kuDza+mMYsICE2c+2IAIM80Rhjd/dAnK/LSjtC9lYHYn3WX6Yr+N0PCoBpXiHUBh3mTQ=
+	t=1740855804; cv=none; b=bmqdCig8DiUhPmtvmzXS7d8ifQcyVB/RksTqQN5VczR/MvpirE0mC7zSEkqWDz0WDbD6mteMUg1O/seNGCniz8vct9y8Kc6F0VaM16BasfnZnxrFG2d3hTf9tELD/i7hQfdhPmam0IHj1WrM9jb2s5IwrerUZpMIZSpqM68NclQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740836971; c=relaxed/simple;
-	bh=TdQrSsfUqsgjam5ayWXfQx9MiC0CEceDz3qNAdJSGZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mK0zfwb+aotzeAV4auwXGO7/C2z0irNLWfjruLKrXt0hiwjD3vmgtBiIxFWw8ZsiD+Y0B9sfuL5wT1JFB5e5g3PhGrIXw8GIb1dxbLYKN25UGM1UwFcrloWb+uqjILEXPoM22346yD7bwjCrL+Gu8/ptTQVs1VdbQH1jOJBxAHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wgys34JL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740855804; c=relaxed/simple;
+	bh=GRjsFbkbVxXqkass6qIGbhqNaI3PmF5zffUNEdoUW8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ISGCSkXFkyyO0gkGO1cs3i+brygLETZOZ4Z0A09udc/KmLg1ps3n10JuRHVrRgBAsTu9rK9Ehur7tvYS3YgdbP9UW7/XKfTW8rdlLF22RxSEYL3o42fXxXUdBLSkkBTYSpAyk1mDB+wPkzci96zBqR9bjl6JsmhrbJEEfYcDLWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=aKfmjQ4t; arc=none smtp.client-ip=209.85.222.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wgys34JL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740836968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yX8SsUhxK1pBuuAliUfaXKNUpsQ+odkuNQ8838vLa54=;
-	b=Wgys34JLFuQ0P8FSx5EK3e+M2th002YskSeQIcWugE6aANnLy0BCqskES4nlII3IfOMRwn
-	SpLWEH9S4uOqKcxkwfz57oerhM2bUYfat5EOw5COd4K/Ey3QJKDX8LwmVRSK85g3brgXG/
-	Kd6IsyylQZR3qFCuG3PAaO1REPAIM3Y=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-315-UsM1OL0dN9Cwo8BktjiVqw-1; Sat,
- 01 Mar 2025 08:49:25 -0500
-X-MC-Unique: UsM1OL0dN9Cwo8BktjiVqw-1
-X-Mimecast-MFC-AGG-ID: UsM1OL0dN9Cwo8BktjiVqw_1740836964
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8E263180034A;
-	Sat,  1 Mar 2025 13:49:23 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F35E519560AD;
-	Sat,  1 Mar 2025 13:49:17 +0000 (UTC)
-Date: Sat, 1 Mar 2025 21:49:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org
-Subject: Re: [PATCH] io_uring/ublk: report error when unregister operation
- fails
-Message-ID: <Z8MQV0EGSFpiHwUC@fedora>
-References: <20250228231432.642417-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="aKfmjQ4t"
+Received: by mail-qk1-f225.google.com with SMTP id af79cd13be357-7c0e3688f92so48985385a.1
+        for <linux-block@vger.kernel.org>; Sat, 01 Mar 2025 11:03:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1740855800; x=1741460600; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPtTyrhHo4Bp34ujcUzSOaIDxgVPVdiOF8KP+yd3nw8=;
+        b=aKfmjQ4tqbwyYMQwDe7Hx3zxDJa0Yp2/H53VRGCAuCtCIgHCS+gX6K0lyL69kgyCt0
+         3Vv7K7wN708YiheapACyMkcFfqTfxrtEyi+c0g7jlPUNXjY3Ap4hUOYGA/lqDOAvj8od
+         RGQVPZz6Iizb+/KYYNIql95FgpmjXVPXq+gJ9i46oAbrqXkZff8KdkoHo51ZpRAjRlDX
+         0yZYxn9EKycyIt/mzUWi1awqUbEQL5W0NTM5KBSQDqGv8Wj1oQer9MBAiJmG8KpLD10p
+         wMQbxwEDcmxUUI0SMdpURCYVknme0qrhYNuerFNtCL6l1mfMRPyRVDrh6slJTEXAFpE3
+         51pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740855800; x=1741460600;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zPtTyrhHo4Bp34ujcUzSOaIDxgVPVdiOF8KP+yd3nw8=;
+        b=M1Wt/MPfoKceCkbWhOQJz3OgnvftpRe4jDqdAMyWmjSv7L5gzeX4rX0ph85nuYqLtp
+         iyxRh0EepBMvUE1hYw6DXyqA0oJw47OK9yHNkfcA9tOhvj7ZgY9pZ6ISqbN3XkrSUExC
+         N+B70vtD426auEaTqymhUlDrqX1YAc7nuxgLf8acDXaiw0bmU8S4qWrKIZPiaPAsryJX
+         vqFAIgixhdOxGDLzSldJGD+pEgvMUmvHzNSHXY51JoeHkF+74MHYJOMlgEeFdkq/lEfZ
+         FaQD4EuNK48zlCAgrwd+LPJ75eBxEuJf6tjbXhtVkIvPTpoK+JIAXRnrU+rDb+GXXfLx
+         IyfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9eZblFafAgYwPBIyypT391/NUko6JNGtcumc9Gs154AoBqVD2HwJwedjvInG1ohmlr/2TjSObtOw/VQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz24LbDulH58CF6A8yOvwx2p7esSvUNdrwn/sowicaCFtwel22M
+	7pRa4yBwxabp1ZkvllqJAaQBRVdO8ZnFPY7tAircT2qgXplnKYhKSnqee5Vk/Vd3EsHEiHeZDam
+	1BpaiyU3YzLhJutC0dgxgQycOjoT7siz7aulj2R4WwYflmOGj
+X-Gm-Gg: ASbGncsnI+SYirbm88YY7ZzFIQo/t3NkTIDYeAEBCFmEntGjmOfzGtktt8x5hNz5qmy
+	rKMiuRBFOiBjrz4MWzBNz3sIz9MzJfEMfrzXPgZ6w5GrpzrpSzVsqt4gfA3hqpNYkalcQx0O+9r
+	xLNRxqZUhNvm9Z1dkbnb3fPXlqmglkcB/8KHxA5flBEweUUTKjpSj9liJeR3Zo6DMTiTurqyKVg
+	jA3J5Xy11nuJtbZd960cuPWq6l4WSLbLgR+/DYpBPZZyeP6DyK22gcfQU7Xj3589SKQy46rvaI+
+	pBr6FXUkzMx5Dw2GbgVqegtHGcYQ8bav8A==
+X-Google-Smtp-Source: AGHT+IHT7qGAIK+FkEaSknbOU0OApb1ysNsvmSnrt6XPcK/Su4fAh06kTZ1i9H3Vw3B4+jE1gchSfRbEcxz6
+X-Received: by 2002:a05:620a:410b:b0:7c0:b43c:b36c with SMTP id af79cd13be357-7c39c4bebdcmr470979485a.6.1740855800384;
+        Sat, 01 Mar 2025 11:03:20 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6e8b0f85d4bsm812006d6.5.2025.03.01.11.03.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Mar 2025 11:03:20 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E2EBC340314;
+	Sat,  1 Mar 2025 12:03:18 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id DCDEAE4164A; Sat,  1 Mar 2025 12:03:18 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: don't cast registered buffer index to int
+Date: Sat,  1 Mar 2025 12:03:16 -0700
+Message-ID: <20250301190317.950208-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250228231432.642417-1-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 28, 2025 at 04:14:31PM -0700, Caleb Sander Mateos wrote:
-> Indicate to userspace applications if a UBLK_IO_UNREGISTER_IO_BUF
-> command specifies an invalid buffer index by returning an error code.
-> Return -EINVAL if no buffer is registered with the given index, and
-> -EBUSY if the registered buffer is not a kernel bvec.
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
->  drivers/block/ublk_drv.c     |  3 +--
->  include/linux/io_uring/cmd.h |  4 ++--
->  io_uring/rsrc.c              | 18 ++++++++++++++----
->  3 files changed, 17 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index b5cf92baaf0f..512cbd456817 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1785,12 +1785,11 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
->  
->  static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
->  				  const struct ublksrv_io_cmd *ub_cmd,
->  				  unsigned int issue_flags)
->  {
-> -	io_buffer_unregister_bvec(cmd, ub_cmd->addr, issue_flags);
-> -	return 0;
-> +	return io_buffer_unregister_bvec(cmd, ub_cmd->addr, issue_flags);
->  }
->  
->  static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
->  			       unsigned int issue_flags,
->  			       const struct ublksrv_io_cmd *ub_cmd)
-> diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-> index cf8d80d84734..05d7b6145731 100644
-> --- a/include/linux/io_uring/cmd.h
-> +++ b/include/linux/io_uring/cmd.h
-> @@ -127,9 +127,9 @@ static inline struct io_uring_cmd_data *io_uring_cmd_get_async_data(struct io_ur
->  }
->  
->  int io_buffer_register_bvec(struct io_uring_cmd *cmd, struct request *rq,
->  			    void (*release)(void *), unsigned int index,
->  			    unsigned int issue_flags);
-> -void io_buffer_unregister_bvec(struct io_uring_cmd *cmd, unsigned int index,
-> -			       unsigned int issue_flags);
-> +int io_buffer_unregister_bvec(struct io_uring_cmd *cmd, unsigned int index,
-> +			      unsigned int issue_flags);
->  
->  #endif /* _LINUX_IO_URING_CMD_H */
-> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-> index 45bfb37bca1e..29c0c31092eb 100644
-> --- a/io_uring/rsrc.c
-> +++ b/io_uring/rsrc.c
-> @@ -975,30 +975,40 @@ int io_buffer_register_bvec(struct io_uring_cmd *cmd, struct request *rq,
->  	io_ring_submit_unlock(ctx, issue_flags);
->  	return ret;
->  }
->  EXPORT_SYMBOL_GPL(io_buffer_register_bvec);
->  
-> -void io_buffer_unregister_bvec(struct io_uring_cmd *cmd, unsigned int index,
-> -			       unsigned int issue_flags)
-> +int io_buffer_unregister_bvec(struct io_uring_cmd *cmd, unsigned int index,
-> +			      unsigned int issue_flags)
->  {
->  	struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
->  	struct io_rsrc_data *data = &ctx->buf_table;
->  	struct io_rsrc_node *node;
-> +	int ret = 0;
->  
->  	io_ring_submit_lock(ctx, issue_flags);
-> -	if (index >= data->nr)
-> +	if (index >= data->nr) {
-> +		ret = -EINVAL;
->  		goto unlock;
-> +	}
->  	index = array_index_nospec(index, data->nr);
->  
->  	node = data->nodes[index];
-> -	if (!node || !node->buf->is_kbuf)
-> +	if (!node) {
-> +		ret = -EINVAL;
->  		goto unlock;
-> +	}
-> +	if (!node->buf->is_kbuf) {
-> +		ret = -EBUSY;
-> +		goto unlock;
-> +	}
+io_buffer_register_bvec() takes index as an unsigned int argument, but
+ublk_register_io_buf() casts ub_cmd->addr (a u64) to int. Remove the
+misleading cast and instead pass index as an unsigned value to
+ublk_register_io_buf() and ublk_unregister_io_buf().
 
-Good catch, otherwise, ublk request may never get completed if unreg
-command fails, which can happen really as one uring_cmd.
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/block/ublk_drv.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-Thanks,
-Ming
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 512cbd456817..af5a4ff4bd3d 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1760,16 +1760,15 @@ static void ublk_io_release(void *priv)
+ 	ublk_put_req_ref(ubq, rq);
+ }
+ 
+ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 				struct ublk_queue *ubq, unsigned int tag,
+-				const struct ublksrv_io_cmd *ub_cmd,
+-				unsigned int issue_flags)
++				unsigned int index, unsigned int issue_flags)
+ {
+ 	struct ublk_device *ub = cmd->file->private_data;
+-	int index = (int)ub_cmd->addr, ret;
+ 	struct request *req;
++	int ret;
+ 
+ 	req = __ublk_check_and_get_req(ub, ubq, tag, 0);
+ 	if (!req)
+ 		return -EINVAL;
+ 
+@@ -1782,14 +1781,13 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 
+ 	return 0;
+ }
+ 
+ static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+-				  const struct ublksrv_io_cmd *ub_cmd,
+-				  unsigned int issue_flags)
++				  unsigned int index, unsigned int issue_flags)
+ {
+-	return io_buffer_unregister_bvec(cmd, ub_cmd->addr, issue_flags);
++	return io_buffer_unregister_bvec(cmd, index, issue_flags);
+ }
+ 
+ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			       unsigned int issue_flags,
+ 			       const struct ublksrv_io_cmd *ub_cmd)
+@@ -1840,13 +1838,13 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 		goto out;
+ 
+ 	ret = -EINVAL;
+ 	switch (_IOC_NR(cmd_op)) {
+ 	case UBLK_IO_REGISTER_IO_BUF:
+-		return ublk_register_io_buf(cmd, ubq, tag, ub_cmd, issue_flags);
++		return ublk_register_io_buf(cmd, ubq, tag, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_UNREGISTER_IO_BUF:
+-		return ublk_unregister_io_buf(cmd, ub_cmd, issue_flags);
++		return ublk_unregister_io_buf(cmd, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_FETCH_REQ:
+ 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
+ 		if (ublk_queue_ready(ubq)) {
+ 			ret = -EBUSY;
+ 			goto out;
+-- 
+2.45.2
 
