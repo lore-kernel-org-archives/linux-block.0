@@ -1,72 +1,33 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092A01ADC68
-	for <linux-block@vger.kernel.org>; Sat,  1 Mar 2025 02:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B3E2C9A;
+	Sat,  1 Mar 2025 04:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740795823; cv=none; b=ZxEQg2a28Hh7WbXcwfT5u3AlhEyZNio8kaXRzGTdtasFrO+t4XUcwmV+7dtDgM3Ae3G6td17kVpXaZX+V+JKQavsFVYphAhesNCLgUj+HiXDvqRChYV41/GKUa7VeL7fcVnps6DoICvTwmiQljnEAR6KaneaaS/TMJvIgz46p/Y=
+	t=1740802986; cv=none; b=BRezp4iGCPK5Fmnrh0JXaAxz1kFrDgCMM5Jbjp3udivLksRxTIR6942NFuv03hQxLSTqdzCYRPEC8xHUFGV8ahiOio2k3YxNct/P7cb4A2D7FsWUkWPfUIpOBSiy8Bx36onVkfFPEpzgN2GGMMS6hm3MoQ+F7Q7WEe21UBrUkmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740795823; c=relaxed/simple;
-	bh=pKwkVTSQJ0aAuAlftXppJmht0Kot7MxlbY6yGzg7bVs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=VYY5xyFid0oI+N5NgjJq0lE2Z/np0JAe9owCLokq9l/Fhn5CklrRRvjJauvSdVzLOutoAaO947YYViGGcVpHm2DnEsFOi0147NlUklUHyncJSJzcLJRgVxVgla3YfDrC7Q/sxQoQRkN9Dabllrf3QrUtc+ySufJ7upVi9WBjCww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gD4T4Vuf; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1740802986; c=relaxed/simple;
+	bh=p8VM9Bl0ApB7gurlDfnc5ERgWv0qjUanc6mf2uHC3aI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=eBUX98Wy+IsX51PDIik8KwPAuHqNtFts6zxdKIplpPrGU6ZeMHRrT0G/iBg8p044iE3ci0X+q/eVIYs3ZgKWW1yYil2Sq2+mAW6MPaEmMP8q3J54TfMaOt4P/7xWjuIo+ASyckACE8uTewfnI6QxbrEVyUnGhd22zC4UBCPz7ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HyEJE2kg; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gD4T4Vuf"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6ef9b8b4f13so23456237b3.2
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2025 18:23:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740795821; x=1741400621; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9BLBwQOwrrYQIN7raxU+No/2e8DfV51qZaSaJee9wDc=;
-        b=gD4T4VufIzLXAfDpNNrVvusy4WZ9Vu4BbV7h18EDY/Pq7V27AuxzScRtJPvDQTZYRQ
-         vJc3SD8IAUYnXO9/whnJC5v13Ue7pdLhAI97/RCSEzpTFX4wPkuopZ86Q7YuseS4OI6t
-         XrnkI74oSNTWzx3NTz4j6gOX2iFgTc1mt9PbE+19m6dLNHbhmGqKdpHiNeA313z3eAki
-         n3Bvk6R1RFULa2KBpxxaBXGXpWTY9EDJMz2xgDm9uNstRn0LyhRISkvWWyj2EiaVnfnl
-         T4KX9kyx9GZCUuKIXT0i5/ZDl7T6YsqRwLQ4Fqf6d9XsimiPTkfW0HcvRnmeWCMfrhSI
-         9Vsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740795821; x=1741400621;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9BLBwQOwrrYQIN7raxU+No/2e8DfV51qZaSaJee9wDc=;
-        b=O3FK7EVB0CoFTRq+VrQYYx7JezqtMhz09ki12PQg9DcPv22JjMlWo3FOvoiFlnAANm
-         AXIgSdmNNGXelmBQWWHcHVi59mdOrnfRjBUZPUJbdXS3TuJ88ik12DJz9yx6UAObmyTo
-         007JSIilXllC4D3yhG9u3NZ+R5gMG4Uicma1gThVACxiYX95lSv1gOnvZ0EAdHTFgm6f
-         sHFOr5tyyBlO6YdJovBdIIXLrnrschBp/O9XuGzPq5vAn4vYsxRU7nUA2fyar6BtqbvD
-         rdxgzvuD3NkWX9/7G2em6gUi2eMr1jgSrKVNuph92947S4n/ybHze+Hb8ZP+CTia9y6H
-         1ejA==
-X-Gm-Message-State: AOJu0YzxgIrlvFAyjEgCAx5LB89CDYa7QGP3SDgi4JwD+u1CM+yrxog5
-	NNCGiMNrMgu6P2Lmhcv6Dnu25c80QesKHvah3ljEHJS2yDTQ/LmePqy5NsTPW8M=
-X-Gm-Gg: ASbGncubKynL+19jxSWaOiT6i5KgS81ggPZdWLZJsFhsPOVkb38wNEZmNr5ODb4mYqd
-	WoGAzwxTjHYXKKU0RRNgZW4Cu5dI8UUHCM6tfsu9KotWLLc4pTDtRvYrrcJMV0f0yRuYfhWPRV4
-	TFFCvHsBeJnxsn2njT4dbP2Ta4EC9D5EYedhM4pHFKqMxctTGcR+BpoLHtrVWPptJnrrFhc9L6Y
-	kvEFJErNFdIoHsZuWjEQ4Xkkf+JzJGZOEmaRo+bFW261X3u1FilWbEuQv068Jz2H1Yrf3A8R0ra
-	MmqgGqLlaeYo44Ls3xyyy6Wb2mHQQvQUnVN8Pds=
-X-Google-Smtp-Source: AGHT+IEAfgFEonGI7v81NxkPZsf+pVyxnn3pBYJKAcjf3ha9OznoVu7uywfX2gEhdr3ETKKz7Ff3pQ==
-X-Received: by 2002:a05:690c:5719:b0:6fd:3ff9:ad96 with SMTP id 00721157ae682-6fd4a16d0aemr55511127b3.37.1740795820960;
-        Fri, 28 Feb 2025 18:23:40 -0800 (PST)
-Received: from [127.0.0.1] ([207.222.175.10])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fd3cb7e02dsm10175307b3.84.2025.02.28.18.23.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 18:23:40 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Pavel Begunkov <asml.silence@gmail.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- io-uring@vger.kernel.org
-In-Reply-To: <20250228231432.642417-1-csander@purestorage.com>
-References: <20250228231432.642417-1-csander@purestorage.com>
-Subject: Re: [PATCH] io_uring/ublk: report error when unregister operation
- fails
-Message-Id: <174079581972.2596794.14825315582480664341.b4-ty@kernel.dk>
-Date: Fri, 28 Feb 2025 19:23:39 -0700
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HyEJE2kg"
+Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 54CED2038A28;
+	Fri, 28 Feb 2025 20:23:04 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 54CED2038A28
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1740802984;
+	bh=3jHYa/0Xarc29iomR76KgYiKvPwnE0MNnWeMmBfBZWk=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=HyEJE2kghS30G13zEV2j4oV/PdhuWKfaBvtF3ETmd9B3SdS38oITvwLfSMzQZ+tZy
+	 dKeOxA1llHMf3jcgK7clLp2zTZXKXfuZzt3KGVl8OsarJrxu5dr38c8fXAtphcMvvx
+	 HSkXif3K1ieDai/11Fct5h/so6j/gQNrXloYsnkY=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Date: Sat, 01 Mar 2025 04:22:52 +0000
+Subject: [PATCH v4 1/2] rbd: convert timeouts to secs_to_jiffies()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,25 +36,79 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-94c79
+Message-Id: <20250301-converge-secs-to-jiffies-part-two-v4-1-c9226df9e4ed@linux.microsoft.com>
+References: <20250301-converge-secs-to-jiffies-part-two-v4-0-c9226df9e4ed@linux.microsoft.com>
+In-Reply-To: <20250301-converge-secs-to-jiffies-part-two-v4-0-c9226df9e4ed@linux.microsoft.com>
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+ Daniel Vacek <neelx@suse.com>, Ilya Dryomov <idryomov@gmail.com>, 
+ Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>, 
+ Xiubo Li <xiubli@redhat.com>
+Cc: ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Easwar Hariharan <eahariha@linux.microsoft.com>
+X-Mailer: b4 0.14.2
 
+Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+secs_to_jiffies().  As the value here is a multiple of 1000, use
+secs_to_jiffies() instead of msecs_to_jiffies() to avoid the multiplication
 
-On Fri, 28 Feb 2025 16:14:31 -0700, Caleb Sander Mateos wrote:
-> Indicate to userspace applications if a UBLK_IO_UNREGISTER_IO_BUF
-> command specifies an invalid buffer index by returning an error code.
-> Return -EINVAL if no buffer is registered with the given index, and
-> -EBUSY if the registered buffer is not a kernel bvec.
-> 
-> 
+This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+the following Coccinelle rules:
 
-Applied, thanks!
+@depends on patch@ expression E; @@
 
-[1/1] io_uring/ublk: report error when unregister operation fails
-      commit: e6ea7ec494881bcf61b8f0f77f7cb3542f717ff2
+-msecs_to_jiffies(E * 1000)
++secs_to_jiffies(E)
 
-Best regards,
+@depends on patch@ expression E; @@
+
+-msecs_to_jiffies(E * MSEC_PER_SEC)
++secs_to_jiffies(E)
+
+Change the check for range to check against HZ.
+
+Acked-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+---
+ drivers/block/rbd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index faafd7ff43d6ef53110ab3663cc7ac322214cc8c..1c406b17f3cee741b7bdd9f742958b3f1d5b1bbe 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -108,7 +108,7 @@ static int atomic_dec_return_safe(atomic_t *v)
+ #define RBD_OBJ_PREFIX_LEN_MAX	64
+ 
+ #define RBD_NOTIFY_TIMEOUT	5	/* seconds */
+-#define RBD_RETRY_DELAY		msecs_to_jiffies(1000)
++#define RBD_RETRY_DELAY		secs_to_jiffies(1)
+ 
+ /* Feature bits */
+ 
+@@ -4162,7 +4162,7 @@ static void rbd_acquire_lock(struct work_struct *work)
+ 		dout("%s rbd_dev %p requeuing lock_dwork\n", __func__,
+ 		     rbd_dev);
+ 		mod_delayed_work(rbd_dev->task_wq, &rbd_dev->lock_dwork,
+-		    msecs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT * MSEC_PER_SEC));
++		    secs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT));
+ 	}
+ }
+ 
+@@ -6283,9 +6283,9 @@ static int rbd_parse_param(struct fs_parameter *param,
+ 		break;
+ 	case Opt_lock_timeout:
+ 		/* 0 is "wait forever" (i.e. infinite timeout) */
+-		if (result.uint_32 > INT_MAX / 1000)
++		if (result.uint32 > INT_MAX / HZ)
+ 			goto out_of_range;
+-		opt->lock_timeout = msecs_to_jiffies(result.uint_32 * 1000);
++		opt->lock_timeout = secs_to_jiffies(result.uint_32);
+ 		break;
+ 	case Opt_pool_ns:
+ 		kfree(pctx->spec->pool_ns);
+
 -- 
-Jens Axboe
-
-
+2.43.0
 
