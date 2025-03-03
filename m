@@ -1,144 +1,180 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB45214A6E
-	for <linux-block@vger.kernel.org>; Mon,  3 Mar 2025 15:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E016230BFC
+	for <linux-block@vger.kernel.org>; Mon,  3 Mar 2025 16:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741016933; cv=none; b=XBmxoZYW0CwEjoCdigIcf6om9uK5mxpvlOM8VohOLtGdalH/pxY86nbDmnxDLtrKub2TPzY98M6kGeX9Wyjcf8e0z/uBQbJAhyRBYJYdEibCdjrPvEnLDm9lRTWGFhhRAE42tn6m3mR8ppfbUJ94Mcs3TLIIL4uS3CGsrynaGS4=
+	t=1741018504; cv=none; b=H8u19NMeSM7Je6KJeo0RsBrlTX/z1V0CKipOTqGqCsVuOGKitGc9bWAoAruhI6AcFHvSUgN32AvEjKc5hEMGBL9+NoNN7QDAHNoCrxEI+0Uyjr75fzUk4uFdKVAKyhLc4lZPFb1oKg1sIzLjx3IW/48ePhpPeWZxnnjVxymH0NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741016933; c=relaxed/simple;
-	bh=1gfWbXOHXAYCblxNQ2JEhLx8RXJFIn3Fg535FJYmFfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F+oSd2gWdXHcUgT5OKDOmydp4t0xDQUPvypSJQnIztDxZk+WUvjQ9B5gfTSacI3diXtZvkb6pQeIWYXl/WPDZ/dgVttL8RbIVS8ZLf9PxXNQkjxJI87dqbAvufr0KbBUkNIH7SFFGaTnDMLealhdKGIPma52xqILX7qJplYV0dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KF4dtobH; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1741018504; c=relaxed/simple;
+	bh=50BnvivVpdCCeB9VzdI7dDNYz7sP6VMIwBqkkwK7pvw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l3q2ZJZNpBtl6V7tO6PtLk8rmvcLigMQJiW65lINymRFQ9tuPp4Sp39bNFdVU2alQ1dhJzfyJdmwnf6geONMg0lV2lGDJAD/4xOcDzlFSNfp9EMJlntXz2kTCvr5oDaGepPhYXRdteY3EE6tDl97NWwCw42kycW8RtH/hsMvdm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=CiZY8yBd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PYeWJ2tU; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=CiZY8yBd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PYeWJ2tU; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KF4dtobH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=oBr3Q35PYOX8KLcyP5TMvc9JdpscxzNbBR95ep2biiE=; b=KF4dtobHd1vxFyKHtfGmYLTnJu
-	3geMPg49K4GbOBm2pLeLDxmdEyM8wxBYxMf0A6ZCUckskxQC8SObjg7eTENqRnD+xezhPXhoVYHt7
-	BIa6qhmEz9fV+4iAUt8AtSB0mCb9bo/tn0/azePHbgZeoTb9n1epLw+QhwDJCzecaA/PCHoFKXcTX
-	YzLAysAqb1fhfLjGJtAwfR99COhkmANTeVDCN0GV88kJod+UULBOqZjVdywdyIZq8Xtd7uUnlRtjW
-	bHDeAxxeCqrp+xFeD2K166PKbV/B9nTwf9tEdMJHfR7IP0C7C7IqpVZ1OCAMaIrfuxbxcT6EvnVve
-	YABkLQIw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tp82C-0000000BqnG-2N01;
-	Mon, 03 Mar 2025 15:48:48 +0000
-Date: Mon, 3 Mar 2025 15:48:48 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	linux-mm@kvack.org
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-Message-ID: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
-References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
- <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
- <Z8W8OtJYFzr9OQac@casper.infradead.org>
- <Z8W_1l7lCFqMiwXV@casper.infradead.org>
- <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="CiZY8yBd";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PYeWJ2tU";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="CiZY8yBd";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PYeWJ2tU"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 18A351F444;
+	Mon,  3 Mar 2025 16:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1741018501; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=50BnvivVpdCCeB9VzdI7dDNYz7sP6VMIwBqkkwK7pvw=;
+	b=CiZY8yBdX6CgR6pN7QOOFP3Xh0sFxjWIzYvi6mWQ+PwVysO+p6ZBfuStbtf+R0n4aY2Env
+	wY8u3ggZrtvymuVpQ1rjD54lF3jM7eTFElJH3arXPMm/Ia0I21u7OVzhF6YdEJgo5j849e
+	7XubAbtALN6jdH/0sWeQw59AkXGmjoU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1741018501;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=50BnvivVpdCCeB9VzdI7dDNYz7sP6VMIwBqkkwK7pvw=;
+	b=PYeWJ2tUsEfaLzds48Yz8c8n4ClRTOwyXNxwUHGuCJYGvqWa6oLf8xmSPyuQFyL9WhPFhN
+	ag7kDmySZ0xq/OAQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=CiZY8yBd;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=PYeWJ2tU
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1741018501; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=50BnvivVpdCCeB9VzdI7dDNYz7sP6VMIwBqkkwK7pvw=;
+	b=CiZY8yBdX6CgR6pN7QOOFP3Xh0sFxjWIzYvi6mWQ+PwVysO+p6ZBfuStbtf+R0n4aY2Env
+	wY8u3ggZrtvymuVpQ1rjD54lF3jM7eTFElJH3arXPMm/Ia0I21u7OVzhF6YdEJgo5j849e
+	7XubAbtALN6jdH/0sWeQw59AkXGmjoU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1741018501;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=50BnvivVpdCCeB9VzdI7dDNYz7sP6VMIwBqkkwK7pvw=;
+	b=PYeWJ2tUsEfaLzds48Yz8c8n4ClRTOwyXNxwUHGuCJYGvqWa6oLf8xmSPyuQFyL9WhPFhN
+	ag7kDmySZ0xq/OAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 06BDD13939;
+	Mon,  3 Mar 2025 16:15:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5DEnAYXVxWcxHgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 03 Mar 2025 16:15:01 +0000
+Message-ID: <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+Date: Mon, 3 Mar 2025 17:15:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+Content-Language: en-US
+To: Matthew Wilcox <willy@infradead.org>, Hannes Reinecke <hare@suse.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-mm@kvack.org
+References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
+ <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
+ <Z8W8OtJYFzr9OQac@casper.infradead.org>
+ <Z8W_1l7lCFqMiwXV@casper.infradead.org>
+ <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
+ <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJkBREIBQkRadznAAoJECJPp+fMgqZkNxIQ
+ ALZRqwdUGzqL2aeSavbum/VF/+td+nZfuH0xeWiO2w8mG0+nPd5j9ujYeHcUP1edE7uQrjOC
+ Gs9sm8+W1xYnbClMJTsXiAV88D2btFUdU1mCXURAL9wWZ8Jsmz5ZH2V6AUszvNezsS/VIT87
+ AmTtj31TLDGwdxaZTSYLwAOOOtyqafOEq+gJB30RxTRE3h3G1zpO7OM9K6ysLdAlwAGYWgJJ
+ V4JqGsQ/lyEtxxFpUCjb5Pztp7cQxhlkil0oBYHkudiG8j1U3DG8iC6rnB4yJaLphKx57NuQ
+ PIY0Bccg+r9gIQ4XeSK2PQhdXdy3UWBr913ZQ9AI2usid3s5vabo4iBvpJNFLgUmxFnr73SJ
+ KsRh/2OBsg1XXF/wRQGBO9vRuJUAbnaIVcmGOUogdBVS9Sun/Sy4GNA++KtFZK95U7J417/J
+ Hub2xV6Ehc7UGW6fIvIQmzJ3zaTEfuriU1P8ayfddrAgZb25JnOW7L1zdYL8rXiezOyYZ8Fm
+ ZyXjzWdO0RpxcUEp6GsJr11Bc4F3aae9OZtwtLL/jxc7y6pUugB00PodgnQ6CMcfR/HjXlae
+ h2VS3zl9+tQWHu6s1R58t5BuMS2FNA58wU/IazImc/ZQA+slDBfhRDGYlExjg19UXWe/gMcl
+ De3P1kxYPgZdGE2eZpRLIbt+rYnqQKy8UxlszsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZAUSmwUJDK5EZgAKCRAiT6fnzIKmZOJGEACOKABgo9wJXsbWhGWYO7mD
+ 8R8mUyJHqbvaz+yTLnvRwfe/VwafFfDMx5GYVYzMY9TWpA8psFTKTUIIQmx2scYsRBUwm5VI
+ EurRWKqENcDRjyo+ol59j0FViYysjQQeobXBDDE31t5SBg++veI6tXfpco/UiKEsDswL1WAr
+ tEAZaruo7254TyH+gydURl2wJuzo/aZ7Y7PpqaODbYv727Dvm5eX64HCyyAH0s6sOCyGF5/p
+ eIhrOn24oBf67KtdAN3H9JoFNUVTYJc1VJU3R1JtVdgwEdr+NEciEfYl0O19VpLE/PZxP4wX
+ PWnhf5WjdoNI1Xec+RcJ5p/pSel0jnvBX8L2cmniYnmI883NhtGZsEWj++wyKiS4NranDFlA
+ HdDM3b4lUth1pTtABKQ1YuTvehj7EfoWD3bv9kuGZGPrAeFNiHPdOT7DaXKeHpW9homgtBxj
+ 8aX/UkSvEGJKUEbFL9cVa5tzyialGkSiZJNkWgeHe+jEcfRT6pJZOJidSCdzvJpbdJmm+eED
+ w9XOLH1IIWh7RURU7G1iOfEfmImFeC3cbbS73LQEFGe1urxvIH5K/7vX+FkNcr9ujwWuPE9b
+ 1C2o4i/yZPLXIVy387EjA6GZMqvQUFuSTs/GeBcv0NjIQi8867H3uLjz+mQy63fAitsDwLmR
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 18A351F444
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-On Mon, Mar 03, 2025 at 04:39:47PM +0100, Hannes Reinecke wrote:
-> On 3/3/25 15:42, Matthew Wilcox wrote:
-> > On Mon, Mar 03, 2025 at 02:27:06PM +0000, Matthew Wilcox wrote:
-> > > We have a _lot_ of page types available.  We should mark large kmallocs
-> > > as such.  I'll send a patch to do that.
-> > 
-> > Can you try this?  It should fix the crash, at least.  Not sure why the
-> > frozen patch triggered it.
-> 
-> Still crashes:
+On 3/3/25 16:48, Matthew Wilcox wrote:
+> You need to turn on the debugging options Vlastimil mentioned and try to
+> figure out what nvme is doing wrong.
 
-It warns, but doesn't crash!  This is an improvement.
-
-> [   63.658068] WARNING: CPU: 6 PID: 5216 at mm/slub.c:4720
-> free_large_kmalloc+0x89/0xa0
-> [   63.667728] RIP: 0010:free_large_kmalloc+0x89/0xa0
-> [   63.842773] Call Trace:
-> [   63.934398]  kfree+0x2a5/0x340
-> [   63.987632]  nvmf_connect_admin_queue+0x105/0x1a0 [nvme_fabrics
-> 18bfa9223bf0bd1ec571f5f45774adcc919a867e]
-> [   63.987641]  nvme_tcp_start_queue+0x192/0x310 [nvme_tcp
-> a0629454ac5200d03b72a09e4d2b1e27dfa113e9]
-> [   63.987649]  nvme_tcp_setup_ctrl+0xf8/0x700 [nvme_tcp
-> a0629454ac5200d03b72a09e4d2b1e27dfa113e9]
-> [   64.043323]  nvme_tcp_create_ctrl+0x2e3/0x4d0 [nvme_tcp
-> a0629454ac5200d03b72a09e4d2b1e27dfa113e9]
-> [   64.043332]  nvmf_dev_write+0x323/0x3d0 [nvme_fabrics
-> 18bfa9223bf0bd1ec571f5f45774adcc919a867e]
-> [   64.043344]  vfs_write+0xd9/0x430
-> [   64.108458] ---[ end trace 0000000000000000 ]---
-> [   64.108461] page: refcount:0 mapcount:0 mapping:0000000000000000
-> index:0x2 pfn:0x5e3a
-> [   64.108465] flags: 0xfffffc0000000(node=0|zone=1|lastcpupid=0x1fffff)
-> [   64.108469] raw: 000fffffc0000000 0000000000000000 fffb0b48c0178e90
-> 0000000000000000
-> [   64.108472] raw: 0000000000000002 0000000000000000 00000000ffffffff
-> 0000000000000000
-> [   64.108473] page dumped because: Not a kmalloc allocation
-
-Right.  So you called kfree() on something that isn't currently
-kmalloced memory.  Either it used to be kmalloced memory and we freed
-the slab that it used to be in, or it's a wild pointer.  Whichever
-it is, that's a bug in the caller, not in slab.
-
-Why it bisected to that commit, I can't say.  Maybe it changed the
-timing, or maybe it was just luck (whether the allocation which is now
-being freed is the last allocation in the slab or not).
-
-> [   66.084156] page: refcount:0 mapcount:0 mapping:0000000000000000
-> index:0x0 pfn:0x5de5
-> [   66.093770] flags: 0xfffffc0000000(node=0|zone=1|lastcpupid=0x1fffff)
-> [   66.101810] raw: 000fffffc0000000 0000000000000000 dead000000000122
-> 0000000000000000
-> [   66.111311] raw: 0000000000000000 0000000000000000 00000000ffffffff
-> 0000000000000000
-> [   66.111314] page dumped because: Not a kmalloc allocation
-> [   66.112001] page: refcount:0 mapcount:0 mapping:0000000000000000
-> index:0xdc pfn:0x5de3
-> [   66.137452] flags: 0xfffffc0000000(node=0|zone=1|lastcpupid=0x1fffff)
-> [   66.137460] raw: 000fffffc0000000 ff45d9a24d93f420 ff45d9a24d93f420
-> 0000000000000000
-> [   66.137464] raw: 00000000000000dc 0000000000000000 00000000ffffffff
-> 0000000000000000
-
-It happened again ;-)
-
-> [   66.137466] page dumped because: Not a kmalloc allocation
-> [   66.138095] page: refcount:0 mapcount:0 mapping:0000000000000000
-> index:0x0 pfn:0x5de5
-> [   66.180944] flags: 0xfffffc0000000(node=0|zone=1|lastcpupid=0x1fffff)
-> [   66.180950] raw: 000fffffc0000000 ff45d9a24da3f420 ff45d9a24da3f420
-> 0000000000000000
-> [   66.180953] raw: 0000000000000000 0000000000000000 00000000ffffffff
-> 0000000000000000
-> [   66.180954] page dumped because: Not a kmalloc allocation
-
-And again ...
-
-> [   66.181672] BUG: unable to handle page fault for address:
-> ff40e4ea8fa50250
-
-Oh, now it crashed.  But we have so much evidence of a bug in the caller
-at this point that I don't think we can blame slab for falling over.
-If you're double-freeing something that's _not_ in a freed slab, this
-is the kind of thing we might expect?
-
-You need to turn on the debugging options Vlastimil mentioned and try to
-figure out what nvme is doing wrong.
-
+Agree, looks like some error path going wrong?
+Since there seems to be actual non-large kmalloc usage involved, another
+debug parameter that could help: CONFIG_SLUB_DEBUG=y, and boot with
+"slab_debug=FZPU,kmalloc-*"
