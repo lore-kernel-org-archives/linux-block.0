@@ -1,89 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAFE27C15A;
-	Mon,  3 Mar 2025 16:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212318489;
+	Mon,  3 Mar 2025 17:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019556; cv=none; b=LA7ScH1fidjJpfkY1Rh4qj6JzTRItdbtxKlg2yQN295TVhq5U+BW3yLodmlnJ0pMcx15YPj6Xc89Id5rEbxmoZ+ePWej+xl+lW2ATThkh8xWFZKwKQBt0r5Ma6VsrCdzdJvz9eedjlVguOhu9OUmEN5b+GPoQOcMZluN7N9t54I=
+	t=1741022656; cv=none; b=Xig9MK8l7h6O3Krx7Lfa+ma6EjJuGeZjcZJbKe40QvRR5fEB971huwX9nfYTbs2p692QbcPr4TQrJxZCVF74zpqhghYJ85Vw+IY3+zm4v2PB5WN1UR9SBZOy7hT+MB9PMuRbO/1PBEEmkDX0nJvkzV1bVmZ5x9dfW9x0UiGE09Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019556; c=relaxed/simple;
-	bh=BjovHo68oZYSOarCRlTU07vBmWsubBFMlJwRwXudCBw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=k0X0jxj2fxSnsaaZCjce88eKnQvzNO6hgJW1nErGGPWLcUmVfclcYn9zEgcRvSgQVwE0UwcM6p3Xj823Sye6mws8qtw46tVgQhK4QDHwmQXsKzz3QPgRpeYZrvPOj8Dvrxg/nqBwF1bF8DP5RVhemWxl2hE/z8UcggN27K5j30E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQ444xxJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741022656; c=relaxed/simple;
+	bh=C2ckK8bQNDcbcsSG2G21/Gbr8CgvuAOuCYZlkUnoJzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eLSij6ixTublHiZClU7uHdwSdAF3wyK1NYXuNVhuhpIKlcPvmzQPVvspki70lJ5PBtZWz1SulDivKiAcPN4mLpKpEem3sn7ICShM20eTwmND7RfzbVynDDjb3Y7PyP7P7SegYA+1P4/uC68cepMUyukwbqAd69zduIEzN3Bves0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4uQGxSas; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQ444xxJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB74EC4CEE4;
-	Mon,  3 Mar 2025 16:32:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741019556;
-	bh=BjovHo68oZYSOarCRlTU07vBmWsubBFMlJwRwXudCBw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jQ444xxJ6/gSE93dA042mF786W6Qvu9hi3Gz8TOR/lgPLL6Tks/vAgiqf0nZE+U+Y
-	 OZ6vSvjK+ovXCi140mmlldh8TVqP216ULl3N3e8+ySc7Gn/LfWNgk2PaixLGA9v9YD
-	 V4n3xvmrZYHKRd9ifut0b8LhJcTdSajtifQ6RN4ab+cSJy4KeZlMV+DJS98kbOtN7O
-	 sN/718DRYnAFpF4p2d69EswmMVN/uI0WQ6BHZrXcFxwanSpGDNavP0lMC5cWy8Gz9j
-	 I0Orsw45hGMqSfq3Gwm74SSXG9tMoy0VsswWsHpTbak/ddO5kzn5yoLzVS7wJDi96H
-	 hdQlOak0ystIw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Guangwu Zhang <guazhang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 4/4] block: fix 'kmem_cache of name 'bio-108' already exists'
-Date: Mon,  3 Mar 2025 11:32:27 -0500
-Message-Id: <20250303163228.3764394-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250303163228.3764394-1-sashal@kernel.org>
-References: <20250303163228.3764394-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4uQGxSas"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=W8TcBwyxADhLGVfNgYnLKlgRAFc493awa18FegwhHx8=; b=4uQGxSasnvdUe0VwB9hxz63WQu
+	O3W5iHQirJAb0LlJ8nST9aR2VPRfy9NVZH/b9AmAl06WsDr6iWozOdBQvOBikaxrDwhITAvKXEBGR
+	4k1Os81aX6xhVZ/FIvp2o+36HOxMHXO15SORYtaLWUU6+1vxPeWeqwtgjuEDnpYoSL3h/G701zhdR
+	FpP9PBBgEH7VzhG8ATqt9zkazF5zF+5C62CX3OV+VUN2JlZ2NOX2PTDgmyDxrup65AILiFJrt0WeX
+	b9VDVuolET3U2wU/HKpZzOSTUN9MkHkV2+Wg5saBndPjAv+H6ksAFPvbX9XDzesHxjrxVf694SE6g
+	EdqvXLgA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tp9WX-00000001jSm-2duk;
+	Mon, 03 Mar 2025 17:24:13 +0000
+Date: Mon, 3 Mar 2025 09:24:13 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <Z8XlvU0o3C5hAAaM@infradead.org>
+References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
+ <Z8W1q6OYKIgnfauA@infradead.org>
+ <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.290
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Ming Lei <ming.lei@redhat.com>
+On Mon, Mar 03, 2025 at 05:16:48PM +0100, Mikulas Patocka wrote:
+> What should I use instead of bmap? Is fiemap exported for use in the 
+> kernel?
 
-[ Upstream commit b654f7a51ffb386131de42aa98ed831f8c126546 ]
+You can't do an ahead of time mapping.  It's a broken concept.
 
-Device mapper bioset often has big bio_slab size, which can be more than
-1000, then 8byte can't hold the slab name any more, cause the kmem_cache
-allocation warning of 'kmem_cache of name 'bio-108' already exists'.
+> Would Jens Axboe agree to merge the dm-loop logic into the existing loop 
+> driver?
 
-Fix the warning by extending bio_slab->name to 12 bytes, but fix output
-of /proc/slabinfo
+What logic?
 
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20250228132656.2838008-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Dm-loop is significantly faster than the regular loop:
+> 
+> # modprobe brd rd_size=1048576
+> # dd if=/dev/zero of=/dev/ram0 bs=1048576
+> # mkfs.ext4 /dev/ram0
+> # mount -t ext4 /dev/ram0 /mnt/test
+> # dd if=/dev/zero of=/mnt/test/test bs=1048576 count=512
 
-diff --git a/block/bio.c b/block/bio.c
-index e3d3e75c97e03..239f6bd421a80 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -53,7 +53,7 @@ struct bio_slab {
- 	struct kmem_cache *slab;
- 	unsigned int slab_ref;
- 	unsigned int slab_size;
--	char name[8];
-+	char name[12];
- };
- static DEFINE_MUTEX(bio_slab_lock);
- static struct bio_slab *bio_slabs;
--- 
-2.39.5
+All of this needs to be in a commit log.  Also note that the above:
+
+ a) does not use direct I/O which any sane loop user should
+ b) is not on a file but a block device, rendering the use of a loop
+    device entirely pointless.
 
