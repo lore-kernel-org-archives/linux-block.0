@@ -1,68 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060F4264600;
-	Tue,  4 Mar 2025 16:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5772E339D;
+	Tue,  4 Mar 2025 17:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107304; cv=none; b=GNSVZiQwybBsyiJKNeYijdhgYgcsOj/4wPRi6aa3Cc3+d28FSwyUtzmMdW3MJkbu47amtrf/4IgR3PP+i6C0ei1y/Freqc08kyCxTjG77G4Be8K+/yZA3b7T2AQ37S8g2qHdgQqWa9uN82s2fjSPK3+usIk7BNzCAKkAenaGFBs=
+	t=1741107985; cv=none; b=JZONJcngvsbvUcyKSP0TWd8ublp1k8Kz5XyGS5ONEqmIM7vNicnd4baq9tPpRMEFLM9jhv2NE1UQkFIJJlEgm2tIas9DqgWeLDrSHkNLpgH4GseB1ObbfIlatzGV8q1lAEBND67aVC19CZOOxdJOjPhOFfUF42gt7qwZHepaGS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107304; c=relaxed/simple;
-	bh=b0tgUtFT8jt9U9rAUFsewLIDZQyfCwT4CxSxsMn617o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gmHEktfNPTecthqH75dw/KIJDCcLJGdIRb8qskxiYiHW/EDfIAuN1FYh8CO3PEIfplN8wJEIgtEg6qbK6ib9oeS08JzWZPnOzu2I/Sg+Jf7ILLstWJZmQkpNPa4UwHrfZMQ4JQ7B4rF7u6/ad392VYjjnfHX8iYNyEyg6SXxc8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2Rq8z9/; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2Rq8z9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50726C4CEE5;
-	Tue,  4 Mar 2025 16:55:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741107303;
-	bh=b0tgUtFT8jt9U9rAUFsewLIDZQyfCwT4CxSxsMn617o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q2Rq8z9/nPxSEiZwUtvczIg9EPcyL/IYN32H60rL/gqIycMJKiRuQOIj/pgZ5I03D
-	 9WrgshNJEhKU58Q0KI1iEYJRRsMb21f6LT/1gSL1JI6dKDQHSKeRWNc3mW254Rgr9C
-	 IcYGH3P5YQwo04ZoVKexsrSAJEa/d+fR+QLJ+eS01xz3sWQAe/OIFc4YOPs68yaKsz
-	 Q6Z5jjf6RsKkieIbBGTjmnSsklG7voc7jrETAn7MdANlC3bgIe2UD+3ju/eb0ROkQx
-	 TFsSVIgnKa0cmQK+p9wXsiEQIwRZyqGXOIwAGUvSxjkpN1+dFyVwIKYufIANYR/JYS
-	 9sbEy8w/oVrkw==
-Date: Tue, 4 Mar 2025 06:55:02 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Waiman Long <longman@redhat.com>
-Subject: Re: [PATCH 4/9] cgroup: Print warning when /proc/cgroups is read on
- v2-only system
-Message-ID: <Z8cwZluJooqbO7uZ@slm.duckdns.org>
-References: <20250304153801.597907-1-mkoutny@suse.com>
- <20250304153801.597907-5-mkoutny@suse.com>
+	s=arc-20240116; t=1741107985; c=relaxed/simple;
+	bh=gplCaX+VWzq5DdsjNfptvfyOwRsNpfyecdkli3hz+E0=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlAyiqYtP6Jkz20qkchUScvpfRQmH/8qMzCCCPNpg9m1m+dOONHR/4A35coFYtJ+ZYTDm/5o/156P7me4g3H6dGqd92iGLEwM+fRIb/0liMkQPSojgVjAiq6+pkISubxvXoWlT/5Hu0HiTaQttP/5wOJd9dHU5yqAhQsEb0apx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tpVim-000000000mq-1eLc;
+	Tue, 04 Mar 2025 17:06:20 +0000
+Date: Tue, 4 Mar 2025 17:06:17 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jens Axboe <axboe@kernel.dk>, Daniel Golle <daniel@makrotopia.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Douglas Anderson <dianders@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Riyan Dhiman <riyandhiman14@gmail.com>,
+	Konstantin Khlebnikov <koct9i@gmail.com>,
+	Li Lingfeng <lilingfeng3@huawei.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] block: partitions: of: assign Device Tree node to
+ partition
+Message-ID: <c0b234511303c2efbbff336ed4d5bb993b54f16b.1741107851.git.daniel@makrotopia.org>
+References: <8cfbf225bcda906df0c89dd18ba07ecfa17123c2.1741107851.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250304153801.597907-5-mkoutny@suse.com>
+In-Reply-To: <8cfbf225bcda906df0c89dd18ba07ecfa17123c2.1741107851.git.daniel@makrotopia.org>
 
-On Tue, Mar 04, 2025 at 04:37:56PM +0100, Michal Koutný wrote:
-> As a followup to commits 6c2920926b10e ("cgroup: replace
-> unified-hierarchy.txt with a proper cgroup v2 documentation") and
-> ab03125268679 ("cgroup: Show # of subsystem CSSes in cgroup.stat"),
-> add a runtime message to users who read status of controllers in
-> /proc/cgroups on v2-only system. The detection is based on a)
-> no controllers are attached to v1, b) default hierarchy is mounted (the
-> latter is for setups that neven mount v2 but read /proc/cgroups upon
-> boot when controllers default to v2).
+Assign partition of_node so other drivers are able to identify a
+partition by its Device Tree node.
 
-I'm hoping that we could deprecate /proc/cgroups entirely. Maybe we can just
-warn whenever the file is accessed?
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ block/partitions/of.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
-
+diff --git a/block/partitions/of.c b/block/partitions/of.c
+index 4e760fdffb3fe..8b82f9f396866 100644
+--- a/block/partitions/of.c
++++ b/block/partitions/of.c
+@@ -48,7 +48,7 @@ static void add_of_partition(struct parsed_partitions *state, int slot,
+ 	u64 offset = of_read_number(reg, a_cells) / SECTOR_SIZE;
+ 	u64 size = of_read_number(reg + a_cells, s_cells) / SECTOR_SIZE;
+ 
+-	put_partition(state, slot, offset, size);
++	of_put_partition(state, slot, offset, size, np);
+ 
+ 	if (of_property_read_bool(np, "read-only"))
+ 		state->parts[slot].flags |= ADDPART_FLAG_READONLY;
 -- 
-tejun
+2.48.1
