@@ -1,104 +1,87 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6C51FCFD3
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 13:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3BF2045A6;
+	Tue,  4 Mar 2025 13:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741093694; cv=none; b=l8MBi6cUUcVgOCvsLfjSvDy7dPA9SHk9e1YwRye0Z5IIFT7zyY/iwhZrHvpVEowt/f9gnGZk2uxDg92Xbz1tBNmMrJ2q9oispkXDx2Qu5cfyqCJDWD/hpG170BLZQU4nQJI9HQHf01/sGZ9jwFf0HhYBrmYHCYF46QEyAPWRgjc=
+	t=1741096195; cv=none; b=K1Sdmy24JGF1y31u/7uJ7r7yk7+JbfU1aJtbSIfpD1c4B5+GUUA66b8cakaS+9a/H4RIasouH5aYX7/25xOP33uqKM5IK/6N7PUDjCJZFSl+PWQeqlczvS04vKGtfclsWC1lMzvHflMuBWSbsVR/uzGGsZkPQvBlaF5EHtAp+EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741093694; c=relaxed/simple;
-	bh=o+18Gvk6i5ZAdBjUO5UE/Ocyl2SDouZB22Xh9ZdhxWc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=QKqRL5pVyz2X2JcyP8lUMtWzAdo+KMR3xyz4luIL80Ljlnl/xydXfUddZu0Zwcy7b5zfeDJ2rFAphJZEtOk7+VUVlPZmkztlI07xkdCv5GP0AJ8CchGnehUlCYkNAHU11lLqjpSdu2nP+S1WlR7HojXWs6NkrsVPDSsajGp/JLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z6bZS4v2yz4f3jYG
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 21:07:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id C265A1A1947
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 21:08:06 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgB32l41+8ZnwcoYFg--.45068S3;
-	Tue, 04 Mar 2025 21:08:06 +0800 (CST)
-Subject: Re: [PATCH] tests/throtl: add a new test 006
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250224095945.1994997-1-ming.lei@redhat.com>
- <94ad8a55-97a7-d75a-7cfd-08cbce159bed@huaweicloud.com>
- <CAFj5m9KZqaVb_ZGgtdHxNxpuccuBcAVxcYOxaTGkuvuAQSf5Xw@mail.gmail.com>
- <d0013f94-65a0-684f-6122-d8e98eb3e9bf@huaweicloud.com>
- <7ff7166f-3069-59ae-6820-98e8b76057d6@huaweicloud.com>
- <Z8bPm44sMy88l0yL@fedora>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5ae724a4-966a-3276-f9f7-ed720dc524be@huaweicloud.com>
-Date: Tue, 4 Mar 2025 21:08:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1741096195; c=relaxed/simple;
+	bh=KHHcDaudjfP4u0p/+Ih+DTSAdyY6lXkDxSOUsZ7Ewew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oWF0CMP1C6FETL4XE/EwMbBgTMsgNkFCzS9F9yeu4o1+F27gqImMzfVVs9iUGIzZgHSihQcdMwKyI6ceaSkC2bPlnYVvYli7Ebybj0iRCjUbkVlnK/ksEoDMcgZxEe+oPANX2VCkThUJxrdMFWTa5IpOhXAkDPYwa189NG2yndQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GZ2pKHpZ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GZ2pKHpZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=pDnPDI97a7aET7imOLMNEqHsZIh7T+bfAPBqUaDDehI=; b=GZ2pKHpZSS5hKapeMQF+nRfLGH
+	abN6Dctk9OeIScyIH1Pm2F5OJffxhFY+mx1cL7MG/eL9Upx3bKjYvglZLjNKtCyiI2tlZEjcucnVl
+	ofWCt0dTk3rzrDnPvMq1a7xEpKREYrpM30r3E0e94uSiIf8f3fPGKlNHDhMWxL3xOzkAIcPUA4jAQ
+	B5pdnC7+gvdeTBnp9n7vMEjwVa0jGwbtOaqFkzSwOUwZaswq2tVoWEi/yn4F6nWgFHwarDBlIXpOd
+	/TKajq34mS6+BcTKlF6X4/Lr3zwOZpAg3+p9oBn5/QPSk/uUMMKiZmjBxg6y2tH3gX3xnu8r1NsGy
+	uGpaInew==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpSed-00000004qEw-1OIP;
+	Tue, 04 Mar 2025 13:49:51 +0000
+Date: Tue, 4 Mar 2025 05:49:51 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <Z8cE_4KSKHe5-J3e@infradead.org>
+References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
+ <Z8W1q6OYKIgnfauA@infradead.org>
+ <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
+ <Z8XlvU0o3C5hAAaM@infradead.org>
+ <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z8bPm44sMy88l0yL@fedora>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB32l41+8ZnwcoYFg--.45068S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKrW3tw4kXr4UWw4UXF4kXrb_yoWDXFgEgF
-	yxKFZ2kFyUZ3W2yr4kKFWkurZxKF4ruFyIga4rXFyfKrn8uF18GFZrKry5Zr9rZ3WYq39F
-	kryYvF4kGw1fCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbVxFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
-	r21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUehL0UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
+On Mon, Mar 03, 2025 at 10:03:42PM +0100, Mikulas Patocka wrote:
+> Swapfile does ahead of time mapping.
 
-在 2025/03/04 18:02, Ming Lei 写道:
-> But the issue still can't be reproduced by adding the following delta
-> change, meantime revert 29390bb5661d ("blk-throttle: support prioritized
-> processing of metadata") on kernel side.
+It does.  But it is:
 
-Because you're issuing 64 64k IO, and dd is issuing next IO after the
-previous IO is done.
+ a) protected against modification by the S_SWAPFILE flag and checked
+    for full allocation first
+ b) something we want to get rid of because even with the above it is
+    rather problematic
 
-Following diff will work for this test:
+> And I just looked at what swapfile 
+> does and copied the logic into dm-loop. If swapfile is not broken, how 
+> could dm-loop be broken?
 
-Thanks,
-Kuai
+As said above, swapfile works around the brokenness in ways that you
+can't.  And just blindly copying old code without understanding it is
+never a good idea.
 
-diff --git a/tests/throtl/006 b/tests/throtl/006
-index 4baadaf..758293b 100755
---- a/tests/throtl/006
-+++ b/tests/throtl/006
-@@ -43,8 +43,13 @@ test() {
+> 
+> > > Would Jens Axboe agree to merge the dm-loop logic into the existing loop 
+> > > driver?
+> > 
+> > What logic?
+> 
+> The ahead-of-time mapping.
 
-         _throtl_set_limits wbps=$((1024 * 1024))
-         {
-+               local jbd2_pid
-+
-+               jbd2_pid=$(ps -eo pid,comm |grep "jbd2/${THROTL_DEV}" 
-|awk '{print $1}')
-                 echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
--               _throtl_issue_fs_io  "${TMPDIR}/mnt/test.img" write 64K 64 &
-+               echo "$jbd2_pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
-+
-+               _throtl_issue_fs_io  "${TMPDIR}/mnt/test.img" write 4M 1 &
-                 sleep 2
-                 test_meta_io "${TMPDIR}/mnt"
-                 wait
+As said multiple times you can't do that.  The block mapping is
+file system private information.
 
