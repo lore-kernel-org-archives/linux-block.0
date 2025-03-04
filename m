@@ -1,88 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A731642AA6
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 02:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EF1179BD
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 02:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741055707; cv=none; b=ZD6E53YIh2oCnMtcUp3VjjOzqgn8neosdpQebIxJ/xt1J0Z2XNUdWDn/1ArRjsFKablnJzVRV6aGFmg4GNIZJEshvVWFltBC+sHeHj47PaHWO/mTL03IUPt3VEBQODwoxThJyzI7TsBko3oovpN3+TLyHF3XpLRtkVYwAk2r3dw=
+	t=1741056414; cv=none; b=DcBtLOoa17OoAENChbtfg11bZdbziYNNrSPyqN3wRX7tY86PV2HehEQ8IR1MA0dBX+8FvsXqzmycPANRoXMSVmvbWGznIJ+J1ix9FyBdKtP9i7ppx0A+sw0d1oHajBuy3Aw+sUJNpPbtNhYFweuB54uCfEoaD+Dy3Wwe+Y1OUK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741055707; c=relaxed/simple;
-	bh=/N6DTjx4bMNjT4L9NEX3XpcO9guBS7cavMoy+l+3WMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=coz8P803JT95UNcKQEb4YIycGrhn1+1DORGBfRE0jXCvj1+y4P7m3fsrnULke/yFa50TC7j3F9FpNqcd5RiEUK1RAVc21FmlXxyWAXkchRT+6Qg8XI36NrVZ9N5jbixemyF6iV/vZ95Nju85dVHXYOHOkpQzc32KJ5uxiSe9Xnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GH65IdLA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GH65IdLA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741055704;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hmNnBPQSG4/JQiTH7GFC97F6Fk4OVNc3GtFOK8TdAWQ=;
-	b=GH65IdLAA9Ih2M2NAXQpdZPiSdOiK0yVyjTzzDD0p/akc57qMKoSb9aYE+xHHjlE5k3lbc
-	Q2rZXC5edi5E7fzPLPKIAgmjooD14WvdA/p3rdOXxXd6JL1Mm5E/UnxGU+is1a1KU0Z8QV
-	E+hOsoEDzXDQtZnzZPY2fBg64DoBACE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-133-3KTn4lt1NmSHoj4BLDs1ow-1; Mon,
- 03 Mar 2025 21:35:02 -0500
-X-MC-Unique: 3KTn4lt1NmSHoj4BLDs1ow-1
-X-Mimecast-MFC-AGG-ID: 3KTn4lt1NmSHoj4BLDs1ow_1741055701
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 975F219560AF;
-	Tue,  4 Mar 2025 02:35:01 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.26])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E8EF19560A3;
-	Tue,  4 Mar 2025 02:34:57 +0000 (UTC)
-Date: Tue, 4 Mar 2025 10:34:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Yu Kuai <yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1741056414; c=relaxed/simple;
+	bh=US0pACHIooNQLrO9dOJoRBchZWYyUlJ7WsFFdZguFZE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=IVCGBILj0TiZnYMdbqlCoUB+IthkPJ6DEsbd7I0rDu9XRhEzfGKWuxP1NEEzwD/62Mu///qHNI/ZLESizwkUL3RXbQcgtF6rRcwM8OaiVex5art0ye4J4xPAj+e6W6yNM/OS+UJ8VZZ2sqoZKSqhdgBBuzyz8OVKTzqZEt92Ur0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z6KnR6F1Mz4f3jR5
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:46:19 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E80D11A084E
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:46:41 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBXvGCQacZnRSzvFQ--.39862S3;
+	Tue, 04 Mar 2025 10:46:41 +0800 (CST)
 Subject: Re: [PATCH] tests/throtl: add a new test 006
-Message-ID: <Z8Zmy91_o7alwuKI@fedora>
+To: Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
 References: <20250224095945.1994997-1-ming.lei@redhat.com>
- <ddvcm7qzw3wxx4wrz6partrr5riobvna75vgcly5cxah76cmmd@w3v3k5yj4daj>
+ <94ad8a55-97a7-d75a-7cfd-08cbce159bed@huaweicloud.com>
+ <CAFj5m9KZqaVb_ZGgtdHxNxpuccuBcAVxcYOxaTGkuvuAQSf5Xw@mail.gmail.com>
+ <d0013f94-65a0-684f-6122-d8e98eb3e9bf@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <7ff7166f-3069-59ae-6820-98e8b76057d6@huaweicloud.com>
+Date: Tue, 4 Mar 2025 10:46:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ddvcm7qzw3wxx4wrz6partrr5riobvna75vgcly5cxah76cmmd@w3v3k5yj4daj>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <d0013f94-65a0-684f-6122-d8e98eb3e9bf@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXvGCQacZnRSzvFQ--.39862S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKF4fKryfKrWkKFW7tr47urg_yoW3CFc_Za
+	17Zr4kK3y5Aw4Dt3yqqr1YvrZ7Ga1Iyry8Xw1j9F4UGFWrXr1DGFnxGrZ5Z39xCFs5Jr1S
+	kryqqFyfKF17ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbVxFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+	Y487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa
+	73UjIFyTuYvjfUehL0UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Mar 03, 2025 at 12:06:44PM +0000, Shinichiro Kawasaki wrote:
-> Hi, Ming, thank you for the patch.
+Hi,
+
+在 2025/02/25 10:07, Yu Kuai 写道:
+> Hi,
 > 
-> On Feb 24, 2025 / 17:59, Ming Lei wrote:
-> > Add test for covering prioritized meta IO when throttling, regression
-> > test for commit 29390bb5661d ("blk-throttle: support prioritized processing
-> > of metadata").
+> 在 2025/02/24 21:54, Ming Lei 写道:
+>>> Do you run this test without the kernel patch? If I remembered
+>>> correctly, ext4 issue the meta IO from jbd2 by default, which is from
+>>> root cgroup, and root cgroup can only throttled from cgroup v1.
+>> It passes on v6.14-rc1, does META/SWAP IO only route from cgroup v1?
 > 
-> I ran this test case with the kernel v6.14-rc3, and it passed. Then I reverted
-> the commit 29390bb5661d form the kernel, and still the test case passed. I
-> wonder how can I make the test case fail. The commit was in v6.12-rc1 tag, so
-> do I need to try with v6.11 kernel to see it fails?
+> Of course not, it's just ext4 will issue such IO from root cgroup, and
+> there is no IO can be throttled here.
 > 
-> I have two nit comments in line. If you respin the patch, please consider to
-> fold them in.
+> You might want to bind jbd2 to the test cgroup as well.
 
-The test needs to setup cgroup v1, I guess.
-
-Kuai, any idea for setting one test to cover the change of commit 29390bb5661d
-("blk-throttle: support prioritized processing of metadata")?
-
+I think the test will be OK this way.
 
 Thanks,
-Ming
+Kuai
+
+> 
+> Thanks,
+> Kuai
+> 
+>>
+>>    static inline bool bio_issue_as_root_blkg(struct bio *bio)
+>>    {
+>>            return (bio->bi_opf & (REQ_META | REQ_SWAP)) != 0;
+>>    }
+>>
+>> Thanks,
+>> Ming
+> 
+> .
+> 
 
