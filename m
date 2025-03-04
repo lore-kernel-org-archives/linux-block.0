@@ -1,319 +1,606 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5598B1FF7B5
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7711FFC6D
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741083972; cv=none; b=GCSzJVQhE608PvH83dWhTXrydHmHoWjtxwylyaBomdWG2h7hsP24HDZIxW2EP84J2DfkeCW55hbnOyRMLc+ihd9ShcX5vLvyW2H0K0VyIkHLh5fCnjjgB6j1ccv9PzOk1tRN0XT1YwaB9uQJmqM5ZUUKy0AMMzQDqD0PQhIvdGo=
+	t=1741083975; cv=none; b=YaimnMY8h+BGolhDKLcp1sF6iRz7gnLEkK4wVAsCoyRtvizNVUf3wQ6hxm+Y+yvEUrezHd7YdQby1Hfl9qV5KnhRi9Z/q5PwC9QBUljMroWKL++TqbsgL8VTYTI5quN/ijOjGPOajJAtFK5gb4ix50QAks2V40jH4M7ckCFvGPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741083972; c=relaxed/simple;
-	bh=yu3c7z0CVYgK1OLgX+OPtqDJjFsSN1v3vNFsJXphADQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LHl1fsHUilaND+z9aO+rxulQcImmtmiKMe9A5PA0ctYw+A268UXH+lR6cUja0aOnD6plkYYMQinVKsNUUihuJo6hxXRHfIR2g7rg5EB02oUVpEAy8691CJL7kbfz7s29G+ih3r2VtKvsKy51m8cnBR+HajyMrvNG2vZKErJsHo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pZy8j07k; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ESjfsJST; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pZy8j07k; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ESjfsJST; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1741083975; c=relaxed/simple;
+	bh=0Ham6fhOwF5aqga6Wl7KFFZYTNoFjQToKzrJgnh7UP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HRMgdoqMv/Haeg76WUMh+Z8jxLagntVbCl2naDOZWT0Z9lJp1JtE6v3nCXq2YDjy8kkggTbT0rJgee2CACLkZmgCbIdc/hp2YXo/83BqDb+4ExP3pcSnRRWJZPXiTavmOVXTXCbH67jq3bSMKU484VunPFgP7aDN9iw17p4shAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oldFVCq8; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pZy8j07k";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ESjfsJST";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pZy8j07k";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ESjfsJST"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6961C1F78D;
-	Tue,  4 Mar 2025 10:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741083968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DWTJSYkqVDNyFS9bm4Q2lrVmulLaHNzSIa7P1+Vo2+8=;
-	b=pZy8j07ktSnmKLOQ2DeAd2T2s1vSy0B6iBJ6olsKtHUQtKBl1Xk2pzkCEOKbIB8hVtOnWj
-	LQlrv62VxM+3tfq2L9QRVcIM6Tr575dky98kDP0HtZag74Yw5LvMKiMLBQ0y631NjukeSi
-	nstkAyYbBrNAcsrIQEu6iyRvyMfxJU4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741083968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DWTJSYkqVDNyFS9bm4Q2lrVmulLaHNzSIa7P1+Vo2+8=;
-	b=ESjfsJST/yxlPqvucHVI825Afq9YxQqMq8eMrUgSWm+/Mqz6rVGe1SasB48F+ZrXZ81lTv
-	zyNXQPqG/06FF4DA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=pZy8j07k;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=ESjfsJST
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741083968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DWTJSYkqVDNyFS9bm4Q2lrVmulLaHNzSIa7P1+Vo2+8=;
-	b=pZy8j07ktSnmKLOQ2DeAd2T2s1vSy0B6iBJ6olsKtHUQtKBl1Xk2pzkCEOKbIB8hVtOnWj
-	LQlrv62VxM+3tfq2L9QRVcIM6Tr575dky98kDP0HtZag74Yw5LvMKiMLBQ0y631NjukeSi
-	nstkAyYbBrNAcsrIQEu6iyRvyMfxJU4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741083968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DWTJSYkqVDNyFS9bm4Q2lrVmulLaHNzSIa7P1+Vo2+8=;
-	b=ESjfsJST/yxlPqvucHVI825Afq9YxQqMq8eMrUgSWm+/Mqz6rVGe1SasB48F+ZrXZ81lTv
-	zyNXQPqG/06FF4DA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4DDEC1393C;
-	Tue,  4 Mar 2025 10:26:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MDJaEkDVxmf0YAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Tue, 04 Mar 2025 10:26:08 +0000
-Message-ID: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
-Date: Tue, 4 Mar 2025 11:26:07 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oldFVCq8"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5248g0Cr023991;
+	Tue, 4 Mar 2025 10:26:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=9mOYfSxI0q8iIDBSa
+	+UUFTunTMyZ8OY7T3Xsy7Fty4c=; b=oldFVCq8o3YQd3cbEKZdAsMfug2v7Pdly
+	QsbxsaIf3DkByh2WyBeJunL1/cNuyFUWyG0uPfkip87s6IB277jWRs2aZiFgqto2
+	etnIQ4TWpHKR35GirnbtnDWgL708x/wxrfea8/aytGfCK13IUSjSu9EfDlY9Zj/1
+	Qd09KOuKdwDAqEgVT82qB8bIHOIgl8Pq95ktb8P5VwFBHCkMxhIhpvwEwaJ6qTXM
+	1CBJjPJTKrfjVhCKEC7wbXjJdgq0KCQnh0cNaPOmxsgA3SplphLwYvVmz5miPlzM
+	8zrU1acCvzESOJX44oiVgMK+9XyNMORPmYQnFiK0IBGyKlaSVszNQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455cf2pm7x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 10:26:02 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5247AAGI008901;
+	Tue, 4 Mar 2025 10:26:01 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454cxyd0ev-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 10:26:01 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524APxNe32375042
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Mar 2025 10:25:59 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 211322004B;
+	Tue,  4 Mar 2025 10:25:59 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1666F20043;
+	Tue,  4 Mar 2025 10:25:57 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.149])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Mar 2025 10:25:56 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de,
+        axboe@kernel.dk, lkp@intel.com, gjoyce@ibm.com
+Subject: [PATCHv6 2/7] block: move q->sysfs_lock and queue-freeze under show/store method
+Date: Tue,  4 Mar 2025 15:52:31 +0530
+Message-ID: <20250304102551.2533767-3-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250304102551.2533767-1-nilay@linux.ibm.com>
+References: <20250304102551.2533767-1-nilay@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.com>, Hannes Reinecke <hare@suse.de>,
- Matthew Wilcox <willy@infradead.org>, Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
- <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
- <Z8W8OtJYFzr9OQac@casper.infradead.org>
- <Z8W_1l7lCFqMiwXV@casper.infradead.org>
- <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
- <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6961C1F78D
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FREEMAIL_TO(0.00)[suse.com,suse.de,infradead.org,nvidia.com,gmail.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TTF17gDee_YeZ2Q7IEaKGBqjaOUrMuOD
+X-Proofpoint-ORIG-GUID: TTF17gDee_YeZ2Q7IEaKGBqjaOUrMuOD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_04,2025-03-03_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 spamscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503040084
 
-+Cc NETWORKING [TLS] maintainers and netdev for input, thanks.
+In preparation to further simplify and group sysfs attributes which
+don't require locking or require some form of locking other than q->
+limits_lock, move acquire/release of q->sysfs_lock and queue freeze/
+unfreeze under each attributes' respective show/store method.
 
-The full error is here:
-https://lore.kernel.org/all/fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de/
+While we are at it, also remove ->load_module() as it's used to load
+the module before queue is freezed. Now as we moved queue-freeze under
+->store(), we could load module directly from the attributes' store
+method before we actually start freezing the queue. Currently, the
+->load_module() is only used by "scheduler" attribute, so we now load
+the relevant elevator module before we start freezing the queue in
+elv_iosched_store().
 
-On 3/4/25 11:20, Hannes Reinecke wrote:
-> On 3/4/25 09:18, Vlastimil Babka wrote:
->> On 3/4/25 08:58, Hannes Reinecke wrote:
->>> On 3/3/25 23:02, Vlastimil Babka wrote:
->>>> On 3/3/25 17:15, Vlastimil Babka wrote:
->>>>> On 3/3/25 16:48, Matthew Wilcox wrote:
->>>>>> You need to turn on the debugging options Vlastimil mentioned and try to
->>>>>> figure out what nvme is doing wrong.
->>>>>
->>>>> Agree, looks like some error path going wrong?
->>>>> Since there seems to be actual non-large kmalloc usage involved, another
->>>>> debug parameter that could help: CONFIG_SLUB_DEBUG=y, and boot with
->>>>> "slab_debug=FZPU,kmalloc-*"
->>>>
->>>> Also make sure you have CONFIG_DEBUG_VM please.
->>>>
->>> Here you go:
->>>
->>> [  134.506802] page: refcount:0 mapcount:0 mapping:0000000000000000
->>> index:0x0 pfn:0x101ef8
->>> [  134.509253] head: order:3 mapcount:0 entire_mapcount:0
->>> nr_pages_mapped:0 pincount:0
->>> [  134.511594] flags:
->>> 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
->>> [  134.513556] page_type: f5(slab)
->>> [  134.513563] raw: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810
->>> ffff8881000402f0
->>> [  134.513568] raw: 0000000000000000 00000000000a000a 00000000f5000000
->>> 0000000000000000
->>> [  134.513572] head: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810
->>> ffff8881000402f0
->>> [  134.513575] head: 0000000000000000 00000000000a000a 00000000f5000000
->>> 0000000000000000
->>> [  134.513579] head: 0017ffffc0000003 ffffea000407be01 ffffffffffffffff
->>> 0000000000000000
->>> [  134.513583] head: 0000000000000008 0000000000000000 00000000ffffffff
->>> 0000000000000000
->>> [  134.513585] page dumped because: VM_BUG_ON_FOLIO(((unsigned int)
->>> folio_ref_count(folio) + 127u <= 127u))
->>> [  134.513615] ------------[ cut here ]------------
->>> [  134.529822] kernel BUG at ./include/linux/mm.h:1455!
->> 
->> Yeah, just as I suspected, folio_get() says the refcount is 0.
->> 
->>> [  134.529835] Oops: invalid opcode: 0000 [#1] PREEMPT SMP
->>> DEBUG_PAGEALLOC NOPTI
->>> [  134.529843] CPU: 0 UID: 0 PID: 274 Comm: kworker/0:1H Kdump: loaded
->>> Tainted: G            E      6.14.0-rc4-default+ #309
->>> 03b131f1ef70944969b40df9d90a283ed638556f
->>> [  134.536577] Tainted: [E]=UNSIGNED_MODULE
->>> [  134.536580] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
->>> 0.0.0 02/06/2015
->>> [  134.536583] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
->>> [  134.536595] RIP: 0010:__iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.542810] Code: e8 4c 39 e0 49 0f 47 c4 48 01 45 08 48 29 45 18 e9
->>> 90 fa ff ff 48 83 ef 01 e9 7f fe ff ff 48 c7 c6 40 57 4f 82 e8 6a e2 ce
->>> ff <0f> 0b e8 43 b8 b1 ff eb c5 f7 c1 ff 0f 00 00 48 89 cf 0f 85 4f ff
->>> [  134.542816] RSP: 0018:ffffc900004579d8 EFLAGS: 00010282
->>> [  134.542821] RAX: 000000000000005c RBX: ffffc90000457a90 RCX:
->>> 0000000000000027
->>> [  134.542825] RDX: 0000000000000000 RSI: 0000000000000002 RDI:
->>> ffff88817f423748
->>> [  134.542828] RBP: ffffc90000457d60 R08: 0000000000000000 R09:
->>> 0000000000000001
->>> [  134.554485] R10: ffffc900004579c0 R11: ffffc90000457720 R12:
->>> 0000000000000000
->>> [  134.554488] R13: ffffea000407be40 R14: ffffc90000457a70 R15:
->>> ffffc90000457d60
->>> [  134.554495] FS:  0000000000000000(0000) GS:ffff88817f400000(0000)
->>> knlGS:0000000000000000
->>> [  134.554499] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> [  134.554502] CR2: 0000556b0675b600 CR3: 0000000106bd8000 CR4:
->>> 0000000000350ef0
->>> [  134.554509] Call Trace:
->>> [  134.554512]  <TASK>
->>> [  134.554516]  ? __die_body+0x1a/0x60
->>> [  134.554525]  ? die+0x38/0x60
->>> [  134.554531]  ? do_trap+0x10f/0x120
->>> [  134.554538]  ? __iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.568839]  ? do_error_trap+0x64/0xa0
->>> [  134.568847]  ? __iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.568855]  ? exc_invalid_op+0x53/0x60
->>> [  134.572489]  ? __iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.572496]  ? asm_exc_invalid_op+0x16/0x20
->>> [  134.572512]  ? __iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.576726]  ? __iov_iter_get_pages_alloc+0x676/0x710
->>> [  134.576733]  ? srso_return_thunk+0x5/0x5f
->>> [  134.576740]  ? ___slab_alloc+0x924/0xb60
->>> [  134.580253]  ? mempool_alloc_noprof+0x41/0x190
->>> [  134.580262]  ? tls_get_rec+0x3d/0x1b0 [tls
->>> 47f199c97f69357468c91efdbba24395e9dbfa77]
->>> [  134.580282]  iov_iter_get_pages2+0x19/0x30
->> 
->> Presumably that's __iov_iter_get_pages_alloc() doing get_page() either in
->> the " if (iov_iter_is_bvec(i)) " branch or via iter_folioq_get_pages()?
->> 
-> Looks like it.
-> 
->> Which doesn't work for a sub-size kmalloc() from a slab folio, which after
->> the frozen refcount conversion no longer supports get_page().
->> 
->> The question is if this is a mistake specific for this path that's easy to
->> fix or there are more paths that do this. At the very least the pinning of
->> page through a kmalloc() allocation from it is useless - the object itself
->> has to be kfree()'d and that would never happen through a put_page()
->> reaching zero.
->> 
-> Looks like a specific mistake.
-> tls_sw is the only user of sk_msg_zerocopy_from_iter()
-> (which is calling into __iov_iter_get_pages_alloc()).
-> 
-> And, more to the point, tls_sw messes up iov pacing coming in from
-> the upper layers.
-> So even if the upper layers send individual iovs (where each iov might
-> contain different allocation types), tls_sw is packing them together 
-> into full records. So it might end up with iovs having _different_ 
-> allocations.
-> Which would explain why we only see it with TLS, but not with normal
-> connections.
-> 
-> Or so my reasoning goes. Not sure if that's correct.
-> 
-> So I'd be happy with an 'easy' fix for now. Obviously :-)
-> 
-> Cheers,
-> 
-> Hannes
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ block/blk-sysfs.c | 210 +++++++++++++++++++++++++++++++---------------
+ block/elevator.c  |  20 ++++-
+ 2 files changed, 162 insertions(+), 68 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index eba5121690af..4700ee168ed5 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -28,8 +28,6 @@ struct queue_sysfs_entry {
+ 	ssize_t (*store)(struct gendisk *disk, const char *page, size_t count);
+ 	int (*store_limit)(struct gendisk *disk, const char *page,
+ 			size_t count, struct queue_limits *lim);
+-
+-	void (*load_module)(struct gendisk *disk, const char *page, size_t count);
+ };
+ 
+ static ssize_t
+@@ -55,7 +53,12 @@ queue_var_store(unsigned long *var, const char *page, size_t count)
+ 
+ static ssize_t queue_requests_show(struct gendisk *disk, char *page)
+ {
+-	return queue_var_show(disk->queue->nr_requests, page);
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	ret = queue_var_show(disk->queue->nr_requests, page);
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t
+@@ -63,27 +66,38 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
+ {
+ 	unsigned long nr;
+ 	int ret, err;
++	unsigned int memflags;
++	struct request_queue *q = disk->queue;
+ 
+-	if (!queue_is_mq(disk->queue))
++	if (!queue_is_mq(q))
+ 		return -EINVAL;
+ 
+ 	ret = queue_var_store(&nr, page, count);
+ 	if (ret < 0)
+ 		return ret;
+ 
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
+ 	if (nr < BLKDEV_MIN_RQ)
+ 		nr = BLKDEV_MIN_RQ;
+ 
+ 	err = blk_mq_update_nr_requests(disk->queue, nr);
+ 	if (err)
+-		return err;
+-
++		ret = err;
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ 	return ret;
+ }
+ 
+ static ssize_t queue_ra_show(struct gendisk *disk, char *page)
+ {
+-	return queue_var_show(disk->bdi->ra_pages << (PAGE_SHIFT - 10), page);
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	ret = queue_var_show(disk->bdi->ra_pages << (PAGE_SHIFT - 10), page);
++	mutex_unlock(&disk->queue->sysfs_lock);
++
++	return ret;
+ }
+ 
+ static ssize_t
+@@ -91,11 +105,19 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
+ {
+ 	unsigned long ra_kb;
+ 	ssize_t ret;
++	unsigned int memflags;
++	struct request_queue *q = disk->queue;
+ 
+ 	ret = queue_var_store(&ra_kb, page, count);
+ 	if (ret < 0)
+ 		return ret;
++
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
+ 	disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
++
+ 	return ret;
+ }
+ 
+@@ -150,7 +172,12 @@ QUEUE_SYSFS_LIMIT_SHOW_SECTORS_TO_KB(max_hw_sectors)
+ #define QUEUE_SYSFS_SHOW_CONST(_name, _val)				\
+ static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
+ {									\
+-	return sysfs_emit(page, "%d\n", _val);				\
++	ssize_t ret;							\
++									\
++	mutex_lock(&disk->queue->sysfs_lock);				\
++	ret = sysfs_emit(page, "%d\n", _val);				\
++	mutex_unlock(&disk->queue->sysfs_lock);				\
++	return ret;							\
+ }
+ 
+ /* deprecated fields */
+@@ -239,10 +266,17 @@ QUEUE_SYSFS_FEATURE_SHOW(dax, BLK_FEAT_DAX);
+ 
+ static ssize_t queue_poll_show(struct gendisk *disk, char *page)
+ {
+-	if (queue_is_mq(disk->queue))
+-		return sysfs_emit(page, "%u\n", blk_mq_can_poll(disk->queue));
+-	return sysfs_emit(page, "%u\n",
+-		!!(disk->queue->limits.features & BLK_FEAT_POLL));
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	if (queue_is_mq(disk->queue)) {
++		ret = sysfs_emit(page, "%u\n", blk_mq_can_poll(disk->queue));
++	} else {
++		ret = sysfs_emit(page, "%u\n",
++			!!(disk->queue->limits.features & BLK_FEAT_POLL));
++	}
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t queue_zoned_show(struct gendisk *disk, char *page)
+@@ -254,7 +288,12 @@ static ssize_t queue_zoned_show(struct gendisk *disk, char *page)
+ 
+ static ssize_t queue_nr_zones_show(struct gendisk *disk, char *page)
+ {
+-	return queue_var_show(disk_nr_zones(disk), page);
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	ret = queue_var_show(disk_nr_zones(disk), page);
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t queue_iostats_passthrough_show(struct gendisk *disk, char *page)
+@@ -281,35 +320,51 @@ static int queue_iostats_passthrough_store(struct gendisk *disk,
+ 
+ static ssize_t queue_nomerges_show(struct gendisk *disk, char *page)
+ {
+-	return queue_var_show((blk_queue_nomerges(disk->queue) << 1) |
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	ret = queue_var_show((blk_queue_nomerges(disk->queue) << 1) |
+ 			       blk_queue_noxmerges(disk->queue), page);
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t queue_nomerges_store(struct gendisk *disk, const char *page,
+ 				    size_t count)
+ {
+ 	unsigned long nm;
++	unsigned int memflags;
++	struct request_queue *q = disk->queue;
+ 	ssize_t ret = queue_var_store(&nm, page, count);
+ 
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, disk->queue);
+-	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, disk->queue);
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
++	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, q);
++	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, q);
+ 	if (nm == 2)
+-		blk_queue_flag_set(QUEUE_FLAG_NOMERGES, disk->queue);
++		blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
+ 	else if (nm)
+-		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, disk->queue);
++		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ 
+ 	return ret;
+ }
+ 
+ static ssize_t queue_rq_affinity_show(struct gendisk *disk, char *page)
+ {
+-	bool set = test_bit(QUEUE_FLAG_SAME_COMP, &disk->queue->queue_flags);
+-	bool force = test_bit(QUEUE_FLAG_SAME_FORCE, &disk->queue->queue_flags);
++	ssize_t ret;
++	bool set, force;
+ 
+-	return queue_var_show(set << force, page);
++	mutex_lock(&disk->queue->sysfs_lock);
++	set = test_bit(QUEUE_FLAG_SAME_COMP, &disk->queue->queue_flags);
++	force = test_bit(QUEUE_FLAG_SAME_FORCE, &disk->queue->queue_flags);
++	ret = queue_var_show(set << force, page);
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t
+@@ -319,11 +374,14 @@ queue_rq_affinity_store(struct gendisk *disk, const char *page, size_t count)
+ #ifdef CONFIG_SMP
+ 	struct request_queue *q = disk->queue;
+ 	unsigned long val;
++	unsigned int memflags;
+ 
+ 	ret = queue_var_store(&val, page, count);
+ 	if (ret < 0)
+ 		return ret;
+ 
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
+ 	if (val == 2) {
+ 		blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, q);
+ 		blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, q);
+@@ -334,6 +392,8 @@ queue_rq_affinity_store(struct gendisk *disk, const char *page, size_t count)
+ 		blk_queue_flag_clear(QUEUE_FLAG_SAME_COMP, q);
+ 		blk_queue_flag_clear(QUEUE_FLAG_SAME_FORCE, q);
+ 	}
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ #endif
+ 	return ret;
+ }
+@@ -347,29 +407,52 @@ static ssize_t queue_poll_delay_store(struct gendisk *disk, const char *page,
+ static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
+ 				size_t count)
+ {
+-	if (!(disk->queue->limits.features & BLK_FEAT_POLL))
+-		return -EINVAL;
++	unsigned int memflags;
++	ssize_t ret = count;
++	struct request_queue *q = disk->queue;
++
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
++	if (!(q->limits.features & BLK_FEAT_POLL)) {
++		ret = -EINVAL;
++		goto out;
++	}
+ 	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
+ 	pr_info_ratelimited("please use driver specific parameters instead.\n");
+-	return count;
++out:
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
++
++	return ret;
+ }
+ 
+ static ssize_t queue_io_timeout_show(struct gendisk *disk, char *page)
+ {
+-	return sysfs_emit(page, "%u\n", jiffies_to_msecs(disk->queue->rq_timeout));
++	ssize_t ret;
++
++	mutex_lock(&disk->queue->sysfs_lock);
++	ret = sysfs_emit(page, "%u\n",
++			jiffies_to_msecs(disk->queue->rq_timeout));
++	mutex_unlock(&disk->queue->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
+ 				  size_t count)
+ {
+-	unsigned int val;
++	unsigned int val, memflags;
+ 	int err;
++	struct request_queue *q = disk->queue;
+ 
+ 	err = kstrtou32(page, 10, &val);
+ 	if (err || val == 0)
+ 		return -EINVAL;
+ 
+-	blk_queue_rq_timeout(disk->queue, msecs_to_jiffies(val));
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
++	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ 
+ 	return count;
+ }
+@@ -428,14 +511,6 @@ static struct queue_sysfs_entry _prefix##_entry = {	\
+ 	.store_limit	= _prefix##_store,			\
+ }
+ 
+-#define QUEUE_RW_LOAD_MODULE_ENTRY(_prefix, _name)		\
+-static struct queue_sysfs_entry _prefix##_entry = {		\
+-	.attr		= { .name = _name, .mode = 0644 },	\
+-	.show		= _prefix##_show,			\
+-	.load_module	= _prefix##_load_module,		\
+-	.store		= _prefix##_store,			\
+-}
+-
+ QUEUE_RW_ENTRY(queue_requests, "nr_requests");
+ QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
+ QUEUE_LIM_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
+@@ -443,7 +518,7 @@ QUEUE_LIM_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
+ QUEUE_LIM_RO_ENTRY(queue_max_segments, "max_segments");
+ QUEUE_LIM_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
+ QUEUE_LIM_RO_ENTRY(queue_max_segment_size, "max_segment_size");
+-QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
++QUEUE_RW_ENTRY(elv_iosched, "scheduler");
+ 
+ QUEUE_LIM_RO_ENTRY(queue_logical_block_size, "logical_block_size");
+ QUEUE_LIM_RO_ENTRY(queue_physical_block_size, "physical_block_size");
+@@ -512,14 +587,24 @@ static ssize_t queue_var_store64(s64 *var, const char *page)
+ 
+ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
+ {
+-	if (!wbt_rq_qos(disk->queue))
+-		return -EINVAL;
++	ssize_t ret;
++	struct request_queue *q = disk->queue;
+ 
+-	if (wbt_disabled(disk->queue))
+-		return sysfs_emit(page, "0\n");
++	mutex_lock(&q->sysfs_lock);
++	if (!wbt_rq_qos(q)) {
++		ret = -EINVAL;
++		goto out;
++	}
+ 
+-	return sysfs_emit(page, "%llu\n",
+-		div_u64(wbt_get_min_lat(disk->queue), 1000));
++	if (wbt_disabled(q)) {
++		ret = sysfs_emit(page, "0\n");
++		goto out;
++	}
++
++	ret = sysfs_emit(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
++out:
++	mutex_unlock(&q->sysfs_lock);
++	return ret;
+ }
+ 
+ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+@@ -529,6 +614,7 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+ 	struct rq_qos *rqos;
+ 	ssize_t ret;
+ 	s64 val;
++	unsigned int memflags;
+ 
+ 	ret = queue_var_store64(&val, page);
+ 	if (ret < 0)
+@@ -536,20 +622,24 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+ 	if (val < -1)
+ 		return -EINVAL;
+ 
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
++
+ 	rqos = wbt_rq_qos(q);
+ 	if (!rqos) {
+ 		ret = wbt_init(disk);
+ 		if (ret)
+-			return ret;
++			goto out;
+ 	}
+ 
++	ret = count;
+ 	if (val == -1)
+ 		val = wbt_default_latency_nsec(q);
+ 	else if (val >= 0)
+ 		val *= 1000ULL;
+ 
+ 	if (wbt_get_min_lat(q) == val)
+-		return count;
++		goto out;
+ 
+ 	/*
+ 	 * Ensure that the queue is idled, in case the latency update
+@@ -561,8 +651,11 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+ 	wbt_set_min_lat(q, val);
+ 
+ 	blk_mq_unquiesce_queue(q);
++out:
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ 
+-	return count;
++	return ret;
+ }
+ 
+ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
+@@ -684,22 +777,20 @@ queue_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
+ {
+ 	struct queue_sysfs_entry *entry = to_queue(attr);
+ 	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
+-	ssize_t res;
+ 
+ 	if (!entry->show && !entry->show_limit)
+ 		return -EIO;
+ 
+ 	if (entry->show_limit) {
++		ssize_t res;
++
+ 		mutex_lock(&disk->queue->limits_lock);
+ 		res = entry->show_limit(disk, page);
+ 		mutex_unlock(&disk->queue->limits_lock);
+ 		return res;
+ 	}
+ 
+-	mutex_lock(&disk->queue->sysfs_lock);
+-	res = entry->show(disk, page);
+-	mutex_unlock(&disk->queue->sysfs_lock);
+-	return res;
++	return entry->show(disk, page);
+ }
+ 
+ static ssize_t
+@@ -709,21 +800,13 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
+ 	struct queue_sysfs_entry *entry = to_queue(attr);
+ 	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
+ 	struct request_queue *q = disk->queue;
+-	unsigned int memflags;
+-	ssize_t res;
+ 
+ 	if (!entry->store_limit && !entry->store)
+ 		return -EIO;
+ 
+-	/*
+-	 * If the attribute needs to load a module, do it before freezing the
+-	 * queue to ensure that the module file can be read when the request
+-	 * queue is the one for the device storing the module file.
+-	 */
+-	if (entry->load_module)
+-		entry->load_module(disk, page, length);
+-
+ 	if (entry->store_limit) {
++		ssize_t res;
++
+ 		struct queue_limits lim = queue_limits_start_update(q);
+ 
+ 		res = entry->store_limit(disk, page, length, &lim);
+@@ -738,12 +821,7 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
+ 		return length;
+ 	}
+ 
+-	mutex_lock(&q->sysfs_lock);
+-	memflags = blk_mq_freeze_queue(q);
+-	res = entry->store(disk, page, length);
+-	blk_mq_unfreeze_queue(q, memflags);
+-	mutex_unlock(&q->sysfs_lock);
+-	return res;
++	return entry->store(disk, page, length);
+ }
+ 
+ static const struct sysfs_ops queue_sysfs_ops = {
+diff --git a/block/elevator.c b/block/elevator.c
+index cd2ce4921601..041f1d983bc7 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -723,11 +723,24 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ {
+ 	char elevator_name[ELV_NAME_MAX];
+ 	int ret;
++	unsigned int memflags;
++	struct request_queue *q = disk->queue;
+ 
++	/*
++	 * If the attribute needs to load a module, do it before freezing the
++	 * queue to ensure that the module file can be read when the request
++	 * queue is the one for the device storing the module file.
++	 */
++	elv_iosched_load_module(disk, buf, count);
+ 	strscpy(elevator_name, buf, sizeof(elevator_name));
+-	ret = elevator_change(disk->queue, strstrip(elevator_name));
++
++	mutex_lock(&q->sysfs_lock);
++	memflags = blk_mq_freeze_queue(q);
++	ret = elevator_change(q, strstrip(elevator_name));
+ 	if (!ret)
+-		return count;
++		ret = count;
++	blk_mq_unfreeze_queue(q, memflags);
++	mutex_unlock(&q->sysfs_lock);
+ 	return ret;
+ }
+ 
+@@ -738,6 +751,7 @@ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
+ 	struct elevator_type *cur = NULL, *e;
+ 	int len = 0;
+ 
++	mutex_lock(&q->sysfs_lock);
+ 	if (!q->elevator) {
+ 		len += sprintf(name+len, "[none] ");
+ 	} else {
+@@ -755,6 +769,8 @@ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
+ 	spin_unlock(&elv_list_lock);
+ 
+ 	len += sprintf(name+len, "\n");
++	mutex_unlock(&q->sysfs_lock);
++
+ 	return len;
+ }
+ 
+-- 
+2.47.1
 
