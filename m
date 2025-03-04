@@ -1,64 +1,64 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6422C1FE461
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEF81FCF72
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 10:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741083978; cv=none; b=UXxxTFZ5TwjelaXTaSjyWVR3IOE9Zy2+SwcBhVCUXqWYO4GcfaGXO3biDxYEDs9YMgGuY0Qva1Q3cE5HOQMvvJicsR45jaJqUh6pk7Sw8/COKq/VjEI49O/GEPDB3KpfueR29D/bKl8BE0H9ZWHsylHz1hfy8YTF4HuCtUXnD9w=
+	t=1741083979; cv=none; b=B+Zb6lpnwc7gJZx6wEzax+BnxlZ441VPQ/TAVxqtM9DjMXeLadi3cG9njpBICbts0VCPGMRmxtExx4MofvuSjtASAqyBwfmnqYEfkiqyf6xatKyA33SfB2Wrj/o9ptxwmVCnQ/9IYzbsJBfNMxARg569lEwnIQHPaTyd26TTKW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741083978; c=relaxed/simple;
-	bh=/6HJRRR9aL+b1mXAJGV7JwiSkxx/2popuvQjFgXhIfI=;
+	s=arc-20240116; t=1741083979; c=relaxed/simple;
+	bh=WrjsnHiPsXjSFwM2536QBTSLx+8xNYBrr6bXcaBo/Dg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jntuikrSFaH4itIxBQa2XYVPgX2p6TXUf8d/OhLd+2OrIxv9LQMQJtImwRd2CdzZrVYLc77vwTIjusZkJ2LOBDVPf2GTwQ1hotYUznAdEYgG4WgSeWjabZaft5uQZ4U29iLmx0tBaNzl1n0L5a8G1mdyVQG1wORLYPOn+k09Ygs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KlZypEb9; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=dhWMr32eCBNUAIvTzoqLfMK56mXeeHkRMb7hTO1/lUFb+RViT2/qdGAOHoiEZY4iTrJI9neH4IexuqCDdH97QmMMlRW+QSXnLzbXjAsBKf/hL5Shol8LsOdEbbhyZn0iXmZ8w+oNQbrdYBetUEZZMdvaUAYfqwesd7wzlfl91/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AjXa5DDa; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KlZypEb9"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523KtN66022669;
-	Tue, 4 Mar 2025 10:26:04 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AjXa5DDa"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524ABZIh026439;
+	Tue, 4 Mar 2025 10:25:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=nPHDdpmD3idZ+8g7J
-	K/XGyPfBonvq0zfSYQxomINwcQ=; b=KlZypEb9Ew3ys3yiqASaqj4kdC1B2fIhs
-	2zEUtvKKWffwe7G4LT0B5w2h5FJpMV+tvVAr4osDpIJn6LvxAMmFeCLYJCLIbuEX
-	jgO/1uHJXAxBC05RlQclD/K6hfp86eCWDe4xr29jjH5kDxrS4v1eE2QwX9dd1h+e
-	bJEo9IMVmioBmY7vmPx73sho9E4YKU0knbtpLsieKlpbqAjLjkiMtyWgkegMLHkL
-	T4MTft2m/slGRpRwJBmsxwoqxsiQlqd42+Gn53a8Tv4eQjQc1/3wvAyQ4xkue1Il
-	Q1YFRcr/LyPp5Fi+SXeusiFF8DzNMveOudysC9YGNRJqUyvJQlynw==
+	:mime-version:references:subject:to; s=pp1; bh=z976WmYzsgncyERMw
+	tGQDB37M69AJE0VAPjbAVqc+P8=; b=AjXa5DDa3sUIbNekc+b47wqfYTdNM38kG
+	0Znd9OZ+roDWqeXXIdDDYHCfQZAAzQIJz8nRqxEjDXHZxXt6fsG5FdbxSsO0xdVk
+	/whxopW3Bp9KIAzrZHPJ2+mQ2eXQK30zZZ1sf/7QUMKvQfjqF9RGXQde2dd3bySd
+	hez8I+PsRfgVzMSbDZiuTvbLk0tH0wlrmxb4n6Ez0vJNbw7WUCDAtVnwPGnysJOL
+	WmdrtYkoDKnm0HUHPYAAJ/i5Tj/e58MchDlRfKCjXf1lLeSCLoW8UugofT89/2Zw
+	FFmWDDpRxEpUlOMu/XJyK38xIvU5y+hJQgYvLgr2Uy7xiEZoZr7rw==
 Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455dunx2a1-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455kkpb82v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 10:26:03 +0000 (GMT)
+	Tue, 04 Mar 2025 10:25:59 +0000 (GMT)
 Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5249WBnE025031;
-	Tue, 4 Mar 2025 10:26:03 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 454f91veer-1
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5249iV7F025012;
+	Tue, 4 Mar 2025 10:25:58 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 454f91veej-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 10:26:02 +0000
+	Tue, 04 Mar 2025 10:25:58 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524AQ1vn20971864
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524APu3h8454470
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Mar 2025 10:26:01 GMT
+	Tue, 4 Mar 2025 10:25:56 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4621C2004B;
-	Tue,  4 Mar 2025 10:26:01 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 9123120043;
+	Tue,  4 Mar 2025 10:25:56 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7AFC320040;
-	Tue,  4 Mar 2025 10:25:59 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 92F6720040;
+	Tue,  4 Mar 2025 10:25:54 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.149])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Mar 2025 10:25:59 +0000 (GMT)
+	Tue,  4 Mar 2025 10:25:54 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-block@vger.kernel.org
 Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de,
         axboe@kernel.dk, lkp@intel.com, gjoyce@ibm.com
-Subject: [PATCHv6 3/7] block: remove q->sysfs_lock for attributes which don't need it
-Date: Tue,  4 Mar 2025 15:52:32 +0530
-Message-ID: <20250304102551.2533767-4-nilay@linux.ibm.com>
+Subject: [PATCHv6 1/7] block: acquire q->limits_lock while reading sysfs attributes
+Date: Tue,  4 Mar 2025 15:52:30 +0530
+Message-ID: <20250304102551.2533767-2-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250304102551.2533767-1-nilay@linux.ibm.com>
 References: <20250304102551.2533767-1-nilay@linux.ibm.com>
@@ -70,299 +70,255 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3-kA5q5O4phnDCnnLH-SHAcx49Drgxgq
-X-Proofpoint-GUID: 3-kA5q5O4phnDCnnLH-SHAcx49Drgxgq
+X-Proofpoint-GUID: MqBTR-6mYXq-h6p3EXmTU-M-dR58wLT_
+X-Proofpoint-ORIG-GUID: MqBTR-6mYXq-h6p3EXmTU-M-dR58wLT_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-03-04_04,2025-03-03_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 clxscore=1015 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503040084
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2503040080
 
-There're few sysfs attributes in block layer which don't really need
-acquiring q->sysfs_lock while accessing it. The reason being, reading/
-writing a value from/to such attributes are either atomic or could be
-easily protected using READ_ONCE()/WRITE_ONCE(). Moreover, sysfs
-attributes are inherently protected with sysfs/kernfs internal locking.
+There're few sysfs attributes(RW) whose store method is protected
+with q->limits_lock, however the corresponding show method of these
+attributes run holding q->sysfs_lock and that doesn't make sense
+as ideally the show method of these attributes should also run
+holding q->limits_lock instead of q->sysfs_lock. Hence update the
+show method of these sysfs attributes so that reading of these
+attributes acquire q->limits_lock instead of q->sysfs_lock.
 
-So this change help segregate all existing sysfs attributes for which
-we could avoid acquiring q->sysfs_lock. For all read-only attributes
-we removed the q->sysfs_lock from show method of such attributes. In
-case attribute is read/write then we removed the q->sysfs_lock from
-both show and store methods of these attributes.
+Similarly, there're few sysfs attributes(RO) whose show method is
+currently protected with q->sysfs_lock however updates to these
+attributes could occur using atomic limit update APIs such as queue_
+limits_start_update() and queue_limits_commit_update() which run
+holding q->limits_lock. So that means that reading these attributes
+holding q->sysfs_lock doesn't make sense. Hence update the show method
+of these sysfs attributes(RO) such that they run with holding q->
+limits_lock instead of q->sysfs_lock.
 
-We audited all block sysfs attributes and found following list of
-attributes which shouldn't require q->sysfs_lock protection:
+We have defined a new macro QUEUE_LIM_RO_ENTRY() which uses new ->show_
+limit() method and it runs holding q->limits_lock. All existing sysfs
+attributes(RO) which needs protection using q->limits_lock while
+reading have been now updated to use this new macro for initialization.
 
-1. io_poll:
-   Write to this attribute is ignored. So, we don't need q->sysfs_lock.
-
-2. io_poll_delay:
-   Write to this attribute is NOP, so we don't need q->sysfs_lock.
-
-3. io_timeout:
-   Write to this attribute updates q->rq_timeout and read of this
-   attribute returns the value stored in q->rq_timeout Moreover, the
-   q->rq_timeout is set only once when we init the queue (under blk_mq_
-   init_allocated_queue()) even before disk is added. So that means
-   that we don't need to protect it with q->sysfs_lock. As this
-   attribute is not directly correlated with anything else simply using
-   READ_ONCE/WRITE_ONCE should be enough.
-
-4. nomerges:
-   Write to this attribute file updates two q->flags : QUEUE_FLAG_
-   NOMERGES and QUEUE_FLAG_NOXMERGES. These flags are accessed during
-   bio-merge which anyways doesn't run with q->sysfs_lock held.
-   Moreover, the q->flags are updated/accessed with bitops which are
-   atomic. So, protecting it with q->sysfs_lock is not necessary.
-
-5. rq_affinity:
-   Write to this attribute file makes atomic updates to q->flags:
-   QUEUE_FLAG_SAME_COMP and QUEUE_FLAG_SAME_FORCE. These flags are
-   also accessed from blk_mq_complete_need_ipi() using test_bit macro.
-   As read/write to q->flags uses bitops which are atomic, protecting
-   it with q->stsys_lock is not necessary.
-
-6. nr_zones:
-   Write to this attribute happens in the driver probe method (except
-   nvme) before disk is added and outside of q->sysfs_lock or any other
-   lock. Moreover nr_zones is defined as "unsigned int" and so reading
-   this attribute, even when it's simultaneously being updated on other
-   cpu, should not return torn value on any architecture supported by
-   linux. So we can avoid using q->sysfs_lock or any other lock/
-   protection while reading this attribute.
-
-7. discard_zeroes_data:
-   Reading of this attribute always returns 0, so we don't require
-   holding q->sysfs_lock.
-
-8. write_same_max_bytes
-   Reading of this attribute always returns 0, so we don't require
-   holding q->sysfs_lock.
+Also, the existing QUEUE_LIM_RW_ENTRY() is updated to use new ->show_
+limit() method for reading attributes instead of existing ->show()
+method. As ->show_limit() runs holding q->limits_lock, the existing
+sysfs attributes(RW) requiring protection are now inherently protected
+using q->limits_lock instead of q->sysfs_lock.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- block/blk-settings.c |  2 +-
- block/blk-sysfs.c    | 81 +++++++++++++++-----------------------------
- 2 files changed, 29 insertions(+), 54 deletions(-)
+ block/blk-sysfs.c | 102 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 65 insertions(+), 37 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b9c6f0ec1c49..78f6a832a3f4 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -21,7 +21,7 @@
- 
- void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
- {
--	q->rq_timeout = timeout;
-+	WRITE_ONCE(q->rq_timeout, timeout);
- }
- EXPORT_SYMBOL_GPL(blk_queue_rq_timeout);
- 
 diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 4700ee168ed5..bc641ac71cde 100644
+index 6f548a4376aa..eba5121690af 100644
 --- a/block/blk-sysfs.c
 +++ b/block/blk-sysfs.c
-@@ -172,12 +172,7 @@ QUEUE_SYSFS_LIMIT_SHOW_SECTORS_TO_KB(max_hw_sectors)
- #define QUEUE_SYSFS_SHOW_CONST(_name, _val)				\
- static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
- {									\
--	ssize_t ret;							\
--									\
--	mutex_lock(&disk->queue->sysfs_lock);				\
--	ret = sysfs_emit(page, "%d\n", _val);				\
--	mutex_unlock(&disk->queue->sysfs_lock);				\
--	return ret;							\
-+	return sysfs_emit(page, "%d\n", _val);				\
- }
- 
- /* deprecated fields */
-@@ -266,17 +261,11 @@ QUEUE_SYSFS_FEATURE_SHOW(dax, BLK_FEAT_DAX);
- 
- static ssize_t queue_poll_show(struct gendisk *disk, char *page)
- {
--	ssize_t ret;
-+	if (queue_is_mq(disk->queue))
-+		return sysfs_emit(page, "%u\n", blk_mq_can_poll(disk->queue));
- 
--	mutex_lock(&disk->queue->sysfs_lock);
--	if (queue_is_mq(disk->queue)) {
--		ret = sysfs_emit(page, "%u\n", blk_mq_can_poll(disk->queue));
--	} else {
--		ret = sysfs_emit(page, "%u\n",
-+	return sysfs_emit(page, "%u\n",
- 			!!(disk->queue->limits.features & BLK_FEAT_POLL));
--	}
--	mutex_unlock(&disk->queue->sysfs_lock);
--	return ret;
- }
- 
- static ssize_t queue_zoned_show(struct gendisk *disk, char *page)
-@@ -288,12 +277,7 @@ static ssize_t queue_zoned_show(struct gendisk *disk, char *page)
- 
- static ssize_t queue_nr_zones_show(struct gendisk *disk, char *page)
- {
--	ssize_t ret;
--
--	mutex_lock(&disk->queue->sysfs_lock);
--	ret = queue_var_show(disk_nr_zones(disk), page);
--	mutex_unlock(&disk->queue->sysfs_lock);
--	return ret;
-+	return queue_var_show(disk_nr_zones(disk), page);
- }
- 
- static ssize_t queue_iostats_passthrough_show(struct gendisk *disk, char *page)
-@@ -320,13 +304,8 @@ static int queue_iostats_passthrough_store(struct gendisk *disk,
- 
- static ssize_t queue_nomerges_show(struct gendisk *disk, char *page)
- {
--	ssize_t ret;
--
--	mutex_lock(&disk->queue->sysfs_lock);
--	ret = queue_var_show((blk_queue_nomerges(disk->queue) << 1) |
-+	return queue_var_show((blk_queue_nomerges(disk->queue) << 1) |
- 			       blk_queue_noxmerges(disk->queue), page);
--	mutex_unlock(&disk->queue->sysfs_lock);
--	return ret;
- }
- 
- static ssize_t queue_nomerges_store(struct gendisk *disk, const char *page,
-@@ -340,7 +319,6 @@ static ssize_t queue_nomerges_store(struct gendisk *disk, const char *page,
- 	if (ret < 0)
- 		return ret;
- 
--	mutex_lock(&q->sysfs_lock);
- 	memflags = blk_mq_freeze_queue(q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, q);
-@@ -349,22 +327,16 @@ static ssize_t queue_nomerges_store(struct gendisk *disk, const char *page,
- 	else if (nm)
- 		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
- 	blk_mq_unfreeze_queue(q, memflags);
--	mutex_unlock(&q->sysfs_lock);
- 
- 	return ret;
- }
- 
- static ssize_t queue_rq_affinity_show(struct gendisk *disk, char *page)
- {
--	ssize_t ret;
--	bool set, force;
-+	bool set = test_bit(QUEUE_FLAG_SAME_COMP, &disk->queue->queue_flags);
-+	bool force = test_bit(QUEUE_FLAG_SAME_FORCE, &disk->queue->queue_flags);
- 
--	mutex_lock(&disk->queue->sysfs_lock);
--	set = test_bit(QUEUE_FLAG_SAME_COMP, &disk->queue->queue_flags);
--	force = test_bit(QUEUE_FLAG_SAME_FORCE, &disk->queue->queue_flags);
--	ret = queue_var_show(set << force, page);
--	mutex_unlock(&disk->queue->sysfs_lock);
--	return ret;
-+	return queue_var_show(set << force, page);
- }
- 
- static ssize_t
-@@ -380,7 +352,12 @@ queue_rq_affinity_store(struct gendisk *disk, const char *page, size_t count)
- 	if (ret < 0)
- 		return ret;
- 
--	mutex_lock(&q->sysfs_lock);
-+	/*
-+	 * Here we update two queue flags each using atomic bitops, although
-+	 * updating two flags isn't atomic it should be harmless as those flags
-+	 * are accessed individually using atomic test_bit operation. So we
-+	 * don't grab any lock while updating these flags.
-+	 */
- 	memflags = blk_mq_freeze_queue(q);
- 	if (val == 2) {
- 		blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, q);
-@@ -393,7 +370,6 @@ queue_rq_affinity_store(struct gendisk *disk, const char *page, size_t count)
- 		blk_queue_flag_clear(QUEUE_FLAG_SAME_FORCE, q);
- 	}
- 	blk_mq_unfreeze_queue(q, memflags);
--	mutex_unlock(&q->sysfs_lock);
- #endif
- 	return ret;
- }
-@@ -411,30 +387,23 @@ static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
- 	ssize_t ret = count;
- 	struct request_queue *q = disk->queue;
- 
--	mutex_lock(&q->sysfs_lock);
- 	memflags = blk_mq_freeze_queue(q);
- 	if (!(q->limits.features & BLK_FEAT_POLL)) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
+@@ -23,9 +23,12 @@
+ struct queue_sysfs_entry {
+ 	struct attribute attr;
+ 	ssize_t (*show)(struct gendisk *disk, char *page);
++	ssize_t (*show_limit)(struct gendisk *disk, char *page);
 +
- 	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
- 	pr_info_ratelimited("please use driver specific parameters instead.\n");
- out:
- 	blk_mq_unfreeze_queue(q, memflags);
--	mutex_unlock(&q->sysfs_lock);
--
- 	return ret;
+ 	ssize_t (*store)(struct gendisk *disk, const char *page, size_t count);
+ 	int (*store_limit)(struct gendisk *disk, const char *page,
+ 			size_t count, struct queue_limits *lim);
++
+ 	void (*load_module)(struct gendisk *disk, const char *page, size_t count);
+ };
+ 
+@@ -412,10 +415,16 @@ static struct queue_sysfs_entry _prefix##_entry = {	\
+ 	.store	= _prefix##_store,			\
+ };
+ 
++#define QUEUE_LIM_RO_ENTRY(_prefix, _name)			\
++static struct queue_sysfs_entry _prefix##_entry = {	\
++	.attr		= { .name = _name, .mode = 0444 },	\
++	.show_limit	= _prefix##_show,			\
++}
++
+ #define QUEUE_LIM_RW_ENTRY(_prefix, _name)			\
+ static struct queue_sysfs_entry _prefix##_entry = {	\
+ 	.attr		= { .name = _name, .mode = 0644 },	\
+-	.show		= _prefix##_show,			\
++	.show_limit	= _prefix##_show,			\
+ 	.store_limit	= _prefix##_store,			\
  }
  
- static ssize_t queue_io_timeout_show(struct gendisk *disk, char *page)
- {
--	ssize_t ret;
--
--	mutex_lock(&disk->queue->sysfs_lock);
--	ret = sysfs_emit(page, "%u\n",
--			jiffies_to_msecs(disk->queue->rq_timeout));
--	mutex_unlock(&disk->queue->sysfs_lock);
--	return ret;
-+	return sysfs_emit(page, "%u\n",
-+			jiffies_to_msecs(READ_ONCE(disk->queue->rq_timeout)));
- }
+@@ -430,39 +439,39 @@ static struct queue_sysfs_entry _prefix##_entry = {		\
+ QUEUE_RW_ENTRY(queue_requests, "nr_requests");
+ QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
+ QUEUE_LIM_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
+-QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
+-QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
+-QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
+-QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
++QUEUE_LIM_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
++QUEUE_LIM_RO_ENTRY(queue_max_segments, "max_segments");
++QUEUE_LIM_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
++QUEUE_LIM_RO_ENTRY(queue_max_segment_size, "max_segment_size");
+ QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
  
- static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
-@@ -448,11 +417,9 @@ static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
- 	if (err || val == 0)
- 		return -EINVAL;
+-QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
+-QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
+-QUEUE_RO_ENTRY(queue_chunk_sectors, "chunk_sectors");
+-QUEUE_RO_ENTRY(queue_io_min, "minimum_io_size");
+-QUEUE_RO_ENTRY(queue_io_opt, "optimal_io_size");
++QUEUE_LIM_RO_ENTRY(queue_logical_block_size, "logical_block_size");
++QUEUE_LIM_RO_ENTRY(queue_physical_block_size, "physical_block_size");
++QUEUE_LIM_RO_ENTRY(queue_chunk_sectors, "chunk_sectors");
++QUEUE_LIM_RO_ENTRY(queue_io_min, "minimum_io_size");
++QUEUE_LIM_RO_ENTRY(queue_io_opt, "optimal_io_size");
  
--	mutex_lock(&q->sysfs_lock);
- 	memflags = blk_mq_freeze_queue(q);
- 	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
- 	blk_mq_unfreeze_queue(q, memflags);
--	mutex_unlock(&q->sysfs_lock);
+-QUEUE_RO_ENTRY(queue_max_discard_segments, "max_discard_segments");
+-QUEUE_RO_ENTRY(queue_discard_granularity, "discard_granularity");
+-QUEUE_RO_ENTRY(queue_max_hw_discard_sectors, "discard_max_hw_bytes");
++QUEUE_LIM_RO_ENTRY(queue_max_discard_segments, "max_discard_segments");
++QUEUE_LIM_RO_ENTRY(queue_discard_granularity, "discard_granularity");
++QUEUE_LIM_RO_ENTRY(queue_max_hw_discard_sectors, "discard_max_hw_bytes");
+ QUEUE_LIM_RW_ENTRY(queue_max_discard_sectors, "discard_max_bytes");
+ QUEUE_RO_ENTRY(queue_discard_zeroes_data, "discard_zeroes_data");
  
- 	return count;
- }
-@@ -706,6 +673,10 @@ static struct attribute *queue_attrs[] = {
- 	 * Attributes which are protected with q->sysfs_lock.
- 	 */
- 	&queue_ra_entry.attr,
+-QUEUE_RO_ENTRY(queue_atomic_write_max_sectors, "atomic_write_max_bytes");
+-QUEUE_RO_ENTRY(queue_atomic_write_boundary_sectors,
++QUEUE_LIM_RO_ENTRY(queue_atomic_write_max_sectors, "atomic_write_max_bytes");
++QUEUE_LIM_RO_ENTRY(queue_atomic_write_boundary_sectors,
+ 		"atomic_write_boundary_bytes");
+-QUEUE_RO_ENTRY(queue_atomic_write_unit_max, "atomic_write_unit_max_bytes");
+-QUEUE_RO_ENTRY(queue_atomic_write_unit_min, "atomic_write_unit_min_bytes");
++QUEUE_LIM_RO_ENTRY(queue_atomic_write_unit_max, "atomic_write_unit_max_bytes");
++QUEUE_LIM_RO_ENTRY(queue_atomic_write_unit_min, "atomic_write_unit_min_bytes");
+ 
+ QUEUE_RO_ENTRY(queue_write_same_max, "write_same_max_bytes");
+-QUEUE_RO_ENTRY(queue_max_write_zeroes_sectors, "write_zeroes_max_bytes");
+-QUEUE_RO_ENTRY(queue_max_zone_append_sectors, "zone_append_max_bytes");
+-QUEUE_RO_ENTRY(queue_zone_write_granularity, "zone_write_granularity");
++QUEUE_LIM_RO_ENTRY(queue_max_write_zeroes_sectors, "write_zeroes_max_bytes");
++QUEUE_LIM_RO_ENTRY(queue_max_zone_append_sectors, "zone_append_max_bytes");
++QUEUE_LIM_RO_ENTRY(queue_zone_write_granularity, "zone_write_granularity");
+ 
+-QUEUE_RO_ENTRY(queue_zoned, "zoned");
++QUEUE_LIM_RO_ENTRY(queue_zoned, "zoned");
+ QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
+-QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones");
+-QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
++QUEUE_LIM_RO_ENTRY(queue_max_open_zones, "max_open_zones");
++QUEUE_LIM_RO_ENTRY(queue_max_active_zones, "max_active_zones");
+ 
+ QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
+ QUEUE_LIM_RW_ENTRY(queue_iostats_passthrough, "iostats_passthrough");
+@@ -470,16 +479,16 @@ QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
+ QUEUE_RW_ENTRY(queue_poll, "io_poll");
+ QUEUE_RW_ENTRY(queue_poll_delay, "io_poll_delay");
+ QUEUE_LIM_RW_ENTRY(queue_wc, "write_cache");
+-QUEUE_RO_ENTRY(queue_fua, "fua");
+-QUEUE_RO_ENTRY(queue_dax, "dax");
++QUEUE_LIM_RO_ENTRY(queue_fua, "fua");
++QUEUE_LIM_RO_ENTRY(queue_dax, "dax");
+ QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
+-QUEUE_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
+-QUEUE_RO_ENTRY(queue_dma_alignment, "dma_alignment");
++QUEUE_LIM_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
++QUEUE_LIM_RO_ENTRY(queue_dma_alignment, "dma_alignment");
+ 
+ /* legacy alias for logical_block_size: */
+ static struct queue_sysfs_entry queue_hw_sector_size_entry = {
+-	.attr = {.name = "hw_sector_size", .mode = 0444 },
+-	.show = queue_logical_block_size_show,
++	.attr		= {.name = "hw_sector_size", .mode = 0444 },
++	.show_limit	= queue_logical_block_size_show,
+ };
+ 
+ QUEUE_LIM_RW_ENTRY(queue_rotational, "rotational");
+@@ -561,7 +570,9 @@ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
+ 
+ /* Common attributes for bio-based and request-based queues. */
+ static struct attribute *queue_attrs[] = {
+-	&queue_ra_entry.attr,
++	/*
++	 * Attributes which are protected with q->limits_lock.
++	 */
+ 	&queue_max_hw_sectors_entry.attr,
+ 	&queue_max_sectors_entry.attr,
+ 	&queue_max_segments_entry.attr,
+@@ -577,37 +588,46 @@ static struct attribute *queue_attrs[] = {
+ 	&queue_discard_granularity_entry.attr,
+ 	&queue_max_discard_sectors_entry.attr,
+ 	&queue_max_hw_discard_sectors_entry.attr,
+-	&queue_discard_zeroes_data_entry.attr,
+ 	&queue_atomic_write_max_sectors_entry.attr,
+ 	&queue_atomic_write_boundary_sectors_entry.attr,
+ 	&queue_atomic_write_unit_min_entry.attr,
+ 	&queue_atomic_write_unit_max_entry.attr,
+-	&queue_write_same_max_entry.attr,
+ 	&queue_max_write_zeroes_sectors_entry.attr,
+ 	&queue_max_zone_append_sectors_entry.attr,
+ 	&queue_zone_write_granularity_entry.attr,
+ 	&queue_rotational_entry.attr,
+ 	&queue_zoned_entry.attr,
+-	&queue_nr_zones_entry.attr,
+ 	&queue_max_open_zones_entry.attr,
+ 	&queue_max_active_zones_entry.attr,
+-	&queue_nomerges_entry.attr,
+ 	&queue_iostats_passthrough_entry.attr,
+ 	&queue_iostats_entry.attr,
+ 	&queue_stable_writes_entry.attr,
+ 	&queue_add_random_entry.attr,
+-	&queue_poll_entry.attr,
+ 	&queue_wc_entry.attr,
+ 	&queue_fua_entry.attr,
+ 	&queue_dax_entry.attr,
+-	&queue_poll_delay_entry.attr,
+ 	&queue_virt_boundary_mask_entry.attr,
+ 	&queue_dma_alignment_entry.attr,
 +
 +	/*
-+	 * Attributes which don't require locking.
++	 * Attributes which are protected with q->sysfs_lock.
 +	 */
- 	&queue_discard_zeroes_data_entry.attr,
- 	&queue_write_same_max_entry.attr,
- 	&queue_nr_zones_entry.attr,
-@@ -723,11 +694,15 @@ static struct attribute *blk_mq_queue_attrs[] = {
- 	 */
- 	&queue_requests_entry.attr,
- 	&elv_iosched_entry.attr,
--	&queue_rq_affinity_entry.attr,
--	&queue_io_timeout_entry.attr,
- #ifdef CONFIG_BLK_WBT
- 	&queue_wb_lat_entry.attr,
- #endif
-+	/*
-+	 * Attributes which don't require locking.
-+	 */
-+	&queue_rq_affinity_entry.attr,
-+	&queue_io_timeout_entry.attr,
++	&queue_ra_entry.attr,
++	&queue_discard_zeroes_data_entry.attr,
++	&queue_write_same_max_entry.attr,
++	&queue_nr_zones_entry.attr,
++	&queue_nomerges_entry.attr,
++	&queue_poll_entry.attr,
++	&queue_poll_delay_entry.attr,
 +
  	NULL,
  };
  
+ /* Request-based queue attributes that are not relevant for bio-based queues. */
+ static struct attribute *blk_mq_queue_attrs[] = {
++	/*
++	 * Attributes which are protected with q->sysfs_lock.
++	 */
+ 	&queue_requests_entry.attr,
+ 	&elv_iosched_entry.attr,
+ 	&queue_rq_affinity_entry.attr,
+@@ -666,8 +686,16 @@ queue_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
+ 	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
+ 	ssize_t res;
+ 
+-	if (!entry->show)
++	if (!entry->show && !entry->show_limit)
+ 		return -EIO;
++
++	if (entry->show_limit) {
++		mutex_lock(&disk->queue->limits_lock);
++		res = entry->show_limit(disk, page);
++		mutex_unlock(&disk->queue->limits_lock);
++		return res;
++	}
++
+ 	mutex_lock(&disk->queue->sysfs_lock);
+ 	res = entry->show(disk, page);
+ 	mutex_unlock(&disk->queue->sysfs_lock);
 -- 
 2.47.1
 
