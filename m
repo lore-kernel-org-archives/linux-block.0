@@ -1,71 +1,69 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9193020551C
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 14:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC38204F79
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 14:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741097790; cv=none; b=XAkYQ0z7KEZSq3XNTwOuMAzetTOgEtWodji2OEKsL1X9BE0e6dgWvKdVByJhpKMD0nCQUrb3gEkPmD/G1k59Sr0YsX/kQyXrC138P40nmKHJEKgn79DRFew6qtF1tVeraaCH6W2GhqXIZP5wh16DkhKzX4m8SMMYc9ln1z7VYCE=
+	t=1741097791; cv=none; b=UG/B0LmyhaRl+BxXwoUpSbBK0EsExyniLjGC4/wwMROsO0tk3hWLYFV5gmjZNwc3MunETZfOGz3hj03E6WOvHTXT5YfKO+J7wxqrktTmmJmh3S7IxZlbAh8vxs0zks2rs+6eEUWY1wMg1e7UjxKLnWtUSDxB2B3tqqMfcqjLuDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741097790; c=relaxed/simple;
-	bh=ZZ+tUxCQ5Vq6r5SZVC9DDT1JjV/LpKtO0cS1gMILap8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=g74rXz5Ln/PLozF/G6fQ6ve/e/iXj2gzhdEwVt/ZAF8IBt0v29xd3xkmYcWxLzOibVjv9Mb/GcvxLBtP/qForZ6CJnQzpHbB/T8LXEsaSgY2BXVHaL3cieAwDBzUyHFP1GU88YRA35LvOwe9FuKOiqkqiOZ3cG3vmUpkTYT4WKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2lSlfADE; arc=none smtp.client-ip=209.85.166.182
+	s=arc-20240116; t=1741097791; c=relaxed/simple;
+	bh=4ZJH4JC5NCAq34uANyln48ENejnGDm2pl/k7fWmPFf0=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SjE9IACub29CFWgBVmMTDs/HDAWu7+KrZtGeo+DYfCtMUAxK3cSESyOnsYcwCVsg8DI5mx/blGvxhlofZxD+tdWyBTkIHD+4DsyhF8MrRfqxFdmzo9P6SQ5F9KmlMtZbMsGkOLGm6WfRkiIDIPApBFkVWmM/GDKjy9mJzPxT4mU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vCjXcLhw; arc=none smtp.client-ip=209.85.166.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2lSlfADE"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3d191bfeafbso22354175ab.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Mar 2025 06:16:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vCjXcLhw"
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so20749665ab.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Mar 2025 06:16:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741097787; x=1741702587; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741097789; x=1741702589; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rMyl+oxcOIKmILwJnWXb5CChyFyffMt+pqOQjpq2JwQ=;
-        b=2lSlfADEvmqLIr7E45M9jUEpVQIJtOMqq+yklTgdHvLx9ui7E92bCxWZI4cVXGleGJ
-         GOsST3UPyZizVXjJ54Dyu5AfnHwIJ6F8NUSFOnW40XssUKOjhA1Obg0DgLEJTVjfoMcU
-         MweqQubqEc1kI1nnYNmgG3nb32JhAqSQfJEQigq8BegjiMGF6zHk81ow7i13hbzcHh+g
-         h5xKyP54t3LZLxvynULrNtM3cyt5kKF8OPpjEWdSt8gn0mF4E5Yr39OLjL2t//8bcPby
-         SGsTYU9fheDKopR4cAKiZch3x8fZ15DcUuSBsl6p1wL8Rtr/jLxRxxAesuU9YfxYVEIy
-         Gs2Q==
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HQpKgDu4ElSZifTyTDqZ0+IWGRMDpXmTQXuBXcDTpW0=;
+        b=vCjXcLhwyhZnG1fJdx6rBjmeXlELNYo2PWg4ot47bWNyE1hOU8CHyTuxFMnu1bTLhz
+         yLOD549R8WYhdCRlrx34QEwRo7ix5Nhp6G1RZzEosaVsJr8uuHbPnaIlUVP3zyJiOjwI
+         /bbMAOKAhKVoSx7Y0wknHOMK70UKYRercf0TBxF8iI1b8Z1MAxlcu8i2sZaX0MlnYQj2
+         iJDJ4y8EZZ+ErfEUleMI0U/birsjz9998wNZkuBcaKntuomAlekU3M7aRNQD29kGbfkv
+         +PEswAPx82XG60toe4CSB2pe22sezJycffXCLr4JJ2Mx3xAWY8kYLn30T3ooktprBRwE
+         lH9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741097787; x=1741702587;
+        d=1e100.net; s=20230601; t=1741097789; x=1741702589;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rMyl+oxcOIKmILwJnWXb5CChyFyffMt+pqOQjpq2JwQ=;
-        b=YtXUwaOjNLlW2OQ5cXtC17GIPEcImTN7al3EIGdm5ZTIlWzufjTYdbk4JmyuqfRB0W
-         fPNsnLfXitSHrfEp1JEQxH7IjMPItDtIw6xtmT03EYvpHjNvvEd8jcnZlKHc5IrB2ygF
-         dyyYmt6F1LDl9C2EMBmO8dZ0tcuysb43lG8lf9D2eZkn4fUOHu30JwmZNFsZJ1vpIy18
-         5nVNCrR+MZZsEh8moyZx50uq85JHXDGwJry26ivuFi0inqGpEdB1K+H80w8CM+Yz+gR2
-         XHgOscSbwakpmlTNtcOcp0jYQArDUD8CMR0um6Jlxm8eeDdoAC4nCrwArKcg5ux/8m7o
-         r/Fw==
-X-Gm-Message-State: AOJu0YzmH0k0M0XWfoIvzRH9xGGTvrrNcACYuPsuadhmX9oZATcy7gaY
-	IxWnzAMTOwN0L9+CU0Fjyd0YSEnujI7IJ73P53iWmu/AMucoyJpCE5J/VrgEFOXlvtjScJfEuRw
-	/
-X-Gm-Gg: ASbGncv+zZyB+pNryOmdfx/Csp2Nzb58xEwHlgMvzaRNFl4bEjgfht05UGGDqQIaAiq
-	OGFvAV3K76Sps/Nfvg8cbQvsXmm/2zPTD89wgeWd0CKZTUivgZ4kUZ0QfdXj05z5Y7rg337il4i
-	Bz1duQNoTL0mqzIXiq4k2PKIb0BLeqQoAgS5jJH+kjrlju3nAuRyOVbX/zR63bBNbVqKI60ZozF
-	7sWUpO91QxHXyRyhKVWsY9EEMqufj8if3gFEbmgeEBdLjN36JC4q2iWoOOqj+Rv5+nf7rLnZo12
-	aU9dhVDfjG8gZ4sQcpHaB/Kldreb4NfPwNs=
-X-Google-Smtp-Source: AGHT+IFj8V1lrVTGX1aEmcbIsZIMETt6qEL+1ROpr16ZBa8ONvS9TQnQWeQjOnuK1GtqqTDzWub/ww==
-X-Received: by 2002:a92:c8c9:0:b0:3d3:f5fe:fea3 with SMTP id e9e14a558f8ab-3d3f5feff37mr88813775ab.9.1741097787069;
-        Tue, 04 Mar 2025 06:16:27 -0800 (PST)
+        bh=HQpKgDu4ElSZifTyTDqZ0+IWGRMDpXmTQXuBXcDTpW0=;
+        b=flN6RUkfYy5f8+et6u85OvbqG0ypvPeYtUQbcO6wwKXgxmQBBvaK8BIoaYZZUdO1KZ
+         KqhSFM5uCHetAUewtIEWvp3/hgajZNIukqIezopPCXgsH1o1M8jAxrV7ARgEYJSrZXH1
+         b6VcIBFYQr69d8Xd4kLu7N7SDkX4mUPK87WL3/fjOihzcuIyo+O4QmPIt/mjRcTLiM3b
+         iNdhSSou+1UkU/2cT+4gqpr2utBy+1irqL9Wa52b8cOpcxjpkWKqopEEgIh5U12Xr/vL
+         pxlavpG08wRkgqM9Qn1SpvrY5fk20d5m0+LBxwbqnV/92gfYB6Rv7ZFN5SLNsmM3NpiK
+         adZw==
+X-Gm-Message-State: AOJu0YwKmIbCFQI9BJE1XYIpEzUUIIvZ2mlPZ7QBl5IxssqTk5YBQZl5
+	nkHWOLEF+J2b1JrwrC6UZ3VpGBxbblaCOdJlgTPQfya2lTyBo9PgtLsLEgzvigHWvvwPrEhmcsx
+	k
+X-Gm-Gg: ASbGncsNAPslWGNSzY5Ae5THrngyOhMzOD6kfTXrIOmGWWjVVDvXNEVIzYwO4DSfi+S
+	EFl3DSldu7eIG5XBeGXNhnvYHys2QYdYhtQOlX2I6lgRsc6xSBpaGYCtjEX4aFL/QF/JH5hpVm5
+	KrRtIAtI0BG3vv8bz61bApYw9HbtH1zIMc8bYEV1OSIlBOYilMpqrF7I9iYskm5WRIu5ha42Q8u
+	MZCkcU6vSz+jcPpjSrv2T6919HatTxTa2dTl+OymBCwRErk9xpiNa+yfrr8rZdCoZLdXbWz20J4
+	tDgo5dg6zaARMtuKYQg98exN5eFBY9PQ2ow=
+X-Google-Smtp-Source: AGHT+IHkNUnCUpl3S9C1PHvycERwd5D8P8SBt8vYIem9+Og7JkxFkiM/QeSyLNjh6OnakZ8W5Fhz2Q==
+X-Received: by 2002:a05:6e02:1fe5:b0:3d1:97e1:cbac with SMTP id e9e14a558f8ab-3d3e6e91255mr151065655ab.11.1741097788756;
+        Tue, 04 Mar 2025 06:16:28 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f1e668e5ddsm712422173.140.2025.03.04.06.16.26
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f1e668e5ddsm712422173.140.2025.03.04.06.16.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 06:16:26 -0800 (PST)
+        Tue, 04 Mar 2025 06:16:27 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250301190317.950208-1-csander@purestorage.com>
-References: <20250301190317.950208-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: don't cast registered buffer index to int
-Message-Id: <174109778621.2730103.3690369290810043076.b4-ty@kernel.dk>
-Date: Tue, 04 Mar 2025 07:16:26 -0700
+To: linux-block@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20250227163343.55952-1-yanjun.zhu@linux.dev>
+References: <20250227163343.55952-1-yanjun.zhu@linux.dev>
+Subject: Re: [PATCH 1/1] loop: Remove struct loop_func_table
+Message-Id: <174109778728.2730103.7622983195340534946.b4-ty@kernel.dk>
+Date: Tue, 04 Mar 2025 07:16:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,18 +75,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-94c79
 
 
-On Sat, 01 Mar 2025 12:03:16 -0700, Caleb Sander Mateos wrote:
-> io_buffer_register_bvec() takes index as an unsigned int argument, but
-> ublk_register_io_buf() casts ub_cmd->addr (a u64) to int. Remove the
-> misleading cast and instead pass index as an unsigned value to
-> ublk_register_io_buf() and ublk_unregister_io_buf().
+On Thu, 27 Feb 2025 17:33:43 +0100, Zhu Yanjun wrote:
+> The struct is introduced in the commit 754d96798fab
+> ("loop: remove loop.h"), but it is not used now.
+> So remove it.
+> 
+> No functional changes.
 > 
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] ublk: don't cast registered buffer index to int
-      commit: 9e12d09cfdaf89db894abdad392bb8dcd6c0f464
+[1/1] loop: Remove struct loop_func_table
+      commit: 3aab938c93ca952ebc96c85b753f2592de919369
 
 Best regards,
 -- 
