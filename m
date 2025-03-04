@@ -1,208 +1,188 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A33824C08A
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 15:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E95324C081
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 15:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741101067; cv=none; b=rCvtsQdxMEFcgZCjHEMIXYJeBGwxKzAmr4DBQh7BurUnABi1wuYb4I4UnTARcTeuJ8QFhGXkiDTfn/aFYIXONnrN0OxxaiVtAmgtoRnNktgbFRBHbkb+WRR2OmR6m99wGP1evdUdP3dSsYjEFnO2kXpNt6YouBLkAFo1K/ECqGw=
+	t=1741101551; cv=none; b=i5RIKuvfNlnesyDPTHiZ0UbMoGJhGhwXGqpqEcQ8by7JR5ZhRRqGytPClxcCqgN4h0Gy7Aw95jUfpxoVuzPh4IbtTYW41jyNVmXWZjENfhRXIjTuzPqc359iDBnPmQcAlXORWtk/wEXstf2nOCMlBA2jKGLhKrpmWk7O1LIsNw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741101067; c=relaxed/simple;
-	bh=Hs3V4ubHAzDfljGxE34608dwdKKF1J7BMBFRN7k5x9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fyvB9OuOQOv+9E1KdyM6WOGMehQ+J+4Z7T1Ievsdo697v00EKKKKsNXi87AFPDLOIlnrxp3hpcqHX9aGLFOrWFTpJ7jdds27fAh++OIQW5Mjpf4s8QSk2PeW0cFDmqv5cWzjC5Qs48BiXq4QORWnx4sXBY62nyaNZTPSiK5o8SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FtdXr/sb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9OuXOL5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FtdXr/sb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9OuXOL5; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1741101551; c=relaxed/simple;
+	bh=vQbdjZrJpjsCl+2pVYlRRnWPloVNShO3ONnJfjjbwX4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UOUsdzkP6KndCuNSgfcfct+4/PG4qlXaJixI+QTXfVNIfb6HM2EHkS0HDDSTrs8nLiR3uSxS+wH4MtXttLT/3nP9yxKbmS2tlQ52kZpJfaUYlpi9cMS3A+PFCSUXMheUVn50ZkFVsps4JeYCGk2yPuLd86CtQOfP4ZagySF7kYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IE4+eHEf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FtdXr/sb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9OuXOL5";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FtdXr/sb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9OuXOL5"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IE4+eHEf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741101548;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ec3jGzmetFrZi6YSAy0SYh1KEddMNSpPR3trZ7+JZUg=;
+	b=IE4+eHEfeX0rT8IkXkROgaOETjiWPek+fWJcipCWeWTGANPAT/rCHKZyMYRsVDPIADb8qT
+	0jZIVHGx0DIUZI54NxEeG38JHnVimZCX9BPLMPNZPaXeiZbuuIzIKHKJDv5AHEMisJXoRL
+	rSywVmPAwEt+gL7myaPFzAwkHpI1PFA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-209-eYhyKKdiMIGzFzm1wP_LBQ-1; Tue,
+ 04 Mar 2025 10:19:06 -0500
+X-MC-Unique: eYhyKKdiMIGzFzm1wP_LBQ-1
+X-Mimecast-MFC-AGG-ID: eYhyKKdiMIGzFzm1wP_LBQ_1741101545
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 46F5C1F745;
-	Tue,  4 Mar 2025 15:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741101062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
-	b=FtdXr/sbgTevIT7kLTiK2NqosX3i1oi7WsvBkLuBm9F4T0zoBRDP1oaV8SQQYN8ocOD0MJ
-	FA5Dpuzm2GR0/ZCpoOfivGWieCOmC3FDj6ZXSx6s2SBLzlHvPdB5WcA2s4m5jD0qAfwrA6
-	dCLLgQ0DAlPOuhAH1fx/RpnEP9cRWUg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741101062;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
-	b=O9OuXOL506gxbwAPJXlyJuzp3cqCXrhd2a580OA85f0RTsUnzcmJXek/pOnMGjpsQfz8Ha
-	0OJ9qlGJh6wOnQAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741101062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
-	b=FtdXr/sbgTevIT7kLTiK2NqosX3i1oi7WsvBkLuBm9F4T0zoBRDP1oaV8SQQYN8ocOD0MJ
-	FA5Dpuzm2GR0/ZCpoOfivGWieCOmC3FDj6ZXSx6s2SBLzlHvPdB5WcA2s4m5jD0qAfwrA6
-	dCLLgQ0DAlPOuhAH1fx/RpnEP9cRWUg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741101062;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
-	b=O9OuXOL506gxbwAPJXlyJuzp3cqCXrhd2a580OA85f0RTsUnzcmJXek/pOnMGjpsQfz8Ha
-	0OJ9qlGJh6wOnQAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 269B313967;
-	Tue,  4 Mar 2025 15:11:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id T8QBCQYYx2c8PwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 04 Mar 2025 15:11:02 +0000
-Message-ID: <24870f73-97f9-496d-a1ca-787b54c222e4@suse.de>
-Date: Tue, 4 Mar 2025 16:11:01 +0100
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B6B41944D03;
+	Tue,  4 Mar 2025 15:19:05 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.29])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E5AFE180087D;
+	Tue,  4 Mar 2025 15:19:03 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>
+Subject: [PATCH V2] tests/throtl: add a new test 006
+Date: Tue,  4 Mar 2025 23:18:58 +0800
+Message-ID: <20250304151858.3795301-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-To: Vlastimil Babka <vbabka@suse.cz>, Hannes Reinecke <hare@suse.com>,
- Matthew Wilcox <willy@infradead.org>, Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
- <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
- <Z8W8OtJYFzr9OQac@casper.infradead.org>
- <Z8W_1l7lCFqMiwXV@casper.infradead.org>
- <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
- <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[suse.cz,suse.com,infradead.org,nvidia.com,gmail.com,kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
-X-Spam-Score: -2.80
-X-Spam-Flag: NO
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 3/4/25 11:26, Vlastimil Babka wrote:
-> On 3/4/25 11:20, Hannes Reinecke wrote:
+Add test for covering prioritized meta IO when throttling, regression
+test for commit 29390bb5661d ("blk-throttle: support prioritized processing
+of metadata").
 
-[ .. ]
->> So I'd be happy with an 'easy' fix for now. Obviously :-)
->>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- add ext4 jbd2 task into the cgroup(Kuai)
+	- use 4M size IO(Kuai)
 
-With this patch:
+ tests/throtl/006     | 62 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/006.out |  4 +++
+ tests/throtl/rc      | 19 ++++++++++++++
+ 3 files changed, 85 insertions(+)
+ create mode 100755 tests/throtl/006
+ create mode 100644 tests/throtl/006.out
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 65f550cb5081..b035a9928cdd 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1190,8 +1190,14 @@ static ssize_t __iov_iter_get_pages_alloc(struct 
-iov_iter *i,
-                 if (!n)
-                         return -ENOMEM;
-                 p = *pages;
--               for (int k = 0; k < n; k++)
--                       get_page(p[k] = page + k);
-+               for (int k = 0; k < n; k++) {
-+                       if (!get_page_unless_zero(p[k] = page + k)) {
-+                               pr_warn("%s: frozen page %d of %d\n",
-+                                       __func__, k, n);
-+                               return -ENOMEM;
-+                       }
-+               }
+diff --git a/tests/throtl/006 b/tests/throtl/006
+new file mode 100755
+index 0000000..23b30dc
+--- /dev/null
++++ b/tests/throtl/006
+@@ -0,0 +1,62 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Ming Lei
++#
++# Test prioritized meta IO when IO throttling, regression test for
++# commit 29390bb5661d ("blk-throttle: support prioritized processing of metadata")
 +
-                 maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
-                 i->count -= maxsize;
-                 i->iov_offset += maxsize;
-
-
-the system doesn't crash anymore:
-[   51.520949] __iov_iter_get_pages_alloc: frozen page 0 of 1
-[   51.536393] nvme nvme0: creating 4 I/O queues.
-[   51.968897] nvme nvme0: mapped 4/0/0 default/read/poll queues.
-[   51.972207] __iov_iter_get_pages_alloc: frozen page 0 of 1
-[   51.974528] __iov_iter_get_pages_alloc: frozen page 0 of 1
-[   51.976928] __iov_iter_get_pages_alloc: frozen page 0 of 1
-[   51.978980] __iov_iter_get_pages_alloc: frozen page 0 of 1
-[   51.981236] nvme nvme0: new ctrl: NQN "nqn.blktests-subsystem-1", 
-addr 10.161.9.19:4420, hostnqn: 
-nqn.2014-08.org.nvmexpress:uuid:027a49dc-b554-40e5-b0f9-0a9ea03ec30c
-
-and the allocation in question is coming from
-drivers/nvme/host/fabrics.c:nvmf_connect_data_prep(), which
-coincidentally _is_ a kmalloc()ed buffer.
-
-But TLS doesn't work, either:
-
-[   58.886754] nvme nvme0: I/O tag 1 (3001) type 4 opcode 0x18 (Keep 
-Alive) QID 0 timeout
-[   58.889112] nvme nvme0: starting error recovery
-[   58.892176] nvme nvme0: failed nvme_keep_alive_end_io error=10
-[   58.892282] nvme nvme0: reading non-mdts-limits failed: -4
-[   58.902490] nvme nvme0: Reconnecting in 10 seconds...
-
-(probably not surprising seeing that an error is returned ..)
-
-So yeah, looks like TLS has issues with kmalloced data.
-
-Cheers,
-
-Hannes
++. tests/throtl/rc
++
++DESCRIPTION="test if meta IO has higher priority than data IO"
++QUICK=1
++
++requires() {
++	_have_program mkfs.ext4
++}
++
++test_meta_io() {
++	local path="$1"
++	local start_time
++	local end_time
++	local elapsed
++
++	start_time=$(date +%s.%N)
++	mkdir "${path}"/xxx
++	touch "${path}"/xxx/1
++	sync "${path}"/xxx
++
++	end_time=$(date +%s.%N)
++	elapsed=$(echo "$end_time - $start_time" | bc)
++	printf "%.0f\n" "$elapsed"
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _set_up_throtl memory_backed=1; then
++		return 1;
++	fi
++
++	mkdir -p "${TMPDIR}/mnt"
++	mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 -F "/dev/${THROTL_DEV}" >> "$FULL" 2>&1
++	mount "/dev/${THROTL_DEV}" "${TMPDIR}/mnt" >> "$FULL" 2>&1
++
++	_throtl_set_limits wbps=$((1024 * 1024))
++	{
++		local jbd2_pid
++
++		jbd2_pid=$(ps -eo pid,comm | pgrep -f "jbd2/${THROTL_DEV}" | awk '{print $1}')
++		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
++		echo "$jbd2_pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
++		_throtl_issue_fs_io  "${TMPDIR}/mnt/test.img" write 4M 1 &
++		sleep 2
++		test_meta_io "${TMPDIR}/mnt"
++		wait
++	} &
++	wait $!
++
++	umount "${TMPDIR}/mnt" || return $?
++	_throtl_remove_limits
++	_clean_up_throtl
++	echo "Test complete"
++}
+diff --git a/tests/throtl/006.out b/tests/throtl/006.out
+new file mode 100644
+index 0000000..8c3d176
+--- /dev/null
++++ b/tests/throtl/006.out
+@@ -0,0 +1,4 @@
++Running throtl/006
++0
++4
++Test complete
+diff --git a/tests/throtl/rc b/tests/throtl/rc
+index df54cb9..327084b 100644
+--- a/tests/throtl/rc
++++ b/tests/throtl/rc
+@@ -75,6 +75,25 @@ _throtl_get_max_io_size() {
+ 	cat "/sys/block/$THROTL_DEV/queue/max_sectors_kb"
+ }
+ 
++_throtl_issue_fs_io() {
++	local path=$1
++	local start_time
++	local end_time
++	local elapsed
++
++	start_time=$(date +%s.%N)
++
++	if [ "$2" == "read" ]; then
++		dd if="${path}" of=/dev/null bs="$3" count="$4" iflag=direct status=none
++	elif [ "$2" == "write" ]; then
++		dd of="${path}" if=/dev/zero bs="$3" count="$4" oflag=direct conv=fdatasync status=none
++	fi
++
++	end_time=$(date +%s.%N)
++	elapsed=$(echo "$end_time - $start_time" | bc)
++	printf "%.0f\n" "$elapsed"
++}
++
+ _throtl_issue_io() {
+ 	local start_time
+ 	local end_time
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.47.1
+
