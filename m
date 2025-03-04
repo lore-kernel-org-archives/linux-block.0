@@ -1,332 +1,221 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578EF1FC0EA
-	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 08:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5301F790C
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 09:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741076322; cv=none; b=e9O5YjaQfk2zJt24Q87pm+vGqjLPzvQN7FHZcYJRpqsAlUSayGE6W2l5f97P6mVGlQd6qDv89/dOcxUDplzZaaulswqohli/0oeatyu+IEbtcYpwnQvlyJWg/hJA6y9d21U5PfVTmV3FCGQU4EGFGi21PlIq7aYGZg5jET13TPQ=
+	t=1741079278; cv=none; b=Q4Kp+J8eIx0FRrhJ+ZHX8clSKJYu6ge+2Xp97ZBTInkCuo78ZLSTeL9cjk3HaAkx5+HrYO5cBLTy7+6W9Xv5YoFAb9l+HE8scISUB2Nuh9HhfEAIW1CCXd3f7DxEygLSODenLU0maFcwrlDAmS8CO4J7F8YLKRirK0FF9COtSxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741076322; c=relaxed/simple;
-	bh=db7AYAp07HQot8ucccE3wgbky8FW8vI9wSfFD7RfLOo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O83VlKW7exw1dNezRKflm0bpHsESEiKsHklqlJvuCikoivjxhC5S1wk7oiVhF6OS1a2I5MYK36Bihqy2DF2ZJp4N9wE48NF/Ar/fRSx0ChVy0uVaKY5rZXutqlfibF+E+rF1RvRfn/bx3sWYl9zCGnVIqOwgGX+tKbTumOU5zEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j5SEd4ra; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=oz69JD+G; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j5SEd4ra; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=oz69JD+G; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1741079278; c=relaxed/simple;
+	bh=HlRuJsObdmTIXLy2gntSExiNIMT953QBK+Wk2BF7v2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=Pwfk9t1pQATa3fBR0S+fR0yzzeQNDISAlAQsFTp4ysRZdSjtai0+FqG3UWvDBCp/gIXVWVJ0u5VuRbWVoGXsGxtC7kby4liMfPusCHyDuQkhl8Wqpg+/lrYd4vMqwAIjzxRwfioweXelsavjR21WRz1vh/RstH/vh4ds0N84VPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=j6JYOB95; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j5SEd4ra";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="oz69JD+G";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j5SEd4ra";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="oz69JD+G"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 193B72116B;
-	Tue,  4 Mar 2025 08:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741076318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3b8vitvq6jlDF6ZqmJgXp/e3fWYiv+UPwkqJVrD107g=;
-	b=j5SEd4raIuD+ElZhECvDRCvOtCIxMiOy83EWHYpwOCg9AqM/Zu0RuDVx8tMH6LHmdzMKPX
-	HXc3BI12JmjTpuZkh8Lsa8FqqCDkN4DwB9QztgTe2jJcENlIrjDq8M3gm7/K9Ne24GkCaf
-	CQETAwM5c35Yz7raUdXdqQs5bAVVIUo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741076318;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3b8vitvq6jlDF6ZqmJgXp/e3fWYiv+UPwkqJVrD107g=;
-	b=oz69JD+G0/TD1AOXlXe/C587hkBkJ1LQZVdxwmWZBqYKyFMnXDvcCA761VZwVfldZ3FCJz
-	Z9IMO2g6xUEWrXDg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=j5SEd4ra;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=oz69JD+G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741076318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3b8vitvq6jlDF6ZqmJgXp/e3fWYiv+UPwkqJVrD107g=;
-	b=j5SEd4raIuD+ElZhECvDRCvOtCIxMiOy83EWHYpwOCg9AqM/Zu0RuDVx8tMH6LHmdzMKPX
-	HXc3BI12JmjTpuZkh8Lsa8FqqCDkN4DwB9QztgTe2jJcENlIrjDq8M3gm7/K9Ne24GkCaf
-	CQETAwM5c35Yz7raUdXdqQs5bAVVIUo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741076318;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3b8vitvq6jlDF6ZqmJgXp/e3fWYiv+UPwkqJVrD107g=;
-	b=oz69JD+G0/TD1AOXlXe/C587hkBkJ1LQZVdxwmWZBqYKyFMnXDvcCA761VZwVfldZ3FCJz
-	Z9IMO2g6xUEWrXDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 048931393C;
-	Tue,  4 Mar 2025 08:18:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id raidAF63xme/NQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Tue, 04 Mar 2025 08:18:38 +0000
-Message-ID: <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
-Date: Tue, 4 Mar 2025 09:18:37 +0100
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="j6JYOB95"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250304090749epoutp04175b05f7acb8ef9c71cec88ead0037a9~pjl7pqxfI1202712027epoutp04D
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 09:07:49 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250304090749epoutp04175b05f7acb8ef9c71cec88ead0037a9~pjl7pqxfI1202712027epoutp04D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1741079269;
+	bh=lYUkzFUtjAJu2r8Sfk/2FkWYl0bsmp8WMCZ3jAWLAa0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j6JYOB95C/pmvw7Lmp7RFuqvzaptCW8a9/e/eh1cjwACWwUFTUh8zJNeGiCj+aRcd
+	 M1UbDAX8qxxoB5BOsso+b0OQ70SCbcEJdVcUPdDG1o0hPcv0PErw3TIKXq6blTtSYf
+	 fJrAtzO4jqV9+/FiLqIHH+a03F04FgS8QvvpCzZw=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250304090748epcas5p4eb357b126b85673c8abd3224e4e5ccc0~pjl7QfCAo2922629226epcas5p4A;
+	Tue,  4 Mar 2025 09:07:48 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4Z6VFZ34t7z4x9Q3; Tue,  4 Mar
+	2025 09:07:46 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A7.0B.19956.2E2C6C76; Tue,  4 Mar 2025 18:07:46 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250304085652epcas5p27939cc1666c3c792c972ce357031cd52~pjcXyiPfK2121921219epcas5p2U;
+	Tue,  4 Mar 2025 08:56:52 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250304085652epsmtrp12bc988aa8f22d49630f449dfb733c945~pjcXxza2n0410804108epsmtrp1a;
+	Tue,  4 Mar 2025 08:56:52 +0000 (GMT)
+X-AuditID: b6c32a4b-fd1f170000004df4-08-67c6c2e22fbe
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	5B.AB.18949.450C6C76; Tue,  4 Mar 2025 17:56:52 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250304085650epsmtip1023e35fb0295564b7ea289ac153165d0~pjcWV0cRw0129801298epsmtip1N;
+	Tue,  4 Mar 2025 08:56:50 +0000 (GMT)
+Date: Tue, 4 Mar 2025 14:18:33 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, anuj1072538@gmail.com,
+	nikh1092@linux.ibm.com, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	dm-devel@lists.linux.dev, M Nikhil <nikhilm@linux.ibm.com>
+Subject: Re: [PATCH v2 1/2] block: ensure correct integrity capability
+ propagation in stacked devices
+Message-ID: <20250304084833.GA29801@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-To: Hannes Reinecke <hare@suse.de>, Matthew Wilcox <willy@infradead.org>,
- Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>
-References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
- <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
- <Z8W8OtJYFzr9OQac@casper.infradead.org>
- <Z8W_1l7lCFqMiwXV@casper.infradead.org>
- <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
- <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
-From: Vlastimil Babka <vbabka@suse.cz>
-Content-Language: en-US
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 193B72116B
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+In-Reply-To: <20250303141236.GB16268@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBJsWRmVeSWpSXmKPExsWy7bCmhu6jQ8fSDV5sFLL4+PU3i8Xqu/1s
+	FgsWzWWxWLn6KJPF3lvaFvOXPWW36L6+g81i+fF/TBZ3Lz5lttjZfozRgctj56y77B6Xz5Z6
+	TFh0gNFj85J6jxebZzJ67L7ZwObx8ektFo/Pm+QCOKKybTJSE1NSixRS85LzUzLz0m2VvIPj
+	neNNzQwMdQ0tLcyVFPISc1NtlVx8AnTdMnOALlRSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX
+	2CqlFqTkFJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGfs23uCqaBJuuL+9z72BsZusS5GTg4J
+	AROJky/esnUxcnEICexmlPh75hYjSEJI4BOjRNN2CYjEN0aJ+//PsMF07DwxhwkisZdRomNS
+	AzOE84xRYuuNBUwgVSwCKhJn3xxgB7HZBNQljjxvBRsrIqAk8fTVWUaQBmaBn4wSy+69ZgVJ
+	CAukS7z9fhTM5hXQlZh/ZAkLhC0ocXLmEzCbU0BHYv3paWA1ogLKEge2HQc7Q0JgKYfEg09n
+	2SHuc5F4PbGLFcIWlnh1fAtUXEriZX8blJ0u8ePyUyYIu0Ci+dg+RgjbXqL1VD8ziM0skCGx
+	/V83M0RcVmLqqXVMEHE+id7fT6B6eSV2zIOxlSTaV86BsiUk9p5rgLI9JJ7MOsUCCaLbjBIv
+	HvYwTWCUn4XkuVlI9kHYOhILdn9im8XIAWRLSyz/xwFhakqs36W/gJF1FaNkakFxbnpqsWmB
+	cV5qOTzKk/NzNzGCk7CW9w7GRw8+6B1iZOJgPMQowcGsJML7+cCxdCHelMTKqtSi/Pii0pzU
+	4kOMpsDYmsgsJZqcD8wDeSXxhiaWBiZmZmYmlsZmhkrivM07W9KFBNITS1KzU1MLUotg+pg4
+	OKUamBbz5Mf/OMi9VvfrPFU35f8rnctnWxs/7m+5ypp8v/Tpiu9/eZbwdgTly8nFpunXHp/U
+	91p3j5+fzmUfXsYPoucvmIryznk9ud/thQnjQ2GDqyUHc450HHSr6lqjLTXrd3PNM5aX1dnH
+	3319cs+o0re7Sb8mWnLBka+2fvkHdPY890qW6ZJfFa+2rKLTIrj4drL0I4ejOoWMHpF9RW9O
+	PkzIN13hIJF8ZYUNg1DQlTTPfp9G70WfklfqvjG1sv685op00L1p8psO/HMW2V6dGDelS2tt
+	t+/shQLH7mqI2zkdKo173LI8bFH6FAezqtvFyXWxTcGbVm5tSjBTXH82yTao5JD3EcWV7r8L
+	H8xRYinOSDTUYi4qTgQAsFzcp0sEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBLMWRmVeSWpSXmKPExsWy7bCSnG7IgWPpBr9+cll8/PqbxWL13X42
+	iwWL5rJYrFx9lMli7y1ti/nLnrJbdF/fwWax/Pg/Jou7F58yW+xsP8bowOWxc9Zddo/LZ0s9
+	Jiw6wOixeUm9x4vNMxk9dt9sYPP4+PQWi8fnTXIBHFFcNimpOZllqUX6dglcGX/nHmMrOCRR
+	MXtPYAPjE+EuRk4OCQETiZ0n5jB1MXJxCAnsZpRY/+05E0RCQuLUy2WMELawxMp/z9khip4w
+	Svy6vA8swSKgInH2zQF2EJtNQF3iyPNWsLiIgJLE01dnGUEamAV+Mkosu/eaFSQhLJAu8fb7
+	UTCbV0BXYv6RJSwgtpDAXUaJLzNzIOKCEidnPgGLMwtoSdz49xLoIg4gW1pi+T8OkDCngI7E
+	+tPTwMaICihLHNh2nGkCo+AsJN2zkHTPQuhewMi8ilEytaA4Nz232LDAKC+1XK84Mbe4NC9d
+	Lzk/dxMjOHK0tHYw7ln1Qe8QIxMH4yFGCQ5mJRHeW+1H04V4UxIrq1KL8uOLSnNSiw8xSnOw
+	KInzfnvdmyIkkJ5YkpqdmlqQWgSTZeLglGpg4hXTvTK7rqtX5fyrfwJuurnreo2N6/5UsAkF
+	lpjziltcYShaMuFXYfm/qyudFKqj2na8Kkk4O3vGOfcg/W/7Hc/9+bXbPVam+wdL5IX33IlM
+	K9i95ob3/mtOPqoUcezgdaHdn7qZCmaF18Xfs9tSY/fR5/+kzHY+vVqh3pI0dgHzv5wLxEVP
+	vZJjVtaJ/LT4UmnLtucbLsYVxmfMNQ1hT/vxtzhl1waZ6voAxw1HDmsduuQ04cnh+Pioddvb
+	7r1QOrsveevm5RPTY//zLpQKDN0+KydYjfucYbl8TrLjwsOMU+a7ekw+bvw99PLOrekfot3V
+	LNmf2myb/Sf5XVPhwyfqkevyHuslHDix78EsJZbijERDLeai4kQAaye1TAsDAAA=
+X-CMS-MailID: 20250304085652epcas5p27939cc1666c3c792c972ce357031cd52
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_a01c4_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250226112857epcas5p1654e62b5fff4551926622f19269c6ff4
+References: <20250226112035.2571-1-anuj20.g@samsung.com>
+	<CGME20250226112857epcas5p1654e62b5fff4551926622f19269c6ff4@epcas5p1.samsung.com>
+	<20250226112035.2571-2-anuj20.g@samsung.com> <20250303141236.GB16268@lst.de>
 
-On 3/4/25 08:58, Hannes Reinecke wrote:
-> On 3/3/25 23:02, Vlastimil Babka wrote:
->> On 3/3/25 17:15, Vlastimil Babka wrote:
->>> On 3/3/25 16:48, Matthew Wilcox wrote:
->>>> You need to turn on the debugging options Vlastimil mentioned and try to
->>>> figure out what nvme is doing wrong.
->>>
->>> Agree, looks like some error path going wrong?
->>> Since there seems to be actual non-large kmalloc usage involved, another
->>> debug parameter that could help: CONFIG_SLUB_DEBUG=y, and boot with
->>> "slab_debug=FZPU,kmalloc-*"
->> 
->> Also make sure you have CONFIG_DEBUG_VM please.
->> 
-> Here you go:
+------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_a01c4_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+
+On Mon, Mar 03, 2025 at 03:12:36PM +0100, Christoph Hellwig wrote:
+> On Wed, Feb 26, 2025 at 04:50:34PM +0530, Anuj Gupta wrote:
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index c44dadc35e1e..8bd0d0f1479c 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -861,7 +861,8 @@ bool queue_limits_stack_integrity(struct queue_limits *t,
+> >  
+> >  	if (!ti->tuple_size) {
+> >  		/* inherit the settings from the first underlying device */
+> > -		if (!(ti->flags & BLK_INTEGRITY_STACKED)) {
+> > +		if (!(ti->flags & BLK_INTEGRITY_STACKED) &&
+> > +		    (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)) {
+> >  			ti->flags = BLK_INTEGRITY_DEVICE_CAPABLE |
+> >  				(bi->flags & BLK_INTEGRITY_REF_TAG);
+> >  			ti->csum_type = bi->csum_type;
 > 
-> [  134.506802] page: refcount:0 mapcount:0 mapping:0000000000000000 
-> index:0x0 pfn:0x101ef8
-> [  134.509253] head: order:3 mapcount:0 entire_mapcount:0 
-> nr_pages_mapped:0 pincount:0
-> [  134.511594] flags: 
-> 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
-> [  134.513556] page_type: f5(slab)
-> [  134.513563] raw: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810 
-> ffff8881000402f0
-> [  134.513568] raw: 0000000000000000 00000000000a000a 00000000f5000000 
-> 0000000000000000
-> [  134.513572] head: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810 
-> ffff8881000402f0
-> [  134.513575] head: 0000000000000000 00000000000a000a 00000000f5000000 
-> 0000000000000000
-> [  134.513579] head: 0017ffffc0000003 ffffea000407be01 ffffffffffffffff 
-> 0000000000000000
-> [  134.513583] head: 0000000000000008 0000000000000000 00000000ffffffff 
-> 0000000000000000
-> [  134.513585] page dumped because: VM_BUG_ON_FOLIO(((unsigned int) 
-> folio_ref_count(folio) + 127u <= 127u))
-> [  134.513615] ------------[ cut here ]------------
-> [  134.529822] kernel BUG at ./include/linux/mm.h:1455!
+> As mentioned last round this still does the wrong thing if the first
+> device(s) is/are not PI-capable but the next one(s) is/are.  Please
+> look into the pseudocode I posted in reply to the previous iteration
+> on how to fix it.
 
-Yeah, just as I suspected, folio_get() says the refcount is 0.
+Christoph,
+Right, based on your comment modified this patch.
+Does this look ok?
 
-> [  134.529835] Oops: invalid opcode: 0000 [#1] PREEMPT SMP 
-> DEBUG_PAGEALLOC NOPTI
-> [  134.529843] CPU: 0 UID: 0 PID: 274 Comm: kworker/0:1H Kdump: loaded 
-> Tainted: G            E      6.14.0-rc4-default+ #309 
-> 03b131f1ef70944969b40df9d90a283ed638556f
-> [  134.536577] Tainted: [E]=UNSIGNED_MODULE
-> [  134.536580] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
-> 0.0.0 02/06/2015
-> [  134.536583] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
-> [  134.536595] RIP: 0010:__iov_iter_get_pages_alloc+0x676/0x710
-> [  134.542810] Code: e8 4c 39 e0 49 0f 47 c4 48 01 45 08 48 29 45 18 e9 
-> 90 fa ff ff 48 83 ef 01 e9 7f fe ff ff 48 c7 c6 40 57 4f 82 e8 6a e2 ce 
-> ff <0f> 0b e8 43 b8 b1 ff eb c5 f7 c1 ff 0f 00 00 48 89 cf 0f 85 4f ff
-> [  134.542816] RSP: 0018:ffffc900004579d8 EFLAGS: 00010282
-> [  134.542821] RAX: 000000000000005c RBX: ffffc90000457a90 RCX: 
-> 0000000000000027
-> [  134.542825] RDX: 0000000000000000 RSI: 0000000000000002 RDI: 
-> ffff88817f423748
-> [  134.542828] RBP: ffffc90000457d60 R08: 0000000000000000 R09: 
-> 0000000000000001
-> [  134.554485] R10: ffffc900004579c0 R11: ffffc90000457720 R12: 
-> 0000000000000000
-> [  134.554488] R13: ffffea000407be40 R14: ffffc90000457a70 R15: 
-> ffffc90000457d60
-> [  134.554495] FS:  0000000000000000(0000) GS:ffff88817f400000(0000) 
-> knlGS:0000000000000000
-> [  134.554499] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  134.554502] CR2: 0000556b0675b600 CR3: 0000000106bd8000 CR4: 
-> 0000000000350ef0
-> [  134.554509] Call Trace:
-> [  134.554512]  <TASK>
-> [  134.554516]  ? __die_body+0x1a/0x60
-> [  134.554525]  ? die+0x38/0x60
-> [  134.554531]  ? do_trap+0x10f/0x120
-> [  134.554538]  ? __iov_iter_get_pages_alloc+0x676/0x710
-> [  134.568839]  ? do_error_trap+0x64/0xa0
-> [  134.568847]  ? __iov_iter_get_pages_alloc+0x676/0x710
-> [  134.568855]  ? exc_invalid_op+0x53/0x60
-> [  134.572489]  ? __iov_iter_get_pages_alloc+0x676/0x710
-> [  134.572496]  ? asm_exc_invalid_op+0x16/0x20
-> [  134.572512]  ? __iov_iter_get_pages_alloc+0x676/0x710
-> [  134.576726]  ? __iov_iter_get_pages_alloc+0x676/0x710
-> [  134.576733]  ? srso_return_thunk+0x5/0x5f
-> [  134.576740]  ? ___slab_alloc+0x924/0xb60
-> [  134.580253]  ? mempool_alloc_noprof+0x41/0x190
-> [  134.580262]  ? tls_get_rec+0x3d/0x1b0 [tls 
-> 47f199c97f69357468c91efdbba24395e9dbfa77]
-> [  134.580282]  iov_iter_get_pages2+0x19/0x30
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index c44dadc35e1e..d0469a812734 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -859,36 +859,28 @@ bool queue_limits_stack_integrity(struct queue_limits *t,
+ 	if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY))
+ 		return true;
+ 
+-	if (!ti->tuple_size) {
+-		/* inherit the settings from the first underlying device */
+-		if (!(ti->flags & BLK_INTEGRITY_STACKED)) {
+-			ti->flags = BLK_INTEGRITY_DEVICE_CAPABLE |
+-				(bi->flags & BLK_INTEGRITY_REF_TAG);
+-			ti->csum_type = bi->csum_type;
+-			ti->tuple_size = bi->tuple_size;
+-			ti->pi_offset = bi->pi_offset;
+-			ti->interval_exp = bi->interval_exp;
+-			ti->tag_size = bi->tag_size;
+-			goto done;
+-		}
+-		if (!bi->tuple_size)
+-			goto done;
++	if (ti->flags & BLK_INTEGRITY_STACKED) {
++		if (ti->tuple_size != bi->tuple_size)
++			goto incompatible;
++		if (ti->interval_exp != bi->interval_exp)
++			goto incompatible;
++		if (ti->tag_size != bi->tag_size)
++			goto incompatible;
++		if (ti->csum_type != bi->csum_type)
++			goto incompatible;
++		if ((ti->flags & BLK_INTEGRITY_REF_TAG) !=
++		    (bi->flags & BLK_INTEGRITY_REF_TAG))
++			goto incompatible;
++	} else {
++		ti->flags = BLK_INTEGRITY_STACKED;
++		ti->flags |= (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE) |
++			     (bi->flags & BLK_INTEGRITY_REF_TAG);
++		ti->csum_type = bi->csum_type;
++		ti->tuple_size = bi->tuple_size;
++		ti->pi_offset = bi->pi_offset;
++		ti->interval_exp = bi->interval_exp;
++		ti->tag_size = bi->tag_size;
+ 	}
+-
+-	if (ti->tuple_size != bi->tuple_size)
+-		goto incompatible;
+-	if (ti->interval_exp != bi->interval_exp)
+-		goto incompatible;
+-	if (ti->tag_size != bi->tag_size)
+-		goto incompatible;
+-	if (ti->csum_type != bi->csum_type)
+-		goto incompatible;
+-	if ((ti->flags & BLK_INTEGRITY_REF_TAG) !=
+-	    (bi->flags & BLK_INTEGRITY_REF_TAG))
+-		goto incompatible;
+-
+-done:
+-	ti->flags |= BLK_INTEGRITY_STACKED;
+ 	return true;
+ 
+ incompatible:
+-- 
+2.25.1
 
-Presumably that's __iov_iter_get_pages_alloc() doing get_page() either in
-the " if (iov_iter_is_bvec(i)) " branch or via iter_folioq_get_pages()?
 
-Which doesn't work for a sub-size kmalloc() from a slab folio, which after
-the frozen refcount conversion no longer supports get_page().
 
-The question is if this is a mistake specific for this path that's easy to
-fix or there are more paths that do this. At the very least the pinning of
-page through a kmalloc() allocation from it is useless - the object itself
-has to be kfree()'d and that would never happen through a put_page()
-reaching zero.
+------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_a01c4_
+Content-Type: text/plain; charset="utf-8"
 
-> [  134.580289]  sk_msg_zerocopy_from_iter+0x85/0x1d0
-> [  134.580301]  ? srso_return_thunk+0x5/0x5f
-> [  134.586842]  ? srso_return_thunk+0x5/0x5f
-> [  134.586847]  ? __kmalloc_noprof+0x187/0x500
-> [  134.586854]  ? srso_return_thunk+0x5/0x5f
-> [  134.586859]  ? __sk_mem_raise_allocated+0x2ba/0x4a0
-> [  134.591697]  ? srso_return_thunk+0x5/0x5f
-> [  134.591703]  ? sk_page_frag_refill+0x19/0xb0
-> [  134.591708]  ? srso_return_thunk+0x5/0x5f
-> [  134.591712]  ? sk_msg_alloc+0x5a/0x2b0
-> [  134.591722]  tls_sw_sendmsg+0x6bf/0x9b0 [tls 
-> 47f199c97f69357468c91efdbba24395e9dbfa77]
-> [  134.598284]  __sock_sendmsg+0x98/0xc0
-> [  134.598293]  sock_sendmsg+0x5c/0xa0
-> [  134.600490]  ? srso_return_thunk+0x5/0x5f
-> [  134.600495]  ? __sock_sendmsg+0x98/0xc0
-> [  134.600500]  ? srso_return_thunk+0x5/0x5f
-> [  134.600504]  ? sock_sendmsg+0x5c/0xa0
-> [  134.600515]  nvme_tcp_try_send_data+0x13f/0x410 [nvme_tcp 
-> 71d3ffab2b48b41b11556946fd79065f8f8b0f42]
-> [  134.607125]  ? __dequeue_entity+0x401/0x470
-> [  134.607142]  nvme_tcp_try_send+0x299/0x330 [nvme_tcp 
-> 71d3ffab2b48b41b11556946fd79065f8f8b0f42]
-> [  134.607153]  nvme_tcp_io_work+0x37/0xb0 [nvme_tcp 
-> 71d3ffab2b48b41b11556946fd79065f8f8b0f42]
-> [  134.607162]  process_scheduled_works+0x97/0x400
-> [  134.613657]  ? __pfx_worker_thread+0x10/0x10
-> [  134.613663]  worker_thread+0x105/0x240
-> [  134.613669]  ? __pfx_worker_thread+0x10/0x10
-> [  134.613675]  kthread+0xec/0x200
-> [  134.618136]  ? __pfx_kthread+0x10/0x10
-> [  134.618144]  ret_from_fork+0x30/0x50
-> [  134.618151]  ? __pfx_kthread+0x10/0x10
-> [  134.618157]  ret_from_fork_asm+0x1a/0x30
-> [  134.622519]  </TASK>
-> [  134.622522] Modules linked in: tls(E) nvme_tcp(E) af_packet(E) 
-> iscsi_ibft(E) iscsi_boot_sysfs(E) xfs(E) nls_iso8859_1(E) nls_cp437(E) 
-> vfat(E) fat(E) iTCO_wdt(E) intel_rapl_msr(E) intel_pmc_bxt(E) 
-> intel_rapl_common(E) iTCO_vendor_support(E) bnxt_en(E) i2c_i801(E) 
-> i2c_mux(E) lpc_ich(E) i2c_smbus(E) joydev(E) mfd_core(E) 
-> virtio_balloon(E) button(E) nvme_fabrics(E) nvme_keyring(E) nvme_core(E) 
-> fuse(E) nvme_auth(E) efi_pstore(E) configfs(E) dmi_sysfs(E) ip_tables(E) 
-> x_tables(E) hid_generic(E) usbhid(E) qxl(E) ahci(E) drm_client_lib(E) 
-> libahci(E) drm_exec(E) xhci_pci(E) drm_ttm_helper(E) virtio_scsi(E) 
-> libata(E) ttm(E) xhci_hcd(E) sd_mod(E) scsi_dh_emc(E) drm_kms_helper(E) 
-> scsi_dh_rdac(E) ghash_clmulni_intel(E) scsi_dh_alua(E) sg(E) 
-> sha512_ssse3(E) sha256_ssse3(E) drm(E) usbcore(E) scsi_mod(E) 
-> sha1_ssse3(E) scsi_common(E) serio_raw(E) btrfs(E) blake2b_generic(E) 
-> xor(E) raid6_pq(E) efivarfs(E) qemu_fw_cfg(E) virtio_rng(E) 
-> aesni_intel(E) crypto_simd(E) cryptd(E)
-> 
-> Cheers,
-> 
-> Hannes
 
+------MTAFpDJBIS7x0DorxmyomC-IKR7RHdtq514vGN5lDcSFRf5o=_a01c4_--
