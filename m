@@ -1,54 +1,38 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB44D2980AA;
-	Tue,  4 Mar 2025 17:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54BB28152A;
+	Tue,  4 Mar 2025 17:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741108635; cv=none; b=ujBCBQ8ZeFtLQlt+loMuvqhfh0CqDN2PgGsKe9oe3Hl3uu2qJnfatz2V1fFv8RbKIaWvZumoTeJPn0UzulEX5rqAU2OBKppxg40T/ifenAnA+qjA9275U6Mbeg4zinBLB4kSZjWR50QWykfjCEdrNhpNBNLoJPeA2BZSlP3bBAQ=
+	t=1741109413; cv=none; b=UPjCx1bB01sPBB0UDhcnz31CdJ0APWCFnF7TjWtQbLrFoM9X8aSm0h0I2qTGZAw/DXspL0+YVNY4Dx1bEocRDsyClV2oj6W+/HqR9uGGilAcZ94OzJHrmzG07TgLPq1kcEa5SIHIWa2qqi1QiZjCVDLN7LuqMwHH6/RtHDvQmFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741108635; c=relaxed/simple;
-	bh=3j+Qz7hT1f8OqjlZi9V6ZuZnjswQjZpLuYZfWeHW7K0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/4yRG67kmhqTCvzfpmwGhglmLr36cdlkXDDrXnZ/G1zzwXzVz5cdh3IMr4V2aDXkzPpuZGlNqYZYsxlK0RDyChdnxDyFkhCLiTOhaRqzhgWkHag4mwpnmXIWQ/AAETwzhsvsNzZrmGLsUd1wWwykiWi4D3fMON2+kzp+9rZG9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JFrjF+sp; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JFrjF+sp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/Uoeevh/Cjq7NLA2NMtRTv1MiqPIpGJ85FyoLQLLraE=; b=JFrjF+spdHGmhMsTnV97EVwxcB
-	gjRe0ezJfT9DhgQSvu6I6A0PLsl1Or6kFvAcoqmV++vCFw8QSzX5HfwYf4BRNzlGzd8K7QhYvoguP
-	S3EV7klTjp15oLbLbgFQ+kMoTwBbDCt0FXmIJPAtI9TrYx2DKRiT5uFxyAo/ex95NPXiArHu1KkGJ
-	cT3EcJzKvfkr3mtqYCpWUtjNOUN/s2moR7tD1xvTZzHzHkr4I6sk8K1TSTdwH6NVKPoBMM4KJ27zV
-	h12RaE3NFg3pSkoYDJV4J3uk3K43b50EXrqTlvmOmcV6QBhoNYmm4NrWtHzBfdwBw2VpdgRnUH7a0
-	/YQfRolQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpVtH-00000005ahU-2jq2;
-	Tue, 04 Mar 2025 17:17:11 +0000
-Date: Tue, 4 Mar 2025 09:17:11 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Heinz Mauelshagen <heinzm@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z8c1l_MjG4youGNO@infradead.org>
-References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
- <Z8W1q6OYKIgnfauA@infradead.org>
- <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
- <Z8XlvU0o3C5hAAaM@infradead.org>
- <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
- <Z8cE_4KSKHe5-J3e@infradead.org>
- <CAM23Vxr=fKy-0L1R5P-5h6A95acKT_d=CC1E+TAzAs8v6q9gHw@mail.gmail.com>
- <Z8cki-inrku8QIhB@infradead.org>
- <CAM23VxqJX46DCpCiH5qxPpDLtMVg87Ba8sx55aQ4hvt-XaHzuQ@mail.gmail.com>
+	s=arc-20240116; t=1741109413; c=relaxed/simple;
+	bh=OdPmI4U5vFoGTHKzd0tRe7tG0OV3RaqOyfZhfElBWDE=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=sWQiePKRFNizOmYYVZfbuLZ7wGIgvG2n6hXeTpXmXn3bX+xTIiidB96gSHhDO3l0zMd46kEucss5Rk3ggxaI33j7EQdur7AQrVcoO9aFfv1UU4rzmDe+zUPS1HL+L/7bQ8VbTIJhHkjhHOdlAvnrSjLLM0k7nMHZR0BfPi8Drtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tpViZ-000000000mW-0i6s;
+	Tue, 04 Mar 2025 17:06:07 +0000
+Date: Tue, 4 Mar 2025 17:06:01 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jens Axboe <axboe@kernel.dk>, Daniel Golle <daniel@makrotopia.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Douglas Anderson <dianders@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Riyan Dhiman <riyandhiman14@gmail.com>,
+	Konstantin Khlebnikov <koct9i@gmail.com>,
+	Li Lingfeng <lilingfeng3@huawei.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] block: allow setting partition of_node
+Message-ID: <8cfbf225bcda906df0c89dd18ba07ecfa17123c2.1741107851.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,19 +41,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAM23VxqJX46DCpCiH5qxPpDLtMVg87Ba8sx55aQ4hvt-XaHzuQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 04, 2025 at 06:01:04PM +0100, Heinz Mauelshagen wrote:
-> > As Mikulas shared earlier:
->  > The Android people concluded that loop is too slow and rather than using
-> > loop they want to map a file using a table with dm-linear targets over the
-> > image of the host filesystem. So, they are already doing what dm-loop is
-> > doing.
+Allow partition parsers to set the Device Tree node for a partition by
+introducing of_put_partition() and extending struct parsed_partitions
+accordingly.
 
-Which again is completely handwavy.  What is the workload.  What are the
-issues with the workload?  Where is the time spent making it slower.
-e.g. the extent mapping code in this patch is a lot less efficient than
-the btree based extent lookup in XFS.  If it is faster it is not looking
-up the extents but something else, and you need to figure out what it
-is.
+As the partition information is preallocated independently of the actual
+number of partitions the additional pointer takes about 2 kiB of allocated
+memory which is worth avoiding in case CONFIG_OF is not set. This is
+achieved by only adding the corresponding field to the struct in case
+CONFIG_OF is set using #ifdef'ery.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ block/partitions/check.h | 16 +++++++++++++++-
+ block/partitions/core.c  | 14 +++++++++++---
+ 2 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/block/partitions/check.h b/block/partitions/check.h
+index e5c1c61eb3532..0b326086b1b61 100644
+--- a/block/partitions/check.h
++++ b/block/partitions/check.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #include <linux/pagemap.h>
+ #include <linux/blkdev.h>
++#include <linux/of.h>
+ #include "../blk.h"
+ 
+ /*
+@@ -16,6 +17,9 @@ struct parsed_partitions {
+ 		int flags;
+ 		bool has_info;
+ 		struct partition_meta_info info;
++#ifdef CONFIG_OF
++		struct device_node *np;
++#endif
+ 	} *parts;
+ 	int next;
+ 	int limit;
+@@ -34,18 +38,28 @@ static inline void put_dev_sector(Sector p)
+ }
+ 
+ static inline void
+-put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
++of_put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size,
++		 struct device_node *np)
+ {
+ 	if (n < p->limit) {
+ 		char tmp[1 + BDEVNAME_SIZE + 10 + 1];
+ 
+ 		p->parts[n].from = from;
+ 		p->parts[n].size = size;
++#ifdef CONFIG_OF
++		p->parts[n].np = np;
++#endif
+ 		snprintf(tmp, sizeof(tmp), " %s%d", p->name, n);
+ 		strlcat(p->pp_buf, tmp, PAGE_SIZE);
+ 	}
+ }
+ 
++static inline void
++put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
++{
++	of_put_partition(p, n, from, size, NULL);
++}
++
+ /* detection routines go here in alphabetical order: */
+ int adfspart_check_ADFS(struct parsed_partitions *state);
+ int adfspart_check_CUMANA(struct parsed_partitions *state);
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 815ed33caa1b8..70d1ad8e37b93 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -9,6 +9,7 @@
+ #include <linux/slab.h>
+ #include <linux/ctype.h>
+ #include <linux/vmalloc.h>
++#include <linux/device.h>
+ #include <linux/raid/detect.h>
+ #include "check.h"
+ 
+@@ -292,7 +293,8 @@ static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
+  */
+ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 				sector_t start, sector_t len, int flags,
+-				struct partition_meta_info *info)
++				struct partition_meta_info *info,
++				struct device_node *np)
+ {
+ 	dev_t devt = MKDEV(0, 0);
+ 	struct device *ddev = disk_to_dev(disk);
+@@ -341,6 +343,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 	pdev->class = &block_class;
+ 	pdev->type = &part_type;
+ 	pdev->parent = ddev;
++	device_set_node(pdev, of_fwnode_handle(np));
+ 
+ 	/* in consecutive minor range? */
+ 	if (bdev_partno(bdev) < disk->minors) {
+@@ -447,7 +450,7 @@ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
+ 	}
+ 
+ 	part = add_partition(disk, partno, start, length,
+-			ADDPART_FLAG_NONE, NULL);
++			ADDPART_FLAG_NONE, NULL, NULL);
+ 	ret = PTR_ERR_OR_ZERO(part);
+ out:
+ 	mutex_unlock(&disk->open_mutex);
+@@ -561,8 +564,13 @@ static bool blk_add_partition(struct gendisk *disk,
+ 		size = get_capacity(disk) - from;
+ 	}
+ 
++#ifdef CONFIG_OF
+ 	part = add_partition(disk, p, from, size, state->parts[p].flags,
+-			     &state->parts[p].info);
++			     &state->parts[p].info, state->parts[p].np);
++#else
++	part = add_partition(disk, p, from, size, state->parts[p].flags,
++			     &state->parts[p].info, NULL);
++#endif
+ 	if (IS_ERR(part)) {
+ 		if (PTR_ERR(part) != -ENXIO) {
+ 			printk(KERN_ERR " %s: p%d could not be added: %pe\n",
+-- 
+2.48.1
