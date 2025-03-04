@@ -1,168 +1,115 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54BB28152A;
-	Tue,  4 Mar 2025 17:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F227B2E337A
+	for <linux-block@vger.kernel.org>; Tue,  4 Mar 2025 17:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109413; cv=none; b=UPjCx1bB01sPBB0UDhcnz31CdJ0APWCFnF7TjWtQbLrFoM9X8aSm0h0I2qTGZAw/DXspL0+YVNY4Dx1bEocRDsyClV2oj6W+/HqR9uGGilAcZ94OzJHrmzG07TgLPq1kcEa5SIHIWa2qqi1QiZjCVDLN7LuqMwHH6/RtHDvQmFQ=
+	t=1741109619; cv=none; b=qIRo9gUFr/w4oqbIxfSOjqUCJqKDJ6tm5MQEsunEgr+4Txbw1XZ2Ohm8qoWeYgbvIL+uXnsfNftCmnwtsCiTvmB9v0hdyLjEEm2vabpsXlibB6rOu1/1FBSJHepBprAsv0V5Xwz+my0lbho0LQEBO0lgVlIS7+hltqERwE1jEJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109413; c=relaxed/simple;
-	bh=OdPmI4U5vFoGTHKzd0tRe7tG0OV3RaqOyfZhfElBWDE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=sWQiePKRFNizOmYYVZfbuLZ7wGIgvG2n6hXeTpXmXn3bX+xTIiidB96gSHhDO3l0zMd46kEucss5Rk3ggxaI33j7EQdur7AQrVcoO9aFfv1UU4rzmDe+zUPS1HL+L/7bQ8VbTIJhHkjhHOdlAvnrSjLLM0k7nMHZR0BfPi8Drtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tpViZ-000000000mW-0i6s;
-	Tue, 04 Mar 2025 17:06:07 +0000
-Date: Tue, 4 Mar 2025 17:06:01 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Jens Axboe <axboe@kernel.dk>, Daniel Golle <daniel@makrotopia.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Douglas Anderson <dianders@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Riyan Dhiman <riyandhiman14@gmail.com>,
-	Konstantin Khlebnikov <koct9i@gmail.com>,
-	Li Lingfeng <lilingfeng3@huawei.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] block: allow setting partition of_node
-Message-ID: <8cfbf225bcda906df0c89dd18ba07ecfa17123c2.1741107851.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1741109619; c=relaxed/simple;
+	bh=bNdSqKlXHjCnildLaWJjGpSWWKI5F2WeOXv0PLvCCFg=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tYmqfSRPuKtC7WSPZ+0qYCr0ODff4/O2+fNK3uhMqy746+UOR6FiaD04B2Fy73g451MErBp+ER5dxo8L56QeVplvwfBr6ByMeGYIW6DEv5WVa+FcSP1Wr4qQYlP3JkYbLQlYgvGlX+ytU/HJgt5a9bEEmNRkwU+UQ+tHQAVxxSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZOAKXg1m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZOAKXg1m"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741109616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u/gloNWENauCZr2RKyu+Q4jT9a16xZQ906Rg5zjtKlo=;
+	b=ZOAKXg1mkhrR4XBigBOjWG00CLcmYQt7qPOeOCMXVE4x5JbC+0lkf4e/coeesWZBVEFBwV
+	8fTOqkV+AcdoJ7fAQn4pM7zFsqbxL9WiLwzNpTkdcQGnOWeOctP8xNLHuX8xdBuqQrptQ0
+	sNsA3lSlvbGolgl2pdlzDDZfEOD3Tm0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-290-DDhvsmNpOJ-WJm_9K1rchA-1; Tue, 04 Mar 2025 12:33:36 -0500
+X-MC-Unique: DDhvsmNpOJ-WJm_9K1rchA-1
+X-Mimecast-MFC-AGG-ID: DDhvsmNpOJ-WJm_9K1rchA_1741109614
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c0b0cf53f3so1085097785a.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Mar 2025 09:33:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741109614; x=1741714414;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u/gloNWENauCZr2RKyu+Q4jT9a16xZQ906Rg5zjtKlo=;
+        b=w4ublXcTZaChm2FE4817x7FdOa1Di0qqFfE0z00KGsBU/2dys5+htJSlH2tC7CUgXY
+         Ut0LYEN5lW9SCokh783EDEDFCooMEEZIlqtXYwrYY7UJV27yruUUp8dMSPJu/Yvn/Ta9
+         raocqqGnIJrjyp5fZshtcWtfNeWY9wtom6uw/UsB6FBEvHUuYev96M9FQkczvUPEgR76
+         IyK+zDgfCPcyefuOc6r+85TASRDiUY8iauTOZ9lD8UqeTXQgG5QMrVZpz7Z1C25IlTd5
+         Sm44+izkRX4ESyIsST8Zm50MB+JhE7jLJ91WHhQetOoJTO9I8TssyHSdb9olmT9draQ9
+         MUvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVx14WQj+ZATxAaVzhVG37NGSOVnG4uODn8mMQbYPJ2cZSxzNw0KYY0a9a6ybp50ZvGCnOVyQv1JHib7g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywc4ZBGfYQV18V7wti2zD++IXpSDE7JFfYxCPQueM9Nc37USzXh
+	1mKrmH6e3qLQT+R43BnHnhuPW85p7KWDduX/xYB9GQ1EJjjsG4PPMD5c78qOOmYIE24uceINEc1
+	df5hFAXjrUS0n0FpJ/G3+M9MYg9YajewO+K86gb8ZfRozlZ8HIBk+UmjZVQ7q
+X-Gm-Gg: ASbGncsTLfVzuZ0kpY0qLbeZRptbGgk4hobDd4Mp1M545mR+Hn31gHeuNuHHuANSGu5
+	2ATcpU72R6WwMtZYV3itfHLqy0sdZ//L4m+hRRIyfhuVe1bn8ixzl/aKQe15I5SdNdrplAX+1tO
+	ZAvAu41T+Bwuk44WKjelVg6qD+NJmZ6vpnTlHMHmNpU+ED8YJmhdBE/WxU51AdmoSDd3Kek1Id5
+	Y/H0S7PKZwwiZ/iBJXGrgPHlTO8NsvJtJ2K6eV+sT64tUyeiu3NWXodqK6of3j3AZ2iUpaLJHXW
+	YxvFgQXMeBciLFFcuREv4lM1Mhe5JeBjBt1lQaIel6eVYCIx/ZyHNci7mGA=
+X-Received: by 2002:a05:620a:8908:b0:7c0:b523:e1b6 with SMTP id af79cd13be357-7c3d8e15ce7mr23061885a.11.1741109614504;
+        Tue, 04 Mar 2025 09:33:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEmWg+hzZenzZ4mRN1NfTFISPU5M4QS3jH+9tCASNEau0B50X9pJfy2Hegsf7Yzo9avT0yhxQ==
+X-Received: by 2002:a05:620a:8908:b0:7c0:b523:e1b6 with SMTP id af79cd13be357-7c3d8e15ce7mr23057985a.11.1741109614183;
+        Tue, 04 Mar 2025 09:33:34 -0800 (PST)
+Received: from ?IPV6:2601:188:c100:5710:627d:9ff:fe85:9ade? ([2601:188:c100:5710:627d:9ff:fe85:9ade])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c36fef4bbasm768017685a.40.2025.03.04.09.33.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 09:33:33 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <123839ed-f607-4374-800a-4411e87ef845@redhat.com>
+Date: Tue, 4 Mar 2025 12:33:32 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] cgroup/cpuset-v1: Add deprecation warnings to
+ sched_load_balance and memory_pressure_enabled
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Tejun Heo <tj@kernel.org>
+Cc: Waiman Long <llong@redhat.com>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>
+References: <20250304153801.597907-1-mkoutny@suse.com>
+ <20250304153801.597907-2-mkoutny@suse.com>
+ <8b8f0f99-6d42-4c6f-9c43-d0224bdedf9e@redhat.com>
+ <Z8cv2akQ_RY4uKQa@slm.duckdns.org>
+ <n2ygi7m53y5y4dx5tjxhqgzqtgs5sisdi27sk7x2xjngpxenod@7behfsvlzhxi>
+Content-Language: en-US
+In-Reply-To: <n2ygi7m53y5y4dx5tjxhqgzqtgs5sisdi27sk7x2xjngpxenod@7behfsvlzhxi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Allow partition parsers to set the Device Tree node for a partition by
-introducing of_put_partition() and extending struct parsed_partitions
-accordingly.
 
-As the partition information is preallocated independently of the actual
-number of partitions the additional pointer takes about 2 kiB of allocated
-memory which is worth avoiding in case CONFIG_OF is not set. This is
-achieved by only adding the corresponding field to the struct in case
-CONFIG_OF is set using #ifdef'ery.
+On 3/4/25 12:10 PM, Michal Koutný wrote:
+> On Tue, Mar 04, 2025 at 06:52:41AM -1000, Tejun Heo <tj@kernel.org> wrote:
+>> On Tue, Mar 04, 2025 at 11:19:00AM -0500, Waiman Long wrote:
+>> ...
+>>> I do have some concern with the use of pr_warn*() because some users may
+>>> attempt to use the panic_on_warn command line option.
+>> Yeah, let's print these as info.
+> The intention is _not_ to cause panic by any of this this.
+> Note the difference between WARN() and pr_warn() (only the former
+> panics).
+> Warn level has precedent in mm/memcontrol-v1.c already.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- block/partitions/check.h | 16 +++++++++++++++-
- block/partitions/core.c  | 14 +++++++++++---
- 2 files changed, 26 insertions(+), 4 deletions(-)
+I think you are right. The pr_warn() function should not cause a panic. 
+I have the misconception that pr_warn() will be affected by 
+panic_on_warn before. In that case, I have no objection to use pr_warn().
 
-diff --git a/block/partitions/check.h b/block/partitions/check.h
-index e5c1c61eb3532..0b326086b1b61 100644
---- a/block/partitions/check.h
-+++ b/block/partitions/check.h
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <linux/pagemap.h>
- #include <linux/blkdev.h>
-+#include <linux/of.h>
- #include "../blk.h"
- 
- /*
-@@ -16,6 +17,9 @@ struct parsed_partitions {
- 		int flags;
- 		bool has_info;
- 		struct partition_meta_info info;
-+#ifdef CONFIG_OF
-+		struct device_node *np;
-+#endif
- 	} *parts;
- 	int next;
- 	int limit;
-@@ -34,18 +38,28 @@ static inline void put_dev_sector(Sector p)
- }
- 
- static inline void
--put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
-+of_put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size,
-+		 struct device_node *np)
- {
- 	if (n < p->limit) {
- 		char tmp[1 + BDEVNAME_SIZE + 10 + 1];
- 
- 		p->parts[n].from = from;
- 		p->parts[n].size = size;
-+#ifdef CONFIG_OF
-+		p->parts[n].np = np;
-+#endif
- 		snprintf(tmp, sizeof(tmp), " %s%d", p->name, n);
- 		strlcat(p->pp_buf, tmp, PAGE_SIZE);
- 	}
- }
- 
-+static inline void
-+put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
-+{
-+	of_put_partition(p, n, from, size, NULL);
-+}
-+
- /* detection routines go here in alphabetical order: */
- int adfspart_check_ADFS(struct parsed_partitions *state);
- int adfspart_check_CUMANA(struct parsed_partitions *state);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 815ed33caa1b8..70d1ad8e37b93 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -9,6 +9,7 @@
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/vmalloc.h>
-+#include <linux/device.h>
- #include <linux/raid/detect.h>
- #include "check.h"
- 
-@@ -292,7 +293,8 @@ static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
-  */
- static struct block_device *add_partition(struct gendisk *disk, int partno,
- 				sector_t start, sector_t len, int flags,
--				struct partition_meta_info *info)
-+				struct partition_meta_info *info,
-+				struct device_node *np)
- {
- 	dev_t devt = MKDEV(0, 0);
- 	struct device *ddev = disk_to_dev(disk);
-@@ -341,6 +343,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 	pdev->class = &block_class;
- 	pdev->type = &part_type;
- 	pdev->parent = ddev;
-+	device_set_node(pdev, of_fwnode_handle(np));
- 
- 	/* in consecutive minor range? */
- 	if (bdev_partno(bdev) < disk->minors) {
-@@ -447,7 +450,7 @@ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
- 	}
- 
- 	part = add_partition(disk, partno, start, length,
--			ADDPART_FLAG_NONE, NULL);
-+			ADDPART_FLAG_NONE, NULL, NULL);
- 	ret = PTR_ERR_OR_ZERO(part);
- out:
- 	mutex_unlock(&disk->open_mutex);
-@@ -561,8 +564,13 @@ static bool blk_add_partition(struct gendisk *disk,
- 		size = get_capacity(disk) - from;
- 	}
- 
-+#ifdef CONFIG_OF
- 	part = add_partition(disk, p, from, size, state->parts[p].flags,
--			     &state->parts[p].info);
-+			     &state->parts[p].info, state->parts[p].np);
-+#else
-+	part = add_partition(disk, p, from, size, state->parts[p].flags,
-+			     &state->parts[p].info, NULL);
-+#endif
- 	if (IS_ERR(part)) {
- 		if (PTR_ERR(part) != -ENXIO) {
- 			printk(KERN_ERR " %s: p%d could not be added: %pe\n",
--- 
-2.48.1
+Thanks,
+Longman
+
