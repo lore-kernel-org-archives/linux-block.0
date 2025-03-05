@@ -1,32 +1,49 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5521E531;
-	Wed,  5 Mar 2025 13:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2F32746B;
+	Wed,  5 Mar 2025 14:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741182100; cv=none; b=SJB6tjvfsvdGBBlCYSppybUEvB92diCmIjclq5NTxyWs7MVeM4ILDVIFmR8Qn46434rIpOKk+FEKlObD/NhZsulBVwMP8V+Yk8zbeB9vxvUCfv7X26DOUSPqwzdRLqNU2b903Zo95BGcqClw478ZpwIdnjwfbsPS2SmzWKclBdw=
+	t=1741184156; cv=none; b=Z0TmMyc/dU6AcB2u8Frp54nroZv10l5L7qNzXR/ubSnjjL4w1fYeOEft6c1kfxVFhaWzXt+fUP3Yq2gUP2xtsjsdEowX8CxUWlhdK43pVQGRyUYCiqOTd/YJvor3zJX5wXtkSZM7GV8jq8ZKv1OWUBtF8GUdLy/I3ZEdxrbr5uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741182100; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1741184156; c=relaxed/simple;
+	bh=Jd0oFoBFCKY0hrFzbb92DWtvlLdcSoRBduiUG5Uiqks=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RKCSCXihYE8Ef1uBLJ9iye1TiYpFvm6x4b6ZOJPRZIfzd1RO6bJ2FbWhxgNm4EZveX5LOlkZjD7/SeVvp6kuyymujw35Nuwday60kZKZG6Q6OV4+jU3EWeWiF8Ap5vbzcEbAn+p6lszV+dYFxAoVJjyhnEvgnwBhxqsPrFNDBS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0283668AFE; Wed,  5 Mar 2025 14:32:18 +0100 (CET)
-Date: Wed, 5 Mar 2025 14:32:17 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	anuj1072538@gmail.com, nikh1092@linux.ibm.com,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: [PATCH v3 1/2] block: ensure correct integrity capability
- propagation in stacked devices
-Message-ID: <20250305133217.GA16755@lst.de>
-References: <20250305063033.1813-1-anuj20.g@samsung.com> <CGME20250305063902epcas5p25cc1df91006f1bb35ea782ec430b6d4b@epcas5p2.samsung.com> <20250305063033.1813-2-anuj20.g@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oaoT0aEAxvA+Wo/O6HSYSRbcwoKXbcMmNrR0z+uhmHXpBvFXA2LyDyh08HRC8ukmbuRmBrChj7PVUdehsBmD54zd0wgfHIgZkkSmKLzUjlB3X74OFcQ6zmKU4/iqkA5TFDKHqXSoiEMVsSFAvlNRy5UDdou6xIHK0QwzMRnsvU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ruv7Sxpk; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ruv7Sxpk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=EcLdV6q+VbbCZ2RH5VzC2yHi/7sMLvo0VgctfZO0l8I=; b=Ruv7SxpkDeNaqUBwXW3IRjSHE8
+	d5cHgB9CYPcPAEkpL2rtt/DnBnE94Y+4XjYe7W2v3mYKpLzL46PA1Xzetl1lkB+QClgCnwyiQH1DL
+	qMd6WuET3d3IdZVm0Ln9Id3asAlmZdvmmkOdZCvp7HsK4FICQ/o1FLqHv6+F1IMwcmgv4DR8n9UXG
+	kzxJDXkw/JcQkDgD+BMVEg/bkaAt9Jdi7C2FmjwmJRoElrGaUHIKePFY3oLzNIAM0JfDdNW3z5bCr
+	Qw5FA3+Dj+6/blmh4kjdNXlOlIAXI1BmQbOfvS77H4ImsvLJQKAAPR877iQpydmAA66e2pA040/Kl
+	2oRoqyYw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tppXH-00000005dx5-1koi;
+	Wed, 05 Mar 2025 14:15:47 +0000
+Date: Wed, 5 Mar 2025 14:15:47 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org, hare@suse.de,
+	david@fromorbit.com, kbusch@kernel.org, john.g.garry@oracle.com,
+	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
+ sb_set_blocksize()
+Message-ID: <Z8hck6aKEopiezug@casper.infradead.org>
+References: <20250305015301.1610092-1-mcgrof@kernel.org>
+ <Z8fpZWHNs8eI5g38@casper.infradead.org>
+ <20250305063330.GA2803730@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,10 +52,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305063033.1813-2-anuj20.g@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250305063330.GA2803730@frogsfrogsfrogs>
 
-Looks good:
+On Tue, Mar 04, 2025 at 10:33:30PM -0800, Darrick J. Wong wrote:
+> > So this is expedient because XFS happens to not call sb_set_blocksize()?
+> > What is the path forward for filesystems which call sb_set_blocksize()
+> > today and want to support LBS in future?
+> 
+> Well they /could/ set sb_blocksize/sb_blocksize_bits themselves, like
+> XFS does.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I'm kind of hoping that isn't the answer.
 
+> Luis: Is the bsize > PAGE_SIZE constraint in set_blocksize go away?
+> IOWs, will xfs support sector sizes > 4k in the near future?
+
+Already there in linux-next.  47dd67532303 in next-20250304.
