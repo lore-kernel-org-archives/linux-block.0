@@ -1,111 +1,137 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43911146A6F;
-	Wed,  5 Mar 2025 01:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5B1153800
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 02:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741139592; cv=none; b=R0yQnc/6baiczDNzCpO2e2tLzwdQjU8cG982Aw7jEwNbMHRUcKXFBwXIiMMRN820J3Z9ocPPSg7lut+tNIN+KrBITSVOi3bxUgzwe3lHjqdJ8kbrYOYVIFBbv1/m6y89aJQ32XRXiUg+lqaF2AQI74PwP5AXML12t7d5VU1tozI=
+	t=1741141345; cv=none; b=SN2I2Phe+8r64hCbUgTLxmIoN9F8cCHVsq+M68QOEgcB622HchxPZ5dlea6rk2xXogsrJ4mrNLiOv0yIIz1HdvF3e7yA2X9K6OjcIcDSucSAtrUNJwRGUG4P46Qbm/SuU+7IUKlAO7bq7HXRjVEKzA+ljExb+62AqEWU7hPijsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741139592; c=relaxed/simple;
-	bh=tlaqVgr8vtGbRleo/L1EpGdIMlFP9kz8AIunLQ7ShQg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JZanNeDQHPSfAqJiq5degYd7KQmbWFyGGc8+WZYiRXKaN+H7GlEe9okwlCQYbhex+R1gSiJvNIF3EnyqGVVkzco2xAFBgs2qf4ksM/5D4pnLBszyTvSeajLDmPKALI2ovn4QCi6exIPfywyfJvmwclBlwSUSTTXr+A7vWyLm6ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Jx/Of5PV; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1741141345; c=relaxed/simple;
+	bh=rqRlavxmZUaLIf4yVkniFSJFKnQ5oM/LDJ7eUVpTdCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HNmF8HWBD01IvJHyBqWV+507VE1dNXUV7vPACJ/KxQflT9AT+VJNgcNFV9ffyfl9z2u5+3E6kyaDW4eJ+i5//y5xPtTC0OPm88rxjTa4bfoXLUUTiMnusnL2XElMxhTxqZNoWi7/CrgHZbR1P4hFF3/YaBhu350jwD0By+mGxlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ancLDkYO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Jx/Of5PV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=ZrC3f8pMRf+T5oXLUaMnjlglozHjJOk02SyBFDBOYb0=; b=Jx/Of5PVEs5IPOpFTHi/F756ku
-	Zi7Pmxn62ZbcMwDhtjP8/XvnEhMx+IXnz3C+AZjySOkrU694OWksh16eKYlUuiuSWKRqieJDh7Zz1
-	md5/5fjF+s3fNxSixkScqB5m/DzmOwBELOePfsSMfg5V8fATNg3P4hwUK7R0gU1eS5/hPqjbuqwtT
-	n9gMuS3fB4H/Xdz8VTTdxtFvpGyRM0qWMTfvz6oQ5fyDxK2JSsmMYA3RP+Dzf0diGhhpq9bQOIeMb
-	E911quhvz4xy4jnRJjqhy8SqVnpiAGscHZaZSvJyZWPkosHJA2FWzc53zTHG/ztTC5ULlu3vdDB2j
-	qS7JZDZA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpdwW-00000006krT-37YN;
-	Wed, 05 Mar 2025 01:53:04 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: brauner@kernel.org,
-	hare@suse.de,
-	willy@infradead.org,
-	david@fromorbit.com,
-	djwong@kernel.org
-Cc: kbusch@kernel.org,
-	john.g.garry@oracle.com,
-	hch@lst.de,
-	ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	gost.dev@samsung.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	kernel@pankajraghav.com,
-	mcgrof@kernel.org,
-	Kent Overstreet <kent.overstreet@linux.dev>
-Subject: [PATCH] bdev: add back PAGE_SIZE block size validation for sb_set_blocksize()
-Date: Tue,  4 Mar 2025 17:53:01 -0800
-Message-ID: <20250305015301.1610092-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ancLDkYO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741141341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=z9exZRKmyKrZHf+rgrYcQi5Z7IXeB7+IoeNx/2M67zs=;
+	b=ancLDkYOo6sQaCZX6XfmbpB+9hzFB5WoezJRlQhaQQJa8SJbY1E8PUWjdYVyMWbIIvoooW
+	tSpx5wzHdsn/mK7GIwTk+QKVKm0m192I9ZNkETEV9OvW20NJ7pZDp4E+f1NzNtFQdK9ZsT
+	nGDYW2CGqBcR8gKdO0Qm51Quwsek85U=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-z9zjwkIPMNmIySsZeITidw-1; Tue,
+ 04 Mar 2025 21:22:13 -0500
+X-MC-Unique: z9zjwkIPMNmIySsZeITidw-1
+X-Mimecast-MFC-AGG-ID: z9zjwkIPMNmIySsZeITidw_1741141331
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1826A1955BFC;
+	Wed,  5 Mar 2025 02:22:11 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.23])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C58D31954B00;
+	Wed,  5 Mar 2025 02:22:08 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-efi@vger.kernel.org,
+	Olivier Gayot <olivier.gayot@canonical.com>,
+	Mulhern <amulhern@redhat.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	stable@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3] block: fix conversion of GPT partition name to 7-bit
+Date: Wed,  5 Mar 2025 10:21:54 +0800
+Message-ID: <20250305022154.3903128-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The commit titled "block/bdev: lift block size restrictions to 64k"
-lifted the block layer's max supported block size to 64k inside the
-helper blk_validate_block_size() now that we support large folios.
-However in lifting the block size we also removed the silly use
-cases many filesystems have to use sb_set_blocksize() to *verify*
-that the block size < PAGE_SIZE. The call to sb_set_blocksize() can
-happen in-kernel given mkfs utilities *can* create for example an
-ext4 32k block size filesystem on x86_64, the issue we want to prevent
-is mounting it on x86_64 unless the filesystem supports LBS.
+From: Olivier Gayot <olivier.gayot@canonical.com>
 
-While, we could argue that such checks should be filesystem specific,
-there are much more users of sb_set_blocksize() than LBS enabled
-filesystem on linux-next, so just do the easier thing and bring back
-the PAGE_SIZE check for sb_set_blocksize() users.
+The utf16_le_to_7bit function claims to, naively, convert a UTF-16
+string to a 7-bit ASCII string. By naively, we mean that it:
+ * drops the first byte of every character in the original UTF-16 string
+ * checks if all characters are printable, and otherwise replaces them
+   by exclamation mark "!".
 
-This will ensure that tests such as generic/466 when run in a loop
-against say, ext4, won't try to try to actually mount a filesystem with
-a block size larger than your filesystem supports given your PAGE_SIZE
-and in the worst case crash.
+This means that theoretically, all characters outside the 7-bit ASCII
+range should be replaced by another character. Examples:
 
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+ * lower-case alpha (ɒ) 0x0252 becomes 0x52 (R)
+ * ligature OE (œ) 0x0153 becomes 0x53 (S)
+ * hangul letter pieup (ㅂ) 0x3142 becomes 0x42 (B)
+ * upper-case gamma (Ɣ) 0x0194 becomes 0x94 (not printable) so gets
+   replaced by "!"
+
+The result of this conversion for the GPT partition name is passed to
+user-space as PARTNAME via udev, which is confusing and feels questionable.
+
+However, there is a flaw in the conversion function itself. By dropping
+one byte of each character and using isprint() to check if the remaining
+byte corresponds to a printable character, we do not actually guarantee
+that the resulting character is 7-bit ASCII.
+
+This happens because we pass 8-bit characters to isprint(), which
+in the kernel returns 1 for many values > 0x7f - as defined in ctype.c.
+
+This results in many values which should be replaced by "!" to be kept
+as-is, despite not being valid 7-bit ASCII. Examples:
+
+ * e with acute accent (é) 0x00E9 becomes 0xE9 - kept as-is because
+   isprint(0xE9) returns 1.
+ * euro sign (€) 0x20AC becomes 0xAC - kept as-is because isprint(0xAC)
+   returns 1.
+
+This way has broken pyudev utility[1], fixes it by using a mask of 7 bits
+instead of 8 bits before calling isprint.
+
+Link: https://github.com/pyudev/pyudev/issues/490#issuecomment-2685794648 [1]
+Link: https://lore.kernel.org/linux-block/4cac90c2-e414-4ebb-ae62-2a4589d9dc6e@canonical.com/
+Cc: Mulhern <amulhern@redhat.com>
+Cc: Davidlohr Bueso <dave@stgolabs.net>
+Cc: stable@vger.kernel.org
+Signed-off-by: Olivier Gayot <olivier.gayot@canonical.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
+V3:
+	- userspace break words in commit log
+	- Cc more list and guys
 
-Christian, a small fixup for a crash when running generic/466 on ext4
-in a loop. The issue is obvious, and we just need to ensure we don't
-break old filesystem expectations of sb_set_blocksize().
+V2:
+	- No change - resubmitted with subsystem maintainers in CC
 
-This still allows XFS with 32k block size and I even tested with XFS
-with 32k block size and a 32k sector size set.
-
- block/bdev.c | 2 +-
+ block/partitions/efi.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 3bd948e6438d..de9ebc3e5d15 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -181,7 +181,7 @@ EXPORT_SYMBOL(set_blocksize);
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index 5e9be13a56a8..7acba66eed48 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -682,7 +682,7 @@ static void utf16_le_to_7bit(const __le16 *in, unsigned int size, u8 *out)
+ 	out[size] = 0;
  
- int sb_set_blocksize(struct super_block *sb, int size)
- {
--	if (set_blocksize(sb->s_bdev_file, size))
-+	if (size > PAGE_SIZE || set_blocksize(sb->s_bdev_file, size))
- 		return 0;
- 	/* If we get here, we know size is validated */
- 	sb->s_blocksize = size;
+ 	while (i < size) {
+-		u8 c = le16_to_cpu(in[i]) & 0xff;
++		u8 c = le16_to_cpu(in[i]) & 0x7f;
+ 
+ 		if (c && !isprint(c))
+ 			c = '!';
 -- 
-2.47.2
+2.47.0
 
