@@ -1,231 +1,78 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BB72E3364
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 04:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F323F2E338F;
+	Wed,  5 Mar 2025 06:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741149130; cv=none; b=tECXG4kl+soOWOoG+MZ9tNJavyebr7uxYboaSv7AKABJ6sI85i7hdQ/+thfBQOh+3pTycjqpf6KSbwIl5y+TE02jZH2wWKM7gcdRsk//1QsVB2IpRcNyoH8cvyhUn18LeS6FLWY0LR8UpBt/UWAknwnF0lH292/SO+sO8UThY3w=
+	t=1741154672; cv=none; b=S7mnhwAQ9PkIxBUpOp20sArTICibCwdvV1qupVu06xdQzEvVKJQY+hLtkqT8memb/IR6RtD4cdauZkFkqrlh78kB6gwuqeUcNmyK7mghGm0wE2Zt3Ne1sTVQgzBRmzPE833OnFH8wbDmG6ok/8f9uxIyaOB1bDqFM+NUBMt6gGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741149130; c=relaxed/simple;
-	bh=FcMi33G4UmI8kEn3NoiRVsJwt+idhTnznk+//B53NGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ukZFS87yaaRfi8K/bpxVVPP196gg67Zk/faaYYcJav3Hv7UDWpGM1SNtw88sWObQ1LDvEQ8wQx2ewJo7M8V7QrLab6I1l+ttmZJK8Zy7jt1M3g+c+IHomGNVqkZr/9dQ9IO5SLH4njfDmZ64XaEvj02IRQy6WRGiu8335qMEOxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=POmK5lX7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741154672; c=relaxed/simple;
+	bh=OXph4ujJlPsqqPzhhrB3GYYsGtqeypRxXEPTIotWMLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JPlbKnfIm7/GyWd0Xwng2j5YE9me3ITQMwns//vgD9In0vLJBMPbq3FcGTF4oPg7reIwLyWA72G1F0EG2nosii/GE1yZy42XtGX1Iq4qdLdvvvZ30D1irNb/dQlEidSy5QE/CQ/66T8EQIxFdZQTh9T7AcEk5fmxbeNUBbI5hww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Wdqb53XN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POmK5lX7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741149127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+O5anJ3PaMp0jQuVFJKKk3whExV0kfUZWEdWjnXAUVs=;
-	b=POmK5lX7udPO6ZLjQ9KTVTVdtw4acNgnqOv1uCXWQerpHyKLdg7XMD4jDsgq1P+OzewRyK
-	qCK9peMZ7BEwCShWGl2ugMXx3hXgpjB3iUGFcxSjFQhx7VwmqFDJnJckS5oRF5lHWQnQ0S
-	BN6h5RVgXrjBQ1sDMZ1YzKiYx/VUQqc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-n8r74JF8M1mOjorjGCo1wQ-1; Tue,
- 04 Mar 2025 23:31:49 -0500
-X-MC-Unique: n8r74JF8M1mOjorjGCo1wQ-1
-X-Mimecast-MFC-AGG-ID: n8r74JF8M1mOjorjGCo1wQ_1741149108
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E54BF1801A09;
-	Wed,  5 Mar 2025 04:31:47 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.23])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AA2FC1944EAA;
-	Wed,  5 Mar 2025 04:31:46 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH 3/3] blk-throttle: carry over directly
-Date: Wed,  5 Mar 2025 12:31:21 +0800
-Message-ID: <20250305043123.3938491-4-ming.lei@redhat.com>
-In-Reply-To: <20250305043123.3938491-1-ming.lei@redhat.com>
-References: <20250305043123.3938491-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wdqb53XN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5rAW3kna2L/oLcwpIx54HiaaUQE+mm7gEUx3fbSEXoY=; b=Wdqb53XN7+C0d0dv1rFuLy+uC0
+	tY+ao74Dj+jOWwKMyPUem123vE8hj+9ktII7rPuVfwUFQTMkrJiYHKtdhD7AJZNL53tmSgJ23PevV
+	lj/YjCajWJBd/cO1Y+7c4d2q7/YtlvuiRZS9qDKRGtP3y/RznFlLm3mEP8xXJS5wdotG5VAJ/EVW6
+	HQCRez5uIocC76trRGzPsAEhwUOIo7YNL5Ig6N2zb6g3cMjlSli58n7Xi9Mec4LP+yYuYCn6/zMUh
+	v5J8XzZ+tLQ7/MtMcMp6ggGn2632Oh1SvkZ3vlw5LwJKj48t7HEFnICozgc4IE921YSk8FAvXLt0A
+	al85CaIQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tphri-00000004pIP-06xF;
+	Wed, 05 Mar 2025 06:04:22 +0000
+Date: Wed, 5 Mar 2025 06:04:21 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, hare@suse.de, david@fromorbit.com,
+	djwong@kernel.org, kbusch@kernel.org, john.g.garry@oracle.com,
+	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
+ sb_set_blocksize()
+Message-ID: <Z8fpZWHNs8eI5g38@casper.infradead.org>
+References: <20250305015301.1610092-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305015301.1610092-1-mcgrof@kernel.org>
 
-Now ->carryover_bytes[] and ->carryover_ios[] only covers limit/config
-update.
+On Tue, Mar 04, 2025 at 05:53:01PM -0800, Luis Chamberlain wrote:
+> The commit titled "block/bdev: lift block size restrictions to 64k"
+> lifted the block layer's max supported block size to 64k inside the
+> helper blk_validate_block_size() now that we support large folios.
+> However in lifting the block size we also removed the silly use
+> cases many filesystems have to use sb_set_blocksize() to *verify*
+> that the block size < PAGE_SIZE. The call to sb_set_blocksize() can
+> happen in-kernel given mkfs utilities *can* create for example an
+> ext4 32k block size filesystem on x86_64, the issue we want to prevent
+> is mounting it on x86_64 unless the filesystem supports LBS.
+> 
+> While, we could argue that such checks should be filesystem specific,
+> there are much more users of sb_set_blocksize() than LBS enabled
+> filesystem on linux-next, so just do the easier thing and bring back
+> the PAGE_SIZE check for sb_set_blocksize() users.
+> 
+> This will ensure that tests such as generic/466 when run in a loop
+> against say, ext4, won't try to try to actually mount a filesystem with
+> a block size larger than your filesystem supports given your PAGE_SIZE
+> and in the worst case crash.
 
-Actually the carryover bytes/ios can be carried to ->bytes_disp[] and
-->io_disp[] directly, since the carryover is one-shot thing and only valid
-in current slice.
-
-Then we can remove the two fields and simplify code much.
-
-Type of ->bytes_disp[] and ->io_disp[] has to change as signed because the
-two fields may become negative when updating limits or config, but both are
-big enough for holding bytes/ios dispatched in single slice
-
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-throttle.c | 49 +++++++++++++++++++-------------------------
- block/blk-throttle.h |  4 ++--
- 2 files changed, 23 insertions(+), 30 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7271aee94faf..91dab43c65ab 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -478,8 +478,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- {
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
--	tg->carryover_bytes[rw] = 0;
--	tg->carryover_ios[rw] = 0;
- 
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
-@@ -498,16 +496,14 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- }
- 
- static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
--					  bool clear_carryover)
-+					  bool clear)
- {
--	tg->bytes_disp[rw] = 0;
--	tg->io_disp[rw] = 0;
-+	if (clear) {
-+		tg->bytes_disp[rw] = 0;
-+		tg->io_disp[rw] = 0;
-+	}
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
--	if (clear_carryover) {
--		tg->carryover_bytes[rw] = 0;
--		tg->carryover_ios[rw] = 0;
--	}
- 
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
-@@ -617,20 +613,16 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	 */
- 	time_elapsed -= tg->td->throtl_slice;
- 	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
--					     time_elapsed) +
--		     tg->carryover_bytes[rw];
--	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed) +
--		  tg->carryover_ios[rw];
-+					     time_elapsed);
-+	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
- 	if (bytes_trim <= 0 && io_trim <= 0)
- 		return;
- 
--	tg->carryover_bytes[rw] = 0;
- 	if ((long long)tg->bytes_disp[rw] >= bytes_trim)
- 		tg->bytes_disp[rw] -= bytes_trim;
- 	else
- 		tg->bytes_disp[rw] = 0;
- 
--	tg->carryover_ios[rw] = 0;
- 	if ((int)tg->io_disp[rw] >= io_trim)
- 		tg->io_disp[rw] -= io_trim;
- 	else
-@@ -645,7 +637,8 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 		   jiffies);
- }
- 
--static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
-+static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
-+				  long long *bytes, int *ios)
- {
- 	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
- 	u64 bps_limit = tg_bps_limit(tg, rw);
-@@ -658,26 +651,28 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
- 	 * configuration.
- 	 */
- 	if (bps_limit != U64_MAX)
--		tg->carryover_bytes[rw] +=
--			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
-+		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
- 			tg->bytes_disp[rw];
- 	if (iops_limit != UINT_MAX)
--		tg->carryover_ios[rw] +=
--			calculate_io_allowed(iops_limit, jiffy_elapsed) -
-+		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
- 			tg->io_disp[rw];
-+	tg->bytes_disp[rw] -= *bytes;
-+	tg->io_disp[rw] -= *ios;
- }
- 
- static void tg_update_carryover(struct throtl_grp *tg)
- {
-+	long long bytes[2] = {0};
-+	int ios[2] = {0};
-+
- 	if (tg->service_queue.nr_queued[READ])
--		__tg_update_carryover(tg, READ);
-+		__tg_update_carryover(tg, READ, &bytes[READ], &ios[READ]);
- 	if (tg->service_queue.nr_queued[WRITE])
--		__tg_update_carryover(tg, WRITE);
-+		__tg_update_carryover(tg, WRITE, &bytes[WRITE], &ios[WRITE]);
- 
- 	/* see comments in struct throtl_grp for meaning of these fields. */
- 	throtl_log(&tg->service_queue, "%s: %lld %lld %d %d\n", __func__,
--		   tg->carryover_bytes[READ], tg->carryover_bytes[WRITE],
--		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
-+		   bytes[READ], bytes[WRITE], ios[READ], ios[WRITE]);
- }
- 
- static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
-@@ -695,8 +690,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 
- 	/* Round up to the next throttle slice, wait time must be nonzero */
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
--	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
--		     tg->carryover_ios[rw];
-+	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
- 	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
- 		return 0;
- 
-@@ -729,8 +723,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
--	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
--			tg->carryover_bytes[rw];
-+	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
- 	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
- 		return 0;
- 
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ba8f6e986994..7964cc041e06 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -102,9 +102,9 @@ struct throtl_grp {
- 	unsigned int iops[2];
- 
- 	/* Number of bytes dispatched in current slice */
--	uint64_t bytes_disp[2];
-+	int64_t bytes_disp[2];
- 	/* Number of bio's dispatched in current slice */
--	unsigned int io_disp[2];
-+	int io_disp[2];
- 
- 	/*
- 	 * The following two fields are updated when new configuration is
--- 
-2.47.0
-
+So this is expedient because XFS happens to not call sb_set_blocksize()?
+What is the path forward for filesystems which call sb_set_blocksize()
+today and want to support LBS in future?
