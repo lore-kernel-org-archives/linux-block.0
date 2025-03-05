@@ -1,187 +1,139 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1ABF1DED5F
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 07:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FB21F153A
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 07:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741159114; cv=none; b=ldSphNc6vlXdQfuznDdN++VkpnQnJ2PKCFBYaUPFgqrp7JIj7Hdwe0z6HKx6rYR0/Av3xft9/QYRDeuKuZvTM+NmQk7EfIPl1F2Rj/KIS4gM6j1koshLuC4JMpg0wG3g7AFUx9D0S06kBpV1N4xMfTUJY3hloNpLvIZ1uoTAy0Y=
+	t=1741160471; cv=none; b=fpxOzuMpHxx0wu0CedMzdTmcDAyWOqtAsfKJt0Qz8zH2flbJLLCT5C4yWHLoZvoU/7IrBal7Nt0PBrSLNkaiK210PcrU/l7ct4/bn8cnOormXAumHIOUawM5zaGOdPbmsUjQsWgI2bK2LttLXy5LedTCrVbgPa3lYvRTICuP7+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741159114; c=relaxed/simple;
-	bh=7u1YqTcyeJXlmqAXzMP3SO3Bin2qzZsFYkFcXJ9kl+4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WkQJMs7sso6Z8/K3TBmtZDpyi0j6wm7fAkAr04e8rV888MlJ1ho+kepZs6+VvBbCMJfbBrEGZC5T7LTTl4SJOzm8RY4bHImsVoUtQWO/nrZoHQ3AEUPypoytUjyDXxHC0u0V8yf0qLxx7agRp5Hu2U0/BTh2HZ8JV77X+/xX/8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QznafEv+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MBszmnW6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=w6ZRFLk2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=L6o3xhB+; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1741160471; c=relaxed/simple;
+	bh=+0v9asLaBPRNl7EokrcaYWNtIFxIhxzqEMJXvGxnmdE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=KOmKOy7Hr48rUsi8bLeHH2lc1CfrtGMu25QXL+RGkkt32PuDCXC16zwDQPwgSGoHVcSILqxeMiUytbEj825rDpWUy9fWxRAl9O31j4asj30/m2dRjwSrJ7/O9XXPzqW6vPWmwV9IdGZbJeGrM1rH/d8KFY3f3hWs6zzqgfPmMUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=BCUqLNUg; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QznafEv+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MBszmnW6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="w6ZRFLk2";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="L6o3xhB+"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DD7DD1F38A;
-	Wed,  5 Mar 2025 07:18:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741159111; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mggCM6iIwRGwJc80xu0g1Bp7a+92pIfiEEUnJ4UBDAM=;
-	b=QznafEv+SRXFU699kRk6pO2U1HHOLeBm7OXSr7Yt5g+EjQlwngsWg7QHNhWZQ7TK+5oH/m
-	5DDNGJF3/5MIZ80eMEyR1hFSCjx+yWP7RKceAko4bXTNTy2M4yasTIqy58zeXpke5gMwsU
-	YuVrRh4G9fh6GDB+loNs5wnxQK4SiJ0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741159111;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mggCM6iIwRGwJc80xu0g1Bp7a+92pIfiEEUnJ4UBDAM=;
-	b=MBszmnW6EXeDwskWYdg6HcMlM93Y1UHxfw9G4ra9JzTYW8k5ot1u9bnfwlwQ/nof69wZcR
-	BwHLnoUYTrPwZvDw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741159110; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mggCM6iIwRGwJc80xu0g1Bp7a+92pIfiEEUnJ4UBDAM=;
-	b=w6ZRFLk2EeMWUm+DTOtmneSV31+s73CuypZKSvr2y/UDzZZZhhpX5AqPDp8ABZjkzmd+kx
-	syDvL1FV8au3qHvoj1Ms4qV78RZm3by0osQ+C4ZRickK8aX/Ghw9PKB0OCsyAkQlq8mnSZ
-	UveInMCv0Nrsu3lJMHl3Dt/vxB6vE4o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741159110;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mggCM6iIwRGwJc80xu0g1Bp7a+92pIfiEEUnJ4UBDAM=;
-	b=L6o3xhB+VQswqzNd1pf3ImfmR7d7kwB4aT7hGas2H7mlMxoY2BqF9AUjhaPFiR4au6LWG/
-	/dBj2qC/fMZM4CDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3A37F13939;
-	Wed,  5 Mar 2025 07:18:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id S9bqC8b6x2cBRQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 05 Mar 2025 07:18:30 +0000
-Message-ID: <828e529d-3e42-4b9e-a0ce-a05516a7274d@suse.de>
-Date: Wed, 5 Mar 2025 08:18:29 +0100
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BCUqLNUg"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250305074105epoutp030a8ff7558b62b4ca1548f57738eee83e~p2DftA8Oo1839818398epoutp03s
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 07:41:05 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250305074105epoutp030a8ff7558b62b4ca1548f57738eee83e~p2DftA8Oo1839818398epoutp03s
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1741160465;
+	bh=TqTMIzOu/gxWCqxo2RhLijjV18qKrUTqkY9kGAPDnjc=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=BCUqLNUg3AQK+eFt6t3zq1DmCGkSiH2rEkVbmJo9nlExtaG6GgbD/D8NotUIAPcq1
+	 eoC/j+cPhBEaigpK/lyaqE9OsrWr+LjUk+9hZaS5mw/DmqMwwPxUAFfWUOuabBWa0t
+	 We31/fyZ+gyQyRuApQfOEf6jcaqGFhMcq2otF7bc=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20250305074105epcas5p2ea7197f1fa88dd7766f2a65ad5139f88~p2DfFpRxB3180831808epcas5p27;
+	Wed,  5 Mar 2025 07:41:05 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4Z74H33PL7z4x9QD; Wed,  5 Mar
+	2025 07:41:03 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	58.1E.20052.F0008C76; Wed,  5 Mar 2025 16:41:03 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250305063900epcas5p38bb20587ccf4310cfb0f3307180eb536~p1NSb-V4G1936819368epcas5p3U;
+	Wed,  5 Mar 2025 06:39:00 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250305063900epsmtrp2d7a9c79c37c0042a29392c21b8b0893f~p1NSVvIPN0758807588epsmtrp2B;
+	Wed,  5 Mar 2025 06:39:00 +0000 (GMT)
+X-AuditID: b6c32a49-3fffd70000004e54-0a-67c8000ff15f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	49.53.33707.481F7C76; Wed,  5 Mar 2025 15:39:00 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250305063858epsmtip1ca541a816175f86a904b65b74ee49cf7~p1NQ6wL351091010910epsmtip19;
+	Wed,  5 Mar 2025 06:38:58 +0000 (GMT)
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
+Cc: anuj1072538@gmail.com, nikh1092@linux.ibm.com,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, Anuj Gupta
+	<anuj20.g@samsung.com>
+Subject: [PATCH v3 0/2] Fix integrity sysfs reporting inconsistencies
+Date: Wed,  5 Mar 2025 12:00:31 +0530
+Message-Id: <20250305063033.1813-1-anuj20.g@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
- sb_set_blocksize()
-To: Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org,
- willy@infradead.org, david@fromorbit.com, djwong@kernel.org
-Cc: kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
- ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, gost.dev@samsung.com, p.raghav@samsung.com,
- da.gomez@samsung.com, kernel@pankajraghav.com,
- Kent Overstreet <kent.overstreet@linux.dev>
-References: <20250305015301.1610092-1-mcgrof@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250305015301.1610092-1-mcgrof@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,oracle.com,lst.de,gmail.com,vger.kernel.org,samsung.com,pankajraghav.com,linux.dev];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEJsWRmVeSWpSXmKPExsWy7bCmhi4/w4l0g4MfJC0+fv3NYtE04S+z
+	xeq7/WwWCxbNZbFYufook8XeW9oW85c9Zbfovr6DzWL58X9MFncvPmV24PLYOesuu8fls6Ue
+	ExYdYPTYvKTe48XmmYweu282sHl8fHqLxaNvyypGj8+b5AI4o7JtMlITU1KLFFLzkvNTMvPS
+	bZW8g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4DOVFIoS8wpBQoFJBYXK+nb2RTll5ak
+	KmTkF5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZ5zs28lWcI+14vzzI+wNjI9Y
+	uhg5OSQETCS23dvICmILCexmlNi03RLC/sQosWJZUBcjF4S9+/9LNpiGuzN/s0IkdjJKXF15
+	ng3C+cwo8ezMN3aQKjYBdYkjz1sZuxg5OEQErCXevxYHqWEWOMso8bfxP9hqYQFXiX9nl4Gt
+	ZhFQldh47ysTiM0rYCGx/uBSqPPkJWZe+s4OEReUODnzCVicGSjevHU2M8hQCYGv7BKTtnUz
+	QzS4SFy+v5MRwhaWeHV8CzuELSXx+d1eqBfSJX5cfsoEYRdINB/bB1VvL9F6qp8Z5GhmAU2J
+	9bv0IcKyElNPrWOC2Msn0fv7CVQrr8SOeTC2kkT7yjlQtoTE3nMNULaHxO5ra9ghQRor0XXk
+	F/MERvlZSN6ZheSdWQibFzAyr2KUTC0ozk1PLTYtMMxLLYfHa3J+7iZGcGLV8tzBePfBB71D
+	jEwcjIcYJTiYlUR4X586ni7Em5JYWZValB9fVJqTWnyI0RQYxhOZpUST84GpPa8k3tDE0sDE
+	zMzMxNLYzFBJnLd5Z0u6kEB6YklqdmpqQWoRTB8TB6dUAxNLn7Hor/8zNW+nbpNn/JFi1rfx
+	su/kuSL3s/0efViY1vDoxu/prNdnrC/n/CcpHXhuEW97uNGe9Emb7pfc1tF1E+X/4LPQfcPZ
+	Iw/SbS6kPFcOYu/wP2az8Oj97S3HJz/8kvBxsdKJ951/p1ny194M2yLFG5+Rf3sFi2RWxOI1
+	f+pvGE37wX0kxFRt7+Ir6oGp346qWzxtf7IqJLyu/kexcXDLvrUvfTlXpf5huZrxbYq67xar
+	fqvg+AMuHz5o36ic99apaHZaWuvUC5dj56Q0O0ilLmTap/WBT3FTabn+qcSbFQE3i0Mm3Kr1
+	jA+pO2DTGJzRpLnoWeDXWul3imbr5izdkOzHfkfmySuTlulKLMUZiYZazEXFiQAmnHv6NQQA
+	AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNLMWRmVeSWpSXmKPExsWy7bCSnG7Lx+PpBtdXSVh8/PqbxaJpwl9m
+	i9V3+9ksFiyay2KxcvVRJou9t7Qt5i97ym7RfX0Hm8Xy4/+YLO5efMrswOWxc9Zddo/LZ0s9
+	Jiw6wOixeUm9x4vNMxk9dt9sYPP4+PQWi0ffllWMHp83yQVwRnHZpKTmZJalFunbJXBlnOzb
+	yVZwj7Xi/PMj7A2Mj1i6GDk5JARMJO7O/M3axcjFISSwnVFizuoWqISExKmXyxghbGGJlf+e
+	s0MUfWSUuDLzCViCTUBd4sjzViCbg0NEwF7i3o8KkBpmgcuMElNefWEFqREWcJX4d3YZmM0i
+	oCqx8d5XJhCbV8BCYv3BpVDL5CVmXvrODhEXlDg58wlYnBko3rx1NvMERr5ZSFKzkKQWMDKt
+	YhRNLSjOTc9NLjDUK07MLS7NS9dLzs/dxAgOb62gHYzL1v/VO8TIxMF4iFGCg1lJhPf1qePp
+	QrwpiZVVqUX58UWlOanFhxilOViUxHmVczpThATSE0tSs1NTC1KLYLJMHJxSDUwq7W53LHep
+	3w2aI7Z3EQfjvbNiCYzN8xqMP+o93tfk7XTL/gtD6bUMufnhATv+Ts4Q+bOs8ir/mYLT6X8W
+	z/QXnJ8jt0wo1+WNvnnN5+xEyVf70nL5BMTPRh4NSHqu+LFnQr7hSk72+pCH+hYGUcId9oy8
+	JX98ulw9inidSs6IbnOrWun3o9Kvb//+tva23BMa103MlxbpWj1fp/t/8rFLM/i7LhUVTjrF
+	o2Vi87z97ap1DOJGsXdnF2tcimkIqd5741vP4YM3frcd/K28+ip7p71T7xzRpdxLFJMnmq6c
+	HK+xUHjWu+WrmG44sN/W07WdYijJ2lmY+qHDKCZV8+Lx3hj1XrtHNvKz7grdVWIpzkg01GIu
+	Kk4EAJFyOqTeAgAA
+X-CMS-MailID: 20250305063900epcas5p38bb20587ccf4310cfb0f3307180eb536
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250305063900epcas5p38bb20587ccf4310cfb0f3307180eb536
+References: <CGME20250305063900epcas5p38bb20587ccf4310cfb0f3307180eb536@epcas5p3.samsung.com>
 
-On 3/5/25 02:53, Luis Chamberlain wrote:
-> The commit titled "block/bdev: lift block size restrictions to 64k"
-> lifted the block layer's max supported block size to 64k inside the
-> helper blk_validate_block_size() now that we support large folios.
-> However in lifting the block size we also removed the silly use
-> cases many filesystems have to use sb_set_blocksize() to *verify*
-> that the block size < PAGE_SIZE. The call to sb_set_blocksize() can
-> happen in-kernel given mkfs utilities *can* create for example an
-> ext4 32k block size filesystem on x86_64, the issue we want to prevent
-> is mounting it on x86_64 unless the filesystem supports LBS.
-> 
-> While, we could argue that such checks should be filesystem specific,
-> there are much more users of sb_set_blocksize() than LBS enabled
-> filesystem on linux-next, so just do the easier thing and bring back
-> the PAGE_SIZE check for sb_set_blocksize() users.
-> 
-> This will ensure that tests such as generic/466 when run in a loop
-> against say, ext4, won't try to try to actually mount a filesystem with
-> a block size larger than your filesystem supports given your PAGE_SIZE
-> and in the worst case crash.
-> 
-> Cc: Kent Overstreet <kent.overstreet@linux.dev>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
-> 
-> Christian, a small fixup for a crash when running generic/466 on ext4
-> in a loop. The issue is obvious, and we just need to ensure we don't
-> break old filesystem expectations of sb_set_blocksize().
-> 
-> This still allows XFS with 32k block size and I even tested with XFS
-> with 32k block size and a 32k sector size set.
-> 
->   block/bdev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 3bd948e6438d..de9ebc3e5d15 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -181,7 +181,7 @@ EXPORT_SYMBOL(set_blocksize);
->   
->   int sb_set_blocksize(struct super_block *sb, int size)
->   {
-> -	if (set_blocksize(sb->s_bdev_file, size))
-> +	if (size > PAGE_SIZE || set_blocksize(sb->s_bdev_file, size))
->   		return 0;
->   	/* If we get here, we know size is validated */
->   	sb->s_blocksize = size;
+Patch 1: Ensures DM devices correctly propagate
+device_is_integrity_capable
+Patch 2: initialize nogenerate and noverify correctly
 
-Can you add a comment stating why it's needed, even with LBS?
-It's kinda non-obious, and we don't want to repeat the mistake
-in the future.
+Changes since v2:
+Ensure that integrity capability gets propogated correctly for all cases
+in DM (hch)
 
-Cheers,
+Changes since v1:
+initialize BLK_INTEGRITY_NOGENERATE and BLK_INTEGRITY_NOVERIFY in
+blk_validate_integrity_limits rather than doing it in the driver (hch)
 
-Hannes
+Anuj Gupta (2):
+  block: ensure correct integrity capability propagation in stacked
+    devices
+  block: Correctly initialize BLK_INTEGRITY_NOGENERATE and
+    BLK_INTEGRITY_NOVERIFY
+
+ block/blk-settings.c | 51 +++++++++++++++++++-------------------------
+ 1 file changed, 22 insertions(+), 29 deletions(-)
+
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.25.1
+
