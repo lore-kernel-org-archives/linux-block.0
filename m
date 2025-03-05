@@ -1,147 +1,213 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C7D1EC00B
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 07:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC9A1D8DEE
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 08:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741160484; cv=none; b=hC5+FKjShJMUmRPsvDLYamsEq/W+aUYPOy9YHSYdnVJ4spj3XAKx5FDL/xWebGhQ0cFXrmkbZqhUXdEM67RZmL1FCK6Uoxw6gZziiAhw1LH7+ndEhC7a59p2fSDJvTTTBt8+jPID7WXXiaQjkJDtydSRJnJPcczFQvw7wy/6Obo=
+	t=1741162860; cv=none; b=dp4yDpEhWdW9cFv3s4cAwZNpA5uJSyk7shxYlAFiN3Hkfe4qN6Q+aJpMilH/ACMY2Y4bRjHmG1RilUIKwbexEXt3RAOPJCadb/JoDze358Tmb5cQgLY1ADUJZxiwpcLVA+c82Gl8nVoQhjG0rut8puJDgtrns8bprT21wzOTjpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741160484; c=relaxed/simple;
-	bh=gnt9jmtrbPVP9N4xNFbqyRGyqo8qlPs6vEMuPN+5aAY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=APZMEDQKsyyNSwJUw7VZrU/eU9cjgJNWUbjS2k2HDWWjXEg94pxEwe/SE6ySmC2tR9mKzNU8VxRpr5WT6TuFtG25x8xVy8DUMFmALM0wLuZEWqFBdiSRZZhCggvx9qwuuTH3xieJUZGLo70EsuBMTcqwS9S6/30i9E4EumsvRig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=MbbHBdCD; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1741162860; c=relaxed/simple;
+	bh=az709ctz3dT0WPp2vTzv787H0juge6K89/xhC/fTUCE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f5n5dZy3oqVFfBccNSv/XkskUzQCr7Wfb6+5eTTixpBTaFw4ZbU54eM+Gh0Niem29Ymd2a6F1pICw+mmVQe37gAxnHLA+QIaLDdTJecHHwdgmGIZS5FiBGT4Cc8ZbhGJlJYZDMf255qBNZvPgDbFXjB2HNNLKhSv+e7agMR96HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Px+B9JqB; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MbbHBdCD"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250305074117epoutp01a8f828e38b79e101297a4fc36993903d~p2DrKv7Ij2140521405epoutp01R
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 07:41:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250305074117epoutp01a8f828e38b79e101297a4fc36993903d~p2DrKv7Ij2140521405epoutp01R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1741160478;
-	bh=Rapm8PpxKCMln8BPsT/78x2XH1Vus2Tmowr2iKgf18c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MbbHBdCDD30wzmbJyavCUBYHB8yjHgH1eeNdDlFgkkJx+cH5a1PXWuMzOABDxhPsR
-	 7vobBMIZEs0XdE49apBi25Obgb1Mz8l0USqerjZ7Qq/BGeMwG8VcTsvwp/TDImOGz3
-	 ovC/SOr8/JooTpryBGfJLBXY6u+cDubvY2NQtApc=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20250305074117epcas5p34744f7055f9917573475476be1b53648~p2DqqOgaB2096020960epcas5p3B;
-	Wed,  5 Mar 2025 07:41:17 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Z74HG59npz4x9Q0; Wed,  5 Mar
-	2025 07:41:14 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	06.B1.19710.A1008C76; Wed,  5 Mar 2025 16:41:14 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20250305063903epcas5p46a5f908f6500fc34795b8330534d0c15~p1NVfvCZa1303613036epcas5p4a;
-	Wed,  5 Mar 2025 06:39:03 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250305063903epsmtrp23591450b4b388ff249873f5ee48260b1~p1NVe2cOS0766407664epsmtrp25;
-	Wed,  5 Mar 2025 06:39:03 +0000 (GMT)
-X-AuditID: b6c32a44-363dc70000004cfe-e6-67c8001a6787
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	67.63.33707.781F7C76; Wed,  5 Mar 2025 15:39:03 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250305063902epsmtip13d9cf281c7fa3c5fee5dfa632f99d727~p1NUCq3yv1100611006epsmtip1z;
-	Wed,  5 Mar 2025 06:39:02 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
-Cc: anuj1072538@gmail.com, nikh1092@linux.ibm.com,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev, Anuj Gupta
-	<anuj20.g@samsung.com>
-Subject: [PATCH v3 2/2] block: Correctly initialize BLK_INTEGRITY_NOGENERATE
- and BLK_INTEGRITY_NOVERIFY
-Date: Wed,  5 Mar 2025 12:00:33 +0530
-Message-Id: <20250305063033.1813-3-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250305063033.1813-1-anuj20.g@samsung.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Px+B9JqB"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3910e101d0fso1982618f8f.2
+        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 00:20:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1741162856; x=1741767656; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WstflJwOKcHhDHAGRoeZWYR9qd28A8X/ITaM3cnKcLU=;
+        b=Px+B9JqBPzuiczU7hMBkKIINjhcmwR21t2u3lVTsMov1Q0BI+6IjPlAOK5I9FJ2y35
+         qEMRyJybv9xhzFynMfAU96T5Ey8QBNlexIYPUTY1ORRbHmpsXELsC3Uf1NPR9ZMADhc6
+         BSHa1ixZIRQ4Kb2VC5Hxmp9lWbm3VQ56e+m2ly5VPhB+YyuNr9fCstL4UiXrHVeFPGUy
+         o9zat2OcKcHbg7SfNfPz/IlSM2eYl0hxHzET0BFSIQ0iXKOLbLVFR6u5srZMgcXHJL3N
+         U1VlZuEyIJpbrhoKzKOK1WOM1PU9JajdPArWxswN/yz+mT+1UJ1jI7tBQHS9YNJzmnVd
+         L8EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741162856; x=1741767656;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WstflJwOKcHhDHAGRoeZWYR9qd28A8X/ITaM3cnKcLU=;
+        b=nmA+C8aeH6OD+ftpMoIchHjK1utEust6RUgo1/MSW4DhKPsvFYeSl4dkn9NVm8k6tv
+         kS65vp5KRUTmRDLwGV9nwO+G1Rsw2cBWX2eX68wa7rBZ8KQmkA/ayiJa+ko52bPF4Yq8
+         QThsjkd4ALEcJvwHhfiBSeAz/ZUkK87RBsPKcv3+FyuV43HlfdQ45DDSq2s7Cfe7J19a
+         +whkUFNKsyZkniqeGemEq6UpiglGsBPy7EoTahMSYpXsfg1T+Gz51z+qJxzLrjOcooDb
+         XYBsWZw9+u4kb/ok/38RwuDdCbqv65tYSJXeumj4jwWkcqBhVSacLMN4sin3wRtVgjZJ
+         uKWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbyQ8m2/aYwVwLiv8EfehTisfi5UnMk7G3dmpt/5qjCmtOX1soL4dcCwPw8cUDXYYRbia0MK6fMGuQ4Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+aPYsgSJafzuZyGKJGtXUSbIYzEaMhBDEsl2kp6e45r6l/AmW
+	+3BcSsNsMBfP2vZhADu9MSX4MTu23Fw/LnwiaknjIsAWBIAeHCso7iquOBP4t20=
+X-Gm-Gg: ASbGncuNKITVGyfIf5wQJlc0VTuG0CKmsUyWXGzt45UaFIYLoPjtjMooZGRFjJxbG59
+	cLvf+dOpXOgtWSDLkGRHdIPaNmzUlCPqMdvf1165UWvsj9m1BtUD0MObH88gz2wS2y8PkjWSYZZ
+	V96SatSSyQiLQxA+x0rYNnjo+6j7hoebCVU6ed1+X/XENmdpTGOoVYOig0a/p69Pacbx65u65c7
+	mKUckCgyi9UaYMwgRlroIc2GpgKtm1vdZhs1xty+tc7r6twbFSEKy4pHXjo4iBshMS1/HNHJBJO
+	A9IGaq3DETHtd1uR6as6r29h0axCkvWZGmnOMGsGLVkMm1WeA2KQlfYzCQvyFM8dFIzDrQpissP
+	bg46w20FZgQ==
+X-Google-Smtp-Source: AGHT+IEAkj4nFKh5XmT6XTDGea5rdD5iNWGSoZ6uQmLsfSiyS4yVckbQm32RaOrZ0zLDfWxwkT/AOQ==
+X-Received: by 2002:a5d:6d06:0:b0:391:122c:8ab with SMTP id ffacd0b85a97d-3911f756724mr1275068f8f.22.1741162856237;
+        Wed, 05 Mar 2025 00:20:56 -0800 (PST)
+Received: from [192.168.178.47] (aftr-62-216-202-7.dynamic.mnet-online.de. [62.216.202.7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4844adfsm20346370f8f.62.2025.03.05.00.20.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Mar 2025 00:20:55 -0800 (PST)
+Message-ID: <f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
+Date: Wed, 5 Mar 2025 09:20:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+To: Vlastimil Babka <vbabka@suse.cz>, Hannes Reinecke <hare@suse.de>,
+ Matthew Wilcox <willy@infradead.org>
+Cc: Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+ <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+ <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
+ <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
+ <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
+ <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
+ <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+ <Z8cm5bVJsbskj4kC@casper.infradead.org>
+ <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
+ <Z8cv9VKka2KBnBKV@casper.infradead.org>
+ <Z8dA8l1NR-xmFWyq@casper.infradead.org>
+ <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
+ <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.com>
+In-Reply-To: <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmhq4Uw4l0g5WvNC0+fv3NYtE04S+z
-	xeq7/WwWCxbNZbFYufook8XeW9oW85c9Zbfovr6DzWL58X9MFncvPmV24PLYOesuu8fls6Ue
-	ExYdYPTYvKTe48XmmYweu282sHl8fHqLxaNvyypGj8+b5AI4o7JtMlITU1KLFFLzkvNTMvPS
-	bZW8g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4DOVFIoS8wpBQoFJBYXK+nb2RTll5ak
-	KmTkF5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZzScX85YsI+jYtLEf2wNjAvY
-	uxg5OSQETCR2XvvE0sXIxSEksJtR4t/6iUwgCSGBT4wSOxoK4Ox9O3NgGrqmHmeCaNjJKLFr
-	4gxWCOczo8SL9knMIFVsAuoSR563MnYxcnCICFhLvH8tDlLDLHCWUeJv438WkLiwQKZE84k6
-	kHIWAVWJX0eOgy3mFbCQOH9qP9R18hIzL30HszkFLCV+bZ3BDFEjKHFy5hMWEJsZqKZ562xm
-	kPkSAhM5JF7f2McE0ewiseDHZ0YIW1ji1fEtUEOlJD6/28sGYadL/Lj8FKq+QKL52D6oenuJ
-	1lP9zCB3MgtoSqzfpQ8RlpWYemodE8RePone30+gWnkldsyDsZUk2lfOgbIlJPaea4CyPSSm
-	zfsEDaseRomWP13MExgVZiH5ZxaSf2YhrF7AyLyKUTK1oDg3PTXZtMAwL7UcHsfJ+bmbGMEJ
-	V8tlB+ON+f/0DjEycTAeYpTgYFYS4X196ni6EG9KYmVValF+fFFpTmrxIUZTYIBPZJYSTc4H
-	pvy8knhDE0sDEzMzMxNLYzNDJXHe5p0t6UIC6YklqdmpqQWpRTB9TBycUg1MBeY+UfO4Oicb
-	Prl7Y4m8o+GOJYWcZYbH6zxOno90/nptxcsZtTOdtHimbV26YtGyi8fl7pmdmlv/NHWdeLt+
-	cZqmShynftT3E69L093t361/Ez/z2RKnwpS7/iKp8bKTwhcWtzN88d7S+OHCno9XhM/yiaj2
-	/nMUePZuk7A007KSK+WSTln2uy9tD5y2b52cZunP9Tz/z16Siiw6K8VzaOk3t0lPLbc95rm+
-	munMHpON091dNrU78vPWstZMsLfibq0VsKrnSzzmvPCAVsipdetsK2LkShwlReR5btgtYLX7
-	5b/wxAvDozL/fruLfE7UW1Kpce+l2P/d2npG7pe4pkRqLNt667eM2yX35QUFSizFGYmGWsxF
-	xYkAodxOLkEEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMLMWRmVeSWpSXmKPExsWy7bCSnG77x+PpBkv3GVh8/PqbxaJpwl9m
-	i9V3+9ksFiyay2KxcvVRJou9t7Qt5i97ym7RfX0Hm8Xy4/+YLO5efMrswOWxc9Zddo/LZ0s9
-	Jiw6wOixeUm9x4vNMxk9dt9sYPP4+PQWi0ffllWMHp83yQVwRnHZpKTmZJalFunbJXBlNJxf
-	zliwj6Ni0sR/bA2MC9i7GDk5JARMJLqmHmfqYuTiEBLYzijxpO8YE0RCQuLUy2WMELawxMp/
-	z9khij4ySlyf3gJWxCagLnHkeStQEQeHiIC9xL0fFSA1zAKXGSWmvPrCClIjLJAusWzKarBt
-	LAKqEr+OHAfr5RWwkDh/aj/UFfISMy99B7M5BSwlfm2dwQxiCwHVzFmxgxGiXlDi5MwnLCA2
-	M1B989bZzBMYBWYhSc1CklrAyLSKUTS1oDg3PTe5wFCvODG3uDQvXS85P3cTIzgetIJ2MC5b
-	/1fvECMTB+MhRgkOZiUR3tenjqcL8aYkVlalFuXHF5XmpBYfYpTmYFES51XO6UwREkhPLEnN
-	Tk0tSC2CyTJxcEo1ME1hW3Ij0dFK1NzNfU71B+/oKWE7ikr1X3Vcll5n9PnP3g9Tc7wyV2p+
-	vLt7/qbJ7W+N30/Xn3rtX1fvlrOJE0yZ4mRZH6yOtOGoSu7ds7t04j+VOTKG5VMn57IcCs3d
-	3KlwhCFGy0u/gkGrU+pT1eT0q3eyZbZyBpck8FvJq5zfLBrMcPd49odEvcqpvg3z50QeMq4Q
-	vb7pR+hV743igQ5mlxnMWma9/vLr3ES9FcYu3ImPY4SN2Iy2PbTbfsQ1v3HJfaY3Uj71TtqB
-	uSLTy1qSG4WfbXifE7v14+kru36ZchmflN2zq7T5+NYFXtGrO0+c6zFiDA1M3LmYtU/Foelx
-	G4fhLeGrER1sd7VjlFiKMxINtZiLihMBzbswIvYCAAA=
-X-CMS-MailID: 20250305063903epcas5p46a5f908f6500fc34795b8330534d0c15
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250305063903epcas5p46a5f908f6500fc34795b8330534d0c15
-References: <20250305063033.1813-1-anuj20.g@samsung.com>
-	<CGME20250305063903epcas5p46a5f908f6500fc34795b8330534d0c15@epcas5p4.samsung.com>
 
-Currently, BLK_INTEGRITY_NOGENERATE and BLK_INTEGRITY_NOVERIFY are not
-explicitly set during integrity initialization. This can lead to
-incorrect reporting of read_verify and write_generate sysfs values,
-particularly when a device does not support integrity. Ensure that these
-flags are correctly initialized by default.
+On 3/4/25 20:44, Vlastimil Babka wrote:
+> On 3/4/25 20:39, Hannes Reinecke wrote:
+[ .. ]
+>>
+>> Good news and bad news ...
+>> Good news: TLS works again!
+>> Bad news: no errors.
+> 
+> Wait, did you add a WARN_ON_ONCE() to the put_page() as I suggested? If yes
+> and there was no error, it would have to be leaking the page. Or the path
+> uses folio_put() and we'd need to put the warning there.
+> 
+That triggers:
+[   42.364339] page dumped because: VM_WARN_ON_FOLIO(folio_test_slab(folio))
+[   42.364379] ------------[ cut here ]------------
+[   42.375500] WARNING: CPU: 0 PID: 236 at ./include/linux/mm.h:1564 
+sk_msg_free_elem+0x157/0x180
+[   42.375642] Modules linked in: tls(E) nvme_tcp(E) af_packet(E) 
+iscsi_ibft(E) iscsi_boot_sysfs(E) xfs(E) nls_iso8859_1(E) nls_cp437(E) 
+vfat(E) fat(E) iTCO_wdt(E) intel_pmc_bxt(E) intel_rapl_msr(E) 
+iTCO_vendor_support(E) intel_rapl_common(E) i2c_i801(E) bnxt_en(E) 
+i2c_mux(E) lpc_ich(E) mfd_core(E) i2c_smbus(E) virtio_balloon(E) 
+joydev(E) button(E) nvme_fabrics(E) nvme_keyring(E) nvme_core(E) fuse(E) 
+nvme_auth(E) efi_pstore(E) configfs(E) dmi_sysfs(E) ip_tables(E) 
+x_tables(E) hid_generic(E) usbhid(E) ahci(E) libahci(E) libata(E) 
+virtio_scsi(E) sd_mod(E) scsi_dh_emc(E) scsi_dh_rdac(E) scsi_dh_alua(E) 
+qxl(E) sg(E) ghash_clmulni_intel(E) xhci_pci(E) drm_client_lib(E) 
+drm_exec(E) drm_ttm_helper(E) sha512_ssse3(E) xhci_hcd(E) ttm(E) 
+sha256_ssse3(E) drm_kms_helper(E) scsi_mod(E) sha1_ssse3(E) usbcore(E) 
+scsi_common(E) drm(E) serio_raw(E) btrfs(E) blake2b_generic(E) xor(E) 
+raid6_pq(E) efivarfs(E) qemu_fw_cfg(E) virtio_rng(E) aesni_intel(E) 
+crypto_simd(E) cryptd(E)
+[   42.393292] CPU: 0 UID: 0 PID: 236 Comm: kworker/0:1H Kdump: loaded 
+Tainted: G            E      6.14.0-rc4-default+ #316 
+cadaa81909a6170d00e1f47f3fc0db03c6a03650
+[   42.393303] Tainted: [E]=UNSIGNED_MODULE
+[   42.393305] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
+0.0.0 02/06/2015
+[   42.393310] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
+[   42.393323] RIP: 0010:sk_msg_free_elem+0x157/0x180
+[   42.393331] Code: ff 48 c7 c6 d0 42 4f 82 48 89 ef e8 b3 63 8a ff 0f 
+0b 48 8d 6a ff e9 6c ff ff ff 48 c7 c6 a0 42 4f 82 48 89 ef e8 99 63 8a 
+ff <0f> 0b e9 c7 fe ff ff 2b 87 78 01 00 00 8b 97 c0 00 00 00 29 d0 ba
+[   42.393336] RSP: 0018:ffffc9000040b798 EFLAGS: 00010282
+[   42.393341] RAX: 000000000000003d RBX: ffff888110ab0858 RCX: 
+0000000000000027
+[   42.393344] RDX: 0000000000000000 RSI: 0000000000000002 RDI: 
+ffff88817f423748
+[   42.393347] RBP: ffffea0004295e00 R08: 0000000000000000 R09: 
+0000000000000001
+[   42.393350] R10: ffffc9000040b780 R11: ffffc9000040b4e0 R12: 
+0000000000000400
+[   42.393353] R13: ffff888110ab0818 R14: 0000000000000002 R15: 
+ffff88810fa669d8
+[   42.393361] FS:  0000000000000000(0000) GS:ffff88817f400000(0000) 
+knlGS:0000000000000000
+[   42.393365] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   42.393369] CR2: 00007f56a6ea6da4 CR3: 000000011bfc0000 CR4: 
+0000000000350ef0
+[   42.416071] Call Trace:
+[   42.416078]  <TASK>
+[   42.416084]  ? __warn+0x85/0x130
+[   42.416095]  ? sk_msg_free_elem+0x157/0x180
+[   42.418893]  ? report_bug+0xf8/0x1e0
+[   42.418904]  ? handle_bug+0x50/0xa0
+[   42.418910]  ? exc_invalid_op+0x13/0x60
+[   42.418916]  ? asm_exc_invalid_op+0x16/0x20
+[   42.418935]  ? sk_msg_free_elem+0x157/0x180
+[   42.423206]  ? sk_msg_free_elem+0x157/0x180
+[   42.423215]  __sk_msg_free+0x4f/0x100
+[   42.423224]  tls_tx_records+0x118/0x190 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.426506]  bpf_exec_tx_verdict+0x249/0x5e0 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.426519]  ? srso_return_thunk+0x5/0x5f
+[   42.426526]  ? __pfx_stack_trace_consume_entry+0x10/0x10
+[   42.426572]  tls_sw_sendmsg+0x72f/0x9f0 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.432016]  __sock_sendmsg+0x98/0xc0
+[   42.432025]  sock_sendmsg+0x5c/0xa0
+[   42.432030]  ? srso_return_thunk+0x5/0x5f
+[   42.432034]  ? __sock_sendmsg+0x98/0xc0
+[   42.432040]  ? srso_return_thunk+0x5/0x5f
+[   42.436134]  ? sock_sendmsg+0x5c/0xa0
+[   42.436146]  nvme_tcp_try_send_data+0x13f/0x410 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.436159]  ? srso_return_thunk+0x5/0x5f
+[   42.439452]  ? sched_balance_newidle+0x2f6/0x400
+[   42.439468]  nvme_tcp_try_send+0x299/0x330 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.439479]  nvme_tcp_io_work+0x37/0xb0 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.443603]  process_scheduled_works+0x97/0x400
+[   42.443614]  ? __pfx_worker_thread+0x10/0x10
+[   42.443619]  worker_thread+0x105/0x240
+[   42.443625]  ? __pfx_worker_thread+0x10/0x10
+[   42.443630]  kthread+0xec/0x200
+[   42.443639]  ? __pfx_kthread+0x10/0x10
+[   42.443646]  ret_from_fork+0x30/0x50
+[   42.443652]  ? __pfx_kthread+0x10/0x10
+[   42.443658]  ret_from_fork_asm+0x1a/0x30
+[   42.451127]  </TASK>
+[   42.451131] ---[ end trace 0000000000000000 ]---
 
-Reported-by: M Nikhil <nikh1092@linux.ibm.com>
-Link: https://lore.kernel.org/linux-block/f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com/
-Fixes: 9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
----
- block/blk-settings.c | 1 +
- 1 file changed, 1 insertion(+)
+Not surprisingly, though, as the original code did a get_page(), so
+there had to be a corresponding put_page() somewhere.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index d0469a812734..40278a28378f 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -114,6 +114,7 @@ static int blk_validate_integrity_limits(struct queue_limits *lim)
- 			pr_warn("invalid PI settings.\n");
- 			return -EINVAL;
- 		}
-+		bi->flags |= BLK_INTEGRITY_NOGENERATE | BLK_INTEGRITY_NOVERIFY;
- 		return 0;
- 	}
- 
+Cheers,
+
+Hannes
 -- 
-2.25.1
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.com                               +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
