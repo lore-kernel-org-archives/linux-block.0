@@ -1,175 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951E4254B09;
-	Wed,  5 Mar 2025 19:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17FE2046BF
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 23:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741204539; cv=none; b=Mi+AMpfz79OK3Vr7ygagTJPtm35LKUgztntj2U07h5b4I4SsIBZOycA1nYy7GL5FnyNVohaWZIoSINsfRSgL0mBLsO+sidGP7D2Uz8HoqJ7W60ez+Vuylj1u3I81zdbvpMzng9mzFgqd2yIQ0vDlBQTV9vatN7Jr0blwCWpMm1A=
+	t=1741217112; cv=none; b=AP1EQNo6PGy3aZ9Y/qAVqhmPt+s23w7Hj+IAeJcqm7vGbkIj+142gOdXwZpzYxy9kiTfbLPJi8iNBaGv7OEIJBrJpMBc0XS1leai8iCrE63PwU5Bu7Wruw822PXS+q4pyQ3t8s58EWBJCBnLWvo2UaVb7oB7J1C7SqYCX28eWt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741204539; c=relaxed/simple;
-	bh=8Pi9k7DrvKthL1MuanmkdkV6KFC0FH691EfVrLc2rWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoHuE+yN8SKoGJEboIAlImVR263JOJg2tRQVp2KToJEFdtQ+5WGNn0Q7tlbKIv5NwCw5VbSIdKNRDHl8LYE11ikqK1Ktr9W3piwRe8utakaP4+iYU7iWRCquqsSHpbCVp9u+RSqoFgKMHB/ehgcCx5Q1sRSD5KjRdAjS2ildvzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4fkjJpY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741217112; c=relaxed/simple;
+	bh=AnJYcyyPuSQ4pNrFrYAJyHf2ljozt32xk7TDdF8nbVM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Cz3VoKMDujD6R9x4o6yEDAsDjky6W7XcWSZwNYZ1drQ7ZX+2bqQqpNPVt2dZkYmPkrd0XLrijR9pv5MbRUhko5Im5HJiCOMVOI2dvFUTVzWokSI7wdSRvYuPrKygsmCuJVoSzSx0JXWOhnNMtDdqbRkIP3ZNrYnUWKlpuM/a95g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iELWRdRC; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4fkjJpY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2EA5C4CED1;
-	Wed,  5 Mar 2025 19:55:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741204539;
-	bh=8Pi9k7DrvKthL1MuanmkdkV6KFC0FH691EfVrLc2rWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k4fkjJpYo9TeEfrG+XOTafCgzjrj6icd0DGTyQhzvVLpyCZtRCLk+/Kum4K9Om2iw
-	 25NFh2ZNGoE/h+2fMT8AbiqWILIa/u36NidjMD0o+vIrj18x5VoL3f5Ck4vBStbAaB
-	 GKrWfCEVZbT8ibCrXhvZDoNYrkW3+IuKu1+T2ymomaWUwC7U6/ye/s9sj5vV1dWGGZ
-	 fPd81/shlGg9Y6QrWKbklANtsPU7EOcoGx8t4yqtP7QI/9BbNEwlezveIQ+jG0Ad3K
-	 2dG6IXWgFFpCq+u3najwWhIhQ90vCjCTshyzNWqGJyaiid5QZQHqP2DRmHR1SH4zps
-	 esd2ulnUEeBQg==
-Date: Wed, 5 Mar 2025 11:55:37 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>, brauner@kernel.org, hare@suse.de,
-	david@fromorbit.com, kbusch@kernel.org, john.g.garry@oracle.com,
-	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com,
-	Kent Overstreet <kent.overstreet@linux.dev>
-Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
- sb_set_blocksize()'
-Message-ID: <Z8isOYkBnMtQgzXw@bombadil.infradead.org>
-References: <20250305015301.1610092-1-mcgrof@kernel.org>
- <Z8fpZWHNs8eI5g38@casper.infradead.org>
- <20250305063330.GA2803730@frogsfrogsfrogs>
- <Z8hck6aKEopiezug@casper.infradead.org>
- <Z8iEMv354ThMRr0b@bombadil.infradead.org>
- <20250305184834.GE2803771@frogsfrogsfrogs>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iELWRdRC"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3d3db3b68a7so582815ab.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 15:25:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741217109; x=1741821909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l7kX7Ef8fyaxBwW7MaGLY5EScGfcxKucjoKcRNwnL6E=;
+        b=iELWRdRC3yglom12TSoFzTShH7ez6cj5DJdLwQpSMiCr1tpPRtvFGeejPnRu7U/bhy
+         VLGZtGdbRNGNTFbt3UZMv5gblgZatnMJHyOmPVunM6IBx7PCKmiRHCwkmB2X9c9kK+i/
+         WW+JqpkOMWi+51XeZbwKSS7AfratUMT0euXzAHdV/IFSos62bu+zbc1N8Q8HggxPcDfy
+         ptRINXruGoTn85heQ2xEK2ZPR7sp+PS8Ru2FE6DUWlNgK1PHPYaThECuaOFBZ1qGFsZx
+         /qfwcyOjf5at5fV4BpkgETZrVMXFQDV5+QlQwij2AP/NV73hakGO/NZlpjNRpY8pYN+i
+         +yAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741217109; x=1741821909;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l7kX7Ef8fyaxBwW7MaGLY5EScGfcxKucjoKcRNwnL6E=;
+        b=sF9Q6s8tlh+7kQn886Jk2nOtG5lye3sfxhC3q+JPsZOZWIBN+p5hGxtgYgj/Yvqdj1
+         w5sGaT7FNqz/JPBHoOtqdLpr9spU314v5aipfjn4j1YFcTRt6o7cLOZKTF1cM1oohelk
+         rEJT29sx3rqsjdtHvxAFVzpGb8fO8gywAQOi88UP8nNgMP8tRaqilDzLXTo5FeN2+A1y
+         QviM6CrW1BURjrSuiht1A8r2qZQQMfDegDEmTXtX+QxCbe+5zWHx5+YJWgVNCK5DiBGZ
+         KTwhu+oqi2OdaUaa7HFx4MlgX41Aitk7aqRGe1oi1Afe3Up2ZOz7wnwa1GsAfoEOp+uu
+         0sgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhdXlKkpMd7mSmLVbSxrv/QhpFWdqgdruxbHyvJcYUqwVDebxSi3n8K/gHIFqKY8mnkhLxX/Ntwx1kIw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx6FwybWeD+M82d12eoKjVdTywNPexD1GSIwzdPow5movJPRIA
+	JsD+Zcpk/06DL1k4C0OTWSVsVCaCWY69WiTQYAeL/OcCjdqX+STgLWKY/92suSg=
+X-Gm-Gg: ASbGncvZrfDvsMeaykTnIeE+cx/AA4ffDOq5TlAaCUT9MbTLj7ho5DWufvULo1FYlvP
+	1QxFTgRTrhkUn/04RTug03fCKkSoCMqFuF9kP0KphKz7QczqnGVsADMsc5xYpd+FrD4r138BT73
+	tmtFBReEuS1xSTWysP/pcYPj/MUMoExNlCKTD2CUk2+0IMU6U/hANHM1bP3eKWvu4/DlPUjhwhy
+	12pzgVW8lHkqRy1ayaTqvn+WAh5wUkjFwtNvMauiFUKspVnn9XSN7Pmuu/bN75r80VDm7LqWs6f
+	AgBcyPZMBbR6xphe8ZmAk+0EzU3r7XxZhVzY
+X-Google-Smtp-Source: AGHT+IFw7DOF2AlpkNGRt5nKYLzCwHXDlYJ9rI13bHT9B8yZEwsvGPw15V0L62f7x6TiXP73rO1Krw==
+X-Received: by 2002:a92:c26d:0:b0:3d2:a637:d622 with SMTP id e9e14a558f8ab-3d42b8c1c5bmr71442235ab.12.1741217109024;
+        Wed, 05 Mar 2025 15:25:09 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f209df3ea9sm17360173.27.2025.03.05.15.25.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 15:25:08 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, 
+ vgoyal@redhat.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
+ yangerkun@huawei.com
+In-Reply-To: <20250227120645.812815-1-yukuai1@huaweicloud.com>
+References: <20250227120645.812815-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2] blk-throttle: fix lower bps rate by
+ throtl_trim_slice()
+Message-Id: <174121710777.165456.10255728984898278903.b4-ty@kernel.dk>
+Date: Wed, 05 Mar 2025 16:25:07 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305184834.GE2803771@frogsfrogsfrogs>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Wed, Mar 05, 2025 at 10:48:34AM -0800, Darrick J. Wong wrote:
-> On Wed, Mar 05, 2025 at 09:04:50AM -0800, Luis Chamberlain wrote:
-> > On Wed, Mar 05, 2025 at 02:15:47PM +0000, Matthew Wilcox wrote:
-> > > On Tue, Mar 04, 2025 at 10:33:30PM -0800, Darrick J. Wong wrote:
-> > > > > So this is expedient because XFS happens to not call sb_set_blocksize()?
-> > > > > What is the path forward for filesystems which call sb_set_blocksize()
-> > > > > today and want to support LBS in future?
-> > > > 
-> > > > Well they /could/ set sb_blocksize/sb_blocksize_bits themselves, like
-> > > > XFS does.
-> > > 
-> > > I'm kind of hoping that isn't the answer.
-> > 
-> > set_blocksize() can be used. The only extra steps the filesystem needs
-> > to in addition is:
-> > 
-> > 	sb->s_blocksize = size;
-> > 	sb->s_blocksize_bits = blksize_bits(size);
-> > 
-> > Which is what both XFS and bcachefs do.
-> > 
-> > We could modify sb to add an LBS flag but that alone would not suffice
-> > either as the upper limit is still a filesystem specific limit. Additionally
-> > it also does not suffice for filesystems that support a different device
-> > for metadata writes, for instance XFS supports this and uses the sector
-> > size for set_blocksize().
-> > 
-> > So I think that if ext4 for example wants to use LBS then simply it
-> > would open code the above two lines and use set_blocksize(). Let me know
-> > if you have any other recommendations.
+
+On Thu, 27 Feb 2025 20:06:45 +0800, Yu Kuai wrote:
+> The bio submission time may be a few jiffies more than the expected
+> waiting time, due to 'extra_bytes' can't be divided in
+> tg_within_bps_limit(), and also due to timer wakeup delay.
+> In this case, adjust slice_start to jiffies will discard the extra wait time,
+> causing lower rate than expected.
 > 
-> int sb_set_large_blocksize(struct super_block *sb, int size)
-> {
-> 	if (set_blocksize(sb->s_bdev_file, size))
-> 		return 0;
-> 	sb->s_blocksize = size;
-> 	sb->s_blocksize_bits = blksize_bits(size);
-> 	return sb->s_blocksize;
-> }
-> EXPORT_SYMBOL_GPL(sb_set_large_blocksize);
+> Current in-tree code already covers deviation by rounddown(), but turns
+> out it is not enough, because jiffies - slice_start can be a multiple of
+> throtl_slice.
 > 
-> int sb_set_blocksize(struct super_block *sb, int size)
-> {
-> 	if (size > PAGE_SIZE)
-> 		return 0;
-> 	return sb_set_large_blocksize(sb, size);
-> }
-> EXPORT_SYMBOL(sb_set_blocksize);
-> 
-> Though you'll note that this doesn't help XFS, or any other filesystem
-> where the bdev block size isn't set to the fs block size.  But xfs can
-> just be weird on its own like always. ;)
+> [...]
 
-Actually, I failed to also notice XFS implicitly calls sb_set_large_blocksize()
-through:
+Applied, thanks!
 
-xfs_fs_get_tree() -->
-  get_tree_bdev() -->
-    get_tree_bdev_flags() -->
-      get_tree_bdev_flags() -->
-        sb_set_blocksize()
+[1/1] blk-throttle: fix lower bps rate by throtl_trim_slice()
+      commit: 29cb955934302a5da525db6b327c795572538426
 
-We just don't care if sb_set_blocksize() if fails inside get_tree_bdev_flags().
-To be clear this has been the case since we added and tested LBS on XFS.
+Best regards,
+-- 
+Jens Axboe
 
-So if we wanted something more automatic, how about:
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 3bd948e6438d..4844d1e27b6f 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -181,6 +181,8 @@ EXPORT_SYMBOL(set_blocksize);
- 
- int sb_set_blocksize(struct super_block *sb, int size)
- {
-+	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
-+		return 0;
- 	if (set_blocksize(sb->s_bdev_file, size))
- 		return 0;
- 	/* If we get here, we know size is validated */
-diff --git a/fs/bcachefs/fs.c b/fs/bcachefs/fs.c
-index 90ade8f648d9..e99e378d68ea 100644
---- a/fs/bcachefs/fs.c
-+++ b/fs/bcachefs/fs.c
-@@ -2396,7 +2396,7 @@ static struct file_system_type bcache_fs_type = {
- 	.name			= "bcachefs",
- 	.init_fs_context	= bch2_init_fs_context,
- 	.kill_sb		= bch2_kill_sb,
--	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP,
-+	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_LBS,
- };
- 
- MODULE_ALIAS_FS("bcachefs");
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index d92d7a07ea89..3d8b80165d48 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -2118,7 +2118,8 @@ static struct file_system_type xfs_fs_type = {
- 	.init_fs_context	= xfs_init_fs_context,
- 	.parameters		= xfs_fs_parameters,
- 	.kill_sb		= xfs_kill_sb,
--	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME,
-+	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME |
-+				  FS_LBS,
- };
- MODULE_ALIAS_FS("xfs");
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2c3b2f8a621f..16d17bd82be0 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2616,6 +2616,7 @@ struct file_system_type {
- #define FS_DISALLOW_NOTIFY_PERM	16	/* Disable fanotify permission events */
- #define FS_ALLOW_IDMAP         32      /* FS has been updated to handle vfs idmappings. */
- #define FS_MGTIME		64	/* FS uses multigrain timestamps */
-+#define FS_LBS			128	/* FS supports LBS */
- #define FS_RENAME_DOES_D_MOVE	32768	/* FS will handle d_move() during rename() internally. */
- 	int (*init_fs_context)(struct fs_context *);
- 	const struct fs_parameter_spec *parameters;
+
