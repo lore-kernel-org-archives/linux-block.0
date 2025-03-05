@@ -1,74 +1,71 @@
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17FE2046BF
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 23:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DA92054FB
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 23:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741217112; cv=none; b=AP1EQNo6PGy3aZ9Y/qAVqhmPt+s23w7Hj+IAeJcqm7vGbkIj+142gOdXwZpzYxy9kiTfbLPJi8iNBaGv7OEIJBrJpMBc0XS1leai8iCrE63PwU5Bu7Wruw822PXS+q4pyQ3t8s58EWBJCBnLWvo2UaVb7oB7J1C7SqYCX28eWt8=
+	t=1741217113; cv=none; b=URftfHF+/xORPhlwJEw/7hifSQLpxXT6hXVj95OlzA06N/04HGc9nJjVxGHjuRVcS/na/uNadWez4C5c6aWMKN66bpq2v0EefWnGvHah1jmXaw6NuLu44v9OnSlnleYOQAVXhqHovlToqN49HE+y5fZzn7aLPSDystWqvpdhj4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741217112; c=relaxed/simple;
-	bh=AnJYcyyPuSQ4pNrFrYAJyHf2ljozt32xk7TDdF8nbVM=;
+	s=arc-20240116; t=1741217113; c=relaxed/simple;
+	bh=ydTk/iuTKsVlDZZMdxpL5fo9gKeB2DDLMWgRTVqvrpU=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Cz3VoKMDujD6R9x4o6yEDAsDjky6W7XcWSZwNYZ1drQ7ZX+2bqQqpNPVt2dZkYmPkrd0XLrijR9pv5MbRUhko5Im5HJiCOMVOI2dvFUTVzWokSI7wdSRvYuPrKygsmCuJVoSzSx0JXWOhnNMtDdqbRkIP3ZNrYnUWKlpuM/a95g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iELWRdRC; arc=none smtp.client-ip=209.85.166.170
+	 MIME-Version:Content-Type; b=q5oFOZj67Jm0M2Nqj3M2cSa/n/JGhz45pAseNXUq0GUfZjEW/wkMVDKJLwHxZU+fp/F2XXpwMjnVu5/5BRFmJBhrcAiVEZPsNnxV086g6QdPxTntnITNyQl/wq9+yd51KnRz1rCfgv0xsYzwR1qoIpfXMztuOoQVQCfx8Ib6WOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rLJrT6wJ; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iELWRdRC"
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3d3db3b68a7so582815ab.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 15:25:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rLJrT6wJ"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-85ae131983eso6478039f.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 15:25:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741217109; x=1741821909; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741217110; x=1741821910; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l7kX7Ef8fyaxBwW7MaGLY5EScGfcxKucjoKcRNwnL6E=;
-        b=iELWRdRC3yglom12TSoFzTShH7ez6cj5DJdLwQpSMiCr1tpPRtvFGeejPnRu7U/bhy
-         VLGZtGdbRNGNTFbt3UZMv5gblgZatnMJHyOmPVunM6IBx7PCKmiRHCwkmB2X9c9kK+i/
-         WW+JqpkOMWi+51XeZbwKSS7AfratUMT0euXzAHdV/IFSos62bu+zbc1N8Q8HggxPcDfy
-         ptRINXruGoTn85heQ2xEK2ZPR7sp+PS8Ru2FE6DUWlNgK1PHPYaThECuaOFBZ1qGFsZx
-         /qfwcyOjf5at5fV4BpkgETZrVMXFQDV5+QlQwij2AP/NV73hakGO/NZlpjNRpY8pYN+i
-         +yAQ==
+        bh=y0RhbP0JdWKLySfTbL+kC7pjlCWicLno65Zg0j3u3BA=;
+        b=rLJrT6wJk8mcInX2qo/VaoDnuNEeYnbyam+fAzPlnkMtcaHnPNiEpRs5JoMqbhKHhb
+         rasBiJaQI++l8MsEeEp8X6tiMVxeZyQxV46j1U3opD2wSSo26rq135CF4mYagu1q4y2Z
+         ACQb4H2xOOlOv7qX1EYtHiftSe4uVgm5S1lsUQUQz9XvidE3ABK+YZ1luNp90Kt6rRQJ
+         8YU5+mWJMkrAP1fIUx5QmWmP0x028Y7JZ47gnNhkCnglggi4qdx5ztaon2OHeZce9p3V
+         BLjbPOlOYiwuZT9dGAcf4AQ7U0p8YfaycQTxs6Ff4XYCsrv9HAdeJ+CLsbpE+QtoPYoN
+         xygA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741217109; x=1741821909;
+        d=1e100.net; s=20230601; t=1741217110; x=1741821910;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l7kX7Ef8fyaxBwW7MaGLY5EScGfcxKucjoKcRNwnL6E=;
-        b=sF9Q6s8tlh+7kQn886Jk2nOtG5lye3sfxhC3q+JPsZOZWIBN+p5hGxtgYgj/Yvqdj1
-         w5sGaT7FNqz/JPBHoOtqdLpr9spU314v5aipfjn4j1YFcTRt6o7cLOZKTF1cM1oohelk
-         rEJT29sx3rqsjdtHvxAFVzpGb8fO8gywAQOi88UP8nNgMP8tRaqilDzLXTo5FeN2+A1y
-         QviM6CrW1BURjrSuiht1A8r2qZQQMfDegDEmTXtX+QxCbe+5zWHx5+YJWgVNCK5DiBGZ
-         KTwhu+oqi2OdaUaa7HFx4MlgX41Aitk7aqRGe1oi1Afe3Up2ZOz7wnwa1GsAfoEOp+uu
-         0sgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhdXlKkpMd7mSmLVbSxrv/QhpFWdqgdruxbHyvJcYUqwVDebxSi3n8K/gHIFqKY8mnkhLxX/Ntwx1kIw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx6FwybWeD+M82d12eoKjVdTywNPexD1GSIwzdPow5movJPRIA
-	JsD+Zcpk/06DL1k4C0OTWSVsVCaCWY69WiTQYAeL/OcCjdqX+STgLWKY/92suSg=
-X-Gm-Gg: ASbGncvZrfDvsMeaykTnIeE+cx/AA4ffDOq5TlAaCUT9MbTLj7ho5DWufvULo1FYlvP
-	1QxFTgRTrhkUn/04RTug03fCKkSoCMqFuF9kP0KphKz7QczqnGVsADMsc5xYpd+FrD4r138BT73
-	tmtFBReEuS1xSTWysP/pcYPj/MUMoExNlCKTD2CUk2+0IMU6U/hANHM1bP3eKWvu4/DlPUjhwhy
-	12pzgVW8lHkqRy1ayaTqvn+WAh5wUkjFwtNvMauiFUKspVnn9XSN7Pmuu/bN75r80VDm7LqWs6f
-	AgBcyPZMBbR6xphe8ZmAk+0EzU3r7XxZhVzY
-X-Google-Smtp-Source: AGHT+IFw7DOF2AlpkNGRt5nKYLzCwHXDlYJ9rI13bHT9B8yZEwsvGPw15V0L62f7x6TiXP73rO1Krw==
-X-Received: by 2002:a92:c26d:0:b0:3d2:a637:d622 with SMTP id e9e14a558f8ab-3d42b8c1c5bmr71442235ab.12.1741217109024;
-        Wed, 05 Mar 2025 15:25:09 -0800 (PST)
+        bh=y0RhbP0JdWKLySfTbL+kC7pjlCWicLno65Zg0j3u3BA=;
+        b=EphYDdovsxc78ddZA52iHsfnHBKGAexVp9zwbBVHh8Fc/Yrkpp/ANw/pc2/m3s9MkO
+         n8SUg4vgRv/yOG0G76TypQZFG3RjZUAkPLaQ1wGZgTr4GVRqBEZ0wUBvoiWcbpF302ul
+         ZXxGpyJKPWSNlkHJgw6pGcT9fXTpvnXXaSDUrKrgvxcXjIblX6FgwtQ9CzxFrYshwRVS
+         HlZb8zHEjkugLS9cZJHQJ3gyUPdsDul1Nv2sY9jD+DiHnh5QjaWQXNNGAStTWQiXsqAe
+         MKTY0+sA0xkFQbo94EWpbgC3s3mT1bKgb7KsSREqgLJjnZ1iuN5Bo7gz7Jg2tiOBLzdD
+         1btw==
+X-Gm-Message-State: AOJu0YzzonCj5r3vHGmF7Uz1iwLIhUlD/dvl4F4SnbjBBs/TktojlcUI
+	GRrkvszb3IecnU75CgqlaVLcP26iV7rXPyF4pCTwNMu8+V6t64pjGa1dloOU93c=
+X-Gm-Gg: ASbGncuA3iP7BJFNCjdjKzGqdvhGBR+InIuVp69xXmIKuT9UxJfTeh8liPPO6BzF35p
+	LzFH+gHVizSiUTRkGadbMLOmYSA0IRVY6tSRTipdi7T+vqT//21jCteaPzZEaNEDLsPW1qX3EM5
+	mClPvHAhO8xw/PozzF+Y3rsjgLbdFZTvoEq+8MkC2sG1ae29ED+2XASZZ+nRPe0w4kBMGq5h/EX
+	tfhFAgCUtFoJ0Bg6bao+PQNZ5rmF4GDrD7i8TC5DxyCARXcyn671s3UBnmYyOTTiMMA+O+ZoJHB
+	pOOVSDM3i1i6oV6/oR+Txj+o7AX0fusFSWX8
+X-Google-Smtp-Source: AGHT+IH3KqAbGDF1xwNKnUg78tOxCRXKwYUEhnJ7WUjiCyUqzy+1A7ZGZSeoPkNgg09EhM62HVsbDg==
+X-Received: by 2002:a05:6602:7208:b0:855:a4a4:a938 with SMTP id ca18e2360f4ac-85aff8bded8mr643813439f.2.1741217110443;
+        Wed, 05 Mar 2025 15:25:10 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f209df3ea9sm17360173.27.2025.03.05.15.25.07
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f209df3ea9sm17360173.27.2025.03.05.15.25.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 15:25:08 -0800 (PST)
+        Wed, 05 Mar 2025 15:25:09 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, 
- vgoyal@redhat.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
- yangerkun@huawei.com
-In-Reply-To: <20250227120645.812815-1-yukuai1@huaweicloud.com>
-References: <20250227120645.812815-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2] blk-throttle: fix lower bps rate by
- throtl_trim_slice()
-Message-Id: <174121710777.165456.10255728984898278903.b4-ty@kernel.dk>
-Date: Wed, 05 Mar 2025 16:25:07 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+ Yu Kuai <yukuai3@huawei.com>
+In-Reply-To: <20250305043123.3938491-1-ming.lei@redhat.com>
+References: <20250305043123.3938491-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 0/3] blk-throttle: remove last_bytes/ios and carryover
+ byte/ios
+Message-Id: <174121710911.165456.3433159135540117935.b4-ty@kernel.dk>
+Date: Wed, 05 Mar 2025 16:25:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,23 +77,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Thu, 27 Feb 2025 20:06:45 +0800, Yu Kuai wrote:
-> The bio submission time may be a few jiffies more than the expected
-> waiting time, due to 'extra_bytes' can't be divided in
-> tg_within_bps_limit(), and also due to timer wakeup delay.
-> In this case, adjust slice_start to jiffies will discard the extra wait time,
-> causing lower rate than expected.
+On Wed, 05 Mar 2025 12:31:18 +0800, Ming Lei wrote:
+> Remove last_bytes_disp and last_ios_disp which isn't used any more.
 > 
-> Current in-tree code already covers deviation by rounddown(), but turns
-> out it is not enough, because jiffies - slice_start can be a multiple of
-> throtl_slice.
+> Remove carryover bytes/ios because we can carry the compensation bytes/ios
+> against dispatch bytes/ios directly.
+> 
+> Depends on "[PATCH v2] blk-throttle: fix lower bps rate by throtl_trim_slice()"[1]
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blk-throttle: fix lower bps rate by throtl_trim_slice()
-      commit: 29cb955934302a5da525db6b327c795572538426
+[1/3] blk-throttle: remove last_bytes_disp and last_ios_disp
+      commit: 483a393e7e6189aac7d47b5295029159ab7a1cf1
+[2/3] blk-throttle: don't take carryover for prioritized processing of metadata
+      commit: a9fc8868b350cbf4ff730a4ea9651319cc669516
+[3/3] blk-throttle: carry over directly
+      commit: 6cc477c36875ea5329b8bfbdf4d91f83dc653c91
 
 Best regards,
 -- 
