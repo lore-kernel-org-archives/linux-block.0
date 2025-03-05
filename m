@@ -1,71 +1,72 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EEF2356C2
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 14:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C74A221F05
+	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 14:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741185930; cv=none; b=Xm40EIqEnGxbgoSauyvR0sZlSPq4dMRVF00cTCX1m5OMM3sooNlvWq5NzXp5fc9cT/J9z8YdA2KbC42HaC4f+qTJCc4nvN2GD0pzbKMzDZdkT2TIIoNy8ztLdZqVxR7CE66Lz4jKfR9sk/3HomJ9/owx+OlhA8BR3tZ+uIAjNSU=
+	t=1741185930; cv=none; b=eVZHB0id+fPHfBRiirz+h/I6EKSF94a8kRpMm0mDYlR/TRnli5lwGb6uAtyJRYp6vdI6h79DH+ytlK8+ssnKRcpSj57mLKeZNiRo2C3RhX/C0l9eBHSp5wB7VfbvW4PXGuc5mM7JEQm4c+bEymIRyJzn+8VmueBgjw+99WsLtDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741185930; c=relaxed/simple;
-	bh=QD3ga/c6a6dPSLCRDh0XYDvnBkS+MZ1s3Z50gU7AYl8=;
+	bh=Cmk1xtK9zj/mZKksRgzAj6pkbkT0aOMNt6bwRChxyTg=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=o347Pfb7jHSTbhL0DIT4eISGMte0kzd3jYYVjKyT/6qrU6gk6R9fGMjjsaGKvErUv5aZP3houSAghi4UzndqjFHdXhMYCRVlVBkbnA7qmlurWevf1IgSNP1HvB4kHAF/arSYI9CMo8+QEcpDeR7F8PRg0rPfoalmpPAaFB2Ox0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=M5LUgQFf; arc=none smtp.client-ip=209.85.166.177
+	 MIME-Version:Content-Type; b=X0PET4IZNa2t2Z7n+7uQkfHZYmgVVBU7C0RNuKi3ubFPc4vhfeKuX8ZAc5fltLg8T0fvNde1MnwGg4ZW99omzJlKYkCdNdRDzT0L3uZolC8JZDByqpjvIfkBHCvMD8Z+o+yQUFACEraMoIdZEGkgu/tsBf6ozPFN+A7AT1OgGu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GpPv39p7; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="M5LUgQFf"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d3e28e6bb4so49285805ab.3
-        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 06:45:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GpPv39p7"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3d2acdea3acso20517095ab.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 06:45:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741185926; x=1741790726; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741185928; x=1741790728; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m697LK8H3MxKU8e0ryDs2CXnNQZ/RNDmKpVLCA+5XWc=;
-        b=M5LUgQFfu9grwrvTi+/8JxB3tvMmYYHfhBkUx6iN23V/CfQCjAOeUyUs3H6YKiikr8
-         oyOHUZxQbE5G+d2wb10iEkjwvF1UFnNeCTKkHSTbevt+/1MK6tnadiSdhT/A15VdLNqh
-         GBUJhdXVGwM5wIrsbQeGNcaE+B9JR/wC3ss5qf9Q4KNaH/C+D99y5TqpXR53cS7iSIfP
-         mAtPXr8cb8Fb6AOYw8OzAV0SdZ6ObkXlattm4Zcj1P/RxPkWw0kgGXvy/owLzeS20Z+N
-         bNzg2rZ3dUJo1sY41/+7tPgH5+WyQrYdqsZ9aJzQmxtIY9BOWUaaoKgDr7Q9KthI3YoV
-         u4hA==
+        bh=/mtFeKx17Yutqyl4iJJ9qPun4qwlSidhHSO6yuTK2pU=;
+        b=GpPv39p7F0jzsUxYCnv0nOJcQ9gfdwlfXpTmD4Q567NUXMLjqYXSHZIUnRQFlgwJAl
+         rRUpaVegoC5lloIXI1KkLJvkMWE9yaW7tWspFYimbzhXuDVD6ZvgQRuBZgxB/kdOvsDh
+         rpRj6aZawoHM2CQzhk8tHGFVfODLP8scexxh5HWBS3ejchXwQzg+bfW1QYJ42vEdApQ4
+         Rdxn5hwPf2AFWaMTwx0sGJevA6ZfD2bXABUz8AwXQe/KHzP9UGO558mCjIK0kElq8AM0
+         p8CXXGFAnaBNnumJ3qrr2QvA9crMfUKteDhIj4qqInFcr2Bav935LFr0FykJqFDCOQ8P
+         bXiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741185926; x=1741790726;
+        d=1e100.net; s=20230601; t=1741185928; x=1741790728;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m697LK8H3MxKU8e0ryDs2CXnNQZ/RNDmKpVLCA+5XWc=;
-        b=jNNqe2bTA2mmQxjRb9TtC/1XFOAQNeiGnnjB/cIT5AFRdpNCI0MvmVnSQq2CNwaNep
-         DOdmFzP1M1EUnlaulygbmSYaEK8DMtUPPoT79TzG4yo8xGA4gL+Nfkb2w1BOAo4X/bfG
-         62oKdLtm9ajt022flDwaDt6FHh9JntrTNpX0Vr55yu1nHJZnlM2y7h64yoDoQzB/jBnp
-         aagnAaTGuH0LNfJeZ+MtFFiqBPxZYCDUXDYvrYkU97xUCpyff2HI+ephXA/99j6SL9T4
-         JUSaMSE0xGTEsyrH+9A88wtSv2IMawdNfInShKVLFWrVnrGfn4xzGnXfPqmboivQT+fY
-         6LoQ==
-X-Gm-Message-State: AOJu0YxX/C9C9rabAeEXsZfhCjT4o09yjh+hdhb09x9h4nXvSnsuCo+z
-	FLwfTiiZlD+EF/teYfhcvzz1hVU9aTAdwxAxieU4uoDvA+6jOAyznksyRTxdZLTW8yYdlsqlZ5U
-	d
-X-Gm-Gg: ASbGncv3KeYCcUH2TLv7/zrEu2uijaVFaZ8jJuWVTKyCHYa6AyRv9x0JLZ7CI9OpxyX
-	Ox+UqhaqZQdNtddLfxQHm62NaXCMm8T6V/V5t7a1Yt+YwJ93vcTPolgKWMFJZQBPkgDXC++ZBOa
-	6jx4Tjc7hbUIri253xRf3PTavDqoMjcwtmHhmc0qTAeOlbsU9FKWZM6uzBsX2IwFUIQo7ffOLCp
-	EmkZH/W5T5tT9SC6Alf96NF99RDmkuBCAfbEdVl55ZOnXCw4pKzbeci/yB1QO7j4W5kia2jVhNK
-	Yf42eUT4GHFPZ5cZ0OcLZ2nIkjyxn8wzla4=
-X-Google-Smtp-Source: AGHT+IE+nw0PXhiFEnRRFQEatyfHWRw6QhVn7+SN+ikDIHOOsoZLnm9P9x2fgGyq567pucoW9v70Mg==
-X-Received: by 2002:a05:6e02:170a:b0:3d3:cfac:ce2d with SMTP id e9e14a558f8ab-3d42b996236mr41627935ab.21.1741185925695;
-        Wed, 05 Mar 2025 06:45:25 -0800 (PST)
+        bh=/mtFeKx17Yutqyl4iJJ9qPun4qwlSidhHSO6yuTK2pU=;
+        b=gkJ3wYQbsEYc9YP1wnS3EEhsSC5hIJ/dYieeS44CWafidOBKTDP1mNFz9Krf3sAj+U
+         k79GZrleKsgAI2CC2AjMIouK/CuE5xH4n4bjq8gcGYq7xeXfrxMUCtL3kqqyH6YviX56
+         Y2BZdGTr4HkxO9dimQQ2fy21JazEuRcNrpBgwRQRZN9B5r7+Fs6XEhmVerN1N3x2Vvk6
+         6QN99ekVt9wgnyXsd6VyHgb6oXOXDxtkCwiAAo0Ntu+HOHF+DYrktvYWVbo8RPkI369d
+         ZWQ0Wbcme3fVanwmNWhlzpBIyDlVBS0UxL6QABvkxXjMoKMKVrqsW/omqdJ57tA5XgXn
+         BP1A==
+X-Gm-Message-State: AOJu0YxRTSYDubljv/8vu57NfU5LPh6g7i2gTWdCtg6flgct7u5JKUx5
+	UXmlyoCCpB3gU3nXuvmZOsdpUarmwGRZLBG7Ira9mIizz5gr/g0LalyEA2A6m8w=
+X-Gm-Gg: ASbGnctElgRO3cSO8ZwXlEEtAHx8CqkXE0tERncr2FRX9GuxGFjsIkk/le0XV1nQ3ue
+	9H1S3fMZkw2L9edGALqc7qOnm2l1sYkOkIDT21ijaQSbTux9qvCTMA42o2HX6HQgoNpZ1nCvo6c
+	j9XPi39FfvPIucDJjS+EWlIPyp3op/EM4sxxkGYhtNhbdbvUYtlsI5clFbliBHysZGawQjqw0dX
+	nzQ3SV2lkbn03HgxvFpf1jaWj9mh2U2xqfYO/An61hbSZpl80vO5txOLWoq9JiIoYA2sOMLvfRn
+	X+Jexc6paaixURJ1I94V0ykRdhM9l0MdPKc=
+X-Google-Smtp-Source: AGHT+IGsBmYSs3QMp0F/1K4jts+fZHuzb1nFpuhkf3zgDvndXF+r7uxykpB9Nima3gyrxwD3OUT9Eg==
+X-Received: by 2002:a05:6e02:18cb:b0:3d3:dcb8:1bf1 with SMTP id e9e14a558f8ab-3d42b87f6bbmr41882915ab.3.1741185928232;
+        Wed, 05 Mar 2025 06:45:28 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f061c07b73sm3585381173.23.2025.03.05.06.45.24
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f061c07b73sm3585381173.23.2025.03.05.06.45.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 06:45:25 -0800 (PST)
+        Wed, 05 Mar 2025 06:45:27 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20250304-set_params-v1-1-17b5e0887606@purestorage.com>
-References: <20250304-set_params-v1-1-17b5e0887606@purestorage.com>
-Subject: Re: [PATCH] ublk: set_params: properly check if parameters can be
- applied
-Message-Id: <174118592485.8596.3723770986875822816.b4-ty@kernel.dk>
-Date: Wed, 05 Mar 2025 07:45:24 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: linux-efi@vger.kernel.org, Olivier Gayot <olivier.gayot@canonical.com>, 
+ Mulhern <amulhern@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>, 
+ stable@vger.kernel.org
+In-Reply-To: <20250305022154.3903128-1-ming.lei@redhat.com>
+References: <20250305022154.3903128-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V3] block: fix conversion of GPT partition name to
+ 7-bit
+Message-Id: <174118592720.8596.17751872254586866019.b4-ty@kernel.dk>
+Date: Wed, 05 Mar 2025 07:45:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,25 +78,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-94c79
 
 
-On Tue, 04 Mar 2025 14:34:26 -0700, Uday Shankar wrote:
-> The parameters set by the set_params call are only applied to the block
-> device in the start_dev call. So if a device has already been started, a
-> subsequently issued set_params on that device will not have the desired
-> effect, and should return an error. There is an existing check for this
-> - set_params fails on devices in the LIVE state. But this check is not
-> sufficient to cover the recovery case. In this case, the device will be
-> in the QUIESCED or FAIL_IO states, so set_params will succeed. But this
-> success is misleading, because the parameters will not be applied, since
-> the device has already been started (by a previous ublk server). The bit
-> UB_STATE_USED is set on completion of the start_dev; use it to detect
-> and fail set_params commands which arrive too late to be applied (after
-> start_dev).
+On Wed, 05 Mar 2025 10:21:54 +0800, Ming Lei wrote:
+> The utf16_le_to_7bit function claims to, naively, convert a UTF-16
+> string to a 7-bit ASCII string. By naively, we mean that it:
+>  * drops the first byte of every character in the original UTF-16 string
+>  * checks if all characters are printable, and otherwise replaces them
+>    by exclamation mark "!".
+> 
+> This means that theoretically, all characters outside the 7-bit ASCII
+> range should be replaced by another character. Examples:
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] ublk: set_params: properly check if parameters can be applied
+[1/1] block: fix conversion of GPT partition name to 7-bit
       (no commit info)
 
 Best regards,
