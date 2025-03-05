@@ -1,107 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACED198822;
-	Wed,  5 Mar 2025 18:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363EB25179E;
+	Wed,  5 Mar 2025 18:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741199991; cv=none; b=TgIjDxlnkDq84zVWYre5nB32JV1JCoyrvZlqOl80G+UZN524tHEW7MgvDyoQM4eOx+3fSSArJ0gehts+xLWCtyw9VXS5wm1QEda8UWvO/h4xQseNJrnv1RsR61Sjv+YX/OZbVASVm3LLcVkE0RYjcnhgJNiP4Oyt2GEjGGVrKsg=
+	t=1741200516; cv=none; b=Jajrz1zKE63CusioinmwfTTk69pZGcNSoMTuipl1e6zGDxw6Yu5LsX9IS+GLwuZgNNrH0vj44haCaT0OMrlZfa+nT4L8g8MwYGoyKFM1k0PsG35uZY0n7qMN0dYgdGZqs0e7nHkiSnEgXtfBMLIT/VbjJzsClgILvTBAtxgZmxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741199991; c=relaxed/simple;
-	bh=uVQk+c/QggQHiv+8/A6v7lNI9M/N5W1t0Fiz38TfaPE=;
+	s=arc-20240116; t=1741200516; c=relaxed/simple;
+	bh=wel2R8QVy27EKiGZf1o/TwGcyJNnKp1OngV/HowqlWs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AoSozuNMpU/bn808lTQJgp54s11fgc9j5uzO735Drft0LNQEZS0ORAEXgopaar4CIlj6gvDDDr5oZ23giVRepKlyCSbwuk+6DYV2pX/xrrfIEdMB5TOker23gFUcEgwuVHQcGbTO/lgpW040LvwH8Yo9hAcwNAyJyYWmue95H3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cg4zcSQg; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qu0+nidWn1t9C8C4YsqJHqy6vfjB9vAJys9NAmLjkRlgV1BOrK4lZcWGbAljMwaFAue9KGrnErzI7TrQ+WvZ3kOh3rXbCjXDAKEQ3i9FlW0NJsze6Lq62Ws7XgdrAgF5tEVU3tm4GPInodegD6ZHtmIptTf2n8krsakuWF9Jvhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=it+H1gaB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cg4zcSQg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E624CC4CED1;
-	Wed,  5 Mar 2025 18:39:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="it+H1gaB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CAD5C4CEE0;
+	Wed,  5 Mar 2025 18:48:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741199991;
-	bh=uVQk+c/QggQHiv+8/A6v7lNI9M/N5W1t0Fiz38TfaPE=;
+	s=k20201202; t=1741200514;
+	bh=wel2R8QVy27EKiGZf1o/TwGcyJNnKp1OngV/HowqlWs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cg4zcSQgXN9/t4en54R8HTqIJc1/5/MWossef0e09IOAaJjTbGlXSHgaK5dBUrC1I
-	 Pla/ZAQpL07S3v62KDzDzk63gu+4OC7xc7o67i31bo8tFI99i47+JkuiaKHIJrwdqP
-	 rRafrpc1NiptV1fZY3JUid7CX2sOWiVdT3fEj60tGrN8lklXD3f17Fi2m4ZVAMs9Fe
-	 cWiVHKRwDLueE9s7Zrbiwaf47bfpUBJ8J8M8hV0o18hsrJDTiCG64QDTwz8vsnGo3S
-	 AXy5+E6LsA7pieEd2nv2xlx28JqiJKaIAbW6CbmfCv8gzp957i4dKyet8VsXEXgTSi
-	 zMs6pnug1p7hQ==
-Date: Wed, 5 Mar 2025 08:39:49 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc: Waiman Long <llong@redhat.com>, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCH 1/9] cgroup/cpuset-v1: Add deprecation warnings to
- sched_load_balance and memory_pressure_enabled
-Message-ID: <Z8iadfcPxgamx9CC@slm.duckdns.org>
-References: <20250304153801.597907-1-mkoutny@suse.com>
- <20250304153801.597907-2-mkoutny@suse.com>
- <8b8f0f99-6d42-4c6f-9c43-d0224bdedf9e@redhat.com>
- <Z8cv2akQ_RY4uKQa@slm.duckdns.org>
- <n2ygi7m53y5y4dx5tjxhqgzqtgs5sisdi27sk7x2xjngpxenod@7behfsvlzhxi>
- <123839ed-f607-4374-800a-4411e87ef845@redhat.com>
- <Z8dAlvRnE28WyOGP@slm.duckdns.org>
- <5bw7yc6bacojk2i2ikhlmf2skfiix6t3ipchbnvyfttmyh644j@iyquxeuyapd7>
+	b=it+H1gaBIr4l6YFVJwudnADMG34ihH8fwzBvXfsb3ft9ouvQKzpQsvfzX3XlwKoHd
+	 esNWY48VZEhviEWIBxPCo3/lPuUzAbkCkZ+CaXOh6kVC5tF6tNUoRqp+/ToOomDmQd
+	 7mdkLSK0+KPOlbkqe7SEieWeeEzOvdEJFJZH+PY1hvnKEcTzAg8WKpfGNf6ZsUeEim
+	 cipHZbGBJLdfoLAMdGHQ5uxfjEpb9KUziQ9twD5gYPa3EJ/EqPJ+zMeEP2oFRdThF8
+	 yxqAMKiJZ/Ue5lTmHuRmTMeHgWUUu9+fX3oXwd5tbTaI6rK5n2+00MmHxlWGYAtC84
+	 qjfXfT4K/n0mg==
+Date: Wed, 5 Mar 2025 10:48:34 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>, brauner@kernel.org, hare@suse.de,
+	david@fromorbit.com, kbusch@kernel.org, john.g.garry@oracle.com,
+	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
+ sb_set_blocksize()'
+Message-ID: <20250305184834.GE2803771@frogsfrogsfrogs>
+References: <20250305015301.1610092-1-mcgrof@kernel.org>
+ <Z8fpZWHNs8eI5g38@casper.infradead.org>
+ <20250305063330.GA2803730@frogsfrogsfrogs>
+ <Z8hck6aKEopiezug@casper.infradead.org>
+ <Z8iEMv354ThMRr0b@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5bw7yc6bacojk2i2ikhlmf2skfiix6t3ipchbnvyfttmyh644j@iyquxeuyapd7>
+In-Reply-To: <Z8iEMv354ThMRr0b@bombadil.infradead.org>
 
-Hello,
-
-On Wed, Mar 05, 2025 at 11:12:21AM +0100, Michal Koutný wrote:
-> On Tue, Mar 04, 2025 at 08:04:06AM -1000, Tejun Heo <tj@kernel.org> wrote:
-> > I'm apprehensive about adding warning messages which may be triggered
-> > consistently without anything end users can do about them.
+On Wed, Mar 05, 2025 at 09:04:50AM -0800, Luis Chamberlain wrote:
+> On Wed, Mar 05, 2025 at 02:15:47PM +0000, Matthew Wilcox wrote:
+> > On Tue, Mar 04, 2025 at 10:33:30PM -0800, Darrick J. Wong wrote:
+> > > > So this is expedient because XFS happens to not call sb_set_blocksize()?
+> > > > What is the path forward for filesystems which call sb_set_blocksize()
+> > > > today and want to support LBS in future?
+> > > 
+> > > Well they /could/ set sb_blocksize/sb_blocksize_bits themselves, like
+> > > XFS does.
+> > 
+> > I'm kind of hoping that isn't the answer.
 > 
-> That means you'd distinguish RE (replacement exists) vs DN (dropped as
-> non-ideal) categories?
-
-I don't think I am. I'm just concerned about emitting warn messages on every
-boot without users being able to do anything about them.
-
-> > I think that deprecation messages, unless such deprecation is
-> > immediate and would have direct consequences on how the system can be
-> > used, should be informational.
+> set_blocksize() can be used. The only extra steps the filesystem needs
+> to in addition is:
 > 
-> I could subscribe to that if there weren't so many other places to
-> evaluate:
->   $ git grep -i "pr_warn.*deprec" torvalds/master --  | wc -l
->   62
->   $ git grep -i "pr_info.*deprec" torvalds/master --  | wc -l
->   2
+> 	sb->s_blocksize = size;
+> 	sb->s_blocksize_bits = blksize_bits(size);
 > 
-> So is the disctinction worth the hassle?
+> Which is what both XFS and bcachefs do.
+> 
+> We could modify sb to add an LBS flag but that alone would not suffice
+> either as the upper limit is still a filesystem specific limit. Additionally
+> it also does not suffice for filesystems that support a different device
+> for metadata writes, for instance XFS supports this and uses the sector
+> size for set_blocksize().
+> 
+> So I think that if ext4 for example wants to use LBS then simply it
+> would open code the above two lines and use set_blocksize(). Let me know
+> if you have any other recommendations.
 
-Well, not all deprecations are the same. If users are stuck on cgroup1, they
-can be really stuck - there can be a tall stack of software with
-dependencies that users can't do much about, at least not immediately. We
-will deprecate cgroup1 but this is going to be a long stretched out process
-at the end of which we should be fairly comfortable in stating that there
-aren't major users left which are stuck on cgroup1.
+int sb_set_large_blocksize(struct super_block *sb, int size)
+{
+	if (set_blocksize(sb->s_bdev_file, size))
+		return 0;
+	sb->s_blocksize = size;
+	sb->s_blocksize_bits = blksize_bits(size);
+	return sb->s_blocksize;
+}
+EXPORT_SYMBOL_GPL(sb_set_large_blocksize);
 
-It's almost certain that that future won't arrive in, say, three years. Five
-years may be too ambitious too but let's say that at that point we are
-relatively sure that most platforms have moved on (but there may still be
-users on older versions of those platforms). Maybe it'd make sense to
-increase the deprecation warning temperature by then to warn and drain
-existing users and maybe after a few years we'd actually be able to drop
-cgroup1 support.
+int sb_set_blocksize(struct super_block *sb, int size)
+{
+	if (size > PAGE_SIZE)
+		return 0;
+	return sb_set_large_blocksize(sb, size);
+}
+EXPORT_SYMBOL(sb_set_blocksize);
 
-So, I don't want to be emitting warnings on every boot for the good part of
-a decade on every boot for those users. Doing so feels silly and annoying to
-me. Let's inform that it's coming down the pipeline but I personally don't
-want to be warned by something that's close to a decade out.
+Though you'll note that this doesn't help XFS, or any other filesystem
+where the bdev block size isn't set to the fs block size.  But xfs can
+just be weird on its own like always. ;)
 
-Thanks.
+--D
 
--- 
-tejun
+> 
+>   Luis
