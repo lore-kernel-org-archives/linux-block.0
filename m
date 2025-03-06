@@ -1,176 +1,106 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FA619F438
-	for <linux-block@vger.kernel.org>; Thu,  6 Mar 2025 09:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A475FEEA9
+	for <linux-block@vger.kernel.org>; Thu,  6 Mar 2025 15:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254020; cv=none; b=WLW28ziaJxC6FLdraJN4WfQugc6cVt6Nrys5sPZKw+Ld/mT5B1T050LJLUkdSYA+xQjjeSy0eCFndM47s3LTmNog3e1xoBZJYAg4G1GICCTou4tSQGgNlM9tU5cfeH3lSXGd6+15dPA4MKCLWSMxP5y/ndiyKWMgOmjfQBArVPk=
+	t=1741273339; cv=none; b=JHev809b+0Fqx3jaMc9+uw17vKabKMbOmMPVFNVMoR/jpPrl6KOruB8KVcSFKOzwvgdiGVg20YJ+I60/6rG5OkqYl86M+YX/AV/43vrxAPUhA2tir9c3Lst7WWKaRh+lomx30EHKzlVFvN4q1xO3Y2/s2AhzKPU7tLheOZmEkLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254020; c=relaxed/simple;
-	bh=slXQxy8D3rzzEXV3gqS7Lt7NiuqIL4flKYR1TgDWdzc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C7DDyK/FaNAM0OKIjWvDNTb54RFMbgRr9pK2fb3IQFbdafV2sxXzHldG+b9IAlVsXLHedbjpWWEQ11msWJTni5t6cTn4PIEFHlNsZ7cszlbcocraVtQl87Yx3dipZji3wAOWprAxYHNL+yEAEU6n0zRhBJwLYnuh7Y1CKul2hcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BOkL+rj4; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1741273339; c=relaxed/simple;
+	bh=TNHYt9OrG7z20k4JSs77FE0a0Uuxd1mThM9cNp/g3qw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=lO0Dk+2xGejBLJeP4zJnzGDalmqWeUonPj8jHvUSQKIjJeSVR6glp8v/N9qIVhxDlY6Mwraxsh3Up6nrZvAts7NS7bFlNoRKHI6cZkgUmIWx3VENpPGJNwLCggYzEFf2bvLSV/WOq5sVhyEBUr87z6LxkVXor9X6tzUcLG7v8Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=axjCXDg0; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BOkL+rj4"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5269LR8h032613;
-	Thu, 6 Mar 2025 09:40:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=GZ8E6SMjlfBsI+AHwBXNIYgwqStZAqJcARgkxsFlT
-	UY=; b=BOkL+rj4WQFC23STLRubByyK3vtqpJ+plgcPmhK1+JSYnKNApM6OcEGeD
-	C5/2czWh2Lf/Y6w0vuY1g/YAQOD4Ieozcv94dlmnxYGsscsaKJGIUFK8PnYiX0mY
-	RJY4yxdJAd7m7TK9o0kxO8l+G10hKeLt0lC/ilcxLAfVj+bUzG8Y6UIaJ2Fs5B7f
-	wSN9t9yXT7ql06qs1t4AjVKvIv6nSVSvyMsXLpSxEP/WzUItGuNzX7nB/sw6uRgN
-	AxZ/qJAcHRzHS6OnCvyNNrOktvIIsUj4Nmb+TrwNCthWkTmPDl0/f7K0T5ADNsnQ
-	WA7y3m8+7yZDlHrAd9Pg9G9A4KHAw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 456wspjwew-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Mar 2025 09:40:01 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5268CY0P031946;
-	Thu, 6 Mar 2025 09:40:00 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 454cjt85f0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Mar 2025 09:40:00 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5269dwj932834284
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Mar 2025 09:39:59 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D2CA72004D;
-	Thu,  6 Mar 2025 09:39:58 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4092320040;
-	Thu,  6 Mar 2025 09:39:57 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.149])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  6 Mar 2025 09:39:57 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de,
-        axboe@kernel.dk, gjoyce@ibm.com
-Subject: [PATCH] block: protect hctx attributes/params using q->elevator_lock
-Date: Thu,  6 Mar 2025 15:09:53 +0530
-Message-ID: <20250306093956.2818808-1-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="axjCXDg0"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3d03d2bd7d2so6566425ab.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Mar 2025 07:02:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741273336; x=1741878136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=85jq1Q6VP5GwImlSpp7X1r/ay/vqE02iBEhuFPnO6PI=;
+        b=axjCXDg0hfRlXe9OQhPPPI6BBGSflFi9vI/4gF7FbrKEOWLGUnBs9/Q5yKsG4Lp4Of
+         g5KpvfUtsCN0wu72WiIaFc6KalEqI7T9RwJbpCtCu3ivCEewAYEChUQdyrSG4ukwKFcf
+         ZDxmhbqZTnAUs/f+VyKrS0zVDPv5OebVbbaIFuhZQZ2bR4pQERFCUZo1SNjAJYUlT/L0
+         Ch7zv35rCo20R5rgjvk4ewapIQyGWILC89uxWEpMbsFTOmKyotoyP+tQEV1UlNJASevj
+         D15q4sh4YgZfqfJLzVQueJHuoFQaLwMrHn1Dd3adkx8CWtgTgfQL2MaowirUE67c+rrj
+         R5dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741273336; x=1741878136;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=85jq1Q6VP5GwImlSpp7X1r/ay/vqE02iBEhuFPnO6PI=;
+        b=ARQ3IRCxl30p0PU6Y9pFtFYAqXTH/VSS306geqhyb7MpOfBEgYrRcCa2cSAC1/rTkq
+         NFg9Hw2HzVc3YVZdA16vPtMuH7WEwF3sBCVO+CP5Hcz9LeUXz9TPw6UUW1ZbwntwhMss
+         +LumrOjKVhnz1zqik7BB+OWEy2EsnivOnfTgQ3MIfEFqAzC4NevQKzoy17nFY3YEaaQ/
+         8n37YTE5cEJfW67qoLBR6jjCXmTj4wU411jiHMv/ML7T6NqrgLIQ88YnV9RJ99cOJy5I
+         e36zEnf/hoIUhADZOYItUhmytx/4CSeVJ8d0x3FAI5lYO5ZX8jDUKyjU1qkr4z2gfBdP
+         YZrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVo0duX+NA6No0vNA2jbVjTZdxwWP10VOP4VqFnmyVFuNlJUaFDU/PaEJ2xMnwkUdmLrQkxyreKSdog7Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAYzmQYlWhc956HklYD7Rma9aSm1iBCvJnNZfo+/uxoPYubmx2
+	Ya+hal8HVUrS1EIb8i9948fagVJM0iDieTDntKImbtIniGiE7lL7GuzgYIzxxPU=
+X-Gm-Gg: ASbGncsZ7hYGOP4oEWjQAVQ0mezKFKSXKXG/nZ+8hV7/1Yvp9udUEqal198M7muKQsL
+	Ox8MMQIIQ4ye7H0Ba3tnUZsgIQY3pNP35nsmbg9UFq3zl2+xdNE8Fjw5IdkuQOFy3MHNv14uYcS
+	I613ZyYTLeoKA4slFOnRMWOHU6KV7OIvi7cMRlG/5mnWsH3ycf5h7GPu3tozOE8qZCVde4ryHm5
+	Sv/VmBQXE5II4aR01YGhSSNCnLdHYHUDDOemhhz/uSoQG5SbhGRUgjc5OErxq5JhPIf60tMFZFw
+	FHN2bl3R4Djtg7UQONKnnDelqHQjuEi+if5w
+X-Google-Smtp-Source: AGHT+IFLAobN1y/JaLFeXk9mcMrXNaETTC2QGpW5wyvCdzhLBlyXi27OPaIuZlvogV6xlSSS4u8ADg==
+X-Received: by 2002:a05:6e02:1985:b0:3cf:bb6e:3065 with SMTP id e9e14a558f8ab-3d42b75767bmr95773635ab.0.1741273335734;
+        Thu, 06 Mar 2025 07:02:15 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f20a06a6a7sm375874173.134.2025.03.06.07.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 07:02:14 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@lst.de, martin.petersen@oracle.com, 
+ Anuj Gupta <anuj20.g@samsung.com>
+Cc: anuj1072538@gmail.com, nikh1092@linux.ibm.com, 
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev
+In-Reply-To: <20250305063033.1813-1-anuj20.g@samsung.com>
+References: <CGME20250305063900epcas5p38bb20587ccf4310cfb0f3307180eb536@epcas5p3.samsung.com>
+ <20250305063033.1813-1-anuj20.g@samsung.com>
+Subject: Re: [PATCH v3 0/2] Fix integrity sysfs reporting inconsistencies
+Message-Id: <174127333427.62743.13850185317855218553.b4-ty@kernel.dk>
+Date: Thu, 06 Mar 2025 08:02:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8iE_6UPoDmkeYwIMN91PemnA9bpMbfyq
-X-Proofpoint-ORIG-GUID: 8iE_6UPoDmkeYwIMN91PemnA9bpMbfyq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-06_04,2025-03-06_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxlogscore=850 clxscore=1015 priorityscore=1501 phishscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503060071
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-Currently, hctx attributes (nr_tags, nr_reserved_tags, and cpu_list)
-are protected using `q->sysfs_lock`. However, these attributes can be
-updated in multiple scenarios:
-  - During the driver's probe method.
-  - When updating nr_hw_queues.
-  - When writing to the sysfs attribute nr_requests,
-    which can modify nr_tags.
-The nr_requests attribute is already protected using q->elevator_lock,
-but none of the update paths actually use q->sysfs_lock to protect hctx
-attributes. So to ensure proper synchronization, replace q->sysfs_lock
-with q->elevator_lock when reading hctx attributes through sysfs.
 
-Additionally, blk_mq_update_nr_hw_queues allocates and updates hctx.
-The allocation of hctx is protected using q->elevator_lock, however,
-updating hctx params happens without any protection, so safeguard hctx
-param update path by also using q->elevator_lock.
+On Wed, 05 Mar 2025 12:00:31 +0530, Anuj Gupta wrote:
+> Patch 1: Ensures DM devices correctly propagate
+> device_is_integrity_capable
+> Patch 2: initialize nogenerate and noverify correctly
+> 
+> Changes since v2:
+> Ensure that integrity capability gets propogated correctly for all cases
+> in DM (hch)
+> 
+> [...]
 
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
-Please note that this patch was unit tested against blktests and 
-quick xfstest with lockdep enabled.
+Applied, thanks!
 
-This patch should go on top of the previous patchset:
-https://lore.kernel.org/all/20250304102551.2533767-1-nilay@linux.ibm.com/
----
- block/blk-mq-sysfs.c   |  4 ++--
- block/blk-mq.c         |  4 ++++
- include/linux/blkdev.h | 14 ++++++++------
- 3 files changed, 14 insertions(+), 8 deletions(-)
+[1/2] block: ensure correct integrity capability propagation in stacked devices
+      commit: 677e332e4885a17def5efa4788b6e725a737b63c
+[2/2] block: Correctly initialize BLK_INTEGRITY_NOGENERATE and BLK_INTEGRITY_NOVERIFY
+      commit: 85f72925000e924291a0ebf63d2234994a4f22bd
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 3feeeccf8a99..24656980f443 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -61,9 +61,9 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
- 	if (!entry->show)
- 		return -EIO;
- 
--	mutex_lock(&q->sysfs_lock);
-+	mutex_lock(&q->elevator_lock);
- 	res = entry->show(hctx, page);
--	mutex_unlock(&q->sysfs_lock);
-+	mutex_unlock(&q->elevator_lock);
- 	return res;
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5a2d63927525..b9550a127c8e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4094,6 +4094,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_tag_set *set = q->tag_set;
- 
-+	mutex_lock(&q->elevator_lock);
-+
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		cpumask_clear(hctx->cpumask);
- 		hctx->nr_ctx = 0;
-@@ -4198,6 +4200,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 		hctx->next_cpu = blk_mq_first_mapped_cpu(hctx);
- 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
- 	}
-+
-+	mutex_unlock(&q->elevator_lock);
- }
- 
- /*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4daef0408683..b6f893e1741b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -563,12 +563,14 @@ struct request_queue {
- 	struct list_head	flush_list;
- 
- 	/*
--	 * Protects against I/O scheduler switching, particularly when
--	 * updating q->elevator. Since the elevator update code path may
--	 * also modify q->nr_requests and wbt latency, this lock also
--	 * protects the sysfs attributes nr_requests and wbt_lat_usec.
--	 * To ensure proper locking order during an elevator update, first
--	 * freeze the queue, then acquire ->elevator_lock.
-+	 * Protects against I/O scheduler switching, particularly when updating
-+	 * q->elevator. Since the elevator update code path may also modify q->
-+	 * nr_requests and wbt latency, this lock also protects the sysfs attrs
-+	 * nr_requests and wbt_lat_usec. Additionally the nr_hw_queues update may
-+	 * modify hctx tags, reserved-tags and cpumask, so this lock also helps
-+	 * protect the hctx attrs.
-+	 * To ensure proper locking order during an elevator or nr_hw_queue
-+	 * update, first freeze the queue, then acquire ->elevator_lock.
- 	 */
- 	struct mutex		elevator_lock;
- 
+Best regards,
 -- 
-2.47.1
+Jens Axboe
+
+
 
