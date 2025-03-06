@@ -1,223 +1,176 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFA119F438
-	for <linux-block@vger.kernel.org>; Thu,  6 Mar 2025 09:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FA619F438
+	for <linux-block@vger.kernel.org>; Thu,  6 Mar 2025 09:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741252516; cv=none; b=oAPDiakdurD9OhA+fODElCkx82ZsSjsdJQtqgWfOsJfGjo82thUwOWOfZFncvDj3oBSW4e87XCV/ZuoplHm6qib/VYEhNUFWf9xYs5KiU2/rutTxh2GBlHo3wBUDura+TSK/qUFBGfzBWD3A5fhKUl34OLV11b4F8BoVta+my+0=
+	t=1741254020; cv=none; b=WLW28ziaJxC6FLdraJN4WfQugc6cVt6Nrys5sPZKw+Ld/mT5B1T050LJLUkdSYA+xQjjeSy0eCFndM47s3LTmNog3e1xoBZJYAg4G1GICCTou4tSQGgNlM9tU5cfeH3lSXGd6+15dPA4MKCLWSMxP5y/ndiyKWMgOmjfQBArVPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741252516; c=relaxed/simple;
-	bh=V+jWF95gHaHUxMo/YXkawzf7T55uTockMQppBhlaosc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nPJLvXJHh/+r+HbNqKADa91CJHXz54gLgEwocy6lOmVKjL+OGmy0ZW35dIviOdB8VAuDQA59Sa/y41l5NIT9GcXEWY7vJEW1vIiOYcap21sAkvvGOVtI2Derqa22UwWQppgaU27nsHMzpJ0DQqlKlJMMw7PMnj8itDnusvQZ7gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=vBwbmBBU; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mD9aK61I; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=vBwbmBBU; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mD9aK61I; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1741254020; c=relaxed/simple;
+	bh=slXQxy8D3rzzEXV3gqS7Lt7NiuqIL4flKYR1TgDWdzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C7DDyK/FaNAM0OKIjWvDNTb54RFMbgRr9pK2fb3IQFbdafV2sxXzHldG+b9IAlVsXLHedbjpWWEQ11msWJTni5t6cTn4PIEFHlNsZ7cszlbcocraVtQl87Yx3dipZji3wAOWprAxYHNL+yEAEU6n0zRhBJwLYnuh7Y1CKul2hcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BOkL+rj4; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="vBwbmBBU";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mD9aK61I";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="vBwbmBBU";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mD9aK61I"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1908A211BA;
-	Thu,  6 Mar 2025 09:15:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741252513; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPhhRvINO8sdNrDDGrFMepQM60xk8knk9oHarU6dqAw=;
-	b=vBwbmBBUiQw+JRmOBdvXucqI226N8EsqCTy5Oe+no3qWFLc5QmTXHJf0REGo3EvJdNV88R
-	A4iF3rCIy4sf2BP2AFeurXxrRGQIgySCCEw3cF+kXWJUfjcLX6E+c1qzcPHdH30S77awLx
-	ADL70xm8FrUyNLKW0RWpgkMYEKRK5S0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741252513;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPhhRvINO8sdNrDDGrFMepQM60xk8knk9oHarU6dqAw=;
-	b=mD9aK61ISZTDqNAZvIMEfDYX4TLw8iNgnCLbNocLqk/PxZtLBjWr4amLJWTtdvAo0FiP6C
-	qc6D6x8g0e8NpnCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1741252513; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPhhRvINO8sdNrDDGrFMepQM60xk8knk9oHarU6dqAw=;
-	b=vBwbmBBUiQw+JRmOBdvXucqI226N8EsqCTy5Oe+no3qWFLc5QmTXHJf0REGo3EvJdNV88R
-	A4iF3rCIy4sf2BP2AFeurXxrRGQIgySCCEw3cF+kXWJUfjcLX6E+c1qzcPHdH30S77awLx
-	ADL70xm8FrUyNLKW0RWpgkMYEKRK5S0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1741252513;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPhhRvINO8sdNrDDGrFMepQM60xk8knk9oHarU6dqAw=;
-	b=mD9aK61ISZTDqNAZvIMEfDYX4TLw8iNgnCLbNocLqk/PxZtLBjWr4amLJWTtdvAo0FiP6C
-	qc6D6x8g0e8NpnCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EF4D413A61;
-	Thu,  6 Mar 2025 09:15:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NcMLOqBnyWf3EgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 06 Mar 2025 09:15:12 +0000
-Message-ID: <c9110425-b584-4be6-af89-542d97859250@suse.cz>
-Date: Thu, 6 Mar 2025 10:15:12 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BOkL+rj4"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5269LR8h032613;
+	Thu, 6 Mar 2025 09:40:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=GZ8E6SMjlfBsI+AHwBXNIYgwqStZAqJcARgkxsFlT
+	UY=; b=BOkL+rj4WQFC23STLRubByyK3vtqpJ+plgcPmhK1+JSYnKNApM6OcEGeD
+	C5/2czWh2Lf/Y6w0vuY1g/YAQOD4Ieozcv94dlmnxYGsscsaKJGIUFK8PnYiX0mY
+	RJY4yxdJAd7m7TK9o0kxO8l+G10hKeLt0lC/ilcxLAfVj+bUzG8Y6UIaJ2Fs5B7f
+	wSN9t9yXT7ql06qs1t4AjVKvIv6nSVSvyMsXLpSxEP/WzUItGuNzX7nB/sw6uRgN
+	AxZ/qJAcHRzHS6OnCvyNNrOktvIIsUj4Nmb+TrwNCthWkTmPDl0/f7K0T5ADNsnQ
+	WA7y3m8+7yZDlHrAd9Pg9G9A4KHAw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 456wspjwew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Mar 2025 09:40:01 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5268CY0P031946;
+	Thu, 6 Mar 2025 09:40:00 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 454cjt85f0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Mar 2025 09:40:00 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5269dwj932834284
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Mar 2025 09:39:59 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D2CA72004D;
+	Thu,  6 Mar 2025 09:39:58 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4092320040;
+	Thu,  6 Mar 2025 09:39:57 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.149])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Mar 2025 09:39:57 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de,
+        axboe@kernel.dk, gjoyce@ibm.com
+Subject: [PATCH] block: protect hctx attributes/params using q->elevator_lock
+Date: Thu,  6 Mar 2025 15:09:53 +0530
+Message-ID: <20250306093956.2818808-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>,
- Matthew Wilcox <willy@infradead.org>
-Cc: Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- David Howells <dhowells@redhat.com>
-References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
- <Z8cm5bVJsbskj4kC@casper.infradead.org>
- <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
- <Z8cv9VKka2KBnBKV@casper.infradead.org>
- <Z8dA8l1NR-xmFWyq@casper.infradead.org>
- <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
- <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
- <f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
- <d6e65c4c-a575-4389-a801-2ba40e1d25e1@suse.cz>
- <7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -6.80
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,grimberg.me,lists.infradead.org,vger.kernel.org,kvack.org,oracle.com,redhat.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8iE_6UPoDmkeYwIMN91PemnA9bpMbfyq
+X-Proofpoint-ORIG-GUID: 8iE_6UPoDmkeYwIMN91PemnA9bpMbfyq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-06_04,2025-03-06_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxlogscore=850 clxscore=1015 priorityscore=1501 phishscore=0
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503060071
 
-On 3/5/25 12:43, Hannes Reinecke wrote:
-> On 3/5/25 09:58, Vlastimil Babka wrote:
->> On 3/5/25 09:20, Hannes Reinecke wrote:
->>> On 3/4/25 20:44, Vlastimil Babka wrote:
->>>> On 3/4/25 20:39, Hannes Reinecke wrote:
->>> [ .. ]
->>>>>
->>>>> Good news and bad news ...
->>>>> Good news: TLS works again!
->>>>> Bad news: no errors.
->>>>
->>>> Wait, did you add a WARN_ON_ONCE() to the put_page() as I suggested? If yes
->>>> and there was no error, it would have to be leaking the page. Or the path
->>>> uses folio_put() and we'd need to put the warning there.
->>>>
->>> That triggers:
->> ...
->>> Not surprisingly, though, as the original code did a get_page(), so
->>> there had to be a corresponding put_page() somewhere.
->> 
->> Is is this one? If there's no more warning afterwards, that should be it.
->> 
->> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->> index 61f3f3d4e528..b37d99cec069 100644
->> --- a/net/core/skmsg.c
->> +++ b/net/core/skmsg.c
->> @@ -182,9 +182,14 @@ static int sk_msg_free_elem(struct sock *sk, struct sk_msg *msg, u32 i,
->>   
->>          /* When the skb owns the memory we free it from consume_skb path. */
->>          if (!msg->skb) {
->> +               struct folio *folio;
->> +
->>                  if (charge)
->>                          sk_mem_uncharge(sk, len);
->> -               put_page(sg_page(sge));
->> +
->> +               folio = page_folio(sg_page(sge));
->> +               if (!folio_test_slab(folio))
->> +                       folio_put(folio);
->>          }
->>          memset(sge, 0, sizeof(*sge));
->>          return len;
->> 
->> 
-> Oh, sure. But what annoys me: why do we have to care?
-> 
-> When doing I/O _all_ data is stuffed into bvecs via
-> bio_add_page(), and after that information about the
-> origin is lost; any iteration on the bio will be a bvec
-> iteration.
-> Previously we could just do a bvec iteration, get a reference
-> for each page, and start processing.
+Currently, hctx attributes (nr_tags, nr_reserved_tags, and cpu_list)
+are protected using `q->sysfs_lock`. However, these attributes can be
+updated in multiple scenarios:
+  - During the driver's probe method.
+  - When updating nr_hw_queues.
+  - When writing to the sysfs attribute nr_requests,
+    which can modify nr_tags.
+The nr_requests attribute is already protected using q->elevator_lock,
+but none of the update paths actually use q->sysfs_lock to protect hctx
+attributes. So to ensure proper synchronization, replace q->sysfs_lock
+with q->elevator_lock when reading hctx attributes through sysfs.
 
-AFAIU there's BIO_PAGE_PINNED that controls whether the pages are pinned, as
-there are usecases where it makes sense to do that (userspace pages?). And
-__bio_release_pages() can be removing the last pin and freeing the pages.
+Additionally, blk_mq_update_nr_hw_queues allocates and updates hctx.
+The allocation of hctx is protected using q->elevator_lock, however,
+updating hctx params happens without any protection, so safeguard hctx
+param update path by also using q->elevator_lock.
 
-But this is a case where the buffer is a kmalloc() allocation, so somebody
-has to do the corresponding kfree() when the messages are processed. A pin
-on the slab folio where the kmalloc() resides helps nothing and as willy
-says it's just unnecessary overhead of atomic allocations.
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+Please note that this patch was unit tested against blktests and 
+quick xfstest with lockdep enabled.
 
-> Now suddenly the caller has to check if it's a slab page and don't
-> get a reference for that. Not only that, he also has to remember
-> to _not_ drop the reference when he's done.
+This patch should go on top of the previous patchset:
+https://lore.kernel.org/all/20250304102551.2533767-1-nilay@linux.ibm.com/
+---
+ block/blk-mq-sysfs.c   |  4 ++--
+ block/blk-mq.c         |  4 ++++
+ include/linux/blkdev.h | 14 ++++++++------
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
-The caller did kmalloc() and will have to do kfree(). I guess it's about
-telling the intermediate layers via something similar like BIO_PAGE_PINNED
-whether the pages should be pinned or not.
-
-> And, of course, tracing get_page() and the corresponding put_page()
-> calls through all the layers.
-> Really?
-> 
-> Cheers,
-> 
-> Hannes
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 3feeeccf8a99..24656980f443 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -61,9 +61,9 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
+ 	if (!entry->show)
+ 		return -EIO;
+ 
+-	mutex_lock(&q->sysfs_lock);
++	mutex_lock(&q->elevator_lock);
+ 	res = entry->show(hctx, page);
+-	mutex_unlock(&q->sysfs_lock);
++	mutex_unlock(&q->elevator_lock);
+ 	return res;
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5a2d63927525..b9550a127c8e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4094,6 +4094,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 
++	mutex_lock(&q->elevator_lock);
++
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		cpumask_clear(hctx->cpumask);
+ 		hctx->nr_ctx = 0;
+@@ -4198,6 +4200,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 		hctx->next_cpu = blk_mq_first_mapped_cpu(hctx);
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+ 	}
++
++	mutex_unlock(&q->elevator_lock);
+ }
+ 
+ /*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 4daef0408683..b6f893e1741b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -563,12 +563,14 @@ struct request_queue {
+ 	struct list_head	flush_list;
+ 
+ 	/*
+-	 * Protects against I/O scheduler switching, particularly when
+-	 * updating q->elevator. Since the elevator update code path may
+-	 * also modify q->nr_requests and wbt latency, this lock also
+-	 * protects the sysfs attributes nr_requests and wbt_lat_usec.
+-	 * To ensure proper locking order during an elevator update, first
+-	 * freeze the queue, then acquire ->elevator_lock.
++	 * Protects against I/O scheduler switching, particularly when updating
++	 * q->elevator. Since the elevator update code path may also modify q->
++	 * nr_requests and wbt latency, this lock also protects the sysfs attrs
++	 * nr_requests and wbt_lat_usec. Additionally the nr_hw_queues update may
++	 * modify hctx tags, reserved-tags and cpumask, so this lock also helps
++	 * protect the hctx attrs.
++	 * To ensure proper locking order during an elevator or nr_hw_queue
++	 * update, first freeze the queue, then acquire ->elevator_lock.
+ 	 */
+ 	struct mutex		elevator_lock;
+ 
+-- 
+2.47.1
 
