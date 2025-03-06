@@ -1,104 +1,125 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DA92054FB
-	for <linux-block@vger.kernel.org>; Wed,  5 Mar 2025 23:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D393A376;
+	Thu,  6 Mar 2025 00:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741217113; cv=none; b=URftfHF+/xORPhlwJEw/7hifSQLpxXT6hXVj95OlzA06N/04HGc9nJjVxGHjuRVcS/na/uNadWez4C5c6aWMKN66bpq2v0EefWnGvHah1jmXaw6NuLu44v9OnSlnleYOQAVXhqHovlToqN49HE+y5fZzn7aLPSDystWqvpdhj4o=
+	t=1741222015; cv=none; b=JoQim9XjGk8Yb2uS487SmZrAhXGuuDv+6SlRQ58P4WgAJaQ2ygPk1luKkLYPEnimBotkOBIhBl+Fl79oHfyPrKLWxppJVQFlppj1P07cw1u859xJAtdQ+f5KzhMyt5+DnF/CJ9VrJTS6ZvCau5qbAQtIsitTWIhHXAJg2ZmSRWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741217113; c=relaxed/simple;
-	bh=ydTk/iuTKsVlDZZMdxpL5fo9gKeB2DDLMWgRTVqvrpU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=q5oFOZj67Jm0M2Nqj3M2cSa/n/JGhz45pAseNXUq0GUfZjEW/wkMVDKJLwHxZU+fp/F2XXpwMjnVu5/5BRFmJBhrcAiVEZPsNnxV086g6QdPxTntnITNyQl/wq9+yd51KnRz1rCfgv0xsYzwR1qoIpfXMztuOoQVQCfx8Ib6WOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rLJrT6wJ; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1741222015; c=relaxed/simple;
+	bh=I9Gwb+4dTz3fcNf1F6yu4Sjs1ZiacNO3dNVCwPrvIZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GPlrp0O7H6WY+ySft508BkemSs8U7H1+F41UKp/ZupR9WK76bDPFYVpZm5m++PBUWEQa/LFl7hyqoqyQ2pMnUzO6V0dvKaVdgubSj7LoCVnZt826LN4qfTVelp4BwiWu+ivYgHIFe945pLD47zf+1J02k2j1Ks5n2+pKZcd0n4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k18Kwvma; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rLJrT6wJ"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-85ae131983eso6478039f.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Mar 2025 15:25:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k18Kwvma"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22334203781so27658355ad.0;
+        Wed, 05 Mar 2025 16:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741217110; x=1741821910; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y0RhbP0JdWKLySfTbL+kC7pjlCWicLno65Zg0j3u3BA=;
-        b=rLJrT6wJk8mcInX2qo/VaoDnuNEeYnbyam+fAzPlnkMtcaHnPNiEpRs5JoMqbhKHhb
-         rasBiJaQI++l8MsEeEp8X6tiMVxeZyQxV46j1U3opD2wSSo26rq135CF4mYagu1q4y2Z
-         ACQb4H2xOOlOv7qX1EYtHiftSe4uVgm5S1lsUQUQz9XvidE3ABK+YZ1luNp90Kt6rRQJ
-         8YU5+mWJMkrAP1fIUx5QmWmP0x028Y7JZ47gnNhkCnglggi4qdx5ztaon2OHeZce9p3V
-         BLjbPOlOYiwuZT9dGAcf4AQ7U0p8YfaycQTxs6Ff4XYCsrv9HAdeJ+CLsbpE+QtoPYoN
-         xygA==
+        d=gmail.com; s=20230601; t=1741222013; x=1741826813; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+35VwW0guPAXPD3vm8P/KmL9oBW5pOr3grFjFyiZYJM=;
+        b=k18KwvmaGcP2M+PGYW2AkhEA1T1Oz2oml3Uz5WjIv0QOFLbnUNYp5psLjvKFSNVIhZ
+         QH4KOWTXMHV0MZeVg+ZHTYCR7KccwOwY54rNe29xmpvMk23o4jlfQ+XF/7GUnAjtLMC9
+         Mwyj+AEquiFbgIp2Tz/bF6MjqbmDJbTaZn1/3kJTSxFIvwVl5lrlwEu1F4nwvDrpeVp5
+         U/Nz9puyi8iCgbKleq5TRsxK5AFKqnyrkzFIIP9cbhwFq9HKs53fno6rxYvEWDDYtqIc
+         IcPtsfvvJetkcKO/exGAaRGqMbNzHzq1iUDSCd4YSnjZSf+vHof7mEkexIzVY/cyANQi
+         Njyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741217110; x=1741821910;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y0RhbP0JdWKLySfTbL+kC7pjlCWicLno65Zg0j3u3BA=;
-        b=EphYDdovsxc78ddZA52iHsfnHBKGAexVp9zwbBVHh8Fc/Yrkpp/ANw/pc2/m3s9MkO
-         n8SUg4vgRv/yOG0G76TypQZFG3RjZUAkPLaQ1wGZgTr4GVRqBEZ0wUBvoiWcbpF302ul
-         ZXxGpyJKPWSNlkHJgw6pGcT9fXTpvnXXaSDUrKrgvxcXjIblX6FgwtQ9CzxFrYshwRVS
-         HlZb8zHEjkugLS9cZJHQJ3gyUPdsDul1Nv2sY9jD+DiHnh5QjaWQXNNGAStTWQiXsqAe
-         MKTY0+sA0xkFQbo94EWpbgC3s3mT1bKgb7KsSREqgLJjnZ1iuN5Bo7gz7Jg2tiOBLzdD
-         1btw==
-X-Gm-Message-State: AOJu0YzzonCj5r3vHGmF7Uz1iwLIhUlD/dvl4F4SnbjBBs/TktojlcUI
-	GRrkvszb3IecnU75CgqlaVLcP26iV7rXPyF4pCTwNMu8+V6t64pjGa1dloOU93c=
-X-Gm-Gg: ASbGncuA3iP7BJFNCjdjKzGqdvhGBR+InIuVp69xXmIKuT9UxJfTeh8liPPO6BzF35p
-	LzFH+gHVizSiUTRkGadbMLOmYSA0IRVY6tSRTipdi7T+vqT//21jCteaPzZEaNEDLsPW1qX3EM5
-	mClPvHAhO8xw/PozzF+Y3rsjgLbdFZTvoEq+8MkC2sG1ae29ED+2XASZZ+nRPe0w4kBMGq5h/EX
-	tfhFAgCUtFoJ0Bg6bao+PQNZ5rmF4GDrD7i8TC5DxyCARXcyn671s3UBnmYyOTTiMMA+O+ZoJHB
-	pOOVSDM3i1i6oV6/oR+Txj+o7AX0fusFSWX8
-X-Google-Smtp-Source: AGHT+IH3KqAbGDF1xwNKnUg78tOxCRXKwYUEhnJ7WUjiCyUqzy+1A7ZGZSeoPkNgg09EhM62HVsbDg==
-X-Received: by 2002:a05:6602:7208:b0:855:a4a4:a938 with SMTP id ca18e2360f4ac-85aff8bded8mr643813439f.2.1741217110443;
-        Wed, 05 Mar 2025 15:25:10 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f209df3ea9sm17360173.27.2025.03.05.15.25.09
+        d=1e100.net; s=20230601; t=1741222013; x=1741826813;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+35VwW0guPAXPD3vm8P/KmL9oBW5pOr3grFjFyiZYJM=;
+        b=oHDpPqJwx7ryRyfT08TNnNzoFvgBdhopO2tEHALD9Ba99VZmyOq+vR0gX0z1gKhVPo
+         NFjeVFcax9nt0QJu88smuDvkKievPNYUDDlTy1s02VVx7OLRVv/LV5Xjk+oAglz7Wf58
+         Zf5Z9er5NI6WwCSeKXWXz/aivVg74ujLKW/Bw9EU2JLNIWdaLn8qu7Uys2N9ofFu55U5
+         0m4zz9T3CNQ6M8PBvIUEGghNAa/55jTPAh/S2nMj6esx++HVDXi8tSYt2fAlRwNXVAiC
+         ZX3uuNPc9k1Mvq4kQOdVEfbtssb+2++hra2bBqL1AzbbCObEYFCdK8+SsN1N9uJYmmlJ
+         vlRg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9mePlR1f5QIm9zQqo5yieI4zZSsfg64ux+hqScHMp4LIvkXCXyuwz4SiEhdf425ClkxZk+HEiFXRKoQ==@vger.kernel.org, AJvYcCWtJd2ZGB+nHx+cbV0T/BPq/vF2r+2hWwKP1OGavay1nOyTPnUMMSeKAyw7vDiMo+28ti5XGc1Y@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy24hKIHOnuU7g9HD9ySLpGC6UXtn575c721o1max+scVbeFNvU
+	TAszBYioKM2HwM0PAPs4TqYnP/apMe6iHgJtGA/bYQn4hCOMwF34
+X-Gm-Gg: ASbGncsyf5mdgx2aPNQTYT277+0R32pIOZm96+iOruC/ad15sFyPC4sGjfoPTyCXEnp
+	vsTwoBObT6eM2VRpH7zpGDrxdphe7tB1roFaf1h8I2YQyC25xXdcJlD7i6yfUp60+oEJ8CvYrtM
+	jqntmJIRVhiAk+nwTRCK5UxtlGEfEZZr4diHHTbOsBYeJJGN1PFVxisMH1kvYmPdxjnbEzj77T4
+	Q7jWZp2kft5fB1WEywlYaNA17yG1inNUmA6Wcp4tH9Ij255SKnHWNAHQ0zRXbK6DFc47+IoA4vb
+	Px5y6RZhze/4mpImEE3op7mGDb2aQnUsqAK9w2+IGhoTrSRl
+X-Google-Smtp-Source: AGHT+IF7vCbcPdVKVzzzP+Jt9zGpX61vizMrmay+ZL8kmmG60vfaBPu0w+ySA1n4Rl5PNTclnwnm5g==
+X-Received: by 2002:a05:6a21:3983:b0:1f3:3864:bbe0 with SMTP id adf61e73a8af0-1f359b18686mr2000333637.8.1741222012978;
+        Wed, 05 Mar 2025 16:46:52 -0800 (PST)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af2810c1d24sm70649a12.41.2025.03.05.16.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 15:25:09 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- Yu Kuai <yukuai3@huawei.com>
-In-Reply-To: <20250305043123.3938491-1-ming.lei@redhat.com>
-References: <20250305043123.3938491-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 0/3] blk-throttle: remove last_bytes/ios and carryover
- byte/ios
-Message-Id: <174121710911.165456.3433159135540117935.b4-ty@kernel.dk>
-Date: Wed, 05 Mar 2025 16:25:09 -0700
+        Wed, 05 Mar 2025 16:46:52 -0800 (PST)
+Date: Wed, 5 Mar 2025 16:46:51 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Hannes Reinecke <hare@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
+	Hannes Reinecke <hare@suse.com>, Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Networking people smell funny and make poor life choices
+Message-ID: <Z8jwe7dFXVEI9fT1@pop-os.localdomain>
+References: <Z8cm5bVJsbskj4kC@casper.infradead.org>
+ <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
+ <Z8cv9VKka2KBnBKV@casper.infradead.org>
+ <Z8dA8l1NR-xmFWyq@casper.infradead.org>
+ <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
+ <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
+ <f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
+ <d6e65c4c-a575-4389-a801-2ba40e1d25e1@suse.cz>
+ <7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
+ <Z8iTzPRieLB7Ee-9@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8iTzPRieLB7Ee-9@casper.infradead.org>
 
-
-On Wed, 05 Mar 2025 12:31:18 +0800, Ming Lei wrote:
-> Remove last_bytes_disp and last_ios_disp which isn't used any more.
+On Wed, Mar 05, 2025 at 06:11:24PM +0000, Matthew Wilcox wrote:
+> On Wed, Mar 05, 2025 at 12:43:02PM +0100, Hannes Reinecke wrote:
+> > Oh, sure. But what annoys me: why do we have to care?
+> > 
+> > When doing I/O _all_ data is stuffed into bvecs via
+> > bio_add_page(), and after that information about the
+> > origin is lost; any iteration on the bio will be a bvec
+> > iteration.
+> > Previously we could just do a bvec iteration, get a reference
+> > for each page, and start processing.
+> > Now suddenly the caller has to check if it's a slab page and don't
+> > get a reference for that. Not only that, he also has to remember
+> > to _not_ drop the reference when he's done.
+> > And, of course, tracing get_page() and the corresponding put_page()
+> > calls through all the layers.
 > 
-> Remove carryover bytes/ios because we can carry the compensation bytes/ios
-> against dispatch bytes/ios directly.
+> Networking needs to follow block's lead and STOP GETTING REFCOUNTS ON
+> PAGES.  That will speed up networking (eliminates two atomic operations per
+> page).  And of course, it will eliminate this hack in the MM.  I think
+> we do need to put this hack into the MM for now, but it needs to go away
+> again as quickly as possible.
 > 
-> Depends on "[PATCH v2] blk-throttle: fix lower bps rate by throtl_trim_slice()"[1]
-> 
-> [...]
+> What worries me is that nobody in networking has replied to this thread
+> yet.  Do they not care?  Let's see if a subject line change will help
+> with that.
 
-Applied, thanks!
+Since it triggered a kernel crash, I am pretty sure people care. How
+about sending out a patch to get more attentions?
 
-[1/3] blk-throttle: remove last_bytes_disp and last_ios_disp
-      commit: 483a393e7e6189aac7d47b5295029159ab7a1cf1
-[2/3] blk-throttle: don't take carryover for prioritized processing of metadata
-      commit: a9fc8868b350cbf4ff730a4ea9651319cc669516
-[3/3] blk-throttle: carry over directly
-      commit: 6cc477c36875ea5329b8bfbdf4d91f83dc653c91
+I am not sure what patterns here you are suggesting to change w.r.t page
+refcount, but at least using AI copilot or whatever automation tool should
+be very handy.
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Thanks.
