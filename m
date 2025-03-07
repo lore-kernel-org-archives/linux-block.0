@@ -1,103 +1,141 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92A942069
-	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 00:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B288143748
+	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 01:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741308706; cv=none; b=epXQo2gyN1lQ81ulCQR95owgUq14YOwftb+5mq1Ue1uwWBH/niRgDK/m7aVCeiHJG9gz1AGoifIzl3gz6qal8QZclh7eNx0blC84xzisYU+BzpvlzBLVIsFWHRSZ/uv1aNeL0bqY9+38HTdx+8PSUVoUAKVdcFsP5MAEW2wUI24=
+	t=1741311834; cv=none; b=iwTnoagm8bbzWYuMFZaAq6FxuXQSgBxtVqgsHtVSNSd5Agv0cP0NiVGhx01kjBP20RfIPIgd1D8d78E9V9o8GF3RbG43q2LDgu6AiclZhEXPK91kdjh3aEEUT68BwtaQeVMScX3PlAzLLOmJntRGUEwPNJCe9EaaOS1nq8wgIjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741308706; c=relaxed/simple;
-	bh=kXCduX4hE36U/CoaPyXGNbVZJMBuWofHOZzlZuTpgTo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=iam/Ci3pPRzs+0XztS8ZojwN2JGD5+76+YMFfuEzn5LQEDwJX32j+nHVSJkHOfXMRvWaz5tN8cgZKmPamxQeS7bmktgWio41XnZ6mtYEo06IzvqeewYp0gdqeQ+RDKjvJEP5eYAAsAgeAfycz5DE0M+Wi2crBbonYVUNMWcFwWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lMDKqoV3; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1741311834; c=relaxed/simple;
+	bh=Mhok/zgjlVu0PlG+Gcd//AggRxc17WGf5ySm1zSUbOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FICXq4Am9V0qe+Aw8vlVH3zjysDuVlLO56OU96QvwYxRDl0rQBzDgL6TMxKlRVxd9nWnpc4oIwPEpYCW4LVRQvRl5WhM7eG6fd9qK+fBs36UpDhfUmfV//5Dg3uD0hVy3tQre1S1of7Qh/hfAQFTknIcnpvakpvVsc3qHFSpzjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MmhLpXCF; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lMDKqoV3"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3cda56e1dffso4254955ab.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Mar 2025 16:51:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741308703; x=1741913503; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5qVyADKTsqTkTvG/3k9p/YQJZnQ6SccIWFfvUDbm2Rs=;
-        b=lMDKqoV3Ho6NylRs+ZSwzivh46jge6AxuYpjjTt9Z6pZAwxYsRCYjQMUuiESBeXiV5
-         g/zSYHeyPy/d6LBAlLbEjxNw/hucEUC4yd+VX+8PsT/5EGAVZNOpFw5mnGyAatLfANb+
-         x2RVfxaooWafhVnxILuL5wdueUzqap0XEnFAei/0CTPhuqKm2oqA0M1h7iAiG9e3KS1k
-         cZsfKi0rjgaPWZ22UVZlf0PpwYXMOU5tVIZ5jbvgyPWULw9VA6jXSEd9TXWieqHhNPqP
-         4AKqBYEcMHv4GupJc1ADBwcBPUqGg5vFQ+cZFImymtS/UBLPEeSgWYa4pPVaEvo+WQdQ
-         SANA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741308703; x=1741913503;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5qVyADKTsqTkTvG/3k9p/YQJZnQ6SccIWFfvUDbm2Rs=;
-        b=VzlBxuTT3VOxzmx0q5/3zhZ/dBA+pTkHQD3km7mV0y9P9QLqCIg64+3Ni1SQ/PakFm
-         HMXPrKpLC2BVKW2H1BXUtcvqEbSy1HSVSbeEq2QtfYGLEPu3OZsaaVulDHPnUXIps2UO
-         Yk0vWhfdgmcNrSsCbXjZ6Atk8e1rEz6+hTBWTlTf1dsAi6I5gKsAUhLrvzSnFw9jF7Ws
-         uz5oVTEPGDZmUanyYLvPGfVHrPN5MTrm1YC6DzEAkTpgcfn+QR3Jl+zRLch8m8zI69N1
-         4nE0QGIkpetP3unnhWQYMj0Cwbz1lt7xjlmJD1mhXm/90QhNcKnmUqZrlIa6POqbNtjq
-         Me5w==
-X-Gm-Message-State: AOJu0YxIfOXn4F3WkyOgL0KMDvAOucwt8DSEWG2145x8G6UalQYOPKOX
-	vBHEiu/Vwm1pfZ3vRpmmUBZTmiI/c23qs8u8bwG+5wfEcMIcJHekmMsLjFqdEvc=
-X-Gm-Gg: ASbGncvWpGlbBmsyw9dPud9sSU4tBGosDKy/8vhVvpjfXZIIqZ10gdB9d6p/+d3/2Ei
-	RHqc4jblNkk40jMNkaXkVOEPMVqX9YycKSHRMrgnxxZZG0NdXx8O1UiIyhZCOWqVYuH+Fv2xRQq
-	XRfz26paJ7VYEeXA+/FQZCLJzXlvK7bF5H/ZDYbx5UIR3dbo5Tr5YcpQ2ypoSjehYmopyjY9KNA
-	8ZccwMOjmLUFRJEHgp9SivDrmup3o5jtNw0pP6lxrqpgFloWcrO4e8uMNIf8dpD4Hf523m7MpF5
-	VD4aeGpvkqMbOEIY4w0J4svn4Ou6XpQ7ymNk
-X-Google-Smtp-Source: AGHT+IFvMFyVJzq0CGa/q6ARLt4ujQOSTJjZd+XWOlBRoiADhUQftyPtRq86dsu188a1/xZu5uDMzA==
-X-Received: by 2002:a05:6e02:1d03:b0:3d0:4e57:bbda with SMTP id e9e14a558f8ab-3d441933046mr21325595ab.1.1741308702832;
-        Thu, 06 Mar 2025 16:51:42 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d43b599842sm5459815ab.64.2025.03.06.16.51.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 16:51:42 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Breno Leitao <leitao@debian.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, kernel-team@meta.com, 
- Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250306-rqf_flags-v1-1-bbd64918b406@debian.org>
-References: <20250306-rqf_flags-v1-1-bbd64918b406@debian.org>
-Subject: Re: [PATCH] block: Name the RQF flags enum
-Message-Id: <174130870132.334915.1531694322372614000.b4-ty@kernel.dk>
-Date: Thu, 06 Mar 2025 17:51:41 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MmhLpXCF"
+Date: Thu, 6 Mar 2025 20:43:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741311829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H79nZv8dkq+G8rEaXQpyb/bsRjDzTOrL1NcJhXAv2sE=;
+	b=MmhLpXCFV9MRNh2dnN8pS5L6GWV5OkzyhpvHEsAW3pEeRysN1tF1BlxudX3N7r/VRJL0xU
+	T1yNCAZOeYzC238JBbTSlKzVR+5Mo2FvfMxjmLjVfSFSi4xP/U7K3jdj0jbdxPqaeJ93Oj
+	9LeRvYFS3CMBMfkq37Lr7gXlqZOGcZ4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, hare@suse.de, willy@infradead.org, 
+	david@fromorbit.com, djwong@kernel.org, kbusch@kernel.org, john.g.garry@oracle.com, 
+	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com, 
+	kernel@pankajraghav.com
+Subject: Re: [PATCH] bdev: add back PAGE_SIZE block size validation for
+ sb_set_blocksize()
+Message-ID: <4lf6tj4dd4uziypukbfumw7ypd2t5gnxrnessylb7q4h6nwuiy@dpifjujhd5d7>
+References: <20250305015301.1610092-1-mcgrof@kernel.org>
+ <bgqqfjiumcr5csde4qzom2vs2ktnneok3gdffvu6tlyc3ih7x3@tioflbnatc5w>
+ <Z8pBkuPn3kwf1Jvm@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8pBkuPn3kwf1Jvm@bombadil.infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-
-On Thu, 06 Mar 2025 08:27:51 -0800, Breno Leitao wrote:
-> Commit 5f89154e8e9e3445f9b59 ("block: Use enum to define RQF_x bit
-> indexes") converted the RQF flags to an anonymous enum, which was
-> a beneficial change. This patch goes one step further by naming the enum
-> as "rqf_flags".
+On Thu, Mar 06, 2025 at 04:45:06PM -0800, Luis Chamberlain wrote:
+> On Thu, Mar 06, 2025 at 01:39:49PM -0500, Kent Overstreet wrote:
+> > On Tue, Mar 04, 2025 at 05:53:01PM -0800, Luis Chamberlain wrote:
+> > > The commit titled "block/bdev: lift block size restrictions to 64k"
+> > > lifted the block layer's max supported block size to 64k inside the
+> > > helper blk_validate_block_size() now that we support large folios.
+> > > However in lifting the block size we also removed the silly use
+> > > cases many filesystems have to use sb_set_blocksize() to *verify*
+> > > that the block size < PAGE_SIZE. The call to sb_set_blocksize() can
+> > > happen in-kernel given mkfs utilities *can* create for example an
+> > > ext4 32k block size filesystem on x86_64, the issue we want to prevent
+> > > is mounting it on x86_64 unless the filesystem supports LBS.
+> > > 
+> > > While, we could argue that such checks should be filesystem specific,
+> > > there are much more users of sb_set_blocksize() than LBS enabled
+> > > filesystem on linux-next, so just do the easier thing and bring back
+> > > the PAGE_SIZE check for sb_set_blocksize() users.
+> > > 
+> > > This will ensure that tests such as generic/466 when run in a loop
+> > > against say, ext4, won't try to try to actually mount a filesystem with
+> > > a block size larger than your filesystem supports given your PAGE_SIZE
+> > > and in the worst case crash.
+> > > 
+> > > Cc: Kent Overstreet <kent.overstreet@linux.dev>
+> > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > 
+> > bcachefs doesn't use sb_set_blocksize() - but it appears it should, and
+> > it does also support bs > ps in -next.
+> > 
+> > Can we get a proper helper for lbs filesystems?
 > 
-> This naming enables exporting these flags to BPF clients, eliminating
-> the need to duplicate these flags in BPF code. Instead, BPF clients can
-> now access the same kernel-side values through CO:RE (Compile Once, Run
-> Everywhere), as shown in this example:
+> What do you think of this last recommention I had?
+
+Perfect :)
+
 > 
-> [...]
-
-Applied, thanks!
-
-[1/1] block: Name the RQF flags enum
-      commit: e7112524e5e885181cc5ae4d258f33b9dbe0b907
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 3bd948e6438d..4844d1e27b6f 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -181,6 +181,8 @@ EXPORT_SYMBOL(set_blocksize);
+>  
+>  int sb_set_blocksize(struct super_block *sb, int size)
+>  {
+> +	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
+> +		return 0;
+>  	if (set_blocksize(sb->s_bdev_file, size))
+>  		return 0;
+>  	/* If we get here, we know size is validated */
+> diff --git a/fs/bcachefs/fs.c b/fs/bcachefs/fs.c
+> index 90ade8f648d9..e99e378d68ea 100644
+> --- a/fs/bcachefs/fs.c
+> +++ b/fs/bcachefs/fs.c
+> @@ -2396,7 +2396,7 @@ static struct file_system_type bcache_fs_type = {
+>  	.name			= "bcachefs",
+>  	.init_fs_context	= bch2_init_fs_context,
+>  	.kill_sb		= bch2_kill_sb,
+> -	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP,
+> +	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_LBS,
+>  };
+>  
+>  MODULE_ALIAS_FS("bcachefs");
+> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+> index d92d7a07ea89..3d8b80165d48 100644
+> --- a/fs/xfs/xfs_super.c
+> +++ b/fs/xfs/xfs_super.c
+> @@ -2118,7 +2118,8 @@ static struct file_system_type xfs_fs_type = {
+>  	.init_fs_context	= xfs_init_fs_context,
+>  	.parameters		= xfs_fs_parameters,
+>  	.kill_sb		= xfs_kill_sb,
+> -	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME,
+> +	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME |
+> +				  FS_LBS,
+>  };
+>  MODULE_ALIAS_FS("xfs");
+>  
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 2c3b2f8a621f..16d17bd82be0 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2616,6 +2616,7 @@ struct file_system_type {
+>  #define FS_DISALLOW_NOTIFY_PERM	16	/* Disable fanotify permission events */
+>  #define FS_ALLOW_IDMAP         32      /* FS has been updated to handle vfs idmappings. */
+>  #define FS_MGTIME		64	/* FS uses multigrain timestamps */
+> +#define FS_LBS			128	/* FS supports LBS */
+>  #define FS_RENAME_DOES_D_MOVE	32768	/* FS will handle d_move() during rename() internally. */
+>  	int (*init_fs_context)(struct fs_context *);
+>  	const struct fs_parameter_spec *parameters;
