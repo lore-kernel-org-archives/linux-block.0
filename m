@@ -1,166 +1,146 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C2420DD48
-	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 09:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from smtp.cecloud.com (unknown [1.203.97.240])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A7120CCF5;
+	Fri,  7 Mar 2025 10:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741340858; cv=none; b=khUdVPFQ8ZpdAMyhA6vt2HxQGb682UykdhUhfIg1L/LxUP/WmT+GJ3CbEvEWFT/xN0V2J3FCLEbBXhKHHq/BKmuoo/Wl6PSIWNAfLU8/fvRWlSm/xs5jkKI0SsmwBFXdShZ0XDEDLKjNFzgK8bfA/Wb6a64SL2uK8mKpik1BRBw=
+	t=1741342599; cv=none; b=t06Lw97w0GIkzwhfmvp3WtJd+Pag0tGH6Rle05EXWA6npGjpSgL6M/Wy/p699vYcyPqsV0sGxUlv90dXr0AkVDZls81x3whorUm9/bhP92EloBVXKJ0fNxZ3yx6G/DGxXJU14V1giSGK99IT5b4wsrPEwoZe5GXd+XttWuQYwSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741340858; c=relaxed/simple;
-	bh=erMGJmtXEJJrGTZnuRDuDpgv8iwPaiRcLgpLlI9OswI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZwxG1hGDtXpNAgUoHKNjhap68jeZXo0wKjnK3Zppp4y66NAHowNenGt3W9XVnkQBKaKbp6WYZCXxkRvfhoKq5iw4blfusNAB9V/GWrNStBmAzDO2aR0+HxbD1srno3bunhGirNEc7AFeTRFhvDvnNhxr0aUeD7uHs92Vc6do0s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XYUNcddC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYUNcddC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741340854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fENBFIri74cayVNvUVVQ3Lg4CNoRB1cMbPLqKDA5HLQ=;
-	b=XYUNcddCaMcpQb+XmHx7A19R3JRJMGR/R94SF2Jixj0jw1cWZI5rhEZCrvsHhWWOWkaeZ4
-	QJo404uEcbohw7d+im42uikMbXjSN+RmtLfQFqCpiWX1BkEHq+DvBSmWjBZ5bIokk1I8eP
-	DVi4od0rck8c9g1brB8zb1g7Vq/k3wA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-100-5LYzeCx7MBujD5y09DpZTQ-1; Fri,
- 07 Mar 2025 04:47:28 -0500
-X-MC-Unique: 5LYzeCx7MBujD5y09DpZTQ-1
-X-Mimecast-MFC-AGG-ID: 5LYzeCx7MBujD5y09DpZTQ_1741340847
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B4D019560B3;
-	Fri,  7 Mar 2025 09:47:26 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB18F1801747;
-	Fri,  7 Mar 2025 09:47:21 +0000 (UTC)
-Date: Fri, 7 Mar 2025 17:47:15 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
-	yukuai3@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH RFC 1/2] tests/throtl: add a new test 007
-Message-ID: <Z8rAo8aCwi-OWADq@fedora>
-References: <20250307080318.3860858-1-yukuai1@huaweicloud.com>
- <20250307080318.3860858-2-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1741342599; c=relaxed/simple;
+	bh=0C8ZfqMqZuoovYFbMVUqy5GecvU3AoQHWZmmwzHJY7o=;
+	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
+	 Content-Type; b=HBVXBzWLLHNbqLdqhuOC68v0poQqlzl8TRy3nhqezG+mzdOnhK/uTQ7uTAd8ffKTRY9DtuhbmvteN/5KaEy34lVIkafvBWKvoj5WcWBKib/p57C5rZxjNmVmoX0C+l9jPlUelzqE2O3mCxdSTTojD9SFdSJ6cq7iLom+aJ7en2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.cecloud.com (Postfix) with ESMTP id 859D5900113;
+	Fri,  7 Mar 2025 18:10:48 +0800 (CST)
+X-MAIL-GRAY:0
+X-MAIL-DELIVERY:1
+X-SKE-CHECKED:1
+X-ABS-CHECKED:1
+X-ANTISPAM-LEVEL:2
+Received: from desktop-n31qu50 (unknown [39.156.73.12])
+	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281458224329072S1741342247056699_;
+	Fri, 07 Mar 2025 18:10:47 +0800 (CST)
+X-IP-DOMAINF:1
+X-RL-SENDER:zhang.guanghui@cestc.cn
+X-SENDER:zhang.guanghui@cestc.cn
+X-LOGIN-NAME:zhang.guanghui@cestc.cn
+X-FST-TO:sagi@grimberg.me
+X-RCPT-COUNT:8
+X-LOCAL-RCPT-COUNT:0
+X-MUTI-DOMAIN-COUNT:0
+X-SENDER-IP:39.156.73.12
+X-ATTACHMENT-NUM:0
+X-UNIQUE-TAG:<1be85d387a87dfb187ff48dbfef631eb>
+X-System-Flag:0
+Date: Fri, 7 Mar 2025 18:10:46 +0800
+From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
+To: sagi <sagi@grimberg.me>, 
+	mgurtovoy <mgurtovoy@nvidia.com>, 
+	kbusch <kbusch@kernel.org>, 
+	sashal <sashal@kernel.org>, 
+	chunguang.xu <chunguang.xu@shopee.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-nvme <linux-nvme@lists.infradead.org>, 
+	linux-block <linux-block@vger.kernel.org>
+Subject: =?UTF-8?B?UmU6IFJlOiBudm1lLXRjcDogZml4IGEgcG9zc2libGUgVUFGIHdoZW4gZmFpbGluZyB0byBzZW5kIHJlcXVlc3TjgJDor7fms6jmhI/vvIzpgq7ku7bnlLFzYWdpZ3JpbUBnbWFpbC5jb23ku6Plj5HjgJE=?=
+References: <2025021015413817916143@cestc.cn>, 
+	<aed9dde7-3271-4b97-9632-8380d37505d9@grimberg.me>
+X-Priority: 3
+X-GUID: 975E8B81-9D52-4F73-B182-02888A113620
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.331[cn]
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250307080318.3860858-2-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Mime-Version: 1.0
+Message-ID: <202503071810452687957@cestc.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-On Fri, Mar 07, 2025 at 04:03:17PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Add test for IO merge over iops limit.
-> 
-> Noted this test will fail for now, kernel solution is in development.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  tests/throtl/007     | 65 ++++++++++++++++++++++++++++++++++++++++++++
->  tests/throtl/007.out |  4 +++
->  2 files changed, 69 insertions(+)
->  create mode 100755 tests/throtl/007
->  create mode 100644 tests/throtl/007.out
-> 
-> diff --git a/tests/throtl/007 b/tests/throtl/007
-> new file mode 100755
-> index 0000000..597f879
-> --- /dev/null
-> +++ b/tests/throtl/007
-> @@ -0,0 +1,65 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2025 Yu Kuai
-> +#
-> +# Test iops limit over io merge
-> +
-> +. tests/throtl/rc
-> +
-> +DESCRIPTION="basic functionality"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_program taskset
-> +	_have_program fio
-> +}
-> +
-> +# every 16 0.5k IO will merge into one 8k IO, ideally runtime is 1s,
-> +# however it's about 1.3s in practice
-> +__fio() {
-> +	taskset -c 0 \
-> +	fio -filename=/dev/$THROTL_DEV \
-> +	-name=test \
-> +	-size=1600k \
-> +	-rw=write \
-> +	-bs=512 \
-> +	-iodepth=32 \
-> +	-iodepth_low=16 \
-> +	-iodepth_batch=16 \
-> +	-numjobs=1 \
-> +	-direct=1 \
-> +	-ioengine=io_uring &> /dev/null
-> +}
-> +
-> +test_io() {
-> +	start_time=$(date +%s.%N)
-> +
-> +	{
-> +		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
-> +		__fio
-> +	} &
-> +
-> +	wait $!
-> +	end_time=$(date +%s.%N)
-> +	elapsed=$(echo "$end_time - $start_time" | bc)
-> +	printf "%.0f\n" "$elapsed"
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	# iolatency is 10ms, iops is at most 200/s
-> +	if ! _set_up_throtl irqmode=2 completion_nsec=10000000 hw_queue_depth=2; then
-> +		return 1;
-> +	fi
-> +
-> +	test_io
-> +
-> +	# 300 means 50% error range, no IO should be throttled
-> +	_throtl_set_limits wiops=300
-> +	test_io
-> +	_throtl_remove_limits
-> +
-> +	_clean_up_throtl
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/throtl/007.out b/tests/throtl/007.out
-> new file mode 100644
-> index 0000000..0d568ef
-> --- /dev/null
-> +++ b/tests/throtl/007.out
-> @@ -0,0 +1,4 @@
-> +Running throtl/007
-> +1
-> +1
-> +Test complete
+CkhpIAoKICAgICAgICBBZnRlciB0ZXN0aW5nIHRoaXMgcGF0Y2gsICAgc2VuZGluZyByZXF1ZXN0
+IGZhaWx1cmUgb2NjdXJyZWQsICAgdW5mb3J0dW5hdGVseSwgdGhlIGlzc3VlIHN0aWxsIHBlcnNp
+c3RzLiAgCgoKYmVzdCB3aXNoZXMKCgoKCnpoYW5nLmd1YW5naHVpQGNlc3RjLmNuCgoKCsKgCgoK
+CuWPkeS7tuS6uu+8msKgU2FnaSBHcmltYmVyZwoKCgrlj5HpgIHml7bpl7TvvJrCoDIwMjUtMDIt
+MTfCoDE1OjQ2CgoKCuaUtuS7tuS6uu+8msKgemhhbmcuZ3VhbmdodWlAY2VzdGMuY247IG1ndXJ0
+b3ZveTsga2J1c2NoOyBzYXNoYWw7IGNodW5ndWFuZy54dQoKCgrmioTpgIHvvJrCoGxpbnV4LWtl
+cm5lbDsgbGludXgtbnZtZTsgbGludXgtYmxvY2sKCgoK5Li76aKY77yawqBSZTogbnZtZS10Y3A6
+IGZpeCBhIHBvc3NpYmxlIFVBRiB3aGVuIGZhaWxpbmcgdG8gc2VuZCByZXF1ZXN044CQ6K+35rOo
+5oSP77yM6YKu5Lu255Sxc2FnaWdyaW1AZ21haWwuY29t5Luj5Y+R44CRCgoKCsKgCgoKCsKgCgoK
+CsKgCgoKCk9uIDEwLzAyLzIwMjUgOTo0MSwgemhhbmcuZ3VhbmdodWlAY2VzdGMuY24gd3JvdGU6
+CgoKCj4gSGVsbG8KCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqBXaGVuIHVzaW5nIHRoZSBu
+dm1lLXRjcCBkcml2ZXIgaW4gYSBzdG9yYWdlIGNsdXN0ZXIsIHRoZSBkcml2ZXIgbWF5IHRyaWdn
+ZXIgYSBudWxsIHBvaW50ZXIgY2F1c2luZyB0aGUgaG9zdCB0byBjcmFzaCBzZXZlcmFsIHRpbWVz
+LgoKCgo+CgoKCj4KCgoKPgoKCgo+IEJ5IGFuYWx5emluZyB0aGUgdm1jb3JlLCB3ZSBrbm93IHRo
+ZSBkaXJlY3QgY2F1c2UgaXMgdGhhdMKgIHRoZSByZXF1ZXN0LT5tcV9oY3R4IHdhcyB1c2VkIGFm
+dGVyIGZyZWUuCgoKCj4KCgoKPgoKCgo+CgoKCj4KCgoKPgoKCgo+IENQVTHCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoENQVTIKCgoKPgoKCgo+CgoKCj4KCgoKPiBu
+dm1lX3RjcF9wb2xswqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbnZtZV90Y3BfdHJ5X3Nl
+bmTCoCAtLWZhaWxlZCB0byBzZW5kIHJlcXJlc3QgMTMKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKg
+IMKgwqBudm1lX3RjcF90cnlfcmVjdsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfdGNwX2Zh
+aWxfcmVxdWVzdAoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9y
+ZWN2X3NrYsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfdGNwX2VuZF9yZXF1ZXN0CgoKCj4K
+CgoKPgoKCgo+CgoKCj7CoCDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9yZWN2X3BkdcKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfY29tcGxldGVfcnEKCgoKPgoKCgo+CgoKCj4KCgoK
+PsKgIMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9oYW5kbGVfY29tcMKgIMKg
+wqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDC
+oMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgbnZtZV9yZXRyeV9yZXEgLS3CoHJlcXVlc3QtPm1x
+X2hjdHggaGF2ZSBiZWVuIGZyZWVkLCBpcyBOVUxMLgoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAg
+wqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9wcm9jZXNzX252bWVfY3Fl
+CgoKCj4KCgoKPgoKCgo+CgoKCj7CoCDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDC
+oMKgIMKgIG52bWVfY29tcGxldGVfcnEKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqDCoCDC
+oMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgIG52bWVfZW5kX3JlcQoKCgo+CgoK
+Cj4KCgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKg
+wqAgwqDCoMKgIMKgwqDCoCBibGtfbXFfZW5kX3JlcXVlc3QKCgoKPgoKCgo+CgoKCj4KCgoKPgoK
+Cgo+CgoKCj4KCgoKPgoKCgo+IHdoZW4gbnZtZV90Y3BfdHJ5X3NlbmQgZmFpbGVkIHRvIHNlbmQg
+cmVxcmVzdCAxMywgaXQgbWF5YmUgYmUgcmVzdWx0ZWQgYnkgc2VsaW51eCBvciBvdGhlciByZWFz
+b25zLCB0aGlzIGlzIGEgcHJvYmxlbS4gdGhlbsKgIHRoZSBudm1lX3RjcF9mYWlsX3JlcXVlc3Qg
+d291bGQgZXhlY3V0ZeOAggoKCgo+CgoKCj4KCgoKPgoKCgo+IGJ1dCB0aGUgbnZtZV90Y3BfcmVj
+dl9wZHUgbWF5IGhhdmUgcmVjZWl2ZWQgdGhlIHJlc3BvbmRpbmcgcGR1IGFuZCB0aGUgbnZtZV90
+Y3BfcHJvY2Vzc19udm1lX2NxZSB3b3VsZCBoYXZlIGNvbXBsZXRlZCB0aGUgcmVxdWVzdC7CoCBy
+ZXF1ZXN0LT5tcV9oY3R4IHdhcyB1c2VkIGFmdGVyIGZyZWUuCgoKCj4KCgoKPgoKCgo+CgoKCj4g
+dGhlIGZvbGxvdyBwYXRjaCBpcyB0byBzb2x2ZSBpdC4KCgoKwqAKCgoKWmhhbmcsIHlvdXIgZW1h
+aWwgY2xpZW50IG5lZWRzIGZpeGluZyAtIGl0IGlzIGltcG9zc2libGUgdG8gZm9sbG93IHlvdXIK
+CgoKZW1haWxzLgoKCgrCoAoKCgo+CgoKCj4KCgoKPgoKCgo+IGNhbiB5b3UgZ2l2ZcKgIHNvbWUg
+c3VnZ2VzdGlvbnM/wqAgdGhhbmtzIQoKCgrCoAoKCgpUaGUgcHJvYmxlbSBpcyB0aGUgQzJIVGVy
+bSB0aGF0IHRoZSBob3N0IGlzIHVuYWJsZSB0byBoYW5kbGUgY29ycmVjdGx5LgoKCgpBbmQgaXQg
+YWxzbyBhcHBlYXJzIHRoYXQgbnZtZV90Y3BfcG9sbCgpIGRvZXMgbm90IHNpZ25hbCBjb3JyZWN0
+bHkgdG8KCgoKYmxrLW1xIHRvIHN0b3AKCgoKY2FsbGluZyBwb2xsLgoKCgrCoAoKCgpPbmUgdGhp
+bmcgdG8gZG8gaXMgdG8gaGFuZGxlIEMySFRlcm0gUERVIGNvcnJlY3RseSwgYW5kLCBoZXJlIGlz
+IGEKCgoKcG9zc2libGUgZml4IHRvIHRyeSBmb3IgdGhlIFVBRiBpc3N1ZToKCgoKLS0KCgoKZGlm
+ZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5jIGIvZHJpdmVycy9udm1lL2hvc3QvdGNw
+LmMKCgoKaW5kZXggYzYzN2ZmMDRhMDUyLi4wZTM5MGU5OGFhZjkgMTAwNjQ0CgoKCi0tLSBhL2Ry
+aXZlcnMvbnZtZS9ob3N0L3RjcC5jCgoKCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5jCgoK
+CkBAIC0yNjczLDYgKzI2NzMsNyBAQCBzdGF0aWMgaW50IG52bWVfdGNwX3BvbGwoc3RydWN0IGJs
+a19tcV9od19jdHgKCgoKKmhjdHgsIHN0cnVjdCBpb19jb21wX2JhdGNoICppb2IpCgoKCsKgewoK
+CgrCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgbnZtZV90Y3BfcXVldWUgKnF1ZXVlID0gaGN0eC0+ZHJp
+dmVyX2RhdGE7CgoKCsKgwqDCoMKgwqDCoMKgIHN0cnVjdCBzb2NrICpzayA9IHF1ZXVlLT5zb2Nr
+LT5zazsKCgoKK8KgwqDCoMKgwqDCoCBpbnQgcmV0OwoKCgrCoAoKCgrCoMKgwqDCoMKgwqDCoCBp
+ZiAoIXRlc3RfYml0KE5WTUVfVENQX1FfTElWRSwgJnF1ZXVlLT5mbGFncykpCgoKCsKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKCgoKQEAgLTI2ODAsOSArMjY4MSw5IEBA
+IHN0YXRpYyBpbnQgbnZtZV90Y3BfcG9sbChzdHJ1Y3QgYmxrX21xX2h3X2N0eAoKCgoqaGN0eCwg
+c3RydWN0IGlvX2NvbXBfYmF0Y2ggKmlvYikKCgoKwqDCoMKgwqDCoMKgwqAgc2V0X2JpdChOVk1F
+X1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3MpOwoKCgrCoMKgwqDCoMKgwqDCoCBpZiAoc2tf
+Y2FuX2J1c3lfbG9vcChzaykgJiYKCgoKc2tiX3F1ZXVlX2VtcHR5X2xvY2tsZXNzKCZzay0+c2tf
+cmVjZWl2ZV9xdWV1ZSkpCgoKCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBza19idXN5
+X2xvb3Aoc2ssIHRydWUpOwoKCgotwqDCoMKgwqDCoMKgIG52bWVfdGNwX3RyeV9yZWN2KHF1ZXVl
+KTsKCgoKK8KgwqDCoMKgwqDCoCByZXQgPSBudm1lX3RjcF90cnlfcmVjdihxdWV1ZSk7CgoKCsKg
+wqDCoMKgwqDCoMKgIGNsZWFyX2JpdChOVk1FX1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3Mp
+OwoKCgotwqDCoMKgwqDCoMKgIHJldHVybiBxdWV1ZS0+bnJfY3FlOwoKCgorwqDCoMKgwqDCoMKg
+IHJldHVybiByZXQgPCAwID8gcmV0IDogcXVldWUtPm5yX2NxZTsKCgoKwqB9CgoKCsKgCgoKCsKg
+c3RhdGljIGludCBudm1lX3RjcF9nZXRfYWRkcmVzcyhzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBj
+aGFyICpidWYsIGludAoKCgpzaXplKQoKCgotLQoKCgrCoAoKCgpEb2VzIHRoaXMgaGVscD8KCgoK
+wqAKCgoKwqAKCgo=
 
-I'd suggest to check if actual iops matches with the iops limit directly,
-and it isn't intuitive to compare time taken in test wrt. iops throttle.
 
-Thanks,
-Ming
 
