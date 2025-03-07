@@ -1,114 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277EC21C9FD
-	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 15:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260B822539E;
+	Fri,  7 Mar 2025 16:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741360937; cv=none; b=Z5iNKzr5Kwl9PxEPqidlikg9djh+ix1HZOnWAYQbSHdiYMl31QLXs2qDmtJBVTkmDKe+mEsxqmkItGqpjSr9sm3mKZY48Q6M5XLSvYClaWCFTQdizBypq5Pd8FLN3C5twm9jC2M3LOVUO3QZfYu1yS8DZc0qWnzXmTNljjGK2Nk=
+	t=1741363658; cv=none; b=trBqLBVzbPvk8dmL3JwbbTFj/Rqe/AFORGSkTeoZAZglV00L6Xmst2NAeaBXjoPKPU5XEB0hBDFwH0//ySE4CVmTQKAE4lnoB1mNx2K7/dUPMI55dlJdiRXxS41+QaPY6+6meHoUvoLTa6kzi6K3ONWwzX8AdXHakORGP4RwjtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741360937; c=relaxed/simple;
-	bh=8bkm9D+A9b09Me9TsLQSLQoaTKIDYLGe1bUICWPE0eY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=dFgB3clepzi/shQhuwTuAyO0ci46HEUlG6frDFAGEeCAo1y98EX2dPShtVzDjr/OdELwYFbjsK1FFgADlRtC4TChAuuUdc5BXYgfkSpDDLhxHuiz60H3c1oy+jd4dRr6feN+6Jix6X0y/Xcm8VTR4uCQhjNGnd7KpMWMHjzTHA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=La2bXAUm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741363658; c=relaxed/simple;
+	bh=dcm0Hs9gMi5hesN2kdGvOo6rsOd3t+0dAqIv5xGKQKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3FZy1NbXPuXh82gAkfxUV3pCRHFTFSQdUQs2zx6wLWxAeaD5wTKzce9+wx34EWjYmkYeJwsqZPmQLov4bMh/hhhUjyIfJ5DY3TlYlzz5FnhLvmQyvr4kEZlb4a0Mu+j1eKPIyvzC9cyML+ykGHuD4lL8odEXH6OlmZB4PFsj/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0cfEB99; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="La2bXAUm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741360934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HeDSEd/YjPeusnr10Mm42vys340e0N+uOy6aIocYd3Q=;
-	b=La2bXAUmBGCfrp7snBIbiY8lBml566J3xA5TB2s/ZI6tcMolB7bE96mQ4H0P0r5HkXCZ6o
-	0jRRl0+JURiZf/msX/NIFXSlKSm2pvrkiBbACwpjH6WSSz46+iw60n2ooN2ID99Y40eaST
-	EeNyKyaiYCmvptzHe/NCDweMK1CmbfU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-190-DViTGFTgMkuZHqgu0UVOTQ-1; Fri,
- 07 Mar 2025 10:22:10 -0500
-X-MC-Unique: DViTGFTgMkuZHqgu0UVOTQ-1
-X-Mimecast-MFC-AGG-ID: DViTGFTgMkuZHqgu0UVOTQ_1741360929
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19F261828A93;
-	Fri,  7 Mar 2025 15:22:06 +0000 (UTC)
-Received: from [10.45.224.44] (unknown [10.45.224.44])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0251E1955DCE;
-	Fri,  7 Mar 2025 15:22:01 +0000 (UTC)
-Date: Fri, 7 Mar 2025 16:21:58 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
-    Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>, 
-    Mike Snitzer <snitzer@kernel.org>, Heinz Mauelshagen <heinzm@redhat.com>, 
-    zkabelac@redhat.com, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-    linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-In-Reply-To: <Z8eURG4AMbhornMf@dread.disaster.area>
-Message-ID: <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
-References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com> <Z8W1q6OYKIgnfauA@infradead.org> <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com> <Z8XlvU0o3C5hAAaM@infradead.org> <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com> <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
- <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com> <Z8eURG4AMbhornMf@dread.disaster.area>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0cfEB99"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7814CC4CEE3;
+	Fri,  7 Mar 2025 16:07:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741363657;
+	bh=dcm0Hs9gMi5hesN2kdGvOo6rsOd3t+0dAqIv5xGKQKU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D0cfEB99EdFUY4VmHqJ1fkK2VCAgct+T9BI5TdsqJTdTMUdpp1JrYZbW6YtTQfEHB
+	 ezEI6nTGTVP0KRw17aPzG1XDGYAL3FPZRmP9loDJjRb58U4GPIT+p7IwbYdbWaaeV0
+	 z2knmkZD/pP2wy8iR2Y4KedPST5SpQ8jdrJCoi6rLH0ZK6o/WSnumydyWHJ90pWvKq
+	 zIrQmqoXQWNiUayzSeV6Hht6VsmQwX80WSHcfdAppiFAQFqD9bpbfcfX97pL4v9h+W
+	 q1XjlcugTSdzDTk64FjIKugqz1rh2sCkotVVJcRMxMezuOn9ymf60qr9QMNSh/ZZwM
+	 Q25WZcvDY6aTw==
+Date: Fri, 7 Mar 2025 06:07:36 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: ming.lei@redhat.com, axboe@kernel.dk, josef@toxicpanda.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
+Message-ID: <Z8sZyElaHQQwKqpB@slm.duckdns.org>
+References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
 
-> I didn't say you were. I said the concept that dm-loop is based on
-> is fundamentally flawed and that your benchmark setup does not
-> reflect real world usage of loop devices.
+Hello,
 
-> Where are the bug reports about the loop device being slow and the
-> analysis that indicates that it is unfixable?
+On Fri, Mar 07, 2025 at 05:01:52PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> support to account split IO for iops limit, because block layer provides
+> io accounting against split bio.
+> 
+> However, io merge is still not handled, while block layer doesn't
+> account merged io for iops. Fix this problem by decreasing io_disp
+> if bio is merged, and following IO can use the extra budget. If io merge
+> concurrent with iops throttling, it's not handled if one more or one
+> less bio is dispatched, this is fine because as long as new slice is not
+> started, blk-throttle already preserve one extra slice for deviation,
+> and it's not worth it to handle the case that iops_limit rate is less than
+> one per slice.
+> 
+> A regression test will be added for this case [1], before this patch,
+> the test will fail:
+> 
+> +++ /root/blktests-mainline/results/nodev/throtl/007.out.bad
+> @@ -1,4 +1,4 @@
+>  Running throtl/007
+>  1
+> -1
+> +11
+>  Test complete
+> 
+> [1] https://lore.kernel.org/all/20250307080318.3860858-2-yukuai1@huaweicloud.com/
 
-So, I did benchmarks on an enterprise nvme drive (SAMSUNG 
-MZPLJ1T6HBJR-00007). I stacked ext4/loop/ext4, xfs/loop/xfs (using losetup 
---direct-io=on), ext4/dm-loop/ext4 and xfs/dm-loop/xfs. And loop is slow.
+For blk-throtl, iops limit has meant the number of bios issued. I'm not
+necessarily against this change but this is significantly changing what a
+given configuration means. Also, if we're now doing hardware request based
+throttling, maybe we should just move this under rq-qos. That has the
+problem of not supporting bio-based drivers but maybe we can leave
+blk-throtl in deprecation mode and slowly phase it out.
 
-synchronous I/O:
-fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=psync --iodepth=1 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
-raw block device:
-   READ: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3985MiB (4179MB), run=10001-10001msec
-  WRITE: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3990MiB (4184MB), run=10001-10001msec
-ext4/loop/ext4:
-   READ: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2232MiB (2341MB), run=10002-10002msec
-  WRITE: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2231MiB (2339MB), run=10002-10002msec
-xfs/loop/xfs:
-   READ: bw=220MiB/s (230MB/s), 220MiB/s-220MiB/s (230MB/s-230MB/s), io=2196MiB (2303MB), run=10001-10001msec
-  WRITE: bw=219MiB/s (230MB/s), 219MiB/s-219MiB/s (230MB/s-230MB/s), io=2193MiB (2300MB), run=10001-10001msec
-ext4/dm-loop/ext4:
-   READ: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3383MiB (3547MB), run=10002-10002msec
-  WRITE: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3385MiB (3549MB), run=10002-10002msec
-xfs/dm-loop/xfs:
-   READ: bw=375MiB/s (393MB/s), 375MiB/s-375MiB/s (393MB/s-393MB/s), io=3752MiB (3934MB), run=10002-10002msec
-  WRITE: bw=376MiB/s (394MB/s), 376MiB/s-376MiB/s (394MB/s-394MB/s), io=3756MiB (3938MB), run=10002-10002msec
+Also, can you please make atomic_t conversion a separate patch and describe
+why that's being done?
 
-asynchronous I/O:
-fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=libaio --iodepth=16 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
-raw block device:
-   READ: bw=1246MiB/s (1306MB/s), 1246MiB/s-1246MiB/s (1306MB/s-1306MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
-  WRITE: bw=1247MiB/s (1308MB/s), 1247MiB/s-1247MiB/s (1308MB/s-1308MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
-ext4/loop/ext4:
-   READ: bw=274MiB/s (288MB/s), 274MiB/s-274MiB/s (288MB/s-288MB/s), io=2743MiB (2877MB), run=10001-10001msec
-  WRITE: bw=275MiB/s (288MB/s), 275MiB/s-275MiB/s (288MB/s-288MB/s), io=2747MiB (2880MB), run=10001-10001msec
-xfs/loop/xfs:
-   READ: bw=276MiB/s (289MB/s), 276MiB/s-276MiB/s (289MB/s-289MB/s), io=2761MiB (2896MB), run=10002-10002msec
-  WRITE: bw=276MiB/s (290MB/s), 276MiB/s-276MiB/s (290MB/s-290MB/s), io=2765MiB (2899MB), run=10002-10002msec
-ext4/dm-loop/ext4:
-   READ: bw=1189MiB/s (1247MB/s), 1189MiB/s-1189MiB/s (1247MB/s-1247MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
-  WRITE: bw=1190MiB/s (1248MB/s), 1190MiB/s-1190MiB/s (1248MB/s-1248MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
-xfs/dm-loop/xfs:
-   READ: bw=1209MiB/s (1268MB/s), 1209MiB/s-1209MiB/s (1268MB/s-1268MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
-  WRITE: bw=1210MiB/s (1269MB/s), 1210MiB/s-1210MiB/s (1269MB/s-1269MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
+Thanks.
 
-Mikulas
-
+-- 
+tejun
