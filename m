@@ -1,256 +1,166 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A117199E94;
-	Fri,  7 Mar 2025 09:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C2420DD48
+	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 09:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741338398; cv=none; b=Ad8SnuB66UBXgRNyYGbcSgD2ffyVhwVHuEQ1iNpni7UWGp8+FGOSJrpxGEPx4BJmqJNhG46IV4SveobgtC8o/W8ZbnopACg5aXf+w+u9dIKlUOYo6F8sC3ST15Se3qtJy/aPUTHpecN9BMpXFBSZkMjreban4i6CwXU4fqGyVn8=
+	t=1741340858; cv=none; b=khUdVPFQ8ZpdAMyhA6vt2HxQGb682UykdhUhfIg1L/LxUP/WmT+GJ3CbEvEWFT/xN0V2J3FCLEbBXhKHHq/BKmuoo/Wl6PSIWNAfLU8/fvRWlSm/xs5jkKI0SsmwBFXdShZ0XDEDLKjNFzgK8bfA/Wb6a64SL2uK8mKpik1BRBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741338398; c=relaxed/simple;
-	bh=HGOVik4p9v3ak8rxb1sEyoauH9teQ1vQw9f36MUssQM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HyR48n+klyxFkwlEIWzDR/LuZfSFzJ4/VOo6iLTg9jWOV7cKadgsE8Ape6J8hyJfM/9br2Ia8JeDAB/DJ9Ooi0NyrjwI2AaB+eJUKLr7ZDmF476tDezPCZXrhixt/L+uWKyzZ/X6PV2kV1qbF4G30lXRuXUoH+oc/9yqvxgD5N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Z8L4H3YMtz4f3jXP;
-	Fri,  7 Mar 2025 17:06:07 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id AA2451A0ACF;
-	Fri,  7 Mar 2025 17:06:29 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgAni18St8pnW0QrFw--.36042S4;
-	Fri, 07 Mar 2025 17:06:28 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: ming.lei@redhat.com,
-	axboe@kernel.dk,
-	tj@kernel.org,
-	josef@toxicpanda.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH] blk-throttle: support io merge over iops_limit
-Date: Fri,  7 Mar 2025 17:01:52 +0800
-Message-Id: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1741340858; c=relaxed/simple;
+	bh=erMGJmtXEJJrGTZnuRDuDpgv8iwPaiRcLgpLlI9OswI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZwxG1hGDtXpNAgUoHKNjhap68jeZXo0wKjnK3Zppp4y66NAHowNenGt3W9XVnkQBKaKbp6WYZCXxkRvfhoKq5iw4blfusNAB9V/GWrNStBmAzDO2aR0+HxbD1srno3bunhGirNEc7AFeTRFhvDvnNhxr0aUeD7uHs92Vc6do0s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XYUNcddC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYUNcddC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741340854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fENBFIri74cayVNvUVVQ3Lg4CNoRB1cMbPLqKDA5HLQ=;
+	b=XYUNcddCaMcpQb+XmHx7A19R3JRJMGR/R94SF2Jixj0jw1cWZI5rhEZCrvsHhWWOWkaeZ4
+	QJo404uEcbohw7d+im42uikMbXjSN+RmtLfQFqCpiWX1BkEHq+DvBSmWjBZ5bIokk1I8eP
+	DVi4od0rck8c9g1brB8zb1g7Vq/k3wA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-100-5LYzeCx7MBujD5y09DpZTQ-1; Fri,
+ 07 Mar 2025 04:47:28 -0500
+X-MC-Unique: 5LYzeCx7MBujD5y09DpZTQ-1
+X-Mimecast-MFC-AGG-ID: 5LYzeCx7MBujD5y09DpZTQ_1741340847
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B4D019560B3;
+	Fri,  7 Mar 2025 09:47:26 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.3])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB18F1801747;
+	Fri,  7 Mar 2025 09:47:21 +0000 (UTC)
+Date: Fri, 7 Mar 2025 17:47:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
+	yukuai3@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH RFC 1/2] tests/throtl: add a new test 007
+Message-ID: <Z8rAo8aCwi-OWADq@fedora>
+References: <20250307080318.3860858-1-yukuai1@huaweicloud.com>
+ <20250307080318.3860858-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAni18St8pnW0QrFw--.36042S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3AFy3WF15XF48KF4xAFy8Grg_yoWxWw18pF
-	WjyF4UAws7XF4vgFZ8J3WfJFWFqwsrA343G3y5Gw4fAFnIgrn5tF1kZryFvFW0vFZ3uFZ7
-	AF1IgwnrGF48trJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307080318.3860858-2-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Fri, Mar 07, 2025 at 04:03:17PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Add test for IO merge over iops limit.
+> 
+> Noted this test will fail for now, kernel solution is in development.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  tests/throtl/007     | 65 ++++++++++++++++++++++++++++++++++++++++++++
+>  tests/throtl/007.out |  4 +++
+>  2 files changed, 69 insertions(+)
+>  create mode 100755 tests/throtl/007
+>  create mode 100644 tests/throtl/007.out
+> 
+> diff --git a/tests/throtl/007 b/tests/throtl/007
+> new file mode 100755
+> index 0000000..597f879
+> --- /dev/null
+> +++ b/tests/throtl/007
+> @@ -0,0 +1,65 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2025 Yu Kuai
+> +#
+> +# Test iops limit over io merge
+> +
+> +. tests/throtl/rc
+> +
+> +DESCRIPTION="basic functionality"
+> +QUICK=1
+> +
+> +requires() {
+> +	_have_program taskset
+> +	_have_program fio
+> +}
+> +
+> +# every 16 0.5k IO will merge into one 8k IO, ideally runtime is 1s,
+> +# however it's about 1.3s in practice
+> +__fio() {
+> +	taskset -c 0 \
+> +	fio -filename=/dev/$THROTL_DEV \
+> +	-name=test \
+> +	-size=1600k \
+> +	-rw=write \
+> +	-bs=512 \
+> +	-iodepth=32 \
+> +	-iodepth_low=16 \
+> +	-iodepth_batch=16 \
+> +	-numjobs=1 \
+> +	-direct=1 \
+> +	-ioengine=io_uring &> /dev/null
+> +}
+> +
+> +test_io() {
+> +	start_time=$(date +%s.%N)
+> +
+> +	{
+> +		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
+> +		__fio
+> +	} &
+> +
+> +	wait $!
+> +	end_time=$(date +%s.%N)
+> +	elapsed=$(echo "$end_time - $start_time" | bc)
+> +	printf "%.0f\n" "$elapsed"
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	# iolatency is 10ms, iops is at most 200/s
+> +	if ! _set_up_throtl irqmode=2 completion_nsec=10000000 hw_queue_depth=2; then
+> +		return 1;
+> +	fi
+> +
+> +	test_io
+> +
+> +	# 300 means 50% error range, no IO should be throttled
+> +	_throtl_set_limits wiops=300
+> +	test_io
+> +	_throtl_remove_limits
+> +
+> +	_clean_up_throtl
+> +	echo "Test complete"
+> +}
+> diff --git a/tests/throtl/007.out b/tests/throtl/007.out
+> new file mode 100644
+> index 0000000..0d568ef
+> --- /dev/null
+> +++ b/tests/throtl/007.out
+> @@ -0,0 +1,4 @@
+> +Running throtl/007
+> +1
+> +1
+> +Test complete
 
-Commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-support to account split IO for iops limit, because block layer provides
-io accounting against split bio.
+I'd suggest to check if actual iops matches with the iops limit directly,
+and it isn't intuitive to compare time taken in test wrt. iops throttle.
 
-However, io merge is still not handled, while block layer doesn't
-account merged io for iops. Fix this problem by decreasing io_disp
-if bio is merged, and following IO can use the extra budget. If io merge
-concurrent with iops throttling, it's not handled if one more or one
-less bio is dispatched, this is fine because as long as new slice is not
-started, blk-throttle already preserve one extra slice for deviation,
-and it's not worth it to handle the case that iops_limit rate is less than
-one per slice.
-
-A regression test will be added for this case [1], before this patch,
-the test will fail:
-
-+++ /root/blktests-mainline/results/nodev/throtl/007.out.bad
-@@ -1,4 +1,4 @@
- Running throtl/007
- 1
--1
-+11
- Test complete
-
-[1] https://lore.kernel.org/all/20250307080318.3860858-2-yukuai1@huaweicloud.com/
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-merge.c    |  3 +++
- block/blk-throttle.c | 20 ++++++++++----------
- block/blk-throttle.h | 19 +++++++++++++++++--
- 3 files changed, 30 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 15cd231d560c..8dc7add7c31e 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -988,6 +988,7 @@ enum bio_merge_status bio_attempt_back_merge(struct request *req,
- 
- 	trace_block_bio_backmerge(bio);
- 	rq_qos_merge(req->q, req, bio);
-+	blk_throtl_bio_merge(req->q, bio);
- 
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
-@@ -1025,6 +1026,7 @@ static enum bio_merge_status bio_attempt_front_merge(struct request *req,
- 
- 	trace_block_bio_frontmerge(bio);
- 	rq_qos_merge(req->q, req, bio);
-+	blk_throtl_bio_merge(req->q, bio);
- 
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
-@@ -1055,6 +1057,7 @@ static enum bio_merge_status bio_attempt_discard_merge(struct request_queue *q,
- 		goto no_merge;
- 
- 	rq_qos_merge(q, req, bio);
-+	blk_throtl_bio_merge(q, bio);
- 
- 	req->biotail->bi_next = bio;
- 	req->biotail = bio;
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 91dab43c65ab..9fd613c79caa 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -477,7 +477,7 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 		bool rw, unsigned long start)
- {
- 	tg->bytes_disp[rw] = 0;
--	tg->io_disp[rw] = 0;
-+	atomic_set(&tg->io_disp[rw], 0);
- 
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
-@@ -500,7 +500,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
- {
- 	if (clear) {
- 		tg->bytes_disp[rw] = 0;
--		tg->io_disp[rw] = 0;
-+		atomic_set(&tg->io_disp[rw], 0);
- 	}
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-@@ -623,10 +623,10 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	else
- 		tg->bytes_disp[rw] = 0;
- 
--	if ((int)tg->io_disp[rw] >= io_trim)
--		tg->io_disp[rw] -= io_trim;
-+	if (atomic_read(&tg->io_disp[rw]) >= io_trim)
-+		atomic_sub(io_trim, &tg->io_disp[rw]);
- 	else
--		tg->io_disp[rw] = 0;
-+		atomic_set(&tg->io_disp[rw], 0);
- 
- 	tg->slice_start[rw] += time_elapsed;
- 
-@@ -655,9 +655,9 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
- 			tg->bytes_disp[rw];
- 	if (iops_limit != UINT_MAX)
- 		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
--			tg->io_disp[rw];
-+			atomic_read(&tg->io_disp[rw]);
- 	tg->bytes_disp[rw] -= *bytes;
--	tg->io_disp[rw] -= *ios;
-+	atomic_sub(*ios, &tg->io_disp[rw]);
- }
- 
- static void tg_update_carryover(struct throtl_grp *tg)
-@@ -691,7 +691,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 	/* Round up to the next throttle slice, wait time must be nonzero */
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
- 	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
--	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
-+	if (io_allowed > 0 && atomic_read(&tg->io_disp[rw]) + 1 <= io_allowed)
- 		return 0;
- 
- 	/* Calc approx time to dispatch */
-@@ -815,7 +815,7 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- 	if (!bio_flagged(bio, BIO_BPS_THROTTLED))
- 		tg->bytes_disp[rw] += bio_size;
- 
--	tg->io_disp[rw]++;
-+	atomic_inc(&tg->io_disp[rw]);
- }
- 
- /**
-@@ -1679,7 +1679,7 @@ bool __blk_throtl_bio(struct bio *bio)
- 		   rw == READ ? 'R' : 'W',
- 		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
- 		   tg_bps_limit(tg, rw),
--		   tg->io_disp[rw], tg_iops_limit(tg, rw),
-+		   atomic_read(&tg->io_disp[rw]), tg_iops_limit(tg, rw),
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
- 	td->nr_queued[rw]++;
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 7964cc041e06..7e5f50c6bb19 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -104,7 +104,7 @@ struct throtl_grp {
- 	/* Number of bytes dispatched in current slice */
- 	int64_t bytes_disp[2];
- 	/* Number of bio's dispatched in current slice */
--	int io_disp[2];
-+	atomic_t io_disp[2];
- 
- 	/*
- 	 * The following two fields are updated when new configuration is
-@@ -144,6 +144,8 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
- static inline void blk_throtl_exit(struct gendisk *disk) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
- static inline void blk_throtl_cancel_bios(struct gendisk *disk) { }
-+static inline void blk_throtl_bio_merge(struct request_queue *q,
-+					struct bio *bio) { }
- #else /* CONFIG_BLK_DEV_THROTTLING */
- void blk_throtl_exit(struct gendisk *disk);
- bool __blk_throtl_bio(struct bio *bio);
-@@ -189,12 +191,25 @@ static inline bool blk_should_throtl(struct bio *bio)
- 
- static inline bool blk_throtl_bio(struct bio *bio)
- {
--
- 	if (!blk_should_throtl(bio))
- 		return false;
- 
- 	return __blk_throtl_bio(bio);
- }
-+
-+static inline void blk_throtl_bio_merge(struct request_queue *q,
-+					struct bio *bio)
-+{
-+	struct throtl_grp *tg;
-+	int rw = bio_data_dir(bio);
-+
-+	if (!blk_throtl_activated(bio->bi_bdev->bd_queue))
-+		return;
-+
-+	tg = blkg_to_tg(bio->bi_blkg);
-+	if (tg->has_rules_iops[rw])
-+		atomic_dec(&tg->io_disp[rw]);
-+}
- #endif /* CONFIG_BLK_DEV_THROTTLING */
- 
- #endif
--- 
-2.39.2
+Thanks,
+Ming
 
