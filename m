@@ -1,146 +1,142 @@
-Received: from smtp.cecloud.com (unknown [1.203.97.240])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A7120CCF5;
-	Fri,  7 Mar 2025 10:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784B021771B
+	for <linux-block@vger.kernel.org>; Fri,  7 Mar 2025 11:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741342599; cv=none; b=t06Lw97w0GIkzwhfmvp3WtJd+Pag0tGH6Rle05EXWA6npGjpSgL6M/Wy/p699vYcyPqsV0sGxUlv90dXr0AkVDZls81x3whorUm9/bhP92EloBVXKJ0fNxZ3yx6G/DGxXJU14V1giSGK99IT5b4wsrPEwoZe5GXd+XttWuQYwSQ=
+	t=1741348354; cv=none; b=GGE6skXTxCjblni/oOqTFd0wTiOs9GBv9j/2Ohuj8oGlXbKIEUku2fBVqIRbTx0ow7Z6+KOOTSeT6SnZkpziy0UKkdr6OuvWZYI1DFzwgyG8zz9ZxT3Z6Q6EYRt3RHIYfghW1mSSsuBOAP2pkRpabNBMqSyuFfW5SlZj1Pho8Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741342599; c=relaxed/simple;
-	bh=0C8ZfqMqZuoovYFbMVUqy5GecvU3AoQHWZmmwzHJY7o=;
-	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
-	 Content-Type; b=HBVXBzWLLHNbqLdqhuOC68v0poQqlzl8TRy3nhqezG+mzdOnhK/uTQ7uTAd8ffKTRY9DtuhbmvteN/5KaEy34lVIkafvBWKvoj5WcWBKib/p57C5rZxjNmVmoX0C+l9jPlUelzqE2O3mCxdSTTojD9SFdSJ6cq7iLom+aJ7en2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.cecloud.com (Postfix) with ESMTP id 859D5900113;
-	Fri,  7 Mar 2025 18:10:48 +0800 (CST)
-X-MAIL-GRAY:0
-X-MAIL-DELIVERY:1
-X-SKE-CHECKED:1
-X-ABS-CHECKED:1
-X-ANTISPAM-LEVEL:2
-Received: from desktop-n31qu50 (unknown [39.156.73.12])
-	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281458224329072S1741342247056699_;
-	Fri, 07 Mar 2025 18:10:47 +0800 (CST)
-X-IP-DOMAINF:1
-X-RL-SENDER:zhang.guanghui@cestc.cn
-X-SENDER:zhang.guanghui@cestc.cn
-X-LOGIN-NAME:zhang.guanghui@cestc.cn
-X-FST-TO:sagi@grimberg.me
-X-RCPT-COUNT:8
-X-LOCAL-RCPT-COUNT:0
-X-MUTI-DOMAIN-COUNT:0
-X-SENDER-IP:39.156.73.12
-X-ATTACHMENT-NUM:0
-X-UNIQUE-TAG:<1be85d387a87dfb187ff48dbfef631eb>
-X-System-Flag:0
-Date: Fri, 7 Mar 2025 18:10:46 +0800
-From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
-To: sagi <sagi@grimberg.me>, 
-	mgurtovoy <mgurtovoy@nvidia.com>, 
-	kbusch <kbusch@kernel.org>, 
-	sashal <sashal@kernel.org>, 
-	chunguang.xu <chunguang.xu@shopee.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-nvme <linux-nvme@lists.infradead.org>, 
-	linux-block <linux-block@vger.kernel.org>
-Subject: =?UTF-8?B?UmU6IFJlOiBudm1lLXRjcDogZml4IGEgcG9zc2libGUgVUFGIHdoZW4gZmFpbGluZyB0byBzZW5kIHJlcXVlc3TjgJDor7fms6jmhI/vvIzpgq7ku7bnlLFzYWdpZ3JpbUBnbWFpbC5jb23ku6Plj5HjgJE=?=
-References: <2025021015413817916143@cestc.cn>, 
-	<aed9dde7-3271-4b97-9632-8380d37505d9@grimberg.me>
-X-Priority: 3
-X-GUID: 975E8B81-9D52-4F73-B182-02888A113620
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.331[cn]
+	s=arc-20240116; t=1741348354; c=relaxed/simple;
+	bh=KY3XNvpIqqodv+H/0yMBf1NJV0oAgK4uZr3G2TWi0Go=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WBvKof1MdkkDlQlaxYY5v0FSpBvD+hHuc/x/WDNBH9gPEs+Ar0qQhJP/5fuBJW3A85jNR0o7SkawmxA+TEuKEud6fujFhHCeJaUwTCPQr6x6I/HcTj30Ol+RSH4YrfL8iI5juvCpl267MKpMcRxhq4R5ttrEnKI9a8SMFp1AJQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Drp5yUOl; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Drp5yUOl"
+Date: Fri, 7 Mar 2025 06:52:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741348350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AR8Kl6IuJYg26NfT4ABsZ98hzvEkHvnC4uDjdCNtrp0=;
+	b=Drp5yUOltMdXZePcWi3SmAhYlAin2u+vF1z2nLAQvw4UBXYff59nHFQQMd/2v/hcYcMxCA
+	y6lrluVbwQ8T5q1QY4zgxyzaNM+hcPwDblvqP4dBRoAPe1mHL8CO+1Z+f4ggL8m6DF/RIi
+	PMh69TeS6Ou6G9KtL4j76JdZ/z5RS8s=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, hare@suse.de, willy@infradead.org, 
+	david@fromorbit.com, djwong@kernel.org, kbusch@kernel.org, john.g.garry@oracle.com, 
+	hch@lst.de, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com, 
+	kernel@pankajraghav.com
+Subject: Re: [PATCH v2] bdev: add back PAGE_SIZE block size validation for
+ sb_set_blocksize()
+Message-ID: <p2aj32dbt7dwvedsfno6nehah4fdhwweclgvin3thip4gqeezk@f7ctgb7cis3w>
+References: <20250307020403.3068567-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <202503071810452687957@cestc.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307020403.3068567-1-mcgrof@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-CkhpIAoKICAgICAgICBBZnRlciB0ZXN0aW5nIHRoaXMgcGF0Y2gsICAgc2VuZGluZyByZXF1ZXN0
-IGZhaWx1cmUgb2NjdXJyZWQsICAgdW5mb3J0dW5hdGVseSwgdGhlIGlzc3VlIHN0aWxsIHBlcnNp
-c3RzLiAgCgoKYmVzdCB3aXNoZXMKCgoKCnpoYW5nLmd1YW5naHVpQGNlc3RjLmNuCgoKCsKgCgoK
-CuWPkeS7tuS6uu+8msKgU2FnaSBHcmltYmVyZwoKCgrlj5HpgIHml7bpl7TvvJrCoDIwMjUtMDIt
-MTfCoDE1OjQ2CgoKCuaUtuS7tuS6uu+8msKgemhhbmcuZ3VhbmdodWlAY2VzdGMuY247IG1ndXJ0
-b3ZveTsga2J1c2NoOyBzYXNoYWw7IGNodW5ndWFuZy54dQoKCgrmioTpgIHvvJrCoGxpbnV4LWtl
-cm5lbDsgbGludXgtbnZtZTsgbGludXgtYmxvY2sKCgoK5Li76aKY77yawqBSZTogbnZtZS10Y3A6
-IGZpeCBhIHBvc3NpYmxlIFVBRiB3aGVuIGZhaWxpbmcgdG8gc2VuZCByZXF1ZXN044CQ6K+35rOo
-5oSP77yM6YKu5Lu255Sxc2FnaWdyaW1AZ21haWwuY29t5Luj5Y+R44CRCgoKCsKgCgoKCsKgCgoK
-CsKgCgoKCk9uIDEwLzAyLzIwMjUgOTo0MSwgemhhbmcuZ3VhbmdodWlAY2VzdGMuY24gd3JvdGU6
-CgoKCj4gSGVsbG8KCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqBXaGVuIHVzaW5nIHRoZSBu
-dm1lLXRjcCBkcml2ZXIgaW4gYSBzdG9yYWdlIGNsdXN0ZXIsIHRoZSBkcml2ZXIgbWF5IHRyaWdn
-ZXIgYSBudWxsIHBvaW50ZXIgY2F1c2luZyB0aGUgaG9zdCB0byBjcmFzaCBzZXZlcmFsIHRpbWVz
-LgoKCgo+CgoKCj4KCgoKPgoKCgo+IEJ5IGFuYWx5emluZyB0aGUgdm1jb3JlLCB3ZSBrbm93IHRo
-ZSBkaXJlY3QgY2F1c2UgaXMgdGhhdMKgIHRoZSByZXF1ZXN0LT5tcV9oY3R4IHdhcyB1c2VkIGFm
-dGVyIGZyZWUuCgoKCj4KCgoKPgoKCgo+CgoKCj4KCgoKPgoKCgo+IENQVTHCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoENQVTIKCgoKPgoKCgo+CgoKCj4KCgoKPiBu
-dm1lX3RjcF9wb2xswqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbnZtZV90Y3BfdHJ5X3Nl
-bmTCoCAtLWZhaWxlZCB0byBzZW5kIHJlcXJlc3QgMTMKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKg
-IMKgwqBudm1lX3RjcF90cnlfcmVjdsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfdGNwX2Zh
-aWxfcmVxdWVzdAoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9y
-ZWN2X3NrYsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfdGNwX2VuZF9yZXF1ZXN0CgoKCj4K
-CgoKPgoKCgo+CgoKCj7CoCDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9yZWN2X3BkdcKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfY29tcGxldGVfcnEKCgoKPgoKCgo+CgoKCj4KCgoK
-PsKgIMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9oYW5kbGVfY29tcMKgIMKg
-wqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDC
-oMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgbnZtZV9yZXRyeV9yZXEgLS3CoHJlcXVlc3QtPm1x
-X2hjdHggaGF2ZSBiZWVuIGZyZWVkLCBpcyBOVUxMLgoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAg
-wqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9wcm9jZXNzX252bWVfY3Fl
-CgoKCj4KCgoKPgoKCgo+CgoKCj7CoCDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDC
-oMKgIMKgIG52bWVfY29tcGxldGVfcnEKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqDCoCDC
-oMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgIG52bWVfZW5kX3JlcQoKCgo+CgoK
-Cj4KCgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKg
-wqAgwqDCoMKgIMKgwqDCoCBibGtfbXFfZW5kX3JlcXVlc3QKCgoKPgoKCgo+CgoKCj4KCgoKPgoK
-Cgo+CgoKCj4KCgoKPgoKCgo+IHdoZW4gbnZtZV90Y3BfdHJ5X3NlbmQgZmFpbGVkIHRvIHNlbmQg
-cmVxcmVzdCAxMywgaXQgbWF5YmUgYmUgcmVzdWx0ZWQgYnkgc2VsaW51eCBvciBvdGhlciByZWFz
-b25zLCB0aGlzIGlzIGEgcHJvYmxlbS4gdGhlbsKgIHRoZSBudm1lX3RjcF9mYWlsX3JlcXVlc3Qg
-d291bGQgZXhlY3V0ZeOAggoKCgo+CgoKCj4KCgoKPgoKCgo+IGJ1dCB0aGUgbnZtZV90Y3BfcmVj
-dl9wZHUgbWF5IGhhdmUgcmVjZWl2ZWQgdGhlIHJlc3BvbmRpbmcgcGR1IGFuZCB0aGUgbnZtZV90
-Y3BfcHJvY2Vzc19udm1lX2NxZSB3b3VsZCBoYXZlIGNvbXBsZXRlZCB0aGUgcmVxdWVzdC7CoCBy
-ZXF1ZXN0LT5tcV9oY3R4IHdhcyB1c2VkIGFmdGVyIGZyZWUuCgoKCj4KCgoKPgoKCgo+CgoKCj4g
-dGhlIGZvbGxvdyBwYXRjaCBpcyB0byBzb2x2ZSBpdC4KCgoKwqAKCgoKWmhhbmcsIHlvdXIgZW1h
-aWwgY2xpZW50IG5lZWRzIGZpeGluZyAtIGl0IGlzIGltcG9zc2libGUgdG8gZm9sbG93IHlvdXIK
-CgoKZW1haWxzLgoKCgrCoAoKCgo+CgoKCj4KCgoKPgoKCgo+IGNhbiB5b3UgZ2l2ZcKgIHNvbWUg
-c3VnZ2VzdGlvbnM/wqAgdGhhbmtzIQoKCgrCoAoKCgpUaGUgcHJvYmxlbSBpcyB0aGUgQzJIVGVy
-bSB0aGF0IHRoZSBob3N0IGlzIHVuYWJsZSB0byBoYW5kbGUgY29ycmVjdGx5LgoKCgpBbmQgaXQg
-YWxzbyBhcHBlYXJzIHRoYXQgbnZtZV90Y3BfcG9sbCgpIGRvZXMgbm90IHNpZ25hbCBjb3JyZWN0
-bHkgdG8KCgoKYmxrLW1xIHRvIHN0b3AKCgoKY2FsbGluZyBwb2xsLgoKCgrCoAoKCgpPbmUgdGhp
-bmcgdG8gZG8gaXMgdG8gaGFuZGxlIEMySFRlcm0gUERVIGNvcnJlY3RseSwgYW5kLCBoZXJlIGlz
-IGEKCgoKcG9zc2libGUgZml4IHRvIHRyeSBmb3IgdGhlIFVBRiBpc3N1ZToKCgoKLS0KCgoKZGlm
-ZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5jIGIvZHJpdmVycy9udm1lL2hvc3QvdGNw
-LmMKCgoKaW5kZXggYzYzN2ZmMDRhMDUyLi4wZTM5MGU5OGFhZjkgMTAwNjQ0CgoKCi0tLSBhL2Ry
-aXZlcnMvbnZtZS9ob3N0L3RjcC5jCgoKCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5jCgoK
-CkBAIC0yNjczLDYgKzI2NzMsNyBAQCBzdGF0aWMgaW50IG52bWVfdGNwX3BvbGwoc3RydWN0IGJs
-a19tcV9od19jdHgKCgoKKmhjdHgsIHN0cnVjdCBpb19jb21wX2JhdGNoICppb2IpCgoKCsKgewoK
-CgrCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgbnZtZV90Y3BfcXVldWUgKnF1ZXVlID0gaGN0eC0+ZHJp
-dmVyX2RhdGE7CgoKCsKgwqDCoMKgwqDCoMKgIHN0cnVjdCBzb2NrICpzayA9IHF1ZXVlLT5zb2Nr
-LT5zazsKCgoKK8KgwqDCoMKgwqDCoCBpbnQgcmV0OwoKCgrCoAoKCgrCoMKgwqDCoMKgwqDCoCBp
-ZiAoIXRlc3RfYml0KE5WTUVfVENQX1FfTElWRSwgJnF1ZXVlLT5mbGFncykpCgoKCsKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKCgoKQEAgLTI2ODAsOSArMjY4MSw5IEBA
-IHN0YXRpYyBpbnQgbnZtZV90Y3BfcG9sbChzdHJ1Y3QgYmxrX21xX2h3X2N0eAoKCgoqaGN0eCwg
-c3RydWN0IGlvX2NvbXBfYmF0Y2ggKmlvYikKCgoKwqDCoMKgwqDCoMKgwqAgc2V0X2JpdChOVk1F
-X1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3MpOwoKCgrCoMKgwqDCoMKgwqDCoCBpZiAoc2tf
-Y2FuX2J1c3lfbG9vcChzaykgJiYKCgoKc2tiX3F1ZXVlX2VtcHR5X2xvY2tsZXNzKCZzay0+c2tf
-cmVjZWl2ZV9xdWV1ZSkpCgoKCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBza19idXN5
-X2xvb3Aoc2ssIHRydWUpOwoKCgotwqDCoMKgwqDCoMKgIG52bWVfdGNwX3RyeV9yZWN2KHF1ZXVl
-KTsKCgoKK8KgwqDCoMKgwqDCoCByZXQgPSBudm1lX3RjcF90cnlfcmVjdihxdWV1ZSk7CgoKCsKg
-wqDCoMKgwqDCoMKgIGNsZWFyX2JpdChOVk1FX1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3Mp
-OwoKCgotwqDCoMKgwqDCoMKgIHJldHVybiBxdWV1ZS0+bnJfY3FlOwoKCgorwqDCoMKgwqDCoMKg
-IHJldHVybiByZXQgPCAwID8gcmV0IDogcXVldWUtPm5yX2NxZTsKCgoKwqB9CgoKCsKgCgoKCsKg
-c3RhdGljIGludCBudm1lX3RjcF9nZXRfYWRkcmVzcyhzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBj
-aGFyICpidWYsIGludAoKCgpzaXplKQoKCgotLQoKCgrCoAoKCgpEb2VzIHRoaXMgaGVscD8KCgoK
-wqAKCgoKwqAKCgo=
+On Thu, Mar 06, 2025 at 06:04:03PM -0800, Luis Chamberlain wrote:
+> The commit titled "block/bdev: lift block size restrictions to 64k"
+> lifted the block layer's max supported block size to 64k inside the
+> helper blk_validate_block_size() now that we support large folios.
+> However in lifting the block size we also removed the silly use
+> cases many filesystems have to use sb_set_blocksize() to *verify*
+> that the block size <= PAGE_SIZE. The call to sb_set_blocksize() was
+> used to check the block size <= PAGE_SIZE since historically we've
+> always supported userspace to create for example 64k block size
+> filesystems even on 4k page size systems, but what we didn't allow
+> was mounting them. Older filesystems have been using the check with
+> sb_set_blocksize() for years.
+> 
+> While, we could argue that such checks should be filesystem specific,
+> there are much more users of sb_set_blocksize() than LBS enabled
+> filesystem on upstream, so just do the easier thing and bring back
+> the PAGE_SIZE check for sb_set_blocksize() users and only skip it
+> for LBS enabled filesystems.
+> 
+> This will ensure that tests such as generic/466 when run in a loop
+> against say, ext4, won't try to try to actually mount a filesystem with
+> a block size larger than your filesystem supports given your PAGE_SIZE
+> and in the worst case crash.
+> 
+> Cc: Kent Overstreet <kent.overstreet@linux.dev>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 
+Reviewed-by: Kent Overstreet <kent.overstreet@linux.dev>
 
-
+> ---
+>  block/bdev.c       | 2 ++
+>  fs/bcachefs/fs.c   | 2 +-
+>  fs/xfs/xfs_super.c | 3 ++-
+>  include/linux/fs.h | 1 +
+>  4 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 3bd948e6438d..4844d1e27b6f 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -181,6 +181,8 @@ EXPORT_SYMBOL(set_blocksize);
+>  
+>  int sb_set_blocksize(struct super_block *sb, int size)
+>  {
+> +	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
+> +		return 0;
+>  	if (set_blocksize(sb->s_bdev_file, size))
+>  		return 0;
+>  	/* If we get here, we know size is validated */
+> diff --git a/fs/bcachefs/fs.c b/fs/bcachefs/fs.c
+> index 8b3be33a1f7a..8624b3b1601f 100644
+> --- a/fs/bcachefs/fs.c
+> +++ b/fs/bcachefs/fs.c
+> @@ -2414,7 +2414,7 @@ static struct file_system_type bcache_fs_type = {
+>  	.name			= "bcachefs",
+>  	.init_fs_context	= bch2_init_fs_context,
+>  	.kill_sb		= bch2_kill_sb,
+> -	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP,
+> +	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_LBS,
+>  };
+>  
+>  MODULE_ALIAS_FS("bcachefs");
+> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+> index 37898f89b3ea..54a353f52ffb 100644
+> --- a/fs/xfs/xfs_super.c
+> +++ b/fs/xfs/xfs_super.c
+> @@ -2134,7 +2134,8 @@ static struct file_system_type xfs_fs_type = {
+>  	.init_fs_context	= xfs_init_fs_context,
+>  	.parameters		= xfs_fs_parameters,
+>  	.kill_sb		= xfs_kill_sb,
+> -	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME,
+> +	.fs_flags		= FS_REQUIRES_DEV | FS_ALLOW_IDMAP | FS_MGTIME |
+> +				  FS_LBS,
+>  };
+>  MODULE_ALIAS_FS("xfs");
+>  
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 110d95d04299..62440a9383dc 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2614,6 +2614,7 @@ struct file_system_type {
+>  #define FS_DISALLOW_NOTIFY_PERM	16	/* Disable fanotify permission events */
+>  #define FS_ALLOW_IDMAP         32      /* FS has been updated to handle vfs idmappings. */
+>  #define FS_MGTIME		64	/* FS uses multigrain timestamps */
+> +#define FS_LBS			128	/* FS supports LBS */
+>  #define FS_RENAME_DOES_D_MOVE	32768	/* FS will handle d_move() during rename() internally. */
+>  	int (*init_fs_context)(struct fs_context *);
+>  	const struct fs_parameter_spec *parameters;
+> -- 
+> 2.47.2
+> 
