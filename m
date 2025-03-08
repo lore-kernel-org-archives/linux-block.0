@@ -1,117 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581602CAB;
-	Sat,  8 Mar 2025 03:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE5D196;
+	Sat,  8 Mar 2025 05:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741405786; cv=none; b=PsSMGmtfgjzEt5IiB5zIhZqaNjIaYN1qln1y2rHLSND7PeAQmNu2CsxykGB0Y3u4gpqkNLxzjtTBvTnaBZj763vWmq+Nm8B6n7rYC6e58TZLj4MD2jJ761Xx5gmRSR8/KF4Tnk9iuIewoBaIrtUuAAOR94ZlCJksb9Z/UMaPq84=
+	t=1741412507; cv=none; b=emd4fHodrZoeV45Dng/nJ/GFwP0cQCGXmHYJ74oKoPW9+VtGUoM9N/telqqzWNbBKcgOQtOFa5W+AniWljSOep8QlPbdXuU0fOA+s7P8AfuXjD13VsWWazLCbWit6jW2uW0OlD2gMwys1/xOH1sOs4O/OYzqYiE/jGjmLb/NexY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741405786; c=relaxed/simple;
-	bh=2/DxdqCSAxsariLOtaoQkAGj3uF1Ebn1pZo/9k2V3PI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HwCwKlRhxNgpcrQW6+IDNMea2BJ3ERpCHVubRo9t9Y81Ka9JtdX+BByP7yrtmVSMCkSKqbb4FnvjWqg4EGYMDt/wgPG+VFWc5kqc/Ka6uGRjvIeE3geKub9k4kJh9J0Si/1NgZKKSURJQuPuZuqiAiR0vmpJChPVjGqaSQW7PPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6ETkMBV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741412507; c=relaxed/simple;
+	bh=vpj7oqHxRtgino/k70h8+Z75eRS1qaORviyYbtyKUSg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LBj4IvHlu3Koy9+WluhFUm4scm4+5ucACy/6k/GKNo9DkPxHNYKD9hyD6zf7A3/d7fieLQQXQ6ZIk9tqHrsUYxtJWW9WllXHyVeinrMw73Lo3sN+q8yYXyY1ccafScTkklAri7TmsfxUFsNnlsmlrBs4WxC/esHVCGJGgsIOhcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJZGHiVY; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6ETkMBV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE90EC4CEE0;
-	Sat,  8 Mar 2025 03:49:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741405785;
-	bh=2/DxdqCSAxsariLOtaoQkAGj3uF1Ebn1pZo/9k2V3PI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n6ETkMBV3STfh2avZe1G42xUmy80Mhp4D8jdUYdrpc4gyxcAsA5im5FXjn+0ha33o
-	 y9SzamCzzFcTL0a9niw5eq+3lhKSznGkToWkPrFHVb4saIpsbqufTKG3gvfbT01jYz
-	 WxFksvGTJ7q/WhDFHBrNxOidWIo/exK67Ig497rxdFVZzbkIHDfESXzOLcl/RK7JAi
-	 paMaw1ja8Nh04BzLL4e7hta0KsgT5KyoktSZ2aNX+wwMWbEIicuvD7nZJLRdoxIdwB
-	 8MyVmJ8pWOYizVzhPA+/AlqGaXcVxQdY9dKnse5EHOfBUq8X7dHuG8irSzkY+wPJJ8
-	 OWbb/N6TeYLMQ==
-Date: Fri, 7 Mar 2025 19:49:45 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Dave Chinner <david@fromorbit.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <20250308034945.GG2803740@frogsfrogsfrogs>
-References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
- <Z8W1q6OYKIgnfauA@infradead.org>
- <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
- <Z8XlvU0o3C5hAAaM@infradead.org>
- <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
- <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
- <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com>
- <Z8eURG4AMbhornMf@dread.disaster.area>
- <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJZGHiVY"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-86b9b1def28so2275138241.3;
+        Fri, 07 Mar 2025 21:41:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741412504; x=1742017304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EJmfZfA0tNqTdg8bAfZWDeUCZMhc8ZXDtBpkPMyhAvk=;
+        b=jJZGHiVYRzfiHPLDzHe5MaFX/aLJRVQ+iqfszM7wrju1+Z2GEvJhSWxSrbWaeGL9N3
+         cKEwn6eVqTRRcC2XPer+Xyj9EWPNI6yqRsUn2vP5kvkWzhfXBAuUYL8FYQkUmRlgPJBn
+         2uFPS2eggL5UCtIxCMGKvRjqbxVQPN7gEDt4n/2/I7uKMlNvSiTWtxfzZ4KJJfsGrfle
+         Z021rN5T8OX8lzapp5AylXRc0GcktCSqVuqJ0Bu+LP5KDlPWEto0Uh2I2opB/fEBBZWM
+         FQH6uzvieQv52IbKw28yz09atTj6jk1yLz3mmRfCn4nLprXFSl9vw3pRPQ7g9vlP5L7H
+         e6SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741412504; x=1742017304;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EJmfZfA0tNqTdg8bAfZWDeUCZMhc8ZXDtBpkPMyhAvk=;
+        b=cxfJWjJMSOPJaC+mWCb4PmA6hKd7B/9yemj0YB1aIVl2tOIGLsUjB0GaaTd/CP4VUk
+         a6WrA4+43U45iepT5JmtuPZc87FUFbQfZUQ8LawGx0zvlxEmOLdsBdc44QM2fbTMmN3z
+         wcOgMQHHRiiAKQylGN06TK/7yiqMC8fz64HDu2TqNy4LM8PHuGxCnVf8Kheiqe3Cs8rj
+         Fm1AiSvyHB0LChhCQFUby8Rn9qePBGvDLZNr7tv/Y3pwHcsAhFqee8sr6wGauNqjIJZ8
+         E0R4hEsjpfzytrFSQt84Y8wnErjW1uIUfw8dXmkYAy29Z/GIFuPOWnJqSofpm7GlsZBJ
+         amqg==
+X-Forwarded-Encrypted: i=1; AJvYcCV01jjtBtTEh5myg1fA2E6W8gHc8MH6H7480wX1AmVme8m5kUnBD6AKBApi7ECRWlnb4WFy2Mm+00zt1g==@vger.kernel.org, AJvYcCVoUOdzDUC+hsLikxTsGxt7ZkTurHtKZGLzG6utNrEtmDgQDsyLeJT5I8tIgP2ulTWnI+f0cZwtncU4sY14@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSvTrYYRhGs9RDM8SaOsnf+VHQ5qQrD80j+nbZRMzIdT1qpFHU
+	o8cRbRXGVXDA5v8LV2cQCX2tOOsGQ7D9N8D/t1HG5v5dn2Jkk3na7rzi2V/b3/iwlc3+LbjUhK3
+	Ta0QOwIrR+ac/s5xEOzAL4d3O6i8=
+X-Gm-Gg: ASbGncvl2JDk1oi/O3xr8kQHL3RnxXZ1kiUw84AwqOKV0OvUFyY9u/Zuun5wfGOKM4D
+	jPEvcdJsH6LVgkBW3Un5QSsraDe0rzsGZK/n/PD2hI0bN/FpDVaikkPzmrIZcDWKreVEMt4n7Ck
+	X1l6dShcXOAlwGJ2FNVGZ1ETeeUdkQVLA49Z2h
+X-Google-Smtp-Source: AGHT+IHHggIPKrL5d8yR6LTugXbBrgtYx9QYjOVM0FXkszko5m8Bp+SYzJZbZ7yqbzdNsHG/XrgFTdExUecoVmk9yWY=
+X-Received: by 2002:a05:6102:809c:b0:4bb:9b46:3f6f with SMTP id
+ ada2fe7eead31-4c30a538979mr4607096137.1.1741412504595; Fri, 07 Mar 2025
+ 21:41:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
+References: <20250307120141.1566673-1-qun-wei.lin@mediatek.com> <CAKEwX=NfKrisQL-DBcNxBwK2ErK-u=MSzHNpETcuWWNBh9s9Bg@mail.gmail.com>
+In-Reply-To: <CAKEwX=NfKrisQL-DBcNxBwK2ErK-u=MSzHNpETcuWWNBh9s9Bg@mail.gmail.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Sat, 8 Mar 2025 18:41:33 +1300
+X-Gm-Features: AQ5f1JoraQfrjgklIeJVnsPlZLYjnVJdWtNTlR00z_Bw9q9Ie66lMyjY9JB8lAo
+Message-ID: <CAGsJ_4ysL1xV=902oNM3vBfianF6F_iqDgyck6DGzFrZCtOprw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Improve Zram by separating compression context from kswapd
+To: Nhat Pham <nphamcs@gmail.com>
+Cc: Qun-Wei Lin <qun-wei.lin@mediatek.com>, Jens Axboe <axboe@kernel.dk>, 
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Vishal Verma <vishal.l.verma@intel.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Chris Li <chrisl@kernel.org>, 
+	Ryan Roberts <ryan.roberts@arm.com>, "Huang, Ying" <ying.huang@intel.com>, 
+	Kairui Song <kasong@tencent.com>, Dan Schatzberg <schatzberg.dan@gmail.com>, 
+	Al Viro <viro@zeniv.linux.org.uk>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, nvdimm@lists.linux.dev, linux-mm@kvack.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	Casper Li <casper.li@mediatek.com>, Chinwen Chang <chinwen.chang@mediatek.com>, 
+	Andrew Yang <andrew.yang@mediatek.com>, James Hsu <james.hsu@mediatek.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 07, 2025 at 04:21:58PM +0100, Mikulas Patocka wrote:
-> > I didn't say you were. I said the concept that dm-loop is based on
-> > is fundamentally flawed and that your benchmark setup does not
-> > reflect real world usage of loop devices.
-> 
-> > Where are the bug reports about the loop device being slow and the
-> > analysis that indicates that it is unfixable?
-> 
-> So, I did benchmarks on an enterprise nvme drive (SAMSUNG 
-> MZPLJ1T6HBJR-00007). I stacked ext4/loop/ext4, xfs/loop/xfs (using losetup 
-> --direct-io=on), ext4/dm-loop/ext4 and xfs/dm-loop/xfs. And loop is slow.
+On Sat, Mar 8, 2025 at 12:03=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wrote=
+:
+>
+> On Fri, Mar 7, 2025 at 4:02=E2=80=AFAM Qun-Wei Lin <qun-wei.lin@mediatek.=
+com> wrote:
+> >
+> > This patch series introduces a new mechanism called kcompressd to
+> > improve the efficiency of memory reclaiming in the operating system. Th=
+e
+> > main goal is to separate the tasks of page scanning and page compressio=
+n
+> > into distinct processes or threads, thereby reducing the load on the
+> > kswapd thread and enhancing overall system performance under high memor=
+y
+> > pressure conditions.
+>
+> Please excuse my ignorance, but from your cover letter I still don't
+> quite get what is the problem here? And how would decouple compression
+> and scanning help?
 
-Are you running the loop device in directio mode?  The default is to use
-buffered io, which wastes pagecache /and/ sometimes trips dirty limits
-throttling.  The loopdev tests in fstests get noticeably faster if I
-force directio mode.
+My understanding is as follows:
 
---D
+When kswapd attempts to reclaim M anonymous folios and N file folios,
+the process involves the following steps:
 
-> synchronous I/O:
-> fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=psync --iodepth=1 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
-> raw block device:
->    READ: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3985MiB (4179MB), run=10001-10001msec
->   WRITE: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3990MiB (4184MB), run=10001-10001msec
-> ext4/loop/ext4:
->    READ: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2232MiB (2341MB), run=10002-10002msec
->   WRITE: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2231MiB (2339MB), run=10002-10002msec
-> xfs/loop/xfs:
->    READ: bw=220MiB/s (230MB/s), 220MiB/s-220MiB/s (230MB/s-230MB/s), io=2196MiB (2303MB), run=10001-10001msec
->   WRITE: bw=219MiB/s (230MB/s), 219MiB/s-219MiB/s (230MB/s-230MB/s), io=2193MiB (2300MB), run=10001-10001msec
-> ext4/dm-loop/ext4:
->    READ: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3383MiB (3547MB), run=10002-10002msec
->   WRITE: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3385MiB (3549MB), run=10002-10002msec
-> xfs/dm-loop/xfs:
->    READ: bw=375MiB/s (393MB/s), 375MiB/s-375MiB/s (393MB/s-393MB/s), io=3752MiB (3934MB), run=10002-10002msec
->   WRITE: bw=376MiB/s (394MB/s), 376MiB/s-376MiB/s (394MB/s-394MB/s), io=3756MiB (3938MB), run=10002-10002msec
-> 
-> asynchronous I/O:
-> fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=libaio --iodepth=16 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
-> raw block device:
->    READ: bw=1246MiB/s (1306MB/s), 1246MiB/s-1246MiB/s (1306MB/s-1306MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
->   WRITE: bw=1247MiB/s (1308MB/s), 1247MiB/s-1247MiB/s (1308MB/s-1308MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
-> ext4/loop/ext4:
->    READ: bw=274MiB/s (288MB/s), 274MiB/s-274MiB/s (288MB/s-288MB/s), io=2743MiB (2877MB), run=10001-10001msec
->   WRITE: bw=275MiB/s (288MB/s), 275MiB/s-275MiB/s (288MB/s-288MB/s), io=2747MiB (2880MB), run=10001-10001msec
-> xfs/loop/xfs:
->    READ: bw=276MiB/s (289MB/s), 276MiB/s-276MiB/s (289MB/s-289MB/s), io=2761MiB (2896MB), run=10002-10002msec
->   WRITE: bw=276MiB/s (290MB/s), 276MiB/s-276MiB/s (290MB/s-290MB/s), io=2765MiB (2899MB), run=10002-10002msec
-> ext4/dm-loop/ext4:
->    READ: bw=1189MiB/s (1247MB/s), 1189MiB/s-1189MiB/s (1247MB/s-1247MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
->   WRITE: bw=1190MiB/s (1248MB/s), 1190MiB/s-1190MiB/s (1248MB/s-1248MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
-> xfs/dm-loop/xfs:
->    READ: bw=1209MiB/s (1268MB/s), 1209MiB/s-1209MiB/s (1268MB/s-1268MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
->   WRITE: bw=1210MiB/s (1269MB/s), 1210MiB/s-1210MiB/s (1269MB/s-1269MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
-> 
-> Mikulas
-> 
-> 
+* t1: Time to scan and unmap anonymous folios
+* t2: Time to compress anonymous folios
+* t3: Time to reclaim file folios
+
+Currently, these steps are executed sequentially, meaning the total time
+required to reclaim M + N folios is t1 + t2 + t3.
+
+However, Qun-Wei's patch enables t1 + t3 and t2 to run in parallel,
+reducing the total time to max(t1 + t3, t2). This likely improves the
+reclamation speed, potentially reducing allocation stalls.
+
+I don=E2=80=99t have concrete data on this. Does Qun-Wei have detailed
+performance data?
+
+>
+> >
+> > Problem:
+> >  In the current system, the kswapd thread is responsible for both
+> >  scanning the LRU pages and compressing pages into the ZRAM. This
+> >  combined responsibility can lead to significant performance bottleneck=
+s,
+>
+> What bottleneck are we talking about? Is one stage slower than the other?
+>
+> >  especially under high memory pressure. The kswapd thread becomes a
+> >  single point of contention, causing delays in memory reclaiming and
+> >  overall system performance degradation.
+> >
+> > Target:
+> >  The target of this invention is to improve the efficiency of memory
+> >  reclaiming. By separating the tasks of page scanning and page
+> >  compression into distinct processes or threads, the system can handle
+> >  memory pressure more effectively.
+>
+> I'm not a zram maintainer, so I'm definitely not trying to stop this
+> patch. But whatever problem zram is facing will likely occur with
+> zswap too, so I'd like to learn more :)
+
+Right, this is likely something that could be addressed more generally
+for zswap and zram.
+
+Thanks
+Barry
