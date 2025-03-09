@@ -1,62 +1,62 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E299380
-	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 22:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B7C1ACECF
+	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 22:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741559353; cv=none; b=ixSDDTXEDCdBYHpH4tve8o8DGSwsxF3Kt2Xid2gWv6O957iv6BXp+0vSHgf1dITvbniYuKIX92oDQOEg/v6FTXS6hVa9z3XI1UTiEo1rTlmRxoJxggpRic6DxGvmWE+3w3YNVqY6JdNSF4LZ//veJnJNU+u3YYgNAeiAIVfASQE=
+	t=1741559353; cv=none; b=WEZwJ8IUop+/qrnb05GTErR1iTMEgXWq9+ylvEPllAa6MLIbLaadGSrwhU+u3iS/Pl2N5DeWHuQOrXOYvCEidHGUrkMJMtvnH6NdNsrb+mahByTHnFU+VUgWewwc1ixKH8H0s6d4l7KBhoAU6261JctsQAWkN92hy/xM4+133kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741559353; c=relaxed/simple;
-	bh=Nit5eGBZo36ImOkkw0d8GTm2439IuMLkPgxUWZZjClo=;
+	bh=RqpEUDKRpX+/sxS+/cAxze8je/z92gmcAuFdiNF8+no=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=srYUedNpjhGlJnq7kAAfd20vqtjqfJDQpX6bEBx0CPtbJwcku0TwdM7MlDL4S1qYWd6pIhAYiumNAIclcg2MkOczuikhD8Opd4DOuEkmn5+eMACxnWjw2xIu7s7ZkCm+7WephHC2XSl85LxXiuVs8ZhtFxbtkBPJsoZe3L0z2Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=erG4tnS9; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=PrxJFFfVC2KZgarxN5gxiZ9c4eN1wfu1AQzdAbrtbmviE+M8TqcwnYYgwB81o7xKxqdVsj8fZMuUDthKXTOIwyqXxiA2mKsdmwWSWbV5RISkPpFuW7uuvt2+ElmKga6tDohBILnPSNDQgsfkBGUM2sFKLhWx52GG77opwQb5SrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O6GdM84g; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="erG4tnS9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6GdM84g"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1741559350;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0wzDrXohFD8kfHjsv0TqvsdLEWh7a1xlYQ7Ha0uawxU=;
-	b=erG4tnS9Z63+psMbkmlb5/YUFuwBFQ/VL2VayN1ot6eR+r0hUvFPjYsW5fP7UjbfuvOb8W
-	JaH8GK5zPEfo3hXVb+ihlRnMmV66GbFB9hbtJlUh64Q2IrD0ATfFVRrhvNfc+Q/9oYNg2H
-	cX2DxGVLFOcHM/6rQgh8QZFN7KVkbKM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=y8fv7Z1eNPyvos22f4cRSlyF9ihNCLNiBcEZgwkwgFQ=;
+	b=O6GdM84gyMXh/0jE109vNzHaxSytpMNg9rVSmUt2z5F7USrFzd8DVsfF6UOAdBXcBpdHMt
+	DxCCDL5VQR8ml/k1gGVOJxiIOjaGNYpmSAJGX1klh2xV51sliFCIH44gVPIGuw8ruFxTW2
+	FgujpBI76q5JCbMef0Hw84DPS0043mA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-Cp1syWSWMu-ro1OwATYxjQ-1; Sun,
- 09 Mar 2025 18:29:08 -0400
-X-MC-Unique: Cp1syWSWMu-ro1OwATYxjQ-1
-X-Mimecast-MFC-AGG-ID: Cp1syWSWMu-ro1OwATYxjQ_1741559347
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-wGI-mortPM-MAOIgFdLTeA-1; Sun,
+ 09 Mar 2025 18:29:09 -0400
+X-MC-Unique: wGI-mortPM-MAOIgFdLTeA-1
+X-Mimecast-MFC-AGG-ID: wGI-mortPM-MAOIgFdLTeA_1741559348
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3238D1956087;
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B46481800258;
 	Sun,  9 Mar 2025 22:29:07 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5BAB41956094;
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17A7E1956095;
 	Sun,  9 Mar 2025 22:29:06 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 529MT4Nk449823
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 529MT5Ce449839
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 9 Mar 2025 18:29:04 -0400
+	Sun, 9 Mar 2025 18:29:05 -0400
 Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 529MT4jW449822;
-	Sun, 9 Mar 2025 18:29:04 -0400
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 529MT5um449838;
+	Sun, 9 Mar 2025 18:29:05 -0400
 From: Benjamin Marzinski <bmarzins@redhat.com>
 To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
         Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/7] dm: don't change md if dm_table_set_restrictions() fails
-Date: Sun,  9 Mar 2025 18:28:57 -0400
-Message-ID: <20250309222904.449803-2-bmarzins@redhat.com>
+Subject: [PATCH 5/7] blk-zoned: clean up zone settings for devices without zwplugs
+Date: Sun,  9 Mar 2025 18:29:01 -0400
+Message-ID: <20250309222904.449803-6-bmarzins@redhat.com>
 In-Reply-To: <20250309222904.449803-1-bmarzins@redhat.com>
 References: <20250309222904.449803-1-bmarzins@redhat.com>
 Precedence: bulk
@@ -68,70 +68,59 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-__bind was changing the disk capacity, geometry and mempools of the
-mapped device before calling dm_table_set_restrictions() which could
-fail, forcing dm to drop the new table. Failing here would leave the
-device using the old table but with the wrong capacity and mempools.
-
-Move dm_table_set_restrictions() earlier in __bind(). Since it needs the
-capacity to be set, save the old version and restore it on failure.
+Previously disk_free_zone_resources() would only clean up zoned settings
+on a disk if the disk had write plugs allocated. Make it clean up zoned
+settings on any disk, so disks that don't allocate write plugs can use
+it as well.
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 ---
- drivers/md/dm.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ block/blk-zoned.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 5ab7574c0c76..f5c5ccb6f8d2 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -2421,21 +2421,29 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
- 			       struct queue_limits *limits)
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 761ea662ddc3..d7dc89cbdccb 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1363,24 +1363,23 @@ static unsigned int disk_set_conv_zones_bitmap(struct gendisk *disk,
+ 
+ void disk_free_zone_resources(struct gendisk *disk)
  {
- 	struct dm_table *old_map;
--	sector_t size;
-+	sector_t size, old_size;
- 	int ret;
- 
- 	lockdep_assert_held(&md->suspend_lock);
- 
- 	size = dm_table_get_size(t);
- 
-+	old_size = dm_get_size(md);
-+	set_capacity(md->disk, size);
-+
-+	ret = dm_table_set_restrictions(t, md->queue, limits);
-+	if (ret) {
-+		set_capacity(md->disk, old_size);
-+		old_map = ERR_PTR(ret);
-+		goto out;
-+	}
-+
- 	/*
- 	 * Wipe any geometry if the size of the table changed.
- 	 */
--	if (size != dm_get_size(md))
-+	if (size != old_size)
- 		memset(&md->geometry, 0, sizeof(md->geometry));
- 
--	set_capacity(md->disk, size);
+-	if (!disk->zone_wplugs_pool)
+-		return;
 -
- 	dm_table_event_callback(t, event_callback, md);
- 
- 	if (dm_table_request_based(t)) {
-@@ -2468,12 +2476,6 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
- 		t->mempools = NULL;
- 	}
- 
--	ret = dm_table_set_restrictions(t, md->queue, limits);
--	if (ret) {
--		old_map = ERR_PTR(ret);
--		goto out;
+-	if (disk->zone_wplugs_wq) {
+-		destroy_workqueue(disk->zone_wplugs_wq);
+-		disk->zone_wplugs_wq = NULL;
 -	}
--
- 	old_map = rcu_dereference_protected(md->map, lockdep_is_held(&md->suspend_lock));
- 	rcu_assign_pointer(md->map, (void *)t);
- 	md->immutable_target_type = dm_table_get_immutable_target_type(t);
++	if (disk->zone_wplugs_pool) {
++		if (disk->zone_wplugs_wq) {
++			destroy_workqueue(disk->zone_wplugs_wq);
++			disk->zone_wplugs_wq = NULL;
++		}
+ 
+-	disk_destroy_zone_wplugs_hash_table(disk);
++		disk_destroy_zone_wplugs_hash_table(disk);
+ 
+-	/*
+-	 * Wait for the zone write plugs to be RCU-freed before
+-	 * destorying the mempool.
+-	 */
+-	rcu_barrier();
++		/*
++		 * Wait for the zone write plugs to be RCU-freed before
++		 * destorying the mempool.
++		 */
++		rcu_barrier();
+ 
+-	mempool_destroy(disk->zone_wplugs_pool);
+-	disk->zone_wplugs_pool = NULL;
++		mempool_destroy(disk->zone_wplugs_pool);
++		disk->zone_wplugs_pool = NULL;
++	}
+ 
+ 	disk_set_conv_zones_bitmap(disk, NULL);
+ 	disk->zone_capacity = 0;
 -- 
 2.48.1
 
