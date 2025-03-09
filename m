@@ -1,182 +1,104 @@
-Received: from mail42.out.titan.email (mail42.out.titan.email [209.209.25.43])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010241DE4F8
-	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 16:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.209.25.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C952AE95
+	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 17:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741538589; cv=none; b=haazQFeTZSPJXy5BSR62awkQc9Grv9tfj6x8eZCG6I7smPGccK8YvR3stREkprCo6luDoWs4zsiBtBQHp7j4iuG64CIQU7Sb+Jo23lCYpzui9rRK3lz5rbw6j97a0ZQXEeONShox3vfExQlAD1wZDfhUQnSZaAp6bPcFmhSFPII=
+	t=1741539883; cv=none; b=WGZjegaHJ2Ujeo5Tx9iWlQUJAk7CNtgdoAOG+oos/n5pgGjF3uLrOaO0DctzrEviMUEYMa7lw046tS/np88ub1XQnOkyaj88VIOivQ/RpgSUKTFkyrq5URjz4BKMfsCep+8pMEe6BXFHBw33cyCNyPVUTK26tSmUcRiVKOdqS9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741538589; c=relaxed/simple;
-	bh=oH4wwJlTC8RywziiEnNdkwKpipiOGuOfib+M01mB0Dc=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=pKK8lw44x44kIO81ypCDbK+D4H/Y+lHPhJQM74mwXMTOAe+xWSILs9kXM5uoL3q3SMlaNLv2fxjYybo067Mg0tS3kocHjtKwz1bySCEFSmDl8nwkhBouCDss8Hk6Y/cW55XOgE+6PuFAMpUjeLy610quOXZulMoeS/alkqSlkE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=OtUQ/47z; arc=none smtp.client-ip=209.209.25.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
+	s=arc-20240116; t=1741539883; c=relaxed/simple;
+	bh=5F9GMK+dh0RLB41h5cOrqscqckOnfTZ2PetY+a9Kfrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZHuIXwI6DrVjtICZCwAvft0wWJznWNUQcAEK8laTa7UBfVj9c5YikCuRhc+mDZmx/itlpQnvPINxki2Db0Cn274sd6eUzFC/cZgcI5YQ7bdctvKwTz7VGga8OzNPNadcq9kOrlPi/J3Vdm/9YTY/7e27gQ2EPoCVeZLscCzCZ38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iZE47u+L; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="OtUQ/47z"
-DKIM-Signature: a=rsa-sha256; bh=JsV29vf87lO68vdSl5Li1WxJXM9iyqC5aDWsbs6cej0=;
-	c=relaxed/relaxed; d=t12smtp-sign004.email;
-	h=references:mime-version:cc:to:from:in-reply-to:message-id:subject:date:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
-	q=dns/txt; s=titan1; t=1741536417; v=1;
-	b=OtUQ/47zT2SkffhGXUaqujNwFZpVI5lCFzePR/zQZILHJrhn/gdeyWo3OxQlSY+f3mGf9o8Z
-	FNzLB6rXufuLT3GhNZIsCCnyg85PeUNykNvsn9swKKjAbp5cdMr5BQb1j1Dmgvye1dNgxJzallE
-	pjcHVbl2s4SAQOFETAuaKxOk=
-Received: from smtpclient.apple (unknown [141.11.218.23])
-	by smtp-out.flockmail.com (Postfix) with ESMTPA id 67176E02C4;
-	Sun,  9 Mar 2025 16:06:55 +0000 (UTC)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iZE47u+L"
+Date: Sun, 9 Mar 2025 13:04:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741539869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JN2+3PxWzjJWZY3E01tDTQ/yxuQF1+/hXqt42PsFsCQ=;
+	b=iZE47u+LZypnqrhSWr2cDhml+RN5iJ81/O7ZOWANbRLu5TuG1yWZfOq5KKp0zSPd92TmQu
+	EYsr+Us8I0qLIqKgbID5ZjQ0DXMpOB0BfCygnpM2NpWMz7QmnQrbLt2ZmPD1bUwWNvr9gg
+	0gYVPHznCDM3BOWqg2uo/pHCPCB/v0U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: dm-devel@lists.linux.dev, Mikulas Patocka <mpatocka@redhat.com>, 
+	Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org, Josef Bacik <josef@redhat.com>, 
+	axboe@kernel.dk, Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Bring back md-faulty? (was Re: dm-flakey: Fix memory corruption)
+Message-ID: <xt5b22a3i6klpdsysz4ds3fubu3p6s22redu56w6ewc7mmcter@kcgbz3ccoedf>
+References: <20250308155011.1742461-1-kent.overstreet@linux.dev>
+ <Z8yKMlhd-Z0sf6tG@kernel.org>
+ <ij3pre7rlgez3ybsfrsj2i3ohoeb5ma5rgz3tfuv63h7rv6uoo@2hw6452r4qbn>
+ <Z823ZmamUoGO8P6I@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
-Subject: Re: [bug report] badblocks: improve badblocks_check() for multiple
- ranges handling
-Feedback-ID: :i@coly.li:coly.li:flockmailId
-From: Coly Li <i@coly.li>
-In-Reply-To: <c8e4f72d-7a9f-428d-a67b-41ddd4da8f2f@stanley.mountain>
-Date: Mon, 10 Mar 2025 00:06:20 +0800
-Cc: linux-block@vger.kernel.org,
- colyli@kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A4B7FCE6-4F1A-4A87-B9C9-2D3FB1D5FB25@coly.li>
-References: <c8e4f72d-7a9f-428d-a67b-41ddd4da8f2f@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-X-Mailer: Apple Mail (2.3826.400.131.1.6)
-X-F-Verdict: SPFVALID
-X-Titan-Src-Out: 1741536416991095307.19601.873836069139295401@prod-use1-smtp-out1004.
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.4 cv=F6ytdrhN c=1 sm=1 tr=0 ts=67cdbca1
-	a=USBFZE4A2Ag4MGBBroF6Xg==:117 a=USBFZE4A2Ag4MGBBroF6Xg==:17
-	a=IkcTkHD0fZMA:10 a=CEWIc4RMnpUA:10 a=KKAkSRfTAAAA:8
-	a=EAby17L36nNo1SpXxpYA:9 a=QEXdDO2ut3YA:10 a=cvBusfyB2V15izCimMoJ:22
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z823ZmamUoGO8P6I@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
+On Sun, Mar 09, 2025 at 11:44:38AM -0400, Mike Snitzer wrote:
+> On Sat, Mar 08, 2025 at 04:50:05PM -0500, Kent Overstreet wrote:
+> > On Sat, Mar 08, 2025 at 01:19:30PM -0500, Mike Snitzer wrote:
+> > > On Sat, Mar 08, 2025 at 10:50:08AM -0500, Kent Overstreet wrote:
+> > > > So, this code clearly isn't getting tested - at all. Besides this bug,
+> > > > the parsing for the "corrupt" modes is also broken.
+> > > > 
+> > > > Guys, don't push broken crap, and figure out how to write some tests.
+> > > 
+> > > Thank you sir, may we have another?
+> > > 
+> > > Like you never introduced a bug in your life?
+> > > 
+> > > Not going to tolerate your entitled primadonna attitude here.  You are
+> > > capable of being better, you've chosen not to be on this issue (twice)
+> > 
+> > Talking about basic engineering standards is in no way "being a prima
+> > donna". Testing your changes is as basic as it gets, and this code
+> > wasn't tested _at all_.
+> 
+> "entitled primadonna attitude" was me pulling punches.
+> 
+> I don't disagree that this is a bug that was missed and that proper
+> testing hasn't been performed (I'd quibble with the no testing part
+> only because I cannot speak for Mikulas and don't like to assume I
+> know it all).
+> 
+> But you're missing the very problematic detail: you used a bug in an
+> optional feature of the test-only dm-flakey target to try to take a
+> pound of flesh while preaching from your high horse.  That is
+> unacceptable behaviour that won't be tolerated here.  Be cool and
+> others will be in return (unless you keep setting fire to bridges).
+> 
+> Fin.
 
+Mike, saying code needs to be tested is not an "entitled primadonna
+attitude". Pushing completely broken code because you made no attempt to
+test it and then flipping out when called out over it - that is.
 
-> 2025=E5=B9=B43=E6=9C=888=E6=97=A5 18:25=EF=BC=8CDan Carpenter =
-<dan.carpenter@linaro.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hello Coly Li,
->=20
-> Commit 3ea3354cb9f0 ("badblocks: improve badblocks_check() for
-> multiple ranges handling") from Aug 12, 2023 (linux-next), leads to
-> the following Smatch static checker warning:
->=20
-> block/badblocks.c:1251 _badblocks_check()
-> warn: unsigned 'sectors' is never less than zero.
->=20
-> block/badblocks.c
->   1186 static int _badblocks_check(struct badblocks *bb, sector_t s, =
-sector_t sectors,
->                                                                      =
-^^^^^^^^^^^^^^^^
-> sector_t is u64.
+To recap, we're not talking about some obscure corner cases, we're
+talking about core documentated functionality in dm-flakey that is
+completely broken in ways that show up immediately if you run it - and
+there's at least three bugs that I saw; the parsing code, the
+clone_bio() memory corruption, and the read side corruption still wasn't
+working when I fixed or worked around the other two (write side did).
 
-Hi Dan,
+This isn't your personal project, this is the kernel - there are
+standards, and other people depend on your work. dm-flakey is used
+heavily by filesystem folks, and additionally, md-faulty was recently
+removed because, supposedly, dm-flakey was sufficient.
 
-
-Thank you for the notice.
-
-
->=20
->   1187                             sector_t *first_bad, sector_t =
-*bad_sectors)
->   1188 {
->   1189         int prev =3D -1, hint =3D -1, set =3D 0;
->   1190         struct badblocks_context bad;
->   1191         int unacked_badblocks =3D 0;
->   1192         int acked_badblocks =3D 0;
->   1193         u64 *p =3D bb->page;
->   1194         int len, rv;
->   1195=20
->   1196 re_check:
->   1197         bad.start =3D s;
->   1198         bad.len =3D sectors;
->   1199=20
->   1200         if (badblocks_empty(bb)) {
->   1201                 len =3D sectors;
->   1202                 goto update_sectors;
->   1203         }
->   1204=20
->   1205         prev =3D prev_badblocks(bb, &bad, hint);
->   1206=20
->   1207         /* start after all badblocks */
->   1208         if ((prev >=3D 0) &&
->   1209             ((prev + 1) >=3D bb->count) && !overlap_front(bb, =
-prev, &bad)) {
->   1210                 len =3D sectors;
->   1211                 goto update_sectors;
->   1212         }
->   1213=20
->   1214         /* Overlapped with front badblocks record */
->   1215         if ((prev >=3D 0) && overlap_front(bb, prev, &bad)) {
->   1216                 if (BB_ACK(p[prev]))
->   1217                         acked_badblocks++;
->   1218                 else
->   1219                         unacked_badblocks++;
->   1220=20
->   1221                 if (BB_END(p[prev]) >=3D (s + sectors))
->   1222                         len =3D sectors;
->   1223                 else
->   1224                         len =3D BB_END(p[prev]) - s;
->   1225=20
->   1226                 if (set =3D=3D 0) {
->   1227                         *first_bad =3D BB_OFFSET(p[prev]);
->   1228                         *bad_sectors =3D BB_LEN(p[prev]);
->   1229                         set =3D 1;
->   1230                 }
->   1231                 goto update_sectors;
->   1232         }
->   1233=20
->   1234         /* Not front overlap, but behind overlap */
->   1235         if ((prev + 1) < bb->count && overlap_behind(bb, &bad, =
-prev + 1)) {
->   1236                 len =3D BB_OFFSET(p[prev + 1]) - bad.start;
->   1237                 hint =3D prev + 1;
->   1238                 goto update_sectors;
->   1239         }
->   1240=20
->   1241         /* not cover any badblocks range in the table */
->   1242         len =3D sectors;
->   1243=20
->   1244 update_sectors:
->   1245         s +=3D len;
->   1246         sectors -=3D len;
->                ^^^^^^^^^^^^^^
-> Subtraction.
->=20
->   1247=20
->   1248         if (sectors > 0)
->   1249                 goto re_check;
->   1250=20
-> --> 1251         WARN_ON(sectors < 0);
->                        ^^^^^^^^^^^
->=20
-
-Yes you are right, this is totally unnecessary and no sense. Let me fix =
-it.
-
-Thank you again !
-
-Coly Li
-
-
->   1252=20
->   1253         if (unacked_badblocks > 0)
->   1254                 rv =3D -1;
->   1255         else if (acked_badblocks > 0)
->   1256                 rv =3D 1;
->   1257         else
->   1258                 rv =3D 0;
->   1259=20
->   1260         return rv;
->   1261 }
->=20
-> regards,
-> dan carpenter
->=20
-
+And that's what I was using before, and it worked fine, so I'm willing
+to bring it back and maintain it if dm-flakey can't be relied on.
