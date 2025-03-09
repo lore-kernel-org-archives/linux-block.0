@@ -1,104 +1,112 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mail72.out.titan.email (mail72.out.titan.email [209.209.25.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C952AE95
-	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 17:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0002C1DF244
+	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 17:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.209.25.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741539883; cv=none; b=WGZjegaHJ2Ujeo5Tx9iWlQUJAk7CNtgdoAOG+oos/n5pgGjF3uLrOaO0DctzrEviMUEYMa7lw046tS/np88ub1XQnOkyaj88VIOivQ/RpgSUKTFkyrq5URjz4BKMfsCep+8pMEe6BXFHBw33cyCNyPVUTK26tSmUcRiVKOdqS9w=
+	t=1741541459; cv=none; b=Lo/6sMeBVHU7A+G3bUubGAzVg4Z1cJodcgkvMLOhc/B5VR8AvwAN3bxSa1XbRmLSg8lNaenZyGjUcdnyAMleiItXxie5vDfWmcrM3ru1m8Omn3CUeUoIYQa/GfrPCFjz/yp5fIyybFoGQDzc7C5tGiJPUdXO2EmNP1z4q/s7gjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741539883; c=relaxed/simple;
-	bh=5F9GMK+dh0RLB41h5cOrqscqckOnfTZ2PetY+a9Kfrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZHuIXwI6DrVjtICZCwAvft0wWJznWNUQcAEK8laTa7UBfVj9c5YikCuRhc+mDZmx/itlpQnvPINxki2Db0Cn274sd6eUzFC/cZgcI5YQ7bdctvKwTz7VGga8OzNPNadcq9kOrlPi/J3Vdm/9YTY/7e27gQ2EPoCVeZLscCzCZ38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iZE47u+L; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1741541459; c=relaxed/simple;
+	bh=nYsezjtEawGbIotwS0oewzdbvfdj0cxmn3BQAbWPMko=;
+	h=From:Content-Type:Mime-Version:Subject:Date:References:Cc:To:
+	 Message-Id; b=tXQ7p4pBwzqun6ntsq6EfV0WQMimL1XBKuLKvu/4sBq2kmHewowiQB7W4qW/HFxJYfR27xX1PS2kHZFOQ++/eh8QGHJsdi78c+znxQeUvCs79svNxap9CTA8TBxb6fOoMLNL2eqpMWUkUfrZ+ai0cl2Xlfil4w9qETNijbsDIB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=JAf9AETs; arc=none smtp.client-ip=209.209.25.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iZE47u+L"
-Date: Sun, 9 Mar 2025 13:04:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741539869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JN2+3PxWzjJWZY3E01tDTQ/yxuQF1+/hXqt42PsFsCQ=;
-	b=iZE47u+LZypnqrhSWr2cDhml+RN5iJ81/O7ZOWANbRLu5TuG1yWZfOq5KKp0zSPd92TmQu
-	EYsr+Us8I0qLIqKgbID5ZjQ0DXMpOB0BfCygnpM2NpWMz7QmnQrbLt2ZmPD1bUwWNvr9gg
-	0gYVPHznCDM3BOWqg2uo/pHCPCB/v0U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: dm-devel@lists.linux.dev, Mikulas Patocka <mpatocka@redhat.com>, 
-	Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org, Josef Bacik <josef@redhat.com>, 
-	axboe@kernel.dk, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Bring back md-faulty? (was Re: dm-flakey: Fix memory corruption)
-Message-ID: <xt5b22a3i6klpdsysz4ds3fubu3p6s22redu56w6ewc7mmcter@kcgbz3ccoedf>
-References: <20250308155011.1742461-1-kent.overstreet@linux.dev>
- <Z8yKMlhd-Z0sf6tG@kernel.org>
- <ij3pre7rlgez3ybsfrsj2i3ohoeb5ma5rgz3tfuv63h7rv6uoo@2hw6452r4qbn>
- <Z823ZmamUoGO8P6I@kernel.org>
+	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="JAf9AETs"
+DKIM-Signature: a=rsa-sha256; bh=cDdiEW5jhUv92NCXLbxub9APdfK5JMV/G6z6IwfEcKU=;
+	c=relaxed/relaxed; d=t12smtp-sign004.email;
+	h=cc:message-id:subject:mime-version:from:references:to:date:from:to:cc:subject:date:message-id:references:in-reply-to:reply-to;
+	q=dns/txt; s=titan1; t=1741536741; v=1;
+	b=JAf9AETsPBJ2J5KuRKoF1UFn3swNJnlrrh9j9AMGHOWFA2NIaomXgYUOhttw0aCtd5CYN4Ze
+	jn1J6wV18UOt0mv6n7FSHli42/NJhM/gKDTgDfdITehxrP3aOC97HeawEoDe2+XHm+pgGlvRWrE
+	hpljsmIM1wTHXmrkCQzCT2Hc=
+Received: from smtpclient.apple (v133-18-178-219.vir.kagoya.net [133.18.178.219])
+	by smtp-out.flockmail.com (Postfix) with ESMTPA id EA70D1001D6;
+	Sun,  9 Mar 2025 16:12:19 +0000 (UTC)
+Feedback-ID: :i@coly.li:coly.li:flockmailId
+From: Coly Li <i@coly.li>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z823ZmamUoGO8P6I@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Fwd: [PATCH] badblocks: Fix a nonsense WARN_ON() which checks whether
+ a u64 variable < 0
+Date: Mon, 10 Mar 2025 00:12:06 +0800
+References: <20250309160556.42854-1-colyli@kernel.org>
+Cc: linux-block@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Message-Id: <18D3673D-575E-4002-B5A8-FEE56A732EDC@coly.li>
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+X-F-Verdict: SPFVALID
+X-Titan-Src-Out: 1741536741337664736.29396.8333416838371928616@prod-use1-smtp-out1002.
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.4 cv=I9+fRMgg c=1 sm=1 tr=0 ts=67cdbde5
+	a=6yy/x1GoN29p2+/2k52XZQ==:117 a=6yy/x1GoN29p2+/2k52XZQ==:17
+	a=kj9zAlcOel0A:10 a=CEWIc4RMnpUA:10 a=VwQbUJbxAAAA:8 a=KKAkSRfTAAAA:8
+	a=O8RVhBXIRMEz6hEWSBwA:9 a=CjuIK1q_8ugA:10 a=cvBusfyB2V15izCimMoJ:22
 
-On Sun, Mar 09, 2025 at 11:44:38AM -0400, Mike Snitzer wrote:
-> On Sat, Mar 08, 2025 at 04:50:05PM -0500, Kent Overstreet wrote:
-> > On Sat, Mar 08, 2025 at 01:19:30PM -0500, Mike Snitzer wrote:
-> > > On Sat, Mar 08, 2025 at 10:50:08AM -0500, Kent Overstreet wrote:
-> > > > So, this code clearly isn't getting tested - at all. Besides this bug,
-> > > > the parsing for the "corrupt" modes is also broken.
-> > > > 
-> > > > Guys, don't push broken crap, and figure out how to write some tests.
-> > > 
-> > > Thank you sir, may we have another?
-> > > 
-> > > Like you never introduced a bug in your life?
-> > > 
-> > > Not going to tolerate your entitled primadonna attitude here.  You are
-> > > capable of being better, you've chosen not to be on this issue (twice)
-> > 
-> > Talking about basic engineering standards is in no way "being a prima
-> > donna". Testing your changes is as basic as it gets, and this code
-> > wasn't tested _at all_.
-> 
-> "entitled primadonna attitude" was me pulling punches.
-> 
-> I don't disagree that this is a bug that was missed and that proper
-> testing hasn't been performed (I'd quibble with the no testing part
-> only because I cannot speak for Mikulas and don't like to assume I
-> know it all).
-> 
-> But you're missing the very problematic detail: you used a bug in an
-> optional feature of the test-only dm-flakey target to try to take a
-> pound of flesh while preaching from your high horse.  That is
-> unacceptable behaviour that won't be tolerated here.  Be cool and
-> others will be in return (unless you keep setting fire to bridges).
-> 
-> Fin.
+Hi Jens,
 
-Mike, saying code needs to be tested is not an "entitled primadonna
-attitude". Pushing completely broken code because you made no attempt to
-test it and then flipping out when called out over it - that is.
+Could you please take a look at it and pick this patch into the =
+for-6.15/block branch? The patch is generated based on the =
+for-6.15/block branch.
 
-To recap, we're not talking about some obscure corner cases, we're
-talking about core documentated functionality in dm-flakey that is
-completely broken in ways that show up immediately if you run it - and
-there's at least three bugs that I saw; the parsing code, the
-clone_bio() memory corruption, and the read side corruption still wasn't
-working when I fixed or worked around the other two (write side did).
+Thanks in advance.
 
-This isn't your personal project, this is the kernel - there are
-standards, and other people depend on your work. dm-flakey is used
-heavily by filesystem folks, and additionally, md-faulty was recently
-removed because, supposedly, dm-flakey was sufficient.
+Coly Li
 
-And that's what I was using before, and it worked fine, so I'm willing
-to bring it back and maintain it if dm-flakey can't be relied on.
+
+> From: Coly Li <colyli@kernel.org>
+>=20
+> In _badblocks_check(), there are lines of code like this,
+> 1246         sectors -=3D len;
+> [snipped]
+> 1251         WARN_ON(sectors < 0);
+>=20
+> The WARN_ON() at line 1257 doesn't make sense because sectors is
+> unsigned long long type and never to be <0.
+>=20
+> Fix it by checking directly checking whether sectors is less than len.
+>=20
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Coly Li <colyli@kernel.org>
+> ---
+> block/badblocks.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/block/badblocks.c b/block/badblocks.c
+> index 673ef068423a..ece64e76fe8f 100644
+> --- a/block/badblocks.c
+> +++ b/block/badblocks.c
+> @@ -1242,14 +1242,15 @@ static int _badblocks_check(struct badblocks =
+*bb, sector_t s, sector_t sectors,
+> 	len =3D sectors;
+>=20
+> update_sectors:
+> +	/* This situation should never happen */
+> +	WARN_ON(sectors < len);
+> +
+> 	s +=3D len;
+> 	sectors -=3D len;
+>=20
+> 	if (sectors > 0)
+> 		goto re_check;
+>=20
+> -	WARN_ON(sectors < 0);
+> -
+> 	if (unacked_badblocks > 0)
+> 		rv =3D -1;
+> 	else if (acked_badblocks > 0)
+> --=20
+> 2.47.2
+>=20
+
