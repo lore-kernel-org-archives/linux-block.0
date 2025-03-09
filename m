@@ -1,112 +1,137 @@
-Received: from mail72.out.titan.email (mail72.out.titan.email [209.209.25.165])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0002C1DF244
-	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 17:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.209.25.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E299380
+	for <linux-block@vger.kernel.org>; Sun,  9 Mar 2025 22:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741541459; cv=none; b=Lo/6sMeBVHU7A+G3bUubGAzVg4Z1cJodcgkvMLOhc/B5VR8AvwAN3bxSa1XbRmLSg8lNaenZyGjUcdnyAMleiItXxie5vDfWmcrM3ru1m8Omn3CUeUoIYQa/GfrPCFjz/yp5fIyybFoGQDzc7C5tGiJPUdXO2EmNP1z4q/s7gjE=
+	t=1741559353; cv=none; b=ixSDDTXEDCdBYHpH4tve8o8DGSwsxF3Kt2Xid2gWv6O957iv6BXp+0vSHgf1dITvbniYuKIX92oDQOEg/v6FTXS6hVa9z3XI1UTiEo1rTlmRxoJxggpRic6DxGvmWE+3w3YNVqY6JdNSF4LZ//veJnJNU+u3YYgNAeiAIVfASQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741541459; c=relaxed/simple;
-	bh=nYsezjtEawGbIotwS0oewzdbvfdj0cxmn3BQAbWPMko=;
-	h=From:Content-Type:Mime-Version:Subject:Date:References:Cc:To:
-	 Message-Id; b=tXQ7p4pBwzqun6ntsq6EfV0WQMimL1XBKuLKvu/4sBq2kmHewowiQB7W4qW/HFxJYfR27xX1PS2kHZFOQ++/eh8QGHJsdi78c+znxQeUvCs79svNxap9CTA8TBxb6fOoMLNL2eqpMWUkUfrZ+ai0cl2Xlfil4w9qETNijbsDIB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=JAf9AETs; arc=none smtp.client-ip=209.209.25.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
+	s=arc-20240116; t=1741559353; c=relaxed/simple;
+	bh=Nit5eGBZo36ImOkkw0d8GTm2439IuMLkPgxUWZZjClo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=srYUedNpjhGlJnq7kAAfd20vqtjqfJDQpX6bEBx0CPtbJwcku0TwdM7MlDL4S1qYWd6pIhAYiumNAIclcg2MkOczuikhD8Opd4DOuEkmn5+eMACxnWjw2xIu7s7ZkCm+7WephHC2XSl85LxXiuVs8ZhtFxbtkBPJsoZe3L0z2Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=erG4tnS9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="JAf9AETs"
-DKIM-Signature: a=rsa-sha256; bh=cDdiEW5jhUv92NCXLbxub9APdfK5JMV/G6z6IwfEcKU=;
-	c=relaxed/relaxed; d=t12smtp-sign004.email;
-	h=cc:message-id:subject:mime-version:from:references:to:date:from:to:cc:subject:date:message-id:references:in-reply-to:reply-to;
-	q=dns/txt; s=titan1; t=1741536741; v=1;
-	b=JAf9AETsPBJ2J5KuRKoF1UFn3swNJnlrrh9j9AMGHOWFA2NIaomXgYUOhttw0aCtd5CYN4Ze
-	jn1J6wV18UOt0mv6n7FSHli42/NJhM/gKDTgDfdITehxrP3aOC97HeawEoDe2+XHm+pgGlvRWrE
-	hpljsmIM1wTHXmrkCQzCT2Hc=
-Received: from smtpclient.apple (v133-18-178-219.vir.kagoya.net [133.18.178.219])
-	by smtp-out.flockmail.com (Postfix) with ESMTPA id EA70D1001D6;
-	Sun,  9 Mar 2025 16:12:19 +0000 (UTC)
-Feedback-ID: :i@coly.li:coly.li:flockmailId
-From: Coly Li <i@coly.li>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="erG4tnS9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741559350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0wzDrXohFD8kfHjsv0TqvsdLEWh7a1xlYQ7Ha0uawxU=;
+	b=erG4tnS9Z63+psMbkmlb5/YUFuwBFQ/VL2VayN1ot6eR+r0hUvFPjYsW5fP7UjbfuvOb8W
+	JaH8GK5zPEfo3hXVb+ihlRnMmV66GbFB9hbtJlUh64Q2IrD0ATfFVRrhvNfc+Q/9oYNg2H
+	cX2DxGVLFOcHM/6rQgh8QZFN7KVkbKM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-Cp1syWSWMu-ro1OwATYxjQ-1; Sun,
+ 09 Mar 2025 18:29:08 -0400
+X-MC-Unique: Cp1syWSWMu-ro1OwATYxjQ-1
+X-Mimecast-MFC-AGG-ID: Cp1syWSWMu-ro1OwATYxjQ_1741559347
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3238D1956087;
+	Sun,  9 Mar 2025 22:29:07 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5BAB41956094;
+	Sun,  9 Mar 2025 22:29:06 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 529MT4Nk449823
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 9 Mar 2025 18:29:04 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 529MT4jW449822;
+	Sun, 9 Mar 2025 18:29:04 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+        Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/7] dm: don't change md if dm_table_set_restrictions() fails
+Date: Sun,  9 Mar 2025 18:28:57 -0400
+Message-ID: <20250309222904.449803-2-bmarzins@redhat.com>
+In-Reply-To: <20250309222904.449803-1-bmarzins@redhat.com>
+References: <20250309222904.449803-1-bmarzins@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
-Subject: Fwd: [PATCH] badblocks: Fix a nonsense WARN_ON() which checks whether
- a u64 variable < 0
-Date: Mon, 10 Mar 2025 00:12:06 +0800
-References: <20250309160556.42854-1-colyli@kernel.org>
-Cc: linux-block@vger.kernel.org,
- Dan Carpenter <dan.carpenter@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Message-Id: <18D3673D-575E-4002-B5A8-FEE56A732EDC@coly.li>
-X-Mailer: Apple Mail (2.3826.400.131.1.6)
-X-F-Verdict: SPFVALID
-X-Titan-Src-Out: 1741536741337664736.29396.8333416838371928616@prod-use1-smtp-out1002.
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.4 cv=I9+fRMgg c=1 sm=1 tr=0 ts=67cdbde5
-	a=6yy/x1GoN29p2+/2k52XZQ==:117 a=6yy/x1GoN29p2+/2k52XZQ==:17
-	a=kj9zAlcOel0A:10 a=CEWIc4RMnpUA:10 a=VwQbUJbxAAAA:8 a=KKAkSRfTAAAA:8
-	a=O8RVhBXIRMEz6hEWSBwA:9 a=CjuIK1q_8ugA:10 a=cvBusfyB2V15izCimMoJ:22
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Hi Jens,
+__bind was changing the disk capacity, geometry and mempools of the
+mapped device before calling dm_table_set_restrictions() which could
+fail, forcing dm to drop the new table. Failing here would leave the
+device using the old table but with the wrong capacity and mempools.
 
-Could you please take a look at it and pick this patch into the =
-for-6.15/block branch? The patch is generated based on the =
-for-6.15/block branch.
+Move dm_table_set_restrictions() earlier in __bind(). Since it needs the
+capacity to be set, save the old version and restore it on failure.
 
-Thanks in advance.
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ drivers/md/dm.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-Coly Li
-
-
-> From: Coly Li <colyli@kernel.org>
->=20
-> In _badblocks_check(), there are lines of code like this,
-> 1246         sectors -=3D len;
-> [snipped]
-> 1251         WARN_ON(sectors < 0);
->=20
-> The WARN_ON() at line 1257 doesn't make sense because sectors is
-> unsigned long long type and never to be <0.
->=20
-> Fix it by checking directly checking whether sectors is less than len.
->=20
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Signed-off-by: Coly Li <colyli@kernel.org>
-> ---
-> block/badblocks.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/badblocks.c b/block/badblocks.c
-> index 673ef068423a..ece64e76fe8f 100644
-> --- a/block/badblocks.c
-> +++ b/block/badblocks.c
-> @@ -1242,14 +1242,15 @@ static int _badblocks_check(struct badblocks =
-*bb, sector_t s, sector_t sectors,
-> 	len =3D sectors;
->=20
-> update_sectors:
-> +	/* This situation should never happen */
-> +	WARN_ON(sectors < len);
-> +
-> 	s +=3D len;
-> 	sectors -=3D len;
->=20
-> 	if (sectors > 0)
-> 		goto re_check;
->=20
-> -	WARN_ON(sectors < 0);
-> -
-> 	if (unacked_badblocks > 0)
-> 		rv =3D -1;
-> 	else if (acked_badblocks > 0)
-> --=20
-> 2.47.2
->=20
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 5ab7574c0c76..f5c5ccb6f8d2 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -2421,21 +2421,29 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 			       struct queue_limits *limits)
+ {
+ 	struct dm_table *old_map;
+-	sector_t size;
++	sector_t size, old_size;
+ 	int ret;
+ 
+ 	lockdep_assert_held(&md->suspend_lock);
+ 
+ 	size = dm_table_get_size(t);
+ 
++	old_size = dm_get_size(md);
++	set_capacity(md->disk, size);
++
++	ret = dm_table_set_restrictions(t, md->queue, limits);
++	if (ret) {
++		set_capacity(md->disk, old_size);
++		old_map = ERR_PTR(ret);
++		goto out;
++	}
++
+ 	/*
+ 	 * Wipe any geometry if the size of the table changed.
+ 	 */
+-	if (size != dm_get_size(md))
++	if (size != old_size)
+ 		memset(&md->geometry, 0, sizeof(md->geometry));
+ 
+-	set_capacity(md->disk, size);
+-
+ 	dm_table_event_callback(t, event_callback, md);
+ 
+ 	if (dm_table_request_based(t)) {
+@@ -2468,12 +2476,6 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 		t->mempools = NULL;
+ 	}
+ 
+-	ret = dm_table_set_restrictions(t, md->queue, limits);
+-	if (ret) {
+-		old_map = ERR_PTR(ret);
+-		goto out;
+-	}
+-
+ 	old_map = rcu_dereference_protected(md->map, lockdep_is_held(&md->suspend_lock));
+ 	rcu_assign_pointer(md->map, (void *)t);
+ 	md->immutable_target_type = dm_table_get_immutable_target_type(t);
+-- 
+2.48.1
 
