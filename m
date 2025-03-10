@@ -1,72 +1,71 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FFE22A804
-	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 13:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0933122AE59
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 13:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741614643; cv=none; b=kxA4fz5kuQnQuCZQ67Tlt7/Xwx9JP+FJa4CI8Kc+GgxhmidVFdCSj01ZWf/kmYhYnhYmPm+8n8WRcITgfgtvW2sjhFWJcWWGIVJIXS70x9F1GGZ0hRGBwYFVx8v/l68+3Viz9BiZGjDhifTZ2P3qmyEFCu5d93NJu1Zq13gdTX4=
+	t=1741614644; cv=none; b=lM4vaXfa3H8/MpFK1dGgNtSVCmQxvOZQxZwQ6z/ee8/maUBIdi0QLq5yacps/gLekxY7ev/c3mqVBg4shvc8gcoGztDOfIEopOuUQYtY/vwSMM+6EaNVAKBRTJxdUVIGJixDE8ZFUCp9xF/wh+z8Tz/rtN+KjfhUcSBjcacwfB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741614643; c=relaxed/simple;
-	bh=HDSVjBRDOlDp5ZbJellhnv8UG12s5G7+SzNOG7IEdzI=;
+	s=arc-20240116; t=1741614644; c=relaxed/simple;
+	bh=kRowGLaCnFK9DFM6f7uMT7JNCKLCEf2PT5kJGF3yYYc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ATG3XlGfQ2v6GsgVky9rft1AMVqy/ss8fgt3oW2yZ3sfU1dujMBRyoNnWjoiP8SGsrkC6fTdetqjYo+cS4TInuT27iG0NNnJyx1Rz9MJcDlwz6UIecmJU9CrpWGIPEvCpFhVTNikpKRruCHbg3uk59vBGePlY42U/qifSVn/q6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k1w6BATw; arc=none smtp.client-ip=209.85.166.178
+	 MIME-Version:Content-Type; b=IWOZIqmK+uhFBjD5t8ZvU8783dV6gfTEYOPGzQcygzdUnU//xvxMeG744HVw34RMyR/j9erBg+vlhYboVm4D3Jj8LcQGGB7ufof5ytQygpUKENQMGmN3+cuihq82E2DmeobH32BSe7vS9VF5IObmMA5VhKUBkj+GUoU652+cWeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zleemMs6; arc=none smtp.client-ip=209.85.166.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k1w6BATw"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d439f01698so13466305ab.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 06:50:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zleemMs6"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-85b42db7b69so13141539f.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 06:50:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741614640; x=1742219440; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741614642; x=1742219442; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yu9eoktnyx7wChYFY2A9SHj9c4UxEPLe3buR1ZnNl7A=;
-        b=k1w6BATw/QlxbYSKumwY/1UMiydKTRuqw8BM+o2dGOw3K/k/m7zACz4jO370tBSBLj
-         Jd9KdCMHVkwQxDHS5VrtHxltxhwACiQHIaBDJz82ny3ztvS5v9ia6gIup0eSFxGdcNfB
-         W1S5cZCYyeU+tUbNoa7xW7HWo/qKIvy0WmnXVN38MWMLRyHrzXBGNUFmJpHfg60AbYH6
-         +fMwKwrEWVCpCz9u6/BuITdsyEHkhATyOc/5ZimHmLOsQUsjJrDzaWVcKi4HrPvcJeua
-         gcCVP+sOWEaAgQvLcnccQsB7kp8ViWqKYLo73X+sr91mU23KzFKK8HiGiHXSu4pkpH6U
-         ggiA==
+        bh=tUspsaKaBehtCKwT16rXODc0xHUdVxEjdsqpOZ3zIYo=;
+        b=zleemMs6gwSf9iH3d7QXA9Cm0D9zd/MVCE+3KpjYFO3zGibKLV0umPE6zqo7/fW001
+         ojpnKELVjUVTaVjgjLWXFJt6ZrClCv/tdjm+MEBtgeu8dzMcwZqUttxyqgNjneoY3gGY
+         JyBq4X9XdJfUMI91UFYafqAS4hmAQFj6a7EIm5on5i3OnhgAL+u80W9wJOxnATjGOyVv
+         BUu2XJJtF7vpqmSBK9v8T2rtol685jbXq6EYRWGRcqtui5D3x+wH8+L3ZLwQIPr2IDso
+         lX7fxfJE0uZCOeYx/54UG9Icfm5+yb+ZfcPZTPDDTOaOkvCfKrKY+R6GeANsOrnm/2zz
+         3mMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741614640; x=1742219440;
+        d=1e100.net; s=20230601; t=1741614642; x=1742219442;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yu9eoktnyx7wChYFY2A9SHj9c4UxEPLe3buR1ZnNl7A=;
-        b=wbsLPh2T8DbwmxXBY7you1f3tcKbaZkaGZrkmMOefsSSh+DSS4+F02F3ov7ufqQtHi
-         jPy5NcSmP4vQIyFH0XRWVVlGLNYflvrjQNYN7cpY4ZD9zZv/OJOkTXI2sGB1Ym7xKlci
-         nyu0lBmCwdAWTTW1pWmC9o5P5cQCbFCd/6f7OXRYC6hyQrfX9XzqjeMqRYNaeSBGQW/D
-         gIv/SmotUBpwYtbV/EyDyPsnIUC8bhLPx5rblXc7cFlhYbfMsGbPMNBJeF50vQkwQ4PS
-         qr5xWDVdU5hjHcHLLmJIX8ce7YHay4jqw6zSvbxTXRoA89eg8mlSlbw90fXKMk7uh5oY
-         xoPg==
-X-Gm-Message-State: AOJu0Yyo6wHvXewDl2oH1jq6oPOQHgOO0i/oLgCs17BWFoolCZJWA4I5
-	v42+sqnEQ/10raWGCPSXoERlssovQ1DNkpIfhkrOHmGiSZylAISIdNYAgOE15FXe1Yt6YuTSWQt
-	t
-X-Gm-Gg: ASbGncsydSU4VAtOKU+VdpXYl/7l5FAg01nGMzmwVOCTpaKs5IIoDXSjVClaG5nRHZr
-	uhKZ9YnW5kPJJQfa6rHSZ7FheEQY2XgD0PWLQRmjBfHSsNtZl8DnfHqymbLhat85vCDJXTGbOvY
-	/+4qtBpP2MPMJDewD2BPzn7clA+/LvdKXVFwrlpuDa+PwYZPJJsoKFjWGErPPj4AA0xwK0DqeH/
-	Z2siipj68tiqwie+RDKhzBy/NnB0GQze2XgLIp4U8DsRYzLCJxEB11nW71sUJ8U93ocPx3a/RZr
-	+ftNmqkyXxIQ0HIqrhP7H/KSMLcu+R5EDrEtdA71TmklCg==
-X-Google-Smtp-Source: AGHT+IFA3G070Bz3e2F4pxV+ytiqksQSn56Sib0NnFK56DUF5oucsSHDNYC1XrxNF9SaEXkzhCfIzg==
-X-Received: by 2002:a92:cc4b:0:b0:3d2:ed3c:67a8 with SMTP id e9e14a558f8ab-3d44aea1c62mr87035255ab.4.1741614640605;
-        Mon, 10 Mar 2025 06:50:40 -0700 (PDT)
+        bh=tUspsaKaBehtCKwT16rXODc0xHUdVxEjdsqpOZ3zIYo=;
+        b=TVKRrL+t0iSiBFoVa3k02Y1fCn1YPsz8/D9+WJae7CkaaCKa1JpQfNH38j3F+a6Ad9
+         mk7IXLoJum787ZXYAFGihuS3me27n3U5xIcVPial8o5MmXjoh2tZk0msCXVLYvYRJGY9
+         fouCkMhdmWQb+Zmgth2eygQqkKI5S4trCwUFPl8blMBiBz/eiSJ5VNjyfy439H9Kc/dh
+         BfC929VmpWmsSPoRitcSiI62vqVNVTWovRohNKIz2G6dHn7rFF94E7uLmoF29Mi8N89B
+         +rjipddzYmglTBg4azNRHN8rZmAYvw8Rs1YHmM07pvGzwVYGOF+s5UAWowKKuFwlOytS
+         I4+Q==
+X-Gm-Message-State: AOJu0YwszaCwfh4Een+I0hiZrzLnAqzY2AQIbcs2smM2KgK+exTGNJH3
+	cykzAIhBOrBTSIw+gUo0+irzm8x5B69UXKcVMMWJ/8ggXACX4IvTBoPEMU5l0Jk=
+X-Gm-Gg: ASbGncvgjb7t4ZSO8YiWfIUOPckdIX/kosYSRAxo9V/Rnwj85HpIrOodAz1duw2e6q/
+	G8zrNI7vIAWhy1AxEkqrSmFpUEl2SsW35ztHPRSzT04gsyHNPPv9OtnRpHIhyz2cQqZHAVWNv5V
+	cHG/CHjufomr1e1K2h4onirNpk4oMXKFPzmcBmuP6dCVg7Q3S8lG27HHQ3lJtk8QgIrVBBl3UlD
+	ohpZpoIsbaIWCqQDW/pxPyu1kMeShXHWXAijesyUbmf4CFGAfvo7XSvOhbm87tRacBSObEMYKhs
+	s9DeJ3Br4DrglXwJSDJyhh/0nCMGtR/LNX4=
+X-Google-Smtp-Source: AGHT+IFNw1d4zMmcDFKbVYZybB1yEIUzV0WvPzCrDNX6b2PPX+F5muZn2JfFNZcEZIvopidgYOn7fw==
+X-Received: by 2002:a05:6e02:144f:b0:3d4:36c3:7fe3 with SMTP id e9e14a558f8ab-3d441960b65mr144960085ab.9.1741614641970;
+        Mon, 10 Mar 2025 06:50:41 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d43b511091sm21350915ab.42.2025.03.10.06.50.39
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d43b511091sm21350915ab.42.2025.03.10.06.50.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 06:50:39 -0700 (PDT)
+        Mon, 10 Mar 2025 06:50:41 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
-Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de, 
- gjoyce@ibm.com
-In-Reply-To: <20250306093956.2818808-1-nilay@linux.ibm.com>
-References: <20250306093956.2818808-1-nilay@linux.ibm.com>
-Subject: Re: [PATCH] block: protect hctx attributes/params using
- q->elevator_lock
-Message-Id: <174161463963.178937.17538366690761311232.b4-ty@kernel.dk>
-Date: Mon, 10 Mar 2025 07:50:39 -0600
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: dm-devel@lists.linux.dev, stable@vger.kernel.org, 
+ Christoph Hellwig <hch@infradead.org>
+In-Reply-To: <20250310115453.2271109-1-ming.lei@redhat.com>
+References: <20250310115453.2271109-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] block: make sure ->nr_integrity_segments is cloned
+ in blk_rq_prep_clone
+Message-Id: <174161464074.178937.3099509536865247557.b4-ty@kernel.dk>
+Date: Mon, 10 Mar 2025 07:50:40 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,25 +77,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Thu, 06 Mar 2025 15:09:53 +0530, Nilay Shroff wrote:
-> Currently, hctx attributes (nr_tags, nr_reserved_tags, and cpu_list)
-> are protected using `q->sysfs_lock`. However, these attributes can be
-> updated in multiple scenarios:
->   - During the driver's probe method.
->   - When updating nr_hw_queues.
->   - When writing to the sysfs attribute nr_requests,
->     which can modify nr_tags.
-> The nr_requests attribute is already protected using q->elevator_lock,
-> but none of the update paths actually use q->sysfs_lock to protect hctx
-> attributes. So to ensure proper synchronization, replace q->sysfs_lock
-> with q->elevator_lock when reading hctx attributes through sysfs.
+On Mon, 10 Mar 2025 19:54:53 +0800, Ming Lei wrote:
+> Make sure ->nr_integrity_segments is cloned in blk_rq_prep_clone(),
+> otherwise requests cloned by device-mapper multipath will not have the
+> proper nr_integrity_segments values set, then BUG() is hit from
+> sg_alloc_table_chained().
 > 
-> [...]
+> 
 
 Applied, thanks!
 
-[1/1] block: protect hctx attributes/params using q->elevator_lock
-      commit: 5abba4cebec0a591ca7e7f55701e42cd5dc059af
+[1/1] block: make sure ->nr_integrity_segments is cloned in blk_rq_prep_clone
+      commit: fc0e982b8a3a169b1c654d9a1aa45bf292943ef2
 
 Best regards,
 -- 
