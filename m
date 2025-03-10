@@ -1,44 +1,45 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D541A7264;
-	Mon, 10 Mar 2025 15:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB9B22D4FA;
+	Mon, 10 Mar 2025 15:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741620529; cv=none; b=KZ7qosVhelu2gZDlmupK5EofDfMWBJjQDs+O+KT6z1FJci/ZmcBdsinA0BVO/Ry4qJMlH+8RylqUGysZIdvI+Zo876BRFrsArwgwXl8tzue7aRljf4QfpXg5yRuegsrPRGbeNwmeGXAkmyDQ5Nam2pGh6KolSYFgqrJrGzsE/zI=
+	t=1741621990; cv=none; b=QMQYP0IigkW4A9/+iHAXJsHrGdSun86Hr3p2rHup1P+eM19kLWJaz1+0J+fVt48zubgk0+1TiUdsEKa8n3053YQGicncWbl7ufvib6kL6B+lyitbOWLoBXoZzdrUC6zdGcmTnRlVmWmG9o5ZPtPqF+e5ZB2996S/C06CUScdSOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741620529; c=relaxed/simple;
-	bh=mcn+vY+S1woGC0GGbfsPy3tYqvbju7ryrvfDi1hup5s=;
+	s=arc-20240116; t=1741621990; c=relaxed/simple;
+	bh=lF26eElOXDYH/1khOX1IrCW3xye3zUD/CDg2PngBW/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IIMrn91fHPHUOiDxarpKytOZYoflUCIHC/o1UJkGm/bfnn9UypLy45ALYRdnakGTeInZFDg/Fz+2E4MDCv3gO357//+bOK46xsMQdx+E3BHPm2kn+6nqSQCWDkAlGPYznvAnxY96Tn1BTToUbZy6u5baWomlq7bKvVjGYlIPBEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PVcNxY1g; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vr6ZdDHz5OSnmWvwnuP6UBI+LYFaiNWvPH3rqdOCxnp8Sn8y3W7Emkbg+faJ1ZHVVgWnbQhUsTApuCmEUACR6NzEwGQD7B3rOEjSbmEO69DQh85BSSg26/TmODhaY2JgGTrVhTmZE/Dd7+rWZ4X2aZlowUgUMB2/9STG5IO2Tzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+JO9rRx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PVcNxY1g"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=LFuFlzgoC5ukemUl0eQEeCKPuI6gKDdM8KBiSpcB9xc=; b=PVcNxY1guezp38LWF2ftYx46zh
-	181jogpyXvCV9SSUrAPj/osD+voUmWRbp2zm6AeYiiKay6FgNfYmpKuauHVDCW6WjekFqReRquzm1
-	PXmVsr717nWi+/mnwiKZlEEPvk+giC4gwbO5IndT89MR4H+AWHNuPMPsRHv2FBgJVbdC/PtBSG73X
-	7xqfhrIZatuk/WFJMuQdok3HpPuEZXYDrP49NSsYbf1ppb1dyUFuARUdFjhn7Oco4mnpUUP6r1hqj
-	qBzNNIt63C/zJ87dDmJM2ZeS2r2KnA10Hk6S8R2OWN77XmpBJY0Zq3k7VK2oHyb6A+Xek0GpayjpP
-	ycbYH5mQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1trf3Z-00000006Dsj-3Xn1;
-	Mon, 10 Mar 2025 15:28:45 +0000
-Date: Mon, 10 Mar 2025 15:28:41 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: syzbot <syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com>
-Cc: linux-block@vger.kernel.org, akpm@linux-foundation.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [mm?] [fs?] KCSAN: data-race in __filemap_add_folio /
- invalidate_bdev (8)
-Message-ID: <Z88FKeXyaQCeXapp@casper.infradead.org>
-References: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+JO9rRx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F075EC4CEE5;
+	Mon, 10 Mar 2025 15:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741621990;
+	bh=lF26eElOXDYH/1khOX1IrCW3xye3zUD/CDg2PngBW/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B+JO9rRxtkmYaGaHJDRS7E29d8BwLm6Gn/E50rKjFZ3W4z4QYk/MUej5oLO66CKYf
+	 2kMXYwxLLlXioUBj7eh5nksizl7e1M9+GGHYfrBVwI6NsPl3Su9LUaEgfto6m6qLhG
+	 dgz9RB0/l7h0j1OmyrRowVVCUzVF8LwN41EJ6cxE4FGN7blfu0k2hwO7Ty84Mmldly
+	 /e1aopSSKnjHRD20V62S0rbk9qYSuSGax9LsioBF0bliEY4QAmeReXqFtYFNgJgx9h
+	 FmIQeOYC/PSkCZiD9ys52yb4fBsWECZmbbgqwtRDQearMEJ2F49fxms+ce9t+KW7S3
+	 0F5nPJXR6SdOw==
+Date: Mon, 10 Mar 2025 05:53:08 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+	josef@toxicpanda.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
+Message-ID: <Z88K5JtR4rhhIFsY@slm.duckdns.org>
+References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
+ <Z8sZyElaHQQwKqpB@slm.duckdns.org>
+ <5fc124c9-e202-99ca-418d-0f52d027640f@huaweicloud.com>
+ <Z85LjhvkCzlqBVZy@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,51 +48,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
+In-Reply-To: <Z85LjhvkCzlqBVZy@fedora>
 
-On Mon, Mar 10, 2025 at 02:40:26AM -0700, syzbot wrote:
-> Reported-by: syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com
+Hello,
+
+On Mon, Mar 10, 2025 at 10:16:46AM +0800, Ming Lei wrote:
+...
+> > Yes, but it's a litter hard to explain to users the differece between IO
+> > split and IO merge, they just think IO split is the numer of IOs issued
+> > to disk, and IO merge is the number of IOs issued from user.
 > 
-> EXT4-fs (loop0): unmounting filesystem 00000000-0000-0000-0000-000000000000.
-> ==================================================================
-> BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
+> Here it is really one trouble.
 > 
-> read-write to 0xffff888100630570 of 8 bytes by task 3291 on cpu 0:
->  __filemap_add_folio+0x430/0x6f0 mm/filemap.c:929
-
-This is a write to mapping->nrpages with the i_pages lock held, as it
-should be.
-
->  filemap_add_folio+0x9c/0x1b0 mm/filemap.c:981
->  page_cache_ra_unbounded+0x1c1/0x350 mm/readahead.c:276
->  do_page_cache_ra mm/readahead.c:328 [inline]
->  force_page_cache_ra mm/readahead.c:357 [inline]
->  page_cache_sync_ra+0x252/0x680 mm/readahead.c:585
->  filemap_get_pages+0x2ca/0x11a0 mm/filemap.c:2580
->  filemap_read+0x230/0x8c0 mm/filemap.c:2691
->  blkdev_read_iter+0x228/0x2d0 block/fops.c:796
->  new_sync_read fs/read_write.c:484 [inline]
->  vfs_read+0x5cc/0x6f0 fs/read_write.c:565
->  ksys_read+0xe8/0x1b0 fs/read_write.c:708
+> a) Sometimes people think IOs wrt. IOPS means that the read/write IO
+> submitted from application, one typical example is `fio`.
 > 
-> read to 0xffff888100630570 of 8 bytes by task 3306 on cpu 1:
->  invalidate_bdev+0x25/0x70 block/bdev.c:99
+> b) Sometimes people think it is the data observed from `iostat`.
+> 
+> In a), io merge/split isn't taken into account, but b) does cover io
+> merge and split.
+> 
+> So question is that what is the correct way for user to observe IOPS
+> wrt. iops throttle?
 
-This is a read of mapping->nrpages with no lock held.  So we could
-silence this warning by making this a READ_ONCE or data_race().
+If we could go back in time, I think the right metric to use is
+hardware-seen IOPS as that's better correlated with the actual capacity
+available (the correlation is very flawed but still better) and the number
+of issued bio's can easily change depending on kernel implementation
+details.
 
-The problem is that I'm not sure this is the right answer.  Obviously
-here we only care about zero-vs-non-zero, but what if we race with
-0 being incremented to 1?  Should there be some locking higher up
-that prevents this?  Or is this "yes, root can do this and screw
-themselves"?
+That said, I'm not sure about changing the behavior now. blk-throtl has
+mostly used the number of bios as long as it has existed and given that
+there can be a signficant difference between the two metrics, I'm not sure
+the change is justified at this point.
 
->  ext4_put_super+0x571/0x810 fs/ext4/super.c:1356
->  generic_shutdown_super+0xe5/0x220 fs/super.c:642
->  kill_block_super+0x2a/0x70 fs/super.c:1710
->  ext4_kill_sb+0x44/0x80 fs/ext4/super.c:7368
->  deactivate_locked_super+0x7d/0x1c0 fs/super.c:473
->  deactivate_super+0x9f/0xb0 fs/super.c:506
->  cleanup_mnt+0x268/0x2e0 fs/namespace.c:1413
->  __cleanup_mnt+0x19/0x20 fs/namespace.c:1420
->  task_work_run+0x13a/0x1a0 kernel/task_work.c:227
+Thanks.
+
+-- 
+tejun
