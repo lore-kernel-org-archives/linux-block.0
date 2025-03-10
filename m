@@ -1,58 +1,166 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EDE28EA
-	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 11:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAA9221550
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 11:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741605365; cv=none; b=EitLbNkcCclRQg2kIEMoTbc7WlVcaMxY+l7UbQLa1MknwrThvDymOaBSxFS45E1F9LQhwN9KnyFFACqHfxF0Ad5+mOv1N+jXRPmqU3cG1EI7Z4rh83Llx40s9vxOmELLtzOtPrEL49RK3GjwyvmQeJ0kzFbxp7veF4hEUemOVjA=
+	t=1741605546; cv=none; b=TbuOR/7ZwFjBWC4X8DTPYGtk8MnBlLfWAv/4vs4qqoEQKAUrH7xkh1hll5TxV+1BBOECkYxSahWCBaozShhlKeR5Z2yUXObiS5NnUXOHnfrHcckTG4cYlLoDOImmS9uBoDHomaqszjOvr5DxWbgfyyIQNpFsvjQidxqmpejWElA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741605365; c=relaxed/simple;
-	bh=79mkcjY4B0YyCKt/FNwnEIEuznX3ICbMQ2Arl7DS3+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUAp+4jownnXlPOV98aW/ALX1yFHOXb+M5KhF7VRggxCW0CqHu6UmpgzI+SgxanZCaBQbv3wGfzG5P4awVOSklCaNXJULjp58epge0E7scTznQgkfi57qcjmPMTBmZKDiN2fsL+q8y/xRKT8LJUNPuRNFSVEDJmCeg5XmgdDjw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vACbGrjg; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1741605546; c=relaxed/simple;
+	bh=E9vy+7ZZSCNSqS/a5RaQtqZ+dBTKHVlGqId6boiKsns=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=E2SMl3gFNpycfdPTr6Dbk6UlLw+oH1Bm/D7kQnm435pRisuUjHGprD8OL6NPDU77NoDFqLyDluxZY+fcol8ogojUtE3Y4yfUDLmyh6EleQc6YBTdo6ujqyPLDUPynoj3bzeDpGm3LnHAdpyMOe7ic8FFyGjT0N60mn6yeJdsHik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gHlF/yVe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vACbGrjg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ac92hY6FRoS7VKnFS5DkCcDP+ztI8Nn2UzOVEEt7Rl8=; b=vACbGrjgIy4urzv0MpYSfGWmZY
-	2vlBqtWxN8hjVm+nMZS26XFXyVxdCE+d6w2K8Z6qBFIqM05AF+B/eV2dHT37VgA5p3seUMBD0iK3H
-	GYyWX8V2jOXoU1Gf47v2KRV4UCpk2Ukx7UQ6cwQL1DcqC5GrSZ50QjOTqijF5WmS+JJssfYRMrU/c
-	U2dbhzaKSFVklmc7ISrY4ru/r21C+7htciKDa1aHw7qAtx3ISQxatFG/x3OCadtq1wcwWUaVNySSo
-	Tld42F8lFIaQSWGohnKKNruGiaNP+w3F/JUmnMYFjnP+dSCB+nDHd16SDU9ZgGjkcS/EaDA9bjHWh
-	c3SIW0lQ==;
-Received: from [80.149.170.9] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1trb71-00000002Oog-3zRo;
-	Mon, 10 Mar 2025 11:16:02 +0000
-Date: Mon, 10 Mar 2025 12:15:44 +0100
-From: Christoph Hellwig <hch@infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gHlF/yVe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741605543;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MdVJpJDSCf8VK9aSFyWsVw9QtWdz+77Ho+x7EaRXXMc=;
+	b=gHlF/yVeITDwZ0PcBJTQvDhXfp+9j5Eq5vj75I3srHiYytDS2KLYJ+KqIWGF9DeCuHqCL9
+	1jNxHDnqAPSiGwboTzKbtlh8JQcc9l/BJU/rjryS54w2WM/QVkRqRqnKcdlXHdLpcA4okn
+	b4zqd43H4SGl6nkKen7cPX0FC7hVwTM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-341-sDXs6nBPMcOLK0wmhbY1fw-1; Mon,
+ 10 Mar 2025 07:19:00 -0400
+X-MC-Unique: sDXs6nBPMcOLK0wmhbY1fw-1
+X-Mimecast-MFC-AGG-ID: sDXs6nBPMcOLK0wmhbY1fw_1741605538
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0BB5319560A1;
+	Mon, 10 Mar 2025 11:18:58 +0000 (UTC)
+Received: from [10.45.224.17] (unknown [10.45.224.17])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 714C71800946;
+	Mon, 10 Mar 2025 11:18:54 +0000 (UTC)
+Date: Mon, 10 Mar 2025 12:18:51 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [RESEND PATCH 5/5] loop: add module parameter of 'nr_hw_queues'
-Message-ID: <Z87J4IqflP_L_Vcf@infradead.org>
-References: <20250308162312.1640828-1-ming.lei@redhat.com>
- <20250308162312.1640828-6-ming.lei@redhat.com>
+cc: Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@infradead.org>, 
+    Jens Axboe <axboe@kernel.dk>, Jooyung Han <jooyung@google.com>, 
+    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+    Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com, 
+    dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+    linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+In-Reply-To: <Z8zbYOkwSaOJKD1z@fedora>
+Message-ID: <a8e5c76a-231f-07d1-a394-847de930f638@redhat.com>
+References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com> <Z8W1q6OYKIgnfauA@infradead.org> <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com> <Z8XlvU0o3C5hAAaM@infradead.org> <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com> <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
+ <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com> <Z8eURG4AMbhornMf@dread.disaster.area> <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com> <Z8zbYOkwSaOJKD1z@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250308162312.1640828-6-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Sun, Mar 09, 2025 at 12:23:09AM +0800, Ming Lei wrote:
-> Add module parameter of 'nr_hw_queues' so that loop can support MQ,
-> which may reduce contention in case of too many io jobs.
 
-More details, please.  Also a module parameter is a really bad
-interface - this needs to be per-device and have a good default.
+
+On Sun, 9 Mar 2025, Ming Lei wrote:
+
+> On Fri, Mar 07, 2025 at 04:21:58PM +0100, Mikulas Patocka wrote:
+> > > I didn't say you were. I said the concept that dm-loop is based on
+> > > is fundamentally flawed and that your benchmark setup does not
+> > > reflect real world usage of loop devices.
+> > 
+> > > Where are the bug reports about the loop device being slow and the
+> > > analysis that indicates that it is unfixable?
+> > 
+> > So, I did benchmarks on an enterprise nvme drive (SAMSUNG 
+> > MZPLJ1T6HBJR-00007). I stacked ext4/loop/ext4, xfs/loop/xfs (using losetup 
+> > --direct-io=on), ext4/dm-loop/ext4 and xfs/dm-loop/xfs. And loop is slow.
+> > 
+> > synchronous I/O:
+> > fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=psync --iodepth=1 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+> > raw block device:
+> >    READ: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3985MiB (4179MB), run=10001-10001msec
+> >   WRITE: bw=399MiB/s (418MB/s), 399MiB/s-399MiB/s (418MB/s-418MB/s), io=3990MiB (4184MB), run=10001-10001msec
+> > ext4/loop/ext4:
+> >    READ: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2232MiB (2341MB), run=10002-10002msec
+> >   WRITE: bw=223MiB/s (234MB/s), 223MiB/s-223MiB/s (234MB/s-234MB/s), io=2231MiB (2339MB), run=10002-10002msec
+> > xfs/loop/xfs:
+> >    READ: bw=220MiB/s (230MB/s), 220MiB/s-220MiB/s (230MB/s-230MB/s), io=2196MiB (2303MB), run=10001-10001msec
+> >   WRITE: bw=219MiB/s (230MB/s), 219MiB/s-219MiB/s (230MB/s-230MB/s), io=2193MiB (2300MB), run=10001-10001msec
+> > ext4/dm-loop/ext4:
+> >    READ: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3383MiB (3547MB), run=10002-10002msec
+> >   WRITE: bw=338MiB/s (355MB/s), 338MiB/s-338MiB/s (355MB/s-355MB/s), io=3385MiB (3549MB), run=10002-10002msec
+> > xfs/dm-loop/xfs:
+> >    READ: bw=375MiB/s (393MB/s), 375MiB/s-375MiB/s (393MB/s-393MB/s), io=3752MiB (3934MB), run=10002-10002msec
+> >   WRITE: bw=376MiB/s (394MB/s), 376MiB/s-376MiB/s (394MB/s-394MB/s), io=3756MiB (3938MB), run=10002-10002msec
+> > 
+> > asynchronous I/O:
+> > fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=libaio --iodepth=16 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+> > raw block device:
+> >    READ: bw=1246MiB/s (1306MB/s), 1246MiB/s-1246MiB/s (1306MB/s-1306MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
+> >   WRITE: bw=1247MiB/s (1308MB/s), 1247MiB/s-1247MiB/s (1308MB/s-1308MB/s), io=12.2GiB (13.1GB), run=10001-10001msec
+> > ext4/loop/ext4:
+> >    READ: bw=274MiB/s (288MB/s), 274MiB/s-274MiB/s (288MB/s-288MB/s), io=2743MiB (2877MB), run=10001-10001msec
+> >   WRITE: bw=275MiB/s (288MB/s), 275MiB/s-275MiB/s (288MB/s-288MB/s), io=2747MiB (2880MB), run=10001-10001msec
+> > xfs/loop/xfs:
+> >    READ: bw=276MiB/s (289MB/s), 276MiB/s-276MiB/s (289MB/s-289MB/s), io=2761MiB (2896MB), run=10002-10002msec
+> >   WRITE: bw=276MiB/s (290MB/s), 276MiB/s-276MiB/s (290MB/s-290MB/s), io=2765MiB (2899MB), run=10002-10002msec
+> > ext4/dm-loop/ext4:
+> >    READ: bw=1189MiB/s (1247MB/s), 1189MiB/s-1189MiB/s (1247MB/s-1247MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
+> >   WRITE: bw=1190MiB/s (1248MB/s), 1190MiB/s-1190MiB/s (1248MB/s-1248MB/s), io=11.6GiB (12.5GB), run=10002-10002msec
+> > xfs/dm-loop/xfs:
+> >    READ: bw=1209MiB/s (1268MB/s), 1209MiB/s-1209MiB/s (1268MB/s-1268MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
+> >   WRITE: bw=1210MiB/s (1269MB/s), 1210MiB/s-1210MiB/s (1269MB/s-1269MB/s), io=11.8GiB (12.7GB), run=10001-10001msec
+> 
+> Hi Mikulas,
+> 
+> Please try the following patchset:
+> 
+> https://lore.kernel.org/linux-block/20250308162312.1640828-1-ming.lei@redhat.com/
+> 
+> which tries to handle IO in current context directly via NOWAIT, and
+> supports MQ for loop since 12 io jobs are applied in your test. With this
+> change, I can observe similar perf data on raw block device and loop/xfs
+> over mq-virtio-scsi & nvme in my test VM.
+
+Yes - with these patches, it is much better.
+
+> 1) try single queue first by `modprobe loop`
+
+fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=psync --iodepth=1 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+xfs/loop/xfs
+   READ: bw=302MiB/s (317MB/s), 302MiB/s-302MiB/s (317MB/s-317MB/s), io=3024MiB (3170MB), run=10001-10001msec
+  WRITE: bw=303MiB/s (317MB/s), 303MiB/s-303MiB/s (317MB/s-317MB/s), io=3026MiB (3173MB), run=10001-10001msec
+
+fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=libaio --iodepth=16 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+xfs/loop/xfs
+   READ: bw=1055MiB/s (1106MB/s), 1055MiB/s-1055MiB/s (1106MB/s-1106MB/s), io=10.3GiB (11.1GB), run=10001-10001msec
+  WRITE: bw=1056MiB/s (1107MB/s), 1056MiB/s-1056MiB/s (1107MB/s-1107MB/s), io=10.3GiB (11.1GB), run=10001-10001msec
+
+> 2) then try MQ by 'modprobe loop nr_hw_queues=4'
+
+fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=psync --iodepth=1 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+xfs/loop/xfs
+   READ: bw=352MiB/s (370MB/s), 352MiB/s-352MiB/s (370MB/s-370MB/s), io=3525MiB (3696MB), run=10001-10001msec
+  WRITE: bw=353MiB/s (370MB/s), 353MiB/s-353MiB/s (370MB/s-370MB/s), io=3527MiB (3698MB), run=10001-10001msec
+
+fio --direct=1 --bs=4k --runtime=10 --time_based --numjobs=12 --ioengine=libaio --iodepth=16 --group_reporting=1 --filename=/mnt/test2/l -name=job --rw=rw
+xfs/loop/xfs
+   READ: bw=1181MiB/s (1239MB/s), 1181MiB/s-1181MiB/s (1239MB/s-1239MB/s), io=11.5GiB (12.4GB), run=10001-10001msec
+  WRITE: bw=1183MiB/s (1240MB/s), 1183MiB/s-1183MiB/s (1240MB/s-1240MB/s), io=11.5GiB (12.4GB), run=10001-10001msec
+
+> If it still doesn't work, please provide fio log for both `raw block
+> device` and 'loop/xfs', which may provide some clue for the big perf
+> gap.
+> 
+> 
+> 
+> Thanks,
+> Ming
+
+Mikulas
 
