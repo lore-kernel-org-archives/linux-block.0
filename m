@@ -1,187 +1,279 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C3C233156;
-	Mon, 10 Mar 2025 17:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5226E22F164
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 17:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741627864; cv=none; b=E0JMPF6xNbpL5lCvW24gxbaYlb7zrGIaNOk4AUaI02Zs5Fw6HxRcXrvbsoG2imEwZmeH63JcNWFGsYbDooPmBuTO1MKNV+nYAu/lSQltnbaYGpQva+PnPJWwsNZmT80mx07/o+seeeVwSY8TzYsIR39BzBZmG0xXT3ulHrwBiNc=
+	t=1741628247; cv=none; b=KUNiiXRfVJuH3abUpgTLHEKW11itP6/bBzehr3aQmRr44Qf89T2+iwPEFo2B0GgDe+RIWFnD1YGu+h0a/HlQOaGnf+8/A9/oDRabcSmkEKOohtVHcXujFVQhwaUOdVoRdVpw/8+pegbypDCa0LNXaacRALz0mjiqRlOoM/YNKa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741627864; c=relaxed/simple;
-	bh=hBQ6Jb0lIvYkY5YwdG9Lzpk3SfgbN4yRgpRLE9J874U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KoiUHm6Iumx/ExFNaNtxgZie+1FEpN+NboYefz9P2IPLz3mBU+VC2uBA07HsZkic31VW4BKbdOQtStCoC6Vj4g2rRzA/mopk6cUa3NY9MoZ4kM4jqm3PrylDw295lBKGtlYeLB1rlr+tortUNU6Wb5ny7V/Lc2y03DE//3ddMLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y9oswiZQ; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741628247; c=relaxed/simple;
+	bh=GH8/rH1SI2j1ceiXTzakUYJwaQ2lj4sVPGRISfCSt0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CBtj52MlPJq+zpqa3aL8NZvhCSYELVGwZL27z8vYxe02V5Z632mbfb+hSOMnt8CGz38FI1Ns/EscQSQon/2qIYBtU5W+LDOpqYM6p1clYbHHeExLNgwCLDuekYY8spYJPefWevsxaLFjMKzRPWhp05BiXtJkl5kBuaHpt2wOFoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UDeYqjty; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9oswiZQ"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-47690a4ec97so9086411cf.2;
-        Mon, 10 Mar 2025 10:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741627861; x=1742232661; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b78KlAfyXKoBfZcmMN7ECuBnSEo3W7UZ1w2TCHUTUXU=;
-        b=Y9oswiZQFiifab+rw/nqZpMroR7IKnfmyZmz/DaIrvToFK5/Xn7EWIg886s3IPHIOB
-         nIRUT1m2aogSB2VBCHRtd1lCf4zCaYz3aSlFADrG/nfw0bnHMgg4nvQb7eVgYrdbZ9BZ
-         FUt4t32hKqKY2UlqvdGEBwglheiFkRUiHYoka/9PkK06H5HMJ85iI63PwA8Kf4wZsLd1
-         3ewClJLCqFFp+x3ZqKE+myHtdhFgfH1Lfny8luqrL5iGpW8kEIuA7bgpJZJ49xZ25VWp
-         kgigFfAvlh6Z7tKZ8QGWFIFnuUm9Kj8VCWnTzI4RwWSzgWiCWUC/cjlsTFeA2eKBG7ep
-         lUYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741627861; x=1742232661;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b78KlAfyXKoBfZcmMN7ECuBnSEo3W7UZ1w2TCHUTUXU=;
-        b=MgMbM0Z/uBLOCHDZ5+mbZYeu9ckRfdrTOwEB70G2i3e2gjnEZRVBK+SeqcNBDzS+so
-         n/ws2SQIdurWkk7VnKUz/wKp9ZuGggtShySAl3RpZlcPodyrkm+800tNINvqaTBneXj7
-         bhq8q1TMmBcMhkDg96ZZQJfG5mNISlvjdkjqovlfKRoJVAObY6qWE11MKfRjxfA5thPt
-         ox/Lutebrj98tRJVl2tFFPG0Dj5LjeBVdNhb52uM3FAl9StG/Zq6s9wA0raOZz1NHuFS
-         5brRni953CQPZ+Ka4nV1uBJW9EQIx5daSpwdkHlRjni9qZOW7IbhO1LqgzSvwdM/bx+T
-         Hm1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUL91F9EVCSKK3MRBYtCo/KOllJ+6ZHjzBYj/P+k4nfG9rhBU8ProsUR+yRVjm+ao+59uwdvpc/RxLspap/@vger.kernel.org, AJvYcCWg7bYNI9A2+Ji8RgefWrSiOrZ+MQFDxBemnCNiWUxAXx5p+2IH+PcudRJvV3PaDNz34sqjLydfcgwR9A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAxSbEYQDxuPZu8weszUzRl8zyJ0EJQ8+VmJDwxcCb3oUMZ9sK
-	DJ/EdUtFkk0XHnydQ2o518Dxyy8MA4+7VthJ/HGXlJlhTj6wW33MIQjmWApZHGFPTxz8Na6CazN
-	BW7VRnM57dESkUJD4IMVP+rKRV3U=
-X-Gm-Gg: ASbGnctEeDwPcZ2cu6HXZ5eP9gHqPbLkOGp63uWEo7WTJS4UlId5gMe1VDyb28G1jP6
-	A6nOjM6r+3adTduxzyy3DdBar4mMwYffwUKhrAEU/n7WMoCzcwVG/q5CMUX7KR6QbcaBpQnZb4t
-	D5C4vkuSsD4b6sD/XFdKSpYS1she98d45eGD5EO9yyEvawYJskCX2Wt9Re1A==
-X-Google-Smtp-Source: AGHT+IH1LLSAI/+s4Zi9zEGfRKSLEY80Xhq1yNJSxRKUtitCQBu1/cEDGmenPOC3lpC07sG6xvj89oLC5RUraLQQ57A=
-X-Received: by 2002:ad4:5945:0:b0:6e8:feae:929c with SMTP id
- 6a1803df08f44-6ea2dd25b7dmr6779506d6.21.1741627861048; Mon, 10 Mar 2025
- 10:31:01 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDeYqjty"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741628244;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zZwW1Pyf314nkOcDOOWAdxiKKYBtxRCDqYI9mkDDoks=;
+	b=UDeYqjtyDC9nTBwNz22RDMNQUU38lFzdaKvkCKGshOpEXQWps1bWMrsIDNiNiLlGbYfH4x
+	VVp57FqHf2E4CQF6rhCQAIeKz9pP3jMAtHBVMCAsPhITkOPlbf3x7OgXQa+SuRZUjwOQas
+	wODUJlTgDuXm+ulOrxq5Diy+3mT1Y1c=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-QJlpmnvSPOmzTsfWKeiuEw-1; Mon,
+ 10 Mar 2025 13:37:22 -0400
+X-MC-Unique: QJlpmnvSPOmzTsfWKeiuEw-1
+X-Mimecast-MFC-AGG-ID: QJlpmnvSPOmzTsfWKeiuEw_1741628241
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 007C31955BC1;
+	Mon, 10 Mar 2025 17:37:21 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B14761956096;
+	Mon, 10 Mar 2025 17:37:20 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52AHbJXn480743
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 10 Mar 2025 13:37:19 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52AHbJ6O480742;
+	Mon, 10 Mar 2025 13:37:19 -0400
+Date: Mon, 10 Mar 2025 13:37:19 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 3/7] dm: handle failures in dm_table_set_restrictions
+Message-ID: <Z88jTxQqoLitl4ee@redhat.com>
+References: <20250309222904.449803-1-bmarzins@redhat.com>
+ <20250309222904.449803-4-bmarzins@redhat.com>
+ <9b5ff861-964d-472c-9267-5e5b10186ed3@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307120141.1566673-1-qun-wei.lin@mediatek.com>
- <CAKEwX=NfKrisQL-DBcNxBwK2ErK-u=MSzHNpETcuWWNBh9s9Bg@mail.gmail.com>
- <CAGsJ_4ysL1xV=902oNM3vBfianF6F_iqDgyck6DGzFrZCtOprw@mail.gmail.com>
- <52896654fa07a685707b11cfcc141b038a13b649.camel@mediatek.com> <CAKEwX=PNHik8O6swwRPsuDovtCNLxXRQUsiXZSSq8ZbzFvJV0w@mail.gmail.com>
-In-Reply-To: <CAKEwX=PNHik8O6swwRPsuDovtCNLxXRQUsiXZSSq8ZbzFvJV0w@mail.gmail.com>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Mon, 10 Mar 2025 10:30:48 -0700
-X-Gm-Features: AQ5f1JpRFqqTBM7MTZvYEz_bClOJNrcAPr9qIUA-7zONYB5oqdusO9tVlggAxPY
-Message-ID: <CAKEwX=Onwhy7FkB97tw4JonN3POj=dDp3ixsfS14=_3x3=KvuA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Improve Zram by separating compression context from kswapd
-To: =?UTF-8?B?UXVuLXdlaSBMaW4gKOael+e+pOW0tCk=?= <Qun-wei.Lin@mediatek.com>
-Cc: "21cnbao@gmail.com" <21cnbao@gmail.com>, =?UTF-8?B?QW5kcmV3IFlhbmcgKOaliuaZuuW8tyk=?= <Andrew.Yang@mediatek.com>, 
-	=?UTF-8?B?Q2FzcGVyIExpICjmnY7kuK3mpq4p?= <casper.li@mediatek.com>, 
-	"chrisl@kernel.org" <chrisl@kernel.org>, =?UTF-8?B?SmFtZXMgSHN1ICjlvpDmhbbolrAp?= <James.Hsu@mediatek.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>, 
-	"ira.weiny@intel.com" <ira.weiny@intel.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"dave.jiang@intel.com" <dave.jiang@intel.com>, 
-	"schatzberg.dan@gmail.com" <schatzberg.dan@gmail.com>, 
-	=?UTF-8?B?Q2hpbndlbiBDaGFuZyAo5by16Yym5paHKQ==?= <chinwen.chang@mediatek.com>, 
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"minchan@kernel.org" <minchan@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
-	"nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>, 
-	"vishal.l.verma@intel.com" <vishal.l.verma@intel.com>, 
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
-	"dan.j.williams@intel.com" <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b5ff861-964d-472c-9267-5e5b10186ed3@kernel.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Mar 10, 2025 at 9:58=E2=80=AFAM Nhat Pham <nphamcs@gmail.com> wrote=
-:
->
-> On Mon, Mar 10, 2025 at 6:22=E2=80=AFAM Qun-wei Lin (=E6=9E=97=E7=BE=A4=
-=E5=B4=B4)
-> <Qun-wei.Lin@mediatek.com> wrote:
-> >
-> >
-> > Thank you for your explanation. Compared to the original single kswapd,
-> > we expect t1 to have a slight increase in re-scan time. However, since
-> > our kcompressd can focus on compression tasks and we can have multiple
-> > kcompressd instances (kcompressd0, kcompressd1, ...) running in
-> > parallel, we anticipate that the number of times a folio needs be re-
-> > scanned will not be too many.
-> >
-> > In our experiments, we fixed the CPU and DRAM at a certain frequency.
-> > We created a high memory pressure enviroment using a memory eater and
-> > recorded the increase in pgsteal_anon per second, which was around 300,
-> > 000. Then we applied our patch and measured again, that pgsteal_anon/s
-> > increased to over 800,000.
-> >
-> > > >
-> > > > >
-> > > > > Problem:
-> > > > >  In the current system, the kswapd thread is responsible for both
-> > > > >  scanning the LRU pages and compressing pages into the ZRAM. This
-> > > > >  combined responsibility can lead to significant performance
-> > > > > bottlenecks,
-> > > >
-> > > > What bottleneck are we talking about? Is one stage slower than the
-> > > > other?
-> > > >
-> > > > >  especially under high memory pressure. The kswapd thread becomes
-> > > > > a
-> > > > >  single point of contention, causing delays in memory reclaiming
-> > > > > and
-> > > > >  overall system performance degradation.
-> > > > >
-> > > > > Target:
-> > > > >  The target of this invention is to improve the efficiency of
-> > > > > memory
-> > > > >  reclaiming. By separating the tasks of page scanning and page
-> > > > >  compression into distinct processes or threads, the system can
-> > > > > handle
-> > > > >  memory pressure more effectively.
-> > > >
-> > > > I'm not a zram maintainer, so I'm definitely not trying to stop
-> > > > this
-> > > > patch. But whatever problem zram is facing will likely occur with
-> > > > zswap too, so I'd like to learn more :)
-> > >
-> > > Right, this is likely something that could be addressed more
-> > > generally
-> > > for zswap and zram.
-> > >
-> >
-> > Yes, we also hope to extend this to other swap devices, but currently,
-> > we have only modified zram. We are not very familiar with zswap and
-> > would like to ask if anyone has any suggestions for modifications?
-> >
->
-> My understanding is right now schedule_bio_write is the work
-> submission API right? We can make it generic, having it accept a
-> callback and a generic untyped pointer which can be casted into a
-> backend-specific context struct. For zram it would contain struct zram
-> and the bio. For zswap, depending on at which point do you want to
-> begin offloading the work - it could simply be just the folio itself
-> if we offload early, or a more complicated scheme.
+On Mon, Mar 10, 2025 at 08:25:39AM +0900, Damien Le Moal wrote:
+> On 3/10/25 07:28, Benjamin Marzinski wrote:
+> > If dm_table_set_restrictions() fails while swapping tables,
+> > device-mapper will continue using the previous table. It must be sure to
+> > leave the mapped_device in it's previous state on failure.  Otherwise
+> > device-mapper could end up using the old table with settings from the
+> > unused table.
+> > 
+> > Do not update the mapped device in dm_set_zones_restrictions(). Wait
+> > till after dm_table_set_restrictions() is sure to succeed to update the
+> > md zoned settings. Do the same with the dax settings, and if
+> > dm_revalidate_zones() fails, restore the original queue limits.
+> > 
+> > Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+> > ---
+> >  drivers/md/dm-table.c | 24 ++++++++++++++++--------
+> >  drivers/md/dm-zone.c  | 26 ++++++++++++++++++--------
+> >  drivers/md/dm.h       |  1 +
+> >  3 files changed, 35 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index 0ef5203387b2..4003e84af11d 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> > @@ -1836,6 +1836,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  			      struct queue_limits *limits)
+> >  {
+> >  	int r;
+> > +	struct queue_limits old_limits;
+> >  
+> >  	if (!dm_table_supports_nowait(t))
+> >  		limits->features &= ~BLK_FEAT_NOWAIT;
+> > @@ -1862,16 +1863,11 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  	if (dm_table_supports_flush(t))
+> >  		limits->features |= BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA;
+> >  
+> > -	if (dm_table_supports_dax(t, device_not_dax_capable)) {
+> > +	if (dm_table_supports_dax(t, device_not_dax_capable))
+> >  		limits->features |= BLK_FEAT_DAX;
+> > -		if (dm_table_supports_dax(t, device_not_dax_synchronous_capable))
+> > -			set_dax_synchronous(t->md->dax_dev);
+> > -	} else
+> > +	else
+> >  		limits->features &= ~BLK_FEAT_DAX;
+> >  
+> > -	if (dm_table_any_dev_attr(t, device_dax_write_cache_enabled, NULL))
+> > -		dax_write_cache(t->md->dax_dev, true);
+> > -
+> >  	/* For a zoned table, setup the zone related queue attributes. */
+> >  	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+> >  	    (limits->features & BLK_FEAT_ZONED)) {
+> > @@ -1883,6 +1879,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  	if (dm_table_supports_atomic_writes(t))
+> >  		limits->features |= BLK_FEAT_ATOMIC_WRITES;
+> >  
+> > +	old_limits = q->limits;
+> 
+> I am not sure this is safe to do like this since the user may be simultaneously
+> changing attributes, which would result in the old_limits struct being in an
+> inconsistent state. So shouldn't we hold q->limits_lock here ? We probably want
+> a queue_limits_get() helper for that though.
+> 
+> >  	r = queue_limits_set(q, limits);
+> 
+> ...Or, we could modify queue_limits_set() to also return the old limit struct
+> under the q limits_lock. That maybe easier.
 
-To expand a bit - zswap_store() is where all the logic lives. It's
-fairly straightforward: checking zswap cgroup limits, acquire the
-zswap pool (a combination of compression algorithm and backend memory
-allocator, which is just zsmalloc now), perform compression, then ask
-for a slot from zsmalloc and store it there.
+If we disallow switching between zoned devices then this is unnecssary.
+OTherwise you're right. We do want to make sure that we don't grep the
+limits while something is updating the limits.
 
-You can probably just offload the whole thing here, or perform some
-steps of the sequence before offloading the rest :) One slight
-complication is don't forget to fallback to disk swapping - unlike
-zram, zswap is originally designed as a "cache" for underlying swap
-files on disk, which we can fallback to if the compression attempt
-fails. Everything should be fairly straightforward though :)
+Unfortunately, thinking about this just made me realize a different
+problem, that has nothing to do with this patchset. bio-based devices
+can't handle freezing the queue while there are plugged zone write bios.
+So, for instance, if you do something like:
 
->
->
->
-> > > Thanks
-> > > Barry
-> >
-> > Best Regards,
-> > Qun-wei
-> >
-> >
+# modprobe scsi_debug dev_size_mb=512 zbc=managed zone_size_mb=128 zone_nr_conv=0 delay=20
+# dmsetup create test --table "0 1048576 crypt aes-cbc-essiv:sha256 deadbeefdeadbeefdeadbeefdeadbeef 0 /dev/sda 0"
+# dd if=/dev/zero of=/dev/mapper/test bs=1M count=128 &
+# echo 0 > /sys/block/dm-1/queue/iostats
+
+you hang.
+
+*** FREEZING THE QUEUE WHILE UPDATING THE LIMIT ***
+root@fedora-test:~# cat /proc/1344/stack 
+[<0>] blk_mq_freeze_queue_wait+0x9f/0xd0
+[<0>] queue_limits_commit_update_frozen+0x38/0x60
+[<0>] queue_attr_store+0xc6/0x1b0
+[<0>] kernfs_fop_write_iter+0x13b/0x1f0
+[<0>] vfs_write+0x28d/0x450
+[<0>] ksys_write+0x6c/0xe0
+[<0>] do_syscall_64+0x82/0x160
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+**** WRITING OUT THE PLUGGED BIOS [kworker/0:1H+dm-1_zwplugs] ****
+root@fedora-test:~# cat /proc/341/stack
+[<0>] __bio_queue_enter+0x13c/0x270
+[<0>] __submit_bio+0xf9/0x280
+[<0>] submit_bio_noacct_nocheck+0x197/0x3e0
+[<0>] blk_zone_wplug_bio_work+0x1ad/0x1f0
+[<0>] process_one_work+0x176/0x330
+[<0>] worker_thread+0x252/0x390
+[<0>] kthread+0xec/0x230
+[<0>] ret_from_fork+0x31/0x50
+[<0>] ret_from_fork_asm+0x1a/0x30
+
+Changing the iostats limit could be swapped with anything that freezes
+the queue.
+
+-Ben
+
+> 
+> >  	if (r)
+> >  		return r;
+> > @@ -1894,10 +1891,21 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+> >  	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+> >  	    (limits->features & BLK_FEAT_ZONED)) {
+> >  		r = dm_revalidate_zones(t, q);
+> > -		if (r)
+> > +		if (r) {
+> > +			queue_limits_set(q, &old_limits);
+> >  			return r;
+> > +		}
+> >  	}
+> >  
+> > +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+> > +		dm_finalize_zone_settings(t, limits);
+> > +
+> > +	if (dm_table_supports_dax(t, device_not_dax_synchronous_capable))
+> > +		set_dax_synchronous(t->md->dax_dev);
+> > +
+> > +	if (dm_table_any_dev_attr(t, device_dax_write_cache_enabled, NULL))
+> > +		dax_write_cache(t->md->dax_dev, true);
+> > +
+> >  	dm_update_crypto_profile(q, t);
+> >  	return 0;
+> >  }
+> > diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+> > index 20edd3fabbab..681058feb63b 100644
+> > --- a/drivers/md/dm-zone.c
+> > +++ b/drivers/md/dm-zone.c
+> > @@ -340,12 +340,8 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
+> >  	 * mapped device queue as needing zone append emulation.
+> >  	 */
+> >  	WARN_ON_ONCE(queue_is_mq(q));
+> > -	if (dm_table_supports_zone_append(t)) {
+> > -		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > -	} else {
+> > -		set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > +	if (!dm_table_supports_zone_append(t))
+> >  		lim->max_hw_zone_append_sectors = 0;
+> > -	}
+> >  
+> >  	/*
+> >  	 * Determine the max open and max active zone limits for the mapped
+> > @@ -383,9 +379,6 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
+> >  		lim->zone_write_granularity = 0;
+> >  		lim->chunk_sectors = 0;
+> >  		lim->features &= ~BLK_FEAT_ZONED;
+> > -		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > -		md->nr_zones = 0;
+> > -		disk->nr_zones = 0;
+> >  		return 0;
+> >  	}
+> >  
+> > @@ -408,6 +401,23 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
+> >  	return 0;
+> >  }
+> >  
+> > +void dm_finalize_zone_settings(struct dm_table *t, struct queue_limits *lim)
+> > +{
+> > +	struct mapped_device *md = t->md;
+> > +
+> > +	if (lim->features & BLK_FEAT_ZONED) {
+> > +		if (dm_table_supports_zone_append(t))
+> > +			clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > +		else
+> > +			set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > +	} else {
+> > +		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
+> > +		md->nr_zones = 0;
+> > +		md->disk->nr_zones = 0;
+> > +	}
+> > +}
+> > +
+> > +
+> >  /*
+> >   * IO completion callback called from clone_endio().
+> >   */
+> > diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+> > index a0a8ff119815..e5d3a9f46a91 100644
+> > --- a/drivers/md/dm.h
+> > +++ b/drivers/md/dm.h
+> > @@ -102,6 +102,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
+> >  int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
+> >  		struct queue_limits *lim);
+> >  int dm_revalidate_zones(struct dm_table *t, struct request_queue *q);
+> > +void dm_finalize_zone_settings(struct dm_table *t, struct queue_limits *lim);
+> >  void dm_zone_endio(struct dm_io *io, struct bio *clone);
+> >  #ifdef CONFIG_BLK_DEV_ZONED
+> >  int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+> 
+> 
+> -- 
+> Damien Le Moal
+> Western Digital Research
+
