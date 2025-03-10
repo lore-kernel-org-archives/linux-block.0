@@ -1,39 +1,37 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E968C16D9C2;
-	Mon, 10 Mar 2025 01:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA47A935
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 02:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741571953; cv=none; b=fRlokmNKtAwosn7N9xF9BN/aSETWrwjzqo017w/jWNtu0sdAd0nHm/rmLxEaCwSxm6Fi+QV9hx/OxbLfA3IpTzMSbU5hUsRsBOUUHK9faiFtDC004zQNZbFuNN0elaJsvJ7eRMuBRnUPNAuVogaqDdAk/CC9MyS/XyXBNQo/VEs=
+	t=1741572376; cv=none; b=AdX4o3ILAiSnYcOwZXtprr4vltMBdfUX/Rc7KZHw+IHDMU2Hnu4goc5xutPFv0iEgoKZn7y8uUepF0xRPS+w586p33esUZocQMyTZDrW+gNT1Tithz/UpFAKn2paRdOwcFyiJmQwso6Tm5brpci/BnqQuuWp9s4xjBXk0US6wo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741571953; c=relaxed/simple;
-	bh=z4U2Yepj8+Rxo+bbVZwMaxR9KQ3v6DWGnPNdRQjwXqU=;
+	s=arc-20240116; t=1741572376; c=relaxed/simple;
+	bh=7ZQ4pC9QJnUI5TRrnScH0WkQ0HBeVzzuHzZuwS1CHCw=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=LajjTEBg6GRiCR4u36SXBPewUFJ3vqRn79aj+BYbcpREpnt27iurLJFanHGNuaKhzPEwKU2jjUXpJXzXjmsNRzV32u3+Dd04o267FJ3zgQGQvmqX33C2bHmJIs4eNgwAKUuIYrLlzXSBou3XEZ4aUaK1EBjGhR5vPYtZjAUf3W4=
+	 In-Reply-To:Content-Type; b=nyXTX6RmY3QR/dct0j9KTRliNvJ2cAwwuK19VhV0xa2xb1HyJIGvmg/GvNIRkHDYaiFjlWSzTVddGv9jRbffE+QuwwMwTfzzxnUqTJUMMuwKvBFAVQ4jthSTOYyX6iUJkwdhym9FYjUXsg0wimrCqjePaLPs27RcQ9ghyv0Jfxk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZB0Rc5ZxYz4f3lfZ;
-	Mon, 10 Mar 2025 09:58:36 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZB0c0654Lz4f3jQd
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 10:05:52 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 83CA71A15A4;
-	Mon, 10 Mar 2025 09:59:00 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id BF08E1A1669
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 10:06:09 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHrGBhR85n5aAwGA--.5165S3;
-	Mon, 10 Mar 2025 09:58:58 +0800 (CST)
-Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
-To: Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: ming.lei@redhat.com, axboe@kernel.dk, josef@toxicpanda.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+	by APP4 (Coremail) with SMTP id gCh0CgCH618RSc5nLR0xGA--.63204S3;
+	Mon, 10 Mar 2025 10:06:09 +0800 (CST)
+Subject: Re: [PATCH] badblocks: Fix a nonsense WARN_ON() which checks whether
+ a u64 variable < 0
+To: colyli@kernel.org, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, Dan Carpenter <dan.carpenter@linaro.org>,
  "yukuai (C)" <yukuai3@huawei.com>
-References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
- <Z8sZyElaHQQwKqpB@slm.duckdns.org>
+References: <20250309160556.42854-1-colyli@kernel.org>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5fc124c9-e202-99ca-418d-0f52d027640f@huaweicloud.com>
-Date: Mon, 10 Mar 2025 09:58:57 +0800
+Message-ID: <2a7c5442-1fad-4cd5-dba8-9eb91e03b6a4@huaweicloud.com>
+Date: Mon, 10 Mar 2025 10:06:09 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -42,92 +40,72 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z8sZyElaHQQwKqpB@slm.duckdns.org>
+In-Reply-To: <20250309160556.42854-1-colyli@kernel.org>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHrGBhR85n5aAwGA--.5165S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4fCr45Xr4rArWfJr1fWFg_yoW8KF13pF
-	W2gFsakrZxJFnFk397uwn2qFWFy3y3CrW5AryrWrZxtan0yrnFyrWIvr1Yk3ykXF4fCay2
-	qr1jqas5ua15Z3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-TRANSID:gCh0CgCH618RSc5nLR0xGA--.63204S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7XF18tF45GF48Cr4rGrWkXrb_yoWktrX_Aw
+	1F9FZ5Xrn5XFWYyw1Ykwn0qrZYkFyUCr10934Yyrs7XrZ5ta1DAF4rJFW5ArnxWFyxGFsI
+	vFyfZrZIvw10gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb4AYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v2
+	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1yE_t
+	UUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
-
-在 2025/03/08 0:07, Tejun Heo 写道:
-> Hello,
+在 2025/03/10 0:05, colyli@kernel.org 写道:
+> From: Coly Li <colyli@kernel.org>
 > 
-> On Fri, Mar 07, 2025 at 05:01:52PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
->> support to account split IO for iops limit, because block layer provides
->> io accounting against split bio.
->>
->> However, io merge is still not handled, while block layer doesn't
->> account merged io for iops. Fix this problem by decreasing io_disp
->> if bio is merged, and following IO can use the extra budget. If io merge
->> concurrent with iops throttling, it's not handled if one more or one
->> less bio is dispatched, this is fine because as long as new slice is not
->> started, blk-throttle already preserve one extra slice for deviation,
->> and it's not worth it to handle the case that iops_limit rate is less than
->> one per slice.
->>
->> A regression test will be added for this case [1], before this patch,
->> the test will fail:
->>
->> +++ /root/blktests-mainline/results/nodev/throtl/007.out.bad
->> @@ -1,4 +1,4 @@
->>   Running throtl/007
->>   1
->> -1
->> +11
->>   Test complete
->>
->> [1] https://lore.kernel.org/all/20250307080318.3860858-2-yukuai1@huaweicloud.com/
+> In _badblocks_check(), there are lines of code like this,
+> 1246         sectors -= len;
+> [snipped]
+> 1251         WARN_ON(sectors < 0);
 > 
-> For blk-throtl, iops limit has meant the number of bios issued. I'm not
-
-Yes, but it's a litter hard to explain to users the differece between IO
-split and IO merge, they just think IO split is the numer of IOs issued
-to disk, and IO merge is the number of IOs issued from user.
-
-> necessarily against this change but this is significantly changing what a
-> given configuration means. Also, if we're now doing hardware request based
-> throttling, maybe we should just move this under rq-qos. That has the
-> problem of not supporting bio-based drivers but maybe we can leave
-> blk-throtl in deprecation mode and slowly phase it out.
-
-Yes, we discussed this before.
-
-And there is another angle that might convince you for the patch, if the
-user workload triggers a lot of IO merge, and iops limit is above the
-actual iops on disk, then before this patch, blk-throttle will make IO
-merge impossible and resulting in performance degradation.
-
+> The WARN_ON() at line 1257 doesn't make sense because sectors is
+> unsigned long long type and never to be <0.
 > 
-> Also, can you please make atomic_t conversion a separate patch and describe
-> why that's being done?
-
-Of course, the reason is that new helper will decrease the counter
-outside lock.
-
-Thanks,
-Kuai
-
+> Fix it by checking directly checking whether sectors is less than len.
 > 
-> Thanks.
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Coly Li <colyli@kernel.org>
+> ---
+>   block/badblocks.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+
+> diff --git a/block/badblocks.c b/block/badblocks.c
+> index 673ef068423a..ece64e76fe8f 100644
+> --- a/block/badblocks.c
+> +++ b/block/badblocks.c
+> @@ -1242,14 +1242,15 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
+>   	len = sectors;
+>   
+>   update_sectors:
+> +	/* This situation should never happen */
+> +	WARN_ON(sectors < len);
+> +
+>   	s += len;
+>   	sectors -= len;
+>   
+>   	if (sectors > 0)
+>   		goto re_check;
+>   
+> -	WARN_ON(sectors < 0);
+> -
+>   	if (unacked_badblocks > 0)
+>   		rv = -1;
+>   	else if (acked_badblocks > 0)
 > 
 
