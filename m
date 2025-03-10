@@ -1,77 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.cs.ucr.edu (mail.cs.ucr.edu [169.235.30.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A40231A22;
-	Mon, 10 Mar 2025 16:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28CD19004A;
+	Mon, 10 Mar 2025 17:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=169.235.30.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741624920; cv=none; b=n2XqwbP1i6OH/iFGcaRff0v7Ca+AghmspeyJXSnxsoHbR1P97dRK4vv7XeWA31+oTw2rdZbOK2uOoGl89D2oQHK5BwSqcF4M35vbtgG9pOpYsPnF6ISGy8K/o3p/CG8D2oN757TKTW4QD09i7rVUpxIE0ChJW6Y0nfvRDFEUJMQ=
+	t=1741626181; cv=none; b=IqYU1sP3ha+3/JN1RtNssXqvTv7QhL8Uz46WnarppGnA4uETUyhWMQF/hkgl6QawVo2g9bqU9JhxQ0Z7epJREvsDPWH4lfS6vchl8Yp1ZJqVxE2a/ZpJBGKopEfllGuo9uCNBNF2ujeY/sH9l7D/Jvh9HSQ3EAemSQx6JBesqD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741624920; c=relaxed/simple;
-	bh=AonGS/l9pN/Ns1XP5OZmwRVEfJkZ3sbj6I9acRs39sE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q50/nSn2zxdZLkVu1CoWEy35xpfB1OCNPu3CWJKYR82h6LDy+01CweaAIOdP3O2uOxiwBkadXNAftggazfxsbP+7hXJOPKS0yKDJLmJIxfH6HqSdDaEtMdQ3HcXSDDbxZYTXP+7tNWrC3SW0yiX099EUAnYK4xpHAM+bzRSZOBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gut4zvA9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gut4zvA9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A759CC4CEE5;
-	Mon, 10 Mar 2025 16:41:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741624920;
-	bh=AonGS/l9pN/Ns1XP5OZmwRVEfJkZ3sbj6I9acRs39sE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gut4zvA9kSCVVqb5oEIk8UB9IOhmL4oBHTFbGoJztp6Zqvb/DrD/Va8bPfj94dGwC
-	 ikHc7Eh8+LX8looTrA7reyhmYHHbJdEuhPR1H9QoyG28tfYDeyKy37medElaSpwPRu
-	 YJCkVJ/egYaHHU6+XQVehmImsNMchRh2RdUs8lJcKWr+EOrPc+udO/qXtYSaCARlHn
-	 14RAfMCjToz2fgO4f4I0b9o6xZ10Lyr0J2QSIpM6FM5o47pY2d0lkPV0qCEZsyycZP
-	 zJnC8XZ945L10nmbU+DpkCVRj1lPJzcj8oD0OPq8TiiuluI4Ddco+B4GQjzmZSd1Fp
-	 OXhceAqh5whUQ==
-Date: Mon, 10 Mar 2025 09:41:58 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, linux-fscrypt@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	s=arc-20240116; t=1741626181; c=relaxed/simple;
+	bh=hdUusOO1njK/6Sqr856+h049ZnrUaK5BHfpdHIEg3LM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Mvzh5c2+GLw4SyU8W/46T6hgyPVOEIyWy5Lz3HwXsPOSPbKZm0T5eqnf9bk7ETCrpxrg34sXPKRaJmo3IzMpA/1Q8hxsC+mF2bDAxyw1QBJvr13kv8iJpl3h2OZ1Q3IPge5JNNgJoSDAZN/+mVy4Bjrem0ru7wLdrbgMPDYGBp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tinylab.org; spf=none smtp.mailfrom=mail.cs.ucr.edu; arc=none smtp.client-ip=169.235.30.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tinylab.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mail.cs.ucr.edu
+Received: by mail.cs.ucr.edu (Postfix, from userid 1000)
+	id BAB902C800243; Mon, 10 Mar 2025 09:55:58 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.cs.ucr.edu BAB902C800243
+X-Spam-Report: No
+X-Spam-Level: No
+Received: from kq.cs.ucr.edu (kq.cs.ucr.edu [169.235.27.223])
+	by mail.cs.ucr.edu (Postfix) with ESMTP id 9C2D92C8002FC;
+	Mon, 10 Mar 2025 09:55:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.cs.ucr.edu 9C2D92C8002FC
+Received: by kq.cs.ucr.edu (Postfix, from userid 101072)
+	id 84D6427E46DC; Mon, 10 Mar 2025 09:54:46 -0700 (PDT)
+From: Yuan Tan <tanyuan@tinylab.org>
+To: axboe@kernel.dk,
+	syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com
+Cc: linux-block@vger.kernel.org,
+	akpm@linux-foundation.org,
+	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Subject: Re: [PATCH v12 0/4] Driver and fscrypt support for HW-wrapped inline
- encryption keys
-Message-ID: <20250310164158.GA1701@sol.localdomain>
-References: <20250210202336.349924-1-ebiggers@kernel.org>
- <CAMRc=Md0fsB7Yfx9Au1pXi+7Y_5DQf2z430c9R+tyS9e60-y5w@mail.gmail.com>
- <20250302222336.GD2079@quark.localdomain>
+	linux-mm@kvack.org,
+	syzkaller-bugs@googlegroups.com,
+	willy@infradead.org,
+	falcon@tinylab.org,
+	tanyuan@tinylab.org
+Subject: [PATCH] block: add lock for safe nrpages access in invalidate_bdev()
+Date: Mon, 10 Mar 2025 09:54:00 -0700
+Message-Id: <20250310165400.3166618-1-tanyuan@tinylab.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
+References: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250302222336.GD2079@quark.localdomain>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Mar 02, 2025 at 02:23:36PM -0800, Eric Biggers wrote:
-> > > TBD whether these will land in 6.15 too, or wait until 6.16 when the
-> > > block patches that patches 2-4 depend on will have landed.
-> > >
-> > 
-> > Could Jens provide an immutable branch with these patches? I don't
-> > think there's a reason to delay it for another 3 months TBH.
-> 
-> They don't seem to be on an immutable branch, so I'll just wait until the next
-> cycle, rather than trying to do something weird where I rebase the fscrypt tree
-> onto the block tree and also include driver patches.  TBH, I've already been
-> waiting 5 years to land this, so an extra 9 weeks is not a big deal :-)
-> 
-> The first patch "soc: qcom: ice: make qcom_ice_program_key() take struct
-> blk_crypto_key" does not depend on the block ones though, and it could land in
-> 6.15.  Bjorn, would you like to take that patch through your tree to get it out
-> of the way?
+Syzbot reported a data-race in __filemap_add_folio / invalidate_bdev[1]
+due to concurrent access to mapping->nrpages.
+Adds a lock around the access to nrpages.
 
-Bjorn, could you apply patch 1 to your tree?  Thanks!
+[1] https://syzkaller.appspot.com/bug?extid=f2aaf773187f5cae54f3
 
-- Eric
+Signed-off-by: Yuan Tan <tanyuan@tinylab.org>
+Reported-by: syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com
+---
+ block/bdev.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+I had already completed and tested this patch before Matthew sent the
+email. I'm not sure if this solution is correct. If it's not, please
+ignore the patch :)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 9d73a8fbf7f9..934043d09068 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -96,7 +96,14 @@ void invalidate_bdev(struct block_device *bdev)
+ {
+ 	struct address_space *mapping = bdev->bd_mapping;
+ 
+-	if (mapping->nrpages) {
++	XA_STATE(xas, &mapping->i_pages, 0);  /* we don't care about the index */
++	unsigned long nrpages;
++
++	xas_lock_irq(&xas);
++	nrpages = mapping->nrpages;
++	xas_unlock_irq(&xas);
++
++	if (nrpages) {
+ 		invalidate_bh_lrus();
+ 		lru_add_drain_all();	/* make sure all lru add caches are flushed */
+ 		invalidate_mapping_pages(mapping, 0, -1);
+-- 
+2.25.1
+
