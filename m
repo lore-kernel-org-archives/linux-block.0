@@ -1,119 +1,97 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2211B3927
-	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 15:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D541A7264;
+	Mon, 10 Mar 2025 15:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741619885; cv=none; b=WVxy9ViwTLBtBfEayubV+5qTFqgPEPV7iLUL7vDHHdr6I+AdJ0vTx3a80dKrcSL9UNfmvSxVsEeUVLBftD1n1lGzfNeEQYDhfK3SMgCn1fS6c0Uxzmi0R69UjVvvrajna4EjlX6tY7a2B9jA28iGpVrWexKE8sXgb9BuPdmh0Jk=
+	t=1741620529; cv=none; b=KZ7qosVhelu2gZDlmupK5EofDfMWBJjQDs+O+KT6z1FJci/ZmcBdsinA0BVO/Ry4qJMlH+8RylqUGysZIdvI+Zo876BRFrsArwgwXl8tzue7aRljf4QfpXg5yRuegsrPRGbeNwmeGXAkmyDQ5Nam2pGh6KolSYFgqrJrGzsE/zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741619885; c=relaxed/simple;
-	bh=bPylOSDwS97iSZCV+IEqBXVcR6T1dmvHZUxK1IgpS9E=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=usMjnKgwaXKILig3XMmVYYa4k+VCSUDDI1GqrFp3DpdoL/tEP0DUBGIb64sqJkoYiqq+1KxX4/4vKPHscNDLVv2ArE6yk/wwV3jlbWWDu9YBsD6w0pX33xJAiWh1GphhQ/rMX0/epwXT8B710rW70r8m59K69ZqJGWCG7NMU4vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=r5qPsxO7; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1741620529; c=relaxed/simple;
+	bh=mcn+vY+S1woGC0GGbfsPy3tYqvbju7ryrvfDi1hup5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IIMrn91fHPHUOiDxarpKytOZYoflUCIHC/o1UJkGm/bfnn9UypLy45ALYRdnakGTeInZFDg/Fz+2E4MDCv3gO357//+bOK46xsMQdx+E3BHPm2kn+6nqSQCWDkAlGPYznvAnxY96Tn1BTToUbZy6u5baWomlq7bKvVjGYlIPBEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PVcNxY1g; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="r5qPsxO7"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d46693a5e9so2275295ab.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 08:18:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741619882; x=1742224682; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sJONlHZ+GagU256YR9i4k/iT8kbk8lsmHf8ZZIFoi8U=;
-        b=r5qPsxO7zJjb+EM2lDGjAycLC07ZTQ3KOufDZU5/3eB465ILeo7DWNujMbDJhvQQ6n
-         jhzTe9FXDgfwQQ3pxtyFRDpzOFDOz8Axs8aOD0rQ92E/VSLJ0MswlVCNFfmVpnkCoy6r
-         FyoGUy/rTJGsytx/Yb0R8ccWKR8rwATbZ0ocqSE8aHz37TKA71Gm019PsHJUzW0wRnHE
-         vZn/VhmfKAg7o34DaHTtansori9mttCQHRrP1vzJ1Fh7aMiynUqdcCSnEN34rA8tEbJc
-         IeK+FIDO3Bz99UP3i1l7LYl6/ZNC39sj7/l0j6CMW6v20wcO+bVxonG+cTjPpboQ9wen
-         24pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741619882; x=1742224682;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sJONlHZ+GagU256YR9i4k/iT8kbk8lsmHf8ZZIFoi8U=;
-        b=PZdHch1E4ezmKcJ1pVYe26JfzBvMH0QeXdA45LcwPbfVTQbvoTH86IYR5I02sb8tTk
-         NkZG7gwaylxgGK6vw7EQgiJNYAtjCOV7rHc0puDnVNF8EZert/oNQekhF4Eqvzkpd0Mk
-         8glNYcokcZzrT74v8Rvwu5p1uFTzwzYNgv5Ow/Vjdz+Hweo5THz4vkqTfZQ01aTVj1Ff
-         RxTqB+eFfn+R5FDpooy4RVR8LFt43i0Sg9m6XgQiJksyDJLGR/zS5JKQt1RRZ3TcPVIa
-         EInwc+I1nepnt5W2DDw0F0ZjNx9AwrBISm0dj29NUz+vtWvRWuV5NWeCMV6oU9lId3hH
-         h8TQ==
-X-Gm-Message-State: AOJu0YygzgSUk9FXKJiunVMNN02l4wvdO/VXIB9PTG4qPNkwv5lwMEsi
-	antLPjYMzAglEdw8qnOE8csHKetGXBNz3OvWFe0IGI5Mau4c0QkUvcHIJIucNtZ5z1i6VzbPx9z
-	5
-X-Gm-Gg: ASbGncteuCW9/OFLzVcJruKaU69B2Yh08ILr3QUP/x+4LKDgT7cS3uOleP1TmnrBGYS
-	8sGj4dU6AiqxnvWWtsPl/LbCrImbrcEJGfPg7PfWU0gpu4KNj/SgVM25fx/cdHAKcl+HAvdx+oW
-	hC+daGGWjhMkvaK2KmG4ssVGN4qMHQboc8AY+EPIwJM7Ogdz+XPB6BdvRitwghfsn7fTDn/oGdr
-	GCISNGlW13NZeJFM0x4f5edUpDbhsWJ1wjox2KNgPRbbiFofaqTpDnXCK8SwQRWjESUsdq/AnxK
-	nPP5FkRYZEuXCA8oGeeGRLLqEFfoPT9SrlI=
-X-Google-Smtp-Source: AGHT+IHv9VsH6yBvvTt1jAq7zvObqCkXqipABSruyTT1k4fmXx9mvK0swA53Jk2vVY8Ndp7VAb1ADg==
-X-Received: by 2002:a05:6e02:1b0a:b0:3d0:4a82:3f43 with SMTP id e9e14a558f8ab-3d46890d179mr1277075ab.5.1741619881935;
-        Mon, 10 Mar 2025 08:18:01 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d459e2377asm6121355ab.31.2025.03.10.08.18.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 08:18:01 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: linux-kselftest@vger.kernel.org
-In-Reply-To: <20250303124324.3563605-1-ming.lei@redhat.com>
-References: <20250303124324.3563605-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 00/11] selftests: ublk: bug fixes & consolidation
-Message-Id: <174161988103.195912.1952372188242377031.b4-ty@kernel.dk>
-Date: Mon, 10 Mar 2025 09:18:01 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PVcNxY1g"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LFuFlzgoC5ukemUl0eQEeCKPuI6gKDdM8KBiSpcB9xc=; b=PVcNxY1guezp38LWF2ftYx46zh
+	181jogpyXvCV9SSUrAPj/osD+voUmWRbp2zm6AeYiiKay6FgNfYmpKuauHVDCW6WjekFqReRquzm1
+	PXmVsr717nWi+/mnwiKZlEEPvk+giC4gwbO5IndT89MR4H+AWHNuPMPsRHv2FBgJVbdC/PtBSG73X
+	7xqfhrIZatuk/WFJMuQdok3HpPuEZXYDrP49NSsYbf1ppb1dyUFuARUdFjhn7Oco4mnpUUP6r1hqj
+	qBzNNIt63C/zJ87dDmJM2ZeS2r2KnA10Hk6S8R2OWN77XmpBJY0Zq3k7VK2oHyb6A+Xek0GpayjpP
+	ycbYH5mQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1trf3Z-00000006Dsj-3Xn1;
+	Mon, 10 Mar 2025 15:28:45 +0000
+Date: Mon, 10 Mar 2025 15:28:41 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: syzbot <syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com>
+Cc: linux-block@vger.kernel.org, akpm@linux-foundation.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [mm?] [fs?] KCSAN: data-race in __filemap_add_folio /
+ invalidate_bdev (8)
+Message-ID: <Z88FKeXyaQCeXapp@casper.infradead.org>
+References: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67ceb38a.050a0220.e1a89.04b1.GAE@google.com>
 
-
-On Mon, 03 Mar 2025 20:43:10 +0800, Ming Lei wrote:
-> This patchset fixes several issues(1, 2, 4) and consolidate & improve
-> the tests in the following ways:
+On Mon, Mar 10, 2025 at 02:40:26AM -0700, syzbot wrote:
+> Reported-by: syzbot+f2aaf773187f5cae54f3@syzkaller.appspotmail.com
 > 
-> - support shellcheck and fixes all warning
+> EXT4-fs (loop0): unmounting filesystem 00000000-0000-0000-0000-000000000000.
+> ==================================================================
+> BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
 > 
-> - misc cleanup
+> read-write to 0xffff888100630570 of 8 bytes by task 3291 on cpu 0:
+>  __filemap_add_folio+0x430/0x6f0 mm/filemap.c:929
+
+This is a write to mapping->nrpages with the i_pages lock held, as it
+should be.
+
+>  filemap_add_folio+0x9c/0x1b0 mm/filemap.c:981
+>  page_cache_ra_unbounded+0x1c1/0x350 mm/readahead.c:276
+>  do_page_cache_ra mm/readahead.c:328 [inline]
+>  force_page_cache_ra mm/readahead.c:357 [inline]
+>  page_cache_sync_ra+0x252/0x680 mm/readahead.c:585
+>  filemap_get_pages+0x2ca/0x11a0 mm/filemap.c:2580
+>  filemap_read+0x230/0x8c0 mm/filemap.c:2691
+>  blkdev_read_iter+0x228/0x2d0 block/fops.c:796
+>  new_sync_read fs/read_write.c:484 [inline]
+>  vfs_read+0x5cc/0x6f0 fs/read_write.c:565
+>  ksys_read+0xe8/0x1b0 fs/read_write.c:708
 > 
-> [...]
+> read to 0xffff888100630570 of 8 bytes by task 3306 on cpu 1:
+>  invalidate_bdev+0x25/0x70 block/bdev.c:99
 
-Applied, thanks!
+This is a read of mapping->nrpages with no lock held.  So we could
+silence this warning by making this a READ_ONCE or data_race().
 
-[01/11] selftests: ublk: make ublk_stop_io_daemon() more reliable
-        commit: 9894e0eaae980df1ed3f2e86a487fe4c8ef1ab46
-[02/11] selftests: ublk: fix build failure
-        commit: 9d80f48c5e08b2e003e506c6e5326a35a652ea2f
-[03/11] selftests: ublk: add --foreground command line
-        commit: 2ecdcdfee58c028c15ed00b691104249370db075
-[04/11] selftests: ublk: fix parsing '-a' argument
-        commit: cf2132935639813a0b88e55074e6e52a4b82f26a
-[05/11] selftests: ublk: support shellcheck and fix all warning
-        commit: 30aab83035048c70e09ff058a73e8428de9bd103
-[06/11] selftests: ublk: don't pass ${dev_id} to _cleanup_test()
-        commit: 8da9f88fee59fe5aa99014a2621b07347edd5780
-[07/11] selftests: ublk: move zero copy feature check into _add_ublk_dev()
-        commit: b95b47eaa8d7c8b595d93397d1b85f1559c2d220
-[08/11] selftests: ublk: load/unload ublk_drv when preparing & cleaning up tests
-        commit: 9e71305495d1b79f96729b8d77d4d823a6bd998a
-[09/11] selftests: ublk: add one stress test for covering IO vs. removing device
-        commit: 6f3004e78b59e98a903e20e2240ae77e76dfde77
-[10/11] selftests: ublk: add stress test for covering IO vs. killing ublk server
-        commit: 4fcd5b5a6dff71cf82212dd208dc1765ca8a8088
-[11/11] selftests: ublk: improve test usability
-        commit: 22c880f446a149f5ee11260690a34d4b3f95c221
+The problem is that I'm not sure this is the right answer.  Obviously
+here we only care about zero-vs-non-zero, but what if we race with
+0 being incremented to 1?  Should there be some locking higher up
+that prevents this?  Or is this "yes, root can do this and screw
+themselves"?
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+>  ext4_put_super+0x571/0x810 fs/ext4/super.c:1356
+>  generic_shutdown_super+0xe5/0x220 fs/super.c:642
+>  kill_block_super+0x2a/0x70 fs/super.c:1710
+>  ext4_kill_sb+0x44/0x80 fs/ext4/super.c:7368
+>  deactivate_locked_super+0x7d/0x1c0 fs/super.c:473
+>  deactivate_super+0x9f/0xb0 fs/super.c:506
+>  cleanup_mnt+0x268/0x2e0 fs/namespace.c:1413
+>  __cleanup_mnt+0x19/0x20 fs/namespace.c:1420
+>  task_work_run+0x13a/0x1a0 kernel/task_work.c:227
