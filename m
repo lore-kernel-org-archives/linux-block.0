@@ -1,296 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0110323536A
-	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 18:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C002620B22;
+	Mon, 10 Mar 2025 23:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741630536; cv=none; b=OpLecELWzSAGoR7aM5tr8SkciflsJpC4FBMzFJdfzUSIaxVtSxBcv+1vqmVHv1P7MjblnugrsETLYUIJJkGDp1ZGQYOBA60t3Bs6dikV9iG9xXRpuFDi7qCpXDpDjVv8byI4GSZMpccoG0usnCZSfMlBjoF3VaE6EeAvXvQkvnE=
+	t=1741648439; cv=none; b=lOGsF9Q9BxqidJM7BWmwsSCLt/RVvGL4M1GuF+zZ9X4ARKH+78ZrtcoFbV7QLudGoCbktg9mL7l87yy02X8AaOIOWiuen2FbTUy4Fwp44nuskcc242aYkOf0BVRBIsYvtmYJKhOYCo4tL9UeHfWQ3ZqS74JpCJFO5mxRPvXaXKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741630536; c=relaxed/simple;
-	bh=Na5zhdKf2O55yKRGtPd+q98cYm/xvTwwh/pSP1rCL7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d4sohqUePQ1aAg+JYn0CjbUo0GjgDwLgmJxzn+CLlbFucCBxxKNOq5EX5ApDB8a82BodtDX/OJW6wNk/oozG41rIg4b1ffFH23hfiwq2z9uJTgEj4YKlUTWwbYVWit6eAWnMMYQ3NEM2Xtea9JW2gxFUIFm2Pt1E0majdFkMUGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IFvEzckH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741648439; c=relaxed/simple;
+	bh=ZMPUuoxsJB05Imxo4EDg1YKKTGBgB9+iMvPW21LwCpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iaSqP6fbNxwR6tzt8pzjVe5MA6oOWzbzSy4DL510ifGsLVRV71iXDGHxLreGWi4gAAp1e8Kg1hFBX7WpYMleVSlO2a5pdWKNBbNn8NGDYN892vmiu/PatVd3QgFkHs85i57GtxBYr0lFas40qXl+S65G/sgm2lpjLQqp5aHi37U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYG8CvAs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFvEzckH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741630533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nYYRVhn9kPqJlKSspmchMebnCnF2QmmF5y39Qhli950=;
-	b=IFvEzckHsCvx8x85O4RlxGP6G+QY5yCAMc8Uz6Wc4+0wy5WY6H0/hq8v/h1btzsfdpHkLk
-	BQbL2l30dOqoE6ui7RFG8i1eEufZh6/IrFqXWf1Xea9mltqtHKb4+EZiK4e7nosKiLSB4R
-	eSaOiemQTUgTpPIIxbqFOvPWM/YEVbo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-3tA_T7xyPUufwhya28utIQ-1; Mon,
- 10 Mar 2025 14:15:30 -0400
-X-MC-Unique: 3tA_T7xyPUufwhya28utIQ-1
-X-Mimecast-MFC-AGG-ID: 3tA_T7xyPUufwhya28utIQ_1741630529
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C32AB180AF6B;
-	Mon, 10 Mar 2025 18:15:29 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 987BA1944F2F;
-	Mon, 10 Mar 2025 18:15:28 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52AIFRia481879
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 10 Mar 2025 14:15:27 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52AIFR8F481878;
-	Mon, 10 Mar 2025 14:15:27 -0400
-Date: Mon, 10 Mar 2025 14:15:27 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 3/7] dm: handle failures in dm_table_set_restrictions
-Message-ID: <Z88sP2WyotRbTd2E@redhat.com>
-References: <20250309222904.449803-1-bmarzins@redhat.com>
- <20250309222904.449803-4-bmarzins@redhat.com>
- <9b5ff861-964d-472c-9267-5e5b10186ed3@kernel.org>
- <Z88jTxQqoLitl4ee@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYG8CvAs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C38C4CEE5;
+	Mon, 10 Mar 2025 23:13:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741648439;
+	bh=ZMPUuoxsJB05Imxo4EDg1YKKTGBgB9+iMvPW21LwCpo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NYG8CvAsMJIPO3nNL45LwXxqXCtZVjSBclaUoX53dM2nWx2Z8RBRL03sghgXdme6P
+	 2KOYG6IuUBANdHG5OlaLoUjYX3Q/AKM/QBc5+/OngXxywdcGazHBmc+vrZ73ZKChFD
+	 teeo7lhJQKRlt3TI33KakWTRvpYDb0Ns2fh3MgLp5QiAm8moL3jNvaTA+TYhfit8QI
+	 uvEG/fcE0D841LTVORG/4vpJB6kOvnLYEocV8zlpRP5RXq5FVeBxZW+GhvyMUjyC1b
+	 Cv8GbxjvL/D6kW1GPuWkF0DgfY9+lW1LeYi7lkv6gu5zVZYeiCCsMJis9nwpKL5wbP
+	 /Qj4lmTu3gSAA==
+Message-ID: <0de801e9-1943-4243-9a88-5e3bce3fdfc0@kernel.org>
+Date: Tue, 11 Mar 2025 08:13:57 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z88jTxQqoLitl4ee@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/7] dm: fix issues with swapping dm tables
+To: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20250309222904.449803-1-bmarzins@redhat.com>
+ <788a1ec4-ac86-40fb-a709-eba7e6d5535f@kernel.org>
+ <Z88VdfOmo1MU73ue@redhat.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <Z88VdfOmo1MU73ue@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 10, 2025 at 01:37:19PM -0400, Benjamin Marzinski wrote:
-> On Mon, Mar 10, 2025 at 08:25:39AM +0900, Damien Le Moal wrote:
-> > On 3/10/25 07:28, Benjamin Marzinski wrote:
-> > > If dm_table_set_restrictions() fails while swapping tables,
-> > > device-mapper will continue using the previous table. It must be sure to
-> > > leave the mapped_device in it's previous state on failure.  Otherwise
-> > > device-mapper could end up using the old table with settings from the
-> > > unused table.
-> > > 
-> > > Do not update the mapped device in dm_set_zones_restrictions(). Wait
-> > > till after dm_table_set_restrictions() is sure to succeed to update the
-> > > md zoned settings. Do the same with the dax settings, and if
-> > > dm_revalidate_zones() fails, restore the original queue limits.
-> > > 
-> > > Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
-> > > ---
-> > >  drivers/md/dm-table.c | 24 ++++++++++++++++--------
-> > >  drivers/md/dm-zone.c  | 26 ++++++++++++++++++--------
-> > >  drivers/md/dm.h       |  1 +
-> > >  3 files changed, 35 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> > > index 0ef5203387b2..4003e84af11d 100644
-> > > --- a/drivers/md/dm-table.c
-> > > +++ b/drivers/md/dm-table.c
-> > > @@ -1836,6 +1836,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  			      struct queue_limits *limits)
-> > >  {
-> > >  	int r;
-> > > +	struct queue_limits old_limits;
-> > >  
-> > >  	if (!dm_table_supports_nowait(t))
-> > >  		limits->features &= ~BLK_FEAT_NOWAIT;
-> > > @@ -1862,16 +1863,11 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  	if (dm_table_supports_flush(t))
-> > >  		limits->features |= BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA;
-> > >  
-> > > -	if (dm_table_supports_dax(t, device_not_dax_capable)) {
-> > > +	if (dm_table_supports_dax(t, device_not_dax_capable))
-> > >  		limits->features |= BLK_FEAT_DAX;
-> > > -		if (dm_table_supports_dax(t, device_not_dax_synchronous_capable))
-> > > -			set_dax_synchronous(t->md->dax_dev);
-> > > -	} else
-> > > +	else
-> > >  		limits->features &= ~BLK_FEAT_DAX;
-> > >  
-> > > -	if (dm_table_any_dev_attr(t, device_dax_write_cache_enabled, NULL))
-> > > -		dax_write_cache(t->md->dax_dev, true);
-> > > -
-> > >  	/* For a zoned table, setup the zone related queue attributes. */
-> > >  	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> > >  	    (limits->features & BLK_FEAT_ZONED)) {
-> > > @@ -1883,6 +1879,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  	if (dm_table_supports_atomic_writes(t))
-> > >  		limits->features |= BLK_FEAT_ATOMIC_WRITES;
-> > >  
-> > > +	old_limits = q->limits;
-> > 
-> > I am not sure this is safe to do like this since the user may be simultaneously
-> > changing attributes, which would result in the old_limits struct being in an
-> > inconsistent state. So shouldn't we hold q->limits_lock here ? We probably want
-> > a queue_limits_get() helper for that though.
-> > 
-> > >  	r = queue_limits_set(q, limits);
-> > 
-> > ...Or, we could modify queue_limits_set() to also return the old limit struct
-> > under the q limits_lock. That maybe easier.
+On 3/11/25 01:38, Benjamin Marzinski wrote:
+> On Mon, Mar 10, 2025 at 08:16:43AM +0900, Damien Le Moal wrote:
+>> On 3/10/25 07:28, Benjamin Marzinski wrote:
+>>> There were multiple places in dm's __bind() function where it could fail
+>>> and not completely roll back, leaving the device using the the old
+>>> table, but with device limits and resources from the new table.
+>>> Additionally, unused mempools for request-based devices were not always
+>>> freed immediately.
+>>>
+>>> Finally, there were a number of issues with switching zoned tables that
+>>> emulate zone append (in other words, dm-crypt on top of zoned devices).
+>>> dm_blk_report_zones() could be called while the device was suspended and
+>>> modifying zoned resources or could possibly fail to end a srcu read
+>>> section.  More importantly, blk_revalidate_disk_zones() would never get
+>>> called when updating a zoned table. This could cause the dm device to
+>>> see the wrong zone write offsets, not have a large enough zwplugs
+>>> reserved in its mempool, or read invalid memory when checking the
+>>> conventional zones bitmap.
+>>>
+>>> This patchset fixes these issues. It does not make it so that
+>>> device-mapper is able to load any zoned table from any other zoned
+>>> table. Zoned dm-crypt devices can be safely grown and shrunk, but
+>>> reloading a zoned dm-crypt device to, for instance, point at a
+>>> completely different underlying device won't work correctly. IO might
+>>> fail since the zone write offsets of the dm-crypt device will not be
+>>> updated for all the existing zones with plugs. If the new device's zone
+>>> offsets don't match the old device's offsets, IO to the zone will fail.
+>>> If the ability to switch tables from a zoned dm-crypt device to an
+>>> abritry other zoned dm-crypt device is important to people, it could be
+>>> done as long as there are no plugged zones when dm suspends.
+>>
+>> Thanks for fixing this.
+>>
+>> Given that in the general case switching tables will always likely result in
+>> unaligned write errors, I think we should just report a ENOTSUPP error if the
+>> user attempts to swap tables.
 > 
-> If we disallow switching between zoned devices then this is unnecssary.
+> If we don't think there's any interest in growing or shrinking zoned
+> dm-crypt devices, that's fine.  I do think we should make an exception
+> for switching to the dm-error target. We specifically call that out with
+> DM_TARGET_WILDCARD so that we can always switch to it from any table if
+> we just want to fail out all the IO.
 
-Err.. nevermind that last line. There are still multiple cases where we
-could still fail here and need to fail back to the earlier limits. But
-I'm less sure that it's really necessary to lock the limits before
-reading them. For DM devices, I don't see a place where a bunch of
-limits could be updated at the same time, while we are swapping tables.
-An individual limit could get updated by things like the sysfs
-interface. But since that could happen at any time, I don't see what
-locking gets us. And if it's not safe to simply read a limit without
-locking them, then there are lots of places where we have unsafe code.
-Am I missing something here?
+Arg ! dm-error is used in xfstests so we need it (for btrfs at least since btrfs
+supports zoned devices, and soon xfs as well). So I guess we should disallow
+switching tables when the new table changes something to the zone configuration
+(grow, shrink, zone size, zoned/non-zoned). dm-error does not change anything,
+so we should still be able to allow it.
 
--Ben
 
-> OTherwise you're right. We do want to make sure that we don't grep the
-> limits while something is updating the limits.
-> 
-> Unfortunately, thinking about this just made me realize a different
-> problem, that has nothing to do with this patchset. bio-based devices
-> can't handle freezing the queue while there are plugged zone write bios.
-> So, for instance, if you do something like:
-> 
-> # modprobe scsi_debug dev_size_mb=512 zbc=managed zone_size_mb=128 zone_nr_conv=0 delay=20
-> # dmsetup create test --table "0 1048576 crypt aes-cbc-essiv:sha256 deadbeefdeadbeefdeadbeefdeadbeef 0 /dev/sda 0"
-> # dd if=/dev/zero of=/dev/mapper/test bs=1M count=128 &
-> # echo 0 > /sys/block/dm-1/queue/iostats
-> 
-> you hang.
-> 
-> *** FREEZING THE QUEUE WHILE UPDATING THE LIMIT ***
-> root@fedora-test:~# cat /proc/1344/stack 
-> [<0>] blk_mq_freeze_queue_wait+0x9f/0xd0
-> [<0>] queue_limits_commit_update_frozen+0x38/0x60
-> [<0>] queue_attr_store+0xc6/0x1b0
-> [<0>] kernfs_fop_write_iter+0x13b/0x1f0
-> [<0>] vfs_write+0x28d/0x450
-> [<0>] ksys_write+0x6c/0xe0
-> [<0>] do_syscall_64+0x82/0x160
-> [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> **** WRITING OUT THE PLUGGED BIOS [kworker/0:1H+dm-1_zwplugs] ****
-> root@fedora-test:~# cat /proc/341/stack
-> [<0>] __bio_queue_enter+0x13c/0x270
-> [<0>] __submit_bio+0xf9/0x280
-> [<0>] submit_bio_noacct_nocheck+0x197/0x3e0
-> [<0>] blk_zone_wplug_bio_work+0x1ad/0x1f0
-> [<0>] process_one_work+0x176/0x330
-> [<0>] worker_thread+0x252/0x390
-> [<0>] kthread+0xec/0x230
-> [<0>] ret_from_fork+0x31/0x50
-> [<0>] ret_from_fork_asm+0x1a/0x30
-> 
-> Changing the iostats limit could be swapped with anything that freezes
-> the queue.
-> 
-> -Ben
-> 
-> > 
-> > >  	if (r)
-> > >  		return r;
-> > > @@ -1894,10 +1891,21 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> > >  	    (limits->features & BLK_FEAT_ZONED)) {
-> > >  		r = dm_revalidate_zones(t, q);
-> > > -		if (r)
-> > > +		if (r) {
-> > > +			queue_limits_set(q, &old_limits);
-> > >  			return r;
-> > > +		}
-> > >  	}
-> > >  
-> > > +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
-> > > +		dm_finalize_zone_settings(t, limits);
-> > > +
-> > > +	if (dm_table_supports_dax(t, device_not_dax_synchronous_capable))
-> > > +		set_dax_synchronous(t->md->dax_dev);
-> > > +
-> > > +	if (dm_table_any_dev_attr(t, device_dax_write_cache_enabled, NULL))
-> > > +		dax_write_cache(t->md->dax_dev, true);
-> > > +
-> > >  	dm_update_crypto_profile(q, t);
-> > >  	return 0;
-> > >  }
-> > > diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> > > index 20edd3fabbab..681058feb63b 100644
-> > > --- a/drivers/md/dm-zone.c
-> > > +++ b/drivers/md/dm-zone.c
-> > > @@ -340,12 +340,8 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  	 * mapped device queue as needing zone append emulation.
-> > >  	 */
-> > >  	WARN_ON_ONCE(queue_is_mq(q));
-> > > -	if (dm_table_supports_zone_append(t)) {
-> > > -		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > -	} else {
-> > > -		set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > +	if (!dm_table_supports_zone_append(t))
-> > >  		lim->max_hw_zone_append_sectors = 0;
-> > > -	}
-> > >  
-> > >  	/*
-> > >  	 * Determine the max open and max active zone limits for the mapped
-> > > @@ -383,9 +379,6 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  		lim->zone_write_granularity = 0;
-> > >  		lim->chunk_sectors = 0;
-> > >  		lim->features &= ~BLK_FEAT_ZONED;
-> > > -		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > -		md->nr_zones = 0;
-> > > -		disk->nr_zones = 0;
-> > >  		return 0;
-> > >  	}
-> > >  
-> > > @@ -408,6 +401,23 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +void dm_finalize_zone_settings(struct dm_table *t, struct queue_limits *lim)
-> > > +{
-> > > +	struct mapped_device *md = t->md;
-> > > +
-> > > +	if (lim->features & BLK_FEAT_ZONED) {
-> > > +		if (dm_table_supports_zone_append(t))
-> > > +			clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > +		else
-> > > +			set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > +	} else {
-> > > +		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
-> > > +		md->nr_zones = 0;
-> > > +		md->disk->nr_zones = 0;
-> > > +	}
-> > > +}
-> > > +
-> > > +
-> > >  /*
-> > >   * IO completion callback called from clone_endio().
-> > >   */
-> > > diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-> > > index a0a8ff119815..e5d3a9f46a91 100644
-> > > --- a/drivers/md/dm.h
-> > > +++ b/drivers/md/dm.h
-> > > @@ -102,6 +102,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
-> > >  int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-> > >  		struct queue_limits *lim);
-> > >  int dm_revalidate_zones(struct dm_table *t, struct request_queue *q);
-> > > +void dm_finalize_zone_settings(struct dm_table *t, struct queue_limits *lim);
-> > >  void dm_zone_endio(struct dm_io *io, struct bio *clone);
-> > >  #ifdef CONFIG_BLK_DEV_ZONED
-> > >  int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
-> > 
-> > 
-> > -- 
-> > Damien Le Moal
-> > Western Digital Research
-> 
 
+-- 
+Damien Le Moal
+Western Digital Research
