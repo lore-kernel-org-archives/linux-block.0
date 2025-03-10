@@ -1,100 +1,83 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail86.out.titan.email (mail86.out.titan.email [209.209.25.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B17522AE74
-	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 13:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FCC1D79BE
+	for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 14:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.209.25.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741614645; cv=none; b=WPeNxYdCaFM3NI733rrWKbwsWe0QzrjnbhAP/s3kQBHq0VU7O0QxklPnuO58c459wJlS/n2IEOgx7Br0h9YSMpoo1KOZH02bjLnLMRES5Ke6UEOV/WVTEKDqoccfDr0xVsl+LIh9FB5vPM9HKor81qjZrm2g8tngbtMh/M/EXhk=
+	t=1741615258; cv=none; b=mF9NdCP5P4SHlC2IpUv3LN475gjajryJDhHN4SUU39AtK7sSVigC/2pGQoubqsjwMo+NhB0Q+k2plRqOtiOn5RoUSeBHk/GnBICl+Ep3ej7fSb/HgML+R8W+rxuuATLXfSppXya6ai8WvqTK2mST48kM2008de1V5xKIBJcdhEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741614645; c=relaxed/simple;
-	bh=Nt6jGYnFerGzC4w0WINdu/ZuiGUKXT3Rri0U5ZDZSy4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ODwIdborPsHp7P9r+CaNvuFOx4wI9mkJWXG3Tmgopj/Cr4proXzgO5tii7DShxv04P8qkavvyWHNHZECW8Ba8ndSKOGYt2MTPhlSmV+jBCdnooFHPkzqhd6L+t3ZHoWBFdxMvP/P0o3GnINQdxFVlkvPTDnwO/Sci9JIn8TGOJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xYhlOm7P; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1741615258; c=relaxed/simple;
+	bh=o3jo8Yp6GBl1EzB187l+mO+RUd+WDfgcPP/VmFEaNZQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=kt8bovE3Eak+YQB+eceO+1kUdspx8RW6MXrtDPBpyP4JNIXJk275HZnPIKrZCx6vn84kLpvCk8KCPkacH/2p0oeWzukJGQddnCVQVIDpnce6YoLXsmaQdMJlCyMlU548yip7R5REoSh1rjArHg7Xuq/OSi7vB3PM/BaoC9a74OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=gpTfGvb8; arc=none smtp.client-ip=209.209.25.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xYhlOm7P"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d04932a36cso42494185ab.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 06:50:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741614643; x=1742219443; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EuvcGo7WnKEPEQ0sWQsDW7WhCqe6qPP+dOCAPRfTNpI=;
-        b=xYhlOm7PRB94cUSlYVoQlsPA8w1C5S2TkGnoFe1jTfmOaUSYLQ+kj7eF5hySuPu6BN
-         zSuvTxx13XxRFuy9BGGn8FcSk7/AER3JdB2djKeoa8F7hEsSHu16/KDttYLgqn6RCv9L
-         /3NadeiIcSn86Ms31Bkzu3LGClJQdBNebxL2Jpm2JaihyIUgQbBArv0dypfmsROZH/w3
-         Pdg3Oe6V4PfqUZCtOcXM0quXgXlQ5mKk20NZH1vI8qRNpK0iXMPx5aaFpVdjXc45Fkao
-         CyAIywRH0NJelakg4O3uC/OhS1RRpe6xhc3UcDccCJbFA9wt2WyUMb3pzdTdP7xWNSHm
-         hC9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741614643; x=1742219443;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EuvcGo7WnKEPEQ0sWQsDW7WhCqe6qPP+dOCAPRfTNpI=;
-        b=ConRaHsj56L3dRqLaiM96FSJov/MXUIxyqlicFn1EXDpr77Qa/vZ2P8nFcQaCwtR5I
-         1u7j35LTJVoXay45A+nJHmxk/BDKTcb/FtpFc977JXKBeYpNOo/UTz7EvW3s8brCgdh3
-         yICTJIXN+ZkytYTOmTYIAX1HcBh7kkTFT7xOTWGhh3TKXJeVKXk50OcdUGbxxkWTBfbr
-         +1HZdWzg3ge45gUyXhWk3HEyh9c8nGzld4kTcFNVhWbnsn2Y2xfOT31LD6BLXSSfH5A3
-         gxOgIMwMVuYKu9HCldYnn5ETkZqPrxmMk+8ee8T+lP7E8cGpZgTE7dRi462bR3m7PhTQ
-         fyTQ==
-X-Gm-Message-State: AOJu0Yz9AHpwiGTjyFjTWD3cUiRuc+nEihzSeE82Lt9SxP07nvllPbGT
-	hfC9zhzo2yr1V17g1RyMz6BMbVKqB0SP52vsSbz/kvgJzYZSbEQFb4doo1ZTDzo=
-X-Gm-Gg: ASbGncvemwbYXDubm1hAbBv28K1WeSHWscqNPvw2ZCRsibfOerRmDR8hT5ZeqF5kcsn
-	/0aJDrG+ZySlHzo4cPG4fisUfZqnXBGm6qMHyKzTsAaGrbqaTTFiypfT5dewJYKWZhAIn/XNmPS
-	E5t2qVkqXnJ1Oad2hLpEyfN2EJTgvTMUjYi/+7lffHyJuSyuA6fGw05r6zYu6aIUI43Hc8BjYzT
-	9QonhA/wmPEiflHSR8eiiRwruSKRl9b5ARhJ4oGLn7CJZ3QsvkbHnmVtDkIpNF3fXvPBdd/39LG
-	hj24iXjLyn9rl7RzA1RAbZxtpRe9MjraVdM=
-X-Google-Smtp-Source: AGHT+IEo8mqkIPXY7WjBbBD8LR26Swh+IZa/UDJkWe2PZF7RXXlZI/YEDehOmzMngNwvJJ7XQfPk0A==
-X-Received: by 2002:a05:6e02:240b:b0:3d4:244b:db20 with SMTP id e9e14a558f8ab-3d4419296b0mr143219995ab.16.1741614643514;
-        Mon, 10 Mar 2025 06:50:43 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d43b511091sm21350915ab.42.2025.03.10.06.50.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 06:50:42 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, colyli@kernel.org
-Cc: Dan Carpenter <dan.carpenter@linaro.org>
-In-Reply-To: <20250309160556.42854-1-colyli@kernel.org>
-References: <20250309160556.42854-1-colyli@kernel.org>
-Subject: Re: [PATCH] badblocks: Fix a nonsense WARN_ON() which checks
- whether a u64 variable < 0
-Message-Id: <174161464217.178937.13356549396893564854.b4-ty@kernel.dk>
-Date: Mon, 10 Mar 2025 07:50:42 -0600
+	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="gpTfGvb8"
+DKIM-Signature: a=rsa-sha256; bh=o3jo8Yp6GBl1EzB187l+mO+RUd+WDfgcPP/VmFEaNZQ=;
+	c=relaxed/relaxed; d=t12smtp-sign004.email;
+	h=mime-version:date:references:to:subject:from:in-reply-to:cc:message-id:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
+	q=dns/txt; s=titan1; t=1741614317; v=1;
+	b=gpTfGvb8e/wHWyCIe6OuqWrYd3zTM6cZgGpZSnY4ENXCOa8gHLJhb1YlnmERxzlY/zRiyU14
+	fX8ovwJm2+EiFVFnJwA3N96mw6l953h1EpoHbq8uNEptEKZVe3cLXH05xoFxD9eQXanXfrtKZq8
+	PevqyG1OcMqQAJ5xJzsfihyA=
+Received: from smtpclient.apple (v133-18-178-219.vir.kagoya.net [133.18.178.219])
+	by smtp-out.flockmail.com (Postfix) with ESMTPA id 9BACB1004A4;
+	Mon, 10 Mar 2025 13:45:14 +0000 (UTC)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
-
-
-On Sun, 09 Mar 2025 12:05:56 -0400, colyli@kernel.org wrote:
-> In _badblocks_check(), there are lines of code like this,
-> 1246         sectors -= len;
-> [snipped]
-> 1251         WARN_ON(sectors < 0);
-> 
-> The WARN_ON() at line 1257 doesn't make sense because sectors is
-> unsigned long long type and never to be <0.
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] badblocks: Fix a nonsense WARN_ON() which checks whether a u64 variable < 0
-      commit: 7e76336e14de9a2b67af96012ddd46c5676cf340
-
-Best regards,
--- 
-Jens Axboe
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: [PATCH] badblocks: Fix a nonsense WARN_ON() which checks whether
+ a u64 variable < 0
+Feedback-ID: :i@coly.li:coly.li:flockmailId
+From: Coly Li <i@coly.li>
+In-Reply-To: <de3a5313-b0b5-432f-ace2-f6859eeb4436@kernel.dk>
+Date: Mon, 10 Mar 2025 21:44:59 +0800
+Cc: linux-block@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DB1BA32F-C77C-4606-A886-B519ADC3FCB5@coly.li>
+References: <20250309160556.42854-1-colyli@kernel.org>
+ <18D3673D-575E-4002-B5A8-FEE56A732EDC@coly.li>
+ <de3a5313-b0b5-432f-ace2-f6859eeb4436@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+X-F-Verdict: SPFVALID
+X-Titan-Src-Out: 1741614317168885566.29396.279708926236796156@prod-use1-smtp-out1002.
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.4 cv=IeV9WXqa c=1 sm=1 tr=0 ts=67ceeced
+	a=6yy/x1GoN29p2+/2k52XZQ==:117 a=6yy/x1GoN29p2+/2k52XZQ==:17
+	a=IkcTkHD0fZMA:10 a=CEWIc4RMnpUA:10 a=i1v2BhhCwKSZKKg_S70A:9
+	a=QEXdDO2ut3YA:10
 
 
 
+> 2025=E5=B9=B43=E6=9C=8810=E6=97=A5 21:42=EF=BC=8CJens Axboe =
+<axboe@kernel.dk> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On 3/9/25 10:12 AM, Coly Li wrote:
+>> Hi Jens,
+>>=20
+>> Could you please take a look at it and pick this patch into the =
+for-6.15/block branch? The patch is generated based on the =
+for-6.15/block branch.
+>=20
+> Just a heads-up - you don't need to send these emails outside of
+> just sending the patch, I do get the patches. If I didn't, then that'd
+> be a problem. If you feel patches need extra context, then just do a
+> cover letter for them.
+
+So if you are the receiver of the patch email, then I don=E2=80=99t need =
+to worry that you will treat it as a normal patch for review. Can I take =
+this as a rule?
+
+Thanks.
+
+Coly Li=
