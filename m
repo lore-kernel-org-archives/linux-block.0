@@ -1,300 +1,712 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1F91F4C96
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 06:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1689F1EB18A;
+	Tue, 11 Mar 2025 07:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741676258; cv=none; b=h9eSqpm7+jswYTekkr+KQDNx/sZqthV7EudIt9v9KfOMyLLFuwlJS2KIgrZKE8y8DFH5vE3FVFdlWP2VlhIuwbTLG+g3utK746k+EeSqpa68Y/MWcUsmFFWi3eT0022lXz/WhlPR1bPEJAKiOu4iyKgP6/G3FkdZ92bYhrptUiI=
+	t=1741676754; cv=none; b=tI1b1A6wSkFOOi1DufIMIVZy5CGvIM1g/3mkS7rhPPE5ogcPqBpwKMnx058hD/dUo5siZ9cqwr+KEgB35ZxjzDl96xyxzNq/TT9SHHgaRa/MpNRVhMvQ/+RbpWSK3uYF3Zs+wuN6u4jM5WfJpxpqlrfGQm1Hyc1j81Fsz+OfWjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741676258; c=relaxed/simple;
-	bh=IiG6GOizI2cPjF6uYxMtN1anttuQC9GTwGiRXRKL+6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fY9xMb15SPkbAcug9mYn4weuTdBdqTRdklqkZkEJAYsfSUC/RvY9xIluTg103yovCi3vPrFsPefQ3QWlsypeMErSzDZiaVLHZLD3p7KCdWTQdeNvpgW/p8eQ1FzeRnhTZsbz5iSeh7dXc+g2bxszikGWzkZqHaZgBlrhNblP9sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=u7K1mgLc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TwOTWzRJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U6QdZhou; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=etHgcreL; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1741676754; c=relaxed/simple;
+	bh=ciUwCZPfi6ydUgg555AQMOLdMYISogolV9qW034+wN0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ML66Jx3J2+XF3sIgDUxOPLyeZfmZlaCHl7ke5Bdasft7J86YRtXHeWKRU/TSsPZXpVRM7sLVZgOyGbDvrNPBaRtVi4AzlWtjMduuBHKh3zcvzrL4/NXrjwLbnhfdSMJQpAY5pnYVpfISaGV/NLjzVo058lx7UwgRUnd0KKAiFPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6GcKiz1; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="u7K1mgLc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TwOTWzRJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U6QdZhou";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="etHgcreL"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5D86D1F394;
-	Tue, 11 Mar 2025 06:57:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741676249; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1do7IXGEo6iQ6jN6FJHXmAwttRU/AZFODq7/L+TmzU=;
-	b=u7K1mgLcFT96k01RIfSJiwWoY0ZPVAivFB+QrKeqHiiqr6nqfTJ6r+rKKsmykgftw1XSAv
-	PHCoev+p9guyB9BLhgKOc8pR7WCgvio8EK5ZfpLyVkjyd2aO6R9/MxLAVcEKAdFxbgar+o
-	VR13BHltYx4ZzZ9UUqUYB2ZrCxNxj9s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741676249;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1do7IXGEo6iQ6jN6FJHXmAwttRU/AZFODq7/L+TmzU=;
-	b=TwOTWzRJx5IGbkO1VAtaNcGj6+beOc6unBWWjkeTEEbKkRPzx+8RoPv1rUHS8biSnsqMHD
-	x3NUSVRStbfCUfAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741676248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1do7IXGEo6iQ6jN6FJHXmAwttRU/AZFODq7/L+TmzU=;
-	b=U6QdZhouQEAOc8bicu67IM7oK5yH4Jk9/1kL6Y9riyH+UqK1C1IIxsmR9docwe6ung0pTX
-	AZsCZSu1JRrsKBPHZtPl49yFFsziI13FovFrhSSGXA52MfUmnkC3RJibLjJTgmu8aA01kh
-	/KBBhNEIxDbkxZyhbWeH6xuXwFR1TW4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741676248;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1do7IXGEo6iQ6jN6FJHXmAwttRU/AZFODq7/L+TmzU=;
-	b=etHgcreLrKAUzyeYmzH8uaCrpUqCys9rPuF2+gSM8WkQwxkKZleSav1/wxI7rfYuoN0EZb
-	aczvODa8gbqhpRCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8CB6A132CB;
-	Tue, 11 Mar 2025 06:57:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5SIRINfez2fDQgAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 11 Mar 2025 06:57:27 +0000
-Message-ID: <16de123b-abe8-4f6d-8b4a-ec9541eca249@suse.de>
-Date: Tue, 11 Mar 2025 07:57:27 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6GcKiz1"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86d3907524cso2102729241.0;
+        Tue, 11 Mar 2025 00:05:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741676751; x=1742281551; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q31kVzsoBkQBSCd3vqptmMsYbS7RNSe4aJBdM93V6lM=;
+        b=A6GcKiz1W50ZmEmpWd+lYVMjHAVnd+cQZ1taQ9Oa74yEllJqmYax6RvbM05p1xweJ9
+         lzNN+27Jg/IN1dWdhpk6UUjP58e7SsmtW0z4ZTOTr74Vw6dGl7uy0Vfqdz/RmK0GqlN5
+         YvqDVHCGJv23+7hNReVPsr9MhPMHNSNvQKJ/iEe5fQ0sZI1G5vVK41WBx/7kUax2nILh
+         x/h9ZeePX+v+brB31ee9Y0t2baUwbYxAZnCq6KeCisI00ad75A7H1mLCDKrfgqqrp84Z
+         V+DtmNbcscH4+mT0bvXmekbsTwUXVv4hqbalaj3VomqQnfh87txidDggwnjm0zeMttys
+         jOPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741676751; x=1742281551;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q31kVzsoBkQBSCd3vqptmMsYbS7RNSe4aJBdM93V6lM=;
+        b=OPKzrLKtUQ0q3OZHyznNPjau4+J9pOcNkFUSVcoYwSs5OTmVvOgA023jppRsWY+PIg
+         3k6R6wkRcrdfDzNSWGABz+BrHq+VmS6uVu2pi9hdIFiVh2sSjFnRN5tjbTNrQT0xg5wV
+         4LMFPVoh0KipvXIoE+XQdwcm4emgW+DtdZhTlqwv4wGiguoI4cmEGUfjgC6QFgLGr3fQ
+         WfA61KwjUHPsEpeWcrWToP0y+QlmQGW6cbdgOLYR2xzT+xpp5867YMTbI9THXk8fovWu
+         EsdodPu7xSrSNHfnWn5cx/GGvgF+g/E6KQdPJbijzqj2m9bJaKfFNeghkz1qZ+RZxsiN
+         2oig==
+X-Forwarded-Encrypted: i=1; AJvYcCUx6dPO5jtGAHAJK6LQ2YmWqP21SpI8WrzT1zD+c+Wc5zxn2T799ByFQmEJg5W8pDsVimUAME40YYqQfA==@vger.kernel.org, AJvYcCX1N7eRLHQ6Ul1laL4S95aypxLWoE2Wt31fk8EvQ49d4159EqOurw2OaLUFj3QC3z35P1hSC4Iq3VZP6Dg5@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBuE2fh5lll6fFVsXAweN7eN9M4D3m6uxMD88N/PdvgLolwqCQ
+	muFiCiBmij4TJ7eYbdMe7PNjggpHrKPlfr7hdgME2y7w04rqj6cGh1i4aZWrZNug12OhJbbqIvU
+	9sEhKDWe1fD7NBdNMsynq2wjp2Zc=
+X-Gm-Gg: ASbGncu7lN1L9NF7pQmvooXm4m6EnEt0cyeKBb3hWQ2ZJDfA6/7oeAHhLR82nwF6bpm
+	gs5VODc0eUYWfOt/jxaevCU0MGOkgIjIHKhlgiEU57lwjMl9rrBDPLC4vzSKMoDLw5pKhfpgRYR
+	i2VS+LP7P+Go7E2Xa12UJ3IRDdsg==
+X-Google-Smtp-Source: AGHT+IHAzH8jT0g+s0jDcfWjjdx0MoItO4/EnfD08W69uptTJjESTeNMzIUQijW2my5HNSH+Or9ehxFp9/SLkGNQOZs=
+X-Received: by 2002:a05:6102:6cf:b0:4bb:cf34:374d with SMTP id
+ ada2fe7eead31-4c30a6ad473mr10393207137.20.1741676750766; Tue, 11 Mar 2025
+ 00:05:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: change blk_mq_add_to_batch() third argument
- type to blk_status_t
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, Sagi Grimberg <sagi@grimberg.me>,
- Alan Adamson <alan.adamson@oracle.com>
-Cc: virtualization@lists.linux.dev, asahi@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, "Michael S . Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Sven Peter <sven@svenpeter.dev>,
- Janne Grunau <j@jannau.net>, Alyssa Rosenzweig <alyssa@rosenzweig.io>
-References: <20250311024144.1762333-1-shinichiro.kawasaki@wdc.com>
- <20250311024144.1762333-3-shinichiro.kawasaki@wdc.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250311024144.1762333-3-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wdc.com:email,suse.de:email,suse.de:mid]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+References: <20250307120141.1566673-1-qun-wei.lin@mediatek.com>
+ <20250307120141.1566673-3-qun-wei.lin@mediatek.com> <CAGsJ_4xtp9iGPQinu5DOi3R2B47X9o=wS94GdhdY-0JUATf5hw@mail.gmail.com>
+ <7938f840136165be1c50050feb39fb14ee37721b.camel@mediatek.com>
+In-Reply-To: <7938f840136165be1c50050feb39fb14ee37721b.camel@mediatek.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Tue, 11 Mar 2025 20:05:35 +1300
+X-Gm-Features: AQ5f1JogAWL2F7qntgpMfCfk0eGiFWnmzClUe5D5QlYNBRZgUBUA-ZCMZhJ8AdU
+Message-ID: <CAGsJ_4zzZdjbr2DbRybHYDmL2EuUBohOP1=ho7fjx1XWoKDDGw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kcompressd: Add Kcompressd for accelerated zram compression
+To: =?UTF-8?B?UXVuLXdlaSBMaW4gKOael+e+pOW0tCk=?= <Qun-wei.Lin@mediatek.com>
+Cc: =?UTF-8?B?QW5kcmV3IFlhbmcgKOaliuaZuuW8tyk=?= <Andrew.Yang@mediatek.com>, 
+	=?UTF-8?B?Q2FzcGVyIExpICjmnY7kuK3mpq4p?= <casper.li@mediatek.com>, 
+	"chrisl@kernel.org" <chrisl@kernel.org>, =?UTF-8?B?SmFtZXMgSHN1ICjlvpDmhbbolrAp?= <James.Hsu@mediatek.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>, 
+	"ira.weiny@intel.com" <ira.weiny@intel.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"dave.jiang@intel.com" <dave.jiang@intel.com>, 
+	"schatzberg.dan@gmail.com" <schatzberg.dan@gmail.com>, 
+	=?UTF-8?B?Q2hpbndlbiBDaGFuZyAo5by16Yym5paHKQ==?= <chinwen.chang@mediatek.com>, 
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"minchan@kernel.org" <minchan@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "kasong@tencent.com" <kasong@tencent.com>, 
+	"nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>, 
+	"vishal.l.verma@intel.com" <vishal.l.verma@intel.com>, 
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"ying.huang@intel.com" <ying.huang@intel.com>, 
+	"senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
+	"dan.j.williams@intel.com" <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/11/25 03:41, Shin'ichiro Kawasaki wrote:
-> Commit 1f47ed294a2b ("block: cleanup and fix batch completion adding
-> conditions") modified the evaluation criteria for the third argument,
-> 'ioerror', in the blk_mq_add_to_batch() function. Initially, the
-> function had checked if 'ioerror' equals zero. Following the commit, it
-> started checking for negative error values, with the presumption that
-> such values, for instance -EIO, would be passed in.
-> 
-> However, blk_mq_add_to_batch() callers do not pass negative error
-> values. Instead, they pass status codes defined in various ways:
-> 
-> - NVMe PCI and Apple drivers pass NVMe status code
-> - virtio_blk driver passes the virtblk request header status byte
-> - null_blk driver passes blk_status_t
-> 
-> These codes are either zero or positive, therefore the revised check
-> fails to function as intended. Specifically, with the NVMe PCI driver,
-> this modification led to the failure of the blktests test case nvme/039.
-> In this test scenario, errors are artificially injected to the NVMe
-> driver, resulting in positive NVMe status codes passed to
-> blk_mq_add_to_batch(), which unexpectedly processes the failed I/O in a
-> batch. Hence the failure.
-> 
-> To correct the ioerror check within blk_mq_add_to_batch(), make all
-> callers to uniformly pass the argument as blk_status_t. Modify the
-> callers to translate their specific status codes into blk_status_t. For
-> this translation, export the helper function nvme_error_status(). Adjust
-> blk_mq_add_to_batch() to translate blk_status_t back into the error
-> number for the appropriate check.
-> 
-> Fixes: 1f47ed294a2b ("block: cleanup and fix batch completion adding conditions")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->   drivers/block/null_blk/main.c | 2 +-
->   drivers/block/virtio_blk.c    | 5 +++--
->   drivers/nvme/host/apple.c     | 3 ++-
->   drivers/nvme/host/core.c      | 3 ++-
->   drivers/nvme/host/nvme.h      | 1 +
->   drivers/nvme/host/pci.c       | 5 +++--
->   include/linux/blk-mq.h        | 5 +++--
->   7 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index d94ef37480bd..31f23f6a8ed0 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1549,7 +1549,7 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
->   		cmd = blk_mq_rq_to_pdu(req);
->   		cmd->error = null_process_cmd(cmd, req_op(req), blk_rq_pos(req),
->   						blk_rq_sectors(req));
-> -		if (!blk_mq_add_to_batch(req, iob, (__force int) cmd->error,
-> +		if (!blk_mq_add_to_batch(req, iob, cmd->error,
->   					blk_mq_end_request_batch))
->   			blk_mq_end_request(req, cmd->error);
->   		nr++;
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 6a61ec35f426..74f73cb8becd 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1207,11 +1207,12 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
->   
->   	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
->   		struct request *req = blk_mq_rq_from_pdu(vbr);
-> +		u8 status = virtblk_vbr_status(vbr);
->   
->   		found++;
->   		if (!blk_mq_complete_request_remote(req) &&
-> -		    !blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
-> -						virtblk_complete_batch))
-> +		    !blk_mq_add_to_batch(req, iob, virtblk_result(status),
-> +					 virtblk_complete_batch))
->   			virtblk_request_done(req);
->   	}
->   
-> diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
-> index a060f69558e7..ae859f772485 100644
-> --- a/drivers/nvme/host/apple.c
-> +++ b/drivers/nvme/host/apple.c
-> @@ -599,7 +599,8 @@ static inline void apple_nvme_handle_cqe(struct apple_nvme_queue *q,
->   	}
->   
->   	if (!nvme_try_complete_req(req, cqe->status, cqe->result) &&
-> -	    !blk_mq_add_to_batch(req, iob, nvme_req(req)->status,
-> +	    !blk_mq_add_to_batch(req, iob,
-> +				 nvme_error_status(nvme_req(req)->status),
->   				 apple_nvme_complete_batch))
->   		apple_nvme_complete_rq(req);
->   }
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 8359d0aa0e44..725f2052bcb2 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -274,7 +274,7 @@ void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
->   	nvme_put_ctrl(ctrl);
->   }
->   
-> -static blk_status_t nvme_error_status(u16 status)
-> +blk_status_t nvme_error_status(u16 status)
->   {
->   	switch (status & NVME_SCT_SC_MASK) {
->   	case NVME_SC_SUCCESS:
-> @@ -315,6 +315,7 @@ static blk_status_t nvme_error_status(u16 status)
->   		return BLK_STS_IOERR;
->   	}
->   }
-> +EXPORT_SYMBOL_GPL(nvme_error_status);
->   
->   static void nvme_retry_req(struct request *req)
->   {
-> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-> index 7be92d07430e..4e166da4aa81 100644
-> --- a/drivers/nvme/host/nvme.h
-> +++ b/drivers/nvme/host/nvme.h
-> @@ -904,6 +904,7 @@ void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
->   int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
->   int nvme_reset_ctrl_sync(struct nvme_ctrl *ctrl);
->   int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
-> +blk_status_t nvme_error_status(u16 status);
->   void nvme_queue_scan(struct nvme_ctrl *ctrl);
->   int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
->   		void *log, size_t size, u64 offset);
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 640590b21728..873564efc346 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -1130,8 +1130,9 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq,
->   
->   	trace_nvme_sq(req, cqe->sq_head, nvmeq->sq_tail);
->   	if (!nvme_try_complete_req(req, cqe->status, cqe->result) &&
-> -	    !blk_mq_add_to_batch(req, iob, nvme_req(req)->status,
-> -					nvme_pci_complete_batch))
-> +	    !blk_mq_add_to_batch(req, iob,
-> +				 nvme_error_status(nvme_req(req)->status),
-> +				 nvme_pci_complete_batch))
->   		nvme_pci_complete_rq(req);
->   }
->   
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 71f4f0cc3dac..9ba479a52ce7 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -857,7 +857,8 @@ static inline bool blk_mq_is_reserved_rq(struct request *rq)
->    * ->end_io handler.
->    */
->   static inline bool blk_mq_add_to_batch(struct request *req,
-> -				       struct io_comp_batch *iob, int ioerror,
-> +				       struct io_comp_batch *iob,
-> +				       blk_status_t status,
->   				       void (*complete)(struct io_comp_batch *))
->   {
->   	/*
-> @@ -874,7 +875,7 @@ static inline bool blk_mq_add_to_batch(struct request *req,
->   	if (!blk_rq_is_passthrough(req)) {
->   		if (req->end_io)
->   			return false;
-> -		if (ioerror < 0)
-> +		if (blk_status_to_errno(status) < 0)
->   			return false;
->   	}
->   
-That feels a bit odd; errno will always be negative, so we really are 
-just checking if it's non-zero. Maybe it's better to use a 'bool' value
-here, that would avoid all the rather pointless casting, too.
+On Tue, Mar 11, 2025 at 2:26=E2=80=AFAM Qun-wei Lin (=E6=9E=97=E7=BE=A4=E5=
+=B4=B4)
+<Qun-wei.Lin@mediatek.com> wrote:
+>
+> On Sat, 2025-03-08 at 08:41 +1300, Barry Song wrote:
+> >
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> >
+> >
+> > On Sat, Mar 8, 2025 at 1:02=E2=80=AFAM Qun-Wei Lin <qun-wei.lin@mediate=
+k.com>
+> > wrote:
+> > >
+> > > Introduced Kcompressd to offload zram page compression, improving
+> > > system efficiency by handling compression separately from memory
+> > > reclaiming. Added necessary configurations and dependencies.
+> > >
+> > > Signed-off-by: Qun-Wei Lin <qun-wei.lin@mediatek.com>
+> > > ---
+> > >  drivers/block/zram/Kconfig      |  11 ++
+> > >  drivers/block/zram/Makefile     |   3 +-
+> > >  drivers/block/zram/kcompressd.c | 340
+> > > ++++++++++++++++++++++++++++++++
+> > >  drivers/block/zram/kcompressd.h |  25 +++
+> > >  drivers/block/zram/zram_drv.c   |  22 ++-
+> > >  5 files changed, 397 insertions(+), 4 deletions(-)
+> > >  create mode 100644 drivers/block/zram/kcompressd.c
+> > >  create mode 100644 drivers/block/zram/kcompressd.h
+> > >
+> > > diff --git a/drivers/block/zram/Kconfig
+> > > b/drivers/block/zram/Kconfig
+> > > index 402b7b175863..f0a1b574f770 100644
+> > > --- a/drivers/block/zram/Kconfig
+> > > +++ b/drivers/block/zram/Kconfig
+> > > @@ -145,3 +145,14 @@ config ZRAM_MULTI_COMP
+> > >           re-compress pages using a potentially slower but more
+> > > effective
+> > >           compression algorithm. Note, that IDLE page recompression
+> > >           requires ZRAM_TRACK_ENTRY_ACTIME.
+> > > +
+> > > +config KCOMPRESSD
+> > > +       tristate "Kcompressd: Accelerated zram compression"
+> > > +       depends on ZRAM
+> > > +       help
+> > > +         Kcompressd creates multiple daemons to accelerate the
+> > > compression of pages
+> > > +         in zram, offloading this time-consuming task from the
+> > > zram driver.
+> > > +
+> > > +         This approach improves system efficiency by handling page
+> > > compression separately,
+> > > +         which was originally done by kswapd or direct reclaim.
+> >
+> > For direct reclaim, we were previously able to compress using
+> > multiple CPUs
+> > with multi-threading.
+> > After your patch, it seems that only a single thread/CPU is used for
+> > compression
+> > so it won't necessarily improve direct reclaim performance?
+> >
+>
+> Our patch only splits the context of kswapd. When direct reclaim is
+> occurred, it is bypassed, so direct reclaim remains unchanged, with
+> each thread that needs memory directly reclaiming it.
 
-Cheers,
+Qun-wei, I=E2=80=99m getting a bit confused. Looking at the code in page_io=
+.c,
+you always call swap_writepage_bdev_async() no matter if it is kswapd
+or direct reclaim:
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+- else if (data_race(sis->flags & SWP_SYNCHRONOUS_IO))
++ else if (data_race(sis->flags & SWP_WRITE_SYNCHRONOUS_IO))
+           swap_writepage_bdev_sync(folio, wbc, sis);
+  else
+            swap_writepage_bdev_async(folio, wbc, sis);
+
+In zram, I notice you are bypassing kcompressd by:
+
++ if (!nr_kcompressd || !current_is_kswapd())
++        return -EBUSY;
+
+How will this work if no one is calling __end_swap_bio_write(&bio),
+which is present in swap_writepage_bdev_sync()?
+Am I missing something? Or is it done by zram_bio_write() ?
+
+On the other hand, zram is a generic block device, and coupling its
+code with kswapd/direct reclaim somehow violates layering
+principles :-)
+
+>
+> > Even for kswapd, we used to have multiple threads like [kswapd0],
+> > [kswapd1],
+> > and [kswapd2] for different nodes. Now, are we also limited to just
+> > one thread?
+>
+> We only considered a single kswapd here and didn't account for multiple
+> instances. Since I use kfifo to collect the bios, if there are multiple
+> kswapds, we need to add a lock to protect the bio queue. I can revise
+> this in the 2nd version, or do you have any other suggested approaches?
+
+I'm wondering if we can move the code to vmscan/page_io instead
+of zram. If we're using a sync I/O swap device or have enabled zswap,
+we could run reclamation in this separate thread, which should also be
+NUMA-aware.
+
+I would definitely be interested in prototyping it when I have the time.
+
+>
+> > I also wonder if this could be handled at the vmscan level instead of
+> > the zram
+> > level. then it might potentially help other sync devices or even
+> > zswap later.
+> >
+> > But I agree that for phones, modifying zram seems like an easier
+> > starting
+> > point. However, relying on a single thread isn't always the best
+> > approach.
+> >
+> >
+> > > +
+> > > diff --git a/drivers/block/zram/Makefile
+> > > b/drivers/block/zram/Makefile
+> > > index 0fdefd576691..23baa5dfceb9 100644
+> > > --- a/drivers/block/zram/Makefile
+> > > +++ b/drivers/block/zram/Makefile
+> > > @@ -9,4 +9,5 @@ zram-$(CONFIG_ZRAM_BACKEND_ZSTD)        +=3D
+> > > backend_zstd.o
+> > >  zram-$(CONFIG_ZRAM_BACKEND_DEFLATE)    +=3D backend_deflate.o
+> > >  zram-$(CONFIG_ZRAM_BACKEND_842)                +=3D backend_842.o
+> > >
+> > > -obj-$(CONFIG_ZRAM)     +=3D      zram.o
+> > > +obj-$(CONFIG_ZRAM)             +=3D zram.o
+> > > +obj-$(CONFIG_KCOMPRESSD)       +=3D kcompressd.o
+> > > diff --git a/drivers/block/zram/kcompressd.c
+> > > b/drivers/block/zram/kcompressd.c
+> > > new file mode 100644
+> > > index 000000000000..195b7e386869
+> > > --- /dev/null
+> > > +++ b/drivers/block/zram/kcompressd.c
+> > > @@ -0,0 +1,340 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> > > +/*
+> > > + * Copyright (C) 2024 MediaTek Inc.
+> > > + */
+> > > +
+> > > +#include <linux/module.h>
+> > > +#include <linux/kernel.h>
+> > > +#include <linux/bio.h>
+> > > +#include <linux/bitops.h>
+> > > +#include <linux/freezer.h>
+> > > +#include <linux/kernel.h>
+> > > +#include <linux/psi.h>
+> > > +#include <linux/kfifo.h>
+> > > +#include <linux/swap.h>
+> > > +#include <linux/delay.h>
+> > > +
+> > > +#include "kcompressd.h"
+> > > +
+> > > +#define INIT_QUEUE_SIZE                4096
+> > > +#define DEFAULT_NR_KCOMPRESSD  4
+> > > +
+> > > +static atomic_t enable_kcompressd;
+> > > +static unsigned int nr_kcompressd;
+> > > +static unsigned int queue_size_per_kcompressd;
+> > > +static struct kcompress *kcompress;
+> > > +
+> > > +enum run_state {
+> > > +       KCOMPRESSD_NOT_STARTED =3D 0,
+> > > +       KCOMPRESSD_RUNNING,
+> > > +       KCOMPRESSD_SLEEPING,
+> > > +};
+> > > +
+> > > +struct kcompressd_para {
+> > > +       wait_queue_head_t *kcompressd_wait;
+> > > +       struct kfifo *write_fifo;
+> > > +       atomic_t *running;
+> > > +};
+> > > +
+> > > +static struct kcompressd_para *kcompressd_para;
+> > > +static BLOCKING_NOTIFIER_HEAD(kcompressd_notifier_list);
+> > > +
+> > > +struct write_work {
+> > > +       void *mem;
+> > > +       struct bio *bio;
+> > > +       compress_callback cb;
+> > > +};
+> > > +
+> > > +int kcompressd_enabled(void)
+> > > +{
+> > > +       return likely(atomic_read(&enable_kcompressd));
+> > > +}
+> > > +EXPORT_SYMBOL(kcompressd_enabled);
+> > > +
+> > > +static void kcompressd_try_to_sleep(struct kcompressd_para *p)
+> > > +{
+> > > +       DEFINE_WAIT(wait);
+> > > +
+> > > +       if (!kfifo_is_empty(p->write_fifo))
+> > > +               return;
+> > > +
+> > > +       if (freezing(current) || kthread_should_stop())
+> > > +               return;
+> > > +
+> > > +       atomic_set(p->running, KCOMPRESSD_SLEEPING);
+> > > +       prepare_to_wait(p->kcompressd_wait, &wait,
+> > > TASK_INTERRUPTIBLE);
+> > > +
+> > > +       /*
+> > > +        * After a short sleep, check if it was a premature sleep.
+> > > If not, then
+> > > +        * go fully to sleep until explicitly woken up.
+> > > +        */
+> > > +       if (!kthread_should_stop() && kfifo_is_empty(p-
+> > > >write_fifo))
+> > > +               schedule();
+> > > +
+> > > +       finish_wait(p->kcompressd_wait, &wait);
+> > > +       atomic_set(p->running, KCOMPRESSD_RUNNING);
+> > > +}
+> > > +
+> > > +static int kcompressd(void *para)
+> > > +{
+> > > +       struct task_struct *tsk =3D current;
+> > > +       struct kcompressd_para *p =3D (struct kcompressd_para *)para;
+> > > +
+> > > +       tsk->flags |=3D PF_MEMALLOC | PF_KSWAPD;
+> > > +       set_freezable();
+> > > +
+> > > +       while (!kthread_should_stop()) {
+> > > +               bool ret;
+> > > +
+> > > +               kcompressd_try_to_sleep(p);
+> > > +               ret =3D try_to_freeze();
+> > > +               if (kthread_should_stop())
+> > > +                       break;
+> > > +
+> > > +               if (ret)
+> > > +                       continue;
+> > > +
+> > > +               while (!kfifo_is_empty(p->write_fifo)) {
+> > > +                       struct write_work entry;
+> > > +
+> > > +                       if (sizeof(struct write_work) =3D=3D
+> > > kfifo_out(p->write_fifo,
+> > > +                                               &entry,
+> > > sizeof(struct write_work))) {
+> > > +                               entry.cb(entry.mem, entry.bio);
+> > > +                               bio_put(entry.bio);
+> > > +                       }
+> > > +               }
+> > > +
+> > > +       }
+> > > +
+> > > +       tsk->flags &=3D ~(PF_MEMALLOC | PF_KSWAPD);
+> > > +       atomic_set(p->running, KCOMPRESSD_NOT_STARTED);
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int init_write_queue(void)
+> > > +{
+> > > +       int i;
+> > > +       unsigned int queue_len =3D queue_size_per_kcompressd *
+> > > sizeof(struct write_work);
+> > > +
+> > > +       for (i =3D 0; i < nr_kcompressd; i++) {
+> > > +               if (kfifo_alloc(&kcompress[i].write_fifo,
+> > > +                                       queue_len, GFP_KERNEL)) {
+> > > +                       pr_err("Failed to alloc kfifo %d\n", i);
+> > > +                       return -ENOMEM;
+> > > +               }
+> > > +       }
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static void clean_bio_queue(int idx)
+> > > +{
+> > > +       struct write_work entry;
+> > > +
+> > > +       while (sizeof(struct write_work) =3D=3D
+> > > kfifo_out(&kcompress[idx].write_fifo,
+> > > +                               &entry, sizeof(struct write_work)))
+> > > {
+> > > +               bio_put(entry.bio);
+> > > +               entry.cb(entry.mem, entry.bio);
+> > > +       }
+> > > +       kfifo_free(&kcompress[idx].write_fifo);
+> > > +}
+> > > +
+> > > +static int kcompress_update(void)
+> > > +{
+> > > +       int i;
+> > > +       int ret;
+> > > +
+> > > +       kcompress =3D kvmalloc_array(nr_kcompressd, sizeof(struct
+> > > kcompress), GFP_KERNEL);
+> > > +       if (!kcompress)
+> > > +               return -ENOMEM;
+> > > +
+> > > +       kcompressd_para =3D kvmalloc_array(nr_kcompressd,
+> > > sizeof(struct kcompressd_para), GFP_KERNEL);
+> > > +       if (!kcompressd_para)
+> > > +               return -ENOMEM;
+> > > +
+> > > +       ret =3D init_write_queue();
+> > > +       if (ret) {
+> > > +               pr_err("Initialization of writing to FIFOs
+> > > failed!!\n");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       for (i =3D 0; i < nr_kcompressd; i++) {
+> > > +               init_waitqueue_head(&kcompress[i].kcompressd_wait);
+> > > +               kcompressd_para[i].kcompressd_wait =3D
+> > > &kcompress[i].kcompressd_wait;
+> > > +               kcompressd_para[i].write_fifo =3D
+> > > &kcompress[i].write_fifo;
+> > > +               kcompressd_para[i].running =3D &kcompress[i].running;
+> > > +       }
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static void stop_all_kcompressd_thread(void)
+> > > +{
+> > > +       int i;
+> > > +
+> > > +       for (i =3D 0; i < nr_kcompressd; i++) {
+> > > +               kthread_stop(kcompress[i].kcompressd);
+> > > +               kcompress[i].kcompressd =3D NULL;
+> > > +               clean_bio_queue(i);
+> > > +       }
+> > > +}
+> > > +
+> > > +static int do_nr_kcompressd_handler(const char *val,
+> > > +               const struct kernel_param *kp)
+> > > +{
+> > > +       int ret;
+> > > +
+> > > +       atomic_set(&enable_kcompressd, false);
+> > > +
+> > > +       stop_all_kcompressd_thread();
+> > > +
+> > > +       ret =3D param_set_int(val, kp);
+> > > +       if (!ret) {
+> > > +               pr_err("Invalid number of kcompressd.\n");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       ret =3D init_write_queue();
+> > > +       if (ret) {
+> > > +               pr_err("Initialization of writing to FIFOs
+> > > failed!!\n");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       atomic_set(&enable_kcompressd, true);
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static const struct kernel_param_ops
+> > > param_ops_change_nr_kcompressd =3D {
+> > > +       .set =3D &do_nr_kcompressd_handler,
+> > > +       .get =3D &param_get_uint,
+> > > +       .free =3D NULL,
+> > > +};
+> > > +
+> > > +module_param_cb(nr_kcompressd, &param_ops_change_nr_kcompressd,
+> > > +               &nr_kcompressd, 0644);
+> > > +MODULE_PARM_DESC(nr_kcompressd, "Number of pre-created daemon for
+> > > page compression");
+> > > +
+> > > +static int do_queue_size_per_kcompressd_handler(const char *val,
+> > > +               const struct kernel_param *kp)
+> > > +{
+> > > +       int ret;
+> > > +
+> > > +       atomic_set(&enable_kcompressd, false);
+> > > +
+> > > +       stop_all_kcompressd_thread();
+> > > +
+> > > +       ret =3D param_set_int(val, kp);
+> > > +       if (!ret) {
+> > > +               pr_err("Invalid queue size for kcompressd.\n");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       ret =3D init_write_queue();
+> > > +       if (ret) {
+> > > +               pr_err("Initialization of writing to FIFOs
+> > > failed!!\n");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       pr_info("Queue size for kcompressd was changed: %d\n",
+> > > queue_size_per_kcompressd);
+> > > +
+> > > +       atomic_set(&enable_kcompressd, true);
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static const struct kernel_param_ops
+> > > param_ops_change_queue_size_per_kcompressd =3D {
+> > > +       .set =3D &do_queue_size_per_kcompressd_handler,
+> > > +       .get =3D &param_get_uint,
+> > > +       .free =3D NULL,
+> > > +};
+> > > +
+> > > +module_param_cb(queue_size_per_kcompressd,
+> > > &param_ops_change_queue_size_per_kcompressd,
+> > > +               &queue_size_per_kcompressd, 0644);
+> > > +MODULE_PARM_DESC(queue_size_per_kcompressd,
+> > > +               "Size of queue for kcompressd");
+> > > +
+> > > +int schedule_bio_write(void *mem, struct bio *bio,
+> > > compress_callback cb)
+> > > +{
+> > > +       int i;
+> > > +       bool submit_success =3D false;
+> > > +       size_t sz_work =3D sizeof(struct write_work);
+> > > +
+> > > +       struct write_work entry =3D {
+> > > +               .mem =3D mem,
+> > > +               .bio =3D bio,
+> > > +               .cb =3D cb
+> > > +       };
+> > > +
+> > > +       if (unlikely(!atomic_read(&enable_kcompressd)))
+> > > +               return -EBUSY;
+> > > +
+> > > +       if (!nr_kcompressd || !current_is_kswapd())
+> > > +               return -EBUSY;
+> > > +
+> > > +       bio_get(bio);
+> > > +
+> > > +       for (i =3D 0; i < nr_kcompressd; i++) {
+> > > +               submit_success =3D
+> > > +                       (kfifo_avail(&kcompress[i].write_fifo) >=3D
+> > > sz_work) &&
+> > > +                       (sz_work =3D=3D
+> > > kfifo_in(&kcompress[i].write_fifo, &entry, sz_work));
+> > > +
+> > > +               if (submit_success) {
+> > > +                       switch (atomic_read(&kcompress[i].running))
+> > > {
+> > > +                       case KCOMPRESSD_NOT_STARTED:
+> > > +                               atomic_set(&kcompress[i].running,
+> > > KCOMPRESSD_RUNNING);
+> > > +                               kcompress[i].kcompressd =3D
+> > > kthread_run(kcompressd,
+> > > +
+> > > &kcompressd_para[i], "kcompressd:%d", i);
+> > > +                               if
+> > > (IS_ERR(kcompress[i].kcompressd)) {
+> > > +
+> > > atomic_set(&kcompress[i].running, KCOMPRESSD_NOT_STARTED);
+> > > +                                       pr_warn("Failed to start
+> > > kcompressd:%d\n", i);
+> > > +                                       clean_bio_queue(i);
+> > > +                               }
+> > > +                               break;
+> > > +                       case KCOMPRESSD_RUNNING:
+> > > +                               break;
+> > > +                       case KCOMPRESSD_SLEEPING:
+> > > +
+> > > wake_up_interruptible(&kcompress[i].kcompressd_wait);
+> > > +                               break;
+> > > +                       }
+> > > +                       return 0;
+> > > +               }
+> > > +       }
+> > > +
+> > > +       bio_put(bio);
+> > > +       return -EBUSY;
+> > > +}
+> > > +EXPORT_SYMBOL(schedule_bio_write);
+> > > +
+> > > +static int __init kcompressd_init(void)
+> > > +{
+> > > +       int ret;
+> > > +
+> > > +       nr_kcompressd =3D DEFAULT_NR_KCOMPRESSD;
+> > > +       queue_size_per_kcompressd =3D INIT_QUEUE_SIZE;
+> > > +
+> > > +       ret =3D kcompress_update();
+> > > +       if (ret) {
+> > > +               pr_err("Init kcompressd failed!\n");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       atomic_set(&enable_kcompressd, true);
+> > > +       blocking_notifier_call_chain(&kcompressd_notifier_list, 0,
+> > > NULL);
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static void __exit kcompressd_exit(void)
+> > > +{
+> > > +       atomic_set(&enable_kcompressd, false);
+> > > +       stop_all_kcompressd_thread();
+> > > +
+> > > +       kvfree(kcompress);
+> > > +       kvfree(kcompressd_para);
+> > > +}
+> > > +
+> > > +module_init(kcompressd_init);
+> > > +module_exit(kcompressd_exit);
+> > > +
+> > > +MODULE_LICENSE("Dual BSD/GPL");
+> > > +MODULE_AUTHOR("Qun-Wei Lin <qun-wei.lin@mediatek.com>");
+> > > +MODULE_DESCRIPTION("Separate the page compression from the memory
+> > > reclaiming");
+> > > +
+> > > diff --git a/drivers/block/zram/kcompressd.h
+> > > b/drivers/block/zram/kcompressd.h
+> > > new file mode 100644
+> > > index 000000000000..2fe0b424a7af
+> > > --- /dev/null
+> > > +++ b/drivers/block/zram/kcompressd.h
+> > > @@ -0,0 +1,25 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +/*
+> > > + * Copyright (C) 2024 MediaTek Inc.
+> > > + */
+> > > +
+> > > +#ifndef _KCOMPRESSD_H_
+> > > +#define _KCOMPRESSD_H_
+> > > +
+> > > +#include <linux/rwsem.h>
+> > > +#include <linux/kfifo.h>
+> > > +#include <linux/atomic.h>
+> > > +
+> > > +typedef void (*compress_callback)(void *mem, struct bio *bio);
+> > > +
+> > > +struct kcompress {
+> > > +       struct task_struct *kcompressd;
+> > > +       wait_queue_head_t kcompressd_wait;
+> > > +       struct kfifo write_fifo;
+> > > +       atomic_t running;
+> > > +};
+> > > +
+> > > +int kcompressd_enabled(void);
+> > > +int schedule_bio_write(void *mem, struct bio *bio,
+> > > compress_callback cb);
+> > > +#endif
+> > > +
+> > > diff --git a/drivers/block/zram/zram_drv.c
+> > > b/drivers/block/zram/zram_drv.c
+> > > index 2e1a70f2f4bd..bcd63ecb6ff2 100644
+> > > --- a/drivers/block/zram/zram_drv.c
+> > > +++ b/drivers/block/zram/zram_drv.c
+> > > @@ -35,6 +35,7 @@
+> > >  #include <linux/part_stat.h>
+> > >  #include <linux/kernel_read_file.h>
+> > >
+> > > +#include "kcompressd.h"
+> > >  #include "zram_drv.h"
+> > >
+> > >  static DEFINE_IDR(zram_index_idr);
+> > > @@ -2240,6 +2241,15 @@ static void zram_bio_write(struct zram
+> > > *zram, struct bio *bio)
+> > >         bio_endio(bio);
+> > >  }
+> > >
+> > > +#if IS_ENABLED(CONFIG_KCOMPRESSD)
+> > > +static void zram_bio_write_callback(void *mem, struct bio *bio)
+> > > +{
+> > > +       struct zram *zram =3D (struct zram *)mem;
+> > > +
+> > > +       zram_bio_write(zram, bio);
+> > > +}
+> > > +#endif
+> > > +
+> > >  /*
+> > >   * Handler function for all zram I/O requests.
+> > >   */
+> > > @@ -2252,6 +2262,10 @@ static void zram_submit_bio(struct bio *bio)
+> > >                 zram_bio_read(zram, bio);
+> > >                 break;
+> > >         case REQ_OP_WRITE:
+> > > +#if IS_ENABLED(CONFIG_KCOMPRESSD)
+> > > +               if (kcompressd_enabled() &&
+> > > !schedule_bio_write(zram, bio, zram_bio_write_callback))
+> > > +                       break;
+> > > +#endif
+> > >                 zram_bio_write(zram, bio);
+> > >                 break;
+> > >         case REQ_OP_DISCARD:
+> > > @@ -2535,9 +2549,11 @@ static int zram_add(void)
+> > >  #if ZRAM_LOGICAL_BLOCK_SIZE =3D=3D PAGE_SIZE
+> > >                 .max_write_zeroes_sectors       =3D UINT_MAX,
+> > >  #endif
+> > > -               .features                       =3D
+> > > BLK_FEAT_STABLE_WRITES        |
+> > > -
+> > > BLK_FEAT_READ_SYNCHRONOUS     |
+> > > -
+> > > BLK_FEAT_WRITE_SYNCHRONOUS,
+> > > +               .features                       =3D
+> > > BLK_FEAT_STABLE_WRITES
+> > > +                                                 |
+> > > BLK_FEAT_READ_SYNCHRONOUS
+> > > +#if !IS_ENABLED(CONFIG_KCOMPRESSD)
+> > > +                                                 |
+> > > BLK_FEAT_WRITE_SYNCHRONOUS,
+> > > +#endif
+> > >         };
+> > >         struct zram *zram;
+> > >         int ret, device_id;
+> > > --
+> > > 2.45.2
+> > >
+> >
+
+Thanks
+Barry
