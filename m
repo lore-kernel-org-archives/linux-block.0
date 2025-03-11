@@ -1,74 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA6D17591;
-	Tue, 11 Mar 2025 19:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86E4264A71
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741721661; cv=none; b=WUrvzCtC+sH8NGZqLE5F/yfm/5LxmYTd5wGey46j20E5zVDEii2SqB6Lqdc8pIsxrdEPEaykVTvM+b5teVMAD4mEUlKS8t+Zojriiu/ebcq0glnbPYhaLRkSkt3JXsI2R5jA9pdwSnmw7cNBVXpIdFKUJQWPPiX56poXJbND80Q=
+	t=1741724141; cv=none; b=H2Okta4tt7cp5VwldpSX1TOAkZHl+zSyMp+7s3hsmB3tpJfepM6zRXqk7FxC76WHcAlPSX5ygPejZAqrzuDzppsvW4QuJaUa20pw3A1yGwI8N85uDRWn81+JkIyEtIDqMxNOR0FW+ML4n+HNl098VYzR1zHt4gZMRhoU4yEdJtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741721661; c=relaxed/simple;
-	bh=p87FX0SnpPxZ9l1ZBDNa6QJprc90RiIs0UOFXGZGDxM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EKCF8Ga4tJWNW9LyOFMe7HjZvSglD3uG4JOA4VQS2yuKW0LNU/wXcSK3cL0/Cyf4g3n6HSIU8dfQnJhYLEFj3ynJ9LzFUK9VzyTM+tBRrSW10d8MXQ3pc46c7SlDTUHb+gwA7rJwmjDHasJzn9ZWj/KrH6DpQgQbjTkczOiPib0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OlsVUps8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741724141; c=relaxed/simple;
+	bh=FEISgi/l4oR05eYMQZtexpwvOvtdSl5KimiXIHb0ch8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JCgR7hhI/tik5AlYWCtJg0bT0SLu7JXbtKMc2gqz0dVhOJdxrX7x4PfY2SEYAl9C6ZfOGfe7J6tV49BEG2osbm2tIcj2no2O1RieKSxYUa/K9kneJL495bjoKKmaMNI9UXJWzYOvRwPWQ4RazCux7PxkaM2f1pR5TTHVl92I91c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WoRpsrIU; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OlsVUps8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46C8FC4CEE9;
-	Tue, 11 Mar 2025 19:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741721659;
-	bh=p87FX0SnpPxZ9l1ZBDNa6QJprc90RiIs0UOFXGZGDxM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OlsVUps8vrLIXM3DGWSr6KQfKDIbTTZV/i2KsDQ5w74YasGSAPZHdgYEGSpXG6eoI
-	 AaFU3I652y/uAms2zTuP9rNq3cMsg+a4jnD/fZw9AZ3QhXuOGTUkSZ6fRhZWpENM8l
-	 XpgfnHMC9vuPV1u8s+qXmCpY7hxwCWPOQPKXz/G2SteMk0H3kP+NraT4IL3ZkI++Qm
-	 exbdtkzmMl1Uw9ylgaCthmVlxvVTYqeYG+yGeZwjjm3HzBEj21QN8nM5C2E3FVda8m
-	 X+gGPUbFzXnM3FB+7pfM8uoucLf6jKBZzdHqHjNHxIP4G3sahe5GqbR4+G71yUk+Pz
-	 Rt01Cw+xFgd2A==
-Date: Tue, 11 Mar 2025 09:34:18 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk, josef@toxicpanda.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
-Message-ID: <Z9CQOuJA-bo4xZkH@slm.duckdns.org>
-References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
- <Z8sZyElaHQQwKqpB@slm.duckdns.org>
- <5fc124c9-e202-99ca-418d-0f52d027640f@huaweicloud.com>
- <Z85LjhvkCzlqBVZy@fedora>
- <Z88K5JtR4rhhIFsY@slm.duckdns.org>
- <baba2f82-6c35-8c24-847c-32a002009b63@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WoRpsrIU"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741724137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K3k/t7z7wqE8OoTjAqtCf+7y0qN5BcjA4jAcbb7jrc4=;
+	b=WoRpsrIUazYlL8JVLUi6H26W+CNs9bkGn0kPQ04FPGmeMnuoPWOCVWFQnPbCT+NiL0Fm46
+	opLCUAIb9yHqfsqYjgESSfy8TvXBNieziKIdzOt2VBvsE665FvmT0ZgKuyLOndkm60ufMm
+	jJxRX82tekYkkSygnD2l0VDBEwfSU6g=
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: linux-bcachefs@vger.kernel.org
+Cc: Kent Overstreet <kent.overstreet@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Date: Tue, 11 Mar 2025 16:15:15 -0400
+Message-ID: <20250311201518.3573009-14-kent.overstreet@linux.dev>
+In-Reply-To: <20250311201518.3573009-1-kent.overstreet@linux.dev>
+References: <20250311201518.3573009-1-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <baba2f82-6c35-8c24-847c-32a002009b63@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+REQ_FUA|REQ_READ means "do a read that bypasses the controller cache",
+the same as writes.
 
-On Tue, Mar 11, 2025 at 11:08:00AM +0800, Yu Kuai wrote:
-...
-> > That said, I'm not sure about changing the behavior now. blk-throtl has
-> > mostly used the number of bios as long as it has existed and given that
-> > there can be a signficant difference between the two metrics, I'm not sure
-> > the change is justified at this point.
-> 
-> If we really concern about the behavior change, can we consider a new
-> flag that can switch to the old behavior? We'll see if any user will
-> complain.
+This is useful for when the filesystem gets a checksum error, it's
+possible that a bit was flipped in the controller cache, and when we
+retry we want to retry the entire IO, not just from cache.
 
-Yeah, that may be the right way to go about this, but let me turn this
-around and ask you why adding a new behavior would be a good idea. What
-problems are you trying to solve?
+The nvme driver already passes through REQ_FUA for reads, not just
+writes, so disabling the warning is sufficient to start using it, and
+bcachefs is implementing additional retries for checksum errors so can
+immediately use it.
 
-Thanks.
+Link: https://lore.kernel.org/linux-block/20250311133517.3095878-1-kent.overstreet@linux.dev/
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+---
+ block/blk-core.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d6c4fa3943b5..7b1103eb877d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -793,20 +793,21 @@ void submit_bio_noacct(struct bio *bio)
+ 			goto end_io;
+ 	}
+ 
++	if (WARN_ON_ONCE((bio->bi_opf & REQ_PREFLUSH) &&
++			 bio_op(bio) != REQ_OP_WRITE &&
++			 bio_op(bio) != REQ_OP_ZONE_APPEND))
++		goto end_io;
++
+ 	/*
+ 	 * Filter flush bio's early so that bio based drivers without flush
+ 	 * support don't have to worry about them.
+ 	 */
+-	if (op_is_flush(bio->bi_opf)) {
+-		if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_WRITE &&
+-				 bio_op(bio) != REQ_OP_ZONE_APPEND))
++	if (op_is_flush(bio->bi_opf) &&
++	    !bdev_write_cache(bdev)) {
++		bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
++		if (!bio_sectors(bio)) {
++			status = BLK_STS_OK;
+ 			goto end_io;
+-		if (!bdev_write_cache(bdev)) {
+-			bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
+-			if (!bio_sectors(bio)) {
+-				status = BLK_STS_OK;
+-				goto end_io;
+-			}
+ 		}
+ 	}
+ 
 -- 
-tejun
+2.47.2
+
