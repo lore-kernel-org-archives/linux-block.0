@@ -1,42 +1,39 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86E4264A71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD0E264638
 	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 20:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741724141; cv=none; b=H2Okta4tt7cp5VwldpSX1TOAkZHl+zSyMp+7s3hsmB3tpJfepM6zRXqk7FxC76WHcAlPSX5ygPejZAqrzuDzppsvW4QuJaUa20pw3A1yGwI8N85uDRWn81+JkIyEtIDqMxNOR0FW+ML4n+HNl098VYzR1zHt4gZMRhoU4yEdJtE=
+	t=1741724141; cv=none; b=lD+RXmxFwiY0Br7CvXknIaseYu7GmFyZypjmxp5XcYDOFTSppSCwMLWoOByrCmkh7f7gp6wfz38MKWvD10AODyS0fojUj/Fy5HJRcdYmgGH+RqGGssXz0uKcdZw7oS8JsVssEabpNw44/sFEEGeoar146UzbP9mSATdZrX4Ef9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741724141; c=relaxed/simple;
-	bh=FEISgi/l4oR05eYMQZtexpwvOvtdSl5KimiXIHb0ch8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JCgR7hhI/tik5AlYWCtJg0bT0SLu7JXbtKMc2gqz0dVhOJdxrX7x4PfY2SEYAl9C6ZfOGfe7J6tV49BEG2osbm2tIcj2no2O1RieKSxYUa/K9kneJL495bjoKKmaMNI9UXJWzYOvRwPWQ4RazCux7PxkaM2f1pR5TTHVl92I91c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WoRpsrIU; arc=none smtp.client-ip=91.218.175.185
+	bh=9kxzyQ7WNcc0CNS9HuQkrJLgzQDtU3H0tehHlZkAuQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ShAAOsrOzy3VdOub64Az+wwDZHiUGx0UlsMvfXFYfPQLz0yTnniDWTZfhB6mzlkd+qJTZ/kLZbaye0nk1gsY5seFPzUsy5iJ6fMQnUNnLDmbI0lOrCQCYSqk0481RIrpRcN7kjTR9rqDbtGXIYwfAv87ycqAXkd+XM0yA5nGcc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lexv+R5U; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WoRpsrIU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lexv+R5U"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741724137;
+	t=1741724127;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K3k/t7z7wqE8OoTjAqtCf+7y0qN5BcjA4jAcbb7jrc4=;
-	b=WoRpsrIUazYlL8JVLUi6H26W+CNs9bkGn0kPQ04FPGmeMnuoPWOCVWFQnPbCT+NiL0Fm46
-	opLCUAIb9yHqfsqYjgESSfy8TvXBNieziKIdzOt2VBvsE665FvmT0ZgKuyLOndkm60ufMm
-	jJxRX82tekYkkSygnD2l0VDBEwfSU6g=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3Nrgdr9y7mpusjQj2TskrwXHx7MXt9LTGAJ46g3dBsk=;
+	b=lexv+R5UkC6Gdc/rM2MhzVrOX0b7jFwG2Gs7ANgePxvEb3dnpD8tbo9HEZ838jutsadf15
+	e9mKk7m36SB583Lwj8EvEiYJkxM/J9uLJ09luz1SzyFoXiO4nNW8qTN2/MQ+nUE6RKXvql
+	2bDXkIbLz6N5mU8qa5Iuof7iW74FziI=
 From: Kent Overstreet <kent.overstreet@linux.dev>
-To: linux-bcachefs@vger.kernel.org
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	Jens Axboe <axboe@kernel.dk>,
+To: linux-bcachefs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Date: Tue, 11 Mar 2025 16:15:15 -0400
-Message-ID: <20250311201518.3573009-14-kent.overstreet@linux.dev>
-In-Reply-To: <20250311201518.3573009-1-kent.overstreet@linux.dev>
-References: <20250311201518.3573009-1-kent.overstreet@linux.dev>
+Cc: Kent Overstreet <kent.overstreet@linux.dev>,
+	Roland Vet <vet.roland@protonmail.com>,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH 00/14] better handling of checksum errors/bitrot
+Date: Tue, 11 Mar 2025 16:15:02 -0400
+Message-ID: <20250311201518.3573009-1-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,61 +43,100 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-REQ_FUA|REQ_READ means "do a read that bypasses the controller cache",
-the same as writes.
+Roland Vet spotted a good one: currently, rebalance/copygc get stuck if
+we've got an extent that can't be read, due to checksum error/bitrot.
 
-This is useful for when the filesystem gets a checksum error, it's
-possible that a bit was flipped in the controller cache, and when we
-retry we want to retry the entire IO, not just from cache.
+This took some doing to fix properly, because
 
-The nvme driver already passes through REQ_FUA for reads, not just
-writes, so disabling the warning is sufficient to start using it, and
-bcachefs is implementing additional retries for checksum errors so can
-immediately use it.
+- We don't want to just delete such data (replace it with
+  KEY_TYPE_error); we never want to delete anything except when
+  explicitly told to by the user, and while we don't yet have an API for
+  "read this file even though there's errors, just give me what you
+  have" we definitely will in the future.
 
-Link: https://lore.kernel.org/linux-block/20250311133517.3095878-1-kent.overstreet@linux.dev/
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
----
- block/blk-core.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+- Not being able to move data is a non-option: that would block copygc,
+  device removal, etc.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d6c4fa3943b5..7b1103eb877d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -793,20 +793,21 @@ void submit_bio_noacct(struct bio *bio)
- 			goto end_io;
- 	}
- 
-+	if (WARN_ON_ONCE((bio->bi_opf & REQ_PREFLUSH) &&
-+			 bio_op(bio) != REQ_OP_WRITE &&
-+			 bio_op(bio) != REQ_OP_ZONE_APPEND))
-+		goto end_io;
-+
- 	/*
- 	 * Filter flush bio's early so that bio based drivers without flush
- 	 * support don't have to worry about them.
- 	 */
--	if (op_is_flush(bio->bi_opf)) {
--		if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_WRITE &&
--				 bio_op(bio) != REQ_OP_ZONE_APPEND))
-+	if (op_is_flush(bio->bi_opf) &&
-+	    !bdev_write_cache(bdev)) {
-+		bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
-+		if (!bio_sectors(bio)) {
-+			status = BLK_STS_OK;
- 			goto end_io;
--		if (!bdev_write_cache(bdev)) {
--			bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
--			if (!bio_sectors(bio)) {
--				status = BLK_STS_OK;
--				goto end_io;
--			}
- 		}
- 	}
- 
+- And, moving said extent requires giving it a new checksum - strictly
+  required if the move has to fragment it, teaching the write/move path
+  about extents with bad checksums is unpalateable, and anyways we'd
+  like to be able to guard against more bitrot, if we can.
+
+So that means:
+
+- Extents need a poison bit: "reads return errors, even though it now
+  has a good checksum" - this was added in a separate patch queued up
+  for 6.15.
+
+  It's an incompat feature because it's a new extent field, and old
+  versions can't parse extents with unknown field types, since they
+  won't know their sizes - meaning users will have to explicitly do an
+  incompat upgrade to make use of this stuff.
+
+- The read path needs to do additional retries after checksum errors
+  before giving up and marking it poisoned, so that we don't
+  accidentally convert a transient error to permanent corruption.
+
+- The read path gets a whole bunch of work to plumb precise modern error
+  codes around, so that e.g. the retry path, the data move path, and the
+  "mark extent poisoned" path all know exactly what's going on.
+
+- Read path is responsible for marking extents poisoned after sufficient
+  retry attempts (controlled by a new filesystem option)
+
+- Data move path is allowed to move extents after a read error, if it's
+  a checksum error (giving it a new checksum) if it's been poisoned
+  (i.e. the extent flags feature is enabled).
+
+Code should be more or less finalized - still have more tests for corner
+cases to write, but "write corrupt data and then tell rebalance to move
+it to another device" works as expected.
+
+TODO:
+
+- NVME has a "read recovery level" attribute that controlls how hard the
+  erasure coding algorithms work - we want that plumbed.
+
+  Before we give up and move data that we know is bad, we need to try
+  _as hard as possible_ to get a successful read.
+
+Code currently lives in
+https://evilpiepirate.org/git/bcachefs.git/log/?h=bcachefs-testing
+
+Kent Overstreet (14):
+  bcachefs: Convert read path to standard error codes
+  bcachefs: Fix BCH_ERR_data_read_csum_err_maybe_userspace in retry path
+  bcachefs: Read error message now indicates if it was for an internal
+    move
+  bcachefs: BCH_ERR_data_read_buffer_too_small
+  bcachefs: Return errors to top level bch2_rbio_retry()
+  bcachefs: Print message on successful read retry
+  bcachefs: Don't create bch_io_failures unless it's needed
+  bcachefs: Checksum errors get additional retries
+  bcachefs: __bch2_read() now takes a btree_trans
+  bcachefs: Poison extents that can't be read due to checksum errors
+  bcachefs: Data move can read from poisoned extents
+  bcachefs: Debug params for data corruption injection
+  block: Allow REQ_FUA|REQ_READ
+  bcachefs: Read retries are after checksum errors now REQ_FUA
+
+ block/blk-core.c              |  19 +-
+ fs/bcachefs/bcachefs_format.h |   2 +
+ fs/bcachefs/btree_io.c        |   2 +-
+ fs/bcachefs/errcode.h         |  19 +-
+ fs/bcachefs/extents.c         | 157 +++++++++-------
+ fs/bcachefs/extents.h         |   7 +-
+ fs/bcachefs/extents_types.h   |  11 +-
+ fs/bcachefs/io_read.c         | 325 +++++++++++++++++++++++++---------
+ fs/bcachefs/io_read.h         |  21 +--
+ fs/bcachefs/io_write.c        |  24 +++
+ fs/bcachefs/move.c            |  26 ++-
+ fs/bcachefs/opts.h            |   5 +
+ fs/bcachefs/super-io.c        |   4 +
+ fs/bcachefs/util.c            |  21 +++
+ fs/bcachefs/util.h            |  12 ++
+ 15 files changed, 473 insertions(+), 182 deletions(-)
+
 -- 
 2.47.2
 
