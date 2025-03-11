@@ -1,116 +1,123 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC691E5B83
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5581E0DD1
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741669372; cv=none; b=OTrV7PH5Wlh1ln0j7oyTVZ4UbxDXYIZpHgLUwEzUyPAooSLlcM0IE6Ns7yHB/2Taa6w42I4J1j7DBSQSgHjUUNswrKyJ4zyBw617pnNyQUTevMQBRprJLnH6ZR2jktF/A8vGTHlkF7+M9A1zhoye6pU3vBe5FlywLukfbLRSTG8=
+	t=1741669380; cv=none; b=JoDUipz8ObN+A2IJiG4zM46A+zlyLcHYq7JsXLdrzF75zVLUEGZ9FHW/ZHzYKDPuDqkMyyTS+3snf6EVPG98gaj93gRkvjDkF7xq4XAtTWdcFvVfgy77lnUqQlqulHzJXmMlruwEhF9R93yXnn3xQjHMNICkJxPti+wKyeqx+g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741669372; c=relaxed/simple;
-	bh=RhaZm/cSv+yC3HFSPC17iQsu6nY2OVc5d4bSK3oNuHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L9ZNmHJKNHabXo1hctp6NWsvAH9H9yBHdQ/5VLxDtsgkiSHOtIqLu1vA1Fo1gerV3Fc8I8ncmoix3mcgERK3A8x1u+XaBNWQ0NRk1J66UXB1hNfsFG8HvxQeeSPJ41P9mLylI5hRfRTjYIvg3ZzdzYL9EoJ47D6htMpzRayTY4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=IGpOwHvb; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1741669380; c=relaxed/simple;
+	bh=3ECEa2t9d5y92Pz32OnF3QpiFge1TDTBvaI3574/zjY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yvt89uwbLkCogIpB1VcJHpp2IMOrlMPfR/3xqP4LMNgP/FAyE/nYqTzPsIn3b8+1pgS2sfEOru6fQT0C3haUVUVqoTrFa7bsdVgNVoXQiEigTOM+MuMpGStg9mHlDPq/XlDYqzmdX63MD/nIV+VOL+i3QiMOf9/x2AWSjYf6nJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7UbpngM; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IGpOwHvb"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22359001f1aso120151725ad.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 22:02:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7UbpngM"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e61375c108so4607768a12.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 22:02:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1741669371; x=1742274171; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YsL06UvFaIQXEiahdE6DhBRWjwB8pb861e5j/ftXC1c=;
-        b=IGpOwHvbnFgxNs+0ESrki4vAB3llPBkZT4bciVn7QuEVB1hOhhPFcqU9YavYEfOABS
-         Blo3DfWxOj3KdsjwX80cj7mClPha/FKuNWDCGr9Ze1bdi92lOYVibmRIPmY5hu7YQ1Ef
-         f3YIR75NU5EEVIFMctroZZ1V8Ad6hjYoAfcQc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741669371; x=1742274171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1741669376; x=1742274176; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YsL06UvFaIQXEiahdE6DhBRWjwB8pb861e5j/ftXC1c=;
-        b=W6B+i90c+Hz8zfbSgIhNwSjZqrunA0SBjI7OVaMdK1u9r5ISz7hSWQVkO4nEsYXd6s
-         9tgvh1QD53rGlnKNkelYbLiGYAvCP+quRLoYM57/MtAZCIOOH0UGVA5lMetnxxMEaJGq
-         jiNtJevHspgUGpf8i40tY8jYYrZ7imkn1h1mRlAL1MS0Di0hreVY8NlIYyS9R6hu0b5f
-         6CRVdIg3YU5gc3WAh0WQTQTGwWrFra7hHw4he2/UkvnmD+5wMco5pgJrUjU0wgPt9PQq
-         854EEi8D6o8RmxYwFqkC+zizLcgZ3ib/Yzk7gZuCuJRUOx72S68uYnFxz00lMSEBTF2e
-         3K5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUiUy+fRex9kFCe2fleHmYiemFYjgB3HRq2Y0C5iBeeosdU7QSwX7GXHSYEYCp4dxaCL/Jq48nDUWNQpA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKy4P6aqbk+SInYnBwTwfDq7GsrjEEEwNnl8ykYw3DHzkbXxF0
-	uW6rQ9Atx1bMYw5iwNNzEZwu7X0ZNahyeVmXaJkkfkXvQ1sDyU37LXbtJlWBuA==
-X-Gm-Gg: ASbGncth1mlDy+rQzTRpArpM0NlDikbR6gPJKuxvL+ysTPL7I5ROwMZ4/hl7EBeaVxQ
-	P2p0HqlGZzRUfTkII2aTfYysFFXgYXTiRbn6JopUmuFT+L8Vg2kEUzCj4sRRxlfNXoSABY7ocYd
-	USPN2nshV6kxPNWsl3E1BJUfpLBx5OQutyQyIG6UWjARYItgjZxO3nqLOZnMbVYSnDPKzzOpWh7
-	l+QvuOMqLLxTmeke18RkZlBXmRmR6HdaG1yQRzYg5g2Hz7hggwZAJgPaGYr54iRLC/H5KrzV7Kj
-	yXwbTpIA4TzG4/XDI0qYy+9XhsG8044vL1RiLZ2S1Umy2VZX
-X-Google-Smtp-Source: AGHT+IFKfiFQm8ms/qPRi+wcBaiWNYQfbAZZRcHY4n0zNhnBnJ9IpLaSuc9kTChF2fwrDmR2pqJfNQ==
-X-Received: by 2002:a17:903:40cb:b0:223:6744:bfb9 with SMTP id d9443c01a7336-22428ab7691mr283789275ad.41.1741669370601;
-        Mon, 10 Mar 2025 22:02:50 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:cce8:82e2:587d:db6a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109ddca2sm87480825ad.13.2025.03.10.22.02.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 22:02:50 -0700 (PDT)
-Date: Tue, 11 Mar 2025 14:02:42 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Barry Song <21cnbao@gmail.com>, Qun-Wei Lin <qun-wei.lin@mediatek.com>, 
-	Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Chris Li <chrisl@kernel.org>, 
-	Ryan Roberts <ryan.roberts@arm.com>, "Huang, Ying" <ying.huang@intel.com>, 
-	Kairui Song <kasong@tencent.com>, Dan Schatzberg <schatzberg.dan@gmail.com>, 
-	Al Viro <viro@zeniv.linux.org.uk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, Casper Li <casper.li@mediatek.com>, 
-	Chinwen Chang <chinwen.chang@mediatek.com>, Andrew Yang <andrew.yang@mediatek.com>, 
-	James Hsu <james.hsu@mediatek.com>
-Subject: Re: [PATCH 2/2] kcompressd: Add Kcompressd for accelerated zram
- compression
-Message-ID: <mzythwqmi22gmuunmqcyyn7eiggevvrzkpqmjkoxsj4q4jc46s@64jdco5s6spa>
-References: <20250307120141.1566673-1-qun-wei.lin@mediatek.com>
- <20250307120141.1566673-3-qun-wei.lin@mediatek.com>
- <CAGsJ_4xtp9iGPQinu5DOi3R2B47X9o=wS94GdhdY-0JUATf5hw@mail.gmail.com>
- <CAKEwX=OP9PJ9YeUvy3ZMQPByH7ELHLDfeLuuYKvPy3aCQCAJwQ@mail.gmail.com>
+        bh=nU3DsZ1XAulR9Bt1UcDHguhYwisbNbjiLIOTrtdFyTk=;
+        b=O7UbpngMo/UkMZPdjaBZ+m2+tEZAhGRwNCdZH4OsRnQJE0xnapSfIrCGsEacv6I4t+
+         7nZ4obbSUPuAAW3by+/6h68jfdodGDDO49jasga2QucG3OtJxAa8hbgG6Ntx3t4/Azjk
+         huDFol7es/jJjR8BehrGcMvKu2WGaUoDVcF5LvlJRVvLwD5/EuNToEW7tl2RmNn+qTo/
+         doydAPohImoDifnqXjljnEsttje4X+ls147zOVKFghMVYZGpH6ds3lFjdEHWMxGE1DK7
+         Fh8C3YM6B95chfIiWHqZ38etlp7JPJJlnludEWAaWKE+c+EYrNEl4RpZXYDljet7MQ4S
+         w1Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741669376; x=1742274176;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nU3DsZ1XAulR9Bt1UcDHguhYwisbNbjiLIOTrtdFyTk=;
+        b=AJjMad/I4cNxTHnYH+Mcn6vrwmJiza5K+hQVS6Ff3jTmHvYHciLllBV1XtOZEZTjeI
+         81U6JAko+C8TezJK3Z6Ck/tW2Giw0vfkLTQFiPjOjVSOnUUmrzMjrsnDsvgKvRgeNSH8
+         r2QgZp7SHkifPrM68I9c1vW1oRK+3YzpSx2vCcFr/uDI5HVATGWcSJExm3L99oL8Crvn
+         UFQ4urHl0wvVJysl+bDXEt8kIj8Qnq8xYFTbC8JRquTvBeKH0mqsaOrl3hO1zDhszvhP
+         u9WJHHRBQkJva2rHnxknXuwQwKNA7zqvyxNj2atM0nTDbZx26vNhjsJcXOIoIyGWeOGf
+         mj7Q==
+X-Gm-Message-State: AOJu0Yxdj+PT6AWMsxUhjwXu1Bsm0svngAbjQZ9vP7q/YjYe5x1z3MJD
+	qbNjh+eTlNFClBjfaxM5QVoc/W0WgDcWM1lx+cQCFqo4GthRMhHRGtoxVn/42JMwS/xDK0dVR9n
+	HIdiXr5yUIdsdvLVCvI1dxpaxY40=
+X-Gm-Gg: ASbGncsTyqJYWad2kiMGaOwxlRGCWiZCsxcGuzcSvZP6Dj5opGzYl0zCdt6JEV8M82t
+	CBKb9PBzja79VnBwsOBWR0vGth9BvqzPj1wxhf4B0WkAoI8wJWY69WrefgReiUSboxUQ35udM2X
+	iM5ylZrHRvr3/z1zxJZKezmXXaSw==
+X-Google-Smtp-Source: AGHT+IE7p9ESJhaRtmTdHGCk8dKC1MDYNTTHcp542UMCynAJicglEY62j02PsiPON63nvymsVjYo1GJqTYgydaJ1MSA=
+X-Received: by 2002:a05:6402:13d0:b0:5e5:c5f5:f5b with SMTP id
+ 4fb4d7f45d1cf-5e5e249af7bmr18994497a12.26.1741669376163; Mon, 10 Mar 2025
+ 22:02:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKEwX=OP9PJ9YeUvy3ZMQPByH7ELHLDfeLuuYKvPy3aCQCAJwQ@mail.gmail.com>
+References: <20250311024144.1762333-1-shinichiro.kawasaki@wdc.com> <20250311024144.1762333-3-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250311024144.1762333-3-shinichiro.kawasaki@wdc.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 11 Mar 2025 13:02:44 +0800
+X-Gm-Features: AQ5f1JqbCkxhn7T9fgxWWXH1RylAmKuYJRnbUWmBaNKkk8A2xfV5IxO-QOVV2tg
+Message-ID: <CAJSP0QXZQWSVV60SWDey7i55VqAw7H+W9mQZ1uQyeOLK4TounA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: change blk_mq_add_to_batch() third argument
+ type to blk_status_t
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+	Christoph Hellwig <hch@infradead.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	Alan Adamson <alan.adamson@oracle.com>, virtualization@lists.linux.dev, 
+	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	"Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Sven Peter <sven@svenpeter.dev>, Janne Grunau <j@jannau.net>, 
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (25/03/07 15:13), Nhat Pham wrote:
-> > > +config KCOMPRESSD
-> > > +       tristate "Kcompressd: Accelerated zram compression"
-> > > +       depends on ZRAM
-> > > +       help
-> > > +         Kcompressd creates multiple daemons to accelerate the compression of pages
-> > > +         in zram, offloading this time-consuming task from the zram driver.
-> > > +
-> > > +         This approach improves system efficiency by handling page compression separately,
-> > > +         which was originally done by kswapd or direct reclaim.
-> >
-> > For direct reclaim, we were previously able to compress using multiple CPUs
-> > with multi-threading.
-> > After your patch, it seems that only a single thread/CPU is used for compression
-> > so it won't necessarily improve direct reclaim performance?
-> >
-> > Even for kswapd, we used to have multiple threads like [kswapd0], [kswapd1],
-> > and [kswapd2] for different nodes. Now, are we also limited to just one thread?
-> > I also wonder if this could be handled at the vmscan level instead of the zram
-> > level. then it might potentially help other sync devices or even zswap later.
-> 
-> Agree. A shared solution would be much appreciated. We can keep the
-> kcompressd idea, but have it accept IO work from multiple sources
-> (zram, zswap, whatever) through a shared API.
+On Tue, Mar 11, 2025 at 10:42=E2=80=AFAM Shin'ichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> Commit 1f47ed294a2b ("block: cleanup and fix batch completion adding
+> conditions") modified the evaluation criteria for the third argument,
+> 'ioerror', in the blk_mq_add_to_batch() function. Initially, the
+> function had checked if 'ioerror' equals zero. Following the commit, it
+> started checking for negative error values, with the presumption that
+> such values, for instance -EIO, would be passed in.
+>
+> However, blk_mq_add_to_batch() callers do not pass negative error
+> values. Instead, they pass status codes defined in various ways:
+>
+> - NVMe PCI and Apple drivers pass NVMe status code
+> - virtio_blk driver passes the virtblk request header status byte
+> - null_blk driver passes blk_status_t
+>
+> These codes are either zero or positive, therefore the revised check
+> fails to function as intended. Specifically, with the NVMe PCI driver,
+> this modification led to the failure of the blktests test case nvme/039.
+> In this test scenario, errors are artificially injected to the NVMe
+> driver, resulting in positive NVMe status codes passed to
+> blk_mq_add_to_batch(), which unexpectedly processes the failed I/O in a
+> batch. Hence the failure.
+>
+> To correct the ioerror check within blk_mq_add_to_batch(), make all
+> callers to uniformly pass the argument as blk_status_t. Modify the
+> callers to translate their specific status codes into blk_status_t. For
+> this translation, export the helper function nvme_error_status(). Adjust
+> blk_mq_add_to_batch() to translate blk_status_t back into the error
+> number for the appropriate check.
+>
+> Fixes: 1f47ed294a2b ("block: cleanup and fix batch completion adding cond=
+itions")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+>  drivers/block/null_blk/main.c | 2 +-
+>  drivers/block/virtio_blk.c    | 5 +++--
 
-I guess it also need to take swapoff into consideration (especially
-if it takes I/O from multiple sources)?
+For virtio_blk:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
