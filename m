@@ -1,167 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D2011CBA;
-	Tue, 11 Mar 2025 12:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3F05A4D5
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 12:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741695048; cv=none; b=tw63TyAjb8IA6iAZEHyDniN91cDVjCUiaEULZdXMtP88aZvSSkWt0TpwNVU/EyIY52APtb2LmjhDul5Sgz6ZFCuitvHxFGoowBYxeaXzvKiM10VWhPM+zeB2MEwGxST5WpxoL4tu2pBa2c44EdmwfwbY3OlFqp50xK5Lzc/A6e4=
+	t=1741696616; cv=none; b=iadW13QUSKdhw7DbQi1im6cxqjE330U1GhAeOc8SsduKLQ2+QTyJsEuoV8w7m6bZPdYCbWPUhyew98pVr4fcywb5wC9wLGYiJN8VxFI3CcufKGxBby6tvatx8ylp3eKMh/uMS5X4/rC/lozDO+tvOIFe7SIttr35nf8yyNGHIYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741695048; c=relaxed/simple;
-	bh=MPQEg5ZspKJem06ktpIpqTUrYZgcnEZSH61y0z6cE1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cjHCgWDuH+YWDsNhDRT75QRzPz+ntKoYN5434menu3z7RHy2bXwCilReiAjI+GexUiTl5nazWieP9Khcoe/EDMMTuI8H923QCVWm9+mT8ddyKyGcQtgZrw7EwTWtei0n0QA+foHGKlU3V+AUufLdfm4ZRdr+9JdHUXplONOdON4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hT8F7hR2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741696616; c=relaxed/simple;
+	bh=CePJDN6866RNu5OilP7NSNORan/RA/RBfUihDSOHno8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lqogzGZIeGlnhojDau13kHmsHndqaUZEDjZt6WJDg4+AAKdYDKuoZ8xOlh+4pnGZvoKY+iZxJQL0TC81jErW7is3M2U+4kTB/La4UOGhOATEyto6xqLXbh1oiyQBG0yPAdADjvflSQGcAe/e5+ZTyuXsWicpyhm5xFopPWkgZMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CGF+l0I5; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hT8F7hR2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32850C4CEEC;
-	Tue, 11 Mar 2025 12:10:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741695047;
-	bh=MPQEg5ZspKJem06ktpIpqTUrYZgcnEZSH61y0z6cE1w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hT8F7hR2KxabWlh8ZZQRGkj7dxr8nftImoYF0q+KU6VsZTTVREPRD2dnMRH0WX3l2
-	 YmBXIlsDIwyIGHVU9B91AH2HAs7ObYRD2frrYHZAgSRe4ezF9qk7AwEXgOdTG4zd5q
-	 7UMcUEZl2nlExVjCpCZ/bfV/TudPLcoAMZm/7EZ+YtxRRdgLBc1vf1Y6kj5bt78O44
-	 ZvEpg4IAaoG+i+brns+Qq9ml/nrjlkEYHwseDkQxPnw5urGZLrgY2cTZV6Kfio5892
-	 58IirZJbIozOINhm3+TfIz0tzqQX6cfTEY5izi5OMEKaK5gEaYXTKmnwGxTxJKFfde
-	 28oEb6E1lj0VA==
-Date: Tue, 11 Mar 2025 13:10:43 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: kernel test robot <oliver.sang@intel.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>
-Cc: Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev, lkp@intel.com, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, John Garry <john.g.garry@oracle.com>, 
-	linux-block@vger.kernel.org, ltp@lists.linux.it
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <20250311-testphasen-behelfen-09b950bbecbf@brauner>
-References: <202503101536.27099c77-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CGF+l0I5"
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-3914a5def6bso1317293f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1741696613; x=1742301413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7qYs9YHqi3o8BYflhXgM2/h7DX07No2svICRJmWY6FQ=;
+        b=CGF+l0I5Wsrch1iKaNhFNsc5fv4W/qTGaw/bNGmoseaXUOT+2ET757nQPK4LILnZQe
+         NzPbI/T0cinS74vqEzOL4MjQI5edjxOoHs1Gns4eXwRbrRZnrQZTxpMS/viv6FBf86nT
+         7yDM7hJFIPQP6hEIZlkEmyC8Qdw9ZylQpbjyWPqHgaPvVorEwplGVoiN2LAyRacz9MRT
+         LQoyOY36HWdHQcCf3d3aSANd16Tr568SPBQndn3TWNr3yMoaAgtABiIIJHQ+itfHox6K
+         hFX4lEOZt7+r+bFRpXkH4f2mx4imRji0yfcNNoTdiw9zoxVzuJX4yoPUzIqTAWs/C2YF
+         cWIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741696613; x=1742301413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7qYs9YHqi3o8BYflhXgM2/h7DX07No2svICRJmWY6FQ=;
+        b=stHhelJlAoGQr9ugoalhVqMO4eVCMmgSEiniVwB2gd+s2BQixA349dtP5TbmNyOi8C
+         rwv3goczsrPmalG+FYK5/trWZbGub8jPhFO28NsH6pd6GDIJJnci3sKVZwc4pbLIchJi
+         5V0d+MEq/7qp1wKsyvwAQPWygqnWItaSaUuz+0jH6RguSvMSa53z22KIqtCWW8ScQB64
+         1t8pQBfeUAjGhnGrWUr4zAg27ZaFcjgx/3uM9Eo8n8boBy5xj7Bas5msdlMAlQE7GZ+C
+         WJnt6qyyRd3EmJ0zKpPrsR1EsZO61RgRYD1zjHzBHSpHWaivi0lsYTgdHd9DZaAjpd+w
+         K3gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUoS4Y6VEUTpjvmuuT5zmssMQm0ySc++srk5Ef356L0rddMrVCuu/7eliRvo/Xk6OIG4oJFxJDvSf53JQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YySlSOMUJ1PBVjKlrZLBnD0+VWac5Bp4AVMmIog1IoPGCWwFw2M
+	gZZnbGKkFy/ymDoNmzdbbkklU3g2wGYMC4KOGefQM0IW6F2mL7WUFSESbH+Vlko=
+X-Gm-Gg: ASbGncu/jEg8it58cDK3kD6fKKRplLji2RhXxTd7jcc7s+35z8+QkZ7RiUfxDDVtiDC
+	96ijEX/0FjkqbfwCQ3n7gSesdzZoxaRv/4hDrNvIsGG0uEPazSSy2ypKx2BDlg5TYRHPvDQ91RP
+	YXWy10/Uh6ySOSQSPU1u0KO/uf9QqBP26zeuzFKYnHu+vIao1RwvXtmPQ3Y2UJmZWwH93GNbdUR
+	SwiX84H6Hp0BLBfvVJMs+/z664tgK9uaBGPQIwGEm1jWUL2YRxQQ5MMSka1Jp2fT1Xc9UXbiMtP
+	1lNGeXywMLpDPSRSKgICu4+ghjdlYv6OAL5ddCtdunhfDrG64koHJF0rHg==
+X-Google-Smtp-Source: AGHT+IEBZYqz4EXYjBrQl7MEBAEBtNENBPTwZcu8eE/AXSvpLAC27EkQUSrI1TFPSdtbH6FbRzmNrg==
+X-Received: by 2002:adf:b312:0:b0:390:f6cd:c89f with SMTP id ffacd0b85a97d-39132db6f86mr10434242f8f.53.1741696613012;
+        Tue, 11 Mar 2025 05:36:53 -0700 (PDT)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d04004240sm9742265e9.3.2025.03.11.05.36.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 05:36:52 -0700 (PDT)
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-mm@kvack.org
+Cc: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Waiman Long <longman@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Tejun Heo <tj@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Michal Hocko <mhocko@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2 00/11] cgroup v1 deprecation messages
+Date: Tue, 11 Mar 2025 13:36:17 +0100
+Message-ID: <20250311123640.530377-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202503101536.27099c77-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 10, 2025 at 03:43:49PM +0800, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed "BUG:sleeping_function_called_from_invalid_context_at_mm/util.c" on:
-> 
-> commit: 3c20917120ce61f2a123ca0810293872f4c6b5a4 ("block/bdev: enable large folio support for large logical block sizes")
-> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
+Memory controller had begun to print warning messages when using some
+attributes that do no have a counterpart in its cgroup v2
+implementation. This is informative to users who run (unwittingly) on v1
+or to distros that run v1 (they can learn about such users or prepare
+for disabling v1 configs).
 
-Is this also already fixed by:
+I consider the deprecated files in three categories:
+  - RE) replacement exists,
+  - DN) dropped as non-ideal concept (e.g. non-hierarchical resources),
+  - NE) not evaluated (yet).
 
-commit a64e5a596067 ("bdev: add back PAGE_SIZE block size validation for sb_set_blocksize()")
+For RE, I added the replacement into the warning message, DN have only a
+plain deprecation message and I marked the commits with NE as RFC.
+Also I'd be happy if you would point out some forgotten knobs that'd
+deserve similar warnings.
 
-?
+The level of messages is info to avoid too much noise (may be increased
+in future when there are fewer users). Some knobs from DN have warn
+level.
 
-> 
-> in testcase: ltp
-> version: ltp-x86_64-0f9d817a3-1_20250222
-> with following parameters:
-> 
-> 	disk: 1HDD
-> 	fs: btrfs
-> 	test: syscalls-04/close_range01
-> 
-> 
-> 
-> config: x86_64-rhel-9.4-ltp
-> compiler: gcc-12
-> test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz (Ivy Bridge) with 8G memory
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202503101536.27099c77-lkp@intel.com
-> 
-> 
-> [  218.427851][   T51] BUG: sleeping function called from invalid context at mm/util.c:901
-> [  218.435981][   T51] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 51, name: kcompactd0
-> [  218.444773][   T51] preempt_count: 1, expected: 0
-> [  218.449601][   T51] RCU nest depth: 0, expected: 0
-> [  218.454476][   T51] CPU: 2 UID: 0 PID: 51 Comm: kcompactd0 Tainted: G S                 6.14.0-rc1-00006-g3c20917120ce #1
-> [  218.454486][   T51] Tainted: [S]=CPU_OUT_OF_SPEC
-> [  218.454488][   T51] Hardware name: Hewlett-Packard HP Pro 3340 MT/17A1, BIOS 8.07 01/24/2013
-> [  218.454492][   T51] Call Trace:
-> [  218.454495][   T51]  <TASK>
-> [ 218.454498][ T51] dump_stack_lvl (lib/dump_stack.c:123 (discriminator 1)) 
-> [ 218.454508][ T51] __might_resched (kernel/sched/core.c:8767) 
-> [ 218.454517][ T51] folio_mc_copy (include/linux/sched.h:2072 mm/util.c:901) 
-> [ 218.454525][ T51] ? _raw_spin_lock (arch/x86/include/asm/atomic.h:107 include/linux/atomic/atomic-arch-fallback.h:2170 include/linux/atomic/atomic-instrumented.h:1302 include/asm-generic/qspinlock.h:111 include/linux/spinlock.h:187 include/linux/spinlock_api_smp.h:134 kernel/locking/spinlock.c:154) 
-> [ 218.454532][ T51] __migrate_folio+0x11a/0x2d0 
-> [ 218.454541][ T51] __buffer_migrate_folio (mm/migrate.c:945 mm/migrate.c:876) 
-> [ 218.454548][ T51] move_to_new_folio (mm/migrate.c:1080) 
-> [ 218.454555][ T51] migrate_folio_move (mm/migrate.c:1360) 
-> [ 218.454562][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454572][ T51] ? __pfx_migrate_folio_move (mm/migrate.c:1349) 
-> [ 218.454578][ T51] ? compaction_alloc_noprof (arch/x86/include/asm/bitops.h:206 arch/x86/include/asm/bitops.h:238 include/asm-generic/bitops/instrumented-non-atomic.h:142 include/linux/page-flags.h:829 include/linux/page-flags.h:850 mm/internal.h:711 mm/compaction.c:1878) 
-> [ 218.454587][ T51] ? __pfx_compaction_alloc (mm/compaction.c:1882) 
-> [ 218.454594][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454601][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454607][ T51] ? migrate_folio_unmap (arch/x86/include/asm/atomic.h:23 include/linux/atomic/atomic-arch-fallback.h:457 include/linux/atomic/atomic-instrumented.h:33 include/linux/mm.h:1257 include/linux/mm.h:1273 mm/migrate.c:1324) 
-> [ 218.454614][ T51] migrate_pages_batch (mm/migrate.c:1721 mm/migrate.c:1959) 
-> [ 218.454621][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454631][ T51] ? __pfx_migrate_pages_batch (mm/migrate.c:1779) 
-> [ 218.454638][ T51] ? cgroup_rstat_updated (kernel/cgroup/rstat.c:45 kernel/cgroup/rstat.c:101) 
-> [ 218.454648][ T51] migrate_pages_sync (mm/migrate.c:1992) 
-> [ 218.454656][ T51] ? __pfx_compaction_alloc (mm/compaction.c:1882) 
-> [ 218.454662][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454669][ T51] ? lru_gen_del_folio (include/linux/list.h:215 include/linux/list.h:229 include/linux/mm_inline.h:300) 
-> [ 218.454677][ T51] ? __pfx_migrate_pages_sync (mm/migrate.c:1982) 
-> [ 218.454683][ T51] ? set_pfnblock_flags_mask (mm/page_alloc.c:415 (discriminator 14)) 
-> [ 218.454691][ T51] ? __pfx_lru_gen_del_folio (include/linux/mm_inline.h:284) 
-> [ 218.454699][ T51] ? __pfx_compaction_alloc (mm/compaction.c:1882) 
-> [ 218.454705][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454713][ T51] migrate_pages (mm/migrate.c:2098) 
-> [ 218.454720][ T51] ? __pfx_compaction_alloc (mm/compaction.c:1882) 
-> [ 218.454726][ T51] ? __pfx_compaction_free (mm/compaction.c:1892) 
-> [ 218.454733][ T51] ? __pfx_buffer_migrate_folio_norefs (mm/migrate.c:936) 
-> [ 218.454740][ T51] ? __pfx_migrate_pages (mm/migrate.c:2057) 
-> [ 218.454748][ T51] ? isolate_migratepages (mm/compaction.c:2167) 
-> [ 218.454757][ T51] compact_zone (mm/compaction.c:2667) 
-> [ 218.454767][ T51] ? __pfx_compact_zone (mm/compaction.c:2529) 
-> [ 218.454774][ T51] ? _raw_spin_lock_irqsave (arch/x86/include/asm/atomic.h:107 include/linux/atomic/atomic-arch-fallback.h:2170 include/linux/atomic/atomic-instrumented.h:1302 include/asm-generic/qspinlock.h:111 include/linux/spinlock.h:187 include/linux/spinlock_api_smp.h:111 kernel/locking/spinlock.c:162) 
-> [ 218.454780][ T51] ? __pfx__raw_spin_lock_irqsave (kernel/locking/spinlock.c:161) 
-> [ 218.454788][ T51] compact_node (mm/compaction.c:2934) 
-> [ 218.454795][ T51] ? __pfx_compact_node (mm/compaction.c:2910) 
-> [ 218.454807][ T51] ? __pfx_extfrag_for_order (mm/vmstat.c:1138) 
-> [ 218.454814][ T51] ? __pfx_mutex_unlock (kernel/locking/mutex.c:518) 
-> [ 218.454822][ T51] ? finish_wait (include/linux/list.h:215 include/linux/list.h:287 kernel/sched/wait.c:376) 
-> [ 218.454831][ T51] kcompactd (mm/compaction.c:2235 mm/compaction.c:3227) 
-> [ 218.454839][ T51] ? __pfx_kcompactd (mm/compaction.c:3179) 
-> [ 218.454846][ T51] ? _raw_spin_lock_irqsave (arch/x86/include/asm/atomic.h:107 include/linux/atomic/atomic-arch-fallback.h:2170 include/linux/atomic/atomic-instrumented.h:1302 include/asm-generic/qspinlock.h:111 include/linux/spinlock.h:187 include/linux/spinlock_api_smp.h:111 kernel/locking/spinlock.c:162) 
-> [ 218.454852][ T51] ? __pfx__raw_spin_lock_irqsave (kernel/locking/spinlock.c:161) 
-> [ 218.454858][ T51] ? __pfx_autoremove_wake_function (kernel/sched/wait.c:383) 
-> [ 218.454867][ T51] ? __kthread_parkme (arch/x86/include/asm/bitops.h:206 arch/x86/include/asm/bitops.h:238 include/asm-generic/bitops/instrumented-non-atomic.h:142 kernel/kthread.c:291) 
-> [ 218.454874][ T51] ? __pfx_kcompactd (mm/compaction.c:3179) 
-> [ 218.454880][ T51] kthread (kernel/kthread.c:464) 
-> [ 218.454887][ T51] ? __pfx_kthread (kernel/kthread.c:413) 
-> [ 218.454895][ T51] ? __pfx_kthread (kernel/kthread.c:413) 
-> [ 218.454902][ T51] ret_from_fork (arch/x86/kernel/process.c:154) 
-> [ 218.454910][ T51] ? __pfx_kthread (kernel/kthread.c:413) 
-> [ 218.454915][ T51] ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-> [  218.454924][   T51]  </TASK>
-> 
-> 
-> The kernel config and materials to reproduce are available at:
-> https://download.01.org/0day-ci/archive/20250310/202503101536.27099c77-lkp@intel.com
-> 
-> 
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
-> 
+The net_cls and net_prio controllers that only exist on v1 hierarchies
+have no straightforward action for users (replacement would rely on net
+NS or eBPF), so messages for their usage are omitted, although it'd be
+good to eventually retire that code in favor of aforementioned.
+
+At the end are some cleanup patches I encountered en route.
+
+Changes from v1 (https://lore.kernel.org/r/20250304153801.597907-1-mkoutny@suse.com/)
+- cpuset load_balance/pressure warn wording (Waiman)
+- comment typo (Waiman)
+- collect Acks
+- drop bouncing Cc: and respective RFC (self)
+- change level warn -> info, except for spread slab (Tejun)
+- add memory.swappiness (self)
+- add legacy freezer message (self)
+- update cover wrt net* controllers (self)
+
+Michal Koutný (11):
+  cgroup/cpuset-v1: Add deprecation messages to sched_load_balance and
+    memory_pressure_enabled
+  cgroup/cpuset-v1: Add deprecation messages to memory_spread_page and
+    memory_spread_slab
+  cgroup/blkio: Add deprecation messages to reset_stats
+  cgroup: Print message when /proc/cgroups is read on v2-only system
+  cgroup/cpuset-v1: Add deprecation messages to mem_exclusive and
+    mem_hardwall
+  cgroup/cpuset-v1: Add deprecation messages to memory_migrate
+  RFC cgroup/cpuset-v1: Add deprecation messages to
+    sched_relax_domain_level
+  mm: Add transformation message for per-memcg swappiness
+  cgroup: Add deprecation message to legacy freezer controller
+  cgroup: Update file naming comment
+  blk-cgroup: Simplify policy files registration
+
+ .../cgroup-v1/freezer-subsystem.rst           |  4 ++++
+ .../admin-guide/cgroup-v1/memory.rst          |  1 +
+ block/blk-cgroup.c                            |  8 +++++--
+ block/blk-ioprio.c                            | 23 ++++++-------------
+ include/linux/cgroup-defs.h                   |  5 ++--
+ include/linux/cgroup.h                        |  1 +
+ kernel/cgroup/cgroup-internal.h               |  1 +
+ kernel/cgroup/cgroup-v1.c                     |  7 ++++++
+ kernel/cgroup/cgroup.c                        |  4 ++--
+ kernel/cgroup/cpuset-v1.c                     |  8 +++++++
+ kernel/cgroup/legacy_freezer.c                |  6 +++--
+ mm/memcontrol-v1.c                            |  6 +++--
+ 12 files changed, 47 insertions(+), 27 deletions(-)
+
+
+base-commit: 80e54e84911a923c40d7bee33a34c1b4be148d7a
+-- 
+2.48.1
+
