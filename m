@@ -1,62 +1,63 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC222222AB
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 12:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B3225B666
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 12:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741696620; cv=none; b=RoLq1Mdw8oHBHQyNp5Ze9o44Nl2l4ihVFwLo6foP4wdg6CZh6TzB9NHOUYhlspEBiRrzOV6zjWUw8QfUoTQLyW3lMEgANZj4iIoD1oggfbAg/X2tzM3wcOTDCTu4lEXIzX7VwyGx1JPRoo0tlH5gLcxjiM0uxvJ31CuIF9iDHtc=
+	t=1741696631; cv=none; b=YPc74WipakPdfxGbEYOHSEgJluRaHEjfCLwq0zRIWdYxmw+R2a5uqVuN1aMxHJMsZzJcBKRsuF38TQyZqiZnkhOfazPDN/LNbbpV1fLS99e/apWVmlQsP4BiB2Lm+9EpAjfOnR9KF3P/aZmnDRQpxnozpgE/GbFUF0dfBDkM7mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741696620; c=relaxed/simple;
-	bh=3fO27bZgRSLX+ZjJteSn+272IeY/0JUe6KT6vJpgZF8=;
+	s=arc-20240116; t=1741696631; c=relaxed/simple;
+	bh=eOYfV3hkQJ4COrJVGB6V6NB92ZYbl7TFTpc5f+sHq+A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ksCGBD6ojG6PiT8wV6x4ABkwd23Xd5nx9bcHiFSPW58e4RjjmpFTzLyG0CtGffBEfgFLYUkk+TDqabmxNVtCxH3EHNTSj1WfHInyA+pE5KVR0JDF6abbOD4mFl2IMUKbsrBWuHVELHWuurT7BJSy3rCU5ktKjWLl0mDARtX/nEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=BqeD8fBG; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version:Content-Type; b=fFvAaBQ1rrFVrUwxPqjvFYSDgWK2VL0mxuSWPk6pDTRGbRCmlLk7mY8VjycNVFZbt9j7j+Gf9imQtdF9qhkv7lFOT1/QJateB1yaB03V2ZGl+2ptxq6FQhS10UMKVphOWeZGaTqEyiMeHawi2IDl1Qw3maZnI11wlUrSHNnSZWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Gj6+wHTo; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="BqeD8fBG"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso32121885e9.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:36:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Gj6+wHTo"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso32122945e9.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1741696617; x=1742301417; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1741696627; x=1742301427; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AeNwiCAXtv8YYTGNB6COQ1c83CjJXd/IUXH7xE+l9C0=;
-        b=BqeD8fBGYb1N+2ZDPxv3fuEKAJAbnrhqj5BWeyODaWECtWw8uiaNIdYzfJuBv/J2LB
-         qU4is8T0u/FhQAiwteu9Q67uW3iOwo0Qc1POzeV2mxzundKw27KMuqhmoNDnImApMWNM
-         MPa74CnVj4s7EbLTdurkNzitpcQiagnrtviu5vB0LxkEpC5ejENwdmCDbuUw1rkPBgYO
-         W69f6+tYWr2zAQkshkkRYqz0z7w4C1NiGiiYKcDOAD5VVo17bujgBoYpWgQORstw5sw9
-         5siLzL5867/f25Qnr0CX7iM6NHV/dzXdrR7ENmNP2fy+mcgFDVxXDXoKOoxgYisGcksH
-         kelg==
+        bh=DXKXrFA2VlkBneAZZTTJT0fgxthnXkiDyglv3h81Of0=;
+        b=Gj6+wHTolGFeAgq22JiafPqm8VHBHP0h/rnlt1cfsS+rrHR0pO6waVKh7/+5iZh3Qx
+         qphA3U9dDmz+ZLsJc7gR46WS4WOoqTCuJu5nYw6OVlbHxZWMkVIAcD1OEVhdQZnaKYmf
+         HGVOUqLmmM34MGVI0ziF4AZOZwLshw0t3B2SJLyWrFx/d75zL3HRtNx0ZA0xDzn9UvPa
+         gcUEl2MDR6Tccapij03aYYIktHjH2hA+TNV7LR0HTDaQtb5WuPiwveoOXxQT4ySGBW6R
+         fgM7u7kVfMzSWo6QPHImJxQ3UnzZ/AqQHhp3eepAYj0dNJTy1lwgpidVvOpCBLF3hYgn
+         +MmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741696617; x=1742301417;
+        d=1e100.net; s=20230601; t=1741696627; x=1742301427;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AeNwiCAXtv8YYTGNB6COQ1c83CjJXd/IUXH7xE+l9C0=;
-        b=McK/IdAG5nOs3kqOJXkpRWx7j/dP3jOLnUgxphIe+A2ulZePcXOIgvxrtyQHpMGf61
-         0RvKAuEPwps2qN/IeO+uf512w7nXXlY4fimTlCM5sBsYRcA/cOE78cVdDC+yFcnr6T3i
-         S1p16nU1UNi/kYXlQ5IHT1ISBCjvmJUM+EPYKyhO2/DJGlajgOzJ2onVcSW3jxhasfqu
-         iyk/kAccQ2oDHatPfGoU2ghjpIAs+T7n6HvGqDgEadZRQL9rH69zDNMM76Rit9DbuapL
-         j0tvOAJa8sE9YC4K3S1yM7PnND4wOG5veWV0+V20RF22U3535b5GlsaTwlI6yBaYp21y
-         I24w==
-X-Forwarded-Encrypted: i=1; AJvYcCWvgUtbsxPyHvnhfBo6H7U/M44IxOiRJtO0jGz68D9m/bs3OhAigne+DfY71UAcIdDwvNbPccGfn37Wsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFQgPBRufxuRozmDb2dD6aqhVkVxRcnVwA0NZhwUOEjardnP9T
-	bezDBS5+ramEGL/OUNOdsBGdqRi8r/0tGv4kZS9DBENG06kRrKKHHqiDUD8TD18=
-X-Gm-Gg: ASbGncurZHFUfV1mUQcApObH+lwqEzE3V4otljzh4HKcUIR5eBEZG+6imHqKFR4zWHv
-	2oGrM0SbJaWdlS1Q6hNn+07o/7HCUVyf3wHi0+bNmHV8hg4jqgWSX6ol/Se0RAjud5q53f1gHzw
-	GdoNqOsn3ZdP26iGFbmWGLmUYAZJccLcplyDhlcuqOndcpBUzCMCGLvQ1BB9OmR7rvymdd8LL5K
-	nQaHdzmtK9acVHp98wuyRjBOk96b65FoySFLLzoVNoEDAdldPc450k/J+gM9U5B4Fk7pnXncTzW
-	4jO1JPy1W8T835dGJzvOIglqyzyi23V/fA8/jCsKSP+gC0Y=
-X-Google-Smtp-Source: AGHT+IHn6PvkpQKJBbjtpTZtl/brCs+22CGDxaMUBRMoRp7lTvofXIIlLNevzeSErD/52v0LpfOABA==
-X-Received: by 2002:a05:600c:4f8b:b0:43d:649:4e50 with SMTP id 5b1f17b1804b1-43d064952fbmr18361755e9.13.1741696617111;
-        Tue, 11 Mar 2025 05:36:57 -0700 (PDT)
+        bh=DXKXrFA2VlkBneAZZTTJT0fgxthnXkiDyglv3h81Of0=;
+        b=OnYnN1UYYpts3uxXMWaTYyiPB5fqn5BVcnTFdfMdTtT4y4edq+nBo1uba/7bL9Qq2w
+         1GrlcMCMRUd+RxAEJXWdzFebek0eccavMJVKhJ96QL0GqAOOjkMqT41E8/lwrmYhQnPk
+         py8X+P9m4tJrGlSLEIJYCRTaJ5qj/AHc6jVaV0kBFxdbNnDOczfOgm8ZA8MgQkGTUHa8
+         +Fc6x1/fpJcQb/Tn4EkY3jjl6HjSzowixnWOSUgmGlyZ4mgOb+KvJ5zSAwlDMuqjEDc0
+         CxuuinHnzFjxMKmpIqgGhDims6GFdJoCl9A8vQvxRi28KMdD96NAdEfyRvuGGxLQb11H
+         QTYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDN4bLeTlcddCIp0iGuSN4AcU+O1XJl7SVcY8iu2om+F/+eLweeAgOcNX6JLiwc7BjEpzFtZOk8B1JPw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR9UBE1ewHRJ8FJuIYcs33JGcQuNYH49JM69JofVpyrsxacQ8W
+	Hasc5Cujrq+7bp68D/7xaXKQV1stUkwDT8WpUSmP5DTIr6S68Ljut4L5GF2QNtf7novAry/iUhz
+	OnQA=
+X-Gm-Gg: ASbGnct856z8j6TAHmtQ7V7NbKlhaOcgx/YprP95ZXnOOUq+jsnxeQC/0OGe0LwW3i6
+	Oo8AuOjnXbGZi6hHHr24UXZ+FuRRMy8OqfdldJgB1E+uWBuEHvhZ+CWAgKERKkBF1UCt3yPDFuU
+	M8U03myxvy3P4nJ5MLornQADmQb6+rMGL+hgELNeooj8kVNjfpSmdsBfo1KEvFQ4JGYWnAxUKSf
+	VJVfumVJEsHUk0c9+utqCNzyBJXhKgfYsamLsKCk2iy9z7U1XVe3/mOJql0Nyli0ae04ErR4yuz
+	4xgv4aa84NZgACafSM8phVlX0mdpM90vPOj0d4iRSfYR1Xk=
+X-Google-Smtp-Source: AGHT+IGxtVT4Mv/MwWFfw1GFVyifXbknAcM7hLfQYB/ggvVos7rNOTA6kXKjciYRQIAM+TQeTmsWVw==
+X-Received: by 2002:a05:600c:46cf:b0:43c:e8ca:5140 with SMTP id 5b1f17b1804b1-43ce8ca528dmr93497435e9.23.1741696627217;
+        Tue, 11 Mar 2025 05:37:07 -0700 (PDT)
 Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d04004240sm9742265e9.3.2025.03.11.05.36.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d04004240sm9742265e9.3.2025.03.11.05.37.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 05:36:56 -0700 (PDT)
+        Tue, 11 Mar 2025 05:37:07 -0700 (PDT)
 From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
 To: cgroups@vger.kernel.org,
 	linux-block@vger.kernel.org,
@@ -64,10 +65,11 @@ To: cgroups@vger.kernel.org,
 Cc: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
 	Tejun Heo <tj@kernel.org>,
 	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 03/11] cgroup/blkio: Add deprecation messages to reset_stats
-Date: Tue, 11 Mar 2025 13:36:20 +0100
-Message-ID: <20250311123640.530377-4-mkoutny@suse.com>
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>
+Subject: [PATCH v2 11/11] blk-cgroup: Simplify policy files registration
+Date: Tue, 11 Mar 2025 13:36:28 +0100
+Message-ID: <20250311123640.530377-12-mkoutny@suse.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250311123640.530377-1-mkoutny@suse.com>
 References: <20250311123640.530377-1-mkoutny@suse.com>
@@ -80,25 +82,103 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-It is difficult to sync with stat updaters, stats are (should be)
-monotonic so users can calculate differences from a reference.
+Use one set of files when there is no difference between default and
+legacy files, similar to regular subsys files registration. No
+functional change.
 
 Signed-off-by: Michal Koutný <mkoutny@suse.com>
 ---
- block/blk-cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-cgroup.c     |  7 +++++--
+ block/blk-ioprio.c     | 23 +++++++----------------
+ include/linux/cgroup.h |  1 +
+ kernel/cgroup/cgroup.c |  2 +-
+ 4 files changed, 14 insertions(+), 19 deletions(-)
 
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 9ed93d91d754a..1464c968eeb0c 100644
+index 1464c968eeb0c..1994a11ff9034 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -659,6 +659,7 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
- 	struct blkcg_gq *blkg;
- 	int i;
+@@ -1771,12 +1771,15 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	mutex_unlock(&blkcg_pol_mutex);
  
-+	pr_info_once("blkio.%s is deprecated\n", cftype->name);
- 	mutex_lock(&blkcg_pol_mutex);
- 	spin_lock_irq(&blkcg->lock);
+ 	/* everything is in place, add intf files for the new policy */
+-	if (pol->dfl_cftypes)
++	if (pol->dfl_cftypes == pol->legacy_cftypes) {
++		WARN_ON(cgroup_add_cftypes(&io_cgrp_subsys,
++					   pol->dfl_cftypes));
++	} else {
+ 		WARN_ON(cgroup_add_dfl_cftypes(&io_cgrp_subsys,
+ 					       pol->dfl_cftypes));
+-	if (pol->legacy_cftypes)
+ 		WARN_ON(cgroup_add_legacy_cftypes(&io_cgrp_subsys,
+ 						  pol->legacy_cftypes));
++	}
+ 	mutex_unlock(&blkcg_pol_register_mutex);
+ 	return 0;
+ 
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 8fff7ccc0ac73..13659dc15c3ff 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -113,27 +113,18 @@ static void ioprio_free_cpd(struct blkcg_policy_data *cpd)
+ 	kfree(blkcg);
+ }
+ 
+-#define IOPRIO_ATTRS						\
+-	{							\
+-		.name		= "prio.class",			\
+-		.seq_show	= ioprio_show_prio_policy,	\
+-		.write		= ioprio_set_prio_policy,	\
+-	},							\
+-	{ } /* sentinel */
+-
+-/* cgroup v2 attributes */
+ static struct cftype ioprio_files[] = {
+-	IOPRIO_ATTRS
+-};
+-
+-/* cgroup v1 attributes */
+-static struct cftype ioprio_legacy_files[] = {
+-	IOPRIO_ATTRS
++	{
++		.name		= "prio.class",
++		.seq_show	= ioprio_show_prio_policy,
++		.write		= ioprio_set_prio_policy,
++	},
++	{ } /* sentinel */
+ };
+ 
+ static struct blkcg_policy ioprio_policy = {
+ 	.dfl_cftypes	= ioprio_files,
+-	.legacy_cftypes = ioprio_legacy_files,
++	.legacy_cftypes = ioprio_files,
+ 
+ 	.cpd_alloc_fn	= ioprio_alloc_cpd,
+ 	.cpd_free_fn	= ioprio_free_cpd,
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index f8ef47f8a634d..8e7415c64ed1d 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -113,6 +113,7 @@ int cgroup_transfer_tasks(struct cgroup *to, struct cgroup *from);
+ 
+ int cgroup_add_dfl_cftypes(struct cgroup_subsys *ss, struct cftype *cfts);
+ int cgroup_add_legacy_cftypes(struct cgroup_subsys *ss, struct cftype *cfts);
++int cgroup_add_cftypes(struct cgroup_subsys *ss, struct cftype *cfts);
+ int cgroup_rm_cftypes(struct cftype *cfts);
+ void cgroup_file_notify(struct cgroup_file *cfile);
+ void cgroup_file_show(struct cgroup_file *cfile, bool show);
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 3a5af0fc544a6..e93b0563a8964 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4447,7 +4447,7 @@ int cgroup_rm_cftypes(struct cftype *cfts)
+  * function currently returns 0 as long as @cfts registration is successful
+  * even if some file creation attempts on existing cgroups fail.
+  */
+-static int cgroup_add_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
++int cgroup_add_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
+ {
+ 	int ret;
  
 -- 
 2.48.1
