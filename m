@@ -1,46 +1,47 @@
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFA723F374
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 10:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A915523F384
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 10:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741689845; cv=none; b=At/TZjQ7qL4z/Esk0UqTC73ExfywYlsJW+jJ6A/lnlox+ofSN2VozlalG+EVkuzGXPON97FEWI4l53vIytdLHAUgVsU8MHhgOFgbneQm/SdKWAVbs9J+Sj0H9j1kdMYJfT0DlNY7jgmB70HTIL+6sxGdpaIbB5jQV3gDohUU6Po=
+	t=1741689847; cv=none; b=eTt/3ULf7/gphbM/3uE6wCpKqXOEhagOoXuHGPr0fSwMT8DB1zPPWGFBvDsvJ3VXjpsHGw6C4bK7Z+2T8A21kvl4qlx9T6jycQbipWHhQ6CbokjexQ1IcEp5J0jwGMiJFuj1Mnwl/YT7gJF04l65Oey+4WRScUO/sobjGr0Qi6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741689845; c=relaxed/simple;
-	bh=tOzGi1+oE4i2IJoUxhsL9xdE2CFvuKnrU3TH/IWp1Uw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZNsS7OWnmUUHPjvzCM6yLnbBt7OmYu4kGihu1yqhj8W0E76PoueA6sMc+sskk3EevBBL6oGZSjKaMjTKo+lelA8E+mTgDRd7L33NcBOCS5kVxONjk02wSHscgxh+HisZMV5coIGTGCPT17WClGRC3amJCx+Slw0+yn+hmC2Ce80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=IYOaGFx4; arc=none smtp.client-ip=68.232.141.245
+	s=arc-20240116; t=1741689847; c=relaxed/simple;
+	bh=qZkpL8+UK4Jf7ALWWjcCeKVGPKdF94sM7MXUzKsePGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KOTEzvLbnU7VK1tDUhv6l8CKUixSBx+nRLrQVIrpOmQUP5IZtlyxjmp0eFVrDY3xZXWBD6HmtxJ1st6raMSBmBuO5XSRZob5aomv71HXqqC7ac9xkKkb29VkyRihork41KgnX7eP1Fhd292tPS8uHnzKS7vONvJtkEChnNk0x6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=PZADjgv4; arc=none smtp.client-ip=68.232.141.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IYOaGFx4"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PZADjgv4"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1741689843; x=1773225843;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tOzGi1+oE4i2IJoUxhsL9xdE2CFvuKnrU3TH/IWp1Uw=;
-  b=IYOaGFx4nZGvj9CioSJKnPkRJ7+LLlX0cv2SABrLZpxgtrIQuLoZVb+7
-   /ktIFc5OXhIVRT5g/otkYhXqwwsumLCxxU8Z++6OZocQzsUPkXCGXuHQ9
-   zdhChHbgDMnvwVGduHILk5yGNbFoEpMDF/LGTBVrSwgbgMrv80/0uxQHO
-   ECIHnYYr5Y9nhFmc4YS0vEKQnLPLLS5HTtdDk3qqT7k9lSoW3eiv30+XM
-   3EUzKC3H8P24Dq3VjI1sw7egO5+a37Nu9R2Qg00HbNYJvnB7mIguJx4R5
-   VsiprFI1dtyt8+HgshIVxEZ5s3A1nGyHeJf+Ua2LRBUlo5LZun3THuN+2
-   A==;
-X-CSE-ConnectionGUID: lFU6rM7PRo60H2meMaVdZA==
-X-CSE-MsgGUID: LTpROUtlSjGKBJZmoVJjQw==
+  t=1741689845; x=1773225845;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qZkpL8+UK4Jf7ALWWjcCeKVGPKdF94sM7MXUzKsePGs=;
+  b=PZADjgv4G3FITTrW9KLBdx+x+VK3yg2cg7+N56EAdPt6KvWbgdWI1KDl
+   OHokqyHLFcRl1GhbJ4kiqA6cPuVNU2IAM9RHiUOoNxIlzmqovHGrZxLWS
+   oYzVxYesv1a2dD7vKrUMYxUq/PbZoSFy4F0sy8cXu6XVZQzEquKz8FhH6
+   6PoG8Lx5gIdu9leiIQWrhxwbHEr7JvEI+Co31SgicE14zvKK6DONvf+0B
+   s8TlN+1Wk7ppBJ+2/uTnrLl3FRM0pftaN+J5muFSBHmHiq38DH3zT5SOX
+   rofeT+1ksCvl+2hTRbRAD8YPMg9tqESwumCnP9WfssaBTeQs8eMaqIdP/
+   w==;
+X-CSE-ConnectionGUID: /cx2piexSB64MUPWLjBICQ==
+X-CSE-MsgGUID: +ix9QzOtRaq2ugqRoUt7CQ==
 X-IronPort-AV: E=Sophos;i="6.14,238,1736784000"; 
-   d="scan'208";a="47078831"
+   d="scan'208";a="47078869"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Mar 2025 18:44:02 +0800
-IronPort-SDR: 67d0061d_0B+tLYpA52qYl04Hi3Cwdk4GhWdPy/hVgyqCLdhTVm7tuxH
- CsF4Tad+G/Y1Qh5/vaaGfX8TqQosI6mCcgJTpww==
+  by ob1.hgst.iphmx.com with ESMTP; 11 Mar 2025 18:44:05 +0800
+IronPort-SDR: 67d0061f_jLhYbm9rL1QRbGdPFFdgDcvo4PcaTeoI3Rn/cBn2IDFC4xm
+ EB1zy9+2cF9Zb9W6cAbW2KDjOc0yvRqEQjkc8jQ==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Mar 2025 02:45:01 -0700
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Mar 2025 02:45:04 -0700
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 11 Mar 2025 03:43:59 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Mar 2025 03:44:02 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
@@ -63,10 +64,12 @@ Cc: virtualization@lists.linux.dev,
 	Janne Grunau <j@jannau.net>,
 	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH v2 0/2] block: nvme: fix blktests nvme/039 failure
-Date: Tue, 11 Mar 2025 19:43:57 +0900
-Message-ID: <20250311104359.1767728-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v2 1/2] nvme: move error logging from nvme_end_req() to __nvme_end_req()
+Date: Tue, 11 Mar 2025 19:43:58 +0900
+Message-ID: <20250311104359.1767728-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20250311104359.1767728-1-shinichiro.kawasaki@wdc.com>
+References: <20250311104359.1767728-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,38 +78,79 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 1f47ed294a2b ("block: cleanup and fix batch completion adding
-conditions") in the kernel tag v6.14-rc3 triggered blktests nvme/039
-failure [1].
+Before the Commit 1f47ed294a2b ("block: cleanup and fix batch completion
+adding conditions"), blk_mq_add_to_batch() did not add failed
+passthrough requests to batch, and returned false. After the commit,
+blk_mq_add_to_batch() always adds passthrough requests to batch
+regardless of whether the request failed or not, and returns true. This
+affected error logging feature in the NVME driver.
 
-The test case injects errors to the NVMe driver and confirms the errors
-are logged. The first half of the test checks it for non-passthrough
-requests, and the second half checks for passthrough requests. The
-commit made both halves fail.
+Before the commit, the call chain of failed passthrough request was as
+follows:
 
-This series addresses the test case failure. The first patch covers the
-passthrough requests, and the second patch covers the non-passthrough
-requests.
+nvme_handle_cqe()
+ blk_mq_add_to_batch() .. false is returned, then call nvme_pci_complete_rq()
+ nvme_pci_complete_rq()
+  nvme_complete_rq()
+   nvme_end_req()
+    nvme_log_err_passthru() .. error logging
+    __nvme_end_req()        .. end of the rqeuest
 
-[1] https://lkml.kernel.org/linux-block/y7m5kyk5r2eboyfsfprdvhmoo27ur46pz3r2kwb4puhxjhbvt6@zgh4dg3ewya3/
+After the commit, the call chain is as follows:
 
-Changes from v1:
-* 1st patch: Added Reviewed-by tags
-* 2nd patch: Replaced argument blk_status_t with boolean 'is_error'
-             Added kerneldoc of blk_mq_add_to_batch() arguments
+nvme_handle_cqe()
+ blk_mq_add_to_batch() .. true is returned, then set nvme_pci_complete_batch()
+ ..
+ nvme_pci_complete_batch()
+  nvme_complete_batch()
+   nvme_complete_batch_req()
+    __nvme_end_req() .. end of the request, without error logging
 
-Shin'ichiro Kawasaki (2):
-  nvme: move error logging from nvme_end_req() to __nvme_end_req()
-  block: change blk_mq_add_to_batch() third argument type to bool
+To make the error logging feature work again for passthrough requests, move the
+nvme_log_err_passthru() call from nvme_end_req() to __nvme_end_req().
 
- drivers/block/null_blk/main.c |  4 ++--
- drivers/block/virtio_blk.c    |  5 +++--
- drivers/nvme/host/apple.c     |  3 ++-
- drivers/nvme/host/core.c      | 12 ++++++------
- drivers/nvme/host/pci.c       |  5 +++--
- include/linux/blk-mq.h        | 11 ++++++++---
- 6 files changed, 24 insertions(+), 16 deletions(-)
+While at it, move nvme_log_error() call for non-passthrough requests together
+with nvme_log_err_passthru(). Even though the trigger commit does not affect
+non-passthrough requests, move it together for code simplicity.
 
+Fixes: 1f47ed294a2b ("block: cleanup and fix batch completion adding conditions")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f028913e2e62..8359d0aa0e44 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -431,6 +431,12 @@ static inline void nvme_end_req_zoned(struct request *req)
+ 
+ static inline void __nvme_end_req(struct request *req)
+ {
++	if (unlikely(nvme_req(req)->status && !(req->rq_flags & RQF_QUIET))) {
++		if (blk_rq_is_passthrough(req))
++			nvme_log_err_passthru(req);
++		else
++			nvme_log_error(req);
++	}
+ 	nvme_end_req_zoned(req);
+ 	nvme_trace_bio_complete(req);
+ 	if (req->cmd_flags & REQ_NVME_MPATH)
+@@ -441,12 +447,6 @@ void nvme_end_req(struct request *req)
+ {
+ 	blk_status_t status = nvme_error_status(nvme_req(req)->status);
+ 
+-	if (unlikely(nvme_req(req)->status && !(req->rq_flags & RQF_QUIET))) {
+-		if (blk_rq_is_passthrough(req))
+-			nvme_log_err_passthru(req);
+-		else
+-			nvme_log_error(req);
+-	}
+ 	__nvme_end_req(req);
+ 	blk_mq_end_request(req, status);
+ }
 -- 
 2.47.0
 
