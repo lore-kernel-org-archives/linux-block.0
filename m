@@ -1,63 +1,62 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAA91EB183
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 04:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC691E5B83
+	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 05:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741669115; cv=none; b=cuugXZGAmiPeuUMYHjoAhhUz2FtNs5hazVW6hp92z6FqLK2eezC8q0ufO5HJxuWBSzHzCFX9txjfYOtIDBpQuWqJ1clBjnyUFFWAwnbgZwJyQUruzbhYd1paeKWpGm3nnxJWGdDOrBW21kTTxc6FwrK+kHMck8UCwUFrCUL6yhU=
+	t=1741669372; cv=none; b=OTrV7PH5Wlh1ln0j7oyTVZ4UbxDXYIZpHgLUwEzUyPAooSLlcM0IE6Ns7yHB/2Taa6w42I4J1j7DBSQSgHjUUNswrKyJ4zyBw617pnNyQUTevMQBRprJLnH6ZR2jktF/A8vGTHlkF7+M9A1zhoye6pU3vBe5FlywLukfbLRSTG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741669115; c=relaxed/simple;
-	bh=y4p+ZhQyaKnYanXotaEYWNu9zgRRUQZJKlAJpGme0rI=;
+	s=arc-20240116; t=1741669372; c=relaxed/simple;
+	bh=RhaZm/cSv+yC3HFSPC17iQsu6nY2OVc5d4bSK3oNuHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V8HLziXew5vVmbjR28U/3n8Qg/5TGh/aIVG+Lm4jKFhkuUL8hQQTLfefzK7icorP27SaadJg4NX0WucMY8OoR4Oj81p3nr0C/1nugq8eAgaKYXDYA4RXVf7X2fXGnw5dcUE+tY7PR+alMGBOrI+0XeLfrfj9g9Z0NIfBR0xdEOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=BTi8pZOx; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=L9ZNmHJKNHabXo1hctp6NWsvAH9H9yBHdQ/5VLxDtsgkiSHOtIqLu1vA1Fo1gerV3Fc8I8ncmoix3mcgERK3A8x1u+XaBNWQ0NRk1J66UXB1hNfsFG8HvxQeeSPJ41P9mLylI5hRfRTjYIvg3ZzdzYL9EoJ47D6htMpzRayTY4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=IGpOwHvb; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BTi8pZOx"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2241053582dso85983195ad.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 21:58:34 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IGpOwHvb"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22359001f1aso120151725ad.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Mar 2025 22:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1741669114; x=1742273914; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8USPBO/MC/ax4XcIyiJLB9/BI0M0mqSA7MMjrt59Uto=;
-        b=BTi8pZOxIKmI3/rdE0mPx5MdSz9R7kRggTFiaoW28GF1JdpIF6Z+RJE1CkAon/W8CR
-         gzbc22JGQn6TF39rW7xwMCXp1fDIkGYuY7KYpjqto5GFtB9ek/h1oVmYNCnmfNhwprSC
-         T37uN883Zg6ndB4c9DK6OPAlcl1M7KUpi3jZo=
+        d=chromium.org; s=google; t=1741669371; x=1742274171; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YsL06UvFaIQXEiahdE6DhBRWjwB8pb861e5j/ftXC1c=;
+        b=IGpOwHvbnFgxNs+0ESrki4vAB3llPBkZT4bciVn7QuEVB1hOhhPFcqU9YavYEfOABS
+         Blo3DfWxOj3KdsjwX80cj7mClPha/FKuNWDCGr9Ze1bdi92lOYVibmRIPmY5hu7YQ1Ef
+         f3YIR75NU5EEVIFMctroZZ1V8Ad6hjYoAfcQc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741669114; x=1742273914;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8USPBO/MC/ax4XcIyiJLB9/BI0M0mqSA7MMjrt59Uto=;
-        b=Ko6XalHfPcufKlkflMgDiXvGkIJS1DTdWv5BCNh0V+Acw1qxPuBy7vV+WGSrjzWH9p
-         lrvl9D96+8mU1kC02jLs+D476OrgRwgo6NJVlo1aJhlHTZNoj8WlHFOXcxXd9EY2p7r9
-         WdQx9+HKIwXiBNRLRmYet0mMWgiFzLJ5hFOX0Nj0RpgxmFd4FURKIR2CXlhEVE/M4RyL
-         FuwahVF4LxrKZgrRW1MDr1G4kk7jEEdwr26zPnBJKBoJReg4bcT1ibUF5SzwXyGGMRzI
-         MWbCDPWQgpbLo9SsnxOmdz3090GV/4rbgOOXyZXSXjMrWz9Crrz2nrfpfpA59gp0T0Ak
-         LL2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWuaw+vXchxN5bO8FyzxPDNK46T7PHBH9G55X9ghDbWdojNVsGuP4etdUh2KjOVKFwF7pgQzt97+sqfwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjoN/440dXGOQdSFOv3aNwkZuaG8P5dDkl/6OnA+TwKpFrevL2
-	Ljd9cY7FwFOxlxi0BL+MX3Aze3wleK4ARF5gI6CiEUDVVMULhxSRaa9jf0P4/Q==
-X-Gm-Gg: ASbGncuy0VTLWobBpiz4nYF5t7NI+23Ydr47uuhZhf+PQFCND36pwHJ/s39T8AYwuPZ
-	hWPZmYU3SwCj6SyS++b8mRQUj921l0Utoubo+RzC60IO988vgfpVxhNcmNSNfCQdfsTrxUj6lsc
-	HOy2RAy5WHtdCrS2CyZ3PHun08fldOuZZSgfzQem/che0acmFBsCA4wPDDgoD3hrsuwvAdWLR9T
-	QCCCR+6wMJWEz1BLnae73+XQgxzvATnBmoANZU+jUtk+NFUwdJsSL7oMDEgzKivAquJtzeDX32Z
-	bst5dldXh9o6w5aZFFFnmBqzeIx9ZEcUIThD9uVvCYoVAJbSisYy5jt/s8A=
-X-Google-Smtp-Source: AGHT+IEy+/UJdnWSvGMFpDegWU6yxUJzFshmjVJEwVUQ1vPxzmyvb0Te8hk0DkXqfdh84yZ0kk8jEg==
-X-Received: by 2002:a05:6a00:b84:b0:736:3d7c:236c with SMTP id d2e1a72fcca58-736aaa00c36mr22819900b3a.14.1741669113611;
-        Mon, 10 Mar 2025 21:58:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741669371; x=1742274171;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YsL06UvFaIQXEiahdE6DhBRWjwB8pb861e5j/ftXC1c=;
+        b=W6B+i90c+Hz8zfbSgIhNwSjZqrunA0SBjI7OVaMdK1u9r5ISz7hSWQVkO4nEsYXd6s
+         9tgvh1QD53rGlnKNkelYbLiGYAvCP+quRLoYM57/MtAZCIOOH0UGVA5lMetnxxMEaJGq
+         jiNtJevHspgUGpf8i40tY8jYYrZ7imkn1h1mRlAL1MS0Di0hreVY8NlIYyS9R6hu0b5f
+         6CRVdIg3YU5gc3WAh0WQTQTGwWrFra7hHw4he2/UkvnmD+5wMco5pgJrUjU0wgPt9PQq
+         854EEi8D6o8RmxYwFqkC+zizLcgZ3ib/Yzk7gZuCuJRUOx72S68uYnFxz00lMSEBTF2e
+         3K5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUiUy+fRex9kFCe2fleHmYiemFYjgB3HRq2Y0C5iBeeosdU7QSwX7GXHSYEYCp4dxaCL/Jq48nDUWNQpA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKy4P6aqbk+SInYnBwTwfDq7GsrjEEEwNnl8ykYw3DHzkbXxF0
+	uW6rQ9Atx1bMYw5iwNNzEZwu7X0ZNahyeVmXaJkkfkXvQ1sDyU37LXbtJlWBuA==
+X-Gm-Gg: ASbGncth1mlDy+rQzTRpArpM0NlDikbR6gPJKuxvL+ysTPL7I5ROwMZ4/hl7EBeaVxQ
+	P2p0HqlGZzRUfTkII2aTfYysFFXgYXTiRbn6JopUmuFT+L8Vg2kEUzCj4sRRxlfNXoSABY7ocYd
+	USPN2nshV6kxPNWsl3E1BJUfpLBx5OQutyQyIG6UWjARYItgjZxO3nqLOZnMbVYSnDPKzzOpWh7
+	l+QvuOMqLLxTmeke18RkZlBXmRmR6HdaG1yQRzYg5g2Hz7hggwZAJgPaGYr54iRLC/H5KrzV7Kj
+	yXwbTpIA4TzG4/XDI0qYy+9XhsG8044vL1RiLZ2S1Umy2VZX
+X-Google-Smtp-Source: AGHT+IFKfiFQm8ms/qPRi+wcBaiWNYQfbAZZRcHY4n0zNhnBnJ9IpLaSuc9kTChF2fwrDmR2pqJfNQ==
+X-Received: by 2002:a17:903:40cb:b0:223:6744:bfb9 with SMTP id d9443c01a7336-22428ab7691mr283789275ad.41.1741669370601;
+        Mon, 10 Mar 2025 22:02:50 -0700 (PDT)
 Received: from google.com ([2401:fa00:8f:203:cce8:82e2:587d:db6a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af281287d9esm8542757a12.75.2025.03.10.21.58.27
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109ddca2sm87480825ad.13.2025.03.10.22.02.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 21:58:33 -0700 (PDT)
-Date: Tue, 11 Mar 2025 13:58:24 +0900
+        Mon, 10 Mar 2025 22:02:50 -0700 (PDT)
+Date: Tue, 11 Mar 2025 14:02:42 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Qun-Wei Lin <qun-wei.lin@mediatek.com>
-Cc: Nhat Pham <nphamcs@gmail.com>, Barry Song <21cnbao@gmail.com>, 
+To: Nhat Pham <nphamcs@gmail.com>
+Cc: Barry Song <21cnbao@gmail.com>, Qun-Wei Lin <qun-wei.lin@mediatek.com>, 
 	Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
 	Sergey Senozhatsky <senozhatsky@chromium.org>, Vishal Verma <vishal.l.verma@intel.com>, 
 	Dan Williams <dan.j.williams@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
@@ -71,62 +70,47 @@ Cc: Nhat Pham <nphamcs@gmail.com>, Barry Song <21cnbao@gmail.com>,
 	linux-mediatek@lists.infradead.org, Casper Li <casper.li@mediatek.com>, 
 	Chinwen Chang <chinwen.chang@mediatek.com>, Andrew Yang <andrew.yang@mediatek.com>, 
 	James Hsu <james.hsu@mediatek.com>
-Subject: Re: [PATCH 0/2] Improve Zram by separating compression context from
- kswapd
-Message-ID: <dubgo2s3xafoitc2olyjqmkmroiowxbpbswefhdioaeupxoqs2@z3s4uuvojvyu>
+Subject: Re: [PATCH 2/2] kcompressd: Add Kcompressd for accelerated zram
+ compression
+Message-ID: <mzythwqmi22gmuunmqcyyn7eiggevvrzkpqmjkoxsj4q4jc46s@64jdco5s6spa>
 References: <20250307120141.1566673-1-qun-wei.lin@mediatek.com>
- <CAKEwX=NfKrisQL-DBcNxBwK2ErK-u=MSzHNpETcuWWNBh9s9Bg@mail.gmail.com>
- <CAGsJ_4ysL1xV=902oNM3vBfianF6F_iqDgyck6DGzFrZCtOprw@mail.gmail.com>
+ <20250307120141.1566673-3-qun-wei.lin@mediatek.com>
+ <CAGsJ_4xtp9iGPQinu5DOi3R2B47X9o=wS94GdhdY-0JUATf5hw@mail.gmail.com>
+ <CAKEwX=OP9PJ9YeUvy3ZMQPByH7ELHLDfeLuuYKvPy3aCQCAJwQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGsJ_4ysL1xV=902oNM3vBfianF6F_iqDgyck6DGzFrZCtOprw@mail.gmail.com>
+In-Reply-To: <CAKEwX=OP9PJ9YeUvy3ZMQPByH7ELHLDfeLuuYKvPy3aCQCAJwQ@mail.gmail.com>
 
-On (25/03/08 18:41), Barry Song wrote:
-> On Sat, Mar 8, 2025 at 12:03 PM Nhat Pham <nphamcs@gmail.com> wrote:
+On (25/03/07 15:13), Nhat Pham wrote:
+> > > +config KCOMPRESSD
+> > > +       tristate "Kcompressd: Accelerated zram compression"
+> > > +       depends on ZRAM
+> > > +       help
+> > > +         Kcompressd creates multiple daemons to accelerate the compression of pages
+> > > +         in zram, offloading this time-consuming task from the zram driver.
+> > > +
+> > > +         This approach improves system efficiency by handling page compression separately,
+> > > +         which was originally done by kswapd or direct reclaim.
 > >
-> > On Fri, Mar 7, 2025 at 4:02 AM Qun-Wei Lin <qun-wei.lin@mediatek.com> wrote:
-> > >
-> > > This patch series introduces a new mechanism called kcompressd to
-> > > improve the efficiency of memory reclaiming in the operating system. The
-> > > main goal is to separate the tasks of page scanning and page compression
-> > > into distinct processes or threads, thereby reducing the load on the
-> > > kswapd thread and enhancing overall system performance under high memory
-> > > pressure conditions.
+> > For direct reclaim, we were previously able to compress using multiple CPUs
+> > with multi-threading.
+> > After your patch, it seems that only a single thread/CPU is used for compression
+> > so it won't necessarily improve direct reclaim performance?
 > >
-> > Please excuse my ignorance, but from your cover letter I still don't
-> > quite get what is the problem here? And how would decouple compression
-> > and scanning help?
+> > Even for kswapd, we used to have multiple threads like [kswapd0], [kswapd1],
+> > and [kswapd2] for different nodes. Now, are we also limited to just one thread?
+> > I also wonder if this could be handled at the vmscan level instead of the zram
+> > level. then it might potentially help other sync devices or even zswap later.
 > 
-> My understanding is as follows:
-> 
-> When kswapd attempts to reclaim M anonymous folios and N file folios,
-> the process involves the following steps:
-> 
-> * t1: Time to scan and unmap anonymous folios
-> * t2: Time to compress anonymous folios
-> * t3: Time to reclaim file folios
-> 
-> Currently, these steps are executed sequentially, meaning the total time
-> required to reclaim M + N folios is t1 + t2 + t3.
-> 
-> However, Qun-Wei's patch enables t1 + t3 and t2 to run in parallel,
-> reducing the total time to max(t1 + t3, t2). This likely improves the
-> reclamation speed, potentially reducing allocation stalls.
+> Agree. A shared solution would be much appreciated. We can keep the
+> kcompressd idea, but have it accept IO work from multiple sources
+> (zram, zswap, whatever) through a shared API.
 
-If compression kthread-s can run (have CPUs to be scheduled on).
-This looks a bit like a bottleneck.  Is there anything that
-guarantees forward progress?  Also, if compression kthreads
-constantly preempt kswapd, then it might not be worth it to
-have compression kthreads, I assume?
-
-If we have a pagefault and need to map a page that is still in
-the compression queue (not compressed and stored in zram yet, e.g.
-dut to scheduling latency + slow compression algorithm) then what
-happens?
+I guess it also need to take swapoff into consideration (especially
+if it takes I/O from multiple sources)?
