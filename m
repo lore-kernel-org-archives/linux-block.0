@@ -1,78 +1,93 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A0324E01B;
-	Wed, 12 Mar 2025 14:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D342033A;
+	Wed, 12 Mar 2025 14:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741789215; cv=none; b=q5QJo3QyFpYN+WdAMy2mlDszJyfpRlx5sEXh+hjFLQSiM1zKutM88veLkLy/O/6d6lXL0nc328Ia4iCZ5srCMSSQS7D8Hbskj6XF5l46x9fTD4w8tvHwg3xcHG4plrtFDebTj72xcGCcSCYcCgZBE45XJrWl80jUBz41YlLSx84=
+	t=1741789370; cv=none; b=MUsfnMHjk4ZGxvsJsFiOCm4Y3Aydif6HVHv5Ua3CMXKL2EcV133+oQb1Xrk4/Oh43UmxJm2wP+NDJFIIKUD0QUC/lCE4oIvEZNpIr9ZsAaTdlF+AAnssKihCropUXzb4/TVBzGEhg67S3cCDApQoyQJfOEXnv6be5l5OBLTTFXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741789215; c=relaxed/simple;
-	bh=FVgwkNvdBVna1lZKEuoxhUiMfcQJE7r/RVcXktgflO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXPTyF0BP1k7TxNJy+HJSlzOeZuS4dmESXPuzDS9vcS4+hwM1c28AZ2tRqH8yU+N42xbzZozEaXD+tZWcpTfm9rhHbpqrP0B0Lds9b9iwesUtqoQyCMP6DOgPOFv51yeAn0pKAbSnlQGsXn4ciL00nD3KEmYvS8dv/5mBvUNbwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=iYn2cEi0; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1741789370; c=relaxed/simple;
+	bh=5zIB9aP4MjZVZbVwkvtMy8bZT0SBYH8T7xQXJLwcGRk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SIufARffDV5POpuvfWywAMBk7krPz2hp1LGa9hghTh6ImfMIReQIX1mvVHVn3y12lX4Nk0Ed5c7LwZC/pgvXS/fbkIaFspl/7Bbimj7ueFAnya9RloKzzYF4Z2kUAzCFymOKG94UgCPgFLlo5iD1WgMlkxXEET/Hd9nBPFkJnAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=AELYw4fM; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iYn2cEi0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qKvB2nlT3iUgjzyDXuqxiMFS1Em8INDMpJfZqPHhHac=; b=iYn2cEi0fHqMF9jO945+0Payis
-	ebcZe3lInCyVQtA+Cpk69+kFkR76CPVVG5sWIB1AaJj7JPcZb82CbVScbWZQz0xP73IhCe/l9eS0B
-	gw+nctm7DFDdVykaTKLxCQU2xGZEu40w/fgZhIPiMVIPTwZj0VJxv7wWCvpAzQ3bkzq879siKtCTH
-	r/i1iXP++jhEEGCpf8DzQQBJZKbggvFv+hEm6bF7qKoD9UlmsZtH9o3A4JAW2KZKjgU63y36D1SpG
-	xM7V2kRkanFltPH0HfXyyZd6M+giV8yS0UnMLuPsaMlTzI7uGypDhKznDG5LNMBGK9RPcDgeg+wJ3
-	ZMFdBEEw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tsMwN-00000008ffL-2u45;
-	Wed, 12 Mar 2025 14:20:11 +0000
-Date: Wed, 12 Mar 2025 07:20:11 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z9GYGyjJcXLvtDfv@infradead.org>
-References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
- <Z8W1q6OYKIgnfauA@infradead.org>
- <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
- <Z8XlvU0o3C5hAAaM@infradead.org>
- <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
- <Z8cE_4KSKHe5-J3e@infradead.org>
- <2pwjcvwkfasiwq5cum63ytgurs6wqzhlh6r25amofjz74ykybi@ru2qpz7ug6eb>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="AELYw4fM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=bqwn6hkv25epfihij5ctljfsnu.protonmail; t=1741789360; x=1742048560;
+	bh=lpMoYYhCby2+h930TAwepOJMN45pAXmhdXKYFNY3rBs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=AELYw4fMwrmf0lwSNSt1YDmhebSHR9WcORDIYt0JUDXOt4hlNwtokvjC+7uebmJ34
+	 i9XkNLKy2r83wsepgZTQ3Mhy88Ptt9tWqegrUtliRiz4vFOaqH3rtlEcIrPUXxOjG3
+	 BTvPbiX9AT31ZUqxdc6KQJx+hCinuSSFlwVc6Ui5p3hGnKsw2/EfF/O6xwVCPm9KD+
+	 YiWEHOkwRt88tMvA3ksF3WfXM31SqGUcdqWnnxv8hAdQcRXlYA3DJKfOPkVC4GQSeZ
+	 1cY1Vhd1HXWvQyUoCM++3MlIe6eM57VYkXZbVGxAle5cIo37MNE2bYw65EBh6Xknyn
+	 jLIB5LpcyZ+/A==
+Date: Wed, 12 Mar 2025 14:22:31 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] rust: retain pointer mut-ness in `container_of!`
+Message-ID: <D8ECSHQTFGM5.E4N1XJBDTJUY@proton.me>
+In-Reply-To: <20250309-ptr-as-ptr-v2-1-25d60ad922b7@gmail.com>
+References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com> <20250309-ptr-as-ptr-v2-1-25d60ad922b7@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: da106fb69e93b9a459d540ee0cf6831ad932bfee
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2pwjcvwkfasiwq5cum63ytgurs6wqzhlh6r25amofjz74ykybi@ru2qpz7ug6eb>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 12, 2025 at 09:26:55AM -0400, Kent Overstreet wrote:
-> We might be able to provide an API to _request_ a stable mapping to a
-> file - with proper synchronization, of course.
+On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
+> Avoid casting the input pointer to `*const _`, allowing the output
+> pointer to be `*mut` if the input is `*mut`. This allows a number of
+> `*const` to `*mut` conversions to be removed at the cost of slightly
+> worse ergonomics when the macro is used with a reference rather than a
+> pointer; the only example of this was in the macro's own doctest.
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-We already have that with the pNFS layouts.
+One tiny nit below, but even without that:
 
-> I don't recall anyone ever trying that, it'd replace all the weird
-> IF_SWAPFILE() hacks and be a safe way to do these kinds of performance
-> optimizations.
+Reviewed-by: Benno Lossin <benno.lossin@proton.me>
 
-IS_SWAPFILE isn't going way, as can't allow other writers to it.
-Also asides from the that the layouts are fairly complex.
+> ---
+>  rust/kernel/lib.rs      |  5 ++---
+>  rust/kernel/pci.rs      |  2 +-
+>  rust/kernel/platform.rs |  2 +-
+>  rust/kernel/rbtree.rs   | 23 ++++++++++-------------
+>  4 files changed, 14 insertions(+), 18 deletions(-)
+>
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index 7697c60b2d1a..9cd6b6864739 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -187,7 +187,7 @@ fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
+>  /// }
+>  ///
+>  /// let test =3D Test { a: 10, b: 20 };
+> -/// let b_ptr =3D &test.b;
+> +/// let b_ptr: *const _ =3D &test.b;
 
-The right way ahead for swap is to literally just treat it as a slightly
-special case of direct I/o that is allowed to IS_SWAPFILE files.  We
-can safely do writeback to file backed folios under memory pressure,
-so we can also go through the normal file system path.
+You could also use `&raw test.b` to get a pointer instead of relying on
+the pointer coercion. That syntax is stable since 1.82.0, so older
+compilers would need to enable the `raw_ref_op` feature.
+
+I created an orthogonal good-first-issue for changing uses of
+`addr_of[_mut]!` to `&raw [mut]`, so maybe that can also be done there:
+
+    https://github.com/Rust-for-Linux/linux/issues/1148
+
+---
+Cheers,
+Benno
+
