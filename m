@@ -1,93 +1,95 @@
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D342033A;
-	Wed, 12 Mar 2025 14:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A974645
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741789370; cv=none; b=MUsfnMHjk4ZGxvsJsFiOCm4Y3Aydif6HVHv5Ua3CMXKL2EcV133+oQb1Xrk4/Oh43UmxJm2wP+NDJFIIKUD0QUC/lCE4oIvEZNpIr9ZsAaTdlF+AAnssKihCropUXzb4/TVBzGEhg67S3cCDApQoyQJfOEXnv6be5l5OBLTTFXs=
+	t=1741789631; cv=none; b=AEksvvvmw6dRfxTY/KLz/RlhAygo92Tk12lv7FiV3W4GTgMs1Nf/WPq7u56dDFVmSIzIUeCRnI6JVm/IjkEQkLhi+qVj3kgXMdaR4RPtwPGMvFVAxl5KajGgxbiKvxN0FCuHDHY/9T7d/+o+orXk7m/YNn5PcfjzsI7tXX6RL2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741789370; c=relaxed/simple;
-	bh=5zIB9aP4MjZVZbVwkvtMy8bZT0SBYH8T7xQXJLwcGRk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SIufARffDV5POpuvfWywAMBk7krPz2hp1LGa9hghTh6ImfMIReQIX1mvVHVn3y12lX4Nk0Ed5c7LwZC/pgvXS/fbkIaFspl/7Bbimj7ueFAnya9RloKzzYF4Z2kUAzCFymOKG94UgCPgFLlo5iD1WgMlkxXEET/Hd9nBPFkJnAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=AELYw4fM; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1741789631; c=relaxed/simple;
+	bh=UBxjjewEfqW7bgsY5pLmVJwDI/I5b1vpzN/Tb6m2NY0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=jKRTHVUq/vw/96NbcMI7OxmskhpKd3eCNffBqI4GbCVQ3JZyWNZr9iXOrEqeXR7VQ9fz4fNgiHSS8A915kfqFWsP4HuHpE6mCQPRYUO3K0of1p2Ip4jrR32+Q6b2itSU7dVpGMZDXQb+Dw2Kior/RAYn1or76MBqM0CPbof2egc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=s/5AZ9wm; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="AELYw4fM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=bqwn6hkv25epfihij5ctljfsnu.protonmail; t=1741789360; x=1742048560;
-	bh=lpMoYYhCby2+h930TAwepOJMN45pAXmhdXKYFNY3rBs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=AELYw4fMwrmf0lwSNSt1YDmhebSHR9WcORDIYt0JUDXOt4hlNwtokvjC+7uebmJ34
-	 i9XkNLKy2r83wsepgZTQ3Mhy88Ptt9tWqegrUtliRiz4vFOaqH3rtlEcIrPUXxOjG3
-	 BTvPbiX9AT31ZUqxdc6KQJx+hCinuSSFlwVc6Ui5p3hGnKsw2/EfF/O6xwVCPm9KD+
-	 YiWEHOkwRt88tMvA3ksF3WfXM31SqGUcdqWnnxv8hAdQcRXlYA3DJKfOPkVC4GQSeZ
-	 1cY1Vhd1HXWvQyUoCM++3MlIe6eM57VYkXZbVGxAle5cIo37MNE2bYw65EBh6Xknyn
-	 jLIB5LpcyZ+/A==
-Date: Wed, 12 Mar 2025 14:22:31 +0000
-To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] rust: retain pointer mut-ness in `container_of!`
-Message-ID: <D8ECSHQTFGM5.E4N1XJBDTJUY@proton.me>
-In-Reply-To: <20250309-ptr-as-ptr-v2-1-25d60ad922b7@gmail.com>
-References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com> <20250309-ptr-as-ptr-v2-1-25d60ad922b7@gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: da106fb69e93b9a459d540ee0cf6831ad932bfee
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="s/5AZ9wm"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so21570345ab.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 07:27:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741789628; x=1742394428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3nM8y5yMTrKKaGiqQToVe7ZOOp/tPnNhmC6g36Zt2NE=;
+        b=s/5AZ9wmdwp/ZXT69+RcZnh/PjMrPyFrZAjO0peCqeTc8YNiEyI/KfyISiuvVx1rDf
+         cse1vzAjxoO+NaeDUCnr2cKTx7p9VlxMHXJawQUFqZP1Y18LEaeB8LITbWvyxegK3Vgs
+         NyiTwT8qVguxadkLy3hZm5VqllniF5oiMV8RS2aoAQ4zm82sNI7LigewCQHgdOV/rREk
+         pUoU9xLW7srrwd4YIkqfLctK7GDl6sZbMK05TyTEWWF7Gv2R5bCo2JKCJceGSWM9fUl6
+         NVEzRqbNjKmlVTEdCk2I3dzIemO9womHZwbA89HihCXW8GREuXqpClP5u0G3uJ1zXdpx
+         URNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741789628; x=1742394428;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3nM8y5yMTrKKaGiqQToVe7ZOOp/tPnNhmC6g36Zt2NE=;
+        b=ZX+l6rAv2K3ZH5AfRGHB5NJ66yY+YQipxsPNKFzUAbVcyfuKlOe2WKOE4ptahjozsd
+         8/bF7CFyyWWNg6WVDuDGGdcZODMPaR1XZ2z3s8FrFklYLHIeNlD2br3OmjiizLpVzSfZ
+         g6+Y5JYbFXM/bkUNGACm5HVIYoTF0Kk8nM33GMfMQXM2al1TMqQhxATboEiqLI0LtISh
+         Ro+OPu1TxSD8bmS/+2g5V5B+P/ucOIc0yLnLkfw8ZaUUfor+UKRD/rzj/ejcC5RttOPt
+         Op8FvwfvPASfbPYTn9DtANvYW6Df/Q5JZQdmOpmG3PgG+Xjdg5ZXIoB70Jhj+eWwLqo7
+         CFTA==
+X-Gm-Message-State: AOJu0YxvyCgR3pGf83ozLUXll2Wz+9uDUT0QwZdrXkAyduz44lUqrphk
+	C+cfukiB0+K0TtgfTYS/2T36H7Ft4BcR/6ZHHL3bXnxabXSQUCz+pZOWHTdRNYjXIClf0N98bEG
+	7
+X-Gm-Gg: ASbGncuLZCs18QbXe53k1KJSTpN8h2gYJUFcGAygYkpRXiI09nvcz1kMv92MIuZy+HK
+	kc90oaHB3uShu73/Vl6mxdS03aGynRP1uTBghIvzTboFYD5mYdpl/kEdeuSk9n/M11JaZz/1qgk
+	bX0xMVQ9vEF72VDTbUblLsuIIKzeHvVE+fot/qig7xmxpLdwihsPJ0Vwh8Xyy1rlPwFmdWl7qHJ
+	srYxJN/Wopi8hciAyyzrwaHO82FJCh6z+H+LVBQq8dgOwhCYGvy3EoA9JPSeTBAcoYDJMZoxfAz
+	ItcozhJrjrFvjRyCQu0GscXfjlpJU94Wx8+h6OnwHSDkqA==
+X-Google-Smtp-Source: AGHT+IFjZxOaxOQMpHju/ujIiv0xL0DG5hI2T2oJVYSh3a8Oo/W3Zko6Mugub4K2M7oJAFLiesDwhA==
+X-Received: by 2002:a05:6e02:1a84:b0:3d3:db70:b585 with SMTP id e9e14a558f8ab-3d4419baaf6mr247212435ab.21.1741789627705;
+        Wed, 12 Mar 2025 07:27:07 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f23db8f8d0sm1335734173.45.2025.03.12.07.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Mar 2025 07:27:06 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Guixin Liu <kanie@linux.alibaba.com>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20250312084722.129680-1-kanie@linux.alibaba.com>
+References: <20250312084722.129680-1-kanie@linux.alibaba.com>
+Subject: Re: [PATCH] block: remove unused parameter
+Message-Id: <174178962656.513960.8514899109835328005.b4-ty@kernel.dk>
+Date: Wed, 12 Mar 2025 08:27:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
-> Avoid casting the input pointer to `*const _`, allowing the output
-> pointer to be `*mut` if the input is `*mut`. This allows a number of
-> `*const` to `*mut` conversions to be removed at the cost of slightly
-> worse ergonomics when the macro is used with a reference rather than a
-> pointer; the only example of this was in the macro's own doctest.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-One tiny nit below, but even without that:
+On Wed, 12 Mar 2025 16:47:22 +0800, Guixin Liu wrote:
+> The blk_mq_map_queue()'s request_queue param is not used anymore,
+> remove it, same with blk_get_flush_queue().
+> 
+> 
 
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+Applied, thanks!
 
-> ---
->  rust/kernel/lib.rs      |  5 ++---
->  rust/kernel/pci.rs      |  2 +-
->  rust/kernel/platform.rs |  2 +-
->  rust/kernel/rbtree.rs   | 23 ++++++++++-------------
->  4 files changed, 14 insertions(+), 18 deletions(-)
->
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index 7697c60b2d1a..9cd6b6864739 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -187,7 +187,7 @@ fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
->  /// }
->  ///
->  /// let test =3D Test { a: 10, b: 20 };
-> -/// let b_ptr =3D &test.b;
-> +/// let b_ptr: *const _ =3D &test.b;
+[1/1] block: remove unused parameter
+      (no commit info)
 
-You could also use `&raw test.b` to get a pointer instead of relying on
-the pointer coercion. That syntax is stable since 1.82.0, so older
-compilers would need to enable the `raw_ref_op` feature.
+Best regards,
+-- 
+Jens Axboe
 
-I created an orthogonal good-first-issue for changing uses of
-`addr_of[_mut]!` to `&raw [mut]`, so maybe that can also be done there:
 
-    https://github.com/Rust-for-Linux/linux/issues/1148
-
----
-Cheers,
-Benno
 
