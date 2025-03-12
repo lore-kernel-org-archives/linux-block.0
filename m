@@ -1,30 +1,53 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3141E3DE8
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A0324E01B;
+	Wed, 12 Mar 2025 14:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741788778; cv=none; b=alDTfXDH7oMdMtOtmMatPC1I2ZKeVDgHbTTkcSbsyJ7Ma2fzvCqHzwI0h4PBzxguCHz07DUFRVkGosSu8tVB8IFr4bCQ9jDubL6ycgjmismxe7RwoJDA2Lnxps/qGzAdv9hNJ8dBncA+593EizSFj8dcvdeLlmDaqshquvIKERo=
+	t=1741789215; cv=none; b=q5QJo3QyFpYN+WdAMy2mlDszJyfpRlx5sEXh+hjFLQSiM1zKutM88veLkLy/O/6d6lXL0nc328Ia4iCZ5srCMSSQS7D8Hbskj6XF5l46x9fTD4w8tvHwg3xcHG4plrtFDebTj72xcGCcSCYcCgZBE45XJrWl80jUBz41YlLSx84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741788778; c=relaxed/simple;
-	bh=+/7AbLm/fC2Gv5bJt/sys9hAPjrlLI1mH7Uw+V3Uvbk=;
+	s=arc-20240116; t=1741789215; c=relaxed/simple;
+	bh=FVgwkNvdBVna1lZKEuoxhUiMfcQJE7r/RVcXktgflO8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T+LPBIZmescuWCUtCncFjIc0vw0iOYAHhetWirR3+cf7UvzAmIZO1NinqZSrXFpVNLexZikR5Gwu/GQfbrvsobrNw+LDCA7oKSCj5Zwf5s7yaPgOLswL/zbnKH9HpYCwSK0hz5HyQ4p2/YqQ5/k3wD+6zhPKkp29hdKc9rF/bJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7B3B768BFE; Wed, 12 Mar 2025 15:12:51 +0100 (CET)
-Date: Wed, 12 Mar 2025 15:12:51 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, ming.lei@redhat.com,
-	dlemoal@kernel.org, hare@suse.de, axboe@kernel.dk, gjoyce@ibm.com
-Subject: Re: [PATCH] block: protect debugfs attributes using
- q->elevator_lock
-Message-ID: <20250312141251.GA13250@lst.de>
-References: <20250312102903.3584358-1-nilay@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GXPTyF0BP1k7TxNJy+HJSlzOeZuS4dmESXPuzDS9vcS4+hwM1c28AZ2tRqH8yU+N42xbzZozEaXD+tZWcpTfm9rhHbpqrP0B0Lds9b9iwesUtqoQyCMP6DOgPOFv51yeAn0pKAbSnlQGsXn4ciL00nD3KEmYvS8dv/5mBvUNbwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=iYn2cEi0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iYn2cEi0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=qKvB2nlT3iUgjzyDXuqxiMFS1Em8INDMpJfZqPHhHac=; b=iYn2cEi0fHqMF9jO945+0Payis
+	ebcZe3lInCyVQtA+Cpk69+kFkR76CPVVG5sWIB1AaJj7JPcZb82CbVScbWZQz0xP73IhCe/l9eS0B
+	gw+nctm7DFDdVykaTKLxCQU2xGZEu40w/fgZhIPiMVIPTwZj0VJxv7wWCvpAzQ3bkzq879siKtCTH
+	r/i1iXP++jhEEGCpf8DzQQBJZKbggvFv+hEm6bF7qKoD9UlmsZtH9o3A4JAW2KZKjgU63y36D1SpG
+	xM7V2kRkanFltPH0HfXyyZd6M+giV8yS0UnMLuPsaMlTzI7uGypDhKznDG5LNMBGK9RPcDgeg+wJ3
+	ZMFdBEEw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tsMwN-00000008ffL-2u45;
+	Wed, 12 Mar 2025 14:20:11 +0000
+Date: Wed, 12 Mar 2025 07:20:11 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <Z9GYGyjJcXLvtDfv@infradead.org>
+References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
+ <Z8W1q6OYKIgnfauA@infradead.org>
+ <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
+ <Z8XlvU0o3C5hAAaM@infradead.org>
+ <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
+ <Z8cE_4KSKHe5-J3e@infradead.org>
+ <2pwjcvwkfasiwq5cum63ytgurs6wqzhlh6r25amofjz74ykybi@ru2qpz7ug6eb>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,42 +56,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250312102903.3584358-1-nilay@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <2pwjcvwkfasiwq5cum63ytgurs6wqzhlh6r25amofjz74ykybi@ru2qpz7ug6eb>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 12, 2025 at 03:58:38PM +0530, Nilay Shroff wrote:
-> Additionally, debugfs attribute "busy" is currently unprotected. This
-> attribute iterates over all started requests in a tagset and prints them. 
-> However, the tags can be updated simultaneously via the sysfs attribute 
-> "nr_requests" or "scheduler" (elevator switch), leading to potential race 
-> conditions. Since the sysfs attributes "nr_requests" and "scheduler" are 
-> already protected using q->elevator_lock, extend this protection to the 
-> debugfs "busy" attribute as well.
+On Wed, Mar 12, 2025 at 09:26:55AM -0400, Kent Overstreet wrote:
+> We might be able to provide an API to _request_ a stable mapping to a
+> file - with proper synchronization, of course.
 
-I'd split that into a separate patch for bisectability.
+We already have that with the pNFS layouts.
 
->  	struct show_busy_params params = { .m = m, .hctx = hctx };
-> +	int res;
->  
-> +	res = mutex_lock_interruptible(&hctx->queue->elevator_lock);
-> +	if (res)
-> +		goto out;
+> I don't recall anyone ever trying that, it'd replace all the weird
+> IF_SWAPFILE() hacks and be a safe way to do these kinds of performance
+> optimizations.
 
-Is mutex_lock_interruptible really the right primitive here?  We don't
-really want this read system call interrupted by random signals, do
-we?  I guess this should be mutex_lock_killable.
+IS_SWAPFILE isn't going way, as can't allow other writers to it.
+Also asides from the that the layouts are fairly complex.
 
-(and the same for the existing methods this is copy and pasted from).
-
->  	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy_rq,
->  				&params);
-> -
-> -	return 0;
-> +	mutex_unlock(&hctx->queue->elevator_lock);
-> +out:
-> +	return res;
-
-And as Damien already said, no need for the labels here, including for
-the existing code.  That should probably be alsot changed in an extra
-patch for the existing code while you're at it.
-
+The right way ahead for swap is to literally just treat it as a slightly
+special case of direct I/o that is allowed to IS_SWAPFILE files.  We
+can safely do writeback to file backed folios under memory pressure,
+so we can also go through the normal file system path.
