@@ -1,57 +1,42 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389F82033A
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8452139CE3
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 15:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741791113; cv=none; b=GknKjDcETNGkRhS8uKdTUZr3v1iqZzyAuD3dmqLYwJH7oD3Jdxypi32HuZw/GDWRFyQ1wpZbGH+NPRJndLZrop7bTSVxx0W9mwcUq+1XNlU382890DLbnPISCBfNCGs7MVTF1/ti+vjqB4+vnKBBERsjaMV8R2QlKJXdiCfY6Bc=
+	t=1741791693; cv=none; b=TRIpLFMyw9Pvx1Ao594s8IGlgQYgo6HbMcRmBil5kDJpumTHST/ZIXMMYMMjBE8OTCq6VCAz/YBIBJLTwGoF9pBT5wGHfBpny4lXGMF+5WftUJL7fDVwVwORCo7EFxIIYwBFoeefca+AgqZC08TZiGITmA/vJEGRWvC364AcF/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741791113; c=relaxed/simple;
-	bh=NDnLTuLhOFzy1eHOPqYKtCMG2xhRjI5pQ+kKeELws+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YY5B5wFAz0V/JV/uLo6yG7QBdRK6MO+O8c4o8o02PA6CK39WlxuJXP/bowcItUaaQxHXVN803fJUjxMnBwGbu3HJULbO0wouJ+ftuFCcOjRLg4g9+Ivsy3C3VRxPadIpnUgQhdLF71bmJeUV7/u/9LeY9g6jowqJsO78de9cbsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilUDgNTk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741791693; c=relaxed/simple;
+	bh=zfXdgjsn4jotX0gU/wLEybx4NSSTxKMMi7oRl9w2FEM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IE1C9zwGuqB8CRIq1YFArgr2e/7BBdPwYEcScKnwxQBRGbyHg4xdfQfEPQ/xntoFJWszqjleI+HTTrHYB9xo4Sok0pPGRKnFq9bd2pCta7lc2J1Is6JrfJTzCk8sfOMhmjuLQM13kUYkb0BYvTedpZH+GX5gd/+gbNKvxZ9WPoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Oxgix4Ei; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilUDgNTk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741791110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+5ekf4RNz/WiY7b8vyFjJlYDOxBqKzeFiRMoudgmqD0=;
-	b=ilUDgNTkgPaErnywg/HNC4686YRDM7OhwlZ/Rf42lZq8kAgQwHkmEAzauDMHi1MUQcCS3A
-	hrr+PyUtZh8NUND4vzcTCx82LQyXJc9UEttoZmqvuQr9JL1mCB/I0VUT6gHk6BW1l+lPbq
-	+O1w3Kv4m3O0zWMR0q6pSMDuJ7voIeA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-106-JZENE8AjNOOKSAg-dqb6DQ-1; Wed,
- 12 Mar 2025 10:51:47 -0400
-X-MC-Unique: JZENE8AjNOOKSAg-dqb6DQ-1
-X-Mimecast-MFC-AGG-ID: JZENE8AjNOOKSAg-dqb6DQ_1741791106
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA71E1800263;
-	Wed, 12 Mar 2025 14:51:45 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.24])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6C68E1955BCB;
-	Wed, 12 Mar 2025 14:51:43 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Oxgix4Ei"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=VkhONVgBZPRVpFnog11+NqMPYsG0NfayAyjjvBPvr+o=; b=Oxgix4EiKfIK8dC7Pfmq+xOrX+
+	RB9LMsYYFMxXTCrVW0udCe6mbK/8hugXFK+Igr7ihRnTQkyboSHNGIaZbqMtPhszpEWF39lrfMcW+
+	kFz3+IlC6Lh4b8DThbyKnA08rghv+cZF+uSZVxvGPUd73A5qzpEQQOLqH4L8b9Ni93/qKET24W+iJ
+	bgF0M4dF040AFmmALU1fTtiReg+fqxLl6KOhPsCl1sr5XI3ZZRk3hM5EGlAGP5FHvNNr3Dbo4Sf6F
+	aBW6h4IX5GpGsF2KvtgJ9PpHtXfwXJD5rAc6gky4Zrl3HD9u1VzjG3H7rUCtAuLOeAA7CGH4F1ajr
+	DsqigHIQ==;
+Received: from 2a02-8389-2341-5b80-f359-bc8f-8f56-db64.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:f359:bc8f:8f56:db64] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tsNaM-00000008mEb-3Ot9;
+	Wed, 12 Mar 2025 15:01:31 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: nilay@linux.ibm.com,
 	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Kundan Kumar <kundan.kumar@samsung.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Gavin Shan <gshan@redhat.com>
-Subject: [PATCH V2] block: fix adding folio to bio
-Date: Wed, 12 Mar 2025 22:51:36 +0800
-Message-ID: <20250312145136.2891229-1-ming.lei@redhat.com>
+Subject: [PATCH] block: fix a comment in the queue_attrs[] array
+Date: Wed, 12 Mar 2025 16:01:27 +0100
+Message-ID: <20250312150127.703534-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,62 +44,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
->4GB folio is possible on some ARCHs, such as aarch64, 16GB hugepage
-is supported, then 'offset' of folio can't be held in 'unsigned int',
-cause warning in bio_add_folio_nofail() and IO failure.
+queue_ra_entry uses limits_lock just like the attributes above it.
 
-Fix it by adjusting 'page' & trimming 'offset' so that `->bi_offset` won't
-be overflow, and folio can be added to bio successfully.
-
-Fixes: ed9832bc08db ("block: introduce folio awareness and add a bigger size from folio")
-Cc: Kundan Kumar <kundan.kumar@samsung.com>
-Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Gavin Shan <gshan@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-V2:
-	- trim `offset` unconditionally(Matthew)
-	- cover bio_add_folio() too (Matthew)
-	
+ block/blk-sysfs.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
- block/bio.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index f0c416e5931d..42392dd989ec 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1026,9 +1026,10 @@ EXPORT_SYMBOL(bio_add_page);
- void bio_add_folio_nofail(struct bio *bio, struct folio *folio, size_t len,
- 			  size_t off)
- {
-+	unsigned long nr = off / PAGE_SIZE;
-+
- 	WARN_ON_ONCE(len > UINT_MAX);
--	WARN_ON_ONCE(off > UINT_MAX);
--	__bio_add_page(bio, &folio->page, len, off);
-+	__bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE);
- }
- EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index d584461a1d84..a2882751f0d2 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -671,11 +671,6 @@ static struct attribute *queue_attrs[] = {
+ 	&queue_dax_entry.attr,
+ 	&queue_virt_boundary_mask_entry.attr,
+ 	&queue_dma_alignment_entry.attr,
+-
+-	/*
+-	 * Attributes which require some form of locking other than
+-	 * q->sysfs_lock.
+-	 */
+ 	&queue_ra_entry.attr,
  
-@@ -1049,9 +1050,11 @@ EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
- bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
- 		   size_t off)
- {
--	if (len > UINT_MAX || off > UINT_MAX)
-+	unsigned long nr = off / PAGE_SIZE;
-+
-+	if (len > UINT_MAX)
- 		return false;
--	return bio_add_page(bio, &folio->page, len, off) > 0;
-+	return bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE) > 0;
- }
- EXPORT_SYMBOL(bio_add_folio);
- 
+ 	/*
 -- 
-2.47.1
+2.45.2
 
