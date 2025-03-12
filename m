@@ -1,111 +1,92 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342FB24419B
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 15:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471FB23A9B4;
+	Wed, 12 Mar 2025 15:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741793901; cv=none; b=NgBFc+206MD4Az8Ldbc4FQdvvFITXJS0/8qR2fHvr6rMpGIjyXNGQ+sfEkA9QQnzOK7mivTg+C9oawwJlRUJW3K7om9Ug5iaxc7+dda8Cm9XoNymt0wG9VNgLrpbRKGcaK9B+mgW52VsPEvgZpVJ7ofvQf18U4JYHKdhbDNghi0=
+	t=1741794065; cv=none; b=DCeI+9SYELnDnY42roEiTYsIXeqH2W0D4ZJYRBTSNqgzp2eSCGGUqPJQi2SJdRL6BcFtKm8ueDEy5AfonTDagtWpsqiXIQJy6DBPjiMFr87iKzFKwx4HUNkMhLd6NHzGVN4j0APXqcQ5SiwI1JUBIZOOjU15hN+Ip7fOlbvf+Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741793901; c=relaxed/simple;
-	bh=mECECZUKyT8tJ1zfg2PNBtQFa78DsD3UR2qD52joMLQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f4qIjLS2HXZZvv1cAAh6OVGREH9pmmYXxcqM/5N2Al+2j+z5yJVX6/EgD4fy5/ramKM7PgoAHaEUXTfP1cWQ0dxXIp2HChV/hIw1qRCCDAu+Z0Bhmf2V4LGX2a2vOvqZViAjkih8VZzHRFca3vSKCMBcZfp38iSzfJqHzX5m4KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K+5ySMTT; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1741794065; c=relaxed/simple;
+	bh=+DjZrMhoe4S80lso1kZouk0162bjEZBCnZ+ayHsbcco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dO2HfJxEGZqX/tI3D/NzKuhT/GxrMfGF9rvim06oQPooC7OUQAi6agh5uilshTkxpJYn2l5k5Qgiz7MnFNC9cG0MOy/a6P1UrulCOvmLfxb+0CI5dk7uXrLrNigrvW7jYDzfSfOQ15F9MRxJMyz3070XZl97cp6b2xbL7oackHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2kI93PJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K+5ySMTT"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47681dba807so215841cf.1
-        for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 08:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741793899; x=1742398699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oad3olm2GEdFBtEEysjN3502N0ME3OM6JNCjW+ME63A=;
-        b=K+5ySMTTjBAxhjT9qopNvR6EZYDfWxMnt8IKrWiVBK6YWqeMh6/FU3jJA2dRgTx81U
-         SmiPCtQKidIlC2wfkRLADkfrmmZ79sD+a/4ayM0kHFy1ES3trxvXhfwsI5KU3JazqsH2
-         ZOQ+iL4b+3SVS6szaRL0mV3UHxt+TO5ZNCiMxcvoKuTDY+lQljrz4jpTD28CCk87VTv2
-         ykW6QmpsaUBynRldirFij0VSMQEDlsZ5Tj0QYEUjEfC4E9WW5ztGUUHfcHHEOaDbyCdE
-         qhKoYzZK19zaEBgJ03U2ViK5PumkXOOXPstRfkFe0lyJcjVyIrMOb5ZmIoyL4t8+Z0pW
-         pyCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741793899; x=1742398699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oad3olm2GEdFBtEEysjN3502N0ME3OM6JNCjW+ME63A=;
-        b=cLj9m7gRk/SUm3QTFKqNFAXF1rTvZ1Q1iwbf6f2AxXIXq0KG9MBIZfo9mQ/44HWxnZ
-         ngvLbrsjrogYOwL4rUIYqVFSGuFv4J3EAHgh7wSN1oAJpOpfVyeyI1ODDuNzzafhqgQa
-         gdudFb2lS/ftgxDOw0/cRVYkKsMQ+Ua/d/5ikAmYJmPP8FkOZdHfjA6P7pNJ9zJOP0q7
-         /R3wiMzZnwOeuV59qYiYSAYgBAoEawoqCexR4fL85LrJyrjMS2ry0Xzgh1NQSUG8j8ao
-         PytKlWnjiscItyptlPs6Xi20MvR66y7YE9GlL5d/50npzYc/0gnGjwGLJbkEjhbuiuE1
-         mmjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURVqRzFIQ4SKcCtlHciyX4mJlBUL2KTq8Oxmm6wmxS10CkdAqczrda1aRg8xn8SJDnpV6kPVeHHOdA+g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/NBS94lg/jYbKZRSXkUptxL1lo7GaEWxVgm2w1Mld9gqRFmEb
-	oNpxxdD4X5yqKCoSIcNNPi2gSFrRBjJFrQXvRcPX7XQdNPbs8nc7jgIuFpJeiDLhNBQrHBDlnfb
-	5gIGOJlk5iVj02lvi1NNNO82ddf2TDzhc/mZn
-X-Gm-Gg: ASbGncvGMU/W9i7ChvFG13pr2g2EKPBh4oED5SDJJiOoZ3O38AFM9Yc35aECGihymYN
-	HT/rO2CPfFeiok07YnVSwdH9j5t2jGPNnudXBt1NEUzjIXqg3RfaEG8Ipj3TylS6nXSBZSpOaVJ
-	JOcYrCTuBLnH1cH0J+owov255FuyWVFGrw9soXNjCSYYCFGmkqI3lMZZCg7pJ0dE5+XJ8=
-X-Google-Smtp-Source: AGHT+IFQd7cFv173t000O1zcn+8wgPx4dJlGWMBi427eiMql7l9Xmf0NxuFYWlaUbMq6ERIxoPYFIgYpzBuguiARoR4=
-X-Received: by 2002:ac8:5a95:0:b0:472:538:b795 with SMTP id
- d75a77b69052e-476b798f0admr328451cf.22.1741793898834; Wed, 12 Mar 2025
- 08:38:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2kI93PJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2D38C4CEDD;
+	Wed, 12 Mar 2025 15:41:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741794064;
+	bh=+DjZrMhoe4S80lso1kZouk0162bjEZBCnZ+ayHsbcco=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e2kI93PJwrZsHc79AU8BZ5RCBZLJoSoYEnUXthRsPCJ44E4PlwcYVZCmSJx/3RqB1
+	 XlyLfcJNX6T75ZnzJH/NZI1KMS2od/AnGqIHY6u49ZrpOUgYpG+TXe/+SbF7wEqI24
+	 72RFgJ8LygU37SC4YmEj0oQ2Bm8SFVIXNU7LwyuZqyF+CVcxLanFGMJJ+cnyQYVi8M
+	 YrIfZhFiF/Heeusbqthq25bnHSgPq/8idyBLAE2bjTVQ6XuHMlKiObBy/V4bu9agt4
+	 JKc9OFaaCWyygI/3LB5cBhmeSLoML0jga1RfTwjNzUygLOCcY6tFifRQO7V85ShQPK
+	 IiDtquB5LnHTQ==
+Date: Wed, 12 Mar 2025 05:41:03 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk, josef@toxicpanda.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
+Message-ID: <Z9GrD-7tW6tKVimk@slm.duckdns.org>
+References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
+ <Z8sZyElaHQQwKqpB@slm.duckdns.org>
+ <5fc124c9-e202-99ca-418d-0f52d027640f@huaweicloud.com>
+ <Z85LjhvkCzlqBVZy@fedora>
+ <Z88K5JtR4rhhIFsY@slm.duckdns.org>
+ <baba2f82-6c35-8c24-847c-32a002009b63@huaweicloud.com>
+ <Z9CQOuJA-bo4xZkH@slm.duckdns.org>
+ <c1e467a9-7499-e42b-88ed-b8e34b831515@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20250306074101epcas1p4b24ac546f93df2c7fe3176607b20e47f@epcas1p4.samsung.com>
- <20250306074056.246582-1-s.suk@samsung.com> <Z8m-vJ6mP1Sh2pt3@infradead.org>
- <CAJrd-UuLvOPLC2Xr=yOzZYvOw9k8qwbNa0r9oNjne31x8Pmnhw@mail.gmail.com>
- <848301db8f05$a1d79430$e586bc90$@samsung.com> <CAJuCfpHjV=nRmkAGrf-tyCxEEygZ0CuW-PRp+F_vHwFbfYS8dA@mail.gmail.com>
- <Z9Gld_s3XYic8-dG@infradead.org> <CAJuCfpGa43OQHG9BmnvxROX1AneCvkuLxFwM+TdxAdR1v9kWSg@mail.gmail.com>
- <Z9GnUaUD-iaFre_i@infradead.org>
-In-Reply-To: <Z9GnUaUD-iaFre_i@infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Wed, 12 Mar 2025 08:38:07 -0700
-X-Gm-Features: AQ5f1Jpfs-45rUWpy4AjGITfWFgctjNpl6Oq04S9EIvxgwjOZng3y_psNvrHlmM
-Message-ID: <CAJuCfpEpWQV8y1RKb3hH+-kxczTUvpvCBNNzGJufsAxpkhB4_A@mail.gmail.com>
-Subject: Re: [RFC PATCH] block, fs: use FOLL_LONGTERM as gup_flags for direct IO
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sooyong Suk <s.suk@samsung.com>, Jaewon Kim <jaewon31.kim@gmail.com>, viro@zeniv.linux.org.uk, 
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-mm@kvack.org, 
-	spssyr@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	dhavale@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1e467a9-7499-e42b-88ed-b8e34b831515@huaweicloud.com>
 
-On Wed, Mar 12, 2025 at 8:25=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> On Wed, Mar 12, 2025 at 08:20:36AM -0700, Suren Baghdasaryan wrote:
-> > > Direct I/O pages are not unmovable.  They are temporarily pinned for
-> > > the duration of the direct I/O.
-> >
-> > Yes but even temporarily pinned pages can cause CMA allocation
-> > failure. My point is that if we know beforehand that the pages will be
-> > pinned we could avoid using CMA and these failures would go away.
->
-> Direct I/O (and other users of pin_user_pages) are designed to work
-> on all anonymous and file backed pages, which is kinda the point.
-> If you CMA user can't wait for the time of an I/O something is wrong
-> with that caller and it really should not use CMA.
+Hello,
 
-I might be wrong but my understanding is that we should try to
-allocate from CMA when the allocation is movable (not pinned), so that
-CMA can move those pages if necessary. I understand that in some cases
-a movable allocation can be pinned and we don't know beforehand
-whether it will be pinned or not. But in this case we know it will
-happen and could avoid this situation.
+On Wed, Mar 12, 2025 at 09:51:30AM +0800, Yu Kuai wrote:
+...
+> In the case of dirty pages writeback, BIO is 4k, while RQ can be up to
+> hw_sectors_kb. Our user are limiting iops based on real disk capacity
+> and they found BIO merge will be broken.
+> 
+> The idea way really is rq-qos based iops limit, which is after BIO merge
+> and BIO merge is ensured not borken. In this case, I have to suggest
+> them set a high iops limit or just remove the iops limit.
 
-Yeah, low latency usecases for CMA are problematic and I think the
-only current alternative (apart from solutions involving HW change) is
-to use a memory carveouts. Device vendors hate that since carved-out
-memory ends up poorly utilized. I'm working on a GCMA proposal which
-hopefully can address that.
+I get that that particular situation may be worked around with what you're
+suggesting but you should be able to see that this would create the exact
+opposite problem for people who are limiting by the IOs they issue, which
+would be the majority of the existing users, so I don't think we can flip
+the meaning of the existing knobs.
 
->
+re. introducing new knobs or a switch, one thing to consider is that
+independent iops limits are not that useful to begin with. A device's iops
+capacity can vary drastically depending on e.g. IO sizes and there usually
+is no one good iops limit value that both doesn't get in the way and
+isolates the impact on other users, so it does feel like trying to polish
+something which is fundamentally flawed.
+
+Whether bio or rq based, can you actually achieve meaningful isolation with
+blk-throtl's iops/bw limits? If switching to rq based (or something
+approximating that) substantially improves the situation, adding new sets of
+knobs would make sense, but I'm skeptical this will be all that useful. If
+this is just going to be a coarse safety mechanism to guard against things
+going completely out of hands or throttle already known IO patterns, whether
+the limits are based on bio or rq doesn't make whole lot of difference.
+
+Thanks.
+
+-- 
+tejun
