@@ -1,74 +1,87 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97FC15539A;
-	Wed, 12 Mar 2025 15:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE631253355;
+	Wed, 12 Mar 2025 15:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741793108; cv=none; b=L2hCr8TXphviLrtcpzPC0bwm9y5FZLPNVMeTBJvUsIoP+jN+tXYZGV8KEAt4uWLjDeQwJGV4yM+g1eH4Osczyiy3U0ajtPNHn0vqvZW2roMGFj9GMtBDTse37F1XVSYmG+pqPdC3JI4tx1VcRvKX+xP48h0SLVdfGC1NFEXaD7I=
+	t=1741793109; cv=none; b=iLoHID9thPfK3w9xaAp3xgX/tbenb1BUELsdYfjKtdaDNfPeTEzXZAE16e/+r1IBqXqk5EFmeKLqjCuMhJ5+s7hFB7o+paO9B7yY0Dy2Hk3Byppw/YihPeoUMgnbSS2I/9FaELCUhXVciJ+extwq5YkCLLOyLVJWHNEHv2SIfmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741793108; c=relaxed/simple;
-	bh=qCy31R7dww0j1i0US9AlZoqTPW70teVl4tpDVXWN810=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GT0eXATK4DatTS272LRNzIolZi4/DT3gOkHGCBFSMSqJS9MSIad7ZXKAo3r4gLGmdPlsYJFf6dHA7bYBD9zKJDJO5wxLhGspWi+8lqeZ/7XbOUaWjUc208LjBdsy+P1gPfCEdfDNtDvICD88KXPlwbEdVAR/WtxsvHfnVyN/s/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hzlgqTqV; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1741793109; c=relaxed/simple;
+	bh=DfBHEd0SO4r7NiVGfilpd306yK11/eGsLe574+AnTFE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iompNPW+EX/sECr5CDvEQh34dqaUw+VIEofdzoVY5IPW8cQrehAlr9t1E8yV6KizkL4RIc6EajOWuRvFhmxj9OO1jjPpK6VOdJgGiHZJlosg1lgs0QpJMEj4I605Pu0l6BU6Iq/kmBejevNRgmVk0543KKp6Mz6z5CIam1CVGpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=frPan1h6; arc=none smtp.client-ip=185.70.40.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hzlgqTqV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=j+Uxy4UgqZ01TMYocbtqbznCHYwDjKEPy1F0RAtlmZA=; b=hzlgqTqV1c7iAagiTWiaVa6U2l
-	0iHfK9bc6oWAIxUTiaaVHTJT2qSGyN9k7icitCFpm5owgGRNv8sLo3vhGgpvSvbrfiCYJ46DfB6MZ
-	2W/k/eQbp1z0FKgeTtLOLOJYb0VWQpuZJbdpZ5ENuzc7EaFaFdcHz9/TZ6OxWWPS5h0hzeqsZmVsE
-	mNUivblro2QSUYCpCJPnMdUvM9JXjp44b8hybJlJBWv7IW8gLn7i++jQe+oAihGk4pCwarJikD+wf
-	FT3/Os+f/IqXlI3a9jmtSo1iaRo+P86f9CaM0amimyOjJ3kSka14ADw1v01rmHlOoQd4NoPRHwqYv
-	2ycBJh1Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tsNxB-00000008r6s-0921;
-	Wed, 12 Mar 2025 15:25:05 +0000
-Date: Wed, 12 Mar 2025 08:25:05 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Sooyong Suk <s.suk@samsung.com>,
-	Jaewon Kim <jaewon31.kim@gmail.com>, viro@zeniv.linux.org.uk,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	linux-mm@kvack.org, spssyr@gmail.com, axboe@kernel.dk,
-	linux-block@vger.kernel.org, dhavale@google.com
-Subject: Re: [RFC PATCH] block, fs: use FOLL_LONGTERM as gup_flags for direct
- IO
-Message-ID: <Z9GnUaUD-iaFre_i@infradead.org>
-References: <CGME20250306074101epcas1p4b24ac546f93df2c7fe3176607b20e47f@epcas1p4.samsung.com>
- <20250306074056.246582-1-s.suk@samsung.com>
- <Z8m-vJ6mP1Sh2pt3@infradead.org>
- <CAJrd-UuLvOPLC2Xr=yOzZYvOw9k8qwbNa0r9oNjne31x8Pmnhw@mail.gmail.com>
- <848301db8f05$a1d79430$e586bc90$@samsung.com>
- <CAJuCfpHjV=nRmkAGrf-tyCxEEygZ0CuW-PRp+F_vHwFbfYS8dA@mail.gmail.com>
- <Z9Gld_s3XYic8-dG@infradead.org>
- <CAJuCfpGa43OQHG9BmnvxROX1AneCvkuLxFwM+TdxAdR1v9kWSg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="frPan1h6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1741793105; x=1742052305;
+	bh=uVoMgsncNZ81Qs244XhiNiFSVWapFutHM21B/73cujs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=frPan1h6YKzC0bqmU90vrOcukl566AIP3m89ASwWziUTdMAfARywXB6xoIg5UvfEN
+	 uTRXcdJ+e39oceAAQXFwT1toqQCsPCa0lu5tXgylrivtsfeTW/uBausk1BNWN8xE7e
+	 LxGN+w83PewYzTnX++QkpWrxHTv/niZTJQo7rmXUozJejyjRjD6E4jJak6YD/8TkGu
+	 Hmb9Y+cRH+osorMUMDEMxGIZ16PyvudJ7XX9ubJzWd+818lcGjffTJk8218pDZ3GRU
+	 CXgzzIGbAEuahl8+tyGyQkG0XGwt13MItmEPxE1lg82Ev7wPTS/uvZX1mIjlz3SPqx
+	 2121b88MfPw2g==
+Date: Wed, 12 Mar 2025 15:25:00 +0000
+To: Tamir Duberstein <tamird@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] rust: enable `clippy::ptr_as_ptr` lint
+Message-ID: <D8EE4BXJ5NLB.8BBCUV0UXWY5@proton.me>
+In-Reply-To: <CAJ-ks9kOLgXrOHucFXHB+DwZEZpZEKhBNmXKh_hB_agrq=2n6g@mail.gmail.com>
+References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com> <20250309-ptr-as-ptr-v2-2-25d60ad922b7@gmail.com> <D8ED5UWKL2N1.2JPWVV0297BJ0@proton.me> <CAJ-ks9kOLgXrOHucFXHB+DwZEZpZEKhBNmXKh_hB_agrq=2n6g@mail.gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 6dd0142bc1b95eaf185630e5f364e5053d7fe2a5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJuCfpGa43OQHG9BmnvxROX1AneCvkuLxFwM+TdxAdR1v9kWSg@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 12, 2025 at 08:20:36AM -0700, Suren Baghdasaryan wrote:
-> > Direct I/O pages are not unmovable.  They are temporarily pinned for
-> > the duration of the direct I/O.
-> 
-> Yes but even temporarily pinned pages can cause CMA allocation
-> failure. My point is that if we know beforehand that the pages will be
-> pinned we could avoid using CMA and these failures would go away.
+On Wed Mar 12, 2025 at 4:18 PM CET, Tamir Duberstein wrote:
+> On Wed, Mar 12, 2025 at 10:40=E2=80=AFAM Benno Lossin <benno.lossin@proto=
+n.me> wrote:
+>>
+>> On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
+>> > In Rust 1.51.0, Clippy introduced the `ptr_as_ptr` lint [1]:
+>> >
+>> >> Though `as` casts between raw pointers are not terrible,
+>> >> `pointer::cast` is safer because it cannot accidentally change the
+>> >> pointer's mutability, nor cast the pointer to other types like `usize=
+`.
+>> >
+>> > There are a few classes of changes required:
+>> > - Modules generated by bindgen are marked
+>> >   `#[allow(clippy::ptr_as_ptr)]`.
+>> > - Inferred casts (` as _`) are replaced with `.cast()`.
+>> > - Ascribed casts (` as *... T`) are replaced with `.cast::<T>()`.
+>> > - Multistep casts from references (` as *const _ as *const T`) are
+>> >   replaced with `let x: *const _ =3D &x;` and `.cast()` or `.cast::<T>=
+()`
+>>
+>> Similarly to the other patch, this could be `let x =3D &raw x;`. (but it=
+'s
+>> fine to leave it as-is for now, we can also make that a
+>> good-first-issue.)
+>
+> Yeah, same as the other patch; we can't directly do that here without
+> introducing some compiler infra or bumping MSRV.
 
-Direct I/O (and other users of pin_user_pages) are designed to work
-on all anonymous and file backed pages, which is kinda the point.
-If you CMA user can't wait for the time of an I/O something is wrong
-with that caller and it really should not use CMA.
+I think it's fine enabling the feature for this patch (or in a prior
+one) if you want to do the work. But someone already took up the issue I
+created, so maybe it's best to let them handle it.
+
+---
+Cheers,
+Benno
 
