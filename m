@@ -1,116 +1,80 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFDA3D76
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 16:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335FB1DFF7
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 16:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741795577; cv=none; b=TlF5tU1eKXI6bkwTFZ7SBfkp6EGZ50CgEmt8zwDHryS/9eZxiUqNVl4S9XLLgwtLO/lf6mANKUpAfKu7s8DPdrqVrK0dmgY2Io/DeHU4tD40RRh4AiKguxa/nVcz029+QaDgBz2os4n2lRE5Vacbmvqhwv2dQOrincS6XlS6oBk=
+	t=1741795793; cv=none; b=YxTPDEt0yLmPSt96dHpVYDkfCmhzomJZGFcCFEOQWKCTX4Sg8UfC+eYB7VDtHlWv2gnSZoh8/wXXG8zxpotgOY9fZPZj5pbz5spwc8xrTZ4f4OM1HXxWN2dS0FeU0f66de2AXCypPpvwzkOggkOuoyrZHpWTw+OQk46rcrFOXaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741795577; c=relaxed/simple;
-	bh=pI0/d6VWhb3rHB70TMDWtb5UFpEepPzY4oFcPVKsnh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TROVpuHOIVukG/gdW4LSMpaWhrRCQs5qLRlfwwhQNQQ8A+7Rq4OYAezp9px0zILgmP8fMMiJSabxXb2jPNf6O1082a/w4xbvE7gfnb+UczRdeU+WEhcdfwI7l+tdBu+/u/cF+UA03EsGM6AtgFOXgQRnG2rQmeN0czO2RzRyGj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PInQDyQ4; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1741795793; c=relaxed/simple;
+	bh=zlPYJmg6XIKKvyi9auq/yznc1WWM0rXVGDpiDoNVdhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=se1yWcI7mojXr197yd8fMjdQh0RnR417qa4F31AC99AaWj8SGrYzV6Oq+OdyxvNISSze+Ni7G5UgQV1UBtQuFPkaFwHJ6tTC4basRRUUR721Nn/ztrhH2ithsGRaMB+TsAZKgJI/6cuhYxxhx59SJ5U8ln/mJGuFAAo5YfG0bHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KK8IHyHR; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PInQDyQ4"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47666573242so349901cf.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 09:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741795574; x=1742400374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WrwYv4hV0FSY3G0vHHh7TMbzsgf3mwWBIi9HSSg420o=;
-        b=PInQDyQ4dIr1GHpBncgGK5/XRGNFnPfFQtC2uexqDz9zyoUoT7JHfgt4Zps+a1IoLZ
-         9F1mzQnt6W5doUKmDd3e20dkC7Ys8+W3pzRK4cJbI8G2/r8cs/ybZ6Q0mDW6zPbMVesT
-         EyCx8FWWfKeM7vvve82uFHtXGJvcDuIh0VeFi0QEWbuKFoRFM9iGdcsX3nGslKBZw9lS
-         fZz+OjsDV6ah/px1rP0ONs8U4a0EeBrqaExqrHCnXPzyp7kZCESYxC/grSM4my1k2BMR
-         j6NSyspAxJ408QBxd9RHOsVIY90ZWqwdxqFzGSBV6sRYp1wczk6ERHOUo0JkLLHFR0IZ
-         ZdFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741795574; x=1742400374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WrwYv4hV0FSY3G0vHHh7TMbzsgf3mwWBIi9HSSg420o=;
-        b=PFveDNN9nnRrKyr8S/Z9Is84L/K/oiPTBkzEPgjWeYSQVpeGhjAZeK6jFl+LdtqAiq
-         hVaMWBlpzBKbEXnv13wimLjS+NRNkX/ALOwtFBxd1FpxCwE8uyqfxp2EPRMFd4rHmbYe
-         meYJdm1aWOjAcu6vHvudpgSrA0yduKHYZJeoObZE5MiXIdWuIpRoXOQfzhS5YvU5Enwc
-         2ZsnTEfyec2CGmjU2UPCVOZhB1UEc2HncTIbW94v2gBZbzBunyiLxDHvHYWRalH3rpTa
-         0JsIeU3Rb7Fz6KqO3ssRrZf/WHtv9+mJJmR90IYN0I8PLCKJt5kY41XMYV+6Tl73pOXS
-         GD3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXMYh+zp2cTmyr/FoOGuML5HP15abo32qVeSlFrR4H3LYpaXIAPto2KqnZ/GuLhNS/5cKJjshcJM1gH0w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHUW7wlQlGoy1v+ZPHFKeoeeScp7Y71IRSe3rkfo0x84OTkZ2V
-	Ej9hjoBIn/odhE0BpDfUOZmnSH2H/j1FhSHLbow25In0pJMAZ6GBspnZ5yZ/QwzE/wU3bU6fI+Q
-	zccH3nw6BajZ+B2i/56JHvdkDHaPTCRkwebMu
-X-Gm-Gg: ASbGnctz7rkSlcGyBNxpLdXysVXmYA8fXEO1guPLwdC4XgmBtBYP6J6ar9R7P69t8eV
-	DKJUVooNuIkJpqg3EFM7xSIuVzABqCLXX6xAtK4uBpROwAglBcM+x2MESKHmginHiGj/w87rktf
-	XaxJbiygsH3w8uMEOwxkX+1D0mMYBxTtHSqoLTda6//eklrm9xwAcC5CoD
-X-Google-Smtp-Source: AGHT+IFGXoN107iRcKAaMfh5q54qUSWhsZqDVFmtSnv/zuzK/6+/d0yI2gmYWt4umU7mYkJ4NKdYWUinvN1PCsVQ9g4=
-X-Received: by 2002:ac8:5846:0:b0:467:8416:d99e with SMTP id
- d75a77b69052e-476b7ade14dmr390451cf.21.1741795573844; Wed, 12 Mar 2025
- 09:06:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KK8IHyHR"
+Date: Wed, 12 Mar 2025 12:09:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741795788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kA6L/HzWXWC5BJ9yaTfNuDk1v/yp7mCPLWYFlG4K5hU=;
+	b=KK8IHyHRBJCGhTXK3cs+1+j/J3Sy9bKUaBWAcn8OeU0hpw2OF9LvA678XMXpG4MQrvVD0A
+	gao+qZLvQEbSbfd9y0EQFoJbqd/WfqI9AXLMXRmGfa4Y6KaWnUVAavBDBItOxszNYrHyaC
+	BjaYb7jjB4QKIP8efStRgQTgK0bHwFM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com, 
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <c7znin3sdyzyggpnmwexlnlzhhyzwmrz5l7kyfr3wpszrfhvlt@q74rkjdjz53i>
+References: <7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com>
+ <Z8W1q6OYKIgnfauA@infradead.org>
+ <b3caee06-c798-420e-f39f-f500b3ea68ca@redhat.com>
+ <Z8XlvU0o3C5hAAaM@infradead.org>
+ <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
+ <Z8cE_4KSKHe5-J3e@infradead.org>
+ <2pwjcvwkfasiwq5cum63ytgurs6wqzhlh6r25amofjz74ykybi@ru2qpz7ug6eb>
+ <Z9GYGyjJcXLvtDfv@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20250306074101epcas1p4b24ac546f93df2c7fe3176607b20e47f@epcas1p4.samsung.com>
- <20250306074056.246582-1-s.suk@samsung.com> <Z8m-vJ6mP1Sh2pt3@infradead.org>
- <CAJrd-UuLvOPLC2Xr=yOzZYvOw9k8qwbNa0r9oNjne31x8Pmnhw@mail.gmail.com>
- <848301db8f05$a1d79430$e586bc90$@samsung.com> <CAJuCfpHjV=nRmkAGrf-tyCxEEygZ0CuW-PRp+F_vHwFbfYS8dA@mail.gmail.com>
- <Z9Gld_s3XYic8-dG@infradead.org> <CAJuCfpGa43OQHG9BmnvxROX1AneCvkuLxFwM+TdxAdR1v9kWSg@mail.gmail.com>
- <Z9GnUaUD-iaFre_i@infradead.org> <CAJuCfpEpWQV8y1RKb3hH+-kxczTUvpvCBNNzGJufsAxpkhB4_A@mail.gmail.com>
- <Z9Gty3Ax-2RslqDX@infradead.org>
-In-Reply-To: <Z9Gty3Ax-2RslqDX@infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Wed, 12 Mar 2025 09:06:02 -0700
-X-Gm-Features: AQ5f1Joz69JkjpPsTbZTRmJZtQx_aT9cYAZCenCDm6y3j32d7IR3YQveqxicKU4
-Message-ID: <CAJuCfpHG9EWAC9p7hcOH6oPMWMMSDr91HDt7ZuX2M7=j6bxuGw@mail.gmail.com>
-Subject: Re: [RFC PATCH] block, fs: use FOLL_LONGTERM as gup_flags for direct IO
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sooyong Suk <s.suk@samsung.com>, Jaewon Kim <jaewon31.kim@gmail.com>, viro@zeniv.linux.org.uk, 
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-mm@kvack.org, 
-	spssyr@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	dhavale@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9GYGyjJcXLvtDfv@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 12, 2025 at 8:52=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> On Wed, Mar 12, 2025 at 08:38:07AM -0700, Suren Baghdasaryan wrote:
-> > I might be wrong but my understanding is that we should try to
-> > allocate from CMA when the allocation is movable (not pinned), so that
-> > CMA can move those pages if necessary. I understand that in some cases
-> > a movable allocation can be pinned and we don't know beforehand
-> > whether it will be pinned or not. But in this case we know it will
-> > happen and could avoid this situation.
->
-> Any file or anonymous folio can be temporarily pinned for I/O and only
-> moved once that completes.  Direct I/O is one use case for that but there
-> are plenty others.  I'm not sure how you define "beforehand", but the
-> pinning is visible in the _pincount field.
+On Wed, Mar 12, 2025 at 07:20:11AM -0700, Christoph Hellwig wrote:
+> On Wed, Mar 12, 2025 at 09:26:55AM -0400, Kent Overstreet wrote:
+> > We might be able to provide an API to _request_ a stable mapping to a
+> > file - with proper synchronization, of course.
+> 
+> We already have that with the pNFS layouts.
 
-Well, by "beforehand" I mean that when allocating for Direct I/O
-operation we know this memory will be pinned, so we could tell the
-allocator to avoid CMA. However I agree that FOLL_LONGTERM is a wrong
-way to accomplish that.
+Good point, maybe Mikulas wants to look at that if they care about
+squeezing every iops...
 
->
-> > Yeah, low latency usecases for CMA are problematic and I think the
-> > only current alternative (apart from solutions involving HW change) is
-> > to use a memory carveouts. Device vendors hate that since carved-out
-> > memory ends up poorly utilized. I'm working on a GCMA proposal which
-> > hopefully can address that.
->
-> I'd still like to understand what the use case is.  Who does CMA
-> allocation at a time where heavy direct I/O is in progress?
+> 
+> > I don't recall anyone ever trying that, it'd replace all the weird
+> > IF_SWAPFILE() hacks and be a safe way to do these kinds of performance
+> > optimizations.
+> 
+> IS_SWAPFILE isn't going way, as can't allow other writers to it.
+> Also asides from the that the layouts are fairly complex.
+> 
+> The right way ahead for swap is to literally just treat it as a slightly
+> special case of direct I/o that is allowed to IS_SWAPFILE files.  We
+> can safely do writeback to file backed folios under memory pressure,
+> so we can also go through the normal file system path.
 
-I'll let Samsung folks clarify their usecase.
-
->
+Yeah, and that gets us e.g. encrypted swap on bcachefs
