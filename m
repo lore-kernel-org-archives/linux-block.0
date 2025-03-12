@@ -1,68 +1,105 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62F024E4B1
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 15:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113AF24E4B1;
+	Wed, 12 Mar 2025 15:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741794561; cv=none; b=AMCG4UXCpgADwSm3it15D9uYzIU/UWvAAKNeohMgwZ8N1lYzs3OLVwhgd99Fa/OqJjZVODzwnhKRmf2g9r5wXJ/T4232FnYjpj+gAfHXCsc4s9Eh4G+6Xv1ucYb8uB/sX3V3IBbYeY9YN8VqUx+H33+oqidJFIcze41xPGEGO1U=
+	t=1741794577; cv=none; b=OJeN46Cr2apmp/1vmcbSSKo63anCeCc0/h07t7FGyb5/lZO9qoaulsAnXK1EoiDmsrotQGiFNbxMkrkofeB0e4VeGCwbPNZHB6qVbSB/jqhyg8I2BabYjr+rZ19m4MhdMeA4H5nQNd1qAJArW1tXwlxj6IDnp7r7og/OY7xEDJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741794561; c=relaxed/simple;
-	bh=+cWntcQGDdLod9UlfcFgPmq4SFd2ivxoCGZ8ykeS0Ro=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MF+RSbp3eHmc/6//5K6QdhlbZbIDzlmraDPYiGPwNORgStkp7aRynOx8FrKja5z7Z1Vu30w35XF37ZUj0SQml8STZSe1EY9p6LonHmZ9J/QIw870bDCAphLgEZPHT3GrJN9NoRa74bqrKC3kVO5axlVjmAK62bzBelwK2Sp9TdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tXKyVV/n; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1741794577; c=relaxed/simple;
+	bh=qO0bVVRsexfHs9ID5KYNSlTNf4wVGRYGPnAWO1TSDys=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UyKBtjd7sD9tyMiV7wO/p9q1Zas3I3bptBLoMcJqYCatbhVpEaZRFkSxhxIzKDE1UNBG1ZIDR89BLU15iElyu6NJfpNH4WMdlsG2iMvpLdD19F0ExeZ2YL9cy+FoFjjUJsI8sBZGONKzxTK7BnciWKaxIWhIG2S5VvIMFBPDMo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JeWcKroP; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tXKyVV/n"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Y31dMfui2EjHLJ3ZByMDwupJBzCgqnpcVJIzftRq0jY=; b=tXKyVV/nlOzdUdaIUuqAAm2fOR
-	UPJLYKRPalh4/SCQugyxMEO/NLYt693MIVjBTYTHnfFg9LyKvvVN0+R6b/BaEJ26i4GVk8cVZswNV
-	eqiDP592UmO8QGF7KU52RxRrkGqmJgmguu+v3C3J3Mabp2D+wr9AbhFD2CV2rZO6Xez1wc/I3k2fr
-	wNvgAaXBHFtp0UL+rDqcSrAOebxvI+f27qDf6zQyUFUk7ihCuCSETGlNeyPYzjB3uSzB4A/JUXidN
-	JhJuCiUHcoKd3VDFx/j2qeb/MZhkJM0WMvbXMy73EZW6iOAMbXyBR1uJu34bpz/+iwjwRBZbqFXQj
-	lnzl+1kw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tsOKZ-0000000D0Nx-46NK;
-	Wed, 12 Mar 2025 15:49:15 +0000
-Date: Wed, 12 Mar 2025 15:49:15 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Kundan Kumar <kundan.kumar@samsung.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Luis Chamberlain <mcgrof@kernel.org>, Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH V2] block: fix adding folio to bio
-Message-ID: <Z9Gs-wIhjSmBBIXx@casper.infradead.org>
-References: <20250312145136.2891229-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JeWcKroP"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ff6ce72844so5725a91.2;
+        Wed, 12 Mar 2025 08:49:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741794575; x=1742399375; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qO0bVVRsexfHs9ID5KYNSlTNf4wVGRYGPnAWO1TSDys=;
+        b=JeWcKroPHXglf+UM/h+h0Z+lQtJM5P+my4Ic4T0EPCy66ZNF+xzroJaUTRXiX+yrgf
+         XIYmL+hvmGLmHRwFvIvYX+is9CUefGs6hDKM8VulUfVzzRAlrHuyooRsGYP5CR8QCEbg
+         Oh7bWnKCHYu1filfWg+w20HhrmgNyF9uswrIURv8Skb7GAmKK8Iy7U3u1yKMJq+FQQRt
+         ZnaC/7H3sQWe5lwhVX4oUt5ZenTQJ0mfkon271Xs4QMCKUruhYC2T8Nx8JR5Wt/WD5mX
+         JQV0zuwAezDDBzsu171lV5GfWmESVmgbb6RRRuDGymBTOKh38gDknyup0S6yh8J7nmz4
+         xUiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741794575; x=1742399375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qO0bVVRsexfHs9ID5KYNSlTNf4wVGRYGPnAWO1TSDys=;
+        b=HqdOUWxHfE/rr5iTAy8IPNHuVMsQQKdDW3Pjus9/9feqr46fQvOPoa+LIE2au5UpLg
+         3hR/usyhwaBTSrvt/NcCQF787U1rb9+QQzISg6eTSiCYTJe6lT+Bmo0HtEKFTosHjnzF
+         gXz3DEns4/8G2iGbHwERVlYZ/sfsPZpuESTeSaZWSVtwDOQgN8GjSFtnOuaUCK0yp22M
+         ZtR1G3Nb/2bYr0kbvU97hvTlz93hjd++ViX+UIcUl7YBPI+TZOxFJI49ukBIFnInFTg9
+         JCsYvIKtqeMnhm8Obzrw3hgXIuVOa5F8qAyA6wwJXoYg88i51YPmbkUilWsVaPaJ96Dv
+         eThQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUy/9I3t7wJg79ytUxdJyiLEbOusWnWPAlbszwvZ3Sc/IyyPczkY40qEHq094qOK7IS1KX9Q/BvRqmy8mFJrM8=@vger.kernel.org, AJvYcCV+NBioyLzMl/dFfFhElZsElULntOY4JeEnxpzyvre1SlpOThZydpa5btbqNjQXzO7e0AaC22MlwX/vsA2n@vger.kernel.org, AJvYcCWUlEGqN8CcB9KE/GQPE8OL4h8jSaFnKpE5Z4FFuTSuTAUohr3RvbKA0lXphxkJsZRl8j1fZATOWSVY/7g=@vger.kernel.org, AJvYcCWdYjiKwr3P+8XxQ7YYG+JHZg91wQ4W7fV9gzf151YAHVQI05/Ck06wazMRAc6+dTizRKBVVB2ZmFigY0BlwrMj@vger.kernel.org, AJvYcCWouRPfAKiAdybrccFcoMErIFPwg1o/19loh9AFdrM38eZW6j850jvM/dd1w0Y+WcPPL+cSABqdDykVChnx@vger.kernel.org, AJvYcCXdk00UcqKekk+pbIa9i+LHYwh+JL7E5BPsF8l945OAQL1R467Z8707nvCrQi48ag/91AgcfyzgD4jN@vger.kernel.org, AJvYcCXkGLO7djdWInS9sDiXJ5Z1IG8pODrFiAY7Fvw9UyCCIyQWHfnnmy9mvzbXpjPaBH/mrfMmOZDFv5jy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5mDgg6mmKPHXnJ5nycVyqlP9MEmojPNlQ7dVvRWWDAIS+o6dU
+	suRUehLTQjkj76b52S+4A9M/Tsu9zj+OGKVBae5lk5wQkCh7pkvLJenp3ONVu+to1XsbDALTjjI
+	npXeoS0xjvkzIqLzFggbNGCvkT2I=
+X-Gm-Gg: ASbGncsqP43kWkEQyOIAMbi+hlFDAvob19qPBXCe2qB7iS9P0fYWB8M/O1Hcd8k/B7G
+	OOdM+iVvBN/z4406bay3MpkZN1gcvevgI9IN/XVxZoUrtEJnPdwk8mkQVoGbtbgIZSv6+GkWBYY
+	+19BTwTw9d2eb9cNXt+musn2DebA==
+X-Google-Smtp-Source: AGHT+IFe+OpuO99XWupXs4of2kQ2UK3ZQjUDx1ynodylSC86EHTfBlh7n2S/1c35NKi3CjXlMbYTtDOXmh3xmNx65n8=
+X-Received: by 2002:a17:90b:3ec8:b0:2ff:6bcf:540a with SMTP id
+ 98e67ed59e1d1-300a578d62cmr9754852a91.6.1741794575223; Wed, 12 Mar 2025
+ 08:49:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312145136.2891229-1-ming.lei@redhat.com>
+References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com>
+ <20250309-ptr-as-ptr-v2-5-25d60ad922b7@gmail.com> <D8EDP4SMQG2M.3HUNZGX8X0IL7@proton.me>
+ <CAJ-ks9=K06OT6cutUABj2QDHJHJ70719c-eJ=F3n-_bhkYbZ3w@mail.gmail.com>
+In-Reply-To: <CAJ-ks9=K06OT6cutUABj2QDHJHJ70719c-eJ=F3n-_bhkYbZ3w@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 12 Mar 2025 16:49:22 +0100
+X-Gm-Features: AQ5f1JpDZ3MfaqLw9tP1SvKaWd4DrWDIczoaJSjDTCrETi3uYKBvX_O58mzb7EY
+Message-ID: <CANiq72kH0AUxeMPE5qcUiMQiCCTGZvORCtnm6CA1mgksze_s8A@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] rust: enable `clippy::as_underscore` lint
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Benno Lossin <benno.lossin@proton.me>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 12, 2025 at 10:51:36PM +0800, Ming Lei wrote:
-> >4GB folio is possible on some ARCHs, such as aarch64, 16GB hugepage
-> is supported, then 'offset' of folio can't be held in 'unsigned int',
-> cause warning in bio_add_folio_nofail() and IO failure.
-> 
-> Fix it by adjusting 'page' & trimming 'offset' so that `->bi_offset` won't
-> be overflow, and folio can be added to bio successfully.
-> 
-> Fixes: ed9832bc08db ("block: introduce folio awareness and add a bigger size from folio")
-> Cc: Kundan Kumar <kundan.kumar@samsung.com>
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On Wed, Mar 12, 2025 at 4:36=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
+>
+> Yeah, we don't have strict provenance APIs (and we can't introduce
+> them without compiler tooling or bumping MSRV). I'm not sure if we are
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+The strict provenance APIs were added a long time ago (1.61) -- in
+fact we briefly discussed doing so back then (we started before that,
+with 1.58).
+
+So unless we need some detail that changed recently (i.e. since 1.78),
+we should be able to use them, and it should be fairly safe since they
+are stable now (1.84).
+
+Cheers,
+Miguel
