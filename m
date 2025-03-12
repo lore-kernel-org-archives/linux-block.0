@@ -1,47 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6082C1172A;
-	Wed, 12 Mar 2025 05:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB741E1C09;
+	Wed, 12 Mar 2025 05:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741758252; cv=none; b=LjE8705rIPCfMogmJIicxK0CqbQJS8IS5AhKFPZDdVFhLSGkrgi9A8peRIQieZ9u6zx+ICAKDZIyfkHuuR2RoTusfqG9ID/tWWke8Azq4dsVGngxg7WjfmSYFihi9R1+uNZ15WmM8AI1IZwA+e1j4qmHzgTDNpADmGTgeAZuVBg=
+	t=1741759201; cv=none; b=pu2MiYpvlxGERQgoDSh8kZeKe4g7C4nwUIMJcNVpMJDRlP4AVpsaL7Q5bKNeTBBfH2xzSIAloEiYfOySO545KDuDtKOfJ97odN7JdAwDJ1zrr97eLTZsv1MOtxKFpCwAjn7OHqgS+kTrCFkN19n++FRpv6goA83UN4S2HKHBKGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741758252; c=relaxed/simple;
-	bh=xZJOc5XyyMym8hnBaWHbYKIhBmxjzcDArBveIIsMQaw=;
+	s=arc-20240116; t=1741759201; c=relaxed/simple;
+	bh=w2bWWcvUWJL51NtS1GMZcwVGuTpZ9zHBGMLxwaUwCZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lp/Qt0EkbmBzZLXYUO4h6Vfbpogu4hhJsjS+gWg8tL3/7uEAoD6XRdEKrKZNcbI+dtnsQYoiYV+4vgycGMyf91bB9H6vECul/eepHGlGnhSr/axm222Trgtqfuqg6SLb7bfsPLsN3ac/r9x8aoG65QL11ufBFj//vr6NCjw2ZEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICeOF2ep; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJ8ij6fUWcspCqGd/pRl+yF9Uf39IJFeeXFRWTcUWe0KyLK8ttOQbvFRxcZgtT68F+nDksWtCYZZe6VosZ0VKYQVzfaTNLOPV/psFL8Ur++Jz+WYHT9/yUNZOIrHgs71Ib7H9rT0QUtyaquY7hhRR8lrJ1EsLZelH2dQdEo0KMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U/1nE9hn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICeOF2ep"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F770C4CEE3;
-	Wed, 12 Mar 2025 05:44:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741758251;
-	bh=xZJOc5XyyMym8hnBaWHbYKIhBmxjzcDArBveIIsMQaw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ICeOF2epMNoffeQ3REYCIW93hpTuJ2Sj4xX0l2wWnvQWl6oEOKD8dyiYJgHNexqfH
-	 kwmoltpD4B4hjxY4VJ8rtKV00O5gfg+O11VC02S9n6VqlSwJZ3ATubAwqzPl11nj53
-	 HXIGdEQ8AjcSNSbu7dOugnu6tp8myqa/9ZexcN59FMbbG/moBfpsXLeVMQlLpSNVtC
-	 wp7zwmWI5h2FPeJvfvHx4rY+0mqVSqtZvMIH2KsOPhk+q8XnBbNvvOsYwJEc0dH7r2
-	 bCLp2GzVEZjOQaay5zOlb4RJbAmYrKmu1BTxRdHrOL/D8bi9ihKW3YgT1k1PKPKXuv
-	 0eKWlA7+ygwOg==
-Date: Tue, 11 Mar 2025 22:44:09 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: liwang@redhat.com, brauner@kernel.org, hare@suse.de,
-	willy@infradead.org, david@fromorbit.com, djwong@kernel.org,
-	kbusch@kernel.org, john.g.garry@oracle.com, ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	ltp@lists.linux.it, lkp@intel.com, oliver.sang@intel.com,
-	oe-lkp@lists.linux.dev, gost.dev@samsung.com, p.raghav@samsung.com,
-	da.gomez@samsung.com, kernel@pankajraghav.com
-Subject: Re: [PATCH] block: add BLK_FEAT_LBS to check for PAGE_SIZE limit
-Message-ID: <Z9EfKXH6w8C0arzb@bombadil.infradead.org>
-References: <20250312050028.1784117-1-mcgrof@kernel.org>
- <20250312052155.GA11864@lst.de>
- <Z9Edl05uSrNfgasu@bombadil.infradead.org>
- <20250312054053.GA12234@lst.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U/1nE9hn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=QcXOYRCH0+rzrtF5eKJ9mNGNA8kBZEbH+ucO4R4KXyE=; b=U/1nE9hnYPBulm4i10QfSh0WL+
+	Q33SCEtiLE/AuUap1bJrCFr9azMjGbdVTgK2EsHSQnnwVD+CqINw3ncjoIP7TMbi7Eg28PbxgSNzj
+	8S5tvAVeCLPbgLe2yQhJK7mXRNejQmHhrftJd7g83LQpbRYva2KoOu/CwnZEv63K1rAqWkiitg0oh
+	dAWhSuDF+Zt0rop+r9wOOc3Qjb6ewyeg9CSH4073KS9jXBLOFxkX4iAXSR7coZuI4k9nODUEOffc8
+	nRttjjhWwc80c/H73E5lTpcwG4V8/4DT1NnoS2QOj6iVy/xwWza/AUSip+ujFCjN7goF26oTYJPTN
+	Umc6FxOQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tsF8E-00000007YHO-3CIm;
+	Wed, 12 Mar 2025 05:59:54 +0000
+Date: Tue, 11 Mar 2025 22:59:54 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alan Adamson <alan.adamson@oracle.com>,
+	virtualization@lists.linux.dev, asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Hannes Reinecke <hare@suse.de>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Sven Peter <sven@svenpeter.dev>, Janne Grunau <j@jannau.net>,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>
+Subject: Re: [PATCH v2 2/2] block: change blk_mq_add_to_batch() third
+ argument type to bool
+Message-ID: <Z9Ei2t7z_7QbEWXW@infradead.org>
+References: <20250311104359.1767728-1-shinichiro.kawasaki@wdc.com>
+ <20250311104359.1767728-3-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,26 +61,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250312054053.GA12234@lst.de>
+In-Reply-To: <20250311104359.1767728-3-shinichiro.kawasaki@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 12, 2025 at 06:40:53AM +0100, Christoph Hellwig wrote:
-> On Tue, Mar 11, 2025 at 10:37:27PM -0700, Luis Chamberlain wrote:
-> > > If you need extra per-driver validatation, do it in the driver.
-> > 
-> > Are you suggesting we just move back the PAGE_SIZE check,
-> 
-> PAGE_SIZE now is a consumer (i.e. file system) limitation.  Having
-> a flag in the provider (driver) does not make sense.
-> 
-> > or to keep
-> > the checks for the block driver limits into each driver?
-> 
-> Most drivers probably don't have a limit other than than that implicit
-> by the field width used for reporting.  So in general the driver should
-> not need any checks.  The only exceptions might be for virtual drivers
-> where the value comes from userspace, but even then it is a bit doubtful.
+On Tue, Mar 11, 2025 at 07:43:59PM +0900, Shin'ichiro Kawasaki wrote:
+>  /*
+>   * Batched completions only work when there is no I/O error and no special
+>   * ->end_io handler.
+> + *
+> + * @req: The request to add to batch
+> + * @iob: The batch to add the request
+> + * @is_error: Specify true if the request failed with an error
+> + * @io_comp_batch: The completaion handler for the request
+>   */
 
-Alrighty, so silly tests just need to be updated. If a hang is reported,
-we can look into it, or just add block driver checks / limitations.
+This needs more work to be a proper kerneldoc comment, i.e. start with
+"/*8", mention the function name, etc.
 
-  Luis
+The logic changes themselves look good.
