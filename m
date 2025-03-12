@@ -1,127 +1,130 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531723595E;
-	Wed, 12 Mar 2025 05:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BE63595E;
+	Wed, 12 Mar 2025 05:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741755641; cv=none; b=CA1ojzRhKIZ68/lVPBakwsATQq4oxKH35pnVfz0JeizpQBmFUSRK7YTnTmbcEdNb1YYnvXlaExUmZ21rVeAoHYMQZb1wW4lqGPv2KvXKIIaepsH8CbztNgettCWMkNU8F4uSxETbuZx+f4r+VOMIuppL4t+a6ESBg/NlMfvyZhg=
+	t=1741755645; cv=none; b=IYPFBeiBxVzn0+K8h9GgOGIOFBtHS3aTCREDxbb8PBoGhrHXPvTbTlfkFE/eWNKrLtJYcibJELlsmxJ5qfopiYrYWuNxhNvnBSKtL2X2YNPEAVavLJ9uwJ3TKbpZpbTr5Bf8pti+qIwqa43YCOW49CZXD2nXIIHeGAzss8TjzqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741755641; c=relaxed/simple;
-	bh=OkfWCX8RTVVm9tKf1VzdYkRl9gs9wdSCj7hmibIgeMo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KpnzfJfxL7v8tH1i+ZWTRQMyFdKhJ5hRYAW3RUMDZHwukXRn/7jRrxti/3JrOWkQrZDg9G9oDoWuj9BsvQf1NaHoGrf3TZosbsO8mACyLVfuwkI4wCPykzpzdRtQjKSXtetIP3QWGRImqF+lo3d5XmXPqEPndsYqssWpZ3moYAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=t/IlGc//; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1741755645; c=relaxed/simple;
+	bh=gJD35K03DizHx1Ki+npAg0sP1R5X6WsLx/uI7xSKEnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNiUUO/FTN4fXeTbeDq4Iq60UxFHV1AocX4R+kgFAPdYOOo+pLx2OyFY7/737j4qbOw4lDnlzKHUr9xytbrfIFo+AI47XDGQO5OMy0GLcMKyRO6QCVYfLBhqU00l9WqyZshDeEG/FZ7kuGA5yGlceH5/eJta95URARRm+bcWgCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB1NraYK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t/IlGc//"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=4VfUOjWo+32AuDiC0iqDr/l/PZ8nRE39G5zh1X+A1H0=; b=t/IlGc//5oKhH6cZ8+VHa8bIfM
-	tvt1u6yhti395QXHvt9kcozQoMQbFXQZouoDZl+V2ogFnAQJqk/1QHNdwflgIwO/UhbQY6ft0lyU2
-	6MpOs3RjEmatQ+7feZOUZaGhmt7nC11d8dLCRfIC7urgrHjiypoz6KwayU8iq8yAdeGDDc0t/BBIl
-	epyGrqE59e6CTlhp4neui5oR2SlfVz3+AaYwkHb+AOyhJgu9BMAf5VKZhHlIWc8C4S6MQymNXAD84
-	BcObPxnc+TcSehPM8PIDNsHyDEHH1zfY6rxeGK6Rf6liXSVNtNB3icLV8j33REoK6YIPEBIbrN6F7
-	CrPzSN/Q==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tsECj-00000007U8E-2579;
-	Wed, 12 Mar 2025 05:00:29 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB1NraYK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A11BC4CEE3;
+	Wed, 12 Mar 2025 05:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741755645;
+	bh=gJD35K03DizHx1Ki+npAg0sP1R5X6WsLx/uI7xSKEnc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PB1NraYK0kpGAyMdYcobXBiuXRsgcj3RuWTJDf3JKvNTE+rVQ0N+dNFPCPzCRFQ8M
+	 M1e0DzBH6Pv38S1eBvkZWlZLaUfi+69OrvleQ7R9MXJGKx8AEB6jEdwBq/EEo2e+a8
+	 FJKPY9DQkR9cCEvv0vLCtsiUJBJDs+vRNfXL3aZClsUCTgkGzbJQELiwZ23j2J+I84
+	 9I5WZBtl18MslPwWUCJLuiRXrGhRg8M3jdccmlz1IyzonoaL0bsETyQCp9HQB14Qzq
+	 FKSrmq2evdYcBfcRVtoKIL5nr3psWFjCL7u0nRbP/xetUk0pZMRApu6kyDuC2Qljt3
+	 BXJ8/sS1VHVgQ==
+Date: Tue, 11 Mar 2025 22:00:43 -0700
 From: Luis Chamberlain <mcgrof@kernel.org>
-To: liwang@redhat.com,
-	brauner@kernel.org,
-	hare@suse.de,
-	willy@infradead.org,
-	david@fromorbit.com,
-	djwong@kernel.org
-Cc: kbusch@kernel.org,
-	john.g.garry@oracle.com,
-	hch@lst.de,
-	ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	ltp@lists.linux.it,
-	lkp@intel.com,
-	oliver.sang@intel.com,
-	oe-lkp@lists.linux.dev,
-	gost.dev@samsung.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	kernel@pankajraghav.com,
-	mcgrof@kernel.org
-Subject: [PATCH] block: add BLK_FEAT_LBS to check for PAGE_SIZE limit
-Date: Tue, 11 Mar 2025 22:00:28 -0700
-Message-ID: <20250312050028.1784117-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.48.1
+To: Li Wang <liwang@redhat.com>
+Cc: kernel test robot <oliver.sang@intel.com>,
+	LTP List <ltp@lists.linux.it>,
+	Christian Brauner <brauner@kernel.org>, 0day robot <lkp@intel.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+	oe-lkp@lists.linux.dev
+Subject: Re: [LTP] [linux-next:master] [block/bdev] 47dd675323:
+ ltp.ioctl_loop06.fail
+Message-ID: <Z9EU-70DuwqFqD4p@bombadil.infradead.org>
+References: <202503101538.84c33cd4-lkp@intel.com>
+ <CAEemH2egF6ehr7B_5KDLuBQqoUJ5k7bVZkid-ERDBkxkChi7fw@mail.gmail.com>
+ <CAB=NE6UWzyq+qXhGmpH2-6bePE+Zi=dJjBH7y3HeJnYyh6xvtw@mail.gmail.com>
+ <CAEemH2c21vrSOKdJvHkyH+UOv-aXefXeFVZuv4-DSZ_P4Z3Mxw@mail.gmail.com>
+ <Z8-tV0zJKP7wRAxK@bombadil.infradead.org>
+ <CAEemH2d36bY-q-+P_vHKvj+kg6qi2k=y37PRNOr6mkY=pdFQrQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <CAEemH2d36bY-q-+P_vHKvj+kg6qi2k=y37PRNOr6mkY=pdFQrQ@mail.gmail.com>
 
-The commit titled "block/bdev: lift block size restrictions to 64k"
-lifted the block layer's max supported block size to 64k inside the
-helper blk_validate_block_size() now that we support large folios on
-the block layer. However, block drivers have relied on the call for
-queue_limits_commit_update() to validate and ensure the logical block
-size < PAGE_SIZE.
+On Tue, Mar 11, 2025 at 09:09:08PM +0800, Li Wang wrote:
+> On Tue, Mar 11, 2025 at 11:33 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> 
+> > On Tue, Mar 11, 2025 at 09:43:42AM +0800, Li Wang wrote:
+> > > On Mon, Mar 10, 2025 at 11:15 PM Luis Chamberlain <mcgrof@kernel.org>
+> > wrote:
+> > >
+> > > > There's a fix for this already in next
+> > > >
+> > >
+> > > Oh? Which commit?
+> >
+> > Oh seems linux-next hasn't been updated in a few days, so you can try
+> > this patch:
+> >
+> > https://lore.kernel.org/all/20250307020403.3068567-1-mcgrof@kernel.org/
+> 
+> 
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -181,6 +181,8 @@ EXPORT_SYMBOL(set_blocksize);
+> 
+>  int sb_set_blocksize(struct super_block *sb, int size)
+>  {
+> +       if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
+> +               return 0;
+>         if (set_blocksize(sb->s_bdev_file, size))
+>                 return 0;
+> ...
+> 
+> 
+> Thanks, but looking at the code change, seems filesystems with FS_LBS
+> (e.g., bcachefs, XFS) can still mount larger block sizes properly. IOW,
+> the test ioctl_loop06 still failed on RHEL9 (XFS) platform.
 
-We should take time to validate each block driver before enabling
-support for larger logical block sizes, so that those that didn't
-have support stay that way and don't need modifications.
+The test does not fail because the filesystem being used, the test fails
+because it expects setting the block size > PAGE_SIZE will fail for the
+loop back device it is creating and then setting the block size for it.
 
-Li Wang reported this as a regression on LTP via:
+There are two tests which fail:
 
-testcases/kernel/syscalls/ioctl/ioctl_loop06
+  * set block size > PAGE_SIZE with LOOP_SET_BLOCK_SIZE
+  * set block size > PAGE_SIZE with LOOP_CONFIGURE
 
-Which uses the loopback driver to enable larger logical block sizes
-first with LOOP_CONFIGURE and then LOOP_SET_BLOCK_SIZE. While
-I see no reason why the loopback block driver can't support
-larger logical block sizes than PAGE_SIZE, leave this validation
-step as a secondary effort for each block driver.
+It expects to fail. The new work enables the block layer to support
+block sizes > PAGE_SIZE on block devices, essentially that the logical
+or physical block size can be > PAGE_SIZE. That is supported now.
 
-Reported-by: Li Wang <liwang@redhat.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202503101538.84c33cd4-lkp@intel.com
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/blk-settings.c   | 4 +++-
- include/linux/blkdev.h | 3 +++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> Is that expected? Or, should we adjust the testcase for FS with FS_LBS
+> as exception?
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c44dadc35e1e..5cdd0d7d2af2 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -254,7 +254,9 @@ int blk_validate_limits(struct queue_limits *lim)
- 	 */
- 	if (!lim->logical_block_size)
- 		lim->logical_block_size = SECTOR_SIZE;
--	else if (blk_validate_block_size(lim->logical_block_size)) {
-+	else if (blk_validate_block_size(lim->logical_block_size) ||
-+		 (lim->logical_block_size > PAGE_SIZE &&
-+		   !(lim->features & BLK_FEAT_LBS))) {
- 		pr_warn("Invalid logical block size (%d)\n", lim->logical_block_size);
- 		return -EINVAL;
- 	}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a97428e8bbbe..cdab3731a646 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -341,6 +341,9 @@ typedef unsigned int __bitwise blk_features_t;
- #define BLK_FEAT_ATOMIC_WRITES \
- 	((__force blk_features_t)(1u << 16))
- 
-+/* Supports sector sizes > PAGE_SIZE */
-+#define BLK_FEAT_LBS		((__force blk_features_t)(1u << 17))
-+
- /*
-  * Flags automatically inherited when stacking limits.
-  */
--- 
-2.47.2
+Contrary to filesystems, block drivers use now implicitly use
+blk_validate_limits() through queue_limits_commit_update to validate
+queue limits, but PAGE_SIZE is no longer an issue. In the loop back driver
+case we have then:
 
+ioctl LOOP_CONFIGURE --> loop_configure() 
+	lim = queue_limits_start_update(lo->lo_queue);                           
+	loop_update_limits(lo, &lim, config->block_size); 
+
+ioctl LOOP_SET_BLOCK_SIZE --> loop_set_block_size()
+	lim = queue_limits_start_update(lo->lo_queue);                           
+	loop_update_limits(lo, &lim, arg); 
+
+I don't see anything wrong with the loop driver supporting logical block
+sizes > PAGE_SIZE, from a quick look, but it does not matter. If tests
+exists which are verifying you *can't* do it, then we're bound to get
+other similar reports. queue_limits_commit_update() calls
+blk_validate_block_size. I just sent a fix.
+
+Thanks for the report.
+
+  Luis
