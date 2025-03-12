@@ -1,91 +1,77 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638761D86F2;
-	Wed, 12 Mar 2025 06:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421AA1CA9C;
+	Wed, 12 Mar 2025 06:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741760649; cv=none; b=OK0H1OkXU7f81OpbfvYem7oMXEnrX1ZRtRnxpdQApzjikBX1alOSzntuNZ9IsnW1T87lgVBDPNABpJKyC0ONHYWRf26DOHJ59se2zOqqhM0hB1C5WLCrinJrSVuaF8iCvzD1MfCaS7pA5HXVo/P6tQ/cnLai6f6udPwuf24NQgI=
+	t=1741762533; cv=none; b=jJeQAfUPolI0HnLhfH92+kj39uI3bkMRrxUaLdWwxmPTskYvv4DUXzeh/9UW74uE4rOM+SrBLsCFfEmzXL5qTxa/d6qJfAxOtU+pegNMJPV5A7yYp3DNry0gyD5bXQSHZ5kP8Sx9MWexNnvXPezJHnewGIRXWNodvjAz+1bC8oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741760649; c=relaxed/simple;
-	bh=v0gdL/3I1B1zmaBLpSypGmJbmVvLAJ0k7+jEv5AuK60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FyeKYLRDCIUVFkAVtRWeWEYst5lB4RUe0+IgIE3dKpNUXhoghFcWRw3DEIcdyHn3+kZlT//YG42khu1jXSuzJ8L/yGzFGIqwwlDqQuFvZfFAUMZVdUiLFNopp8QWcSPYnLVhCoG5fiRehvkJC0wfpsJlyIgzgnaOEknuQQTvdLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OPTnXOxt; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1741762533; c=relaxed/simple;
+	bh=KOGDNs/PVyHGWJZgE2a5B/atUWquZRHoJf8vfvekNqA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BTiERh7kQJbf0vLd1dgbsaM8+dqgQFGzrbepyVQHw0ZyClMMW3BVDeVPfSZbAw/IxTnLq0As+aB91Wap5OJem7clNEYk1Ra7B8w1i3lAyOuR+iGT4UuopRZ4mq6KuKcL+e7fOGMePEHTJMhDLUI2dYAKtU89pwVu+maBUUgDhqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLNmR1S3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OPTnXOxt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0AMBUI0pkHIlozu33qNSwEjssVugwAFn0k7gmS65+Tk=; b=OPTnXOxttEqQHGWdfiMgFAY85n
-	IRX7WnBXAE/qlCH81CoW4+g7FDPqsU210mPTFYyOY+ZLyosen4fBL0ilYF5wwH1hdJrrR7W+kcmHP
-	YmLPyS69h/2PoXfbzgQcYu7mhum1G/VbJ36GgBMebOpMk84ygJSnNauWXRFCiX7ucqg4iB3jPkYtA
-	5f4tyNmSeUIv5fiFUlg9SSxiLTIXX7CFaocl025VUTcyVnV+LGrSoArbd1j9zwM0adlqfdaGxqNUl
-	tzgR+Zr1dzfXJN8/YbFjC3iBY34RpjZJbiL4dEq6vEUFflQJ1C+cMVLE70HtPW4Ag3b9fCF9qDVTh
-	+KQiZI0w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tsFVe-00000007aIv-2N0P;
-	Wed, 12 Mar 2025 06:24:06 +0000
-Date: Tue, 11 Mar 2025 23:24:06 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z9Eohuavq6847KOt@infradead.org>
-References: <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
- <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
- <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com>
- <Z8eURG4AMbhornMf@dread.disaster.area>
- <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
- <Z8zbYOkwSaOJKD1z@fedora>
- <a8e5c76a-231f-07d1-a394-847de930f638@redhat.com>
- <Z8-ReyFRoTN4G7UU@dread.disaster.area>
- <Z9ATyhq6PzOh7onx@fedora>
- <Z9DymjGRW3mTPJTt@dread.disaster.area>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLNmR1S3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E44C4CEEB;
+	Wed, 12 Mar 2025 06:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741762532;
+	bh=KOGDNs/PVyHGWJZgE2a5B/atUWquZRHoJf8vfvekNqA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GLNmR1S3XmZsAoYaahDVsASWtVJ+BkSEktiikymh6SD2jZYVDyzOmRJ6yex1qYZNv
+	 Iz7KVSdMKW+VQBunuIamd2kxBYj74urBp+Vck74UZMyabUmq+dRV2HnnZLTvppZyxV
+	 CjdqM6rf8jO7ksJ3ja+HZgTWoXcrt0CK9ySLU4rTlvUiaZCVGHFOA5kitjgaRRpWRQ
+	 5G2LBPIXqbFwo0r7HumgLHioV2udLC0DyJ0tNfyklwiIQSRnnZAkMWtUf246smohbd
+	 J7JohNNpjzalZMPcNIGpeg/i+6/da6fKepgnk+aBmw488P5MXLXKOBgFZT/arAUIJY
+	 kCYJ0RG9zlIaA==
+Message-ID: <dfa516c7-2a4f-45c5-a184-0b0e64336c38@kernel.org>
+Date: Wed, 12 Mar 2025 15:55:31 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9DymjGRW3mTPJTt@dread.disaster.area>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: introduce zone capacity helper
+To: Christoph Hellwig <hch@infradead.org>, Naohiro Aota <naohiro.aota@wdc.com>
+Cc: linux-btrfs@vger.kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org
+References: <cover.1741596325.git.naohiro.aota@wdc.com>
+ <335b0d7cd8c0e7492332273a330807a8130e213e.1741596325.git.naohiro.aota@wdc.com>
+ <Z9EbSZh-OtLGttoB@infradead.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <Z9EbSZh-OtLGttoB@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 12, 2025 at 01:34:02PM +1100, Dave Chinner wrote:
-> Wrong.
+On 3/12/25 14:27, Christoph Hellwig wrote:
+> On Wed, Mar 12, 2025 at 10:31:03AM +0900, Naohiro Aota wrote:
+>> +#ifdef CONFIG_BLK_DEV_ZONED
+>> +static inline unsigned int disk_zone_capacity(struct gendisk *disk, sector_t pos)
 > 
-> Speculative non-blocking IO like NOWAIT is the wrong optimisation to
-> make for workloads that are very likely to block in the IO path. It
-> just adds overhead without adding any improvement in performance.
+> Overly long line.
+> 
+>> +{
+>> +	sector_t zone_sectors = disk->queue->limits.chunk_sectors;
+>> +
+>> +	if (pos + zone_sectors >= get_capacity(disk))
+>> +		return disk->last_zone_capacity;
+>> +	return disk->zone_capacity;
+> 
+> But I also don't understand how pos plays in here.  Maybe add a
+> kerneldoc comment describing what the function is supposed to do?
 
-Note that I suspect that most or at least many loop workloads are
-read-heavy.  And at least for reads NOWAIT makes perfect sense.
+The last zone can be smaller than all other zones, hence we have
+disk->zone_capacity and disk->last_zone_capacity. Pos is a sector used to
+indicate the zone for which you want the capacity.
 
-> Getting rid of the serialised IO submission problems that the loop
-> device current has will benefit *all* workloads that use the loop
-> device, not just those that are fully allocated. Yes, it won't quite
-> show the same performance as NOWAIT in that case, but it still
-> should give 90-95% of native performance for the static file case.
-> And it should also improve all the other cases, too, because now
-> they will only serialise when the backing file needs IO operations to
-> serialise (i.e. during allocation).
+But yes, agreed, a kernel doc would be nice to clarify that.
 
-And I agree that this should be a first step.
 
-> *cough*
-
-The whole ublk-zoned is a bit of a bullshit thing where Ming wrote
-up something that barely works to block inclusion of the zloop driver
-we really need for zoned xfs testing.  Please don't take it serious.
-
+-- 
+Damien Le Moal
+Western Digital Research
