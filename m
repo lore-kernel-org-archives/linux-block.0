@@ -1,361 +1,231 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFAB566A
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 02:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741746848; cv=none; b=P9YRhEtNm1OLKJIlpmgbM+I5jB6Z+A09SehC1itwi517GorClvd/oaCaSEPNhJLReEpilHT8gllvYObTFqo5RIJsjMMesYN/8icb7YTPdyW86KxLO67rFaTqtbAENSayAlWGSKFK/AybS+k0VuF8A0pj0Sp1H+/m55o7pqxgVoA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741746848; c=relaxed/simple;
-	bh=M48AM9kcumZWzN55D21lzW7LRTHUoW/zsTZg7ld9Cug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=liLYoIPNz84KAe4P1NeAj3QdatqfhW7ee0QPi5HdJOWm2isAq6rqBKpGKftafntddfU4pDPeA8YiNlmrMrCeTAU+c5XHmyYmraF2K4dj6VD5wZWDD6C760Ogb3xch4mfsYVUMPzf6hm0mq7RTQQjnumpEU6oO9HOs5R7o+QQ0Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=DqIGbvya; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49E2566A
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 02:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741747004; cv=fail; b=dg+CfncgfAR4YVnfcBfrwU9nr9ZakrTez90ZhRriAvfUmJeHDkvEgSvfIG/7CE68mdHEjRGRjna2KAHxWH9eqq0+fe0NMnaR93e19wV3fg87v4svFX55sMywV3JC9Yae/cy2RplLnODHJ9z2EauYgy3p4flAmGUj0KAOZ9s4Xr8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741747004; c=relaxed/simple;
+	bh=EJyKkaqK0+S+5RGlU5JJqQRut3BMMIKD//1zf53iOeE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eiIMOnRVULsSH/In7aKlbJqPUOtAF6qJ1/O6Sl1QMvx8hpBt6n7Q/WSStdaL+h2H7A5gzdU1FPo5uDSD1ymJY6LqN5DeTQPhgGFvBMzViBV6Hth89cfGHnYB5BlliUv0rmVsFwQN/pcoBkgBFmMlmSxNVLFo+DtoEadtiGjSaqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=evTpklW+; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=QItmisEo; arc=fail smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="DqIGbvya"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223fb0f619dso115860725ad.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 19:34:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="evTpklW+";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="QItmisEo"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1741747002; x=1773283002;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=EJyKkaqK0+S+5RGlU5JJqQRut3BMMIKD//1zf53iOeE=;
+  b=evTpklW+WGgu3t66dJXJ11bdORQ9IQhRVftmtdJ0SdnmXKVN7UGJCU+c
+   yVRXmGpY3MLkAu3rpsE/7ogdcWsUsjALEOV2dkpdtBWhyR5n0gzqjbjGm
+   ipoEvAa52fO7VOAD+Yk23UvwoNEbDshpxBcQ8SCjGCdiIRVf9EfIqsNZo
+   RLyh9xaawa23TW2R2VVNeYD0imOs/Ws+xkqHWFaYBB0r51mT27pWMlcxn
+   VnPBNlvIt8OKUfHVfxFrik90qpVKNj1GP/WXAOkEh/aaU/AiISJCZoVyX
+   XrYBOEAQkxaxFnMn3F2ZdVuVRr/yXAb/MqCNuQiZW7KIPbGB749aj4ePE
+   w==;
+X-CSE-ConnectionGUID: 57apZvAIRR+/ClnEZY1lCw==
+X-CSE-MsgGUID: w/lN3hbVQ3miQpEZ/6TEyw==
+X-IronPort-AV: E=Sophos;i="6.14,240,1736784000"; 
+   d="scan'208";a="46717595"
+Received: from mail-westcentralusazlp17011029.outbound.protection.outlook.com (HELO CY4PR02CU008.outbound.protection.outlook.com) ([40.93.6.29])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Mar 2025 10:36:34 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mSnPUlrq3fzp9r+fK0lTwUbLE5QoVhlATyaMbLXbnzzC7exHhgq/4/O16LEj01qcBhTz/X0AhrowQEdsRQsn1AZKAfUfD1OTIWMwr40xwIUeQ6pUbVRHa8RUedUbvvBpEfdOxMK0I5ltfF+IzUTeZS9ybr0E8uHloyKz2s2gXwZfg6aeQ1fZCtqW3TagHnIAUw9VYo5USmcFyKQ2/mJQgziOojquwlQCWx9Vww1LCvq9l+RpWoHBkfaSfTe2ANbTdJeft8kcv0S8+IJ19syuDkIOigvjC0YUwdiK7CRxNUcTK82FYNl2TFs5Jle4SsnYnQW7+PvWlwZAMgrbG+FY6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U5eMIdvwCsbp3mTqCbXc/MfqmVMXmlj52rMsXrzwXBI=;
+ b=A+pmKZXq3hUwfoAP/Sc1lNXpEPfCnDSUad35QU83axI4NOBjXUxvE6gmeGrqeO0L6Lrc1eh3uDZvmd1wony/R+/jTdfrXcRAORd0IPTOu39x0Iz1B8UUPq09/hjMXm4//bWmQCk3kipGOiy+tFSimxxrnurJ29KuSyqZet8IeHzdDl23L0AXGfBNKVVYTUOFLP32x0fpIpaSjYa/C4dwGgH2kkss/O2Us5Z5IuBTrZ9LoDBRB6edLAKBhgeRilwH0+6poNEJBd9pHftjebDX3699cEvgwjhb957c53n+bfHQMi/L/SU8hsLhz2GUq3y7Rhbah7FlV3yQm8MZBXLPlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1741746846; x=1742351646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Stlf1qu6rV+8OapbnZzujdtm5F0KDIptQKaIEDCKwrU=;
-        b=DqIGbvyaCckdB2/yNgqiErjrfLm25dqPw1SJvR2X25n3Vo/bRz7K4ExS5Jmq4+9+d5
-         YvTdc4+EgsazdSUXXCLX3SfkzZAbGIfprVLirv5bi+gQpsT5R1UfGb1OfVFKaginOqtO
-         emDVjZb8KVESah1IHByP+kH8fEl5ASLND2/fV/07MNFEJ7megtZ6/Qp+UmTBUMNc1P8M
-         RSTd6R2et+J5sD4mMuDdlvZLJtt97xL4wxu5UqHmiAd8SeQsqMjRBurDeHRDcWoCnFxl
-         7MxiFu9cKpaE2XLrLunpmsXOp5Z5eI+71zwel7PX8EU3m/1B4uUk2bscHgCXqWH8tLP8
-         nNog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741746846; x=1742351646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Stlf1qu6rV+8OapbnZzujdtm5F0KDIptQKaIEDCKwrU=;
-        b=uqIPiWO+5P64uzW6UTudSY+Fn1mOaPNHllXXPAVVBz6Atqr0Nwo1g43aW0FUwJZwr4
-         R+39Krh3UmqsSBy56yDc/pGZuArSZfQx7EtaW7RATKoK5dBlFYYEd4VCMziwfkonISFu
-         Dlh9PCTFB3prsCiNaQGkowFyKAuLzFidg17l3BlqQQ2rZ5+WOLX31rquXghfGmi/uqf5
-         471QoQqW0Q0xfeBQz7Vt7MyxWWbjkZIKASQXqdCMk+nBOvnoqz6jJA1fSMiKdMZylY7M
-         HnxSYNZwzzK6ttMMKQBtXgeR3e9BEHDUSeolKIwooL6OL9auHLrxkYiIxX33SfqxWqLs
-         mWHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeITljNCWplT4dopw72opyC0vyh5otoQGEll+dfxx4VwQrtWKk04gdHSpZGzZPf08eAaLYheRfeeaDPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmkQLOQY6atHqGGKI5IdGzTqVPsPv8rOKwdw3/j8FLkZhOliol
-	Go9AlLxm7nWpqf+/uKABXbpNmN5Q0KCxAZ3yTO0P5yNJaKAIDO1dTxeVOO9b34g=
-X-Gm-Gg: ASbGncuk1QLsGxH6J8hG0c6xBrtQ72XR1K87FjEc5Pq8gjrNBfRVCbXajI0MWH+ZyAd
-	n1T0k68BBEIaBZwiLecG9SR04bMBK1kN1Fv39AwVLCk0zxybdh0NicUJ/3fCrsaJ2NkDEj14yv1
-	c1SfjxNdGwfylEA/8CCrvd4CCveQ99GMuxtMz8CsnF/duE/WgTFDYC5f5NgedZMKqMeoaGBN1DX
-	5D/lJ5c2Z2L+wOjVqtEXR7k9O/GW7+D2bcudwoAenJxpthpF1lmepDYcZNL6K3RIky0rU6DlPZ7
-	XckyBCs1Gfq5RipK+WdgfyP2TV27bdFt/8bA7ClLkB7w+MwzileZTJNjMAYFDzN+UnFll4tB7Xx
-	Hbg7rxNmXkXP/FUt2pzZm
-X-Google-Smtp-Source: AGHT+IGcm3lvVDuzTxuY7XdP4D+eZSLjgBNBtRf9A2oXbOqunQw+ST+TfFUK9jaq8Qp+O7C4BkIDOA==
-X-Received: by 2002:a17:902:d48f:b0:224:76f:9e4a with SMTP id d9443c01a7336-22592e2d5b2mr85216595ad.14.1741746845581;
-        Tue, 11 Mar 2025 19:34:05 -0700 (PDT)
-Received: from dread.disaster.area (pa49-186-89-135.pa.vic.optusnet.com.au. [49.186.89.135])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109ddc7esm105413475ad.48.2025.03.11.19.34.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 19:34:04 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.98)
-	(envelope-from <david@fromorbit.com>)
-	id 1tsBv0-0000000ByYH-0qEH;
-	Wed, 12 Mar 2025 13:34:02 +1100
-Date: Wed, 12 Mar 2025 13:34:02 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z9DymjGRW3mTPJTt@dread.disaster.area>
-References: <Z8XlvU0o3C5hAAaM@infradead.org>
- <8adb8df2-0c75-592d-bc3e-5609bb8de8d8@redhat.com>
- <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
- <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com>
- <Z8eURG4AMbhornMf@dread.disaster.area>
- <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
- <Z8zbYOkwSaOJKD1z@fedora>
- <a8e5c76a-231f-07d1-a394-847de930f638@redhat.com>
- <Z8-ReyFRoTN4G7UU@dread.disaster.area>
- <Z9ATyhq6PzOh7onx@fedora>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U5eMIdvwCsbp3mTqCbXc/MfqmVMXmlj52rMsXrzwXBI=;
+ b=QItmisEoJ/MR9NsgdK32Jp8hS1gWJP/A3oLdnKfExremxTyJTBKIWq1ndnmAs/3q5uU7t0JABQRD7CUeRIivj2hIJbpIagKFji2UoZqx/OwoZLVxsg+K66iw9FiaSJECZsKJoW3eUl9fs3jr7NWnUYphHwd3vp2kEHeWOgxhQr0=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ LV3PR04MB9468.namprd04.prod.outlook.com (2603:10b6:408:28e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Wed, 12 Mar
+ 2025 02:36:32 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%7]) with mapi id 15.20.8511.026; Wed, 12 Mar 2025
+ 02:36:30 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+CC: "ming.lei@redhat.com" <ming.lei@redhat.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "yukuai3@huawei.com" <yukuai3@huawei.com>,
+	"yangerkun@huawei.com" <yangerkun@huawei.com>
+Subject: Re: [PATCH RFC 1/2] tests/throtl: add a new test 007
+Thread-Topic: [PATCH RFC 1/2] tests/throtl: add a new test 007
+Thread-Index: AQHbjzgWst/0zddoHUagIOuSiMTwMbNu0KUA
+Date: Wed, 12 Mar 2025 02:36:30 +0000
+Message-ID: <qmajylrcxxcnp5b7o3lthx7mpwqzdhuqehpa3rb3p5q26ceorm@gjp3yrqu42ee>
+References: <20250307080318.3860858-1-yukuai1@huaweicloud.com>
+ <20250307080318.3860858-2-yukuai1@huaweicloud.com>
+In-Reply-To: <20250307080318.3860858-2-yukuai1@huaweicloud.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|LV3PR04MB9468:EE_
+x-ms-office365-filtering-correlation-id: 81caada9-2f25-449b-1435-08dd610eb239
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?R4MAvDOLPdzP10dIDQ/oOwxXYf/r29uHQxAiJhE2hSO5KK7o++LKpxpEhN6x?=
+ =?us-ascii?Q?Y6lQyrOxvg9gi8CsaAEjEffWHUo1XM+0DyflGVN6MT++a3fePOQTNqlbvHQX?=
+ =?us-ascii?Q?B8RlVw//w16oUy16/mtI+xa6p5SrI1Z5FxqeaOF51ogs+5n3TmMiklYWup8q?=
+ =?us-ascii?Q?e7E1rqCUCejQcCC22eQq9KJ+pyd7Zur6IHDtdgKqG34xJNuvpS+MMNkJbQSL?=
+ =?us-ascii?Q?Y+zscn8MP10uCE5WSKP2FTM9MiKsIkyr4mFis/e5yIOaZhcnDjG/eRE9qo1+?=
+ =?us-ascii?Q?8yxNOlxBldOOowvQmH3TGjPgQiCMyPthkEER4x+s1px/w+wdWRrsxW7K80X2?=
+ =?us-ascii?Q?PsNaR9pgfIUEfmoThB0meQh+1J2sD3Ix8acj8Um7uo+Z1qeMf+f+7sY8GqUh?=
+ =?us-ascii?Q?N2i6NE+NS9HAoyHn9PRZx3Qk89EKrarVZiIKyGJ5HecYFC8qKBddC9S3tL89?=
+ =?us-ascii?Q?PlzmomZ2YfEDq2Ee5WNWsnV2rnKSqkxgGOiBNeDAvGcqvqo6TaxTTumFwONH?=
+ =?us-ascii?Q?t+RJb71aQ5oCVGb0mqxO4HT85MTPZCbPiqIoj5C+HMsSoagDS87/4Yhc5Psk?=
+ =?us-ascii?Q?qogNLSsL+pBjDPPWUO2lYO7ouJ3dwh0LgurHf0szAM09xkU5nVt5cVJnqphq?=
+ =?us-ascii?Q?wyurcOivg7muqSFCYxbBfP2kkog4tz1vJmA+pPXB3YQdYGZ/s8W0isznJzvE?=
+ =?us-ascii?Q?Sb81eEh3lHrZ9eUpb1c18J3DzdwczCjNtSs48HHAsolKbzrtTTjfURkWZuWi?=
+ =?us-ascii?Q?UYjCBEsQsExrROm8hiACm03C1feNAdnhrUwiz19FpvkddpkG2uKKK5WfQEb+?=
+ =?us-ascii?Q?G8JY9bErygMjCGTqdvhFSjFYGbBHPpNxvqlOLgLkuAH6Rg9AVErURNsx2JBm?=
+ =?us-ascii?Q?NKBpEdY/kXXbaybuOvqE98xNr4UnDjvM0Phmbb3fxRxEc+rQStpLlCKptWbA?=
+ =?us-ascii?Q?emtWVld5V0ds+fn8DNh1keY5TkzrqeKdoepwA8eYq8v9RWrmRSOL8jsL670c?=
+ =?us-ascii?Q?Rtr4b2S9RG19KkNQ+y0bMl1gIrLNe9yRmo8Hdzm+7LkN5ujwlnjxU8LqKybj?=
+ =?us-ascii?Q?IFlrdOrqPzhhcFbo7D+sOKRd1+cVE8Uy0o96ZbF0NJHWQq2cb/DO3A2KiUfG?=
+ =?us-ascii?Q?GEop5urM0e7+N6gOr8JOED0PVn7ArwzK++iTmst7ynrGOUyBxjUYUuSL7vmh?=
+ =?us-ascii?Q?yr7JzvAz8Hsjd6TPjViUggJdrmABHGyJfO/+YW4dH635q3JSWkCXN3gZeyU3?=
+ =?us-ascii?Q?kDjjmkgky1iz6eGawKjqdHkGttAJFYeHpJ9DG1hAV/6OAdRdjagZwPLAOeyF?=
+ =?us-ascii?Q?4mp9bArHLtt306zno24qgRylgmKIB1J+oKCS9ButgEHCPX54wHIv6pRarwIr?=
+ =?us-ascii?Q?Guw9qpt9ZEQYS5zc5RRajOERVpwVF2z26F/Mb2jAXgwvxFcku9lvL0sgwO3l?=
+ =?us-ascii?Q?OEy/U1PGiTswSy4qjPo9YrFjPWozCW9n?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?rGfjYKDymSYbcm3A32UhpvD0mNMWwYwfZ/B1YytbiraHq0nzWGTUf/oHWf97?=
+ =?us-ascii?Q?7xIwXFRU8pkcslj7qhviZRQv33LCSau/JstRQPRHWSCcu5Mia35HrCr2IAP0?=
+ =?us-ascii?Q?b9OVIaIgHrBjP2+H0gvGFxhBNLC05s3bxak+MzHKmVyFqkw58rd+aMBX1kXN?=
+ =?us-ascii?Q?qu3MmGFj7PH4Qy8EoL+MeWMDvvIT7pElCXg+SeUvlNZqs+7/zxhKkrmWTdqI?=
+ =?us-ascii?Q?J1Ibuk2O4pph8zB8hRgYMVE3JX8C5wBthTB7bdYGWxwei29TcRGTOcT3sqp7?=
+ =?us-ascii?Q?mNA7M2Jo336BGcpF6x36jfyu9fN3eUGkZCK2n5Va2yHr+wBW9R7FsHVO4ddS?=
+ =?us-ascii?Q?xIXPx/Kvg1QJc4kwBq0nyckxmPq7GJk1wdQbZm2kFbkYK8mU8SXTLbMS7Faw?=
+ =?us-ascii?Q?nyuVJKMTbh8hS7Uy+fvg09DkswibOf6lK4t8NVRGvamwQCBcUZks10taNzIV?=
+ =?us-ascii?Q?SSf0eZ9LUtCXIcnFf7/d+sWgf+iQQiTlbh2qqqHkvp5xZ366F69UDcrca3V7?=
+ =?us-ascii?Q?1Y09smaTPnFsh3cenkogV0xxjyWNIa3m8GTv8yKCO0CRvTdkNxCe36pXTcmq?=
+ =?us-ascii?Q?EbmuxTcwDBERnmFl1FUAEi6sJI+7l4PDgwkL0NBVm+8QlrH/LtGBr4CqRfA0?=
+ =?us-ascii?Q?jHsT+2tjapS+bLvrEXtmoNdFrdH9yiVYo39QTdNWZ/FeKfuPqe/O0j9LCC/e?=
+ =?us-ascii?Q?qQGFvJQieYVpLQc/+2LMXTJbFVk2MBvEZyed6DjyBSzvwBxNURqswBZYWvo6?=
+ =?us-ascii?Q?gup2/oTkWdO9dHa6H80fhpG9BOGmwtuCs3g25GWOWXahkpMpBY5yUGAaN8k4?=
+ =?us-ascii?Q?fVlzawKGn/NyWt3gr+SGFTN+IIcd+N/SIXmwxFSKP9yhp+lwKso+PvatwlmK?=
+ =?us-ascii?Q?8SeB6pLeZBTdvv/EvkQdVfM/py21fPw/OhaUfLwdus8qu1+ZPU/x1mkfhIRE?=
+ =?us-ascii?Q?6/2uKUUIe7F6jOGILCPZwZcrom0EXqIXIgwRnt99Pxjav7HrnSWuGqV9DaA6?=
+ =?us-ascii?Q?NX8aT1Ty/VN9xnFj2LMo/6+dDNZsEU3JVLaBDKaB1FMEWIYdE0X7b2O4as9r?=
+ =?us-ascii?Q?VNmA9jMaUiAIMdWu3ZHAG6oJ5Zd2b/VbTsSEkJRq8pqS9rKtN+RDfqXreEfK?=
+ =?us-ascii?Q?cxdMAXvPrh9Ush3G4nydU8zAv1NjKRSf/tO4EMrshX8/P1D1Q8K9s+nmp0WA?=
+ =?us-ascii?Q?M6tz5gjC8qbgSyqHEEgTY58i3FWUAOKhU4byyNnrOvcZrN61rM/LJD2W83vk?=
+ =?us-ascii?Q?kziySKViU2+xUJfbHid0li537tWgsIOwNTqclnrwPzyKVB2KJPIdu/kAwZl+?=
+ =?us-ascii?Q?KhtJaNyqkYP15P9oXIV+3hN6wSI7Ou9fFL2LshJa/ui52gN4Z76PUw8tNAsa?=
+ =?us-ascii?Q?dvwrOP9d9gwCdfvh2nHAreM8mWtG/ovG8gqrbUgZsQE+0XBFwmeVH20jmurd?=
+ =?us-ascii?Q?vlIB5rKBdt1YnDGOjMmR+ry4aeDTvtiOBgumRad8KA/0sRmteg7hDR+Sq1p1?=
+ =?us-ascii?Q?zCRnAKYvItcSqU1zLqDp/crd1eXn0E+yo4ne0XmYCBdfmzq8YSDiOuDWSnDd?=
+ =?us-ascii?Q?GrZ7EUuYzAWtNG5OY3vIVJ+XVpMB7SXkIEdDCf7RDkphP/qe8vu01F6OYyrE?=
+ =?us-ascii?Q?Fg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D7723B2F968D534FA5D5FCEAE9F52D06@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9ATyhq6PzOh7onx@fedora>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	+g1qPcnr4X2g+fRRWUPxYDpiUSuIRbc/5g7rDyGkbKO6SSizOtOTm6NF14fUQnAF8rw9Y1LA+Iz8Y3T947pflzF0OmIC+AwoPoKm+oVuqN/7/FdiIdLzuEJ+fh8R2aTggc/iot+UcqNKYkvFk7T8CP9kxwggC1wrxriY4H8VDxnpB8bZLpwCA9JpKJSiLVp83xY1kZF1ZVhlkBS8GUlK8WQNIhJwIgn9LBOBRxYJKml0qaXs7o4aK2Iyb+MsDvqzdrPAKiYgEVh5UBEySjiyyYW2FNDulmyZ1hsWHIuVqT9A1P4BOuOZ49vqzLjeENOfG0e283A6mRsiFNh+/TsKQuycjwxPDo2qyGDVPopOoCiq5CWxcuZSP1AQXa9zdc0jZf2gC+XMveSmaQPHF8wkgY6YbsiFpcwLtMqoL5fmkT98mDZsB35RRDx818iCTs9JZolZhUX5ZH++3luIan4TC/oODRem/TuZosi8279LxrfgqHuzIdDUMd4pYMGMj4PLDy4+6wrchjoqsnxQfwkkhnplrPEb0ZIC8wIDgKG86k4kM9eKIKdMFaCXPbEHw+mexW1B9Je/zGL0JDBKUVBt3HMn+qp7B4fUzYe9qKnxu3JzDHMRf9gaQQxE8t5zojrj
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81caada9-2f25-449b-1435-08dd610eb239
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Mar 2025 02:36:30.3378
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Byx3tmNlWsnG3gGIZtZyAcpdWIy2TuvIxkUUkDbTCcXuIjnLcxL8GxtPX26Sxx8OYBZjmefAL4DhYX90myk6sugB4RX2tIp69Ggv8Q6ZnqE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR04MB9468
 
-On Tue, Mar 11, 2025 at 06:43:22PM +0800, Ming Lei wrote:
-> On Tue, Mar 11, 2025 at 12:27:23PM +1100, Dave Chinner wrote:
-> > On Mon, Mar 10, 2025 at 12:18:51PM +0100, Mikulas Patocka wrote:
-> > > On Sun, 9 Mar 2025, Ming Lei wrote:
-> > > > Please try the following patchset:
-> > > > 
-> > > > https://lore.kernel.org/linux-block/20250308162312.1640828-1-ming.lei@redhat.com/
-> > > > 
-> > > > which tries to handle IO in current context directly via NOWAIT, and
-> > > > supports MQ for loop since 12 io jobs are applied in your test. With this
-> > > > change, I can observe similar perf data on raw block device and loop/xfs
-> > > > over mq-virtio-scsi & nvme in my test VM.
-> > 
-> > I'm not sure RWF_NOWAIT is a workable solution.
-> > 
-> > Why?
-> 
-> It is just the sane implementation of Mikulas's static mapping
-> approach: no need to move to workqueue if the mapping is immutable
-> or sort of.
-> 
-> Also it matches with io_uring's FS read/write implementation:
->
-> - try to submit IO with NOWAIT first
-> - then fallback to io-wq in case of -EAGAIN
+On Mar 07, 2025 / 16:03, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+>=20
+> Add test for IO merge over iops limit.
+>=20
+> Noted this test will fail for now, kernel solution is in development.
 
-No, it doesn't match what io_uring does. yes, the NOWAIT bit does,
-but the work queue implementation is in the loop device is
-completely different to the way io_uring dispatches work.
+Thanks Yu. I will add nit comments below. I will do review again and trial =
+runs
+when the kernel solution gets available.
 
-That is, io_uring dispatches one IO per wroker thread context so
-they can all run in parallel down through the filesystem. The loop
-device has a single worker thread so it -serialises- IO submission
-to the filesystem.
+>=20
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  tests/throtl/007     | 65 ++++++++++++++++++++++++++++++++++++++++++++
+>  tests/throtl/007.out |  4 +++
+>  2 files changed, 69 insertions(+)
+>  create mode 100755 tests/throtl/007
+>  create mode 100644 tests/throtl/007.out
+>=20
+> diff --git a/tests/throtl/007 b/tests/throtl/007
+> new file mode 100755
+> index 0000000..597f879
+> --- /dev/null
+> +++ b/tests/throtl/007
+> @@ -0,0 +1,65 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2025 Yu Kuai
+> +#
+> +# Test iops limit over io merge
+> +
+> +. tests/throtl/rc
+> +
+> +DESCRIPTION=3D"basic functionality"
 
-i.e. blocking a single IO submission in the loop worker blocks all
-IO submission, whereas io_uring submits all IO indepedently so they
-only block if serialisation occurs further down the stack.
+I expect this will be updated
 
-> It isn't perfect, sometime it may be slower than running on io-wq
-> directly.
-> 
-> But is there any better way for covering everything?
+> +QUICK=3D1
+> +
+> +requires() {
+> +	_have_program taskset
 
-Yes - fix the loop queue workers.
+This line is not necessary. taskset is included in util-linux, which the "c=
+heck"
+script confirms avialability.
 
-> I guess no, because FS can't tell us when the IO can be submitted
-> successfully via NOWAIT, and we can't know if it may succeed without
-> trying. And basically that is what the interface is designed.
+> +	_have_program fio
 
-Wrong.
+I recommend _have_fio instead.
 
-Speculative non-blocking IO like NOWAIT is the wrong optimisation to
-make for workloads that are very likely to block in the IO path. It
-just adds overhead without adding any improvement in performance.
+> +}
+> +
+> +# every 16 0.5k IO will merge into one 8k IO, ideally runtime is 1s,
+> +# however it's about 1.3s in practice
+> +__fio() {
 
-Getting rid of the serialised IO submission problems that the loop
-device current has will benefit *all* workloads that use the loop
-device, not just those that are fully allocated. Yes, it won't quite
-show the same performance as NOWAIT in that case, but it still
-should give 90-95% of native performance for the static file case.
-And it should also improve all the other cases, too, because now
-they will only serialise when the backing file needs IO operations to
-serialise (i.e. during allocation).
-
-> > IO submission is queued to a different thread context because to
-> > avoid a potential deadlock. That is, we are operating here in the
-> > writeback context of another filesystem, and so we cannot do things
-> > like depend on memory allocation making forwards progress for IO
-> > submission.  RWF_NOWAIT is not a guarantee that memory allocation
-> > will not occur in the IO submission path - it is implemented as best
-> > effort non-blocking behaviour.
-> 
-> Yes, that is why BLK_MQ_F_BLOCKING is added.
-> 
-> > 
-> > Further, if we have stacked loop devices (e.g.
-> > xfs-loop-ext4-loop-btrfs-loop-xfs) we can will be stacking
-> > RWF_NOWAIT IO submission contexts through multiple filesystems. This
-> > is not a filesystem IO path I want to support - being in the middle
-> > of such a stack creates all sorts of subtle constraints on behaviour
-> > that otherwise wouldn't exist. We actually do this sort of multi-fs
-> > stacking in fstests, so it's not a made up scenario.
-> > 
-> > I'm also concerned that RWF_NOWAIT submission is not an optimisation
-> > at all for the common sparse/COW image file case, because in this
-> > case RWF_NOWAIT failing with EAGAIN is just as common (if not
-> > moreso) than it succeeding.
-> > 
-> > i.e. in this case, RWF_NOWAIT writes will fail with -EAGAIN very
-> > frequently, so all that time spent doing IO submission is wasted
-> > time.
-> 
-> Right.
-> 
-> I saw that when I wrote ublk/zoned in which every write needs to
-> allocate space. It is workaround by preallocating space for one fixed
-> range or the whole zone.
-
-*cough*
-
-You do realise that fallocate() serialises all IO on the file? i.e.
-not only does it block all IO submission, mmap IO and other metadata
-operations, it also waits for all IO in flight to complete and it
-doesn't allow any IO to restart until the preallocation is complete.
-
-i.e. preallocation creates a huge IO submission latency bubble in
-the IO path. Hence preallocation is something that should be avoided
-at runtime if at all possible.
-
-If you have problems with allocation overhead during IO, then we
-have things like extent size hints that allow the per-IO allocation
-to be made much larger than the IO itself. This effectively does
-preallocation during IO without the IO pipeline bubbles that
-preallocation requires to function correctly....
-
-> > Further, because allocation on write requires an exclusive lock and
-> > it is held for some time, this will affect read performance from the
-> > backing device as well. i.e. block mapping during a read while a
-> > write is doing allocation will also return EAGAIN for RWF_NOWAIT.
-> 
-> But that can't be avoided without using NOWAIT, and read is blocked
-> when write(WAIT) is in-progress.
-
-If the loop worker dispatches each IO in it's own task context, then
-we don't care if a read IO blocks on some other write in progress.
-It doesn't get in the way of any other IO submission...
-
-> > This will push the read off to the background worker thread to be
-> > serviced and so that will go much slower than a RWF_NOWAIT read that
-> > hits the backing file between writes doing allocation. i.e. read
-> > latency is going to become much, much more variable.
-> > 
-> > Hence I suspect RWF_NOWAIT is simply hiding the underlying issue
-> > by providing this benchmark with a "pure overwrite" fast path that
-> > avoids the overhead of queueing work through loop_queue_work()....
-> > 
-> > Can you run these same loop dev tests using a sparse image file and
-> > a sparse fio test file so that the fio benchmark measures the impact
-> > of loop device block allocation on the test? I suspect the results
-> > with the RWF_NOWAIT patch will be somewhat different to the fully
-> > allocated case...
-> 
-> Yes, it will be slower, and io_uring FS IO application is in
-> the same situation, and usually application doesn't have such
-> knowledge if RWF_NOWAIT can succeed.
-
-And that's my point: nothing above the filesystem will have - or
-can have - any knowledge of whether NOWAIT IO will succeed or
-not.
-
-Therefore we have to use our brains to analyse what the typical
-behaviour of the filesystem will be for a given situation to
-determine how best to optimise IO submission.
-
-> However, usually meta IO is much less compared with normal IO, so most
-> times it will be a win to try NOWAIT first.
-
-Data vs metadata from the upper filesystem doesn't even enter into
-the equation here.
-
-Filesystems like XFS, bcachefs and btrfs all dynamically create,
-move and remove metadata, so metadata writes are as much of an
-allocation problem for sparse loop backing files as write-once user
-data IO is.
-
-> > Yup, this sort of difference in performance simply from bypassing
-> > loop_queue_work() implies the problem is the single threaded loop
-> > device queue implementation needs to be fixed.
-> > 
-> > loop_queue_work()
-> > {
-> > 	....
-> > 	spin_lock_irq(&lo->lo_work_lock);
-> > 	....
-> > 
-> >         } else {
-> >                 work = &lo->rootcg_work;
-> >                 cmd_list = &lo->rootcg_cmd_list;
-> >         }
-> > 	list_add_tail(&cmd->list_entry, cmd_list);
-> > 	queue_work(lo->workqueue, work);
-> > 	spin_unlock_irq(&lo->lo_work_lock);
-> > }
-> > 
-> > Not only does every IO that is queued takes this queue lock, there
-> > is only one work instance for the loop device. Therefore there is
-> > only one kworker process per control group that does IO submission
-> > for the loop device. And that kworker thread also takes the work
-> > lock to do dequeue as well.
-> > 
-> > That serialised queue with a single IO dispatcher thread looks to be
-> > the performance bottleneck to me. We could get rid of the lock by
-> > using a llist for this multi-producer/single consumer cmd list
-> > pattern, though I suspect we can get rid of the list entirely...
-> > 
-> > i.e. we have a work queue that can run a
-> > thousand concurrent works for this loop device, but the request
-> > queue is depth limited to 128 requests. hence we can have a full
-> > set of requests in flight and not run out of submission worker
-> > concurrency. There's no need to isolate IO from different cgroups in
-> > this situation - they will not get blocked behind IO submission
-> > from a different cgroup that is throttled...
-> > 
-> > i.e. the cmd->list_entry list_head could be replaced with a struct
-> > work_struct and that whole cmd list management and cgroup scheduling
-> > thing could be replaced with a single call to
-> > queue_work(cmd->io_work). i.e. the single point that all IO
-> 
-> Then there will be many FS write contention, :-)
-
-Did you think about how much parallelism your NOWAIT patches are
-directing at the loop device backing file before making that
-comment?
-
-The fio test that was run had 12 jobs running, there is at least
-12-way IO concurrency hitting the backing file directly via the
-NOWAIT path.
-
-Yup, the NOWAIT path exposes the filesystem directly to userspace
-write IO concurrency.  Yet the filesystem IO scaled to near raw
-device speed....
-
-It should be obvious that adding more IO concurrency to loop
-device IO submission isn't a problem for the XFS IO path. And if it
-proves to be an issue, then that's an XFS problem to solve, not a
-generic device scalability issue.
-
-> > submission is directed through goes away completely.
-> 
-> It has been shown many times that AIO submitted from single or much less
-> contexts is much more efficient than running IO concurrently from multiple
-> contexts, especially for sequential IO.
-
-Yes, I know that, and I'm not disputing that this is the most
-optimal way to submit IO *when it doesn't require blocking to
-dispatch*.
-
-However, the fact is this benefit only exists when all IO can be
-submitted in a non-blocking manner.
-
-As soon as blocking occurs in IO submission, then AIO submission
-either becomes synchronous or is aborted with EAGAIN (i.e. NOWAIT
-io).
-
-If we use blocking submission behaviour, then performance tanks.
-This is what the loop device does right now.
-
-If we use non-blocking submission and get -EAGAIN, then we still
-need to use the slightly less efficient method of per-IO task
-contexts to scale out blocking IO submission.
-
-With that in mind, we must accept that loop device IO *frequently
-needs to block* and so non-blocking IO is the wrong behaviour to
-optimise *exclusively* for.
-
-Hence we need to first make the loop device scale with per-IO task
-contexts as this will improve both IO that can be dispatched without
-blocking as well as IO that will block during dispatch.  If this
-does not bring performance up to acceptible levels, then other
-optimisations can then be considered.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+I guess you will think about better name of this function here. "run_fio" o=
+r
+something?  It's the better to not have underscore prefix.=
