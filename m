@@ -1,131 +1,138 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40269250BE9;
-	Wed, 12 Mar 2025 15:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68B02512C5
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 15:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741792775; cv=none; b=Hoez01aeJc+3pUCW7lNIDrYAnlGBE3sLtQERbT8+OWrReS9FxgWUwyniH5wTSkxMJeRxRgcrLog2zDRyboHKqhbOzmjKJ7C1Dha90iG03JT3Xk9Yq3Wwshi1P79g6SP+my3UIZlz0w6z/VuxNNtmWg5FbyezZnu3MOgsEeiU07I=
+	t=1741792793; cv=none; b=TuIWaIjxvXLtliJE119JNzBUFqNnzXvJYJ2NB+UtyOMeovRG2W75poKJMICOODHdcWIc7zm3bnKNxnB58Vpjb2DAwoVfYSFfe4m18sBUviy8Q82tYcnwiDCaCzK/8bHZSCm79d6dd10DaSH2y+TH3qhcvhK6bL+nlCri4gul2Sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741792775; c=relaxed/simple;
-	bh=DZ1Y+gpCWCY9gKqjbGx1YlA81MAHDVWvWbEPAiVSvzM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rbLAovF3ZJMAnIH1WqmLgLGZyknFXqeLYWCIyGXcyFvCH1pQQhDp2SOiqMLYl5D1ZJiB1PZXN0altxFQ1QbuZ+Ompf0Wmz1yfvqeTpRSQWp0H4tAPO4LOSaEgjlHcrK14EXqyli8Dm6HdCpJ3V65VUUwyPEHa/9wM9RGcYFD4bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2L9vETx; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741792793; c=relaxed/simple;
+	bh=IkBLvmDITnyPBUUbc0HneErGyCPjUNDYRBIFFpOeaS0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jmIzK+4uGTg+TpPtKIfCCtP0WfHnVy3ZfPUxPo8Ws2LChb8kGcy/FhqA10sm8LElo7d5EwDnCm0P5stRXXMcQ0l3qMAK4HdsRRPBRhrDTXmkGOnl9iUhCVDj6qXnPqAUbvomonF1cMDsbzkI3G76rD9c1+JbgQTkMFM8ih0AK48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SJ+mzjZM; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2L9vETx"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac2963dc379so523031266b.2;
-        Wed, 12 Mar 2025 08:19:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741792772; x=1742397572; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w/pXIDpOp6BNiWBUcqQ2AhAHmg0GVGeLpFmyRHgc3pE=;
-        b=f2L9vETxOjhFHt4qjMoo/4c6jNtezvdUw2WVDcef1/yoL+aPsbmgquk+srAlmv7/ZQ
-         cR0rIf3NW7Z0y5N68ie1/75rUlE32YOBMPtmGehqq0Rqf9LcewBjIiRsst3rHIRa9FSH
-         T9YOtBdD1ynGWwEzSGLxdLzFQklhTsZOZZ9rvZoA0jbiZVv/9Cynx39sW1UkgP5gGVEs
-         dw3N5b/Ienxumf3aDSrU6d6Ko4h5AS86emhXSJ8SAG4vPx1xW1Q68VwXWmzN3pCtBPop
-         aU5ElsnjHqaZGt5zyrTNWxkiI7IOOh6a44XvgXG4nNKmSoC3z4D2vNsrPwucMVPNiaGO
-         kcBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741792772; x=1742397572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w/pXIDpOp6BNiWBUcqQ2AhAHmg0GVGeLpFmyRHgc3pE=;
-        b=OmaacCNcRnmAt8N8aB0RVCWBs/leC2+Yu+YYAJyWmVJe/ssR4xBnyzQ4NfPqKqvuEP
-         ukR0HvvwFR8985p4TmX2sJ8z+e+ixGdE6pjeiO9MqpMkXAeKg1cF6cfBkilMPflo0Vr9
-         91OZ3xlyT8ATuNMvXpxTejAzOGLgkWiestO9R1hWacCUuk30Smk6zUcYXxsz2DsEwWIY
-         VwAZg3MI9Lu51DLmg63GzT2PcnLgkATOqPXUIn29JrIQn58NOlHpR8e430qD9pWi4AhH
-         kKJ4OibXvI+HPtvLPjEydICfoOOKvwPG8/uDD9bFSXX9Z8mu5SMatahdG818RMy2/2EG
-         sT8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUm+7KUixVkU6+hAwFDxAzdMhVrmLgNzdpmAfQqwJbbGF5qTjyv9s+4kKOWrVBhuiwsAofuvM4hq6X/hbap@vger.kernel.org, AJvYcCVIKZ0PPOBeiLAJc6KJMEdzzA7wdylnjz6hS0iLZ6fZT+F8YUDbN5QRCuRJHTBZU2kaJMtVaZUCXXbgg/zA@vger.kernel.org, AJvYcCVksydJ1ssi9biopRUq0Mzb9R1YEkPmhJ887nkicdLSK5nTCmaQCrQfOur1oPIgmB7j2ZgYED/ICDb44Sg3AkY=@vger.kernel.org, AJvYcCW2JUvT4JN+uCsDXJfbnygoUA6bGxPY/9/kNnIUDeTx8PVl5x151Zu93knE//QY2t/xCre3LG2OBfcY@vger.kernel.org, AJvYcCX65ech20LkzcNCUdpdGJJTBGeot/jz6aTr3ks4y3I7vCk5QB3XiJpuv3PtcBK65ylsWlp22YrxDYt2@vger.kernel.org, AJvYcCXIVHBM/j9zIb0ul9jEpMu0J4TrB7hKv5LwkXLpOz00jP/z6pUrIi3j/vYHYFMYfgPk8Otq1rDdNOYJq6Y=@vger.kernel.org, AJvYcCXKVJd42IjmWhL1DSBp0i4eXJ5JdlMGSnRzM/YgrI9PPJGArxGfTnYH2gAqAcZa5Tn3nZu/DC0eCGWLS9z07z85@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP0D0CfMNNuX9mFFDLAtyzW+PNG8PVDQPxcIXxOv9GtjZKSDX/
-	Vn9HiggpNZpOiMmMsEfCid4ghgxW3/2+17nH4KO7+GLzxSrUxqtB+ErDOl1nm5+0EPB+GwX/UND
-	w3jvj7uRS7/jApOr9Aq7xqlrcSeE=
-X-Gm-Gg: ASbGnctHEF+TyHBp1t55DBgnf1+wmOSV0jC9vGndkdMhAV5WCHv/0kCztB54q27Jm14
-	QstzVCn+4/vFQ+ymRbUS6ktcxJ02Lf/GQOCwC6Cw3WPYEDxjd6IPfqcA+T6E7ljqMhUzdO7ujTL
-	6KHV+pm6ZBfkuf8vqI7XtdT9EL/m7a3I/P1+uW8z1pTg==
-X-Google-Smtp-Source: AGHT+IEec6B4lJH1kJ1qHPybkofl06oPx4WtqrcLkOLw+lXdaHEZafbVI/G1oeMNC9lXPgjx3er5Eb5Gd21kfKnMS/g=
-X-Received: by 2002:a17:906:f10d:b0:ac1:e332:b1e7 with SMTP id
- a640c23a62f3a-ac2525af682mr518458366b.4.1741792770733; Wed, 12 Mar 2025
- 08:19:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SJ+mzjZM"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52CCdnq6028667;
+	Wed, 12 Mar 2025 15:19:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CfiSmE
+	amRd3ACvm3B1lU8m6rJNAK/6qer0yMaBEUWog=; b=SJ+mzjZM9yD8VZY/58B5Ob
+	zQZhlHXv6njBItIwcRSTHE5E21Z+20HbWVo685PULWFcOiNZgy92dr7NMCT1Ie7e
+	R5eabxsb7Rz3yucVSdXegdwqKOzxpvfLInzr/mpMUAB49XOa+jUVSsUHE0oWdxBl
+	RR57QuZ6q6fRyMglE7esBcqS4Iph9y+0OgtTuFOCq+zBmmHnghBc1KL40sGB2ivW
+	rwAAqrHUGY2oYt0Mlmyo3MT0xZvVD1QDj2BBXBlGiV26hu31KxyOKMuc6FIo7wba
+	7B6Xgwd2R9upb0snym4OSvpwFzRh/blE96DDs+EV0ATN1aly1klQfDndRvR1jJLQ
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45b2n9b8n6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Mar 2025 15:19:39 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52CDv8NZ027172;
+	Wed, 12 Mar 2025 15:19:37 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45atsqvqys-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Mar 2025 15:19:37 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52CFJb9x25428552
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Mar 2025 15:19:37 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E92558052;
+	Wed, 12 Mar 2025 15:19:37 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0024158056;
+	Wed, 12 Mar 2025 15:19:34 +0000 (GMT)
+Received: from [9.61.69.177] (unknown [9.61.69.177])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Mar 2025 15:19:34 +0000 (GMT)
+Message-ID: <9e5fd5f1-1564-4a99-aeb4-6d8d9d765db7@linux.ibm.com>
+Date: Wed, 12 Mar 2025 20:49:33 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com>
- <20250309-ptr-as-ptr-v2-2-25d60ad922b7@gmail.com> <D8ED5UWKL2N1.2JPWVV0297BJ0@proton.me>
-In-Reply-To: <D8ED5UWKL2N1.2JPWVV0297BJ0@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 12 Mar 2025 11:18:54 -0400
-X-Gm-Features: AQ5f1JryaC9D1lS-G8sJ5tBzfvkxBopn5cTygfhECRK8JmXzAdfXvR_ZyRwcnOw
-Message-ID: <CAJ-ks9kOLgXrOHucFXHB+DwZEZpZEKhBNmXKh_hB_agrq=2n6g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] rust: enable `clippy::ptr_as_ptr` lint
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: protect debugfs attributes using q->elevator_lock
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        hare@suse.de, axboe@kernel.dk, gjoyce@ibm.com
+References: <20250312102903.3584358-1-nilay@linux.ibm.com>
+ <20250312141251.GA13250@lst.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250312141251.GA13250@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kB1EMD0VIIMdupKUK-cRq33mtTLgW7_y
+X-Proofpoint-ORIG-GUID: kB1EMD0VIIMdupKUK-cRq33mtTLgW7_y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-12_05,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ spamscore=0 mlxscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 mlxlogscore=687 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2503120102
 
-On Wed, Mar 12, 2025 at 10:40=E2=80=AFAM Benno Lossin <benno.lossin@proton.=
-me> wrote:
->
-> On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
-> > In Rust 1.51.0, Clippy introduced the `ptr_as_ptr` lint [1]:
-> >
-> >> Though `as` casts between raw pointers are not terrible,
-> >> `pointer::cast` is safer because it cannot accidentally change the
-> >> pointer's mutability, nor cast the pointer to other types like `usize`=
-.
-> >
-> > There are a few classes of changes required:
-> > - Modules generated by bindgen are marked
-> >   `#[allow(clippy::ptr_as_ptr)]`.
-> > - Inferred casts (` as _`) are replaced with `.cast()`.
-> > - Ascribed casts (` as *... T`) are replaced with `.cast::<T>()`.
-> > - Multistep casts from references (` as *const _ as *const T`) are
-> >   replaced with `let x: *const _ =3D &x;` and `.cast()` or `.cast::<T>(=
-)`
->
-> Similarly to the other patch, this could be `let x =3D &raw x;`. (but it'=
-s
-> fine to leave it as-is for now, we can also make that a
-> good-first-issue.)
 
-Yeah, same as the other patch; we can't directly do that here without
-introducing some compiler infra or bumping MSRV.
 
-> >   according to the previous rules. The intermediate `let` binding is
-> >   required because `(x as *const _).cast::<T>()` results in inference
-> >   failure.
-> > - Native literal C strings are replaced with `c_str!().as_char_ptr()`.
-> >
-> > Apply these changes and enable the lint -- no functional change
-> > intended.
-> >
-> > Link: https://rust-lang.github.io/rust-clippy/master/index.html#ptr_as_=
-ptr [1]
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
->
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+On 3/12/25 7:42 PM, Christoph Hellwig wrote:
+> On Wed, Mar 12, 2025 at 03:58:38PM +0530, Nilay Shroff wrote:
+>> Additionally, debugfs attribute "busy" is currently unprotected. This
+>> attribute iterates over all started requests in a tagset and prints them. 
+>> However, the tags can be updated simultaneously via the sysfs attribute 
+>> "nr_requests" or "scheduler" (elevator switch), leading to potential race 
+>> conditions. Since the sysfs attributes "nr_requests" and "scheduler" are 
+>> already protected using q->elevator_lock, extend this protection to the 
+>> debugfs "busy" attribute as well.
+> 
+> I'd split that into a separate patch for bisectability.
+Ok I will split it.
+> 
+>>  	struct show_busy_params params = { .m = m, .hctx = hctx };
+>> +	int res;
+>>  
+>> +	res = mutex_lock_interruptible(&hctx->queue->elevator_lock);
+>> +	if (res)
+>> +		goto out;
+> 
+> Is mutex_lock_interruptible really the right primitive here?  We don't
+> really want this read system call interrupted by random signals, do
+> we?  I guess this should be mutex_lock_killable.
+> 
+> (and the same for the existing methods this is copy and pasted from).
+> 
+I thought we wanted to interrupt using SIGINT (CTRL+C) in case user opens 
+this file using cat. Maybe that's more convenient than sending SIGKILL. 
+And yes I used mutex_lock_interruptible because for other attributes we are 
+already using it. But if mutex_lock_killable is preferred then I'd change it
+for all methods.
 
-Thanks!
+>>  	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy_rq,
+>>  				&params);
+>> -
+>> -	return 0;
+>> +	mutex_unlock(&hctx->queue->elevator_lock);
+>> +out:
+>> +	return res;
+> 
+> And as Damien already said, no need for the labels here, including for
+> the existing code.  That should probably be alsot changed in an extra
+> patch for the existing code while you're at it.
+> 
+Okay will do in next patch.
+
+Thanks,
+--Nilay
+
