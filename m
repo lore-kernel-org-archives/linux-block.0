@@ -1,39 +1,56 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD0E264638
-	for <linux-block@vger.kernel.org>; Tue, 11 Mar 2025 20:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A504D288BA;
+	Wed, 12 Mar 2025 01:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.143.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741724141; cv=none; b=lD+RXmxFwiY0Br7CvXknIaseYu7GmFyZypjmxp5XcYDOFTSppSCwMLWoOByrCmkh7f7gp6wfz38MKWvD10AODyS0fojUj/Fy5HJRcdYmgGH+RqGGssXz0uKcdZw7oS8JsVssEabpNw44/sFEEGeoar146UzbP9mSATdZrX4Ef9s=
+	t=1741743142; cv=none; b=pVCmg9VmPM6PI4fH3oogyief0lGnOzsVg1K41LkfqFCUdALed2yerpzO/kcfv5jzfcJZwgRgi5oWTjFtWPQPtldxdjprXqCJJlq3W6wEA9mfIhG82kjF6mmhgd6ixGhGH6LvPUEEaNyK1cP/4IXj5SXapB2vA2kzCMUABBuIlOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741724141; c=relaxed/simple;
-	bh=9kxzyQ7WNcc0CNS9HuQkrJLgzQDtU3H0tehHlZkAuQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ShAAOsrOzy3VdOub64Az+wwDZHiUGx0UlsMvfXFYfPQLz0yTnniDWTZfhB6mzlkd+qJTZ/kLZbaye0nk1gsY5seFPzUsy5iJ6fMQnUNnLDmbI0lOrCQCYSqk0481RIrpRcN7kjTR9rqDbtGXIYwfAv87ycqAXkd+XM0yA5nGcc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lexv+R5U; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1741743142; c=relaxed/simple;
+	bh=3HXkPpjaDv2Fk/dyHKIX6r2EqAVaGb2JhvF5jc/ID4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C7n0VdRwR7L3lv0lKPI5/K2y5CLVSLe9fFO4PuWJADtnEpkbrTKfqgE1wEgCZUu1URrDW2DYDVYm3ZCwrNtTTmwxakZdjSHOkIToW5G4/SD2sw/dHXEPZBiB4MtIaRmeh6hn7fn8BBCzoHmIREVABo1/G1G+R9p0+Ar4rm09kb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=BC+3wf+O; arc=none smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lexv+R5U"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741724127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3Nrgdr9y7mpusjQj2TskrwXHx7MXt9LTGAJ46g3dBsk=;
-	b=lexv+R5UkC6Gdc/rM2MhzVrOX0b7jFwG2Gs7ANgePxvEb3dnpD8tbo9HEZ838jutsadf15
-	e9mKk7m36SB583Lwj8EvEiYJkxM/J9uLJ09luz1SzyFoXiO4nNW8qTN2/MQ+nUE6RKXvql
-	2bDXkIbLz6N5mU8qa5Iuof7iW74FziI=
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: linux-bcachefs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	Roland Vet <vet.roland@protonmail.com>,
-	linux-fsdevel@vger.kernel.org
-Subject: [PATCH 00/14] better handling of checksum errors/bitrot
-Date: Tue, 11 Mar 2025 16:15:02 -0400
-Message-ID: <20250311201518.3573009-1-kent.overstreet@linux.dev>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BC+3wf+O"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1741743140; x=1773279140;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3HXkPpjaDv2Fk/dyHKIX6r2EqAVaGb2JhvF5jc/ID4o=;
+  b=BC+3wf+OTIhO1+8J7AfyiDv2/Q4AoKAwl/usZhnJxvTG32aG96WitGt0
+   RhARlGRq9fIe8Dji4NCXjVeLGLwAiAnETJQn5gXJA2Khbgl8LYWAiD2+Z
+   /xZcegvEQX/oJrBLZVSpd5HBJm0W/18Km+r6lMlxJp4V5AWlRgO5V3weS
+   N8g620+fgs7C7eQJWSiggBI4TeT0qbG6zONXD6xa0CdpExNGZhHSF3xPg
+   SSQFQ82EQU+KsfRriwqUVXIywm73Xc0oMVotaEofZ0ITtDY5XCV+xbXPM
+   Gx8KkXQpnkh10OcqR1O1aAct4Dcm8HDcPLTboZx+ehB9smRbs8Jq6w1mF
+   g==;
+X-CSE-ConnectionGUID: TAR9BIrLQ6ulYCi3L9atig==
+X-CSE-MsgGUID: b89OwsL9TPSMEVMfsennqA==
+X-IronPort-AV: E=Sophos;i="6.14,240,1736784000"; 
+   d="scan'208";a="48299246"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Mar 2025 09:32:17 +0800
+IronPort-SDR: 67d0d64b_qGd0lW4z24BudC5FxuTU8VRxGGjuqZFyCyWyuxUg/sN7E0I
+ NVbA8MQrueADWsT13kUzHoxoE57kpl7PukSBx5w==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Mar 2025 17:33:16 -0700
+WDCIronportException: Internal
+Received: from hy1cl13.ad.shared (HELO naota-xeon..) ([10.224.109.64])
+  by uls-op-cesaip02.wdc.com with ESMTP; 11 Mar 2025 18:32:17 -0700
+From: Naohiro Aota <naohiro.aota@wdc.com>
+To: linux-btrfs@vger.kernel.org
+Cc: dlemoal@kernel.org,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	Naohiro Aota <naohiro.aota@wdc.com>
+Subject: [PATCH 0/2] btrfs: zoned: skip reporting zone for new block group
+Date: Wed, 12 Mar 2025 10:31:02 +0900
+Message-ID: <cover.1741596325.git.naohiro.aota@wdc.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,102 +58,25 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Roland Vet spotted a good one: currently, rebalance/copygc get stuck if
-we've got an extent that can't be read, due to checksum error/bitrot.
+Newly created block group should reside on empty zones, whose write pointer
+should always be 0. Also, we can load the zone capacity from the block
+layer. So, we don't need to REPORT_ZONE to load the info.
 
-This took some doing to fix properly, because
+The reporting zone on a new block group is not only unnecessary, but also
+can cause a deadlock. When one process do a report zones and another
+process freezes the block device, the report zones side cannot allocate
+a tag because the freeze is already started. This can thus result in new
+block group creation to hang forever, blocking the write path.
 
-- We don't want to just delete such data (replace it with
-  KEY_TYPE_error); we never want to delete anything except when
-  explicitly told to by the user, and while we don't yet have an API for
-  "read this file even though there's errors, just give me what you
-  have" we definitely will in the future.
+Naohiro Aota (2):
+  block: introduce zone capacity helper
+  btrfs: zoned: skip reporting zone for new block group
 
-- Not being able to move data is a non-option: that would block copygc,
-  device removal, etc.
-
-- And, moving said extent requires giving it a new checksum - strictly
-  required if the move has to fragment it, teaching the write/move path
-  about extents with bad checksums is unpalateable, and anyways we'd
-  like to be able to guard against more bitrot, if we can.
-
-So that means:
-
-- Extents need a poison bit: "reads return errors, even though it now
-  has a good checksum" - this was added in a separate patch queued up
-  for 6.15.
-
-  It's an incompat feature because it's a new extent field, and old
-  versions can't parse extents with unknown field types, since they
-  won't know their sizes - meaning users will have to explicitly do an
-  incompat upgrade to make use of this stuff.
-
-- The read path needs to do additional retries after checksum errors
-  before giving up and marking it poisoned, so that we don't
-  accidentally convert a transient error to permanent corruption.
-
-- The read path gets a whole bunch of work to plumb precise modern error
-  codes around, so that e.g. the retry path, the data move path, and the
-  "mark extent poisoned" path all know exactly what's going on.
-
-- Read path is responsible for marking extents poisoned after sufficient
-  retry attempts (controlled by a new filesystem option)
-
-- Data move path is allowed to move extents after a read error, if it's
-  a checksum error (giving it a new checksum) if it's been poisoned
-  (i.e. the extent flags feature is enabled).
-
-Code should be more or less finalized - still have more tests for corner
-cases to write, but "write corrupt data and then tell rebalance to move
-it to another device" works as expected.
-
-TODO:
-
-- NVME has a "read recovery level" attribute that controlls how hard the
-  erasure coding algorithms work - we want that plumbed.
-
-  Before we give up and move data that we know is bad, we need to try
-  _as hard as possible_ to get a successful read.
-
-Code currently lives in
-https://evilpiepirate.org/git/bcachefs.git/log/?h=bcachefs-testing
-
-Kent Overstreet (14):
-  bcachefs: Convert read path to standard error codes
-  bcachefs: Fix BCH_ERR_data_read_csum_err_maybe_userspace in retry path
-  bcachefs: Read error message now indicates if it was for an internal
-    move
-  bcachefs: BCH_ERR_data_read_buffer_too_small
-  bcachefs: Return errors to top level bch2_rbio_retry()
-  bcachefs: Print message on successful read retry
-  bcachefs: Don't create bch_io_failures unless it's needed
-  bcachefs: Checksum errors get additional retries
-  bcachefs: __bch2_read() now takes a btree_trans
-  bcachefs: Poison extents that can't be read due to checksum errors
-  bcachefs: Data move can read from poisoned extents
-  bcachefs: Debug params for data corruption injection
-  block: Allow REQ_FUA|REQ_READ
-  bcachefs: Read retries are after checksum errors now REQ_FUA
-
- block/blk-core.c              |  19 +-
- fs/bcachefs/bcachefs_format.h |   2 +
- fs/bcachefs/btree_io.c        |   2 +-
- fs/bcachefs/errcode.h         |  19 +-
- fs/bcachefs/extents.c         | 157 +++++++++-------
- fs/bcachefs/extents.h         |   7 +-
- fs/bcachefs/extents_types.h   |  11 +-
- fs/bcachefs/io_read.c         | 325 +++++++++++++++++++++++++---------
- fs/bcachefs/io_read.h         |  21 +--
- fs/bcachefs/io_write.c        |  24 +++
- fs/bcachefs/move.c            |  26 ++-
- fs/bcachefs/opts.h            |   5 +
- fs/bcachefs/super-io.c        |   4 +
- fs/bcachefs/util.c            |  21 +++
- fs/bcachefs/util.h            |  12 ++
- 15 files changed, 473 insertions(+), 182 deletions(-)
+ fs/btrfs/zoned.c       | 18 ++++++++++++++++--
+ include/linux/blkdev.h | 21 +++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 2 deletions(-)
 
 -- 
-2.47.2
+2.48.1
 
