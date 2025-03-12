@@ -1,98 +1,107 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFB924E00B
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853DF242927;
+	Wed, 12 Mar 2025 14:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741789632; cv=none; b=P7JiUruFyuklys3NHjjYg7XFPNRYF4vRRp758AC11fpIJxmjGI9CyXPNadr4JzTEznQJeEUJASq46hHaljaTKfeb/KCnfMJ9RuT88szgBhf2wxuEdA6VyklxgplyNXwFxCKJuv0MIraP7Ondzi5QDHoWkCmqFF96P0hW78P8JDw=
+	t=1741790411; cv=none; b=Wlms2/3Av3pKTtalxry4a5d64ap6SBnvk3ZkMTfv65qpykAH5PhPB84RMTeJoVKqZj5Aul9WtgSb8jsrvK5oluRHE6cRgC1XPhOJK9WEC3end/wbWZ8kE983IQWM6G/PbiSm6rhsIdjfxA1LzzkULlEcQBMmSjSyaFKW8k1b+rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741789632; c=relaxed/simple;
-	bh=6wEw943lHtUwgN72AWkOL4YoRnHBKa4yCZaGZNFhZHo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=U6uTxapR55qlsKbv07Sywg3fSoBjTvFrduz7UPgiRDThz945mTNq4koLB84YfPEKkG9n6IuBHZ0/TRxiWgr6CFZa4VT73WbraRERXcGvoFMJso5AQDkb176+i7j6C1ja6OH2ZuNS10Ow4VOMwDTmaEBcIlpItr0/HS6ze05iUGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q0rTJv3t; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1741790411; c=relaxed/simple;
+	bh=Fi/xls1kSt18tedNUCc6ZZh7/Q3+KsdT4mWnx7Ose1s=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nLR4oW8tAqM9V1+zvaXOzg0Rb1Kit1QD+JpJ2WV0+qViBi99N5FsHJd6+koGtbUgHPTE3jXEqUUqrUfBsJJYatC6jPNAC5JZqXtbzLIKcq1RCyvwZcJbKlEvK0UM6K/Ncnd1aohIg4TMPAP1f0LJ1Op4bfPFZGBoE0w4TLK+KsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=igs2XxEz; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q0rTJv3t"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-85da5a3667bso53991339f.1
-        for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 07:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741789629; x=1742394429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uMRSODIOsXT6T/CkSVqfJgUMfMK90GHSbIvmyb9xhYA=;
-        b=Q0rTJv3tKzdmYw9/cvPohLHLKhTDBkrYT2lk1jteTmsk2JftBwLzCyLC67QLENEwmR
-         3/OHbOpiwDlCA2+eEJkvXvwOCuKNFhTpdHEnBsYlsPFtTCy1c4Yq7HZEWGle1hP/heRr
-         MQTvKBPVLVgMEqom/0rBUw4CQV1VDCj+B7UPAm7cX7nczs1rl669WslKZbYd0MROFGSo
-         +terA9/EINlVH3qjX7DT6MW2BAkB/sQPuzZpGc9hgroX4DlFESBsWGkhIDKqZHs0X1O+
-         4o306JlibMk88pTyz81r4fZSJXOSiga6+FRVkOYYcJLxMzMG2NGUL4T/5s2kKU/jXO3Z
-         9spA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741789629; x=1742394429;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uMRSODIOsXT6T/CkSVqfJgUMfMK90GHSbIvmyb9xhYA=;
-        b=PUNzFa4vJnYGIEt9OqgsYh9UaWWcPlcYlPDSeTpm4EFii7MEPr1AcsZxyFaZa0PRwE
-         /BVIX5u6SaQ5VoRjTI8s0SSh55Ly2ESUB83eSLowXULszXXtAQaSMH0q326Dk/wYqV9F
-         +TSnzjK0yOMOd3Yvjupcc04GVoQFdHaudKyatnpqrrpJ9HqIQA++oSpWOvD6Ii2ci7U7
-         nHxw9HqMWgZH4f99SwGKtnwzCnqbhmD9KJl7zjQFarqbJOLWEytbrdfFvjAwtQhPhUNU
-         7nOB9J4nodKiitGvK4/JIxzthlLUhWkZ2B7WHMzbcnATyiJaeS9mJX4CNOwJqbai2FDr
-         lYRA==
-X-Gm-Message-State: AOJu0YzfaeK+2KQtGe8RKoEIoks0a5eb7EOyQJkFycQSEpQnU9ReD8tQ
-	vSMh0g58baqjGJVF+0sjeK6qpCc28944hIQvUYRskMVjWiWAvoINXd6hzeWDzi1+G+o1lN/6sh3
-	B
-X-Gm-Gg: ASbGncvFCKHP18SKYHujh9+Q2nxif8SOzvsLWJOskD/WKo5a3cSdx7o5Z330pL4dHFE
-	4HWwXD7DrGwdqTOehBukHnEWrUVyaN9nqvKhH80yXKI84RIfjI3wlpu2jnSZN62/KW4QY6UydDK
-	+OEvq5gqSY/jtqnjATaMuXGcpG5oumFLdeEAUZzjIlk0K4J1O+h2XKmST8lajpA4Gvk0EERMvi2
-	gyVF0qn/ZjXDnkpe9M9bQCljHm2YZil9ABtjSkt57FCtnpEkzbVH+CXACESCBe0zHvpQI8ddplB
-	sNKuo+ArZie//NlMZgyK3K2GAF7U2ErvJZI=
-X-Google-Smtp-Source: AGHT+IETiWExYtTjc+IcNeMYGVYuARHuyOBl7KeQ4OjHqMRUj+ySwepYn6hAb6JGdNvJbtZ2dew0NA==
-X-Received: by 2002:a05:6602:36c4:b0:85b:41cc:f709 with SMTP id ca18e2360f4ac-85b41ccf72dmr1724403739f.14.1741789629083;
-        Wed, 12 Mar 2025 07:27:09 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f23db8f8d0sm1335734173.45.2025.03.12.07.27.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 07:27:08 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-In-Reply-To: <20250312072712.1777580-1-shinichiro.kawasaki@wdc.com>
-References: <20250312072712.1777580-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH] block: improve kerneldoc of blk_mq_add_to_batch()
-Message-Id: <174178962785.513960.8480899138080580036.b4-ty@kernel.dk>
-Date: Wed, 12 Mar 2025 08:27:07 -0600
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="igs2XxEz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1741790406; x=1742049606;
+	bh=ln7+3zkl6JCWdcMdIgyVOnjSeIR+wlhx+5g0dVF9NAs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=igs2XxEzdhhAm6M2XBHYRc+ZpZhhqIJ8cnmEd9XPVyUS6FPIBc0clFccpxH1jnbjB
+	 Zvgd0MqYs+Vatdh9rW5h0bdJBJZLiz4NQYRnbYHQOR2QKnnVIB29kohar1RmRFshCN
+	 Wgnmm2Tdz08mHYdI0hLq7B1CDFt82uNlE76P51c3qeb/2e5trtutknGowYz+uIyAvL
+	 2xgwfyMPNgGu0hljClBe2qdCMKqmpiew5GX1T2uocwd/+KJ1LVnm86GLYm4RQRU1aW
+	 LxSl+DhoPfxI4XJgp7Yz8vZEVR47xLCAeeR+MGxVAaW+c49n8eqo04Sti1OimU3Fa9
+	 AbU5MaXucOkQQ==
+Date: Wed, 12 Mar 2025 14:39:59 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] rust: enable `clippy::ptr_as_ptr` lint
+Message-ID: <D8ED5UWKL2N1.2JPWVV0297BJ0@proton.me>
+In-Reply-To: <20250309-ptr-as-ptr-v2-2-25d60ad922b7@gmail.com>
+References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com> <20250309-ptr-as-ptr-v2-2-25d60ad922b7@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: cfdcac70a4dffef0ce337ad830841016c81e6356
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
+> In Rust 1.51.0, Clippy introduced the `ptr_as_ptr` lint [1]:
+>
+>> Though `as` casts between raw pointers are not terrible,
+>> `pointer::cast` is safer because it cannot accidentally change the
+>> pointer's mutability, nor cast the pointer to other types like `usize`.
+>
+> There are a few classes of changes required:
+> - Modules generated by bindgen are marked
+>   `#[allow(clippy::ptr_as_ptr)]`.
+> - Inferred casts (` as _`) are replaced with `.cast()`.
+> - Ascribed casts (` as *... T`) are replaced with `.cast::<T>()`.
+> - Multistep casts from references (` as *const _ as *const T`) are
+>   replaced with `let x: *const _ =3D &x;` and `.cast()` or `.cast::<T>()`
 
-On Wed, 12 Mar 2025 16:27:12 +0900, Shin'ichiro Kawasaki wrote:
-> Commit f00baf2eac78 ("block: change blk_mq_add_to_batch() third argument
-> type to bool") added kerneldoc style comment of blk_mq_add_to_batch().
-> However, it did not follow the kerneldoc format and was incomplete.
-> Improve the comment to follow the format.
-> 
-> 
+Similarly to the other patch, this could be `let x =3D &raw x;`. (but it's
+fine to leave it as-is for now, we can also make that a
+good-first-issue.)
 
-Applied, thanks!
+>   according to the previous rules. The intermediate `let` binding is
+>   required because `(x as *const _).cast::<T>()` results in inference
+>   failure.
+> - Native literal C strings are replaced with `c_str!().as_char_ptr()`.
+>
+> Apply these changes and enable the lint -- no functional change
+> intended.
+>
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#ptr_as_pt=
+r [1]
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-[1/1] block: improve kerneldoc of blk_mq_add_to_batch()
-      (no commit info)
+Reviewed-by: Benno Lossin <benno.lossin@proton.me>
 
-Best regards,
--- 
-Jens Axboe
+---
+Cheers,
+Benno
 
-
+> ---
+>  Makefile                               |  1 +
+>  rust/bindings/lib.rs                   |  1 +
+>  rust/kernel/alloc/allocator_test.rs    |  2 +-
+>  rust/kernel/alloc/kvec.rs              |  4 ++--
+>  rust/kernel/device.rs                  |  5 +++--
+>  rust/kernel/devres.rs                  |  2 +-
+>  rust/kernel/error.rs                   |  2 +-
+>  rust/kernel/fs/file.rs                 |  2 +-
+>  rust/kernel/kunit.rs                   | 15 +++++++--------
+>  rust/kernel/list/impl_list_item_mod.rs |  2 +-
+>  rust/kernel/pci.rs                     |  2 +-
+>  rust/kernel/platform.rs                |  4 +++-
+>  rust/kernel/print.rs                   | 11 +++++------
+>  rust/kernel/seq_file.rs                |  3 ++-
+>  rust/kernel/str.rs                     |  2 +-
+>  rust/kernel/sync/poll.rs               |  2 +-
+>  rust/kernel/workqueue.rs               | 10 +++++-----
+>  rust/uapi/lib.rs                       |  1 +
+>  18 files changed, 38 insertions(+), 33 deletions(-)
 
