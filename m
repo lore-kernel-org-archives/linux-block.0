@@ -1,79 +1,120 @@
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B40124E01A
-	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389F82033A
+	for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 14:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741790470; cv=none; b=GVQncE5KRVvVvfpP6Fo1ZpG6TNxD4sp45Evvw0CDuHK+nhCmD/iHwBqLh4bbPej+77H03lv1Pht6W5c0AaBp7m4/N1XBfugqpavyjgenh8TfVcmb7sEYy/PUiJ8DSH1F9n5volTNgyitV5q9S13l3aq5ptp9zjBdcTSMwnFOoso=
+	t=1741791113; cv=none; b=GknKjDcETNGkRhS8uKdTUZr3v1iqZzyAuD3dmqLYwJH7oD3Jdxypi32HuZw/GDWRFyQ1wpZbGH+NPRJndLZrop7bTSVxx0W9mwcUq+1XNlU382890DLbnPISCBfNCGs7MVTF1/ti+vjqB4+vnKBBERsjaMV8R2QlKJXdiCfY6Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741790470; c=relaxed/simple;
-	bh=8Z3f9St12qWcetrZIU5ZBX91BsZDoV5+6V34IbAU8/Q=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T53twsuPurMMToB6p69kCH91CjFJMK25vmNGLfYm/yIazjbQy3EnzPvHSChrw0ESztMDm3vOL3fUdun02EZfnAGNuWeZxgcgmQHJO4dSwUY6FWNeXSTOmxhegg0R1XBpu2YuTBRcpxtX1ppIxEHe+sAcQCmxJx2zi4JbYT9zkok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=b1oZhEt1; arc=none smtp.client-ip=185.70.40.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1741791113; c=relaxed/simple;
+	bh=NDnLTuLhOFzy1eHOPqYKtCMG2xhRjI5pQ+kKeELws+M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YY5B5wFAz0V/JV/uLo6yG7QBdRK6MO+O8c4o8o02PA6CK39WlxuJXP/bowcItUaaQxHXVN803fJUjxMnBwGbu3HJULbO0wouJ+ftuFCcOjRLg4g9+Ivsy3C3VRxPadIpnUgQhdLF71bmJeUV7/u/9LeY9g6jowqJsO78de9cbsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilUDgNTk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="b1oZhEt1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1741790465; x=1742049665;
-	bh=D0FqqFXulxUsSxG/gB+0KynGvQTpgX0dOCuKKLUrQKA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=b1oZhEt1yfUJ61lbRrCyKeLedycU0anqAzq5qmFwT43G7bfsqd3jxepIuDJIgxOvG
-	 FMq66nJtyptjBHahmEmYRMVv1tvUJJUmG8m5wuhxpCjP4iHmLH5s0fwtH6wiXKQsE7
-	 v3AAMWJjkj7BGNqY+M2zRAutYn42y0AfFxJ7awi43zrXxtsx5bE6PmX9ZINbqnRtwS
-	 T6prNkA/GYscjtlDBezLcdNYtU8ajsbs2Ms2uwX+TrO557riSF+v8i7mdAyFeuUbh1
-	 +KHrPIQbTVTLTpD7gRuOT33ufFi8v2njzC4wQgJpKAWHuzCJ1MMI9PdYZqJTffs2Kd
-	 yRnFsYvQ+cRzQ==
-Date: Wed, 12 Mar 2025 14:40:58 +0000
-To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] rust: enable `clippy::ptr_cast_constness` lint
-Message-ID: <D8ED6OB8UFD3.2O2SXDLJO5TUI@proton.me>
-In-Reply-To: <20250309-ptr-as-ptr-v2-3-25d60ad922b7@gmail.com>
-References: <20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com> <20250309-ptr-as-ptr-v2-3-25d60ad922b7@gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: e6f6237cc903833d4125e44bdcd40b2e67b08589
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilUDgNTk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741791110;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+5ekf4RNz/WiY7b8vyFjJlYDOxBqKzeFiRMoudgmqD0=;
+	b=ilUDgNTkgPaErnywg/HNC4686YRDM7OhwlZ/Rf42lZq8kAgQwHkmEAzauDMHi1MUQcCS3A
+	hrr+PyUtZh8NUND4vzcTCx82LQyXJc9UEttoZmqvuQr9JL1mCB/I0VUT6gHk6BW1l+lPbq
+	+O1w3Kv4m3O0zWMR0q6pSMDuJ7voIeA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-106-JZENE8AjNOOKSAg-dqb6DQ-1; Wed,
+ 12 Mar 2025 10:51:47 -0400
+X-MC-Unique: JZENE8AjNOOKSAg-dqb6DQ-1
+X-Mimecast-MFC-AGG-ID: JZENE8AjNOOKSAg-dqb6DQ_1741791106
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA71E1800263;
+	Wed, 12 Mar 2025 14:51:45 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.24])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6C68E1955BCB;
+	Wed, 12 Mar 2025 14:51:43 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Kundan Kumar <kundan.kumar@samsung.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Gavin Shan <gshan@redhat.com>
+Subject: [PATCH V2] block: fix adding folio to bio
+Date: Wed, 12 Mar 2025 22:51:36 +0800
+Message-ID: <20250312145136.2891229-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Sun Mar 9, 2025 at 5:00 PM CET, Tamir Duberstein wrote:
-> In Rust 1.72.0, Clippy introduced the `ptr_cast_constness` lint [1]:
->
->> Though `as` casts between raw pointers are not terrible,
->> `pointer::cast_mut` and `pointer::cast_const` are safer because they
->> cannot accidentally cast the pointer to another type.
->
-> There are only 2 affected sites:
-> - `*mut T as *const U as *mut U` becomes `(*mut T).cast()`
-> - `&self as *const Self as *mut Self` becomes a reference-to-pointer
->   coercion + `(*const Self).cast()`.
->
-> Apply these changes and enable the lint -- no functional change
-> intended.
->
-> Link: https://rust-lang.github.io/rust-clippy/master/index.html#ptr_cast_=
-constness [1]
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>4GB folio is possible on some ARCHs, such as aarch64, 16GB hugepage
+is supported, then 'offset' of folio can't be held in 'unsigned int',
+cause warning in bio_add_folio_nofail() and IO failure.
 
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+Fix it by adjusting 'page' & trimming 'offset' so that `->bi_offset` won't
+be overflow, and folio can be added to bio successfully.
 
+Fixes: ed9832bc08db ("block: introduce folio awareness and add a bigger size from folio")
+Cc: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Gavin Shan <gshan@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-Cheers,
-Benno
+V2:
+	- trim `offset` unconditionally(Matthew)
+	- cover bio_add_folio() too (Matthew)
+	
 
-> ---
->  Makefile                        | 1 +
->  rust/kernel/block/mq/request.rs | 5 +++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
+ block/bio.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index f0c416e5931d..42392dd989ec 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1026,9 +1026,10 @@ EXPORT_SYMBOL(bio_add_page);
+ void bio_add_folio_nofail(struct bio *bio, struct folio *folio, size_t len,
+ 			  size_t off)
+ {
++	unsigned long nr = off / PAGE_SIZE;
++
+ 	WARN_ON_ONCE(len > UINT_MAX);
+-	WARN_ON_ONCE(off > UINT_MAX);
+-	__bio_add_page(bio, &folio->page, len, off);
++	__bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE);
+ }
+ EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
+ 
+@@ -1049,9 +1050,11 @@ EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
+ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+ 		   size_t off)
+ {
+-	if (len > UINT_MAX || off > UINT_MAX)
++	unsigned long nr = off / PAGE_SIZE;
++
++	if (len > UINT_MAX)
+ 		return false;
+-	return bio_add_page(bio, &folio->page, len, off) > 0;
++	return bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE) > 0;
+ }
+ EXPORT_SYMBOL(bio_add_folio);
+ 
+-- 
+2.47.1
 
