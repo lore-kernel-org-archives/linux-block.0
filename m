@@ -1,35 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6BA1F754C;
-	Thu, 13 Mar 2025 22:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F52E1F869E
+	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 23:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741903224; cv=none; b=cjhJuXbKUucEKsTc7Il/F2FMXA2YxenTVN8ykdQKKE8vA4T/HcaFPOoHRX2hj97bKmcH3WlokUoINnvx8TULgsm8giBCoanxkbaUjcLF9mRrYeBmC/xh3X4sxoBqsEYHtN6c5W/7dsfH9hbOSGNNK/hOE/cLZ70w9xOtGqUudzQ=
+	t=1741908838; cv=none; b=B6o7piasXNYAaR9IpPoygBL4AJ/KFEY6rMGfHkKV9G9NViTtGlLFoqst5cWFXK4kcQAIo1MyOBX4yXBlbTHzwt4i+vjC6sPd94kYk/ELn0xcUBxuF1QIycnTBcVpv1CH2/qk+dCd8a0sZgzATCDrk9EEVPWfHKC45JomExo2zYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741903224; c=relaxed/simple;
-	bh=hdrHTR1mL6tmZplZ1odsZgbWQm+yiq9Gt1ma1cVGaS4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sbOhjBg3R30T5sWYvfvmrPfQEgL4iec2GWIFM75GdrRahMnXJn3jYQ6gwuZ7PspjSUF+G9BSJ/TS+7kXTvURBPTeymhJ/XAwGwNijlVO5i6hfeJ9fR9Wxn8Gww7fh95GjY45y2UCy0z+U42zdaNiXMjRUfGfqXQApaBLlpOK7UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AsSmmTsL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741908838; c=relaxed/simple;
+	bh=LXsjgeko6//eAqaEigtD+Tzc69BNzf4lhF7ByGtGZT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O4OR0TFQSMwpg8Dhd5cssb50yIdJDmt+lyyD8xEUstVEhTEJgjDueUPC7MYHuXRjOKwipbdD/yjFEZEKDmfJ628YHtGNWnDFrN8h/Q2aRT1aIjmEwnxnzjBVI22I00+l8khNX7FyoZFEWEtP90WI8WMLivAWUrxUutEBVZyB4oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Roq3HjZ2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AsSmmTsL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61617C4CEEA;
-	Thu, 13 Mar 2025 22:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741903223;
-	bh=hdrHTR1mL6tmZplZ1odsZgbWQm+yiq9Gt1ma1cVGaS4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AsSmmTsL/avuhvlYe1k9W9fLouGe3miPR7yUX83m5klF1r659wLQG1XcMEBWNUUdf
-	 aLfugTttEnporG/wEdmKkXnR6eZGtI6FvvYFvCM5NezvE2or4qSMfjf3bIgO6iTd0x
-	 7vh1L4E50Yen+weXKEZ0DbEzXuptaPtXKk1Xi+yaiKNWUm6LC1bc9oyEfUm8LK4TKp
-	 PZLkP2xByy9VX2nk4hAOysNLlHmrWVG+QT3LmS0I33h/sDsyVk54G48M3TUqlAicSy
-	 RYqhTDdunuUo3HYnmD+velIarwW6ieeqf0OVGOlHQYraSDFghMCXVvSzi2DmNgN/ki
-	 xjqVQIyQh8vhw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BDE3806651;
-	Thu, 13 Mar 2025 22:00:59 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Roq3HjZ2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741908835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Pt/qecAJBGqhDhSDrfXYHqZ9iuqSie8AP9R3VN/0np4=;
+	b=Roq3HjZ2zPQY/QXm/Hq+BbjQ8ovKwc7kRfgr8ENi08yDwbzVltOIeI74V57mPlPDuS83H3
+	QI6qKDLL1DCuahZwMdAqm0TS7MFe2t32lt69dCD570TRHmZV4MSWHLNotB926tq1Ex3exh
+	MK+kMRVyr1Q7AbpXJiFBWaOd9TPWAZc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-77-jW-_ShucMLulKnlbNg3XyA-1; Thu,
+ 13 Mar 2025 19:33:51 -0400
+X-MC-Unique: jW-_ShucMLulKnlbNg3XyA-1
+X-Mimecast-MFC-AGG-ID: jW-_ShucMLulKnlbNg3XyA_1741908830
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00A7419560B7;
+	Thu, 13 Mar 2025 23:33:50 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.61])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0BEB93003770;
+	Thu, 13 Mar 2025 23:33:46 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Viacheslav Dubeyko <slava@dubeyko.com>,
+	Alex Markuze <amarkuze@redhat.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Dongsheng Yang <dongsheng.yang@easystack.cn>,
+	ceph-devel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 00/35] ceph, rbd, netfs: Make ceph fully use netfslib
+Date: Thu, 13 Mar 2025 23:32:52 +0000
+Message-ID: <20250313233341.1675324-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,43 +61,170 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] block: Name the RQF flags enum
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174190325773.1674705.18381879459653855191.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Mar 2025 22:00:57 +0000
-References: <20250306-rqf_flags-v1-1-bbd64918b406@debian.org>
-In-Reply-To: <20250306-rqf_flags-v1-1-bbd64918b406@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, kernel-team@meta.com,
- yonghong.song@linux.dev
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hello:
+Hi Viacheslav, Alex,
 
-This patch was applied to netdev/net.git (main)
-by Jens Axboe <axboe@kernel.dk>:
+[!] NOTE: This is a preview of a work in progress.  rbd works and ceph
+    works for plain I/O, but content crypto does not.
 
-On Thu, 06 Mar 2025 08:27:51 -0800 you wrote:
-> Commit 5f89154e8e9e3445f9b59 ("block: Use enum to define RQF_x bit
-> indexes") converted the RQF flags to an anonymous enum, which was
-> a beneficial change. This patch goes one step further by naming the enum
-> as "rqf_flags".
-> 
-> This naming enables exporting these flags to BPF clients, eliminating
-> the need to duplicate these flags in BPF code. Instead, BPF clients can
-> now access the same kernel-side values through CO:RE (Compile Once, Run
-> Everywhere), as shown in this example:
-> 
-> [...]
+[!] NOTE: These patches are based on some other sets of patches not
+    included in this posting.  They are, however, included in the git
+    branch mentioned below.
 
-Here is the summary with links:
-  - block: Name the RQF flags enum
-    https://git.kernel.org/netdev/net/c/e7112524e5e8
+These patches do a number of things:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ (1) (Mostly) collapse the different I/O types (PAGES, PAGELIST, BVECS,
+     BIO) down to a single one.
 
+     I added a new type, ceph_databuf, to make this easier.  The page list
+     is attached to that as a bio_vec[] with an iov_iter, but could also be
+     some other type supported by the iov_iter.  The iov_iter defines the
+     data or buffer to be used.  I have an additional iov_iter type
+     implemented that allows use of a straight folio[] or page[] instead of
+     a bio_vec[] that I can deploy if that proves more useful.
+
+ (2) RBD is modified to get rid of the removed page-list types and I think
+     now fully works.
+
+ (3) Ceph is mostly converted to using netfslib.  At this point, it can do
+     plain reads and writes, but content crypto in currently
+     non-functional.
+
+     Multipage folios are enabled and work (all the support for that is
+     hidden inside of netfslib).
+
+ (4) The old Ceph VFS/VM I/O API implementation is removed.  With that, as
+     the code currently stands, the patches overall result in a ~2500 LoC
+     reduction.  That may be reduced as some more bits need transferring
+     from the old code to the new code.
+
+The conversion isn't quite complete:
+
+ (1) ceph_osd_linger_request::preply_pages needs switching over to a
+     ceph_databuf, but I haven't yet managed to work out how the pages that
+     handle_watch_notify() sticks in there come about.
+
+ (2) I haven't altered data transmission in net/ceph/messenger*.c yet.  The
+     aim is to reduce it to a single sendmsg() call for each ceph_msg_data
+     struct, using the iov_iter therein.
+
+ (3) The data reception routines in net/ceph/messenger*.c also need
+     modifying to pass each ceph_msg_data::iter to recvmsg() in turn.
+
+ (4) It might be possible to merge struct ceph_databuf into struct
+     ceph_msg_data and eliminate the former.
+
+ (5) fs/ceph/ still needs a bit more work to clean up the use of page
+     arrays.
+
+ (6) I would like to change front and middle buffers with a ceph_databuf,
+     vmapping them when we need to access them.
+
+I added a kmap_ceph_databuf_page() macro and used that to get a page and
+use kmap_local_page() on it to hide the bvec[] inside to make it easier to
+replace.
+
+Anyway, if anyone has any thoughts...
+
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=ceph-iter
+
+David
+
+David Howells (35):
+  ceph: Fix incorrect flush end position calculation
+  libceph: Rename alignment to offset
+  libceph: Add a new data container type, ceph_databuf
+  ceph: Convert ceph_mds_request::r_pagelist to a databuf
+  libceph: Add functions to add ceph_databufs to requests
+  rbd: Use ceph_databuf for rbd_obj_read_sync()
+  libceph: Change ceph_osdc_call()'s reply to a ceph_databuf
+  libceph: Unexport osd_req_op_cls_request_data_pages()
+  libceph: Remove osd_req_op_cls_response_data_pages()
+  libceph: Convert notify_id_pages to a ceph_databuf
+  ceph: Use ceph_databuf in DIO
+  libceph: Bypass the messenger-v1 Tx loop for databuf/iter data blobs
+  rbd: Switch from using bvec_iter to iov_iter
+  libceph: Remove bvec and bio data container types
+  libceph: Make osd_req_op_cls_init() use a ceph_databuf and map it
+  libceph: Convert req_page of ceph_osdc_call() to ceph_databuf
+  libceph, rbd: Use ceph_databuf encoding start/stop
+  libceph, rbd: Convert some page arrays to ceph_databuf
+  libceph, ceph: Convert users of ceph_pagelist to ceph_databuf
+  libceph: Remove ceph_pagelist
+  libceph: Make notify code use ceph_databuf_enc_start/stop
+  libceph, rbd: Convert ceph_osdc_notify() reply to ceph_databuf
+  rbd: Use ceph_databuf_enc_start/stop()
+  ceph: Make ceph_calc_file_object_mapping() return size as size_t
+  ceph: Wrap POSIX_FADV_WILLNEED to get caps
+  ceph: Kill ceph_rw_context
+  netfs: Pass extra write context to write functions
+  netfs: Adjust group handling
+  netfs: Allow fs-private data to be handed through to request alloc
+  netfs: Make netfs_page_mkwrite() use folio_mkwrite_check_truncate()
+  netfs: Fix netfs_unbuffered_read() to return ssize_t rather than int
+  netfs: Add some more RMW support for ceph
+  ceph: Use netfslib [INCOMPLETE]
+  ceph: Enable multipage folios for ceph files
+  ceph: Remove old I/O API bits
+
+ drivers/block/rbd.c             |  904 ++++++--------
+ fs/9p/vfs_file.c                |    2 +-
+ fs/afs/write.c                  |    2 +-
+ fs/ceph/Makefile                |    2 +-
+ fs/ceph/acl.c                   |   39 +-
+ fs/ceph/addr.c                  | 2009 +------------------------------
+ fs/ceph/cache.h                 |    5 +
+ fs/ceph/caps.c                  |    2 +-
+ fs/ceph/crypto.c                |   56 +-
+ fs/ceph/file.c                  | 1810 +++-------------------------
+ fs/ceph/inode.c                 |  116 +-
+ fs/ceph/ioctl.c                 |    2 +-
+ fs/ceph/locks.c                 |   23 +-
+ fs/ceph/mds_client.c            |  134 +--
+ fs/ceph/mds_client.h            |    2 +-
+ fs/ceph/rdwr.c                  | 1006 ++++++++++++++++
+ fs/ceph/super.h                 |   81 +-
+ fs/ceph/xattr.c                 |   69 +-
+ fs/netfs/buffered_read.c        |   11 +-
+ fs/netfs/buffered_write.c       |   48 +-
+ fs/netfs/direct_read.c          |   83 +-
+ fs/netfs/direct_write.c         |    3 +-
+ fs/netfs/internal.h             |   40 +-
+ fs/netfs/main.c                 |    5 +-
+ fs/netfs/objects.c              |    4 +
+ fs/netfs/read_collect.c         |    2 +
+ fs/netfs/read_pgpriv2.c         |    2 +-
+ fs/netfs/read_single.c          |    2 +-
+ fs/netfs/write_issue.c          |   55 +-
+ fs/netfs/write_retry.c          |    5 +-
+ fs/smb/client/file.c            |    4 +-
+ include/linux/ceph/databuf.h    |  169 +++
+ include/linux/ceph/decode.h     |    4 +-
+ include/linux/ceph/libceph.h    |    3 +-
+ include/linux/ceph/messenger.h  |  122 +-
+ include/linux/ceph/osd_client.h |   87 +-
+ include/linux/ceph/pagelist.h   |   60 -
+ include/linux/ceph/striper.h    |   60 +-
+ include/linux/netfs.h           |   89 +-
+ include/trace/events/netfs.h    |    3 +
+ net/ceph/Makefile               |    5 +-
+ net/ceph/cls_lock_client.c      |  200 ++-
+ net/ceph/databuf.c              |  200 +++
+ net/ceph/messenger.c            |  310 +----
+ net/ceph/messenger_v1.c         |   76 +-
+ net/ceph/mon_client.c           |   10 +-
+ net/ceph/osd_client.c           |  510 +++-----
+ net/ceph/pagelist.c             |  133 --
+ net/ceph/snapshot.c             |   20 +-
+ net/ceph/striper.c              |   57 +-
+ 50 files changed, 2996 insertions(+), 5650 deletions(-)
+ create mode 100644 fs/ceph/rdwr.c
+ create mode 100644 include/linux/ceph/databuf.h
+ delete mode 100644 include/linux/ceph/pagelist.h
+ create mode 100644 net/ceph/databuf.c
+ delete mode 100644 net/ceph/pagelist.c
 
