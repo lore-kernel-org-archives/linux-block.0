@@ -1,101 +1,115 @@
-Received: from secgw2.intern.tuwien.ac.at (secgw2.intern.tuwien.ac.at [128.130.30.72])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB3226389F;
-	Thu, 13 Mar 2025 10:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.130.30.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A553260363
+	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 11:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741863446; cv=none; b=BnguZapFKMR0qdwMBQ1+zAegA2CU4K5KKHs2I9knF1Y5LrGhPGtRz+iM2grTAA/iaJHXvx4jhs3BA2Z9dFUuBDMkGdBofD//cp4abndgWl4N6Wlb7TcscyA7l/E1r6iwX67TXVYEySQ9V+rh4CahqRETUcmHQ5B/kdcXR7nPgsY=
+	t=1741866524; cv=none; b=PVZ9/6tX3x+/7JxcqDNehngKMgLvTv6isnFyugR2ceGtdK10QuBAj6+3RKCy2JoT2Z9mHl2VbkctBTSq1Kjj1WLPocoraxzOhhY+UHoCgvqHOS19bXPxjLnfCJSZNMR0CGHOEcC8QXdM8sxFtaS/NB1FbRhjVy1O4T+NP/J/oio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741863446; c=relaxed/simple;
-	bh=MU0WvNUHRHTqe3ZvTck80HMMfWSXYPVLM93DH5nJthk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=nu6VK02bflH2xG02K4rfNMFXmeg5HXzTWAddqWzNJaT8zMYwMLQ3pPL74pXwmEW7QXROpA4hMKwd8NoGQyxtZ08RQcdPjwjYMXSfBrlT/Y6xPsv6SY6Se+zI89av0KF45TyCqh4QeWAnRhBulFgaGVxHyhINIkbKu9ng6U0MM40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuwien.ac.at; spf=pass smtp.mailfrom=tuwien.ac.at; arc=none smtp.client-ip=128.130.30.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuwien.ac.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuwien.ac.at
-Received: from Kiteworks (kwmta2.intern.tuwien.ac.at [128.130.30.92])
-	by secgw2.intern.tuwien.ac.at (8.14.7/8.14.7) with ESMTP id 52DAq8pA001695;
-	Thu, 13 Mar 2025 11:52:08 +0100
-Received: from secgw2.intern.tuwien.ac.at ([128.130.30.72])
-          by totemomail.intern.tuwien.ac.at (Totemo SMTP Server) with SMTP ID 159;
-          Thu, 13 Mar 2025 10:52:07 +0000 (GMT)
-Received: from edge19b.intern.tuwien.ac.at (edge19b.intern.tuwien.ac.at [IPv6:2001:629:1005:30::46])
-	by secgw2.intern.tuwien.ac.at (8.14.7/8.14.7) with ESMTP id 52DAq63d001680
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 13 Mar 2025 11:52:06 +0100
-Received: from mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82) by
- edge19b.intern.tuwien.ac.at (2001:629:1005:30::46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 13 Mar 2025 11:52:06 +0100
-Received: from t205-079.demo.tuwien.ac.at (128.131.205.79) by
- mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 13 Mar 2025 11:52:06 +0100
-Date: Thu, 13 Mar 2025 11:57:05 +0100
-From: Thomas Haschka <thomas.haschka@tuwien.ac.at>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-CC: Thomas Haschka <thomas.haschka@tuwien.ac.at>,
-        Ricky WU
-	<ricky_wu@realtek.com>, Bart Van Assche <bvanassche@acm.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "James.Bottomley@hansenpartnership.com"
-	<James.Bottomley@hansenpartnership.com>,
-        "martin.peterson@oracle.com"
-	<martin.peterson@oracle.com>,
-        <adrian.hunter@intel.com>
-Subject: Re: mmc0: error -95 doing runtime resume
-In-Reply-To: <CAPDyKFqyWFfyhkyB4ZA+uH8YanYbb2safzL_qM13vCDDyesPQA@mail.gmail.com>
-Message-ID: <96117a90-d8e4-0476-8e7d-04495ea29a28@tuwien.ac.at>
-References: <c2f50eac-3270-8dfa-2440-4c737c366b17@tuwien.ac.at> <8fd7f1d9-fc0d-4fa7-81be-378a3fc47d2a@acm.org> <CAPDyKFpwZt9rezBhBbe9FeUX1BycD2br6RRTttvAVS_C99=TiQ@mail.gmail.com> <4e7162dfccbe44468f6a452896110cc8@realtek.com> <aebf263c-570a-ed4b-bb37-22ab6596fbb3@tuwien.ac.at>
- <CAPDyKFqyWFfyhkyB4ZA+uH8YanYbb2safzL_qM13vCDDyesPQA@mail.gmail.com>
+	s=arc-20240116; t=1741866524; c=relaxed/simple;
+	bh=ALZi0DIIUxTTKUDvZEMcVIapgbQMQxRWma1IanOorV8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CiPaSGfDTV69xy2et8npzCkvHyKsNtYqsQQTogXaIsG91/F4pT41sdTqqezhktjTxh+qHqfykAIZd6YOBD+JixNBWeeAWEhei9npp3DnJaPZ9yok6+u0tqyw5NpiQpMIWGHskQiwFWXKKxrUkEooHQ3CQhuKfZaMgg7FWGk1ShQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=otMRofBp; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="otMRofBp"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52D90SbQ026800;
+	Thu, 13 Mar 2025 11:48:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4Qvnbx
+	spKzcMNWjdJPJf1GcEHDA8uVkTx5/RgJDy0w4=; b=otMRofBpDuJkow77k659Iv
+	wFhyFquPvIiqzgbMOHUoYmh2pjJBtfXyIXx83tSAuBqfQMrCOFsDNS9FX6ZTa7PB
+	5MP8S6lM6k1FsyMoOc1NYamgcoXgUKxSynb6Nmc75YWlsqCthFmfqLBMMjd/xUhQ
+	v1pRSmNruORSXGTJpN0RQC+3Kk1cJbsbGms8UNoN1pzyKGrb1SBm7M/YLTXhaKOX
+	x/g65iDuG2fOG7w1D42bcz8bYDBDfSM2y0DizMI/jHsuFU5QfZd3uH7Db/lI4SfC
+	pV3UvD69zNCw/mwHhd1Vlxmissw7DYtKCYaMQkNXfd3Hiq4SiUCUgmQ+y4T0LCag
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45bhepke2u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Mar 2025 11:48:23 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52D919VS007627;
+	Thu, 13 Mar 2025 11:48:22 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45atsr9h7e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Mar 2025 11:48:22 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52DBmLMZ32965198
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Mar 2025 11:48:21 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B37B258056;
+	Thu, 13 Mar 2025 11:48:21 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 40FA85803F;
+	Thu, 13 Mar 2025 11:48:19 +0000 (GMT)
+Received: from [9.109.198.185] (unknown [9.109.198.185])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 13 Mar 2025 11:48:18 +0000 (GMT)
+Message-ID: <c44eabfb-847a-41fd-9b63-37b64db141f9@linux.ibm.com>
+Date: Thu, 13 Mar 2025 17:18:17 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1656070384-1741863437=:2772"
-X-ClientProxiedBy: mbx19d.intern.tuwien.ac.at (2001:629:1005:30::84) To
- mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: protect debugfs attributes using q->elevator_lock
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        hare@suse.de, axboe@kernel.dk, gjoyce@ibm.com
+References: <20250312102903.3584358-1-nilay@linux.ibm.com>
+ <20250312141251.GA13250@lst.de>
+ <9e5fd5f1-1564-4a99-aeb4-6d8d9d765db7@linux.ibm.com>
+ <20250313075421.GA12286@lst.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250313075421.GA12286@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tx77lEQmdUzUzLNWCAPD0eraLIcyjuuz
+X-Proofpoint-ORIG-GUID: tx77lEQmdUzUzLNWCAPD0eraLIcyjuuz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-13_05,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 malwarescore=0 clxscore=1015 mlxlogscore=590
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503130090
 
---0-1656070384-1741863437=:2772
-Content-Type: text/plain; format=flowed; charset="US-ASCII"
 
-Dear Uffe,
 
-I built and tried the attached patch, however the problems with the sdcards
-remain even if I remove MMC_CAP_AGGRESSIVE_PM;
+On 3/13/25 1:24 PM, Christoph Hellwig wrote:
+> On Wed, Mar 12, 2025 at 08:49:33PM +0530, Nilay Shroff wrote:
+>>> really want this read system call interrupted by random signals, do
+>>> we?  I guess this should be mutex_lock_killable.
+>>>
+>>> (and the same for the existing methods this is copy and pasted from).
+>>>
+>> I thought we wanted to interrupt using SIGINT (CTRL+C) in case user opens 
+>> this file using cat. Maybe that's more convenient than sending SIGKILL. 
+>> And yes I used mutex_lock_interruptible because for other attributes we are 
+>> already using it. But if mutex_lock_killable is preferred then I'd change it
+>> for all methods.
+> 
+> Let's leave it alone for this series.  While I think it's the wrong
+> choice it's been there for a long time, so we might as well not change
+> it now for unrelated reasons.
+> 
+Alright, then I will not replace mutex_lock_interruptible with 
+mutex_lock_killable for this series. A next version of this 
+series is on the way... 
 
-All the best,
-- Thomas
+Thanks,
+--Nilay
 
---0-1656070384-1741863437=:2772
-Content-Type: text/plain; charset="US-ASCII";
-	name="remove_mmc_cap_aggressive_pm.patch"
-Content-Transfer-Encoding: BASE64
-Content-ID: <ca262cc7-5da1-a29e-d2c1-5553baa015e8@tuwien.ac.at>
-Content-Description:
-Content-Disposition: attachment;
-	filename="remove_mmc_cap_aggressive_pm.patch"
-
-ZGlmZiAnLS1jb2xvcj1hdXRvJyAtdXJOIGEvZHJpdmVycy9tbWMvaG9zdC9y
-dHN4X3BjaV9zZG1tYy5jIGIvZHJpdmVycy9tbWMvaG9zdC9ydHN4X3BjaV9z
-ZG1tYy5jDQotLS0gYS9kcml2ZXJzL21tYy9ob3N0L3J0c3hfcGNpX3NkbW1j
-LmMJMjAyNS0wMi0yMSAxNDowMTo0Ny4wMDAwMDAwMDAgKzAxMDANCisrKyBi
-L2RyaXZlcnMvbW1jL2hvc3QvcnRzeF9wY2lfc2RtbWMuYwkyMDI1LTAzLTEz
-IDExOjUwOjMwLjQyNzAxNjM4MyArMDEwMA0KQEAgLTE0NTksNyArMTQ1OSw3
-IEBADQogCQlNTUNfQ0FQX01NQ19ISUdIU1BFRUQgfCBNTUNfQ0FQX0JVU19X
-SURUSF9URVNUIHwNCiAJCU1NQ19DQVBfVUhTX1NEUjEyIHwgTU1DX0NBUF9V
-SFNfU0RSMjU7DQogCWlmIChwY3ItPnJ0ZDNfZW4pDQotCQltbWMtPmNhcHMg
-PSBtbWMtPmNhcHMgfCBNTUNfQ0FQX0FHR1JFU1NJVkVfUE07DQorCQltbWMt
-PmNhcHMgPSBtbWMtPmNhcHM7DQogCW1tYy0+Y2FwczIgPSBNTUNfQ0FQMl9O
-T19QUkVTQ0FOX1BPV0VSVVAgfCBNTUNfQ0FQMl9GVUxMX1BXUl9DWUNMRSB8
-DQogCQlNTUNfQ0FQMl9OT19TRElPOw0KIAltbWMtPm1heF9jdXJyZW50XzMz
-MCA9IDQwMDsNCg==
-
---0-1656070384-1741863437=:2772--
