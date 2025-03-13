@@ -1,94 +1,71 @@
 Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A908B26770A
-	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 13:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09522267731
+	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 13:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741872283; cv=none; b=sR4/TX0+IA6C0EjkJMaY4+bg0E5S4q+L+jZF01GtMrq4urKyKIVlbmDYOpJHL8l91yHmPsZAv8R4Jz5G1B8dt9+B3J2fkmXfFjiBb1ZgPWxX0/AWh5nQhZe9L/9oUrZxxk9+PzKm3tkPVlzapxqIxFzJmPwz3tU6nXA68sEyTyo=
+	t=1741872283; cv=none; b=UA1pW+5WLGUt9JgxomWzMsxmDY1/OG7XZBw+KaY9MmsxACsVmfgyAGLvKWuz7z/l0TC5hHHW9wFxBjq+7ko1+4j+Q8WezKRBX2PQfxLmBnOb0EAfxOUPQitJokUi40dumDJp9svTi2Z2FG983U8uIVgljCuj9qL/ivWaeE5NBbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741872283; c=relaxed/simple;
-	bh=oxBvzwvTrG82n8EJbBWNJ307/ROiMAIN3ZDd1Xbf3ig=;
+	bh=InbA8onC9F6wquLTdvjEiZ8sMyqB35U9iUYYVebe2iI=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DEtuaDWdpRRpozSUhuwfD05KDb+IZ9x9eU6B7J8NR7inQJeZ8jIpIsFPAaDsszg9CsLt/ubsmBUQo/Q+e13ZPHsDZxaetY/DFRNZ/1NQaWnkMPUfe4418h8Irdlwo6vn+Qc9qM5djUSIloAN7hLj82PdXH2RfXWqhHroVRn6RGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CgRsHjrX; arc=none smtp.client-ip=209.85.166.41
+	 MIME-Version:Content-Type; b=n+6+i3a3oQOkRnOMKm71irk+seiLAck5jr+alaNcVrI24ruxqs3taOTj0jx9NaLictH9wRYSCP1q6p5d5zs4FTOLgrKGEYHNO9yVvzsfTkUVR6mfJuT9yJlSCoCAwnRENSBBmgHF0PSXqg7XHN+WplBqCjcX5ZvSvA3jC+647hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FC6hBmSW; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CgRsHjrX"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-851c4ee2a37so68766139f.3
-        for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 06:24:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FC6hBmSW"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-85da5a36679so91028039f.3
+        for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 06:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741872280; x=1742477080; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741872281; x=1742477081; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5PLsvEgnbim2yotRJtm3RxSyGerYXasNwsqr+/KVpS4=;
-        b=CgRsHjrXXRqq4vaPHAcHpS5QmNOKwPbwPx1qON250R6Zi2OYgAUJ+uhFKQuGASSWQm
-         rS7BY/yLPqLiuDxkl1/pXv7VWbJ7vDEGxpDH6GcG6/dLYajQjZHTa8KbZ+qumNySbDVQ
-         gz6YNnTe5EHVHnU/j+EU4aBDLYuPhD9jw0fqBgZkqKCCOAEfIOt1oGRotT9X1Ju/lCix
-         1bBdnCrP7jcTTY79NVlC35F9pvq8RTo3qnAo1c2m5X5xGbeUAbZETRvWLoKC6dh7aE6e
-         gLjgAv/qJFO5MTjp5mpC15RwBUcg8FbdNu6RlZel9/kWcHOY+Vi/o8qQR9Lpa2KJ1yXT
-         A59A==
+        bh=9m9TYRFM2Wbb2YmUjUbp0Vo4gnj5yl1hodZTOu8t4Kg=;
+        b=FC6hBmSW5gd8i9HU2Fx8wd+OsdocdQ4lmMpdb1MrGPU1fM6VD46ewflA3mdAwNz1bV
+         E5GDBaSzaP25t059jAbItI0r4rhcS7WEpOZgL6GR7SGFUPrP6bPVCCe8Qb5aKFdHrMCZ
+         K3HLbH27BUwDz7lvDlF5aSYe8ELGsOt/WBbHI9z+IZB6Swd1CGJZStRPq03V8aQbJ324
+         jkBlnunQIaTb3aGGufdO+H/sD1t7I/09HAJkt4M6tk0hD2WbTlCW+TGX78l5YCIR0638
+         1hZN8Y7RPiO9stQ1gskDnIGx5BQm8EqkmriV1gTOvzcZCnUgYSUFVt/aoE7b0r/m2NHT
+         rYzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741872280; x=1742477080;
+        d=1e100.net; s=20230601; t=1741872281; x=1742477081;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5PLsvEgnbim2yotRJtm3RxSyGerYXasNwsqr+/KVpS4=;
-        b=YTeHwAExHBUqcZxMjlqgchE6viXjz6ZVHa6C6hvqxI0GzUhepHRvZ4YjhoOeOY3b6d
-         6YIl54Hm1qwG5Kkylw/jrGlMwJfK+lm65uPmJw1qsG6MZNdj5RC3uUzdiK0HhdJSssuM
-         wMiQf15YJ8tiesZjPJot3BkD2JvA0vDpEM5C/1VcLDDIjsdsXdRyxgyBogiBg295nmh4
-         hShIbP2dxeNssoKi+2o1XaMV+i3pyxQkHGcKznci/3fS+mFVPbvaE79hPfijpCo4MTTT
-         azWZ3+qR2209LhN3SgApypQOyV/kfB9wFoGZ7h1jA3faKUdClcoBfU1rPV0YJY1aS0DF
-         o+IQ==
-X-Gm-Message-State: AOJu0YwJ7IB2VBzx93AEC0AbRwSVFIbsznCZVwg3QXJZR3QtMi02b4/B
-	Ax7VDAprKZSWIkjLHoJBTT4YYVz1WBTg8evlLBCCRDeDOA380boEuPXKK+48KGc=
-X-Gm-Gg: ASbGnctdcvQ29UEvx41jq801wC87HwLZs8oy0yjgcbFoV8bqfJw5j/1CIdJbt+PIYzq
-	ax7qKJVqa2VDoEJuavyiFRXia/JOEm9hM1C9ibfVeRYQ7c3fYz4Cv/jsmaoFPhA/F04G1aCZL9U
-	ns//K0oT+PNhLPuJIR8dAmmlp0VbmJpO8JBf6X34VS6a08Vzg1ihSXfBIy48PkyDziFytFY+hgV
-	QoUpZdxV7ijAt9xkvg71aU6vmfk/arA0mBcNQc1/DMMyyQM2LAfSWV2JgGUh8zbR8YS+DMC/ltr
-	VBFPHK8zmrDslWWi/aBfqZ4FUzzA1jJ3HVk=
-X-Google-Smtp-Source: AGHT+IEer637uehs/daevOydns9iUer0NF8/Lop3Ui7LDoPjH6cMpb131IF3qkXQqxQNFL57dNEHAg==
-X-Received: by 2002:a05:6602:380d:b0:85b:5494:5519 with SMTP id ca18e2360f4ac-85b54946d71mr1891701439f.5.1741872279762;
-        Thu, 13 Mar 2025 06:24:39 -0700 (PDT)
+        bh=9m9TYRFM2Wbb2YmUjUbp0Vo4gnj5yl1hodZTOu8t4Kg=;
+        b=v9yG2fN0+exVTBpbo+rpFL48nof/uVkDz/tY+RtV08odGjA0qTylJNHImkmaZ8mKN4
+         AHf6ZJbaI4y/zUWGrsB9vUjUn/y8LP640N03u17dic2E87wDyzlISzrEKQXd1t+Iat9Z
+         2WsMAKvtdVwNWzuDfuGJqCQjjGgeBoFL6o1wyfeSOmvfqCXlLIiZ64WMk3A7gUV5rzhR
+         NfWiOMYDnTGbzJyG0EpqdUFR9y/h5aSbYidLOqNkpk9aZgtS5Vl1Lp/d78/j5GNyM2Ru
+         sZ81YyOm13VWoskuzlfjsoKfwoRe9v1q/K2so54UH5hxpodUJ7mujskoPTJ5jFVSG2va
+         OJBA==
+X-Gm-Message-State: AOJu0YzPmOJ7HlyiOA/orNFC7Ixu7KhXk5PvEeTP81rAvmcn/C1p5A2C
+	R7QkQ2I5szk/FMl0FXymGiZFQrgi5NEsx+IYe1yap7mBO0aaRiB3oBUaQXOyiz0=
+X-Gm-Gg: ASbGncv1Ydy5E/TlNpF5PCkzWG26fezrB/FiDJg1GuSqv8u7zBq79j+Bm/Yy3ie5iRs
+	OrvgG0Ut2Jxgz3jQRoX2/KGCCjCZ8cyt7SPP84CyjZXz61OMdcETdPEbDYK8UA5qu6ADbzA0WSm
+	ZUZGtnxwJ650a5cwms4PRmKmfk74ny7mMYZOPec0SFEHQo4N9+yUdvNNC6KCnRUNO12a/JWoeiY
+	RWDm5zRWA4uimVzHSU9G7lxRv5jzzkRTggq+XSO6L/AC2v6S7apDYvlkX4AKWouoWYDFor6Ukld
+	kdTMT9eq+rU4/FXvsj3FJv2ZyTEY2H6ydss=
+X-Google-Smtp-Source: AGHT+IH2AcCTgvyT+v79+H3REQPUXzHVkcIlt/2zAciSI4sX6xtn023o14ZRz+Vz7W9fdHJ4nUm77Q==
+X-Received: by 2002:a05:6602:4008:b0:85b:577a:e419 with SMTP id ca18e2360f4ac-85d8e1ac1cfmr1282781639f.1.1741872281089;
+        Thu, 13 Mar 2025 06:24:41 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85db879e512sm31580739f.28.2025.03.13.06.24.37
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85db879e512sm31580739f.28.2025.03.13.06.24.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 06:24:39 -0700 (PDT)
+        Thu, 13 Mar 2025 06:24:40 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
- Jack Wang <jinpu.wang@ionos.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- =?utf-8?q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
- Juergen Gross <jgross@suse.com>, 
- Stefano Stabellini <sstabellini@kernel.org>, 
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, 
- Maxim Levitsky <maximlevitsky@gmail.com>, Alex Dubov <oakad@yahoo.com>, 
- Ulf Hansson <ulf.hansson@linaro.org>, Richard Weinberger <richard@nod.at>, 
- Zhihao Cheng <chengzhihao1@huawei.com>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Sven Peter <sven@svenpeter.dev>, 
- Janne Grunau <j@jannau.net>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, James Smart <james.smart@broadcom.com>, 
- Chaitanya Kulkarni <kch@nvidia.com>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Anuj Gupta <anuj20.g@samsung.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- virtualization@lists.linux.dev, xen-devel@lists.xenproject.org, 
- linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
- asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-In-Reply-To: <20250313035322.243239-1-anuj20.g@samsung.com>
-References: <CGME20250313040150epcas5p347f94dac34fd2946dea51049559ee1de@epcas5p3.samsung.com>
- <20250313035322.243239-1-anuj20.g@samsung.com>
-Subject: Re: [PATCH] block: remove unused parameter
-Message-Id: <174187227786.18244.14269218969550436496.b4-ty@kernel.dk>
-Date: Thu, 13 Mar 2025 07:24:37 -0600
+To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, hare@suse.de, 
+ gjoyce@ibm.com
+In-Reply-To: <20250313115235.3707600-1-nilay@linux.ibm.com>
+References: <20250313115235.3707600-1-nilay@linux.ibm.com>
+Subject: Re: [PATCHv2 0/3] block: protect debugfs attributes using
+ elavtor_lock
+Message-Id: <174187227989.18244.2426507810626348446.b4-ty@kernel.dk>
+Date: Thu, 13 Mar 2025 07:24:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -100,16 +77,26 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Thu, 13 Mar 2025 09:23:18 +0530, Anuj Gupta wrote:
-> request_queue param is not used by blk_rq_map_sg and __blk_rq_map_sg.
-> remove it.
+On Thu, 13 Mar 2025 17:21:49 +0530, Nilay Shroff wrote:
+> This patchset contains total three patches.
+> The first patch helps protect debugfs attributes using q->elevator_lock
+> instead of q->sysfs_lock.
+> The second patch in the series removes the goto labels from the read
+> methods of debugfs attributes that improves code readability and reducing
+> complexity.
+> The third patch in the series protects debugfs attribute method hctx_
+> busy_show using q->elevator_lock.
 > 
-> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: remove unused parameter
-      commit: 61667cb6644f6fb01eb8baa928e381c016b5ed7b
+[1/3] block: protect debugfs attrs using elevator_lock instead of sysfs_lock
+      commit: a3996d11f3ab743e6cc4e3529ce9459c2cd27139
+[2/3] block: Remove unnecessary goto labels in debugfs attribute read methods
+      commit: 78800f5997d8ae0f20d4aced66a524f0f2fc4c7f
+[3/3] block: protect debugfs attribute method hctx_busy_show
+      commit: 0e94ed33681424a6dce65c62837e08e4c7aa09ac
 
 Best regards,
 -- 
