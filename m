@@ -1,151 +1,135 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6824610C
-	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 01:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A7F1BC5C
+	for <linux-block@vger.kernel.org>; Thu, 13 Mar 2025 01:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741828099; cv=none; b=LN8otc80zeNbwGgUmj9myV90HDFC4gnbIi03Jzj1MOl/uXCb4iuR/qxgRGgAM8m47UGHL54GLsxbK9qpUTY6Bylg3HlzB0XNOFWG4pNIsImQ1+qlo+eKyNx058ZSyiYAnPUOx8PVqvFgchRwG/Yf7hYvuMyDSVSX7FC9Ch/K3EA=
+	t=1741829807; cv=none; b=aBuIB4nWsdjkePS3momUkax4YbZ7loA3qfamvxxXxlIB0h3kXtsNqFv5nmhLNFhXOU0aK3MU7FqCpIFvsvg0M4qYiwMm9X3cx0Qehfh+X3wXebI6BamSmcrIsI6qpFif+aWDHEHzH/lbb8tsiMT3lrMmwxbago7u4jMRYD3clk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741828099; c=relaxed/simple;
-	bh=MBv9XzTUGYPJjVrxIu+txses2UVQqUgv59w1fMbFACY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kbtpjOmv4RrTiV0z1NqZ5Yy6/qjqV7IIplelIB7IHFPzucQAk+cZ/WmiW/uB3/KceXGzg+wcUgg/vKzhVDnyADeIeUQ6UtKlk2BNshI+vPb8kfJfJq82hgrreKxIuyhQLGk+BTqdnpPT2liPNLWXS/pSAcDQyH6ldCfQuQJyaN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ex9SeB/I; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1741829807; c=relaxed/simple;
+	bh=SA22QSLUYyol1u4wMjFAO85jdH5duOHGUlWzrso8yZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rCXfRCG6UPEz/yQJ16ThAyApsO5MOgy8hXoKwSjmTwcXOKvrmiWwtasbgIzM/Qhozz6WAimLjXKLRsLWC74QJrFsLKcD/EjyIEqA+RHg9GDopD0Fb7QLIF6OBJsVlbvFsLJsn/LrYI39zWYhuQadlp1zEdBpxDsbjMVWZluuBAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IwbKiDSC; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ex9SeB/I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwbKiDSC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741828096;
+	s=mimecast20190719; t=1741829804;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wutst5qZ94UnhD3x5JmelF6pckDcOxzOB686lbtU1ZU=;
-	b=ex9SeB/IKHkJn+OpEVkfYOsAumvY8ZfSS22jn6TgkXBkEInMjxnbQF5hLgt+5rcMzTY5ci
-	alx1jMev6od5ke4pU0yGu9irVvjDSxxM3IcW6EPKHF1wJYUm3bNhaKH0Xuj2/XDdJ2C641
-	F8eisLSmIQgSlPSflfjq1B9EJWLp6BQ=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-306-pyDsc1fVO5Gl_sH8vflCng-1; Wed, 12 Mar 2025 21:08:15 -0400
-X-MC-Unique: pyDsc1fVO5Gl_sH8vflCng-1
-X-Mimecast-MFC-AGG-ID: pyDsc1fVO5Gl_sH8vflCng_1741828094
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2240a7aceeaso7381495ad.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Mar 2025 18:08:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741828093; x=1742432893;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wutst5qZ94UnhD3x5JmelF6pckDcOxzOB686lbtU1ZU=;
-        b=Uaes21v/GbKsi/1qCNFJ0JJh82/MSkCi/3hwZbmUcbF5MiPaeab9DJ4mWU0glNcIry
-         3LQ8HB+p7LjRgklDvtZmM8goYQp5dWo52dQrxHYAdQz/AqNp/cBi1NUpGerjbBbQ2MB3
-         7UehyTeTOS2zEdsSaPq9lwH1/6l+4cV9/KP56aMYgb8SpHN2v6pzhXdb+k/WBLGrjBTB
-         ZnrSPhVaiJb94zC/GgPva87a8U3nKixn/cjN42N5myhioXIgppdQucPZgUknxBGTGsSn
-         pve10GLmqHayiOLijKYRfcbnydYegamzz2keKmPfGJ8Yfy7qpbAFVOBPpLlGNiL45w60
-         Nbfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXv1+RwVyah1w+Dl+4TjMTTVFUdSUkCFoX9ZDAD3fKWK0gZ+bS1G01nV5go0wXTrA3n/LFCICriwne5sA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAyLsBE6mF5nEgFCos46emh6PUyf41oLH+Yzeez8KEyCeDYkTl
-	I5rxb5KRHZnXBG1LBzqAlXc7/syJJBcN1ss8CWT7fNvWAKt0qt4FeexhGwICjjw/XOCcNQaXvyx
-	lNtc23aiyp075NwLIQyV+VUk31A29lJhe7hM5dAIz5oAcc6kVuXIesEFtsQk6IbF+JwgZ
-X-Gm-Gg: ASbGncvgnjTU9YIBDIXCBF+YRFFd5QvYE8GrHUGzbsdKttbWLGQESP49QRQKfNlMb6S
-	KDuiLwbbtWPs1POKnZIBQgehwqbWmlMVcS5c+WK3IipF9opr1Z2sjxzocB7BWO0PAMwUG/QdxeP
-	RyVzyFf0Wm9MgB9kqp/5U8kZA7dBnBMM+cWLRDqIq/6dOY6hNVfCE4hiZryXGGxZO7wEOmQzjAR
-	H/OfLJml/I5cgmRg9ujHXo0QF+0j1MAe+RQEQoGkVUh2Vy8uCyYGpfsj19Mf0c6rFX0cBAUehQO
-	+fnMKlpYuJWEAMKPcA==
-X-Received: by 2002:a17:902:da84:b0:224:10a2:cae7 with SMTP id d9443c01a7336-22428c057cemr426189515ad.40.1741828093685;
-        Wed, 12 Mar 2025 18:08:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIZcmrCoKZ/BkX0AkwyhURpfSQPZ55JEBp+LSHzf23umBLBHhzalnRPPxlUnWGk3FWhOD46w==
-X-Received: by 2002:a17:902:da84:b0:224:10a2:cae7 with SMTP id d9443c01a7336-22428c057cemr426189155ad.40.1741828093386;
-        Wed, 12 Mar 2025 18:08:13 -0700 (PDT)
-Received: from [192.168.68.55] ([180.233.125.167])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6ba6ee9sm1968875ad.121.2025.03.12.18.08.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 18:08:12 -0700 (PDT)
-Message-ID: <56dab1e8-67b6-4887-a9a6-b313a84343cb@redhat.com>
-Date: Thu, 13 Mar 2025 11:08:08 +1000
+	bh=D0kUhjCqdb4FPJavIOLP1GIJNyUID8mWi+LpOymw+zs=;
+	b=IwbKiDSCP2jmL1bLYSxjEaVKZM9JWpINIakIKJROHRUEZv9Mg+9tkzHsIk3hsopmLd8g/u
+	zNcH31jXzxJ0mZeKPQDNTsG4g+LY+8yzE7r5WJiMQU+PbOYGxj1IyIZfN05GIrOtAY0X7y
+	8BSa4ueG2lUy1pyk07hRgYgEYBajLug=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-178-J6-VLbwlMDeShec5NqsR-g-1; Wed,
+ 12 Mar 2025 21:36:40 -0400
+X-MC-Unique: J6-VLbwlMDeShec5NqsR-g-1
+X-Mimecast-MFC-AGG-ID: J6-VLbwlMDeShec5NqsR-g_1741829799
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7CA681955BC1;
+	Thu, 13 Mar 2025 01:36:38 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.15])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2E03D1800944;
+	Thu, 13 Mar 2025 01:36:27 +0000 (UTC)
+Date: Thu, 13 Mar 2025 09:36:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <Z9I2lm31KOQ784nb@fedora>
+References: <Z8Zh5T9ZtPOQlDzX@dread.disaster.area>
+ <1fde6ab6-bfba-3dc4-d7fb-67074036deb0@redhat.com>
+ <Z8eURG4AMbhornMf@dread.disaster.area>
+ <81b037c8-8fea-2d4c-0baf-d9aa18835063@redhat.com>
+ <Z8zbYOkwSaOJKD1z@fedora>
+ <a8e5c76a-231f-07d1-a394-847de930f638@redhat.com>
+ <Z8-ReyFRoTN4G7UU@dread.disaster.area>
+ <Z9ATyhq6PzOh7onx@fedora>
+ <Z9DymjGRW3mTPJTt@dread.disaster.area>
+ <Z9FFTiuMC8WD6qMH@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] block: fix adding folio to bio
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Kundan Kumar <kundan.kumar@samsung.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Christoph Hellwig <hch@lst.de>, Luis Chamberlain <mcgrof@kernel.org>
-References: <20250312145136.2891229-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250312145136.2891229-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9FFTiuMC8WD6qMH@fedora>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 3/13/25 12:51 AM, Ming Lei wrote:
->> 4GB folio is possible on some ARCHs, such as aarch64, 16GB hugepage
-> is supported, then 'offset' of folio can't be held in 'unsigned int',
-> cause warning in bio_add_folio_nofail() and IO failure.
-> 
-> Fix it by adjusting 'page' & trimming 'offset' so that `->bi_offset` won't
-> be overflow, and folio can be added to bio successfully.
-> 
-> Fixes: ed9832bc08db ("block: introduce folio awareness and add a bigger size from folio")
-> Cc: Kundan Kumar <kundan.kumar@samsung.com>
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- trim `offset` unconditionally(Matthew)
-> 	- cover bio_add_folio() too (Matthew)
-> 	
-> 
->   block/bio.c | 11 +++++++----
->   1 file changed, 7 insertions(+), 4 deletions(-)
-> 
+On Wed, Mar 12, 2025 at 04:27:12PM +0800, Ming Lei wrote:
+> On Wed, Mar 12, 2025 at 01:34:02PM +1100, Dave Chinner wrote:
 
-Thanks for fixing it quickly, Ming. It fixes my issue where the guest can't boot
-successfully when 16GB hugetlb pages are used on ARM64 host. With this applied,
-the guest can boot up successfully.
+...
 
-Tested-by: Gavin Shan <gshan@redhat.com>
+> 
+> block layer/storage has many optimization for batching handling, if IOs
+> are submitted from many contexts:
+> 
+> - this batch handling optimization is gone
+> 
+> - IO is re-ordered from underlying hardware viewpoint
+> 
+> - more contention from FS write lock, because loop has single back file.
+> 
+> That is why the single task context is taken from the beginning of loop aio,
+> and it performs pretty well for sequential IO workloads, as I shown
+> in the zloop example.
+> 
+> > 
+> > > It isn't perfect, sometime it may be slower than running on io-wq
+> > > directly.
+> > > 
+> > > But is there any better way for covering everything?
+> > 
+> > Yes - fix the loop queue workers.
+> 
+> What you suggested is threaded aio by submitting IO concurrently from
+> different task context, this way is not the most efficient one, otherwise
+> modern language won't invent async/.await.
+> 
+> In my test VM, by running Mikulas's fio script on loop/nvme by the attached
+> threaded_aio patch:
+> 
+> NOWAIT with MQ 4		:   70K iops(read), 70K iops(write), cpu util: 40%
+> threaded_aio with MQ 4	:	64k iops(read), 64K iops(write), cpu util: 52% 
+> in tree loop(SQ)		:   58K	iops(read), 58K iops(write)	
+> 
+> Mikulas, please feel free to run your tests with threaded_aio:
+> 
+> 	modprobe loop nr_hw_queues=4 threaded_aio=1
+> 
+> by applying the attached the patch over the loop patchset.
+> 
+> The performance gap could be more obvious in fast hardware.
 
-> diff --git a/block/bio.c b/block/bio.c
-> index f0c416e5931d..42392dd989ec 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1026,9 +1026,10 @@ EXPORT_SYMBOL(bio_add_page);
->   void bio_add_folio_nofail(struct bio *bio, struct folio *folio, size_t len,
->   			  size_t off)
->   {
-> +	unsigned long nr = off / PAGE_SIZE;
-> +
->   	WARN_ON_ONCE(len > UINT_MAX);
-> -	WARN_ON_ONCE(off > UINT_MAX);
-> -	__bio_add_page(bio, &folio->page, len, off);
-> +	__bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE);
->   }
->   EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
->   
-> @@ -1049,9 +1050,11 @@ EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
->   bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
->   		   size_t off)
->   {
-> -	if (len > UINT_MAX || off > UINT_MAX)
-> +	unsigned long nr = off / PAGE_SIZE;
-> +
-> +	if (len > UINT_MAX)
->   		return false;
-> -	return bio_add_page(bio, &folio->page, len, off) > 0;
-> +	return bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE) > 0;
->   }
->   EXPORT_SYMBOL(bio_add_folio);
->   
+For the normal single job sequential WRITE workload, on same test VM, still
+loop over /dev/nvme0n1, and running fio over loop directly:
+
+fio --direct=1 --bs=4k --runtime=40 --time_based --numjobs=1 --ioengine=libaio \
+	--iodepth=16 --group_reporting=1 --filename=/dev/loop0 -name=job --rw=write
+
+threaded_aio(SQ)	:	81k  iops(write), cpu util: 20% 
+in tree loop(SQ)	:   100K iops(write), cpu util: 7%	
+
+
+Thanks,
+Ming
 
