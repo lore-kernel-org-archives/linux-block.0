@@ -1,690 +1,614 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a8-87.smtp-out.amazonses.com (a8-87.smtp-out.amazonses.com [54.240.8.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D92E1991C1
-	for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 22:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4090A1F4701;
+	Fri, 14 Mar 2025 23:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.240.8.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741991286; cv=none; b=afhfoL8dRHq6a6DITf15xgO9hs0GhsJ+Soz3EC4NW67fKW5EOf2PU/0HsdHA4gx2wvapcGTSRVsapYBqI3X0Ol6MtT2GwqwOdiF0tC9CrqMcvUi7ca9FBrCsoqgvVTNdxD+/N2A884D9hGhG/sOxCYmTLzxzWgVvvPcBSE7W9TU=
+	t=1741995720; cv=none; b=YhCfkScXd0zjvxCoa7+Q5SUwRqsjUSH3oBNexAn22MvgKnN3wlD41WCtdUAQFzEY3D/56PkaeVu8r8tUm0TufhJpBkTZctNOPCE6zyplLE3bXk85/0QfF9wOwmQeHOJAQuijbVygp4oTgRkosD8tPybOzcROMBpJZxc6x302GD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741991286; c=relaxed/simple;
-	bh=1Q9AXu5bLTb6dB1YPbDvV6DVY+k+FxmpfD9pb0jNUxo=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 MIME-Version:Date; b=Iy8QfHVBR1ekgMPY6zCF3AGOCejfj1X1LogrhEgV5MNoY1i5vZut7K4c8stMhc3nJq/SrwNWw0DvHWQZ8wSeAQhebFvfkRfYVDT1ml/DbyH4Fz6C7reokN3sZCfvLNcoGCE6ZZU0iyMIKrwDznN7PESlAK/zX0YgEGstigOSt/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=vGT6het8; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	s=arc-20240116; t=1741995720; c=relaxed/simple;
+	bh=pHvx9d+HDAMV94DS0MC6Livhm17g6usKXutS7tJNVMU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=laOGloDxPYfbrBFWHffDxzPnbUgdpSwl5OYXN/E2frpYkiFOgwoG9/0d5I7V78l9qd0o4N6dOor+u9gzsCkvlajruN7uINPUlQ5ECL+wb7xTZD+UFu5yjIaKAQNH7Z3ARRx1bKYOuZWh/+DaS/aFgzp5CVJabE0IONeafM2NalI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=antoniohickey.com; spf=pass smtp.mailfrom=amazonses.com; dkim=pass (2048-bit key) header.d=antoniohickey.com header.i=@antoniohickey.com header.b=FVSdnVvy; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=R63Xzxpz; arc=none smtp.client-ip=54.240.8.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=antoniohickey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazonses.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="vGT6het8"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2c1c4e364c8so1128131fac.1
-        for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 15:28:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1741991283; x=1742596083; darn=vger.kernel.org;
-        h=user-agent:date:mime-version:content-transfer-encoding:references
-         :in-reply-to:cc:to:from:subject:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=feac0ze6HikpkxtN6hDRr2IbhULf7JuQ3eA4z9EYJD0=;
-        b=vGT6het8u8EeLIhEnMN2esBwXgzM+DXnqEuGIar+5BJc5bRkYUMrjTaQCMrK22B9YL
-         r+h35dMPEKDi15nsLGaP3//+YQ+aRrKFC9qyvmj0MCmJ2fuvA+IrPOI2wSdXlNPojWLz
-         8xNH2bNvyj/TGLl1uufR56FBNhGOeBXFWhEGz4FfS7W/or+qoBmM5puwnHvtIPU1Ojqd
-         btZX85bTW2T4aRpCUSGC0E/nacYRjR80k6jlJ8kRdgjJDNEQs61Qn3wD8PBPhQ3tCie7
-         q8ZnHAHVyxfaNUo4BehnSAG8fnuE4L6rjKfLqh2G9OqhEaCXxHEs2r/5lciQAF0xeYeT
-         HRjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741991283; x=1742596083;
-        h=user-agent:date:mime-version:content-transfer-encoding:references
-         :in-reply-to:cc:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=feac0ze6HikpkxtN6hDRr2IbhULf7JuQ3eA4z9EYJD0=;
-        b=Mm6Eg2CZhgWBLsxmOn3hhZP9W/Nnzd95DDb+iwEjvame961pQETGI2cN6ZqxQ35pBX
-         3O/kUKoqs6zFJSfsMFOfyCa4o2NmGjUJ8+2myK9IFngtf8H7N+LkWp1pz7xuheS8aYsq
-         4osqUUtY5kUzkLfol6SKsLeinbLZCw+CnBBtJao9SKKAV6CiZgNPdbxgGAYcotvZZv2C
-         Ucsv7x8irJW2ILLfHG2YxfMOTwHmkHoO8r6y/ae6vSMBWZvWqWDKMflxi176AhA5TO0a
-         Bym+v6z7bmTyuKpFOwZYkPpwFlBid9evxEVRbrBkboCbadV5MKCzO+nRGCiq2yXTQlA4
-         vi6g==
-X-Forwarded-Encrypted: i=1; AJvYcCWWmd+NHjNCyowZhR1Pa2CfoWQEV3sQedp40UqwwGamARcishdtxI5T2qHVDzm3op/1YOCUBjoJpCJBMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS4Pn8da3uaN3Q0xQet3KOLN7MqJ4UkEdWKqUDdEDjObNQWIzu
-	e6uTIxLBDIk0nc3eX7AYyX82Kv+J69S9GEUgfDlDDD3Fq9aEp+T4z65CQOC98Cs=
-X-Gm-Gg: ASbGncv/O2np8125iePU4aZBRK5z4L6bwIdtN5ViGyi3Y81kzTWVJz3rKhmFaRhJan5
-	GRzqG+XbB8wx7nHKZ3rzGpBuxyqtIkBmWI/x3bSLzwIbjM2IJkn2f6oX4UaF5n5oMAN4H/H18qc
-	h+XPSKWPEsVIr1PsAo/niecO6UbDszzCQm9VvTnDZFjcVA7UduWmKJusFufSA/Y8CHkrAcI+NXj
-	w9o8DB8ksjcCIQBBt2A0zOZjgFSq/okbrfca6TYhjWGjaBjzGptqWORiBeRE/OGAlHC6W7b97Q1
-	APA1fHfUsFiVCS94UMxcHBlW0IhL03bN+WRfFKkmOiMtRCnizHr4V3sbUVe7Pxf96xC5kFIYWxQ
-	HKtSAS3TWkGlpuS72
-X-Google-Smtp-Source: AGHT+IEcQVrM4yLizX+SD244NBQDUc/jbsxy9pjrTkVucbdKWDx8L13qOVLUAha8gMUagXg96TfntQ==
-X-Received: by 2002:a05:6871:3285:b0:2b8:92f0:ba5d with SMTP id 586e51a60fabf-2c66f88b26fmr4484637fac.8.1741991282937;
-        Fri, 14 Mar 2025 15:28:02 -0700 (PDT)
-Received: from ?IPv6:2600:1700:6476:1430:7a51:a450:8c55:68d0? ([2600:1700:6476:1430:7a51:a450:8c55:68d0])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c67100aa32sm1039831fac.12.2025.03.14.15.28.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 15:28:01 -0700 (PDT)
-Message-ID: <a62918950646701cb9bb2ab0a32c87b53e2f102e.camel@dubeyko.com>
-Subject: Re: [RFC PATCH 04/35] ceph: Convert ceph_mds_request::r_pagelist
- to a databuf
-From: slava@dubeyko.com
-To: David Howells <dhowells@redhat.com>, Alex Markuze <amarkuze@redhat.com>
-Cc: Ilya Dryomov <idryomov@gmail.com>, Jeff Layton <jlayton@kernel.org>, 
- Dongsheng Yang <dongsheng.yang@easystack.cn>, ceph-devel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, 	linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Slava.Dubeyko@ibm.com
-In-Reply-To: <20250313233341.1675324-5-dhowells@redhat.com>
-References: <20250313233341.1675324-1-dhowells@redhat.com>
-	 <20250313233341.1675324-5-dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=antoniohickey.com header.i=@antoniohickey.com header.b="FVSdnVvy";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="R63Xzxpz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=cgcwyxycg75iw36cao5ku2ksreqpjkvc; d=antoniohickey.com;
+	t=1741995716;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=pHvx9d+HDAMV94DS0MC6Livhm17g6usKXutS7tJNVMU=;
+	b=FVSdnVvya9EnaCW4b7nwD25Ii7l7zizG/kW/O49rWuaZIfbcbgAv1jrqE8Z8BYHY
+	yu0FeokjLTICKBNKsAlqX7iSGy9oglqHbVfyaAhj+1Tf6PDSTUlD1GTUyXrSyrr+1V3
+	SnyVm+vIOn0Jys7fZLEJHWeNjEsoMJOPr82xgIJ6AOCwXy2c6bA4S9HrW6cx8D60VPD
+	hojbj468R7XQhHY9KSHxAvAYKFO0F4tr6UqE07Qkpa0gxlhP5QS2ZcecD+KXqGweDhS
+	nyt1K/H7UjdXsShixagJN9xv8zSzzMG/y2X9+SBcbWcIhsTV0BW6TesF14DRMNctRfG
+	sOZ/4ALIGw==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1741995716;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Feedback-ID;
+	bh=pHvx9d+HDAMV94DS0MC6Livhm17g6usKXutS7tJNVMU=;
+	b=R63Xzxpz8WVGQlPP9tLGoe23VfYm+brmmkTs2XgX2DvQ10L4WGADFG/K7Lwb7HqT
+	AQ+I3gxvPfQFQt9bO1ptdv8FJZsq8wfpWNuHQxF42fxUHUYzvChN1IqSaj/oORFHgPZ
+	RbEpYFUcVYZBdO4dsJD9aRr7tHpaANJeVIJndhoo=
+From: Antonio Hickey <contact@antoniohickey.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: Antonio Hickey <contact@antoniohickey.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: [PATCH v3 2/3] rust: replace `addr_of[_mut]!` with `&raw [mut]`
+Date: Fri, 14 Mar 2025 23:41:55 +0000
+Message-ID: <0100019597092d67-0da59c6d-9680-413f-bbce-109ef95724cc-000000@email.amazonses.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250314234148.599196-1-contact@antoniohickey.com>
+References: <20250314234148.599196-1-contact@antoniohickey.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 14 Mar 2025 15:27:55 -0700
-User-Agent: Evolution 3.54.3 (by Flathub.org) 
+Content-Transfer-Encoding: 8bit
+Feedback-ID: ::1.us-east-1.3SHHfi5Rh4c+NdtIv+pxNWeqDT0J3zAhYZLMebdhE9o=:AmazonSES
+X-SES-Outgoing: 2025.03.14-54.240.8.87
 
-On Thu, 2025-03-13 at 23:32 +0000, David Howells wrote:
-> Convert ceph_mds_request::r_pagelist to a databuf, along with the
-> stuff
-> that uses it such as setxattr ops.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Viacheslav Dubeyko <slava@dubeyko.com>
-> cc: Alex Markuze <amarkuze@redhat.com>
-> cc: Ilya Dryomov <idryomov@gmail.com>
-> cc: ceph-devel@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
-> =C2=A0fs/ceph/acl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 39 ++++++=
-++++----------
-> =C2=A0fs/ceph/file.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 12 ++++---
-> =C2=A0fs/ceph/inode.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 85 ++++++++++++++++=
-+++-----------------------
-> --
-> =C2=A0fs/ceph/mds_client.c | 11 +++---
-> =C2=A0fs/ceph/mds_client.h |=C2=A0 2 +-
-> =C2=A0fs/ceph/super.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> =C2=A0fs/ceph/xattr.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 68 +++++++++++++++-=
--------------------
-> =C2=A07 files changed, 96 insertions(+), 123 deletions(-)
->=20
-> diff --git a/fs/ceph/acl.c b/fs/ceph/acl.c
-> index 1564eacc253d..d6da650db83e 100644
-> --- a/fs/ceph/acl.c
-> +++ b/fs/ceph/acl.c
-> @@ -171,7 +171,7 @@ int ceph_pre_init_acls(struct inode *dir, umode_t
-> *mode,
-> =C2=A0{
-> =C2=A0	struct posix_acl *acl, *default_acl;
-> =C2=A0	size_t val_size1 =3D 0, val_size2 =3D 0;
-> -	struct ceph_pagelist *pagelist =3D NULL;
-> +	struct ceph_databuf *dbuf =3D NULL;
-> =C2=A0	void *tmp_buf =3D NULL;
-> =C2=A0	int err;
-> =C2=A0
-> @@ -201,58 +201,55 @@ int ceph_pre_init_acls(struct inode *dir,
-> umode_t *mode,
-> =C2=A0	tmp_buf =3D kmalloc(max(val_size1, val_size2), GFP_KERNEL);
-> =C2=A0	if (!tmp_buf)
-> =C2=A0		goto out_err;
-> -	pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
-> -	if (!pagelist)
-> +	dbuf =3D ceph_databuf_req_alloc(1, PAGE_SIZE, GFP_KERNEL);
-> +	if (!dbuf)
-> =C2=A0		goto out_err;
-> =C2=A0
-> -	err =3D ceph_pagelist_reserve(pagelist, PAGE_SIZE);
-> -	if (err)
-> -		goto out_err;
-> -
-> -	ceph_pagelist_encode_32(pagelist, acl && default_acl ? 2 :
-> 1);
-> +	ceph_databuf_encode_32(dbuf, acl && default_acl ? 2 : 1);
-> =C2=A0
-> =C2=A0	if (acl) {
-> =C2=A0		size_t len =3D strlen(XATTR_NAME_POSIX_ACL_ACCESS);
-> -		err =3D ceph_pagelist_reserve(pagelist, len +
-> val_size1 + 8);
-> +		err =3D ceph_databuf_reserve(dbuf, len + val_size1 +
-> 8,
-> +					=C2=A0=C2=A0 GFP_KERNEL);
+Replacing all occurrences of `addr_of!(place)` with `&raw const place`, and
+all occurrences of `addr_of_mut!(place)` with `&raw mut place`.
 
-I know that it's simple change. But this len + val_size1 + 8 looks
-confusing, anyway. What this hardcoded 8 means? :)
+Utilizing the new feature will allow us to reduce macro complexity, and
+improve consistency with existing reference syntax as `&raw const`, `&raw mut`
+is very similar to `&`, `&mut` making it fit more naturally with other
+existing code.
 
+Suggested-by: Benno Lossin <benno.lossin@proton.me>
+Link: https://github.com/Rust-for-Linux/linux/issues/1148
+Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
+---
+ rust/kernel/block/mq/request.rs        |  4 ++--
+ rust/kernel/faux.rs                    |  4 ++--
+ rust/kernel/fs/file.rs                 |  2 +-
+ rust/kernel/init.rs                    |  8 ++++----
+ rust/kernel/init/macros.rs             | 28 +++++++++++++-------------
+ rust/kernel/jump_label.rs              |  4 ++--
+ rust/kernel/kunit.rs                   |  4 ++--
+ rust/kernel/list.rs                    |  2 +-
+ rust/kernel/list/impl_list_item_mod.rs |  6 +++---
+ rust/kernel/net/phy.rs                 |  4 ++--
+ rust/kernel/pci.rs                     |  4 ++--
+ rust/kernel/platform.rs                |  4 +---
+ rust/kernel/rbtree.rs                  | 22 ++++++++++----------
+ rust/kernel/sync/arc.rs                |  2 +-
+ rust/kernel/task.rs                    |  4 ++--
+ rust/kernel/workqueue.rs               |  8 ++++----
+ 16 files changed, 54 insertions(+), 56 deletions(-)
 
-> =C2=A0		if (err)
-> =C2=A0			goto out_err;
-> -		ceph_pagelist_encode_string(pagelist,
-> XATTR_NAME_POSIX_ACL_ACCESS,
-> -					=C2=A0=C2=A0=C2=A0 len);
-> +		ceph_databuf_encode_string(dbuf,
-> XATTR_NAME_POSIX_ACL_ACCESS,
-> +					=C2=A0=C2=A0 len);
-> =C2=A0		err =3D posix_acl_to_xattr(&init_user_ns, acl,
-> =C2=A0					 tmp_buf, val_size1);
-> =C2=A0		if (err < 0)
-> =C2=A0			goto out_err;
-> -		ceph_pagelist_encode_32(pagelist, val_size1);
-> -		ceph_pagelist_append(pagelist, tmp_buf, val_size1);
-> +		ceph_databuf_encode_32(dbuf, val_size1);
-> +		ceph_databuf_append(dbuf, tmp_buf, val_size1);
-> =C2=A0	}
-> =C2=A0	if (default_acl) {
-> =C2=A0		size_t len =3D strlen(XATTR_NAME_POSIX_ACL_DEFAULT);
-> -		err =3D ceph_pagelist_reserve(pagelist, len +
-> val_size2 + 8);
-> +		err =3D ceph_databuf_reserve(dbuf, len + val_size2 +
-> 8,
-> +					=C2=A0=C2=A0 GFP_KERNEL);
-
-Same question here. :) What this hardcoded 8 means? :)
-
-> =C2=A0		if (err)
-> =C2=A0			goto out_err;
-> -		ceph_pagelist_encode_string(pagelist,
-> -					=C2=A0
-> XATTR_NAME_POSIX_ACL_DEFAULT, len);
-> +		ceph_databuf_encode_string(dbuf,
-> +					=C2=A0=C2=A0
-> XATTR_NAME_POSIX_ACL_DEFAULT, len);
-> =C2=A0		err =3D posix_acl_to_xattr(&init_user_ns, default_acl,
-> =C2=A0					 tmp_buf, val_size2);
-> =C2=A0		if (err < 0)
-> =C2=A0			goto out_err;
-> -		ceph_pagelist_encode_32(pagelist, val_size2);
-> -		ceph_pagelist_append(pagelist, tmp_buf, val_size2);
-> +		ceph_databuf_encode_32(dbuf, val_size2);
-> +		ceph_databuf_append(dbuf, tmp_buf, val_size2);
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	kfree(tmp_buf);
-> =C2=A0
-> =C2=A0	as_ctx->acl =3D acl;
-> =C2=A0	as_ctx->default_acl =3D default_acl;
-> -	as_ctx->pagelist =3D pagelist;
-> +	as_ctx->dbuf =3D dbuf;
-> =C2=A0	return 0;
-> =C2=A0
-> =C2=A0out_err:
-> =C2=A0	posix_acl_release(acl);
-> =C2=A0	posix_acl_release(default_acl);
-> =C2=A0	kfree(tmp_buf);
-> -	if (pagelist)
-> -		ceph_pagelist_release(pagelist);
-> +	ceph_databuf_release(dbuf);
-> =C2=A0	return err;
-> =C2=A0}
-> =C2=A0
-> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-> index 851d70200c6b..9de2960748b9 100644
-> --- a/fs/ceph/file.c
-> +++ b/fs/ceph/file.c
-> @@ -679,9 +679,9 @@ static int ceph_finish_async_create(struct inode
-> *dir, struct inode *inode,
-> =C2=A0	iinfo.change_attr =3D 1;
-> =C2=A0	ceph_encode_timespec64(&iinfo.btime, &now);
-> =C2=A0
-> -	if (req->r_pagelist) {
-> -		iinfo.xattr_len =3D req->r_pagelist->length;
-> -		iinfo.xattr_data =3D req->r_pagelist->mapped_tail;
-> +	if (req->r_dbuf) {
-> +		iinfo.xattr_len =3D ceph_databuf_len(req->r_dbuf);
-> +		iinfo.xattr_data =3D kmap_ceph_databuf_page(req-
-> >r_dbuf, 0);
-
-Possibly, it's in another patch. Have we removed req->r_pagelist from
-the structure?
-
-Do we always have memory pages in ceph_databuf? How
-kmap_ceph_databuf_page() will behave if it's not memory page.
-
-> =C2=A0	} else {
-> =C2=A0		/* fake it */
-> =C2=A0		iinfo.xattr_len =3D ARRAY_SIZE(xattr_buf);
-> @@ -731,6 +731,8 @@ static int ceph_finish_async_create(struct inode
-> *dir, struct inode *inode,
-> =C2=A0	ret =3D ceph_fill_inode(inode, NULL, &iinfo, NULL, req-
-> >r_session,
-> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 req->r_fmode, NULL);
-> =C2=A0	up_read(&mdsc->snap_rwsem);
-> +	if (req->r_dbuf)
-> +		kunmap_local(iinfo.xattr_data);
-
-Maybe, we need to hide kunmap_local() into something like
-kunmap_ceph_databuf_page()?
-
-> =C2=A0	if (ret) {
-> =C2=A0		doutc(cl, "failed to fill inode: %d\n", ret);
-> =C2=A0		ceph_dir_clear_complete(dir);
-> @@ -849,8 +851,8 @@ int ceph_atomic_open(struct inode *dir, struct
-> dentry *dentry,
-> =C2=A0			goto out_ctx;
-> =C2=A0		}
-> =C2=A0		/* Async create can't handle more than a page of
-> xattrs */
-> -		if (as_ctx.pagelist &&
-> -		=C2=A0=C2=A0=C2=A0 !list_is_singular(&as_ctx.pagelist->head))
-> +		if (as_ctx.dbuf &&
-> +		=C2=A0=C2=A0=C2=A0 as_ctx.dbuf->nr_bvec > 1)
-
-Maybe, it makes sense to call something like ceph_databuf_length()
-instead of low level access to dbuf->nr_bvec?
-
-> =C2=A0			try_async =3D false;
-> =C2=A0	} else if (!d_in_lookup(dentry)) {
-> =C2=A0		/* If it's not being looked up, it's negative */
-> diff --git a/fs/ceph/inode.c b/fs/ceph/inode.c
-> index b060f765ad20..ec9b80fec7be 100644
-> --- a/fs/ceph/inode.c
-> +++ b/fs/ceph/inode.c
-> @@ -112,9 +112,9 @@ struct inode *ceph_new_inode(struct inode *dir,
-> struct dentry *dentry,
-> =C2=A0void ceph_as_ctx_to_req(struct ceph_mds_request *req,
-> =C2=A0			struct ceph_acl_sec_ctx *as_ctx)
-> =C2=A0{
-> -	if (as_ctx->pagelist) {
-> -		req->r_pagelist =3D as_ctx->pagelist;
-> -		as_ctx->pagelist =3D NULL;
-> +	if (as_ctx->dbuf) {
-> +		req->r_dbuf =3D as_ctx->dbuf;
-> +		as_ctx->dbuf =3D NULL;
-
-Maybe, we need something like swap() method? :)
-
-> =C2=A0	}
-> =C2=A0	ceph_fscrypt_as_ctx_to_req(req, as_ctx);
-> =C2=A0}
-> @@ -2341,11 +2341,10 @@ static int fill_fscrypt_truncate(struct inode
-> *inode,
-> =C2=A0	loff_t pos, orig_pos =3D round_down(attr->ia_size,
-> =C2=A0					=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
-> =C2=A0	u64 block =3D orig_pos >> CEPH_FSCRYPT_BLOCK_SHIFT;
-> -	struct ceph_pagelist *pagelist =3D NULL;
-> -	struct kvec iov =3D {0};
-> +	struct ceph_databuf *dbuf =3D NULL;
-> =C2=A0	struct iov_iter iter;
-> -	struct page *page =3D NULL;
-> -	struct ceph_fscrypt_truncate_size_header header;
-> +	struct ceph_fscrypt_truncate_size_header *header;
-> +	void *p;
-> =C2=A0	int retry_op =3D 0;
-> =C2=A0	int len =3D CEPH_FSCRYPT_BLOCK_SIZE;
-> =C2=A0	loff_t i_size =3D i_size_read(inode);
-> @@ -2372,37 +2371,35 @@ static int fill_fscrypt_truncate(struct inode
-> *inode,
-> =C2=A0			goto out;
-> =C2=A0	}
-> =C2=A0
-> -	page =3D __page_cache_alloc(GFP_KERNEL);
-> -	if (page =3D=3D NULL) {
-> -		ret =3D -ENOMEM;
-> +	ret =3D -ENOMEM;
-> +	dbuf =3D ceph_databuf_req_alloc(2, 0, GFP_KERNEL);
-
-So, do we allocate 2 items of zero length here?
-
-> +	if (!dbuf)
-> =C2=A0		goto out;
-> -	}
-> =C2=A0
-> -	pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
-> -	if (!pagelist) {
-> -		ret =3D -ENOMEM;
-> +	if (ceph_databuf_insert_frag(dbuf, 0, sizeof(*header),
-> GFP_KERNEL) < 0)
-> +		goto out;
-> +	if (ceph_databuf_insert_frag(dbuf, 1, PAGE_SIZE, GFP_KERNEL)
-> < 0)
-> =C2=A0		goto out;
-> -	}
-> =C2=A0
-> -	iov.iov_base =3D kmap_local_page(page);
-> -	iov.iov_len =3D len;
-> -	iov_iter_kvec(&iter, READ, &iov, 1, len);
-> +	iov_iter_bvec(&iter, ITER_DEST, &dbuf->bvec[1], 1, len);
-
-Is it correct &dbuf->bvec[1]? Why do we work with item #1? I think it
-looks confusing.
-
-> =C2=A0
-> =C2=A0	pos =3D orig_pos;
-> =C2=A0	ret =3D __ceph_sync_read(inode, &pos, &iter, &retry_op,
-> &objver);
-> =C2=A0	if (ret < 0)
-> =C2=A0		goto out;
-> =C2=A0
-> +	header =3D kmap_ceph_databuf_page(dbuf, 0);
-> +
-> =C2=A0	/* Insert the header first */
-> -	header.ver =3D 1;
-> -	header.compat =3D 1;
-> -	header.change_attr =3D
-> cpu_to_le64(inode_peek_iversion_raw(inode));
-> +	header->ver =3D 1;
-> +	header->compat =3D 1;
-> +	header->change_attr =3D
-> cpu_to_le64(inode_peek_iversion_raw(inode));
-> =C2=A0
-> =C2=A0	/*
-> =C2=A0	 * Always set the block_size to CEPH_FSCRYPT_BLOCK_SIZE,
-> =C2=A0	 * because in MDS it may need this to do the truncate.
-> =C2=A0	 */
-> -	header.block_size =3D cpu_to_le32(CEPH_FSCRYPT_BLOCK_SIZE);
-> +	header->block_size =3D cpu_to_le32(CEPH_FSCRYPT_BLOCK_SIZE);
-> =C2=A0
-> =C2=A0	/*
-> =C2=A0	 * If we hit a hole here, we should just skip filling
-> @@ -2417,51 +2414,41 @@ static int fill_fscrypt_truncate(struct inode
-> *inode,
-> =C2=A0	if (!objver) {
-> =C2=A0		doutc(cl, "hit hole, ppos %lld < size %lld\n", pos,
-> i_size);
-> =C2=A0
-> -		header.data_len =3D cpu_to_le32(8 + 8 + 4);
-> -		header.file_offset =3D 0;
-> +		header->data_len =3D cpu_to_le32(8 + 8 + 4);
-
-The same problem of understanding here for me. What this hardcoded 8 +
-8 + 4 value means? :)
-
-> +		header->file_offset =3D 0;
-> =C2=A0		ret =3D 0;
-> =C2=A0	} else {
-> -		header.data_len =3D cpu_to_le32(8 + 8 + 4 +
-> CEPH_FSCRYPT_BLOCK_SIZE);
-> -		header.file_offset =3D cpu_to_le64(orig_pos);
-> +		header->data_len =3D cpu_to_le32(8 + 8 + 4 +
-> CEPH_FSCRYPT_BLOCK_SIZE);
-
-Ditto.
-
-> +		header->file_offset =3D cpu_to_le64(orig_pos);
-> =C2=A0
-> =C2=A0		doutc(cl, "encrypt block boff/bsize %d/%lu\n", boff,
-> =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
-> =C2=A0
-> =C2=A0		/* truncate and zero out the extra contents for the
-> last block */
-> -		memset(iov.iov_base + boff, 0, PAGE_SIZE - boff);
-> +		p =3D kmap_ceph_databuf_page(dbuf, 1);
-
-Maybe, we need to introduce some constants to address #0 and #1 pages?
-Because, #0 it's header and I assume #1 is some content.
-
-> +		memset(p + boff, 0, PAGE_SIZE - boff);
-> +		kunmap_local(p);
-> =C2=A0
-> =C2=A0		/* encrypt the last block */
-> -		ret =3D ceph_fscrypt_encrypt_block_inplace(inode,
-> page,
-> -						=C2=A0=C2=A0=C2=A0
-> CEPH_FSCRYPT_BLOCK_SIZE,
-> -						=C2=A0=C2=A0=C2=A0 0, block,
-> -						=C2=A0=C2=A0=C2=A0 GFP_KERNEL);
-> +		ret =3D ceph_fscrypt_encrypt_block_inplace(
-> +			inode, ceph_databuf_page(dbuf, 1),
-> +			CEPH_FSCRYPT_BLOCK_SIZE, 0, block,
-> GFP_KERNEL);
-> =C2=A0		if (ret)
-> =C2=A0			goto out;
-> =C2=A0	}
-> =C2=A0
-> -	/* Insert the header */
-> -	ret =3D ceph_pagelist_append(pagelist, &header,
-> sizeof(header));
-> -	if (ret)
-> -		goto out;
-> +	ceph_databuf_added_data(dbuf, sizeof(*header));
-> +	if (header->block_size)
-> +		ceph_databuf_added_data(dbuf,
-> CEPH_FSCRYPT_BLOCK_SIZE);
-> =C2=A0
-> -	if (header.block_size) {
-> -		/* Append the last block contents to pagelist */
-> -		ret =3D ceph_pagelist_append(pagelist, iov.iov_base,
-> -					=C2=A0=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
-> -		if (ret)
-> -			goto out;
-> -	}
-> -	req->r_pagelist =3D pagelist;
-> +	req->r_dbuf =3D dbuf;
-> =C2=A0out:
-> =C2=A0	doutc(cl, "%p %llx.%llx size dropping cap refs on %s\n",
-> inode,
-> =C2=A0	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ceph_vinop(inode), ceph_cap_string(=
-got));
-> =C2=A0	ceph_put_cap_refs(ci, got);
-> -	if (iov.iov_base)
-> -		kunmap_local(iov.iov_base);
-> -	if (page)
-> -		__free_pages(page, 0);
-> -	if (ret && pagelist)
-> -		ceph_pagelist_release(pagelist);
-> +	kunmap_local(header);
-> +	if (ret)
-> +		ceph_databuf_release(dbuf);
-> =C2=A0	return ret;
-> =C2=A0}
-> =C2=A0
-> diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
-> index 230e0c3f341f..09661a34f287 100644
-> --- a/fs/ceph/mds_client.c
-> +++ b/fs/ceph/mds_client.c
-> @@ -1125,8 +1125,7 @@ void ceph_mdsc_release_request(struct kref
-> *kref)
-> =C2=A0	put_cred(req->r_cred);
-> =C2=A0	if (req->r_mnt_idmap)
-> =C2=A0		mnt_idmap_put(req->r_mnt_idmap);
-> -	if (req->r_pagelist)
-> -		ceph_pagelist_release(req->r_pagelist);
-> +	ceph_databuf_release(req->r_dbuf);
-> =C2=A0	kfree(req->r_fscrypt_auth);
-> =C2=A0	kfree(req->r_altname);
-> =C2=A0	put_request_session(req);
-> @@ -3207,10 +3206,10 @@ static struct ceph_msg
-> *create_request_message(struct ceph_mds_session *session,
-> =C2=A0	msg->front.iov_len =3D p - msg->front.iov_base;
-> =C2=A0	msg->hdr.front_len =3D cpu_to_le32(msg->front.iov_len);
-> =C2=A0
-> -	if (req->r_pagelist) {
-> -		struct ceph_pagelist *pagelist =3D req->r_pagelist;
-> -		ceph_msg_data_add_pagelist(msg, pagelist);
-> -		msg->hdr.data_len =3D cpu_to_le32(pagelist->length);
-> +	if (req->r_dbuf) {
-> +		struct ceph_databuf *dbuf =3D req->r_dbuf;
-> +		ceph_msg_data_add_databuf(msg, dbuf);
-> +		msg->hdr.data_len =3D
-> cpu_to_le32(ceph_databuf_len(dbuf));
-> =C2=A0	} else {
-> =C2=A0		msg->hdr.data_len =3D 0;
-> =C2=A0	}
-> diff --git a/fs/ceph/mds_client.h b/fs/ceph/mds_client.h
-> index 3e2a6fa7c19a..a7ee8da07ce7 100644
-> --- a/fs/ceph/mds_client.h
-> +++ b/fs/ceph/mds_client.h
-> @@ -333,7 +333,7 @@ struct ceph_mds_request {
-> =C2=A0	u32 r_direct_hash;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* choose dir fra=
-g based on this
-> dentry hash */
-> =C2=A0
-> =C2=A0	/* data payload is used for xattr ops */
-> -	struct ceph_pagelist *r_pagelist;
-> +	struct ceph_databuf *r_dbuf;
-> =C2=A0
-> =C2=A0	/* what caps shall we drop? */
-> =C2=A0	int r_inode_drop, r_inode_unless;
-> diff --git a/fs/ceph/super.h b/fs/ceph/super.h
-> index bb0db0cc8003..984a6d2a5378 100644
-> --- a/fs/ceph/super.h
-> +++ b/fs/ceph/super.h
-> @@ -1137,7 +1137,7 @@ struct ceph_acl_sec_ctx {
-> =C2=A0#ifdef CONFIG_FS_ENCRYPTION
-> =C2=A0	struct ceph_fscrypt_auth *fscrypt_auth;
-> =C2=A0#endif
-> -	struct ceph_pagelist *pagelist;
-> +	struct ceph_databuf *dbuf;
-> =C2=A0};
-> =C2=A0
-> =C2=A0#ifdef CONFIG_SECURITY
-> diff --git a/fs/ceph/xattr.c b/fs/ceph/xattr.c
-> index 537165db4519..b083cd3b3974 100644
-> --- a/fs/ceph/xattr.c
-> +++ b/fs/ceph/xattr.c
-> @@ -1114,17 +1114,17 @@ static int ceph_sync_setxattr(struct inode
-> *inode, const char *name,
-> =C2=A0	struct ceph_mds_request *req;
-> =C2=A0	struct ceph_mds_client *mdsc =3D fsc->mdsc;
-> =C2=A0	struct ceph_osd_client *osdc =3D &fsc->client->osdc;
-> -	struct ceph_pagelist *pagelist =3D NULL;
-> +	struct ceph_databuf *dbuf =3D NULL;
-> =C2=A0	int op =3D CEPH_MDS_OP_SETXATTR;
-> =C2=A0	int err;
-> =C2=A0
-> =C2=A0	if (size > 0) {
-> -		/* copy value into pagelist */
-> -		pagelist =3D ceph_pagelist_alloc(GFP_NOFS);
-> -		if (!pagelist)
-> +		/* copy value into dbuf */
-> +		dbuf =3D ceph_databuf_req_alloc(1, size, GFP_NOFS);
-> +		if (!dbuf)
-> =C2=A0			return -ENOMEM;
-> =C2=A0
-> -		err =3D ceph_pagelist_append(pagelist, value, size);
-> +		err =3D ceph_databuf_append(dbuf, value, size);
-> =C2=A0		if (err)
-> =C2=A0			goto out;
-> =C2=A0	} else if (!value) {
-> @@ -1154,8 +1154,8 @@ static int ceph_sync_setxattr(struct inode
-> *inode, const char *name,
-> =C2=A0		req->r_args.setxattr.flags =3D cpu_to_le32(flags);
-> =C2=A0		req->r_args.setxattr.osdmap_epoch =3D
-> =C2=A0			cpu_to_le32(osdc->osdmap->epoch);
-> -		req->r_pagelist =3D pagelist;
-> -		pagelist =3D NULL;
-> +		req->r_dbuf =3D dbuf;
-> +		dbuf =3D NULL;
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	req->r_inode =3D inode;
-> @@ -1169,8 +1169,7 @@ static int ceph_sync_setxattr(struct inode
-> *inode, const char *name,
-> =C2=A0	doutc(cl, "xattr.ver (after): %lld\n", ci-
-> >i_xattrs.version);
-> =C2=A0
-> =C2=A0out:
-> -	if (pagelist)
-> -		ceph_pagelist_release(pagelist);
-> +	ceph_databuf_release(dbuf);
-> =C2=A0	return err;
-> =C2=A0}
-> =C2=A0
-> @@ -1377,7 +1376,7 @@ bool ceph_security_xattr_deadlock(struct inode
-> *in)
-> =C2=A0int ceph_security_init_secctx(struct dentry *dentry, umode_t mode,
-> =C2=A0			=C2=A0=C2=A0 struct ceph_acl_sec_ctx *as_ctx)
-> =C2=A0{
-> -	struct ceph_pagelist *pagelist =3D as_ctx->pagelist;
-> +	struct ceph_databuf *dbuf =3D as_ctx->dbuf;
-> =C2=A0	const char *name;
-> =C2=A0	size_t name_len;
-> =C2=A0	int err;
-> @@ -1391,14 +1390,11 @@ int ceph_security_init_secctx(struct dentry
-> *dentry, umode_t mode,
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	err =3D -ENOMEM;
-> -	if (!pagelist) {
-> -		pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
-> -		if (!pagelist)
-> +	if (!dbuf) {
-> +		dbuf =3D ceph_databuf_req_alloc(0, PAGE_SIZE,
-> GFP_KERNEL);
-> +		if (!dbuf)
-> =C2=A0			goto out;
-> -		err =3D ceph_pagelist_reserve(pagelist, PAGE_SIZE);
-> -		if (err)
-> -			goto out;
-> -		ceph_pagelist_encode_32(pagelist, 1);
-> +		ceph_databuf_encode_32(dbuf, 1);
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	/*
-> @@ -1407,38 +1403,31 @@ int ceph_security_init_secctx(struct dentry
-> *dentry, umode_t mode,
-> =C2=A0	 * dentry_init_security hook.
-> =C2=A0	 */
-> =C2=A0	name_len =3D strlen(name);
-> -	err =3D ceph_pagelist_reserve(pagelist,
-> -				=C2=A0=C2=A0=C2=A0 4 * 2 + name_len + as_ctx-
-> >lsmctx.len);
-> +	err =3D ceph_databuf_reserve(dbuf, 4 * 2 + name_len + as_ctx-
-> >lsmctx.len,
-> +				=C2=A0=C2=A0 GFP_KERNEL);
-
-The 4 * 2 + name_len + as_ctx->lsmctx.len looks unclear to me. It wil
-be good to have some well defined constants here.
-
-> =C2=A0	if (err)
-> =C2=A0		goto out;
-> =C2=A0
-> -	if (as_ctx->pagelist) {
-> +	if (as_ctx->dbuf) {
-> =C2=A0		/* update count of KV pairs */
-> -		BUG_ON(pagelist->length <=3D sizeof(__le32));
-> -		if (list_is_singular(&pagelist->head)) {
-> -			le32_add_cpu((__le32*)pagelist->mapped_tail,
-> 1);
-> -		} else {
-> -			struct page *page =3D
-> list_first_entry(&pagelist->head,
-> -							=C2=A0=C2=A0=C2=A0=C2=A0 struct
-> page, lru);
-> -			void *addr =3D kmap_atomic(page);
-> -			le32_add_cpu((__le32*)addr, 1);
-> -			kunmap_atomic(addr);
-> -		}
-> +		BUG_ON(ceph_databuf_len(dbuf) <=3D sizeof(__le32));
-> +		__le32 *addr =3D kmap_ceph_databuf_page(dbuf, 0);
-> +		le32_add_cpu(addr, 1);
-> +		kunmap_local(addr);
-> =C2=A0	} else {
-> -		as_ctx->pagelist =3D pagelist;
-> +		as_ctx->dbuf =3D dbuf;
-> =C2=A0	}
-> =C2=A0
-> -	ceph_pagelist_encode_32(pagelist, name_len);
-> -	ceph_pagelist_append(pagelist, name, name_len);
-> +	ceph_databuf_encode_32(dbuf, name_len);
-> +	ceph_databuf_append(dbuf, name, name_len);
-> =C2=A0
-> -	ceph_pagelist_encode_32(pagelist, as_ctx->lsmctx.len);
-> -	ceph_pagelist_append(pagelist, as_ctx->lsmctx.context,
-> -			=C2=A0=C2=A0=C2=A0=C2=A0 as_ctx->lsmctx.len);
-> +	ceph_databuf_encode_32(dbuf, as_ctx->lsmctx.len);
-> +	ceph_databuf_append(dbuf, as_ctx->lsmctx.context, as_ctx-
-> >lsmctx.len);
-> =C2=A0
-> =C2=A0	err =3D 0;
-> =C2=A0out:
-> -	if (pagelist && !as_ctx->pagelist)
-> -		ceph_pagelist_release(pagelist);
-> +	if (dbuf && !as_ctx->dbuf)
-> +		ceph_databuf_release(dbuf);
-> =C2=A0	return err;
-> =C2=A0}
-> =C2=A0#endif /* CONFIG_CEPH_FS_SECURITY_LABEL */
-> @@ -1456,8 +1445,7 @@ void ceph_release_acl_sec_ctx(struct
-> ceph_acl_sec_ctx *as_ctx)
-> =C2=A0#ifdef CONFIG_FS_ENCRYPTION
-> =C2=A0	kfree(as_ctx->fscrypt_auth);
-> =C2=A0#endif
-> -	if (as_ctx->pagelist)
-> -		ceph_pagelist_release(as_ctx->pagelist);
-> +	ceph_databuf_release(as_ctx->dbuf);
-> =C2=A0}
-> =C2=A0
-> =C2=A0/*
->=20
-
-Thanks,
-Slava.
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 7943f43b9575..4a5b7ec914ef 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -12,7 +12,7 @@
+ };
+ use core::{
+     marker::PhantomData,
+-    ptr::{addr_of_mut, NonNull},
++    ptr::NonNull,
+     sync::atomic::{AtomicU64, Ordering},
+ };
+ 
+@@ -187,7 +187,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
+     pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
+         // SAFETY: Because of the safety requirements of this function, the
+         // field projection is safe.
+-        unsafe { addr_of_mut!((*this).refcount) }
++        unsafe { &raw mut (*this).refcount }
+     }
+ }
+ 
+diff --git a/rust/kernel/faux.rs b/rust/kernel/faux.rs
+index 5acc0c02d451..52ac554c1119 100644
+--- a/rust/kernel/faux.rs
++++ b/rust/kernel/faux.rs
+@@ -7,7 +7,7 @@
+ //! C header: [`include/linux/device/faux.h`]
+ 
+ use crate::{bindings, device, error::code::*, prelude::*};
+-use core::ptr::{addr_of_mut, null, null_mut, NonNull};
++use core::ptr::{null, null_mut, NonNull};
+ 
+ /// The registration of a faux device.
+ ///
+@@ -45,7 +45,7 @@ impl AsRef<device::Device> for Registration {
+     fn as_ref(&self) -> &device::Device {
+         // SAFETY: The underlying `device` in `faux_device` is guaranteed by the C API to be
+         // a valid initialized `device`.
+-        unsafe { device::Device::as_ref(addr_of_mut!((*self.as_raw()).dev)) }
++        unsafe { device::Device::as_ref((&raw mut (*self.as_raw()).dev)) }
+     }
+ }
+ 
+diff --git a/rust/kernel/fs/file.rs b/rust/kernel/fs/file.rs
+index ed57e0137cdb..7ee4830b67f3 100644
+--- a/rust/kernel/fs/file.rs
++++ b/rust/kernel/fs/file.rs
+@@ -331,7 +331,7 @@ pub fn flags(&self) -> u32 {
+         // SAFETY: The file is valid because the shared reference guarantees a nonzero refcount.
+         //
+         // FIXME(read_once): Replace with `read_once` when available on the Rust side.
+-        unsafe { core::ptr::addr_of!((*self.as_ptr()).f_flags).read_volatile() }
++        unsafe { (&raw const (*self.as_ptr()).f_flags).read_volatile() }
+     }
+ }
+ 
+diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
+index 7fd1ea8265a5..a8fac6558671 100644
+--- a/rust/kernel/init.rs
++++ b/rust/kernel/init.rs
+@@ -122,7 +122,7 @@
+ //! ```rust
+ //! # #![expect(unreachable_pub, clippy::disallowed_names)]
+ //! use kernel::{init, types::Opaque};
+-//! use core::{ptr::addr_of_mut, marker::PhantomPinned, pin::Pin};
++//! use core::{marker::PhantomPinned, pin::Pin};
+ //! # mod bindings {
+ //! #     #![expect(non_camel_case_types)]
+ //! #     #![expect(clippy::missing_safety_doc)]
+@@ -159,7 +159,7 @@
+ //!         unsafe {
+ //!             init::pin_init_from_closure(move |slot: *mut Self| {
+ //!                 // `slot` contains uninit memory, avoid creating a reference.
+-//!                 let foo = addr_of_mut!((*slot).foo);
++//!                 let foo = &raw mut (*slot).foo;
+ //!
+ //!                 // Initialize the `foo`
+ //!                 bindings::init_foo(Opaque::raw_get(foo));
+@@ -541,7 +541,7 @@ macro_rules! stack_try_pin_init {
+ ///
+ /// ```rust
+ /// # use kernel::{macros::{Zeroable, pin_data}, pin_init};
+-/// # use core::{ptr::addr_of_mut, marker::PhantomPinned};
++/// # use core::marker::PhantomPinned;
+ /// #[pin_data]
+ /// #[derive(Zeroable)]
+ /// struct Buf {
+@@ -554,7 +554,7 @@ macro_rules! stack_try_pin_init {
+ /// pin_init!(&this in Buf {
+ ///     buf: [0; 64],
+ ///     // SAFETY: TODO.
+-///     ptr: unsafe { addr_of_mut!((*this.as_ptr()).buf).cast() },
++///     ptr: unsafe { &raw mut (*this.as_ptr()).buf.cast() },
+ ///     pin: PhantomPinned,
+ /// });
+ /// pin_init!(Buf {
+diff --git a/rust/kernel/init/macros.rs b/rust/kernel/init/macros.rs
+index 1fd146a83241..af525fbb2f01 100644
+--- a/rust/kernel/init/macros.rs
++++ b/rust/kernel/init/macros.rs
+@@ -244,25 +244,25 @@
+ //!                     struct __InitOk;
+ //!                     // This is the expansion of `t,`, which is syntactic sugar for `t: t,`.
+ //!                     {
+-//!                         unsafe { ::core::ptr::write(::core::addr_of_mut!((*slot).t), t) };
++//!                         unsafe { ::core::ptr::write(&raw mut (*slot).t, t) };
+ //!                     }
+ //!                     // Since initialization could fail later (not in this case, since the
+ //!                     // error type is `Infallible`) we will need to drop this field if there
+ //!                     // is an error later. This `DropGuard` will drop the field when it gets
+ //!                     // dropped and has not yet been forgotten.
+ //!                     let __t_guard = unsafe {
+-//!                         ::pinned_init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).t))
++//!                         ::pinned_init::__internal::DropGuard::new(&raw mut (*slot).t)
+ //!                     };
+ //!                     // Expansion of `x: 0,`:
+ //!                     // Since this can be an arbitrary expression we cannot place it inside
+ //!                     // of the `unsafe` block, so we bind it here.
+ //!                     {
+ //!                         let x = 0;
+-//!                         unsafe { ::core::ptr::write(::core::addr_of_mut!((*slot).x), x) };
++//!                         unsafe { ::core::ptr::write(&raw mut (*slot).x, x) };
+ //!                     }
+ //!                     // We again create a `DropGuard`.
+ //!                     let __x_guard = unsafe {
+-//!                         ::kernel::init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).x))
++//!                         ::kernel::init::__internal::DropGuard::new(&raw mut (*slot).x)
+ //!                     };
+ //!                     // Since initialization has successfully completed, we can now forget
+ //!                     // the guards. This is not `mem::forget`, since we only have
+@@ -459,15 +459,15 @@
+ //!         {
+ //!             struct __InitOk;
+ //!             {
+-//!                 unsafe { ::core::ptr::write(::core::addr_of_mut!((*slot).a), a) };
++//!                 unsafe { ::core::ptr::write(&raw mut (*slot).a, a) };
+ //!             }
+ //!             let __a_guard = unsafe {
+-//!                 ::kernel::init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).a))
++//!                 ::kernel::init::__internal::DropGuard::new(&raw mut (*slot).a)
+ //!             };
+ //!             let init = Bar::new(36);
+-//!             unsafe { data.b(::core::addr_of_mut!((*slot).b), b)? };
++//!             unsafe { data.b(&raw mut (*slot).b, b)? };
+ //!             let __b_guard = unsafe {
+-//!                 ::kernel::init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).b))
++//!                 ::kernel::init::__internal::DropGuard::new(&raw mut (*slot).b)
+ //!             };
+ //!             ::core::mem::forget(__b_guard);
+ //!             ::core::mem::forget(__a_guard);
+@@ -1210,7 +1210,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+         // SAFETY: `slot` is valid, because we are inside of an initializer closure, we
+         // return when an error/panic occurs.
+         // We also use the `data` to require the correct trait (`Init` or `PinInit`) for `$field`.
+-        unsafe { $data.$field(::core::ptr::addr_of_mut!((*$slot).$field), init)? };
++        unsafe { $data.$field(&raw mut (*$slot).$field, init)? };
+         // Create the drop guard:
+         //
+         // We rely on macro hygiene to make it impossible for users to access this local variable.
+@@ -1218,7 +1218,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+         ::kernel::macros::paste! {
+             // SAFETY: We forget the guard later when initialization has succeeded.
+             let [< __ $field _guard >] = unsafe {
+-                $crate::init::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
++                $crate::init::__internal::DropGuard::new(&raw mut (*$slot).$field)
+             };
+ 
+             $crate::__init_internal!(init_slot($use_data):
+@@ -1241,7 +1241,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+         //
+         // SAFETY: `slot` is valid, because we are inside of an initializer closure, we
+         // return when an error/panic occurs.
+-        unsafe { $crate::init::Init::__init(init, ::core::ptr::addr_of_mut!((*$slot).$field))? };
++        unsafe { $crate::init::Init::__init(init, &raw mut (*$slot).$field)? };
+         // Create the drop guard:
+         //
+         // We rely on macro hygiene to make it impossible for users to access this local variable.
+@@ -1249,7 +1249,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+         ::kernel::macros::paste! {
+             // SAFETY: We forget the guard later when initialization has succeeded.
+             let [< __ $field _guard >] = unsafe {
+-                $crate::init::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
++                $crate::init::__internal::DropGuard::new(&raw mut (*$slot).$field)
+             };
+ 
+             $crate::__init_internal!(init_slot():
+@@ -1272,7 +1272,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+             // Initialize the field.
+             //
+             // SAFETY: The memory at `slot` is uninitialized.
+-            unsafe { ::core::ptr::write(::core::ptr::addr_of_mut!((*$slot).$field), $field) };
++            unsafe { ::core::ptr::write(&raw mut (*$slot).$field, $field) };
+         }
+         // Create the drop guard:
+         //
+@@ -1281,7 +1281,7 @@ fn assert_zeroable<T: $crate::init::Zeroable>(_: *mut T) {}
+         ::kernel::macros::paste! {
+             // SAFETY: We forget the guard later when initialization has succeeded.
+             let [< __ $field _guard >] = unsafe {
+-                $crate::init::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
++                $crate::init::__internal::DropGuard::new(&raw mut (*$slot).$field)
+             };
+ 
+             $crate::__init_internal!(init_slot($($use_data)?):
+diff --git a/rust/kernel/jump_label.rs b/rust/kernel/jump_label.rs
+index 4e974c768dbd..ca10abae0eee 100644
+--- a/rust/kernel/jump_label.rs
++++ b/rust/kernel/jump_label.rs
+@@ -20,8 +20,8 @@
+ #[macro_export]
+ macro_rules! static_branch_unlikely {
+     ($key:path, $keytyp:ty, $field:ident) => {{
+-        let _key: *const $keytyp = ::core::ptr::addr_of!($key);
+-        let _key: *const $crate::bindings::static_key_false = ::core::ptr::addr_of!((*_key).$field);
++        let _key: *const $keytyp = &raw const $key;
++        let _key: *const $crate::bindings::static_key_false = &raw const (*_key).$field;
+         let _key: *const $crate::bindings::static_key = _key.cast();
+ 
+         #[cfg(not(CONFIG_JUMP_LABEL))]
+diff --git a/rust/kernel/kunit.rs b/rust/kernel/kunit.rs
+index 824da0e9738a..a17ef3b2e860 100644
+--- a/rust/kernel/kunit.rs
++++ b/rust/kernel/kunit.rs
+@@ -128,9 +128,9 @@ unsafe impl Sync for UnaryAssert {}
+             unsafe {
+                 $crate::bindings::__kunit_do_failed_assertion(
+                     kunit_test,
+-                    core::ptr::addr_of!(LOCATION.0),
++                    &raw const LOCATION.0,
+                     $crate::bindings::kunit_assert_type_KUNIT_ASSERTION,
+-                    core::ptr::addr_of!(ASSERTION.0.assert),
++                    &raw const ASSERTION.0.assert,
+                     Some($crate::bindings::kunit_unary_assert_format),
+                     core::ptr::null(),
+                 );
+diff --git a/rust/kernel/list.rs b/rust/kernel/list.rs
+index c0ed227b8a4f..e98f0820f002 100644
+--- a/rust/kernel/list.rs
++++ b/rust/kernel/list.rs
+@@ -176,7 +176,7 @@ pub fn new() -> impl PinInit<Self> {
+     #[inline]
+     unsafe fn fields(me: *mut Self) -> *mut ListLinksFields {
+         // SAFETY: The caller promises that the pointer is valid.
+-        unsafe { Opaque::raw_get(ptr::addr_of!((*me).inner)) }
++        unsafe { Opaque::raw_get(&raw const (*me).inner) }
+     }
+ 
+     /// # Safety
+diff --git a/rust/kernel/list/impl_list_item_mod.rs b/rust/kernel/list/impl_list_item_mod.rs
+index a0438537cee1..014b6713d59d 100644
+--- a/rust/kernel/list/impl_list_item_mod.rs
++++ b/rust/kernel/list/impl_list_item_mod.rs
+@@ -49,7 +49,7 @@ macro_rules! impl_has_list_links {
+         // SAFETY: The implementation of `raw_get_list_links` only compiles if the field has the
+         // right type.
+         //
+-        // The behavior of `raw_get_list_links` is not changed since the `addr_of_mut!` macro is
++        // The behavior of `raw_get_list_links` is not changed since the `&raw mut` op is
+         // equivalent to the pointer offset operation in the trait definition.
+         unsafe impl$(<$($implarg),*>)? $crate::list::HasListLinks$(<$id>)? for
+             $self $(<$($selfarg),*>)?
+@@ -61,7 +61,7 @@ unsafe fn raw_get_list_links(ptr: *mut Self) -> *mut $crate::list::ListLinks$(<$
+                 // SAFETY: The caller promises that the pointer is not dangling. We know that this
+                 // expression doesn't follow any pointers, as the `offset_of!` invocation above
+                 // would otherwise not compile.
+-                unsafe { ::core::ptr::addr_of_mut!((*ptr)$(.$field)*) }
++                unsafe { &raw mut (*ptr)$(.$field)* }
+             }
+         }
+     )*};
+@@ -103,7 +103,7 @@ macro_rules! impl_has_list_links_self_ptr {
+             unsafe fn raw_get_list_links(ptr: *mut Self) -> *mut $crate::list::ListLinks$(<$id>)? {
+                 // SAFETY: The caller promises that the pointer is not dangling.
+                 let ptr: *mut $crate::list::ListLinksSelfPtr<$item_type $(, $id)?> =
+-                    unsafe { ::core::ptr::addr_of_mut!((*ptr).$field) };
++                    unsafe { &raw mut (*ptr).$field };
+                 ptr.cast()
+             }
+         }
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index a59469c785e3..757db052cc09 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -7,7 +7,7 @@
+ //! C headers: [`include/linux/phy.h`](srctree/include/linux/phy.h).
+ 
+ use crate::{error::*, prelude::*, types::Opaque};
+-use core::{marker::PhantomData, ptr::addr_of_mut};
++use core::marker::PhantomData;
+ 
+ pub mod reg;
+ 
+@@ -285,7 +285,7 @@ impl AsRef<kernel::device::Device> for Device {
+     fn as_ref(&self) -> &kernel::device::Device {
+         let phydev = self.0.get();
+         // SAFETY: The struct invariant ensures that `mdio.dev` is valid.
+-        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phydev).mdio.dev)) }
++        unsafe { kernel::device::Device::as_ref(&raw mut (*phydev).mdio.dev) }
+     }
+ }
+ 
+diff --git a/rust/kernel/pci.rs b/rust/kernel/pci.rs
+index f7b2743828ae..6cb9ed1e7cbf 100644
+--- a/rust/kernel/pci.rs
++++ b/rust/kernel/pci.rs
+@@ -17,7 +17,7 @@
+     types::{ARef, ForeignOwnable, Opaque},
+     ThisModule,
+ };
+-use core::{ops::Deref, ptr::addr_of_mut};
++use core::ops::Deref;
+ use kernel::prelude::*;
+ 
+ /// An adapter for the registration of PCI drivers.
+@@ -60,7 +60,7 @@ extern "C" fn probe_callback(
+     ) -> kernel::ffi::c_int {
+         // SAFETY: The PCI bus only ever calls the probe callback with a valid pointer to a
+         // `struct pci_dev`.
+-        let dev = unsafe { device::Device::get_device(addr_of_mut!((*pdev).dev)) };
++        let dev = unsafe { device::Device::get_device(&raw mut (*pdev).dev) };
+         // SAFETY: `dev` is guaranteed to be embedded in a valid `struct pci_dev` by the call
+         // above.
+         let mut pdev = unsafe { Device::from_dev(dev) };
+diff --git a/rust/kernel/platform.rs b/rust/kernel/platform.rs
+index 1297f5292ba9..344875ad7b82 100644
+--- a/rust/kernel/platform.rs
++++ b/rust/kernel/platform.rs
+@@ -14,8 +14,6 @@
+     ThisModule,
+ };
+ 
+-use core::ptr::addr_of_mut;
+-
+ /// An adapter for the registration of platform drivers.
+ pub struct Adapter<T: Driver>(T);
+ 
+@@ -55,7 +53,7 @@ unsafe fn unregister(pdrv: &Opaque<Self::RegType>) {
+ impl<T: Driver + 'static> Adapter<T> {
+     extern "C" fn probe_callback(pdev: *mut bindings::platform_device) -> kernel::ffi::c_int {
+         // SAFETY: The platform bus only ever calls the probe callback with a valid `pdev`.
+-        let dev = unsafe { device::Device::get_device(addr_of_mut!((*pdev).dev)) };
++        let dev = unsafe { device::Device::get_device(&raw mut (*pdev).dev) };
+         // SAFETY: `dev` is guaranteed to be embedded in a valid `struct platform_device` by the
+         // call above.
+         let mut pdev = unsafe { Device::from_dev(dev) };
+diff --git a/rust/kernel/rbtree.rs b/rust/kernel/rbtree.rs
+index 1ea25c7092fb..b0ad35663cb0 100644
+--- a/rust/kernel/rbtree.rs
++++ b/rust/kernel/rbtree.rs
+@@ -11,7 +11,7 @@
+     cmp::{Ord, Ordering},
+     marker::PhantomData,
+     mem::MaybeUninit,
+-    ptr::{addr_of_mut, from_mut, NonNull},
++    ptr::{from_mut, NonNull},
+ };
+ 
+ /// A red-black tree with owned nodes.
+@@ -238,7 +238,7 @@ pub fn values_mut(&mut self) -> impl Iterator<Item = &'_ mut V> {
+ 
+     /// Returns a cursor over the tree nodes, starting with the smallest key.
+     pub fn cursor_front(&mut self) -> Option<Cursor<'_, K, V>> {
+-        let root = addr_of_mut!(self.root);
++        let root = &raw mut self.root;
+         // SAFETY: `self.root` is always a valid root node
+         let current = unsafe { bindings::rb_first(root) };
+         NonNull::new(current).map(|current| {
+@@ -253,7 +253,7 @@ pub fn cursor_front(&mut self) -> Option<Cursor<'_, K, V>> {
+ 
+     /// Returns a cursor over the tree nodes, starting with the largest key.
+     pub fn cursor_back(&mut self) -> Option<Cursor<'_, K, V>> {
+-        let root = addr_of_mut!(self.root);
++        let root = &raw mut self.root;
+         // SAFETY: `self.root` is always a valid root node
+         let current = unsafe { bindings::rb_last(root) };
+         NonNull::new(current).map(|current| {
+@@ -459,7 +459,7 @@ pub fn cursor_lower_bound(&mut self, key: &K) -> Option<Cursor<'_, K, V>>
+         let best = best_match?;
+ 
+         // SAFETY: `best` is a non-null node so it is valid by the type invariants.
+-        let links = unsafe { addr_of_mut!((*best.as_ptr()).links) };
++        let links = unsafe { &raw mut (*best.as_ptr()).links };
+ 
+         NonNull::new(links).map(|current| {
+             // INVARIANT:
+@@ -767,7 +767,7 @@ pub fn remove_current(self) -> (Option<Self>, RBTreeNode<K, V>) {
+         let node = RBTreeNode { node };
+         // SAFETY: The reference to the tree used to create the cursor outlives the cursor, so
+         // the tree cannot change. By the tree invariant, all nodes are valid.
+-        unsafe { bindings::rb_erase(&mut (*this).links, addr_of_mut!(self.tree.root)) };
++        unsafe { bindings::rb_erase(&mut (*this).links, &raw mut self.tree.root) };
+ 
+         let current = match (prev, next) {
+             (_, Some(next)) => next,
+@@ -803,7 +803,7 @@ fn remove_neighbor(&mut self, direction: Direction) -> Option<RBTreeNode<K, V>>
+             let neighbor = neighbor.as_ptr();
+             // SAFETY: The reference to the tree used to create the cursor outlives the cursor, so
+             // the tree cannot change. By the tree invariant, all nodes are valid.
+-            unsafe { bindings::rb_erase(neighbor, addr_of_mut!(self.tree.root)) };
++            unsafe { bindings::rb_erase(neighbor, &raw mut self.tree.root) };
+             // SAFETY: By the type invariant of `Self`, all non-null `rb_node` pointers stored in `self`
+             // point to the links field of `Node<K, V>` objects.
+             let this = unsafe { container_of!(neighbor, Node<K, V>, links) }.cast_mut();
+@@ -918,7 +918,7 @@ unsafe fn to_key_value_raw<'b>(node: NonNull<bindings::rb_node>) -> (&'b K, *mut
+         let k = unsafe { &(*this).key };
+         // SAFETY: The passed `node` is the current node or a non-null neighbor,
+         // thus `this` is valid by the type invariants.
+-        let v = unsafe { addr_of_mut!((*this).value) };
++        let v = unsafe { &raw mut (*this).value };
+         (k, v)
+     }
+ }
+@@ -1027,7 +1027,7 @@ fn next(&mut self) -> Option<Self::Item> {
+         self.next = unsafe { bindings::rb_next(self.next) };
+ 
+         // SAFETY: By the same reasoning above, it is safe to dereference the node.
+-        Some(unsafe { (addr_of_mut!((*cur).key), addr_of_mut!((*cur).value)) })
++        Some(unsafe { (&raw mut (*cur).key, &raw mut (*cur).value) })
+     }
+ }
+ 
+@@ -1170,7 +1170,7 @@ fn insert(self, node: RBTreeNode<K, V>) -> &'a mut V {
+ 
+         // SAFETY: `node` is valid at least until we call `Box::from_raw`, which only happens when
+         // the node is removed or replaced.
+-        let node_links = unsafe { addr_of_mut!((*node).links) };
++        let node_links = unsafe { &raw mut (*node).links };
+ 
+         // INVARIANT: We are linking in a new node, which is valid. It remains valid because we
+         // "forgot" it with `Box::into_raw`.
+@@ -1178,7 +1178,7 @@ fn insert(self, node: RBTreeNode<K, V>) -> &'a mut V {
+         unsafe { bindings::rb_link_node(node_links, self.parent, self.child_field_of_parent) };
+ 
+         // SAFETY: All pointers are valid. `node` has just been inserted into the tree.
+-        unsafe { bindings::rb_insert_color(node_links, addr_of_mut!((*self.rbtree).root)) };
++        unsafe { bindings::rb_insert_color(node_links, &raw mut (*self.rbtree).root) };
+ 
+         // SAFETY: The node is valid until we remove it from the tree.
+         unsafe { &mut (*node).value }
+@@ -1261,7 +1261,7 @@ fn replace(self, node: RBTreeNode<K, V>) -> RBTreeNode<K, V> {
+ 
+         // SAFETY: `node` is valid at least until we call `Box::from_raw`, which only happens when
+         // the node is removed or replaced.
+-        let new_node_links = unsafe { addr_of_mut!((*node).links) };
++        let new_node_links = unsafe { &raw mut (*node).links };
+ 
+         // SAFETY: This updates the pointers so that `new_node_links` is in the tree where
+         // `self.node_links` used to be.
+diff --git a/rust/kernel/sync/arc.rs b/rust/kernel/sync/arc.rs
+index 3cefda7a4372..81d8b0f84957 100644
+--- a/rust/kernel/sync/arc.rs
++++ b/rust/kernel/sync/arc.rs
+@@ -243,7 +243,7 @@ pub fn into_raw(self) -> *const T {
+         let ptr = self.ptr.as_ptr();
+         core::mem::forget(self);
+         // SAFETY: The pointer is valid.
+-        unsafe { core::ptr::addr_of!((*ptr).data) }
++        unsafe { &raw const (*ptr).data }
+     }
+ 
+     /// Recreates an [`Arc`] instance previously deconstructed via [`Arc::into_raw`].
+diff --git a/rust/kernel/task.rs b/rust/kernel/task.rs
+index 49012e711942..b2ac768eed23 100644
+--- a/rust/kernel/task.rs
++++ b/rust/kernel/task.rs
+@@ -257,7 +257,7 @@ pub fn as_ptr(&self) -> *mut bindings::task_struct {
+     pub fn group_leader(&self) -> &Task {
+         // SAFETY: The group leader of a task never changes after initialization, so reading this
+         // field is not a data race.
+-        let ptr = unsafe { *ptr::addr_of!((*self.as_ptr()).group_leader) };
++        let ptr = unsafe { *(&raw const (*self.as_ptr()).group_leader) };
+ 
+         // SAFETY: The lifetime of the returned task reference is tied to the lifetime of `self`,
+         // and given that a task has a reference to its group leader, we know it must be valid for
+@@ -269,7 +269,7 @@ pub fn group_leader(&self) -> &Task {
+     pub fn pid(&self) -> Pid {
+         // SAFETY: The pid of a task never changes after initialization, so reading this field is
+         // not a data race.
+-        unsafe { *ptr::addr_of!((*self.as_ptr()).pid) }
++        unsafe { *(&raw const (*self.as_ptr()).pid) }
+     }
+ 
+     /// Returns the UID of the given task.
+diff --git a/rust/kernel/workqueue.rs b/rust/kernel/workqueue.rs
+index 0cd100d2aefb..34e8abb38974 100644
+--- a/rust/kernel/workqueue.rs
++++ b/rust/kernel/workqueue.rs
+@@ -401,9 +401,9 @@ pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self
+     pub unsafe fn raw_get(ptr: *const Self) -> *mut bindings::work_struct {
+         // SAFETY: The caller promises that the pointer is aligned and not dangling.
+         //
+-        // A pointer cast would also be ok due to `#[repr(transparent)]`. We use `addr_of!` so that
+-        // the compiler does not complain that the `work` field is unused.
+-        unsafe { Opaque::raw_get(core::ptr::addr_of!((*ptr).work)) }
++        // A pointer cast would also be ok due to `#[repr(transparent)]`. We use `&raw const (*ptr).work`
++        // so that the compiler does not complain that the `work` field is unused.
++        unsafe { Opaque::raw_get(&raw const (*ptr).work) }
+     }
+ }
+ 
+@@ -510,7 +510,7 @@ macro_rules! impl_has_work {
+             unsafe fn raw_get_work(ptr: *mut Self) -> *mut $crate::workqueue::Work<$work_type $(, $id)?> {
+                 // SAFETY: The caller promises that the pointer is not dangling.
+                 unsafe {
+-                    ::core::ptr::addr_of_mut!((*ptr).$field)
++                    &raw mut (*ptr).$field
+                 }
+             }
+         }
+-- 
+2.48.1
 
