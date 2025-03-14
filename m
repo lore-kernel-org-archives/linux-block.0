@@ -1,109 +1,132 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828862E336A
-	for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 13:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AB61F4716
+	for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 14:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741959980; cv=none; b=Sw6gEvjRsDaBv4ux7YNlWYDKsDUcYKR+o/d6r8Xw3b2i3nQFaxRWpc/WXSBrloilhRgD3b3uyV3dQXIAkaEYv6BYYpZsc/3/KaSc1rFaGMg+IDV4gxoN+sLtNNvkA1nmTsY4txn5s91a5K1FiOnvybX3Ox8jdPXURy53evhTC3A=
+	t=1741964006; cv=none; b=BaDE987U8IsjbwDtAGZziv43NoHFZNG4tNVGytAjfji9sorIyTkhenwhp9EuGr5/ErQ3IXQc0s8FhakHIJUQvUKSWttzNGyzNcojaXMeSOT0tu1EEEQLqHeerWBm0Ha7A5SLgCQkTmf6e8M3pNTbs0fB8JXiiqK6Acr1FU9LcYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741959980; c=relaxed/simple;
-	bh=CMosphvIKObhrydM+YJMtYd9w5/5+7A3bY1ZPhjerxk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=lw5lSKb3Epq7Wgnb/2UdrZ1PAnP3MC92No9qJ2wbmAjNkwZs9zlaGj3TzaTUM8BhDATuwZOuUpaTjbp5Rpvk/poAQ6I+L/qMotujV+6INMONORH0yry/uDWwHBfGSHXgEerYZXDkYboK1yOd0Aww2Ni5VHNP6lr76w4gcD3zqbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X4Knb+b8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741964006; c=relaxed/simple;
+	bh=35mBIMYKOqRLZT04hOvrAl8Z7XOvI7OMdSANAGvALNg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=afVzqX+sekbmvb9xqxiIrDc9DmhG4am8sFAOZn2r25+jjLuE+MF9gRLBu+5vTBg0oI2IzlgP7G3z2WBfJsfgjh7bGsESxFVvAXaL2i0kqwua5iVp2RN5ehnMoYOzBvJ6A6kOmPO2Mf9jz5vXx7yw93tlAkbOMjnSWcse4B3agRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H4ghaqQk; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X4Knb+b8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741959977;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bpaiR54VREhXZFyomjKr4V+aMQOgKWe9LPRjtR3j5E8=;
-	b=X4Knb+b8zpQ2EtZxI+YzMS3W/YmO+2Gvuww7C5bQJcWghXyNdqLH0gRmGUmEGmZb007rvi
-	U/P23OBTlIugQ9TlIi/3o2IH7LaIvBeLfWKHYaY+2RK3Qjh2eKFC6EvaoGegKj27VhOSdv
-	QVTXJhK6Q5LFX7H9H2ic1Mq0TnH8ye4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-YdDR5skXPNehbMugQ1myXQ-1; Fri,
- 14 Mar 2025 09:46:14 -0400
-X-MC-Unique: YdDR5skXPNehbMugQ1myXQ-1
-X-Mimecast-MFC-AGG-ID: YdDR5skXPNehbMugQ1myXQ_1741959973
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BD8619560B7;
-	Fri, 14 Mar 2025 13:46:12 +0000 (UTC)
-Received: from [10.22.82.75] (unknown [10.22.82.75])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A43981954B32;
-	Fri, 14 Mar 2025 13:46:09 +0000 (UTC)
-Date: Fri, 14 Mar 2025 14:46:06 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-cc: Benjamin Marzinski <bmarzins@redhat.com>, 
-    Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-    dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-    Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 3/7] dm: handle failures in dm_table_set_restrictions
-In-Reply-To: <ad565ffc-d34e-7c24-ab2b-aad4774f92f1@redhat.com>
-Message-ID: <260b3f5f-a58e-0815-6d27-7efff0e1fc76@redhat.com>
-References: <20250309222904.449803-1-bmarzins@redhat.com> <20250309222904.449803-4-bmarzins@redhat.com> <9b5ff861-964d-472c-9267-5e5b10186ed3@kernel.org> <Z88jTxQqoLitl4ee@redhat.com> <Z88sP2WyotRbTd2E@redhat.com> <60f0f94c-3c80-4806-82aa-04ace428b4d4@kernel.org>
- <ad565ffc-d34e-7c24-ab2b-aad4774f92f1@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H4ghaqQk"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3cfeff44d94so7434495ab.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 07:53:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1741964001; x=1742568801; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ocb12fwyeVfviG3UI6QA2CNOWbf9Abl8GuGxnQTrHhY=;
+        b=H4ghaqQkiWErm/eXafHt1vM9/kRWZSUiixh0HrGOzUNsdOtnfGDIJj1DmyKGms4nT5
+         RWYzSWeLa9tYdwunIX3Jxop9ey8jFcSwWBL1kVEPMYExx621otvbBzQMgNA/Zq7l7Fz9
+         t42lw0Dk3ah7wGCBzT9ZqeZonkjUNCadBmmRr6bItNYRvsMglVy9/2wTkFVl4C52jtkM
+         dVu2h+OdwVzxGCQK2epkuHzOdwgtQut+Sz1UCBSDgE1PYzeqpFQMdUGB14JoMKi8ppjA
+         +Spa61gD/zq5QAxX4z7NQ46d4i+OE+ijtnlfidjhzftwOYm5GlhHRwTqr8s/ejb0caHD
+         4Rmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741964001; x=1742568801;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ocb12fwyeVfviG3UI6QA2CNOWbf9Abl8GuGxnQTrHhY=;
+        b=q0NriZOOC+QDu2s1CTgOB014Fwg/ZntexIoxCVdlHNlY0IImXb4zUZTwv7nsmw6hBV
+         VfEH/8hzDafhKDa5mT2R748vpLULDqNvb1WKZID5V8V8XLZv/xN2BdkIu7nXVPqvp1a4
+         719h1nNd7vCOuAdHQNkjKVQ30cmEJ+V0+df065CHoy+KrKYlHvlZOgLRKcuPHCVCY7V8
+         TyCErxj5GiVRaKAjFXjCaVP9eBEbv4tdNpFlkbU0AWvhGuyQ22YwUYvSc1rFEsvMYH+V
+         BfvLcxmqyn1wcrf6+ipDg4vR/MDTY30oEGsIgsChxljGmI+Y3cy+FPwfyLFDhMPfLNB1
+         VKbw==
+X-Gm-Message-State: AOJu0Yw9rFESd3FwlVX44twMTpu5CoRL8gYXwsqsHrRB1z6Dy/+w5wGc
+	3/AUGJEtg6qMrzMvGCSZy/cEyeFvrgkF7cwpc3j3ycyjl5tlLYL72PbZPT6sgJpOYy7et93roVx
+	W
+X-Gm-Gg: ASbGncs2rknEp5qMIVX0JoprYoqUOcnYKpLRNamFvg7H0TdnmZcc7VXBnj7MtLQedoR
+	aEvGlYdZ315nzCF8Qqk9FuUM6y1oj6PI6yR/EEBGsLFCMsxohA8OkN+mc1h/eg2GheR0beYssWd
+	aVOYfeDfUS/vcSeR7tkNalFtkbi1NCnfAMenWZZBQdW23c0r+52PlO5jF+Z8jF+A9oMiByN7BxR
+	3lNIxWqoFDoI01HX1jnxVSBgj4qcO0T2y9pb8FxnhDNARb6vNMk/1cOpbHzXOJSkfxxXZuiRkE9
+	kQ5ChpDTTVMSoRf2GNpbNBqtCcyHq5XZ7SdzEuVk7Q==
+X-Google-Smtp-Source: AGHT+IE+IhCFE8W2RkMDKHTTcDkB6+CJYT7lS8sqv8qYpaJNKkctnLnnyOU8FGAwN7VjwoGhbyqPSA==
+X-Received: by 2002:a05:6e02:1a27:b0:3d1:78f1:8a9e with SMTP id e9e14a558f8ab-3d483a80000mr26166085ab.20.1741964001194;
+        Fri, 14 Mar 2025 07:53:21 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2638147bcsm883298173.120.2025.03.14.07.53.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Mar 2025 07:53:20 -0700 (PDT)
+Message-ID: <8bb4ab47-d557-4017-ba70-308ad3251c94@kernel.dk>
+Date: Fri, 14 Mar 2025 08:53:20 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.14-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi Linus,
+
+Set of fixes that should go into the 6.14-rc7 kernel. This pull request
+contains:
+
+- NVMe pull request via Keith
+	- Concurrent pci error and hotplug handling fix (Keith)
+	- Endpoint function fixes (Damien)
+
+- Fix for a regression introduced in this cycle with error checking for
+  batched request completions (Shin'ichiro)
+
+Please pull!
 
 
+The following changes since commit e7112524e5e885181cc5ae4d258f33b9dbe0b907:
 
-On Fri, 14 Mar 2025, Mikulas Patocka wrote:
+  block: Name the RQF flags enum (2025-03-06 17:50:55 -0700)
 
-> 
-> 
-> On Tue, 11 Mar 2025, Damien Le Moal wrote:
-> 
-> > Yes, for simple scalar limits, I do not think there is any issue. But there are
-> > some cases where changing one limit implies a change to other limits when the
-> > limits are committed (under the limits lock). So my concern was that if the
-> > above runs simultaneously with a queue limits commit, we may endup with the
-> > limits struct copy grabbing part of the new limits and thus resulting in an
-> > inconsistent limits struct. Not entirely sure that can actually happen though.
-> > But given that queue_limits_commit_update() does:
-> > 
-> > 	q->limits = *lim;
-> > 
-> > and this code does:
-> > 
-> > 	old_limits = q->limits;
-> > 
-> > we may endup depending on how the compiler handles the struct copy ?
-> 
-> There is no guarantee that struct copy will update the structure fields 
-> atomically.
-> 
-> On some CPUs, a "rep movsb" instruction may be used, which may be 
-> optimized by the CPU, but it may be also interrupted at any byte boundary.
-> 
-> I think it should be changed to the sequence of WRITE_ONCE statements, for 
-> example:
-> WRITE_ONCE(q->limits->file, lim->field);
-> 
-> Mikulas
+are available in the Git repository at:
 
-BTW. some SPARC CPUs had an instruction that would zero a cache line 
-without loading it from memory. The memcpy implementation on SPARC used 
-this instruction to avoid loading data that would be soon overwritten.
+  git://git.kernel.dk/linux.git tags/block-6.14-20250313
 
-The result was that if you read a region of memory concurrently with 
-memcpy writing to it, you could read zeros produced by this instruction.
+for you to fetch changes up to a9381351dd6c52bf465233cae5f50da227834607:
 
-Mikulas
+  Merge tag 'nvme-6.14-2025-03-13' of git://git.infradead.org/nvme into block-6.14 (2025-03-13 09:41:57 -0600)
+
+----------------------------------------------------------------
+block-6.14-20250313
+
+----------------------------------------------------------------
+Damien Le Moal (2):
+      nvmet: pci-epf: Set NVMET_PCI_EPF_Q_LIVE when a queue is fully created
+      nvmet: pci-epf: Do not add an IRQ vector if not needed
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.14-2025-03-13' of git://git.infradead.org/nvme into block-6.14
+
+Keith Busch (1):
+      nvme-pci: fix stuck reset on concurrent DPC and HP
+
+Shin'ichiro Kawasaki (2):
+      nvme: move error logging from nvme_end_req() to __nvme_end_req()
+      block: change blk_mq_add_to_batch() third argument type to bool
+
+ drivers/block/null_blk/main.c |  4 ++--
+ drivers/block/virtio_blk.c    |  5 +++--
+ drivers/nvme/host/apple.c     |  3 ++-
+ drivers/nvme/host/core.c      | 12 ++++++------
+ drivers/nvme/host/pci.c       | 18 +++++++++++++++---
+ drivers/nvme/target/pci-epf.c | 28 ++++++++++++++--------------
+ include/linux/blk-mq.h        | 16 ++++++++++++----
+ 7 files changed, 54 insertions(+), 32 deletions(-)
+
+-- 
+Jens Axboe
 
