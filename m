@@ -1,126 +1,690 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19B21DE89E;
-	Fri, 14 Mar 2025 22:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D92E1991C1
+	for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 22:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741990899; cv=none; b=e6UKPRRLbyBwDu0GB+AMOaVpWPIgiyhKUCbCW38khlswhdElFJBXE5+nbEXgAt826OZO1XDQZIthFPpnFRPVGl+6e5D7Oc+RuzAoRk81rz6h13lhA8SKmhG1HsCbsEuSuNI+RO6jHO6IkuMAVT9LY0EFYBzHPTmlzE0kJ1MYP08=
+	t=1741991286; cv=none; b=afhfoL8dRHq6a6DITf15xgO9hs0GhsJ+Soz3EC4NW67fKW5EOf2PU/0HsdHA4gx2wvapcGTSRVsapYBqI3X0Ol6MtT2GwqwOdiF0tC9CrqMcvUi7ca9FBrCsoqgvVTNdxD+/N2A884D9hGhG/sOxCYmTLzxzWgVvvPcBSE7W9TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741990899; c=relaxed/simple;
-	bh=bNHo813I0F32BNqKbJfaolMlVwl7tD0FMX9RWCWB8Vc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mgpSMWcpIv0zUfg6KAhRWYETVOe8eu1DBEF41y339JvTd86lri8mthr0YJdJNvkSD8L75QHW2FwAM92MkwBPNtr0czRjiT3JBvTDBCQXwzIyVh5Ud8GOSkc35Imid0Q6IP4kwg2rYnNrOebCYa5L99VUIzBkKceje8ugYKleNaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nQFlgxAW; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741991286; c=relaxed/simple;
+	bh=1Q9AXu5bLTb6dB1YPbDvV6DVY+k+FxmpfD9pb0jNUxo=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 MIME-Version:Date; b=Iy8QfHVBR1ekgMPY6zCF3AGOCejfj1X1LogrhEgV5MNoY1i5vZut7K4c8stMhc3nJq/SrwNWw0DvHWQZ8wSeAQhebFvfkRfYVDT1ml/DbyH4Fz6C7reokN3sZCfvLNcoGCE6ZZU0iyMIKrwDznN7PESlAK/zX0YgEGstigOSt/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=vGT6het8; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQFlgxAW"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30bf5d7d107so22638701fa.2;
-        Fri, 14 Mar 2025 15:21:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="vGT6het8"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2c1c4e364c8so1128131fac.1
+        for <linux-block@vger.kernel.org>; Fri, 14 Mar 2025 15:28:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741990895; x=1742595695; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1741991283; x=1742596083; darn=vger.kernel.org;
+        h=user-agent:date:mime-version:content-transfer-encoding:references
+         :in-reply-to:cc:to:from:subject:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bNHo813I0F32BNqKbJfaolMlVwl7tD0FMX9RWCWB8Vc=;
-        b=nQFlgxAWeRyp5XvSJy2I6SI5gWxlRZ9nIwGM8e0QHz2TlNvyKrv6ryAcEve/ZORFyk
-         P/ilmoeKl19f/IKMqVJHqcM5nA8qZUCMF9LfN/VBa0YgdNgk+LqXI+v7sCQGGIz8v1Kl
-         fIVtoIQAti9rB3+9UT43CzD+kvDrTsuhWdVgKsX8lfZORzz+2mhcr+bag8eYogkutnBY
-         /Mm5SIzeVvsSVlfkttqSETNDHqHIV1Sd+PCAwXZQbAzcgz9rP468i07Y075EIeTsG7k5
-         3WDWrsBs+ANjly7Shw93k/kOsOFzDHNFFaT9y4E1fecsdGedpfNy/QKycsD3m9ixtjpM
-         98Gw==
+        bh=feac0ze6HikpkxtN6hDRr2IbhULf7JuQ3eA4z9EYJD0=;
+        b=vGT6het8u8EeLIhEnMN2esBwXgzM+DXnqEuGIar+5BJc5bRkYUMrjTaQCMrK22B9YL
+         r+h35dMPEKDi15nsLGaP3//+YQ+aRrKFC9qyvmj0MCmJ2fuvA+IrPOI2wSdXlNPojWLz
+         8xNH2bNvyj/TGLl1uufR56FBNhGOeBXFWhEGz4FfS7W/or+qoBmM5puwnHvtIPU1Ojqd
+         btZX85bTW2T4aRpCUSGC0E/nacYRjR80k6jlJ8kRdgjJDNEQs61Qn3wD8PBPhQ3tCie7
+         q8ZnHAHVyxfaNUo4BehnSAG8fnuE4L6rjKfLqh2G9OqhEaCXxHEs2r/5lciQAF0xeYeT
+         HRjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741990895; x=1742595695;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bNHo813I0F32BNqKbJfaolMlVwl7tD0FMX9RWCWB8Vc=;
-        b=ZjMxqquGARzF63VwxzpQaH7b22yJm2nQKW/IJqrGZl9eBjvLBF36YLldkv0MgjzFJw
-         CprHtIKX0ZD2q+Tm/WNW8vDqnsLS5IxdHnfKWBal6Kyj8j3WOAf2+WBr4vCHX0TG7sp+
-         +Otwbbxvn5UVWJ9RHcg0cBoUBDbXLLeEoR4hWt8uGPMsKD2K7r4T57Gl67KJza9ygk/I
-         IdwEQuVdDj62Bd0V/XvgyYXbvl97j3rC2SV/kGV3XUcz3Y5vtPomPW0ivhwnU+ZRgHPZ
-         7FF5c2Z7n3SQvQCpXx48h2GOwqyYk7Ou8j1ZFbyOsMjnAQvaBhjJ9zq2RM+rXM8ol57R
-         BoIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEjAlunbZ6VH1RiZgRSDgiTXSbzZM7IbLRopv1Vso8YDRtoIIOl5x+9MMG2frxC82UIxkWVq895pV8XBY=@vger.kernel.org, AJvYcCUoTJqU2YQ2AL40wGxUFMV0G753y7ILO8o7fIxPRRuJcAs4h6TcXcPZPR2bMShggcOxKFOPUq/c4L9y@vger.kernel.org, AJvYcCUttC/SF0b+KHZ8/jOHpeipn046y22zFKBiTqUm1vUfuvINSZY9S2VAOxFg7La+sH+ObbV29uzrXkbTPhAt@vger.kernel.org, AJvYcCWTZC6OZFsB2iLW8pdedud66Pt82QGwCkahpM8w6R+S/hAbTs+3jMr/wJ01GX84Y/JBkHv0zKXGOCRYyWqbxBQ=@vger.kernel.org, AJvYcCXBKXgNeFSfSo6kFIOdF7XqA+k3AXjH+T9aSlyERoJ/G4RV8c8TMMLfAbPNw5kBgmaGoB4cGc26Y0AzoXjO@vger.kernel.org, AJvYcCXPPHcjmHg1Xw10vUdsrwjlcIBtfaVE3ja+MpuglEMmYVSsDFniBkSR/Ds++1dygyle84JqnRfAaJh5icSIf2MR@vger.kernel.org, AJvYcCXo13tZhrrRBQcMFCzy+2RCRoVqKKPftkDR5PlZ/nWLWt96YlllTD/n2toj6zZzRJHL9n7iPiPKLGTr@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNCR48cdAiaMU0gYfxgmmYn79HRsAk/HObcZsWlcQei/cBr34q
-	jXXMXRtInm7JNvUwspxjtnSQb+XNxW7Iq9+S3tsNXcUEh0fIgcrAQZNu3GnSr4sWgcExx/cYODc
-	hgUo+u5Y/aro7qml/stYPT2L6td0=
-X-Gm-Gg: ASbGncudvqn4RzoEjVNw7axKkbecSbvjXSS10Kjq96ZRhLha60z+h0Q7aFFcO0fxcNg
-	oZ0z5byUS3qsURxm9QYajejBrvYzJexecJAlTDeIwqUzKwFrERXn8eFz78oMDrTgkijZP64W+5B
-	UZH82lZ00Fez5FT0bpzgEZgts7qmdfG8taa8u1OLLH4otZP9fGqk3DDWw+SWWa
-X-Google-Smtp-Source: AGHT+IGyBV9m3L4w8t2OrUSMAwxoyxvAW/4fi81XmciRP3/5Az2O5GNUknnICX9axlKWv4h/L/9eWm6e7JTJiZoyVC4=
-X-Received: by 2002:a05:651c:a0b:b0:30b:d562:c154 with SMTP id
- 38308e7fff4ca-30c4a875fe6mr14747691fa.19.1741990895355; Fri, 14 Mar 2025
- 15:21:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741991283; x=1742596083;
+        h=user-agent:date:mime-version:content-transfer-encoding:references
+         :in-reply-to:cc:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=feac0ze6HikpkxtN6hDRr2IbhULf7JuQ3eA4z9EYJD0=;
+        b=Mm6Eg2CZhgWBLsxmOn3hhZP9W/Nnzd95DDb+iwEjvame961pQETGI2cN6ZqxQ35pBX
+         3O/kUKoqs6zFJSfsMFOfyCa4o2NmGjUJ8+2myK9IFngtf8H7N+LkWp1pz7xuheS8aYsq
+         4osqUUtY5kUzkLfol6SKsLeinbLZCw+CnBBtJao9SKKAV6CiZgNPdbxgGAYcotvZZv2C
+         Ucsv7x8irJW2ILLfHG2YxfMOTwHmkHoO8r6y/ae6vSMBWZvWqWDKMflxi176AhA5TO0a
+         Bym+v6z7bmTyuKpFOwZYkPpwFlBid9evxEVRbrBkboCbadV5MKCzO+nRGCiq2yXTQlA4
+         vi6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWWmd+NHjNCyowZhR1Pa2CfoWQEV3sQedp40UqwwGamARcishdtxI5T2qHVDzm3op/1YOCUBjoJpCJBMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS4Pn8da3uaN3Q0xQet3KOLN7MqJ4UkEdWKqUDdEDjObNQWIzu
+	e6uTIxLBDIk0nc3eX7AYyX82Kv+J69S9GEUgfDlDDD3Fq9aEp+T4z65CQOC98Cs=
+X-Gm-Gg: ASbGncv/O2np8125iePU4aZBRK5z4L6bwIdtN5ViGyi3Y81kzTWVJz3rKhmFaRhJan5
+	GRzqG+XbB8wx7nHKZ3rzGpBuxyqtIkBmWI/x3bSLzwIbjM2IJkn2f6oX4UaF5n5oMAN4H/H18qc
+	h+XPSKWPEsVIr1PsAo/niecO6UbDszzCQm9VvTnDZFjcVA7UduWmKJusFufSA/Y8CHkrAcI+NXj
+	w9o8DB8ksjcCIQBBt2A0zOZjgFSq/okbrfca6TYhjWGjaBjzGptqWORiBeRE/OGAlHC6W7b97Q1
+	APA1fHfUsFiVCS94UMxcHBlW0IhL03bN+WRfFKkmOiMtRCnizHr4V3sbUVe7Pxf96xC5kFIYWxQ
+	HKtSAS3TWkGlpuS72
+X-Google-Smtp-Source: AGHT+IEcQVrM4yLizX+SD244NBQDUc/jbsxy9pjrTkVucbdKWDx8L13qOVLUAha8gMUagXg96TfntQ==
+X-Received: by 2002:a05:6871:3285:b0:2b8:92f0:ba5d with SMTP id 586e51a60fabf-2c66f88b26fmr4484637fac.8.1741991282937;
+        Fri, 14 Mar 2025 15:28:02 -0700 (PDT)
+Received: from ?IPv6:2600:1700:6476:1430:7a51:a450:8c55:68d0? ([2600:1700:6476:1430:7a51:a450:8c55:68d0])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c67100aa32sm1039831fac.12.2025.03.14.15.28.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 15:28:01 -0700 (PDT)
+Message-ID: <a62918950646701cb9bb2ab0a32c87b53e2f102e.camel@dubeyko.com>
+Subject: Re: [RFC PATCH 04/35] ceph: Convert ceph_mds_request::r_pagelist
+ to a databuf
+From: slava@dubeyko.com
+To: David Howells <dhowells@redhat.com>, Alex Markuze <amarkuze@redhat.com>
+Cc: Ilya Dryomov <idryomov@gmail.com>, Jeff Layton <jlayton@kernel.org>, 
+ Dongsheng Yang <dongsheng.yang@easystack.cn>, ceph-devel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, 	linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Slava.Dubeyko@ibm.com
+In-Reply-To: <20250313233341.1675324-5-dhowells@redhat.com>
+References: <20250313233341.1675324-1-dhowells@redhat.com>
+	 <20250313233341.1675324-5-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com>
- <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <D8G9LZCS7ETL.9UPPQ73CAUQM@proton.me>
- <CANiq72=JCgdmd+h4_2VguOO9kxdx3OuTqUmpLix3mTLLHLKbZw@mail.gmail.com>
-In-Reply-To: <CANiq72=JCgdmd+h4_2VguOO9kxdx3OuTqUmpLix3mTLLHLKbZw@mail.gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Fri, 14 Mar 2025 18:20:59 -0400
-X-Gm-Features: AQ5f1Jp7KldemuJS7KUxPUxPs7sBfWHcTu3t4bd_hn0YFX45gGFgXjsgYG75HQw
-Message-ID: <CAJ-ks9=Ec0xLg81GUYJ07uDzwtwhFkoEdxaa3kNtV6xSjZ57MQ@mail.gmail.com>
-Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Benno Lossin <benno.lossin@proton.me>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date: Fri, 14 Mar 2025 15:27:55 -0700
+User-Agent: Evolution 3.54.3 (by Flathub.org) 
 
-On Fri, Mar 14, 2025 at 6:00=E2=80=AFPM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Fri, Mar 14, 2025 at 9:18=E2=80=AFPM Benno Lossin <benno.lossin@proton=
-.me> wrote:
-> >
-> > I don't know when we'll be bumping the minimum version. IIRC 1.85.0 is
-> > going to be in debian trixie, so eventually we could bump it to that,
-> > but I'm not sure what the time frame will be for that.
-> >
-> > Maybe we can salvage this effort by gating both the lint and the
-> > unstable features on the versions where it works? @Miguel, what's your
-> > opinion?
-> >
-> > We could even make it simple, requiring 1.84 and not bothering with the
-> > older versions.
->
-> Regarding Debian Trixie: unknown, since my understanding is that it
-> does not have a release date yet, but apparently mid May is the Hard
-> Freeze and then it may take e.g. a month or two to the release.
->
-> And when it releases, we may want to wait a while before bumping it,
-> depending on how much time has passed since Rust 1.85.0 and depending
-> on whether we managed to get e.g. Ubuntu LTSs to provide a versioned
-> package etc.
->
-> If something simple works, then let's just go for that -- we do not
-> care too much about older versions for linting purposes, since people
-> should be testing with the latest stable too anyway.
+On Thu, 2025-03-13 at 23:32 +0000, David Howells wrote:
+> Convert ceph_mds_request::r_pagelist to a databuf, along with the
+> stuff
+> that uses it such as setxattr ops.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Viacheslav Dubeyko <slava@dubeyko.com>
+> cc: Alex Markuze <amarkuze@redhat.com>
+> cc: Ilya Dryomov <idryomov@gmail.com>
+> cc: ceph-devel@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> =C2=A0fs/ceph/acl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 39 ++++++=
+++++----------
+> =C2=A0fs/ceph/file.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 12 ++++---
+> =C2=A0fs/ceph/inode.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 85 ++++++++++++++++=
++++-----------------------
+> --
+> =C2=A0fs/ceph/mds_client.c | 11 +++---
+> =C2=A0fs/ceph/mds_client.h |=C2=A0 2 +-
+> =C2=A0fs/ceph/super.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
+> =C2=A0fs/ceph/xattr.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 68 +++++++++++++++-=
+-------------------
+> =C2=A07 files changed, 96 insertions(+), 123 deletions(-)
+>=20
+> diff --git a/fs/ceph/acl.c b/fs/ceph/acl.c
+> index 1564eacc253d..d6da650db83e 100644
+> --- a/fs/ceph/acl.c
+> +++ b/fs/ceph/acl.c
+> @@ -171,7 +171,7 @@ int ceph_pre_init_acls(struct inode *dir, umode_t
+> *mode,
+> =C2=A0{
+> =C2=A0	struct posix_acl *acl, *default_acl;
+> =C2=A0	size_t val_size1 =3D 0, val_size2 =3D 0;
+> -	struct ceph_pagelist *pagelist =3D NULL;
+> +	struct ceph_databuf *dbuf =3D NULL;
+> =C2=A0	void *tmp_buf =3D NULL;
+> =C2=A0	int err;
+> =C2=A0
+> @@ -201,58 +201,55 @@ int ceph_pre_init_acls(struct inode *dir,
+> umode_t *mode,
+> =C2=A0	tmp_buf =3D kmalloc(max(val_size1, val_size2), GFP_KERNEL);
+> =C2=A0	if (!tmp_buf)
+> =C2=A0		goto out_err;
+> -	pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
+> -	if (!pagelist)
+> +	dbuf =3D ceph_databuf_req_alloc(1, PAGE_SIZE, GFP_KERNEL);
+> +	if (!dbuf)
+> =C2=A0		goto out_err;
+> =C2=A0
+> -	err =3D ceph_pagelist_reserve(pagelist, PAGE_SIZE);
+> -	if (err)
+> -		goto out_err;
+> -
+> -	ceph_pagelist_encode_32(pagelist, acl && default_acl ? 2 :
+> 1);
+> +	ceph_databuf_encode_32(dbuf, acl && default_acl ? 2 : 1);
+> =C2=A0
+> =C2=A0	if (acl) {
+> =C2=A0		size_t len =3D strlen(XATTR_NAME_POSIX_ACL_ACCESS);
+> -		err =3D ceph_pagelist_reserve(pagelist, len +
+> val_size1 + 8);
+> +		err =3D ceph_databuf_reserve(dbuf, len + val_size1 +
+> 8,
+> +					=C2=A0=C2=A0 GFP_KERNEL);
 
-It's not going to be simple because `rust_common_flags` is defined
-before the config is read, which means I'll have to sprinkle
-conditional logic in even more places to enable the lints.
+I know that it's simple change. But this len + val_size1 + 8 looks
+confusing, anyway. What this hardcoded 8 means? :)
 
-The most minimal version of this patch would drop all the build system
-changes and just have conditionally compiled polyfills for the strict
-provenance APIs. Are folks OK with that?
+
+> =C2=A0		if (err)
+> =C2=A0			goto out_err;
+> -		ceph_pagelist_encode_string(pagelist,
+> XATTR_NAME_POSIX_ACL_ACCESS,
+> -					=C2=A0=C2=A0=C2=A0 len);
+> +		ceph_databuf_encode_string(dbuf,
+> XATTR_NAME_POSIX_ACL_ACCESS,
+> +					=C2=A0=C2=A0 len);
+> =C2=A0		err =3D posix_acl_to_xattr(&init_user_ns, acl,
+> =C2=A0					 tmp_buf, val_size1);
+> =C2=A0		if (err < 0)
+> =C2=A0			goto out_err;
+> -		ceph_pagelist_encode_32(pagelist, val_size1);
+> -		ceph_pagelist_append(pagelist, tmp_buf, val_size1);
+> +		ceph_databuf_encode_32(dbuf, val_size1);
+> +		ceph_databuf_append(dbuf, tmp_buf, val_size1);
+> =C2=A0	}
+> =C2=A0	if (default_acl) {
+> =C2=A0		size_t len =3D strlen(XATTR_NAME_POSIX_ACL_DEFAULT);
+> -		err =3D ceph_pagelist_reserve(pagelist, len +
+> val_size2 + 8);
+> +		err =3D ceph_databuf_reserve(dbuf, len + val_size2 +
+> 8,
+> +					=C2=A0=C2=A0 GFP_KERNEL);
+
+Same question here. :) What this hardcoded 8 means? :)
+
+> =C2=A0		if (err)
+> =C2=A0			goto out_err;
+> -		ceph_pagelist_encode_string(pagelist,
+> -					=C2=A0
+> XATTR_NAME_POSIX_ACL_DEFAULT, len);
+> +		ceph_databuf_encode_string(dbuf,
+> +					=C2=A0=C2=A0
+> XATTR_NAME_POSIX_ACL_DEFAULT, len);
+> =C2=A0		err =3D posix_acl_to_xattr(&init_user_ns, default_acl,
+> =C2=A0					 tmp_buf, val_size2);
+> =C2=A0		if (err < 0)
+> =C2=A0			goto out_err;
+> -		ceph_pagelist_encode_32(pagelist, val_size2);
+> -		ceph_pagelist_append(pagelist, tmp_buf, val_size2);
+> +		ceph_databuf_encode_32(dbuf, val_size2);
+> +		ceph_databuf_append(dbuf, tmp_buf, val_size2);
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	kfree(tmp_buf);
+> =C2=A0
+> =C2=A0	as_ctx->acl =3D acl;
+> =C2=A0	as_ctx->default_acl =3D default_acl;
+> -	as_ctx->pagelist =3D pagelist;
+> +	as_ctx->dbuf =3D dbuf;
+> =C2=A0	return 0;
+> =C2=A0
+> =C2=A0out_err:
+> =C2=A0	posix_acl_release(acl);
+> =C2=A0	posix_acl_release(default_acl);
+> =C2=A0	kfree(tmp_buf);
+> -	if (pagelist)
+> -		ceph_pagelist_release(pagelist);
+> +	ceph_databuf_release(dbuf);
+> =C2=A0	return err;
+> =C2=A0}
+> =C2=A0
+> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+> index 851d70200c6b..9de2960748b9 100644
+> --- a/fs/ceph/file.c
+> +++ b/fs/ceph/file.c
+> @@ -679,9 +679,9 @@ static int ceph_finish_async_create(struct inode
+> *dir, struct inode *inode,
+> =C2=A0	iinfo.change_attr =3D 1;
+> =C2=A0	ceph_encode_timespec64(&iinfo.btime, &now);
+> =C2=A0
+> -	if (req->r_pagelist) {
+> -		iinfo.xattr_len =3D req->r_pagelist->length;
+> -		iinfo.xattr_data =3D req->r_pagelist->mapped_tail;
+> +	if (req->r_dbuf) {
+> +		iinfo.xattr_len =3D ceph_databuf_len(req->r_dbuf);
+> +		iinfo.xattr_data =3D kmap_ceph_databuf_page(req-
+> >r_dbuf, 0);
+
+Possibly, it's in another patch. Have we removed req->r_pagelist from
+the structure?
+
+Do we always have memory pages in ceph_databuf? How
+kmap_ceph_databuf_page() will behave if it's not memory page.
+
+> =C2=A0	} else {
+> =C2=A0		/* fake it */
+> =C2=A0		iinfo.xattr_len =3D ARRAY_SIZE(xattr_buf);
+> @@ -731,6 +731,8 @@ static int ceph_finish_async_create(struct inode
+> *dir, struct inode *inode,
+> =C2=A0	ret =3D ceph_fill_inode(inode, NULL, &iinfo, NULL, req-
+> >r_session,
+> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 req->r_fmode, NULL);
+> =C2=A0	up_read(&mdsc->snap_rwsem);
+> +	if (req->r_dbuf)
+> +		kunmap_local(iinfo.xattr_data);
+
+Maybe, we need to hide kunmap_local() into something like
+kunmap_ceph_databuf_page()?
+
+> =C2=A0	if (ret) {
+> =C2=A0		doutc(cl, "failed to fill inode: %d\n", ret);
+> =C2=A0		ceph_dir_clear_complete(dir);
+> @@ -849,8 +851,8 @@ int ceph_atomic_open(struct inode *dir, struct
+> dentry *dentry,
+> =C2=A0			goto out_ctx;
+> =C2=A0		}
+> =C2=A0		/* Async create can't handle more than a page of
+> xattrs */
+> -		if (as_ctx.pagelist &&
+> -		=C2=A0=C2=A0=C2=A0 !list_is_singular(&as_ctx.pagelist->head))
+> +		if (as_ctx.dbuf &&
+> +		=C2=A0=C2=A0=C2=A0 as_ctx.dbuf->nr_bvec > 1)
+
+Maybe, it makes sense to call something like ceph_databuf_length()
+instead of low level access to dbuf->nr_bvec?
+
+> =C2=A0			try_async =3D false;
+> =C2=A0	} else if (!d_in_lookup(dentry)) {
+> =C2=A0		/* If it's not being looked up, it's negative */
+> diff --git a/fs/ceph/inode.c b/fs/ceph/inode.c
+> index b060f765ad20..ec9b80fec7be 100644
+> --- a/fs/ceph/inode.c
+> +++ b/fs/ceph/inode.c
+> @@ -112,9 +112,9 @@ struct inode *ceph_new_inode(struct inode *dir,
+> struct dentry *dentry,
+> =C2=A0void ceph_as_ctx_to_req(struct ceph_mds_request *req,
+> =C2=A0			struct ceph_acl_sec_ctx *as_ctx)
+> =C2=A0{
+> -	if (as_ctx->pagelist) {
+> -		req->r_pagelist =3D as_ctx->pagelist;
+> -		as_ctx->pagelist =3D NULL;
+> +	if (as_ctx->dbuf) {
+> +		req->r_dbuf =3D as_ctx->dbuf;
+> +		as_ctx->dbuf =3D NULL;
+
+Maybe, we need something like swap() method? :)
+
+> =C2=A0	}
+> =C2=A0	ceph_fscrypt_as_ctx_to_req(req, as_ctx);
+> =C2=A0}
+> @@ -2341,11 +2341,10 @@ static int fill_fscrypt_truncate(struct inode
+> *inode,
+> =C2=A0	loff_t pos, orig_pos =3D round_down(attr->ia_size,
+> =C2=A0					=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
+> =C2=A0	u64 block =3D orig_pos >> CEPH_FSCRYPT_BLOCK_SHIFT;
+> -	struct ceph_pagelist *pagelist =3D NULL;
+> -	struct kvec iov =3D {0};
+> +	struct ceph_databuf *dbuf =3D NULL;
+> =C2=A0	struct iov_iter iter;
+> -	struct page *page =3D NULL;
+> -	struct ceph_fscrypt_truncate_size_header header;
+> +	struct ceph_fscrypt_truncate_size_header *header;
+> +	void *p;
+> =C2=A0	int retry_op =3D 0;
+> =C2=A0	int len =3D CEPH_FSCRYPT_BLOCK_SIZE;
+> =C2=A0	loff_t i_size =3D i_size_read(inode);
+> @@ -2372,37 +2371,35 @@ static int fill_fscrypt_truncate(struct inode
+> *inode,
+> =C2=A0			goto out;
+> =C2=A0	}
+> =C2=A0
+> -	page =3D __page_cache_alloc(GFP_KERNEL);
+> -	if (page =3D=3D NULL) {
+> -		ret =3D -ENOMEM;
+> +	ret =3D -ENOMEM;
+> +	dbuf =3D ceph_databuf_req_alloc(2, 0, GFP_KERNEL);
+
+So, do we allocate 2 items of zero length here?
+
+> +	if (!dbuf)
+> =C2=A0		goto out;
+> -	}
+> =C2=A0
+> -	pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
+> -	if (!pagelist) {
+> -		ret =3D -ENOMEM;
+> +	if (ceph_databuf_insert_frag(dbuf, 0, sizeof(*header),
+> GFP_KERNEL) < 0)
+> +		goto out;
+> +	if (ceph_databuf_insert_frag(dbuf, 1, PAGE_SIZE, GFP_KERNEL)
+> < 0)
+> =C2=A0		goto out;
+> -	}
+> =C2=A0
+> -	iov.iov_base =3D kmap_local_page(page);
+> -	iov.iov_len =3D len;
+> -	iov_iter_kvec(&iter, READ, &iov, 1, len);
+> +	iov_iter_bvec(&iter, ITER_DEST, &dbuf->bvec[1], 1, len);
+
+Is it correct &dbuf->bvec[1]? Why do we work with item #1? I think it
+looks confusing.
+
+> =C2=A0
+> =C2=A0	pos =3D orig_pos;
+> =C2=A0	ret =3D __ceph_sync_read(inode, &pos, &iter, &retry_op,
+> &objver);
+> =C2=A0	if (ret < 0)
+> =C2=A0		goto out;
+> =C2=A0
+> +	header =3D kmap_ceph_databuf_page(dbuf, 0);
+> +
+> =C2=A0	/* Insert the header first */
+> -	header.ver =3D 1;
+> -	header.compat =3D 1;
+> -	header.change_attr =3D
+> cpu_to_le64(inode_peek_iversion_raw(inode));
+> +	header->ver =3D 1;
+> +	header->compat =3D 1;
+> +	header->change_attr =3D
+> cpu_to_le64(inode_peek_iversion_raw(inode));
+> =C2=A0
+> =C2=A0	/*
+> =C2=A0	 * Always set the block_size to CEPH_FSCRYPT_BLOCK_SIZE,
+> =C2=A0	 * because in MDS it may need this to do the truncate.
+> =C2=A0	 */
+> -	header.block_size =3D cpu_to_le32(CEPH_FSCRYPT_BLOCK_SIZE);
+> +	header->block_size =3D cpu_to_le32(CEPH_FSCRYPT_BLOCK_SIZE);
+> =C2=A0
+> =C2=A0	/*
+> =C2=A0	 * If we hit a hole here, we should just skip filling
+> @@ -2417,51 +2414,41 @@ static int fill_fscrypt_truncate(struct inode
+> *inode,
+> =C2=A0	if (!objver) {
+> =C2=A0		doutc(cl, "hit hole, ppos %lld < size %lld\n", pos,
+> i_size);
+> =C2=A0
+> -		header.data_len =3D cpu_to_le32(8 + 8 + 4);
+> -		header.file_offset =3D 0;
+> +		header->data_len =3D cpu_to_le32(8 + 8 + 4);
+
+The same problem of understanding here for me. What this hardcoded 8 +
+8 + 4 value means? :)
+
+> +		header->file_offset =3D 0;
+> =C2=A0		ret =3D 0;
+> =C2=A0	} else {
+> -		header.data_len =3D cpu_to_le32(8 + 8 + 4 +
+> CEPH_FSCRYPT_BLOCK_SIZE);
+> -		header.file_offset =3D cpu_to_le64(orig_pos);
+> +		header->data_len =3D cpu_to_le32(8 + 8 + 4 +
+> CEPH_FSCRYPT_BLOCK_SIZE);
+
+Ditto.
+
+> +		header->file_offset =3D cpu_to_le64(orig_pos);
+> =C2=A0
+> =C2=A0		doutc(cl, "encrypt block boff/bsize %d/%lu\n", boff,
+> =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
+> =C2=A0
+> =C2=A0		/* truncate and zero out the extra contents for the
+> last block */
+> -		memset(iov.iov_base + boff, 0, PAGE_SIZE - boff);
+> +		p =3D kmap_ceph_databuf_page(dbuf, 1);
+
+Maybe, we need to introduce some constants to address #0 and #1 pages?
+Because, #0 it's header and I assume #1 is some content.
+
+> +		memset(p + boff, 0, PAGE_SIZE - boff);
+> +		kunmap_local(p);
+> =C2=A0
+> =C2=A0		/* encrypt the last block */
+> -		ret =3D ceph_fscrypt_encrypt_block_inplace(inode,
+> page,
+> -						=C2=A0=C2=A0=C2=A0
+> CEPH_FSCRYPT_BLOCK_SIZE,
+> -						=C2=A0=C2=A0=C2=A0 0, block,
+> -						=C2=A0=C2=A0=C2=A0 GFP_KERNEL);
+> +		ret =3D ceph_fscrypt_encrypt_block_inplace(
+> +			inode, ceph_databuf_page(dbuf, 1),
+> +			CEPH_FSCRYPT_BLOCK_SIZE, 0, block,
+> GFP_KERNEL);
+> =C2=A0		if (ret)
+> =C2=A0			goto out;
+> =C2=A0	}
+> =C2=A0
+> -	/* Insert the header */
+> -	ret =3D ceph_pagelist_append(pagelist, &header,
+> sizeof(header));
+> -	if (ret)
+> -		goto out;
+> +	ceph_databuf_added_data(dbuf, sizeof(*header));
+> +	if (header->block_size)
+> +		ceph_databuf_added_data(dbuf,
+> CEPH_FSCRYPT_BLOCK_SIZE);
+> =C2=A0
+> -	if (header.block_size) {
+> -		/* Append the last block contents to pagelist */
+> -		ret =3D ceph_pagelist_append(pagelist, iov.iov_base,
+> -					=C2=A0=C2=A0 CEPH_FSCRYPT_BLOCK_SIZE);
+> -		if (ret)
+> -			goto out;
+> -	}
+> -	req->r_pagelist =3D pagelist;
+> +	req->r_dbuf =3D dbuf;
+> =C2=A0out:
+> =C2=A0	doutc(cl, "%p %llx.%llx size dropping cap refs on %s\n",
+> inode,
+> =C2=A0	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ceph_vinop(inode), ceph_cap_string(=
+got));
+> =C2=A0	ceph_put_cap_refs(ci, got);
+> -	if (iov.iov_base)
+> -		kunmap_local(iov.iov_base);
+> -	if (page)
+> -		__free_pages(page, 0);
+> -	if (ret && pagelist)
+> -		ceph_pagelist_release(pagelist);
+> +	kunmap_local(header);
+> +	if (ret)
+> +		ceph_databuf_release(dbuf);
+> =C2=A0	return ret;
+> =C2=A0}
+> =C2=A0
+> diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
+> index 230e0c3f341f..09661a34f287 100644
+> --- a/fs/ceph/mds_client.c
+> +++ b/fs/ceph/mds_client.c
+> @@ -1125,8 +1125,7 @@ void ceph_mdsc_release_request(struct kref
+> *kref)
+> =C2=A0	put_cred(req->r_cred);
+> =C2=A0	if (req->r_mnt_idmap)
+> =C2=A0		mnt_idmap_put(req->r_mnt_idmap);
+> -	if (req->r_pagelist)
+> -		ceph_pagelist_release(req->r_pagelist);
+> +	ceph_databuf_release(req->r_dbuf);
+> =C2=A0	kfree(req->r_fscrypt_auth);
+> =C2=A0	kfree(req->r_altname);
+> =C2=A0	put_request_session(req);
+> @@ -3207,10 +3206,10 @@ static struct ceph_msg
+> *create_request_message(struct ceph_mds_session *session,
+> =C2=A0	msg->front.iov_len =3D p - msg->front.iov_base;
+> =C2=A0	msg->hdr.front_len =3D cpu_to_le32(msg->front.iov_len);
+> =C2=A0
+> -	if (req->r_pagelist) {
+> -		struct ceph_pagelist *pagelist =3D req->r_pagelist;
+> -		ceph_msg_data_add_pagelist(msg, pagelist);
+> -		msg->hdr.data_len =3D cpu_to_le32(pagelist->length);
+> +	if (req->r_dbuf) {
+> +		struct ceph_databuf *dbuf =3D req->r_dbuf;
+> +		ceph_msg_data_add_databuf(msg, dbuf);
+> +		msg->hdr.data_len =3D
+> cpu_to_le32(ceph_databuf_len(dbuf));
+> =C2=A0	} else {
+> =C2=A0		msg->hdr.data_len =3D 0;
+> =C2=A0	}
+> diff --git a/fs/ceph/mds_client.h b/fs/ceph/mds_client.h
+> index 3e2a6fa7c19a..a7ee8da07ce7 100644
+> --- a/fs/ceph/mds_client.h
+> +++ b/fs/ceph/mds_client.h
+> @@ -333,7 +333,7 @@ struct ceph_mds_request {
+> =C2=A0	u32 r_direct_hash;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* choose dir fra=
+g based on this
+> dentry hash */
+> =C2=A0
+> =C2=A0	/* data payload is used for xattr ops */
+> -	struct ceph_pagelist *r_pagelist;
+> +	struct ceph_databuf *r_dbuf;
+> =C2=A0
+> =C2=A0	/* what caps shall we drop? */
+> =C2=A0	int r_inode_drop, r_inode_unless;
+> diff --git a/fs/ceph/super.h b/fs/ceph/super.h
+> index bb0db0cc8003..984a6d2a5378 100644
+> --- a/fs/ceph/super.h
+> +++ b/fs/ceph/super.h
+> @@ -1137,7 +1137,7 @@ struct ceph_acl_sec_ctx {
+> =C2=A0#ifdef CONFIG_FS_ENCRYPTION
+> =C2=A0	struct ceph_fscrypt_auth *fscrypt_auth;
+> =C2=A0#endif
+> -	struct ceph_pagelist *pagelist;
+> +	struct ceph_databuf *dbuf;
+> =C2=A0};
+> =C2=A0
+> =C2=A0#ifdef CONFIG_SECURITY
+> diff --git a/fs/ceph/xattr.c b/fs/ceph/xattr.c
+> index 537165db4519..b083cd3b3974 100644
+> --- a/fs/ceph/xattr.c
+> +++ b/fs/ceph/xattr.c
+> @@ -1114,17 +1114,17 @@ static int ceph_sync_setxattr(struct inode
+> *inode, const char *name,
+> =C2=A0	struct ceph_mds_request *req;
+> =C2=A0	struct ceph_mds_client *mdsc =3D fsc->mdsc;
+> =C2=A0	struct ceph_osd_client *osdc =3D &fsc->client->osdc;
+> -	struct ceph_pagelist *pagelist =3D NULL;
+> +	struct ceph_databuf *dbuf =3D NULL;
+> =C2=A0	int op =3D CEPH_MDS_OP_SETXATTR;
+> =C2=A0	int err;
+> =C2=A0
+> =C2=A0	if (size > 0) {
+> -		/* copy value into pagelist */
+> -		pagelist =3D ceph_pagelist_alloc(GFP_NOFS);
+> -		if (!pagelist)
+> +		/* copy value into dbuf */
+> +		dbuf =3D ceph_databuf_req_alloc(1, size, GFP_NOFS);
+> +		if (!dbuf)
+> =C2=A0			return -ENOMEM;
+> =C2=A0
+> -		err =3D ceph_pagelist_append(pagelist, value, size);
+> +		err =3D ceph_databuf_append(dbuf, value, size);
+> =C2=A0		if (err)
+> =C2=A0			goto out;
+> =C2=A0	} else if (!value) {
+> @@ -1154,8 +1154,8 @@ static int ceph_sync_setxattr(struct inode
+> *inode, const char *name,
+> =C2=A0		req->r_args.setxattr.flags =3D cpu_to_le32(flags);
+> =C2=A0		req->r_args.setxattr.osdmap_epoch =3D
+> =C2=A0			cpu_to_le32(osdc->osdmap->epoch);
+> -		req->r_pagelist =3D pagelist;
+> -		pagelist =3D NULL;
+> +		req->r_dbuf =3D dbuf;
+> +		dbuf =3D NULL;
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	req->r_inode =3D inode;
+> @@ -1169,8 +1169,7 @@ static int ceph_sync_setxattr(struct inode
+> *inode, const char *name,
+> =C2=A0	doutc(cl, "xattr.ver (after): %lld\n", ci-
+> >i_xattrs.version);
+> =C2=A0
+> =C2=A0out:
+> -	if (pagelist)
+> -		ceph_pagelist_release(pagelist);
+> +	ceph_databuf_release(dbuf);
+> =C2=A0	return err;
+> =C2=A0}
+> =C2=A0
+> @@ -1377,7 +1376,7 @@ bool ceph_security_xattr_deadlock(struct inode
+> *in)
+> =C2=A0int ceph_security_init_secctx(struct dentry *dentry, umode_t mode,
+> =C2=A0			=C2=A0=C2=A0 struct ceph_acl_sec_ctx *as_ctx)
+> =C2=A0{
+> -	struct ceph_pagelist *pagelist =3D as_ctx->pagelist;
+> +	struct ceph_databuf *dbuf =3D as_ctx->dbuf;
+> =C2=A0	const char *name;
+> =C2=A0	size_t name_len;
+> =C2=A0	int err;
+> @@ -1391,14 +1390,11 @@ int ceph_security_init_secctx(struct dentry
+> *dentry, umode_t mode,
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	err =3D -ENOMEM;
+> -	if (!pagelist) {
+> -		pagelist =3D ceph_pagelist_alloc(GFP_KERNEL);
+> -		if (!pagelist)
+> +	if (!dbuf) {
+> +		dbuf =3D ceph_databuf_req_alloc(0, PAGE_SIZE,
+> GFP_KERNEL);
+> +		if (!dbuf)
+> =C2=A0			goto out;
+> -		err =3D ceph_pagelist_reserve(pagelist, PAGE_SIZE);
+> -		if (err)
+> -			goto out;
+> -		ceph_pagelist_encode_32(pagelist, 1);
+> +		ceph_databuf_encode_32(dbuf, 1);
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	/*
+> @@ -1407,38 +1403,31 @@ int ceph_security_init_secctx(struct dentry
+> *dentry, umode_t mode,
+> =C2=A0	 * dentry_init_security hook.
+> =C2=A0	 */
+> =C2=A0	name_len =3D strlen(name);
+> -	err =3D ceph_pagelist_reserve(pagelist,
+> -				=C2=A0=C2=A0=C2=A0 4 * 2 + name_len + as_ctx-
+> >lsmctx.len);
+> +	err =3D ceph_databuf_reserve(dbuf, 4 * 2 + name_len + as_ctx-
+> >lsmctx.len,
+> +				=C2=A0=C2=A0 GFP_KERNEL);
+
+The 4 * 2 + name_len + as_ctx->lsmctx.len looks unclear to me. It wil
+be good to have some well defined constants here.
+
+> =C2=A0	if (err)
+> =C2=A0		goto out;
+> =C2=A0
+> -	if (as_ctx->pagelist) {
+> +	if (as_ctx->dbuf) {
+> =C2=A0		/* update count of KV pairs */
+> -		BUG_ON(pagelist->length <=3D sizeof(__le32));
+> -		if (list_is_singular(&pagelist->head)) {
+> -			le32_add_cpu((__le32*)pagelist->mapped_tail,
+> 1);
+> -		} else {
+> -			struct page *page =3D
+> list_first_entry(&pagelist->head,
+> -							=C2=A0=C2=A0=C2=A0=C2=A0 struct
+> page, lru);
+> -			void *addr =3D kmap_atomic(page);
+> -			le32_add_cpu((__le32*)addr, 1);
+> -			kunmap_atomic(addr);
+> -		}
+> +		BUG_ON(ceph_databuf_len(dbuf) <=3D sizeof(__le32));
+> +		__le32 *addr =3D kmap_ceph_databuf_page(dbuf, 0);
+> +		le32_add_cpu(addr, 1);
+> +		kunmap_local(addr);
+> =C2=A0	} else {
+> -		as_ctx->pagelist =3D pagelist;
+> +		as_ctx->dbuf =3D dbuf;
+> =C2=A0	}
+> =C2=A0
+> -	ceph_pagelist_encode_32(pagelist, name_len);
+> -	ceph_pagelist_append(pagelist, name, name_len);
+> +	ceph_databuf_encode_32(dbuf, name_len);
+> +	ceph_databuf_append(dbuf, name, name_len);
+> =C2=A0
+> -	ceph_pagelist_encode_32(pagelist, as_ctx->lsmctx.len);
+> -	ceph_pagelist_append(pagelist, as_ctx->lsmctx.context,
+> -			=C2=A0=C2=A0=C2=A0=C2=A0 as_ctx->lsmctx.len);
+> +	ceph_databuf_encode_32(dbuf, as_ctx->lsmctx.len);
+> +	ceph_databuf_append(dbuf, as_ctx->lsmctx.context, as_ctx-
+> >lsmctx.len);
+> =C2=A0
+> =C2=A0	err =3D 0;
+> =C2=A0out:
+> -	if (pagelist && !as_ctx->pagelist)
+> -		ceph_pagelist_release(pagelist);
+> +	if (dbuf && !as_ctx->dbuf)
+> +		ceph_databuf_release(dbuf);
+> =C2=A0	return err;
+> =C2=A0}
+> =C2=A0#endif /* CONFIG_CEPH_FS_SECURITY_LABEL */
+> @@ -1456,8 +1445,7 @@ void ceph_release_acl_sec_ctx(struct
+> ceph_acl_sec_ctx *as_ctx)
+> =C2=A0#ifdef CONFIG_FS_ENCRYPTION
+> =C2=A0	kfree(as_ctx->fscrypt_auth);
+> =C2=A0#endif
+> -	if (as_ctx->pagelist)
+> -		ceph_pagelist_release(as_ctx->pagelist);
+> +	ceph_databuf_release(as_ctx->dbuf);
+> =C2=A0}
+> =C2=A0
+> =C2=A0/*
+>=20
+
+Thanks,
+Slava.
+
