@@ -1,129 +1,101 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB8D366;
-	Sat, 15 Mar 2025 14:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B5518EB0
+	for <linux-block@vger.kernel.org>; Sat, 15 Mar 2025 16:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742050379; cv=none; b=Y6d/nyIhQ4E6BP1ygzv4XJTovo8iWqEhZWfpauxbXxzDqNBqJqxM3Ma06iHA2QLDkBPROxPlCsSQkOJEAUTOEwVRM+3GefG+q+cma8U8GLI6nT3wyFutK/voIQZL2LnXCpBI5zt/rYnLjYCqHr1MW/fxRe2UrtS1lwETamO+T0E=
+	t=1742057234; cv=none; b=Hlto0LqJpHErvz1hNBAzLfFzmD4ftoUrQnEd6upeWIaOptMG9kiMOeOzyzi+dnN4IZoeyAAN0YRGqFHNHXUpryda6zzcZAp5mATH9WgCb13FtqShJmZI6EMt4EoZJKO4KIDrucrK5p3RvC5g4Q66n26BKEvkQEyzr73RvZ2AvW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742050379; c=relaxed/simple;
-	bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VnCTsJxWce/saO4H4G1xIF+bruSQpVI7Mt9l6Ha7+AduThmfVvlxe3c5cUmYbdSaBkExWX246BuLLjsIMe3whicBziJHkNGjuNLKBuUv4AkL0zJAEJhDBn9sDtKV6axk5RY04F0LolslkmVrpEt9hCzPag67k1KAlECq3bIubZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=StvcQOfM; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742057234; c=relaxed/simple;
+	bh=RzHWaT4y8FPuXSb9EybUcX/aTXlFTIG+ZECIl1glCDs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t5efdd6+1ab/V6jfnyjwARRUF5p54BEukypO5kLHI2ZhetyeADqH2Zy6j4jH+5hiUm/ORYQkCIunyM4F9hxKv9YpX4aERC8b2xwUyWYs0UHRmJP5PYzEU5kSR5tpu6Ds9BAZNNVxPS4Km5GKCcG4W/o1aXG1DZL0EMBbW2Vvy68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NezbWjHJ; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="StvcQOfM"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bfe0d2b6dso33088531fa.3;
-        Sat, 15 Mar 2025 07:52:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NezbWjHJ"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-85b5e49615aso306119439f.1
+        for <linux-block@vger.kernel.org>; Sat, 15 Mar 2025 09:47:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742050375; x=1742655175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
-        b=StvcQOfMZsabErV8DBV42/ODW+fZVGzMk6ecV7FxwXVw42S841I1tZU8/AliKU21SC
-         onStk8UzRf98iVsvmfof/3NXahDXUpF14uZRvEtCr0fzf5M+V0Zu76kodD2PJUBlJo10
-         ePqc9KTHbH50ePsIXoFfXWsSh2Jxk7mJ/5uQ+nF5+33/kQohzqrymxxkFQAbdPBSpA7H
-         Eb51sPtaVMWtdkhArfwd8d8T3uMZ7qVHHLXgneaqPSQjB/1J53OfyA/HpwMCmlO+a7Zz
-         72ftThHpt4nnO7auws+3bGo/zj13TkR/JnenMJrAdcEZFyGQ+9bhDNtfHuBNjmXwxG7j
-         G9wQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742057231; x=1742662031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RvVjMW0xlIRW+xAq0tG5On8FqH6hGpEXfAg7HOXwb2o=;
+        b=NezbWjHJWogCb+zWyAdo2X381DaXgKolfJvDEb8zZqsIOoEq9DzU5aQ1iUCzVj43US
+         Mi6gCU2K27H9SVnXImmqcAQFKwn6nRTfpcs9nlNIGKf4L2D7qBPHsMXV/ESJa91aIX5q
+         zwCNOHlFQFsH6yEbwMvXZL5a+tzF7o8/pcJp3QvNQTMcbF4j7Qj7kP5JK1JXHrz4h/bW
+         WFpCL9mfNaSWzmdMMLP9y3CYLD+KsFBszYm0Yi+o0TgymxImGZNxCJbw89tF8DxkD3te
+         e0cL34wbXjIBJDlK60DVVjQbeUEjFApw4j5od7A9dIK/l7pAlcC1/kuTATzbSapcOUVd
+         xx+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742050375; x=1742655175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
-        b=oDRFvimbc/PV0sf3a8G+JVUXjTp3A/1qSgPkVt4TdqrPSZ0USHknEp9LE8kFEcudfg
-         D9sJiNYM2tEqE/OQ0cNjFerfuO0LyCqUlSnfN2ATh2oXkjwRVcRPigawENnzfnmLUBAb
-         LjXfv4EOiwW3ZLDhor9LE5ACs3uuES64Qgs4o5cIFr2vHsFrdU9eqn0CbNyzS304rC7D
-         cjWCCZhkgTAol6RtONC056etkbcH9wgg+0EKmAS9lHeWrV3e/pfRlKdQuMMUAiC2/0PI
-         /PhiYeUx1uA6fjDHIvBde2q0Cm90sZB7ikLmKd4kYOlV5Dc7rkHY8ESG+j78OpCXPB8C
-         8Nrw==
-X-Forwarded-Encrypted: i=1; AJvYcCU49P0qTcugGp834alFLslbPFzgf1LNLd5fc45Sj5fRhNdasQ/S8rOtvUkVLYkrDXO8tUTmWrwOOKk1wux6sWU=@vger.kernel.org, AJvYcCUqjk3SS8y0FMT/NDIIqn1u78Bih9i2mIg8V9omMEUzS+RTc9leT+neo4EaDrlK4AYnEwTefBJkB4+u@vger.kernel.org, AJvYcCVEVka0Ne7qSzHvGUS7WOuExFbfeq0RXy1VYq8nqSyYkflrxCWHlr05AIsESadjihY83DzURndSv0lOJxVZ@vger.kernel.org, AJvYcCVZfGy9qp5Jd2PwzVYvQ84rT0ATzuXG8qSHKDfcU8a5h1sihVFi2cIwEXe1kBrGWk09hifPkS7G3wucSA2Q@vger.kernel.org, AJvYcCWNNLK++edMZp26SclQxVV+lpaCRihB8T54kZRmuTDe0LdJ3NeKLcD1zYsrRBH8GXpH+kcJsP6fRGKw5dcyOCWC@vger.kernel.org, AJvYcCWPt+KkLOwXZo4c7m4oX26rv8vkBaBhvleRn018WPdT3dQMoxlqIEq+ELWw1xbWGq0CQ9iDtzhPUoWN@vger.kernel.org, AJvYcCXQa7u+65f6iOTPqbH3PrjlVRRMo5xedYmVh5ylEh3hxBsuedmmpVQy2Kxcc+hQFrMGDu7cCzDiqJOgbC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yykqka6F8FZIRml26Qb9+uDS0SvJ9ZryrC+tZqx+Iv1ylb6DBjE
-	BMrwdRdAUgTX+YI93kz6SQ8bkSyKaEpRfd37N3AbVe5vzH0ENifjB5iLBEdw0o/0pcfrJ/lTh9R
-	SZopoAN5oT5mg8U6Zuzgkbx5XHfo=
-X-Gm-Gg: ASbGncue3kp7EAAXrths7o1VlElVYuHb5/lIKl4ozpko6HfNIudHmTBsFT2EpXIOvFY
-	tf6Sr+U/GiIiJ+SCQ4om1zDLpBrEQscUXOoj47yMwTIwOKkEFFuG6HnPylKE2h5uFSobCcmodpN
-	Pkhc+muC0ISEypzMeMQaQRnh3g20mG+v5hhILNlBqB0rKKA23rcArotMMO/MW5
-X-Google-Smtp-Source: AGHT+IH8nC0TpYa6om1KJkuvMAniWm5KQw6dxG84o6l4T8qWuLbPOUtyA3zl+ap3w3tC9KO/f//DCnawBJXOvMWsW2o=
-X-Received: by 2002:a2e:2413:0:b0:30c:514c:55d4 with SMTP id
- 38308e7fff4ca-30c514c562cmr12196061fa.16.1742050375070; Sat, 15 Mar 2025
- 07:52:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742057231; x=1742662031;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RvVjMW0xlIRW+xAq0tG5On8FqH6hGpEXfAg7HOXwb2o=;
+        b=lyoMNSsOdKPBcY5yb9Fs/6m+BUzAZI4DNLKzlP8Cl7souWJdH5SuTIqNIpL8rPa7wl
+         eEiIpJiuLUPUgqFA9Y9r/EMP2MfcRQO1msIlAdOAFcdYSJ0moqJTAwX7+ogawu8UIWNZ
+         dxmDiPiU2UVo4H1IcTH3m3Xt58F1PnEtGpHNB6th4uj/BY+ooW1J5N4ma3+WAq/ern05
+         JeZMCtRqupiPR+80iE2v9Sbc5zM0eyRd2Bxw5qAt/2HPsOdljzgBvbAAGHsBiUxWlKd8
+         HTSmhOQEJhsvNBkD0gha75TMagcquMgX2oAAa8WEt0csfYnYsrMSb4EnxH9wPfZyY9rB
+         nkaw==
+X-Gm-Message-State: AOJu0YzVPBLzWXCkHZGsHZVj9Ekgi+ESKzSgHE+79QusdmrvbspDTXDU
+	IAiEIDLNNgtuXz+NQmKyRCBD8YroDNqbQdkTfPdgGmaf+V46laon6qu654VDOrU=
+X-Gm-Gg: ASbGnctdbU/INnEda21mhXY2x3Xqw5NInl1CX6I1GH2FI2/yyLrV9ZZFe5D95B/fLGM
+	xPrV4plvjlHyZwQ4BTc6FO0v8IQyJiOMZRUj8rnggpeV3rz2u8J/efUpyfyVQ2OdXwLY2B6PAuA
+	GodzeDMIeVWqTb7qj1SMyLcFciHee5jywLZSFLqaJZSn3353gOv0lSbKZDk2NQbhI4HFbTAioQL
+	0HzshK0l9kYIqwdW6ShQ3buT0CfpsfFZZjr5DP8pYvIQrVDtKk4zURzfO0POcc1kP+fq/Tx9nSd
+	PKx2m0zX8JrezAMOPTWQowBiaO2JkoXz3nxUcMUaeQ==
+X-Google-Smtp-Source: AGHT+IHOOeiIQZQPOu8/OVyhd4PFH31ke+riSoGFw34JBk8pbMYH6OQSgnRrTi5e/eP9N2SBosxEdw==
+X-Received: by 2002:a05:6602:3a0c:b0:85b:5d92:35b9 with SMTP id ca18e2360f4ac-85dc47d6010mr680553339f.2.1742057231114;
+        Sat, 15 Mar 2025 09:47:11 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2637fb2b2sm1404595173.94.2025.03.15.09.47.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 15 Mar 2025 09:47:10 -0700 (PDT)
+Message-ID: <9db17620-4b93-4c01-b7f8-ecab83b12d0f@kernel.dk>
+Date: Sat, 15 Mar 2025 10:47:09 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com>
- <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com>
- <D8GQJQFGKB8C.DZBUZT4IJIM0@proton.me> <Z9V0jSfuhqWi_t52@Mac.home>
- <CAJ-ks9k+5c-MYNaxv412Ri1LDAxvkdSQQfKEgQtTu6aEsS-XFA@mail.gmail.com> <Z9V5srg9h73ufu3G@Mac.home>
-In-Reply-To: <Z9V5srg9h73ufu3G@Mac.home>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Sat, 15 Mar 2025 10:52:18 -0400
-X-Gm-Features: AQ5f1JqjwDEWbdaR9Dml9SSN-lD5tP8ZfiC2uWZ_VNOu30cX7hVl5zfkNy74Ccw
-Message-ID: <CAJ-ks9=23BLX_eo9QYESHFR6JCWJg6AL2Bmg45GAS=wHqAZw4w@mail.gmail.com>
-Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Benno Lossin <benno.lossin@proton.me>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+To: Kent Overstreet <kent.overstreet@linux.dev>,
+ linux-bcachefs@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20250311201518.3573009-1-kent.overstreet@linux.dev>
+ <20250311201518.3573009-14-kent.overstreet@linux.dev>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250311201518.3573009-14-kent.overstreet@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 15, 2025 at 8:59=E2=80=AFAM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
->
-> On Sat, Mar 15, 2025 at 08:41:49AM -0400, Tamir Duberstein wrote:
-> > On Sat, Mar 15, 2025 at 8:37=E2=80=AFAM Boqun Feng <boqun.feng@gmail.co=
-m> wrote:
-> > >
-> > > On Sat, Mar 15, 2025 at 09:34:42AM +0000, Benno Lossin wrote:
-> > > [...]
-> > > > > The rest Rust code changes look good to me. Although I would sugg=
-est you
-> > > > > to split this patch into several patches: you can do the conversi=
-on from
-> > > > > "as" pattern to provenance API one file by one file, and this mak=
-e it
-> > > > > easier for people to review. And after the conversions are done, =
-you can
-> > > > > introduce the Makefile changes.
-> > > >
-> > > > I think it's fine to do several of the `as` conversions in a single
-> > >
-> > > Well, "fine" !=3D "recommended", right? ;-) If the patch was split,
-> > > reviewers would be able to give Reviewed-by to individual patches tha=
-t
-> > > looks fine trivially. Then it's easier to make progress every iterati=
-on,
-> > > and also allows partially applying the changes. Of course it doesn't
-> > > have to be file-by-file.
-> >
-> > I sent v4 a little while ago, hopefully the resulting complexity is
-> > manageable now that the build system is untouched.
-> >
->
-> I have fun plans today (skiing!), so won't be able to take another
-> detailed look. What I was trying to say is that: should you split the
-> patches, I would have already given some Reviewed-bys ;-) But as Benno
-> said, it's fine, so don't worry, I will take another look later. Thanks!
+On 3/11/25 2:15 PM, Kent Overstreet wrote:
+> REQ_FUA|REQ_READ means "do a read that bypasses the controller cache",
+> the same as writes.
+> 
+> This is useful for when the filesystem gets a checksum error, it's
+> possible that a bit was flipped in the controller cache, and when we
+> retry we want to retry the entire IO, not just from cache.
+> 
+> The nvme driver already passes through REQ_FUA for reads, not just
+> writes, so disabling the warning is sufficient to start using it, and
+> bcachefs is implementing additional retries for checksum errors so can
+> immediately use it.
 
-Have fun! =E2=9B=B7=EF=B8=8F
+This one got effectively nak'ed by various folks here:
+
+> Link: https://lore.kernel.org/linux-block/20250311133517.3095878-1-kent.overstreet@linux.dev/
+
+yet it's part of this series and in linux-next? Hmm?
+
+-- 
+Jens Axboe
+
