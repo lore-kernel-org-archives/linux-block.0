@@ -1,44 +1,44 @@
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529141F4734;
-	Sat, 15 Mar 2025 09:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE37A32;
+	Sat, 15 Mar 2025 09:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742031296; cv=none; b=ZroaIuDrXZcg+iQUF0RcopMeeV1YU/vLtFAi7B/EnGMmqEB8PQKtQm2ojS/07nEhpXltx/HM5KeK5OKFuMsYAyoR2RVy5A3LG08u80ZLucCY6ihSD6WLBvDgs4ZjjmVJ7IWxqhYIdNapiIUcmDdY9M0pQ8fCajuNQu6lEdx7BUs=
+	t=1742031887; cv=none; b=ZJbdqQwVJ6fshR1eyEDfzMtc00tsMZkPHbQSfNjAyt1sge/5fhdy2Pg8V2v/K3v+1hwYIrsLKVjmQsU7jH25Fyx6uJ6f8QPGoUkSbDaAw9D73M9WEHyCi7BoigKB++ddsaAx7xA832aBRubeV2j10hza5JXeAhCJ9SPWQzh7yQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742031296; c=relaxed/simple;
-	bh=hNzSGeM9w6XNPYNUplk+W0RxLfc6Ek9uwsXvUt0eEuQ=;
+	s=arc-20240116; t=1742031887; c=relaxed/simple;
+	bh=9o+XY6imgq6zaQDxE/bPz6kfIxurI0uiJIyhQ04e950=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rgCI2bpoCz76cYskXm33uTOxQBs7lHjyn7rOXKXWIxp9OKfr4/suqbp4Qsaid9Cj4AWB2AfmJpu8bz5U7tT2Hi0yfJ8IK33/mWtc66TyqKD0u+4if5FjPAvkFdX1iaqCVbEV617J/20PfZFo9tDosvaYnD07fNr1g7uCDF7h4c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=lLYkVZ7W; arc=none smtp.client-ip=79.135.106.29
+	 MIME-Version:Content-Type; b=CvAb1ocnodS3rjGfUaAWwftHDDk9N0XVt//Z4u2B1SNVhTWze2HLGWt5zQFLghyM1C7Eev5bNuROhAvY4hwZUGOYXy09+Td3R0NlXaeV2ht4c9F0U601FFLLR89rM2QtH3zDPntOB+LH/8BhO+v+OppUx5/DFmhdDPvWbmQspoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=RjD2trdW; arc=none smtp.client-ip=109.224.244.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="lLYkVZ7W"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="RjD2trdW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1742031287; x=1742290487;
-	bh=2YpOaSrR4hSpqfGZqahP1NQlMMYBu1x+CopCGLc8TCw=;
+	s=apypmejo2zdgdad4cw5ld4bjgu.protonmail; t=1742031877; x=1742291077;
+	bh=9o+XY6imgq6zaQDxE/bPz6kfIxurI0uiJIyhQ04e950=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=lLYkVZ7WsxbKWWPw215MDyByXyYk2sMT04se/nnfaXXROFTTQ2IrlSeAE0ztiAqqn
-	 OAJMwAJKmCPp7LzaOH3hgyMk2JpZ5qM7ODp9RHPOETqJBtRgGmfxmM6jSPhWW2dBum
-	 QdU/uZrPPrxz19dkDlwNQyB4lOvKT939syCP5SzdMyrqHac41JwAmDEz0W9IsFOj2u
-	 G/OcKTUAbrQ2BBAKsmalD23hOSXZpRBnaHqNPvE2yLBp7VKj9cXBjPwthnAoQecDmX
-	 qSzdOY1s8MdTQOTACXkRtiPRb/ZJv1Viox8Of0hdoBQlaeVTq6grwpXwBwJu9Bl6oM
-	 1Q/HO8GpE0V+A==
-Date: Sat, 15 Mar 2025 09:34:42 +0000
-To: Boqun Feng <boqun.feng@gmail.com>, Tamir Duberstein <tamird@gmail.com>
+	b=RjD2trdWilavDargEPJh31BaRD1d0iE94K1WTsJ/ad1+eb36FAPT3fUI7TMqp4+vp
+	 BRA4qDvo3Xlw2DAHsB34qIikjLUkuGU49IhcV0xUeYfrGe+MIGFT6dyGOlcXorpdI+
+	 13NdK8Gh63jNwYmwhfJges7p1LmFjkOzxniQnd7B3GsO+5ig20muHxlw1o4vm2pSyP
+	 hncsfKqglFrsdmvUhR9/jlpxZlSWpm3w+aRulnnpDSv1gLMX3icQ5oNoRII6ZsZnwY
+	 XOFgkjwdW0YJsEYhHa08PG3v8bxHheqxyMyHsixf+18F5nEKuGXSU12m23q8WB89W4
+	 sTQ7jsUBA5SUA==
+Date: Sat, 15 Mar 2025 09:44:33 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
 Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
-Message-ID: <D8GQJQFGKB8C.DZBUZT4IJIM0@proton.me>
-In-Reply-To: <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com>
-References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com> <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com>
+Message-ID: <D8GQRANRVU11.SI7SZ8RAXXF@proton.me>
+In-Reply-To: <CAJ-ks9=Ec0xLg81GUYJ07uDzwtwhFkoEdxaa3kNtV6xSjZ57MQ@mail.gmail.com>
+References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com> <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <D8G9LZCS7ETL.9UPPQ73CAUQM@proton.me> <CANiq72=JCgdmd+h4_2VguOO9kxdx3OuTqUmpLix3mTLLHLKbZw@mail.gmail.com> <CAJ-ks9=Ec0xLg81GUYJ07uDzwtwhFkoEdxaa3kNtV6xSjZ57MQ@mail.gmail.com>
 Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 5e603b89734b66f978da35e7885d24202eac65c5
+X-Pm-Message-ID: 3cfde2319760f064666ce8d81b7235df8b240a00
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,36 +48,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri Mar 14, 2025 at 10:54 PM CET, Boqun Feng wrote:
-> On Fri, Mar 14, 2025 at 08:28:10AM -0400, Tamir Duberstein wrote:
-> [...]
->> --- a/rust/kernel/alloc.rs
->> +++ b/rust/kernel/alloc.rs
->> @@ -217,7 +217,7 @@ unsafe fn free(ptr: NonNull<u8>, layout: Layout) {
->> =20
->>  /// Returns a properly aligned dangling pointer from the given `layout`=
-.
->>  pub(crate) fn dangling_from_layout(layout: Layout) -> NonNull<u8> {
->> -    let ptr =3D layout.align() as *mut u8;
->> +    let ptr =3D crate::with_exposed_provenance_mut(layout.align());
->
-> Dangling pointers don't have provenance, neither has its provenance been
-> exposed. I think should use `without_provenance_mut()` here:
->
-> =09https://doc.rust-lang.org/std/ptr/fn.without_provenance_mut.html
->
-> see also the source of core::ptr::dangling().
+On Fri Mar 14, 2025 at 11:20 PM CET, Tamir Duberstein wrote:
+> On Fri, Mar 14, 2025 at 6:00=E2=80=AFPM Miguel Ojeda
+> <miguel.ojeda.sandonis@gmail.com> wrote:
+>>
+>> On Fri, Mar 14, 2025 at 9:18=E2=80=AFPM Benno Lossin <benno.lossin@proto=
+n.me> wrote:
+>> >
+>> > I don't know when we'll be bumping the minimum version. IIRC 1.85.0 is
+>> > going to be in debian trixie, so eventually we could bump it to that,
+>> > but I'm not sure what the time frame will be for that.
+>> >
+>> > Maybe we can salvage this effort by gating both the lint and the
+>> > unstable features on the versions where it works? @Miguel, what's your
+>> > opinion?
+>> >
+>> > We could even make it simple, requiring 1.84 and not bothering with th=
+e
+>> > older versions.
+>>
+>> Regarding Debian Trixie: unknown, since my understanding is that it
+>> does not have a release date yet, but apparently mid May is the Hard
+>> Freeze and then it may take e.g. a month or two to the release.
+>>
+>> And when it releases, we may want to wait a while before bumping it,
+>> depending on how much time has passed since Rust 1.85.0 and depending
+>> on whether we managed to get e.g. Ubuntu LTSs to provide a versioned
+>> package etc.
 
-Good catch.
+Yeah that's what I thought, thanks for confirming.
 
-> The rest Rust code changes look good to me. Although I would suggest you
-> to split this patch into several patches: you can do the conversion from
-> "as" pattern to provenance API one file by one file, and this make it
-> easier for people to review. And after the conversions are done, you can
-> introduce the Makefile changes.
+>> If something simple works, then let's just go for that -- we do not
+>> care too much about older versions for linting purposes, since people
+>> should be testing with the latest stable too anyway.
+>
+> It's not going to be simple because `rust_common_flags` is defined
+> before the config is read, which means I'll have to sprinkle
+> conditional logic in even more places to enable the lints.
+>
+> The most minimal version of this patch would drop all the build system
+> changes and just have conditionally compiled polyfills for the strict
+> provenance APIs. Are folks OK with that?
 
-I think it's fine to do several of the `as` conversions in a single
-patch, but splitting off the makefile changes is a good idea.
+So you'd not enable the lint, but fix all occurrences? I think we should
+still have the lint (if it's too cumbersome, then let's only enable it
+in the kernel crate).
 
 ---
 Cheers,
