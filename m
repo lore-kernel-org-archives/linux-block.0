@@ -1,80 +1,107 @@
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820D6202F9A;
-	Sat, 15 Mar 2025 18:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A50E78F5F
+	for <linux-block@vger.kernel.org>; Sat, 15 Mar 2025 18:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742061661; cv=none; b=sq9v4QEGWGvM8cjG8sSe5L/QcoOHfrilvBdbqaSjEACDfvnLQ5ODfSCkW2B6oW8lP99s9Jsf2nbYEpk9US+Nj6rQ6PsYMz1zSPnADzzaEcwuv2rlc2/TCResfKECwl2tnuKjYnJYUaN/bT/VbPgm2G+LHFm7bPrXfKhDcfaxRXY=
+	t=1742062066; cv=none; b=r9v13K94EBcpTvTtWp8fr+dQYGfHLAqpzJAKQA0ccjSxxP9Q8dE1Bbur4dI8owXMj5mRJGj7vXoLrtKWjhjhQbdbZCUIt5k/RNTdYQnP4mo+4p5uSYJJfx7pqUEC4FFZrn6q+jIqvYr8wuAGn1hPUW2d2/cDXXBAjQbfE/XbY4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742061661; c=relaxed/simple;
-	bh=AQGvhnW+89joQbtnIYgMqzkrKefUsN/EBiBpxqMXD3M=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S6mQoDE+dhchrxROIzDimsAE3dGIidNYTcpJcccNwFmL0ZKBUhps0obYu2EoFTTnHUN+sHdT/xw/YNSIdtoJRMIuHGiWcZcxCGQbPdDSX0KknMkCpxLCM5cQvYKTvLkf7R6P21F7cI2y7fxSydK/wJ3NyCYW6ZuRnzcH3oq99kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=YQBSNm5r; arc=none smtp.client-ip=185.70.40.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1742062066; c=relaxed/simple;
+	bh=c2rs5eMOMTRYYq1Q3HIE+MHiw0VbKuBEAIYfXGP7dsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PSiaRgKmbjFYqjxuq8B930TVIxO/pLouj7v23UO5X2ZtRA3RCl+bo/ASbKpc2/KXj7Kw4GTcUH0eoZZhnNZjVUVKCo8uJsjbmEs5QDOugLVtaAlJvGMtf4q4n5PXC/tHRcPod0kNn7jkpcsHsDXS+M09oWav0OPt0I9EorUeeT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FaTRybZd; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="YQBSNm5r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1742061656; x=1742320856;
-	bh=AQGvhnW+89joQbtnIYgMqzkrKefUsN/EBiBpxqMXD3M=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=YQBSNm5rm3zDSkda26bpQz4cz3kOmYU0eTl0lth9UKvCZXGjSGzd6PsjFfUKKMy3J
-	 GrYoFmqDIXnYxh6q/bn2zQJdg3uA9rkmXmBHe5Tdyoc6rpYBojJlYDHrjGyIe2kR4t
-	 +EZ56x1KZ+F86WXa1sZThE/dGYNe/VVb2Ba8ITYCCd32Obp+P9T8bKEoZyUsv9k2M8
-	 ztNaBlLgOiveGrJphf+wqT8fq9AOcc2L/Iee/wIICoez++0FIyC7FUq8Kslmk+I8Lz
-	 PA+VltRu0qSquuI4YM48XtMZvBm6we7E28qwveNZlP5uQZvUZT963yorq5xNXTFwVP
-	 ch5qzW3cxAUmA==
-Date: Sat, 15 Mar 2025 18:00:50 +0000
-To: Boqun Feng <boqun.feng@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
-Message-ID: <D8H1B8HT45UJ.OQ8N8YS92UL5@proton.me>
-In-Reply-To: <Z9V0jSfuhqWi_t52@Mac.home>
-References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com> <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com> <D8GQJQFGKB8C.DZBUZT4IJIM0@proton.me> <Z9V0jSfuhqWi_t52@Mac.home>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: e83c3409294cafcbb4ff1e1cee286a3ff1c398c1
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FaTRybZd"
+Date: Sat, 15 Mar 2025 14:07:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742062050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3MW01DMFm3Qn4TfYbXEYmP3m+bbmpxjr8V0foeC03Eg=;
+	b=FaTRybZd0b+1dUF85lPx72wX3Ogldz++RirE/nLVfEwUhMhCom8IY1OUfSALeTaGknzGM+
+	6PAOga3761IibqNeE9iTdcdoXm8uVaZg37RFS1/7TIcnfCqRLjfdl3jnnq5TEDe8PEhGBC
+	93z/Qr8xMtjlwPRn3r7QLfdKcrJhSwU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
+References: <20250311201518.3573009-1-kent.overstreet@linux.dev>
+ <20250311201518.3573009-14-kent.overstreet@linux.dev>
+ <9db17620-4b93-4c01-b7f8-ecab83b12d0f@kernel.dk>
+ <abk74sbsvsuijqhohyenl2mecz6unmkhavkga55fxsld6m6ise@ncbz3xmjlymw>
+ <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
+ <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
+ <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat Mar 15, 2025 at 1:37 PM CET, Boqun Feng wrote:
-> On Sat, Mar 15, 2025 at 09:34:42AM +0000, Benno Lossin wrote:
-> [...]
->> > The rest Rust code changes look good to me. Although I would suggest y=
-ou
->> > to split this patch into several patches: you can do the conversion fr=
-om
->> > "as" pattern to provenance API one file by one file, and this make it
->> > easier for people to review. And after the conversions are done, you c=
-an
->> > introduce the Makefile changes.
->>=20
->> I think it's fine to do several of the `as` conversions in a single
->
-> Well, "fine" !=3D "recommended", right? ;-) If the patch was split,
-> reviewers would be able to give Reviewed-by to individual patches that
-> looks fine trivially. Then it's easier to make progress every iteration,
-> and also allows partially applying the changes. Of course it doesn't
-> have to be file-by-file.
+On Sat, Mar 15, 2025 at 11:43:30AM -0600, Jens Axboe wrote:
+> On 3/15/25 11:27 AM, Kent Overstreet wrote:
+> > On Sat, Mar 15, 2025 at 11:03:20AM -0600, Jens Axboe wrote:
+> >> On 3/15/25 11:01 AM, Kent Overstreet wrote:
+> >>> On Sat, Mar 15, 2025 at 10:47:09AM -0600, Jens Axboe wrote:
+> >>>> On 3/11/25 2:15 PM, Kent Overstreet wrote:
+> >>>>> REQ_FUA|REQ_READ means "do a read that bypasses the controller cache",
+> >>>>> the same as writes.
+> >>>>>
+> >>>>> This is useful for when the filesystem gets a checksum error, it's
+> >>>>> possible that a bit was flipped in the controller cache, and when we
+> >>>>> retry we want to retry the entire IO, not just from cache.
+> >>>>>
+> >>>>> The nvme driver already passes through REQ_FUA for reads, not just
+> >>>>> writes, so disabling the warning is sufficient to start using it, and
+> >>>>> bcachefs is implementing additional retries for checksum errors so can
+> >>>>> immediately use it.
+> >>>>
+> >>>> This one got effectively nak'ed by various folks here:
+> >>>>
+> >>>>> Link: https://lore.kernel.org/linux-block/20250311133517.3095878-1-kent.overstreet@linux.dev/
+> >>>>
+> >>>> yet it's part of this series and in linux-next? Hmm?
+> >>>
+> >>> As I explained in that thread, they were only thinking about the caching
+> >>> of writes.
+> >>>
+> >>> That's not what we're concerned about; when we retry a read due to a
+> >>> checksum error we do not want the previous _read_ cached.
+> >>
+> >> Please follow the usual procedure of getting the patch acked/reviewed on
+> >> the block list, and go through the usual trees. Until that happens, this
+> >> patch should not be in your tree, not should it be staged in linux-next.
+> > 
+> > It's been posted to linux-block and sent to your inbox. If you're going
+> > to take it that's fine, otherwise - since this is necessary for handling
+> > bitrotted data correctly and I've got users who've been waiting on this
+> > patch series, and it's just deleting a warning, I'm inclined to just
+> > send it.
+> > 
+> > I'll make sure he's got the lore links and knows what's going on, but
+> > this isn't a great thing to be delaying on citing process.
+> 
+> Kent, you know how this works, there's nothing to argue about here.
+> 
+> Let the block people get it reviewed and staged. You can't just post a
+> patch, ignore most replies, and then go on to stage it yourself later
+> that day. It didn't work well in other subsystems, and it won't work
+> well here either.
 
-While I see your point, in this case splitting file-by-file is too much.
-v4 has: 9 files changed, 82 insertions(+), 27 deletions(-). I've seen
-much bigger changes that do smaller things like this patch.
+Jens, those replies weren't ignored, the concerns were answered. Never
+have I seen that considered "effectively nacked".
 
-At around 150 lines added + deleted I find it more and more difficult.
-
----
-Cheers,
-Benno
-
+And as far as "how things work around here" - let's not even go there,
+lest we have to cover your issues with process.
