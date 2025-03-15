@@ -1,173 +1,129 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB301E7C20;
-	Sat, 15 Mar 2025 12:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB8D366;
+	Sat, 15 Mar 2025 14:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742043575; cv=none; b=fBqAybqY0Ek+yyZZ2U3qJc3EtUP0ZVurEZeLOAxuXZKNpadfxUkzvLy+pNA4NWUNEM1Dq1+pjPMIn9UoVugxVgs0Y9i5Gafidlyo+2jh2wE6bvxgT9gWAVx3WCKPx8HXNZcQ5qs5/WQ2wWDuLWm/2m6wVRae51xquvIaWmer2MU=
+	t=1742050379; cv=none; b=Y6d/nyIhQ4E6BP1ygzv4XJTovo8iWqEhZWfpauxbXxzDqNBqJqxM3Ma06iHA2QLDkBPROxPlCsSQkOJEAUTOEwVRM+3GefG+q+cma8U8GLI6nT3wyFutK/voIQZL2LnXCpBI5zt/rYnLjYCqHr1MW/fxRe2UrtS1lwETamO+T0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742043575; c=relaxed/simple;
-	bh=Ecv+iNkGFfi9tUIlY/rwyQCIyEj65xXadpmlroL1C4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bgslsZelC7xjRSMYG6hvosC2QlvDZhjGWZLpS1xlKrwRALJQrLgG7BqeYGe9xndYcc5OdpKUeaNhOALpTeKLjrrW6e8Z3sGWHHJWPPsCwpF4SMH5JHTEV7Aiy8r5cPyfd+/T51VA18tWxHmtFCEwVEu5SHun09lW3f14xopzZgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2D/3uEs; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1742050379; c=relaxed/simple;
+	bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VnCTsJxWce/saO4H4G1xIF+bruSQpVI7Mt9l6Ha7+AduThmfVvlxe3c5cUmYbdSaBkExWX246BuLLjsIMe3whicBziJHkNGjuNLKBuUv4AkL0zJAEJhDBn9sDtKV6axk5RY04F0LolslkmVrpEt9hCzPag67k1KAlECq3bIubZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=StvcQOfM; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2D/3uEs"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c3c4ff7d31so378266485a.1;
-        Sat, 15 Mar 2025 05:59:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="StvcQOfM"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bfe0d2b6dso33088531fa.3;
+        Sat, 15 Mar 2025 07:52:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742043573; x=1742648373; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3sz3C7TI4DPvSlkchso2NNuBOnisGdY3eDfJJKlUEcw=;
-        b=D2D/3uEsHIf3XX5YuMp9i/yQyYhQ/7r4gpEp/Qk1f5dNkWC1DNsWpc66U2TOwKkQO4
-         BwtMJt9nWmvkrpPsUZdhhJr6lchNFfE4K4ce7XX/oarvMISVYAPJWzlTEWlBW0vuoSjF
-         BipqvF5Uy+GPZf8iKlLsRopBSnAa1SzzD2nxAkVyZ02isCQdv3S4AOCtjcGdKytYFm4a
-         4rO4ZoXotO3gwO8LmC6bnacDTdw5tVUs7ZtM2iiNv3iqT9jYVg5HRAcxg3QC8tiqP3zZ
-         meoPBQynHP/QIhL9VXrCDaGgR6Ebzm8JO8gFsS/eTQm/25ib8GX1NYOrQXR81Yfxvwrf
-         Lwnw==
+        d=gmail.com; s=20230601; t=1742050375; x=1742655175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
+        b=StvcQOfMZsabErV8DBV42/ODW+fZVGzMk6ecV7FxwXVw42S841I1tZU8/AliKU21SC
+         onStk8UzRf98iVsvmfof/3NXahDXUpF14uZRvEtCr0fzf5M+V0Zu76kodD2PJUBlJo10
+         ePqc9KTHbH50ePsIXoFfXWsSh2Jxk7mJ/5uQ+nF5+33/kQohzqrymxxkFQAbdPBSpA7H
+         Eb51sPtaVMWtdkhArfwd8d8T3uMZ7qVHHLXgneaqPSQjB/1J53OfyA/HpwMCmlO+a7Zz
+         72ftThHpt4nnO7auws+3bGo/zj13TkR/JnenMJrAdcEZFyGQ+9bhDNtfHuBNjmXwxG7j
+         G9wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742043573; x=1742648373;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3sz3C7TI4DPvSlkchso2NNuBOnisGdY3eDfJJKlUEcw=;
-        b=EpbNAPOluy9HL2U1L+L5oZc9fzxO07ot5kCH10ES8RHzkcTFWYj6XPfscRm7dipVC/
-         dAq6F+JMLEVH+OmiTRa+S8YBDDyi7O+MoM7EV/XrVJwagVSW5T7awOb83oetbbKkZ4aL
-         q8KX4MvtfIUNx7fc1til/EmZYBjZY5k6NRVYZvDRQ8qq/XyNLX/7bcJrUMnnKRwzIN2k
-         p9GBSfvvHtABfE+wQFWLo/dn7yDkl1Yw/kTIiG3cG4dVck7NuuMqngCqc4xQF0N5fEyp
-         plN4+tlS/WhZYUBju0txF2vHi7o2aDeD0xclqsXNWziHgXhE1xr2Nn+I6rBl7FxAf2IV
-         zFrg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9maMFDC46Y5ToPXIlKFCpDTwrjDMsjk3p3dtJuYOzOV0xi4+c7pUddubHS+SmeKX7bRGrZXvqU6AW6mLy@vger.kernel.org, AJvYcCUHpLd+kfoZyB20niGchOlOc74fYQ/xjcy+qx12Nta4xKEQwA3b6VPE7ToRAFPvyrLFD524kjuwll87sJ0ayr8=@vger.kernel.org, AJvYcCVD9g56bCXpTnYQegweqjsJ7fJs3NTKQaPAzrsXylMvE3xcBTcUVTXGhWbjXLRj5E/HKZZWF/LtZLIK@vger.kernel.org, AJvYcCVtH0ohIjCK3XWyw7lMSp1/fimD+hTqNXnvi0MgK4Q0vLCWacrCDFIQ0IcGufZdDoPWZH4gWy2yuH38@vger.kernel.org, AJvYcCWW/zpJd/WnPTkYOUG4+x6EDLTazEczdk1JH19q07CHM5xGNSrZVEKY8sNuPoyOOeAfvyWIlEFzOCeVIJFq@vger.kernel.org, AJvYcCWgF/YWCVUIpi2J6YJZYlzW365jnh8O7Bj3p9vgfUYKBYJAFhpCFD21/HDhlTXALnHTG5uDDsrBXM4gaWD2UCwl@vger.kernel.org, AJvYcCXcYmgAOOCLt8ijHsHZvASFTlehXRl9U3KuRvK8oNHPat1WWmyD2qFCuGw3k/XDmYD5DpHZYj6nsAjp45o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQUYf4m+cXK8Gdg5B1KCDlJBG09EuRSi8It1vY68vLrxjmBysN
-	I6IpTlaAvw0FP09nswqMQ1GenxTzfe+n4byYF/b7Fk7QlSUHvUUz
-X-Gm-Gg: ASbGncvpg/Qo25CiiC3E2apKAZSPXy40Ci1q6/sLWtacaSA1AOMlYQqdmgLqcAiTepr
-	0ixp8CYlu1ukYKE+4nSoYWSpFu07yoaXhPatMrWIL4sEeTdwvHaGApGP05JZB16Omqw17w4FvxM
-	pGw8DG3tOaMZcTi88wZi3WGBYsLSB5QJIhQslPu9Qm+q+4j82+EBDch5uaVZtICra1hxVpNmOoT
-	A8fzToRIWm53dhkVIb47VP/eZnS2iS6PUoOtEVMSdmPoDCbEDhYhFrTHcLBpM20w+lvBYXmRV9z
-	+VMJBrmi4P5F/lfyCFXUKktm01eGN1jmRM2Jwp59fpaoAA1mqiCkiRpZ1TcNN1acDBa+xfVEJDa
-	OLIEYaaaZLA8LQk75C8zx1j1RavSbgGtf/jM=
-X-Google-Smtp-Source: AGHT+IEpbbxMYi7EBT1EpTmd88snq+U0V3yFRIPptelZUz7jiwwoiDRCLnSaptxPR29bV7X4h0Mpwg==
-X-Received: by 2002:a05:620a:444d:b0:7c5:58b0:42c1 with SMTP id af79cd13be357-7c57c810e96mr650223585a.34.1742043572800;
-        Sat, 15 Mar 2025 05:59:32 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c9ddacsm374895885a.54.2025.03.15.05.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Mar 2025 05:59:32 -0700 (PDT)
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfauth.phl.internal (Postfix) with ESMTP id A10EC120007C;
-	Sat, 15 Mar 2025 08:59:31 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Sat, 15 Mar 2025 08:59:31 -0400
-X-ME-Sender: <xms:s3nVZ8TdeqsmhV7UVIaGrrgzTLRzzVaVHK404GklawqDuqmLzeWN_g>
-    <xme:s3nVZ5ygNBeWaTrB25Kh6mbqtrGaDWmNhx9EW6GezrBDHJUHfQJdttYPggPyelQ0e
-    S_DHs85hIZIZkE64Q>
-X-ME-Received: <xmr:s3nVZ53i5Hi3M9gJghxNbkTSCqGS3BQTkAJLssJdEL0mDX_fr46ponHE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeefjeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvefghfeuveekudetgfevudeuudejfeel
-    tdfhgfehgeekkeeigfdukefhgfegleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhn
-    rghlihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpe
-    epghhmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopeefvddp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthgrmhhirhgusehgmhgrihhlrdgtoh
-    hmpdhrtghpthhtohepsggvnhhnohdrlhhoshhsihhnsehprhhothhonhdrmhgvpdhrtghp
-    thhtohepmhgrshgrhhhirhhohieskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrth
-    hhrghnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnihgtohhlrghssehfjhgrshhl
-    vgdrvghupdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    eprghlvgigrdhgrgihnhhorhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhies
-    ghgrrhihghhuohdrnhgvthdprhgtphhtthhopegsjhhorhhnfegpghhhsehprhhothhonh
-    hmrghilhdrtghomh
-X-ME-Proxy: <xmx:s3nVZwD3rHARBzffMwEo8y5Gj0UgqGvgIWncmE4VxNcjL1f7aKoavw>
-    <xmx:s3nVZ1jv0k-EA8DcHnDKPwNvS4HCVAvWdleIUGgEgTRphYprSMukYg>
-    <xmx:s3nVZ8qU3_V62dVihs6JImUnjbPjbz7RDz0qCLJDX8zlCOiBOnyYzw>
-    <xmx:s3nVZ4hntVgpm3x2UQaRwfixWs2bfmTblOP8Fqrs1jVnmDrzvoF_vA>
-    <xmx:s3nVZ8QRUioK8FjOwuLJwK7CW6U3LykcFm8XcERBRFGe79knaO8nrmOw>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 15 Mar 2025 08:59:31 -0400 (EDT)
-Date: Sat, 15 Mar 2025 05:59:30 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Benno Lossin <benno.lossin@proton.me>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,	linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org,	rust-for-linux@vger.kernel.org,
- linux-kselftest@vger.kernel.org,	kunit-dev@googlegroups.com,
- linux-pci@vger.kernel.org,	linux-block@vger.kernel.org,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
-Message-ID: <Z9V5srg9h73ufu3G@Mac.home>
-References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com>
- <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com>
- <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com>
- <D8GQJQFGKB8C.DZBUZT4IJIM0@proton.me>
- <Z9V0jSfuhqWi_t52@Mac.home>
- <CAJ-ks9k+5c-MYNaxv412Ri1LDAxvkdSQQfKEgQtTu6aEsS-XFA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1742050375; x=1742655175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=25toXEF63pIyQ4BAaA3+SY0YWyKwqbXfkZDOS2yXEXk=;
+        b=oDRFvimbc/PV0sf3a8G+JVUXjTp3A/1qSgPkVt4TdqrPSZ0USHknEp9LE8kFEcudfg
+         D9sJiNYM2tEqE/OQ0cNjFerfuO0LyCqUlSnfN2ATh2oXkjwRVcRPigawENnzfnmLUBAb
+         LjXfv4EOiwW3ZLDhor9LE5ACs3uuES64Qgs4o5cIFr2vHsFrdU9eqn0CbNyzS304rC7D
+         cjWCCZhkgTAol6RtONC056etkbcH9wgg+0EKmAS9lHeWrV3e/pfRlKdQuMMUAiC2/0PI
+         /PhiYeUx1uA6fjDHIvBde2q0Cm90sZB7ikLmKd4kYOlV5Dc7rkHY8ESG+j78OpCXPB8C
+         8Nrw==
+X-Forwarded-Encrypted: i=1; AJvYcCU49P0qTcugGp834alFLslbPFzgf1LNLd5fc45Sj5fRhNdasQ/S8rOtvUkVLYkrDXO8tUTmWrwOOKk1wux6sWU=@vger.kernel.org, AJvYcCUqjk3SS8y0FMT/NDIIqn1u78Bih9i2mIg8V9omMEUzS+RTc9leT+neo4EaDrlK4AYnEwTefBJkB4+u@vger.kernel.org, AJvYcCVEVka0Ne7qSzHvGUS7WOuExFbfeq0RXy1VYq8nqSyYkflrxCWHlr05AIsESadjihY83DzURndSv0lOJxVZ@vger.kernel.org, AJvYcCVZfGy9qp5Jd2PwzVYvQ84rT0ATzuXG8qSHKDfcU8a5h1sihVFi2cIwEXe1kBrGWk09hifPkS7G3wucSA2Q@vger.kernel.org, AJvYcCWNNLK++edMZp26SclQxVV+lpaCRihB8T54kZRmuTDe0LdJ3NeKLcD1zYsrRBH8GXpH+kcJsP6fRGKw5dcyOCWC@vger.kernel.org, AJvYcCWPt+KkLOwXZo4c7m4oX26rv8vkBaBhvleRn018WPdT3dQMoxlqIEq+ELWw1xbWGq0CQ9iDtzhPUoWN@vger.kernel.org, AJvYcCXQa7u+65f6iOTPqbH3PrjlVRRMo5xedYmVh5ylEh3hxBsuedmmpVQy2Kxcc+hQFrMGDu7cCzDiqJOgbC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yykqka6F8FZIRml26Qb9+uDS0SvJ9ZryrC+tZqx+Iv1ylb6DBjE
+	BMrwdRdAUgTX+YI93kz6SQ8bkSyKaEpRfd37N3AbVe5vzH0ENifjB5iLBEdw0o/0pcfrJ/lTh9R
+	SZopoAN5oT5mg8U6Zuzgkbx5XHfo=
+X-Gm-Gg: ASbGncue3kp7EAAXrths7o1VlElVYuHb5/lIKl4ozpko6HfNIudHmTBsFT2EpXIOvFY
+	tf6Sr+U/GiIiJ+SCQ4om1zDLpBrEQscUXOoj47yMwTIwOKkEFFuG6HnPylKE2h5uFSobCcmodpN
+	Pkhc+muC0ISEypzMeMQaQRnh3g20mG+v5hhILNlBqB0rKKA23rcArotMMO/MW5
+X-Google-Smtp-Source: AGHT+IH8nC0TpYa6om1KJkuvMAniWm5KQw6dxG84o6l4T8qWuLbPOUtyA3zl+ap3w3tC9KO/f//DCnawBJXOvMWsW2o=
+X-Received: by 2002:a2e:2413:0:b0:30c:514c:55d4 with SMTP id
+ 38308e7fff4ca-30c514c562cmr12196061fa.16.1742050375070; Sat, 15 Mar 2025
+ 07:52:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ-ks9k+5c-MYNaxv412Ri1LDAxvkdSQQfKEgQtTu6aEsS-XFA@mail.gmail.com>
+References: <20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com>
+ <20250314-ptr-as-ptr-v3-6-e7ba61048f4a@gmail.com> <67d4a57f.c80a0220.16ff45.9cf1@mx.google.com>
+ <D8GQJQFGKB8C.DZBUZT4IJIM0@proton.me> <Z9V0jSfuhqWi_t52@Mac.home>
+ <CAJ-ks9k+5c-MYNaxv412Ri1LDAxvkdSQQfKEgQtTu6aEsS-XFA@mail.gmail.com> <Z9V5srg9h73ufu3G@Mac.home>
+In-Reply-To: <Z9V5srg9h73ufu3G@Mac.home>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Sat, 15 Mar 2025 10:52:18 -0400
+X-Gm-Features: AQ5f1JqjwDEWbdaR9Dml9SSN-lD5tP8ZfiC2uWZ_VNOu30cX7hVl5zfkNy74Ccw
+Message-ID: <CAJ-ks9=23BLX_eo9QYESHFR6JCWJg6AL2Bmg45GAS=wHqAZw4w@mail.gmail.com>
+Subject: Re: [PATCH v3 6/6] rust: use strict provenance APIs
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Benno Lossin <benno.lossin@proton.me>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 15, 2025 at 08:41:49AM -0400, Tamir Duberstein wrote:
-> On Sat, Mar 15, 2025 at 8:37 AM Boqun Feng <boqun.feng@gmail.com> wrote:
-> >
-> > On Sat, Mar 15, 2025 at 09:34:42AM +0000, Benno Lossin wrote:
-> > [...]
-> > > > The rest Rust code changes look good to me. Although I would suggest you
-> > > > to split this patch into several patches: you can do the conversion from
-> > > > "as" pattern to provenance API one file by one file, and this make it
-> > > > easier for people to review. And after the conversions are done, you can
-> > > > introduce the Makefile changes.
+On Sat, Mar 15, 2025 at 8:59=E2=80=AFAM Boqun Feng <boqun.feng@gmail.com> w=
+rote:
+>
+> On Sat, Mar 15, 2025 at 08:41:49AM -0400, Tamir Duberstein wrote:
+> > On Sat, Mar 15, 2025 at 8:37=E2=80=AFAM Boqun Feng <boqun.feng@gmail.co=
+m> wrote:
 > > >
-> > > I think it's fine to do several of the `as` conversions in a single
+> > > On Sat, Mar 15, 2025 at 09:34:42AM +0000, Benno Lossin wrote:
+> > > [...]
+> > > > > The rest Rust code changes look good to me. Although I would sugg=
+est you
+> > > > > to split this patch into several patches: you can do the conversi=
+on from
+> > > > > "as" pattern to provenance API one file by one file, and this mak=
+e it
+> > > > > easier for people to review. And after the conversions are done, =
+you can
+> > > > > introduce the Makefile changes.
+> > > >
+> > > > I think it's fine to do several of the `as` conversions in a single
+> > >
+> > > Well, "fine" !=3D "recommended", right? ;-) If the patch was split,
+> > > reviewers would be able to give Reviewed-by to individual patches tha=
+t
+> > > looks fine trivially. Then it's easier to make progress every iterati=
+on,
+> > > and also allows partially applying the changes. Of course it doesn't
+> > > have to be file-by-file.
 > >
-> > Well, "fine" != "recommended", right? ;-) If the patch was split,
-> > reviewers would be able to give Reviewed-by to individual patches that
-> > looks fine trivially. Then it's easier to make progress every iteration,
-> > and also allows partially applying the changes. Of course it doesn't
-> > have to be file-by-file.
-> 
-> I sent v4 a little while ago, hopefully the resulting complexity is
-> manageable now that the build system is untouched.
-> 
+> > I sent v4 a little while ago, hopefully the resulting complexity is
+> > manageable now that the build system is untouched.
+> >
+>
+> I have fun plans today (skiing!), so won't be able to take another
+> detailed look. What I was trying to say is that: should you split the
+> patches, I would have already given some Reviewed-bys ;-) But as Benno
+> said, it's fine, so don't worry, I will take another look later. Thanks!
 
-I have fun plans today (skiing!), so won't be able to take another
-detailed look. What I was trying to say is that: should you split the
-patches, I would have already given some Reviewed-bys ;-) But as Benno
-said, it's fine, so don't worry, I will take another look later. Thanks!
-
-Regards,
-Boqun
-
-> Cheers.
-> 
-> Tamir
+Have fun! =E2=9B=B7=EF=B8=8F
