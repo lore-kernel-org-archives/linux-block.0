@@ -1,76 +1,78 @@
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from a48-105.smtp-out.amazonses.com (a48-105.smtp-out.amazonses.com [54.240.48.105])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AC51F561D;
-	Sat, 15 Mar 2025 18:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99992D26D;
+	Sun, 16 Mar 2025 02:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.240.48.105
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742064101; cv=none; b=ua7D7F0jHr4AL3owpHS1AFIlADWPAd/Cv+jgE8Hz22NPhK/gh43LUgPekN+oPGT2XV1x6PCKhIEe+XUhxOzJPD/2ep5Vdn+Llwja5Rlx5fxqR3N4Qtppp+AoiVe/WtzITz3gGfMc6Z+vikQsjHSs4bpQI69+/cmAk1wbXgoJuoU=
+	t=1742093839; cv=none; b=ggPlARfioIfb4sT9mSQzehmUqXLI/wKMgolSHKWF4SJkAOKf3ghMvhfcxvf42nQMGXLu7yOgGpPtKm7qhs8qeSpFKIl6qv4CKqgJ++SjyYPgqli/JcylQhCRS26lVwNlrktMbmrIAm1rST332d1knD4XC1EkM0GpE09R9NWh/ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742064101; c=relaxed/simple;
-	bh=BcPZpCb5hUMBl2xPR4trisSVQQoDkDSi25QYkuo9OLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZwXBMlrIVV0PRymK3QtLpGx26rg6MLjIa/wyYVvV22AIbWtUwHapLcNgSzdumOvu2RjmadL49IdL3oplIbO7chkjCMyHN2CWm5oR3BYPyaBvVfBHoNz9QfkFm4c+6EfNxH6xWF4fr+S+obKLFhWHlv27n/axbVhco+TJBS8a1Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rtKGBYBS; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742093839; c=relaxed/simple;
+	bh=V/Hofvva/tI/9xwFYj237s5Y/mAkuzG9//5niNcWUes=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AsPdxuIh0B1csx8VXn0Qepaosk5R0gHftani+x8oi+TrBHBhvn2nKGozLfNldxyYB4hQghzp9MDjXAF/DnIRAYSKsYkdrlQMJ8570PKZT1NPhE/PofUlGfZFwmYyaLK3zQtzzHNplS8OS8tcUHi81WWHXe9H50XJGr8DF9m3QPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=antoniohickey.com; spf=pass smtp.mailfrom=contact.antoniohickey.com; dkim=pass (2048-bit key) header.d=antoniohickey.com header.i=@antoniohickey.com header.b=sgr6dt0a; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=cdBU4kE4; arc=none smtp.client-ip=54.240.48.105
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=antoniohickey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=contact.antoniohickey.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rtKGBYBS"
-Date: Sat, 15 Mar 2025 14:41:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742064096;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BcPZpCb5hUMBl2xPR4trisSVQQoDkDSi25QYkuo9OLU=;
-	b=rtKGBYBSngX7Vh9nOEZziCgVYr6SjyioyAjsHy6xwD/otmu+Zzw/tZTgkEX3pZ++NiCt/n
-	kFKWsz5vTcm3UWLMSOPkXuWRLPXlHXUUR84KM7fjXqdvd/VkzouWC/sP67xa7JnmBO3/kv
-	eIeeuz3bvsJILWNsYvneuM/8Kri5yyw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
-References: <20250311201518.3573009-1-kent.overstreet@linux.dev>
- <20250311201518.3573009-14-kent.overstreet@linux.dev>
- <9db17620-4b93-4c01-b7f8-ecab83b12d0f@kernel.dk>
- <abk74sbsvsuijqhohyenl2mecz6unmkhavkga55fxsld6m6ise@ncbz3xmjlymw>
- <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
- <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
- <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
- <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
- <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
+	dkim=pass (2048-bit key) header.d=antoniohickey.com header.i=@antoniohickey.com header.b="sgr6dt0a";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="cdBU4kE4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=cgcwyxycg75iw36cao5ku2ksreqpjkvc; d=antoniohickey.com;
+	t=1742093835;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=V/Hofvva/tI/9xwFYj237s5Y/mAkuzG9//5niNcWUes=;
+	b=sgr6dt0aQCm6CWyx60Efq+NaH4J77lXJ/VbVXnQZPAG+sOLnPvMDnrctSPadj9v0
+	Ia4cG0hMReXfPDulzVYM+J0hy8qK35w8BeFvUdH69yGO2chJQ6ASbT9t7D17Ju5TQ5g
+	69fFKTwTC7BZOT7FnBuYkJkpMHBjTlGQqRhUEJOi4nS3/SmQIigAI7rxRCnkbyscE+Q
+	thRFkl5q6ZREsfAWplwz37ialodcZqqgWsQ/4ydXPSuOao6OcpYO09Rodvq/yGC2PKD
+	zGEpfqYRGDmUArHFyRF7azLPBI1kFuh4BI5G/QvAp+RaGZBV6QGJVma6BosPMO3vhs6
+	7eaPxxnzFQ==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1742093835;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Feedback-ID;
+	bh=V/Hofvva/tI/9xwFYj237s5Y/mAkuzG9//5niNcWUes=;
+	b=cdBU4kE4lye1j/25GGNgpltkhyTIn8HunKAWi64VV1mTlvTyaao8cx4mr9W5GIQV
+	oDtO95sFNqDYTQjsI9VMLaH55QKSdIrj0BIgHf80inxZyGmL2UaeUzIjAhNkhSSi5Dr
+	tDLG4pP8ASnt2PA8e15LxxSMwYWX0Vn09BGTL+qw=
+From: Antonio Hickey <contact@antoniohickey.com>
+To: boqun.feng@gmail.com
+Cc: a.hindborg@kernel.org, alex.gaynor@gmail.com, aliceryhl@google.com, 
+	benno.lossin@proton.me, bhelgaas@google.com, 
+	bjorn3_gh@protonmail.com, brendan.higgins@linux.dev, 
+	contact@antoniohickey.com, dakr@kernel.org, davidgow@google.com, 
+	fujita.tomonori@gmail.com, gary@garyguo.net, 
+	gregkh@linuxfoundation.org, kunit-dev@googlegroups.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org, 
+	netdev@vger.kernel.org, ojeda@kernel.org, rafael@kernel.org, 
+	rmoar@google.com, rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: Re: [PATCH v3 2/3] rust: replace `addr_of[_mut]!` with `&raw [mut]` 
+Date: Sun, 16 Mar 2025 02:57:15 +0000
+Message-ID: <010001959ce25be2-a436530e-858c-4da8-b823-24f98bad392b-000000@email.amazonses.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67d4c74d.050a0220.66d0.b23d@mx.google.com>
+References: <67d4c74d.050a0220.66d0.b23d@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Feedback-ID: ::1.us-east-1.3SHHfi5Rh4c+NdtIv+pxNWeqDT0J3zAhYZLMebdhE9o=:AmazonSES
+X-SES-Outgoing: 2025.03.16-54.240.48.105
 
-On Sat, Mar 15, 2025 at 12:32:49PM -0600, Jens Axboe wrote:
-> Kent, let me make this really simple for you, since you either still
-> don't understand how the development process works, or is under some
-> assumption that it doesn't apply to you - get some of the decades of
-> storage experience in that first thread to sign off on the patch and use
-> case. The patch doesn't go upstream before that happens, simple as that.
+On Fri, Mar 14, 2025 at 05:18:17PM -0700, Boqun Feng wrote:
+> Besides, it'll be easy to review if you can split the changes into
+> multiple patches. Thanks!
 
-No, you're the one who's consistently been under the assumption that it
-doesn't apply to you.
 
-You've got a history of applying patches to code that I maintain without
-even CCing the list, let alone myself, and introducing silent data
-corruption bugs into code that I wrote, without CCs, which I then had to
-debug, and then putting up absolutely ridiculous fights to get fixed.
+Hey Boqun,
 
-That's the sort of thing that process is supposed to avoid. To be clear,
-you and Christoph are the two reasons I've had to harp on process in the
-past - everyone else in the kernel has been fine.
+Thanks for the review, do you think splitting this patch
+into a seperate patch for each file would be best?
 
-As I said before, I'm not trying to bypass you without communicating -
-but this has gone completely off the rails.
+Thanks,
+Antonio
+
