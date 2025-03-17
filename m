@@ -1,248 +1,129 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CF3200BB3;
-	Mon, 17 Mar 2025 21:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E25B1E1E08
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 22:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742247375; cv=none; b=oiqy2QfAurosWmDU1KrMu8/TDFhx+w9LxBmiztAkoBGg3V2PeVWhC1qpE7cbfPFhxktO2of+VkE356/3xiKznO4D1+8xiqV8DVDcBFXeCueJuK8IEmSL9qZalr8rmnXNYp8tsi8C02EaBKUoxkUxRTIMRoNUfZLMEJ2NskyQb24=
+	t=1742249546; cv=none; b=QpmchkQqGoWmvRrWWHk6vDxIE1M+aOVBKX0OZ8MN96rPRSHhqV/lpKhjoXd+/8s40e3r6fZdgVNbcMkmcTj3EetOd5PR2OD5V7kjj7hF/rthZ1u0rGRFDgEGGlMq2z271jreHS5nLxr06D1oLyiJFjrYqw/wIRdJF9ibYgeeXgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742247375; c=relaxed/simple;
-	bh=NDRo1NDyk0UjBObq9g44k3C9noQuO7EtswHNQ9SKiec=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j0PKDBvfTRZHhcPR9da5uoxQ/fBFoolkKWsczDRtlqHzh/yviX+5l2ltYbKJsBHO3NWEo28BpBb0U6pTYPrtl7AJdkbgekMcxjnxXzndhkqt872ShN+Ud6XtsRR9Sn1BxkvHpkfW+98ZxybOW6g1cQnrzC1sLIgTXFIcSpvlz+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wd6ULlpE; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742249546; c=relaxed/simple;
+	bh=usLCjoxsqNxSzSutwumY5Uq3e0q2VzW9jIdFhiDVJe0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=HOIw5pzXszq9lYYLsBi3xTPn5GPw+H6Kmu/cNgYVfmWTI9VJJNdtb51vfyxTTT6XUEZuZaEPEt3o1FjWzlXE/WGTMz6NCYV6/lkgi9xH4H4csxw3Vio8hDfWWZafaEkqKqa3CLOK1C8prt0oNtXizs3q18nrPNxQc7S6CHq9HUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B8zLKMb3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wd6ULlpE"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e8f4c50a8fso41538676d6.1;
-        Mon, 17 Mar 2025 14:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742247372; x=1742852172; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8gbb/i5BgK8BB2vPDb7y+lygRuwfeWxT2URX0MKFH64=;
-        b=Wd6ULlpE/9aitSilvzrPJUogeV+afAS6Q9DCfD8Z8OmQoZabhmsg6fjX7mfkYZDSYs
-         f0Hr6IZHNvia/nETXeB0DX3Eps/o+Su4eKsFo0ON7uebLWl40u7V4MYP12gW13Xu9Whw
-         8GDMCfMcf/MUwRar/gGrD0PsX67ceYRYvNvagQNAs6kj02vn7vA2CrINj2fpqUtO3UaT
-         UMdRHFuwNxBVkuIkdk4FtVC4AGIxZQhGNh7jXb//1hAVry5650+Oy/lXoHMP8eNP0Dj7
-         kNlK6XnZZZ0gwVvYVUzWcW+zN/+AjlQ+nvxcZKFJWHXdOFd5yaJh2ZEH97Sf6+kUnUA2
-         M7Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742247372; x=1742852172;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8gbb/i5BgK8BB2vPDb7y+lygRuwfeWxT2URX0MKFH64=;
-        b=eFtz78hCAbxsE3Xt1/Hmqh3bqlrPUVKU4FP+ny0nQHv/Ye59QvAAhKlGJHuKPLf9aD
-         4nv2T7zBNrYv5nSmuH+erLoeyysdotXqT343d3C8YIrgjQ2N6hqM77CMwUcOaeq4n+PN
-         DWmSr9uZz8XOAiMFf5IgRxB9ezKrAulti2CXgA9a2e5rMJIcsKhAHuy7wgC28wrkrZnt
-         x7jITvJ5ZyHn6i2sZv5UfsNBD1n/y8nL4JPvF0F9mnam/s25vqAWLd1KEDUYyFpA9/gc
-         JJQ684eidmEoLzgBqPH+hr9og0T7PVHLkubAu6DcmfUeyEynfDnEIMdc2Cl9I7klzwjO
-         pUFA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIIuw+KJyN1G7G98ofllND30CQIjn3Yx8nVvYn1y8bybOkb+d1n0it2Legi0xHe0dpoTdv9THW6UBx@vger.kernel.org, AJvYcCUsyHSyyP/nuHyq4WRa1SJR7rXyGMGGSS/crLJjBByXDEf11r20Wz8SX+tbK5ZYJfDL9XCU/h9fui5i/qeN@vger.kernel.org, AJvYcCUyanpg2vg+Lzt7cPljobq8A+TZASZV8Mk3t5ETbe4DMSvafZU+e99ZWMU4TggpDr+A2gJ4/Al6sdBvAneiNanj@vger.kernel.org, AJvYcCVhlb6JvWosBEATNn7tuZjRtsxt6xxOr727nPnfx/WBKnmA92ADOb1n0ig635Zy85j7TIqVVykEtc/uyKIg@vger.kernel.org, AJvYcCW4+J7Ir8T4dQySjquChgbrneMqIbgFGmewzcdZ0x2uO/iapZXWMy7sT8//SpBA9QgUF5MhUQRJDtBg@vger.kernel.org, AJvYcCWzN9CjQa/Kunm1Wh/XBL0NfdPG3B+xEvtc5H5TkSPkfHVNMrHnWIhvSzqlt6LLw3SmfTC5jwODEmbIiAA=@vger.kernel.org, AJvYcCXr2YU5FWSTQHC0YCAl05oByRaPUyKvSCxZOwj8HT26uSR7tFOGz93EArSPekaYo33Oh5QBgF3n1XcDD/BD40s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5Ighyk1YwwDB0iXP3Sz0raJVrxRTdYQ4CbUzxqRgYZyYrGatW
-	rY5XjlwVJGJQIO6jgffHWvtdPcsgbdU7MVRhjFTeEqiHdbybi2Qm
-X-Gm-Gg: ASbGncuY2xGlEgGj2QLrIfwZwkxBO/w071DL0G5yBpT0/6OjlZt1Ni75me/r//ft6sD
-	YHXdqujqgMYeQcZX6lOWFUQa4qQBJ9unCk7QSK8hJcLnWWvhT81qj5tF7Ns4ywTs6+1foS1TmHV
-	DUuJahYa2bv310zVmv0cQxU+LZpU4N7sxCDX9Ii55ToWpDfzmEUDZd9D4ubVSkNDya8v6c8zC27
-	9vywXPtKiswUA97flxumG1y1hgNuGwbTp1794KNn7G7aMjH00hdYSdj0QlGt3Kj7Vnl8CTaFXN/
-	iC+y/TNBSoUXVDQdYVfpz1jponxgJb4JG5daL59T4o6MtHOCrsib/ODvmHXz8sUGxdSiriNZLQC
-	Dk1PHpwn3SytwP3FgAg3zv0ihFwN0FFQd7mKUzMII3F8Ppw==
-X-Google-Smtp-Source: AGHT+IH7Cg+zRnk0RKChbvzsCRrFHm3/BGwV9VJShTZo0drsjzRIjm781oK9RmO+lw2g3ZlpO0mzrA==
-X-Received: by 2002:a05:6214:d49:b0:6e6:602f:ef68 with SMTP id 6a1803df08f44-6eaea9e0a17mr215245556d6.10.1742247372550;
-        Mon, 17 Mar 2025 14:36:12 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade24b8c2sm59151996d6.50.2025.03.17.14.36.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 14:36:12 -0700 (PDT)
-Message-ID: <67d895cc.050a0220.99d33.5adc@mx.google.com>
-X-Google-Original-Message-ID: <Z9iVyI7hTo0imPzs@winterfell.>
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 18F611200073;
-	Mon, 17 Mar 2025 17:36:11 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Mon, 17 Mar 2025 17:36:11 -0400
-X-ME-Sender: <xms:ypXYZ4YXhTbqXacc55vyK0DzU36dWKEoqldGMH5M6YKAOcHDbJQ2nA>
-    <xme:ypXYZzaES_UoXJhNr1-Tpfcy9v_PPeCLlIF_G-JB2IOtJKMJxXpIr-C9w4HJkEoIe
-    PdXMRJsXTe-JBGXIA>
-X-ME-Received: <xmr:ypXYZy8nGPeqzJOzL8NTluopRnAXycXq7Fx6bEGwXYEm5IbLg5trBkpcf1iOKA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugedtieefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhephedthfeukeefuefhteehgedvvdfhleff
-    jeefleevkeeklefhffdvkeefleeuvedtnecuffhomhgrihhnpehgihhthhhusgdrtghomh
-    dprhhushhtqdhlrghnghdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgr
-    mhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlh
-    hithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehg
-    mhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepfedvpdhmoh
-    guvgepshhmthhpohhuthdprhgtphhtthhopehtrghmihhrugesghhmrghilhdrtghomhdp
-    rhgtphhtthhopehmrghsrghhihhrohihsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhhitgholhgrshesfhhj
-    rghslhgvrdgvuhdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopegrlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepghgr
-    rhihsehgrghrhihguhhordhnvghtpdhrtghpthhtohepsghjohhrnhefpghghhesphhroh
-    htohhnmhgrihhlrdgtohhmpdhrtghpthhtohepsggvnhhnohdrlhhoshhsihhnsehprhho
-    thhonhdrmhgv
-X-ME-Proxy: <xmx:y5XYZypVtA76PPl-m-9kbwVPrIJgH5gajSBF3WTO0nKBx_5qXn6pdg>
-    <xmx:y5XYZzrDR3LvRcQhC_YjdvlvHCExbhH_kDpbnyWb0oU0v1YByxCBcA>
-    <xmx:y5XYZwTYUuiPTy3RWllPn1PCnorfOu_ULD6QLLg3X52FEOnzp6HIdw>
-    <xmx:y5XYZzojp2cg3CDIWX-EdUsXDkf_6fF-SbZDicqSt6QlHWCr-wgjug>
-    <xmx:y5XYZ47o-BkwHDGbRJ7JuT-GW1O6nTYgbSm5Ebi6pRye0rPkZg8zfL6G>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Mar 2025 17:36:10 -0400 (EDT)
-Date: Mon, 17 Mar 2025 14:36:08 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,	linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org,	rust-for-linux@vger.kernel.org,
- linux-kselftest@vger.kernel.org,	kunit-dev@googlegroups.com,
- linux-pci@vger.kernel.org,	linux-block@vger.kernel.org,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-References: <CAJ-ks9kBp8zPfaQuZRb0Unms1b13hDb5cRypceO8TWFR0Ty5Ww@mail.gmail.com>
- <67d864b2.0c0a0220.39fb6f.4df4@mx.google.com>
- <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
- <67d8671d.050a0220.3305ab.6372@mx.google.com>
- <CAJ-ks9=uHjJrzM0ruvm4v4wr8LygRMP-1orWBy_9OiNNeQr0ow@mail.gmail.com>
- <CAJ-ks9=Qcmvbm=YGJ=jrX_+YdMsftk=FAimszYZB1OUuV4diZw@mail.gmail.com>
- <67d885ff.0c0a0220.111215.5644@mx.google.com>
- <CAJ-ks9kYB1b4XsQcFb=NScPq+R+13U+Sv-6opi-yp6=ZjuLD_g@mail.gmail.com>
- <67d88a1d.050a0220.2cdacf.4adf@mx.google.com>
- <CAJ-ks9kg4Br=56HT7T5sWpoMKhRqT_2x+cpQAWoyrEG3qyqQ6Q@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B8zLKMb3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742249543;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6pVRX09G0SFKsJWurQ5KQ9f6tFMu5DS0xLdXsv+JFok=;
+	b=B8zLKMb39XNCrK+nNM+CSNe6HIP4Zeqo/kSANd/ua5D/z36QLb3jLY0ccYyeRk/LQZPn7P
+	tQh6VawX0x/1j6nrcNI/mwjCEXdw6M+n6xouY1eCbEEVbuEF8uEzaaS6CyAc5tPKtaR0hr
+	YpurGdouv5XWWRFB3vqk6GYHQZLBrTA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-113-cq-J--F_NJ25fhgySNfabQ-1; Mon,
+ 17 Mar 2025 18:12:20 -0400
+X-MC-Unique: cq-J--F_NJ25fhgySNfabQ-1
+X-Mimecast-MFC-AGG-ID: cq-J--F_NJ25fhgySNfabQ_1742249538
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7D16E19560BB;
+	Mon, 17 Mar 2025 22:12:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A180118001EF;
+	Mon, 17 Mar 2025 22:12:14 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <9a4b6142448b70ca4cfad092219b3e23841dd961.camel@ibm.com>
+References: <9a4b6142448b70ca4cfad092219b3e23841dd961.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-8-dhowells@redhat.com>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
+    "slava@dubeyko.com" <slava@dubeyko.com>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "idryomov@gmail.com" <idryomov@gmail.com>,
+    "jlayton@kernel.org" <jlayton@kernel.org>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 07/35] libceph: Change ceph_osdc_call()'s reply to a ceph_databuf
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ-ks9kg4Br=56HT7T5sWpoMKhRqT_2x+cpQAWoyrEG3qyqQ6Q@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2342308.1742249533.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 17 Mar 2025 22:12:13 +0000
+Message-ID: <2342310.1742249533@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Mar 17, 2025 at 04:53:18PM -0400, Tamir Duberstein wrote:
-> On Mon, Mar 17, 2025 at 4:46 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> >
-> > On Mon, Mar 17, 2025 at 04:35:42PM -0400, Tamir Duberstein wrote:
-> > > On Mon, Mar 17, 2025 at 4:28 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> > > >
-> > > > On Mon, Mar 17, 2025 at 03:05:45PM -0400, Tamir Duberstein wrote:
-> > > > > On Mon, Mar 17, 2025 at 2:50 PM Tamir Duberstein <tamird@gmail.com> wrote:
-> > > > > >
-> > > > > > On Mon, Mar 17, 2025 at 2:17 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> > > > > > >
-> > > > > > > Then we should fix clippy or how we set msrv rather adding the stub.
-> > > > > > > @Miguel?
-> > > > > >
-> > > > > > I filed https://github.com/rust-lang/rust-clippy/issues/14425.
-> > > > >
-> > > > > I don't think we can wait for that to be fixed, though. Usually clippy
-> > > > > is distributed with rustc via rustup, so even if this is eventually
-> > > > > fixed, all versions between 1.84.0 and the fix will need this
-> > > > > workaround until MSRV is >= 1.84.0.
-> > > >
-> > > > We need to take one step back to evalute this "workaround".
-> > > >
-> > > > First, expose_provenance() and with_exposed_provenance{,_mut}() API are
-> > > > clearly defined as equavilent to `as` operation [1]. Therefore, the
-> > > > changes in this patch doing the conversion with expose_provenance() and
-> > > > with_exposed_provenance{,_mut}() don't change anything related to
-> > > > provenance in practice.
-> > > >
-> > > > I do agree we want to use the explicit provenance API, but I don't think
-> > > > we want to introduce some API that we know we will change them latter
-> > > > when we bump the rustc minimal version. So the question is: are these
-> > > > stubs what we want even though in the future our minimal rustc version
-> > > > stablizes provenance API? If not, then the cost of this patch cannot
-> > > > justify its benefits IMO.
-> > > >
-> > > > Now let's also look into why we choose a msrv for clippy, I would guess
-> > > > it's because we need to support all the versions of rustc starting at
-> > > > 1.78 and we want clippy to report a problem based on 1.78 even though
-> > > > we're using a higher version of rustc. But for this particular case, we
-> > > > use a feature that has already been stablized in a higher version of
-> > > > rustc, which means the problem reported by clippy doesn't help us, nor
-> > > > does it provide better code. Frankly speaking, I think we have other
-> > > > ways to ensure the support of all rustc versions without a msrv for
-> > > > clippy. If I was to choose, I would simply drop the msrv. But maybe I'm
-> > > > missing something.
-> > > >
-> > > > The point is tools should help us to write good and maintainable code,
-> > > > we shouldn't introduce complicated structure of code just because some
-> > > > tools fail to do its job.
-> > > >
-> > > > [1]: https://doc.rust-lang.org/std/ptr/fn.with_exposed_provenance_mut.html
-> > >
-> > > Even if we globally disable this clippy lint, we still need stubs
-> > > because exposed_provenance was added in 1.79.0. Did your suggestion
-> > > address this? Perhaps I missed it.
-> >
-> > No, I didn't.
-> >
-> > That's a separate topic though, because I can see the argument that:
-> > because with_exposed_provenance() is a function rather than a method, it
-> > won't be very benefical to use ptr::with_exposed_provenance() instead of
-> > kernel::with_exposed_provenance(), therefor these stubs of
-> > exposed_provenance make sense to exist. But I don't think the same
-> > argument works for ptr::{with_,map_,}addr().
-> 
-> What about `pointer::expose_provenance`? It's a method that was added in 1.79.0.
-> 
+Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
 
-We have a few options:
+> > +	struct ceph_databuf *reply;
+> > +	void *p, *q, *end;
+> =
 
-1) we can decide to use funtion-version of expose_provenance() (i.e. the
-   stub), if we feel the symmetry with with_exposed_provenance() is
-   a strong rationale. This also means we won't likely use
-   pointer::expose_provenance() in the future. That is, although kernel
-   doesn't have stable internal API, but in the foreseeable future, we
-   decide to use funtion-version of expose_provenance().
+> If I understood correctly the logic, q represents a pointer on current
+> position.  So, maybe, it makes sense to rename p into something like
+> "begin"? In this case, we will have begin pointer, end pointer and p cou=
+ld
+> be used as the name of pointer on current position.
 
-2) we can introduce a PtrExt trait for <1.79
+"hdr" might be a better choice.
 
-   pub trait PtrExt<T> {
-       fn expose_provenance(self) -> usize;
-   }
+> > +	iov_iter_advance(&reply->iter, q - p);
+> >  =
 
-   and
+> > -	if (offset_in_page(p) + object_map_bytes > reply_len) {
+> > +	if (object_map_bytes > ceph_databuf_len(reply)) {
+> =
 
-   impl<T> PtrExt<T> for *const T {
-   	...
-   }
+> Does it mean that we had bug before here? Because it was offset_in_page(=
+p) +
+> object_map_bytes before.
 
-   and `PtrExt` in kernel::prelude.
+No.  The iov_iter_advance() call advances the iterator over the header whi=
+ch
+renders the subtraction unnecessary.
 
-   (we need to #[allow(unstable_name_collisions)] to make that work)
+> >  	rbd_dev->object_map_size =3D object_map_size;
+> =
 
-   We can also make with_exposed_provenance() use the same *Ext trick,
-   and remove it when we bump the minimal rustc version.
+> Why do we have object_map_size and object_map_bytes at the same time? It=
+ could
+> be confusing for my taste. Maybe, we need to rename the object_map_size =
+to
+> object_map_num_objects?
 
-Regards,
-Boqun
+Those names preexist.
 
-> We can certainly disable the clippy lint rather than add stubs for
-> `pointer::{with_,map_,}addr`, but it doesn't bring us to a solution
-> where only free functions require stubs.
+> > +	reply =3D ceph_databuf_reply_alloc(1, inbound_size, GFP_KERNEL);
+> =
+
+> Interesting... We allocated memory page before. Now we allocate the memo=
+ry
+> of inbound size. Potentially, it could be any size of starting from zero
+> bytes and including several memory pages. Could we have an issue here?
+
+Shouldn't do.  ceph_databuf_reply_alloc() will expand databuf's bvec[] as
+necessary to accommodate sufficient pages for the requested amount of
+bufferage.
+
+David
+
