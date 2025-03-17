@@ -1,92 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55022417C7;
-	Mon, 17 Mar 2025 14:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF172405E7;
+	Mon, 17 Mar 2025 14:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742220842; cv=none; b=WCBqW8/f6kKb84mDDq+dkZOGDFIyZ5wni0I+7ZZOwjy0LAJ8xJD9/LD8kVPlrzWbWpqWQV9y+XAbeU2713vMqc9teEqiUsOgs5elOf3ExmRMJiU+Cf3Ih7YIuTjCOVKI8P8FgeRUNK89lNbakItfZTo70DZJ/9OTP5YhTHLnQvM=
+	t=1742221437; cv=none; b=JRLcGSphPcBQarhdwdTqEvQkunBVeYEbq179RzO1pwUMY+romON4CXDmGMx2swY2G70dZquC0f7sJnmTLttQnfUdttc7qMryKPybx+WIuCt2L+a6MPiiS9DElpH/jqBRw2Iy7QAmPO54uqqUeB0EwKr2/y/SMQlTIRPkSQtdTAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742220842; c=relaxed/simple;
-	bh=KetjEDEIpNK3M8QcLEfsyRIU1gURvCcBvqSeu3O8Y4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TAp/PKv+cHLheFw0762OZ3zriwkIIblJqtxc6SKBPtoQfseH/uCI3LVSHvokFemCkzA7FVN1G3lkS7BJIOY7CF+ihVXfaSR3FGO7D5kBOdJfHsJA7CIxd60enkfMQxFJZ8DX4yY12IUH/HOSQGoKvkan0yMWpAQ8nF3cqMAyegA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEGAqmaF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742221437; c=relaxed/simple;
+	bh=5zjwde8AZ/8b8+2Y46pl7g3mNNK7OdSviWWwEh2lyV0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=iqIqrps/1qhza3x9N8t6C5dLhNEtV8eeO9cHl8jyBjEaoiRikM0mmBt/bYUYg7V+38OLhPl4UUz/yf4HcWdWFXVf6SCCtlB/SMEYi+8vrkFPBOd4XlkSzL3VK5wIN4GKQTKqjcPiZjJOlRWZZSz0aq5snIgVwFwNStuI32eDPps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zaqru/CJ; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEGAqmaF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AACD6C4CEE3;
-	Mon, 17 Mar 2025 14:14:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742220842;
-	bh=KetjEDEIpNK3M8QcLEfsyRIU1gURvCcBvqSeu3O8Y4Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TEGAqmaFg2dV/ByjFvfDpQBY74I21IYlF7W1EZ0xyleN4H6jqR7VXiLxKJHoqAel6
-	 Y8tG3rEzJsfq7V9I7YRByt+CsyDC0oc+HEiNu27qad9bsdI5od+rNmCpFXiLLbzgL6
-	 nfCzWnrCp4vCAQvvofOtJGXVR5FNxlqoilmPT8k5cLPQT7FFT4yofuWpv0RRndESUs
-	 42B/p/Tc28dfdUGky+UnMTIoUEw1OMU1skoXPK1H3jWiBwgDgvwH0t5+DxSAQfeyQV
-	 zP8NDqk/PFpI/VlG3TbHhvoNP+fiHGefGlOnXjJlajPxQHXsajnyNwUUoVc1TsVY0T
-	 gbmltAxJoxtjg==
-Date: Mon, 17 Mar 2025 08:13:59 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
-References: <9db17620-4b93-4c01-b7f8-ecab83b12d0f@kernel.dk>
- <abk74sbsvsuijqhohyenl2mecz6unmkhavkga55fxsld6m6ise@ncbz3xmjlymw>
- <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
- <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
- <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
- <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
- <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
- <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
- <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zaqru/CJ"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4767b3f8899so55550211cf.0;
+        Mon, 17 Mar 2025 07:23:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742221434; x=1742826234; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ze+DSjxO3+Ymtxfj0TgyBM0AsCVysO4hhdvABkeHMk=;
+        b=Zaqru/CJnnccMVDNqrc+YWq8D36QebRu4ZvuW16GbIt9wDge6L1BJtq9HuJWq/LiE1
+         ihdAgH6doCAa/w6DZPQRDz+rblPDhJCyWpGnzcM4iqVniG0fj5nxcgb/auiRdf0Bkqph
+         jsvaXZwYUQZHDBJUJMxbWGSbO4nXL72Ke3yf/o+Y3/u8dvn0SK+E9S6qZ6u8hEgiGgg8
+         IN1Tn7ReYg8nFezuhCCgfnbkHk8F0vCfwXJT7fYkzBLxY716uVnkWyQMRKyV2Kwk6+Yg
+         z79Sr1naVeidW/nTQRed0ImuAPOcZFJI8kpz5cfY1d/QAuYABD81I9RoWkD1wpWKpDDJ
+         XWfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742221434; x=1742826234;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5ze+DSjxO3+Ymtxfj0TgyBM0AsCVysO4hhdvABkeHMk=;
+        b=qpq9U6kYtDqXfuUYIEXcNgCiAxWylRGN03qEyApAg2K8A19+32SbCsFLssMbG6kckb
+         mcDf6PvCiwvdQMDLPwmVz9FEadfEAkzWzREf2nqKu4m0haw3g2SCDlybQDq2QHXZ5SfY
+         9DAGtUk8YdJbqv/a+Ojw5iKBdEc5rfKtSO5Gh09vEq5+54iAvLKwA5PcWcMf1LvnvyEv
+         zx9oG1psOswE3w6aERSQfK47h2lkkSCLNdHuWoWOSB4D5AMgC3o9jomks9vYP5y9/H8/
+         D9yLZu7aZuiXDtQVSHgOrYNrBmzsjtnOU4naHbiOn95YvGuR3t9g2tGvxWDx8sOQBtPZ
+         6OCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOvTREHosynVr/Iu548PXB0SiiqV3UygA6OXH+IZ789ThRokGbtqBjFfdPy+guhFvqiRfB1RwsM3gq@vger.kernel.org, AJvYcCVcdmkgzboYUKm3GTJf0H63qoBHSOJO5TPVoxZ0vL33sGKxYqT61oWky3MytQDWBZqhPHMetj4EhVeO9lUrqjaD@vger.kernel.org, AJvYcCVeiC4dFAVD/1d9xwZeaTdE5CYftGTinLrNQNKJKvyiKTh+7F8PuPZUjopZpnUxmNMLpIg+tOXh00cR0GQu@vger.kernel.org, AJvYcCWY6Yum1ZZNWrfTglng5XDS6b09xEvxW8wVtU8dTOnQIE6T8vzFsBZh/jCy9Qdtj0fvTcFwDNzvdqfMQqVjyY0=@vger.kernel.org, AJvYcCXDGlfK6ON5+dUJqTNGNdyn4fM47cvLVm+XoBqu+/CTjZXHIt8STT2UPEGh8PPaJ4v4L+x0Qomlsgdp@vger.kernel.org, AJvYcCXYjCAAix3M4tJQaqNh6yFU4UW/el00c/N9kVBVn4fRFa9buyyKnUmX3fh6KpvWKt4Z3kcIRTUFZa9kTCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3wW1Ic/XN6wzF5LFqM3AFXSf/UN8ed92O/ZSGKMXK2bvVUqsm
+	CjgV9sjLfeh89jXDUYJ0h15KSy0knEtdjwN7crl0WvpliY/D+U7U
+X-Gm-Gg: ASbGncu4iRNJFEQVNd3f4fP3TNgBiCcVcwHLc1gXQHtX47HqrEKnrSkTlcUZE571685
+	hTmrrxJ4LjHWSgFPNdzibJL94oLtIlMOpB/k6SGbKnxzfSa0aeHfT7gm5RdQa/qfLp46TNAbfXx
+	lNoB6dy2AOBiV/RyBiBxTiA4aL8AqJGFyfuc+Xf2iSTQUh+V0ghb7Ah9xjavPmikBY3/0FnlXN5
+	+uEvlsZRX0GyuWI5PFv5x++b8F/a1IMWhU6kfj6AWXddo7bjQJck2WfJHP4Hc+lHDZdKE5sjezt
+	TwPOvKoxGgRk3AAWaou/EfEEk9js9ZvD612D1h0NFOdvbx7QNP+AuaRCWnC5+iJchJEOj3oGcQ=
+	=
+X-Google-Smtp-Source: AGHT+IHCPgh1LNFalMZ6pNl0PgrDUz9Ysq8X9QDeDL9NErlnrsd3XTsU1GehYSE1Htg8/Dz4cfPQyQ==
+X-Received: by 2002:a05:622a:1481:b0:472:521:871a with SMTP id d75a77b69052e-476babcd20bmr240941271cf.23.1742221434351;
+        Mon, 17 Mar 2025 07:23:54 -0700 (PDT)
+Received: from tamird-mac.local ([2600:4041:5be7:7c00:6895:24c6:e898:e320])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476bb60b13esm54601011cf.6.2025.03.17.07.23.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Mar 2025 07:23:53 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH v5 0/6] rust: reduce pointer casts, enable related lints
+Date: Mon, 17 Mar 2025 10:23:50 -0400
+Message-Id: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHYw2GcC/23MTQrCMBCG4atI1kYy00nSuvIe4iJN0jZgf0ikK
+ NK7G7tqxdXwDTzvmyUfg0/sfHiz6OeQwjjkIY8HZjsztJ4HlzdDgVIUQvPpEblJ60GooVS6seS
+ IZTBF34TnGrve8u5CeozxtbZn+H7/ZmbgwGWJTigJZKvy0vYm3E927Nk3M+OWVjuKXHCUTgnjK
+ sRa/9JiQ4F2tMjU69ooEFQ2ZH4pbancUcq0RqfRAjmLakuXZfkAkqykYFUBAAA=
+X-Change-ID: 20250307-ptr-as-ptr-21b1867fc4d4
+To: Masahiro Yamada <masahiroy@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+ Saravana Kannan <saravanak@google.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+ linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+ Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
 
-On Mon, Mar 17, 2025 at 08:15:51AM -0400, Kent Overstreet wrote:
-> On Sun, Mar 16, 2025 at 11:00:20PM -0700, Christoph Hellwig wrote:
-> > On Sat, Mar 15, 2025 at 02:41:33PM -0400, Kent Overstreet wrote:
-> > > That's the sort of thing that process is supposed to avoid. To be clear,
-> > > you and Christoph are the two reasons I've had to harp on process in the
-> > > past - everyone else in the kernel has been fine.
-> 
-> ...
-> 
-> > In this case you very clearly misunderstood how the FUA bit works on
-> > reads (and clearly documented that misunderstanding in the commit log).
-> 
-> FUA reads are clearly documented in the NVME spec.
+This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
+Lossin suggested I also look into `clippy::ptr_cast_constness` and I
+discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
+lints. It also enables `clippy::as_underscore` which ensures other
+pointer casts weren't missed. The first commit reduces the need for
+pointer casts and is shared with another series[1].
 
-NVMe's Read with FUA documentation is a pretty short:
+The final patch also enables pointer provenance lints and fixes
+violations. See that commit message for details. The build system
+portion of that commit is pretty messy but I couldn't find a better way
+to convincingly ensure that these lints were applied globally.
+Suggestions would be very welcome.
 
-  Force Unit Access (FUA): If this bit is set to `1´, then for data and
-  metadata, if any, associated with logical blocks specified by the Read
-  command, the controller shall:
+Link: https://lore.kernel.org/all/20250307-no-offset-v1-0-0c728f63b69c@gmail.com/ [1]
 
-    1) commit that data and metadata, if any, to non-volatile medium; and
-    2) read the data and metadata, if any, from non-volatile medium.
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v5:
+- Use `pointer::addr` in OF. (Boqun Feng)
+- Add documentation on stubs. (Benno Lossin)
+- Mark stubs `#[inline]`.
+- Pick up Alice's RB on a shared commit from
+  https://lore.kernel.org/all/Z9f-3Aj3_FWBZRrm@google.com/.
+- Link to v4: https://lore.kernel.org/r/20250315-ptr-as-ptr-v4-0-b2d72c14dc26@gmail.com
 
-So this aligns with ATA and SCSI.
+Changes in v4:
+- Add missing SoB. (Benno Lossin)
+- Use `without_provenance_mut` in alloc. (Boqun Feng)
+- Limit strict provenance lints to the `kernel` crate to avoid complex
+  logic in the build system. This can be revisited on MSRV >= 1.84.0.
+- Rebase on rust-next.
+- Link to v3: https://lore.kernel.org/r/20250314-ptr-as-ptr-v3-0-e7ba61048f4a@gmail.com
 
-The concern about what you're doing is with respect to "1". Avoiding that
-requires all writes also set FUA, or you sent a flush command before doing any
-reads. Otherwise how would you know whether or not read data came from a
-previous cached write?
+Changes in v3:
+- Fixed clippy warning in rust/kernel/firmware.rs. (kernel test robot)
+  Link: https://lore.kernel.org/all/202503120332.YTCpFEvv-lkp@intel.com/
+- s/as u64/as bindings::phys_addr_t/g. (Benno Lossin)
+- Use strict provenance APIs and enable lints. (Benno Lossin)
+- Link to v2: https://lore.kernel.org/r/20250309-ptr-as-ptr-v2-0-25d60ad922b7@gmail.com
 
-I'm actually more curious how you came to use this mechanism for recovery.
-Have you actually seen this approach fix a real problem? In my experience, a
-Read FUA is used to ensure what you're reading has been persistently committed.
-It can be used as an optimization to flush a specific LBA range, but I'd not
-seen this used as a bit error recovery mechanism.
+Changes in v2:
+- Fixed typo in first commit message.
+- Added additional patches, converted to series.
+- Link to v1: https://lore.kernel.org/r/20250307-ptr-as-ptr-v1-1-582d06514c98@gmail.com
+
+---
+Tamir Duberstein (6):
+      rust: retain pointer mut-ness in `container_of!`
+      rust: enable `clippy::ptr_as_ptr` lint
+      rust: enable `clippy::ptr_cast_constness` lint
+      rust: enable `clippy::as_ptr_cast_mut` lint
+      rust: enable `clippy::as_underscore` lint
+      rust: use strict provenance APIs
+
+ Makefile                               |   4 ++
+ init/Kconfig                           |   3 +
+ rust/bindings/lib.rs                   |   1 +
+ rust/kernel/alloc.rs                   |   2 +-
+ rust/kernel/alloc/allocator_test.rs    |   2 +-
+ rust/kernel/alloc/kvec.rs              |   4 +-
+ rust/kernel/block/mq/operations.rs     |   2 +-
+ rust/kernel/block/mq/request.rs        |   7 +-
+ rust/kernel/device.rs                  |   5 +-
+ rust/kernel/device_id.rs               |   2 +-
+ rust/kernel/devres.rs                  |  19 +++---
+ rust/kernel/error.rs                   |   2 +-
+ rust/kernel/firmware.rs                |   3 +-
+ rust/kernel/fs/file.rs                 |   2 +-
+ rust/kernel/io.rs                      |  16 ++---
+ rust/kernel/kunit.rs                   |  15 ++---
+ rust/kernel/lib.rs                     | 113 ++++++++++++++++++++++++++++++++-
+ rust/kernel/list/impl_list_item_mod.rs |   2 +-
+ rust/kernel/miscdevice.rs              |   2 +-
+ rust/kernel/of.rs                      |   6 +-
+ rust/kernel/pci.rs                     |  15 +++--
+ rust/kernel/platform.rs                |   6 +-
+ rust/kernel/print.rs                   |  11 ++--
+ rust/kernel/rbtree.rs                  |  23 +++----
+ rust/kernel/seq_file.rs                |   3 +-
+ rust/kernel/str.rs                     |  18 ++----
+ rust/kernel/sync/poll.rs               |   2 +-
+ rust/kernel/uaccess.rs                 |  12 ++--
+ rust/kernel/workqueue.rs               |  12 ++--
+ rust/uapi/lib.rs                       |   1 +
+ 30 files changed, 218 insertions(+), 97 deletions(-)
+---
+base-commit: 498f7ee4773f22924f00630136da8575f38954e8
+change-id: 20250307-ptr-as-ptr-21b1867fc4d4
+
+Best regards,
+-- 
+Tamir Duberstein <tamird@gmail.com>
+
