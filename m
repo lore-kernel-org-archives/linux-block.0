@@ -1,70 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A718418EFD4;
-	Mon, 17 Mar 2025 17:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3AE1A4F21;
+	Mon, 17 Mar 2025 17:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742232744; cv=none; b=eftyXhiPQQF8ALdQHoPF8ckmyuYN3ZQKnB1wLJQYFcTqquucWs/l2kQv20BMN+a7lygaysFuqlYDwYxi7tyBdt/c6XYxIePcUzs+mbxrjyej6rbON3cZGMnts3W+BBQPgLX4bGQB/LS93Pg7X0qUc7gXO/6zQptpD1x9af6LLps=
+	t=1742233090; cv=none; b=a1yXllPXlNFTHBC3bzRi4fiZ6Y8M5/YGPWq+dKDQ/g2lYVvcWkdVIsyXqrq9D9cU9NO5V3jvNSiVTXu6urJhH2fjCilnPKzYdvBpt5FZRc6ukak+MIFmGvElYUTi50j52rV0PdzHlralMTPptc9JVV69kAppVr1KWbIc7xZJv1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742232744; c=relaxed/simple;
-	bh=AjWJoCR6EvWimJacmp0+Bq30yU+x6T8HEqTzBbemVvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nEzK+XBHUo2YBAXohWv4wroebpoM8YVUcLngTJ2Ogih+h322OkKzFnCdWkXm9DV/lW5QjKXIqL60CpHvMzfawD5kteOseyDp7NzTiHcworfAgrQtnxnJm/2jWKyJdxe3McCMLA+yN5iSZ928kLq7SSH+8T1ouv+QqWqu0tKswac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKs3zXvY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742233090; c=relaxed/simple;
+	bh=uMyIM2a3hCj4fo5uDuORTOP5YfPaHIBtJM+ilAprrzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IxZxiBv4fAOh12F8rlBnmI/JrZOW514Ui7tN1AHat1wFJaL0/cuvT2iVdmrqncVuw4S8WjEqZ+IQSytyXnaXuGd8FWnaSwFBgTYbAMG/kKja80eHZsi0pNSvNjiVkSLwwN2YHekW11GB0ufyVebqT0snHAu5e3YDyve8X0Vn0w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=XF9yy9wD; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKs3zXvY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1BC1C4CEE3;
-	Mon, 17 Mar 2025 17:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742232744;
-	bh=AjWJoCR6EvWimJacmp0+Bq30yU+x6T8HEqTzBbemVvE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qKs3zXvYw3b925F1ZFXUUdisyj4ItRVxH7Vs9sE5GdATw/ODMR26lH1v+34WcL9qj
-	 s5U2uPl0a44w0I5JBaJYybwb6tq9QpajnA6952GtmhD/HTgUv1Py1bMH7O5qPvlqZf
-	 h7cHXju0b4WWQSUqSZDjIWsxhGuc7DIgkDWcAfKBs3lyDZKyL301an8+OGcZwdX2h/
-	 fzSeBAgbU8RerCOgfe0Js/C67xr/nT02YJFeVMCJSr5lan5uDaW+I6KQORAvIdJ76G
-	 uhsicd69sYA3t2pw9pBZvNth9SWdIaOOhsD8RbFtcUVJmoaqzzllBw9giVZhdzq0IJ
-	 N7DLHJiU1aJ+g==
-Date: Mon, 17 Mar 2025 11:32:21 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <Z9hcpS64HDZUJ21c@kbusch-mbp.dhcp.thefacebook.com>
-References: <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
- <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
- <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
- <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
- <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
- <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
- <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
- <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
- <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="XF9yy9wD"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZGhyL1jgFzm1HbZ;
+	Mon, 17 Mar 2025 17:38:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1742233081; x=1744825082; bh=bpd9/sYn2lGjFRExHt31Ceh7
+	1iSTR4WLZ5wIQVQq7tM=; b=XF9yy9wDUg7VvISLmpf1rkx8ynVvvTUzi/Ocsg7T
+	J+HhoCVq112cJVLKCET2O5i1pIek9PFQHd66FeBl6jdcZnopjN4+wCNFZBAD9pOf
+	uF2AFtQDCa/CpZmekUlh7WOJNE6Hx3AVnpF/T3Xt/uJh1ITjUdcMxoDO1H64Q7t6
+	aNzH7mDABd1lIZVLY+xwjMtCk3HJOgtzZQTTJ3tH7pTYFgi9bTKj8BOIQdW3hWF8
+	g84HSDtwjnAo2aWtBKJuzzScLySRoDg7L+aFWP4x2BIIHw5ZeblPETUN3PgO5tgH
+	KYfOp3b4ZeTEWZz+eFbf5Gtd1YgLsC5bDSXsmaWRarv8Rw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id cy3Gewyb3M6o; Mon, 17 Mar 2025 17:38:01 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZGhyG2fwGzm1HbX;
+	Mon, 17 Mar 2025 17:37:57 +0000 (UTC)
+Message-ID: <f46f0286-8052-4a29-9d89-376bf9b48d8a@acm.org>
+Date: Mon, 17 Mar 2025 10:37:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] block: Make request_queue lockdep splats show up
+ earlier
+To: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ming Lei <ming.lei@redhat.com>
+References: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 11:30:13AM -0400, Martin K. Petersen wrote:
-> Kent is trying to address a scenario in which data in the cache is
-> imperfect and the data on media is reliable. SCSI did not consider such
-> a scenario because the entire access model would be fundamentally broken
-> if cache contents couldn't be trusted.
+On 3/17/25 10:11 AM, Thomas Hellstr=C3=B6m wrote:
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index d6c4fa3943b5..4aa439309406 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -455,6 +455,12 @@ struct request_queue *blk_alloc_queue(struct queue=
+_limits *lim, int node_id)
+>   	lockdep_init_map(&q->q_lockdep_map, "&q->q_usage_counter(queue)",
+>   			 &q->q_lock_cls_key, 0);
+>  =20
+> +	/* Prime io_lockdep_map as reclaim tainted */
+> +	fs_reclaim_acquire(GFP_KERNEL);
+> +	rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
+> +	rwsem_release(&q->io_lockdep_map, _RET_IP_);
+> +	fs_reclaim_release(GFP_KERNEL);
+> +
+>   	q->nr_requests =3D BLKDEV_DEFAULT_RQ;
+>  =20
+>   	return q;
 
-I'm not even sure it makes sense to suspect the controller side, but the
-host side is considered reliable? If the media is in fact perfect, and
-if non-FUA read returns data that fails the checksum, wouldn't it be
-just as likely that the transport or host side is the problem? Every
-NVMe SSD I've developered couldn't efficiently fill the PCIe tx-buffer
-directly from media (excluding Optane; RIP), so a read with or without
-FUA would stage the data in the very same controller-side DRAM.
+Hmm ... my understanding is that it is fine if FS code calls block layer
+code but also that block layer code never should call FS code.
+
+Thanks,
+
+Bart.
