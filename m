@@ -1,154 +1,106 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94FB1CDFD5
-	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 18:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41763EED6;
+	Mon, 17 Mar 2025 18:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742235709; cv=none; b=MISVXiQgJRhJnht3F5157Boysh929lXVIAvuIC6KLuIGhsmw/4qbZvrpP1ghEkieShz4hqBYKSbyGoZ2AJN2HDev5XVUe25qCu5DxQWjW3spTA8WFz3dvfHg/DYU+ygURAtUDxyD5BRvNfI/AOfpZVBdJhDllnMxfsuCEtgwJMU=
+	t=1742236105; cv=none; b=BehI7RIJuNf9xqKO8spBuqd+n+TRnQLhXuK8/f18vLP8gnlb6PuiQ8kBY7OJ+wKeojkqu1upJqwWbLeNEIhGzZvQf+E+qV6Y/NigYLUZkvk0ttLphezA/07PS7tw+ZquzJLBIVQ4GaufmkFYUCbAmZ6X9bYdnFYg1onFToCUSic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742235709; c=relaxed/simple;
-	bh=y7PiawXMLjhJAHEtPEANtUgbmlPj8uz7tgQ/uKONMdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jvXvOiOLZI6VODpR/lDUZeTOIZC/QcbDBFZNAiWjMpYLGHjRn8HAx2B7xCelhp95PP1BNSDnUNkLEgppXb3m4cX1TMTULpOuzLunNCD4a4/cGVZ7uWhomrz9S/U+ZJIml6wCzyJRkRpG/2SKDo/GVYS5+Tr3GndILNBtmiqfNsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n5yQ/gwH; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742236105; c=relaxed/simple;
+	bh=Jic7LTo33nITNM3oJkdLiqyjphLqMZ8yFiyEQhuSp5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hS+1q7Y3wfA366UPDra84k1ISGrPhhWqzNE9yTmHkQQl5+qoUeUHvQBzRQA2E3p0gPPoueIViJx1aSedidaWDRrSbfIiJNUjOX/CM3hAH6oPItlupjQfDRF/bzXYFa5VkXhNnjlervGW1y0Ci/wtaqW3I1mr37nwOocnkj2GAZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=o+MzdPFN; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n5yQ/gwH"
-Date: Mon, 17 Mar 2025 14:21:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742235694;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Egdu7lu2alx2YW0th9IMSNOYWGB3ViakICF9fWwb8vY=;
-	b=n5yQ/gwHVTVVdWlOiJ+XVaqS7K6k2mjgYqXha0qdPUFupQyqa0l0ruezRNtVzm621MA7yK
-	seyQBoe29Or7osboe5o3nxYyFO2zcPshWZ9dVniHt2dMlPXL1eMOvHiYK475tv69fjGiQ3
-	JXFxdyWf9fm8OiC37upy/ReiVVjpoB4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
-	Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
-References: <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
- <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
- <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
- <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
- <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
- <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
- <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
- <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
- <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="o+MzdPFN"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZGk4J1rMJzm0R40;
+	Mon, 17 Mar 2025 18:28:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1742236095; x=1744828096; bh=7TPkFiJOJUHh3hlZJsWwzzO5
+	re+hHlLP4IsNnjC0wkM=; b=o+MzdPFN33MspEhQwhPRfyGp1huUhEK+thVupdFU
+	RO8Ye1VjTPe2blHwDHkE/uwuT3y3i4z2prbAcNPt+kIYgYl/ylSBZuVDniIE0GO3
+	4GSBZg9CzzjGl2ZiQhF8Txx1GvKUkn7Jo0pLTAXIsBVH31JGcxysN44aryvWyZh5
+	5VzZRpkTjj9GB0ELXj3Lm4jsLMVNMK8CiM71ZOd/mYrXvF4CW6MvPEagxJBbZhsI
+	B8KVbyJOCKCGF68Xi4rQitODbAj3QXjkpxVjPMceEaDZNvVwEipgdsUfjOvoi13o
+	rQeAgdgahz+XV5nasCYVzDrn38glFtAsbL76RNMxJBFa8A==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ZCOmU5wj8kFo; Mon, 17 Mar 2025 18:28:15 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4ZGk4C5fybzltBD0;
+	Mon, 17 Mar 2025 18:28:10 +0000 (UTC)
+Message-ID: <5b81f4be-427f-4083-8cbe-e201d0f255c5@acm.org>
+Date: Mon, 17 Mar 2025 11:28:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] block: Make request_queue lockdep splats show up
+ earlier
+To: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ming Lei <ming.lei@redhat.com>
+References: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
+ <f46f0286-8052-4a29-9d89-376bf9b48d8a@acm.org>
+ <13031d34692b0c97799de81c0b83875d56076e13.camel@linux.intel.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <13031d34692b0c97799de81c0b83875d56076e13.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 01:57:53PM -0400, Martin K. Petersen wrote:
-> 
-> Kent,
-> 
-> >> At least for SCSI, given how FUA is usually implemented, I consider
-> >> it quite unlikely that two read operations back to back would somehow
-> >> cause different data to be transferred. Regardless of which flags you
-> >> use.
-> >
-> > Based on what, exactly?
-> 
-> Based on the fact that many devices will either blindly flush on FUA or
-> they'll do the equivalent of a media verify operation. In neither case
-> will you get different data returned. The emphasis for FUA is on media
-> durability, not caching.
-> 
-> In most implementations the cache isn't an optional memory buffer thingy
-> that can be sidestepped. It is the only access mechanism that exists
-> between the media and the host interface. Working memory if you will. So
-> bypassing the device cache is not really a good way to think about it.
-> 
-> The purpose of FUA is to ensure durability for future reads, it is a
-> media management flag. As such, any effect FUA may have on the device
-> cache is incidental.
-> 
-> For SCSI there is a different flag to specify caching behavior. That
-> flag is orthogonal to FUA and did not get carried over to NVMe.
-> 
-> > We _know_ devices are not perfect, and your claim that "it's quite
-> > unlikely that two reads back to back would return different data"
-> > amounts to claiming that there are no bugs in a good chunk of the IO
-> > path and all that is implemented perfectly.
-> 
-> I'm not saying that devices are perfect or that the standards make
-> sense. I'm just saying that your desired behavior does not match the
-> reality of how a large number of these devices are actually implemented.
-> 
-> The specs are largely written by device vendors and therefore
-> deliberately ambiguous. Many of the explicit cache management bits and
-> bobs have been removed from SCSI or are defined as hints because device
-> vendors don't want the OS to interfere with how they manage resources,
-> including caching. I get what your objective is. I just don't think FUA
-> offers sufficient guarantees in that department.
+On 3/17/25 11:13 AM, Thomas Hellstr=C3=B6m wrote:
+> On Mon, 2025-03-17 at 10:37 -0700, Bart Van Assche wrote:
+>> On 3/17/25 10:11 AM, Thomas Hellstr=C3=B6m wrote:
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index d6c4fa3943b5..4aa439309406 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -455,6 +455,12 @@ struct request_queue *blk_alloc_queue(struct
+>>> queue_limits *lim, int node_id)
+>>>  =C2=A0=C2=A0	lockdep_init_map(&q->q_lockdep_map, "&q-
+>>>> q_usage_counter(queue)",
+>>>  =C2=A0=C2=A0			 &q->q_lock_cls_key, 0);
+>>>   =20
+>>> +	/* Prime io_lockdep_map as reclaim tainted */
+>>> +	fs_reclaim_acquire(GFP_KERNEL);
+>>> +	rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
+>>> +	rwsem_release(&q->io_lockdep_map, _RET_IP_);
+>>> +	fs_reclaim_release(GFP_KERNEL);
+>>> +
+>>>  =C2=A0=C2=A0	q->nr_requests =3D BLKDEV_DEFAULT_RQ;
+>>>   =20
+>>>  =C2=A0=C2=A0	return q;
+>>
+>> Hmm ... my understanding is that it is fine if FS code calls block
+>> layer
+>> code but also that block layer code never should call FS code.
+>=20
+> That added code only mimics the locking sequence that happens during
+> reclaim with the existing code to register the locking order expected
+> by the reclaim code. If anything violates that, lockdep splat [2] will
+> appear.
+>=20
+> So I'm not quite following your comment?
+Shouldn't the above code be added in the VFS code rather than in the
+block layer?
 
-If you're saying this is going to be a work in progress to get the
-behaviour we need in this scenario - yes, absolutely.
+Thanks,
 
-Beyond making sure that retries go to the physical media, there's "retry
-level" in the NVME spec which needs to be plumbed, and that one will be
-particularly useful in multi device scenarios. (Crank retry level up
-or down based on whether we can retry from different devices).
-
-But we've got to start somewhere, and given that the spec says "bypass
-the cache" - that looks like the place to start. If devices don't
-support the behaviour we want today, then nudging the drive
-manufacturers to support it is infinitely saner than getting a whole
-nother bit plumbed through the NVME standard, especially given that the
-letter of the spec does describe exactly what we want.
-
-So: I understand your concerns, but they're out of scope for the moment.
-As long as nothing actively breaks when we feed it READ|FUA, it's
-totally fine.
-
-Later on I can imagine us adding some basic sanity tests to alert if
-READ|FUA is behaving as expected; it's pretty easy to test latency of
-random vs. reads to the same location vs. FUA reads to the same
-location.
-
-So yes: there will be more work to do in this area.
-
-> Also, given the amount of hardware checking done at the device level, my
-> experience tells me that you are way more likely to have undetected
-> corruption problems on the host side than inside the storage device. In
-> general storage devices implement very extensive checking on both
-> control and data paths. And they will return an error if there is a
-> mismatch (as opposed to returning random data).
-
-Bugs host side are very much a concern, yes (we can only do so much
-against memory stompers, and the RMW that buffered IO does is a giant
-hole), but at the filesystem level there are techniques for avoiding
-corruption that are not available at the block level.  The main one
-being, every pointer carries the checksum that validates the data it
-points to - the ZFS model.
-
-So we do that, and additionally we're _very_ careful when moving around
-data to carry around existing checksums, and validate the old after
-generating the new (or sum up new checksums to validate them against the
-old directly) when moving data around.
-
-IOW - in my world, it's the filesystem's job to verify and authenticate
-everything.
-
-And layers above bcachefs do their own verification and authentication
-as well - nixos package builders and git being the big ones that have
-caught bugs for us.
-
-It all matters...
+Bart.
