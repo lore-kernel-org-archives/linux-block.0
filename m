@@ -1,106 +1,69 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DBC21C194;
-	Mon, 17 Mar 2025 15:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A647221F04;
+	Mon, 17 Mar 2025 15:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742223888; cv=none; b=lpj3mg+1W+xbYBaMRo6V4y3HpvLMPAsEfT6yRIHvIMqEK5KcXZNeXtmZRZCI2Zuk0boKUhc9Ro8zXZv6SAP+gt31YkRKZssh7LL0OnDZc2D8W30kdu5RnKIhvWshr5znqFnXajUHqXQ798mlFbqhhsrFxZD0cmkrxrJCsQ5dq54=
+	t=1742224507; cv=none; b=ft3ogKtXNSr9mFDuNZdDFhPpcu29bBQOZOr5K0ibGAKJeiy8Yj6TOHY1WKAs5BfXSXSHGvDD0nuXh7FTlTpsF3jWP+Nnjcx1bMC0eEbDHO0CXn1kM2BCs1BBuMPR0GDq7bjJg6VCN/Rkv0JvcxzWYfOdbG5VlG3QQfoovO44tXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742223888; c=relaxed/simple;
-	bh=dvV/UXPx7k0Bp/O7ZeVMaIo8X4bYnnZqpVVHk2iNOnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aQ5RMM+IG94XjFHAB8hAnilEy8pr2ouT7sP5xbFHpSLv8b1ubOS9A/f2VR1yLz9/sg/PWcwOTqACeUOmDNEh97yOd+RueZ1552ahluhMfXBRec3raKkP4l7uHK33oOl6v1PU8GctW7inM1yZr3d/xyW6C2sifD6/GE3X4jfN9Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5SBu4VV; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742224507; c=relaxed/simple;
+	bh=9xE/ZZFAhbUdXemL+vvPekfXt864Auu6rMm4NZH2MIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EPw1DAP/I93IYQT7amGqIr8s95+UO+CeJqXgPFZEdTldv6Qx3BVQ5yX74X/4vYHU+lRElwOxi+jAZtEwfec1DWinwfq+6dhtPIzf62+sR5fBRu4V6jv2d6GVmIwak6rz2f0vxOA25j4KZdBHbUJ3hOfaER3Ten8Ptl3Lsav8n5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uZljwjN/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5SBu4VV"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bf3f3539dso46135381fa.1;
-        Mon, 17 Mar 2025 08:04:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742223885; x=1742828685; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dvV/UXPx7k0Bp/O7ZeVMaIo8X4bYnnZqpVVHk2iNOnE=;
-        b=m5SBu4VVZ2Ql144SXytUUn4IL7O40pAFOxKSl6AfxxbLcS9JEN33VCWh7aHDng7bAQ
-         vXQJGMbcgrWyDbmCcn2tqKCT/aP9d4XSQp3It7Wj3c60oceAiVVoLZdpA+6lkEWhXJU9
-         DeecI5GVkZ9OtJzbZ8BIsToJ8iZKLnPNM2C1GZ7GZALHpkTg0j//7Sg1BqCXA/2SvcEA
-         1P9MIZaQGwA+/SdzdpDX+83K7Csm8LSSamhEdDfCb758h1TOJuMfmsei+ulVYskzB0gQ
-         z8CBPSSelGPpkSuaw6G2HrvdT4AlMbcuPgn/1n7yOg8o3MFqHdv+5LN7w18zWGtWm+2n
-         pePQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742223885; x=1742828685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dvV/UXPx7k0Bp/O7ZeVMaIo8X4bYnnZqpVVHk2iNOnE=;
-        b=ko3GRZCw4KD6gHyDQaui110NLJAb40oZmu8aHpEKqA33dbOH9m58qSZ8Er8vSXMl2l
-         8VHK2LMM6+vb0geDQ9NYI8OigbOUY/1VFdDDTd665u7UIddlb5H0lHxKkTzq8fLMQDY8
-         CgFCtD0xpU/D3QLkEA7+qnj1tzUG4ICwqrSrN577iJCsVGs2R4U6W606duO37AYecFXY
-         MDzOvMii4YB/VfETMam/kEKKxMZX96zQehRXii9AZVSfkOs/Ck2GQ24MyqCBtdUBN4gN
-         3XWOa8Kbv2xvmfBiNr5DVB2x1L6o7ufrnDO32yYdE2f+25UfFcGKX/2eTXadmjSPcTIg
-         rA9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUSVtn3NqBFxfUmGV2my4VNB4AdF1DHBUugpfTOOK9iln1ZVv+L6BrFXF8a4CA6RGverwCs9ekEpPVE/UbY@vger.kernel.org, AJvYcCV58RnKiTEZJbTEJsXbu+2LU7CmX12WvHXr0RhgTZF1dcnOY75E1bHKzOZ7h602sP2z4j/pJifS6Sq3@vger.kernel.org, AJvYcCWQ7GX4uw7aB+45TFlfpgUmewY8HZRuVqk9cecTY71GzoR6WETvmKGatC95GhJOFg/oEDq8uMc2aglPuOg=@vger.kernel.org, AJvYcCWbAXW7ejgXc4Li2eyVj65jm/xa/t+Tkqy1Vq4bpNHCybVdAO3k8DmSLwcV56sq7N/aVejE8NKJAewoKBRBF2Zz@vger.kernel.org, AJvYcCWuB2McuGhZZYkq3vxnK+X3FJUdHnxMzMQ9F1Y2Ut/QdFHe2qQ+veilsoXK4jzK2q4lEva8UHf8Bga7bSkf6kA=@vger.kernel.org, AJvYcCXo/E2rQ2ZbkP10GFXoDmPF/1Ega2kZESylpm5UeM0SLaYe0lYqggEuTAkVIXfsq+5v4YQbt6ymCMN2@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyA21GKQpLmrQnzsxFfIDBRIMzmthWlZk1Sh7k4/UFmip28Efx
-	JCrTv2HD+3ZE77Lr+xgH5HHdGe2qtikhvtM8XAOX/VZ5TY2b950vlO9eBmrmLuH85PpdMeWyROH
-	OShge3HRPBHYP0P/KJznZdvHGksTtTHlRo11wlA==
-X-Gm-Gg: ASbGncuIb2Tig+UU0k0cCUN5CBYT7JTZP2NdsWaJUOON0EGhrc28E0phBE57K444aOU
-	KPfJf1OEFLHg67YVwvYwwv51i+SYo7DOuawG9YggX9AnagUwzf6UoadOpEyCEaPTUnbvnkwwrnv
-	jPKBvyp66vv8HfJJB1JBAaw5/N10DKd3Mx4lTdmU3vMsOP5aa9B+5la7IrQJCB
-X-Google-Smtp-Source: AGHT+IHmVgJtSNYLkZaRzNpE6HP4wyihn0rjt7KnDqgNADuLUcHY0++O0fXvQGwGOiqydLENMHn7E4D2IwhvWvm9+PE=
-X-Received: by 2002:a05:651c:1a0a:b0:30b:f2d7:1e7c with SMTP id
- 38308e7fff4ca-30c4aa9fdd8mr66558431fa.5.1742223884425; Mon, 17 Mar 2025
- 08:04:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZljwjN/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 487E3C4CEE9;
+	Mon, 17 Mar 2025 15:15:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742224506;
+	bh=9xE/ZZFAhbUdXemL+vvPekfXt864Auu6rMm4NZH2MIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uZljwjN/RNTCBEqtKOwk1ZI5S/0fAt2dCVakzDyZo54+f8aKpzphcKQ8BKmUwLxN6
+	 FqVtb/de3AJO45AihTs/lxI0BxBleXyrQVIU4xNi4p9YcDOlWwYUMf7e5M94MRAztU
+	 4DHEQ62ILF18aKdi9ygCrqLVdvdHpichufjweffrZV41aBwvnDferKllyWoEHQlWbz
+	 9oMsK7lGfjql+dF0owDdZqwx14AdUFaTi9OsKHIoGUYBPTJwK3lOoRXv5vP+4Vr0u6
+	 cj+8QT8Dv16EFvMZkhqmeCL0KIfhs/vHdqqhCFN7sKhjWOTzZoyl32KLZhDf0+VaJZ
+	 KVkAS9KJhU+mA==
+Date: Mon, 17 Mar 2025 09:15:04 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <Z9g8eO4Ngvagw2XP@kbusch-mbp.dhcp.thefacebook.com>
+References: <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
+ <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
+ <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
+ <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
+ <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
+ <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
+ <Z9e6dFm_qtW29sVe@infradead.org>
+ <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+ <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
+ <ro2padvzarj6v2bsh6xlsz36qs67z6ubomsvaw77dw4elfqqu7@4acij7zk6g7z>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com> <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com>
-In-Reply-To: <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 11:04:08 -0400
-X-Gm-Features: AQ5f1Jqz7-ZXmJNFs_YhRQRGhbHO2cgIBb8ny_OJeurceVHHPcJUVWK0PvgHo-A
-Message-ID: <CAJ-ks9kc5nGuY-8DXST_kK-u9PHjR9QHpVT7RVtkBctLKdFqaQ@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ro2padvzarj6v2bsh6xlsz36qs67z6ubomsvaw77dw4elfqqu7@4acij7zk6g7z>
 
-On Mon, Mar 17, 2025 at 10:24=E2=80=AFAM Tamir Duberstein <tamird@gmail.com=
-> wrote:
->
-> Throughout the tree, use the strict provenance APIs stabilized in Rust
-> 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-> functions at the `kernel` crate root along with polyfills for rustc <
-> 1.84.0.
->
-> Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
-> 1.84.0 as our MSRV is 1.78.0.
->
-> In the `kernel` crate, enable the strict provenance lints on rustc >=3D
-> 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
-> compiler flags that are dependent on the rustc version in use.
+On Mon, Mar 17, 2025 at 10:49:55AM -0400, Kent Overstreet wrote:
+> But we do absolutely require checking for transient read errors, and we
+> will miss things and corrupt data unnecessarily without FUA reads that
+> bypass the controller cache.
 
-As Benno pointed out on v4, this should probably include:
+Read FUA doesn't "bypass the controller cache". This is a "flush cache
+first, then read the result" operation. That description seems
+consistent for nvme, ata, and scsi.
 
-Note that the enablement of the strict provenance lints does not
-extend to the `kernel` crate's doctests.
+You are only interested in the case where the read doesn't overlap with
+any dirty cache, so the "flush" part isn't a factor. Okay fine, but I'm
+still curious if you have actually seen a case where read data was
+corrupt in cache but correct with FUA?
