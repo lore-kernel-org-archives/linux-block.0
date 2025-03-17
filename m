@@ -1,62 +1,62 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A324175D5D
-	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 04:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A80B1CAB3
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 04:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742186720; cv=none; b=eShRlScwGMShZdf2s6WuWdsfc1da1GOTvNt41PW8UUyo2OgZZqyNJf+pvIN4Pf2jbwFYuDcYRbc1cjq0YkWYdyI903hKafsPewDwbX3WoC3n0GZgsCrvHx6XZcqycKIzq2MkKv0qdstZjGK9GmQ66GzYl/sWlsjlePsAxoOja8Q=
+	t=1742186721; cv=none; b=Dc/YEinlVvjLGl/3Q2O/tQIQCzk5MJw9a9bKgwcziS0Dq3z27ZqZGiM9/2UGlMs5/VOxFU2qtj2FulKpgTXAa2Yvj/4+1Phrmq117YF7QEoNYUGDVQ1e1dpePDXAaHex9vpfkh3FW5TOhL2RZ57dB6gBFw0JUKAcwk0N95N84WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742186720; c=relaxed/simple;
-	bh=mLBBrYbSbk2DQV+/TZdd6Icc6RDzDF7/lqHhA8sj5eQ=;
+	s=arc-20240116; t=1742186721; c=relaxed/simple;
+	bh=SegGlhs5rUpbazr0P6rA5zofnxeczZspPIszZebPp0Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H3UZNWM4twvEUAAcZbx7d3EqGiCmUlDyGnbQwYu+2XOc3zjMz0DlvNVmJ7iZOyxvcG+43MmsSQ062pKxzyXMUO1GC8ruHCI6wNBeYr3QC+gGCEy6NPk35C1FbIenT4OnRgOYUHAcyNkgFdIKYzJHBW9+pxNOOgvPdKIMVdmq/jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cEsrsWTC; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=h3U2NpxN0UbCy/zM6DQnw0NkHS+mrbR94FQ+0y4Sfa+sHNq7xsOGaUXo7jHRvBWA9pImgenyPyFdkKC6cKalkLml3eOgb42Kk7USmxt1WNV8+8Qc/fwatas+nrA5JLFw7zSgdEnIG4eFfVnC8eX59wpCSRhkm7nYzWFOASMtels=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZuAqQmbC; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEsrsWTC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuAqQmbC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742186717;
+	s=mimecast20190719; t=1742186718;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v75uG4j8z7Addvp3lObGLO4D7RHzJZGZNNgCdcTkhsQ=;
-	b=cEsrsWTCCaqamogpi4qVTRng7EgGXuqmSdb5rWjpLe7f7aM0hN5mjy0JJgK/UbSa8YZ4UL
-	R6UszagttQ8WQaOn3Lv8QbOYI7b67fyrThlWInFk+CPD3qkMe3oVaSBsxRaVJv3EeWUWmW
-	vPHyhBrhm0+0OQJ/j5sabFu1f3TaxeA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=CWrD1i2oH26aPXh0nPETAOF3chlf/K1Pa5lwOz3u0UQ=;
+	b=ZuAqQmbCe/DAutF1kB51Eh3DJJt2qNQmd9RlBV2pnqRheNyKc8FxzneI9+4N5X6zF692WH
+	bkeAvX5F/iKYCq1Qtf1lm6SdPq1LLfNHX6iUyL8toJaslK3ormwyxc97YjOVjbaoA4eL0P
+	0cYo3sC6LtKRiv0majhoALpb490Z9Fw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-0d3WAc-MMJu8YwZjVpfwrA-1; Mon,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-1K0TQU_INa21wgKix8Saiw-1; Mon,
  17 Mar 2025 00:45:15 -0400
-X-MC-Unique: 0d3WAc-MMJu8YwZjVpfwrA-1
-X-Mimecast-MFC-AGG-ID: 0d3WAc-MMJu8YwZjVpfwrA_1742186713
+X-MC-Unique: 1K0TQU_INa21wgKix8Saiw-1
+X-Mimecast-MFC-AGG-ID: 1K0TQU_INa21wgKix8Saiw_1742186714
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F4D51800266;
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B5AD180AF50;
 	Mon, 17 Mar 2025 04:45:13 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 893CA18009BC;
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C3FC1180175A;
 	Mon, 17 Mar 2025 04:45:12 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52H4jB2T2200874
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52H4jBD92200882
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Mon, 17 Mar 2025 00:45:11 -0400
 Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52H4jBmB2200873;
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52H4jBhL2200881;
 	Mon, 17 Mar 2025 00:45:11 -0400
 From: Benjamin Marzinski <bmarzins@redhat.com>
 To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
         Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 3/6] block: make queue_limits_set() optionally return old limits
-Date: Mon, 17 Mar 2025 00:45:07 -0400
-Message-ID: <20250317044510.2200856-4-bmarzins@redhat.com>
+Subject: [PATCH v2 5/6] dm: fix dm_blk_report_zones
+Date: Mon, 17 Mar 2025 00:45:09 -0400
+Message-ID: <20250317044510.2200856-6-bmarzins@redhat.com>
 In-Reply-To: <20250317044510.2200856-1-bmarzins@redhat.com>
 References: <20250317044510.2200856-1-bmarzins@redhat.com>
 Precedence: bulk
@@ -68,142 +68,87 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-A future device-mapper patch will make use of this new argument. No
-functional changes intended in this patch.
+If dm_get_live_table() returned NULL, dm_put_live_table() was never
+called.  Also, if md->zone_revalidate_map is set, check that
+dm_blk_report_zones() is being called from the process that set it in
+__bind(). Otherwise the zone resources could change while accessing
+them. Finally, it is possible that md->zone_revalidate_map will change
+while calling this function. Only read it once, so that we are always
+using the same value. Otherwise we might miss a call to
+dm_put_live_table().
 
-Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+Fixes: f211268ed1f9b ("dm: Use the block layer zone append emulation")
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 ---
- block/blk-settings.c   | 9 +++++++--
- drivers/md/dm-table.c  | 2 +-
- drivers/md/md-linear.c | 2 +-
- drivers/md/raid0.c     | 2 +-
- drivers/md/raid1.c     | 2 +-
- drivers/md/raid10.c    | 2 +-
- drivers/md/raid5.c     | 2 +-
- include/linux/blkdev.h | 3 ++-
- 8 files changed, 15 insertions(+), 9 deletions(-)
+ drivers/md/dm-core.h |  1 +
+ drivers/md/dm-zone.c | 23 +++++++++++++++--------
+ 2 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c44dadc35e1e..bad690ef8fec 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -476,16 +476,21 @@ EXPORT_SYMBOL_GPL(queue_limits_commit_update_frozen);
-  * queue_limits_set - apply queue limits to queue
-  * @q:		queue to update
-  * @lim:	limits to apply
-+ * @old_lim:	store previous limits if non-null.
-  *
-- * Apply the limits in @lim that were freshly initialized to @q.
-+ * Apply the limits in @lim that were freshly initialized to @q, and
-+ * optionally return the previous limits in @old_lim.
-  * To update existing limits use queue_limits_start_update() and
-  * queue_limits_commit_update() instead.
-  *
-  * Returns 0 if successful, else a negative error code.
-  */
--int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
-+int queue_limits_set(struct request_queue *q, struct queue_limits *lim,
-+		     struct queue_limits *old_lim)
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index 3637761f3585..f3a3f2ef6322 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -141,6 +141,7 @@ struct mapped_device {
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 	unsigned int nr_zones;
+ 	void *zone_revalidate_map;
++	struct task_struct *revalidate_map_task;
+ #endif
+ 
+ #ifdef CONFIG_IMA
+diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+index 681058feb63b..11e19281bb64 100644
+--- a/drivers/md/dm-zone.c
++++ b/drivers/md/dm-zone.c
+@@ -56,24 +56,29 @@ int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
  {
- 	mutex_lock(&q->limits_lock);
-+	if (old_lim)
-+		*old_lim = q->limits;
- 	return queue_limits_commit_update(q, lim);
- }
- EXPORT_SYMBOL_GPL(queue_limits_set);
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 0ef5203387b2..77d8459b2f2a 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1883,7 +1883,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	if (dm_table_supports_atomic_writes(t))
- 		limits->features |= BLK_FEAT_ATOMIC_WRITES;
+ 	struct mapped_device *md = disk->private_data;
+ 	struct dm_table *map;
+-	int srcu_idx, ret;
++	struct dm_table *zone_revalidate_map = md->zone_revalidate_map;
++	int srcu_idx, ret = -EIO;
  
--	r = queue_limits_set(q, limits);
-+	r = queue_limits_set(q, limits, NULL);
- 	if (r)
- 		return r;
+-	if (!md->zone_revalidate_map) {
+-		/* Regular user context */
++	if (!zone_revalidate_map || md->revalidate_map_task != current) {
++		/*
++		 * Regular user context or
++		 * Zone revalidation during __bind() is in progress, but this
++		 * call is from a different process
++		 */
+ 		if (dm_suspended_md(md))
+ 			return -EAGAIN;
  
-diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
-index a382929ce7ba..65ceec5b078f 100644
---- a/drivers/md/md-linear.c
-+++ b/drivers/md/md-linear.c
-@@ -81,7 +81,7 @@ static int linear_set_limits(struct mddev *mddev)
- 		return err;
+ 		map = dm_get_live_table(md, &srcu_idx);
+-		if (!map)
+-			return -EIO;
+ 	} else {
+ 		/* Zone revalidation during __bind() */
+-		map = md->zone_revalidate_map;
++		map = zone_revalidate_map;
  	}
  
--	return queue_limits_set(mddev->gendisk->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
- }
+-	ret = dm_blk_do_report_zones(md, map, sector, nr_zones, cb, data);
++	if (map)
++		ret = dm_blk_do_report_zones(md, map, sector, nr_zones, cb,
++					     data);
  
- static struct linear_conf *linear_conf(struct mddev *mddev, int raid_disks)
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index 8fc9339b00c7..2eb42b2c103b 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -390,7 +390,7 @@ static int raid0_set_limits(struct mddev *mddev)
- 		queue_limits_cancel_update(mddev->gendisk->queue);
- 		return err;
- 	}
--	return queue_limits_set(mddev->gendisk->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
- }
+-	if (!md->zone_revalidate_map)
++	if (!zone_revalidate_map)
+ 		dm_put_live_table(md, srcu_idx);
  
- static int raid0_run(struct mddev *mddev)
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 9d57a88dbd26..e8103dbc549c 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -3223,7 +3223,7 @@ static int raid1_set_limits(struct mddev *mddev)
- 		queue_limits_cancel_update(mddev->gendisk->queue);
- 		return err;
- 	}
--	return queue_limits_set(mddev->gendisk->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
- }
+ 	return ret;
+@@ -175,7 +180,9 @@ int dm_revalidate_zones(struct dm_table *t, struct request_queue *q)
+ 	 * our table for dm_blk_report_zones() to use directly.
+ 	 */
+ 	md->zone_revalidate_map = t;
++	md->revalidate_map_task = current;
+ 	ret = blk_revalidate_disk_zones(disk);
++	md->revalidate_map_task = NULL;
+ 	md->zone_revalidate_map = NULL;
  
- static int raid1_run(struct mddev *mddev)
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index efe93b979167..dbc2ee70d0d3 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4024,7 +4024,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
- 		queue_limits_cancel_update(mddev->gendisk->queue);
- 		return err;
- 	}
--	return queue_limits_set(mddev->gendisk->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
- }
- 
- static int raid10_run(struct mddev *mddev)
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 5c79429acc64..a7cc2ec86793 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7774,7 +7774,7 @@ static int raid5_set_limits(struct mddev *mddev)
- 	/* No restrictions on the number of segments in the request */
- 	lim.max_segments = USHRT_MAX;
- 
--	return queue_limits_set(mddev->gendisk->queue, &lim);
-+	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
- }
- 
- static int raid5_run(struct mddev *mddev)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 248416ecd01c..bb264fd7b2f2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -953,7 +953,8 @@ int queue_limits_commit_update_frozen(struct request_queue *q,
- 		struct queue_limits *lim);
- int queue_limits_commit_update(struct request_queue *q,
- 		struct queue_limits *lim);
--int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
-+int queue_limits_set(struct request_queue *q, struct queue_limits *lim,
-+		     struct queue_limits *old_lim);
- int blk_validate_limits(struct queue_limits *lim);
- 
- /**
+ 	if (ret) {
 -- 
 2.48.1
 
