@@ -1,495 +1,139 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713D924BBFA;
-	Mon, 17 Mar 2025 14:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4186241C98;
+	Mon, 17 Mar 2025 14:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742221447; cv=none; b=dSIFs0OJVHAb84ee1KCUxScYxjawdsUvDqw1nVO2APVZt5j+K1AAG0wO2GAhkrgfhRIRORq4oTQEQinD5btdv7vdLRfewZxLvl05VQhlvfXFJ7gCLs2ROi8G0GmrOeRR60GrIMQcuC40Vj3MNG1guVo0eGwmpH8bIphmEseezPM=
+	t=1742222123; cv=none; b=NZXa7OzHI39N4EOy+uylV/f8asVvz6Pm4wzwLcWZfKSYOnT7OcCC97G9lAmLElGasiB+u6ysaDDGajOB+fKml6q/w1Jczy4iwB2J19BXzAkaS9EYOCw0iG+msHKiPQdTRPSFHu8YNBa70eWks/fHeGQ3bcoUWqvx2hSWjEBONPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742221447; c=relaxed/simple;
-	bh=987TtpkPPaoRHA6crXpHFcJAOt/VWj29CNmz2SRJV7s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WlvKhwtdAXAoCddnZxhIaSn+Bh/J2jSXDNCKJKL0c7ZCPSSDECJA9GSHinDn1Dh6HmoU/pJlDiJ60nmOisCyIvKfBbEHFToAL6NR6PxLTW1qZkxEmvHt/wlcWNoYI7H7mYWLdDM2VhhVBOuRz0ZrqqsYK5uoKFQr0HhMPC/iu08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgQboESw; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742222123; c=relaxed/simple;
+	bh=Yt3WgbrVQo8duGBSP1Jia0wgkU05qIskxVJQhvJpiV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQspIFHMqRqDn6SdiqFMlXnks1bXVqWPYS7PlhkR/mFasvqfxPuP1fSMY9xwD3HcOFJZq3AlGkGi1ZasyHu0TMYTmky31yXK/wFoVofzhPD23+h2wcF7Q/v7iNyjCsVgRqs7+4L4exrkirt8A6NMrfG32mZqOcp6BXQd8D+omBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=JRXO7sqL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wjKm4YMp; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgQboESw"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-47688ae873fso43244551cf.0;
-        Mon, 17 Mar 2025 07:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742221444; x=1742826244; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3AoPgamZTGw+bLyE66VJT+0+YBBvA1ZVLa2NjT4B3rE=;
-        b=XgQboESwWpO3/ZTLwe90iaKpkrKBiBoQXI7624HdgL89ivAZNL3TJnq1gML7fygt7L
-         cDnZiIz58iTmkzPW6Qr3d3yVH6ZX042DBys3lFiQpmmVurmhRRN1xcc9PAFJotRzBqQ0
-         iXIBd7RgDRcnSGPFZqqexv+FyBLQXrsG0dZ7oUxuLprE80Am71XRUvG6Hbfo7xkzf5+Q
-         gn1IRMc1vj7O7+JIp1VoU3V0K/q0gEJtn+TRdIIq2M0fpESmH2msbu6p8ybiTQJNQj/c
-         Pm+FaHP1qfvAvQZ6iMfmRaZ9WXgi+YD4WXfetloRdz4O3rEo4YcZxkBABmmInXkLFBTz
-         cviA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742221444; x=1742826244;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3AoPgamZTGw+bLyE66VJT+0+YBBvA1ZVLa2NjT4B3rE=;
-        b=xFTlVSUUjaIld1WoqicJAHwFuCHatnwcL1gbVl6mwa62ubaOYBxtTVyZbGl31i8jSG
-         Vgdiwq/FPjBAViBX+HLBAa0ooKGNJdafMXix0B/5nwUFMEJOQDc2srJpf1ABC0Ta2a2K
-         WiJyt1ehTGOJqSpR4QM5NoFYShdOVgHhTD76FJq019+Axfy5AZwd8tsACDzu2lQW8HMz
-         k/WXm82EmZJ+Iyz8+U7Ba6j2vgC2ZEUAekI9fu0ore94Km55ROWn4+GOdcP68P6kX2rQ
-         LWuvtOhNOB9UChYY4MKDU5dASiRg6yE2rfdI5/0a/1YD1v62ilQyk75AvJv9BKS/0qev
-         HtPA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2NSUAOEAsWaHaTUUfaNqiPEhouXwsj8RCZZmCbQszSLWS+/L9mgXrJyT73/Il2eQzspGosOfZFwbj@vger.kernel.org, AJvYcCV3+qg89VknENCySsn8NGZ0HW4EBlK74tH22+cnSrXx2ycaAoICdQWcRgxY3drS+4ePNwSw+fvl8Ar+@vger.kernel.org, AJvYcCVWApQkjJFTs92nM0aaUodYmOskwlRnJOSvDlQolfhSGl4XViGhIo3qhRVN5roft2cFliGf3cQtj3w0pFg=@vger.kernel.org, AJvYcCVZMhmMUS5m3LT/lItkKYqIAeug0QWjrsZg0Uuzj/dLL10tic86bK4oaEObfJg5PVjvxx3BbNBhwp0TaAEP@vger.kernel.org, AJvYcCXYh9Qkj/xWmzuaDwywMamrxQLuWZE2f5DidK6H/7hu/bXjVckFRdX56bZwcfVmPtLRmp+N5kIrzWrhiePrhA/H@vger.kernel.org, AJvYcCXol4F/xsOlgdYfszHcfnpeu+iXZMvUgwZ2dC4Epm3AUa2OXTcmHlLhVe9+13F/IApJipO9cf486dxjwzlNx5o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSHjDacf59h6CUfQssCm44zUTmZnjAleDWa7ZlIodM2+xn1a3g
-	c0XY9dIlCHw4yA+1ENPkWWKORYJH+2Y0zlHvUN1HdialOIzSyXWK
-X-Gm-Gg: ASbGncsC0Z90ZpdcabG7v5J8us6Bqx+Ln+nCx/hkbRvpTP8CklBl/zXroUDtHn47fC0
-	dhtZ7xuYsBjjUxgB62phZrqVlvj6J4+Z2aE94mtwp/RtwtQXlkkbGWuQiTs75eg/3qcE+oZvP0D
-	1MZ04YrmIw50yhlerKlBybc2TOFNh9CuKbJpV4HVhsXkjlCmI6Zl+wdXkMfGvbAc6Hqi6m4J43Q
-	DxHcBygW9I126PURve02ieNlf75hx8tWGzRY3DFkUbCd3RhnmsRSOB0kky6p5058l6Z9cAmTLW6
-	xMWmKrnWAsk/nqzv6FW7hVLJGSt5JcZ/vj+4KLwEbRG+AcBGTOnFGFJH8RP1l0WF2zCLaAaa5g=
-	=
-X-Google-Smtp-Source: AGHT+IEOcZaAErVkrTUiISs/oSWF4CNXcbc1QPv9pQ6mWesRhgejS3Ggisnz7nL3giOYmSt+NZV5+Q==
-X-Received: by 2002:ac8:5d13:0:b0:476:884e:52f4 with SMTP id d75a77b69052e-476c812c79cmr189000251cf.12.1742221444046;
-        Mon, 17 Mar 2025 07:24:04 -0700 (PDT)
-Received: from tamird-mac.local ([2600:4041:5be7:7c00:6895:24c6:e898:e320])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476bb60b13esm54601011cf.6.2025.03.17.07.24.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 07:24:03 -0700 (PDT)
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 10:23:56 -0400
-Subject: [PATCH v5 6/6] rust: use strict provenance APIs
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="JRXO7sqL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wjKm4YMp"
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id F14CD1140098;
+	Mon, 17 Mar 2025 10:35:19 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Mon, 17 Mar 2025 10:35:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1742222119;
+	 x=1742308519; bh=2YSB9jrUO3YWPRHJXtZJF6w39S1fmkOod2mob/5TWPA=; b=
+	JRXO7sqLMoiym1IS/rElHi5heyyAdPhFUdkMfejJE+e7/ZI1zIMkWE9I6SWcSev7
+	udrth6sTL5KjMqpwlP7F1nPF0sBdrnfjwmqDbiPRGy8WAr1QjJ+3CEBckwr91GsE
+	3jtubLvlds+blpu7ZjOEojwQlHizgUx3m3YXKQ0RlSKWcgYA3l7hglJsuIoniRNZ
+	sfYVMkZIi0IumCQK8nHVbZbuwiWgbNGlbUASIlDJrl/0mhhVXBQXZ7JigcO7QxCJ
+	t18mZRZbBVyMwFO0c68878iN/ui2DikKiTjJ8+Xm6juP2+m9sFla9oT4WmZGpFrO
+	bGCzROiaaZbzqaaMK6nCxQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1742222119; x=
+	1742308519; bh=2YSB9jrUO3YWPRHJXtZJF6w39S1fmkOod2mob/5TWPA=; b=w
+	jKm4YMpNXWUmpNt36OtTm92YSomhtqbQoxFc3H08aXn9aPUBHJH0edyYGRFMznm1
+	bUlwJ+v3BP7hdqD298P97WbvbDob0ntbW+9y9tLuX7CllupDgKh8g/lhcHXJgtb4
+	GLRE+UmFOvEhNHMOe5FnowGw8S39oAcgI0OjiNIkdCc/V1LBJmH+p7f8Cy3cWuBc
+	F4sqf1+3BxP13kBT9HqIhZkfnONAeZgibdG9RI2nsV6OCqt2FknccCycwnn8m5c5
+	J0zO+lNNqLjSpePoxoIEUyAtfqRomnle53Lzpl4bG8Bm+xomgtviZ6lPFapdb9X7
+	0NXvZ640OTV7r1z5XoEZQ==
+X-ME-Sender: <xms:JzPYZ6t029xOpdkopxRg73Jt_RADru25mk86WG2_1ZTVjfqioAh5zQ>
+    <xme:JzPYZ_dq3FN-qFWNIqGCJAXu4IfN4otAoV-V-KTGVcHtZWSbxI6k6Zw9yBnsDwmzv
+    2OifyBFtoQ9Gw>
+X-ME-Received: <xmr:JzPYZ1zNB4J5UB9ZyxJf7uzS012kj-Dmvw0F0Srr690Tg_t6lbMUtNnnxg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeeljeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
+    tddunecuhfhrohhmpefirhgvghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenuc
+    ggtffrrghtthgvrhhnpeffveeivedvkeejiedvteeggfeihfejtefghfeltdelledtueeg
+    heduvddvjeevhfenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrh
+    fuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgt
+    ohhmpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    epthhhohhmrghsrdifvghishhsshgthhhuhheslhhinhhuthhrohhnihigrdguvgdprhgt
+    phhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohepmhgrtghosegrnh
+    gurhhoihgurdgtohhmpdhrtghpthhtohephhhisegrlhihshhsrgdrihhspdhrtghpthht
+    ohepjhhohhhnrdhoghhnvghssheslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhope
+    hlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:JzPYZ1OEhr29cuNzu3OSg5YOzlewpUdp4kYwpaNI2gtFjQHCubIRKA>
+    <xmx:JzPYZ6-t8L-c8z_Dloch3rNmEym9Vl0jZ-lP7hreJf_EJ-vUTsr1fQ>
+    <xmx:JzPYZ9XJv1XAUp9rYRpGJFLQcdZqLqCNJN4RJhjveGTouAlAz-eW6A>
+    <xmx:JzPYZzff9wr73gR5j0Q77sS3MMOBTh4E8AD-q4ecbtmJaZrg89wE1w>
+    <xmx:JzPYZ6NncXCqcBum0CCdJVxmXRiH0dvxGNXkFnbMsPqRaQuikOXFRrUq>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 17 Mar 2025 10:35:18 -0400 (EDT)
+Date: Mon, 17 Mar 2025 15:33:55 +0100
+From: Greg KH <greg@kroah.com>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Martijn Coenen <maco@android.com>,
+	Alyssa Ross <hi@alyssa.is>, John Ogness <john.ogness@linutronix.de>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] loop: Properly send KOBJ_CHANGED uevent for disk device
+Message-ID: <2025031759-unlined-candle-1d91@gregkh>
+References: <20250317-loop-uevent-changed-v1-1-cb29cb91b62d@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com>
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
-In-Reply-To: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
-To: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <benno.lossin@proton.me>, 
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Brendan Higgins <brendan.higgins@linux.dev>, 
- David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
- Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
- Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
- Saravana Kannan <saravanak@google.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
- linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
- Tamir Duberstein <tamird@gmail.com>
-X-Mailer: b4 0.15-dev
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250317-loop-uevent-changed-v1-1-cb29cb91b62d@linutronix.de>
 
-Throughout the tree, use the strict provenance APIs stabilized in Rust
-1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-functions at the `kernel` crate root along with polyfills for rustc <
-1.84.0.
+On Mon, Mar 17, 2025 at 03:13:25PM +0100, Thomas Weiﬂschuh wrote:
+> The wording "uncork" in the code comment indicates that it is expected that
+> the suppressed event instances are automatically sent after unsuppressing.
+> This is not the case, they are discarded.
+> In effect this means that no "changed" events are emitted on the device
+> itself by default. On the other hand each discovered partition does trigger
+> a "changed" event on the loop device itself. Therefore no event is emitted for
+> devices without partitions.
+> 
+> This leads to udev missing the device creation and prompting workarounds in
+> userspace, see the linked util-linux/losetup bug.
+> 
+> Explicitly emit the events and drop the confusingly worded comments.
+> 
+> Link: https://github.com/util-linux/util-linux/issues/2434
+> Fixes: 3448914e8cc5 ("loop: Add LOOP_CONFIGURE ioctl")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> ---
+>  drivers/block/loop.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index c05fe27a96b64f1f1ea3868510fdd0c7f4937f55..fbc67ff29e07c15f2e3b3e225a4a37df016fe9de 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -654,8 +654,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+>  
+>  	error = 0;
+>  done:
+> -	/* enable and uncork uevent now that we are done */
+>  	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> +	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
 
-Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
-1.84.0 as our MSRV is 1.78.0.
+Why not just remove the place where the uevent was suppressed to start
+with?  It feels by manually sending a change event, you are doing
+exactly what the suppress was trying to prevent, which makes me think
+this is wrong.
 
-In the `kernel` crate, enable the strict provenance lints on rustc >=
-1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
-compiler flags that are dependent on the rustc version in use.
+thanks,
 
-Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-provenance-apis [1]
-Suggested-by: Benno Lossin <benno.lossin@proton.me>
-Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.me/
-Signed-off-by: Tamir Duberstein <tamird@gmail.com>
----
- init/Kconfig           |   3 ++
- rust/kernel/alloc.rs   |   2 +-
- rust/kernel/devres.rs  |   4 +-
- rust/kernel/io.rs      |  14 +++----
- rust/kernel/lib.rs     | 108 +++++++++++++++++++++++++++++++++++++++++++++++++
- rust/kernel/of.rs      |   2 +-
- rust/kernel/pci.rs     |   4 +-
- rust/kernel/str.rs     |  16 +++-----
- rust/kernel/uaccess.rs |  12 ++++--
- 9 files changed, 138 insertions(+), 27 deletions(-)
-
-diff --git a/init/Kconfig b/init/Kconfig
-index d0d021b3fa3b..82e28d6f7c3f 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -132,6 +132,9 @@ config CC_HAS_COUNTED_BY
- config RUSTC_HAS_COERCE_POINTEE
- 	def_bool RUSTC_VERSION >= 108400
- 
-+config RUSTC_HAS_STABLE_STRICT_PROVENANCE
-+	def_bool RUSTC_VERSION >= 108400
-+
- config PAHOLE_VERSION
- 	int
- 	default $(shell,$(srctree)/scripts/pahole-version.sh $(PAHOLE))
-diff --git a/rust/kernel/alloc.rs b/rust/kernel/alloc.rs
-index fc9c9c41cd79..a1d282e48249 100644
---- a/rust/kernel/alloc.rs
-+++ b/rust/kernel/alloc.rs
-@@ -217,7 +217,7 @@ unsafe fn free(ptr: NonNull<u8>, layout: Layout) {
- 
- /// Returns a properly aligned dangling pointer from the given `layout`.
- pub(crate) fn dangling_from_layout(layout: Layout) -> NonNull<u8> {
--    let ptr = layout.align() as *mut u8;
-+    let ptr = crate::without_provenance_mut(layout.align());
- 
-     // SAFETY: `layout.align()` (and hence `ptr`) is guaranteed to be non-zero.
-     unsafe { NonNull::new_unchecked(ptr) }
-diff --git a/rust/kernel/devres.rs b/rust/kernel/devres.rs
-index 34571f992f0d..e8232bb771b2 100644
---- a/rust/kernel/devres.rs
-+++ b/rust/kernel/devres.rs
-@@ -64,14 +64,14 @@ struct DevresInner<T> {
- ///             return Err(ENOMEM);
- ///         }
- ///
--///         Ok(IoMem(IoRaw::new(addr as usize, SIZE)?))
-+///         Ok(IoMem(IoRaw::new(kernel::expose_provenance(addr), SIZE)?))
- ///     }
- /// }
- ///
- /// impl<const SIZE: usize> Drop for IoMem<SIZE> {
- ///     fn drop(&mut self) {
- ///         // SAFETY: `self.0.addr()` is guaranteed to be properly mapped by `Self::new`.
--///         unsafe { bindings::iounmap(self.0.addr() as *mut c_void); };
-+///         unsafe { bindings::iounmap(kernel::with_exposed_provenance_mut(self.0.addr())); };
- ///     }
- /// }
- ///
-diff --git a/rust/kernel/io.rs b/rust/kernel/io.rs
-index 9d2aadf40edf..0a018ad7478a 100644
---- a/rust/kernel/io.rs
-+++ b/rust/kernel/io.rs
-@@ -5,7 +5,7 @@
- //! C header: [`include/asm-generic/io.h`](srctree/include/asm-generic/io.h)
- 
- use crate::error::{code::EINVAL, Result};
--use crate::{bindings, build_assert, ffi::c_void};
-+use crate::{bindings, build_assert};
- 
- /// Raw representation of an MMIO region.
- ///
-@@ -75,14 +75,14 @@ pub fn maxsize(&self) -> usize {
- ///             return Err(ENOMEM);
- ///         }
- ///
--///         Ok(IoMem(IoRaw::new(addr as usize, SIZE)?))
-+///         Ok(IoMem(IoRaw::new(kernel::expose_provenance(addr), SIZE)?))
- ///     }
- /// }
- ///
- /// impl<const SIZE: usize> Drop for IoMem<SIZE> {
- ///     fn drop(&mut self) {
- ///         // SAFETY: `self.0.addr()` is guaranteed to be properly mapped by `Self::new`.
--///         unsafe { bindings::iounmap(self.0.addr() as *mut c_void); };
-+///         unsafe { bindings::iounmap(kernel::with_exposed_provenance_mut(self.0.addr())); };
- ///     }
- /// }
- ///
-@@ -119,7 +119,7 @@ pub fn $name(&self, offset: usize) -> $type_name {
-             let addr = self.io_addr_assert::<$type_name>(offset);
- 
-             // SAFETY: By the type invariant `addr` is a valid address for MMIO operations.
--            unsafe { bindings::$name(addr as *const c_void) }
-+            unsafe { bindings::$name(crate::with_exposed_provenance(addr)) }
-         }
- 
-         /// Read IO data from a given offset.
-@@ -131,7 +131,7 @@ pub fn $try_name(&self, offset: usize) -> Result<$type_name> {
-             let addr = self.io_addr::<$type_name>(offset)?;
- 
-             // SAFETY: By the type invariant `addr` is a valid address for MMIO operations.
--            Ok(unsafe { bindings::$name(addr as *const c_void) })
-+            Ok(unsafe { bindings::$name(crate::with_exposed_provenance(addr)) })
-         }
-     };
- }
-@@ -148,7 +148,7 @@ pub fn $name(&self, value: $type_name, offset: usize) {
-             let addr = self.io_addr_assert::<$type_name>(offset);
- 
-             // SAFETY: By the type invariant `addr` is a valid address for MMIO operations.
--            unsafe { bindings::$name(value, addr as *mut c_void) }
-+            unsafe { bindings::$name(value, crate::with_exposed_provenance_mut(addr)) }
-         }
- 
-         /// Write IO data from a given offset.
-@@ -160,7 +160,7 @@ pub fn $try_name(&self, value: $type_name, offset: usize) -> Result {
-             let addr = self.io_addr::<$type_name>(offset)?;
- 
-             // SAFETY: By the type invariant `addr` is a valid address for MMIO operations.
--            unsafe { bindings::$name(value, addr as *mut c_void) }
-+            unsafe { bindings::$name(value, crate::with_exposed_provenance_mut(addr)) }
-             Ok(())
-         }
-     };
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index fc6835cc36a3..c1b274c04a0f 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -17,6 +17,11 @@
- #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(coerce_unsized))]
- #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(dispatch_from_dyn))]
- #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(unsize))]
-+#![cfg_attr(
-+    CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE,
-+    feature(strict_provenance_lints),
-+    deny(fuzzy_provenance_casts, lossy_provenance_casts)
-+)]
- #![feature(inline_const)]
- #![feature(lint_reasons)]
- // Stable in Rust 1.83
-@@ -25,6 +30,109 @@
- #![feature(const_ptr_write)]
- #![feature(const_refs_to_cell)]
- 
-+#[cfg(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE)]
-+#[allow(clippy::incompatible_msrv)]
-+mod strict_provenance {
-+    /// Gets the "address" portion of the pointer.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.html#method.addr.
-+    #[inline]
-+    pub fn addr<T>(ptr: *const T) -> usize {
-+        ptr.addr()
-+    }
-+
-+    /// Exposes the "provenance" part of the pointer for future use in
-+    /// [`with_exposed_provenance`] and returns the "address" portion.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.html#method.expose_provenance.
-+    #[inline]
-+    pub fn expose_provenance<T>(ptr: *const T) -> usize {
-+        ptr.expose_provenance()
-+    }
-+
-+    /// Converts an address back to a pointer, picking up some previously 'exposed'
-+    /// provenance.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.with_exposed_provenance.html.
-+    #[inline]
-+    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-+        core::ptr::with_exposed_provenance(addr)
-+    }
-+
-+    /// Converts an address back to a mutable pointer, picking up some previously 'exposed'
-+    /// provenance.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.with_exposed_provenance_mut.html
-+    #[inline]
-+    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-+        core::ptr::with_exposed_provenance_mut(addr)
-+    }
-+
-+    /// Creates a pointer with the given address and no [provenance][crate::ptr#provenance].
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.without_provenance_mut.html.
-+    #[inline]
-+    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-+        core::ptr::without_provenance_mut(addr)
-+    }
-+}
-+
-+#[cfg(not(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE))]
-+mod strict_provenance {
-+    /// Gets the "address" portion of the pointer.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.html#method.addr.
-+    #[inline]
-+    pub fn addr<T>(ptr: *const T) -> usize {
-+        // This is core's implementation from
-+        // https://github.com/rust-lang/rust/commit/4291332175d12e79e6061cdc3f5dccac2e28b969 through
-+        // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/ptr/const_ptr.rs#L172
-+        // which is the first version that satisfies `CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE`.
-+        #[allow(clippy::undocumented_unsafe_blocks)]
-+        unsafe {
-+            #[allow(clippy::transmutes_expressible_as_ptr_casts)]
-+            core::mem::transmute(ptr.cast::<()>())
-+        }
-+    }
-+
-+    /// Exposes the "provenance" part of the pointer for future use in
-+    /// [`with_exposed_provenance`] and returns the "address" portion.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.html#method.expose_provenance.
-+    #[inline]
-+    pub fn expose_provenance<T>(ptr: *const T) -> usize {
-+        ptr.cast::<()>() as usize
-+    }
-+
-+    /// Converts an address back to a pointer, picking up some previously 'exposed'
-+    /// provenance.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.with_exposed_provenance.html.
-+    #[inline]
-+    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-+        addr as *const T
-+    }
-+
-+    /// Converts an address back to a mutable pointer, picking up some previously 'exposed'
-+    /// provenance.
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.with_exposed_provenance_mut.html
-+    #[inline]
-+    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-+        addr as *mut T
-+    }
-+
-+    /// Creates a pointer with the given address and no [provenance][crate::ptr#provenance].
-+    ///
-+    /// See https://doc.rust-lang.org/stable/core/ptr/fn.without_provenance_mut.html.
-+    #[inline]
-+    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-+        addr as *mut T
-+    }
-+}
-+
-+pub use strict_provenance::*;
-+
- // Ensure conditional compilation based on the kernel configuration works;
- // otherwise we may silently break things like initcall handling.
- #[cfg(not(CONFIG_RUST))]
-diff --git a/rust/kernel/of.rs b/rust/kernel/of.rs
-index 40d1bd13682c..b70076d16008 100644
---- a/rust/kernel/of.rs
-+++ b/rust/kernel/of.rs
-@@ -22,7 +22,7 @@ unsafe impl RawDeviceId for DeviceId {
-     const DRIVER_DATA_OFFSET: usize = core::mem::offset_of!(bindings::of_device_id, data);
- 
-     fn index(&self) -> usize {
--        self.0.data as usize
-+        crate::addr(self.0.data)
-     }
- }
- 
-diff --git a/rust/kernel/pci.rs b/rust/kernel/pci.rs
-index a26f154ae1b9..87c9f67b3f0f 100644
---- a/rust/kernel/pci.rs
-+++ b/rust/kernel/pci.rs
-@@ -287,7 +287,7 @@ fn new(pdev: Device, num: u32, name: &CStr) -> Result<Self> {
-         // `pdev` is valid by the invariants of `Device`.
-         // `num` is checked for validity by a previous call to `Device::resource_len`.
-         // `name` is always valid.
--        let ioptr: usize = unsafe { bindings::pci_iomap(pdev.as_raw(), num, 0) } as usize;
-+        let ioptr = crate::expose_provenance(unsafe { bindings::pci_iomap(pdev.as_raw(), num, 0) });
-         if ioptr == 0 {
-             // SAFETY:
-             // `pdev` valid by the invariants of `Device`.
-@@ -320,7 +320,7 @@ unsafe fn do_release(pdev: &Device, ioptr: usize, num: i32) {
-         // `ioptr` is valid by the safety requirements.
-         // `num` is valid by the safety requirements.
-         unsafe {
--            bindings::pci_iounmap(pdev.as_raw(), ioptr as *mut kernel::ffi::c_void);
-+            bindings::pci_iounmap(pdev.as_raw(), crate::with_exposed_provenance_mut(ioptr));
-             bindings::pci_release_region(pdev.as_raw(), num);
-         }
-     }
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index 0b80a119d5f0..6bc6357293e4 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -692,9 +692,9 @@ fn new() -> Self {
-     pub(crate) unsafe fn from_ptrs(pos: *mut u8, end: *mut u8) -> Self {
-         // INVARIANT: The safety requirements guarantee the type invariants.
-         Self {
--            beg: pos as usize,
--            pos: pos as usize,
--            end: end as usize,
-+            beg: crate::expose_provenance(pos),
-+            pos: crate::expose_provenance(pos),
-+            end: crate::expose_provenance(end),
-         }
-     }
- 
-@@ -705,7 +705,7 @@ pub(crate) unsafe fn from_ptrs(pos: *mut u8, end: *mut u8) -> Self {
-     /// The memory region starting at `buf` and extending for `len` bytes must be valid for writes
-     /// for the lifetime of the returned [`RawFormatter`].
-     pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
--        let pos = buf as usize;
-+        let pos = crate::expose_provenance(buf);
-         // INVARIANT: We ensure that `end` is never less then `buf`, and the safety requirements
-         // guarantees that the memory region is valid for writes.
-         Self {
-@@ -719,7 +719,7 @@ pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
-     ///
-     /// N.B. It may point to invalid memory.
-     pub(crate) fn pos(&self) -> *mut u8 {
--        self.pos as *mut u8
-+        crate::with_exposed_provenance_mut(self.pos)
-     }
- 
-     /// Returns the number of bytes written to the formatter.
-@@ -741,11 +741,7 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
-             // SAFETY: If `len_to_copy` is non-zero, then we know `pos` has not gone past `end`
-             // yet, so it is valid for write per the type invariants.
-             unsafe {
--                core::ptr::copy_nonoverlapping(
--                    s.as_bytes().as_ptr(),
--                    self.pos as *mut u8,
--                    len_to_copy,
--                )
-+                core::ptr::copy_nonoverlapping(s.as_bytes().as_ptr(), self.pos(), len_to_copy)
-             };
-         }
- 
-diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
-index 719b0a48ff55..96393bcf6bd7 100644
---- a/rust/kernel/uaccess.rs
-+++ b/rust/kernel/uaccess.rs
-@@ -226,7 +226,9 @@ pub fn read_raw(&mut self, out: &mut [MaybeUninit<u8>]) -> Result {
-         }
-         // SAFETY: `out_ptr` points into a mutable slice of length `len`, so we may write
-         // that many bytes to it.
--        let res = unsafe { bindings::copy_from_user(out_ptr, self.ptr as *const c_void, len) };
-+        let res = unsafe {
-+            bindings::copy_from_user(out_ptr, crate::with_exposed_provenance(self.ptr), len)
-+        };
-         if res != 0 {
-             return Err(EFAULT);
-         }
-@@ -264,7 +266,7 @@ pub fn read<T: FromBytes>(&mut self) -> Result<T> {
-         let res = unsafe {
-             bindings::_copy_from_user(
-                 out.as_mut_ptr().cast::<c_void>(),
--                self.ptr as *const c_void,
-+                crate::with_exposed_provenance(self.ptr),
-                 len,
-             )
-         };
-@@ -330,7 +332,9 @@ pub fn write_slice(&mut self, data: &[u8]) -> Result {
-         }
-         // SAFETY: `data_ptr` points into an immutable slice of length `len`, so we may read
-         // that many bytes from it.
--        let res = unsafe { bindings::copy_to_user(self.ptr as *mut c_void, data_ptr, len) };
-+        let res = unsafe {
-+            bindings::copy_to_user(crate::with_exposed_provenance_mut(self.ptr), data_ptr, len)
-+        };
-         if res != 0 {
-             return Err(EFAULT);
-         }
-@@ -357,7 +361,7 @@ pub fn write<T: AsBytes>(&mut self, value: &T) -> Result {
-         // is a compile-time constant.
-         let res = unsafe {
-             bindings::_copy_to_user(
--                self.ptr as *mut c_void,
-+                crate::with_exposed_provenance_mut(self.ptr),
-                 (value as *const T).cast::<c_void>(),
-                 len,
-             )
-
--- 
-2.48.1
-
+greg k-h
