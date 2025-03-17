@@ -1,150 +1,123 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614E6146588;
-	Mon, 17 Mar 2025 20:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAEB146588;
+	Mon, 17 Mar 2025 20:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742243783; cv=none; b=VsuXiEf3to548FHKhjzo8VEM9qTgTdEMj+lDRXbr2YwdUEekZRXk2Cc3Or33v+6/uLQ97doUusdDGDKRexWkw9W3yaj8owqkwUwGNYe9fRXpOk+ezj6xGf5x74HO7YFsrxolFnFJ6uNkTAYkOkXaaPpI1/cLU3ygRfw4tSWNB1o=
+	t=1742243950; cv=none; b=E9kWicQXFOiTYZ34msB+yVEPXdnVDEmkRqQe2A/sfs0gNCQAXj6yspQhOfTggp1GxC/tbRBetwKe3BEloLYSJBBKK4m71cGnVsAQEeJIfMwoZmALkmhRuU3mi47zY52W9h7ansbi356bCbydHDX91fPUXlAOQ4f4LK5A+giCinc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742243783; c=relaxed/simple;
-	bh=qM2+6w4f6b/JlSZe8vL4wEJF46txPHCxK1AdfBHc6YU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lNhKKxtq6cm32tNzDBU/DTSMqgzb6MKx/vokC6012QvuS4CQWqOTAWGkO2EzX4nOSoRqdiH2bV7BRgiP26gr2DauaDAMaNZo8r4dN3VanKpx28Q4RgW30i3m73JrGMka4JUqsJD8F51/hAbYDjiBqEOy0rUaooGI/KeQud54An4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQP/3j1Q; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742243950; c=relaxed/simple;
+	bh=8X2NmdyPuY4DdxqALj/FVxjZR06pGA112Q2x8CGkeVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3jQx4vVbp6arJsg1UEySDmarFhzh06eUCECr7ZP0Ul50oUoxtzLo822Cq2yVtDstlxNDbf2lKHo4EICBlN0HhC6betBJP82OGrwrAVk42fx+jgdDNU2dzajHhremE3MYd8d7mF3aZ4OO4Oxbqi0oxbNBCtZWRghZ51FHvvZQPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsdYMUMI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQP/3j1Q"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30bfed67e08so54251831fa.2;
-        Mon, 17 Mar 2025 13:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742243779; x=1742848579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qM2+6w4f6b/JlSZe8vL4wEJF46txPHCxK1AdfBHc6YU=;
-        b=dQP/3j1QLPCmH/w+WCTSqiTHJbey+5DNXB+g6ZfM/GsDPU4u5ytOLIUS4LKZOXpc2R
-         e7EyJksTNgF6pOsb5/c4MCiDJTavUSBrawE5q4Cpob//YXg6C92RfTfUIhl1RgBEihVE
-         JwPNrWhUxnFWyt8T34Uq9r5nkZkZP2QhHOiuf3klTZSE9tReeVE/cONJyPMY81ietRGE
-         zqypbx7jvP4X9Uj0C+mtl4l6DkhbHJU9DN10A9opW6HNJAak+UrofOoUXFNLBF8DZm2U
-         jp2hVn5tnRgsFzsk/GUHWGTLjf/Gw1TEMSIFVCHsKpPnralZpXV/fonC7yyRbnMucPtJ
-         O47Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742243779; x=1742848579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qM2+6w4f6b/JlSZe8vL4wEJF46txPHCxK1AdfBHc6YU=;
-        b=hGoiJZsBlg2oPyNgbMRR4Y7NVehALdrRFnyCtjvTH3zwWN9RniWczlQg8PQmXwZp8F
-         L76csH3yjh8Sam6u6AlSHEVrfwlXiITf3L96I4J+Rwsn536HL0/vDRD6b5WspI52oxOT
-         EhEX7CzApNqJuFPYuRKDNaByrGnG93U4NXiwvam1uqoriNmz+9k5DW7onG6ScWs/Morj
-         e2G5RBEAqSew7qxwSVc8f1tw/m8RissZftfja5t4aOT8WpWNNlvgnW28nro0SNZ3a59R
-         SDm/E+Rw/Oa6iN27c6FtUzM86UArWkriqVRRe9Ads7zhsh25sv4GHYiGweptepvePb6H
-         8JCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmHG46IIbrW3u/d67EVZl8MbH4YopvHI6mZmpzWjiG00F2V5Xs/SZAyG454Wn5ZugZcGCig8EmVEG6@vger.kernel.org, AJvYcCVBdrz5YFNc235rpybMd8GOwxQsbxIguMEkg4SVuKVdTHiyXZ3At88qOMWpLMr53/n3zom8fCsUhcakpuzt@vger.kernel.org, AJvYcCVhHWNQJJPIwVUlnl03ZBfgRqm0aDj1b0JxZj+xUiMiXGtCqegSKsKcN5kAXvhF9jTxKGcHs37s762HmxkK@vger.kernel.org, AJvYcCW26KF/2St4AY1yugQ/9T8uRkAumRtjpnUGaanXpMSiaV7w5yKBarD4aV+LyfbYXkJvujZ/tWQpCVRl57Q=@vger.kernel.org, AJvYcCW5oRU0uZmY7obkbj71aIuXoGKUAGQueZINNyBB+qR1wFSkGOhLtxzyVrVtkLCF41MFoHwuZIuF7O4+T9fyrTM=@vger.kernel.org, AJvYcCWsS5pPCZnGf9ZgvDS46bkiJWGOK51NFUmK1N0V+YthJFYsoltWvHJj6wb42jzJ9RTeRSwzHEFYLABd@vger.kernel.org, AJvYcCXtXNDW+93GGABR5RNjnxw55+dDA5CftNFSiHeo5lJSHzlkWiCcdBXmPbL7YKvsuhOKY5jNi2ENKGFluEkClxmE@vger.kernel.org
-X-Gm-Message-State: AOJu0YypM8J1jNV36LLcHkOt73/WS3DxU6iZS4fhgj1peaRUaCWbzmU0
-	v2AQA9WIpPOj7ZRiXVoPZWYtV+K5cNMttWlSSN4qyB3xE+7aCZb+XjMeP4Ux9fEf/a1if2FLE6n
-	CB180IujDzKZC/sVOPfbT04MDqqE=
-X-Gm-Gg: ASbGncvHcjhftHMMJQbeFe05UVIzyuVqhx0+D72EjtNywqWFRWqcANMjfCp+7awnWsL
-	wLNusFz5sifMZ/1SUj3bgH1YB8lccWVWgvr6vKjoGStQhOTZWVf8rajI7ClaIaNqqpGecSi2dnz
-	QPUegPuHB7kFP1BJ+SJONGs/y2gI9TGF0Kn0h3EtepRn7F45ywt/47KORf8Al+IaoZHQ4rWw==
-X-Google-Smtp-Source: AGHT+IH8zVr++NSNNLXeK1LLEAL53MfIwsN2fQKGrVb8hyKgIXGiHkTS2l6AtuLI3BuMwtJPdkeMKucB/6Pcq+U8mXA=
-X-Received: by 2002:a2e:a4c4:0:b0:30c:50ff:1a4e with SMTP id
- 38308e7fff4ca-30c50ff1acdmr75805741fa.18.1742243779142; Mon, 17 Mar 2025
- 13:36:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsdYMUMI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 470E7C4CEE3;
+	Mon, 17 Mar 2025 20:39:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742243949;
+	bh=8X2NmdyPuY4DdxqALj/FVxjZR06pGA112Q2x8CGkeVo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BsdYMUMIYPJb4P2gDEtQSK/7k/odDLkD3EcRbTt+lrQlU2SI0sNrk1ctGaQYFhxGX
+	 ZH5VbTsxz/n//mer/BI7CJ+zL1MwxguQRD2txV8x8lohXgmKZqrrYOyKGQwf3ZW84Y
+	 zNaDBXGJNI26hkTvFgUhmTdFM/5XzCK3fpBuLeRQEmFRM11HVuJ6r5cONQvzylWeyZ
+	 qryg3df4a48Bdv76zQUoQ+aLQv45WyqzTUmMuFcidvJG5wPNlMmlAj82wwB+1WkgGO
+	 wIjpjLK4zh8XAaB9P7dr79DkNl2uRKZggL+DCwRM3/FivlcdjMehTmXJeEW2n7dtll
+	 TD3sJiT/uTLvg==
+Date: Mon, 17 Mar 2025 14:39:07 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <Z9iIa770ySTgKgp0@kbusch-mbp.dhcp.thefacebook.com>
+References: <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
+ <Z9e6dFm_qtW29sVe@infradead.org>
+ <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+ <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
+ <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
+ <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
+ <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
+ <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
+ <Z9h25wvi0VQOaGh2@kbusch-mbp.dhcp.thefacebook.com>
+ <ysvt4npanz4qfoxm5cv627cq2ommq6rxpka6pkvl3l2crcatmc@ic7tn5tt7aw4>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <67d85e51.050a0220.2a36b.58b3@mx.google.com>
- <CAJ-ks9kBp8zPfaQuZRb0Unms1b13hDb5cRypceO8TWFR0Ty5Ww@mail.gmail.com>
- <67d864b2.0c0a0220.39fb6f.4df4@mx.google.com> <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
- <67d8671d.050a0220.3305ab.6372@mx.google.com> <CAJ-ks9=uHjJrzM0ruvm4v4wr8LygRMP-1orWBy_9OiNNeQr0ow@mail.gmail.com>
- <CAJ-ks9=Qcmvbm=YGJ=jrX_+YdMsftk=FAimszYZB1OUuV4diZw@mail.gmail.com> <67d885ff.0c0a0220.111215.5644@mx.google.com>
-In-Reply-To: <67d885ff.0c0a0220.111215.5644@mx.google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 16:35:42 -0400
-X-Gm-Features: AQ5f1Jom6vkSdbmn6oaBiraATarxSi5flyvequP1N2vSDIIJ5c82kRxp43mFlwM
-Message-ID: <CAJ-ks9kYB1b4XsQcFb=NScPq+R+13U+Sv-6opi-yp6=ZjuLD_g@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ysvt4npanz4qfoxm5cv627cq2ommq6rxpka6pkvl3l2crcatmc@ic7tn5tt7aw4>
 
-On Mon, Mar 17, 2025 at 4:28=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
+On Mon, Mar 17, 2025 at 03:40:10PM -0400, Kent Overstreet wrote:
+> On Mon, Mar 17, 2025 at 01:24:23PM -0600, Keith Busch wrote:
+> > This is a bit dangerous to assume. I don't find anywhere in any nvme
+> > specifications (also checked T10 SBC) with text saying anything similiar
+> > to "bypass" in relation to the cache for FUA reads. I am reasonably
+> > confident some vendors, especially ones developing active-active
+> > controllers, will fight you to the their win on the spec committee for
+> > this if you want to take it up in those forums.
+> 
+> "Read will come direct from media" reads pretty clear to me.
 >
-> On Mon, Mar 17, 2025 at 03:05:45PM -0400, Tamir Duberstein wrote:
-> > On Mon, Mar 17, 2025 at 2:50=E2=80=AFPM Tamir Duberstein <tamird@gmail.=
-com> wrote:
-> > >
-> > > On Mon, Mar 17, 2025 at 2:17=E2=80=AFPM Boqun Feng <boqun.feng@gmail.=
-com> wrote:
-> > > >
-> > > > Then we should fix clippy or how we set msrv rather adding the stub=
-.
-> > > > @Miguel?
-> > >
-> > > I filed https://github.com/rust-lang/rust-clippy/issues/14425.
-> >
-> > I don't think we can wait for that to be fixed, though. Usually clippy
-> > is distributed with rustc via rustup, so even if this is eventually
-> > fixed, all versions between 1.84.0 and the fix will need this
-> > workaround until MSRV is >=3D 1.84.0.
->
-> We need to take one step back to evalute this "workaround".
->
-> First, expose_provenance() and with_exposed_provenance{,_mut}() API are
-> clearly defined as equavilent to `as` operation [1]. Therefore, the
-> changes in this patch doing the conversion with expose_provenance() and
-> with_exposed_provenance{,_mut}() don't change anything related to
-> provenance in practice.
->
-> I do agree we want to use the explicit provenance API, but I don't think
-> we want to introduce some API that we know we will change them latter
-> when we bump the rustc minimal version. So the question is: are these
-> stubs what we want even though in the future our minimal rustc version
-> stablizes provenance API? If not, then the cost of this patch cannot
-> justify its benefits IMO.
->
-> Now let's also look into why we choose a msrv for clippy, I would guess
-> it's because we need to support all the versions of rustc starting at
-> 1.78 and we want clippy to report a problem based on 1.78 even though
-> we're using a higher version of rustc. But for this particular case, we
-> use a feature that has already been stablized in a higher version of
-> rustc, which means the problem reported by clippy doesn't help us, nor
-> does it provide better code. Frankly speaking, I think we have other
-> ways to ensure the support of all rustc versions without a msrv for
-> clippy. If I was to choose, I would simply drop the msrv. But maybe I'm
-> missing something.
->
-> The point is tools should help us to write good and maintainable code,
-> we shouldn't introduce complicated structure of code just because some
-> tools fail to do its job.
->
-> [1]: https://doc.rust-lang.org/std/ptr/fn.with_exposed_provenance_mut.htm=
-l
+> But even if it's not supported the way we want, I'm not seeing anything
+> dangerous about using it this way. Worst case, our retries aren't as
+> good as we want them to be, and it'll be an item to work on in the
+> future.
 
-Even if we globally disable this clippy lint, we still need stubs
-because exposed_provenance was added in 1.79.0. Did your suggestion
-address this? Perhaps I missed it.
+I don't think you're appreciating the complications that active-active
+and multi-host brings to the scenario. Those are why this is not the
+forum to solve it. The specs need to be clear on the guarantees, and
+what they currently guarnatee might provide some overlap with what
+you're seeking in specific scenarios, but I really think (and I believe
+Martin agrees) your use is outside its targeted use case.
+ 
+> As long as drives aren't barfing when we give them a read fua (and so
+> far they haven't when running this code), we're fine for now.
+
+In this specific regard, I think its safe to assume the devices will
+remain operational.
+
+> > > If devices don't support the behaviour we want today, then nudging the
+> > > drive manufacturers to support it is infinitely saner than getting a
+> > > whole nother bit plumbed through the NVME standard, especially given
+> > > that the letter of the spec does describe exactly what we want.
+> > 
+> > I my experience, the storage standards committees are more aligned to
+> > accomodate appliance vendors than anything Linux specific. Your desired
+> > read behavior would almost certainly be a new TPAR in NVMe to get spec
+> > defined behavior. It's not impossible, but I'll just say it is an uphill
+> > battle and the end result may or may not look like what you have in
+> > mind.
+> 
+> I'm not so sure.
+> 
+> If there are users out there depending on a different meaning of read
+> fua, then yes, absolutely (and it sounds like Martin might have been
+> alluding to that - but why wouldn't the write have been done fua? I'd
+> want to hear more about that)
+
+As I mentioned, READ FUA provides an optimization opportunity that
+can be used instead of Write + Flush or WriteFUA when the host isn't
+sure about the persistence needs at the time of the initial Write: it
+can be used as a checkpoint on a specific block range that you may have
+written and overwritten. This kind of "read" command provides a well
+defined persistence barrier. Thinking of Read FUA as a barrier is better
+aligned with how the standards and device makers intended it to be used.
+
+> If, OTOH, this is just something that hasn't come up before - the
+> language in the spec is already there, so once code is out there with
+> enough users and a demonstrated use case then it might be a pretty
+> simple nudge - "shoot down this range of the cache, don't just flush it"
+> is a pretty simple code change, as far as these things go.
+
+So you're telling me you've never written SSD firmware then waited for
+the manufacturer to release it to your users? Yes, I jest, and maybe
+YMMV; but relying on that process is putting your destiny in the wrong
+hands.
