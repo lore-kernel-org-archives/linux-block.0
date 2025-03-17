@@ -1,166 +1,126 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C915119048F;
-	Mon, 17 Mar 2025 18:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95051A2860;
+	Mon, 17 Mar 2025 18:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742236434; cv=none; b=TVyj3QqAuJU0Z/e0MG7WBa0lYNMfOxgEI/qxIWuLkCeiR3ybmM1DSbS9BgXxw/JWdrDbam8h+s+4F98aHM3yu+zRIW9z/JMDm63YInaSNFVAzOAYUz/R5aVeLGZD+FYdZiFi19AQOCE4FsoWHsGcOdJm2dbNFNZZHSLMH7HWsts=
+	t=1742236700; cv=none; b=ODtutI4dW5B4mbzmfKPmMhObwBtZVwLcKo4mgd1+Muk0+MdIb/mb/e4hZWjAosFBXR+9SeRi3t+QeCf9iA/rnaA05OE/Zti2+aAq4cE/Hsq7xfij1/njqU97TXOZ+AZWJs+xi2CWbQNQCOclithw7SdwblgAPg0YXCC05WbGbR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742236434; c=relaxed/simple;
-	bh=ehOGcmrGZaJQniQGWoH0A1zU6UMeQK1IbOtzAOin1lY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jf4fHc0KDwqL7fu5m6Z+InUZNofIJOE3hGKU7yTfzrWrwCRPO1dHzhFLcZ0xgrrW6CXJMJ5dSGUgii9zs3e1wLIaUvYdIn7cdE0znFCVcgVsEfebNQo4e5WDQoGVQCs7bChAIbxh0vusdywCN/2zB9UtThbCLTtfc90i7C7gL9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xq7BStlh; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742236700; c=relaxed/simple;
+	bh=39OVTY6F/UnTTojg2v2I6px85IZIQ5P7czNQSmDtm4Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Abx5MAjbs4yoZi7QpKtj3pY78DF3f9PvBt6bSmjil8NRPp0g5HRyt/1sLlc2f6Jer/ZI8h26z8lFaB2tUbDxhHd03SzCESUNG6Gb33oRVcAvu7upDJ4RNwFBcXhC9geGytc5FR+suMYD/S5cDmWVouIwQcfwcq0wOLW3zfyZRYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mThr8JO4; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xq7BStlh"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3061513d353so59395991fa.2;
-        Mon, 17 Mar 2025 11:33:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742236431; x=1742841231; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+RgH8a/UTVf+jUM886CjeJ+7fFyfFZ683ptFNfGfQ4E=;
-        b=Xq7BStlhC2uV+7o/89RKvcRLCLmppScbfvZ/eWDMNgkfFlcHKxObU45wkw4xs9VPIp
-         psb9CbihFbBjP3+lWk/gZrYW46q18kB5sfAc2Oj3EGYhh5YpeHQTgsWl+ya4eV3QviYY
-         uTJceN9XW+hrrK9Vddn0bBgwMDDCV/N2ENHHNoj3rRC52F1AhA0LO0NZZgkLYApViZAk
-         1rmEeG/GIVaMvkJwPFfek8IyORFb039hSE46IRKqAQXp0XfmCxMDOAQ9HO1Cr5FeePEI
-         b8EDAmDisPDjNQVtl+NgDeowq08hC6Rm5OAMbRP8pHVXIumyfClpZoJ603rSbTeDAdmI
-         YyiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742236431; x=1742841231;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+RgH8a/UTVf+jUM886CjeJ+7fFyfFZ683ptFNfGfQ4E=;
-        b=d/t1cZiYhgLrJOn27oZPrBeGkZ3FVbyl4KKfho8cm0JlySJGsWVi3d5iuKZwb0cm8F
-         I74cdpL8JeViugwRueUbhuOmfG7ElEtTVFCONw3QglX6H1w0QJdBVRantEQvI7cIFYO2
-         eKmxlIkKomIZoAu+vg+rqojP5pomLVujrKByaCvyHDMaK0BS6DU+7o7i/v9p12rj5rKX
-         tAeY8VIFMAqEEFocpbHX8fhDhx72QK6InZyVQswkHTJne7uHY3zGJwa/UlGooWc8iYoU
-         +hQuwNb2ypRE24aG4TujLcFDIY2OH8RGYe8gPSftmI0cKrUBC0tnxVH1k1nIY9oZqflC
-         7W/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVAqH8Wg5tPAUlnBzExLDCv57Uto2Qd5VHeOgQ1SGsHSavOgW/IVaEHfkTl33zzNp9CvxfR9kx9YA4N1Us8fJXa@vger.kernel.org, AJvYcCVXigdoblaqLcGKpPaF9+fglXfLJCjtH75Si3xTQTcHFgimeIhAjjHP9+eBrOU7elz6dqrHDiHQW4UEBra8@vger.kernel.org, AJvYcCVgYl4jU8aYaF+tfwiHJASxcji5fqNIc0xGgxu0xw0yOQmMzVuziR2q5w+tOk5M/1GbFgcssoOi4CUja/Cg@vger.kernel.org, AJvYcCVr806qnfmtjgfoqScQD+EGxS8myD6Cgz8aXQRv+ECzoTH+6KsW30tIL8RJ2bZlfNDy0D0WLqpHuEQNrmM=@vger.kernel.org, AJvYcCW+pr9F+ww50tK4+d4ccYlVSLQ7k4jL6VAZK8vKyB8ddTPicp0Wf/33+/ngFFLGzakvcRoyz7YvVxLp@vger.kernel.org, AJvYcCWwQagfSD1i7QAx8TPkxgUryOzAcKVW1UdGXLVS3fklxj3PtBPp0YTBW1bsws9dKL8nFX7gWvLF7OW339xJz+o=@vger.kernel.org, AJvYcCXF8Tqmw8leeb27OGdjFKWzzKHswBpBiacxHZZe9ErNp98pmuQLWAXf+TGnJJrCmTn2oQ6DNQJuossj@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPRIWILSn/aEBEg7rxCXkhxjf3E10AehE8fV8V2SWmKv1V+WdS
-	/uE6u6kN4wlg1+RxslDCqhKNL4APFYSPeRh+HVmEu+xDlw58+68tRmkdhAOfgw//1q+udw6vm/T
-	QL7ltdiLg/2tZukCm2bjOyoNY8pg=
-X-Gm-Gg: ASbGnctZ0Dw1vBqU/m66tamo9h8njQdFrW7qlrHrS0Emk6AdQOR61Gf9tCwffTm6pkA
-	uM7t/FsI6wfQzaq4tzHTAVIUwoAObRduagV2nORoKpmjkiUwa4t0JvEpSp9haMbEAH/yQztZIxl
-	S4SpjN2P8SxsfXTSeUgeUmpL1aaSOYgNp5mWXZAQEN/Zw3JHaqjJyZ+DEFmBmR
-X-Google-Smtp-Source: AGHT+IEuOyU1EAIZGNPcU1UQpVvmze5Fv4puhAbwE4i2xu3ParhHBig+KUJCu/9ANLld3Xe0NJ1pTjvfSHUJlGkg4r0=
-X-Received: by 2002:a2e:7819:0:b0:30b:b204:6b98 with SMTP id
- 38308e7fff4ca-30c97543facmr9366801fa.12.1742236430751; Mon, 17 Mar 2025
- 11:33:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mThr8JO4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742236699; x=1773772699;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=39OVTY6F/UnTTojg2v2I6px85IZIQ5P7czNQSmDtm4Q=;
+  b=mThr8JO4epncEm8LKTkp4mw5HbL2H0zWr4oSFfRISweKp9x0tYhg9qzj
+   iCC8A6qgp+J8xDgYY6Llcb/kWT2gXBTu223pQvw2w+yH1RKf0retcdFsd
+   d1envx2+omCEbErInU0ZB8el2PlebZx9S88fqadXPU83hpbRiLkZzOFpK
+   8UVNpKOAK3ZDi7hfaE4PBr5evLKUKN3BBysKyr5UU60yjFQhEafLm5lZc
+   1v3haZh7uFbr9sqmwCUAWtaF2iir6kU8k6sSZz7xUzsjxLHAk8hiFdCil
+   PZQgV944dXbeQJjw4lSLhYhW8aHiXcS75HtM4/e2/StSox8eXfDGyTmi4
+   A==;
+X-CSE-ConnectionGUID: Dlri5rglRV6nKO0W7pEOuQ==
+X-CSE-MsgGUID: qTOwnNlbQqiSYq7f+sAPKg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="43230773"
+X-IronPort-AV: E=Sophos;i="6.14,254,1736841600"; 
+   d="scan'208";a="43230773"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 11:38:18 -0700
+X-CSE-ConnectionGUID: 2TxeDznFTcGtjANJYrwKjg==
+X-CSE-MsgGUID: JE2/MoTxS1G7MFn7ywJRRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,254,1736841600"; 
+   d="scan'208";a="122202900"
+Received: from hrotuna-mobl2.ger.corp.intel.com (HELO [10.245.246.97]) ([10.245.246.97])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 11:38:16 -0700
+Message-ID: <e3b4f44ad493da5c39749d1721702b133937b321.camel@linux.intel.com>
+Subject: Re: [RFC PATCH] block: Make request_queue lockdep splats show up
+ earlier
+From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, Ming Lei
+	 <ming.lei@redhat.com>
+Date: Mon, 17 Mar 2025 19:38:13 +0100
+In-Reply-To: <5b81f4be-427f-4083-8cbe-e201d0f255c5@acm.org>
+References: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
+	 <f46f0286-8052-4a29-9d89-376bf9b48d8a@acm.org>
+	 <13031d34692b0c97799de81c0b83875d56076e13.camel@linux.intel.com>
+	 <5b81f4be-427f-4083-8cbe-e201d0f255c5@acm.org>
+Organization: Intel Sweden AB, Registration Number: 556189-6027
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <D8IQCJHJWPNJ.1J2UO4OK0D0B3@proton.me>
- <CAJ-ks9=cBEZqPHMWsh7-c16LTg+i+RmDFigwy81o9yOj2J+jFA@mail.gmail.com>
-In-Reply-To: <CAJ-ks9=cBEZqPHMWsh7-c16LTg+i+RmDFigwy81o9yOj2J+jFA@mail.gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 14:33:14 -0400
-X-Gm-Features: AQ5f1JrVwUf05ntBkD98vS-EcZTcBLddhaoJo6_SZObmEIDvKFbJY6SKC0TNZzk
-Message-ID: <CAJ-ks9nCdcn7ajG69m+2QTgYxvELd2h7kdBb_bLpTwQbnZ8X_Q@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 2:31=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> On Mon, Mar 17, 2025 at 1:50=E2=80=AFPM Benno Lossin <benno.lossin@proton=
-.me> wrote:
-> >
-> > On Mon Mar 17, 2025 at 3:23 PM CET, Tamir Duberstein wrote:
-> > > Throughout the tree, use the strict provenance APIs stabilized in Rus=
-t
-> > > 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-> > > functions at the `kernel` crate root along with polyfills for rustc <
-> > > 1.84.0.
-> > >
-> > > Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc =
-<
-> > > 1.84.0 as our MSRV is 1.78.0.
-> > >
-> > > In the `kernel` crate, enable the strict provenance lints on rustc >=
-=3D
-> > > 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introduci=
-ng
-> > > compiler flags that are dependent on the rustc version in use.
-> > >
-> > > Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-p=
-rovenance-apis [1]
-> > > Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> > > Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.m=
-e/
-> > > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> >
-> > One comment below, with that fixed:
-> >
-> > Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-> >
-> > > ---
-> > >  init/Kconfig           |   3 ++
-> > >  rust/kernel/alloc.rs   |   2 +-
-> > >  rust/kernel/devres.rs  |   4 +-
-> > >  rust/kernel/io.rs      |  14 +++----
-> > >  rust/kernel/lib.rs     | 108 +++++++++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  rust/kernel/of.rs      |   2 +-
-> > >  rust/kernel/pci.rs     |   4 +-
-> > >  rust/kernel/str.rs     |  16 +++-----
-> > >  rust/kernel/uaccess.rs |  12 ++++--
-> > >  9 files changed, 138 insertions(+), 27 deletions(-)
-> >
-> >
-> > > +#[cfg(not(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE))]
-> > > +mod strict_provenance {
-> > > +    /// Gets the "address" portion of the pointer.
-> > > +    ///
-> > > +    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.=
-html#method.addr.
-> > > +    #[inline]
-> > > +    pub fn addr<T>(ptr: *const T) -> usize {
-> > > +        // This is core's implementation from
-> > > +        // https://github.com/rust-lang/rust/commit/4291332175d12e79=
-e6061cdc3f5dccac2e28b969 through
-> > > +        // https://github.com/rust-lang/rust/blob/1.84.0/library/cor=
-e/src/ptr/const_ptr.rs#L172
-> > > +        // which is the first version that satisfies `CONFIG_RUSTC_H=
-AS_STABLE_STRICT_PROVENANCE`.
-> > > +        #[allow(clippy::undocumented_unsafe_blocks)]
-> > > +        unsafe {
-> > > +            #[allow(clippy::transmutes_expressible_as_ptr_casts)]
-> > > +            core::mem::transmute(ptr.cast::<()>())
-> > > +        }
-> >
-> > I think we should just use `ptr as usize` here instead. It's going away
-> > at some point and it will only affect optimizations (I don't even know
-> > if they exist at the moment) of old versions.
->
-> Why get cute? I'd rather defer to the standard library.
+On Mon, 2025-03-17 at 11:28 -0700, Bart Van Assche wrote:
+> On 3/17/25 11:13 AM, Thomas Hellstr=C3=B6m wrote:
+> > On Mon, 2025-03-17 at 10:37 -0700, Bart Van Assche wrote:
+> > > On 3/17/25 10:11 AM, Thomas Hellstr=C3=B6m wrote:
+> > > > diff --git a/block/blk-core.c b/block/blk-core.c
+> > > > index d6c4fa3943b5..4aa439309406 100644
+> > > > --- a/block/blk-core.c
+> > > > +++ b/block/blk-core.c
+> > > > @@ -455,6 +455,12 @@ struct request_queue
+> > > > *blk_alloc_queue(struct
+> > > > queue_limits *lim, int node_id)
+> > > > =C2=A0=C2=A0=C2=A0	lockdep_init_map(&q->q_lockdep_map, "&q-
+> > > > > q_usage_counter(queue)",
+> > > > =C2=A0=C2=A0=C2=A0			 &q->q_lock_cls_key, 0);
+> > > > =C2=A0=C2=A0=20
+> > > > +	/* Prime io_lockdep_map as reclaim tainted */
+> > > > +	fs_reclaim_acquire(GFP_KERNEL);
+> > > > +	rwsem_acquire_read(&q->io_lockdep_map, 0, 0,
+> > > > _RET_IP_);
+> > > > +	rwsem_release(&q->io_lockdep_map, _RET_IP_);
+> > > > +	fs_reclaim_release(GFP_KERNEL);
+> > > > +
+> > > > =C2=A0=C2=A0=C2=A0	q->nr_requests =3D BLKDEV_DEFAULT_RQ;
+> > > > =C2=A0=C2=A0=20
+> > > > =C2=A0=C2=A0=C2=A0	return q;
+> > >=20
+> > > Hmm ... my understanding is that it is fine if FS code calls
+> > > block
+> > > layer
+> > > code but also that block layer code never should call FS code.
+> >=20
+> > That added code only mimics the locking sequence that happens
+> > during
+> > reclaim with the existing code to register the locking order
+> > expected
+> > by the reclaim code. If anything violates that, lockdep splat [2]
+> > will
+> > appear.
+> >=20
+> > So I'm not quite following your comment?
+> Shouldn't the above code be added in the VFS code rather than in the
+> block layer?
 
-Ah, this is gone anyway with Boqun's suggestion - this function exists in 1=
-.78.
+It registers a known locking order WRT reclaim(GFP_KERNEL) for the q-
+>io_lockdep_map, which is itself initialized in this function. I
+believe any known locking orders should be registered at the place the
+lockdep map is initialized.
+
+Thanks,
+Thomas
+
+
+>=20
+> Thanks,
+>=20
+> Bart.
+
