@@ -1,148 +1,168 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DEC22F01;
-	Mon, 17 Mar 2025 02:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92E979D2;
+	Mon, 17 Mar 2025 04:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742178698; cv=none; b=oiip6tr/U9xbu8tFY2mQdU8P0nZYX5xcDJubRNkn97XZAla0yJ0GSr1rUlNDEZvH2HZAwHttaq89eEt4QpeFVwbFnf/gGFM8ughZPBbdLWN/vZLsFPCRrru7HVvBH+vb9CxT3L9QD7VWNCK2VTlZN226NHYavBjbZaqReChplXA=
+	t=1742184276; cv=none; b=DlObvQj97O6TC0zFl6S+CpJWjqo8dY/j+cLK2UVFTwCGD3aaGVCPJLhIawNZCNjtu1aB73HSl5FCLdzj2svFgFB/XkGDzCSOwE/dRR7dRfF7SalM9LJ16L9FjEhcIk2OoQ7ZSvOSrajUfBsLPKWTWUgh1YxlM1AcvRaB3CbJmWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742178698; c=relaxed/simple;
-	bh=UgfxJNs9q+/V4egib8TdG9hry6mBYQ5JsRB8g8YOHV0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nFaep+SWej698dwvoL8UxsZQAy9IvibIEbbUwr/ZH+cGi2GPoIaEouE8S/esYGFIcU0Rj0rvyhVYSVe0vf05plqHQ5I1bJUIdm+pBngB6IWXoEuxD7jq8nk6Qju0njqwXt+v/paR9p95S/ZhtQIPwxtcBBVu4n6eBFdeD0uyGKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=eujEPbGH; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1742184276; c=relaxed/simple;
+	bh=Zqx1VgtwCX1Jxqme0dY01T8ETZuysrsyCc9RI14Ut68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U/FJq6QmYawrEIBUP47+gcXakmHDjS8pu4XxF/BYQSfp4wnOCfyp3p3Kdx4ScTAsYy+6XkfWjf09e+QxLgrPr8ZGj6L2r1ZL+SwfjO8u2+GC9JwGgMSWwyModcggllc+SFUXkfcBRz4auU8NkkHBlM+Dk6KDfUTxSWkfM54fUQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0g1w9sr; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="eujEPbGH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1742178612;
-	bh=3Ep9OXxN57SI8f3T+ZVX5uyeB57BAjZ5iyhA2KEimRc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=eujEPbGHu2xoiuLVyAqfym6OY2aEfo1/y+VTsgSa4sWnBZ3VjiLJV3Jcd/WT/5SUx
-	 rgu1sIqSuduu8THjxYRJFcNY7nNTnhSlfQ7cU9x8uiOnx4nkkQmrShENtHEPKr+TnP
-	 huyTBkJPvz9O1AF4Zecu4wcyoQtTUmcw3dZImT+o=
-X-QQ-mid: bizesmtp82t1742178584trdbk4w4
-X-QQ-Originating-IP: PfeJu7VBQytMgWIHxuI6OA58c+5IKKd8+cawwIOHxTY=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 17 Mar 2025 10:29:42 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16559626076117230096
-From: Chen Linxuan <chenlinxuan@uniontech.com>
-To: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Chen Linxuan <chenlinxuan@uniontech.com>,
-	Wen Tao <wentao@uniontech.com>,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0g1w9sr"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e90b1b20c6so22258266d6.3;
+        Sun, 16 Mar 2025 21:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742184273; x=1742789073; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FdC2SWGkfGaYEex5fKxWwqou3YQPoCqtTCDGuK//30g=;
+        b=X0g1w9sr12mVD/4tyUg/7hHM19gHNV/jZS+woWUKTVccrcgUkzWCZApmyeM6NqWGhI
+         E9ckD4g9rvL4Rglna/VocwWRSH82AKl6H1ZUduvAEZUWCWUNKNDddU7NAwyi98s1kKX4
+         da1YJ+8pTJMSQBHrHd2ZuUxsjFkBO88NaVKjnuVWuTTQ7sLP0IvT8SAldJAUopnigfXT
+         KNlM2JO1CuA00FZX+m9NiUSJKo+AOteQ8hqKZ97ykWv69FtwKG0/aGE08nV+wnafNwn/
+         A5+wCHdvTIPgGF9qh49rL1WCtGbMjrvVN6DKg3hSX5XHpezlRpB3+ogvUnnbUrFMZdhM
+         +Oxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742184273; x=1742789073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FdC2SWGkfGaYEex5fKxWwqou3YQPoCqtTCDGuK//30g=;
+        b=i32xVVxcGupb2TrebSKZeFEzY3V0jGeXLFxsqW5LMl9H8/CKwa6WdZEhScUZxplr6g
+         DrUr66sSy7kQgG7pQUdVq6wex2dI5lnWHnqEkFnm2v/IfHO6VN+jVNIWD/XA8sdu4n18
+         efpQjDx+V0Tgetwfw+qqv0otVXXV8CzChXXVa8q7A0zkP9+c0yljCS8OfO1AM3Zqnsw5
+         WO/+1imlv23bmUQvE8YmBNC/LgKUuLauFWW7qt/dDSvNZXbcyl3OC9H2wcHEQHxj+S/i
+         T0G+/sON0MXEIzY0i0o4H1Ap47Qo04uhtxmjppBVlctamya2UyA10lPYqxvCNL1fFH3S
+         1pCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnIFWGYR7Ph/N8iNvMJkYGzrH75NfAl03FL589Bm9UPAS+uMeDzOkv7xEjngjgfnNRKizPdHvguTUKvkH8@vger.kernel.org, AJvYcCWLZ+y0uyuXq1o+Nj1ZK8fQsKZOieM2EsdgkJeiq/D+32VnYI/60mVoVsZJZe/cHXqzP1+mdVoYWO4eGA==@vger.kernel.org, AJvYcCWnh3w40J4m/RQr2vYO209IiBwZc5tmy/zm+ZGE9eQ7YaggBLXNC2I5+EipogTl696G9SFtWT0aa2aP9xX9GKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjI8DFLerFYaZLxdOLijqMGc4qrWAwsroyGD9c8SY7plQybrYB
+	TsBZZdicb3JxBXs1j2e26rxlqO4tVh613tuQoPjB51RDA9tyvmCm
+X-Gm-Gg: ASbGncu2qeL+Q8vSXzxEpbf6USgHfZuZpWdoncPIFzf3itnpueGAVP7L10x6C+YAKFO
+	X85lI6cCQhFBBiQqAxxr6dJjJWrLNWjRi1ow0wrVDYSPlBZDXeDG8z5jd7E9sKd3El2pkoarajT
+	nDizU+g+oGqBOInkoVvDDG+FaF4L/BJKI63WV5vzyAb/+wLdUG0LBac/+KXTR/V/X45c38HfiCF
+	pGokg8Lvk1lNu4lKK1D0tHQrc0LlC1f3aHHqbWAl8uaKomBY6tR2bMO4jEo6LIyS+DfryDKUMFK
+	JxAtL72iuGOczAmN5ifuHl7vAnroRObf8p0lcwtP+9X5NDVG3o1G9X0fVIshqZbC5QIiTcqhT3x
+	CZhV3wY2AZRagaorbeMl/MTfIFdOnl8KAdOs=
+X-Google-Smtp-Source: AGHT+IFBjKayl+RdbauHaxiuB08xXW4tWmQhml6RN5yk9hM6PR8a9pGbUs5bHQpeSWSWoGVm6b1QQw==
+X-Received: by 2002:a05:6214:23cd:b0:6e6:630c:71e8 with SMTP id 6a1803df08f44-6eaea995137mr171140126d6.7.1742184273679;
+        Sun, 16 Mar 2025 21:04:33 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade237957sm50558536d6.42.2025.03.16.21.04.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Mar 2025 21:04:33 -0700 (PDT)
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id B0B4F120007C;
+	Mon, 17 Mar 2025 00:04:32 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Mon, 17 Mar 2025 00:04:32 -0400
+X-ME-Sender: <xms:UJ_XZ6DDSwKCe5ZvCIEXH1KGlfQDsQKuZIX0e8WBS41-cWtXy72gug>
+    <xme:UJ_XZ0gnemuLMsj4msD-PDLSwpMC5WaYioNwnJ6cQdUdnnvre7GEvpua-qd21PqRl
+    9vGcNV9aVTwRKN9iw>
+X-ME-Received: <xmr:UJ_XZ9nBDSDUjviwonxZviSa_l5-bAJtAa9kUuvEeAsd2Ce2EDaVIDIb>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeekgeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpefftdeihfeigedtvdeuueffieetvedtgeej
+    uefhhffgudfgfeeggfeftdeigeehvdenucffohhmrghinhepghhithhhuhgsrdgtohhmne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhu
+    nhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqdduje
+    ejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdr
+    nhgrmhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
+    htoheptghonhhtrggtthessgihthgvqdhfohhrghgvrdhiohdprhgtphhtthhopegrrdhh
+    ihhnuggsohhrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurgeskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilhdrtgho
+    mhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthhopegsjh
+    horhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvghnnhho
+    rdhlohhsshhinhesphhrohhtohhnrdhmvgdprhgtphhtthhopegrlhhitggvrhihhhhlse
+    hgohhoghhlvgdrtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughu
+X-ME-Proxy: <xmx:UJ_XZ4zr8yhGLZQx7SvvzOBbXveY6ewp8CsHMJ440O_E-YZJXcDH4A>
+    <xmx:UJ_XZ_TWzl77m1yLkxNrUxP5tImmzP7inyLPm8SPUL3OTF4W2fuZLw>
+    <xmx:UJ_XZzZaB3Xa2Z-v5ze5PZY0_tgvOqrL73nrCJX31l_IhbTfuDjtUg>
+    <xmx:UJ_XZ4R-k99u7Jz4wDc3fYp2lcbb3CAKZCPzhdgZQ384oDS6LkhDRQ>
+    <xmx:UJ_XZxBD2Nc4ayW3tgllwTe42yfoTsmXHxEBXh9qQ7cuxCKywKF6Cy1p>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 17 Mar 2025 00:04:32 -0400 (EDT)
+Date: Sun, 16 Mar 2025 21:04:31 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Antonio Hickey <contact@byte-forge.io>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Antonio Hickey <contact@antoniohickey.com>,
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND v2] blk-cgroup: improve policy registration error handling
-Date: Mon, 17 Mar 2025 10:29:24 +0800
-Message-ID: <3E333A73B6B6DFC0+20250317022924.150907-1-chenlinxuan@uniontech.com>
-X-Mailer: git-send-email 2.48.1
+Subject: Re: [PATCH v4 15/16] rust: block: refactor to use `&raw [const|mut]`
+Message-ID: <Z9efT3ramQIwwRXG@Mac.home>
+References: <20250316061429.817126-1-contact@antoniohickey.com>
+ <20250316061429.817126-16-contact@antoniohickey.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-QQ-XMAILINFO: MRY6qckr/MVJxb3HfPNW3ZfnBmjUWM9MGV9dFuk0w/eq/JIaFCYCtdB3
-	mIks34asbJFtK71dGiZ4otvPa6tpbs84T3O+iyXe9k4/r1rKm1amACL1bMjEtlgq3yswCr6
-	8VYl9+modzLsiC4bJTi8rM/QfVzNQaduGZtZcmsdb/U34sN/C74aHjh+9CyDhteIWokDNZo
-	67F06gq/TtB82o/tPaEq9+3jTltgA4/c9H2KIRr58hmxAmCb02eIorzi23AQEB38FqymY5s
-	oidj5szmYrGVpYI7Uk+eRCrmSeMSX45ZJHolqPlMO1bGK4sGpOO5BnQIHev/yuy0CH42aKC
-	VCkvvOKnjbSqbYGfTOlQZYRfwPH9JHaBJjQ8oC8cYOnu26VtQHtIHmHa2d+N9tCZcLbFALe
-	f7tV5JUBNJGwVDmCbALf7GxxRdVsPf+TZQriuN7geyztp0adeYRAgXpEBGEbwSVNYHYgTJI
-	psw4tbq4ECxSAbsqd5OYbmrftmbS6f8JP7wPKumrm4h87gqE1yk3S6p5qvmcbY3Q0ToE8kt
-	RHUZ8fP0xdsgzkhY2iidQDq/ZaOi8oo62tBdsJ7/YhJm8fAtC7bXN9bsJJ1gbrOZBNNA222
-	5GglTQye6Z390FoXBSlLpiDBrlEqyvxBuR5rq/ZlB9nO3TkSChszqRdJ1E4ZM4aBlteUAIf
-	6/QSZo071fUbsvAAOp3fMwBI5wvfXCIxnzRC6UTeo+IXSmz0CDmssIX2vspRh0J3p20Ar8V
-	ob235v7KS18bWoem0QeCfhugSNVKw7B9t4zrbxTmjk8Hy/BOiT5JkvzxB1+7GkJSnoKnEtP
-	FZqg18hbdCZ9FpDVAzELTV9bBEtTiy3O8nwMsgZypy7oDZHkyLZZmX5j6+H7zlbCXwebJRG
-	uQEZuaVWaqHfKPh+BPKeWfCTk9p8BvXqSVG9tg1BlWvLUJfbkD6iPTaBZmpVrnXxfoZR0oS
-	y+sbvMr7jmOzFOvAOd1d17iAbFuLh8APAhSPc8nkN+LhhF3+GmTDCin1/
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250316061429.817126-16-contact@antoniohickey.com>
 
-This patch improve the returned error code of blkcg_policy_register().
+On Sun, Mar 16, 2025 at 02:14:24AM -0400, Antonio Hickey wrote:
+> Replacing all occurrences of `addr_of!(place)` and `addr_of_mut!(place)`
+> with `&raw const place` and `&raw mut place` respectively.
+> 
+> This will allow us to reduce macro complexity, and improve consistency
+> with existing reference syntax as `&raw const`, `&raw mut` are similar
+> to `&`, `&mut` making it fit more naturally with other existing code.
+> 
+> Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> Link: https://github.com/Rust-for-Linux/linux/issues/1148
+> Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
 
-1. Move the validation check for cpd/pd_alloc_fn and cpd/pd_free_fn
-   function pairs to the start of blkcg_policy_register(). This ensures
-   we immediately return -EINVAL if the function pairs are not correctly
-   provided, rather than returning -ENOSPC after locking and unlocking
-   mutexes unnecessarily.
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 
-   Those locks should not contention any problems, as error of policy
-   registration is a super cold path.
+Regards,
+Boqun
 
-2. Return -ENOMEM when cpd_alloc_fn() failed.
-
-Co-authored-by: Wen Tao <wentao@uniontech.com>
-Signed-off-by: Wen Tao <wentao@uniontech.com>
-Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
----
- block/blk-cgroup.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 9ed93d91d754..2609f7294427 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1727,27 +1727,27 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 	struct blkcg *blkcg;
- 	int i, ret;
- 
-+	/*
-+	 * Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs, and policy
-+	 * without pd_alloc_fn/pd_free_fn can't be activated.
-+	 */
-+	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
-+	    (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
-+		return -EINVAL;
-+
- 	mutex_lock(&blkcg_pol_register_mutex);
- 	mutex_lock(&blkcg_pol_mutex);
- 
- 	/* find an empty slot */
--	ret = -ENOSPC;
- 	for (i = 0; i < BLKCG_MAX_POLS; i++)
- 		if (!blkcg_policy[i])
- 			break;
- 	if (i >= BLKCG_MAX_POLS) {
- 		pr_warn("blkcg_policy_register: BLKCG_MAX_POLS too small\n");
-+		ret = -ENOSPC;
- 		goto err_unlock;
- 	}
- 
--	/*
--	 * Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs, and policy
--	 * without pd_alloc_fn/pd_free_fn can't be activated.
--	 */
--	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
--	    (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
--		goto err_unlock;
--
- 	/* register @pol */
- 	pol->plid = i;
- 	blkcg_policy[pol->plid] = pol;
-@@ -1758,8 +1758,10 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 			struct blkcg_policy_data *cpd;
- 
- 			cpd = pol->cpd_alloc_fn(GFP_KERNEL);
--			if (!cpd)
-+			if (!cpd) {
-+				ret = -ENOMEM;
- 				goto err_free_cpds;
-+			}
- 
- 			blkcg->cpd[pol->plid] = cpd;
- 			cpd->blkcg = blkcg;
--- 
-2.48.1
-
+> ---
+>  rust/kernel/block/mq/request.rs | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+> index 7943f43b9575..4a5b7ec914ef 100644
+> --- a/rust/kernel/block/mq/request.rs
+> +++ b/rust/kernel/block/mq/request.rs
+> @@ -12,7 +12,7 @@
+>  };
+>  use core::{
+>      marker::PhantomData,
+> -    ptr::{addr_of_mut, NonNull},
+> +    ptr::NonNull,
+>      sync::atomic::{AtomicU64, Ordering},
+>  };
+>  
+> @@ -187,7 +187,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
+>      pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
+>          // SAFETY: Because of the safety requirements of this function, the
+>          // field projection is safe.
+> -        unsafe { addr_of_mut!((*this).refcount) }
+> +        unsafe { &raw mut (*this).refcount }
+>      }
+>  }
+>  
+> -- 
+> 2.48.1
+> 
