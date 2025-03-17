@@ -1,203 +1,70 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D570317D346
-	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 11:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A6C235C15
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 12:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742212390; cv=none; b=gffy9+xoixbJXIAWBmDlB6XtTiVTi+6OFoA19YVNDExwCJ9owjLPZNljfk83ZGs0XyGHXMEc+tvXHCybbsKrLXWOgd++k7d/5L3l38I1RDRcrS1ejk2yxnmPam7JdoFQgyrrThO7b4aG3EqI8Ks+geKUH5g9eXhxWSBrP5IWrkg=
+	t=1742213761; cv=none; b=eiabrNJ5nx+xibunv9LghRSASLpLNVsbVpqlCbrc9H19p496ulE8Hfq8jslsRVXfX74CnomTlqjFLkiGkguwbBc282r4lXGt8mymA6bswwoSQ30ubDE3G7Tcr+TLS+Ar+oUVJ02EO8d+AurdhhlyANtmlmDGVuR3GBkErmlRydc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742212390; c=relaxed/simple;
-	bh=5kErYDQm5IeYb+fhyjZg6NjqMDCo2JxgEGxd2Qz+a3Q=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=tBf4J2GlypC0uTkxUICUwDyvn7e+Ek236P8hXdyCK3TogfAaxUNcXi8OycgOhmjDRgxfHXM+86C0R3c9neDGfq8U1MBTKA2JGqiI2uGR5GRwlERWS6/yFdJQPv0Lxm3x1TA+T1AaBscZJHyuui2DroHKb2bXL9g3m88dCd0EJXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CrwK9Uvx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742213761; c=relaxed/simple;
+	bh=FRN7UrN0XbZiFXMmo1/fuiOaUtBz90zOk5jrUMZN4yA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a1cy/J6CErQZsAoklx7fWIx0eeh7RKknV00MO6TI2kuc7vLdxQd3fIVtU6MlHGOzNVCKeU2Nci21S024No0KIJqD6aeUyE9IWscsXi+7gGhEQt0+76LZC3xCtjseo8qWKIJpOmwNEZV0nWFgclC5xqdfWhhV6XZ3y+rfTKu0OcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WtWIDZH6; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CrwK9Uvx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742212387;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WtWIDZH6"
+Date: Mon, 17 Mar 2025 08:15:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742213756;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YcQ5Y3qi8I25j6PFVriuZX0AXowSo1CEZ8WifhltYCQ=;
-	b=CrwK9UvxhzrAvv95A8+cxSJlVeXVyCq53osBSUztJU01JtUwKQN65BNTdaaKO8CBamPMRp
-	lJSTrYcvNa/nZGbIyco8ipiBbdyj0hmv60RErghaWCub3A1hkMY9U8OunQ9JSMd3DMYccI
-	YIscoChJyMS/z7iGsnNYfibv7E0+eEg=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-VFydDtk5ObakTPaIGfce_g-1; Mon,
- 17 Mar 2025 07:53:04 -0400
-X-MC-Unique: VFydDtk5ObakTPaIGfce_g-1
-X-Mimecast-MFC-AGG-ID: VFydDtk5ObakTPaIGfce_g_1742212383
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C34DF195605A;
-	Mon, 17 Mar 2025 11:53:02 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 55A711800946;
-	Mon, 17 Mar 2025 11:52:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <a62918950646701cb9bb2ab0a32c87b53e2f102e.camel@dubeyko.com>
-References: <a62918950646701cb9bb2ab0a32c87b53e2f102e.camel@dubeyko.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-5-dhowells@redhat.com>
-To: slava@dubeyko.com
-Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
-    Ilya Dryomov <idryomov@gmail.com>, Jeff Layton <jlayton@kernel.org>,
-    Dongsheng Yang <dongsheng.yang@easystack.cn>,
-    ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-    Slava.Dubeyko@ibm.com
-Subject: Re: [RFC PATCH 04/35] ceph: Convert ceph_mds_request::r_pagelist to a databuf
+	bh=FRN7UrN0XbZiFXMmo1/fuiOaUtBz90zOk5jrUMZN4yA=;
+	b=WtWIDZH6vSYOAGee3HaNkPgGUIIQE9zS2U63tJ76LpmOLde8uUX+u+kzn1jAo1AezGNfyh
+	wfjXadT3kkDx+4+k44YJ5ctJTQUDooHqKqWk4zOz6XCUUz2FNWaxxk+5RNKYVv3Tznogc3
+	6A9I3zyv+FNoyBLt3rwA263Y5Xjx2+0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, 
+	linux-block@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+References: <20250311201518.3573009-14-kent.overstreet@linux.dev>
+ <9db17620-4b93-4c01-b7f8-ecab83b12d0f@kernel.dk>
+ <abk74sbsvsuijqhohyenl2mecz6unmkhavkga55fxsld6m6ise@ncbz3xmjlymw>
+ <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
+ <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
+ <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
+ <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
+ <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
+ <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
+ <Z9e6dFm_qtW29sVe@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 17 Mar 2025 11:52:58 +0000
-Message-ID: <2161520.1742212378@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9e6dFm_qtW29sVe@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-slava@dubeyko.com wrote:
+On Sun, Mar 16, 2025 at 11:00:20PM -0700, Christoph Hellwig wrote:
+> On Sat, Mar 15, 2025 at 02:41:33PM -0400, Kent Overstreet wrote:
+> > That's the sort of thing that process is supposed to avoid. To be clear,
+> > you and Christoph are the two reasons I've had to harp on process in the
+> > past - everyone else in the kernel has been fine.
 
-> > -		err =3D ceph_pagelist_reserve(pagelist, len +
-> > val_size1 + 8);
-> > +		err =3D ceph_databuf_reserve(dbuf, len + val_size1 +
-> > 8,
-> > +					=C2=A0=C2=A0 GFP_KERNEL);
->=20
-> I know that it's simple change. But this len + val_size1 + 8 looks
-> confusing, anyway. What this hardcoded 8 means? :)
+...
 
-You tell me.  The '8' is pre-existing.
+> In this case you very clearly misunderstood how the FUA bit works on
+> reads (and clearly documented that misunderstanding in the commit log).
 
-> > -	if (req->r_pagelist) {
-> > -		iinfo.xattr_len =3D req->r_pagelist->length;
-> > -		iinfo.xattr_data =3D req->r_pagelist->mapped_tail;
-> > +	if (req->r_dbuf) {
-> > +		iinfo.xattr_len =3D ceph_databuf_len(req->r_dbuf);
-> > +		iinfo.xattr_data =3D kmap_ceph_databuf_page(req-
-> > >r_dbuf, 0);
->=20
-> Possibly, it's in another patch. Have we removed req->r_pagelist from
-> the structure?
+FUA reads are clearly documented in the NVME spec.
 
-See patch 20 "libceph: Remove ceph_pagelist".
-
-It cannot be removed here as the kernel must still compile and work at this
-point.
-
-> Do we always have memory pages in ceph_databuf? How
-> kmap_ceph_databuf_page() will behave if it's not memory page.
-
-Are there other sorts of pages?
-
-> Maybe, we need to hide kunmap_local() into something like
-> kunmap_ceph_databuf_page()?
-
-Actually, probably better to rename kmap_ceph_databuf_page() to
-kmap_local_ceph_databuf().
-
-> Maybe, it makes sense to call something like ceph_databuf_length()
-> instead of low level access to dbuf->nr_bvec?
-
-Sounds reasonable.  Better to hide the internal workings.
-
-> > +	if (as_ctx->dbuf) {
-> > +		req->r_dbuf =3D as_ctx->dbuf;
-> > +		as_ctx->dbuf =3D NULL;
->=20
-> Maybe, we need something like swap() method? :)
-
-I could point out that you were complaining about ceph_databuf_get() return=
-ing
-a pointer than a void;-).
-
-> > +	dbuf =3D ceph_databuf_req_alloc(2, 0, GFP_KERNEL);
->=20
-> So, do we allocate 2 items of zero length here?
-
-You don't.  One is the bvec[] count (2) and one is that amount of memory to
-preallocate (0) and attach to that bvec[].
-
-Now, it may make sense to split the API calls to handle a number of differe=
-nt
-scenarios, e.g.: request with just protocol, no pages; request with just
-pages; request with both protocol bits and page list.
-
-> > +	if (ceph_databuf_insert_frag(dbuf, 0, sizeof(*header),
-> > GFP_KERNEL) < 0)
-> > +		goto out;
-> > +	if (ceph_databuf_insert_frag(dbuf, 1, PAGE_SIZE, GFP_KERNEL)
-> > < 0)
-> >  		goto out;
-> >=20=20
-> > +	iov_iter_bvec(&iter, ITER_DEST, &dbuf->bvec[1], 1, len);
->=20
-> Is it correct &dbuf->bvec[1]? Why do we work with item #1? I think it
-> looks confusing.
-
-Because you have a protocol element (in dbuf->bvec[0]) and a buffer (in
-dbuf->bvec[1]).
-
-An iterator is attached to the buffer and the iterator then conveys it to
-__ceph_sync_read() as the destination.
-
-If you look a few lines further on in the patch, you can see the first
-fragment being accessed:
-
-> +	header =3D kmap_ceph_databuf_page(dbuf, 0);
-> +
-
-Note that, because the read buffer is very likely a whole page, I split them
-into separate sections rather than trying to allocate an order-1 page as th=
-at
-would be more likely to fail.
-
-> > -		header.data_len =3D cpu_to_le32(8 + 8 + 4);
-> > -		header.file_offset =3D 0;
-> > +		header->data_len =3D cpu_to_le32(8 + 8 + 4);
->=20
-> The same problem of understanding here for me. What this hardcoded 8 +
-> 8 + 4 value means? :)
-
-You need to ask a ceph expert.  This is nothing specifically to do with my
-changes.  However, I suspect it's the size of the message element.
-
-> > -		memset(iov.iov_base + boff, 0, PAGE_SIZE - boff);
-> > +		p =3D kmap_ceph_databuf_page(dbuf, 1);
->=20
-> Maybe, we need to introduce some constants to address #0 and #1 pages?
-> Because, #0 it's header and I assume #1 is some content.
-
-Whilst that might be useful, I don't know that the 0 and 1... being header =
-and
-content respectively always hold.  I haven't checked, but there could even =
-be
-a protocol trailer in some cases as well.
-
-> > -	err =3D ceph_pagelist_reserve(pagelist,
-> > -				=C2=A0=C2=A0=C2=A0 4 * 2 + name_len + as_ctx-
-> > >lsmctx.len);
-> > +	err =3D ceph_databuf_reserve(dbuf, 4 * 2 + name_len + as_ctx-
-> > >lsmctx.len,
-> > +				=C2=A0=C2=A0 GFP_KERNEL);
->=20
-> The 4 * 2 + name_len + as_ctx->lsmctx.len looks unclear to me. It wil
-> be good to have some well defined constants here.
-
-Again, nothing specifically to do with my changes.
-
-David
-
+As for the rest, I'm juts going to ignore the ranting.
