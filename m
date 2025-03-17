@@ -1,50 +1,44 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412DA54652
-	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 14:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8971C23FC7A;
+	Mon, 17 Mar 2025 15:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742223007; cv=none; b=iOge13iiL9GRAH/3GR6RgP9YG//2SvsgGBVqTwhvyJFxRPdSAtWPOP309cECD2SE9zzSXYrAVUVgnKxrXAr7aixS40iTolAEofQPvk7vi4A4aIkyvICHPLm42AasMeiIRcZ4uC9YxDQP1Z/CAr6LQsV0+MBpgSokX1+h1+aCmDw=
+	t=1742223637; cv=none; b=BuebLL/DUDrDG8HEDz1Xx0o5okow9cVEXNIa9pyylWTHu5CV+/H/KAiykzPpzuEoju9F/kGGvb3FjQbpGt62i4pshvPneNkevNex5Tv8XOXtifnL1mCqQPMkZ/ZItdqScYVDXjtS4pfEO0vHh8SprvWGL9BIdvlxrbW8EUR7Loc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742223007; c=relaxed/simple;
-	bh=ii8rr7/fVEXM+qxLFj8b1Tz+X0ZoLXUhPPLzPozq6tQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uJvldwNgVhE86MIuZEUn5WrtYd+4qxftJMhNf3tCli0GeZsCKHwq2WXdyNeJCmy8TfNh9HwByHboPVudC10u4azfaacFbLEDXgXUZJYhBXI5/PhV927ygyRvnvgqBUTbVnw7Uj4VHv/0GqXsxX/pPgaJMlknbzFF5Io7YIx5qRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RiH06duA; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742223637; c=relaxed/simple;
+	bh=cWkQsoSV/IZUx6NDHHMXi0u9x4VMUdLI8PhyNjOqZn8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JV5y3UA80cx1M63MG+m2FT272c3tBq3Yek0ZAQPiKQclzfP6/hk3Ow6fOW5HuV1LllKqbeoajTv1pQjqUkj8KOZ3Tequ+h/uILmwmAGqJuGxeMjnTDyVJ7ZaY4Zxv5A1BJTfC+iStxZK14M68eDO71IomQgtWTbJaLwLekDLglE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=XNbAaFS7; arc=none smtp.client-ip=109.224.244.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RiH06duA"
-Date: Mon, 17 Mar 2025 10:49:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742223001;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZWGKsAKJqpyZSzvsK8O05PgmjgiLt2JSMbr6M+1JUuI=;
-	b=RiH06duA0wLvVdudVUiqT4rfR2S55oOGex0DA+1ubS6acg+1m/EiAHfZqEjxsiWeEd1pHd
-	tx3EmR79E+hxrUB4sS3LmjViTowMQPjYP2VSdL/olPRCbJ79f4UiTcdA6G6EHAEiyEV3ZG
-	HlDkaKg7oexQrTtQdj0XzRsMkXYckL8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <ro2padvzarj6v2bsh6xlsz36qs67z6ubomsvaw77dw4elfqqu7@4acij7zk6g7z>
-References: <abk74sbsvsuijqhohyenl2mecz6unmkhavkga55fxsld6m6ise@ncbz3xmjlymw>
- <510692e2-b83c-45bc-8d9d-08f7a172ffe6@kernel.dk>
- <5ymzmc3u3ar7p4do5xtrmlmddpzhkqse2gfharr3nrhvdexiiq@p3hszkhipbgr>
- <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
- <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
- <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
- <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
- <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
- <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="XNbAaFS7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1742223633; x=1742482833;
+	bh=2jV32eFqRje1RzHN9WgvrVAw0d//cFd065kmoy6q4vw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=XNbAaFS7YmwSZSS6lTWs9g7U1K2XAtOZg0C3sK6ueUvAmr5BtDZj6IQw9+J5RQFQq
+	 FHsYc/2HGxesqxq1sChqL1n9z39vsXSbe9A1oli5+l+98nhgSKu1hB+JWtrwtN0MYI
+	 6onS600ofo+EkmZ4cAx7SuZAAYDxmTUFBmU+5eai6rRlrjX6EGgXArKDRcpVws3HDt
+	 yPvoV+A8wpCBfL3rDCa/mHpwj+FhDF7Ss3FEphgevmybLuJICw+ln3azmKqu89SeZ0
+	 /38zZWgOwlOLNn+7cdlWir3HndGMSX7/hNc8SRYODtPSlIr9HJFCvJL/hLGEmti3BG
+	 qUEqifVlTV5ww==
+Date: Mon, 17 Mar 2025 15:00:26 +0000
+To: Tamir Duberstein <tamird@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v4 6/6] rust: use strict provenance APIs
+Message-ID: <D8IMQ8OEOMAG.1AFKGZJ1C4DGQ@proton.me>
+In-Reply-To: <CAJ-ks9kH3SE91XSadBx1qFaG5dem93o_ctR0t2FwW-0ZfkRNwQ@mail.gmail.com>
+References: <20250315-ptr-as-ptr-v4-0-b2d72c14dc26@gmail.com> <20250315-ptr-as-ptr-v4-6-b2d72c14dc26@gmail.com> <D8IFS7175NNQ.3VAP8WA2QC8WF@proton.me> <CAJ-ks9mXzM6D++vq0QCugaFOS9ES0j7GpeWZqckY0dA3JwpnJw@mail.gmail.com> <CAJ-ks9kH3SE91XSadBx1qFaG5dem93o_ctR0t2FwW-0ZfkRNwQ@mail.gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 6436172b8e08da928624aeaa38482e05181d7d0f
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,108 +46,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 08:13:59AM -0600, Keith Busch wrote:
-> On Mon, Mar 17, 2025 at 08:15:51AM -0400, Kent Overstreet wrote:
-> > On Sun, Mar 16, 2025 at 11:00:20PM -0700, Christoph Hellwig wrote:
-> > > On Sat, Mar 15, 2025 at 02:41:33PM -0400, Kent Overstreet wrote:
-> > > > That's the sort of thing that process is supposed to avoid. To be clear,
-> > > > you and Christoph are the two reasons I've had to harp on process in the
-> > > > past - everyone else in the kernel has been fine.
-> > 
-> > ...
-> > 
-> > > In this case you very clearly misunderstood how the FUA bit works on
-> > > reads (and clearly documented that misunderstanding in the commit log).
-> > 
-> > FUA reads are clearly documented in the NVME spec.
-> 
-> NVMe's Read with FUA documentation is a pretty short:
-> 
->   Force Unit Access (FUA): If this bit is set to `1´, then for data and
->   metadata, if any, associated with logical blocks specified by the Read
->   command, the controller shall:
-> 
->     1) commit that data and metadata, if any, to non-volatile medium; and
->     2) read the data and metadata, if any, from non-volatile medium.
-> 
-> So this aligns with ATA and SCSI.
-> 
-> The concern about what you're doing is with respect to "1". Avoiding that
-> requires all writes also set FUA, or you sent a flush command before doing any
-> reads. Otherwise how would you know whether or not read data came from a
-> previous cached write?
+On Mon Mar 17, 2025 at 3:13 PM CET, Tamir Duberstein wrote:
+> On Mon, Mar 17, 2025 at 6:53=E2=80=AFAM Tamir Duberstein <tamird@gmail.co=
+m> wrote:
+>>
+>> On Mon, Mar 17, 2025 at 5:34=E2=80=AFAM Benno Lossin <benno.lossin@proto=
+n.me> wrote:
+>> >
+>> > > +    pub fn expose_provenance<T>(addr: *const T) -> usize {
+>> > > +        addr.expose_provenance()
+>> >
+>> > Instead of having these stubs here, you can probably just do
+>> >
+>> >     pub use core::ptr::expose_provenance;
+>>
+>> This doesn't work for the methods on primitives, but it works for the
+>> free functions. Done.
+>
+> Have to revert this, writing `pub use ...` directly causes the MSRV
+> clippy lint to fire at the caller.
 
-Line 1 is not the relevant concern here. That would be relevant if we
-were trying to verify the integrity of writes end-to-end immediately
-after they'd been completed - and that would be a lovely thing to do in
-the spirit of "true end to end data integrity", but we're not ready to
-contemplate such things due to the obvious performance implications.
+Ah that is unfortunate.
 
-The scenario here is: we go to read old data, we get a bit error, and
-then we want to retry the read to verify that it wasn't a transient
-error before declaring it dead (marking it poisoned).
+---
+Cheers,
+Benno
 
-In this scenario, "dirty data in the writeback cache" is something that
-would only ever happen if userspace is doing very funny things with
-O_DIRECT, and the drive flushing that data on FUA read is totally fine.
-It's an irrelevant corner case.
-
-But we do absolutely require checking for transient read errors, and we
-will miss things and corrupt data unnecessarily without FUA reads that
-bypass the controller cache.
-
-> I'm actually more curious how you came to use this mechanism for recovery.
-> Have you actually seen this approach fix a real problem? In my experience, a
-> Read FUA is used to ensure what you're reading has been persistently committed.
-> It can be used as an optimization to flush a specific LBA range, but I'd not
-> seen this used as a bit error recovery mechanism.
-
-It's not data recovery - in the conventional sense.
-
-Typically, on conventional filesystems, this doesn't come up because a:
-most filesystems don't even do data checksumming, and even then on a
-filesystem with data checksumming this won't automatically come up -
-because like other other transient errors, it's generally perfectly
-acceptable to return the error and let the upper layer retry later; the
-filesystem generaly doesn't have to care if the error is transient or
-not.
-
-Where this becomes a filesystem concern is when those errors start
-driving state changes within the filesystem, i.e. when we need to track
-and know about them: in that case, we absolutely do need to try hard to
-distinguish between transient and permanent errors.
-
-Specifically, bcachefs needs to be able to move data around - even if
-it's bitrotted and generating checksum errors. There's a couple
-different reasons we may need to move data:
-
-- rebalance, this is the task that does arbitrary data processing in the
-  background based on user policy (moving it to a slower device,
-  compressing it or recompressing it with a more expensive algorithm)
-
-- copygc, which compacts fragmented data in mostly-empty buckets and is
-  required for the allocator and the whole system to be able to make
-  forward progress
-
-- device evacuate/removal
-
-Rebalance is optional (and still needs to bitrotted extents to be
-tracked so that it doesn't spin on them, retrying them endlessly), but
-copygc and evacuate are not.
-
-And the only way for these processes to handle bitrotted extents
-(besides throwing them out, which obviously we're not going to do) is
-
-- generate a new checksum
-- mark them as poisoned, so that reads to userspace still return the
-  appropriate error (unless it's a read done with a "I know there's
-  errors, give me what you still have" API).
-
-But the critical thing here is, marking an extent as poisoned will turn
-a transient corruption into a permanent error unless we've made damn
-sure there is no transient error with additional FUA retries.
