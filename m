@@ -1,106 +1,154 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41763EED6;
-	Mon, 17 Mar 2025 18:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A809315573A;
+	Mon, 17 Mar 2025 18:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742236105; cv=none; b=BehI7RIJuNf9xqKO8spBuqd+n+TRnQLhXuK8/f18vLP8gnlb6PuiQ8kBY7OJ+wKeojkqu1upJqwWbLeNEIhGzZvQf+E+qV6Y/NigYLUZkvk0ttLphezA/07PS7tw+ZquzJLBIVQ4GaufmkFYUCbAmZ6X9bYdnFYg1onFToCUSic=
+	t=1742236317; cv=none; b=Ovd0ayEePdbQcs499D9l13SxhQ3XOqm4RZeaWNIomplb1EH+vzhP2teMB/fU6pzW7LLcxreZI1u2MO09jnwJSguY4BdggTyplEWYHrmNX+C71Ulnk/Nai6CUXXJe/bTOtm9sYfxvuqZWR9kK9oW/FF8SaiO+1p+sqEHUgDqnDag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742236105; c=relaxed/simple;
-	bh=Jic7LTo33nITNM3oJkdLiqyjphLqMZ8yFiyEQhuSp5k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hS+1q7Y3wfA366UPDra84k1ISGrPhhWqzNE9yTmHkQQl5+qoUeUHvQBzRQA2E3p0gPPoueIViJx1aSedidaWDRrSbfIiJNUjOX/CM3hAH6oPItlupjQfDRF/bzXYFa5VkXhNnjlervGW1y0Ci/wtaqW3I1mr37nwOocnkj2GAZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=o+MzdPFN; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1742236317; c=relaxed/simple;
+	bh=GUdlu9CBP5F5dI2Y8Ye2ckdBW8ifZqJH0P0YqQpuV6c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SoFpgyZIlZw56VoZkAY6vzOezdiCokTM0ylouFqBEk7gGnttOpF/rx8Ez5avGnebEG3FE6S5G0sx3npuJ6BL8uLXvJ3M/TmNVb1y2jbwhA5tXxnejlyr0AGWMTCrvoD0Qom3qtuIm/+7a0nNL2z0RWlotjaLGnXO+TmvMT9F7S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDTqqigD; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="o+MzdPFN"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZGk4J1rMJzm0R40;
-	Mon, 17 Mar 2025 18:28:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1742236095; x=1744828096; bh=7TPkFiJOJUHh3hlZJsWwzzO5
-	re+hHlLP4IsNnjC0wkM=; b=o+MzdPFN33MspEhQwhPRfyGp1huUhEK+thVupdFU
-	RO8Ye1VjTPe2blHwDHkE/uwuT3y3i4z2prbAcNPt+kIYgYl/ylSBZuVDniIE0GO3
-	4GSBZg9CzzjGl2ZiQhF8Txx1GvKUkn7Jo0pLTAXIsBVH31JGcxysN44aryvWyZh5
-	5VzZRpkTjj9GB0ELXj3Lm4jsLMVNMK8CiM71ZOd/mYrXvF4CW6MvPEagxJBbZhsI
-	B8KVbyJOCKCGF68Xi4rQitODbAj3QXjkpxVjPMceEaDZNvVwEipgdsUfjOvoi13o
-	rQeAgdgahz+XV5nasCYVzDrn38glFtAsbL76RNMxJBFa8A==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ZCOmU5wj8kFo; Mon, 17 Mar 2025 18:28:15 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4ZGk4C5fybzltBD0;
-	Mon, 17 Mar 2025 18:28:10 +0000 (UTC)
-Message-ID: <5b81f4be-427f-4083-8cbe-e201d0f255c5@acm.org>
-Date: Mon, 17 Mar 2025 11:28:09 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDTqqigD"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30bfe0d2b6dso53864641fa.3;
+        Mon, 17 Mar 2025 11:31:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742236314; x=1742841114; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xNP/SipY9rGfX3yqYI9bcBc8SEPT09LFO6ib/YoE8Mc=;
+        b=gDTqqigDDP8hyq0sQiw4yb/r5QmOvsEtsSqWjW6ikIrOPz0r2LWbigZfaYOzqam+zT
+         D/vHruoWHIRhuL+sZ0klddFfIMrOkBR8+OFRZ4EjIZZHZEWlqUYpnV8ynhScU8GF0PeG
+         Rm1DHV+4Sn6NacJwR7mrJsP6Q+2F+mt0V90+UctJEz5oK1tr3kyYLs/MyZGY0ETfttyj
+         ZxKmwgEp02Z0YxniMd/0rtjnsi6iGGxepOzKHjCykrQgmX3hGOflqrjLfD8BoVJ2aVrI
+         pFFKAmBnlSJlsy9Z79g2t7BDR8m5YAjbMVF/IcAiFClRVvFEsdRHXI7bGBWWeea+XDdc
+         sKoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742236314; x=1742841114;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xNP/SipY9rGfX3yqYI9bcBc8SEPT09LFO6ib/YoE8Mc=;
+        b=AXDU30QBmyjZlDLha053XRGJq5v6axXjb2lbl2ZheP+xROr6JfdRMzWMOD7FhUCMs/
+         HFKk5KWtn8rIsuT7D28J8GTPwGnCVk+5eZlDBkzD8kpvRaWpPg3VQnxuJvrS/EKuW9m9
+         xKg9o0NTajr1IVoWKtAl+Hnmu4mKrOt3x7oEk69FLJEIO9bMdwljy43zmbGpooH5mlQZ
+         rj8Aq/RJXzHFmdrdavsr3Ezqr01HtCyLzz0cqbDXo3sy4KJHYU4UmDn7Y59QpK358+rm
+         CsKT+Ge4/UVpbszjduUx2toLukbWQU5wntMsCsey/92yEK/zDK3IXhGeN40C9DsBRQT1
+         jt5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUEz+W9uZ2Pro1Zi9TAI+YZzoADr1+8tYLkO1Hrs+EXv9SeQI/IP3qNhzQt5wAjZTHpUBaKbSI3av0Jpybl6PA=@vger.kernel.org, AJvYcCUY+yWQ9ORywIMM4cD2lrdO9BNJ5LnUFaeWYxPAFmDoynmX25ZoVuW9bJWbApO+cVQfuBtMmnRRRUzlr2gF@vger.kernel.org, AJvYcCV3avjrcLj9XvUR4D3n+11ncqaLXs7guTw4o0jrsqVW2efe68JZ10RL1dq8dUQWaeDgs77ejj+msmsP@vger.kernel.org, AJvYcCVF2l6JtbTtllDjZHLl9xwhVfpTFPJckd85CMIyAGR4NIuR2AlRjkgdJiWuIS7MZs/ZGR9RbRhrpcy0@vger.kernel.org, AJvYcCVlt5KA05OzVybKBK7ilnqFpwKWvWiQUUGqsuFTd2KmxUwwvigysY+CxZssKX3NEWolZ/7KK160KR6VTAc=@vger.kernel.org, AJvYcCX+5be8lYOGokyQ1cP62i7w6oEW4PevxQ9im0nA0wuUucehdx9UFnkvgiFB0JxWLZBbeiIlKZGOOOxjENireDnj@vger.kernel.org, AJvYcCXc3It0x0d4jzQf9/Ej1qW/roDnYPjUXifyG7PaysvD5QlxlBGGWSAGdUblGnUd6BpWFXaN9XNNNRdVsvee@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGqnyaSW6T9sMxNoA7h/91VR68YNIZyy0/8PhujwSCsCsYmE/A
+	ExjZ+HBD1BepTDpbDA1tWBU7/LuLRo5B4OudaMr3pcp6fQI6aOlv7VUVfPpHv5s/ma/0qzxLwAR
+	4Rm4Ntju736ieP/An+14zKOUyumxHFMk22iKwEg==
+X-Gm-Gg: ASbGncuWJglzZ/SfP5Qc+jYZpjFbSO1O0ZmB4ibQoUGTO+BFWYrqQUhzWSY/LerI9nU
+	dRiHraWLlWbeXPkrPlmKnoyaXZkHeemH3alwN3hqW9oloLWQXNig29EGSimqbvy06FBX8Lr6Ap0
+	jMEGJ8zjb7FmD2QtdPHLItewSqeIOHTSEgPWKEiV1cwWuGK9qHKEGqX1Bader+
+X-Google-Smtp-Source: AGHT+IEZvVPmFY03wZUVY/ylW/q1BAu23Bh0J53NdaLLp76SOniWjZtzsJ0TyVYBwZ7GjS+TdC448tm/USrojMxl29k=
+X-Received: by 2002:a2e:be06:0:b0:30c:1fc4:418e with SMTP id
+ 38308e7fff4ca-30c4a8d225bmr90356151fa.26.1742236313542; Mon, 17 Mar 2025
+ 11:31:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] block: Make request_queue lockdep splats show up
- earlier
-To: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ming Lei <ming.lei@redhat.com>
-References: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
- <f46f0286-8052-4a29-9d89-376bf9b48d8a@acm.org>
- <13031d34692b0c97799de81c0b83875d56076e13.camel@linux.intel.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <13031d34692b0c97799de81c0b83875d56076e13.camel@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
+ <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <D8IQCJHJWPNJ.1J2UO4OK0D0B3@proton.me>
+In-Reply-To: <D8IQCJHJWPNJ.1J2UO4OK0D0B3@proton.me>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 17 Mar 2025 14:31:16 -0400
+X-Gm-Features: AQ5f1Jri1KT9n-llBAsDBvGxTN7gIuyMaWJX8rvKMwx-KwPH-TLKot_wyhCkGgs
+Message-ID: <CAJ-ks9=cBEZqPHMWsh7-c16LTg+i+RmDFigwy81o9yOj2J+jFA@mail.gmail.com>
+Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 3/17/25 11:13 AM, Thomas Hellstr=C3=B6m wrote:
-> On Mon, 2025-03-17 at 10:37 -0700, Bart Van Assche wrote:
->> On 3/17/25 10:11 AM, Thomas Hellstr=C3=B6m wrote:
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index d6c4fa3943b5..4aa439309406 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -455,6 +455,12 @@ struct request_queue *blk_alloc_queue(struct
->>> queue_limits *lim, int node_id)
->>>  =C2=A0=C2=A0	lockdep_init_map(&q->q_lockdep_map, "&q-
->>>> q_usage_counter(queue)",
->>>  =C2=A0=C2=A0			 &q->q_lock_cls_key, 0);
->>>   =20
->>> +	/* Prime io_lockdep_map as reclaim tainted */
->>> +	fs_reclaim_acquire(GFP_KERNEL);
->>> +	rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
->>> +	rwsem_release(&q->io_lockdep_map, _RET_IP_);
->>> +	fs_reclaim_release(GFP_KERNEL);
->>> +
->>>  =C2=A0=C2=A0	q->nr_requests =3D BLKDEV_DEFAULT_RQ;
->>>   =20
->>>  =C2=A0=C2=A0	return q;
->>
->> Hmm ... my understanding is that it is fine if FS code calls block
->> layer
->> code but also that block layer code never should call FS code.
->=20
-> That added code only mimics the locking sequence that happens during
-> reclaim with the existing code to register the locking order expected
-> by the reclaim code. If anything violates that, lockdep splat [2] will
-> appear.
->=20
-> So I'm not quite following your comment?
-Shouldn't the above code be added in the VFS code rather than in the
-block layer?
+On Mon, Mar 17, 2025 at 1:50=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
+e> wrote:
+>
+> On Mon Mar 17, 2025 at 3:23 PM CET, Tamir Duberstein wrote:
+> > Throughout the tree, use the strict provenance APIs stabilized in Rust
+> > 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
+> > functions at the `kernel` crate root along with polyfills for rustc <
+> > 1.84.0.
+> >
+> > Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
+> > 1.84.0 as our MSRV is 1.78.0.
+> >
+> > In the `kernel` crate, enable the strict provenance lints on rustc >=3D
+> > 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
+> > compiler flags that are dependent on the rustc version in use.
+> >
+> > Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-pro=
+venance-apis [1]
+> > Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> > Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.me/
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>
+> One comment below, with that fixed:
+>
+> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+>
+> > ---
+> >  init/Kconfig           |   3 ++
+> >  rust/kernel/alloc.rs   |   2 +-
+> >  rust/kernel/devres.rs  |   4 +-
+> >  rust/kernel/io.rs      |  14 +++----
+> >  rust/kernel/lib.rs     | 108 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  rust/kernel/of.rs      |   2 +-
+> >  rust/kernel/pci.rs     |   4 +-
+> >  rust/kernel/str.rs     |  16 +++-----
+> >  rust/kernel/uaccess.rs |  12 ++++--
+> >  9 files changed, 138 insertions(+), 27 deletions(-)
+>
+>
+> > +#[cfg(not(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE))]
+> > +mod strict_provenance {
+> > +    /// Gets the "address" portion of the pointer.
+> > +    ///
+> > +    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.ht=
+ml#method.addr.
+> > +    #[inline]
+> > +    pub fn addr<T>(ptr: *const T) -> usize {
+> > +        // This is core's implementation from
+> > +        // https://github.com/rust-lang/rust/commit/4291332175d12e79e6=
+061cdc3f5dccac2e28b969 through
+> > +        // https://github.com/rust-lang/rust/blob/1.84.0/library/core/=
+src/ptr/const_ptr.rs#L172
+> > +        // which is the first version that satisfies `CONFIG_RUSTC_HAS=
+_STABLE_STRICT_PROVENANCE`.
+> > +        #[allow(clippy::undocumented_unsafe_blocks)]
+> > +        unsafe {
+> > +            #[allow(clippy::transmutes_expressible_as_ptr_casts)]
+> > +            core::mem::transmute(ptr.cast::<()>())
+> > +        }
+>
+> I think we should just use `ptr as usize` here instead. It's going away
+> at some point and it will only affect optimizations (I don't even know
+> if they exist at the moment) of old versions.
 
-Thanks,
-
-Bart.
+Why get cute? I'd rather defer to the standard library.
