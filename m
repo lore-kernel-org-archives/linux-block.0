@@ -1,111 +1,148 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A581A3166;
-	Sun, 16 Mar 2025 12:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DEC22F01;
+	Mon, 17 Mar 2025 02:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742129687; cv=none; b=ZxuiMdypxbs/nQPX0Jxx4td7FWOyrZ+pdwMq+44cxnwVGJ8bRIaenTH2vJPDADjgjU4QnwonXO33StdQ/SzA8uPi11bJjkWz01rxp4Mdwk/qDiOzvxXTyc+4xgOtYbnW1ZfjYDgaa+V4TC0oGQiEMyiYUrcqJF7PGaJgJDDWRxY=
+	t=1742178698; cv=none; b=oiip6tr/U9xbu8tFY2mQdU8P0nZYX5xcDJubRNkn97XZAla0yJ0GSr1rUlNDEZvH2HZAwHttaq89eEt4QpeFVwbFnf/gGFM8ughZPBbdLWN/vZLsFPCRrru7HVvBH+vb9CxT3L9QD7VWNCK2VTlZN226NHYavBjbZaqReChplXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742129687; c=relaxed/simple;
-	bh=la8iWv4aKLDOW0r7llYW7xIb+W8ddGrURAKkkeCgcDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rBzYuUnF0zwciAfol2TuLr5ae7KTemmsk6LnurUkY0+jrGi2rYrbJ3DBYmCoawDkL0jHm5ecssn+7crO7UB4DcuSl5Au2E0AwuDJSPn8zNfO2WNljVhMVW1EdR3IXypm+A598d0bAWeA3I35jK5MUPdCaMKoYezzFEyGg50sofI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LzJ1ozKn; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742178698; c=relaxed/simple;
+	bh=UgfxJNs9q+/V4egib8TdG9hry6mBYQ5JsRB8g8YOHV0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nFaep+SWej698dwvoL8UxsZQAy9IvibIEbbUwr/ZH+cGi2GPoIaEouE8S/esYGFIcU0Rj0rvyhVYSVe0vf05plqHQ5I1bJUIdm+pBngB6IWXoEuxD7jq8nk6Qju0njqwXt+v/paR9p95S/ZhtQIPwxtcBBVu4n6eBFdeD0uyGKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=eujEPbGH; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LzJ1ozKn"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30bae572157so36825201fa.3;
-        Sun, 16 Mar 2025 05:54:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742129683; x=1742734483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m72Ysl4ko4hY5HZYX4qrB+VwpHKR3dQw5Vbh4xYJNfA=;
-        b=LzJ1ozKnTBK3Nuks3YCvLJW7/Z/EgJgIT+3DVVjlxG0cEo3AjIIqyITHuNZcgCvdNG
-         ckvoPbVH7s4LIV+Eb8W42Y0RmHfkOOQrgDG7eH4m5REbTCfONTLexr77qTPXjBT0X2uK
-         C8tNEWxvNiWNIIsL1FYCr1FVPeTbabcOsEzbqkCe/KofTBJlpObvczW5n8gCbQAqbXYA
-         ni1gAVBY6EiwWvYD8SUTOyyUTfnLnUSb/4byMTJOl+yJKGzzbtD7G6yDHRKR3cbannAI
-         tYpMNrEyuHng7ezK4ZbMPndMnNYgKyY8D3dwdt2H7fe+zUTSCZTfLKTIGtg/6rrjXJ51
-         eXuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742129683; x=1742734483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m72Ysl4ko4hY5HZYX4qrB+VwpHKR3dQw5Vbh4xYJNfA=;
-        b=gv99bfCGwAGJvDkbgP26SE+bgfjfIlIBiWAk4lA7pto2km5SXytDRbzz2cgvIWVZg3
-         mortDva990284TCukzWVZqbC6UA6J9eujJxQe4UUmamZ5T6c2DwL3X6s59MxmqpFnyCK
-         +5fFqA9U0rURglxrQyNnG22fLpMebPbqf1SxJtW7AQVMeV/7wyLh7iZeLlMD5muGFGwy
-         f68WXrtx0UMsC9/vB/+Q81RmrfR2WmVJq3+ZHI0JirmOEr4NQyf80gEqxwXregLK4uE4
-         VzOnFI2esBGU7/vfYlZsbzRhxkBBzVAhEqx9DOWiAN5l9tXIhQ5sp/yjFkCaDdjn2uDS
-         p6Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2dhLCV85wGtXu3yEePIZK4bNWZvQxnPh7dq8U/gHcndt/CliEvlUUjNCUhshx37/KElPv/pI/LA98Vi4=@vger.kernel.org, AJvYcCV/U53Oo/PSiZEmtbzR/nK5raK8kyocbCWtZjLSLRFjh51qO/FpKtRt2ZmXOZssHRlNKuOkBpzypY5G@vger.kernel.org, AJvYcCV6pxQlOQzoiEB53tuH+MlSNik8GKAQmhyjRYJnDyqOkvuia3x6olG6EpTNdm30Q0ee3Nx6fHYUborDlkb5GUeQ@vger.kernel.org, AJvYcCVID1K3veLYfT7XuVDwnywSuxbs3rcH4z59WP4InNShqnwi9Fg2O3XHhJtBNUchF5uGoOf7ueITjqjcpYNN@vger.kernel.org, AJvYcCXLk2pifFd39Im7duj+7xtz+Y30iLga6qVyU+OYs5aEZlbO8AuCofT+v+SwiEOy6UgwmUzcxf+2MVf4@vger.kernel.org, AJvYcCXVfAkKd75cOvtRCJPaW3d+dGAwIFhMTlnppWRoWZwGOHtgG0v+Hzrjan2AVHTyIz+Fl223DGJbtyQWPsIOBXo=@vger.kernel.org, AJvYcCXaS39X6QebQQr7K6IGzJgLEY6n6/ZkKygkXmym4LPwBtbV2WYxj6aPMrhbJNNRBf2I5n/JVgYfh0LM2Mi2@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy521CC1DqjXoztkQSjYqGM8frgwcgske38ps3FBv1OsbgBDDo
-	T7mTmhYAov8aq0WlPE9/Xe9hrn0BSLQFJn6S/ESvA+xGflocp8PtkAhwWLslq7hmQ7tKbprg49t
-	0C0cx5qUEeJQ0r+6rzjOFr0jtOPI=
-X-Gm-Gg: ASbGnctES8i5UEnZ4poeOrMM8Kk7QcpYB3zmDMCjL63nAD7esNbwhzWMEM1xx2kMDjD
-	5sAOwTdW2jpQ6bPSTyFk87z/rp/1jR07aVq2PFWX9TJW2nzmQGV2VfZyupIcwIww3qT6BbXhrtz
-	EqhoI01rDkxNgc2dnBzLsB+fxtVZzPYaCuZGFci2KuwmNIihMex9HpyKpy+lmF
-X-Google-Smtp-Source: AGHT+IE6iBXWS50nKSAYwo5FCXBdnhbNHVXtxORgs/RwlrM4JXF7GGDHtXE0EnpBEkJ1e6Y0/wbpMEdDeSo/iTCQCcY=
-X-Received: by 2002:a2e:a98e:0:b0:30b:d17b:269a with SMTP id
- 38308e7fff4ca-30c4a749070mr42282761fa.7.1742129682837; Sun, 16 Mar 2025
- 05:54:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="eujEPbGH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742178612;
+	bh=3Ep9OXxN57SI8f3T+ZVX5uyeB57BAjZ5iyhA2KEimRc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=eujEPbGHu2xoiuLVyAqfym6OY2aEfo1/y+VTsgSa4sWnBZ3VjiLJV3Jcd/WT/5SUx
+	 rgu1sIqSuduu8THjxYRJFcNY7nNTnhSlfQ7cU9x8uiOnx4nkkQmrShENtHEPKr+TnP
+	 huyTBkJPvz9O1AF4Zecu4wcyoQtTUmcw3dZImT+o=
+X-QQ-mid: bizesmtp82t1742178584trdbk4w4
+X-QQ-Originating-IP: PfeJu7VBQytMgWIHxuI6OA58c+5IKKd8+cawwIOHxTY=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 17 Mar 2025 10:29:42 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 16559626076117230096
+From: Chen Linxuan <chenlinxuan@uniontech.com>
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Chen Linxuan <chenlinxuan@uniontech.com>,
+	Wen Tao <wentao@uniontech.com>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND v2] blk-cgroup: improve policy registration error handling
+Date: Mon, 17 Mar 2025 10:29:24 +0800
+Message-ID: <3E333A73B6B6DFC0+20250317022924.150907-1-chenlinxuan@uniontech.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250315-ptr-as-ptr-v4-0-b2d72c14dc26@gmail.com>
- <20250315-ptr-as-ptr-v4-6-b2d72c14dc26@gmail.com> <Z9ZbNY2XR10vt3Ro@Mac.home>
-In-Reply-To: <Z9ZbNY2XR10vt3Ro@Mac.home>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Sun, 16 Mar 2025 08:54:06 -0400
-X-Gm-Features: AQ5f1Jq4oEInzEsIP6AyCUxxntLRsaKIunWuOaZj1h8pyzZQkrJrV4gfLymNygE
-Message-ID: <CAJ-ks9ntUhnD2D1qUCosrKk2bEYHXFDLEanznpNn51d6CbD6aw@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] rust: use strict provenance APIs
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-QQ-XMAILINFO: MRY6qckr/MVJxb3HfPNW3ZfnBmjUWM9MGV9dFuk0w/eq/JIaFCYCtdB3
+	mIks34asbJFtK71dGiZ4otvPa6tpbs84T3O+iyXe9k4/r1rKm1amACL1bMjEtlgq3yswCr6
+	8VYl9+modzLsiC4bJTi8rM/QfVzNQaduGZtZcmsdb/U34sN/C74aHjh+9CyDhteIWokDNZo
+	67F06gq/TtB82o/tPaEq9+3jTltgA4/c9H2KIRr58hmxAmCb02eIorzi23AQEB38FqymY5s
+	oidj5szmYrGVpYI7Uk+eRCrmSeMSX45ZJHolqPlMO1bGK4sGpOO5BnQIHev/yuy0CH42aKC
+	VCkvvOKnjbSqbYGfTOlQZYRfwPH9JHaBJjQ8oC8cYOnu26VtQHtIHmHa2d+N9tCZcLbFALe
+	f7tV5JUBNJGwVDmCbALf7GxxRdVsPf+TZQriuN7geyztp0adeYRAgXpEBGEbwSVNYHYgTJI
+	psw4tbq4ECxSAbsqd5OYbmrftmbS6f8JP7wPKumrm4h87gqE1yk3S6p5qvmcbY3Q0ToE8kt
+	RHUZ8fP0xdsgzkhY2iidQDq/ZaOi8oo62tBdsJ7/YhJm8fAtC7bXN9bsJJ1gbrOZBNNA222
+	5GglTQye6Z390FoXBSlLpiDBrlEqyvxBuR5rq/ZlB9nO3TkSChszqRdJ1E4ZM4aBlteUAIf
+	6/QSZo071fUbsvAAOp3fMwBI5wvfXCIxnzRC6UTeo+IXSmz0CDmssIX2vspRh0J3p20Ar8V
+	ob235v7KS18bWoem0QeCfhugSNVKw7B9t4zrbxTmjk8Hy/BOiT5JkvzxB1+7GkJSnoKnEtP
+	FZqg18hbdCZ9FpDVAzELTV9bBEtTiy3O8nwMsgZypy7oDZHkyLZZmX5j6+H7zlbCXwebJRG
+	uQEZuaVWaqHfKPh+BPKeWfCTk9p8BvXqSVG9tg1BlWvLUJfbkD6iPTaBZmpVrnXxfoZR0oS
+	y+sbvMr7jmOzFOvAOd1d17iAbFuLh8APAhSPc8nkN+LhhF3+GmTDCin1/
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-On Sun, Mar 16, 2025 at 1:01=E2=80=AFAM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
->
-> On Sat, Mar 15, 2025 at 08:17:30AM -0400, Tamir Duberstein wrote:
-> [...]
-> > diff --git a/rust/kernel/of.rs b/rust/kernel/of.rs
-> > index 40d1bd13682c..f9459694cbdc 100644
-> > --- a/rust/kernel/of.rs
-> > +++ b/rust/kernel/of.rs
-> > @@ -22,7 +22,7 @@ unsafe impl RawDeviceId for DeviceId {
-> >      const DRIVER_DATA_OFFSET: usize =3D core::mem::offset_of!(bindings=
-::of_device_id, data);
-> >
-> >      fn index(&self) -> usize {
-> > -        self.0.data as usize
-> > +        crate::expose_provenance(self.0.data)
->
-> Even though of_device_id::data was defined as `void *`, but in Rust we
-> use it to store index, see kernel::device_id::{IdTable::info(),
-> IdArray::new()}. Hence we should use self.0.data.addr() here.
+This patch improve the returned error code of blkcg_policy_register().
 
-Good point, thanks.
+1. Move the validation check for cpd/pd_alloc_fn and cpd/pd_free_fn
+   function pairs to the start of blkcg_policy_register(). This ensures
+   we immediately return -EINVAL if the function pairs are not correctly
+   provided, rather than returning -ENOSPC after locking and unlocking
+   mutexes unnecessarily.
+
+   Those locks should not contention any problems, as error of policy
+   registration is a super cold path.
+
+2. Return -ENOMEM when cpd_alloc_fn() failed.
+
+Co-authored-by: Wen Tao <wentao@uniontech.com>
+Signed-off-by: Wen Tao <wentao@uniontech.com>
+Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
+---
+ block/blk-cgroup.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 9ed93d91d754..2609f7294427 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1727,27 +1727,27 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	struct blkcg *blkcg;
+ 	int i, ret;
+ 
++	/*
++	 * Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs, and policy
++	 * without pd_alloc_fn/pd_free_fn can't be activated.
++	 */
++	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
++	    (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
++		return -EINVAL;
++
+ 	mutex_lock(&blkcg_pol_register_mutex);
+ 	mutex_lock(&blkcg_pol_mutex);
+ 
+ 	/* find an empty slot */
+-	ret = -ENOSPC;
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++)
+ 		if (!blkcg_policy[i])
+ 			break;
+ 	if (i >= BLKCG_MAX_POLS) {
+ 		pr_warn("blkcg_policy_register: BLKCG_MAX_POLS too small\n");
++		ret = -ENOSPC;
+ 		goto err_unlock;
+ 	}
+ 
+-	/*
+-	 * Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs, and policy
+-	 * without pd_alloc_fn/pd_free_fn can't be activated.
+-	 */
+-	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
+-	    (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
+-		goto err_unlock;
+-
+ 	/* register @pol */
+ 	pol->plid = i;
+ 	blkcg_policy[pol->plid] = pol;
+@@ -1758,8 +1758,10 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 			struct blkcg_policy_data *cpd;
+ 
+ 			cpd = pol->cpd_alloc_fn(GFP_KERNEL);
+-			if (!cpd)
++			if (!cpd) {
++				ret = -ENOMEM;
+ 				goto err_free_cpds;
++			}
+ 
+ 			blkcg->cpd[pol->plid] = cpd;
+ 			cpd->blkcg = blkcg;
+-- 
+2.48.1
+
