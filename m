@@ -1,175 +1,225 @@
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B542F30;
-	Mon, 17 Mar 2025 09:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8AF191499;
+	Mon, 17 Mar 2025 09:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742204046; cv=none; b=M0/jU38aoJp3GgL01zfJ2wmXxduoFARbXIfwzdIvia2u619vUD7T37iMrcsCQFCwb1/7Ow6AaHzQ19g/3/9Ulndx/EstZrqB+b3rN2PVLv0vJOzxSEQ/G+xxu7fHTTuMSaHUtR4Hw5pgCebXZNufPRBKT0NP0goz0gOqaII0zeI=
+	t=1742205193; cv=none; b=nCoo4aVopxCPSOp3fNRfFBCbSxBguXIKgHDBxwA8xxPY+potrFiORRqskYQxtyFBgbLjaWrtVBzkE9nBAKwjGbAI4v8KSObv2yYQHOz3vHzjnhF5xF17oXXIkhf5UUnxCn2Obt+Jbr/80NPIWHOSZ0CtOEQ/L4WW4aWd01zMEhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742204046; c=relaxed/simple;
-	bh=ELzfSEZuhr25sXbSFYa8Pvn+Hzk6Nq+k/X6C4475L78=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZEWrwwuRrheSUU3gLm9uzOLueiv1brgxRhRy31pZARYsOnHqre7Zm3Vh/0Xrcbb1stPx5z4Ov6kfVzRJSmihUFGwrfYRBa2JW0H8Mq7ROjjSA+SVREYUPRIh7cI2b8qp+LsOYff+toohRys9RlacdOErz1l5hl4IdOFRKp5eg2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=O6yrVXnX; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1742205193; c=relaxed/simple;
+	bh=9LvosgfNboj4d6skergAV5qna7rDXXjRYXQz0EOL2xw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kwLT90TUJbxSw60ys3ljDqlPbkMdiayxJK0oSDWozzyfYckF4ReFZRgUedFHwi52H5jA9LKicOHd9lQl1lIfCV4MPnLfJD6oq5W/OrhOfcFifGZFu7ooY+fH+vGzXtqEi1x863QBR2MpxGn4fgoBQ/nAX811Wl/Erf6R94Cnqzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hGlqs8an; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="O6yrVXnX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1742204040; x=1742463240;
-	bh=FMpu9u3oj6vcJmcZvMEZn/YisvXXjcOdgQLecCKsTSY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=O6yrVXnXOA3zGBPsi58FLNfuNpgVmzRiUQVSt6n2RvDFaScYeNrmXm3L1XRnQzrCB
-	 8YlXNeEvc40Q8ELt8iWYb+KxAyvWpjqulvZgkNYKWJO35Cij+vUrsQ0GE7dUOlk+Jc
-	 rzMvfujAWxXxusZkbpaGYypuRMbU0pOLD+IP4MHj08+imTci+wd6XeRMC5LuYndpni
-	 M9/0EHtFyD89TeUGfSMNoe5XXrjHoXufvS4DgXPkj63oNVXQntmnqx4q3dqLr5UZPP
-	 OuNLW59d65h/ntfWzcGZJHsxtH2V6/1dpPJRMXGxgh4h0t6z0VLLIpNrDRSFWnHQPf
-	 hwkSkhYH00J8Q==
-Date: Mon, 17 Mar 2025 09:33:52 +0000
-To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] rust: use strict provenance APIs
-Message-ID: <D8IFS7175NNQ.3VAP8WA2QC8WF@proton.me>
-In-Reply-To: <20250315-ptr-as-ptr-v4-6-b2d72c14dc26@gmail.com>
-References: <20250315-ptr-as-ptr-v4-0-b2d72c14dc26@gmail.com> <20250315-ptr-as-ptr-v4-6-b2d72c14dc26@gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: ae828af5ffc8f596a802aaa8ecc51e4ae679d167
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hGlqs8an"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52H9eY00025235;
+	Mon, 17 Mar 2025 09:52:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=hIg8v/
+	EyjfTcc0iuNUQscATzYjiWKV5XrpqVVFSl4mk=; b=hGlqs8anJ55ZOjYtA7f5VK
+	UJykErQ6f+n4hAaorqRs0UEeWg/4xqym49kk87c5pL9NPScV1J5pIcH5s26flq2T
+	TIkQhuAavtA/pw1vd7CnAYQ8TKrRT4bLGozXrJhVx4H47tfArvVKzjuCqvtF7KzW
+	nimDlGV08TO0w3gKSsQWFpFx4Vek4de+QSQzww9fYmmfu0JS/qsKW9zwrarnZCBL
+	KEVF82zleKN9/s+7CqweQtF7aQCPKCvvNW5CY0n8/BC4sQbRRPPYdv6djH8iZYVY
+	Dyi+sBdcT4JWY/Jp/9cWb9olSQorquMJGzWFBhfj8/omD//n6LxyZW7cZdjcm2rw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e6252h95-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Mar 2025 09:52:19 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52H9qIVA006829;
+	Mon, 17 Mar 2025 09:52:18 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e6252h91-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Mar 2025 09:52:18 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52H90WIa012351;
+	Mon, 17 Mar 2025 09:52:18 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45dmvnngg1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Mar 2025 09:52:18 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52H9qHqa12321330
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Mar 2025 09:52:17 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51CA258056;
+	Mon, 17 Mar 2025 09:52:17 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70DD158052;
+	Mon, 17 Mar 2025 09:52:12 +0000 (GMT)
+Received: from [9.179.19.164] (unknown [9.179.19.164])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 17 Mar 2025 09:52:12 +0000 (GMT)
+Message-ID: <d83afae060351f49fe0ba661f69c1d0b00538a35.camel@linux.ibm.com>
+Subject: Re: [PATCH v7 03/17] iommu: generalize the batched sync after map
+ interface
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Jason
+ Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+        Will
+ Deacon	 <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch	
+ <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Logan Gunthorpe	
+ <logang@deltatee.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum	
+ <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Marek Szyprowski
+ <m.szyprowski@samsung.com>,
+        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse	
+ <jglisse@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Randy Dunlap
+ <rdunlap@infradead.org>
+Date: Mon, 17 Mar 2025 10:52:11 +0100
+In-Reply-To: <ad8b0dc927ea21238457a47537d39cd746751f4b.1738765879.git.leonro@nvidia.com>
+References: <cover.1738765879.git.leonro@nvidia.com>
+	 <ad8b0dc927ea21238457a47537d39cd746751f4b.1738765879.git.leonro@nvidia.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0hF70HY6BT5s-wPoLrVhBSjKbm0vSecU
+X-Proofpoint-ORIG-GUID: BH4B5Yn9WYfZcmNDq4xTvZV-53IulqxV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-17_03,2025-03-17_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 mlxlogscore=991
+ clxscore=1011 suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2503170069
 
-On Sat Mar 15, 2025 at 1:17 PM CET, Tamir Duberstein wrote:
-> Throughout the tree, use the strict provenance APIs stabilized in Rust
-> 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-> functions at the `kernel` crate root along with polyfills for rustc <
-> 1.84.0.
->
-> Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
-> 1.84.0 as our MSRV is 1.78.0.
-
-This isn't necessary, right?
-
-> In the `kernel` crate, enable the strict provenance lints on rustc >=3D
-> 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
-> compiler flags that are dependent on the rustc version in use.
-
-So it won't be enabled in the doctests, right?
-
-> Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-prove=
-nance-apis [1]
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.me/
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On Wed, 2025-02-05 at 16:40 +0200, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
+>=20
+> For the upcoming IOVA-based DMA API we want to use the interface batch th=
+e
+> sync after mapping multiple entries from dma-iommu without having a
+> scatterlist.
+>=20
+> For that move more sanity checks from the callers into __iommu_map and
+> make that function available outside of iommu.c as iommu_map_nosync.
+>=20
+> Add a wrapper for the map_sync as iommu_sync_map so that callers don't
+> need to poke into the methods directly.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->  init/Kconfig           |  3 +++
->  rust/kernel/alloc.rs   |  2 +-
->  rust/kernel/devres.rs  |  4 ++--
->  rust/kernel/io.rs      | 14 +++++++-------
->  rust/kernel/lib.rs     | 52 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  rust/kernel/of.rs      |  2 +-
->  rust/kernel/pci.rs     |  4 ++--
->  rust/kernel/str.rs     | 16 ++++++----------
->  rust/kernel/uaccess.rs | 12 ++++++++----
->  9 files changed, 82 insertions(+), 27 deletions(-)
-
-
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index 486715528587..84eb2602e79e 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -17,6 +17,9 @@
->  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(coerce_unsized=
-))]
->  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(dispatch_from_=
-dyn))]
->  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(unsize))]
-> +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, feature(strict_pr=
-ovenance_lints))]
-> +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, deny(fuzzy_proven=
-ance_casts))]
-> +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, deny(lossy_proven=
-ance_casts))]
->  #![feature(inline_const)]
->  #![feature(lint_reasons)]
->  // Stable in Rust 1.83
-> @@ -25,6 +28,55 @@
->  #![feature(const_ptr_write)]
->  #![feature(const_refs_to_cell)]
+>  drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
+>  include/linux/iommu.h |  4 +++
+>  2 files changed, 33 insertions(+), 36 deletions(-)
+>=20
+>=20
+--- snip ---
+> +
+>  	return mapped;
 > =20
-> +#[cfg(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE)]
-> +#[allow(clippy::incompatible_msrv)]
+>  out_err:
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 38c65e92ecd0..7ae9aa3a1894 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -857,6 +857,10 @@ extern struct iommu_domain *iommu_get_domain_for_dev=
+(struct device *dev);
+>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>  		     phys_addr_t paddr, size_t size, int prot, gfp_t gfp);
+> +int iommu_map_nosync(struct iommu_domain *domain, unsigned long iova,
+> +		phys_addr_t paddr, size_t size, int prot, gfp_t gfp);
+> +int iommu_sync_map(struct iommu_domain *domain, unsigned long iova,
+> +		size_t size);
 
-Do we still need this allow?
+There are two different word orders in the function names.
+iommu_sync_map() vs iommu_map_nosync(). I'd prefer to be consistent
+with e.g. iommu_map_sync() vs iommu_map_nosync().
 
-> +mod strict_provenance {
-> +    #[doc(hidden)]
-
-Why make them hidden in docs?
-
-> +    pub fn expose_provenance<T>(addr: *const T) -> usize {
-> +        addr.expose_provenance()
-
-Instead of having these stubs here, you can probably just do
-
-    pub use core::ptr::expose_provenance;
-
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-> +        core::ptr::without_provenance_mut(addr)
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-> +        core::ptr::with_exposed_provenance(addr)
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-> +        core::ptr::with_exposed_provenance_mut(addr)
-> +    }
-> +}
-> +
-> +#[cfg(not(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE))]
-> +mod strict_provenance {
-> +    #[doc(hidden)]
-
-I think we should document these.
-
----
-Cheers,
-Benno
-
-> +    pub fn expose_provenance<T>(addr: *const T) -> usize {
-> +        addr.cast::<()>() as usize
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-> +        addr as *mut T
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-> +        addr as *const T
-> +    }
-> +
-> +    #[doc(hidden)]
-> +    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-> +        addr as *mut T
-> +    }
-> +}
-> +
-> +pub use strict_provenance::*;
+>  extern size_t iommu_unmap(struct iommu_domain *domain, unsigned long iov=
+a,
+>  			  size_t size);
+>  extern size_t iommu_unmap_fast(struct iommu_domain *domain,
 
