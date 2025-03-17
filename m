@@ -1,168 +1,209 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92E979D2;
-	Mon, 17 Mar 2025 04:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A324175D5D
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 04:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742184276; cv=none; b=DlObvQj97O6TC0zFl6S+CpJWjqo8dY/j+cLK2UVFTwCGD3aaGVCPJLhIawNZCNjtu1aB73HSl5FCLdzj2svFgFB/XkGDzCSOwE/dRR7dRfF7SalM9LJ16L9FjEhcIk2OoQ7ZSvOSrajUfBsLPKWTWUgh1YxlM1AcvRaB3CbJmWQ=
+	t=1742186720; cv=none; b=eShRlScwGMShZdf2s6WuWdsfc1da1GOTvNt41PW8UUyo2OgZZqyNJf+pvIN4Pf2jbwFYuDcYRbc1cjq0YkWYdyI903hKafsPewDwbX3WoC3n0GZgsCrvHx6XZcqycKIzq2MkKv0qdstZjGK9GmQ66GzYl/sWlsjlePsAxoOja8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742184276; c=relaxed/simple;
-	bh=Zqx1VgtwCX1Jxqme0dY01T8ETZuysrsyCc9RI14Ut68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/FJq6QmYawrEIBUP47+gcXakmHDjS8pu4XxF/BYQSfp4wnOCfyp3p3Kdx4ScTAsYy+6XkfWjf09e+QxLgrPr8ZGj6L2r1ZL+SwfjO8u2+GC9JwGgMSWwyModcggllc+SFUXkfcBRz4auU8NkkHBlM+Dk6KDfUTxSWkfM54fUQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0g1w9sr; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742186720; c=relaxed/simple;
+	bh=mLBBrYbSbk2DQV+/TZdd6Icc6RDzDF7/lqHhA8sj5eQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=H3UZNWM4twvEUAAcZbx7d3EqGiCmUlDyGnbQwYu+2XOc3zjMz0DlvNVmJ7iZOyxvcG+43MmsSQ062pKxzyXMUO1GC8ruHCI6wNBeYr3QC+gGCEy6NPk35C1FbIenT4OnRgOYUHAcyNkgFdIKYzJHBW9+pxNOOgvPdKIMVdmq/jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cEsrsWTC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0g1w9sr"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e90b1b20c6so22258266d6.3;
-        Sun, 16 Mar 2025 21:04:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742184273; x=1742789073; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FdC2SWGkfGaYEex5fKxWwqou3YQPoCqtTCDGuK//30g=;
-        b=X0g1w9sr12mVD/4tyUg/7hHM19gHNV/jZS+woWUKTVccrcgUkzWCZApmyeM6NqWGhI
-         E9ckD4g9rvL4Rglna/VocwWRSH82AKl6H1ZUduvAEZUWCWUNKNDddU7NAwyi98s1kKX4
-         da1YJ+8pTJMSQBHrHd2ZuUxsjFkBO88NaVKjnuVWuTTQ7sLP0IvT8SAldJAUopnigfXT
-         KNlM2JO1CuA00FZX+m9NiUSJKo+AOteQ8hqKZ97ykWv69FtwKG0/aGE08nV+wnafNwn/
-         A5+wCHdvTIPgGF9qh49rL1WCtGbMjrvVN6DKg3hSX5XHpezlRpB3+ogvUnnbUrFMZdhM
-         +Oxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742184273; x=1742789073;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FdC2SWGkfGaYEex5fKxWwqou3YQPoCqtTCDGuK//30g=;
-        b=i32xVVxcGupb2TrebSKZeFEzY3V0jGeXLFxsqW5LMl9H8/CKwa6WdZEhScUZxplr6g
-         DrUr66sSy7kQgG7pQUdVq6wex2dI5lnWHnqEkFnm2v/IfHO6VN+jVNIWD/XA8sdu4n18
-         efpQjDx+V0Tgetwfw+qqv0otVXXV8CzChXXVa8q7A0zkP9+c0yljCS8OfO1AM3Zqnsw5
-         WO/+1imlv23bmUQvE8YmBNC/LgKUuLauFWW7qt/dDSvNZXbcyl3OC9H2wcHEQHxj+S/i
-         T0G+/sON0MXEIzY0i0o4H1Ap47Qo04uhtxmjppBVlctamya2UyA10lPYqxvCNL1fFH3S
-         1pCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnIFWGYR7Ph/N8iNvMJkYGzrH75NfAl03FL589Bm9UPAS+uMeDzOkv7xEjngjgfnNRKizPdHvguTUKvkH8@vger.kernel.org, AJvYcCWLZ+y0uyuXq1o+Nj1ZK8fQsKZOieM2EsdgkJeiq/D+32VnYI/60mVoVsZJZe/cHXqzP1+mdVoYWO4eGA==@vger.kernel.org, AJvYcCWnh3w40J4m/RQr2vYO209IiBwZc5tmy/zm+ZGE9eQ7YaggBLXNC2I5+EipogTl696G9SFtWT0aa2aP9xX9GKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjI8DFLerFYaZLxdOLijqMGc4qrWAwsroyGD9c8SY7plQybrYB
-	TsBZZdicb3JxBXs1j2e26rxlqO4tVh613tuQoPjB51RDA9tyvmCm
-X-Gm-Gg: ASbGncu2qeL+Q8vSXzxEpbf6USgHfZuZpWdoncPIFzf3itnpueGAVP7L10x6C+YAKFO
-	X85lI6cCQhFBBiQqAxxr6dJjJWrLNWjRi1ow0wrVDYSPlBZDXeDG8z5jd7E9sKd3El2pkoarajT
-	nDizU+g+oGqBOInkoVvDDG+FaF4L/BJKI63WV5vzyAb/+wLdUG0LBac/+KXTR/V/X45c38HfiCF
-	pGokg8Lvk1lNu4lKK1D0tHQrc0LlC1f3aHHqbWAl8uaKomBY6tR2bMO4jEo6LIyS+DfryDKUMFK
-	JxAtL72iuGOczAmN5ifuHl7vAnroRObf8p0lcwtP+9X5NDVG3o1G9X0fVIshqZbC5QIiTcqhT3x
-	CZhV3wY2AZRagaorbeMl/MTfIFdOnl8KAdOs=
-X-Google-Smtp-Source: AGHT+IFBjKayl+RdbauHaxiuB08xXW4tWmQhml6RN5yk9hM6PR8a9pGbUs5bHQpeSWSWoGVm6b1QQw==
-X-Received: by 2002:a05:6214:23cd:b0:6e6:630c:71e8 with SMTP id 6a1803df08f44-6eaea995137mr171140126d6.7.1742184273679;
-        Sun, 16 Mar 2025 21:04:33 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade237957sm50558536d6.42.2025.03.16.21.04.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 21:04:33 -0700 (PDT)
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfauth.phl.internal (Postfix) with ESMTP id B0B4F120007C;
-	Mon, 17 Mar 2025 00:04:32 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Mon, 17 Mar 2025 00:04:32 -0400
-X-ME-Sender: <xms:UJ_XZ6DDSwKCe5ZvCIEXH1KGlfQDsQKuZIX0e8WBS41-cWtXy72gug>
-    <xme:UJ_XZ0gnemuLMsj4msD-PDLSwpMC5WaYioNwnJ6cQdUdnnvre7GEvpua-qd21PqRl
-    9vGcNV9aVTwRKN9iw>
-X-ME-Received: <xmr:UJ_XZ9nBDSDUjviwonxZviSa_l5-bAJtAa9kUuvEeAsd2Ce2EDaVIDIb>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeekgeelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpefftdeihfeigedtvdeuueffieetvedtgeej
-    uefhhffgudfgfeeggfeftdeigeehvdenucffohhmrghinhepghhithhhuhgsrdgtohhmne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhu
-    nhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqdduje
-    ejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdr
-    nhgrmhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htoheptghonhhtrggtthessgihthgvqdhfohhrghgvrdhiohdprhgtphhtthhopegrrdhh
-    ihhnuggsohhrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurgeskhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilhdrtgho
-    mhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthhopegsjh
-    horhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvghnnhho
-    rdhlohhsshhinhesphhrohhtohhnrdhmvgdprhgtphhtthhopegrlhhitggvrhihhhhlse
-    hgohhoghhlvgdrtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughu
-X-ME-Proxy: <xmx:UJ_XZ4zr8yhGLZQx7SvvzOBbXveY6ewp8CsHMJ440O_E-YZJXcDH4A>
-    <xmx:UJ_XZ_TWzl77m1yLkxNrUxP5tImmzP7inyLPm8SPUL3OTF4W2fuZLw>
-    <xmx:UJ_XZzZaB3Xa2Z-v5ze5PZY0_tgvOqrL73nrCJX31l_IhbTfuDjtUg>
-    <xmx:UJ_XZ4R-k99u7Jz4wDc3fYp2lcbb3CAKZCPzhdgZQ384oDS6LkhDRQ>
-    <xmx:UJ_XZxBD2Nc4ayW3tgllwTe42yfoTsmXHxEBXh9qQ7cuxCKywKF6Cy1p>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Mar 2025 00:04:32 -0400 (EDT)
-Date: Sun, 16 Mar 2025 21:04:31 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Antonio Hickey <contact@byte-forge.io>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Antonio Hickey <contact@antoniohickey.com>,
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 15/16] rust: block: refactor to use `&raw [const|mut]`
-Message-ID: <Z9efT3ramQIwwRXG@Mac.home>
-References: <20250316061429.817126-1-contact@antoniohickey.com>
- <20250316061429.817126-16-contact@antoniohickey.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEsrsWTC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742186717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v75uG4j8z7Addvp3lObGLO4D7RHzJZGZNNgCdcTkhsQ=;
+	b=cEsrsWTCCaqamogpi4qVTRng7EgGXuqmSdb5rWjpLe7f7aM0hN5mjy0JJgK/UbSa8YZ4UL
+	R6UszagttQ8WQaOn3Lv8QbOYI7b67fyrThlWInFk+CPD3qkMe3oVaSBsxRaVJv3EeWUWmW
+	vPHyhBrhm0+0OQJ/j5sabFu1f3TaxeA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-0d3WAc-MMJu8YwZjVpfwrA-1; Mon,
+ 17 Mar 2025 00:45:15 -0400
+X-MC-Unique: 0d3WAc-MMJu8YwZjVpfwrA-1
+X-Mimecast-MFC-AGG-ID: 0d3WAc-MMJu8YwZjVpfwrA_1742186713
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F4D51800266;
+	Mon, 17 Mar 2025 04:45:13 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 893CA18009BC;
+	Mon, 17 Mar 2025 04:45:12 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52H4jB2T2200874
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 17 Mar 2025 00:45:11 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52H4jBmB2200873;
+	Mon, 17 Mar 2025 00:45:11 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+        Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 3/6] block: make queue_limits_set() optionally return old limits
+Date: Mon, 17 Mar 2025 00:45:07 -0400
+Message-ID: <20250317044510.2200856-4-bmarzins@redhat.com>
+In-Reply-To: <20250317044510.2200856-1-bmarzins@redhat.com>
+References: <20250317044510.2200856-1-bmarzins@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250316061429.817126-16-contact@antoniohickey.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Sun, Mar 16, 2025 at 02:14:24AM -0400, Antonio Hickey wrote:
-> Replacing all occurrences of `addr_of!(place)` and `addr_of_mut!(place)`
-> with `&raw const place` and `&raw mut place` respectively.
-> 
-> This will allow us to reduce macro complexity, and improve consistency
-> with existing reference syntax as `&raw const`, `&raw mut` are similar
-> to `&`, `&mut` making it fit more naturally with other existing code.
-> 
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1148
-> Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
+A future device-mapper patch will make use of this new argument. No
+functional changes intended in this patch.
 
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ block/blk-settings.c   | 9 +++++++--
+ drivers/md/dm-table.c  | 2 +-
+ drivers/md/md-linear.c | 2 +-
+ drivers/md/raid0.c     | 2 +-
+ drivers/md/raid1.c     | 2 +-
+ drivers/md/raid10.c    | 2 +-
+ drivers/md/raid5.c     | 2 +-
+ include/linux/blkdev.h | 3 ++-
+ 8 files changed, 15 insertions(+), 9 deletions(-)
 
-Regards,
-Boqun
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index c44dadc35e1e..bad690ef8fec 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -476,16 +476,21 @@ EXPORT_SYMBOL_GPL(queue_limits_commit_update_frozen);
+  * queue_limits_set - apply queue limits to queue
+  * @q:		queue to update
+  * @lim:	limits to apply
++ * @old_lim:	store previous limits if non-null.
+  *
+- * Apply the limits in @lim that were freshly initialized to @q.
++ * Apply the limits in @lim that were freshly initialized to @q, and
++ * optionally return the previous limits in @old_lim.
+  * To update existing limits use queue_limits_start_update() and
+  * queue_limits_commit_update() instead.
+  *
+  * Returns 0 if successful, else a negative error code.
+  */
+-int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
++int queue_limits_set(struct request_queue *q, struct queue_limits *lim,
++		     struct queue_limits *old_lim)
+ {
+ 	mutex_lock(&q->limits_lock);
++	if (old_lim)
++		*old_lim = q->limits;
+ 	return queue_limits_commit_update(q, lim);
+ }
+ EXPORT_SYMBOL_GPL(queue_limits_set);
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 0ef5203387b2..77d8459b2f2a 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1883,7 +1883,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	if (dm_table_supports_atomic_writes(t))
+ 		limits->features |= BLK_FEAT_ATOMIC_WRITES;
+ 
+-	r = queue_limits_set(q, limits);
++	r = queue_limits_set(q, limits, NULL);
+ 	if (r)
+ 		return r;
+ 
+diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+index a382929ce7ba..65ceec5b078f 100644
+--- a/drivers/md/md-linear.c
++++ b/drivers/md/md-linear.c
+@@ -81,7 +81,7 @@ static int linear_set_limits(struct mddev *mddev)
+ 		return err;
+ 	}
+ 
+-	return queue_limits_set(mddev->gendisk->queue, &lim);
++	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
+ }
+ 
+ static struct linear_conf *linear_conf(struct mddev *mddev, int raid_disks)
+diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+index 8fc9339b00c7..2eb42b2c103b 100644
+--- a/drivers/md/raid0.c
++++ b/drivers/md/raid0.c
+@@ -390,7 +390,7 @@ static int raid0_set_limits(struct mddev *mddev)
+ 		queue_limits_cancel_update(mddev->gendisk->queue);
+ 		return err;
+ 	}
+-	return queue_limits_set(mddev->gendisk->queue, &lim);
++	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
+ }
+ 
+ static int raid0_run(struct mddev *mddev)
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 9d57a88dbd26..e8103dbc549c 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -3223,7 +3223,7 @@ static int raid1_set_limits(struct mddev *mddev)
+ 		queue_limits_cancel_update(mddev->gendisk->queue);
+ 		return err;
+ 	}
+-	return queue_limits_set(mddev->gendisk->queue, &lim);
++	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
+ }
+ 
+ static int raid1_run(struct mddev *mddev)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index efe93b979167..dbc2ee70d0d3 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4024,7 +4024,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
+ 		queue_limits_cancel_update(mddev->gendisk->queue);
+ 		return err;
+ 	}
+-	return queue_limits_set(mddev->gendisk->queue, &lim);
++	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
+ }
+ 
+ static int raid10_run(struct mddev *mddev)
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 5c79429acc64..a7cc2ec86793 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -7774,7 +7774,7 @@ static int raid5_set_limits(struct mddev *mddev)
+ 	/* No restrictions on the number of segments in the request */
+ 	lim.max_segments = USHRT_MAX;
+ 
+-	return queue_limits_set(mddev->gendisk->queue, &lim);
++	return queue_limits_set(mddev->gendisk->queue, &lim, NULL);
+ }
+ 
+ static int raid5_run(struct mddev *mddev)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 248416ecd01c..bb264fd7b2f2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -953,7 +953,8 @@ int queue_limits_commit_update_frozen(struct request_queue *q,
+ 		struct queue_limits *lim);
+ int queue_limits_commit_update(struct request_queue *q,
+ 		struct queue_limits *lim);
+-int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
++int queue_limits_set(struct request_queue *q, struct queue_limits *lim,
++		     struct queue_limits *old_lim);
+ int blk_validate_limits(struct queue_limits *lim);
+ 
+ /**
+-- 
+2.48.1
 
-> ---
->  rust/kernel/block/mq/request.rs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-> index 7943f43b9575..4a5b7ec914ef 100644
-> --- a/rust/kernel/block/mq/request.rs
-> +++ b/rust/kernel/block/mq/request.rs
-> @@ -12,7 +12,7 @@
->  };
->  use core::{
->      marker::PhantomData,
-> -    ptr::{addr_of_mut, NonNull},
-> +    ptr::NonNull,
->      sync::atomic::{AtomicU64, Ordering},
->  };
->  
-> @@ -187,7 +187,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
->      pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
->          // SAFETY: Because of the safety requirements of this function, the
->          // field projection is safe.
-> -        unsafe { addr_of_mut!((*this).refcount) }
-> +        unsafe { &raw mut (*this).refcount }
->      }
->  }
->  
-> -- 
-> 2.48.1
-> 
