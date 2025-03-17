@@ -1,199 +1,154 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D751A5B95;
-	Mon, 17 Mar 2025 18:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94FB1CDFD5
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 18:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742235424; cv=none; b=ThhxBfXMjEZrb//3Se0EsFjMYEDQPMhFy+j4o+Vs6t5+NCz17uPkBtXMqnc+zDAdM/wCNFpkPuc+zb1kC9KhZxEHoEFHAiGCWpw04GHt7V0G8UiU+Lz2vsxqe4OJNp/xPH9w8Y9TEPSPna71rCQnBh0Thc3HormNEoW1c+wYmLI=
+	t=1742235709; cv=none; b=MISVXiQgJRhJnht3F5157Boysh929lXVIAvuIC6KLuIGhsmw/4qbZvrpP1ghEkieShz4hqBYKSbyGoZ2AJN2HDev5XVUe25qCu5DxQWjW3spTA8WFz3dvfHg/DYU+ygURAtUDxyD5BRvNfI/AOfpZVBdJhDllnMxfsuCEtgwJMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742235424; c=relaxed/simple;
-	bh=EYQCXNR1fnl1wWPPKs9b1TEod9XljzCnx9/BpeczPEI=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OY+4xMDPH44Y0aUpw726fIWxGdIwDuQu8mBpi5TtTWgiwMFgR2V5FJ6wHLepzGIK1RKtdW11WASwStFzqWQ8vtyOMqk4aXXhFHbOMY0cuyK+YrwDgX0+j3gjUSxZx851vjCeEd989u3pukAJVLIcpi2wzT4mmFIwRFpP+ucMg3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XuoWCvjW; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742235709; c=relaxed/simple;
+	bh=y7PiawXMLjhJAHEtPEANtUgbmlPj8uz7tgQ/uKONMdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jvXvOiOLZI6VODpR/lDUZeTOIZC/QcbDBFZNAiWjMpYLGHjRn8HAx2B7xCelhp95PP1BNSDnUNkLEgppXb3m4cX1TMTULpOuzLunNCD4a4/cGVZ7uWhomrz9S/U+ZJIml6wCzyJRkRpG/2SKDo/GVYS5+Tr3GndILNBtmiqfNsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n5yQ/gwH; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuoWCvjW"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7be6fdeee35so846869185a.1;
-        Mon, 17 Mar 2025 11:17:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742235421; x=1742840221; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cGBnGtUMV4N26BP3QlQ12S9pan6nDACT7i7KUsJv6yY=;
-        b=XuoWCvjWEDIlvLa20nmqHHoxUL+PERBimyAzL5lN7VE8Kw+V8BSxdzD+xiIPd589bX
-         Ztv5kTHD10Abei5R34BcWsL+AooHVPx+al7bjPm7/mfVh03y3iqsctnVQiff8SevaPQU
-         SlA0gmFVy3Rt5yIHpLZDVsHwojAkaD+N9ltiYc8SMdTZ3Tq4DtHL5ahUJGKK44sJ9brR
-         AsMoXxxhY7mpYcL0/RO3SOkvEV4B4CK0VJjRN/sGNGZrcc129tB3/QrGUdAjkJvpJ1sQ
-         hvwyuKXJZzcFklDZ5mWLj+1ELEoy7dRdXsNDxr8AWL+6mknW37w00abzAtU5w0uixi4V
-         hyJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742235421; x=1742840221;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cGBnGtUMV4N26BP3QlQ12S9pan6nDACT7i7KUsJv6yY=;
-        b=uNr6KrmcA8/RbvZBqzihpXx7c4qU4y3L2xBl1k1vXiEbEpyoAur+O9hrhqdjukhYJ7
-         +X+SakxTLJVxFG2G3VDeGKuPqorV4qWUSN1XVwspwc7j/SCl4/uAG/kLq7C2R9pKDC2t
-         OHCkYFAFvjpXSU42GVB5JtnfnkfCuefnFzqlrCFWs/rema9OFTOjCF92g9QBFzh3MXg+
-         KL0Acn1kTqst/1Jo9lpsjR8RWvle4xaRfUuFaxfrkaD7qiwohhldwMQdAoR+9guRJqrI
-         J9Zm1+6gjjPOSFhPGzVvK1ZTKhndvT+f04QHnRNNecLpsYsFtdJdlDvwGFZURt43JjB4
-         oBmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFBwBITPIWXFneGM68n8s0wqAtGS41vvd/lIl8k7sokfiYcuEmLXrxNE1N+s63qN3ABqO81WQXrUR+densNiE=@vger.kernel.org, AJvYcCUTyrDnHKdsrAYMYfHsbGz/O6Dmew27Ij25qf+zXFHp64yaZo9VfKSt/eKwKwLORL7URuttrlFVa0nw@vger.kernel.org, AJvYcCUnw/dA9uGJGxi3BOeoexnEAb1AK2ZHpS5YYprTbR4yXNfAxmh1cr/p5NJ211VeBi6n+qCDrTvr0gwVgyqO@vger.kernel.org, AJvYcCVqAoou+Z71nz+uZA4YwxqOOe0MQFsGewWAhj80n+XRZ5dLOLsxLpdd9Y6DSPdukWseoX0kwSXdsUR+lPs=@vger.kernel.org, AJvYcCVrlPBZtf1+CtRa08dWMwOV1QGDRmqB38n9ig+sLYbZHJE/ttYOJtwC5Q1N/thlXlHwhi5opuXroYFJ1Rg9@vger.kernel.org, AJvYcCXdjrYsXrWV9KL9WY9sJ9AA0qu4757FgtYvjDwM02LCxutgljf+xeLLi6S4MEMjoiEKfyHhkrtx+9g1@vger.kernel.org, AJvYcCXs/xt3693nnpitzZEAHmqm8R2TY0uuQ0fBv+SzGWyexWC6u0vQ9i/pO7d+AmABnV4UHmGlK1gyHgsHfimK0Sgr@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbzMb/eeybl5M6GEvhk6OvgEqz1NYyga4YjxmSmFZY6SxKm3+x
-	aw3Icn8VPSQCFa6Ufpe/AG8P0Xa+wKwNfOza7cmb40PFciicbkwp
-X-Gm-Gg: ASbGnctxUQ/hsS9pQ9pXCqBWAtmwx8/rZ7vgbsCzOJHmkTlptrMBTecc00S/Mv4h+jq
-	9UJ4tFmNEgYb8wePucr0Hfk5EjuU+XXMLawKWSoOaKHSUWsE8Tf7GRE5Ineg8y3YVA9POd1PPw6
-	kZdTvIohGysm8sPKQ+hZGZ/pwSrKdeViiqBjivFPWG0YxdyaY0kBN1hSEzMKkvi3hkraXVtAzto
-	hVc6WtwB8Mci0EQFs1e05Y4aIkkoRZ75lGYHbeLFTHI3qozpE++QwCR1XT42D/Y+I3HEXabDmDB
-	B+78SdUWp0DHm4HckR3Wz/8QJVtReK7vHhXCJzxQmHeUTvPIEf1tDobQQ/Mfk9vhdbMC4631ma8
-	g49Icz/LPenTRSxJqfYL9kLkopIr1NliPOXk=
-X-Google-Smtp-Source: AGHT+IHZ19Mtd+P5elXN8MUUqT70x0aWcnKbrNuywFbsTL1ou8fnOUqUq8bDmmEjEHpoomslrhv8qQ==
-X-Received: by 2002:a05:620a:2887:b0:7c5:99a6:7883 with SMTP id af79cd13be357-7c599a67960mr259055485a.54.1742235421536;
-        Mon, 17 Mar 2025 11:17:01 -0700 (PDT)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d72b94sm619175685a.77.2025.03.17.11.17.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 11:17:01 -0700 (PDT)
-Message-ID: <67d8671d.050a0220.3305ab.6372@mx.google.com>
-X-Google-Original-Message-ID: <Z9hnGprWodQ2Pbup@winterfell.>
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 63D291200043;
-	Mon, 17 Mar 2025 14:17:00 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Mon, 17 Mar 2025 14:17:00 -0400
-X-ME-Sender: <xms:HGfYZwJmp9VRvX_XyrW2qHZfusbGxOojCkf4ouObKayviNjmwTiNdw>
-    <xme:HGfYZwJXumttfwvQ0Sr2IHfNV0sSzTct-YE9qDx5WPTU_lkLmomZLlZ1j8MrtbsZB
-    VQjkM8b7wwIm60dAw>
-X-ME-Received: <xmr:HGfYZwswuzHhqYuhH0TMeV0WnfNLGC2IWgMV7lGKmyWiW4H0mIJnzBPdgaY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugedtvdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepieehfeekgfdvfeetjeejudekhfeiveel
-    feefveehheeffffhkefhteevffevhffgnecuffhomhgrihhnpehruhhsthdqlhgrnhhgrd
-    horhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhep
-    sghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtie
-    egqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhi
-    gihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpd
-    hrtghpthhtohepthgrmhhirhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrshgr
-    hhhirhhohieskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrthhhrghnsehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehnihgtohhlrghssehfjhgrshhlvgdrvghupdhrtghp
-    thhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrg
-    ihnhhorhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdr
-    nhgvthdprhgtphhtthhopegsjhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtghomh
-    dprhgtphhtthhopegsvghnnhhordhlohhsshhinhesphhrohhtohhnrdhmvg
-X-ME-Proxy: <xmx:HGfYZ9bC5HJI2gjlDJ8Cr2TlyJ_LMerRt1wcGwogHVxrmpKYzZ_oQQ>
-    <xmx:HGfYZ3b9_t_FXuY_AcAItbW6GVpsmF9Oo4xxGj19Y0sLmTSyFlcEnw>
-    <xmx:HGfYZ5CL-PTmQx4JvirZcvRjt1ksvGpB4jqVFsoEoLHm_h8TQXSU7w>
-    <xmx:HGfYZ9ZdlJbXrL3uWiFTQIOlRQflsbAnaT5qWy5f8SqmdIQ1kKFtQw>
-    <xmx:HGfYZ_oEc4ckfcRaCiG2Y6kvXBTBNF5ajW_GVUxaTddTgkFfbabVdnZZ>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Mar 2025 14:16:59 -0400 (EDT)
-Date: Mon, 17 Mar 2025 11:16:58 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,	linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org,	rust-for-linux@vger.kernel.org,
- linux-kselftest@vger.kernel.org,	kunit-dev@googlegroups.com,
- linux-pci@vger.kernel.org,	linux-block@vger.kernel.org,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com>
- <67d85e51.050a0220.2a36b.58b3@mx.google.com>
- <CAJ-ks9kBp8zPfaQuZRb0Unms1b13hDb5cRypceO8TWFR0Ty5Ww@mail.gmail.com>
- <67d864b2.0c0a0220.39fb6f.4df4@mx.google.com>
- <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n5yQ/gwH"
+Date: Mon, 17 Mar 2025 14:21:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742235694;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Egdu7lu2alx2YW0th9IMSNOYWGB3ViakICF9fWwb8vY=;
+	b=n5yQ/gwHVTVVdWlOiJ+XVaqS7K6k2mjgYqXha0qdPUFupQyqa0l0ruezRNtVzm621MA7yK
+	seyQBoe29Or7osboe5o3nxYyFO2zcPshWZ9dVniHt2dMlPXL1eMOvHiYK475tv69fjGiQ3
+	JXFxdyWf9fm8OiC37upy/ReiVVjpoB4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
+	Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
+References: <0712e91f-2342-41ef-baad-3f2348f47ed6@kernel.dk>
+ <ycsdpbpm4jbyc6tbixj3ujricqg3pszpfpjltb25b3qxl47tti@b2oydmcmf2a6>
+ <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
+ <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
+ <Z9e6dFm_qtW29sVe@infradead.org>
+ <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+ <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
+ <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
+ <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
+ <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
+In-Reply-To: <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 17, 2025 at 02:10:42PM -0400, Tamir Duberstein wrote:
-> On Mon, Mar 17, 2025 at 2:06 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> >
-> > On Mon, Mar 17, 2025 at 02:04:34PM -0400, Tamir Duberstein wrote:
-> > > On Mon, Mar 17, 2025 at 1:39 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> > > >
-> > > > On Mon, Mar 17, 2025 at 10:23:56AM -0400, Tamir Duberstein wrote:
-> > > > [...]
-> > > > > diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> > > > > index fc6835cc36a3..c1b274c04a0f 100644
-> > > > > --- a/rust/kernel/lib.rs
-> > > > > +++ b/rust/kernel/lib.rs
-> > > > > @@ -17,6 +17,11 @@
-> > > > >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(coerce_unsized))]
-> > > > >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(dispatch_from_dyn))]
-> > > > >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(unsize))]
-> > > > > +#![cfg_attr(
-> > > > > +    CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE,
-> > > > > +    feature(strict_provenance_lints),
-> > > > > +    deny(fuzzy_provenance_casts, lossy_provenance_casts)
-> > > > > +)]
-> > > > >  #![feature(inline_const)]
-> > > > >  #![feature(lint_reasons)]
-> > > > >  // Stable in Rust 1.83
-> > > > > @@ -25,6 +30,109 @@
-> > > > >  #![feature(const_ptr_write)]
-> > > > >  #![feature(const_refs_to_cell)]
-> > > > >
-> > > > > +#[cfg(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE)]
-> > > > > +#[allow(clippy::incompatible_msrv)]
-> > > > > +mod strict_provenance {
-> > > > > +    /// Gets the "address" portion of the pointer.
-> > > > > +    ///
-> > > > > +    /// See https://doc.rust-lang.org/stable/core/primitive.pointer.html#method.addr.
-> > > > > +    #[inline]
-> > > > > +    pub fn addr<T>(ptr: *const T) -> usize {
-> > > > > +        ptr.addr()
-> > > > > +    }
-> > > > > +
-> > > >
-> > > > For addr(), I would just enable feature(strict_provenance) if
-> > > > CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE=n, because that feature is
-> > > > available for 1.78. Plus we may need with_addr() or map_addr() in the
-> > > > future.
-> > >
-> > > We still need these stubs to avoid `clippy::incompatible_msrv`, and
-> > > we'll need those until MSRV is above 1.84.
-> > >
-> >
-> > Hmm.. why? Clippy cannot work with unstable features?
+On Mon, Mar 17, 2025 at 01:57:53PM -0400, Martin K. Petersen wrote:
 > 
-> Yes, `clippy::incompatible_msrv` doesn't pay attention to enabled
-> unstable features.
+> Kent,
+> 
+> >> At least for SCSI, given how FUA is usually implemented, I consider
+> >> it quite unlikely that two read operations back to back would somehow
+> >> cause different data to be transferred. Regardless of which flags you
+> >> use.
+> >
+> > Based on what, exactly?
+> 
+> Based on the fact that many devices will either blindly flush on FUA or
+> they'll do the equivalent of a media verify operation. In neither case
+> will you get different data returned. The emphasis for FUA is on media
+> durability, not caching.
+> 
+> In most implementations the cache isn't an optional memory buffer thingy
+> that can be sidestepped. It is the only access mechanism that exists
+> between the media and the host interface. Working memory if you will. So
+> bypassing the device cache is not really a good way to think about it.
+> 
+> The purpose of FUA is to ensure durability for future reads, it is a
+> media management flag. As such, any effect FUA may have on the device
+> cache is incidental.
+> 
+> For SCSI there is a different flag to specify caching behavior. That
+> flag is orthogonal to FUA and did not get carried over to NVMe.
+> 
+> > We _know_ devices are not perfect, and your claim that "it's quite
+> > unlikely that two reads back to back would return different data"
+> > amounts to claiming that there are no bugs in a good chunk of the IO
+> > path and all that is implemented perfectly.
+> 
+> I'm not saying that devices are perfect or that the standards make
+> sense. I'm just saying that your desired behavior does not match the
+> reality of how a large number of these devices are actually implemented.
+> 
+> The specs are largely written by device vendors and therefore
+> deliberately ambiguous. Many of the explicit cache management bits and
+> bobs have been removed from SCSI or are defined as hints because device
+> vendors don't want the OS to interfere with how they manage resources,
+> including caching. I get what your objective is. I just don't think FUA
+> offers sufficient guarantees in that department.
 
-Then we should fix clippy or how we set msrv rather adding the stub.
-@Miguel?
+If you're saying this is going to be a work in progress to get the
+behaviour we need in this scenario - yes, absolutely.
 
-Regards,
-Boqun
+Beyond making sure that retries go to the physical media, there's "retry
+level" in the NVME spec which needs to be plumbed, and that one will be
+particularly useful in multi device scenarios. (Crank retry level up
+or down based on whether we can retry from different devices).
+
+But we've got to start somewhere, and given that the spec says "bypass
+the cache" - that looks like the place to start. If devices don't
+support the behaviour we want today, then nudging the drive
+manufacturers to support it is infinitely saner than getting a whole
+nother bit plumbed through the NVME standard, especially given that the
+letter of the spec does describe exactly what we want.
+
+So: I understand your concerns, but they're out of scope for the moment.
+As long as nothing actively breaks when we feed it READ|FUA, it's
+totally fine.
+
+Later on I can imagine us adding some basic sanity tests to alert if
+READ|FUA is behaving as expected; it's pretty easy to test latency of
+random vs. reads to the same location vs. FUA reads to the same
+location.
+
+So yes: there will be more work to do in this area.
+
+> Also, given the amount of hardware checking done at the device level, my
+> experience tells me that you are way more likely to have undetected
+> corruption problems on the host side than inside the storage device. In
+> general storage devices implement very extensive checking on both
+> control and data paths. And they will return an error if there is a
+> mismatch (as opposed to returning random data).
+
+Bugs host side are very much a concern, yes (we can only do so much
+against memory stompers, and the RMW that buffered IO does is a giant
+hole), but at the filesystem level there are techniques for avoiding
+corruption that are not available at the block level.  The main one
+being, every pointer carries the checksum that validates the data it
+points to - the ZFS model.
+
+So we do that, and additionally we're _very_ careful when moving around
+data to carry around existing checksums, and validate the old after
+generating the new (or sum up new checksums to validate them against the
+old directly) when moving data around.
+
+IOW - in my world, it's the filesystem's job to verify and authenticate
+everything.
+
+And layers above bcachefs do their own verification and authentication
+as well - nixos package builders and git being the big ones that have
+caught bugs for us.
+
+It all matters...
