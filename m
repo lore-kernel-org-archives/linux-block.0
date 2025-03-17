@@ -1,234 +1,294 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04AF233141;
-	Mon, 17 Mar 2025 10:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0E81D79B3
+	for <linux-block@vger.kernel.org>; Mon, 17 Mar 2025 11:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742208840; cv=none; b=XbBXkUuxUTDSYcULXowK1ilLaZ5MFtCnk2NXm1nVyCxQBngEbRQhbMgCCa9Xqd9qE/IMpp38UhnOr0OP4y+isW8dQagHz3q6AP82EuIUAW3KzrKZw6fDzx6TeAA/K2DT8SyLMGStDP0RhoMmwjvrHuoLMaCAsmqq06pDfVhdaHY=
+	t=1742210870; cv=none; b=U6QMvNfw9JLveexv7pVqHrkxZMShF8fl86i245xUQZ4VxIiTgYxHzpYboOko2QKK6c1M0a7k+75lFd2cjUUIvNNsBR2ldDeQHruHnlTAsLSa6csOjndwYudH4rkYPEDt2NpSXOwiussUwL2eJgZ6x9LkglLe8eIBdfsscs/T2CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742208840; c=relaxed/simple;
-	bh=xQCIvtZ7gkiHiOAfI0sMD7QZtE9jk12bnsX/6xPz/l4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LjC6Xh0WS1Mju5WdOccTMDLbMCpL3mt41lC9QMQqmatV4+7ecfS5iIVxufHQdLYT0IXXek0AbsufHDd1zoV79zqD+DtTutoRF+ve7L04oKBrbxo6+YtJJuskAVo8qCmkSPOfR5Sw6UIaY16L+uZBiY1pfrs29DNKEenJsIAf2pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQJtQuoY; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742210870; c=relaxed/simple;
+	bh=Qmdw44/Y9/OgfNp31AlBCDtokgDg/kGkmfVHIvL4bZM=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=g/L1pvYFNBbuaGOzVofpEMcf7i5LTzASMvpOSkfgJQIOyOlRkOMrVvnF5wI0M+GI8DA8D6n70pFqQ4GNTIaiGgGythUk56NhUK1KDZlq9AhpznO41AblBB6rhLPlc4S5Tm+/v5N+WvVI4nglz5TNyh9mdhHYWYZ+JQ0MNI4Rm7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YksjpdBg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQJtQuoY"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30bfb6ab47cso42296281fa.3;
-        Mon, 17 Mar 2025 03:53:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742208836; x=1742813636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W2GJ9qJ8OjX1yfsEXuO0p0ppxNDngQ6k8zpz585ECzc=;
-        b=MQJtQuoYOIp0Cog5Vgqd1mpwZt0F1578JzBjV2B5ba7wrchb4cO17BwCSoPWY7fwWa
-         TLZyy6ISpvB1P2jTRN/twILS0SYAh5SeQX7ZGN1o7RthRMP8NxuZOrS8OAxWkIXyGqhH
-         r9VhDPvq2TYiHuGBzto7qmtrefwy2EeyJn4Z2msWoHDsMukinH4rBUkivFrIVJYVm2Ru
-         Z/D9xy1fiD4vz3mOkGhKe14uWI0qJwGBSf77huAUQ9Vdznqbzv4t4i/fytd3RS3J+j53
-         38J/Gs4VqByHm4QEn60Yqp/JRilMfugeMpTLM/kGPIfucBkoKZtquWf3XKaJmm0MUI93
-         o0Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742208836; x=1742813636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W2GJ9qJ8OjX1yfsEXuO0p0ppxNDngQ6k8zpz585ECzc=;
-        b=WkS4W2MGFxYPUIVey6GJDTFUIDb2+GYJ3BHN/BcUyOiEiE7OAk46m5Rtatz1ylN1qF
-         yjVTkUlYvby/3z3u7dIOX9JR9k7tJqSdAHpRBfgmRtvoBXWyuixERw7OLnnfusJbq1Px
-         hXxqNKQsivjrwgdLzPDj8jqy/lC4/lA8ZgemEr2z8mse8l9qQR4B7gr4kUOk1zNgQ3uB
-         3jWMySW8TDaesrWhXXuXfDAKq9cXe3fiw02XeKQ7mF9w4/pFhBzTg39oh8SN9MgAkDrA
-         +zXLodt92ITzUrvKFCATmRxDNL04UBDWDFlpbSQPiiBCcNgLmrj09+hChrGCsAUkfuLE
-         vBcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUq8f14I1k1UIlQVV1+yeJUQsDpXx6ALD8AGeQ9drlJWE181BLc1SIce+fxwlKkMwd21msQfmNAOjqga9dNBZPb@vger.kernel.org, AJvYcCV0UjchdIGv8VA5Z9thu+TOIzG5Ti+H0mjuvn7QkgqQBpFqClciSYPTerFxw09/CxALxF+9b7X6UNNEE9Pj@vger.kernel.org, AJvYcCVRoHnxpPF8eLNqNZoSDXRu8VcYG/V0RbAQv+mzmQHlSlbjziqMg/k6kWclINlpSUXoWLeDL31TfZtwvig=@vger.kernel.org, AJvYcCVq8cOqd+kvTHwNGSksNPnNJ1cosQTdUaPsyfKqmxppEvbaNh/4/WD9G9A17/oarN1D7ALleV6k7pVH@vger.kernel.org, AJvYcCW10kAxPm8Ns5U3ziW3gxImNT8U+Q+qCO5VIv4PxHr5wegDQVNDl5YErzsFN0E5ui6euSMDoTKFJaMR@vger.kernel.org, AJvYcCWxLRnnLgPFuwmqdci4ebZtxrCD0FpQXo/PH743ZImOJx3sr3OtXgS5Xff9+k7siFls2pyriGv7KdtuUbjY@vger.kernel.org, AJvYcCXXpPdM3/fEcnTTjmMrbM9W/xotclTo+SkYS6N6RjaJJWIbJZO030muX2zT5GyICWSFQT/LUY0MMD6M1vVeXmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEbzo4uHWyQnxmok/icIu1jl/35H3XtFYnkXfzQ/k66IQ3oIVs
-	TEOCzP0EfzwvuuLyeZV4H/hq+26TSIpifEKvS48m2G2G9PYA+YGHwGpmqFRtE65ge8V7W/+sY37
-	YrL1geAENWgN4bjcvJ6GHOTZ7bYU=
-X-Gm-Gg: ASbGncsrzBvPKznCiQXic9uSMd/dEsDHTpiUhFeKzAZauN5ycxuAoXa27zycZqzlRKb
-	t1b7YiSuhHhsghtUtR6XqlEMgcMGHrUioK449oqXgiIhJoSEzFoa1Av1fgbTqhkO+RJjZs3MENC
-	WitJPZXlsWkWNNjG2zzP2C7OOA3pg2nQlB60rPLbppO1blaCfX3LbKpWAcHsrO
-X-Google-Smtp-Source: AGHT+IEeubawRlSkpRnGzmVWw22++0Ktqk/MMMgtA5rXFVJr9UoRX1gyCSDhiL2Xi0GL2rblLWjf9DmjfBaJCJzQ7wE=
-X-Received: by 2002:a05:651c:221b:b0:30b:d63c:ad20 with SMTP id
- 38308e7fff4ca-30c4a8ce9dbmr64521931fa.24.1742208835540; Mon, 17 Mar 2025
- 03:53:55 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YksjpdBg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742210867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pmb1M6YuJLZPZhb6X3kxk0iHal+/a9cYjzs9Ehglbdg=;
+	b=YksjpdBg497XcXIZC4IP3XE2lu7BpEFnAIvY3iUmmkwtaaXtWmwVJDNJvcs8WcoxMsWTKE
+	dLYPAFQR3kLKGgcCrWcFroAcdLLAOKbLqrPWCad3V65QbOpVvz9ysB4a0Pu6FYXIl1fYZ0
+	ruigD1aIJUR0Pu31m9IufJpX2o6RaX8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-u8BecNH2NaG6uI5h4Zt1Sg-1; Mon,
+ 17 Mar 2025 07:27:43 -0400
+X-MC-Unique: u8BecNH2NaG6uI5h4Zt1Sg-1
+X-Mimecast-MFC-AGG-ID: u8BecNH2NaG6uI5h4Zt1Sg_1742210862
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4D221956087;
+	Mon, 17 Mar 2025 11:27:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5E9371955BE1;
+	Mon, 17 Mar 2025 11:27:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1bab7ad752df6f2fa953fbf8eed8370e10344ff7.camel@ibm.com>
+References: <1bab7ad752df6f2fa953fbf8eed8370e10344ff7.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-4-dhowells@redhat.com>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
+    "slava@dubeyko.com" <slava@dubeyko.com>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "idryomov@gmail.com" <idryomov@gmail.com>,
+    "jlayton@kernel.org" <jlayton@kernel.org>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 03/35] libceph: Add a new data container type, ceph_databuf
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250315-ptr-as-ptr-v4-0-b2d72c14dc26@gmail.com>
- <20250315-ptr-as-ptr-v4-6-b2d72c14dc26@gmail.com> <D8IFS7175NNQ.3VAP8WA2QC8WF@proton.me>
-In-Reply-To: <D8IFS7175NNQ.3VAP8WA2QC8WF@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 06:53:19 -0400
-X-Gm-Features: AQ5f1JqqKWQmJQtQxcuGwEC9JarpMRPLE1rROZqjJX4KytwdbIBYSIApzB74Pbo
-Message-ID: <CAJ-ks9mXzM6D++vq0QCugaFOS9ES0j7GpeWZqckY0dA3JwpnJw@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] rust: use strict provenance APIs
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2160749.1742210857.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 17 Mar 2025 11:27:37 +0000
+Message-ID: <2160750.1742210857@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, Mar 17, 2025 at 5:34=E2=80=AFAM Benno Lossin <benno.lossin@proton.m=
-e> wrote:
->
-> On Sat Mar 15, 2025 at 1:17 PM CET, Tamir Duberstein wrote:
-> > Throughout the tree, use the strict provenance APIs stabilized in Rust
-> > 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-> > functions at the `kernel` crate root along with polyfills for rustc <
-> > 1.84.0.
-> >
-> > Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
-> > 1.84.0 as our MSRV is 1.78.0.
->
-> This isn't necessary, right?
+Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
 
-It is necessary. MSRV is encoded in .clippy.toml, it doesn't matter
-what the *current* rustc version is.
+> > +struct ceph_databuf {
+> > +	struct bio_vec	*bvec;		/* List of pages */
+> =
 
-> > In the `kernel` crate, enable the strict provenance lints on rustc >=3D
-> > 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
-> > compiler flags that are dependent on the rustc version in use.
->
-> So it won't be enabled in the doctests, right?
+> So, maybe we need to think about folios now?
 
-Yes, that is correct.
+Yeah, I know...  but struct bio_vec has a page pointer and may point to
+non-folio type pages.  This stuff is still undergoing evolution as Willy w=
+orks
+on reducing struct page.
 
-> > Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-pro=
-venance-apis [1]
-> > Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> > Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.me/
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > ---
-> >  init/Kconfig           |  3 +++
-> >  rust/kernel/alloc.rs   |  2 +-
-> >  rust/kernel/devres.rs  |  4 ++--
-> >  rust/kernel/io.rs      | 14 +++++++-------
-> >  rust/kernel/lib.rs     | 52 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  rust/kernel/of.rs      |  2 +-
-> >  rust/kernel/pci.rs     |  4 ++--
-> >  rust/kernel/str.rs     | 16 ++++++----------
-> >  rust/kernel/uaccess.rs | 12 ++++++++----
-> >  9 files changed, 82 insertions(+), 27 deletions(-)
->
->
-> > diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> > index 486715528587..84eb2602e79e 100644
-> > --- a/rust/kernel/lib.rs
-> > +++ b/rust/kernel/lib.rs
-> > @@ -17,6 +17,9 @@
-> >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(coerce_unsiz=
-ed))]
-> >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(dispatch_fro=
-m_dyn))]
-> >  #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(unsize))]
-> > +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, feature(strict_=
-provenance_lints))]
-> > +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, deny(fuzzy_prov=
-enance_casts))]
-> > +#![cfg_attr(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE, deny(lossy_prov=
-enance_casts))]
-> >  #![feature(inline_const)]
-> >  #![feature(lint_reasons)]
-> >  // Stable in Rust 1.83
-> > @@ -25,6 +28,55 @@
-> >  #![feature(const_ptr_write)]
-> >  #![feature(const_refs_to_cell)]
-> >
-> > +#[cfg(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE)]
-> > +#[allow(clippy::incompatible_msrv)]
->
-> Do we still need this allow?
+What I'm pondering is changing struct folio_queue to take a list of { foli=
+o,
+offset, len } rather than using a folio_batch with a simple list of folios=
+.
+It doesn't necessarily help with DIO, though, but there we're given an
+iterator we're required to use.
 
-Yes, explained above.
+One of the things I'd like to look at for ceph as well is using the page f=
+rag
+allocator[*] to get small pieces of memory for stashing protocol data in
+rather than allocating full-page buffers.
 
-> > +mod strict_provenance {
-> > +    #[doc(hidden)]
->
-> Why make them hidden in docs?
+[*] Memory allocated from the page frag allocator can be used with
+MSG_SPLICE_PAGES as its lifetime is controlled by the refcount.  Now, we c=
+ould
+probably have a page frag allocator that uses folios rather than non-folio
+pages for network filesystem use.  That could be of use to afs and cifs al=
+so.
 
-I've added documentation that defers to the standard library.
+As I mentioned, in a previous reply, how to better integrate folioq/bvec i=
+s
+hopefully up for discussion at LSF/MM next week.
 
->
-> > +    pub fn expose_provenance<T>(addr: *const T) -> usize {
-> > +        addr.expose_provenance()
->
-> Instead of having these stubs here, you can probably just do
->
->     pub use core::ptr::expose_provenance;
+> > +static inline void ceph_databuf_append_page(struct ceph_databuf *dbuf=
+,
+> > +					    struct page *page,
+> > +					    unsigned int offset,
+> > +					    unsigned int len)
+> > +{
+> > +	BUG_ON(dbuf->nr_bvec >=3D dbuf->max_bvec);
+> > +	bvec_set_page(&dbuf->bvec[dbuf->nr_bvec++], page, len, offset);
+> > +	dbuf->iter.count +=3D len;
+> > +	dbuf->iter.nr_segs++;
+> =
 
-This doesn't work for the methods on primitives, but it works for the
-free functions. Done.
+> Why do we assign len to dbuf->iter.count but only increment
+> dbuf->iter.nr_segs?
 
+Um, because it doesn't?  It adds len to dbuf->iter.count.
 
-> > +    }
+> >  enum ceph_msg_data_type {
+> >  	CEPH_MSG_DATA_NONE,	/* message contains no data payload */
+> > +	CEPH_MSG_DATA_DATABUF,	/* data source/destination is a data buffer *=
+/
+> >  	CEPH_MSG_DATA_PAGES,	/* data source/destination is a page array */
+> >  	CEPH_MSG_DATA_PAGELIST,	/* data source/destination is a pagelist */
+> =
+
+> So, the final replacement on databuf will be in the future?
+
+The result of each patch has to compile and work, right?  But yes, various=
+ of
+the patches in this series reduce the use of those other data types.  I ha=
+ve
+patches in progress to finally remove PAGES and PAGELIST, but they're not
+quite compiling yet.
+
+> > +	dbuf =3D kzalloc(sizeof(*dbuf), gfp);
+> > +	if (!dbuf)
+> > +		return NULL;
+> =
+
+> I am guessing... Should we return error code here?
+
+The only error this function can return is ENOMEM, so it just returns NULL
+like many other alloc functions.
+
+> > +	} else if (min_bvec) {
+> > +		min_bvec =3D umax(min_bvec, 16);
+> =
+
+> Why 16 here? Maybe, do we need to introduce some well explained constant=
+?
+
+Fair point.
+
+> > +		dbuf->max_bvec =3D min_bvec;
+> =
+
+> Why do we assign min_bvec to max_bvec? I am simply slightly confused why
+> argument of function is named as min_bvec, but finally we are saving min=
+_bvec
+> value into max_bvec.
+
+The 'min_bvec' argument is the minimum number of bvecs that the caller nee=
+ds
+to be allocated.  This may get rounded up to include all of the piece of
+memory we're going to be given by the slab.
+
+'dbuf->max_bvec' is the maximum number of entries that can be used in
+dbuf->bvec[] and is a property of the databuf object.
+
+> > +struct ceph_databuf *ceph_databuf_get(struct ceph_databuf *dbuf)
+> =
+
+> I see the point here. But do we really need to return pointer? Why not s=
+imply:
+> =
+
+> void ceph_databuf_get(struct ceph_databuf *dbuf)
+
+It means I can do:
+
+	foo->databuf =3D ceph_databuf_get(dbuf);
+
+rather than:
+
+	ceph_databuf_get(dbuf);
+	foo->databuf =3D dbuf;
+
+> > +static int ceph_databuf_expand(struct ceph_databuf *dbuf, size_t req_=
+bvec,
+> > +			       gfp_t gfp)
+> > +{
+> > +	struct bio_vec *bvec =3D dbuf->bvec, *old =3D bvec;
+> =
+
+> I think that assigning (*old =3D bvec) looks confusing if we keep it on =
+the same
+> line as bvec declaration and initialization. Why do not declare and not
+> initialize it on the next line?
+> =
+
+> > +	size_t size, max_bvec, off =3D dbuf->iter.bvec - old;
+> =
+
+> I think it's too much declarations on the same line. Why not:
+> =
+
+> size_t size, max_bvec;
+> size_t off =3D dbuf->iter.bvec - old;
+
+A matter of personal preference, I guess.
+
+> > +	bvec =3D dbuf->bvec;
+> > +	while (dbuf->nr_bvec < req_bvec) {
+> > +		struct page *pages[16];
+> =
+
+> Why do we hardcoded 16 here but using some well defined constant?
+
+Because this is only about stack usage.  alloc_pages_bulk() gets an straig=
+ht
+array of page*; we have a bvec[], so we need an intermediate.  Now, I coul=
+d
+actually just overlay the array over the tail of the bvec[] and do a singl=
+e
+bulk allocation since sizeof(struct page*) > sizeof(struct bio_vec).
+
+> And, again, why not folio?
+
+I don't think there's a bulk folio allocator.  Quite possibly there *shoul=
+d*
+be so that readahead can use it - one that allocates different sizes of fo=
+lios
+to fill the space required.
+
+> > +		size_t want =3D min(req_bvec, ARRAY_SIZE(pages)), got;
 > > +
-> > +    #[doc(hidden)]
-> > +    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-> > +        core::ptr::without_provenance_mut(addr)
-> > +    }
-> > +
-> > +    #[doc(hidden)]
-> > +    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-> > +        core::ptr::with_exposed_provenance(addr)
-> > +    }
-> > +
-> > +    #[doc(hidden)]
-> > +    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-> > +        core::ptr::with_exposed_provenance_mut(addr)
-> > +    }
-> > +}
-> > +
-> > +#[cfg(not(CONFIG_RUSTC_HAS_STABLE_STRICT_PROVENANCE))]
-> > +mod strict_provenance {
-> > +    #[doc(hidden)]
->
-> I think we should document these.
+> > +		memset(pages, 0, sizeof(pages));
+> > +		got =3D alloc_pages_bulk(gfp, want, pages);
+> > +		if (!got)
+> > +			return -ENOMEM;
+> > +		for (i =3D 0; i < got; i++)
+> =
 
-Done.
+> Why do we use size_t for i and got? Why not int, for example?
 
->
-> ---
-> Cheers,
-> Benno
->
-> > +    pub fn expose_provenance<T>(addr: *const T) -> usize {
-> > +        addr.cast::<()>() as usize
-> > +    }
-> > +
-> > +    #[doc(hidden)]
-> > +    pub fn without_provenance_mut<T>(addr: usize) -> *mut T {
-> > +        addr as *mut T
-> > +    }
-> > +
-> > +    #[doc(hidden)]
-> > +    pub fn with_exposed_provenance<T>(addr: usize) -> *const T {
-> > +        addr as *const T
-> > +    }
-> > +
-> > +    #[doc(hidden)]
-> > +    pub fn with_exposed_provenance_mut<T>(addr: usize) -> *mut T {
-> > +        addr as *mut T
-> > +    }
-> > +}
-> > +
-> > +pub use strict_provenance::*;
->
+alloc_pages_bulk() doesn't return an int.  Now, one could legitimately arg=
+ue
+that I should use "unsigned long" rather than "size_t", but I wouldn't use=
+ int
+here.  int is smaller and signed.  Granted, it's unlikely we'll be asked >=
+2G
+pages, but if we're going to assign it down to an int, it probably needs t=
+o be
+checked first.
+
+> > +			bvec_set_page(&bvec[dbuf->nr_bvec + i], pages[i],
+> > +				      PAGE_SIZE, 0);
+> > +		dbuf->iter.nr_segs +=3D got;
+> > +		dbuf->nr_bvec +=3D got;
+> =
+
+> If I understood correctly, the ceph_databuf_append_page() uses slightly
+> different logic.
+
+Can you elaborate?
+
+> +	dbuf->iter.count +=3D len;
+> +	dbuf->iter.nr_segs++;
+> =
+
+> But here we assign number of allocated pages to nr_segs. It is slightly
+> confusing. I think I am missing something here.
+
+Um - it's an incremement?
+
+I think part of the problem might be that we're mixing two things within t=
+he
+same container: Partial pages that get kmapped and accessed directly
+(e.g. protocol bits) and pages that get accessed indirectly (e.g. data
+buffers).  Maybe this needs to be made more explicit in the API.
+
+David
+
