@@ -1,49 +1,78 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f226.google.com (mail-il1-f226.google.com [209.85.166.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8981C6FF4
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 21:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC11202C5C
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 21:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742333637; cv=none; b=ql02g3LAMLjwmyn4vA6ZIdUM5EAPUHA3kqQ5ht9enaTtO8jkz5WK4jxo95RiT532GjC/9ViycdJfPcD3sBHNx1+8NJk7p0n1WRwuBwARiex5TLWpXjLqAexkBve498KjhYY597AnEUEpz2+qy5JJUGInGhJ26u7p7+pSS592Fv4=
+	t=1742335123; cv=none; b=PLWl5x0ZKUcEmyKdotMJGqAitR/VLszfCDZjr/QRUWWUH3s6QjCwsHKbRkj7PvfFgdYOBMtExozp62To01HeoIVM1MvJKRL+3INvXBclGX+5xDwwpTk4nnuV6ClJWRfc2v5SKTkJX219NoFz/DCKkEZ2LwHDXFSqbufW5oxfpDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742333637; c=relaxed/simple;
-	bh=yPrACEXC0AHNwx5w8YYzWO946MVzQgap67C/sXvWWB4=;
+	s=arc-20240116; t=1742335123; c=relaxed/simple;
+	bh=FNOlOnKPTmoDLF/ixHDn/TzCbzcrb8utOwuiWY5hpWA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KlXNtMVuc//yvlcd4UTcE4ZnaVBEIE9LP2GD6+53aQOEskRxU8gf6U9pgEEdQ4sELozbpJCpc1L92LoLYDsk9jVkEMEa0TkLxSq5064vRTF8CZmliqAvYkctSzB6Y++DPAHecqbDZKdJh6u4GckUKlnOW6L3mgut5K97Tjcqhx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NeJRFR//; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=vDJRISbVCDDeKFacV2IKXuIuerMyfNSNzy1lbmRHYaIribBhY6eS4uexvaCcM9+LEQWzi5L3jTt1lyjfwQtciI1mhZWKj1YMfvveeIQarwQCd5mk5Iv0KpKiaOJ5IQusSrmfQ9aoJ/2zCnLwxgUifJklflLmUiztziHiqzhxEDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IzC14sa7; arc=none smtp.client-ip=209.85.166.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NeJRFR//"
-Date: Tue, 18 Mar 2025 17:33:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742333624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wJkM1Kqmtkvq+hbyPWsnAEsKOLS1w1MOE/fS1Wi5N8M=;
-	b=NeJRFR//a4kY9xCZ2bo9CgpVfP8jsapNnDqs/dNinrQRzE/MZ+Gcg62QE09oKfxkIe0J/1
-	+v5SAZzdL9va0z1GCTV6ulbyt0uWam0uFuLamPlryujuTlcL99UXENMVMeKELGVXMCGtzf
-	ICeJZKorqnXTDvdSjqN3e9qlvpmUfbs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <y46xnqnnltwz3y6b5rvepn4gqivkksoszn2ktjts4jlkqgmjqq@qoaq2fb5ayu2>
-References: <ad32deb6-daad-4aa8-8366-2013b08e394f@kernel.dk>
- <fy5lq7bxyr64f7oiypo343s57nujafjue2bcl72ovwszbzasxk@k6jhr6asqtmx>
- <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
- <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
- <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
- <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
- <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
- <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
- <Z9kOftZAZgQYYMU6@infradead.org>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IzC14sa7"
+Received: by mail-il1-f226.google.com with SMTP id e9e14a558f8ab-3d44369e87aso374665ab.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1742335120; x=1742939920; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yx3ZT83Sw/P9UkLE21bhz44X65U7VubHeSIX9oQCM98=;
+        b=IzC14sa7wtXAvbvaKXncFgHXF4grPE9eNuCRf//kau1C2tLvNK1lEUv/vJzooy1ZL6
+         GuGX8649emGHDbC2OQOo4R6EcOY5bQ+RRs0/c7oN5JkTqU9umugdzjC4pulfGyGOoUsr
+         QyPMVrcZikp6ylpwD5dOmj5j91sP46t610WzeB6/zuOdrSpz9rVn/F6M5ijKJkyDjYHy
+         APQZ6VKU4xEfAkD98XtxH+DGIoIglSd913PsOWEMSeeaKHe5JfF78qT9SaJ/U1q3T+sO
+         w4V/BTLyy/1pLyFV/bJtJQyLNGpHQUM7QtrGKef1apobhAXCCNAnKfbVLR+9GBbErm3G
+         Rc8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742335120; x=1742939920;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yx3ZT83Sw/P9UkLE21bhz44X65U7VubHeSIX9oQCM98=;
+        b=PXfvdxeAtusYw2Xfnwvqc1LST18DNXv5AfKOhZj3SpRm9bZqUJng9BkPzDalkBqojv
+         l/JNNVfIDX+MWDvkioXfw4X1OqNuJb+qEBYISUFKTLvTO9VWyGtd5amB9FLK01gYq+mM
+         lzmA35t2zVqFSC509Ocs+qHspmsxlWPUxurLcFrZw6oqZ63/LobyMNvijtvJwel6MXUD
+         7PbT3JMSzmgbBKpRT5C1uqQY/O2787kdBMTade6OE3rsLXMxKVFsDqIcC50pHx48OH1P
+         1+3vau2LM2djV/rB8XDVSi6A0ZwSU5SnvVVzQG8mV8dAeJFMYWZb+rwBhG0WS471jvEI
+         Pohg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKq50QNeEQNNmCBgiLvymMvn7k87tRvsrillwYOOEJj5bUe37xGCFPaCeUaMM+ZwJ24bceEloVRWutMQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI2KeMWvEFNksWtSYJJFEAoArm3AfkC9F02pRt2swFf34dF2pi
+	Q9hg8CqtOBOrel7G6uTM7G897fUDd2CsMChgvqeYc3LKArX9KDxlOlR/cCWeQMc4IYxjGBXBd06
+	gJPQudJwsQd/Qrw8qfK/P24x2YPa8j4jI
+X-Gm-Gg: ASbGncse6beXYcJEAqCjxKQnjDDVZ+ttvelMfd1BMOqAS6ZjbSh6DbGglCpV5qJojEQ
+	Rva0kLg7XncruMYOKAqxdXRovNTIcSsrQYrIKIyoFeUonm/9UosRMQ4J9NHIsX+ZAtlqZPFbc3W
+	ozJNi74fis01rezNj3UeO3w7sXxCJ2Q2+kR9zvJPODvYLKDb35o2/cyQscegFjwN5E90sqXu8ii
+	lxeN5XphHiCwsix7DMO60ISrqN66MYwU62Kz5RmmGENjYRZtiIMFwN66psog0oWK1Xedk4pj9Bh
+	u0dDOcIfEXHq2SD4FLNgfSd3hnvdrxTWAAfWd6a/y9SSVGbNGw==
+X-Google-Smtp-Source: AGHT+IECvniETaGhCeEpj9MhYKxcwDE74kf5vAb4l+lxw+2Z9R92wfP9az5nmgsH4mfe0p/fxsSqnM5lsGrw
+X-Received: by 2002:a05:6e02:20c6:b0:3d4:6e3a:4659 with SMTP id e9e14a558f8ab-3d586dae129mr3889215ab.1.1742335120214;
+        Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3d47a68593asm7574825ab.40.2025.03.18.14.58.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id B42A4340338;
+	Tue, 18 Mar 2025 15:58:38 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id A8733E400CB; Tue, 18 Mar 2025 15:58:38 -0600 (MDT)
+Date: Tue, 18 Mar 2025 15:58:38 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] ublk: remove io_cmds list in ublk_queue
+Message-ID: <Z9nsjiynsQ9gRPv7@dev-ushankar.dev.purestorage.com>
+References: <20250318-ublk_io_cmds-v1-1-c1bb74798fef@purestorage.com>
+ <c91dfaf8-d925-4f6d-8ced-06ecb395a360@kernel.dk>
+ <Z9m+3qMBXgqDz399@dev-ushankar.dev.purestorage.com>
+ <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,32 +81,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9kOftZAZgQYYMU6@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk>
 
-On Mon, Mar 17, 2025 at 11:11:10PM -0700, Christoph Hellwig wrote:
-> On Mon, Mar 17, 2025 at 02:21:29PM -0400, Kent Overstreet wrote:
-> > Beyond making sure that retries go to the physical media, there's "retry
-> > level" in the NVME spec which needs to be plumbed, and that one will be
-> > particularly useful in multi device scenarios. (Crank retry level up
-> > or down based on whether we can retry from different devices).
+On Tue, Mar 18, 2025 at 12:48:44PM -0600, Jens Axboe wrote:
+> > though I don't see any examples of drivers using it. Would it be a bad
+> > idea to try and reuse that?
 > 
-> The read recovery level is to reduce the amount or intensity of read
-> retries, not to increase it so that workloads that have multiple sources
-> for data aren't stalled by the sometimes extremely long read recovery.
-> You won't really find much hardware that actually implements it.
-> 
-> As a little background: The read recovery level was added as part of the
-> predictive latency mode and originally tied to the (now heavily deprecated
-> and never implemented in scale) NVM sets.  Yours truly successfully
-> argued that they should not be tied to NVM sets and helped to make them
-> more generic, but the there was basically no uptake of the read recovery
-> level, with or without NVM sets.
+> We can't reuse that one, and it's not for driver use - purely internal.
+> But I _think_ you could easily grab space in the union that has the hash
+> and ipi_list for it. And then you could dump needing this extra data per
+> request.
 
-Well, if it can't be set per IO, that makes it fairly useless.
+Another idea is to union the refcount with end_io_data, since that's
+purely for the driver. But it might be a bit weird to tell drivers that
+they can use either end_io/end_io_data or the refcount but not both...
+not to mention it could be a nice exploit vector if drivers get it
+wrong.
 
-If it _was_ per IO it'd be dead easy to slot into bcachefs, the tracking
-of IO/checksum errors in a replicated/erasure coded extent is
-sophisticated enough to easily accommodate things like this (mainly you
-need to know when submitting - do we have additional retries? and then
-when you get an error, you don't want count it if it was "fast fail").
+Either way, I think this work is follow-on material and shouldn't be
+rolled into this patch.
+
