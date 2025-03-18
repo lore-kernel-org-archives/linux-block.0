@@ -1,64 +1,87 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72C6211A04;
-	Tue, 18 Mar 2025 17:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D49720B807;
+	Tue, 18 Mar 2025 17:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742319750; cv=none; b=F4wWjbGZe8e4GSM1lOq+rfcVFwUwBhjpagTbSUelKSVLcEvR7jwHc1IjNpFCvAlQ/2lySbNb8B6u4h8Xjh9tAfh9jJJFfI0+h5AV6MbeSXmjhT0xHduJyaZf1xUCrSfDvDOmyY9z4e3tEAUTbdZW//AeDMp0VzRifyB9DFjUarw=
+	t=1742320179; cv=none; b=m1X7FVJgoWEruVzoJkyst3nH8fwDC/Ihr7OdSYG5ES6Lxf1XLQmEzcrQrJf8VbHxzjIagKDzzBvms63J4hKdEZHrJjKqNsT8W1W7rzz8YNucLfQLFAcwyXGxPJlsQZJBrP4L1k1m9+Yj12dh8bt+spMG6XGVKsua2731lQ6HyG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742319750; c=relaxed/simple;
-	bh=uBMGCmpRkySXdW0ViKd8ets6zijLHH+Iy6pM2LFlE60=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=OpyEp0ZKL5u9P0tPEiNT/JQ+M07t2+aFAVULvciOwvbQmRmqIjT7Ft4eMn9au5xUqWxF6OQ0xwTupr0N+TrBwNoCbFr2GguZSUAt4UO13PHlVEGUBxC6YE2hcPJDs95i0tyItRU05S3RxvejMWjWLtOafJyT3H334bqTAoQhEDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mRZiuDpZ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1742320179; c=relaxed/simple;
+	bh=IYsa6MGKR7XUOvqEKeGyQAa4P8dV+JrfgleJujHMbJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=elekNDLJ7Fh3/cJS8e+xujpwnySM6a9sZyxWtjuSm/MPid2nWA5fX9vuP3j5Ogx5sRvO4I0zrNLFlcBSIWJpvk/H74Q/lLSVaoyeBKBZ5yxDt9Pj9FHNECoGSeri+A3XaSIy3j/+v9/rA+CI30xknaCrv/LZpsi10y4ZRnnkjdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RV6I4dOB; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mRZiuDpZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=uBMGCmpRkySXdW0ViKd8ets6zijLHH+Iy6pM2LFlE60=; b=mRZiuDpZyZzCwK+JTvOq8v1itd
-	HfHfXN0FptfCauveymqf6IZZT9IzsTFMsyBBdXHbWSoyS3HtjWlQ7khPLDh/9mp25dB0nv/GfcwtD
-	cPPwLnGQwMOBykc4UU6h1GGorQDEWf4aoCnsSndhMry98WWm9gxXVIy0D0aShbLLRGblzx9O0dN3c
-	O2YUPWyBP70kAYu73AoPtgBhUoEHKG70oi+aB2Ii7gbQiIZv0yfJyOcqz8/WNrrGK+uDG5s9jFTzB
-	E1Ixd8GI5DVNry4EDcgHtPkUcXSzJCoZbOGI5e9/8jN1aZT5ukfmjcP4Kc2KCg1Svk1kPz9Hj2K+A
-	6a2m8FOQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tuaxK-00000001lNV-1jy7;
-	Tue, 18 Mar 2025 17:42:22 +0000
-Date: Tue, 18 Mar 2025 17:42:22 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC] State Of The Page 2025
-Message-ID: <Z9mwflUa2uucwFHo@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RV6I4dOB"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZHK9D2pSmzlyw8n;
+	Tue, 18 Mar 2025 17:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1742320174; x=1744912175; bh=IYsa6MGKR7XUOvqEKeGyQAa4
+	P8dV+JrfgleJujHMbJ4=; b=RV6I4dOBT6YQ48WBNQGHZnwn5MtioVsulSxsIG/U
+	fW7xH4A5h57Kr+Y4EGhmhHTewnarNQzqrQ1dBuE3ArwYIipwJYsfqFqJMj75bWgc
+	NpjwAxTPj4bMeui/I20+6tRDh9lLEXhZtYzdRi2FLUBQov0aBui1Gae/zfptRt7Z
+	3xzEdwfJ7trgf564BZNg8FGcqstLxb361xHrnrbhb9mjVEXWgcU+HFo+RjVrk41j
+	er+dUOFIlys1t/TcGg+gTAnmpBbqRB6BCh1EiwfsHUdR/j4PHemrUmnBKdqjAnQF
+	0qnWQvIeqWnmaOFnwh/VH4uQOlesPagoTsxDm71xgyLjiQ==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id iY5CP80lKQ7U; Tue, 18 Mar 2025 17:49:34 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4ZHK930mJnzlyw85;
+	Tue, 18 Mar 2025 17:49:25 +0000 (UTC)
+Message-ID: <18b03fe9-1f57-48ac-92e3-308d27c5d144@acm.org>
+Date: Tue, 18 Mar 2025 10:49:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>
+References: <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
+ <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
+ <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
+ <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
+ <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
+ <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
+ <Z9h25wvi0VQOaGh2@kbusch-mbp.dhcp.thefacebook.com>
+ <ysvt4npanz4qfoxm5cv627cq2ommq6rxpka6pkvl3l2crcatmc@ic7tn5tt7aw4>
+ <Z9iIa770ySTgKgp0@kbusch-mbp.dhcp.thefacebook.com>
+ <566e4f59-4aaa-4d8e-b61f-b27cf79c1201@acm.org>
+ <4mqi7e74ji7j3pzfdhfncz2yz3vvvvb6jivtzry4pmljgygcg5@hd5pv2lddzeq>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4mqi7e74ji7j3pzfdhfncz2yz3vvvvb6jivtzry4pmljgygcg5@hd5pv2lddzeq>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I would like to once again give a "state of the page" talk across
-block, fs & mm.
+On 3/17/25 6:06 PM, Kent Overstreet wrote:
+> What bcachefs is doing is entirely in line with the behaviour the
+> standard states.
 
-As usual, I will give a brief overview of the transition from
-pages to memdescs:
+I do not agree with the above.
 
- - What are we doing and why
- - What subprojects have been completed this year
- - What our goals are for the next year
- - What adjacent projects are also in progress
+Kent, do you plan to attend the LSF/MM/BPF summit next week? I'm
+wondering whether allowing REQ_FUA|REQ_READ would be a good topic
+for that summit.
 
-2024: https://lore.kernel.org/linux-mm/ZaqiPSj1wMrTMdHa@casper.infradead.org/
-2023: https://lore.kernel.org/linux-mm/Y9KtCc+4n5uANB2f@casper.infradead.org/
-
-January 2025 update:
-https://lore.kernel.org/linux-mm/Z37pxbkHPbLYnDKn@casper.infradead.org/
-August 2022 update:
-https://lore.kernel.org/linux-mm/YvV1KTyzZ+Jrtj9x@casper.infradead.org/
+Bart.
