@@ -1,44 +1,43 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C091C36;
-	Tue, 18 Mar 2025 05:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAA81DE3A5
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 05:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742277252; cv=none; b=Ys69FTJbc/H1QJpTcOKZj5ijl9/PA3yvf9cGPnin4SiQKtk+zW3tm07oJhj451HFvUGs+cQaGL9rqJdb8IDmP2UFeQp45WNFmrs3XziJTCi2Ycgot5JepvNJ5mfDXBVAwOrOjtRRRNs340wFLDWLxk4LUCmmVXBifJoUw4XOU8Y=
+	t=1742277370; cv=none; b=Jys54HsIWlyFjDyiPk34woTXQ6ltlReTrK7BVgUbgTgGcAe4HLBuQ7ue2MFb/4hrTadRbxzE5tHYzGqOkRVzgPmFtw8qU/1YWwQvhkF4hzNjXGgXN4lMeTh/cU/RnyZuZvb9Xu70Wu8GDTqRVq7s0kaiSjAMc/ptsaGRc+bMWBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742277252; c=relaxed/simple;
-	bh=HZmM70UzyNNsCSmyWME8Ov95gLfQI08bUvM1i8S/Ayc=;
+	s=arc-20240116; t=1742277370; c=relaxed/simple;
+	bh=VXWwZuEuCOwe8Le4O/bF4WnDNtCdDeZwt1+t6wZx7Kk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpZjkX+Brc6n+82icqySaPgZjiOoAOv9HWrJLDz52IEtnLqnAqTBoQtduwpOi53k9VHYry9tL8DQVaRNoCT+wxJOw5M/u6LdTwN7TnkxezthqojbF0SXjYq+vnjCWVyI2DwbeMEb8Uy/jbQVvsBuNwhlaeTnnTKjq3HlFte6YB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fp+SR/Uw; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsTDvPCExuhmrPwQFEZq6oKCYJe3m0kYBN1kzom6CdeAVizP36g8k95yB82/argonnRlO3n94FnFC1HEvbPg+tNQ9WRM5LpnFaYqycKfkMXinFNgiD6v5NcOHsroOCu0NynQ6M2Z6l/SIw2K2/R1vVn30TdXXsd2XzuP+YQUSPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MreVBbqw; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fp+SR/Uw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MreVBbqw"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zs1eyB2m8bxqxR1fuDPMRDnq5aX98Uzg8ixNEBfOvRY=; b=fp+SR/UwWPNp1oNYVw0IvBHShn
-	A1Gp4sh/5RDiunmYi9JxdX7HqwIlnGHm0eLfZ1TjwSP3+8b47n2QuiUzSnW2gLwLbJmefEwNhjdUO
-	xF2U6XopG5eG1BWIyMZ+fZya6Ot7AI5HIhqOqk9Cb5Aaqnyu8DrDuijRpIew237M5m7oKGyEyQkyo
-	yamTfRNDirgP2ZDH88y7gg9CBLEmUtqvIm1NwV1K6lv9XTGRrwDXRkI4iTtJBhBslmUc0mkhkxdSx
-	XYFAO5yNJwsMniILhCW6OKUN45L/oVB91NxkLMOVYcZB0yWrFItkP4BAVn7L4fQrjP2dX57gwL3wM
-	+oM3kJgw==;
+	bh=L/LbVwqvXLAd7K4Yd8eLiYO/LLQeqOjwv2Ks7hWVBZI=; b=MreVBbqwaSjD2tejRMkWzMV2hE
+	hJtl16KoKDKlDcirz4zyp8S3iyuSR9+rkclmVgFmH6iugzDVfESWA3L6BIocve0ONx5eDNnouGLTu
+	cs/ODus2rWDIY1rF+wLUVbfdLg35kcbbOd7CCrnGnl0PRSXBa40Iw3DWPInKEC3W+DV/eAo93Dj1Y
+	Wr7UcmvjgiXzASllu8p7yPbhYltI4qMq1kpxaUoK2+vbCVNgErywP8IL+PRXYZldXJZu6Ht5hmPDa
+	Sv879OYWE+ubWYzy6rfQ+izyvJAx6YwNBcbnPz3/E9gUhsRgap01w+nz2CPO0fFY5ekcwAufQoSgM
+	ALD31LnA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tuPtu-00000004lVH-47XV;
-	Tue, 18 Mar 2025 05:54:06 +0000
-Date: Mon, 17 Mar 2025 22:54:06 -0700
+	id 1tuPvr-00000004li2-19bJ;
+	Tue, 18 Mar 2025 05:56:07 +0000
+Date: Mon, 17 Mar 2025 22:56:07 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Naohiro Aota <naohiro.aota@wdc.com>, linux-btrfs@vger.kernel.org,
-	axboe@kernel.dk, linux-block@vger.kernel.org, hch@infradead.org
-Subject: Re: [PATCH v2 1/2] block: introduce zone capacity helper
-Message-ID: <Z9kKfpY0E-phdJ5G@infradead.org>
-References: <cover.1742259006.git.naohiro.aota@wdc.com>
- <e0fa06613d4f39f85a64c75e5b4413ccfd725c4b.1742259006.git.naohiro.aota@wdc.com>
- <2a641d02-1d59-4e0b-9dcc-defb64548d1b@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin <jjtan24@m.fudan.edu.cn>
+Subject: Re: [PATCH V2] loop: move vfs_fsync() out of loop_update_dio()
+Message-ID: <Z9kK95VoHmp5k7_B@infradead.org>
+References: <20250318010318.3861682-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,17 +46,75 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2a641d02-1d59-4e0b-9dcc-defb64548d1b@kernel.org>
+In-Reply-To: <20250318010318.3861682-1-ming.lei@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 18, 2025 at 02:14:29PM +0900, Damien Le Moal wrote:
-> @pos is not the start of the zone, so this should be:
+On Tue, Mar 18, 2025 at 09:03:18AM +0800, Ming Lei wrote:
+> If vfs_flush() is called with queue frozen, the queue freeze lock may be
+> connected with FS internal lock, and lockdep warning can be triggered
+> because the queue freeze lock is connected with too many global or
+> sub-system locks.
 > 
->  * disk_zone_capacity - returns the capacity of the zone containing @sect
+> Fix the warning by moving vfs_fsync() out of loop_update_dio():
 > 
-> And rename pos to sect.
+> - vfs_fsync() is only needed when switching to dio
+> 
+> - only loop_change_fd() and loop_configure() may switch from buffered
+> IO to direct IO, so call vfs_fsync() directly here. This way is safe
+> because either loop is in unbound, or new file isn't attached
+> 
+> - for the other two cases of set_status and set_block_size, direct IO
+> can only become off, so no need to call vfs_fsync()
+> 
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Reported-by: Kun Hu <huk23@m.fudan.edu.cn>
+> Reported-by: Jiaji Qin <jjtan24@m.fudan.edu.cn>
+> Closes: https://lore.kernel.org/linux-block/359BC288-B0B1-4815-9F01-3A349B12E816@m.fudan.edu.cn/T/#u
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- update comment(Christoph)
+> 
+>  drivers/block/loop.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 8ca092303794..7ddb3cbc20fe 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -189,18 +189,12 @@ static bool lo_can_use_dio(struct loop_device *lo)
+>   */
+>  static inline void loop_update_dio(struct loop_device *lo)
+>  {
+> -	bool dio_in_use = lo->lo_flags & LO_FLAGS_DIRECT_IO;
+> -
+>  	lockdep_assert_held(&lo->lo_mutex);
+>  	WARN_ON_ONCE(lo->lo_state == Lo_bound &&
+>  		     lo->lo_queue->mq_freeze_depth == 0);
+>  
+>  	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !lo_can_use_dio(lo))
+>  		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+> -
+> -	/* flush dirty pages before starting to issue direct I/O */
+> -	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use)
+> -		vfs_fsync(lo->lo_backing_file, 0);
+>  }
+>  
+>  /**
+> @@ -637,6 +631,9 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+>  	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
+>  		goto out_err;
+>  
+> +	/* may work in dio, so flush page cache before issuing dio */
+> +	vfs_fsync(file, 0);
 
-While we're nitpicking:  sect is a bit weird, the block layer usually
-spells it out as sectors (sect sounds too close to the german word for
-sparkling wine anyway :))
+What does "may work" here mean?  I think you mean something like:
+
+	/*
+	 * We might switch to direct I/O mode for the loop device, write back
+	 * all dirty data the page cache now that so that the individual I/O
+	 * operations don't have to do that.
+	 */
+
+?
 
