@@ -1,78 +1,64 @@
-Received: from mail-il1-f226.google.com (mail-il1-f226.google.com [209.85.166.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC11202C5C
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 21:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF931DF744
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 22:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742335123; cv=none; b=PLWl5x0ZKUcEmyKdotMJGqAitR/VLszfCDZjr/QRUWWUH3s6QjCwsHKbRkj7PvfFgdYOBMtExozp62To01HeoIVM1MvJKRL+3INvXBclGX+5xDwwpTk4nnuV6ClJWRfc2v5SKTkJX219NoFz/DCKkEZ2LwHDXFSqbufW5oxfpDM=
+	t=1742335812; cv=none; b=JR2nmw/pOjC0suxbJicyS1eBgXMZF7yjee7s5/C0kP0F/EGVK6pA0IGBvYKe6aJmMV8SGW0oJAzLRK5SDFC94lF9DfgZ/QTUxmVP78gOmywzb32gJHqTuZqUdLMxf5iTLueDuWda/bd3ktbeDDam0oHe3pPtbkVi0apaIuGTWNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742335123; c=relaxed/simple;
-	bh=FNOlOnKPTmoDLF/ixHDn/TzCbzcrb8utOwuiWY5hpWA=;
+	s=arc-20240116; t=1742335812; c=relaxed/simple;
+	bh=khxj7baollN6tKPpDs535oc7tDAvfa/VkO/Qu/pf/rI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vDJRISbVCDDeKFacV2IKXuIuerMyfNSNzy1lbmRHYaIribBhY6eS4uexvaCcM9+LEQWzi5L3jTt1lyjfwQtciI1mhZWKj1YMfvveeIQarwQCd5mk5Iv0KpKiaOJ5IQusSrmfQ9aoJ/2zCnLwxgUifJklflLmUiztziHiqzhxEDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IzC14sa7; arc=none smtp.client-ip=209.85.166.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WYrm8LoOqDJLMSIYQN/7HHNHk1WdSoxo5teOY1JE1jWj1jhzDUiOBxRui+7umPHc+/2yRhjlp2Zh7jX77Q6jIkSV+Ja5k2myUwQW4JFCRsAJrBNRK1DKVulrpdcT5YVfv5iHl2T8BHpgdPI0v/QZ/g62bGCV+eG2NfDrtvX5qkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A+BwupGS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IzC14sa7"
-Received: by mail-il1-f226.google.com with SMTP id e9e14a558f8ab-3d44369e87aso374665ab.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1742335120; x=1742939920; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yx3ZT83Sw/P9UkLE21bhz44X65U7VubHeSIX9oQCM98=;
-        b=IzC14sa7wtXAvbvaKXncFgHXF4grPE9eNuCRf//kau1C2tLvNK1lEUv/vJzooy1ZL6
-         GuGX8649emGHDbC2OQOo4R6EcOY5bQ+RRs0/c7oN5JkTqU9umugdzjC4pulfGyGOoUsr
-         QyPMVrcZikp6ylpwD5dOmj5j91sP46t610WzeB6/zuOdrSpz9rVn/F6M5ijKJkyDjYHy
-         APQZ6VKU4xEfAkD98XtxH+DGIoIglSd913PsOWEMSeeaKHe5JfF78qT9SaJ/U1q3T+sO
-         w4V/BTLyy/1pLyFV/bJtJQyLNGpHQUM7QtrGKef1apobhAXCCNAnKfbVLR+9GBbErm3G
-         Rc8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742335120; x=1742939920;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yx3ZT83Sw/P9UkLE21bhz44X65U7VubHeSIX9oQCM98=;
-        b=PXfvdxeAtusYw2Xfnwvqc1LST18DNXv5AfKOhZj3SpRm9bZqUJng9BkPzDalkBqojv
-         l/JNNVfIDX+MWDvkioXfw4X1OqNuJb+qEBYISUFKTLvTO9VWyGtd5amB9FLK01gYq+mM
-         lzmA35t2zVqFSC509Ocs+qHspmsxlWPUxurLcFrZw6oqZ63/LobyMNvijtvJwel6MXUD
-         7PbT3JMSzmgbBKpRT5C1uqQY/O2787kdBMTade6OE3rsLXMxKVFsDqIcC50pHx48OH1P
-         1+3vau2LM2djV/rB8XDVSi6A0ZwSU5SnvVVzQG8mV8dAeJFMYWZb+rwBhG0WS471jvEI
-         Pohg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKq50QNeEQNNmCBgiLvymMvn7k87tRvsrillwYOOEJj5bUe37xGCFPaCeUaMM+ZwJ24bceEloVRWutMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI2KeMWvEFNksWtSYJJFEAoArm3AfkC9F02pRt2swFf34dF2pi
-	Q9hg8CqtOBOrel7G6uTM7G897fUDd2CsMChgvqeYc3LKArX9KDxlOlR/cCWeQMc4IYxjGBXBd06
-	gJPQudJwsQd/Qrw8qfK/P24x2YPa8j4jI
-X-Gm-Gg: ASbGncse6beXYcJEAqCjxKQnjDDVZ+ttvelMfd1BMOqAS6ZjbSh6DbGglCpV5qJojEQ
-	Rva0kLg7XncruMYOKAqxdXRovNTIcSsrQYrIKIyoFeUonm/9UosRMQ4J9NHIsX+ZAtlqZPFbc3W
-	ozJNi74fis01rezNj3UeO3w7sXxCJ2Q2+kR9zvJPODvYLKDb35o2/cyQscegFjwN5E90sqXu8ii
-	lxeN5XphHiCwsix7DMO60ISrqN66MYwU62Kz5RmmGENjYRZtiIMFwN66psog0oWK1Xedk4pj9Bh
-	u0dDOcIfEXHq2SD4FLNgfSd3hnvdrxTWAAfWd6a/y9SSVGbNGw==
-X-Google-Smtp-Source: AGHT+IECvniETaGhCeEpj9MhYKxcwDE74kf5vAb4l+lxw+2Z9R92wfP9az5nmgsH4mfe0p/fxsSqnM5lsGrw
-X-Received: by 2002:a05:6e02:20c6:b0:3d4:6e3a:4659 with SMTP id e9e14a558f8ab-3d586dae129mr3889215ab.1.1742335120214;
-        Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3d47a68593asm7574825ab.40.2025.03.18.14.58.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 14:58:40 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id B42A4340338;
-	Tue, 18 Mar 2025 15:58:38 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id A8733E400CB; Tue, 18 Mar 2025 15:58:38 -0600 (MDT)
-Date: Tue, 18 Mar 2025 15:58:38 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] ublk: remove io_cmds list in ublk_queue
-Message-ID: <Z9nsjiynsQ9gRPv7@dev-ushankar.dev.purestorage.com>
-References: <20250318-ublk_io_cmds-v1-1-c1bb74798fef@purestorage.com>
- <c91dfaf8-d925-4f6d-8ced-06ecb395a360@kernel.dk>
- <Z9m+3qMBXgqDz399@dev-ushankar.dev.purestorage.com>
- <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+BwupGS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742335809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rNBBDhtZR+j1rFU2QPO7CjAk6CumeAeXjh8sXEmCw3A=;
+	b=A+BwupGSGuDtERmR9T20PyeiFbbrzIvVYLsGK/gmh7sAOQN6AM1ZtoTXnn7XzcqZH3kEyC
+	N2nJnjvea7FJXGZjTReKjx41wg4pIkJrskNKZ/3Xyr0qE4tgkKo6G4Ye5lV6oXyugmu3Eh
+	Ki0FjB0f0/gycVYn0tXLgVF36ZvSTKE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-237-8_KXTYjuP-m6YybbA2NBUg-1; Tue,
+ 18 Mar 2025 18:10:06 -0400
+X-MC-Unique: 8_KXTYjuP-m6YybbA2NBUg-1
+X-Mimecast-MFC-AGG-ID: 8_KXTYjuP-m6YybbA2NBUg_1742335805
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E001C195608A;
+	Tue, 18 Mar 2025 22:10:04 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DAB9B1800946;
+	Tue, 18 Mar 2025 22:10:03 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52IMA2uF2272791
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 18 Mar 2025 18:10:02 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52IMA16j2272790;
+	Tue, 18 Mar 2025 18:10:01 -0400
+Date: Tue, 18 Mar 2025 18:10:01 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH v2 5/6] dm: fix dm_blk_report_zones
+Message-ID: <Z9nvOcQRrxopHfrF@redhat.com>
+References: <20250317044510.2200856-1-bmarzins@redhat.com>
+ <20250317044510.2200856-6-bmarzins@redhat.com>
+ <20250318065721.GB16259@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,23 +67,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk>
+In-Reply-To: <20250318065721.GB16259@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Mar 18, 2025 at 12:48:44PM -0600, Jens Axboe wrote:
-> > though I don't see any examples of drivers using it. Would it be a bad
-> > idea to try and reuse that?
+On Tue, Mar 18, 2025 at 07:57:21AM +0100, Christoph Hellwig wrote:
+> On Mon, Mar 17, 2025 at 12:45:09AM -0400, Benjamin Marzinski wrote:
+> > __bind(). Otherwise the zone resources could change while accessing
+> > them. Finally, it is possible that md->zone_revalidate_map will change
+> > while calling this function. Only read it once, so that we are always
+> > using the same value. Otherwise we might miss a call to
+> > dm_put_live_table().
 > 
-> We can't reuse that one, and it's not for driver use - purely internal.
-> But I _think_ you could easily grab space in the union that has the hash
-> and ipi_list for it. And then you could dump needing this extra data per
-> request.
+> This checking for calling context is pretty ugly.  Can you just use
+> a separate report zones helper or at least a clearly documented flag for it?
 
-Another idea is to union the refcount with end_io_data, since that's
-purely for the driver. But it might be a bit weird to tell drivers that
-they can use either end_io/end_io_data or the refcount but not both...
-not to mention it could be a nice exploit vector if drivers get it
-wrong.
+Not sure how that would work. The goal is to keep another process,
+calling something like blkdev_report_zones_ioctl(), from being able to
+call its report_zones_cb, while DM is in blk_revalidate_disk_zones()
+which needs to use that same disk->fops->report_zones() interface in
+order to call blk_revalidate_zone_cb(). We need some way to distinguish
+between the callers. We could export blk_revalidate_zone_cb() and have
+dm_blk_report_zones() check if it was called with that report_zones_cb.
+That seems just as ugly to me. But if you like that better, fine.
+Otherwise I don't see how we can distinguish between the call from
+blk_revalidate_disk_zones() and a call from something like
+blkdev_report_zones_ioctl(). Am I not understanding your suggestion?
 
-Either way, I think this work is follow-on material and shouldn't be
-rolled into this patch.
+Allowing the blkdev_report_zones_ioctl() call to go ahead using
+md->zone_revalidate_map runs into three problems.
+
+1. It's running while the device is switching tables, and there's no
+guarantee that DM won't encounter an error and have to fail back. So it
+could report information for this unused table. We could just say that
+this is what you get from trying to grab the zone information of a
+device while it's switching tables. Fine.
+
+2. Without this patch, it's possible that while
+blkdev_report_zones_ioctl() is still running its report_zones_cb, DM
+fails switching tables and frees the new table that's being used by
+blkdev_report_zones_ioctl(), causing use-after-free errors. However,
+this is solvable by calling srcu_read_lock(&md->io_barrier) to make sure
+that we're in a SRCU read section while using md->zone_revalidate_map.
+Making that chage should make DM as safe as any other zoned device,
+which brings me to...
+
+3. On any zoned device, not just DM, what's stopping
+one process from syncing the zone write plug offsets:
+blkdev_report_zones_ioctl() -> blkdev_report_zones() ->
+various.report_zones() -> disk_report_zones_cb() ->
+disk_zone_wplug_sync_wp_offset()
+
+While another process is running into problems while dealing with the
+gendisk's zone configuration changing:
+
+blk_revalidate_disk_zones() -> disk_free_zone_resources()
+
+I don't see any synchronizing between these two call paths. Am I missing
+something that stops this? Can this only happen for DM devices, for some
+reason? If this can't happen, I'm fine with just adding a
+srcu_read_lock() to dm_blk_report_zones() and calling it good.  If it
+can happen, then we should fix that.
+
+-Ben
 
