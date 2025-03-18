@@ -1,97 +1,91 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE99F1E5211;
-	Tue, 18 Mar 2025 08:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB311EF365
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 08:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742285262; cv=none; b=UMOM0soN6edU3wxxBlb4dheqWZutiWlLslzDBBOWIj6T0REzL6s9gGh0z0kf3VGuNdnHDld68G3zx7EUB/vepesIheOCnxbTH4mLrMuN2nil1oWWF2qzvJSSgSdOwnWMzbNUkVwRb0DDZhXDJwqvMddxJoRbKZdiK/zGa5uZLh8=
+	t=1742285425; cv=none; b=ozv9gFs9tpypbmXNcJgGt0aWAma80sq1NOWbL0QfifvMxaqVO2kQiP4Vs9kb2njB42nZdeHS8Aypw2rkRF5qF7m/YFFRGIufQ5458udRCFbbep+I0jadY+QLa7Ac0S+J2CJd6MJg4rQf1L4u/D15OIBmRHADfx2lv1ZuocfcCB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742285262; c=relaxed/simple;
-	bh=yYAaPK4KMHyPbAfvjE/LAXlEj70e+IDL+4J3y7h/2jU=;
+	s=arc-20240116; t=1742285425; c=relaxed/simple;
+	bh=6fRqmHHeqgOGf36TDhqGQ8fGGqn66hJpSEfaUv1FSYQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFNN5kJw/yNCSb/I5WsljnVwNop2dlQB2nbyguWGrbhSVl9fIZ+LS8aZb1pQs/Ml75VgAF59+yAOzy2CFsL1z5UNeN5Tpvlr3H+waj2IjpPSEt7VxNFSvoYRzggEUXIxfCOSW6InRvUk9G8gwgmVsn8bGFjHeJGRNl7L19Mjmro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W0HsmWYy; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=sjttFsgyy3dG1RUFFDlRATFTB4d0QVNlsMi9MI7koGXkcObeLw339II7F9WZ2R0YNFnQaTgA69IFG5UuxRNZTieThQvHS5LxoN0/MhIaXFUZbvIYFWjXQktWBbMQNuAQ7iL0X4jnm41p0ygV9KvC8zUHjgMus7GK9KkPoUpYVB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGyYvD1P; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W0HsmWYy"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=bXD5ixfMQVnQm/9ZG+Sq7VooSDOkIDNBkp5z/JkUoAQ=; b=W0HsmWYyz8wwNEiRdtMR6IZi/7
-	f7ClQg5SWaNaJyvBXabWjbneRD9gya3sBAMvr1DlU6htfwqcfzla6alMl9xGekPIj6islyM7fltQx
-	5iKzKRxo8iKnv9drk5ia+VEWYHOk6ydozei9bl1dgF9EkES+1rueGh/B4M4IFNclg71jpInJfg+WM
-	m4Scda4IF/rO0NBXDYkceJRZg14u+epw13pp598X9GyEKp8s+gFoaupFinbeuv6rU/x74sih+pStr
-	WnKNxOxaxpN6DM/D35SQ5J+wVxl1y2vwQ6EMr64Cz5fqDjtIyi/9IWDYK40dvrjFvOMyfaiMFbsFH
-	3dvSJrIA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tuRz8-000000055vK-0y3G;
-	Tue, 18 Mar 2025 08:07:38 +0000
-Date: Tue, 18 Mar 2025 01:07:38 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: "hch@infradead.org" <hch@infradead.org>, Qu Wenruo <wqu@suse.com>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>
-Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
-Message-ID: <Z9kpyh_8RH5irL96@infradead.org>
-References: <20250130091545.66573-1-joshi.k@samsung.com>
- <20250130142857.GB401886@mit.edu>
- <97f402bc-4029-48d4-bd03-80af5b799d04@samsung.com>
- <b8790a76-fd4e-49b6-bc08-44e5c3bf348a@wdc.com>
- <Z6B2oq_aAaeL9rBE@infradead.org>
- <bb516f19-a6b3-4c6b-89f9-928d46b66e2a@wdc.com>
- <eaec853d-eda6-4ee9-abb6-e2fa32f54f5c@suse.com>
- <cfe11af2-44c5-43a7-9114-72471a615de7@samsung.com>
- <Z6GivxxFWFZhN7jD@infradead.org>
- <edde46e9-403b-4ddf-bd73-abe95446590c@samsung.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGyYvD1P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742285422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gNED/LKIFp+L21kimYG44CVtj1edL5R8VzQcJcnl6QY=;
+	b=YGyYvD1PRNpD8ESVzLefoEoH5TGw4tTiOtSmGSqfylArrVEijd7hcwMckVLjDUR+X2YqFj
+	KnZHplwzKt5AX1HAyK9B00p7DoidZ7MSLlW/24sCNrfeCMvbfQILqPgxz0C9qGdGznU31T
+	HTGjUx0aaljghOw8WLc7EtH2M+6lGWs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-eY56JBbaPRCU9hpGfcVByQ-1; Tue,
+ 18 Mar 2025 04:10:20 -0400
+X-MC-Unique: eY56JBbaPRCU9hpGfcVByQ-1
+X-Mimecast-MFC-AGG-ID: eY56JBbaPRCU9hpGfcVByQ_1742285419
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C863180034D;
+	Tue, 18 Mar 2025 08:10:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.33])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5D371955BE4;
+	Tue, 18 Mar 2025 08:10:14 +0000 (UTC)
+Date: Tue, 18 Mar 2025 16:10:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] block: Make request_queue lockdep splats show up
+ earlier
+Message-ID: <Z9kqYBnvrxBckn-u@fedora>
+References: <20250317171156.2954-1-thomas.hellstrom@linux.intel.com>
+ <Z9jJ401CKYYXys0o@fedora>
+ <fa077596a112c9cae51905cff0987755db2a7934.camel@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <edde46e9-403b-4ddf-bd73-abe95446590c@samsung.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <fa077596a112c9cae51905cff0987755db2a7934.camel@linux.intel.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, Mar 18, 2025 at 12:36:44PM +0530, Kanchan Joshi wrote:
-> Right, I'm not saying that protection is getting better. Just that any 
-> offload is about trusting someone else with the job. We have other 
-> instances like atomic-writes, copy, write-zeroes, write-same etc.
+On Tue, Mar 18, 2025 at 08:56:18AM +0100, Thomas Hellström wrote:
+> On Tue, 2025-03-18 at 09:18 +0800, Ming Lei wrote:
+> > On Mon, Mar 17, 2025 at 06:11:55PM +0100, Thomas Hellström wrote:
 
-So wahst is the use case for it?  What is the "thread" model you are
-trying to protect against (where thread here is borrowed from the
-security world and implies data corruption caught by checksums).
+...
 
 > 
-> > IFF using PRACT is an acceptable level of protection just running
-> > NODATASUM and disabling PI generation/verification in the block
-> > layer using the current sysfs attributes (or an in-kernel interface
-> > for that) to force the driver to set PRACT will do exactly the same
-> > thing.
-> 
-> I had considered but that can't work because:
-> 
-> - the sysfs attributes operate at block-device level for all read or all 
-> write operations. That's not flexible for policies such "do something 
-> for some writes/reads but not for others" which can translate to "do 
-> checksum offload for FS data, but keep things as is for FS meta" or 
-> other combinations.
+> One caveat though. If this is merged, people will probably start seeing
+> the lockdep splat as a regression and bisects will point to this commit
+> demanding the potential deadlock(s) to be fixed.
 
-Well, we can easily do the using a per-I/O flag assuming we have a
-use caÑ•e for it.  But for that we need to find the use case first.
+Don't worry, just keep linux-block@ updated with the report.
 
-So as with so many things (including some of my own), we really need
-to go back to describe the problem we're trying to fix, before
-diving deep down into the implementation.
+> 
+> Is there a line of sight to fix the real deadlock?
+
+The linux-block community has solved many such warnings recently, and your
+patch could expose more, and we will try to address new coming reports as
+before.
+
+
+Thanks,
+Ming
+
