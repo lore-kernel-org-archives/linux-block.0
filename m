@@ -1,113 +1,85 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0130D528;
-	Tue, 18 Mar 2025 00:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53F1126BFA;
+	Tue, 18 Mar 2025 01:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742258528; cv=none; b=qX6ghlp4UZ9MRc3uChxEPMfvJxhvyAo3R1cWu6s37wt+EJh/F6Qzvy6UGL/+Rmio/HNhjMNH5nMlC1mKgNTFMYhSRIn7A93wuxrLzjwz769R9BxlpC64pbRZqERAiHRxNpf1atvJX3DJc7mdCS7VQiJRkwblOxNRbG06A/9FYY8=
+	t=1742259603; cv=none; b=sJHXOVgKrUacaZbNVXpyS+rzlfKaxEHl9WOn74ygnOobjzkfcFmTLh5GyUTDtTT5nX1QlO71XObtcVXTyAz209YMEXc46c4djIZCU5Kv/1Hkpp0Oh0xv9Qm4AARl8zBvWZLPGIQlPZleLjA0Wh++2glkcTeN9BoTSQWyrAgTbJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742258528; c=relaxed/simple;
-	bh=PgzC/F33BYAA53t0eSb8TLPna6imarmpm+vWugeqXCY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dzdwmsK40zrzZvBlTHMQ8tvKvCnGciukIoHtyeAM9KoJOKit5lh0rQXiz14FLJKxOElEK3k183lq+Uy/7uG0YkQCBRW3xwZegBnDAZv0V4u35hp6f0rrdwRL1ta7ByXmikgNdgRa2lQF+V8LhN02MpD3sBzF8d1xZMXpRBqMoNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qw7StJyc; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742259603; c=relaxed/simple;
+	bh=1ADAxFxWLGir6QAMwrO5KOdveLvAY6tD4m43q1TuCDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uhJeEE3Dw5sUV7V9eXIgbEnOXusCzEEgVfKFkFVoPk+YOLRyCG6VkNmPYtUBuuE9qgUYiqALzp546U1MsX5dCkbzoYbRmFmXCzQSpkYWXrKLTUF7mBfuR8bOIwL8k4nEMF5COplF9vYLAx0HV71njY4FWXw+Zf8rBoql40JQcJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=mE6gJ0DL; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qw7StJyc"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30795988ebeso52112181fa.3;
-        Mon, 17 Mar 2025 17:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742258525; x=1742863325; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B7IfKOPhAlS//llZDZ8iu5ShHju61/9HzEhonjMXx+s=;
-        b=Qw7StJycBI7mWjgQpc6ky6N7gIAmD3ev7RIaMuDfW7ioBGCk4pWfFo+tGqnCYIy6Ax
-         Ijh+TWl/48z78hJ6QfsHpPZ9lzWZFTNPqpw5AGGECHVsDwVvPxa7otrcO+8sfh5JWiyP
-         5xSHz9KjTKQNU9ZoZpsGWzpfdbOjhO+O42dV/n/HqKtKB6HmccORC/XHZX2dvmNjU/6v
-         jh6ZZK+t6urhPGu7tq9Sjq+xjwKqXXPpwJ7gdheUyO/WC0ZhLL/x90I8svKkVrnHYsw1
-         HDeCyYCQ0yQf1iFJZwpNGmlERbxzxPRsULqix160gxkrzMxvFffSsM45R6cx+miDy/j0
-         0DAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742258525; x=1742863325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B7IfKOPhAlS//llZDZ8iu5ShHju61/9HzEhonjMXx+s=;
-        b=Qm4e3bQpi4U/4T5QC8EjrqzIEZF4JjiIV4x3XBB+dp6YODxv14NWfubFQdyapFFGEg
-         36AU7+cXeJYpSrpw9kioh9CEo+eplZ0j9E9N8mowKzljr5tyrKBvX8iOmIN9JKHp9GXW
-         djBgRGdbTJSDMUW/LtXp+ZPr+ussc2YvWsiz6G/X3WVuw/qbeUrFsr68JnXrnAVTRzNp
-         Aoi+/HcbAmIsNkh1XwMJoBpLvmcO7mRMifBA1BbqhAsi/oXmVVa1tpYMUyI7TLpn9zJg
-         ARzOWIRjty5uxykf+D2txuWd9o7b6vAi3+7vuF+3mBEc4HEGcQu9WLTeH08rzmrF8sr8
-         fUBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO5KwCEsYD35cZzdIQNEbwZa78SS+Ra/obJt0ERJ+2j9+P8QwCJ3FGQByuXKcrJA+I52nW5kdWzcuLtqMm@vger.kernel.org, AJvYcCVYkMozWUZk1m2CFAfIKdU/Vnp+2InnFolnwHc0QE3+5zDDcVIHjzAnhZx2ZvqHYN+RJu6q69qa1OadYQpAoq0=@vger.kernel.org, AJvYcCVtR64EvI8P7O5FNn8SyHjhjyM4M4YY5zZDAT38VOwj2xMLOXsf9FOiTN8OQJo6sHbpvCj5GRwB76Iuues=@vger.kernel.org, AJvYcCW0lxuQpcVrCWASUtPxhf3fnpkvtKzdn2PJwKNbvD1P5BYJgkKDVGQWzwheZcgpwrCRPSvUoXmjhBPlfPkDIzY8@vger.kernel.org, AJvYcCWATtWO76muUPyfGFgwi+FYoDC/yTDVBan9CZY9AzZOeQDlyn+5ze5eotmbNvkuoIqocCsqvcsV7i7tTRdL@vger.kernel.org, AJvYcCXah9vW6lD6Jp4QqbooTx8HeSNtPHNRDldHHjeuWOJMrGZiAEQa7XFBLasD0ng8uEbxa/iZNTXLTzVl@vger.kernel.org, AJvYcCXo2tst5mLk8G+JHcoiysN9la+s9zLuTiChJq8ldYOKYcUkJjjr1YED4KkVQIM2p0g8pFXP/BP3rE+b@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/3sw9BkEf8Y9pqIRm3jTqAe5mo5WNOKpn22MR671ajjjSsFXO
-	HyafM8WxMdqjh8HArlksxQZkIn0yneZwPEyfOloHNJU9TQZOomm6xcyCc4JCHXp35K+KutIFxq1
-	PfYPbdwtQE1gySoWEgCIalvHHejA=
-X-Gm-Gg: ASbGncsy+cQC59TxL2XQIcvGv2hPBqB8DkaUOFnnreIjGAq5oUcH5JheOtfZZ+eVUeR
-	0inYcDaThjbvsrcJrQqlQjxStCA04qcnchqP478zrj32rmG/G1W/bAGdkSBXL6w5rV9Mf2d6BHZ
-	tuBhBVhhCM38wz9wlLoxpg28M2/wNp3II5lrTcNDeoXkQ5jll6rQUtLSDmI0N+LToDND9Repk=
-X-Google-Smtp-Source: AGHT+IF5vCiDQ8UvKh1Yne26mi3NIgR+bYUhG99rsvoK4CRqZFLHBICrHc5mvPXVOh74lH0hTvVBsz+mo/B6+Mv42Wo=
-X-Received: by 2002:a05:651c:2108:b0:300:5c57:526b with SMTP id
- 38308e7fff4ca-30c4a861dc9mr89186201fa.11.1742258524555; Mon, 17 Mar 2025
- 17:42:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mE6gJ0DL"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1742259601; x=1773795601;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1ADAxFxWLGir6QAMwrO5KOdveLvAY6tD4m43q1TuCDE=;
+  b=mE6gJ0DLcUPF9nzAFtJcyA3Iwzaa7UeM0OTJgB5rM4cl1NyDC6QnVBdz
+   f6jIvtqVMKrFjvWxsy4Gx8ixFhKzQTncT2g79VnLKw3g1Lla7zTRdDUbh
+   ND2ehNKPTgQAbUdzXLpG3FiM89LxDvImXGx5gFJVL89xcZO0K55lA3/5t
+   yNkEqkU009CHhpptPEZ99IZ/t1jTsLHjqYHO17MMeTrabk/B4oJ0PiYvf
+   EHpJ3MHzATrQiOo1RkYGMVwCgJS0hO9j0UAtdtn9G/3hBHG9orRTf0MhY
+   w+1ooFdqriRDIxXiBKdn8N8otRqlsUi++LGlAdMedUoX+VuO5UmjMOIJt
+   w==;
+X-CSE-ConnectionGUID: eGg2E3TUSQK/8WfESCjXaQ==
+X-CSE-MsgGUID: 4w7nP0UWRTOCbW1O0jJz6w==
+X-IronPort-AV: E=Sophos;i="6.14,255,1736784000"; 
+   d="scan'208";a="52645822"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Mar 2025 08:59:55 +0800
+IronPort-SDR: 67d8b7ad_AYefiJ7fwnr3y5Bcg0LGPrHUyVUVjjbj2E4An2hts5Vt18n
+ FgzKs9T60BGqRC4mgtDBLsD6KnexfvMINWqO5mA==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Mar 2025 17:00:45 -0700
+WDCIronportException: Internal
+Received: from 5cg21468mp.ad.shared (HELO naota-xeon..) ([10.224.109.129])
+  by uls-op-cesaip02.wdc.com with ESMTP; 17 Mar 2025 17:59:54 -0700
+From: Naohiro Aota <naohiro.aota@wdc.com>
+To: linux-btrfs@vger.kernel.org
+Cc: dlemoal@kernel.org,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	Naohiro Aota <naohiro.aota@wdc.com>
+Subject: [PATCH v2 0/2] btrfs: zoned: skip reporting zone for new block group
+Date: Tue, 18 Mar 2025 09:59:40 +0900
+Message-ID: <cover.1742259006.git.naohiro.aota@wdc.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67d864b2.0c0a0220.39fb6f.4df4@mx.google.com> <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
- <67d8671d.050a0220.3305ab.6372@mx.google.com> <CAJ-ks9=uHjJrzM0ruvm4v4wr8LygRMP-1orWBy_9OiNNeQr0ow@mail.gmail.com>
- <CAJ-ks9=Qcmvbm=YGJ=jrX_+YdMsftk=FAimszYZB1OUuV4diZw@mail.gmail.com>
- <67d885ff.0c0a0220.111215.5644@mx.google.com> <CAJ-ks9kYB1b4XsQcFb=NScPq+R+13U+Sv-6opi-yp6=ZjuLD_g@mail.gmail.com>
- <67d88a1d.050a0220.2cdacf.4adf@mx.google.com> <CAJ-ks9kg4Br=56HT7T5sWpoMKhRqT_2x+cpQAWoyrEG3qyqQ6Q@mail.gmail.com>
- <67d895cc.050a0220.99d33.5adc@mx.google.com> <67d8ba3e.050a0220.39b3b5.753c@mx.google.com>
-In-Reply-To: <67d8ba3e.050a0220.39b3b5.753c@mx.google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Mar 2025 20:41:28 -0400
-X-Gm-Features: AQ5f1JoEGp_5o1WcOYKQ7KQIGBB5nqYglySnTY7b-xENR_n0SAcUGZzOBrzhgus
-Message-ID: <CAJ-ks9n57P=NnMAAvLr9dnZhs2zT8cvD_gdLkSmnFtSQR4b-Jw@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 17, 2025 at 8:11=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
->
-> diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
-> index 036635fb1621..331ed32adc35 100644
-> --- a/scripts/rustdoc_test_gen.rs
-> +++ b/scripts/rustdoc_test_gen.rs
-> @@ -224,6 +224,8 @@ macro_rules! assert_eq {{
->          BufWriter::new(File::create("rust/doctests_kernel_generated.rs")=
-.unwrap()),
->          r#"//! `kernel` crate documentation tests.
->
-> +#![allow(clippy::incompatible_msrv)]
+Newly created block group should reside on empty zones, whose write pointer
+should always be 0. Also, we can load the zone capacity from the block
+layer. So, we don't need to REPORT_ZONE to load the info.
 
-Ah, this is the reason this works for you (and the one in the kernel
-root). When I said it didn't work, I was referring to not being able
-to convincingly avoid these lints without disabling the check
-altogether. Let's see what Miguel thinks. I agree that the options
-are: extension trait + stubs/reexports + suppressing
-`incompatible_msrv` or just dropping the last patch until MSRV bump.
+The reporting zone on a new block group is not only unnecessary, but also
+can cause a deadlock. When one process do a report zones and another
+process freezes the block device, the report zones side cannot allocate
+a tag because the freeze is already started. This can thus result in new
+block group creation to hang forever, blocking the write path.
+
+v1: https://patch.msgid.link/cover.1741596325.git.naohiro.aota@wdc.com
+
+Naohiro Aota (2):
+  block: introduce zone capacity helper
+  btrfs: zoned: skip reporting zone for new block group
+
+ fs/btrfs/zoned.c       | 18 ++++++++++--
+ include/linux/blkdev.h | 67 ++++++++++++++++++++++++++++--------------
+ 2 files changed, 61 insertions(+), 24 deletions(-)
+
+-- 
+2.49.0
+
