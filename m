@@ -1,206 +1,212 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3221E3DD7
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 07:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742281625; cv=none; b=l4KOO5n8KiIDyaBAGfW/GzawS8UaFyuZMBtgRT6xjVjy5hXRUUo2j8pzVDTT6BNZe97pVqkqQd1irrsLL5183CVAodpTwTVDm9UzW9P2F9Qf00oaC/DRSPrAPVakHDI+7y4Jaxo+E5Pv0e2vPk/C++FyfA51lQR6GRNXFC/vQGs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742281625; c=relaxed/simple;
-	bh=d8PtkrdNtZxYKD2u1cY8BemtU8YT5fQ8WzTd56g0vmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=Al+NRDE/BoVu+Pik81wNNM675Gu9Y+S57MDpPOhDeqmvAU2uEhVF+Oba0aZPNTat7CWF1PwBXDVSbU41oopswRKMyBNhfAj9nc34fHVvihgv3lypggWHwqfd9fzCQ3eWBGHm5hiaWKxK0t1TTo/rL0IC1zh5/TKF7E9USgm7Sbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NDVZQYJK; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454701991A9;
+	Tue, 18 Mar 2025 07:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742282721; cv=fail; b=iS1zxYg9dII3oPxMOmtTM69eiJjIXBpfxqCixyBEcx2+nbIxDcKrnpH9uJlRRvczNkdPCnA5yPl9y6/SMUOZX07pOAVtqFxEBp3F1PDSVgUHrBQcq4zHZnDeCr3MqW9uI5THRyvaFQnaFA9I5xP4cIKpupU/lI26kjMr7XxmX70=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742282721; c=relaxed/simple;
+	bh=Cu9DfPNAmwd93ZFx+6WN+t8qCtrgXtJVpXJKZZEs92Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=b4QnkJ4Lzjjozj4hzh0DDxYnMwvOvaCIP+JahqpDoPvgmYZQwVp5UkwDG34bCELyNMxGGRjcyIa/pEKoxu2Evn1xg/aA7na1EO1zJwhFvMuIhFfRloUZEgsioH7IeUo0sYxfd34bP1r6tlxNG3KJrSAsuKpT6WAi18+MEXl/MBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=L62PuqE1; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=c8SuiHv/; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NDVZQYJK"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250318070653epoutp0311247b5f68e464f3c1b6ce20c8660907~t0_WOqiOj2866128661epoutp03z
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 07:06:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250318070653epoutp0311247b5f68e464f3c1b6ce20c8660907~t0_WOqiOj2866128661epoutp03z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1742281613;
-	bh=4BcyKe56ztD+lnm938/6LqmBi37tVsoiHEhtNJhj4sA=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=NDVZQYJK5vFZn8vMYAWJyNm613DPQhfMBWmKdxUgI0vmEaF3GW/vk+qxdv1xuoYlm
-	 MbYO+X/wOfnlXfpuu0TH2ohk1a3dweYP7AJSjtLGomUPdvcIJBniAFW6cXQIHs55m0
-	 v8253dvfJZWEHAtNr9vZZhBIecVRqDPA0z/V9ugE=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20250318070653epcas5p3beda02f314d748f29f9f6fdbb6d76eff~t0_VkBnTa1730717307epcas5p34;
-	Tue, 18 Mar 2025 07:06:53 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4ZH2vW4CVYz4x9QF; Tue, 18 Mar
-	2025 07:06:47 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	6B.92.19933.78B19D76; Tue, 18 Mar 2025 16:06:47 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250318070647epcas5p2f3e162aa3a172113cbda22326e7bd34e~t0_QALYS90333203332epcas5p2D;
-	Tue, 18 Mar 2025 07:06:47 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250318070647epsmtrp2a497a90be0e121f52a9bd2bb8de63412~t0_P-YHaA2960529605epsmtrp2i;
-	Tue, 18 Mar 2025 07:06:47 +0000 (GMT)
-X-AuditID: b6c32a4a-c1fda70000004ddd-d5-67d91b8716ec
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	EB.72.23488.68B19D76; Tue, 18 Mar 2025 16:06:46 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250318070645epsmtip28678c6c9740b3ed29fd27514977523ad~t0_OdCvfv0823908239epsmtip2U;
-	Tue, 18 Mar 2025 07:06:45 +0000 (GMT)
-Message-ID: <edde46e9-403b-4ddf-bd73-abe95446590c@samsung.com>
-Date: Tue, 18 Mar 2025 12:36:44 +0530
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L62PuqE1";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="c8SuiHv/"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1742282719; x=1773818719;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Cu9DfPNAmwd93ZFx+6WN+t8qCtrgXtJVpXJKZZEs92Y=;
+  b=L62PuqE1BcqwKpRyVXNUqtxNskqizypBvFWNG++i1IN09cHNWVWXDC3r
+   tu+K2w3jeBDgMLGJWR0slB2Zw8ZOlz12Vl9GY+iFO+FKg+Bb5A9OHs0gW
+   P4tH6ebRFe3qRdL+q+c9oj7YlyfMHxOcEds3TiPudFTPmP0sqY9pimlNG
+   FoNc08SnN2ASPx25Ee8UcjAxbGYAZ6zlvvpggpvFsRSIJkDb/X0Z5MuOB
+   ouZEKmRQ/w7A9p5hoZKmW5401FNH1a36E5iMQeTZ9mbz69C4kXbQLxh8J
+   3Z0M1sv0djDCojG6CzxYdmXBUFiXncdWeYVr7J8jjk3qrO8TLjzS8Fj5f
+   g==;
+X-CSE-ConnectionGUID: /0zYsi40SvWizEMK3srHkQ==
+X-CSE-MsgGUID: goK+NRYvSa2yUzIAKSomaQ==
+X-IronPort-AV: E=Sophos;i="6.14,256,1736784000"; 
+   d="scan'208";a="54045281"
+Received: from mail-southcentralusazlp17012011.outbound.protection.outlook.com (HELO SN4PR2101CU001.outbound.protection.outlook.com) ([40.93.14.11])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Mar 2025 15:25:11 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=syjHZ3eUyji/oZoDf4+cIaekNIGk/W5mHTmtGN6Z9BGCo7JFq2i5AvehxV02ig+FJhQ/cUv1BQvWan634qB+OlIsMDxeBYBALrsTgt+4+dVBRjZvnNfbvVxyCU0JKwsAICrKXm2Luy2ZFtHN9PgqZG03tHHtCEYtRXo9Bqd8vI9KdyzWEfdnqZkoyhJnlxLOtfPaGYQctkPz9C+L/BJ8Asfw9ClK2XzILc0ob2RWvRNheeG2HDfuMimdkzwPkE+YrOn4XOtKi4iSaGhE3ArDQq0WDGitkFN5g4Kt6Yes69VfI5su8DOwrwWrDyeLzLm8LtclQDPnmZU5WSm0hGurDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Cu9DfPNAmwd93ZFx+6WN+t8qCtrgXtJVpXJKZZEs92Y=;
+ b=lym8UKSD69l14tViZQmZKrRWkUCptTnaRoOaQw0SNygrxcH/bYODazTj1KJ5nT65a08KKZj2y07RIj7c+VJJISWPVBnn2vEXTsDQ31RGzfpluGHLGXqM2oAOOMcLj/cO6ztbV+1Z6v8b5A1r/uX/wWyPdOxbXCwwHWZtTgJJl18S8KslKAz2fsgBXpdZnP3Vf5pOO/gaHEcTt0s0Opz1iOxIEC2PCI7phFWJ0LilVz//nHK2mJ4+ezn/srr67CV9VjWoCW868FVUkwGIR/g7ppAz3ADHy/ssKslpCFPiu1rHayzTUEmJjpsEej722WugXHpTO7KMnok7kt+IpSUnfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cu9DfPNAmwd93ZFx+6WN+t8qCtrgXtJVpXJKZZEs92Y=;
+ b=c8SuiHv/V0De2+ei6HDerNrAzgpg14GZUKPy/mdhyV6CWwSVMlgY3KzBR1Wg1F90ijIPbBwV4ryA+a0O6t8j8KenyRLnph4U29Ci+3LDgsG2rQB1iqcGLIRntixYQJSVs9CmqzkHB1ZfZ/InCmqvin6gLhLDFK0aFqOg/WouyKY=
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com (2603:10b6:806:e7::18)
+ by CH3PR04MB8873.namprd04.prod.outlook.com (2603:10b6:610:17a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
+ 2025 07:25:10 +0000
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::17f4:5aba:f655:afe9]) by SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::17f4:5aba:f655:afe9%5]) with mapi id 15.20.8534.031; Tue, 18 Mar 2025
+ 07:25:09 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Naohiro Aota <Naohiro.Aota@wdc.com>, "linux-btrfs@vger.kernel.org"
+	<linux-btrfs@vger.kernel.org>
+CC: "dlemoal@kernel.org" <dlemoal@kernel.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hch@infradead.org" <hch@infradead.org>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH v2 2/2] btrfs: zoned: skip reporting zone for new block
+ group
+Thread-Topic: [PATCH v2 2/2] btrfs: zoned: skip reporting zone for new block
+ group
+Thread-Index: AQHbl6Ei/VoeCnPrv0ySWEHcQw1PrrN4fn+A
+Date: Tue, 18 Mar 2025 07:25:09 +0000
+Message-ID: <84a5eab2-eb29-4a40-86d0-18db0547cf93@wdc.com>
+References: <cover.1742259006.git.naohiro.aota@wdc.com>
+ <36a2b5616d275feaae315d0c34ac07481bd77cab.1742259006.git.naohiro.aota@wdc.com>
+In-Reply-To:
+ <36a2b5616d275feaae315d0c34ac07481bd77cab.1742259006.git.naohiro.aota@wdc.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA0PR04MB7418:EE_|CH3PR04MB8873:EE_
+x-ms-office365-filtering-correlation-id: ca903245-643a-4bce-12e8-08dd65ee03cf
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?MmY3V3E5ZlFXRmQ5dDR6c0k3WHA5ck9YTENYdVJIS1FzL243cGhGODNJcFVz?=
+ =?utf-8?B?YnhWYXBqcjR3UEtjUEoyRVRXS2Z6bitHYVF3SmlydlVOcENGdFExeVd4UE5X?=
+ =?utf-8?B?VHBwZXUxTmJlQUlxVDJBTnB0NDF3UjVLdHJ5cm1wSld5WVRiK2I0emJHR1J0?=
+ =?utf-8?B?aWUvRXl6clY1dTJyeFJ1V2krM1VXNnFia0JLcWRib2o5NUJMWDBubHhuUEdG?=
+ =?utf-8?B?b3NDK1N4RGpDSjJqMGNsNlFuZmVwTVhqQXA5YytaVUZKM1hkbTZOcUQ0aHNj?=
+ =?utf-8?B?MG5OSG1lR0VyUnIvbkpZRWRIYll5S3VGdVBmR2tzdkg5NFlvb3FUcmFxSjVm?=
+ =?utf-8?B?dzI3TjI2ZXF0emNrbDRoWWU2VlBCclBDM1poMzV2N0xxc2Y2ckExZDNkTlRx?=
+ =?utf-8?B?eWJYdE9FQ2NwTS9tMGNSdUdZaStPcmtiQXFNV2UvSzVSQjVaTTFYVEFuZldF?=
+ =?utf-8?B?eDRqd1Z4R2VuNitvOWgzT0xyNWpyMWY0c1E4bXRQVlhXQ0Q4NmRKTFZ3Y2tz?=
+ =?utf-8?B?MFB3bHVuQlMwWDI2SEhUenJCSVdndzd3TFllQW9POWV3RDBjWGFNTThnYkxw?=
+ =?utf-8?B?aFQzQXJjd05GMnNjK3lIU1hGNTNaLzkyTnc3TGtDK1BBa1ptWkhSSStHNjdB?=
+ =?utf-8?B?Z2FpTlJuNjMwNndKZlM0RWNWOXR5U29mMHMxTmlmTWhWYng2MjNEaCtIU3pk?=
+ =?utf-8?B?eFFJa2lGT21JVE9JWEJ4M1d4VHhqYnFQT2dWeW0ycFUyWlhZK0ozUytPM2xo?=
+ =?utf-8?B?TEl5WGFHSkZlUWJiTGV2RExOTFpENUsvRTd5cTBaSG9BcHI5V2xUdzNKTTFq?=
+ =?utf-8?B?Ykt3ODdlb0hLUWRGZ05MRmMrSkdSYjhyU0xmb29ueU9nK1F0MWJ6QUUvZUJt?=
+ =?utf-8?B?TjJRQVFZd2xIeFE3aG13UmRLMUg3UWVxb3VKOStOSmxWS2hqcE1aZHliVzVK?=
+ =?utf-8?B?WVdtblhQVVprNy9EbEVVa1RsWXpzelVWakVFdmFiL09FMnAzQ3VwK1liZm1D?=
+ =?utf-8?B?NTliL1V4VmluYytlVld2Rk5nTkNWdE1oNGpEWkMxeSt6b3dRaEovNUJHSW84?=
+ =?utf-8?B?Vk02S0ZVUFJmZjJPU0tTVHMzeURLVnZaUmRFVE9veVI1YlV6aWtYYkp0YkNB?=
+ =?utf-8?B?d0NNSFFmWWd2UUgrcmIvVVErVXpsc2RXWFVtcU9nU2RNUFNuMW1zVVJ1TTFI?=
+ =?utf-8?B?anF4ZSthTHZjTWZnRFZ5V0xDV1M4VnJ3QmJ6TlZYVktadTJHRkhSSjJER01H?=
+ =?utf-8?B?cmxOUnBPbEIyWHN4NTJRS3BzWFk5azhUUFQwT1dZYjRiaWxCb1ZHb3Jtd00v?=
+ =?utf-8?B?OXpxa2FQRG9lZXkvbWU2a2dsNGxWRW1nckE3cXpqa1NDb3JQTFJ6VGhXQndP?=
+ =?utf-8?B?QzVKaS90NTJlSmlQdTNKZnNueHdXZnJ6NE1UTWtLM2xEU3I5ZFRxYkJYemVr?=
+ =?utf-8?B?MVhpUGF6Q0t1TzNZOHJSeHF4OUprS3M5L1BiWC9lekVudCs2U3JPZDBFL09n?=
+ =?utf-8?B?VnNtQldwdGNGbjJ0TG8rNC9hU1ZWb1pKNG9KVzlKSk50TG5qaENPRzVwTFBV?=
+ =?utf-8?B?T25mYjhvNEZlQXFFWVA4TmRVbWtuQzYzRmU2Y1pxV2YrQU1nUlRHKzFUTHpR?=
+ =?utf-8?B?aVFHM0ZPVVdacFBuN2dGeTZQUSs4bkNWT1VicDE1U0hFK0RtMjh3N1BtQk9B?=
+ =?utf-8?B?b2VvN1c3M0orKzdnNW9LdEIwSjRINCs5WjdHcG8vTHlieVRDQmpSa0o3aUdU?=
+ =?utf-8?B?N2w3Y2NnYjdFUmZqZGFHQXVHZUdndTNPUTkwd01MNFk4TFFlbVpWczlPRWxD?=
+ =?utf-8?B?YUY4MC95aHpGM21kQlNlMnp3eDllZ3RucVBORHdGQWJRbWMwWkZyWlF6RUVC?=
+ =?utf-8?B?L1V6Zno3b1VvMzIyMmRSOHJDVUl2aHJiM28wTTdETHdnMzVUMHJoOHNyS0Iy?=
+ =?utf-8?Q?vuncxBXU2TGc7t1eusA/5iLmxhmWzTnx?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR04MB7418.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?cVRGLy9FMk1hY3NSdm1aK0VTT0JCYk16WkxrU0RmWnJmYmg4bS8vSVowMVJI?=
+ =?utf-8?B?bHgwanVBNjNWbWg0czJUMmYrSGtKNUpPcFFQR2pYSjlCY3NKUURWODlSR1FS?=
+ =?utf-8?B?N2drOGZIQ0M1Wi9wczZvVmwxWFBrRjZMWkhNWWM2d3dHR1IvdkFlSFIwRkNO?=
+ =?utf-8?B?SEVFd1VvZWFhMDA4TERja3V0UmxEdVFEQk0yR0hOL1VtNU1qL1hUN01YUHhF?=
+ =?utf-8?B?UzdkL2l5NXdLeTUvb2NaUzV5ZVp4aEV5Zm9iM0tQWTAwNXB1TTFBTEYzWGMv?=
+ =?utf-8?B?SkVUdmprUGt2eGp6YkkzeFZyNlgxUXVadEI4NjBKNmQ3Z2IweFV1NVVsUHVJ?=
+ =?utf-8?B?N3hucWxSUkkwZVk3ODk3U21lZTNBUUQxY3Avb2pHS1J5YXlScHRtaTNOZ2Rw?=
+ =?utf-8?B?eDI3UzJrSGMxeC9zSHcxblRJRXNMbkczaEticElYL0IxNnU2bnNpUzJib0th?=
+ =?utf-8?B?U1VFbjlCRXRLQS9VQlVYYm9BcTB5ejVkYWJkV3FINkJWSW1WZVpWWHhxQmov?=
+ =?utf-8?B?dWJzb2VMdzZWYUdFKzBLTlJlVklBaFhuaFU0anFuWi8rdUNLekVQUHdKWSt6?=
+ =?utf-8?B?aWJNM2doV1RpOGVHVWM1cWtweHVtdlkxOVVmbFlEQm9TQ3RnS0lmNy9JYzRO?=
+ =?utf-8?B?UGZzcVR4RFEwU2ZNMHlyMGJHZFV2UVlBWERVT0tPVVpEbG1USXJ4NGE0QUNE?=
+ =?utf-8?B?ZkZGZ0VtRjF3NDJEeTdYNnJnem04Nmxxcm1SZndxcjdlSmNDZ3N0ckhtcDl3?=
+ =?utf-8?B?dUFVc0FJR29VQU55azNzVndFZHkvMVZXa1lVSC9mV0NIczJCd0dmMnRqemJm?=
+ =?utf-8?B?NEhsTEhEcXJhSUMvbWNkeWFjdDZFM3Vxcnc1OU9SeHpxWUlNM005TDJFT1FT?=
+ =?utf-8?B?b1ZxVDY3OXFydXJHVm1CTlVGRXVBOGh0ZnNDWWxtRVE0a1g3c0lPeFpwUjM0?=
+ =?utf-8?B?YWpmNkhrU3NrTFlVWXZ6TmFVSXA1L290ZitPdExhSDFnUlgxL1JVTGhLRVlz?=
+ =?utf-8?B?QkJ1TllhckxnZzFVTTd2czNDc1NpUm1Tc2FVbjFQaEEvbE5UUkZFeHI2K1pz?=
+ =?utf-8?B?U2VKbXppbEpOVHRuZzJWN0liMEg4YmRvSWU2aFZpNTJtbGZmN2hNVUxIUDll?=
+ =?utf-8?B?OC9NcWRoSWsvUVd1T0VsSUFhWSt5d2xIYUZ4bThiNWRwQzluWEcrSmtjcVI0?=
+ =?utf-8?B?RTdocGRqR0h2ZHBwYzJaRmR5bnBYOE91dEVzU2tuL3pRMWJmSjBzQzlaWkRK?=
+ =?utf-8?B?Ynd5ZHRBcmI3TmhUZHhjemt4NTA5dnVHTWQ3Z3NORVIxSGZyQTFQQVdJV3V4?=
+ =?utf-8?B?ZWZJaTBmQ2wyRmMyakEyNzFVSzMwVjFXTitKcS9oL05lWEFTTEI4eFdjRHE4?=
+ =?utf-8?B?LzlNVlFVU1plM01NQ1kvS0dnUjhhNWorOGRHZEpWdFU0MFU0NFkycDdWeW9z?=
+ =?utf-8?B?bXZOSTkxL2s1SnVrTVc1d3hsSXhZZ3lmY3ZSS1BSSVZNTXVGWTZpR1FiOFU2?=
+ =?utf-8?B?MXRGb2Y3Z2VPTWNhODhXRjlsU3ExdUczVkhjWTNIZVFlTncyLzJiZEEzdDJo?=
+ =?utf-8?B?d0pEQ2pFMTBSYkI3bWhNMVdJNFhvYnJxVnlmUmJXVXlncklaK1plMmIwWWFT?=
+ =?utf-8?B?T0EyTnJ4NnFqeWc4VUpZeFlkY2NSTXFhckJGZEhPUzFUYVhQbXkyWjY5eXRv?=
+ =?utf-8?B?di8xUFM4R1ZpZ1h6cFc4TklRQTZjaDJNNUE4eHArU3dlV0s0OFJSU1BDV09D?=
+ =?utf-8?B?MkxCZ3QrdkpwQTFWQk5OdFV1WHdFTVpTSW9mRlE2b2RXalJ1YkFCZlEwSHNa?=
+ =?utf-8?B?RkZscCtiSzBpUW92TVZxSkVUV2E4VjQzcWVac0xkcjBnLy93S1ErTzZnbERN?=
+ =?utf-8?B?Rnh3L3hyRTZyUUZjaXNNWkRuYjhDRXdaMUFGZGhkNkRkTlVqRUlocU9TV1Av?=
+ =?utf-8?B?Ym0wbCtXNENXY3VKNEdHNDRXRkpCUzA3YmF2OVVURkxRR0NXenNWaStLbERa?=
+ =?utf-8?B?N1BSK21SbHMzZmRCbEk4eFZHcFNwcXlRUmcrSUdwakY4dmVEajZtL0g3a0VU?=
+ =?utf-8?B?bVdORktyVzFVMytHUjJaNks3aDhvOVBTemtoc2hwVitMYlBoY2ZPZXdWYWQ2?=
+ =?utf-8?B?dEQ3MU1hM2didmNGTkRWL1c2dU5ZdERmYVVLeksxSnZ1dDVONmFZeW13eitv?=
+ =?utf-8?B?NHc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <57042107C1425E4ABD5E39F04F2F2178@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
-To: "hch@infradead.org" <hch@infradead.org>
-Cc: Qu Wenruo <wqu@suse.com>, Johannes Thumshirn
-	<Johannes.Thumshirn@wdc.com>, Theodore Ts'o <tytso@mit.edu>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <Z6GivxxFWFZhN7jD@infradead.org>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCJsWRmVeSWpSXmKPExsWy7bCmpm679M10g55WGYvTExYxWfztusdk
-	8eehocXeW9oWlx6vYLfYs/cki8X8ZU/ZLfa93sts0drzk91izbqP7A5cHptXaHlsXlLvMfnG
-	ckaPpjNHmT3Wb7nK4jFh80ZWj8+b5DzaD3QzBXBEZdtkpCampBYppOYl56dk5qXbKnkHxzvH
-	m5oZGOoaWlqYKynkJeam2iq5+AToumXmAB2opFCWmFMKFApILC5W0rezKcovLUlVyMgvLrFV
-	Si1IySkwKdArTswtLs1L18tLLbEyNDAwMgUqTMjO6Gn7zVTwV7ri+OUX7A2MV0W7GDk5JARM
-	JBo6brB2MXJxCAnsZpT4cncfM4TziVFi+bSXUJlvjBJtk/YydjFygLVMeagBEd/LKDH7wzkm
-	COcto8TjvmcsIHN5Bewk/i/7wAhiswioSmxvXQUVF5Q4OfMJmC0qIC9x/9YMdhBbWMBGonvX
-	ITaQBSIC2hKLH9eBzGQW+MAs0fZsMxNIDbOAuMStJ/OZQGrYBDQlLkwuBQlzCuhK7P/9jQWi
-	RF5i+9s5YB9ICGzhkHjd+5EF4k8XiQ13LrFC2MISr45vYYewpSQ+v9vLBmFnSzx49ACqvkZi
-	x+Y+qHp7iYY/oDDiAFqgKbF+lz7ELj6J3t9PmCBhwivR0SYEUa0ocW/SU6hOcYmHM5ZA2R4S
-	l1ZthgbVF2aJh3va2CYwKsxCCpVZSL6cheSdWQibFzCyrGKUTC0ozk1PLTYtMMpLLYfHd3J+
-	7iZGcPLV8trB+PDBB71DjEwcjIcYJTiYlUR43Z9cTxfiTUmsrEotyo8vKs1JLT7EaAqMnonM
-	UqLJ+cD0n1cSb2hiaWBiZmZmYmlsZqgkztu8syVdSCA9sSQ1OzW1ILUIpo+Jg1OqgWmV4JeV
-	KTMjWMQMWGt/W64Vk5RRnr7gsp3JLc27RTVzBaZcnPHjxYS5ax6wFWgdOS7pWpEx9xB78MMf
-	kxSNLqh52nlwFJmXNb59/N1k1gKHKxs9c4V3LzZlr9z/fF1XcCezunKv8yyPX3zi/+aICN0r
-	1phVE/vP3apgTd3GUuXADJGwmNf5R6x4X8oIXJ94YOfjZonwzUKK5d6R1Rt1mDcv3hgTsz7I
-	8/l/O6nFSw/c54mf8sHMKkfi9gMmFlP7yco75Oc/3nvQre6lc6ivTX/R369dBfLPQxk27r71
-	88y2yYfF/Kd5q/83VP92jsXGZW+Z8E3jwFiJzBWvg0926F0M7OBLcZ/rNWH1l+iO20osxRmJ
-	hlrMRcWJADEFMl1HBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAIsWRmVeSWpSXmKPExsWy7bCSvG6b9M10g/3t1hanJyxisvjbdY/J
-	4s9DQ4u9t7QtLj1ewW6xZ+9JFov5y56yW+x7vZfZorXnJ7vFmnUf2R24PDav0PLYvKTeY/KN
-	5YweTWeOMnus33KVxWPC5o2sHp83yXm0H+hmCuCI4rJJSc3JLEst0rdL4MroafvNVPBXuuL4
-	5RfsDYxXRbsYOTgkBEwkpjzU6GLk4hAS2M0osezIOeYuRk6guLhE87Uf7BC2sMTKf8/ZIYpe
-	M0r0LP3MBpLgFbCT+L/sAyOIzSKgKrG9dRULRFxQ4uTMJ2C2qIC8xP1bM8AGCQvYSHTvOsQG
-	slhEQFti8eM6kJnMAh+YJZZufcEMseALs8ScmefAhjIDXXHryXwmkAY2AU2JC5NLQcKcAroS
-	+39/Y4EoMZPo2toFVS4vsf3tHOYJjEKzkJwxC8mkWUhaZiFpWcDIsopRMrWgODc9N9mwwDAv
-	tVyvODG3uDQvXS85P3cTIzjStDR2ML771qR/iJGJg/EQowQHs5IIr/uT6+lCvCmJlVWpRfnx
-	RaU5qcWHGKU5WJTEeVcaRqQLCaQnlqRmp6YWpBbBZJk4OKUamHT9LD177vsv3/vcSKtmAfO3
-	x/vnfH1nse8MT75kmJK6tJCIt0qFKoO4fso5zumKmd+Zcj/1abr/vPYmInSpfstqPsk+77XL
-	VpXmydb6PwpfZ96xwt7yUNqHXS6xbH/XvcqaUq+dFVjD1CJ6kuPR+wWzHOYZc4TEKllZRnys
-	OTvTseRaVuXsHX3JfLZH2wQe81X7hZxawPwod5KX0c+A5eWNnC/Zt3ycyXR57b3jZz9cubHc
-	wD+dNe6PWqa9B9/5q/vWnnxQuqpv2xSbm/PC2lj6piyK6BefK/7+7R9ZvUitq/XGH4+82DZX
-	VW/GlQJd4bVqxVttdf681bCZvEf0Sh3LtCdpr3aVvrp9TFLCRYmlOCPRUIu5qDgRAE9nlqMj
-	AwAA
-X-CMS-MailID: 20250318070647epcas5p2f3e162aa3a172113cbda22326e7bd34e
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824
-References: <CGME20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824@epcas5p1.samsung.com>
-	<20250130091545.66573-1-joshi.k@samsung.com>
-	<20250130142857.GB401886@mit.edu>
-	<97f402bc-4029-48d4-bd03-80af5b799d04@samsung.com>
-	<b8790a76-fd4e-49b6-bc08-44e5c3bf348a@wdc.com>
-	<Z6B2oq_aAaeL9rBE@infradead.org>
-	<bb516f19-a6b3-4c6b-89f9-928d46b66e2a@wdc.com>
-	<eaec853d-eda6-4ee9-abb6-e2fa32f54f5c@suse.com>
-	<cfe11af2-44c5-43a7-9114-72471a615de7@samsung.com>
-	<Z6GivxxFWFZhN7jD@infradead.org>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	fMQE0M2Ou7R1PV1v0gT6FBELPGp/8LvnG3F8DtzJHHpOvzJVcNcWCyXyRgPNo1DBzzZiw87nd1nwQTO7WQdEyAuUguIAnr/r0kLL+teYPNdJCZaPwlJvSji6ZSi5uL3K5o1WK9xYMOL4gOIoBWLJv3roNjUNWhuQ6njw2d9v3vLaOtn2sn4Mgs+cV2J8MOvm9ccUG3hfKx13qEw/eP1ifSAnWcCGh3yt0J26wZBPKebnoHeb2stKHL/2rNK4IJFSnJ+tnxBZwXk3bSkuqI2Q0cNZOz6q6tUY1pnby1YB1XvhoqY0ywUKLf2REMjosXeNGlmsW9iFDknvIbjysVjwruwuXjIVM2sOym9w/3KXEbh+L7fZ9Ylc+71i6N4bKF48ER+z4oLP+dLxyGIfDiWdcU1eEz/thTDMh5nYuEMxgsTJqqEnUxOXFovl3SuRAwXGHe49l8T8qw+Ky0fdR58V5kRGhQdyWOUhTGi+AjrfzIghpxgVB4RIDOoLlp7cwcH24DvhtWOlpebxrKSpvpzqQiLz6E8lMjaWeJIQg0IGzV3Dxa5WZOEkSRQJxl6jjiPZRrfinkaYTwXMK9XgWFGseNZOFbkWaJOFhGLpgllxoFKymQAXUwuR1adOfOWkmvae
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR04MB7418.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca903245-643a-4bce-12e8-08dd65ee03cf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2025 07:25:09.6883
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wJeBNfyAi28OkCSNKG3RHvUa2WQPYG9RTZkSnoNkUojVrK5TJj+RlyZ65M9c35vBsM/0JXkLFcWd2UTuP5JhsJMARWilBfu6k5yWSKvM+sQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR04MB8873
 
-On 2/4/2025 10:46 AM, hch@infradead.org wrote:
-> On Mon, Feb 03, 2025 at 06:57:13PM +0530, Kanchan Joshi wrote:
->> But, patches do exactly that i.e., hardware cusm support. And posted
->> numbers [*] are also when hardware is checksumming the data blocks.
-> 
-> I'm still not sure why you think the series implements hardware
-> csum support.
-
-Series ensure that (a) that host does not compute the csum, and (b) 
-device computes.
-Not sure if you were doubting the HW instead, but I checked that part 
-with user-space nvme-passthrough program which
-- [During write] does not send checksum and sets PRACT as 1.
-- [During read] sends metadata buffer and keeps PRACT as 0.
-It reads the correct data checksum which host never computed (but device 
-did at the time of write).
-
-> The buf mode is just a duplicate implementation of the block layer
-> automatic PI.  The no buf means PRACT which let's the device auto
-> generate and strip PI.
-
-Regardless of buf or no buf, it applies PRACT and only device computes 
-the checksum. The two modes are taking shape only because of the way 
-PRACT works for two different device configurations
-
-#1: when meta-size == pi-size, we don't need to send meta-buffer.
-#2: when meta-size > pi-size, we need to.
-
-Automatic PI helps for #2 as split handling of meta-buffer comes free if 
-I/O is split. But overall, this is also about abstracting PRACT details 
-so that each filesystem does not have to bother.
-And changes to keep this abstracted in Auto-PI/NVMe are not much:
-
-  block/bio-integrity.c     | 42 ++++++++++++++++++++++++++++++++++++++-
-  block/t10-pi.c            |  7 +++++++
-  drivers/nvme/host/core.c  | 24 ++++++++++++++++++++++
-  drivers/nvme/host/nvme.h  |  1 +
-
->  Especially the latter one (which is the
-> one that was benchmarked) literally provides no additional protection
-> over what the device would already do.  It's the "trust me, bro" of
-> data integrity :)  Which to be fair will work pretty well as devices
-> that support PI are the creme de la creme of storage devices and
-> will have very good internal data protection internally.  But the
-> point of data checksums is to not trust the storage device and
-> not trust layers between the checksum generation and the storage
-> device.
-
-Right, I'm not saying that protection is getting better. Just that any 
-offload is about trusting someone else with the job. We have other 
-instances like atomic-writes, copy, write-zeroes, write-same etc.
-
-> IFF using PRACT is an acceptable level of protection just running
-> NODATASUM and disabling PI generation/verification in the block
-> layer using the current sysfs attributes (or an in-kernel interface
-> for that) to force the driver to set PRACT will do exactly the same
-> thing.
-
-I had considered but that can't work because:
-
-- the sysfs attributes operate at block-device level for all read or all 
-write operations. That's not flexible for policies such "do something 
-for some writes/reads but not for others" which can translate to "do 
-checksum offload for FS data, but keep things as is for FS meta" or 
-other combinations.
-
-- If the I/O goes down to driver with , driver will start failing 
-(rather than setting PRACT) if the configuration is "meta-size > 
-pi-size". This part in nvme_setup_rw:
-
-                 if (!blk_integrity_rq(req)) {
-                         if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
-                                 return BLK_STS_NOTSUPP;
-                         control |= NVME_RW_PRINFO_PRACT;
-                 }
-
+T24gMTguMDMuMjUgMDI6MDAsIE5hb2hpcm8gQW90YSB3cm90ZToNCj4gVGhlcmUgaXMgYSBwb3Rl
+bnRpYWwgZGVhZGxvY2sgaWYgd2UgZG8gcmVwb3J0IHpvbmVzIGluIGFuIElPIGNvbnRleHQsIGRl
+dGFpbGVkDQo+IGluIGJlbG93IGxvY2tkZXAgcmVwb3J0LiBXaGVuIG9uZSBwcm9jZXNzIGRvIGEg
+cmVwb3J0IHpvbmVzIGFuZCBhbm90aGVyIHByb2Nlc3MNCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgZG9lcyBeDQo+IGZyZWV6ZXMgdGhlIGJsb2NrIGRldmljZSwgdGhl
+IHJlcG9ydCB6b25lcyBzaWRlIGNhbm5vdCBhbGxvY2F0ZSBhIHRhZyBiZWNhdXNlDQo+IHRoZSBm
+cmVlemUgaXMgYWxyZWFkeSBzdGFydGVkLiBUaGlzIGNhbiB0aHVzIHJlc3VsdCBpbiBuZXcgYmxv
+Y2sgZ3JvdXAgY3JlYXRpb24NCj4gdG8gaGFuZyBmb3JldmVyLCBibG9ja2luZyB0aGUgd3JpdGUg
+cGF0aC4NCj4gDQoNCg0KDQo+ICAgIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc2
+LzB4N2UNCj4gICBSSVA6IDAwMzM6MHg3ZjQzNjcxMmI2OGINCj4gICBDb2RlOiA3MyAwMSBjMyA0
+OCA4YiAwZCA4ZCBhNyAwYyAwMCBmNyBkOCA2NCA4OSAwMSA0OCA4MyBjOCBmZiBjMyA2NiAyZSAw
+ZiAxZiA4NCAwMCAwMCAwMCAwMCAwMCA5MCBmMyAwZiAxZSBmYSBiOCBiMCAwMCAwMCAwMCAwZiAw
+NSA8NDg+IDNkIDAxIGYwIGZmIGZmIDczIDAxIGMzIDQ4IDhiIDBkIDVkIGE3IDBjIDAwIGY3IGQ4
+IDY0IDg5IDAxIDQ4DQoNClRoZSBjb2RlIGxpbmUgaXNuJ3QgcmVhbGx5IG5lY2Vzc2FyeSBmb3Ig
+dGhlIGJ1ZyByZXBvcnQgYW5kIG92ZXJseSBsb25nLCANCnNvIEkgdGhpbmsgeW91IGNhbiBqdXN0
+IGRlbGV0ZSBpdC4NCk90aGVyIHRoYW4gdGhhdCwNCg0KUmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRo
+dW1zaGlybiA8am9oYW5uZXMudGh1bXNoaXJuQHdkYy5jb20+DQo=
