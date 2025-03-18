@@ -1,152 +1,111 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C1920DD5C;
-	Tue, 18 Mar 2025 14:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C7120AF7C
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 14:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742306958; cv=none; b=QIaLGfggaD/iwpJOB5I0/hwtyi6/08d5ewoSxMCNbkInOYZIVB3+A3AQsbvSleas1B3Ga8/JfkWh5J/mreW/nflxOFtN779klEI5UYk5KSWKXN5toAtwlMa9RXp3zycrOk2QvGmgdr9GbVRz2vv4vI1B8fYbX0xFOeYkIn5B2wQ=
+	t=1742307983; cv=none; b=XY3d+NAf5JO/cDtFDR4PhBZQAcoN4p/VKiiLFHJGkb5zLhMI6ri9nZOIk/rwTfGp+dJ6oo4F0K8x9Aajgg2fU29cE0YnmY/OOOS6uICq1rIXB1D4ri8W1WCItF4jJXZucGSaxDlLMgBMjhzo3UaBpOa0RHT4o2dB2JAbcsUvbTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742306958; c=relaxed/simple;
-	bh=FPLOeGmswPNA6gj/GxUZMLB4rXeT/EXYqMBZlMgddeM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SabyosLE6mcybPemIlFbzzW8sT3rFILodadHfqlOnktcTVawSlcR7Zg6Wvm5o5DiEWIiSrZAt+dTtAUgUzVVj+kp7SNzMPVCX1k82v277DsWFhi/4uTs0m13u0Rw8FhF377wsS2djYhxzphvY0kmtwMl/0fMLZjhEymXsZn/4/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NsXGJRTZ; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742307983; c=relaxed/simple;
+	bh=OosZcgJIKzG1WoaoxuMYkBhQpSNSLo+s8stp5KAGHJQ=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=tOwnHs1tfw8hQKqPAQVzCmXk/a9TKK7b+rpjx9l4KY6TdJpApmu7nmdgQGIpNz+7oN3fLERAPqtrci3vb3kM4YTRAg/h6VLvoMqsOMEg7tKwz9rfjE+9wlE8PMdP1UvhrfppGcCWFARVpxqmw7DXV49mGz+nIjUyTfaNTADu/Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UGJqKU7G; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NsXGJRTZ"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30beedb99c9so51477071fa.3;
-        Tue, 18 Mar 2025 07:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742306954; x=1742911754; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XR3QmdTlX82CLNbiCjBnydKIXsFQoeJ3c+u1awJ7NeY=;
-        b=NsXGJRTZGEg2AC/EzaTj9CA8WlTV1eDmbGE4dObHLPTKxcLmR7NAcy8pzuW2KE2xjv
-         GPdyEvHMKHFVrqYgFT2wMbjQyIeMC3+jeImh37NY16KDEUdYslnCEv3EYPHcBBrUZ5G8
-         X9L2OQCIjK6Blyov+YnutOuOjUjoZGGe1FVg2U6QcLEVe8peDBidLNq0lO9CVQ75iU6x
-         zjz4iYokGP6MrPxeSIUvo4YYNVlDqV1BXkwHz+6Fq+8NF+2t4J5tCczFUEV8V/2GgRQT
-         25q86K9ad6zhumVpZOaKZe5ePxyHgANHPHvyEDnbbHO76pxjq9CmmQvV3fkQAtCPnX7e
-         NQ0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742306954; x=1742911754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XR3QmdTlX82CLNbiCjBnydKIXsFQoeJ3c+u1awJ7NeY=;
-        b=hLScdTO7YEuJ0TjEdd84CQpOVuPJvObG9g1IDhrMVml2PElwcBClEeHB/31rGZaB9l
-         czh5WuSxTk5yVYbRH5LJtqNMf7TgDMa9zReIMVa8R/zHXcY79lFvDvcqW/d/gjp5lwni
-         JoRs5w8vDrM9tTC+fJg64T4LoIreC9ZN7bAztjtBF0KXKtZCxy1QU8erPGqdFu2yfJtO
-         8ofKXn7OBobWtBxG2HAb81N8dhrOje3yjenfKfgz+KVN+P1Gz/dQtPQoI7qW7RRD2UQS
-         z1S+11r0uHnTLUw8sdHZQ856r7tRFImADAkfjINOBsy91WF+VeGJxsyfHQptOpqC5dYr
-         AGGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUB9LvThrVVfn4mPoVmvnOLeIPqDxKGPB/2pZesJwnckost+PGovH8CxJZaHRNWrN8G3d1bpBXM7Xh/QWJD@vger.kernel.org, AJvYcCUKQ+VMiNOltvB0v58jU8x0ZD+Bk7VR4lBQkgG6wRGmxtzuRD7moPyyAKsjiYbnkSOJiP7NtI/t/PuvbW8MJ1en@vger.kernel.org, AJvYcCUPpVKEjIIcl8+791LucEBdnVSPScZnGCd6y+H9rstFwUFrpvu7QzHhBHqhiZXBPpPqgnOeLeq3Ax6Y@vger.kernel.org, AJvYcCUXzSEaGpE7dsBHRlmDLvBMtIdNGOv5GuYyV21oOtju/tA49ppqGSlgUgUXdSFy1snZqiOcJ81EXdTP8oo=@vger.kernel.org, AJvYcCWz4g0l/YRc9QogetayS3RMaAB1xW3gfhG2FgxgYpXjlhD+i/K85pI5pYkHHOhy5nY/TbSox8zN7wxZoyIP@vger.kernel.org, AJvYcCX07O0yWFsq//bgpA1DezHsZLIWrq02qYIsH+gMCiWdGuQiEuRLD34lvzNa5Mh35BI+eUW8RelGkobL@vger.kernel.org, AJvYcCX6kD+rK23Gl4WOLRUsmvp5eyuO1Dh0SDOyHf1HcnkbmDfdNZbxa6yAzod4weKF1dXjDD/4GQkLo12Xye2Hfsk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC9ldYRsW83v3Y7OQAJyjPCqjeJL/yi0iiTxLkn3rJhOikWo2l
-	3BdaBpiOkcWUl15y3XWxCpARL5FQ2gMyk3CInlbFWE2afiNVrMprd07KkC+LLOyYUpNQRmVIlwg
-	8mGwWD3nuXe1Ql01ueTsYKlmZwW8=
-X-Gm-Gg: ASbGnctFV/jwijM7RM158Lit/ZX4wEn+1R5oN65cc0uzmXHm1PqKaYPRpjQR5cssEhe
-	SJg0Y24LMqgSTmrOCE0cwRiYI+5Aiw47464Z81XEMCr3BeH2WE2Ef6J0XoJlVw720VBeBCQbvt0
-	fgL5IttFxQdEaCw79F07+12vaU3oNQ01P1Acgm3u8EhA==
-X-Google-Smtp-Source: AGHT+IFxpjLk/MoadRODdmp6sMkrXqEk5zu/R6whmoxUeanggxj1j1wQ9JCQLIxNBupqBoSdrmyU8Q9aU/YaFrU7328=
-X-Received: by 2002:a2e:bd09:0:b0:30c:160b:c76c with SMTP id
- 38308e7fff4ca-30c9755de18mr33340731fa.17.1742306953725; Tue, 18 Mar 2025
- 07:09:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UGJqKU7G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742307980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=9DK79vEkj60H4A6R6HETunbW5RhdY45htg39zNnZN74=;
+	b=UGJqKU7GGQIsNG3lcaiI2CjTdeUPQbSFUCkPdYwAeJfQnOmnymBCvkx5hOy57Ns//p7/2X
+	9CcqW2cWcUDu/Sx+PDISqYUpg3+H9uVVamOAJSEbsTr1x+WwoiqcldVYbIvasoSaogwwsH
+	OO4AT+bkCcAUgeJWKdaKuR65nU0vX9M=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-434-Dj22WKlSOWKVl3TP6Ptv-A-1; Tue,
+ 18 Mar 2025 10:26:19 -0400
+X-MC-Unique: Dj22WKlSOWKVl3TP6Ptv-A-1
+X-Mimecast-MFC-AGG-ID: Dj22WKlSOWKVl3TP6Ptv-A_1742307978
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51FBD19560B3;
+	Tue, 18 Mar 2025 14:26:17 +0000 (UTC)
+Received: from [10.22.82.75] (unknown [10.22.82.75])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94CFC1955BE1;
+	Tue, 18 Mar 2025 14:26:15 +0000 (UTC)
+Date: Tue, 18 Mar 2025 15:26:10 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: [PATC] block: update queue limits atomically
+Message-ID: <ee66a4f2-ecc4-68d2-4594-a0bcba7ffe9c@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <Z9lnIJCcVSza6UVo@google.com>
-In-Reply-To: <Z9lnIJCcVSza6UVo@google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Tue, 18 Mar 2025 10:08:37 -0400
-X-Gm-Features: AQ5f1JqOYVk7nD9z0cLpiPEdxTeWINnN4TjRzqE0nN_LBkIs9bu7CUDTA0sD4FE
-Message-ID: <CAJ-ks9k5XZUN_vuH648rr6-e+v0my_dR2zo+986rzx+A5ZLxng@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, Mar 18, 2025 at 8:29=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> w=
-rote:
->
-> On Mon, Mar 17, 2025 at 10:23:56AM -0400, Tamir Duberstein wrote:
-> > Throughout the tree, use the strict provenance APIs stabilized in Rust
-> > 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
-> > functions at the `kernel` crate root along with polyfills for rustc <
-> > 1.84.0.
-> >
-> > Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc <
-> > 1.84.0 as our MSRV is 1.78.0.
-> >
-> > In the `kernel` crate, enable the strict provenance lints on rustc >=3D
-> > 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introducing
-> > compiler flags that are dependent on the rustc version in use.
-> >
-> > Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-pro=
-venance-apis [1]
-> > Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> > Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.me/
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
->
-> I'm not convinced that the pros of this change outweigh the cons. I
-> think this is going to be too confusing for the C developers who look at
-> this code.
->
-> > diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
-> > index 719b0a48ff55..96393bcf6bd7 100644
-> > --- a/rust/kernel/uaccess.rs
-> > +++ b/rust/kernel/uaccess.rs
-> > @@ -226,7 +226,9 @@ pub fn read_raw(&mut self, out: &mut [MaybeUninit<u=
-8>]) -> Result {
-> >          }
-> >          // SAFETY: `out_ptr` points into a mutable slice of length `le=
-n`, so we may write
-> >          // that many bytes to it.
-> > -        let res =3D unsafe { bindings::copy_from_user(out_ptr, self.pt=
-r as *const c_void, len) };
-> > +        let res =3D unsafe {
-> > +            bindings::copy_from_user(out_ptr, crate::with_exposed_prov=
-enance(self.ptr), len)
-> > +        };
-> >          if res !=3D 0 {
-> >              return Err(EFAULT);
-> >          }
-> > @@ -264,7 +266,7 @@ pub fn read<T: FromBytes>(&mut self) -> Result<T> {
-> >          let res =3D unsafe {
-> >              bindings::_copy_from_user(
-> >                  out.as_mut_ptr().cast::<c_void>(),
-> > -                self.ptr as *const c_void,
-> > +                crate::with_exposed_provenance(self.ptr),
-> >                  len,
-> >              )
-> >          };
->
-> That's especially true for cases like this. These are userspace pointers
-> that are never dereferenced. It's not useful to care about provenance
-> here.
->
-> Alice
+The block limits may be read while they are being modified. The statement
+"q->limits = *lim" is not really atomic. The compiler may turn it into
+memcpy (clang does).
 
-Let's just drop this last patch. It can be revisited later or not at
-all. Perhaps in the future I need to be more willing to say no to
-scope creep.
+On x86-64, the kernel uses the "rep movsb" instruction for memcpy - it is
+optimized on modern CPUs, but it is not atomic, it may be interrupted at
+any byte boundary - and if it is interrupted, the readers may read
+garbage.
+
+On sparc64, there's an instruction that zeroes a cache line without
+reading it from memory. The kernel memcpy implementation uses it (see
+b3a04ed507bf) to avoid loading the destination buffer from memory. The
+problem is that if we copy a block of data to q->limits and someone reads
+it at the same time, the reader may read zeros.
+
+This commit changes it to use WRITE_ONCE, so that individual words are
+updated atomically.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Cc: stable@vger.kernel.org
+
+---
+ block/blk-settings.c |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+Index: linux-2.6/block/blk-settings.c
+===================================================================
+--- linux-2.6.orig/block/blk-settings.c
++++ linux-2.6/block/blk-settings.c
+@@ -433,6 +433,7 @@ int queue_limits_commit_update(struct re
+ 		struct queue_limits *lim)
+ {
+ 	int error;
++	size_t i;
+ 
+ 	error = blk_validate_limits(lim);
+ 	if (error)
+@@ -446,7 +447,14 @@ int queue_limits_commit_update(struct re
+ 	}
+ #endif
+ 
+-	q->limits = *lim;
++	/*
++	 * Note that direct assignment like "q->limits = *lim" is not atomic
++	 * (the compiler can generate things like "rep movsb" for it),
++	 * so we use WRITE_ONCE.
++	 */
++	for (i = 0; i < sizeof(struct queue_limits) / sizeof(long); i++)
++		WRITE_ONCE(*((long *)&q->limits + i), *((long *)lim + i));
++
+ 	if (q->disk)
+ 		blk_apply_bdi_limits(q->disk->bdi, lim);
+ out_unlock:
+
