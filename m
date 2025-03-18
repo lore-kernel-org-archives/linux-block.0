@@ -1,84 +1,64 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27021586C8
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 16:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72C6211A04;
+	Tue, 18 Mar 2025 17:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742314397; cv=none; b=SFRq0mfgWEFLKXKJmzbmDNVlnN1mlokvbXoIBsxAr2tn4CLuLSX80F6agvyHzOgsSrX7uy7ab5XHDXsTSbIjhkMYSvkXS4p3HeZvry9l9JRM1VGDDP1ubmk/hePZC4j22+mCkRDB4FyNxqt7+lCcggHAo4FpuIk3PvGOJR3Z4cU=
+	t=1742319750; cv=none; b=F4wWjbGZe8e4GSM1lOq+rfcVFwUwBhjpagTbSUelKSVLcEvR7jwHc1IjNpFCvAlQ/2lySbNb8B6u4h8Xjh9tAfh9jJJFfI0+h5AV6MbeSXmjhT0xHduJyaZf1xUCrSfDvDOmyY9z4e3tEAUTbdZW//AeDMp0VzRifyB9DFjUarw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742314397; c=relaxed/simple;
-	bh=DllG38BYOokA0Bi29339VZSQQG53Zbv+VmI1+g5+v3g=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=RHMT1FflwiUstLr67LVypaWR/QV9gVCdboHs3grArpDf3zylKhK02SpDSER2SUxUfTm+ZzZIyhI3CvyiCaHdlhU5vrS8R10fyxsWwgtlpFSpxTrxbmmhYcft6WsF913jqATfrvELSF1zB7D6SAaNA+s7XHl3qOMu3tPfQYYhkLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P3YS/blG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742319750; c=relaxed/simple;
+	bh=uBMGCmpRkySXdW0ViKd8ets6zijLHH+Iy6pM2LFlE60=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=OpyEp0ZKL5u9P0tPEiNT/JQ+M07t2+aFAVULvciOwvbQmRmqIjT7Ft4eMn9au5xUqWxF6OQ0xwTupr0N+TrBwNoCbFr2GguZSUAt4UO13PHlVEGUBxC6YE2hcPJDs95i0tyItRU05S3RxvejMWjWLtOafJyT3H334bqTAoQhEDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mRZiuDpZ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3YS/blG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742314394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fv4IGnzTLlWvEisT1ne8MCV/2g+mHPSVR+ca+3UZg84=;
-	b=P3YS/blGX3GM5/C3qcVKzszwKbVtEJUcJ2mDl4zzp1e4dFk406l7TowapbFX4gfevZUVab
-	dmGXviaDjVGmS/WiqzdFiFu0c+fdrkzlzwKGI8awBmw9SmKMpFYDQRPhTYgidxllEsKBjK
-	r7qDhbyk4fWApdJmMIHWg1kJE7V1fr0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-83-UchRZJbxOKiaeEF8QIenJA-1; Tue,
- 18 Mar 2025 12:13:11 -0400
-X-MC-Unique: UchRZJbxOKiaeEF8QIenJA-1
-X-Mimecast-MFC-AGG-ID: UchRZJbxOKiaeEF8QIenJA_1742314390
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9289919560B4;
-	Tue, 18 Mar 2025 16:13:09 +0000 (UTC)
-Received: from [10.22.82.75] (unknown [10.22.82.75])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 387D71828A92;
-	Tue, 18 Mar 2025 16:13:07 +0000 (UTC)
-Date: Tue, 18 Mar 2025 17:13:04 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-cc: Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>, 
-    Mike Snitzer <snitzer@kernel.org>, Ming Lei <ming.lei@redhat.com>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: [PATC] block: update queue limits atomically
-In-Reply-To: <14dd4360-c846-43e3-86bc-b1e7448e5896@acm.org>
-Message-ID: <bbc48d3c-e221-8429-0753-d9d48462b19c@redhat.com>
-References: <ee66a4f2-ecc4-68d2-4594-a0bcba7ffe9c@redhat.com> <14dd4360-c846-43e3-86bc-b1e7448e5896@acm.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mRZiuDpZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=uBMGCmpRkySXdW0ViKd8ets6zijLHH+Iy6pM2LFlE60=; b=mRZiuDpZyZzCwK+JTvOq8v1itd
+	HfHfXN0FptfCauveymqf6IZZT9IzsTFMsyBBdXHbWSoyS3HtjWlQ7khPLDh/9mp25dB0nv/GfcwtD
+	cPPwLnGQwMOBykc4UU6h1GGorQDEWf4aoCnsSndhMry98WWm9gxXVIy0D0aShbLLRGblzx9O0dN3c
+	O2YUPWyBP70kAYu73AoPtgBhUoEHKG70oi+aB2Ii7gbQiIZv0yfJyOcqz8/WNrrGK+uDG5s9jFTzB
+	E1Ixd8GI5DVNry4EDcgHtPkUcXSzJCoZbOGI5e9/8jN1aZT5ukfmjcP4Kc2KCg1Svk1kPz9Hj2K+A
+	6a2m8FOQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tuaxK-00000001lNV-1jy7;
+	Tue, 18 Mar 2025 17:42:22 +0000
+Date: Tue, 18 Mar 2025 17:42:22 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC] State Of The Page 2025
+Message-ID: <Z9mwflUa2uucwFHo@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+I would like to once again give a "state of the page" talk across
+block, fs & mm.
 
+As usual, I will give a brief overview of the transition from
+pages to memdescs:
 
-On Tue, 18 Mar 2025, Bart Van Assche wrote:
+ - What are we doing and why
+ - What subprojects have been completed this year
+ - What our goals are for the next year
+ - What adjacent projects are also in progress
 
-> On 3/18/25 7:26 AM, Mikulas Patocka wrote:
-> > The block limits may be read while they are being modified. The statement
-> > "q->limits = *lim" is not really atomic. The compiler may turn it into
-> > memcpy (clang does).
-> 
-> Which code reads block limits while these are being updated?
+2024: https://lore.kernel.org/linux-mm/ZaqiPSj1wMrTMdHa@casper.infradead.org/
+2023: https://lore.kernel.org/linux-mm/Y9KtCc+4n5uANB2f@casper.infradead.org/
 
-See my reply to Ming - 
-https://lore.kernel.org/dm-devel/14dd4360-c846-43e3-86bc-b1e7448e5896@acm.org/T/#m7e4e49fed1cbcb56954b880e54a5155c4089c0e0
-
-> This should be mentioned in the patch description.
-> 
-> Bart.
-
-Yes, I can add it there.
-
-Mikulas
-
+January 2025 update:
+https://lore.kernel.org/linux-mm/Z37pxbkHPbLYnDKn@casper.infradead.org/
+August 2022 update:
+https://lore.kernel.org/linux-mm/YvV1KTyzZ+Jrtj9x@casper.infradead.org/
