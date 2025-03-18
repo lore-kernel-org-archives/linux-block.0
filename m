@@ -1,141 +1,124 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C48191F92
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 15:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4750720F078
+	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 15:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742312707; cv=none; b=ry+x+OkWzqeT3MIQTQEqKOVvWcgK1ohcxMS0notaRUA8wXWtv+wTw4z6vpMt9wdNffyenDqMrxdWdoLwnxIF2sU0qNMLTI7M0DyFtzaSXTITNNm6xA23017mVDdkRg/49v2xkPtj2aT0QUZUrBUdIDyGUVFofiM5YBVt86h3rsw=
+	t=1742313118; cv=none; b=Lb5bpe4jlg/80qZ16AJ8qxB2HGLYPapVCjA97Cm+TpsQ6PP4tGmJS2pPBV0EqoWZSRHgy+oXlJzQfcJ3kEBfPb6kviw5sUKTWgAQVqdIUWE92Ap2mL8oTcMWMnJJo1q1Rrkk5gbQ/WHkDFDqh7o/ZTEKm2SfnLB62Fh8aLzU9cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742312707; c=relaxed/simple;
-	bh=KWk/bN9ELEeFN2tK34OWgu3HJs0a/hjkYwJUU8LqA0w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uT4Kh43CyFfkTvktmps/M/2+YXc9l1pAXVIX366Raads6PQnZ0E/nHqy2HZKeyV2rSAg36mnAtErotVe1pZMdZmS7Ms54R84veaNCEhan+HAO2LiT4yyMAS8+m++FqLo/in0B5UiVHylYLRTRm1vfG3J1/g/M1GlvigyXHMvoWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mmlBCxzD; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742313118; c=relaxed/simple;
+	bh=DGxt/C9Irx935A9Pm++nZrOSxRQnuPRkq/va9N8kXGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SH2P4gSOypw94Ytxr9UbQLFVPkv0wfXGD+KlELASJGgJq0hQM6PPprCqQTTopFGZVU5NWq2DUk8RQU2N11BZpD/0ct/d+X3JdIbN7ayhmIb5A24zNa+mqwLLvDJ4GPZfGl30nnpnKGubpsiwEdPiQj1srCJ5yKsQ7AgLkYrrPGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Et/URCv9; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmlBCxzD"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac339f53df9so499383666b.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 08:45:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Et/URCv9"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso24819415e9.3
+        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 08:51:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742312700; x=1742917500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1qYvjyq4pU4tNrtVHaMUg2l6HN5kc1GZ86F6qK4ZHRg=;
-        b=mmlBCxzDsAzlnGMQJHeYAuBYg7q5VBWJYJ9bejEainUZoC9mNTTMJv7G+Mr5C1uU2i
-         ZrJOCI+k6ayAnQGvpTYgSihX7hi9GlsSyUTB5lP/pCvkJmQJtEuKXFkhrcdY1D5oMD2n
-         dih3jmFdBhoYq8dazM8S72MpASehQsIOIAWEEPV3iJfI3hqVFLCwRIPYbdGB41Tc5njZ
-         9M7JUXH016HVFp2nNXJweQmuVlZ6pUEo2zZJp+8N2m4ReVXUTqwYlIc8GmqgicGNubBL
-         1iGg+1ffg9Jfcm83zO2o4YLRLZ0HxPz9DfAvmbbjvvHaQ6uAQr1kg+zbLBcQD3N6oczm
-         0yAw==
+        d=suse.com; s=google; t=1742313114; x=1742917914; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LC+nF3SpDbrztDI/MPmvjDr2ML72AXfztVInSF11ZLQ=;
+        b=Et/URCv9VUqhbbCuh2OiA40TUlZTJKIo4NrqYpYx4anoeTsHY693SRXZrI+o0+4Aru
+         0730BET89aTdA0xl/EQaqbOvGYDIGvQQ7Bi7ukSpTdvXpedOokPNitrbfsLT7uVCFa3n
+         FV5GUuywMYOqMHK8kKxQU0Deti3eYEBktIcRRt3ThEaOm33VqoFlr1O0klqggcYqNwJk
+         OcVVUoMgGOF2p3qMHxX7pHccKlUhyqWjiun5mV3DPnbo6UxYeOjph8BD7F/kB3mejYxi
+         gotEDBILVR95etF0e6Biwar+7wcpe9dsSZCzoY4RtOz276QoMAAheIT8xZZ9TnYimZ1U
+         CmuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742312700; x=1742917500;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1qYvjyq4pU4tNrtVHaMUg2l6HN5kc1GZ86F6qK4ZHRg=;
-        b=gQbd6ZG9mNaOp2GXWE7vEmbSrR9gz6ucKhT12FXKWewTESak4QdFmql+myb3GRmjAt
-         TR58JC+gl0vr7R72nv5NwXFzk9BzP7ceB5cM7Mo9hU6Cc9dA5aYhQcAMaiJJv5oLN0Mc
-         WccjNDesl6vwP5kMO1p5lr6hbdJxnH/IJCwASeHvH02fxVONiD8mLmI5BuLkqoIL/Nkw
-         dv+4rHW5SFw1YJa0Wjva+f7OuIYSRQvdDXrSXa+PrZZDykncfbkK9IfuOCpCGfoPTjSO
-         nt4/zGtDnSOm20m/IZzNLatsehDwQDVl6Yj5j6PHaUWX8B1Ho9zobnr2rzHhkHuBscl5
-         rdxw==
-X-Gm-Message-State: AOJu0YyS2m2eZVrFH4sbh64+F9y8EQ6RcIOaIJ69jhS6Curs+HAUOTBr
-	as/FqA5cr6LD6pH/H1gk3AEz5UHqcefLVCGRvZiPtsCtqC9zBxIs9a6cserf
-X-Gm-Gg: ASbGncv4txoVKpXdk1r+106Pzi/DP/pRyXuSnyZVV59xIqfNAojj8NWbQD56hC4EmCw
-	4IJYEiKiaT4rA76HzIycUzSzj3cprNMchKkRSmoqHQIjwpNlMSsJ86nZy3fl3KgF+uMYHGraLgS
-	vp1OyNPCL3/bJ/Z4XcbDWLdy3fIyyQxV/ft23zBDxpqRtvMbHUJwIjYm73766a16UK3eWZVH0J2
-	s/uMllvGrLTYaXCMlSAF0IELNkdvFs9cxGmKiwe0MZ2U8K1TmrO8EY8eHPij+MXgq69OFKeh5Pl
-	CLAnomBsSh/gzO05VmemN+V6vXX4oX632ifKCzRrQlqwp6NgTj49K9vvCg==
-X-Google-Smtp-Source: AGHT+IEmYGy9R9GwCkCXnc51zX4MIzm41D1D3xF242VopRhmxZAj2QlbVB1aEbDpQqrHbot4Zt7RDg==
-X-Received: by 2002:a17:907:d7c8:b0:ac3:8987:5ca9 with SMTP id a640c23a62f3a-ac389875d4dmr493086266b.19.1742312699481;
-        Tue, 18 Mar 2025 08:44:59 -0700 (PDT)
-Received: from syrah.fi.muni.cz (fosforos.fi.muni.cz. [2001:718:801:22a::6a])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149ce9a9sm863710666b.110.2025.03.18.08.44.58
+        d=1e100.net; s=20230601; t=1742313114; x=1742917914;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LC+nF3SpDbrztDI/MPmvjDr2ML72AXfztVInSF11ZLQ=;
+        b=ISiw4PWHBM9Ut46jvY+pKj2mGPfshIpuq6ifcNjh5hxZmxTE0kIXj2VXPwFhTp0Muc
+         Lcy8gJSJ4CuD5j0jURg7zie7aef+whAJJ9QUzDiH/ir1H7d3101TeTEOCUhOeaBO5jxM
+         Y/niTSCK3/EInDqZw0fRAW1x7l8pnY+vqdzHRSBCIoeRIuxae38Lg6mPrVCvmZOD38nm
+         zY7tj7J/AN3YR8HD5MqA1AQ2yiYYahcCUByxuU+Qx3UTE4EVyBq3D5RtQgRusCKrEgSR
+         zOHX6aAzKeOysaXsw5x81Iy0exRVE7m63U0bx+RyvFg7UQdkW8LtUCIDfERjD2Hgd73F
+         kApQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXf2WBHe4NuwjqRE6JXxI6KeTiSlXHyM+q0vg4MLZCfDoHk7KwnweQu+ShJn8k5jdQbXCzKaVltAVYzIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YylVhvVqTD1v/2ja0Zi87gKxl1celMR3+a8wlSltuVVTVU+dnWA
+	EtWtv+fDcURBIyA/+vTBGhlFi6pcnrKLca673sRAgGU4mOx/6weWsrzshEQNHBU=
+X-Gm-Gg: ASbGnctCQTOFlI6kGhBuzLWvqD7x0BreF1m7dPkfRDcAAO7dlEA1n2wV+GNtKnQMzKq
+	QFzYr+Dm5Q+I+tES4z+C8vwlm/0b+rBVmw8X0j/LyJNiAU63OWHaHrAUXeX7gupxPPJ1oNIYxTU
+	r/pkRlf/Zb4ap1XhqHkDmPRM2zeIp5/Z6lbb90mY2vrPYAdua4oQbfSHK27en1/E2CxMmo8pEi1
+	YcYdblo7ChTiGaT6o667L5eOwZ78ec1x7B8r3fpJ2IhRZ8wzcp5exh/oQTQ2y9RyVuK6fvaIaX8
+	ZWpOVLMCRjmOSftduNCvDZgQcY3kZcqcvWaxZwqzKjbEG9M=
+X-Google-Smtp-Source: AGHT+IGue5dNi02epZqdFwISRO2DqY6eSFTBAINSLQ09pyo7v2ItFYvRcQhhbHm998Hg1ISsTrUK4Q==
+X-Received: by 2002:a05:600c:1da4:b0:43d:26e3:f2f6 with SMTP id 5b1f17b1804b1-43d3b950035mr32588205e9.5.1742313114536;
+        Tue, 18 Mar 2025 08:51:54 -0700 (PDT)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fdda2dbsm138960905e9.2.2025.03.18.08.51.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 08:44:59 -0700 (PDT)
-From: Milan Broz <gmazyland@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] docs: sysfs-block: Clarify integrity sysfs attributes
-Date: Tue, 18 Mar 2025 16:44:47 +0100
-Message-ID: <20250318154447.370786-1-gmazyland@gmail.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <yq1pliuoqek.fsf@ca-mkp.ca.oracle.com>
-References: <yq1pliuoqek.fsf@ca-mkp.ca.oracle.com>
+        Tue, 18 Mar 2025 08:51:54 -0700 (PDT)
+Date: Tue, 18 Mar 2025 16:51:52 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Chen Linxuan <chenlinxuan@uniontech.com>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Jens Axboe <axboe@kernel.dk>, Wen Tao <wentao@uniontech.com>, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND v2] blk-cgroup: improve policy registration error
+ handling
+Message-ID: <sb7dgl6e22jsskvtiqvfny64pdxfxuyijcj2zxc46s27kwecfw@xqyutig7nlem>
+References: <3E333A73B6B6DFC0+20250317022924.150907-1-chenlinxuan@uniontech.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ezfht26i7an4lh3x"
+Content-Disposition: inline
+In-Reply-To: <3E333A73B6B6DFC0+20250317022924.150907-1-chenlinxuan@uniontech.com>
 
-The /sys/block/<disk>/integrity fields are historically set
-if T10 protection Information is enabled.
 
-It is not set if some upper layer uses integrity metadata.
-Document it.
+--ezfht26i7an4lh3x
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH RESEND v2] blk-cgroup: improve policy registration error
+ handling
+MIME-Version: 1.0
 
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
-Co-developed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- Documentation/ABI/stable/sysfs-block | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+On Mon, Mar 17, 2025 at 10:29:24AM +0800, Chen Linxuan <chenlinxuan@unionte=
+ch.com> wrote:
+> This patch improve the returned error code of blkcg_policy_register().
+>=20
+> 1. Move the validation check for cpd/pd_alloc_fn and cpd/pd_free_fn
+>    function pairs to the start of blkcg_policy_register(). This ensures
+>    we immediately return -EINVAL if the function pairs are not correctly
+>    provided, rather than returning -ENOSPC after locking and unlocking
+>    mutexes unnecessarily.
+>=20
+>    Those locks should not contention any problems, as error of policy
+>    registration is a super cold path.
+>=20
+> 2. Return -ENOMEM when cpd_alloc_fn() failed.
+>=20
+> Co-authored-by: Wen Tao <wentao@uniontech.com>
+> Signed-off-by: Wen Tao <wentao@uniontech.com>
+> Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
+> ---
+>  block/blk-cgroup.c | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0cceb2badc83..16e485c05d36 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -109,6 +109,10 @@ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
- Description:
- 		Indicates whether a storage device is capable of storing
- 		integrity metadata. Set if the device is T10 PI-capable.
-+		This flag is set to 1 if the storage media is formatted
-+		with T10 Protection Information. If the storage media is
-+		not formatted with T10 Protection Information, this flag
-+		is set to 0.
- 
- 
- What:		/sys/block/<disk>/integrity/format
-@@ -117,6 +121,13 @@ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
- Description:
- 		Metadata format for integrity capable block device.
- 		E.g. T10-DIF-TYPE1-CRC.
-+		This field describes the type of T10 Protection Information
-+		that the block device can send and receive.
-+		If the device can store application integrity metadata but
-+		no T10 Protection Information profile is used, this field
-+		contains "nop".
-+		If the device does not support integrity metadata, this
-+		field contains "none".
- 
- 
- What:		/sys/block/<disk>/integrity/protection_interval_bytes
-@@ -142,7 +153,17 @@ Date:		June 2008
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
- Description:
- 		Number of bytes of integrity tag space available per
--		512 bytes of data.
-+		protection_interval_bytes, which is typically
-+		the device's logical block size.
-+		This field describes the size of the application tag
-+		if the storage device is formatted with T10 Protection
-+		Information and permits use of the application tag.
-+		The tag_size is reported in bytes and indicates the
-+		space available for adding an opaque tag to each block
-+		(protection_interval_bytes).
-+		If the device does not support T10 Protection Information
-+		(even if the device provides application integrity
-+		metadata space), this field is set to 0.
- 
- 
- What:		/sys/block/<disk>/integrity/write_generate
--- 
-2.47.2
+Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
 
+--ezfht26i7an4lh3x
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ9mWlgAKCRAt3Wney77B
+SVbeAP0R3rvFXNGUuUa13r5copvUVvPw7HFAvwgRKTH+2St7xwEAnNOyY8KO5Bq3
+vaXcX0HdBl1zK/D6EeT9tE9kZc1RHQ8=
+=Rk6K
+-----END PGP SIGNATURE-----
+
+--ezfht26i7an4lh3x--
