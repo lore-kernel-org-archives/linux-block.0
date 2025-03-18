@@ -1,183 +1,113 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24E817E0
-	for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 00:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0130D528;
+	Tue, 18 Mar 2025 00:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742257652; cv=none; b=bKyOftyLvak+PdMOAoZpZvU0bvVbwz20Y7MbgxywZhFCfb9AacJA5XIJQKtOuT+r4RdWSRWHa0+Y0LpFNlBIqEW17HsMLevP+ixHctFToaSmj2ehtD1/e4W5lq9VqKWzikX4Vp86kySG8/ZyybglkYdKN5U3J9YBA5L+qtj9mEE=
+	t=1742258528; cv=none; b=qX6ghlp4UZ9MRc3uChxEPMfvJxhvyAo3R1cWu6s37wt+EJh/F6Qzvy6UGL/+Rmio/HNhjMNH5nMlC1mKgNTFMYhSRIn7A93wuxrLzjwz769R9BxlpC64pbRZqERAiHRxNpf1atvJX3DJc7mdCS7VQiJRkwblOxNRbG06A/9FYY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742257652; c=relaxed/simple;
-	bh=4XQgHb3+iG4KY/95NxTaGbG/ca/uVMXQ5luUzGA+Z+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YkJWZNseJ8kMeka73SAgBHa4Qqx+7sOv8cl6r//HkiDoJMgv+YEYXZH8koqMZ8/yZ+kwJ3/rzOBoDGSy3pa3aH6zxez5/yDkK9evE6hvQvAWml9ZxmaJ4tNEESnKckGspIfi+TSL/fjOmOtBll1dLJXIzisdy5nyLD4hSi1b9GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0RQYvUB; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742258528; c=relaxed/simple;
+	bh=PgzC/F33BYAA53t0eSb8TLPna6imarmpm+vWugeqXCY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dzdwmsK40zrzZvBlTHMQ8tvKvCnGciukIoHtyeAM9KoJOKit5lh0rQXiz14FLJKxOElEK3k183lq+Uy/7uG0YkQCBRW3xwZegBnDAZv0V4u35hp6f0rrdwRL1ta7ByXmikgNdgRa2lQF+V8LhN02MpD3sBzF8d1xZMXpRBqMoNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qw7StJyc; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0RQYvUB"
-Date: Mon, 17 Mar 2025 20:27:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742257646;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=msGHYgLziAV/KnCnYfOi8Q9iOJf9m2mu/XhNQWn1dZU=;
-	b=o0RQYvUBVpgY96oA3+JGvTACsyXcqPJr4fhYZUSMgBaBUV+YnVhYcoUsPErEvwhNvSxMUT
-	awy7kVIRNQDMHc0Q7QxEfPR3S2I0eFe9TjC1i4HlA47A2Wf3+9kTAxSsyJEgENym0VIeNe
-	kzVhpi+3Of/c2VDFTSBVxFDvHOj5QkY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Keith Busch <kbusch@kernel.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
-Message-ID: <nffu6uwqi7lshwlmw7why2mkckffnboosv6frrspe2ckaksphq@yql25ni5pzub>
-References: <Z9e6dFm_qtW29sVe@infradead.org>
- <fhhgjnhmk72vpruhgftwq3lzfmylbhn6cuajj6saikee2zuqjp@54yfyxu35yiz>
- <Z9guJ2VxvqAmm9o9@kbusch-mbp.dhcp.thefacebook.com>
- <yq1msdjg23p.fsf@ca-mkp.ca.oracle.com>
- <qhc7tpttpt57meqqyxrfuvvfaqg7hgrpivtwa5yxkvv22ubyia@ga3scmjr5kti>
- <yq1bjtzfyen.fsf@ca-mkp.ca.oracle.com>
- <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
- <Z9h25wvi0VQOaGh2@kbusch-mbp.dhcp.thefacebook.com>
- <ysvt4npanz4qfoxm5cv627cq2ommq6rxpka6pkvl3l2crcatmc@ic7tn5tt7aw4>
- <Z9iIa770ySTgKgp0@kbusch-mbp.dhcp.thefacebook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qw7StJyc"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30795988ebeso52112181fa.3;
+        Mon, 17 Mar 2025 17:42:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742258525; x=1742863325; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B7IfKOPhAlS//llZDZ8iu5ShHju61/9HzEhonjMXx+s=;
+        b=Qw7StJycBI7mWjgQpc6ky6N7gIAmD3ev7RIaMuDfW7ioBGCk4pWfFo+tGqnCYIy6Ax
+         Ijh+TWl/48z78hJ6QfsHpPZ9lzWZFTNPqpw5AGGECHVsDwVvPxa7otrcO+8sfh5JWiyP
+         5xSHz9KjTKQNU9ZoZpsGWzpfdbOjhO+O42dV/n/HqKtKB6HmccORC/XHZX2dvmNjU/6v
+         jh6ZZK+t6urhPGu7tq9Sjq+xjwKqXXPpwJ7gdheUyO/WC0ZhLL/x90I8svKkVrnHYsw1
+         HDeCyYCQ0yQf1iFJZwpNGmlERbxzxPRsULqix160gxkrzMxvFffSsM45R6cx+miDy/j0
+         0DAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742258525; x=1742863325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B7IfKOPhAlS//llZDZ8iu5ShHju61/9HzEhonjMXx+s=;
+        b=Qm4e3bQpi4U/4T5QC8EjrqzIEZF4JjiIV4x3XBB+dp6YODxv14NWfubFQdyapFFGEg
+         36AU7+cXeJYpSrpw9kioh9CEo+eplZ0j9E9N8mowKzljr5tyrKBvX8iOmIN9JKHp9GXW
+         djBgRGdbTJSDMUW/LtXp+ZPr+ussc2YvWsiz6G/X3WVuw/qbeUrFsr68JnXrnAVTRzNp
+         Aoi+/HcbAmIsNkh1XwMJoBpLvmcO7mRMifBA1BbqhAsi/oXmVVa1tpYMUyI7TLpn9zJg
+         ARzOWIRjty5uxykf+D2txuWd9o7b6vAi3+7vuF+3mBEc4HEGcQu9WLTeH08rzmrF8sr8
+         fUBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUO5KwCEsYD35cZzdIQNEbwZa78SS+Ra/obJt0ERJ+2j9+P8QwCJ3FGQByuXKcrJA+I52nW5kdWzcuLtqMm@vger.kernel.org, AJvYcCVYkMozWUZk1m2CFAfIKdU/Vnp+2InnFolnwHc0QE3+5zDDcVIHjzAnhZx2ZvqHYN+RJu6q69qa1OadYQpAoq0=@vger.kernel.org, AJvYcCVtR64EvI8P7O5FNn8SyHjhjyM4M4YY5zZDAT38VOwj2xMLOXsf9FOiTN8OQJo6sHbpvCj5GRwB76Iuues=@vger.kernel.org, AJvYcCW0lxuQpcVrCWASUtPxhf3fnpkvtKzdn2PJwKNbvD1P5BYJgkKDVGQWzwheZcgpwrCRPSvUoXmjhBPlfPkDIzY8@vger.kernel.org, AJvYcCWATtWO76muUPyfGFgwi+FYoDC/yTDVBan9CZY9AzZOeQDlyn+5ze5eotmbNvkuoIqocCsqvcsV7i7tTRdL@vger.kernel.org, AJvYcCXah9vW6lD6Jp4QqbooTx8HeSNtPHNRDldHHjeuWOJMrGZiAEQa7XFBLasD0ng8uEbxa/iZNTXLTzVl@vger.kernel.org, AJvYcCXo2tst5mLk8G+JHcoiysN9la+s9zLuTiChJq8ldYOKYcUkJjjr1YED4KkVQIM2p0g8pFXP/BP3rE+b@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/3sw9BkEf8Y9pqIRm3jTqAe5mo5WNOKpn22MR671ajjjSsFXO
+	HyafM8WxMdqjh8HArlksxQZkIn0yneZwPEyfOloHNJU9TQZOomm6xcyCc4JCHXp35K+KutIFxq1
+	PfYPbdwtQE1gySoWEgCIalvHHejA=
+X-Gm-Gg: ASbGncsy+cQC59TxL2XQIcvGv2hPBqB8DkaUOFnnreIjGAq5oUcH5JheOtfZZ+eVUeR
+	0inYcDaThjbvsrcJrQqlQjxStCA04qcnchqP478zrj32rmG/G1W/bAGdkSBXL6w5rV9Mf2d6BHZ
+	tuBhBVhhCM38wz9wlLoxpg28M2/wNp3II5lrTcNDeoXkQ5jll6rQUtLSDmI0N+LToDND9Repk=
+X-Google-Smtp-Source: AGHT+IF5vCiDQ8UvKh1Yne26mi3NIgR+bYUhG99rsvoK4CRqZFLHBICrHc5mvPXVOh74lH0hTvVBsz+mo/B6+Mv42Wo=
+X-Received: by 2002:a05:651c:2108:b0:300:5c57:526b with SMTP id
+ 38308e7fff4ca-30c4a861dc9mr89186201fa.11.1742258524555; Mon, 17 Mar 2025
+ 17:42:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9iIa770ySTgKgp0@kbusch-mbp.dhcp.thefacebook.com>
-X-Migadu-Flow: FLOW_OUT
+References: <67d864b2.0c0a0220.39fb6f.4df4@mx.google.com> <CAJ-ks9n8mwt5q9unqfkfSHj9=ELJHtqsXM-xQ8jsbXeJX6Uyfg@mail.gmail.com>
+ <67d8671d.050a0220.3305ab.6372@mx.google.com> <CAJ-ks9=uHjJrzM0ruvm4v4wr8LygRMP-1orWBy_9OiNNeQr0ow@mail.gmail.com>
+ <CAJ-ks9=Qcmvbm=YGJ=jrX_+YdMsftk=FAimszYZB1OUuV4diZw@mail.gmail.com>
+ <67d885ff.0c0a0220.111215.5644@mx.google.com> <CAJ-ks9kYB1b4XsQcFb=NScPq+R+13U+Sv-6opi-yp6=ZjuLD_g@mail.gmail.com>
+ <67d88a1d.050a0220.2cdacf.4adf@mx.google.com> <CAJ-ks9kg4Br=56HT7T5sWpoMKhRqT_2x+cpQAWoyrEG3qyqQ6Q@mail.gmail.com>
+ <67d895cc.050a0220.99d33.5adc@mx.google.com> <67d8ba3e.050a0220.39b3b5.753c@mx.google.com>
+In-Reply-To: <67d8ba3e.050a0220.39b3b5.753c@mx.google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 17 Mar 2025 20:41:28 -0400
+X-Gm-Features: AQ5f1JoEGp_5o1WcOYKQ7KQIGBB5nqYglySnTY7b-xENR_n0SAcUGZzOBrzhgus
+Message-ID: <CAJ-ks9n57P=NnMAAvLr9dnZhs2zT8cvD_gdLkSmnFtSQR4b-Jw@mail.gmail.com>
+Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 02:39:07PM -0600, Keith Busch wrote:
-> On Mon, Mar 17, 2025 at 03:40:10PM -0400, Kent Overstreet wrote:
-> > On Mon, Mar 17, 2025 at 01:24:23PM -0600, Keith Busch wrote:
-> > > This is a bit dangerous to assume. I don't find anywhere in any nvme
-> > > specifications (also checked T10 SBC) with text saying anything similiar
-> > > to "bypass" in relation to the cache for FUA reads. I am reasonably
-> > > confident some vendors, especially ones developing active-active
-> > > controllers, will fight you to the their win on the spec committee for
-> > > this if you want to take it up in those forums.
-> > 
-> > "Read will come direct from media" reads pretty clear to me.
-> >
-> > But even if it's not supported the way we want, I'm not seeing anything
-> > dangerous about using it this way. Worst case, our retries aren't as
-> > good as we want them to be, and it'll be an item to work on in the
-> > future.
-> 
-> I don't think you're appreciating the complications that active-active
-> and multi-host brings to the scenario. Those are why this is not the
-> forum to solve it. The specs need to be clear on the guarantees, and
-> what they currently guarnatee might provide some overlap with what
-> you're seeking in specific scenarios, but I really think (and I believe
-> Martin agrees) your use is outside its targeted use case.
+On Mon, Mar 17, 2025 at 8:11=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
+rote:
+>
+> diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
+> index 036635fb1621..331ed32adc35 100644
+> --- a/scripts/rustdoc_test_gen.rs
+> +++ b/scripts/rustdoc_test_gen.rs
+> @@ -224,6 +224,8 @@ macro_rules! assert_eq {{
+>          BufWriter::new(File::create("rust/doctests_kernel_generated.rs")=
+.unwrap()),
+>          r#"//! `kernel` crate documentation tests.
+>
+> +#![allow(clippy::incompatible_msrv)]
 
-You do realize this is a single node filesystem we're talking about,
-right?
-
-Crazy multi-homing stuff, while cool, has no bearing here.
-
->  
-> > As long as drives aren't barfing when we give them a read fua (and so
-> > far they haven't when running this code), we're fine for now.
-> 
-> In this specific regard, I think its safe to assume the devices will
-> remain operational.
-> 
-> > > > If devices don't support the behaviour we want today, then nudging the
-> > > > drive manufacturers to support it is infinitely saner than getting a
-> > > > whole nother bit plumbed through the NVME standard, especially given
-> > > > that the letter of the spec does describe exactly what we want.
-> > > 
-> > > I my experience, the storage standards committees are more aligned to
-> > > accomodate appliance vendors than anything Linux specific. Your desired
-> > > read behavior would almost certainly be a new TPAR in NVMe to get spec
-> > > defined behavior. It's not impossible, but I'll just say it is an uphill
-> > > battle and the end result may or may not look like what you have in
-> > > mind.
-> > 
-> > I'm not so sure.
-> > 
-> > If there are users out there depending on a different meaning of read
-> > fua, then yes, absolutely (and it sounds like Martin might have been
-> > alluding to that - but why wouldn't the write have been done fua? I'd
-> > want to hear more about that)
-> 
-> As I mentioned, READ FUA provides an optimization opportunity that
-> can be used instead of Write + Flush or WriteFUA when the host isn't
-> sure about the persistence needs at the time of the initial Write: it
-> can be used as a checkpoint on a specific block range that you may have
-> written and overwritten. This kind of "read" command provides a well
-> defined persistence barrier. Thinking of Read FUA as a barrier is better
-> aligned with how the standards and device makers intended it to be used.
-
-Yeah, I got that. Again, a neat trick, but who in their right mind would
-use that sort of thing when the sane thing to do is just write fua?
-
-So I'm skeptical that that sort of thing is an actual use with any
-bearing on the devices any single node filesystem targets.
-
-Now, in crazy enterprise multi homing land, sure.
-
-Now, if you're saying you think the standard should be interpreted in a
-way such that read fua does what it seems you and Martin want it to do
-in crazy enterprise multi homing land... now _that_ would be a fun
-argument to have in a standards committee :)
-
-But I mostly jest, because my suspicion is that there wouldn't be any
-real conflict, just a bit of the "I hadn't thought to use it that way"
-anxiety.
-
-> > If, OTOH, this is just something that hasn't come up before - the
-> > language in the spec is already there, so once code is out there with
-> > enough users and a demonstrated use case then it might be a pretty
-> > simple nudge - "shoot down this range of the cache, don't just flush it"
-> > is a pretty simple code change, as far as these things go.
-> 
-> So you're telling me you've never written SSD firmware then waited for
-> the manufacturer to release it to your users? Yes, I jest, and maybe
-> YMMV; but relying on that process is putting your destiny in the wrong
-> hands.
-
-Nah, back when I was at an employer that did SSD drivers/firmware, it
-was all in house - no waiting to ship required :)
-
-And incidentally, it's been fun watching the "FTL host or device side"
-thing go back and forth since then; we had the same back-and-forth
-happen just between different generations of the internal stuff being
-built at Google that's been happening now with NVME and ZNS.
-
-The appeal of a host side FTL was fairly obvious back then, but the FTL
-ended up moving from the host to the device because people wanted to do
-complete kernel IO stack bypass. The AIO and DIO code were really bad
-back then especially in certain multithreaded scenarios - profiles were
-absolutely atrocious, and the performance gains of a host side FTL
-only really happen if you can do it in combination with the filesystem,
-cutting out a lot of redundancy and improving on GC efficiency (this is
-a big one) because in the filesystem, you have a lot more information on
-what goes with what, that's lost at the block layer. IO tail latency in
-particular improves, especially on loaded machines.
-
-But a filesystem meant for that didn't exist at the time, nor did
-hardware with any kind of an open interface...
-
-Since then the kernel IO stack has gotten massively faster, ZNS hardware
-exists, and bcachefs was pretty much designed from the start for
-directly driving flash. There's about a month of work left, max, for
-finish that off and driving hardware I have sitting on my desk.
-
-Which means there should be more interesting things happen in the NVME
-transport area in the future. In particular, moving the FTL into the
-filesystem ought to allow for much more gracefully degrading failure
-modes instead of the whole SSD going offline (and signals to the user
-about when flash is going bad! flash ECC algorithms give you this, it's
-just not exposed!).
-
-So should be fun times.
+Ah, this is the reason this works for you (and the one in the kernel
+root). When I said it didn't work, I was referring to not being able
+to convincingly avoid these lints without disabling the check
+altogether. Let's see what Miguel thinks. I agree that the options
+are: extension trait + stubs/reexports + suppressing
+`incompatible_msrv` or just dropping the last patch until MSRV bump.
