@@ -1,142 +1,213 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0439217E0;
-	Wed, 19 Mar 2025 02:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C994D20F091;
+	Wed, 19 Mar 2025 08:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742353157; cv=none; b=XaXIvbVmQCguYQMrh2x9cNvNcQUo4Nplmg/Sxl0F/9F8IspMLOrTTuNKocbz1Wlhc4LNFL7VzZ7FkmTpCVy+ApdzztD5sq1YHARo5WWg2iZzfwm9FX6/rchEdxB5MpkWzVnnMGDLsPX0gO2lXabMx1iZ0zLPmQ2p+6vV8b1GewQ=
+	t=1742373064; cv=none; b=RzdkwKfac6Rf+c9N9OBTOIuZiLPR4sBUmgcHPxk72VnU/5NutxShNmzge43QSrV3vvdEktIhE2ri81Y1nbdvTBZpSyjNW/vgS8PL/A9NYTrhpae/kgu7+eLemU5GkIzWddUQ6uEGjQwu8DZS/C+H1UotPz6s931hb8TuF5CFDdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742353157; c=relaxed/simple;
-	bh=ORxf7Wl5D6pS8hxyVlm8qbOGe2MYj8z7WfpvvQwBnEQ=;
+	s=arc-20240116; t=1742373064; c=relaxed/simple;
+	bh=w3JmB7o8CKormT/Akok+UN9U+U8VYEVmbKd3okiCYoE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KL2lQ8ydV+0lPk4OR7mxxt4q2IxoNzTZP26f4zXRkX9Pl6EkoOeSOdU/HlcD0P4UEUabBQtTgtvO73vUtHUb1tLO85lYdVHTUujgUJIljsSX+KR8Pr48yFEhnxd7p0915z4WrY8eQjR8qGj/OxwNNVLJe/g0+TQvEQQg5h055wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jDoB0hg4; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=WcgP+Rt+xPObIsmt1BqHd3kuIvYuVeA+JzlrwHBTJngo8cyeE61nA38kDLiV+xG6gNN1eG/sT+YCRh7/yn+BKu2pG3h0MnAqWDOD0mSfrL+Lt8Sa7Al9oLz1f8aVVDhO2E1wUo4FW4mnQhyivBvyDGOtJB972JsS+wlirjcumWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/ZmCalc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jDoB0hg4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=A6RUDuo3cNbiixoqkREg738jFP2pjKLFG8KWUHUl4c0=; b=jDoB0hg4x2xQ8jBQAABOdNuRkb
-	wdwD8AnWSTs9PuPFmcCVKeyR1EKXtetZOtAd4rnPG3BwGR4uaC6bPq5lzZa4dFYQjAaJlKn+IYZ1c
-	Fmh2kdaZAAbBg2oHN5vZElMEinKBLfjUOdk0aoSR5sAVTdIN3kcxsWwjDh4JA8aSpGpLTpmiuXwNO
-	nNVGz4OYn9mq0kAgF5z5FmFjsl/ANEL/Y/XB7DKXmObB6rMdiIux+TJdbdxmewGQr6dn2V/X0CLSn
-	g9PbLXnfsdqK/z29aNIwts4XT4hNMoO9n2YOsy4ptub+BX659yoSo5srmxfHrYsXAdLIh+QFlmGjQ
-	/ojSY0sQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tujde-00000000cmK-2G74;
-	Wed, 19 Mar 2025 02:58:38 +0000
-Date: Wed, 19 Mar 2025 02:58:38 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Oliver Sang <oliver.sang@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z9oy3i3n_HKFu1M1@casper.infradead.org>
-References: <202503101536.27099c77-lkp@intel.com>
- <20250311-testphasen-behelfen-09b950bbecbf@brauner>
- <Z9kEdPLNT8SOyOQT@xsang-OptiPlex-9020>
- <Z9krpfrKjnFs6mfE@bombadil.infradead.org>
- <Z9mFKa3p5P9TBSTQ@casper.infradead.org>
- <Z9n_Iu6W40ZNnKwT@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/ZmCalc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96DF5C4CEE9;
+	Wed, 19 Mar 2025 08:31:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742373063;
+	bh=w3JmB7o8CKormT/Akok+UN9U+U8VYEVmbKd3okiCYoE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k/ZmCalc1dPOZG6tOAhA+Vbavt7ywew9AlCIx2pzmLHVBTMjREfKHqE2Yum/A2k90
+	 Mgo+utD6esZ3GSzapnLqbyG8yVsrTWUf4LItvlOCrYiiwuNO3yR2hQSEZpAOU6nnCo
+	 ZQRiEYn2mZ5bFSK8HEji2pCWj4CLMwBv5PoBA514qIBaTnW4NxRHmPJsRxHz6F9LM6
+	 DEj4Vkpkiz3HR+9d8OInlfDxTa9WdUELXV90gpobKxd8KKBd5UGsQL7y13D0qR11Xw
+	 1V/5hXHr1Z4zSHswxS63wOUI6bDFZ2FK5D8dKbOltHWG9ThPOmE1f0m3YkoTz1ruoI
+	 rs/FbXe+RBpfw==
+Date: Wed, 19 Mar 2025 10:30:58 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <20250319083058.GG1322339@unreal>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+ <20250312193249.GI1322339@unreal>
+ <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+ <20250314184911.GR1322339@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Z9n_Iu6W40ZNnKwT@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250314184911.GR1322339@unreal>
 
-On Tue, Mar 18, 2025 at 04:17:54PM -0700, Luis Chamberlain wrote:
-> Ah, then that LTP test isn't going to easily reproduce bugs around
-> compaction bug. To help proactively find compaction bugs more
-> deterministically we wrote generic/750 and indeed we can easily see
-> issues creep up with a SOAK_DURATION=9000 on ext4 on linux-next as of
-> yesterday next-20250317.
+On Fri, Mar 14, 2025 at 08:49:11PM +0200, Leon Romanovsky wrote:
+> On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
+> > On 12.03.2025 20:32, Leon Romanovsky wrote:
+> > > On Wed, Mar 12, 2025 at 10:28:32AM +0100, Marek Szyprowski wrote:
+> > >> Hi Robin
+> > >>
+> > >> On 28.02.2025 20:54, Robin Murphy wrote:
+> > >>> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
+> > >>>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
+> > >>>>> From: Leon Romanovsky <leonro@nvidia.com>
+> > >>>>>
+> > >>>>> Changelog:
+> > >>>>> v7:
+> > >>>>>    * Rebased to v6.14-rc1
+> > >>>> <...>
+> > >>>>
+> > >>>>> Christoph Hellwig (6):
+> > >>>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
+> > >>>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+> > >>>>>     iommu: generalize the batched sync after map interface
+> > >>>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+> > >>>>>     dma-mapping: add a dma_need_unmap helper
+> > >>>>>     docs: core-api: document the IOVA-based API
+> > >>>>>
+> > >>>>> Leon Romanovsky (11):
+> > >>>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
+> > >>>>>     dma-mapping: Provide an interface to allow allocate IOVA
+> > >>>>>     dma-mapping: Implement link/unlink ranges API
+> > >>>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
+> > >>>>>     mm/hmm: provide generic DMA managing logic
+> > >>>>>     RDMA/umem: Store ODP access mask information in PFN
+> > >>>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+> > >>>>>       linkage
+> > >>>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
+> > >>>>>     vfio/mlx5: Explicitly use number of pages instead of allocated
+> > >>>>> length
+> > >>>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> > >>>>>     vfio/mlx5: Enable the DMA link API
+> > >>>>>
+> > >>>>>    Documentation/core-api/dma-api.rst   |  70 ++++
+> > >>>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
+> > >>>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+> > >>>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
+> > >>>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+> > >>>>>    drivers/iommu/dma-iommu.c            | 468
+> > >>>>> +++++++++++++++++++++++----
+> > >>>>>    drivers/iommu/iommu.c                |  84 ++---
+> > >>>>>    drivers/pci/p2pdma.c                 |  38 +--
+> > >>>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
+> > >>>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
+> > >>>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
+> > >>>>>    include/linux/dma-map-ops.h          |  54 ----
+> > >>>>>    include/linux/dma-mapping.h          |  85 +++++
+> > >>>>>    include/linux/hmm-dma.h              |  33 ++
+> > >>>>>    include/linux/hmm.h                  |  21 ++
+> > >>>>>    include/linux/iommu.h                |   4 +
+> > >>>>>    include/linux/pci-p2pdma.h           |  84 +++++
+> > >>>>>    include/rdma/ib_umem_odp.h           |  25 +-
+> > >>>>>    kernel/dma/direct.c                  |  44 +--
+> > >>>>>    kernel/dma/mapping.c                 |  18 ++
+> > >>>>>    mm/hmm.c                             | 264 +++++++++++++--
+> > >>>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
+> > >>>>>    create mode 100644 include/linux/hmm-dma.h
+> > >>>> Kind reminder.
+> > > <...>
+> > >
+> > >> Removing the need for scatterlists was advertised as the main goal of
+> > >> this new API, but it looks that similar effects can be achieved with
+> > >> just iterating over the pages and calling page-based DMA API directly.
+> > > Such iteration can't be enough because P2P pages don't have struct pages,
+> > > so you can't use reliably and efficiently dma_map_page_attrs() call.
+> > >
+> > > The only way to do so is to use dma_map_sg_attrs(), which relies on SG
+> > > (the one that we want to remove) to map P2P pages.
+> > 
+> > That's something I don't get yet. How P2P pages can be used with 
+> > dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate 
+> > internally on struct page pointer.
+> 
+> Yes, and no.
+> See users of is_pci_p2pdma_page(...) function. In dma_*_sg() APIs, there
+> is a real check and support for p2p. In dma_map_page_attrs() variants,
+> this support is missing (ignored, or error is returned).
+> 
+> > 
+> > >> Maybe I missed something. I still see some advantages in this DMA API
+> > >> extension, but I would also like to see the clear benefits from
+> > >> introducing it, like perf logs or other benchmark summary.
+> > > We didn't focus yet on performance, however Christoph mentioned in his
+> > > block RFC [1] that even simple conversion should improve performance as
+> > > we are performing one P2P lookup per-bio and not per-SG entry as was
+> > > before [2]. In addition it decreases memory [3] too.
+> > >
+> > > [1] https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org/
+> > > [2] https://lore.kernel.org/all/34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org/
+> > > [3] https://lore.kernel.org/all/383557d0fa1aa393dbab4e1daec94b6cced384ab.1730037261.git.leon@kernel.org/
+> > >
+> > > So clear benefits are:
+> > > 1. Ability to use native for subsystem structure, e.g. bio for block,
+> > > umem for RDMA, dmabuf for DRM, e.t.c. It removes current wasteful
+> > > conversions from and to SG in order to work with DMA API.
+> > > 2. Batched request and iotlb sync optimizations (perform only once).
+> > > 3. Avoid very expensive call to pgmap pointer.
+> > > 4. Expose MMIO over VFIO without hacks (PCI BAR doesn't have struct pages).
+> > > See this series for such a hack
+> > > https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+> > 
+> > I see those benefits and I admit that for typical DMA-with-IOMMU case it 
+> > would improve some things. I think that main concern from Robin was how 
+> > to handle it for the cases without an IOMMU.
+> 
+> In such case, we fallback to non-IOMMU flow (old, well-established one).
+> See this HMM patch as an example https://lore.kernel.org/all/a796da065fa8a9cb35d591ce6930400619572dcc.1738765879.git.leonro@nvidia.com/
+> +dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
+> +			   size_t idx,
+> +			   struct pci_p2pdma_map_state *p2pdma_state)
+> ...
+> +	if (dma_use_iova(state)) {
+> ...
+> +	} else {
+> ...
+> +		dma_addr = dma_map_page(dev, page, 0, map->dma_entry_size,
+> +					DMA_BIDIRECTIONAL);
+> 
+> Thanks
 
-Umm .. this is an entirely separate bug.  How much COMFIG_DEBUG do you
-have enabled (ie is this a consequence of something that we have an
-assert for, but you've disabled?)
+Marek,
 
-> BUG: unable to handle page fault for address: ffff9d5640010c48
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 38601067 P4D 38601067 PUD 0 
-> Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-> CPU: 0 UID: 0 PID: 74 Comm: kcompactd0 Not tainted 6.14.0-rc7-next-20250317 #30
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.11-5 01/28/2025
-> RIP: 0010:__zone_watermark_ok+0x4e/0x1e0
-> Code: 00 00 00 41 f7 c0 38 02 00 00 0f 85 2c 01 00 00 48 8b 4f 30 48 63 d2 48 01 ca 85 db 0f 84 f3 00 00 00 49 29 d1 bb 80 00 00 00 <4c> 03 54 f7 38 31 d2 4d 39 ca 0f 8d d2 00 00 00 ba 01 00 00 00 85
-> RSP: 0018:ffffbf47c02b7c78 EFLAGS: 00010202
-> RAX: 0000000000000000 RBX: 0000000000000080 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000002f52 RDI: ffff9d563fff9180
-> RBP: 0000000000000009 R08: 0000000000000080 R09: 00000000000030a1
-> R10: 0000000000000be4 R11: 0000000000000be4 R12: 0000000000000002
-> R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000002f52
+Did it answer your concerns?
 
-  2a:*	4c 03 54 f7 38       	add    0x38(%rdi,%rsi,8),%r10		<-- trapping instruction
+How can we progress here? As you can see, the chances to get meaningful
+response to your review request and my questions are not high.
 
-Not quite sure what this is.  Perhaps running this through decode_stacktrace.sh
-would be helpful?
+Thanks
 
-> FS:  0000000000000000(0000) GS:ffff9d56b6cce000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffff9d5640010c48 CR3: 0000000115920006 CR4: 0000000000772ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  <TASK>
->  ? __die_body.cold+0x19/0x28
->  ? page_fault_oops+0xa1/0x230
->  ? search_module_extables+0x40/0x60
->  ? __zone_watermark_ok+0x4e/0x1e0
->  ? search_bpf_extables+0x5b/0x80
->  ? exc_page_fault+0x16d/0x190
->  ? __zone_watermark_ok+0x4e/0x1e0
->  ? hrtimer_try_to_cancel+0x78/0x110
->  compaction_suit_allocation_order+0x8f/0x110
->  kcompactd_do_work+0xbc/0x260
->  kcompactd+0x396/0x3e0
->  ? __pfx_autoremove_wake_function+0x10/0x10
->  ? __pfx_kcompactd+0x10/0x10
->  kthread+0xf6/0x240
->  ? __pfx_kthread+0x10/0x10
->  ? _raw_spin_unlock+0x15/0x30
->  ? finish_task_switch.isra.0+0x94/0x290
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x2d/0x50
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
-> Modules linked in: exfat xfs ext2 loop sunrpc 9p nls_iso8859_1 nls_cp437 crc32c_generic vfat fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha512_generic sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio virtio_console virtio_balloon button joydev evdev serio_raw nvme_fabrics dm_mod nvme_core drm vsock_loopback vmw_vsock_virtio_transport_common vsock nfnetlink autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover failover virtio_blk psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-> CR2: ffff9d5640010c48
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:__zone_watermark_ok+0x4e/0x1e0
-> Code: 00 00 00 41 f7 c0 38 02 00 00 0f 85 2c 01 00 00 48 8b 4f 30 48 63 d2 48 01 ca 85 db 0f 84 f3 00 00 00 49 29 d1 bb 80 00 00 00 <4c> 03 54 f7 38 31 d2 4d 39 ca 0f 8d d2 00 00 00 ba 01 00 00 00 85
-> RSP: 0018:ffffbf47c02b7c78 EFLAGS: 00010202
-> RAX: 0000000000000000 RBX: 0000000000000080 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000002f52 RDI: ffff9d563fff9180
-> RBP: 0000000000000009 R08: 0000000000000080 R09: 00000000000030a1
-> R10: 0000000000000be4 R11: 0000000000000be4 R12: 0000000000000002
-> R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000002f52
-> FS:  0000000000000000(0000) GS:ffff9d56b6cce000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffff9d5640010c48 CR3: 0000000115920006 CR4: 0000000000772ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> note: kcompactd0[74] exited with irqs disabled
+> 
+> > 
+> > Best regards
+> > -- 
+> > Marek Szyprowski, PhD
+> > Samsung R&D Institute Poland
+> > 
+> 
