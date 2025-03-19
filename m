@@ -1,107 +1,88 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1A9255E3C
-	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 12:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E4F17BA6
+	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 13:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742387552; cv=none; b=C70xYCuHLzO04oMJmhZy60rbYyVuLflfA06yPPvx1C8eaAM39TJwZt+SuHrYSdbfpxezfGs8XIP5XBCHSZAKIKuxoDJ/Rs8DFIEvf4J/prWLSTgq36yb4HDY8jRY0gXIBLbe+HtcM8UfluKGe1RDkM7nIdXtGdZgLVhyxI1Kr2Y=
+	t=1742390236; cv=none; b=KT354WlxxAniTT+/kbaTpgzbvLJ6W1o6WsJPfV3++/9jEzU+dxnW+5ArS3wnmaNC32S5Joea+LkzB6iyaHhfmrLO3LaaEPDQBrlEzEYl/0/laZYWRymBiEkFojpOW7AzDN2KpZB70Lj2FJhtCglgmZJUx9gXSONnuAbmFDBAGbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742387552; c=relaxed/simple;
-	bh=3sLaeeRb8QGUs2qP+ok9FxoUFnt0ypcwPX8d19Uwcyk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=uYa1MmzD5kSKJ0GyZeyfQNzFhU6JVbxmTpK5yh1QSFuIwqIhWMifiM6rfQgy/S7rxueigZ/lMyvAERGrNJMSDyjCwAFLMgdt7uDUf4rS9IEvmdNi4895XBjAzeUD4mBxEsySGkAHedWetSlpA934yTgwpENA/yUHL/HLhBJQZso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IrTx7OdE; arc=none smtp.client-ip=209.85.166.44
+	s=arc-20240116; t=1742390236; c=relaxed/simple;
+	bh=D47VypazdbU4fqhF0bTU3OX18kv0Xc7Ljtwoo1I84YA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=I3/O7SAGWcdqzkIrCrPNVpr5dp9m0M+NVfDr/MyOfD6Zet+JvRa/xmUaRnaoBaPuecjPlyNa+bbDVbF9fbtlcRkevIq09AlHy6+vDj+KG7hTO6dXBdMUFzQ3RKbEzLgKheI2VvfC3CjS1r2jS3tWGwLW1pmvB5PIULYzaDBfq9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vc9hBrap; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IrTx7OdE"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-85ae4dc67e5so286490139f.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 05:32:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vc9hBrap"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d03d2bd7d2so77909175ab.0
+        for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 06:17:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742387547; x=1742992347; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n5O/QbKWxunF8Y6I3M+WlpXJ/TuyTQEPMHlqnEWvQ/s=;
-        b=IrTx7OdEil4XXzjmAbrEx6TcbL9w4H/eQdupsWwYos8aLIHT0zqp43bRJN98132wqc
-         TaI5dOGTiGn3WV3fpnXu56lOOwH/+z44iAwR/EhVNYKOs/cNKrQqm5WmgfNYOQaIrWg2
-         BXLz0VN0u14Y1U+wVqQ5wd4OOSh4F5XuVbkcu59Vap/wZWv03dGLuDgclyRF9M96XCKX
-         sCgc24Y5ChJd5XhI/UCPpHAglDJ8x8lhAZAWHSG6JUky10Wt5lJsLFRDa/Cr3fo26U4q
-         whI4Z/r21T2ISy7kUo7gNwsF9nB0iiFi80AMRC2+GkyoNljuOmVnHlFS5jeqgMGZwaW5
-         HgBg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742390233; x=1742995033; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JSHoB0s0coctjvbY3kKqqVrIVzw0mCbNKlZ4oqh6wdQ=;
+        b=vc9hBrapUr301yEj8tJtS6ATIpG1HYkmkomLax3Ku3o+guzXrme2DoDnXadEIgukda
+         FyCvoNsqDoQhK/N8XIyCkenUhw1AG4noqFPEEzV80Ick0OYljw2Ou/LM68L+nYFiDa4B
+         7sts+3oSc5slhEy57I0kwvIri7NevgTIBNZq+rF9HWQMmOSdVZsKHr6NDlyFioBcAtk5
+         e1le0+m7DjaVu+RZ6wNcs6rDI42Inim6IOgZr+8H4eOADOdlRiDgpXWd3Gxrjc6bIGQb
+         IbFqygV2fUNMGJYw/HALBjkRkW2oK3GPbDYKRS2bn+xDYvpcruJGJG/CGyruu327yIXy
+         117Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742387547; x=1742992347;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n5O/QbKWxunF8Y6I3M+WlpXJ/TuyTQEPMHlqnEWvQ/s=;
-        b=qTqxoi7ddlr1PcUeMQJGAKLFoNa5S/A944mPqF8T3MyC6mh9whoAB7GHE1/WXiSra4
-         bNYLDeyzyqLqwZKyZgZezqpZ0rXnErUErIM7c+j+JWskAEcOxvKrDgGwAYDbQjixbTJO
-         qauoofyt63Xc3WRGWpj0mbLtLBCpcrdVuoEk8rUcAPSO2J84CAFCSPYJnvKOOmuFfPop
-         T0tvMnUIoKeVBMkzWN/em/hAoYjHtwkO7BWsGUnhvlrrqYG/wolXGD9tkGUwvaVi/hs4
-         c6R3sF3DNTt3M0GgVOM+o1teqeEmRRV2izZLaiHYWMBkXfh/sofI0O3+3Ukdk+FfDWr/
-         8yWQ==
-X-Gm-Message-State: AOJu0YzysHP7Mb/KShVXqGwhR/gqT4+SSmPxTZpWOqVtlt/Oz/9tAoyA
-	+d6wJHWxkwVu0vOsUMnZEuYc6lFwDnbV4njhC1hZg7h5mSw9/r7Lv7b0+m4e2DVWllEtKNfE+s7
-	+
-X-Gm-Gg: ASbGnctXdmUqsYwqUdljQBbX/6Bb7hN0GrM5A9AuHKfimQvXZv9pI/QwmXT2vPq11qk
-	+osp5ZK175eKEGitG+WBx7iTzfeUR+r8/UkbhtxaUL4qWQG9JzwiRM/epGrCn/fbgmHM5nWJqXM
-	Xjr2Og8Q7jHyGMUPV6jpLIdZQphoizqQTF9ssryYFWv/CXZMrdOrXY4t0SBKf9m3h2HCGt89+JR
-	BgkwmDznxoxbshRA9wnRe12ToY8hMMY+U94HJ0jqHw8lUg6FZXAqGk995+6Qh7gjVmFXCfuRbrz
-	XnrEA/TU7NyeILAzwbUsICydB7FacPGnp8de
-X-Google-Smtp-Source: AGHT+IHk2B/ooYRCMecare5o4+SvKD32nJBaYeev6PeJOvnzW+gB+hnSyHFoeMRT/jBqurldVQU5sQ==
-X-Received: by 2002:a05:6602:489a:b0:85b:59f3:2ed3 with SMTP id ca18e2360f4ac-85e137de648mr297745539f.8.1742387547598;
-        Wed, 19 Mar 2025 05:32:27 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85db874a028sm305508039f.4.2025.03.19.05.32.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 05:32:27 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20250318-ublk_io_cmds-v1-1-c1bb74798fef@purestorage.com>
-References: <20250318-ublk_io_cmds-v1-1-c1bb74798fef@purestorage.com>
-Subject: Re: [PATCH] ublk: remove io_cmds list in ublk_queue
-Message-Id: <174238754686.12244.10161282968686330237.b4-ty@kernel.dk>
-Date: Wed, 19 Mar 2025 06:32:26 -0600
+        d=1e100.net; s=20230601; t=1742390233; x=1742995033;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSHoB0s0coctjvbY3kKqqVrIVzw0mCbNKlZ4oqh6wdQ=;
+        b=urhEUW2JYMAy7+e4IdG3nq3TiAAI1XiIvctnz1MlR6WFWN0SYYS4SJ6V8HFoQn5y+P
+         +7OU59702zuaYvwd5Iy9y5tJRQpIn3GshzFLSoquFzPU/UDHLh+zhaP6YvJI3rSRsL1T
+         S6fo+P1BrLZCfyYnTXxhGVhuj0pI7veBgNVP6dPaA6zWNXfhRkroS9+xuj/XuMoQjclm
+         eSTRLmxVArbMUxGeoqpVr7bIw86ZIMmBtEvY2Ve4X2NMi5qlyfkBxE5olnVB/BU/aEN0
+         UTyxMt+nVyMtjrWCcWqoF48webnrA5dja35mbkziQGHtyim+FixjGsKWQfK+7f8KGbE2
+         jQsA==
+X-Forwarded-Encrypted: i=1; AJvYcCXThcbizS33VdsDsNEtOb3AuIybWyyZSixv83rFGxyGfBd++bSW8td/E+96lcInNT74WcAxby/PyHC+eg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7Ot46O77vPFSJEDgIqWnbBwe6BVSj0ePjFiY5uyR74Q/jlcm0
+	6hbXdYEtMMonnIRoV0UZ+O8PWRwkTUaVkistA9DHZgfRv6eBSfnuuWoTOHwW/6hmH0EKFiyfECt
+	i
+X-Gm-Gg: ASbGncvSuqfNjXHoTFoCY3gg3EmQLDPeFSZLZU8oW5xCFmPmG+jd7EabqNQmab5srfs
+	G8bI093M966dJHjfC0VyZxl6IHGZpXi96xL7GzMgz14u/VFS3mFY1oqBkjVtkKyKMLzNts2i1ph
+	0XZrpgX7VbURhegbwA1cZ06T2TKkaOG/lF7zxpwRWcoZdopAbf35p5DQpSopaNv59My3v4uMjDa
+	tmM5XqE1HukDsel8boOf/t4vE7phpzVy8W0JLx30AsV26AuGz9BAvfNxUGTnroc7LArQ44qt3ZC
+	pCGKVLR5x8aDVdnCNFyUJsX2G/RGq856nPZRhP89
+X-Google-Smtp-Source: AGHT+IEXpD47cRg6Bku6LXrgHWdfyHM2OHeGwIiM+rS5wNtVz0eHSBfmYPQUcjCZ1Dfr00bKDqC30Q==
+X-Received: by 2002:a05:6e02:2788:b0:3d3:e41b:936f with SMTP id e9e14a558f8ab-3d586b1b1c7mr28926755ab.3.1742390232640;
+        Wed, 19 Mar 2025 06:17:12 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d47a6691d1sm38857155ab.27.2025.03.19.06.17.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 06:17:11 -0700 (PDT)
+Message-ID: <8281b548-8801-42a7-973e-9d06a1ef3c35@kernel.dk>
+Date: Wed, 19 Mar 2025 07:17:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: don't define __blk_mq_end_request() as inline
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+References: <20250319021343.3976476-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250319021343.3976476-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
 
+On 3/18/25 8:13 PM, Ming Lei wrote:
+> It doesn't make sense to define one global symbol as inline, also this
+> way cause __blk_mq_end_request become not traceable.
 
-On Tue, 18 Mar 2025 12:14:17 -0600, Uday Shankar wrote:
-> The current I/O dispatch mechanism - queueing I/O by adding it to the
-> io_cmds list (and poking task_work as needed), then dispatching it in
-> ublk server task context by reversing io_cmds and completing the
-> io_uring command associated to each one - was introduced by commit
-> 7d4a93176e014 ("ublk_drv: don't forward io commands in reserve order")
-> to ensure that the ublk server received I/O in the same order that the
-> block layer submitted it to ublk_drv. This mechanism was only needed for
-> the "raw" task_work submission mechanism, since the io_uring task work
-> wrapper maintains FIFO ordering (using quite a similar mechanism in
-> fact). The "raw" task_work submission mechanism is no longer supported
-> in ublk_drv as of commit 29dc5d06613f2 ("ublk: kill queuing request by
-> task_work_add"), so the explicit llist/reversal is no longer needed - it
-> just duplicates logic already present in the underlying io_uring APIs.
-> Remove it.
-> 
-> [...]
+It does for the local scope though, it'll force it inline for
+blk_mq_end_request(), for example.
 
-Applied, thanks!
-
-[1/1] ublk: remove io_cmds list in ublk_queue
-      commit: 989bcd623a8b0c32b76d9258767d8b37e53419e6
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
