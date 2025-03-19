@@ -1,64 +1,65 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC87721CC52
-	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 01:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA5221CC52
+	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 01:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742349281; cv=none; b=kao8o+kKutJWfo8+FHhX1KAA6WEkQn+SBrumCIQK435QrgbAaPeglA75FZ6e+PY7kBVYW2I3ukbt8px6L1OEidLvoIBIi2RhAKAt4gjqImpaKDHncYNvYNX6eEdMlJxxMRYG61ID7ay1/K2mp7U80NAQGwjkBYe4js433K/25mM=
+	t=1742349436; cv=none; b=PD8Zsh3Cyoo7YHnfIhoWBCM6snlGJa6VZQ19unmoWhdW4QCbNoNOjejEhemMnmt2MA253s4l1W0wMfA0nXYyi4A4efbM40zVkAHXcVYJfw5mKP+k2LropqHh3gezQYFKEF7KW3ApqFE86HizDkbQZPpZ4PKDTQK2fNX3xrKsQnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742349281; c=relaxed/simple;
-	bh=O05zv9Gr7ij6UY/M3en/ncnaSQw7ZAi41fgFLgqI3zQ=;
+	s=arc-20240116; t=1742349436; c=relaxed/simple;
+	bh=4Iky9k1xOnxkJmjy7odfgV61tLiI113GtBHNMqbfGuQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BhyfZO7yxb8Btm/sOyjIvEfmsLdvKm+EpaAMjy7/v6mb+AYAIGMv7jLh1QHU5qTN2wUjVlqEjXdmMKMXHHuiCxAQpjN0rsUMN7LniZhdnr5T0KLDsTkK3nQGYyfrE9UJn9Fo42bvx7qSTU7jozBsEzZABFydJYvRcqrF9DOuH2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1K9tS80S; arc=none smtp.client-ip=209.85.166.42
+	 In-Reply-To:Content-Type; b=HMN94Y59SqsPIQ/6VNXk+AiyUuaEtxh0lophiRPPkdEPUaKn/hM2jnuIsVnBZYR2EdFG6tYHHmO7ndHVdrcki7+BxzdzTu4MQb/w/HG9je9C83Trunyb26FGetw8v94K/+RNjXpu/hk3YuNxVy9L9bWwi1j+5Pxok4Yu6E+vRMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qn/pDGIB; arc=none smtp.client-ip=209.85.166.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1K9tS80S"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-85e14ce87ceso6330039f.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 18:54:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qn/pDGIB"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-85b40c7d608so582413739f.3
+        for <linux-block@vger.kernel.org>; Tue, 18 Mar 2025 18:57:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742349278; x=1742954078; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742349433; x=1742954233; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=K+ADK92XLUbLu1McrNmz+RFbt3c8h6ORFjxwugmoA+4=;
-        b=1K9tS80SuM1wLi8vpMJcRdmTuX+726/S7gyHJTHUHuBJuYs13T+2pBvwVV4OBtr+Tc
-         FEiHA/vnPF/lsVERYYYCXI0bZE+WGwyUWPXS9VkqyVYRDvlmU56BjBhA5kTgmRy/PeL5
-         E2F0yJAoulFtlRo+J0FpiGcJbr9vrkUnfRDC6UmRKHFKpDpVoenNy7tvTWsqwLISE7vA
-         ixBz4A0U+n2QimxZ+2HBpaOqswQm/NNQZmgmd23snugtW2mCKZXwqPuD8MpyS4Gk3P2H
-         A4eAO5FBKl37YDidbHVfErLqnnjiykiDE8MKo2MzHM+jrKInxPCnCGbR+08I3K6u3nIH
-         cnqQ==
+        bh=uAtG/3XT8Z4ZhRh/HAzFXzZVyaeq2S82ltLZZg2sZSo=;
+        b=qn/pDGIB1a+zoF8L92G4E+iAUSq2nZnL1HjUx38AsUOKrNUAryL1OKXtgIXAhz0JiB
+         ZeP+EKYow3zoPwPTVVVisU7JsXK6pVs8Iuk7BX2Rk/Dhg3ZTiW/vfzsC7DVLa9To3tBc
+         EK4qXZH0aDrVAQBczH2SNWdfV2KTOBue2hnfwussq2PIN+GaDdTF/0fKn0F0/G/AJ5UK
+         zX7ivSn8HlMTEe8+eT+Jkk2623YrYSyvku6sZDh0wQJfxGCyz/Y+Lz2ggNaulUG2Ttn6
+         2cPs+9sLge8K1qRLLEnhg11NJHF3ppS9v2bHAgrFYB868QJM8dj+Pijfg/YKv3q3eNDP
+         271g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742349278; x=1742954078;
+        d=1e100.net; s=20230601; t=1742349433; x=1742954233;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+ADK92XLUbLu1McrNmz+RFbt3c8h6ORFjxwugmoA+4=;
-        b=Ro2t99LmpfqxOczuR5y9iu/quAbjjvi98sfYLaizCCFFKwe+3Ft3HSjK0+rNbS07+6
-         f9wUF65VOS9SN81NF/uLARuz5RQOtwFpV6ni9wBiRYEQmfF6LMBRlaRcdRl+Aa2YmOWE
-         qO5WudxyGPMK6dwoHaAaRJRdr03ORQO5/Iparknm6780whQYwXN1nvr2GHp85o8eS+wn
-         ZjwLsXel/SVJD9IrRpELoLfI4qU7rRzzw8DDOJGUpdxbMwdq9GzIN8BdGejXtileCYnT
-         eQNFzfpt+0yf1/opRFOCSQFvZOrsFvJOGrUPKrRe/wG25QOB7ydXphloaRjm82L5PgBT
-         y0Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCXuO4chCq2uwkNeJLVFtOcut0/CEKXumWLuBp2y7mo/x0hYLWbWjkOdy8DNE4h8mWzVJ+J4y9poaHjOKg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXmPS0/P/SXrlnpllBQSDDrE+ZD5hNNTe8697dFT4KvapkLG8K
-	WX9CZ0iKzEXJPTbh7UTKbEGKkk+eIZXth8ZpBDErBabncUVsBaRQhxsWpK3u1vU=
-X-Gm-Gg: ASbGnct3Ub648E1iCukcQ2Fh2WyoTs/Gxh7EfzP0jquBqrKLaiXJIVWWF6IGdNwQV39
-	6vEFtJbv6f+boy2mWTxqZlK3iKyPynWna4zmAHajUBYKIy5g2qE2dO9wzWlJfvtD6wQwtQc9gV4
-	KixH8eI4nsz47Y1DifMFPJi2dNXoyKiACbIZAxi0gRud89tfzPXcc/fa6ouxQ13UyE5Pa7qaqQd
-	kgVphKjEgyrPmcOvpMdm4YdLN/n0JtTXSRdDl++ib8vgUdOE0qlnl5sk8JUERFtbG67GgZc2A9F
-	DIh3W1DT+S1ivyAAnzvT8Ke7urt6LK0OFIf/CqCNDw==
-X-Google-Smtp-Source: AGHT+IG83dNvTQFpMCt3EQiPF9LPCDkl3G0nYDFFStwTN5nKFtl4tIC7PhUB1HeyZ1mWwotU30XEYg==
-X-Received: by 2002:a6b:dd19:0:b0:858:7b72:ec89 with SMTP id ca18e2360f4ac-85e00bcf75emr547531539f.5.1742349277855;
-        Tue, 18 Mar 2025 18:54:37 -0700 (PDT)
+        bh=uAtG/3XT8Z4ZhRh/HAzFXzZVyaeq2S82ltLZZg2sZSo=;
+        b=cA25H0JB183oMAWGmGsaXlFgeWAwvMIXcZ/l98UJZC7RCQmsquFmP4MK60kfvfpbxv
+         gXoeX3FrAMQBa00mjtFqOVkOcwk7xM3a0XQshuBqXkZxWWxxZAo5kt7mSI1ajmbvCmVa
+         rD1QLyt5qLYQAJat2aMLrYm8mHAGCnEWOjgQCSLbAMaWj4GWYgn/0najP5cB7XmY48F4
+         7OI88Lunr1PjCzKFT21okMmf9QWxIFoXKomNyJmIXVBl0A+Fy+m1FA57aXsJss3r9rpy
+         SCV2RifT06Hr6zJHoXDmW6K1D9GDC33O9jcpOnXFCHxEqS3XGHpjnm8CgvLM39BRs0On
+         pI0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUNE8kFc6C413mfV+xhGjBlgEDnzCTKEpvTvlVtvFh1kgTByInqwsq/1lDjJNxFaDXUjJsCcaI1qCa1kw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxZjeBDKFQjalQz871zYTAgD1YcxMKNM/kHCwCIXQdHJBMquYn
+	POypfkvDvyu62PDeMcZ3bKJXAC6ZS6tMOVDVpbzssgLZPrnPWfjJKRoeLVX4Lcgf5t9UcsQCh7G
+	0
+X-Gm-Gg: ASbGncuGAYg5zlFIbSn5bDpfs+CmSu+J/QTVi5zenIW9tRCEaR9rSruk/4C3rccgvtg
+	1Ki3JU6if9ZU7/mb+WizKfXMmqSlFVs863ZJ7eL66VnGRCDIOAX1hHFxzxK2nLFf6ZnuD3vSAO/
+	JmVv21vZU+f/ycAveQY4tTUEwozHGO05KIHGUuJeiBT75+ClJvM62vKn8K6kxbG9eFl62r5pLCu
+	fYXXuJJBlFHM8+ngIFVrHXNZWgtTdbnHtHWiY+dYV9oPUhMyxO0aXtyjH3JBUN2Xrjzwp9t7G6z
+	twOj3eHTiT+/op04ZCV/bek1Ji0oiFEcxGwYgYQx/A==
+X-Google-Smtp-Source: AGHT+IHF7/5McpOTghKiFHWq/2xfOfaFa5C8Kfg8Jj5rTk0KBja8L7jo2jOzdntuucPNbmmOqgwxpw==
+X-Received: by 2002:a05:6e02:1d17:b0:3d4:337f:121b with SMTP id e9e14a558f8ab-3d586b2b089mr9206325ab.8.1742349433365;
+        Tue, 18 Mar 2025 18:57:13 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f263816ae0sm3029513173.119.2025.03.18.18.54.37
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f26382c424sm3023540173.134.2025.03.18.18.57.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 18:54:37 -0700 (PDT)
-Message-ID: <a8d7e5bf-be50-41fa-8b1c-1dedaf7e6609@kernel.dk>
-Date: Tue, 18 Mar 2025 19:54:36 -0600
+        Tue, 18 Mar 2025 18:57:12 -0700 (PDT)
+Message-ID: <e9fdd761-d7c6-4c2d-8621-cc151d5fad8f@kernel.dk>
+Date: Tue, 18 Mar 2025 19:57:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,21 +68,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] ublk: remove io_cmds list in ublk_queue
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org
 References: <20250318-ublk_io_cmds-v1-1-c1bb74798fef@purestorage.com>
  <c91dfaf8-d925-4f6d-8ced-06ecb395a360@kernel.dk>
  <Z9m+3qMBXgqDz399@dev-ushankar.dev.purestorage.com>
- <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk>
- <Z9nsjiynsQ9gRPv7@dev-ushankar.dev.purestorage.com>
+ <097f0495-b2e8-4938-9a0d-c321f618d49b@kernel.dk> <Z9oYFdWj1qAWH1q3@fedora>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z9nsjiynsQ9gRPv7@dev-ushankar.dev.purestorage.com>
+In-Reply-To: <Z9oYFdWj1qAWH1q3@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/18/25 3:58 PM, Uday Shankar wrote:
+On 3/18/25 7:04 PM, Ming Lei wrote:
 > On Tue, Mar 18, 2025 at 12:48:44PM -0600, Jens Axboe wrote:
+>> On 3/18/25 12:43 PM, Uday Shankar wrote:
+>>> On Tue, Mar 18, 2025 at 12:22:57PM -0600, Jens Axboe wrote:
+>>>>>  struct ublk_rq_data {
+>>>>> -	struct llist_node node;
+>>>>> -
+>>>>>  	struct kref ref;
+>>>>>  };
+>>>>
+>>>> Can we get rid of ublk_rq_data then? If it's just a ref thing, I'm sure
+>>>> we can find an atomic_t of space in struct request and avoid it. Not a
+>>>> pressing thing, just tossing it out there...
+>>>
+>>> Yeah probably - we do need a ref since one could complete a request
+>>> concurrently with another code path which references it (user copy and
+>>> zero copy). I see that struct request has a refcount in it already,
+>>
+>> Right, at least with the current usage, we still do need that kref, or
+>> something similar. I would've probably made it just use refcount_t
+>> though, rather than rely on the indirect calls. kref doesn't really
+>> bring us anything here in terms of API.
+>>
 >>> though I don't see any examples of drivers using it. Would it be a bad
 >>> idea to try and reuse that?
 >>
@@ -90,17 +111,23 @@ On 3/18/25 3:58 PM, Uday Shankar wrote:
 >> and ipi_list for it. And then you could dump needing this extra data per
 >> request.
 > 
-> Another idea is to union the refcount with end_io_data, since that's
-> purely for the driver. But it might be a bit weird to tell drivers that
-> they can use either end_io/end_io_data or the refcount but not both...
-> not to mention it could be a nice exploit vector if drivers get it
-> wrong.
+> It should be fine to reuse request->ref, since the payload shares same
+> lifetime with request.
 > 
-> Either way, I think this work is follow-on material and shouldn't be
-> rolled into this patch.
+> But if it is exported, the interface is likely to be misused...
 
-For sure, that's what I said in my first reply too. It's just an idea
-for a further improvement, not gating this patch at all.
+Exactly, that's why I don't want to have drivers mess with this.
+
+And following up on the location, as I forgot to do that in the reply to
+Uday - the end_io_data is not a bad idea either, drivers get to use that
+as they wish. Then you can't use it with an end_io handler, but it's not
+like we've had a need to do that before anyway... It is a bit odd,
+however.
+
+But the ipi_list is only used completion side, at which point the driver
+is by definition done with the ref. And hash is just for io scheduling,
+which we'd never do with requests like this. So still think that's the
+best option.
 
 -- 
 Jens Axboe
