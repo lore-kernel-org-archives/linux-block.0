@@ -1,59 +1,69 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890F221507C;
-	Wed, 19 Mar 2025 19:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09B7213235
+	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 19:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742412273; cv=none; b=HRxB1bO9LuYqEy7exKixUErZaXMW9NHbuu4TLzWdajN+DulsuxLRip15JMIFnI+vnhCEqCSl5jeqbDXKwT/wiiDagrovH5VlcAX8foQ0fxrhju2RN8sEHlEhqtvazG3W9B3RJ1IVghHQaA4dCHfwfzbyGJWAV5ciIw55JKLE89Q=
+	t=1742413844; cv=none; b=gAOL266ZBRI1YJ6b0HEuvUx6fwCCOSLywq8sR+f5Puq+xGPeCTGd9DNDvGJ9nptEa8CmmsGnELGs/sYDiqCk2htTzxWcVNVNx8px0sdlvX5ETbbKqhzAayCGA+0om2soEdggjhZRGc5jZrA9iLt2RXNjl+Uggs3veubGLZZSIxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742412273; c=relaxed/simple;
-	bh=DrDTgA+tztj5ovrn1XiPKXpb6kAe2O6mVMv5MVwJIrI=;
+	s=arc-20240116; t=1742413844; c=relaxed/simple;
+	bh=sExoy8pqp0ariENfKfzxL5q5xGicuuhF34RlyGSM2pc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qqwwMup7aRL0Y54bpP/wwP20Y3pL8Q5jL97Jfws8+WVm7m5FW0cLFZc14GqIVkBA+qwjkr/152U7bPMG21WW5Z9M74IX9Y3jgba84ycHIQhhhM1CVnWyQAbXllyIzJty2RGNfc82BX2sH2N+iugyJaUNPolVNfZyvBPjg644Ens=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=febyWxe8; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=GnrEI4VOfyyoP8saMobh6q8kPw8nqWAaCDJp8UmNKi51c2qS17hkTwJFaN4K9xrHg4kRNmdMGWsSB5kxgEhr6UJh0aM8rkEADX7X0ohg1KGDgtIJAPKb1HCgjO/24/MZMcRNdB39lXW2Q7AccR1sf+nl/gWU9N9vTJ+VqFzPD+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eyIOCt7F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="febyWxe8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=EpQOjPVa2Beq04kJvvraeY6xvIQbVVFWRl2dfYg/9BQ=; b=febyWxe8indQHW+/DXNc8XwTh7
-	pCXPazgrVQb1NC7evVDOPeSQltfuqysNWTFC5oJj3WPOzEA2aD6iRliRra4uBuFJ13mq7UTwbfs/V
-	z1n1JUECWHCnmeAomv/S7mWQSA6v0rTDYeF62tAa69tKTTbrMJVuphq3P82FjqMbUN/5W76Abd2cl
-	dQpsiF2P9sTan1YH5XPb0LA41V4TPkJ9iNxITxRbCovvgb9tJLA4x84vbYEPWobTccY1GzwbBVd3R
-	CjZnVFu71PRuIuEfbzM8Ubd7coSD1oeTCHb8fqZBuDXWVeLlruLDcwvqw6RonAk2AcdNTu4qbyLeL
-	pMlxg84A==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tuz1c-0000000E0QD-02eg;
-	Wed, 19 Mar 2025 19:24:24 +0000
-Date: Wed, 19 Mar 2025 19:24:23 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Oliver Sang <oliver.sang@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	David Bueso <dave@stgolabs.net>
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z9sZ5_lJzTwGShQT@casper.infradead.org>
-References: <202503101536.27099c77-lkp@intel.com>
- <20250311-testphasen-behelfen-09b950bbecbf@brauner>
- <Z9kEdPLNT8SOyOQT@xsang-OptiPlex-9020>
- <Z9krpfrKjnFs6mfE@bombadil.infradead.org>
- <Z9mFKa3p5P9TBSTQ@casper.infradead.org>
- <Z9n_Iu6W40ZNnKwT@bombadil.infradead.org>
- <Z9oy3i3n_HKFu1M1@casper.infradead.org>
- <Z9r27eUk993BNWTX@bombadil.infradead.org>
- <Z9sYGccL4TocoITf@bombadil.infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyIOCt7F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742413841;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UoMsJz6uQ9Xsq6hoAcbPVlQz7ODTaS5nZ9IsZpDthKQ=;
+	b=eyIOCt7FCqbPabjgQaNdP5xOe1DrizE+ef5Zhx4CxzgfWizJhTH477UgnDt2g6BowUPxbJ
+	Fx86po6npjtCpjO6XfkOU4QhprN+VonHgHfiY0bo11zAMwu0Yhanz1ClxvkFbMGYWjWlP3
+	rRdWICYHAFqAMljJphCDX8rPLH4INwY=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-550-pc5hPzSgOM-Mh3OFUt2lmQ-1; Wed,
+ 19 Mar 2025 15:50:38 -0400
+X-MC-Unique: pc5hPzSgOM-Mh3OFUt2lmQ-1
+X-Mimecast-MFC-AGG-ID: pc5hPzSgOM-Mh3OFUt2lmQ_1742413836
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B028180AB19;
+	Wed, 19 Mar 2025 19:50:33 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E6C11956095;
+	Wed, 19 Mar 2025 19:50:31 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 52JJoUdr2309780
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 19 Mar 2025 15:50:30 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 52JJoRRp2309779;
+	Wed, 19 Mar 2025 15:50:27 -0400
+Date: Wed, 19 Mar 2025 15:50:27 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
+        tytso@mit.edu, djwong@kernel.org, john.g.garry@oracle.com,
+        chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
+        yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com,
+        yangerkun@huawei.com
+Subject: Re: [RFC PATCH -next v3 06/10] dm: add BLK_FEAT_WRITE_ZEROES_UNMAP
+ support
+Message-ID: <Z9sgAxM-hZZJtZu9@redhat.com>
+References: <20250318073545.3518707-1-yi.zhang@huaweicloud.com>
+ <20250318073545.3518707-7-yi.zhang@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,26 +72,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9sYGccL4TocoITf@bombadil.infradead.org>
+In-Reply-To: <20250318073545.3518707-7-yi.zhang@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Mar 19, 2025 at 12:16:41PM -0700, Luis Chamberlain wrote:
-> On Wed, Mar 19, 2025 at 09:55:11AM -0700, Luis Chamberlain wrote:
-> > FWIW, I'm not seeing this crash or any kernel splat within the
-> > same time (I'll let this run the full 2.5 hours now to verify) on
-> > vanilla 6.14.0-rc3 + the 64k-sector-size patches, which would explain why I
-> > hadn't seen this in my earlier testing over 10 ext4 profiles on fstests. This
-> > particular crash seems likely to be an artifact on the development cycle on
-> > next-20250317.
+On Tue, Mar 18, 2025 at 03:35:41PM +0800, Zhang Yi wrote:
+> From: Zhang Yi <yi.zhang@huawei.com>
 > 
-> I confirm that with a vanilla 6.14.0-rc3 + the 64k-sector-size patches a 2.5
-> hour run generic/750 doesn't crash at all. So indeed something on the
-> development cycle leads to this particular crash.
+> Set the BLK_FEAT_WRITE_ZEROES_UNMAP feature on stacking queue limits by
+> default. This feature shall be disabled if any underlying device does
+> not support it.
+> 
+Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
 
-We can't debug two problems at once.
+> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+> ---
+>  drivers/md/dm-table.c | 7 +++++--
+>  drivers/md/dm.c       | 1 +
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index 453803f1edf5..d4a483287e26 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -598,7 +598,8 @@ int dm_split_args(int *argc, char ***argvp, char *input)
+>  static void dm_set_stacking_limits(struct queue_limits *limits)
+>  {
+>  	blk_set_stacking_limits(limits);
+> -	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL;
+> +	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL |
+> +			    BLK_FEAT_WRITE_ZEROES_UNMAP;
+>  }
+>  
+>  /*
+> @@ -1848,8 +1849,10 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>  		limits->discard_alignment = 0;
+>  	}
+>  
+> -	if (!dm_table_supports_write_zeroes(t))
+> +	if (!dm_table_supports_write_zeroes(t)) {
+>  		limits->max_write_zeroes_sectors = 0;
+> +		limits->features &= ~BLK_FEAT_WRITE_ZEROES_UNMAP;
+> +	}
+>  
+>  	if (!dm_table_supports_secure_erase(t))
+>  		limits->max_secure_erase_sectors = 0;
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 5ab7574c0c76..b59c3dbeaaf1 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1096,6 +1096,7 @@ void disable_write_zeroes(struct mapped_device *md)
+>  
+>  	/* device doesn't really support WRITE ZEROES, disable it */
+>  	limits->max_write_zeroes_sectors = 0;
+> +	limits->features &= ~BLK_FEAT_WRITE_ZEROES_UNMAP;
+>  }
+>  
+>  static bool swap_bios_limit(struct dm_target *ti, struct bio *bio)
+> -- 
+> 2.46.1
 
-FOr the first problem, I've demonstrated what the cause is, and that's
-definitely introduced by your patch, so we need to figure out a
-solution.
-
-For the second problem, we don't know what it is.  Do you want to bisect
-it to figure out which commit introduced it?
