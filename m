@@ -1,151 +1,171 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5D920B20D;
-	Wed, 19 Mar 2025 18:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0165920B808;
+	Wed, 19 Mar 2025 18:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742408628; cv=none; b=lF0vON7Hs3Nf16wxwEfYmVHYMxtNsvYZC+O6mU3QmuKtlUYWvgastkpf0dcPp6ptTqytxNk1FOtJBeHX0tTgjFZg+70X3ZbE7S/REYnxNkcFUHqGSZRWLjthyckyNT7G0UULlS5M6+iDzYkPr1yWwl7wTHlj4VSm2rqBYFmOFzA=
+	t=1742410488; cv=none; b=YRJEat/gdFEPmj9mvRF+5sHi2NVPLnAKcRe/oPuD9fyHM4bM/WE51fyxkSXARnjkc5m7BYdV4cdQHoAvIrF1L0LMC/bAT0BZXS3K3aP0STFSFY/G21zOQGJegr/PsqHfI6ldxleNAdhEiflDhT7MEoWAGWM+wfxmQ4IeuqHPP0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742408628; c=relaxed/simple;
-	bh=7GpRSo1f4MpmUps8FOp+0DDkfwMvKF616oD0sC3QzMU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sUttccy8dgHGAqGI6YkjIR+DfaRgKhO71mAINxUlNwRqSzRZ0SEMzIdiaa0lU+3EdRKd4TTqG5zQhlHqjiRmji0sN5xX7HsXEU/NI7nV88Yx0yDZKm+9e8Siko5x5/yXY33r/FEzTG7uU7RsRnC6x/T6rKDs3MfGFBip2/Hp4dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4HjHWU0; arc=none smtp.client-ip=209.85.208.177
+	s=arc-20240116; t=1742410488; c=relaxed/simple;
+	bh=B0FCJ7Zkbt/So+72cIaSgUymVXf4MBJ+iTga2GM4ZQg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KceW1dHoFVM2oN3gbAWdr8veZ6mXv+PS0vXeBXuiZd0chGEAeBn2s/Z99M1CEGPzAzRmU25Q5S+XvuJsWNJAj8bngxCArvBwfmlyqqv5PqL6P37qg1cMoPmiUu/xxliDDMoRWWNJ8LFCkyimUkgyT4RaUyjF+gOJw9CsNGlusts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bzud6jv4; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4HjHWU0"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30bd11bfec6so73521fa.0;
-        Wed, 19 Mar 2025 11:23:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bzud6jv4"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-abec8b750ebso5452966b.0;
+        Wed, 19 Mar 2025 11:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742408624; x=1743013424; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vM5vjdDKgplT27wll6RHU/DkDnOyBUK3CxhD6DbHY44=;
-        b=j4HjHWU07NGBxMj1a8I06uk+LpqLa2bIvA+H672d3ZjkKvw0iyBYWX50nKfowdS0Na
-         gTWGOomv2tjjvkoGELZUOLrP7RRQ3uSGDZf8u3wZ6yw6oy6JYtp3k0s59LT8o1pt1Smm
-         CMaQxacgezEO7WTg83+67eP8mZ3bt0K4Lm0M8rAyrq8ehgf8tKe1/G975lJ1+01voyQL
-         3Nbv+nUWiIezWhnwS+t+qsh75+0goCKMCGYpeEA++rUZqmaA4Axd6CZ8wbs8C/JxLZfF
-         q2qcSCrKI9SvOXLCuVy/XLAeyJYKs/d4FhjrPF7UX0NimPlG6+1A/OqrcupL7xR/dUKb
-         fsiA==
+        d=gmail.com; s=20230601; t=1742410485; x=1743015285; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7SA5z+d1gmTrKxq6Z/NWTwhJ4KshIax6c/w3v0Ejqg=;
+        b=Bzud6jv4dR3KzWMqjHMUDfB+cZeqj9FDgFIHwsxdXQdAS7yRy5TDW5/yfebXfOHj6c
+         NSPNfqMOQlgFuuUdFsQALvoEXK69q4x/wfCZXCfMc19b4LYjtni9YaT5q7NLIB1s0Hi7
+         Tc/KFSh2Gd3T71BQz9DOytepIDUaOH+Gf/fSwQpObW/AtsUIdfpKXiri/VxX9fKvpFM0
+         bsx1D8ZlbD+GHcmTqHnLY+8Mx69myfNVyyqN38RXrxtmi3t9Eodh/Iuoov7H8LmKfHov
+         gvT1F39nhbQSNck/Lxd4rSxbkRIg8KOwBUwkQLrzy/zWP7TOZXpoVbKqxefxEx8cRkRx
+         8V/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742408624; x=1743013424;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vM5vjdDKgplT27wll6RHU/DkDnOyBUK3CxhD6DbHY44=;
-        b=iKu0qP2VJYKe16/yzjki1E2A4JXhrA332PmB3ovL0Fa2+ylJx5MfpQehwjhUVEA7PJ
-         3YaTo7/w/YcVOUVsPV/wizBrkBLfrKV5zCSo5PTAPZvJVfweAFMm/3OaPBYmtJAn5aGJ
-         yCVXna95LObJA6+1txR6x3FH/rmnfu67330j9Pll+rpCK30RPTNu1pfbc271NJmTEPjg
-         OUW64ItTS/xRuyJMdWrKzmlhHsQbX6xCRK+dhtXCHDaMP/NY529dhFgQZl/EaJpq2c80
-         CkZ4CcNhdXgNlUk5fwL++eOTzGS330tCtDvE85kYBkp6pIIycb2xefXkjLDO6yicQvI0
-         nWQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVsDCgFHowtbrq0f6s2UAwq9pPnZqFFggJh9wtEv7em3e9+Rnarlrv0z9yZch9QCI9licEI1qgExNNZ@vger.kernel.org, AJvYcCW30xbqKv+WcxkBH+HZVX/FU4v5yNbWqmnE5shfIDIdyV5MkOIC0J8PFEIn33GWZvcvYTHB+MtD8If+I3CzayU=@vger.kernel.org, AJvYcCWLkh9IMSmSZIKxgII1iR3XuhtzkPWuHcriSomD/CwTrOrmwrM0NMKOp2tcIwp5BCNiFXqpCg2BcYjR7nf4nQ3y@vger.kernel.org, AJvYcCWOz8TMoSvkZ336uXQN4ZSMAQqB+ebXxX3lAjrT9mGXP1mE1FG6TVakrT4H8/Xo5wmS+317yZxDq+H2HvM=@vger.kernel.org, AJvYcCX+Bp9gPkyQu3dIvl2e22CvVw/et1ktYTR8P15Hu7uXiy8zrYR9HeRgxTtIWdXzZdXjDeY2ACoEJOMdO6nL@vger.kernel.org, AJvYcCX/8dh34L+e9Uv0/MB+Tu64Upy2Y+R0jWnCdpXrfqitZfU6bnMfbnBIvtNVroFsfFZmPBN7ZcM3H14N@vger.kernel.org, AJvYcCXWPnpT3diCGZMNKG+G5pncopaZ9VKLRVE1oOgTwt19fwBbfqVvSgfM+cICM9LLKZPD1FscydUhpwpH0csL@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOii58+VsG5yxGS/QMPsOaqWbTJz3+eo5C2S3tTIXx9+f36Ooq
-	3OB2DADHtBLveSqCxWhRLo0rtzpNFAeoY0NQoPkXuWm6q+s2DGTPNxqyPxctCg7YMNju4SKX83v
-	0/4lD9hAutDFw/Eyh6kvJFdz/PM0=
-X-Gm-Gg: ASbGncvEFUgMEZ+ZhSQX6k3QDY9fgMQbFPPZRc/o9QRKSgyhoJrztdE7UTfsqpwtQqZ
-	nHQald3ydURBrRU7NRPevLgJxkOkIljYnz2N8lLdci3t9l79D+jVjNjURnfLfybv5GAbsO7mwtH
-	6trRzP0tGeI3F5Mmo0cesnYtdPvUR02M0loeJ1iNEK6g==
-X-Google-Smtp-Source: AGHT+IGEOK5N8tHIazzaBBFYwKPt7IK0lEyYARQ8Yuk7nnN9JY1twqyBbq57jCCO+3DJSYYYx9K5vKdbuZ/veyaYAWE=
-X-Received: by 2002:a2e:a912:0:b0:30b:9813:afff with SMTP id
- 38308e7fff4ca-30d6a465c16mr17800591fa.31.1742408624335; Wed, 19 Mar 2025
- 11:23:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742410485; x=1743015285;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h7SA5z+d1gmTrKxq6Z/NWTwhJ4KshIax6c/w3v0Ejqg=;
+        b=dCKt4VdW5fyZabGfRys2SNidpuFrp5XJuAKQqWN28eMmPTykahIFm4BPDWh3/G5i5N
+         PqMUc+sNmTi4p93cNJFjZf9tRXI6dOJ9mKdezcpl6kQai/llsinwREKDeDp8UpHyu9hP
+         NT/izKtrdh4fF0cYivTbD7tvSaeJv7Q/Q2ANe4lvIG/nJYqsJKyILMKHNhUWAXG1ot7+
+         iHQW4HV9ZeKjvd24CrWR+SSJF+q3ur3zg5PMEMgn6hjaoexTVM0k+EpZgq16An2VVrhO
+         IAma3eZet+AM334kpvKtlBqEmooewSTKfi0W9h8EIyYeQPBlXGv/0MYAHttP6Ig2B2h/
+         f/WA==
+X-Forwarded-Encrypted: i=1; AJvYcCWew/ZHyQOym15hUSxv5UlHmILIzZP01xjy5jVAa1f/ShnSvl+LGcujmZ2zz/SubYtwYJBlXT0fQ1L0Sg==@vger.kernel.org, AJvYcCXt8/3Zii0SF9ZCoXtSauEeE1sAwo6iacjXTiVje8dKmiANNToDxexFLSHhe4LHrc/ywcV87NE+@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyiowyz18eBEgtUFMF0FLVN/Wk/qxifzul7IGDIjTzUfm3PXxtE
+	uAkjZ3/rscjBnMEVEExi6BopIQjaCcVaoZsy6dngwIXBHa5qtUkU
+X-Gm-Gg: ASbGnctX0Qixs2B39rMBmO/5EGew6jxIZmihiP7p0y4ss8RBxTE3wpnrswHi+eKqXDy
+	8VTuq5QIP0uXCGk0QjITGtAnobjKxWsUivQJOqmIcRchBfOSvphKFnWrQgLbzgC2YnghCBaUCr+
+	NYsMGRBl24emRASgjsm7OGPjWhLZrSVsHDzpTc/r3RvM3XfMlhtcqLTTXAr1bZkpRx4gA+cfuWs
+	XftwcVGQqZx8luoJeLxB1ZeYoeaXdPYTJjVwrW/wjneoXXtRkzIWxQmQLKpCAB+fmBLASjL15tn
+	mJ69AgA/2KswaA2al3g41RRWlFibwlHs2iWLcxYlw2tmFXIIrFD9LacnFHhGvdXLC27Y3w==
+X-Google-Smtp-Source: AGHT+IGkkf7oue+S7jXWJ4oNOyt7eHKO0uFR9zbkxHH3o3VlrtXlY+vhJdacujHSWn0whUtBjGjxTg==
+X-Received: by 2002:a17:907:d1f:b0:ac2:9d15:2ec0 with SMTP id a640c23a62f3a-ac3b7dd75d7mr473548666b.27.1742410484988;
+        Wed, 19 Mar 2025 11:54:44 -0700 (PDT)
+Received: from [192.168.2.22] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147e9ab1sm1059914266b.52.2025.03.19.11.54.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 11:54:44 -0700 (PDT)
+Message-ID: <38b3eb9b-6448-4684-9f47-f4b64e5415cd@gmail.com>
+Date: Wed, 19 Mar 2025 19:54:43 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <Z9lnIJCcVSza6UVo@google.com>
- <D8JTC30W0NF6.17SR73Y9I99ZT@proton.me> <Z9q2xpwsNMDzZ2Gp@google.com>
- <CAJ-ks9m8r_ABh4ift3wmM_wpbYLo=ZuhUarfLJKQnS7TcGHRdg@mail.gmail.com> <D8KBL9Z0B68N.2Q3MU9UK9YI6G@proton.me>
-In-Reply-To: <D8KBL9Z0B68N.2Q3MU9UK9YI6G@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 19 Mar 2025 14:23:07 -0400
-X-Gm-Features: AQ5f1JqqkJVkMtcz0tmGeT7J4y37KKPcDpFZR1eCkSoR2DOM6YfFaGeUBI4_56I
-Message-ID: <CAJ-ks9kD++_T_3my1Etam9PRJHHZvdM=zbkWgbxW3oybwMTw9w@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Alice Ryhl <aliceryhl@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: cleanup and fix batch completion adding conditions
+To: Jens Axboe <axboe@kernel.dk>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+ Ondrej Kozina <okozina@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Alan Adamson <alan.adamson@oracle.com>, stable@vger.kernel.org
+References: <20575f0a-656e-4bb3-9d82-dec6c7e3a35c@kernel.dk>
+ <71bbd596-a3a0-4e37-baae-19f02c6997be@redhat.com>
+ <459b9c3b-0d5e-4797-86f7-4237406608ff@kernel.dk>
+ <535ff54b-5c49-42f0-af5f-020169b5da79@redhat.com>
+ <d84313c6-3dd1-446d-910d-e7f9f2e7d53c@gmail.com>
+ <3irisb67klhv2xu3w5digf2tavrbnn2umthcgkbgrpfs3effnd@f3btiynduuox>
+ <cdc19799-fc72-4581-a942-adf411b19a94@gmail.com>
+ <625382fc-8503-4e19-b571-6245fb4d1317@kernel.dk>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ xsFNBE94p38BEADZRET8y1gVxlfDk44/XwBbFjC7eM6EanyCuivUPMmPwYDo9qRey0JdOGhW
+ hAZeutGGxsKliozmeTL25Z6wWICu2oeY+ZfbgJQYHFeQ01NVwoYy57hhytZw/6IMLFRcIaWS
+ Hd7oNdneQg6mVJcGdA/BOX68uo3RKSHj6Q8GoQ54F/NpCotzVcP1ORpVJ5ptyG0x6OZm5Esn
+ 61pKE979wcHsz7EzcDYl+3MS63gZm+O3D1u80bUMmBUlxyEiC5jo5ksTFheA8m/5CAPQtxzY
+ vgezYlLLS3nkxaq2ERK5DhvMv0NktXSutfWQsOI5WLjG7UWStwAnO2W+CVZLcnZV0K6OKDaF
+ bCj4ovg5HV0FyQZknN2O5QbxesNlNWkMOJAnnX6c/zowO7jq8GCpa3oJl3xxmwFbCZtH4z3f
+ EVw0wAFc2JlnufR4dhaax9fhNoUJ4OSVTi9zqstxhEyywkazakEvAYwOlC5+1FKoc9UIvApA
+ GvgcTJGTOp7MuHptHGwWvGZEaJqcsqoy7rsYPxtDQ7bJuJJblzGIUxWAl8qsUsF8M4ISxBkf
+ fcUYiR0wh1luUhXFo2rRTKT+Ic/nJDE66Ee4Ecn9+BPlNODhlEG1vk62rhiYSnyzy5MAUhUl
+ stDxuEjYK+NGd2aYH0VANZalqlUZFTEdOdA6NYROxkYZVsVtXQARAQABzSBNaWxhbiBCcm96
+ IDxnbWF6eWxhbmRAZ21haWwuY29tPsLBlQQTAQgAPwIbAwYLCQgHAwIGFQgCCQoLBBYCAwEC
+ HgECF4AWIQQqKRgkP95GZI0GhvnZsFd72T6Y/AUCYaUUZgUJJPhv5wAKCRDZsFd72T6Y/D5N
+ D/438pkYd5NyycQ2Gu8YAjF57Od2GfeiftCDBOMXzh1XxIx7gLosLHvzCZ0SaRYPVF/Nr/X9
+ sreJVrMkwd1ILNdCQB1rLBhhKzwYFztmOYvdCG9LRrBVJPgtaYqO/0493CzXwQ7FfkEc4OVB
+ uhBs4YwFu+kmhh0NngcP4jaaaIziHw/rQ9vLiAi28p1WeVTzOjtBt8QisTidS2VkZ+/iAgqB
+ 9zz2UPkE1UXBAPU4iEsGCVXGWRz99IULsTNjP4K3p8ZpdZ6ovy7X6EN3lYhbpmXYLzZ3RXst
+ PEojSvqpkSQsjUksR5VBE0GnaY4B8ZlM3Ng2o7vcxbToQOsOkbVGn+59rpBKgiRadRFuT+2D
+ x80VrwWBccaph+VOfll9/4FVv+SBQ1wSPOUHl11TWVpdMFKtQgA5/HHldVqrcEssWJb9/tew
+ 9pqxTDn6RHV/pfzKCspiiLVkI66BF802cpyboLBBSvcDuLHbOBHrpC+IXCZ7mgkCrgMlZMql
+ wFWBjAu8Zlc5tQJPgE9eeQAQrfZRcLgux88PtxhVihA1OsMNoqYapgMzMTubLUMYCCsjrHZe
+ nzw5uTcjig0RHz9ilMJlvVbhwVVLmmmf4p/R37QYaqm1RycLpvkUZUzSz2NCyTcZp9nM6ooR
+ GhpDQWmUdH1Jz9T6E9//KIhI6xt4//P15ZfiIs7BTQRPeKd/ARAA3oR1fJ/D3GvnoInVqydD
+ U9LGnMQaVSwQe+fjBy5/ILwo3pUZSVHdaKeVoa84gLO9g6JLToTo+ooMSBtsCkGHb//oiGTU
+ 7KdLTLiFh6kmL6my11eiK53o1BI1CVwWMJ8jxbMBPet6exUubBzceBFbmqq3lVz4RZ2D1zKV
+ njxB0/KjdbI53anIv7Ko1k+MwaKMTzO/O6vBmI71oGQkKO6WpcyzVjLIip9PEpDUYJRCrhKg
+ hBeMPwe+AntP9Om4N/3AWF6icarGImnFvTYswR2Q+C6AoiAbqI4WmXOuzJLKiImwZrSYnSfQ
+ 7qtdDGXWYr/N1+C+bgI8O6NuAg2cjFHE96xwJVhyaMzyROUZgm4qngaBvBvCQIhKzit61oBe
+ I/drZ/d5JolzlKdZZrcmofmiCQRa+57OM3Fbl8ykFazN1ASyCex2UrftX5oHmhaeeRlGVaTV
+ iEbAvU4PP4RnNKwaWQivsFhqQrfFFhvFV9CRSvsR6qu5eiFI6c8CjB49gBcKKAJ9a8gkyWs8
+ sg4PYY7L15XdRn8kOf/tg98UCM1vSBV2moEJA0f98/Z48LQXNb7dgvVRtH6owARspsV6nJyD
+ vktsLTyMW5BW9q4NC1rgQC8GQXjrQ+iyQLNwy5ESe2MzGKkHogxKg4Pvi1wZh9Snr+RyB0Rq
+ rIrzbXhyi47+7wcAEQEAAcLBfAQYAQgAJgIbDBYhBCopGCQ/3kZkjQaG+dmwV3vZPpj8BQJh
+ pRSXBQkk+HAYAAoJENmwV3vZPpj8BPMP/iZV+XROOhs/MsKd7ngQeFgETkmt8YVhb2Rg3Vgp
+ AQe9cn6aw9jk3CnB0ecNBdoyyt33t3vGNau6iCwlRfaTdXg9qtIyctuCQSewY2YMk5AS8Mmb
+ XoGvjH1Z/irrVsoSz+N7HFPKIlAy8D/aRwS1CHm9saPQiGoeR/zThciVYncRG/U9J6sV8XH9
+ OEPnQQR4w/V1bYI9Sk+suGcSFN7pMRMsSslOma429A3bEbZ7Ikt9WTJnUY9XfL5ZqQnjLeRl
+ 8243OTfuHSth26upjZIQ2esccZMYpQg0/MOlHvuFuFu6MFL/gZDNzH8jAcBrNd/6ABKsecYT
+ nBInKH2TONc0kC65oAhrSSBNLudTuPHce/YBCsUCAEMwgJTybdpMQh9NkS68WxQtXxU6neoQ
+ U7kEJGGFsc7/yXiQXuVvJUkK/Xs04X6j0l1f/6KLoNQ9ep/2In596B0BcvvaKv7gdDt1Trgg
+ vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
+ xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
+ Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
+In-Reply-To: <625382fc-8503-4e19-b571-6245fb4d1317@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 19, 2025 at 10:42=E2=80=AFAM Benno Lossin <benno.lossin@proton.=
-me> wrote:
->
-> On Wed Mar 19, 2025 at 3:14 PM CET, Tamir Duberstein wrote:
-> > On Wed, Mar 19, 2025 at 8:21=E2=80=AFAM Alice Ryhl <aliceryhl@google.co=
-m> wrote:
-> >> On Wed, Mar 19, 2025 at 12:23:44AM +0000, Benno Lossin wrote:
-> >> > On Tue Mar 18, 2025 at 1:29 PM CET, Alice Ryhl wrote:
-> >> > > On Mon, Mar 17, 2025 at 10:23:56AM -0400, Tamir Duberstein wrote:
-> >> > >> @@ -264,7 +266,7 @@ pub fn read<T: FromBytes>(&mut self) -> Resul=
-t<T> {
-> >> > >>          let res =3D unsafe {
-> >> > >>              bindings::_copy_from_user(
-> >> > >>                  out.as_mut_ptr().cast::<c_void>(),
-> >> > >> -                self.ptr as *const c_void,
-> >> > >> +                crate::with_exposed_provenance(self.ptr),
-> >> > >>                  len,
-> >> > >>              )
-> >> > >>          };
-> >> > >
-> >> > > That's especially true for cases like this. These are userspace po=
-inters
-> >> > > that are never dereferenced. It's not useful to care about provena=
-nce
-> >> > > here.
-> >> >
-> >> > I agree for this case, but I think we shouldn't be using raw pointer=
-s
-> >> > for this to begin with. I'd think that a newtype wrapping `usize` is=
- a
-> >> > much better fit. It can then also back the `IoRaw` type. AFAIU user
-> >> > space pointers don't have provenance, right? (if they do, then we sh=
-ould
-> >> > use this API :)
-> >>
-> >> We're doing that to the fullest extent possible already. We only conve=
-rt
-> >> them to pointers when calling C FFI functions that take user pointers =
-as
-> >> a raw pointer.
-> >>
-> >> Alice
-> >
-> > Personally, I agree with Benno that `as` conversions are a misfeature
-> > in the language.
-> >
-> > I think this patch and the ensuing discussion is making perfect the
-> > enemy of good, so I'd prefer to drop it and revisit when the
-> > ergonomics have improved.
->
-> I don't think that we need to rush on the rest of the patch series.
-> Boqun's suggestion is very good and I'm not sure which ergonomics need
-> to be improved here.
+On 3/11/25 4:00 PM, Jens Axboe wrote:
+> On 3/11/25 8:59 AM, Milan Broz wrote:
+>> On 3/11/25 4:03 AM, Shinichiro Kawasaki wrote:
+>>>
+>>> I created fix candidate patches to address the blktests nvme/039 failure [1].
+>>> This may work for the failures Ondrej and Milan observe too, hopefully.
+>>
+>> Hi,
+>>
+>> I quickly tried to run the test with todays' mainline git and mentioned two patches:
+>>    https://lkml.kernel.org/linux-block/20250311024144.1762333-2-shinichiro.kawasaki@wdc.com/
+>>    https://lkml.kernel.org/linux-block/20250311024144.1762333-3-shinichiro.kawasaki@wdc.com/
+>> and it looks like our SED Opal tests are fixed, no errors or warnings, thanks!
+>>
+>>> Jens, Alan, could you take a look in the patches and see if they make sense?
+>>
+>> Please, fix it before the 6.14 final, this could cause serious data corruption, at least
+>> on systems using SED Opal drives.
+> 
+> Fix is already queued up.
 
-The improved ergonomics arrive in Rust 1.79. See Boqun's reply that
-explains we need to keep all the stubs until then.
+Hi Jens,
 
-Regarding landing the rest of the series - you said it yourself: "it's
-only going to get more painful in the long run to change this". The
-nature of lints is that the longer you don't enable them, the likelier
-you are to have a higher hill to climb later.
+it seems the bug was "successfully" backported to stable 6.13.4+ and I do not see any fix
+in the stable queue yet.
+
+We were hit by it today, as all locked ranges for Opal devices now returning empty data
+instead of failing read.
+
+Please could you check what need to be backported to 6.13 stable?
+
+IMO these patches should be backported:
+   https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e5c2bcc0cd47321d78bb4e865d7857304139f95d
+   https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9bce6b5f8987678b9c6c1fe433af6b5fe41feadc
+
+Thanks,
+Milan
+
