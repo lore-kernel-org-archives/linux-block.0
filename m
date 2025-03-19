@@ -1,167 +1,171 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C8220A5DF
-	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 17:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926D21C1F02
+	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 18:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407124; cv=none; b=I73G0LTldE9gq6FmUKNT+12afFOLQmyunbNNSEz0naVG3a7WSV6t1WqX6D35rrbU1F9ReYsTdaurRYRvrmVf2hs3npIDHvnXFSO+8NwINYH/AA3bRQ2SYKvkdU3CyNGaaiAI46DcBW4ppfMrxR3WHRrU0Ru2xiUOCqjzvnv9o1g=
+	t=1742407603; cv=none; b=njgZK9Qhk25PVBzAmBGBePb60Qgfmjm2z7ykQjU3htT/4NbwA7cnhGYUK+hVGoYwIiVzfWS7RT1wEcMhQ5wIDCeEVOIL5yEXR0TXZFcEjrDy0gHo6svE8X+SAARU7bRCxY+pmLldJiCpSel3rYIuoIXnU4zgVKWLtATwkwRG+oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407124; c=relaxed/simple;
-	bh=O1aeb0KFlrkj4Yiw1nWYiPzizeq56+6Mn3GDJKk7WrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqSCf9xEfppRrlgkAIbht10ur8YDrOCIp9gQdzD7GnCTG4kwCWlyFhDRi1bW2asPsGAJhi9A7DbZ+gvcGZZ4Mufru+nl5J/f8NscXBwBFI3up8f3d5d8alFvTzvmOApqnY/kxeFZIbd9BVqfor21hQfGziHpmqSZcW6in6Yv9B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=JswssZao; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1742407603; c=relaxed/simple;
+	bh=G6iHZgQIholcAW90us3ob4KynXMLkF5xSbRKYF29/C0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=s/Viq3Zk9w6eEeBn4riHhsGf8IALHeKDU/RG1ctcArGmPfAatKTTzipcFQ04EVN32NDqx6ipmOOncdXlV4GI2NIde1jI2L9O2MCA/Taq1dNYLUE3kOU1apumv6vcjN11c/eKxay+DkUABksPYzZGcn6h8x/iWTlkdKaRYMvYr58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Mt8saeKe; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="JswssZao"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c24ae82de4so809542785a.1
-        for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 10:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1742407121; x=1743011921; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk5ycb3N9meE73NCm46CD0AtZuFHAdivFMZfwt24RPU=;
-        b=JswssZaoSvcGZ3Nb3HuBG6yTTepkbVvops9jz8GX0QPSsMZFW5TAmeqJyqUmyrXh5e
-         9yd0D5+xit2h+NbfDPGcgydDHXSJ2ZawWNZlNKWiPsbscwgJO3I/D/ccaEd6sXaQefXL
-         P8IaxLiPCwfg4vuJ9yijo8Qifjg8jhUnuqW3o6y37oeE1UjF0yLhoJ0ffNsqWWhVLzbx
-         03eQ6VGcXdRNbfKzRLeEWywvgzyxONJ2hS86uSYluPzy0M0PxKuFPIYJfQH/xuM5OYQ5
-         s5XDR6OMjA+U7S70WxOERiIXTMPnvEsyw3TOvGC0iyLiroIrIpuMe5vEkwUAUWF5OZqs
-         GzCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742407121; x=1743011921;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tk5ycb3N9meE73NCm46CD0AtZuFHAdivFMZfwt24RPU=;
-        b=mNO/EiEdBWm1PMaqlAiGV4sJEeFnUsSP0a5Dg6xrg0Js2Ivg9pXCBVA3sCtIlo4PLn
-         vZ9OHcuXgMiCbObE6C9HobtwdpwKHRyXB9OSAuEf/kQhk4TAQwzW/ilBG2HCxitZ/GYR
-         pdL0K/mKg68sH4JCFzE35cFzvUW4fS/j1j9tNb6QiKwsNxAW8HFaqc6JCCK2MJKkyVqN
-         CUASUwTGnBm6/USZongoV2A3aQDVaEulOzkrMNDtFhzaEjg/5RvPP+PdRunLiQD/TIrI
-         YTmK95QizkZyALYTdxVT1LW4wFBPsClwt8sBCEPlNHo9et4Y3BYtPrVIl0dpJLb5Fqog
-         kHYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVjt/fJhVXUVUFGJaqZDNW0MFMfwfBLFkbBvhJS52FGTBV8ZpATX0ZvlDP9mAnj9tlEHlusf8bg04wyCw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx/0J1HKstErbnPI/8fWtLrV06t32bTCm9B7CBw6KJ8JvTG8Hp
-	3LffeCk7TycnkPEyhiqN8ZWVWTeP2pDF2vp1GH4LLcNkU28adaiFAJQ5+Pwa4Ow=
-X-Gm-Gg: ASbGncsmnZdH2ZTsXx0DqSP3SASxeRwrB/sogjzbs4ppsINvEfVcujKPMHGIdu2d8sl
-	Y/UB0PuYR7Kt6Ka+jrJUfPvftGuuzr7WMkdy9pI0t6eqsFa4RXFTVI8NQvxcDlODSZv3SIPAY2v
-	YLxy/TkX5udPFbak0Jy34xqat5dVINOVbM7272mXNTFVAvmS0o6IbzF0o2Cik2INV3TMULC5is2
-	qFVfVvHeei3wQVYoglAR6gjdoz4Gs8Nua16ZyC+pyxLxFMif++eiXnm1CUy323JuDUf+rsw9XcB
-	WQovXQHZQh6HjZXb4lBNL/+/cl3YEkRkFjlAv7xH+DhEnCcYmTIQYX72D4LJ6GhExohv/ZBQ8pK
-	9xp+smavdj3oBD0ZnJw==
-X-Google-Smtp-Source: AGHT+IH//pIx1EBbRFqDU6QPhXC6odo+Ppd2dshOt/mNgQMR0e3nRHsssO7Vo2UonDgQd/fB3+YCbw==
-X-Received: by 2002:a05:620a:3189:b0:7c5:5154:cb2 with SMTP id af79cd13be357-7c5a839688cmr568357985a.15.1742407121681;
-        Wed, 19 Mar 2025 10:58:41 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d8a62asm885096585a.96.2025.03.19.10.58.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 10:58:40 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tuxge-00000000Wns-1mXJ;
-	Wed, 19 Mar 2025 14:58:40 -0300
-Date: Wed, 19 Mar 2025 14:58:40 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-Message-ID: <20250319175840.GG10600@ziepe.ca>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
- <20250312193249.GI1322339@unreal>
- <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Mt8saeKe"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250319180634epoutp026f973ead4626ff0b92dcfaec81ceec16~uRnmmqXKp0483104831epoutp02Y
+	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 18:06:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250319180634epoutp026f973ead4626ff0b92dcfaec81ceec16~uRnmmqXKp0483104831epoutp02Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1742407594;
+	bh=r+OZ0dZjRdagPeJioXzbnIj1AKfJy9OpWi/BR3HcRpc=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=Mt8saeKeErG5R1xYmueL6B2f16sgH+Q2vcAjLX/Rllbf+0RbnX+QuV9YPwy3JBzq4
+	 1+haMKLx7WCIlnLOvVlwyEt1w/MQ9b7n8/soLReOZ67Ww+XXHddpfUKeJbuy0GwwOa
+	 JJDNCXh0qBA09dPuPsag8tMuKCoU2Ngd77ZKvFOg=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20250319180633epcas5p37fdb720f28677dc579821d1b4f820966~uRnmEC2MM1969719697epcas5p32;
+	Wed, 19 Mar 2025 18:06:33 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4ZHxVH4ZWnz4x9Pv; Wed, 19 Mar
+	2025 18:06:31 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	50.5D.19956.7A70BD76; Thu, 20 Mar 2025 03:06:31 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20250319180631epcas5p47dbbc86eb8982b6cb230ab33dfd43aa0~uRnj33X9u1744817448epcas5p4N;
+	Wed, 19 Mar 2025 18:06:31 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250319180631epsmtrp176ea9c1c70e9a2b5756a793717c5e402~uRnj3F3l21334513345epsmtrp1G;
+	Wed, 19 Mar 2025 18:06:31 +0000 (GMT)
+X-AuditID: b6c32a4b-fe9f470000004df4-d5-67db07a78a2b
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	4F.EC.18729.6A70BD76; Thu, 20 Mar 2025 03:06:31 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250319180629epsmtip27f2b0f464fbd09d8727b5ef0ca773742~uRniVqTrs2457824578epsmtip25;
+	Wed, 19 Mar 2025 18:06:29 +0000 (GMT)
+Message-ID: <435cf6be-98e7-4b8b-ae42-e074091de991@samsung.com>
+Date: Wed, 19 Mar 2025 23:36:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
+To: "hch@infradead.org" <hch@infradead.org>
+Cc: Qu Wenruo <wqu@suse.com>, Johannes Thumshirn
+	<Johannes.Thumshirn@wdc.com>, Theodore Ts'o <tytso@mit.edu>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <Z9kpyh_8RH5irL96@infradead.org>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCJsWRmVeSWpSXmKPExsWy7bCmhu5y9tvpBn9uy1qcnrCIyeJv1z0m
+	iz8PDS323tK2uPR4BbvFnr0nWSzmL3vKbrHv9V5mi9aen+wWa9Z9ZHfg8ti8Qstj85J6j8k3
+	ljN6NJ05yuyxfstVFo8JmzeyenzeJOfRfqCbKYAjKtsmIzUxJbVIITUvOT8lMy/dVsk7ON45
+	3tTMwFDX0NLCXEkhLzE31VbJxSdA1y0zB+hAJYWyxJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmt
+	UmpBSk6BSYFecWJucWleul5eaomVoYGBkSlQYUJ2xtSbfxkLtvNWrG69z9zA+I2ri5GTQ0LA
+	RGLuy6UsXYxcHEICuxklVvw+yASSEBL4xCix9akpROIbo8Tn59dZYTqmrtoO1bGXUaLtxQUm
+	COctUEfDZbAqXgE7iZ27zoLZLAKqEk+WLGKGiAtKnJz5hAXEFhWQl7h/awY7iC0sYCPRvesQ
+	WxcjB4eIgLbE4sd1IDOZBT4wS7Q92wx2ErOAuMStJ/OZQGrYBDQlLkwuBQlzCuhKbHl+kBGi
+	RF5i+9s5zCC9EgI7OCQm3twBdbWLxK+P19ggbGGJV8e3sEPYUhIv+9ug7GyJB48esEDYNRI7
+	NvdB9dpLNPy5wQqylxlo7/pd+hC7+CR6fz8BO0dCgFeio00IolpR4t6kp1Cd4hIPZyyBsj0k
+	9k94ywgJqjMsEpvfnWSbwKgwCylUZiH5chaSd2YhbF7AyLKKUTK1oDg3PbXYtMA4L7UcHt/J
+	+bmbGMHJV8t7B+OjBx/0DjEycTAeYpTgYFYS4XV/cj1diDclsbIqtSg/vqg0J7X4EKMpMHom
+	MkuJJucD039eSbyhiaWBiZmZmYmlsZmhkjhv886WdCGB9MSS1OzU1ILUIpg+Jg5OqQYmg+2L
+	6pxbDzC/3Sd5Nn6N7EX+a2alxpud3Mp/SdpZ5V59Ne2ql+APiZ93vyc1LrNwj57NyxTwbOvN
+	2L1NdSvyP8uZviw6u5BXMeLE9/31Ux5e/fj6zWTLLRpsG1dM+iDovtp6aVjzypCUKzXybKdt
+	/+fq1vyWDPooIi5woN/kkUy97enOaxqcKoail740cPn6HXg3cf/85xUzz4Q3fXBivi/H+ePd
+	Nu6/CTEvDs9pNNNlnPM36aTMg3mbAzZ8zAmb+H/rLpdGXtFvdpYZm36Ef2bkn85/7/W+A7u5
+	PaV8fB7JHZnDfPvIqvymxozsc7Z2UiXzrkZnPVdsCDEUl2dP5/NJtW/+yGl1+GjGxJ6JSizF
+	GYmGWsxFxYkATfiznkcEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIIsWRmVeSWpSXmKPExsWy7bCSvO5y9tvpBs3HmCxOT1jEZPG36x6T
+	xZ+HhhZ7b2lbXHq8gt1iz96TLBbzlz1lt9j3ei+zRWvPT3aLNes+sjtweWxeoeWxeUm9x+Qb
+	yxk9ms4cZfZYv+Uqi8eEzRtZPT5vkvNoP9DNFMARxWWTkpqTWZZapG+XwJUx9eZfxoLtvBWr
+	W+8zNzB+4+pi5OSQEDCRmLpqO0sXIxeHkMBuRolDv68xQSTEJZqv/WCHsIUlVv57zg5R9JpR
+	4uDabSwgCV4BO4mdu86ygtgsAqoST5YsYoaIC0qcnPkErEZUQF7i/q0ZYIOEBWwkuncdYuti
+	5OAQEdCWWPy4DmQms8AHZomlW18wQyw4wyKxvG8aG0gDM9AVt57MZwJpYBPQlLgwuRQkzCmg
+	K7Hl+UFGiBIzia6tXVC2vMT2t3OYJzAKzUJyxiwkk2YhaZmFpGUBI8sqRsnUguLc9NxiwwLD
+	vNRyveLE3OLSvHS95PzcTYzgWNPS3MG4fdUHvUOMTByMhxglOJiVRHjdn1xPF+JNSaysSi3K
+	jy8qzUktPsQozcGiJM4r/qI3RUggPbEkNTs1tSC1CCbLxMEp1cC0rt3H9EagrTpb1ofsx3cf
+	3eiYsTL+ZPXiFyH8Uiny8avzXn/czVTxfYdEi4H/6o/zP3yZvH3qn1/BJ05xpb1ZN1/rYbK9
+	cYiB7SONJXXHNtWvvv/s6DvOmp/N3auOKXtv99zatyXs5LaG7afyPs0qz7hbdSE4bcaS+oK2
+	yP0HfvOY6fEoLl4z/5qD/vGbjE/frLVavubv8ljT7reGG5z/dJr//jVHcxVP6Czx5uoph47z
+	7/lodHbCLLmO3wskt60KSdznwrpRdKqv+t6n75sNaxtlwy6xNTsZnGHKWSzRqq9icTno5fo3
+	ee4PRVuMn67z+WY6ufSRh7rPq0ui+7YduLi81ovflbn/ubaph504hxJLcUaioRZzUXEiAOXN
+	lTYkAwAA
+X-CMS-MailID: 20250319180631epcas5p47dbbc86eb8982b6cb230ab33dfd43aa0
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250318080742epcas5p31b31b3024d6f7d9d150c8a7c2db4dffd
+References: <20250130091545.66573-1-joshi.k@samsung.com>
+	<20250130142857.GB401886@mit.edu>
+	<97f402bc-4029-48d4-bd03-80af5b799d04@samsung.com>
+	<b8790a76-fd4e-49b6-bc08-44e5c3bf348a@wdc.com>
+	<Z6B2oq_aAaeL9rBE@infradead.org>
+	<bb516f19-a6b3-4c6b-89f9-928d46b66e2a@wdc.com>
+	<eaec853d-eda6-4ee9-abb6-e2fa32f54f5c@suse.com>
+	<cfe11af2-44c5-43a7-9114-72471a615de7@samsung.com>
+	<Z6GivxxFWFZhN7jD@infradead.org>
+	<edde46e9-403b-4ddf-bd73-abe95446590c@samsung.com>
+	<CGME20250318080742epcas5p31b31b3024d6f7d9d150c8a7c2db4dffd@epcas5p3.samsung.com>
+	<Z9kpyh_8RH5irL96@infradead.org>
 
-On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
-
-> > The only way to do so is to use dma_map_sg_attrs(), which relies on SG
-> > (the one that we want to remove) to map P2P pages.
+On 3/18/2025 1:37 PM, hch@infradead.org wrote:
+> On Tue, Mar 18, 2025 at 12:36:44PM +0530, Kanchan Joshi wrote:
+>> Right, I'm not saying that protection is getting better. Just that any
+>> offload is about trusting someone else with the job. We have other
+>> instances like atomic-writes, copy, write-zeroes, write-same etc.
 > 
-> That's something I don't get yet. How P2P pages can be used with 
-> dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate 
-> internally on struct page pointer.
+> So wahst is the use case for it? 
 
-It is a bit subtle, I ran in to this when exploring enabling proper
-P2P for dma_map_resource() too.
+I tried to describe that in the cover letter of the PoC:
+https://lore.kernel.org/linux-btrfs/20250129140207.22718-1-joshi.k@samsung.com/
 
-The API signatures are:
 
-dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
-		size_t offset, size_t size, enum dma_data_direction dir,
-		unsigned long attrs);
-void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
-		enum dma_data_direction dir, unsigned long attrs);
+  What is the "thread" model you are
+> trying to protect against (where thread here is borrowed from the
+> security world and implies data corruption caught by checksums).
 
-The thing to notice immediately is that the unmap path does not get
-passed a struct page.
+Seems you meant threat model. That was not on my mind for this series, 
+but sure, we don't boost integrity with offload.
 
-So, lets think about the flow when the iommu is turned on. 
+>>
+>>> IFF using PRACT is an acceptable level of protection just running
+>>> NODATASUM and disabling PI generation/verification in the block
+>>> layer using the current sysfs attributes (or an in-kernel interface
+>>> for that) to force the driver to set PRACT will do exactly the same
+>>> thing.
+>>
+>> I had considered but that can't work because:
+>>
+>> - the sysfs attributes operate at block-device level for all read or all
+>> write operations. That's not flexible for policies such "do something
+>> for some writes/reads but not for others" which can translate to "do
+>> checksum offload for FS data, but keep things as is for FS meta" or
+>> other combinations.
+> 
+> Well, we can easily do the using a per-I/O flag
 
-For normal struct page memory:
-
- - dma_map_page_attrs() allocates some IOVA and returns it in the
-   dma_addr_t and then maps the struct page to the iommu page table
-
- - dma_unmap_page_attrs() frees the IOVA from the given dma_addr_t
- 
-If we think about P2P now:
-
- - dma_map_page_attrs() can inspect the struct page and determine it
-   is P2P. It computes a bus address which is not an IOVA, and does
-   not transit through the IOMMU. No IOVA allocation is performed. the
-   bus address is returned as the dma_addr_t
-
- - dma_unmap_page_attrs() ... is impossible. We just get this
-   dma_addr_t that doesn't have enough information to tell anymore if
-   the address is a P2P bus address or not, so we can't tell if we
-   should unmap an iova from the dma_addr_t :\
-
-The sg path fixes this because it introduced a new flag in the
-scatterlist, SG_DMA_BUS_ADDRESS, that allows the sg map path to record
-the information for the unmap path so it can do the right thing.
-
-Leon's approach fixes this by putting an overarching transaction state
-around the DMA operation so that map and unmap operations can look in
-the state and determine if this is a P2P or non P2P map and then know
-how to unmap.
-
-For some background here, Christoph gave me this idea back at LSF/MM
-in Vancouver (two years ago now). At the time I was looking at
-replacing scatterlist and giving new DMA API ops to operate on a
-"scatterlist v2" structure.
-
-Christoph's vision was to make a performance DMA API path that could
-be used to implement any scatterlist-like data structure very
-efficiently without having to teach the DMA API about all sorts of 
-scatterlist-like things.
-
-Jason
+Right, a per-I/O flag (named REQ_INTEGRITY_OFFLOAD) is what I did in the 
+patch:
+https://lore.kernel.org/linux-btrfs/20250129140207.22718-2-joshi.k@samsung.com/
