@@ -1,142 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C8A12CD8B;
-	Wed, 19 Mar 2025 01:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE11025760;
+	Wed, 19 Mar 2025 01:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742348472; cv=none; b=OX1quNh+yDADRbABBbuVWT+XnTHCXgpWr2IeyEkU753rG40iovLMA6UvqoNkeeyfzXTaS6RfK6IYIFnPMMMyhTmGfJ1CdMy/EIMgp7gOo/QiCCGnJALdKNZmFAer8CyLfABn45Zs9obF+tji75xgj77L7mzG2welt+6ixRdpXWM=
+	t=1742349124; cv=none; b=A9SAdyLerf7r1uDloJs+3n1Rbd02pn948wNcrltAT8DoOkXAX7DKmHs6kdWCiMGqLjfWvkVA0lJklk+ksYYmzgvUALX1iDQJ5mBxNHia8TnDwrYA51ImZr1Pu8VFzUAO0/wq169uY07e9eiFGCXm9fMZRsSaE/25y48Cy2g+JkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742348472; c=relaxed/simple;
-	bh=u4VHbYwCy1SXsrB93FaqV0IDSgJLRNG/nVselvNk5tc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qMgWyqwhM4ng10yWf6XHxMdXnD4FXI50IGFR/TdS/0uu37nk5qm96sQojyhJ0oVch8jOZ5ORuS8/0Sgy4mMOIT0w7UdMPr8V0K9QtIOtQ53afkJCJ1jFyOIObQsSKSacUmPA9lno3Gb3g0z0wCz73cUj2bea7OT6w4LUyO2QGIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+OEW0v+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742349124; c=relaxed/simple;
+	bh=2vyRaOUIlTcHVmVvCyIoUILERixT/msGSRT3MY0J97M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rhcrlPvGFV7j8j2Pce4I6wf2Uxq25movV7J8mGBdRj8/tDyu41boiJAlCDGxvwtL+UG44/d/i6IwP1ZIs6rGV9jT3GEQyHaWLZ2QgUMmhEKv6zjglMnjLh1vH4AaWPm5Hvx6DBlHA+AROVKMu81jXzWmEIxTlck0r4qeoi2W/zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=WCUJ6xUo; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+OEW0v+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34C3EC4CEDD;
-	Wed, 19 Mar 2025 01:41:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742348471;
-	bh=u4VHbYwCy1SXsrB93FaqV0IDSgJLRNG/nVselvNk5tc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=q+OEW0v+EP1swX61eH89htc1YJ8I60kVlUChKew66UC33nAV8NjpJvHQR1TCnO0ON
-	 796xOzZSzmmfO8Rnd6FzrDFhkH5POxpEfwoIvrsqtw4VsJtEX99YCIrU6kMOB1sUiC
-	 3lj1PZ3YjcuCARAHJVLEEfLIphIxs5eQkBU9Vl+IcDGEw+dozSJeiU/O7naBaqw0fp
-	 lS5bTeps372XJulRysfhMdhsH2NUKMmDVEegw/9+Dae+KJXlidJTWBCdtEoDAizbNX
-	 EPK5xsJAb0918iSneanWHkcdqDU557P6/LbdMvkFNbdEG2Y+7M0mLKiuUGAFhs4Xrs
-	 EFKirTUVuqcyQ==
-Message-ID: <ae356993-ffa3-4ee1-87e3-3257dedf9908@kernel.org>
-Date: Wed, 19 Mar 2025 10:40:38 +0900
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WCUJ6xUo"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1742349122; x=1773885122;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2vyRaOUIlTcHVmVvCyIoUILERixT/msGSRT3MY0J97M=;
+  b=WCUJ6xUooEj91vg0/kVjTJr7Yq4MusuN1tRHKjDjcZJHWhLZ1yZTECBQ
+   qKYsTbukKyQE7s+yy2rS8mPnn+RKEoyfcSQfYPBbQ95eJhwfIjgtJkf67
+   +gyRUbvpEbu4wS7HE8clolm739B7fCiH8xinPBO1G+HT7cOWNHuGgIew+
+   HCJmjoCTf2Dgjo1RkQrhencodp+H5OhGUpGQvJdh8lLXxyN3ojNepAfxO
+   S32XdOo3n3zEkJzGU/lx5ECls+BY+WsezVYSjBhQnW17OEJnhYP55cGlK
+   Mi125UeYd+LoO5tjv70V4PlxS+OwWDfcP8b+sbpGsJ8MJ6ky6ZjgdpiDM
+   w==;
+X-CSE-ConnectionGUID: FmLztPWfSbCQJlDdHg01VQ==
+X-CSE-MsgGUID: 0dXxnS2mSKebp7J3D6Wy0w==
+X-IronPort-AV: E=Sophos;i="6.14,258,1736784000"; 
+   d="scan'208";a="55009577"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Mar 2025 09:52:01 +0800
+IronPort-SDR: 67da1562_e9p6hQ/88JRgBF7tZb04JkibPkB/SUEry260aFY1g5BjhvU
+ Ct7DeIxbY5rj6n1HCqfuV/Igwu0r60OJHvE1vfg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Mar 2025 17:52:50 -0700
+WDCIronportException: Internal
+Received: from gbdn3z2.ad.shared (HELO naota-xeon..) ([10.224.109.136])
+  by uls-op-cesaip02.wdc.com with ESMTP; 18 Mar 2025 18:52:01 -0700
+From: Naohiro Aota <naohiro.aota@wdc.com>
+To: linux-btrfs@vger.kernel.org
+Cc: dlemoal@kernel.org,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	Naohiro Aota <naohiro.aota@wdc.com>
+Subject: [PATCH v3 0/2] btrfs: zoned: skip reporting zone for new block group
+Date: Wed, 19 Mar 2025 10:49:15 +0900
+Message-ID: <cover.1742348826.git.naohiro.aota@wdc.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/6] dm: fix dm_blk_report_zones
-To: Benjamin Marzinski <bmarzins@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
- linux-block@vger.kernel.org
-References: <20250317044510.2200856-1-bmarzins@redhat.com>
- <20250317044510.2200856-6-bmarzins@redhat.com>
- <20250318065721.GB16259@lst.de> <Z9nvOcQRrxopHfrF@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <Z9nvOcQRrxopHfrF@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/19/25 7:10 AM, Benjamin Marzinski wrote:
-> On Tue, Mar 18, 2025 at 07:57:21AM +0100, Christoph Hellwig wrote:
->> On Mon, Mar 17, 2025 at 12:45:09AM -0400, Benjamin Marzinski wrote:
->>> __bind(). Otherwise the zone resources could change while accessing
->>> them. Finally, it is possible that md->zone_revalidate_map will change
->>> while calling this function. Only read it once, so that we are always
->>> using the same value. Otherwise we might miss a call to
->>> dm_put_live_table().
->>
->> This checking for calling context is pretty ugly.  Can you just use
->> a separate report zones helper or at least a clearly documented flag for it?
-> 
-> Not sure how that would work. The goal is to keep another process,
-> calling something like blkdev_report_zones_ioctl(), from being able to
-> call its report_zones_cb, while DM is in blk_revalidate_disk_zones()
-> which needs to use that same disk->fops->report_zones() interface in
-> order to call blk_revalidate_zone_cb(). We need some way to distinguish
-> between the callers. We could export blk_revalidate_zone_cb() and have
-> dm_blk_report_zones() check if it was called with that report_zones_cb.
-> That seems just as ugly to me. But if you like that better, fine.
-> Otherwise I don't see how we can distinguish between the call from
-> blk_revalidate_disk_zones() and a call from something like
-> blkdev_report_zones_ioctl(). Am I not understanding your suggestion?
-> 
-> Allowing the blkdev_report_zones_ioctl() call to go ahead using
-> md->zone_revalidate_map runs into three problems.
-> 
-> 1. It's running while the device is switching tables, and there's no
-> guarantee that DM won't encounter an error and have to fail back. So it
-> could report information for this unused table. We could just say that
-> this is what you get from trying to grab the zone information of a
-> device while it's switching tables. Fine.
-> 
-> 2. Without this patch, it's possible that while
-> blkdev_report_zones_ioctl() is still running its report_zones_cb, DM
-> fails switching tables and frees the new table that's being used by
-> blkdev_report_zones_ioctl(), causing use-after-free errors. However,
-> this is solvable by calling srcu_read_lock(&md->io_barrier) to make sure
-> that we're in a SRCU read section while using md->zone_revalidate_map.
-> Making that chage should make DM as safe as any other zoned device,
-> which brings me to...
-> 
-> 3. On any zoned device, not just DM, what's stopping
-> one process from syncing the zone write plug offsets:
-> blkdev_report_zones_ioctl() -> blkdev_report_zones() ->
-> various.report_zones() -> disk_report_zones_cb() ->
-> disk_zone_wplug_sync_wp_offset()
+Newly created block group should reside on empty zones, whose write pointer
+should always be 0. Also, we can load the zone capacity from the block
+layer. So, we don't need to REPORT_ZONE to load the info.
 
-disk_zone_wplug_sync_wp_offset() is a nop for any zone write plug that does not
-have BLK_ZONE_WPLUG_NEED_WP_UPDATE set. And that flag is set only for zones
-that had a write error. Given that recovering from write errors on zoned device
-requires to:
-1) stop writing to the zone,
-2) Do a report zone (which will sync the wp offset)
-3) Restart writing
-there is no write IOs going on for the zone that is being reported, for a well
-behaved user. If the user is not well behaved, it will get errors/out of sync
-wp, until the user behaves :) So I would not worry too much about this.
-As we discussed, the table switching should be allowed only for the wildcard
-target (dm-error) and that's it. We should not allow table switching otherwise.
-And given that inserting dm-error does not cause any change to the zone
-configuration, I do not see why we need to revalidate zones.
+The reporting zone on a new block group is not only unnecessary, but also
+can cause a deadlock. When one process do a report zones and another
+process freezes the block device, the report zones side cannot allocate
+a tag because the freeze is already started. This can thus result in new
+block group creation to hang forever, blocking the write path.
 
-> 
-> While another process is running into problems while dealing with the
-> gendisk's zone configuration changing:
-> 
-> blk_revalidate_disk_zones() -> disk_free_zone_resources()
+v1: https://patch.msgid.link/cover.1741596325.git.naohiro.aota@wdc.com
+v2: https://patch.msgid.link/cover.1742259006.git.naohiro.aota@wdc.com
+  - Move other zone related functions into the same #ifdef block.
+v3:
+  - Rename argument variable and fix the kerneldoc.
 
-We should not allow the zone configuration to change. That is impossible to
-deal with at the user level.
+Naohiro Aota (2):
+  block: introduce zone capacity helper
+  btrfs: zoned: skip reporting zone for new block group
 
-> I don't see any synchronizing between these two call paths. Am I missing
-> something that stops this? Can this only happen for DM devices, for some
-> reason? If this can't happen, I'm fine with just adding a
-> srcu_read_lock() to dm_blk_report_zones() and calling it good.  If it
-> can happen, then we should fix that.
-
-I think it can happen today but no-one ever had this issue because no-one has
-tried to switch a dm-table on a zoned drive. And I really think we should
-prevent that from being done, except for dm-error since that's used for fstests.
-
-> 
-> -Ben
-> 
-
+ fs/btrfs/zoned.c       | 18 ++++++++++--
+ include/linux/blkdev.h | 67 ++++++++++++++++++++++++++++--------------
+ 2 files changed, 61 insertions(+), 24 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.49.0
+
