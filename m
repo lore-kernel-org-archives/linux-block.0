@@ -1,88 +1,212 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E4F17BA6
-	for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 13:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD86F17A2E7;
+	Wed, 19 Mar 2025 14:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742390236; cv=none; b=KT354WlxxAniTT+/kbaTpgzbvLJ6W1o6WsJPfV3++/9jEzU+dxnW+5ArS3wnmaNC32S5Joea+LkzB6iyaHhfmrLO3LaaEPDQBrlEzEYl/0/laZYWRymBiEkFojpOW7AzDN2KpZB70Lj2FJhtCglgmZJUx9gXSONnuAbmFDBAGbE=
+	t=1742393711; cv=none; b=IMr8MkuAwZupGbhgO7AO38EtQWXxoG9JqKas0mRCapDpU7uOvjT5rnsrz1OSPZ15PH43TnPCUdNORAYQ37f8IlyO4LSbClhtRXGEQDfWwrhJ/39bEQmAE2Jz6vKSichTTT6sl9hct82Nhw5ad96U2nwhehHdkl3pAlrpJY58Uzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742390236; c=relaxed/simple;
-	bh=D47VypazdbU4fqhF0bTU3OX18kv0Xc7Ljtwoo1I84YA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=I3/O7SAGWcdqzkIrCrPNVpr5dp9m0M+NVfDr/MyOfD6Zet+JvRa/xmUaRnaoBaPuecjPlyNa+bbDVbF9fbtlcRkevIq09AlHy6+vDj+KG7hTO6dXBdMUFzQ3RKbEzLgKheI2VvfC3CjS1r2jS3tWGwLW1pmvB5PIULYzaDBfq9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vc9hBrap; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1742393711; c=relaxed/simple;
+	bh=soRBHKuXHAhfbzS4wZUjxzqCvZJqD5O3F1rh8HobrP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K9h7axLRnYXoAc49B2ksMgSYOoUgH900f51J4Sxg7ivaqIZOEJqmAaK5QafIotPHhKSHQUuNwg8x6GKDaCE444gGRV1UwwPx/cBmB1QEugd7rD6+fSjQH2cRKbazo5chg/7ytH0gZ3quYIhmN6m5RbG9U7pCaUbjSMcRfJ5f+5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjIFafIC; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vc9hBrap"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d03d2bd7d2so77909175ab.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 06:17:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjIFafIC"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30bfca745c7so69896461fa.0;
+        Wed, 19 Mar 2025 07:15:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742390233; x=1742995033; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JSHoB0s0coctjvbY3kKqqVrIVzw0mCbNKlZ4oqh6wdQ=;
-        b=vc9hBrapUr301yEj8tJtS6ATIpG1HYkmkomLax3Ku3o+guzXrme2DoDnXadEIgukda
-         FyCvoNsqDoQhK/N8XIyCkenUhw1AG4noqFPEEzV80Ick0OYljw2Ou/LM68L+nYFiDa4B
-         7sts+3oSc5slhEy57I0kwvIri7NevgTIBNZq+rF9HWQMmOSdVZsKHr6NDlyFioBcAtk5
-         e1le0+m7DjaVu+RZ6wNcs6rDI42Inim6IOgZr+8H4eOADOdlRiDgpXWd3Gxrjc6bIGQb
-         IbFqygV2fUNMGJYw/HALBjkRkW2oK3GPbDYKRS2bn+xDYvpcruJGJG/CGyruu327yIXy
-         117Q==
+        d=gmail.com; s=20230601; t=1742393708; x=1742998508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=omRKJWK9MexjsAQwKDXOrJ+QXdF1TIOx0mszaRJ4U3E=;
+        b=MjIFafIC6qJPytuAzn4SqnRontOUv4Ap5qI28fVaXWe9AL+rAm7w9MKQey+/FGJzqt
+         DfwPIXzJiH3w4mlqY6fSwVE7zH4g6ZpsW28Zi5ji6E0PBYfnrNUyNecwBfoEtwQdzs3g
+         Me5MwxESfywpnM9bH6UPbJbenpqke1qsfSDbR8y5Y2XzH6Bpz2cxv1tUTizwa/SEBdv9
+         X/H8OvMTitxAajpvF35Kj0w0LQYGgO+LGMh01YiP4xc1KL6zuoTeMPhoTHe7Yc+o6YU3
+         x2RcWbC88BVDtqtC/tJzBDhf2KOUhSGYq9Nf9VZdjsKm/Hy27FKhL3eHZyZrIF4PRsnj
+         ZVuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742390233; x=1742995033;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JSHoB0s0coctjvbY3kKqqVrIVzw0mCbNKlZ4oqh6wdQ=;
-        b=urhEUW2JYMAy7+e4IdG3nq3TiAAI1XiIvctnz1MlR6WFWN0SYYS4SJ6V8HFoQn5y+P
-         +7OU59702zuaYvwd5Iy9y5tJRQpIn3GshzFLSoquFzPU/UDHLh+zhaP6YvJI3rSRsL1T
-         S6fo+P1BrLZCfyYnTXxhGVhuj0pI7veBgNVP6dPaA6zWNXfhRkroS9+xuj/XuMoQjclm
-         eSTRLmxVArbMUxGeoqpVr7bIw86ZIMmBtEvY2Ve4X2NMi5qlyfkBxE5olnVB/BU/aEN0
-         UTyxMt+nVyMtjrWCcWqoF48webnrA5dja35mbkziQGHtyim+FixjGsKWQfK+7f8KGbE2
-         jQsA==
-X-Forwarded-Encrypted: i=1; AJvYcCXThcbizS33VdsDsNEtOb3AuIybWyyZSixv83rFGxyGfBd++bSW8td/E+96lcInNT74WcAxby/PyHC+eg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7Ot46O77vPFSJEDgIqWnbBwe6BVSj0ePjFiY5uyR74Q/jlcm0
-	6hbXdYEtMMonnIRoV0UZ+O8PWRwkTUaVkistA9DHZgfRv6eBSfnuuWoTOHwW/6hmH0EKFiyfECt
-	i
-X-Gm-Gg: ASbGncvSuqfNjXHoTFoCY3gg3EmQLDPeFSZLZU8oW5xCFmPmG+jd7EabqNQmab5srfs
-	G8bI093M966dJHjfC0VyZxl6IHGZpXi96xL7GzMgz14u/VFS3mFY1oqBkjVtkKyKMLzNts2i1ph
-	0XZrpgX7VbURhegbwA1cZ06T2TKkaOG/lF7zxpwRWcoZdopAbf35p5DQpSopaNv59My3v4uMjDa
-	tmM5XqE1HukDsel8boOf/t4vE7phpzVy8W0JLx30AsV26AuGz9BAvfNxUGTnroc7LArQ44qt3ZC
-	pCGKVLR5x8aDVdnCNFyUJsX2G/RGq856nPZRhP89
-X-Google-Smtp-Source: AGHT+IEXpD47cRg6Bku6LXrgHWdfyHM2OHeGwIiM+rS5wNtVz0eHSBfmYPQUcjCZ1Dfr00bKDqC30Q==
-X-Received: by 2002:a05:6e02:2788:b0:3d3:e41b:936f with SMTP id e9e14a558f8ab-3d586b1b1c7mr28926755ab.3.1742390232640;
-        Wed, 19 Mar 2025 06:17:12 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d47a6691d1sm38857155ab.27.2025.03.19.06.17.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Mar 2025 06:17:11 -0700 (PDT)
-Message-ID: <8281b548-8801-42a7-973e-9d06a1ef3c35@kernel.dk>
-Date: Wed, 19 Mar 2025 07:17:11 -0600
+        d=1e100.net; s=20230601; t=1742393708; x=1742998508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=omRKJWK9MexjsAQwKDXOrJ+QXdF1TIOx0mszaRJ4U3E=;
+        b=evaBrEzo/Odux78eLQVkdZf1qW43fdCkGP2KmJpzKxzxw9x2uIK9lXT685KA1IlT9w
+         zk0ehwCPTN+QKrf2U8bor3QX63yFRm384j5p3XjA5ocRwrqVBCIc/TlPg7gec8tsNmRw
+         zM1l2aXHlN4xKoK4iOmWbLRW7DR6HM49Wqqc9zmje1IxWIyjqMET+FpTr4pDzOs9HEO7
+         5Q3nT8SOTVRKQnlQ2B3t4Kw4ugUdfNI0/MW41sOKNBm9Bbz9REX2DikqrqnM/TrauHsZ
+         ngkRKF3WISdHmci0oHrPrCUOVQFc08CvAO624T59NOOJ9WvyVU3niyxpkZwWVTG9dCWK
+         krFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9ArWjGBuu70okt1UrOAtWrubkOtljI7nHVxVcWM9vgqQw5YCcOvinOzcV35wu5z3uaV1j/E9kbmsu@vger.kernel.org, AJvYcCUkATTNVyafHZm2i+la5nGbsymWK2UmpXd4zTFHO2YL3s8WcA3Tck46OznaX06/13Lxqbsz8Ky2WqUHeuo=@vger.kernel.org, AJvYcCV1XE43Lr4J6RfTfTdVNQpFYnAnBVfLDX/kS5K1sEvAGxthozxxM4FA9oPeqd+YzDQQ0QnGnbSNlMGS@vger.kernel.org, AJvYcCW4fH0ea7Wez6P5ZNEReUd237hhDkEBNhBxs99IlWap2gmYpPRKb8qzSGwCmjlv5KsSy+2/A0edgziCln2j5L8=@vger.kernel.org, AJvYcCX7X5YJ7LHW665iRms4X0RM3Ed8QEJi7p0KSu9KEOFVNtp12+5aEXO+Kvl0nvoOrTUWk8Odj+4Msh4V7dgBUjjv@vger.kernel.org, AJvYcCXPAr8WhOaIsBWQ2sJ46D1KGmN6Aiy5TM4fTKxze9tzZKkPFa6xUaiJuKyXXs1/kMynGNuDF3Zyc8TMb4r8@vger.kernel.org, AJvYcCXSOFY5v6WxSoX4PHpJ65/cJ0DBSq5zWPqIMpXm9LZxWtShtMyxLLJuIqpeLvygKylUrCG+dROHA0dxgID+@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEVaj69bOlm+ROerAVinVaBe+zSp3r0saHpeqDnpRmzkyN+8Rz
+	V7/7uADqUfkB5x/zKyBe4pl4ad95DFWPvJ7M81Cmpfz7zRyuzvZgsfJhGVfcb6cIk4AnaP7Kt50
+	CphoJvo26/MeWQT5iOByDi2yqVQw=
+X-Gm-Gg: ASbGncv9seVvKt7nx2hP5WkxcaEZXH6dqHZ9rmBNSr+Es0UcBHoPjIcEyqDrHWjSfwe
+	m3xUwh7S796bsxioKIEmJYjv++a1Khh2wfzZfcfLNzThCfuxAdSB7EGz76PgeUr7q7fwywHFnh6
+	zm3XecBnKINYtjLl82gbcCcNOKrFsvUQYtpXPgtx1NDg==
+X-Google-Smtp-Source: AGHT+IE2kuxS9+6hmerN8azzogPPnG6YOR0pawaKaHpqogkvHtFjmfrpl84a2HNK1iEZA2uiAgHTzd6L5hmK8RS/L14=
+X-Received: by 2002:a05:651c:2127:b0:30b:c83e:720f with SMTP id
+ 38308e7fff4ca-30d6a410c7cmr11265591fa.7.1742393707679; Wed, 19 Mar 2025
+ 07:15:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: don't define __blk_mq_end_request() as inline
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-References: <20250319021343.3976476-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250319021343.3976476-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
+ <20250317-ptr-as-ptr-v5-6-5b5f21fa230a@gmail.com> <Z9lnIJCcVSza6UVo@google.com>
+ <D8JTC30W0NF6.17SR73Y9I99ZT@proton.me> <Z9q2xpwsNMDzZ2Gp@google.com>
+In-Reply-To: <Z9q2xpwsNMDzZ2Gp@google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 19 Mar 2025 10:14:31 -0400
+X-Gm-Features: AQ5f1JrpdSjcw-UeRIviJZbfSflMiKfOV4agzm5OnMFsQT1IS5sITNF_DoEDTos
+Message-ID: <CAJ-ks9m8r_ABh4ift3wmM_wpbYLo=ZuhUarfLJKQnS7TcGHRdg@mail.gmail.com>
+Subject: Re: [PATCH v5 6/6] rust: use strict provenance APIs
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Benno Lossin <benno.lossin@proton.me>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/18/25 8:13 PM, Ming Lei wrote:
-> It doesn't make sense to define one global symbol as inline, also this
-> way cause __blk_mq_end_request become not traceable.
+On Wed, Mar 19, 2025 at 8:21=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> w=
+rote:
+>
+> On Wed, Mar 19, 2025 at 12:23:44AM +0000, Benno Lossin wrote:
+> > On Tue Mar 18, 2025 at 1:29 PM CET, Alice Ryhl wrote:
+> > > On Mon, Mar 17, 2025 at 10:23:56AM -0400, Tamir Duberstein wrote:
+> > >> Throughout the tree, use the strict provenance APIs stabilized in Ru=
+st
+> > >> 1.84.0[1]. Retain backwards-compatibility by introducing forwarding
+> > >> functions at the `kernel` crate root along with polyfills for rustc =
+<
+> > >> 1.84.0.
+> > >>
+> > >> Use `#[allow(clippy::incompatible_msrv)]` to avoid warnings on rustc=
+ <
+> > >> 1.84.0 as our MSRV is 1.78.0.
+> > >>
+> > >> In the `kernel` crate, enable the strict provenance lints on rustc >=
+=3D
+> > >> 1.84.0; do this in `lib.rs` rather than `Makefile` to avoid introduc=
+ing
+> > >> compiler flags that are dependent on the rustc version in use.
+> > >>
+> > >> Link: https://blog.rust-lang.org/2025/01/09/Rust-1.84.0.html#strict-=
+provenance-apis [1]
+> > >> Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> > >> Link: https://lore.kernel.org/all/D8EIXDMRXMJP.36TFCGWZBRS3Y@proton.=
+me/
+> > >> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> > >
+> > > I'm not convinced that the pros of this change outweigh the cons. I
+> > > think this is going to be too confusing for the C developers who look=
+ at
+> > > this code.
+> >
+> > 1) I think we should eliminate all possible `as` conversions. They are
+> >    non-descriptive (since they can do may *very* different things) and
+> >    ptr2int conversions are part of that.
+> > 2) At some point we will have to move to the provenance API, since
+> >    that's what Rust chose to do. I don't think that doing it at a later
+> >    point is doing anyone a favor.
+>
+> We don't *have* to do anything. Sure, most `as` conversions can be
+> removed now that we have fixed the integer type mappings, but I'm still
+> not convinced by this case.
+>
+> Like, sure, use it for that one case in `kernel::str` where it uses
+> integers for pointers for some reason. But most other cases, provenance
+> isn't useful.
+>
+> > 3) I don't understand the argument that this is confusing to C devs.
+> >    They are just normal functions that are well-documented (and if
+> >    that's not the case, we can just improve them upstream). And
+> >    functions are much easier to learn about than `as` casts (those are
+> >    IMO much more difficult to figure out than then strict provenance
+> >    functions).
+>
+> I really don't think that's true, no matter how good the docs are. If
+> you see `addr as *mut c_void` as a C dev, you are going to immediately
+> understand what that means. If you see with_exposed_provenance(addr),
+> you're not going to understand what that means from the name - you have
+> to interrupt your reading and look up the function with the weird name.
+>
+> And those docs probably spend a long time talking about stuff that
+> doesn't matter for your pointer, since it's probably a userspace pointer
+> or similar.
+>
+> > Thus I think we should keep this patch (with Boqun's improvement).
+> >
+> > >> diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
+> > >> index 719b0a48ff55..96393bcf6bd7 100644
+> > >> --- a/rust/kernel/uaccess.rs
+> > >> +++ b/rust/kernel/uaccess.rs
+> > >> @@ -226,7 +226,9 @@ pub fn read_raw(&mut self, out: &mut [MaybeUnini=
+t<u8>]) -> Result {
+> > >>          }
+> > >>          // SAFETY: `out_ptr` points into a mutable slice of length =
+`len`, so we may write
+> > >>          // that many bytes to it.
+> > >> -        let res =3D unsafe { bindings::copy_from_user(out_ptr, self=
+.ptr as *const c_void, len) };
+> > >> +        let res =3D unsafe {
+> > >> +            bindings::copy_from_user(out_ptr, crate::with_exposed_p=
+rovenance(self.ptr), len)
+> > >> +        };
+> > >>          if res !=3D 0 {
+> > >>              return Err(EFAULT);
+> > >>          }
+> > >> @@ -264,7 +266,7 @@ pub fn read<T: FromBytes>(&mut self) -> Result<T=
+> {
+> > >>          let res =3D unsafe {
+> > >>              bindings::_copy_from_user(
+> > >>                  out.as_mut_ptr().cast::<c_void>(),
+> > >> -                self.ptr as *const c_void,
+> > >> +                crate::with_exposed_provenance(self.ptr),
+> > >>                  len,
+> > >>              )
+> > >>          };
+> > >
+> > > That's especially true for cases like this. These are userspace point=
+ers
+> > > that are never dereferenced. It's not useful to care about provenance
+> > > here.
+> >
+> > I agree for this case, but I think we shouldn't be using raw pointers
+> > for this to begin with. I'd think that a newtype wrapping `usize` is a
+> > much better fit. It can then also back the `IoRaw` type. AFAIU user
+> > space pointers don't have provenance, right? (if they do, then we shoul=
+d
+> > use this API :)
+>
+> We're doing that to the fullest extent possible already. We only convert
+> them to pointers when calling C FFI functions that take user pointers as
+> a raw pointer.
+>
+> Alice
 
-It does for the local scope though, it'll force it inline for
-blk_mq_end_request(), for example.
+Personally, I agree with Benno that `as` conversions are a misfeature
+in the language.
 
--- 
-Jens Axboe
-
+I think this patch and the ensuing discussion is making perfect the
+enemy of good, so I'd prefer to drop it and revisit when the
+ergonomics have improved.
