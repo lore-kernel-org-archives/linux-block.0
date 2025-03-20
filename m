@@ -1,84 +1,107 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BAC155398;
-	Thu, 20 Mar 2025 14:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98DA1DF985
+	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 14:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742481075; cv=none; b=kKtvhXsqyAaHwocM/8OWM+5lAzynGdKC9R6ufeYSQLgpWBPORFFeNFyID2b6JZgAKZir4uv6z3YHCrtYSqp7aFN32WP0UJ7W5wts6nnyUGgYOafbtgx1ufnFYX3tXI+nR+dd1tVeMZX5PFYUJHJ4Ev0K0T255TG2rhylBMLTmfI=
+	t=1742481436; cv=none; b=bCIRFwxSnx7fOY/Y27LSARfgaGs3/vGZ9psEcwrb79URqZ2WBQSf/fH1lAdKzCP1AyBUgwmFh6pxTCI+uv5UuYXNHhMamigEhQCKbmOMrjPDiUCkQuTWqQuJUf0UM9a9DFELE4x2LOFgTORsWL6MvwwLqQwSbftEVfZp8hgQPog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742481075; c=relaxed/simple;
-	bh=FFSIXT5DcGX7/dkepbl74FSQUrt+QKc/N+V3dVJVCKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UtfZyIq48HUfzrKB417Pfb9mLggIMUR0Hn6U2W/pXI5At5blcCAN+ipbt3H+87u5s1xaBWBrtbyzc/wW5U7aRVlLuAcfQroIKLPp0Kd1ztXkgI1tIQJTtq6iX1MtPlxJZ08/WydAyrzsZUjZTg4AUI0ssLH15qP4MSFl7xvAWyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hpptel6x; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1742481436; c=relaxed/simple;
+	bh=dKWHt6FujybyOyL5cedYtqrafz17Hc5CfWsQ5YrnuQ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iWzXIoLTbgLarKeHeFskCcq/j5YoN+jFD707Hik/Sr1IuoFbCAP48Yx1YVBFigCHiBPcI6e8r1HLtJo6jmWhxqpYyP8Q1AWCOILzDQZq/+7XZASjXf6yDJG/YW3h3hJU9fsVhAlW/hOvyORbNQnwgeIv7Zs8RCEU9AU2SyBPJck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LVzqQcNF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hpptel6x"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NJZJ1FkgbSm88M1HAHaut+9UWjO501+rWTX6iMm1JYs=; b=hpptel6xf9qMXLORgmovdqNhsc
-	x/1Qb0Kfq49q3b9UnlTmYq6W8erzzsDExlykz63TG9LKnT2bJXWX2L3kB5tywslbUyur3+MK9WfWe
-	3885xJ52ZM3P7Wspdlg0Mi/ahv5vBXr90doJLvQOONPhfQHVdpvxnh/x/rGn3NCJA2qfj2+KPWpGA
-	wNQ812jt2LFC5N7+Sxb1KBZv5lJIVF9VAPsd/24oHrFoWAmIYrnNmBx8+9KscmD/NPbmftmbaAY8X
-	M30c0nhdu9CxMt/7sAMeZqZ6zCuF55sx80DoF2xCtt2UAvoTB+gpIuNu5vnjLf+m703v1WCFwFE2c
-	ek+FXj5Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tvGvL-0000000BzxE-2fcV;
-	Thu, 20 Mar 2025 14:31:07 +0000
-Date: Thu, 20 Mar 2025 14:31:07 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Daniel Gomez <da.gomez@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	lsf-pc@lists.linux-foundation.org, david@fromorbit.com,
-	leon@kernel.org, hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
-	axboe@kernel.dk, joro@8bytes.org, brauner@kernel.org, hare@suse.de,
-	djwong@kernel.org, john.g.garry@oracle.com, ritesh.list@gmail.com,
-	p.raghav@samsung.com, gost.dev@samsung.com, da.gomez@samsung.com
-Subject: Re: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
-Message-ID: <Z9wmq0UH3V7-Y4OZ@casper.infradead.org>
-References: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
- <Z9wGA9z_cVn6Mfa1@casper.infradead.org>
- <t5zqyoxwjkl2su6ypfo6p4toliwq6opktufhibd4wwhfrjs26r@k56hbgmr2hwz>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LVzqQcNF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742481433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OhfkO0nOeFh31dBWlpIBHPp/23oMIm4/ZzrV7nDHXfs=;
+	b=LVzqQcNF5lFnNgzkRLDogBItBVTSgR3acHVWsqaBBBvy0NPqsrbCc0UhJkDvq94vWcFaPZ
+	4d7m7H9Zs+Fr5cVTV5lwjqqxpevX2jQMx+qkpz92rVgOVrsazJ7UzcWwHRe8gte/2Q7rnx
+	FIhbRRmgrmKUZ5WLAv8WcKC5gIF+Ft4=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-zpZ2P0haMhCfjQkdfMlInQ-1; Thu, 20 Mar 2025 10:37:12 -0400
+X-MC-Unique: zpZ2P0haMhCfjQkdfMlInQ-1
+X-Mimecast-MFC-AGG-ID: zpZ2P0haMhCfjQkdfMlInQ_1742481432
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-523efd77006so299204e0c.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 07:37:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742481432; x=1743086232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OhfkO0nOeFh31dBWlpIBHPp/23oMIm4/ZzrV7nDHXfs=;
+        b=kS24RdZoGOYE1GcJ05Nd3bHjVtExOC43tCFbQezNtBXIA7C6FOU87q0s1NpsBgy40/
+         B68b4Dkpp6EiTSHLt5e3FLyrRsP/ggwvJEpHTe/mXUv8upz8CSL0QkxwzetDksAd8Cdc
+         TTByp/MbNvfkguJ/XNBMKbqr1txG74qmDOBohzzJTyqjr2o1R7A3By/TLDSakdr+I2jZ
+         oDzpa9QcSbhB44I8gLXmd6ple9SmY2cmhKA4SJ67DqdhBSjBr9YsdjcKYKEkr5wDJCK4
+         X74zqsdfFnYzRiI61n91TRMKDFJJUSaZaNXjVtN2mIo+ouNEDX9QhgrXNDsElBv+PBgD
+         SJPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXSQPLfTskn4YtgcB5XQxQIDdgKR5hT49pXjefhrEmqEdU3Z5K0nL+9XUtYuKKcVc+jKMIiPr688xYZHA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq7/rYNPIqY1sqO3votXSAnIGd+nsZGi1c21trzia+qXRyQMNA
+	9TYrYcO1sIBPEYgbDLFM3mRtqK3vduKU1sXv9tmVkE9Y0oI6y9po7/gD8aHKjmeAnezPnDoVPaP
+	QQGmQhrvzCIDJM8CxnoLzL2IL/xfw0kICWxoq1Fj8xM7JBFv4TsZo4N5bwvKVBu2NoqlcoLJhu5
+	ioQbB7qWBldLzktrNXJTS9M7V6dOsbO00k/aU=
+X-Gm-Gg: ASbGncuyZrQNYLZ95KERvMmerasjx/jdD4eFTwZEEB74uuMVO8FOZ/zuAiYVvxH5pME
+	UVZTTGYqVgqBVn1tJJIX8p2QiooXU+9FCK4m2ebS13E/guFfSRMq4Pjk3k0W97yJhcN9iRAyv2w
+	==
+X-Received: by 2002:a05:6122:608b:b0:520:60c2:3fb with SMTP id 71dfb90a1353d-525960812c0mr3062141e0c.0.1742481431791;
+        Thu, 20 Mar 2025 07:37:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZzOib+M1uSgBNdPU9As6RS1qawt2FeKNo41kWJkJdCE9L3Fh8fjGANZNClbTw9gJ8Xn1+es3nosLVtfd7E60=
+X-Received: by 2002:a05:6122:608b:b0:520:60c2:3fb with SMTP id
+ 71dfb90a1353d-525960812c0mr3062090e0c.0.1742481431364; Thu, 20 Mar 2025
+ 07:37:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <t5zqyoxwjkl2su6ypfo6p4toliwq6opktufhibd4wwhfrjs26r@k56hbgmr2hwz>
+References: <Z8-ReyFRoTN4G7UU@dread.disaster.area> <Z9ATyhq6PzOh7onx@fedora>
+ <Z9DymjGRW3mTPJTt@dread.disaster.area> <Z9FFTiuMC8WD6qMH@fedora>
+ <7b8b8a24-f36b-d213-cca1-d8857b6aca02@redhat.com> <Z9j2RJBark15LQQ1@dread.disaster.area>
+ <Z9knXQixQhs90j5F@infradead.org> <Z9k-JE8FmWKe0fm0@fedora>
+ <Z9u-489C_PVu8Se1@infradead.org> <Z9vGxrPzJ6oswWrS@fedora> <Z9wko1GfrScgv4Ev@infradead.org>
+In-Reply-To: <Z9wko1GfrScgv4Ev@infradead.org>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Thu, 20 Mar 2025 22:36:59 +0800
+X-Gm-Features: AQ5f1Jr8FjeQhNt7BbY6PJzfG3RS9LN-fvPsePmLRNjHLbVpaQVZTtsZ8BaAdPI
+Message-ID: <CAFj5m9J1BGiqG+P+7kidH4V0hR9f-BmUar=0ADDR9wpGbnWSZw@mail.gmail.com>
+Subject: Re: [PATCH] the dm-loop target
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Dave Chinner <david@fromorbit.com>, Mikulas Patocka <mpatocka@redhat.com>, 
+	Jens Axboe <axboe@kernel.dk>, Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com, 
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 20, 2025 at 02:29:56PM +0100, Daniel Gomez wrote:
-> On Thu, Mar 20, 2025 at 12:11:47PM +0100, Matthew Wilcox wrote:
-> > On Thu, Mar 20, 2025 at 04:41:11AM -0700, Luis Chamberlain wrote:
-> > > We've been constrained to a max single 512 KiB IO for a while now on x86_64.
-> > ...
-> > > It does beg a few questions:
-> > > 
-> > >  - How are we computing the new max single IO anyway? Are we really
-> > >    bounded only by what devices support?
-> > >  - Do we believe this is the step in the right direction?
-> > >  - Is 2 MiB a sensible max block sector size limit for the next few years?
-> > >  - What other considerations should we have?
-> > >  - Do we want something more deterministic for large folios for direct IO?
-> > 
-> > Is the 512KiB limit one that real programs actually hit?  Would we
-> > see any benefit from increasing it?  A high end NVMe device has a
-> > bandwidth limit around 10GB/s, so that's reached around 20k IOPS,
-> > which is almost laughably low.
-> 
-> Current devices do more than that. A quick search gives me 14GB/s and 2.5M IOPS
-> for gen5 devices:
-> 
-> https://semiconductor.samsung.com/ssd/enterprise-ssd/pm1743/
-> 
-> An gen6 goes even further.
+On Thu, Mar 20, 2025 at 10:22=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+>
+> On Thu, Mar 20, 2025 at 03:41:58PM +0800, Ming Lei wrote:
+> > > That does not match my observations in say nvmet.  But if you have
+> > > numbers please share them.
+> >
+> > Please see the result I posted:
+> >
+> > https://lore.kernel.org/linux-block/Z9FFTiuMC8WD6qMH@fedora/
+>
+> That shows it improves numbers and not that it doens't.
 
-That kind of misses my point.  You don't need to exceed 512KiB I/Os to
-be bandwidth limited.  So what's the ROI of all this work?  Who benefits?
+Fine, then please look at the result in the following reply:
+
+https://lore.kernel.org/linux-block/Z9I2lm31KOQ784nb@fedora/
+
+Thanks,
+
