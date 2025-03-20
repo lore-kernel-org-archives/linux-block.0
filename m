@@ -1,54 +1,102 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBEF1E0DDC;
-	Thu, 20 Mar 2025 14:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F921E5739
+	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 14:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482500; cv=none; b=tRmnFqmk46T21zK0Ps2t44iDr5KsFN4OTMU9NdpgpBXSSL4LCTOU6K3xJqDXoEVP6o1qaUWS/5JUi+tY3Hjsn4cE6IT2DwXPcX06lNA24knHgr14Dcm0mEDYzAzc5+nkWKUnMl9uE4Onw6Z6tDNz9dS9f7664mfik9HK7poOH3U=
+	t=1742482799; cv=none; b=Xl7xm/MVQNPQhwj/tumJzqGqbLRJFa6/1ohPRIV6sJqBZZNw54aDs9I8/salV0hd5Eq8pgN+kHqNs6CaatrvjgguckC/MrPaYgzjV+FnnB4LRql5FRZFbsFIoYQ9kdchjAYeH1esDIg9aNyzuZoP10K/rQk+712RaEWgtDhgZXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482500; c=relaxed/simple;
-	bh=QpZoklcSe9c0cXug7ux+6BI0reRDb7pcy9sIxBjz2Zg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZ1PzyKyPfGWho1zfBq2RezC0XFtGMBrlvtcBrMIxacOfcxw6gIT7w83xWf3A8EdpIi4zh9FkGpydDuFVCwoMu59rFDpnPf8uPw9v5MJaO081bia5SjN+c1CzuOEqDYSyviwpqo949bQy9LyXhzcoGh5ZLn/E+pPQFI1QCjRLbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2AD9868BFE; Thu, 20 Mar 2025 15:54:50 +0100 (CET)
-Date: Thu, 20 Mar 2025 15:54:49 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Daniel Gomez <da.gomez@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	lsf-pc@lists.linux-foundation.org, david@fromorbit.com,
-	leon@kernel.org, hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
-	axboe@kernel.dk, joro@8bytes.org, brauner@kernel.org, hare@suse.de,
-	willy@infradead.org, djwong@kernel.org, john.g.garry@oracle.com,
-	ritesh.list@gmail.com, p.raghav@samsung.com, gost.dev@samsung.com,
-	da.gomez@samsung.com
-Subject: Re: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
-Message-ID: <20250320145449.GA14191@lst.de>
-References: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org> <ijpsvpc5xgd52r3uu3ibkjcyqzl6edke6fbotj7zf2wbw5vrqb@zzr274ln4tjd>
+	s=arc-20240116; t=1742482799; c=relaxed/simple;
+	bh=2rOGlMmtdQ4Ksoad5RSTtLyZgwyZ5X/mRZl26DRqT94=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=mZNCiM0QOWBLzO+BDHICw+/GtiOVpeFj201zqS9h5UZdSgag6t8cYhybuxZC9rTGNpmyykI0DhiBg6muCxk5Q6OuF+SEoVJpdd0RG5wfKP9xDIcz9K3cd0vvW8FfaX/vza79304dBoB7eImKKJMJXAIo4oGYMpZEvNafRa3/O0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SSaRsfEY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSaRsfEY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742482796;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nRe2APlP+3rualAe+YEcPMiZ23dWUMdOZf0dy04wvzQ=;
+	b=SSaRsfEYJU3zDtGeOrOS9g1OTB/h6qAjLjgtNXyEvI4qmFexW7hP39MoNTKYz+amGnsH41
+	CSLqJhEvuqXMhZPSaVHyO2pWvKFcOV2jee7sO+WjfO33swT/OjkWr7LVEndD+ON0yy+k6n
+	TSEgoT8hwn2l0jDo3IcPWsvlMXJxjWw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-327-XPbzXm-7PjWIQos2Ykpyrw-1; Thu,
+ 20 Mar 2025 10:59:52 -0400
+X-MC-Unique: XPbzXm-7PjWIQos2Ykpyrw-1
+X-Mimecast-MFC-AGG-ID: XPbzXm-7PjWIQos2Ykpyrw_1742482791
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5F635196D2E0;
+	Thu, 20 Mar 2025 14:59:50 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 163253001D16;
+	Thu, 20 Mar 2025 14:59:46 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <749dc130afd32accfd156b06f297585a56af47f3.camel@ibm.com>
+References: <749dc130afd32accfd156b06f297585a56af47f3.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-24-dhowells@redhat.com>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
+    Ilya Dryomov <idryomov@gmail.com>
+Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
+    "slava@dubeyko.com" <slava@dubeyko.com>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "jlayton@kernel.org" <jlayton@kernel.org>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Why use plain numbers and totals rather than predef'd constants for RPC sizes?
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ijpsvpc5xgd52r3uu3ibkjcyqzl6edke6fbotj7zf2wbw5vrqb@zzr274ln4tjd>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3172945.1742482785.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Mar 2025 14:59:45 +0000
+Message-ID: <3172946.1742482785@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Mar 20, 2025 at 02:47:22PM +0100, Daniel Gomez wrote:
-> On Thu, Mar 20, 2025 at 04:41:11AM +0100, Luis Chamberlain wrote:
-> > We've been constrained to a max single 512 KiB IO for a while now on x86_64.
-> > This is due to the number of DMA segments and the segment size. With LBS the
-> > segments can be much bigger without using huge pages, and so on a 64 KiB
-> > block size filesystem you can now see 2 MiB IOs when using buffered IO.
-> 
-> Actually up to 8 MiB I/O with 64k filesystem block size with buffered I/O
-> as we can describe up to 128 segments at 64k size.
+Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
 
-Block layer segments are in no way limited to the logical block size.
+> > -	dbuf =3D ceph_databuf_reply_alloc(1, 8 + sizeof(struct ceph_timespec=
+), GFP_NOIO);
+> > -	if (!dbuf)
+> > +	request =3D ceph_databuf_reply_alloc(1, 8 + sizeof(struct ceph_times=
+pec), GFP_NOIO);
+> =
+
+> Ditto. Why do we have 8 + sizeof(struct ceph_timespec) here?
+
+Because that's the size of the composite protocol element.
+
+As to why it's using a total of plain integers and sizeofs rather than
+constant macros, Ilya is the person to ask according to git blame;-).
+
+I would probably prefer sizeof(__le64) here over 8, but I didn't want to
+change it too far from the existing code.
+
+If you want macro constants for these sorts of things, someone else who kn=
+ows
+the protocol better needs to do that.  You could probably write something =
+to
+generate them (akin to rpcgen).
+
+David
+
