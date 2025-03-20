@@ -1,68 +1,49 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D161F4C81
-	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 07:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5121209F5E
+	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 10:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742456542; cv=none; b=iPlaewvkgmYMQA99mBZuwo846nbQtAGwDI8vgNGtsF77Eo7Dfy7jNmX1375T9RZSzliUrmyJDJA1l1IBTX8PD1ZbadoXuvGONvlM9InRjAow0kvDRMOaTU4YSrTvY3mXjL9LX1Y6MWyfUiVnv7OBe7BDKxn/aBiKX9K2HwE12ZI=
+	t=1742466514; cv=none; b=jO/beTOdmhcnaYmwXBF4oPhuCRm4maJ7pw+jDOvSfNmdYiEOJgz7vAVZmhbBJPKnThsCXW9YcPnwc4f/FFNsKtTqH0FXIki331m2xSkLlrnpUUK6HDHll0pARWZlagzMuf3rX43UTQyPAtxKrn1vujOepSYc/f2jXNpd7ZTRJns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742456542; c=relaxed/simple;
-	bh=DJzXSmy/bbs+qKb+f67Qgl7ywvF5y9oAZVpOItOiVZ4=;
+	s=arc-20240116; t=1742466514; c=relaxed/simple;
+	bh=J7wsQei5Jvv3rc9OfhfzjWzPOrQ93NlcxGqqycKNfFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HRyGnHo0YhQL0n9N3TZQ90XOerfPSLSfJvS3CRB6qC4eIhdXTrz0pN5oyCI+x9Khy+345iu8ZoLdhrio083EbcodF17X3bMw+JtHTEOEHvaFpguzqPzEVh3CaUJoK5GCHIN21mnaC59ftRmtwuRbq5hFu1L7enYf/3ZMeGJ8FvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F2PBYwek; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=sbdcapWplOLKzwGfFSdvVag2kNC7EJP7Pnxk8pthxGHrQuTerDOw3TkM1OYyA1jX1UR3IsaxHthCvcEpUce/dn245tDJ+23Ve5nn4SRdZ+q6TRmIyJWsYd087fLcZlTkP/cxsQHH4CUISi+l4dVhxe549t0y7WR31yZl3shfMGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sXasm3/M; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2PBYwek"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742456539;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sXasm3/M"
+Date: Thu, 20 Mar 2025 06:28:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742466499;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=U8pGM+K1r9HJttHN9XN8AarpXIQG27tn6vD2t40C+P8=;
-	b=F2PBYwekMUhhaErAsvVYQj5Fo8eFyudZ6OJbfOZwTDpJXv82N8RcQ9IMn3o/+yIyd1f9Gy
-	+3VOnYUefaTN7wcPf6wW+H3CoA5cRHbPFkogfGDPAAbjd50knhP4sfkO0rDRHOujEm9Hza
-	QevaQ+w9om8OK/eRKoMyMpgfqs4mtC8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-ncbbwjXyPlqHiGYBctJwvg-1; Thu,
- 20 Mar 2025 03:42:16 -0400
-X-MC-Unique: ncbbwjXyPlqHiGYBctJwvg-1
-X-Mimecast-MFC-AGG-ID: ncbbwjXyPlqHiGYBctJwvg_1742456534
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64D8D19560B0;
-	Thu, 20 Mar 2025 07:42:14 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.32])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 684B81828A87;
-	Thu, 20 Mar 2025 07:42:03 +0000 (UTC)
-Date: Thu, 20 Mar 2025 15:41:58 +0800
-From: Ming Lei <ming.lei@redhat.com>
+	bh=hKkmTlPdjL5yWb2hU/bKjk/s2siqxaNI4P74wFGaO1s=;
+	b=sXasm3/Mmy+26eFEtYplujYizkL07/GrGDJZUBdVFC+8xN2TPlXpk0FszVApkAb5dyyPlm
+	TTY2ciYyitFcr+mUMDsGs3XZYawsM8gl/rmPilwA10+HlnoidGE4V4N/+7GtszW6r/Pt7X
+	vigznRTLjpWqhA7qgN8WJgiKrAdudFw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
 To: Christoph Hellwig <hch@infradead.org>
-Cc: Dave Chinner <david@fromorbit.com>,
-	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z9vGxrPzJ6oswWrS@fedora>
-References: <a8e5c76a-231f-07d1-a394-847de930f638@redhat.com>
- <Z8-ReyFRoTN4G7UU@dread.disaster.area>
- <Z9ATyhq6PzOh7onx@fedora>
- <Z9DymjGRW3mTPJTt@dread.disaster.area>
- <Z9FFTiuMC8WD6qMH@fedora>
- <7b8b8a24-f36b-d213-cca1-d8857b6aca02@redhat.com>
- <Z9j2RJBark15LQQ1@dread.disaster.area>
- <Z9knXQixQhs90j5F@infradead.org>
- <Z9k-JE8FmWKe0fm0@fedora>
- <Z9u-489C_PVu8Se1@infradead.org>
+Cc: Keith Busch <kbusch@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-bcachefs@vger.kernel.org, 
+	linux-block@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 13/14] block: Allow REQ_FUA|REQ_READ
+Message-ID: <6fbiaellaiveldpywvrqlss6zovgastnqrkpkuwh4nhgoqx3wj@2lamdytlkg5v>
+References: <zjwvemsjlshzm5zes7jznmhchvf2erebmuil4ssnkax3lwpw3a@5gnzbjlta36f>
+ <Z9h25wvi0VQOaGh2@kbusch-mbp.dhcp.thefacebook.com>
+ <ysvt4npanz4qfoxm5cv627cq2ommq6rxpka6pkvl3l2crcatmc@ic7tn5tt7aw4>
+ <Z9iIa770ySTgKgp0@kbusch-mbp.dhcp.thefacebook.com>
+ <566e4f59-4aaa-4d8e-b61f-b27cf79c1201@acm.org>
+ <4mqi7e74ji7j3pzfdhfncz2yz3vvvvb6jivtzry4pmljgygcg5@hd5pv2lddzeq>
+ <18b03fe9-1f57-48ac-92e3-308d27c5d144@acm.org>
+ <t4zch7xnj5j3ifnivw3fkhkjpjldk2mozk3ouhogi224ntalab@3jjt2j6crbxe>
+ <Z9m3KSGxyt_HQ5oD@kbusch-mbp>
+ <Z9uqZS7QmjSvMlA5@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,56 +52,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9u-489C_PVu8Se1@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <Z9uqZS7QmjSvMlA5@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Mar 20, 2025 at 12:08:19AM -0700, Christoph Hellwig wrote:
-> On Tue, Mar 18, 2025 at 05:34:28PM +0800, Ming Lei wrote:
-> > On Tue, Mar 18, 2025 at 12:57:17AM -0700, Christoph Hellwig wrote:
-> > > On Tue, Mar 18, 2025 at 03:27:48PM +1100, Dave Chinner wrote:
-> > > > Yes, NOWAIT may then add an incremental performance improvement on
-> > > > top for optimal layout cases, but I'm still not yet convinced that
-> > > > it is a generally applicable loop device optimisation that everyone
-> > > > wants to always enable due to the potential for 100% NOWAIT
-> > > > submission failure on any given loop device.....
-> > 
-> > NOWAIT failure can be avoided actually:
-> > 
-> > https://lore.kernel.org/linux-block/20250314021148.3081954-6-ming.lei@redhat.com/
+On Wed, Mar 19, 2025 at 10:40:53PM -0700, Christoph Hellwig wrote:
+> On Tue, Mar 18, 2025 at 12:10:49PM -0600, Keith Busch wrote:
+> > Maybe just change the commit log. Read FUA has legit uses for persisting
+> > data as described by the specs. No need to introduce contested behavior
+> > to justify this patch, yah?
 > 
-> That's a very complex set of heuristics which doesn't match up
-> with other uses of it.
-
-I'd suggest you to point them out in the patch review.
-
+> While not having a factually incorrect commit message is a great
+> start I still don't think we want it.  For one there is no actual
+> use case for the actual semantics, so why add it?  Second it still
+> needs all the proper per-driver opt-in as these sematncis are not
+> defined for all out protocols as I've already mentioned before.
 > 
-> > 
-> > > 
-> > > Yes, I think this is a really good first step:
-> > > 
-> > > 1) switch loop to use a per-command work_item unconditionally, which also
-> > >    has the nice effect that it cleans up the horrible mess of the
-> > >    per-blkcg workers.  (note that this is what the nvmet file backend has
-> > 
-> > It could be worse to take per-command work, because IO handling crosses
-> > all system wq worker contexts.
-> 
-> So do other workloads with pretty good success.
-> 
-> > 
-> > >    always done with good result)
-> > 
-> > per-command work does burn lots of CPU unnecessarily, it isn't good for
-> > use case of container
-> 
-> That does not match my observations in say nvmet.  But if you have
-> numbers please share them.
+> But hey, maybe Kent can actually find other storage or file system
+> developers to support it, so having an at least technically correct
+> patch out on the list would be a big start, even if I would not expect
+> to Jens to take it in a whim.
 
-Please see the result I posted:
+Chistoph,
 
-https://lore.kernel.org/linux-block/Z9FFTiuMC8WD6qMH@fedora/
+You're arguing over nothing. Go back and reread, you and I have the same
+interpretation of what read fua should do.
 
-
-Thanks,
-Ming
-
+You all really are a surly and argumentative lot...
