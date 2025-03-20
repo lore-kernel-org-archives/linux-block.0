@@ -1,126 +1,113 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A04A1EE00C
-	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 02:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14CB1CAA99
+	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 02:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742436561; cv=none; b=ovx1X0cBHqzp38oHohs1bwuj8GAESuuWn3SApwPsynvqw5ZLaZWAXzo7HWsDlzB4MUKDh5/UiP0Q2ymRJ3yx5Nol1WZoO2PwDZvNXFJrN/t2f8JM9l1j5/JLygkSntdIUOkN4N9FfkRBZpvrrQecJmVjUM9AWUffWyFlJQVRRVQ=
+	t=1742437350; cv=none; b=MHfB0UvmXl2sp01EEn2wHXyh1Qgr+rkIpyHoz4OkwgTag+tFM2ryAUtIZGYbaVDUEBsO/JXvvzz2ct5l24Bm72gH4b3JLcsrT1te9yYvkpQmgd4DmaenBk8oVh3zqnK2bCjzVfBYAMjtojIwFr4/y3ZDucsfKgOVsER6m1iboq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742436561; c=relaxed/simple;
-	bh=ccxg1rSgzzghOVz+XAsY+n/ViHFUNsOJayH2bWRfmec=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A3XaZSZLUjJ9kbAxu8R82ZYL3urotZNh8/C0M8qRKC8bgDpoUGSpv2UW0gUrn2D6FEMWN6rlzGB6YFs7G/5POIOvNn3Hx2hSb83pTi1/GxkumA10JMdKrbGr4fCGZ8EozmhqgnXSfq7BZ6w/sUYmPuCouO/CgZpGMHENYdL/6MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com; spf=pass smtp.mailfrom=byte-forge.io; dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b=rILsLC/P; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=byte-forge.io
+	s=arc-20240116; t=1742437350; c=relaxed/simple;
+	bh=svY3R/mQg+rdzMVDS5G88T9Iv3/0VSEcFG586RfYxXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AGnLD7xjoLPZba7ricyMNgr5w/1senDm317Lo41V7ANEGUFmmXD6/cfyiiOsR7e+a0UxdTkAQIg2Sk0tbmwXDyNwY84WykIAKs+q5xJvSbsf+uiUP+TsU66Js+eRcHEABsDynmIfkciq6JFrf00P+Csy4OuESB0BPvEsw+7eXc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bBvt4BFZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b="rILsLC/P"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6febbd3b75cso2765707b3.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Mar 2025 19:09:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=byte-forge-io.20230601.gappssmtp.com; s=20230601; t=1742436559; x=1743041359; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zH7pN2HHzqaHv/+RURjN1vt61BNgNWW8J1587fmHapM=;
-        b=rILsLC/P8OFesqmdPys9UE52UMUXakmEh9/y6GFIzfNZNlYWSvtIi8OVmhXwGFQxfd
-         sEfCq0OGDF3ZJyJ3FDqbN3FAF9z29XJzBhkxq8mTLKoMhEaX1BvZmj0h9HkBE8WMO+4I
-         36+Rh4PttgIVenMM0wILnBzL44RhnRyYgrLhBQqMZVds9fcdwsseDLdApZMCIkR7itU/
-         ed9rock7WjcD9ORmHvtyzEE1kRWHVBw/+1zpYpGtZJhU9LqgSF38TQMBzdnZPrObSVhc
-         +Tq3+/+Jxw4GgYY+cbGsbMdFYSXejlrZNnN9BnDy/aIISDwXvo+HSTDQCjzpz34UsGBy
-         pakA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742436559; x=1743041359;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zH7pN2HHzqaHv/+RURjN1vt61BNgNWW8J1587fmHapM=;
-        b=jkQT4tTk/3UYi4cELhyiL30GL9lAxycxDg0bHJDfybtZRLuDC/tNljpRTRhvFnjoj2
-         XY0Pk53joHE0xLwD4cbD0rJ/FwxG0F+r4A0u4qCZmaikq0v8e4BFRJeu7wlM1PGehI9h
-         GSam6L3vQYfwgP57Rz+2kzdfzwTdqm/cCaxv29ivYOFgdnspgGx+lX1XRP0HYcicZfZW
-         1mvkI7hb3Nozy3299K9BebbI0fzBbqR3Ddn18J3fNO/hYd7j66gNBVMLeA9g7mTNLjlp
-         3WITl+NjoTnHNhSYiMlXIJgWYeof6C46wftq2N2byhrQsIIBjwruponnYE28+ZwI8Mkf
-         tQEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBQ09ZKEFiO43QJXO3yUF5U7FvypVRj4YPiGUTvI6DuMitHPvkwvLulIo9XBJKXwjgTOOHxJKMVCIG3A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7EMTYDlJ5ExqYqr+bMOZXx2KB/V6O+1bQ48RL8IpPTwqsiTXg
-	i76hJ8Ih1eCgCIJPQPJQvPBFR8+kU868kkcvN/R9EoDLKcBUCYf0MZWdMlMElP8=
-X-Gm-Gg: ASbGncunqY9EdItZoYPol6NDYV9MWM2ycjafujxa+RQ9lzmJQj/TGwDhyzMMsWMmB1E
-	hgOUtNNoPQVVhgzeZ4PO9dGJjelzRk01cJpklQaFQhdvebjFY34w2GiJ1Ein/9GUhCw8w/N76iS
-	eVmyPXHMie03hT+ucFUBeQZKyMHI0ICaqexWcAB/6Qvs4dTQ/jGH+0RAuxk5ExBKMjOoGrML7hO
-	OfudKw9lNkXwDU2I7Gdpwg6hPt4rTkK3IWz70eMFO+oXquzlJuqpYQIH9TV5U/HMwJZREZIe6wL
-	X7g73wvvNOzny6/P5SXak8LDisKsT8V0TCunsUvh3WATk39FbG9P7lJN+FvfocOSK3W9WoZqSpw
-	B4QLoANQpBkfOpp1wO1kCU+EQXC+tuw==
-X-Google-Smtp-Source: AGHT+IEW5G+pDsiPRKkgTvD8Zo00R32kyaBsI8eJPeORLUzbOvUl0Vn9XDX1yfKHznCnzVzUBF0jUg==
-X-Received: by 2002:a05:690c:498d:b0:6fe:b109:6965 with SMTP id 00721157ae682-7009c157709mr77798037b3.35.1742436559191;
-        Wed, 19 Mar 2025 19:09:19 -0700 (PDT)
-Received: from Machine.lan (107-219-75-226.lightspeed.wepbfl.sbcglobal.net. [107.219.75.226])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6ff32cb598asm32826357b3.111.2025.03.19.19.09.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 19:09:18 -0700 (PDT)
-From: Antonio Hickey <contact@antoniohickey.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>
-Cc: Antonio Hickey <contact@antoniohickey.com>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 16/17] rust: block: refactor to use `&raw [const|mut]`
-Date: Wed, 19 Mar 2025 22:07:35 -0400
-Message-ID: <20250320020740.1631171-17-contact@antoniohickey.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250320020740.1631171-1-contact@antoniohickey.com>
-References: <20250320020740.1631171-1-contact@antoniohickey.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bBvt4BFZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742437347;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BhOHJHQ3iKvyBTuMABgfluShtMSX375oKQ9uFwU6pnw=;
+	b=bBvt4BFZgFh7vzPbeU/vypGrKv4aY2RIHD/iwm03YcEmVPtF5Qt1/LOyvm57u9cg/ZaDVb
+	6dQ6sCOOpOgnLKDqxm2TTbnr0mvZQBmyfeP8uJVJ6leowGwNGJR7g1sw63ctpwRl7+Y0qd
+	daCtAYQAzHAgocv7bWy0kMlHCmlk5/0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-674-FLbfnP19P4G3iWv7DrU0zQ-1; Wed,
+ 19 Mar 2025 22:22:24 -0400
+X-MC-Unique: FLbfnP19P4G3iWv7DrU0zQ-1
+X-Mimecast-MFC-AGG-ID: FLbfnP19P4G3iWv7DrU0zQ_1742437343
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A214195609E;
+	Thu, 20 Mar 2025 02:22:23 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA7163001D13;
+	Thu, 20 Mar 2025 02:22:17 +0000 (UTC)
+Date: Thu, 20 Mar 2025 10:22:11 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: Re: [PATC] block: update queue limits atomically
+Message-ID: <Z9t709DZs-Flq1qS@fedora>
+References: <ee66a4f2-ecc4-68d2-4594-a0bcba7ffe9c@redhat.com>
+ <Z9mJmlhmZwnOlnqT@fedora>
+ <d5193df0-5944-8cf6-7eb6-26adf191269e@redhat.com>
+ <Z9ocUCrvXQRJHFVY@fedora>
+ <6ebdd2ae-8fc2-4072-b131-a7c0da56d3f2@kernel.dk>
+ <d04fcd9f-b4a7-100a-e9a4-b0d4d45b372b@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d04fcd9f-b4a7-100a-e9a4-b0d4d45b372b@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Replacing all occurrences of `addr_of_mut!(place)` with
-`&raw mut place`.
+On Wed, Mar 19, 2025 at 10:18:39PM +0100, Mikulas Patocka wrote:
+> 
+> 
+> On Tue, 18 Mar 2025, Jens Axboe wrote:
+> 
+> > > Yeah, it looks fine, but I feel it is still fragile, and not sure it is one
+> > > accepted solution.
+> > 
+> > Agree - it'd be much better to have the bio drivers provide the same
+> > guarantees that we get on the request side, rather than play games with
+> > this and pretend that concurrent update and usage is fine.
+> > 
+> > -- 
+> > Jens Axboe
+> 
+> And what mechanism should they use to read the queue limits?
+> * locking? (would degrade performance)
+> * percpu-rwsem? (no overhead for readers, writers wait for the RCU 
+>   synchronization)
+> * RCU?
+> * anything else?
 
-This will allow us to reduce macro complexity, and improve consistency
-with existing reference syntax as `&raw mut` is similar to `&mut`
-making it fit more naturally with other existing code.
+1) queue usage counter is for covering fast IO code path
 
-Suggested-by: Benno Lossin <benno.lossin@proton.me>
-Link: https://github.com/Rust-for-Linux/linux/issues/1148
-Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
----
- rust/kernel/block/mq/request.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+- in __submit_bio(), queue usage counter is grabbed when calling
+  ->submit_bio()
 
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index 7943f43b9575..4a5b7ec914ef 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -12,7 +12,7 @@
- };
- use core::{
-     marker::PhantomData,
--    ptr::{addr_of_mut, NonNull},
-+    ptr::NonNull,
-     sync::atomic::{AtomicU64, Ordering},
- };
- 
-@@ -187,7 +187,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
-     pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
-         // SAFETY: Because of the safety requirements of this function, the
-         // field projection is safe.
--        unsafe { addr_of_mut!((*this).refcount) }
-+        unsafe { &raw mut (*this).refcount }
-     }
- }
- 
+- the only trouble should be from dm-crypt or thin-provision which offloads
+bio submission to other context, so you can grab the usage counter by
+percpu_ref_get(&q->q_usage_counter) until this bio submission or queue
+limit consumption is done
+
+2) slow path: dm_set_device_limits
+
+which is done before DM disk is on, so it should be fine by holding limit lock.
+
+3) changing queue limits from bio->end_io() or request completion handler
+
+- this usage need fix
+
+
+
+thanks,
+Ming
 
