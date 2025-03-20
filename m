@@ -1,126 +1,83 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F3B209F4E;
-	Thu, 20 Mar 2025 11:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89747214A98;
+	Thu, 20 Mar 2025 11:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742469225; cv=none; b=TD8JLeCaZCByfbDblJ1vRLksZv3yNx4jguK4vixhKB4l77oedS1UR2+e4YnLbTV5Q2MLYYVh4KtXuwMI6wHhUmmjefSiTH9TV3aUmOlijcmsfy2rPetNNZAEd9xmKM2qpv4+WfuUZILsJwYm5YgpR6PtUStxZmIgXHIAwQ2CRyY=
+	t=1742470873; cv=none; b=TkblkmppVYgvLFNYjPq9L6bCbuwXK+vbP6sCcQFF9i939PO/3DPA7XTYeUZyWf0Hi1i7PIlIMQc1eRwhjE113ZzR+RsTklb1J0tsB2cYPkPn1E8pfvvwxddvQduqq7Hm/vhYEeZkih1sAQKWDppo4VN9aczj/p3HRPPiQz7bdjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742469225; c=relaxed/simple;
-	bh=UQSVd9fn4oGGUe3K7GxXqZFSqLzzVOuQ21NoWR5cw8Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AHJSeeeg9keynWCFm7bugqIfcpqFubFVTmFbamd5qcrFvprq0S4RpOUkYPhH1yBnsPaLJjtUt2KEkYNZ4HlYs0rirv1KuErVACImIJH8/g5jjjzhpU0Xr2ZYLvMylOycnalPOYjZGl0cWoye89xUvYF/qnn4MPvHmRX62F98aGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=k1i6JkBH; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1742470873; c=relaxed/simple;
+	bh=76RdB/g6Y50zkaCO75Y2n9UEvJzSLLD2iwa/QrAYSwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lt+2kBLFQXZluoFsVt2H3vrO6yAg52Nj+S+fMheCsP7AMhN+pxeyJL7AMf/Zj2t7tvJp0e1JcNUiqbN0/ErCrKnKKSOxyM7laAw9kreiRWkbQzWKZ6cn3c7KoJVcJuKTj+eS0mYwmskeZl7pNOd9QgD9qg0VCaWi2tMs3bDLE2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGqnsfhX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k1i6JkBH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=gs4mQgpvMaKPx1XMegy2dt340WQwRma2LYoA2+CbDAc=; b=k1i6JkBHSHT0fr3QGyBpbdKsKs
-	qwtzxHS2sxeO/5RW2t/2epVt9HQlqit7a1xKKEr6Ekf/btQ9vTKoA0rCyc0w8E6PSbY0VZ3Gt0Gzx
-	FWphpz71JxF3i0wY6vjNTs4+Y1NTDvvsCNmGFfVDDaAPxPfc7G/Yx4n09nQu8tCz5zNhMODlArXcS
-	hFAVGvl521m/au46cLJvAKxQwm5pfoFd591QFVEMXYhBWmuD1xCarxZDjVOVdARnWnKCEiVjBb0LL
-	hFg5owWxQH9jv1x8Lc/M48kTqeVHRznRau24Jro+rjaqhzXaBHEWDGL/fPmwRIFl3HoEPffitH5A9
-	oyrGnhWQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tvDqB-0000000BvGP-1BwN;
-	Thu, 20 Mar 2025 11:13:35 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGqnsfhX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B8BC4CEDD;
+	Thu, 20 Mar 2025 11:41:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742470873;
+	bh=76RdB/g6Y50zkaCO75Y2n9UEvJzSLLD2iwa/QrAYSwI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=AGqnsfhXk9NYBoKxuflpuxAxjxhUGPR5bhUuk1NMOeWrOrO8dZLv7nYDxqAQ0ysox
+	 pXioidUOdytJnK1Wbp5Hef+ollk2qOnba9MgrIq1M8OCj1W9/8Pm/CcezPcKagrx0L
+	 Yf/yNROzL6LuDGeUDlcUJXk5GZ7WmXrBkXtjv3YNKgfmH9eUlSe7+cK6boQzJe1Gfj
+	 iLcfD7GZPBLimrDc4vF9TgZscNe58A925X+PhBf1FZ0CVFYPW7jKGFIXuN0Msa/8Ew
+	 iB0iGVs5pWPMMe5VRzIZyIM0wRj3xFwzgRhhTVu9bGTi+kbaW6x0UuyawLI5gzczOB
+	 JKq4qkrcE99Gg==
+Date: Thu, 20 Mar 2025 04:41:11 -0700
 From: Luis Chamberlain <mcgrof@kernel.org>
-To: leon@kernel.org,
-	hch@lst.de,
-	kbusch@kernel.org,
-	sagi@grimberg.me,
-	axboe@kernel.dk,
-	joro@8bytes.org,
-	brauner@kernel.org,
-	hare@suse.de,
-	willy@infradead.org,
-	david@fromorbit.com,
-	djwong@kernel.org
-Cc: john.g.garry@oracle.com,
-	ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	gost.dev@samsung.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	kernel@pankajraghav.com,
-	mcgrof@kernel.org
-Subject: [RFC 4/4] nvme-pci: add quirk for qemu with bogus NOWS
-Date: Thu, 20 Mar 2025 04:13:28 -0700
-Message-ID: <20250320111328.2841690-5-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250320111328.2841690-1-mcgrof@kernel.org>
-References: <20250320111328.2841690-1-mcgrof@kernel.org>
+To: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org
+Cc: lsf-pc@lists.linux-foundation.org, david@fromorbit.com, leon@kernel.org,
+	hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
+	joro@8bytes.org, brauner@kernel.org, hare@suse.de,
+	willy@infradead.org, djwong@kernel.org, john.g.garry@oracle.com,
+	ritesh.list@gmail.com, p.raghav@samsung.com, gost.dev@samsung.com,
+	da.gomez@samsung.com, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
+Message-ID: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The NOWS value for qemu is bogus but that means we need
-to be mucking with userspace when testing large IO, so just
-add a quirk to use sensible max limits, in this case just use
-MDTS as these drives are virtualized.
+We've been constrained to a max single 512 KiB IO for a while now on x86_64.
+This is due to the number of DMA segments and the segment size. With LBS the
+segments can be much bigger without using huge pages, and so on a 64 KiB
+block size filesystem you can now see 2 MiB IOs when using buffered IO.
+But direct IO is still crippled, because allocations are from anonymous
+memory, and unless you are using mTHP you won't get large folios. mTHP
+is also non-deterministic, and so you end up in a worse situation for
+direct IO if you want to rely on large folios, as you may *sometimes*
+end up with large folios and sometimes you might not. IO patterns can
+therefore be erratic.
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/nvme/host/core.c | 2 ++
- drivers/nvme/host/nvme.h | 5 +++++
- drivers/nvme/host/pci.c  | 3 ++-
- 3 files changed, 9 insertions(+), 1 deletion(-)
+As I just posted in a simple RFC [0], I believe the two step DMA API
+helps resolve this.  Provided we move the block integrity stuff to the
+new DMA API as well, the only patches really needed to support larger
+IOs for direct IO for NVMe are:
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f028913e2e62..8f516de16281 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2070,6 +2070,8 @@ static bool nvme_update_disk_info(struct nvme_ns *ns, struct nvme_id_ns *id,
- 		/* NOWS = Namespace Optimal Write Size */
- 		if (id->nows)
- 			io_opt = bs * (1 + le16_to_cpu(id->nows));
-+		else if (ns->ctrl->quirks & NVME_QUIRK_BOGUS_NOWS)
-+			io_opt = lim->max_hw_sectors << SECTOR_SHIFT;
- 	}
- 
- 	/*
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 7be92d07430e..c63a804db462 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -178,6 +178,11 @@ enum nvme_quirks {
- 	 * Align dma pool segment size to 512 bytes
- 	 */
- 	NVME_QUIRK_DMAPOOL_ALIGN_512		= (1 << 22),
-+
-+	/*
-+	 * Reports a NOWS of 0 which is 1 logical block size which is bogus
-+	 */
-+	NVME_QUIRK_BOGUS_NOWS			= (1 << 23),
- };
- 
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 27b830072c14..577d8f909139 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -3469,7 +3469,8 @@ static const struct pci_device_id nvme_id_table[] = {
- 				NVME_QUIRK_DISABLE_WRITE_ZEROES |
- 				NVME_QUIRK_BOGUS_NID, },
- 	{ PCI_VDEVICE(REDHAT, 0x0010),	/* Qemu emulated controller */
--		.driver_data = NVME_QUIRK_BOGUS_NID, },
-+		.driver_data = NVME_QUIRK_BOGUS_NID |
-+				NVME_QUIRK_BOGUS_NOWS, },
- 	{ PCI_DEVICE(0x1217, 0x8760), /* O2 Micro 64GB Steam Deck */
- 		.driver_data = NVME_QUIRK_DMAPOOL_ALIGN_512, },
- 	{ PCI_DEVICE(0x126f, 0x2262),	/* Silicon Motion generic */
--- 
-2.47.2
+  iomap: use BLK_MAX_BLOCK_SIZE for the iomap zero page
+  blkdev: lift BLK_MAX_BLOCK_SIZE to page cache limit
 
+The other two nvme-pci patches in that series are to just help with
+experimentation now and they can be ignored.
+
+It does beg a few questions:
+
+ - How are we computing the new max single IO anyway? Are we really
+   bounded only by what devices support?
+ - Do we believe this is the step in the right direction?
+ - Is 2 MiB a sensible max block sector size limit for the next few years?
+ - What other considerations should we have?
+ - Do we want something more deterministic for large folios for direct IO?
+
+[0] https://lkml.kernel.org/r/20250320111328.2841690-1-mcgrof@kernel.org
+
+  Luis
