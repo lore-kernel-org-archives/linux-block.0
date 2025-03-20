@@ -1,34 +1,57 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2D51D47A6;
-	Thu, 20 Mar 2025 14:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCB32253FB;
+	Thu, 20 Mar 2025 14:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742480334; cv=none; b=oILbnkDnJEndLKaPB0gPtcZrL3ecqOa0J6yPf6mLcSb6VaUo13TT/be/rHMVzVtysI+QC+lZtgnyojT9t3q3fV8puPEUqna/ojDWTwmpppuTuWKDoXgl+JtRj22SqshoFD28tlMkd119qtAftoaCulWw0Klz3LF12t68wKIFgGs=
+	t=1742480552; cv=none; b=bU5GbN1mnoWVkyAo4XfrzTlhmAjKhNOuz6fvzG4qLr1oGIvUUI4to7ttFVLuV8O3bk8SsVtZEwKXNp6ZVuuuVO8gCLtBGwVRzq5BHF1mwRYtfZxi5MHDv66gJ1kpZnNFjVUPAPZshqZVeI5nYbjbQMalcAZKeO1OJ8QMqVDUHEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742480334; c=relaxed/simple;
-	bh=z0SpEwCYglJQbG+ycO6OoWcHpaVIFARN/Aoyofd6pjY=;
+	s=arc-20240116; t=1742480552; c=relaxed/simple;
+	bh=IdkMRHnUO/qRTR7NCURnpDcjkokfTVGPb8CQ59hfS1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oR9EmifHoPGvf+aIdDQtj4Fm0mArgkM84YOyjWEyynOQmLn112FEAvUIL1feFMaqSiP2sQjib98GiNrX5PDAbhB58HegoI9BDSOb4ruEuvbiPC+NftBlGPygN8qt3SxlNOmysssbVWmJpFEBnfJGUYczjuI79Ml+Rb2b084SGzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id CE86768AA6; Thu, 20 Mar 2025 15:18:47 +0100 (CET)
-Date: Thu, 20 Mar 2025 15:18:46 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
-	david@fromorbit.com, leon@kernel.org, hch@lst.de, kbusch@kernel.org,
-	sagi@grimberg.me, axboe@kernel.dk, joro@8bytes.org,
-	brauner@kernel.org, hare@suse.de, willy@infradead.org,
-	djwong@kernel.org, john.g.garry@oracle.com, ritesh.list@gmail.com,
-	p.raghav@samsung.com, gost.dev@samsung.com, da.gomez@samsung.com
-Subject: Re: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
-Message-ID: <20250320141846.GA11512@lst.de>
-References: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fhcb665vLW+oVrQAu1bo+CSy3uFS+JIWKRntvhzxE4nlfJM0N+8EZFPLcBbSguXnbdwDqCpb5uVn04IuSaO4BfJER6QNu+dpwvh3b/8FXIhIgdMKtJfS4iJrvWSqREhltuNRb91zEeWT2ebQmqSLhH414fvpLim/Qn4U0pGISiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wiq4onaB; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wiq4onaB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ApHStimX9vO8afb2pgoWPG9MHpxSpNGMq6vSzrYXkvI=; b=wiq4onaB4pn4qb8/QHx7rQEypz
+	8PHj4dZ8NSoiLbKm3J9mnqcx6PMKNx3+n56JfJd3wCQ+Kiu9oeejOF1f1wLCWfPV5rP6QnHbbN8uu
+	39PcbICrh7bu6fiLIXGKFEaHhRMg4rcQEYSzzgl6QPMSCUPWbPRscflI974xy7lSIHQT8y+cIT82q
+	2XOrCB9xiaVqWfAtEf6Odgw28DIJTHICshE/HiNkOyEcVoKy50wCYSOSKM+DyShbucyfFPKYiOl0l
+	KG5UpaZTaPeou4/paqNoK5/ZEfoS7XBCw6Dvgs0F1rj/C6+IBbp9U0oTThO6S9oO5yZzoJUf7JUR6
+	pcwlJNCg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tvGmx-0000000CN6x-07LL;
+	Thu, 20 Mar 2025 14:22:27 +0000
+Date: Thu, 20 Mar 2025 07:22:27 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Dave Chinner <david@fromorbit.com>,
+	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH] the dm-loop target
+Message-ID: <Z9wko1GfrScgv4Ev@infradead.org>
+References: <Z8-ReyFRoTN4G7UU@dread.disaster.area>
+ <Z9ATyhq6PzOh7onx@fedora>
+ <Z9DymjGRW3mTPJTt@dread.disaster.area>
+ <Z9FFTiuMC8WD6qMH@fedora>
+ <7b8b8a24-f36b-d213-cca1-d8857b6aca02@redhat.com>
+ <Z9j2RJBark15LQQ1@dread.disaster.area>
+ <Z9knXQixQhs90j5F@infradead.org>
+ <Z9k-JE8FmWKe0fm0@fedora>
+ <Z9u-489C_PVu8Se1@infradead.org>
+ <Z9vGxrPzJ6oswWrS@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,17 +60,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <Z9vGxrPzJ6oswWrS@fedora>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Mar 20, 2025 at 04:41:11AM -0700, Luis Chamberlain wrote:
-> We've been constrained to a max single 512 KiB IO for a while now on x86_64.
+On Thu, Mar 20, 2025 at 03:41:58PM +0800, Ming Lei wrote:
+> > That does not match my observations in say nvmet.  But if you have
+> > numbers please share them.
+> 
+> Please see the result I posted:
+> 
+> https://lore.kernel.org/linux-block/Z9FFTiuMC8WD6qMH@fedora/
 
-No, we absolutely haven't.  I'm regularly seeing multi-MB I/O on both
-SCSI and NVMe setup.
-
-> This is due to the number of DMA segments and the segment size.
-
-In nvme the max_segment_size is UINT_MAX, and for most SCSI HBAs it is
-fairly large as well.
+That shows it improves numbers and not that it doens't.
 
