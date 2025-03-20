@@ -1,47 +1,58 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14B613C695;
-	Thu, 20 Mar 2025 12:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773BB218585;
+	Thu, 20 Mar 2025 12:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742472717; cv=none; b=ZeZpKxfxVOqMSI3HrMJfREts5Czfw9t+QVtGlh8r1bNvTbOUAuNzX77dkiJi7zmwnNHW47JveGaDdgTgM5LScHMsAh+5eEt/VZ56HmSBMZHvJVchonEqbCGYduviHFvPsxoVmJenDBdW3+uKz05zwoh5H3bqyFd2k0onmx1LwtM=
+	t=1742473121; cv=none; b=UrzeLRUgKCR1PvlXwjTADYFStBVVyFW/9xu6SebxVD7mTqgbhqaLNWoyhO5hxEG4/YpdCQwfSvPaEcBEQ3d299Jr7nLDgUWYt/9bXrGZjU/xKZxT6qeveAcNf7TqY1SamIj11TiK5wsaU2su7m2gRkVSPGB3wpEuUqsxD18mpoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742472717; c=relaxed/simple;
-	bh=K3hg1bCjJiCU739YdKYncHOb2k8F152AweW3t/yo/+k=;
+	s=arc-20240116; t=1742473121; c=relaxed/simple;
+	bh=K2/BZGoFSC6TQw/cxXRdYTP8MwP9Rvb39XqZtWmojH8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fYPiQlnb6jcwyOtpOzn9kwpKi2Awhm3kd8WBENiEjesdghWgmd6dvaqpj1YBBElLtHFIzLW1SoNlJyjlX/mZ7d0FLu0W9DSPbzhkYSbFLTxrIUgrXOQPzovyUnNKz05ri+DkmWEYhcFIcdZ2ueoyTVIgA7HvC+JFXYOTLXr8wA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CYrG33lH; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jrsb2M0bSzNFpTuD3YxyImHrIXpg1xs1Ab6zhacZIvcQjkdZHdpjrbEOxG1AtfeOjYvWHgAwVYRVVRZKGOGRq+J3ywyPSjyaeIeVgYp0bMY57KJZArnQywrxRVui5hwxXBr1oe6RfumV4O1nfXqXBuk/7J+k3mPlXM4Oqggo7uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KF9CPQba; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CYrG33lH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6GdYJvaUyHN33OWPLsIOGOvCIvn/uOWWV0lLG312V8w=; b=CYrG33lHZUSnxCeeDL6buuQ3Gd
-	ZXncxZYgvDt1AhMNMoxH0NNgwN2Vl/F9DMX+klnY+ql1Nb+wF/bNYyP/5zrijkmvfvPDldi/G/EXp
-	KZ1Q1NnN3Rr8W5nTujHbkt3VZiKIH9ixxUui/KKTA3xtFqsZfx5lXXPq5W6wTx/2lpL8sWXxZKC4J
-	TOdTSyTLt3BwtjJhMpAK7cx44jaEMtN5u4ZeVbRBcNzwzpAjKmCKA3scFSbMAUkwwPWRaK1TbSfTT
-	ixPtmOV+j6xVtlwvDjX1uEPVjP7nTjGExNuYoIeZyhvmcGgOTeQaTXbjfMIkvYPuLHAk9OrzT0L5s
-	orBbgBbA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tvEkV-0000000A7g4-2x1Q;
-	Thu, 20 Mar 2025 12:11:47 +0000
-Date: Thu, 20 Mar 2025 12:11:47 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
-	david@fromorbit.com, leon@kernel.org, hch@lst.de, kbusch@kernel.org,
-	sagi@grimberg.me, axboe@kernel.dk, joro@8bytes.org,
-	brauner@kernel.org, hare@suse.de, djwong@kernel.org,
-	john.g.garry@oracle.com, ritesh.list@gmail.com,
-	p.raghav@samsung.com, gost.dev@samsung.com, da.gomez@samsung.com
-Subject: Re: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
-Message-ID: <Z9wGA9z_cVn6Mfa1@casper.infradead.org>
-References: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KF9CPQba"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70BC0C4CEDD;
+	Thu, 20 Mar 2025 12:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742473120;
+	bh=K2/BZGoFSC6TQw/cxXRdYTP8MwP9Rvb39XqZtWmojH8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KF9CPQbajSzxspd6Xf8MQjoIk/2zRdL0CkWtpTdjhjG9V/wXbGEQQhelwh5bgKFXG
+	 uv09BvTPRO5L5cts+sXTbrNpMSt+4Qx/u5eN3id3xX9P8CkN8GpOK+SYh3NvxPbxHJ
+	 B14QyMiQ6ls8/0PvZvXiOaEHDzDbUp6llc9qGbuybchomC5MEJel2ly0WtNmy/uVpn
+	 n/1yl6iUY4rH3FLZOYJFTVlY0ZU51Ozov7TNI7+fOEU6sC1OobSH3nQD3u2mS+wuXh
+	 UkGG6eQqeIwWQwOY38Twpuo8VXR5mvuch7EmOBqzsjAYvMKgGKFyg0TBH/VfyWEp1r
+	 kGaZpJg7Izy7g==
+Date: Thu, 20 Mar 2025 05:18:39 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>,
+	Johannes Weiner <hannes@cmpxchg.org>
+Cc: Jan Kara <jack@suse.cz>, Oliver Sang <oliver.sang@intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
+	Christian Brauner <brauner@kernel.org>,
+	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
+	linux-block@vger.kernel.org, ltp@lists.linux.it,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	David Bueso <dave@stgolabs.net>
+Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
+ BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
+Message-ID: <Z9wHnw4qE_6rjpxh@bombadil.infradead.org>
+References: <20250311-testphasen-behelfen-09b950bbecbf@brauner>
+ <Z9kEdPLNT8SOyOQT@xsang-OptiPlex-9020>
+ <Z9krpfrKjnFs6mfE@bombadil.infradead.org>
+ <Z9mFKa3p5P9TBSTQ@casper.infradead.org>
+ <Z9n_Iu6W40ZNnKwT@bombadil.infradead.org>
+ <Z9oy3i3n_HKFu1M1@casper.infradead.org>
+ <Z9r27eUk993BNWTX@bombadil.infradead.org>
+ <Z9sYGccL4TocoITf@bombadil.infradead.org>
+ <Z9sZ5_lJzTwGShQT@casper.infradead.org>
+ <Z9wF57eEBR-42K9a@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,21 +61,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
+In-Reply-To: <Z9wF57eEBR-42K9a@bombadil.infradead.org>
 
-On Thu, Mar 20, 2025 at 04:41:11AM -0700, Luis Chamberlain wrote:
-> We've been constrained to a max single 512 KiB IO for a while now on x86_64.
-...
-> It does beg a few questions:
+On Thu, Mar 20, 2025 at 05:11:21AM -0700, Luis Chamberlain wrote:
+> Sure, the culprit is the patch titled:
 > 
->  - How are we computing the new max single IO anyway? Are we really
->    bounded only by what devices support?
->  - Do we believe this is the step in the right direction?
->  - Is 2 MiB a sensible max block sector size limit for the next few years?
->  - What other considerations should we have?
->  - Do we want something more deterministic for large folios for direct IO?
+> mm: page_alloc: trace type pollution from compaction capturing
 
-Is the 512KiB limit one that real programs actually hit?  Would we
-see any benefit from increasing it?  A high end NVMe device has a
-bandwidth limit around 10GB/s, so that's reached around 20k IOPS,
-which is almost laughably low.
+Sorry.. that's incorrect, the right title is:
+
+mm: compaction: push watermark into compaction_suitable() callers
+
+  Luis
