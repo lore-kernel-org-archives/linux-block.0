@@ -1,88 +1,105 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4381E8333
-	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 15:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA61A1DDC0F;
+	Thu, 20 Mar 2025 15:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742484380; cv=none; b=faEWf1B5FjbMdoH49M4pH+ncufqtLNeNpvcSd7T0Suls85UuoiLdPssaTZGCQKlB+vjhTU9hrwS8NoAbUmMD4nfq2+gxkzDGV5DsG2TYd+S6bt707jVrBd25GcBJVsitgTrPKf6QRsb8pDijd/i9AOaUOQSLur71R0jcnHb7M98=
+	t=1742485047; cv=none; b=k6MTFhsESs+Oms/Ikpka+hnhyqWhXjFYFXbnEK/pAyRaq43qLOiOwtIPO8NiCrY7T6WQ++TRP3QNyYDHumAVYg4DQ4q7huHi0GIki1D4x5A2rnLZHOJib6Iwj5dWzlVCfKNAhhgsD+If3LCSO4gXg847bPQnNBPZFU2vQLOiOkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742484380; c=relaxed/simple;
-	bh=TR1eTBA7fRTupQfcNBL8gfm9cGkD0wK7jgIIEFhsD/I=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=D3+Kj5QwEmjJnc43Mb6bTPaW4VrhVV6584vooGUsH87HUHHj9JO6tUTPCwwbRs/VAZzg9Qc0q5d0X9sr897657rC8y1GPquZdP8LO7hHizoJ9U7J2mcacw7MLFThf7HboVYLzai8+3ZC568xRwh/mHv3prHEQfL9OKSPyY/ta1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UJxquCEr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742485047; c=relaxed/simple;
+	bh=J+e8IhyIIBJvv0xjeU0BQK7lYADTbr9FmLCze4AWg3Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tZRr8k7VVCBYc5IMjKpPAk6swNLxJGZ3ho97un7CCQ8gD8AFMHW3Sagz3MpGDbiXxp782wedflkCJtMqM4eMyJQIhbKVGKwSDXa8Kl8qJbcWGP3PZgDYBPQqp4n/LBqY0ebgubkx2Naw7Q4eb4NAkR3UAPcNIBTmRoaPD1+41Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Qv4MB0lJ; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJxquCEr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742484377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=79P3Rj9ZIxn8gB2XJc6nRUWm/vSrFhJbw3HtD7EvGj0=;
-	b=UJxquCErJ4k1QHr6MOnVRJ1z004sjZhWeFEurYSk1HN+oJYA9rgzo2M7mm9Ymx51AnrZc4
-	ygWLaiPv8+ndKEdzg1C7fEOqJZWLko7Xs0IZqfYlVXAXnMd9yjCvO5ACm+g+kKxkVaPcit
-	p033+wb074ohw7Szwq92zu7J6CPP4eA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-68-0M1WztXYMpy43it4VearTw-1; Thu,
- 20 Mar 2025 11:26:13 -0400
-X-MC-Unique: 0M1WztXYMpy43it4VearTw-1
-X-Mimecast-MFC-AGG-ID: 0M1WztXYMpy43it4VearTw_1742484372
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Qv4MB0lJ"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZJV7m2n5qzmWRtG;
+	Thu, 20 Mar 2025 15:37:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1742485041; x=1745077042; bh=3XYe1tuQS507NL5nm9rpDihD
+	H8Gzkr7TFGJUWeSwmG8=; b=Qv4MB0lJ9xWZJ9jMy8RMFI9qzNsHX2Zk8MxpcKaH
+	c4HSTrBC9zuL8atxolDY9431JpPYULMP/TAF/Cej53mMuAM6OsnjQKiXq1oeqDqA
+	RHIXi5Hkh0JYIMEzcSYQfnVgJZf6RnJvxjisw5Rw6a6tLIBwMkLuKIhpaw0Cp1XK
+	hksP4adk00A0QIY4Ebo0BKimLRW9zAhR1wfY/50RhrUD8n3QHGIxkNWMg6klQrAn
+	rhKkLib7pV1kZjzwbd0F2YzxQ/208axbE0tYcls+8KzTkXm/YLimi96KDaHUfvNm
+	lsRhKyOHR/3nAlBty+Jzd81HQ7SyD++zqsEXhc9t0hgiCg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id GJk4IoTrJnfO; Thu, 20 Mar 2025 15:37:21 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC3121828B26;
-	Thu, 20 Mar 2025 15:26:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E4B3C19560AF;
-	Thu, 20 Mar 2025 15:25:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <b31f451e2949e7c07535accda067178238f7e1bb.camel@ibm.com>
-References: <b31f451e2949e7c07535accda067178238f7e1bb.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-33-dhowells@redhat.com>
-To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
-Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
-    "slava@dubeyko.com" <slava@dubeyko.com>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "idryomov@gmail.com" <idryomov@gmail.com>,
-    "jlayton@kernel.org" <jlayton@kernel.org>,
-    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 32/35] netfs: Add some more RMW support for ceph
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZJV7R4kR0zmWSKQ;
+	Thu, 20 Mar 2025 15:37:06 +0000 (UTC)
+Message-ID: <a40a704f-22c8-4ae9-9800-301c9865cee4@acm.org>
+Date: Thu, 20 Mar 2025 08:37:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3173769.1742484356.1@warthog.procyon.org.uk>
-Date: Thu, 20 Mar 2025 15:25:56 +0000
-Message-ID: <3173770.1742484356@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] breaking the 512 KiB IO boundary on x86_64
+To: Christoph Hellwig <hch@lst.de>, Luis Chamberlain <mcgrof@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
+ david@fromorbit.com, leon@kernel.org, kbusch@kernel.org, sagi@grimberg.me,
+ axboe@kernel.dk, joro@8bytes.org, brauner@kernel.org, hare@suse.de,
+ willy@infradead.org, djwong@kernel.org, john.g.garry@oracle.com,
+ ritesh.list@gmail.com, p.raghav@samsung.com, gost.dev@samsung.com,
+ da.gomez@samsung.com
+References: <Z9v-1xjl7dD7Tr-H@bombadil.infradead.org>
+ <20250320141846.GA11512@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250320141846.GA11512@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
-
-> > +	rreq->buffer.iter	= *iter;
+On 3/20/25 7:18 AM, Christoph Hellwig wrote:
+> On Thu, Mar 20, 2025 at 04:41:11AM -0700, Luis Chamberlain wrote:
+>> We've been constrained to a max single 512 KiB IO for a while now on x86_64.
 > 
-> The struct iov_iter structure is complex enough and we assign it by value to
-> rreq->buffer.iter. So, the initial pointer will not receive any changes
-> then. Is it desired behavior here?
+> No, we absolutely haven't.  I'm regularly seeing multi-MB I/O on both
+> SCSI and NVMe setup.
 
-Yes.  The buffer described by the iterator is going to get partitioned across
-a number of subrequests, each of which will get a copy of the iterator
-suitably advanced and truncated.  As they may run in parallel, there's no way
-for them to share the original iterator.
+Is NVME_MAX_KB_SZ the current maximum I/O size for PCIe NVMe
+controllers? From drivers/nvme/host/pci.c:
 
-David
+/*
+  * These can be higher, but we need to ensure that any command doesn't
+  * require an sg allocation that needs more than a page of data.
+  */
+#define NVME_MAX_KB_SZ	8192
+#define NVME_MAX_SEGS	128
+#define NVME_MAX_META_SEGS 15
+#define NVME_MAX_NR_ALLOCATIONS	5
+
+>> This is due to the number of DMA segments and the segment size.
+> 
+> In nvme the max_segment_size is UINT_MAX, and for most SCSI HBAs it is
+> fairly large as well.
+
+I have a question for NVMe device manufacturers. It is known since a
+long time that submitting large I/Os with the NVMe SGL format requires
+less CPU time compared to the NVMe PRP format. Is this sufficient to
+motivate NVMe device manufacturers to implement the SGL format? All SCSI
+controllers I know of, including UFS controllers, support something that
+is much closer to the NVMe SGL format rather than the NVMe PRP format.
+
+Thanks,
+
+Bart.
+
 
