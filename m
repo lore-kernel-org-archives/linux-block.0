@@ -1,437 +1,167 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCD822CBF1
-	for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 16:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9E922D799
+	for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 16:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742573671; cv=none; b=Hiz42LD4geVQ7LDYCdu1KZaaWgHvASBPaCUawtguPBWLGbkGXmnQWKcxsX09vyqUkRAlIdIlULdDCGqNw9Gk0IfYQWN4l9ouO0KAG/v0XJL5viBzNrOBDZXm3HaRH57DS34AQfdZ9KBHlH6smOQQOn7hmFYkUVHQ2Atc5v9tYyE=
+	t=1742573679; cv=none; b=DJcVWr170d2IasAOm+jR93XU4IgqKpsg5k/9GhyAUDRk94FHaI7exoY3unl9uP9/Zdz0Sq2OcR/pP1kSSdwKVPeW0DSdH43qljxphU/1zvCrM1vykzVqqTSNOU8IWFt7p+hNxA69JUSkYV854DYhSqF78q6l/V1Vv0mFEERJ+ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742573671; c=relaxed/simple;
-	bh=l2b1GcwPJAEPhOwxBQ1cF95qrnUO7ROHoDw/IdBu/Z0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OQ8dFvwhdm00Am8SqCe3hYNkHrUqDpUpQzu45Ajmj8AmVtuwjfO+gZWnihinF2ky+0/4EUIdKji7VzCOp/V/wONdQvqhU2jF8qP5OQVF2YmIz8RK2/+b7S++/j1/q4INlZFkYzK5l+YSdhiJWVavpU2DRrCIRtFqGQWzDcuhGU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hcX6hpdX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742573679; c=relaxed/simple;
+	bh=qXpYjnL6QzDKFF/vEA2avZLphl/BA8jmPIwzNSXeK7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iv6jrNfEaA/B7q0v9TXyL0tzTNavzb+zGskNwQB0xW3EtjDrlS352ranU6UBwHl56m4Odg0B1Q+5RmoA9q2EzmbE6fX3dKaK3O+elPUAG61bW6sxIjir25WVUxcG8Dp70C8Demr5k6jHa59r1+Ba7p2JjC3QGLj69TfZZzq1BU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fv3+y9CY; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hcX6hpdX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742573668;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HNZpwpQRDsQTXPWBbnZ/kr6+Jl8CRL/WggEaD7n3AVo=;
-	b=hcX6hpdXEZP9prw7fNEM2kmCcD76tKAbr0EJRVzuTtYs/MWk9yEXV2s3/oflBMMQ/8WpxE
-	erYM3+yeQqq7Y71qLZeoVdG2+Tw3t8OvPPPUgd4OjfOI2yvZuO9ZRQAPfOgEwgV0S6IT2v
-	MndLIeCLybTa4BMg+UPE1VSDMJMuj9Q=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-JD6l5jh6OGyM8ciJnzstOA-1; Fri,
- 21 Mar 2025 12:14:26 -0400
-X-MC-Unique: JD6l5jh6OGyM8ciJnzstOA-1
-X-Mimecast-MFC-AGG-ID: JD6l5jh6OGyM8ciJnzstOA_1742573665
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A39031809CA5;
-	Fri, 21 Mar 2025 16:14:24 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.61])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1FA2B19373C4;
-	Fri, 21 Mar 2025 16:14:19 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Leon Romanovsky <leonro@nvidia.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Steve French <smfrench@gmail.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Trond Myklebust <trond.myklebust@hammerspace.com>
-Subject: [RFC PATCH 2/4] iov_iter: Add an iterator-of-iterators
-Date: Fri, 21 Mar 2025 16:14:02 +0000
-Message-ID: <20250321161407.3333724-3-dhowells@redhat.com>
-In-Reply-To: <20250321161407.3333724-1-dhowells@redhat.com>
-References: <20250321161407.3333724-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fv3+y9CY"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-47681dba807so242911cf.1
+        for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 09:14:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742573677; x=1743178477; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lr1NpamvodEP6MFP3VgS0Dk87IubpsnKUE/+euMf6QU=;
+        b=Fv3+y9CY8f2z8Zy2KI6pqFnQyV7BVUDrSAJNKGpTVdyOpcyNU4/FQUL4zz3+faPkaT
+         oTn39Aqr1rBjdcYFvzwokw8ucOYuOiR6qNpR0xhBxlofxuKBD2A17SWui721887+jErb
+         lueqHOTTfjYujWnpOrnpa5DUarH7F+TBIooG65jTgRsSgylaC3X874jRNb/uAZ/0UtEa
+         RHQJyMwwwLLgnmTfRdf4Mez+HL4viGgBfv77sFS0axbQKPdYfgZ1LoK8v6DYvcKsDWnT
+         5CIGlf3AVywZZKfZkUs3PSXud/k6UbXei63f8v/a3XWoKST+acnFS6g7cKySgNE6PqQF
+         4QKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742573677; x=1743178477;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lr1NpamvodEP6MFP3VgS0Dk87IubpsnKUE/+euMf6QU=;
+        b=AvaTtA/twz1ykI/uCF3piwH1MCiGTRtMWJyMrkeF6mnq7FJzKem7cBUCDtxpsd/eCB
+         frFT8loqAKIZRC3j42crroXKMdP1KgIGFhm6Aia/aqONGTsy9IrMGHZ2q7OH/1GRJldo
+         lH8vgEBgkeFXFemV1wshpgbdu7wv3jrkMDB+hT/Vc9mNTeo+I0OYVSHDTUdas4TeBnTf
+         TrZOkQmli4stxJ3mmvvwbK5kQNBvXallKG2C1jlwZ/RjqFRtVJxjtISbDGOlkbJFH6gp
+         jYfD+I3exjHjwoClg518XfDA9T6TBjgcwzRzeYX3MccPW77opeh9/FturHzEwS5uufTl
+         S1Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHmYy6I556Lr0UrpKrM70HgNoq8crb8wHjlszZjLtjZsww4++N1KCRVKImpn72Q6ROBnsoqP+mR9yitA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT++ItFPwcBr/WByLJqd6/XGMWgJ5cu4+Rn8ZE1kM2hE4GJui8
+	kxNZFJKPD/zyXJaLFcmwFFvR7b5YoKfsmOV88xUEbYYRnlTOBPueSy/w+So18YvkJy+YUIbJfxF
+	wBvoOLhhavg4JZQlCj1RqWvNSP4pXnv5KDFUM
+X-Gm-Gg: ASbGncsYvgzQUP+zLfhZ/YgPjFZ8Wo2X2GNDPyOFUmvbSWBTurWBmkGPDV/198XdbmQ
+	L3tzkI+biMkUMbJ2wqjqnbD6dSyD507Iv3rs6zZqPsVrxwA4uFf24kwXZrSaz/yUkARTc+6l9X6
+	25NNicni4fhWliXqvj43voafKR/w==
+X-Google-Smtp-Source: AGHT+IFtRdtnxmYqCiNGozdyiDRgbS5XVd2/jJNIMYaa9ildizNYGE8X3N7zH+w9Lm6oeOkoQXAJJ6yRGhxNC/i547Y=
+X-Received: by 2002:a05:622a:1c10:b0:476:77be:9102 with SMTP id
+ d75a77b69052e-4771f510a8amr3527931cf.7.1742573676464; Fri, 21 Mar 2025
+ 09:14:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20250320173931.1583800-1-surenb@google.com> <20250320173931.1583800-4-surenb@google.com>
+ <20250321-unhelpful-doze-791895ca5b01@spud>
+In-Reply-To: <20250321-unhelpful-doze-791895ca5b01@spud>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Fri, 21 Mar 2025 09:14:24 -0700
+X-Gm-Features: AQ5f1Jp8UfxX8WOnw9385d8J0NeQgt0g6OSnoez6cTxiRd2n5Bydr6rryoZB6As
+Message-ID: <CAJuCfpEujbaSrk5+mR=+vWqwSu-t52fVmbPf5msnpduSB6AT2Q@mail.gmail.com>
+Subject: Re: [RFC 3/3] mm: integrate GCMA with CMA using dt-bindings
+To: Conor Dooley <conor@kernel.org>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@redhat.com, 
+	vbabka@suse.cz, lorenzo.stoakes@oracle.com, liam.howlett@oracle.com, 
+	alexandru.elisei@arm.com, peterx@redhat.com, hannes@cmpxchg.org, 
+	mhocko@kernel.org, m.szyprowski@samsung.com, iamjoonsoo.kim@lge.com, 
+	mina86@mina86.com, axboe@kernel.dk, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, hch@infradead.org, jack@suse.cz, hbathini@linux.ibm.com, 
+	sourabhjain@linux.ibm.com, ritesh.list@gmail.com, aneesh.kumar@kernel.org, 
+	bhelgaas@google.com, sj@kernel.org, fvdl@google.com, ziy@nvidia.com, 
+	yuzhao@google.com, minchan@kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Minchan Kim <minchan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a new I/O iterator type, ITER_ITERLIST, that allows iteration over a
-series of I/O iterators, provided the iterators are all the same direction
-(all ITER_SOURCE or all ITER_DEST) and none of them are themselves
-ITER_ITERLIST (this function is recursive).
+On Fri, Mar 21, 2025 at 7:06=E2=80=AFAM Conor Dooley <conor@kernel.org> wro=
+te:
+>
+> On Thu, Mar 20, 2025 at 10:39:31AM -0700, Suren Baghdasaryan wrote:
+> > This patch introduces a new "guarantee" property for shared-dma-pool.
+> > With this property, admin can create specific memory pool as
+> > GCMA-based CMA if they care about allocation success rate and latency.
+> > The downside of GCMA is that it can host only clean file-backed pages
+> > since it's using cleancache as its secondary user.
+> >
+> > Signed-off-by: Minchan Kim <minchan@google.com>
+> > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+> > ---
+> >  arch/powerpc/kernel/fadump.c |  2 +-
+> >  include/linux/cma.h          |  2 +-
+> >  kernel/dma/contiguous.c      | 11 ++++++++++-
+> >  mm/cma.c                     | 33 ++++++++++++++++++++++++++-------
+> >  mm/cma.h                     |  1 +
+> >  mm/cma_sysfs.c               | 10 ++++++++++
+> >  6 files changed, 49 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/arch/powerpc/kernel/fadump.c b/arch/powerpc/kernel/fadump.=
+c
+> > index 4b371c738213..4eb7be0cdcdb 100644
+> > --- a/arch/powerpc/kernel/fadump.c
+> > +++ b/arch/powerpc/kernel/fadump.c
+> > @@ -111,7 +111,7 @@ void __init fadump_cma_init(void)
+> >               return;
+> >       }
+> >
+> > -     rc =3D cma_init_reserved_mem(base, size, 0, "fadump_cma", &fadump=
+_cma);
+> > +     rc =3D cma_init_reserved_mem(base, size, 0, "fadump_cma", &fadump=
+_cma, false);
+> >       if (rc) {
+> >               pr_err("Failed to init cma area for firmware-assisted dum=
+p,%d\n", rc);
+> >               /*
+> > diff --git a/include/linux/cma.h b/include/linux/cma.h
+> > index 62d9c1cf6326..3207db979e94 100644
+> > --- a/include/linux/cma.h
+> > +++ b/include/linux/cma.h
+> > @@ -46,7 +46,7 @@ extern int __init cma_declare_contiguous_multi(phys_a=
+ddr_t size,
+> >  extern int cma_init_reserved_mem(phys_addr_t base, phys_addr_t size,
+> >                                       unsigned int order_per_bit,
+> >                                       const char *name,
+> > -                                     struct cma **res_cma);
+> > +                                     struct cma **res_cma, bool gcma);
+> >  extern struct page *cma_alloc(struct cma *cma, unsigned long count, un=
+signed int align,
+> >                             bool no_warn);
+> >  extern bool cma_pages_valid(struct cma *cma, const struct page *pages,=
+ unsigned long count);
+> > diff --git a/kernel/dma/contiguous.c b/kernel/dma/contiguous.c
+> > index 055da410ac71..a68b3123438c 100644
+> > --- a/kernel/dma/contiguous.c
+> > +++ b/kernel/dma/contiguous.c
+> > @@ -459,6 +459,7 @@ static int __init rmem_cma_setup(struct reserved_me=
+m *rmem)
+> >       unsigned long node =3D rmem->fdt_node;
+> >       bool default_cma =3D of_get_flat_dt_prop(node, "linux,cma-default=
+", NULL);
+> >       struct cma *cma;
+> > +     bool gcma;
+> >       int err;
+> >
+> >       if (size_cmdline !=3D -1 && default_cma) {
+> > @@ -476,7 +477,15 @@ static int __init rmem_cma_setup(struct reserved_m=
+em *rmem)
+> >               return -EINVAL;
+> >       }
+> >
+> > -     err =3D cma_init_reserved_mem(rmem->base, rmem->size, 0, rmem->na=
+me, &cma);
+> > +     gcma =3D !!of_get_flat_dt_prop(node, "guarantee", NULL);
+>
+> When this (or if I guess) this goes !RFC, you will need to document this
+> new property that you're adding.
 
-To make reversion possible, I've added an 'orig_count' member into the
-iov_iter struct so that reversion of an ITER_ITERLIST can know when to go
-move backwards through the iter list.  It might make more sense to make the
-iterator list element, say:
-
-	struct itervec {
-		struct iov_iter iter;
-		size_t orig_count;
-	};
-
-rather than expanding struct iov_iter itself and have iov_iter_iterlist()
-set vec[i].orig_count from vec[i].iter->count.
-
-Also, for the moment, I've only permitted its use with source iterators
-(eg. sendmsg).
-
-To use this, you allocate an array of iterators and point the list iterator
-at it, e.g.:
-
-	struct iov_iter iters[3];
-	struct msghdr msg;
-
-	iov_iter_bvec(&iters[0], ITER_SOURCE, &head_bv, 1,
-		      sizeof(marker) + head->iov_len);
-	iov_iter_xarray(&iters[1], ITER_SOURCE, xdr->pages,
-			xdr->page_fpos, xdr->page_len);
-	iov_iter_kvec(&iters[2], ITER_SOURCE, &tail_kv, 1,
-		      tail->iov_len);
-	iov_iter_iterlist(&msg.msg_iter, ITER_SOURCE, iters, 3, size);
-
-This can be used by network filesystem protocols, such as sunrpc, to glue a
-header and a trailer on to some data to form a message and then dump the
-entire message onto the socket in a single go.
-
-[!] Note: I'm not entirely sure that this is a good idea: the problem is
-    that it's reasonably common practice to copy an iterator by direct
-    assignment - and that works for the existing iterators... but not this
-    one.  With the iterator-of-iterators, the list of iterators has to be
-    modified if we recurse.  It's probably fine just for calling sendmsg()
-    from network filesystems, but I'm not 100% sure of that.
-
-Suggested-by: Trond Myklebust <trond.myklebust@hammerspace.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
- include/linux/uio.h |  15 +++++
- lib/iov_iter.c      | 158 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 172 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 8ada84e85447..59a586333e1b 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -29,6 +29,7 @@ enum iter_type {
- 	ITER_FOLIOQ,
- 	ITER_XARRAY,
- 	ITER_DISCARD,
-+	ITER_ITERLIST,
- };
- 
- #define ITER_SOURCE	1	// == WRITE
-@@ -71,6 +72,7 @@ struct iov_iter {
- 				const struct folio_queue *folioq;
- 				struct xarray *xarray;
- 				void __user *ubuf;
-+				struct iov_iterlist *iterlist;
- 			};
- 			size_t count;
- 		};
-@@ -82,6 +84,11 @@ struct iov_iter {
- 	};
- };
- 
-+struct iov_iterlist {
-+	struct iov_iter	iter;
-+	size_t		orig_count;
-+};
-+
- typedef __u16 uio_meta_flags_t;
- 
- struct uio_meta {
-@@ -149,6 +156,11 @@ static inline bool iov_iter_is_xarray(const struct iov_iter *i)
- 	return iov_iter_type(i) == ITER_XARRAY;
- }
- 
-+static inline bool iov_iter_is_iterlist(const struct iov_iter *i)
-+{
-+	return iov_iter_type(i) == ITER_ITERLIST;
-+}
-+
- static inline unsigned char iov_iter_rw(const struct iov_iter *i)
- {
- 	return i->data_source ? WRITE : READ;
-@@ -302,6 +314,9 @@ void iov_iter_folio_queue(struct iov_iter *i, unsigned int direction,
- 			  unsigned int first_slot, unsigned int offset, size_t count);
- void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
- 		     loff_t start, size_t count);
-+void iov_iter_iterlist(struct iov_iter *i, unsigned int direction,
-+		       struct iov_iterlist *iterlist, unsigned long nr_segs,
-+		       size_t count);
- ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
- 			size_t maxsize, unsigned maxpages, size_t *start);
- ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 33a8746e593e..1d9190abfeb5 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -578,6 +578,19 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
- 		iov_iter_folioq_advance(i, size);
- 	} else if (iov_iter_is_discard(i)) {
- 		i->count -= size;
-+	} else if (iov_iter_is_iterlist(i)) {
-+		i->count -= size;
-+		for (;;) {
-+			size_t part = umin(size, i->iterlist->iter.count);
-+
-+			if (part > 0)
-+				iov_iter_advance(&i->iterlist->iter, part);
-+			size -= part;
-+			if (!size)
-+				break;
-+			i->iterlist++;
-+			i->nr_segs--;
-+		}
- 	}
- }
- EXPORT_SYMBOL(iov_iter_advance);
-@@ -608,6 +621,23 @@ static void iov_iter_folioq_revert(struct iov_iter *i, size_t unroll)
- 	i->folioq = folioq;
- }
- 
-+static void iov_iter_revert_iterlist(struct iov_iter *i, size_t unroll)
-+{
-+	for (;;) {
-+		struct iov_iterlist *il = i->iterlist;
-+
-+		size_t part = umin(unroll, il->orig_count - il->iter.count);
-+
-+		if (part > 0)
-+			iov_iter_revert(&il->iter, part);
-+		unroll -= part;
-+		if (!unroll)
-+			break;
-+		i->iterlist--;
-+		i->nr_segs++;
-+	}
-+}
-+
- void iov_iter_revert(struct iov_iter *i, size_t unroll)
- {
- 	if (!unroll)
-@@ -617,6 +647,8 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
- 	i->count += unroll;
- 	if (unlikely(iov_iter_is_discard(i)))
- 		return;
-+	if (unlikely(iov_iter_is_iterlist(i)))
-+		return iov_iter_revert_iterlist(i, unroll);
- 	if (unroll <= i->iov_offset) {
- 		i->iov_offset -= unroll;
- 		return;
-@@ -663,6 +695,8 @@ EXPORT_SYMBOL(iov_iter_revert);
-  */
- size_t iov_iter_single_seg_count(const struct iov_iter *i)
- {
-+	if (iov_iter_is_iterlist(i))
-+		i = &i->iterlist->iter;
- 	if (i->nr_segs > 1) {
- 		if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
- 			return min(i->count, iter_iov(i)->iov_len - i->iov_offset);
-@@ -787,6 +821,41 @@ void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count)
- }
- EXPORT_SYMBOL(iov_iter_discard);
- 
-+/**
-+ * iov_iter_iterlist - Initialise an I/O iterator that is a list of iterators
-+ * @iter: The iterator to initialise.
-+ * @direction: The direction of the transfer.
-+ * @iterlist: The list of iterators
-+ * @nr_segs: The number of elements in the list
-+ * @count: The size of the I/O buffer in bytes.
-+ *
-+ * Set up an I/O iterator that walks over an array of other iterators.  It's
-+ * only available as a source iterator (for WRITE) and none of the iterators in
-+ * the array can be of ITER_ITERLIST type to prevent infinite recursion.
-+ */
-+void iov_iter_iterlist(struct iov_iter *iter, unsigned int direction,
-+		       struct iov_iterlist *iterlist, unsigned long nr_segs,
-+		       size_t count)
-+{
-+	unsigned long i;
-+
-+	BUG_ON(direction != WRITE);
-+	for (i = 0; i < nr_segs; i++) {
-+		BUG_ON(iterlist[i].iter.iter_type == ITER_ITERLIST);
-+		BUG_ON(iterlist[i].iter.data_source != direction);
-+		iterlist[i].orig_count = iterlist[i].iter.count;
-+	}
-+
-+	*iter = (struct iov_iter){
-+		.iter_type	= ITER_ITERLIST,
-+		.data_source	= true,
-+		.count		= count,
-+		.iterlist	= iterlist,
-+		.nr_segs	= nr_segs,
-+	};
-+}
-+EXPORT_SYMBOL(iov_iter_iterlist);
-+
- static bool iov_iter_aligned_iovec(const struct iov_iter *i, unsigned addr_mask,
- 				   unsigned len_mask)
- {
-@@ -947,6 +1016,15 @@ unsigned long iov_iter_alignment(const struct iov_iter *i)
- 	if (iov_iter_is_xarray(i))
- 		return (i->xarray_start + i->iov_offset) | i->count;
- 
-+	if (iov_iter_is_iterlist(i)) {
-+		unsigned long align = 0;
-+		unsigned int j;
-+
-+		for (j = 0; j < i->nr_segs; j++)
-+			align |= iov_iter_alignment(&i->iterlist[j].iter);
-+		return align;
-+	}
-+
- 	return 0;
- }
- EXPORT_SYMBOL(iov_iter_alignment);
-@@ -1206,6 +1284,18 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
- 		return iter_folioq_get_pages(i, pages, maxsize, maxpages, start);
- 	if (iov_iter_is_xarray(i))
- 		return iter_xarray_get_pages(i, pages, maxsize, maxpages, start);
-+	if (iov_iter_is_iterlist(i)) {
-+		ssize_t size;
-+
-+		while (!i->iterlist->iter.count) {
-+			i->iterlist++;
-+			i->nr_segs--;
-+		}
-+		size = __iov_iter_get_pages_alloc(&i->iterlist->iter,
-+						  pages, maxsize, maxpages, start);
-+		i->count -= size;
-+		return size;
-+	}
- 	return -EFAULT;
- }
- 
-@@ -1274,6 +1364,21 @@ static int bvec_npages(const struct iov_iter *i, int maxpages)
- 	return npages;
- }
- 
-+static int iterlist_npages(const struct iov_iter *i, int maxpages)
-+{
-+	const struct iov_iterlist *p;
-+	ssize_t size = i->count;
-+	int npages = 0;
-+
-+	for (p = i->iterlist; size; p++) {
-+		size -= p->iter.count;
-+		npages += iov_iter_npages(&p->iter, maxpages - npages);
-+		if (unlikely(npages >= maxpages))
-+			return maxpages;
-+	}
-+	return npages;
-+}
-+
- int iov_iter_npages(const struct iov_iter *i, int maxpages)
- {
- 	if (unlikely(!i->count))
-@@ -1298,6 +1403,8 @@ int iov_iter_npages(const struct iov_iter *i, int maxpages)
- 		int npages = DIV_ROUND_UP(offset + i->count, PAGE_SIZE);
- 		return min(npages, maxpages);
- 	}
-+	if (iov_iter_is_iterlist(i))
-+		return iterlist_npages(i, maxpages);
- 	return 0;
- }
- EXPORT_SYMBOL(iov_iter_npages);
-@@ -1309,11 +1416,14 @@ const void *dup_iter(struct iov_iter *new, struct iov_iter *old, gfp_t flags)
- 		return new->bvec = kmemdup(new->bvec,
- 				    new->nr_segs * sizeof(struct bio_vec),
- 				    flags);
--	else if (iov_iter_is_kvec(new) || iter_is_iovec(new))
-+	if (iov_iter_is_kvec(new) || iter_is_iovec(new))
- 		/* iovec and kvec have identical layout */
- 		return new->__iov = kmemdup(new->__iov,
- 				   new->nr_segs * sizeof(struct iovec),
- 				   flags);
-+	if (WARN_ON_ONCE(iov_iter_is_iterlist(old)))
-+		/* Don't allow dup'ing of iterlist as the cleanup is complicated */
-+		return NULL;
- 	return NULL;
- }
- EXPORT_SYMBOL(dup_iter);
-@@ -1924,6 +2034,23 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i,
- 		return iov_iter_extract_xarray_pages(i, pages, maxsize,
- 						     maxpages, extraction_flags,
- 						     offset0);
-+	if (iov_iter_is_iterlist(i)) {
-+		ssize_t size;
-+
-+		while (i->nr_segs && !i->iterlist->iter.count) {
-+			i->iterlist++;
-+			i->nr_segs--;
-+		}
-+		if (!i->nr_segs) {
-+			WARN_ON_ONCE(i->count);
-+			return 0;
-+		}
-+		size = iov_iter_extract_pages(&i->iterlist->iter,
-+					      pages, maxsize, maxpages,
-+					      extraction_flags, offset0);
-+		i->count -= size;
-+		return size;
-+	}
- 	return -EFAULT;
- }
- EXPORT_SYMBOL_GPL(iov_iter_extract_pages);
-@@ -1994,6 +2121,33 @@ size_t iterate_discard(struct iov_iter *iter, size_t len, void *priv, void *priv
- 	return progress;
- }
- 
-+/*
-+ * Handle iteration over ITER_ITERLIST.
-+ */
-+static size_t iterate_iterlist(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-+			       iov_ustep_f ustep, iov_step_f step)
-+{
-+	struct iov_iterlist *p = iter->iterlist;
-+	size_t progress = 0;
-+
-+	do {
-+		size_t consumed;
-+
-+		consumed = iterate_and_advance2(&p->iter, len, priv, priv2, ustep, step);
-+
-+		len -= consumed;
-+		progress += consumed;
-+		if (p->iter.count)
-+			break;
-+		p++;
-+	} while (len);
-+
-+	iter->nr_segs -= p - iter->iterlist;
-+	iter->iterlist = p;
-+	iter->count -= progress;
-+	return progress;
-+}
-+
- /*
-  * Out of line iteration for iterator types that don't need such fast handling.
-  */
-@@ -2004,6 +2158,8 @@ size_t __iterate_and_advance2(struct iov_iter *iter, size_t len, void *priv,
- 		return iterate_discard(iter, len, priv, priv2, step);
- 	if (iov_iter_is_xarray(iter))
- 		return iterate_xarray(iter, len, priv, priv2, step);
-+	if (iov_iter_is_iterlist(iter))
-+		return iterate_iterlist(iter, len, priv, priv2, ustep, step);
- 	WARN_ON(1);
- 	return 0;
- }
-
+Definitely. I'll document the cleancache and GCMA as well.
+Thanks!
