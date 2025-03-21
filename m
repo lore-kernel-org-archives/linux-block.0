@@ -1,185 +1,150 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA0417741;
-	Fri, 21 Mar 2025 13:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3457442A94
+	for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 13:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742565127; cv=none; b=PG4HyjrhZj/EmMxfVb1k1V+G5Rdx4R6PF+ZI95Z+mRmulQr3Hf3y2RpNWlTjYmZ52uY1eZoq8V6wdjAHPtI+59RVs79qC5sOXYMjOn1qjUybvyS26AvGfbu9xcumZLa4xhypC9KlO9f/Dokh2StI75XAoFI1o6a/+3f9D+JgEa8=
+	t=1742565220; cv=none; b=XurVlaQSWUzATW7coggsF5NzSSfgD0ePJ0lzxdGZ+6i7Ja6YkIeOIjm61Km8Xkbo7AFW3cBbLmea3NN9SBIo9L3PRj+OAeO73mEPf1A54AIVETMRAMyPixUXN9zfiGSfDmutKAjur1Y8wExzaaJSHpEJNVh41S7HV5ejypWXFIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742565127; c=relaxed/simple;
-	bh=pkg+CNKx3vciyRK561CUgBnHgYjht9lrfmsH7bML4JY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ms4fmmnOJ4viL3+cTqRa//ZQmeHy69odu3dIWZMVfXwm7RcKMEWskzCQ2lySxOupNbAJvx6gf+C3IRQprlqQg7BNpeWjrYjlIDKiVg+PrgB1huuDZbA2O49N+fUJ5Y3Wd60EAOcZjwR0Njj3f1t9Dp14OzN9BKgzac67st3NP8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BAF99113E;
-	Fri, 21 Mar 2025 06:52:12 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3328E3F673;
-	Fri, 21 Mar 2025 06:52:02 -0700 (PDT)
-Message-ID: <d64a40d9-0c5b-45b6-a95c-d428a4dd9640@arm.com>
-Date: Fri, 21 Mar 2025 13:52:00 +0000
+	s=arc-20240116; t=1742565220; c=relaxed/simple;
+	bh=EiCilvJlLEdEh5lxdvjcbru8JvGaA1KGjQwvkqX6YWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AH/8ZnUQf3rY2yMuqQEY1R+A26wYMvhSCjyPMh1FfZdMLh1FN9c9M4x/vwCkzuwiDliZ774QFhHoKtqwjuJAyhsfguoOM9GL1GMQXw+/slrVkUnp5lo2WpmKtri+nZU2ETBkfSiE3LS7nbFAa0nNvfV1nHHkSYuV0Wi0pAUvGOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U55UIlZ8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U55UIlZ8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742565217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Rb/0fycfKxUxKQhOU0nYLz6+WvRJOmWcMbjeI/Z3jM4=;
+	b=U55UIlZ8JOc0hpT1I4w16MLuiRdrQDB/quu8NNZpm59eRdZFgpxIcIbQT6rLqYq7BS9a37
+	DmLLVu0PjAiXoVgyEI0TBA+hwmY0j4BPWQvcSAe1tEVDzkWCz1Q3RXP3Jwy1j8RMA/q28h
+	8EdRTpVxza8dnCDI+MFkw4TlcRbkZLs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-c1cFPPafOHKGBxoYeVd7Hw-1; Fri,
+ 21 Mar 2025 09:53:35 -0400
+X-MC-Unique: c1cFPPafOHKGBxoYeVd7Hw-1
+X-Mimecast-MFC-AGG-ID: c1cFPPafOHKGBxoYeVd7Hw_1742565214
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BFE3B18EBE8F;
+	Fri, 21 Mar 2025 13:53:34 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.2])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 898B91800370;
+	Fri, 21 Mar 2025 13:53:32 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] selftests: ublk: fix starting ublk device
+Date: Fri, 21 Mar 2025 21:53:24 +0800
+Message-ID: <20250321135324.259677-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-To: Marek Szyprowski <m.szyprowski@samsung.com>,
- Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
- Randy Dunlap <rdunlap@infradead.org>
-References: <cover.1738765879.git.leonro@nvidia.com>
- <20250220124827.GR53094@unreal>
- <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
- <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
- <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 12/03/2025 9:28 am, Marek Szyprowski wrote:
-> Hi Robin
-> 
-> On 28.02.2025 20:54, Robin Murphy wrote:
->> On 20/02/2025 12:48 pm, Leon Romanovsky wrote:
->>> On Wed, Feb 05, 2025 at 04:40:20PM +0200, Leon Romanovsky wrote:
->>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>
->>>> Changelog:
->>>> v7:
->>>>    * Rebased to v6.14-rc1
->>>
->>> <...>
->>>
->>>> Christoph Hellwig (6):
->>>>     PCI/P2PDMA: Refactor the p2pdma mapping helpers
->>>>     dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
->>>>     iommu: generalize the batched sync after map interface
->>>>     iommu/dma: Factor out a iommu_dma_map_swiotlb helper
->>>>     dma-mapping: add a dma_need_unmap helper
->>>>     docs: core-api: document the IOVA-based API
->>>>
->>>> Leon Romanovsky (11):
->>>>     iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
->>>>     dma-mapping: Provide an interface to allow allocate IOVA
->>>>     dma-mapping: Implement link/unlink ranges API
->>>>     mm/hmm: let users to tag specific PFN with DMA mapped bit
->>>>     mm/hmm: provide generic DMA managing logic
->>>>     RDMA/umem: Store ODP access mask information in PFN
->>>>     RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
->>>>       linkage
->>>>     RDMA/umem: Separate implicit ODP initialization from explicit ODP
->>>>     vfio/mlx5: Explicitly use number of pages instead of allocated
->>>> length
->>>>     vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->>>>     vfio/mlx5: Enable the DMA link API
->>>>
->>>>    Documentation/core-api/dma-api.rst   |  70 ++++
->>>    drivers/infiniband/core/umem_odp.c   | 250 +++++---------
->>>>    drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
->>>>    drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
->>>>    drivers/infiniband/hw/mlx5/umr.c     |  12 +-
->>>>    drivers/iommu/dma-iommu.c            | 468
->>>> +++++++++++++++++++++++----
->>>>    drivers/iommu/iommu.c                |  84 ++---
->>>>    drivers/pci/p2pdma.c                 |  38 +--
->>>>    drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++++++----------
->>>>    drivers/vfio/pci/mlx5/cmd.h          |  35 +-
->>>>    drivers/vfio/pci/mlx5/main.c         |  87 +++--
->>>>    include/linux/dma-map-ops.h          |  54 ----
->>>>    include/linux/dma-mapping.h          |  85 +++++
->>>>    include/linux/hmm-dma.h              |  33 ++
->>>>    include/linux/hmm.h                  |  21 ++
->>>>    include/linux/iommu.h                |   4 +
->>>>    include/linux/pci-p2pdma.h           |  84 +++++
->>>>    include/rdma/ib_umem_odp.h           |  25 +-
->>>>    kernel/dma/direct.c                  |  44 +--
->>>>    kernel/dma/mapping.c                 |  18 ++
->>>>    mm/hmm.c                             | 264 +++++++++++++--
->>>>    21 files changed, 1435 insertions(+), 693 deletions(-)
->>>>    create mode 100644 include/linux/hmm-dma.h
->>>
->>> Kind reminder.
->>
->> ...that you've simply reposted the same thing again? Without doing
->> anything to address the bugs, inconsistencies, fundamental design
->> flaws in claiming to be something it cannot possibly be, the egregious
->> abuse of DMA_ATTR_SKIP_CPU_SYNC proudly highlighting how
->> unfit-for-purpose the most basic part of the whole idea is, nor
->> *still* the complete lack of any demonstrable justification of how
->> callers who supposedly can't use the IOMMU API actually benefit from
->> adding all the complexity of using the IOMMU API in a hat but also
->> still the streaming DMA API as well?
->>
->> Yeah, consider me reminded.
->>
->>
->>
->> In case I need to make it any more explicit, NAK to this not-generic
->> not-DMA-mapping API, until you can come up with either something which
->> *can* actually work in any kind of vaguely generic manner as claimed,
->> or instead settle on a reasonable special-case solution for
->> justifiable special cases. Bikeshedding and rebasing through half a
->> dozen versions, while ignoring fundamental issues I've been pointing
->> out from the very beginning, has not somehow magically made this
->> series mature and acceptable to merge.
->>
->> Honestly, given certain other scenarios we may also end up having to
->> deal with, if by the time everything broken is taken away, it were to
->> end up stripped all the way back to something well-reasoned like:
->>
->> "Some drivers want more control of their DMA buffer layout than the
->> general-purpose IOVA allocator is able to provide though the DMA
->> mapping APIs, but also would rather not have to deal with managing an
->> entire IOMMU domain and address space, making MSIs work, etc. Expose
->> iommu_dma_alloc_iova() and some trivial IOMMU API wrappers to allow
->> drivers of coherent devices to claim regions of the default domain
->> wherein they can manage their own mappings directly."
->>
->> ...I wouldn't necessarily disagree.
-> 
-> 
-> Well, this is definitely not a review I've expected. I admit that I
-> wasn't involved in this proposal nor the discussion about it and I
-> wasn't able to devote enough time for keeping myself up to date. Now
-> I've tried to read all the required backlog and I must admit that this
-> was quite demanding.
-> 
-> If You didn't like this design from the beginning, then please state
-> that early instead of pointing random minor issues in the code. There
-> have been plenty of time to discuss the overall approach if You think it
-> was wrong.
+Firstly ublk char device node may not be created by udev yet, so wait
+a while until it can be opened or timeout.
 
-You mean like if a year ago I'd said "this is clearly an awkward 
-reinvention of the IOMMU API" of the very first RFC, and then continued 
-to point out specific and general concerns with both the design and 
-implementation on the v1 posting in October, and then again on 
-subsequent versions? Oh yeah right that's exactly what I did do...
+Secondly delete created ublk device in case of start failure, otherwise
+the device becomes zombie.
 
-The fact that the issues summarised above are *still* present in v7 is 
-not for lack of me pointing them out. And there is no obligation for 
-maintainers to accept code with obvious significant issues just because 
-they don't have the time or inclination to personally engage in trying 
-to fix said issues.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tools/testing/selftests/ublk/file_backed.c |  4 ++-
+ tools/testing/selftests/ublk/kublk.c       | 30 ++++++++++++++--------
+ 2 files changed, 23 insertions(+), 11 deletions(-)
 
-Thanks,
-Robin.
+diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
+index 8a07356eccaf..570a5158b665 100644
+--- a/tools/testing/selftests/ublk/file_backed.c
++++ b/tools/testing/selftests/ublk/file_backed.c
+@@ -196,11 +196,13 @@ static int ublk_loop_tgt_init(struct ublk_dev *dev)
+ 		},
+ 	};
+ 
+-	assert(dev->tgt.nr_backing_files == 1);
+ 	ret = backing_file_tgt_init(dev);
+ 	if (ret)
+ 		return ret;
+ 
++	if (dev->tgt.nr_backing_files != 1)
++		return -EINVAL;
++
+ 	bytes = dev->tgt.backing_file_size[0];
+ 	dev->tgt.dev_size = bytes;
+ 	p.basic.dev_sectors = bytes >> 9;
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index 148355717ee7..11005a87bcfa 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -379,26 +379,34 @@ static int ublk_queue_init(struct ublk_queue *q)
+ 	return -ENOMEM;
+ }
+ 
++#define WAIT_USEC 	100000
++#define MAX_WAIT_USEC 	(3 * 1000000)
+ static int ublk_dev_prep(struct ublk_dev *dev)
+ {
+ 	int dev_id = dev->dev_info.dev_id;
++	unsigned int wait_usec = 0;
++	int ret = 0, fd = -1;
+ 	char buf[64];
+-	int ret = 0;
+ 
+ 	snprintf(buf, 64, "%s%d", UBLKC_DEV, dev_id);
+-	dev->fds[0] = open(buf, O_RDWR);
+-	if (dev->fds[0] < 0) {
+-		ret = -EBADF;
+-		ublk_err("can't open %s, ret %d\n", buf, dev->fds[0]);
+-		goto fail;
++
++	while (wait_usec < MAX_WAIT_USEC) {
++		fd = open(buf, O_RDWR);
++		if (fd >= 0)
++			break;
++		usleep(WAIT_USEC);
++		wait_usec += WAIT_USEC;
++	}
++	if (fd < 0) {
++		ublk_err("can't open %s %s\n", buf, strerror(errno));
++		return -1;
+ 	}
+ 
++	dev->fds[0] = fd;
+ 	if (dev->tgt.ops->init_tgt)
+ 		ret = dev->tgt.ops->init_tgt(dev);
+-
+-	return ret;
+-fail:
+-	close(dev->fds[0]);
++	if (ret)
++		close(dev->fds[0]);
+ 	return ret;
+ }
+ 
+@@ -856,6 +864,8 @@ static int __cmd_dev_add(const struct dev_ctx *ctx)
+ 
+ 	ret = ublk_start_daemon(ctx, dev);
+ 	ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\b", ret);
++	if (ret < 0)
++		ublk_ctrl_del_dev(dev);
+ 
+ fail:
+ 	if (ret < 0)
+-- 
+2.47.1
+
