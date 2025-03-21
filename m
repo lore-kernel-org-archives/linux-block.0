@@ -1,211 +1,97 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC0F1EDA05
-	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 23:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC2F79C2
+	for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 00:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742514761; cv=none; b=etQHYNOCxWTA8iyeuZ5PM6vyX+dq+zWinkRT/PpsCm6uQ2M/mnY3Fn5Ek5PVTjBilPslq4dwpGUJDI83+bOBbb7LkBkRx05pr8QYNbXj/wKAnvYOLLUPTgJrmQwPYAkI4WT/blhkZK4PO5i7GxJh5bBekKaYa+7lZqnOtbT4QiM=
+	t=1742518096; cv=none; b=BPStSeo1tDHledh/IXIs79Cywzv/Q3w5j9xsTK3TGXjbIpt5yJRry0s0nIhOfUM1fejCLfb+XYWqaubqPqsW3WTycDp0bg7bwShVCTV7Ez031jSq2sUQBFrocuwhP74tKOZf67nIzP7uFasGPWaWi0kxSf3O089bEa3UA3jN8lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742514761; c=relaxed/simple;
-	bh=VKx7RH8Mg8DPC+U1B1C8czPF3VXsHpYGIbro1lkVn6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=Pzx5W9n9DiiwYR9K/ve7Xjxw8w4fLm/Lbc3NtARcr/h/hBKdjn3T6eE3BqMrwj5nWJA0QHKKODtkC7jpQzogGpHD8gbit7pO4AuIIBGRGmxakkU9xU6pyVXsmc3Tx+CFOrNQ2ZtLFMOJFRxwY7eM9reWXPRaYd7W8nYjW+xtoZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ut2npbg4; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1742518096; c=relaxed/simple;
+	bh=vwVkl2AvR207GF3yS7P18meBn53mtP3g/XP/6BqwQCc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pl7qWkmxRQvAYJRMgSELn+8HO3jMc+pwhOX/LXvUNWklVA3zD/xJWD+iWf4nWMc0Q4wyFSLMGVlmNtdViiM2EbrmN1jjArkWZ4Mq1fUVbkE3nHATT6HRteVn0QiDWI5HtWKoKOMYtQeNPTAVMeA+kU2BDj7ChdfOOswvy80iyzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiTx3l9T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ut2npbg4"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250320235237euoutp02d2031d307eee5e8a6696fd6995b347d7~up-CtdmxP1448614486euoutp02W
-	for <linux-block@vger.kernel.org>; Thu, 20 Mar 2025 23:52:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250320235237euoutp02d2031d307eee5e8a6696fd6995b347d7~up-CtdmxP1448614486euoutp02W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1742514758;
-	bh=V40Yt8b5UQP5CQRebMaM4XT/r0qYRmMZ1DD0U7kvnK4=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=ut2npbg4/kdcP2bqSdFlfrUbOPb3A5+wIWFnP1CDcxcmTBdUP5JsoPTmaSPgllVtW
-	 12v/xbNbkMJ8m2iNY9Y0f+LGHF28UMshTJ8v7BXonnoeHcoMfhc6dJCAR4w6RO+Biz
-	 v0cL49lJyjsjlqArWlGlfnAFNqjgUfI3WAGoW4Jk=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20250320235236eucas1p2d25a78b8b13dc4ab1b2ca298ada0dfd6~up-BT_ZSP1299312993eucas1p2O;
-	Thu, 20 Mar 2025 23:52:36 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id 33.34.20821.44AACD76; Thu, 20
-	Mar 2025 23:52:36 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250320235235eucas1p20083fac3310cb507f47cd27594507feb~up-Ah0Xfl1299312993eucas1p2N;
-	Thu, 20 Mar 2025 23:52:35 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250320235235eusmtrp147af0699b5659e6df38f53ef4ac28c3e~up-AhBruB1931419314eusmtrp12;
-	Thu, 20 Mar 2025 23:52:35 +0000 (GMT)
-X-AuditID: cbfec7f2-b09c370000005155-97-67dcaa4406f9
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 4F.88.19920.34AACD76; Thu, 20
-	Mar 2025 23:52:35 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250320235231eusmtip12043beb3ef63386f7348b314310b8aad~up_9CwvKL2854028540eusmtip1R;
-	Thu, 20 Mar 2025 23:52:31 +0000 (GMT)
-Message-ID: <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
-Date: Fri, 21 Mar 2025 00:52:30 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiTx3l9T"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742518092;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uSXy+/A4Aie58AzmTbsuDZnEYoP8mJ9RD+6yp+n/J6A=;
+	b=FiTx3l9TzlKLoxhEqKMHqSPmVsq2A+C79CAr5TWI7gQtTrpN/rUds0AyRxt8SpqvY30f9Y
+	METq+9Pv96tHyVkr43qE9fe1LPcs4B0wqFPfuz/FpwQaoGNJnYvuhkwh4+ib31Gr9+i56b
+	PWIfc83pkXyzK0rdz8Oj9A/nYSu2oDg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-7-Z8x6wdUkPOqZy2L9eOfHuA-1; Thu,
+ 20 Mar 2025 20:48:08 -0400
+X-MC-Unique: Z8x6wdUkPOqZy2L9eOfHuA-1
+X-Mimecast-MFC-AGG-ID: Z8x6wdUkPOqZy2L9eOfHuA_1742518086
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FDA5180049D;
+	Fri, 21 Mar 2025 00:48:05 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.19])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 27D091955DCE;
+	Fri, 21 Mar 2025 00:48:03 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] selftests: ublk: fix write cache implementation
+Date: Fri, 21 Mar 2025 08:47:58 +0800
+Message-ID: <20250321004758.152572-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
-	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
-	<bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
-	<yishaih@nvidia.com>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, Randy
-	Dunlap <rdunlap@infradead.org>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250319175840.GG10600@ziepe.ca>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01SbUxTVxjOuff2tjQpuRQcB2UjK5MFNgrdNJ5kwMCw5U7/4H5sGcviGrkW
-	t1K1tYgk2zrGl11RKLCWwko3y4eF8C1gFYQiK4QJDCNiBTsTZEztBsJ0fAxHe3Xj3/M+z/N+
-	PCeHhws7yO28I4oTjFIhlYtIPtH508podLJtWhY71BiIqpobSfT4qY5EDTNnSWTNSUezfQUA
-	nW8YxNDqMkIVxiGAKg3zGDpd2cJFesckQDWeC1xUVX4cla3W4KjH9Rr6Id9KoOv2KhLdaXzK
-	QdW197jomtlJojlHEYGseZvIM20gUP/CLAc1PfiTQF03cjgod3o3qi3nJ4bSs/1mjG40NwJ6
-	7sYcoC1tanrsTitB5171cOj2+ij63OXfMfr6NTXdZjtN0m2P9Fx6yLhG0O3Wr+j59gpAX7ql
-	IelzZ0o5KUGp/Lg0Rn4kk1HGJHzKTz/v6CWPbYRkDRdWExowEKQFfjxI7YITXeOYFvB5Qqoe
-	wG8vDZJeQUgtA6hxxbPCEoC3NXr8eUeBuxBnhToA6w1zBFssAqgtrfa1C6gEaC4x+DBB7YSa
-	xRKc5QPgcMUs4cXbqDDodhm5XhxIJcO+TtYTRIlgr72E6x2KU51caJpfxLwCTgVD12y1D5OU
-	BGo9Wt8CP0oMS8bmnnnCYJen6tmpPXzo7E7RAt4mToZVRRKWDoT3nR1cFofCkVKdLwCkCgC0
-	rLkxtijezP+bC7Cut+D06CrpHYRTkbDZHsPSSXD8r7tcdr4/nPIEsCf4Q32nAWdpASzMF7Lu
-	CGhyNv23tn98Ai8GItOWVzFtCWnaEsb0/14LIGwgmFGrMmSMSqJgTopV0gyVWiETHzqa0QY2
-	P/bIhvNRN/j+/qLYATAecADIw0VBgqDC2zKhIE16KptRHj2oVMsZlQPs4BGiYMGPV/JkQkom
-	PcF8zjDHGOVzFeP5bddgqbkxO+oK9yxULue/+apiwhhge6XBP+lJZsIv4nj9njMD+6s5kfbo
-	vZaQfR91L67Y4tt7i12Wla+L392bvYTVt7uN6Ilj6hvzzNquy1+EvDEzaD8QR6jOmsqOl4X1
-	JYa/3KLTW9HFn4u4bcHY+8v+fusvuK/8un7h1MmWOOvBT4bX/7l44O/3djo/nH67qzYl1uGp
-	e5Bz8+qSOWUsemXI4Hp8C6xt8D+2CMOSbdnNqff+GI35kp7MGi6TK16aVC7dVH23sC8p0ZaZ
-	Jw+u0EVQD2vsD/PQ67EfhN9NM4QuROoGWnts68ShEUVTXYdjqnX3O11Z5ZPWiM8U+qjD2yTp
-	4bkvHhYRqnSpJApXqqT/ApX9M15HBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxTZxTG8957e1uqXS61pi/oYDZxc+oqBVpflrZjH3HXLDMkhmRzG6zC
-	tTRAi70tkS1mjWMCzZyrFoFKWrTFjNK5rY1CABvo1EoMQyCSwQAH1spYikgWEoXJKM0S/vvl
-	nOc5z8nJ4eHCfk4qT6c3MUa9pkxC8om7L8KTb7zrndBmDNrTUPNPPhItrX5LovbJsyTynCpB
-	kd4agNrab2Ho+T8INTXeAehiwyyG6i7+zEXnQqMAtcaucVFz/XFkf96Koxvje9Cl0x4CjXQ1
-	k2jKt8pBriuPuGjAGSZRNHSGQJ5v1ig20UCgvoUIB139+wmBOu6f4qDqCTm6Us/P3U5H+pwY
-	7XP6AB29HwV0i99MD079QtDVN2McOvDDbtrd8xdGjwyYab+3jqT9i+e49J3GZYIOeL6iZwNN
-	gO4es5C0+7vznDzREanSaDCbmFdKDKxJJflEhjKlshwkzczOkcqy9n/2ZqZcsk+tLGbKdJWM
-	cZ/6c2lJWyhIVrxIOdFf6yIs4FeRFSTxIJUNax7U4lbA5wmpVgB7Fn/EE43tsP+ChZPgLXBl
-	1EomRE8A9J5d5MYbAkoNnbYGMs4EtRNantrwRD0Z9jdFiDhvpdLhg/HGdf0W6j3Yez2hEVES
-	GOyyceNDcaqTC4e6wlgi4QwOH12eX4/GKTEcj7iwOJOUDFpj1vW0JEoKbYNRLKFRQOs1K0hw
-	OuyINePfA6FjwyKODaMcGyyODZYWQHiBiDGz5dpyViZlNeWsWa+VFhnK/WDtp67ffhboBM65
-	p9IQwHggBCAPl4gEoto/tEJBsabqC8ZoKDSayxg2BORr17DhqVuLDGtPqTcVyhQZclm2IidD
-	nqPIkogFB0YGjwkprcbElDJMBWP834fxklItWOl0L9ItF7g+euwDqsX+HcaV9kO/hXVfpqpe
-	L25r+1Q79afD61DOvR8eyh1Gy3vempoVpvk387pVWSbvRNrC2LG9p2fGYkdP7OrUFAqTu6Em
-	N7Ksyg8etCuSH6fGQuik+8LDg/zjoV0dtfXBqzvu3VhoKSlYiKmml8r61GI3/m/KtqMVhw+3
-	z/w+XjbQ6vmw+jw7D6O5Kfbp2qqu18YqOUpD3jv5O5eKOh7e4yuH82sCz3RzH0xs6t58+/K2
-	7gGKSb/lLvDZxZbiHuPbwqG6m/MnZ1ZW1XLMtp8NCzqrXHurJ0eDw1/XZR3p0XNe8i+9vCk3
-	cDfPKa50lr5a+XG9hGBLNLLduJHV/AehhEaR3AMAAA==
-X-CMS-MailID: 20250320235235eucas1p20083fac3310cb507f47cd27594507feb
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
-References: <cover.1738765879.git.leonro@nvidia.com>
-	<20250220124827.GR53094@unreal>
-	<CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
-	<1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
-	<d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
-	<20250312193249.GI1322339@unreal>
-	<adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
-	<20250319175840.GG10600@ziepe.ca>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 19.03.2025 18:58, Jason Gunthorpe wrote:
-> On Fri, Mar 14, 2025 at 11:52:58AM +0100, Marek Szyprowski wrote:
->
->>> The only way to do so is to use dma_map_sg_attrs(), which relies on SG
->>> (the one that we want to remove) to map P2P pages.
->> That's something I don't get yet. How P2P pages can be used with
->> dma_map_sg_attrs(), but not with dma_map_page_attrs()? Both operate
->> internally on struct page pointer.
-> It is a bit subtle, I ran in to this when exploring enabling proper
-> P2P for dma_map_resource() too.
->
-> The API signatures are:
->
-> dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
-> 		size_t offset, size_t size, enum dma_data_direction dir,
-> 		unsigned long attrs);
-> void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
-> 		enum dma_data_direction dir, unsigned long attrs);
->
-> The thing to notice immediately is that the unmap path does not get
-> passed a struct page.
+For loop target, write cache isn't enabled, and each write isn't be
+marked as DSYNC too.
 
-I see, thanks for pointing this out. It looks that I've encountered this 
-issue too long time ago when I was implementing first 
-iommu-to-dma-mapping glue for ARM arch. The lack of some kind of 
-'object' returned from dma_map* (and dma_alloc*) and passed back to 
-dma_unmap* (and dma_free_*) required some non-trivial workarounds there 
-and made the unmap/free path a bit more complicated.
+Fix it by enabling write cache, meantime fix FLUSH implementation
+by not taking LBA range into account, and there isn't such info
+for FLUSH command.
 
-> So, lets think about the flow when the iommu is turned on.
->
-> For normal struct page memory:
->
->   - dma_map_page_attrs() allocates some IOVA and returns it in the
->     dma_addr_t and then maps the struct page to the iommu page table
->
->   - dma_unmap_page_attrs() frees the IOVA from the given dma_addr_t
->   
-> If we think about P2P now:
->
->   - dma_map_page_attrs() can inspect the struct page and determine it
->     is P2P. It computes a bus address which is not an IOVA, and does
->     not transit through the IOMMU. No IOVA allocation is performed. the
->     bus address is returned as the dma_addr_t
->
->   - dma_unmap_page_attrs() ... is impossible. We just get this
->     dma_addr_t that doesn't have enough information to tell anymore if
->     the address is a P2P bus address or not, so we can't tell if we
->     should unmap an iova from the dma_addr_t :\
->
-> The sg path fixes this because it introduced a new flag in the
-> scatterlist, SG_DMA_BUS_ADDRESS, that allows the sg map path to record
-> the information for the unmap path so it can do the right thing.
->
-> Leon's approach fixes this by putting an overarching transaction state
-> around the DMA operation so that map and unmap operations can look in
-> the state and determine if this is a P2P or non P2P map and then know
-> how to unmap.
->
-> For some background here, Christoph gave me this idea back at LSF/MM
-> in Vancouver (two years ago now). At the time I was looking at
-> replacing scatterlist and giving new DMA API ops to operate on a
-> "scatterlist v2" structure.
->
-> Christoph's vision was to make a performance DMA API path that could
-> be used to implement any scatterlist-like data structure very
-> efficiently without having to teach the DMA API about all sorts of
-> scatterlist-like things.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tools/testing/selftests/ublk/file_backed.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Thanks for explaining one more motivation behind this patchset!
-
-Best regards
+diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
+index 38e68b414962..8a07356eccaf 100644
+--- a/tools/testing/selftests/ublk/file_backed.c
++++ b/tools/testing/selftests/ublk/file_backed.c
+@@ -123,10 +123,7 @@ static int loop_queue_tgt_io(struct ublk_queue *q, int tag)
+ 		sqe = ublk_queue_alloc_sqe(q);
+ 		if (!sqe)
+ 			return -ENOMEM;
+-		io_uring_prep_sync_file_range(sqe, 1 /*fds[1]*/,
+-				iod->nr_sectors << 9,
+-				iod->start_sector << 9,
+-				IORING_FSYNC_DATASYNC);
++		io_uring_prep_fsync(sqe, 1 /*fds[1]*/, IORING_FSYNC_DATASYNC);
+ 		io_uring_sqe_set_flags(sqe, IOSQE_FIXED_FILE);
+ 		q->io_inflight++;
+ 		sqe->user_data = build_user_data(tag, ublk_op, UBLK_IO_TGT_NORMAL, 1);
+@@ -187,6 +184,7 @@ static int ublk_loop_tgt_init(struct ublk_dev *dev)
+ 	struct ublk_params p = {
+ 		.types = UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DMA_ALIGN,
+ 		.basic = {
++			.attrs = UBLK_ATTR_VOLATILE_CACHE,
+ 			.logical_bs_shift	= 9,
+ 			.physical_bs_shift	= 12,
+ 			.io_opt_shift	= 12,
 -- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+2.47.1
 
