@@ -1,98 +1,147 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BB241C64
-	for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 19:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746A3522A
+	for <linux-block@vger.kernel.org>; Sat, 22 Mar 2025 00:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742586425; cv=none; b=mQrEsjM8fy8hXmMwQmT3/YVWB7gSaYzPthnPME0ynCfyoou0SEoiHkWA4cz4bdp4wOxG1unhvparGLUbAuDo4U+o7Z/uZQUaEWRcUz3JT3l0ugDfAtHfBclLlf9jZWwm7ZayOvW5nl0o+lHm9x2ie0xS5PfrU/CxaXWe3O8W5K4=
+	t=1742604094; cv=none; b=MIPE00/UHT51Qo5Pm73bYw3pOzuV/ArWpjsAV6cbsLlUEfZp2tMtjivW+kfqq9S3BeOFQejsck6+cdM/fLU+OJEsfpBatjyWoWlCcPC+zosZ7tSnLwjbjn7EBYU/GF8ndg8LXi89PtPDL1CXiBGDKrN6+ewqxoNxK1rerlZ10JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742586425; c=relaxed/simple;
-	bh=+WnbsCQf0RkeQjRKxamSw94es1Sb3f9LAw7sWH14CZI=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Y4ViWDWts3SPFDxAyfqRpEtboNp4VPMoUYsJKeq7P1bdk1F1IsR1t5ZFwapXXkPi37L51upKxWG7HkU1l9HvQG+z60azrCYeimEeMGRJuf6LW5eHwAc+LOcPKNEhYG0q3ipfTZDWQ6HlQp18VPqEP9+vyW53zgoiCk2Yu8DIzAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yU0mmTdW; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1742604094; c=relaxed/simple;
+	bh=hqoJRCdWhjuEg7TGBkaWxPiFOMvAutcwW1byYHxtnno=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5RqYTR1XXEixaxXElr+AUr0CfLMMX52Q+BoLDMffG2G9KM4k80754pchmnPbUTUXR1q0caVwOnOPXgy+rU/mx2VgLrv1traA5lnqEq56t39ds63SwvTxu4N+lgX53H1fCaIeysSJpZuJOSsHEH1Lf1FDHPyFDTk8f4nyP2hEDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R7B8UWhJ; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yU0mmTdW"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-85b515e4521so72417339f.1
-        for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 12:47:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R7B8UWhJ"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-476977848c4so26020981cf.1
+        for <linux-block@vger.kernel.org>; Fri, 21 Mar 2025 17:41:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742586421; x=1743191221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FK2kg9IYmxE42LXnq6anIi6OHhpvShyg+1plxYgL42w=;
-        b=yU0mmTdW4mX/07KzFbcThuL3XanyNlv1VNy7MMra6KgP+Hs08ZxSusvvaTmZR7ywrH
-         lyUHvcXf9vi5nCp4MLYKxHDwkn8QG0CIirgbxdlNWCcdhNQmMLyxO2nnqYzd/LiHGf7l
-         GIVnVFLeJw2VfQfRm0TUjkKH23Y4h1vnf868x6Oj1rKKepfGlz+PyoMlAahot7fImE+C
-         o3OsRT8+trrFvejqmQPm9plcnpV3QlJ19phlifhv9PZHIniN7XO+WnyzsS6+0VH0dwg8
-         XR1SYzwEBr+SqiR6BbeHz5YrpFil1VNGwGw8mL/zPXMiHZAB+CKP7q8BdyayMpzmdbrP
-         32RQ==
+        d=ziepe.ca; s=google; t=1742604091; x=1743208891; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7w18pLCxgYQdbgr4L7Ilx5M+dDme30Hw40dLx2kJ/Cs=;
+        b=R7B8UWhJvzY42pvGEXzc6g/CCpxVufGWlUhFok38uou2OkWlLPGuDJtZw2zv0X4g2t
+         8J5H7J4iv1COZfvtScYcLqv9UYzmPga9O/PMs2PLCjtHMbt/F0sr/E5TOwdCISHFdnc8
+         exaOwDFrFSeER/EDk/U5R5I4ss8/9qVJpHWvlC5zpAs/igjUOeO+/BxSk93pH1UXx+SP
+         LgqpLAQwbAZ0onbxeHG4Mp3udUsn+AaBi8XeRFKkfmStyPwJPUKi1tgDkHRXr9OXgZbx
+         VNuHyNVmP70zXrP/aA9tz91BGWewef+tcco1OglHPjxMOipK+QxDWUYAtcqogWNoxQ8a
+         yiYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742586421; x=1743191221;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FK2kg9IYmxE42LXnq6anIi6OHhpvShyg+1plxYgL42w=;
-        b=UHfJEsmdfSZmRpvse0h3Q8z2XqYTXSDnarBSj9d6Eu1yaWPvpOAXOW8hZBq7xvW8xh
-         KZPWQMjU3rB89CPOPF0lZSwP/eXd6bY2rX+OAAi31d66mD41CzZnRMGt1Kpobqf71Pb2
-         2ws7iUG+i2EqO6kb6cJ4IOAJVeViGf7DS7bHNc0xTMPPN2NYLd33Xvlyj6mLmtjTEvJe
-         a+hAiTJ37KUrqAmh672TIiS8u/MS2IUK2BfSM8X+R5247xgAbfSSkmOCqXT5LOFM6LKm
-         3E0QMn26IGvrwy94jteHrI/nPWfs4BB2gOunqV3BlmvmggpE9+ibjiLMUiF6H3yME/7y
-         vLWA==
-X-Gm-Message-State: AOJu0YyUf/ZkVNPZP9OYed1vWc5Lk8Vp2pm7RNR2b+mct5ldd2efTpY6
-	NkqSdG/P5IhYUXQaUtWBgTrk0++w+0WCc+sN/pGKcyW4s0KefleIdFS4mCCFdY3V2y2aCOq1cyi
-	0
-X-Gm-Gg: ASbGncv9Ue+FdxnJaP7WGudIwI9M1VwQZUIHfBlOOV1YB/2lSui1vNOPLN/kj+Oddec
-	PJzpAY5Q3S3nn01phmu34ZsRzDVlm6tVjfMOmeuU76VWBkxhzVWD4MYjPOTkcod9wxfT/nkPkmR
-	1laqKKfAms7mDoXRmOlsRasD8WWVyUjBckUiJNCQnGdo/3sEgi9cFY1Vfgv4lYre34NaAQk7jgA
-	hTeURNFpLRISkyaGn2nGhZH1KQPXnYJ7GCGB72qZvXpt1T6SMxaWWg6fkNUei0TWDtuDuCmgPJS
-	Y8mqDj6ECvPTSQVs1SarXG3LW8YVUPMZy3+6oyvujLXt4sQ=
-X-Google-Smtp-Source: AGHT+IG3olMYGrDAWHqUT+U6acPiKVkiz2EfrAeXXfW5t4GvNNSOzt4Pn6Enrr7ke+n0/hFa0vzgCA==
-X-Received: by 2002:a05:6602:380f:b0:85d:9e5d:efa9 with SMTP id ca18e2360f4ac-85e2cb423f8mr512036539f.10.1742586421442;
-        Fri, 21 Mar 2025 12:47:01 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2cbe80b01sm579627173.79.2025.03.21.12.47.00
+        d=1e100.net; s=20230601; t=1742604091; x=1743208891;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7w18pLCxgYQdbgr4L7Ilx5M+dDme30Hw40dLx2kJ/Cs=;
+        b=HOAL4Pux+WqBnXTRjsvq2GSmN7IB2a297WeQMAS8yBjeFsfeNiFU1X881Q2vxpT4Wo
+         od3+fwuGZGPbf0fuyX78YGMf55K4bwzgykN569V+IDU2F9yhpv+EXj+sUJH8X++U1OOm
+         SowGKYvddVPCvPY6yvWLmvAEYG+xESDgiUeT6yLt3Tbc1DLsqtt6XeELpebncZrxNim0
+         mCEPZDRrnySzP5L1SEvnUOX9YuwMT3J9mri6aUu0REoUQrVi76s9HZ8dMj8ncN9S5NEo
+         DCcWZ856jVJeNqulX9p5TxDjCoDerqc+PRMY3ukwgBi5flLxoBlbzpcstaH/viZDohqv
+         ObBw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmXZQ+hLMiT+FICzDs/zLwD0qUfug0s9c6xcsMUL7hklixtl1yJoor2KjIsIPzLIqHO6/9OO13N7pLzw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEaUJlX8IqhI8XzTtMa15SxcW4ptJaZzcaDF/x2OxvnRKDtFt9
+	642U+DbvjnMyPtryW4AMXiHzo0ejEH1Oyxm2gFr0UptJ5mlcJRAvrEr/sxn4OFU=
+X-Gm-Gg: ASbGncudAHuOI7c4JzrQ+FHaGKTbyC2HEbPQS3gKETYThsStg5vJxn4PAPK56SQS7JT
+	mgZMig0bUgiHDJhkLVW2LaDvXfyNhQtHa05o813ClZGf1OnHx55xlHoBMyJ+TPMEeyq0dmUSvQb
+	JFlN4zKNAs0RjCkt5VJAmZu1NNP4TNz0UOydkhMT7lLc809/Z37T22oS6A2ewgNpEG8AkJ6358g
+	yGMfl1lGgqvAvEhkhqPoBESptb2NVPl7nE1YwTJvkvdKRMCKqSOOAwa+MAbyMRNEx4rhr1y+lOf
+	9nhuhKm1+LOJVjhn6dJ0zC5Cw7LxJo3TSbtMDzUTXDsSMONi6sjDAmZI6d4RBXlqXHUeaMvl2DG
+	o411mwTrFrEGN/eJzIhJUTXU=
+X-Google-Smtp-Source: AGHT+IF3UkobCdIF7lNWuu9KRAhdJDE5q4DcYOtKKTS+FcoMl1AlUzXXVqHHTKDK0VlDF9Mdifo+AQ==
+X-Received: by 2002:a05:622a:480c:b0:476:b7e2:385c with SMTP id d75a77b69052e-4771dd5d0e6mr84261721cf.2.1742604091376;
+        Fri, 21 Mar 2025 17:41:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d0ad87esm18121731cf.0.2025.03.21.17.41.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 12:47:00 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20250321135324.259677-1-ming.lei@redhat.com>
-References: <20250321135324.259677-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] selftests: ublk: fix starting ublk device
-Message-Id: <174258642055.742061.1713958203897349462.b4-ty@kernel.dk>
-Date: Fri, 21 Mar 2025 13:47:00 -0600
+        Fri, 21 Mar 2025 17:41:30 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tvmva-00000001CZm-0pDT;
+	Fri, 21 Mar 2025 21:41:30 -0300
+Date: Fri, 21 Mar 2025 21:41:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <20250322004130.GS126678@ziepe.ca>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
+ <20250312193249.GI1322339@unreal>
+ <adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
+ <20250319175840.GG10600@ziepe.ca>
+ <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1034b694-2b25-4649-a004-19e601061b90@samsung.com>
 
-
-On Fri, 21 Mar 2025 21:53:24 +0800, Ming Lei wrote:
-> Firstly ublk char device node may not be created by udev yet, so wait
-> a while until it can be opened or timeout.
+On Fri, Mar 21, 2025 at 12:52:30AM +0100, Marek Szyprowski wrote:
+> > Christoph's vision was to make a performance DMA API path that could
+> > be used to implement any scatterlist-like data structure very
+> > efficiently without having to teach the DMA API about all sorts of
+> > scatterlist-like things.
 > 
-> Secondly delete created ublk device in case of start failure, otherwise
-> the device becomes zombie.
-> 
-> 
-> [...]
+> Thanks for explaining one more motivation behind this patchset!
 
-Applied, thanks!
+Sure, no problem.
 
-[1/1] selftests: ublk: fix starting ublk device
-      commit: 2b17a89292b98c27ffacc7966e2e42bfe0465242
+To close the loop on the bigger picture here..
 
-Best regards,
--- 
-Jens Axboe
+When you put the parts together:
 
+ 1) dma_map_sg is the only API that is both performant and fully
+    functional
 
+ 2) scatterlist is a horrible leaky design and badly misued all over
+    the place. When Logan added SG_DMA_BUS_ADDRESS it became quite
+    clear that any significant changes to scatterlist are infeasible,
+    or at least we'd break a huge number of untestable legacy drivers
+    in the process.
 
+ 3) We really want to do full featured performance DMA *without* a
+    struct page. This requires changing scatterlist, inventing a new
+    scatterlist v2 and DMA map for it, or this idea here of a flexible
+    lower level DMA API entry point.
+
+    Matthew has been talking about struct-pageless for a long time now
+    from the block/mm direction using folio & memdesc and this is
+    meeting his work from the other end of the stack by starting to
+    build a way to do DMA on future struct pageless things. This is 
+    going to be huge multi-year project but small parts like this need
+    to be solved and agreed to make progress.
+
+ 4) In the immediate moment we still have problems in VFIO, RDMA, and
+    DRM managing P2P transfers because dma_map_resource/page() don't
+    properly work, and we don't have struct pages to use
+    dma_map_sg(). Hacks around the DMA API have been in the kernel for
+    a long time now, we want to see a properly architected solution.
+
+Jason
