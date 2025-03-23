@@ -1,93 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA84BAD24;
-	Sun, 23 Mar 2025 07:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E5A1754B;
+	Sun, 23 Mar 2025 09:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742713650; cv=none; b=KRiT3gUPVYvw/pvR/S2/wbxxu8J9pY9teOCa+8nZmSSER6ajvYPpwSw+Ay0eb3v7z0l6vdkruwl380C8DcPx8EnDhwG6Zzs/nbtsGbTS3sORqvHQmzsW/lS1FFmJxDCxVJ4ujpIEbKB7adrZypThvLGRmjTqEfnstax5dj7536Y=
+	t=1742721526; cv=none; b=Eb4J/OlNPJjPpjs5dZUt6Ae8CJXsDGI0GO9MxZvmiMtEp8xcu9Zdry5KnD9kslU2jM1P2v1Oc+QDMWQXIIfBUv7varBiDc18o7h8ieamNDe4MDZa1aPQfNS0RNgvJ/B6JJnJX5ecfKH/wXOBmiGVOOsZkOF1nIaLQHnCZ+vDjUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742713650; c=relaxed/simple;
-	bh=waNR4m35arNyjJJa0jtGjNQD6uPw/33mh7/K0+sSIU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M3tCssTpE+Kp6PGXlFgbBv4tyMKcuC57Fnzvrtgws08lhfA7x8mAPQHNZhiGPV5uwRmHS0kEB/L69oqx7+rmDAHb/FSeHrrwEtDX/yqEo2oPGgNwKHmubRR76DLlkbvZfQIP3Gz9TTub6lA1dP4c4ja6q5e1x2yK4qCjm+OO17A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DtaPfMGI; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DtaPfMGI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6291C4CEE2;
-	Sun, 23 Mar 2025 07:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742713649;
-	bh=waNR4m35arNyjJJa0jtGjNQD6uPw/33mh7/K0+sSIU0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DtaPfMGIzhAvrqUamGTqwM1triUwq3WJtmXy2fQM/+l/eFBpbreqQ6PJGuA7YlHxL
-	 MB3p4OjJjZU/C6YWcUXLA4zDZqvW2omU0/cFsmt6135idyi4+0iGCdqp4M9XvxJxFF
-	 32bdFKkg+/m6lNWc9T+RGWXE8xTy+/U2CQj8Lq1AKhELBZ3um48DbTfk+2QOV+lRyS
-	 oH5DWdSgtSlotIj+XTfFV8SFwnX8Z5XCkwnK0BCb6Oje9qdHVq1hZ20NX6KScKifRi
-	 jnUspnRHfa+5/ivFqTYm4m/LuWnJTZu4jOwppG905ycdAUOfAse+jzkOXB1MovafSd
-	 M64Oe4gdkbOyA==
-Date: Sun, 23 Mar 2025 00:07:27 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Johannes Weiner <hannes@cmpxchg.org>,
-	Oliver Sang <oliver.sang@intel.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	David Bueso <dave@stgolabs.net>
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z9-zL3pRpCHm5a0w@bombadil.infradead.org>
-References: <Z9krpfrKjnFs6mfE@bombadil.infradead.org>
- <Z9mFKa3p5P9TBSTQ@casper.infradead.org>
- <Z9n_Iu6W40ZNnKwT@bombadil.infradead.org>
- <Z9oy3i3n_HKFu1M1@casper.infradead.org>
- <Z9r27eUk993BNWTX@bombadil.infradead.org>
- <Z9sYGccL4TocoITf@bombadil.infradead.org>
- <Z9sZ5_lJzTwGShQT@casper.infradead.org>
- <Z9wF57eEBR-42K9a@bombadil.infradead.org>
- <20250322231440.GA1894930@cmpxchg.org>
- <Z99dk_ZMNRFgaaH8@bombadil.infradead.org>
+	s=arc-20240116; t=1742721526; c=relaxed/simple;
+	bh=5HZmLzce4L9XeAcPttemnSzWQxYapG6GBhfDbqgHz10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RqU3joL5eo6CjOG/88/9gvhib74ssDnDJm6634WPT7Xv5vAGwOjXxKoXgtltcKPAnQPiY2kcnhechGyh02ymhQG6gIn3PnlFRnZIx/B5NyHW0/mAcYBl4zzCwxpymGTjFGFDcfliw2pxQHmfvqDPnMkyUb+sm+dqXwd7DkD9/So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9DDE106F;
+	Sun, 23 Mar 2025 02:18:41 -0700 (PDT)
+Received: from [10.57.41.149] (unknown [10.57.41.149])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4888E3F63F;
+	Sun, 23 Mar 2025 02:18:33 -0700 (PDT)
+Message-ID: <1e870bd8-0e13-4e0d-bbe9-e9f601f59a50@arm.com>
+Date: Sun, 23 Mar 2025 09:18:30 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z99dk_ZMNRFgaaH8@bombadil.infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] cpuidle: psd: add power sleep demotion prevention for
+ fast I/O devices
+To: "King, Colin" <colin.king@intel.com>, Jens Axboe <axboe@kernel.dk>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <33882f284ac6e6d1ec766ca4bb2f3b88@intel.com>
+ <f18607ca-30dc-43de-be77-fec69968aeec@arm.com>
+ <SJ2PR11MB7670F63C7052C88637D305DF8DDF2@SJ2PR11MB7670.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <SJ2PR11MB7670F63C7052C88637D305DF8DDF2@SJ2PR11MB7670.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 22, 2025 at 06:02:13PM -0700, Luis Chamberlain wrote:
-> On Sat, Mar 22, 2025 at 07:14:40PM -0400, Johannes Weiner wrote:
-> > Hey Luis,
-> > 
-> > This looks like the same issue the bot reported here:
-> > 
-> > https://lore.kernel.org/all/20250321135524.GA1888695@cmpxchg.org/
-> > 
-> > There is a fix for it queued in next-20250318 and later. Could you
-> > please double check with your reproducer against a more recent next?
+On 3/17/25 10:03, King, Colin wrote:
+> Hi Christian, 
 > 
-> Confirmed, at least it's been 30 minutes and no crashes now where as
-> before it would crash in 1 minute. I'll let it soak for 2.5 hours in
-> the hopes I can trigger the warning originally reported by this thread.
+> Follow-up below:
 > 
-> Even though from code inspection I see how the kernel warning would
-> trigger I just want to force trigger it on a test, and I can't yet.
+>> -----Original Message-----
+>> From: Christian Loehle <christian.loehle@arm.com>
+>> Sent: 03 March 2025 22:25
+>> To: King, Colin <colin.king@intel.com>; Jens Axboe <axboe@kernel.dk>; Rafael
+>> J. Wysocki <rafael@kernel.org>; Daniel Lezcano <daniel.lezcano@linaro.org>;
+>> linux-block@vger.kernel.org; linux-pm@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Subject: Re: [PATCH] cpuidle: psd: add power sleep demotion prevention for
+>> fast I/O devices
+>>
+>> On 3/3/25 16:43, Colin Ian King wrote:
+>>> Modern processors can drop into deep sleep states relatively quickly
+>>> to save power. However, coming out of deep sleep states takes a small
+>>> amount of time and this is detrimental to performance for I/O devices
+>>> such as fast PCIe NVME drives when servicing a completed I/O
+>>> transactions.
+>>>
+>>> Testing with fio with read/write RAID0 PCIe NVME devices on various
+>>> modern SMP based systems (such as 96 thead Granite Rapids Xeon 6741P)
+>>> has shown that on 85-90% of read/write transactions issued on a CPU
+>>> are completed by the same CPU, so it makes some sense to prevent the
+>>> CPU from dropping into a deep sleep state to help reduce I/O handling
+>>> latency.
+>>
+>> For the platform you tested on that may be true, but even if we constrain
+>> ourselves to pci-nvme there's a variety of queue/irq mappings where this
+>> doesn't hold I'm afraid.
+> 
+> This code is optional, one can enable it or disable it via the config option. Also, 
+> even when it is built-in one can disable it by writing 0 to the sysfs file
+>   /sys/devices/system/cpu/cpuidle/psd_cpu_lat_timeout_ms
+> 
+>>
+>>>
+>>> This commit introduces a simple, lightweight and fast power sleep
+>>> demotion mechanism that provides the block layer a way to inform the
+>>> menu governor to prevent a CPU from going into a deep sleep when an
+>>> I/O operation is requested. While it is true that some I/Os may not
+>>
+>> s/requested/completed is the full truth, isn't it?
+>>
+>>> be serviced on the same CPU that issued the I/O request and hence is
+>>> not 100% perfect the mechanism does work well in the vast majority of
+>>> I/O operations and there is very small overhead with the sleep
+>>> demotion prevention.
+>>>
+>>> Test results on a 96 thread Xeon 6741P with a 6 way RAID0 PCIe NVME md
+>>> array using fio 3.35 performing random read and read-write test on a
+>>> 512GB file with 8 concurrent I/O jobs. Tested with the
+>>> NHM_C1_AUTO_DEMOTE bit set in MSR_PKG_CST_CONFIG_CONTROL set in
+>> the BIOS.
+>>>
+>>> Test case: random reads, results based on geometic mean of results
+>>> from
+>>> 5 test runs:
+>>>            Bandwidth         IO-ops   Latency   Bandwidth
+>>>            read (bytes/sec)  per sec    (ns)    % Std.Deviation
+>>> Baseline:  21365755610	     20377     390105   1.86%
+>>> Patched:   25950107558       24748     322905   0.16%
+>>
+>> What is the baseline?
+>> Do you mind trying with Rafael's recently posted series?
+>> Given the IOPS I'd expect good results from that alone already.
+>> https://lore.kernel.org/lkml/1916668.tdWV9SEqCh@rjwysocki.net/
+>>
+>> (Happy to see teo as comparison too, which you don't modify).
+> 
+> OK, I re-ran the tests on 6.14-rc5 on the same H/W. The "Baseline" is 6.14-rc5 without
+> Raphel's patch. I also testing the Baseline with C6 and C6P disabled as this stops deeper
+> C-state sleeps and in theory should provide "best performance". I also benchmarked with
+> Raphel's patch and just my patch, and finally Raphels patch AND my patch:
+> 
+> Reads
+>                         Bandwidth       Bandwidth       latency         latency
+>                         Bytes/sec       %Std.Dev.       nanosecs        %Std.Dev.
+> Baseline                25689182477     0.15            326177          0.15
+> C6, C6P disabled        25839580014     0.19            324349          0.19
+> Raphels Patch:          25695523747     0.06            326150          0.06
+> My patch:               25782011833     0.07            324999          0.07
+> Raphel + My patch:      25792551514     0.10            324924          0.10
 
-Survied 5 hours now. This certainly fixed that crash.
+So these are mostly equal right?
 
-As for the kernel warning, I can't yet reproduce that, so trying to
-run generic/750 forever and looping
-./testcases/kernel/syscalls/close_range/close_range01
-and yet nothing.
+> 
+> Writes
+>                         Bandwidth       Bandwidth       latency         latency
+>                         Bytes/sec       %Std.Dev.       nanosecs        %Std.Dev.
+> Baseline                15220468898     3.33            550290          3.36
+> C6, C6P disabled        13405624707     0.66            625424          0.66
+> Raphels Patch:          14017625200     1.15            598049          1.16
+> My patch:               15444417488     3.73            467818          29.10
+> Raphel + My patch:      14037711032     1.13            597143          1.13
 
-Oliver can you reproduce the kernel warning on next-20250321 ?
+These don't make sense to me, why would C6 / C6P be this bad?
+Why would Rafael's patch make it worse?
+Are these just noise?
 
-  Luis
+> 
+> Combined Read+Writes, Reads
+> 
+>                         Bandwidth       Bandwidth       latency         latency
+>                         Bytes/sec       %Std.Dev.       nanosecs        %Std.Dev.
+> Baseline                10132229433     0.41            484919          0.25
+> C6, C6P disabled        10567536346     0.60            515260          1.16
+> Raphels Patch:          10171044817     0.37            486937          0.20
+> My patch:               10468953527     0.07            504797          0.07
+> Raphel + My patch:      10174707546     1.26            488263          1.13
+> 
+> Combined Read+Writes, Writes
+> 
+>                         Bandwidth       Bandwidth       latency         latency
+>                         Bytes/sec       %Std.Dev.       nanosecs        %Std.Dev.
+> Baseline                10139393169     0.44            342132          1.23
+> C6, C6P disabled        10583264662     0.63            277052          3.87
+> Raphels Patch:          10178275035     0.39            336989          0.94
+> My patch:               10482766569     1.28            294803          6.87
+> Raphel + My patch:      10183837235     0.38            330657          3.39      
+
+The above two indicate a +3% from (now mainline) Rafael's patch to yours.
+There's no reason why Rafael + your patch should be worse than just your patch.
+If this is statistically significant we would need to look into why.
+
+FWIW I think the energy cost of essentially remaining in polling even for quite
+sporadic IO can't be understated IMO.
+Comparison for teo, which might slightly better than menu while not outright
+disabling idle would be interesting still.
+
+
+
