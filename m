@@ -1,48 +1,80 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CDE623;
-	Sun, 23 Mar 2025 12:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362246ADD
+	for <linux-block@vger.kernel.org>; Sun, 23 Mar 2025 13:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742733376; cv=none; b=K28RyGGbIDv+ZV2f0EgxijTTT1l3zdi5RGBLi40k5aNezyQeHHPMLQqg6+JobfTOZbFQ0NgFyVGNElKZPudgewILWWlVTK+DiabCsQvz/Ge/P5+SoXBvXtSbcWfOWzm0AI44yx6+/EeQG/qqMpsfh6MrMii77IqidDQmMHRvlpc=
+	t=1742737482; cv=none; b=XEkayNw+KkAtsbCMBrX8yylD93vpxDGe5n7bhbENBP/5rD2OrXB59Yjanv79AHM8vjCSv0gTjJudfzydOSODzMBrBPHCtmv07favbd/kDqdXNHM3S10mlVCgm6N6MJa1qcJAyTSCjbEeD4KPl7UUJDlVu4nSfoaHIs3BrvzX7bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742733376; c=relaxed/simple;
-	bh=cKnmb/AvRSbteASF5DT+ty/21aXMVv19VOgr9QzltMs=;
+	s=arc-20240116; t=1742737482; c=relaxed/simple;
+	bh=sfV8sTeG3E1hItfwSdC8ohJjAPzeBI/flxFeIAONGIw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cP5NurDTI1MoL5dqt7rmnbe3Bf541yaSzqpKVUzPoEpynG1UzgLyXYZLng7p7zvLaH0dzmH1zLBu3hZmS78uD1gr7M4dX5Cz9YVqW/4Dexva5YAZ/DF5IdkSvetHeWoVSoUcNP+dEl9I1WgtGxPfSFH/Va0gkwcDj1/m4NjhGqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=A5GWs8ZZ; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=Wmn0D78KKr0cHdofPogTbdw8vhfimAMcRwFSKtJsEN5U6YSjqTkHW6H+oBQlQBEBEepE/McT0520AkNDfLha2/tUr8RpHXd9oeV1rRPenwKP2QBF3zfpeA2+zyWlLPvSthUu+g7/RFnt51sWPgsxNJVL+ymm1CACKkGd9vrJL24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FV9N5rQC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BBZhvwsV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FV9N5rQC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BBZhvwsV; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="A5GWs8ZZ"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZLFzD1Dqjzm0ytd;
-	Sun, 23 Mar 2025 12:36:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1742733366; x=1745325367; bh=5tj9iO/ST31ro8NtZXZ+WYzO
-	2KM6kAX7w53AjZ7Mg0A=; b=A5GWs8ZZ3fEVqp/IdS6gJ5ndHfUdUWDGXjSVadOm
-	ULUDNHfTeBg63zQOC/FYqWafLEyyAuM3Acaon/qlwAwmofjkUL5leSzGQEXN4bfp
-	WeJcisPT0KAPbeKZdB/55HMrN8u5xr/jwzLKUE+ozDsWc3cCxJOnvCU7Pgx2VhdT
-	5acN3hB2uASO90SyDR+xECFYnU7+e+XAhi/WOOc8UV5nhrk8hNZ7pYayDN7zx8FL
-	ol/sdTCpYOQjem7jkiWyVzuQVGtdBVJkqMjD/+1LXwYaJrpJm28WeIN4ToORgdA4
-	/dIFh62l4lQ0i1AeUXXBP2LnlNa5+p1Aqie5zaD/JRTR1Q==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id dO7ADQ8zc2Rh; Sun, 23 Mar 2025 12:36:06 +0000 (UTC)
-Received: from [10.46.23.145] (unknown [156.39.10.100])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FV9N5rQC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BBZhvwsV";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FV9N5rQC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BBZhvwsV"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZLFz56LcHzm0pKT;
-	Sun, 23 Mar 2025 12:36:00 +0000 (UTC)
-Message-ID: <1ae51ccc-66cc-4551-b649-2f5883e2f5a2@acm.org>
-Date: Sun, 23 Mar 2025 05:35:59 -0700
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 4FD3C2119B;
+	Sun, 23 Mar 2025 13:39:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1742737172; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BWVZ3Kdi+HJq7l0g1Bgu8S33aVRgtrlzt+LCiTo58HU=;
+	b=FV9N5rQCUbKqNJpr6VK34cwLh5HERn+QGIxB7STG1L/z5HIDePujWJfc+ZRGrJivQtYwVH
+	XS+2SkWbm+zfE2zlweOy86hoW4+0dIe9bn0GVzcxTrcVbPQm3V2FGxFBoLf9G+QjQltuLl
+	/a/Q+Zfge3b/5RRWQ7j8n9q6WUHN874=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1742737172;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BWVZ3Kdi+HJq7l0g1Bgu8S33aVRgtrlzt+LCiTo58HU=;
+	b=BBZhvwsVeWCu5ErNU8iXwE0kf9m/svPIg6cc/iykFhiaUsGoDU/gx3OUWooVYxzQwU4ZNu
+	ZV51dmE1M7a/6WCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1742737172; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BWVZ3Kdi+HJq7l0g1Bgu8S33aVRgtrlzt+LCiTo58HU=;
+	b=FV9N5rQCUbKqNJpr6VK34cwLh5HERn+QGIxB7STG1L/z5HIDePujWJfc+ZRGrJivQtYwVH
+	XS+2SkWbm+zfE2zlweOy86hoW4+0dIe9bn0GVzcxTrcVbPQm3V2FGxFBoLf9G+QjQltuLl
+	/a/Q+Zfge3b/5RRWQ7j8n9q6WUHN874=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1742737172;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BWVZ3Kdi+HJq7l0g1Bgu8S33aVRgtrlzt+LCiTo58HU=;
+	b=BBZhvwsVeWCu5ErNU8iXwE0kf9m/svPIg6cc/iykFhiaUsGoDU/gx3OUWooVYxzQwU4ZNu
+	ZV51dmE1M7a/6WCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D800213757;
+	Sun, 23 Mar 2025 13:39:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id VCzALhIP4Gc5NQAAD6G6ig
+	(envelope-from <hare@suse.de>); Sun, 23 Mar 2025 13:39:30 +0000
+Message-ID: <107a8fbf-c36d-4870-be86-ec1415139cab@suse.de>
+Date: Sun, 23 Mar 2025 14:39:25 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,41 +82,92 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] cpuidle: psd: add power sleep demotion prevention for
- fast I/O devices
-To: "King, Colin" <colin.king@intel.com>,
- Christian Loehle <christian.loehle@arm.com>, Jens Axboe <axboe@kernel.dk>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <33882f284ac6e6d1ec766ca4bb2f3b88@intel.com>
- <f18607ca-30dc-43de-be77-fec69968aeec@arm.com>
- <SJ2PR11MB7670F63C7052C88637D305DF8DDF2@SJ2PR11MB7670.namprd11.prod.outlook.com>
+Subject: Re: [RFC PATCH 0/4] iov_iter: Add composite, scatterlist and skbuff
+ iterator types
+To: Christoph Hellwig <hch@infradead.org>, David Howells <dhowells@redhat.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+ Christian Brauner <christian@brauner.io>,
+ Matthew Wilcox <willy@infradead.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Steve French <smfrench@gmail.com>, Ilya Dryomov <idryomov@gmail.com>,
+ netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org
+References: <20250321161407.3333724-1-dhowells@redhat.com>
+ <Z9-oaC3lVIMQ4rUF@infradead.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <SJ2PR11MB7670F63C7052C88637D305DF8DDF2@SJ2PR11MB7670.namprd11.prod.outlook.com>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <Z9-oaC3lVIMQ4rUF@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,brauner.io,infradead.org,oracle.com,gmail.com,lists.linux.dev,vger.kernel.org,kvack.org];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 3/17/25 3:03 AM, King, Colin wrote:
-> This code is optional, one can enable it or disable it via the config option. Also,
-> even when it is built-in one can disable it by writing 0 to the sysfs file
->    /sys/devices/system/cpu/cpuidle/psd_cpu_lat_timeout_ms
+On 3/23/25 07:21, Christoph Hellwig wrote:
+> This is going entirely in the wrong direction.  We don't need more iter
+> types but less.  The reason why we have to many is because the underlying
+> representation of the ranges is a mess which goes deeper than just the
+> iterator, because it also means we have to convert between the
+> underlying representations all the time.
+> 
+> E.g. the socket code should have (and either has for a while or at least
+> there were patches) been using bio_vecs instead of reinventing them as sk
+> fragment.  The crypto code should not be using scatterlists, which are a
+> horrible data structure because they mix up the physical memory
+> description and the dma mapping information which isn't even used for
+> most uses, etc.
+> 
+> So instead of more iters let's convert everyone to a common
+> scatter/gather memory definition, which simplifies the iters.  For now
+> that is the bio_vec, which really should be converted from storing a
+> struct page to a phys_addr_t (and maybe renamed if that helps adoption).
+> That allows to trivially kill the kvec for example.
+> 
+> As for the head/tail - that seems to be a odd NFS/sunrpc fetish.  I've
+> actually started a little project to just convert the sunrpc code to
+> use bio_vecs, which massively simplifies the code, and allows directly
+> passing it to the iters in the socket API.  It doesn't quite work yet
+> but shows how all these custom (and in this case rather ad-hoc) memory
+> fragment representation cause a huge mess.
+> 
+> I don't think the iterlist can work in practice, but it would be nice
+> to have for a few use cases.  If it worked it should hopefully allow
+> to kill off the odd xarray iterator.
+> 
+Can we have a session around this?
+IE define how iterators should be used, and what the iterator elements
+should be. If we do it properly this will also fix the frozen page 
+discussion we're having; if we define iterators whose data elements
+are _not_ pages then clearly one cannot take a reference to them.
 
-I'm not sure we need even more configuration knobs in sysfs. How are
-users expected to find this configuration option? How should they
-decide whether to enable or to disable it?
+But in either case, we should define the long-term goal such that
+people can start converting stuff.
 
-Please take a look at this proposal and let me know whether this would
-solve the issue that you are looking into: "[LSF/MM/BPF Topic] Energy-
-Efficient I/O" (https://lore.kernel.org/linux-block/ad1018b6-7c0b-4d70-
-b845-c869287d3cf3@acm.org/). The only disadvantage of this approach
-compared to the cpuidle patch is that it requires RPM (runtime power
-management) to be enabled. Maybe I should look into modifying the
-approach such that it does not rely on RPM.
+Cheers,
 
-Thanks,
-
-Bart.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
