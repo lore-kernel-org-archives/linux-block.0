@@ -1,85 +1,82 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D50BE5E
-	for <linux-block@vger.kernel.org>; Mon, 24 Mar 2025 15:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2195F9450;
+	Mon, 24 Mar 2025 15:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742828517; cv=none; b=JEnx9wX2mRA4Cn3VR9nD9rLVy+8rM0v0AiyDn6iHNEKL2RaKhQNCLEkx4OyGjLICH8huOmcVUVXZ3jWvDBnnJOgoiznE+caW64t2J1+mhC59xrvsNhbFd1ouxqLnJQjBa9hg2Acwq0tov+1UYPFdaipCEDpcVCflX82KDjdh4ao=
+	t=1742828569; cv=none; b=tjmAeh7KMYnnIE89lOpOm+xABms7l2alK4pMCWTwb30B88vdCuXRfGbdKu7dtqz9ic5eVogaqDi1N96I/AbmlMn6pd5N7ohftvHEEcI9xHxbsXBp5JSrHVCL8UIdGkyKpVnijF4JU3ZflK5Xp2phC5MYFLWi8vvBVxy9SE6zfXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742828517; c=relaxed/simple;
-	bh=OyHKg9wyo21QoH7tAZcX4BFsG9Zuouo7GfgqRsHQySM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tDRb5D18EKQrqzJSivMJ+CSHAl6CUYZA3eVxnKmEss8lr+7sqWwWXze6RJJSl+Cpd2SxoSHZn2yIU5yXWy4T+P4M8pvFBHHvwlyOD2nL5fcOE9Fve2vC4Vrm0fmE02i7LZqxGYGLM4ke5rJYJfxhyBhVN1nvAOH3/TLRSYW0gZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XIhsxOg3; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1742828569; c=relaxed/simple;
+	bh=yv61cHAJiH0JNvFm2SJMGEiqMHIGpIt9dw/H9oZc3ps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X2o19QtboQiC34501n9QYqzCm5KU0nabbygD4/wIfps9U9+xHta84NKD+sPJHkmwq9tTqHUOdz5lR3bcrfcJ1+MYkb44xvE16afw3PzlTgJi9YfL40QtZJFsrROQ9bDmtO4e/U4r0eyu5gqlzNZZ5hp+0hQNHilqlcm085e7Wcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FBUtQeBP; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XIhsxOg3"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2260202c2a1so8983845ad.3
-        for <linux-block@vger.kernel.org>; Mon, 24 Mar 2025 08:01:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1742828515; x=1743433315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OyHKg9wyo21QoH7tAZcX4BFsG9Zuouo7GfgqRsHQySM=;
-        b=XIhsxOg3nIYvz1HS1Y6vNK7vNpzA6oujTvVs6KMzePJrAjIkNwxmQ0+Xdh+6+y/y7b
-         gzlcbhWzwKncZNzkzX0kzkU86RYkZ+BoNOt4C/Iai1vjZQJR6wtm9Z02Ct3ABmkQNA0V
-         2lzjLCCcqme4Hq+V7jrocOKgv584dh1cOesO2zTN+9Px82lwiY/JYIAq0PwQO8UOuOTs
-         l1FhMuUaeB7UI3NHEKLFRRORk/yyEdjgPdjJZ5Xgvhq+P4/afrI6MTlzY0FZi6gcyKCl
-         wsxI5bvN4oHkaShheiEWwlnbIGldVB+UYYaCdMQ60yIeyAPx5eYiI0uX+QPNNkQTv727
-         2gzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742828515; x=1743433315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OyHKg9wyo21QoH7tAZcX4BFsG9Zuouo7GfgqRsHQySM=;
-        b=j3IdjMApmDr+vMY9fBKv2c/fZcD3t+Oz/c7YH82I9fkhjCiNJG4zqR4Zn1yHU4h0Ig
-         mvpnQWL7ypQQ23DGJCMXfjsJ9KUyOyibcOT9juQ5oGfamM5lY9hRLwWjJxQaQCGADudb
-         skUr+CJfzb0oJxEmGJV1No12NG52FIPbZnT80KfAg3s181NpUaBjf/5YeY9+fxUcK3IT
-         8M6eSggrBcUMizTRKSFPiPqEMUQwQJmQ68pjSRlaNaxWnVwpQKhdVcZzBtexugBLYp9d
-         VS5rMxtUTyaYAJsglxc54+OH/jeWjMy+9qe8J5KuuwVvGCKYz2I+lctF7yciWox76KYf
-         76Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHyqgkLgifesKabfWet2c0C4if6CFJCDfgFnTQJ168bz6cs/E1kpYDxoMC5WPmwXJthFV50QwwLKhayQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKSNujLMsPPpf6TM7N6wZK+QqCtHTvp1XNe76zPcqX/xyw2MnG
-	RUhY7vGEAAHlPfb13mGgMUOeeddFJBNBsRWbZdqtL/+9kc/aABnBTIk08wjyoJIaikCFHkvienV
-	e8LG4t74/eoNGV0G1iEZqin/BTw4aw8qdzJMxIQ==
-X-Gm-Gg: ASbGncs9EfJTmIHH+9WhO072aGdqF3GmxTDLkM+FQI8g5l/D9LGsh7PlQRSPC6arR/O
-	KNtMZgDuwE05zCwq6CpEEY2csfxaQ8gitLmnDmquOxtU9SS+/OKYDbuunJNHVd7omTu2kaSpsBn
-	RpISQ0RBrAhlpAlJduA2bgvu5UuoFGODOZsqyg
-X-Google-Smtp-Source: AGHT+IGt17KtPj7Z1/TiCHVmp0C//z2l2UdDHFz0RFvAhXA6+U8XMeTjKai4tNm0W2U91FnQJRppzmi+1jGogkKrK5Y=
-X-Received: by 2002:a17:902:ecc7:b0:221:7854:7618 with SMTP id
- d9443c01a7336-22780d8ac1fmr78311775ad.8.1742828514315; Mon, 24 Mar 2025
- 08:01:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FBUtQeBP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=35uXtVKGaER37nteavlftmrAz1omkXbLtRVHdTRcrGg=; b=FBUtQeBPskXqJVfpcbX/bRxJvQ
+	U2UCMFZYdpfbptLlHKjGYxLU2B8/oQDhAPnh21t9yzMuEVHHDwfI1ONuI6/zAc0hjPr1f7m1TZtZO
+	e2dBaQR4jEQWGFfU+py5gItU6l5FA0x5kChkEyVut1rJ9GQXTwqjj/3UsuDEMZyQIdEioE301qkJA
+	HTV1KguSRIZ0g9ni6Lw5xaadMh2gnEAIsmQknuozj4ZbDD08+uHfbDcSY3Y5DFFVBtrG3sBRLvxMH
+	8FDNI2L8lziT8Qzs2L6EqViVNqEq99VAOspCmx48yoD+PJtOba1BhHVs5tnsdSeddHaa5CsiS3EY3
+	Z8eGSKnA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1twjJu-00000000odr-3Z0q;
+	Mon, 24 Mar 2025 15:02:30 +0000
+Date: Mon, 24 Mar 2025 15:02:30 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, leon@kernel.org, hch@lst.de,
+	kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
+	joro@8bytes.org, brauner@kernel.org, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, john.g.garry@oracle.com,
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
+	kernel@pankajraghav.com
+Subject: Re: [RFC 2/4] blkdev: lift BLK_MAX_BLOCK_SIZE to page cache limit
+Message-ID: <Z-F0BgYykhh9DFby@casper.infradead.org>
+References: <20250320111328.2841690-1-mcgrof@kernel.org>
+ <20250320111328.2841690-3-mcgrof@kernel.org>
+ <5459e3e0-656c-4d94-82c7-3880608f9ac8@acm.org>
+ <Z9w9FWG2hKCe7mhR@casper.infradead.org>
+ <c33c1dab-a0f6-4c36-8732-182f640eff52@acm.org>
+ <Z9xB4kZiZfSdFJfV@casper.infradead.org>
+ <e399689b-c0e9-4499-b200-3d7e110a359f@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324134905.766777-1-ming.lei@redhat.com> <20250324134905.766777-3-ming.lei@redhat.com>
-In-Reply-To: <20250324134905.766777-3-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 24 Mar 2025 08:01:42 -0700
-X-Gm-Features: AQ5f1JpBoEXS66bzKO20LSdFtmRfdfKDzqq-a7PXpWkzUyFqcfYctAa1Ff_aUV8
-Message-ID: <CADUfDZohS39Oj-mU8nT7BOEX5PZ14ofesR_gnF17_4JQguRv8g@mail.gmail.com>
-Subject: Re: [PATCH 2/8] ublk: add helper of ublk_need_map_io()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Keith Busch <kbusch@kernel.org>, Uday Shankar <ushankar@purestorage.com>, 
-	Ming Lei <tom.leiming@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e399689b-c0e9-4499-b200-3d7e110a359f@acm.org>
 
-On Mon, Mar 24, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> From: Ming Lei <tom.leiming@gmail.com>
->
-> ublk_need_map_io() is more readable.
+On Mon, Mar 24, 2025 at 06:58:26AM -0400, Bart Van Assche wrote:
+> If the goal is to reduce DRAM costs then I recommend SSD manufacturers
+> to implement zoned storage (ZNS) instead of only increasing the logical
+> block size. A big advantage of zoned storage is that the DRAM cost is
+> reduced significantly even if the block size is not increased.
+> 
+> Are there any applications that benefit from a block size larger than
+> 64 KiB? If not, why to increase BLK_MAX_BLOCK_SIZE further? Do you agree
+> that this question should be answered in the patch description?
 
-Agreed!
+Do I agree that we should use the commit message to enter into a
+philosophical debate about whether ZNS or large block sizes are better?
+No, I do not.  I don't even think we should have this discussion
+any more on this mailing list; I think everyone is aware that both
+alternatives exist.  You don't like it, and that's your prerogative.
+But at some point you have to stop being an awkward cuss about it.
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+I think CXL is an abomination; I've made this point often enough that
+everybody is aware of it.  I don't make it any more.  All I do is NACK
+the inclusion of patches that are only for the benefit of CXL until
+CXL has actually demonstrated its utility.
