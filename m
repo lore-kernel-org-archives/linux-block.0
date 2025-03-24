@@ -1,96 +1,153 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C4A266EFE
-	for <linux-block@vger.kernel.org>; Mon, 24 Mar 2025 18:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2B02A1CA;
+	Mon, 24 Mar 2025 20:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742842591; cv=none; b=sefO9qPWOxnnheUzburFL2+7Y81Au/fXFTNpDfK+C1PAVeT+gkZsp4wxQHTtFTuUcnBU3XCe+NjZHCF0ebK+s2Doyqe2vkek4O6jPIQUsPAOcybXaz8hNz5Utf/CL28xrA90KSTxToUmqp0s9b2jrKO8Gz+hDOdwYfrTTV93bZY=
+	t=1742847389; cv=none; b=RVR+gtI5s5cV7VaQwXkYZFkDm1XnvQv32njsqqlqNoZvI/bXEObcmc1NV6BK5H1A2PxBCBxEKulY91HmpNWmtWH7N7hTNl94jnJpgiZYQpG5PHIX/Iz5N0tlDGxogrCtF0ZAHjfS/pIgpicoE8INkxJdF2sNDKZOHS0dzsXTHp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742842591; c=relaxed/simple;
-	bh=dGu8ZX7xORsOF8wWNZlRunghBJPEysAWFzcel8DWUz4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NJ0LnZnWf1hdihQmtwbQ9ho++gXAS9+Z0d672wfQ76XHRCre32oANZnCs03NOuFjGHLXtb3umhPrf0UKmabaFTCRje3uscg7jj6z8R69eDj6I4ptuiDoLO0SWmDtQVPXhb9ROSgLh1AoTjDd4kA5bnAvm3a6Btg09SQCiSKuvHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d443811ed2so81146255ab.3
-        for <linux-block@vger.kernel.org>; Mon, 24 Mar 2025 11:56:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742842589; x=1743447389;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hHEqM4s/n82u0+AHc6/WHpGzcmPow5ScOlUXqSyMHhc=;
-        b=LkRZvViEJk7a3trADvp2KTMANZULOK6GZUjqGROCPhHyyzaPjgtuNm7tUmwOyy429H
-         zVjfjbvssVGZX1wPVMoJEZI+s8uYOy271UknrRxxdNSRngWGNQokGf+jplZ2v5CcgU2E
-         re3f59h/BGSvnN5lTn0Cj7nbW5AFkbMSF7TxmFr9dUlWCCHR0heWIygtxE3RJygd0qi/
-         l2vy/TOHRFQkLpNJB44wD0TY4yeDdCXHP2gu/TausHIo+UPYrIPiQpYZIw6d7o4A6LjC
-         Sl9Tq47gXXB8MPTl0bNksBdH5+tcaT32/H7WzYIkFU5DVHPHSPcpLICqhB4wwWWHsSJu
-         BYDA==
-X-Gm-Message-State: AOJu0YyXtdMImXN5kWjzKHlIf1KrubHZ6qNY+2wHklRi5ljdm+put8Dc
-	sLJVXyMaQxAKhziUXvuyV2U8QpuISVM9YVDCl545OUhdxCwcosqHbhYwo4EewgdgDF1jNSyq405
-	gG9pgrHWmEG31CY6V7opo2x2M2rVtTX9oEhgPM0GbV9wz3K0dE+b5/RQ=
-X-Google-Smtp-Source: AGHT+IHzLyC+7Jgi2/vD5BMI7zMaViS3yAQGImmRsLAOstVx7G+O0tdzNlbkVVkc4kM3S8VduVt+pEakeD+f60HgWrv7GCUc88pI
+	s=arc-20240116; t=1742847389; c=relaxed/simple;
+	bh=pi/J5f+zxa5+vr4I4x8F+Q+w3M7QcKQqlVHWcxr7Mbc=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Af/gdKfaKjNWLPBtosrAWc8Q9R2wZsAre+yKCKhwKn+abUFub7GzYkveaTP4TA4i4MPcbSV7TCDLhuZyo0O08TOY2sWjSwDcmvZnlmwV3uiGGN/4yJc72UsLFMY7cVq1r/cGIkZMaJWsWiWYYZgJ2bLd9pyh1k+gatIaqtjZbgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=TI71ew07; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="TI71ew07"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1742847380; x=1743106580;
+	bh=5zkri0TfwaVQ5Do9MmCdBt/y8+WtBGC8HaDSalWQ/b8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=TI71ew073ff2IQeYGaFDBN5e4BpGTt+SQkDr3Gkx+pNBx1wepjbufC3naVIb0fTMo
+	 J2yr7/mP9FptcD9UZh5KkLdy+CarcuEfod41sZ3T24kmeQSSMoeWGVSmafgHR/6KBJ
+	 J29pRX64HDAQU0ukZj2mUOBhTIO8UNETpQgZs/eGfIS4WLTI8KO8Lw0tooKRx+TDdE
+	 ZLlUBETcRMBO7pIfsQc0d+rlN/I9yBKB0Vom9Rl01ucsiWJhLsG1GCy3nMuXHvBInX
+	 dRHApYxwuXhZH/un8+cFYrQfOFEOtO5JPJH/8s50xSt9+q4265ZNup+5zk0vSxihPO
+	 KYVjDrnsAN9dQ==
+Date: Mon, 24 Mar 2025 20:16:15 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v5 0/6] rust: reduce pointer casts, enable related lints
+Message-ID: <D8ORTXSUTKGL.1KOJAGBM8F8TN@proton.me>
+In-Reply-To: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
+References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 389621328b72d358f474de1a56bb51cdd22e9db2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1525:b0:3d3:d4f0:271d with SMTP id
- e9e14a558f8ab-3d5961602a3mr156971435ab.12.1742842589229; Mon, 24 Mar 2025
- 11:56:29 -0700 (PDT)
-Date: Mon, 24 Mar 2025 11:56:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e1aadd.050a0220.a7ebc.002d.GAE@google.com>
-Subject: [syzbot] Monthly block report (Mar 2025)
-From: syzbot <syzbot+listfe2d68429fd5e51f6083@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello block maintainers/developers,
+On Mon Mar 17, 2025 at 3:23 PM CET, Tamir Duberstein wrote:
+> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
+> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
+> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
+> lints. It also enables `clippy::as_underscore` which ensures other
+> pointer casts weren't missed. The first commit reduces the need for
+> pointer casts and is shared with another series[1].
+>
+> The final patch also enables pointer provenance lints and fixes
+> violations. See that commit message for details. The build system
+> portion of that commit is pretty messy but I couldn't find a better way
+> to convincingly ensure that these lints were applied globally.
+> Suggestions would be very welcome.
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+I applied the patches to v6.14-rc7 and did a quick pass with
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 42 issues are still open and 95 have already been fixed.
+    rg -nC 3 -t rust ' as ' | bat -l rust
 
-Some of the still happening issues:
+to see if there are any cases left that we could fix and I found a
+couple:
 
-Ref  Crashes Repro Title
-<1>  60676   Yes   possible deadlock in __submit_bio
-                   https://syzkaller.appspot.com/bug?extid=949ae54e95a2fab4cbb4
-<2>  5264    Yes   KMSAN: kernel-infoleak in filemap_read
-                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<3>  3626    Yes   KASAN: slab-use-after-free Read in percpu_ref_put (2)
-                   https://syzkaller.appspot.com/bug?extid=905d719acdbd213bf67e
-<4>  2498    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<5>  1675    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<6>  962     Yes   possible deadlock in loop_set_status
-                   https://syzkaller.appspot.com/bug?extid=9b145229d11aa73e4571
-<7>  305     No    INFO: task hung in read_part_sector (2)
-                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
-<8>  77      No    KCSAN: data-race in block_uevent / inc_diskseq (2)
-                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
-<9>  43      Yes   WARNING in blk_register_tracepoints
-                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-<10> 37      Yes   INFO: task hung in nbd_add_socket (2)
-                   https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
+* there are several cases of `number as int_type` (like `num as c_int`
+  or `my_u32 as usize` etc.) not sure what we can do about these, some
+  are probably unavoidable, but since the kernel doesn't support 16 bit
+  systems (that is true, right?), we *could* have a `From<u32> for
+  usize` impl...
+* some instances of `'|' as u32` (samples/rust/rust_misc_device.rs:112).
+  There is a `From<char> for u32` impl, so this can just be replaced
+  with `.into()` (or maybe by using a byte literal `b'|'`?).
+* `shared_ref as *const _` (for example in rust/kernel/uaccess.rs:247,
+  rust/kernel/str.rs:32 and rust/kernel/fs/file.rs:367), these we can
+  replace with `let ptr: *const ... =3D shared_ref;`. Don't know if there
+  is a clippy lint for this.
+* some pointer casts in rust/kernel/list/impl_list_item_mod.rs:{253,254}
+  not sure if they can be converted though (maybe they are unsizing the
+  pointer?)
+  Another pointer cast in rust/kernel/driver.rs:81 (I'm pretty sure this
+  one can be replaced by a `.cast()`)
+
+Some clippy lints that we could also enable that share the spirit of
+this series:
+
+* `char_lit_as_u8` (maybe that also covers the `'|' as u32` case from
+  above?)
+* `cast_lossless` (maybe this catches some of the `num as int_type`
+  conversions I mentioned above)
+
+I'll leave it up to you what you want to do with this: add it to this
+series, make a new one, or let someone else handle it. If you don't want
+to handle it, let me know, then I'll create a good-first-issue :)
+
+> ---
+> Tamir Duberstein (6):
+>       rust: retain pointer mut-ness in `container_of!`
+>       rust: enable `clippy::ptr_as_ptr` lint
+>       rust: enable `clippy::ptr_cast_constness` lint
+>       rust: enable `clippy::as_ptr_cast_mut` lint
+>       rust: enable `clippy::as_underscore` lint
+>       rust: use strict provenance APIs
+>
+>  Makefile                               |   4 ++
+>  init/Kconfig                           |   3 +
+>  rust/bindings/lib.rs                   |   1 +
+>  rust/kernel/alloc.rs                   |   2 +-
+>  rust/kernel/alloc/allocator_test.rs    |   2 +-
+>  rust/kernel/alloc/kvec.rs              |   4 +-
+>  rust/kernel/block/mq/operations.rs     |   2 +-
+>  rust/kernel/block/mq/request.rs        |   7 +-
+>  rust/kernel/device.rs                  |   5 +-
+>  rust/kernel/device_id.rs               |   2 +-
+>  rust/kernel/devres.rs                  |  19 +++---
+>  rust/kernel/error.rs                   |   2 +-
+>  rust/kernel/firmware.rs                |   3 +-
+>  rust/kernel/fs/file.rs                 |   2 +-
+>  rust/kernel/io.rs                      |  16 ++---
+>  rust/kernel/kunit.rs                   |  15 ++---
+>  rust/kernel/lib.rs                     | 113 +++++++++++++++++++++++++++=
++++++-
+>  rust/kernel/list/impl_list_item_mod.rs |   2 +-
+>  rust/kernel/miscdevice.rs              |   2 +-
+>  rust/kernel/of.rs                      |   6 +-
+>  rust/kernel/pci.rs                     |  15 +++--
+>  rust/kernel/platform.rs                |   6 +-
+>  rust/kernel/print.rs                   |  11 ++--
+>  rust/kernel/rbtree.rs                  |  23 +++----
+>  rust/kernel/seq_file.rs                |   3 +-
+>  rust/kernel/str.rs                     |  18 ++----
+>  rust/kernel/sync/poll.rs               |   2 +-
+>  rust/kernel/uaccess.rs                 |  12 ++--
+>  rust/kernel/workqueue.rs               |  12 ++--
+>  rust/uapi/lib.rs                       |   1 +
+>  30 files changed, 218 insertions(+), 97 deletions(-)
+> ---
+> base-commit: 498f7ee4773f22924f00630136da8575f38954e8
+
+Btw I didn't find this commit anywhere I usually check, where is it
+from?
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Cheers,
+Benno
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+> change-id: 20250307-ptr-as-ptr-21b1867fc4d4
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
