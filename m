@@ -1,134 +1,104 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3DA1362;
-	Mon, 24 Mar 2025 02:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8653C10F9;
+	Mon, 24 Mar 2025 10:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742782004; cv=none; b=oH8nWnjwkAd0oOqxkUEX4p191yTaiG2zubPAZUz0oTF7KRzqJsOQrHr2iQnA5lLF4UDc/YSlcENK/7ydrkprVMWQLdnuoOrhy0Btmy3uwdDIwntnjTklWfoGx3rgqxUNsuF0blqL3U9jCcoupdAVvBVWKRdLak7O0SueGFJSM3c=
+	t=1742813931; cv=none; b=LUsIuuUXv15I7Fwe0YJQBW8aM1n9uPpaWXcKlyBnOE5LVDbUfuAHBBImsSrRXYpmqXZ9JOwJ9RKl8Q+rgrjGp1vfESdjPzTRwpIu7GMwQyeM0HUEjsePaPx21fymakadhpURNgnSpmN6uzXRIKP5Kex9zBbJn2/A7C90CrILFA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742782004; c=relaxed/simple;
-	bh=Hi4oW6GyVoQTk60WFu4HDfjDhU2apN+Ms5+ZxheYusE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=C/7BsMjVEKiXMC2cukMWkDZoNZSyA3tvpS/CXF1iJ3DzxghvytIsgNwMlfT93RzZum+yy/6CSjUCBaYgcZ0wmC8dmToEaeXX65/uuJ3len2/kwf+GUxSc3dzPeTJEw9Q1CzDZWvcRVt2sHNWgfWO0VHk9ecphC2abWkUn7Jxh2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZLbxy28Jhz4f3jtJ;
-	Mon, 24 Mar 2025 10:06:14 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BB7341A1CA8;
-	Mon, 24 Mar 2025 10:06:31 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCnCl8lvuBnEoqPHQ--.16986S3;
-	Mon, 24 Mar 2025 10:06:31 +0800 (CST)
-Subject: Re: [PATCH] blk-throttle: support io merge over iops_limit
-To: Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk, josef@toxicpanda.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250307090152.4095551-1-yukuai1@huaweicloud.com>
- <Z8sZyElaHQQwKqpB@slm.duckdns.org>
- <5fc124c9-e202-99ca-418d-0f52d027640f@huaweicloud.com>
- <Z85LjhvkCzlqBVZy@fedora> <Z88K5JtR4rhhIFsY@slm.duckdns.org>
- <baba2f82-6c35-8c24-847c-32a002009b63@huaweicloud.com>
- <Z9CQOuJA-bo4xZkH@slm.duckdns.org>
- <c1e467a9-7499-e42b-88ed-b8e34b831515@huaweicloud.com>
- <Z9GrD-7tW6tKVimk@slm.duckdns.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <9d87351a-8ea6-9ed9-7359-3963672cdc17@huaweicloud.com>
-Date: Mon, 24 Mar 2025 10:06:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1742813931; c=relaxed/simple;
+	bh=4yVXdodDIfdUdrQgYWR7r1IWVSW9cP+OijHo91EXgFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PKmKd5WxTSd/QgDIjOSqSGFKiXNqvY0UFAEq/EGapSBMHIScv6ivUu8H4EVQRTnKJdhpfNHo4j4SIX8ywHJ3Wo5ba2aoNktVppcYfExuhKPL9qkoCRBBsC4g52Cevikifi17HR7djV4XZW6nC4IJ90qXiAU0BMYMh15RCT+Nni4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=weSd2VmF; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="weSd2VmF"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZLqmS1qwtzm0R3r;
+	Mon, 24 Mar 2025 10:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1742813925; x=1745405926; bh=qHWnXl7QzKO/pXeMQIokr+0r
+	ghD0nnpt18hbCu3fEWw=; b=weSd2VmF2OMTqgTjsbIuZtT/MRyOanBpLKlCYj7Y
+	RECtUB+Sy5QO2wOxdv3LKADHEGtWXwKh9BgTTcIdEPWpmq1hnjgaVYglOlMuEiHM
+	rglZrP3CiALvb8X6xbDD5JP79/PEJy+FJBe48GnZD1OUviyCzJS/PZ/mM+njGDZN
+	wyGOu5/MXIoVAJq6CwUoMhcnSDqKaJikeS6tIDLrSoYyH/LXYvx1voganLX+kicj
+	s1HLfdYTI0f/Ad0TTSbExUfHlxa2hYLVK96RxJFZfAezOkLM9777is2jiVjJu0Aj
+	leJOwJNiSqlPs8lOTj4CEj2fZ7SgWdv6wBvYk/OjbipFyw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id fx8_Kpnf0S6p; Mon, 24 Mar 2025 10:58:45 +0000 (UTC)
+Received: from [172.22.32.156] (unknown [99.209.85.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4ZLqm46VPpzm8kw7;
+	Mon, 24 Mar 2025 10:58:27 +0000 (UTC)
+Message-ID: <e399689b-c0e9-4499-b200-3d7e110a359f@acm.org>
+Date: Mon, 24 Mar 2025 06:58:26 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z9GrD-7tW6tKVimk@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnCl8lvuBnEoqPHQ--.16986S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZrW8Kw1xuw4fGw1UtF4Dtwb_yoW5Jw15pa
-	yfGwnayFs5W3ZrCFn3ur4xuryF9rZ5Gw45Jrn5Gr4DZr4Y93WxJr4xtayrAF929r4Sya42
-	qwn5Xas8Xas8Za7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 2/4] blkdev: lift BLK_MAX_BLOCK_SIZE to page cache limit
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, leon@kernel.org, hch@lst.de,
+ kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk, joro@8bytes.org,
+ brauner@kernel.org, hare@suse.de, david@fromorbit.com, djwong@kernel.org,
+ john.g.garry@oracle.com, ritesh.list@gmail.com,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+ da.gomez@samsung.com, kernel@pankajraghav.com
+References: <20250320111328.2841690-1-mcgrof@kernel.org>
+ <20250320111328.2841690-3-mcgrof@kernel.org>
+ <5459e3e0-656c-4d94-82c7-3880608f9ac8@acm.org>
+ <Z9w9FWG2hKCe7mhR@casper.infradead.org>
+ <c33c1dab-a0f6-4c36-8732-182f640eff52@acm.org>
+ <Z9xB4kZiZfSdFJfV@casper.infradead.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Z9xB4kZiZfSdFJfV@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi, Tejun!
-
-ÔÚ 2025/03/12 23:41, Tejun Heo Ð´µÀ:
-> Hello,
+On 3/20/25 12:27 PM, Matthew Wilcox wrote:
+> On Thu, Mar 20, 2025 at 09:15:23AM -0700, Bart Van Assche wrote:
+>> The patch description mentions what has been changed but does not
+>> mention why. Shouldn't the description of this patch explain why this
+>> change has been made? Shouldn't the description of this patch explain
+>> for which applications this change is useful?
 > 
-> On Wed, Mar 12, 2025 at 09:51:30AM +0800, Yu Kuai wrote:
-> ...
->> In the case of dirty pages writeback, BIO is 4k, while RQ can be up to
->> hw_sectors_kb. Our user are limiting iops based on real disk capacity
->> and they found BIO merge will be broken.
->>
->> The idea way really is rq-qos based iops limit, which is after BIO merge
->> and BIO merge is ensured not borken. In this case, I have to suggest
->> them set a high iops limit or just remove the iops limit.
-> 
+> The manufacturer chooses the block size.  If they've made a bad decision,
+> their device will presumably not sell well.  We don't need to justify
+> their decision in the commit message.
 
-My apology for the late reply.
+ From a 2023 presentation by Luis 
+(https://lpc.events/event/17/contributions/1508/attachments/1298/2608/LBS_LPC2023.pdf):
+- SSD manufacturers want to increase the indirection unit (IU) size.
+- Increasing the IU size reduces SSD DRAM costs.
+- LBS is not suitable for all workloads because smaller IOs with LBS can
+   cause write amplification (WAF) due to read modify writes.
+- Some database software benefits of a 16 KiB logical block size.
 
-> I get that that particular situation may be worked around with what you're
-> suggesting but you should be able to see that this would create the exact
-> opposite problem for people who are limiting by the IOs they issue, which
-> would be the majority of the existing users, so I don't think we can flip
-> the meaning of the existing knobs.
+If the goal is to reduce DRAM costs then I recommend SSD manufacturers
+to implement zoned storage (ZNS) instead of only increasing the logical
+block size. A big advantage of zoned storage is that the DRAM cost is
+reduced significantly even if the block size is not increased.
 
-Yes, I understand the current situation. I just feel blk-throttle have
-no such capacity to limit IOs that are issuing from user. There could
-also be filesystems, and data blocks can be fragmented.
-> 
-> re. introducing new knobs or a switch, one thing to consider is that
-> independent iops limits are not that useful to begin with. A device's iops
-> capacity can vary drastically depending on e.g. IO sizes and there usually
-> is no one good iops limit value that both doesn't get in the way and
-> isolates the impact on other users, so it does feel like trying to polish
-> something which is fundamentally flawed.
-
-It's not just fundamentally flawed, and the implementation is just too
-one-sided. So what is the next step?
-
-- remove iops limit since it's not that useful;
-- swith iops limit to against disk;
-- do nothing?
-> 
-> Whether bio or rq based, can you actually achieve meaningful isolation with
-> blk-throtl's iops/bw limits? If switching to rq based (or something
-> approximating that) substantially improves the situation, adding new sets of
-> knobs would make sense, but I'm skeptical this will be all that useful. If
-> this is just going to be a coarse safety mechanism to guard against things
-> going completely out of hands or throttle already known IO patterns, whether
-> the limits are based on bio or rq doesn't make whole lot of difference.
-
-Most of our users will just set meaningful bps limit, however, since
-iops limit is supported they will set it as well, without much knowledge
-how it really works, causing some unexpected phenomenon. And for now,
-we'll suggest not to set iops limit, no even a high limit.
+Are there any applications that benefit from a block size larger than
+64 KiB? If not, why to increase BLK_MAX_BLOCK_SIZE further? Do you agree
+that this question should be answered in the patch description?
 
 Thanks,
-Kuai
 
-> 
-> Thanks.
-> 
-
+Bart.
