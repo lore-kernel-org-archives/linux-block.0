@@ -1,110 +1,99 @@
-Received: from mail-yw1-f225.google.com (mail-yw1-f225.google.com [209.85.128.225])
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF6F269D1D
-	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 22:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E332326A088
+	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 22:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742941212; cv=none; b=qeo27MhpLrf6C9LLypIK2tOfD7us0FClWJOTg4j0LccLIUhhvujdGeMpDU5pRX06Oe9sS/FM7gAblBt7DcN9aRcH5x+NSA0ect+cBrdtPlFQXGDNe5UTsTDDT42wgOnAA8dRl2s+b0lCdUrOU1BJFA6E9XRe5P4ePrpM9StVKD0=
+	t=1742941576; cv=none; b=nhyduD07ElMlKBNqXi9RXED5I7zOGXtgkBKGuXicO6HAT117P5+OYxaSzOYN2I8KJf5S/k9QUStsUQmsbUKL9s+2PRT/R9s1+LF40pBNIFXNbjwZaxsGFl2E374fKommy9rLaNlNufiuT3T1UAAy8q2O0UEWfmdPSDkKC/mGkSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742941212; c=relaxed/simple;
-	bh=NeRkZlcvaCBRIUNhcAknsxh2pPI89exFKSolPCOwHZM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OrdVYWZrTObsOjtS+M9I1li2xJ7nobbYJmzG8rsukgpoCTStDGnwXVZXmLfb346aNUP/wMiUCabbsR13BGhELoHsGAfnLU1uu07DzlDNNdpy0vJFhwj3nxvb6EdUy18v+cbs34NWOwGKP1HmqrTgxgQA/rHYsiW/Wv3oJqU64pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dpLTqJz7; arc=none smtp.client-ip=209.85.128.225
+	s=arc-20240116; t=1742941576; c=relaxed/simple;
+	bh=KKtFXFITA4hOuLwA4HcWHFD1w/QWq7sNwvdwYb0AV3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f15JSZlY/sn9GKVU84Y4r7L5CZESeiXAyjELQaSrrr6NSCmOOphjkherYs6ysrpcjhIF0lrDG+bGm/FvMmBgB9cTB/qTi1y19KRkmVb2ckJO4VPK9aglZWL1req98weQCF6E26ZuhtRjcd2fRg5lB03g+wZLfuHlYRxlypmsUK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bz9dH6x9; arc=none smtp.client-ip=209.85.214.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dpLTqJz7"
-Received: by mail-yw1-f225.google.com with SMTP id 00721157ae682-6f666c94285so59194137b3.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 15:20:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bz9dH6x9"
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-227d6b530d8so51484115ad.3
+        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 15:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1742941208; x=1743546008; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P8dONTFM6RC8uRNfo7doEMwcZfV7041orR9CUS1WNic=;
-        b=dpLTqJz77dNB2PodaHyDQmKAThY6hSgYyHc1wGnQhVzNj4cRGZ1fSiocj/tpNOb4VE
-         ohxLDKa0NYyYGiXyqRxd8ltvM7nNq3FsXXfpdWrU2qnpuwv2x93r90B222FN5s7UGYj4
-         jiwItdje7ozCLsXKGb+NqfqnWyuBNYO2xCDAu0oH1mOGc2NE8v8TcXvGJsLABJq6wzZO
-         Fq3cZxJFatqh+FBdw5xlTabbCXpFWACN/YpeErCq0nJpbEPbu/1yCjC3ks6XkYqTbPO4
-         QsHeb3R9DamnkkR9X6AlMoVOtlqsVJeXNlp+KFuPLpy1hCF2dB5tFGYJA6ISgNNL4qW4
-         ArPg==
+        d=purestorage.com; s=google2022; t=1742941574; x=1743546374; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KKtFXFITA4hOuLwA4HcWHFD1w/QWq7sNwvdwYb0AV3c=;
+        b=bz9dH6x9Mz+fIEKoQQzJKPqpr4dPafCNM4vlLhiEYAoZ/V8uyM1JQO9SBkKlOkFLtZ
+         8Wbyqgo/mgcm9xGnBVBBpAeMPoYlKQR7IKLHQthPHb4vxX6UdDrygIqCVq1Vabv/Fyp4
+         CujRq0VEDYcKdcl8it5KKfx5oRfYEQmEbQIP44kzSNzYVBlgg0k9wCpH16TVfAu+IU4/
+         SKmsoE9OGhGxcgMNvkZRtP2MPlkHwoeZgJFdfwxjJrwR9VcehdG7BnmuLHwGoW0vJFsq
+         8SbVu1lQlgz5eH7LpixyYMW3MBfjvFUmC62YLrr7LA113yQGkrPX9U8N1Uf7/grc9Fsm
+         dJBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742941208; x=1743546008;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P8dONTFM6RC8uRNfo7doEMwcZfV7041orR9CUS1WNic=;
-        b=V7naSZaklU2pVwh1x/cZyU40lv6EjZih4L7ZjgL72hlq2yAPZVCcUq/x/aOaKrJeQM
-         p0w/piaPRQu/gMqoC3AwmQn3+0MU2Md5eZ4I5mjPK9DUvHNBYGK7TTpgJSHX7BBibT8C
-         oduE7l5rFtloiiNF9YdPKvstoAwZ6SdEZU35V2HTi2P5DUFrzFkSqi9ykmRXPsgWSR5i
-         2F4az1NWORoZF4Qk9U6ek3JzNlPFF+pYsqzROmtkdatwiI2yuago2kQrmLMrxnmSt/Vq
-         MrksEUA7cBb0gdvPtmSUMa8aChx8SOuaSz44VixNWJpdEKMa9B0vnJ7PNveZVtkEUDVA
-         Qs2w==
-X-Gm-Message-State: AOJu0Yz9YWMR6ZS4g28ELyMGYIHjfv89Tdzz027R/Oq4uuoDczrlco6p
-	dlewllkJcJUSRC0F6PK+7lTJV7bCX2F3xrU4my9ONMMJxEMTDVaIjFDdh58LJCR0Zil/vDfuRJk
-	MZ80zZt1r7iLxRc1r0GJ9k/Vqw8jr4OOroaAJplrdbOuWjl7u
-X-Gm-Gg: ASbGncv7xUHzic+htq9A7n3PqVc9L0DyibNQJ/e1OhYy7p204kGff6FvLhqPXkvbzKN
-	TyInwMJof3VKpCXzti2376O0wwqrNacM4WuO+wtC21NI9Qo/BvxRCUk6CwKkpHl+2LbQD3O+mag
-	eZf+sDO/dNTYFyRCFsASHB48DVAVQZbmY+bTuA0u25/EfGCJbeh0mcZr1Cbyym+bgUrBCJNaryQ
-	cHXSf6USJ5T8xKiPQzqK+1QbpZnrs+jsm5wh79Yv7MrlrdSj5ci4HvvhWjXi6Jy0DkFlSs1KqQg
-	1GEbD1KFmH1Vv/tl3bxD73Y3rcxytaehVls=
-X-Google-Smtp-Source: AGHT+IGkV8dFuwx5r2yLmkio5J6J8fr4hQ3tR+zgbUM8xz8jKTp4WzA8Bx5pOB3XzpAT281kk+7kSZkfNhRd
-X-Received: by 2002:a05:690c:a8b:b0:6fe:e76a:4d38 with SMTP id 00721157ae682-700bac5e14emr258757897b3.21.1742941208289;
-        Tue, 25 Mar 2025 15:20:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742941574; x=1743546374;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KKtFXFITA4hOuLwA4HcWHFD1w/QWq7sNwvdwYb0AV3c=;
+        b=uTz6aTyXG7RupVKFj2BEeFTHYb1qU578DD5F6tExAvuIQuovESdTgx/FXjnZKE0sHN
+         9tERk9dAkCH/fTA1uit2weIT8qXebAlAzr7+oS4Hog7aNFImA4JWpXdRvMbVaT7kxXEq
+         HCeMPdstDOCgJAvnvwQsSUbzivFlV4woRZ+wFaUrZTBhwhfQFKRhaNjMshNJmbFeJXiG
+         oAVZZlSOjFT+Fk2oV61u3dEQ5ut87f56OLoV26O4Fkr+UGNRqneks16aZN2swdK+vxfo
+         codnc2KXYXZvyIfC0m0d6vHfiKZBpRMuQNqEs6vZb8ebPA/b5DzNHK5giUjR11P4Ebl6
+         dg3w==
+X-Gm-Message-State: AOJu0YyzN+2BGl53YYK4zqWWQgEA9njt4kPsS0o8taOuLG9kwxNgTmkE
+	MWtpO9uWjSqRNQvm0bpZrDNIJdvm+2Mor/WsuSQejI46iMxkCUQhLiIcTONUEHGQfROkL32x+cw
+	/Mwa9BPlRKXBE+DGKvFn+1KE1LwTFvU/o0tZ4dKheJ/apR8Qc
+X-Gm-Gg: ASbGnctn0uvUha/FCbWrk2U2E9CyBd2QDSeiQ8eV9p69v3thx0b3FQhvqxAX4wwZ+JH
+	OdHKzEZKWGVzo3aUvdHU1l7a0tAgYYUs8pBYTCucy7X4bciqy9+lPkh9K4kcLOPwmSeFAkynhg4
+	i4YKYP+mkscxbOL5q5LZdtP7VmRbV5TkWNLTtmQeUL5YEl9HOhN4+yYwEAKhIzgdrU+HAHlDp95
+	KREYabu1pPa1F/AZ6sNL3/Bz4XhoB2+/gez9PLScTHLbuR5bKVhcL3IGbbo3M41qntTlvni/jH3
+	W7wiZUmhMX8vYAAiJQiTgtBoWzLMADr7Lq4=
+X-Google-Smtp-Source: AGHT+IGT0KKJcSpjdtMSKMKsUWymjpS7sayjzqsLE4bPkiJaL54O/zO+3IKG+hoGFZrocDh08pKlkUao+W+O
+X-Received: by 2002:a17:902:f683:b0:21f:136a:a374 with SMTP id d9443c01a7336-22780e25b3dmr295953605ad.43.1742941574203;
+        Tue, 25 Mar 2025 15:26:14 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-700ba82d5a9sm3786797b3.46.2025.03.25.15.20.07
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-227eb1938c4sm643615ad.58.2025.03.25.15.26.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 15:20:08 -0700 (PDT)
+        Tue, 25 Mar 2025 15:26:14 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5B1ED3404E1;
-	Tue, 25 Mar 2025 16:20:06 -0600 (MDT)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 70C3234041F;
+	Tue, 25 Mar 2025 16:26:13 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 4E772E415C9; Tue, 25 Mar 2025 16:20:06 -0600 (MDT)
+	id 0EFD8E40158; Tue, 25 Mar 2025 16:26:13 -0600 (MDT)
+Date: Tue, 25 Mar 2025 16:26:13 -0600
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Tue, 25 Mar 2025 16:19:33 -0600
-Subject: [PATCH 3/4] selftests: ublk: kublk: ignore SIGCHLD
+To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] selftests: ublk: kublk: use ioctl-encoded opcodes
+Message-ID: <Z+MthdcV2jaSBnwC@dev-ushankar.dev.purestorage.com>
+References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
+ <20250325-ublk_timeout-v1-1-262f0121a7bd@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250325-ublk_timeout-v1-3-262f0121a7bd@purestorage.com>
-References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
-In-Reply-To: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325-ublk_timeout-v1-1-262f0121a7bd@purestorage.com>
 
-SIGCHLD from exiting children can arrive during io_uring_wait_cqe and
-cause it to return early with -EINTR. Since we don't have a handler for
-SIGCHLD, avoid this issue by ignoring SIGCHLD.
+On Tue, Mar 25, 2025 at 04:19:31PM -0600, Uday Shankar wrote:
+> There are a couple of places in the kublk selftests ublk server which
+> use the legacy ublk opcodes. These operations fail (with -EOPNOTSUPP) on
+> a kernel compiled without CONFIG_BLKDEV_UBLK_LEGACY_OPCODES set. We
+> could easily require it to be set as a prerequisite for these selftests,
+> but since new applications should not be using the legacy opcodes, use
+> the ioctl-encoded opcodes everywhere in kublk.
 
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
----
- tools/testing/selftests/ublk/kublk.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index ded1b93e7913011499ae5dae7b40f0e425982ee4..064a5bb6f12f35892065b8dfacb6f57f6fc16aee 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -890,6 +890,7 @@ static int cmd_dev_add(struct dev_ctx *ctx)
- 		exit(-1);
- 	}
- 
-+	signal(SIGCHLD, SIG_IGN);
- 	setsid();
- 	res = fork();
- 	if (res == 0) {
-
--- 
-2.34.1
+Is it required to allow for the building of old userspace code (using
+legacy opcodes) against new kernel headers? Or do we only need to
+guarantee that old userspace code using legacy opcodes that is already
+compiled continues to work against newer ublk_drv? If it's the latter
+case, maybe we can consider removing the legacy opcode definitions from
+the userspace header as a follow-on change?
 
