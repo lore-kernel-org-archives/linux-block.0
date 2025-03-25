@@ -1,71 +1,71 @@
-Received: from mail-qv1-f100.google.com (mail-qv1-f100.google.com [209.85.219.100])
+Received: from mail-yw1-f225.google.com (mail-yw1-f225.google.com [209.85.128.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21A226A097
-	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 22:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF6F269D1D
+	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 22:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742941212; cv=none; b=PyLsTWC0DR8s+UocM1K1aZydWzOaLacdwDdXrqfd7agK8lHntby4yTcYcyfuAxz7p1d1b2iUG7mFA9LZmqRidFL/ckWwF0ypAWg+PeUSGGhxZSvDRivNIabneoVDn2TSBSYxpnoXTzuzO5lEKQEzOmc86ExkFQWd6ne4ZTC5LL4=
+	t=1742941212; cv=none; b=qeo27MhpLrf6C9LLypIK2tOfD7us0FClWJOTg4j0LccLIUhhvujdGeMpDU5pRX06Oe9sS/FM7gAblBt7DcN9aRcH5x+NSA0ect+cBrdtPlFQXGDNe5UTsTDDT42wgOnAA8dRl2s+b0lCdUrOU1BJFA6E9XRe5P4ePrpM9StVKD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742941212; c=relaxed/simple;
-	bh=iUUuXJBiCpZ2KY7Vcl/FqmY4eqvXt95bbU3djV7Lkxw=;
+	bh=NeRkZlcvaCBRIUNhcAknsxh2pPI89exFKSolPCOwHZM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RKYO3CNjLeT2mrl8Mjztt1Wd7ZDX2pEfruAwegPPc9ZLaeYIaiaEjnm4cpxU7hXCQFAYkp/asDwnttEPss2mZKcNis9mlbHpZeN5Y2duVDMqQQhPG+ikqojWWKJYG3ojpPgfIKWaxeGCE1WbTXkOSc3yerOQJSF0q0wZg9mrQjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fJDYVBx/; arc=none smtp.client-ip=209.85.219.100
+	 In-Reply-To:To:Cc; b=OrdVYWZrTObsOjtS+M9I1li2xJ7nobbYJmzG8rsukgpoCTStDGnwXVZXmLfb346aNUP/wMiUCabbsR13BGhELoHsGAfnLU1uu07DzlDNNdpy0vJFhwj3nxvb6EdUy18v+cbs34NWOwGKP1HmqrTgxgQA/rHYsiW/Wv3oJqU64pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dpLTqJz7; arc=none smtp.client-ip=209.85.128.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fJDYVBx/"
-Received: by mail-qv1-f100.google.com with SMTP id 6a1803df08f44-6e904f53151so53525826d6.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 15:20:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dpLTqJz7"
+Received: by mail-yw1-f225.google.com with SMTP id 00721157ae682-6f666c94285so59194137b3.3
+        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 15:20:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1742941209; x=1743546009; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1742941208; x=1743546008; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HPFNc5Esbl1AnvK1mUxwxpu3e5PtuYoRUmJc1JKQ2Hg=;
-        b=fJDYVBx/mrlK2PuUCUMmRBfN41b6b+r+EJNqKI2yLLMM4kcsW/44O4lBN8UMuF8q9i
-         66boKvu/zsn1raXFLh2SaZ4bd3ulNGL9Xq6Qo3dtPLPKp8ci9TS2PmvANGqH5NX0Fhxw
-         RM48bmygCfGfY50BWezm0LewX3gTqWyweLBR5JJFzZAYL9D/p3dROUToXDcyIfZED4t4
-         MoOEOvEbv+EucOC+8EOLSeqrqcP4n7tV79cvsBcuJw+HZ+E07d5lEUsafoIhuYf5G4Hv
-         Yu+x3t2YXj3qAZrD+8TYGm+2Gcabp7pyE6HdleAW9E3pkrfQWfOlG8M44xgVSokGBlKs
-         xeHw==
+        bh=P8dONTFM6RC8uRNfo7doEMwcZfV7041orR9CUS1WNic=;
+        b=dpLTqJz77dNB2PodaHyDQmKAThY6hSgYyHc1wGnQhVzNj4cRGZ1fSiocj/tpNOb4VE
+         ohxLDKa0NYyYGiXyqRxd8ltvM7nNq3FsXXfpdWrU2qnpuwv2x93r90B222FN5s7UGYj4
+         jiwItdje7ozCLsXKGb+NqfqnWyuBNYO2xCDAu0oH1mOGc2NE8v8TcXvGJsLABJq6wzZO
+         Fq3cZxJFatqh+FBdw5xlTabbCXpFWACN/YpeErCq0nJpbEPbu/1yCjC3ks6XkYqTbPO4
+         QsHeb3R9DamnkkR9X6AlMoVOtlqsVJeXNlp+KFuPLpy1hCF2dB5tFGYJA6ISgNNL4qW4
+         ArPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742941209; x=1743546009;
+        d=1e100.net; s=20230601; t=1742941208; x=1743546008;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HPFNc5Esbl1AnvK1mUxwxpu3e5PtuYoRUmJc1JKQ2Hg=;
-        b=ui5qn81OJGHEmG2OMOs24/c5MNfNYVFCp8TAdKSznSz8l3HG3aLmvLpyZ2x+vYsj91
-         yt9f+2TWTbTFe4mmIXlLpLyn38QQkV2A8aYJO+UPMtuUqyvLTMOzUPuix31QO/5h/mDh
-         +D8dUhr7kusdO8p95Cqw//+R1qI9tca9i7DtD55VcO/lokTsxft7xxO0a1P/98ltz/fm
-         VRTuS47v+gG/HUGMucGMwxhAeaGOLi/ODPTzfb0P8wUszWCW6/HKl2yEfIVcsbzE2eyx
-         hqW3x8WL2MtT6c+nq3j4pQLsB9YLe7RxSisYjf7yNEoqGN/kQHh+J/yC+6jZTtgL97MY
-         yPPQ==
-X-Gm-Message-State: AOJu0Ywu6r/GFlHhHrCMPGG+zGqgYgcxpXyBVTLUONvHrEyxM5Pa+C93
-	Ry4xV4KZm/yQLOazpSJR+cyF1sKY0AwQ2oLbhEjv3N3ILM6ZGP+KQqdxZhuBNZgvuynKVRaS3Nf
-	TPHXZvc+C7hp6Ha43/LNnRqRE+oIuZzwJ
-X-Gm-Gg: ASbGncsblElS/yAothurRGssw/9STULmzX1T6FDpiFe25HwFGyWZKN5PX0AMb+g4Wqq
-	Xr/CpmKGec+DYJH4/i4xtxKiad3gWYUbPDsV7S7D4wLR5wlFeROiyeKeXC4563cggiZu2OarvDL
-	tn8pkReBQ+JVeZo75KHMhfbj8nlsEHVUqouPnvRIT0k8Y9a5EgKojwVeWCO6FjaFJNmjnTejAzS
-	yaa+3zzIclFovSj/nSlNHGmBZzpPz/HTU+h/mxEW2kYQ+VCFH2xzUqKeg+wiwRRoa4/yzy+fnHX
-	Dnplmeg+ZM3Rl1PmrHv7ND7zbEcWZbR8CjcNZ54sYHCXI215NA==
-X-Google-Smtp-Source: AGHT+IHb+86ayT2ygvfsudkk78BISqn0oik+3h9hOJYmO2qtUwGHON9JVTSnF7D/muprKkeWETyBc8or7kNj
-X-Received: by 2002:a05:6214:124a:b0:6ea:d604:9e5b with SMTP id 6a1803df08f44-6eb3f27dbd6mr233467416d6.2.1742941209071;
-        Tue, 25 Mar 2025 15:20:09 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6ecf0aa8733sm3629376d6.8.2025.03.25.15.20.08
+        bh=P8dONTFM6RC8uRNfo7doEMwcZfV7041orR9CUS1WNic=;
+        b=V7naSZaklU2pVwh1x/cZyU40lv6EjZih4L7ZjgL72hlq2yAPZVCcUq/x/aOaKrJeQM
+         p0w/piaPRQu/gMqoC3AwmQn3+0MU2Md5eZ4I5mjPK9DUvHNBYGK7TTpgJSHX7BBibT8C
+         oduE7l5rFtloiiNF9YdPKvstoAwZ6SdEZU35V2HTi2P5DUFrzFkSqi9ykmRXPsgWSR5i
+         2F4az1NWORoZF4Qk9U6ek3JzNlPFF+pYsqzROmtkdatwiI2yuago2kQrmLMrxnmSt/Vq
+         MrksEUA7cBb0gdvPtmSUMa8aChx8SOuaSz44VixNWJpdEKMa9B0vnJ7PNveZVtkEUDVA
+         Qs2w==
+X-Gm-Message-State: AOJu0Yz9YWMR6ZS4g28ELyMGYIHjfv89Tdzz027R/Oq4uuoDczrlco6p
+	dlewllkJcJUSRC0F6PK+7lTJV7bCX2F3xrU4my9ONMMJxEMTDVaIjFDdh58LJCR0Zil/vDfuRJk
+	MZ80zZt1r7iLxRc1r0GJ9k/Vqw8jr4OOroaAJplrdbOuWjl7u
+X-Gm-Gg: ASbGncv7xUHzic+htq9A7n3PqVc9L0DyibNQJ/e1OhYy7p204kGff6FvLhqPXkvbzKN
+	TyInwMJof3VKpCXzti2376O0wwqrNacM4WuO+wtC21NI9Qo/BvxRCUk6CwKkpHl+2LbQD3O+mag
+	eZf+sDO/dNTYFyRCFsASHB48DVAVQZbmY+bTuA0u25/EfGCJbeh0mcZr1Cbyym+bgUrBCJNaryQ
+	cHXSf6USJ5T8xKiPQzqK+1QbpZnrs+jsm5wh79Yv7MrlrdSj5ci4HvvhWjXi6Jy0DkFlSs1KqQg
+	1GEbD1KFmH1Vv/tl3bxD73Y3rcxytaehVls=
+X-Google-Smtp-Source: AGHT+IGkV8dFuwx5r2yLmkio5J6J8fr4hQ3tR+zgbUM8xz8jKTp4WzA8Bx5pOB3XzpAT281kk+7kSZkfNhRd
+X-Received: by 2002:a05:690c:a8b:b0:6fe:e76a:4d38 with SMTP id 00721157ae682-700bac5e14emr258757897b3.21.1742941208289;
+        Tue, 25 Mar 2025 15:20:08 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-700ba82d5a9sm3786797b3.46.2025.03.25.15.20.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 15:20:09 -0700 (PDT)
+        Tue, 25 Mar 2025 15:20:08 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5940B3404B9;
-	Tue, 25 Mar 2025 16:20:07 -0600 (MDT)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5B1ED3404E1;
+	Tue, 25 Mar 2025 16:20:06 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 417E0E40158; Tue, 25 Mar 2025 16:20:06 -0600 (MDT)
+	id 4E772E415C9; Tue, 25 Mar 2025 16:20:06 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Tue, 25 Mar 2025 16:19:31 -0600
-Subject: [PATCH 1/4] selftests: ublk: kublk: use ioctl-encoded opcodes
+Date: Tue, 25 Mar 2025 16:19:33 -0600
+Subject: [PATCH 3/4] selftests: ublk: kublk: ignore SIGCHLD
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,7 +74,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250325-ublk_timeout-v1-1-262f0121a7bd@purestorage.com>
+Message-Id: <20250325-ublk_timeout-v1-3-262f0121a7bd@purestorage.com>
 References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
 In-Reply-To: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
@@ -83,40 +83,27 @@ Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-There are a couple of places in the kublk selftests ublk server which
-use the legacy ublk opcodes. These operations fail (with -EOPNOTSUPP) on
-a kernel compiled without CONFIG_BLKDEV_UBLK_LEGACY_OPCODES set. We
-could easily require it to be set as a prerequisite for these selftests,
-but since new applications should not be using the legacy opcodes, use
-the ioctl-encoded opcodes everywhere in kublk.
+SIGCHLD from exiting children can arrive during io_uring_wait_cqe and
+cause it to return early with -EINTR. Since we don't have a handler for
+SIGCHLD, avoid this issue by ignoring SIGCHLD.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 ---
- tools/testing/selftests/ublk/kublk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/testing/selftests/ublk/kublk.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 05147b53c3613a436e3a13848e146e0c66ca2525..b17eee643b2dbfd59903b61718afcbc21da91d97 100644
+index ded1b93e7913011499ae5dae7b40f0e425982ee4..064a5bb6f12f35892065b8dfacb6f57f6fc16aee 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -99,7 +99,7 @@ static int __ublk_ctrl_cmd(struct ublk_dev *dev,
- static int ublk_ctrl_stop_dev(struct ublk_dev *dev)
- {
- 	struct ublk_ctrl_cmd_data data = {
--		.cmd_op	= UBLK_CMD_STOP_DEV,
-+		.cmd_op	= UBLK_U_CMD_STOP_DEV,
- 	};
+@@ -890,6 +890,7 @@ static int cmd_dev_add(struct dev_ctx *ctx)
+ 		exit(-1);
+ 	}
  
- 	return __ublk_ctrl_cmd(dev, &data);
-@@ -169,7 +169,7 @@ static int ublk_ctrl_get_params(struct ublk_dev *dev,
- 		struct ublk_params *params)
- {
- 	struct ublk_ctrl_cmd_data data = {
--		.cmd_op	= UBLK_CMD_GET_PARAMS,
-+		.cmd_op	= UBLK_U_CMD_GET_PARAMS,
- 		.flags	= CTRL_CMD_HAS_BUF,
- 		.addr = (__u64)params,
- 		.len = sizeof(*params),
++	signal(SIGCHLD, SIG_IGN);
+ 	setsid();
+ 	res = fork();
+ 	if (res == 0) {
 
 -- 
 2.34.1
