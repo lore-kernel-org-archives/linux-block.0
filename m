@@ -1,144 +1,195 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5201E5B9E;
-	Tue, 25 Mar 2025 17:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF5C4A21
+	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 19:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742923070; cv=none; b=rtKNfm1I6LROd8L73C2QXjvpjIGog0wjfxaP6sYEV8C5wq8gFnjqFAaN3OeXxJDdHJm4SlV8oFHaGU8PNQYSKpRodGazUxkiQJzZzTl7QsLBcOngsGtaCH5/DHbtSbw7Y4+H4JbMpO5Rg7JY8wgItpTc0dzZc2DbNknefG0yeVU=
+	t=1742931820; cv=none; b=YFJ71fHj8Irb/wZNqKTKM4JAoI380LTSCh1jukKoHAJ2AjbqXDKYzoYZfeLysTmOjIw4A774niz0aHrtb6rkYNsAvKXfWBnTanWPTnnxiUAYlszyOiyxCD/xW07I8fEpg4IVC+y5/IIhQqY1qeWxrvjve18hjebRmCqhD784B9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742923070; c=relaxed/simple;
-	bh=b6MGlnUVaFKBQ+2xHwkDeovJSJdklX90bjhSIP8Uqkc=;
+	s=arc-20240116; t=1742931820; c=relaxed/simple;
+	bh=8pCGR0oWQsL/zrulkS68E97X7kUV6uH/q9mLsS22jZ0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lbx6HuIATkn/hOjfCdr9qmroOaXsCpLhDcss4qLE2PHLPpdPHvuvRF7z5aSLGNCB2oStADd0PIXfXZLfSSpWQ5uT+ZNoOSOZay92/SBvaHwTuXBZKAOQsy8AB1HyBorJo5eQvmP7Xb+vlN4z08g6djbXWJwPrkodbk3/DGA+Iww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=chE8zGi4; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=lYBndWP3wdHSSfgYjBtB11Kg8ooW0PMDxKuPZQUEw6jtA0hpWKrV3bXiSUP8Z7k+xLt2t7vWxtUXevvcNGo4SflzSbAwwst/KKLUdI6HZUSqiCK66R18Bbp2kjbuyE2qrTkwx/Kb+3xar69G/oiuiQctde96UhhDz0sxOxSlGDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FxBCAKBY; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="chE8zGi4"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-30bfd4d4c63so60157881fa.2;
-        Tue, 25 Mar 2025 10:17:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FxBCAKBY"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2264aefc3b5so14463485ad.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 12:43:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742923067; x=1743527867; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1742931818; x=1743536618; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ncjZuqLz4pCC4vphDuKl5ZPEUefScVXYO+j+PxLNSXk=;
-        b=chE8zGi4XqIqrv5sB9O5OWgRv3IWYGWbTNPTrgIkCSnLu4mpaEtpyDqCBx+FQUmXyQ
-         Fl0fEWKOuVdo6AfvbQ6lQDmBN9O/Sq6oTvCdPt8sprjVhCs388SMlux64f6Z1/1i8k2Z
-         0Q5qiJlSR5E5hJkgwGFiDyEcAEOryMlE/1Xa9dg9PjSGwJ5JLOLArHWD8ESltnQ5mF9K
-         JxwK3UostqofxMdAlH5vUE/Y9vbVO9M/2uJLwYTIQgBZcxjRSBIM1mB9FUhOV+uyGe0/
-         mC27Q43oCbD1yxSQJ6qDqzrJG7AU3zi81frK6Ov510F+JDT4o8IYg3+VNUFXEM8UHHdW
-         FLQw==
+        bh=5BMCkyqXqh/cZutpqeBhbEl3alZwGc4iqYZYwunOAvY=;
+        b=FxBCAKBY6f9/oi0ZrxDyjUYQJheiyBm83ggAg48YsIF6xC6Gu5BtZ46gkHVCWmYLx9
+         jkwrzwcQ5sMEEnz1Ax+hOy1mn+IHusItZ90mBbcLRk9cndSBTJWWzsLyGLzZBEDY5Ty2
+         Ng1452vJYY2prMJINKwhHs4gSVIdUyt/jaDE0hs+aRiJts9ef6JuOK3cdOhMqzth2jrM
+         68LlZRNgbFqFOiuZZtoLZPIrXm7KepJ4+0y5Cf3qDM1VUMPdVFyf5j5wQGnXKORP3mb6
+         +gSdHkGMccUV5IgWyFByJnBguc4i6eQ2JLP671wBDNq0y+/amRKmBKvSEPzGxANL7SC+
+         NMuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742923067; x=1743527867;
+        d=1e100.net; s=20230601; t=1742931818; x=1743536618;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ncjZuqLz4pCC4vphDuKl5ZPEUefScVXYO+j+PxLNSXk=;
-        b=O+H1NCc5ZiihLR5VaslFJQpKUYAfg1qk0tvveRfuUHfh2wleQWDC/PyCkxMX9pk8zY
-         iuG9Wv4BXpqqcNe5Mb8b2GsAUazGb7wliHVuykQjbrTy0vDRcN1MgPLchfSQC4cCDPUi
-         oAIZurjwqkYk0fEma+LGODLLJjzqQ8Su8KjsBU18r/PC/9QEGPobvVRgAsnCX7aI+t+u
-         xuruTm9NY+t6qEduNYg+hBAa/aeDh0g2WWCSbhjM6UD5TkeS1RWBYpVmP5RMCqx+jXLW
-         dcylwhx1iLvxs8r6iRHFHwmhTLQsx9lKuEMlLzAy5oIlPmQpcpi36AYUpH6YPUNgF27i
-         bXEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURQcgI4KfD9HA1UuB3yE7JQHkLKIXGzot2H6ncwW9+tLYmsIi+XEGWdeAhiYHV4rmG9LJtpK060V/8i8D+@vger.kernel.org, AJvYcCUxmyZFjf9+7SEpHAPU5LNoQd74T1rHzsPYSR8WHIvpiSDll3ObszKlGqLiolNkttJxbFxEYGIrEQj5LK0=@vger.kernel.org, AJvYcCVDOXk5CSSltCXMusu/YaW3+X00KSJQ/xKdRe6fBRUjJicizZj0CKXT3vaPxXZ0jIMAXdBHMCWNnncazolQM9yu@vger.kernel.org, AJvYcCVS0KJoxxoEgD93+bzub5IDrTyw464yCiOq2rRdVGQ0Uu4w6gVG2h48/XxakYHG2kAIZ+7DCzAuj11f@vger.kernel.org, AJvYcCVjzI95P2wI0ISTP1RWMTbvvqagt369jA2C/hhQ+6MvHDRDWiJjJzE0Gonaft4++NGn3mQ/tVihcvgu@vger.kernel.org, AJvYcCXEyOGWpjSMEEIVKumtMEgtOGqqLIxrp1X0ew5fb/f30mZ9YxDV3coijqcckpwJG4zmnQjPZ4ut8Klp9567@vger.kernel.org, AJvYcCXROI1TbrYkYL66KTXX9gLdNMgNA1aGQ8jhF8OcSVuUksf8BhK3wxP7W8Fr4m7vh9vfHt2/s9qKx5DfzO/jCx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPDqaRApEYYME2dVxALU485X8l9+W/1PbBahFmupYkf3VoWWt/
-	45DCVo4wUhHYg/lDrKsDJgVLjEJcfKnwaIbZUpHDnzrN21/90LUrSZJZS26J4d8upAdyBZLetay
-	sonJpnpj7kdgE1uqDPzRRJjj0HfA=
-X-Gm-Gg: ASbGncutG8fUCQatClst2ow8OXecMPw+wcjbWH16j++a87li5srjRO6Tss6+SSiKFPs
-	xrrFA58c35/K3TUhB724FfrhZ92qzNa4RZUrR9iR9kWUq51XWzbndqb4E41/4AQKeAmP6Wx5Yjn
-	iwupgEJ8yUKYVpGX3bkBTssYDVRVeCSHZ854xmz4671A==
-X-Google-Smtp-Source: AGHT+IEho6TRTFYibffTOcXg2imxNyfO/NDJlMfW4YuFXt5pXTh3sRV4mlcchTRWE3KKFuAFKeLrQV8vCY3tNcZg+Mc=
-X-Received: by 2002:a2e:88cb:0:b0:30c:177c:9e64 with SMTP id
- 38308e7fff4ca-30d7e2bce01mr65584441fa.35.1742923066511; Tue, 25 Mar 2025
- 10:17:46 -0700 (PDT)
+        bh=5BMCkyqXqh/cZutpqeBhbEl3alZwGc4iqYZYwunOAvY=;
+        b=RicDB1wIvR34wAVIkPG8S65rmRDwIcF3Y691GakLIVl8F+otxP82k2HnhGaKB0extb
+         lbFSHIZTgTXcoJ1dVSvXmCtS5FrurnQh5Z4AxSP2S7HwyEar7I0cq+GDvxZVUHggUOD2
+         L2rdQHEotp9UC9+7PqLR5wE9scAlcWYLwhsi9/+pfPXZO5WP6Xe5nGzyeGmHacqFPohn
+         bgMrSmpvtek2YqZBD76uQcvakoYIz+wQ7h5AuyJcItxbdED9OTlshEYS4PZYiKodTQfF
+         Nj4NvTXI55KrZ++Rx5gFB0j4gFYWCRoT3EuGozIqzCw4wmRQ+eGytQeHJzLFUP1YW6yy
+         dtMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUY+bUFKGq7Zb35WnkiZCZxD/71gM1xJNdm1lonssrXUbazn2FMQU6Z7q+nzk4q8wb3RnvgWjYGJIijOQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtVdHLTxAiLpK0Eh+vNYWNjESt/qWxC/tk81aqP0PJifN7HN+Z
+	w+EY7Dx+sXiJ0rZ4DESMxnsWXSGo5R5lOpNXjbMHNiVdkqxDUy40DSi4OswI5qOPCBCOHwyD0Dx
+	xV4fnkZFpviKvtO8TVuVx45nmOC77YdCBYiRNKQ==
+X-Gm-Gg: ASbGncu4IJgzb/CaSwULUe8zhhU19LOm51l72SgnVRWDCTBl1MdOIuYqGmGbno04RJt
+	LiLyaKmB/3D+C9EeYG4D3qLUvjOgm8Ws2b+atguii04sR55xe+o6zFAftnz04Z2FziPKsX7QqCP
+	e0ifXRGP0ewvsLxe4CgWxE9SHz
+X-Google-Smtp-Source: AGHT+IHVY3zfJID9ukncnoAFGijme5y/FvdL8B0djR3QSWjPQX12duGznltyLRDp34ibFtM6XKQvELwqmZb+sLiW7EQ=
+X-Received: by 2002:a17:903:2306:b0:21f:519:6bc6 with SMTP id
+ d9443c01a7336-22780def9c3mr102015095ad.9.1742931817507; Tue, 25 Mar 2025
+ 12:43:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317-ptr-as-ptr-v5-0-5b5f21fa230a@gmail.com>
- <D8ORTXSUTKGL.1KOJAGBM8F8TN@proton.me> <CAJ-ks9n-z0SETz+zBfJmda6Q_vJDeM2jmDXx48xX9qpMmR-mdQ@mail.gmail.com>
- <D8OTXLDQCOKI.34R1U5R0JSB8H@proton.me> <CAJ-ks9nc0ptzfh+tHj47aTCMqoaKB0SnGpZOLQ06upt7x8EBMQ@mail.gmail.com>
- <D8PAQXHJDVQE.36QKQGBVVL4QU@proton.me> <CAJ-ks9kuG8SyybioKQ0+bYwjnCQFMhip+4A1WnMhsdgnNZGiZQ@mail.gmail.com>
- <D8PGG7NTWB6U.3SS3A5LN4XWMN@proton.me>
-In-Reply-To: <D8PGG7NTWB6U.3SS3A5LN4XWMN@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Tue, 25 Mar 2025 13:17:10 -0400
-X-Gm-Features: AQ5f1Jo-XOMVt3AtJU0OfhrKyPKg6t27WTK1AODdNRJ_VnhlwpYHl6kJ4WNIc0w
-Message-ID: <CAJ-ks9mMVzm4m20AxiZ53DyAmSEaEh9veMoVB5XRxmTQP_H_ZQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] rust: reduce pointer casts, enable related lints
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org
+References: <20250324134905.766777-1-ming.lei@redhat.com> <20250324134905.766777-5-ming.lei@redhat.com>
+ <CADUfDZo4jmifYJwDRsX0FMemxDiuRu_XG6GV6+drVUOgDk3QwQ@mail.gmail.com> <Z-IDwx3mv6I90hhg@fedora>
+In-Reply-To: <Z-IDwx3mv6I90hhg@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 25 Mar 2025 12:43:26 -0700
+X-Gm-Features: AQ5f1Jq20vMaXFC5PczMZvnY05Sskpy2habWzGN322yEzlCG3SkcgwB-0xXrcQQ
+Message-ID: <CADUfDZpv-EmJy+GZcWL=q5MHg4ovae_kg8k+ewcdrwNTQ_zK9g@mail.gmail.com>
+Subject: Re: [PATCH 4/8] ublk: add segment parameter
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Keith Busch <kbusch@kernel.org>, Uday Shankar <ushankar@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 25, 2025 at 11:33=E2=80=AFAM Benno Lossin <benno.lossin@proton.=
-me> wrote:
+On Mon, Mar 24, 2025 at 6:16=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> On Tue Mar 25, 2025 at 2:34 PM CET, Tamir Duberstein wrote:
-> > On Tue, Mar 25, 2025 at 7:05=E2=80=AFAM Benno Lossin <benno.lossin@prot=
-on.me> wrote:
-> >> On Mon Mar 24, 2025 at 10:59 PM CET, Tamir Duberstein wrote:
-> >> > On Mon, Mar 24, 2025 at 5:55=E2=80=AFPM Benno Lossin <benno.lossin@p=
-roton.me> wrote:
-> >> >> On Mon Mar 24, 2025 at 9:55 PM CET, Tamir Duberstein wrote:
-> >> >> > On Mon, Mar 24, 2025 at 4:16=E2=80=AFPM Benno Lossin <benno.lossi=
-n@proton.me> wrote:
-> >> >> >> I'll leave it up to you what you want to do with this: add it to=
- this
-> >> >> >> series, make a new one, or let someone else handle it. If you do=
-n't want
-> >> >> >> to handle it, let me know, then I'll create a good-first-issue :=
-)
-> >> >> >
-> >> >> > I'll add a patch for `cast_lossless` -- the rest should probably =
-go
-> >> >> > into an issue.
-> >> >>
-> >> >> Do you mind filing the issue? Then you can decide yourself what you=
- want
-> >> >> to do yourself vs what you want to leave for others. Feel free to c=
-opy
-> >> >> from my mail summary.
-> >> >
-> >> > Well, I don't really know what's left to do. We're pretty close at
-> >> > this point to having enabled everything but the nukes. Then there's
-> >> > the strict provenance thing, which I suppose we can write down.
-> >>
-> >> Yes, but there are also these from my original mail:
-> >> * `shared_ref as *const _` (for example in rust/kernel/uaccess.rs:247,
-> >>   rust/kernel/str.rs:32 and rust/kernel/fs/file.rs:367), these we can
-> >>   replace with `let ptr: *const ... =3D shared_ref;`. Don't know if th=
-ere
-> >>   is a clippy lint for this.
+> On Mon, Mar 24, 2025 at 03:26:06PM -0700, Caleb Sander Mateos wrote:
+> > On Mon, Mar 24, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.com> =
+wrote:
+> > >
+> > > IO split is usually bad in io_uring world, since -EAGAIN is caused an=
+d
+> > > IO handling may have to fallback to io-wq, this way does hurt perform=
+ance.
+> > >
+> > > ublk starts to support zero copy recently, for avoiding unnecessary I=
+O
+> > > split, ublk driver's segment limit should be aligned with backend
+> > > device's segment limit.
+> > >
+> > > Another reason is that io_buffer_register_bvec() needs to allocate bv=
+ecs,
+> > > which number is aligned with ublk request segment number, so that big
+> > > memory allocation can be avoided by setting reasonable max_segments l=
+imit.
+> > >
+> > > So add segment parameter for providing ublk server chance to align
+> > > segment limit with backend, and keep it reasonable from implementatio=
+n
+> > > viewpoint.
+> > >
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  drivers/block/ublk_drv.c      | 15 ++++++++++++++-
+> > >  include/uapi/linux/ublk_cmd.h |  9 +++++++++
+> > >  2 files changed, 23 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index acb6aed7be75..53a463681a41 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -74,7 +74,7 @@
+> > >  #define UBLK_PARAM_TYPE_ALL                                \
+> > >         (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
+> > >          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
+> > > -        UBLK_PARAM_TYPE_DMA_ALIGN)
+> > > +        UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
+> > >
+> > >  struct ublk_rq_data {
+> > >         struct kref ref;
+> > > @@ -580,6 +580,13 @@ static int ublk_validate_params(const struct ubl=
+k_device *ub)
+> > >                         return -EINVAL;
+> > >         }
+> > >
+> > > +       if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
+> > > +               const struct ublk_param_segment *p =3D &ub->params.se=
+g;
+> > > +
+> > > +               if (!is_power_of_2(p->seg_boundary_mask + 1))
+> > > +                       return -EINVAL;
 > >
-> > I don't think we should go fixing things for which we don't have a
-> > clippy lint. That way lies madness, particularly as patches begin to
-> > be carried by other trees.
+> > Looking at blk_validate_limits(), it seems like there are some
+> > additional requirements? Looks like seg_boundary_mask has to be at
+> > least PAGE_SIZE - 1
 >
-> There already exists a lint for that: `clippy::ref_as_ptr` (almost
-> created an issue asking for one :)
+> Yeah, it isn't done in ublk because block layer runs the check, and it
+> will be failed when starting the device. That said we take block layer's
+> default setting, which isn't good from UAPI viewpoint, since block
+> layer may change the default setting.
 
-=F0=9F=AB=A1 picked this one up as well.
+Even though blk_validate_limits() rejects it, it appears to log a
+warning. That seems undesirable for something controllable from
+userspace.
+/*
+ * By default there is no limit on the segment boundary alignment,
+ * but if there is one it can't be smaller than the page size as
+ * that would break all the normal I/O patterns.
+ */
+if (!lim->seg_boundary_mask)
+        lim->seg_boundary_mask =3D BLK_SEG_BOUNDARY_MASK;
+if (WARN_ON_ONCE(lim->seg_boundary_mask < BLK_MIN_SEGMENT_SIZE - 1))
+        return -EINVAL;
 
-> Here is another lint that we probably want to enable (after the `&raw
-> {const,mut}` series lands): `clippy::borrow_as_ptr`.
+>
+> Also it is bad to associate device property with PAGE_SIZE which is
+> a variable actually. The latest kernel has replaced PAGE_SIZE with 4096
+> for segment limits.
+>
+> I think we can take 4096 for validation here.
+>
+> > and max_segment_size has to be at least PAGE_SIZE
+> > if virt_boundary_mask is set?
+>
+> If virt_boundary_mask is set, max_segment_size will be ignored usually
+> except for some stacking devices.
 
-This sounds like a good one to file.
+Sorry, I had it backwards. The requirement is if virt_boundary_mask is
+*not* set:
+/*
+ * Stacking device may have both virtual boundary and max segment
+ * size limit, so allow this setting now, and long-term the two
+ * might need to move out of stacking limits since we have immutable
+ * bvec and lower layer bio splitting is supposed to handle the two
+ * correctly.
+ */
+if (lim->virt_boundary_mask) {
+        if (!lim->max_segment_size)
+                lim->max_segment_size =3D UINT_MAX;
+} else {
+        /*
+         * The maximum segment size has an odd historic 64k default that
+         * drivers probably should override.  Just like the I/O size we
+         * require drivers to at least handle a full page per segment.
+         */
+        if (!lim->max_segment_size)
+                lim->max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
+        if (WARN_ON_ONCE(lim->max_segment_size < BLK_MIN_SEGMENT_SIZE))
+                return -EINVAL;
+}
+
+Best,
+Caleb
