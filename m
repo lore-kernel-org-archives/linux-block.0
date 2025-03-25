@@ -1,68 +1,94 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F492620C1
-	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 12:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C12029C35D
+	for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 12:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905446; cv=none; b=pDRIbDqLp/KVVgwsZSnJTVAMSX06JhBPV3MNMxz6CBZTy+TeoKLLcqjY1UMI/17iMzPIxtgvFvYMmDKIdIeE/VAM6rWUgFEe0+Ye0nM8myHaW9kCvZj12vy38JPGK/NMnkR/5kCJbLAgy9e6NN2fu/XjNiizIIbTLQMNW1u7tYw=
+	t=1742906202; cv=none; b=bZkIH3r/BDXGv1tnuXyNpQ/63l2hbEHsrU3OHuzyj5JyIhvgZW81XV1LiryeneANzpNVFP+19y5wGeilouxzqlsZkr4Ipu1RoBBkgl3KCb6YCU8aDxDB9mc0uadql0PnYj0j/qggscdVuK4StuBBNMGtUie44at+Gy4jEapt3qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905446; c=relaxed/simple;
-	bh=wn1WBoIMzL15p320nXFa8dKndRoz/qSGoUe1u5eIMCQ=;
+	s=arc-20240116; t=1742906202; c=relaxed/simple;
+	bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NgM9Yf+ekPlX/ktmTamzKlioR2tyLKX/5o5kV3AzqHSPJES/fgs9eDSvRiXTl/DAISyfhbniS+1Do77h5gvaikJiFA/6rrFHek0YS/aVi5ME8I9I/JjYJIuukyfrUdS6NnVycGMPNoHqTnU8BjDjAR7kdxuNELA8Xn0VcHVDNnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T2cStf5v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=aIxl3s1BETCyNnOlwYouZz7WwYXHan81bXGgSk5xTOCD0/hJNWETV2G6stA9EP2Wpcyo/fXwxGEzsZQo0FfyrAbTybSujTzvrixuQo7n3vrYZLuueetCe83GJzE8uYVom7Q1RHuNW01LmfynJ+8S52bxlNuYAOGZjfehkrdx2hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R6aoxlLP; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T2cStf5v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742905443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8FZoxiXkYnN/E/dxEvlD3+meuAIyG+ElT4G9u+2PW1g=;
-	b=T2cStf5v6jLrUZg0Zv/+LJlDGP0ASsfO94Yn7ChoQK8hw/pfxxiU4p2atp8NSYYIZuhaKv
-	z2RCKrc75Vov+NYPJE6EsEoKhMCO5apyaOJUmKbVwNvyKz9u0FZpbHi9dxA9nWeC/bw16t
-	C8pm0H6esXdDK0GoAWS3Oim0cCI9nA8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-1sbbKYNFPeeJZ9r7Jdz1Wg-1; Tue,
- 25 Mar 2025 08:24:00 -0400
-X-MC-Unique: 1sbbKYNFPeeJZ9r7Jdz1Wg-1
-X-Mimecast-MFC-AGG-ID: 1sbbKYNFPeeJZ9r7Jdz1Wg_1742905438
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1EBC180049D;
-	Tue, 25 Mar 2025 12:23:57 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 397CA180A803;
-	Tue, 25 Mar 2025 12:23:48 +0000 (UTC)
-Date: Tue, 25 Mar 2025 20:23:43 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jooyung Han <jooyung@google.com>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Heinz Mauelshagen <heinzm@redhat.com>, zkabelac@redhat.com,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH] the dm-loop target
-Message-ID: <Z-KgT3Xine0kcVo-@fedora>
-References: <Z9ATyhq6PzOh7onx@fedora>
- <Z9DymjGRW3mTPJTt@dread.disaster.area>
- <Z9FFTiuMC8WD6qMH@fedora>
- <7b8b8a24-f36b-d213-cca1-d8857b6aca02@redhat.com>
- <Z9j2RJBark15LQQ1@dread.disaster.area>
- <Z9knXQixQhs90j5F@infradead.org>
- <Z9k-JE8FmWKe0fm0@fedora>
- <Z9u-489C_PVu8Se1@infradead.org>
- <Z9vGxrPzJ6oswWrS@fedora>
- <Z-KCPvmBO3AeuiDf@dread.disaster.area>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R6aoxlLP"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-47688ae873fso56414191cf.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Mar 2025 05:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1742906199; x=1743510999; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
+        b=R6aoxlLPQAkjRJPVn6UQKY+axJtOgCb9opi7uMwdqzSxq6yDpzVJboXoMURzqFNmXG
+         L4O6evUJSpFvB1ok/nkAvZ2ctxsJoJGXuCD5Hfcl44KP64YYXU13GEP0YO8Nau/AluDo
+         dwmvpAQBTe1LqtUycADgDK7X5PVMkLiTdnUNXX0D9l0eroks0GyGaEG2e0DV8VX4ddgC
+         7zSjqhv0fWoL3gPf+VGU1+rXRM5Nwx0srQafUgfbqXPk3xjimSWRPzLHwxPFJ/VzIJm8
+         styI2AyIntvNjgTTu1Uz79TV7Z9P2nkoB/bDnkzGibSm9AMzCtsSkHlsSbxQRi2emnYn
+         A+Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742906199; x=1743510999;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kF/4SP83eP8Xbwc4RoYXxSygK8pZn4d3t2Dba+Ka8B8=;
+        b=i/E0gzLhcqpSEmkaBBz9EcUWXHdpJsoKgJxZ2WZhnOBckFJWo0VWkayTIy2gI3DLLu
+         v6xCVT7UifDGNIcBowCWl0ZH+foKnlW0U22mELOSBgiW8IRRsK2ucq5mPqE8gQHu596A
+         EzWzOt5PVOan634Gfwr8nai15caQJyVoo4GeQdf6EQbpitjfPo3lFfokyFvwVOvjjghS
+         I/lWRazPLtDz3scEf+Qj1ZKpFc7B0EJ/rmCt2ngGiyPp8G8SPn2gs1Ja8t7YB2c4LCww
+         W8fHUf25M/j/oF2krNt/P2ISfVpH0dc+Ik6jmewieAPaENifgjcmHvkNwEmi8kzOIWwb
+         CUQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRZ0/LZyUwZXeMmReszpA/MpUrhiN3srnhP/Smo2a6o+S8euarTflly+NHXq+5c7gR0zzL0EyLoNx53w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw68+PKha4Bh00zljBpNqLXij8AF+SvQicjSuWfUlSgykNJcy6s
+	Jhk9XFn6bRNtOkbd/01+gko1d9jBMYa2hEynn4tGNOZ3NtMiPmudtNFJWrAoERM=
+X-Gm-Gg: ASbGncuG35uIaQKoM3JqBOJorG4IV40LFMsSeA6LDDjqxJpo4PdESpfosFn2em2YU30
+	g6ypBCjFZ99lT2dfXsr0P6JA1NQz8DrqWSacg/YXcCCLhGnP8T/lOX4jQTWdnRa/p/nXb09N6AP
+	DEzR6E+Da0dmC5ydwIv79P91q2t0amUOIjGG1hpO44GDofi96Z505E6BJRsIqq72QTFEcxH+ctK
+	HMie4kRZ/4fi/bG8s+HWBYpVsm50yHDAtVtuujwD/CahGpkYvlKKvUoPoYCECU+zHyKTO7tGhiy
+	w5CBlY6jvyHOemlROw==
+X-Google-Smtp-Source: AGHT+IFaGG2Y6kZs0f1G4EEOh4+V+xY6UlM60nMPDSox/R89SepA61uky3NuOhrbXo7zMnxqikKbBQ==
+X-Received: by 2002:a05:622a:4106:b0:477:cc4:cb76 with SMTP id d75a77b69052e-4771dd54452mr310138501cf.3.1742906199124;
+        Tue, 25 Mar 2025 05:36:39 -0700 (PDT)
+Received: from ziepe.ca ([99.209.85.25])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d63597dsm59500991cf.71.2025.03.25.05.36.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 05:36:38 -0700 (PDT)
+Received: from jgg by jggl with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tx3WH-0003AX-NS;
+	Tue, 25 Mar 2025 09:36:37 -0300
+Date: Tue, 25 Mar 2025 09:36:37 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
+Message-ID: <Z+KjVVpPttE3Ci62@ziepe.ca>
+References: <cover.1738765879.git.leonro@nvidia.com>
+ <20250220124827.GR53094@unreal>
+ <1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
+ <20250302085717.GO53094@unreal>
+ <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,110 +97,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z-KCPvmBO3AeuiDf@dread.disaster.area>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <e024fe3d-bddf-4006-8535-656fd0a3fada@arm.com>
 
-On Tue, Mar 25, 2025 at 09:15:26PM +1100, Dave Chinner wrote:
-> On Thu, Mar 20, 2025 at 03:41:58PM +0800, Ming Lei wrote:
-> > On Thu, Mar 20, 2025 at 12:08:19AM -0700, Christoph Hellwig wrote:
-> > > On Tue, Mar 18, 2025 at 05:34:28PM +0800, Ming Lei wrote:
-> > > > On Tue, Mar 18, 2025 at 12:57:17AM -0700, Christoph Hellwig wrote:
-> > > > > On Tue, Mar 18, 2025 at 03:27:48PM +1100, Dave Chinner wrote:
-> > > > > > Yes, NOWAIT may then add an incremental performance improvement on
-> > > > > > top for optimal layout cases, but I'm still not yet convinced that
-> > > > > > it is a generally applicable loop device optimisation that everyone
-> > > > > > wants to always enable due to the potential for 100% NOWAIT
-> > > > > > submission failure on any given loop device.....
-> > > > 
-> > > > NOWAIT failure can be avoided actually:
-> > > > 
-> > > > https://lore.kernel.org/linux-block/20250314021148.3081954-6-ming.lei@redhat.com/
-> > > 
-> > > That's a very complex set of heuristics which doesn't match up
-> > > with other uses of it.
-> > 
-> > I'd suggest you to point them out in the patch review.
-> 
-> Until you pointed them out here, I didn't know these patches
-> existed.
-> 
-> Please cc linux-fsdevel on any loop device changes you are
-> proposing, Ming. It is as much a filesystem driver as it is a block
-> device, and it changes need review from both sides of the fence.
+On Fri, Mar 21, 2025 at 04:05:22PM +0000, Robin Murphy wrote:
 
-Please see the patchset:
+> What everyone seems to have missed is that while it is technically true that
+> the streaming DMA API doesn't need a literal struct page, it still very much
+> depends on something which having a struct page makes it sufficiently safe
+> to assume: that what it's being given is valid kernel memory that it can do
+> things like phys_to_virt() or kmap_atomic() on.
 
-https://lore.kernel.org/linux-block/20250322012617.354222-1-ming.lei@redhat.com/
+No one has missed this, we are not yet at the point of implementing a
+non-struct page PFN only path. That is going to be a followup series,
+and yes there are going to need to be some cases where DMA will get
+EOPNOTSUPP. You can't swiotlb something without a kmap, or MMIO for
+instance.
 
-> 
-> > > > > Yes, I think this is a really good first step:
-> > > > > 
-> > > > > 1) switch loop to use a per-command work_item unconditionally, which also
-> > > > >    has the nice effect that it cleans up the horrible mess of the
-> > > > >    per-blkcg workers.  (note that this is what the nvmet file backend has
-> > > > 
-> > > > It could be worse to take per-command work, because IO handling crosses
-> > > > all system wq worker contexts.
-> > > 
-> > > So do other workloads with pretty good success.
-> > > 
-> > > > 
-> > > > >    always done with good result)
-> > > > 
-> > > > per-command work does burn lots of CPU unnecessarily, it isn't good for
-> > > > use case of container
-> > > 
-> > > That does not match my observations in say nvmet.  But if you have
-> > > numbers please share them.
-> > 
-> > Please see the result I posted:
-> > 
-> > https://lore.kernel.org/linux-block/Z9FFTiuMC8WD6qMH@fedora/
-> 
-> You are arguing in circles about how we need to optimise for static
-> file layouts.
-> 
-> Please listen to the filesystem people when they tell you that
-> static file layouts are a -secondary- optimisation target for loop
-> devices.
-> 
-> The primary optimisation target is the modification that makes all
-> types of IO perform better in production, not just the one use case
-> that overwrite-specific IO benchmarks exercise.
-> 
-> If you want me to test your changes, I have a very loop device heavy
-> workload here - it currently creates about 300 *sparse* loop devices
-> totalling about 1.2TB of capacity, then does all sorts of IO to them
-> through both the loop devices themselves and filesystems created on
-> top of the loop devices. It typically generates 4-5GB/s of IO
-> through the loop devices to the backing filesystem and it's physical
-> storage.
+> efficiently. And pushing the complexity into every caller to encourage and
+> normalise drivers calling virt_to_phys() all over (_so_ many bugs there...)
 
-The patchset does cover the sparse backfile, and I also provide one test
-case in which one completely sparse file is used, and make sure that
-there isn't regression in this case.
+That is unlikely to be how things end up.
 
-This patchset is supposed to address Mikulas's case of stable FS mapping,
-meantime without introducing regression on other cases, such as
-the sparse backing file.
+> and pass magic flags to influence internal behaviour of the API
+> implementation clearly isn't scalable. Don't think I haven't seen the other
+> thread where Christian had the same concern that this "sounds like an
+> absolutely horrible design."
 
-> 
-> Speeding up or slowing down IO submission through the loop devices
-> has direct impact on the speed of the workload. Using buffered IO
-> through the loop device right now is about 25% faster than using
-> aio+dio for the loop because there is some amount of re-read and
-> re-write in the filesystem IO patterns. That said, AIO+DIO should be
-> much faster than it is, hence my interest in making all the AIO+DIO
-> IO submission independent of potential blocking operations.
-> 
-> Hence if you have patch sets that improve loop device performance,
-> then you need to make sure filesystem people like myself see those
-> patch series so they can be tested and reviewed in a timely manner.
-> That means you need to cc loop device patches to linux-fsdevel....
+Christian's perspective is thinking about DMABUF exporters using CPU
+PFNs to mmap them to VMAs. Which is a uniquely DRM API abuse.
 
-OK, will Cc you and linux-fsdevel in future loop patch submission.
+I think everyone who has really dug into this stuff understands that
+the driver that is going to perform the DMA should be the one to do
+the DMA mapping. It makes little sense for the driver providing the
+memory to do the DMA mapping on behalf of the driver programming the
+HW for DMA.
 
+Regardless it doesn't really change this series as the same DMA API
+interface to the driver is required to do the work. It doesn't matter
+if the DMABUF API puts the calls on the exporter or importer side of
+it's API.
 
-Thanks,
-Ming
+> So what is it now, a layering violation in a hat with still no clear path to
+> support SWIOTLB?
 
+I was under the impression Leon had been testing SWIOTLB?
+
+What does "no clear path to support SWIOTLB" mean?
+
+Jason
