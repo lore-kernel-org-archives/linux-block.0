@@ -1,91 +1,136 @@
-Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f98.google.com (mail-oa1-f98.google.com [209.85.160.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BDD383A5;
-	Wed, 26 Mar 2025 22:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098C11C8600
+	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 23:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743027355; cv=none; b=BuYFO3syV0PrjBe0cW8mMSfkdRUR5JRUERlRbTd3hQ/KLnRSsJ+n+gRwnEx4Gm77eGsBxxXBTMP+dh3Jw027sGf8pprbQDzeGylgICIN6cwIQytXVR5IOLL6dxFZwkKSq8r9zWyuqskrDIipl5KD2eq4H97Z8X9ppN2r8oVe8Nw=
+	t=1743030503; cv=none; b=KHDVYP6zUq0AAfSGVuVcvxj3YSi9a6EFeAa/dcXMEVkcxKKTfKuKKke31aWjhBYGNYAyXcFU9ZTp+IOAc1rUv7FkH6PPjnYlyWdoRjzz3J3a8XJYcYYXsNsVkOBCn7LJF4Ncq00z54YpT/e2BfUPdaBWMVKWfYbDMTm0lHtpWv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743027355; c=relaxed/simple;
-	bh=to6Tsfx7WaJmCqvucS0jsS/ayq4WMOWhnETk19VRfdE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CMju6WGh3tNRhQ0d+wLxGgo0yrSj0C2S+oitt4+2vCdMFjh01iBBGzbpETTqWlhu6ScW2l5803psizo95gmQGYBx4rjbU1GQWK2FHF38OTOcbPlBcpyMW6D7KcX1dWMGw8q2smGVWmit0v+5ToMr/ZqTe3b0dLIEp74W82aPeXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NfmhZFGn; arc=none smtp.client-ip=109.224.244.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1743030503; c=relaxed/simple;
+	bh=UIucPY8Hw6s1pIjj0T40L+yyxKLaVSlySiCPpLn2cd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SZaxbWpH3cB1/KATEK+TP/O9bIcHmt2UJdX3GlSWDzF9VFHbHXorJ4oCSFy1hsonbPFCiu3xUZjLIXjqY8p6a0W9NiRW1PjfzZgjnd1XKM/NaV08TRjpUh/V+AQWpxZ/9r1AsjFoNip51s2KoB0YeOs3ldFDIC4t5/ziXPzfHA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=S+CytnhC; arc=none smtp.client-ip=209.85.160.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NfmhZFGn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1743027350; x=1743286550;
-	bh=9oUH4nV7QWQ54U20IxphlyDvPRuA4nnGHt2VBGcRbbw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=NfmhZFGnZRbbdqlbfPwEKd/ANRL+wlFC9YDrN0Ocytq9tNKX28ozucbnFQZO06h4A
-	 6bp4EJwQEGWQs+vJ20ZYU/ylXbKQXav5uZljiSFbf2HJzHtVxY3KH7BZ6KaO4v9GG6
-	 ODNyZAT49Y1XeMXKHT7KvLLy2J9CkWVhB3HsD+ZUrWuZR0PUeh9vsHjiUNkKhcA8e2
-	 G+aKEPyabTNhQmVRkg9pLTTTgls9QAfZ2qsAMu+RlEDatw+wGMe4oevr5frzJgWhwI
-	 RMzWu7EteG8oYB3njlaRNRwAPsZ6DT+m5ybUsoU2gdPSloc2RgOkZSRju2yiIvP6qL
-	 HGLYeu1DORYJQ==
-Date: Wed, 26 Mar 2025 22:15:43 +0000
-To: Tamir Duberstein <tamird@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-Message-ID: <D8QJMH5UR6VG.2OT5MXJJQU5QT@proton.me>
-In-Reply-To: <CAJ-ks9mA5QDeZ3EvOD3THayFt4TtDysgm0jp2aiSF2mQCrhWiQ@mail.gmail.com>
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com> <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com> <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me> <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com> <D8QI804Q3DAS.2BV4WSL81H52Z@proton.me> <CAJ-ks9mA5QDeZ3EvOD3THayFt4TtDysgm0jp2aiSF2mQCrhWiQ@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 9b3e0eaf59f5bd85b3b1266b193b59b5e33ec08b
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="S+CytnhC"
+Received: by mail-oa1-f98.google.com with SMTP id 586e51a60fabf-2b3680e548aso807943fac.0
+        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 16:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1743030501; x=1743635301; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8rVT5gyP0OGTon/Wq3WnQYduId/TZ40NupCn3Es6UaA=;
+        b=S+CytnhCujIqDOAGDu6jJWVwbefFUYR5QQE+QDd86pIuWCDioun9cgd9ZiHBxLEvmK
+         9QG3drlbcLV6Ce94OMqta6qurINg8+hLrlu+E9+j9Kysi07LevrA3aUwVRPbL5jc8/Jp
+         qPDoPa+bC9dwblkw/thRI11KCLH84Jvw7SdOrdvsRo88uD7w003kqNNHFvMEZoiDzImu
+         YFD3LZJTrIDJcfBPq8sIFf9vAwRmSbDnzCcVNOVceBnNxny1JWpJZr1J2JaeNRjxw/3f
+         jU7SH/Kd2nR8bbPSUwl0cuvZVjIQ8XyDosUPYl2/fDPOO4VOaJEondV5GCn/1ZS3zapb
+         9Ykg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743030501; x=1743635301;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8rVT5gyP0OGTon/Wq3WnQYduId/TZ40NupCn3Es6UaA=;
+        b=FvC+gRUGMiMmA+g/HYxm1mGGEbNE+lovgft4xA6fJixzzRWIC1GVzzSS5cXOljJ9eE
+         yrs6Q68lF1Q7QkTe680kHgOfjoA2IzSWoOLzh5B/lcF+KrfI+53pQzCvdlmnSSCFjcKz
+         Rme5Yi5eh3JmI49BfSm/rUSiiJYnQkvf77tAXdACVKN0S0pq+SDDXqVAa0clgR7vQBtq
+         4+pWsiPhnurUSAvd0BwQa3ZeAVIK4uEFJRIp/DlnD+ZeInQmZKeXnXIm0a7jt461zyR2
+         2jc7NVxy7GefUFtV33KuhrbycN4iUwC2UDKB9OViZebzao9ELH0S6B73Hpp7tOBremRp
+         g/0g==
+X-Forwarded-Encrypted: i=1; AJvYcCVI5xZpBLiH26dLsx3cHc1jBEYgKuKv8tIbF9xsRyBBt1Dr2X3xeYJD+2tPfTSZMA8Lm0IvhX9KU2FOXQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+9/f+bLZdmVQjlIX4IJbibpamqxO+j+tLm5xCiHBwvET1XfHV
+	tNt+qcM5Enrl0cXKA7l04pan49OY0uQqPQJMaDnz3msDmJRH9NcTVk86GV5JT7HcE7EJY4iLGuT
+	cAcndFNkeLCpHFWeuKAK5d2LtNs8UMtRo
+X-Gm-Gg: ASbGncveySRnXEPmuIuQ5nFswyM2mh4wVybUMhqDnBBe6ruf5df2xnJeH9HvFVFLGW4
+	uGyk8CuZgvvww0Yj0J3eaKaoKPvaBQHBOCcOp4NvJvedthVsnfCVWXcpWDANb7/MEoYP7NkOKS/
+	1DXDyIlMNa2LNoWHedfPJLdJhALHmQFT/3zqOzJkU69K8lcCehHkMFnt792iMlpOkFqz1Gzlz2i
+	UUoOUGRgNHLT480xYIGZ/48nlOcJYNN31gldb4TuAH2+g8YmluKbeO1XdYI2qmgBcAgf1nG4Je4
+	5Vyyx7ZVTh2/l5/qi234xSO0XzHMLk0UYzq0I21zZKd9pPl3Aw==
+X-Google-Smtp-Source: AGHT+IEPeX5QO7+np0lHt1JqQH6URXpDSCirYyHJkWTJBvVF0t+eQSx2Y6evgmmZSMAjZEj8DhgivwD6H6cm
+X-Received: by 2002:a05:6870:2a45:b0:2c1:d516:66c1 with SMTP id 586e51a60fabf-2c826ccb975mr3678918fac.12.1743030500879;
+        Wed, 26 Mar 2025 16:08:20 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2c77f0ab523sm496151fac.37.2025.03.26.16.08.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 16:08:20 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 25C4C340199;
+	Wed, 26 Mar 2025 17:08:19 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 153F7E40310; Wed, 26 Mar 2025 17:08:19 -0600 (MDT)
+Date: Wed, 26 Mar 2025 17:08:19 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] ublk: improve handling of saturated queues when ublk
+ server exits
+Message-ID: <Z+SI4x+0J52rCJpN@dev-ushankar.dev.purestorage.com>
+References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
+ <20250325-ublk_timeout-v1-4-262f0121a7bd@purestorage.com>
+ <Z-OS2_J7o0NKHWmj@fedora>
+ <Z+Q/SNmX+DpVQ5ir@dev-ushankar.dev.purestorage.com>
+ <Z+RN+CPnWO69aJD5@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z+RN+CPnWO69aJD5@dev-ushankar.dev.purestorage.com>
 
-On Wed Mar 26, 2025 at 11:09 PM CET, Tamir Duberstein wrote:
-> On Wed, Mar 26, 2025 at 5:09=E2=80=AFPM Benno Lossin <benno.lossin@proton=
-.me> wrote:
->> On Wed Mar 26, 2025 at 8:06 PM CET, Tamir Duberstein wrote:
->> > On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@pro=
-ton.me> wrote:
->> >> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
->> >> >
->> >> > Yeah, we should do this - but again: not relevant in this discussio=
-n.
->> >>
->> >> I think it's pretty relevant.
->> >
->> > It's not relevant because we're no longer talking about transmuting
->> > pointer to pointer. The two options are:
->> > 1. transmute reference to reference.
->> > 2. coerce reference to pointer, `as` cast pointer to pointer (triggers
->> > `ptr_as_ptr`), reborrow pointer to reference.
->> >
->> > If anyone can help me understand why (2) is better than (1), I'd
->> > certainly appreciate it.
->>
->> I am very confident that (2) is correct. With (1) I'm not sure (see
->> above), so that's why I mentioned it.
->
-> Can you help me understand why you're confident about (2) but not (1)?
+On Wed, Mar 26, 2025 at 12:56:56PM -0600, Uday Shankar wrote:
+> On Wed, Mar 26, 2025 at 11:54:16AM -0600, Uday Shankar wrote:
+> > > ublk_abort_requests() should be called only in case of queue dying,
+> > > since ublk server may open & close the char device multiple times.
+> > 
+> > Sure that is technically possible, however is any real ublk server doing
+> > this? Seems like a strange thing to do, and seems reasonable for the
+> > driver to transition the device to the nosrv state (dead or recovery,
+> > depending on flags) when the char device is closed, since in this case,
+> > no one can be handling I/O anymore.
+> 
+> I see ublksrv itself is doing this :(
+> 
+> /* Wait until ublk device is setup by udev */
+> static void ublksrv_check_dev(const struct ublksrv_ctrl_dev_info *info)
+> {
+> 	unsigned int max_time = 1000000, wait = 0;
+> 	char buf[64];
+> 
+> 	snprintf(buf, 64, "%s%d", "/dev/ublkc", info->dev_id);
+> 
+> 	while (wait < max_time) {
+> 		int fd = open(buf, O_RDWR);
+> 
+> 		if (fd > 0) {
+> 			close(fd);
+> 			break;
+> 		}
+> 
+> 		usleep(100000);
+> 		wait += 100000;
+> 	}
+> }
+> 
+> This seems related to some failures in ublksrv tests
 
-My explanation from above explains why I'm not confident about (1):
+Actually this is the only issue I'm seeing - after patching this up in
+ublksrv, make T=generic test appears to pass - I don't see any logs
+indicating failures, and no kernel panics.
 
-    For ptr-to-int transmutes, I know that they will probably remove
-    provenance, hence I am a bit cautious about using them for ptr-to-ptr o=
-r
-    ref-to-ref.
-
-The reason I'm confident about (2) is that that is the canonical way to
-cast the type of a reference pointing to an `!Sized` value.
-
----
-Cheers,
-Benno
+So the question is, does this patch break existing ublk servers? It does
+break ublksrv as shown above, but I think one could argue that the above
+code is just testing for file existence, and it's a bit weird to do that
+by opening and closing the file (especially given that it's a device
+special file). It can be patched to just use access or something
+instead.
 
