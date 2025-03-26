@@ -1,150 +1,154 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1804A28F4;
-	Wed, 26 Mar 2025 19:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948EC253B43
+	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 20:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743016019; cv=none; b=LW5i8X0o7ECsneNNaJJV38hM88vnamW6EnYLW1E3Ujtp/Sb9xu9pie3d0TUGQ+9zMZztvMkOB0aGvrYjEK03jG2tdbw27OMjxLafFsopahnXHJCB++hyTgZXk3h/GpzxPTnB4PCKYGm+xO3eq1MSUz5E+ngu+pgZh6hMstYryV8=
+	t=1743021970; cv=none; b=TYNfLhWaNhGNJsJ2P6LY0BMgWby29x6NaLV8TwmlBWu675PoVV19ODzX05huFteOm9JHPONATMIpIixYjYke2NEL/6F1/CuqSEn+VRlz9NjH3UUsnNNMSO0pZgkYAyD39I5wFHtT2WQ7ucnlXM0xJqMD4E5vPXzIhGYyaiqfmlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743016019; c=relaxed/simple;
-	bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XPRRJFjPZ3tUZYhJqdvDZd0R9AMtbCAd8+xdFbD0GIZGfj3M5E0oPAFCl2P4X22rz4lV8eA84QefGpIFAgwufX5pXGfzVoKUR2kwGfNH04vWnBETPlUfd0+bln6nnvcdmHvzmIQuQKXFAcN5BSRco/y/xIRzgXfmHXwc5lJ5an0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTiaoPUT; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743021970; c=relaxed/simple;
+	bh=0fffkpb2/dTnrDBMgXFpfQbnuIh9s/gxDQH3AhTGbzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EZ7ck9PUjMijquHZnFLyuFZR5w6CTe13TmtrWVq0hDPXkGuO/T+/tI9Z12n7IJ/OtN74N3/TRjLXecf8mDXrWafPUG9yPHCVeMnzQGBrnTx8kYwOqtb9pOUqCMNSj4G63G3zuvqZPwbPtivy/dvxXj879P6Cbewt7NXJFGUK4LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=NgWlZ/+8; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTiaoPUT"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30bfed67e08so2255321fa.2;
-        Wed, 26 Mar 2025 12:06:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="NgWlZ/+8"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-224341bbc1dso6353755ad.3
+        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 13:46:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743016016; x=1743620816; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-        b=aTiaoPUTXhlz0TWPtz+Y44JteqxaDLfRo2CXuDryjK/5Nef0PPICQBIUqY4YIhhTmU
-         i/w8AGV/lTNgNPYNX0ulVacg3IZAwpb6vEJa0jVz/TlWZXtmQYm0aiLO6pLvjVuav4Ul
-         aH3Pg62nzVPkXRmdrPv/aC9LoddjkxcuySQGlvO0ongu1fTtJhytIDkGYSLrZAH+wCzb
-         lCCEFdGDf8Q8bPct91/6D1LpnBe7A3cSuDnbyBc+lVvCuB6VfGrOJGFC9TyjjrbsZJuL
-         HZfrlp4hsiIl7BQsJz1daj/KyLt8q4ovKxNCr0DYCClG6RWXmaMkv3qg5Y4dQskrykJ/
-         Kx+A==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1743021968; x=1743626768; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0DxjNG0t0sEawU75w2W9OviEBnYSuXggXRVCOAy4Bs=;
+        b=NgWlZ/+82sL4aGEzJML4+KrqN9COuLeIGR4rcrWVVAM7ytwjvVv2ptAc7moSi8P1IY
+         1n0uGkoMT9tAH4zgSt81QlG4iBBW29xfWjfr4+W19MxhuX9JAlceCXtu1sxijMUFC9Jb
+         vn99TUqvxW/wXWWHKBQIiulYUJYBTV1CfrPewlN2i8p383FDdZplRYopFgGtqKD699b3
+         2hThlA1aE0OOpEpMnWs8tqLNQaiB64sTvVA/rBy9qE4HZxf6i08gged3pRCUefLQLN7Y
+         2neksZtsHIlRwJhBInsNsjRXjC+WLEL4ShRwQIAb41GOI7YTiOwnEl2Ffy8Gdp1rZFNn
+         vH/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743016016; x=1743620816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-        b=u7ASLFfjWU3+C4Hbd8ojDjidpvZA8E9wg5fXGtu2Oyu30jJjtQEfukZEmelEyUDeq/
-         Z1lIlXAz3uMD4JTFy0F+/LzxsZtXqhOUzy4H5EqzQDxiZ9YwhnhCENa15bBZsEat3w6u
-         ltwzmAMnK5RmkpsvYfOf1CybN1wToLbV5XeHBA3VwreXwYz5eDaXyS9nyQtiXQI77F9T
-         J2WzxuT+WLstCyq7zfKiqO6m62c/a/3w2INuw/SldqSxSXAR5SzZFnCRR3BCRUAk7KQo
-         qhorjFKUy2cY1CNfRaDzW8fQfY8UUvKvobnQuJmWk06mgqaPQhJ5fEDDAFHAyJMKlZ6L
-         S4zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjstPFP8AutMsI7KFZy2sxUcI8lpofjeaDtujc5nZb1KM+DSaDgiEDV5Ysph54mc2TjPjX0cKg@vger.kernel.org, AJvYcCUlWlE3gQ4V5qI4mnZA5OfZsXjeEkP0FnyYhEn/0UI5vw09LXjkBETsMNzz6dGwJMPRAlM0yLhyGIWY@vger.kernel.org, AJvYcCUxHO5cL5xOtYBwQ4ssyK3pbgD2Sx5vPX0/kCnar1Bt68z3AFL4c4bpwVyqynkAOWCpjAg95aaruIlAGIsG@vger.kernel.org, AJvYcCUzHrs9hhZPhJHdc8T2hQSfJtlajJClJaaTZZXirNG0rLunB5dfXHvrXxPP4ZrmRYVcf8al2TMrf496wno=@vger.kernel.org, AJvYcCV83ZrNc7qR83APq23ziwqVAqEMJHhCntcCJ2HPdrnQgF9M4z/LnkKOZRQmA7MMggUgv4aX1wtSOP6f@vger.kernel.org, AJvYcCW0MGnWhUKfW7WLe9XElSZ0h6mA+cr+9XzQYCzItXbThwc1R+4GA4KWxlm7eYWhA4LQBWDsQOH8dSP8Mka/ECg=@vger.kernel.org, AJvYcCWCLHlsCqrgPCLB4YzC8gG2XkkJwu2g8DsAqwyr/Kh6P6FfhT0tKSAIIJs7LpXZM+O244iUptxoqmHNfbmd@vger.kernel.org, AJvYcCWRPQKLEotIxfWvm7jfKl4WN43SEV3G8V1tEtQFTmCnMSyHUG5Ld5vnER6ofRGzWKRbMBrBRb3uCP8x9RZnoKPh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzvx5V1cHjnkhzKrKY5P8Z1exSSq9Zq4BWDAxyt0QTmSthHycBf
-	gy970IOCP5mamWPyrxXOnU9xa0jcvhuiTPwtTM6oJZPXKPjgFlubsskDMFAbqWKF6PJL2i+MFp6
-	40fnd+cwpaboLAdwkBQnCtluHI/A=
-X-Gm-Gg: ASbGnctj9WgJZ7cCM3YPJaNxw5v6UwiJ+j7IeNOxGRp0wt24ooHXhLAGEJ0S9u9NLk2
-	fylV1BlBEoN3wpI8nMsMBO288/mmCph6NfqixLXVGcNuti+otdsyTbQzLqwTZHRRC+F2JYBLQd3
-	Iyi3B6OtmlcYHkTt1/o8iDkT32YFBnWeh6IYgFQMHXXQ==
-X-Google-Smtp-Source: AGHT+IHDYgVo8MGaQ9BkG5+GyvT0+QD0Hn1jlcmz/IJfG8ECGaCOtoHRacJDMqa8JoaxSiLcVOV3Dc1Whxt+lMktHno=
-X-Received: by 2002:a05:651c:4ca:b0:30b:e440:dbdb with SMTP id
- 38308e7fff4ca-30dc5f45b99mr3646831fa.37.1743016015848; Wed, 26 Mar 2025
- 12:06:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743021968; x=1743626768;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l0DxjNG0t0sEawU75w2W9OviEBnYSuXggXRVCOAy4Bs=;
+        b=iCcOx7PRF1j8BF8545hY7ltW8U6sAt8QLegIs5yah+9CqMoSAJFsoUkm1ifUfNlxlg
+         RbFf5q3+6Mx/y4+IqmGFRizBgqeSvHOEfpBA8+C6T/30Py8aR/BJjeS3tFWpNfh1PvDp
+         3CGqQeP4XZ6SzArjbSTXj968ZI1DwHTlhFjDyZ1amLpJOpqGy+b/Yx+dNPrf4avoQZ5/
+         ebUnIYz0/TWJ+IiwVchSgrBhQ/717ndNHANuKnVpAfeYio6kLwscudN8TPu+9zavCjSW
+         pNYqlKDdJ+EhVa/Ko1PBwv6HiCrenWZpsBKPIBgUgyy05wQyiGyu3Dp1obsNCU3GibLR
+         O8ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWNsPto8dZ5hWD584Ef0Zed6o60hOqJr572tXp/M68uV2DGUPJ0vK0JX42AfEuAwhfqjqCpptPROvvJVw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBMTWToE0cJgDXFdUaF4j9lc1fzOvXmvv9mDJBKDRbAGWlc/cd
+	N/93k7wINii2vURrjZSSCI8gRSPtvYzVKfQYxba5w/Bk6SewcaLE35F/i1dJTLo=
+X-Gm-Gg: ASbGncuRaUZHVgOtk2F5oz6MYsPygUq2paNGM/XR6SfRePpXq/O4lbNxJ3darw/lyKE
+	Hbt9GFRYBuuhhRC+G2He3bsU5PqQpoMpGTL/lpom2A1CDkLkR/Z8UhjD9pjcksOku3mkoUrTMWZ
+	P3xKoIIedQilpvFkmd/ZsiAPGoj4Y8ozPt/B0QLKJ0v258CZIpO0GeNzwHHsduSr1zRV4anD1Ck
+	M18bBYY5vZgDZsKeB6dFRKIteLZC9iUhFFQhLimVD/ohNXVHKZVQa/fA5XlePjBOVw4HfdcmXq7
+	YXzVQn5LSuL/w4z4z+MrjryPsSsdtqwP0Ve4dkt2WNEJtVO9K66+dRb4WkHNVDFyFuA7vCtrE2L
+	A7TBdXSHVq3xBmcuveQ==
+X-Google-Smtp-Source: AGHT+IHYC9faJMfvw3S3nDn2V7wFInikoEkVJnJUgRfyAHRL+/TjLMdCvBBuENH2adHdN+PgG4A1eA==
+X-Received: by 2002:a17:90b:2c84:b0:2ff:6e72:b8e2 with SMTP id 98e67ed59e1d1-303a8e76448mr1592314a91.31.1743021967688;
+        Wed, 26 Mar 2025 13:46:07 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-60-96.pa.nsw.optusnet.com.au. [49.181.60.96])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3039e60f81fsm752510a91.48.2025.03.26.13.46.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 13:46:07 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.98)
+	(envelope-from <david@fromorbit.com>)
+	id 1txXdT-00000000gYk-3LF2;
+	Thu, 27 Mar 2025 07:46:03 +1100
+Date: Thu, 27 Mar 2025 07:46:03 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: lsf-pc@lists.linux-foundation.org, patches@lists.linux.dev,
+	fstests@vger.kernel.org, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	oliver.sang@intel.com, hannes@cmpxchg.org, willy@infradead.org,
+	jack@suse.cz, apopple@nvidia.com, brauner@kernel.org, hare@suse.de,
+	oe-lkp@lists.linux.dev, lkp@intel.com, john.g.garry@oracle.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, dave@stgolabs.net,
+	riel@surriel.com, krisman@suse.de, boris@bur.io,
+	jackmanb@google.com, gost.dev@samsung.com
+Subject: Re: [LSF/MM/BPF Topic] synthetic mm testing like page migration
+Message-ID: <Z-Rni3UhAF4RB7AY@dread.disaster.area>
+References: <Z-ROpGYBo37-q9Hb@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
- <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me>
- <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com>
- <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com>
- <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
- <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
- <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me>
-In-Reply-To: <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 26 Mar 2025 15:06:19 -0400
-X-Gm-Features: AQ5f1Jou-JUIkYYZHmN0n0DjKziFwOI3NizL41USvJvQpjSfAnBz0gZwusssOLs
-Message-ID: <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-ROpGYBo37-q9Hb@bombadil.infradead.org>
 
-On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
-e> wrote:
->
-> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
-> >
-> >
-> > In the current code you're looking at, yes. But in the code I have
-> > locally I'm transmuting `[u8]` to `BStr`. See my earlier reply where I
-> > said "Hmm, looking at this again we can just transmute ref-to-ref and
-> > avoid pointers entirely. We're already doing that in
-> > `CStr::from_bytes_with_nul_unchecked`".
->
-> `CStr::from_bytes_with_nul_unchecked` does the transmute with
-> references. That is a usage that the docs of `transmute` explicitly
-> recommend to change to an `as` cast [1].
+On Wed, Mar 26, 2025 at 11:59:48AM -0700, Luis Chamberlain wrote:
+> I'd like to propose this as a a BoF for MM.
+> 
+> We can find issues if we test them, but some bugs are hard to reproduce,
+> specially some mm bugs. How far are we willing to add knobs to help with
+> synthetic tests which which may not apply to numa for instance? An
+> example is the recent patch I just posted to force testing page
+> migration [0]. We can only run that test if we have a numa system, and a
+> lot of testing today runs on guests without numa. Would we be willing
+> to add a fake numa node to help with synthetic tests like page
+> migration?
 
-RIght. That guidance was written in 2016
-(https://github.com/rust-lang/rust/pull/34609) and doesn't present any
-rationale for `as` casts being preferred to transmute. I posted a
-comment in the most relevant issue I could find:
-https://github.com/rust-lang/rust/issues/34249#issuecomment-2755316610.
+Boot your test VMs with fake-numa=4, and now you have a 4 node
+system being tested even though it's not a real, physical numa
+machine.  I've been doing this for the best part of 15 years now
+with a couple of my larger test VMs explicitly to test NUMA
+interactions.
 
-> No idea about provenance still.
+I also have a large 64p VM with explicit qemu NUMA configuration
+that mirrors the underlying hardware NUMA layout. This allows NUMA
+aware perf testing from inside that VM that responds the same as a
+real physical machine would.
 
-Well that's not surprising, nobody was thinking about provenance in
-2016. But I really don't think we should blindly follow the advice in
-this case. It doesn't make an iota of sense to me - does it make sense
-to you?
+$ $ lscpu
+....
+CPU(s):                   64
+  On-line CPU(s) list:    0-63
+    Thread(s) per core:   1
+    Core(s) per socket:   16
+    Socket(s):            4
+.....
+NUMA:                     
+  NUMA node(s):           4
+  NUMA node0 CPU(s):      0-15
+  NUMA node1 CPU(s):      16-31
+  NUMA node2 CPU(s):      32-47
+  NUMA node3 CPU(s):      48-63
 
->
-> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html#alternatives
->
-> >> I tried to find some existing issues about the topic and found that
-> >> there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
-> >> asking for a better justification [1] and it seems like nobody provide=
-d
-> >> one there. Maybe we should ask the opsem team what happens to provenan=
-ce
-> >> when transmuting?
-> >
-> > Yeah, we should do this - but again: not relevant in this discussion.
->
-> I think it's pretty relevant.
+This is also the VM I'm doing most of my performance testing and
+check-parallel development on, so I see the NUMA scalability issues
+that occur when trying to make use of the underlying hardware NUMA
+capability...
 
-It's not relevant because we're no longer talking about transmuting
-pointer to pointer. The two options are:
-1. transmute reference to reference.
-2. coerce reference to pointer, `as` cast pointer to pointer (triggers
-`ptr_as_ptr`), reborrow pointer to reference.
+> Then what else could we add to help stress test page migration and
+> compaction further? We already have generic/750 and that has found some
+> snazzy issues so far. But what else can we do to help random guests
+> all over running fstests start covering complex mm tests better?
 
-If anyone can help me understand why (2) is better than (1), I'd
-certainly appreciate it.
+Use check-parallel on buffered loop devices - it'll generate a heap
+of page cache pressure from all the IO, and run a heap more
+tests at the same time as the compaction is running from g/740. This
+often overlaps with g/650 which does background CPU hotplug, and it
+definitely overlaps with other tests running drop_caches, mount,
+unmount, etc, too.
+
+One of the eventual goals of check-parallel is to have all these
+things environmental variables like memory load, compaction, cpu
+hotplug, etc to be changing in the background whilst the tests
+running so that we can exercise all the filesystem functionality
+under changing MM and environmental conditions without having to
+code that into individual tests....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
