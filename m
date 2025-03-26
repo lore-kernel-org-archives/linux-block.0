@@ -1,358 +1,134 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737BC1F63E8
-	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 16:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6315F1547E7;
+	Wed, 26 Mar 2025 16:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743007408; cv=none; b=fWuSnl0oK0nSkB5Ic+cFkjEeoI2swx6smiqRigPYiufWBeingwT+NBnoTxHilTJIbqlBciVZ0p1cKuqYmZmRLL1J/oMC6RKEl3iCv1jiHZeEwHX2GVyIXTuFUTseZl2zLbKM7nvEzBxjlMUoJKJ7a5wp1VYbHYdIIsFU4J+iJvk=
+	t=1743007420; cv=none; b=iVJPrksbFISahrhES0k9S2BSeByp//DvmOXJa3xc+8fVf0Yr7MQUofg7KRlZIUVpMpc1eD/ZaYvUgnEfRpCRocjiTPmFYDC/jZKvaXVKOn/ylHljo2gMlc+8YEBTjRCtdV5UeGc3aJW3Lyt+8VkVQCWlBkBpnvK+mS6xTsBnN94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743007408; c=relaxed/simple;
-	bh=n6+3qn0dgMDhLyTF7igz+yOUvAFAF7NoKlECeCu5EKI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9fPFpUhaOWlnj4AVzhlrDdy78eJGU/20a9EG1HdswiVOrCOZXLv0fHXvj9Wtnd9RQKb2bWa0E52fmfl7WtSOSIIdbMy3R5EjX6MS1L0dqqB1/vVlbCwJTLdWiP6SMi9TzFwkwm4FqaxAh6BiUZOoCb585lHxAHHiSGwgkJDXOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XtlLre1O; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1743007420; c=relaxed/simple;
+	bh=dRoILmxBCmB+LmPipcAncHBrEibSROR5ByjhNIYvaEk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FFVuXq8WsAWrkYcX9onnH7swgHbGtKbL0Rv7GsHOu4ofXx3fUGbtFh3RKLktKnYsLArKfL/YXITtaFCFZC6A+UCSOZUM7dqGR5jdVB1YBIdSxN6vhGlX/h9skPBBL3YS/ze+Dymcxv4EWDTam+1BT1wsLCd0f2bPPUcY62sAUOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=iWbHoKQ3; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XtlLre1O"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ff53b26af2so1910240a91.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 09:43:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1743007406; x=1743612206; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CLzOQ+BdGkOXJhBkBzUQ0CiAN35NUo3v4I6j8y4k9CM=;
-        b=XtlLre1O9b5N0ZGc4GbDSJiZ3koWGzst/xki4CZJhOPjYsXta0XQlPJsTLgeDCcrQv
-         8EXcMB+GT5ibxB3oWif8BWhtM6LHBu+KHD3KUfDHLQFmSYYils5uuBzox9zOiAdyO8Fu
-         74zLHiVzHslP4sDr6VoBKsxQoWNUxtVpxi+jGl8NarDCMXKFUzvC1OYWlaWyT5I6sK41
-         Ku7FSuRNLwQwgfSCeg7/0nPB5xY+eeLCXr/xufUGBjAwNNxLQOPf1+J5stwdxVUf+kP3
-         UGcDjxxrYmMNOxcoeeoLZ3MGvlgUniWhi0XseeN2qyIl6LZqUg0VFaPBHSfhSAOizGkA
-         gNAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743007406; x=1743612206;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CLzOQ+BdGkOXJhBkBzUQ0CiAN35NUo3v4I6j8y4k9CM=;
-        b=FcLl5rcpSuoN84NZ+zx8S7EpUkdT0wNVPgyZISGF4aiOTbsjw7CMLSkPMad0Nx53TO
-         amnMuvJq5zhGfIcnexuzNexsAu/J8jXz1cJwRUrEJGxbePsXCqJ9iNS96Q+O3T4sGf8K
-         cN9QGPMzDrXGg8VafNBk6MEdnbO3eZGEnp+Hv5IVqygscHavZJ6LCXl+VK/uiDjQ8Rvr
-         rM3REW0dZGoU8r+L0ir84/Ce6fUwdIJ4Epdb1hQZnnRNU/dzkESimgprwNdw0m9/NRlM
-         oLxFD6SUtv3GcOpsODeRdmRgMLZvgVV2Xqa8sZE8G4FhqAphgQbNqD5VPBW0CSsFTtcv
-         diUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDcd0cctSQIQWA8j1HKcfY7KI5AF4mvb56nBIBP7voDGJxUvOBIWbenj5XRLh1exD5x2HJBwu34Dt24A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvY4ImJAhcc4HbLYGc44I6zZsa55o5ZxZYsasDk7KfP+3MW7FO
-	7B1X/vG7a+B1be6sCIDKjOY+TrP25wclUx4MSfhK1GjuItxq4srcqiZixm+Hq5lCDaAg5JZt1mE
-	Zsc+jzLx65RTP+2eRkuBqZTLA4Ia1RUknr7cUfw==
-X-Gm-Gg: ASbGncstQC8rbAgK2xKM+SzO5CNP0MvxQjQZF2FsHmnU30e+WF7Vr1eFu5czPUBkg3A
-	pN5tXK0PSGX+ihX1upZ3nQSpL06nwLQutwClSVPG97MnXfCAL+pMW1Lp5WyjrcOL1z5AS9UGZwr
-	T4drirg8ULoiP4Cq5m2RGtF10z
-X-Google-Smtp-Source: AGHT+IGBx+NXadhv5vzICZHD/MdabwncvO9n3RJC/a5uKMLLXNJgmfFIxI5h8sK9fEQgAz27rEr2Js82vuTfOXLsZzA=
-X-Received: by 2002:a17:90b:1b05:b0:301:1c11:aa7a with SMTP id
- 98e67ed59e1d1-303a83c3c36mr186600a91.3.1743007405442; Wed, 26 Mar 2025
- 09:43:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="iWbHoKQ3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1743007415; x=1743266615;
+	bh=SBA0lIVlYigqsD6gj5BKr4rg3daBl3KuUvd0a5qoKyQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=iWbHoKQ3q//lzkeLnbXrpD/K0JBHRvanSfajOeHLvf/ABisj8J8MxZ+5Szf6IAVwz
+	 cm6CROl1XHcgLoi0c8f8WF2vZ4BIPsM5D4ffwPzx2P24j7XXDs8bhVLjBqCUUQbi4S
+	 LLTPIrty/DypE1RsJLAmhmdT++IBIwQDPOF6RiBEJViq1/YyFB1nebuFXfgkcSS3rv
+	 RnwsOHDfYpSHbih8pB5hshb/Yg11MvlDP7va/eqAPI5HhqXjCSJl0zPxG6x0qK8mjB
+	 Q4UuBTuuBwVXZquozIs6zNsdDgjSmdtxqbPbriXVgWN6nYRPn8UKI/p8DYLWx1pKoP
+	 XcdjKJZB0215Q==
+Date: Wed, 26 Mar 2025 16:43:29 +0000
+To: Tamir Duberstein <tamird@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
+Message-ID: <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me>
+In-Reply-To: <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
+References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me> <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com> <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com> <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 56fa6bd54add0cb38181c1a80c576e471517373d
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324134905.766777-1-ming.lei@redhat.com> <20250324134905.766777-5-ming.lei@redhat.com>
- <CADUfDZo4jmifYJwDRsX0FMemxDiuRu_XG6GV6+drVUOgDk3QwQ@mail.gmail.com>
- <Z-IDwx3mv6I90hhg@fedora> <CADUfDZpv-EmJy+GZcWL=q5MHg4ovae_kg8k+ewcdrwNTQ_zK9g@mail.gmail.com>
- <Z-NjqBgCc0qduUmd@fedora>
-In-Reply-To: <Z-NjqBgCc0qduUmd@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 26 Mar 2025 09:43:13 -0700
-X-Gm-Features: AQ5f1JqTJQTAoJC3JASlVsJXil1SHeQY-0UPfT8vDZCuavceriH3FnEiXQWFlTc
-Message-ID: <CADUfDZrHUbpRPkZ2UafmET7dd_0aex8o01fB4tiLkzDz5p0phw@mail.gmail.com>
-Subject: Re: [PATCH 4/8] ublk: add segment parameter
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Keith Busch <kbusch@kernel.org>, Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 25, 2025 at 7:17=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
+On Wed Mar 26, 2025 at 11:35 AM CET, Tamir Duberstein wrote:
+> On Wed, Mar 26, 2025 at 6:31=E2=80=AFAM Benno Lossin <benno.lossin@proton=
+.me> wrote:
+>> On Wed Mar 26, 2025 at 12:54 AM CET, Tamir Duberstein wrote:
+>> > On Tue, Mar 25, 2025 at 6:40=E2=80=AFPM Benno Lossin <benno.lossin@pro=
+ton.me> wrote:
+>> >> On Tue Mar 25, 2025 at 11:33 PM CET, Tamir Duberstein wrote:
+>> >> > On Tue, Mar 25, 2025 at 6:11=E2=80=AFPM Benno Lossin <benno.lossin@=
+proton.me> wrote:
+>> >> >> On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
+>> >> >> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+>> >> >> > index 40034f77fc2f..6233af50bab7 100644
+>> >> >> > --- a/rust/kernel/str.rs
+>> >> >> > +++ b/rust/kernel/str.rs
+>> >> >> > @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
+>> >> >> >      #[inline]
+>> >> >> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
+>> >> >> >          // SAFETY: `BStr` is transparent to `[u8]`.
+>> >> >> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
+>> >> >> > +        unsafe { &*(core::mem::transmute::<*const [u8], *const =
+Self>(bytes)) }
+>> >> >>
+>> >> >> Hmm I'm not sure about using `transmute` here. Yes the types are
+>> >> >> transparent, but I don't think that we should use it here.
+>> >> >
+>> >> > What's your suggestion? I initially tried
+>> >> >
+>> >> > let bytes: *const [u8] =3D bytes;
+>> >> > unsafe { &*bytes.cast() }
+>> >> >
+>> >> > but that doesn't compile because of the implicit Sized bound on poi=
+nter::cast.
+>> >>
+>> >> This is AFAIK one of the only places where we cannot get rid of the `=
+as`
+>> >> cast. So:
+>> >>
+>> >>     let bytes: *const [u8] =3D bytes;
+>> >>     // CAST: `BStr` transparently wraps `[u8]`.
+>> >>     let bytes =3D bytes as *const BStr;
+>> >>     // SAFETY: `bytes` is derived from a reference.
+>> >>     unsafe { &*bytes }
+>> >>
+>> >> IMO a `transmute` is worse than an `as` cast :)
+>> >
+>> > Hmm, looking at this again we can just transmute ref-to-ref and avoid
+>> > pointers entirely. We're already doing that in
+>> > `CStr::from_bytes_with_nul_unchecked`
+>> >
+>> > Why is transmute worse than an `as` cast?
+>>
+>> It's right in the docs: "`transmute` should be the absolute last
+>> resort." [1]. IIRC, Gary was a bit more lenient in its use, but I think
+>> we should avoid it as much as possible such that people copying code or
+>> taking inspiration also don't use it.
+>>
+>> So for both cases I'd prefer an `as` cast.
+>>
+>> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html
 >
-> On Tue, Mar 25, 2025 at 12:43:26PM -0700, Caleb Sander Mateos wrote:
-> > On Mon, Mar 24, 2025 at 6:16=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
-> > >
-> > > On Mon, Mar 24, 2025 at 03:26:06PM -0700, Caleb Sander Mateos wrote:
-> > > > On Mon, Mar 24, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.c=
-om> wrote:
-> > > > >
-> > > > > IO split is usually bad in io_uring world, since -EAGAIN is cause=
-d and
-> > > > > IO handling may have to fallback to io-wq, this way does hurt per=
-formance.
-> > > > >
-> > > > > ublk starts to support zero copy recently, for avoiding unnecessa=
-ry IO
-> > > > > split, ublk driver's segment limit should be aligned with backend
-> > > > > device's segment limit.
-> > > > >
-> > > > > Another reason is that io_buffer_register_bvec() needs to allocat=
-e bvecs,
-> > > > > which number is aligned with ublk request segment number, so that=
- big
-> > > > > memory allocation can be avoided by setting reasonable max_segmen=
-ts limit.
-> > > > >
-> > > > > So add segment parameter for providing ublk server chance to alig=
-n
-> > > > > segment limit with backend, and keep it reasonable from implement=
-ation
-> > > > > viewpoint.
-> > > > >
-> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c      | 15 ++++++++++++++-
-> > > > >  include/uapi/linux/ublk_cmd.h |  9 +++++++++
-> > > > >  2 files changed, 23 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index acb6aed7be75..53a463681a41 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -74,7 +74,7 @@
-> > > > >  #define UBLK_PARAM_TYPE_ALL                                \
-> > > > >         (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
-> > > > >          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
-> > > > > -        UBLK_PARAM_TYPE_DMA_ALIGN)
-> > > > > +        UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
-> > > > >
-> > > > >  struct ublk_rq_data {
-> > > > >         struct kref ref;
-> > > > > @@ -580,6 +580,13 @@ static int ublk_validate_params(const struct=
- ublk_device *ub)
-> > > > >                         return -EINVAL;
-> > > > >         }
-> > > > >
-> > > > > +       if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
-> > > > > +               const struct ublk_param_segment *p =3D &ub->param=
-s.seg;
-> > > > > +
-> > > > > +               if (!is_power_of_2(p->seg_boundary_mask + 1))
-> > > > > +                       return -EINVAL;
-> > > >
-> > > > Looking at blk_validate_limits(), it seems like there are some
-> > > > additional requirements? Looks like seg_boundary_mask has to be at
-> > > > least PAGE_SIZE - 1
-> > >
-> > > Yeah, it isn't done in ublk because block layer runs the check, and i=
-t
-> > > will be failed when starting the device. That said we take block laye=
-r's
-> > > default setting, which isn't good from UAPI viewpoint, since block
-> > > layer may change the default setting.
-> >
-> > Even though blk_validate_limits() rejects it, it appears to log a
-> > warning. That seems undesirable for something controllable from
-> > userspace.
-> > /*
-> >  * By default there is no limit on the segment boundary alignment,
-> >  * but if there is one it can't be smaller than the page size as
-> >  * that would break all the normal I/O patterns.
-> >  */
-> > if (!lim->seg_boundary_mask)
-> >         lim->seg_boundary_mask =3D BLK_SEG_BOUNDARY_MASK;
-> > if (WARN_ON_ONCE(lim->seg_boundary_mask < BLK_MIN_SEGMENT_SIZE - 1))
-> >         return -EINVAL;
->
-> Yes, it has been addressed in my local version, and we need to make it
-> a hw/sw interface.
->
-> >
-> > >
-> > > Also it is bad to associate device property with PAGE_SIZE which is
-> > > a variable actually. The latest kernel has replaced PAGE_SIZE with 40=
-96
-> > > for segment limits.
-> > >
-> > > I think we can take 4096 for validation here.
-> > >
-> > > > and max_segment_size has to be at least PAGE_SIZE
-> > > > if virt_boundary_mask is set?
-> > >
-> > > If virt_boundary_mask is set, max_segment_size will be ignored usuall=
-y
-> > > except for some stacking devices.
-> >
-> > Sorry, I had it backwards. The requirement is if virt_boundary_mask is
-> > *not* set:
-> > /*
-> >  * Stacking device may have both virtual boundary and max segment
-> >  * size limit, so allow this setting now, and long-term the two
-> >  * might need to move out of stacking limits since we have immutable
-> >  * bvec and lower layer bio splitting is supposed to handle the two
-> >  * correctly.
-> >  */
-> > if (lim->virt_boundary_mask) {
-> >         if (!lim->max_segment_size)
-> >                 lim->max_segment_size =3D UINT_MAX;
-> > } else {
-> >         /*
-> >          * The maximum segment size has an odd historic 64k default tha=
-t
-> >          * drivers probably should override.  Just like the I/O size we
-> >          * require drivers to at least handle a full page per segment.
-> >          */
-> >         if (!lim->max_segment_size)
-> >                 lim->max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
-> >         if (WARN_ON_ONCE(lim->max_segment_size < BLK_MIN_SEGMENT_SIZE))
-> >                 return -EINVAL;
-> > }
->
-> Right.
->
-> Please feel free to see if the revised patch is good:
->
->
-> From 0718b9f130b3bc9b9b06907c687fb5b9eea172f7 Mon Sep 17 00:00:00 2001
-> From: Ming Lei <ming.lei@redhat.com>
-> Date: Mon, 24 Mar 2025 12:33:59 +0000
-> Subject: [PATCH V2 3/8] ublk: add segment parameter
->
-> IO split is usually bad in io_uring world, since -EAGAIN is caused and
-> IO handling may have to fallback to io-wq, this way does hurt performance=
-.
->
-> ublk starts to support zero copy recently, for avoiding unnecessary IO
-> split, ublk driver's segment limit should be aligned with backend
-> device's segment limit.
->
-> Another reason is that io_buffer_register_bvec() needs to allocate bvecs,
-> which number is aligned with ublk request segment number, so that big
-> memory allocation can be avoided by setting reasonable max_segments limit=
-.
->
-> So add segment parameter for providing ublk server chance to align
-> segment limit with backend, and keep it reasonable from implementation
-> viewpoint.
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c      | 20 +++++++++++++++++++-
->  include/uapi/linux/ublk_cmd.h | 21 +++++++++++++++++++++
->  2 files changed, 40 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 6fa1384c6436..6367476cef2b 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -74,7 +74,7 @@
->  #define UBLK_PARAM_TYPE_ALL                                \
->         (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
->          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
-> -        UBLK_PARAM_TYPE_DMA_ALIGN)
-> +        UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
->
->  struct ublk_rq_data {
->         struct kref ref;
-> @@ -580,6 +580,18 @@ static int ublk_validate_params(const struct ublk_de=
-vice *ub)
->                         return -EINVAL;
->         }
->
-> +       if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
-> +               const struct ublk_param_segment *p =3D &ub->params.seg;
-> +
-> +               if (!is_power_of_2(p->seg_boundary_mask + 1))
-> +                       return -EINVAL;
-> +
-> +               if (p->seg_boundary_mask + 1 < UBLK_MIN_SEGMENT_SIZE)
-> +                       return -EINVAL;
-> +               if (p->max_segment_size < UBLK_MIN_SEGMENT_SIZE)
-> +                       return -EINVAL;
+> I don't follow the logic. The trouble with `as` casts is that they are
+> very lenient in what they allow, and to do these conversions with `as`
+> casts requires ref -> pointer -> pointer -> pointer deref versus a
+> single transmute. The safety comment perfectly describes why it's OK
+> to do: the types are transparent. So why is `as` casting pointers
+> better? It's just as unchecked as transmuting, and worse, it requires
+> a raw pointer dereference.
 
-These checks look good, except they don't allow omitting
-seg_boundary_mask or max_segment_size. I can imagine a ublk server
-might want to set only some of the segment limits and leave the others
-as 0?
+Note that you're not transmuting `[u8]` to `BStr`, but `*const [u8]` to
+`*const BStr`. Those pointers have provenance and I'm not sure if
+transmuting them preserves it.
 
-Best,
-Caleb
+I tried to find some existing issues about the topic and found that
+there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
+asking for a better justification [1] and it seems like nobody provided
+one there. Maybe we should ask the opsem team what happens to provenance
+when transmuting?
 
-> +       }
-> +
->         return 0;
->  }
->
-> @@ -2346,6 +2358,12 @@ static int ublk_ctrl_start_dev(struct ublk_device =
-*ub, struct io_uring_cmd *cmd)
->         if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN)
->                 lim.dma_alignment =3D ub->params.dma.alignment;
->
-> +       if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
-> +               lim.seg_boundary_mask =3D ub->params.seg.seg_boundary_mas=
-k;
-> +               lim.max_segment_size =3D ub->params.seg.max_segment_size;
-> +               lim.max_segments =3D ub->params.seg.max_segments;
-> +       }
-> +
->         if (wait_for_completion_interruptible(&ub->completion) !=3D 0)
->                 return -EINTR;
->
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
-h
-> index 7255b36b5cf6..ffa805b05141 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -410,6 +410,25 @@ struct ublk_param_dma_align {
->         __u8    pad[4];
->  };
->
-> +#define UBLK_MIN_SEGMENT_SIZE   4096
-> +struct ublk_param_segment {
-> +       /*
-> +        * seg_boundary_mask + 1 needs to be power_of_2(), and the sum ha=
-s
-> +        * to be >=3D UBLK_MIN_SEGMENT_SIZE(4096)
-> +        */
-> +       __u64   seg_boundary_mask;
-> +
-> +       /*
-> +        * max_segment_size could be override by virt_boundary_mask, so b=
-e
-> +        * careful when setting both.
-> +        *
-> +        * max_segment_size has to be >=3D UBLK_MIN_SEGMENT_SIZE(4096)
-> +        */
-> +       __u32   max_segment_size;
-> +       __u16   max_segments;
-> +       __u8    pad[2];
-> +};
-> +
->  struct ublk_params {
->         /*
->          * Total length of parameters, userspace has to set 'len' for bot=
-h
-> @@ -423,6 +442,7 @@ struct ublk_params {
->  #define UBLK_PARAM_TYPE_DEVT            (1 << 2)
->  #define UBLK_PARAM_TYPE_ZONED           (1 << 3)
->  #define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
-> +#define UBLK_PARAM_TYPE_SEGMENT         (1 << 5)
->         __u32   types;                  /* types of parameter included */
->
->         struct ublk_param_basic         basic;
-> @@ -430,6 +450,7 @@ struct ublk_params {
->         struct ublk_param_devt          devt;
->         struct ublk_param_zoned zoned;
->         struct ublk_param_dma_align     dma;
-> +       struct ublk_param_segment       seg;
->  };
->
->  #endif
-> --
-> 2.47.0
->
->
->
-> Thanks,
-> Ming
->
+[1]: https://github.com/rust-lang/rust-clippy/issues/6372
+
+---
+Cheers,
+Benno
+
