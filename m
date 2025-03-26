@@ -1,134 +1,202 @@
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6315F1547E7;
-	Wed, 26 Mar 2025 16:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2065D1F790B
+	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 16:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743007420; cv=none; b=iVJPrksbFISahrhES0k9S2BSeByp//DvmOXJa3xc+8fVf0Yr7MQUofg7KRlZIUVpMpc1eD/ZaYvUgnEfRpCRocjiTPmFYDC/jZKvaXVKOn/ylHljo2gMlc+8YEBTjRCtdV5UeGc3aJW3Lyt+8VkVQCWlBkBpnvK+mS6xTsBnN94=
+	t=1743007724; cv=none; b=IfzLC8FWqoINf5BCn3WOacaflAkrXhsBtqxwx4+fbs+tkbk1Jcj9REwN4hxv58dlO6ocCvOoS2Oc05RSvQjnAZfWLHuy/eKSDGk+zSK2e9Q74Ty6OeGpwL+f4L4nxeP8fmY0eT3Pp32Y29LMiwA8xr8SflAka48MlzMLKNPoW30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743007420; c=relaxed/simple;
-	bh=dRoILmxBCmB+LmPipcAncHBrEibSROR5ByjhNIYvaEk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FFVuXq8WsAWrkYcX9onnH7swgHbGtKbL0Rv7GsHOu4ofXx3fUGbtFh3RKLktKnYsLArKfL/YXITtaFCFZC6A+UCSOZUM7dqGR5jdVB1YBIdSxN6vhGlX/h9skPBBL3YS/ze+Dymcxv4EWDTam+1BT1wsLCd0f2bPPUcY62sAUOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=iWbHoKQ3; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1743007724; c=relaxed/simple;
+	bh=p/OaKL9Kn6kApSO4ooQ3KGS4GrLDdhLMGRXjeveabig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A77ZIlddWuOhraywcnTkrnaTOQQmF8iAduKy4fBZVH9clOTxX6SVUmBKxA5ToPj2VAIVNJPEhYW4XfAEvjA5Eph4dTyiAFHb3OHco6BLkosYlga68GcylYwOlkJqkvG61ZOWNwC517beFX2yfozYrg3byT6J3rfEjpNrZzgCn6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WD0czLY+; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="iWbHoKQ3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1743007415; x=1743266615;
-	bh=SBA0lIVlYigqsD6gj5BKr4rg3daBl3KuUvd0a5qoKyQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=iWbHoKQ3q//lzkeLnbXrpD/K0JBHRvanSfajOeHLvf/ABisj8J8MxZ+5Szf6IAVwz
-	 cm6CROl1XHcgLoi0c8f8WF2vZ4BIPsM5D4ffwPzx2P24j7XXDs8bhVLjBqCUUQbi4S
-	 LLTPIrty/DypE1RsJLAmhmdT++IBIwQDPOF6RiBEJViq1/YyFB1nebuFXfgkcSS3rv
-	 RnwsOHDfYpSHbih8pB5hshb/Yg11MvlDP7va/eqAPI5HhqXjCSJl0zPxG6x0qK8mjB
-	 Q4UuBTuuBwVXZquozIs6zNsdDgjSmdtxqbPbriXVgWN6nYRPn8UKI/p8DYLWx1pKoP
-	 XcdjKJZB0215Q==
-Date: Wed, 26 Mar 2025 16:43:29 +0000
-To: Tamir Duberstein <tamird@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-Message-ID: <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me>
-In-Reply-To: <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me> <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com> <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com> <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 56fa6bd54add0cb38181c1a80c576e471517373d
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WD0czLY+"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-301001bc6a8so1932391a91.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 09:48:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1743007722; x=1743612522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Kb0867v9KiYCkSpsgeiAuGhvBV0zRRsrYk5Gph4h5Y=;
+        b=WD0czLY+hLU1MwfypSMpWh6gd0FubgonyqHjUnhA/ImWmPDDds6FrS/qZC0gbQUBuh
+         Dmr4Rla+l8MNuETw/N8dHc7A4aQyNI15OgcVg1Zme6KJaGW1sNrJ3l/Bn2SJl3I75FX1
+         HFk3BGooycg/oDbslWohrsvSUUZNyngTIXoG2wDZBqSoUZOocFJPscWe5842BSzBxVpf
+         lDqioL30H7QSnuXDif7XJKZ8/O8hm/798CqnGGH2UYMrdDuJW8Q6nWIhIC9V07kEuYOC
+         xU4JZQwBaf2edME5OdXWDs2B5NSxD2zLofF9GPwFIV0qFrFvMYePL9M2Vw4BS4ArtIQC
+         7fng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743007722; x=1743612522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Kb0867v9KiYCkSpsgeiAuGhvBV0zRRsrYk5Gph4h5Y=;
+        b=NS7NoXlCfWyzPtxsTYVz1BeDC2jNMyCS5p7MAIlfCk7P3/93+SgUw9i+pQ8YTtlg5C
+         xOqvFONPWHzgl4XRBl46bZtoCmH51M+KwxTTTPHtbp7/kABgSet/16eklh5XaGuYM4ew
+         wZQmFocTayYUX9rSXQO8WUe3tdn7ZYQ6MoT53ZSMAp8htxYeydK0IQ+zgs8JM3GCbspx
+         cMChQv4H6bARoFDHH0K/6jg66YREdmod869/JOc6INd3yOrWYq0HTaKEyQCWx96WmknD
+         eazprTeYrFlYSsYHbr48pG3+Zt2UfOby1jO9jL4ArPtUFIAeyZQW3ewwJ5//lgXbFunU
+         Pa4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWwfToxXNbBcuiy4I4LjrFw2uV1ZBTpkbc9lzfcYNYQLkqiAM/2sevjjUMkU+hTzScdJZNjjeNSfg+PBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywcnv8QlVQYdR4WyHmhz8t0sNuDZ5kMp0328tefPH2vK879QZns
+	Nfz5syhoVAuJWYSP0MyvNHWCEa2YK/xtpvL5j6vKDPn9HgSUMJcxiehuqX2X9kteXW0K9yBv+Tv
+	6Ws42v6zrJ0viCQcXgv4MPWl/EOZgDkDvSPkaimyHXTKhnXFVi64=
+X-Gm-Gg: ASbGncs0HpQN98va6u/zBjdYOpm098YV0MVlkhIsaFlSKQ1eVmtfYYTb4YE+AjENS+c
+	6IqpHShFTKeJtkF8Zkp3eyu/PZhuT2iNZO6ff1Ul200mRQF9FVgRcJQmo0zoCMeiWlbs95N0Z6K
+	6pPmcP3hMWyd1xhlEiDEKfvAW0bekfUi9hQGY=
+X-Google-Smtp-Source: AGHT+IHq+TAMKZd7fKu2lRSrTKNUk579TC1yqon/FvwGw3dhZAmZEmjfUHPBBEnizt4MlNoT4GU4L1pigvoDXkPdCvE=
+X-Received: by 2002:a17:90b:1c87:b0:2ff:5540:bb48 with SMTP id
+ 98e67ed59e1d1-303a91b5a6dmr177736a91.8.1743007721970; Wed, 26 Mar 2025
+ 09:48:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250324134905.766777-1-ming.lei@redhat.com> <20250324134905.766777-6-ming.lei@redhat.com>
+ <CADUfDZquEOA7ckJVkBbcso2Paw9viSa9-5eQptgRgQRoxgvVqA@mail.gmail.com> <Z-NmobqY9C4o8ESL@fedora>
+In-Reply-To: <Z-NmobqY9C4o8ESL@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 26 Mar 2025 09:48:30 -0700
+X-Gm-Features: AQ5f1JoGPZkfcL7HHhDZkEDg41fJYNn0RvkoQMedEKPCFlPxtVKx2k3wDH831mo
+Message-ID: <CADUfDZrkDsyqdeuAgzoDFeANwFqw=djuSObAm3kPwimG0SHx9Q@mail.gmail.com>
+Subject: Re: [PATCH 5/8] ublk: document zero copy feature
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Keith Busch <kbusch@kernel.org>, Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed Mar 26, 2025 at 11:35 AM CET, Tamir Duberstein wrote:
-> On Wed, Mar 26, 2025 at 6:31=E2=80=AFAM Benno Lossin <benno.lossin@proton=
-.me> wrote:
->> On Wed Mar 26, 2025 at 12:54 AM CET, Tamir Duberstein wrote:
->> > On Tue, Mar 25, 2025 at 6:40=E2=80=AFPM Benno Lossin <benno.lossin@pro=
-ton.me> wrote:
->> >> On Tue Mar 25, 2025 at 11:33 PM CET, Tamir Duberstein wrote:
->> >> > On Tue, Mar 25, 2025 at 6:11=E2=80=AFPM Benno Lossin <benno.lossin@=
-proton.me> wrote:
->> >> >> On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
->> >> >> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> >> >> > index 40034f77fc2f..6233af50bab7 100644
->> >> >> > --- a/rust/kernel/str.rs
->> >> >> > +++ b/rust/kernel/str.rs
->> >> >> > @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
->> >> >> >      #[inline]
->> >> >> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
->> >> >> >          // SAFETY: `BStr` is transparent to `[u8]`.
->> >> >> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
->> >> >> > +        unsafe { &*(core::mem::transmute::<*const [u8], *const =
-Self>(bytes)) }
->> >> >>
->> >> >> Hmm I'm not sure about using `transmute` here. Yes the types are
->> >> >> transparent, but I don't think that we should use it here.
->> >> >
->> >> > What's your suggestion? I initially tried
->> >> >
->> >> > let bytes: *const [u8] =3D bytes;
->> >> > unsafe { &*bytes.cast() }
->> >> >
->> >> > but that doesn't compile because of the implicit Sized bound on poi=
-nter::cast.
->> >>
->> >> This is AFAIK one of the only places where we cannot get rid of the `=
-as`
->> >> cast. So:
->> >>
->> >>     let bytes: *const [u8] =3D bytes;
->> >>     // CAST: `BStr` transparently wraps `[u8]`.
->> >>     let bytes =3D bytes as *const BStr;
->> >>     // SAFETY: `bytes` is derived from a reference.
->> >>     unsafe { &*bytes }
->> >>
->> >> IMO a `transmute` is worse than an `as` cast :)
->> >
->> > Hmm, looking at this again we can just transmute ref-to-ref and avoid
->> > pointers entirely. We're already doing that in
->> > `CStr::from_bytes_with_nul_unchecked`
->> >
->> > Why is transmute worse than an `as` cast?
->>
->> It's right in the docs: "`transmute` should be the absolute last
->> resort." [1]. IIRC, Gary was a bit more lenient in its use, but I think
->> we should avoid it as much as possible such that people copying code or
->> taking inspiration also don't use it.
->>
->> So for both cases I'd prefer an `as` cast.
->>
->> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html
+On Tue, Mar 25, 2025 at 7:30=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> I don't follow the logic. The trouble with `as` casts is that they are
-> very lenient in what they allow, and to do these conversions with `as`
-> casts requires ref -> pointer -> pointer -> pointer deref versus a
-> single transmute. The safety comment perfectly describes why it's OK
-> to do: the types are transparent. So why is `as` casting pointers
-> better? It's just as unchecked as transmuting, and worse, it requires
-> a raw pointer dereference.
+> On Tue, Mar 25, 2025 at 08:26:18AM -0700, Caleb Sander Mateos wrote:
+> > On Mon, Mar 24, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.com> =
+wrote:
+> > >
+> > > Add words to explain how zero copy feature works, and why it has to b=
+e
+> > > trusted for handling IO read command.
+> > >
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  Documentation/block/ublk.rst | 28 ++++++++++++++++++++--------
+> > >  1 file changed, 20 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.=
+rst
+> > > index 1e0e7358e14a..33efff25b54d 100644
+> > > --- a/Documentation/block/ublk.rst
+> > > +++ b/Documentation/block/ublk.rst
+> > > @@ -309,18 +309,30 @@ with specified IO tag in the command data:
+> > >    ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to c=
+opy
+> > >    the server buffer (pages) read to the IO request pages.
+> > >
+> > > -Future development
+> > > -=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > -
+> > >  Zero copy
+> > >  ---------
+> > >
+> > > -Zero copy is a generic requirement for nbd, fuse or similar drivers.=
+ A
+> > > -problem [#xiaoguang]_ Xiaoguang mentioned is that pages mapped to us=
+erspace
+> > > -can't be remapped any more in kernel with existing mm interfaces. Th=
+is can
+> > > -occurs when destining direct IO to ``/dev/ublkb*``. Also, he reporte=
+d that
+> > > -big requests (IO size >=3D 256 KB) may benefit a lot from zero copy.
+> > > +ublk zero copy relies on io_uring's fixed kernel buffer, which provi=
+des
+> > > +two APIs: `io_buffer_register_bvec()` and `io_buffer_unregister_bvec=
+`.
+> >
+> > nit: missing parentheses after io_buffer_unregister_bvec
+>
+> OK
+>
+> >
+> > > +
+> > > +ublk adds IO command of `UBLK_IO_REGISTER_IO_BUF` to call
+> > > +`io_buffer_register_bvec()` for ublk server to register client reque=
+st
+> > > +buffer into io_uring buffer table, then ublk server can submit io_ur=
+ing
+> > > +IOs with the registered buffer index. IO command of `UBLK_IO_UNREGIS=
+TER_IO_BUF`
+> > > +calls `io_buffer_unregister_bvec` to unregister the buffer.
+> >
+> > Parentheses missing here too.
+> > It might be worth adding a note that the registered buffer and any I/O
+> > that uses it will hold a reference on the ublk request. For a ublk
+> > server implementer, I think it's useful to know that the buffer needs
+> > to be unregistered in order to complete the ublk request, and that the
+> > zero-copy I/O won't corrupt any data even if it completes after the
+> > buffer is unregistered.
+>
+> Good point, how about the following words?
+>
+> ```
+> The ublk client IO request buffer is guaranteed to be live between callin=
+g
+> `io_buffer_register_bvec()` and `io_buffer_unregister_bvec()`.
+>
+> And any io_uring operation which supports this kind of kernel buffer will
+> grab one reference of the buffer until the operation is completed.
+> ```
 
-Note that you're not transmuting `[u8]` to `BStr`, but `*const [u8]` to
-`*const BStr`. Those pointers have provenance and I'm not sure if
-transmuting them preserves it.
+That's definitely better. I think it could be a bit more explicit that
+the buffer needs to be unregistered in order for the ublk request to
+complete.
 
-I tried to find some existing issues about the topic and found that
-there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
-asking for a better justification [1] and it seems like nobody provided
-one there. Maybe we should ask the opsem team what happens to provenance
-when transmuting?
+>
+> >
+> > > +
+> > > +ublk server implementing zero copy has to be CAP_SYS_ADMIN and be tr=
+usted,
+> > > +because it is ublk server's responsibility to make sure IO buffer fi=
+lled
+> > > +with data, and ublk server has to handle short read correctly by ret=
+urning
+> > > +correct bytes filled to io buffer. Otherwise, uninitialized kernel b=
+uffer
+> > > +will be exposed to client application.
+> >
+> > This isn't specific to zero-copy, right? ublk devices configured with
+> > UBLK_F_USER_COPY also need to initialize the full request buffer. I
+>
+> Right, but it is important for zero copy.
 
-[1]: https://github.com/rust-lang/rust-clippy/issues/6372
+Sure. Maybe change "zero copy" to "zero copy or user copy"?
 
----
-Cheers,
-Benno
+>
+> > would also drop the "handle short read" part; ublk servers don't
+> > necessarily issue read operations in the backend, so "short read" may
+> > not be applicable.
+>
+> Here 'read' in 'short read' means ublk front READ command, not actual rea=
+d
+> done in ublk server. Maybe we can make it more accurate:
+>
+> ```
+> ..., and ublk server has to return correct result to ublk driver when han=
+dling
+> READ command, and the result has to match with how many bytes filled to t=
+he IO
+> buffer. Otherwise, uninitialized kernel IO buffer will be exposed to clie=
+nt
+> application.
+> ```
 
+Thanks for clarifying. That looks great!
+
+Best,
+Caleb
