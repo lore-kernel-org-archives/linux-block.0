@@ -1,293 +1,166 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9222A18D65C
-	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 21:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C5314A4E0;
+	Wed, 26 Mar 2025 22:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743024670; cv=none; b=hxzfGEI15ZVnWgabbLBJGGlyRwmBfG7lbAgu73s+oJ8V2dn6GlRhDTZ3Zm1TyCjA+LrK1yY9Q1fJtwjkBXaSZCWEUj5w6EgLeCMKDZ3yjD6pexf3fRadEbkrJBy6fHBYhSlJUEPNKTWeBKlB5V9jJIAcIWCtckjh3ubcskoEYis=
+	t=1743027001; cv=none; b=Xexb1JGlScjtz8EfkGFvKc+GI9cC9Xst4DNAYZ4bAclY+nwtqgrCZgZ6tb1/Fa4s+NkllZCgWP3V2t1pTypXSz0UPO6yVsmcGBGU6rDJ22Y27O3Ug+mTs4EZaYlLBptajcDze0ag5D5kWKpsK6ANQa3pNOQB3HMhZR6/5cFWmvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743024670; c=relaxed/simple;
-	bh=NCcp8hCsmejCq+FSWXRD3v20a7U6ndkKV49r2cmDA2w=;
+	s=arc-20240116; t=1743027001; c=relaxed/simple;
+	bh=25Tr7RM7XhHf1JCtkM+bWEr7gcCanZ/l1B2na6DpLrY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SvmF3LnMH8qP0LHMLbAg16+hyTNlFkPws5ZpGdxnXY5/AvvxKBSt06evWEc4fZyfwmyPQj8OzbrA2pSeTnrpEkuXqRFyPYrN8PmNZFBSL8eEKj1ehLTGjCv9UkTga9xvfkfF7Q7cD5bdMqfMjJ1jN60d3K3N6ZiSf9xAN3iAZT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=U2xsA7bz; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=QE3l01OmJvmL/jfnM6oaQUfvExV/N/2SfID19zogj+E6y+r+tjfnAEN9Oi3yWqczeGUgldtsOcM7AAhXF/dz8dnqXPgCx4WarnMFuXrgRr3e0h71cRauOhhTNaqd1WzlqSi+04LK5ldPmiz44YeBrxryH35cgxohF5xrCh55Obw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpNYGiYO; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="U2xsA7bz"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff6b9a7f91so51521a91.3
-        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 14:31:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpNYGiYO"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30bf5d7d107so3074791fa.2;
+        Wed, 26 Mar 2025 15:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1743024668; x=1743629468; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743026997; x=1743631797; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RogaLn74MA/pLnVl1HWQrTj+WxNxYyzjrAJ+bwp6L3Y=;
-        b=U2xsA7bzX7mCjT97tSJeys3yo7ZbSQr5K+HjJaON66BCmNzcgT8kwj4eCdpVzMRdC/
-         vRyn81GBQ/02FYBUTFopeLZiCUHCMOmu2AFNrNBsmV1NIkPezdxxbMDhxtPCCinBDD74
-         1DfG2FOQpS0itEKc4Ls+fEEgZ2tpoFexgSL8uY4JoEn0orfZYJUR0p6Bype7SzJ0oakl
-         8k+aueQwUE50woB4prxCIJa3gVOFTqfbFWWcGfZn/zhxYUWET2LN6t3oYcmKLuouoYxG
-         3WR9KNt05Vo6wMutfWes7FwInFG/guaXG3OW2ZwGQ0YdAw3LmMedg6bk38hP/r1QMrZ0
-         asgQ==
+        bh=25Tr7RM7XhHf1JCtkM+bWEr7gcCanZ/l1B2na6DpLrY=;
+        b=MpNYGiYO4yDbsQe6zzpDaE0Jd/jCtiogrX12Ioy6whfOJAU3y9m1k7l7cW70JIG+Fm
+         Ca5xdpz3VgWvEwzfx678zlvFel4PwLXnZarxoDYD0/CD4p7a4wOEXCoLKEW+ghVwzRUS
+         PCtqfP2RgGi7+V+iX+AZvoImf2ieXhPxYjagUGKBRNOMrScdIRA8j9aq1K5+L1HQD4Sl
+         rda++dZgGs66cUqhdWsC7o6SS3Ks/ln4rZcxL/cfXmeIo+KSCD+hjhRR3j5Ewb6Q+y8B
+         UJjCN6CBI1oJ8Hzq2ekfv8eAvUfWa6CWH0vgkaw6LOoGY7NTmChGhgI4g2DwJUxOA1kz
+         b3Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743024668; x=1743629468;
+        d=1e100.net; s=20230601; t=1743026997; x=1743631797;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RogaLn74MA/pLnVl1HWQrTj+WxNxYyzjrAJ+bwp6L3Y=;
-        b=FByIAE9FhPRD0ZmhU39/iGHPcx18MujsLpy1NvR/tG10qOdRpNrt1iWcb5V+bX1Lyx
-         cqWNmrSCrszx8D00hFLmvWNNrFKx0B4pUQxTKJKltthVrfyc88JoTeMT7G8XCeoQmj+a
-         AOYuTJxlT7JaFYrEa0jGEr3iz+lfmLZtoM8w4oO3GHF5ZvddwI3PbfFHebo0ekLcK6nf
-         AsKOL6C9Mq8v7Y1yjbjQ86HyS37wjHSrAw4FnH8KLcxL3Bl4pCTez2PdU/f3jVs/DZVQ
-         NP0fchBX2Vq+nZQGqc+vInx98IZQ7odsMHOUi2lprIswwZqfPkF6JBz38hYg7TmW4ZZn
-         GNwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyjy/3k4r+Gr3F6gYzbk1f0NtooySVFWzvhASCfpTzYCMp9qVRCk3SMxQujw37mb/A82p5kw4OD8kwvA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtEyaPR+Y7T1R+OJCLA74uFb7LoeByJ2AAZkmR3A633BrZm94Y
-	BCO7mbzpv/wVxsINUQ48x7KjxNBj34kpdepFt2aSmyCxkTBL35D/qtQGYwfVHsktzAeuPqYwl4x
-	xh6/jAy0XZYh16GFm9k2ejQ3FuZXT1MCUZrOhsg==
-X-Gm-Gg: ASbGncsR5Q27BBeEbUGNmrYWM6VQPcPl23WpOMuU7Wmm3a8iJrmVULNFcbG5rC8Z4PX
-	uRC2spzro04Ry5zdhBDh5MjYjjQlbKxd47t3RNuG6yHxRv2gUhd0PI/L6N0JI1aiVOfQGAD3mQR
-	tIQu9xoWcYWptEI8sGKYNPXVzk
-X-Google-Smtp-Source: AGHT+IFIn+mj3pJmvAx20lMZCVFRo89DdYtIqq4Wk4vtIpBCugWFXsUjKNZMMtzu1q6T1kWEO1/nUsKjWnqgpB6kUJc=
-X-Received: by 2002:a17:90b:1b48:b0:301:ba2b:3bc6 with SMTP id
- 98e67ed59e1d1-303a91a3395mr573090a91.7.1743024667626; Wed, 26 Mar 2025
- 14:31:07 -0700 (PDT)
+        bh=25Tr7RM7XhHf1JCtkM+bWEr7gcCanZ/l1B2na6DpLrY=;
+        b=EMRytNpPpeJSBetJzjSFTNS0vQeO+9oYZ0JjSI4HpnASXXIzpgGodVN64YJiGCOJrf
+         WXgRFVxgfoGolk41nmX5L+SvkyvWH2FGO9h7BXYG/pWg71az88gvNKi4Cn983ritjucF
+         xgM2aSElRrNqwuYzUPB3QYXMO5nthSEplRGTbPNO331Mn57vOGQS05xt30IsvsbWugrV
+         nevDTK+uwqJ47nf9Ci+ljD26gjrn1xN20AR51Pi3K5/iK6k97TTouxkCQnKniDpHaUwe
+         sjj6KgnVV57I5g9ssT87RtIwHUCgnEoh5M4o7UcR0knv1SK4kw66sQURAhSEs+pwumcC
+         /zGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxleR5oNwQo7SV8hTsRlmt2UDGO9ONUyzGgtHvASQ9PKfKpHrYGJnHIMu7bwdlyQK4Dm+T1Yl0@vger.kernel.org, AJvYcCWKDY38m5VfGk0LJ07aVGUFhYCj/M9174jxGRw3meHwL0EgxDIqz0fi+swWWcxVIAY/ifjMbRO6Kg41uoQNtbI8@vger.kernel.org, AJvYcCWo6rR5PHOu1XlVVThMr4NWdahdatc8N3yzFedHlKVkA4CFymTro5Q+bEvFUcTAN3sK5/uCe+1e+V/aTdAUA+4=@vger.kernel.org, AJvYcCWywqkt2fq4j2ELv/C9JHaAjMnBiwZXnfODfGj4sq/gG7TqUgEgZ+2tYLWrqjFDIUaiEzxgLAgoKR7taZE=@vger.kernel.org, AJvYcCX9g1T5j2VtYsAWGFoQkn9qJfvka0LRu1usnStjIwPp29eOcO9uOIvz9OD1x7gti+dvkJLoC4Umtk3d@vger.kernel.org, AJvYcCXMo3mMrUjLf1kvQh5GGuK6Gcm/7gjny2lXHOdbztCNO2HcFsTWXOwk9mzzRwjLydUMhBhZpuJFNjU3@vger.kernel.org, AJvYcCXy05nECEpnzM8zjSunTd39mnCQKezQcSnxH/2CwJ5rEYFFAO3He8JUMFCfCa5EydxNxBtUbWcnFDfQ0gA+@vger.kernel.org, AJvYcCXypFzzZdXDMuzBUet+Kw7QrQrRKPVTs1YZc6j+mA+JQoKPf5pJl/y3dXx4PQeGmdTy/hWfUkEs9o+d5XNV@vger.kernel.org
+X-Gm-Message-State: AOJu0YxitNT2j9+EmgpBzSQEgBHFiWEMkJl/jpJLKXa/u1LG7+9TnddQ
+	FjoB9Yo/yv9bgtsIvY3pt79U5B9o1v7CN11ONwAOWu0xxZNpOjXfsiyL2NnzGoEVtDzUAkpqnWZ
+	oSptoz6UcBd04FA3lkSGyfuz7G/Y=
+X-Gm-Gg: ASbGncszqYk7+OX+x3vd8arnrbRXtlPaOu4YfZ36ZmsCAZSEWMNuZQyIBOwvcksI8ss
+	YmpywSGPlRFzUqbZll5iBMvgyJXD3UxXB1RtYr7ds5NNrimApp47Vigx1JduJClx7E7DukK0ks0
+	7x9sG7M4ZYhVOjnH+qaLiEF4FWwWg3VP/wmwiatdfh/A==
+X-Google-Smtp-Source: AGHT+IHX4HWxiuDcJh6RFBYB0z4mv1VQdnwmt/CKhKHr01wYV9yimExXiWC5KliSOM/5II+nRJgfsPlCyM8KCWUVSdg=
+X-Received: by 2002:a2e:9982:0:b0:300:26bc:4311 with SMTP id
+ 38308e7fff4ca-30dc5dd50b1mr5206711fa.18.1743026996866; Wed, 26 Mar 2025
+ 15:09:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324134905.766777-1-ming.lei@redhat.com> <20250324134905.766777-7-ming.lei@redhat.com>
-In-Reply-To: <20250324134905.766777-7-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 26 Mar 2025 14:30:56 -0700
-X-Gm-Features: AQ5f1JqsuImub5rcHuLpx3VP3pbztzABrAo9eCyASLqKRNHDWC6uqkhlOBwlBxg
-Message-ID: <CADUfDZoBTkNypLXsVFMsZLSJGw3i7VxnQ=POodmYm=E4HPU=SA@mail.gmail.com>
-Subject: Re: [PATCH 6/8] ublk: implement ->queue_rqs()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Keith Busch <kbusch@kernel.org>, Uday Shankar <ushankar@purestorage.com>
+References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
+ <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com>
+ <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
+ <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
+ <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me> <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
+ <D8QI804Q3DAS.2BV4WSL81H52Z@proton.me>
+In-Reply-To: <D8QI804Q3DAS.2BV4WSL81H52Z@proton.me>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 26 Mar 2025 18:09:20 -0400
+X-Gm-Features: AQ5f1Jr4h_VyjyWTUSlSb_WqvOkQ5GTUuP7SqBZOv0icJYUW2AkHAvgmWwY4H9E
+Message-ID: <CAJ-ks9mA5QDeZ3EvOD3THayFt4TtDysgm0jp2aiSF2mQCrhWiQ@mail.gmail.com>
+Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 24, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
+On Wed, Mar 26, 2025 at 5:09=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
+e> wrote:
 >
-> Implement ->queue_rqs() for improving perf in case of MQ.
+> On Wed Mar 26, 2025 at 8:06 PM CET, Tamir Duberstein wrote:
+> > On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@prot=
+on.me> wrote:
+> >> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
+> >> > In the current code you're looking at, yes. But in the code I have
+> >> > locally I'm transmuting `[u8]` to `BStr`. See my earlier reply where=
+ I
+> >> > said "Hmm, looking at this again we can just transmute ref-to-ref an=
+d
+> >> > avoid pointers entirely. We're already doing that in
+> >> > `CStr::from_bytes_with_nul_unchecked`".
+> >>
+> >> `CStr::from_bytes_with_nul_unchecked` does the transmute with
+> >> references. That is a usage that the docs of `transmute` explicitly
+> >> recommend to change to an `as` cast [1].
+> >
+> > RIght. That guidance was written in 2016
+> > (https://github.com/rust-lang/rust/pull/34609) and doesn't present any
+> > rationale for `as` casts being preferred to transmute. I posted a
+> > comment in the most relevant issue I could find:
+> > https://github.com/rust-lang/rust/issues/34249#issuecomment-2755316610.
 >
-> In this way, we just need to call io_uring_cmd_complete_in_task() once fo=
-r
-> one batch, then both io_uring and ublk server can get exact batch from
-> client side.
+> Not sure if that's the correct issue, maybe we should post one on the
+> UCG (unsafe code guidelines). But before that we probably should ask on
+> zulip...
 >
-> Follows IOPS improvement:
+> >> No idea about provenance still.
+> >
+> > Well that's not surprising, nobody was thinking about provenance in
+> > 2016. But I really don't think we should blindly follow the advice in
+> > this case. It doesn't make an iota of sense to me - does it make sense
+> > to you?
 >
-> - tests
+> For ptr-to-int transmutes, I know that they will probably remove
+> provenance, hence I am a bit cautious about using them for ptr-to-ptr or
+> ref-to-ref.
 >
->         tools/testing/selftests/ublk/kublk add -t null -q 2 [-z]
+> >> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html#alternatives
+> >>
+> >> >> I tried to find some existing issues about the topic and found that
+> >> >> there exists a clippy lint `transmute_ptr_to_ptr`. There is an issu=
+e
+> >> >> asking for a better justification [1] and it seems like nobody prov=
+ided
+> >> >> one there. Maybe we should ask the opsem team what happens to prove=
+nance
+> >> >> when transmuting?
+> >> >
+> >> > Yeah, we should do this - but again: not relevant in this discussion=
+.
+> >>
+> >> I think it's pretty relevant.
+> >
+> > It's not relevant because we're no longer talking about transmuting
+> > pointer to pointer. The two options are:
+> > 1. transmute reference to reference.
+> > 2. coerce reference to pointer, `as` cast pointer to pointer (triggers
+> > `ptr_as_ptr`), reborrow pointer to reference.
+> >
+> > If anyone can help me understand why (2) is better than (1), I'd
+> > certainly appreciate it.
 >
->         fio/t/io_uring -p0 /dev/ublkb0
->
-> - results:
->
->         more than 10% IOPS boost observed
->
-> Pass all ublk selftests, especially the io dispatch order test.
->
-> Cc: Uday Shankar <ushankar@purestorage.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c | 85 ++++++++++++++++++++++++++++++++++++----
->  1 file changed, 77 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 53a463681a41..86621fde7fde 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -83,6 +83,7 @@ struct ublk_rq_data {
->  struct ublk_uring_cmd_pdu {
->         struct ublk_queue *ubq;
->         u16 tag;
-> +       struct rq_list list;
->  };
->
->  /*
-> @@ -1258,6 +1259,32 @@ static void ublk_queue_cmd(struct ublk_queue *ubq,=
- struct request *rq)
->         io_uring_cmd_complete_in_task(io->cmd, ublk_rq_task_work_cb);
->  }
->
-> +static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
-> +               unsigned int issue_flags)
-> +{
-> +       struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
-> +       struct ublk_queue *ubq =3D pdu->ubq;
-> +       struct request *rq;
-> +
-> +       while ((rq =3D rq_list_pop(&pdu->list))) {
-> +               struct ublk_io *io =3D &ubq->ios[rq->tag];
-> +
-> +               ublk_rq_task_work_cb(io->cmd, issue_flags);
+> I am very confident that (2) is correct. With (1) I'm not sure (see
+> above), so that's why I mentioned it.
 
-ublk_rq_task_work_cb() is duplicating the lookup of ubq, rq, and io.
-Could you factor out a helper that takes those values instead of cmd?
-
-> +       }
-> +}
-> +
-> +static void ublk_queue_cmd_list(struct ublk_queue *ubq, struct rq_list *=
-l)
-> +{
-> +       struct request *rq =3D l->head;
-> +       struct ublk_io *io =3D &ubq->ios[rq->tag];
-> +       struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(io->cmd=
-);
-> +
-> +       pdu->ubq =3D ubq;
-
-Why does pdu->ubq need to be set here but not in ublk_queue_cmd()? I
-would have thought it would already be set to ubq because pdu comes
-from a rq belonging to this ubq.
-
-> +       pdu->list =3D *l;
-> +       rq_list_init(l);
-> +       io_uring_cmd_complete_in_task(io->cmd, ublk_cmd_list_tw_cb);
-
-Could store io->cmd in a variable to avoid looking it up twice.
-
-> +}
-> +
->  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
->  {
->         struct ublk_queue *ubq =3D rq->mq_hctx->driver_data;
-> @@ -1296,16 +1323,13 @@ static enum blk_eh_timer_return ublk_timeout(stru=
-ct request *rq)
->         return BLK_EH_RESET_TIMER;
->  }
->
-> -static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
-> -               const struct blk_mq_queue_data *bd)
-> +static blk_status_t ublk_prep_rq_batch(struct request *rq)
-
-naming nit: why "batch"?
-
->  {
-> -       struct ublk_queue *ubq =3D hctx->driver_data;
-> -       struct request *rq =3D bd->rq;
-> +       struct ublk_queue *ubq =3D rq->mq_hctx->driver_data;
->         blk_status_t res;
->
-> -       if (unlikely(ubq->fail_io)) {
-> +       if (unlikely(ubq->fail_io))
->                 return BLK_STS_TARGET;
-> -       }
->
->         /* fill iod to slot in io cmd buffer */
->         res =3D ublk_setup_iod(ubq, rq);
-> @@ -1324,17 +1348,58 @@ static blk_status_t ublk_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
->         if (ublk_nosrv_should_queue_io(ubq) && unlikely(ubq->force_abort)=
-)
->                 return BLK_STS_IOERR;
->
-> +       if (unlikely(ubq->canceling))
-> +               return BLK_STS_IOERR;
-
-Why is ubq->cancelling treated differently for ->queue_rq() vs. ->queue_rqs=
-()?
-
-> +
-> +       blk_mq_start_request(rq);
-> +       return BLK_STS_OK;
-> +}
-> +
-> +static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
-> +               const struct blk_mq_queue_data *bd)
-> +{
-> +       struct ublk_queue *ubq =3D hctx->driver_data;
-> +       struct request *rq =3D bd->rq;
-> +       blk_status_t res;
-> +
->         if (unlikely(ubq->canceling)) {
->                 __ublk_abort_rq(ubq, rq);
->                 return BLK_STS_OK;
->         }
->
-> -       blk_mq_start_request(bd->rq);
-> -       ublk_queue_cmd(ubq, rq);
-> +       res =3D ublk_prep_rq_batch(rq);
-> +       if (res !=3D BLK_STS_OK)
-> +               return res;
->
-> +       ublk_queue_cmd(ubq, rq);
->         return BLK_STS_OK;
->  }
->
-> +static void ublk_queue_rqs(struct rq_list *rqlist)
-> +{
-> +       struct rq_list requeue_list =3D { };
-> +       struct rq_list submit_list =3D { };
-> +       struct ublk_queue *ubq =3D NULL;
-> +       struct request *req;
-> +
-> +       while ((req =3D rq_list_pop(rqlist))) {
-> +               struct ublk_queue *this_q =3D req->mq_hctx->driver_data;
-> +
-> +               if (ubq && ubq !=3D this_q && !rq_list_empty(&submit_list=
-))
-> +                       ublk_queue_cmd_list(ubq, &submit_list);
-> +               ubq =3D this_q;
-
-Probably could avoid the extra ->driver_data dereference on every rq
-by comparing the mq_hctx pointers instead. The ->driver_data
-dereference could be moved to the ublk_queue_cmd_list() calls.
-
-> +
-> +               if (ublk_prep_rq_batch(req) =3D=3D BLK_STS_OK)
-> +                       rq_list_add_tail(&submit_list, req);
-> +               else
-> +                       rq_list_add_tail(&requeue_list, req);
-> +       }
-> +
-> +       if (ubq && !rq_list_empty(&submit_list))
-> +               ublk_queue_cmd_list(ubq, &submit_list);
-> +       *rqlist =3D requeue_list;
-> +}
-> +
->  static int ublk_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
->                 unsigned int hctx_idx)
->  {
-> @@ -1347,6 +1412,7 @@ static int ublk_init_hctx(struct blk_mq_hw_ctx *hct=
-x, void *driver_data,
->
->  static const struct blk_mq_ops ublk_mq_ops =3D {
->         .queue_rq       =3D ublk_queue_rq,
-> +       .queue_rqs      =3D ublk_queue_rqs,
->         .init_hctx      =3D ublk_init_hctx,
->         .timeout        =3D ublk_timeout,
->  };
-> @@ -3147,6 +3213,9 @@ static int __init ublk_init(void)
->         BUILD_BUG_ON((u64)UBLKSRV_IO_BUF_OFFSET +
->                         UBLKSRV_IO_BUF_TOTAL_SIZE < UBLKSRV_IO_BUF_OFFSET=
-);
->
-> +       BUILD_BUG_ON(sizeof(struct ublk_uring_cmd_pdu) >
-> +                       sizeof_field(struct io_uring_cmd, pdu));
-
-Looks like Uday also suggested this, but if you change
-ublk_get_uring_cmd_pdu() to use io_uring_cmd_to_pdu(), you get this
-check for free.
-
-Best,
-Caleb
-
-
-> +
->         init_waitqueue_head(&ublk_idr_wq);
->
->         ret =3D misc_register(&ublk_misc);
-> --
-> 2.47.0
->
+Can you help me understand why you're confident about (2) but not (1)?
