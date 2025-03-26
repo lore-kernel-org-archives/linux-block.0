@@ -1,239 +1,123 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f100.google.com (mail-io1-f100.google.com [209.85.166.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCC317F7;
-	Wed, 26 Mar 2025 18:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E8C19CD19
+	for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 18:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743015068; cv=none; b=JovLa1rsAV8I1u6l/chOg/taMdqgz0TBtzdQ6b/t7s/rXCqbCIsxMwe598sV9Am4XDmbHYQKHJS1c+I+QJ5stnzs7J4jkZTXdwBy5FS9/r+W1+p2+ZlvrGz0QZixdJLTOrC3fU8yDrW3LyYXgmGfeGYVK2T04e1Qd242uGNtmR8=
+	t=1743015420; cv=none; b=mRA8RHdNErc5qO3DjkzjoV6O38QEVWnihwwh5159q3Ikn73OJMjTXve8YUv5TBePSkQoOal/qG1AkClRHaYHt9zbJaYX72aPFAqsDt66VeEugQJblD1ecP92tK+dx21sY+R0zbfLWZnIYvzN9d+T4jkkde+IAGGAdhMAU3FaHdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743015068; c=relaxed/simple;
-	bh=DWgEXr9fuwdtMXS+nOYIHZ1UHKVv3edPUTElOoJ/aZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EfLYf8gdyZ40utLgfwZzv/resEjcZV07LvcDDn6+X88fqanzC/zLNjtrN8MMcNbzm+Lwb8F3OmCowr5jRdhczhnaPG5M0po/UF3xaKV2y6XVNJK2A55YqkjqW3UHdts9fgKWGANaNsHy7F2ZOoMnUI679egKzXmpDus/GVmeMwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TOBgnsZW; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1743015420; c=relaxed/simple;
+	bh=jGpiZ3lPuBCyjBbQjqjfHfoJjy55SOzqxjPMosf7Ot8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEVfqFNFmSrnfGj/k+DStnsPPzQZKL5+dzoRNBUuAFOJEwsPdgxuLwX8emBuWdxx6YIMMpPSHcabxpLrsyihW/ECIDBHULoYY2n9PusEEPPlYBqOithja4+AU1ql1koLy2GmUfiBHLh0o+90oC3dMqg1npfImS7Oyqs9rj6nHgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eLoz/+G3; arc=none smtp.client-ip=209.85.166.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TOBgnsZW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=EswWmpH0jdfJkjx/smz0IWtj6k3xpAbWXDFWCIq3/Gg=; b=TOBgnsZWngiPWkGP2A/P6PFSAV
-	+3FwAaUROryqiOu0PfRDntjMVa6xc4IrMYNiHVnUrsPG0hLVfTD7nKG8TMpCfn28VblSkvYIT4XJI
-	6EnZDerlzJs7NBPzqnFpuKDLiiRXEjlesv0gx48NJlzzfLQguRByX+Q6Gt1Jg1nRf6q5uona+f31M
-	5+HFbZKkjrUAthOJHQ0S91cQY1jwLxJAujFB69R+ptvPAvN46B3kClH2RVOzosnl0hqx6YJV+nQGX
-	ZAOZt9zT8dXd32D1q6iBSHjMimi3Wj/Mmb+tgVkC2Y1QwlXBk2eHdQYkeenD3qtThfu0fgP1CXvk7
-	aEO/DiEA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1txVqB-00000009O28-1Nuk;
-	Wed, 26 Mar 2025 18:51:03 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: patches@lists.linux.dev,
-	fstests@vger.kernel.org,
-	linux-mm@kvack.org
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	oliver.sang@intel.com,
-	hannes@cmpxchg.org,
-	willy@infradead.org,
-	jack@suse.cz,
-	apopple@nvidia.com,
-	brauner@kernel.org,
-	hare@suse.de,
-	oe-lkp@lists.linux.dev,
-	lkp@intel.com,
-	john.g.garry@oracle.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	dave@stgolabs.net,
-	riel@surriel.com,
-	krisman@suse.de,
-	boris@bur.io,
-	jackmanb@google.com,
-	gost.dev@samsung.com,
-	mcgrof@kernel.org
-Subject: [PATCH] generic/764: fsstress + migrate_pages() test
-Date: Wed, 26 Mar 2025 11:50:55 -0700
-Message-ID: <20250326185101.2237319-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eLoz/+G3"
+Received: by mail-io1-f100.google.com with SMTP id ca18e2360f4ac-85da5a3667bso8089739f.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Mar 2025 11:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1743015417; x=1743620217; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nMSYNUtEXougJlHExQh8eBet5bvIJeI5uFDV0DD+oQ0=;
+        b=eLoz/+G3BzzyNWtS6MMGQA9TZmjUWCr6TwBsq93oAoRAht4ZR9c1HzLyc0HyRtkfVG
+         X8UYuaPODWt51YCJpAqb8W9p1jp0/v9wob52JL3qcnP9rQEua0asIpKPuyLwHPorzp/7
+         Xsas89nirOm1+2L8cgDwX2oowCUW9kL4jB8ajkSjH/shOgFxGsAZdJ1mHMooe0xDMEOh
+         Dnp8vMNPNZ0ZmGrTngsz/wOOi2yGbeBNKicRQeT+HMfl/uBz6Ao4b2QGCQ+cmVkAJqFR
+         OnWNuSxfgoaIdZOy+vbi1I8tLN0xmZZ1eYa6CnHYJzKRFCENc5iCxF+wOh9kSR0SLnha
+         +XmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743015417; x=1743620217;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nMSYNUtEXougJlHExQh8eBet5bvIJeI5uFDV0DD+oQ0=;
+        b=tWk8eRQ7VF48mvHkVAYmV+yJ0HpMjUYaSssrBJ5Tw3p9+6822wVmPqBlVeeG8L+WjJ
+         gtg5ubC9EjhRXc/HDRBU7Z5e1mM/DzU1Md12txqumrj8WwQIVznH82LYY4kxI9oQKuoR
+         o4vM+MnGDjRR9BML0ke91pY1GQyvI7iICmf80P3nv1ESrWx+WnAXLc5s/4Xc+1+j4WGI
+         GEo2n0gCR22Z/+mS6OxX6EaD6rzT75kedcJsOELn3cocpFBX6Yn4WQGvQdjgt6A2+tGS
+         pM7l+pDCB5veUrGcFdbXOWnHnDk1ZfSiDUpxlmy2qg5gp5AS3r3DJ1JEbaNo8gUS7UkX
+         Gaqw==
+X-Forwarded-Encrypted: i=1; AJvYcCXne/do8b06pmj43W8OFg/CoWzktwmCNLs6tphxKA+xbCE6JNZhWLumFAvvbQLIxP9Dvfyp9IOpj+h3Ng==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz09BRzZgxt5tviEtguUNK8ebh5f4ru2y+0/FQn+CC2Z9rgz7AZ
+	LyXuWPMT3k3qTo7mz3GLga3m1K2X9fhzlJHq1Q+6FsQg9hMl1QopoutEeqOsAPmoR4cpzEC7xEf
+	NFfM/2uOGjkXdFbO4yOOkzLiEexr0qTSc
+X-Gm-Gg: ASbGncvXKIRjF0QRGop0PwKcbJWrNYZfqyG1UKFzBa+xJl0NOy9+42wmH6MlWl6oAav
+	1q0SbLT1n4dC9NTCgUhKTmj76ey5GJsaOOEsuNG0C1ncReeRD5QJ3oYIR/cE5LOYz9Z2b2wNlHF
+	g0QLpc+kgOtaR+/UEZ+LcxEje2xP+iEbXL2SHnW2ivRavQZIdOlUQNqFFhCIUaM9BtDhd7b2j5j
+	tTvt0nCsAby9HihDqF2NzYi+xx1A67UFgKvxMyIT5zKUaDKsxbGNDEsDK892X9NiD8fw6jfFGbV
+	Il126cczsO5+u2Bs1XmmFiKPmALwlTJf7yIjUBh9E9PEgxl20Q==
+X-Google-Smtp-Source: AGHT+IFprfUQX7hl7ALwRYy+fGTAFCgg2CZhgcsHAI4AVmaA2YLgu/KYeOGvdhWmwZaou7Txa0q9P1fZ+A3n
+X-Received: by 2002:a05:6602:7286:b0:85b:3f1a:30aa with SMTP id ca18e2360f4ac-85e82127fb2mr121287439f.9.1743015417329;
+        Wed, 26 Mar 2025 11:56:57 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-4f2cbf03468sm574746173.57.2025.03.26.11.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 11:56:57 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 6300234024A;
+	Wed, 26 Mar 2025 12:56:56 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 6BAF0E40158; Wed, 26 Mar 2025 12:56:56 -0600 (MDT)
+Date: Wed, 26 Mar 2025 12:56:56 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] ublk: improve handling of saturated queues when ublk
+ server exits
+Message-ID: <Z+RN+CPnWO69aJD5@dev-ushankar.dev.purestorage.com>
+References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
+ <20250325-ublk_timeout-v1-4-262f0121a7bd@purestorage.com>
+ <Z-OS2_J7o0NKHWmj@fedora>
+ <Z+Q/SNmX+DpVQ5ir@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z+Q/SNmX+DpVQ5ir@dev-ushankar.dev.purestorage.com>
 
-0-day reported a page migration kernel warning with folios which happen
-to be buffer-heads [0]. I'm having a terribly hard time reproducing the bug
-and so I wrote this test to force page migration filesystems.
+On Wed, Mar 26, 2025 at 11:54:16AM -0600, Uday Shankar wrote:
+> > ublk_abort_requests() should be called only in case of queue dying,
+> > since ublk server may open & close the char device multiple times.
+> 
+> Sure that is technically possible, however is any real ublk server doing
+> this? Seems like a strange thing to do, and seems reasonable for the
+> driver to transition the device to the nosrv state (dead or recovery,
+> depending on flags) when the char device is closed, since in this case,
+> no one can be handling I/O anymore.
 
-It turns out we have have no tests for page migration on fstests or ltp,
-and its no surprise, other than compaction covered by generic/750 there
-is no easy way to trigger page migration right now unless you have a
-numa system.
+I see ublksrv itself is doing this :(
 
-We should evaluate if we want to help stress test page migration
-artificially by later implementing a way to do page migration on simple
-systems to an artificial target.
+/* Wait until ublk device is setup by udev */
+static void ublksrv_check_dev(const struct ublksrv_ctrl_dev_info *info)
+{
+	unsigned int max_time = 1000000, wait = 0;
+	char buf[64];
 
-So far, this doesn't trigger any kernel splats, not even warnings for me.
+	snprintf(buf, 64, "%s%d", "/dev/ublkc", info->dev_id);
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Link: https://lore.kernel.org/r/202503101536.27099c77-lkp@intel.com # [0]
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- common/config         |  2 +
- common/rc             |  8 ++++
- tests/generic/764     | 94 +++++++++++++++++++++++++++++++++++++++++++
- tests/generic/764.out |  2 +
- 4 files changed, 106 insertions(+)
- create mode 100755 tests/generic/764
- create mode 100644 tests/generic/764.out
+	while (wait < max_time) {
+		int fd = open(buf, O_RDWR);
 
-diff --git a/common/config b/common/config
-index 2afbda141746..93b50f113b44 100644
---- a/common/config
-+++ b/common/config
-@@ -239,6 +239,8 @@ export BTRFS_MAP_LOGICAL_PROG=$(type -P btrfs-map-logical)
- export PARTED_PROG="$(type -P parted)"
- export XFS_PROPERTY_PROG="$(type -P xfs_property)"
- export FSCRYPTCTL_PROG="$(type -P fscryptctl)"
-+export NUMACTL_PROG="$(type -P numactl)"
-+export MIGRATEPAGES_PROG="$(type -P migratepages)"
- 
- # udev wait functions.
- #
-diff --git a/common/rc b/common/rc
-index e51686389a78..ed9613a9bf28 100644
---- a/common/rc
-+++ b/common/rc
-@@ -281,6 +281,14 @@ _require_vm_compaction()
- 	fi
- }
- 
-+_require_numa_nodes()
-+{
-+	readarray -t QUEUE < <($NUMACTL_PROG --show | awk '/^membind:/ {for (i=2; i<=NF; i++) print $i}')
-+	if (( ${#QUEUE[@]} < 2 )); then
-+		_notrun "You need a system with at least two numa nodes to run this test"
-+	fi
-+}
-+
- # Requires CONFIG_DEBUGFS and truncation knobs
- _require_split_huge_pages_knob()
- {
-diff --git a/tests/generic/764 b/tests/generic/764
-new file mode 100755
-index 000000000000..91d9fb7e08da
---- /dev/null
-+++ b/tests/generic/764
-@@ -0,0 +1,94 @@
-+#! /bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (c) 2024 Luis Chamberlain.  All Rights Reserved.
-+#
-+# FS QA Test 764
-+#
-+# fsstress + migrate_pages() test
-+#
-+. ./common/preamble
-+_begin_fstest auto rw long_rw stress soak smoketest
-+
-+_cleanup()
-+{
-+	cd /
-+	rm -f $runfile
-+	rm -f $tmp.*
-+	kill -9 $run_migration_pid > /dev/null 2>&1
-+	kill -9 $stress_pid > /dev/null 2>&1
-+
-+	wait > /dev/null 2>&1
-+}
-+
-+_require_scratch
-+_require_command "$NUMACTL_PROG" "numactl"
-+_require_command "$MIGRATEPAGES_PROG" "migratepages"
-+_require_numa_nodes
-+
-+readarray -t QUEUE < <($NUMACTL_PROG --show | awk '/^membind:/ {for (i=2; i<=NF; i++) print $i}')
-+if (( ${#QUEUE[@]} < 2 )); then
-+	echo "Not enough NUMA nodes to pick two different ones."
-+	exit 1
-+fi
-+
-+echo "Silence is golden"
-+
-+_scratch_mkfs > $seqres.full 2>&1
-+_scratch_mount >> $seqres.full 2>&1
-+
-+nr_cpus=$((LOAD_FACTOR * 4))
-+nr_ops=$((25000 * nr_cpus * TIME_FACTOR))
-+fsstress_args=(-w -d $SCRATCH_MNT -n $nr_ops -p $nr_cpus)
-+test -n "$SOAK_DURATION" && fsstress_args+=(--duration="$SOAK_DURATION")
-+
-+runfile="$tmp.migratepages"
-+pidfile="$tmp.stress.pid"
-+
-+run_stress_fs()
-+{
-+	$FSSTRESS_PROG $FSSTRESS_AVOID "${fsstress_args[@]}" &
-+	stress_pid=$!
-+	echo $stress_pid > $pidfile
-+	wait $stress_pid
-+	rm -f $runfile
-+	rm -f $pidfile
-+}
-+
-+run_stress_fs &
-+touch $runfile
-+
-+stress_pid=$(cat $pidfile)
-+
-+while [ -e $runfile ]; do
-+	readarray -t QUEUE < <(numactl --show | awk '/^membind:/ {for (i=2; i<=NF; i++) print $i}')
-+	# Proper Fisher–Yates shuffle
-+	for ((i=${#QUEUE[@]} - 1; i > 0; i--)); do
-+		j=$((RANDOM % (i + 1)))
-+		var=${QUEUE[i]}
-+		QUEUE[i]=${QUEUE[j]}
-+		QUEUE[j]=$var
-+	done
-+
-+	RANDOM_NODE_1=${QUEUE[0]}
-+	RANDOM_NODE_2=${QUEUE[1]}
-+
-+	if [[ -f $pidfile ]]; then
-+		echo "migrating parent fsstress process:" >> $seqres.full
-+		echo -en "\t$MIGRATEPAGES_PROG $pid $RANDOM_NODE_1 $RANDOM_NODE_2 ..." >> $seqres.full
-+		$MIGRATEPAGES_PROG $stress_pid $RANDOM_NODE_1 $RANDOM_NODE_2
-+		echo " $?" >> $seqres.full
-+		echo "migrating child fsstress processes ..." >> $seqres.full
-+		for pid in $(ps --ppid "$stress_pid" -o pid=); do
-+			echo -en "\tmigratepages $pid $RANDOM_NODE_1 $RANDOM_NODE_2 ..." >> $seqres.full
-+			$MIGRATEPAGES_PROG $pid $RANDOM_NODE_1 $RANDOM_NODE_2
-+			echo " $?" >> $seqres.full
-+		done
-+	fi
-+	sleep 2
-+done &
-+run_migration_pid=$!
-+
-+wait > /dev/null 2>&1
-+
-+status=0
-+exit
-diff --git a/tests/generic/764.out b/tests/generic/764.out
-new file mode 100644
-index 000000000000..bb58e5b8957f
---- /dev/null
-+++ b/tests/generic/764.out
-@@ -0,0 +1,2 @@
-+QA output created by 764
-+Silence is golden
--- 
-2.47.2
+		if (fd > 0) {
+			close(fd);
+			break;
+		}
+
+		usleep(100000);
+		wait += 100000;
+	}
+}
+
+This seems related to some failures in ublksrv tests
 
