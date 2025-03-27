@@ -1,86 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42AF8462;
-	Thu, 27 Mar 2025 21:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4C81DED45;
+	Thu, 27 Mar 2025 21:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743112006; cv=none; b=ow7SO+T/Kk7cWB87dtzNQtY7XcNf7Hc0V/pxL5Fj5/TRTNnG6FYMmTWxMwrqTMQxHAJbbL+zwcEftedbkqI1/czCh+2O/EOy2YiV0LTUOyAt6LqrfBzLcCdyXINTKBr5J4kgxCIie3vWqWsAV+NTJkxojlfMZx+gx3aSz/nci3U=
+	t=1743112671; cv=none; b=GAIsXX3/hHT2FF1SSUrip23/8Dyt8rvWPaiZu0rw7z6Z2xtHnpM/kfSkQAygiZxJRdviZdBo7rQNr+X5HfKHdbtPFbPfmpzLxLKXJB9mBQGh2vmeEHwi6gOEyPgfBxPMYZ2kYa/O3x4fXgYbQa7JaFWxa4SiTqd6SIl29oNk4T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743112006; c=relaxed/simple;
-	bh=044NMnypJBKDHzV54PkNfkWM1PAfOVt5sNmhyUdaFz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JaNkzehRHK+8F1f4WcLOb4rM2SHWrEUa/WeggmBc5f4nvouESylVw0FZaXHGBhjBK0RMoYyC+spuibiRqFOxK2QxFNzq6jwbyoxytyEg2XM6sjnoIOuSG+ciS1FJw//6+ev0xypFpm5mNyGzCbkdE/oWoBrQkx3vAoeVD2K4/FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbrjDgJ4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743112671; c=relaxed/simple;
+	bh=2JaAn98f3WVVTUV4zPmAkU4cOoVTOpFjAd0eloNL26s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YJ5vre7eXNJFfEvNwaT+5miCpoKrVIgUV8UR+OrPDhGH6UVNrMQe1SW1EewZlee7yan9tI228JVc6EGGysZqONndwPlcTXeOyaoYB7EcFiIkr0wOPRGXWlascJANjD+uqmm+CdF+xW2J2jdK3kT0XHjyvOqz82NwWtBqC8ywoSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B6COfFjl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbrjDgJ4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D4EFC4CEDD;
-	Thu, 27 Mar 2025 21:46:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B6COfFjl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0BF0C4CEDD;
+	Thu, 27 Mar 2025 21:57:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743112006;
-	bh=044NMnypJBKDHzV54PkNfkWM1PAfOVt5sNmhyUdaFz8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PbrjDgJ4+NfAozJ7lqUyl/lBGtxzqX4FdqXvsbkLlWVlzKiNBfvv149fKViJAbrER
-	 5CtC9il1MqDLyz8I+p1kXiPFoz/CM9Nhcz/IX3D4UQSkykxPycZSr9Pi7jpc660yUL
-	 V6UyTrNzKm1mzyTeNkpZsi+y7JCsoe1BvdEWYlTU5niHpJ1/r4mogyHZJZvWD+VuUV
-	 xO8+ZystdjlkOMfDt9ox3odkNMIpmJ+5CdmMH7QpGTbv0AJ4aho7RMV+6L/Cl+c2WA
-	 TZV0g/0RPt5SvtM/IdTaZxRlNVhyJSy48fNnsreUpmVUtNBrTvwejGc7HOZfnXi5jU
-	 zhyBn2nGlwvyg==
-Date: Thu, 27 Mar 2025 14:46:44 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Dave Chinner <david@fromorbit.com>
-Cc: lsf-pc@lists.linux-foundation.org, patches@lists.linux.dev,
-	fstests@vger.kernel.org, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	oliver.sang@intel.com, hannes@cmpxchg.org, willy@infradead.org,
-	jack@suse.cz, apopple@nvidia.com, brauner@kernel.org, hare@suse.de,
-	oe-lkp@lists.linux.dev, lkp@intel.com, john.g.garry@oracle.com,
-	p.raghav@samsung.com, da.gomez@samsung.com, dave@stgolabs.net,
-	riel@surriel.com, krisman@suse.de, boris@bur.io,
-	jackmanb@google.com, gost.dev@samsung.com
-Subject: Re: [LSF/MM/BPF Topic] synthetic mm testing like page migration
-Message-ID: <Z-XHRAgL0u2qO7LH@bombadil.infradead.org>
-References: <Z-ROpGYBo37-q9Hb@bombadil.infradead.org>
- <Z-Rni3UhAF4RB7AY@dread.disaster.area>
+	s=k20201202; t=1743112670;
+	bh=2JaAn98f3WVVTUV4zPmAkU4cOoVTOpFjAd0eloNL26s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=B6COfFjlmv44H/k8P+/lDonPywmqiVsjydXWYBGmwJNHXItK56LsIYYCHHQsNCi4m
+	 c8rDyU3SMmrjRXWXb4ZOTIUkAjf05A0hKeJKoHpRLXReBDGuzUUW/eZaSoDTyRK3BK
+	 Khjkc7cJSoPNhaOvjjnbXbD02ffpLYPlRS6fC9xq8J88o17qUC+1K/ophEYU+IZCQJ
+	 iv1KIjQaCTnZm+pVc/Q5fL2DhtGYEeQcDDS7ejfsxW3Ab5DPvDhRvhFhRTA17cABWY
+	 KgAGz2fwz++ipPkeXUlTM6Vzuk/lcC0EZZ4SLuQabCgAHXkMoLioP57G+iE7wt0m0Z
+	 +AB0AExum5kcA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7109C380AAFD;
+	Thu, 27 Mar 2025 21:58:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-Rni3UhAF4RB7AY@dread.disaster.area>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [f2fs-dev] [RFC v2 00/38] Improve ABI documentation generation
+From: patchwork-bot+f2fs@kernel.org
+Message-Id: 
+ <174311270700.2230226.6627341491675246186.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Mar 2025 21:58:27 +0000
+References: <cover.1738020236.git.mchehab+huawei@kernel.org>
+In-Reply-To: <cover.1738020236.git.mchehab+huawei@kernel.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: linux-doc@vger.kernel.org, corbet@lwn.net, gregkh@linuxfoundation.org,
+ linux-pm@vger.kernel.org, netdev@vger.kernel.org, coresight@lists.linaro.org,
+ linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-block@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-hardening@vger.kernel.org, workflows@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-media@vger.kernel.org
 
-On Thu, Mar 27, 2025 at 07:46:03AM +1100, Dave Chinner wrote:
-> On Wed, Mar 26, 2025 at 11:59:48AM -0700, Luis Chamberlain wrote:
-> > I'd like to propose this as a a BoF for MM.
-> > 
-> > We can find issues if we test them, but some bugs are hard to reproduce,
-> > specially some mm bugs. How far are we willing to add knobs to help with
-> > synthetic tests which which may not apply to numa for instance? An
-> > example is the recent patch I just posted to force testing page
-> > migration [0]. We can only run that test if we have a numa system, and a
-> > lot of testing today runs on guests without numa. Would we be willing
-> > to add a fake numa node to help with synthetic tests like page
-> > migration?
+Hello:
+
+This patch was applied to jaegeuk/f2fs.git (dev)
+by Jonathan Corbet <corbet@lwn.net>:
+
+On Tue, 28 Jan 2025 01:05:49 +0100 you wrote:
+> Hi Jon/Greg,
 > 
-> Boot your test VMs with fake-numa=4, and now you have a 4 node
-> system being tested even though it's not a real, physical numa
-> machine.  I've been doing this for the best part of 15 years now
-> with a couple of my larger test VMs explicitly to test NUMA
-> interactions.
+> That's the second version of my RFC patches meant to modenize the ABI
+> parser that I wrote in Perl.
+> 
+> I originally started it due to some issues I noticed when searching for
+> ABI symbols. While I could just go ahead and fix the already existing
+> script, I noticed that the script maintainance didn't have much care over
+> all those years, probably because it is easier to find Python programmers
+> those days.
+> 
+> [...]
 
-Suuuuweet! Given your long term use of it, we'll just make it a default
-for all kdevops libvirt testing now!
+Here is the summary with links:
+  - [f2fs-dev,RFC,v2,10/38] ABI: sysfs-fs-f2fs: fix date tags
+    https://git.kernel.org/jaegeuk/f2fs/c/90800df0da78
 
-> One of the eventual goals of check-parallel is to have all these
-> things environmental variables like memory load, compaction, cpu
-> hotplug, etc to be changing in the background whilst the tests
-> running so that we can exercise all the filesystem functionality
-> under changing MM and environmental conditions without having to
-> code that into individual tests....
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Indeed, I have high hopes for check-parallel.
 
-  Luis
