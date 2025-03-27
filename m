@@ -1,135 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434AF2101BD;
-	Thu, 27 Mar 2025 11:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334C8440C;
+	Thu, 27 Mar 2025 11:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743073665; cv=none; b=cjYmet76Wof/I5GH2MKc8f3JQBbwyi3ehR3phGPgjy2/e88KfPMItpqx93qHDc0kVcbXskide3wm0gpy7s4yzUJwN0xY/fyTINDF436RghnEEaEF6VvCK61XTIv85FBU2OjgixQtooKevD9tTMNMJu53PefHBskN7HPw+mQumx0=
+	t=1743075215; cv=none; b=ObocryrmJa3qf9UpgIkNf08bD6HDvFDKVPTtoRmdj+uPbQ0FOvlAxSGDWxdGfVjGsP+BaPmRwXh1iNOs97YfC07GWZq/CMhDsZHkzZTTPtL2h0zI446PXrPEkJeIVgLsMcwirsVJ5pOOjN2GFI64VdVQW1RslNS1E23d0OOHyhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743073665; c=relaxed/simple;
-	bh=Dvi5btozFJtTcgREwrstpdJeuJ6eZajLPIGDsvSUmLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DtyqqzqQNusoWY3vDgVKsZ0WlzQovZekWW9kmXA8fFgYF16xrukLjMwnUfAzt6gcpSoEQthWVTaZXPzvGCsb9Z62tj+M9AmjtYP0SOV7UnobntGu+pGeuviublwbRrgmDDL3mbkNGA6utN72U0eWvzbx+L16098eqSz4jZ6YhAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOd6RVnn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743075215; c=relaxed/simple;
+	bh=LlM1BSHZ9HGeLI6TzmIaSytFaCV3jPNneKD8n0ivMNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H8y+FqQxiQUdOK7HeQ8oSDOvMlZDwylC/YktY/yZTdrJ1CiyH64Ed/kUFtW7BUuTfe0q7/wdjHyJRvHVCt9KJkRmH/Pj/thqxrwh3q7A0KLl4hobMAA2eKzX47cRnEwhj5GazmA2qd94fdLKrmwe5YTFcJOEZrntQUEC3HRkrbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fE+X4b1w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOd6RVnn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD6FC4CEEB;
-	Thu, 27 Mar 2025 11:07:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fE+X4b1w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F27C4CEDD;
+	Thu, 27 Mar 2025 11:33:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743073664;
-	bh=Dvi5btozFJtTcgREwrstpdJeuJ6eZajLPIGDsvSUmLM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WOd6RVnnHMZ2iLhSj3+dDLlbVEq37EvLFtb1Cn67TjbXM3yWGmGJwXVkGbupRFTvr
-	 Uu4MS0EXybE4wCWUS8GakAXOnpilNS3k2TgkmUgWc4DrWHOBs+je1UWBPYXSVwrMr5
-	 fdxmUpnppAwo6LR3AKjU8agNHUQy8lUoe90iV21XOGQ9vXPLu+F28oRPZdcikkKpnV
-	 qrQm4WoUPD291sWdaz7p9qzg8z88NfFMvMWpAEnsiKKwZMpj//LAlTVc53HNInR683
-	 6C9NCbCTbcdDFynecOBCK5pX86uR/FXriGlep5lawP7AZvd2gAK9+Q1vm/i6bPIqc7
-	 C8bytQO5hNbDg==
-From: Philipp Stanner <phasta@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Jens Axboe <axboe@kernel.dk>,
+	s=k20201202; t=1743075214;
+	bh=LlM1BSHZ9HGeLI6TzmIaSytFaCV3jPNneKD8n0ivMNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fE+X4b1wxvUFV8s34bIDCxIofDhuiGuBNvwU43r4Y+oFDV0oTUOkBoL9gyETF/oHv
+	 tcg1O8ZPfUAufSQ1vejt6O4DP3d808t9DBOluT/NwtEOKGuDiNnX1B5Mr6vd/NkMOj
+	 mUGRPLi+AQoyVlpFxHLQRHrxP9m/MBoT8CbCqXw+bvoLfCcz9hxoYVpbYdlS7aFjxW
+	 vWQbmhfTCEP8NcMXc3RkDxLAXR7Sk+mICLkQ2W/uUh0T1XD6lKJYQ0pWLbP70v1ov5
+	 274x6ofyLLF0Oo0ZS47RFp2B+GVcPlix5Zyqd4IQmNMyXKSLL5de4p/iqEhVY2Ho9/
+	 IJfgscVPyvtkQ==
+Date: Thu, 27 Mar 2025 11:33:28 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Philipp Stanner <phasta@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
 	Bjorn Helgaas <bhelgaas@google.com>,
-	Mark Brown <broonie@kernel.org>,
 	David Lechner <dlechner@baylibre.com>,
 	Philipp Stanner <pstanner@redhat.com>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Yang Yingliang <yangyingliang@huawei.com>,
-	Zijun Hu <quic_zijuhu@quicinc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Li Zetao <lizetao1@huawei.com>,
-	Anuj Gupta <anuj20.g@samsung.com>
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
+	Zijun Hu <quic_zijuhu@quicinc.com>, Hannes Reinecke <hare@suse.de>,
+	Al Viro <viro@zeniv.linux.org.uk>, Li Zetao <lizetao1@huawei.com>,
+	Anuj Gupta <anuj20.g@samsung.com>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-pci@vger.kernel.org
-Subject: [PATCH 2/2] PCI: Remove pcim_iounmap_regions()
-Date: Thu, 27 Mar 2025 12:07:08 +0100
-Message-ID: <20250327110707.20025-4-phasta@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250327110707.20025-2-phasta@kernel.org>
+Subject: Re: [PATCH 1/2] mtip32xx: Remove unnecessary PCI function calls
+Message-ID: <b1aa0663-afe4-4fe2-b311-e1e0c9930314@sirena.org.uk>
 References: <20250327110707.20025-2-phasta@kernel.org>
+ <20250327110707.20025-3-phasta@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Pd8goGw0e2pe9hhP"
+Content-Disposition: inline
+In-Reply-To: <20250327110707.20025-3-phasta@kernel.org>
+X-Cookie: Multics is security spelled sideways.
 
-From: Philipp Stanner <pstanner@redhat.com>
 
-All users of the deprecated function pcim_iounmap_regions() have been
-ported by now. Remove it.
+--Pd8goGw0e2pe9hhP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
----
- .../driver-api/driver-model/devres.rst        |  1 -
- drivers/pci/devres.c                          | 24 -------------------
- include/linux/pci.h                           |  1 -
- 3 files changed, 26 deletions(-)
+On Thu, Mar 27, 2025 at 12:07:07PM +0100, Philipp Stanner wrote:
+> pcim_iounmap_regions() is deprecated. Moreover, it is not necessary to
+> call it in the driver's remove() function or if probe() fails, since it
+> does cleanup automatically on driver detach.
 
-diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-index d75728eb05f8..601f1a74d34d 100644
---- a/Documentation/driver-api/driver-model/devres.rst
-+++ b/Documentation/driver-api/driver-model/devres.rst
-@@ -396,7 +396,6 @@ PCI
-   pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
-   pcim_iomap_table()		: array of mapped addresses indexed by BAR
-   pcim_iounmap()		: do iounmap() on a single BAR
--  pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
-   pcim_pin_device()		: keep PCI device enabled after release
-   pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
- 
-diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-index 3431a7df3e0d..c60441555758 100644
---- a/drivers/pci/devres.c
-+++ b/drivers/pci/devres.c
-@@ -946,30 +946,6 @@ int pcim_request_all_regions(struct pci_dev *pdev, const char *name)
- }
- EXPORT_SYMBOL(pcim_request_all_regions);
- 
--/**
-- * pcim_iounmap_regions - Unmap and release PCI BARs (DEPRECATED)
-- * @pdev: PCI device to map IO resources for
-- * @mask: Mask of BARs to unmap and release
-- *
-- * Unmap and release regions specified by @mask.
-- *
-- * This function is DEPRECATED. Do not use it in new code.
-- * Use pcim_iounmap_region() instead.
-- */
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask)
--{
--	int i;
--
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (!mask_contains_bar(mask, i))
--			continue;
--
--		pcim_iounmap_region(pdev, i);
--		pcim_remove_bar_from_legacy_table(pdev, i);
--	}
--}
--EXPORT_SYMBOL(pcim_iounmap_regions);
--
- /**
-  * pcim_iomap_range - Create a ranged __iomap mapping within a PCI BAR
-  * @pdev: PCI device to map IO resources for
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 47b31ad724fa..7661f10913ca 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -2323,7 +2323,6 @@ void pcim_iounmap(struct pci_dev *pdev, void __iomem *addr);
- void __iomem * const *pcim_iomap_table(struct pci_dev *pdev);
- int pcim_request_region(struct pci_dev *pdev, int bar, const char *name);
- int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
- void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
- 				unsigned long offset, unsigned long len);
- 
--- 
-2.48.1
+Acked-by: Mark Brown <broonie@kernel.org>
 
+--Pd8goGw0e2pe9hhP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmflN4cACgkQJNaLcl1U
+h9Bg0gf/SdUIZuMAvDjjum537HCUp/d3IiAWo2tPl9cBi5na/HGuYCxifauxJyQC
+MB+yL+xZXivD3XYRlfBLU/nwFA+zxjbXUvzbdeg5vvcz92AVqHmiB35mh2U6q60j
+Z4iR2BBaWGx5JCmzq0+830sSIu0ukch8nDslMHHUQAIjGnufhsK8RiB3U22qdSKI
+JoMMBwZEDFz742aA0CxOluoSa5nnLP3naxjmJEz0mtbE4N1OohttGAOoQsIuYO3T
+jShNX4fsykw0rZmFyGYdrPpdVp+307X+Fing342Vu4P6jnzP8lrVNyLx7XiXWPWa
+VHW3QIIhEYJhLe1BAAER1rwk7Di6mQ==
+=YeSr
+-----END PGP SIGNATURE-----
+
+--Pd8goGw0e2pe9hhP--
