@@ -1,137 +1,149 @@
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD161C6FED;
-	Thu, 27 Mar 2025 22:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F5D15442A;
+	Thu, 27 Mar 2025 22:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743113842; cv=none; b=G7FH4APpwoFIt39hWpKwVT41nGngMPqn3ay4dGCKTbaDfd+CQn17ZNGv3qLGovtplAHY5gmUrAtz5L5hsa1a3H4ERJfGiLX8fSGMKI+e6cCErpjtYZr6RYCaTU3eLqCVI8lrzfHfyQczX4ceN+IuMNiWJZqmjOR5U+5WfoEvyvU=
+	t=1743114889; cv=none; b=DGh/c/a4qbatThF6VlO9MjRH6WJj4kSeRY1FehgdlbFYVa8uUbxrfvVIbJ1UfGc6JxjLRz/JCGTCO15BYjTG+Y082eQkzpwrAgKhBzuiHlv3hcMmByQfIAQMkIVtFyKwEin+N/X2bDeXrUO5xbksOIY9vEdRsZsBV1BHZurUKu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743113842; c=relaxed/simple;
-	bh=89psVsuhmLnpB0D1Kli4UHQLPn+imufHphtlmAmXIs0=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yj1jiFYyPNoKQl+l+O+b07F1z86xYEMDAGueip+THKLPuwU85vKsUxH0oxueoiDnTWO/XfUV6VjTXd+EbMJgeTElPUnDAhNwoyIC+ZhiRge+GXJQEkZWqdADZ8GFqTU0feCecPqyzxNL8C0Xs6JKcrIiwXO6mqx+EPYVBwe2GEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=jic0rZP8; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="jic0rZP8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1743113838; x=1743373038;
-	bh=pOr0DNwW22udl+QjNXdk6JXxuaFTQiZdJAYlJD9wBnM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=jic0rZP8jIRDUlYJVFn/WyH0SzSXhx/zI69q9kX7QeIHgrcfENJqk0J8WRHjnVLi8
-	 NYQ1OQjEs2l7GGNjObJEnLrPxDYndr08EDpfs5TYJPPr+lShwi3LeLeDuagfKMTX0v
-	 UXJnlwsDLJtsylUVLqPjRLZYRG8dDGGuGYSii/uS3sv0xX1IDXSgSC7+Wz31lLkvL2
-	 5BnTTLJTUPFluto7iYwREkzHvpTxJGSFCr0IhBxuyRScrQ9B5ClXkGkU0BdIv7WVEx
-	 65PCUwy1qRK0ngPc/CSLFvWJ2GfvoP8cmalbSSqimzg1t97SUicTxDSvJk0LsHlwll
-	 zekMJyBpIF4Pg==
-Date: Thu, 27 Mar 2025 22:17:13 +0000
-To: Tamir Duberstein <tamird@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-Message-ID: <D8REA6VW7QFS.Y5195VX38USO@proton.me>
-In-Reply-To: <CAJ-ks9n3BdKkfCpMXhE8M8Sx4B5rASoNvbmA4zPU3rmPQwZCiQ@mail.gmail.com>
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com> <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me> <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com> <D8QI804Q3DAS.2BV4WSL81H52Z@proton.me> <CAJ-ks9mA5QDeZ3EvOD3THayFt4TtDysgm0jp2aiSF2mQCrhWiQ@mail.gmail.com> <D8QJMH5UR6VG.2OT5MXJJQU5QT@proton.me> <CAJ-ks9m96vf_HxttuopuC_UfNGJbHHNdEGS2er6nZZG38pe3HQ@mail.gmail.com> <CAJ-ks9n3BdKkfCpMXhE8M8Sx4B5rASoNvbmA4zPU3rmPQwZCiQ@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 82a53baabf13e0ce95fda485724e51f17f7c7368
+	s=arc-20240116; t=1743114889; c=relaxed/simple;
+	bh=3CSkkhDB3OkuUO8+fBRtj2a5+2D2468SNUFndQtMkHM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jkfiOOfrcsV/7g3bi9qb+o5EBcqkaN6s1/Qjb3IVSUIKdZGwOH8FP1iwrooXbwhD4uvYPS6BqtjbBd0ukKbeJwMWOpF7AsvLksj1r7TLWzCW1LUy23/AqDX6ZLMtkfV33qIlTy9uembrhlWC7uUyl/c+axJ/2k5saWduRvJAntg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
+Received: from [2a02:578:851f:1502:391e:c5f5:10e2:b9a3] (helo=deadeye)
+	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1txvo4-0002Xd-2s;
+	Thu, 27 Mar 2025 22:34:35 +0000
+Received: from ben by deadeye with local (Exim 4.98.1)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1txvo2-000000054em-1uCU;
+	Thu, 27 Mar 2025 23:34:34 +0100
+Message-ID: <3fa05bba190bec01df2bc117cf7e3e2f00e8b946.camel@decadent.org.uk>
+Subject: Re: [PATCH V3] block: fix conversion of GPT partition name to 7-bit
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org
+Cc: linux-efi@vger.kernel.org, Olivier Gayot <olivier.gayot@canonical.com>, 
+ Mulhern <amulhern@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>,
+ stable@vger.kernel.org
+Date: Thu, 27 Mar 2025 23:34:29 +0100
+In-Reply-To: <20250305022154.3903128-1-ming.lei@redhat.com>
+References: <20250305022154.3903128-1-ming.lei@redhat.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-RVoY/5FyFWWaQY8gMRQ4"
+User-Agent: Evolution 3.56.0-1 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-SA-Exim-Connect-IP: 2a02:578:851f:1502:391e:c5f5:10e2:b9a3
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
+
+
+--=-RVoY/5FyFWWaQY8gMRQ4
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu Mar 27, 2025 at 8:44 PM CET, Tamir Duberstein wrote:
-> On Thu, Mar 27, 2025 at 10:15=E2=80=AFAM Tamir Duberstein <tamird@gmail.c=
-om> wrote:
->> On Wed, Mar 26, 2025 at 6:15=E2=80=AFPM Benno Lossin <benno.lossin@proto=
-n.me> wrote:
->> > On Wed Mar 26, 2025 at 11:09 PM CET, Tamir Duberstein wrote:
->> > > On Wed, Mar 26, 2025 at 5:09=E2=80=AFPM Benno Lossin <benno.lossin@p=
-roton.me> wrote:
->> > >> On Wed Mar 26, 2025 at 8:06 PM CET, Tamir Duberstein wrote:
->> > >> > On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossi=
-n@proton.me> wrote:
->> > >> >> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
->> > >> >> >
->> > >> >> > Yeah, we should do this - but again: not relevant in this disc=
-ussion.
->> > >> >>
->> > >> >> I think it's pretty relevant.
->> > >> >
->> > >> > It's not relevant because we're no longer talking about transmuti=
-ng
->> > >> > pointer to pointer. The two options are:
->> > >> > 1. transmute reference to reference.
->> > >> > 2. coerce reference to pointer, `as` cast pointer to pointer (tri=
-ggers
->> > >> > `ptr_as_ptr`), reborrow pointer to reference.
->> > >> >
->> > >> > If anyone can help me understand why (2) is better than (1), I'd
->> > >> > certainly appreciate it.
->> > >>
->> > >> I am very confident that (2) is correct. With (1) I'm not sure (see
->> > >> above), so that's why I mentioned it.
->> > >
->> > > Can you help me understand why you're confident about (2) but not (1=
-)?
->> >
->> > My explanation from above explains why I'm not confident about (1):
->> >
->> >     For ptr-to-int transmutes, I know that they will probably remove
->> >     provenance, hence I am a bit cautious about using them for ptr-to-=
-ptr or
->> >     ref-to-ref.
->> >
->> > The reason I'm confident about (2) is that that is the canonical way t=
-o
->> > cast the type of a reference pointing to an `!Sized` value.
->>
->> Do you have a citation, other than the transmute doc?
+On Wed, 2025-03-05 at 10:21 +0800, Ming Lei wrote:
+> From: Olivier Gayot <olivier.gayot@canonical.com>
+>=20
+> The utf16_le_to_7bit function claims to, naively, convert a UTF-16
+> string to a 7-bit ASCII string. By naively, we mean that it:
+>  * drops the first byte of every character in the original UTF-16 string
+>  * checks if all characters are printable, and otherwise replaces them
+>    by exclamation mark "!".
+>=20
+> This means that theoretically, all characters outside the 7-bit ASCII
+> range should be replaced by another character. Examples:
+>=20
+>  * lower-case alpha (=C9=92) 0x0252 becomes 0x52 (R)
+>  * ligature OE (=C5=93) 0x0153 becomes 0x53 (S)
+>  * hangul letter pieup (=E3=85=82) 0x3142 becomes 0x42 (B)
+>  * upper-case gamma (=C6=94) 0x0194 becomes 0x94 (not printable) so gets
+>    replaced by "!"
 
-Not that I am aware of anything.
+Also any character with low 8 bits equal to 0 terminates the string.
 
-> Turns out this appeases clippy:
+> The result of this conversion for the GPT partition name is passed to
+> user-space as PARTNAME via udev, which is confusing and feels questionabl=
+e.
+
+Indeed.  But this change seems to make it worse!
+
+[...]
+> This results in many values which should be replaced by "!" to be kept
+> as-is, despite not being valid 7-bit ASCII. Examples:
+>=20
+>  * e with acute accent (=C3=A9) 0x00E9 becomes 0xE9 - kept as-is because
+>    isprint(0xE9) returns 1.
 >
-> diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
-> index 80a9782b1c6e..7a6fc78fc314 100644
-> --- a/rust/kernel/uaccess.rs
-> +++ b/rust/kernel/uaccess.rs
-> @@ -240,9 +240,10 @@ pub fn read_raw(&mut self, out: &mut
-> [MaybeUninit<u8>]) -> Result {
->      /// Fails with [`EFAULT`] if the read happens on a bad address,
-> or if the read goes out of
->      /// bounds of this [`UserSliceReader`]. This call may modify
-> `out` even if it returns an error.
->      pub fn read_slice(&mut self, out: &mut [u8]) -> Result {
-> +        let out: *mut [u8] =3D out;
->          // SAFETY: The types are compatible and `read_raw` doesn't
-> write uninitialized bytes to
->          // `out`.
-> -        let out =3D unsafe { &mut *(out as *mut [u8] as *mut
-> [MaybeUninit<u8>]) };
-> +        let out =3D unsafe { &mut *(out as *mut [MaybeUninit<u8>]) };
->          self.read_raw(out)
->      }
+>  * euro sign (=E2=82=AC) 0x20AC becomes 0xAC - kept as-is because isprint=
+(0xAC)
+>    returns 1.
+[...]
+> --- a/block/partitions/efi.c
+> +++ b/block/partitions/efi.c
+> @@ -682,7 +682,7 @@ static void utf16_le_to_7bit(const __le16 *in, unsign=
+ed int size, u8 *out)
+>  	out[size] =3D 0;
+> =20
+>  	while (i < size) {
+> -		u8 c =3D le16_to_cpu(in[i]) & 0xff;
+> +		u8 c =3D le16_to_cpu(in[i]) & 0x7f;
+> =20
+>  		if (c && !isprint(c))
+>  			c =3D '!';
 
-Seems like your email client auto-wrapped that :(
+Now we map '=C3=A9' to 'i' and '=E2=82=AC' to ','.  Didn't we want to map t=
+hem to
+'!'?
 
-> Benno, would that work for you? Same in str.rs, of course.
+We shouldn't mask the input character; instead we should do a range
+check before calling isprint().  Something like:
 
-For this specific case, I do have a `cast_slice_mut` function I
-mentioned in the other thread, but that is still stuck in the untrusted
-data series, I hope that it's ready tomorrow or maybe next week. I'd
-prefer if we use that (since its implementation also doesn't use `as`
-casts :). But if you can't wait, then the above is fine.
+	u16 uc =3D le16_to_cpu(in[i]);
+	u8 c;
 
----
-Cheers,
-Benno
+	if (uc < 0x80 && (uc =3D=3D 0 || isprint(uc)))
+		c =3D uc;
+	else
+		c =3D '!';
 
+Ben.
+
+--=20
+Ben Hutchings
+If God had intended Man to program,
+we'd have been born with serial I/O ports.
+
+--=-RVoY/5FyFWWaQY8gMRQ4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmfl0nUACgkQ57/I7JWG
+EQkwGQ/8DAz/Sk0ptrmxpyj5dLfoDsrDF3pR2z+3uhS3QzuqqDo1kp68oupVW9SD
+5KosvmwQWwPMStwkK5yfRXHbBlp7mUbJK5Q4y2P+yL9QD95IzVLb6yH165MjRjY0
+YxEVdPruGdxMzMU4GKx7ix4JC+xRrz3XLB7CI8cz1sKfvRQ1vAUNq3nVL305k1+o
+Dt2zmkCtB5sB6pcvxKHjnOoIV5V6gnejryzWYc7XGD4JoRF0Xrp4ktBWINgMkdE/
+bgdHtEhysFmxlGx9F5nOJcm173tl9ErgdKRzC0j5U5sd1A0kZTY1HpkoyqPDczIl
+coVeiEwmP/POaATGR/2zmMRbq22WVObC6Q5H3oMUE4gkUf1Ht6DDpjlfKfy41jvy
+Qb2omMUqM24szn5WbJxwHnbaGXpkv2k+ERIHI2tGsIp55tMX1CxqfUpOKPXPahW+
+xiVb6MZPOTp1ZCo81nznDvIM9GE3ckUYnlH3i+Z/P8GsW5YHjNOJ696z4VRdpiVG
+dRju1K2f4xHBISaQMVu3J7xvJjgdPsaDwLSe2W93wmwvIP9pHJ8Y8qCE19kWfSHo
+fXjEz1NFEziGEeZ3pMwYEvOQLHf9zdtReB8scGK1YFUFIlbIcUM7a4OpKX0DWYHn
+T8xSRXAylMM79sFy90LFGHhdS66o7rTtXgiKEDnNNQKW6vPjFKI=
+=7cKK
+-----END PGP SIGNATURE-----
+
+--=-RVoY/5FyFWWaQY8gMRQ4--
