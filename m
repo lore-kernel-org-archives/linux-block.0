@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3536120CCF4
-	for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 09:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A51B20D4F9
+	for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 09:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743069129; cv=none; b=HZh29GoCa4Pji1Qt05VqjRtU039QJRX8GNYYI/c0m7MmIpgYaT2Mb43E6+zTvC7nwOJaipQVla9z7bAUpo9jCvjfICiKyd414cb6mErKHJDH/n8Q+DdvkJvIcAeCiLs9RWglWeTMqgQTACXy7AxUvg3a66/2p8q+SGKZUomSOSg=
+	t=1743069131; cv=none; b=U3diJgySewR+6XYroDuNhmME/mwHBOGy2arUZaqsYSt7YCCWgKoJFJMhhj/ogzrYbu2K99fCoHXeQ0X/ukAovqhOOXvtnxTrNvcMOUITl6k63RoRPAlp3aYM5LVDp5VVeXMSXsT23kqim4dQMfzmBQy/c8vnt/DnvMhC0W2TRLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743069129; c=relaxed/simple;
-	bh=Lzk91e+bm4UrsHZFIVQqR/PpuSZp5G5Ftod5lvc4Les=;
+	s=arc-20240116; t=1743069131; c=relaxed/simple;
+	bh=YR9H23ELDAR2h+U151ru/9gfbkLqACHvu2O0ca7Lj/I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=koImi2Y/cHXOAR6dAdYtdO4tWqXXElFT3F5Pzw14h7VSb3Zz9jHI3IFNsJmtxTMbVA26Ox8hrLG133vQhJ5P78ADjT2yYkFp4DXZrUBfW2F+5xsuZ6UaHSPKg2+i+G60/OIjwH74S2EhmtCXHsifWgnNWfw9Zp/H+Rc1oPWhLS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eke5oBJK; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=HhDnBVND6S7Cde+rLBFlznfQ6pvPnyyRy/if6HTHYWh5Vt5u6+kw3WY7G2FZVR7rbBw5UanU1LpDWBfke9jJnFTfe6xlHyUDQelv9XLm7xYSKm0X9WKDkozXCgRhGUw5qL6NtiJeguCmXjRDKDx/304KUJyHUnyihQRKHrSNhsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hc3P8tZy; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eke5oBJK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hc3P8tZy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743069127;
+	s=mimecast20190719; t=1743069129;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m0uqAm0AAlb4nG7i2N7QrnmwRlnxOyV21jQTpS1Nrc8=;
-	b=Eke5oBJKQFqt0mutKU/3y7N8rvVurA2I5AfOFWGjB3F4qfaxxcsOYnb9K66jKzf+2QH4WV
-	bTS21dLDuJFsldjRJT8y178iRdTXqOIi2hXkRTQpwVU29k3ZacTk9G6wQIZke4O0hzRXt7
-	8vq0NbyIYA4gm9Hj2wCHDotmYtRUwJo=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=xk+exhIlCPp8aznnhECR4dZ0OnIYMDVjf7IHKcKbC+w=;
+	b=Hc3P8tZyxshDh9Y1Bj7J7zmWqO3LrAyKHGw/2upm4G1rtrpTpFIdG8LU9jLLDTbar1cQzf
+	7FAVPis+e7MX/NWek6VZePxCRdd1qEBghwlTRasZYCaqfL9Mkbj0V1jaa7iCjaG7J2zyC3
+	ElCjdOdz9ekFABniwh0e3FUaZdvXQ0g=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-448-wRksnLvjPWanPMVnFHDM0A-1; Thu,
- 27 Mar 2025 05:52:03 -0400
-X-MC-Unique: wRksnLvjPWanPMVnFHDM0A-1
-X-Mimecast-MFC-AGG-ID: wRksnLvjPWanPMVnFHDM0A_1743069122
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-636-9WvFzHUBOO6T5rpEva95FA-1; Thu,
+ 27 Mar 2025 05:52:08 -0400
+X-MC-Unique: 9WvFzHUBOO6T5rpEva95FA-1
+X-Mimecast-MFC-AGG-ID: 9WvFzHUBOO6T5rpEva95FA_1743069127
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 18E7A196B378;
-	Thu, 27 Mar 2025 09:52:02 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B12BF180035C;
+	Thu, 27 Mar 2025 09:52:06 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.3])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D84D11801747;
-	Thu, 27 Mar 2025 09:52:00 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B79F91801750;
+	Thu, 27 Mar 2025 09:52:05 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -49,9 +49,9 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Keith Busch <kbusch@kernel.org>,
 	Uday Shankar <ushankar@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 06/11] ublk: add segment parameter
-Date: Thu, 27 Mar 2025 17:51:15 +0800
-Message-ID: <20250327095123.179113-7-ming.lei@redhat.com>
+Subject: [PATCH V2 07/11] ublk: document zero copy feature
+Date: Thu, 27 Mar 2025 17:51:16 +0800
+Message-ID: <20250327095123.179113-8-ming.lei@redhat.com>
 In-Reply-To: <20250327095123.179113-1-ming.lei@redhat.com>
 References: <20250327095123.179113-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,122 +63,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-IO split is usually bad in io_uring world, since -EAGAIN is caused and
-IO handling may have to fallback to io-wq, this way does hurt performance.
-
-ublk starts to support zero copy recently, for avoiding unnecessary IO
-split, ublk driver's segment limit should be aligned with backend
-device's segment limit.
-
-Another reason is that io_buffer_register_bvec() needs to allocate bvecs,
-which number is aligned with ublk request segment number, so that big
-memory allocation can be avoided by setting reasonable max_segments limit.
-
-So add segment parameter for providing ublk server chance to align
-segment limit with backend, and keep it reasonable from implementation
-viewpoint.
+Add words to explain how zero copy feature works, and why it has to be
+trusted for handling IO read command.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c      | 20 +++++++++++++++++++-
- include/uapi/linux/ublk_cmd.h | 25 +++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 1 deletion(-)
+ Documentation/block/ublk.rst | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 1e11816d0b90..a5bcf3aa9d8c 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -74,7 +74,7 @@
- #define UBLK_PARAM_TYPE_ALL                                \
- 	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
- 	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
--	 UBLK_PARAM_TYPE_DMA_ALIGN)
-+	 UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
+diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+index 1e0e7358e14a..74c57488dc9a 100644
+--- a/Documentation/block/ublk.rst
++++ b/Documentation/block/ublk.rst
+@@ -309,18 +309,35 @@ with specified IO tag in the command data:
+   ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to copy
+   the server buffer (pages) read to the IO request pages.
  
- struct ublk_rq_data {
- 	struct kref ref;
-@@ -580,6 +580,18 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 			return -EINVAL;
- 	}
+-Future development
+-==================
+-
+ Zero copy
+ ---------
  
-+	if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
-+		const struct ublk_param_segment *p = &ub->params.seg;
+-Zero copy is a generic requirement for nbd, fuse or similar drivers. A
+-problem [#xiaoguang]_ Xiaoguang mentioned is that pages mapped to userspace
+-can't be remapped any more in kernel with existing mm interfaces. This can
+-occurs when destining direct IO to ``/dev/ublkb*``. Also, he reported that
+-big requests (IO size >= 256 KB) may benefit a lot from zero copy.
+-
++ublk zero copy relies on io_uring's fixed kernel buffer, which provides
++two APIs: `io_buffer_register_bvec()` and `io_buffer_unregister_bvec`.
 +
-+		if (!is_power_of_2(p->seg_boundary_mask + 1))
-+			return -EINVAL;
++ublk adds IO command of `UBLK_IO_REGISTER_IO_BUF` to call
++`io_buffer_register_bvec()` for ublk server to register client request
++buffer into io_uring buffer table, then ublk server can submit io_uring
++IOs with the registered buffer index. IO command of `UBLK_IO_UNREGISTER_IO_BUF`
++calls `io_buffer_unregister_bvec()` to unregister the buffer, which is
++guaranteed to be live between calling `io_buffer_register_bvec()` and
++`io_buffer_unregister_bvec()`. Any io_uring operation which supports this
++kind of kernel buffer will grab one reference of the buffer until the
++operation is completed.
 +
-+		if (p->seg_boundary_mask + 1 < UBLK_MIN_SEGMENT_SIZE)
-+			return -EINVAL;
-+		if (p->max_segment_size < UBLK_MIN_SEGMENT_SIZE)
-+			return -EINVAL;
-+	}
++ublk server implementing zero copy or user copy has to be CAP_SYS_ADMIN and
++be trusted, because it is ublk server's responsibility to make sure IO buffer
++filled with data for handling read command, and ublk server has to return
++correct result to ublk driver when handling READ command, and the result
++has to match with how many bytes filled to the IO buffer. Otherwise,
++uninitialized kernel IO buffer will be exposed to client application.
 +
- 	return 0;
- }
- 
-@@ -2370,6 +2382,12 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- 	if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN)
- 		lim.dma_alignment = ub->params.dma.alignment;
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_SEGMENT) {
-+		lim.seg_boundary_mask = ub->params.seg.seg_boundary_mask;
-+		lim.max_segment_size = ub->params.seg.max_segment_size;
-+		lim.max_segments = ub->params.seg.max_segments;
-+	}
++ublk server needs to align the parameter of `struct ublk_param_dma_align`
++with backend for zero copy to work correctly.
 +
- 	if (wait_for_completion_interruptible(&ub->completion) != 0)
- 		return -EINTR;
++For reaching best IO performance, ublk server should align its segment
++parameter of `struct ublk_param_segment` with backend for avoiding
++unnecessary IO split, which usually hurts io_uring performance.
  
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 7255b36b5cf6..583b86681c93 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -410,6 +410,29 @@ struct ublk_param_dma_align {
- 	__u8	pad[4];
- };
- 
-+#define UBLK_MIN_SEGMENT_SIZE   4096
-+/*
-+ * If any one of the three segment parameter is set as 0, the behavior is
-+ * undefined.
-+ */
-+struct ublk_param_segment {
-+	/*
-+	 * seg_boundary_mask + 1 needs to be power_of_2(), and the sum has
-+	 * to be >= UBLK_MIN_SEGMENT_SIZE(4096)
-+	 */
-+	__u64 	seg_boundary_mask;
-+
-+	/*
-+	 * max_segment_size could be override by virt_boundary_mask, so be
-+	 * careful when setting both.
-+	 *
-+	 * max_segment_size has to be >= UBLK_MIN_SEGMENT_SIZE(4096)
-+	 */
-+	__u32 	max_segment_size;
-+	__u16 	max_segments;
-+	__u8	pad[2];
-+};
-+
- struct ublk_params {
- 	/*
- 	 * Total length of parameters, userspace has to set 'len' for both
-@@ -423,6 +446,7 @@ struct ublk_params {
- #define UBLK_PARAM_TYPE_DEVT            (1 << 2)
- #define UBLK_PARAM_TYPE_ZONED           (1 << 3)
- #define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
-+#define UBLK_PARAM_TYPE_SEGMENT         (1 << 5)
- 	__u32	types;			/* types of parameter included */
- 
- 	struct ublk_param_basic		basic;
-@@ -430,6 +454,7 @@ struct ublk_params {
- 	struct ublk_param_devt		devt;
- 	struct ublk_param_zoned	zoned;
- 	struct ublk_param_dma_align	dma;
-+	struct ublk_param_segment	seg;
- };
- 
- #endif
+ References
+ ==========
 -- 
 2.47.0
 
