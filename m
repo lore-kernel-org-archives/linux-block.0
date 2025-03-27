@@ -1,59 +1,54 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEEA1FF7D1
-	for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 09:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDAB1F8736;
+	Thu, 27 Mar 2025 11:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743069156; cv=none; b=G1U1O83teMRLt0vKQCkTVCMiI91F9t8PyagQdaq9lTpHs9ry0CeXm92jDrsmp2mW3SrjwscrVRKa+okoxMqQdHh80yCY39cRG46bNG9pHX7GNcTBM2N8Qz0TV6c+kjzjhGVfDgVPzRWomMdJZuX5ol8OAzjgCsou86XY6StYcs8=
+	t=1743073656; cv=none; b=DmCLyY/0c47G97evmCqcJlg+nPNWxJO4qXhL6Cew6Zm0mFSc9QAsjpNzXSx/8MUe5jmou4zHTMMtUghl7JPoTjupbDxfx1LcahL6EyoF4sFLYiZ6wY+Dguzt3jBWwTvQz5oHEWRa6rovxjQqX2ovHmnkP7gaPfp7f0tsDgEXh1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743069156; c=relaxed/simple;
-	bh=hQiV6RRmDBbNPxuipEl4/oEQSXT5szKUVlfDP//JuQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NI/hdogcL49ZfKSMinkVnCjXc++QeLFygVogh10+P8l7fFAYCWEFM6NCgTS0m+sAD/nBVnZaV+QNzNWCYSEyLiM9UrkARDxh+wHwvQsj/UY9bIkWOgk5OINvNs4nk2NIExQdbX/qv1EsiUyD4RHn59gelYQ7iJpdQutOFbfjiyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iOFnk6aq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1743073656; c=relaxed/simple;
+	bh=DEt7nEClwnJ4SBU8HeiPuDhg2XrpLQRF46+7OEBIvUo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGO4dfla07CZGi910wW41/DArF6lFEsHuYMRlZl24+5Y0Cu/jR+Y7E9JX6wmNVQwqnPY8TRBHElHA+Fy3K4Vk/r2e0XU2zt+XsoXIAf2mYa81fXKOSNoYmXZl2m/rl4A+NzgHvnSYBasCjEmyHAiy6aonBhf7ofSI6UNcLWx2hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WV3vcoqO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOFnk6aq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743069154;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wnA/tlHBAaiHAb4D7vGHol88Qw6R4cWW2mxPuN+/i9Q=;
-	b=iOFnk6aqEh6tUqzh1QzgCo733rLGlqhZy8izp0rwdx762OSuCCLuZsitlb56vnQztJwsyo
-	jP4/TF7vERGN+CfbU0BosqgBvyukLsDrWjePrhd9uomSWaT7Vp4pHITlHhLAQT7Fh7RKAp
-	hrCTpulF1ByCZjoRPczMo5OFXWxqUlo=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-2GCgxwawMhiXAkVCWPx7gw-1; Thu,
- 27 Mar 2025 05:52:28 -0400
-X-MC-Unique: 2GCgxwawMhiXAkVCWPx7gw-1
-X-Mimecast-MFC-AGG-ID: 2GCgxwawMhiXAkVCWPx7gw_1743069147
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC78B190308B;
-	Thu, 27 Mar 2025 09:52:27 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1AFD619560AD;
-	Thu, 27 Mar 2025 09:52:25 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 11/11] selftests: ublk: add test for checking zero copy related parameter
-Date: Thu, 27 Mar 2025 17:51:20 +0800
-Message-ID: <20250327095123.179113-12-ming.lei@redhat.com>
-In-Reply-To: <20250327095123.179113-1-ming.lei@redhat.com>
-References: <20250327095123.179113-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WV3vcoqO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9761C4CEE8;
+	Thu, 27 Mar 2025 11:07:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743073655;
+	bh=DEt7nEClwnJ4SBU8HeiPuDhg2XrpLQRF46+7OEBIvUo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WV3vcoqOor6w4RBDwBdmtn/+XUVjsZFnb2AjHUKslkFDLTBowmFaLOPlJ0OImErLq
+	 lzgnqxURTqjH6453AwLTHF2QM7BSTalTWA87xFSoW5d9Ki/oNyRPIr+tJWdDAdmlIW
+	 RBgTe3jnjvpi/Y9r3xlmHF6tPeqcn+qP+fdA/J11uvaBTnw89Isp4L50wszSl7A58t
+	 zT2elvq+1631IeGKGFgDM0UZXhRClrQdYHNDTuCnRYDDU3mN9YpDWWQNmVWXEz4Pss
+	 P3NLpjxtWtElGhNyVuSfcJ0Gqg3r0q2MAP5bgQTDzTXlUKdg6dpHg3Wj9uZHbUQuHS
+	 vL8vvT2B2XYaA==
+From: Philipp Stanner <phasta@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Zijun Hu <quic_zijuhu@quicinc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Zetao <lizetao1@huawei.com>,
+	Anuj Gupta <anuj20.g@samsung.com>
+Cc: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Philipp Stanner <phasta@kernel.org>
+Subject: [PATCH 0/2] PCI: Remove pcim_iounmap_regions()
+Date: Thu, 27 Mar 2025 12:07:06 +0100
+Message-ID: <20250327110707.20025-2-phasta@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,95 +56,27 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-ublk zero copy usually requires to set dma and segment parameter correctly,
-so hard-code null target's dma & segment parameter in non-default value,
-and verify if they are setup correctly by ublk driver.
+The last remaining user of pcim_iounmap_regions() is mtip32 (in Linus's
+current master)
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/null.c           | 11 +++++++-
- .../testing/selftests/ublk/test_generic_03.sh | 28 +++++++++++++++++++
- 3 files changed, 39 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/ublk/test_generic_03.sh
+So we could finally remove this deprecated API. I suggest that this gets
+merged through the PCI tree. (I also suggest we watch with an eagle's
+eyes for folks who want to re-add calls to that function before the next
+merge window opens).
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 7a8c994de244..d98680d64a2f 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -5,6 +5,7 @@ LDLIBS += -lpthread -lm -luring
- 
- TEST_PROGS := test_generic_01.sh
- TEST_PROGS += test_generic_02.sh
-+TEST_PROGS += test_generic_03.sh
- 
- TEST_PROGS += test_null_01.sh
- TEST_PROGS += test_null_02.sh
-diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
-index 899875ff50fe..91fec3690d4b 100644
---- a/tools/testing/selftests/ublk/null.c
-+++ b/tools/testing/selftests/ublk/null.c
-@@ -17,7 +17,8 @@ static int ublk_null_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 
- 	dev->tgt.dev_size = dev_size;
- 	dev->tgt.params = (struct ublk_params) {
--		.types = UBLK_PARAM_TYPE_BASIC,
-+		.types = UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DMA_ALIGN |
-+			UBLK_PARAM_TYPE_SEGMENT,
- 		.basic = {
- 			.logical_bs_shift	= 9,
- 			.physical_bs_shift	= 12,
-@@ -26,6 +27,14 @@ static int ublk_null_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 			.max_sectors		= info->max_io_buf_bytes >> 9,
- 			.dev_sectors		= dev_size >> 9,
- 		},
-+		.dma = {
-+			.alignment 		= 4095,
-+		},
-+		.seg = {
-+			.seg_boundary_mask 	= 4095,
-+			.max_segment_size 	= 32 << 10,
-+			.max_segments 		= 32,
-+		},
- 	};
- 
- 	if (info->flags & UBLK_F_SUPPORT_ZERO_COPY)
-diff --git a/tools/testing/selftests/ublk/test_generic_03.sh b/tools/testing/selftests/ublk/test_generic_03.sh
-new file mode 100755
-index 000000000000..b551aa76cb0d
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_03.sh
-@@ -0,0 +1,28 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+TID="generic_03"
-+ERR_CODE=0
-+
-+_prep_test "null" "check dma & segment limits for zero copy"
-+
-+dev_id=$(_add_ublk_dev -t null -z)
-+_check_add_dev $TID $?
-+
-+sysfs_path=/sys/block/ublkb"${dev_id}"
-+dma_align=$(cat "$sysfs_path"/queue/dma_alignment)
-+max_segments=$(cat "$sysfs_path"/queue/max_segments)
-+max_segment_size=$(cat "$sysfs_path"/queue/max_segment_size)
-+if [ "$dma_align" != "4095" ]; then
-+	ERR_CODE=255
-+fi
-+if [ "$max_segments" != "32" ]; then
-+	ERR_CODE=255
-+fi
-+if [ "$max_segment_size" != "32768" ]; then
-+	ERR_CODE=255
-+fi
-+_cleanup_test "null"
-+_show_result $TID $ERR_CODE
+P.
+
+Philipp Stanner (2):
+  mtip32xx: Remove unnecessary PCI function calls
+  PCI: Remove pcim_iounmap_regions()
+
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/block/mtip32xx/mtip32xx.c             |  7 ++----
+ drivers/pci/devres.c                          | 24 -------------------
+ include/linux/pci.h                           |  1 -
+ 4 files changed, 2 insertions(+), 31 deletions(-)
+
 -- 
-2.47.0
+2.48.1
 
