@@ -1,159 +1,100 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A090B2139A6
-	for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 11:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49331F5608
+	for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 11:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743076414; cv=none; b=posZ/rnZcwyibyJjyIV85qZfrYNQTeVHKqitS8s5QlEIrzEh631KtC9dhMtlhx7SnS8/1ou+5WlsNCpxHNdsblnF/ok9iA4IkXFsbw7+o2bEzmdJzYE25lLo6M6gBdQQE2frbHSblcCua/i4gOMrOcGrLgNDvx1xi0PwvGiz7fo=
+	t=1743076656; cv=none; b=fVGKL44eMZca5xKU/hCjL8rOSQv+ygGMy8DzOQZApuQ7WuIGMqcudM9ctRjg78OGLNe1n1e50ZrVeZV9z1p1MWeoziAcBdOXY6PJ9qkEafggpv4dEDBxc95rvDa4e7jwPNZs44D1obsl3vYNp/Z1G8JH0QXFnk4PEUBcsNwXLuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743076414; c=relaxed/simple;
-	bh=XABOlLOdb+GYGihfxxXpKbRns0kIKcDt7XDQoGxdyfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gyhUfT2PSOZ88yHp0fbT/fYfBzKU3DAf5q4jla8JXFEbRX6vFVBseYEf7hbcEFfWetIZ0SN54q0TVSoxDH9t8aDUFRyzbXlp2M5HxWBERxzOhQU+tnjZ3DfgYMxdEG45RHFPjlu6/Q8rabdLEQdmjVuTFU22FaaDEVDiNVoolfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0WmmS6iH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pIotN3XF; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0WmmS6iH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pIotN3XF; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1743076656; c=relaxed/simple;
+	bh=AL7gJ87a2UA6E+40BaZ+E4mdcf+6HZXsmDjrJ7tBF8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E/K9kDa3mKkNEIY7iO6D5wBywIFdnlDzvV3c+0Oa4UE75uJ5VDScctioaQnO09b5OZT4drF6ZJFdy75vjIX5aqEthlWR9e1G+8XCEl9/xJmyatmrBiN4YTxf9cahktWG0PC6fOm7F/pYF6wpMTf+TTuaoJBTz3GaPw1aflYLqRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KdUG0aH3; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0WmmS6iH";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pIotN3XF";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0WmmS6iH";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pIotN3XF"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A2A181F449;
-	Thu, 27 Mar 2025 11:53:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743076410; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R+QxkDVy5JRXbW51kJ2F9UVtUHbBkep2u9RXAqpaoBw=;
-	b=0WmmS6iHlw/gOs91YI8HSX8we1JIoZSAW6ycjBmd9yfK0HSf1J+h20t4Z96p3NQL4EgvLy
-	pqVLrN6Hm1zJlzxIuQ4gqZGmb2fGiZFJ/KjnMFQiPTnM3hIGCP4XyrnCBa1aTDa4jL1LK7
-	HJfIKZQ8nZ1pjFXGLmphhZqpXOIIL9c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743076410;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R+QxkDVy5JRXbW51kJ2F9UVtUHbBkep2u9RXAqpaoBw=;
-	b=pIotN3XFDhfuYS4qF+/VXHQh4jiW8JPxvUg9Zao5zvzq318vz6yZH7IPHfymstt2WoLJK5
-	9gpWYqRYiKvLeaBw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=0WmmS6iH;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=pIotN3XF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743076410; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R+QxkDVy5JRXbW51kJ2F9UVtUHbBkep2u9RXAqpaoBw=;
-	b=0WmmS6iHlw/gOs91YI8HSX8we1JIoZSAW6ycjBmd9yfK0HSf1J+h20t4Z96p3NQL4EgvLy
-	pqVLrN6Hm1zJlzxIuQ4gqZGmb2fGiZFJ/KjnMFQiPTnM3hIGCP4XyrnCBa1aTDa4jL1LK7
-	HJfIKZQ8nZ1pjFXGLmphhZqpXOIIL9c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743076410;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R+QxkDVy5JRXbW51kJ2F9UVtUHbBkep2u9RXAqpaoBw=;
-	b=pIotN3XFDhfuYS4qF+/VXHQh4jiW8JPxvUg9Zao5zvzq318vz6yZH7IPHfymstt2WoLJK5
-	9gpWYqRYiKvLeaBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 941D9139D4;
-	Thu, 27 Mar 2025 11:53:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CNgjJDo85WdlMAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 27 Mar 2025 11:53:30 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 49C00A082A; Thu, 27 Mar 2025 12:53:30 +0100 (CET)
-Date: Thu, 27 Mar 2025 12:53:30 +0100
-From: Jan Kara <jack@suse.cz>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: patches@lists.linux.dev, fstests@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, oliver.sang@intel.com, 
-	hannes@cmpxchg.org, willy@infradead.org, jack@suse.cz, apopple@nvidia.com, 
-	brauner@kernel.org, hare@suse.de, oe-lkp@lists.linux.dev, lkp@intel.com, 
-	john.g.garry@oracle.com, p.raghav@samsung.com, da.gomez@samsung.com, dave@stgolabs.net, 
-	riel@surriel.com, krisman@suse.de, boris@bur.io, jackmanb@google.com, 
-	gost.dev@samsung.com
-Subject: Re: [PATCH] generic/764: fsstress + migrate_pages() test
-Message-ID: <pociwdgfqbzw4mjass6u6wcnvmqlh3ddqzoeoiwiyqs64pl6yu@5ad7ne7rgwe2>
-References: <20250326185101.2237319-1-mcgrof@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KdUG0aH3"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6ecfbf1c7cbso13907366d6.2
+        for <linux-block@vger.kernel.org>; Thu, 27 Mar 2025 04:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1743076652; x=1743681452; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xpSvo5VpDe+5C3l3q6WN5wiD27fFfcYVq0S4jyx0P6k=;
+        b=KdUG0aH36qKf4ZKce21gUhCKT3ZUf2WNoOC0rZa2gRbutluZ0jCSFAmnnC+61A2sd0
+         Njdrt1Nj2fXg43CLfCF44LW9ef95MhDEJWEEmBMehuOBXiRYdTiM30rWbtrMY/aWEGLd
+         rYjBgTZlgpvZjm8HkNrGAcL/EbG9VgKscRinhah3bTwjaG8M50uvOVXNokIPSnt+2lkx
+         mhlCuyeeTnoP/Xsk0vjebjmQA7seF6lSHIkFYpP3gnAknC14p/N9vvbD+gURC8OIj2bA
+         LqbmNtn1g9Wn3vq/xXgwbUBfBwXSqyhktBciKekra4S/rYXgxaWVSGCpYbJtPZPWTipD
+         /eJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743076652; x=1743681452;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpSvo5VpDe+5C3l3q6WN5wiD27fFfcYVq0S4jyx0P6k=;
+        b=gUD8reYKJn845yWfNoHV26FD5JGNiaq9XXoE1hmFszBrA7CxsH0Gi+VCIWITKftEov
+         08v/q514dIDy/QlVREgRgQpEvDAXrKS00A4ZOsF5HMOQ9wWloSMdoRHz5X2MSmlMdxJN
+         RvWZ0HhnaUHT3RPS/tKr5HXl4pr+2lDZ9FrzZKjluMn/Nrf1jgf64AJS/g4ztbjye+q3
+         4D6rNgpvSih1ee1cvl7DZpaPm3I2Q6ETJYaukVnAqlz+XGiI/+1F6OTcqVD8swOGqnjD
+         mmAuThbDsIFDvZLCEYP/56Vz29+KRj8aENBtgi+lWdEz3V4q9jgHO9pwdgF6djXChNuy
+         7xmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvl9u/I6XhD24b9CAoFJwkDaszwNrsNjjsz3YrJ40AP9xXOZH1Is3oSII6ZLugVij566vRz0hgcekBFA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPGk4f+GW/x5IFe/oQZ9AOs9AuGdZdUCFIgR/eTyMjpDc3y2oO
+	xek0zQm8gSAgNOJ0uL64qCGdJZaVbdktVSxLTMfj88T5lE4J+jyjsz2UmUePj3w=
+X-Gm-Gg: ASbGncuY9i1I22dnvQUOG2d40tZ07+Lu2ERveLxqmt+1mTlfUV2/r7QSQPc0mbNbkx8
+	lXqTRJ7/sK8Jx+zYFA0dF4Gln6koss+7YgUC2ULHtnt/Vh3QPnhj42ABRKL2FyX0/PpWXJquMGs
+	M8W/bn/9Qis/Ix73hF4Ly2KkuUcUDkPao9trr3G1jLJbGUcbcyzWYUm38mXczJIcWYstkFydLnU
+	cfDGXuH2FkOA0HA/8djSputsOhM2szM6ByWyObZaxN8T3eN2HwmyLvuVM/tQnWasE5C/JdoxkUH
+	MgIzP8VOtasLEKm4URVP1sHXC4x/KrQH2vqjLe0=
+X-Google-Smtp-Source: AGHT+IHXYc+blwEc+1Jk6K0qq58ubOvP6uoSjfLzJ99a9D1oWzuzwHQ5UPYlNMHK61Rbx4L/GoX0BA==
+X-Received: by 2002:a05:6214:19e1:b0:6e8:90eb:e591 with SMTP id 6a1803df08f44-6ed238b72cdmr40938446d6.24.1743076652436;
+        Thu, 27 Mar 2025 04:57:32 -0700 (PDT)
+Received: from [172.20.6.96] ([99.209.85.25])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3f0003c6sm79108206d6.120.2025.03.27.04.57.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Mar 2025 04:57:31 -0700 (PDT)
+Message-ID: <2853aff5-9056-4950-a796-d3e19a0f0c5d@kernel.dk>
+Date: Thu, 27 Mar 2025 05:57:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250326185101.2237319-1-mcgrof@kernel.org>
-X-Rspamd-Queue-Id: A2A181F449
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:dkim];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.01
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] mtip32xx: Remove unnecessary PCI function calls
+To: Philipp Stanner <phasta@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Helgaas <bhelgaas@google.com>, Mark Brown <broonie@kernel.org>,
+ David Lechner <dlechner@baylibre.com>, Philipp Stanner
+ <pstanner@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Yang Yingliang <yangyingliang@huawei.com>, Zijun Hu
+ <quic_zijuhu@quicinc.com>, Hannes Reinecke <hare@suse.de>,
+ Al Viro <viro@zeniv.linux.org.uk>, Li Zetao <lizetao1@huawei.com>,
+ Anuj Gupta <anuj20.g@samsung.com>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20250327110707.20025-2-phasta@kernel.org>
+ <20250327110707.20025-3-phasta@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250327110707.20025-3-phasta@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed 26-03-25 11:50:55, Luis Chamberlain wrote:
-> 0-day reported a page migration kernel warning with folios which happen
-> to be buffer-heads [0]. I'm having a terribly hard time reproducing the bug
-> and so I wrote this test to force page migration filesystems.
+On 3/27/25 5:07 AM, Philipp Stanner wrote:
+> pcim_iounmap_regions() is deprecated. Moreover, it is not necessary to
+> call it in the driver's remove() function or if probe() fails, since it
+> does cleanup automatically on driver detach.
 > 
-> It turns out we have have no tests for page migration on fstests or ltp,
-> and its no surprise, other than compaction covered by generic/750 there
-> is no easy way to trigger page migration right now unless you have a
-> numa system.
-> 
-> We should evaluate if we want to help stress test page migration
-> artificially by later implementing a way to do page migration on simple
-> systems to an artificial target.
-> 
-> So far, this doesn't trigger any kernel splats, not even warnings for me.
-> 
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Link: https://lore.kernel.org/r/202503101536.27099c77-lkp@intel.com # [0]
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> Remove all calls to pcim_iounmap_regions().
 
-So when I was testing page migration in the past MM guys advised me to use
-THP compaction as a way to trigger page migration. You can manually
-trigger compaction by:
+Acked-by: Jens Axboe <axboe@kernel.dk>
 
-echo 1 >/proc/sys/vm/compact_memory
-
-So you first mess with the page cache a bit to fragment memory and then
-call the above to try to compact it back...
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
