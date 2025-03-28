@@ -1,68 +1,66 @@
-Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
+Received: from mail-qv1-f98.google.com (mail-qv1-f98.google.com [209.85.219.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F9D440C
-	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 19:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E1E1E32D5
+	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 19:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743190964; cv=none; b=WYeHFfs8XjCDemSRP5PeCqfZCmoc54DSN2sIa08IbRFTZTku/2uYbEsgEiDefLasETJTYUBDmq3pivIokR7Ko07Y6AGoC8JsyObdbcgfC/50njkEomMSB8kp0X934lP4+VpbRPU350hW12W+ZEfzKD5EDPPMJ5XZKG3KeFusBEg=
+	t=1743190993; cv=none; b=GgaI3wreqFNQlvdhUyHoFjXC6uJ1Wb0M1t/5J1jeuQ4wxI2vqfEiI/XCs3FKBt6XBRec2W5kQQwwBeBdjCFFh1RkBlBRU/rjxO9W2RAxyV0pyXze3F/RGS8GkD3gRWDutQ2UspkQ+7GyvGkmPJlWrVwnpMNYnUB4SrT8UDZPD5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743190964; c=relaxed/simple;
-	bh=IIFz4j2C2Eh7fAQD0vF3myZwWOH3MPOPveM/pvRkH1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DhQz8IZdDGPaZwT4KEWMfSaCo4vRGI7y73LmHcRWdPt4fZWjAV9minYCM/XUCFUhLuZu2AYSski4R8LzhnqjdigeX9lZoQ4rMiwO4j5qy0TsYyfXH00CF9/f0nnBcXvjvk6xeKEX3JeK8kqQxFaKa3/5xZ7paJgKTmdaMHfHBSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dcPP/t60; arc=none smtp.client-ip=209.85.219.99
+	s=arc-20240116; t=1743190993; c=relaxed/simple;
+	bh=OLxAmO7yW2b8KKMedc+3ZdU1b31cGrrllojaBB9EdZQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MmZzZTJYLZsOwsTyABbSwAFlyX//oaqZc5lpNIUhPuC53SNEBspVxlbSIl32W95MNWXtcfvfHVGnZyQzhqfk6E2kn4hA0m/3KJOeoG1QwLdOczbFoEy+nKTs47CxvQR9AL1ITWcwvTd/SYzik40BKBbrmuCjhtv8SUS044GdKlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=CjUcN1RR; arc=none smtp.client-ip=209.85.219.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dcPP/t60"
-Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-6e8fa2d467fso3629886d6.2
-        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 12:42:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="CjUcN1RR"
+Received: by mail-qv1-f98.google.com with SMTP id 6a1803df08f44-6e8fa1f99a6so3028386d6.3
+        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 12:43:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1743190961; x=1743795761; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lLazX2sR1QiGKeTx3lHr1mcmdxpFqxEOFWM2x5oC3Fg=;
-        b=dcPP/t60EJ04nWA4KNJSsA28QsWcIhbE+btJeaFWjL8RBB9EWMcwDo7Jrw3pJ0a6Uy
-         OUhC42H5kJO3/3DtTC+OXjC963gJ5P3BfRtSvJ9BVfZdq4EIToMyLzU1MClaCAhc10qp
-         xpNSJ3Cq59ANj2a+VWs4SM18EBFgaM35wCrAB1PG1XZxXOpEPWt3iJ2aXGneAIiwhqrJ
-         z3FJA8V4LTgpMvSjhokkSeZYcTaM6eamUnAwMZRf/nkOnNjcfUb2KmXip3e12QRLtfSG
-         YMJ7LFo+ZE6aTGjH+xqiRcMq47/kYEOogqoLH+sTsIuP/xHQgktgLq+s3usLAuVQwJdS
-         PlaA==
+        d=purestorage.com; s=google2022; t=1743190990; x=1743795790; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ODvPSfxlecP14OuA5OKuO2EdeJD2/HHQgbxBXvFdj/Q=;
+        b=CjUcN1RRgmd+h+DNqzoT+AT4x2H0VyxybgSxUTZmtuIJt/T5OKfyfLb+EeTJEuL6ER
+         K3UFIT5X582QF19jXN2+I5Eh7Jazrzpn6+Um0BCy+NEyQtvApDXsZ+Odawppg0Ds+tHe
+         9rFDJvFsdp0hAoM8JQMkFIXopy54/05JIP1eSNh2vxZq0EsHo/wvVLWiyeVF5yRKL/ng
+         SRIqaR9cFLQuV1MZKf77XrfO7gGEG6BZmJR1VWuvIBjce3E5OtW1zgdBVfEsdPDpnou5
+         l0ngFK1b+2jrcJkKsIt/fMemEQccCIKGsMCQwraSEv5rRiv+OmqZ4ngcWhhC7eODDEtc
+         8E4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743190961; x=1743795761;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lLazX2sR1QiGKeTx3lHr1mcmdxpFqxEOFWM2x5oC3Fg=;
-        b=C57fP3MzrRxyQAsbir4Nnv6dHu434Ox+2HwtXMNHUyR4a5FXc+geAcRt2xKR5fCCWX
-         TY3e+G4SjqYZDySYzl5KIZnbMGrsj8E9EwMZThNWf8XGaZcDPZLyB+OaX21xZ6QWweDw
-         538IE/8A25DuAtZr/wLf67afzeRburw6sULJDdJsZVDkOsoo08TP7KWC2peEOh7S96G7
-         aOq58OvRnpyxKVWSuAQfEoe5V7A/ALGlzOpsX/HnOTMO3BusNTx8pDfxzT99HhEWFPn4
-         ooSKy7/5UbVt3e11259sXAP6C5oXRhJhFvnj8OKG/0WePNut2HNxHFGbzwCt3vUAEN8u
-         L88g==
-X-Gm-Message-State: AOJu0YyGnEfYxVsZDMqBAtezGNf5uXBCqprWMbGhO3iLv+rz5/buA7PE
-	H/jXXkBIqkH5m4M+FP3N5xKWu+wnmaxNFfnQdDSC18jP49lTADvwBvdRzpSMaxNnVOhiCCla/kP
-	HP1lzMN559bUWbzCSzpxGtpr+lxeswCuD
-X-Gm-Gg: ASbGncs0NzCOsTEBeIOOGQItl0qZwjFM/q5QdO4YYEZnxnXYf5i6lLz7yjRSKknxC/i
-	MKsVah3LOSczWdNEkoe9DwcOS0Yi23/bnn1zFkhzoPyiQH8X6Wo2FuNF5RRf/fE+dOkwUl1hq/9
-	2ovGv49IWFjIPy2TxwHDu3vDHJp8Ei7EzKpxLk6fAyM7Cxplv33ixMHUGZ9c9VncpObahugvlET
-	FBg2cslx2T1vWbFBMWTZYWOkapa32F7TYJaRNCvXaJzRSk5iL3BKLA7zdpT1IhLyqlwysxybHXf
-	MQoPFKAVwHwQUOYgnVbszHpSQTdRYGZ9AWs3W6ZXiRGZHCqH
-X-Google-Smtp-Source: AGHT+IGTVuJ9wsa8D0YOPf/IR0bLXPoK/A+oaStmp2cHkFUKuudrLMCf9S4wmCfByWcdBV5jz2al3JueEfox
-X-Received: by 2002:a05:622a:110f:b0:474:e996:197a with SMTP id d75a77b69052e-477ed7b2291mr3086091cf.10.1743190960620;
-        Fri, 28 Mar 2025 12:42:40 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-47782a2849asm2198541cf.6.2025.03.28.12.42.40
+        d=1e100.net; s=20230601; t=1743190990; x=1743795790;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ODvPSfxlecP14OuA5OKuO2EdeJD2/HHQgbxBXvFdj/Q=;
+        b=uEfPw/oz/gDaybHg+Qp8bM1gO2VCrqwII9e4pKaI9H58hbAWjQMf2VbT9VO6GZrPo8
+         ngTg9YyCRR9jIsnL4TSiOnxwmzbhdPNK0Qkh6CVAmxY3vb2S0DciyEZvv3MRaP2kLGUr
+         9jNkCMnXmWo6YjofIgMUZElNtsobs6gr0Sy0WirEN6hMWan6aS34tf8rSGNbuJKa1c9I
+         fBL5TcHABfoAZJRgA7p8D114yL2PukPSeSLJRaHFiBnVks3HhgnQaqPm1yMsY4VIO1Ph
+         lw3RKb2C3iaBad4vrh3N/XbAS7e1ZPCpsEbyIy83WEqk1GiQqImnVICGDvAtMa9JnRS/
+         qtog==
+X-Gm-Message-State: AOJu0YwezMfhAFPALozTWJjlL25fnqQXs+cUkLtJwO++QW0WOcObiR6j
+	0S/8WXEzNmN39gpMavFVRZSRKqjG42UIpg/azln4osMrvQeTjps2LyGWEyvq9JvIhSNX0JVOkbY
+	6dtXsaxAPZ2kGgWUYH7TmmmWAP3gssj2oYzSAT6ndACpvS7jn
+X-Gm-Gg: ASbGnctUYvc92SJXsu7vt2NSFfAx0cRYIhjK4KG0OvpvjT+IYH3PWvvP2At/DNs4jGm
+	KwjQiG/TCh+OGsN2395SBbARshq04ERpgMP2Y9NHRUwRF+RT7dEVheR1uXg2+xgnsWdmTt29uy/
+	E8Y1DagOz4rz1nM5+CBs+Ci9YY5au7h526/bm6TPeibQPOFV35WAsNi58Bdsx0QBazr7A0zAtTY
+	SozIVOXnZNd7uatZjCUQzOPNPCahnTGmklItuZ7MDQjF9cqo2eCT/zLAnym39pqUDj5AiPt4aOi
+	2/ZvP64lTD5Kgn1GiJ0qbnaI1EGm3qF9pA==
+X-Google-Smtp-Source: AGHT+IHE1BDqSoPFQBosK4FIZagJvkov+uoLlZNqBQtT2+qBsIa0Cb6b1jpVWKVmQ243c8hGamaf9x1PNGPX
+X-Received: by 2002:ad4:5bae:0:b0:6e8:8f31:3120 with SMTP id 6a1803df08f44-6eed620e64dmr1735846d6.8.1743190990230;
+        Fri, 28 Mar 2025 12:43:10 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6eec97b6bddsm2788096d6.70.2025.03.28.12.43.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 12:42:40 -0700 (PDT)
+        Fri, 28 Mar 2025 12:43:10 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8A3F73402DD;
-	Fri, 28 Mar 2025 13:42:39 -0600 (MDT)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 2B899340325;
+	Fri, 28 Mar 2025 13:43:09 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 8669BE40DF3; Fri, 28 Mar 2025 13:42:39 -0600 (MDT)
+	id 1D2D2E40AF7; Fri, 28 Mar 2025 13:42:38 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
@@ -71,12 +69,10 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 1/2] ublk: specify io_cmd_buf pointer type
-Date: Fri, 28 Mar 2025 13:42:29 -0600
-Message-ID: <20250328194230.2726862-2-csander@purestorage.com>
+Subject: [PATCH 0/2] ublk: specify io_cmd_buf pointer type
+Date: Fri, 28 Mar 2025 13:42:28 -0600
+Message-ID: <20250328194230.2726862-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250328194230.2726862-1-csander@purestorage.com>
-References: <20250328194230.2726862-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -92,47 +88,17 @@ The compiler also can't check the pointer types.
 Change io_cmd_buf's type to struct ublksrv_io_desc * so it can be
 indexed directly and the compiler can type-check the code.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Make the same change to the ublk selftests.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 355a59c78539..ed73e2ffdf09 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -153,11 +153,11 @@ struct ublk_queue {
- 	int q_id;
- 	int q_depth;
- 
- 	unsigned long flags;
- 	struct task_struct	*ubq_daemon;
--	char *io_cmd_buf;
-+	struct ublksrv_io_desc *io_cmd_buf;
- 
- 	bool force_abort;
- 	bool timeout;
- 	bool canceling;
- 	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
-@@ -701,15 +701,15 @@ static inline bool ublk_rq_has_data(const struct request *rq)
- }
- 
- static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
- 		int tag)
- {
--	return (struct ublksrv_io_desc *)
--		&(ubq->io_cmd_buf[tag * sizeof(struct ublksrv_io_desc)]);
-+	return &ubq->io_cmd_buf[tag];
- }
- 
--static inline char *ublk_queue_cmd_buf(struct ublk_device *ub, int q_id)
-+static inline struct ublksrv_io_desc *
-+ublk_queue_cmd_buf(struct ublk_device *ub, int q_id)
- {
- 	return ublk_get_queue(ub, q_id)->io_cmd_buf;
- }
- 
- static inline int __ublk_queue_cmd_buf_size(int depth)
+Caleb Sander Mateos (2):
+  ublk: specify io_cmd_buf pointer type
+  selftests: ublk: specify io_cmd_buf pointer type
+
+ drivers/block/ublk_drv.c             | 8 ++++----
+ tools/testing/selftests/ublk/kublk.c | 2 +-
+ tools/testing/selftests/ublk/kublk.h | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
 -- 
 2.45.2
 
