@@ -1,146 +1,164 @@
-Received: from mail-qv1-f100.google.com (mail-qv1-f100.google.com [209.85.219.100])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987941E3DE4
-	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 19:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E3C440C;
+	Fri, 28 Mar 2025 19:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743190994; cv=none; b=SRH21aOUcDxHeF4C94wWsQ8bI5Y9dNyzvktzY5i4G6U3pUPPDuBQ2lz/GwKO/QuVbc8g442kEtEwpdon1bZ1Ka46m1PqSxq7+qzzLqjUJQROIU24nk5DC16gkb7pYJA+zHPCJrd+hpKG1oGTGZU8uZMSw5rPeaGq4PWfc1hjurc=
+	t=1743191842; cv=none; b=pEa7dw5elIHy/VZnTGakl/pfJzqlC7+b8es5ZZMYp19itXz2nwD2kQUohQfwN+kEBwayrIlzOh3tiJ4xspDyTBsCj3D44PPm/I8nrX4nGVeDk7L0FYWhPEcuQPBOZno7eoB7aFFyf0Sz7ru0swg/aEd8xzgBUrvB9s39oGCrjwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743190994; c=relaxed/simple;
-	bh=flOtsZf7EBjh13FNyMsTD/5FQtLGeN9iZpmU8bbk1i0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kc1KsTBp5XbG1vozqPsBPwXIFxWNaHoaRIgI8eo6IMtksd8LPRFMJteva9EWaIEVt8sV9cp6hRPWBvdW1dksx64EmUDqL/H3atbqLqh8/4MdtlqagPxu9fMMHzWpeNK/x69FVXZeEUuFdlP4mxjtxwX7OqiMkvJn66GLk8w2jAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XyjY05Iw; arc=none smtp.client-ip=209.85.219.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1743191842; c=relaxed/simple;
+	bh=WOyP51M5VG8gM9J1EQ7WxvSWTNgzj+fuAuQhwo2lTcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iqJD/6BzrCSBD2LVH3zRuZ20jWnyaTpvEaOTVIv0Ysdcy35JJdGRjjyCPFrFqMMz7cP2LyMJPLVYkZkOPblGrGlwGBYU/cThYG//5328A/WDIrxm0wzisXBaRstZu6zH+1BGzx2lXdqGx50A0kQKTBN8titatLXfxTXiB2mNCCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VX8b/jJB; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XyjY05Iw"
-Received: by mail-qv1-f100.google.com with SMTP id 6a1803df08f44-6eaf348103cso4079326d6.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 12:43:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VX8b/jJB"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3997205e43eso2140576f8f.0;
+        Fri, 28 Mar 2025 12:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1743190991; x=1743795791; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743191839; x=1743796639; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mx6Kws4EehWQnJaxPytGf8blP84+Tos6v3LWW/hBgTg=;
-        b=XyjY05IwJf4CtrRETT91urQ3w1rKNhpRDzT57zdo7OEYwR3ZDB64EyuaT2BxVCt4+s
-         jZzpIxPNXfOBGdkbagHa+PPIMyZ0+FV1LJAcHr8C3jEP6+eFilqmlkapncB8zJbQQVWr
-         qfx5Q8sWGqkidWiXE6lGInnI/xPnWTSz/5mEd+JLAlC0bKQnTLsp2UgT+RWjsMkAgTuK
-         jylwsyFtAexyLd30ltuA04rsZbdK4u7H70y3uiCjeTiFrII9pyyNyytxd89zkhYugIRW
-         oiCJ+MlBOnku7vM0Z3Uvzfm9Q028K61jHBqFVvmwtC7zhVfh9oi3mMm2GWvPO+jG1JqH
-         HxRw==
+        bh=VVRh/j2CYf82mbVK3ol4luVdl6Ntk/Flrnz5IBJyauc=;
+        b=VX8b/jJBuLFGcF4dKVvcIC3avE+tvRN52DYCzfi1Pgo6yXnymnLPqjdSwM6ELyuX70
+         EVyVRY5iAaEoORX+IKDFRd1OHWTuRkjM82jG0eeJxR9bB90gzSwauqgFECgedx3y2raH
+         wCJUpWBRg1sXfLEGgP6QkNiPHdXEIK7Oblyr0Hsc5eNb5uQ/HsK5fpkikl2GZGd0MDBZ
+         btoF9Vwxxaq3jJGyMsL4w01uOGAuW3ZYivdKoXdEJjX5Kt76pnsPnxkGsW4yPMZjFd2R
+         iP4V9K1fqQG9AKlf7DIom2sTnR7uJ/Zmwy8bMM20Za7xWcLLbmfED0P+pvfPL9MQN9GV
+         +Vhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743190991; x=1743795791;
+        d=1e100.net; s=20230601; t=1743191839; x=1743796639;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Mx6Kws4EehWQnJaxPytGf8blP84+Tos6v3LWW/hBgTg=;
-        b=dx3i30cAxpBurIV3NIXddkSMYou+xj6e8FdJyQb/S+Muj9Dk+Ljt8tpRPeSUDOAkTM
-         GhmYne+CPYuDjIcqoGTXFNMTvvVg/BWhGatWuva+AbLpHC2FTqR4seG79ff/Xh43RRXX
-         mUzzCJlUaIaJcUEP+5oXECPhk3XBVBthTvH+NKLKZZr5lTMw7s6xnUURIOrI47Ml86r5
-         F7qCyTNa6qDNK72FYmkEbMeJPBhEXPKvZ6SbT7N8h15/w4L/N96Sms0f/Rjsy/Q+gdtB
-         Yaub0iKJeyncnPIaxL2QkfS4RlJoHhg9B+4hfUPJ0L2PexQlw14zRWD6eTuDzvdXkijK
-         f9vA==
-X-Gm-Message-State: AOJu0Yz4QEd8eS6DqL7dhLqzGXSQTo7bmPHjLiFpxG+MArSOSGK2oq1E
-	glNgqophEF5hduWCDPZ3sCepOb93Sq8mW2wTEkztYQAKFKoBvifZf2AKykLlZZgmofWVOHzyZXl
-	AVZZRinoeK1iAvj3wo0afWkC3IpgN49MO
-X-Gm-Gg: ASbGncsAV9QhB9vWvlVEHWAZaQq2Aqev6t2mhQU9QN+RUGYk5uYNA80sY4mafmaKv7x
-	0lEH2nwP6B5oUCIlsV2r2vSoqGIEns/bnBXSBQaWQlw9Uh6NoIIXd9agh+rDkM6HwWnfF+P9Slt
-	yRBfxpiE92w3QQbCFAeoN1h9g1/3ktwmkH6RzWAGYdgAyw4JwyBUig3vdLeBSIrW2cBUk5zgvWm
-	0LWjE4VwWS8Pfi8SmJo9Xv9a4KWyPcBfclT25cbvTtoRyUaV36L48j9yxgJbGv2+hjCI0H+yuT9
-	/iGHr9k/Ptj3wI2sUtEgs5rKlMLrGgRn9DqJ5lEDaPFlvnbC
-X-Google-Smtp-Source: AGHT+IFQh9Pcs5CAbScmakAUo+ucuKKnoyChirklEpCbSZtv64yiMBBKapJk+vPUTDfe74Ad8xyLWKkPfmB2
-X-Received: by 2002:ad4:596f:0:b0:6e8:9ed4:140c with SMTP id 6a1803df08f44-6eed61f0b0bmr1762166d6.7.1743190991334;
-        Fri, 28 Mar 2025 12:43:11 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6eec963b60bsm2865306d6.17.2025.03.28.12.43.11
+        bh=VVRh/j2CYf82mbVK3ol4luVdl6Ntk/Flrnz5IBJyauc=;
+        b=SghVD3eO3YWkoTxh7zgNT8Yc+Ha7wshxgWXub2NtyJ4kk3nuHovWpIlhLrziZwhOdF
+         5PAJPiU4WoNea39S0GpZdVEmcuS9WEOSxvtEMXHsumcNCTZculzJE0aFBBD2UAbpNJGf
+         1W/N/BEAfBdRvQGdgk7OXqBBrWKY1metP3tj1YAdpW4utkDyJKYJAcAM4J+sE1hneOmn
+         YDeGe4Etx2VNkujDFLvhKdkzgxApt5D82OITqndU6q1c131TX6gpF8GMAFbRg6LU4p+P
+         xK3hh/FRQH3GKOWE8ioStmp8OFfF1dk96hhs/NvV4fBz94+AVpDwzHTuYQxEj06jzldc
+         GaNA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+tOke/lz0238niGUCcyRllo8PRHvHU6GRqL4ActxfivwpFzTPv2Ey/SmjF5BYNXivZR09NOSF@vger.kernel.org, AJvYcCVUWBveXoFDu9Zq+mF9VD2qgRCZBuGdL+ACcSpQLELnYy7fGO4FDZ7IoFT12PsIhz1ZcnUFfHc80F6e6g==@vger.kernel.org, AJvYcCX8YCHpqKh9hUd7tXoJJXKQ1PCDu6vquNkQauH4ouAj3OmpZfeKg2n/6icYkdBIdApjNI1ewof9YJNR@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4KJVhPI2L3gz8YaNzy6FRDGJgVA0HHXxEJeIaA2sUxnUbZGQK
+	Fb5CQPNJSvy48TlTchGim4+5MAoeNcg4DI8aIjjPWKvFh3wBc8zx
+X-Gm-Gg: ASbGncs/wVoEFiatkoagRvq3f8kJvfLusHiy2lMz0TZHM2qc1PqnwCeDadVLs4m+pZu
+	nJipKsa6kVaW79xMnUj4L5JFyWfNlKYPEy0xAhl8mZaa33u6lhWcgJaHqG7AsKkm5A6LwARxReb
+	wdlXHpv74Cq/kUhjC+Bv0ecgLubNcNFAJkIpLLwSjv9avyVZoz2F0mlk7VCm8B/flHlaiP+7KZK
+	9GqOYZuAJCmRwvbUDxGhuKgfZD+ZmudoKSxsZqQ0JwT+5j4H3BqOfvc0e/4baeAnSRraXGQuzPq
+	0f4yFT731P5npUtGyAQ5wtq2gJyhMijJfPmReLZbkaz7ebayV3Uwp2SVcE0a2wmH7gbMU3qr+/9
+	35HAjmQ8=
+X-Google-Smtp-Source: AGHT+IFfCE7vy+jmjroDw/bDpWsw8c21bpFoAbgXY/5dzQEXhKrNDoe1GpwfCvWGEF2yEk9g/CLohw==
+X-Received: by 2002:a05:6000:178b:b0:390:e1e0:1300 with SMTP id ffacd0b85a97d-39c120e3ee0mr296428f8f.33.1743191838874;
+        Fri, 28 Mar 2025 12:57:18 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b663470sm3520481f8f.27.2025.03.28.12.57.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 12:43:11 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 479CE3402DD;
-	Fri, 28 Mar 2025 13:43:10 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 3CDC7E40DF3; Fri, 28 Mar 2025 13:42:40 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 2/2] selftests: ublk: specify io_cmd_buf pointer type
-Date: Fri, 28 Mar 2025 13:42:30 -0600
-Message-ID: <20250328194230.2726862-3-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250328194230.2726862-1-csander@purestorage.com>
-References: <20250328194230.2726862-1-csander@purestorage.com>
+        Fri, 28 Mar 2025 12:57:18 -0700 (PDT)
+Date: Fri, 28 Mar 2025 19:57:16 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-efi@vger.kernel.org, Olivier Gayot
+ <olivier.gayot@canonical.com>, Mulhern <amulhern@redhat.com>, Davidlohr
+ Bueso <dave@stgolabs.net>, stable@vger.kernel.org
+Subject: Re: [PATCH V3] block: fix conversion of GPT partition name to 7-bit
+Message-ID: <20250328195716.54325489@pumpkin>
+In-Reply-To: <3fa05bba190bec01df2bc117cf7e3e2f00e8b946.camel@decadent.org.uk>
+References: <20250305022154.3903128-1-ming.lei@redhat.com>
+	<3fa05bba190bec01df2bc117cf7e3e2f00e8b946.camel@decadent.org.uk>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Matching the ublk driver, change the type of io_cmd_buf from char * to
-struct ublksrv_io_desc *.
+On Thu, 27 Mar 2025 23:34:29 +0100
+Ben Hutchings <ben@decadent.org.uk> wrote:
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- tools/testing/selftests/ublk/kublk.c | 2 +-
- tools/testing/selftests/ublk/kublk.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> On Wed, 2025-03-05 at 10:21 +0800, Ming Lei wrote:
+> > From: Olivier Gayot <olivier.gayot@canonical.com>
+> >=20
+> > The utf16_le_to_7bit function claims to, naively, convert a UTF-16
+> > string to a 7-bit ASCII string. By naively, we mean that it:
+> >  * drops the first byte of every character in the original UTF-16 string
+> >  * checks if all characters are printable, and otherwise replaces them
+> >    by exclamation mark "!".
+> >=20
+> > This means that theoretically, all characters outside the 7-bit ASCII
+> > range should be replaced by another character. Examples:
+> >=20
+> >  * lower-case alpha (=C9=92) 0x0252 becomes 0x52 (R)
+> >  * ligature OE (=C5=93) 0x0153 becomes 0x53 (S)
+> >  * hangul letter pieup (=E3=85=82) 0x3142 becomes 0x42 (B)
+> >  * upper-case gamma (=C6=94) 0x0194 becomes 0x94 (not printable) so gets
+> >    replaced by "!" =20
+>=20
+> Also any character with low 8 bits equal to 0 terminates the string.
+>=20
+> > The result of this conversion for the GPT partition name is passed to
+> > user-space as PARTNAME via udev, which is confusing and feels questiona=
+ble. =20
+>=20
+> Indeed.  But this change seems to make it worse!
+>=20
+> [...]
+> > This results in many values which should be replaced by "!" to be kept
+> > as-is, despite not being valid 7-bit ASCII. Examples:
+> >=20
+> >  * e with acute accent (=C3=A9) 0x00E9 becomes 0xE9 - kept as-is because
+> >    isprint(0xE9) returns 1.
+> >
+> >  * euro sign (=E2=82=AC) 0x20AC becomes 0xAC - kept as-is because ispri=
+nt(0xAC)
+> >    returns 1. =20
+> [...]
+> > --- a/block/partitions/efi.c
+> > +++ b/block/partitions/efi.c
+> > @@ -682,7 +682,7 @@ static void utf16_le_to_7bit(const __le16 *in, unsi=
+gned int size, u8 *out)
+> >  	out[size] =3D 0;
+> > =20
+> >  	while (i < size) {
+> > -		u8 c =3D le16_to_cpu(in[i]) & 0xff;
+> > +		u8 c =3D le16_to_cpu(in[i]) & 0x7f;
+> > =20
+> >  		if (c && !isprint(c))
+> >  			c =3D '!'; =20
+>=20
+> Now we map '=C3=A9' to 'i' and '=E2=82=AC' to ','.  Didn't we want to map=
+ them to
+> '!'?
+>=20
+> We shouldn't mask the input character; instead we should do a range
+> check before calling isprint().  Something like:
+>=20
+> 	u16 uc =3D le16_to_cpu(in[i]);
+> 	u8 c;
+>=20
+> 	if (uc < 0x80 && (uc =3D=3D 0 || isprint(uc)))
 
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 05147b53c361..83756f97c26e 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -320,11 +320,11 @@ static int ublk_queue_init(struct ublk_queue *q)
- 		q->state |= UBLKSRV_ZC;
- 	}
- 
- 	cmd_buf_size = ublk_queue_cmd_buf_sz(q);
- 	off = UBLKSRV_CMD_BUF_OFFSET + q->q_id * ublk_queue_max_cmd_buf_sz();
--	q->io_cmd_buf = (char *)mmap(0, cmd_buf_size, PROT_READ,
-+	q->io_cmd_buf = mmap(0, cmd_buf_size, PROT_READ,
- 			MAP_SHARED | MAP_POPULATE, dev->fds[0], off);
- 	if (q->io_cmd_buf == MAP_FAILED) {
- 		ublk_err("ublk dev %d queue %d map io_cmd_buf failed %m\n",
- 				q->dev->dev_info.dev_id, q->q_id);
- 		goto fail;
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index f31a5c4d4143..760ff8ffb810 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -126,11 +126,11 @@ struct ublk_queue {
- 	int q_depth;
- 	unsigned int cmd_inflight;
- 	unsigned int io_inflight;
- 	struct ublk_dev *dev;
- 	const struct ublk_tgt_ops *tgt_ops;
--	char *io_cmd_buf;
-+	struct ublksrv_io_desc *io_cmd_buf;
- 	struct io_uring ring;
- 	struct ublk_io ios[UBLK_QUEUE_DEPTH];
- #define UBLKSRV_QUEUE_STOPPING	(1U << 0)
- #define UBLKSRV_QUEUE_IDLE	(1U << 1)
- #define UBLKSRV_NO_BUF		(1U << 2)
-@@ -300,11 +300,11 @@ static inline void ublk_mark_io_done(struct ublk_io *io, int res)
- 	io->result = res;
- }
- 
- static inline const struct ublksrv_io_desc *ublk_get_iod(const struct ublk_queue *q, int tag)
- {
--	return (struct ublksrv_io_desc *)&(q->io_cmd_buf[tag * sizeof(struct ublksrv_io_desc)]);
-+	return &q->io_cmd_buf[tag];
- }
- 
- static inline void ublk_set_sqe_cmd_op(struct io_uring_sqe *sqe, __u32 cmd_op)
- {
- 	__u32 *addr = (__u32 *)&sqe->off;
--- 
-2.45.2
+Given that, for 7-bit ascii, isprint(uc) is equivalent to (uc >=3D 0x20 && =
+uc <=3D 0x7e)
+you can do:
+	if (uc >=3D 0x20 && uc <=3D 0x7e)
+		c =3D uc;
+	else
+		c =3D uc ? '!' : 0;
+
+  David
+
+> 		c =3D uc;
+> 	else
+> 		c =3D '!';
+>=20
+> Ben.
+>=20
 
