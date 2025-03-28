@@ -1,216 +1,106 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0708D214A76;
-	Fri, 28 Mar 2025 06:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+Received: from smtp.cecloud.com (unknown [1.203.97.240])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4411A12C7FD;
+	Fri, 28 Mar 2025 09:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743142501; cv=none; b=Pd7s5Y7wpd8I64wpbnE0txVRTU18WYj1LVzofnc1584R14/dtxVR+z3v6h9Soc24Gg+Te2DPY06ySoKRBBzGhdhmuFWs/177jrB37IfJhv4ACvFWxaAI53kZeyp6TzJ7OfQPcDZm1Gg5cQAmMIQvvE+D4rw/m7j6T4t1NbUP3eQ=
+	t=1743153874; cv=none; b=N0ONlGj0jwXZVliYgJF6O/LsWMK5CupXBtqPdOiTflVAFk6lhobVH47X8BJOVjzNOWVganXmAMcdLo4DsEXLoRBRwu+LUDWsWqLolw4MYjt956MAFnABoWiOX2xoNs8zyapztWwBRjUuU4iMZt5Ocp9ersRY1rteiWNI2t/E+g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743142501; c=relaxed/simple;
-	bh=ZtBApdvbCHQMo0CY4GcBbl/RqYZCO4FTf2913i3BV6g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rHnQ+c59tEmtnELNlCy+VKXEVo432dtevwso7ZzWyT5fecIwGVKN2KV7fvI5moAVUq1tA/uaP7L2nxeeDbKNw+meJ0qcQJWiCRac6oEz+UOxUMwt/YfExlsft9cUZ+nSzdUZuL1BEnchCuucyw2EEkyUMl9B5ab73I8mISd+5Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZP9Gb6hWmz4f3jdF;
-	Fri, 28 Mar 2025 14:14:31 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E42001A0CE1;
-	Fri, 28 Mar 2025 14:14:54 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDHK2BSPuZnfAUtHw--.25875S18;
-	Fri, 28 Mar 2025 14:14:54 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: hch@lst.de,
-	xni@redhat.com,
-	colyli@kernel.org,
-	axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@kernel.org,
-	mpatocka@redhat.com,
-	song@kernel.org,
-	yukuai3@huawei.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH RFC v2 14/14] md/md-llbitmap: add Kconfig
-Date: Fri, 28 Mar 2025 14:08:53 +0800
-Message-Id: <20250328060853.4124527-15-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
-References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1743153874; c=relaxed/simple;
+	bh=vbOcQua1kJoV003LNZEFGlJzdO/VYTvOPAg2h3oTidQ=;
+	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
+	 Content-Type; b=I5lUcfc/PMnYUeeLx5IuK/2moz4TwIwFHRYqVLeYqkfc3MLM6FPvtSF2X65YiMLGHPBURZXcdU96GWolHzBFFCq5Yc5asgR8z9cpVeyrJE02lDa9fRq+U9G7ccvw78r3KRf0JIQNfeyCjuN5uz0d6O4FKD25tdKcVJrOXZeYDv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.cecloud.com (Postfix) with ESMTP id 7EEF8900144;
+	Fri, 28 Mar 2025 17:24:21 +0800 (CST)
+X-MAIL-GRAY:0
+X-MAIL-DELIVERY:1
+X-SKE-CHECKED:1
+X-ABS-CHECKED:1
+X-ANTISPAM-LEVEL:2
+Received: from desktop-n31qu50 (unknown [39.156.73.12])
+	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281458215874928S1743153860161413_;
+	Fri, 28 Mar 2025 17:24:20 +0800 (CST)
+X-IP-DOMAINF:1
+X-RL-SENDER:zhang.guanghui@cestc.cn
+X-SENDER:zhang.guanghui@cestc.cn
+X-LOGIN-NAME:zhang.guanghui@cestc.cn
+X-FST-TO:mlombard@bsdbackstore.eu
+X-RCPT-COUNT:9
+X-LOCAL-RCPT-COUNT:0
+X-MUTI-DOMAIN-COUNT:0
+X-SENDER-IP:39.156.73.12
+X-ATTACHMENT-NUM:0
+X-UNIQUE-TAG:<d482b18df017b0e78a61940e0cc6a21d>
+X-System-Flag:0
+Date: Fri, 28 Mar 2025 17:24:19 +0800
+From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
+To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, 
+	sagi <sagi@grimberg.me>, 
+	mgurtovoy <mgurtovoy@nvidia.com>, 
+	kbusch <kbusch@kernel.org>, 
+	sashal <sashal@kernel.org>, 
+	chunguang.xu <chunguang.xu@shopee.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-nvme <linux-nvme@lists.infradead.org>, 
+	linux-block <linux-block@vger.kernel.org>
+Subject: Re: Re: nvme-tcp: fix a possible UAF when failing to send request
+References: <2025021015413817916143@cestc.cn>, 
+	<aed9dde7-3271-4b97-9632-8380d37505d9@grimberg.me>, 
+	<202503071810452687957@cestc.cn>, 
+	<D8DDP6LIPOKB.2ACTHLE9FPI2A@bsdbackstore.eu>
+X-Priority: 3
+X-GUID: B902EF6A-813E-44A3-BD2F-D196D9A9356B
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.374[cn]
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHK2BSPuZnfAUtHw--.25875S18
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF17trW3GFW3trW3Zr4xZwb_yoWrJw1rpF
-	Z3Xry5Cr1rtF4xXw13Aa4UuF98Jan7Kr9rurn3u3yruFWDArZ8Jr4xKFyUtw1DWrsxJF9x
-	JF1rGa9xG3WYqw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0JUQFxUUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Mime-Version: 1.0
+Message-ID: <2025032817241899538928@cestc.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-From: Yu Kuai <yukuai3@huawei.com>
+SGksIAoKICAgICAgU28gZmFyLCAgdGhlIFVBRiBpc3N1ZSBoYXZlIG5vdCBiZWVuIG9jY2N1cnJl
+ZCBkdXJpbmcgdGVzdGluZyB0aGlzIHBhdGNoIGluIHRoZSBzYW1lIHNpdHVhdGlvbi4gCkFkZGl0
+aW9uYWxseSwgdGhlIHBhdGNoIHRyaWdnZXJzIGEgY29tcGlsYXRpb24gd2FybmluZywgIG52bWVf
+dGNwX2ZhaWxfcmVxdWVzdCBpcyBkZWNsYXJlZCBidXQgbm90IGRlZmluZWQsIHBsZWFzZSBhbHNv
+IHJldmlldy4gIAoKVGhhbmtzIAoKCgoKemhhbmcuZ3VhbmdodWlAY2VzdGMuY24KCgoKwqAKCgoK
+5Y+R5Lu25Lq677yawqBNYXVyaXppbyBMb21iYXJkaQoKCgrlj5HpgIHml7bpl7TvvJrCoDIwMjUt
+MDMtMTHCoDE4OjUyCgoKCuaUtuS7tuS6uu+8msKgemhhbmcuZ3VhbmdodWlAY2VzdGMuY247IHNh
+Z2k7IG1ndXJ0b3ZveTsga2J1c2NoOyBzYXNoYWw7IGNodW5ndWFuZy54dQoKCgrmioTpgIHvvJrC
+oGxpbnV4LWtlcm5lbDsgbGludXgtbnZtZTsgbGludXgtYmxvY2sKCgoK5Li76aKY77yawqBSZTog
+bnZtZS10Y3A6IGZpeCBhIHBvc3NpYmxlIFVBRiB3aGVuIGZhaWxpbmcgdG8gc2VuZCByZXF1ZXN0
+44CQ6K+35rOo5oSP77yM6YKu5Lu255Sxc2FnaWdyaW1AZ21haWwuY29t5Luj5Y+R44CRCgoKCk9u
+IEZyaSBNYXIgNywgMjAyNSBhdCAxMToxMCBBTSBDRVQsIHpoYW5nLmd1YW5naHVpQGNlc3RjLmNu
+IHdyb3RlOgoKCgo+CgoKCj4gSGkKCgoKPgoKCgo+wqDCoMKgwqDCoMKgwqDCoCBBZnRlciB0ZXN0
+aW5nIHRoaXMgcGF0Y2gswqDCoCBzZW5kaW5nIHJlcXVlc3QgZmFpbHVyZSBvY2N1cnJlZCzCoMKg
+IHVuZm9ydHVuYXRlbHksIHRoZSBpc3N1ZSBzdGlsbCBwZXJzaXN0cy4KCgoKwqAKCgoKTWF5YmUg
+SSBhbSBjb21wbGV0ZWx5IHdyb25nIGJ1dCBJIGFtIHN0aWxsIHF1aXRlIGNvbnZpbmNlZCB0aGF0
+IHRoZSBwcm9ibGVtIGhlcmUKCgoKaXMgdGhhdCwgZGVzcGl0ZSB0aGUgbnZtZV90Y3BfdHJ5X3Nl
+bmQoKSBmYWlsdXJlLCB0aGUgdGFyZ2V0IHNlbmRzIGEgcmVzcG9uc2UgY2Fwc3VsZQoKCgpmb3Ig
+dGhlIGNvbW1hbmQsIGxlYWRpbmcgdG8gYSBkb3VibGUtY29tcGxldGlvbiBpbiB0aGUgaG9zdC4K
+CgoKwqAKCgoKU2FnaSwgd2hhdCBhYm91dCB0YWtpbmcgdGhpcyBwYXRjaDogaHR0cHM6Ly9sb3Jl
+Lmtlcm5lbC5vcmcvbGludXgtbnZtZS8yMDI1MDMwNjE2MDMyMi4xMzcwMzAwLTItbWxvbWJhcmRA
+cmVkaGF0LmNvbS9ULyN1CgoKCmFuZCBkbyBhIHN0ZXAgZnVydGhlciBieSBub3QgY29tcGxldGlu
+ZyB0aGUgcmVxdWVzdCwgbGVhdmluZyB0aGUgZXJyb3IKCgoKcmVjb3ZlcnkgaGFuZGxlciB0aGUg
+dGFzayBvZiBjbGVhbmluZyBldmVyeXRoaW5nIHVwPwoKCgrCoAoKCgrCoAoKCgpkaWZmIC0tZ2l0
+IGEvZHJpdmVycy9udm1lL2hvc3QvdGNwLmMgYi9kcml2ZXJzL252bWUvaG9zdC90Y3AuYwoKCgpp
+bmRleCAzMjdmM2YyZjUzOTkuLjcyYzFkNzk0ODM4NiAxMDA2NDQKCgoKLS0tIGEvZHJpdmVycy9u
+dm1lL2hvc3QvdGNwLmMKCgoKKysrIGIvZHJpdmVycy9udm1lL2hvc3QvdGNwLmMKCgoKQEAgLTEz
+MjgsOCArMTMyOCw4IEBAIHN0YXRpYyBpbnQgbnZtZV90Y3BfdHJ5X3NlbmQoc3RydWN0IG52bWVf
+dGNwX3F1ZXVlICpxdWV1ZSkKCgoKfSBlbHNlIGlmIChyZXQgPCAwKSB7CgoKCmRldl9lcnIocXVl
+dWUtPmN0cmwtPmN0cmwuZGV2aWNlLAoKCgoiZmFpbGVkIHRvIHNlbmQgcmVxdWVzdCAlZFxuIiwg
+cmV0KTsKCgoKLSBudm1lX3RjcF9mYWlsX3JlcXVlc3QocXVldWUtPnJlcXVlc3QpOwoKCgpudm1l
+X3RjcF9kb25lX3NlbmRfcmVxKHF1ZXVlKTsKCgoKKyBudm1lX3RjcF9lcnJvcl9yZWNvdmVyeSgm
+cXVldWUtPmN0cmwtPmN0cmwpOwoKCgp9CgoKCm91dDoKCgoKbWVtYWxsb2Nfbm9yZWNsYWltX3Jl
+c3RvcmUobm9yZWNsYWltX2ZsYWcpOwoKCgrCoAoKCgrCoAoKCgpNYXVyaXppbwoKCgrCoAoKCgrC
+oAoKCg==
 
-A new config MD_LLBITMAP is added, user can now using llbitmap to
-replace the old bitmap.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/md/Kconfig       | 12 ++++++++++++
- drivers/md/Makefile      |  1 +
- drivers/md/md-bitmap.h   | 13 +++++++++++++
- drivers/md/md-llbitmap.c | 27 +++++++++++++++++++++++++++
- drivers/md/md.c          |  7 +++++++
- 5 files changed, 60 insertions(+)
-
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 0da07182494c..e5dc893ad09a 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -52,6 +52,18 @@ config MD_BITMAP
- 
- 	  If unsure, say Y.
- 
-+config MD_LLBITMAP
-+	bool "MD RAID lockless bitmap support"
-+	default n
-+	depends on BLK_DEV_MD
-+	help
-+	  If you say Y here, support for the lockless write intent bitmap will
-+	  be enabled.
-+
-+	  Note, this is an experimental feature.
-+
-+	  If unsure, say N.
-+
- config MD_AUTODETECT
- 	bool "Autodetect RAID arrays during kernel boot"
- 	depends on BLK_DEV_MD=y
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index 811731840a5c..e70e4d3cbe29 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -39,6 +39,7 @@ linear-y       += md-linear.o
- obj-$(CONFIG_MD_LINEAR)		+= linear.o
- obj-$(CONFIG_MD_RAID0)		+= raid0.o
- obj-$(CONFIG_MD_BITMAP)		+= md-bitmap.o
-+obj-$(CONFIG_MD_LLBITMAP)	+= md-llbitmap.o
- obj-$(CONFIG_MD_RAID1)		+= raid1.o
- obj-$(CONFIG_MD_RAID10)		+= raid10.o
- obj-$(CONFIG_MD_RAID456)	+= raid456.o
-diff --git a/drivers/md/md-bitmap.h b/drivers/md/md-bitmap.h
-index 7a3cd2f70772..ee0c65e87dba 100644
---- a/drivers/md/md-bitmap.h
-+++ b/drivers/md/md-bitmap.h
-@@ -171,4 +171,17 @@ static inline void md_bitmap_exit(void)
- }
- #endif
- 
-+#ifdef CONFIG_MD_LLBITMAP
-+int md_llbitmap_init(void);
-+void md_llbitmap_exit(void);
-+#else
-+static inline int md_llbitmap_init(void)
-+{
-+	return 0;
-+}
-+static inline void md_llbitmap_exit(void)
-+{
-+}
-+#endif
-+
- #endif
-diff --git a/drivers/md/md-llbitmap.c b/drivers/md/md-llbitmap.c
-index 88ba29111e13..5e2f89137feb 100644
---- a/drivers/md/md-llbitmap.c
-+++ b/drivers/md/md-llbitmap.c
-@@ -1381,3 +1381,30 @@ static struct bitmap_operations llbitmap_ops = {
- 
- 	.group			= &md_llbitmap_group,
- };
-+
-+int md_llbitmap_init(void)
-+{
-+	md_llbitmap_io_wq = alloc_workqueue("md_llbitmap_io",
-+					 WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-+	if (!md_llbitmap_io_wq)
-+		return -ENOMEM;
-+
-+	md_llbitmap_unplug_wq = alloc_workqueue("md_llbitmap_unplug",
-+					 WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-+	if (!md_llbitmap_unplug_wq) {
-+		destroy_workqueue(md_llbitmap_io_wq);
-+		md_llbitmap_io_wq = NULL;
-+		return -ENOMEM;
-+	}
-+
-+	return register_md_submodule(&llbitmap_ops.head);
-+}
-+
-+void md_llbitmap_exit(void)
-+{
-+	destroy_workqueue(md_llbitmap_io_wq);
-+	md_llbitmap_io_wq = NULL;
-+	destroy_workqueue(md_llbitmap_unplug_wq);
-+	md_llbitmap_unplug_wq = NULL;
-+	unregister_md_submodule(&llbitmap_ops.head);
-+}
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index c1f13288069a..4d05eae69795 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -10104,6 +10104,10 @@ static int __init md_init(void)
- 	if (ret)
- 		return ret;
- 
-+	ret = md_llbitmap_init();
-+	if (ret)
-+		goto err_bitmap;
-+
- 	ret = -ENOMEM;
- 	md_wq = alloc_workqueue("md", WQ_MEM_RECLAIM, 0);
- 	if (!md_wq)
-@@ -10135,6 +10139,8 @@ static int __init md_init(void)
- err_misc_wq:
- 	destroy_workqueue(md_wq);
- err_wq:
-+	md_llbitmap_exit();
-+err_bitmap:
- 	md_bitmap_exit();
- 	return ret;
- }
-@@ -10439,6 +10445,7 @@ static __exit void md_exit(void)
- 
- 	destroy_workqueue(md_misc_wq);
- 	destroy_workqueue(md_wq);
-+	md_llbitmap_exit();
- 	md_bitmap_exit();
- }
- 
--- 
-2.39.2
 
