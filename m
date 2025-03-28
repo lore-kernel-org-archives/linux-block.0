@@ -1,153 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DBF1DEFE5;
-	Fri, 28 Mar 2025 19:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D0A1C173F
+	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 19:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743188946; cv=none; b=oir0qVnkBhL/mnOXh8IH+yD0GUqtMRj/2VsScNhjwPk1X+sRvuVHvCNzeNOsQGbJFU1hZB0zkToqCZ2+xjKUNKWy92cN4tVkxxA4NG/Q08mpwV1Slj6fgoDzy+Ne32U7wjF6DBNcizWT0FsyeKboOl9A+R4hw1GdtfdGlKXfldo=
+	t=1743189664; cv=none; b=fXA8vr5AppECswCW+GedrFgapGWtuXiwA7tCrAEldIK4HgjMhgYjIZUQraTnVh5H3m6x2yAMPp5cKf4dGYrFwftPpxG9F3I/LUlYk1rNNYbHQ3gDnatq7QQrlFbTz407QphCMm+qW5FA049TaOBYU5azKT6c3WaWz72rPbM9N/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743188946; c=relaxed/simple;
-	bh=nbVAbadFhwirIIc7wDc9emhsG/6sME7ykQ1kn6t6U48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rNGk+KcqCGQ8/rLTpT/fN2Lr/CL4rYyVnphoCStGkPkZwgzJD7rkZnHggKA7NSiUibY9gm8xgaqmHWl86rxQcwkAdYgcRatgbmO2/X60zN+hVTgSOOX+aLCANn7lanpwgro6RGe1vSSLHrxXKgQ50zYYFjlaMClav3Hg0CPi7kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dB3UELKK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743189664; c=relaxed/simple;
+	bh=9Esyej47MXyXzcSAmIJ4EgIKMmSjGEuUuaT0dcSkzJA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BtAgF7YkJbAhXKR+EhCpu+D/5aKLX/EQd3oz7zpHUjZOH7Yz8ei0/lfY4NhfY1m9cAPL/6mVCYyBIijuvWJV5MdERq44+iqGY8l2+xWvMqrAuHbP4IJUkwmxH2CjM6cOwKg6s/s2GNe+FrXo0NAhoIVHbqbzXEiDXxCk26EHbiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AimN/x+5; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dB3UELKK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBB8C4CEE4;
-	Fri, 28 Mar 2025 19:09:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743188946;
-	bh=nbVAbadFhwirIIc7wDc9emhsG/6sME7ykQ1kn6t6U48=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dB3UELKKWurwo5YB6MHwFg/UZUce61fmOuW0NiU9qFlFdtoNv0aOf8YfAgXZPl/VK
-	 LnRc6mubqtAjjwkdjUQPZWkbXjEWwyo9K6zW6LAA74Be8JbsB91M+5435jttZzFU+z
-	 2bYAnSgTaLkzS616JBBRVmk7K2lKc5/LqQ0dQZNqJo0vxu9km++GxxMOwPXezFu5OR
-	 Gmued/cHagZgMmn2Wkv3ONd2KESeVcsywtzTS0eYb5Qb3EEdRv00wIk3buiNm7b6sF
-	 WhlFhMw/njMC/KKbBSmHRNF2dXZoi/kG6jExwozgFY7EI9kQkXZo/PROy5tjNwBU2I
-	 mMPyKH3bTT/BQ==
-Date: Fri, 28 Mar 2025 12:09:04 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	David Bueso <dave@stgolabs.net>, Tso Ted <tytso@mit.edu>,
-	Ritesh Harjani <ritesh.list@gmail.com>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Oliver Sang <oliver.sang@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Dave Chinner <david@fromorbit.com>, gost.dev@samsung.com,
-	mcgrof@kernel.org
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z-bz0IZuTtwNYPBq@bombadil.infradead.org>
-References: <Z9sYGccL4TocoITf@bombadil.infradead.org>
- <Z9sZ5_lJzTwGShQT@casper.infradead.org>
- <Z9wF57eEBR-42K9a@bombadil.infradead.org>
- <20250322231440.GA1894930@cmpxchg.org>
- <Z99dk_ZMNRFgaaH8@bombadil.infradead.org>
- <Z9-zL3pRpCHm5a0w@bombadil.infradead.org>
- <Z+JSwb8BT0tZrSrx@xsang-OptiPlex-9020>
- <Z-X_FiXDTSvRSksp@bombadil.infradead.org>
- <Z-YjyBF-M9ciJC7X@bombadil.infradead.org>
- <Z-ZwToVfJbdTVRtG@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AimN/x+5"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85b5e49615aso216773839f.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 12:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1743189661; x=1743794461; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lG9dZo5ZH0RsJOu3eXzt0yKhbFMrsHY9cwC7gax1O9I=;
+        b=AimN/x+5ziwROVNt0fmrXcdrtEuJoi4GAeJapo9cMWnYOoVOlbw72/E2K6gYnFg4TJ
+         xI/DdxHRN/Cl15FNXmcisNrSbC7q+vFcjujQumg/DOIkAp1W2i2iaNr8KKwflf8hLeNG
+         M+nH9vjsVPWmOPrjNJvrK94bnmZ49AYj7lSDvZbiQavOvf5AMAK1DdcUflKMAnIoxc4q
+         Aexu6PEG8P9+3yb9jyE28XSUb7Q71TG85tH2Jk3N+G01REEjeD+nK6DIpcMc77L/p8EK
+         MgfWHrV6WdIOF6QeDVPXbSr+UOz5EeOsjxTf+1Gj3H7YG4bNyLvyu6Yf1TTvHnuckC0o
+         ihgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743189661; x=1743794461;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lG9dZo5ZH0RsJOu3eXzt0yKhbFMrsHY9cwC7gax1O9I=;
+        b=cwi+pIb8ZgrP0EXTlky+hFihF3PLdMawN83CkNrmTlqWM358zp2Zp2++Gl/yJN4cTQ
+         +A3Jaq9k/v186D3CbWG7kq2ODgkuMw0yiGYrfkDRYyYVxE+uaGXnflpA7habs3YIBhyV
+         7TKLo/qrPz0MFuOBEMGBNPBtETskWFLoivrBRG1Hy7Z7JRtUmeEm+ufT58bmEImoN3ay
+         I81Z+5t1/L9zE95GTc2DdFMWLjaMd+A1afhlV9KnJdTHnWT8H5TGxrK5k2wMURCHBYmO
+         HESF8vFEXHc6T71f9PqiAHd1EWcIN29Vr6bvwcE50MB0PFNwbefr6gcALK6p35OJLkso
+         38UQ==
+X-Gm-Message-State: AOJu0Yzf+waqPQq4zoTCgwLMOzQE4RvOoNl9Q9Bvi39s5yJwaLlcM3aN
+	71z56xl7WD99Vj7ayf5QsoekWMMldNGluQbSCveT/EsJJp+lQz78SHfp4f83vxA=
+X-Gm-Gg: ASbGncv3qNxU4fV8xvciAbfjGB2j51T361i2zlhmlx4j1i5Kvuw1hEjGLNJ+fOwkdYO
+	fU+4ZDNIR5RfsoV8ov9bG4Zmq6hV+8nvLc2/M6m2Ghf2xAjnhE7DllAF/hDSMZy9QqZH9U6kLsa
+	50LnhBFX/UvFBgSX8RzeFAzahb8uH9YMJrgyqAHP6mHqC7zKSZOXMh49jZvIEOcerW8dSrsrnWe
+	s6xm218jO87zCwj4xMtC+zzRz1s+tAclXND2CUNdXzkBhHXFCA/otD8lxpcg7VTYVJm/5ovwa+i
+	K56JYEzdsHouvT2JQqTibckp0RL7a4T+CeTi8c+mFA==
+X-Google-Smtp-Source: AGHT+IEdoUiqLHpxteaAmvVOy+f9e6FFbOsTplCGfV+RJGis2sI0S3KCmLvvUpHS294ydDErNHXdkQ==
+X-Received: by 2002:a05:6602:358a:b0:85b:5564:2d51 with SMTP id ca18e2360f4ac-85e9e90b88amr75155739f.11.1743189661154;
+        Fri, 28 Mar 2025 12:21:01 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f46470fcfdsm577183173.24.2025.03.28.12.21.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Mar 2025 12:21:00 -0700 (PDT)
+Message-ID: <31fe911c-7340-4687-a384-c67cfc4b6380@kernel.dk>
+Date: Fri, 28 Mar 2025 13:20:59 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-ZwToVfJbdTVRtG@bombadil.infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] Minor ublk optimizations
+To: Caleb Sander Mateos <csander@purestorage.com>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250328180411.2696494-1-csander@purestorage.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250328180411.2696494-1-csander@purestorage.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 28, 2025 at 02:48:00AM -0700, Luis Chamberlain wrote:
-> On Thu, Mar 27, 2025 at 09:21:30PM -0700, Luis Chamberlain wrote:
-> > Would the extra ref check added via commit 060913999d7a9e50 ("mm:
-> > migrate: support poisoned recover from migrate folio") make the removal
-> > of the spin lock safe now given all the buffers are locked from the
-> > folio? This survives some basic sanity checks on my end with
-> > generic/750 against ext4 and also filling a drive at the same time with
-> > fio. I have a feeling is we are not sure, do we have a reproducer for
-> > the issue reported through ebdf4de5642fb6 ("mm: migrate: fix reference
-> > check race between __find_get_block() and migration")? I suspect the
-> > answer is no.
+On 3/28/25 12:04 PM, Caleb Sander Mateos wrote:
+> A few cleanups on top of Ming's recent patch set that implemented
+> ->queue_rqs() for ublk:
+> https://lore.kernel.org/linux-block/20250327095123.179113-1-ming.lei@redhat.com/T/#u
+> 
+> Caleb Sander Mateos (5):
+>   ublk: remove unused cmd argument to ublk_dispatch_req()
+>   ublk: skip 1 NULL check in ublk_cmd_list_tw_cb() loop
+>   ublk: get ubq from pdu in ublk_cmd_list_tw_cb()
+>   ublk: avoid redundant io->cmd in ublk_queue_cmd_list()
+>   ublk: store req in ublk_uring_cmd_pdu for ublk_cmd_tw_cb()
 
-Sebastian, David, is there a reason CONFIG_DEBUG_ATOMIC_SLEEP=y won't
-trigger a atomic sleeping context warning when cond_resched() is used?
-Syzbot and 0-day had ways to reproduce it a kernel warning under these
-conditions, but this config didn't, and require dan explicit might_sleep()
+All look like reasonable cleanups to me.
 
-CONFIG_PREEMPT_BUILD=y
-CONFIG_ARCH_HAS_PREEMPT_LAZY=y
-# CONFIG_PREEMPT_NONE is not set
-# CONFIG_PREEMPT_VOLUNTARY is not set
-CONFIG_PREEMPT=y
-# CONFIG_PREEMPT_LAZY is not set
-# CONFIG_PREEMPT_RT is not set
-CONFIG_PREEMPT_COUNT=y
-CONFIG_PREEMPTION=y
-CONFIG_PREEMPT_DYNAMIC=y
-CONFIG_PREEMPT_RCU=y
-CONFIG_HAVE_PREEMPT_DYNAMIC=y
-CONFIG_HAVE_PREEMPT_DYNAMIC_CALL=y
-CONFIG_PREEMPT_NOTIFIERS=y
-CONFIG_DEBUG_PREEMPT=y
-CONFIG_PREEMPTIRQ_TRACEPOINTS=y
-# CONFIG_PREEMPT_TRACER is not set
-# CONFIG_PREEMPTIRQ_DELAY_TEST is not set
+-- 
+Jens Axboe
 
-Are there some preemption configs under which cond_resched() won't
-trigger a kernel splat where expected so the only thing I can think of
-is perhaps some preempt configs don't implicate a sleep? If true,
-instead of adding might_sleep() to one piece of code (in this case
-foio_mc_copy()) I wonder if instead just adding it to cond_resched() may
-be useful.
-
-Note that the issue in question wouldn't trigger at all with ext4, that
-some reports suggset it happened with btrfs  (0-day) with LTP, or
-another test from syzbot was just coincidence on any filesystem, the
-only way to reproduce this really was by triggering compaction with the
-block device cache and hitting compaction as we're now enabling large
-folios with the block device cache, and we've narrowed that down to
-a simple reproducer of running
-
-dd if=/dev/zero of=/dev/vde bs=1024M count=1024.
-
-and by adding the might_sleep() on folio_mc_copy()
-
-Then as for the issue we're analzying, now that I get back home I think
-its important to highlight then that generic/750 seems likely able to
-reproduce the original issue reported by commit ebdf4de5642fb6 ("mm:
-migrate: fix reference check race between __find_get_block() and migration")
-and that it takes about 3 hours to reproduce, which requires reverting
-that commit which added the spin lock:
-
-Mar 28 03:36:37 extra-ext4-4k unknown: run fstests generic/750 at 2025-03-28 03:36:37
-<-- snip -->
-Mar 28 05:57:09 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_get_first_dir_block:3538: inode #5174: comm fsstress: directory missing '.'
-
-Jan, can you confirm if the symptoms match the original report?
-
-It would be good for us to see if running the newly proposed generic/764
-I am proposing [0] can reproduce that corruption faster than 3 hours.
-
-If we have a reproducer we can work on evaluating a fix for both the
-older ext4 issue reported by commit ebdf4de5642fb6 and also remove
-the spin lock from page migration to support large folios.
-
-And lastly, can __find_get_block() avoid running in case of page
-migration? Do we have semantics from a filesystem perspective to prevent
-work in filesystems going on when page migration on a folio is happening
-in atomic context? If not, do we need it?
-
-[0] https://lore.kernel.org/all/20250326185101.2237319-1-mcgrof@kernel.org/T/#u
-
-  Luis
