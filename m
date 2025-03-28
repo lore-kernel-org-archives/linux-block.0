@@ -1,204 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414DD3CF58;
-	Fri, 28 Mar 2025 04:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2DF18BB8E;
+	Fri, 28 Mar 2025 06:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743135692; cv=none; b=awbQlfPWCN2XAE7LCllL2WYdLzXkvCWhuSYM60f7kEijAUP/VpLTW1rX2obCf0CQ9R2eu7F8N7qsLweH8aStDoUd0VTk2y6m/yFHQJqGWIk7HVg4lvjwYnCycCeajYNNOklXo6pMq6bWdrfPNuWFFslQbRqv+9/BOLPoO2KMp6k=
+	t=1743142492; cv=none; b=nJoQdtU7dV2Pu0Jb/eSwszjj3L0CVtKejTqj4wHipn2BS3mq6iy18U+DQnzXkbAV7Imm3mTO6fjUBZF7L0E3FDHODMo+yFbBE7drt+yitA5fomWd67RO+dNY/wK2s9mPL1hjDgeAVEDqiTnhZiYpQKnVKNaTLeSg1EWazQAbuis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743135692; c=relaxed/simple;
-	bh=EkZr+InM+IE+kVx2qsfh4jplm5ZGyo/xPOkhd09hklc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/Goo6O8rIUsHwJ439JJRbMls26RqUBo4xux0ic6OPs2MqXnF1MKHA5yERTr2zWXU0Pl9O7ZK71tLxpP7dbAqkXP5vtoKMYfsqOSR6BVQhNTpr+PbMdkJpx6eip29DgEeuKnnRPgJEsdgJgzJZncMq0MRk3nidHaEIlqIgkDAo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0GeXZzY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0GeXZzY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB44C4CEE4;
-	Fri, 28 Mar 2025 04:21:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743135690;
-	bh=EkZr+InM+IE+kVx2qsfh4jplm5ZGyo/xPOkhd09hklc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t0GeXZzYKN4pot90kVRCo8FSkgmYZFvOjZ60Zuyy6iByYStTWb7psQOlbk/wCHJg+
-	 AcceYumfrBCUDVPOuU3bLcJ1z0UAeSSDfl1MxByNAzLaiJ2bQURoGk/jIM3WzG7VyL
-	 HV6BpgRfWJK8hQ58Qm9sqm4R9j79X/eQfQNXmCBpMvHSpL/8/PPDb9kcvLCX7ikNWC
-	 nC4/ykbJdl3mogEPpX4Hq03d6gL0QCdmtcZZCB6fAD1jR/UiBNEnmevAGCwTd09qvq
-	 rceggSr4u732Mk/KggVDiMnsrTYPYNPao4ISic0fCXJrfPJyRmtFb9WJnkKyrLNKIv
-	 vRgJc2/a04frg==
-Date: Thu, 27 Mar 2025 21:21:28 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Oliver Sang <oliver.sang@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	David Bueso <dave@stgolabs.net>
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z-YjyBF-M9ciJC7X@bombadil.infradead.org>
-References: <Z9oy3i3n_HKFu1M1@casper.infradead.org>
- <Z9r27eUk993BNWTX@bombadil.infradead.org>
- <Z9sYGccL4TocoITf@bombadil.infradead.org>
- <Z9sZ5_lJzTwGShQT@casper.infradead.org>
- <Z9wF57eEBR-42K9a@bombadil.infradead.org>
- <20250322231440.GA1894930@cmpxchg.org>
- <Z99dk_ZMNRFgaaH8@bombadil.infradead.org>
- <Z9-zL3pRpCHm5a0w@bombadil.infradead.org>
- <Z+JSwb8BT0tZrSrx@xsang-OptiPlex-9020>
- <Z-X_FiXDTSvRSksp@bombadil.infradead.org>
+	s=arc-20240116; t=1743142492; c=relaxed/simple;
+	bh=yvMAEESoNnbvRo/WhnPSJN0fQteTcSJ7e9or7cAm9nM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HDRr3DpbbYA7cblw3FkPW5MBhT7Z/tkXtb/XiHbwE0ya48VjP0ckKQ1Fy8svElSQ/0UeWVNcNtcLmrZt4txdE+LqoL7/JT0tn62LUgyTxhl+VUHx87QCf0d380oNBU7yJ6DuvxCsV7RFXRGIcdW+Klmwbds51seive0qTDyzGGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZP9GR6PfZz4f3jch;
+	Fri, 28 Mar 2025 14:14:23 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id DB4F51A06D7;
+	Fri, 28 Mar 2025 14:14:46 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgDHK2BSPuZnfAUtHw--.25875S5;
+	Fri, 28 Mar 2025 14:14:46 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: hch@lst.de,
+	xni@redhat.com,
+	colyli@kernel.org,
+	axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	song@kernel.org,
+	yukuai3@huawei.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH RFC v2 01/14] block: factor out a helper bdev_file_alloc()
+Date: Fri, 28 Mar 2025 14:08:40 +0800
+Message-Id: <20250328060853.4124527-2-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
+References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-X_FiXDTSvRSksp@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDHK2BSPuZnfAUtHw--.25875S5
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr4rXFW5WryxXr47Ar1UJrb_yoW5JFWxpF
+	Z8Jayrtry8Gr1qqFW2va17JF15twnxGr1UZF9xW343ArZrtr1vkFs5CrW5u34Fy3yktF4D
+	XF45WryUWryFkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0JU4OJ5UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, Mar 27, 2025 at 06:44:56PM -0700, Luis Chamberlain wrote:
-> On Tue, Mar 25, 2025 at 02:52:49PM +0800, Oliver Sang wrote:
-> > hi, Luis,
-> > 
-> > On Sun, Mar 23, 2025 at 12:07:27AM -0700, Luis Chamberlain wrote:
-> > > On Sat, Mar 22, 2025 at 06:02:13PM -0700, Luis Chamberlain wrote:
-> > > > On Sat, Mar 22, 2025 at 07:14:40PM -0400, Johannes Weiner wrote:
-> > > > > Hey Luis,
-> > > > > 
-> > > > > This looks like the same issue the bot reported here:
-> > > > > 
-> > > > > https://lore.kernel.org/all/20250321135524.GA1888695@cmpxchg.org/
-> > > > > 
-> > > > > There is a fix for it queued in next-20250318 and later. Could you
-> > > > > please double check with your reproducer against a more recent next?
-> > > > 
-> > > > Confirmed, at least it's been 30 minutes and no crashes now where as
-> > > > before it would crash in 1 minute. I'll let it soak for 2.5 hours in
-> > > > the hopes I can trigger the warning originally reported by this thread.
-> > > > 
-> > > > Even though from code inspection I see how the kernel warning would
-> > > > trigger I just want to force trigger it on a test, and I can't yet.
-> > > 
-> > > Survied 5 hours now. This certainly fixed that crash.
-> > > 
-> > > As for the kernel warning, I can't yet reproduce that, so trying to
-> > > run generic/750 forever and looping
-> > > ./testcases/kernel/syscalls/close_range/close_range01
-> > > and yet nothing.
-> > > 
-> > > Oliver can you reproduce the kernel warning on next-20250321 ?
-> > 
-> > the issue still exists on
-> > 9388ec571cb1ad (tag: next-20250321, linux-next/master) Add linux-next specific files for 20250321
-> > 
-> > but randomly (reproduced 7 times in 12 runs, then ltp.close_range01 also failed.
->a> on another 5 times, the issue cannot be reproduced then ltp.close_range01 pass)
-> 
-> OK I narrowed down a reproducer to requiring the patch below 
-> 
-> 
-> diff --git a/mm/util.c b/mm/util.c
-> index 448117da071f..3585bdb8700a 100644
-> --- a/mm/util.c
-> +++ b/mm/util.c
-> @@ -735,6 +735,8 @@ int folio_mc_copy(struct folio *dst, struct folio *src)
->  	long nr = folio_nr_pages(src);
->  	long i = 0;
->  
-> +	might_sleep();
-> +
->  	for (;;) {
->  		if (copy_mc_highpage(folio_page(dst, i), folio_page(src, i)))
->  			return -EHWPOISON;
-> 
-> 
-> And  then just running:
-> 
-> dd if=/dev/zero of=/dev/vde bs=1024M count=1024
-> 
-> For some reason a kernel with the following didn't trigger it so the
-> above patch is needed
-> 
-> 
-> CONFIG_PROVE_LOCKING=y
-> CONFIG_DEBUG_SPINLOCK=y
-> CONFIG_ACPI_SLEEP=y
-> 
-> It may have to do with my preemtpion settings:
-> 
-> CONFIG_PREEMPT_BUILD=y
-> CONFIG_ARCH_HAS_PREEMPT_LAZY=y
-> # CONFIG_PREEMPT_NONE is not set
-> CONFIG_PREEMPT_VOLUNTARY=y
-> # CONFIG_PREEMPT is not set
-> # CONFIG_PREEMPT_LAZY is not set
-> CONFIG_PREEMPT_COUNT=y
-> CONFIG_PREEMPTION=y
-> CONFIG_PREEMPT_DYNAMIC=y
-> CONFIG_PREEMPT_RCU=y
-> 
-> And so now to see how we should fix it.
+From: Yu Kuai <yukuai3@huawei.com>
 
-Would the extra ref check added via commit 060913999d7a9e50 ("mm:
-migrate: support poisoned recover from migrate folio") make the removal
-of the spin lock safe now given all the buffers are locked from the
-folio? This survives some basic sanity checks on my end with
-generic/750 against ext4 and also filling a drive at the same time with
-fio. I have a feeling is we are not sure, do we have a reproducer for
-the issue reported through ebdf4de5642fb6 ("mm: migrate: fix reference
-check race between __find_get_block() and migration")? I suspect the
-answer is now. The only other thing I can think of at this tie is to add
-the lru_cache_disabled() || cpu_is_isolated(smp_processor_id())) checks
-on __find_get_block_slow() as we do in bh_lru_install() but I am not
-sure if that suffices for the old races.
+To allocate bdev_file without opening the bdev, mdraid will create hidden
+disk to manage internal bitmap in following patches, while the hidden disk
+can't be opened by user, and mdraid will initialize this file to manage
+bitmap IO.
 
-Thoughts?
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bdev.c           | 21 ++++++++++++++++-----
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 97f0edf0c032..6a5d125ecde9 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -859,12 +859,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
- 			}
- 			bh = bh->b_this_page;
- 		} while (bh != head);
-+		spin_unlock(&mapping->i_private_lock);
- 		if (busy) {
- 			if (invalidated) {
- 				rc = -EAGAIN;
- 				goto unlock_buffers;
- 			}
--			spin_unlock(&mapping->i_private_lock);
- 			invalidate_bh_lrus();
- 			invalidated = true;
- 			goto recheck_buffers;
-@@ -882,8 +882,6 @@ static int __buffer_migrate_folio(struct address_space *mapping,
- 	} while (bh != head);
+diff --git a/block/bdev.c b/block/bdev.c
+index 9d73a8fbf7f9..6b4ba6cb04c9 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -989,12 +989,26 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+ 	return flags;
+ }
  
- unlock_buffers:
--	if (check_refs)
--		spin_unlock(&mapping->i_private_lock);
- 	bh = head;
- 	do {
- 		unlock_buffer(bh);
-diff --git a/mm/util.c b/mm/util.c
-index 448117da071f..3585bdb8700a 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -735,6 +735,8 @@ int folio_mc_copy(struct folio *dst, struct folio *src)
- 	long nr = folio_nr_pages(src);
- 	long i = 0;
- 
-+	might_sleep();
++struct file *bdev_file_alloc(struct block_device *bdev, blk_mode_t mode)
++{
++	unsigned int flags = blk_to_file_flags(mode);
++	struct file *bdev_file;
 +
- 	for (;;) {
- 		if (copy_mc_highpage(folio_page(dst, i), folio_page(src, i)))
- 			return -EHWPOISON;
++	bdev_file = alloc_file_pseudo_noaccount(BD_INODE(bdev),
++			blockdev_mnt, "", flags | O_LARGEFILE, &def_blk_fops);
++
++	if (!IS_ERR(bdev_file))
++		ihold(BD_INODE(bdev));
++
++	return bdev_file;
++}
++EXPORT_SYMBOL_GPL(bdev_file_alloc);
++
+ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 				   const struct blk_holder_ops *hops)
+ {
+ 	struct file *bdev_file;
+ 	struct block_device *bdev;
+-	unsigned int flags;
+ 	int ret;
+ 
+ 	ret = bdev_permission(dev, mode, holder);
+@@ -1005,14 +1019,11 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 	if (!bdev)
+ 		return ERR_PTR(-ENXIO);
+ 
+-	flags = blk_to_file_flags(mode);
+-	bdev_file = alloc_file_pseudo_noaccount(BD_INODE(bdev),
+-			blockdev_mnt, "", flags | O_LARGEFILE, &def_blk_fops);
++	bdev_file = bdev_file_alloc(bdev, mode);
+ 	if (IS_ERR(bdev_file)) {
+ 		blkdev_put_no_open(bdev);
+ 		return bdev_file;
+ 	}
+-	ihold(BD_INODE(bdev));
+ 
+ 	ret = bdev_open(bdev, mode, holder, hops, bdev_file);
+ 	if (ret) {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 248416ecd01c..dede6721374a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1639,6 +1639,7 @@ extern const struct blk_holder_ops fs_holder_ops;
+ 	(BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES | \
+ 	 (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
+ 
++struct file *bdev_file_alloc(struct block_device *bdev, blk_mode_t mode);
+ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 		const struct blk_holder_ops *hops);
+ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
+-- 
+2.39.2
+
