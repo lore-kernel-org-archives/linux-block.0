@@ -1,189 +1,243 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C351A315A
-	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 14:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551A7EAF9
+	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 14:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743171531; cv=none; b=NlrYufYwW5OlxwnxBk1J2R5TWKOUoq/z2T7Yj9hn43NS5Aakls2mF14e9plxV6Bo8FKpA4W1/nJlY1mks2ma+OG5mRRV14gAg5m1v3DmAfmxEcLFbZoxRmrdCjeHIe3K3qsIYYdXta1P2hDKCt4ey7/qgo+K2c0W2ErZ1gN4WEo=
+	t=1743172648; cv=none; b=j9JZGufLeR9FwjbQHVxAz23W/A0tgNk4D+zTdCgi/WS/B2XhOIfgoAfV6PBuQIlWyPTvZiP+yxbDeYMZLDvO9Y7USrsr2dcT+SeJwGkqbOhqZ+m9urB/PeqONmIrMXlLQcGFifUiLCR2yPVnFTG7480JSlm9MPP29hRfoG48/qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743171531; c=relaxed/simple;
-	bh=aRsjjWJzK8Szt9gdEbaPUx+/TAhrL4HukvLzIArcr1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=pQUoKMJQWVvqAvTBl7ZriVJA5DLkFMHkSNpCCErXC2mXYbJSVwNKwM4uO1gulshmsrXNcu5jHxlJ3ESIuL+oKP9Ma2qs6jX97yYEDtTpJfFhDPzTjjUpUbLLTsy2CAdtEcFW1ylWxSm6KuUrScpY29U0W37EWDbdupcx9wBlGko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LzJ9hYAu; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LzJ9hYAu"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250328141842euoutp02fb5f6947554b043c045cf323a8e16b07~w-UOILX6k2995829958euoutp02G
-	for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 14:18:42 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250328141842euoutp02fb5f6947554b043c045cf323a8e16b07~w-UOILX6k2995829958euoutp02G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1743171522;
-	bh=lO48Yx1dRxN6L1ypDuwiGhfZgN4Rzqi6MuK49Ng7t8Q=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=LzJ9hYAuVORDdpPDNoaAsSxqQPvxAGN70JzbeWTmHFXBBQgApzHABzlGOwL7v/NTq
-	 Bt8Py3MY06YHzpCwrOOD4l40Zl0MQ/FF8ERl5yImACnQCUZssD16PAHT56NCF007wz
-	 90uDi0LLMtuZPUD23/QJMqJdaUkIsTHwBiJmT6tk=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20250328141841eucas1p1619292970847f923dcfe86bb5c47ab46~w-UNvtGSP2939129391eucas1p1d;
-	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id C6.C6.20821.1CFA6E76; Fri, 28
-	Mar 2025 14:18:41 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250328141841eucas1p246ea46aed1be0fbf2d32f4681bff0ebf~w-UNT_XZY0412104121eucas1p2i;
-	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250328141841eusmtrp2242bde5cbf852d9b3900ec6a0b0bf6da~w-UNS7Wbt0154501545eusmtrp2_;
-	Fri, 28 Mar 2025 14:18:41 +0000 (GMT)
-X-AuditID: cbfec7f2-b11c470000005155-8c-67e6afc17b98
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id A7.C7.19920.1CFA6E76; Fri, 28
-	Mar 2025 14:18:41 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250328141839eusmtip22afc9ba3e6f88769393f971c378bbae1~w-ULzCb-Z1176711767eusmtip2M;
-	Fri, 28 Mar 2025 14:18:39 +0000 (GMT)
-Message-ID: <c916a21e-2d95-476d-9895-4d91873fc5d5@samsung.com>
-Date: Fri, 28 Mar 2025 15:18:39 +0100
+	s=arc-20240116; t=1743172648; c=relaxed/simple;
+	bh=XBMrqYUsCPznN8n/M9onA9isnYgnfTeEDYQTpXQynb4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZE+DcjGj1H0gQ+fB4n0V8NE/sZxEN3eQLcWUyhnwixGOCTwOPhvy/0P8altRT3+vr+5hpBSe5AbReMQPcLbTboRtGhhMI7WrMvNFbUsjgFwRDaYLtL+cr+T2IeC8klOux9MfUpZV4u3T0+vWKhDf+c/dO6vr5+WbS8CJfSoj2RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d585d76b79so19490895ab.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 07:37:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743172645; x=1743777445;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jrIsynC7wDauUFdk9ZGu6mLeEwLIurD5LaZr5lqwa+A=;
+        b=tvocKjttdcE6yYNVt+S5p/1Sh1NVFn3Z3GMnzrkKNQ4KyRw08aproWdq3f0soTfa40
+         DWv8EBxMaQrJRc2pnBsnX8QtESCGFttf7/0bXh1Fu3iUBbF3iE290HavaErEoJt4x2Hb
+         qC46TQ3LTfo61DoMVytmt+jBA+kGNKpoFBY3Vuo1cf8WYQHNo9UVeGCyEhXhHnU5ryWx
+         f1WShxud6nfwPppDTg/sjWfSSifcO9rNltFq1qTXFolqtC39/0veX1u3/P1Viovsu2ND
+         1X6/28WmFf/phCX2o8IM8FGDtV8j7MMbQ0DneB9dFjuiRB37YLFuEHAfNnztxZjHM08h
+         z2iA==
+X-Forwarded-Encrypted: i=1; AJvYcCWem7l+PagrSOJWHRqTEL/48B+wRtP75yQbiZU45Nfzd534aSa9OVT2dNdBCKsEqJtVT6K1bI3aqrtd5Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJJVL6ZqN+MV8QeU+ZNFXtuOV6tBiO/FGNKEhNFwkfJLRfwD6D
+	eLac9pWQshgbX3QkxFdj9LiOLdkJElWPLAhJk5LMySoJhDP6Z827gI4zwC8SyEhJDfdR7gXodND
+	8jOljGWDTKPh9dM/rjBEpIpgzsaJ9E6jR+gevngYIDFRfaTPzKOdd5+g=
+X-Google-Smtp-Source: AGHT+IFjeUX/1qp+XSaAt5dRpfluog4cCd4hHDZygW7z7b7ncOEGUEBMzDp18gQUASGzYvELdpZwNH7HVncxxsvOG3fcEefnQgb1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/17] Provide a new two step DMA mapping API
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
-	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
-	<bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
-	<yishaih@nvidia.com>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, Randy
-	Dunlap <rdunlap@infradead.org>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250322004130.GS126678@ziepe.ca>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xTVxzuaW/vvTS2uxYmR6cjqWEPl7Uj2eMsoLJA3DViHHu4jOhYM+8K
-	4aUtdUyTiQRhFiYVZYUWC4yCCAQEZlGUjVZmyxigAzbpamFZqQg0rMg2pWaM9uLGf9/5Hr/v
-	/E4OyRNfwjeQqZnZjDJTni7BBZj5xsOhFy2tHsVLDyakqLK1GUd/LRXjqOlOCY5MeSnI3VMI
-	0IWm77locQGhinI7QAbdFBedNFwkUKn1Z4DqvJcIVFl2CJ1drOOhbscLqKbAhKHhrkocuZqX
-	+KiqfpJAA0YbjjzWLzFkOrGMvE4dhix/uPmoZWYOQ52jeXyU73wF1ZcJYjfSbouRSzcbmwHt
-	GfUAurpdTQ+52jA6v9fLpzsattC11+5x6eEBNd3eeBKn2+dLCdpe7sfoDtMxeqqjAtBXx3Jx
-	uvbUGf5bYUmCmANMeuphRinb9pEgxVVTzz9oF+cUjw2BXFAl0oAQElIvQ1/hKE8DBKSYagDw
-	xm0bPyCIqQUA68oBK9wHUOe/Ax4nbk3cwljTeQAnF5JZkw9AX4WTCAhCahtsah4KTsKoSDhd
-	6uCx/FrYV+EOhp+kIuC4ozzoD6XiYY/5dNATRkngt12nicBQHmUmoH7Kxw0IPCocOtxVQYxT
-	UVDj1eABHELJoLHfxWc9EbDTWxncB1LdAjhWNsJnrx0PB4w/rKwQCqdt3xAs3giXrgSGBgKF
-	AFb7x1cOWgBz7zpWEtHQObi4XEcuVzwPW7tkLP0GvPnnb0SAhpQI3vauZS8hgqVmHY+lhfCL
-	AjHrfgbqbS3/1Vpu/sTTAol+1bvoV62pX7WO/v/eaoA1gnBGrcpQMKqoTOZTqUqeoVJnKqQf
-	Z2W0g+Wf3f+Pbf4yODftk1oBlwRWAEmeJEy4fsStEAsPyD87wiizkpXqdEZlBU+RmCRc+PV3
-	JxRiSiHPZtIY5iCjfKxyyZANudwd+2y1u+b6x/UciSlyZnechJIl1vSqZt3xYW+WvL6Gsz02
-	YSH577vX7Rfn9xr2J3I+3AOjYyzJO1skv86F9l0w+jBfQbT/uPZHTsMnxLqxWUPao63D+4jo
-	Pp9j73ZTI6mNsHlEZnlqvPq+9omchznvlnNadr+2xmI/luY8/JyhbZ1+fCDhF//+9WrzB73Z
-	5DWdKi7JOfn5SIzrq9B3PC5r0YBXTt/Lcm4KGQlXOaHm2d8TwvqV08pXW+OSrh6dLYrdLNqE
-	Py051/P+2WzDoevwvYnJK/NHyrr37Kiwt5XUDmYZNw++/WDnrqPFx21bTxX10ImyzsjzUzmX
-	DdKZR/lTeRJMlSKP2sJTquT/AioQlFtIBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJKsWRmVeSWpSXmKPExsVy+t/xe7oH1z9LN5hxkc9izvo1bBbf/vew
-	Way+289msaQpw+LJgXZGi5WrjzJZ/PpiYTFzxglGi9nTXzBZdM7ewG4x6dA1Roulb7eyW8yZ
-	Wmgx5ddSZou9t7QtFrYtYbG4vGsOm8W9Nf9ZLeYve8pucXbecTaLZ4d6WSyWtAJZb+9MZ7E4
-	+OEJq8W61+9ZLLZfbWK1aLljarFsKpeDjMeTg/OYPNbMW8Po8ezqM0aPBZtKPc7f28ji0XLk
-	LavH5hVaHov3vGTyuHy21GPTqk42j02fJrF7nJjxm8Vj85J6jxebZzJ67L7ZwOaxuG8ya4BI
-	lJ5NUX5pSapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7GvYXL
-	WAtOCFX03DzP2MA4n6+LkZNDQsBE4uKDiyxdjFwcQgJLGSVamtqZIBIyEienNbBC2MISf651
-	sUEUvWeUOHNsGSNIglfATmL1mvNgRSwCqhKvJt1ihogLSpyc+YQFxBYVkJe4f2sGO4gtLOAi
-	cWDbRLAaEQEliX27JrKDDGUW2MEucXHXcSaIDc+ZJf52HwLrYBYQl7j1ZD7YSWwChhJdb0HO
-	4OTgFNCXmHf6HitEjZlE19YuRghbXmL72znMExiFZiE5ZBaSUbOQtMxC0rKAkWUVo0hqaXFu
-	em6xoV5xYm5xaV66XnJ+7iZGYJraduzn5h2M81591DvEyMTBeIhRgoNZSYRX8sqTdCHelMTK
-	qtSi/Pii0pzU4kOMpsDQmMgsJZqcD0yUeSXxhmYGpoYmZpYGppZmxkrivG6Xz6cJCaQnlqRm
-	p6YWpBbB9DFxcEo1MFldaJWPjrp8esKyTQs39a9UPna0699GGZvqxVrZ/Os/tK/rO79/ab2J
-	le6Uzt+/AhhsVefceLSfwc2YK/L/qhsbJhX5r/apvuecIXGXNVfrpphdj+vqWS9UbEVy4h+d
-	3tdz9A5zYfifi62yU6vfK7judn5w0HxL9cmj999GxvsVFSzI1Y3945SdYOV8c+HLvHPfmoML
-	ub/+mO0treTxo55p5XXxsB2/whqjhP+eLsgL2tcUedx3oU79lK4bbzka1PjS7TU9NfVnBPuY
-	TZ4n86Bp4enTZSr/Zq7ScXQ4yWjM6u63uHD9G/HCo4t4nQ7yRjFMZ4yT26/+vLKep6HxZe73
-	Nk0v3w9bvGdOc/mrpcRSnJFoqMVcVJwIAGW+P3ncAwAA
-X-CMS-MailID: 20250328141841eucas1p246ea46aed1be0fbf2d32f4681bff0ebf
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648
-References: <cover.1738765879.git.leonro@nvidia.com>
-	<20250220124827.GR53094@unreal>
-	<CGME20250228195423eucas1p221736d964e9aeb1b055d3ee93a4d2648@eucas1p2.samsung.com>
-	<1166a5f5-23cc-4cce-ba40-5e10ad2606de@arm.com>
-	<d408b1c7-eabf-4a1e-861c-b2ddf8bf9f0e@samsung.com>
-	<20250312193249.GI1322339@unreal>
-	<adb63b87-d8f2-4ae6-90c4-125bde41dc29@samsung.com>
-	<20250319175840.GG10600@ziepe.ca>
-	<1034b694-2b25-4649-a004-19e601061b90@samsung.com>
-	<20250322004130.GS126678@ziepe.ca>
+X-Received: by 2002:a05:6e02:3207:b0:3d4:3cd7:d29c with SMTP id
+ e9e14a558f8ab-3d5ccdd54cbmr79145495ab.11.1743172645316; Fri, 28 Mar 2025
+ 07:37:25 -0700 (PDT)
+Date: Fri, 28 Mar 2025 07:37:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67e6b425.050a0220.2f068f.007b.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in elv_iosched_store
+From: syzbot <syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 22.03.2025 01:41, Jason Gunthorpe wrote:
-> On Fri, Mar 21, 2025 at 12:52:30AM +0100, Marek Szyprowski wrote:
->>> Christoph's vision was to make a performance DMA API path that could
->>> be used to implement any scatterlist-like data structure very
->>> efficiently without having to teach the DMA API about all sorts of
->>> scatterlist-like things.
->> Thanks for explaining one more motivation behind this patchset!
-> Sure, no problem.
->
-> To close the loop on the bigger picture here..
->
-> When you put the parts together:
->
->   1) dma_map_sg is the only API that is both performant and fully
->      functional
->
->   2) scatterlist is a horrible leaky design and badly misued all over
->      the place. When Logan added SG_DMA_BUS_ADDRESS it became quite
->      clear that any significant changes to scatterlist are infeasible,
->      or at least we'd break a huge number of untestable legacy drivers
->      in the process.
->
->   3) We really want to do full featured performance DMA *without* a
->      struct page. This requires changing scatterlist, inventing a new
->      scatterlist v2 and DMA map for it, or this idea here of a flexible
->      lower level DMA API entry point.
->
->      Matthew has been talking about struct-pageless for a long time now
->      from the block/mm direction using folio & memdesc and this is
->      meeting his work from the other end of the stack by starting to
->      build a way to do DMA on future struct pageless things. This is
->      going to be huge multi-year project but small parts like this need
->      to be solved and agreed to make progress.
+Hello,
 
-Again, thanks for another summary!
+syzbot found the following issue on:
 
->   4) In the immediate moment we still have problems in VFIO, RDMA, and
->      DRM managing P2P transfers because dma_map_resource/page() don't
->      properly work, and we don't have struct pages to use
->      dma_map_sg(). Hacks around the DMA API have been in the kernel for
->      a long time now, we want to see a properly architected solution.
+HEAD commit:    1a9239bb4253 Merge tag 'net-next-6.15' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1384b43f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c7163a109ac459a8
+dashboard link: https://syzkaller.appspot.com/bug?extid=4c7e0f9b94ad65811efb
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178cfa4c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a8ca4c580000
 
-What kind of a fix is needed to dma_map_resource()/dma_unmap_resource() 
-API to make it usable with P2P DMA? It looks that this API is closest to 
-the mentioned dma_map_phys() and has little clients, so potentially 
-changing the function signature should be quite easy.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fc7dc9f0d9a7/disk-1a9239bb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f555a3ae03d3/vmlinux-1a9239bb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/55f6ea74eaf2/bzImage-1a9239bb.xz
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
 
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-syzkaller-05877-g1a9239bb4253 #0 Not tainted
+------------------------------------------------------
+syz-executor192/5823 is trying to acquire lock:
+ffff888144302cd8 (&q->elevator_lock){+.+.}-{4:4}, at: elv_iosched_store+0x201/0x5f0 block/elevator.c:735
+
+but task is already holding lock:
+ffff8881443027a8 (&q->q_usage_counter(io)#58){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&q->q_usage_counter(io)#58){++++}-{0:0}:
+       blk_alloc_queue+0x619/0x760 block/blk-core.c:461
+       blk_mq_alloc_queue+0x179/0x290 block/blk-mq.c:4349
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
+       nbd_dev_add+0x49d/0xbb0 drivers/block/nbd.c:1933
+       nbd_init+0x181/0x320 drivers/block/nbd.c:2670
+       do_one_initcall+0x120/0x6e0 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 (fs_reclaim){+.+.}-{0:0}:
+       __fs_reclaim_acquire mm/page_alloc.c:3853 [inline]
+       fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:3867
+       might_alloc include/linux/sched/mm.h:318 [inline]
+       xa_insert include/linux/xarray.h:783 [inline]
+       blk_mq_init_hctx block/blk-mq.c:3924 [inline]
+       blk_mq_alloc_and_init_hctx+0x503/0x11c0 block/blk-mq.c:4457
+       blk_mq_realloc_hw_ctxs+0x8f6/0xc00 block/blk-mq.c:4486
+       blk_mq_init_allocated_queue+0x3af/0x1230 block/blk-mq.c:4540
+       blk_mq_alloc_queue+0x1c2/0x290 block/blk-mq.c:4353
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
+       loop_add+0x496/0xb70 drivers/block/loop.c:2067
+       loop_init+0x164/0x270 drivers/block/loop.c:2302
+       do_one_initcall+0x120/0x6e0 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (&q->elevator_lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3166 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+       validate_chain kernel/locking/lockdep.c:3909 [inline]
+       __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+       lock_acquire kernel/locking/lockdep.c:5866 [inline]
+       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+       __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+       __mutex_lock+0x19a/0xb00 kernel/locking/mutex.c:732
+       elv_iosched_store+0x201/0x5f0 block/elevator.c:735
+       queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
+       sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
+       kernfs_fop_write_iter+0x349/0x510 fs/kernfs/file.c:334
+       iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
+       do_splice_from fs/splice.c:935 [inline]
+       direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
+       splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+       do_splice_direct_actor fs/splice.c:1201 [inline]
+       do_splice_direct+0x174/0x240 fs/splice.c:1227
+       do_sendfile+0xafd/0xe50 fs/read_write.c:1368
+       __do_sys_sendfile64 fs/read_write.c:1429 [inline]
+       __se_sys_sendfile64 fs/read_write.c:1415 [inline]
+       __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter(io)#58
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#58);
+                               lock(fs_reclaim);
+                               lock(&q->q_usage_counter(io)#58);
+  lock(&q->elevator_lock);
+
+ *** DEADLOCK ***
+
+5 locks held by syz-executor192/5823:
+ #0: ffff888035bd2420 (sb_writers#7){.+.+}-{0:0}, at: splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+ #1: ffff888033e17088 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x287/0x510 fs/kernfs/file.c:325
+ #2: ffff8880258933c8 (kn->active#47){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x510 fs/kernfs/file.c:326
+ #3: ffff8881443027a8 (&q->q_usage_counter(io)#58){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+ #4: ffff8881443027e0 (&q->q_usage_counter(queue)#10){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5823 Comm: syz-executor192 Not tainted 6.14.0-syzkaller-05877-g1a9239bb4253 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2079
+ check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2211
+ check_prev_add kernel/locking/lockdep.c:3166 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+ validate_chain kernel/locking/lockdep.c:3909 [inline]
+ __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+ lock_acquire kernel/locking/lockdep.c:5866 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+ __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+ __mutex_lock+0x19a/0xb00 kernel/locking/mutex.c:732
+ elv_iosched_store+0x201/0x5f0 block/elevator.c:735
+ queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
+ sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
+ kernfs_fop_write_iter+0x349/0x510 fs/kernfs/file.c:334
+ iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
+ do_splice_from fs/splice.c:935 [inline]
+ direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
+ splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+ do_splice_direct_actor fs/splice.c:1201 [inline]
+ do_splice_direct+0x174/0x240 fs/splice.c:1227
+ do_sendfile+0xafd/0xe50 fs/read_write.c:1368
+ __do_sys_sendfile64 fs/read_write.c:1429 [inline]
+ __se_sys_sendfile64 fs/read_write.c:1415 [inline]
+ __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff2c3abb2e9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffc4e88b88 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+RAX: ffffffffffffffda RBX: 00007fffc4e88d58 RCX: 00007ff2c3abb2e9
+RDX: 0000000000000000 RSI: 0000000000000003 RDI: 0000000000000003
+RBP: 00007ff2c3b2e610 R08: 0000000000000000 R09: 00007fffc4e88d58
+R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fffc4e88d48 R14: 0000000000000001 R15: 0000
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
