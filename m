@@ -1,257 +1,111 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCA5DDBC
-	for <linux-block@vger.kernel.org>; Sat, 29 Mar 2025 06:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1313E41C85
+	for <linux-block@vger.kernel.org>; Sat, 29 Mar 2025 11:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743228135; cv=none; b=e1GuhAH/SbLKOtQWCl4F2gfIcdTkLl3J1wYSW8vNum6nafQlte8z56Yk4r9ANXHAeRWN5oJOZ/LAWvmXlVzQA6+gTL8bd9sMsv+azaOGhPqk5ma+P271/FCqeOEoLUSjc3NElqZTRLNiE+lrpj1h1BGpwaRfnwmAH+nW0nkzU4s=
+	t=1743249463; cv=none; b=sOz6uLY9i01Quct/PxzWsCFtE77B0KrsOwKkW/WEfcprdNh+kyVOXED+cqf6HvbZD9y/BTTarFhux8MhK4D6vfHZuHQH2W/rRTABkT70bMwzKsPf3/1KH5No1YGP92wLw3LqAz/F49svIhVTzTZaUTWKObGp5P0fGlEV9w5I1G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743228135; c=relaxed/simple;
-	bh=wNxhe+rWQoGRC6duS7Ckowlo1wnA1Bcwre/uCDy9EKM=;
-	h=From:To:cc:Subject:In-reply-to:References:Mime-Version:
-	 Content-Type:Date:Message-ID; b=oHN60qSDCMtG41BslwoyaGvHbxO4gn55/9FTRlaljyLLfljjavpd+mIsgjWp1hCeBliH4MVcgBH9gG8Ymtb2UG4rdGmDZsncR5d7RaJlX09QIc5jrJSswoLeUAPIzHxbxmsxLQXR9FdyM25fVhocgG0AZTObJkNideMLXW1bu/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vt.edu; spf=pass smtp.mailfrom=vt.edu; dkim=pass (2048-bit key) header.d=vt-edu.20230601.gappssmtp.com header.i=@vt-edu.20230601.gappssmtp.com header.b=Vms5GMt4; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vt.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vt.edu
+	s=arc-20240116; t=1743249463; c=relaxed/simple;
+	bh=e2538gtUpQ42rrCf6f3RRClLcz0Ugt7JJeP9VY7Pvjk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=iJpwjFhuPPIPokEW3fqsjRjhb05eVrTuPSNm6qzGVQ6cX0UuDNSbAXaAZnjbuVT9+KjsounzXldhQNR/EWq3ju6BjS8FBsMYgn3Q0eKsInr52wqAnFIgEnEroSa4+CzSKMeGqwV/cxJD1jV9xlOu/9SSSC4TdB+uZVlcYW0Acsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bTpdGO+6; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vt-edu.20230601.gappssmtp.com header.i=@vt-edu.20230601.gappssmtp.com header.b="Vms5GMt4"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c592764e54so374213785a.3
-        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 23:02:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bTpdGO+6"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3cf8e017abcso11017085ab.1
+        for <linux-block@vger.kernel.org>; Sat, 29 Mar 2025 04:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1743228132; x=1743832932; darn=vger.kernel.org;
-        h=message-id:date:mime-version:references:in-reply-to:subject:cc:to
-         :from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=yd9YLVPtD8axfm0LhvKZP7RniIiBIW1ndqouPPCDs3M=;
-        b=Vms5GMt4+ykdKRVA6jAZ14RN6VGf8oNtnFvCvUrBjxLyDfm/SxZAFUYsYGHS/6qN7c
-         QtVnn32o/0tLw+m1JESv4DqPQP+ozuQvZz4AebxLwyY600Ya6KAVuD7jJtC6a8PHjXfU
-         6sGPm3NLH9OZcmJrIBnvcee08ySSdFz1A/SFq2RBw4yYphH1lMrJOdq8wydlOEdGUrmE
-         lnGEb9p7jt3cXFJ8o5d7QQqYZ3+ExwVOE2u5+SYjbhpDbNloBL8iHEQMjxW37XTwmKnz
-         uq6yhox+hky3S7cNnkTO9vT36oD2zg6MA0Q92oPuYszPAFFsfWPDeM/qN8tN/HR2b14S
-         4TXQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1743249460; x=1743854260; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YxX3ANr6NSvvPmsJnkIgr64FYB3lilCLAO/JftDlNQg=;
+        b=bTpdGO+6yu6mWaar7hVxou5cvrMtdtuDcfwcsGiv2MpCxa9rsk/7RwdTomPxqWDKue
+         vz4l3U3y0/G1axtwPuS23wHXNcwwEqhOG0FC2KRyK3dTI7r8z+ESSr/Y5vTvtru64U0C
+         w2axtgc3DW68p5EYKvYgzXCWCJrTqtggUyKonQcy5pY1zNazHz1sxfcRxz08ONSk6PLm
+         pzmYOFX42w3ocjUDI33Tit+BBiEEmDRkkCUkFMPB1xAk7NWdpF0qKXyawXKSC9yONga6
+         vwkHOTUPllUrakvXHJv0d3OnHRhJ7pVRF8O4qXa/Au4UarR4XIq5k4PFMvbiKbaYr4i/
+         Uf+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743228132; x=1743832932;
-        h=message-id:date:mime-version:references:in-reply-to:subject:cc:to
-         :from:sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yd9YLVPtD8axfm0LhvKZP7RniIiBIW1ndqouPPCDs3M=;
-        b=SxEYWbRUjxhO7oXSOY31fvwm6P+mFK0HN8cYJ8ykKumn9cKRGOYWdRPyPncp5va1sR
-         Ijw/0i4xxX/a5sVlLjVjQRSCCe8mRvHPL0V3ZYrSU0svhyIZdMNjM+hLoDZ8wOBSXNSd
-         W41VFDUoRVUv3O/4kAdC+QYuheAPA2riVw8yrycw2IsCmn3k99uRA/P5LcMXLOi+GDRt
-         A03PK2ltbuRLl5syuoMN3Oe2zUdveflU8mHOo5NBtmOh4Ris4M045WsNeh5Xqq5lzlXX
-         iX52/VxdkOHEVKaDBb6n6jXtJbHiVzDvdB7hZXRnhLGtWFy7+7xEIUKWH1NvfuOEeAwX
-         ZABg==
-X-Forwarded-Encrypted: i=1; AJvYcCXol0gbmvnbJ7p04pKRI3Id1wHNehH2Gfh5Vk1GCAJ4B8iJBsS9biGUdK/5JAtPmLBId0yGt5A/AQSMNw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg1QWUGjPIfIJGncpZCfMQOzkGrzobqyKy5QZpmEa5MOCNpNYX
-	mWTZfmCcZFl8DTBWTYVBaPgbLqweBzBXWAu29VwUOqkUPJQYsjKOiY1SSeOq51Q=
-X-Gm-Gg: ASbGncvuQUPCVTcDJtG9clpZgm4LD9GyuUaKyqs754L3p/IaNDaPOBXz7fB1jpRv8K7
-	i228U5ankcysPY6Ly2UodubGH11jW4gnfPXKmPVa8Maw23H3fJ5AbzDrquA1hK7f18NJLhZDKyy
-	/7pwsQtjylNymxXZIxsPAoJSgrYfnXy2XblQIhN58Zc4K63Qrd7+MzanzLl9AlQWzO3GLt46he+
-	IhTYB0ew6h6/iyrmwsrpelS6Rc4XV8RLPjSNn7bL1gGDcL7t0Tehc86PQ8h3NEG7C7ZMUMa1xzf
-	0McRTTpxE1BifB04fkL1Ox3rdRrS+EbSilRRRmeK
-X-Google-Smtp-Source: AGHT+IG2DCY7Ldp9rOmylZCs5R++q3u4fta77kE4MAFYfU7PoL+jxbKFr5Jewn89iztu0BLDtdphoQ==
-X-Received: by 2002:a05:620a:4607:b0:7c5:ae20:e832 with SMTP id af79cd13be357-7c6862e740amr204567285a.11.1743228132172;
-        Fri, 28 Mar 2025 23:02:12 -0700 (PDT)
-Received: from turing-police ([2601:5cf:407f:b7f2::c36])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f765ada7sm214508085a.9.2025.03.28.23.02.11
+        d=1e100.net; s=20230601; t=1743249460; x=1743854260;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YxX3ANr6NSvvPmsJnkIgr64FYB3lilCLAO/JftDlNQg=;
+        b=vATi3EBk0askF69uoEv6KRXWRsMFdg057pa10xJJ0w5UfuvpE9b+tZXsTiAO+i8QjQ
+         5J6FruUruCXGLELiLP7J0ZKAzc6wFaW++qTYvG8XDBMw3uTbIf+ZUGgNyhD0Hy31GSq+
+         HP9yHAF9dCQuNuvCSf9SU4OpqGdQeIBAhyh6JoX8IAaMheoPylpQPZk+U937S3CHlbSD
+         F+Y/ApWihqFhRKDWohtv/yL+iV4h1fvOgLpVGmOVMDaQFvUw71TWGS8X6gY1w+RzBrLm
+         PvQKXppVGL6tku0mrcMA0SO/cLPWBu5rtBL6Dk3D8OF7+GQyle+Q9f0d7bcgMOEA1QP3
+         DGAw==
+X-Gm-Message-State: AOJu0YwuSiFHdwO23P2nzrqGOJfB0YEYV1pBRjnYNSCgflkjx2XuFw2q
+	jFjEP7klvqXliU67G7d+Co7DPuyba7sCm/mFWP5pSTAc5yVQb5WTvIl8c6udcnA=
+X-Gm-Gg: ASbGncu7bi35PtseMDSaOBg+7eYc++VL876ykiDT/poX+EeSUKmpPmoJJx8+lmq3uL+
+	XMsEkq1CSk7bG9b9pysUr+B0iaPrWySFy231NddNqATUhTo4qffNBeHzwWszsBfJv5NHWE42Lu1
+	KLXoLtXRmh92BKGv6Dk7SccDbvbmirCgXX/rCemeJX641SXhlJpSu/JGcDsSYmJVsJbVKq++92C
+	ZkAo0drQGngybeXSap6qlI/gPcM12HbKJHtGJsFQWvdcmp5TRU0Sc7liHa0UoqJhz+k6Gw42jWC
+	5WWxwpzy6aIWvX1lS2C6q+qZVm8DpgMYR/UY
+X-Google-Smtp-Source: AGHT+IFTVZKYFNe6UA85TvVbckIVybnZWJ6eZNQXCHzFACulSzjpoYCh0/bq1dgaV0YT6sDI9LHHKw==
+X-Received: by 2002:a05:6e02:2144:b0:3d4:6ff4:260a with SMTP id e9e14a558f8ab-3d5e08e9ecdmr27404885ab.2.1743249459868;
+        Sat, 29 Mar 2025 04:57:39 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d5d5a6345esm9616765ab.1.2025.03.29.04.57.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 23:02:11 -0700 (PDT)
-Sender: Valdis Kletnieks <valdis@vt.edu>
-From: "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <valdis.kletnieks@vt.edu>
-X-Google-Original-From: "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <Valdis.Kletnieks@vt.edu>
-X-Mailer: exmh version 2.10.0-pre 07/05/2021 with nmh-1.8+dev
-To: Ming Lei <ming.lei@redhat.com>
-cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-    Jens Axboe <axboe@kernel.dk>, linux-next@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: next-20250327 - lockdep whine and USB issues at boot
-In-reply-to: <Z-dVr6cIyrOID0J0@fedora>
-References: <8775.1743185453@turing-police>
- <Z-dVr6cIyrOID0J0@fedora>
+        Sat, 29 Mar 2025 04:57:39 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20250328180411.2696494-1-csander@purestorage.com>
+References: <20250328180411.2696494-1-csander@purestorage.com>
+Subject: Re: [PATCH 0/5] Minor ublk optimizations
+Message-Id: <174324945878.1614213.14704274208444492991.b4-ty@kernel.dk>
+Date: Sat, 29 Mar 2025 05:57:38 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Date: Sat, 29 Mar 2025 02:02:10 -0400
-Message-ID: <7755.1743228130@turing-police>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Sat, 29 Mar 2025 10:06:39 +0800, Ming Lei said:
-> On Fri, Mar 28, 2025 at 02:10:53PM -0400, Valdis Klētnieks wrote:
-> > Saw this during boot on a Dell Inspiron 5559 laptop.  
-> > 
-> > In addition, the external USB ports all gave up, rendering a USB mouse and a
-> > USB external drive totally dead in the water.  May or may not be related, I didn't
-> > dig too far into it.
->
-> It shouldn't be related to the warning.
 
-> For this lockdep warning, feel free to try patch in the following link:
->
-> https://lore.kernel.org/linux-block/Z-dUCLvf06SfTOHy@fedora/
+On Fri, 28 Mar 2025 12:04:06 -0600, Caleb Sander Mateos wrote:
+> A few cleanups on top of Ming's recent patch set that implemented
+> ->queue_rqs() for ublk:
+> https://lore.kernel.org/linux-block/20250327095123.179113-1-ming.lei@redhat.com/T/#u
+> 
+> Caleb Sander Mateos (5):
+>   ublk: remove unused cmd argument to ublk_dispatch_req()
+>   ublk: skip 1 NULL check in ublk_cmd_list_tw_cb() loop
+>   ublk: get ubq from pdu in ublk_cmd_list_tw_cb()
+>   ublk: avoid redundant io->cmd in ublk_queue_cmd_list()
+>   ublk: store req in ublk_uring_cmd_pdu for ublk_cmd_tw_cb()
+> 
+> [...]
 
-After applying that patch, USB *didn't* die during boot.  So apparently
-*something* changed.  
+Applied, thanks!
 
-Also, the patch merely caused a *different* lockdep warning.
-Rather than  &q->q_usage_counter(io) and &q->elevator_lock, the
-new one is &q->elevator_lock versus pcpu_alloc_mutex...
+[1/5] ublk: remove unused cmd argument to ublk_dispatch_req()
+      commit: dfbce8b798fb848a42706e2e544b78b3db22aaae
+[2/5] ublk: skip 1 NULL check in ublk_cmd_list_tw_cb() loop
+      commit: 9d7fa99189709b80eb16094aad18f7e492b835de
+[3/5] ublk: get ubq from pdu in ublk_cmd_list_tw_cb()
+      commit: 6a87fc437a034e4be2a63d8dfd4d2985c6c574bc
+[4/5] ublk: avoid redundant io->cmd in ublk_queue_cmd_list()
+      commit: 108d8aecaeeb52f5fbe98ac94da534954db1da44
+[5/5] ublk: store req in ublk_uring_cmd_pdu for ublk_cmd_tw_cb()
+      commit: 00cfc05cf81f58b1bc2650e18228350a094b1f6d
 
-Looks like it's a bit more convoluted than first looked?
+Best regards,
+-- 
+Jens Axboe
 
-[   52.140990] [    T954] io scheduler bfq registered
 
-[   52.355286] [    T848] ======================================================
-[   52.436367] [    T848] WARNING: possible circular locking dependency detected
-[   52.517414] [    T848] 6.14.0-next-20250327-dirty #111 Tainted: G          I     T  
-[   52.598492] [    T848] ------------------------------------------------------
-[   52.679571] [    T848] (udev-worker)/848 is trying to acquire lock:
-[   52.760647] [    T848] ffffffff99bb4470 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+0x524/0x840
-[   53.162776] [    T848] 
-                          but task is already holding lock:
-[   53.244616] [    T848] ffff8c22c3392428 (&q->elevator_lock){+.+.}-{4:4}, at: elv_iosched_store+0xe1/0x260
-[   53.646741] [    T848] 
-                          which lock already depends on the new lock.
-
-[   53.729459] [    T848] 
-                          the existing dependency chain (in reverse order) is:
-[   53.811348] [    T848] 
-                          -> #3 (&q->elevator_lock){+.+.}-{4:4}:
-[   54.214266] [    T848]        lock_acquire.part.0+0xbe/0x240
-[   54.295342] [    T848]        __mutex_lock+0xcb/0xfc0
-[   54.376409] [    T848]        elv_iosched_store+0xe1/0x260
-[   54.457476] [    T848]        kernfs_fop_write_iter+0x160/0x240
-[   54.538548] [    T848]        vfs_write+0x2ec/0x5c0
-[   54.619619] [    T848]        ksys_write+0x7a/0xf0
-[   54.700687] [    T848]        do_syscall_64+0x68/0x140
-[   54.781751] [    T848]        entry_SYSCALL_64_after_hwframe+0x71/0x79
-[   54.862814] [    T848] 
-                          -> #2 (&q->q_usage_counter(io)#10){++++}-{0:0}:
-[   55.345959] [    T848]        lock_acquire.part.0+0xbe/0x240
-[   55.427018] [    T848]        blk_alloc_queue+0x30b/0x350
-[   55.508082] [    T848]        blk_mq_alloc_queue+0x62/0xd0
-[   55.589134] [    T848]        scsi_alloc_sdev+0x29c/0x3d0
-[   55.670185] [    T848]        scsi_probe_and_add_lun+0x1d8/0x2b0
-[   55.751232] [    T848]        __scsi_add_device+0x114/0x130
-[   55.832276] [    T848]        ata_scsi_scan_host+0x7a/0x190
-[   55.913321] [    T848]        async_run_entry_fn+0x24/0xc0
-[   55.994358] [    T848]        process_one_work+0x21e/0x5a0
-[   56.075404] [    T848]        worker_thread+0x1d5/0x3c0
-[   56.156444] [    T848]        kthread+0x114/0x230
-[   56.237474] [    T848]        ret_from_fork+0x2c/0x50
-[   56.318492] [    T848]        ret_from_fork_asm+0x1a/0x30
-[   56.399515] [    T848] 
-                          -> #1 (fs_reclaim){+.+.}-{0:0}:
-[   56.802275] [    T848]        lock_acquire.part.0+0xbe/0x240
-[   56.883298] [    T848]        fs_reclaim_acquire+0xa8/0xe0
-[   56.964317] [    T848]        __alloc_frozen_pages_noprof+0xd2/0x340
-[   57.045338] [    T848]        __alloc_pages_noprof+0x9/0x20
-[   57.126360] [    T848]        pcpu_alloc_pages.isra.0+0x97/0x180
-[   57.207375] [    T848]        pcpu_populate_chunk+0x34/0x70
-[   57.288388] [    T848]        pcpu_alloc_noprof+0x2d1/0x840
-[   57.369366] [    T848]        iommu_dma_init_fq+0x91/0x260
-[   57.450373] [    T848]        iommu_dma_init_domain+0x1de/0x210
-[   57.531381] [    T848]        iommu_setup_dma_ops+0x47/0x80
-[   57.612355] [    T848]        iommu_device_register+0x172/0x250
-[   57.693348] [    T848]        intel_iommu_init+0x5ef/0xbb0
-[   57.774344] [    T848]        pci_iommu_init+0x29/0x90
-[   57.855333] [    T848]        do_one_initcall+0x83/0x3c0
-[   57.936316] [    T848]        do_initcalls+0x130/0x1b0
-[   58.017300] [    T848]        kernel_init_freeable+0x292/0x300
-[   58.098281] [    T848]        kernel_init+0x15/0x130
-[   58.179254] [    T848]        ret_from_fork+0x2c/0x50
-[   58.260224] [    T848]        ret_from_fork_asm+0x1a/0x30
-[   58.341195] [    T848] 
-                          -> #0 (pcpu_alloc_mutex){+.+.}-{4:4}:
-[   58.743832] [    T848]        check_prev_add+0xe1/0xcf0
-[   58.824752] [    T848]        __lock_acquire+0x1031/0x13b0
-[   58.905697] [    T848]        lock_acquire.part.0+0xbe/0x240
-[   58.986633] [    T848]        __mutex_lock+0xcb/0xfc0
-[   59.067565] [    T848]        pcpu_alloc_noprof+0x524/0x840
-[   59.148463] [    T848]        sbitmap_init_node+0xf0/0x230
-[   59.229392] [    T848]        sbitmap_queue_init_node+0x29/0x140
-[   59.310317] [    T848]        blk_mq_init_tags+0x95/0x110
-[   59.391240] [    T848]        blk_mq_alloc_map_and_rqs+0x3c/0x110
-[   59.472131] [    T848]        blk_mq_init_sched+0x100/0x260
-[   59.553017] [    T848]        elevator_switch+0xb1/0x190
-[   59.633926] [    T848]        elv_iosched_store+0x1db/0x260
-[   59.714841] [    T848]        kernfs_fop_write_iter+0x160/0x240
-[   59.795728] [    T848]        vfs_write+0x2ec/0x5c0
-[   59.876599] [    T848]        ksys_write+0x7a/0xf0
-[   59.957500] [    T848]        do_syscall_64+0x68/0x140
-[   60.038396] [    T848]        entry_SYSCALL_64_after_hwframe+0x71/0x79
-[   60.119269] [    T848] 
-                          other info that might help us debug this:
-
-[   60.201395] [    T848] Chain exists of:
-                            pcpu_alloc_mutex --> &q->q_usage_counter(io)#10 --> &q->elevator_lock
-
-[   60.845339] [    T848]  Possible unsafe locking scenario:
-
-[   60.926872] [    T848]        CPU0                    CPU1
-[   61.007776] [    T848]        ----                    ----
-[   61.088676] [    T848]   lock(&q->elevator_lock);
-[   61.330053] [    T848]                                lock(&q->q_usage_counter(io)#10);
-[   61.651731] [    T848]                                lock(&q->elevator_lock);
-[   61.893151] [    T848]   lock(pcpu_alloc_mutex);
-[   62.134602] [    T848] 
-                           *** DEADLOCK ***
-
-[   62.216729] [    T848] 6 locks held by (udev-worker)/848:
-[   62.297630] [    T848]  #0: ffff8c22c8575440 (sb_writers#4){.+.+}-{0:0}, at: ksys_write+0x7a/0xf0
-[   62.860055] [    T848]  #1: ffff8c22c9fb4090 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x119/0x240
-[   63.422482] [    T848]  #2: ffff8c22c821fad0 (kn->active#89){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x122/0x240
-[   63.984915] [    T848]  #3: ffff8c22c3391e98 (&q->q_usage_counter(io)#10){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x11/0x20
-[   64.547390] [    T848]  #4: ffff8c22c3391ed8 (&q->q_usage_counter(queue)){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x11/0x20
-[   65.029578] [    T848]  #5: ffff8c22c3392428 (&q->elevator_lock){+.+.}-{4:4}, at: elv_iosched_store+0xe1/0x260
-[   65.511794] [    T848] 
-                          stack backtrace:
-[   65.593348] [    T848] CPU: 1 UID: 0 PID: 848 Comm: (udev-worker) Tainted: G          I     T   6.14.0-next-20250327-dirty #111 PREEMPT(full)  7b54f670bb22238ec039f82f30e0fd3bcc8dbc83
-[   65.673611] [    T848] Tainte        d: [I]=FIRMWARE_WORKAROUND, [T]=RANDSTRUCT
-[   65.753868] [    T848] Hardware name: Dell Inc. Unidentified System/052K07, BIOS 1.9.0 09/07/2020
-[   65.834126] [    T848] Call Trace:
-[   65.914385] [    T848]  <TASK>
-[   65.994655] [    T848]  dump_stack_lvl+0x65/0x90
-[   66.074916] [    T848]  print_circular_bug.cold+0x38/0x46
-[   66.155178] [    T848]  check_noncircular+0x169/0x190
-[   66.235441] [    T848]  check_prev_add+0xe1/0xcf0
-[   66.315699] [    T848]  ? add_chain_cache+0x115/0x4c0
-[   66.395961] [    T848]  __lock_acquire+0x1031/0x13b0
-[   66.476225] [    T848]  lock_acquire.part.0+0xbe/0x240
-[   66.556484] [    T848]  ? pcpu_alloc_noprof+0x524/0x840
-[   66.636745] [    T848]  ? lock_acquire+0xf8/0x140
-[   66.717006] [    T848]  __mutex_lock+0xcb/0xfc0
-[   66.797266] [    T848]  ? pcpu_alloc_noprof+0x524/0x840
-[   66.877526] [    T848]  ? lockdep_hardirqs_on+0x84/0x130
-[   66.957786] [    T848]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
-[   67.038044] [    T848]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
-[   67.118303] [    T848]  ? pcpu_alloc_noprof+0x524/0x840
-[   67.198566] [    T848]  ? pcpu_alloc_noprof+0x524/0x840
-[   67.278825] [    T848]  ? find_held_lock+0x2b/0x80
-[   67.359084] [    T848]  pcpu_alloc_noprof+0x524/0x840
-[   67.439344] [    T848]  ? local_clock_noinstr+0xf/0x100
-[   67.519608] [    T848]  sbitmap_init_node+0xf0/0x230
-[   67.599870] [    T848]  sbitmap_queue_init_node+0x29/0x140
-[   67.680131] [    T848]  blk_mq_init_tags+0x95/0x110
-[   67.760392] [    T848]  blk_mq_alloc_map_and_rqs+0x3c/0x110
-[   67.840654] [    T848]  blk_mq_init_sched+0x100/0x260
-[   67.920916] [    T848]  elevator_switch+0xb1/0x190
-[   68.001176] [    T848]  ? elv_iosched_store+0x1d0/0x260
-[   68.081437] [    T848]  elv_iosched_store+0x1db/0x260
-[   68.161700] [    T848]  kernfs_fop_write_iter+0x160/0x240
-[   68.241960] [    T848]  vfs_write+0x2ec/0x5c0
-[   68.322224] [    T848]  ksys_write+0x7a/0xf0
-[   68.402485] [    T848]  do_syscall_64+0x68/0x140
-[   68.482745] [    T848]  entry_SYSCALL_64_after_hwframe+0x71/0x79
-[   68.563004] [    T848] RIP: 0033:0x7f2a1747ca06
-[   68.643263] [    T848] Code: 5d e8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75 19 83 e2 39 83 fa 08 75 11 e8 26 ff ff ff 66 0f 1f 44 00 00 48 8b 45 10 0f 05 <48> 8b 5d f8 c9 c3 0f 1f 40 00 f3 0f 1e fa 55 48 89 e5 48 83 ec 08
-[   68.723521] [    T848] RSP: 002b:00007ffe48933eb0 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-[   68.884037] [    T848] RAX: ffffffffffffffda RBX: 000056119a4eaff0 RCX: 00007f2a1747ca06
-[   68.964295] [    T848] RDX: 0000000000000003 RSI: 00007ffe48934200 RDI: 0000000000000027
-[   69.044553] [    T848] RBP: 00007ffe48933ed0 R08: 0000000000000000 R09: 0000000000000000
-[   69.124811] [    T848] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
-[   69.205068] [    T848] R13: 0000000000000003 R14: 00007ffe48934200 R15: 00007ffe48934200
-[   69.285332] [    T848]  </TASK>
 
