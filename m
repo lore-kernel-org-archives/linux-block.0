@@ -1,111 +1,94 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4E0801
-	for <linux-block@vger.kernel.org>; Sat, 29 Mar 2025 02:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3F317BA5
+	for <linux-block@vger.kernel.org>; Sat, 29 Mar 2025 02:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743213739; cv=none; b=t4PB4nBhT5sj1ZCJpObQg8LFZLlu6h9Xu3Rrdy3qouu2+fkZm7QrJFi2KKNFJCJu94//TfErRsBGxm5uH5hRyLFj3kQP0GxxztZAdRYs1ItM4XndOpvQTRjciZ22w30SOaVt8toXZuJvjQinbywrxfCKw9ufbCz9X3uAn7R4kKQ=
+	t=1743214020; cv=none; b=emQDjndrXtgVSH/EP8ga/e0VCVBjWARKC8U/sx1zFgtQZmk7c3fgcbhu0wbskMqjVc34lt57rJqXU/6WrRRQSrAokqIXlQOaeuxmLcRLSrSt31KoaTu36W8JC5AbffalJWfn0LwvgHC4TlvToBHp6dE/ZKYMjZef+HZp1tCOMlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743213739; c=relaxed/simple;
-	bh=Qx0FzgTCX3aQ2PIcYG2ILsq37rf8Qh6B4wBb1R0balU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=JDl0oetw7LwNVhQGd3GoeuPchZMyXW1D5rKIJX73TmUUxjf6LhLolI4nA18XSnfrWjDixi/ACcTOYlUJuu3zZRzPizppdsAGxbG431N5TbO5ln/y+8JBzaYSwalx5/ETC1Ype3bo0kElceEoDjwOGBSYDjkAgGLiIYzTLDgkAHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d458e61faaso27339065ab.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Mar 2025 19:02:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743213736; x=1743818536;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FguXTsE+8XhGP7o0QFnNh0+TKzAKTaLyzGQZThRy3NM=;
-        b=JrI1JydOAjjzwJ+KvEr3LE5cPTRrOTlvCom7xzkwXfTr22hI2bzbWw+eXb40Ga2Ed0
-         8GsngQ3PpmLDSGAehsNc7PPcLjo796wEepPYSVv8hr9gHPIOJ/0SX69ZdaAhk+IP7VVP
-         DrJH+4oATh614epMyHYyOv8M4o8gFPH1SpIanFZiDhtLucfNGvoez3jkQ4hjMDJ0RdQx
-         1CFmHf35fMZ+2xYrG+E11ZutMqG8RzxCfua3XxyNHEkGc6Jv+TZ5rddQuY/fVVQ9Vr/R
-         0Oa3Eb1FrpyA4ICVwfw5I/FANnoHW92pK7jYKqjXq4iCqEyzYidTemgtlePWfosR38wK
-         pXXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEIY6Flt+nZ9E1hnUksnRaojod5ezzCZ+XHZd/uYrJkpNADzDak1L+jMZCbqW9uCDc2H2L85x0a4wW3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLXm8/P0gmAlcQ654meq9NFkJczDVkpgjr4j3jy66eZcFKShrz
-	Vh+BzMm86xrObN8g2QWz/WdCPd9hZDwJ4cRh+kPY7yufY4bZzTRzwcPi9e7GArXdgCYD8Gi2b90
-	+AyVFxfvc8BUzgLOIUCZy75YW+tO4zihE5xerZgd/bK8G+GZZ3f+aZiU=
-X-Google-Smtp-Source: AGHT+IGYPTYrXVhdHfZfT3ymkJ40LOxZViBHlIvGGCGh2BLckLTaIJTEI7fCi/XX1HgFnN2Py5yzsoziyrwM5gkeLXEXzIPb7M02
+	s=arc-20240116; t=1743214020; c=relaxed/simple;
+	bh=FGfh1w5NNAwOa7YGzQ31Zdi/MT5RLje1ttsCq9kxKUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0FC5edLGjuDmyW1a14QWokpUGu/7WCsL2ZQXKjLm3GbxD4tZy08aBt2cGcm4a1pwN2FHghm47qeUhbdt/ggckS2LzJswG3mi7IUB8Aa0rtU+EY6ZYmXUtF+vHJ2ZLbagjuq2rgUdTSKs8CoC5kaavgIUOoIaV/e07tuVmvjiIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3SDMQs5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3SDMQs5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743214017;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n+I0PCjfoO4Xb5NRpmwsp6+T9WL+XxdVxoqaSDpoe1c=;
+	b=D3SDMQs5bCUwCc52OrzlXT7VMeLBjbYIJPKjH6mmq8UCpL0DJj/oLxjaycE7eK5xjL/ZNp
+	U+qGnYMbe5OxhQWOadYU4q1DukPIgktth2BgqnfKphP+AFhpzBwjwVZmCIpgAHzzm/EG6a
+	y60gVnQ6E9d1C6BmETJrBHFMRjRQZ44=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-pDcAzlcGOa2cPzjBH5KviQ-1; Fri,
+ 28 Mar 2025 22:06:53 -0400
+X-MC-Unique: pDcAzlcGOa2cPzjBH5KviQ-1
+X-Mimecast-MFC-AGG-ID: pDcAzlcGOa2cPzjBH5KviQ_1743214011
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 321441801A06;
+	Sat, 29 Mar 2025 02:06:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.4])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B827B1956095;
+	Sat, 29 Mar 2025 02:06:45 +0000 (UTC)
+Date: Sat, 29 Mar 2025 10:06:39 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Jens Axboe <axboe@kernel.dk>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: next-20250327 - lockdep whine and USB issues at boot
+Message-ID: <Z-dVr6cIyrOID0J0@fedora>
+References: <8775.1743185453@turing-police>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:4401:20b0:3d3:d344:2a1a with SMTP id
- e9e14a558f8ab-3d5e07c4822mr13365705ab.0.1743213736542; Fri, 28 Mar 2025
- 19:02:16 -0700 (PDT)
-Date: Fri, 28 Mar 2025 19:02:16 -0700
-In-Reply-To: <Z-dUlymffoNwgHdb@fedora>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e754a8.050a0220.1547ec.0005.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in elv_iosched_store
-From: syzbot <syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com>
-To: ming.lei@redhat.com
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8775.1743185453@turing-police>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-> On Fri, Mar 28, 2025 at 07:37:25AM -0700, syzbot wrote:
->> Hello,
->> 
->> syzbot found the following issue on:
->> 
->> HEAD commit:    1a9239bb4253 Merge tag 'net-next-6.15' of git://git.kernel..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=1384b43f980000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=c7163a109ac459a8
->> dashboard link: https://syzkaller.appspot.com/bug?extid=4c7e0f9b94ad65811efb
->> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178cfa4c580000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a8ca4c580000
->> 
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/fc7dc9f0d9a7/disk-1a9239bb.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/f555a3ae03d3/vmlinux-1a9239bb.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/55f6ea74eaf2/bzImage-1a9239bb.xz
->> 
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
->> 
->
-> ...
->
->> 
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->> 
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->> 
->> If the report is already addressed, let syzbot know by replying with:
->> #syz fix: exact-commit-title
->> 
->> If you want syzbot to run the reproducer, reply with:
->> #syz test: git://repo/address.git branch-or-commit-hash
->> If you attach or paste a git patch, syzbot will apply it before testing.
->> 
->> If you want to overwrite report's subsystems, reply with:
->> #syz set subsystems: new-subsystem
->> (See the list of subsystem names on the web dashboard)
->> 
->> If the report is a duplicate of another one, reply with:
->> #syz dup: exact-subject-of-another-report
->
-> #syz dup: [syzbot] [block?] possible deadlock in elv_iosched_store
+On Fri, Mar 28, 2025 at 02:10:53PM -0400, Valdis Klētnieks wrote:
+> Saw this during boot on a Dell Inspiron 5559 laptop.  
+> 
+> In addition, the external USB ports all gave up, rendering a USB mouse and a
+> USB external drive totally dead in the water.  May or may not be related, I didn't
+> dig too far into it.
 
-Can't dup bug to itself.
+It shouldn't be related to the warning.
 
->
-> -- 
-> Ming
->
+> 
+> [   40.842033] [    T953] io scheduler bfq registered
+> 
+> [   41.022391] [    T817] ======================================================
+> [   41.103507] [    T817] WARNING: possible circular locking dependency detected
+> [   41.184587] [    T817] 6.14.0-next-20250327 #110 Tainted: G          I     T  
+> [   41.265700] [    T817] ------------------------------------------------------
+> [   41.346832] [    T817] (udev-worker)/817 is trying to acquire lock:
+> [   41.427952] [    T817] ffff93a2c80ae9f0 (&q->elevator_lock){+.+.}-{4:4}, at: elv_iosched_store+0xe1/0x260
+> [   41.830112] [    T817] 
+>                           but task is already holding lock:
+> [   41.912022] [    T817] ffff93a2c80ae460 (&q->q_usage_counter(io)#10){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x11/0x20
+
+For this lockdep warning, feel free to try patch in the following link:
+
+https://lore.kernel.org/linux-block/Z-dUCLvf06SfTOHy@fedora/
+
+Thanks,
+Ming
+
