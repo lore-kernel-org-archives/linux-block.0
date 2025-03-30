@@ -1,115 +1,84 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B841487ED;
-	Sun, 30 Mar 2025 06:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277532BB04;
+	Sun, 30 Mar 2025 12:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743317268; cv=none; b=HyjhoVCB3dTql5aU9WLCXQzSPHBFHPlHaIxfoqKQ6/Sq9rksFivvnZueLvTAV5clWYfUhPVce8bUeD/M7TazKGyTIlUj6nXBS0tPgA7K1fooHSPchj7K9e+oAZH5moIPrzGOXdCIyNWH5mFvJBIVV5HeOemLnHfZ4/tXreGNzGI=
+	t=1743336257; cv=none; b=b8hx3XdtnBiyJ6fUkSGar0Jo7L/ZYgn6qWf3Xl3EvUt1NDM8iRWM/0Pf8y5IsD/vJMZrEWRY4qGTzCoJi1xOGHCsyvg3kF8b8x8w4oCRvOiFNNg9+So0FmZDWAthG9/cV4ygAQ1X2JfG9nf4sgzNNoM5VoUw/OSIJXDmPefMxNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743317268; c=relaxed/simple;
-	bh=S0yYGnICLAFP8vO8D9NkY4L3AoBOC/H7qrYdcLOST3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uuia6p9V9uRgdkaap1d+XTEjHMsw4peurTV6x1c3yxU1aivK7ShWOftH2+CXZF1V6eMlnDrPSzhzhKofAH/rrY55uCPIEy2rcVWWmSLIS6ELfQATIHF8TKhL82NZGq1RFGqqcY0MCbqNk/XBIusGKvqMBj695zOQEjOJlxiBFr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wLMgxrFk; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+	s=arc-20240116; t=1743336257; c=relaxed/simple;
+	bh=j8I7Y4X262Zlf2k8C6vN5Flngo160/1EeL7FXB8cA3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bQG+XCWLrsZj/rysOdxLnCARvubVWPJd5fhlXd7GH59GFj7BP8A3hP/OjnUOI7+Gd6IDdQ2dTB+uDGD2pm9+MFBBXTBf/ZqB8uePURq3yx/4zEWmz/oPifo2OfEwyNnJIFyVB++PWz10Ga//5HdK8QZpIR01EQd/yoz88BuFQ0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q0GkGU+6; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wLMgxrFk"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q0GkGU+6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=onIgRtrD6Nz7xiHJP06V1b9T8bhfAqun/9iFQD7ExnE=; b=wLMgxrFkz6RqAFPXNuvnYeq12f
-	5bSya1Py6vwHH0CVpx39eIsb6/UXSOBGCbMJW8R6L3ndD9p9F2thqCvw/1YMqFLbvqJG0ty5TXQV+
-	JEiBumJAXM5KdYy5/BZpf2aijL5v1+dl+AN0TOGqrkmdrJiCLHggSJgUPTiSaGMCBhrohClOwL1N/
-	NB8V+OmymtA4tru3MvjmAqAFqEVOmXc2pEskzexy7e9GKR2n85+03P5rxLFrlrY+2vFKlOMLy12n/
-	gxpQhvAGP1EDtkbjD80PuOEW51KMtKo+50LGKQDA/lj1QobP65W4CjrzqEinA5wxs4JTdgrK3KGlZ
-	eXsohaEw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1tymSJ-0000000Fre8-1xZf;
-	Sun, 30 Mar 2025 06:47:39 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: brauner@kernel.org,
-	jack@suse.cz,
-	tytso@mit.edu,
-	adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org,
-	riel@surriel.com
-Cc: willy@infradead.org,
-	hannes@cmpxchg.org,
-	oliver.sang@intel.com,
-	dave@stgolabs.net,
-	david@redhat.com,
-	axboe@kernel.dk,
-	hare@suse.de,
-	david@fromorbit.com,
-	djwong@kernel.org,
-	ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	gost.dev@samsung.com,
-	p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	mcgrof@kernel.org
-Subject: [PATCH 0/3] mm: move migration work around to buffer-heads
-Date: Sat, 29 Mar 2025 23:47:29 -0700
-Message-ID: <20250330064732.3781046-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=voDv8EMh3wDI8Ol9zgDNGOFRR3qzvAQIM67ZjI3SCz8=; b=q0GkGU+6GJ3rbA/gqQ0Af/LEyg
+	b4UR04DsVRCaisDDpggnecveh2T2HG2hI3FYGxHsV1yK2jwXaHKw8+5hJeqAeB4TBDUiZJBV7sK5/
+	e4ntTTvaW7srOCXgoxG6mHOKljPVQ2BnECSogx8ttaFZu3ZML+5CIYNQ2a7wgaCcuVvrBcPdVvUYW
+	lbIbWtB2ftNtQf31ZMqCRR3mV8C2Pyrtf6kKqRPN4VOnuGrPyjUuCTvFG6iV5og6xRBvpgwMhFmma
+	Yd1uPj0T2gQ+64/f6JemxhVYWoP36361IdpKdNI+arvw72ypRh9rXc64cLBtR3gNUANvGtPGC4Ot0
+	4R2A6eUg==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1tyrOU-00000004M53-2Dfn;
+	Sun, 30 Mar 2025 12:04:02 +0000
+Date: Sun, 30 Mar 2025 13:04:02 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, jack@suse.cz, tytso@mit.edu,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com, hannes@cmpxchg.org, oliver.sang@intel.com,
+	dave@stgolabs.net, david@redhat.com, axboe@kernel.dk, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+	da.gomez@samsung.com
+Subject: Re: [PATCH 1/3] mm/migrate: add might_sleep() on __migrate_folio()
+Message-ID: <Z-kzMlwJXG7V9lip@casper.infradead.org>
+References: <20250330064732.3781046-1-mcgrof@kernel.org>
+ <20250330064732.3781046-2-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250330064732.3781046-2-mcgrof@kernel.org>
 
-We have an eye-sore of a spin lock held during page migration which
-was added for a ext4 jbd corruption fix for which we have no clear
-public corruption data. We want to remove the spin lock on mm/migrate
-so to help buffer-head filesystems embrace large folios, since we
-can cond_resched() on large folios on folio_mc_copy(). I've managed
-to reproduce a corruption by just removing the spinlock and stressing
-ext4 with generic/750, a corruption happens after 3 hours.
+On Sat, Mar 29, 2025 at 11:47:30PM -0700, Luis Chamberlain wrote:
+> However tracing shows that folio_mc_copy() *isn't* being called
+> as often as we'd expect from buffer_migrate_folio_norefs() path
+> as we're likely bailing early now thanks to the check added by commit
+> 060913999d7a ("mm: migrate: support poisoned recover from migrate
+> folio").
 
-The spin lock was added to help ext4 jbd and other users of
-buffer_migrate_folio_norefs(), so the block device cache and nilfs2.
-This does the work to move the heuristic needed to avoid page migration
-to back to the buffere-head code on __find_get_block_slow() and only
-to users of buffer_migrate_folio_norefs(). I have ran generic/750 over
-20 hours and don't see the corruption issue.
+Umm.  You're saying that most folios we try to migrate have extra refs?
+That seems unexpected; does it indicate a bug in 060913999d7a?
 
-I've also ran this patchset against all the following ext4 profiles on
-all fstests tests and have found no regression, I've published the
-baseline based on linux-next tag next-20250328 onto kdevops [0]. For
-further sanity I've also tested this patchset against blktests as well
-and found no regressions.
+> +++ b/mm/migrate.c
+> @@ -751,6 +751,8 @@ static int __migrate_folio(struct address_space *mapping, struct folio *dst,
+>  {
+>  	int rc, expected_count = folio_expected_refs(mapping, src);
+>  
+> +	might_sleep();
 
-ext4-defaults
-ext4-1k
-ext4-2k
-ext4-4k
-ext4-bigalloc16k-4k
-ext4-bigalloc32k-4k
-ext4-bigalloc64k-4k
-ext4-bigalloc1024k-4k
-ext4-bigalloc2048k-4k
-ext4-advanced-features
+We deliberately don't sleep when the folio is only a single page.
+So this needs to be:
 
-[0] https://github.com/linux-kdevops/kdevops/commit/3ecd638e67b14162b76b733a120e6e1b55698cc9
+	might_sleep_if(folio_test_large(folio));
 
-Luis Chamberlain (3):
-  mm/migrate: add might_sleep() on __migrate_folio()
-  fs/buffer: avoid races with folio migrations on
-    __find_get_block_slow()
-  mm/migrate: avoid atomic context on buffer_migrate_folio_norefs()
-    migration
-
- fs/buffer.c  | 9 +++++++++
- mm/migrate.c | 6 +++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
--- 
-2.47.2
-
+>  	/* Check whether src does not have extra refs before we do more work */
+>  	if (folio_ref_count(src) != expected_count)
+>  		return -EAGAIN;
+> -- 
+> 2.47.2
+> 
