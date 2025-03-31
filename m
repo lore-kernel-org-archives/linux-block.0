@@ -1,101 +1,145 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0357083C
-	for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 07:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFA0157A5A;
+	Mon, 31 Mar 2025 08:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743407146; cv=none; b=qZnmh+1j3+YWZOIJCsOBfT31UUv0hubV/X5O2hRQFAFP++yuZugBmddN8OblP0Cea9y3t7027CM18pKAPMsTGqPDh76O4/ZD1j/UhlrRbtVuvZuPRsPD+Mb8zvWA9uatnbv1hyaQx2KpU23qOOOzTf9y6Yg7H0ecswEiuDwNzA0=
+	t=1743408919; cv=none; b=eL/ug6rFNneyuLbXx29QJZ0kkFA0927ziRgf2+glVzFRtrk0wyLsVe/2da9LFlVUV4toyLHcnaf4WBEXotZfLTsdG0PhW2Of4s20QamZmPlDv4MTaN6WNKFAQOFWe6RfAQ/eNIxWw4x1UmETsUZvY4iETtnQCSmcVS+fZV751qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743407146; c=relaxed/simple;
-	bh=0ekbu07f4tS/74cP3eCqM7h5bFfjV8JNVfiZixcdWxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIS9yuiInPW/SWHfJs5ezp4Zg/PG7QwOXZJVtObOAsKe1WZ8VezB3rXt09HDByA5rY/q5nCa+kEyEry3TgkGCQliyvPxLT8AzAxKYrw46HPXju1IG8UcTysSn9E1WaOfy+EDm0rsj3pqj3CehkBVq/T8aMdwPFwMPfke0fI7is0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Vl23Tf11; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aIf8YGPq; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1743408919; c=relaxed/simple;
+	bh=/K1LqsVggHmL0UhIvJIi4z7UtHYa7X4m1Mt1UAfv840=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=ijFZDtLLWLE2/hbZkTR3J8vJBVZSH2T1cEH73LpTT7s1A9nKTiwdqpEa/2sJ2iJ8v6aULzPKg2pPVFoeolTsnwtpwzcvYYQnDPpAiAnHBCKCYfLThRta06bnZExhmtrdJFJ4cemX2jOZZ2OiArC6zEEfOalZwjxNFBZjA1/4u/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=rn6gP9Tr; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Vl23Tf11";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aIf8YGPq"
-Date: Mon, 31 Mar 2025 09:45:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1743407142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QQ/BW6GXmNSlhD+uZ4t2ZYkR1yvCJQ3S7CnL9jv1y1Y=;
-	b=Vl23Tf117IRS0N8GCZpT3mpyI5f/8m/vdIZDlPBiKzoW0ZvlR/RLSm2fdecTpsk84JwZPO
-	aqNWOlx+pzRXNWB8wgjq3E68MYDFTi2vqduq8C5yTkhDptkEcmfZiwV5AK5R9isk/8WJlC
-	tIpKx4XVHoWt70JOrKScwLPytPUqgTMt+vlCJQK5arjVjXP6o8BxVRSqwZLO7Y/nrFje0V
-	gissUjTnI0dZac4Eha2AFcE7g+E1xOkaenLwx/UO81iVt0BC67QHK5tE09UjKQZu0Ijx3p
-	SCT2Ds0mdtaq7SND1we5DRnSyzK/cHA9t8Emvi/RLKS4HYGFFfvfIoqTo6JttA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1743407142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QQ/BW6GXmNSlhD+uZ4t2ZYkR1yvCJQ3S7CnL9jv1y1Y=;
-	b=aIf8YGPqFS8UpqoKhqvAU7P9fA10ugdQ1RoPIZishJZJx9R1P54CgoFNcGw4uRtGF1SuST
-	aXDqXRwiAaj1LDDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>,
-	David Bueso <dave@stgolabs.net>, Tso Ted <tytso@mit.edu>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Oliver Sang <oliver.sang@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Dave Chinner <david@fromorbit.com>, gost.dev@samsung.com
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <20250331074541.gK4N_A2Q@linutronix.de>
-References: <Z9wF57eEBR-42K9a@bombadil.infradead.org>
- <20250322231440.GA1894930@cmpxchg.org>
- <Z99dk_ZMNRFgaaH8@bombadil.infradead.org>
- <Z9-zL3pRpCHm5a0w@bombadil.infradead.org>
- <Z+JSwb8BT0tZrSrx@xsang-OptiPlex-9020>
- <Z-X_FiXDTSvRSksp@bombadil.infradead.org>
- <Z-YjyBF-M9ciJC7X@bombadil.infradead.org>
- <Z-ZwToVfJbdTVRtG@bombadil.infradead.org>
- <Z-bz0IZuTtwNYPBq@bombadil.infradead.org>
- <Z-c6BqCSmAnNxb57@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="rn6gP9Tr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
+	s=s31663417; t=1743408914; x=1744013714; i=quwenruo.btrfs@gmx.com;
+	bh=6+9wgwyWz1ODyntJIKBnB7YG1IaQT7gJbMSQb5t6zjc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
+	 Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=rn6gP9Tray5TjP+E67J2mSKMkVfYYt+GRk5uMfa4EHdCRZdew1Qa+pehbSdrw5LQ
+	 x0LJssO0r30FUqtvWT9vRmYgAtph9jKtZ1E8TRRqnnzj2xN18gM+rXKCAZGyLrecf
+	 nfN0IPtvjkr068lqqxVr8IRqLb5ylbeuIcF2HAHT3cJXYX6nB0UToqfn+iZJZMtKR
+	 SCDu7sq5tNRXMr3fhq6R78nlAhrSl/3qi4LKtpUOqBrjNDTfKxMkmqC7DsNGREh9+
+	 Gea1FToDFLCrmEHyndwzdWrctYj8sQXPGEbgul7uzEpLPIoQ8oAzKT3BaidAqrBs9
+	 0/ckWM5nGCX8RB6pVQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [172.16.0.191] ([159.196.52.54]) by mail.gmx.net (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1M5wPb-1u15yL0c6F-002zPq; Mon, 31
+ Mar 2025 10:15:14 +0200
+Message-ID: <17517804-1c6b-4b96-a608-8c3d80e5f6dd@gmx.com>
+Date: Mon, 31 Mar 2025 18:45:10 +1030
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linux Memory Management List <linux-mm@kvack.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-btrfs <linux-btrfs@vger.kernel.org>
+From: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
+ BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
+ sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
+ xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
+ naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
+ tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
+ 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
+ VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
+ CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
+ /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
+ GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
+ q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
+ ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
+ CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
+ B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
+ Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
+ +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
+ HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
+Subject: Proper way to copy de-compressed data into a bio, in folio style?
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Z-c6BqCSmAnNxb57@bombadil.infradead.org>
+X-Provags-ID: V03:K1:Pa4eZ9t2BG9WOipM89ch+BIP1XwXRZchgff3EFxuT5AXR4Okz5q
+ jJFfpZO1Jx92mLwuXcbayJXYbzeBthY2ITTzDFwpJAXZ8mHdbt9ULRdhbaU+gUcUvz2rb8A
+ MimQ6d+dZ66eE7Lt6puoXE7i0LPJU8GcYoUSjA2bK63RaCo4Va9KD7uo/ORs+4mRn+CdTDO
+ B7PH3rU65lNdEvYhmCAuA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:3VKqjzBD2Qw=;v70ybC2+N2w66XEpL5vQYf0gqu9
+ agtAhwOgsibrjNR6MjyLDxxbu31pLTIQC5Mza+hmRTPk199PseFSxZ1/HMKyP5C08C9cgGHk2
+ 5joFU8ohOPnqR9T8BF6SIh9WyclM3Uh8TRdA25JcaEl4V6fpbNGA73/zHQwC8VqK/C5Un/slC
+ ARmZiKmlAfnwG0eMNR14pgsWPnv0jQVSLBb2CusvJAImXwaf1Zy+aWI9im94HLDspu/tWsW2K
+ pbYr4210lee3VdHRDh55/bLRwb5Ek9EbUsDqV0vf/2clphLKM6TbEb3FfprK9ZIK0C1OzRKjj
+ korKmp8PNz3P1UglynGWk9NjaibiBnNXxo9Lqz+C+H7gaxKJoL0CSgc98Qj7DxjGY1vvVqtEW
+ wzeeTym0kJYtpvQ6ojj+uJMadokPWP6H7i6/6PnBKxXaIFzRG/EmGpBQc0eNi3x9flWelC+Al
+ lVyokOjOHgUvMOZNKQVQO3EmaWQHOhQN3ZTYuSpqovJixVo0N+CI7/SwHxEKcSphHyu2PqQnW
+ eTkcAOCgKv2oPTedSNmtPi/dq2gK0qbCRyLjJeL1fYd9FF7zLFSQ9pkb9nNWzu2QTmxlv1G+o
+ 3jt7RsUkVSPgq1bdXUO+A5y5vA0TDvqCrNy5609Pj29M/KxU35NiiMQ19484dQBTNTAKIOyds
+ Nic1GQ00+E9crER3fKIoExEqgXLXrVHlh9G0mYns2ZLPF38Rggn9CHDUQH9zF0+GNnLZxjzwT
+ 3Tp37wvq0KAHf6k9fe0OFoq+qqC5jAtnqoS2Kaa7p2bGaTs+YmNkMcj2GDaGSqCqQ4u9sESzy
+ w4ySrWo2w+KvkJ/jSnm2BbvVwfPaLc3d+bVyN1dRFbJlZQMMlx/ehVGqRscep4++5fI85Mx87
+ vmDTbToj1faqrnL82m264aVZDZ0wKaF+aEwtvONB+ZPjyu/tj+zz20jHoktuzC5nXYh7eqzzO
+ YYPNIFp3dk5AqElYB1PaAEeLJcXYHIyqvBR9DWfXdCvtr9ojwumTVSCy2USjnJnCvYnnXUXkQ
+ vUQnO6qbIDSrb+IayO7ChgGXZALLoqarZH3j5wMRMLWsSiuGP8/jue5+6sQHL1liYPwyhJ3zr
+ 3bSYKQwEbfD07xXyirnlBh4UUdQhJT+wCZhRn2ttrw7a0B0uJcmmLn0ydeDsUQcvrAkz5nLkr
+ BoKVSDVHSXafD2al9EU2vrEsduDDFdUGU838fIY/Ub7BPrd2rBJeqmbs0u0PaqiEAy0j//yWm
+ 6H90CfjNhW7Hh3EnslGmUpIX0g1sQdLJ4kbJgxPORC8yrz72ge7S1qpxHLzgvlqivLCH+VhBF
+ mGlj3Rsa9up2N7czkgPBYOuWaLt10ub0TnBoxxqSJLsUXt4DdiMhW/FI0i90RdC/q/Oy2gRk0
+ Ca5UVdz55weef3osq9UxX6bwqdm3k0IemziT3AdNLS5ZvDgqh9C24cUts7brY/G081+Z56s8Y
+ qLnAsxA==
 
-On 2025-03-28 17:08:38 [-0700], Luis Chamberlain wrote:
-=E2=80=A6
-> > Are there some preemption configs under which cond_resched() won't
-> > trigger a kernel splat where expected so the only thing I can think of
-> > is perhaps some preempt configs don't implicate a sleep? If true,
-> > instead of adding might_sleep() to one piece of code (in this case
-> > foio_mc_copy()) I wonder if instead just adding it to cond_resched() may
-> > be useful.
->=20
-> I think the answer to the above is "no".
+Hi,
 
-I would say so. You need CONFIG_DEBUG_ATOMIC_SLEEP for the might-sleep
-magic to work. And then the splat from might_sleep() isn't different
-than the one from cond_resched().=20
+The seemingly easy question has some very interesting extra requirements:
 
->=20
->   Luis
+1. The bio contains contig file map folios
+    The folios may be large.
+    So page_offset() on bv_page (using single-page bvec) is no longer
+    reliable, one has to call page_pgoff() instead.
 
-Sebastian
+2. The data may not cover the bio range
+    So we need some range comparison and skip if the data range doesn't
+    cover the bio range.
+
+3. The bio may have been advanced
+    E.g. previous de-compressed range has been copied, but the remaining
+    part still needs to be fulfilled.
+
+    And we need to use the bv_page's file offset to calculate the real
+    beginning of the range to copy.
+
+The current btrfs code is doing single page bvec iteration, and handling
+point 2 and 3 well.
+(btrfs_decompress_buf2page() in fs/btrfs/compression.c)
+
+Point 1 was not causing problem until the incoming large data folio
+support, and can be easily fixed with page_pgoff() convertion.
+
+
+But since we're here, I'm also wondering can we do it better with a
+folio or multi-page bvec way?
+
+The current folio bio iteration helper can only start from the beginning
+of a bio (bio_for_each_folio_all() and bio_first_folio()), thus it's not
+a good fit for point 3.
+
+On the other hand, I'm having some internal code to convert a bio_vec
+into a folio and offset inside the folio already.
+Thus I'm wondering can we provide something like bio_for_each_folio()?
+Or is it too niche that only certain fs can benefit from?
+
+Thanks,
+Qu
