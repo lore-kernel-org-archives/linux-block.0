@@ -1,47 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f100.google.com (mail-io1-f100.google.com [209.85.166.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C571BFE00;
-	Mon, 31 Mar 2025 19:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE543596F
+	for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 23:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743451084; cv=none; b=Jfg7tEfirrpfSaLiI8jNbpvkC9ZM1qwzFUMfq9xzg8NCjRp+SuueoFcmrJZ3AJkn4HkGcYWitaDgS+iVaMERcYK6ZqY+dN1L7paznSg1K6vu8a2ZGGqjhfZpdIbSDGmIB9zQLHLjUEaKjwEVDqydwbf6Yhe51cQDurwrVhXwmtE=
+	t=1743463041; cv=none; b=pdAPmXfjBs0OzWPeNPqVB9W6lTygvj4ncZGA0vVixyTHDt/cVty5g5eNCYcK8PtF9C8zWsQTIdipRmZxiWFAYkAzFqgmI4BfJ4twnugObHqVBNlGbl8/vNFrvjKwe4P4IbRSaXAxPuQGiCvJzIL4vl9wr48rehVj9iWS2WtLbyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743451084; c=relaxed/simple;
-	bh=/E+wwz98eNFd1DmNPK1lqFRD9SrYNrqWDNmrsLZOPHk=;
+	s=arc-20240116; t=1743463041; c=relaxed/simple;
+	bh=V4zcS3VHy00LSstytvIhBcw93HmwPluCvtf3eTnTJiU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AvaSaiO+MJzXcPkLYE3qpeVK5MA5lWBVhMmhhxuyVtnYaHptsv1+IMKzTonR2thtwesW0F99V+6UE+b28xfLefCGBSSBcGWE4nmBZKImM9UFGSzE2aZEf2S6tuVKwlWEcgq695bWbxlcipEFaOAu5UXY4CTSv6YLnXYF/e72Egc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRSNOJeF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=MHdlGZ1JRfXysk19D/O4J2k1VdBunPlXpXxS3TVZeaf6bWX83nBZQw2EjtZgtRI5yvplt+JXOHPQM+5JUASmxu6qbVZP1zyBAnP5XFVYsOlKkwDphKTkTr4VnZy/5LyVHFcKJEHcrDHX08+lL+1sf5PbUI3hRcqfyyIKf9wr7QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=M8uSgUNt; arc=none smtp.client-ip=209.85.166.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRSNOJeF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB31C4CEE3;
-	Mon, 31 Mar 2025 19:58:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743451084;
-	bh=/E+wwz98eNFd1DmNPK1lqFRD9SrYNrqWDNmrsLZOPHk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eRSNOJeFxsx9bkrYs9YzaSS+qpFbA+kQEeEyoiywHRmH+Ncj53au5sr+AX+/QiveT
-	 ICxPqla9sFqPIAQIAjKYHqJocc7dyEdXGELWCyPmV+SrA9oa8dtyTXeU0GiVpy5MoM
-	 Rv7qOiKzJfPw2VrOMKW34FnBuElq9WdXw7V1jJf9QlJ5IqSEyp+w187txwHmK31dBj
-	 c4e6FO8FXAzhpbgbId47fxZlpOIZZub0wseSW5MSo13+9+fqtrlmbrNaH8mtBXTw6p
-	 /RLb2dzCbMK0D1kCog5OXz/E5ZX2fBHtl2ONOY7Iab736QaO0/MEX8JvE3Eed5tQB4
-	 jxn1AwrT0GahQ==
-Date: Mon, 31 Mar 2025 12:58:02 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: brauner@kernel.org, jack@suse.cz, tytso@mit.edu,
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com
-Cc: willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
-	dave@stgolabs.net, david@redhat.com, axboe@kernel.dk, hare@suse.de,
-	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
-	da.gomez@samsung.com
-Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
- __find_get_block_slow()
-Message-ID: <Z-rzyrS0Jr7t984Y@bombadil.infradead.org>
-References: <20250330064732.3781046-1-mcgrof@kernel.org>
- <20250330064732.3781046-3-mcgrof@kernel.org>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="M8uSgUNt"
+Received: by mail-io1-f100.google.com with SMTP id ca18e2360f4ac-85dd470597fso111635939f.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 16:17:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1743463039; x=1744067839; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=253IVXqvyimIRaeq5FLc2Fwm51XlkeZhNQDnFWpHFz8=;
+        b=M8uSgUNtRRQ0jPl+fyNoPd3g3fMQPF7NZpRWDW0ysvwLyIYD81xeXeLnn/diAliUIe
+         H88zBMz4RMcleVXeYvLWMV99PMdyGd5CRPMVcvs3IotTOMDASh4Xo4phReUZIVCDpy2x
+         5mVWvs6HVamdVzGFhqFYMs4C4kwCiZPxbfgkBtxhdbv2Thg/0itPqgTiuFl/DclUJwYr
+         r+Zahsu9u4qJtQNpp8x8qtPGAdSejUecY1gPx8ItvVyOuqMXm+tIjvbpBr4W6Un0inBE
+         g2ldDM6soXRBUeh/P4Ni1/dawFS5dFQ/puuUymVHvv2CSMn63q4p7tCAqPaqTHjO6gYz
+         TevQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743463039; x=1744067839;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=253IVXqvyimIRaeq5FLc2Fwm51XlkeZhNQDnFWpHFz8=;
+        b=Wu1RnypmQYfdwXn01AwG6QLmyy0x6jVZX5rcPsdZ2Jza6Bim6rciKEHKZ1yTejI7Wm
+         TVnvNSJYlQUN+lj/taILnj5CRCjh8A+afZD9rsVTf5KbIi+Ggb8mOyQANE6RYQ6LuuG1
+         k+mOC34Tbyvv5KVy1qL039qHj7qto2G0Bw7P39Ev6gd6juWA3iDzio1rLorHCyD3Wmec
+         sTHzcgROqW+WQwVZ22YW69I5ouGbFptXmwA5nLbfeKiFOatJ5qvqL1nTxdfsE3jf1ecp
+         CMPeJVlU/iy8jKVdEbdnuNxoAXshKIJ34C4959mUrwVduOBQL3QJVx9u031jSo/ZEgDn
+         NLVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUI46hUc+7ccKE/xxGlVyLtscyAsBeNoXcateWR3uhPbQ5Mxep7jA55edzzrx+0QaqP/uio80MAkZ3Wng==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTF2cORwb8o4t+7OsNjfkbDsKQtYpTMmKu797tjBLOV5Ss+Rgh
+	4DEw/HCcpXMKqo0kRSGmLcM+sSiIZbuh5R/7ZaBI4cK1B9Bel7CXEfF6T4W3SPiz4se/24wwZZT
+	nWNKwu1qw6Cg7s7fWTayHHCt6qmXg5D6FtarVb9xz58CYfI3G
+X-Gm-Gg: ASbGncsVoMWvXnfHEiVN4m1YzPLZU/iuQQxP4ZJ+5SNeMhawfzkcFbJ2ncWThCb3ruL
+	t+ZugetU/LZzbIXlWRlu9zTn4ZPkSgQwK5n41E73ZqyJzQKl/C2A+vi4Sw0KUF09v6NRsybE+sT
+	tFglXrK6rmNOFd6T5zmI+klgOY+WiPN8aI6xAyAmqmwi5LOljhYd3MVQLrDSyJtMwXnkaC1h//i
+	Kr/pSqhBYnc7xBWOFQ6I6lpVTgydNMZaWO8wJv02Cv/BIo6Luod9OpcbxktBOKL15O0bQ6CpCeP
+	cp5WvFfSpNZ7AGcq6rPQltAzttcuzQDbsPo=
+X-Google-Smtp-Source: AGHT+IFAfHUOd3wpQObzKgKlayEtIa9KGQW2qhc+r4SeeD3o705EDeaJHnUKCpwklXgxM7GAIwpSa7Eklgd+
+X-Received: by 2002:a05:6602:4c0e:b0:85e:2eba:20ad with SMTP id ca18e2360f4ac-85e9e84a5d6mr1019300939f.2.1743463038674;
+        Mon, 31 Mar 2025 16:17:18 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id ca18e2360f4ac-85e9026b56bsm52135739f.22.2025.03.31.16.17.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 16:17:18 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 090E33404B9;
+	Mon, 31 Mar 2025 17:17:17 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id F17C6E402D8; Mon, 31 Mar 2025 17:17:16 -0600 (MDT)
+Date: Mon, 31 Mar 2025 17:17:16 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] ublk: improve handling of saturated queues when ublk
+ server exits
+Message-ID: <Z+sifI6fujsc186S@dev-ushankar.dev.purestorage.com>
+References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
+ <20250325-ublk_timeout-v1-4-262f0121a7bd@purestorage.com>
+ <Z-OS2_J7o0NKHWmj@fedora>
+ <Z+Q/SNmX+DpVQ5ir@dev-ushankar.dev.purestorage.com>
+ <Z-SoibOdOmzOWB-C@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,178 +85,165 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250330064732.3781046-3-mcgrof@kernel.org>
+In-Reply-To: <Z-SoibOdOmzOWB-C@fedora>
 
-On Sat, Mar 29, 2025 at 11:47:31PM -0700, Luis Chamberlain wrote:
-> Although we don't have exact traces of the filesystem corruption we
-> can can reproduce fs corruption one ext4 by just removing the spinlock
-> and stress testing the filesystem with generic/750, we eventually end
-> up after 3 hours of testing with kdevops using libvirt on the ext4
-> profile ext4-4k. Things like the below as reported recently [1]:
+On Thu, Mar 27, 2025 at 09:23:21AM +0800, Ming Lei wrote:
+> On Wed, Mar 26, 2025 at 11:54:16AM -0600, Uday Shankar wrote:
+> > On Wed, Mar 26, 2025 at 01:38:35PM +0800, Ming Lei wrote:
+> > > On Tue, Mar 25, 2025 at 04:19:34PM -0600, Uday Shankar wrote:
+> > > > There are currently two ways in which ublk server exit is detected by
+> > > > ublk_drv:
+> > > > 
+> > > > 1. uring_cmd cancellation. If there are any outstanding uring_cmds which
+> > > >    have not been completed to the ublk server when it exits, io_uring
+> > > >    calls the uring_cmd callback with a special cancellation flag as the
+> > > >    issuing task is exiting.
+> > > > 2. I/O timeout. This is needed in addition to the above to handle the
+> > > >    "saturated queue" case, when all I/Os for a given queue are in the
+> > > >    ublk server, and therefore there are no outstanding uring_cmds to
+> > > >    cancel when the ublk server exits.
+> > > > 
+> > > > The second method detects ublk server exit only after a long delay
+> > > > (~30s, the default timeout assigned by the block layer). Any
+> > > > applications using the ublk device will be left hanging for these 30s
+> > > > before seeing an error/knowing anything went wrong. This problem is
+> > > > illustrated by running the new test_generic_02 against a ublk_drv which
+> > > > doesn't have the fix:
+> > > > 
+> > > > selftests: ublk: test_generic_02.sh
+> > > > dev id is 0
+> > > > dd: error writing '/dev/ublkb0': Input/output error
+> > > > 1+0 records in
+> > > > 0+0 records out
+> > > > 0 bytes copied, 30.0611 s, 0.0 kB/s
+> > > > DEAD
+> > > > dd took 31 seconds to exit (>= 5s tolerance)!
+> > > > generic_02 : [FAIL]
+> > > > 
+> > > > Fix this by instead handling the saturated queue case in the ublk
+> > > > character file release callback. This happens during ublk server exit
+> > > > and handles the issue much more quickly than an I/O timeout:
+> > > 
+> > > Another solution is to override default 30sec 'timeout'.
+> > 
+> > Yes, but that still will introduce unnecessary delays, since it is a
+> > polling-based solution (very similar to monitor_work we used to have).
+> > Also it will add complexity to the unprivileged case, since that
+> > actually cares about timeout and we will have to track the "real"
+> > timeout separately.
+> > 
+> > > 
+> > > > 
+> > > > selftests: ublk: test_generic_02.sh
+> > > > dev id is 0
+> > > > dd: error writing '/dev/ublkb0': Input/output error
+> > > > 1+0 records in
+> > > > 0+0 records out
+> > > > 0 bytes copied, 0.0376731 s, 0.0 kB/s
+> > > > DEAD
+> > > > generic_02 : [PASS]
+> > > > 
+> > > > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> > > > ---
+> > > >  drivers/block/ublk_drv.c                        | 40 +++++++++++------------
+> > > >  tools/testing/selftests/ublk/Makefile           |  1 +
+> > > >  tools/testing/selftests/ublk/kublk.c            |  3 ++
+> > > >  tools/testing/selftests/ublk/kublk.h            |  3 ++
+> > > >  tools/testing/selftests/ublk/null.c             |  4 +++
+> > > >  tools/testing/selftests/ublk/test_generic_02.sh | 43 +++++++++++++++++++++++++
+> > > >  6 files changed, 72 insertions(+), 22 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > index c060da409ed8a888b7e414c9065efd2cbd6d57d7..1816b2cac01056dc9d01455759594af43c5f78d6 100644
+> > > > --- a/drivers/block/ublk_drv.c
+> > > > +++ b/drivers/block/ublk_drv.c
+> > > > @@ -1247,8 +1247,6 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+> > > >  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+> > > >  {
+> > > >  	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+> > > > -	unsigned int nr_inflight = 0;
+> > > > -	int i;
+> > > >  
+> > > >  	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
+> > > >  		if (!ubq->timeout) {
+> > > > @@ -1259,26 +1257,6 @@ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+> > > >  		return BLK_EH_DONE;
+> > > >  	}
+> > > >  
+> > > > -	if (!ubq_daemon_is_dying(ubq))
+> > > > -		return BLK_EH_RESET_TIMER;
+> > > > -
+> > > > -	for (i = 0; i < ubq->q_depth; i++) {
+> > > > -		struct ublk_io *io = &ubq->ios[i];
+> > > > -
+> > > > -		if (!(io->flags & UBLK_IO_FLAG_ACTIVE))
+> > > > -			nr_inflight++;
+> > > > -	}
+> > > > -
+> > > > -	/* cancelable uring_cmd can't help us if all commands are in-flight */
+> > > > -	if (nr_inflight == ubq->q_depth) {
+> > > > -		struct ublk_device *ub = ubq->dev;
+> > > > -
+> > > > -		if (ublk_abort_requests(ub, ubq)) {
+> > > > -			schedule_work(&ub->nosrv_work);
+> > > > -		}
+> > > > -		return BLK_EH_DONE;
+> > > > -	}
+> > > > -
+> > > >  	return BLK_EH_RESET_TIMER;
+> > > >  }
+> > > >  
+> > > > @@ -1351,6 +1329,24 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+> > > >  static int ublk_ch_release(struct inode *inode, struct file *filp)
+> > > >  {
+> > > >  	struct ublk_device *ub = filp->private_data;
+> > > > +	bool need_schedule = false;
+> > > > +	int i;
+> > > > +
+> > > > +	/*
+> > > > +	 * Error out any requests outstanding to the ublk server. This
+> > > > +	 * may have happened already (via uring_cmd cancellation), in
+> > > > +	 * which case it is not harmful to repeat. But uring_cmd
+> > > > +	 * cancellation does not handle queues which are fully saturated
+> > > > +	 * (all requests in ublk server), because from the kernel's POV,
+> > > > +	 * there are no outstanding uring_cmds to cancel. This code
+> > > > +	 * handles such queues.
+> > > > +	 */
+> > > > +
+> > > > +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> > > > +		need_schedule |= ublk_abort_requests(ub, ublk_get_queue(ub, i));
+> > > > +
+> > > > +	if (need_schedule)
+> > > > +		schedule_work(&ub->nosrv_work);
+> > > 
+> > > ublk_abort_requests() should be called only in case of queue dying,
+> > > since ublk server may open & close the char device multiple times.
+> > 
+> > Sure that is technically possible, however is any real ublk server doing
+> > this? Seems like a strange thing to do, and seems reasonable for the
+> > driver to transition the device to the nosrv state (dead or recovery,
+> > depending on flags) when the char device is closed, since in this case,
+> > no one can be handling I/O anymore.
 > 
-> Mar 28 03:36:37 extra-ext4-4k unknown: run fstests generic/750 at 2025-03-28 03:36:37
-> <-- etc -->
-> Mar 28 05:57:09 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_get_first_dir_block:3538: inode #5174: comm fsstress: directory missing '.'
-> Mar 28 06:04:43 extra-ext4-4k kernel: EXT4-fs warning (device loop5): ext4_empty_dir:3088: inode #5176: comm fsstress: directory missing '.'
-> Mar 28 06:42:05 extra-ext4-4k kernel: EXT4-fs error (device loop5): __ext4_find_entry:1626: inode #5173: comm fsstress: checksumming directory block 0
-> Mar 28 08:16:43 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_find_extent:938: inode #1104560: comm fsstress: pblk 4932229 bad header/extent: invalid magic - magic 8383, entries 33667, max 33667(0), depth 33667(0)
+> ublk server should be free to open & close the char device multiple times,
+> but you patch limits ublk server to open & close the char device just once.
+> 
+> The limit looks too strong...
 
-I reproduced again a corruption with ext4 when we remove the spin lock
-alone with generic/750, the trace looks slightly different, and
-this time I ran the test with ext4 with 2k block size filesystem. I
-also reverted both "mm: migrate: remove folio_migrate_copy()" and
-"mm: migrate: support poisoned recover from migrate folio" just in case
-the extra check added by the later was helping avoid the corruption. I
-also added some debugfs stats one can use to verify exact values of
-how buffer_migrate_folio_norefs() can fail. I put this tree on
-linux-kdevops 20250321-accel-ext4-bug branch [0] for other folks' convenience.
-This time it took ~ 5 hours to reproduce and we start off with a jbd
-jbd2_journal_dirty_metadata() kernel warning followed by putting
-the filesystem in read-only mode:
+Tying a userspace daemon lifetime to the file seems to also be done in
+fuse, which is very similar to ublk_drv. See e.g. the description here:
 
-Mar 31 06:51:30 extra-ext4-2k kernel: Linux version 6.14.0-rc7-next-20250321-00004-ge4b961f1dadb (mcgrof@beef) (gcc (Debian 14.2.0-16) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44) #92 SMP PREEMPT_DYNAMIC Mon Mar 31 06:43:08 UTC 2025
-Mar 31 06:51:30 extra-ext4-2k kernel: Command line: BOOT_IMAGE=/boot/vmlinuz-6.14.0-rc7-next-20250321-00004-ge4b961f1dadb root=PARTUUID=503fa6f2-2d5b-4d7e-8cf8-3a811de326ce ro console=tty0 console=tty1 console=ttyS0,115200n8 console=ttyS0
+https://lore.kernel.org/lkml/20240524064030.4944-1-jefflexu@linux.alibaba.com/T/
 
-<-- snip -->
+This seems required to support certain workflows, e.g. using an fdstore
+with ublk devices. While we still keep task references in ublk_drv,
+these workflows will be broken.
 
-Mar 31 06:56:05 extra-ext4-2k unknown: run fstests generic/750 at 2025-03-31 06:56:05
-Mar 31 06:56:06 extra-ext4-2k kernel: EXT4-fs (loop5): mounted filesystem 858bf9bf-6582-42d3-b2f5-41c7061033df r/w with ordered data mode. Quota mode: none.
-Mar 31 07:02:04 extra-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Mar 31 07:35:22 extra-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Mar 31 07:53:05 extra-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Mar 31 11:47:01 extra-ext4-2k kernel: ------------[ cut here ]------------
-Mar 31 11:47:01 extra-ext4-2k kernel: WARNING: CPU: 5 PID: 3092 at fs/jbd2/transaction.c:1552 jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio virtio_balloon virtio_console button evdev joydev serio_raw nvme_fabrics drm dm_mod nvme_core nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover failover virtio_blk psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-Mar 31 11:47:01 extra-ext4-2k kernel: CPU: 5 UID: 0 PID: 3092 Comm: fsstress Not tainted 6.14.0-rc7-next-20250321-00004-ge4b961f1dadb #92 PREEMPT(full) 
-Mar 31 11:47:01 extra-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.11-5 01/28/2025
-Mar 31 11:47:01 extra-ext4-2k kernel: RIP: 0010:jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel: Code: 30 0f 84 5b fe ff ff 0f 0b 41 bc 8b ff ff ff e9 69 fe ff ff 48 8b 04 24 4c 8b 48 70 4d 39 cf 0f 84 53 ff ff ff e9 22 c5 00 00 <0f> 0b 41 bc e4 ff ff ff e9 41 ff ff ff 0f 0b 90 0f 1f 40 00 90 90
-Mar 31 11:47:01 extra-ext4-2k kernel: RSP: 0018:ffffb8bd83d2f7f8 EFLAGS: 00010246
-Mar 31 11:47:01 extra-ext4-2k kernel: RAX: 0000000000000001 RBX: ffff9d72cb6d7528 RCX: 00000000000000fd
-Mar 31 11:47:01 extra-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: RBP: ffff9d72cf5127b8 R08: ffff9d72cf5127b8 R09: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R10: ffff9d733c8d983c R11: 0000000000006496 R12: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R13: ffff9d72c258cce8 R14: ffff9d72cb6d7530 R15: ffff9d72c25ff000
-Mar 31 11:47:01 extra-ext4-2k kernel: FS:  00007f1f5ae7f740(0000) GS:ffff9d7386349000(0000) knlGS:0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Mar 31 11:47:01 extra-ext4-2k kernel: CR2: 000055a76a03bfa8 CR3: 0000000108f76001 CR4: 0000000000772ef0
-Mar 31 11:47:01 extra-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Mar 31 11:47:01 extra-ext4-2k kernel: PKRU: 55555554
-Mar 31 11:47:01 extra-ext4-2k kernel: Call Trace:
-Mar 31 11:47:01 extra-ext4-2k kernel:  <TASK>
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __warn.cold+0x93/0xf8
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? report_bug+0xe6/0x170
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? handle_bug+0x199/0x260
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? exc_invalid_op+0x13/0x60
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? asm_exc_invalid_op+0x16/0x20
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? jbd2_journal_dirty_metadata+0x9e/0x230 [jbd2]
-Mar 31 11:47:01 extra-ext4-2k kernel:  __ext4_handle_dirty_metadata+0x6d/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_da_write_end+0xa3/0x3c0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  do_writepages+0xdd/0x250
-Mar 31 11:47:01 extra-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
-Mar 31 11:47:01 extra-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  __fput+0xf4/0x2b0
-Mar 31 11:47:01 extra-ext4-2k kernel:  __x64_sys_close+0x39/0x80
-Mar 31 11:47:01 extra-ext4-2k kernel:  do_syscall_64+0x4b/0x120
-Mar 31 11:47:01 extra-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Mar 31 11:47:01 extra-ext4-2k kernel: RIP: 0033:0x7f1f5af11687
-Mar 31 11:47:01 extra-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-Mar 31 11:47:01 extra-ext4-2k kernel: RSP: 002b:00007ffc2509e1d0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-Mar 31 11:47:01 extra-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f1f5ae7f740 RCX: 00007f1f5af11687
-Mar 31 11:47:01 extra-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-Mar 31 11:47:01 extra-ext4-2k kernel: RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R13: 00007ffc2509e7c0 R14: 0000000000000003 R15: 0000000000000004
-Mar 31 11:47:01 extra-ext4-2k kernel:  </TASK>
-Mar 31 11:47:01 extra-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
-Mar 31 11:47:01 extra-ext4-2k kernel: ------------[ cut here ]------------
-Mar 31 11:47:01 extra-ext4-2k kernel: WARNING: CPU: 5 PID: 3092 at fs/ext4/ext4_jbd2.c:360 __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio virtio_balloon virtio_console button evdev joydev serio_raw nvme_fabrics drm dm_mod nvme_core nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover failover virtio_blk psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-Mar 31 11:47:01 extra-ext4-2k kernel: CPU: 5 UID: 0 PID: 3092 Comm: fsstress Tainted: G        W           6.14.0-rc7-next-20250321-00004-ge4b961f1dadb #92 PREEMPT(full) 
-Mar 31 11:47:01 extra-ext4-2k kernel: Tainted: [W]=WARN
-Mar 31 11:47:01 extra-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.11-5 01/28/2025
-Mar 31 11:47:01 extra-ext4-2k kernel: RIP: 0010:__ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel: Code: 00 00 00 44 89 fa 4c 89 f6 49 c7 c1 df 2b 97 c0 4c 89 e7 41 bd fb ff ff ff e8 6a ce 05 00 eb 97 48 89 df e8 60 99 8a f5 eb 8a <0f> 0b 48 c7 c2 60 42 96 c0 45 89 e8 48 89 e9 44 89 fe 4c 89 f7 e8
-Mar 31 11:47:01 extra-ext4-2k kernel: RSP: 0018:ffffb8bd83d2f838 EFLAGS: 00010286
-Mar 31 11:47:01 extra-ext4-2k kernel: RAX: ffff9d72c04ef800 RBX: ffff9d72cf5127b8 RCX: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: RDX: 0000000000000001 RSI: 0000000000000000 RDI: 00000000ffffffff
-Mar 31 11:47:01 extra-ext4-2k kernel: RBP: ffff9d72c258cce8 R08: ffff9d72cf5127b8 R09: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R10: ffff9d733c8d983c R11: 0000000000006496 R12: ffff9d71d05fe378
-Mar 31 11:47:01 extra-ext4-2k kernel: R13: 00000000ffffffe4 R14: ffffffffc0964720 R15: 0000000000000556
-Mar 31 11:47:01 extra-ext4-2k kernel: FS:  00007f1f5ae7f740(0000) GS:ffff9d7386349000(0000) knlGS:0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Mar 31 11:47:01 extra-ext4-2k kernel: CR2: 000055a76a03bfa8 CR3: 0000000108f76001 CR4: 0000000000772ef0
-Mar 31 11:47:01 extra-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Mar 31 11:47:01 extra-ext4-2k kernel: PKRU: 55555554
-Mar 31 11:47:01 extra-ext4-2k kernel: Call Trace:
-Mar 31 11:47:01 extra-ext4-2k kernel:  <TASK>
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __warn.cold+0x93/0xf8
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? report_bug+0xe6/0x170
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? handle_bug+0x199/0x260
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? exc_invalid_op+0x13/0x60
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? asm_exc_invalid_op+0x16/0x20
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? __ext4_handle_dirty_metadata+0x6d/0x190 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_da_write_end+0xa3/0x3c0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  do_writepages+0xdd/0x250
-Mar 31 11:47:01 extra-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
-Mar 31 11:47:01 extra-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
-Mar 31 11:47:01 extra-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
-Mar 31 11:47:01 extra-ext4-2k kernel:  __fput+0xf4/0x2b0
-Mar 31 11:47:01 extra-ext4-2k kernel:  __x64_sys_close+0x39/0x80
-Mar 31 11:47:01 extra-ext4-2k kernel:  do_syscall_64+0x4b/0x120
-Mar 31 11:47:01 extra-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Mar 31 11:47:01 extra-ext4-2k kernel: RIP: 0033:0x7f1f5af11687
-Mar 31 11:47:01 extra-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-Mar 31 11:47:01 extra-ext4-2k kernel: RSP: 002b:00007ffc2509e1d0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-Mar 31 11:47:01 extra-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f1f5ae7f740 RCX: 00007f1f5af11687
-Mar 31 11:47:01 extra-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-Mar 31 11:47:01 extra-ext4-2k kernel: RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-Mar 31 11:47:01 extra-ext4-2k kernel: R13: 00007ffc2509e7c0 R14: 0000000000000003 R15: 0000000000000004
-Mar 31 11:47:01 extra-ext4-2k kernel:  </TASK>
-Mar 31 11:47:01 extra-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs: ext4_ext_grow_indepth:1366: aborting transaction: error 28 in __ext4_handle_dirty_metadata
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5): ext4_ext_grow_indepth:1366: inode #213689: block 9062541: comm fsstress: journal_dirty_metadata failed: handle type 2 started at line 2721, credits 11/0, errcode -28
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_mb_clear_bb:6550: Readonly filesystem
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_reserve_inode_write:5870: Readonly filesystem
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2336: inode #213689: comm fsstress: mark_inode_dirty error
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2338: comm fsstress: Failed to mark inode 213689 dirty
-Mar 31 11:47:01 extra-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_do_writepages:2751: error 28
+I am not familiar with fuse so I don't know for sure, but it sounds like
+if the file is closed after some setup is performed, then the connection
+is aborted. The analogy in ublk might be - if the file is closed while
+the device is LIVE, then we transition to the nosrv state. Otherwise
+nothing happens and the file can be reopened freely. This will allow
+libublksrv to continue working as it opens/closes the fd early to
+determine if it is accessible. Does that sound any better?
 
-So at least we now have 2 different public filesystem corruptions traces with
-ext4 without the spin lock.
-
-[0] https://github.com/linux-kdevops/linux/tree/20250321-accel-ext4-bug
-
-  Luis
