@@ -1,248 +1,243 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9C0213E83
-	for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 14:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CA921148F
+	for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 14:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743430266; cv=none; b=tLrIlZDEPfeP2EMw48QzMOdu8Dab8t4HaGKgsLaCEShrRhoQyBHcUfJbVuI2WQU0nlv7Jh49hqnGSJQNTDhvTX9Q9RxmC6RGAnCOVqVB6S6+5FegSa0DjuWW68PLYiIwQdASiz9+hTFV0G6/EoPNzw9bW4JWPGMMSUeJuEw5NfA=
+	t=1743430643; cv=none; b=jyPIXQVKhbORd4Bk6m80xK0lKQ7nuhiIilVikCvrVukgHcJxBceJz7Pa+GcWnBGFSfA7dLCTV0WXao39NYzazlnia8Tq7eEv4AXEpfOKRNRjOKBV/6v64Kp8kZ7MW0i1c5zWSHhbNUv3QojmXvHUqBZ5WYxSdTZE0RfnySG592w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743430266; c=relaxed/simple;
-	bh=o6YiP+hfdJ1vSNRtwyyAk/naULoqj66JwmyD1tDu4q8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OzZQZ9bZt2LuHF4eBB2BDtrUO9ALKjZPiA1BDSLnjBhPT9ZjezRFFxJWxoLbtrJHWz10yncuK+Ng8uEw16T1NsOnO6mrNeESrIom/iSPFESogOhTcVnBQ4t3s58nGeddmC2HQpp5JLK01EcDF58RitY7TnInC80Njrp9FKE24s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kycF3tPT; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kycF3tPT"
-Message-ID: <d9a00203-a744-4d9e-b86a-51703e1a135a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743430252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WY9rTWqlWYUdXrsjV4+jqRxNBOZeu76XLfJnw4sSWRc=;
-	b=kycF3tPT9QrKetZdCxdw8Hlpcrq3xkS3oFLWKWa4AZVtrJ4rQAVk9v3GoOnPUA9EF74lrD
-	BhLnfNE+2PVHO3zW4vlovcYDPzHBaQ2nv6v3APhj0iOtCRlB2CyIVHNZ8scBr3+FPTw2nZ
-	jlGDcxcw5Wva4Q9iOHNHjHpWiR+6XOs=
-Date: Mon, 31 Mar 2025 16:10:47 +0200
+	s=arc-20240116; t=1743430643; c=relaxed/simple;
+	bh=bNUiw3kjNnY54qfS00GYE+/p+kWr3Rqi1g0RrhSOrSw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZCqkaLs2+Tv7bHMWB6dURxgqS3bDhY1DjWhovkqvYoSZrTMtCh0KXcEcUcu9yH/N13OnxZGmN7F7ThRqUqqZchl0oOblKG76wuXGeld8Zcpq5xxKpC8jgHtozh87Eb13BT32WdZ4L2r/kGiZGweP6CYBHKANWk3T8s+s+Tbl7L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d5d6c997d2so29952325ab.0
+        for <linux-block@vger.kernel.org>; Mon, 31 Mar 2025 07:17:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743430641; x=1744035441;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SEnLau8C9yTFjycIROrk+DLt+cGTsSvTqjUBAy0+9oM=;
+        b=hcWuQONlLHNU/2oOFhEKzt8pJDyVQ1MmDCFlEdckp/fMcSv36MRNBlFIC+fQN3WXMY
+         M1pAEfH9Gg/rpYQwotfTkXtLrhKGJiANuN6BfjTC39QVdobczxkdBGqn1Baruox6tG5K
+         pQneEjKHWLvWUX0/JmV21UXwnxoox2p8hBbPVJCMuKq6qZx+2YTgFYSnf5EO8XRh/Njm
+         K4qbE2wZawUUq4X/ja/f/e5dzAOQWQYp6pVQPAJW/VRYGmXg2hq9gkRJNWv/66fjg/Op
+         SN0bNc9zm9ZD+NikP5sgAZu+uF7/OS1L7YA4ZoV+BypKlWEvJD9z+uL2atapxTuFWOPJ
+         nHvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXd65uX0xR8TzTAB4jqk8MpwnWVTaOzYPhziFkstAcb0hkPRTFGJvlMiYfE5VZ6ZZFYWjn+jqVG2exqlQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqFsy1oHi2jnWJs6ssytmW942D1QZdxt0YZK18VNSbkV2pZcjZ
+	vEU1dhFJlPFwR95vgsE8SNuYHFDmt2tbjuTt8r74AFBPgv+W8C9XdawL2f4g+QhekP9nvCAApdZ
+	mM/cbbTTm0EX5W/bvmyd1XwYP1aQiA6VCv3dhTKXig7Iy+aUix/a1FL8=
+X-Google-Smtp-Source: AGHT+IE7qRDCDADzm3Rs83YYCtT1kPEmyIjVagY0VJ9AgQwZJ53xPbur/iphBcMlqyyotQm58dcMF4xMb5s/WfVS0KzCtCTHIZuI
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH V4 for-6.10/block] loop: Fix a race between loop detach
- and loop open
-To: Gulam Mohamed <gulam.mohamed@oracle.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: yukuai1@huaweicloud.com, hch@lst.de, axboe@kernel.dk
-References: <20240607190607.17705-1-gulam.mohamed@oracle.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240607190607.17705-1-gulam.mohamed@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:216a:b0:3d3:ddb3:fe4e with SMTP id
+ e9e14a558f8ab-3d5e09344f1mr86852135ab.13.1743430640947; Mon, 31 Mar 2025
+ 07:17:20 -0700 (PDT)
+Date: Mon, 31 Mar 2025 07:17:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67eaa3f0.050a0220.3c3d88.0045.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in queue_requests_store
+From: syzbot <syzbot+48928935f5008dde0a41@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 07.06.24 21:06, Gulam Mohamed wrote:
-> 1. Userspace sends the command "losetup -d" which uses the open() call
->     to open the device
-> 2. Kernel receives the ioctl command "LOOP_CLR_FD" which calls the
->     function loop_clr_fd()
-> 3. If LOOP_CLR_FD is the first command received at the time, then the
->     AUTOCLEAR flag is not set and deletion of the
->     loop device proceeds ahead and scans the partitions (drop/add
->     partitions)
-> 
->          if (disk_openers(lo->lo_disk) > 1) {
->                  lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
->                  loop_global_unlock(lo, true);
->                  return 0;
->          }
-> 
->   4. Before scanning partitions, it will check to see if any partition of
->      the loop device is currently opened
->   5. If any partition is opened, then it will return EBUSY:
-> 
->      if (disk->open_partitions)
->                  return -EBUSY;
->   6. So, after receiving the "LOOP_CLR_FD" command and just before the above
->      check for open_partitions, if any other command
->      (like blkid) opens any partition of the loop device, then the partition
->      scan will not proceed and EBUSY is returned as shown in above code
->   7. But in "__loop_clr_fd()", this EBUSY error is not propagated
->   8. We have noticed that this is causing the partitions of the loop to
->      remain stale even after the loop device is detached resulting in the
->      IO errors on the partitions
-> Fix:
-> Defer the detach of loop device to release function, which is called
-> when the last close happens, by setting the lo_flags to LO_FLAGS_AUTOCLEAR
-> at the time of detach i.e in loop_clr_fd() function.
-> 
-> Test case involves the following two scripts:
-> 
-> script1.sh:
-> 
-> while [ 1 ];
-> do
->          losetup -P -f /home/opt/looptest/test10.img
->          blkid /dev/loop0p1
-> done
-> 
-> script2.sh:
-> 
-> while [ 1 ];
-> do
->          losetup -d /dev/loop0
-> done
-> 
-> Without fix, the following IO errors have been observed:
-> 
-> kernel: __loop_clr_fd: partition scan of loop0 failed (rc=-16)
-> kernel: I/O error, dev loop0, sector 20971392 op 0x0:(READ) flags 0x80700
->          phys_seg 1 prio class 0
-> kernel: I/O error, dev loop0, sector 108868 op 0x0:(READ) flags 0x0
->          phys_seg 1 prio class 0
-> kernel: Buffer I/O error on dev loop0p1, logical block 27201, async page
->          read
-> 
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+Hello,
 
-This is for v6.10 stable, should add "Cc: stable@vger.kernel.org"?
-So the engineers who work the stable branch can find this commit and 
-apply it?
+syzbot found the following issue on:
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+HEAD commit:    1a9239bb4253 Merge tag 'net-next-6.15' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15f16bb0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c7163a109ac459a8
+dashboard link: https://syzkaller.appspot.com/bug?extid=48928935f5008dde0a41
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c1e198580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=158cfa4c580000
 
-Zhu Yanjun
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fc7dc9f0d9a7/disk-1a9239bb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f555a3ae03d3/vmlinux-1a9239bb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/55f6ea74eaf2/bzImage-1a9239bb.xz
 
-> ---
-> v4<-v3:
-> 1. Defer the loop detach to last close of loop device
-> 2. Removed the use of lo_open due to following reasons:
-> 
-> Setting the lo_state to Lo_rundown in loop_clr_fd() may not help in
-> stopping the incoming open(), when the loop is being detached, as the
-> open() could invoke the lo_open() before the lo_state is set to Lo_rundown
-> and increment the disk_openers refcnt later.
-> As the actual cleanup is deferred to last close, in release, there is no
-> chance for the open() to kick in to take the reference. Because both open()
-> and release() are protected by open_mutex and hence they cannot run in
-> parallel.
-> So, lo_open() and setting lo_state to Lo_rundown is not needed. Removing
-> the loop state Lo_rundown as its not used anymore.
-> 
->   drivers/block/loop.c | 44 ++++++++------------------------------------
->   1 file changed, 8 insertions(+), 36 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 28a95fd366fe..4936cadc1a63 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -41,7 +41,6 @@
->   enum {
->   	Lo_unbound,
->   	Lo_bound,
-> -	Lo_rundown,
->   	Lo_deleting,
->   };
->   
-> @@ -1131,7 +1130,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   	return error;
->   }
->   
-> -static void __loop_clr_fd(struct loop_device *lo, bool release)
-> +static void __loop_clr_fd(struct loop_device *lo)
->   {
->   	struct file *filp;
->   	gfp_t gfp = lo->old_gfp_mask;
-> @@ -1139,14 +1138,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
->   	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
->   		blk_queue_write_cache(lo->lo_queue, false, false);
->   
-> -	/*
-> -	 * Freeze the request queue when unbinding on a live file descriptor and
-> -	 * thus an open device.  When called from ->release we are guaranteed
-> -	 * that there is no I/O in progress already.
-> -	 */
-> -	if (!release)
-> -		blk_mq_freeze_queue(lo->lo_queue);
-> -
->   	spin_lock_irq(&lo->lo_lock);
->   	filp = lo->lo_backing_file;
->   	lo->lo_backing_file = NULL;
-> @@ -1164,8 +1155,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
->   	mapping_set_gfp_mask(filp->f_mapping, gfp);
->   	/* This is safe: open() is still holding a reference. */
->   	module_put(THIS_MODULE);
-> -	if (!release)
-> -		blk_mq_unfreeze_queue(lo->lo_queue);
->   
->   	disk_force_media_change(lo->lo_disk);
->   
-> @@ -1180,11 +1169,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
->   		 * must be at least one and it can only become zero when the
->   		 * current holder is released.
->   		 */
-> -		if (!release)
-> -			mutex_lock(&lo->lo_disk->open_mutex);
->   		err = bdev_disk_changed(lo->lo_disk, false);
-> -		if (!release)
-> -			mutex_unlock(&lo->lo_disk->open_mutex);
->   		if (err)
->   			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
->   				__func__, lo->lo_number, err);
-> @@ -1232,25 +1217,8 @@ static int loop_clr_fd(struct loop_device *lo)
->   		loop_global_unlock(lo, true);
->   		return -ENXIO;
->   	}
-> -	/*
-> -	 * If we've explicitly asked to tear down the loop device,
-> -	 * and it has an elevated reference count, set it for auto-teardown when
-> -	 * the last reference goes away. This stops $!~#$@ udev from
-> -	 * preventing teardown because it decided that it needs to run blkid on
-> -	 * the loopback device whenever they appear. xfstests is notorious for
-> -	 * failing tests because blkid via udev races with a losetup
-> -	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
-> -	 * command to fail with EBUSY.
-> -	 */
-> -	if (disk_openers(lo->lo_disk) > 1) {
-> -		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
-> -		loop_global_unlock(lo, true);
-> -		return 0;
-> -	}
-> -	lo->lo_state = Lo_rundown;
-> +	lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
->   	loop_global_unlock(lo, true);
-> -
-> -	__loop_clr_fd(lo, false);
->   	return 0;
->   }
->   
-> @@ -1724,15 +1692,19 @@ static void lo_release(struct gendisk *disk)
->   	if (disk_openers(disk) > 0)
->   		return;
->   
-> +	/*
-> +	 * Clear the backing device information if this is the last close of
-> +	 * a device that's been marked for auto clear, or on which LOOP_CLR_FD
-> +	 * has been called.
-> +	 */
->   	mutex_lock(&lo->lo_mutex);
->   	if (lo->lo_state == Lo_bound && (lo->lo_flags & LO_FLAGS_AUTOCLEAR)) {
-> -		lo->lo_state = Lo_rundown;
->   		mutex_unlock(&lo->lo_mutex);
->   		/*
->   		 * In autoclear mode, stop the loop thread
->   		 * and remove configuration after last close.
->   		 */
-> -		__loop_clr_fd(lo, true);
-> +		__loop_clr_fd(lo);
->   		return;
->   	}
->   	mutex_unlock(&lo->lo_mutex);
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+48928935f5008dde0a41@syzkaller.appspotmail.com
 
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-syzkaller-05877-g1a9239bb4253 #0 Not tainted
+------------------------------------------------------
+syz-executor161/5834 is trying to acquire lock:
+ffff8881437b1958 (&q->elevator_lock){+.+.}-{4:4}, at: queue_requests_store+0x1c7/0x310 block/blk-sysfs.c:80
+
+but task is already holding lock:
+ffff8881437b1428 (&q->q_usage_counter(io)#29){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&q->q_usage_counter(io)#29){++++}-{0:0}:
+       blk_alloc_queue+0x619/0x760 block/blk-core.c:461
+       blk_mq_alloc_queue+0x179/0x290 block/blk-mq.c:4349
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
+       loop_add+0x496/0xb70 drivers/block/loop.c:2067
+       loop_init+0x164/0x270 drivers/block/loop.c:2302
+       do_one_initcall+0x120/0x6e0 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 (fs_reclaim){+.+.}-{0:0}:
+       __fs_reclaim_acquire mm/page_alloc.c:3853 [inline]
+       fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:3867
+       might_alloc include/linux/sched/mm.h:318 [inline]
+       xa_insert include/linux/xarray.h:783 [inline]
+       blk_mq_init_hctx block/blk-mq.c:3924 [inline]
+       blk_mq_alloc_and_init_hctx+0x503/0x11c0 block/blk-mq.c:4457
+       blk_mq_realloc_hw_ctxs+0x8f6/0xc00 block/blk-mq.c:4486
+       blk_mq_init_allocated_queue+0x3af/0x1230 block/blk-mq.c:4540
+       blk_mq_alloc_queue+0x1c2/0x290 block/blk-mq.c:4353
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
+       loop_add+0x496/0xb70 drivers/block/loop.c:2067
+       loop_init+0x164/0x270 drivers/block/loop.c:2302
+       do_one_initcall+0x120/0x6e0 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (&q->elevator_lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3166 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+       validate_chain kernel/locking/lockdep.c:3909 [inline]
+       __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+       lock_acquire kernel/locking/lockdep.c:5866 [inline]
+       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+       __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+       __mutex_lock+0x19a/0xb00 kernel/locking/mutex.c:732
+       queue_requests_store+0x1c7/0x310 block/blk-sysfs.c:80
+       queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
+       sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
+       kernfs_fop_write_iter+0x349/0x510 fs/kernfs/file.c:334
+       iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
+       do_splice_from fs/splice.c:935 [inline]
+       direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
+       splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+       do_splice_direct_actor fs/splice.c:1201 [inline]
+       do_splice_direct+0x174/0x240 fs/splice.c:1227
+       do_sendfile+0xafd/0xe50 fs/read_write.c:1368
+       __do_sys_sendfile64 fs/read_write.c:1429 [inline]
+       __se_sys_sendfile64 fs/read_write.c:1415 [inline]
+       __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter(io)#29
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#29);
+                               lock(fs_reclaim);
+                               lock(&q->q_usage_counter(io)#29);
+  lock(&q->elevator_lock);
+
+ *** DEADLOCK ***
+
+5 locks held by syz-executor161/5834:
+ #0: ffff88803625a420 (sb_writers#7){.+.+}-{0:0}, at: splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+ #1: ffff888028f3e488 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x287/0x510 fs/kernfs/file.c:325
+ #2: ffff888022fb55a8 (kn->active#47){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x510 fs/kernfs/file.c:326
+ #3: ffff8881437b1428 (&q->q_usage_counter(io)#29){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+ #4: ffff8881437b1460 (&q->q_usage_counter(queue)#20){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5834 Comm: syz-executor161 Not tainted 6.14.0-syzkaller-05877-g1a9239bb4253 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2079
+ check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2211
+ check_prev_add kernel/locking/lockdep.c:3166 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+ validate_chain kernel/locking/lockdep.c:3909 [inline]
+ __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+ lock_acquire kernel/locking/lockdep.c:5866 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+ __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+ __mutex_lock+0x19a/0xb00 kernel/locking/mutex.c:732
+ queue_requests_store+0x1c7/0x310 block/blk-sysfs.c:80
+ queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
+ sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
+ kernfs_fop_write_iter+0x349/0x510 fs/kernfs/file.c:334
+ iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
+ do_splice_from fs/splice.c:935 [inline]
+ direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
+ splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
+ do_splice_direct_actor fs/splice.c:1201 [inline]
+ do_splice_direct+0x174/0x240 fs/splice.c:1227
+ do_sendfile+0xafd/0xe50 fs/read_write.c:1368
+ __do_sys_sendfile64 fs/read_write.c:1429 [inline]
+ __se_sys_sendfile64 fs/read_write.c:1415 [inline]
+ __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f5e82d252e9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe14bb84d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+RAX: ffffffffffffffda RBX: 00007ffe14bb86a8 RCX: 00007f5e82d252e9
+RDX: 0000000000000000 RSI: 0000000000000003 RDI: 0000000000000003
+RBP: 00007f5e82d98610 R08: 0000000000000000 R09: 00007ffe14bb86a8
+R10: 0000000000000002 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffe14bb8698 R14: 0000000000000001 R15: 0000000
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
