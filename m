@@ -1,97 +1,173 @@
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBEC2F3B
-	for <linux-block@vger.kernel.org>; Tue,  1 Apr 2025 07:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3A11F17F7
+	for <linux-block@vger.kernel.org>; Tue,  1 Apr 2025 10:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743493667; cv=none; b=d0ny9fHbCN1moUw1ghsL+CSTMDcrmH/Oz2aM7ZX/brsF/bIFDRn17PXq8b1dlWBvCixN7H0U3QtFk+boYiB2PjXRmE/l85CuS3Kj8ygTWDhfzLFCDMWCf4lZW9tSYpimlZTaicqFFcX4E0IGrYRxEptrkPfkiJC5EkC8Qstn8Mw=
+	t=1743505061; cv=none; b=qtTRBa4KCYN2McxseinLUqyUOXqqHA0YfurVUE8MGsPyzLaRlj5LttK9DoXy2rovscXrWwKrj14H/xBdkRZZLE64gIUSHWocVADStLX7d+1i6WpnxxDe/RCl9NQfk+C3cgbkMyhnbUdPS7S6o2h62KJF4yziQtzd7ybuKjgiQqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743493667; c=relaxed/simple;
-	bh=KjhNRR9mMoGhC9XVVEq+YwwobekdUMI2ChK5QI1pf6c=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Qh5DGbzb349eX4Azff7YQP/3EsBAcFx12fPNKt0erV9tXNZ/wXMXusO3DfC8DbM3LiZQaQ+2oSYiF4E/jLBWI9PxFOyHn1d4cKh9U2fQIlo/mO/dOueAkLLkM4Ehf+2+EWeeWuiELBTRCm8DpjODlq4/cS7QqA8I96SpxnTl1n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-	by 156.147.23.53 with ESMTP; 1 Apr 2025 16:17:41 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: chanho.min@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
-	by 156.147.1.121 with ESMTP; 1 Apr 2025 16:17:41 +0900
-X-Original-SENDERIP: 10.178.31.96
-X-Original-MAILFROM: chanho.min@lge.com
-From: Chanho Min <chanho.min@lge.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Sven <dm-devel@schwermer.no>,
-	Gunho Lee <gunho.lee@lge.com>,
-	Chanho Min <chanho.min@lge.com>
-Subject: [PATCH] block: restrict blk_lookup_devt non-existent partition return to MD devices
-Date: Tue,  1 Apr 2025 16:17:28 +0900
-Message-Id: <20250401071728.16030-1-chanho.min@lge.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1743505061; c=relaxed/simple;
+	bh=XTf5mAip32mtaZ16/701wMBkZimOdpWCwHnLEFEz5fE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7IKWoDpcdpO3dZhgy1BxDe2CZcQlsfSQMN8qPPRkY599iAELw+U7EK5jd1Iqlm0mSwaYDFL4O6Vap1xMmZqGPOP6HHAMWaLVov4YwPrWeqkBQ8cudgWcgGufOE/CWN5Ur7J9Ioqj9aJy0wTSqYbimLeJiMChb3dTS/ZfUDBwbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=L8P+rHYu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Zu3GfSkV; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=L8P+rHYu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Zu3GfSkV; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="L8P+rHYu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Zu3GfSkV";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="L8P+rHYu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Zu3GfSkV"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4B8121F38E;
+	Tue,  1 Apr 2025 10:57:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1743505058; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J5ks00aa614wqMqQeQ7qxtJzPV9hhH3xCwXQ795wViE=;
+	b=L8P+rHYuPSWVevuIOQ+uMRIuQqnbnQ6j/kw/cvnoq3qhGXJPMJNGYS+EFHOyUj2ts37lEq
+	VhVqpHPUfQ6neX2U/smIsVexEn9Q2UhGhWQMvMjciQ5GK/LEPXN5vnadNxFoJ1FB9tRPeo
+	/aG4bpXxcRV592m1pstYHo3A0bfjsQE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1743505058;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J5ks00aa614wqMqQeQ7qxtJzPV9hhH3xCwXQ795wViE=;
+	b=Zu3GfSkVTh1ZSw7YNuHUhugCvDPA6n0OcaCvV90fRCiKAF54mbocG5V/Y7vrxzxj6ZbTOo
+	Vrxjl1A/WaB4j7BQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1743505058; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J5ks00aa614wqMqQeQ7qxtJzPV9hhH3xCwXQ795wViE=;
+	b=L8P+rHYuPSWVevuIOQ+uMRIuQqnbnQ6j/kw/cvnoq3qhGXJPMJNGYS+EFHOyUj2ts37lEq
+	VhVqpHPUfQ6neX2U/smIsVexEn9Q2UhGhWQMvMjciQ5GK/LEPXN5vnadNxFoJ1FB9tRPeo
+	/aG4bpXxcRV592m1pstYHo3A0bfjsQE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1743505058;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J5ks00aa614wqMqQeQ7qxtJzPV9hhH3xCwXQ795wViE=;
+	b=Zu3GfSkVTh1ZSw7YNuHUhugCvDPA6n0OcaCvV90fRCiKAF54mbocG5V/Y7vrxzxj6ZbTOo
+	Vrxjl1A/WaB4j7BQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 340FD13691;
+	Tue,  1 Apr 2025 10:57:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id o3JuDKLG62cSHgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 01 Apr 2025 10:57:38 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id AFC06A07E6; Tue,  1 Apr 2025 12:57:37 +0200 (CEST)
+Date: Tue, 1 Apr 2025 12:57:37 +0200
+From: Jan Kara <jack@suse.cz>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, jack@suse.cz, tytso@mit.edu, 
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, riel@surriel.com, 
+	willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com, dave@stgolabs.net, 
+	david@redhat.com, axboe@kernel.dk, hare@suse.de, david@fromorbit.com, 
+	djwong@kernel.org, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com, 
+	da.gomez@samsung.com
+Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
+ __find_get_block_slow()
+Message-ID: <lj6o73q6nev776uvy7potqrn5gmgtm4o2cev7dloedwasxcsmn@uanvqp3sm35p>
+References: <20250330064732.3781046-1-mcgrof@kernel.org>
+ <20250330064732.3781046-3-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250330064732.3781046-3-mcgrof@kernel.org>
+X-Spam-Score: -2.30
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,suse.cz,mit.edu,dilger.ca,vger.kernel.org,surriel.com,infradead.org,cmpxchg.org,intel.com,stgolabs.net,redhat.com,kernel.dk,suse.de,fromorbit.com,gmail.com,kvack.org,samsung.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-We have observed occasional failures in dm-init due to dm-mod.waitfor not
-working as expected when partitions are not yet ready. This issue was
-raised in a discussion on the mailing list:
-https://lore.kernel.org/all/e746b8b5-c04c-4982-b4bc-0fa240742755@schwermer.no/T/
-but has remained unresolved since then.
+On Sat 29-03-25 23:47:31, Luis Chamberlain wrote:
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index c7abb4a029dc..a4e4455a6ce2 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -208,6 +208,15 @@ __find_get_block_slow(struct block_device *bdev, sector_t block)
+>  	head = folio_buffers(folio);
+>  	if (!head)
+>  		goto out_unlock;
+> +
+> +	if (folio->mapping->a_ops->migrate_folio &&
+> +	    folio->mapping->a_ops->migrate_folio == buffer_migrate_folio_norefs) {
 
-The root cause was identified in blk_lookup_devt(), which returns a dev_t
-even for non-existent partitions, a behavior introduced by commit
-41b8c853a495 ("block: fix booting from partitioned md array"). This
-change was intended to support MD RAID devices, where partitions may not
-be available during early boot, allowing the system to proceed and detect
-them later.
+This is always true for bdev mapping we have here, isn't it?
 
-However, this behavior conflicts with cases like dm-init's waitfor
-mechanism, where an accurate dev_t for an existing partition is required.
-Returning a dev_t for non-existent partitions should be a special case
-(e.g., MD devices), while most scenarios, including Device Mapper, expect
-blk_lookup_devt() to reflect the actual partition state.
+> +		if (folio_test_lru(folio) &&
 
-To address this without major structural changes, this patch restricts the
-non-existent partition dev_t return to MD devices. For other devices,
-blk_lookup_devt() will only return a dev_t if the partition exists.
-With this change, dm-mod.waitfor works correctly, resolving the dm-init failures.
+Do you expect bdev page cache to contain non-LRU folios? I thought every
+pagecache folio is on LRU so this seems pointless as well? But I may be
+missing something here.
 
-Signed-off-by: Chanho Min <chanho.min@lge.com>
----
- block/early-lookup.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> +		    folio_test_locked(folio) &&
+> +		    !folio_test_writeback(folio))
+> +			goto out_unlock;
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 3fb57f7d2b127..39a32a0fe7aab 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -5,6 +5,7 @@
-  */
- #include <linux/blkdev.h>
- #include <linux/ctype.h>
-+#include <linux/major.h>
- 
- struct uuidcmp {
- 	const char *uuid;
-@@ -133,10 +134,9 @@ static dev_t __init blk_lookup_devt(const char *name, int partno)
- 
- 		if (strcmp(dev_name(dev), name))
- 			continue;
--
--		if (partno < disk->minors) {
-+		if (partno < disk->minors && MAJOR(dev->devt) == MD_MAJOR) {
- 			/* We need to return the right devno, even
--			 * if the partition doesn't exist yet.
-+			 * if the partition doesn't exist yet.(for MD devices)
- 			 */
- 			devt = MKDEV(MAJOR(dev->devt),
- 				     MINOR(dev->devt) + partno);
+I find this problematic. It fixes the race with migration, alright
+(although IMO we should have a comment very well explaining the interplay
+of folio lock and mapping->private_lock to make this work - probably in
+buffer_migrate_folio_norefs() - and reference it from here), but there are
+places which expect that if __find_get_block() doesn't return anything,
+this block is not cached in the buffer cache. And your change breaks this
+assumption. Look for example at write_boundary_block(), that will fail to
+write the block it should write if it races with someone locking the folio
+after your changes. Similarly the code tracking state of deleted metadata
+blocks in fs/jbd2/revoke.c will fail to properly update buffer's state if
+__find_get_block() suddently starts returning NULL although the buffer is
+present in cache. 
+
+> +	}
+> +
+>  	bh = head;
+>  	do {
+>  		if (!buffer_mapped(bh))
+
+								Honza
 -- 
-2.17.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
