@@ -1,106 +1,224 @@
-Received: from mail-pl1-f231.google.com (mail-pl1-f231.google.com [209.85.214.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1022153CE
-	for <linux-block@vger.kernel.org>; Tue,  1 Apr 2025 20:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.231
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743540561; cv=none; b=YR41nc1oVTJssDu6y45yvjmyG7GGIQRhWQXCNCsu048ORshuxw6pv/ju5bYVASXX3STOH0e6eXkcxSf/1CXPuoYESF5myVGmE66r7c1beGQqUCFVDjarnS/Hss+jxee0NCCJH8UDv0EwuxEwqx2a1mjRXTPz5ox+yw5xpWLDPyc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743540561; c=relaxed/simple;
-	bh=30PV2+70FCQMUCz+gunbFAvwdSKP+yMM0OGPlJ/I0uY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=g+Pqp/lKTByeIki7PEWEakjdxABeGVfP1pKJTjpCqU4kR8Q8YMtfquzZRCNfMRy9E+fpeBR87MnLhv5XOdR/7a9zJ51V7guERZaSM5qqRgsaPglBJbmwDUz7cMjV3ZFjXeEfhabmg64wwTZDjl1IkuH3Pr+H9VWDh3F93vzer/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eOe4Qc5Z; arc=none smtp.client-ip=209.85.214.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915461E571A;
+	Tue,  1 Apr 2025 21:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.209.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743544199; cv=pass; b=cnf/bThPyqKxskh5l5ZFvAJAIWvIg6dXbJtkJaL4mvjAR98YDkQfVqeKJqU5r4dNt1MtnfxNdziJ2yMIrVTK39GGE9poff92p0exNEJWm44Gv5qNJBlA92kUpeoCrj4IBigKruFQZ3Hg/9KstoxaJo/otbiziepbQQ8HcR0Bamo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743544199; c=relaxed/simple;
+	bh=Ee7ZhrYrrPHbAR83ceWSSd6J0FdhYVvcZcaZgQUsS6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQccWjslaXpnmP+zCFp9bGz5Fp5m5oMgmx7BnerC716ZJfDQkBUK2KSbLA9utJYCHRZjFbp9zOIlEoOpZdRTBG3JZft2qyL6AAJB46TvH7u+x5FT3oNgKvaz4atotlaGFpTN8sS097TATHB7py955drHpD8unAows5jkZdtywjE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net; spf=pass smtp.mailfrom=stgolabs.net; dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b=Tpv1vXyP; arc=pass smtp.client-ip=23.83.209.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stgolabs.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eOe4Qc5Z"
-Received: by mail-pl1-f231.google.com with SMTP id d9443c01a7336-2295d78b45cso29979145ad.0
-        for <linux-block@vger.kernel.org>; Tue, 01 Apr 2025 13:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1743540557; x=1744145357; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mstT9j25mjz8aUy9IpCZAB9h1zoQsbNBC0c7IzzYKmM=;
-        b=eOe4Qc5ZL6PxBdceX4WZA0jY4bi3HOOTm0/symgIiB4WNyTjHs3G47jdkpEJZ4bZ/E
-         Mq1sg2WjUcPDnuGgHYCiviD2KBTt6RG+8SEqUlKlyq7Sn22CbkFRJkb26Nn5aeIYCCtw
-         txeJg+gN+1U70zPMXe2vLzJGsjybG0V3lJB6uKE5/nwpv2FZrZl7u6tNswAt2Sa38ter
-         +4wkb89FRx/+L4vqAC+Xcm/a44TyjUjRfsDwFhs4yiLNvcvXU9NTE0qJ4dkqXUkLcYzG
-         Vn+1OdI+dZ5NLL6LkwzX+N/VjVy94zX1GknIiLYko4Nkm4Bh3N+xiXOhG2zUAZK2tRUM
-         eRaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743540557; x=1744145357;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mstT9j25mjz8aUy9IpCZAB9h1zoQsbNBC0c7IzzYKmM=;
-        b=DRhjjl30sA25hwdVexrmKlQF4Mj5AbOjtAumPSCQuj5REAVSyEGp9+0GNqiLGFaZxz
-         AgdWAPjDG+6NMjZlTia5KnNTW1HCyl1DN+MSoPFzYuDg/T7HbwNXKaZetS5CGgk6cR2s
-         2a7a6+yM+PvKo1c0tPnfZupK0PXW19qsG33UV1eYuGc2RjPozFsFw5qYwD3gyOhNx8LE
-         8fbPALcOs7/bN+sLeZz9EyAfEKmPWfkTk37KMZtOC6K+5MrX7V49TDYuOlGacFg89Vmt
-         XHyV+WxEDvuo3QQU5VlEovdi4CBV0cBKjXL1HEMagZfSci+2sty80qtzxMXwqOJEZ7fn
-         ZY9Q==
-X-Gm-Message-State: AOJu0YyoDPFYI7z/Hoy0BL1sZi2fuyF0dClNOBgAJeWhvtxNbQ/rybqt
-	kQ1rgeRC0CQXmz/hTmVH+0ujLq+BQ7Z+j/dM5XXaaCjbV9SLl4ZTrmhiPq/N67V3pOP1O32BUnp
-	7O5o3IK55chHtorllw9t2OBRfP9Ucq9IRJnwi5eSZtZS54W4s
-X-Gm-Gg: ASbGncvDgYjl7H9GN6/HSG1ycCVXXsDYQDyhySMYhDvHr6hqD1bf8QYq3G4D6+55rYj
-	/sTccwmQAxI6xPjp4yANcZyWMF0lfnBNFHwXaj23/pf9Jk6ZuycSIfCakxIrLldMEa9kVcpkJvL
-	7A3ev5T1R4FcO4KEr5RCzeEiUzXjXeeHEcgbbo6pyaz00cIH5xsL3maIs1v9bHS21nE+OlABqOb
-	PqxZx+KQgj1ZS3fTVrfOZikk/wSWzrdmhsIIQyfYQhGBznCdLOa6wAXkBUjGApSa2iz8SrWGoxr
-	iHNLezSrxINPHr2n/yMptuwoIGxk2KIB2w4=
-X-Google-Smtp-Source: AGHT+IGs2poYi76n3mLJWXhUA0XPnz0aQSm3PIe6uqP21P4f4eb9jq7kzrwsD2tGzgMq7M/2nrRv9Bzd3IVu
-X-Received: by 2002:a05:6a00:3a1d:b0:736:3d7c:236c with SMTP id d2e1a72fcca58-739803990admr19199141b3a.14.1743540556836;
-        Tue, 01 Apr 2025 13:49:16 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-739710cb596sm757975b3a.20.2025.04.01.13.49.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 13:49:16 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 104C43400D7;
-	Tue,  1 Apr 2025 14:49:16 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 038EAE4034D; Tue,  1 Apr 2025 14:49:15 -0600 (MDT)
-From: Uday Shankar <ushankar@purestorage.com>
-Subject: [PATCH 0/2] ublk: fixes for selftests
-Date: Tue, 01 Apr 2025 14:49:07 -0600
-Message-Id: <20250401-ublk_selftests-v1-0-98129c9bc8bb@purestorage.com>
+	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="Tpv1vXyP"
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id B403E182C1C;
+	Tue,  1 Apr 2025 21:49:56 +0000 (UTC)
+Received: from pdx1-sub0-mail-a218.dreamhost.com (trex-1.trex.outbound.svc.cluster.local [100.125.203.131])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 24643182A7B;
+	Tue,  1 Apr 2025 21:49:56 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1743544196; a=rsa-sha256;
+	cv=none;
+	b=nichnOZxr1pyxuOeQ+iX6n/n3yRMk73ZWDnCx4p1tzBUqZWUjmZfJDXQe4BYVPooYiWPgo
+	iWR74060YGORvfdPgijP1hTCHX3tUfIb86pbA8RATZfs2p4xHpxF7dYuhKpCS7QvdONua0
+	Iyx6DvqnM70pyY37c2Y/ujeTOPnaUDNQf+b0egh9C4BEbs0JwPZfxK9DOpO60mkG/LaPoM
+	bde1WbyHb4F1xa+UI3yg+2WzwUQhUGXJSykoQrLkSgqci0iRg5N8jKQEdomEgCAqTi3xjz
+	tXDb4cW1YsBqoJUNjGtj3sUS8u4aXGBQZ1jK0zLsytHRkTyMdDroS0Kal1ToKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1743544196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=sGlWmBOhS2CwuQbgKM4hR9ROVp92Ooxj6PLZQlRbhm4=;
+	b=ye//Cm2L8aQZ0+DhVtlEacagJmMjBP2Tnx4d8fveuFzyQgd/7i6mACjRETwUKhR2WvYhdQ
+	sy/GwdwBJhWz7snEqwje0yfq7v8z8aF3ZoNeRHnmw0h1QwzUC5gQs+wCVt6yl7AsCTA3JR
+	jM7JXqg3wmQiZ1IvsNCUB1J1XGq71LHh7+2dnTBAqMBvGJedfi8KJncaVXIAbpc9/OldK2
+	I4c/XOodj9wT+AdyqfMdQlS89NDHG7LH7TGVHjb8Nut5ks8zkKcdqMr+AjPEO9BDDTLMXF
+	bZYlIi0hbHn1DODHX+OwFEURusTXdhQli6udQ1RZV2iI+thK1qel7y+dwbbxjg==
+ARC-Authentication-Results: i=1;
+	rspamd-7668cf9b8d-8g8x5;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
+X-MailChannels-Auth-Id: dreamhost
+X-Absorbed-Left: 768fd03f78a578da_1743544196578_3753900963
+X-MC-Loop-Signature: 1743544196578:1801671722
+X-MC-Ingress-Time: 1743544196578
+Received: from pdx1-sub0-mail-a218.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.125.203.131 (trex/7.0.3);
+	Tue, 01 Apr 2025 21:49:56 +0000
+Received: from offworld (ip72-199-50-187.sd.sd.cox.net [72.199.50.187])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dave@stgolabs.net)
+	by pdx1-sub0-mail-a218.dreamhost.com (Postfix) with ESMTPSA id 4ZS1r25qzFzK5;
+	Tue,  1 Apr 2025 14:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
+	s=dreamhost; t=1743544196;
+	bh=sGlWmBOhS2CwuQbgKM4hR9ROVp92Ooxj6PLZQlRbhm4=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=Tpv1vXyPmlYXrkZB6HH2lFjD1Ul4RH/H7pNsJmiOjDiQYQgb+QhJYhYsTB56Bu6cS
+	 FE6AiFUBIJpUFD8x1fdSHuRTdSpSdTe8pSUxKNIstEmp9FtRXRSdEMIJimM1EZHfQ0
+	 KbymcGPVJAId3EIfDw8vBX6yARkZm2mLaC09GmDfytO9rXlgpyi0850wK1JQadcuPK
+	 KZ2MY+1VUIIjsHnL7ZGOlyt9vPqITfPx060uUnGwaqklpbmyBdsOlnbIBEKYUCFToi
+	 MLRwfQc6zddBq7YHe06qwKlP9pxq9wZgb+8nU25wdnIXRb41VmMe+c/G9uuO6WGX4Y
+	 ZM8SdIs8UvRTg==
+Date: Tue, 1 Apr 2025 14:49:51 -0700
+From: Davidlohr Bueso <dave@stgolabs.net>
+To: Jan Kara <jack@suse.cz>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org, tytso@mit.edu,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
+	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
+	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com
+Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
+ __find_get_block_slow()
+Message-ID: <20250401214951.kikcrmu5k3q6qmcr@offworld>
+Mail-Followup-To: Jan Kara <jack@suse.cz>,
+	Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org,
+	tytso@mit.edu, adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
+	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
+	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com
+References: <20250330064732.3781046-1-mcgrof@kernel.org>
+ <20250330064732.3781046-3-mcgrof@kernel.org>
+ <lj6o73q6nev776uvy7potqrn5gmgtm4o2cev7dloedwasxcsmn@uanvqp3sm35p>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAENR7GcC/x3MQQqAIBBA0avErBPMmBZdJSIyxxoSC6ciiO6et
- HyL/x8QSkwCbfFAoouFt5hRlQVMyxhnUuyywWiDujaoThvWQSj4g+QQ1Ywa0Xk7IVrI0Z7I8/0
- Pu/59P8Y+ip1gAAAA
-X-Change-ID: 20250325-ublk_selftests-6a055dfbc55b
-To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <lj6o73q6nev776uvy7potqrn5gmgtm4o2cev7dloedwasxcsmn@uanvqp3sm35p>
+User-Agent: NeoMutt/20220429
 
-Fix a couple of issues I saw when developing selftests for ublk. These
-patches are split out from the following series:
+On Tue, 01 Apr 2025, Jan Kara wrote:
 
-https://lore.kernel.org/linux-block/20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com/T/#t
+>I find this problematic. It fixes the race with migration, alright
+>(although IMO we should have a comment very well explaining the interplay
+>of folio lock and mapping->private_lock to make this work - probably in
+>buffer_migrate_folio_norefs() - and reference it from here), but there are
+>places which expect that if __find_get_block() doesn't return anything,
+>this block is not cached in the buffer cache. And your change breaks this
+>assumption. Look for example at write_boundary_block(), that will fail to
+>write the block it should write if it races with someone locking the folio
+>after your changes. Similarly the code tracking state of deleted metadata
+>blocks in fs/jbd2/revoke.c will fail to properly update buffer's state if
+>__find_get_block() suddently starts returning NULL although the buffer is
+>present in cache.
 
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
----
-Uday Shankar (2):
-      selftests: ublk: kublk: use ioctl-encoded opcodes
-      selftests: ublk: kublk: fix an error log line
+Yeah - one thing I was thinking about, _iff_ failing lookups (__find_get_block()
+returning nil) during migration is in fact permitted, was adding a BH_migrate
+flag and serialize vs __buffer_migrate_folio() entirely. Semantically there
+are no users, and none are added during this window, but as a consequence I
+suppose one thread could see the page not cached, act upon that, then see it
+cached once the migration is done and get confused(?). So I don't see a problem
+here for write_boundary_block() specifically, but I'm probably overlooking others.
 
- tools/testing/selftests/ublk/kublk.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
----
-base-commit: 4cfcc398357b0fb3d4c97d47d4a9e3c0653b7903
-change-id: 20250325-ublk_selftests-6a055dfbc55b
+Now, if bailing on the lookup is not an option, meaning it must wait for the
+migration to complete, I'm not sure large folios will ever be compatible with
+the "Various filesystems appear to want __find_get_block to be non-blocking."
+comment.
 
-Best regards,
--- 
-Uday Shankar <ushankar@purestorage.com>
+So the below could be tucked in for norefs only (because this is about the addr
+space i_private_lock), but this also shortens the hold time; if that matters
+at all, of course, vs changing the migration semantics.
 
+Thanks,
+Davidlohr
+
+---8<----------------------------
+diff --git a/fs/buffer.c b/fs/buffer.c
+index cc8452f60251..f585339ae2e4 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -208,6 +208,14 @@ __find_get_block_slow(struct block_device *bdev, sector_t block)
+	head = folio_buffers(folio);
+	if (!head)
+		goto out_unlock;
++
++	bh = head;
++	do {
++		if (test_bit(BH_migrate, &bh->b_state))
++			goto out_unlock;
++		bh = bh->b_this_page;
++	} while (bh != head);
++
+	bh = head;
+	do {
+		if (!buffer_mapped(bh))
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 932139c5d46f..e956a1509a05 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -34,6 +34,7 @@ enum bh_state_bits {
+	BH_Meta,	/* Buffer contains metadata */
+	BH_Prio,	/* Buffer should be submitted with REQ_PRIO */
+	BH_Defer_Completion, /* Defer AIO completion to workqueue */
++	BH_migrate,     /* Buffer is being migrated */
+
+	BH_PrivateStart,/* not a state bit, but the first bit available
+			 * for private allocation by other entities
+diff --git a/mm/migrate.c b/mm/migrate.c
+index a073eb6c5009..0ffa8b478fd3 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -846,6 +846,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
+	if (!buffer_migrate_lock_buffers(head, mode))
+		return -EAGAIN;
+
++	bh = head;
++	do {
++		set_bit(BH_migrate, &bh->b_state);
++		bh = bh->b_this_page;
++	} while (bh != head);
++
+	if (check_refs) {
+		bool busy;
+		bool invalidated = false;
+@@ -861,12 +867,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
+			}
+			bh = bh->b_this_page;
+		} while (bh != head);
++		spin_unlock(&mapping->i_private_lock);
+		if (busy) {
+			if (invalidated) {
+				rc = -EAGAIN;
+				goto unlock_buffers;
+			}
+-			spin_unlock(&mapping->i_private_lock);
+			invalidate_bh_lrus();
+			invalidated = true;
+			goto recheck_buffers;
+@@ -884,10 +890,9 @@ static int __buffer_migrate_folio(struct address_space *mapping,
+	} while (bh != head);
+
+  unlock_buffers:
+-	if (check_refs)
+-		spin_unlock(&mapping->i_private_lock);
+	bh = head;
+	do {
++		clear_bit(BH_migrate, &bh->b_state)
+		unlock_buffer(bh);
+		bh = bh->b_this_page;
+	} while (bh != head);
