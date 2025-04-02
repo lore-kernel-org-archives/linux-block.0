@@ -1,193 +1,126 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF68D20E6E3
-	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 07:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A15523370F
+	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 07:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743580571; cv=none; b=qk0u4WGqAzAC4niTRGnDx5f3FVPDfPzPR12p5QO+2mzOWgKZlL7h3KnvTfK5nri72dOs90DfdN10AnQOjP/ZL1TusSUnMoq5B36axt4RiXi4YR1oTjlGZGCAWHuW82TlCrcgQaphtPUu5EeMmZzGfJHEmH8ONJudO+FWrU+AQ8s=
+	t=1743580711; cv=none; b=d0nHnHeNDPH3wp1AsdomGvwM/AwmwCzty47T8236AFVs6PY5ItAO41pDeDTl/4fsSRm8V8ZzNWLBQiKSs5WlVClrj/k77wRed4u+KV9l10gqOMg+CqWk/RP+RfqrR97VJtgSW8CWDzrzzFhlQp6RwD4eck/ybFrrfAqO/VoI0Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743580571; c=relaxed/simple;
-	bh=Ou788sx8A2FJ8/HN40a66FBRR0H5TxeBkoErVg9X6b4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kESeMYARWkxj2PzV1lj3X2AO/VC0krgnkML7WTHi2fJiTPDUYjOGaNz9kYQJ/LF1axRQapi8UOyscIq8DNgvO8c85Aq8E1/RYBSny641tB3RrkJCs+9RmbNCmQtbveRICgFPVNOctoMu4wFWvwSGARicKoeMrnzQPHho/Nbj5Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1bIcVXN; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1743580711; c=relaxed/simple;
+	bh=xNZG4kFoGbGB7pheqiYG3iEXKZBGzv6hERVCUWp27mQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GNQUxGi+9UiaTAoVm4VRd/iDFVGhX9DY0p2u7ZANv3cQ4eni7tLRndV6LH4O73qwp5oUVMhAoE1B9BahgZ+uDPfHkM1nalsSP9ZIP6AftoU+Lem/QE+X1cuI5j3idiJWXtqRHya8XrX3rB8zv2Sv/Pn0tP1K/zSkajyTqpXiIGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GCrw+/qy; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1bIcVXN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCrw+/qy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743580568;
+	s=mimecast20190719; t=1743580708;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cD4MFjDtRCW0qD573Lgja3Ag6OzkUK9cUOpFGWRN2vY=;
-	b=I1bIcVXNVGZ14BV+eD25xK5ZO/zR+YOKzR3sZ6n72SbsTk6F94rfHNH+uE20X5xnzl1CY0
-	iJDaZqVF+nQik/mUoc6XxCw+KWIUFj5kPnXfiU0/ypOp0wi8htB/VCJwF+k+PptikoCCSy
-	5hnkdXDMdIvvCEGR2srqe9RaZGZPa2g=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-P2iQS-ofMpiCrfJmsleAaw-1; Wed,
- 02 Apr 2025 03:56:04 -0400
-X-MC-Unique: P2iQS-ofMpiCrfJmsleAaw-1
-X-Mimecast-MFC-AGG-ID: P2iQS-ofMpiCrfJmsleAaw_1743580563
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF9C91800A36;
-	Wed,  2 Apr 2025 07:56:02 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.32])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6858D195609D;
-	Wed,  2 Apr 2025 07:55:57 +0000 (UTC)
-Date: Wed, 2 Apr 2025 15:55:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
-	Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 1/3] block: add blk_mq_enter_no_io() and
- blk_mq_exit_no_io()
-Message-ID: <Z-zthxEKJg_kZqgg@fedora>
-References: <20250402043851.946498-1-ming.lei@redhat.com>
- <20250402043851.946498-2-ming.lei@redhat.com>
+	bh=xNZG4kFoGbGB7pheqiYG3iEXKZBGzv6hERVCUWp27mQ=;
+	b=GCrw+/qy9jjG9WfZJ6ZetWEFlSmpu1kH9nw3fDIoWmZGc7llmClIA8v3XdFSA+xE5xP4/X
+	xYQ6EMveU263xvM4CHHY2NXcLO8Vm7eugB1ypnnJiYOEOnc0TVjdQgankW4ED8B/o+y+2I
+	OB0j72ZagP5fo6O/SDatwd+PCWV2nZY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-jgAg7H7ENGumXsdO6LI8Qg-1; Wed, 02 Apr 2025 03:58:27 -0400
+X-MC-Unique: jgAg7H7ENGumXsdO6LI8Qg-1
+X-Mimecast-MFC-AGG-ID: jgAg7H7ENGumXsdO6LI8Qg_1743580707
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e6a64bd1ecso5220055a12.2
+        for <linux-block@vger.kernel.org>; Wed, 02 Apr 2025 00:58:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743580706; x=1744185506;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xNZG4kFoGbGB7pheqiYG3iEXKZBGzv6hERVCUWp27mQ=;
+        b=kdg6GuL3t//vdy1ef8z/YFCkVqeAvbOhTTRcKMXkdaRhVaHhY+Ht6TJuguqxhoOHs7
+         ZTbvfxD8HRo8gWlCEAQTMsvSW7U6VnjOx0maL7bB8xruutIQIpbzgXr6pMkNudiA+wxK
+         2v/wfEmA/Dlfaa1T17Xn2RzYNZGItvH+Jqw5ub3cXYep/zv6jTlQXXOngHMNIFXykUvU
+         ssPGfQAOhbocVa1cjGaZaQCrJICkYftlVM02Vq6RIdt+VHqNSMGhAGEhDFRt2onB1O/z
+         47haRMZtyu6QLJwD23g8xrfZo+5yiUYkOKzcs4JR5Z2cZjfzvKCj74ETWSsuiMkIJSQ4
+         zUKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQtvhNdKZusWRa+7DUMuSjqPWWpHevB7VADPR5ZKJ5raIZEeb2XAlA3IepFKP4bZjxKzF3ZSWQryzITQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcKEh0sjuNtRDKFrtw7BjkuHyAuMeQWm6AEjZU3wD7eJGU4E68
+	mJaqYtCsLw72emC2JFjcVNP06L24Af2DB3LuhG9e7tCGJuQ5Dxf3SlgDsEhTj6kAJf4foK8B6gX
+	KnPukz6XwFLwxQRZWt/+ucNbXwrOtlwc9+P+VzQ3cG6b2XE3Nd983ezuC1Xud
+X-Gm-Gg: ASbGncsVMIjc+MMWfWQdxKBo3UdxrqmWSs8GCazo2veLHKaRKaep0sEtPiU/mLokI7Y
+	tlX174+CCPc+8yXhYqCYjfwm8L5HH/o8L1X5HzRFdfyeKHl2vA4kGVGq7hACvTdFwwnJrIbLGGS
+	lNvqoEV1aIvX72VnWNnNeq5XYwXfp6hjWodfu9tvw3uJ48HpeF5odrsXGyZkqpIP85aorHMtfHf
+	xYIVWl9pVN0KA4WXyJJNdf5BixFPTiUf7FnBL+fOPzpncxCbL0Qx3UN9OuwgmxxmYdnZEfwRyt7
+	5ERpwGqkW8KKgt/AiySdKamKTv3p1y2k36k6DQPxtTKyrcGkuDMst1CBh33hU7Hxa7/CqhGcHYO
+	N0ld285XX3B3bK+6wlLMEPIv9eVRwz56MG2rA/8NvUGirvi3kpPQ=
+X-Received: by 2002:a17:907:7215:b0:ac2:c06:ad9d with SMTP id a640c23a62f3a-ac7a16c1267mr109993866b.14.1743580706558;
+        Wed, 02 Apr 2025 00:58:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYj6cd0a2ZmOIrY2+9xoa0kFQ790CUzhth/mn7wiW3bHJ2mcwrNEVMrfPgd8xSJJfNJC6BBQ==
+X-Received: by 2002:a17:907:7215:b0:ac2:c06:ad9d with SMTP id a640c23a62f3a-ac7a16c1267mr109991066b.14.1743580706042;
+        Wed, 02 Apr 2025 00:58:26 -0700 (PDT)
+Received: from ?IPv6:2001:16b8:2d97:6a00:6929:a9f6:5863:aac5? (200116b82d976a006929a9f65863aac5.dip.versatel-1u1.de. [2001:16b8:2d97:6a00:6929:a9f6:5863:aac5])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac719223e1esm877349966b.7.2025.04.02.00.58.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Apr 2025 00:58:25 -0700 (PDT)
+Message-ID: <323da53fe2ec06c9cc5d1939a9e003c5bd2a0716.camel@redhat.com>
+Subject: Re: [PATCH 0/2] PCI: Remove pcim_iounmap_regions()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Philipp Stanner
+	 <phasta@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Bjorn
+ Helgaas <bhelgaas@google.com>, Mark Brown <broonie@kernel.org>, David
+ Lechner <dlechner@baylibre.com>, Damien Le Moal <dlemoal@kernel.org>, Yang
+ Yingliang <yangyingliang@huawei.com>, Zijun Hu <quic_zijuhu@quicinc.com>,
+ Hannes Reinecke <hare@suse.de>, Al Viro <viro@zeniv.linux.org.uk>, Li Zetao
+ <lizetao1@huawei.com>,  Anuj Gupta <anuj20.g@samsung.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-pci@vger.kernel.org
+Date: Wed, 02 Apr 2025 09:58:24 +0200
+In-Reply-To: <Z-U5vIbVDZLe9QnM@smile.fi.intel.com>
+References: <20250327110707.20025-2-phasta@kernel.org>
+	 <Z-U5vIbVDZLe9QnM@smile.fi.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250402043851.946498-2-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Apr 02, 2025 at 12:38:47PM +0800, Ming Lei wrote:
-> Add blk_mq_enter_no_io() and blk_mq_exit_no_io() for preventing queue
-> from handling any FS or passthrough IO, meantime the queue is kept in
-> non-freeze state.
-> 
-> The added two APIs are for avoiding many potential lock risk related
-> with freeze lock.
-> 
-> Also add two variants of memsave version.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c       |  6 ++++--
->  block/blk-mq.c         | 18 ++++++++++++++++--
->  block/blk-mq.h         | 19 +++++++++++++++++++
->  block/blk.h            |  5 +++--
->  include/linux/blkdev.h |  8 ++++++++
->  5 files changed, 50 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 4623de79effa..a54a18fada8a 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -319,7 +319,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
->  		smp_rmb();
->  		wait_event(q->mq_freeze_wq,
->  			   (!q->mq_freeze_depth &&
-> -			    blk_pm_resume_queue(pm, q)) ||
-> +			    (blk_pm_resume_queue(pm, q) ||
-> +			     !blk_queue_no_io(q))) ||
->  			   blk_queue_dying(q));
->  		if (blk_queue_dying(q))
->  			return -ENODEV;
-> @@ -352,7 +353,8 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
->  		smp_rmb();
->  		wait_event(q->mq_freeze_wq,
->  			   (!q->mq_freeze_depth &&
-> -			    blk_pm_resume_queue(false, q)) ||
-> +			    (blk_pm_resume_queue(false, q) ||
+On Thu, 2025-03-27 at 13:42 +0200, Andy Shevchenko wrote:
+> On Thu, Mar 27, 2025 at 12:07:06PM +0100, Philipp Stanner wrote:
+> > The last remaining user of pcim_iounmap_regions() is mtip32 (in
+> > Linus's
+> > current master)
+> >=20
+> > So we could finally remove this deprecated API. I suggest that this
+> > gets
+> > merged through the PCI tree.
+>=20
+> Good god! One API less, +1 to support this move.
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>=20
+> > (I also suggest we watch with an eagle's
+> > eyes for folks who want to re-add calls to that function before the
+> > next
+> > merge window opens).
+>=20
+> Instead of this I suggest that PCI can take this before merge window
+> finishes
+> and cooks the (second) PR with it. In such a case we wouldn't need to
+> care,
+> the developers will got broken builds.
+>=20
 
-Here the above '||' should have been '&&'.
+Normally Bjorn / PCI lets changes settle on a branch for >1 week before
+throwing them at mainline =E2=80=93 but if we ask him very very nicely, may=
+be
+he would make an exception for this special case? :)
 
-> +			     !blk_queue_no_io(q))) ||
->  			   test_bit(GD_DEAD, &disk->state));
->  		if (test_bit(GD_DEAD, &disk->state))
->  			goto dead;
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ae8494d88897..075ee51066b3 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -222,8 +222,7 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
->  	bool unfreeze;
->  
->  	mutex_lock(&q->mq_freeze_lock);
-> -	if (force_atomic)
-> -		q->q_usage_counter.data->force_atomic = true;
-> +	q->q_usage_counter.data->force_atomic = force_atomic;
->  	q->mq_freeze_depth--;
->  	WARN_ON_ONCE(q->mq_freeze_depth < 0);
->  	if (!q->mq_freeze_depth) {
-> @@ -278,6 +277,21 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
->  
-> +void blk_mq_enter_no_io(struct request_queue *q)
-> +{
-> +	blk_mq_freeze_queue_nomemsave(q);
-> +	q->no_io = true;
-> +	if (__blk_mq_unfreeze_queue(q, true))
-> +		blk_unfreeze_release_lock(q);
-> +}
-> +
-> +void blk_mq_exit_no_io(struct request_queue *q)
-> +{
-> +	blk_mq_freeze_queue_nomemsave(q);
-> +	q->no_io = false;
-> +	blk_mq_unfreeze_queue_nomemrestore(q);
-> +}
-> +
->  /**
->   * blk_mq_wait_quiesce_done() - wait until in-progress quiesce is done
->   * @set: tag_set to wait on
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index 3011a78cf16a..f49070c8c05f 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -452,4 +452,23 @@ static inline bool blk_mq_can_poll(struct request_queue *q)
->  		q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
->  }
->  
-> +void blk_mq_enter_no_io(struct request_queue *q);
-> +void blk_mq_exit_no_io(struct request_queue *q);
-> +
-> +static inline unsigned int __must_check
-> +blk_mq_enter_no_io_memsave(struct request_queue *q)
-> +{
-> +	unsigned int memflags = memalloc_noio_save();
-> +
-> +	blk_mq_enter_no_io(q);
-> +	return memflags;
-> +}
-> +
-> +static inline void
-> +blk_mq_exit_no_io_memrestore(struct request_queue *q, unsigned int memflags)
-> +{
-> +	blk_mq_exit_no_io(q);
-> +	memalloc_noio_restore(memflags);
-> +}
-> +
->  #endif
-> diff --git a/block/blk.h b/block/blk.h
-> index 006e3be433d2..7d0994c1d3ad 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -56,8 +56,9 @@ static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
->  	 * The code that increments the pm_only counter must ensure that the
->  	 * counter is globally visible before the queue is unfrozen.
->  	 */
-> -	if (blk_queue_pm_only(q) &&
-> -	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED))
-> +	if ((blk_queue_pm_only(q) &&
-> +	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED)) ||
-
-Same with above.
-
-
-Thanks, 
-Ming
+P.
 
