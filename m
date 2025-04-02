@@ -1,211 +1,193 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1120E23315C
-	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 07:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF68D20E6E3
+	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 07:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743577763; cv=none; b=YEtl9k+iOkZdfvYJJweBii8ytxzoYaz4A4rKC0Xbnad/mvAmVc75lXaOpOFblh0Z0iLFD632FZahUBxVD1YZXZ6dwi5R4sfkIPF2OzNSZDQdKgLDsO9T2j9ZgPm6J4rbYbxoV8BkVBsicVJpMfdhim0z94GmbBYA0ZhasuH05ps=
+	t=1743580571; cv=none; b=qk0u4WGqAzAC4niTRGnDx5f3FVPDfPzPR12p5QO+2mzOWgKZlL7h3KnvTfK5nri72dOs90DfdN10AnQOjP/ZL1TusSUnMoq5B36axt4RiXi4YR1oTjlGZGCAWHuW82TlCrcgQaphtPUu5EeMmZzGfJHEmH8ONJudO+FWrU+AQ8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743577763; c=relaxed/simple;
-	bh=MgPxIncYoIu1IyU0/pxsqdBGr5YKFoGwEiRiwr1vak4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C9GO+ecoLCe5+IKn8Y+6X81HB2I3bZISYYYRnMVhsRyJqUgSVV73LpIhoWK58DontOUQz2FgGFDmV5QANDJ8A/z6frHse8c7npnJZPj47if9cVlXE+JIBtB1Pq2IAZvqFkYurneo73WlMY4/cTA5KIML3nB8Vc4rAyIBjmvgt6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=bKq11qpG; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1743580571; c=relaxed/simple;
+	bh=Ou788sx8A2FJ8/HN40a66FBRR0H5TxeBkoErVg9X6b4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kESeMYARWkxj2PzV1lj3X2AO/VC0krgnkML7WTHi2fJiTPDUYjOGaNz9kYQJ/LF1axRQapi8UOyscIq8DNgvO8c85Aq8E1/RYBSny641tB3RrkJCs+9RmbNCmQtbveRICgFPVNOctoMu4wFWvwSGARicKoeMrnzQPHho/Nbj5Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1bIcVXN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bKq11qpG"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1743577761; x=1775113761;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MgPxIncYoIu1IyU0/pxsqdBGr5YKFoGwEiRiwr1vak4=;
-  b=bKq11qpG+FeBd/1W2Kd3aiLOU0q+IwcVqOcqkeGOkfKbdGfffIRqx9EM
-   rKeMGgPMKwcm0m6obqR94PGq3kqafw/Us2XP2kKygKTb8XpO6H7eDjYvH
-   lmnWGi7Btb9lieAAflyrLTNydS4Iu1Z4uhKjJeer9b50LPIvoHY5hM6Y1
-   0vyPXXi/LsVQJ+/eKlT5DEnj/rFkYN11XgVw7c4Ue0G8haYj+2z8Lg5YX
-   LbJDg6D9P5Afxyq4flVu/C6v+Vxl3XSx44dVfeR0tkI4sbDssm2ixumCq
-   VQoBzP/mYxQnZxW8MvRiRAe+bCV21lLDMZ4Q0ft2XS4A9CuelQK23zfnu
-   Q==;
-X-CSE-ConnectionGUID: FPTuqQWhRQSx0sUAO/1Prw==
-X-CSE-MsgGUID: 3deTz+z5QDCwgbn26VeyhA==
-X-IronPort-AV: E=Sophos;i="6.14,295,1736784000"; 
-   d="scan'208";a="71367750"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Apr 2025 15:09:20 +0800
-IronPort-SDR: 67ecd4a9_GZyGbwKYYUmXgRKymJxuDKwC469HVyDuwEzoIkrY4wGQij1
- 4GqkhJL7fefMEVD4YQX6IGM8A5pOeSBrjKJ0pZA==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Apr 2025 23:09:45 -0700
-WDCIronportException: Internal
-Received: from 5cg2075fn7.ad.shared (HELO shinmob.wdc.com) ([10.224.102.114])
-  by uls-op-cesaip02.wdc.com with ESMTP; 02 Apr 2025 00:09:20 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Hannes Reinecke <hare@suse.de>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 10/10] nvme: add testcase for secure concatenation
-Date: Wed,  2 Apr 2025 16:09:06 +0900
-Message-ID: <20250402070906.393160-11-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250402070906.393160-1-shinichiro.kawasaki@wdc.com>
-References: <20250402070906.393160-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1bIcVXN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743580568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cD4MFjDtRCW0qD573Lgja3Ag6OzkUK9cUOpFGWRN2vY=;
+	b=I1bIcVXNVGZ14BV+eD25xK5ZO/zR+YOKzR3sZ6n72SbsTk6F94rfHNH+uE20X5xnzl1CY0
+	iJDaZqVF+nQik/mUoc6XxCw+KWIUFj5kPnXfiU0/ypOp0wi8htB/VCJwF+k+PptikoCCSy
+	5hnkdXDMdIvvCEGR2srqe9RaZGZPa2g=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-P2iQS-ofMpiCrfJmsleAaw-1; Wed,
+ 02 Apr 2025 03:56:04 -0400
+X-MC-Unique: P2iQS-ofMpiCrfJmsleAaw-1
+X-Mimecast-MFC-AGG-ID: P2iQS-ofMpiCrfJmsleAaw_1743580563
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF9C91800A36;
+	Wed,  2 Apr 2025 07:56:02 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.32])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6858D195609D;
+	Wed,  2 Apr 2025 07:55:57 +0000 (UTC)
+Date: Wed, 2 Apr 2025 15:55:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+	Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/3] block: add blk_mq_enter_no_io() and
+ blk_mq_exit_no_io()
+Message-ID: <Z-zthxEKJg_kZqgg@fedora>
+References: <20250402043851.946498-1-ming.lei@redhat.com>
+ <20250402043851.946498-2-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250402043851.946498-2-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Hannes Reinecke <hare@suse.de>
+On Wed, Apr 02, 2025 at 12:38:47PM +0800, Ming Lei wrote:
+> Add blk_mq_enter_no_io() and blk_mq_exit_no_io() for preventing queue
+> from handling any FS or passthrough IO, meantime the queue is kept in
+> non-freeze state.
+> 
+> The added two APIs are for avoiding many potential lock risk related
+> with freeze lock.
+> 
+> Also add two variants of memsave version.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c       |  6 ++++--
+>  block/blk-mq.c         | 18 ++++++++++++++++--
+>  block/blk-mq.h         | 19 +++++++++++++++++++
+>  block/blk.h            |  5 +++--
+>  include/linux/blkdev.h |  8 ++++++++
+>  5 files changed, 50 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 4623de79effa..a54a18fada8a 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -319,7 +319,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+>  		smp_rmb();
+>  		wait_event(q->mq_freeze_wq,
+>  			   (!q->mq_freeze_depth &&
+> -			    blk_pm_resume_queue(pm, q)) ||
+> +			    (blk_pm_resume_queue(pm, q) ||
+> +			     !blk_queue_no_io(q))) ||
+>  			   blk_queue_dying(q));
+>  		if (blk_queue_dying(q))
+>  			return -ENODEV;
+> @@ -352,7 +353,8 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
+>  		smp_rmb();
+>  		wait_event(q->mq_freeze_wq,
+>  			   (!q->mq_freeze_depth &&
+> -			    blk_pm_resume_queue(false, q)) ||
+> +			    (blk_pm_resume_queue(false, q) ||
 
-NVMe-TCP has a 'secure concatenation' mode, where the TLS PSK is
-generated from the secret negotiated by the DH-HMAC-CHAP authentication,
-and the TLS connection is started after authentication.
+Here the above '||' should have been '&&'.
 
-Signed-off-by: Hannes Reinecke <hare@kernel.org>
-[Shin'ichiro: added _have_systemd_tlshd_service, avoided "exit 1"]
-[Shin'ichiro: used _systemctl_start and _systemctl_stop]
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/nvme/061     | 109 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/061.out |   7 +++
- 2 files changed, 116 insertions(+)
- create mode 100755 tests/nvme/061
- create mode 100644 tests/nvme/061.out
+> +			     !blk_queue_no_io(q))) ||
+>  			   test_bit(GD_DEAD, &disk->state));
+>  		if (test_bit(GD_DEAD, &disk->state))
+>  			goto dead;
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ae8494d88897..075ee51066b3 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -222,8 +222,7 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+>  	bool unfreeze;
+>  
+>  	mutex_lock(&q->mq_freeze_lock);
+> -	if (force_atomic)
+> -		q->q_usage_counter.data->force_atomic = true;
+> +	q->q_usage_counter.data->force_atomic = force_atomic;
+>  	q->mq_freeze_depth--;
+>  	WARN_ON_ONCE(q->mq_freeze_depth < 0);
+>  	if (!q->mq_freeze_depth) {
+> @@ -278,6 +277,21 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+>  
+> +void blk_mq_enter_no_io(struct request_queue *q)
+> +{
+> +	blk_mq_freeze_queue_nomemsave(q);
+> +	q->no_io = true;
+> +	if (__blk_mq_unfreeze_queue(q, true))
+> +		blk_unfreeze_release_lock(q);
+> +}
+> +
+> +void blk_mq_exit_no_io(struct request_queue *q)
+> +{
+> +	blk_mq_freeze_queue_nomemsave(q);
+> +	q->no_io = false;
+> +	blk_mq_unfreeze_queue_nomemrestore(q);
+> +}
+> +
+>  /**
+>   * blk_mq_wait_quiesce_done() - wait until in-progress quiesce is done
+>   * @set: tag_set to wait on
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 3011a78cf16a..f49070c8c05f 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -452,4 +452,23 @@ static inline bool blk_mq_can_poll(struct request_queue *q)
+>  		q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
+>  }
+>  
+> +void blk_mq_enter_no_io(struct request_queue *q);
+> +void blk_mq_exit_no_io(struct request_queue *q);
+> +
+> +static inline unsigned int __must_check
+> +blk_mq_enter_no_io_memsave(struct request_queue *q)
+> +{
+> +	unsigned int memflags = memalloc_noio_save();
+> +
+> +	blk_mq_enter_no_io(q);
+> +	return memflags;
+> +}
+> +
+> +static inline void
+> +blk_mq_exit_no_io_memrestore(struct request_queue *q, unsigned int memflags)
+> +{
+> +	blk_mq_exit_no_io(q);
+> +	memalloc_noio_restore(memflags);
+> +}
+> +
+>  #endif
+> diff --git a/block/blk.h b/block/blk.h
+> index 006e3be433d2..7d0994c1d3ad 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -56,8 +56,9 @@ static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
+>  	 * The code that increments the pm_only counter must ensure that the
+>  	 * counter is globally visible before the queue is unfrozen.
+>  	 */
+> -	if (blk_queue_pm_only(q) &&
+> -	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED))
+> +	if ((blk_queue_pm_only(q) &&
+> +	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED)) ||
 
-diff --git a/tests/nvme/061 b/tests/nvme/061
-new file mode 100755
-index 0000000..7477078
---- /dev/null
-+++ b/tests/nvme/061
-@@ -0,0 +1,109 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Hannes Reinecke, SUSE Labs
-+#
-+# Create secure concatenation for TCP connections
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="Create authenticated TCP connections with secure concatenation"
-+QUICK=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_have_kernel_option NVME_AUTH
-+	_have_kernel_option NVME_TCP_TLS
-+	_have_kernel_option NVME_TARGET_AUTH
-+	_have_kernel_option NVME_TARGET_TCP_TLS
-+	_require_kernel_nvme_fabrics_feature dhchap_ctrl_secret
-+	_require_kernel_nvme_fabrics_feature concat
-+	_require_nvme_trtype tcp
-+	_require_nvme_cli_auth
-+	_have_systemd_tlshd_service
-+}
-+
-+set_conditions() {
-+	_set_nvme_trtype "$@"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
-+	local hostkey
-+
-+	_systemctl_start tlshd
-+
-+	hostkey=$(nvme gen-dhchap-key -m 1 -n "${def_hostnqn}" 2> /dev/null)
-+	if [ -z "$hostkey" ] ; then
-+		echo "nvme gen-dhchap-key failed"
-+		_systemctl_stop
-+		return 1
-+	fi
-+
-+	_nvmet_target_setup --blkdev file --hostkey "${hostkey}" --tls
-+	_set_nvmet_hash "${def_hostnqn}" "hmac(sha256)"
-+	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"
-+
-+	echo "Test secure concatenation with SHA256"
-+	_nvme_connect_subsys --dhchap-secret "${hostkey}" --concat
-+
-+	ctrl=$(_find_nvme_dev "${def_subsysnqn}")
-+	if [[ -z "$ctrl" ]]; then
-+		echo "WARNING: connection failed"
-+		_systemctl_stop
-+		return 1
-+	fi
-+	tlskey=$(_nvme_ctrl_tls_key "$ctrl" || true)
-+	if [[ -z "$tlskey" ]]; then
-+		echo "WARNING: connection is not encrypted"
-+		_systemctl_stop
-+		return 1
-+	fi
-+
-+	# Reset controller to force re-negotiation
-+	echo "Reset controller"
-+	if ! nvme reset "/dev/${ctrl}" ; then
-+		echo "WARNING: failed to reset controller"
-+	fi
-+
-+	new_tlskey=$(_nvme_ctrl_tls_key "$ctrl" || true)
-+	if [[ -z "$new_tlskey" ]]; then
-+		echo "WARNING: connection is not encrypted"
-+	elif [[ "$new_tlskey" = "$tlskey" ]]; then
-+		echo "WARNING: TLS key has not been renegotiated"
-+	fi
-+
-+	_nvme_disconnect_subsys
-+
-+	hostkey=$(nvme gen-dhchap-key -m 2 -n "${def_hostnqn}" 2> /dev/null)
-+	if [ -z "$hostkey" ] ; then
-+		echo "nvme gen-dhchap-key failed"
-+		_systemctl_stop
-+		return 1
-+	fi
-+
-+	_set_nvmet_hostkey "${def_hostnqn}" "${hostkey}"
-+	_set_nvmet_hash "${def_hostnqn}" "hmac(sha384)"
-+	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe3072"
-+
-+	echo "Test secure concatenation with SHA384"
-+	_nvme_connect_subsys --dhchap-secret "${hostkey}" --concat
-+
-+	ctrl=$(_find_nvme_dev "${def_subsysnqn}")
-+	if _nvme_ctrl_tls_key "$ctrl" > /dev/null ; then
-+		echo "WARNING: connection is not encrypted"
-+		_systemctl_stop
-+		return 1
-+	fi
-+
-+	_nvme_disconnect_subsys
-+
-+	_nvmet_target_cleanup
-+
-+	_systemctl_stop
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/061.out b/tests/nvme/061.out
-new file mode 100644
-index 0000000..97e8948
---- /dev/null
-+++ b/tests/nvme/061.out
-@@ -0,0 +1,7 @@
-+Running nvme/061
-+Test secure concatenation with SHA256
-+Reset controller
-+disconnected 1 controller(s)
-+Test secure concatenation with SHA384
-+disconnected 1 controller(s)
-+Test complete
--- 
-2.49.0
+Same with above.
+
+
+Thanks, 
+Ming
 
