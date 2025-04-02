@@ -1,151 +1,89 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA58A78F58
-	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 04:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7ED2F4A
+	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 04:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743567288; cv=none; b=BSKpVpiV6CVPLRd33ggfX4Hg6iBwDDKDj5vGYbTf3Zuokcd35Y81Lpfb6ZTsMYwqfRq8BG04WCgaZM71Ok6IUnM0FbHNL7nKRgU5pMmZqui0fNR9xbE6zsm6WuW0nAg7Tmfpt93s6OjlHD8tuB5pAs4herJ0ZRMDbA/5mUvomlU=
+	t=1743568780; cv=none; b=DA/1/4RNm/E9LrDyiB0sT8jce0rRAWFkkoMVEeblz0faKHYuaPK+5RLdFYbZyF6tZgsJkiKBwsNyzVrkYim15X+HPvzlbWRTONCcoO6oCOgnj+u775xS7tVCWvGISueNSbH8AW8y4IzPBO9l6YC80/y/Kvyy6nU/AKE9+OD8Qnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743567288; c=relaxed/simple;
-	bh=5hONtpmRNUyPK4dP1g+RfmfKZ5ZwrU7tnKN1AR2fMDM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TdpRDcRL6lyzKxPcPgVQRZPQ+B2nTAkYbJZlloByYuh3oEJyxyJ/3R+6aHFrFUDANUrL9Vyxu308BYvsb//eNOHYXnz7DTwqfhrOhFWf+8xhDRm4bo6L9WWLS0pm1Fo7DQ01RB5zxb+rz3SDdhaLG1UNx9/mxDqo1JCdN+va0LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOBtLUlh; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1743568780; c=relaxed/simple;
+	bh=5b/dSxXg2FDqdArJq9lKtTejNUJoDvpoiCQrOpdawTA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VbldmIzZAVyCSrmNw9Llc2nyWrwa8tOdDD2vM2hNtEZelSWOChLSvJY98ZFxAf42HJWOxOA2kooNhLcPn2pJsqL5qMp5x9v6qRTPRun1u6Uj+brWweijEK0WXP7vJAC6pq21W26QukC3zen0S/Adjm8hmOFRYBtz+zOmepvz3+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sm/V045+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOBtLUlh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sm/V045+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743567285;
+	s=mimecast20190719; t=1743568777;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=A70mzkVoJ9pfEq4RRHkhmn75Iklh4asHbKzosiOmjb0=;
-	b=DOBtLUlhNiuXIJLCuQU8CHvm8XZTB5af9tsLT/1GLax7MDP2CLZdh8SHQlbtYwibYEwU0Y
-	KUSSN4rE7axc9w3cQX0dEUsehmbbTHN4eOGoyRyjD6j5bOsX9+phgnCgxA0T0LGpgWxQbm
-	LQWZcJnDeeXllIIEj26jsrsXlvzEq8k=
+	bh=bExnF53BT7kz2tmEJk1b9kee2pgr3DmGXHAwiH87Ee8=;
+	b=Sm/V045+ou4fLDGlBO+s8EEF0dxdSowoSgDsl2tgMrzZulIbZQ2uH044yM2tMZc1nd2us8
+	GhLBa3kctZg2WnYhPzmbYl9cleksHOwD1XG9cgmeYYA1ERjqgbx3gqNGSbTddsXNGvsrdK
+	3lJJL+AVozseFZ3al20hSOdrHH0nH1A=
 Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-CCPDpLsQOfiNmhS-YjocxQ-1; Wed,
- 02 Apr 2025 00:14:40 -0400
-X-MC-Unique: CCPDpLsQOfiNmhS-YjocxQ-1
-X-Mimecast-MFC-AGG-ID: CCPDpLsQOfiNmhS-YjocxQ_1743567279
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-524-gJ_7MX_fPT2Yr55Qvgpw2g-1; Wed,
+ 02 Apr 2025 00:39:32 -0400
+X-MC-Unique: gJ_7MX_fPT2Yr55Qvgpw2g-1
+X-Mimecast-MFC-AGG-ID: gJ_7MX_fPT2Yr55Qvgpw2g_1743568771
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE25719560AB;
-	Wed,  2 Apr 2025 04:14:39 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4A01B1956048;
+	Wed,  2 Apr 2025 04:39:30 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.17])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 723E5195609D;
-	Wed,  2 Apr 2025 04:14:37 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B03EE180174E;
+	Wed,  2 Apr 2025 04:39:28 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org,
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: =?UTF-8?q?Valdis=20Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blktests: add block/039 for test updating nr_hw_queues vs switching elevator
-Date: Wed,  2 Apr 2025 12:14:29 +0800
-Message-ID: <20250402041429.942623-1-ming.lei@redhat.com>
+Subject: [PATCH 0/3] block: fix lock dependency between freeze and elevator lock
+Date: Wed,  2 Apr 2025 12:38:46 +0800
+Message-ID: <20250402043851.946498-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Add block/039 for covering updating nr_hw_queues and switching elevator.
+Hello Jens,
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tests/block/039     | 67 +++++++++++++++++++++++++++++++++++++++++++++
- tests/block/039.out |  1 +
- 2 files changed, 68 insertions(+)
- create mode 100755 tests/block/039
- create mode 100644 tests/block/039.out
+This patchset adds two pair of block internal APIs for addressing recent
+lockdep report between freeze and elevator lock.
 
-diff --git a/tests/block/039 b/tests/block/039
-new file mode 100755
-index 0000000..d29db45
---- /dev/null
-+++ b/tests/block/039
-@@ -0,0 +1,67 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright 2025 Ming Lei <ming.lei@redhat.com>
-+#
-+# Most of code is copied from block/029
-+#
-+# Trigger blk_mq_update_nr_hw_queues() & elevator switch
-+
-+. tests/block/rc
-+. common/null_blk
-+
-+DESCRIPTION="test blk_mq_update_nr_hw_queues() vs switch elevator"
-+QUICK=1
-+
-+requires() {
-+	_have_fio && _have_null_blk
-+}
-+
-+
-+modify_io_sched() {
-+	local deadline
-+	local dev=$1
-+
-+	deadline=$(($(_uptime_s) + TIMEOUT))
-+	while [ "$(_uptime_s)" -lt "$deadline" ]; do
-+		for sched in $(_io_schedulers "$dev"); do
-+			echo "$sched" > /sys/block/"$dev"/queue/scheduler > /dev/null 2>&1
-+			sleep .5
-+		done
-+	done
-+}
-+
-+modify_nr_hw_queues() {
-+	local deadline num_cpus
-+
-+	deadline=$(($(_uptime_s) + TIMEOUT))
-+	num_cpus=$(nproc)
-+	while [ "$(_uptime_s)" -lt "$deadline" ]; do
-+		sleep .1
-+		echo 1 > /sys/kernel/config/nullb/nullb1/submit_queues
-+		sleep .1
-+		echo "$num_cpus" > /sys/kernel/config/nullb/nullb1/submit_queues
-+	done
-+}
-+
-+test() {
-+	local sq=/sys/kernel/config/nullb/nullb1/submit_queues
-+
-+	: "${TIMEOUT:=30}"
-+	_configure_null_blk nullb1 completion_nsec=0 blocksize=512 \
-+			    size=16 memory_backed=1 power=1 &&
-+	if { echo 1 >$sq; } 2>/dev/null; then
-+		modify_nr_hw_queues &
-+		modify_io_sched nullb1 &
-+		fio --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		    --iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		    --ioengine=libaio --filename="/dev/nullb1" \
-+		    --runtime="${TIMEOUT}" --name=nullb1 \
-+		    --output="${RESULTS_DIR}/block/fio-output-029.txt" \
-+		    >>"$FULL"
-+		wait
-+	else
-+		echo "Skipping test because $sq cannot be modified" >>"$FULL"
-+	fi
-+	_exit_null_blk
-+	echo Passed
-+}
-diff --git a/tests/block/039.out b/tests/block/039.out
-new file mode 100644
-index 0000000..863339f
---- /dev/null
-+++ b/tests/block/039.out
-@@ -0,0 +1 @@
-+Passed
+Thanks,
+Ming
+
+
+Ming Lei (3):
+  block: add blk_mq_enter_no_io() and blk_mq_exit_no_io()
+  block: don't call freeze queue in elevator_switch() and
+    elevator_disable()
+  block: use blk_mq_no_io() for avoiding lock dependency
+
+ block/blk-core.c       |  6 ++++--
+ block/blk-mq.c         | 25 ++++++++++++++++++-------
+ block/blk-mq.h         | 19 +++++++++++++++++++
+ block/blk-sysfs.c      |  8 ++++----
+ block/blk.h            |  5 +++--
+ block/elevator.c       | 11 ++---------
+ include/linux/blkdev.h |  8 ++++++++
+ 7 files changed, 58 insertions(+), 24 deletions(-)
+
 -- 
-2.44.0
+2.47.0
 
