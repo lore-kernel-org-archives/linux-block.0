@@ -1,101 +1,118 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C622397B4
-	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 13:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3207239089
+	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 13:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743599570; cv=none; b=V0k8CYfkLb/gTDR50L5HC+X4iC17jFwQpMkLWqMikn6OFV/u0deRW+IB6Oa8Ze606rapub7hFNvZ9SgTFxN77/Bum0TWXJT5a5Kgd3sWc4Pe8R1yEPyzm2daLqoOza1W7KOlAwfVa9VXcvem0iV/9LBtRc5icApJEkshO91Ett0=
+	t=1743601452; cv=none; b=TInJ0ld/DwsHRv+3A7k+kXFgCHVLWvLu4UqR66x1kh/kkDPBMHIpnq9FlD3GUCbkyryvJS/1HRx32qTOp3GzHhX56d1auMjwUkKm1E2r2wVI1M+0sTmgVS3RndyvQuPQkw4vH6kA6JRllxRXIN5QU5PWKCz2PUwki43DRGAhxKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743599570; c=relaxed/simple;
-	bh=tOcpGZ8f5Tb47JNS5BNoknblBrTyos3un4K9kSh6yAg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ifh60kAfcdRR8e/wdtAcckVlp/SeIMV+RXlRToH/4MGurqfp+6ut7v1p/SdIoFE0dz3/I1Mt0ynYfgh6LTZQy/TGsxH20Gtt66IKv/iZ4IvpLbu02hcqPGWY9QjWGfgjIPObAvab62UTUymzah62qPT9ZAA/9p3lLPEJK+snSQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JVwcPq7A; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1743601452; c=relaxed/simple;
+	bh=RvArk7DvjQ4JcTjf9cW3WaTXnKJqfeHmF4f5sXRl/1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BFRYbTEq+k1FLpRjq9iDJSn6ZCLeD/JD4NDv64uWQu6XeDvyhgdaEwmYBmQ9VZCh6W/v8HvJF36QReCf7Jwd1p8FyT1+W3KVK9/MlH57MCnGiVVIap9M0kaKTbx1KAXExWqRVYivWjiSLTUXSxPm+RTy1Ra2v2jCFh4eD8mGqUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bOxG1JWz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JVwcPq7A"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d439f01698so2764015ab.1
-        for <linux-block@vger.kernel.org>; Wed, 02 Apr 2025 06:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1743599566; x=1744204366; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6BQoS285p3ACMznO/yhKhIxe+5v4IUlbAZzIu1YF/lI=;
-        b=JVwcPq7A1wYLI6HanfRZBwxUCnBFUCgL0DDsnUb3R/6kPoICi5KThFMKUWWuXNe20d
-         dvie86+AaCAFFwgbWtkm07CLw+wvm0pbpQIBlcbXpDQGncvC9WESUz85Plyj44w3w+yM
-         wSpnMR2N0aQ19mXj8oeKAbdALSn8insFOIWv9nQU6DmXsmhDpgexcBnX/EHB7ziFviUQ
-         /9bE8i3UBc6yg2EiP0+XtGXEs24qTx0YAnowkoJml6ZYSwArI/lQM7+yTKI78ctPQ+lQ
-         A2hUxXMvt20o9JpSbTmmsrs/8QxTf6z1L8ANJ1hYsNpE6RybIKMkJObwC3Sz1EuIwPA4
-         X6OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743599566; x=1744204366;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6BQoS285p3ACMznO/yhKhIxe+5v4IUlbAZzIu1YF/lI=;
-        b=PRrk13Ok6IecGBhlbeU8nc9TwbXZRkNULGTdg1uP5VlmXYHRknjlXceepKt/oceS6m
-         yMTi01P+H2ItohqbsrqlQDrzhZIs5m+OqfoIhBfPL67cVEk8R/yc3Bq/tzKKti4oWReX
-         O37UXv7mAgd7cyH7XPaqJTfbgA+iV9siGPLgWaie8ifeLuzHInVD5OY8b3Xp8y2UZ65I
-         sQvGoO2g/MrcNmuccXq5vw4POx43HoL0c61CplU5l1uBVBma4ncGiOQJ1zV9U+yWdopQ
-         1ySjfxsLo1RqO7lCfPlX+unyCGPg3wb/9pRJTLSjXn3dAw6AplOSZkV1Q/LvpiZxZdTb
-         Joog==
-X-Gm-Message-State: AOJu0YxDJpoU0YqjErR2tr475z97QMwNNyaT3HPz5XmyhOM/nTu1AsMB
-	3e44PPa5V8HTzSlXnJsLngt/Gy0yIqCKAtLj5NOGxEiDWRrVAyMq7gbyGYQ79flyyEdSl8W4xAG
-	G
-X-Gm-Gg: ASbGncs55EaeFVyje1mBjrNA5SRa3fCsxJhT/M6F9LoTsOV9RCjfLhxv/NVGXPJx33b
-	4z49bsaXE+PMaGE8rVvAp2BtxZ3jlJYhltP3DckgDS9d5ZdkMT7skYEpRlqTx/PfrX/kpEfD0U7
-	k3LJUb//JD60qyKWWceVsbajHIvQtBe47uZqoiY65fPrXRBG3t9Bi1sMyjIdxGQ64JTgm1/iqOy
-	0hCpkJLKclY4HvSANFVJjvRV0NBEPXGw0oAZ7E6Cs/IHv89YMevwpNOZyu4+asyEtjPfyE8B3CW
-	K5nQ1AaUb+PRZPN1crpJe5kmTr5hAJqoqBk=
-X-Google-Smtp-Source: AGHT+IGYEtc0rVmUripwItyyW0bmRlCGHyKYzRGoLqwNlAxm5qK9125/20/ajFem/q54Yg0ZLMrZLw==
-X-Received: by 2002:a05:6e02:2783:b0:3d3:fa69:6755 with SMTP id e9e14a558f8ab-3d6d6d17acbmr14537565ab.5.1743599566623;
-        Wed, 02 Apr 2025 06:12:46 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d5d5a6ca4bsm32985265ab.22.2025.04.02.06.12.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 06:12:45 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20250401-ublk_selftests-v1-0-98129c9bc8bb@purestorage.com>
-References: <20250401-ublk_selftests-v1-0-98129c9bc8bb@purestorage.com>
-Subject: Re: [PATCH 0/2] ublk: fixes for selftests
-Message-Id: <174359956539.20480.17105268115889494986.b4-ty@kernel.dk>
-Date: Wed, 02 Apr 2025 07:12:45 -0600
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bOxG1JWz"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 532CTIcL022927;
+	Wed, 2 Apr 2025 13:44:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=USc/VN
+	vOhsPCciup4mQ4SQ0Fe5z+DJn7dPB8BbCkiD0=; b=bOxG1JWzZom09hxojlu/ph
+	Q0qrLxN44gWmtU/yqfn5z35pkPYTspiQ+QWBJKYRZgH6Dw5mXMdiiuyJ790KIAXn
+	+W7DM4O2I92IB+bEMkxe3+KIS8P3w+G6CW5YjxE7oSIDlc+ne+VjvHvzub+D3vxB
+	x9jxXt7DBzLbexO77p9bxX6JJhtKhG79LKYdkBC/zmsFeGwWEmmeHg2gNt0UOn8x
+	QfMPcd9d7UQAxaXvh6VVovlFXvNhKactpz6ft8KOPor2cLBeTQny714ysQTfNyc8
+	ulN+14jXwPD+EXjksknpDERYC8c5Ja2l9vgTiklSq/JcEQMhEIggRlrGaNblPRBw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45s59frcc5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Apr 2025 13:44:02 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 532D0KOI014573;
+	Wed, 2 Apr 2025 13:44:01 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45pvpm83bm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Apr 2025 13:44:01 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 532DhxfR26083884
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 2 Apr 2025 13:43:59 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 46FB458059;
+	Wed,  2 Apr 2025 13:44:01 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 86A9958043;
+	Wed,  2 Apr 2025 13:43:58 +0000 (GMT)
+Received: from [9.171.6.25] (unknown [9.171.6.25])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  2 Apr 2025 13:43:58 +0000 (GMT)
+Message-ID: <089a8cf5-bc01-468f-ab96-f04448e034ae@linux.ibm.com>
+Date: Wed, 2 Apr 2025 19:13:56 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block: use blk_mq_no_io() for avoiding lock
+ dependency
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc: =?UTF-8?Q?Valdis_Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        Christoph Hellwig <hch@lst.de>,
+        syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
+References: <20250402043851.946498-1-ming.lei@redhat.com>
+ <20250402043851.946498-4-ming.lei@redhat.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250402043851.946498-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PhUA9BzmKXO8fk36eE-5fXcQ9CjuQOve
+X-Proofpoint-GUID: PhUA9BzmKXO8fk36eE-5fXcQ9CjuQOve
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-02_05,2025-04-02_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=433
+ impostorscore=0 bulkscore=0 malwarescore=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 adultscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2504020085
 
 
-On Tue, 01 Apr 2025 14:49:07 -0600, Uday Shankar wrote:
-> Fix a couple of issues I saw when developing selftests for ublk. These
-> patches are split out from the following series:
+
+On 4/2/25 10:08 AM, Ming Lei wrote:
+> Use blk_mq_no_io() to prevent IO from entering queue for avoiding lock
+> dependency between freeze lock and elevator lock, and we have got many
+> such reports:
 > 
-> https://lore.kernel.org/linux-block/20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com/T/#t
-> 
-> 
+> Reported-by: syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/linux-block/67e6b425.050a0220.2f068f.007b.GAE@google.com/
+> Reported-by: Valdis Klētnieks <valdis.kletnieks@vt.edu>
+> Closes: https://lore.kernel.org/linux-block/7755.1743228130@turing-police/#t
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Applied, thanks!
+I tested this series on my system and this works well as we cut dependency
+between ->elevator_lock and ->freeze_lock. However don't we plan to now 
+model blk_mq_enter_no_io and blk_mq_exit_no_io as lock/unlock for supporting 
+lockdep? Maybe we don't. 
 
-[1/2] selftests: ublk: kublk: use ioctl-encoded opcodes
-      (no commit info)
-[2/2] selftests: ublk: kublk: fix an error log line
-      (no commit info)
+Overall changes looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 
-Best regards,
--- 
-Jens Axboe
+
+
+
+
 
 
 
