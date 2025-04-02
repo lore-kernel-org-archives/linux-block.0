@@ -1,247 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A022309A6
-	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 03:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA58A78F58
+	for <linux-block@vger.kernel.org>; Wed,  2 Apr 2025 04:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743566391; cv=none; b=R524PWAooh1Rt/ONxe1PeQz7ylUhbxrmaDCq7ZrV5Ywq6dhGPI9Ci6I6qkHM8qOkx3RrsC7kfh7329+zEJYLgA7rDDPvPQThNmMYRexPQ0yjnkrLrZ2H97aSgK+5EfBaMsws9nrFyk16JzfF4LzJDEvmX0hoogNSpKU+DGohWXQ=
+	t=1743567288; cv=none; b=BSKpVpiV6CVPLRd33ggfX4Hg6iBwDDKDj5vGYbTf3Zuokcd35Y81Lpfb6ZTsMYwqfRq8BG04WCgaZM71Ok6IUnM0FbHNL7nKRgU5pMmZqui0fNR9xbE6zsm6WuW0nAg7Tmfpt93s6OjlHD8tuB5pAs4herJ0ZRMDbA/5mUvomlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743566391; c=relaxed/simple;
-	bh=5XAaBVK3PYlu5jmU+rZarTc0x0/lrq+TgCeHcJRWMng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JWj85vH6UxX9u6tExGGZZUEpIlyTKZnXHw25P/Ma9WPyXIjKHhLoxa/hNmIASXZ4OiRz8bymd7pjjT8w491+p+Kxx1JHRogKECtVftFcT/M8AsjD6gvewaO9vwJLiDZTyBiJDMZ+Eh+liJpYZ8Vj+Qt/SGqvwoB+7OkV4hXcdeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d4cA7FBt; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1743567288; c=relaxed/simple;
+	bh=5hONtpmRNUyPK4dP1g+RfmfKZ5ZwrU7tnKN1AR2fMDM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TdpRDcRL6lyzKxPcPgVQRZPQ+B2nTAkYbJZlloByYuh3oEJyxyJ/3R+6aHFrFUDANUrL9Vyxu308BYvsb//eNOHYXnz7DTwqfhrOhFWf+8xhDRm4bo6L9WWLS0pm1Fo7DQ01RB5zxb+rz3SDdhaLG1UNx9/mxDqo1JCdN+va0LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOBtLUlh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4cA7FBt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOBtLUlh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743566387;
+	s=mimecast20190719; t=1743567285;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tGXy3CN7gC6EypnGhzzb76sSaOem2BZqrJYP6QEGJ/4=;
-	b=d4cA7FBte+FxRT+C3p9rHsIZThD+7yAKREW0Tuqd9rOKKtqvOfK9ZCjPJ5yPu0M/FbVaOQ
-	JYBAa9j1gRJvdvS5j9OFC7FZhTgNPPssaAu20HvRTcbpZG7YdxWD+NvdnNIt/7WJW60Qby
-	2XdviKswqDq95c4qs9OqPypvJBhWHZ8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=A70mzkVoJ9pfEq4RRHkhmn75Iklh4asHbKzosiOmjb0=;
+	b=DOBtLUlhNiuXIJLCuQU8CHvm8XZTB5af9tsLT/1GLax7MDP2CLZdh8SHQlbtYwibYEwU0Y
+	KUSSN4rE7axc9w3cQX0dEUsehmbbTHN4eOGoyRyjD6j5bOsX9+phgnCgxA0T0LGpgWxQbm
+	LQWZcJnDeeXllIIEj26jsrsXlvzEq8k=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-459-2mGvHwF1Pd6akDJCiMkKNA-1; Tue,
- 01 Apr 2025 23:59:45 -0400
-X-MC-Unique: 2mGvHwF1Pd6akDJCiMkKNA-1
-X-Mimecast-MFC-AGG-ID: 2mGvHwF1Pd6akDJCiMkKNA_1743566384
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-CCPDpLsQOfiNmhS-YjocxQ-1; Wed,
+ 02 Apr 2025 00:14:40 -0400
+X-MC-Unique: CCPDpLsQOfiNmhS-YjocxQ-1
+X-Mimecast-MFC-AGG-ID: CCPDpLsQOfiNmhS-YjocxQ_1743567279
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 069D719560BB;
-	Wed,  2 Apr 2025 03:59:44 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.17])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B21BD180A803;
-	Wed,  2 Apr 2025 03:59:38 +0000 (UTC)
-Date: Wed, 2 Apr 2025 11:59:32 +0800
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE25719560AB;
+	Wed,  2 Apr 2025 04:14:39 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.17])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 723E5195609D;
+	Wed,  2 Apr 2025 04:14:37 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] ublk: improve handling of saturated queues when ublk
- server exits
-Message-ID: <Z-y2JGJC56ZhdYHP@fedora>
-References: <20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com>
- <20250325-ublk_timeout-v1-4-262f0121a7bd@purestorage.com>
- <Z-OS2_J7o0NKHWmj@fedora>
- <Z+Q/SNmX+DpVQ5ir@dev-ushankar.dev.purestorage.com>
- <Z-SoibOdOmzOWB-C@fedora>
- <Z+sifI6fujsc186S@dev-ushankar.dev.purestorage.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blktests: add block/039 for test updating nr_hw_queues vs switching elevator
+Date: Wed,  2 Apr 2025 12:14:29 +0800
+Message-ID: <20250402041429.942623-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z+sifI6fujsc186S@dev-ushankar.dev.purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Mar 31, 2025 at 05:17:16PM -0600, Uday Shankar wrote:
-> On Thu, Mar 27, 2025 at 09:23:21AM +0800, Ming Lei wrote:
-> > On Wed, Mar 26, 2025 at 11:54:16AM -0600, Uday Shankar wrote:
-> > > On Wed, Mar 26, 2025 at 01:38:35PM +0800, Ming Lei wrote:
-> > > > On Tue, Mar 25, 2025 at 04:19:34PM -0600, Uday Shankar wrote:
-> > > > > There are currently two ways in which ublk server exit is detected by
-> > > > > ublk_drv:
-> > > > > 
-> > > > > 1. uring_cmd cancellation. If there are any outstanding uring_cmds which
-> > > > >    have not been completed to the ublk server when it exits, io_uring
-> > > > >    calls the uring_cmd callback with a special cancellation flag as the
-> > > > >    issuing task is exiting.
-> > > > > 2. I/O timeout. This is needed in addition to the above to handle the
-> > > > >    "saturated queue" case, when all I/Os for a given queue are in the
-> > > > >    ublk server, and therefore there are no outstanding uring_cmds to
-> > > > >    cancel when the ublk server exits.
-> > > > > 
-> > > > > The second method detects ublk server exit only after a long delay
-> > > > > (~30s, the default timeout assigned by the block layer). Any
-> > > > > applications using the ublk device will be left hanging for these 30s
-> > > > > before seeing an error/knowing anything went wrong. This problem is
-> > > > > illustrated by running the new test_generic_02 against a ublk_drv which
-> > > > > doesn't have the fix:
-> > > > > 
-> > > > > selftests: ublk: test_generic_02.sh
-> > > > > dev id is 0
-> > > > > dd: error writing '/dev/ublkb0': Input/output error
-> > > > > 1+0 records in
-> > > > > 0+0 records out
-> > > > > 0 bytes copied, 30.0611 s, 0.0 kB/s
-> > > > > DEAD
-> > > > > dd took 31 seconds to exit (>= 5s tolerance)!
-> > > > > generic_02 : [FAIL]
-> > > > > 
-> > > > > Fix this by instead handling the saturated queue case in the ublk
-> > > > > character file release callback. This happens during ublk server exit
-> > > > > and handles the issue much more quickly than an I/O timeout:
-> > > > 
-> > > > Another solution is to override default 30sec 'timeout'.
-> > > 
-> > > Yes, but that still will introduce unnecessary delays, since it is a
-> > > polling-based solution (very similar to monitor_work we used to have).
-> > > Also it will add complexity to the unprivileged case, since that
-> > > actually cares about timeout and we will have to track the "real"
-> > > timeout separately.
-> > > 
-> > > > 
-> > > > > 
-> > > > > selftests: ublk: test_generic_02.sh
-> > > > > dev id is 0
-> > > > > dd: error writing '/dev/ublkb0': Input/output error
-> > > > > 1+0 records in
-> > > > > 0+0 records out
-> > > > > 0 bytes copied, 0.0376731 s, 0.0 kB/s
-> > > > > DEAD
-> > > > > generic_02 : [PASS]
-> > > > > 
-> > > > > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c                        | 40 +++++++++++------------
-> > > > >  tools/testing/selftests/ublk/Makefile           |  1 +
-> > > > >  tools/testing/selftests/ublk/kublk.c            |  3 ++
-> > > > >  tools/testing/selftests/ublk/kublk.h            |  3 ++
-> > > > >  tools/testing/selftests/ublk/null.c             |  4 +++
-> > > > >  tools/testing/selftests/ublk/test_generic_02.sh | 43 +++++++++++++++++++++++++
-> > > > >  6 files changed, 72 insertions(+), 22 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index c060da409ed8a888b7e414c9065efd2cbd6d57d7..1816b2cac01056dc9d01455759594af43c5f78d6 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -1247,8 +1247,6 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
-> > > > >  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
-> > > > >  {
-> > > > >  	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
-> > > > > -	unsigned int nr_inflight = 0;
-> > > > > -	int i;
-> > > > >  
-> > > > >  	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
-> > > > >  		if (!ubq->timeout) {
-> > > > > @@ -1259,26 +1257,6 @@ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
-> > > > >  		return BLK_EH_DONE;
-> > > > >  	}
-> > > > >  
-> > > > > -	if (!ubq_daemon_is_dying(ubq))
-> > > > > -		return BLK_EH_RESET_TIMER;
-> > > > > -
-> > > > > -	for (i = 0; i < ubq->q_depth; i++) {
-> > > > > -		struct ublk_io *io = &ubq->ios[i];
-> > > > > -
-> > > > > -		if (!(io->flags & UBLK_IO_FLAG_ACTIVE))
-> > > > > -			nr_inflight++;
-> > > > > -	}
-> > > > > -
-> > > > > -	/* cancelable uring_cmd can't help us if all commands are in-flight */
-> > > > > -	if (nr_inflight == ubq->q_depth) {
-> > > > > -		struct ublk_device *ub = ubq->dev;
-> > > > > -
-> > > > > -		if (ublk_abort_requests(ub, ubq)) {
-> > > > > -			schedule_work(&ub->nosrv_work);
-> > > > > -		}
-> > > > > -		return BLK_EH_DONE;
-> > > > > -	}
-> > > > > -
-> > > > >  	return BLK_EH_RESET_TIMER;
-> > > > >  }
-> > > > >  
-> > > > > @@ -1351,6 +1329,24 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
-> > > > >  static int ublk_ch_release(struct inode *inode, struct file *filp)
-> > > > >  {
-> > > > >  	struct ublk_device *ub = filp->private_data;
-> > > > > +	bool need_schedule = false;
-> > > > > +	int i;
-> > > > > +
-> > > > > +	/*
-> > > > > +	 * Error out any requests outstanding to the ublk server. This
-> > > > > +	 * may have happened already (via uring_cmd cancellation), in
-> > > > > +	 * which case it is not harmful to repeat. But uring_cmd
-> > > > > +	 * cancellation does not handle queues which are fully saturated
-> > > > > +	 * (all requests in ublk server), because from the kernel's POV,
-> > > > > +	 * there are no outstanding uring_cmds to cancel. This code
-> > > > > +	 * handles such queues.
-> > > > > +	 */
-> > > > > +
-> > > > > +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-> > > > > +		need_schedule |= ublk_abort_requests(ub, ublk_get_queue(ub, i));
-> > > > > +
-> > > > > +	if (need_schedule)
-> > > > > +		schedule_work(&ub->nosrv_work);
-> > > > 
-> > > > ublk_abort_requests() should be called only in case of queue dying,
-> > > > since ublk server may open & close the char device multiple times.
-> > > 
-> > > Sure that is technically possible, however is any real ublk server doing
-> > > this? Seems like a strange thing to do, and seems reasonable for the
-> > > driver to transition the device to the nosrv state (dead or recovery,
-> > > depending on flags) when the char device is closed, since in this case,
-> > > no one can be handling I/O anymore.
-> > 
-> > ublk server should be free to open & close the char device multiple times,
-> > but you patch limits ublk server to open & close the char device just once.
-> > 
-> > The limit looks too strong...
-> 
-> Tying a userspace daemon lifetime to the file seems to also be done in
-> fuse, which is very similar to ublk_drv. See e.g. the description here:
-> 
-> https://lore.kernel.org/lkml/20240524064030.4944-1-jefflexu@linux.alibaba.com/T/
-> 
-> This seems required to support certain workflows, e.g. using an fdstore
-> with ublk devices. While we still keep task references in ublk_drv,
-> these workflows will be broken.
-> 
-> I am not familiar with fuse so I don't know for sure, but it sounds like
-> if the file is closed after some setup is performed, then the connection
-> is aborted. The analogy in ublk might be - if the file is closed while
-> the device is LIVE, then we transition to the nosrv state. Otherwise
-> nothing happens and the file can be reopened freely. This will allow
-> libublksrv to continue working as it opens/closes the fd early to
-> determine if it is accessible. Does that sound any better?
+Add block/039 for covering updating nr_hw_queues and switching elevator.
 
-Yes, my point is that the close shouldn't delete disk, since it may
-be one normal close().
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tests/block/039     | 67 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/039.out |  1 +
+ 2 files changed, 68 insertions(+)
+ create mode 100755 tests/block/039
+ create mode 100644 tests/block/039.out
 
-Actually I think your patch should work by the following change:
-
-- remove 'schedule_work(&ub->nosrv_work);' done in ublk_ch_release()
-
-- re-initialize each ublk_queue in open()
-
-Then disk won't be deleted, but any IO is `aborted` by ubq->canceling
-if the char device isn't opened. After the char device is re-opened,
-everything will become fine.
-
-
-Thanks,
-Ming
+diff --git a/tests/block/039 b/tests/block/039
+new file mode 100755
+index 0000000..d29db45
+--- /dev/null
++++ b/tests/block/039
+@@ -0,0 +1,67 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright 2025 Ming Lei <ming.lei@redhat.com>
++#
++# Most of code is copied from block/029
++#
++# Trigger blk_mq_update_nr_hw_queues() & elevator switch
++
++. tests/block/rc
++. common/null_blk
++
++DESCRIPTION="test blk_mq_update_nr_hw_queues() vs switch elevator"
++QUICK=1
++
++requires() {
++	_have_fio && _have_null_blk
++}
++
++
++modify_io_sched() {
++	local deadline
++	local dev=$1
++
++	deadline=$(($(_uptime_s) + TIMEOUT))
++	while [ "$(_uptime_s)" -lt "$deadline" ]; do
++		for sched in $(_io_schedulers "$dev"); do
++			echo "$sched" > /sys/block/"$dev"/queue/scheduler > /dev/null 2>&1
++			sleep .5
++		done
++	done
++}
++
++modify_nr_hw_queues() {
++	local deadline num_cpus
++
++	deadline=$(($(_uptime_s) + TIMEOUT))
++	num_cpus=$(nproc)
++	while [ "$(_uptime_s)" -lt "$deadline" ]; do
++		sleep .1
++		echo 1 > /sys/kernel/config/nullb/nullb1/submit_queues
++		sleep .1
++		echo "$num_cpus" > /sys/kernel/config/nullb/nullb1/submit_queues
++	done
++}
++
++test() {
++	local sq=/sys/kernel/config/nullb/nullb1/submit_queues
++
++	: "${TIMEOUT:=30}"
++	_configure_null_blk nullb1 completion_nsec=0 blocksize=512 \
++			    size=16 memory_backed=1 power=1 &&
++	if { echo 1 >$sq; } 2>/dev/null; then
++		modify_nr_hw_queues &
++		modify_io_sched nullb1 &
++		fio --rw=randwrite --bs=4K --loops=$((10**6)) \
++		    --iodepth=64 --group_reporting --sync=1 --direct=1 \
++		    --ioengine=libaio --filename="/dev/nullb1" \
++		    --runtime="${TIMEOUT}" --name=nullb1 \
++		    --output="${RESULTS_DIR}/block/fio-output-029.txt" \
++		    >>"$FULL"
++		wait
++	else
++		echo "Skipping test because $sq cannot be modified" >>"$FULL"
++	fi
++	_exit_null_blk
++	echo Passed
++}
+diff --git a/tests/block/039.out b/tests/block/039.out
+new file mode 100644
+index 0000000..863339f
+--- /dev/null
++++ b/tests/block/039.out
+@@ -0,0 +1 @@
++Passed
+-- 
+2.44.0
 
