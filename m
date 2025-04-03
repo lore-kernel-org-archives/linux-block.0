@@ -1,141 +1,138 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007BF254AE5
-	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 20:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B8D25BAC4
+	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 20:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743710627; cv=none; b=adp41i7ZSiqwpspHR8VgjwlOVPfhotvCilk7aENZNO/rCOZ+5My394WxqsN6xrEacUHUKModYpuoBYaaIYhQoIGdEnSxPfmGVc1Frw87GW1ucKWouPP0f98dAiyYnMGh8fc1IUGN4168gGhnv8Mf4aO5aXIARskIyQtd5AOrdDE=
+	t=1743710715; cv=none; b=R0aesjRjVDlPvEbrFykH7HzKXrk31ULT5RVgPRHhKh4BGMSjCoVP9EY/lWbdxuZDAhcaQlYz2vOjlmoPNG3TAgusu5clu8blTl9RTcfjCtP2kLVz8X1R/+9yiQOSxkB88xlD00d9bTyo4Lb3ToyCrw/R2XYUgA0OMnsB+URmQv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743710627; c=relaxed/simple;
-	bh=571wgAHHNZchY9Pr4Krv2wdR7SYrBWPKkBv+I2tjHsE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOlUTRTw2X3UefkTBYdjSzp/uhqTTh1R4d4IgSZhJnjZvQo16yrUZl2UNYmv05U00fiRWe+0/NDc3SMj/1TBxIxmZEItKLUpkUYBGZSfYfF2nDXoWM/662xjMfROXdUH0a4BXml+s0CjKY7KRKSThGQtt+VxUcX0xZrHTb4yJW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S1DgFDkp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=wo0ERvEd; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S1DgFDkp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=wo0ERvEd; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1743710715; c=relaxed/simple;
+	bh=VOK2OyWtjeX9aTkdjfM8OSqcCK8wX1uA8EMliUvQC1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m7pwYBMa695h+GSAMEeSN1lN9NjtUffvusqjYWqGw8j6mKGsvMQ8pR3jil/OjbUIiLSC5ckepYK/x8x8pTXfeAWtxPO+RrpnbOouyyY6M6gYEiu+LXq197oWW0WC7zzjpwtv+d0ikO3pUK0PnhC8FasN3rByu0TmvEISQRcKFoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KfH2kRCW; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S1DgFDkp";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="wo0ERvEd";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S1DgFDkp";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="wo0ERvEd"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 39BBB2116A;
-	Thu,  3 Apr 2025 20:03:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743710624;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KfH2kRCW"
+Message-ID: <407754b2-1e52-4d20-892d-524be47053c4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743710709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w10ti+zJK+h6hE8dcgW/UYVoQjAr4Y8jdxl/Rh833Sg=;
-	b=S1DgFDkp1+EWFQPDwRK2ZBM5X06AqAjrrGL5blQlM8BN+BACIRkOykAIH2yajrKrq8psRP
-	/pF5Y6xyRLpwia54rCrFCSAcfuzw2i18caOplWAGQ5+6ePFyByYhqtk0yw09vDEohp38vR
-	ecLgjwWm1tDegMYMVKaZfACRaFnaoNM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743710624;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w10ti+zJK+h6hE8dcgW/UYVoQjAr4Y8jdxl/Rh833Sg=;
-	b=wo0ERvEdLqM7jHeBDxD256MHiDpHK6HRCTJc1KVCJceqnildgWAB5Kg6otETLeXqPge0jV
-	ea25pbqjHfVfUvCQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743710624;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w10ti+zJK+h6hE8dcgW/UYVoQjAr4Y8jdxl/Rh833Sg=;
-	b=S1DgFDkp1+EWFQPDwRK2ZBM5X06AqAjrrGL5blQlM8BN+BACIRkOykAIH2yajrKrq8psRP
-	/pF5Y6xyRLpwia54rCrFCSAcfuzw2i18caOplWAGQ5+6ePFyByYhqtk0yw09vDEohp38vR
-	ecLgjwWm1tDegMYMVKaZfACRaFnaoNM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743710624;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w10ti+zJK+h6hE8dcgW/UYVoQjAr4Y8jdxl/Rh833Sg=;
-	b=wo0ERvEdLqM7jHeBDxD256MHiDpHK6HRCTJc1KVCJceqnildgWAB5Kg6otETLeXqPge0jV
-	ea25pbqjHfVfUvCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0DBA913A2C;
-	Thu,  3 Apr 2025 20:03:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UTLZAqDp7meFOAAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Thu, 03 Apr 2025 20:03:44 +0000
-Date: Thu, 3 Apr 2025 22:03:38 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Naohiro Aota <naohiro.aota@wdc.com>
-Cc: linux-btrfs@vger.kernel.org, dlemoal@kernel.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, hch@infradead.org
-Subject: Re: [PATCH v3 0/2] btrfs: zoned: skip reporting zone for new block
- group
-Message-ID: <20250403200338.GV32661@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <cover.1742348826.git.naohiro.aota@wdc.com>
+	bh=AHjk9tyXIvefyYyXbeOptYF3nU21b5sg0r8hT0A6PLY=;
+	b=KfH2kRCWnTbWMeU4yZ1CAbiKyAd8PD9t8WZC0Nt+EHARmp9GlgkqEsOjbhGlZng1D3spGn
+	CfzOr401ZMyheO8bW7Zdc90x75UdWxn4nkSqyzTlmaKc3tVqfUIiwgyTwup2LfMwDMLCAk
+	KjckNje9XPe1R0o3wpzlZ0I9TEHxJR0=
+Date: Thu, 3 Apr 2025 22:04:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1742348826.git.naohiro.aota@wdc.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Score: -4.00
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,imap1.dmz-prg2.suse.org:helo,suse.cz:replyto];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Subject: Re: [PATCH] loop: replace freezing queue with quiesce when changing
+ loop specific setting
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>,
+ syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
+References: <20250403105414.1334254-1-ming.lei@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20250403105414.1334254-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 19, 2025 at 10:49:15AM +0900, Naohiro Aota wrote:
-> Newly created block group should reside on empty zones, whose write pointer
-> should always be 0. Also, we can load the zone capacity from the block
-> layer. So, we don't need to REPORT_ZONE to load the info.
+在 2025/4/3 12:54, Ming Lei 写道:
+> freeze queue should be used for changing block layer generic setting, such
+> as logical block size, PI, ..., and it is enough to quiesce queue for
+> changing loop specific setting.
 > 
-> The reporting zone on a new block group is not only unnecessary, but also
-> can cause a deadlock. When one process do a report zones and another
-> process freezes the block device, the report zones side cannot allocate
-> a tag because the freeze is already started. This can thus result in new
-> block group creation to hang forever, blocking the write path.
+> Remove the queue freeze warning in loop_update_dio(), since it is only
+> needed in loop_set_block_size(), where queue is froze obviously.
 > 
-> v1: https://patch.msgid.link/cover.1741596325.git.naohiro.aota@wdc.com
-> v2: https://patch.msgid.link/cover.1742259006.git.naohiro.aota@wdc.com
->   - Move other zone related functions into the same #ifdef block.
-> v3:
->   - Rename argument variable and fix the kerneldoc.
+> Fix reported lockdep by syszbot:
 > 
-> Naohiro Aota (2):
->   block: introduce zone capacity helper
->   btrfs: zoned: skip reporting zone for new block group
+> https://lore.kernel.org/linux-block/67ea99e0.050a0220.3c3d88.0042.GAE@google.com/
+> 
+> Reported-by: syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-There seem to be no further comments. I'll add the patches to for-next
-and queue it for merge in 6.15-rc2. Thanks.
+I am fine with this commit.
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+Zhu Yanjun
+
+> ---
+>   drivers/block/loop.c | 14 +++++---------
+>   1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 674527d770dc..59886556f55c 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -190,8 +190,6 @@ static bool lo_can_use_dio(struct loop_device *lo)
+>   static inline void loop_update_dio(struct loop_device *lo)
+>   {
+>   	lockdep_assert_held(&lo->lo_mutex);
+> -	WARN_ON_ONCE(lo->lo_state == Lo_bound &&
+> -		     lo->lo_queue->mq_freeze_depth == 0);
+>   
+>   	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !lo_can_use_dio(lo))
+>   		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+> @@ -595,7 +593,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+>   {
+>   	struct file *file = fget(arg);
+>   	struct file *old_file;
+> -	unsigned int memflags;
+>   	int error;
+>   	bool partscan;
+>   	bool is_loop;
+> @@ -640,11 +637,11 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+>   
+>   	/* and ... switch */
+>   	disk_force_media_change(lo->lo_disk);
+> -	memflags = blk_mq_freeze_queue(lo->lo_queue);
+> +	blk_mq_quiesce_queue(lo->lo_queue);
+>   	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
+>   	loop_assign_backing_file(lo, file);
+>   	loop_update_dio(lo);
+> -	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+> +	blk_mq_unquiesce_queue(lo->lo_queue);
+>   	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+>   	loop_global_unlock(lo, is_loop);
+>   
+> @@ -1270,7 +1267,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>   	int err;
+>   	bool partscan = false;
+>   	bool size_changed = false;
+> -	unsigned int memflags;
+>   
+>   	err = mutex_lock_killable(&lo->lo_mutex);
+>   	if (err)
+> @@ -1287,8 +1283,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>   		invalidate_bdev(lo->lo_device);
+>   	}
+>   
+> -	/* I/O needs to be drained before changing lo_offset or lo_sizelimit */
+> -	memflags = blk_mq_freeze_queue(lo->lo_queue);
+> +	/* queue needs to be quiesced before changing lo_offset or lo_sizelimit */
+> +	blk_mq_quiesce_queue(lo->lo_queue);
+>   
+>   	err = loop_set_status_from_info(lo, info);
+>   	if (err)
+> @@ -1310,7 +1306,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>   	loop_update_dio(lo);
+>   
+>   out_unfreeze:
+> -	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+> +	blk_mq_unquiesce_queue(lo->lo_queue);
+>   	if (partscan)
+>   		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+>   out_unlock:
+
