@@ -1,170 +1,130 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234D61494D8;
-	Thu,  3 Apr 2025 10:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158B21F12FD
+	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 10:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743675215; cv=none; b=qqQ4GjqCfZY8bi8mfd2Fw3DVJhgudK/br/sKFzNuopKL7CASWdzhUjh1GuQ4wziKcbCI9z38xAba5F9EFeQSgOIzjAk1F4+4ngtYKRrApURozHPd3CzJfsWI1gj5Jqun/JMNHXwtmREEodJfakVleY36un6ya/bykW3g+5WF4AE=
+	t=1743675771; cv=none; b=aibaTDXtDi8scBfK+GnrZdJmichmlYTB7ofIJXCYiXNzA1aNMRChu/vRLyN55/fss4z6eP3+mHmsaCrc+zJULplnxu8SYCKplJDgbuqR5EwTecwmzHj8VfTHpQJnyyHvnMF0xsqZf9iLooqUFtpgnf6DUdx1I0NGR60QCVbLkXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743675215; c=relaxed/simple;
-	bh=01MeoMdgRxAVrAckVIAvBLc/gYcrfZ7ucXaVfCHHKug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=O62yehQUIMNOrRueKmPKvXlwDypEnT1JCuMah+j2dvvlh45gSitsz9/M3hMV104f9YXkna9uem9bndI8y4spyqnSInfLjWOEVh7d49NmbwpDm0oaMeB5uJ/45efZhqliYMVqgdlNEpyVGANI09ZxiAdglj8j31wcYDd/7KNV7oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JrpYDDl8; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1743675771; c=relaxed/simple;
+	bh=799zBkTkkIWWT9SrKD1M6Eo+aAgp0cwd/FDRsN6Yg90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=STo/uB3WSFfBwkCwKt2uKFVcDd7m3bwgWgtd6T0GzBI/7XFboAO7esFA2f5ewGned1yJ0cfJP0bjhD5y4uJvBJgWNrZB1fz4o6KQEpNLqU1Q5Khm/WwRgJ3Y0D4oak4U5ewZtN2USeXqRw/kEFLuUvIv5P+w2BsWWi7QPF2Ln4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O+esvqz6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JrpYDDl8"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5339rw6f021462;
-	Thu, 3 Apr 2025 10:13:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	+1tIqhAWCJvJ3CMT+y5CBlACyfbXSMkpcdM6/ucOvxU=; b=JrpYDDl8YNsCAZvc
-	gtCR8T7s2hvDqcMg6HzHwahmSP/aQWu7BMthXYHZHW4Y9uVnlbLt0lKEj86vHEaE
-	ieZApWzKyp36/eMKR2eMhtm1ojwsWT9JSSsgu2KQVNeLV8puf36Q2+vcwVqoMEvO
-	OmD3LVvXtyV+zgzf8Sg9FZ8Xo2/87f4rnCmeMg39noD1MaTakSOJclGgmXflwbB6
-	uJf9zlpg3+lk3tCkeNCDCrtGKrCRIGkulbLBTHTwOcGgiZOsx9dolrU6RT53nKPX
-	W5FpRpKBxOGRCoUYZqivdTheIsKvJ64Z2BddVoXHTzZ2G9bW9NtL+IFhnI9II1ch
-	YYONqg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45sbxy1qrm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Apr 2025 10:13:13 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 533ADCIq003801
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 3 Apr 2025 10:13:12 GMT
-Received: from [10.133.33.118] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 3 Apr 2025
- 03:13:08 -0700
-Message-ID: <94dac340-2f92-40a3-be56-ba8bd2298328@quicinc.com>
-Date: Thu, 3 Apr 2025 18:13:05 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+esvqz6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743675767;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6MmDKYKBuQXiMXyQ/vKHj8tE2zeAfLJQ75wQghYrd60=;
+	b=O+esvqz6uvSeCkLOQXjjJ5saN7U1JQhjNtPFNu1XrcC50iUwSNsz0DcY81uL/jb3l1m8AO
+	02onP7PXbxKByyKPAl4fBfkQKH2amKFD/l8AZpf0OgJ3Ep+KnCDHW/jgZRyRjCaaO/XM6D
+	/trgbszi2s15bUzUzY0w3RVTk+nEtLk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-457-zUYLnpZxOHizV1GMDSxqWg-1; Thu,
+ 03 Apr 2025 06:22:44 -0400
+X-MC-Unique: zUYLnpZxOHizV1GMDSxqWg-1
+X-Mimecast-MFC-AGG-ID: zUYLnpZxOHizV1GMDSxqWg_1743675763
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F31019560B6;
+	Thu,  3 Apr 2025 10:22:43 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.26])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE7CE19792DC;
+	Thu,  3 Apr 2025 10:22:38 +0000 (UTC)
+Date: Thu, 3 Apr 2025 18:22:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+	Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH V2 1/3] block: add blk_mq_enter_no_io() and
+ blk_mq_exit_no_io()
+Message-ID: <Z-5haMsgIIGrfZSn@fedora>
+References: <20250403025214.1274650-1-ming.lei@redhat.com>
+ <20250403025214.1274650-2-ming.lei@redhat.com>
+ <20250403054427.GB24133@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] PCI: Remove pcim_iounmap_regions()
-To: Philipp Stanner <phasta@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Jens Axboe <axboe@kernel.dk>, Bjorn Helgaas <bhelgaas@google.com>,
-        Mark Brown
-	<broonie@kernel.org>,
-        David Lechner <dlechner@baylibre.com>,
-        Philipp Stanner
-	<pstanner@redhat.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andy Shevchenko
-	<andriy.shevchenko@linux.intel.com>,
-        Yang Yingliang
-	<yangyingliang@huawei.com>,
-        Hannes Reinecke <hare@suse.de>, Al Viro
-	<viro@zeniv.linux.org.uk>,
-        Li Zetao <lizetao1@huawei.com>, Anuj Gupta
-	<anuj20.g@samsung.com>
-CC: <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-pci@vger.kernel.org>
-References: <20250327110707.20025-2-phasta@kernel.org>
- <20250327110707.20025-4-phasta@kernel.org>
-Content-Language: en-US
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-In-Reply-To: <20250327110707.20025-4-phasta@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 3W9z93NkZwxm7a7kjWSLINJPYXmxd6Gc
-X-Proofpoint-ORIG-GUID: 3W9z93NkZwxm7a7kjWSLINJPYXmxd6Gc
-X-Authority-Analysis: v=2.4 cv=PNAP+eqC c=1 sm=1 tr=0 ts=67ee5f39 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=20KFwNOVAAAA:8 a=COk6AnOGAAAA:8 a=YDoAUpYN6iqzQeISu80A:9
- a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-03_04,2025-04-02_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- malwarescore=0 adultscore=0 phishscore=0 clxscore=1011 mlxscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 priorityscore=1501
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504030036
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250403054427.GB24133@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 3/27/2025 7:07 PM, Philipp Stanner wrote:
-> From: Philipp Stanner <pstanner@redhat.com>
+On Thu, Apr 03, 2025 at 07:44:27AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 03, 2025 at 10:52:08AM +0800, Ming Lei wrote:
+> > Add blk_mq_enter_no_io() and blk_mq_exit_no_io() for preventing queue
+> > from handling any FS or passthrough IO, meantime the queue is kept in
+> > non-freeze state.
 > 
-> All users of the deprecated function pcim_iounmap_regions() have been
-> ported by now. Remove it.
+> How does that differ from the actual freeze?  Please document that
+> clearly in the commit log and in kerneldoc comments, and do an analysis
+> of which callers should do the full freeze and which the limited I/O
+> freeze.
 > 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->  .../driver-api/driver-model/devres.rst        |  1 -
->  drivers/pci/devres.c                          | 24 -------------------
->  include/linux/pci.h                           |  1 -
->  3 files changed, 26 deletions(-)
+> Also the name is really unfortunate - no_io has a very clear connotation
+> for memory allocations, so this should be using something else.
 > 
-> diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-> index d75728eb05f8..601f1a74d34d 100644
-> --- a/Documentation/driver-api/driver-model/devres.rst
-> +++ b/Documentation/driver-api/driver-model/devres.rst
-> @@ -396,7 +396,6 @@ PCI
->    pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
->    pcim_iomap_table()		: array of mapped addresses indexed by BAR
->    pcim_iounmap()		: do iounmap() on a single BAR
-> -  pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
->    pcim_pin_device()		: keep PCI device enabled after release
->    pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
->  
-> diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-> index 3431a7df3e0d..c60441555758 100644
-> --- a/drivers/pci/devres.c
-> +++ b/drivers/pci/devres.c
-> @@ -946,30 +946,6 @@ int pcim_request_all_regions(struct pci_dev *pdev, const char *name)
->  }
->  EXPORT_SYMBOL(pcim_request_all_regions);
->  
-> -/**
-> - * pcim_iounmap_regions - Unmap and release PCI BARs (DEPRECATED)
-> - * @pdev: PCI device to map IO resources for
-> - * @mask: Mask of BARs to unmap and release
-> - *
-> - * Unmap and release regions specified by @mask.
-> - *
-> - * This function is DEPRECATED. Do not use it in new code.
-> - * Use pcim_iounmap_region() instead.
-> - */
-> -void pcim_iounmap_regions(struct pci_dev *pdev, int mask)
-> -{
-> -	int i;
-> -
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (!mask_contains_bar(mask, i))
-> -			continue;
-> -
-> -		pcim_iounmap_region(pdev, i);
-> -		pcim_remove_bar_from_legacy_table(pdev, i);
-> -	}
-> -}
-> -EXPORT_SYMBOL(pcim_iounmap_regions);
-> -
->  /**
->   * pcim_iomap_range - Create a ranged __iomap mapping within a PCI BAR
->   * @pdev: PCI device to map IO resources for
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 47b31ad724fa..7661f10913ca 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -2323,7 +2323,6 @@ void pcim_iounmap(struct pci_dev *pdev, void __iomem *addr);
->  void __iomem * const *pcim_iomap_table(struct pci_dev *pdev);
->  int pcim_request_region(struct pci_dev *pdev, int bar, const char *name);
->  int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
-> -void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
->  void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
->  				unsigned long offset, unsigned long len);
->  
+> > Also add two variants of memsave version, since no fs_reclaim is allowed
+> > in case of blk_mq_enter_no_io().
+> 
+> Please explain why.
+> 
+> 
+> > index ae8494d88897..d117fa18b394 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -222,8 +222,7 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+> >  	bool unfreeze;
+> >  
+> >  	mutex_lock(&q->mq_freeze_lock);
+> > -	if (force_atomic)
+> > -		q->q_usage_counter.data->force_atomic = true;
+> > +	q->q_usage_counter.data->force_atomic = force_atomic;
+> >  	q->mq_freeze_depth--;
+> >  	WARN_ON_ONCE(q->mq_freeze_depth < 0);
+> >  	if (!q->mq_freeze_depth) {
+> 
+> This is a completely unrelated cleanup.
+> 
+> > +void blk_mq_enter_no_io(struct request_queue *q)
+> > +{
+> > +	blk_mq_freeze_queue_nomemsave(q);
+> > +	q->no_io = true;
+> > +	if (__blk_mq_unfreeze_queue(q, true))
+> > +		blk_unfreeze_release_lock(q);
+> 
+> So this freezes the queue, sets a flag to not do I/O then unfreezes
+> it.   So AFAIK it just is a freeze without the automatic recursion.
+> 
+> But maybe I'm missing something?
 
-Reviewed-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Yeah, looks lockdep modeling for blk_mq_enter_no_io() is wrong, and the
+part in bio_enter_queue() is missed.
+
+So this approach doesn't work.
+
+Now the dependency between freeze lock and elevator lock looks one trouble,
+such as [1], which is one real deadlock risk.
+
+And there should be more.
+
+[1] https://lore.kernel.org/linux-block/7755.1743228130@turing-police/#tReviewed-by
+
+
+Thanks,
+Ming
+
