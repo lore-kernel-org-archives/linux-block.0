@@ -1,103 +1,128 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A5114386D
-	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 02:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3234519D065;
+	Thu,  3 Apr 2025 05:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743648892; cv=none; b=Tn8qo4xhX1A0HOh1lhxtMhOMpMk5G6TTjHDo7T07QQ5fGae13elJcjQXDesuWzEAE6SINYte43mU+kCrYGgriW8SELdjoD/6lH8ggVRlc8nDTIBE/po6W8pJzdJIJSrybTzq6sNsz220qfQR0nrhYJkOIY0PM8mUpAAgY0dJSPM=
+	t=1743658095; cv=none; b=kR8qT3Uyz07UuAKE3d0D3RgsrclHfYRsQ8WDhPh9WnlINhSk/IbvY4G/ARBWQviqeDYv80TtLlGxj2QNzjGeYK+YWmIZWLj4oYXDl51BU0NbtSeSqkwJ9KGG8rPISvSV4anV+V/+lxU0dU1urLT2xm0Xn9AvnYakkdO0aoD4jk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743648892; c=relaxed/simple;
-	bh=co0ZqHyeZYqY6ysV04/+bQm8kMeNhD71NM/HvIN9Fas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wd2MxnW1QTAbPXwzxXYz4wwpj/9slIGkQKGTOWa54DjTysDoo91NL7QCnDc1s2kL3ylfvx69YbG5imykA/vCSJfvCOWNn2sa7jetDtg4mFLe8nxnevb6R80v7qRGJKIEj5+J57c4GDz3lqvskt6CTX9xPq69gJAj9q9RJmq8KpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dD0VRPA1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1743658095; c=relaxed/simple;
+	bh=ablVFuA06C0J29dzcF/q8RicjJAWLm1LkqyJq3zLGb8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NCuoyVioqt6SVvqgpoqHcBDl+7KVs2Ou0M/s0B+0VU6LUFdCoUjSud9OgdshKka5VnWQvCUIJINdSCFt6ihIDHP7LFRyRMT30brk0cmeoT3XLa76Ze1hb86ZNZfmVu23fvGyuLd/nCohwntMYv1otJW9eITOnI8KIhymQESiUeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IH4G765w; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dD0VRPA1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743648889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=87x4mFxvzbD9B39A/jzDT8JGVG7M9KU2SK5Nm9bAFXk=;
-	b=dD0VRPA10hfuZU3pxWK40VXU0Y2vD7fnnljpzlTArhZN7h8SyiThhLuJwC4IlDBv1FGkS3
-	Fw1o3Wfl4JK/Nvi+Cabg2YChN4i1xNHJnosOfwSTpSzwiOF0pwYmWuiiiv7xCm6WI9gY+2
-	/TdAQ7okaiYOdi+nXcDmZajojO1L/cM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-532-hsKnii3fMuSQ1vk8QKEiHQ-1; Wed,
- 02 Apr 2025 22:54:46 -0400
-X-MC-Unique: hsKnii3fMuSQ1vk8QKEiHQ-1
-X-Mimecast-MFC-AGG-ID: hsKnii3fMuSQ1vk8QKEiHQ_1743648885
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C59A1801A00;
-	Thu,  3 Apr 2025 02:54:45 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.26])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 41C1B180176A;
-	Thu,  3 Apr 2025 02:54:39 +0000 (UTC)
-Date: Thu, 3 Apr 2025 10:54:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
-Subject: Re: [PATCH 3/3] block: use blk_mq_no_io() for avoiding lock
- dependency
-Message-ID: <Z-34as5GCEtdYsOy@fedora>
-References: <20250402043851.946498-1-ming.lei@redhat.com>
- <20250402043851.946498-4-ming.lei@redhat.com>
- <089a8cf5-bc01-468f-ab96-f04448e034ae@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IH4G765w"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so449332b3a.0;
+        Wed, 02 Apr 2025 22:28:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743658093; x=1744262893; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=StDYUD7CYFFKgLT10v5qHsCOJxby6VYxth9kuac+LSM=;
+        b=IH4G765wa5X2PMk6GCi4vyKgIN92b+fLsCrIRPPH1bH1jfByiLqjTAV17EGEZceR++
+         fEPGFNKDS4ld3Gox8CgWUZmWitDpKzUzUx3AMig1KQN+z63JCxSiIX92XttwwHP3A3+O
+         5Is7a9+TvvVzS4CIwckBoYZnkNzC5LjCTMa5TgfixIRusI9/9JrTVTr7uuGte2iNqLu8
+         VaafArp8H308SUV0BSFfsXU3fUeNl1LENarrEjsqmMRei7CjcwEKIaDr4uSV9dUSgQxP
+         uZJWwZ2hQCXAp/yGU+6eIrhiLbeJv0U0fk9iPdVelf9WKCq6UiBL4FBh8hQvWmWLu8RI
+         uJxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743658093; x=1744262893;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=StDYUD7CYFFKgLT10v5qHsCOJxby6VYxth9kuac+LSM=;
+        b=F0BRLdDXb8G041+ErjOVOg6RwWLayXLLoDW1Zy0/0+0XoJEdQZjDcfdi+KdL6Wkz/J
+         W/ViCE0et2JuKc8Xy7muwn1dHa2HeL/YDvOWzLS7ZvEFnkT4SnJbS2DRWrIrOQgQl/xC
+         LDxMYN2QUCYhosH2gjhrJHV7hP5sM2ARWTcBOwmxH6G6qQpR1Y1FmY17ASf29mtgiNed
+         +kj368z0wJs3q2Xxz9xK7/Rk5U5B7AJ8d/F6DfLzkvIWB7N5PD1w93Qj9R/9aaW/XiCR
+         a6eve+gIWSbOVjrA+H6SVbvh3TgBSlw+4tqdUEtgq8/OybeEp/ZXqM31xWBmeltdgSHJ
+         OaiA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2guNXjzOORlKyE+JFYdw5yY/36yeAGOzrykTJ1rRKoEAq/tdOgodVlR7cLbLxjBOZeMNmtKtOF6uhMiuW@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywyud5v0OwyW8rVE7+QOopdnIc1vpTeDNmDPHGb1dGzI/lluCpB
+	EYdgteYweXK3bi470py27GZ+AR/py1Njx2nYv5hr5/T/sY1CmDBdPwmXuA==
+X-Gm-Gg: ASbGncvy1PGFJY6TBI1MixWP+5z3Izs3Tt3yRDLZ+yjRbtfNKs54n4KPhbNWGdmFDbl
+	jkPcl5YpKNER6JL5L/JuRpJaN5QCWLk4EpzF9uPmU5d0kjiF1tt47OCzhIqcCTdul1RrLptFtwO
+	Ih6yDksQlvys63b1ioyO2Pjw8f+vD8Tra5/NipCeCl/15b5kJCKB4rrJWsA7RWT1JKPJxMco803
+	rhbu6ozST6GFoB2sIY3GInFoBneSCxsrl1yPgvzSJVAV8r4BfcQbeEMAUqPH0i7+u+46oaSt5qk
+	xVl0Oa1nPjOoZooE/t3Boifi9i1NLq4eWajJHNEHRFCnyUsNCg==
+X-Google-Smtp-Source: AGHT+IH76oAzOf2n/1347hmtRzYUYFyy8et/1n6aBjDfBicof8YbnylTMps1+zfYM71ktapq7D722Q==
+X-Received: by 2002:a05:6a00:398f:b0:736:ab48:5b0 with SMTP id d2e1a72fcca58-739c78430demr5736643b3a.2.1743658092660;
+        Wed, 02 Apr 2025 22:28:12 -0700 (PDT)
+Received: from dw-tp.ibmuc.com ([171.76.86.91])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d9ea09a5sm541830b3a.107.2025.04.02.22.28.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Apr 2025 22:28:11 -0700 (PDT)
+From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: John Garry <john.g.garry@oracle.com>,
+	axboe@kernel.dk,
+	djwong@kernel.org,
+	ojaswin@linux.ibm.com,
+	linux-fsdevel@vger.kernel.org,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Subject: [RFC] traceevent/block: Add REQ_ATOMIC flag to block trace events
+Date: Thu,  3 Apr 2025 10:58:03 +0530
+Message-ID: <1cbcee1a6a39abb41768a6b1c69ec8751ed0215a.1743656654.git.ritesh.list@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <089a8cf5-bc01-468f-ab96-f04448e034ae@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Apr 02, 2025 at 07:13:56PM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 4/2/25 10:08 AM, Ming Lei wrote:
-> > Use blk_mq_no_io() to prevent IO from entering queue for avoiding lock
-> > dependency between freeze lock and elevator lock, and we have got many
-> > such reports:
-> > 
-> > Reported-by: syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/linux-block/67e6b425.050a0220.2f068f.007b.GAE@google.com/
-> > Reported-by: Valdis Klētnieks <valdis.kletnieks@vt.edu>
-> > Closes: https://lore.kernel.org/linux-block/7755.1743228130@turing-police/#t
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> 
-> I tested this series on my system and this works well as we cut dependency
-> between ->elevator_lock and ->freeze_lock. However don't we plan to now 
-> model blk_mq_enter_no_io and blk_mq_exit_no_io as lock/unlock for supporting 
-> lockdep? Maybe we don't.
+Filesystems like XFS can implement atomic write I/O using either REQ_ATOMIC
+flag set in the bio or via CoW operation. It will be useful if we have a
+flag in trace events to distinguish between the two. This patch adds
+char 'a' to rwbs field of the trace events if REQ_ATOMIC flag is set in
+the bio.
 
-Good point!
+<W/ REQ_ATOMIC>
+=================
+xfs_io-1107    [002] .....   406.206441: block_rq_issue: 8,48 WSa 16384 () 768 + 32 none,0,0 [xfs_io]
+<idle>-0       [002] ..s1.   406.209918: block_rq_complete: 8,48 WSa () 768 + 32 none,0,0 [0]
 
-> 
-> Overall changes looks good to me:
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+<W/O REQ_ATOMIC>
+===============
+xfs_io-1108    [002] .....   411.212317: block_rq_issue: 8,48 WS 16384 () 1024 + 32 none,0,0 [xfs_io]
+<idle>-0       [002] ..s1.   411.215842: block_rq_complete: 8,48 WS () 1024 + 32 none,0,0 [0]
 
-Thanks for the review!
+Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+---
+ include/trace/events/block.h | 2 +-
+ kernel/trace/blktrace.c      | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-lockdep modeling for blk_mq_enter_no_io and blk_mq_exit_no_io has been
-added in V2.
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index bd0ea07338eb..de538b110ea1 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -11,7 +11,7 @@
+ #include <linux/tracepoint.h>
+ #include <uapi/linux/ioprio.h>
 
+-#define RWBS_LEN	8
++#define RWBS_LEN	9
 
-Thanks, 
-Ming
+ #define IOPRIO_CLASS_STRINGS \
+ 	{ IOPRIO_CLASS_NONE,	"none" }, \
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 3679a6d18934..6badf296ab2b 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1896,6 +1896,8 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+ 		rwbs[i++] = 'S';
+ 	if (opf & REQ_META)
+ 		rwbs[i++] = 'M';
++	if (opf & REQ_ATOMIC)
++		rwbs[i++] = 'a';
+
+ 	rwbs[i] = '\0';
+ }
+--
+2.48.1
 
