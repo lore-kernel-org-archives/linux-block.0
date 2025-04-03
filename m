@@ -1,116 +1,82 @@
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32E0EEA8
-	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 01:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF456F31E;
+	Thu,  3 Apr 2025 02:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743642373; cv=none; b=l5W7Bd6BFadVs7ikMXQ8MBBs6XaOUMtAHOb8Q2QtuxZGXLesuGzVIrmDZ1vYf/o0UU490wzS8O3nB6yqC1e3ktwbwmJ/Hq9FUdcxweHhApEAVB9ADkVhPpcVLAcBiDYgCYh9ZeXDq34Hk5pfYIvDnUoMfaDCoyTBT6cViK83omM=
+	t=1743645866; cv=none; b=FKlmscMDYDLfDN8NmBGF1SzulqCngYbPEd7d93zfx5QevX83G7QWKKJmHBkWRuLX3Gabhz3+4EAofqKba1iRdA+HDkluRnC+x1C5ttTf8uzahy1BI8vOrl/kk4nSKfVQxLhfrDJba/73TzSKuGz3MikqX+4ypKzo6eVDe2ue4pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743642373; c=relaxed/simple;
-	bh=DPjNaJwGYIut3lVEtU1MEzbkoWxtgz7SV3Az7K0Q3eU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Xlc0s99We/DZIRg0QxWpucys5hfhqsrqj2KWyQPPIMIhe2Q/qeUHb5UC2KYoOm6gI13ndjwWy/qw0tA/0v1DrANN4xuJjnujcq9pLQOpoGwZHU6OXmkrpsljH59cjK2y9ns6y7uTibU/hh9PH8FJbYRK7xeRBjePX16uGRlAGQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
-Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-	by 156.147.23.51 with ESMTP; 3 Apr 2025 09:36:07 +0900
-X-Original-SENDERIP: 156.147.1.125
-X-Original-MAILFROM: chanho.min@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
-	by 156.147.1.125 with ESMTP; 3 Apr 2025 09:36:07 +0900
-X-Original-SENDERIP: 10.178.31.96
-X-Original-MAILFROM: chanho.min@lge.com
-From: Chanho Min <chanho.min@lge.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Sven <dm-devel@schwermer.no>,
-	Neil Brown <neilb@suse.de>,
-	hch@lst.de,
-	dm-devel@lists.linux.dev,
-	Gunho Lee <gunho.lee@lge.com>,
-	Chanho Min <chanho.min@lge.com>
-Subject: [PATCH] block: remove non-existent partition dev_t return from blk_lookup_devt
-Date: Thu,  3 Apr 2025 09:35:32 +0900
-Message-Id: <20250403003532.412-1-chanho.min@lge.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1743645866; c=relaxed/simple;
+	bh=a96SlvwEBzJj+2DnKMwsTwDZGhq08Zv/n7EyUk+W7Rs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gd0HKfqSoUqEigUXdshvSd2h5CR6MKEzyiBniEhIu/jok1AX1J4slZnBsXLhuvtTSh3SPBL2o/nr+O48fEFg2B9AsB96bCNVbWTpA75g21wcWhM0DaLAbTjZwtu9WWARsNTcX8jwRxcTPuiRRElO79MWPOMmPIgr6YJTMkutPLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZ/jDKFa; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZ/jDKFa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A600C4CEDD;
+	Thu,  3 Apr 2025 02:04:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743645865;
+	bh=a96SlvwEBzJj+2DnKMwsTwDZGhq08Zv/n7EyUk+W7Rs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GZ/jDKFaDLc097kSITEFAQ6NhhyOGIJG3yaklFbH+MEfC/ySGAZ/45xfBAgNi3XVB
+	 n4V6J65QqB1NCOGquu1iiluGCY7h47njXbzBhYbo/hKA5GyJeDTXj27rkq5OThV2+q
+	 L8zB1DX5jdqsXcB8wRLMKZ51RdJcB0UhyjyeoJfqGihVuNjw6aOKNXHxytumXTcwPV
+	 XuFpklC0UtxfwxG9BzQlAxNaL+3vK1/syQk4KhQ8wIIJhJOMsjbjno5q91werBEMle
+	 /eoP1p1iWA2SQ42DYlBDj4/QPH5fvY63ddBeg8MLGfn6e8vELEAjnp3TmeuFsoSAdp
+	 Zz/K3YI8eqJDA==
+Date: Wed, 2 Apr 2025 19:04:23 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, brauner@kernel.org, tytso@mit.edu,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com, hannes@cmpxchg.org, oliver.sang@intel.com,
+	david@redhat.com, axboe@kernel.dk, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+	da.gomez@samsung.com
+Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
+ __find_get_block_slow()
+Message-ID: <Z-3spxNHYe_CbLgP@bombadil.infradead.org>
+References: <20250330064732.3781046-1-mcgrof@kernel.org>
+ <20250330064732.3781046-3-mcgrof@kernel.org>
+ <lj6o73q6nev776uvy7potqrn5gmgtm4o2cev7dloedwasxcsmn@uanvqp3sm35p>
+ <20250401214951.kikcrmu5k3q6qmcr@offworld>
+ <Z-yZxMVJgqOOpjHn@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-yZxMVJgqOOpjHn@casper.infradead.org>
 
-We encountered frequent boot failures while setting up a dm-verity rootfs with
-the following configuration, and found that this issue had been reported
-previously:
+On Wed, Apr 02, 2025 at 02:58:28AM +0100, Matthew Wilcox wrote:
+> On Tue, Apr 01, 2025 at 02:49:51PM -0700, Davidlohr Bueso wrote:
+> > So the below could be tucked in for norefs only (because this is about the addr
+> > space i_private_lock), but this also shortens the hold time; if that matters
+> > at all, of course, vs changing the migration semantics.
+> 
+> I like this approach a lot better.  One wrinkle is that it doesn't seem
+> that we need to set the BH_Migrate bit on every buffer; we could define
+> that it's only set on the head BH, right?
 
-  root=/dev/dm-0
-  dm-mod.waitfor=/dev/mmcblk0p23
+Yes, we are also only doing this for block devices, and for migration
+purposes. Even though a bit from one buffer may be desirable it makes
+no sense to allow for that in case migration is taking place.  So indeed
+we have no need to add the flag for all buffers.
 
-The error observed was:
+I think the remaining question is what users of __find_get_block_slow()
+can really block, and well I've started trying to determine that with
+coccinelle [0], its gonna take some more time.
 
-  device-mapper: table: 254:0: verity: Data device lookup failed (-ENXIO)
-  device-mapper: ioctl: error adding target to table
+Perhaps its easier to ask, why would a block device mapping want to
+allow __find_get_block_slow() to not block?
 
-Bisecting the issue revealed that this was a latent problem exacerbated by
-commit 238d991f054a ("dm: use fsleep() instead of msleep() for deterministic
-sleep duration"), after which the failures became more frequent. Further
-investigation pinpointed the root cause to a special case added in
-blk_lookup_devt() by commit 41b8c853a495 ("block: fix booting from partitioned
-md array")
+[0] https://lkml.kernel.org/r/20250403020123.1806887-1-mcgrof@kernel.org
 
-This commit modified blk_lookup_devt() to return a dev_t for non-existent
-partitions to support MD RAID booting when partitions are not yet available,
-e.g., for root=/dev/md_d0p1. While this addressed the MD issue, it deviates
-from the expected role of blk_lookup_devt(), which should return a dev_t only
-for existing block devices. Adding MD-specific logic to a common block layer
-function was a suboptimal approach, as it compromises the function's clarity
-and causes side effects, such as the dm-init failures seen with dm-verity.
-
-The MD RAID booting issue should ideally have been handled within the MD
-driver or boot logic (e.g., via a dedicated md_lookup_devt() function) rather
-than modifying a generic lookup function. This patch removes the non-existent
-partition dev_t return logic, restoring blk_lookup_devt() to its intended
-purpose. This resolves the dm-verity boot failures by ensuring accurate dev_t
-returns.
-
-If MD RAID booting still depends on this behavior in some setups, a regression
-may occur. In that case, the MD subsystem should implement a proper solution
-(e.g., specific lookup function) rather than relying on this workaround.
-Testers are encouraged to verify MD RAID booting with partitioned root devices
-(e.g., root=/dev/md_d0p1) to confirm.
-
-Signed-off-by: Chanho Min <chanho.min@lge.com>
----
- block/early-lookup.c | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
-
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 3fb57f7d2b127..3764dfb429c54 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -134,17 +134,9 @@ static dev_t __init blk_lookup_devt(const char *name, int partno)
- 		if (strcmp(dev_name(dev), name))
- 			continue;
- 
--		if (partno < disk->minors) {
--			/* We need to return the right devno, even
--			 * if the partition doesn't exist yet.
--			 */
--			devt = MKDEV(MAJOR(dev->devt),
--				     MINOR(dev->devt) + partno);
--		} else {
--			devt = part_devt(disk, partno);
--			if (devt)
--				break;
--		}
-+		devt = part_devt(disk, partno);
-+		if (devt)
-+			break;
- 	}
- 	class_dev_iter_exit(&iter);
- 	return devt;
--- 
-2.17.1
-
+  Luis
