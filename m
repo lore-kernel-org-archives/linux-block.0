@@ -1,48 +1,44 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF7C24BC06
-	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 16:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AB92512D7;
+	Thu,  3 Apr 2025 17:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743696798; cv=none; b=hF0ng8DX4R9FI5J+9e9ttLqmEVpSYwpIi9SKXS3Qao/eSKxiQ4EX84rxuh4o470chdHCiIDWI8oKkqnp95wA4desf3GQcj5DJAKk7KstYNXhjbp16HTtDqqBTb/ac2VIcsw45W/EQCv5D3voEwqPZeLnJtcSvaQshKddcnxmhD0=
+	t=1743702266; cv=none; b=ZkgjLiUNXg17IRHZ7dhp2ICnB5aDISL5m78vFgDZ4hLLF41nTgcEwgZTgVqbMYkGIWDooepS2cEXpB2NTkZFYGArHiiX5W3M1ido2SDsnzUUxeYYQ6fdqfoqxTgASl99Y6GWKdxvbW+mzUdd62UKW6Ph0z6Cml/6ZY273wvRaAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743696798; c=relaxed/simple;
-	bh=ZxlrAciEoWVbQD1CtbCSoNvl5hTx6xGK12SlTdXCDIU=;
+	s=arc-20240116; t=1743702266; c=relaxed/simple;
+	bh=2k/M/IytbGPTT46+syVtjeXIilg4EhbveiCgLEZgIoc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KiuZQBZIet+2PC+0BoxCZTQlOrA22nem6yD4FamNRZTSI2RyLZtjr5rXsScLG47XzoxGvczoXczq7eX56zNdCwbgBvPiaSZ0tznyf27F8bm4hI62PpfKsCB57jqgg7ZN6DxauhELk+NDgPleTVfg1xecNJ0ZNU3T4RbXPR1FSSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from trampoline.thunk.org (pool-173-48-119-246.bstnma.fios.verizon.net [173.48.119.246])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 533GBsv8001822
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 3 Apr 2025 12:11:54 -0400
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id B7F192E0019; Thu, 03 Apr 2025 12:11:53 -0400 (EDT)
-Date: Thu, 3 Apr 2025 12:11:53 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Jan Kara <jack@suse.cz>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-        brauner@kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, riel@surriel.com, hannes@cmpxchg.org,
-        oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk, hare@suse.de,
-        david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
-        da.gomez@samsung.com
-Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
- __find_get_block_slow()
-Message-ID: <20250403161153.GA3051250@mit.edu>
-References: <20250330064732.3781046-1-mcgrof@kernel.org>
- <20250330064732.3781046-3-mcgrof@kernel.org>
- <lj6o73q6nev776uvy7potqrn5gmgtm4o2cev7dloedwasxcsmn@uanvqp3sm35p>
- <20250401214951.kikcrmu5k3q6qmcr@offworld>
- <Z-yZxMVJgqOOpjHn@casper.infradead.org>
- <Z-3spxNHYe_CbLgP@bombadil.infradead.org>
- <2jrcw4mtwcophanqmi2y74ffgf247m6ap44u3gedpylsjl3bz6@yueuwkmcwm66>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pcfC9Eu+DOgcf/nh0wdBgYN3uoEc8UFSVEop4pTCAs4zeE/IK53ig3HpUjagom4MdLKkTNNoaxJPBzrlp9fk78bU6lA2awukM+/b3iHc6cqeckYnbXhaOJMBX68xjq3HTf69YRX3XVptEVgA8/MW/NPXe+uK2uP8C7EFWWw138w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nl/vq4hP; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nl/vq4hP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5bCE/e2+eVXHTwCCmYdkChzX3931MOPxX+eV7bSag/U=; b=nl/vq4hPPV2slo8lQS9KTGLAhW
+	6HT134e/y+NZ35rY3CdmUXCSkbL80OApd2x+j6ZZdgRWFNVvK+Oo7UKFGHIA+Oa806RrDdDmAb3bV
+	izWJCkr2/Of7CnP3qDjiTLx+h8IBMTVhDYyeVgJaVZ0jLmK6uf4URDQvcX+vym6kRYEFRgybeh0hQ
+	w+XUonev7HTQeJOpUVPYihT/xxjQD60dOfBP/1tb3PmewCtnuRPQxfL+6KSruHCKZzAWT6wlrs60U
+	SfvbpVqqbcmErdNuypbivLXijOP3Wsk6g9/2vCP/Op8cpATSj62osNgmmHqRyweRtPSMw6Eh9rTXq
+	vJqZSuTg==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u0Oc2-0000000DPFq-29E2;
+	Thu, 03 Apr 2025 17:44:22 +0000
+Date: Thu, 3 Apr 2025 18:44:22 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-btrfs <linux-btrfs@vger.kernel.org>
+Subject: Re: Proper way to copy de-compressed data into a bio, in folio style?
+Message-ID: <Z-7I9hOcGzQMV3hq@casper.infradead.org>
+References: <17517804-1c6b-4b96-a608-8c3d80e5f6dd@gmx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,24 +47,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2jrcw4mtwcophanqmi2y74ffgf247m6ap44u3gedpylsjl3bz6@yueuwkmcwm66>
+In-Reply-To: <17517804-1c6b-4b96-a608-8c3d80e5f6dd@gmx.com>
 
-On Thu, Apr 03, 2025 at 03:43:12PM +0200, Jan Kara wrote:
->   fs/ext4/ialloc.c:recently_deleted() - this one is the most problematic
->     place. It must bail rather than sleeping (called under a spinlock) but
->     it depends on the fact that if bh is not returned, then the data has been
->     written out and evicted from memory. Luckily, the usage of
->     recently_deleted() is mostly an optimization to reduce damage in case
->     of crash so rare false failure should be OK. Ted, what is your opinion?
+On Mon, Mar 31, 2025 at 06:45:10PM +1030, Qu Wenruo wrote:
+> Hi,
+> 
+> The seemingly easy question has some very interesting extra requirements:
+> 
+> 1. The bio contains contig file map folios
+>    The folios may be large.
+>    So page_offset() on bv_page (using single-page bvec) is no longer
+>    reliable, one has to call page_pgoff() instead.
 
-Yes, if we can just assume that inode has not been recently deleted in
-the rare case where a miogration is taking place, that should be fine.
-So in practice, recently_deleted() could just call some variant of
-find_get_block() (with some flag ) which returns NULL if we need to
-sleep (e.g., if it is not in the buffer cache so a read would need to
-take place, or we need to wait for the page migration to complete),
-that should work fine.
+page_offset() is on my hitlist.  It actually is correct now (commit
+12851bd921d4) but it's on its way out.  Don't use bv_page.
 
-Thanks,
+> 2. The data may not cover the bio range
+>    So we need some range comparison and skip if the data range doesn't
+>    cover the bio range.
 
-					- Ted
+I have no idea what this means.
+
+> 3. The bio may have been advanced
+>    E.g. previous de-compressed range has been copied, but the remaining
+>    part still needs to be fulfilled.
+> 
+>    And we need to use the bv_page's file offset to calculate the real
+>    beginning of the range to copy.
+> 
+> The current btrfs code is doing single page bvec iteration, and handling
+> point 2 and 3 well.
+> (btrfs_decompress_buf2page() in fs/btrfs/compression.c)
+> 
+> Point 1 was not causing problem until the incoming large data folio
+> support, and can be easily fixed with page_pgoff() convertion.
+> 
+> 
+> But since we're here, I'm also wondering can we do it better with a
+> folio or multi-page bvec way?
+> 
+> The current folio bio iteration helper can only start from the beginning
+> of a bio (bio_for_each_folio_all() and bio_first_folio()), thus it's not
+> a good fit for point 3.
+> 
+> On the other hand, I'm having some internal code to convert a bio_vec
+> into a folio and offset inside the folio already.
+> Thus I'm wondering can we provide something like bio_for_each_folio()?
+> Or is it too niche that only certain fs can benefit from?
+
+I don't understand your requirements. but doing something different that
+fills in a folio_iter along the lines of bio_for_each_folio_all()
+would make sense.
