@@ -1,231 +1,225 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5571A23B9;
-	Thu,  3 Apr 2025 07:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743666952; cv=fail; b=lY6yMY+DMBiJ5oKSlR4Hf8QHGcSeWGfyma2ZpKmQvis2LFwEzpPbG4vhjNWQ+vJXolmPxjMZhm9MRsBhrD8plfPjG9qOja7AzDSSLOAOQHLEjVwSLXWPu2rB+G4YcIHhwxAPxMMXsfbQjkr+hwxoxRZERNR1AfALNRNoz4QLetI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743666952; c=relaxed/simple;
-	bh=O2aQrae7UfXEFRPlDcS8ATKq2K54C6VT7mhHLBXoGqk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MHcaxxyP0WSZKGvNzuEDJzGAk7JeK2cPlTPP5hUuHPOdsoIcnUcUvTDh3EaPjaBgN5RqT6NcsjDMNpHCnGaDGBCe9p3T9+KKAEHUEkk9lu/9Pd1ySBOST/MICGMU8OBV6juVtddU2A+r2ZVZjVIZJ+xwuU/t1yyZgW547zp0Row=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=mhiBo9yC; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=xiQFRiNE; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mhiBo9yC";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="xiQFRiNE"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1743666951; x=1775202951;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=O2aQrae7UfXEFRPlDcS8ATKq2K54C6VT7mhHLBXoGqk=;
-  b=mhiBo9yCuuECRYf9r0hLI0CSUqtoQzjr0rzkxW3UK+7qI1g6MoPjk0bZ
-   ocI3zQIxwAHEuCeOonELLvP6E+FFlGZH10Kb7VBvkXGxHmpglmGtw9wlU
-   daMLXBtZLHZUok59vqOb0QW65Z5kfClc2zmMg3XWOxIgMjYHW+pjKZn/m
-   +HzrDjYp68RfPDvrrNO1oJel35UOdkHeMHz8cUdkkud3lNxXY1FJ1q70B
-   Xa2ua2SE7IyeXRCvScJSSQ9EXvWoNsuGEvRJ91Lr1EFSFSkgFSTi3yEyj
-   DbgS5vJCXFylFCbVQRX10XmNQ8NC8gMVP0+BAZwJDoB01SCRnrRPuSnQK
-   g==;
-X-CSE-ConnectionGUID: RFKJqVDERj2y7tJOiUTz0g==
-X-CSE-MsgGUID: MNYY1zxKSTSShEqyt8PZiA==
-X-IronPort-AV: E=Sophos;i="6.15,184,1739808000"; 
-   d="scan'208";a="68590192"
-Received: from mail-dm6nam10lp2049.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.49])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2025 15:55:48 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U/RfZy/sDj1nWoHJVUeh8FeUfjsooGH+Hu2sb8gPbdp/KM6PuPHFwu3kkOio8lDBpAI8nd7Ki2PRE6t2qIVLRI/7FoVZ1AF6oxO+EDHV7HOxWBH+x1V2g4QbGDOw+hOxqM/SOM2lD1G9d7Dl/qCXTmKeEfWknw87vdFeEMpgFMR3imOriD6tYeT91f/BuJdZXJamOpZELXp4WEk0M0+o2/dUs/Htn96IVFsBhN4uCYI1DSJ4EPLtStFZb+uqozZPHzZ9HZIHXgCZXfgGjYZkeTvU6HXZGJey+OENfsmQoxJsX9SUTVKWOi/t5nTG2IlhjKH5PY/+Q53Y5xoQZHTAKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=caRTlp1o4JHgqCLljZA7+88oCb3FTB6HBjCmXAC8wQQ=;
- b=asSmatcYzoBy3A2IXGAZ3vsEF7xzfaPdjAc2Y5tasWsByQ9mJ8PDK0npEK4GGTnxz6bCfUb2jVPOn0qjXckyA0gXUT5xqjKSyQBMt6OrAKvQ/sPnF1pt/ezoiHMXkzXk2n2zgYuTIkZaY1SvO7V3ZSsEqYBx0Lv3wGVojlgOHFW24I6t9iTiekKP8Y2PA5a4jGDYrLh0cAEXURrvJ/jfK+OmGrZX0IKgtacRiX9LC/1DmHhnx1HwkvWm1lDFqeVcH+y0FPMuKeGnpa6VimlZn66VbkyU+eqtmlcs/tFltmjxLhiGJ+pf9lccKL1D4LJJoqmNaLA3YQhR7tr0smMUKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=caRTlp1o4JHgqCLljZA7+88oCb3FTB6HBjCmXAC8wQQ=;
- b=xiQFRiNE85DUlM2HqcJ2ktxc+xC/jAMQUk+mK/lPRnhkD0Aiwk9sRLGersFrQa2ej97DcufbCK4n4Kg90lGpg7BVSQEW5rsDoK1+nG14xTQeaAMGpCvohDY6RQka0smMaZEqd9SfspYPMtWKg5C/h5MaowqySVRIwdnBBeF9nqE=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- MW4PR04MB7204.namprd04.prod.outlook.com (2603:10b6:303:72::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.44; Thu, 3 Apr 2025 07:55:46 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%7]) with mapi id 15.20.8534.045; Thu, 3 Apr 2025
- 07:55:46 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Zhang Yi <yi.zhang@huaweicloud.com>
-CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, hch
-	<hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>, "djwong@kernel.org"
-	<djwong@kernel.org>, "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
-	"bmarzins@redhat.com" <bmarzins@redhat.com>, "chaitanyak@nvidia.com"
-	<chaitanyak@nvidia.com>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
-	"chengzhihao1@huawei.com" <chengzhihao1@huawei.com>, "yukuai3@huawei.com"
-	<yukuai3@huawei.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>
-Subject: Re: [PATCH blktests 0/3] blktest: add unmap write zeroes tests
-Thread-Topic: [PATCH blktests 0/3] blktest: add unmap write zeroes tests
-Thread-Index: AQHbl9iRyAuHzKjGSUal8SrQu0Ile7ORq+qA
-Date: Thu, 3 Apr 2025 07:55:46 +0000
-Message-ID: <yxfbr3na7iyci7rs3rk4m7zmjrfw3zdccrnur2nkk2lddlowmx@wy32rpgrlzoh>
-References: <20250318072835.3508696-1-yi.zhang@huaweicloud.com>
-In-Reply-To: <20250318072835.3508696-1-yi.zhang@huaweicloud.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|MW4PR04MB7204:EE_
-x-ms-office365-filtering-correlation-id: f6b1ed7f-f6d2-41d8-e5aa-08dd7284f124
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?1emacznYX4xaXIgWpcPdTkVylmD500BoIPQsvWdLeUzDqs+JDqUK2ec752P7?=
- =?us-ascii?Q?EWH5U5Rt2UDFckDF6DfwwMNE90nKf5XAvjZIcQABU5Jhl/i0ylONeLnvHS5W?=
- =?us-ascii?Q?mYR63xdS6TumazaEZ61xxrAaB8C1pjNxl8yVe8c8/p+Ic6i+GaIGhwy7smq7?=
- =?us-ascii?Q?DJtSuGobbnpkJat7iWGeSjxnTKwLAufHdKUbKuMJm2JGSuN/hyscS0IgDpcs?=
- =?us-ascii?Q?dEdC8ic+RB6FYBBhHXYRCLU88upS5+sHVWOOYOuEGO4qh45K/A/ZyrBlvRf8?=
- =?us-ascii?Q?+AAOmYvEvJmk16Q+wYcZGtP+1YopH9dymHog+sY2vmFlAoX9d701AOwq81K0?=
- =?us-ascii?Q?/3Oh+8ZozdtfPNr/KArhPN3QcqtDK5ICzTPgFwFm1rvv6Mf4AUB5oIXbFlVT?=
- =?us-ascii?Q?y4UZ0GsBN/VIIsIiMydIhMYG5yZEqAaYQEcsPrSLQ/meJarUGKsHdk/FAfdg?=
- =?us-ascii?Q?sVlKb8WA9bxTYPJ+SsYutmUHE+i1OjuW5Y+Ev1iCdpP/3I0brtRyjalUH4EK?=
- =?us-ascii?Q?sQO/BrvSA7z8HOp2+Ug+fV3EndtaTiRpS04C81c4EDD4YtzVplUSTeCi1U8n?=
- =?us-ascii?Q?NarjBtpAqUw2HFmxG47nPWzP/uQePSuqUGI/uF4GjMXGaFOW1TeWDxqglK9E?=
- =?us-ascii?Q?eAcvc1ey4GB6g8NNnB4f3T5/hrVlv+xjII2ceCbDIjG1XradyuYUVYZPgTaP?=
- =?us-ascii?Q?LXQmyQ7cK/nGyx0j5r+mM1MvYCugdIO8zs6AddStdhCYMGERgT/YHXPh++wx?=
- =?us-ascii?Q?jF39zcD4cLnub6sPgpqrGmoiqbH73hzVFj8AAorFLDxRTu2MUPv2hwa2byaf?=
- =?us-ascii?Q?/jJGFqdOSxDbUeIfRbj3hOx5qgkPCBNjj3cbiz8Lxg6lfeT6jjmLzL9ugtU3?=
- =?us-ascii?Q?mVJ5KNKU0zOidXNr1jyr0HSucI7iLDedMoMg3AeMqYuXqX3GRle1iypJnIS1?=
- =?us-ascii?Q?O1ZhZLL1NTOV57rsFBF3TeTIoxz3fK5hvLH1KFm+4USoe/dT8iAwo8UaJl70?=
- =?us-ascii?Q?dxBFLIrt7WHA0Fd4FQizC4wPPu97Z71n/x14bslxW1l63CRxkW2pd4VNVHNQ?=
- =?us-ascii?Q?WAYsB4luzlhpFzM75TNafavPudp2+mQhAykSq06ONGTynkB1Bxkk3IbYOCE/?=
- =?us-ascii?Q?oCBDm3P7yiuuGZpEDLQzaWZz+OqMdEBgiNGJ7+OI5esdZOnPcBparOlUBG74?=
- =?us-ascii?Q?I8BeVT6Cxq/TrpBv94pkrD3BvAY4gjzCS/9p3Gr95oPVoxA4CAlf1mkiOtlb?=
- =?us-ascii?Q?ibii4X+v4kCW6uMd7g/oeP3t/d/riftnJzFUuKX1bg7k9yrVKDIn7WZSnIsg?=
- =?us-ascii?Q?timLEVHeu+u+3f5ci5JWQ3S+gcCO+51gAN52PNUrBdzPOKWy9mKuKOjk1WXh?=
- =?us-ascii?Q?8jdkvesQt99tLWk2/kS2Lrdv57sLi/NVz2+4VFA03IT8uVNmy4s8/RZchQtU?=
- =?us-ascii?Q?WHCgFXpvi54bSZ39re5j60xrHXjW0w+n?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VIE7/dLe1fSgF/9Z5uYRDAIC+cluhvGXAwihrldCSa6hWSf56kcAkJomESGh?=
- =?us-ascii?Q?66q8Dsb6JsP3lFEUpwwacEtxZHzQRLF1LVfL17JOtuymBbAISk7I86p+NTdG?=
- =?us-ascii?Q?WRWF53w0jCyGv3TSghX+EJQYCbvdB6WCdM1kzXdWTXVIOUXaIhW3hemwPF1y?=
- =?us-ascii?Q?XLbn0Bt0H0iwcaVUK2c222ZykL3+xiu8dLnODdXdrwYhzJWdzl+FfXorrSNP?=
- =?us-ascii?Q?pjpVZz0PgQ1M6/PiEo6bGknjGLE9kEkRC5Wc6S8FuJr0fyG2jhwi0E4FhYAx?=
- =?us-ascii?Q?ju05mrRx2Ghfg5emQ0Lz6mL0TYFW2x59lcTdz8K+BYN7i4WPySA0wlPAjqpj?=
- =?us-ascii?Q?cVPX+E82W23kLz/ljTI94Tn1b8UPo4VwFSYTHROwHhtNzsaWHCnMncfYCs8v?=
- =?us-ascii?Q?Lq4ZEgkJ82aCRCKorsu0ltCH8rzR5WIdqE9a01iZJzPrqSoB9jYrIYzEDeCV?=
- =?us-ascii?Q?4H/SxeIlAMAXp6+U+qhjSXt0U6YFc5LfGbPCnmjvkLs9nFbzQNeKg5Jmbh4L?=
- =?us-ascii?Q?iYeBsLmDrYA7eJyhM9s+bsmYUOzrcVssRZ4U9mZxXpvOfn/qdUgP308Bdsbp?=
- =?us-ascii?Q?AXf3BZMZoExOo81jOc/6PB5KN13rTGLrpSg+/Su4O+TWrmCQtVzcMQhdr8Hy?=
- =?us-ascii?Q?pu+AMHs4LoEn9fv2hxmlWBm7yqjAQrfjE2XPwpRUUyFNWbqtTSeI6xSjO5pQ?=
- =?us-ascii?Q?KhAN8GPBQXutSPt+acO7Jh/3KdlFszMLqOFaUH5LsKW3xakns3XYjX2CTMkI?=
- =?us-ascii?Q?O87EsrKKmg4LEl/2PEsH9VOilSlgRoYuXWzS1ljFdChXkwvywJA0AH3J/5q1?=
- =?us-ascii?Q?O5oBRbCTkEuncimYEqtVVhiPqV2bUzPBP5jq/L6i9jUki0hHeSCQ1UomfVWv?=
- =?us-ascii?Q?x4T3XfbmLUC1UONDC4uRI/LplgcG3oirtlKgUTuGhY2tCaJDDkeGjFrY6oMU?=
- =?us-ascii?Q?YeTwNwLaXeonvpNb1Z9L7GaM6ttJP6Ia8WZG9UV4FEVwMloE9hiNyoe4Yl7x?=
- =?us-ascii?Q?oUM0YMii85R5MWrNhiJefHvE5+GPMAtzS1an3nhgYAuVCUWD8wq6CiiBqFVd?=
- =?us-ascii?Q?GI6awXRklssTPfveWHX3gxDK5xtP3u17RE47SJm8yisrO1ndprBZZyLjGwYx?=
- =?us-ascii?Q?19PhcenAja3OUE9DMduHiEq+AKtOBa2qiaXyrbQ/esXJRJInMXtQXNREJFLv?=
- =?us-ascii?Q?O22ui5ZzDZgS3DlINMFbFZ/UEoEVyvHg7U4HX3WyYMYpB3bxHd044MnccSPT?=
- =?us-ascii?Q?acGN/fFan9i/MPOaGgLk/Gtt6CcCW/rNhAV1xeKgmcvUfCNCoaRPSC9u/j3G?=
- =?us-ascii?Q?doU/Kmkz6V6muxId0hEXIZ986UGjovrF3bu1pw8tcBv5/ssw42VMStbDA942?=
- =?us-ascii?Q?1J2RARdc1kALT3qnYqFIa7Cz+FM8kAsnxSbUisMtfEoI/pWWpbZj73WLJ6kG?=
- =?us-ascii?Q?mZtvV+V8Ry9ps7/u9SozCxoh59ELRcSEPVX+oNHOiiqFLkeZlfTP2ENPU4Du?=
- =?us-ascii?Q?rs+JCtQ9yMOhJD2bdkI1nxt6KzlzbAMknYYCFKTh7srKhRREbMPnEd3osg4n?=
- =?us-ascii?Q?c3K2A6E5s2mTUe4OXyvcJTZ7ruBDWiAMuodcHFmVypGinz0gdd7MgkIFxVfT?=
- =?us-ascii?Q?65931lkIyq1sZph9ODMI7KI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <254B22F1236C6A4F98145CF15DCA5192@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C006519C558
+	for <linux-block@vger.kernel.org>; Thu,  3 Apr 2025 08:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743669267; cv=none; b=Ywm27v2WLfonUKjySXjANz4xYj6jOjHNLbjCx5/aAOF+KjDjA3u91GTEut/DpcnUTMf1qQfZ2RgyvJ0OB8L890gQguhllGn569b6TbvabR7LmP2XLvarBVgJO0DSPA/79FJZNQxsM6X2ue/m7vi9CcODn1a0g7TrvB1uVmXwTcw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743669267; c=relaxed/simple;
+	bh=Os64dDL4fdbaJ0OtgQLdb+EBopDm4qug5PRmFzn8/qw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=T543K2D5LLssWdOKHK0yzwXqo5nCs5NtoLp1JC+vU2vSZjEfWgug1CZ8w2475Htzxk9wJgtgk329kDmnQ3h79CxuQLPUrs33klYKX5tSI8hzHwFuahIiGqIuqN2Txj2SmIkUgmsyTE3wGKuMQYwmgxLqoZQL9pjwzeaMdUETt70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d458e61faaso7908025ab.0
+        for <linux-block@vger.kernel.org>; Thu, 03 Apr 2025 01:34:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743669265; x=1744274065;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cOMqihNPVzS31r1t9c+x+ekSMUYUpXWeipZaaZGDe4U=;
+        b=Stn5mrXBrO4P6oJF3QJ01Qa3BA8AHOoL0bWHhT9kRXPF6GV+QmfPDcelazyiekCq2a
+         xg6/TciAOQS0cyh/oTj0setXrSs0ggqebxBZiF+11SAtdMKVpLh5cJ7QS+8a1TgOQmeR
+         Kuh+I9dvM4m5Xmjkgl7khs9+OTp5GAK5hzdHLp/kz/6RR63LEgpK+F9dbjr/SU6jzAbK
+         +77PrGQJEbVZzcXICaPect67aQa5Yrxx3Xu8MLN9jMJmoLnnLnt36C/lUuJnbIEoN3r/
+         yivHGof0n0IJIcv5BodcB+M9xHejvyo2oygy1qIDmOoZCYtvdNQMO68WJE8Aha9L3Tar
+         9J2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWlvpQhMSKy8z53F868QM3mhvhpfVHJSaCR9wu0LxJJj0Ks16eBgK1+x/3EIZYr/YU8mjInI+2lwvkyNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5fBDN2vyQsVPl2TKPKECKAI3l2327ECIt1j7J4GL6H9d3Koox
+	UKrHHDIkg2HPB5kMaCA6qNQOJEx7MoFAG2DkSmeoT/anzzzpvOlYm6pf1t8+mSP6hKsCQhbiI0l
+	zwMzYLLlYTzIyXo+BYcR3jH9+GS6QEb0ZJO4/Q8v/9Qo90WbGi3sgPLU=
+X-Google-Smtp-Source: AGHT+IF8666uAbezsqgMerCBMkWt+Hogg0famXNzMMnPgOPyRQRLhjZS4ylUC0XOJXjpzL0ykwyDkBYr1UeLmTknPB8ie5brafmE
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	H1g4U+fuC4w2bzEHAUpJJr2A/zUwycPzOQYQQKcK8le4Da4rphK8FxDpNJlQTcHc0fJUwXiMumxrM6GJeWn8bHPo/W5nGaq7B9ZfrrT3gm9zmr7F+PCDzyvdCLO3DfruFEruFLfjeoPbOZx9YJxQjPblZDFxKaIv2A10Soo5MpDLgvHUQ/VhOnaaTK08CgVDiIgTmph4z5l2drWlVCPyIEXKBCgoeWodbE+1gGfaihXIxMmawHLsHsDd+8d9gWDI+42FHAy/yoiqT3sEPKgUn1FVth1c0XIQAEx/m90A9qd3LOd9KysporffxTTDWuBcj9PmDSO/EYUTf28QW7qh784bR5j4whF4o4HCZn1xqhPipPgdR+JyH20lBrqwDgnDC+SBR+yrWWUqtnU85kPknaCplOeEKxx1pM53kQwdwl62tvjsMKY+7gs5t3bqBCfpl1rC/1L8CNCyI9q79stsJWtjm5gMbYfwNw7abLtT7sSMfQf+rmG3fw4Qp5s4ayt8aGywtoe8XVUOQhQgDRnYxOBhun/UE2ZkEpRSsuGfLI1pRGWS/Utw5bufA33zzSUm+Je/k5pElmCP+l4tepHWL0I8TDVb14gTA8bgOWcF1d+IPQnyYk5Tf096sqIqwScN
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6b1ed7f-f6d2-41d8-e5aa-08dd7284f124
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2025 07:55:46.3419
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lqu69RMY3n0J8LeunUmPc0ZnxTVC2tnCV2c1MqMiqlZcGt4j2FE3JdRo1LNe7uyWPjPKKgQ1hsMDvc+5P8Ey56HvW/T5z1hh3A4a4Wf/E5U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR04MB7204
+X-Received: by 2002:a92:b707:0:b0:3d4:2306:fbb6 with SMTP id
+ e9e14a558f8ab-3d6dcbb773bmr22404045ab.10.1743669264809; Thu, 03 Apr 2025
+ 01:34:24 -0700 (PDT)
+Date: Thu, 03 Apr 2025 01:34:24 -0700
+In-Reply-To: <67ea99e0.050a0220.3c3d88.0042.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67ee4810.050a0220.9040b.016e.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_freeze_queue_nomemsave
+From: syzbot <syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mar 18, 2025 / 15:28, Zhang Yi wrote:
-> From: Zhang Yi <yi.zhang@huawei.com>
->=20
-> The Linux kernel is planning to support FALLOC_FL_WRITE_ZEROES in
-> fallocate(2). Add tests for the newly added BLK_FEAT_WRITE_ZEROES_UNMAP
-> feature flag on the block device queue limit. These tests test block
-> device unmap write zeroes sysfs interface
->=20
->         /sys/block/<disk>/queue/write_zeroes_unmap
->=20
-> with various SCSI/NVMe/device-mapper devices.
->=20
-> The /sys/block/<disk>/queue/write_zeroes_unmap interface should return
-> 1 if the block device supports unmap write zeroes command, and it should
-> return 0 otherwise.
->=20
->  - scsi/010 test SCSI devices.
->  - dm/003 test device mapper stacked devices.
->  - nvme/060 test NVMe devices.
+syzbot has found a reproducer for the following issue on:
 
-Zhang, thank you again for the patches. The test contents look meaningful
-for me :)  When the kernel side changes get ready, I will run the test case=
-s
-and do further review.
+HEAD commit:    a1b5bd45d4ee Merge tag 'usb-6.15-rc1' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1711cfb0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=adffebefc9feb9d6
+dashboard link: https://syzkaller.appspot.com/bug?extid=9dd7dbb1a4b915dee638
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12ee494c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13df5998580000
 
-One thing I noticed is that the patches trigger shellcheck warnings. When y=
-ou
-respin the patches, please run "make check" and address the warnings.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-a1b5bd45.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/588b4d489b63/vmlinux-a1b5bd45.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/51ead797f7ae/bzImage-a1b5bd45.xz
 
-$ make check
-shellcheck -x -e SC2119 -f gcc check common/* \
-        tests/*/rc tests/*/[0-9]*[0-9] src/*.sh
-common/rc:624:7: note: Use $(...) notation instead of legacy backticks `...=
-`. [SC2006]
-common/rc:626:7: note: Double quote to prevent globbing and word splitting.=
- [SC2086]
-common/rc:632:7: warning: Quote this to prevent word splitting. [SC2046]
-common/rc:632:7: note: Useless echo? Instead of 'echo $(cmd)', just use 'cm=
-d'. [SC2005]
-common/rc:632:7: note: Use $(...) notation instead of legacy backticks `...=
-`. [SC2006]
-common/rc:632:17: warning: Quote this to prevent word splitting. [SC2046]
-common/rc:632:29: note: Double quote to prevent globbing and word splitting=
-. [SC2086]
-tests/dm/003:28:8: warning: Declare and assign separately to avoid masking =
-return values. [SC2155]
-tests/nvme/060:32:8: warning: Declare and assign separately to avoid maskin=
-g return values. [SC2155]
-make: *** [Makefile:21: check] Error 1=
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-syzkaller-12886-ga1b5bd45d4ee #0 Not tainted
+------------------------------------------------------
+syz-executor170/5939 is trying to acquire lock:
+ffffffff906953a8 (uevent_sock_mutex){+.+.}-{4:4}, at: uevent_net_broadcast_untagged lib/kobject_uevent.c:317 [inline]
+ffffffff906953a8 (uevent_sock_mutex){+.+.}-{4:4}, at: kobject_uevent_net_broadcast lib/kobject_uevent.c:410 [inline]
+ffffffff906953a8 (uevent_sock_mutex){+.+.}-{4:4}, at: kobject_uevent_env+0xb36/0x1870 lib/kobject_uevent.c:608
+
+but task is already holding lock:
+ffff888025aa6228 (&q->q_usage_counter(io)#24){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&q->q_usage_counter(io)#24){++++}-{0:0}:
+       blk_alloc_queue+0x619/0x760 block/blk-core.c:461
+       blk_mq_alloc_queue+0x179/0x290 block/blk-mq.c:4349
+       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
+       loop_add+0x496/0xb70 drivers/block/loop.c:2067
+       loop_init+0x164/0x270 drivers/block/loop.c:2302
+       do_one_initcall+0x120/0x6e0 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 (fs_reclaim){+.+.}-{0:0}:
+       __fs_reclaim_acquire mm/page_alloc.c:4028 [inline]
+       fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:4042
+       might_alloc include/linux/sched/mm.h:318 [inline]
+       slab_pre_alloc_hook mm/slub.c:4102 [inline]
+       slab_alloc_node mm/slub.c:4180 [inline]
+       kmem_cache_alloc_node_noprof+0x57/0x3b0 mm/slub.c:4252
+       __alloc_skb+0x2b2/0x380 net/core/skbuff.c:658
+       alloc_skb include/linux/skbuff.h:1340 [inline]
+       alloc_uevent_skb+0x7d/0x210 lib/kobject_uevent.c:289
+       uevent_net_broadcast_untagged lib/kobject_uevent.c:326 [inline]
+       kobject_uevent_net_broadcast lib/kobject_uevent.c:410 [inline]
+       kobject_uevent_env+0xca4/0x1870 lib/kobject_uevent.c:608
+       kobject_synth_uevent+0x7d4/0x8a0 lib/kobject_uevent.c:207
+       bus_uevent_store+0x3d/0x90 drivers/base/bus.c:832
+       bus_attr_store+0x71/0xb0 drivers/base/bus.c:172
+       sysfs_kf_write+0xef/0x150 fs/sysfs/file.c:145
+       kernfs_fop_write_iter+0x351/0x510 fs/kernfs/file.c:334
+       new_sync_write fs/read_write.c:591 [inline]
+       vfs_write+0x5ba/0x1180 fs/read_write.c:684
+       ksys_write+0x12a/0x240 fs/read_write.c:736
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (uevent_sock_mutex){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3166 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+       validate_chain kernel/locking/lockdep.c:3909 [inline]
+       __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+       lock_acquire kernel/locking/lockdep.c:5866 [inline]
+       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
+       __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:746
+       uevent_net_broadcast_untagged lib/kobject_uevent.c:317 [inline]
+       kobject_uevent_net_broadcast lib/kobject_uevent.c:410 [inline]
+       kobject_uevent_env+0xb36/0x1870 lib/kobject_uevent.c:608
+       loop_set_size drivers/block/loop.c:211 [inline]
+       loop_set_size drivers/block/loop.c:208 [inline]
+       loop_set_status+0x9c7/0xb90 drivers/block/loop.c:1306
+       loop_set_status_old+0x162/0x1d0 drivers/block/loop.c:1405
+       lo_ioctl+0x695/0x26d0 drivers/block/loop.c:1575
+       blkdev_ioctl+0x274/0x6d0 block/ioctl.c:698
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl fs/ioctl.c:892 [inline]
+       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  uevent_sock_mutex --> fs_reclaim --> &q->q_usage_counter(io)#24
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#24);
+                               lock(fs_reclaim);
+                               lock(&q->q_usage_counter(io)#24);
+  lock(uevent_sock_mutex);
+
+ *** DEADLOCK ***
+
+3 locks held by syz-executor170/5939:
+ #0: ffff888025c4fb68 (&lo->lo_mutex){+.+.}-{4:4}, at: loop_set_status+0x2a/0xb90 drivers/block/loop.c:1275
+ #1: ffff888025aa6228 (&q->q_usage_counter(io)#24){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+ #2: ffff888025aa6260 (&q->q_usage_counter(queue)#20){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5939 Comm: syz-executor170 Not tainted 6.14.0-syzkaller-12886-ga1b5bd45d4ee #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2079
+ check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2211
+ check_prev_add kernel/locking/lockdep.c:3166 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3285 [inline]
+ validate_chain kernel/locking/lockdep.c:3909 [inline]
+ __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
+ lock_acquire kernel/locking/lockdep.c:5866 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
+ __mutex_lock_common kernel/locking/mutex.c:601 [inline]
+ __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:746
+ uevent_net_broadcast_untagged lib/kobject_uevent.c:317 [inline]
+ kobject_uevent_net_broadcast lib/kobject_uevent.c:410 [inline]
+ kobject_uevent_env+0xb36/0x1870 lib/kobject_uevent.c:608
+ loop_set_size drivers/block/loop.c:211 [inline]
+ loop_set_size drivers/block/loop.c:208 [inline]
+ loop_set_status+0x9c7/0xb90 drivers/block/loop.c:1306
+ loop_set_status_old+0x162/0x1d0 drivers/block/loop.c:1405
+ lo_ioctl+0x695/0x26d0 drivers/block/loop.c:1575
+ blkdev_ioctl+0x274/0x6d0 block/ioctl.c:698
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f5b0284a229
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffeda6302f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffeda6304c8 RCX: 00007f5b0284a229
+RDX: 0000200000000080 RSI: 0000000000004c02 RDI: 0000000000000003
+RBP: 00007f5b028bd610 R08: 00007ffeda6304c8 R09: 00007ffeda6304c8
+R10: 00007ffeda6304c8 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffeda6304b8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
