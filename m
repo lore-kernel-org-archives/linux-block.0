@@ -1,216 +1,1245 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0916A1FA859;
-	Fri,  4 Apr 2025 15:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B611F19D8A4;
+	Fri,  4 Apr 2025 22:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743782136; cv=none; b=OUW/Bvvchqn0g7PYdsGEvofuVRRUCLSuRIGzP95cGj5oDoosW8FpUoynNuCphI2lCSJx0KmBexqGFFONsldYBQ9ZCre8Juej1OAtVe+CvQxQmSmPu1iKx3FaCIbVriVKKmdRYNiDViw3cLVGNRMrkWv7/4qGegJT/O3fVkJvCKg=
+	t=1743807565; cv=none; b=O0L+Im8BX5mBEyBXuuD2l1DzJlqamkwx6K33ZUSZXKKfUsV//56E0RHGxFPd1J1elmIK3ylpp2khCD0QnuNTX/YC96XxJemGo801Cs5JQcklirxGGgSrV5L7QKI9bJTHv2ggFFSE+sWe3dj+RT+ly6nBqpq5DrxSM2nplVW6DvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743782136; c=relaxed/simple;
-	bh=H0oSTstdUNtg4cUip28ivErWZsiL7Hvn8FBMRy2yATc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lwDhapm1XlXGd45T/l7GGq5WSzcFcbjIDj2MKSZ8Ds8eY4aXNdvSwjr+/I3e6aF7aIphYHa1P4kUbTonuiKNnReBFfRT9C++oktjXGY9lrnMnMAad1PeIQsIH5+8FTVCP3+mD7T0xZ5Ydo6eDkyvmhsW37vB7xfUTHTqBRoMHFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubHlGEyB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743807565; c=relaxed/simple;
+	bh=vmiCGGZbby7BBYVV2HrGdF0iZp0IxNwkgRRD9XB1zXc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CMzbBfmytcBed9BDXuFsIDuGh+S53EzOXfYZcwVJ9L8cnIG/YH/mLSaAlfVPfv+5Qf/unWudZ2lHGczBKT6NcYu37m1NclSOJj6CYAuTMoT6E4HDvFz3b/syhqJy1B4U+8x8Tf/w3rmxevnVsrOVGRbtbAEZzOTegrBiu1lUDZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIFz1ptY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubHlGEyB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2C7C4CEE8;
-	Fri,  4 Apr 2025 15:55:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIFz1ptY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D1C6C4CEDD;
+	Fri,  4 Apr 2025 22:59:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743782135;
-	bh=H0oSTstdUNtg4cUip28ivErWZsiL7Hvn8FBMRy2yATc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ubHlGEyBaVNw0cRZEWuJQOtYjdKJGC/tqCowyDjCBaxtpQB5FacxboGr7qbohqu4/
-	 mWDJEI1ybSO//1WH64u693OKkG6iVzrvVAZHtjxA3MSHZYevOLIaRlsdVsHL6T7IQY
-	 KVflait1qCEZ40GbJDbWE9+ueGFoILnTg4vywkcJWENPnWg4UR48oOcx+qGouHt4N+
-	 VWxxCA8+binv4BexNpQqPLQiqIALypECEJTxFbXSK50HcXrja+a+tebAATxbRlZtTR
-	 RNVk8dkB7P18/WoBOBUm0ZRU3IUjNGr8szpbnb4PC/QJg5VVtoBmri3lTZ6WakFspo
-	 3YPQxjQpT2FxA==
-Date: Fri, 4 Apr 2025 08:55:33 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: brauner@kernel.org, jack@suse.cz, tytso@mit.edu,
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com
-Cc: willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
-	dave@stgolabs.net, david@redhat.com, axboe@kernel.dk, hare@suse.de,
-	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
-	da.gomez@samsung.com
-Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
- __find_get_block_slow()
-Message-ID: <Z_AA9SHZdRGq6tb4@bombadil.infradead.org>
-References: <20250330064732.3781046-1-mcgrof@kernel.org>
- <20250330064732.3781046-3-mcgrof@kernel.org>
- <Z-rzyrS0Jr7t984Y@bombadil.infradead.org>
- <Z-3EDGCLMtCV-szJ@bombadil.infradead.org>
+	s=k20201202; t=1743807565;
+	bh=vmiCGGZbby7BBYVV2HrGdF0iZp0IxNwkgRRD9XB1zXc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kIFz1ptYKzCGv8+h4XgewNeWDmJeP4RVbTPOV/C4BKRTKtyztkS1BOzISIgIHI4jO
+	 5H0+aFZ5Sgbourbd6l8ASOy/zm7MKL1QsGv/izob1cr3GpZ0vfAbSwRbcch8f1lfEL
+	 aYh1GEGl/hYgPU8nx/nThGbE/C9gTGMsbY6VycT/546G3t1tx3mXqJjjSGlTkFPFcD
+	 2EDcXXyLqjwxDRghhUtMPxf7oVonrCxMsKTUcm5bYWbxvFUtTDuiikZxspeE1B5s3I
+	 5RnMBMwpQLDN/ZQMgtxBQHyFUINHqxFREaDVAgq63+u+A3lcSL4zauggdaEHs4YKOZ
+	 M42y3C7rA63lg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-fscrypt@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v13] fscrypt: add support for hardware-wrapped keys
+Date: Fri,  4 Apr 2025 15:58:59 -0700
+Message-ID: <20250404225859.172344-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-3EDGCLMtCV-szJ@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 02, 2025 at 04:11:10PM -0700, Luis Chamberlain wrote:
-> On Mon, Mar 31, 2025 at 12:58:04PM -0700, Luis Chamberlain wrote:
-> > On Sat, Mar 29, 2025 at 11:47:31PM -0700, Luis Chamberlain wrote:
-> > > Although we don't have exact traces of the filesystem corruption we
-> > > can can reproduce fs corruption one ext4 by just removing the spinlock
-> > > and stress testing the filesystem with generic/750, we eventually end
-> > > up after 3 hours of testing with kdevops using libvirt on the ext4
-> > > profile ext4-4k. Things like the below as reported recently [1]:
-> > > 
-> > > Mar 28 03:36:37 extra-ext4-4k unknown: run fstests generic/750 at 2025-03-28 03:36:37
-> > > <-- etc -->
-> > > Mar 28 05:57:09 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_get_first_dir_block:3538: inode #5174: comm fsstress: directory missing '.'
-> > > Mar 28 06:04:43 extra-ext4-4k kernel: EXT4-fs warning (device loop5): ext4_empty_dir:3088: inode #5176: comm fsstress: directory missing '.'
-> > > Mar 28 06:42:05 extra-ext4-4k kernel: EXT4-fs error (device loop5): __ext4_find_entry:1626: inode #5173: comm fsstress: checksumming directory block 0
-> > > Mar 28 08:16:43 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_find_extent:938: inode #1104560: comm fsstress: pblk 4932229 bad header/extent: invalid magic - magic 8383, entries 33667, max 33667(0), depth 33667(0)
-> > 
-> > I reproduced again a corruption with ext4 when we remove the spin lock
-> > alone with generic/750, the trace looks slightly different, and
-> > this time I ran the test with ext4 with 2k block size filesystem. I
-> > also reverted both "mm: migrate: remove folio_migrate_copy()" and
-> > "mm: migrate: support poisoned recover from migrate folio" just in case
-> > the extra check added by the later was helping avoid the corruption.
-> 
-> Since we didn't have much data over this filesystem corruption I figured
-> it would be good to expand on that with more information. I reproduced yet
-> again with just generic/750 and the spinlock removed in about ~6 hours:
+From: Eric Biggers <ebiggers@google.com>
 
-Here's another for the collection, this one reproduced also on a 2k ext4
-filesytem within just an hour, and also runs into "error count since
-last fsck":
+Add support for hardware-wrapped keys to fscrypt.  Such keys are
+protected from certain attacks, such as cold boot attacks.  For more
+information, see the "Hardware-wrapped keys" section of
+Documentation/block/inline-encryption.rst.
 
-Apr 02 17:49:49 fix-ext4-2k kernel: Linux version 6.14.0-12248-g87aeaf206469 (mcgrof@beef) (gcc (Debian 14.2.0-6) 14.2.0, GNU ld (GNU Binutils for Debian) 2.43.1) #16 SMP PREEMPT_DYNAMIC Wed Apr  2 17:43:14 PDT 2025
+To support hardware-wrapped keys in fscrypt, we allow the fscrypt master
+keys to be hardware-wrapped.  File contents encryption is done by
+passing the wrapped key to the inline encryption hardware via
+blk-crypto.  Other fscrypt operations such as filenames encryption
+continue to be done by the kernel, using the "software secret" which the
+hardware derives.  For more information, see the documentation which
+this patch adds to Documentation/filesystems/fscrypt.rst.
 
-<-- snip -->
+Note that this feature doesn't require any filesystem-specific changes.
+However it does depend on inline encryption support, and thus currently
+it is only applicable to ext4 and f2fs.
 
-Apr 02 17:50:50 fix-ext4-2k unknown: run fstests generic/750 at 2025-04-02 17:50:50
-Apr 02 17:50:51 fix-ext4-2k kernel: EXT4-fs (loop5): mounted filesystem 2f6642d1-eab9-481a-86b4-dac9cc760f63 r/w with ordered data mode. Quota mode: none.
-Apr 02 18:00:45 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Apr 02 18:13:27 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Apr 02 18:47:36 fix-ext4-2k kernel: ------------[ cut here ]------------
-Apr 02 18:47:36 fix-ext4-2k kernel: WARNING: CPU: 4 PID: 2515 at fs/jbd2/transaction.c:1552 jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Apr 02 18:47:36 fix-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio joydev virtio_console virtio_balloon button evdev serio_raw nvme_fabrics nvme_core dm_mod drm nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover virtio_blk failover psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-Apr 02 18:47:36 fix-ext4-2k kernel: CPU: 4 UID: 0 PID: 2515 Comm: fsstress Not tainted 6.14.0-12248-g87aeaf206469 #16 PREEMPT(full) 
-Apr 02 18:47:36 fix-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.08-2 10/04/2024
-Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0010:jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
-Apr 02 18:47:36 fix-ext4-2k kernel: Code: 30 0f 84 5b fe ff ff 0f 0b 41 bc 8b ff ff ff e9 69 fe ff ff 48 8b 04 24 4c 8b 48 70 4d 39 cf 0f 84 53 ff ff ff e9 42 c5 00 00 <0f> 0b 41 bc e4 ff ff ff e9 41 ff ff ff 0f 0b 90 0f 1f 40 00 90 90
-Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 0018:ffffa464824d77f8 EFLAGS: 00010246
-Apr 02 18:47:36 fix-ext4-2k kernel: RAX: 0000000000000001 RBX: ffff95c8866129d8 RCX: 00000000000000fd
-Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: RBP: ffff95c88726ac98 R08: ffff95c88726ac98 R09: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R10: 00000000b2ae40cd R11: 00000000000064a2 R12: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R13: ffff95c9849e7f88 R14: ffff95c8866129e0 R15: ffff95c986708180
-Apr 02 18:47:36 fix-ext4-2k kernel: FS:  00007f230b292740(0000) GS:ffff95ca439cc000(0000) knlGS:0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Apr 02 18:47:36 fix-ext4-2k kernel: CR2: 00007f230b28a000 CR3: 000000012517c003 CR4: 0000000000772ef0
-Apr 02 18:47:36 fix-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-Apr 02 18:47:36 fix-ext4-2k kernel: PKRU: 55555554
-Apr 02 18:47:36 fix-ext4-2k kernel: Call Trace:
-Apr 02 18:47:36 fix-ext4-2k kernel:  <TASK>
-Apr 02 18:47:36 fix-ext4-2k kernel:  __ext4_handle_dirty_metadata+0x6d/0x190 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  do_writepages+0xdd/0x250
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? __call_rcu_common.constprop.0+0x130/0x290
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? iter_file_splice_write+0x1d6/0x4f0
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? kfree+0x1cc/0x370
-Apr 02 18:47:36 fix-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
-Apr 02 18:47:36 fix-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  __fput+0xf4/0x2b0
-Apr 02 18:47:36 fix-ext4-2k kernel:  __x64_sys_close+0x39/0x80
-Apr 02 18:47:36 fix-ext4-2k kernel:  do_syscall_64+0x4b/0x120
-Apr 02 18:47:36 fix-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0033:0x7f230b324687
-Apr 02 18:47:36 fix-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 002b:00007ffc1efe2bb0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f230b292740 RCX: 00007f230b324687
-Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-Apr 02 18:47:36 fix-ext4-2k kernel: RBP: 00007ffc1efe2c60 R08: 0000000000000000 R09: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00007ffc1efe2db0 R14: 00007ffc1efe31b0 R15: 000000000000622d
-Apr 02 18:47:36 fix-ext4-2k kernel:  </TASK>
-Apr 02 18:47:36 fix-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
-Apr 02 18:47:36 fix-ext4-2k kernel: ------------[ cut here ]------------
-Apr 02 18:47:36 fix-ext4-2k kernel: WARNING: CPU: 2 PID: 2515 at fs/ext4/ext4_jbd2.c:360 __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio joydev virtio_console virtio_balloon button evdev serio_raw nvme_fabrics nvme_core dm_mod drm nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover virtio_blk failover psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-Apr 02 18:47:36 fix-ext4-2k kernel: CPU: 2 UID: 0 PID: 2515 Comm: fsstress Tainted: G        W           6.14.0-12248-g87aeaf206469 #16 PREEMPT(full) 
-Apr 02 18:47:36 fix-ext4-2k kernel: Tainted: [W]=WARN
-Apr 02 18:47:36 fix-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.08-2 10/04/2024
-Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0010:__ext4_handle_dirty_metadata+0x102/0x190 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel: Code: 00 00 00 44 89 fa 4c 89 f6 49 c7 c1 3b 2c aa c0 4c 89 e7 41 bd fb ff ff ff e8 5a ce 05 00 eb 97 48 89 df e8 c0 a4 0a f6 eb 8a <0f> 0b 48 c7 c2 a0 42 a9 c0 45 89 e8 48 89 e9 44 89 fe 4c 89 f7 e8
-Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 0018:ffffa464824d7838 EFLAGS: 00010286
-Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffff95c998971800 RBX: ffff95c88726ac98 RCX: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000001 RSI: 0000000000000000 RDI: 00000000ffffffff
-Apr 02 18:47:36 fix-ext4-2k kernel: RBP: ffff95c9849e7f88 R08: ffff95c88726ac98 R09: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R10: 00000000b2ae40cd R11: 00000000000064a2 R12: ffff95c999e4c430
-Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00000000ffffffe4 R14: ffffffffc0a94760 R15: 0000000000000556
-Apr 02 18:47:36 fix-ext4-2k kernel: FS:  00007f230b292740(0000) GS:ffff95ca4394c000(0000) knlGS:0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Apr 02 18:47:36 fix-ext4-2k kernel: CR2: 00007f230b291000 CR3: 000000012517c006 CR4: 0000000000772ef0
-Apr 02 18:47:36 fix-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-Apr 02 18:47:36 fix-ext4-2k kernel: PKRU: 55555554
-Apr 02 18:47:36 fix-ext4-2k kernel: Call Trace:
-Apr 02 18:47:36 fix-ext4-2k kernel:  <TASK>
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  do_writepages+0xdd/0x250
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? __call_rcu_common.constprop.0+0x130/0x290
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? iter_file_splice_write+0x1d6/0x4f0
-Apr 02 18:47:36 fix-ext4-2k kernel:  ? kfree+0x1cc/0x370
-Apr 02 18:47:36 fix-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
-Apr 02 18:47:36 fix-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
-Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
-Apr 02 18:47:36 fix-ext4-2k kernel:  __fput+0xf4/0x2b0
-Apr 02 18:47:36 fix-ext4-2k kernel:  __x64_sys_close+0x39/0x80
-Apr 02 18:47:36 fix-ext4-2k kernel:  do_syscall_64+0x4b/0x120
-Apr 02 18:47:36 fix-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0033:0x7f230b324687
-Apr 02 18:47:36 fix-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 002b:00007ffc1efe2bb0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f230b292740 RCX: 00007f230b324687
-Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-Apr 02 18:47:36 fix-ext4-2k kernel: RBP: 00007ffc1efe2c60 R08: 0000000000000000 R09: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00007ffc1efe2db0 R14: 00007ffc1efe31b0 R15: 000000000000622d
-Apr 02 18:47:36 fix-ext4-2k kernel:  </TASK>
-Apr 02 18:47:36 fix-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
-Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs: ext4_ext_grow_indepth:1366: aborting transaction: error 28 in __ext4_handle_dirty_metadata
-Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5): ext4_ext_grow_indepth:1366: inode #755485: block 3924606: comm fsstress: journal_dirty_metadata failed: handle type 2 started at line 2721, credits 11/0, errcode -28
-Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_mb_clear_bb:6550: Readonly filesystem
-Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_reserve_inode_write:5870: Readonly filesystem
-Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2336: inode #755485: comm fsstress: mark_inode_dirty error
-Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2338: comm fsstress: Failed to mark inode 755485 dirty
-Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_do_writepages:2751: error 28
-Apr 03 05:43:31 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
-Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): error count since last fsck: 6
-Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): initial error at time 1743644856: ext4_ext_grow_indepth:1366: inode 755485: block 3924606
-Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): last error at time 1743644857: ext4_do_writepages:2751
-Apr 04 08:12:34 fix-ext4-2k kernel: EXT4-fs: ext4_ext_grow_indepth:1366: aborting transaction: error 28 in __ext4_handle_dirty_metadata
-Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5): ext4_ext_grow_indepth:1366: inode #330657: block 855807: comm kworker/u35:9: journal_dirty_metadata failed: handle type 2 started at line 2721, credits 11/0, errcode -28
-Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_mb_clear_bb:6550: Readonly filesystem
-Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_do_writepages:2751: error 28
+The version of this feature introduced by this patch is mostly
+equivalent to the version that has existed downstream in the Android
+Common Kernels since 2020.  However, a couple fixes are included.
+First, the flags field in struct fscrypt_add_key_arg is now placed in
+the proper location.  Second, key identifiers for HW-wrapped keys are
+now derived using a distinct HKDF context byte; this fixes a bug where a
+raw key could have the same identifier as a HW-wrapped key.  Note that
+as a result of these fixes, the version of this feature introduced by
+this patch is not UAPI or on-disk format compatible with the version in
+the Android Common Kernels, though the divergence is limited to just
+those specific fixes.  This version should be used going forwards.
+
+This patch has been heavily rewritten from the original version by
+Gaurav Kashyap <quic_gaurkash@quicinc.com> and
+Barani Muthukumaran <bmuthuku@codeaurora.org>.
+
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sm8650
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+
+I'm planning to take this patch through the fscrypt tree for 6.16.
+
+Changed in v13:
+  - Rebased onto latest upstream.
+  - Resent as standalone patch, now that all dependencies are upstream.
+  - Removed unneeded addition of a flags argument to add_master_key().
+
+For changes in v12 and earlier, see
+https://lore.kernel.org/linux-fscrypt/20250210202336.349924-1-ebiggers@kernel.org/
+
+ Documentation/filesystems/fscrypt.rst | 187 ++++++++++++++++++++------
+ fs/crypto/fscrypt_private.h           |  75 +++++++++--
+ fs/crypto/hkdf.c                      |   4 +-
+ fs/crypto/inline_crypt.c              |  44 +++++-
+ fs/crypto/keyring.c                   | 132 ++++++++++++------
+ fs/crypto/keysetup.c                  |  63 +++++++--
+ fs/crypto/keysetup_v1.c               |   4 +-
+ include/uapi/linux/fscrypt.h          |   6 +-
+ 8 files changed, 410 insertions(+), 105 deletions(-)
+
+diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
+index e803299085492..734ee38eb89b0 100644
+--- a/Documentation/filesystems/fscrypt.rst
++++ b/Documentation/filesystems/fscrypt.rst
+@@ -68,11 +68,11 @@ an authorized user later accessing the filesystem.
+ 
+ Online attacks
+ --------------
+ 
+ fscrypt (and storage encryption in general) can only provide limited
+-protection, if any at all, against online attacks.  In detail:
++protection against online attacks.  In detail:
+ 
+ Side-channel attacks
+ ~~~~~~~~~~~~~~~~~~~~
+ 
+ fscrypt is only resistant to side-channel attacks, such as timing or
+@@ -97,20 +97,27 @@ system itself, is *not* protected by the mathematical properties of
+ encryption but rather only by the correctness of the kernel.
+ Therefore, any encryption-specific access control checks would merely
+ be enforced by kernel *code* and therefore would be largely redundant
+ with the wide variety of access control mechanisms already available.)
+ 
+-Kernel memory compromise
+-~~~~~~~~~~~~~~~~~~~~~~~~
++Read-only kernel memory compromise
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Unless `hardware-wrapped keys`_ are used, an attacker who gains the
++ability to read from arbitrary kernel memory, e.g. by mounting a
++physical attack or by exploiting a kernel security vulnerability, can
++compromise all fscrypt keys that are currently in-use.  This also
++extends to cold boot attacks; if the system is suddenly powered off,
++keys the system was using may remain in memory for a short time.
+ 
+-An attacker who compromises the system enough to read from arbitrary
+-memory, e.g. by mounting a physical attack or by exploiting a kernel
+-security vulnerability, can compromise all encryption keys that are
+-currently in use.
++However, if hardware-wrapped keys are used, then the fscrypt master
++keys and file contents encryption keys (but not other types of fscrypt
++subkeys such as filenames encryption keys) are protected from
++compromises of arbitrary kernel memory.
+ 
+-However, fscrypt allows encryption keys to be removed from the kernel,
+-which may protect them from later compromise.
++In addition, fscrypt allows encryption keys to be removed from the
++kernel, which may protect them from later compromise.
+ 
+ In more detail, the FS_IOC_REMOVE_ENCRYPTION_KEY ioctl (or the
+ FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS ioctl) can wipe a master
+ encryption key from kernel memory.  If it does so, it will also try to
+ evict all cached inodes which had been "unlocked" using the key,
+@@ -142,10 +149,28 @@ However, these ioctls have some limitations:
+ 
+ - Secret keys might still exist in CPU registers, in crypto
+   accelerator hardware (if used by the crypto API to implement any of
+   the algorithms), or in other places not explicitly considered here.
+ 
++Full system compromise
++~~~~~~~~~~~~~~~~~~~~~~
++
++An attacker who gains "root" access and/or the ability to execute
++arbitrary kernel code can freely exfiltrate data that is protected by
++any in-use fscrypt keys.  Thus, usually fscrypt provides no meaningful
++protection in this scenario.  (Data that is protected by a key that is
++absent throughout the entire attack remains protected, modulo the
++limitations of key removal mentioned above in the case where the key
++was removed prior to the attack.)
++
++However, if `hardware-wrapped keys`_ are used, such attackers will be
++unable to exfiltrate the master keys or file contents keys in a form
++that will be usable after the system is powered off.  This may be
++useful if the attacker is significantly time-limited and/or
++bandwidth-limited, so they can only exfiltrate some data and need to
++rely on a later offline attack to exfiltrate the rest of it.
++
+ Limitations of v1 policies
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ v1 encryption policies have some weaknesses with respect to online
+ attacks:
+@@ -168,10 +193,14 @@ this reason among others, it is recommended to use v2 encryption
+ policies on all new encrypted directories.
+ 
+ Key hierarchy
+ =============
+ 
++Note: this section assumes the use of raw keys rather than
++hardware-wrapped keys.  The use of hardware-wrapped keys modifies the
++key hierarchy slightly.  For details, see `Hardware-wrapped keys`_.
++
+ Master Keys
+ -----------
+ 
+ Each encrypted directory tree is protected by a *master key*.  Master
+ keys can be up to 64 bytes long, and must be at least as long as the
+@@ -830,11 +859,13 @@ a pointer to struct fscrypt_add_key_arg, defined as follows::
+ 
+     struct fscrypt_add_key_arg {
+             struct fscrypt_key_specifier key_spec;
+             __u32 raw_size;
+             __u32 key_id;
+-            __u32 __reserved[8];
++    #define FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED 0x00000001
++            __u32 flags;
++            __u32 __reserved[7];
+             __u8 raw[];
+     };
+ 
+     #define FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR        1
+     #define FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER        2
+@@ -849,11 +880,11 @@ a pointer to struct fscrypt_add_key_arg, defined as follows::
+             } u;
+     };
+ 
+     struct fscrypt_provisioning_key_payload {
+             __u32 type;
+-            __u32 __reserved;
++            __u32 flags;
+             __u8 raw[];
+     };
+ 
+ struct fscrypt_add_key_arg must be zeroed, then initialized
+ as follows:
+@@ -877,28 +908,36 @@ as follows:
+ 
+ - ``raw_size`` must be the size of the ``raw`` key provided, in bytes.
+   Alternatively, if ``key_id`` is nonzero, this field must be 0, since
+   in that case the size is implied by the specified Linux keyring key.
+ 
+-- ``key_id`` is 0 if the raw key is given directly in the ``raw``
+-  field.  Otherwise ``key_id`` is the ID of a Linux keyring key of
+-  type "fscrypt-provisioning" whose payload is
+-  struct fscrypt_provisioning_key_payload whose ``raw`` field contains
+-  the raw key and whose ``type`` field matches ``key_spec.type``.
+-  Since ``raw`` is variable-length, the total size of this key's
+-  payload must be ``sizeof(struct fscrypt_provisioning_key_payload)``
+-  plus the raw key size.  The process must have Search permission on
+-  this key.
+-
+-  Most users should leave this 0 and specify the raw key directly.
+-  The support for specifying a Linux keyring key is intended mainly to
++- ``key_id`` is 0 if the key is given directly in the ``raw`` field.
++  Otherwise ``key_id`` is the ID of a Linux keyring key of type
++  "fscrypt-provisioning" whose payload is struct
++  fscrypt_provisioning_key_payload whose ``raw`` field contains the
++  key, whose ``type`` field matches ``key_spec.type``, and whose
++  ``flags`` field matches ``flags``.  Since ``raw`` is
++  variable-length, the total size of this key's payload must be
++  ``sizeof(struct fscrypt_provisioning_key_payload)`` plus the number
++  of key bytes.  The process must have Search permission on this key.
++
++  Most users should leave this 0 and specify the key directly.  The
++  support for specifying a Linux keyring key is intended mainly to
+   allow re-adding keys after a filesystem is unmounted and re-mounted,
+-  without having to store the raw keys in userspace memory.
++  without having to store the keys in userspace memory.
++
++- ``flags`` contains optional flags from ``<linux/fscrypt.h>``:
++
++  - FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED: This denotes that the key is a
++    hardware-wrapped key.  See `Hardware-wrapped keys`_.  This flag
++    can't be used if FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR is used.
+ 
+ - ``raw`` is a variable-length field which must contain the actual
+   key, ``raw_size`` bytes long.  Alternatively, if ``key_id`` is
+-  nonzero, then this field is unused.
++  nonzero, then this field is unused.  Note that despite being named
++  ``raw``, if FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED is specified then it
++  will contain a wrapped key, not a raw key.
+ 
+ For v2 policy keys, the kernel keeps track of which user (identified
+ by effective user ID) added the key, and only allows the key to be
+ removed by that user --- or by "root", if they use
+ `FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS`_.
+@@ -906,34 +945,37 @@ removed by that user --- or by "root", if they use
+ However, if another user has added the key, it may be desirable to
+ prevent that other user from unexpectedly removing it.  Therefore,
+ FS_IOC_ADD_ENCRYPTION_KEY may also be used to add a v2 policy key
+ *again*, even if it's already added by other user(s).  In this case,
+ FS_IOC_ADD_ENCRYPTION_KEY will just install a claim to the key for the
+-current user, rather than actually add the key again (but the raw key
+-must still be provided, as a proof of knowledge).
++current user, rather than actually add the key again (but the key must
++still be provided, as a proof of knowledge).
+ 
+ FS_IOC_ADD_ENCRYPTION_KEY returns 0 if either the key or a claim to
+ the key was either added or already exists.
+ 
+ FS_IOC_ADD_ENCRYPTION_KEY can fail with the following errors:
+ 
+ - ``EACCES``: FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR was specified, but the
+   caller does not have the CAP_SYS_ADMIN capability in the initial
+-  user namespace; or the raw key was specified by Linux key ID but the
++  user namespace; or the key was specified by Linux key ID but the
+   process lacks Search permission on the key.
++- ``EBADMSG``: invalid hardware-wrapped key
+ - ``EDQUOT``: the key quota for this user would be exceeded by adding
+   the key
+ - ``EINVAL``: invalid key size or key specifier type, or reserved bits
+   were set
+-- ``EKEYREJECTED``: the raw key was specified by Linux key ID, but the
+-  key has the wrong type
+-- ``ENOKEY``: the raw key was specified by Linux key ID, but no key
+-  exists with that ID
++- ``EKEYREJECTED``: the key was specified by Linux key ID, but the key
++  has the wrong type
++- ``ENOKEY``: the key was specified by Linux key ID, but no key exists
++  with that ID
+ - ``ENOTTY``: this type of filesystem does not implement encryption
+ - ``EOPNOTSUPP``: the kernel was not configured with encryption
+   support for this filesystem, or the filesystem superblock has not
+-  had encryption enabled on it
++  had encryption enabled on it; or a hardware wrapped key was specified
++  but the filesystem does not support inline encryption or the hardware
++  does not support hardware-wrapped keys
+ 
+ Legacy method
+ ~~~~~~~~~~~~~
+ 
+ For v1 encryption policies, a master encryption key can also be
+@@ -992,13 +1034,12 @@ These two ioctls differ only in cases where v2 policy keys are added
+ or removed by non-root users.
+ 
+ These ioctls don't work on keys that were added via the legacy
+ process-subscribed keyrings mechanism.
+ 
+-Before using these ioctls, read the `Kernel memory compromise`_
+-section for a discussion of the security goals and limitations of
+-these ioctls.
++Before using these ioctls, read the `Online attacks`_ section for a
++discussion of the security goals and limitations of these ioctls.
+ 
+ FS_IOC_REMOVE_ENCRYPTION_KEY
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+ The FS_IOC_REMOVE_ENCRYPTION_KEY ioctl removes a claim to a master
+@@ -1314,19 +1355,89 @@ encryption when possible; it doesn't force its use.  fscrypt will
+ still fall back to using the kernel crypto API on files where the
+ inline encryption hardware doesn't have the needed crypto capabilities
+ (e.g. support for the needed encryption algorithm and data unit size)
+ and where blk-crypto-fallback is unusable.  (For blk-crypto-fallback
+ to be usable, it must be enabled in the kernel configuration with
+-CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK=y.)
++CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK=y, and the file must be
++protected by a raw key rather than a hardware-wrapped key.)
+ 
+ Currently fscrypt always uses the filesystem block size (which is
+ usually 4096 bytes) as the data unit size.  Therefore, it can only use
+ inline encryption hardware that supports that data unit size.
+ 
+ Inline encryption doesn't affect the ciphertext or other aspects of
+ the on-disk format, so users may freely switch back and forth between
+-using "inlinecrypt" and not using "inlinecrypt".
++using "inlinecrypt" and not using "inlinecrypt".  An exception is that
++files that are protected by a hardware-wrapped key can only be
++encrypted/decrypted by the inline encryption hardware and therefore
++can only be accessed when the "inlinecrypt" mount option is used.  For
++more information about hardware-wrapped keys, see below.
++
++Hardware-wrapped keys
++---------------------
++
++fscrypt supports using *hardware-wrapped keys* when the inline
++encryption hardware supports it.  Such keys are only present in kernel
++memory in wrapped (encrypted) form; they can only be unwrapped
++(decrypted) by the inline encryption hardware and are temporally bound
++to the current boot.  This prevents the keys from being compromised if
++kernel memory is leaked.  This is done without limiting the number of
++keys that can be used and while still allowing the execution of
++cryptographic tasks that are tied to the same key but can't use inline
++encryption hardware, e.g. filenames encryption.
++
++Note that hardware-wrapped keys aren't specific to fscrypt; they are a
++block layer feature (part of *blk-crypto*).  For more details about
++hardware-wrapped keys, see the block layer documentation at
++:ref:`Documentation/block/inline-encryption.rst
++<hardware_wrapped_keys>`.  The rest of this section just focuses on
++the details of how fscrypt can use hardware-wrapped keys.
++
++fscrypt supports hardware-wrapped keys by allowing the fscrypt master
++keys to be hardware-wrapped keys as an alternative to raw keys.  To
++add a hardware-wrapped key with `FS_IOC_ADD_ENCRYPTION_KEY`_,
++userspace must specify FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED in the
++``flags`` field of struct fscrypt_add_key_arg and also in the
++``flags`` field of struct fscrypt_provisioning_key_payload when
++applicable.  The key must be in ephemerally-wrapped form, not
++long-term wrapped form.
++
++Some limitations apply.  First, files protected by a hardware-wrapped
++key are tied to the system's inline encryption hardware.  Therefore
++they can only be accessed when the "inlinecrypt" mount option is used,
++and they can't be included in portable filesystem images.  Second,
++currently the hardware-wrapped key support is only compatible with
++`IV_INO_LBLK_64 policies`_ and `IV_INO_LBLK_32 policies`_, as it
++assumes that there is just one file contents encryption key per
++fscrypt master key rather than one per file.  Future work may address
++this limitation by passing per-file nonces down the storage stack to
++allow the hardware to derive per-file keys.
++
++Implementation-wise, to encrypt/decrypt the contents of files that are
++protected by a hardware-wrapped key, fscrypt uses blk-crypto,
++attaching the hardware-wrapped key to the bio crypt contexts.  As is
++the case with raw keys, the block layer will program the key into a
++keyslot when it isn't already in one.  However, when programming a
++hardware-wrapped key, the hardware doesn't program the given key
++directly into a keyslot but rather unwraps it (using the hardware's
++ephemeral wrapping key) and derives the inline encryption key from it.
++The inline encryption key is the key that actually gets programmed
++into a keyslot, and it is never exposed to software.
++
++However, fscrypt doesn't just do file contents encryption; it also
++uses its master keys to derive filenames encryption keys, key
++identifiers, and sometimes some more obscure types of subkeys such as
++dirhash keys.  So even with file contents encryption out of the
++picture, fscrypt still needs a raw key to work with.  To get such a
++key from a hardware-wrapped key, fscrypt asks the inline encryption
++hardware to derive a cryptographically isolated "software secret" from
++the hardware-wrapped key.  fscrypt uses this "software secret" to key
++its KDF to derive all subkeys other than file contents keys.
++
++Note that this implies that the hardware-wrapped key feature only
++protects the file contents encryption keys.  It doesn't protect other
++fscrypt subkeys such as filenames encryption keys.
+ 
+ Direct I/O support
+ ==================
+ 
+ For direct I/O on an encrypted file to work, the following conditions
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 8371e4e1f596a..c1d92074b65c5 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -10,10 +10,11 @@
+ 
+ #ifndef _FSCRYPT_PRIVATE_H
+ #define _FSCRYPT_PRIVATE_H
+ 
+ #include <linux/fscrypt.h>
++#include <linux/minmax.h>
+ #include <linux/siphash.h>
+ #include <crypto/hash.h>
+ #include <linux/blk-crypto.h>
+ 
+ #define CONST_STRLEN(str)	(sizeof(str) - 1)
+@@ -25,10 +26,27 @@
+  * if ciphers with a 256-bit security strength are used.  This is just the
+  * absolute minimum, which applies when only 128-bit encryption is used.
+  */
+ #define FSCRYPT_MIN_KEY_SIZE	16
+ 
++/* Maximum size of a raw fscrypt master key */
++#define FSCRYPT_MAX_RAW_KEY_SIZE	64
++
++/* Maximum size of a hardware-wrapped fscrypt master key */
++#define FSCRYPT_MAX_HW_WRAPPED_KEY_SIZE	BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE
++
++/* Maximum size of an fscrypt master key across both key types */
++#define FSCRYPT_MAX_ANY_KEY_SIZE \
++	MAX(FSCRYPT_MAX_RAW_KEY_SIZE, FSCRYPT_MAX_HW_WRAPPED_KEY_SIZE)
++
++/*
++ * FSCRYPT_MAX_KEY_SIZE is defined in the UAPI header, but the addition of
++ * hardware-wrapped keys has made it misleading as it's only for raw keys.
++ * Don't use it in kernel code; use one of the above constants instead.
++ */
++#undef FSCRYPT_MAX_KEY_SIZE
++
+ #define FSCRYPT_CONTEXT_V1	1
+ #define FSCRYPT_CONTEXT_V2	2
+ 
+ /* Keep this in sync with include/uapi/linux/fscrypt.h */
+ #define FSCRYPT_MODE_MAX	FSCRYPT_MODE_AES_256_HCTR2
+@@ -358,41 +376,49 @@ int fscrypt_init_hkdf(struct fscrypt_hkdf *hkdf, const u8 *master_key,
+  * the first byte of the HKDF application-specific info string to guarantee that
+  * info strings are never repeated between contexts.  This ensures that all HKDF
+  * outputs are unique and cryptographically isolated, i.e. knowledge of one
+  * output doesn't reveal another.
+  */
+-#define HKDF_CONTEXT_KEY_IDENTIFIER	1 /* info=<empty>		*/
++#define HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY	1 /* info=<empty>	*/
+ #define HKDF_CONTEXT_PER_FILE_ENC_KEY	2 /* info=file_nonce		*/
+ #define HKDF_CONTEXT_DIRECT_KEY		3 /* info=mode_num		*/
+ #define HKDF_CONTEXT_IV_INO_LBLK_64_KEY	4 /* info=mode_num||fs_uuid	*/
+ #define HKDF_CONTEXT_DIRHASH_KEY	5 /* info=file_nonce		*/
+ #define HKDF_CONTEXT_IV_INO_LBLK_32_KEY	6 /* info=mode_num||fs_uuid	*/
+ #define HKDF_CONTEXT_INODE_HASH_KEY	7 /* info=<empty>		*/
++#define HKDF_CONTEXT_KEY_IDENTIFIER_FOR_HW_WRAPPED_KEY \
++					8 /* info=<empty>		*/
+ 
+ int fscrypt_hkdf_expand(const struct fscrypt_hkdf *hkdf, u8 context,
+ 			const u8 *info, unsigned int infolen,
+ 			u8 *okm, unsigned int okmlen);
+ 
+ void fscrypt_destroy_hkdf(struct fscrypt_hkdf *hkdf);
+ 
+ /* inline_crypt.c */
+ #ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
+-int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci);
++int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci,
++				   bool is_hw_wrapped_key);
+ 
+ static inline bool
+ fscrypt_using_inline_encryption(const struct fscrypt_inode_info *ci)
+ {
+ 	return ci->ci_inlinecrypt;
+ }
+ 
+ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+-				     const u8 *raw_key,
++				     const u8 *key_bytes, size_t key_size,
++				     bool is_hw_wrapped,
+ 				     const struct fscrypt_inode_info *ci);
+ 
+ void fscrypt_destroy_inline_crypt_key(struct super_block *sb,
+ 				      struct fscrypt_prepared_key *prep_key);
+ 
++int fscrypt_derive_sw_secret(struct super_block *sb,
++			     const u8 *wrapped_key, size_t wrapped_key_size,
++			     u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE]);
++
+ /*
+  * Check whether the crypto transform or blk-crypto key has been allocated in
+  * @prep_key, depending on which encryption implementation the file will use.
+  */
+ static inline bool
+@@ -412,11 +438,12 @@ fscrypt_is_key_prepared(struct fscrypt_prepared_key *prep_key,
+ 	return smp_load_acquire(&prep_key->tfm) != NULL;
+ }
+ 
+ #else /* CONFIG_FS_ENCRYPTION_INLINE_CRYPT */
+ 
+-static inline int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci)
++static inline int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci,
++						 bool is_hw_wrapped_key)
+ {
+ 	return 0;
+ }
+ 
+ static inline bool
+@@ -425,11 +452,12 @@ fscrypt_using_inline_encryption(const struct fscrypt_inode_info *ci)
+ 	return false;
+ }
+ 
+ static inline int
+ fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+-				 const u8 *raw_key,
++				 const u8 *key_bytes, size_t key_size,
++				 bool is_hw_wrapped,
+ 				 const struct fscrypt_inode_info *ci)
+ {
+ 	WARN_ON_ONCE(1);
+ 	return -EOPNOTSUPP;
+ }
+@@ -438,10 +466,19 @@ static inline void
+ fscrypt_destroy_inline_crypt_key(struct super_block *sb,
+ 				 struct fscrypt_prepared_key *prep_key)
+ {
+ }
+ 
++static inline int
++fscrypt_derive_sw_secret(struct super_block *sb,
++			 const u8 *wrapped_key, size_t wrapped_key_size,
++			 u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
++{
++	fscrypt_warn(NULL, "kernel doesn't support hardware-wrapped keys");
++	return -EOPNOTSUPP;
++}
++
+ static inline bool
+ fscrypt_is_key_prepared(struct fscrypt_prepared_key *prep_key,
+ 			const struct fscrypt_inode_info *ci)
+ {
+ 	return smp_load_acquire(&prep_key->tfm) != NULL;
+@@ -454,24 +491,42 @@ fscrypt_is_key_prepared(struct fscrypt_prepared_key *prep_key,
+  * fscrypt_master_key_secret - secret key material of an in-use master key
+  */
+ struct fscrypt_master_key_secret {
+ 
+ 	/*
+-	 * For v2 policy keys: HKDF context keyed by this master key.
+-	 * For v1 policy keys: not set (hkdf.hmac_tfm == NULL).
++	 * The KDF with which subkeys of this key can be derived.
++	 *
++	 * For v1 policy keys, this isn't applicable and won't be set.
++	 * Otherwise, this KDF will be keyed by this master key if
++	 * ->is_hw_wrapped=false, or by the "software secret" that hardware
++	 * derived from this master key if ->is_hw_wrapped=true.
+ 	 */
+ 	struct fscrypt_hkdf	hkdf;
+ 
+ 	/*
+-	 * Size of the raw key in bytes.  This remains set even if ->raw was
++	 * True if this key is a hardware-wrapped key; false if this key is a
++	 * raw key (i.e. a "software key").  For v1 policy keys this will always
++	 * be false, as v1 policy support is a legacy feature which doesn't
++	 * support newer functionality such as hardware-wrapped keys.
++	 */
++	bool			is_hw_wrapped;
++
++	/*
++	 * Size of the key in bytes.  This remains set even if ->bytes was
+ 	 * zeroized due to no longer being needed.  I.e. we still remember the
+ 	 * size of the key even if we don't need to remember the key itself.
+ 	 */
+ 	u32			size;
+ 
+-	/* For v1 policy keys: the raw key.  Wiped for v2 policy keys. */
+-	u8			raw[FSCRYPT_MAX_KEY_SIZE];
++	/*
++	 * The bytes of the key, when still needed.  This can be either a raw
++	 * key or a hardware-wrapped key, as indicated by ->is_hw_wrapped.  In
++	 * the case of a raw, v2 policy key, there is no need to remember the
++	 * actual key separately from ->hkdf so this field will be zeroized as
++	 * soon as ->hkdf is initialized.
++	 */
++	u8			bytes[FSCRYPT_MAX_ANY_KEY_SIZE];
+ 
+ } __randomize_layout;
+ 
+ /*
+  * fscrypt_master_key - an in-use master key
+diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
+index 855a0f4b7318b..0f3028adc9c72 100644
+--- a/fs/crypto/hkdf.c
++++ b/fs/crypto/hkdf.c
+@@ -1,8 +1,10 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * This is used to derive keys from the fscrypt master keys.
++ * This is used to derive keys from the fscrypt master keys (or from the
++ * "software secrets" which hardware derives from the fscrypt master keys, in
++ * the case that the fscrypt master keys are hardware-wrapped keys).
+  *
+  * Copyright 2019 Google LLC
+  */
+ 
+ #include <crypto/hash.h>
+diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
+index 7fa53d30aec30..1d008c440cb69 100644
+--- a/fs/crypto/inline_crypt.c
++++ b/fs/crypto/inline_crypt.c
+@@ -87,11 +87,12 @@ static void fscrypt_log_blk_crypto_impl(struct fscrypt_mode *mode,
+ 		}
+ 	}
+ }
+ 
+ /* Enable inline encryption for this file if supported. */
+-int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci)
++int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci,
++				   bool is_hw_wrapped_key)
+ {
+ 	const struct inode *inode = ci->ci_inode;
+ 	struct super_block *sb = inode->i_sb;
+ 	struct blk_crypto_config crypto_cfg;
+ 	struct block_device **devs;
+@@ -128,11 +129,12 @@ int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci)
+ 	 * crypto configuration that the file would use.
+ 	 */
+ 	crypto_cfg.crypto_mode = ci->ci_mode->blk_crypto_mode;
+ 	crypto_cfg.data_unit_size = 1U << ci->ci_data_unit_bits;
+ 	crypto_cfg.dun_bytes = fscrypt_get_dun_bytes(ci);
+-	crypto_cfg.key_type = BLK_CRYPTO_KEY_TYPE_RAW;
++	crypto_cfg.key_type = is_hw_wrapped_key ?
++		BLK_CRYPTO_KEY_TYPE_HW_WRAPPED : BLK_CRYPTO_KEY_TYPE_RAW;
+ 
+ 	devs = fscrypt_get_devices(sb, &num_devs);
+ 	if (IS_ERR(devs))
+ 		return PTR_ERR(devs);
+ 
+@@ -149,29 +151,31 @@ int fscrypt_select_encryption_impl(struct fscrypt_inode_info *ci)
+ 
+ 	return 0;
+ }
+ 
+ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+-				     const u8 *raw_key,
++				     const u8 *key_bytes, size_t key_size,
++				     bool is_hw_wrapped,
+ 				     const struct fscrypt_inode_info *ci)
+ {
+ 	const struct inode *inode = ci->ci_inode;
+ 	struct super_block *sb = inode->i_sb;
+ 	enum blk_crypto_mode_num crypto_mode = ci->ci_mode->blk_crypto_mode;
++	enum blk_crypto_key_type key_type = is_hw_wrapped ?
++		BLK_CRYPTO_KEY_TYPE_HW_WRAPPED : BLK_CRYPTO_KEY_TYPE_RAW;
+ 	struct blk_crypto_key *blk_key;
+ 	struct block_device **devs;
+ 	unsigned int num_devs;
+ 	unsigned int i;
+ 	int err;
+ 
+ 	blk_key = kmalloc(sizeof(*blk_key), GFP_KERNEL);
+ 	if (!blk_key)
+ 		return -ENOMEM;
+ 
+-	err = blk_crypto_init_key(blk_key, raw_key, ci->ci_mode->keysize,
+-				  BLK_CRYPTO_KEY_TYPE_RAW, crypto_mode,
+-				  fscrypt_get_dun_bytes(ci),
++	err = blk_crypto_init_key(blk_key, key_bytes, key_size, key_type,
++				  crypto_mode, fscrypt_get_dun_bytes(ci),
+ 				  1U << ci->ci_data_unit_bits);
+ 	if (err) {
+ 		fscrypt_err(inode, "error %d initializing blk-crypto key", err);
+ 		goto fail;
+ 	}
+@@ -226,10 +230,38 @@ void fscrypt_destroy_inline_crypt_key(struct super_block *sb,
+ 		kfree(devs);
+ 	}
+ 	kfree_sensitive(blk_key);
+ }
+ 
++/*
++ * Ask the inline encryption hardware to derive the software secret from a
++ * hardware-wrapped key.  Returns -EOPNOTSUPP if hardware-wrapped keys aren't
++ * supported on this filesystem or hardware.
++ */
++int fscrypt_derive_sw_secret(struct super_block *sb,
++			     const u8 *wrapped_key, size_t wrapped_key_size,
++			     u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
++{
++	int err;
++
++	/* The filesystem must be mounted with -o inlinecrypt. */
++	if (!(sb->s_flags & SB_INLINECRYPT)) {
++		fscrypt_warn(NULL,
++			     "%s: filesystem not mounted with inlinecrypt\n",
++			     sb->s_id);
++		return -EOPNOTSUPP;
++	}
++
++	err = blk_crypto_derive_sw_secret(sb->s_bdev, wrapped_key,
++					  wrapped_key_size, sw_secret);
++	if (err == -EOPNOTSUPP)
++		fscrypt_warn(NULL,
++			     "%s: block device doesn't support hardware-wrapped keys\n",
++			     sb->s_id);
++	return err;
++}
++
+ bool __fscrypt_inode_uses_inline_crypto(const struct inode *inode)
+ {
+ 	return inode->i_crypt_info->ci_inlinecrypt;
+ }
+ EXPORT_SYMBOL_GPL(__fscrypt_inode_uses_inline_crypto);
+diff --git a/fs/crypto/keyring.c b/fs/crypto/keyring.c
+index 787e9c8938ba3..ace369f130683 100644
+--- a/fs/crypto/keyring.c
++++ b/fs/crypto/keyring.c
+@@ -147,15 +147,15 @@ static inline bool valid_key_spec(const struct fscrypt_key_specifier *spec)
+ 
+ static int fscrypt_user_key_instantiate(struct key *key,
+ 					struct key_preparsed_payload *prep)
+ {
+ 	/*
+-	 * We just charge FSCRYPT_MAX_KEY_SIZE bytes to the user's key quota for
+-	 * each key, regardless of the exact key size.  The amount of memory
++	 * We just charge FSCRYPT_MAX_RAW_KEY_SIZE bytes to the user's key quota
++	 * for each key, regardless of the exact key size.  The amount of memory
+ 	 * actually used is greater than the size of the raw key anyway.
+ 	 */
+-	return key_payload_reserve(key, FSCRYPT_MAX_KEY_SIZE);
++	return key_payload_reserve(key, FSCRYPT_MAX_RAW_KEY_SIZE);
+ }
+ 
+ static void fscrypt_user_key_describe(const struct key *key, struct seq_file *m)
+ {
+ 	seq_puts(m, key->description);
+@@ -556,45 +556,87 @@ static int add_master_key(struct super_block *sb,
+ 			  struct fscrypt_key_specifier *key_spec)
+ {
+ 	int err;
+ 
+ 	if (key_spec->type == FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER) {
+-		err = fscrypt_init_hkdf(&secret->hkdf, secret->raw,
+-					secret->size);
+-		if (err)
+-			return err;
++		u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE];
++		u8 *kdf_key = secret->bytes;
++		unsigned int kdf_key_size = secret->size;
++		u8 keyid_kdf_ctx = HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY;
+ 
+ 		/*
+-		 * Now that the HKDF context is initialized, the raw key is no
+-		 * longer needed.
++		 * For raw keys, the fscrypt master key is used directly as the
++		 * fscrypt KDF key.  For hardware-wrapped keys, we have to pass
++		 * the master key to the hardware to derive the KDF key, which
++		 * is then only used to derive non-file-contents subkeys.
++		 */
++		if (secret->is_hw_wrapped) {
++			err = fscrypt_derive_sw_secret(sb, secret->bytes,
++						       secret->size, sw_secret);
++			if (err)
++				return err;
++			kdf_key = sw_secret;
++			kdf_key_size = sizeof(sw_secret);
++			/*
++			 * To avoid weird behavior if someone manages to
++			 * determine sw_secret and add it as a raw key, ensure
++			 * that hardware-wrapped keys and raw keys will have
++			 * different key identifiers by deriving their key
++			 * identifiers using different KDF contexts.
++			 */
++			keyid_kdf_ctx =
++				HKDF_CONTEXT_KEY_IDENTIFIER_FOR_HW_WRAPPED_KEY;
++		}
++		err = fscrypt_init_hkdf(&secret->hkdf, kdf_key, kdf_key_size);
++		/*
++		 * Now that the KDF context is initialized, the raw KDF key is
++		 * no longer needed.
+ 		 */
+-		memzero_explicit(secret->raw, secret->size);
++		memzero_explicit(kdf_key, kdf_key_size);
++		if (err)
++			return err;
+ 
+ 		/* Calculate the key identifier */
+-		err = fscrypt_hkdf_expand(&secret->hkdf,
+-					  HKDF_CONTEXT_KEY_IDENTIFIER, NULL, 0,
++		err = fscrypt_hkdf_expand(&secret->hkdf, keyid_kdf_ctx, NULL, 0,
+ 					  key_spec->u.identifier,
+ 					  FSCRYPT_KEY_IDENTIFIER_SIZE);
+ 		if (err)
+ 			return err;
+ 	}
+ 	return do_add_master_key(sb, secret, key_spec);
+ }
+ 
++/*
++ * Validate the size of an fscrypt master key being added.  Note that this is
++ * just an initial check, as we don't know which ciphers will be used yet.
++ * There is a stricter size check later when the key is actually used by a file.
++ */
++static inline bool fscrypt_valid_key_size(size_t size, u32 add_key_flags)
++{
++	u32 max_size = (add_key_flags & FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED) ?
++		       FSCRYPT_MAX_HW_WRAPPED_KEY_SIZE :
++		       FSCRYPT_MAX_RAW_KEY_SIZE;
++
++	return size >= FSCRYPT_MIN_KEY_SIZE && size <= max_size;
++}
++
+ static int fscrypt_provisioning_key_preparse(struct key_preparsed_payload *prep)
+ {
+ 	const struct fscrypt_provisioning_key_payload *payload = prep->data;
+ 
+-	if (prep->datalen < sizeof(*payload) + FSCRYPT_MIN_KEY_SIZE ||
+-	    prep->datalen > sizeof(*payload) + FSCRYPT_MAX_KEY_SIZE)
++	if (prep->datalen < sizeof(*payload))
++		return -EINVAL;
++
++	if (!fscrypt_valid_key_size(prep->datalen - sizeof(*payload),
++				    payload->flags))
+ 		return -EINVAL;
+ 
+ 	if (payload->type != FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR &&
+ 	    payload->type != FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER)
+ 		return -EINVAL;
+ 
+-	if (payload->__reserved)
++	if (payload->flags & ~FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED)
+ 		return -EINVAL;
+ 
+ 	prep->payload.data[0] = kmemdup(payload, prep->datalen, GFP_KERNEL);
+ 	if (!prep->payload.data[0])
+ 		return -ENOMEM;
+@@ -634,25 +676,25 @@ static struct key_type key_type_fscrypt_provisioning = {
+ 	.describe		= fscrypt_provisioning_key_describe,
+ 	.destroy		= fscrypt_provisioning_key_destroy,
+ };
+ 
+ /*
+- * Retrieve the raw key from the Linux keyring key specified by 'key_id', and
+- * store it into 'secret'.
++ * Retrieve the key from the Linux keyring key specified by 'key_id', and store
++ * it into 'secret'.
+  *
+- * The key must be of type "fscrypt-provisioning" and must have the field
+- * fscrypt_provisioning_key_payload::type set to 'type', indicating that it's
+- * only usable with fscrypt with the particular KDF version identified by
+- * 'type'.  We don't use the "logon" key type because there's no way to
+- * completely restrict the use of such keys; they can be used by any kernel API
+- * that accepts "logon" keys and doesn't require a specific service prefix.
++ * The key must be of type "fscrypt-provisioning" and must have the 'type' and
++ * 'flags' field of the payload set to the given values, indicating that the key
++ * is intended for use for the specified purpose.  We don't use the "logon" key
++ * type because there's no way to completely restrict the use of such keys; they
++ * can be used by any kernel API that accepts "logon" keys and doesn't require a
++ * specific service prefix.
+  *
+  * The ability to specify the key via Linux keyring key is intended for cases
+  * where userspace needs to re-add keys after the filesystem is unmounted and
+- * re-mounted.  Most users should just provide the raw key directly instead.
++ * re-mounted.  Most users should just provide the key directly instead.
+  */
+-static int get_keyring_key(u32 key_id, u32 type,
++static int get_keyring_key(u32 key_id, u32 type, u32 flags,
+ 			   struct fscrypt_master_key_secret *secret)
+ {
+ 	key_ref_t ref;
+ 	struct key *key;
+ 	const struct fscrypt_provisioning_key_payload *payload;
+@@ -665,16 +707,20 @@ static int get_keyring_key(u32 key_id, u32 type,
+ 
+ 	if (key->type != &key_type_fscrypt_provisioning)
+ 		goto bad_key;
+ 	payload = key->payload.data[0];
+ 
+-	/* Don't allow fscrypt v1 keys to be used as v2 keys and vice versa. */
+-	if (payload->type != type)
++	/*
++	 * Don't allow fscrypt v1 keys to be used as v2 keys and vice versa.
++	 * Similarly, don't allow hardware-wrapped keys to be used as
++	 * non-hardware-wrapped keys and vice versa.
++	 */
++	if (payload->type != type || payload->flags != flags)
+ 		goto bad_key;
+ 
+ 	secret->size = key->datalen - sizeof(*payload);
+-	memcpy(secret->raw, payload->raw, secret->size);
++	memcpy(secret->bytes, payload->raw, secret->size);
+ 	err = 0;
+ 	goto out_put;
+ 
+ bad_key:
+ 	err = -EKEYREJECTED;
+@@ -732,23 +778,32 @@ int fscrypt_ioctl_add_key(struct file *filp, void __user *_uarg)
+ 	if (arg.key_spec.type == FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR &&
+ 	    !capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+ 
+ 	memset(&secret, 0, sizeof(secret));
++
++	if (arg.flags) {
++		if (arg.flags & ~FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED)
++			return -EINVAL;
++		if (arg.key_spec.type != FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER)
++			return -EINVAL;
++		secret.is_hw_wrapped = true;
++	}
++
+ 	if (arg.key_id) {
+ 		if (arg.raw_size != 0)
+ 			return -EINVAL;
+-		err = get_keyring_key(arg.key_id, arg.key_spec.type, &secret);
++		err = get_keyring_key(arg.key_id, arg.key_spec.type, arg.flags,
++				      &secret);
+ 		if (err)
+ 			goto out_wipe_secret;
+ 	} else {
+-		if (arg.raw_size < FSCRYPT_MIN_KEY_SIZE ||
+-		    arg.raw_size > FSCRYPT_MAX_KEY_SIZE)
++		if (!fscrypt_valid_key_size(arg.raw_size, arg.flags))
+ 			return -EINVAL;
+ 		secret.size = arg.raw_size;
+ 		err = -EFAULT;
+-		if (copy_from_user(secret.raw, uarg->raw, secret.size))
++		if (copy_from_user(secret.bytes, uarg->raw, secret.size))
+ 			goto out_wipe_secret;
+ 	}
+ 
+ 	err = add_master_key(sb, &secret, &arg.key_spec);
+ 	if (err)
+@@ -768,31 +823,32 @@ int fscrypt_ioctl_add_key(struct file *filp, void __user *_uarg)
+ EXPORT_SYMBOL_GPL(fscrypt_ioctl_add_key);
+ 
+ static void
+ fscrypt_get_test_dummy_secret(struct fscrypt_master_key_secret *secret)
+ {
+-	static u8 test_key[FSCRYPT_MAX_KEY_SIZE];
++	static u8 test_key[FSCRYPT_MAX_RAW_KEY_SIZE];
+ 
+-	get_random_once(test_key, FSCRYPT_MAX_KEY_SIZE);
++	get_random_once(test_key, sizeof(test_key));
+ 
+ 	memset(secret, 0, sizeof(*secret));
+-	secret->size = FSCRYPT_MAX_KEY_SIZE;
+-	memcpy(secret->raw, test_key, FSCRYPT_MAX_KEY_SIZE);
++	secret->size = sizeof(test_key);
++	memcpy(secret->bytes, test_key, sizeof(test_key));
+ }
+ 
+ int fscrypt_get_test_dummy_key_identifier(
+ 				u8 key_identifier[FSCRYPT_KEY_IDENTIFIER_SIZE])
+ {
+ 	struct fscrypt_master_key_secret secret;
+ 	int err;
+ 
+ 	fscrypt_get_test_dummy_secret(&secret);
+ 
+-	err = fscrypt_init_hkdf(&secret.hkdf, secret.raw, secret.size);
++	err = fscrypt_init_hkdf(&secret.hkdf, secret.bytes, secret.size);
+ 	if (err)
+ 		goto out;
+-	err = fscrypt_hkdf_expand(&secret.hkdf, HKDF_CONTEXT_KEY_IDENTIFIER,
++	err = fscrypt_hkdf_expand(&secret.hkdf,
++				  HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY,
+ 				  NULL, 0, key_identifier,
+ 				  FSCRYPT_KEY_IDENTIFIER_SIZE);
+ out:
+ 	wipe_master_key_secret(&secret);
+ 	return err;
+diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+index b4fe01ea4bd4c..0d71843af9469 100644
+--- a/fs/crypto/keysetup.c
++++ b/fs/crypto/keysetup.c
+@@ -151,11 +151,13 @@ int fscrypt_prepare_key(struct fscrypt_prepared_key *prep_key,
+ 			const u8 *raw_key, const struct fscrypt_inode_info *ci)
+ {
+ 	struct crypto_skcipher *tfm;
+ 
+ 	if (fscrypt_using_inline_encryption(ci))
+-		return fscrypt_prepare_inline_crypt_key(prep_key, raw_key, ci);
++		return fscrypt_prepare_inline_crypt_key(prep_key, raw_key,
++							ci->ci_mode->keysize,
++							false, ci);
+ 
+ 	tfm = fscrypt_allocate_skcipher(ci->ci_mode, raw_key, ci->ci_inode);
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
+ 	/*
+@@ -193,18 +195,33 @@ static int setup_per_mode_enc_key(struct fscrypt_inode_info *ci,
+ 	const struct inode *inode = ci->ci_inode;
+ 	const struct super_block *sb = inode->i_sb;
+ 	struct fscrypt_mode *mode = ci->ci_mode;
+ 	const u8 mode_num = mode - fscrypt_modes;
+ 	struct fscrypt_prepared_key *prep_key;
+-	u8 mode_key[FSCRYPT_MAX_KEY_SIZE];
++	u8 mode_key[FSCRYPT_MAX_RAW_KEY_SIZE];
+ 	u8 hkdf_info[sizeof(mode_num) + sizeof(sb->s_uuid)];
+ 	unsigned int hkdf_infolen = 0;
++	bool use_hw_wrapped_key = false;
+ 	int err;
+ 
+ 	if (WARN_ON_ONCE(mode_num > FSCRYPT_MODE_MAX))
+ 		return -EINVAL;
+ 
++	if (mk->mk_secret.is_hw_wrapped && S_ISREG(inode->i_mode)) {
++		/* Using a hardware-wrapped key for file contents encryption */
++		if (!fscrypt_using_inline_encryption(ci)) {
++			if (sb->s_flags & SB_INLINECRYPT)
++				fscrypt_warn(ci->ci_inode,
++					     "Hardware-wrapped key required, but no suitable inline encryption capabilities are available");
++			else
++				fscrypt_warn(ci->ci_inode,
++					     "Hardware-wrapped keys require inline encryption (-o inlinecrypt)");
++			return -EINVAL;
++		}
++		use_hw_wrapped_key = true;
++	}
++
+ 	prep_key = &keys[mode_num];
+ 	if (fscrypt_is_key_prepared(prep_key, ci)) {
+ 		ci->ci_enc_key = *prep_key;
+ 		return 0;
+ 	}
+@@ -212,10 +229,20 @@ static int setup_per_mode_enc_key(struct fscrypt_inode_info *ci,
+ 	mutex_lock(&fscrypt_mode_key_setup_mutex);
+ 
+ 	if (fscrypt_is_key_prepared(prep_key, ci))
+ 		goto done_unlock;
+ 
++	if (use_hw_wrapped_key) {
++		err = fscrypt_prepare_inline_crypt_key(prep_key,
++						       mk->mk_secret.bytes,
++						       mk->mk_secret.size, true,
++						       ci);
++		if (err)
++			goto out_unlock;
++		goto done_unlock;
++	}
++
+ 	BUILD_BUG_ON(sizeof(mode_num) != 1);
+ 	BUILD_BUG_ON(sizeof(sb->s_uuid) != 16);
+ 	BUILD_BUG_ON(sizeof(hkdf_info) != 17);
+ 	hkdf_info[hkdf_infolen++] = mode_num;
+ 	if (include_fs_uuid) {
+@@ -334,10 +361,18 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
+ 				     struct fscrypt_master_key *mk,
+ 				     bool need_dirhash_key)
+ {
+ 	int err;
+ 
++	if (mk->mk_secret.is_hw_wrapped &&
++	    !(ci->ci_policy.v2.flags & (FSCRYPT_POLICY_FLAG_IV_INO_LBLK_64 |
++					FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32))) {
++		fscrypt_warn(ci->ci_inode,
++			     "Hardware-wrapped keys are only supported with IV_INO_LBLK policies");
++		return -EINVAL;
++	}
++
+ 	if (ci->ci_policy.v2.flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY) {
+ 		/*
+ 		 * DIRECT_KEY: instead of deriving per-file encryption keys, the
+ 		 * per-file nonce will be included in all the IVs.  But unlike
+ 		 * v1 policies, for v2 policies in this case we don't encrypt
+@@ -360,11 +395,11 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
+ 					     true);
+ 	} else if (ci->ci_policy.v2.flags &
+ 		   FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32) {
+ 		err = fscrypt_setup_iv_ino_lblk_32_key(ci, mk);
+ 	} else {
+-		u8 derived_key[FSCRYPT_MAX_KEY_SIZE];
++		u8 derived_key[FSCRYPT_MAX_RAW_KEY_SIZE];
+ 
+ 		err = fscrypt_hkdf_expand(&mk->mk_secret.hkdf,
+ 					  HKDF_CONTEXT_PER_FILE_ENC_KEY,
+ 					  ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE,
+ 					  derived_key, ci->ci_mode->keysize);
+@@ -443,14 +478,10 @@ static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
+ 	struct super_block *sb = ci->ci_inode->i_sb;
+ 	struct fscrypt_key_specifier mk_spec;
+ 	struct fscrypt_master_key *mk;
+ 	int err;
+ 
+-	err = fscrypt_select_encryption_impl(ci);
+-	if (err)
+-		return err;
+-
+ 	err = fscrypt_policy_to_key_spec(&ci->ci_policy, &mk_spec);
+ 	if (err)
+ 		return err;
+ 
+ 	mk = fscrypt_find_master_key(sb, &mk_spec);
+@@ -474,10 +505,14 @@ static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
+ 	}
+ 	if (unlikely(!mk)) {
+ 		if (ci->ci_policy.version != FSCRYPT_POLICY_V1)
+ 			return -ENOKEY;
+ 
++		err = fscrypt_select_encryption_impl(ci, false);
++		if (err)
++			return err;
++
+ 		/*
+ 		 * As a legacy fallback for v1 policies, search for the key in
+ 		 * the current task's subscribed keyrings too.  Don't move this
+ 		 * to before the search of ->s_master_keys, since users
+ 		 * shouldn't be able to override filesystem-level keys.
+@@ -495,13 +530,25 @@ static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
+ 	if (!fscrypt_valid_master_key_size(mk, ci)) {
+ 		err = -ENOKEY;
+ 		goto out_release_key;
+ 	}
+ 
++	err = fscrypt_select_encryption_impl(ci, mk->mk_secret.is_hw_wrapped);
++	if (err)
++		goto out_release_key;
++
+ 	switch (ci->ci_policy.version) {
+ 	case FSCRYPT_POLICY_V1:
+-		err = fscrypt_setup_v1_file_key(ci, mk->mk_secret.raw);
++		if (WARN_ON_ONCE(mk->mk_secret.is_hw_wrapped)) {
++			/*
++			 * This should never happen, as adding a v1 policy key
++			 * that is hardware-wrapped isn't allowed.
++			 */
++			err = -EINVAL;
++			goto out_release_key;
++		}
++		err = fscrypt_setup_v1_file_key(ci, mk->mk_secret.bytes);
+ 		break;
+ 	case FSCRYPT_POLICY_V2:
+ 		err = fscrypt_setup_v2_file_key(ci, mk, need_dirhash_key);
+ 		break;
+ 	default:
+diff --git a/fs/crypto/keysetup_v1.c b/fs/crypto/keysetup_v1.c
+index cf3b58ec32cce..b70521c55132b 100644
+--- a/fs/crypto/keysetup_v1.c
++++ b/fs/crypto/keysetup_v1.c
+@@ -116,11 +116,11 @@ find_and_lock_process_key(const char *prefix,
+ 		goto invalid;
+ 
+ 	payload = (const struct fscrypt_key *)ukp->data;
+ 
+ 	if (ukp->datalen != sizeof(struct fscrypt_key) ||
+-	    payload->size < 1 || payload->size > FSCRYPT_MAX_KEY_SIZE) {
++	    payload->size < 1 || payload->size > sizeof(payload->raw)) {
+ 		fscrypt_warn(NULL,
+ 			     "key with description '%s' has invalid payload",
+ 			     key->description);
+ 		goto invalid;
+ 	}
+@@ -147,11 +147,11 @@ struct fscrypt_direct_key {
+ 	struct hlist_node		dk_node;
+ 	refcount_t			dk_refcount;
+ 	const struct fscrypt_mode	*dk_mode;
+ 	struct fscrypt_prepared_key	dk_key;
+ 	u8				dk_descriptor[FSCRYPT_KEY_DESCRIPTOR_SIZE];
+-	u8				dk_raw[FSCRYPT_MAX_KEY_SIZE];
++	u8				dk_raw[FSCRYPT_MAX_RAW_KEY_SIZE];
+ };
+ 
+ static void free_direct_key(struct fscrypt_direct_key *dk)
+ {
+ 	if (dk) {
+diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+index 7a8f4c2901873..3aff99f2696a0 100644
+--- a/include/uapi/linux/fscrypt.h
++++ b/include/uapi/linux/fscrypt.h
+@@ -117,20 +117,22 @@ struct fscrypt_key_specifier {
+  * Payload of Linux keyring key of type "fscrypt-provisioning", referenced by
+  * fscrypt_add_key_arg::key_id as an alternative to fscrypt_add_key_arg::raw.
+  */
+ struct fscrypt_provisioning_key_payload {
+ 	__u32 type;
+-	__u32 __reserved;
++	__u32 flags;
+ 	__u8 raw[];
+ };
+ 
+ /* Struct passed to FS_IOC_ADD_ENCRYPTION_KEY */
+ struct fscrypt_add_key_arg {
+ 	struct fscrypt_key_specifier key_spec;
+ 	__u32 raw_size;
+ 	__u32 key_id;
+-	__u32 __reserved[8];
++#define FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED	0x00000001
++	__u32 flags;
++	__u32 __reserved[7];
+ 	__u8 raw[];
+ };
+ 
+ /* Struct passed to FS_IOC_REMOVE_ENCRYPTION_KEY */
+ struct fscrypt_remove_key_arg {
+
+base-commit: a52a3c18cdf369a713aca7593332bbb998c71d96
+-- 
+2.49.0
+
