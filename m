@@ -1,49 +1,84 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FE528E8;
-	Fri,  4 Apr 2025 09:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D741624C9
+	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 10:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743758991; cv=none; b=HrCGBl2SEUpiE9N5PNEIpk+PBHfnRISWAChH5AMygUIHDFwkMXsgI95HwusOD2wiFIa1/cfRMkPKYW+DFBoP6wRix9j3r341MpSaWJ2Jg7FB0jJnEp05caIotrOXYbRqd4kF2bOCtBa6lHqGs623efRCUNAlwlJRzjtN7dmA9mM=
+	t=1743761299; cv=none; b=OXHvPxOiQHI+QoFJmXdY/vqlVWMo2VmgL6sjcRuRMwT7VLxNVaxU8xKAgViqzybwA1nC6B43sOgZXviOKb54hlv8mPVSx3yDZhM4OeRKjN/hO6W4c2BaOYXKSzg9zCpD2w+75i01y7myVqv3xWDJkuoZ7wN63V+5x4vAvC9Nvbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743758991; c=relaxed/simple;
-	bh=ik1i71QYf3JPG65boEzuUFsCyr5fouGAXXX3YLJi7B4=;
+	s=arc-20240116; t=1743761299; c=relaxed/simple;
+	bh=i1yWEsoIdahB5bruPbnH3mqvZ/Dws/EoQTvhJmNIMo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i6wluVm3suoXcURaH2QizUYvaeGDVxf/t4qg2ZxiExLq9Aeucy8TFcniSfueo8dLv7neXD91S2wqr5u5he+I6XMQPdsM9Am54OYiKTZzLBlFeHNp4g24tRnQRYHQKRi5jTxAOZTp94pkXnyokkzP6DwgRhPdJarsSYxDvfOtMWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=yZd0gP3M; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=hTyyOr0qRo9HasXQ7EerBpCJvebu4AJqV3k+2ChDDRfOPttNTRZz/WJCpcePeCGvsaJOdA8VUPzTWSda3IhARwgd9tMzNeDw5KQMwJOO3GGVOHlPP9HCQKcEHAQJdFwEg+8Cqhxz+RHkW0KI0dpZctMofuO357u3DZAWAi9efFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZZhhG0Mu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AisoJMkJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZZhhG0Mu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AisoJMkJ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yZd0gP3M"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=29rwdADjqHRGeAdMUDh8+xeUJnzqZ9cQBhBrtI11k9Y=; b=yZd0gP3MeQXwHRTDp3LlV9IF2d
-	cKYUXkxP3qFf1RsYSvn9vMEPWhLcsiy+znHEtiVci3LyFZnjKOObrSS3ttaAEm6WZP7OAJfK65dqM
-	MF4Lfa6k+ztucqGH9kvPhllhZgMohmY60EcrLeil+eUfhPKGSt0l9PlPXaAArHD5EwPdjv8w+FN10
-	0nTVn2oJBFw4/8MFAI8E2oONcZnN1v4CEPibVDsrsQW2FpX1i74AIhUFDmBjIPUi6jDzNQdgc0X4D
-	mKzifzW9H1+s1z4CWH1Kl92hFvyXmkek/SLWO/G9UzW/BoroTaAlD9HmklbkYfK8aK/JZKTv0Lfuu
-	xr0aii2A==;
-Received: from [185.236.188.25] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u0dMr-0000000BHPO-45mp;
-	Fri, 04 Apr 2025 09:29:42 +0000
-Date: Fri, 4 Apr 2025 11:29:37 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, xni@redhat.com, colyli@kernel.org, axboe@kernel.dk,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	song@kernel.org, yukuai3@huawei.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: Re: [PATCH RFC v2 02/14] md/md-bitmap: pass discard information to
- bitmap_{start, end}write
-Message-ID: <Z--mgctoFieWvuM0@infradead.org>
-References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
- <20250328060853.4124527-3-yukuai1@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZZhhG0Mu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AisoJMkJ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZZhhG0Mu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AisoJMkJ"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C303C2119E;
+	Fri,  4 Apr 2025 10:08:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1743761295; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+rVlJ3gw6BUDYyK/+TZGKAXr63UdsYzEPZQY6S/BpQ=;
+	b=ZZhhG0MurQM6GCkYcHQzyM5kcU0lnX19jeQSbOnWXr0JZXbxMoD1P1WQs4BqGK7TIqFn9a
+	OsYNkBjrzkX8FjVMenJIArWyE+LcX0Whzs5wLTa03TmdYs5K52ohLHtg9p6gBASB+9lM2q
+	DtFlHbs/utD9uw0NsPaIqN/iSxZeUs0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1743761295;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+rVlJ3gw6BUDYyK/+TZGKAXr63UdsYzEPZQY6S/BpQ=;
+	b=AisoJMkJDNCRaMOrnh++X7Aunk98vgjAF0jt7iHPna99dR4VdI0Tca70uE/5GTlk64R4Mq
+	FLEcrx5GcgexTUBw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1743761295; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+rVlJ3gw6BUDYyK/+TZGKAXr63UdsYzEPZQY6S/BpQ=;
+	b=ZZhhG0MurQM6GCkYcHQzyM5kcU0lnX19jeQSbOnWXr0JZXbxMoD1P1WQs4BqGK7TIqFn9a
+	OsYNkBjrzkX8FjVMenJIArWyE+LcX0Whzs5wLTa03TmdYs5K52ohLHtg9p6gBASB+9lM2q
+	DtFlHbs/utD9uw0NsPaIqN/iSxZeUs0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1743761295;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+rVlJ3gw6BUDYyK/+TZGKAXr63UdsYzEPZQY6S/BpQ=;
+	b=AisoJMkJDNCRaMOrnh++X7Aunk98vgjAF0jt7iHPna99dR4VdI0Tca70uE/5GTlk64R4Mq
+	FLEcrx5GcgexTUBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9DCD41364F;
+	Fri,  4 Apr 2025 10:08:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ltQgJI+v72dQGwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Fri, 04 Apr 2025 10:08:15 +0000
+Date: Fri, 4 Apr 2025 12:08:10 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Daniel Wagner <wagi@kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests 1/3] common/nvme: add debug nvmet path variable
+Message-ID: <de0fb8ce-6f48-43ee-8865-683eeba61d4a@flourine.local>
+References: <20250318-test-target-v1-0-01e01142cf2b@kernel.org>
+ <20250318-test-target-v1-1-01e01142cf2b@kernel.org>
+ <z6rsq3dla6hefacworxfugmb5mzw4xuqr63a5qnfaigzmceieu@gqdsgiwsr262>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,19 +87,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250328060853.4124527-3-yukuai1@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <z6rsq3dla6hefacworxfugmb5mzw4xuqr63a5qnfaigzmceieu@gqdsgiwsr262>
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_THREE(0.00)[3]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
->  	int (*startwrite)(struct mddev *mddev, sector_t offset,
-> -			  unsigned long sectors);
-> +			  unsigned long sectors, bool is_discard);
->  	void (*endwrite)(struct mddev *mddev, sector_t offset,
-> -			 unsigned long sectors);
-> +			 unsigned long sectors, bool is_discard);
+On Fri, Apr 04, 2025 at 08:03:33AM +0000, Shinichiro Kawasaki wrote:
+> On Mar 18, 2025 / 11:38, Daniel Wagner wrote:
+> > Signed-off-by: Daniel Wagner <wagi@kernel.org>
+> > ---
+> >  common/nvme | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/common/nvme b/common/nvme
+> > index 3761329d39e3763136f60a4751ad15de347f6e9b..a3176ecff2e5fbc0fbe09460c21e9f50c68d3bce 100644
+> > --- a/common/nvme
+> > +++ b/common/nvme
+> > @@ -26,6 +26,7 @@ nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
+> >  NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
+> >  nvme_target_control="${NVME_TARGET_CONTROL:-}"
+> >  NVMET_CFS="/sys/kernel/config/nvmet/"
+> > +NVMET_DFS="/sys/kernel/debug/nvmet/"
+> 
+> This causes the shellcheck warning SC2034.
+> 
+>   common/nvme:29:1: warning: NVMET_DFS appears unused. Verify use (or export if used externally). [SC2034]
+> 
+> I suggest to annotate "# shellcheck disable=SC2034" above the added line.
 
-a bool discard is not a very good interface.  I'd expect an op enum or a set
-of flag to properly describe it.
-
-But is start/end write really the right interface for discard or should it
-have it's own set of ops?
-
+Will do. I keep forgetting to run shellcheck, sorry about that.
