@@ -1,88 +1,86 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B882E62C0
-	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 05:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC4F2E62B3;
+	Fri,  4 Apr 2025 06:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743745206; cv=none; b=Cq2WpluD0yZZwIPxbmo3Y/Wdewe9wTgSRA3wtRn/cl747UGoComVe/CzCKJ0ICxF/xv/POxHRJ6VYAKwGASH173J3VrLDBHRUQYvPXnTdApS84niXYIiZKmAOBCqirg5psaZzfXfpMUDgEjmmWoEytWLmGDtGt2/cyoUGSVNGKo=
+	t=1743747389; cv=none; b=ZNSkF/NTgllZZVf/vz8fuxKYZ8oQRXg8FqY9PQtZlTl5837IF3XSI1NAD5ZsLZ9NrgPJm1brsPOqWxPzQnQYf6jfU7RMkfbIvh29mMJYdaqMCpcQVlduL9nVIxY1Bot7pMgIW3GKExCGL3laeoPYSNPpgTYWjNb54Z5yu7q5lf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743745206; c=relaxed/simple;
-	bh=Qs4lbr2wpnzcI+vTr+5tHYq6r7DHOgWjgDGNVXHoQIs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=b9gsNH3Lk1zHdi0LPNE188MYcwkBKJ0bO5qr+MfZEY+qzscbfKL7i8smldDrDseIIeg9mVYBAFtl1YUaIu3Yj4l9Kc4e5rfhZFM0Da67dpBOA+LObYg9qr+ewWNBS4Lu6SkIaVAEsC8kQZUx3SYCSI+dtFvuEn/pUhycR/GJ7m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d586b968cfso34719765ab.1
-        for <linux-block@vger.kernel.org>; Thu, 03 Apr 2025 22:40:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743745204; x=1744350004;
-        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oGhT7AaSPgccn2zLfjyYOTq87iga1ojaBkigz9uF0LA=;
-        b=O/XRyxjHZ56aSkygbzZkEhfRtvPS0LgJVqEcSlV0edPZLnHaUqyvJHZfnmdMfYh0jA
-         HTxoY6QmTi1U8b2GpSUYJphNgeyFp7SvvXLTSYtgGYDp82+By3MRlUOKHVUrum94Hdmv
-         nO/P+uFXk7EtlYKNShEgwOgLXnVTI7uoL0QMEsVsbma7MHGnJ+hSR48hBF4fcYbhHjKD
-         0wzjjG80+GKb1kvKDYkq2wR26a6ZQ325hfDNqfMkPhG4ycTKsxFIgV/KpMHInUP6rS8i
-         T3niVMf7uaUB54cQ/zEg0xzdIrDi8WQKhNZQXg7EWoRSommmSxXmNMmc+4HWG+0JqqvO
-         aabg==
-X-Forwarded-Encrypted: i=1; AJvYcCWIDE/tFv8/3jhNKM/ZFNAVkdd/6kYfLH5RPJUcK2wVEiJXC5gsvcEe6vp/2MlD8EElo+vK+gTAzvgVVQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXItD5nnf+DkZbu5hkXwYUNvVpZhQNN0jdA2U51Ywg30U+duwR
-	RPLihRPXh5PnrCSmMQS8v1WRB/uMAL7TloYf1Y7KerSc/nf0wuLvhdjCJAwPL0Xl/SYrskHa0oO
-	PJqFyViBnDdbi3knbwcLfZcFdbM7/KV7p1cpoNoJidTcjV1bWJMaoMTI=
-X-Google-Smtp-Source: AGHT+IENX+bd7r8Gf3qQ/2sxsfjDW287OcSjpn0XZLXLkig0YUTGRNLpH78D30vJ8cb/z8prN6AkhY3z39BjBlBgi7SqjE2f1FuJ
+	s=arc-20240116; t=1743747389; c=relaxed/simple;
+	bh=82IomvH91OcZamePfDiiuV/noh/a9CS2f8nbNKLAVHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HX4v91r4B4O5BjeXwqDzVTNE2Mhrhagq/5QZOkNycFzbyuxD/9Fpaawwuqcu0HiTBvo1WehlXLC9bQLsrnRHDlh0hPPyUaSUob7cgP/+n1HvVZM33ZVXaTDt5D4T0W7FlYWqlYqaKs2Css9BzsjCO8NlySVEA2d4BaChltXcdAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nmuSjNdY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nmuSjNdY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=V3rmCXxbDuUkBXJXOeoQph2X01YdsX01VESps6gyXrQ=; b=nmuSjNdYwLsK1QnUOfYvyHPNQU
+	YMDfcxnM+crPwUw5v3H9Fcdgj3D/W5yXdykGC63/quFDMGYYchzScvie/4npdnknSspTLJVDs1ZMs
+	6uc7jZRPHvox9zooE54UGPBMJNZa7RMseuZq3OQ38Jc8i6oe/98+AgUQ/+F802NRgzKuEYpzLnzFW
+	l+bqS/ymopZVeYcT8oTNz8IZQB5rrCmWFY/mNnKmFUi/rPvseD8eXTc9z+SgEFDg0KVR1X4Z7gHqe
+	34cV8WfAiWUx6HgXcr81YMsGoU0/q/Fl9xzNdwOm2WL/YPLYwO0EzcvX+no2MQtq2RXEgBVJOEf/o
+	zZr9cPYQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u0aLk-0000000Aqud-3LLu;
+	Fri, 04 Apr 2025 06:16:20 +0000
+Date: Thu, 3 Apr 2025 23:16:20 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Qu Wenruo <quwenruo.btrfs@gmx.com>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-btrfs <linux-btrfs@vger.kernel.org>
+Subject: Re: Proper way to copy de-compressed data into a bio, in folio style?
+Message-ID: <Z-95NPq_JCQb84XZ@infradead.org>
+References: <17517804-1c6b-4b96-a608-8c3d80e5f6dd@gmx.com>
+ <Z-7I9hOcGzQMV3hq@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1685:b0:3d6:d145:2ffb with SMTP id
- e9e14a558f8ab-3d6e3f89f24mr22540705ab.21.1743745204230; Thu, 03 Apr 2025
- 22:40:04 -0700 (PDT)
-Date: Thu, 03 Apr 2025 22:40:04 -0700
-In-Reply-To: <67ea99e0.050a0220.3c3d88.0042.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67ef70b4.050a0220.9040b.0334.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_freeze_queue_nomemsave
-From: syzbot <syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, nilay@linux.ibm.com, 
-	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com, 
-	yanjun.zhu@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-7I9hOcGzQMV3hq@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-syzbot has bisected this issue to:
+On Thu, Apr 03, 2025 at 06:44:22PM +0100, Matthew Wilcox wrote:
+> > On the other hand, I'm having some internal code to convert a bio_vec
+> > into a folio and offset inside the folio already.
+> > Thus I'm wondering can we provide something like bio_for_each_folio()?
+> > Or is it too niche that only certain fs can benefit from?
+> 
+> I don't understand your requirements. but doing something different that
+> fills in a folio_iter along the lines of bio_for_each_folio_all()
+> would make sense.
+>
 
-commit ffa1e7ada456087c2402b37cd6b2863ced29aff0
-Author: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
-Date:   Tue Mar 18 09:55:48 2025 +0000
+Looking at btrfs_decompress_buf2page it uses bio_iter_iovec, which is
+the building block use by bio_for_each_segment to build segments, that
+is bvecs that are constrained to PAGE_SIZE boundaries.  In this for
+a good reason as it then wants to copy into them with a single kmap
+mapping.
 
-    block: Make request_queue lockdep splats show up earlier
+This means that bv_offset is always less than PAGE_SIZE for these
+generated bio_vecs.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D172e2fb05800=
-00
-start commit:   92b71befc349 Merge tag 'objtool-urgent-2025-04-01' of git:.=
-.
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D14ae2fb05800=
-00
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D10ae2fb0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D47cc4b0c0327825=
-0
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D9dd7dbb1a4b915dee=
-638
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1680d99858000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1180d998580000
+In the short run I'd suggest to just keep using the existing open-coded
+bio_for_each_segment-like loop so that each iteration covers a PAGE_SIZE
+granularity chunk.  Just stop messing th the bvec fields directly and
+use bvec_kmap_local to map the destination and do a plain memcpy into
+that instead of using memcpy_to_page.
 
-Reported-by: syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
-Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earl=
-ier")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
-n
+In the long run it would be great to just rewrite the low-level
+decompressors to work on an iov_iter as output and remove the need
+for the extra data copy entirely, but if that can't happen we'll
+just need for figure out how we can do useful kmaps larger than
+PAGE_SIZE or stop allowing highmem pages for btrfs and then switch to
+a folio based iterator.
