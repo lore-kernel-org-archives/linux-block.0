@@ -1,57 +1,57 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C147199FC1
-	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 12:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644AF155CB3
+	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 12:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743768383; cv=none; b=W0gwEOQFS6e3lqvOSVn234WeTbP5ssU7s+JKqUN53ZgUFJL/hrB1bXpT/P0Dm9DsZt2KE3dW/q1rE9DYB8v7i31pbBWUMStutRk6cjr/pObjqb2E6tLaAG8nnMAn3YgBwKuX11yc1xCS9hUndUElpEX/WMlH+XUf3hUnwlnjbOU=
+	t=1743768591; cv=none; b=k8HX7+rn0elgp86W9oxBMpsVnqKonDfzTVS9noE36Y4kosBRzhqUFImlFCWnO6SfavhZEHaNq+kOzg4jflKvWYeg+PrftMpUL6g3SI5ukmqFLYygmAkRNz4hBYE4lchf5KZfPHJ5N8cHHgU2aXeHUNpSeB5xAyrghu8TomnouV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743768383; c=relaxed/simple;
-	bh=XonAPuP61TGyLqVoYfgEX3V3ARlRTT6k2kF+XdRAq2Q=;
+	s=arc-20240116; t=1743768591; c=relaxed/simple;
+	bh=0x8cCGl6Vpvei1KR3ogPvBCmXkI+nLy8aYHApSp1WBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HgAWgnnK6Nb1Hr992DHoqWGL9uOCOeZAkJ6+rvEN3cQs3cKtdHs13Kz/9ECmhPvAkPSLmhqPFnVZHJ/3mxD8YO5aS8wq7yYIpCmYih/T2Z6eHygq10qi54iqeoR0dWKYVUSQdYGp8/EVFMb6jc434zH8oUXSYOTP25qnPNszQ+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TyxRDlot; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=oSFC2KHXzdNLRJscoQf8d74/3AAz0pRXJarvKEbbgn0VYFRfcyU9jRLexJSl//Yl7dIvySuiwJQncngQmp8kv2ZimGfoDxgtnoIubns6mrmLTSOyjl9nLINOFgzQHzz1Q27eIqB8CeKA8lsF2bXV/RRDcAGtXYgGICuFUCbhAKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WakLtviG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TyxRDlot"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WakLtviG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743768380;
+	s=mimecast20190719; t=1743768588;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5uKHwQgg+TUjxVR2+PRCqd9oyglVoTcAtQciikxDUcE=;
-	b=TyxRDlotgBmcI7J14/qB+Ey3gKXiWZxhEVrODZACKn9Vc4gwIY+N6bQcPyNVKmDMPOsejp
-	+zaVJ1xRuAQ0928FTqpnNZRl68n95oqHCXVoNrk7+vE+A0I/nhWQh0lPGu2hsgnLXBl7qa
-	QiAZqP6HA3ti16aGkT1rAsW0J3dz9dU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=mXcGfDNrqRF7J5DqaXiQWLY0ZYgmxi/Vf7FAwwVfaMg=;
+	b=WakLtviG96huHgXpVTCjTz9IjRoKdwQVZBNLT591O2djZFnZT7Eo8OI5tMtswL0iWAAyaH
+	53APXB5Cu6UJtfxV5Luz6MwMM+xJqshEdhxdd55ioRT0l476idLR9QP3BCRrfAjFVI/NkO
+	8z1IpwKu1J4E5ylquz4ELVpz0t6sl5M=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-106-a1f0dLhnORGZU0WKt16aRA-1; Fri,
- 04 Apr 2025 08:06:19 -0400
-X-MC-Unique: a1f0dLhnORGZU0WKt16aRA-1
-X-Mimecast-MFC-AGG-ID: a1f0dLhnORGZU0WKt16aRA_1743768376
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-260-_TH5-dN3NHqp8kLQF4MwBQ-1; Fri,
+ 04 Apr 2025 08:09:45 -0400
+X-MC-Unique: _TH5-dN3NHqp8kLQF4MwBQ-1
+X-Mimecast-MFC-AGG-ID: _TH5-dN3NHqp8kLQF4MwBQ_1743768583
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3432518001E6;
-	Fri,  4 Apr 2025 12:06:16 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B348195608A;
+	Fri,  4 Apr 2025 12:09:43 +0000 (UTC)
 Received: from fedora (unknown [10.72.120.26])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7ECC31828AA7;
-	Fri,  4 Apr 2025 12:06:10 +0000 (UTC)
-Date: Fri, 4 Apr 2025 20:06:05 +0800
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF2C2195DF8C;
+	Fri,  4 Apr 2025 12:09:38 +0000 (UTC)
+Date: Fri, 4 Apr 2025 20:09:31 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Nilay Shroff <nilay@linux.ibm.com>,
-	syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
-Subject: Re: [PATCH] loop: replace freezing queue with quiesce when changing
- loop specific setting
-Message-ID: <Z-_LLTtusK8g0rlM@fedora>
-References: <20250403105414.1334254-1-ming.lei@redhat.com>
- <20250404091149.GC12163@lst.de>
+	syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
+Subject: Re: [PATCH] block: don't grab elevator lock during queue
+ initialization
+Message-ID: <Z-_L-_9fG0Z6CYQM@fedora>
+References: <20250403105402.1334206-1-ming.lei@redhat.com>
+ <20250404091037.GB12163@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,37 +60,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250404091149.GC12163@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250404091037.GB12163@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Apr 04, 2025 at 11:11:49AM +0200, Christoph Hellwig wrote:
-> On Thu, Apr 03, 2025 at 06:54:14PM +0800, Ming Lei wrote:
-> > freeze queue should be used for changing block layer generic setting, such
-> > as logical block size, PI, ..., and it is enough to quiesce queue for
-> > changing loop specific setting.
+On Fri, Apr 04, 2025 at 11:10:37AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 03, 2025 at 06:54:02PM +0800, Ming Lei wrote:
+> > Fixes the following lockdep warning:
 > 
-> Why?  A queue should generally be frozen for any setting affecting the
-> I/O path.  Nothing about generic or internal.
-
-For any driver specific setting, quiesce is enough, because these settings
-are only visible in driver IO code path, quiesce does provide the
-required protection exactly.
-
+> Please spell the actual dependency out here, links are not permanent
+> and also not readable for any offline reading of the commit logs.
 > 
-> This also misses an explanation of what setting this protects and why
-> you think this is safe and the sound fix.
+> > +static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+> > +				   struct request_queue *q, bool lock)
+> > +{
+> > +	if (lock) {
+> 
+> bool lock(ed) arguments are an anti-pattern, and regularly get Linus
+> screaming at you (in this case even for the right reason :))
+> 
+> > +		/* protect against switching io scheduler  */
+> > +		mutex_lock(&q->elevator_lock);
+> > +		__blk_mq_realloc_hw_ctxs(set, q);
+> > +		mutex_unlock(&q->elevator_lock);
+> > +	} else {
+> > +		__blk_mq_realloc_hw_ctxs(set, q);
+> > +	}
+> 
+> I think the problem here is again that because of all the other
+> dependencies elevator_lock really needs to be per-set instead of
+> per-queue which will allows us to have much saner locking hierarchies.
 
-1) it is typical queue quiesce use case
+per-set lock is required in error handling code path, anywhere it is used
+with freezing together can be one deadlock risk if hardware error happens.
 
-2) loop specific setting is only visible in loop queue_rq() & workfn, and
-quiesce does provide the sync for queue_rq()
-
-3) for driver, quiesce is always preferred over freeze, and freeze is
-easily mis-used by driver, you know we have bad driver uses for freeze.
-
-However, for loop, quiesce only isn't enough, we need to flush the
-workqueue for avoiding workfn to use the changed setting too, will do
-it in V2.
+Or can you explain the idea in details?
 
 Thanks,
 Ming
