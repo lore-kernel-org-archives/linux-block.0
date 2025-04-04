@@ -1,72 +1,216 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EE8433CB
-	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 15:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0916A1FA859;
+	Fri,  4 Apr 2025 15:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743778865; cv=none; b=D318w12jJIxGVyc+ksHMzPnUJW8xZkNbUyzoSDGGLhR04/6ZSu15Rb4HUhfhIeD+KHaxs9Bt9g4uzrd5AH+K50OyT0G0/JkwzSjFLfaWBB1iFr3Mbm1PTj0yq5SjupkObBZulPM0x9Qu8I6bb1qc8fsAMVD5FNgpWyZ0xgKDgJ0=
+	t=1743782136; cv=none; b=OUW/Bvvchqn0g7PYdsGEvofuVRRUCLSuRIGzP95cGj5oDoosW8FpUoynNuCphI2lCSJx0KmBexqGFFONsldYBQ9ZCre8Juej1OAtVe+CvQxQmSmPu1iKx3FaCIbVriVKKmdRYNiDViw3cLVGNRMrkWv7/4qGegJT/O3fVkJvCKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743778865; c=relaxed/simple;
-	bh=AYko1VWOfBVHv9E1RRyYX2hPQcGc735qlsJ419fVcMg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bzN0NKJGKzBLXMiQoYfj/4dwnDoaBaIgzdimb4deMdoxTfBxaeTS9r9cfefD7OOK1yDu+f0DVHeHR0J2EnUR+KxJ0EQ87NLAVI1bIIHkgPx8a7qsGGmQ7ck1X5UjbKh0y/u8+uVFYu/jKK8D4YpTsPdBp0b5+ndW1Gvr+CS8t+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-85ed07f832dso210032539f.2
-        for <linux-block@vger.kernel.org>; Fri, 04 Apr 2025 08:01:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743778863; x=1744383663;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/l5DxVvZzV/XmdJEnN3NdjGY2wFy/vsojLyqFJVpr58=;
-        b=py0wkqtRxGbO4rwLNQ8hhoWhgEzOPAlz7IOU3Lm1SuHMJYtDxppkpZdoGW7ZkS15Eq
-         3tVX0rPtXINUPvgUOTVWB43/z+lh9Q2dqIc/pBAc+UaHA5nt+rPzcebiKvkC6gV/FRrC
-         AWOnTKs51zH+dgMb2wet8/Ad/VetzrOJolly4d/0coDCjkqKFNJ+P4kIYgHKBFy8NAYX
-         V9lQ4rL6AjrTEaVjeWWR2mSYiiZP68UcRdmuebEjIKomrlle0qMUs0hT2LwrdstBCu7d
-         Q6mqfmzTdTJk3Jm8q/9Qb2cV2yzJmwjBtF6EpctI/cyRtg7llRyAv68R2ftXH7PJyBN9
-         zUIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJlVzViPTR4zu2o7wmWtVlBkYkV5tFfusVu/8tZqrKEtC0lfqcT4BMjPBZikiZONerUb2XsST1LJZ7Ag==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwWeO6+wGLaDESZpx+IF5HtIPV2/PVhdxh6us1w9eNLXeqwRJC
-	iSf4U6wIz7FoYyCsBdI1U5NpFb7yhruPC5zG+ouIYn9/YUUGoER6ZgpuMy8N2oetRmlP3QlqEDV
-	vsKrNl6It3F7M9Ycuvq+l6IkDR/1+AxZRbWXu0TpwDk07Yk4YkSfdT9w=
-X-Google-Smtp-Source: AGHT+IG6eW3ypD/dyFDHuVvisZ3SglKvgxqH17m5/3K5JlVsbmlRsCifJq5LIVx1t3MJHQszTfOAcu1rYMYYpd09FqGjs10n4FyV
+	s=arc-20240116; t=1743782136; c=relaxed/simple;
+	bh=H0oSTstdUNtg4cUip28ivErWZsiL7Hvn8FBMRy2yATc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lwDhapm1XlXGd45T/l7GGq5WSzcFcbjIDj2MKSZ8Ds8eY4aXNdvSwjr+/I3e6aF7aIphYHa1P4kUbTonuiKNnReBFfRT9C++oktjXGY9lrnMnMAad1PeIQsIH5+8FTVCP3+mD7T0xZ5Ydo6eDkyvmhsW37vB7xfUTHTqBRoMHFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubHlGEyB; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubHlGEyB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2C7C4CEE8;
+	Fri,  4 Apr 2025 15:55:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743782135;
+	bh=H0oSTstdUNtg4cUip28ivErWZsiL7Hvn8FBMRy2yATc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ubHlGEyBaVNw0cRZEWuJQOtYjdKJGC/tqCowyDjCBaxtpQB5FacxboGr7qbohqu4/
+	 mWDJEI1ybSO//1WH64u693OKkG6iVzrvVAZHtjxA3MSHZYevOLIaRlsdVsHL6T7IQY
+	 KVflait1qCEZ40GbJDbWE9+ueGFoILnTg4vywkcJWENPnWg4UR48oOcx+qGouHt4N+
+	 VWxxCA8+binv4BexNpQqPLQiqIALypECEJTxFbXSK50HcXrja+a+tebAATxbRlZtTR
+	 RNVk8dkB7P18/WoBOBUm0ZRU3IUjNGr8szpbnb4PC/QJg5VVtoBmri3lTZ6WakFspo
+	 3YPQxjQpT2FxA==
+Date: Fri, 4 Apr 2025 08:55:33 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: brauner@kernel.org, jack@suse.cz, tytso@mit.edu,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com
+Cc: willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
+	dave@stgolabs.net, david@redhat.com, axboe@kernel.dk, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+	da.gomez@samsung.com
+Subject: Re: [PATCH 2/3] fs/buffer: avoid races with folio migrations on
+ __find_get_block_slow()
+Message-ID: <Z_AA9SHZdRGq6tb4@bombadil.infradead.org>
+References: <20250330064732.3781046-1-mcgrof@kernel.org>
+ <20250330064732.3781046-3-mcgrof@kernel.org>
+ <Z-rzyrS0Jr7t984Y@bombadil.infradead.org>
+ <Z-3EDGCLMtCV-szJ@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c243:0:b0:3d0:235b:4810 with SMTP id
- e9e14a558f8ab-3d6e3ee191dmr43590305ab.2.1743778863169; Fri, 04 Apr 2025
- 08:01:03 -0700 (PDT)
-Date: Fri, 04 Apr 2025 08:01:03 -0700
-In-Reply-To: <Z-_jtFYt0t0-6A7z@fedora>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67eff42f.050a0220.2dd465.0214.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_freeze_queue_nomemsave
-From: syzbot <syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-3EDGCLMtCV-szJ@bombadil.infradead.org>
 
-Hello,
+On Wed, Apr 02, 2025 at 04:11:10PM -0700, Luis Chamberlain wrote:
+> On Mon, Mar 31, 2025 at 12:58:04PM -0700, Luis Chamberlain wrote:
+> > On Sat, Mar 29, 2025 at 11:47:31PM -0700, Luis Chamberlain wrote:
+> > > Although we don't have exact traces of the filesystem corruption we
+> > > can can reproduce fs corruption one ext4 by just removing the spinlock
+> > > and stress testing the filesystem with generic/750, we eventually end
+> > > up after 3 hours of testing with kdevops using libvirt on the ext4
+> > > profile ext4-4k. Things like the below as reported recently [1]:
+> > > 
+> > > Mar 28 03:36:37 extra-ext4-4k unknown: run fstests generic/750 at 2025-03-28 03:36:37
+> > > <-- etc -->
+> > > Mar 28 05:57:09 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_get_first_dir_block:3538: inode #5174: comm fsstress: directory missing '.'
+> > > Mar 28 06:04:43 extra-ext4-4k kernel: EXT4-fs warning (device loop5): ext4_empty_dir:3088: inode #5176: comm fsstress: directory missing '.'
+> > > Mar 28 06:42:05 extra-ext4-4k kernel: EXT4-fs error (device loop5): __ext4_find_entry:1626: inode #5173: comm fsstress: checksumming directory block 0
+> > > Mar 28 08:16:43 extra-ext4-4k kernel: EXT4-fs error (device loop5): ext4_find_extent:938: inode #1104560: comm fsstress: pblk 4932229 bad header/extent: invalid magic - magic 8383, entries 33667, max 33667(0), depth 33667(0)
+> > 
+> > I reproduced again a corruption with ext4 when we remove the spin lock
+> > alone with generic/750, the trace looks slightly different, and
+> > this time I ran the test with ext4 with 2k block size filesystem. I
+> > also reverted both "mm: migrate: remove folio_migrate_copy()" and
+> > "mm: migrate: support poisoned recover from migrate folio" just in case
+> > the extra check added by the later was helping avoid the corruption.
+> 
+> Since we didn't have much data over this filesystem corruption I figured
+> it would be good to expand on that with more information. I reproduced yet
+> again with just generic/750 and the spinlock removed in about ~6 hours:
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-unregister_netdevice: waiting for DEV to become free
+Here's another for the collection, this one reproduced also on a 2k ext4
+filesytem within just an hour, and also runs into "error count since
+last fsck":
 
-unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
+Apr 02 17:49:49 fix-ext4-2k kernel: Linux version 6.14.0-12248-g87aeaf206469 (mcgrof@beef) (gcc (Debian 14.2.0-6) 14.2.0, GNU ld (GNU Binutils for Debian) 2.43.1) #16 SMP PREEMPT_DYNAMIC Wed Apr  2 17:43:14 PDT 2025
 
+<-- snip -->
 
-Tested on:
-
-commit:         665c7e64 loop: replace freezing queue with quiesce & f..
-git tree:       https://github.com/ming1/linux.git syzbot-test
-console output: https://syzkaller.appspot.com/x/log.txt?x=12321178580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=adffebefc9feb9d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=9dd7dbb1a4b915dee638
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
+Apr 02 17:50:50 fix-ext4-2k unknown: run fstests generic/750 at 2025-04-02 17:50:50
+Apr 02 17:50:51 fix-ext4-2k kernel: EXT4-fs (loop5): mounted filesystem 2f6642d1-eab9-481a-86b4-dac9cc760f63 r/w with ordered data mode. Quota mode: none.
+Apr 02 18:00:45 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
+Apr 02 18:13:27 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
+Apr 02 18:47:36 fix-ext4-2k kernel: ------------[ cut here ]------------
+Apr 02 18:47:36 fix-ext4-2k kernel: WARNING: CPU: 4 PID: 2515 at fs/jbd2/transaction.c:1552 jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
+Apr 02 18:47:36 fix-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio joydev virtio_console virtio_balloon button evdev serio_raw nvme_fabrics nvme_core dm_mod drm nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover virtio_blk failover psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
+Apr 02 18:47:36 fix-ext4-2k kernel: CPU: 4 UID: 0 PID: 2515 Comm: fsstress Not tainted 6.14.0-12248-g87aeaf206469 #16 PREEMPT(full) 
+Apr 02 18:47:36 fix-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.08-2 10/04/2024
+Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0010:jbd2_journal_dirty_metadata+0x21c/0x230 [jbd2]
+Apr 02 18:47:36 fix-ext4-2k kernel: Code: 30 0f 84 5b fe ff ff 0f 0b 41 bc 8b ff ff ff e9 69 fe ff ff 48 8b 04 24 4c 8b 48 70 4d 39 cf 0f 84 53 ff ff ff e9 42 c5 00 00 <0f> 0b 41 bc e4 ff ff ff e9 41 ff ff ff 0f 0b 90 0f 1f 40 00 90 90
+Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 0018:ffffa464824d77f8 EFLAGS: 00010246
+Apr 02 18:47:36 fix-ext4-2k kernel: RAX: 0000000000000001 RBX: ffff95c8866129d8 RCX: 00000000000000fd
+Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: RBP: ffff95c88726ac98 R08: ffff95c88726ac98 R09: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R10: 00000000b2ae40cd R11: 00000000000064a2 R12: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R13: ffff95c9849e7f88 R14: ffff95c8866129e0 R15: ffff95c986708180
+Apr 02 18:47:36 fix-ext4-2k kernel: FS:  00007f230b292740(0000) GS:ffff95ca439cc000(0000) knlGS:0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 02 18:47:36 fix-ext4-2k kernel: CR2: 00007f230b28a000 CR3: 000000012517c003 CR4: 0000000000772ef0
+Apr 02 18:47:36 fix-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+Apr 02 18:47:36 fix-ext4-2k kernel: PKRU: 55555554
+Apr 02 18:47:36 fix-ext4-2k kernel: Call Trace:
+Apr 02 18:47:36 fix-ext4-2k kernel:  <TASK>
+Apr 02 18:47:36 fix-ext4-2k kernel:  __ext4_handle_dirty_metadata+0x6d/0x190 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  do_writepages+0xdd/0x250
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? __call_rcu_common.constprop.0+0x130/0x290
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? iter_file_splice_write+0x1d6/0x4f0
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? kfree+0x1cc/0x370
+Apr 02 18:47:36 fix-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
+Apr 02 18:47:36 fix-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  __fput+0xf4/0x2b0
+Apr 02 18:47:36 fix-ext4-2k kernel:  __x64_sys_close+0x39/0x80
+Apr 02 18:47:36 fix-ext4-2k kernel:  do_syscall_64+0x4b/0x120
+Apr 02 18:47:36 fix-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0033:0x7f230b324687
+Apr 02 18:47:36 fix-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 002b:00007ffc1efe2bb0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f230b292740 RCX: 00007f230b324687
+Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+Apr 02 18:47:36 fix-ext4-2k kernel: RBP: 00007ffc1efe2c60 R08: 0000000000000000 R09: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00007ffc1efe2db0 R14: 00007ffc1efe31b0 R15: 000000000000622d
+Apr 02 18:47:36 fix-ext4-2k kernel:  </TASK>
+Apr 02 18:47:36 fix-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
+Apr 02 18:47:36 fix-ext4-2k kernel: ------------[ cut here ]------------
+Apr 02 18:47:36 fix-ext4-2k kernel: WARNING: CPU: 2 PID: 2515 at fs/ext4/ext4_jbd2.c:360 __ext4_handle_dirty_metadata+0x102/0x190 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel: Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat crc32c_generic fat kvm_intel kvm ghash_clmulni_intel sha512_ssse3 sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd 9pnet_virtio joydev virtio_console virtio_balloon button evdev serio_raw nvme_fabrics nvme_core dm_mod drm nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq raid1 raid0 md_mod virtio_net net_failover virtio_blk failover psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
+Apr 02 18:47:36 fix-ext4-2k kernel: CPU: 2 UID: 0 PID: 2515 Comm: fsstress Tainted: G        W           6.14.0-12248-g87aeaf206469 #16 PREEMPT(full) 
+Apr 02 18:47:36 fix-ext4-2k kernel: Tainted: [W]=WARN
+Apr 02 18:47:36 fix-ext4-2k kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.08-2 10/04/2024
+Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0010:__ext4_handle_dirty_metadata+0x102/0x190 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel: Code: 00 00 00 44 89 fa 4c 89 f6 49 c7 c1 3b 2c aa c0 4c 89 e7 41 bd fb ff ff ff e8 5a ce 05 00 eb 97 48 89 df e8 c0 a4 0a f6 eb 8a <0f> 0b 48 c7 c2 a0 42 a9 c0 45 89 e8 48 89 e9 44 89 fe 4c 89 f7 e8
+Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 0018:ffffa464824d7838 EFLAGS: 00010286
+Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffff95c998971800 RBX: ffff95c88726ac98 RCX: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000001 RSI: 0000000000000000 RDI: 00000000ffffffff
+Apr 02 18:47:36 fix-ext4-2k kernel: RBP: ffff95c9849e7f88 R08: ffff95c88726ac98 R09: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R10: 00000000b2ae40cd R11: 00000000000064a2 R12: ffff95c999e4c430
+Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00000000ffffffe4 R14: ffffffffc0a94760 R15: 0000000000000556
+Apr 02 18:47:36 fix-ext4-2k kernel: FS:  00007f230b292740(0000) GS:ffff95ca4394c000(0000) knlGS:0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 02 18:47:36 fix-ext4-2k kernel: CR2: 00007f230b291000 CR3: 000000012517c006 CR4: 0000000000772ef0
+Apr 02 18:47:36 fix-ext4-2k kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+Apr 02 18:47:36 fix-ext4-2k kernel: PKRU: 55555554
+Apr 02 18:47:36 fix-ext4-2k kernel: Call Trace:
+Apr 02 18:47:36 fix-ext4-2k kernel:  <TASK>
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_insert_extent+0x5c1/0x1510 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_cache_extents+0x5a/0xd0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_find_extent+0x37c/0x3a0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_ext_map_blocks+0x51e/0x1900 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? mpage_map_and_submit_buffers+0x23f/0x270 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_map_blocks+0x11a/0x4d0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? kmem_cache_alloc_noprof+0x321/0x3e0
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_do_writepages+0x762/0xd40 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? ext4_writepages+0xd7/0x1b0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_writepages+0xd7/0x1b0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  do_writepages+0xdd/0x250
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? __call_rcu_common.constprop.0+0x130/0x290
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? iter_file_splice_write+0x1d6/0x4f0
+Apr 02 18:47:36 fix-ext4-2k kernel:  ? kfree+0x1cc/0x370
+Apr 02 18:47:36 fix-ext4-2k kernel:  filemap_fdatawrite_wbc+0x48/0x60
+Apr 02 18:47:36 fix-ext4-2k kernel:  __filemap_fdatawrite_range+0x5b/0x80
+Apr 02 18:47:36 fix-ext4-2k kernel:  ext4_release_file+0x6d/0xa0 [ext4]
+Apr 02 18:47:36 fix-ext4-2k kernel:  __fput+0xf4/0x2b0
+Apr 02 18:47:36 fix-ext4-2k kernel:  __x64_sys_close+0x39/0x80
+Apr 02 18:47:36 fix-ext4-2k kernel:  do_syscall_64+0x4b/0x120
+Apr 02 18:47:36 fix-ext4-2k kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Apr 02 18:47:36 fix-ext4-2k kernel: RIP: 0033:0x7f230b324687
+Apr 02 18:47:36 fix-ext4-2k kernel: Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+Apr 02 18:47:36 fix-ext4-2k kernel: RSP: 002b:00007ffc1efe2bb0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+Apr 02 18:47:36 fix-ext4-2k kernel: RAX: ffffffffffffffda RBX: 00007f230b292740 RCX: 00007f230b324687
+Apr 02 18:47:36 fix-ext4-2k kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+Apr 02 18:47:36 fix-ext4-2k kernel: RBP: 00007ffc1efe2c60 R08: 0000000000000000 R09: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+Apr 02 18:47:36 fix-ext4-2k kernel: R13: 00007ffc1efe2db0 R14: 00007ffc1efe31b0 R15: 000000000000622d
+Apr 02 18:47:36 fix-ext4-2k kernel:  </TASK>
+Apr 02 18:47:36 fix-ext4-2k kernel: ---[ end trace 0000000000000000 ]---
+Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs: ext4_ext_grow_indepth:1366: aborting transaction: error 28 in __ext4_handle_dirty_metadata
+Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5): ext4_ext_grow_indepth:1366: inode #755485: block 3924606: comm fsstress: journal_dirty_metadata failed: handle type 2 started at line 2721, credits 11/0, errcode -28
+Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_mb_clear_bb:6550: Readonly filesystem
+Apr 02 18:47:36 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_reserve_inode_write:5870: Readonly filesystem
+Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2336: inode #755485: comm fsstress: mark_inode_dirty error
+Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5): mpage_map_and_submit_extent:2338: comm fsstress: Failed to mark inode 755485 dirty
+Apr 02 18:47:37 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_do_writepages:2751: error 28
+Apr 03 05:43:31 fix-ext4-2k kernel: NOHZ tick-stop error: local softirq work is pending, handler #10!!!
+Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): error count since last fsck: 6
+Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): initial error at time 1743644856: ext4_ext_grow_indepth:1366: inode 755485: block 3924606
+Apr 03 19:32:37 fix-ext4-2k kernel: EXT4-fs (loop5): last error at time 1743644857: ext4_do_writepages:2751
+Apr 04 08:12:34 fix-ext4-2k kernel: EXT4-fs: ext4_ext_grow_indepth:1366: aborting transaction: error 28 in __ext4_handle_dirty_metadata
+Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5): ext4_ext_grow_indepth:1366: inode #330657: block 855807: comm kworker/u35:9: journal_dirty_metadata failed: handle type 2 started at line 2721, credits 11/0, errcode -28
+Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_mb_clear_bb:6550: Readonly filesystem
+Apr 04 08:12:35 fix-ext4-2k kernel: EXT4-fs error (device loop5) in ext4_do_writepages:2751: error 28
