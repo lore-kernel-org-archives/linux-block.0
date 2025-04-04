@@ -1,110 +1,96 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DC2194A59
-	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 12:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2011F1525
+	for <linux-block@vger.kernel.org>; Fri,  4 Apr 2025 13:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743770228; cv=none; b=A5mbBgw+EOswojxjGrTmj0E3cIx+SACmRqXdOEnBIJ5bA/1KJRLnmH21vzAP088YX07yWGCRi1biOB8IX15E3aeILyHeLSNcWI8hearTVMgz2lBsSAmOVCSKb+tzhZmmMubJ/aSL3yCJPoKbljW3DghPbm82oqFUJ6fos5ommKQ=
+	t=1743774662; cv=none; b=DN/HGgRMFeGOeO/H+5tEedstzWxBjKi+9FGcDGCazk+TN8Bzu57o8eyXWyLRKIyV/Ke+KA1HXDfCdPnMIPyY/IlGhZxI6CyUAbmQ94bHPFz5ZMwFmhhdyzC1v03DefXsps6Sz4DKpueqmd3HVRijA2qXoBzQnOCa+7Bi4iPuEEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743770228; c=relaxed/simple;
-	bh=aplL9E3hJUV1UqoDfkhbZpQSX9j0hQP2QnpBtcr4/DM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Erh6KSOwOr7zR15AKmdzbigIf/oPgVGwmCxgbdKFErDGjJS2jUv1HF9KflPuJt352wn7/tA/nIW/F7rDupKMvkoHNIWotnZioRYnqdpSqVw0JZw7VIEw0DIpDq2jT5l1BDy0DtZpFU2+iiz1+jSxQSjo/2cx2bm4veYuAXSrSZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Yqlmvctq; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1743774662; c=relaxed/simple;
+	bh=g4HKRVR5iNuUKt6XxJzLJNqwyq84woqy+JBuYDM4a+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oxP+Q2wVm5iFR7HPCZf07+I7p+zhNhxqpyNvBEZ2GVUQ5l6z1TFzEe52REaM9LjZzpqXtbqP7Rx1AZCy5VhTpUoYZSLwU+R3DdMC0vjESDKynEUptTXkFJzuFlp5FacLmNE9WOXshQsaJtMfoLmqoWBj4NdLaRSZBTLiX/pEfps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JxLm6uYW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Yqlmvctq"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-854a68f5a9cso162064839f.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Apr 2025 05:37:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1743770224; x=1744375024; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dQGKTRH5vF2qFa6MbP5J8To+Y3RTEV7XoDx03Wd1LbY=;
-        b=YqlmvctqdQWxuoQtYR4Acew4J7W6iGrA/BOZiKhbBVOeycDyjXGNdvKQJze2rrX8GU
-         YVJymGy+7F32uduknxNbBlqkZQOzj23fzu6XfcBjjR4YqufIEDgaUrUQQmbD3h99yEat
-         0wjv5CAnauRDym4fXyFQpbgn/fdj5cSDPzmU21+vRgH1HhRObLtRXExaK+BqMwOQp5yv
-         SBGsNtUMPtAb1BxBOgkyqeBKzCL4kwQYPvXlT+mcd8RHncc0+y0KznzzdlW6I7pDnTFX
-         6/QYrx08g0Ic8XY53cyoIiJ9daEgZcaL15v8dExGVKr/PuFKuZfJL+QRrJXG1HTOal+P
-         dTIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743770224; x=1744375024;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQGKTRH5vF2qFa6MbP5J8To+Y3RTEV7XoDx03Wd1LbY=;
-        b=aWQ+1/FQDs/Oepb63V4dr0O32gJe7MZ5CQ+bFGfWfX9MQ6q/STsU6EwNuWdV/DIkpR
-         BjdvcPth/10eWOD6r7dF+HpMoVwXwP1D1adQaJKuvYbGYnRXdIDNZjSxVwdLHEfeok3J
-         aBHZULX/DC3i6kL5UzuF9eDCxwYJN7CkdAcKLuyZcttTRXzRJusW9QlNCOH2Kx5QlAdP
-         4M1wDp98u06k6Z8YYwPdlbZrsrwOZdGCG12m/2vITTU5pfsdTtCKUKrT+V6ffrVlD71i
-         2OnEGFi3XuMLtLbUyUdexi7GfaKAOLd5LiXOXNfBq/wtoFEQml8YZDo0PALG2WokBNDM
-         oVTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX3T4+a0gXnLZA/N1MYE/HG+cJcniJP9vMh0sTfLz9akGRt5MA06sACbHdbDTD8buHpq0jwbgCDkYDeIw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW0azNY71yaPDI6bLhrSkkCD6Q4KLyaYxoAS2wfQdRpCnv6lUi
-	M4vyfgl5tSiXGjFZhyu1w+s2eCGGD81QooQjw0mWHJljNeDpTNPeFMgU7qqTqZA=
-X-Gm-Gg: ASbGncsDNZRjtKXVVChcJhT9mlKOKLMeH0RYMnQYf9n2EUJ6jrtyR0P7Kf69ZZxzQCD
-	WnHACA+ZssmZg021aQAV6AYQpWCWcYNKDvTYWmtIglIv6lJxiMgYyvx2kOP4ZuyfbKa4pe5nns1
-	OAkUv5cALitA3zbT63OeJMieHeiZZTYlZQ3DBNIqwNVmQr4k4/kP+MBxcCbcSEGK8wQ4F7A85+V
-	Lm2biNWcckLgEGF6IDvJd920RO1Cq8IXLKGj0ihYmmYUIV31/LO/gyqRaXupYsSmGXJ1rL5koZH
-	4o9ZjRqZJDsmLZ3vdQRIiDU3GRyHvDiGjA4k9w3Q+w==
-X-Google-Smtp-Source: AGHT+IEJdhBHtUPEsx9xZjNjGG8BoogSqvJZW5fAfgJdCbBftaee9VNgnXITu8XeA4eoLukybvnqhA==
-X-Received: by 2002:a05:6602:3605:b0:85b:3449:faa2 with SMTP id ca18e2360f4ac-8611b4d9f96mr356776139f.9.1743770224689;
-        Fri, 04 Apr 2025 05:37:04 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-861113a75e5sm64045639f.40.2025.04.04.05.37.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 05:37:04 -0700 (PDT)
-Message-ID: <4a6d39c1-f893-47e4-9328-1df3042aff53@kernel.dk>
-Date: Fri, 4 Apr 2025 06:37:03 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxLm6uYW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743774659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v10Rq+qm+0lVG+/ZpXOjHbbBOxXi0wHFQ9TLKO+kuNU=;
+	b=JxLm6uYWUa97vtIt85uIwZrZP65H2GQzQ+wiFGG/4wrjNrmWsS3GrWecPQIHM8KrRjvs7l
+	muoXgGDxR+OlUn4cbEoacNFzGthgnGPAIi10PLoNAcNSgsix64KSzdGDpE/Y65YyE+EZUr
+	JwYfShBqGuSPo6KvBZwnGjs0bc5ie0Q=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-351-tjhwzyzOMsmGNMNs1LaaYg-1; Fri,
+ 04 Apr 2025 09:50:56 -0400
+X-MC-Unique: tjhwzyzOMsmGNMNs1LaaYg-1
+X-Mimecast-MFC-AGG-ID: tjhwzyzOMsmGNMNs1LaaYg_1743774655
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4891D19560BC;
+	Fri,  4 Apr 2025 13:50:55 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.26])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 157C419560AD;
+	Fri,  4 Apr 2025 13:50:50 +0000 (UTC)
+Date: Fri, 4 Apr 2025 21:50:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: syzbot <syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] possible deadlock in
+ blk_mq_freeze_queue_nomemsave
+Message-ID: <Z-_jtFYt0t0-6A7z@fedora>
+References: <67ea99e0.050a0220.3c3d88.0042.GAE@google.com>
+ <67ee4810.050a0220.9040b.016e.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests: ublk: fix test_stripe_04
-To: Ming Lei <ming.lei@redhat.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
- Pavel Begunkov <asml.silence@gmail.com>,
- Caleb Sander Mateos <csander@purestorage.com>,
- Uday Shankar <ushankar@purestorage.com>
-References: <20250404001849.1443064-1-ming.lei@redhat.com>
- <174373319721.1127267.3756134797323684566.b4-ty@kernel.dk>
- <Z-9WD-sqnPEzUqyh@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z-9WD-sqnPEzUqyh@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67ee4810.050a0220.9040b.016e.GAE@google.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 4/3/25 9:46 PM, Ming Lei wrote:
-> On Thu, Apr 03, 2025 at 08:19:57PM -0600, Jens Axboe wrote:
->>
->> On Fri, 04 Apr 2025 08:18:49 +0800, Ming Lei wrote:
->>> Commit 57ed58c13256 ("selftests: ublk: enable zero copy for stripe target")
->>> added test entry of test_stripe_04, but forgot to add the test script.
->>>
->>> So fix the test by adding the script file.
->>>
->>>
->>
->> Applied, thanks!
->>
->> [1/1] selftests: ublk: fix test_stripe_04
->>       (no commit info)
+On Thu, Apr 03, 2025 at 01:34:24AM -0700, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
 > 
-> Hi Jens,
+> HEAD commit:    a1b5bd45d4ee Merge tag 'usb-6.15-rc1' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1711cfb0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=adffebefc9feb9d6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9dd7dbb1a4b915dee638
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12ee494c580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13df5998580000
 > 
-> Commit 57ed58c13256 ("selftests: ublk: enable zero copy for stripe target")
-> is in io_uring-6.15, so this patch should be merged to io_uring-6.15 instead
-> of block-6.15.
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-a1b5bd45.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/588b4d489b63/vmlinux-a1b5bd45.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/51ead797f7ae/bzImage-a1b5bd45.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
 
-Both branches already went to Linus yesterday, which is why this one is
-in the block branch now as there are no dependencies left.
+...
 
--- 
-Jens Axboe
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+
+#syz test: https://github.com/ming1/linux.git syzbot-test
+
+
+Thanks,
+Ming
+
