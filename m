@@ -1,227 +1,166 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6735189F57
-	for <linux-block@vger.kernel.org>; Sat,  5 Apr 2025 02:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3926B1AAE28
+	for <linux-block@vger.kernel.org>; Sat,  5 Apr 2025 02:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743820771; cv=none; b=oxsDrKoZ4O/HHniLo2bXnodSyhHQ2TNSzcKq1f3NPuDr1JFAemZdQ9tTz747oWHo883l4Otf+9VScXOM88laHovS3kEp1bEVCLb186u8qTLvTv0LwUu5Ob0+SNj/gFgFGO/vPq6r+YU0kgZPxSZDEl4pMadQ+I/YYuf9UXOFsE8=
+	t=1743821487; cv=none; b=US/fdJtHQNlKuOQNTr2BN+jEVvu2+8xNdzYM5IqMT6aegwV5bjDHUmbfsmfEj758ld+9IF9xqcxNVCNNwJcu1wesPjIUd2NHmAetfHjRhOYk7uv+ZscvOSt4Ivs9b3nkNqKXqTbod5wqoACnXoPRNU+uOGVNON6oGcQ3FazqC2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743820771; c=relaxed/simple;
-	bh=140Qvm25bvAzjxAZ3dwrAS1nnOhO4eH2AExbSqYqQU8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=c9JFRpsrXUsuC6GmNi8tOOb68fAsDqUrciJgS23P3qPjUCBZ/TNPEt2/uXv8UPKVS47dJPXIsin4mFlxLk8e0psW3BeJUl/cEdzlE+72vMtV2j3TNgST/Ur2BQ80Izw5s2x/e2EpsDxP4HKrbG06nOMuGJMiTuI50l5t7qpgwEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d458e61faaso29297645ab.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Apr 2025 19:39:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743820769; x=1744425569;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QtwH2AaWubu33ySkf+L6hSVADT3A6b2bPhj7AM0h9iI=;
-        b=FjSbkNYjBeZ8YTJ1A1BhVP0efY9HsOuyJ7wkaC20t9E0mqI2sf4fc6H981HA6w62ua
-         xI3Ale40yE8cdo60rWDILAg8Xz6ji6QbKdo5L/CaGPJi8rYwPQtL4YpHmTggzsEwsXNu
-         Q0FfIrLZyge+OAVovd2zcypoJRDAUa0eYclYSP62m329pTuXlbjcgWxUqqTiWBSZR4/z
-         27stC8rDX6xb+x0yQEX9ynqMOv61+/vqphaMOg8NVYLD0BIVO5U2qUzBGkHHBU5MZgZR
-         Kusl3D+OY+kWk5sHodof8TpdJ2KTzpS9sC1n1PAhEeXJpgPD8EQqlRFEwkjNt3Xy9ecm
-         tqHw==
-X-Forwarded-Encrypted: i=1; AJvYcCVS7OeYaphMIqwcEzOm6qnBJu3ly4y7IIiy1zVQGci7mqrMj8fSYlrAPOwGpXhbnVil6AZOXWY3M5ognQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YypCOaVvsvuZY9teawJVQ/+tpA3SGEYH2j3qR2bt92/eWzOnJiw
-	CC+mt6YhTKJJSBI9oFdIaD/oRYHu1AIy3HHJUimIhsNpfG1YO/FDiHZsMjz9W6hv0KuPM0wL6ZS
-	aa0TBGqFr1NtdbzaixnL3gXz5qvvsLhkaGwUAeo8JNomK34bxmevBUP0=
-X-Google-Smtp-Source: AGHT+IG19L+ZJcEmRZXzBKt84A28fCbPoMlA8n7/wMknyvgj5+WKdq4bZprHLSOmyuR629YIaEBCxFFtTBthsgU1ADR4UeuSgBId
+	s=arc-20240116; t=1743821487; c=relaxed/simple;
+	bh=qTTiIo2Hwj2oZepleSGN1UqYWbojRb7VWml+TQ6OAG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JRqpc8cKtIT8Q0NkW2Zul4ZPdb6C20MxFiBlIWudZWvcgyEjSegnCfhFDRw6mAHUgIixGIuUNs38nLLjox21uuNgeDEIdR89q1L6uCR0XHhPg7TrJ9HNJth38HEvkZHQ/mPr0PG4gj4feayGRBInlvVu4TLG8I+pRzvs0DhrMtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hx3694+i; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hx3694+i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743821484;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q5Pzidrd4gjFd4NGTawODfyIkMxP4bXEOLn8muTnXdM=;
+	b=hx3694+i+j48F5Vwyz2PhNKWk6/F+r+S7feHDpIaOJvx3FldN/iRiQleUbwS0e9S5DOFEa
+	wjNR9AK7qElO3EKn7sceeITPqb+dicTPFPwCCOA32IPpy1l0e/B0ZJ2LQ+Hmj4qW10IDAO
+	DkXm8UVzSBq6Tq5d0ers9cTKqLf9zWw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-HdyYDzdnPfW6dFSvSQyXfw-1; Fri,
+ 04 Apr 2025 22:51:20 -0400
+X-MC-Unique: HdyYDzdnPfW6dFSvSQyXfw-1
+X-Mimecast-MFC-AGG-ID: HdyYDzdnPfW6dFSvSQyXfw_1743821479
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2AF451956048;
+	Sat,  5 Apr 2025 02:51:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D22B18009BC;
+	Sat,  5 Apr 2025 02:51:15 +0000 (UTC)
+Date: Sat, 5 Apr 2025 10:51:09 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jared Holzman <jholzman@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] ublk: Add UBLK_U_CMD_SET_SIZE
+Message-ID: <Z_Cana4Ibs8zN_wA@fedora>
+References: <20250331135449.3371818-1-jholzman@nvidia.com>
+ <SJ1PR12MB63639AFCE9BC8C1EC4D28795B1AE2@SJ1PR12MB6363.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2506:b0:3d4:44:958a with SMTP id
- e9e14a558f8ab-3d6e3f999b0mr64123455ab.3.1743820768746; Fri, 04 Apr 2025
- 19:39:28 -0700 (PDT)
-Date: Fri, 04 Apr 2025 19:39:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f097e0.050a0220.0a13.022a.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in queue_wb_lat_store
-From: syzbot <syzbot+5a9d5d7faa80fa15e3db@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SJ1PR12MB63639AFCE9BC8C1EC4D28795B1AE2@SJ1PR12MB6363.namprd12.prod.outlook.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello,
+Hello Jared,
 
-syzbot found the following issue on:
+On Thu, Apr 03, 2025 at 12:37:11PM +0000, Jared Holzman wrote:
+> Apologies if this is a dup, but I am not seeing the original mail on the mailing list archive.
 
-HEAD commit:    609706855d90 Merge tag 'trace-latency-v6.15-3' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11ea1998580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f51da9763f36e4c7
-dashboard link: https://syzkaller.appspot.com/bug?extid=5a9d5d7faa80fa15e3db
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+I guess it is because the patch is sent as html, instead of plain test,
+please follow the patch submission guide:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+https://www.kernel.org/doc/Documentation/process/submitting-patches.rst
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1e24dc4cf329/disk-60970685.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/616648e7703d/vmlinux-60970685.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/faec611db102/bzImage-60970685.xz
+> 
+> ________________________________
+> From: Jared Holzman <jholzman@nvidia.com>
+> Sent: Monday, 31 March 2025 4:54 PM
+> To: linux-block@vger.kernel.org <linux-block@vger.kernel.org>
+> Cc: ming.lei@redhat.com <ming.lei@redhat.com>; Omri Mann <omri@nvidia.com>; Ofer Oshri <ofer@nvidia.com>; Omri Levi <omril@nvidia.com>; Jared Holzman <jholzman@nvidia.com>
+> Subject: [PATCH] ublk: Add UBLK_U_CMD_SET_SIZE
+> 
+> From: Omri Mann <omri@nvidia.com>
+> 
+> Currently ublk only allows the size of the ublkb block device to be
+> set via UBLK_CMD_SET_PARAMS before UBLK_CMD_START_DEV is triggered.
+> 
+> This does not provide support for extendable user-space block devices
+> without having to stop and restart the underlying ublkb block device
+> causing IO interruption.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5a9d5d7faa80fa15e3db@syzkaller.appspotmail.com
+The requirement is reasonable.
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.14.0-syzkaller-11125-g609706855d90 #0 Not tainted
-------------------------------------------------------
-syz.0.753/9197 is trying to acquire lock:
-ffff8881437e2318 (&q->elevator_lock){+.+.}-{4:4}, at: queue_wb_lat_store+0x187/0x3d0 block/blk-sysfs.c:596
+> 
+> This patch adds a new ublk command UBLK_U_CMD_SET_SIZE to allow the
+> ublk block device to be resized on-the-fly.
 
-but task is already holding lock:
-ffff8881437e1de8 (&q->q_usage_counter(io)#24){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
+Looks CMD_SET_SIZE is not generic enough, maybe UBLK_CMD_UPDATE_PARAMS
+can be added for support any parameter update by allowing to do it
+when device is in LIVE state.
 
-which lock already depends on the new lock.
+> 
+> Signed-off-by: Omri Mann <omri@nvidia.com>
+> ---
+>  Documentation/block/ublk.rst  |  5 +++++
+>  drivers/block/ublk_drv.c      | 26 +++++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h |  7 +++++++
+>  3 files changed, 37 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+> index 1e0e7358e14a..7eca87a66b9c 100644
+> --- a/Documentation/block/ublk.rst
+> +++ b/Documentation/block/ublk.rst
+> @@ -139,6 +139,11 @@ managing and controlling ublk devices with help of several control commands:
+>    set up the per-queue context efficiently, such as bind affine CPUs with IO
+>    pthread and try to allocate buffers in IO thread context.
+> 
+> +- ``UBLK_F_SET_SIZE``
+> +
+> +  Allows changing the size of the block device after it has started. Useful for
+> +  userspace implementations that allow extending the underlying block device.
+> +
+>  - ``UBLK_CMD_GET_DEV_INFO``
+> 
+>    For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c060da409ed8..ab6364475b9c 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -64,7 +64,8 @@
+>                  | UBLK_F_CMD_IOCTL_ENCODE \
+>                  | UBLK_F_USER_COPY \
+>                  | UBLK_F_ZONED \
+> -               | UBLK_F_USER_RECOVERY_FAIL_IO)
+> +               | UBLK_F_USER_RECOVERY_FAIL_IO \
+> +               | UBLK_F_SET_SIZE)
+> 
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>                  | UBLK_F_USER_RECOVERY_REISSUE \
+> @@ -2917,6 +2918,25 @@ static int ublk_ctrl_get_features(struct io_uring_cmd *cmd)
+>          return 0;
+>  }
+> 
+> +static int ublk_ctrl_set_size(struct ublk_device *ub,
+> +               struct io_uring_cmd *cmd)
+> +{
+> +       const struct ublksrv_ctrl_cmd *header = io_uring_sqe_cmd(cmd->sqe);
+> +       struct ublk_param_basic *p = &ub->params.basic;
+> +       size_t new_size = (int)header->data[0];
+> +       int ret = 0;
+> +       unsigned int memflags;
+> +
+> +       p->dev_sectors = new_size;
+> +
+> +       memflags = blk_mq_freeze_queue(ub->ub_disk->queue);
+> +       mutex_lock(&ub->mutex);
+> +       set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
+> +       mutex_unlock(&ub->mutex);
+> +       blk_mq_unfreeze_queue(ub->ub_disk->queue, memflags);
 
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&q->q_usage_counter(io)#24){++++}-{0:0}:
-       blk_alloc_queue+0x619/0x760 block/blk-core.c:461
-       blk_mq_alloc_queue+0x179/0x290 block/blk-mq.c:4349
-       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
-       loop_add+0x496/0xb70 drivers/block/loop.c:2067
-       loop_init+0x164/0x270 drivers/block/loop.c:2302
-       do_one_initcall+0x120/0x6e0 init/main.c:1257
-       do_initcall_level init/main.c:1319 [inline]
-       do_initcalls init/main.c:1335 [inline]
-       do_basic_setup init/main.c:1354 [inline]
-       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
-       kernel_init+0x1c/0x2b0 init/main.c:1457
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 (fs_reclaim){+.+.}-{0:0}:
-       __fs_reclaim_acquire mm/page_alloc.c:3914 [inline]
-       fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:3928
-       might_alloc include/linux/sched/mm.h:318 [inline]
-       xa_insert include/linux/xarray.h:783 [inline]
-       blk_mq_init_hctx block/blk-mq.c:3924 [inline]
-       blk_mq_alloc_and_init_hctx+0x503/0x11c0 block/blk-mq.c:4457
-       blk_mq_realloc_hw_ctxs+0x8f6/0xc00 block/blk-mq.c:4486
-       blk_mq_init_allocated_queue+0x3af/0x1230 block/blk-mq.c:4540
-       blk_mq_alloc_queue+0x1c2/0x290 block/blk-mq.c:4353
-       __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4396
-       loop_add+0x496/0xb70 drivers/block/loop.c:2067
-       loop_init+0x164/0x270 drivers/block/loop.c:2302
-       do_one_initcall+0x120/0x6e0 init/main.c:1257
-       do_initcall_level init/main.c:1319 [inline]
-       do_initcalls init/main.c:1335 [inline]
-       do_basic_setup init/main.c:1354 [inline]
-       kernel_init_freeable+0x5c2/0x900 init/main.c:1567
-       kernel_init+0x1c/0x2b0 init/main.c:1457
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 (&q->elevator_lock){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3166 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
-       validate_chain kernel/locking/lockdep.c:3909 [inline]
-       __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
-       lock_acquire kernel/locking/lockdep.c:5866 [inline]
-       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
-       __mutex_lock_common kernel/locking/mutex.c:587 [inline]
-       __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:732
-       queue_wb_lat_store+0x187/0x3d0 block/blk-sysfs.c:596
-       queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
-       sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
-       kernfs_fop_write_iter+0x351/0x510 fs/kernfs/file.c:334
-       new_sync_write fs/read_write.c:591 [inline]
-       vfs_write+0x5ba/0x1180 fs/read_write.c:684
-       ksys_write+0x12a/0x240 fs/read_write.c:736
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter(io)#24
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->q_usage_counter(io)#24);
-                               lock(fs_reclaim);
-                               lock(&q->q_usage_counter(io)#24);
-  lock(&q->elevator_lock);
-
- *** DEADLOCK ***
-
-6 locks held by syz.0.753/9197:
- #0: ffff88806a44d278 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x2a2/0x370 fs/file.c:1213
- #1: ffff888035a20420 (sb_writers#7){.+.+}-{0:0}, at: ksys_write+0x12a/0x240 fs/read_write.c:736
- #2: ffff888061625888 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x28f/0x510 fs/kernfs/file.c:325
- #3: ffff8880213fbb48 (kn->active#125){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2b2/0x510 fs/kernfs/file.c:326
- #4: ffff8881437e1de8 (&q->q_usage_counter(io)#24){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
- #5: ffff8881437e1e20 (&q->q_usage_counter(queue)#21){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:215
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 9197 Comm: syz.0.753 Not tainted 6.14.0-syzkaller-11125-g609706855d90 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2079
- check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2211
- check_prev_add kernel/locking/lockdep.c:3166 [inline]
- check_prevs_add kernel/locking/lockdep.c:3285 [inline]
- validate_chain kernel/locking/lockdep.c:3909 [inline]
- __lock_acquire+0x1173/0x1ba0 kernel/locking/lockdep.c:5235
- lock_acquire kernel/locking/lockdep.c:5866 [inline]
- lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5823
- __mutex_lock_common kernel/locking/mutex.c:587 [inline]
- __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:732
- queue_wb_lat_store+0x187/0x3d0 block/blk-sysfs.c:596
- queue_attr_store+0x270/0x310 block/blk-sysfs.c:799
- sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
- kernfs_fop_write_iter+0x351/0x510 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:591 [inline]
- vfs_write+0x5ba/0x1180 fs/read_write.c:684
- ksys_write+0x12a/0x240 fs/read_write.c:736
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb5d6d8d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fb5d7bca038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007fb5d6fa5fa0 RCX: 00007fb5d6d8d169
-RDX: 0000000000000081 RSI: 0000200000000040 RDI: 0000000000000003
-RBP: 00007fb5d6e0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fb5d6fa5fa0 R15: 00007ffce0809d88
- </TASK>
+Actually if it is just for updating device size, queue freeze isn't needed,
+because bio_check_eod() is called without grabbing ->q_usage_counter, but
+for updating other parameters, freezing queue is often needed.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Thanks,
+Ming
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
