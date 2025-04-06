@@ -1,376 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E3B7A13A
-	for <linux-block@vger.kernel.org>; Sat,  5 Apr 2025 14:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811CC1AA1F4
+	for <linux-block@vger.kernel.org>; Sun,  6 Apr 2025 19:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743865192; cv=none; b=jaI+T+vhIBMPq4YCWntxvkbM1PZVLwYpm9A5NZDVxJZVe+G7cpRCKGLVC/Xdmu7Xdil3lZzQD+fizy2uIhVrx8RrWWCTHPkeKkeW6rsGDv2FYoVpoJCo7JtQoVxjpsECPb94MkoeB22nvPNmaAAsDZ6PT9MIV2lfiYcD8rwGRaQ=
+	t=1743968410; cv=none; b=dXwOMt6quV0h8jSxHVelMjjoX2tPnQaV4LzN1OA83NNyiF+SGjjO/8sYUPsgUQYUvRkXnMK6+fy4h10y1RrysYLSDJpllsh3LH/PMD/EK4o80ZM9CA/7jXT1wR8Qch2pufsmD5MtiPvQznes0Qz6SR/Ii1xerQ1eHJU7lSbV30Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743865192; c=relaxed/simple;
-	bh=MujoFMWO97NvPreyL+B/x2WoeplqxRBvEV79sESwlJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2FP7JT9TDXVy3uAmZwbrl4qCXdMiCKCVTkZ+G5BywzR4QX/+YaZd2GbNP33KroJDSw7XluKgPSM4HM1yK7q1XUiLJ925NABDc9z4Ofb8iZZQVwJko885S7309Wz8jaMnFRTpWDNMb0p0kc7zX014dSDxAgNVVTBMQ3M+EcPvD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YWaFTks4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1743968410; c=relaxed/simple;
+	bh=slLbUHpczO//KKzP4cgazr8GXbC5c+QCuhuKBFgd2/M=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=qEU/nDjAeBdJa2j7/i+05TBRBPqJ+Dv/DgvYQoe8uzI+vfVGAXo9AtN2Pr7lp0B1Ly4/W1lyDem6nhs9M07YIi+03yS0D6z8g/kmoa0zi3LaAy48pxi0EnW1N2RHrUSUdnpxTlg1p7JGN0adLcDTnOQ8rCTKL30OO9IXEm3IkkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A1J0kesf; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YWaFTks4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743865188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cbkTzprJIlguje41tLks2OTXlNo6AoyMKZsgeX069d4=;
-	b=YWaFTks4Fdrwsr5uIw9L9n265THCDdmbo//j7YO4z58U/G/TsG5+iBjgpBsR1UQIWE0Cmh
-	pPf6Qs3I3l87aWDoOhGmpQrPGin8yd2XTtzpALTTn2+n/tf+/7vAsTD520CDcv059YjubL
-	w84MZ0RqcqyW0AlcfKNdcG5/Tkvu/kI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-T_9m49wINh-rUSJBmh1fAw-1; Sat,
- 05 Apr 2025 10:59:44 -0400
-X-MC-Unique: T_9m49wINh-rUSJBmh1fAw-1
-X-Mimecast-MFC-AGG-ID: T_9m49wINh-rUSJBmh1fAw_1743865181
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3BF52180049D;
-	Sat,  5 Apr 2025 14:59:41 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.4])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 150B7180B489;
-	Sat,  5 Apr 2025 14:59:35 +0000 (UTC)
-Date: Sat, 5 Apr 2025 22:59:29 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] ublk: improve detection and handling of ublk server
- exit
-Message-ID: <Z_FFUXINspN8G0y0@fedora>
-References: <20250403-ublk_timeout-v3-1-aa09f76c7451@purestorage.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A1J0kesf"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5f20d512fso35848585a.2
+        for <linux-block@vger.kernel.org>; Sun, 06 Apr 2025 12:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743968407; x=1744573207; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:cc:to:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mO5fydfHAKGvoUzu82MoiuIQJWkfokSlR1XoSOQYf9Q=;
+        b=A1J0kesfw8337shULYj3yymFyrppAzuOYRIiOnM9gZCz3KF4a9CUoOGwJmTzh2SKdO
+         y+NtZA/fMnhCeIkNRQRZRfDJI3HTpjpzHuqOB7FyPWdDmT5ADv5o6W0mp80nPjqa7iXi
+         5dPjRYOBYRqtfnldrCPs43Ntg3BW+em8uslvHnUIF4JzCXogeXO2Qi83w7At9WWUL0/p
+         gWUeaCrrMWa+W22VlIXmsWZ20sSoC+xvjh1nn0/x8n6kjz72WAJu4ZKMaFRN1/sHPeuO
+         Ys4GnqeDWOuR0oxKMy5VH+YTo5GzTUCZvkcu+zb7aVDLzvOZjg5KuUgftYBEHw+hhEKh
+         bvKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743968407; x=1744573207;
+        h=content-transfer-encoding:subject:cc:to:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mO5fydfHAKGvoUzu82MoiuIQJWkfokSlR1XoSOQYf9Q=;
+        b=wnSn+L3TI3ve1dS/6fQzRYpw0/Gk2sRo1lfoOon+MDNUxmNHC/nxUbNgadw0IwPitj
+         FPFNhHnMpTYMTZS8McUF90UB+yyAQllxjjB8SQ294MwtjNMXIzD9EdGk85ims7V4Dyfd
+         2f/LzgD8Fe7PXCN4ArFXC5d+35c5NHr21F0ifUcVRikwxuJcxywS+AgonOyVWg//sqhN
+         ppkAd+Rxlujs17RjbeuxTkdKckTwBG9re4fbUTczSZd7OqSzZxqqFoQqScjxS3w1ZJvr
+         0HrpTqDirp3p1/fyuek3Ydla3s0bVRnZGxR/8h0KP/zRl86CShUtkZYZrMHi1zRf9FmB
+         UPEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWz+JNOlw+mO45in728ZImPfpCMqdh03EU8XivwEcd0xVCM7lr3tyR2G4ZlgqA+i6ymPH0KbhLjhTZzg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjbM5ZegBvo3ZiFr3zuN0Ho4pANPhlzG6e9HQ1WL7p6Xhy1M2M
+	QzDKefGFQRT7qLt5wq3acFbs6/xRVFp4dsjjzVJiUwNtthubqmrU
+X-Gm-Gg: ASbGncuSiYck4VvjX+cRG1nug9hVMYjxgZUUcpocWarZsTQ7d7HqtvyNG6L6FlrGg3h
+	sMYpKKxDVixcYKmS3TEi1EngDO+1lzU4DbxmV6Wy6Wukf1HR214DpFrvCVE6yaxaA88U52iK6Ck
+	AL6FPHZTjKgdBlEYWZfssI8mFqdpMutGFH/KdSLSonDtykOKN5qPQBavNIN1jv2j79NM830ZZwn
+	+3Axa71FmCO5FqJ9FEBMXveT/T26rm3z9o3kTZdbddldsVETfSEEidr1CHULoniePf5PaaK7HiX
+	djTm9K8kAHmEI6BQVumbkShH5ZaDQbstL+mwLsvXgXExewVSlpRIsPTEEXiPhNycMgiE1TmtDLW
+	lDlopb20rnvpT8ZlVkNn/
+X-Google-Smtp-Source: AGHT+IHshaNiVavKgRypG9Q1JakhTzWtRhNgywqkAA7FhQPQTwXB+tzfd7Sn9ZKxA/TeaV8FIOT9EQ==
+X-Received: by 2002:a05:6214:27e9:b0:6e8:8f31:3120 with SMTP id 6a1803df08f44-6f01e7b21e6mr48014746d6.8.1743968407204;
+        Sun, 06 Apr 2025 12:40:07 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f0483a3sm49244196d6.63.2025.04.06.12.40.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 06 Apr 2025 12:40:06 -0700 (PDT)
+Message-ID: <8dfd97ac-59e7-ae69-238a-85b7a2dae4f1@gmail.com>
+Date: Sun, 6 Apr 2025 15:40:04 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250403-ublk_timeout-v3-1-aa09f76c7451@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-US
+From: Sean Anderson <seanga2@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ linux-mtd@lists.infradead.org, Zhihao Cheng <chengzhihao1@huawei.com>
+Subject: bio segment constraints
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 03, 2025 at 06:05:57PM -0600, Uday Shankar wrote:
-> There are currently two ways in which ublk server exit is detected by
-> ublk_drv:
-> 
-> 1. uring_cmd cancellation. If there are any outstanding uring_cmds which
->    have not been completed to the ublk server when it exits, io_uring
->    calls the uring_cmd callback with a special cancellation flag as the
->    issuing task is exiting.
-> 2. I/O timeout. This is needed in addition to the above to handle the
->    "saturated queue" case, when all I/Os for a given queue are in the
->    ublk server, and therefore there are no outstanding uring_cmds to
->    cancel when the ublk server exits.
-> 
-> There are a couple of issues with this approach:
-> 
-> - It is complex and inelegant to have two methods to detect the same
->   condition
-> - The second method detects ublk server exit only after a long delay
->   (~30s, the default timeout assigned by the block layer). This delays
->   the nosrv behavior from kicking in and potential subsequent recovery
->   of the device.
-> 
-> The second issue is brought to light with the new test_generic_04. It
-> fails before this fix:
-> 
-> selftests: ublk: test_generic_04.sh
-> dev id is 0
-> dd: error writing '/dev/ublkb0': Input/output error
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 30.0611 s, 0.0 kB/s
-> DEAD
-> dd took 31 seconds to exit (>= 5s tolerance)!
-> generic_04 : [FAIL]
-> 
-> Fix this by instead detecting and handling ublk server exit in the
-> character file release callback. This has several advantages:
-> 
-> - This one place can handle both saturated and unsaturated queues. Thus,
->   it replaces both preexisting methods of detecting ublk server exit.
-> - It runs quickly on ublk server exit - there is no 30s delay.
-> - It starts the process of removing task references in ublk_drv. This is
->   needed if we want to relax restrictions in the driver like letting
->   only one thread serve each queue
-> 
-> There is also the disadvantage that the character file release callback
-> can also be triggered by intentional close of the file, which is a
-> significant behavior change. Preexisting ublk servers (libublksrv) are
-> dependent on the ability to open/close the file multiple times. To
-> address this, only transition to a nosrv state if the file is released
-> while the ublk device is live. This allows for programs to open/close
-> the file multiple times during setup. It is still a behavior change if a
-> ublk server decides to close/reopen the file while the device is LIVE
-> (i.e. while it is responsible for serving I/O), but that would be highly
-> unusual. This behavior is in line with what is done by FUSE, which is
-> very similar to ublk in that a userspace daemon is providing services
-> traditionally provided by the kernel.
-> 
-> With this change in, the new test (and all other selftests, and all
-> ublksrv tests) pass:
-> 
-> selftests: ublk: test_generic_04.sh
-> dev id is 0
-> dd: error writing '/dev/ublkb0': Input/output error
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 0.0376731 s, 0.0 kB/s
-> DEAD
-> generic_04 : [PASS]
-> 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> ---
-> Changes in v3:
-> - Quiesce queue earlier to avoid concurrent cancellation and "normal"
->   completion of io_uring cmds (Ming Lei)
-> - Fix del_gendisk hang, found by test_stress_02
-> - Remove unnecessary parameters in fault_inject target (Ming Lei)
-> - Fix delay implementation to have separate per-I/O delay instead of
->   blocking the whole thread (Ming Lei)
-> - Add delay_us to docs
-> - Link to v2: https://lore.kernel.org/r/20250402-ublk_timeout-v2-1-249bc5523000@purestorage.com
-> 
-> Changes in v2:
-> - Leave null ublk selftests target untouched, instead create new
->   fault_inject target for injecting per-I/O delay (Ming Lei)
-> - Allow multiple open/close of ublk character device with some
->   restrictions
-> - Drop patches which made it in separately at https://lore.kernel.org/r/20250401-ublk_selftests-v1-1-98129c9bc8bb@purestorage.com
-> - Consolidate more nosrv logic in ublk character device release, and
->   associated code cleanup
-> - Link to v1: https://lore.kernel.org/r/20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com
-> ---
->  drivers/block/ublk_drv.c                        | 228 +++++++++---------------
->  tools/testing/selftests/ublk/Makefile           |   4 +-
->  tools/testing/selftests/ublk/fault_inject.c     |  72 ++++++++
->  tools/testing/selftests/ublk/kublk.c            |   6 +-
->  tools/testing/selftests/ublk/kublk.h            |   4 +
->  tools/testing/selftests/ublk/test_generic_04.sh |  43 +++++
->  6 files changed, 215 insertions(+), 142 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2fd05c1bd30b03343cb6f357f8c08dd92ff47af9..73baa9d22ccafb00723defa755a0b3aab7238934 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -162,7 +162,6 @@ struct ublk_queue {
->  
->  	bool force_abort;
->  	bool timeout;
-> -	bool canceling;
->  	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
->  	unsigned short nr_io_ready;	/* how many ios setup */
->  	spinlock_t		cancel_lock;
-> @@ -199,8 +198,6 @@ struct ublk_device {
->  	struct completion	completion;
->  	unsigned int		nr_queues_ready;
->  	unsigned int		nr_privileged_daemon;
-> -
-> -	struct work_struct	nosrv_work;
->  };
->  
->  /* header of ublk_params */
-> @@ -209,8 +206,9 @@ struct ublk_params_header {
->  	__u32	types;
->  };
->  
-> -static bool ublk_abort_requests(struct ublk_device *ub, struct ublk_queue *ubq);
-> -
-> +static void ublk_stop_dev_unlocked(struct ublk_device *ub);
-> +static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
-> +static void __ublk_quiesce_dev(struct ublk_device *ub);
->  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
->  		struct ublk_queue *ubq, int tag, size_t offset);
->  static inline unsigned int ublk_req_build_flags(struct request *req);
-> @@ -1314,8 +1312,6 @@ static void ublk_queue_cmd_list(struct ublk_queue *ubq, struct rq_list *l)
->  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
->  {
->  	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
-> -	unsigned int nr_inflight = 0;
-> -	int i;
->  
->  	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
->  		if (!ubq->timeout) {
-> @@ -1326,26 +1322,6 @@ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
->  		return BLK_EH_DONE;
->  	}
->  
-> -	if (!ubq_daemon_is_dying(ubq))
-> -		return BLK_EH_RESET_TIMER;
-> -
-> -	for (i = 0; i < ubq->q_depth; i++) {
-> -		struct ublk_io *io = &ubq->ios[i];
-> -
-> -		if (!(io->flags & UBLK_IO_FLAG_ACTIVE))
-> -			nr_inflight++;
-> -	}
-> -
-> -	/* cancelable uring_cmd can't help us if all commands are in-flight */
-> -	if (nr_inflight == ubq->q_depth) {
-> -		struct ublk_device *ub = ubq->dev;
-> -
-> -		if (ublk_abort_requests(ub, ubq)) {
-> -			schedule_work(&ub->nosrv_work);
-> -		}
-> -		return BLK_EH_DONE;
-> -	}
-> -
->  	return BLK_EH_RESET_TIMER;
->  }
->  
-> @@ -1356,19 +1332,16 @@ static blk_status_t ublk_prep_req(struct ublk_queue *ubq, struct request *rq)
->  	if (unlikely(ubq->fail_io))
->  		return BLK_STS_TARGET;
->  
-> -	/* With recovery feature enabled, force_abort is set in
-> -	 * ublk_stop_dev() before calling del_gendisk(). We have to
-> -	 * abort all requeued and new rqs here to let del_gendisk()
-> -	 * move on. Besides, we cannot not call io_uring_cmd_complete_in_task()
-> -	 * to avoid UAF on io_uring ctx.
-> +	/*
-> +	 * force_abort is set in ublk_stop_dev() before calling
-> +	 * del_gendisk(). We have to abort all requeued and new rqs here
-> +	 * to let del_gendisk() move on. Besides, we cannot not call
-> +	 * io_uring_cmd_complete_in_task() to avoid UAF on io_uring ctx.
->  	 *
->  	 * Note: force_abort is guaranteed to be seen because it is set
->  	 * before request queue is unqiuesced.
->  	 */
-> -	if (ublk_nosrv_should_queue_io(ubq) && unlikely(ubq->force_abort))
-> -		return BLK_STS_IOERR;
-> -
-> -	if (unlikely(ubq->canceling))
-> +	if (unlikely(ubq->force_abort))
->  		return BLK_STS_IOERR;
->  
->  	/* fill iod to slot in io cmd buffer */
-> @@ -1391,16 +1364,6 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	if (res != BLK_STS_OK)
->  		return res;
->  
-> -	/*
-> -	 * ->canceling has to be handled after ->force_abort and ->fail_io
-> -	 * is dealt with, otherwise this request may not be failed in case
-> -	 * of recovery, and cause hang when deleting disk
-> -	 */
-> -	if (unlikely(ubq->canceling)) {
-> -		__ublk_abort_rq(ubq, rq);
-> -		return BLK_STS_OK;
-> -	}
-> -
+Hi all,
 
-If `ubq->canceling` is removed, how to handle recovery? The request has to
-be requeued in case of ublk_nosrv_dev_should_queue_io().
+I'm not really sure what guarantees the block layer makes regarding the
+segments in a bio as part of a request submitted to a block driver. As
+far as I can tell this is not documented anywhere. In particular,
 
-And that should be the reason why 'make test T=generic/004' hangs forever
-after applying this patch.
+- Is bv_len aligned to SECTOR_SIZE?
+- To logical_sector_size?
+- What if logical_sector_size > PAGE_SIZE?
+- What about bv_offset?
+- Is it possible to have a bio where the total length is a multiple of
+   logical_sector_size, but the data is split across several segments
+   where each segment is a multiple of SECTOR_SIZE?
+- Is is possible to have segments not even aligned to SECTOR_SIZE?
+- Can I somehow request to only get segments with bv_len aligned to
+   logical_sector_size? Or do I need to do my own coalescing and bounce
+   buffering for that?
 
->  	ublk_queue_cmd(ubq, rq);
->  	return BLK_STS_OK;
->  }
-> @@ -1461,8 +1424,71 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
->  static int ublk_ch_release(struct inode *inode, struct file *filp)
->  {
->  	struct ublk_device *ub = filp->private_data;
-> +	int i;
-> +
-> +	mutex_lock(&ub->mutex);
-> +	/*
-> +	 * If the device is not live, we will not transition to a nosrv
-> +	 * state. This protects against:
-> +	 * - accidental poking of the ublk character device
-> +	 * - some ublk servers which may open/close the ublk character
-> +	 *   device during startup
-> +	 */
-> +	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
-> +		goto out;
-> +
-> +	/*
-> +	 * Since we are releasing the ublk character file descriptor, we
-> +	 * know that there cannot be any concurrent file-related
-> +	 * activity (e.g. uring_cmds or reads/writes). However, I/O
-> +	 * might still be getting dispatched. Quiesce that too so that
-> +	 * we don't need to worry about anything concurrent.
-> +	 *
-> +	 * We may have already quiesced the queue if we canceled any
-> +	 * uring_cmds, so only quiesce if necessary (quiesce is not
-> +	 * idempotent, it has an internal counter which we need to
-> +	 * manage carefully).
-> +	 */
-> +	if (!blk_queue_quiesced(ub->ub_disk->queue))
-> +		blk_mq_quiesce_queue(ub->ub_disk->queue);
-> +
-> +	/*
-> +	 * Handle any requests outstanding to the ublk server
-> +	 */
-> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-> +		ublk_abort_queue(ub, ublk_get_queue(ub, i));
->  
-> +	/*
-> +	 * Transition the device to the nosrv state. What exactly this
-> +	 * means depends on the recovery flags
-> +	 */
-> +	if (ublk_nosrv_should_stop_dev(ub)) {
-> +		/*
-> +		 * Allow any pending/future I/O to pass through quickly
-> +		 * with an error. This is needed because del_gendisk
-> +		 * waits for all pending I/O to complete
-> +		 */
-> +		for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-> +			ublk_get_queue(ub, i)->force_abort = true;
-> +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
-> +
-> +		ublk_stop_dev_unlocked(ub);
-> +	} else {
-> +		if (ublk_nosrv_dev_should_queue_io(ub)) {
-> +			__ublk_quiesce_dev(ub);
+I've been reading some drivers (as well as stuff in block/) to try and
+figure things out, but it's hard to figure out all the places where
+constraints are enforced. In particular, I've read several drivers that
+make some big assumptions (which might be bugs?) For example, in
+drivers/mtd/mtd_blkdevs.c, do_blktrans_request looks like:
 
-Here only inflight IOs are drained, new IO still comes after queue is
-unquiesced, then uring_cmd UAF is triggered.
+	block = blk_rq_pos(req) << 9 >> tr->blkshift;
+	nsect = blk_rq_cur_bytes(req) >> tr->blkshift;
 
-...
+	switch (req_op(req)) {
+	/* ... snip ... */
+	case REQ_OP_READ:
+		buf = kmap(bio_page(req->bio)) + bio_offset(req->bio);
+		for (; nsect > 0; nsect--, block++, buf += tr->blksize) {
+			if (tr->readsect(dev, block, buf)) {
+				kunmap(bio_page(req->bio));
+				return BLK_STS_IOERR;
+			}
+		}
+		kunmap(bio_page(req->bio));
 
-> --- /dev/null
-> +++ b/tools/testing/selftests/ublk/test_generic_04.sh
-> @@ -0,0 +1,43 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> +
-> +TID="generic_04"
-> +ERR_CODE=0
-> +
-> +_prep_test "fault_inject" "fast cleanup when all I/Os of one hctx are in server"
-> +
-> +# configure ublk server to sleep 2s before completing each I/O
-> +dev_id=$(_add_ublk_dev -t fault_inject -q 2 -d 1 --delay_us 2000000)
-> +_check_add_dev $TID $?
-> +
-> +echo "dev id is ${dev_id}"
-> +
-> +STARTTIME=${SECONDS}
-> +
-> +dd if=/dev/urandom of=/dev/ublkb${dev_id} oflag=direct bs=4k count=1 &
+		rq_for_each_segment(bvec, req, iter)
+			flush_dcache_page(bvec.bv_page);
+		return BLK_STS_OK;
 
-stdout/stderr need to be discarded.
+For context, tr->blkshift is either 512 or 4096, depending on the
+backend. From what I can tell, this code assumes the following:
 
-Also I'd suggest to make the selftest part as one standalone patch.
+- There is only one bio in a request. This one is a bit of a soft
+   assumption since we should only flush the pages in the bio and not the
+   whole request otherwise.
+- There is only one segment in a bio. This one could be reasonable if
+   max_segments was set to 1, but it's not as far as I can tell. So I
+   guess we just go off the end of the bio if there's a second segment?
+- The data is in lowmem OR bv_offset + bv_len <= PAGE_SIZE. kmap() only
+   maps a single page, so if we go past one page we end up in adjacent
+   kmapped pages.
 
+Am I missing something here? Handling highmem seems like a persistent
+issue. E.g. drivers/mtd/ubi/block.c doesn't even bother doing a kmap.
+Should both of these have BLK_FEAT_BOUNCE_HIGH?
 
-thanks,
-Ming
-
+--Sean
