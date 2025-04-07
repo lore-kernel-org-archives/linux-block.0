@@ -1,106 +1,135 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66F222FF2B;
-	Mon,  7 Apr 2025 11:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB955253B7C
+	for <linux-block@vger.kernel.org>; Mon,  7 Apr 2025 13:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744025152; cv=none; b=RpAtjYkHcguWxb56Pe2W9wQ3iU43vTu1TtSqdjGrdr5cxdaO7LgvcrV7GlQfGDGEjqDaN2CGl4flFYVW7p8C1t3MqwphRi5enXW+xG/+vwJGwOobyB2UwH7eqmOZrPgPPznIO4MiEAPU8pg9WeQwrnFTl5X8KKyXvJqDoItUO+M=
+	t=1744031754; cv=none; b=nhlpEgtHFittz2tCVw9VdGxxB6yc4SchvYa66iuqlWNDLD1ptZ/7xDMDrRaJhNvMOp8dwBTc4qUahU+alKkmpdNrYVHw0loTatMLZ5Eynw3xXGjaJZlmYl0ttQJnw3aBok8NCSwodMCcT82hrtTl/kMD7v/MyLwiVP/DXdZqtBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744025152; c=relaxed/simple;
-	bh=9lfVYwaGB5Ix4SRhjWAJHjlYC3VmoMPXG7TqKuhJoN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DcGsICAgiQ0te27gZaNd5ovAkggMYRCmbTNIZzgzHOIVrdMCoJk9LGwOpC7CMkrtr2TrNgbBxbbj/2nCvwAOpffE7b9NKxHanCbVAgyln5tfbQ160+oDpe5r1u9PxcUilUJn49QCcyni7wd7I1jzHNc5/BbBsBRcGCikCWcOSNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZWRhc1vd6z4f3m6j;
-	Mon,  7 Apr 2025 19:25:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 2DB601A01A5;
-	Mon,  7 Apr 2025 19:25:45 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-	by APP4 (Coremail) with SMTP id gCh0CgCH6181tvNniAYcIw--.43994S3;
-	Mon, 07 Apr 2025 19:25:44 +0800 (CST)
-Message-ID: <2e030fad-7f46-6fab-faa3-9727835f02ee@huaweicloud.com>
-Date: Mon, 7 Apr 2025 19:25:41 +0800
+	s=arc-20240116; t=1744031754; c=relaxed/simple;
+	bh=rg1W7c5oHkCdeXrFt4PwzJv7TJw0E4k9deA9lsCQtlg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e2ywM6Rl/wN6An3FIZw+bBwR9Z6IRrnoTDwmSEYE2pTQlTTmMAJb/QUZF6/pJWOMvhc+kL+q/928BLvL9WptyEEnD7jpdfGxVan3a+xwwRXORoRqJ6JO5YHxV+c3miKVlRacBx6eXbd2FAeMk0JFSMi4vz5zVX33gbHypcZBztw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NuZ/jdlT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuZ/jdlT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744031748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BtQOZlbRRt9IpXzX9qB7o/gUmaTk1uGg/EWUf3kce24=;
+	b=NuZ/jdlT5BlwZ18JxZJnnRk/HFXCLBzuEpUJoLDFUyeWm7BWYEUO5CZ++yGM4NYCTf35VS
+	hGl0TV0Cv1DKFq2XtbZHynG1fRKIcqZjzPAEyo9jjhxvT906CgnSpAsUC/erIcIBZCtV4L
+	5tt+BMEUvm1G9SxbxzBOQ/n8hs8561s=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-418-9UWSTRa-PHWEZI3zkbZeBg-1; Mon,
+ 07 Apr 2025 09:15:45 -0400
+X-MC-Unique: 9UWSTRa-PHWEZI3zkbZeBg-1
+X-Mimecast-MFC-AGG-ID: 9UWSTRa-PHWEZI3zkbZeBg_1744031744
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8C9C1955DC5;
+	Mon,  7 Apr 2025 13:15:43 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.16])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CFF933001D13;
+	Mon,  7 Apr 2025 13:15:42 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 00/13] ublk: one driver bug fix and selftest change
+Date: Mon,  7 Apr 2025 21:15:11 +0800
+Message-ID: <20250407131526.1927073-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 1/4] block: factor out a helper to set logical/physical
- block size
-To: Bart Van Assche <bvanassche@acm.org>, linan666@huaweicloud.com,
- axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, hare@suse.de,
- martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, wanghai38@huawei.com
-References: <20250304121918.3159388-1-linan666@huaweicloud.com>
- <20250304121918.3159388-2-linan666@huaweicloud.com>
- <2ca75746-c630-4a15-bf5d-e9cb10b6e83c@acm.org>
-From: Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <2ca75746-c630-4a15-bf5d-e9cb10b6e83c@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCH6181tvNniAYcIw--.43994S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruFWUKrWUGry5uF4UZw13urg_yoW3KwbEq3
-	Z7JFs2yr42vF1Sv3WxCF4ftFWrKa10gr9rZa1UGw47X3s5JF4kGF1kt398WFZ8XayrZr9Y
-	gr1ku3y8Gw4aqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbqxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
-	xwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14
-	v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
-	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8Zw
-	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
-	67AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
-	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbQV
-	y7UUUUU==
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi, Bart:
+The 1st patch fixes kernel panic caused by aborting zc request, which
+can be observed by the added stress_03/stress_04 tests.
 
-Apologies for the delayed response.
+The other patches are ublk selftest change:
 
-在 2025/3/4 22:32, Bart Van Assche 写道:
-> On 3/4/25 4:19 AM, linan666@huaweicloud.com wrote:
->> +EXPORT_SYMBOL(blk_set_block_size);
-> 
-> This function is exported without documenting what the requirements are
-> for calling this function? Yikes.
-> 
+- two bug fixes(2, 3)
 
-Thank you for your reply, I'll add more
-documentation in the next version.
+- cleanup (4, 5)
 
+- allow to run tests in parallel(6), also big simplification on
+test script
 
-> Is my understanding correct that it is only safe to apply changes made with 
-> blk_set_block_size() by calling
-> queue_limits_commit_update_frozen()?
-> 
+- add two stress tests for zero copy(7)
 
-Exported func blk_set_block_size() is only used in RAID, with expected
-usage similar to queue_limits_stack_bdev(): callers must ensure no pending
-IO and use queue_limits_start_update/queue_limits_commit_update to prevent
-concurrent modifications.
+- kublk misc change(8, 9, 10), helps for evaluating performance
 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> .
+- support target specific command line, so help to add new
+target(Uday is working on fault-inject target) (11)
+
+- add two tests for covering recovery features(12)
+
+- add one heavy io & remove test over recovery enabled device(13),
+which can catch io hang triggered by several recent patches.
+
+Thanks,
+
+Ming Lei (13):
+  ublk: delay aborting zc request until io_uring returns the buffer
+  selftests: ublk: fix ublk_find_tgt()
+  selftests: ublk: add io_uring uapi header
+  selftests: ublk: cleanup backfile automatically
+  selftests: ublk: make sure _add_ublk_dev can return in sub-shell
+  selftests: ublk: run stress tests in parallel
+  selftests: ublk: add two stress tests for zero copy feature
+  selftests: ublk: setup ring with
+    IORING_SETUP_SINGLE_ISSUER/IORING_SETUP_DEFER_TASKRUN
+  selftests: ublk: set queue pthread's cpu affinity
+  selftests: ublk: increase max nr_queues and queue depth
+  selftests: ublk: support target specific command line
+  selftests: ublk: support user recovery
+  selftests: ublk: add test_stress_05.sh
+
+ drivers/block/ublk_drv.c                      |  31 +-
+ tools/testing/selftests/ublk/Makefile         |   5 +
+ tools/testing/selftests/ublk/kublk.c          | 341 ++++++++++++++++--
+ tools/testing/selftests/ublk/kublk.h          |  37 +-
+ tools/testing/selftests/ublk/stripe.c         |  28 +-
+ tools/testing/selftests/ublk/test_common.sh   | 140 +++++--
+ .../testing/selftests/ublk/test_generic_04.sh |  40 ++
+ .../testing/selftests/ublk/test_generic_05.sh |  44 +++
+ tools/testing/selftests/ublk/test_loop_01.sh  |   8 +-
+ tools/testing/selftests/ublk/test_loop_02.sh  |   8 +-
+ tools/testing/selftests/ublk/test_loop_03.sh  |   8 +-
+ tools/testing/selftests/ublk/test_loop_04.sh  |   9 +-
+ tools/testing/selftests/ublk/test_loop_05.sh  |   8 +-
+ .../testing/selftests/ublk/test_stress_01.sh  |  45 +--
+ .../testing/selftests/ublk/test_stress_02.sh  |  45 +--
+ .../testing/selftests/ublk/test_stress_03.sh  |  38 ++
+ .../testing/selftests/ublk/test_stress_04.sh  |  37 ++
+ .../testing/selftests/ublk/test_stress_05.sh  |  64 ++++
+ .../testing/selftests/ublk/test_stripe_01.sh  |  12 +-
+ .../testing/selftests/ublk/test_stripe_02.sh  |  13 +-
+ .../testing/selftests/ublk/test_stripe_03.sh  |  12 +-
+ .../testing/selftests/ublk/test_stripe_04.sh  |  13 +-
+ 22 files changed, 811 insertions(+), 175 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_04.sh
+ create mode 100755 tools/testing/selftests/ublk/test_generic_05.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_03.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_04.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_05.sh
 
 -- 
-Thanks,
-Nan
+2.47.0
 
