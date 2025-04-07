@@ -1,87 +1,128 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A131F63E8;
-	Mon,  7 Apr 2025 14:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A031F4716
+	for <linux-block@vger.kernel.org>; Mon,  7 Apr 2025 14:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744037555; cv=none; b=UJqSDJ/Hdzi6IOz9U7jRf6y0AVzMpPx+d32I69v7dolw9Z3GmHMUFWw0gAj/KaMpqbekXaq9KcbMUwmhp9fcwYVZL0vobt1qjWIHGfNmg26HmYrQcwZAD/6UGR8HWUXt7PDwS42tWUI/Vc624F9f4ChYnKbwTNqxSOqiC+ybn9Y=
+	t=1744037660; cv=none; b=pASgqWWYY8fxEJ176/VnferZgvPQAaJ3In2OxW97kfXm7YG2pYYe/iAeQtXjnO0m2qf6XD6Vp45fU5cx+KBp3FOT0FHKPkSDMsIi9LocfWiadrO8BlfuDfS8BLLrbxE/c+zo/Fh4g/iTzIct9NJqxKMb+v5wx+x6KXRSvwIUI6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744037555; c=relaxed/simple;
-	bh=C9Lp+oxxK8YI81wgMjaGgrdX/gmILj7cv8HGtrIXUwQ=;
+	s=arc-20240116; t=1744037660; c=relaxed/simple;
+	bh=Jjt7ZbxI34FOLZVVA70IOrRA6DrynfYhRSt0SxZw0UY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c57u9D/nIP+EyXZu8fn5kj4Fpd7LWCERfGdhl4hPSuqI7eEx6n7itfGV/xfzOa3+EWwXOlRd8beea+XtQs9sjwPioCTpfx4Qdj7qiB+4MyYKDxN1zz8I49lHmYK0PMfDYBu44mgW/xsrGIdgTriAKr0cnfZwoIzOSLZsv9c56Y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hDdjxsvr; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=aLKCVVJYO0aGe0d3hCDmFpaGj38mC4heW0Rj1zF776RJJQiOK+8/YmXAusIklIsTVU0wMUJCxR50K7+Ou+efkNQ+K9vyK/eeAr8/pOXT2WIAEYsu8DV9zwBUBrbT7w6nUQjGh2g8Rqo1mUcL21gMG0I4+E+ayfJhLLtZaEF+5Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fKZcriyw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hDdjxsvr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=Du9LrcnSmmpQfyk+A9bM7cXw8+S6BiGq/iA3VmlU+QY=; b=hDdjxsvrnDrjTcHeoWHXf/wJbM
-	+LH1dO4eh/QQVhFNjbebh0t80sOJG9P9wy+qG88b8Jpf5MDdoiW0PKyODRl89vRbne8srmgsxqjze
-	4bKMLDmoF79HZ7wjPOB/TZDUmeepupQVTtWxLKRRBYnSyxPl5yO8PGyPhZJd7/uqzztQmT/h2dtD7
-	dqknCDv3S3Nljf8j/Th3loZDOfCsQvR2Nr3IxyrM9wm9VCyUVdnAe+eQFVO8/r59Qne6jv/VNOm7z
-	ZW96QTSfHhErE0hfb5PcBrtCNZlGjPvktfT8mJ4C0PrO3GBdzk6nIRSCDyYeCQvdsz6f2akvZiNYo
-	s78ZlglA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u1npt-00000000oqp-2zxf;
-	Mon, 07 Apr 2025 14:52:29 +0000
-Date: Mon, 7 Apr 2025 07:52:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: linan666@huaweicloud.com
-Cc: axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, hare@suse.de,
-	martin.petersen@oracle.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	yangerkun@huawei.com, zhangxiaoxu5@huawei.com, wanghai38@huawei.com
-Subject: Re: [PATCH 1/4] block: factor out a helper to set logical/physical
- block size
-Message-ID: <Z_PmrUtXtCY6FCcw@infradead.org>
-References: <20250304121918.3159388-1-linan666@huaweicloud.com>
- <20250304121918.3159388-2-linan666@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKZcriyw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744037657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hC74ZWpJwv2xPVhirkcEsv8uJ88JkcJRmVIbBjZ0OYM=;
+	b=fKZcriywkIFppcVNkTrlKxPsLLFfmQltU/nPcJnkpDFflR8cjpOhFx2p1J3KfwgHnhylZ6
+	I/7tJchUsM9zXHZ0PwsR7tr3FC7ypZlUe6LoJ305Ma0YfIQg5kIgdZMDxXxs/ZE8JI3gXr
+	4ZChpwyqT6y9kvnX92AzmThHUwQMjZw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-b4idOAm7PPq9cpXZQ06EMg-1; Mon,
+ 07 Apr 2025 10:54:13 -0400
+X-MC-Unique: b4idOAm7PPq9cpXZQ06EMg-1
+X-Mimecast-MFC-AGG-ID: b4idOAm7PPq9cpXZQ06EMg_1744037651
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF6F5180882E;
+	Mon,  7 Apr 2025 14:54:11 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.14])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8814F3001D14;
+	Mon,  7 Apr 2025 14:54:07 +0000 (UTC)
+Date: Mon, 7 Apr 2025 22:54:01 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	syzbot+9dd7dbb1a4b915dee638@syzkaller.appspotmail.com
+Subject: Re: [PATCH] loop: replace freezing queue with quiesce when changing
+ loop specific setting
+Message-ID: <Z_PnCUw0eeVdwxxy@fedora>
+References: <20250403105414.1334254-1-ming.lei@redhat.com>
+ <20250404091149.GC12163@lst.de>
+ <Z-_LLTtusK8g0rlM@fedora>
+ <20250407064806.GA18766@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250304121918.3159388-2-linan666@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250407064806.GA18766@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Mar 04, 2025 at 08:19:15PM +0800, linan666@huaweicloud.com wrote:
-> +extern int blk_set_block_size(struct queue_limits *t, unsigned int logical_block_size,
+On Mon, Apr 07, 2025 at 08:48:06AM +0200, Christoph Hellwig wrote:
+> On Fri, Apr 04, 2025 at 08:06:05PM +0800, Ming Lei wrote:
+> > On Fri, Apr 04, 2025 at 11:11:49AM +0200, Christoph Hellwig wrote:
+> > > On Thu, Apr 03, 2025 at 06:54:14PM +0800, Ming Lei wrote:
+> > > > freeze queue should be used for changing block layer generic setting, such
+> > > > as logical block size, PI, ..., and it is enough to quiesce queue for
+> > > > changing loop specific setting.
+> > > 
+> > > Why?  A queue should generally be frozen for any setting affecting the
+> > > I/O path.  Nothing about generic or internal.
+> > 
+> > For any driver specific setting, quiesce is enough, because these settings
+> > are only visible in driver IO code path, quiesce does provide the
+> > required protection exactly.
+> 
+> What are "internal settings" please?  If you change the loop backing
+> file outstanding I/O is relevant.  If you change NVMe ANA or retry
+> policies are relevant as they are checked in the I/O completion handler.
 
-No need for the extern.
+internal setting means the driver internal setting, which is only visible
+for driver.
 
-> +int blk_set_block_size(struct queue_limits *t, unsigned int logical_block_size,
-> +		     unsigned int physical_block_size)
+Here this setting(lo_offset, backing file, dio, ...) won't be used in completion
+handler, so it is fine to use quiesce here for updating these loop specific
+setting.
+
+> 
+> > > This also misses an explanation of what setting this protects and why
+> > > you think this is safe and the sound fix.
+> > 
+> > 1) it is typical queue quiesce use case
+> 
+> What is the typical queue quiesce use case?  Why is it "typical" and
+> why is it safe.
+
+typical quiesce provides sync with driver's ->queue_rq(), and it is typical
+that these driver settings are only used in driver submission code path.
+
+> 
+> > 
+> > 2) loop specific setting is only visible in loop queue_rq() & workfn, and
+> > quiesce does provide the sync for queue_rq()
+> 
+> _What_ loop specific setting.
+
+Any setting is only visible in loop driver, such lo_offset, backing file,
+dio, ...
+
+> 
+> > 3) for driver, quiesce is always preferred over freeze, and freeze is
+> > easily mis-used by driver, you know we have bad driver uses for freeze.
+> 
+> I am actually much more worried about quiesce.  It is much less well
+> defined.
+
+It is widely used, and please see document of blk_mq_quiesce_queue().
 
 
-As Bart said this really needs documentation, both in the commit message
-and the code.  It appears to be a subset of the queue limits stacking,
-but I have no idea why that is needed, and the set_ name also confers
-the wrong implications to me gіven the stacking logic.
-
-> +{
-> +	int ret = 0;
-
-ret is always 0 or -1, so using a bool would be better.
-
-> +	t->max_sectors = blk_round_down_sectors(t->max_sectors, t->logical_block_size);
-> +	t->max_hw_sectors = blk_round_down_sectors(t->max_hw_sectors, t->logical_block_size);
-> +	t->max_dev_sectors = blk_round_down_sectors(t->max_dev_sectors, t->logical_block_size);
-
-Please avoid the overly long lines.
-
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(blk_set_block_size);
-
-At best this should be a EXPORT_SYMBOL_GPL.
+Thanks,
+Ming
 
