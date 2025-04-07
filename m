@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DE1253F0D
-	for <linux-block@vger.kernel.org>; Mon,  7 Apr 2025 13:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD31253F30
+	for <linux-block@vger.kernel.org>; Mon,  7 Apr 2025 13:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744031809; cv=none; b=cvTccjEyUxXqkSzeka/MTWurGIUTh5Mmm9K4zIkwt5dzXOlvkOAradR5+nzeC5kzDNsDpe9T2oVTsnXYLLmH/1+Ex/EkmJoKgSh4xyG6Er8o9QND0/eoITv6pTtMXq11XguiaFx320p87svSrINvqhwVkAa/2mle+bzVIEdJj0w=
+	t=1744031810; cv=none; b=ZzkaxU72PwIXljeZV8RSZFeLUcX1KqkcJos8w5niulMuUC9FWcCDi5O+v0X2rs2DhevSTKi4NGEmSNyTbcGxFRq8nXbs1mhVSM6G3HhGjJIRhfvE+Fl+KZwksba/nQMbtNP2DVkoiKyOJt1yglcHNAoxWxOV+1ieaN/1RkvbS9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744031809; c=relaxed/simple;
-	bh=AqVLJzp+k9sKIx1lFAtIGJO/vdKumpDq+hH08XWyyao=;
+	s=arc-20240116; t=1744031810; c=relaxed/simple;
+	bh=y+INYGaY7eRlftALmsGI6KDeG8psb/ODLKuDm7EhXrk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tCm6BOV6yHvTWaGwh1j19RShPqgSAZR+P7fPU4VYBB0hHwLRBSaGtvH9CB6SBB4hZK0bGbeSazqkcM4Gwa2Z/7+MzrGX2uCQzJcAA0zcN3jg4niHm7yy9WxVZFJPYBK/Wy3U9W1ATncvI4uqTU2P601AOFAHQpJX/J0udF5tEOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e8xTCS5q; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=kA6vCGPSxnOGz3Zqq2S4UlZ2ZTFVLWwaoFXXsEDg6TEPtg9o8lHvIqOeA+M0ZkNznIiI87E8lijjJnMo59qOx9ZOSKgDc1uMD8JMZaJXvmYWkrbKAbcAQO874/Gzbuk+vNmhhV7R3CBJbrvfDOb+h3AQDJ6C+rOa37HRg8IDqhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bihlq4r7; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8xTCS5q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bihlq4r7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744031806;
+	s=mimecast20190719; t=1744031807;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9CR5/NcCOUu7uSNDryNPBGPUUmiW6o1YhCyLYh3mx2Y=;
-	b=e8xTCS5qGV5JYqvpChUzPGNeCgYTokjNDvupTKfD8yR5QA3tdjvJg2RsGS3UIReBscxSWl
-	/xlANrE7Z+HhaaEGHXCV2xzLmhHDliRGP63CN3xbogD9H2kWunazj0MIsedtnMWz/PHem0
-	yzBMIG6nw7r2Pc5eM2QVFiga67CZ704=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=SR9WADw+KQLct1hA1kd/FlvNmOVOftqlnh1ztFTro5s=;
+	b=bihlq4r7qn7CGae/Au69EpdClHqOdv+QwqUsJ0N5LH7RCwAkCPU1EYYjHmVyOEc/CFPVc/
+	yvlaA025EnfHSS58gmKd36YTbs/YWVW3SZA1D+Mbjenzui7cMLAX/59p0OjfMSOg2HXJaQ
+	DYt6Ct5F+vniQ2jMy/leYarQaGAa+Cs=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-pyLoih-QOmWs9P7CMEqJzA-1; Mon,
- 07 Apr 2025 09:16:41 -0400
-X-MC-Unique: pyLoih-QOmWs9P7CMEqJzA-1
-X-Mimecast-MFC-AGG-ID: pyLoih-QOmWs9P7CMEqJzA_1744031800
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-54-_QHtEddWMoirH4bJfl4rtA-1; Mon,
+ 07 Apr 2025 09:16:46 -0400
+X-MC-Unique: _QHtEddWMoirH4bJfl4rtA-1
+X-Mimecast-MFC-AGG-ID: _QHtEddWMoirH4bJfl4rtA_1744031805
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5288F180AF50;
-	Mon,  7 Apr 2025 13:16:40 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5311B1956087;
+	Mon,  7 Apr 2025 13:16:45 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.16])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1DE1D19560AD;
-	Mon,  7 Apr 2025 13:16:38 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 24C7E1801A6D;
+	Mon,  7 Apr 2025 13:16:43 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 11/13] selftests: ublk: support target specific command line
-Date: Mon,  7 Apr 2025 21:15:22 +0800
-Message-ID: <20250407131526.1927073-12-ming.lei@redhat.com>
+Subject: [PATCH 12/13] selftests: ublk: support user recovery
+Date: Mon,  7 Apr 2025 21:15:23 +0800
+Message-ID: <20250407131526.1927073-13-ming.lei@redhat.com>
 In-Reply-To: <20250407131526.1927073-1-ming.lei@redhat.com>
 References: <20250407131526.1927073-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,235 +60,408 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Support target specific command line for making related command line code
-handling more readable & clean.
+Add user recovery feature.
 
-Also helps for adding new features.
+Meantime add user recovery test: generic_04 and generic_05(zero copy)
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/kublk.c  | 59 +++++++++++++++++++++++----
- tools/testing/selftests/ublk/kublk.h  | 20 +++++++--
- tools/testing/selftests/ublk/stripe.c | 28 ++++++++++++-
- 3 files changed, 95 insertions(+), 12 deletions(-)
+ tools/testing/selftests/ublk/Makefile         |  2 +
+ tools/testing/selftests/ublk/kublk.c          | 96 +++++++++++++++++--
+ tools/testing/selftests/ublk/kublk.h          |  1 +
+ tools/testing/selftests/ublk/test_common.sh   | 57 ++++++++++-
+ .../testing/selftests/ublk/test_generic_04.sh | 40 ++++++++
+ .../testing/selftests/ublk/test_generic_05.sh | 44 +++++++++
+ 6 files changed, 230 insertions(+), 10 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_04.sh
+ create mode 100755 tools/testing/selftests/ublk/test_generic_05.sh
 
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 7311e8f6bee7..d93373384e93 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -6,6 +6,8 @@ LDLIBS += -lpthread -lm -luring
+ TEST_PROGS := test_generic_01.sh
+ TEST_PROGS += test_generic_02.sh
+ TEST_PROGS += test_generic_03.sh
++TEST_PROGS += test_generic_04.sh
++TEST_PROGS += test_generic_05.sh
+ 
+ TEST_PROGS += test_null_01.sh
+ TEST_PROGS += test_null_02.sh
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 11cc8a1df2b8..2e1963bee21c 100644
+index 2e1963bee21c..677a0ba79f09 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -5,6 +5,8 @@
- 
- #include "kublk.h"
- 
-+#define MAX_NR_TGT_ARG 	64
-+
- unsigned int ublk_dbg_mask = UBLK_LOG;
- static const struct ublk_tgt_ops *tgt_ops_list[] = {
- 	&null_tgt_ops,
-@@ -1203,12 +1205,25 @@ static int cmd_dev_get_features(void)
- 
- static int cmd_dev_help(char *exe)
- {
--	printf("%s add -t [null|loop] [-q nr_queues] [-d depth] [-n dev_id] [backfile1] [backfile2] ...\n", exe);
--	printf("\t default: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
-+	int i;
-+
-+	printf("%s add -t [null|loop|stripe] [-q nr_queues] [-d depth] [-n dev_id]\n", exe);
-+	printf("\t[--foreground] [--quiet] [-z] [--debug_mask mask]\n");
-+	printf("\t[target options] [backfile1] [backfile2] ...\n");
-+	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
-+
-+	for (i = 0; i < sizeof(tgt_ops_list) / sizeof(tgt_ops_list[0]); i++) {
-+		const struct ublk_tgt_ops *ops = tgt_ops_list[i];
-+
-+		if (ops->usage)
-+			ops->usage(ops);
-+	}
-+	printf("\n");
-+
- 	printf("%s del [-n dev_id] -a \n", exe);
--	printf("\t -a delete all devices -n delete specified device\n");
-+	printf("\t -a delete all devices -n delete specified device\n\n");
- 	printf("%s list [-n dev_id] -a \n", exe);
--	printf("\t -a list all devices, -n list specified device, default -a \n");
-+	printf("\t -a list all devices, -n list specified device, default -a \n\n");
- 	printf("%s features\n", exe);
- 	return 0;
+@@ -119,6 +119,27 @@ static int ublk_ctrl_start_dev(struct ublk_dev *dev,
+ 	return __ublk_ctrl_cmd(dev, &data);
  }
-@@ -1225,9 +1240,9 @@ int main(int argc, char *argv[])
+ 
++static int ublk_ctrl_start_user_recovery(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_START_USER_RECOVERY,
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++static int ublk_ctrl_end_user_recovery(struct ublk_dev *dev, int daemon_pid)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_END_USER_RECOVERY,
++		.flags	= CTRL_CMD_HAS_DATA,
++	};
++
++	dev->dev_info.ublksrv_pid = data.data[0] = daemon_pid;
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
+ static int ublk_ctrl_add_dev(struct ublk_dev *dev)
+ {
+ 	struct ublk_ctrl_cmd_data data = {
+@@ -812,8 +833,12 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
+ 	free(affinity_buf);
+ 
+ 	/* everything is fine now, start us */
+-	ublk_set_parameters(dev);
+-	ret = ublk_ctrl_start_dev(dev, getpid());
++	if (ctx->recovery)
++		ret = ublk_ctrl_end_user_recovery(dev, getpid());
++	else {
++		ublk_set_parameters(dev);
++		ret = ublk_ctrl_start_dev(dev, getpid());
++	}
+ 	if (ret < 0) {
+ 		ublk_err("%s: ublk_ctrl_start_dev failed: %d\n", __func__, ret);
+ 		goto fail;
+@@ -988,7 +1013,10 @@ static int __cmd_dev_add(const struct dev_ctx *ctx)
+ 		}
+ 	}
+ 
+-	ret = ublk_ctrl_add_dev(dev);
++	if (ctx->recovery)
++		ret = ublk_ctrl_start_user_recovery(dev);
++	else
++		ret = ublk_ctrl_add_dev(dev);
+ 	if (ret < 0) {
+ 		ublk_err("%s: can't add dev id %d, type %s ret %d\n",
+ 				__func__, dev_id, tgt_type, ret);
+@@ -1203,12 +1231,14 @@ static int cmd_dev_get_features(void)
+ 	return ret;
+ }
+ 
+-static int cmd_dev_help(char *exe)
++static void __cmd_create_help(char *exe, bool recovery)
+ {
+ 	int i;
+ 
+-	printf("%s add -t [null|loop|stripe] [-q nr_queues] [-d depth] [-n dev_id]\n", exe);
+-	printf("\t[--foreground] [--quiet] [-z] [--debug_mask mask]\n");
++	printf("%s %s -t [null|loop|stripe] [-q nr_queues] [-d depth] [-n dev_id]\n",
++			exe, recovery ? "recover" : "add");
++	printf("\t[--foreground] [--quiet] [-z] [--debug_mask mask] [-r 0|1 ] [-g 0|1]\n");
++	printf("\t[-e 0|1 ] [-i 0|1]\n");
+ 	printf("\t[target options] [backfile1] [backfile2] ...\n");
+ 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
+ 
+@@ -1218,7 +1248,25 @@ static int cmd_dev_help(char *exe)
+ 		if (ops->usage)
+ 			ops->usage(ops);
+ 	}
++}
++
++static void cmd_add_help(char *exe)
++{
++	__cmd_create_help(exe, false);
++	printf("\n");
++}
++
++static void cmd_recover_help(char *exe)
++{
++	__cmd_create_help(exe, true);
++	printf("\tPlease provide exact command line for creating this device with real dev_id\n");
+ 	printf("\n");
++}
++
++static int cmd_dev_help(char *exe)
++{
++	cmd_add_help(exe);
++	cmd_recover_help(exe);
+ 
+ 	printf("%s del [-n dev_id] -a \n", exe);
+ 	printf("\t -a delete all devices -n delete specified device\n\n");
+@@ -1240,6 +1288,10 @@ int main(int argc, char *argv[])
  		{ "quiet",		0,	NULL,  0  },
  		{ "zero_copy",          0,      NULL, 'z' },
  		{ "foreground",		0,	NULL,  0  },
--		{ "chunk_size", 	1,	NULL,  0  },
++		{ "recovery", 		1,      NULL, 'r' },
++		{ "recovery_fail_io",	1,	NULL, 'e'},
++		{ "recovery_reissue",	1,	NULL, 'i'},
++		{ "get_data",		1,	NULL, 'g'},
  		{ 0, 0, 0, 0 }
  	};
-+	const struct ublk_tgt_ops *ops = NULL;
- 	int option_idx, opt;
- 	const char *cmd = argv[1];
- 	struct dev_ctx ctx = {
-@@ -1235,13 +1250,15 @@ int main(int argc, char *argv[])
- 		.nr_hw_queues	=	2,
- 		.dev_id		=	-1,
- 		.tgt_type	=	"unknown",
--		.chunk_size 	= 	65536, 	/* def chunk size is 64K */
- 	};
+ 	const struct ublk_tgt_ops *ops = NULL;
+@@ -1254,13 +1306,14 @@ int main(int argc, char *argv[])
  	int ret = -EINVAL, i;
-+	int tgt_argc = 1;
-+	char *tgt_argv[MAX_NR_TGT_ARG] = { NULL };
+ 	int tgt_argc = 1;
+ 	char *tgt_argv[MAX_NR_TGT_ARG] = { NULL };
++	int value;
  
  	if (argc == 1)
  		return ret;
  
-+	opterr = 0;
+ 	opterr = 0;
  	optind = 2;
- 	while ((opt = getopt_long(argc, argv, "t:n:d:q:az",
+-	while ((opt = getopt_long(argc, argv, "t:n:d:q:az",
++	while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:az",
  				  longopts, &option_idx)) != -1) {
-@@ -1272,8 +1289,26 @@ int main(int argc, char *argv[])
- 				ublk_dbg_mask = 0;
- 			if (!strcmp(longopts[option_idx].name, "foreground"))
- 				ctx.fg = 1;
--			if (!strcmp(longopts[option_idx].name, "chunk_size"))
--				ctx.chunk_size = strtol(optarg, NULL, 10);
+ 		switch (opt) {
+ 		case 'a':
+@@ -1282,6 +1335,25 @@ int main(int argc, char *argv[])
+ 		case 'z':
+ 			ctx.flags |= UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_USER_COPY;
+ 			break;
++		case 'r':
++			value = strtol(optarg, NULL, 10);
++			if (value)
++				ctx.flags |= UBLK_F_USER_RECOVERY;
 +			break;
-+		case '?':
-+			/*
-+			 * target requires every option must have argument
-+			 */
-+			if (argv[optind][0] == '-' || argv[optind - 1][0] != '-') {
-+				fprintf(stderr, "every target option requires argument: %s %s\n",
-+						argv[optind - 1], argv[optind]);
-+				exit(EXIT_FAILURE);
-+			}
-+
-+			if (tgt_argc < (MAX_NR_TGT_ARG - 1) / 2) {
-+				tgt_argv[tgt_argc++] = argv[optind - 1];
-+				tgt_argv[tgt_argc++] = argv[optind];
-+			} else {
-+				fprintf(stderr, "too many target options\n");
-+				exit(EXIT_FAILURE);
-+			}
-+			optind += 1;
++		case 'e':
++			value = strtol(optarg, NULL, 10);
++			if (value)
++				ctx.flags |= UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_FAIL_IO;
 +			break;
- 		}
- 	}
++		case 'i':
++			value = strtol(optarg, NULL, 10);
++			if (value)
++				ctx.flags |= UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_REISSUE;
++			break;
++		case 'g':
++			value = strtol(optarg, NULL, 10);
++			if (value)
++				ctx.flags |= UBLK_F_NEED_GET_DATA;
+ 		case 0:
+ 			if (!strcmp(longopts[option_idx].name, "debug_mask"))
+ 				ublk_dbg_mask = strtol(optarg, NULL, 16);
+@@ -1327,7 +1399,15 @@ int main(int argc, char *argv[])
  
-@@ -1282,6 +1317,14 @@ int main(int argc, char *argv[])
- 		ctx.files[ctx.nr_files++] = argv[i++];
- 	}
- 
-+	ops = ublk_find_tgt(ctx.tgt_type);
-+	if (ops && ops->parse_cmd_line) {
-+		optind = 0;
-+
-+		tgt_argv[0] = ctx.tgt_type;
-+		ops->parse_cmd_line(&ctx, tgt_argc, tgt_argv);
-+	}
-+
  	if (!strcmp(cmd, "add"))
  		ret = cmd_dev_add(&ctx);
- 	else if (!strcmp(cmd, "del"))
+-	else if (!strcmp(cmd, "del"))
++	else if (!strcmp(cmd, "recover")) {
++		if (ctx.dev_id < 0) {
++			fprintf(stderr, "device id isn't provided for recovering\n");
++			ret = -EINVAL;
++		} else {
++			ctx.recovery = 1;
++			ret = cmd_dev_add(&ctx);
++		}
++	} else if (!strcmp(cmd, "del"))
+ 		ret = cmd_dev_del(&ctx);
+ 	else if (!strcmp(cmd, "list")) {
+ 		ctx.all = 1;
 diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 5b6b473e1c9a..96a5eff436b3 100644
+index 96a5eff436b3..f5bf38d1da36 100644
 --- a/tools/testing/selftests/ublk/kublk.h
 +++ b/tools/testing/selftests/ublk/kublk.h
-@@ -61,6 +61,11 @@
- struct ublk_dev;
- struct ublk_queue;
- 
-+struct stripe_ctx {
-+	/* stripe */
-+	unsigned int    chunk_size;
-+};
-+
- struct dev_ctx {
- 	char tgt_type[16];
- 	unsigned long flags;
-@@ -73,14 +78,15 @@ struct dev_ctx {
+@@ -77,6 +77,7 @@ struct dev_ctx {
+ 	unsigned int	logging:1;
  	unsigned int	all:1;
  	unsigned int	fg:1;
++	unsigned int	recovery:1;
  
--	/* stripe */
--	unsigned int    chunk_size;
--
  	int _evtfd;
  	int _shmid;
- 
- 	/* built from shmem, only for ublk_dump_dev() */
- 	struct ublk_dev *shadow_dev;
-+
-+	union {
-+		struct stripe_ctx  stripe;
-+	};
- };
- 
- struct ublk_ctrl_cmd_data {
-@@ -117,6 +123,14 @@ struct ublk_tgt_ops {
- 	int (*queue_io)(struct ublk_queue *, int tag);
- 	void (*tgt_io_done)(struct ublk_queue *,
- 			int tag, const struct io_uring_cqe *);
-+
-+	/*
-+	 * Target specific command line handling
-+	 *
-+	 * each option requires argument for target command line
-+	 */
-+	void (*parse_cmd_line)(struct dev_ctx *ctx, int argc, char *argv[]);
-+	void (*usage)(const struct ublk_tgt_ops *ops);
- };
- 
- struct ublk_tgt {
-diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
-index 179731c3dd6f..5dbd6392d83d 100644
---- a/tools/testing/selftests/ublk/stripe.c
-+++ b/tools/testing/selftests/ublk/stripe.c
-@@ -281,7 +281,7 @@ static int ublk_stripe_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 			.max_sectors = dev->dev_info.max_io_buf_bytes >> 9,
- 		},
- 	};
--	unsigned chunk_size = ctx->chunk_size;
-+	unsigned chunk_size = ctx->stripe.chunk_size;
- 	struct stripe_conf *conf;
- 	unsigned chunk_shift;
- 	loff_t bytes = 0;
-@@ -344,10 +344,36 @@ static void ublk_stripe_tgt_deinit(struct ublk_dev *dev)
- 	backing_file_tgt_deinit(dev);
+diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
+index 87fd0c824b77..e822b2a2729a 100755
+--- a/tools/testing/selftests/ublk/test_common.sh
++++ b/tools/testing/selftests/ublk/test_common.sh
+@@ -169,8 +169,11 @@ _have_feature()
+ 	return 1
  }
  
-+static void ublk_stripe_cmd_line(struct dev_ctx *ctx, int argc, char *argv[])
-+{
-+	static const struct option longopts[] = {
-+		{ "chunk_size", 	1,	NULL,  0  },
-+		{ 0, 0, 0, 0 }
-+	};
-+	int option_idx, opt;
+-_add_ublk_dev() {
++_create_ublk_dev() {
+ 	local dev_id;
++	local cmd=$1
 +
-+	ctx->stripe.chunk_size = 65536;
-+	while ((opt = getopt_long(argc, argv, "",
-+				  longopts, &option_idx)) != -1) {
-+		switch (opt) {
-+		case 0:
-+			if (!strcmp(longopts[option_idx].name, "chunk_size"))
-+				ctx->stripe.chunk_size = strtol(optarg, NULL, 10);
-+		}
-+	}
++	shift 1
+ 
+ 	if [ ! -c /dev/ublk-control ]; then
+ 		return ${UBLK_SKIP_CODE}
+@@ -181,7 +184,7 @@ _add_ublk_dev() {
+ 		fi
+ 	fi
+ 
+-	if ! dev_id=$("${UBLK_PROG}" add "$@" | grep "dev id" | awk -F '[ :]' '{print $3}'); then
++	if ! dev_id=$("${UBLK_PROG}" "$cmd" "$@" | grep "dev id" | awk -F '[ :]' '{print $3}'); then
+ 		echo "fail to add ublk dev $*"
+ 		return 255
+ 	fi
+@@ -194,6 +197,23 @@ _add_ublk_dev() {
+ 	fi
+ }
+ 
++_add_ublk_dev() {
++	_create_ublk_dev "add" "$@"
 +}
 +
-+static void ublk_stripe_usage(const struct ublk_tgt_ops *ops)
-+{
-+	printf("\tstripe: [--chunk_size chunk_size (default 65536)]\n");
++_recover_ublk_dev() {
++	local dev_id
++	local state
++
++	dev_id=$(_create_ublk_dev "recover" "$@")
++	for ((j=0;j<20;j++)); do
++		state=$(_get_ublk_dev_state "${dev_id}")
++		[ "$state" == "LIVE" ] && break
++		sleep 1
++	done
++	echo "$state"
 +}
 +
- const struct ublk_tgt_ops stripe_tgt_ops = {
- 	.name = "stripe",
- 	.init_tgt = ublk_stripe_tgt_init,
- 	.deinit_tgt = ublk_stripe_tgt_deinit,
- 	.queue_io = ublk_stripe_queue_io,
- 	.tgt_io_done = ublk_stripe_io_done,
-+	.parse_cmd_line = ublk_stripe_cmd_line,
-+	.usage = ublk_stripe_usage,
- };
+ # kill the ublk daemon and return ublk device state
+ __ublk_kill_daemon()
+ {
+@@ -280,6 +300,39 @@ run_io_and_kill_daemon()
+ 	fi
+ }
+ 
++run_io_and_recover()
++{
++	local state
++	local dev_id
++
++	dev_id=$(_add_ublk_dev "$@")
++	_check_add_dev "$TID" $?
++
++	fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio \
++		--rw=readwrite --iodepth=256 --size="${size}" --numjobs=4 \
++		--runtime=20 --time_based > /dev/null 2>&1 &
++	sleep 4
++
++	state=$(__ublk_kill_daemon "${dev_id}" "QUIESCED")
++	if [ "$state" != "QUIESCED" ]; then
++		echo "device isn't quiesced($state) after killing daemon"
++		return 255
++	fi
++
++	state=$(_recover_ublk_dev -n "$dev_id" "$@")
++	if [ "$state" != "LIVE" ]; then
++		echo "faile to recover to LIVE($state)"
++		return 255
++	fi
++
++	if ! __remove_ublk_dev_return "${dev_id}"; then
++		echo "delete dev ${dev_id} failed"
++		return 255
++	fi
++	wait
++}
++
++
+ _ublk_test_top_dir()
+ {
+ 	cd "$(dirname "$0")" && pwd
+diff --git a/tools/testing/selftests/ublk/test_generic_04.sh b/tools/testing/selftests/ublk/test_generic_04.sh
+new file mode 100755
+index 000000000000..8a3bc080c577
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_04.sh
+@@ -0,0 +1,40 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++TID="generic_04"
++ERR_CODE=0
++
++ublk_run_recover_test()
++{
++	run_io_and_recover "$@"
++	ERR_CODE=$?
++	if [ ${ERR_CODE} -ne 0 ]; then
++		echo "$TID failure: $*"
++		_show_result $TID $ERR_CODE
++	fi
++}
++
++if ! _have_program fio; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "recover" "basic recover function verification"
++
++_create_backfile 0 256M
++_create_backfile 1 128M
++_create_backfile 2 128M
++
++ublk_run_recover_test -t null -q 2 -r 1 &
++ublk_run_recover_test -t loop -q 2 -r 1 "${UBLK_BACKFILES[0]}" &
++ublk_run_recover_test -t stripe -q 2 -r 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++wait
++
++ublk_run_recover_test -t null -q 2 -r 1 -i 1 &
++ublk_run_recover_test -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
++ublk_run_recover_test -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++wait
++
++_cleanup_test "recover"
++_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_generic_05.sh b/tools/testing/selftests/ublk/test_generic_05.sh
+new file mode 100755
+index 000000000000..714630b4b329
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_05.sh
+@@ -0,0 +1,44 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++TID="generic_04"
++ERR_CODE=0
++
++ublk_run_recover_test()
++{
++	run_io_and_recover "$@"
++	ERR_CODE=$?
++	if [ ${ERR_CODE} -ne 0 ]; then
++		echo "$TID failure: $*"
++		_show_result $TID $ERR_CODE
++	fi
++}
++
++if ! _have_program fio; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++if ! _have_feature "ZERO_COPY"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "recover" "basic recover function verification (zero copy)"
++
++_create_backfile 0 256M
++_create_backfile 1 128M
++_create_backfile 2 128M
++
++ublk_run_recover_test -t null -q 2 -r 1 -z &
++ublk_run_recover_test -t loop -q 2 -r 1 -z "${UBLK_BACKFILES[0]}" &
++ublk_run_recover_test -t stripe -q 2 -r 1 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++wait
++
++ublk_run_recover_test -t null -q 2 -r 1 -z -i 1 &
++ublk_run_recover_test -t loop -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[0]}" &
++ublk_run_recover_test -t stripe -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++wait
++
++_cleanup_test "recover"
++_show_result $TID $ERR_CODE
 -- 
 2.47.0
 
