@@ -1,41 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f98.google.com (mail-qv1-f98.google.com [209.85.219.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C8221B18A;
-	Mon,  7 Apr 2025 19:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C8821ABA3
+	for <linux-block@vger.kernel.org>; Mon,  7 Apr 2025 19:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744053190; cv=none; b=Zyz4Fam2Mg57xVffI1eNs3gESEjEJnta64w7ODQcvmqVJpd8D2kDnMy9EsHXQOTB8cWO+NHpsFH35JR7wM28MAYxCJYRgJ9Tl5GH88xB2fjMHxfwM58o8Fl+ZtgOYz4JzXRZbTrJYLU92W/i0Ntwi+rSrB/R8Klmzmr2qQ8ZcFc=
+	t=1744053401; cv=none; b=ss2CHbLPhvQ/waWHc5iDGv3Y7VPbJkGkVvWExzhRV7gYQwaDVams/Gu+VEP0BnKKmx8aQ6ubb2wMp5tyt3MoSQOTtYCBzb5oxHGuLPZey1wrlPaBMQIl1MPZdoH063vWyqCg46LdcfLS6oi+BIt410j8c9mj9fXw7KshkUU0CvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744053190; c=relaxed/simple;
-	bh=rgPIpw2F1T9FgYHqd7uJN0zkNUTUDI0Hss+Os5iF1AI=;
+	s=arc-20240116; t=1744053401; c=relaxed/simple;
+	bh=jY2Jpd11jcvdDInmM044QbaXxmP7Xos8IFT3u2JvVZs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoatxzAnLA4o9GyHQq/t6d9MVrk+Bwg5GJtYIRDxtSf8Fk/Oudft5MZXnCaWSpxkzSi7tMgrZ6MgZDn0qBhsi1hYHFsxsUJRSiJ9kHd4KJqH2ikpgAPrs7WvxqnQ42lwTqIWdT4D7Y5nUgBIz3eAb/xnDVy/Djtbdd7+uLwKwbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QY3q7hlK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=bndw+tdyuiMlmLq92aeTX+cNiHqR2hqiyePpKZp8EssmtxnO1S+BERDvVVoIi2eD5nFzsEsWz3ddAnKGXl0C+EBklfOmtMHbmUMlLHvIf8Y6cW8qtvWIW/AelFAHkX3ae8UGsHW3WVEY6XyicS9QY4S2bZVZ/pSwn9gsXILgQ4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=D+6mOkbB; arc=none smtp.client-ip=209.85.219.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QY3q7hlK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4684C4CEDD;
-	Mon,  7 Apr 2025 19:13:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744053190;
-	bh=rgPIpw2F1T9FgYHqd7uJN0zkNUTUDI0Hss+Os5iF1AI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QY3q7hlK55IKhaEPhCKBaoXSTZ1efhgEhO/GbmAf2ioh8W3i7JBXLWmPmTyLQBRsW
-	 YIV3mjzamWcAtwNYCWip9EpMOXygLUBo4yU63OlzNStw777ys0ypQOozWjx6bzRZA1
-	 /mrVbmngjFdb1LNvhcK3t7mXHJw/GKGUFoPv0RKKdbvmBgd/45XtRZvuK65NMPpLYA
-	 lwBYnz2dmrG1smGGNkT8uIk/DyzDA5d0QkMm+7RMyYnHldtW9TFcItf2nRgu68KGL/
-	 Ittby44t92B3MwNVFb9FWZMEU5mxEXwLH5+UP0SaLApz7gCzAR8EMyTOF6J6fQ6l1W
-	 NlanUd+P2rQQQ==
-Date: Mon, 7 Apr 2025 09:13:08 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="D+6mOkbB"
+Received: by mail-qv1-f98.google.com with SMTP id 6a1803df08f44-6e900a7ce55so71338806d6.3
+        for <linux-block@vger.kernel.org>; Mon, 07 Apr 2025 12:16:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1744053397; x=1744658197; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T9DeShEzAF15A7h3elAoOuHtSB63WfEr7n2IOVCSLbQ=;
+        b=D+6mOkbBjFUKfUxu08C+7rthQdf0fsnMQ3YLW5g65cxrvFewIB1tZ1JzfPBmOITz3n
+         wska/M7n2C/12tUOnd7ImQzzs5nsGqRDzA/s6wPG68VBGtFCQqn557UqnQ5xbmTIGRSK
+         BlC4OaM8KRFnxF/VBtpuLQFoajw5nnmONjwIegqCRLWbbVNwIhhc2s28t21BflErt6kQ
+         9vOLqYbKcEa4KJO6i2mqARE22m+PN02SrzQvJ6+3iI6j/45ohfrvo88+eSghvfeuWxH6
+         mCFGi1nYRlBQF8l2fNSpJABa377w6sbcKDEbbUJT8ooj1xbYgZahh4dbbZl5j3T2YdDJ
+         Z9tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744053397; x=1744658197;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T9DeShEzAF15A7h3elAoOuHtSB63WfEr7n2IOVCSLbQ=;
+        b=qBlkMmvHeEE5eRAM0HF0WtsmJlnOO5PcnAk8LhF3ptzonZm87rND7WuYRc3/gPufYj
+         S7Ew5ivLQeR7qYjeTXfA3634hyVnXxcHAWDqxWOrTxFM1jDDiH7OTNEEJMRgt3g2cKpn
+         rfS4J+TdMKqy97y9vb4wL0Q4eHnYLftYmAVSFePfGl5fGC6lbltWgbsmPppGykCES1Yd
+         JDSknUswJYZSNS2zB7hRwFWcGHjK89SuHbXrNkh27sCILVA1HXr1/sGvNOy2H52EozgZ
+         BZgLEOHmb6XOief2rz1Ma23cdgDw+U3u2d0SWQsbByTfrLEKKeFBVL6p3qNnbq7vUzI6
+         IhKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWW/QgkkQJKs0giGHLTffzjOjSzc1SoZxvUHJ6Za/Ns3w/dFSKWKQ5vj2fZCXzQmx0+obF5PciL1y3z3Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkZ8HvhIORH1NjCDRIq+l5ppdcuzVTbD1Y+F0N9fmY9mE6fZr6
+	VhaajXuTAiPFCXWWzAt/lIYV+/RpNt64cslH4l9tizQF1EubD7JH6LcQAhmjaEaodDsAInD/lNo
+	crgWSt8xCEjqwJs8z5Zm59Si7gxLX9iAR
+X-Gm-Gg: ASbGncuiEhcVp1SQ0J1J8hPTrqJc4I9Bw4byuEEc39kBpJfFFvTHevb5p9IpqcP+gBQ
+	H8gBZevWiy6XXWY+a3F3JpEtEXUZNr9LddL5tkK2G6OG5Nt+m20Y7VhibxDQYXRC1K767JUo4r0
+	f192zclCmF18hAB1HWdNtkKTZZbzs0Mb3PXw/w5CBoHOQhftUaQr64LhwAByTGNW+1AbqZWRd0o
+	0mciNGghswB9AWOfKHgHG1vc9Am/qmHzoxQr5MWOZgsoSgyCyGkeWzyivK2K9Qa/C49aqvDW8yW
+	PZ7zKkXSN4YMoTCfZSj6zWD6eRJLd7Il/v1fYbroxONo4h6JZQ==
+X-Google-Smtp-Source: AGHT+IEw+cDFq7qfjt6YMbE/RbUbZqe3oMfICqCCsazV7UgcYGsDVX5CAGAaCw0isAWWJ5UG47VSddgPqcW+
+X-Received: by 2002:a05:6214:404:b0:6e8:fee2:aae4 with SMTP id 6a1803df08f44-6f01e769f7cmr214502116d6.28.1744053396742;
+        Mon, 07 Apr 2025 12:16:36 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6ef0f14b0e1sm7785776d6.60.2025.04.07.12.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 12:16:36 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 002603407A8;
+	Mon,  7 Apr 2025 13:16:34 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id E932AE402F2; Mon,  7 Apr 2025 13:16:33 -0600 (MDT)
+Date: Mon, 7 Apr 2025 13:16:33 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RESEND] Circular locking dependency involving, elevator_lock,
- rq_qos_mutex and pcpu_alloc_mutex
-Message-ID: <Z_QjxCZW7dh_v22Z@slm.duckdns.org>
-References: <Z_QjW7zJLsuO0xp6@slm.duckdns.org>
+Subject: Re: [PATCH v3] ublk: improve detection and handling of ublk server
+ exit
+Message-ID: <Z/QkkTRHfRxtN/mB@dev-ushankar.dev.purestorage.com>
+References: <20250403-ublk_timeout-v3-1-aa09f76c7451@purestorage.com>
+ <Z_FFUXINspN8G0y0@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,188 +82,347 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z_QjW7zJLsuO0xp6@slm.duckdns.org>
+In-Reply-To: <Z_FFUXINspN8G0y0@fedora>
 
-[sorry, lost cc list somehow, resending]
+On Sat, Apr 05, 2025 at 10:59:29PM +0800, Ming Lei wrote:
+> On Thu, Apr 03, 2025 at 06:05:57PM -0600, Uday Shankar wrote:
+> > There are currently two ways in which ublk server exit is detected by
+> > ublk_drv:
+> > 
+> > 1. uring_cmd cancellation. If there are any outstanding uring_cmds which
+> >    have not been completed to the ublk server when it exits, io_uring
+> >    calls the uring_cmd callback with a special cancellation flag as the
+> >    issuing task is exiting.
+> > 2. I/O timeout. This is needed in addition to the above to handle the
+> >    "saturated queue" case, when all I/Os for a given queue are in the
+> >    ublk server, and therefore there are no outstanding uring_cmds to
+> >    cancel when the ublk server exits.
+> > 
+> > There are a couple of issues with this approach:
+> > 
+> > - It is complex and inelegant to have two methods to detect the same
+> >   condition
+> > - The second method detects ublk server exit only after a long delay
+> >   (~30s, the default timeout assigned by the block layer). This delays
+> >   the nosrv behavior from kicking in and potential subsequent recovery
+> >   of the device.
+> > 
+> > The second issue is brought to light with the new test_generic_04. It
+> > fails before this fix:
+> > 
+> > selftests: ublk: test_generic_04.sh
+> > dev id is 0
+> > dd: error writing '/dev/ublkb0': Input/output error
+> > 1+0 records in
+> > 0+0 records out
+> > 0 bytes copied, 30.0611 s, 0.0 kB/s
+> > DEAD
+> > dd took 31 seconds to exit (>= 5s tolerance)!
+> > generic_04 : [FAIL]
+> > 
+> > Fix this by instead detecting and handling ublk server exit in the
+> > character file release callback. This has several advantages:
+> > 
+> > - This one place can handle both saturated and unsaturated queues. Thus,
+> >   it replaces both preexisting methods of detecting ublk server exit.
+> > - It runs quickly on ublk server exit - there is no 30s delay.
+> > - It starts the process of removing task references in ublk_drv. This is
+> >   needed if we want to relax restrictions in the driver like letting
+> >   only one thread serve each queue
+> > 
+> > There is also the disadvantage that the character file release callback
+> > can also be triggered by intentional close of the file, which is a
+> > significant behavior change. Preexisting ublk servers (libublksrv) are
+> > dependent on the ability to open/close the file multiple times. To
+> > address this, only transition to a nosrv state if the file is released
+> > while the ublk device is live. This allows for programs to open/close
+> > the file multiple times during setup. It is still a behavior change if a
+> > ublk server decides to close/reopen the file while the device is LIVE
+> > (i.e. while it is responsible for serving I/O), but that would be highly
+> > unusual. This behavior is in line with what is done by FUSE, which is
+> > very similar to ublk in that a userspace daemon is providing services
+> > traditionally provided by the kernel.
+> > 
+> > With this change in, the new test (and all other selftests, and all
+> > ublksrv tests) pass:
+> > 
+> > selftests: ublk: test_generic_04.sh
+> > dev id is 0
+> > dd: error writing '/dev/ublkb0': Input/output error
+> > 1+0 records in
+> > 0+0 records out
+> > 0 bytes copied, 0.0376731 s, 0.0 kB/s
+> > DEAD
+> > generic_04 : [PASS]
+> > 
+> > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> > ---
+> > Changes in v3:
+> > - Quiesce queue earlier to avoid concurrent cancellation and "normal"
+> >   completion of io_uring cmds (Ming Lei)
+> > - Fix del_gendisk hang, found by test_stress_02
+> > - Remove unnecessary parameters in fault_inject target (Ming Lei)
+> > - Fix delay implementation to have separate per-I/O delay instead of
+> >   blocking the whole thread (Ming Lei)
+> > - Add delay_us to docs
+> > - Link to v2: https://lore.kernel.org/r/20250402-ublk_timeout-v2-1-249bc5523000@purestorage.com
+> > 
+> > Changes in v2:
+> > - Leave null ublk selftests target untouched, instead create new
+> >   fault_inject target for injecting per-I/O delay (Ming Lei)
+> > - Allow multiple open/close of ublk character device with some
+> >   restrictions
+> > - Drop patches which made it in separately at https://lore.kernel.org/r/20250401-ublk_selftests-v1-1-98129c9bc8bb@purestorage.com
+> > - Consolidate more nosrv logic in ublk character device release, and
+> >   associated code cleanup
+> > - Link to v1: https://lore.kernel.org/r/20250325-ublk_timeout-v1-0-262f0121a7bd@purestorage.com
+> > ---
+> >  drivers/block/ublk_drv.c                        | 228 +++++++++---------------
+> >  tools/testing/selftests/ublk/Makefile           |   4 +-
+> >  tools/testing/selftests/ublk/fault_inject.c     |  72 ++++++++
+> >  tools/testing/selftests/ublk/kublk.c            |   6 +-
+> >  tools/testing/selftests/ublk/kublk.h            |   4 +
+> >  tools/testing/selftests/ublk/test_generic_04.sh |  43 +++++
+> >  6 files changed, 215 insertions(+), 142 deletions(-)
+> > 
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 2fd05c1bd30b03343cb6f357f8c08dd92ff47af9..73baa9d22ccafb00723defa755a0b3aab7238934 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -162,7 +162,6 @@ struct ublk_queue {
+> >  
+> >  	bool force_abort;
+> >  	bool timeout;
+> > -	bool canceling;
+> >  	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+> >  	unsigned short nr_io_ready;	/* how many ios setup */
+> >  	spinlock_t		cancel_lock;
+> > @@ -199,8 +198,6 @@ struct ublk_device {
+> >  	struct completion	completion;
+> >  	unsigned int		nr_queues_ready;
+> >  	unsigned int		nr_privileged_daemon;
+> > -
+> > -	struct work_struct	nosrv_work;
+> >  };
+> >  
+> >  /* header of ublk_params */
+> > @@ -209,8 +206,9 @@ struct ublk_params_header {
+> >  	__u32	types;
+> >  };
+> >  
+> > -static bool ublk_abort_requests(struct ublk_device *ub, struct ublk_queue *ubq);
+> > -
+> > +static void ublk_stop_dev_unlocked(struct ublk_device *ub);
+> > +static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
+> > +static void __ublk_quiesce_dev(struct ublk_device *ub);
+> >  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+> >  		struct ublk_queue *ubq, int tag, size_t offset);
+> >  static inline unsigned int ublk_req_build_flags(struct request *req);
+> > @@ -1314,8 +1312,6 @@ static void ublk_queue_cmd_list(struct ublk_queue *ubq, struct rq_list *l)
+> >  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+> >  {
+> >  	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+> > -	unsigned int nr_inflight = 0;
+> > -	int i;
+> >  
+> >  	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
+> >  		if (!ubq->timeout) {
+> > @@ -1326,26 +1322,6 @@ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+> >  		return BLK_EH_DONE;
+> >  	}
+> >  
+> > -	if (!ubq_daemon_is_dying(ubq))
+> > -		return BLK_EH_RESET_TIMER;
+> > -
+> > -	for (i = 0; i < ubq->q_depth; i++) {
+> > -		struct ublk_io *io = &ubq->ios[i];
+> > -
+> > -		if (!(io->flags & UBLK_IO_FLAG_ACTIVE))
+> > -			nr_inflight++;
+> > -	}
+> > -
+> > -	/* cancelable uring_cmd can't help us if all commands are in-flight */
+> > -	if (nr_inflight == ubq->q_depth) {
+> > -		struct ublk_device *ub = ubq->dev;
+> > -
+> > -		if (ublk_abort_requests(ub, ubq)) {
+> > -			schedule_work(&ub->nosrv_work);
+> > -		}
+> > -		return BLK_EH_DONE;
+> > -	}
+> > -
+> >  	return BLK_EH_RESET_TIMER;
+> >  }
+> >  
+> > @@ -1356,19 +1332,16 @@ static blk_status_t ublk_prep_req(struct ublk_queue *ubq, struct request *rq)
+> >  	if (unlikely(ubq->fail_io))
+> >  		return BLK_STS_TARGET;
+> >  
+> > -	/* With recovery feature enabled, force_abort is set in
+> > -	 * ublk_stop_dev() before calling del_gendisk(). We have to
+> > -	 * abort all requeued and new rqs here to let del_gendisk()
+> > -	 * move on. Besides, we cannot not call io_uring_cmd_complete_in_task()
+> > -	 * to avoid UAF on io_uring ctx.
+> > +	/*
+> > +	 * force_abort is set in ublk_stop_dev() before calling
+> > +	 * del_gendisk(). We have to abort all requeued and new rqs here
+> > +	 * to let del_gendisk() move on. Besides, we cannot not call
+> > +	 * io_uring_cmd_complete_in_task() to avoid UAF on io_uring ctx.
+> >  	 *
+> >  	 * Note: force_abort is guaranteed to be seen because it is set
+> >  	 * before request queue is unqiuesced.
+> >  	 */
+> > -	if (ublk_nosrv_should_queue_io(ubq) && unlikely(ubq->force_abort))
+> > -		return BLK_STS_IOERR;
+> > -
+> > -	if (unlikely(ubq->canceling))
+> > +	if (unlikely(ubq->force_abort))
+> >  		return BLK_STS_IOERR;
+> >  
+> >  	/* fill iod to slot in io cmd buffer */
+> > @@ -1391,16 +1364,6 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+> >  	if (res != BLK_STS_OK)
+> >  		return res;
+> >  
+> > -	/*
+> > -	 * ->canceling has to be handled after ->force_abort and ->fail_io
+> > -	 * is dealt with, otherwise this request may not be failed in case
+> > -	 * of recovery, and cause hang when deleting disk
+> > -	 */
+> > -	if (unlikely(ubq->canceling)) {
+> > -		__ublk_abort_rq(ubq, rq);
+> > -		return BLK_STS_OK;
+> > -	}
+> > -
+> 
+> If `ubq->canceling` is removed, how to handle recovery? The request has to
+> be requeued in case of ublk_nosrv_dev_should_queue_io().
 
-Hello,
+In the typical case, requests issued after the ublk server dies with
+recovery enabled queue because the request_queue is quiesced. This is
+the same way things worked before this patch. There is an edge case in
+ublk_dispatch_req where we will manually requeue any request that made
+it to task_work but I assume that is not what you are talking about
+here.
 
-Jakub reports the following lockdep splat. It looks like q_usage_counter
-somehow depends on elevator_lock. After your recent changes, iocost init
-path performs memory allocation while holding elevator_lock completing the
-circular dependency.
+The above test you are highlighting looks like dead code anyways. We
+already test ubq->canceling and fail the I/O if it is set in
+ublk_prep_req, so we cannot possibly enter the if statement above.
 
-I don't understand q_usage_counter -> elevator_lock dependency. Where is
-that coming from? Ah, that's q->io_lockdep_map, not the percpu_ref itself. I
-think it's elevator switch acquiring elevator_lock while queue is frozen,
-which puts the elevator_lock depended on from io path, and thus you can't do
-reclaiming memory allocations while holding it.
+> 
+> And that should be the reason why 'make test T=generic/004' hangs forever
+> after applying this patch.
 
-The involved commits are:
+I am not able to reproduce the hang even after increasing LOOPS to 100
+for more repetitions. Can you ensure you have the most recent version of
+the patch? I fixed a similar hang between v2-v3.
 
- 245618f8e45f ("block: protect wbt_lat_usec using q->elevator_lock")
- 9730763f4756 ("block: correct locking order for protecting blk-wbt parameters")
+> 
+> >  	ublk_queue_cmd(ubq, rq);
+> >  	return BLK_STS_OK;
+> >  }
+> > @@ -1461,8 +1424,71 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+> >  static int ublk_ch_release(struct inode *inode, struct file *filp)
+> >  {
+> >  	struct ublk_device *ub = filp->private_data;
+> > +	int i;
+> > +
+> > +	mutex_lock(&ub->mutex);
+> > +	/*
+> > +	 * If the device is not live, we will not transition to a nosrv
+> > +	 * state. This protects against:
+> > +	 * - accidental poking of the ublk character device
+> > +	 * - some ublk servers which may open/close the ublk character
+> > +	 *   device during startup
+> > +	 */
+> > +	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+> > +		goto out;
+> > +
+> > +	/*
+> > +	 * Since we are releasing the ublk character file descriptor, we
+> > +	 * know that there cannot be any concurrent file-related
+> > +	 * activity (e.g. uring_cmds or reads/writes). However, I/O
+> > +	 * might still be getting dispatched. Quiesce that too so that
+> > +	 * we don't need to worry about anything concurrent.
+> > +	 *
+> > +	 * We may have already quiesced the queue if we canceled any
+> > +	 * uring_cmds, so only quiesce if necessary (quiesce is not
+> > +	 * idempotent, it has an internal counter which we need to
+> > +	 * manage carefully).
+> > +	 */
+> > +	if (!blk_queue_quiesced(ub->ub_disk->queue))
+> > +		blk_mq_quiesce_queue(ub->ub_disk->queue);
+> > +
+> > +	/*
+> > +	 * Handle any requests outstanding to the ublk server
+> > +	 */
+> > +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> > +		ublk_abort_queue(ub, ublk_get_queue(ub, i));
+> >  
+> > +	/*
+> > +	 * Transition the device to the nosrv state. What exactly this
+> > +	 * means depends on the recovery flags
+> > +	 */
+> > +	if (ublk_nosrv_should_stop_dev(ub)) {
+> > +		/*
+> > +		 * Allow any pending/future I/O to pass through quickly
+> > +		 * with an error. This is needed because del_gendisk
+> > +		 * waits for all pending I/O to complete
+> > +		 */
+> > +		for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> > +			ublk_get_queue(ub, i)->force_abort = true;
+> > +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> > +
+> > +		ublk_stop_dev_unlocked(ub);
+> > +	} else {
+> > +		if (ublk_nosrv_dev_should_queue_io(ub)) {
+> > +			__ublk_quiesce_dev(ub);
+> 
+> Here only inflight IOs are drained, new IO still comes after queue is
+> unquiesced, then uring_cmd UAF is triggered.
 
-Can you please take a look? It looks like the second one is expanding the
-locking scopes too wide.
+No, I don't think so. There are three cases here, dependent on recovery
+flags:
 
-Thanks.
+- no recovery flags: in this case, force_abort is set before queue is
+  unquiesced, so I/Os will be errored before we try to access the
+  io_uring_cmd
+- just RECOVERY: queue is not actually unquiesced here at all, because
+  there are two quiesce (one above, one inside __ublk_quiesce_dev), and
+  only one unquiesce
+- RECOVERY|FAIL_IO: similar to no recovery flags case, except we are
+  setting fail_io instead of force_abort. The two flags are very similar
+  and we should consolidate in a follow-up patch
 
-[  139.119772] fb-cgroups-setu/1238 is trying to acquire lock:
-[  139.119776] ffffffff867ca448 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+0x96f/0x1000
-[  139.169460] 
-               but task is already holding lock:
-[  139.169462] ffff88813ba10298 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x218/0x2b0
-[  139.217563] 
-               which lock already depends on the new lock.
-[  139.217566] 
-               the existing dependency chain (in reverse order) is:
-[  139.217568] 
-               -> #4 (&q->rq_qos_mutex){+.+.}-{4:4}:
-[  139.217577]        __mutex_lock+0x17b/0x17c0
-[  139.217587]        blkg_conf_open_bdev_frozen+0x218/0x2b0
-[  139.280864]        ioc_qos_write+0xc9/0xbc0
-[  139.280870]        cgroup_file_write+0x1a3/0x6f0
-[  139.280878]        kernfs_fop_write_iter+0x350/0x520
-[  139.280885]        vfs_write+0x9b2/0xf50
-[  139.280891]        ksys_write+0xf3/0x1d0
-[  139.280896]        do_syscall_64+0x6e/0x190
-[  139.280901]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[  139.280906] 
-               -> #3 (&q->elevator_lock){+.+.}-{4:4}:
-[  139.280915]        __mutex_lock+0x17b/0x17c0
-[  139.280919]        blkg_conf_open_bdev_frozen+0x1c8/0x2b0
-[  139.280925]        ioc_qos_write+0xc9/0xbc0
-[  139.280929]        cgroup_file_write+0x1a3/0x6f0
-[  139.280934]        kernfs_fop_write_iter+0x350/0x520
-[  139.280938]        vfs_write+0x9b2/0xf50
-[  139.280943]        ksys_write+0xf3/0x1d0
-[  139.280947]        do_syscall_64+0x6e/0x190
-[  139.280952]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[  139.280956] 
-               -> #2 (&q->q_usage_counter(io)#2){++++}-{0:0}:
-[  139.280965]        blk_alloc_queue+0x5c1/0x700
-[  139.280971]        blk_mq_alloc_queue+0x14c/0x230
-[  139.280978]        __blk_mq_alloc_disk+0x15/0xc0
-[  139.280983]        nvme_alloc_ns+0x21d/0x30f0
-[  139.280988]        nvme_scan_ns+0x4f1/0x850
-[  139.280991]        async_run_entry_fn+0x93/0x4f0
-[  139.280997]        process_one_work+0x89e/0x1910
-[  139.281001]        worker_thread+0x58d/0xcf0
-[  139.281005]        kthread+0x3d5/0x7a0
-[  139.281010]        ret_from_fork+0x2d/0x70
-[  139.281016]        ret_from_fork_asm+0x11/0x20
-[  139.281023] 
-               -> #1 (fs_reclaim){+.+.}-{0:0}:
-[  139.281031]        fs_reclaim_acquire+0xff/0x150
-[  139.281037]        __kmalloc_noprof+0xa9/0x5f0
-[  139.281042]        pcpu_create_chunk+0x23/0x6e0
-[  139.281049]        pcpu_alloc_noprof+0xd34/0x1000
-[  139.281054]        bts_init+0xaa/0x180
-[  139.281060]        do_one_initcall+0xfa/0x500
-[  139.281065]        kernel_init_freeable+0x4af/0x6d0
-[  139.281070]        kernel_init+0x1b/0x1d0
-[  139.281074]        ret_from_fork+0x2d/0x70
-[  139.281078]        ret_from_fork_asm+0x11/0x20
-[  139.281083] 
-               -> #0 (pcpu_alloc_mutex){+.+.}-{4:4}:
-[  139.281091]        __lock_acquire+0x1569/0x2640
-[  139.281097]        lock_acquire+0x179/0x330
-[  139.281102]        __mutex_lock+0x17b/0x17c0
-[  139.281106]        pcpu_alloc_noprof+0x96f/0x1000
-[  139.281111]        blk_iocost_init+0x6f/0x820
-[  139.281116]        ioc_qos_write+0x468/0xbc0
-[  139.281120]        cgroup_file_write+0x1a3/0x6f0
-[  139.281125]        kernfs_fop_write_iter+0x350/0x520
-[  139.281130]        vfs_write+0x9b2/0xf50
-[  139.281134]        ksys_write+0xf3/0x1d0
-[  139.281138]        do_syscall_64+0x6e/0x190
-[  139.281143]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[  139.281147] 
-               other info that might help us debug this:
-[  139.281149] Chain exists of:
-                 pcpu_alloc_mutex --> &q->elevator_lock --> &q->rq_qos_mutex
-[  139.281158]  Possible unsafe locking scenario:
-[  139.281159]        CPU0                    CPU1
-[  139.281161]        ----                    ----
-[  139.281162]   lock(&q->rq_qos_mutex);
-[  139.281166]                                lock(&q->elevator_lock);
-[  139.281170]                                lock(&q->rq_qos_mutex);
-[  139.281174]   lock(pcpu_alloc_mutex);
-[  139.281178] 
-                *** DEADLOCK ***
-[  139.281179] 8 locks held by fb-cgroups-setu/1238:
-[  139.281183]  #0: ffff888114b3aaf8 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x22c/0x2e0
-[  139.281197]  #1: ffff888148a7c400 (sb_writers#8){.+.+}-{0:0}, at: ksys_write+0xf3/0x1d0
-[  139.281210]  #2: ffff88819c5a1088 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x212/0x520
-[  139.281223]  #3: ffff888124ec8b48 (kn->active#101){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x235/0x520
-[  139.281236]  #4: ffff88813ba100a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
-[  139.281249]  #5: ffff88813ba100e0 (&q->q_usage_counter(queue)#2){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
-[  139.281262]  #6: ffff88813ba105c0 (&q->elevator_lock){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x1c8/0x2b0
-[  139.281275]  #7: ffff88813ba10298 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x218/0x2b0
-[  139.281286] 
-               stack backtrace:
-[  139.281291] CPU: 34 UID: 0 PID: 1238 Comm: fb-cgroups-setu Tainted: G                 N  6.14.0-13254-g2ecc111972cc #114 PREEMPT(undef) 
-[  139.281299] Tainted: [N]=TEST
-[  139.281301] Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
-[  139.281304] Call Trace:
-[  139.281307]  <TASK>
-[  139.281309]  dump_stack_lvl+0x7e/0xc0
-[  139.281318]  print_circular_bug+0x2d8/0x410
-[  139.281326]  check_noncircular+0x12b/0x140
-[  139.281336]  __lock_acquire+0x1569/0x2640
-[  139.281348]  lock_acquire+0x179/0x330
-[  139.281353]  ? pcpu_alloc_noprof+0x96f/0x1000
-[  139.281365]  __mutex_lock+0x17b/0x17c0
-[  139.281370]  ? pcpu_alloc_noprof+0x96f/0x1000
-[  139.281375]  ? __kasan_kmalloc+0x77/0x90
-[  139.281380]  ? ioc_qos_write+0x468/0xbc0
-[  139.281384]  ? cgroup_file_write+0x1a3/0x6f0
-[  139.281390]  ? pcpu_alloc_noprof+0x96f/0x1000
-[  139.281395]  ? ksys_write+0xf3/0x1d0
-[  139.281399]  ? do_syscall_64+0x6e/0x190
-[  139.281404]  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[  139.281411]  ? mutex_lock_io_nested+0x1570/0x1570
-[  139.281418]  ? do_raw_spin_lock+0x12c/0x270
-[  139.281425]  ? find_held_lock+0x2b/0x80
-[  139.281432]  ? mark_held_locks+0x49/0x70
-[  139.281437]  ? _raw_spin_unlock_irqrestore+0x55/0x70
-[  139.281442]  ? lockdep_hardirqs_on+0x78/0x100
-[  139.281449]  ? pcpu_alloc_noprof+0x96f/0x1000
-[  139.281454]  pcpu_alloc_noprof+0x96f/0x1000
-[  139.281465]  ? kasan_save_track+0x10/0x30
-[  139.281471]  blk_iocost_init+0x6f/0x820
-[  139.281480]  ioc_qos_write+0x468/0xbc0
-[  139.281485]  ? __lock_acquire+0x42c/0x2640
-[  139.281494]  ? ioc_cost_model_write+0x7a0/0x7a0
-[  139.281501]  ? __lock_acquire+0x42c/0x2640
-[  139.281509]  ? rcu_is_watching+0x11/0xb0
-[  139.281519]  ? find_held_lock+0x2b/0x80
-[  139.281525]  ? kernfs_root+0xb2/0x1c0
-[  139.281532]  ? kernfs_root+0xbc/0x1c0
-[  139.281539]  cgroup_file_write+0x1a3/0x6f0
-[  139.281546]  ? cgroup_addrm_files+0xa90/0xa90
-[  139.281552]  ? __virt_addr_valid+0x1e1/0x3c0
-[  139.281563]  ? cgroup_addrm_files+0xa90/0xa90
-[  139.281568]  kernfs_fop_write_iter+0x350/0x520
-[  139.281576]  vfs_write+0x9b2/0xf50
-[  139.281583]  ? kernel_write+0x550/0x550
-[  139.281600]  ksys_write+0xf3/0x1d0
-[  139.281606]  ? __ia32_sys_read+0xa0/0xa0
-[  139.281611]  ? rcu_is_watching+0x11/0xb0
-[  139.281620]  do_syscall_64+0x6e/0x190
-[  139.281626]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[  139.281631] RIP: 0033:0x7f9d58116f8d
-[  139.281643] Code: e5 48 83 ec 20 48 89 55 e8 48 89 75 f0 89 7d f8 e8 a8 ca f7 ff 41 89 c0 48 8b 55 e8 48 8b 75 f0 8b 7d f8 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 3b 44 89 c7 48 89 45 f8 e8 df ca f7 ff 48 8b
-[  139.281648] RSP: 002b:00007ffcdd0a6890 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-[  139.281653] RAX: ffffffffffffffda RBX: 0000000000000043 RCX: 00007f9d58116f8d
-[  139.281656] RDX: 0000000000000043 RSI: 00007f9d56ecf200 RDI: 0000000000000007
-[  139.281659] RBP: 00007ffcdd0a68b0 R08: 0000000000000000 R09: 00007f9d57a19010
-[  139.281662] R10: 00007f9d5800afd0 R11: 0000000000000293 R12: 0000000000000043
-[  139.281665] R13: 0000000000000007 R14: 00007ffcdd0a70f0 R15: 0000000000000000
-[  139.281676]  </TASK>
+In all cases we are protected against using already canceled
+io_uring_cmds.
 
-Thanks.
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/ublk/test_generic_04.sh
+> > @@ -0,0 +1,43 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
+> > +
+> > +TID="generic_04"
+> > +ERR_CODE=0
+> > +
+> > +_prep_test "fault_inject" "fast cleanup when all I/Os of one hctx are in server"
+> > +
+> > +# configure ublk server to sleep 2s before completing each I/O
+> > +dev_id=$(_add_ublk_dev -t fault_inject -q 2 -d 1 --delay_us 2000000)
+> > +_check_add_dev $TID $?
+> > +
+> > +echo "dev id is ${dev_id}"
+> > +
+> > +STARTTIME=${SECONDS}
+> > +
+> > +dd if=/dev/urandom of=/dev/ublkb${dev_id} oflag=direct bs=4k count=1 &
+> 
+> stdout/stderr need to be discarded.
+> 
+> Also I'd suggest to make the selftest part as one standalone patch.
 
--- 
-tejun
+Sounds good, that is a nice way to split up this large patch.
+
