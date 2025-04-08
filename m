@@ -1,161 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A505422C35B
-	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 16:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816DB158DD8;
+	Tue,  8 Apr 2025 16:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744129578; cv=none; b=i54V0otXqIOxCq3dufYaHDKDY0SjszRe1G0zK2sIx+0gCfACK/d+MpdGVANZM03gXtbVUKpCaIB1dGfPQRGedOAiWz55T8erkZX5AKr05b4flCBNV7JCHPewrHqGPmMVVnJu3VXT9DmaSvFm3bMuYN/eMAAXXSOPJzMOGfOxUzY=
+	t=1744130588; cv=none; b=kYOjQgu4purN24mHw2+XRM8pvzLXDOW+KMuhzB5WhHdzy+hgu/6M4xBqaoMHz2pCBct/gFVApGuQ6FJv8+UX1SuMbRAk/japkWeVXuEbgdyJ5fm/zPD3/783xcaArx7u9BMN8LCVUaLWGObYGzwUklt12fSQdrxreaZgEkRv7sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744129578; c=relaxed/simple;
-	bh=Fy2gKQJl6FrHnMtBkqmsewmjBpzja8at40mpcZyQCRw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RJDxPOG3NalHAxusV3Rb83En4Kmks3zCBXhbg5iB3crxlDQgQu3a03lmlSfTtiRwsifk0bsFQ9il7NnD/5Bvf+EOJS+s7bs5N49X1+jJpza9edfX93DFnqznSYiwUrh9m4HLeFUXU0pWhL3+KVuHmnUqi1xBorjL5SHFJGBXYY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDSP+SEg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744130588; c=relaxed/simple;
+	bh=YiVE2sQZNSnsy/xycwB0nZFK93qywQx0ei4S9FjDMOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=MXzNvVb0mXbQvpgpjGwdjdcD7EkWk2kyi9fPjquDxf3Gnd735tXJbJPSTt83HUXybDzxbmUUlg0F2I1Aazmg8F4RoW5tm12LqTWw9eTPvqzEdU/SadKdFyRsjHBq8xZ+L8gdNhuocTS+L4E8/aHvknz7rJ6WE+9hy1U0XaE6z7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDYn+zxB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDSP+SEg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E80C4CEEB;
-	Tue,  8 Apr 2025 16:26:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDYn+zxB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ADC9C4CEE5;
+	Tue,  8 Apr 2025 16:43:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744129577;
-	bh=Fy2gKQJl6FrHnMtBkqmsewmjBpzja8at40mpcZyQCRw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RDSP+SEgyVFUeXjL+bJ1RbtY/hkon4ukeoLvfBrtH91I8z0E55+4Z0ae7uCHJp0uo
-	 N20dzC/muNCNvtEQpct3ro7/+spekSw7eufYyRF6CAWyq9SIuNOD7dXjxJqbrUdyPI
-	 nW+ChAOT3ESn/YPE8yMMm8bOl3qZKriJwbaCT9NVblzNz6YGL4s2T/ZZ91dqqVqSc3
-	 MoE0oE0xfIv/OYxra6378jYtfQeAqb4ZFh+PDWdMkeZlTSUSIopxBSqEpvt3r5zTtG
-	 dh92/61CKnzlhSqQC6JslGin+Dr0FEWsSy64nePDjLjvo3E//C97+tR2IZ2qB/NVSv
-	 Fj9uA/nNCzROg==
-From: Daniel Wagner <wagi@kernel.org>
-Date: Tue, 08 Apr 2025 18:26:00 +0200
-Subject: [PATCH blktests v2 4/4] nvme/061: add test teardown and setup
- fabrics target during I/O
+	s=k20201202; t=1744130588;
+	bh=YiVE2sQZNSnsy/xycwB0nZFK93qywQx0ei4S9FjDMOQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=fDYn+zxBIYfEHmnGInySkBgaApJPm/4Sihcg1Ut2EGJCPhU6jDWMXmOP9rnEyfEU9
+	 N0Q52aHW1m3KbWDb5fuWU1qPJ3OLhXIIKfrhF1I2lezhTdcr9+8rR51QLQNsUmLibm
+	 w64RzLXOnh8Z+mMTRV441TaehiL7QSabeXrFN3xIOvoGoyZJXQ7RfooTjbB4XXiZPF
+	 xDNTNgc6H5x4Fo+m88xHKYJr0UHBMM293K8P/+3drnl0XBKvvSz2D7h+MMkF7azRFn
+	 VpicXS+XhYef9PlZcqPcNt0ld5I4iD3dcsIdRcrPU7qXQ3YYM7zTKYiDh23RUmAMfe
+	 TDzUTWRSLH+KA==
+Date: Tue, 8 Apr 2025 09:43:07 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>,
+	David Bueso <dave@stgolabs.net>, Tso Ted <tytso@mit.edu>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Oliver Sang <oliver.sang@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	David Hildenbrand <david@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
+	Christian Brauner <brauner@kernel.org>,
+	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
+	linux-block@vger.kernel.org, ltp@lists.linux.it,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Dave Chinner <david@fromorbit.com>, gost.dev@samsung.com,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
+ BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
+Message-ID: <20250408164307.GK6266@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250408-test-target-v2-4-e9e2512586f8@kernel.org>
-References: <20250408-test-target-v2-0-e9e2512586f8@kernel.org>
-In-Reply-To: <20250408-test-target-v2-0-e9e2512586f8@kernel.org>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org, 
- Daniel Wagner <wagi@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331074541.gK4N_A2Q@linutronix.de>
 
-Add a new test case which forcefully removes the target and setup it
-again.
+Hi Luis,
 
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
----
- tests/nvme/061     | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/061.out | 21 +++++++++++++++++
- 2 files changed, 87 insertions(+)
+I'm not sure if this is related, but I'm seeing the same "BUG: sleeping
+function called from invalid context at mm/util.c:743" message when
+running fstests on XFS.  Nothing exciting with fstests here other than
+the machine is arm64 with 64k basepages and 4k fsblock size:
 
-diff --git a/tests/nvme/061 b/tests/nvme/061
-new file mode 100755
-index 0000000000000000000000000000000000000000..3b59d7137932258d06c3d64166db493df176ba4e
---- /dev/null
-+++ b/tests/nvme/061
-@@ -0,0 +1,66 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Daniel Wagner, SUSE Labs
-+#
-+# Test if the host keeps running IO when the target is forcefully removed and
-+# added back.
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="test fabric target teardown and setup during I/O"
-+TIMED=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_have_fio
-+	_require_nvme_trtype_is_fabrics
-+}
-+
-+set_conditions() {
-+	_set_nvme_trtype "$@"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
-+	local ns
-+
-+	_nvmet_target_setup
-+
-+	_nvme_connect_subsys --keep-alive-tmo 1 --reconnect-delay 1
-+
-+	ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+
-+	_run_fio_rand_io --filename="/dev/${ns}" \
-+		--group_reporting \
-+		--time_based --runtime=1d &> /dev/null &
-+	fio_pid=$!
-+	sleep 1
-+
-+	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
-+	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
-+	for ((i = 0; i <= 5; i++)); do
-+		echo "iteration $i"
-+
-+		_nvmet_target_cleanup
-+
-+		_nvmf_wait_for_state "${def_subsysnqn}" "connecting" || return 1
-+		echo "state: $(cat ${state_file})"
-+
-+		_nvmet_target_setup
-+
-+		_nvmf_wait_for_state "${def_subsysnqn}" "live" || return 1
-+		echo "state: $(cat ${state_file})"
-+	done
-+
-+	{ kill "${fio_pid}"; wait; } &> /dev/null
-+
-+	_nvme_disconnect_subsys
-+
-+	_nvmet_target_cleanup
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/061.out b/tests/nvme/061.out
-new file mode 100644
-index 0000000000000000000000000000000000000000..75516abdac005854c2be165005c076ef8891c518
---- /dev/null
-+++ b/tests/nvme/061.out
-@@ -0,0 +1,21 @@
-+Running nvme/061
-+iteration 0
-+state: connecting
-+state: live
-+iteration 1
-+state: connecting
-+state: live
-+iteration 2
-+state: connecting
-+state: live
-+iteration 3
-+state: connecting
-+state: live
-+iteration 4
-+state: connecting
-+state: live
-+iteration 5
-+state: connecting
-+state: live
-+disconnected 1 controller(s)
-+Test complete
+MKFS_OPTIONS="-m metadir=1,autofsck=1,uquota,gquota,pquota"
 
--- 
-2.49.0
+--D
 
+[18182.889554] run fstests generic/457 at 2025-04-07 23:06:25
+[18182.973535] spectre-v4 mitigation disabled by command-line option
+[18184.849467] XFS (sda3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18184.852941] XFS (sda3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18184.852962] XFS (sda3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18184.858065] XFS (sda3): Mounting V5 Filesystem 13d8c72d-ddac-4052-8d3c-a82c4ce0377d
+[18184.900002] XFS (sda3): Ending clean mount
+[18184.905990] XFS (sda3): Quotacheck needed: Please wait.
+[18184.919801] XFS (sda3): Quotacheck: Done.
+[18184.954170] XFS (sda3): Unmounting Filesystem 13d8c72d-ddac-4052-8d3c-a82c4ce0377d
+[18186.165572] XFS (dm-4): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18186.165601] XFS (dm-4): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18186.165608] XFS (dm-4): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18186.169589] XFS (dm-4): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18187.121289] XFS (dm-4): Ending clean mount
+[18187.131797] XFS (dm-4): Quotacheck needed: Please wait.
+[18187.145700] XFS (dm-4): Quotacheck: Done.
+[18187.393486] XFS (dm-4): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18190.592061] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18190.592083] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18190.592089] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18190.601815] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18190.744215] XFS (dm-3): Starting recovery (logdev: internal)
+[18190.807553] XFS (dm-3): Ending recovery (logdev: internal)
+[18190.818708] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18193.786621] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18193.788879] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18193.788882] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18193.790518] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18193.877969] XFS (dm-3): Starting recovery (logdev: internal)
+[18193.917688] XFS (dm-3): Ending recovery (logdev: internal)
+[18193.945675] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18196.985726] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18196.988868] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18196.988873] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18196.998845] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18197.193740] XFS (dm-3): Starting recovery (logdev: internal)
+[18197.254119] XFS (dm-3): Ending recovery (logdev: internal)
+[18197.280596] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18200.173003] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18200.176855] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18200.176859] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18200.185721] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18200.370893] XFS (dm-3): Starting recovery (logdev: internal)
+[18200.430454] XFS (dm-3): Ending recovery (logdev: internal)
+[18200.462036] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18203.311440] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18203.311454] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18203.311464] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18203.324374] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18203.437989] XFS (dm-3): Starting recovery (logdev: internal)
+[18203.491993] XFS (dm-3): Ending recovery (logdev: internal)
+[18203.517090] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18206.442639] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18206.444851] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18206.444854] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18206.455415] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18206.600488] XFS (dm-3): Starting recovery (logdev: internal)
+[18206.642538] XFS (dm-3): Ending recovery (logdev: internal)
+[18206.673822] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18209.666477] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18209.678778] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18209.678782] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18209.690805] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18209.859688] XFS (dm-3): Starting recovery (logdev: internal)
+[18209.923426] XFS (dm-3): Ending recovery (logdev: internal)
+[18209.947181] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18212.920991] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18212.921001] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18212.921012] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18212.925332] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18213.067578] XFS (dm-3): Starting recovery (logdev: internal)
+[18213.138633] XFS (dm-3): Ending recovery (logdev: internal)
+[18213.161827] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18216.154862] XFS (dm-3): EXPERIMENTAL metadata directory tree feature enabled.  Use at your own risk!
+[18216.156952] XFS (dm-3): EXPERIMENTAL exchange range feature enabled.  Use at your own risk!
+[18216.157070] XFS (dm-3): EXPERIMENTAL parent pointer feature enabled.  Use at your own risk!
+[18216.161145] XFS (dm-3): Mounting V5 Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18216.333087] XFS (dm-3): Starting recovery (logdev: internal)
+[18216.389192] XFS (dm-3): Ending recovery (logdev: internal)
+[18216.410647] XFS (dm-3): Unmounting Filesystem 6ade490d-15b0-43e5-9f17-db534769c746
+[18217.949035] BUG: sleeping function called from invalid context at mm/util.c:743
+[18217.949047] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 35, name: kcompactd0
+[18217.949056] preempt_count: 1, expected: 0
+[18217.949058] RCU nest depth: 0, expected: 0
+[18217.949060] Preemption disabled at:
+[18217.949062] [<fffffe0080339c98>] __buffer_migrate_folio+0xb8/0x2d0
+[18217.949070] CPU: 0 UID: 0 PID: 35 Comm: kcompactd0 Not tainted 6.15.0-rc1-acha #rc1 PREEMPT  92ec4d9d73adc951fe6bbe0d3f3b75d35d67fded
+[18217.949074] Hardware name: QEMU KVM Virtual Machine, BIOS 1.6.6 08/22/2023
+[18217.949075] Call trace:
+[18217.949076]  show_stack+0x20/0x38 (C)
+[18217.949080]  dump_stack_lvl+0x78/0x90
+[18217.949083]  dump_stack+0x18/0x28
+[18217.949084]  __might_resched+0x164/0x1d0
+[18217.949086]  folio_mc_copy+0x5c/0xa0
+[18217.949089]  __migrate_folio.constprop.0+0x70/0x1c8
+[18217.949092]  __buffer_migrate_folio+0x2bc/0x2d0
+[18217.949094]  buffer_migrate_folio_norefs+0x1c/0x30
+[18217.949096]  move_to_new_folio+0x70/0x1f0
+[18217.949099]  migrate_pages_batch+0x9c4/0xf20
+[18217.949101]  migrate_pages+0xb74/0xde8
+[18217.949103]  compact_zone+0x9ac/0xff0
+[18217.949105]  compact_node+0x9c/0x1a0
+[18217.949107]  kcompactd+0x38c/0x400
+[18217.949108]  kthread+0x144/0x210
+[18217.949110]  ret_from_fork+0x10/0x20
