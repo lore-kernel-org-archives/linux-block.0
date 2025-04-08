@@ -1,212 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1225C18784A
-	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 13:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA92E3BBF2
+	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 13:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744120243; cv=none; b=ZNCOz5PXgqNYwdi3YT7FuUluFNLgLCYZ/+3nNQkTxsnz+U/ubGMj+sBNki2+TUch1fZ69YSKCdsl4gANPUvOQWFK22x0aUbpTmaDiA/xwsjmZFGTmlLzew1pi0FisHk5PjunEnzw3txeO2hk3/e2hr+YXLAAOvIF/CFdsYyjYKo=
+	t=1744120675; cv=none; b=R6d2OK6UcOSVWHX1upZ3YVV0yw8UN/T46uK5Pnf3ZeS6ei6/40KGLf/Cm/LC9NBW8Jn3nHw7nb6nVbdGG6i9OqsdgFdzIvd9qCKREMezVfLBXOOgrniOeUIFy90v+SPfJ7/f/qD0+lakNO+tKMiRBSYcBBdVJJ7u+vPpmB9Ha48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744120243; c=relaxed/simple;
-	bh=weZfyOcRqHNtCQMiQVxjLNjn5ZDMkhXurJZ6oR2d9s8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gEhMsF6r8JXH2lnwc5LplXJ7OlvYO+wlPbWU2ErqeiTmyervOAv1mTSpskE+ajl5wCYxkOAaz6xSHPzbb7zvNwDejnzAVPKO1Ac7EdAl+bybb4MriTfhpgI88Z9XigWWukbHC5FdSl3e+fjpwq+Dly7JpcxCNGWWgPBxWsdBjGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FSw8wQ/+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1744120675; c=relaxed/simple;
+	bh=1eLPJrXprM2M0bMGNsUFlKvKVg7bmQjnS+e4G6L38UU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bjIfimO6c8+11afYRReF7gDyJF2rShIn2NLr2kPgAZ1h3ET9g4jXvEAuKSlNw3Pw6CQGqV1Cqxr67th5cjlbRyNOpT4x2V/Zk3KKrA+ZDonU/oLxlLOwMmpbrVPUUq79z1csQtffD8nDl2B2tILWmauzxg4zST8vl4Dfb1/dQZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ao8zLtgL; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSw8wQ/+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744120239;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pwt+BPqHNN6BRxC1elP4KkpHQor+kefZ9eHTpNRe2lc=;
-	b=FSw8wQ/+S1BiXMHrCPlYbUA9l8WAGETRpuwG9bSwq7liKifpbXoFtENkWL9VmFzu4PqTsI
-	IBJY9ch+OuAVYDL/qqC33YI6fO+r5Opp+yZfI+kHuuKbGIwh6ucbj3wTmhOC3P735eoXwD
-	XhLCmwwn51Jmn0tmVF5S9hxN2Pqzpsw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-449-JpD0Exd5NUGfZXnjMRKrmA-1; Tue,
- 08 Apr 2025 09:50:37 -0400
-X-MC-Unique: JpD0Exd5NUGfZXnjMRKrmA-1
-X-Mimecast-MFC-AGG-ID: JpD0Exd5NUGfZXnjMRKrmA_1744120236
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8BF4C1956064;
-	Tue,  8 Apr 2025 13:50:36 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.20])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33A7A1956094;
-	Tue,  8 Apr 2025 13:50:31 +0000 (UTC)
-Date: Tue, 8 Apr 2025 21:50:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: don't grab elevator lock during queue
- initialization
-Message-ID: <Z_UpoiWlBnwaUW7B@fedora>
-References: <20250403105402.1334206-1-ming.lei@redhat.com>
- <20250404091037.GB12163@lst.de>
- <92feba7e-84fc-4668-92c3-aba4e8320559@linux.ibm.com>
- <Z_NB2VA9D5eqf0yH@fedora>
- <ea09ea46-4772-4947-a9ad-195e83f1490d@linux.ibm.com>
- <Z_TSYOzPI3GwVms7@fedora>
- <c2c9e913-1c24-49c7-bfc5-671728f8dddc@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ao8zLtgL"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6eedceb2e7eso9219946d6.3
+        for <linux-block@vger.kernel.org>; Tue, 08 Apr 2025 06:57:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744120673; x=1744725473; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1eLPJrXprM2M0bMGNsUFlKvKVg7bmQjnS+e4G6L38UU=;
+        b=Ao8zLtgL5jLVLZPEpURa9A2urI+Wnc8YIDaWL0awdrM6oXR8j6j4l2+0mZudWSHbbw
+         a6/8VQhmpxhDePDAq8JIMnAq9A/joBKPFGL+Vz/l1dnBsYk62vqDHOZlfmjsj3ebVXh1
+         yNoOFXMeRkIga1dnB5umLOTj06ych1siWjznJ5f5ukqBOb3lF3MMwN+IGo/l8ItnCuU2
+         /T4cQo9DjUT0jlRJ7ErIY6aawx57zqooHsWZm30IbUgR3vPdssyB31uAjzcY705ACxjE
+         A7ucgK+139OgIBZGYecWFpg/m6ogTBAcAwghTIEahjvVYKmuNj0JAZwbGz1SYVJvFVdl
+         uvgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744120673; x=1744725473;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1eLPJrXprM2M0bMGNsUFlKvKVg7bmQjnS+e4G6L38UU=;
+        b=wRWWTzVQD3Qc9bpZ0+YKSdAjGq3bQJ3fF7fvfK/LTOPtbcAxWu9U4ekIAAg5almiFz
+         ntTUW2Wm0how71JJjbtCTej45F0se7mhhoiSReOXjxOMEWgAM4f2jckdWu29nx6Z07Ef
+         gF6v8ehl7F2EjpkyOkIccrb9B8DdKHau+w5869rI7BZQp4J3HsTLjvbdAtQGFawSTa3G
+         8hsWYlkeVemumyxwATuuAIj7Fvkkedb03J/JDtk7PFoSPNdhZEy2Hz/fzPGeBu7mXkmS
+         j/edHdOtO4TH3QIEuFGtvF/dIjW7J8nfcYi6E587UoeDeN+AnYrD6APS72DzEoBM0ymg
+         duDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlmdA4me3WTu+8gBUARboZkGP32Ba32WjpsEtwZf3qzDsfaJYSPery8U/xLOnfwIb5vM9eDQfjVo96CA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS6M83c//8aBbEwMV5yfjWd+W02cf/xOQhqXgUjYHKzAh03S5r
+	27w97fWy8vpOlEGJSoBWLBSB0Wh3k8X0RloWZzr8trelhiAmfV50
+X-Gm-Gg: ASbGncvOlAhJMCNzsx6yx2t8220CIpMmGWQv2kD/vtjns2zwMWm7TxIaos1xhnUEXot
+	bAljfi0j22rxy0/Y0amUPgLremxUuU5hlFdEgAynhKC7kpjJCIXpF9gcuUOi035M6A+SU5NVyrK
+	Qf2f28jBYlLJ8ZHaKydyA4RCb7AtDBVSR6V86H8/JUW4CXoBEnuxNNZ/ucXf0Zv32l97WpMKE3F
+	0eKWZY7gh5ASsPRYVW1ARTlUf86lSRjlk5Smq7cAS58t1FNM9Yf3g9/QP/PDbuPt8b0VAQgMvc8
+	nb3okTwWq9HUY3fDy/PBjDGQorBTb0dq1LJ8lpTUa4gGH7HuWUrgRp/0eYLOi+bQ7XlIz3qsRhh
+	FGt+qTMQbvFCZK2C3S+xD
+X-Google-Smtp-Source: AGHT+IEF0BAK7waavu4eeZ2kovhqT0j6efzE6PujE1HHSsq1l+s4f3Uj0huwtdFotlBVCLmUHqL8yQ==
+X-Received: by 2002:a05:6214:e61:b0:6e8:fee2:aae2 with SMTP id 6a1803df08f44-6f01e7a1f77mr83556006d6.9.1744120672422;
+        Tue, 08 Apr 2025 06:57:52 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0ee7565bsm74841946d6.0.2025.04.08.06.57.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 06:57:51 -0700 (PDT)
+Message-ID: <25e201d2-aa80-1f1c-12fd-3b3f9c774e59@gmail.com>
+Date: Tue, 8 Apr 2025 09:57:50 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c2c9e913-1c24-49c7-bfc5-671728f8dddc@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: bio segment constraints
+Content-Language: en-US
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ linux-mtd@lists.infradead.org, Zhihao Cheng <chengzhihao1@huawei.com>
+References: <8dfd97ac-59e7-ae69-238a-85b7a2dae4f1@gmail.com>
+ <8a232716-74f8-4bba-a514-d0f766492344@suse.de>
+ <a0ffa9b9-8649-1b63-3d56-3fc45fdfda83@gmail.com>
+ <7b8c4805-a91f-4455-a021-e5d8b6078d8b@suse.de>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <7b8c4805-a91f-4455-a021-e5d8b6078d8b@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-On Tue, Apr 08, 2025 at 06:55:26PM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 4/8/25 1:08 PM, Ming Lei wrote:
-> > On Mon, Apr 07, 2025 at 01:59:48PM +0530, Nilay Shroff wrote:
-> >>
-> >>
-> >> On 4/7/25 8:39 AM, Ming Lei wrote:
-> >>> On Sat, Apr 05, 2025 at 07:44:19PM +0530, Nilay Shroff wrote:
-> >>>>
-> >>>>
-> >>>> On 4/4/25 2:40 PM, Christoph Hellwig wrote:
-> >>>>> On Thu, Apr 03, 2025 at 06:54:02PM +0800, Ming Lei wrote:
-> >>>>>> Fixes the following lockdep warning:
-> >>>>>
-> >>>>> Please spell the actual dependency out here, links are not permanent
-> >>>>> and also not readable for any offline reading of the commit logs.
-> >>>>>
-> >>>>>> +static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
-> >>>>>> +				   struct request_queue *q, bool lock)
-> >>>>>> +{
-> >>>>>> +	if (lock) {
-> >>>>>
-> >>>>> bool lock(ed) arguments are an anti-pattern, and regularly get Linus
-> >>>>> screaming at you (in this case even for the right reason :))
-> >>>>>
-> >>>>>> +		/* protect against switching io scheduler  */
-> >>>>>> +		mutex_lock(&q->elevator_lock);
-> >>>>>> +		__blk_mq_realloc_hw_ctxs(set, q);
-> >>>>>> +		mutex_unlock(&q->elevator_lock);
-> >>>>>> +	} else {
-> >>>>>> +		__blk_mq_realloc_hw_ctxs(set, q);
-> >>>>>> +	}
-> >>>>>
-> >>>>> I think the problem here is again that because of all the other
-> >>>>> dependencies elevator_lock really needs to be per-set instead of
-> >>>>> per-queue which will allows us to have much saner locking hierarchies.
-> >>>>>
-> >>>> I believe you meant here q->tag_set->elevator_lock? 
-> >>>
-> >>> I don't know what locks you are planning to invent.
-> >>>
-> >>> For set->tag_list_lock, it has been very fragile:
-> >>>
-> >>> blk_mq_update_nr_hw_queues
-> >>> 	set->tag_list_lock
-> >>> 		freeze_queue
-> >>>
-> >>> If IO failure happens when waiting in above freeze_queue(), the nvme error
-> >>> handling can't provide forward progress any more, because the error
-> >>> handling code path requires set->tag_list_lock.
-> >>
-> >> I think you're referring here nvme_quiesce_io_queues and nvme_unquiesce_io_queues
-> > 
-> > Yes.
-> > 
-> >> which is called in nvme error handling path. If yes then I believe this function 
-> >> could be easily modified so that it doesn't require ->tag_list_lock. 
-> > 
-> > Not sure it is easily, ->tag_list_lock is exactly for protecting the list of "set->tag_list".
-> > 
-> Please see this, here nvme_quiesce_io_queues doen't require ->tag_list_lock:
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 777db89fdaa7..002d2fd20e0c 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -5010,10 +5010,19 @@ void nvme_quiesce_io_queues(struct nvme_ctrl *ctrl)
->  {
->         if (!ctrl->tagset)
->                 return;
-> -       if (!test_and_set_bit(NVME_CTRL_STOPPED, &ctrl->flags))
-> -               blk_mq_quiesce_tagset(ctrl->tagset);
-> -       else
-> -               blk_mq_wait_quiesce_done(ctrl->tagset);
-> +       if (!test_and_set_bit(NVME_CTRL_STOPPED, &ctrl->flags)) {
-> +               struct nvme_ns *ns;
-> +               int srcu_idx;
-> +
-> +               srcu_idx = srcu_read_lock(&ctrl->srcu);
-> +               list_for_each_entry_srcu(ns, &ctrl->namespaces, list,
-> +                               srcu_read_lock_held(&ctrl->srcu)) {
-> +                       if (!blk_queue_skip_tagset_quiesce(ns->queue))
-> +                               blk_mq_quiesce_queue_nowait(ns->queue);
-> +               }
-> +               srcu_read_unlock(&ctrl->srcu, srcu_idx);
-> +       }
-> +       blk_mq_wait_quiesce_done(ctrl->tagset);
->  }
->  EXPORT_SYMBOL_GPL(nvme_quiesce_io_queues);
-> 
-> Here we iterate through ctrl->namespaces instead of relying on tag_list
-> and so we don't need to acquire ->tag_list_lock.
-
-How can you make sure all NSs are covered in this way? RCU/SRCU can't
-provide such kind of guarantee.
-
-> 
-> > And the same list is iterated in blk_mq_update_nr_hw_queues() too.
-> > 
-> >>
-> >>>
-> >>> So all queues should be frozen first before calling blk_mq_update_nr_hw_queues,
-> >>> fortunately that is what nvme is doing.
-> >>>
-> >>>
-> >>>> If yes then it means that we should be able to grab ->elevator_lock
-> >>>> before freezing the queue in __blk_mq_update_nr_hw_queues and so locking
-> >>>> order should be in each code path,
-> >>>>
-> >>>> __blk_mq_update_nr_hw_queues
-> >>>>     ->elevator_lock 
-> >>>>       ->freeze_lock
-> >>>
-> >>> Now tagset->elevator_lock depends on set->tag_list_lock, and this way
-> >>> just make things worse. Why can't we disable elevator switch during
-> >>> updating nr_hw_queues?
-> >>>
-> >> I couldn't quite understand this. As we already first disable the elevator
-> >> before updating sw to hw queue mapping in __blk_mq_update_nr_hw_queues().
-> >> Once mapping is successful we switch back the elevator.
-> > 
-> > Yes, but user still may switch elevator from none to others during the
-> > period, right?
-> > 
-> Yes correct, that's possible. So your suggestion was to disable elevator
-> update while we're running __blk_mq_update_nr_hw_queues? And that way user
-> couldn't update elevator through sysfs (elv_iosched_store) while we update
-> nr_hw_queues? If this is true then still how could it help solve lockdep
-> splat? 
-
-Then why do you think per-set lock can solve the lockdep splat?
-
-__blk_mq_update_nr_hw_queues is the only chance for tagset wide queues
-involved wrt. switching elevator. If elevator switching is not allowed
-when __blk_mq_update_nr_hw_queues() is started, why do we need per-set
-lock?
-
-
-Thanks,
-Ming
-
+T24gNC84LzI1IDAyOjEwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6DQo+IE9uIDQvNy8yNSAx
+NjoxNCwgU2VhbiBBbmRlcnNvbiB3cm90ZToNCj4+IE9uIDQvNy8yNSAwMzoxMCwgSGFubmVz
+IFJlaW5lY2tlIHdyb3RlOg0KPj4+IE9uIDQvNi8yNSAyMTo0MCwgU2VhbiBBbmRlcnNvbiB3
+cm90ZToNCj4+Pj4gSGkgYWxsLA0KPj4+Pg0KPj4+PiBJJ20gbm90IHJlYWxseSBzdXJlIHdo
+YXQgZ3VhcmFudGVlcyB0aGUgYmxvY2sgbGF5ZXIgbWFrZXMgcmVnYXJkaW5nIHRoZQ0KPj4+
+PiBzZWdtZW50cyBpbiBhIGJpbyBhcyBwYXJ0IG9mIGEgcmVxdWVzdCBzdWJtaXR0ZWQgdG8g
+YSBibG9jayBkcml2ZXIuIEFzDQo+Pj4+IGZhciBhcyBJIGNhbiB0ZWxsIHRoaXMgaXMgbm90
+IGRvY3VtZW50ZWQgYW55d2hlcmUuIEluIHBhcnRpY3VsYXIsDQo+Pj4+DQo+Pj4+IC0gSXMg
+YnZfbGVuIGFsaWduZWQgdG8gU0VDVE9SX1NJWkU/DQo+Pj4NCj4+PiBUaGUgYmxvY2sgbGF5
+ZXIgYWx3YXlzIHVzZXMgYSA1MTIgYnl0ZSBzZWN0b3Igc2l6ZSwgc28geWVzLg0KPj4+DQo+
+Pj4+IC0gVG8gbG9naWNhbF9zZWN0b3Jfc2l6ZT8NCj4+Pg0KPj4+IE5vdCBuZWNlc3Nhcmls
+eS4gQnZlY3MgYXJlIGEgY29uc2VjdXRpdmUgbGlzdCBvZiBieXRlIHJhbmdlcyB3aGljaA0K
+Pj4+IG1ha2UgdXAgdGhlIGRhdGEgcG9ydGlvbiBvZiBhIGJpby4NCj4+PiBUaGUgbG9naWNh
+bCBzZWN0b3Igc2l6ZSBpcyBhIHByb3BlcnR5IG9mIHRoZSByZXF1ZXN0IHF1ZXVlLCB3aGlj
+aCBpcw0KPj4+IGFwcGxpZWQgd2hlbiBhIHJlcXVlc3QgaXMgZm9ybWVkIGZyb20gb25lIG9y
+IHNldmVyYWwgYmlvcy4NCj4+PiBGb3IgdGhlIHJlcXVlc3QgdGhlIG92ZXJhbGwgbGVuZ3Ro
+IG5lZWQgdG8gYmUgYSBtdWx0aXBsZSBvZiB0aGUgbG9naWNhbA0KPj4+IHNlY3RvciBzaXpl
+LCBidXQgbm90IG5lY2Vzc2FyaWx5IHRoZSBpbmRpdmlkdWFsIGJpb3MuDQo+Pg0KPj4gT2gs
+IHNvIHRoaXMgaXMgd29yc2UgdGhhbiBJIHRob3VnaHQuIFNvIGlmIHlvdSBjYXJlIGFib3V0
+IGUuZy4gb25seSBzdWJtaXR0aW5nIEkvTyBpbiB1bml0cyBvZiBsb2dpY2FsX2Jsb2NrX3Np
+emUsIHlvdSBoYXZlIHRvIGNvbWJpbmUNCj4gID4gc2VnbWVudHMgYWNyb3NzIHRoZSBlbnRp
+cmUgcmVxdWVzdC4+DQo+IFdlbGwsIHllcywgYW5kIG5vLg0KPiBZb3UgbWlnaHQgYmUgc2Vl
+aW5nIGEgcmVxdWVzdCB3aXRoIHNldmVyYWwgYmlvcywgZWFjaCBoYXZpbmcgc21hbGwNCj4g
+YnZlY3MuIEJ1dCBpbiB0aGUgZHJpdmVyIHlvdSB3aWxsIHdhbnQgdG8gdXNlIGFuIGlvdiBp
+dGVyYXRvciBvciBtYXANCj4gaXQgaW50byBhIHNnIGxpc3QgdmlhIGJsa19ycV9tYXBfc2co
+KSwgYW5kIHRoZW4gaXRlcmF0ZSBvdmVyIHRoYXQNCj4gZm9yIHN1Ym1pc3Npb24uDQo+IA0K
+PiBbIC4uIF0NCj4+Pj4gLSBDYW4gSSBzb21laG93IHJlcXVlc3QgdG8gb25seSBnZXQgc2Vn
+bWVudHMgd2l0aCBidl9sZW4gYWxpZ25lZCB0bw0KPj4+PiDCoMKgIGxvZ2ljYWxfc2VjdG9y
+X3NpemU/IE9yIGRvIEkgbmVlZCB0byBkbyBteSBvd24gY29hbGVzY2luZyBhbmQgYm91bmNl
+DQo+Pj4+IMKgwqAgYnVmZmVyaW5nIGZvciB0aGF0Pw0KPj4+Pg0KPj4+DQo+Pj4gVGhlIGRy
+aXZlciBzdXJlbHkgY2FuLiBZb3Ugc2hvdWxkIGJlIGFibGUgdG8gc2V0ICdtYXhfc2VnbWVu
+dF9zaXplJyB0bw0KPj4+IHRoZSBsb2dpY2FsIGJsb2NrIHNpemUsIGFuZCB0aGF0IHNob3Vs
+ZCBnaXZlIHlvdSB3aGF0IHlvdSB3YW50Lg0KPj4NCj4+IEJ1dCBjb3VsZG4ndCBJIGdldCBz
+ZWdtZW50cyBzbWFsbGVyIHRoYW4gdGhhdD8gbWF4X3NlZ21lbnRfc2l6ZSBzZWVtcyBsaWtl
+DQo+PiBpdCB3b3VsZCBvbmx5IHJlc3RyaWN0IHRoZSBtYXhpbXVtIHNpemUsIGxlYXZpbmcg
+dGhlIHBvc3NpYmlsaXR5IG9wZW4gZm9yDQo+PiBzbWFsbGVyIHNlZ21lbnRzLg0KPj4NCj4g
+QXMgbWVudGlvbmVkOiBpbmRpdmlkdWFsIHNlZ21lbnRzIG1pZ2h0LiBUaGUgb3ZlcmFsbCBy
+ZXF1ZXN0IHN0aWxsIHdpbGwgYWRoZXJlIHRvIHRoZSBsb2dpY2FsIGJsb2NrIHNpemUgc2V0
+dGluZyAoaWUgaXQgd2lsbCBuZXZlciBiZSBzbWFsbGVyIHRoYW4gdGhlIGxvZ2ljYWwgYmxv
+Y2sgc2l6ZSkuDQo+IA0KPiBNYXliZSBoYXZlIGEgbG9vayBhdCBkcml2ZXJzL210ZC91Ymkv
+YmxvY2suYy4gVGhlcmUgdGhlIGRyaXZlciB3aWxsDQo+IG1hcCB0aGUgcmVxdWVzdCBvbnRv
+IGEgc2NhdHRlcmxpc3QsIGFuZCB0aGVuIGl0ZXJhdGUgb3ZlciB0aGUgc2cgZW50cmllcw0K
+PiB0byByZWFkIGluIHRoZSBkYXRhLg0KPiANCj4gTm90ZTogbWFwcGluZyBvbnRvIGEgc2Nh
+dHRlcmxpc3Qgd2lsbCBjb2FsZXNjZSBhZGphY2VudCBidmVjcywgc28gb24gdGhlDQo+IHNj
+YXR0ZXJsaXN0IHlvdSB3aWxsIGZpbmQgb25seSBjb250aWd1b3VzIHNlZ21lbnRzIHdoaWNo
+IGFkaGVyZSB0byB0aGUNCj4gbG9naWNhbCBibG9jayBzaXplIGxpbm1pdGF0aW9ucy4NCg0K
+SG93IGNhbiB0aGlzIGhhcHBlbj8gRnJvbSBhYm92ZSwgeW91IGNvdWxkIGhhdmUgYSBidmVj
+IHdoZXJlIGl0IGNvbnRhaW5zIG9ubHkNCm9uZSBzZWN0b3IuIFNvIGl0IHdpbGwgYWx3YXlz
+IGJlIGRpc2NvbnRpZ3VvdXMgaW4gdGVybXMgb2YgdGhlIGxvZ2ljYWwgYmxvY2sgc2l6ZS4N
+Cg0KSSd2ZSBsb29rZWQgYXQgdWJpYmxvY2ssIGFuZCB0aGF0IG9ubHkgd29ya3MgZm9yIHRo
+YXQgZHJpdmVyIGJlY2F1c2UgaXQncyByZWFkLW9ubHkuDQpUaGUgTVREIEFQSSBhbGxvd3Mg
+eW91IHRvIHJlYWQgdW5hbGlnbmVkIGJ1ZmZlcnMgKGFsdGhvdWdoIGl0J3MgaW5lZmZpY2ll
+bnQgc2luY2UNCnlvdSBtYXkgcmUtcmVhZCB0aGUgc2FtZSBwYWdlIG11bHRpcGxlIHRpbWVz
+KSwgYnV0IGZvciB3cml0ZXMgdGhlIGRhdGEgbXVzdCBiZQ0KYWxpZ25lZCB0byB0aGUgcGFn
+ZSBzaXplLg0KDQpJIHRoaW5rIHRoZSBvbmx5IHdheSB0byBzb2x2ZSB0aGlzIGlzIHRvIGNy
+ZWF0ZSBhIChtdGQtKXBhZ2Utc2l6ZWQgYnVmZmVyIGFuZCBib3VuY2UNCnRoZSBpbmNvbWlu
+ZyBkYXRhIGluIGlmIHRoZSBidmVjIGlzIHNob3J0ZXIgKG9yIGlmIGl0J3MgaW4gaGlnaCBt
+ZW1vcnkpLg0KDQotLVNlYW4NCg==
