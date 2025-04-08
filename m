@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F86C22DF95
-	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 16:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C251A22FE07
+	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 16:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744129572; cv=none; b=nR/ky46sGLRBuRi+zzXTfcC5+iiriluAxS+gWBV8nlNMyNLB0hnC5C9i3DUFLpYep+AfjOEtrcRV7Eh9aVu4fkQWMAf441mgvQWIa72Z/g6epP1ifdFJrEP7Q+4bOtBTv53NxvqQcACYEg6GTwIJvhkmd59yxpgI95pfgzL8Wv4=
+	t=1744129574; cv=none; b=CnGnbFizJXnECDPWMIi1RsHVPszwqEm2HD9VHVVyScAOPrZBQUQ8kgZpXRHuoIClO+Ia8d6kCdrNqR2ipC8fTc7ITZ94+WpNBoHo3LjKhF4GsGSEFYqry5AHH0KS9NPp1QKvfGSEn9yB2NFJmY0c3oXwXhHqca5bLpMMQsT8aiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744129572; c=relaxed/simple;
-	bh=YFoXgbgup6mavWMsiZOhhOvd8aBFDXaX4CBB6vu+uao=;
+	s=arc-20240116; t=1744129574; c=relaxed/simple;
+	bh=WJ9VFXs8LDtfg8uIwMi7UOmm3Jgz8doNUes5m0fdjmU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BCF9Yp9E51vVn4ijh89I9tyHlnDvTACzvKtyN5t/reRIctSvoi6J68MWINMLMvTzM3P9rcI1EJo11fpNCQyiNXvIbfei8/22JXlpp88au+in/wxSgCnyZO/gUZl47TCpDEFjsn31Mwu/AG6T+iEd4P9SoSLnyXaeWEPkZ7HREuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CL3W2UZ2; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=kIrcsvA4plcuBH15yNLHQYPyzAK5z07YA7Hyk7SxQ/yBPCPC1g1QuleIltGPGWzFe/nJs58NQI75wE3CpAW44Iti49g2N4jaGfYHBLXYqpHC7/G3k+jpfWOA9vqmtfEGK+8NA4EELh6XRU17HZuzxxKIMOW6Gi0NSQwxieGah/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gF2W1Zpe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CL3W2UZ2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76637C4CEE9;
-	Tue,  8 Apr 2025 16:26:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gF2W1Zpe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225D0C4CEEB;
+	Tue,  8 Apr 2025 16:26:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744129571;
-	bh=YFoXgbgup6mavWMsiZOhhOvd8aBFDXaX4CBB6vu+uao=;
+	s=k20201202; t=1744129574;
+	bh=WJ9VFXs8LDtfg8uIwMi7UOmm3Jgz8doNUes5m0fdjmU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CL3W2UZ2diIbsHcwCMwLhD4InNQmD4cOiyQTo82QBzcbO1zlL5trT2eTrTA3U5tQJ
-	 n8LNeUzFjJal0mGGQCNlE+1vZEfK8i41thoA+VQQZb2tq9ZumP4jxbESPVWPq73y+I
-	 7209vb58RZyE9BtY7Sn4/aJF1OGcU2MSSDCQitzGXd3Rts8+5VMLeiXYNC36NjMPac
-	 Vi3S2Z5aaVwZbONqL3VGTUMDMJ5NGJ1P3UZI8Ccp3WsViDDeaeGy+UpnaoYOQut4m6
-	 9LvEB+zxF1jj1yaFSCiepsw72CRqWfmGXPUn7dIpfYtkhG0X7TRmELMQWPPt0vEu+8
-	 ZuLRCd08fwkdg==
+	b=gF2W1Zpe25gYTdYRTr8JYhGuc+It0ybVu/i4CrmTyEfOsMqcJD2SYYAs7DkE4Ny8U
+	 pWBin+U16KadB+gkXaLLMSzLW7n8tBIUCaFsrGwBCUIS2bhUKO+SdwxKdKxQx+qZhD
+	 ePOR/mqoVBy4/t0TzTGo6yM5gvmmE9mghGEr/uOywBCpX5WSvnjR8kI8ZffSMbvuor
+	 TNCm92catwzNeioRFmpYKSn0x4p+QZ78SnDH/gbMkaedpNVXs2czl9p9Gm441tJNpd
+	 xGB1isoiJPiuZqEaYvLzKSoK8lnM0bJTOc6ZLu/FrX6+Sjtax7kEi5Z7dU9KJJr/Bz
+	 IHxKAlMEj5Ttg==
 From: Daniel Wagner <wagi@kernel.org>
-Date: Tue, 08 Apr 2025 18:25:58 +0200
-Subject: [PATCH blktests v2 2/4] common/nvme: move nvmf_wait_for_state to
- common code
+Date: Tue, 08 Apr 2025 18:25:59 +0200
+Subject: [PATCH blktests v2 3/4] nvme/060: add test nvme fabrics target
+ resetting during I/O
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250408-test-target-v2-2-e9e2512586f8@kernel.org>
+Message-Id: <20250408-test-target-v2-3-e9e2512586f8@kernel.org>
 References: <20250408-test-target-v2-0-e9e2512586f8@kernel.org>
 In-Reply-To: <20250408-test-target-v2-0-e9e2512586f8@kernel.org>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
@@ -46,109 +46,92 @@ Cc: Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
  Daniel Wagner <wagi@kernel.org>
 X-Mailer: b4 0.14.2
 
-In preperation to add another tests which needs the nvmf_wait_for_state
-function, move it to the common code base.
+Newer kernel support to reset the target via the debugfs. Add a new test
+case which exercises this interface.
 
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
 ---
- common/nvme    | 27 +++++++++++++++++++++++++++
- tests/nvme/048 | 31 ++-----------------------------
- 2 files changed, 29 insertions(+), 29 deletions(-)
+ tests/nvme/060     | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/060.out |  2 ++
+ 2 files changed, 64 insertions(+)
 
-diff --git a/common/nvme b/common/nvme
-index 04b49c2c1f9edc6de516398b537502fc30a92969..68720ddc20cf3ed5cfe2841f9921321d9899ce0d 100644
---- a/common/nvme
-+++ b/common/nvme
-@@ -573,6 +573,33 @@ _nvmf_wait_for_ns() {
- 	return 0
- }
- 
-+_nvmf_wait_for_state() {
-+	local def_state_timeout=5
-+	local subsys_name="$1"
-+	local state="$2"
-+	local timeout="${3:-$def_state_timeout}"
-+	local nvmedev
-+	local state_file
-+	local start_time
-+	local end_time
+diff --git a/tests/nvme/060 b/tests/nvme/060
+new file mode 100755
+index 0000000000000000000000000000000000000000..293b03cd0ef6a75722c6b86fccbbc931d6f5e3a1
+--- /dev/null
++++ b/tests/nvme/060
+@@ -0,0 +1,62 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Daniel Wagner, SUSE Labs
++#
++# Test nvme fabrics controller reset/disconnect/reconnect.
 +
-+	nvmedev=$(_find_nvme_dev "${subsys_name}")
-+	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
++. tests/nvme/rc
 +
-+	start_time=$(date +%s)
-+	while ! grep -q "${state}" "${state_file}"; do
-+		sleep 1
-+		end_time=$(date +%s)
-+		if (( end_time - start_time > timeout )); then
-+			echo "expected state \"${state}\" not " \
-+				"reached within ${timeout} seconds"
-+			return 1
-+		fi
-+	done
++DESCRIPTION="test nvme fabrics target reset"
 +
-+	return 0
++requires() {
++	_nvme_requires
++	_have_loop
++	_require_nvme_trtype_is_fabrics
++	_have_kernel_option NVME_TARGET_DEBUGF
 +}
 +
- _create_nvmet_ns() {
- 	local subsysnqn="${def_subsysnqn}"
- 	local nsid="${def_nsid}"
-diff --git a/tests/nvme/048 b/tests/nvme/048
-index bd41faef4e5431957f63184408c147b8ada1a8dd..afd9272c1a31b5a3d2df2e1ce9fe3268de768420 100755
---- a/tests/nvme/048
-+++ b/tests/nvme/048
-@@ -19,33 +19,6 @@ set_conditions() {
- 	_set_nvme_trtype "$@"
- }
- 
--nvmf_wait_for_state() {
--	local def_state_timeout=5
--	local subsys_name="$1"
--	local state="$2"
--	local timeout="${3:-$def_state_timeout}"
--	local nvmedev
--	local state_file
--	local start_time
--	local end_time
--
--	nvmedev=$(_find_nvme_dev "${subsys_name}")
--	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
--
--	start_time=$(date +%s)
--	while ! grep -q "${state}" "${state_file}"; do
--		sleep 1
--		end_time=$(date +%s)
--		if (( end_time - start_time > timeout )); then
--			echo "expected state \"${state}\" not " \
--				"reached within ${timeout} seconds"
--			return 1
--		fi
--	done
--
--	return 0
--}
--
- nvmf_check_queue_count() {
- 	local subsys_name="$1"
- 	local queue_count="$2"
-@@ -87,7 +60,7 @@ set_qid_max() {
- 
- 	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
- 	nvmf_check_queue_count "${subsys_name}" "${qid_max}" || return 1
--	nvmf_wait_for_state "${subsys_name}" "live" || return 1
-+	_nvmf_wait_for_state "${subsys_name}" "live" || return 1
- 
- 	return 0
- }
-@@ -106,7 +79,7 @@ test() {
- 		_nvme_connect_subsys --keep-alive-tmo 1 \
- 				     --reconnect-delay 2
- 
--		if ! nvmf_wait_for_state "${def_subsysnqn}" "live" ; then
-+		if ! _nvmf_wait_for_state "${def_subsysnqn}" "live" ; then
- 			echo FAIL
- 		else
- 			set_qid_max "${def_subsysnqn}" 1 || echo FAIL
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++nvmet_debug_trigger_reset() {
++	local nvmet_subsystem="$1"
++	local dfs_path="${NVMET_DFS}/${nvmet_subsystem}"
++
++	find "${dfs_path}" -maxdepth 1 -type d -name 'ctrl*' -exec sh -c 'echo "fatal" > "$1/state"' _ {} \;
++}
++
++nvmet_reset_loop() {
++	while true; do
++		nvmet_debug_trigger_reset "${def_subsysnqn}"
++		sleep 2
++	done
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	_nvmet_target_setup
++
++	nvmet_reset_loop &
++	reset_loop_pid=$!
++
++	# Reset the host in different states e.g when the host is in the
++	# connected or connecting state.
++	#
++	# The target reset is triggered with an even number timeout, while the
++	# host reconnects with an odd number timeout.
++	for ((i = 0; i <= 5; i++)); do
++		_nvme_connect_subsys --keep-alive-tmo 1 --reconnect-delay 1
++		sleep 3
++		_nvme_disconnect_subsys >> "$FULL" 2>&1
++	done
++
++	{ kill "${reset_loop_pid}"; wait; } &> /dev/null
++
++	_nvmet_target_cleanup
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/060.out b/tests/nvme/060.out
+new file mode 100644
+index 0000000000000000000000000000000000000000..517ff2dfcfd41c4088991e669af9fef52bde570b
+--- /dev/null
++++ b/tests/nvme/060.out
+@@ -0,0 +1,2 @@
++Running nvme/060
++Test complete
 
 -- 
 2.49.0
