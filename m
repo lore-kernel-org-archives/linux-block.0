@@ -1,191 +1,187 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F09261362
-	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 06:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744092497; cv=fail; b=nUqDNm5K5ygKNioHl1QwuN1yEXWttX+EB6zl2aOQyha33PFq7mPdAR0+2rFCDqM7esC8b4tgMlivoyoYY5rfU7F1o+MfM1ARTfCGfLxr2Q1PRdfTbYkQN9jJMgfN+9+CIdNnViftSkbCNLYKlY3mkpOUdS8OQueYwo+Nm++p77c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744092497; c=relaxed/simple;
-	bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BgjQhVe17og+WgYkKgiIFmS6FfmgtBAl6GloF9Rk0PrkFAQtsCrkV1Df0d9bKyWTOcFty106lKfbt/CcPPVFNyn2n+s+KTD6EyZGdMLcN4m/CXWxKnLxknR1Y3jopJNOTvWaAIY5KfBhRXO7fofhfZ71+ZS4UB1Ys6PaCI4NtIc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=AJqf4aUq; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=bIbDd8GJ; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63D8198A08
+	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 06:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744092661; cv=none; b=R+kizZyjRrNLr5d2z0axAZ272YHOWrMaolaOayiBS1bswtBKVNaovKLwEhpEQw9JWHONAq1Lk4B7WWTjpfO28exT79tzfnrKfDO1sj1vvr2F5wj6YW2oJzYaShlD7XULHCDoyMgfIqRePaUeN/s9gYm3jsCtv6MmeOiVf3gCpKo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744092661; c=relaxed/simple;
+	bh=BbjMwSneqqrBxj40taN5HBRkjZ+V8feoLI1QBnqS37k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I5YPeTFGY5Y3IA8kooZi43Mj+ct0Zg1TDS8PlX3Q5aqHiNFzDQ9S2NANTX27libvpgSlJlghoKh00p9HDgaWi+mP0QoktxQB16PwF7dUerHtBgRBDGMYQqbDiFZs0JQFuvbuTzDOG5mXds3kEBr337CmNSQ9tX1/lZVI8CZeau0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hB2R5CC1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Qqk9nfeI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hB2R5CC1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Qqk9nfeI; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AJqf4aUq";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="bIbDd8GJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1744092496; x=1775628496;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
-  b=AJqf4aUqCkKTMIsTalHIjXv6YwEB8NABmIWfc+c5Vl8eg807fpaSXcms
-   p70YXo9jc2wQrOg43u/UdgawR8P5q3ZiXQXhgjhi33+uQSBouw2dUJ+NJ
-   O9fgoY2szGqLn/XR7npOMoh1lyiEvbF/MfSXjU8+CmpZ6/n6J80ryKIa2
-   l/pF8fyJ/0qnpLc9gbwhdWU6aU/AJYqr6vcEFkGjQmaZA9FYLgPBVfAg5
-   JiDpfUyOsM5MJP/MOfQz2EfKzzLf5LVkQAcPIG0qk2vJEDdQlBgb4rtAC
-   PubcF0vq1cxYXRyXpcNQruJ3SPYvr0FP8n2ICXUHY3rqOpfNUJfBe/nRJ
-   g==;
-X-CSE-ConnectionGUID: ahrr3jykQFaTMQxT62hgmw==
-X-CSE-MsgGUID: DV/4JS69RhWkY5MhJhgvUg==
-X-IronPort-AV: E=Sophos;i="6.15,197,1739808000"; 
-   d="scan'208";a="73506248"
-Received: from mail-bn7nam10lp2042.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.42])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Apr 2025 14:08:13 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q/x6Pj2OumbWqQr9ziFLPmcrZ8SQRD/UB9QVw49PPtyW8lIbda7HSDTuugVVNIEQGg22CejaurLD/2Z5f89jchcMm0A892yW/gX7SXox92BlumZVfoUjWYhEJA2WXfvfJEs0fAzw5UvSGaax7TIU1uIy1/zx4YQUUkOp2zZQgzyRhpnR+a184ovw6DC7yX/eKN4MWMW8un7jO+st01iJa0zqwGY0b0EVb2AuodQnsGHeOqAdRVMRZv1kBcMsc8RSZI5EQdJi8Y2uO0jIih0tkUZMX5Q7ApMTUwgj8zYX2vzEtrf/jrXct7Xu/M8TS1ed1z2rqmFBFDQiihtNC6zo6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
- b=cOEv6rErvIeDzgRuxPoI2OdqT9x9A/lUO7MoHvy4tEXvhHprs70IyTt8nLgmwTdxDltjQRQPJayIJ/lS0OFg2onCMV7PpoWdTJGM231wb+HLuaX5kk4mOlK4eKdPfcqsPwl3StjAulJFc91CajtUeIOaGbAZN1T9lEseebt4Y8zWkcUAVHi+Vy/ar8lkTSGbLamZsk3NS6SucF3hZJiJDTBlc7aYdnRdROgGdc1tVDd4rcakTIeAv4shichBAjXC2T5SjMvoaAufrcGD5ekHekBYbryW7wiblqtekuGYW7A6O30TAyOsMZ475Kel/VOHFF7fPASfG7EcyUnzFjqgWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
- b=bIbDd8GJeBzFKvAoT9Y8vpQFCdIeE3K9kQyr0eezw7cV+DYj8xFrxuvmuVbrwatdRyOZ+xLJ3n0qHNsShgkO3Wyr1tCbWvZ7+znxW+JWLmWDGVE/66qGySuK9pxE6yQ15CeckvJyadsGOabcowrIDT4k1+negpiHdY1r3lQD3ZI=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by IA3PR04MB9426.namprd04.prod.outlook.com (2603:10b6:208:50e::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.36; Tue, 8 Apr
- 2025 06:08:11 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%4]) with mapi id 15.20.8606.033; Tue, 8 Apr 2025
- 06:08:11 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC: Caleb Sander Mateos <csander@purestorage.com>, Uday Shankar
-	<ushankar@purestorage.com>
-Subject: Re: [PATCH 03/13] selftests: ublk: add io_uring uapi header
-Thread-Topic: [PATCH 03/13] selftests: ublk: add io_uring uapi header
-Thread-Index: AQHbp7+fvY1macqNO0KI0Y/VqtEpS7OZSbUA
-Date: Tue, 8 Apr 2025 06:08:11 +0000
-Message-ID: <96986e17-2096-4ceb-8451-14989a9fdac4@wdc.com>
-References: <20250407131526.1927073-1-ming.lei@redhat.com>
- <20250407131526.1927073-4-ming.lei@redhat.com>
-In-Reply-To: <20250407131526.1927073-4-ming.lei@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|IA3PR04MB9426:EE_
-x-ms-office365-filtering-correlation-id: eee42891-d9f3-4dcb-211c-08dd7663bdac
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZVoxZE5CckFndFpzb2dSTExsUUNRa1pZTkdKbkdYUmFReUdjVG5xYXJnOVdo?=
- =?utf-8?B?UUhabGZ0SFdyZURZNDIyTmdXeTcweFFWL0o5NU5XQnBkMDdvVGcxVm8valda?=
- =?utf-8?B?aVdRZkhQbW00RGhyNVJ1eGNyWVlGNURGSHlsaW1DSWJzVmlPZURxVlE5Z2Ri?=
- =?utf-8?B?eGdzZEhYZGZNdmxpNFBPT1VNRS9uSlZQRTc0R3QzYnJvR3QzR09TUWZLdzlk?=
- =?utf-8?B?MGVOekdNUkRjaVRqM0VRZ09zcnBzT1dFNVVmNnRjNjZkR2dkVllJNEVXRFBp?=
- =?utf-8?B?MXk3SWVoc0lXN3dycUYrWW9DKzdPdnlTMnNqS2NpOEI1aGNyK3c5anR5Qis1?=
- =?utf-8?B?UFNkRmU0OUtpbDZwVlIyWlRvSkJmMXlYUTVBR1d4RHVrSkp3VlRCOUtQNjc1?=
- =?utf-8?B?MWVTN3FMSG9LeERFR1ZpRXpaYzBYMXZobXhLS0d1TVNpbDVrQ1Q5THBDWFR4?=
- =?utf-8?B?R3pObUpTMGx4NmZGbktoSlkxbXFwaGNnV1dqQnFkNmU1Q1lndnpXZkJoVlF3?=
- =?utf-8?B?R215bGlJQlAzUG9raVd5NklaZnFlZVVnMzhaY1dabHE0V1phVFhvbEkvTkJE?=
- =?utf-8?B?ZWxqUUhaTk9JSjlqaWFIWjNMaUk2Mjg4TUJtcGNoRGg0R1UzUjBlYzhnNjlw?=
- =?utf-8?B?cXdPTkMrWHJGT09zcis3d3MrYjBYWVlrc1d2WGpURUI2MThNbmNzSlYyOWtR?=
- =?utf-8?B?R3gwUHlNdy9xMW1Ec2YyaCtRS0VPdjVJY0ZDUmVvWjhWR0NUZVZuSlgrMFE1?=
- =?utf-8?B?RExMWTNScmdON21yWkVJZnROMFBNMkRtdjhyT2xoYUxXRTBkU0pHRmpGQ0sw?=
- =?utf-8?B?WTc3enBMOTZUNEN0VmhhT1V2b1Z6OUlXN1pEMzNZT0Y2bUwrLys0dVZZVTdo?=
- =?utf-8?B?Z1I5M0dkTGlwWjYyV2pxLzJ0N2NPc0dNSEJtMDRyUFdORk9jSHVQY0RxWWNr?=
- =?utf-8?B?cWc2Mjg5ZGlaQ0t5QmpJK3BTMjN4VlJVUi9jWm5VNW05bThtUWJsNy9PbWY4?=
- =?utf-8?B?N0RXVzJ2b0FoY1FGWk1ZdHVJbGJNZ1drTUYwdUJDZUFMNWpCTWxzbzBQM1Vm?=
- =?utf-8?B?Y3MyL3p0WUxaTGhJVXJSckNJVVQrZFBpdVMybVRldFRHR0FOaFVQdXBsbVRW?=
- =?utf-8?B?TG9qU3MraTJqVDNrdDNId2E4cDFzSHlUbXQxaTNxNTQzUGErZVg4ajY3Z0VN?=
- =?utf-8?B?c3J2WVFXOWZVVytrOGpmWnovS1k2Kzdra2FxUXJaQ2l2dWUyODZybUh5NlZH?=
- =?utf-8?B?SVdkTWVwelhnb2ZNdVVSM0hjcHRQNkw5aXpLWDVUQzJIeFhLaWFESEpEdWEy?=
- =?utf-8?B?dm83NzNMbFFNQUR6TVBmc3d2MWdhV3lxQlArSHdZUGNGQWkyWUM3T056ZDdV?=
- =?utf-8?B?Q0QvN3hZbUw2ZlE5cXhUemdVMGFXeC9Lb2VRRmhmZVl1YjhTNGYzYnBlMUNT?=
- =?utf-8?B?Sjl1MEVwbUViN3ZWSDhRbjdMSEREN3NERTVhM0ZwUVY5SG9EUHRGNVRMd1Qv?=
- =?utf-8?B?THZQSlN6YVhFamJjRTVJSHJZSTFGMXV1cEdqZ2FOdGZnSDBlYlVDZXVYN0ky?=
- =?utf-8?B?VnRWUTUvU01GNWpCaG5EVXpwTTdzQ2V4ZlYzMnhQdkkya0hWNm10RUpaUldv?=
- =?utf-8?B?dWR3eklVejk4UHZMQXZYTXdXSVJaemEzYjJaSjY1ejVMYXp1Zng1TlhycHJF?=
- =?utf-8?B?ZjJnWTdQNG9yaEFhUTgzWVFUWjgzcDVHMnZ6aFpIcUFpZUU4dVpBZHBFYmZT?=
- =?utf-8?B?TkUxUEJBbEY2R1NrOXh3cFlzaEw1ZXc2d0NpZDYzZUx4REFQd2kya0FvNnc4?=
- =?utf-8?B?RGxNYVJ1d0h1aXBTZWRJUkt5T2V4RllZZkdIdkwxTTREWlNSUWRvSEVaeFYw?=
- =?utf-8?B?WG4zNHBUU053VXM1SlJYR2JQTDdDc0ZzcWFKdlduNFY3bGtZY3BHU0Z1ZUxK?=
- =?utf-8?Q?E9RvUcGFqUM400dUOA32o+DQ1ask2AJI?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?OEJLWVQ0dk9uMXBXZDJnTVNDWHU1VG1sdktVUElTTDJibUxIWGpFRHNJTU9W?=
- =?utf-8?B?YWFacnRxZU1WR1FvWEhteVRpelVHRktmWUNqTk9BRExjeWx5RWpocTN6ME15?=
- =?utf-8?B?ZWFZazYwbllGd3VKdDIxNDFHcWIwWHV1YVBkREhzL0tUV0ozUUFXc0tvcVhh?=
- =?utf-8?B?OGNKbDF6S3Q5Ty9hRU5GQ3E5K1poMW1TaVgvb3lVNzV4RzdYcjJFMHlycm8x?=
- =?utf-8?B?MXJsWC94Yk0xdmVJU3kyemNyYlR3RzFrK1V1ZlMrY1BCcE1MRnR6OWMxeWNQ?=
- =?utf-8?B?alpFZUwvQlVkdGZxWVZCZnVmL1ZnM1dwdC9lNnV1dEpQb3p1SlN0WWt5Snpk?=
- =?utf-8?B?aU5tUDJyRmF0Y0lsRldwVURXWXpPczFhU282RmFlK0pGdGdhWjhwZjZRcTNX?=
- =?utf-8?B?THE3ckgvMkxxaGxJMEY1cnFBdXF3QUFWWnJFVEhSQVdLa2toUjJ5Ukl0by9l?=
- =?utf-8?B?Z0UvR1NuRzJvcTB2dy83RVMwcHlhcDZydGpBeXVlbEE5ZXZ6Y3pPcklLb1NU?=
- =?utf-8?B?eFRrUEt5OENqbGRKZndSa2NMb3RZV3YvejJuanFJd2FrbUw0YU9YbXcxL0d6?=
- =?utf-8?B?bWdlN2hFcnNubEU2ODJkdWpoa3NJdnFNdkRjMFZvUVcrck5LcW5xbGJZU2xx?=
- =?utf-8?B?S2xFaGZiNG5TQllMWW54RUwweUt3c1JLYlFSUXB1cHp0ZG4walM4d2ROVzJq?=
- =?utf-8?B?Y2NTdDRHWUxpREZTZitsUmkwUVFTZE9UbUlscXNIQ2ZJY2RJSkx5cmpyVHFL?=
- =?utf-8?B?RHRMTGlCcWlqUVpzYVk3dVAzbUprWDRTQlh6ejhwUVBCMkx5NUREUWIyMDU5?=
- =?utf-8?B?S2xkam4wbnQ3cC9oZ3BsNWJLODkwS2dlTy9tL3RPd3J1VjBoaUF6K2RnUEdi?=
- =?utf-8?B?YnhXMkY5aTFKVGRYRVpXK3FwazIwNFNXQU04blZYWjZFMFEzQ0NWOEJ4MlNt?=
- =?utf-8?B?aG5UMUNUWkZud0dYRWZnK1ZkRWtNcjRrSGxVeE5qSWp2Nml0dmVvckZIZS9T?=
- =?utf-8?B?RFNwV3pOYkVFNmdiUUFlaGtUTHZ4N2oya0tsMFZDc25IaU9BM2hDejhmMTJO?=
- =?utf-8?B?VjE5QjVhUHViZXBwV2xsZnhkb042azFxa3hTSVpPaHNUTjZCdDc3Y2NiaEhn?=
- =?utf-8?B?b203ZGw3YzRoK0tDMllxYytscGg5YWg5S3hwWkE2UTliM25wb1dqdUdzZFRt?=
- =?utf-8?B?TXZ3VE1UcUZwYll6bGs4UjlLd0ErQ2FhNXVVMmxtaHhiNDdWTUNnQzgwZ0Vh?=
- =?utf-8?B?c0VvM1c5V2Fob0NDZVVPcDZhQVRXR1ZjQllVaENFbFN4UjRjV3lCTFV2TURp?=
- =?utf-8?B?TXRISy9tSFdoN0JDZWowSkFkcmJLczRTenBwdTd1WHlyaVFnSXIveEtuQi9j?=
- =?utf-8?B?MG5VN3VJMWV4QXNUaDdMelF2dnBsNVRqUGt6YVgwLzdRaHE4NmozUEY3c3R3?=
- =?utf-8?B?VHdSL0RvbWtNQ0ZYUUUzVk05OEswdVFoTVZVYVJaS3Rua3NsZ3R2UzBFa1h3?=
- =?utf-8?B?ZWZSM2wzdWMxNTFqU0ZnVjJYNkJUbkxnMzZWRHQzSTBoYUEwOEI3SXk5S3Jo?=
- =?utf-8?B?Qml0eUhoNTMydWJubnJDUEJjejkxVzJLdkczc3BSMTBTSTA2UWhZOWoyeTJw?=
- =?utf-8?B?VmpLYldwR25nMUxWVVB2dXNIUTRpM1p3dkcrU3R2eEgzY2NOVWdWaFViVE1B?=
- =?utf-8?B?R3NucXhBTE5Oa1FheTZVM3RCcnFyVVVZa0JJRFQ4dFUzbWd3cGVnQjhkUlFr?=
- =?utf-8?B?SXZSSktYUmZqeHdGOSsyWGRxS0xmWHoxZDZOWmQ2NDcwU3Y0Zkd4cHJTTXAr?=
- =?utf-8?B?RXI4NHZ5OWxOSDVVRnIySWQxTG96OVNDRkw5UkFKelZVNHQ2Y2xuMGRERFdC?=
- =?utf-8?B?SzBLbmlSVUZFQzAvLys4V3VNS0hNYTFYdnNpMW9TdW9MU0l4UDJ3MWhLV3lN?=
- =?utf-8?B?Tlc1VjdUYlp3NUlmRnczb29BNEtyUzRDZVd6ZmhVc2hDSlNYSnUzTGpDaFI0?=
- =?utf-8?B?K012bWh4bXZNdHhRdEdReXdhWnJEOTFGQjR6b05TbUVtcE9xVnh1K3RQbnBr?=
- =?utf-8?B?NGI3RzBZREVMWTFNdGVhR2FFN0ZkZGhWVm5yazFoNW5UdWFac1hmczQvL1Vq?=
- =?utf-8?B?amlDV2dzcTJwQUpXa2w0a1c4OVVXSDFMejFONlNxZnc5WEhNRjJLY1U4Z2hm?=
- =?utf-8?B?UFE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EBEC37DCBC826741A41B05E0BD088CFB@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hB2R5CC1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qqk9nfeI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hB2R5CC1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qqk9nfeI"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D368121160;
+	Tue,  8 Apr 2025 06:10:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1744092654; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oj3NtTMaIdmS7f74bC9S8exgrmgilgWjdRpkYIVpsYg=;
+	b=hB2R5CC13J5f2F9jzZ4zBglctMigPbWXk4fTWPJXxJp8xD1YU6h85/iTX0aoV7SXnUTnNX
+	/JHXqnoBgWuxigtzjDwh7m3n8X7GyadA6WB5kY5lldHP5FgpdF31ivjVoHPyjpwWnrLkpe
+	tm53WCV2MBHYGJvAnlXz5h/edye0ZC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1744092654;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oj3NtTMaIdmS7f74bC9S8exgrmgilgWjdRpkYIVpsYg=;
+	b=Qqk9nfeIY2mqJVKCS0dZ4Q9X7yq/BgpIew3KBkTRGV+8dn++IjtsZpbkpOwIiiFCPnkNOa
+	I6YJMJubnYg6g6Dg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1744092654; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oj3NtTMaIdmS7f74bC9S8exgrmgilgWjdRpkYIVpsYg=;
+	b=hB2R5CC13J5f2F9jzZ4zBglctMigPbWXk4fTWPJXxJp8xD1YU6h85/iTX0aoV7SXnUTnNX
+	/JHXqnoBgWuxigtzjDwh7m3n8X7GyadA6WB5kY5lldHP5FgpdF31ivjVoHPyjpwWnrLkpe
+	tm53WCV2MBHYGJvAnlXz5h/edye0ZC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1744092654;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oj3NtTMaIdmS7f74bC9S8exgrmgilgWjdRpkYIVpsYg=;
+	b=Qqk9nfeIY2mqJVKCS0dZ4Q9X7yq/BgpIew3KBkTRGV+8dn++IjtsZpbkpOwIiiFCPnkNOa
+	I6YJMJubnYg6g6Dg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8721513A1E;
+	Tue,  8 Apr 2025 06:10:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FxfsHu699GeGJQAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 08 Apr 2025 06:10:54 +0000
+Message-ID: <7b8c4805-a91f-4455-a021-e5d8b6078d8b@suse.de>
+Date: Tue, 8 Apr 2025 08:10:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	BDqjt9XmKZ0ag2wT88WGeTlr4NZZmEPR4jSoE7k8+0cj49l2owCxBb1pkNQ0KXVjv2ViK222c56Pzp1Hb9BJQQtdZ2KCMj6w+V49sS/xHawBiB6IuieMeFvrhw0hnM9vrR9AIJJt1Y+8wIxTDtTPGaFsIn/ra/cwJDoAuwtIRxH0BrOVcj8PTWEoXiVHkKoaVwse7gDmwUCgS8d+XnbanW1IwBcaYYy4KX72pHzkwcGtqOjfwSprq08NoD7JI3uohM80zuI1ZiIsjrs1m7zAHJkrCO9UjgIBD02vZ43g5GBvfOD/bJht1kDD8UmRhi1iDBATFlOrGXgg8GoNimSxiZYnQqNFTtTt35KL/4l4dzbdrNiHKmDr1sljO1rw3ExpGWbRTo7bNKPIXzOYA4ZY0uksqhvi7CylNzlAmD8mpK1+YmKfq2G+Ic+se/tGx7ONGY6pSUrCk4Q96/w61ZXX2CVIu4lJdgwGbrFTExwIL9DwZEK8nVcUMJj9uMv3g/9mtnVYMtPT8x7dkZ+VSfawqEgcjk/LvBanu/ujRAuQFGQOwBuQFd2H7G75l/IsNGG5CvPyt7ZlZj/v+FegXcJMymm1ETWBhfhkrSziqyXz9550bVyjMoiF5CkdaucKifCo
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eee42891-d9f3-4dcb-211c-08dd7663bdac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2025 06:08:11.2247
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ljQMBOBOk+VGfsbLIhRi9qStjLwe9GIcLvEhj3W4FVs36eV8j5YI1K7oaBABVfgZQzu/jSqOWe7HC1T8lvP/I9h5QYQprVomyQDCB06V49g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR04MB9426
+User-Agent: Mozilla Thunderbird
+Subject: Re: bio segment constraints
+To: Sean Anderson <seanga2@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ linux-mtd@lists.infradead.org, Zhihao Cheng <chengzhihao1@huawei.com>
+References: <8dfd97ac-59e7-ae69-238a-85b7a2dae4f1@gmail.com>
+ <8a232716-74f8-4bba-a514-d0f766492344@suse.de>
+ <a0ffa9b9-8649-1b63-3d56-3fc45fdfda83@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <a0ffa9b9-8649-1b63-3d56-3fc45fdfda83@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.dk,vger.kernel.org];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-UmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMudGh1bXNoaXJuQHdkYy5j
-b20+DQo=
+On 4/7/25 16:14, Sean Anderson wrote:
+> On 4/7/25 03:10, Hannes Reinecke wrote:
+>> On 4/6/25 21:40, Sean Anderson wrote:
+>>> Hi all,
+>>>
+>>> I'm not really sure what guarantees the block layer makes regarding the
+>>> segments in a bio as part of a request submitted to a block driver. As
+>>> far as I can tell this is not documented anywhere. In particular,
+>>>
+>>> - Is bv_len aligned to SECTOR_SIZE?
+>>
+>> The block layer always uses a 512 byte sector size, so yes.
+>>
+>>> - To logical_sector_size?
+>>
+>> Not necessarily. Bvecs are a consecutive list of byte ranges which
+>> make up the data portion of a bio.
+>> The logical sector size is a property of the request queue, which is
+>> applied when a request is formed from one or several bios.
+>> For the request the overall length need to be a multiple of the logical
+>> sector size, but not necessarily the individual bios.
+> 
+> Oh, so this is worse than I thought. So if you care about e.g. only 
+> submitting I/O in units of logical_block_size, you have to combine
+ > segments across the entire request.>
+Well, yes, and no.
+You might be seeing a request with several bios, each having small
+bvecs. But in the driver you will want to use an iov iterator or map
+it into a sg list via blk_rq_map_sg(), and then iterate over that
+for submission.
+
+[ .. ]
+>>> - Can I somehow request to only get segments with bv_len aligned to
+>>>    logical_sector_size? Or do I need to do my own coalescing and bounce
+>>>    buffering for that?
+>>>
+>>
+>> The driver surely can. You should be able to set 'max_segment_size' to
+>> the logical block size, and that should give you what you want.
+> 
+> But couldn't I get segments smaller than that? max_segment_size seems like
+> it would only restrict the maximum size, leaving the possibility open for
+> smaller segments.
+> 
+As mentioned: individual segments might. The overall request still will 
+adhere to the logical block size setting (ie it will never be smaller 
+than the logical block size).
+
+Maybe have a look at drivers/mtd/ubi/block.c. There the driver will
+map the request onto a scatterlist, and then iterate over the sg entries
+to read in the data.
+
+Note: mapping onto a scatterlist will coalesce adjacent bvecs, so on the
+scatterlist you will find only contiguous segments which adhere to the
+logical block size linmitations.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
