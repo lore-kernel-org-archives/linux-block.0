@@ -1,300 +1,440 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9174926980C;
-	Tue,  8 Apr 2025 10:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744109107; cv=fail; b=OP7cc1Gg+gbpL0sXhnQDWDh81VVTpjTrWIzhvxreJwimxYSxO4jIk6sh1Wp4cBjgjhleKmyYV+GZ83Qro+xPqQYkpSyrn4IRKQXcfduJQPP2CoCa5SvibaXcLwRLjDnwknk/Azf3ZCYo0GG652uZ61ZEF40mxe/IgxycpT80Llw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744109107; c=relaxed/simple;
-	bh=OxQNq6QEGCEq+/HwIJELBoLmLVhKQyZgrkasPLbfpgI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YNyXLYZ9SgBFBWWc3aFOKkM97B+tngERfZVlBTCw/Fyc6HfV+r4cm7daHxAldW2wJZJl9IbRBdm7xGw77xBULXLQNGufJ+LClY4JWcVlb6UJKTs7B5aGU3lSvLvbBunwTroyMIBIGlwRQsrsUl4KU55360XNa7n/3XYFcChw2fE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oUUjTFpc; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=j2YyDT1N; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oUUjTFpc";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="j2YyDT1N"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5381u4gq029500;
-	Tue, 8 Apr 2025 10:42:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=7fYyOlvylyOU0DXb15UFUCNloOEWOG2/wSGF8TCYNmM=; b=
-	oUUjTFpcFv22NUVdBKAMCbkvxqzDen27bd4Sdsss3240yfg2BLgvTlfKGOX69DdZ
-	b+oFX4rbxZg3O32i9FqP5tG2pTHHPI0er34ODgFBID5Q7ExGWJJUR9UclpGeV9g6
-	1N+2bT97By7Faay/zocbLLqYxSTbi5yB3zsnt3L0IyP4hV4DCy/Ne3D2Dge5SZZG
-	WulkatQB4nsuiTkbboPxyLxsmLQ75hJvwAT8FfOm+IfIzXOfD41xzVbUYJ9hOVAE
-	oH/bTsP1db3yq3PSC4T1Eb6HVld/rQGFii2Wv4izDISiyNcCTuqWdV7WabyKSfCv
-	jUN548FSBvJp+XjSQjlcqg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45tu41cgqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 08 Apr 2025 10:42:52 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5389F4px022201;
-	Tue, 8 Apr 2025 10:42:52 GMT
-Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazlp17013061.outbound.protection.outlook.com [40.93.20.61])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45tty9twg1-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 08 Apr 2025 10:42:52 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z0W5p3yDPazn5Pf5zx6x9y4461+6kn6SbkrkQdwmweh6t319eRzqESyIOLcjAEn1QtSKBG5XDrUZH9hFp7yfHZoSER3GwkCbgcIBsB6s4cV7YlytHBhRptF9XvuCGtxG37OLruPs2dddxGyj78H3m3ljUce8bSwNfGqd29lJzq28/Qf+k53Q4JPAnm+ZlR3mJV78UdZFN57bHiVQ2SC3pRzdiNAtJA6mmdnFO+tYgyWqiyO48B318KrUBThfLImDFUfUqvVbB0YDp6El1WAXJOgRCmhIQ5/EDT68aDeDztPmwPkIsEjZiJ68oMDMipFk22RUddQ0GnH0v4xUoZpzBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7fYyOlvylyOU0DXb15UFUCNloOEWOG2/wSGF8TCYNmM=;
- b=uaXMENwWoNHmLGl1e4O2V5Z2dlYU8QjACIiaHWK6b7LdQ3Etdjvz1Scn4cmCREfyi6V+U39UjbhKbOazO31hez/g4M8wrk2gUlhhEimdswRhsGNMBhlpi75Sv+KFS0+kc8IQCvBAWemviDtLYWS2yqmgGueE02s1ZyhGVZJSvXMNGca7G4YMb562nTNC6dk2gHxDMTdX8zNqAYoXpcT1iPmlYoZ/C4MC7EFftlLlZOJ5NSK/Ca4Rnvwa70rbLRvG4g0ExjZq5IxVIdVGs457DIZEE/IeQD6DAw/pcgO3xrxL++CcA8WdyJT3OmGF+imOkHz4CLAwuGYUDQ5LY7jpEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7fYyOlvylyOU0DXb15UFUCNloOEWOG2/wSGF8TCYNmM=;
- b=j2YyDT1NO26SyJh8Y9Y0cPRG5OewmOLemiWoKTT/kCg+v+TCVMXQJGA+0823XJzGHBntmxiBZQVBmFJ42A2WVk49G4yCLFTCm1HtDO8tijETT3EbZvuIEObRP0q51xWjRxmdvZAvyuVJvi1F0KzUs+rFsvc0viMLMxI/En5Utq8=
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com (2603:10b6:610:7b::9)
- by CY8PR10MB6779.namprd10.prod.outlook.com (2603:10b6:930:9a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Tue, 8 Apr
- 2025 10:42:50 +0000
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::fd5e:682a:f1ac:d0a2]) by CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::fd5e:682a:f1ac:d0a2%6]) with mapi id 15.20.8606.027; Tue, 8 Apr 2025
- 10:42:50 +0000
-From: John Garry <john.g.garry@oracle.com>
-To: brauner@kernel.org, djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
-        jack@suse.cz, cem@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-        martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, catherine.hoang@oracle.com,
-        John Garry <john.g.garry@oracle.com>
-Subject: [PATCH v6 09/12] xfs: commit CoW-based atomic writes atomically
-Date: Tue,  8 Apr 2025 10:42:06 +0000
-Message-Id: <20250408104209.1852036-10-john.g.garry@oracle.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250408104209.1852036-1-john.g.garry@oracle.com>
-References: <20250408104209.1852036-1-john.g.garry@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR1501CA0017.namprd15.prod.outlook.com
- (2603:10b6:207:17::30) To CH2PR10MB4312.namprd10.prod.outlook.com
- (2603:10b6:610:7b::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AF126B94E;
+	Tue,  8 Apr 2025 12:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744116485; cv=none; b=cwzZBeWZgjYlBaq6HrtJ/pztnQt8wSgNutvx1sDDoJnfitFRl11otpxZXLwkt60dX69R36uJFBjqio2QTx/867XFzZfa+w6iE/62lQkp8vtfDf0sYl4pBv92Yj4mJB6SfLTafev2p1E3WCp1sLDnKcD9xhM9B9wLhJGOyD/FfFs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744116485; c=relaxed/simple;
+	bh=o06LsqKt9ZKFc+X/eB16U1/EpTtNW8vDw63l6tKzT70=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mWxi1cmW7++E1Q08guppWW8HsCyeNsUdHjC3VFzNMY6/+QuqZF+WNVm2TAbenHQyQdo8cKIR1S8hc8WwdRV5bQWydVufiZjjjmPaHP0wVR0UVd99Vf/KsHpY4/NVtBDMwyK2JiYNPI8m3EJadZGcA0kp1He3TgRtJYyzv6ZkSYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZX5T63gp9z4f3jkw;
+	Tue,  8 Apr 2025 20:47:38 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 7DBE71A1478;
+	Tue,  8 Apr 2025 20:47:56 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2D6GvVnWMCDIw--.65008S4;
+	Tue, 08 Apr 2025 20:47:56 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	xni@redhat.com,
+	song@kernel.org,
+	yukuai3@huawei.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH RFC] md: fix is_mddev_idle()
+Date: Tue,  8 Apr 2025 20:41:25 +0800
+Message-Id: <20250408124125.2535488-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4312:EE_|CY8PR10MB6779:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b89fa20-7687-49ce-aaad-08dd768a1bb3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Q3TkXI89a0NAGs1p/Hn7LcyA3YvmHMLE+ALPp2Atlh1mQes11WMhRBpWDIgU?=
- =?us-ascii?Q?ivVB0kYp+BJg/Ki4HA37QeJcDJ7blQLRWHlfS4Jj2JR/FsalL4Rc5Czbnn4t?=
- =?us-ascii?Q?wlAbajiMUxK3CrRD/wSiOcmW5ateInOpRMfobOyAzbn1BLcsgPoDStjpziV1?=
- =?us-ascii?Q?PVYPsMg1ReNAHRxjgu2AHyENYkwrplUvo9IusQSirKsv7KJpuHlf5557yvSa?=
- =?us-ascii?Q?ngVkfoWjlAbaJByxO9mq18oqaF7PREs7L7l/cTyME6ItowaRJEMPO7n4IAfQ?=
- =?us-ascii?Q?nRvJlM9Ij3IHNrTWOlQfFkmt3HDL56JCZwjqTIl9t66Wc6md0FTBxVLqxp6A?=
- =?us-ascii?Q?j1FhHng10j9u5XSXurkvM/+RzIJ+ZDviiSuwg0eKKv6Jw/VfAxf3dqf7iq0H?=
- =?us-ascii?Q?TqgrGucFKDgjRqaUHxk8C3xnyHoO8+FKRblQlhbO8KD9mvAfMFIjYm80tbCk?=
- =?us-ascii?Q?1ISVhnvWiP3M3H4tm7cillNH0ty/w9s4TlWcW6fh9rRF2OJZlPnYBP2p6mCf?=
- =?us-ascii?Q?qYIK6a3mHh2NM+e8eFU5S2jtuFEXeWkewRwF4aCaIGLGFae57OpLCKRzApPQ?=
- =?us-ascii?Q?NMslSi53eHSsmMq3Mu2wxOWqPrkNKhzuDMtAHBtmaL1LzGsx+AT3Lz/wOFQy?=
- =?us-ascii?Q?SIf5hUQv6n+AB5fQpehFXq7SvsGg8wReIOOCLjjYD0UhNEuDLQDLLCZ8AbOg?=
- =?us-ascii?Q?dfBSo0WcVlDTUMsEb9WejzSG56JG5ilVMVbZIVb73zUwD/4idBQsfJ2uaEvo?=
- =?us-ascii?Q?7yTcpL/tk8kd0jhMjnoRec3+8iUrJ6Su5KYFxDu9p0pdBoOOIWTxdeRLU4Dk?=
- =?us-ascii?Q?KHlTxRYCEXStXdMNSszrmCwkNJa1TNvUCwC6p/OAnAUJQ8epfsmbAnEEjPzw?=
- =?us-ascii?Q?KkK1PQErLhIAYvGSEL6wclH3SNoPgbEmxyHjjIyoZMYLaI7QIzodbhsj9KKW?=
- =?us-ascii?Q?r9b+GKLsGXf+1M+tjsFk4djFUeTjoApzuAdnX68h1J0NXfjx8cr2hls2bGp1?=
- =?us-ascii?Q?PYD7qv05XfWx++wFqH07DivN5hj6I6klA6KQ2MNIFQ7uDyRAt+zeJ4yCI0XP?=
- =?us-ascii?Q?fot6aw8xr1cDGUMXjWIB9O31S4PFBxN3YFqNsVRlzblgiul6TOrCZHzxVo7k?=
- =?us-ascii?Q?eHK5B8p+QqT1PhJNeOsJVvb5edoKEDWrF/WPWXrxu9+uOD1aqI6M5wVRwvcc?=
- =?us-ascii?Q?UH0oHn3y7woCLOER1m9f+vwQFpP292BJZkDMXN6XQm3GvjXvs7429wYOhHN6?=
- =?us-ascii?Q?rS2daSIlKkcuzilB0hy/ZGuk8MUJTC1MFkPsErgoBl593Dd7XUFaae7FczIE?=
- =?us-ascii?Q?vSELJdbzYphyYOr/f/oUQLGszESeTNFfaM2hvVglrNlzExO87u14XxB+Qtk0?=
- =?us-ascii?Q?ZUUqYMeTKB3aU8Cw55pTY5rhsXkR?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4312.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2SoEALCfpW9RvCUWMeFWguizobc7pVZykykbKqNqJer5aSo0qZt3nnGsX2HU?=
- =?us-ascii?Q?Dj9917Ub4BVWbm172WdxYgvEoIqT9uhx5D0glXbuExoTxo5z7Ib3g0vsuyuH?=
- =?us-ascii?Q?7GVJIrMW95JmoE13ZS6Rylcx8R8ttMoLMihze9sQyGbIPfyTmmMuVTQgE6/U?=
- =?us-ascii?Q?BZc0MuiLwwjmImcHPRFeAYoR8VoKr/9YHB9yEb0hb9g52zIFvQhi2pN7m5dX?=
- =?us-ascii?Q?wybmgoIMqn8uoBc991Yv2902F4l0SKNst8WneUQvwAHeeAw1gMedXJ23lKEQ?=
- =?us-ascii?Q?DiR/panc8cRmf+EYalblYXOu871qes0d8ybmphQA6F3rslLht/8eMYo81TzS?=
- =?us-ascii?Q?uCb/h7R0yDDivVukJtXvuW0PHZdxyjZ16TklCfZu6v8J+3WAARuR84ipRw1J?=
- =?us-ascii?Q?aLcgtBmemLfSzCa4jNloQn8nLkKO2sXt9l2zfyUbNyRS1GoW9XzTyrZes13M?=
- =?us-ascii?Q?whQsE/CPL26Qos5Vu0zSI9EUSmFv4+JAXJYJ50hHLVw4h9i7v8gUQBle5FP8?=
- =?us-ascii?Q?ZjrZPgzdopkHTonvyUwrVJXrp9YvVXCgdBysJRVeQnHU5eEEcsUJ+Svz/kar?=
- =?us-ascii?Q?AnFwjKG2m3XUV9M3j6jTq/zRwTE5cpp6X8Rs2HpEcSZDHJK1974YPkbReysN?=
- =?us-ascii?Q?/rkHNnBUZ4mkaqrhT8AukrPiO1LBhZCvxRh5mb1wbN/tAbnFP9c4a6fw0asZ?=
- =?us-ascii?Q?LFEO62YYvmJkON/U4q+WDKBMmCN7d6/caG1uEcUo5z8OjU7v9lTMvh8ak345?=
- =?us-ascii?Q?8K3EDMyw1N1MpVoMipk8i3TM3r9vh2T4IRHWC4K1AZPKq5F3tY8rifmAkVLG?=
- =?us-ascii?Q?GYIKRsDpY3UevOYwY+n+N/DtExvoa8orkClWjorDH2A5ZqXrjY7GWrelAy5O?=
- =?us-ascii?Q?2BSNp+yH1UK359sN2G3rqWVhdqmk0e8J3zqwYdup9VUbodDtLk3jXz/u9IYm?=
- =?us-ascii?Q?nvtjRQo7uP0D/HbDpBNTzeO4vvgbBHkwamEqDt96qTRkt+XX7nLl1E9RXgqm?=
- =?us-ascii?Q?N2zpOnRdjANTn49l2D+wn5M3gL1peSmSgec3QypeZIrnY//U7zPFDeIrWxYv?=
- =?us-ascii?Q?JulnAE+7+2wjTMNsKob1PH4lKrShPGj4XT8BfTHYoF/9X4wWyKPuWLL0dRM1?=
- =?us-ascii?Q?JqCYH760IQ0Whci2hs4umhyDJVQfSrc1UGZAHfdE0PUlITCHYyN8EZPJ1+gD?=
- =?us-ascii?Q?pRuHRlw+/L3k7vVC2ic1u+87VMi4jXfsxLgx32Ohl4fDDSwdgbPwV/ca8LVd?=
- =?us-ascii?Q?GHtj3MIDBNwJ5RZvkYRdr2wEIPxRItGxYOkVw4ch/YKt6SmqRxsTWBGLEdPk?=
- =?us-ascii?Q?6vP2kmLzr3As0KVkt7LYZK0SEM8eN7QZfm7su3FY+XZ5bIdzL5vk42Vcndma?=
- =?us-ascii?Q?b6kmUs/gLvozEGDkiWittDTW0AMSvfkRsF1uk6WGndw+BfQb8xQhC0ny4G1O?=
- =?us-ascii?Q?cAZ4ivf/0lk7bqd4wVBkIYsuqohXOF3gCqYPyT6y+UTuIUGokMVOKdpgzygh?=
- =?us-ascii?Q?AUKP97C4xvGQHzQU60SUejslIQ1cNRsZna6HQ9qItOkxuKny/xh1TvM2MMYc?=
- =?us-ascii?Q?BpC3Q5Qq90eN8Wk1JglRscHCVsG1Ipczp97S75vTdXLxpFbNFuo/Kc3Pq/5G?=
- =?us-ascii?Q?1g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	9CiprKysHWkznA14vUsbJNui6twhSPtHp211GjXGethxSEHOrZ5gLBYe73Qr47jCMxE5Ep4Y0M/6AatlKicSHyLvp0kQWhWFN3fRsWxGpXHz1p1uD1k/BxbtwwDjZlIQCxRkfA26KWc4bAl9+t4ukHcktxhHDaqQE9x4D73wPUR4wFAAIUVG6nArMvusFhB/C7oO2oPIRZuvQUXkA1oFPK7iJTvflX9l07e4gYxeQ38rM5vzL94grUXgkxyZmHeI9Mit+bAmQrLb+A+Ccf7Y8xVMsFuH2HngkB4iFz6ZZ6vdOHZmuqwlQRmvUC+mxxQdGGIxBPxvJm4YgVhswYYfw6ToSKtjGcd5Wv38tuCHveol5DAKpODIHX8O8IlR5g/14u0eF0okwiZc/7hPFfR8h7kDdmXviJGWcpb8+WoynAhMZ8G+23iJ304rR61YMwLd+Ld716eSW+uFiQJKqjiSsSXeVkyB7jTu4M+Cb9Au9Jl7YAKbnTpvmlYccfGJ3CfoRPqzHL2+pt5fCafMX+7fF91L1BwL7AABWgv3MgY6l2ZHjFAoXuOI9hcKm52/Kd5lY7B+2vDlPbOYKPPCsDIjKtEctORbpfCqC6Y8ydf5IHo=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b89fa20-7687-49ce-aaad-08dd768a1bb3
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4312.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 10:42:50.0860
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iRD08i6mJOPATLP7t8FP2AtSi24JdlQaDSCMpNV+N3BoHfUIYPpNf2XNfLn0HAH3QJLtlRPtbfv1JegIRvDobw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6779
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-08_03,2025-04-08_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 phishscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
- definitions=main-2504080076
-X-Proofpoint-ORIG-GUID: 1P91RsN6HgElpGn1ssEza6B6uCnykTC5
-X-Proofpoint-GUID: 1P91RsN6HgElpGn1ssEza6B6uCnykTC5
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3W2D6GvVnWMCDIw--.65008S4
+X-Coremail-Antispam: 1UD129KBjvAXoW3ur4UXFW5Wr13KrW3Jw18Krg_yoW8JF47uo
+	Z3JFnxuw1rJrWrury7tr1rtFZxW398Cws5Aw15AFs5AFZrXw45tFnrG3yfXa4aqF1SgFWr
+	Xr9Fqw4SqFsrAw1fn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20xva
+	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
+	x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8
+	Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
+	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
+	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
+	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_
+	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-When completing a CoW-based write, each extent range mapping update is
-covered by a separate transaction.
+From: Yu Kuai <yukuai3@huawei.com>
 
-For a CoW-based atomic write, all mappings must be changed at once, so
-change to use a single transaction.
+If sync_speed is above speed_min, then is_mddev_idle() will be called
+for each sync IO to check if the array is idle, and inflihgt sync_io
+will be limited to one if the array is not idle.
 
-Note that there is a limit on the amount of log intent items which can be
-fit into a single transaction, but this is being ignored for now since
-the count of items for a typical atomic write would be much less than is
-typically supported. A typical atomic write would be expected to be 64KB
-or less, which means only 16 possible extents unmaps, which is quite
-small.
+However, while mkfs.ext4 for a large raid5 array while recovery is in
+progress, it's found that sync_speed is already above speed_min while
+lots of stripes are used for sync IO, causing long delay for mkfs.ext4.
 
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-Signed-off-by: John Garry <john.g.garry@oracle.com>
+Root cause is the following checking from is_mddev_idle():
+
+t1: submit sync IO: events1 = completed IO - issued sync IO
+t2: submit next sync IO: events2  = completed IO - issued sync IO
+if (events2 - events1 > 64)
+
+For consequence, the more sync IO issued, the less likely checking will
+pass. And when completed normal IO is more than issued sync IO, the
+condition will finally pass and is_mddev_idle() will return false,
+however, last_events will be updated hence is_mddev_idle() can only
+return false once in a while.
+
+Fix this problem by changing the checking as following:
+
+1) mddev doesn't have normal IO completed;
+2) mddev doesn't have normal IO inflight;
+3) if any member disks is partition, and all other partitions doesn't
+   have IO completed.
+
+Noted in order to prevent sync speed to drop conspicuously, the inflight
+sync IO above speed_min is also increased from 1 to 8.
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- fs/xfs/xfs_file.c    |  5 +++-
- fs/xfs/xfs_reflink.c | 56 ++++++++++++++++++++++++++++++++++++++++++++
- fs/xfs/xfs_reflink.h |  2 ++
- 3 files changed, 62 insertions(+), 1 deletion(-)
+ block/blk.h            |  1 -
+ block/genhd.c          |  1 +
+ drivers/md/md.c        | 97 +++++++++++++++++++++++++-----------------
+ drivers/md/md.h        | 12 +-----
+ drivers/md/raid1.c     |  3 --
+ drivers/md/raid10.c    |  9 ----
+ drivers/md/raid5.c     |  8 ----
+ include/linux/blkdev.h |  2 +-
+ 8 files changed, 60 insertions(+), 73 deletions(-)
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 1302783a7157..ba4b02abc6e4 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -576,7 +576,10 @@ xfs_dio_write_end_io(
- 	nofs_flag = memalloc_nofs_save();
+diff --git a/block/blk.h b/block/blk.h
+index 90fa5f28ccab..a78f9df72a83 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -413,7 +413,6 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+ int blk_dev_init(void);
  
- 	if (flags & IOMAP_DIO_COW) {
--		error = xfs_reflink_end_cow(ip, offset, size);
-+		if (iocb->ki_flags & IOCB_ATOMIC)
-+			error = xfs_reflink_end_atomic_cow(ip, offset, size);
-+		else
-+			error = xfs_reflink_end_cow(ip, offset, size);
- 		if (error)
- 			goto out;
+ void update_io_ticks(struct block_device *part, unsigned long now, bool end);
+-unsigned int part_in_flight(struct block_device *part);
+ 
+ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+ {
+diff --git a/block/genhd.c b/block/genhd.c
+index e9375e20d866..0ce35bc88196 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -139,6 +139,7 @@ unsigned int part_in_flight(struct block_device *part)
+ 
+ 	return inflight;
+ }
++EXPORT_SYMBOL_GPL(part_in_flight);
+ 
+ static void part_in_flight_rw(struct block_device *part,
+ 		unsigned int inflight[2])
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index cefa9cba711b..c65483a33d7a 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8585,50 +8585,51 @@ void md_cluster_stop(struct mddev *mddev)
+ 	put_cluster_ops(mddev);
+ }
+ 
+-static int is_mddev_idle(struct mddev *mddev, int init)
++static bool is_rdev_idle(struct md_rdev *rdev, bool init)
+ {
+-	struct md_rdev *rdev;
+-	int idle;
+-	int curr_events;
++	int last_events = rdev->last_events;
+ 
+-	idle = 1;
+-	rcu_read_lock();
+-	rdev_for_each_rcu(rdev, mddev) {
+-		struct gendisk *disk = rdev->bdev->bd_disk;
++	if (!bdev_is_partition(rdev->bdev))
++		return true;
+ 
+-		if (!init && !blk_queue_io_stat(disk->queue))
+-			continue;
++	rdev->last_events = (int)part_stat_read_accum(rdev->bdev->bd_disk->part0, sectors) -
++			    (int)part_stat_read_accum(rdev->bdev, sectors);
+ 
+-		curr_events = (int)part_stat_read_accum(disk->part0, sectors) -
+-			      atomic_read(&disk->sync_io);
+-		/* sync IO will cause sync_io to increase before the disk_stats
+-		 * as sync_io is counted when a request starts, and
+-		 * disk_stats is counted when it completes.
+-		 * So resync activity will cause curr_events to be smaller than
+-		 * when there was no such activity.
+-		 * non-sync IO will cause disk_stat to increase without
+-		 * increasing sync_io so curr_events will (eventually)
+-		 * be larger than it was before.  Once it becomes
+-		 * substantially larger, the test below will cause
+-		 * the array to appear non-idle, and resync will slow
+-		 * down.
+-		 * If there is a lot of outstanding resync activity when
+-		 * we set last_event to curr_events, then all that activity
+-		 * completing might cause the array to appear non-idle
+-		 * and resync will be slowed down even though there might
+-		 * not have been non-resync activity.  This will only
+-		 * happen once though.  'last_events' will soon reflect
+-		 * the state where there is little or no outstanding
+-		 * resync requests, and further resync activity will
+-		 * always make curr_events less than last_events.
+-		 *
+-		 */
+-		if (init || curr_events - rdev->last_events > 64) {
+-			rdev->last_events = curr_events;
+-			idle = 0;
+-		}
++	if (!init && rdev->last_events > last_events)
++		return false;
++
++	return true;
++}
++
++/*
++ * mddev is idle if following conditions are match since last check:
++ * 1) mddev doesn't have normal IO completed;
++ * 2) mddev doesn't have inflight normal IO;
++ * 3) if any member disk is partition, and other partitions doesn't have IO
++ *    completed;
++ *
++ * Noted this checking rely on IO accounting is enabled.
++ */
++static bool is_mddev_idle(struct mddev *mddev, bool init)
++{
++	struct md_rdev *rdev;
++	bool idle = true;
++
++	if (!mddev_is_dm(mddev)) {
++		int last_events = mddev->last_events;
++
++		mddev->last_events = (int)part_stat_read_accum(mddev->gendisk->part0, sectors);
++		if (!init && (mddev->last_events > last_events ||
++			      part_in_flight(mddev->gendisk->part0)))
++			idle = false;
  	}
-diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
-index f5d338916098..01f1930fdde6 100644
---- a/fs/xfs/xfs_reflink.c
-+++ b/fs/xfs/xfs_reflink.c
-@@ -984,6 +984,62 @@ xfs_reflink_end_cow(
- 	return error;
++
++	rcu_read_lock();
++	rdev_for_each_rcu(rdev, mddev)
++		if (!is_rdev_idle(rdev, init))
++			idle = false;
+ 	rcu_read_unlock();
++
+ 	return idle;
+ }
+ 
+@@ -8940,6 +8941,21 @@ static sector_t md_sync_position(struct mddev *mddev, enum sync_action action)
+ 	}
  }
  
 +/*
-+ * Fully remap all of the file's data fork at once, which is the critical part
-+ * in achieving atomic behaviour.
-+ * The regular CoW end path does not use function as to keep the block
-+ * reservation per transaction as low as possible.
++ * For raid 456, sync IO is stripe(4k) per IO, for other levels, it's
++ * RESYNC_PAGES(64k) per IO, we limit inflight sync IO for no more than
++ * 8 if sync_speed is above speed_min.
 + */
-+int
-+xfs_reflink_end_atomic_cow(
-+	struct xfs_inode		*ip,
-+	xfs_off_t			offset,
-+	xfs_off_t			count)
++static int get_active_threshold(struct mddev *mddev)
 +{
-+	xfs_fileoff_t			offset_fsb;
-+	xfs_fileoff_t			end_fsb;
-+	int				error = 0;
-+	struct xfs_mount		*mp = ip->i_mount;
-+	struct xfs_trans		*tp;
-+	unsigned int			resblks;
++	int max_active = 128 * 8;
 +
-+	trace_xfs_reflink_end_cow(ip, offset, count);
++	if (mddev->level == 4 || mddev->level == 5 || mddev->level == 6)
++		max_active = 8 * 8;
 +
-+	offset_fsb = XFS_B_TO_FSBT(mp, offset);
-+	end_fsb = XFS_B_TO_FSB(mp, offset + count);
-+
-+	/*
-+	 * Each remapping operation could cause a btree split, so in the worst
-+	 * case that's one for each block.
-+	 */
-+	resblks = (end_fsb - offset_fsb) *
-+			XFS_NEXTENTADD_SPACE_RES(mp, 1, XFS_DATA_FORK);
-+
-+	error = xfs_trans_alloc(mp, &M_RES(mp)->tr_write, resblks, 0,
-+			XFS_TRANS_RESERVE, &tp);
-+	if (error)
-+		return error;
-+
-+	xfs_ilock(ip, XFS_ILOCK_EXCL);
-+	xfs_trans_ijoin(tp, ip, 0);
-+
-+	while (end_fsb > offset_fsb && !error) {
-+		error = xfs_reflink_end_cow_extent_locked(tp, ip, &offset_fsb,
-+				end_fsb);
-+	}
-+	if (error) {
-+		trace_xfs_reflink_end_cow_error(ip, error, _RET_IP_);
-+		goto out_cancel;
-+	}
-+	error = xfs_trans_commit(tp);
-+	xfs_iunlock(ip, XFS_ILOCK_EXCL);
-+	return error;
-+out_cancel:
-+	xfs_trans_cancel(tp);
-+	xfs_iunlock(ip, XFS_ILOCK_EXCL);
-+	return error;
++	return max_active;
 +}
 +
- /*
-  * Free all CoW staging blocks that are still referenced by the ondisk refcount
-  * metadata.  The ondisk metadata does not track which inode created the
-diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
-index 379619f24247..412e9b6f2082 100644
---- a/fs/xfs/xfs_reflink.h
-+++ b/fs/xfs/xfs_reflink.h
-@@ -45,6 +45,8 @@ extern int xfs_reflink_cancel_cow_range(struct xfs_inode *ip, xfs_off_t offset,
- 		xfs_off_t count, bool cancel_real);
- extern int xfs_reflink_end_cow(struct xfs_inode *ip, xfs_off_t offset,
- 		xfs_off_t count);
-+int xfs_reflink_end_atomic_cow(struct xfs_inode *ip, xfs_off_t offset,
-+		xfs_off_t count);
- extern int xfs_reflink_recover_cow(struct xfs_mount *mp);
- extern loff_t xfs_reflink_remap_range(struct file *file_in, loff_t pos_in,
- 		struct file *file_out, loff_t pos_out, loff_t len,
+ #define SYNC_MARKS	10
+ #define	SYNC_MARK_STEP	(3*HZ)
+ #define UPDATE_FREQUENCY (5*60*HZ)
+@@ -8953,6 +8969,7 @@ void md_do_sync(struct md_thread *thread)
+ 	unsigned long update_time;
+ 	sector_t mark_cnt[SYNC_MARKS];
+ 	int last_mark,m;
++	int active_threshold = get_active_threshold(mddev);
+ 	sector_t last_check;
+ 	int skipped = 0;
+ 	struct md_rdev *rdev;
+@@ -9208,14 +9225,14 @@ void md_do_sync(struct md_thread *thread)
+ 				msleep(500);
+ 				goto repeat;
+ 			}
+-			if (!is_mddev_idle(mddev, 0)) {
++			if (atomic_read(&mddev->recovery_active) >= active_threshold &&
++			    !is_mddev_idle(mddev, 0))
+ 				/*
+ 				 * Give other IO more of a chance.
+ 				 * The faster the devices, the less we wait.
+ 				 */
+ 				wait_event(mddev->recovery_wait,
+ 					   !atomic_read(&mddev->recovery_active));
+-			}
+ 		}
+ 	}
+ 	pr_info("md: %s: %s %s.\n",mdname(mddev), desc,
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index dd6a28f5d8e6..6890aa4ac8b4 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -518,6 +518,7 @@ struct mddev {
+ 							 * adding a spare
+ 							 */
+ 
++	int last_events;		/* IO event timestamp */
+ 	atomic_t			recovery_active; /* blocks scheduled, but not written */
+ 	wait_queue_head_t		recovery_wait;
+ 	sector_t			recovery_cp;
+@@ -714,17 +715,6 @@ static inline int mddev_trylock(struct mddev *mddev)
+ }
+ extern void mddev_unlock(struct mddev *mddev);
+ 
+-static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sectors)
+-{
+-	if (blk_queue_io_stat(bdev->bd_disk->queue))
+-		atomic_add(nr_sectors, &bdev->bd_disk->sync_io);
+-}
+-
+-static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
+-{
+-	md_sync_acct(bio->bi_bdev, nr_sectors);
+-}
+-
+ struct md_personality
+ {
+ 	struct md_submodule_head head;
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index e366d0bba792..d422bab77580 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2376,7 +2376,6 @@ static void sync_request_write(struct mddev *mddev, struct r1bio *r1_bio)
+ 
+ 		wbio->bi_end_io = end_sync_write;
+ 		atomic_inc(&r1_bio->remaining);
+-		md_sync_acct(conf->mirrors[i].rdev->bdev, bio_sectors(wbio));
+ 
+ 		submit_bio_noacct(wbio);
+ 	}
+@@ -3049,7 +3048,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			bio = r1_bio->bios[i];
+ 			if (bio->bi_end_io == end_sync_read) {
+ 				read_targets--;
+-				md_sync_acct_bio(bio, nr_sectors);
+ 				if (read_targets == 1)
+ 					bio->bi_opf &= ~MD_FAILFAST;
+ 				submit_bio_noacct(bio);
+@@ -3058,7 +3056,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 	} else {
+ 		atomic_set(&r1_bio->remaining, 1);
+ 		bio = r1_bio->bios[r1_bio->read_disk];
+-		md_sync_acct_bio(bio, nr_sectors);
+ 		if (read_targets == 1)
+ 			bio->bi_opf &= ~MD_FAILFAST;
+ 		submit_bio_noacct(bio);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 6ef65b4d1093..12fb01987ff3 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2426,7 +2426,6 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 
+ 		atomic_inc(&conf->mirrors[d].rdev->nr_pending);
+ 		atomic_inc(&r10_bio->remaining);
+-		md_sync_acct(conf->mirrors[d].rdev->bdev, bio_sectors(tbio));
+ 
+ 		if (test_bit(FailFast, &conf->mirrors[d].rdev->flags))
+ 			tbio->bi_opf |= MD_FAILFAST;
+@@ -2448,8 +2447,6 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 			bio_copy_data(tbio, fbio);
+ 		d = r10_bio->devs[i].devnum;
+ 		atomic_inc(&r10_bio->remaining);
+-		md_sync_acct(conf->mirrors[d].replacement->bdev,
+-			     bio_sectors(tbio));
+ 		submit_bio_noacct(tbio);
+ 	}
+ 
+@@ -2583,13 +2580,10 @@ static void recovery_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	d = r10_bio->devs[1].devnum;
+ 	if (wbio->bi_end_io) {
+ 		atomic_inc(&conf->mirrors[d].rdev->nr_pending);
+-		md_sync_acct(conf->mirrors[d].rdev->bdev, bio_sectors(wbio));
+ 		submit_bio_noacct(wbio);
+ 	}
+ 	if (wbio2) {
+ 		atomic_inc(&conf->mirrors[d].replacement->nr_pending);
+-		md_sync_acct(conf->mirrors[d].replacement->bdev,
+-			     bio_sectors(wbio2));
+ 		submit_bio_noacct(wbio2);
+ 	}
+ }
+@@ -3757,7 +3751,6 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		r10_bio->sectors = nr_sectors;
+ 
+ 		if (bio->bi_end_io == end_sync_read) {
+-			md_sync_acct_bio(bio, nr_sectors);
+ 			bio->bi_status = 0;
+ 			submit_bio_noacct(bio);
+ 		}
+@@ -4882,7 +4875,6 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 	r10_bio->sectors = nr_sectors;
+ 
+ 	/* Now submit the read */
+-	md_sync_acct_bio(read_bio, r10_bio->sectors);
+ 	atomic_inc(&r10_bio->remaining);
+ 	read_bio->bi_next = NULL;
+ 	submit_bio_noacct(read_bio);
+@@ -4942,7 +4934,6 @@ static void reshape_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 			continue;
+ 
+ 		atomic_inc(&rdev->nr_pending);
+-		md_sync_acct_bio(b, r10_bio->sectors);
+ 		atomic_inc(&r10_bio->remaining);
+ 		b->bi_next = NULL;
+ 		submit_bio_noacct(b);
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 6389383166c0..ca5b0e8ba707 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -1240,10 +1240,6 @@ static void ops_run_io(struct stripe_head *sh, struct stripe_head_state *s)
+ 		}
+ 
+ 		if (rdev) {
+-			if (s->syncing || s->expanding || s->expanded
+-			    || s->replacing)
+-				md_sync_acct(rdev->bdev, RAID5_STRIPE_SECTORS(conf));
+-
+ 			set_bit(STRIPE_IO_STARTED, &sh->state);
+ 
+ 			bio_init(bi, rdev->bdev, &dev->vec, 1, op | op_flags);
+@@ -1300,10 +1296,6 @@ static void ops_run_io(struct stripe_head *sh, struct stripe_head_state *s)
+ 				submit_bio_noacct(bi);
+ 		}
+ 		if (rrdev) {
+-			if (s->syncing || s->expanding || s->expanded
+-			    || s->replacing)
+-				md_sync_acct(rrdev->bdev, RAID5_STRIPE_SECTORS(conf));
+-
+ 			set_bit(STRIPE_IO_STARTED, &sh->state);
+ 
+ 			bio_init(rbi, rrdev->bdev, &dev->rvec, 1, op | op_flags);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 248416ecd01c..da1a161627ba 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -182,7 +182,6 @@ struct gendisk {
+ 	struct list_head slave_bdevs;
+ #endif
+ 	struct timer_rand_state *random;
+-	atomic_t sync_io;		/* RAID */
+ 	struct disk_events *ev;
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
+@@ -1117,6 +1116,7 @@ static inline long nr_blockdev_pages(void)
+ 
+ extern void blk_io_schedule(void);
+ 
++unsigned int part_in_flight(struct block_device *part);
+ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask);
+ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 -- 
-2.31.1
+2.39.2
 
