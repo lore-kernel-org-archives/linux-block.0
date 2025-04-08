@@ -1,207 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07229801;
-	Mon,  7 Apr 2025 23:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77521157E6B
+	for <linux-block@vger.kernel.org>; Tue,  8 Apr 2025 02:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744068609; cv=none; b=NzHeJtWWBzZY1M6YKNCWBsK/jsW7zoBlOHKLzclri7ISyyJGyy0P+wN0MMqP3XxWIHTiWc0s/+HivQ67WXytgk4JCPq2oYT0HTurJmgGq+aOK0p0j/JuLX7mr/tSDmqBE+7Kl/0LNhcSiDy2yxQVJMZKCekVQo0p4bMHFFC/psU=
+	t=1744078737; cv=none; b=WF17PVsfR+FkcwnR0bGUXE3wthH8uw5y/iHHt4QZUCbat9MLlXboe9aYIfgQIefBAIDSY5dNUh3nlfWN83544PhqVW4sjBPo+vl1ZSneuv6pzhGf/2iHv/XiOE/FBPZESK+pC9kzimLfV2+RNdpdLrbX339lpJ/tRQlK3RyyWBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744068609; c=relaxed/simple;
-	bh=VgglbjWzZgjBVmrkLpMQn6t7LoBGPGEKe9mwRMqCLvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kyt+OMe1eJyCFdgWh7QIPYi+AN5CF0PZhQque0RiH6jrPaN7KvpKLKhamlSlKUgkODXws44hVVSa2kfifwhP4vDq12U9u1KbYssXmQol81r5XOka/KGNnzwt+TLZYm2FdTmpWxkgwLAcHAUAsBnRnDl613/tsMlL9WHUDIpRFn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5QgOnqb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744078737; c=relaxed/simple;
+	bh=PGknkL79QrF0GWiMVHIjmUZq9fxHfFywiGclnhTR5Xg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NhIky2p96qWhy3XakYKF/Sg8R/DKb4jlbRTMjTPPZJ+KUd/jHhVTHavUlWg6ps49NLA14CSykZ7lk/pT+raQSUp9ipSmAXbl9LVDC65DNyvIECxq9iSdutkh2sDHjipeS7jVk9cSB+t/nnA45KdJRW+9QUE5VtG7+Nsz4ZCQ8+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=isq88Sq5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5QgOnqb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70676C4CEDD;
-	Mon,  7 Apr 2025 23:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744068608;
-	bh=VgglbjWzZgjBVmrkLpMQn6t7LoBGPGEKe9mwRMqCLvk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=o5QgOnqbfuFV/GznkOwnyxvPlgvSqA+urdqUaR9KMDweAgS3IcdzSxOXAH+q3GWsW
-	 tt2K/8sleT9W1VXpO/e+/a4ago9ZLe9/NPKhSYofIaegUTynlsaCwoAjxYbiGKqU7k
-	 0QG/RO2xIPY6iM+P9VhPFV52LAs0s2wHwKbyZDKPZshqBfMWma/f5mKxQEEoXdDShe
-	 hTnThm777IjBoKanTg032Vw/1ypJrQmXGnUrvi8FFRid0Ntvt4S9jJmLSs02rGNAY+
-	 Ns/sqBLCCGW0V6PXq398UrrQgudBZgg+F5ljAea9Ew2Nd2jejIplBmJYHptx40PGXZ
-	 L4K248ieczVMA==
-Date: Mon, 7 Apr 2025 16:30:07 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, dlemoal@kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Weird loop device behavior in 6.15-rc1?
-Message-ID: <20250407233007.GG6266@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="isq88Sq5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744078734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o2ir94nAodn7ZBCiKYPmHi42mGL9HdQDliiivjmmEPg=;
+	b=isq88Sq5BmD/AmRlibHYZoBzSdyBdRQ1ImZskw7rUiO3Lp24VSnfO59jG8ZvU1yOR7Cvxb
+	JqOdW44v3d7mKePEcP7qbwPEEcVVGjvw591LBma9EJ1d0iVy6Z4x953K41LL4xVvp53afE
+	AKTE1oNqTz3jtf/nDSG3k2pVL8hnO3k=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-Z70jT3cHOyK4klZ9cj9ZnQ-1; Mon,
+ 07 Apr 2025 22:18:40 -0400
+X-MC-Unique: Z70jT3cHOyK4klZ9cj9ZnQ-1
+X-Mimecast-MFC-AGG-ID: Z70jT3cHOyK4klZ9cj9ZnQ_1744078719
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB3161828B8E;
+	Tue,  8 Apr 2025 02:18:32 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.20])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D3E4B180174E;
+	Tue,  8 Apr 2025 02:18:26 +0000 (UTC)
+Date: Tue, 8 Apr 2025 10:18:21 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>, io-uring@vger.kernel.org
+Subject: Re: [PATCH 01/13] ublk: delay aborting zc request until io_uring
+ returns the buffer
+Message-ID: <Z_SHbVr3QM9Ay3ed@fedora>
+References: <20250407131526.1927073-1-ming.lei@redhat.com>
+ <20250407131526.1927073-2-ming.lei@redhat.com>
+ <CADUfDZodKfOGUeWrnAxcZiLT+puaZX8jDHoj_sfHZCOZwhzz6A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZodKfOGUeWrnAxcZiLT+puaZX8jDHoj_sfHZCOZwhzz6A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hey Christoph,
+On Mon, Apr 07, 2025 at 08:02:24AM -0700, Caleb Sander Mateos wrote:
+> On Mon, Apr 7, 2025 at 6:15 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > When one request buffer is leased to io_uring via
+> > io_buffer_register_bvec(), io_uring guarantees that the buffer will
+> > be returned. However ublk aborts request in case that io_uring context
+> > is exiting, then ublk_io_release() may observe freed request, and
+> > kernel panic is triggered.
+> 
+> Not sure I follow how the request can be freed while its buffer is
+> still registered with io_uring. It looks like __ublk_fail_req()
+> decrements the ublk request's reference count (ublk_put_req_ref()) and
+> the reference count shouldn't hit 0 if the io_uring registered buffer
+> is still holding a reference. Is the problem the if
+> (ublk_nosrv_should_reissue_outstanding()) case, which calls
+> blk_mq_requeue_request() without checking the reference count?
 
-I have a ... weird test setup where loop devices have directio enabled
-unconditionally on a system with 4k-lba disks, and now that I pulled
-down 6.15-rc1, I see failures in xfs/259:
+Yeah, that is the problem, the request can be failed immediately after
+requeue & re-dispatch, then trigger the panic, and I verified that the
+following patch does fix it:
 
---- /run/fstests/bin/tests/xfs/259.out	2025-01-30 10:00:17.074275830 -0800
-+++ /var/tmp/fstests/xfs/259.out.bad	2025-04-06 19:34:56.587315490 -0700
-@@ -1,17 +1,428 @@
- QA output created by 259
- Trying to make (4TB - 4096B) long xfs, block size 4096
- Trying to make (4TB - 4096B) long xfs, block size 2048
-+block size 2048 cannot be smaller than sector size 4096
 
-I think bugs in the loop driver's O_DIRECT handling are responsible for
-this.  I boiled it down to the key commands so that you don't have to
-set up a bunch of hardware.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 2fd05c1bd30b..41bed67508f2 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1140,6 +1140,25 @@ static void ublk_complete_rq(struct kref *ref)
+ 	__ublk_complete_rq(req);
+ }
+ 
++static void ublk_do_fail_rq(struct request *req)
++{
++	struct ublk_queue *ubq = req->mq_hctx->driver_data;
++
++	if (ublk_nosrv_should_reissue_outstanding(ubq->dev))
++		blk_mq_requeue_request(req, false);
++	else
++		__ublk_complete_rq(req);
++}
++
++static void ublk_fail_rq_fn(struct kref *ref)
++{
++	struct ublk_rq_data *data = container_of(ref, struct ublk_rq_data,
++			ref);
++	struct request *req = blk_mq_rq_from_pdu(data);
++
++	ublk_do_fail_rq(req);
++}
++
+ /*
+  * Since ublk_rq_task_work_cb always fails requests immediately during
+  * exiting, __ublk_fail_req() is only called from abort context during
+@@ -1153,10 +1172,13 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+ {
+ 	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
+ 
+-	if (ublk_nosrv_should_reissue_outstanding(ubq->dev))
+-		blk_mq_requeue_request(req, false);
+-	else
+-		ublk_put_req_ref(ubq, req);
++	if (ublk_need_req_ref(ubq)) {
++		struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
++
++		kref_put(&data->ref, ublk_fail_rq_fn);
++	} else {
++		ublk_do_fail_rq(req);
++	}
+ }
+ 
+ static void ubq_complete_io_cmd(struct ublk_io *io, int res,
 
-First, some setup:
 
-# losetup -f --direct-io=on --sector-size 4096 --show /dev/sda
-# mkfs.xfs -f /dev/sda
-# mount /dev/sda /mnt
+Thanks,
+Ming
 
-On 6.14 and 6.15-rc1, if I create the loop device with directio mode
-and try to turn it off so that I can reduce the block size:
-
-# truncate -s 30g /mnt/a
-# losetup --direct-io=on -f --show /mnt/a
-/dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-
-# losetup --sector-size 2048 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 2048
-
-# losetup --direct-io=off /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 2048
-
-# losetup --sector-size 2048 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 2048
-
-(yes, that is a weird sequence)
-
-Then trying to format an XFS filesystem fails:
-
-# mkfs.xfs -f /dev/loop1 -b size=2k -K
-meta-data=/dev/loop1             isize=512    agcount=4, agsize=393216 blks
-         =                       sectsz=2048  attr=2, projid32bit=1
-         =                       crc=1        finobt=1, sparse=1, rmapbt=1
-         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=1
-         =                       exchange=0   metadir=0
-data     =                       bsize=2048   blocks=1572864, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=0
-log      =internal log           bsize=2048   blocks=32768, version=2
-         =                       sectsz=2048  sunit=1 blks, lazy-count=1
-realtime =none                   extsz=4096   blocks=0, rtextents=0
-         =                       rgcount=0    rgsize=0 extents
-mkfs.xfs: pwrite failed: Input/output error
-
-I think there's a bug in the loop driver where changing
-LO_FLAGS_DIRECT_IO doesn't actually try to change the O_DIRECT state of
-the underlying lo->lo_backing_file->f_flags.  So I can try to set a 2k
-block size on the loop dev, which turns off LO_FLAGS_DIRECT_IO but the
-fd is still open O_DIRECT so the writes fail.  But this isn't a
-regression in -rc1, so maybe this is the expected behavior?
-
-/me notes that going the opposite direction (turning directio on after
-creation) fails:
-
-# losetup --direct-io=on /dev/loop2
-losetup: /dev/loop2: set direct io failed: Invalid argument
-
-At least the loopdev stays in buffered mode and mkfs runs fine.
-
-But now let's try passing in "0" to losetup --sector-size to set the
-sector size to the minimum value.  On 6.14, this happens:
-
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-
-# losetup --sector-size 0 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-
-# losetup --direct-io=off /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 4096
-
-# losetup --sector-size 0 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-
-Notice that the loopdev never changes block size, so mkfs fails:
-
-# mkfs.xfs -f /dev/loop1 -b size=2k -K
-block size 2048 cannot be smaller than sector size 4096
-
-On 6.15-rc1, you actually /can/ change the sector size:
-
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-# losetup --sector-size 0 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 1 4096
-# losetup --direct-io=off /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 4096
-# losetup --sector-size 0 /dev/loop1
-# losetup --list --raw /dev/loop1
-NAME SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE DIO LOG-SEC
-/dev/loop1 0 0 0 0 /mnt/a 0 512
-
-But the backing file still has O_DIRECT on, so formatting fails:
-
-# mkfs.xfs -f /dev/loop1 -b size=2k -K
-meta-data=/dev/loop1             isize=512    agcount=4, agsize=393216 blks
-         =                       sectsz=512   attr=2, projid32bit=1
-         =                       crc=1        finobt=1, sparse=1, rmapbt=1
-         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=1
-         =                       exchange=0   metadir=0
-data     =                       bsize=2048   blocks=1572864, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=0
-log      =internal log           bsize=2048   blocks=32768, version=2
-         =                       sectsz=512   sunit=0 blks, lazy-count=1
-realtime =none                   extsz=4096   blocks=0, rtextents=0
-         =                       rgcount=0    rgsize=0 extents
-mkfs.xfs: pwrite failed: Input/output error
-
-So I /think/ what's going on here is that LOOP_SET_DIRECT_IO should be
-trying to set/clear O_DIRECT on the backing file.
-
-I chose to tag you because I think commit f4774e92aab85d ("loop: take
-the file system minimum dio alignment into account") is what caused the
-change in the block size setting behavior.  I also see similar messages
-in xfs/078 and maybe xfs/432 if I turn on zoned=1 mode.
-
-Though as I mentioned, I think the problems with the loop driver go
-deeper than that commit. :/
-
-Thoughts?
-
---D
-
-(/me notes that xfs/801 is failing across the board, and I don't know
-what changed about THPs in tmpfs but clearly something's corrupting
-memory.)
