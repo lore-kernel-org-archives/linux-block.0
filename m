@@ -1,99 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F941E5219;
-	Tue,  8 Apr 2025 17:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D9523DE80;
+	Tue,  8 Apr 2025 17:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744132007; cv=none; b=m2U9J2Ed7sRqCgENXEq12pUSOTc+d+uMtkfOj2MNJm9MwNNliemnHS9uBmzptnFtH7tYstreV1tg2a04314kysfZiGC8bawfhJA7Nzz3ldcRRsyIQX/nJ3JG8snE4T8sXtBQlTXbGpg2hrzp3VWsTVC+H0LRJpdxk5sOESPHHR0=
+	t=1744133096; cv=none; b=gLX+YQZMTkVwYvj7vA+FOVp97twndDt1g/RfKYkluDt8sQhy2Ago1ZvWED+/Q+g1KnO6zcimDVNrsUV3RuHH3XVZYU7seJJ2dMe43haUnTF17XV4pzXSeiBVVrYLewmcy2Wf+f+0XGOTD0HO3aTqpFd4aLTutjyWrOQ3SVvF6JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744132007; c=relaxed/simple;
-	bh=/3eBMgubv0Yka0P/WzdDOXB50+TOIWFo5UCsRYv5O6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/mWrtKUyyWOopWPi6JxEN3QMWqxIxjUK9vmINVXOTfeq/pKaQeeQTgJbcF2EGuXOLZmr32VoEtTMKpEqBJMOhcCJNLx1C/9MYuPOZWkGYLQB2lzh4y+hScdX0Xat6OP9Fv9KvKjOUyN9BbJ/WfNKE7/U5i498u45WUePdmm/Uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwD72MB+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744133096; c=relaxed/simple;
+	bh=Qn5Ck1vJ06hGQa9KFxXgN+oEMgiIIvvFkdSa9O9bo6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kiDdMMEhm+IqWFUnxnizKSPtDBNASO+HmSntawaI7SZhSaAqUFIHDcox+bAvkjBM9Sg61HlKvXqIbcpAUqtjdgaB/VJECBhPTIjgFjzhQxltDTkoa3/TeATDmM+w7Ci/0MZMqe///Y5/jdo7ZLYOe+walq6p12z/0dQAGzfgMYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VR/3sGpW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwD72MB+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A75D0C4CEE5;
-	Tue,  8 Apr 2025 17:06:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VR/3sGpW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8767C4CEF1;
+	Tue,  8 Apr 2025 17:24:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744132007;
-	bh=/3eBMgubv0Yka0P/WzdDOXB50+TOIWFo5UCsRYv5O6Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RwD72MB+BLnSoW4IRomJp7Ix0Bjzj4kV+VhvB0wuUGsxqlzuVsRsQsocnqYiQUwdt
-	 +31xpEKLmAjD/rDiUgNxpng4/1mhIqwM0gmMZgoBDuQdFhb3OILdr9wPBtIcwi6WGd
-	 KQuiv/YxK6+xoFs1un5HzHmCG5i2X2L/p/USUzcH60z1/4nmmEDKI8gCy+9KbAtjen
-	 o83YtH3vHx4ew7p5JAkCmQ0sQvzLVGhyDm7PA6YEc9Xi0HPweYqtgNtcB3RMcVBjd9
-	 cdIIlqMXA+tuhAkRqxDvAHIRZ95wXGWoDHFD66LrEThTktBuifVsVEb/82Oo8mKM4D
-	 GmfjnfjwmCVCQ==
-Date: Tue, 8 Apr 2025 10:06:44 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: "Darrick J. Wong" <djwong@kernel.org>, David Bueso <dave@stgolabs.net>
-Cc: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>,
-	David Bueso <dave@stgolabs.net>, Tso Ted <tytso@mit.edu>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Oliver Sang <oliver.sang@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	David Hildenbrand <david@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org, ltp@lists.linux.it,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Dave Chinner <david@fromorbit.com>, gost.dev@samsung.com,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [linux-next:master] [block/bdev]  3c20917120:
- BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
-Message-ID: <Z_VXpD-d8iC57dBc@bombadil.infradead.org>
-References: <20250331074541.gK4N_A2Q@linutronix.de>
- <20250408164307.GK6266@frogsfrogsfrogs>
+	s=k20201202; t=1744133095;
+	bh=Qn5Ck1vJ06hGQa9KFxXgN+oEMgiIIvvFkdSa9O9bo6s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=VR/3sGpWJ5rWLSoCgzu87J7ftnRZs66hq5WQ1VtAatTEGudI1q5w90Thdvz5lQvLN
+	 dxZOMTiVnlgNEVxY+NgiLIvN0gPQA308PFzDRpGgnf3NHsG3BMuaoFh6SU63LutXV5
+	 08CgQBk4un/8b8A6pubJKz+tPfxAwfIE7VC7ezSAUZ9QZuqOoBuOcz6H7FeLgNS4XO
+	 zGnCIhMdWCDphR5NFS9pphv1SwbHmZs8Ivc3fu07U/WMUUCjnZKPhZpuMRR0znKmGw
+	 9DuPj1Ty3cCW+cqmn4PebZf/mSqWg5of2YEMi9t7Z0C2KPtgxKeCwL85FMJ3dpFGzZ
+	 TW7jLv1H97tHQ==
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso39494725e9.2;
+        Tue, 08 Apr 2025 10:24:55 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWn5vodr1THOTKfpRhq7iv/nG2D6H1Wf7Kc85Tx3XIsZqsgV+oCLjcK7EuxYhaGEOskpodgb2UqUdLUug==@vger.kernel.org, AJvYcCXaeVGJCchZgiFoQf0dg0jwEM90Io4COcL10GbiNnmglMj2r1taJagDEV80mXTsOYvh820XduYRyNJLD0TYEA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxRH7V+XrFOZzP8MfpX2WLEdOfMg8Tgw1fto3Yfy7NpJgRugWj
+	+emnP1Uylg0lt0rYL7JG9pViy7RyNgFIO6FbjmwDgAZXYUdUbehf+wnjWQ0oqlAcw9NvEuJaD76
+	LEF281GFaHFsy8TjPl27Y+/kbJsw=
+X-Google-Smtp-Source: AGHT+IFRAjLfQCBr3rX6vZ2fsBVsMr2T23eGspawcofOM/TZGshy7w4DX7acOT1xhfx/YgNGxx0ILqYbu7TKlmgMCSE=
+X-Received: by 2002:a05:600c:4f0e:b0:43b:c0fa:f9dd with SMTP id
+ 5b1f17b1804b1-43ecf9c3224mr136041325e9.25.1744133094266; Tue, 08 Apr 2025
+ 10:24:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408164307.GK6266@frogsfrogsfrogs>
+References: <20250331074541.gK4N_A2Q@linutronix.de> <20250408164307.GK6266@frogsfrogsfrogs>
+ <Z_VXpD-d8iC57dBc@bombadil.infradead.org>
+In-Reply-To: <Z_VXpD-d8iC57dBc@bombadil.infradead.org>
+From: Luis Chamberlain <mcgrof@kernel.org>
+Date: Tue, 8 Apr 2025 10:24:40 -0700
+X-Gmail-Original-Message-ID: <CAB=NE6X2QztC4OGnJwxRWdeCVEekLBcnFf7JcgV1pKDn6DqhcA@mail.gmail.com>
+X-Gm-Features: ATxdqUG4s7BXjovPaP_VhFNUVZgChGE0cW8x125v6xnSaCbjN2XcbNiVp5avVwc
+Message-ID: <CAB=NE6X2QztC4OGnJwxRWdeCVEekLBcnFf7JcgV1pKDn6DqhcA@mail.gmail.com>
+Subject: Re: [linux-next:master] [block/bdev] 3c20917120: BUG:sleeping_function_called_from_invalid_context_at_mm/util.c
+To: "Darrick J. Wong" <djwong@kernel.org>, David Bueso <dave@stgolabs.net>
+Cc: Jan Kara <jack@suse.cz>, Kefeng Wang <wangkefeng.wang@huawei.com>, Tso Ted <tytso@mit.edu>, 
+	Ritesh Harjani <ritesh.list@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Oliver Sang <oliver.sang@intel.com>, Matthew Wilcox <willy@infradead.org>, 
+	David Hildenbrand <david@redhat.com>, Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org, 
+	Christian Brauner <brauner@kernel.org>, Hannes Reinecke <hare@suse.de>, oe-lkp@lists.linux.dev, lkp@intel.com, 
+	John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org, ltp@lists.linux.it, 
+	Pankaj Raghav <p.raghav@samsung.com>, Daniel Gomez <da.gomez@samsung.com>, 
+	Dave Chinner <david@fromorbit.com>, gost.dev@samsung.com, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 08, 2025 at 09:43:07AM -0700, Darrick J. Wong wrote:
-> Hi Luis,
-> 
-> I'm not sure if this is related, but I'm seeing the same "BUG: sleeping
-> function called from invalid context at mm/util.c:743" message when
-> running fstests on XFS.  Nothing exciting with fstests here other than
-> the machine is arm64 with 64k basepages and 4k fsblock size:
+On Tue, Apr 8, 2025 at 10:06=E2=80=AFAM Luis Chamberlain <mcgrof@kernel.org=
+> wrote:
+> Fun
+> puzzle for the community is figuring out *why* oh why did a large folio
+> end up being used on buffer-heads for your use case *without* an LBS
+> device (logical block size) being present, as I assume you didn't have
+> one, ie say a nvme or virtio block device with logical block size  >
+> PAGE_SIZE. The area in question would trigger on folio migration *only*
+> if you are migrating large buffer-head folios. We only create those
 
-How exotic :D
+To be clear, large folios for buffer-heads.
 
-> MKFS_OPTIONS="-m metadir=1,autofsck=1,uquota,gquota,pquota"
-> 
-> --D
-> 
-> [18182.889554] run fstests generic/457 at 2025-04-07 23:06:25
-
-Me and Davidlohr have some fixes brewed up now, before we post we just
-want to run one more test for metrics on success rate analysis for folio
-migration. Other than that, given the exotic nature of your system we'll
-Cc you on preliminary patches, in case you can test to see if it also
-fixes your issue. It should given your splat is on the buffer-head side
-of things! See _buffer_migrate_folio() reference on the splat. Fun
-puzzle for the community is figuring out *why* oh why did a large folio
-end up being used on buffer-heads for your use case *without* an LBS
-device (logical block size) being present, as I assume you didn't have
-one, ie say a nvme or virtio block device with logical block size  >
-PAGE_SIZE. The area in question would trigger on folio migration *only*
-if you are migrating large buffer-head folios. We only create those if
-you have an LBS device and are leveragin the block device cache or a
-filesystem with buffer-heads with LBS (they don't exist yet other than
-the block device cache).
-
-Regardless, the patches we have brewed up should fix this, regardless
-of the puzzle described above. We'll cc you for testing before we
-post patches to address this.
+> if
+> you have an LBS device and are leveraging the block device cache or a
+> filesystem with buffer-heads with LBS (they don't exist yet other than
+> the block device cache).
 
   Luis
