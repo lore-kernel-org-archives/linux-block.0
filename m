@@ -1,71 +1,70 @@
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
+Received: from mail-il1-f227.google.com (mail-il1-f227.google.com [209.85.166.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6228518BBBB
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 01:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280391990CD
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 01:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744162953; cv=none; b=R3UzEvQMMFWhETK2DAihMTYLxvWzcDCfPnV3T3MEjgr8giM+JM/l3nlfvoyPAu3x1wVwzDJQieb87UqiRXEDw90Kd4tLE7GKj+/jqhSVKsI985hg1RaB083f8uJjDTl5K50rOynCFbgP8xrbB5syjm0U4LwLDoalf8+cBLLRaGE=
+	t=1744162954; cv=none; b=ZWv41iS5voKnbVoyqipuxph1V/P6FtHpNyr2w31RGJ5szX/Pb1T1BsuULqLyAFgtDkXalZuQ145SaFDmNRKBK7wWqBDAJ5yhB8J5B3Zp/e8wePoy5sgC7hJ08nNWvWIgB2NxdiexZso5HrC/OGujz8dKBih3Hs7p8+PVFRgscD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744162953; c=relaxed/simple;
-	bh=4Ldp2l6rBuf/UdGTjzYPoDsd0i7OfOyCP25NGXo7oXo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VvjBpEQ2UYQ+9JoF7wBQwaJG6Nvuv+nU5MpeyD/g6fOLh3Wfn8idyIG1m+Y49XX+vMlLNd+Gz+kIp7E5UpOkNDi3Ytj+w8qv5AqhaimmRft7hlxpwFgaDbt+N7AtQGRUKIkFS015va000Qgogx6IwTnhocvqJPHoXIJKfKtj0KE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Nz2VcDE/; arc=none smtp.client-ip=209.85.160.227
+	s=arc-20240116; t=1744162954; c=relaxed/simple;
+	bh=5toIafPmhc/haL3HG49K5CRcLsyLaW1wFooqUrjy0WA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hQKCktAf3fDk8hVLzdIGM3bu3bYmLwKkSeHHZn49DnZLVQVIileKYFwtrXrtK5stoNkx+U7UuD5ju09WfzUhemKMJ/6JLurqT6iHlj5byRajQwfy0AE4e6GD+zuU4UuLIn2MjxcCV3ppt3ADe3Bog+qeI98aeZC/EyektpIgBqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=VVbHapFs; arc=none smtp.client-ip=209.85.166.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Nz2VcDE/"
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-4775ccf3e56so3140911cf.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Apr 2025 18:42:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="VVbHapFs"
+Received: by mail-il1-f227.google.com with SMTP id e9e14a558f8ab-3d5e68418b5so49510015ab.2
+        for <linux-block@vger.kernel.org>; Tue, 08 Apr 2025 18:42:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1744162950; x=1744767750; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MgpzTCtGeldmEWjmJqn7b6H4/Wj9w7RY3hdIrUJLwxQ=;
-        b=Nz2VcDE/k5BPp3IiTic8YcJjiKPKXvXaiXE1qOz+GkMLh0UW5Gh7juCxTXDEQCGkWv
-         17YXVFLhRBLEr1P2LzNpWlzGPksBg+uh1lXKzAECgj/SqTB87zJFGsaJBvkijNgcP5mb
-         SENdXhjLniMmUrc34LFIkJTgQirKXSh8CY5RLZplGz72P62bdtScldc7KU+t+Dkj1ySz
-         m7TW058DwgBLhCs7Kxt5WT6OSCpM0HBEmMX6pK6YaFvCkDFfCbrntKsmh5dDpwp4pt7d
-         /sum0jjSUErizHKuzGcQZBGVBu8Oah3ls7wluAyRccuFozscpX33JooMrs6hOpm9Ch1T
-         x1BQ==
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oIEN3z0aQQM7LJjKHwApKcNtci83koae0N7JV02vw/Y=;
+        b=VVbHapFscUd+qvXYQJ93XZ+/Ys8pTzHCtuuBpRCY4IO0EqZPXFkE+iarNaxCjlxIEs
+         5tigXfpyHAkDbV08V6AqbPAlwMFywcJb4JjqZcqyJzlN1YmB4oIRNTMp1SJ9IMMsKU9w
+         GDgKAfmdjqbTe5lnakMWFLZ53EqONsrxyXxl4KHkJoD/ZHHSu3wBD6B32E22kZQI6wpk
+         zvMtiXa8x9WiPkAQ67/6ycwk0+ojZ4ynux5eBB1Ao0neYVHnkZbbOHDICwN2+a+dxZmd
+         bx9/xZ/mfFmB9CL7ahmbk2LBKF35R81qpaST79vM4tJtu/mMS0aEt7xs+Ebt8Hpn7rgk
+         t+Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1744162950; x=1744767750;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MgpzTCtGeldmEWjmJqn7b6H4/Wj9w7RY3hdIrUJLwxQ=;
-        b=dEPXLNSaNxcJKv2QtioNxDObL8ot7O1qFqWk6XOsgiOV1w/QvcXqnMTGFneqRMRTCe
-         pdqYS3zlMTwFa0os/kLfS3odjVzMwmOA14w0L+ef04s64AZBAFTLTLWppHASPaftwOe+
-         7Ll6Dr7Z8D0XCAuFjXdkUpJwI+eNWPFsnVJ7MQPx+nmG77ZZ2pktQzjss1hrl3DWVey5
-         lucL8nA0ziVK+GVlxvk6DN6ujZ6V3UrPo4fI32Fi6x2L6i6/WY8WMgdYcoqkZj4AZfkT
-         /nRTPPRoPJMMhLafcoux1LG3W4vG/31C72HgPaWwGOcf8E0lbdMQUPquP39Kp6VkmkYz
-         5qWg==
-X-Gm-Message-State: AOJu0YzPdMWHMyZ30zg/wo172XGGVZghWPcXy+QBkJAMgqOA/lVmOXPR
-	/XT/CiP+WAGYpLr03D2vz+pi7xk2+EBqsbW2jmAVA5PZN9tDIwDfheM5l68tWM3s7OF6eKMXFty
-	aZJVSOgH3nyR3ogbF8qweBjSGb6wfzwFa
-X-Gm-Gg: ASbGncv1XTQEG00393NJuCC+NHd/U2kipPwXwbnEZyPMI7hc9qLqQvk0/xrxw7JOA4N
-	pvTFNgJRCkuMaSw7bFiHRM23FD/OEV5BCfq+q7GGKytBFOcllbwLhP2sZDeBK7/yiq9SZYFeo7a
-	IeyJhoG0AMP4dY6Vbg6X0OJ0jzQqIbJ9UbvFujsAoduSX9Y9mn7Ta/yhUVbS2d0+nbR+z2b2Zz2
-	mr8ABPAuCXjDjOzDUZJWoSu2Pr/wrkwKx35PXug/RSFAqyc+9zpMcTOVoXOwFKd4pNAGbh2jYwq
-	ykI4t6oIcgSl6sm9aE1+qLj3CsSHLh0L3QHWX2Sb7p1mxuwmEw==
-X-Google-Smtp-Source: AGHT+IEds+LY1jv8ZLyqlzOP6+065cbkz0eVWjeidKJKpoEWnDbEXV1YwhzCbfby9ff4B87McyMjD2mvmVqI
-X-Received: by 2002:a05:622a:351:b0:477:51c:d853 with SMTP id d75a77b69052e-4795f08e207mr14639391cf.9.1744162950320;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oIEN3z0aQQM7LJjKHwApKcNtci83koae0N7JV02vw/Y=;
+        b=IJJpef96lj72rF7kOYEg3qxsX6G0cRDNaELpkdfFFLcVuCO6a3becnlPYVgFFEkGsP
+         MmpsTUKRvrQyTIdNfgk4jRDYc3nbIZKt48JLaSEsJeEbAuKy8cHTD97aHeEBg0wMEhs6
+         bixAexrTPBlW39J6z56Usjwf9n8kY/fQq3ZpkpEbt3SFHe7y5SSKJwlF1CUqOWrlAIM5
+         QV3LV+kkqqbVIW0mOWUp++Yp2Sb1kto7CqnimcVO4uytA2r9gpPfv0Tb+faVyjCG+WA+
+         Plc4crje4urDlfAg5k7gH6LRNx4h0uxoeNmgX2F3OYeuTNReuqx0BRyewSpUzaaqy8yz
+         AiSA==
+X-Gm-Message-State: AOJu0YzC5/CpLv3zy070ywB8zPorTjVtEVLH/Uwza+qJ3+MCBrotrhLs
+	rT//K1fvsJwwnk4pvWbsUc8Jm1blH7fHP1sudlxmpajjljJIaC79vei1fI1s1USiN1mK1KI0eci
+	H5m92VbyqGHeGejnmK8ZNSehy3oPUNSFZ
+X-Gm-Gg: ASbGncvxmHV/1RHleAJx7mI+3POverOwXvQzkPUXfBvgwlZxp9rGuG0YwQ8HJUY7uoK
+	z3WG/w7T6JrZwELnEGtlnogYNhaipctBmt5PT/FbZFbqtvSz9hT8dPf7BLyLMy6XQcZWXSpUFez
+	luH75/7pkuz5jIv/iMK5GLQbJuaSNVAE47CUEBvf292YpTgNMpyRqGGCOf793boB/NdBPA02cQL
+	T4Iou1Wwnzi48PGqLAP8RNBfVxwDYsNmjrKFIFv7+R85bf2nR6QGOL6NXlBkaTD8cQM+LiPbtQO
+	4xinJ5b4QNIQJmjlNm1O4DLQnSrHKQaQG7lNsKnLuWqzX6gxBg==
+X-Google-Smtp-Source: AGHT+IGM7Z8M7ncP4ETqffr0iKCymQadEZEMupFufdYPXiHD7qOLIGlk7QsWPMOkh6slQDF+A3/thCqHo4dK
+X-Received: by 2002:a05:6e02:2199:b0:3d4:6ef6:7c70 with SMTP id e9e14a558f8ab-3d77c2cb51cmr14533575ab.21.1744162950229;
         Tue, 08 Apr 2025 18:42:30 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-47964d6fba6sm58471cf.3.2025.04.08.18.42.30
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-4f505cfa2b4sm6542173.10.2025.04.08.18.42.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 08 Apr 2025 18:42:30 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 51E6334045B;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4B2383401A8;
 	Tue,  8 Apr 2025 19:42:29 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 442E7E40EBE; Tue,  8 Apr 2025 19:42:29 -0600 (MDT)
+	id 3F671E40F5F; Tue,  8 Apr 2025 19:42:29 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Tue, 08 Apr 2025 19:42:07 -0600
-Subject: [PATCH v2 1/2] ublk: properly serialize all FETCH_REQs
+Subject: [PATCH v2 0/2] ublk: decouple server threads from hctxs
+Date: Tue, 08 Apr 2025 19:42:06 -0600
+Message-Id: <20250408-ublk_task_per_io-v2-0-b97877e6fd50@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,106 +73,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250408-ublk_task_per_io-v2-1-b97877e6fd50@purestorage.com>
-References: <20250408-ublk_task_per_io-v2-0-b97877e6fd50@purestorage.com>
-In-Reply-To: <20250408-ublk_task_per_io-v2-0-b97877e6fd50@purestorage.com>
+X-B4-Tracking: v=1; b=H4sIAG7Q9WcC/x2NwQqDMBAFf0VybmQTU4099T+KSBpXXaxGEpUW8
+ d8bPc6DN7OzgJ4wsEeyM48bBXJTBHlLmO3N1CGnJjKTIO+gQPP1/RnqxYShntHX5LjNy8y2Oei
+ mMCzeZo8tfS/lq4rcU1ic/12FTZzrKVMCQEqpVFakGWhdasEFX0NsDsY/59XjeTMdptaNrDqO4
+ w++ON2DrAAAAA==
+X-Change-ID: 20250408-ublk_task_per_io-c693cf608d7a
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Uday Shankar <ushankar@purestorage.com>, 
  Caleb Sander Mateos <csander@purestorage.com>
 X-Mailer: b4 0.14.2
 
-Most uring_cmds issued against ublk character devices are serialized
-because each command affects only one queue, and there is an early check
-which only allows a single task (the queue's ubq_daemon) to issue
-uring_cmds against that queue. However, this mechanism does not work for
-FETCH_REQs, since they are expected before ubq_daemon is set. Since
-FETCH_REQs are only used at initialization and not in the fast path,
-serialize them using the per-ublk-device mutex. This fixes a number of
-data races that were previously possible if a badly behaved ublk server
-decided to issue multiple FETCH_REQs against the same qid/tag
-concurrently.
+This patch set aims to allow ublk server threads to better balance load
+amongst themselves by decoupling server threads from ublk queues/hctxs,
+so that multiple threads can service I/Os from a single hctx.
 
-Reported-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 ---
- drivers/block/ublk_drv.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Changes in v2:
+- Remove changes split into other patches
+- To ease error handling/synchronization, associate each I/O (instead of
+  each queue) to the last task that issues a FETCH_REQ against it. Only
+  that task is allowed to operate on the I/O.
+- Link to v1: https://lore.kernel.org/r/20241002224437.3088981-1-ushankar@purestorage.com
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2fd05c1bd30b03343cb6f357f8c08dd92ff47af9..5535073ccd23dfbbd25830c1722c360146b95662 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1809,8 +1809,8 @@ static void ublk_nosrv_work(struct work_struct *work)
- 
- /* device can only be started after all IOs are ready */
- static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
-+	__must_hold(&ub->mutex)
- {
--	mutex_lock(&ub->mutex);
- 	ubq->nr_io_ready++;
- 	if (ublk_queue_ready(ubq)) {
- 		ubq->ubq_daemon = current;
-@@ -1822,7 +1822,6 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
- 	}
- 	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
- 		complete_all(&ub->completion);
--	mutex_unlock(&ub->mutex);
- }
- 
- static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
-@@ -1962,17 +1961,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_IO_UNREGISTER_IO_BUF:
- 		return ublk_unregister_io_buf(cmd, ub_cmd->addr, issue_flags);
- 	case UBLK_IO_FETCH_REQ:
-+		mutex_lock(&ub->mutex);
- 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
- 		if (ublk_queue_ready(ubq)) {
- 			ret = -EBUSY;
--			goto out;
-+			goto out_unlock;
- 		}
- 		/*
- 		 * The io is being handled by server, so COMMIT_RQ is expected
- 		 * instead of FETCH_REQ
- 		 */
- 		if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
--			goto out;
-+			goto out_unlock;
- 
- 		if (ublk_need_map_io(ubq)) {
- 			/*
-@@ -1980,15 +1980,16 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 			 * DATA is not enabled
- 			 */
- 			if (!ub_cmd->addr && !ublk_need_get_data(ubq))
--				goto out;
-+				goto out_unlock;
- 		} else if (ub_cmd->addr) {
- 			/* User copy requires addr to be unset */
- 			ret = -EINVAL;
--			goto out;
-+			goto out_unlock;
- 		}
- 
- 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
- 		ublk_mark_io_ready(ub, ubq);
-+		mutex_unlock(&ub->mutex);
- 		break;
- 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
- 		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
-@@ -2028,7 +2029,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 	ublk_prep_cancel(cmd, issue_flags, ubq, tag);
- 	return -EIOCBQUEUED;
- 
-- out:
-+out_unlock:
-+	mutex_unlock(&ub->mutex);
-+out:
- 	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
- 			__func__, cmd_op, tag, ret, io->flags);
- 	return ret;
+---
+Uday Shankar (2):
+      ublk: properly serialize all FETCH_REQs
+      ublk: require unique task per io instead of unique task per hctx
 
+ drivers/block/ublk_drv.c | 92 +++++++++++++++++++++++-------------------------
+ 1 file changed, 44 insertions(+), 48 deletions(-)
+---
+base-commit: 88e581728f3f0036110126adbaa0d88d3cd3b48d
+change-id: 20250408-ublk_task_per_io-c693cf608d7a
+
+Best regards,
 -- 
-2.34.1
+Uday Shankar <ushankar@purestorage.com>
 
