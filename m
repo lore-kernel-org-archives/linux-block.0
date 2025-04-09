@@ -1,95 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA8F25DAE8
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 13:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD1A2641D3
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 13:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744206300; cv=none; b=qKEDKQOdtl6bS8ou6TYcK315HmYr6ewTmEf6xUlIcmtGX7erTf+PocbZcFUBoG87GayUiwX1z184IAiqNWn7Hd6eCwfoHMC8PNvl4Z1Goi8LNiWSHqAAyKt86ua3eWSPz1roZ5PLoX2mkzSWC8QEnJIeuNfykuXYIFwXgtGj0mM=
+	t=1744206308; cv=none; b=pPurf/dAaQfD4aAgHTzsG1+P3uSexIfL9ILItjFaVvaeGQ0TKAkE04HRPkSjRRhQWjYar5D5H86vBzxxCHwGAxZQbRHt0mpZZr86Hv1W+vnzX7FyPEEVgZ+2EQdWEKFJmarAhm7BLBJR/+yly33MFkOk8Y/0xw2QUsYr2Atuj/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744206300; c=relaxed/simple;
-	bh=uTFkzj67ddRxFFhZq157cYNrnjsukUgynX3BYIAV7zA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ks3tuueT/Iot5yTN/FMc8di45H6b/W+e5Iqxja1fZ9jf5+phx+LdHvZ7wbVQzrgvzWK+UGRngHSejI+vFZe4y7yWpqMg8zYshws+ecuujUfA94ck63hAp6zlSuy14Hpq2WJ+hJrFlZpzKOF0DnGCOGFTKZnhDxV/YZNlIvEkhDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WP4uN7No; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1744206308; c=relaxed/simple;
+	bh=N6wcPMUvh/0+BCr/uygdnupqu+ftVjbtZbuAWSWYlIQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=fk9LkpIkunZdf/9NW6zuMD3Vg1aj6xVg+YCSUev0kq6DZkmnH41/F0Uyo4nCOhfAFh/NshGlYkJ68srub9ysKeR+egd7+L/v9V5kjXhREG2SFr4HCrrsSQcslXoTnYMiQXuQxxuKi1Ii1+qPS51BvGjPAJqRFV1D0ej92aq40W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GvYgJFqx; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WP4uN7No"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744206297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c4rRcuYcKyDjp3Vzjp4yHtgd6P/QYWgzDtJiPE416Ws=;
-	b=WP4uN7NoOne3dU+nsTorkw7drrUy9S+lrza/bSr0Hsp2Y/H+xa7bFaHiue364hRsX5Ga2f
-	qdaOlaSQWCoQmO3RbL+cw3uFAy+C+Bv3tQL8jtn1d/ouig42J3wdp8UKHn+Ik0IRIPMPO1
-	NAF8hSUMpNqTF9jSAJxom/YhHrZk5KY=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-jcuWI2gwNBa5F-akOfcCeA-1; Wed,
- 09 Apr 2025 09:44:55 -0400
-X-MC-Unique: jcuWI2gwNBa5F-akOfcCeA-1
-X-Mimecast-MFC-AGG-ID: jcuWI2gwNBa5F-akOfcCeA_1744206295
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90EA8180AF57;
-	Wed,  9 Apr 2025 13:44:54 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.20])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17F9A1955DCE;
-	Wed,  9 Apr 2025 13:44:48 +0000 (UTC)
-Date: Wed, 9 Apr 2025 21:44:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, djwong@kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] loop: stop using vfs_iter_{read,write} for buffered I/O
-Message-ID: <Z_Z5ydIl7UGkFrz6@fedora>
-References: <20250409130940.3685677-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GvYgJFqx"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-85b3f92c8dfso222427539f.2
+        for <linux-block@vger.kernel.org>; Wed, 09 Apr 2025 06:45:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744206306; x=1744811106; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b2n3IdMUkHossZhEf/i//EkX+jKlNoH2+k6k5Y9546g=;
+        b=GvYgJFqx13AfXjYZVvcQ5yFtZV74Pw6kJ/LNUn8LyEl/QlilBOEr3iZdd7iYRf8yQI
+         A+6A+6tW3hmOGzWWmKHjcFkBHIdiY2FW5FqHJLaE2uLMHzl7msU2hkOkEVvthuTPPUhp
+         VgWQC/xhDDCCvBm5viBwRnCWFG33/ElVGkDdFS1OAr91Poyft0BTJrHd8RmIW9y8Rt42
+         x+hGMtuWrukNx7fS1Z0lENh+zSPYg5ZKOEXdh2P3SB3W7zEwREoHS4wwl9Xrv0UOk1aq
+         fA3zv2g1CQiFx3wACiebVv+tfTMVlOpC01mSLgyBG/6pj/rqKON72F/FXNqlkwQ1luvc
+         yg4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744206306; x=1744811106;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b2n3IdMUkHossZhEf/i//EkX+jKlNoH2+k6k5Y9546g=;
+        b=vpYfqXyacCg4LiNgY34MztVnR0EoxmvB6U+VOLjfu0A9gfxSUwCYbh+2yBaCXjcuas
+         5vZBn4TWmSn6VZtx44M5otnCixyH6Odxw1Ck5kM2XYo/rKssyyyoCOo+56AbCeph/XnZ
+         siDcnjXXPLxovToZjIN5I05HprPP0tvAsXiWXfPribpgMMnS+nrd667TvmDjpj4id5Ez
+         G0m+XP0YzV+Kk8yhEAHRDwOakiyBsFIoOHYI9oWoq5vpTyVWhChoJ2R5dq8GQEIG1dRF
+         Nuzh/aO5W11sx0blYzo1W8SgKE1UAFe8NcM3FcKrIlMtRUb9m1XsL4Iy0ycVxXbq2zwE
+         /iGw==
+X-Gm-Message-State: AOJu0YykLrlsXq9aC3KZLmqphI5tsOZWQXJGDlZBU+dVd2i5Nn+NomN6
+	wglFnwKmUvXFRHCJgMv56dbM91CKUhanB35B+8Xv6HSzDDAa5MyBf5xXluRAR5Ol8clHNw21hsK
+	x
+X-Gm-Gg: ASbGncvj2ht3Y8b8duczv6zQmd8pAyxshGnLnSbOcmaBp4jhPzprQKrLqDNm+eISN2s
+	/TtM4huqi5ojBQ4v9u0Axk7G0m2tQDlVFk6Wgnct2mjAZtzdbQjaXouNGXKkgsNCa+T7hw23oyn
+	cN8tm3ARDfkEZOcuIoaklPZQaAuEFK0hMPY3AcNxlrAMR0zrgJ7IjLav26fAQrPInmWEITmnPWD
+	aUE/SCdjTOjapCPNjWr9SPORsM71AKjhNuCzRDbKmfMsx6XzOL5I3bnM9A5WxvClP06UZKZb27y
+	hoWJoTvcYnfktFwEJYVJHMCcFtmjzG0=
+X-Google-Smtp-Source: AGHT+IFioQPajn1X/B1bL++WNFFBfHffOKSyT9NVCBTe6b+vt/tSXgZ1uZrVMVqdKBwAubtTT7hRZQ==
+X-Received: by 2002:a05:6602:274b:b0:861:1cd4:1fef with SMTP id ca18e2360f4ac-86160f60d6bmr354276539f.0.1744206305776;
+        Wed, 09 Apr 2025 06:45:05 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505e2cbfesm240104173.105.2025.04.09.06.45.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 06:45:04 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>
+In-Reply-To: <20250409011444.2142010-1-ming.lei@redhat.com>
+References: <20250409011444.2142010-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 0/2] ublk: two fixes
+Message-Id: <174420630427.200173.5693990872245207194.b4-ty@kernel.dk>
+Date: Wed, 09 Apr 2025 07:45:04 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409130940.3685677-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Wed, Apr 09, 2025 at 03:09:40PM +0200, Christoph Hellwig wrote:
-> vfs_iter_{read,write} always perform direct I/O when the file has the
-> O_DIRECT flag set, which breaks disabling direct I/O using the
-> LOOP_SET_STATUS / LOOP_SET_STATUS64 ioctls.
 
-So dio is disabled automatically because lo_offset is changed in
-LOOP_SET_STATUS, but backing file is still opened with O_DIRECT,
-then dio fails?
-
-But Darrick reports it is caused by changing sector size, instead of
-LOOP_SET_STATUS.
-
+On Wed, 09 Apr 2025 09:14:40 +0800, Ming Lei wrote:
+> The 1st patch fixes one kernel panic issue when running IO vs. remove
+> devices on ublk zc.
 > 
-> This was recenly reported as a regression, but as far as I can tell
-> was only uncovered by better checking for block sizes and has been
-> around since the direct I/O support was added.
-
-What is the 1st real bad commit for this regression? I think it is useful
-for backporting. Or it is new test case?
-
+> The 2nd one fixes one regression introduced in this cycle.
 > 
-> Fix this by using the existing aio code that calls the raw read/write
-> iter methods instead.  Note that despite the comments there is no need
-> for block drivers to ever call flush_dcache_page themselves, and the
-> call is a left-over from prehistoric times.
+> Thanks,
 > 
-> Fixes: ab1cb278bc70 ("block: loop: introduce ioctl command of LOOP_SET_DIRECT_IO")
+> [...]
 
-Why is the issue related with ioctl(LOOP_SET_DIRECT_IO)?
+Applied, thanks!
+
+[1/2] ublk: fix handling recovery & reissue in ublk_abort_queue()
+      commit: 6ee6bd5d4fce502a5b5a2ea805e9ff16e6aa890f
+[2/2] ublk: don't fail request for recovery & reissue in case of ubq->canceling
+      commit: 18461f2a02be04f8bbbe3b37fecfc702e3fa5bc2
+
+Best regards,
+-- 
+Jens Axboe
 
 
-Thanks, 
-Ming
 
