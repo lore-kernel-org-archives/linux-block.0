@@ -1,314 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f99.google.com (mail-ot1-f99.google.com [209.85.210.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD1A86347;
-	Wed,  9 Apr 2025 02:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE40250EC
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 02:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744165551; cv=none; b=dHPdI0zGMp1K5tXXT1oX9vz2AWub8C/I0BKNQeicTHRhDhZetlISllwPpQgQJi3HeBkeD6zPZleDnkUOXZEp+1jodfQzJzOWIwN603zFYbSZVwFQtg0p0P1RRZMiKgTe9/J/511bXMdPtNlhLT/El+kjT+8b/A07Y+GGOGErxCQ=
+	t=1744167001; cv=none; b=Q1M/IoMIZuY7iZBH5K+K5q6m5EISwrLE9gA6vmsDLIDI2K99Mc/TafV6ICzxythAK64GMgNovq1g1av4VM01wuAWefxcJo4g4lErR3/ePsCJl5llWXJ7PZxe21GfRVCBlfvfQOm6vXVS6mahnNJ80tRcFsCItqPgKlPDgrSXS38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744165551; c=relaxed/simple;
-	bh=ikSFbdx1k6x9wOlRvuqes78WmgYkyOgciTGApzavE3Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CkClG5e7nFcXme1jl6uyVbHHWLViTGzia9jrCHQPdKcs1Tllvt2Rtg3AdoPPedjD5XlMdnCJF2rEVTNJ/MkIlIJxvbhKxhool6JyKfJnvcnholnlVblJFoc9K00OD5xwCcNJ/CDkVPEsEqxWlqo8KHlVcRwt9vxmXzkn7UkJPEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XedzIwDv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744167001; c=relaxed/simple;
+	bh=oSbcp+HMi37hsvJxb6JgCimDrm0TZ96JAmlZ+5ptdLQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aIgogppy2lA7iPV9c58Pihoa0tZzs6Xbo9X5aOKh6iPPsl7J+u6nimvtzWxDwOroGJvL5f6Qqh6bTZtuKiipXcJ86SwMFAry66Lja4zf4b9HAXwxtQvqLbfYgs1hVqTitOds0W+niJ7dPElDIQ/39hVcAawV+nVmAJnDIzrwmtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fAv7b2G3; arc=none smtp.client-ip=209.85.210.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XedzIwDv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E526DC4CEE5;
-	Wed,  9 Apr 2025 02:25:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744165551;
-	bh=ikSFbdx1k6x9wOlRvuqes78WmgYkyOgciTGApzavE3Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XedzIwDv4UzELyb5Fn3/pbZYtjAHKP7t2DuzgLCo6ng1NaktkMFdPNSbP7aT9mlAd
-	 x1YWcm1xAn0R9noKjMdM2gAIqXWwyvZjHcu7Gg7XGlXbCQjQ/R49lp7/XXQZ3dvjQp
-	 k5YgyddMkYXFu8LrC1AdueklQ74MIn2+Xdxvm+uGX6dlkydnaoGThypNikRrrOgJAA
-	 iREIpgzoi4NkU8k89GKl4WMGQk17eBvxDupD5+TZC8YdLF3j2PuAhG6uRnQBjqTxqJ
-	 B8/J/bWha4NBKvQwr2X3ISYH3Bj6TOR8gnMFlLLw9gBigAduttoX4p7SzUzeDg40Ad
-	 //pLgleiwESwQ==
-Date: Tue, 8 Apr 2025 19:25:50 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: brauner@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk, jack@suse.cz,
-	cem@kernel.org, linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, catherine.hoang@oracle.com
-Subject: [PATCH v6.1 RFC 02.1/12] xfs: add helpers to compute transaction
- reservation for finishing intent items
-Message-ID: <20250409022550.GL6283@frogsfrogsfrogs>
-References: <20250408104209.1852036-1-john.g.garry@oracle.com>
- <20250408104209.1852036-3-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fAv7b2G3"
+Received: by mail-ot1-f99.google.com with SMTP id 46e09a7af769-72b87587c61so447543a34.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Apr 2025 19:49:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1744166998; x=1744771798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdepLXKYc4w4R2CT56FvEdADqtoy0OyNwTPs1VSuUO0=;
+        b=fAv7b2G3InMoZcIE2R59VhftlhYaslaK+z/fqkRCgHKGgt3nr0dGtxXtqog8q6t1Oy
+         5WUpf2KLGZXoEUPtjgnoXEZfogSbLhnkfr3tLP3kJs5R9PuBwhX9zg46lADnvZVNXizo
+         fic9CL0SBWSENemTQO3uIhqdm7txp3dFxWqCPV8hIp6dHEhyrW4dkxDRHyBbc+mNB0U+
+         a1vkyFxFUK6MuO5tFOe6/cEt/kAE3QV6pm+jg0Bn+iVQQtkGMyersCllz4GPG4qHbg5x
+         glhphuR12b1VWbyF3GRFxnhk1VNpZ7icVpsuVwZLLKC43xAwYbRU606skPuRDGnQp+RK
+         BcXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744166998; x=1744771798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gdepLXKYc4w4R2CT56FvEdADqtoy0OyNwTPs1VSuUO0=;
+        b=Cn26lEgjMTL53pABZSNlhRqEWWxZCNUrqKxNfDltSVBzYVBF0/GgZp83Vl3lFbLXh0
+         eFwy235UB8LObXykL5DF6K6pfenWYF6YUnjNAB4sIe9s8aXZ1kP0BQ2NE0PbT+kZhSlY
+         cqocMxuZOBSjNZQZlhWZkIOOsU34C0nhYMOa7CahBoF39Da87U8SE39Bv2gTGIy4CiO/
+         GhDXF3WpWZO8LQPqc0qD+Dr8m1xw1szeF0d4Zim0b6wFk1Lf7eEkAn727+8CYw/6X5+c
+         VmiWJx0LA9np5X/DU/e3dxB6vl5It7n8y8SW0VvmzWSPZKhZt1qANR6XHE/sgJRUUPAy
+         Qm0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVVrVVmvNzCHOkykHnnSq00/wwXsw1b287W1lkeH/6n/7KZrd69M/gz/9K0J1IKw8taB+lDcXi3VgzYdw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIIk8u6THjDzHUzBOId/ozFLpz78yuXpFvjdoHULJV3uP7WW4/
+	A5MQa4FjbJIEJa19k2rCaqwIPqzYzbOSp8mBFFySG7D71WGk3uZkQjsUA4V3JwHLrOyi173HBgR
+	9dGf6jX0f4G0Y2Oym7opiiTZJgREEhFD5
+X-Gm-Gg: ASbGncuZMUmHfx8DbvESuwRbvUQ2rpbQXK6dpjXmyk3Hzk8zH2B6OJsZ8H6gMbdE4dc
+	Eczy8WNnK/ghKISS4G5onxlK2x3S+s7okj6CYPm4i+dKM5tUyN+IXa7Uda2E2FYGnr0/bJnntv7
+	fgHprv3epGAqE3JEzrD88J29bFGR3MJ/F9mEg5cdd+bHJEGJgKlHMFes0+UeDlW6p2ZeZjyj+Ur
+	jCb/C7bT3ri2uOdN6mi3xBOY0I1Qe8h52iH8Jg4w3s/JmFqxTg8RsL3C9N32FHqEkJIIMxwarmX
+	zmnAcygaT7YBlRANJO20n+fJdOs3BBP1aUQbvEyNgBFhbRaX
+X-Google-Smtp-Source: AGHT+IG7UagWB48dQ9nnghKAGIyqOWWUlJc6F9oTBFsaRfbwlN/GSxnM5gGWRPD8sIhDJq3uUJ8pk+9s/zWO
+X-Received: by 2002:a05:6871:a012:b0:29e:6ddf:22d2 with SMTP id 586e51a60fabf-2d091ad46c8mr175604fac.9.1744166997809;
+        Tue, 08 Apr 2025 19:49:57 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2d0969cc5ddsm36518fac.23.2025.04.08.19.49.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 19:49:57 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id C90863402AD;
+	Tue,  8 Apr 2025 20:49:56 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id C3AEBE41459; Tue,  8 Apr 2025 20:49:56 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: skip blk_mq_tag_to_rq() bounds check
+Date: Tue,  8 Apr 2025 20:49:54 -0600
+Message-ID: <20250409024955.3626275-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408104209.1852036-3-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 8bit
 
-From: Darrick J. Wong <djwong@kernel.org>
+The ublk driver calls blk_mq_tag_to_rq() in several places.
+blk_mq_tag_to_rq() tolerates an invalid tag for the tagset, checking it
+against the number of tags and returning NULL if it is out of bounds.
+But all the calls from the ublk driver have already verified the tag
+against the ublk queue's queue depth. In ublk_commit_completion(),
+ublk_handle_need_get_data(), and case UBLK_IO_COMMIT_AND_FETCH_REQ, the
+tag has already been checked in __ublk_ch_uring_cmd(). In
+ublk_abort_queue(), the loop bounds the tag by the queue depth. In
+__ublk_check_and_get_req(), the tag has already been checked in
+__ublk_ch_uring_cmd(), in the case of ublk_register_io_buf(), or in
+ublk_check_and_get_req().
 
-In the transaction reservation code, hoist the logic that computes the
-reservation needed to finish one log intent item into separate helper
-functions.  These will be used in subsequent patches to estimate the
-number of blocks that an online repair can commit to reaping in the same
-transaction as the change committing the new data structure.
+So just index the tagset's rqs array directly in the ublk driver.
+Convert the tags to unsigned, as blk_mq_tag_to_rq() does.
 
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- fs/xfs/libxfs/xfs_trans_resv.h |   18 ++++
- fs/xfs/libxfs/xfs_trans_resv.c |  165 ++++++++++++++++++++++++++++++++--------
- 2 files changed, 152 insertions(+), 31 deletions(-)
+ drivers/block/ublk_drv.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/fs/xfs/libxfs/xfs_trans_resv.h b/fs/xfs/libxfs/xfs_trans_resv.h
-index 0554b9d775d269..d9d0032cbbc5d4 100644
---- a/fs/xfs/libxfs/xfs_trans_resv.h
-+++ b/fs/xfs/libxfs/xfs_trans_resv.h
-@@ -98,6 +98,24 @@ struct xfs_trans_resv {
- void xfs_trans_resv_calc(struct xfs_mount *mp, struct xfs_trans_resv *resp);
- uint xfs_allocfree_block_count(struct xfs_mount *mp, uint num_ops);
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 2fd05c1bd30b..5b07329f5197 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -210,11 +210,11 @@ struct ublk_params_header {
+ };
  
-+unsigned int xfs_calc_finish_bui_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+
-+unsigned int xfs_calc_finish_efi_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+unsigned int xfs_calc_finish_rt_efi_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+
-+unsigned int xfs_calc_finish_rui_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+unsigned int xfs_calc_finish_rt_rui_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+
-+unsigned int xfs_calc_finish_cui_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+unsigned int xfs_calc_finish_rt_cui_reservation(struct xfs_mount *mp,
-+		unsigned int nr_ops);
-+
- unsigned int xfs_calc_itruncate_reservation_minlogsize(struct xfs_mount *mp);
- unsigned int xfs_calc_write_reservation_minlogsize(struct xfs_mount *mp);
- unsigned int xfs_calc_qm_dqalloc_reservation_minlogsize(struct xfs_mount *mp);
-diff --git a/fs/xfs/libxfs/xfs_trans_resv.c b/fs/xfs/libxfs/xfs_trans_resv.c
-index 13d00c7166e178..580d00ae28573d 100644
---- a/fs/xfs/libxfs/xfs_trans_resv.c
-+++ b/fs/xfs/libxfs/xfs_trans_resv.c
-@@ -263,6 +263,42 @@ xfs_rtalloc_block_count(
-  * register overflow from temporaries in the calculations.
-  */
+ static bool ublk_abort_requests(struct ublk_device *ub, struct ublk_queue *ubq);
  
-+/*
-+ * Finishing a data device refcount updates (t1):
-+ *    the agfs of the ags containing the blocks: nr_ops * sector size
-+ *    the refcount btrees: nr_ops * 1 trees * (2 * max depth - 1) * block size
-+ */
-+inline unsigned int
-+xfs_calc_finish_cui_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr_ops)
-+{
-+	if (!xfs_has_reflink(mp))
-+		return 0;
-+
-+	return xfs_calc_buf_res(nr_ops, mp->m_sb.sb_sectsize) +
-+	       xfs_calc_buf_res(xfs_refcountbt_block_count(mp, nr_ops),
-+			       mp->m_sb.sb_blocksize);
-+}
-+
-+/*
-+ * Realtime refcount updates (t2);
-+ *    the rt refcount inode
-+ *    the rtrefcount btrees: nr_ops * 1 trees * (2 * max depth - 1) * block size
-+ */
-+inline unsigned int
-+xfs_calc_finish_rt_cui_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr_ops)
-+{
-+	if (!xfs_has_rtreflink(mp))
-+		return 0;
-+
-+	return xfs_calc_inode_res(mp, 1) +
-+	       xfs_calc_buf_res(xfs_rtrefcountbt_block_count(mp, nr_ops),
-+				     mp->m_sb.sb_blocksize);
-+}
-+
- /*
-  * Compute the log reservation required to handle the refcount update
-  * transaction.  Refcount updates are always done via deferred log items.
-@@ -280,19 +316,10 @@ xfs_calc_refcountbt_reservation(
- 	struct xfs_mount	*mp,
- 	unsigned int		nr_ops)
+ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+-		struct ublk_queue *ubq, int tag, size_t offset);
++		struct ublk_queue *ubq, unsigned tag, size_t offset);
+ static inline unsigned int ublk_req_build_flags(struct request *req);
+ static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
+ 						   int tag);
+ static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
  {
--	unsigned int		blksz = XFS_FSB_TO_B(mp, 1);
--	unsigned int		t1, t2 = 0;
-+	unsigned int		t1, t2;
+@@ -1515,11 +1515,11 @@ static void ublk_commit_completion(struct ublk_device *ub,
+ 	/* now this cmd slot is owned by nbd driver */
+ 	io->flags &= ~UBLK_IO_FLAG_OWNED_BY_SRV;
+ 	io->res = ub_cmd->result;
  
--	if (!xfs_has_reflink(mp))
--		return 0;
--
--	t1 = xfs_calc_buf_res(nr_ops, mp->m_sb.sb_sectsize) +
--	     xfs_calc_buf_res(xfs_refcountbt_block_count(mp, nr_ops), blksz);
--
--	if (xfs_has_realtime(mp))
--		t2 = xfs_calc_inode_res(mp, 1) +
--		     xfs_calc_buf_res(xfs_rtrefcountbt_block_count(mp, nr_ops),
--				     blksz);
-+	t1 = xfs_calc_finish_cui_reservation(mp, nr_ops);
-+	t2 = xfs_calc_finish_rt_cui_reservation(mp, nr_ops);
+ 	/* find the io request and complete */
+-	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
++	req = ub->tag_set.tags[qid]->rqs[tag];
+ 	if (WARN_ON_ONCE(unlikely(!req)))
+ 		return;
  
- 	return max(t1, t2);
+ 	if (req_op(req) == REQ_OP_ZONE_APPEND)
+ 		req->__sector = ub_cmd->zone_append_lba;
+@@ -1533,11 +1533,11 @@ static void ublk_commit_completion(struct ublk_device *ub,
+  * blk-mq queue, so we are called exclusively with blk-mq and ubq_daemon
+  * context, so everything is serialized.
+  */
+ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+ {
+-	int i;
++	unsigned i;
+ 
+ 	for (i = 0; i < ubq->q_depth; i++) {
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
+ 		if (!(io->flags & UBLK_IO_FLAG_ACTIVE)) {
+@@ -1545,11 +1545,11 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+ 
+ 			/*
+ 			 * Either we fail the request or ublk_rq_task_work_cb
+ 			 * will do it
+ 			 */
+-			rq = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], i);
++			rq = ub->tag_set.tags[ubq->q_id]->rqs[i];
+ 			if (rq && blk_mq_request_started(rq)) {
+ 				io->flags |= UBLK_IO_FLAG_ABORTED;
+ 				__ublk_fail_req(ubq, io, rq);
+ 			}
+ 		}
+@@ -1824,14 +1824,14 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+ 		complete_all(&ub->completion);
+ 	mutex_unlock(&ub->mutex);
  }
-@@ -379,6 +406,96 @@ xfs_calc_write_reservation_minlogsize(
- 	return xfs_calc_write_reservation(mp, true);
+ 
+ static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
+-		int tag)
++		unsigned tag)
+ {
+ 	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
+-	struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[q_id], tag);
++	struct request *req = ub->tag_set.tags[q_id]->rqs[tag];
+ 
+ 	ublk_queue_cmd(ubq, req);
  }
  
-+/*
-+ * Finishing an EFI can free the blocks and bmap blocks (t2):
-+ *    the agf for each of the ags: nr * sector size
-+ *    the agfl for each of the ags: nr * sector size
-+ *    the super block to reflect the freed blocks: sector size
-+ *    worst case split in allocation btrees per extent assuming nr extents:
-+ *		nr exts * 2 trees * (2 * max depth - 1) * block size
-+ */
-+inline unsigned int
-+xfs_calc_finish_efi_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr)
-+{
-+	return xfs_calc_buf_res((2 * nr) + 1, mp->m_sb.sb_sectsize) +
-+	       xfs_calc_buf_res(xfs_allocfree_block_count(mp, nr),
-+			       mp->m_sb.sb_blocksize);
-+}
-+
-+/*
-+ * Or, if it's a realtime file (t3):
-+ *    the agf for each of the ags: 2 * sector size
-+ *    the agfl for each of the ags: 2 * sector size
-+ *    the super block to reflect the freed blocks: sector size
-+ *    the realtime bitmap:
-+ *		2 exts * ((XFS_BMBT_MAX_EXTLEN / rtextsize) / NBBY) bytes
-+ *    the realtime summary: 2 exts * 1 block
-+ *    worst case split in allocation btrees per extent assuming 2 extents:
-+ *		2 exts * 2 trees * (2 * max depth - 1) * block size
-+ */
-+inline unsigned int
-+xfs_calc_finish_rt_efi_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr)
-+{
-+	if (!xfs_has_realtime(mp))
-+		return 0;
-+
-+	return xfs_calc_buf_res((2 * nr) + 1, mp->m_sb.sb_sectsize) +
-+	       xfs_calc_buf_res(xfs_rtalloc_block_count(mp, nr),
-+			       mp->m_sb.sb_blocksize) +
-+	       xfs_calc_buf_res(xfs_allocfree_block_count(mp, nr),
-+			       mp->m_sb.sb_blocksize);
-+}
-+
-+/*
-+ * Finishing an RUI is the same as an EFI.  We can split the rmap btree twice
-+ * on each end of the record, and that can cause the AGFL to be refilled or
-+ * emptied out.
-+ */
-+inline unsigned int
-+xfs_calc_finish_rui_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr)
-+{
-+	if (!xfs_has_rmapbt(mp))
-+		return 0;
-+	return xfs_calc_finish_efi_reservation(mp, nr);
-+}
-+
-+/*
-+ * Finishing an RUI is the same as an EFI.  We can split the rmap btree twice
-+ * on each end of the record, and that can cause the AGFL to be refilled or
-+ * emptied out.
-+ */
-+inline unsigned int
-+xfs_calc_finish_rt_rui_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr)
-+{
-+	if (!xfs_has_rtrmapbt(mp))
-+		return 0;
-+	return xfs_calc_finish_rt_efi_reservation(mp, nr);
-+}
-+
-+/*
-+ * In finishing a BUI, we can modify:
-+ *    the inode being truncated: inode size
-+ *    dquots
-+ *    the inode's bmap btree: (max depth + 1) * block size
-+ */
-+inline unsigned int
-+xfs_calc_finish_bui_reservation(
-+	struct xfs_mount	*mp,
-+	unsigned int		nr)
-+{
-+	return xfs_calc_inode_res(mp, 1) + XFS_DQUOT_LOGRES +
-+	       xfs_calc_buf_res(XFS_BM_MAXLEVELS(mp, XFS_DATA_FORK) + 1,
-+			       mp->m_sb.sb_blocksize);
-+}
-+
- /*
-  * In truncating a file we free up to two extents at once.  We can modify (t1):
-  *    the inode being truncated: inode size
-@@ -411,16 +528,8 @@ xfs_calc_itruncate_reservation(
- 	t1 = xfs_calc_inode_res(mp, 1) +
- 	     xfs_calc_buf_res(XFS_BM_MAXLEVELS(mp, XFS_DATA_FORK) + 1, blksz);
+ static inline int ublk_check_cmd_op(u32 cmd_op)
+@@ -1989,11 +1989,11 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
  
--	t2 = xfs_calc_buf_res(9, mp->m_sb.sb_sectsize) +
--	     xfs_calc_buf_res(xfs_allocfree_block_count(mp, 4), blksz);
--
--	if (xfs_has_realtime(mp)) {
--		t3 = xfs_calc_buf_res(5, mp->m_sb.sb_sectsize) +
--		     xfs_calc_buf_res(xfs_rtalloc_block_count(mp, 2), blksz) +
--		     xfs_calc_buf_res(xfs_allocfree_block_count(mp, 2), blksz);
--	} else {
--		t3 = 0;
--	}
-+	t2 = xfs_calc_finish_efi_reservation(mp, 4);
-+	t3 = xfs_calc_finish_rt_efi_reservation(mp, 2);
+ 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+ 		ublk_mark_io_ready(ub, ubq);
+ 		break;
+ 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
+-		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
++		req = ub->tag_set.tags[ub_cmd->q_id]->rqs[tag];
  
- 	/*
- 	 * In the early days of reflink, we included enough reservation to log
-@@ -501,9 +610,7 @@ xfs_calc_rename_reservation(
- 	     xfs_calc_buf_res(2 * XFS_DIROP_LOG_COUNT(mp),
- 			XFS_FSB_TO_B(mp, 1));
+ 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+ 			goto out;
  
--	t2 = xfs_calc_buf_res(7, mp->m_sb.sb_sectsize) +
--	     xfs_calc_buf_res(xfs_allocfree_block_count(mp, 3),
--			XFS_FSB_TO_B(mp, 1));
-+	t2 = xfs_calc_finish_efi_reservation(mp, 3);
+ 		if (ublk_need_map_io(ubq)) {
+@@ -2033,18 +2033,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			__func__, cmd_op, tag, ret, io->flags);
+ 	return ret;
+ }
  
- 	if (xfs_has_parent(mp)) {
- 		unsigned int	rename_overhead, exchange_overhead;
-@@ -611,9 +718,7 @@ xfs_calc_link_reservation(
- 	overhead += xfs_calc_iunlink_remove_reservation(mp);
- 	t1 = xfs_calc_inode_res(mp, 2) +
- 	     xfs_calc_buf_res(XFS_DIROP_LOG_COUNT(mp), XFS_FSB_TO_B(mp, 1));
--	t2 = xfs_calc_buf_res(3, mp->m_sb.sb_sectsize) +
--	     xfs_calc_buf_res(xfs_allocfree_block_count(mp, 1),
--			      XFS_FSB_TO_B(mp, 1));
-+	t2 = xfs_calc_finish_efi_reservation(mp, 1);
+ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+-		struct ublk_queue *ubq, int tag, size_t offset)
++		struct ublk_queue *ubq, unsigned tag, size_t offset)
+ {
+ 	struct request *req;
  
- 	if (xfs_has_parent(mp)) {
- 		t3 = resp->tr_attrsetm.tr_logres;
-@@ -676,9 +781,7 @@ xfs_calc_remove_reservation(
+ 	if (!ublk_need_req_ref(ubq))
+ 		return NULL;
  
- 	t1 = xfs_calc_inode_res(mp, 2) +
- 	     xfs_calc_buf_res(XFS_DIROP_LOG_COUNT(mp), XFS_FSB_TO_B(mp, 1));
--	t2 = xfs_calc_buf_res(4, mp->m_sb.sb_sectsize) +
--	     xfs_calc_buf_res(xfs_allocfree_block_count(mp, 2),
--			      XFS_FSB_TO_B(mp, 1));
-+	t2 = xfs_calc_finish_efi_reservation(mp, 2);
+-	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
++	req = ub->tag_set.tags[ubq->q_id]->rqs[tag];
+ 	if (!req)
+ 		return NULL;
  
- 	if (xfs_has_parent(mp)) {
- 		t3 = resp->tr_attrrm.tr_logres;
+ 	if (!ublk_get_req_ref(ubq, req))
+ 		return NULL;
+-- 
+2.45.2
+
