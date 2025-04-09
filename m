@@ -1,74 +1,64 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3320C25DCF3
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 11:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBB425EFB2
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 11:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744197162; cv=none; b=S+1Xk/Zb9QvFBWohBOZoLa5hjDn3x0E29Yl4CyvCbgvU92TISCnD5rf3DlC/LW03pWp2eNlprn2Q6uvVZv1TFhIoZrFWWe7lf1vNdyRHWuXidSqLgLGBMxjabSBYFrF5l+AZIlWbeJXurKNWJ43iUwQ8L7CYPTM+u49aDMZ8kDU=
+	t=1744199205; cv=none; b=dpSxyo+GR4LQV8KqrBKqU4ZxUaSReUSpaggX8MuIy0BiDbAubRaiHwQyiETlN17+KaMFcKsSUS2q8EBl+lCS22OJPUVlFyxW9luDWeb1wMdutWyu92dQ3cJR682aNikuKgi4bn+F7i5v1ZXsU173GWFui+dwyeyVAd4vxhzXj4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744197162; c=relaxed/simple;
-	bh=Z3WABlsB1UGI85o/kZMzF0WpD59YSXlr7X6B5QRZKZk=;
+	s=arc-20240116; t=1744199205; c=relaxed/simple;
+	bh=VV5OQmC7X2+qx+JEFWQYU1ZEWbHaozd5Jzcl7xHiUO0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oMBX9NL8U8Ju0pt5YEgSAvj2BRWJNdA7YF2MoqxtxOtYJ9GqvGg79ZJ27EX75fotqBitjGsULRU1al4cE9OnXjgUkGELXxrASa2h9GwayqGYa3RR6zIgGjFb2Bjv8Lmu7/c3L/tB4C5R8urJB+M2wYL/JKTOckWy4KeO+PdNucg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YN9ANTEh; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=W6lPgPBk+zOyiA3j3znavBFZp/xXLMF7RB0zGAJNOWtcw5KlEXJKSkBJwVZNWbPV1ck/oLf7qwiSE3XUbkBPZl3+kNTr45128kG66u2J5S3gJXz3NWiE8KUt+vYm87vaRik/OMgjsNQkF6IwWN+fV44jpdVSDk372GIlnJLcGuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eSLxUO3j; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YN9ANTEh"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39c1efc4577so3629160f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 09 Apr 2025 04:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744197158; x=1744801958; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mipIJnl4yQ6XlD74FRUZU7GUyWJ8NwjpLfWewuTaQrM=;
-        b=YN9ANTEhJdOtNckiXq4MufqvBj6BKGMTQW/HT5yFV5FsuSh/Y9u9UqbGzGBqQtlazN
-         dk3/YmJrW8Ey8bkBhu1kvJ5hM/35WfR+ecOnb7GB55FY6LmVu6jzLY/Kmstlr1NIG9qX
-         C1XM9/6WUhJtHlPgJdoocCGArB/Bk8GzoghhofAi2cb6B2atzJ+bND0JEQ1TDwLv01ig
-         SsS09nKRrrJZW05ZddI2Y2K6k7REO9cYmBO9E/hsRHo7g3UBPHgx16A+SAzSVZL/i808
-         2A3WBTPYQtfwCFChzu00it96cuuXhhAKTMQpAsI2EjGTodbkVsiCAIsn+ht6HL+OrPEI
-         t98g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744197158; x=1744801958;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mipIJnl4yQ6XlD74FRUZU7GUyWJ8NwjpLfWewuTaQrM=;
-        b=PX6ZGzDU0p3i/3em/S63e7nEGki8Jo2jc83rOVUSkkoomp9d8jaEn7HtRZg2kHVy5f
-         fE6ixD7USCG5Umz1ZqkTtMWx7+oWeoiuqilwunp1R7ZAujZRTvTMSFbtInE6gpIKiodF
-         XGOAw/24NiBJ7gH0JK/CFZiqx96PP0xXY78+RxulVHn5T//7G0r5g4WgrFqLikOm78RY
-         Z4CtvL/h7CcIHqxZ6gLutRD9yTz5M+Cd3E/o4opGB3ATWMozmTWDFhK2iLLHA7GjsK/x
-         wL+6G1ZqzfbuA3kqRaU61TNAeCx+bgvn8VQqF9mTrIUZJSbdKZpNWmg3mrYz+4qMEkQ7
-         0+aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJD/lnF4nFitnisFwIQbrBzJIU2iVFAty4x9o0Emj0XJYt6boN0rDxvlrPnnAgcj4W0InwP4Hcpndd9g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD/y7N8O6pkc413DKDndh5sQlHzwE1V1dMEcTIHfay4m/u1x2Q
-	4qWGORhqSKcIKmIO77kVP4b04w1+e+coZo2EAvQ+4aZ2oZljZtFpvXLySuu3RAO7hYdYc+gH05n
-	c
-X-Gm-Gg: ASbGncs2jjrlUPbYmzdDLgDHyDxEqwwC7DP+nplVa1bK3uJSh4deOanFBQL1WELMfHF
-	JzZfEcfm//b7nKxEvb66AZ+IEudESz3rWMa5/tlaqy1gHwcOwehaePOvbhwjuj9ySbTPv5THq5Y
-	0Y4soqCyu2Xm8yYFhpSTRpQefQfsgx6psXddQfe2Ao2s4gJFLo3HntEudkE8txeZC1c3O3J6cmt
-	h9qGU/N37I3ooRELLVl3frU2uHEcDglvuGUejg+uAHdGrYkCKMnaatlMnZ61iEhLH7ktLBMxsdK
-	3cMuo/VUmiUgIgsraAKd5VNIQKD/O2KSCpC/d/CQH69Ei2cw65Fkh3m6
-X-Google-Smtp-Source: AGHT+IHfn0sTQ79iQ/7T8zc7UTi7ax1XoigXfd8iHlhWM9zbTWV8ADTloCpAqHEZS/cwllSwzMqp4Q==
-X-Received: by 2002:a5d:64c9:0:b0:391:2eb9:bdc5 with SMTP id ffacd0b85a97d-39d87ac56a9mr2016059f8f.23.1744197158492;
-        Wed, 09 Apr 2025 04:12:38 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39d893fc88dsm1309695f8f.81.2025.04.09.04.12.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 04:12:38 -0700 (PDT)
-Date: Wed, 9 Apr 2025 14:12:34 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Brian Geffon <bgeffon@google.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH next] zram: Fix uninitialized variable in
- zram_writeback_slots()
-Message-ID: <e858f6aa-7593-47f7-9bf1-64a747a2e0ed@stanley.mountain>
-References: <02b8e156-e04f-4ab3-9322-b740c1f95284@stanley.mountain>
- <osj54aiqi3b3dtgyfituj6tqpar5s7trkkx7hytfozl4cifc63@mu7bb5pyse2n>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSLxUO3j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744199201;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Vp5W9LEkNxFHEcqJK3cESygMZwUJNl684+JK4O4FXQ=;
+	b=eSLxUO3jgLc3YZMc8slwppmmRoEI971sOYP4hP/C3ZNVP5f+g78cV2TBD0A6aAmyKh8Dlr
+	oN9YqhMUDnkjffvRZCuZLa6IMO6jeb48F4Nz2/InchmsNRSFBr3CxtdeOKep2EcAAIznSJ
+	UAqipN3RxBrRreCb8DNYBiE1Y3TgKNE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-282-_QW2vW74MvOUDSBv_3KDxw-1; Wed,
+ 09 Apr 2025 07:46:37 -0400
+X-MC-Unique: _QW2vW74MvOUDSBv_3KDxw-1
+X-Mimecast-MFC-AGG-ID: _QW2vW74MvOUDSBv_3KDxw_1744199196
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 123D2180AF4E;
+	Wed,  9 Apr 2025 11:46:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.20])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87FCE1955DCE;
+	Wed,  9 Apr 2025 11:46:31 +0000 (UTC)
+Date: Wed, 9 Apr 2025 19:46:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	syzbot+4c7e0f9b94ad65811efb@syzkaller.appspotmail.com
+Subject: Re: [PATCH] block: don't grab elevator lock during queue
+ initialization
+Message-ID: <Z_ZeEXyLLzrYcN3b@fedora>
+References: <20250403105402.1334206-1-ming.lei@redhat.com>
+ <20250404091037.GB12163@lst.de>
+ <92feba7e-84fc-4668-92c3-aba4e8320559@linux.ibm.com>
+ <Z_NB2VA9D5eqf0yH@fedora>
+ <ea09ea46-4772-4947-a9ad-195e83f1490d@linux.ibm.com>
+ <Z_TSYOzPI3GwVms7@fedora>
+ <c2c9e913-1c24-49c7-bfc5-671728f8dddc@linux.ibm.com>
+ <Z_UpoiWlBnwaUW7B@fedora>
+ <ff08d88c-4680-40be-890a-19191e019419@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,21 +67,212 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <osj54aiqi3b3dtgyfituj6tqpar5s7trkkx7hytfozl4cifc63@mu7bb5pyse2n>
+In-Reply-To: <ff08d88c-4680-40be-890a-19191e019419@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Apr 09, 2025 at 08:10:22PM +0900, Sergey Senozhatsky wrote:
-> On (25/04/09 13:58), Dan Carpenter wrote:
-> > The "ret" variable is only initialized on errors and not on success.
-> > Initialize it to zero.
+On Wed, Apr 09, 2025 at 02:42:06PM +0530, Nilay Shroff wrote:
 > 
-> Thank you Dan.
 > 
-> > Fixes: 4529d2d13fd1 ("zram: modernize writeback interface")
-> 
-> This is still in mm-unstable, mind if we fold the fix in?
-> Or I can send a v4 with the fix applied.
+> On 4/8/25 7:20 PM, Ming Lei wrote:
+> > On Tue, Apr 08, 2025 at 06:55:26PM +0530, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 4/8/25 1:08 PM, Ming Lei wrote:
+> >>> On Mon, Apr 07, 2025 at 01:59:48PM +0530, Nilay Shroff wrote:
+> >>>>
+> >>>>
+> >>>> On 4/7/25 8:39 AM, Ming Lei wrote:
+> >>>>> On Sat, Apr 05, 2025 at 07:44:19PM +0530, Nilay Shroff wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>> On 4/4/25 2:40 PM, Christoph Hellwig wrote:
+> >>>>>>> On Thu, Apr 03, 2025 at 06:54:02PM +0800, Ming Lei wrote:
+> >>>>>>>> Fixes the following lockdep warning:
+> >>>>>>>
+> >>>>>>> Please spell the actual dependency out here, links are not permanent
+> >>>>>>> and also not readable for any offline reading of the commit logs.
+> >>>>>>>
+> >>>>>>>> +static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+> >>>>>>>> +				   struct request_queue *q, bool lock)
+> >>>>>>>> +{
+> >>>>>>>> +	if (lock) {
+> >>>>>>>
+> >>>>>>> bool lock(ed) arguments are an anti-pattern, and regularly get Linus
+> >>>>>>> screaming at you (in this case even for the right reason :))
+> >>>>>>>
+> >>>>>>>> +		/* protect against switching io scheduler  */
+> >>>>>>>> +		mutex_lock(&q->elevator_lock);
+> >>>>>>>> +		__blk_mq_realloc_hw_ctxs(set, q);
+> >>>>>>>> +		mutex_unlock(&q->elevator_lock);
+> >>>>>>>> +	} else {
+> >>>>>>>> +		__blk_mq_realloc_hw_ctxs(set, q);
+> >>>>>>>> +	}
+> >>>>>>>
+> >>>>>>> I think the problem here is again that because of all the other
+> >>>>>>> dependencies elevator_lock really needs to be per-set instead of
+> >>>>>>> per-queue which will allows us to have much saner locking hierarchies.
+> >>>>>>>
+> >>>>>> I believe you meant here q->tag_set->elevator_lock? 
+> >>>>>
+> >>>>> I don't know what locks you are planning to invent.
+> >>>>>
+> >>>>> For set->tag_list_lock, it has been very fragile:
+> >>>>>
+> >>>>> blk_mq_update_nr_hw_queues
+> >>>>> 	set->tag_list_lock
+> >>>>> 		freeze_queue
+> >>>>>
+> >>>>> If IO failure happens when waiting in above freeze_queue(), the nvme error
+> >>>>> handling can't provide forward progress any more, because the error
+> >>>>> handling code path requires set->tag_list_lock.
+> >>>>
+> >>>> I think you're referring here nvme_quiesce_io_queues and nvme_unquiesce_io_queues
+> >>>
+> >>> Yes.
+> >>>
+> >>>> which is called in nvme error handling path. If yes then I believe this function 
+> >>>> could be easily modified so that it doesn't require ->tag_list_lock. 
+> >>>
+> >>> Not sure it is easily, ->tag_list_lock is exactly for protecting the list of "set->tag_list".
+> >>>
+> >> Please see this, here nvme_quiesce_io_queues doen't require ->tag_list_lock:
+> >>
+> >> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> >> index 777db89fdaa7..002d2fd20e0c 100644
+> >> --- a/drivers/nvme/host/core.c
+> >> +++ b/drivers/nvme/host/core.c
+> >> @@ -5010,10 +5010,19 @@ void nvme_quiesce_io_queues(struct nvme_ctrl *ctrl)
+> >>  {
+> >>         if (!ctrl->tagset)
+> >>                 return;
+> >> -       if (!test_and_set_bit(NVME_CTRL_STOPPED, &ctrl->flags))
+> >> -               blk_mq_quiesce_tagset(ctrl->tagset);
+> >> -       else
+> >> -               blk_mq_wait_quiesce_done(ctrl->tagset);
+> >> +       if (!test_and_set_bit(NVME_CTRL_STOPPED, &ctrl->flags)) {
+> >> +               struct nvme_ns *ns;
+> >> +               int srcu_idx;
+> >> +
+> >> +               srcu_idx = srcu_read_lock(&ctrl->srcu);
+> >> +               list_for_each_entry_srcu(ns, &ctrl->namespaces, list,
+> >> +                               srcu_read_lock_held(&ctrl->srcu)) {
+> >> +                       if (!blk_queue_skip_tagset_quiesce(ns->queue))
+> >> +                               blk_mq_quiesce_queue_nowait(ns->queue);
+> >> +               }
+> >> +               srcu_read_unlock(&ctrl->srcu, srcu_idx);
+> >> +       }
+> >> +       blk_mq_wait_quiesce_done(ctrl->tagset);
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(nvme_quiesce_io_queues);
+> >>
+> >> Here we iterate through ctrl->namespaces instead of relying on tag_list
+> >> and so we don't need to acquire ->tag_list_lock.
+> > 
+> > How can you make sure all NSs are covered in this way? RCU/SRCU can't
+> > provide such kind of guarantee.
+> > 
+> Why is that so? In fact, nvme_wait_freeze also iterates through 
+> the same ctrl->namespaces to freeze the queue.
 
-No, problem.  I understand how mm works.
+It depends if nvme error handling needs to cover new coming NS,
+suppose it doesn't care, and you can change to srcu and bypass
+->tag_list_lock.
 
-regards,
-dan carpenter
+> 
+> >>
+> >>> And the same list is iterated in blk_mq_update_nr_hw_queues() too.
+> >>>
+> >>>>
+> >>>>>
+> >>>>> So all queues should be frozen first before calling blk_mq_update_nr_hw_queues,
+> >>>>> fortunately that is what nvme is doing.
+> >>>>>
+> >>>>>
+> >>>>>> If yes then it means that we should be able to grab ->elevator_lock
+> >>>>>> before freezing the queue in __blk_mq_update_nr_hw_queues and so locking
+> >>>>>> order should be in each code path,
+> >>>>>>
+> >>>>>> __blk_mq_update_nr_hw_queues
+> >>>>>>     ->elevator_lock 
+> >>>>>>       ->freeze_lock
+> >>>>>
+> >>>>> Now tagset->elevator_lock depends on set->tag_list_lock, and this way
+> >>>>> just make things worse. Why can't we disable elevator switch during
+> >>>>> updating nr_hw_queues?
+> >>>>>
+> >>>> I couldn't quite understand this. As we already first disable the elevator
+> >>>> before updating sw to hw queue mapping in __blk_mq_update_nr_hw_queues().
+> >>>> Once mapping is successful we switch back the elevator.
+> >>>
+> >>> Yes, but user still may switch elevator from none to others during the
+> >>> period, right?
+> >>>
+> >> Yes correct, that's possible. So your suggestion was to disable elevator
+> >> update while we're running __blk_mq_update_nr_hw_queues? And that way user
+> >> couldn't update elevator through sysfs (elv_iosched_store) while we update
+> >> nr_hw_queues? If this is true then still how could it help solve lockdep
+> >> splat? 
+> > 
+> > Then why do you think per-set lock can solve the lockdep splat?
+> > 
+> > __blk_mq_update_nr_hw_queues is the only chance for tagset wide queues
+> > involved wrt. switching elevator. If elevator switching is not allowed
+> > when __blk_mq_update_nr_hw_queues() is started, why do we need per-set
+> > lock?
+> > 
+> Yes if elevator switch is not allowed then we probably don't need per-set lock. 
+> However my question was if we were to not allow elevator switch while 
+> __blk_mq_update_nr_hw_queues is running then how would we implement it?
+
+It can be done easily by tag_set->srcu.
+
+> Do we need to synchronize with ->tag_list_lock? Or in another words,
+> elv_iosched_store would now depends on ->tag_list_lock ? 
+
+->tag_list_lock isn't involved.
+
+> 
+> On another note, if we choose to make ->elevator_lock per-set then 
+> our locking sequence in blk_mq_update_nr_hw_queues() would be,
+
+There is also add/del disk vs. updating nr_hw_queues, do you want to
+add the per-set lock in add/del disk path too?
+
+> 
+> blk_mq_update_nr_hw_queues
+>   -> tag_list_lock
+>     -> elevator_lock
+>      -> freeze_lock 
+
+Actually freeze lock is already held for nvme before calling
+blk_mq_update_nr_hw_queues, and it is reasonable to suppose queue
+frozen for updating nr_hw_queues, so the above order may not match
+with the existed code.
+
+Do we need to consider nvme or blk_mq_update_nr_hw_queues now?
+
+> 
+> elv_iosched_store
+>   -> elevator_lock
+>     -> freeze_lock
+
+I understand that the per-set elevator_lock is just for avoiding the
+nested elvevator lock class acquire? If we needn't to consider nvme
+or blk_mq_update_nr_hw_queues(), this per-set lock may not be needed.
+
+It is actually easy to sync elevator store vs. update nr_hw_queues.
+
+> 
+> So now ->freeze_lock should not depend on ->elevator_lock and that shall
+> help avoid few of the recent lockdep splats reported with fs_reclaim.
+> What do you think?
+
+Yes, reordering ->freeze_lock and ->elevator_lock may avoid many fs_reclaim
+related splat.
+
+However, in del_gendisk(), freeze_lock is still held before calling
+elevator_exit() and blk_unregister_queue(), and looks not easy to reorder.
+
+Thanks,
+Ming
+
