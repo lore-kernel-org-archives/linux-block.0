@@ -1,46 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3FE42AB0;
-	Wed,  9 Apr 2025 00:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6528B2FB2
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 01:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744159318; cv=none; b=Riv4U1RbssNGXj+bERHGbfQFHxmY2cH+EfBE/i3AqVy9dZxtUJVmPmT5Ws26i4tlmRZUAUSKGfEsFSIMAjm+Azv8O6VSj97Jars4wtUigih/gh+qlufeSfwD/cxgt8fxe5nhxtw6/2YDH3U9lRmWvRQA9v3Cl0bq/52t/dCUL5o=
+	t=1744161004; cv=none; b=Dr/eV2V+35DF3G6Z/alML3635+IS3u7uxMNThYp10RmNmg3kFgJ3+z3/OQEQXas8Ui3PYXCXf4mPV24EmPgAytld39AmMSdbqxXe4AGhgRHYe6G151BTFYVpFXR2aJ6B98PGf/Veg+dOlcwSfxc62roavE8D0XkF8jB7/AIj9w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744159318; c=relaxed/simple;
-	bh=Uma3C9lzYk3Qgb36Cpb4H7tai9k/9PKyqCouIVsRh/Y=;
+	s=arc-20240116; t=1744161004; c=relaxed/simple;
+	bh=PCTb8zrHnCYjIh6Uc/IpD0Tt48F6f9xr3dBXb1HAKBk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JEFEvjV6/VVCsTyyfE7+5HZPUWcl/G/0dTQs77dD5zJBgyTYpXtncdMyU6Nx6Wd9G+l8GYcQXe1DJlxl8SFT3EOOOZ1IRFLMOcEnk743WPmjygwqr7WrG2x4y0PtXVWXnQJG78WOIDNC/0fD1oKCIz+W3mDXeAvqt5IY0QZD6lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nycfs46B; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=iVH5vwGKHU4yLS91FE/GcPC0JiW9OQOxM4liOdeige8G8YdyPAuBzKNiyz9+AZGtY3gCoPhQHjgvbKVe5+8mXrOK93+A1cJcSrbIfeUdaOoOOchAJQvfmbwX9DmuY5gKlLAzBSeHgaOhdLIMZcM5Td8t2RaG4ENSKAKSRBxsKa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lx0GyniW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nycfs46B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2845C4CEE5;
-	Wed,  9 Apr 2025 00:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744159316;
-	bh=Uma3C9lzYk3Qgb36Cpb4H7tai9k/9PKyqCouIVsRh/Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nycfs46BHgyP4yQNIdyzteAOP+LEDlExGT1e7ipqvzHCgfZZkvu+kU8Zvxa5PGgID
-	 a7G7bqulNrKcvOr/dX1RYGBeO53FDg8olu85tvR9k461oM/8G0IDxPs1Hybsku/Aw2
-	 atcnVZNl1rQmnatCxLqQDxtH0JCnc4EfDI/sBRUQHSOgoXV6p9Evt474oryNHb2f+q
-	 zqwaNQab3cC3fQDlThE8VloiYPLi9MbxCh7juHxZrYYrBzpppTxcabAbQR/N2CG9pf
-	 YDsoagQn/NryQNOs3Ux1f3WtkOJLvuaB3hbNBPCKXniaNCsq6RRX+MCR5ng2d2r+1h
-	 tWXuYDo93jaBw==
-Date: Tue, 8 Apr 2025 17:41:56 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Dave Chinner <david@fromorbit.com>
-Cc: John Garry <john.g.garry@oracle.com>, brauner@kernel.org, hch@lst.de,
-	viro@zeniv.linux.org.uk, jack@suse.cz, cem@kernel.org,
-	linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, catherine.hoang@oracle.com
-Subject: Re: [PATCH v6 11/12] xfs: add xfs_compute_atomic_write_unit_max()
-Message-ID: <20250409004156.GL6307@frogsfrogsfrogs>
-References: <20250408104209.1852036-1-john.g.garry@oracle.com>
- <20250408104209.1852036-12-john.g.garry@oracle.com>
- <Z_WnbfRhKR6RQsSA@dread.disaster.area>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lx0GyniW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744161001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E/bvoOwMCSXvHxY6UBgZ3uXIPkuq6pzaXuPsC3rgHco=;
+	b=Lx0GyniWqN8gexKCkGQGPh4VR/JCDL+lpCo78z+cSN2Vscnzl3V5dTKTavQ9agrPMsq5Hd
+	xHOs3KT5V7SMQuSBEsZLz6gIeEp4pdRYFz9Q/balZITjeDHgJLyF5k98+lFJwuvOWUG5lz
+	Y4kajwUZuhpCWz9rMwXdfGm0ZXHt/LI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-177-Kvav9N7qN8apr_NQhZTYVg-1; Tue,
+ 08 Apr 2025 21:09:57 -0400
+X-MC-Unique: Kvav9N7qN8apr_NQhZTYVg-1
+X-Mimecast-MFC-AGG-ID: Kvav9N7qN8apr_NQhZTYVg_1744160996
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A483F19560BB;
+	Wed,  9 Apr 2025 01:09:55 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.20])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99DED1956094;
+	Wed,  9 Apr 2025 01:09:51 +0000 (UTC)
+Date: Wed, 9 Apr 2025 09:09:45 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 2/2] ublk: don't fail request for recovery & reissue in
+ case of ubq->canceling
+Message-ID: <Z_XI2TdYF-HV9DIO@fedora>
+References: <20250408072440.1977943-1-ming.lei@redhat.com>
+ <20250408072440.1977943-3-ming.lei@redhat.com>
+ <Z/V0+NnMBFlPGaBX@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,277 +60,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z_WnbfRhKR6RQsSA@dread.disaster.area>
+In-Reply-To: <Z/V0+NnMBFlPGaBX@dev-ushankar.dev.purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, Apr 09, 2025 at 08:47:09AM +1000, Dave Chinner wrote:
-> On Tue, Apr 08, 2025 at 10:42:08AM +0000, John Garry wrote:
-> > Now that CoW-based atomic writes are supported, update the max size of an
-> > atomic write for the data device.
+On Tue, Apr 08, 2025 at 01:11:52PM -0600, Uday Shankar wrote:
+> On Tue, Apr 08, 2025 at 03:24:38PM +0800, Ming Lei wrote:
+> > ubq->canceling is set with request queue quiesced when io_uring context is
+> > exiting. Recovery & reissue(UBLK_F_USER_RECOVERY_REISSUE) requires
+> > request to be re-queued and re-dispatch after device is recovered.
 > > 
-> > The limit of a CoW-based atomic write will be the limit of the number of
-> > logitems which can fit into a single transaction.
+> > However commit d796cea7b9f3 ("ublk: implement ->queue_rqs()") still may
+> > fail any request in case of ubq->canceling, this way breaks
+> > UBLK_F_USER_RECOVERY_REISSUE.
 > 
-> I still think this is the wrong way to define the maximum
-> size of a COW-based atomic write because it is going to change from
-> filesystem to filesystem and that variability in supported maximum
-> length will be exposed to userspace...
+> This change actually affects UBLK_F_USER_RECOVERY as long as FAIL_IO
+> isn't set (regardless of RECOVERY_REISSUE). RECOVERY_REISSUE only
+> changes behavior for requests that are already in the ublk server when
+> the ublk server dies, but the code change only affects requests that
+> come in after ublk server death is already detected. At that point, both
+> plain USER_RECOVERY and USER_RECOVERY|USER_RECOVERY_REISSUE should see
+> requests queue instead of completing with error. See below code
+> snippets:
 > 
-> i.e. Maximum supported atomic write size really should be defined as
-> a well documented fixed size (e.g. 16MB). Then the transaction
-> reservations sizes needed to perform that conversion can be
-> calculated directly from that maximum size and optimised directly
-> for the conversion operation that atomic writes need to perform.
-
-I'll get to this below...
-
-> .....
+> static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+> 		struct request *rq)
+> {
+> 	/* We cannot process this rq so just requeue it. */
+> 	if (ublk_nosrv_dev_should_queue_io(ubq->dev))
+> 		blk_mq_requeue_request(rq, false);
+> 	else
+> 		blk_mq_end_request(rq, BLK_STS_IOERR);
+> }
 > 
-> > diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-> > index b2dd0c0bf509..42b2b7540507 100644
-> > --- a/fs/xfs/xfs_super.c
-> > +++ b/fs/xfs/xfs_super.c
-> > @@ -615,6 +615,28 @@ xfs_init_mount_workqueues(
-> >  	return -ENOMEM;
-> >  }
-> >  
-> > +unsigned int
-> > +xfs_atomic_write_logitems(
-> > +	struct xfs_mount	*mp)
-> > +{
-> > +	unsigned int		efi = xfs_efi_item_overhead(1);
-> > +	unsigned int		rui = xfs_rui_item_overhead(1);
-> > +	unsigned int		cui = xfs_cui_item_overhead(1);
-> > +	unsigned int		bui = xfs_bui_item_overhead(1);
-> > +	unsigned int		logres = M_RES(mp)->tr_write.tr_logres;
-> > +
-> > +	/*
-> > +	 * Maximum overhead to complete an atomic write ioend in software:
-> > +	 * remove data fork extent + remove cow fork extent +
-> > +	 * map extent into data fork
-> > +	 */
-> > +	unsigned int		atomic_logitems =
-> > +		(bui + cui + rui + efi) + (cui + rui) + (bui + rui);
+> /*
+>  * Should I/O issued while there is no ublk server queue? If not, I/O
+>  * issued while there is no ublk server will get errors.
+>  */
+> static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
+> {
+> 	return (ub->dev_info.flags & UBLK_F_USER_RECOVERY) &&
+> 	       !(ub->dev_info.flags & UBLK_F_USER_RECOVERY_FAIL_IO);
+> }
+
+Indeed, will update commit log.
+
 > 
-> This seems wrong. Unmap from the data fork only logs a (bui + cui)
-> pair, we don't log a RUI or an EFI until the transaction that
-> processes the BUI or CUI actually frees an extent from the the BMBT
-> or removes a block from the refcount btree.
-
-This is tricky -- the first transaction in the chain creates a BUI and a
-CUI and that's all it needs.
-
-Then we roll to finish the BUI.  The second transaction needs space for
-the BUD, an RUI, and enough space to relog the CUI (== CUI + CUD).
-
-Then we roll again to finish the RUI.  This third transaction needs
-space for the RUD and space to relog the CUI.
-
-Roll again, fourth transaction needs space for the CUD and possibly a
-new EFI.
-
-Roll again, fifth transaction needs space for an EFD.
-
-	const unsigned int	efi = xfs_efi_log_space(1);
-	const unsigned int	efd = xfs_efd_log_space(1);
-	const unsigned int	rui = xfs_rui_log_space(1);
-	const unsigned int	rud = xfs_rud_log_space();
-	const unsigned int	cui = xfs_cui_log_space(1);
-	const unsigned int	cud = xfs_cud_log_space();
-	const unsigned int	bui = xfs_bui_log_space(1);
-	const unsigned int	bud = xfs_bud_log_space();
-
-	/*
-	 * Maximum overhead to complete an atomic write ioend in software:
-	 * remove data fork extent + remove cow fork extent + map extent into
-	 * data fork.
-	 *
-	 * tx0: Creates a BUI and a CUI and that's all it needs.
-	 *
-	 * tx1: Roll to finish the BUI.  Need space for the BUD, an RUI, and
-	 * enough space to relog the CUI (== CUI + CUD).
-	 *
-	 * tx2: Roll again to finish the RUI.  Need space for the RUD and space
-	 * to relog the CUI.
-	 *
-	 * tx3: Roll again, need space for the CUD and possibly a new EFI.
-	 *
-	 * tx4: Roll again, need space for an EFD.
-	 */
-	const unsigned int	tx0 = bui + cui;
-	const unsigned int	tx1 = bud + rui + cui + cud;
-	const unsigned int	tx2 = rud + cui + cud;
-	const unsigned int	tx3 = cud + efi;
-	const unsigned int	tx4 = efd;
-
-	const unsigned int	per_intent = max3(max3(tx0, tx1, tx2), tx3, tx4);
-
-> We also need to be able to relog all the intents and everything that
-> was modified, so we effectively have at least one
-> xfs_allocfree_block_count() reservation needed here as well. Even
-> finishing an invalidation BUI can result in BMBT block allocation
-> occurring if the operation splits an existing extent record and the
-> insert of the new record causes a BMBT block split....
-
-Agreed.
-
-> > +
-> > +	/* atomic write limits are always a power-of-2 */
-> > +	return rounddown_pow_of_two(logres / (2 * atomic_logitems));
+> > 
+> > Fix it by calling __ublk_abort_rq() in case of ubq->canceling.
+> > 
+> > Reported-by: Uday Shankar <ushankar@purestorage.com>
+> > Closes: https://lore.kernel.org/linux-block/Z%2FQkkTRHfRxtN%2FmB@dev-ushankar.dev.purestorage.com/
+> > Fixes: commit d796cea7b9f3 ("ublk: implement ->queue_rqs()")
 > 
-> What is the magic 2 in that division?
-
-That's handwaving the lack of a computation involving
-xfs_allocfree_block_count.  A better version would be to figure out the
-log space needed:
-
-	/* Overhead to finish one step of each intent item type */
-	const unsigned int	f1 = libxfs_calc_finish_efi_reservation(mp, 1);
-	const unsigned int	f2 = libxfs_calc_finish_rui_reservation(mp, 1);
-	const unsigned int	f3 = libxfs_calc_finish_cui_reservation(mp, 1);
-	const unsigned int	f4 = libxfs_calc_finish_bui_reservation(mp, 1);
-
-	/* We only finish one item per transaction in a chain */
-	const unsigned int	step_size = max(f4, max3(f1, f2, f3));
-
-and then you have what you need to figure out the logres needed to
-support a given awu_max, or vice versa:
-
-	if (desired_max) {
-		dbprintf(
- "desired_max: %u\nstep_size: %u\nper_intent: %u\nlogres: %u\n",
-				desired_max, step_size, per_intent,
-				(desired_max * per_intent) + step_size);
-	} else if (logres) {
-		dbprintf(
- "logres: %u\nstep_size: %u\nper_intent: %u\nmax_awu: %u\n",
-				logres, step_size, per_intent,
-				logres >= step_size ? (logres - step_size) / per_intent : 0);
-	}
-
-I hacked this into xfs_db so that I could compute a variety of
-scenarios.  Let's pretend I have a 10T filesystem with 4k fsblocks and
-the default configuration.
-
-# xfs_db /dev/mapper/moo -c logres -c "untorn_max -b $(( (16 * 1048576) / 4096 ))" -c "untorn_max -l 244216"
-type 0 logres 244216 logcount 5 flags 0x4
-type 1 logres 428928 logcount 5 flags 0x4
-<snip>
-minlogsize logres 648576 logcount 8
-
-To emulate a 16MB untorn write, you'd need a logres of:
-
-desired_max: 4096
-step_size: 107520
-per_intent: 208
-logres: 959488
-
-959488 > 648576, which would alter the minlogsize calculation.  I know
-we banned tiny filesystems a few years ago, but there's still a risk in
-increasing it.
-
-For the tr_write logres that John picked, the awu_max we can emulate is:
-
-logres: 244216
-step_size: 107520
-per_intent: 208
-max_awu: 657
-
-That's enough to emulate a 2MB untorn write.
-
-Now let's try again with a realtime filesystem, because the log
-reservations are absurdly huge there:
-
-# xfs_db /dev/mapper/moo -c logres -c "untorn_max -b $(( (16 * 1048576) / 4096 ))" -c "untorn_max -l 417400"
-type 0 logres 417400 logcount 5 flags 0x4
-type 1 logres 772736 logcount 5 flags 0x4
-<snip>
-minlogsize logres 772736 logcount 5
-
-For 16MB, you'd need a logres of:
-
-desired_max: 4096
-step_size: 107520
-per_intent: 208
-logres: 959488
-
-959488 > 772736, which would alter the minlogsize calculation.
-
-For the tr_write logres that John picked, the awu_max we can emulate is:
-
-logres: 417400
-step_size: 107520
-per_intent: 208
-max_awu: 1489
-
-This is more than enough to handle a 4MB atomic write without affecting
-any the other filesystem geometry.  Now I'll try a 400MB filesystem:
-
-# xfs_db /dev/mapper/moo -c logres -c "untorn_max -b $(( (16 * 1048576) / 4096 ))" -c "untorn_max -l 142840"
-type 0 logres 142840 logcount 5 flags 0x4
-type 1 logres 226176 logcount 5 flags 0x4
-<snip>
-minlogsize logres 445824 logcount 8
-
-desired_max: 4096
-step_size: 56832
-per_intent: 208
-logres: 908800
-
-Definitely still above minlogsize.
-
-logres: 142840
-step_size: 56832
-per_intent: 208
-max_awu: 413
-
-We can still simulate a 1MB untorn write even on a tiny filesystem.
-
-On a 1k fsblock 400MB filesystem:
-
-# xfs_db /dev/mapper/moo -c logres -c "untorn_max -b $(( (16 * 1048576) / 4096 ))" -c "untorn_max -l 63352"
-type 0 logres 63352 logcount 5 flags 0x4
-type 1 logres 103296 logcount 5 flags 0x4
-<snip>
-minlogsize logres 153984 logcount 8
-
-desired_max: 4096
-step_size: 26112
-per_intent: 208
-logres: 878080
-
-Again we see that we'd have to increase the min logsize to support a
-16mB untorn write.
-
-logres: 63352
-step_size: 26112
-per_intent: 208
-max_awu: 179
-
-But we can still emulate a 128K untorn write in software.
-
-This is why I don't agree with adding a static 16MB limit -- we clearly
-don't need it to emulate current hardware, which can commit up to 64k
-atomically.  Future hardware can increase that by 64x and we'll still be
-ok with using the existing tr_write transaction type.
-
-By contrast, adding a 16MB limit would result in a much larger minimum
-log size.  If we add that to struct xfs_trans_resv for all filesystems
-then we run the risk of some ancient filesystem with a 12M log failing
-suddenly failing to mount on a new kernel.
-
-I don't see the point.
-
---D
-
-> > +}
+> Will this upset anything parsing these tags? The syntax I've usually
+> seen doesn't have "commit," i.e.
 > 
-> Also this function does not belong in xfs_super.c - that file is for
-> interfacing with the VFS layer.  Calculating log reservation
-> constants at mount time is done in xfs_trans_resv.c - I suspect most
-> of the code in this patch should probably be moved there and run
-> from xfs_trans_resv_calc()...
-> 
-> -Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
+> Fixes: d796cea7b9f3 ("ublk: implement ->queue_rqs()")
+
+Will fix it in V2.
+
+Thanks
+Ming
+
