@@ -1,84 +1,42 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F5A26FD86
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 17:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB1A1BC073;
+	Wed,  9 Apr 2025 19:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744221585; cv=none; b=tYVfvnDty2zrI9ycsV7wOb+RUlxvBzivcpe9irSuLi5wrey+myS2YtR+ZZIPqLT70Ryw7YWyyfpnoEEGwyOtJYsFdnDRRioc4uTQImV1OLBp8TIO/Z2AHo8V3/Vf9dkTN4xhycrOAWg8v3ReDFS42lkKw+Rw6VEdA4jXifaG304=
+	t=1744225748; cv=none; b=m9oq9ep8yxYGT0FCqU6oXJZuu7BuETXO3b6GAAjPLoovj8exZR3VVFasBJCP5j/LbqrtrOv+GDpXwqP5PPVjDJ/HGAJandNr1fHk8xzWGSY6JXAbR2wSBXPPSYRsS3Wn4zbJBlND7OSVXHmBaEKVVksbgREcD+u0BgN19LNSWWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744221585; c=relaxed/simple;
-	bh=foPbQftCwid7nEeC2q1n/JJulAsrhauYfRD3fATL6QA=;
+	s=arc-20240116; t=1744225748; c=relaxed/simple;
+	bh=slV7aJP8bfDnI9jJg8xkwva4EKe7FG46aq/qjIeYOXE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bt5X4Nx69gclCyuc5EYWlHlbLBfD+NLO42Ok9FvbBqAmYHcSWthI96riRhw+gxRrbysUfm7599IvhyueU6D9kxQ7jqK1s3Poo6EsPKWGimtYeBWcKWJW7AXFjiINk37fnwvJTKgKFFrWpKl09gg6WRxRNlYtTI6BztN37A+UXGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GS5JVGES; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PqHmCLbV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iYzwSlYo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=x16m8ALg; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=U9KboKs2RGXfkrwwwvD7e8P1EyWXYEZQKyy4xNZLeQTuq1bkG4T3xEIJySz3OJvrRnpCS5GfOmLZOxkLZ0a0XIVYDmmXR+NYbJYuTWBG+nJ454VBekmcQ9ZjevsMKVfHlDx4F6z5YVmtnwltQTNFLt7O9ME5YtZYXyLI5SEovoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSCxtPJQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GS5JVGES";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PqHmCLbV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iYzwSlYo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="x16m8ALg"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E540F1F38D;
-	Wed,  9 Apr 2025 17:59:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1744221581; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uIjmt9EIXrrPV7ZfNiHCpT9Mu9CfLBQs+NakOf5it4=;
-	b=GS5JVGESpF8IRTypl7/cyIQyOUPnpMjxqdi48AE99RrFrby1R32DXkwBwA1sxP+78wsF0O
-	SeVButj4LPuL1e0+lTN6XUU9Guc5VUXcSuIh4Q7Rq4ij5pnljfRLnVkVQhJUPzORMLQmpr
-	4GOiCBmauyy2/TUBmF0qkukhlaFB9So=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1744221581;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uIjmt9EIXrrPV7ZfNiHCpT9Mu9CfLBQs+NakOf5it4=;
-	b=PqHmCLbV+HONcEYXX2ZssPtEGKSBdGR6zr6z+T7t7MCOZJRQ7GY1ws6Nheo/ZDpcpjo9QE
-	ohCZPPlRtvvSDWCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1744221580; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uIjmt9EIXrrPV7ZfNiHCpT9Mu9CfLBQs+NakOf5it4=;
-	b=iYzwSlYolKCadtoib3hQqpYPGmDDduYp3MNUfV1gDLBlGOWwjndKAFXwkbjA9LplfAR01C
-	vDRoWKRGSLzpnes36GxQG3ozTRVoPujr4Ie42xZQRM4I+DeXxD+GnFf1LXcjV5sMbB+/3U
-	ROWKEQPx2mXe/KTgotpOK38GrZcof7Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1744221580;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uIjmt9EIXrrPV7ZfNiHCpT9Mu9CfLBQs+NakOf5it4=;
-	b=x16m8ALgiCffOeelURbinsYUpFSqXzcPSaVGfyysINhZq+yA7/L9NmFWvmXl2YIpOV+Wpd
-	a1kBOKsxey0N0yDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D3D99137AC;
-	Wed,  9 Apr 2025 17:59:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id vwZ1M4y19meWFAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 09 Apr 2025 17:59:40 +0000
-Date: Wed, 9 Apr 2025 19:59:36 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-	"asewhichexercisesthisinterface."@fluorine
-Subject: Re: [PATCH blktests v2 3/4] nvme/060: add test nvme fabrics target
- resetting during I/O
-Message-ID: <4f62bf2f-1512-4d5d-808e-b257adf29eb4@flourine.local>
-References: <20250408-test-target-v2-0-e9e2512586f8@kernel.org>
- <20250408-test-target-v2-3-e9e2512586f8@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSCxtPJQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1001C4CEE2;
+	Wed,  9 Apr 2025 19:09:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744225747;
+	bh=slV7aJP8bfDnI9jJg8xkwva4EKe7FG46aq/qjIeYOXE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eSCxtPJQUtB0DfijHbQsOBbiEps+2+YwV7NoOQkZs/cUgU2QYElmLsC052jwHv/15
+	 A24s9ppUVNV5W33Sx909CAnDHpmNu0Ubk5T3ZeWsmjub9GVQBByriUMqmdVIdX4l5L
+	 M2/9bF3Hokj8WP6Ab2C/Qn7HM8rIuKKfNz7CEqe4f1/lO49FQ6OziU8tzokOXvTsDZ
+	 u/jYnhUO3PY5HcTd3428Gpug30MBapDR+IpT1RweUo+yhT7mHQIlpXZSu/hABSNefl
+	 fvpBfdL7jSGs0Jkd0/xhPzWVPjPRPrMGfkWeM2DArxtiIa96vnnZ34IjHXnufD2OKw
+	 myauuZoy28HCg==
+Date: Wed, 9 Apr 2025 12:09:07 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>
+Cc: linux-block <linux-block@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	xfs <linux-xfs@vger.kernel.org>
+Subject: Re: Weird blockdev crash in 6.15-rc1?
+Message-ID: <20250409190907.GO6266@frogsfrogsfrogs>
+References: <20250408175125.GL6266@frogsfrogsfrogs>
+ <20250409173015.GN6266@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -87,34 +45,222 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250408-test-target-v2-3-e9e2512586f8@kernel.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+In-Reply-To: <20250409173015.GN6266@frogsfrogsfrogs>
 
-On Tue, Apr 08, 2025 at 06:25:59PM +0200, Daniel Wagner wrote:
-> +requires() {
-> +	_nvme_requires
-> +	_have_loop
-> +	_require_nvme_trtype_is_fabrics
-> +	_have_kernel_option NVME_TARGET_DEBUGF
+On Wed, Apr 09, 2025 at 10:30:15AM -0700, Darrick J. Wong wrote:
 
-Typo: s/NVME_TARGET_DEBUGF/NVME_TARGET_DEBUGFS/
+> Then it occurred to me to look at set_blocksize again:
+> 
+> 	/* Don't change the size if it is same as current */
+> 	if (inode->i_blkbits != blksize_bits(size)) {
+> 		sync_blockdev(bdev);
+> 		inode->i_blkbits = blksize_bits(size);
+> 		mapping_set_folio_order_range(inode->i_mapping,
+> 				get_order(size), get_order(size));
+> 		kill_bdev(bdev);
+> 	}
+> 
+> (Note that I changed mapping_set_folio_min_order here to
+> mapping_set_folio_order_range to shut up a folio migration bug that I
+> reported elsewhere on fsdevel yesterday, and willy suggested forcing the
+> max order as a temporary workaround.)
+> 
+> The update of i_blkbits and the order bits of mapping->flags are
+> performed before kill_bdev truncates the pagecache, which means there's
+> a window where there can be a !uptodate order-0 folio in the pagecache
+> but i_blkbits > PAGE_SHIFT (in this case, 13).  The debugging assertion
+> above is from someone trying to install a too-small folio into the
+> pagecache.  I think the "FARK" message I captured overnight is from
+> readahead trying to bring in contents from disk for this too-small folio
+> and failing.
+> 
+> So I think the answer is that set_blocksize needs to lock out folio_add,
+> flush the dirty folios, invalidate the entire bdev pagecache, set
+> i_blkbits and the folio order, and only then allow new additions to the
+> pagecache.
+> 
+> But then, which lock(s)?  Were this a file on XFS I'd say that one has
+> to take i_rwsem and mmap_invalidate_lock before truncating the pagecache
+> but by my recollection bdev devices don't take either lock in their IO
+> paths.
+
+Here's my shabby attempt to lock my way out of this mess.  My reproducer
+no longer trips, but I don't think that means much.
+
+--D
+
+From: Darrick J. Wong <djwong@kernel.org>
+Subject: [PATCH] block: fix race between set_blocksize and IO paths
+
+With the new large sector size support, it's now the case that
+set_blocksize needs to change i_blksize and the folio order with no
+folios in the pagecache because the geometry changes cause problems with
+the bufferhead code.
+
+Therefore, truncate the page cache after flushing but before updating
+i_blksize.  However, that's not enough -- we also need to lock out file
+IO and page faults during the update.  Take both the i_rwsem and the
+invalidate_lock in exclusive mode for invalidations, and in shared mode
+for read/write operations.
+
+I don't know if this is the correct fix.
+
+Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+---
+ block/bdev.c      |   12 ++++++++++++
+ block/blk-zoned.c |    5 ++++-
+ block/fops.c      |    7 +++++++
+ block/ioctl.c     |    6 ++++++
+ 4 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 7b4e35a661b0c9..0cbdac46d98d86 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -169,11 +169,23 @@ int set_blocksize(struct file *file, int size)
+ 
+ 	/* Don't change the size if it is same as current */
+ 	if (inode->i_blkbits != blksize_bits(size)) {
++		/* Prevent concurrent IO operations */
++		inode_lock(inode);
++		filemap_invalidate_lock(inode->i_mapping);
++
++		/*
++		 * Flush and truncate the pagecache before we reconfigure the
++		 * mapping geometry because folio sizes are variable now.
++		 */
+ 		sync_blockdev(bdev);
++		kill_bdev(bdev);
++
+ 		inode->i_blkbits = blksize_bits(size);
+ 		mapping_set_folio_order_range(inode->i_mapping,
+ 				get_order(size), get_order(size));
+ 		kill_bdev(bdev);
++		filemap_invalidate_unlock(inode->i_mapping);
++		inode_unlock(inode);
+ 	}
+ 	return 0;
+ }
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 0c77244a35c92e..8f15d1aa6eb89a 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -343,6 +343,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		op = REQ_OP_ZONE_RESET;
+ 
+ 		/* Invalidate the page cache, including dirty pages. */
++		inode_lock(bdev->bd_mapping->host);
+ 		filemap_invalidate_lock(bdev->bd_mapping);
+ 		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
+ 		if (ret)
+@@ -364,8 +365,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
+ 
+ fail:
+-	if (cmd == BLKRESETZONE)
++	if (cmd == BLKRESETZONE) {
+ 		filemap_invalidate_unlock(bdev->bd_mapping);
++		inode_unlock(bdev->bd_mapping->host);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/block/fops.c b/block/fops.c
+index be9f1dbea9ce0a..f46ae08fac33dd 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -746,7 +746,9 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 			ret = direct_write_fallback(iocb, from, ret,
+ 					blkdev_buffered_write(iocb, from));
+ 	} else {
++		inode_lock_shared(bd_inode);
+ 		ret = blkdev_buffered_write(iocb, from);
++		inode_unlock_shared(bd_inode);
+ 	}
+ 
+ 	if (ret > 0)
+@@ -757,6 +759,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ {
++	struct inode *bd_inode = bdev_file_inode(iocb->ki_filp);
+ 	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
+ 	loff_t size = bdev_nr_bytes(bdev);
+ 	loff_t pos = iocb->ki_pos;
+@@ -793,7 +796,9 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 			goto reexpand;
+ 	}
+ 
++	inode_lock_shared(bd_inode);
+ 	ret = filemap_read(iocb, to, ret);
++	inode_unlock_shared(bd_inode);
+ 
+ reexpand:
+ 	if (unlikely(shorted))
+@@ -836,6 +841,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+ 
++	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 
+ 	/*
+@@ -868,6 +874,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 
+  fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++	inode_unlock(inode);
+ 	return error;
+ }
+ 
+diff --git a/block/ioctl.c b/block/ioctl.c
+index faa40f383e2736..e472cc1030c60c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -142,6 +142,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	if (err)
+ 		return err;
+ 
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+ 	if (err)
+@@ -174,6 +175,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	blk_finish_plug(&plug);
+ fail:
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
+@@ -199,12 +201,14 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (!err)
+ 		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+ 						GFP_KERNEL);
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
+@@ -236,6 +240,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 		return -EINVAL;
+ 
+ 	/* Invalidate the page cache, including dirty pages */
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end);
+ 	if (err)
+@@ -246,6 +251,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 
+ fail:
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
