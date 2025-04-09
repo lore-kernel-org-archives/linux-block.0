@@ -1,70 +1,69 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055AC25DAEF
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 10:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43F72459FB
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 11:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744196331; cv=none; b=nLHYIUr5Z5ABu4NLR9obbOyRqLD9n8yMty7x0tRqVn3zslHnMvEunlmUD/+WDT46X3ZQ437gjmXxaXr01Tl/WOj2psHgnMc62IKYK4wR1LekmDLjSF4r0wTQwFZNyU6+/FJG46ugb6/Kj4Ql4MlVFl8cDvxToIaWioEjNOWOHqU=
+	t=1744197030; cv=none; b=aOR8ZqKBgnifYvjzl0es0S1NwTJBLZjcZsTvL0QMUh3rPwB7avrMzwgX9Khz3TXhINbAPPqgiDjzr1YHEA/pFpd0bfhi8np+peYgP0FT7Cdm1kfjwp7L6IBNxtgaWa3nRZ2tefbcVIqjmlPTyDwOHf8Y1U1gmJepyzsT/oetPHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744196331; c=relaxed/simple;
-	bh=Beq6p0A0Aj03j7AtotcrQhblg6FIC8rtviizuSi6oIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=UcuDP97P4QAZszjaE8TTKu/zaTHLF8x3ZIYnd18OfwpkpNjvZUHcE9FtLHar8B12Jk5E+YCSL2Zc7MTtow7HlsyPOreVMUJBUao14lqeNuNhE/nVLjTfOP+lkn1D04deX69Fvj3ikjo4kkGZNxj9ZCbNVLb1swU6iNCraZzBEj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KMIaZK4m; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1744197030; c=relaxed/simple;
+	bh=1cRD+Q2EoGSHOsD44Cq0W9nkSKnhVJaA4hp6x6u/kEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P7xYRjOHqtdRtMHMaZWflRh1KFsXflQsOupqOIwkMXSuevbC2YWFR5nTDLcLQ3qsCQq6YY3h9NTDGfc8yl7r4g66rrMxWKRvneD964Lp3Z7DLF9/0aSBA/aUXwACmYfMEiuzpxq/X58VoQORgaC1/I0Gem+gCgGV0KVrz1xaOHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TusZ+bex; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KMIaZK4m"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so46506175e9.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Apr 2025 03:58:47 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TusZ+bex"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2241053582dso84715365ad.1
+        for <linux-block@vger.kernel.org>; Wed, 09 Apr 2025 04:10:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744196326; x=1744801126; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IiF3hItZ0UAK/f8Cj3X61O/0nheHKx3BwiQHqAtvtCQ=;
-        b=KMIaZK4m2AB+tusrYpYso1uIarovmI17rvC5mYPkUTH2fA3gKybefldLMpqUbuuqHQ
-         t+k/BH8dVdTIBQUl+jfluK45wdrdc9luf5lRBzt1v4PxUlEPTv3YxE2HMsagh/h7jaDY
-         vl3K6BclRbmdSU5BbmJu4hoUDL4CAnmsrO2X3DtvbuHeTTbo8vCG4V0zG5x6PDTjmAhP
-         ms1C7HIP2SqAUiw9BH3PgzGGeKdjK0MEDV6YdixiR3p24RtZGoYbTacQVcW2/B/97PpY
-         dgu4FUJnHGafQXZc6iAYkHNMhrpBOt8epHuOc9iK57LaG1LSqShoSCoFe3n/xqSR3OL2
-         6p+g==
+        d=chromium.org; s=google; t=1744197028; x=1744801828; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cRD+Q2EoGSHOsD44Cq0W9nkSKnhVJaA4hp6x6u/kEw=;
+        b=TusZ+bexpNNEZYaKkjwOZ3nCoYWkYW6ILEViYBMKxbjwBW+muwIGt+WHK64kmbJssL
+         c3QMn4E/Z7MV4uQTgHR5mfxyZ2/zOVjulXqHBTLGfboQHlAbPmsgaibqdLq3d1abE4nr
+         QDgiUDwColfI23yHs39rg3pqWp3RZvb6MhAYw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744196326; x=1744801126;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IiF3hItZ0UAK/f8Cj3X61O/0nheHKx3BwiQHqAtvtCQ=;
-        b=i2xvy8ICPDu5HqxjFvhtBvRqYwYlqgeKwScW2Cpc19dDBvDfOSCKCyFA7aCe9AESVR
-         MaGk6PLBnH8tPNrtX9sCSWmLv1M159kqSoQv0llf9fklbtDbS1WOT9R607HUfdQRK8wH
-         I1IuSq2/cZFu40uozca5rYPUMpUE86k10/31jnXRRide8qqwhCABP3cfgOfvUwKEZ7wM
-         aO5EyYP4zLWS4WtPVDWQOQIsW1Y9LI6TP1WORBwfXaBj5Dgi/9pvaQ78h5NPsDiaol5+
-         aLO1Ymm2NoGyL9cUNrH8hbddYfWqfbz4qYN3IdltJGSDwNXk9UzF62hC5Qp6XCub9FfS
-         cmEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWV2KYzyPQgoGPa9pEzPFhsTWJea2sMzzhk0fsMSxLrGoIKTCLGNvYMADM1HercefqlZsLUoKMpKHNFkA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjL8xGOU307m70nZvrNCOPAcCYNpdwNRafMD7qYO7r5Rm0DNPU
-	SAh4+msXfrfpKKaJ7M9Uxt8xa4CElQczEx3ekNI/s77UOtCBXeUcvXpxrrr+Hnc=
-X-Gm-Gg: ASbGncv51qBhTaRKOFpmEB+ZkreOVkVZpjdv0RVmuwumfREHytztpgfuHbvh26VcCQ9
-	PF7etN09sZp+6qY+VjlA9/mCkbl3mMRtQKeHv09jevvbZ38SMby0hZ3FMrZsYGOk+ugfxLgo8AD
-	vorXaONeMRl5vJtXrEOYqYe+/5+0f4TLoGKjU9lGCrp5UDdantZZXhhESBdSEX6wAetIwcmKYYO
-	rBmhmuQQF9gfxW7RsWvsfPD6Kx4kEPkewGeF8fOzv6Qm2uxIxTCL47/fh95P0hi6vLTnSK6ZkSv
-	kRHS0SKnBxyY+kXIfsOZYswVg1PoW38RaCYs7JO5Vg6zsQ==
-X-Google-Smtp-Source: AGHT+IFqdSFJblVZ7boxxxINoAK4ozoRnpThv+xWoaahnbfo9IExrYdlTmE3N6jSm+EyLm0u1m1MSw==
-X-Received: by 2002:a5d:6d86:0:b0:39c:310a:f87e with SMTP id ffacd0b85a97d-39d87aa837dmr2381147f8f.16.1744196326323;
-        Wed, 09 Apr 2025 03:58:46 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39d89378daasm1308967f8f.38.2025.04.09.03.58.45
+        d=1e100.net; s=20230601; t=1744197028; x=1744801828;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cRD+Q2EoGSHOsD44Cq0W9nkSKnhVJaA4hp6x6u/kEw=;
+        b=ZgviGjCZLgQAumAMuaRheUmQuhA2+EQRAQFiY2lwwHTVFP7Rfj84wPar8K7Q6DUODw
+         6iKM/downzxbAMB6qQBP/G7DIA15QNXLeWr/PWEOoPvp37yP7K+PFhMJ902vISKIz/MI
+         NRismdrsvXLkTCSMBgnMZ3AOFEgy5j8gWV6O2JXAScjsVqMs8/k371KZ5lcUadjdts6l
+         FNfYdjhLfbudLGwW0YAm1qZqF0DjMxTtPeu/dIUzq6u/pSO+7pmlyGv+7mG9E2/+Qe+n
+         H95pObvQptrkv9PeOZrM21QZql6ahlW66AvBqiX1Mt9SlcUYJSaggnwKtlntXqs9hU8k
+         nanw==
+X-Forwarded-Encrypted: i=1; AJvYcCWI4DYCe8ccJPZdc3L0gViPtBQPESXuE+RkdGPc8Rkk6vZi44RpXPO3E2fD4PctS3TeaggvKuSf1TeQQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnvzr8wisL5BLfxET7Mb6/1ZfybfLH3XYHS9a+VsyW6PZ/rBF5
+	8mrpLhf0FnYDBu14fEhKskFpvyCoZazs9y67sCA8vJHwmeJUHUqiRzeqZR3pVg==
+X-Gm-Gg: ASbGncttLWnxKvyKxE/T2vhmeuXhpSE82Rf2jjNoICD3Wgn0GHoU8O7NetWGyIly6HY
+	Cae6JuBmsAEw2ZBKnFIL/UnG7jg83jFHujcKuDg/pQMbWbwie1XkHEezLwTwcrPUYbc5ZwTYT9A
+	9DDgcVIJ48dWvVn758OJFqTAWlQItz5etmLU+9jyIVC9kFPJ91PkB1fL4eQZXvlq2nvBhbVEz8e
+	ROl6rMwy/24jtlu6inIRbpTAD8AGwHRDNfmszDTZwDUBzLwRoaRo9gLlf9NYaaokoTfdI0wqwXd
+	aO6XC3UG2yN/HwIp6ul8yBS8MBGGz8qNHNBixYNOGo1t
+X-Google-Smtp-Source: AGHT+IH6fxmgITIb/nhtffS9HlLl7QIjWlAJGMs05n4iRReuayhWjvcGq2N3FOP8fHxbYwcNMgiypw==
+X-Received: by 2002:a17:903:1b28:b0:21f:7e12:5642 with SMTP id d9443c01a7336-22ac3f6df3dmr30398605ad.18.1744197028206;
+        Wed, 09 Apr 2025 04:10:28 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:eb5e:c849:7471:d0ed])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c9c747sm8987785ad.130.2025.04.09.04.10.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 03:58:45 -0700 (PDT)
-Date: Wed, 9 Apr 2025 13:58:42 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brian Geffon <bgeffon@google.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH next] zram: Fix uninitialized variable in
+        Wed, 09 Apr 2025 04:10:27 -0700 (PDT)
+Date: Wed, 9 Apr 2025 20:10:22 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>, 
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Brian Geffon <bgeffon@google.com>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH next] zram: Fix uninitialized variable in
  zram_writeback_slots()
-Message-ID: <02b8e156-e04f-4ab3-9322-b740c1f95284@stanley.mountain>
+Message-ID: <osj54aiqi3b3dtgyfituj6tqpar5s7trkkx7hytfozl4cifc63@mu7bb5pyse2n>
+References: <02b8e156-e04f-4ab3-9322-b740c1f95284@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,30 +72,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <02b8e156-e04f-4ab3-9322-b740c1f95284@stanley.mountain>
 
-The "ret" variable is only initialized on errors and not on success.
-Initialize it to zero.
+On (25/04/09 13:58), Dan Carpenter wrote:
+> The "ret" variable is only initialized on errors and not on success.
+> Initialize it to zero.
 
-Fixes: 4529d2d13fd1 ("zram: modernize writeback interface")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/block/zram/zram_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you Dan.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 2133488dbfd4..94e6e9b80bf0 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -741,7 +741,7 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
- 	struct zram_pp_slot *pps;
- 	struct bio_vec bio_vec;
- 	struct bio bio;
--	int ret, err;
-+	int ret = 0, err;
- 	u32 index;
- 
- 	page = alloc_page(GFP_KERNEL);
--- 
-2.47.2
+> Fixes: 4529d2d13fd1 ("zram: modernize writeback interface")
 
+This is still in mm-unstable, mind if we fold the fix in?
+Or I can send a v4 with the fix applied.
