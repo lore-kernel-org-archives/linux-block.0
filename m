@@ -1,196 +1,167 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C314A04
-	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 03:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438284A04
+	for <linux-block@vger.kernel.org>; Wed,  9 Apr 2025 03:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744168599; cv=none; b=EV6z23/xo9tu51OzPGc/U/fKsXjN7sxaScHxt8bPKRWRmci0OUsTM+iX/UQh2WiBAZoSmqzSY7M2Hb2N+prwtU0NrvewhHfcV9wrt1ztBb65GCuvpw3XXZWaalvN7rjmmI8gXdJ0qz4dhNymTVGawxezJstSz82d6o4aNnb0Lto=
+	t=1744168683; cv=none; b=VfpiI/19qyDBm6KlWC4x4NXtCEV5TsStfct4e9Hj+Kj3IrD20u/9cA6YvNQky2aweE4UrY6wEN1zUISfbHRfs/2nm9k0SXfh8Ymny28WhmeaYtD+AAFBjQGMljAkD4poHCy56qcF8Czd3ZQqA8mPbldR39YBuIgkNaA6Ui5dhOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744168599; c=relaxed/simple;
-	bh=JOTS8BnSy3NY5eDMbOnbqzyaAWGgusKQJbBKqOWE8iU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=einuJ3F/iY2G7Zhe6Qa/a6IHQZVhjhU5O6V2yGrQxVY0YRDqYmwoyqMttETGXaMFi+QpxIHh3H6A26GNLgLjbJkFIaqYTRmAabZQJE7KrM8uCJp6OpdhUL5yUdGrR4FJjEd4zfV61uGd9KdEj001CECt7LJ7NQpTOXkoLpbPo74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=X7p1VeV0; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1744168683; c=relaxed/simple;
+	bh=i6uliZuGLnCdftmAl8vCOOI9pHuBtlxN4LHLgspC24o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LB/I/K6vPlknn9Semfw67vAOfZ1u04wLl5PIGKTxchDwdbJKKMw/VnVV3tMwQkW21P6HKTFVZm+xcE+gg5HVFw+me1Q1A6kfRDD0YEMd4ONuJy6ctLCJjU1VAVpPtnHow2Hk3DeKCzprNE9Myli1L/r/Wk/8shSGaZNGg++q2KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HCyS0wty; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="X7p1VeV0"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af51b57ea41so588821a12.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Apr 2025 20:16:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1744168597; x=1744773397; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A7lanBtnebtdPdb1o6h6pgi9BSofCUk/apk3Q3n+gJw=;
-        b=X7p1VeV0jGJjGYLxHRUSwWvCXQNP70XofPoXigdDjIQi3o4yh0Mjufs98mqElHi47F
-         QIuCW+EX1FsYjWikhL3xIwU0SJy1cPxNOKWA3gd9CeBDKgYd3hnPG74db28kX6HBwB9r
-         djDj2Wx4qTQ5w4r7VmD616yBVS0x+wghBuQpFXOlMtM+WwyKkMY4AHAheqiXJKF8GKBV
-         lffxn/ghd/YYO2l3cplTizqtba1KcnZ2/EA9p620XrcokVvC4bb/KzBix8HvPJXhmCOY
-         H8yWFk3zLdz1ARwfM5nwXnra/9RBElaFWujgaRfk4CUCaTsOulhU0RKHvu1MfvtNWUVN
-         6vKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744168597; x=1744773397;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A7lanBtnebtdPdb1o6h6pgi9BSofCUk/apk3Q3n+gJw=;
-        b=rVYHnTBKUsTFohTJCXTXGnLrdxxYKIC0Yz5A4mwa2jCWP038Cp/q5Qt+IW9yr3AyYZ
-         00hJkGRV1stDYoIlCELVWhZ9XWLiFVtQrxS05oBXDtvybqvOXV8UMed+uFOMqrGC+D6M
-         dKxvqo3QtH9aKzTbdDp/CeRPvokjXgsTceBcSNoqtiW6Da7GdY9756DqG9LBXRzobQra
-         BUK239v3LcQY2pN91LPG9RvLHe17hGSk8AR3OlASBFVI75ZJ8+VqpxzNCfqj5s+vizpS
-         TYEpIklcU8Uc0UYLsL3hVOwfe+Y8iWelq4r9BDMF5HiaS58S9TtSrgebAC7FjPva5qkM
-         xjuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVc7b9PRCr8R9xdC8YSl3bG1Hkq4d4LUNtiB+XOJx1PTr5sYAZx4dfioqDe54yNYXFhdHDZnr8qE9I14Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YycunuiVsM6rE0IjJ+TbcXAWJ/Ql10ZFs5HLI+QUhlhCI+unoNE
-	ohIY6WV9uAfXR0mqdtkm5ru5bXkFMwQVyZoaWJdTgIOZH/CKUea33fpYyG/xM1LJjKFN4wTMzLi
-	XaLlolT/uaQv156RzdgqE6A/YVE91g7qU0WFXLw==
-X-Gm-Gg: ASbGncvJcNWPkDrLMs1of/M9qCgazegq/rP3KoOs5kAWxDsBrpT1lYePUhK8sEmKnjj
-	sxGY97j9dxMQOz0HEHhn1jqu9i8O4y5mfwF7J0obhSoSqzwQXVgz1yHKJEnqYJzVYe9idXhSda0
-	20TV5mokY67a8BOSpfmT6mT9W3
-X-Google-Smtp-Source: AGHT+IGMXugf6rLzvcW/F285Y4NjLaRh5Iz82YMIfJlcmuXHu8GA0a12cjNfscsqv7avahvAvtKxCphp/EqLAa/IDIw=
-X-Received: by 2002:a17:90b:4d04:b0:2fe:b972:a2c3 with SMTP id
- 98e67ed59e1d1-306dba68a6cmr787236a91.0.1744168596706; Tue, 08 Apr 2025
- 20:16:36 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCyS0wty"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744168679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YEuET2gm+SF2jpfT+HdOpASrOTd1i+kK8LlJweev2iE=;
+	b=HCyS0wtykXp7oOHYVKiR6QPyA+FTPSEdF/mX4pa9p5XLPOo/RQL/nv7YFZxXGIrCkX+Hki
+	03+Ij8o4htgHQxcapNrZ2ZTWY2dnX4lB7Bwj6pnahQOk4BA9Rdjgugrz8vPAgZmKq6cl05
+	vCNqaa2YUfTKcE8QrMa65c9fvhzxv9o=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-557-ZGnN1FdLNxitZACoDL-9wA-1; Tue,
+ 08 Apr 2025 23:17:55 -0400
+X-MC-Unique: ZGnN1FdLNxitZACoDL-9wA-1
+X-Mimecast-MFC-AGG-ID: ZGnN1FdLNxitZACoDL-9wA_1744168674
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 861DB1800349;
+	Wed,  9 Apr 2025 03:17:54 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.20])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 759CF180175B;
+	Wed,  9 Apr 2025 03:17:49 +0000 (UTC)
+Date: Wed, 9 Apr 2025 11:17:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 1/2] ublk: fix handling recovery & reissue in
+ ublk_abort_queue()
+Message-ID: <Z_Xm2DBIaVrpjwNO@fedora>
+References: <20250408072440.1977943-1-ming.lei@redhat.com>
+ <20250408072440.1977943-2-ming.lei@redhat.com>
+ <CADUfDZrHu=8Muss4zSvdLqq-EVoOE9t9PtqYEm343bTWaA-80g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408-ublk_task_per_io-v2-0-b97877e6fd50@purestorage.com> <20250408-ublk_task_per_io-v2-1-b97877e6fd50@purestorage.com>
-In-Reply-To: <20250408-ublk_task_per_io-v2-1-b97877e6fd50@purestorage.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 8 Apr 2025 20:16:25 -0700
-X-Gm-Features: ATxdqUG4NcnbgpWENdrxpVnnkV2LPrates14IyBFzhzGmRQgOYikL_Za8eofzxM
-Message-ID: <CADUfDZrEvT+bfTH=en4zjAexP3v0Nk5Zxk8BphfVV6E5-xdfLQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] ublk: properly serialize all FETCH_REQs
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZrHu=8Muss4zSvdLqq-EVoOE9t9PtqYEm343bTWaA-80g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Apr 8, 2025 at 6:42=E2=80=AFPM Uday Shankar <ushankar@purestorage.c=
-om> wrote:
->
-> Most uring_cmds issued against ublk character devices are serialized
-> because each command affects only one queue, and there is an early check
-> which only allows a single task (the queue's ubq_daemon) to issue
-> uring_cmds against that queue. However, this mechanism does not work for
-> FETCH_REQs, since they are expected before ubq_daemon is set. Since
-> FETCH_REQs are only used at initialization and not in the fast path,
-> serialize them using the per-ublk-device mutex. This fixes a number of
-> data races that were previously possible if a badly behaved ublk server
-> decided to issue multiple FETCH_REQs against the same qid/tag
-> concurrently.
->
-> Reported-by: Caleb Sander Mateos <csander@purestorage.com>
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> ---
->  drivers/block/ublk_drv.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2fd05c1bd30b03343cb6f357f8c08dd92ff47af9..5535073ccd23dfbbd25830c17=
-22c360146b95662 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1809,8 +1809,8 @@ static void ublk_nosrv_work(struct work_struct *wor=
-k)
->
->  /* device can only be started after all IOs are ready */
->  static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue=
- *ubq)
-> +       __must_hold(&ub->mutex)
->  {
-> -       mutex_lock(&ub->mutex);
->         ubq->nr_io_ready++;
->         if (ublk_queue_ready(ubq)) {
->                 ubq->ubq_daemon =3D current;
-> @@ -1822,7 +1822,6 @@ static void ublk_mark_io_ready(struct ublk_device *=
-ub, struct ublk_queue *ubq)
->         }
->         if (ub->nr_queues_ready =3D=3D ub->dev_info.nr_hw_queues)
->                 complete_all(&ub->completion);
-> -       mutex_unlock(&ub->mutex);
->  }
->
->  static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
-> @@ -1962,17 +1961,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_cm=
-d *cmd,
->         case UBLK_IO_UNREGISTER_IO_BUF:
->                 return ublk_unregister_io_buf(cmd, ub_cmd->addr, issue_fl=
-ags);
->         case UBLK_IO_FETCH_REQ:
-> +               mutex_lock(&ub->mutex);
+On Tue, Apr 08, 2025 at 06:47:20PM -0700, Caleb Sander Mateos wrote:
+> On Tue, Apr 8, 2025 at 12:25 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Commit 8284066946e6 ("ublk: grab request reference when the request is handled
+> > by userspace") doesn't grab request reference in case of recovery reissue.
+> > Then the request can be requeued & re-dispatch & failed when canceling
+> > uring command.
+> >
+> > If it is one zc request, the request can be freed before io_uring
+> > returns the zc buffer back, then cause kernel panic:
+> >
+> > [  126.773061] BUG: kernel NULL pointer dereference, address: 00000000000000c8
+> > [  126.773657] #PF: supervisor read access in kernel mode
+> > [  126.774052] #PF: error_code(0x0000) - not-present page
+> > [  126.774455] PGD 0 P4D 0
+> > [  126.774698] Oops: Oops: 0000 [#1] SMP NOPTI
+> > [  126.775034] CPU: 13 UID: 0 PID: 1612 Comm: kworker/u64:55 Not tainted 6.14.0_blk+ #182 PREEMPT(full)
+> > [  126.775676] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-1.fc39 04/01/2014
+> > [  126.776275] Workqueue: iou_exit io_ring_exit_work
+> > [  126.776651] RIP: 0010:ublk_io_release+0x14/0x130 [ublk_drv]
+> >
+> > Fixes it by always grabbing request reference for aborting the request.
+> >
+> > Reported-by: Caleb Sander Mateos <csander@purestorage.com>
+> > Closes: https://lore.kernel.org/linux-block/CADUfDZodKfOGUeWrnAxcZiLT+puaZX8jDHoj_sfHZCOZwhzz6A@mail.gmail.com/
+> > Fixes: 8284066946e6 ("ublk: grab request reference when the request is handled by userspace")
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 30 ++++++++++++++++++++++++++----
+> >  1 file changed, 26 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 2fd05c1bd30b..41bed67508f2 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -1140,6 +1140,25 @@ static void ublk_complete_rq(struct kref *ref)
+> >         __ublk_complete_rq(req);
+> >  }
+> >
+> > +static void ublk_do_fail_rq(struct request *req)
+> > +{
+> > +       struct ublk_queue *ubq = req->mq_hctx->driver_data;
+> > +
+> > +       if (ublk_nosrv_should_reissue_outstanding(ubq->dev))
+> > +               blk_mq_requeue_request(req, false);
+> > +       else
+> > +               __ublk_complete_rq(req);
+> > +}
+> > +
+> > +static void ublk_fail_rq_fn(struct kref *ref)
+> > +{
+> > +       struct ublk_rq_data *data = container_of(ref, struct ublk_rq_data,
+> > +                       ref);
+> > +       struct request *req = blk_mq_rq_from_pdu(data);
+> > +
+> > +       ublk_do_fail_rq(req);
+> > +}
+> > +
+> >  /*
+> >   * Since ublk_rq_task_work_cb always fails requests immediately during
+> >   * exiting, __ublk_fail_req() is only called from abort context during
+> > @@ -1153,10 +1172,13 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+> >  {
+> >         WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
+> >
+> > -       if (ublk_nosrv_should_reissue_outstanding(ubq->dev))
+> > -               blk_mq_requeue_request(req, false);
+> > -       else
+> > -               ublk_put_req_ref(ubq, req);
+> > +       if (ublk_need_req_ref(ubq)) {
+> > +               struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > +
+> > +               kref_put(&data->ref, ublk_fail_rq_fn);
+> 
+> I think this looks good, just a small question. If __ublk_fail_req()
+> is called but there is at least 1 other reference, ublk_do_fail_rq()
+> won't get called here. When the last reference is dropped, it will
+> call __ublk_complete_rq() instead. That checks for io->flags &
+> UBLK_IO_FLAG_ABORTED and will terminate the I/O with BLK_STS_IOERR.
+> But is that the desired behavior in the
+> ublk_nosrv_should_reissue_outstanding() case? I would think it should
+> call blk_mq_requeue_request() instead.
 
-I think this may need to be even earlier. Currently the io->flags &
-UBLK_IO_FLAG_ACTIVE check happens before the mutex is acquired. Which
-means buggy/malicious threads may concurrently try to initialize the
-same ublk_io. ublk_mark_io_ready() would then increment nr_io_ready
-multiple times for the same ublk_io, causing the ublk_queue to be
-declared ready before all its ublk_ios have been initialized. An
-alternative to acquiring the mutex before checking io->flags &
-UBLK_IO_FLAG_ACTIVE would be to check it again after acquiring the
-mutex.
+Good catch, I'd suggest to fix the kernel panic first, and this behavior
+for ublk_nosrv_should_reissue_outstanding() is less serious and can be
+fixed as one followup.
 
-Best,
-Caleb
+Especially, Uday's approach "[PATCH v3] ublk: improve detection and handling of ublk server exit"[1]
+may simplify this area lot, with which requests aborting is moved to
+ublk_ch_release() after all uring_cmd are completed. Then we can get
+correct behavior for ublk_nosrv_should_reissue_outstanding() without any
+change basically.
 
->                 /* UBLK_IO_FETCH_REQ is only allowed before queue is setu=
-p */
->                 if (ublk_queue_ready(ubq)) {
->                         ret =3D -EBUSY;
-> -                       goto out;
-> +                       goto out_unlock;
->                 }
->                 /*
->                  * The io is being handled by server, so COMMIT_RQ is exp=
-ected
->                  * instead of FETCH_REQ
->                  */
->                 if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
-> -                       goto out;
-> +                       goto out_unlock;
->
->                 if (ublk_need_map_io(ubq)) {
->                         /*
-> @@ -1980,15 +1980,16 @@ static int __ublk_ch_uring_cmd(struct io_uring_cm=
-d *cmd,
->                          * DATA is not enabled
->                          */
->                         if (!ub_cmd->addr && !ublk_need_get_data(ubq))
-> -                               goto out;
-> +                               goto out_unlock;
->                 } else if (ub_cmd->addr) {
->                         /* User copy requires addr to be unset */
->                         ret =3D -EINVAL;
-> -                       goto out;
-> +                       goto out_unlock;
->                 }
->
->                 ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
->                 ublk_mark_io_ready(ub, ubq);
-> +               mutex_unlock(&ub->mutex);
->                 break;
->         case UBLK_IO_COMMIT_AND_FETCH_REQ:
->                 req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], =
-tag);
-> @@ -2028,7 +2029,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
-*cmd,
->         ublk_prep_cancel(cmd, issue_flags, ubq, tag);
->         return -EIOCBQUEUED;
->
-> - out:
-> +out_unlock:
-> +       mutex_unlock(&ub->mutex);
-> +out:
->         pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
->                         __func__, cmd_op, tag, ret, io->flags);
->         return ret;
->
-> --
-> 2.34.1
->
+
+[1] https://lore.kernel.org/linux-block/20250403-ublk_timeout-v3-1-aa09f76c7451@purestorage.com/
+
+
+thanks,
+Ming
+
