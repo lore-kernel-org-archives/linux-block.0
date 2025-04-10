@@ -1,111 +1,113 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57632853F1
-	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BB013D521
+	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744291731; cv=none; b=d3OrSjj9p+sHvaMjEet8Q2r0odnPwLPLk1hJ2iFOnk+vuEekldUfPrj8TSFPLrLuKjTbujDvFzFAx9n4Bts96df1QFYwtpqI+dCctkwgtLQHgEqMQWnz7Fce6bekQ3Q5vhvg7KJyMUEru4QhvFAIJhOp+/xBff6HnA3ZVzgU+sg=
+	t=1744291858; cv=none; b=NMFh85XY6PpkNt/gVyi4o0hH7Z9FjJaJzJJ7Cekz3MYnW3SFhoEA7TrfZO3fzhfYnGh7fqSmGVVv8HLky9UGMpgapG9C4KTMN098iewMHwUO9czhrGNHHLE39IAs6nf/+byhqzkgw0JyUi7FLfcXSayHHkpuCUNo81WsZ9WA3qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744291731; c=relaxed/simple;
-	bh=jszfLuW/H/2EKK4crSbbCgGqRnSPmtZnF6dfbueKSK8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tW1+tq/Zzivl3w0r6MV8q2KYzawiPikCJemeZkWGY9je7XTR3RKPBavPQTlNbi0OekN2kaw/2V8Jc3XhLouBtZj9rRhpy8PKJ4Yba7HjL1mYb+jmghDbRElwNGWvM4DmhTXYzOExsXMAVBRom/xIPEIzgypksVmmV3unp2XdFIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=afAhqfeA; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744291858; c=relaxed/simple;
+	bh=fcdL2XqMRamEKQ8LYfaosRRLxWJ2qU2Twu9uiW4BE10=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BugKwtQbiE5WG21WR9xPus8RQD3XItj4PDgeXt3ZS3P7OIllM1G2CHjkFF94dB8Nv8hzlQlHpoBOUDoGhkSvY5/FkDw9VKwNVnfHXG63mkVztmruoeSKPBl7BqV4i9iSlw6pV9yQP/hXtXKHczFtVkG2bsL0bXCBUGjgTcd5azs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ezitjlzh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="afAhqfeA"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d5e43e4725so2629045ab.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 06:28:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744291727; x=1744896527; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S+ZBTB58OM3FI7YWf7zo/tTC1AxPvyN7ZeDztmBCsZs=;
-        b=afAhqfeAPANlgEb4M4yujlCTFdMRmEz36PjwRd56rRIF1kVcRA4IY51oPpbnMEFtWP
-         ASAXnAHbYa+gWEMN49hBejiIvRNShyfOnWTsI0Wk0xKOi3Yp/DslHBeHJNfADLXuIJ8+
-         f9m34orXxhPlsO8FTfEvlmFdQXr3+E5HZ+S+gHncvm2vrPh6ZpTFqmpjd4XhvDrX/IwS
-         1QsR3lyXCCPzbTbnWKBNrjYBZiIrC9HsQ82N1DuT5Zj19BOBh5yIKitRFzITcxDHKYFp
-         TgkdhdpzJnVEaUb7juMEMXNDuqi5Izwi4Dms+pDeUVTeyeJimsV7aF90viAcWWxv7KRq
-         WeEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744291727; x=1744896527;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S+ZBTB58OM3FI7YWf7zo/tTC1AxPvyN7ZeDztmBCsZs=;
-        b=SpY0vpavnTHJA+QjYXquC6JuBX6GUmzPAC+i+0fc8A/0zlhRquSCdti8MKlYwtOsE8
-         KKqAebfeH6s0iYvr2HjZb6Omt18KrVwOabc9tsWIDy+w1SKCiUvDwXnsts5RFRutTRVw
-         hh6YIu7HtIX1pLgNk4EtRk83UPCFJSnx2sIQTpnlJUwX4A3qc1sUH0JdX1V0Hjbaw97A
-         ANuZBC5nLlC6gyy0EwlLiD+sji0ldLE9fzQPYzyqPadwWN9/e8AsJl2+4yBbgCRH2Ddw
-         yO11Qoj5BI/A24aTgAmg60iYTH18q53DjUDAMzHah36/5YSZfkhOtgkyORkpdkPqrg53
-         KACQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ77O0lAilQFioTR5ACmu3pMBqWRbYlM3EOikauYtKwd6kcoOo0UUY//9mfhFb8OH4a5dVsQ3ZSF7LVQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6loqeLiun/IFtcHhN71G/DST3tBk4NeFnrQnXnv+Mm6Kmvcxr
-	Me3EMz1AZXNNYK/OLojE0YcJ++h0XsFK6rW+eGOzm+swFLXFQ9CxnPRe3aCzgACy7Xg1Z404tBO
-	R
-X-Gm-Gg: ASbGnct4joH6Wg7eqqsds0LRhnuJ4AO7bpY1MDGEPVXOjgT0E0Ckbfgxc2Rm/P6YU6T
-	SRzwQbAn/I1oEONzCfzWiyyQZ96RAXzFRglWwYV7ir1YMHk5mJEkI0BlTo43BlkxgdEVT7nKpO9
-	Q4isCqd02v179SrK+XeqYFZqYi5PNkMHaaOywZD85B/IE1/3qKiuyGDevPtoo4HRzD/OS6lQKBQ
-	rha8hzL5ActxafAueqkrlpU3rmfK6+sqGViLKZWG5wiBVCjaGQnVCHa178thjBY1QFgMrwprpyj
-	+sWZq4wXz1+vom93iJHXBbB0Hg90SUE/yOh7H0e0KwZPq88=
-X-Google-Smtp-Source: AGHT+IGrfgscip7VoP6ovpvlhbCCLfsAqX/3XGPvvrVLGABQYarWnsWpJXrOtOSZKqObnV11CcLrnA==
-X-Received: by 2002:a05:6e02:1a8b:b0:3d0:443d:a5c3 with SMTP id e9e14a558f8ab-3d7e46e077dmr29150305ab.3.1744291726849;
-        Thu, 10 Apr 2025 06:28:46 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505e0140dsm735573173.101.2025.04.10.06.28.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Apr 2025 06:28:46 -0700 (PDT)
-Message-ID: <27498cf6-37a2-4ed3-9009-cbe63e86c5bd@kernel.dk>
-Date: Thu, 10 Apr 2025 07:28:45 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ezitjlzh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744291854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+J5rQ28AiVMJsmDrWxftqGn4qfpMVyspT3BT9fJ1CkU=;
+	b=EzitjlzhI05WXhUihMCr5Gzy6lZJ9LUa4YmwX6EaBVlT9FJUqmXugSy9X8j00AH2uddLlZ
+	x1id7hiZ00OuNs9o3a6abAcQz9n7EXJQ8PdCmdHWXwo0WmPx3Mm6hhZuAeeg3VfFoLK31v
+	Q+3LSaRp9ySBFI3RptlUpwL7NDfjEM8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-33-eEbqzVT9NJmfYNSoK-kN7g-1; Thu,
+ 10 Apr 2025 09:30:51 -0400
+X-MC-Unique: eEbqzVT9NJmfYNSoK-kN7g-1
+X-Mimecast-MFC-AGG-ID: eEbqzVT9NJmfYNSoK-kN7g_1744291850
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC01E180025F;
+	Thu, 10 Apr 2025 13:30:49 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.20])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 479DF19560AD;
+	Thu, 10 Apr 2025 13:30:47 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 00/15] block: unify elevator changing and fix lockdep warning
+Date: Thu, 10 Apr 2025 21:30:12 +0800
+Message-ID: <20250410133029.2487054-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ublk: Add UBLK_U_CMD_UPDATE_SIZE
-To: Jared Holzman <jholzman@nvidia.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-References: <d90ff20a-b324-49b8-bc63-7d7a35afd1f6@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d90ff20a-b324-49b8-bc63-7d7a35afd1f6@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 4/10/25 6:29 AM, Jared Holzman wrote:
-> @@ -3052,6 +3053,22 @@ static int ublk_ctrl_get_features(struct io_uring_cmd *cmd)
->         return 0;
->  }
-> 
-> +static int ublk_ctrl_set_size(struct ublk_device *ub,
-> +               struct io_uring_cmd *cmd)
+Hello Jens,
 
-Minor style nit, but that would fit on a single line, doesn't need to be
-split in two.
+The 1st 11 patch cleans up elevator change code, and unifying it via single
+helper, meantime moves kobject_add/del & debugfs register/unregister out of
+queue freezing & elevator_lock. This way fixes many lockdep warnings
+reported recently, especially since fs_reclaim is connected with freeze lock
+manually by commit ffa1e7ada456 ("block: Make request_queue lockdep splats
+show up earlier").
 
-> +{
-> +       const struct ublksrv_ctrl_cmd *header = io_uring_sqe_cmd(cmd->sqe);
-> +       struct ublk_param_basic *p = &ub->params.basic;
-> +       size_t new_size = (int)header->data[0];
-> +       int ret = 0;
-> +
-> +       p->dev_sectors = new_size;
-> +
-> +       mutex_lock(&ub->mutex);
-> +       set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
-> +       mutex_unlock(&ub->mutex);
-> +
-> +       return ret;
-> +}
+The other 4 ones fixes lockdep warnings from bfq and updating nr_hw_queues
+code.
 
-Get rid of 'ret' here, it's entirely unused. In fact maybe just get rid
-of the return value in the first place, as the function can't fail?
+Also the 4th patch fixes kasan warning & oops report from Shinichiro by
+preventing elevator switching when updating nr_hw_queues is in-progress.
+
+Thanks,
+
+Ming Lei (15):
+  block: don't call freeze queue in elevator_switch() and
+    elevator_disable()
+  block: add two helpers for registering/un-registering sched debugfs
+  block: move sched debugfs register into elvevator_register_queue
+  block: prevent elevator switch during updating nr_hw_queues
+  block: simplify elevator reset for updating nr_hw_queues
+  block: add helper of elevator_change()
+  block: move blk_unregister_queue() & device_del() after freeze wait
+  block: add `struct elev_change_ctx` for unifying elevator change
+  block: unifying elevator change
+  block: pass elevator_queue to elv_register_queue & unregister_queue
+  block: move elv_register[unregister]_queue out of elevator_lock
+  block: move debugfs/sysfs register out of freezing queue
+  block: remove several ->elevator_lock
+  block: move hctx cpuhp add/del out of queue freezing
+  block: move wbt_enable_default() out of queue freezing from
+    scheduler's ->exit()
+
+ block/bfq-iosched.c    |   2 +-
+ block/blk-mq-debugfs.c |  13 +--
+ block/blk-mq-sched.c   |  39 +++++---
+ block/blk-mq.c         | 163 +++++++++---------------------
+ block/blk-sysfs.c      |  18 ++--
+ block/blk.h            |  10 +-
+ block/elevator.c       | 221 ++++++++++++++++++++++++++---------------
+ block/elevator.h       |  16 +++
+ block/genhd.c          |  25 +----
+ include/linux/blk-mq.h |  10 +-
+ 10 files changed, 256 insertions(+), 261 deletions(-)
 
 -- 
-Jens Axboe
+2.47.0
+
