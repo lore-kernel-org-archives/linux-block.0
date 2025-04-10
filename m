@@ -1,43 +1,45 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEE41D63F8
-	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 15:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C401E5B94;
+	Thu, 10 Apr 2025 15:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744297297; cv=none; b=OvvYyW65N/htUt0+a9JyClPvyvCddvUofDQbUo4E2rt8AN9wB9YPhfKssECJdNO8YiCJBaJVTGYLmSAWKBEU0GPSRy3i3lL9ZIdttj7We6bEfi4gThDCm02895aLGfSTLq/c1M3uPQIDElMT2xHloErDgvSJGc4oCZSMhJh3ccI=
+	t=1744298755; cv=none; b=Q0NL2DNYjjhGMKoKqAl47DmYF9x4SWBOEcK5OovpwfZfwpYM3vbUbrb8b2G0+RwLRKW8CzZh1ac5Xl/rBo7QqIiVXXcByif6ovFf0IaXN2PODuUFUkLWGEdNnARs4TtDwohNoAmek3r59+4mzHYWylbUxZW9k+MMEbfnH6qoLX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744297297; c=relaxed/simple;
-	bh=vEHtF3unQGwu3E6J/8I0T593fj7jCATjzkR5znjlP7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=pBVonhXtVy26F8zhQ5thnC9vT9xd4Z+KwL5q6GBDzwtM8mtWrTwf0H/J1QT2YtGVAa6Y5FD44hF7wcNs9hsgiJNKdNxS8LTdESdCWbY45OwTtmf73RR01oyXARRvb2ZNgG5BET1LECpMF3S1mMB0gkPjxBJq0DJa40XzotRMeVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=N059IrJN; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1744298755; c=relaxed/simple;
+	bh=XsL8pvigLhE5H8MAreEhkqAdgb3uoyx3yP4EbZnSggg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uWvAUwYU+NwS/cz/C68pm7QzF/45OkKEuL97hIPyuiSXsLFzB/tl/zWkdC3ElzSm8uzqWimmwF4IdwY8SqxQGU4KVsEeRGm+4SZMgzaz9aNoiYjUWLgmwAhuiT/juugmKDHEjIZ+8xWOeZNvEhDaylBy5DAeepkE7qidpIYDBmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrdCEDY7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N059IrJN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=P3cul0HMSLwsREqYKeSJyVYe4xfBvK7Oexli1yLCdSA=; b=N059IrJNuGqaC0YJCv/hW2pld9
-	MbDpjMqH8jSYlao5+4E0TQW7OBQSImboy9Oi2Zx2qGWa9vHXKujkNeCXfIhQAKAMX8RJs19q4vpZX
-	b5WbjbBfbIAFPSUwrC/y0hiLn4xfT7t8KaiV/YGiCq8KNhHmvteL31Ja9zUkX19U6o0AFnfeOwCIq
-	KuOrlF5Qon9VDdZZ38upfcmH1seM/tEgRW3nxTPjqR88cSyD/0aNM1Mmrhhd8JLTWJFYsVvXqPm2q
-	klGEEZzxycCyeiOnxBp14F9JSfDTu/R05jzhc91ad6w640rwaycGiSKox8SviWZtVRwIilPlXGCSf
-	+Vr/rRkQ==;
-Received: from 2a02-8389-2341-5b80-393b-6fa1-7c8e-6b3b.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:393b:6fa1:7c8e:6b3b] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u2tPJ-0000000AwRx-26Yv;
-	Thu, 10 Apr 2025 15:01:33 +0000
-Date: Thu, 10 Apr 2025 17:01:30 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for Linux 6.15
-Message-ID: <Z_fdSjFqscMuzxYq@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrdCEDY7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B0FAC4CEE8;
+	Thu, 10 Apr 2025 15:25:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744298754;
+	bh=XsL8pvigLhE5H8MAreEhkqAdgb3uoyx3yP4EbZnSggg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lrdCEDY7+CZpSbOBEGAt0AExcytkp3ECH+gD02YWdvrDnmzs1zmaPC6fOh/pw3YWH
+	 e0/izyPYs4MXjAFTR5C1erFcuTwp4BBVC6MEEopEhg2/vEjyPYgqC4VOa4RdKGxqb7
+	 CxuNvJsfwIgS2Mx5xrySgVjbObhV/j7cxFUuk5Mj2i5AT4jD9PC353YhRPSz454Kr5
+	 cuEXqHCi1xIOhYFp40P+nVCO9fY1qsy+XEkRGwYs4yJhjfx/Yw2oo3tuit/VXIdpYe
+	 bUULl9yotm080Zwm2d/rwpXL+eNzunh3q7n0wnm1vz9kejX/63yax0ICj5NQdKfv1o
+	 5IsdE3l3SUD0A==
+Date: Thu, 10 Apr 2025 08:25:54 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	xfs <linux-xfs@vger.kernel.org>
+Subject: Re: Weird blockdev crash in 6.15-rc1?
+Message-ID: <20250410152554.GP6307@frogsfrogsfrogs>
+References: <20250408175125.GL6266@frogsfrogsfrogs>
+ <20250409173015.GN6266@frogsfrogsfrogs>
+ <20250409190907.GO6266@frogsfrogsfrogs>
+ <Z_d13yReJn2vqxCL@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,52 +48,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Z_d13yReJn2vqxCL@infradead.org>
 
-The following changes since commit 72070e57b0a518ec8e562a2b68fdfc796ef5c040:
+On Thu, Apr 10, 2025 at 12:40:15AM -0700, Christoph Hellwig wrote:
+> On Wed, Apr 09, 2025 at 12:09:07PM -0700, Darrick J. Wong wrote:
+> > Subject: [PATCH] block: fix race between set_blocksize and IO paths
+> > 
+> > With the new large sector size support, it's now the case that
+> > set_blocksize needs to change i_blksize and the folio order with no
+> > folios in the pagecache because the geometry changes cause problems with
+> > the bufferhead code.
+> 
+> Urrg.  I wish we could just get out of the game of messing with
+> block device inode settings from file systems.  I guess doing it when
+> using buffer_heads is hard, but file systems without buffer heads
+> should have a way out of even propagating their block size to the
+> block device inode.  And file systems with buffer heads should probably
+> not support large folios like this :P
 
-  selftests: ublk: fix test_stripe_04 (2025-04-03 20:13:38 -0600)
+Heh.  Why does xfs still call set_blocksize, anyway?  I can understand
+why we want to validate the fs sector size is a power of 2, greater than
+512, and not smaller than the LBA size; and flushing the dirty bdev
+pagecache.  But do we really need to fiddle with i_blksize or dumping
+the pagecache?
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git tags/nvme-6.15-2025-04-10
-
-for you to fetch changes up to 70289ae5cac4d3a39575405aaf63330486cea030:
-
-  nvmet-fc: put ref when assoc->del_work is already scheduled (2025-04-09 13:03:56 +0200)
-
-----------------------------------------------------------------
-nvme updates for Linux 6.15
-
- - nvmet fc/fcloop refcounting fixes (Daniel Wagner)
- - fix missed namespace/ANA scans (Hannes Reinecke)
- - fix a use after free in the new TCP netns support (Kuniyuki Iwashima)
- - fix a NULL instead of false review in multipath (Uday Shankar)
-
-----------------------------------------------------------------
-Daniel Wagner (8):
-      nvmet-fcloop: swap list_add_tail arguments
-      nvmet-fcloop: replace kref with refcount
-      nvmet-fcloop: add ref counting to lport
-      nvmet-fc: inline nvmet_fc_delete_assoc
-      nvmet-fc: inline nvmet_fc_free_hostport
-      nvmet-fc: update tgtport ref per assoc
-      nvmet-fc: take tgtport reference only once
-      nvmet-fc: put ref when assoc->del_work is already scheduled
-
-Hannes Reinecke (2):
-      nvme: requeue namespace scan on missed AENs
-      nvme: re-read ANA log page after ns scan completes
-
-Kuniyuki Iwashima (1):
-      nvme-tcp: fix use-after-free of netns by kernel TCP socket.
-
-Uday Shankar (1):
-      nvme: multipath: fix return value of nvme_available_path
-
- drivers/nvme/host/core.c      |  9 ++++++
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/tcp.c       |  2 ++
- drivers/nvme/target/fc.c      | 60 ++++++++++++-----------------------
- drivers/nvme/target/fcloop.c  | 74 +++++++++++++++++++++++--------------------
- 5 files changed, 72 insertions(+), 75 deletions(-)
+--D
