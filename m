@@ -1,191 +1,243 @@
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17C21E833F
-	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 08:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744273895; cv=none; b=QMIzNKoLRAEwRmKsqQ8YFF+QEQsMaNyCsrJSRPsmqTRwWYs6fLq9aUQhPUNoIk399HSPp95/cFgAmcuvylJjzbRT/4AQ6rV/vxruqE+f0AVWPJ0Pmli8g6bhBA8L2wqi3TAKXA/VhB098mLqu89sVs+oaqW2+aMsNN+xwBf+o/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744273895; c=relaxed/simple;
-	bh=MH9inepon/NwBHx7CSMIuKgmZl41UPCwzOKE9quAemE=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=FaIUm8FyfnUO0KqbyFE8GMTd4SzyBw/lGnoUmxrZS/EBmTyHMvVPmLw3jtqa6i8gFQH7rAuboE60GAHdTdnBfH07yT1T2EmbTj/yAWqy1aDy1zDGm/shB/Xx6AQo7Qr7lmS3Ko5DLN1ZhL/9itga4nmqKrBOrrNJ7shyBhKyJ44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
-Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-	by 156.147.23.51 with ESMTP; 10 Apr 2025 17:01:30 +0900
-X-Original-SENDERIP: 156.147.1.125
-X-Original-MAILFROM: chanho.min@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
-	by 156.147.1.125 with ESMTP; 10 Apr 2025 17:01:30 +0900
-X-Original-SENDERIP: 10.178.31.96
-X-Original-MAILFROM: chanho.min@lge.com
-From: Chanho Min <chanho.min@lge.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Cc: linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	Christoph Hellwig <hch@lst.de>,
-	gunho.lee@lge.com,
-	Chanho Min <chanho.min@lge.com>
-Subject: [PATCH] block/dm: add early_lookup_ready_bdev to ensure ready device lookup
-Date: Thu, 10 Apr 2025 17:00:56 +0900
-Message-Id: <20250410080056.43247-1-chanho.min@lge.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF001EB1B7;
+	Thu, 10 Apr 2025 08:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744275566; cv=fail; b=eWjZfoF9vwgZygalAWVinklIMPC92pg4xsB1yhtV0O+bRN2Nf4SuuhH482WD0H98EqhJPU7pRjLNUH9cPQmo5SBUmKSt62uWuPH77yJB/HANJczhMGLCgZj2qNfsd+wApar6S3G4mnEevAiG5sI7cxoZqqW0Djg95E9wb1se9bI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744275566; c=relaxed/simple;
+	bh=BOiwRtbs3BPUCL7bvjOLmU8qYPJqrMXMWHLitHJfwY4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qS7IoFRc8+4tMbzMfHsmgILFWLFC4oBQJH6oiqtPEGc+MYqJPKEIwWIZwAMdmaD9lGyJTdLI15yGircckOcgTNkVi6YlRKg/sQCAly++5tnp/h1VU40o4S5ESqJGEh9KJTX4l1YUPrg6A8kBTpEzf62Bo/YFcXU898Oi67zxgpY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=dJE3PYWM; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=TJt/JVii; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dJE3PYWM";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="TJt/JVii"
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53A8Cp9X024950;
+	Thu, 10 Apr 2025 08:59:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=Da2OsozHMAmwn+1QUMML+w00+tuRwYh8zaBMDq37p7A=; b=
+	dJE3PYWMFUB8bO9PRcdABYvRItbcGI1GBnoErdjanIfC3qECa5WoSv7Sl2DHtiwJ
+	cgpxy2XlFFMsZv0dcJMYIbjztw6TebbDH+X5eo4QJfJJfXznCOrCYpnUfsDrMhTg
+	HD+coLJ3hQxp8oi25/hU6XI0Yh3rn1ItUR0Ppqn5YypqESfND12UcmtC9pUc9iuY
+	DqSEsOGljz7YVaDPkB9iabDM0nhPr9fQ4Jbe+oh13PyNejd0AbqoWGt57igmf4cP
+	HyQhyYaB2azzzx6IfNJAbWt9SPXR1swOMC5Xynat/hqhAg0LXZOdV3Y/CpduI9jr
+	7Gk06wNd861Q2DKfD2AY+A==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45xa96033n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Apr 2025 08:59:03 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53A8nEYr001648;
+	Thu, 10 Apr 2025 08:59:02 GMT
+Received: from bn1pr04cu002.outbound.protection.outlook.com (mail-eastus2azlp17010022.outbound.protection.outlook.com [40.93.12.22])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45ttyby6kq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Apr 2025 08:59:02 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lhut6KtoIcpZ9nnFDgbhjywCz1fVKjUZq1BFo9zNTGsk1kVcYfSkmC/5cBdR6uqLJ6JmcyTV4nesTiNMyRlUxcZNMkx423NfX5nOuKxdQrofALg9tjdvu0jaAJrr9voFoDd413INKmaNcxv5u97njb7lSqk8X+lu4kAT5R6XMsoRB6ebwve2voRBp5QRWJoNnZ4xm56aZvrcGUdEXWEsvBsH/6lGPGcfXMqx0sFWYISwB6Ryq8sj6d3YdT6Q2EUz4R799/BECK2/qD188UE/0EUJqtoLMcesji5jQGxQPQ9udPONJb9F58jmr47j1r1M9tFGksGwrdJAluhWGwrjew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Da2OsozHMAmwn+1QUMML+w00+tuRwYh8zaBMDq37p7A=;
+ b=Pd0NPq7ZoqmiY3GegKQMYNRvtR79BNB95ere8SjNV0i3nMpNSMyu4QI0R4mklfO7sLjYD2DFwyXH+JahgmQeVVoNORpRqs6w1tZBnfafUFFrGTpMX4VI2kL2bgzgcJirXeP2j69/NMQXrV1QAAgIjGKNqGJ3G+u/WbtQAlCS2lYHz1XrTNwGWw5JpPudZvkNkRyktpV8hn1o5bRb9kfwv1weKyVazKLZ6XlgI/Drdivwwc9J1dYmkucVyBFmQRuDt6wHLOHokJKgS8QblkmYiViIgWq2cjiAb5DjKO85Mn3pECY2DGePnFvOH2G6t4e6klkYb3OUtzdHlB/uabYeIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Da2OsozHMAmwn+1QUMML+w00+tuRwYh8zaBMDq37p7A=;
+ b=TJt/JViiRy/Gn1HpzcDF6Xsxg7Ik8Y6hZ3ML1WZoXy/vIGa24mpVE2cAIzGI7DpX8hfl7vvY5ItY0vSiv/Vpk3p+uS7pCyKvdlf4VSIGrK+hfyxXnJair2IglPnKc99xtHowzFnSwqi59NLMyeEe7Fa0AqV62vFhKX/ZbCR4C+E=
+Received: from DM6SPR01MB0118.namprd10.prod.outlook.com (2603:10b6:5:295::18)
+ by PH7PR10MB7783.namprd10.prod.outlook.com (2603:10b6:510:2ff::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.21; Thu, 10 Apr
+ 2025 08:58:59 +0000
+Received: from DM6SPR01MB0118.namprd10.prod.outlook.com
+ ([fe80::c04c:7e64:6721:98a2]) by DM6SPR01MB0118.namprd10.prod.outlook.com
+ ([fe80::c04c:7e64:6721:98a2%4]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
+ 08:58:58 +0000
+Message-ID: <6793c64b-ba1b-4633-9161-6fe4662c4947@oracle.com>
+Date: Thu, 10 Apr 2025 09:58:54 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 11/12] xfs: add xfs_compute_atomic_write_unit_max()
+To: Dave Chinner <david@fromorbit.com>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, hch@lst.de,
+        viro@zeniv.linux.org.uk, jack@suse.cz, cem@kernel.org,
+        linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+        martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org, catherine.hoang@oracle.com
+References: <20250408104209.1852036-1-john.g.garry@oracle.com>
+ <20250408104209.1852036-12-john.g.garry@oracle.com>
+ <Z_WnbfRhKR6RQsSA@dread.disaster.area>
+ <20250409004156.GL6307@frogsfrogsfrogs>
+ <Z_YF9HpdbkJDLeuR@dread.disaster.area>
+ <ed53dc33-c811-4c20-8713-8d2d32cb81d7@oracle.com>
+ <Z_b5ZK8H0pK0Saga@dread.disaster.area>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <Z_b5ZK8H0pK0Saga@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0115.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:c::31) To DM6SPR01MB0118.namprd10.prod.outlook.com
+ (2603:10b6:5:295::18)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6SPR01MB0118:EE_|PH7PR10MB7783:EE_
+X-MS-Office365-Filtering-Correlation-Id: f84e5924-eb80-434f-9c45-08dd780dee5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YW9EdG1rNEYrL1h2RWJ3ZTJRQlFadkhwS0ZHVC81UTJuY2NPdGtHZXpWZnFx?=
+ =?utf-8?B?dm9BTUdEdjQ4bVU2K3Rrb1BwMXpPdzJORjVCMUwzdkdJWTlLV3Q3MmNkSVFW?=
+ =?utf-8?B?OE1mWjJyNzFzcytJRlI0eEdBajQzNFhWdHZzcmJBSDYvTVF2ZkFwdDBwKzBR?=
+ =?utf-8?B?amZBdHBRUGh6NmgxNlFVVjFoYjhuT1kzUmdJdHNyenBmemkwQzRCbHVkT1cz?=
+ =?utf-8?B?U09HVzRYZVVMOHl6dG5yMCtLRkMvclh2VXMrbkNVNFV4ZUd4cE00M3I2cnlE?=
+ =?utf-8?B?cElsc0s0dmR5V3hZR0l2T1d5UzdKQ2VaS0pXYVR1czdvTHVRSmlQMktTL1FP?=
+ =?utf-8?B?WFdYQ2puWThQbGZTMjlsWDJLNWloMll6eU8wNEY0RVF6MnpQOER5ejlISW5r?=
+ =?utf-8?B?WDlTN1I0UzdBc012c0poWkNkbUkxTEJBZWs1QXJQUStnMHlEbFcyNnFYK2No?=
+ =?utf-8?B?NmluUUVzc3F0dWpXd09iL3JoMGs2aTk0dmxFc1N5NHNqR3NoUCtEVWJRRXFB?=
+ =?utf-8?B?eDdCbTJiTnFjR0NsMTloc2xGa0t6Zi9IV1VET0s0ekVSNFZoR0pqQnZGMUZv?=
+ =?utf-8?B?SXZZK1JTcTlxb2RsTlBVYmFGdlJOSVVlUUNHSXhoUVN5cjFrVG1LOVpQSHRa?=
+ =?utf-8?B?SFNhZFVISVZLZGdlYTVPQ05wbzlBLzBuc1RvYVVhWCtKVFAxYlo5Mjl6dm9Q?=
+ =?utf-8?B?U29wakVSdTBJTGFyV0VIRDJ3NWhXc05VZjJuMXgxZzRmdnVmNW5vV2M1cFNS?=
+ =?utf-8?B?TnBzekNrSksxR0F1L3BRRFp4dkNYTGV4dUo4Q1RuV0FwK1NDYVhkQlJ6UEJH?=
+ =?utf-8?B?VUxad1Fkc3FQdS80emR2YUhpcWFkdzdhend1ZnhUbFczald3YUxhZWg4Z2Fj?=
+ =?utf-8?B?RGNTN2IyQVRWZXdXa3Z2M0NrcFF3c0JoTkRBZDBCelozbkFyVERTaFRoVXBn?=
+ =?utf-8?B?djNHbFVxVXB0M1hUMWZzakdkVU8zdWpnL2w3U00raVlwVjBLbEptM1VsY2Ju?=
+ =?utf-8?B?QjEwbEV0Mk5MUjBPbG85QkdBR2F5V3oyeWl5RXdYZzlCQmJwUUtMRFlnT1ds?=
+ =?utf-8?B?dHl5aDVxNk1yTXRQRk9iYU9lZnRnWGpRdktrbnBiTXVlQmY4cCttaVN5TDd2?=
+ =?utf-8?B?Qm15WTRORVBCUWpkOFpvc1IwaDBLRW1sSmxoaTZzTmo1UjVTOVE4YUJ3QzhR?=
+ =?utf-8?B?TkRoejlBZzZqckd3bnR2N0FOdkVuOUNsd0dxQVNUOElITWo4eW5Ha29LcktO?=
+ =?utf-8?B?UlNBV29nazdUelpHS1ltQmI4VHJuKzcyV2JUWmNaUzR0aitOZnltRmVDU2lt?=
+ =?utf-8?B?WWlkS3p4SExES1YwemFWMGFxUTJvcGFMbzBPZ1UzR1Y3WlJsc3VScWNPbmJn?=
+ =?utf-8?B?TW5vcU5tTGUxaHJXVEVmcHJDRUszK0MrNERsMXQ5VG4zTkJFOFk3bUNhbDNQ?=
+ =?utf-8?B?Q0twbytZV0J4K0RTdmpOdjE5dDFHSk14MWVJSzJmYnh0TXpBQ3FHblBjeVRQ?=
+ =?utf-8?B?SFpCT1FVckVnY2VFWWE3NGNNTGk5OWFQMzdaQ0o2YkxGWnFuWW43WVVJUFlB?=
+ =?utf-8?B?b3NZczhnQnRMeHFLTHBCelVQUUNmYUhXdVNUQTBEZjdDc0dSMy91ZGJEb2J6?=
+ =?utf-8?B?c1hwUUNzY09RMVp6ZEtrY21JS3c1b0o2ZnZEckVzY0w2d3M1VERSWlFUMzdI?=
+ =?utf-8?B?MStrakZsMzZOeHd2M1ZGVXI1NWVXT0NJeFJ6U05FSHZYbG9uRXliN2NSVlZr?=
+ =?utf-8?B?WnlObzhZZFNEZG5ETVM5T0xiaVErN2pCSk8xbHBoSEJ4NGw3b3BpWXMva2t3?=
+ =?utf-8?B?Zk5aOHpyMjM4aWo5c0VQSXNnUEJnNzdSYkRTMHAwdWJpQi9Mb2JUbSsyUTNQ?=
+ =?utf-8?B?d3Z5eUk3WjhnM1dqd3YyOW1Jd3pRcGtqYlBKSWh1akFPNDRpNVQyaXMvSzg1?=
+ =?utf-8?Q?JiBefYQWEOQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6SPR01MB0118.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YW1YSjNndkNORVgvZUh1ZFhlc3MxaUNxVU9xNVpDYURWWE1lSGlvOENrTSth?=
+ =?utf-8?B?MUxoeC96Ukh5QVFrdi9EaW5jMDh2dkdFaWdYMXhjTGpVcUMwWDh2VUZLQm5T?=
+ =?utf-8?B?OHRRVWxIT29SeHFCa2pFTzB0NzBRQWExdXRHam9nTmI1QkFDdHFJem9RWFBq?=
+ =?utf-8?B?YzlLYWxsTEZCRmlQOWc1K3lNV2JBR2FxRHVpZXlYdWl1M21KNXY0ZmlwY2VO?=
+ =?utf-8?B?ZHJTYkMyejFHdkplanhmR1BpU2Z6UGR0Sm9WOHZvZVJGQ29yTUUxUXM4TnpC?=
+ =?utf-8?B?RCtmT0RGVlhGaFY1UjR3TWdoSnlUQjNJS01mcjVlZGo2SHZjbHh1cWcwRFlm?=
+ =?utf-8?B?a0p6T3JwdXVxT2RLRVhoa3V5Q2hUUHRUaXpXTS9tRktjS0E1TDFWbm9wejgy?=
+ =?utf-8?B?Q1ptVFMrV0JnMmdtbVZxVkhzbFkwUmF6N0dPUUhhRE5VYU9vdzFlSEN4V2ZG?=
+ =?utf-8?B?ZVhKc2RmMEwva0EwT1BrM001MjNTZHpoVTZpRnowNEs3ZzdvazBYZHdPRjR6?=
+ =?utf-8?B?U2l3ZXplNUVDUzZsOXNtdUd5KzBwMHRablhpK2tZZzR4Q2RIdHMvWkl6WTZ0?=
+ =?utf-8?B?a21VQTM1QmNEbTFseTMrZFB6d2FoNW0zd3ZFdFczYTlVNjN0VEc2bGZ1NXRx?=
+ =?utf-8?B?R1Y3c2VZWlJSSnI2eXhsMjB6c1RIc3R1UFJwWCtyRHhOMVdCVkFENHBYeU1C?=
+ =?utf-8?B?SlBSUTNMK1UyTXRHNkpQQWJxS1piT0pvMElYSm1rSHAyZm11RklvNHlZdGY1?=
+ =?utf-8?B?S3ppRHJJdzVKVnZZbktyRitzYXdycXNjbENXaGgwU0pUaW1oUWplL25EdG93?=
+ =?utf-8?B?Rm4wVU9DQTBTc1I0QU45M3FIcWxpcm9uSmpza1hrV2hheGZWdVNuUmYvRmRP?=
+ =?utf-8?B?ZG1Yb3dRRUNyZkgwaWd5SzdxL3RRZndpZG5aV1hPVGQrQ20wUW9hWUF3THpm?=
+ =?utf-8?B?V3UrUnAxNzM3WGZ5M1gwMGNXMGZsQ2RPTEtCRUNIRzFuNUxWVGQzaUVBSTVp?=
+ =?utf-8?B?TjFlWjAzdmZKNnRzaGZMeDNPZ3VXQUY0Uks0ZmJTdlNvMS9adUl2OUt1Sjlh?=
+ =?utf-8?B?VHBxUStmT0dUZVhnUHBXMG02K1FNNEZDUVR4NUYrUmNwZXJKUXVZbFgydWlC?=
+ =?utf-8?B?N2ZhbU52YTNheGhteUhqUkF6MnJUN2NXSTdHV3dsSEx1UTdCV2h2NDdFdDdK?=
+ =?utf-8?B?dWh1TjhVTVVaM2k3VjVnalZDY3JJdzFEbWEzRDJaQnNKajdLOWp0TEI1RmY5?=
+ =?utf-8?B?cGtYZ0x3MkFncURMVGpJcDhGeGptU3JiaTZ0ZDhia2RoelBTMVhId0h6UUQ4?=
+ =?utf-8?B?QnU2L0prUVZ5RUExcWZIUlFhTUtoeWxxSHRVL2ZoajE4Q3FZSE9EU2cwU2Vx?=
+ =?utf-8?B?ZENsUGtvL2xuUm1FOWJ3MDNlOWRUL1hWNVliUEJBLzNCZUk4blBHekF6Zzgz?=
+ =?utf-8?B?SkRIdzkxcGV0R2hwT3o0SjFuamV0V0FNRjRnR1dUSVpsbGlKblJEcUk0eTF3?=
+ =?utf-8?B?clVXMkx5emJNaFJ2anU3NFJUdzBrRTF6S3pKSUE2TDJjSVlFY2tGWnJDMkx3?=
+ =?utf-8?B?am1BUjI4Sk9XR1huNGZyb1h1ajlyUnNYREpKUm1FRWpReTVqMzdvZVFWU21Q?=
+ =?utf-8?B?S04rcnJxdHk2ODBKVjkvWWo1dHZBYUFNbjNNUXZKZFVqNFNTWERZR2psV2Nh?=
+ =?utf-8?B?RDErR3h2ekFvejk4RkhsTmlFYnVkZ1phR2U5REUzTmJZTWNLNWRpMVBUOTJi?=
+ =?utf-8?B?dlczZkdBYmJ3YjJHdzhLZFNOZ3RyS2Y2VTBBVkRZWENubHRxSHI1YWxvei9q?=
+ =?utf-8?B?VXdlQmFORHFPZGdDdDgvb3BRa2NlVnJIeWgwclo4cGJyZ3JvMmtXbWFWbWpk?=
+ =?utf-8?B?bTZDWnJROXM1NzFySGNIT29maWpjdHhWaUtpZnMvMHdHbXlpY2pwSkFUdGUr?=
+ =?utf-8?B?UGZhYkw3L0pCQXJQY2FTOERubmx6MXVOMlNVc2dEOWg1anZOM2lpVk5KWGEz?=
+ =?utf-8?B?bFg2aXYrOXZyYjBUT2V0Wi9OdENBU0tFVThoZTZFUFlJWXRUdERqRVd0N25D?=
+ =?utf-8?B?QWd1ZGJQVUVxa2xZNVFOL0Z6dDNmVHFuVnBKeVhjSGdOa1RRcWROSGJJbERD?=
+ =?utf-8?B?b0lqZEp6cENua244SmJkdzdwTnF3TEtYSStLK3gzUmZtajhibStPOXJGNjRN?=
+ =?utf-8?B?YVE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	N6g+UEJBLfopFF5tuXIvK5uoT+LNakdR4NArvmWjYr6cDepOU6YUa9J89IZeV+M9XX6T2BRbGbP/omsES+P7lFyNNVuUTSRG/EP3LOmQdZz/ysXLDKWSldmIuHwuyFnaacZB/rlSPKRf47Vm1qGZKJwWgm6XNiLSdt9UIpBbDtxEoeI8wJ5awQNflbX5ifkkfdLILaYHUW1gsi0AIGQUOna/NkJBwM6vgeRyPtWvriyj4v+Ug6o9eN/ruNPy5RTD2ucBb5+Fkt9A577OakUAZI6Ac4iVWGGbDko57WGeTGl5UO5Wc+S21eamByJyHQN03lvwifL2aSOCVBDf6xmcWppg9QH8/2fbI9pJC/UPag5CoKq9Yv9OZhndRxS7zee0zRXC1CAZ+gad/dJkCZJg38GAJH9NdZSOlfHVFNQjTRP1LqIQ9k26B3slitqadaRDFb+vgaN7JyiFEfrCENkCUM/r+BKoukMswxgV2nyvUJmDh5c6iCzH4d6HfITCZKsmkfh8gIqnk+GSztnlRFC8XovlzR5JmRRNifI/3Ph+uW38gQIwM2ThM8P5xEL+fchc8W9AsbEW+ec9mgAjRf5yIeOPSC8wlOY7XcctV37ceEg=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f84e5924-eb80-434f-9c45-08dd780dee5f
+X-MS-Exchange-CrossTenant-AuthSource: DM6SPR01MB0118.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 08:58:58.6817
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 71y5dAmGrWKvYeg+WrjcHtvjqAR4xnB8+jwd/Ww1StuvBvZa5LQnx94a2dL/V+iuEDh4ElYVHnUK6+iCpJivuQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB7783
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-10_01,2025-04-08_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 bulkscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2504100067
+X-Proofpoint-ORIG-GUID: w_YMExMOSS4dlmPM1CeelSJNuQxut1D_
+X-Proofpoint-GUID: w_YMExMOSS4dlmPM1CeelSJNuQxut1D_
 
-The dm-init code, waiting for devices specified by dm-mod.waitfor (e.g.,
-root=/dev/dm-0, dm-mod.waitfor=/dev/mmcblk0p23), fails sporadically with
-dm-verity setups, as reported in:
-https://lore.kernel.org/all/e746b8b5-c04c-4982-b4bc-0fa240742755@schwermer.no/T/
+On 09/04/2025 23:49, Dave Chinner wrote:
+>> You did provide a relatively large value in 16MB. When I say relative, I
+>> mean relative to what can be achieved with HW offload today.
+>>
+>> The target user we see for this feature is DBs, and they want to do writes
+>> in the 16/32/64KB size range. Indeed, these are the sort of sizes we see
+>> supported in terms of disk atomic write support today.
+> The target user I see for RWF_ATOMIC write is applications
+> overwriting files safely (e.g. config files, documents, etc).
+> 
+> This requires an atomic write operation that is large enough to
+> overwrite the file entirely in one go.
+> 
+> i.e. we need to think about how RWF_ATOMIC is applicable to the
+> entire userspace ecosystem, not just a narrow database specific
+> niche. Databases really want atomic writes to avoid the need for
+> WAL, whereas application developers that keep asking us for safe
+> file overwrite without fsync() for arbitrary sized files and IO.
 
-This occurs because early_lookup_bdev() uses blk_lookup_devt(), which, since
-commit 41b8c853a4954 ("block: fix booting from partitioned md array"),
-returns a dev_t for non-existent partitions to support MD RAID booting. This
-leads dm-init to proceed with invalid dev_t values, causing "Data device
-lookup failed (-ENXIO)". The issue became more noticeable after commit
-238d991f054a6e2d ("dm: use fsleep() instead of msleep() for deterministic
-sleep duration").
+If they want to use this API, then arbitrary-sized files will need to be 
+power-of-2 sized files (if the user is happy to atomic update all of the 
+file).
 
-This patch introduces early_lookup_ready_bdev(), a variant of
-early_lookup_bdev() that only returns dev_t for devices with ready partitions,
-by adding a 'ready' flag to blk_lookup_devt(). The original early_lookup_bdev()
-is preserved for MD RAID compatibility, while dm-init switches to the new
-function to wait for actual device availability. This resolves dm-verity boot
-failures cleanly at the block layer, avoiding DM-specific workarounds.
+I would have thought that the work Christoph did with O_ATOMIC a few 
+years ago for atomic file updates would be more suited for scenario 
+which you mention.
 
-Tested with dm-verity (root=/dev/dm-0, dm-mod.waitfor=/dev/mmcblk0p23), this
-eliminates boot issues without impacting MD RAID.
+Anyway, back to the main topic..
 
-Signed-off-by: Chanho Min <chanho.min@lge.com>
----
- block/early-lookup.c   | 26 ++++++++++++++++++--------
- drivers/md/dm-init.c   |  2 +-
- include/linux/blkdev.h |  2 ++
- 3 files changed, 21 insertions(+), 9 deletions(-)
+What is the method you propose that the admin can use to fix this upper 
+atomic write limit? Is this an mkfs and/or mount option?
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 3fb57f7d2b127..011cfda5e4843 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -121,7 +121,7 @@ static int __init devt_from_partlabel(const char *label, dev_t *devt)
- 	return 0;
- }
- 
--static dev_t __init blk_lookup_devt(const char *name, int partno)
-+static dev_t __init blk_lookup_devt(const char *name, int partno, bool ready)
- {
- 	dev_t devt = MKDEV(0, 0);
- 	struct class_dev_iter iter;
-@@ -134,7 +134,7 @@ static dev_t __init blk_lookup_devt(const char *name, int partno)
- 		if (strcmp(dev_name(dev), name))
- 			continue;
- 
--		if (partno < disk->minors) {
-+		if (!ready && partno < disk->minors) {
- 			/* We need to return the right devno, even
- 			 * if the partition doesn't exist yet.
- 			 */
-@@ -150,7 +150,7 @@ static dev_t __init blk_lookup_devt(const char *name, int partno)
- 	return devt;
- }
- 
--static int __init devt_from_devname(const char *name, dev_t *devt)
-+static int __init devt_from_devname(const char *name, dev_t *devt, bool ready)
- {
- 	int part;
- 	char s[32];
-@@ -164,7 +164,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 			*p = '!';
- 	}
- 
--	*devt = blk_lookup_devt(s, 0);
-+	*devt = blk_lookup_devt(s, 0, ready);
- 	if (*devt)
- 		return 0;
- 
-@@ -180,7 +180,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 	/* try disk name without <part number> */
- 	part = simple_strtoul(p, NULL, 10);
- 	*p = '\0';
--	*devt = blk_lookup_devt(s, part);
-+	*devt = blk_lookup_devt(s, part, ready);
- 	if (*devt)
- 		return 0;
- 
-@@ -188,7 +188,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
- 		return -ENODEV;
- 	p[-1] = '\0';
--	*devt = blk_lookup_devt(s, part);
-+	*devt = blk_lookup_devt(s, part, ready);
- 	if (*devt)
- 		return 0;
- 	return -ENODEV;
-@@ -241,17 +241,27 @@ static int __init devt_from_devnum(const char *name, dev_t *devt)
-  *	name contains slashes, the device name has them replaced with
-  *	bangs.
-  */
--int __init early_lookup_bdev(const char *name, dev_t *devt)
-+int __init __early_lookup_bdev(const char *name, dev_t *devt, bool ready)
- {
- 	if (strncmp(name, "PARTUUID=", 9) == 0)
- 		return devt_from_partuuid(name + 9, devt);
- 	if (strncmp(name, "PARTLABEL=", 10) == 0)
- 		return devt_from_partlabel(name + 10, devt);
- 	if (strncmp(name, "/dev/", 5) == 0)
--		return devt_from_devname(name + 5, devt);
-+		return devt_from_devname(name + 5, devt, ready);
- 	return devt_from_devnum(name, devt);
- }
- 
-+int __init early_lookup_bdev(const char *name, dev_t *devt)
-+{
-+	return __early_lookup_bdev(name, devt, 0);
-+}
-+
-+int __init early_lookup_ready_bdev(const char *name, dev_t *devt)
-+{
-+	return __early_lookup_bdev(name, devt, 1);
-+}
-+
- static char __init *bdevt_str(dev_t devt, char *buf)
- {
- 	if (MAJOR(devt) <= 0xff && MINOR(devt) <= 0xff) {
-diff --git a/drivers/md/dm-init.c b/drivers/md/dm-init.c
-index 81b8bbd1b63a8..1adfeb4ff8ce3 100644
---- a/drivers/md/dm-init.c
-+++ b/drivers/md/dm-init.c
-@@ -301,7 +301,7 @@ static int __init dm_init_init(void)
- 			dev_t dev;
- 
- 			DMINFO("waiting for device %s ...", waitfor[i]);
--			while (early_lookup_bdev(waitfor[i], &dev))
-+			while (early_lookup_ready_bdev(waitfor[i], &dev))
- 				fsleep(5000);
- 		}
- 	}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da281..f520540ad6a69 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1614,7 +1614,9 @@ int sync_blockdev_nowait(struct block_device *bdev);
- void sync_bdevs(bool wait);
- void bdev_statx(struct path *, struct kstat *, u32);
- void printk_all_partitions(void);
-+int __init __early_lookup_bdev(const char *pathname, dev_t *dev, bool ready);
- int __init early_lookup_bdev(const char *pathname, dev_t *dev);
-+int __init early_lookup_ready_bdev(const char *pathname, dev_t *dev);
- #else
- static inline void invalidate_bdev(struct block_device *bdev)
- {
--- 
-2.17.1
+I appreciate that I am asking the same question as Darrick did in his 
+follow up mail.
+
+John
 
