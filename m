@@ -1,127 +1,169 @@
-Received: from common.ash.relay.mailchannels.net (common.ash.relay.mailchannels.net [23.83.222.38])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9CE20371E;
-	Thu, 10 Apr 2025 17:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.222.38
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744307325; cv=pass; b=O6FJaB95uf6xRU9zM3/lEdg0CSip1aFuvGKYg3+GNBtSIinw4n445ijof8SXFX4oz6r3fX0BWOev97XSPuyFpsBK+RdoRMUK0cdxLBbE0jphGAXe7J1cZ1PnCmmeK93yOruaGxqE0HtNo0KnYMs7cIxGMh1lyLjVleXNM0snQ+4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744307325; c=relaxed/simple;
-	bh=yxGlbdIg4dViHwy3uxMBlDatd6hs3667ULAim1XWhdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ix/Dme1GUDiX+Y7mRoXvLvsy2ZGXZMJW3Nblnb09nutRi32+0y9OoJDCrHNYNkMuWj1ulC0rNs0x5XoGDwuj4iKrcWMuSkOWRe2uHkCXG9qME+Z0tWf0IKudSSfsebjcqva84aa11/X6WSX8xW5KIDji/pCHvTrDR4pCLb+PfQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net; spf=pass smtp.mailfrom=stgolabs.net; dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b=YvqM+2ss; arc=pass smtp.client-ip=23.83.222.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stgolabs.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2821F03EF
+	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 18:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744310269; cv=none; b=HqUfYnD+rKwOLkXhF71YyN+IztOd2v/hGNWfr7JmfWnu2N8IXJ+LvPjw+QTwTwU+bJHQmAEKKMaympBsGRU3sQwkCNz/5eZxsqzDHmfXVzw3yPhI0V+bdzQu701Bp/4ek2tKtK14LhjZdZ7HIhDOtV/jC9ohHwXj/Y/uTATZBDU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744310269; c=relaxed/simple;
+	bh=qNTlcDL07LtjOnPKttMmzreAa1rq1d60wUtEEwWwdus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GgGtLSdYEGrzS9APIt5FWv9cINuvGxyhHEeX/y/AV6t31/38GqkwfKpUouOuy0cgoMzaXPNAAwJ/j5UxJAueL+71NQw1a3tNl7suX23LyU4iiHCq0UnZ5b+d+2Yp5LhA+FE38PljzVgCSos4uLmrZCcFDISwQ1xv/Lwy5joDfMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HFN1Qp8C; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="YvqM+2ss"
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 001E5784B8A;
-	Thu, 10 Apr 2025 17:32:44 +0000 (UTC)
-Received: from pdx1-sub0-mail-a250.dreamhost.com (100-97-35-35.trex-nlb.outbound.svc.cluster.local [100.97.35.35])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 52B0A784AF6;
-	Thu, 10 Apr 2025 17:32:43 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1744306363; a=rsa-sha256;
-	cv=none;
-	b=JyJXISEdm9FUw7mVqhtX17IyBuYOI/dQDUg7iyD6GlrD/it6ZUa8jlRxA2+j/XSq2NWOkp
-	84eJ3m1vtX0i9aEKeJmde1NXIUHatHPRaG0QODtMurIttyJ7x+jQQriaDlO4Jw5m3r3S3n
-	hj2gexh6Qb7zbLBnkf9x+RfR/SkyhHSF/FtZR/HzbwZVc4m/VwUCMF8dLXLCw1L0093iRW
-	LM+17rWbvYStxVJSFfPkOGY38Z7/YStyyBZs0PU2rPIXtLF+7UZ3lYzJ4ZUjoxNzRi9780
-	2xIQPt2zQo36/q945tQk4JcnAt+KDUP/aNbdpfKhnIS3gVOiQ+O0NdlmxnJ0WA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1744306363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=lcTCH9aiGqJzfggr32r0X1UsU9A+is5S7inOOX9o5eY=;
-	b=PMhbia2QBPQApxDJNPfGgWOyvFMWl4dm1HCCjQQ9tEQSD0Ib2R2HBdxDsHrfu6tw1ognqR
-	eCFnf2ByBIF8cbssGJ9MzOTkyo10oW0Cvr+12nAJF0fGZZ3tgb4jKxeol0giulu2bdz+Ww
-	lXcwrwg/Y9u9gdVorjhfrVGrb6hSRdq3Aysx/8YoK6Eyrt0d9f5l6IuysbeoMsQKGpJBx+
-	gtDvRA+Hd8s7id29zlee23luC6JRTR8mQA+wKfl+NR1oji97NZoAx4JgP2UDe+4irnMR7R
-	n8RHw9lusAllFHgPJCwyxlEG4prN1WY8G++HeMnrC8OiFtG464vWQCHRxueQ2w==
-ARC-Authentication-Results: i=1;
-	rspamd-75b96967bb-8k868;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
-X-MailChannels-Auth-Id: dreamhost
-X-Thoughtful-Unite: 098cfac60da347e1_1744306363722_3962588475
-X-MC-Loop-Signature: 1744306363722:357417711
-X-MC-Ingress-Time: 1744306363722
-Received: from pdx1-sub0-mail-a250.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.97.35.35 (trex/7.0.3);
-	Thu, 10 Apr 2025 17:32:43 +0000
-Received: from offworld (ip72-199-50-187.sd.sd.cox.net [72.199.50.187])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dave@stgolabs.net)
-	by pdx1-sub0-mail-a250.dreamhost.com (Postfix) with ESMTPSA id 4ZYRj527cGz70;
-	Thu, 10 Apr 2025 10:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
-	s=dreamhost; t=1744306363;
-	bh=lcTCH9aiGqJzfggr32r0X1UsU9A+is5S7inOOX9o5eY=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=YvqM+2ssz/SACKKaTcst695zmgpo4d92CYxgxgRhGnlHnE66hdYGQsBFuR1N9dCHH
-	 60KirkvbYxy20O/R61o4CELwzAIT4CTTrW7BaeFC17tONX5F6ZWhv4yLcJ2irUmWGE
-	 QdQR9HH7yI0Bt1xP7xww5IsPrk/mKUre3ypL4KxcnwvVmIvvvAN+ppwecFbSgIZwUM
-	 AymsvQV5EGLU0VQHPgDnPYsUbl9dRYimh4JGLkAmQXGKJ3yCF9RgbY7eDu+9a1xIN4
-	 PrH7Vo1+s6CJuiYavdFT9hcInXBJY+cH1YRVUFlf1OsAxrnMpg2YYcY588YpEaJBeW
-	 v/t+PukR3IWBQ==
-Date: Thu, 10 Apr 2025 10:32:36 -0700
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: Jan Kara <jack@suse.cz>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
-	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
-	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com
-Subject: Re: [PATCH v2 6/8] fs/ext4: use sleeping version of
- __find_get_block()
-Message-ID: <20250410173236.jk5cksfw5zege5n7@offworld>
-Mail-Followup-To: Jan Kara <jack@suse.cz>,
-	Luis Chamberlain <mcgrof@kernel.org>, brauner@kernel.org,
-	tytso@mit.edu, adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
-	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
-	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com
-References: <20250410014945.2140781-1-mcgrof@kernel.org>
- <20250410014945.2140781-7-mcgrof@kernel.org>
- <g2xj2du3t226jve57mw4wiig4zpqqsvomtbzeu4wk37dfqbp47@3l66fjg736yy>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HFN1Qp8C"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53ABMICw018446;
+	Thu, 10 Apr 2025 18:37:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PUyQPt
+	futjLaSXzwyQknc3lxG487OIQ8C53l29gICuU=; b=HFN1Qp8C9+K9VtxQyR+uMR
+	MiN9XtJZGhQT+5RBYDDMlrorb30I46+ISAQgMwU36oeJ2zkBvyvuDaxCr8AIuQiW
+	3jSR39NhSy4Ijqf5Ejtd2/SYs83ehvflSZsjKFyfy7eJy+5HpUfKaNRyyRQe0ugq
+	qcBabt0Xdfj/TO0NHXmG7+nWIRbvlK7JmnuaHYX4hhjxLiiEoflnFrMac7Cg7gUw
+	h6tZ5f/N4kQl827xgfecCnpKb0/PrDnqdh+kCDjMr/MAsEo7ahNzWUctom3XqOiV
+	2jWv/n6hil9bqQs5kfiMhVwk5Nc30vyrsGhzwESmuLHR8BAYBU1q7BWmkDkEZn8w
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45x6ca4tf6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Apr 2025 18:37:40 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53AFoE3e011522;
+	Thu, 10 Apr 2025 18:37:39 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 45uf7yykn4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Apr 2025 18:37:39 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53AIbc6O16712218
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Apr 2025 18:37:38 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 63E8558054;
+	Thu, 10 Apr 2025 18:37:38 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4218B5805A;
+	Thu, 10 Apr 2025 18:37:36 +0000 (GMT)
+Received: from [9.171.89.192] (unknown [9.171.89.192])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 10 Apr 2025 18:37:35 +0000 (GMT)
+Message-ID: <83f5e47a-8738-4776-ae23-7ff0cad7ba48@linux.ibm.com>
+Date: Fri, 11 Apr 2025 00:07:34 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <g2xj2du3t226jve57mw4wiig4zpqqsvomtbzeu4wk37dfqbp47@3l66fjg736yy>
-User-Agent: NeoMutt/20220429
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/15] block: unifying elevator change
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20250410133029.2487054-1-ming.lei@redhat.com>
+ <20250410133029.2487054-10-ming.lei@redhat.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250410133029.2487054-10-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RQRAjFyx1WbjQN7mM6lmNcOLmfvZ5HmQ
+X-Proofpoint-ORIG-GUID: RQRAjFyx1WbjQN7mM6lmNcOLmfvZ5HmQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-10_05,2025-04-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 phishscore=0 mlxscore=0 priorityscore=1501 suspectscore=0
+ adultscore=0 bulkscore=0 spamscore=0 clxscore=1011 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2504100133
 
-On Thu, 10 Apr 2025, Jan Kara wrote:
 
->> @@ -860,6 +860,8 @@ struct buffer_head *ext4_getblk(handle_t *handle, struct inode *inode,
->>		return sb_find_get_block(inode->i_sb, map.m_pblk);
->>
->>	/*
->> +	 * Potential TODO: use sb_find_get_block_nonatomic() instead.
->> +	 *
->
->Yes, please. Since we are behind nowait check, we are fine with blocking...
 
-Yes, I will send a follow up that replaces that getblk_unmovable() with
-sb_find_get_block_nonatomic().
+On 4/10/25 7:00 PM, Ming Lei wrote:
+>  /*
+>   * Use the default elevator settings. If the chosen elevator initialization
+>   * fails, fall back to the "none" elevator (no elevator).
+>   */
+> -void elevator_init_mq(struct request_queue *q)
+> +void elevator_set_default(struct request_queue *q)
+>  {
+> -	struct elevator_type *e;
+> -	unsigned int memflags;
+> +	struct elev_change_ctx ctx = { };
+>  	int err;
+>  
+> -	WARN_ON_ONCE(blk_queue_registered(q));
+> -
+> -	if (unlikely(q->elevator))
+> +	if (!queue_is_mq(q))
+>  		return;
+>  
+> -	e = elevator_get_default(q);
+> -	if (!e)
+> +	ctx.name = use_default_elevator(q) ? "mq-deadline" : "none";
+> +	if (!q->elevator && !strcmp(ctx.name, "none"))
+>  		return;
+> +	err = elevator_change(q, &ctx);
+> +	if (err < 0)
+> +		pr_warn("\"%s\" set elevator failed %d, "
+> +			"falling back to \"none\"\n", ctx.name, err);
+> +}
+>  
+If we fail to set the evator to default (mq-deadline) while registering queue, 
+because nr_hw_queue update is simultaneously running then we may end up setting 
+the queue elevator to none and that's not correct. Isn't it?
+
+> +void elevator_set_none(struct request_queue *q)
+> +{
+> +	struct elev_change_ctx ctx = {
+> +		.name	= "none",
+> +		.uevent = 1,
+> +	};
+> +	int err;
+>  
+> -	blk_mq_unfreeze_queue(q, memflags);
+> +	if (!queue_is_mq(q))
+> +		return;
+>  
+> -	if (err) {
+> -		pr_warn("\"%s\" elevator initialization failed, "
+> -			"falling back to \"none\"\n", e->elevator_name);
+> -	}
+> +	if (!q->elevator)
+> +		return;
+>  
+> -	elevator_put(e);
+> +	err = elevator_change(q, &ctx);
+> +	if (err < 0)
+> +		pr_warn("%s: set none elevator failed %d\n", __func__, err);
+>  }
+>  
+Here as well if we fail to disable/exit elevator while deleting disk 
+because nr_hw_queue update is simultaneously running  then we may
+leak elevator resource? 
+
+> @@ -565,11 +559,7 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+>  	if (disk->major == BLOCK_EXT_MAJOR)
+>  		blk_free_ext_minor(disk->first_minor);
+>  out_exit_elevator:
+> -	if (disk->queue->elevator) {
+> -		mutex_lock(&disk->queue->elevator_lock);
+> -		elevator_exit(disk->queue);
+> -		mutex_unlock(&disk->queue->elevator_lock);
+> -	}
+> +	elevator_set_none(disk->queue);
+Same comment as above here as well but this is in add_disk code path.
+
+Thanks,
+--Nilay
+
