@@ -1,134 +1,195 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58DB188006
-	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBF928A3F5
+	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744291927; cv=none; b=uazxnxMz+AWf8VSmT38vPIjt1unJ41BJwqHIawwxmchKA0JjcrB69Kxum5dRDaJ7e0Sl8dQ0W4F5ZitZscMQFjOc4FBr5+BpvcEbJfOtyFBAT5etnJBenl59/ZWpmZ8uDIGdv5k2Q1VMzpUpBVT1e/Mryj/bskWb2wmt0+EqS3o=
+	t=1744292195; cv=none; b=UOoGJZoYmWXpO+sKlXjroe1MVGd2JZB68lK1QS4Zmb/k7rvVDOxdTu6is7cvny6XV1mNzQtQi0Cc7FSBEX7BlUgX9jjy2UmQcNwIjAYl2etZ7s4WO0mr8tkb9UzDgk3ehNAB69ZGzQxIVlqXyy2CT3vnfEomyn3sVWa2R0lvkSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744291927; c=relaxed/simple;
-	bh=k4XS5BBXWJoOZ9an0OYny3cUGfP2t9D0aCKxih9/Evw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ISA7L4umjB6CNOK6rtxUVcNOMpw0Pp65Do7L4rA8YmZHIaBlTdb9dkSGP8Pd2FqTuPqV/RqaYBcYOkNBhpCYjTtsle+hqe0Q5T/2gCm3KKbEBHhseVqRB1v3Cy0YBWTV7hhRKD9YjHrB5YZDDjaYLg9Mub6goYL69ndxL8bcVZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fpPpYvf+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1744292195; c=relaxed/simple;
+	bh=G3JCsHTEIDMSrzwxuJNVbrGum619sm/V+oMoFrGL6q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VmIK4vnjJSm92gch68g9iRZoI1+krUR2GyrL4nBhy4XedbLbtR0G+7kOw3SAilSdLpr/rxQY0OQFg+ufTQvPowzDfcQ4jIK4lDRRg0Nf4sdpJzzK9YOJ/EFyDv6w2rZj2yQsTLREd5tVaYVqUCLbx4HpLmOqyMKb0Zg5aPTwP/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lnFwWNrJ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=m2543pVU; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lnFwWNrJ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=m2543pVU; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpPpYvf+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744291925;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BKHd7cs1y9A1ReQXiJleGLMIXRcUpiEW5ZZKSVQRBkk=;
-	b=fpPpYvf+2mJmk6T0PI/xm9L/NQonbSv3Pu5RsLSiIyjoU2wGtoDF+fSfSd3Ot3igFvf96d
-	UZzGqPOX6+28+hLbduk/vZfMvf12/xzjuVoZqPRlZGLQX+Cv5YMnN0FRemKJyBa+U477br
-	vUmt8xK5trrrgMEZIeGgX/3gS3tjlwE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-360-nMfwbdOrMvmt2UDFz5IrMA-1; Thu,
- 10 Apr 2025 09:32:01 -0400
-X-MC-Unique: nMfwbdOrMvmt2UDFz5IrMA-1
-X-Mimecast-MFC-AGG-ID: nMfwbdOrMvmt2UDFz5IrMA_1744291920
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lnFwWNrJ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="m2543pVU";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lnFwWNrJ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="m2543pVU"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 049D319560A2;
-	Thu, 10 Apr 2025 13:32:00 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.20])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 104A53001D0E;
-	Thu, 10 Apr 2025 13:31:58 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 15/15] block: move wbt_enable_default() out of queue freezing from scheduler's ->exit()
-Date: Thu, 10 Apr 2025 21:30:27 +0800
-Message-ID: <20250410133029.2487054-16-ming.lei@redhat.com>
-In-Reply-To: <20250410133029.2487054-1-ming.lei@redhat.com>
-References: <20250410133029.2487054-1-ming.lei@redhat.com>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id BB3891F395;
+	Thu, 10 Apr 2025 13:36:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1744292190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6X3ZizTCtne9HGkeErFZvJrpS/23t7UWALSWxnxHkPg=;
+	b=lnFwWNrJbWGFz+wygGgWYJe6+phUedIcMwJZN8NrkUzaOvYvwvOIX4eF8IqbUG2x5a6EdL
+	r15/fdvxBplYKXxhaxA388elj4zmLXci1rG6PcJHrtWvfxuY9y6dNAkT+ziJbHjkDCDjFQ
+	rwyBpSBZS1/a8Ne/6pug3GxqSIsC498=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1744292190;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6X3ZizTCtne9HGkeErFZvJrpS/23t7UWALSWxnxHkPg=;
+	b=m2543pVUozaVCe53yZQh25q4eN+MyjMrKJyM2grOmtVY3XaoFEaaOtFXZJPQ/ZOuozIokD
+	flJc+v8dylpROsAQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1744292190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6X3ZizTCtne9HGkeErFZvJrpS/23t7UWALSWxnxHkPg=;
+	b=lnFwWNrJbWGFz+wygGgWYJe6+phUedIcMwJZN8NrkUzaOvYvwvOIX4eF8IqbUG2x5a6EdL
+	r15/fdvxBplYKXxhaxA388elj4zmLXci1rG6PcJHrtWvfxuY9y6dNAkT+ziJbHjkDCDjFQ
+	rwyBpSBZS1/a8Ne/6pug3GxqSIsC498=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1744292190;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6X3ZizTCtne9HGkeErFZvJrpS/23t7UWALSWxnxHkPg=;
+	b=m2543pVUozaVCe53yZQh25q4eN+MyjMrKJyM2grOmtVY3XaoFEaaOtFXZJPQ/ZOuozIokD
+	flJc+v8dylpROsAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 974B8132D8;
+	Thu, 10 Apr 2025 13:36:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id U6fmJF7J92fkagAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 10 Apr 2025 13:36:30 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id E23B9A0910; Thu, 10 Apr 2025 15:36:25 +0200 (CEST)
+Date: Thu, 10 Apr 2025 15:36:25 +0200
+From: Jan Kara <jack@suse.cz>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: brauner@kernel.org, jack@suse.cz, tytso@mit.edu, 
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, riel@surriel.com, dave@stgolabs.net, 
+	willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com, david@redhat.com, 
+	axboe@kernel.dk, hare@suse.de, david@fromorbit.com, djwong@kernel.org, 
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com
+Subject: Re: [PATCH v2 6/8] fs/ext4: use sleeping version of
+ __find_get_block()
+Message-ID: <g2xj2du3t226jve57mw4wiig4zpqqsvomtbzeu4wk37dfqbp47@3l66fjg736yy>
+References: <20250410014945.2140781-1-mcgrof@kernel.org>
+ <20250410014945.2140781-7-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410014945.2140781-7-mcgrof@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,suse.cz,mit.edu,dilger.ca,vger.kernel.org,surriel.com,stgolabs.net,infradead.org,cmpxchg.org,intel.com,redhat.com,kernel.dk,suse.de,fromorbit.com,gmail.com,kvack.org,samsung.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
+X-Spam-Score: -2.30
+X-Spam-Flag: NO
 
-scheduler's ->exit() is called with queue frozen and elevator lock is held, and
-wbt_enable_default() can't be called with queue frozen, otherwise the
-following lockdep warning is triggered:
+On Wed 09-04-25 18:49:43, Luis Chamberlain wrote:
+> From: Davidlohr Bueso <dave@stgolabs.net>
+> 
+> Trivially introduce the wrapper and enable ext4_free_blocks() to use
+> it, which has a cond_resched to begin with. Convert to the new nonatomic
+> flavor to benefit from potential performance benefits and adapt in the
+> future vs migration such that semantics are kept.
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Davidlohr Bueso <dave@stgolabs.net>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  fs/ext4/inode.c             | 2 ++
+>  fs/ext4/mballoc.c           | 3 ++-
+>  include/linux/buffer_head.h | 6 ++++++
+>  3 files changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+> index 1dc09ed5d403..b7acb5d3adcb 100644
+> --- a/fs/ext4/inode.c
+> +++ b/fs/ext4/inode.c
+> @@ -860,6 +860,8 @@ struct buffer_head *ext4_getblk(handle_t *handle, struct inode *inode,
+>  		return sb_find_get_block(inode->i_sb, map.m_pblk);
+>  
+>  	/*
+> +	 * Potential TODO: use sb_find_get_block_nonatomic() instead.
+> +	 *
 
-	#6 (&q->rq_qos_mutex){+.+.}-{4:4}:
-	#5 (&eq->sysfs_lock){+.+.}-{4:4}:
-	#4 (&q->elevator_lock){+.+.}-{4:4}:
-	#3 (&q->q_usage_counter(io)#3){++++}-{0:0}:
-	#2 (fs_reclaim){+.+.}-{0:0}:
-	#1 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
-	#0 (&q->debugfs_mutex){+.+.}-{4:4}:
+Yes, please. Since we are behind nowait check, we are fine with blocking...
 
-Fix the issue by moving wbt_enable_default() out of bfq's exit(), and
-call it from elevator_change_done().
+								Honza
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bfq-iosched.c | 2 +-
- block/elevator.c    | 5 +++++
- block/elevator.h    | 1 +
- 3 files changed, 7 insertions(+), 1 deletion(-)
+>  	 * Since bh could introduce extra ref count such as referred by
+>  	 * journal_head etc. Try to avoid using __GFP_MOVABLE here
+>  	 * as it may fail the migration when journal_head remains.
+> diff --git a/fs/ext4/mballoc.c b/fs/ext4/mballoc.c
+> index 0d523e9fb3d5..6f4265b21e19 100644
+> --- a/fs/ext4/mballoc.c
+> +++ b/fs/ext4/mballoc.c
+> @@ -6644,7 +6644,8 @@ void ext4_free_blocks(handle_t *handle, struct inode *inode,
+>  		for (i = 0; i < count; i++) {
+>  			cond_resched();
+>  			if (is_metadata)
+> -				bh = sb_find_get_block(inode->i_sb, block + i);
+> +				bh = sb_find_get_block_nonatomic(inode->i_sb,
+> +								 block + i);
+>  			ext4_forget(handle, is_metadata, inode, bh, block + i);
+>  		}
+>  	}
+> diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+> index 2b5458517def..8db10ca288fc 100644
+> --- a/include/linux/buffer_head.h
+> +++ b/include/linux/buffer_head.h
+> @@ -399,6 +399,12 @@ sb_find_get_block(struct super_block *sb, sector_t block)
+>  	return __find_get_block(sb->s_bdev, block, sb->s_blocksize);
+>  }
+>  
+> +static inline struct buffer_head *
+> +sb_find_get_block_nonatomic(struct super_block *sb, sector_t block)
+> +{
+> +	return __find_get_block_nonatomic(sb->s_bdev, block, sb->s_blocksize);
+> +}
+> +
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index abd80dc13562..18018c8cf84d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7211,7 +7211,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
- 
- 	blk_stat_disable_accounting(bfqd->queue);
- 	clear_bit(ELEVATOR_FLAG_DISABLE_WBT, &e->flags);
--	wbt_enable_default(bfqd->queue->disk);
-+	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
- 
- 	kfree(bfqd);
- }
-diff --git a/block/elevator.c b/block/elevator.c
-index 1cc640a9db3e..9cf78db4d6a4 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -676,8 +676,13 @@ int elevator_change_done(struct request_queue *q, struct elev_change_ctx *ctx)
- 	int ret = 0;
- 
- 	if (ctx->old) {
-+		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
-+				&ctx->old->flags);
-+
- 		elv_unregister_queue(q, ctx->old);
- 		kobject_put(&ctx->old->kobj);
-+		if (enable_wbt)
-+			wbt_enable_default(q->disk);
- 	}
- 	if (ctx->new) {
- 		ret = elv_register_queue(q, ctx->new, ctx->uevent);
-diff --git a/block/elevator.h b/block/elevator.h
-index 87848fdc8a52..7b66be5b8295 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -122,6 +122,7 @@ struct elevator_queue
- 
- #define ELEVATOR_FLAG_REGISTERED	0
- #define ELEVATOR_FLAG_DISABLE_WBT	1
-+#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
- 
- /* Holding data for changing elevator */
- struct elev_change_ctx {
+This hunk probably belongs to some introductory patch implementing
+nonatomic helpers.
+
+								Honza
 -- 
-2.47.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
