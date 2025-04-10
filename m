@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F8E270EDD
-	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2E58633A
+	for <linux-block@vger.kernel.org>; Thu, 10 Apr 2025 13:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744291866; cv=none; b=ifxQjqNac6VNH3Ss9FlbdIMolfj9gzRl4CMb3TBcNoWq5GlH5IUpYxOP0PKiOlXVC8LtE6qrgr/VuzQ//xm+Or+8/yHTjR9v8bf4O4fsRJRS/IwEfHaAI7lJ8Fb9ifoKLQpvBu8cVwYCJfUJhOAwZyzFeM2Pm2lpOUr9WSKbVAE=
+	t=1744291872; cv=none; b=sYAggPYgaGFIP5JfJOS/rE/YAao/ZQR0Crx+WkZXuJ/0XhqdlB7GJzUuY7b3/vFnP4Naq6fEMvtRk96dDY6sMNoTw/tzWoYkVBHZPfQQK83bqiZ3UPJtWMbcCrVmn7rrJ49kwbYemu5O+QHsTC+MKuem8XFuimCSgK1x2EFNb60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744291866; c=relaxed/simple;
-	bh=W1UdxACutlB4PXXwGop6Bj2NlUg6zghyZyBRqP7SF+o=;
+	s=arc-20240116; t=1744291872; c=relaxed/simple;
+	bh=tfSKemNfw6WoQTadT5wtSUDxFOMrG+XuReDHe6NKuto=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CZqTiyDLFx4nJL9J+0Iebjku4zeqAHlRNC9GPaDJEBOyST/IOQcDKo193eWnZDvSw/K/OXgjjuSgFtQHQ8IA597n0g/ZBS+k9Or9z0gkcF38K2v80gsNk6hXMU3BWaDs96Py1v/ekHfeEXUKdFaey6MSGrp8mAehuXO28rRTArs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cA4Qr/5M; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=rVj3od9wHuhambJ18cn2KX2XaOun4TXuWzvLpVdEuqSfXx30aqly1Cmea8w8yG0zz1i0OB8WmPLXyZVYTXPB3TKPv6VG5K/L8X+AtlXAx7DmSlCG0MTprLCIjcX/OcM4hBR+ONk8zfG74lCgzxbbgNFSA8J5jfeQUL3gHtfESCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F4jW2hfn; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cA4Qr/5M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4jW2hfn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744291864;
+	s=mimecast20190719; t=1744291869;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EkMxNwGGiOx5QHMiE4ibpmnkcfdM3hpGrThHPVIPN10=;
-	b=cA4Qr/5M8eM2Om9Ir/2Go2TM2sz1C0cOv4uK722ixvQ17WX/5mA+ylv0uFvlfDQUA3TLiX
-	j+KomvLMxoGb7EIqbNk/uK/bVxr5DxTFU3Dg0EhqBBTLKOB9w5WwiJc88pIey8VrRas8K3
-	VCHQJ7Vqpcoy3dGR055J/Sz7r/Qw65M=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=pIYWmJnTkyV3sXs2FJyBB4Kxj3WbPutyEvPCf0slPFA=;
+	b=F4jW2hfnJd6cx2SrdJJxSxLGFBm87yMNe1guqqsj4U8YUymNANxPi+6NG0Z3ZZPRo2B57R
+	yj+VypHPDzXZToEyBrVFek0vmgDaWHRxXZiNKmTl4B1mYYi+CqE377NTB/ilEasPgPoa3Y
+	Vj4mNvv9nHL7LgkTBBY+5YXWzussevw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-132-6yON_z6VM4S2J0RfnmPUsw-1; Thu,
- 10 Apr 2025 09:31:00 -0400
-X-MC-Unique: 6yON_z6VM4S2J0RfnmPUsw-1
-X-Mimecast-MFC-AGG-ID: 6yON_z6VM4S2J0RfnmPUsw_1744291859
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-oR4zlVMCPE2_ZEOs3uz1sA-1; Thu,
+ 10 Apr 2025 09:31:06 -0400
+X-MC-Unique: oR4zlVMCPE2_ZEOs3uz1sA-1
+X-Mimecast-MFC-AGG-ID: oR4zlVMCPE2_ZEOs3uz1sA_1744291865
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7234E180025A;
-	Thu, 10 Apr 2025 13:30:59 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 69E041800EC5;
+	Thu, 10 Apr 2025 13:31:04 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.20])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C8FA180175B;
-	Thu, 10 Apr 2025 13:30:57 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0CC7E1956094;
+	Thu, 10 Apr 2025 13:31:02 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -50,9 +50,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 02/15] block: add two helpers for registering/un-registering sched debugfs
-Date: Thu, 10 Apr 2025 21:30:14 +0800
-Message-ID: <20250410133029.2487054-3-ming.lei@redhat.com>
+Subject: [PATCH 03/15] block: move sched debugfs register into elvevator_register_queue
+Date: Thu, 10 Apr 2025 21:30:15 +0800
+Message-ID: <20250410133029.2487054-4-ming.lei@redhat.com>
 In-Reply-To: <20250410133029.2487054-1-ming.lei@redhat.com>
 References: <20250410133029.2487054-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -62,99 +62,132 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Add blk_mq_sched_reg_debugfs()/blk_mq_sched_unreg_debugfs() to clean
-up sched init/exit code a bit.
+sched debugfs shares same lifetime with scheduler's kobject, and same
+lock(elevator lock), so move sched debugfs register/unregister into
+elevator_register_queue() and elevator_unregister_queue().
+
+Then we needn't blk_mq_debugfs_register() for us to register sched
+debugfs any more.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-sched.c | 42 +++++++++++++++++++++++++++---------------
- 1 file changed, 27 insertions(+), 15 deletions(-)
+ block/blk-mq-debugfs.c | 12 ------------
+ block/blk-mq-sched.c   |  7 ++-----
+ block/elevator.c       |  6 ++++++
+ block/elevator.h       |  3 +++
+ 4 files changed, 11 insertions(+), 17 deletions(-)
 
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 3421b5521fe2..c308699ded58 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -624,22 +624,10 @@ void blk_mq_debugfs_register(struct request_queue *q)
+ 
+ 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+ 
+-	/*
+-	 * blk_mq_init_sched() attempted to do this already, but q->debugfs_dir
+-	 * didn't exist yet (because we don't know what to name the directory
+-	 * until the queue is registered to a gendisk).
+-	 */
+-	if (q->elevator && !q->sched_debugfs_dir)
+-		blk_mq_debugfs_register_sched(q);
+-
+-	/* Similarly, blk_mq_init_hctx() couldn't do this previously. */
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx->debugfs_dir)
+ 			blk_mq_debugfs_register_hctx(q, hctx);
+-		if (q->elevator && !hctx->sched_debugfs_dir)
+-			blk_mq_debugfs_register_sched_hctx(q, hctx);
+ 	}
+-
+ 	if (q->rq_qos) {
+ 		struct rq_qos *rqos = q->rq_qos;
+ 
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 109611445d40..f66abaa25430 100644
+index f66abaa25430..14552c58c4e8 100644
 --- a/block/blk-mq-sched.c
 +++ b/block/blk-mq-sched.c
-@@ -436,6 +436,30 @@ static int blk_mq_init_sched_shared_tags(struct request_queue *queue)
+@@ -436,7 +436,7 @@ static int blk_mq_init_sched_shared_tags(struct request_queue *queue)
  	return 0;
  }
  
-+static void blk_mq_sched_reg_debugfs(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	mutex_lock(&q->debugfs_mutex);
-+	blk_mq_debugfs_register_sched(q);
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		blk_mq_debugfs_register_sched_hctx(q, hctx);
-+	mutex_unlock(&q->debugfs_mutex);
-+}
-+
-+static void blk_mq_sched_unreg_debugfs(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	mutex_lock(&q->debugfs_mutex);
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		blk_mq_debugfs_unregister_sched_hctx(hctx);
-+	blk_mq_debugfs_unregister_sched(q);
-+	mutex_unlock(&q->debugfs_mutex);
-+}
-+
- /* caller must have a reference to @e, will grab another one if successful */
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+-static void blk_mq_sched_reg_debugfs(struct request_queue *q)
++void blk_mq_sched_reg_debugfs(struct request_queue *q)
  {
-@@ -469,10 +493,6 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	if (ret)
- 		goto err_free_map_and_rqs;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+@@ -448,7 +448,7 @@ static void blk_mq_sched_reg_debugfs(struct request_queue *q)
+ 	mutex_unlock(&q->debugfs_mutex);
+ }
  
--	mutex_lock(&q->debugfs_mutex);
--	blk_mq_debugfs_register_sched(q);
--	mutex_unlock(&q->debugfs_mutex);
--
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (e->ops.init_hctx) {
- 			ret = e->ops.init_hctx(hctx, i);
-@@ -484,10 +504,8 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 				return ret;
+-static void blk_mq_sched_unreg_debugfs(struct request_queue *q)
++void blk_mq_sched_unreg_debugfs(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+@@ -505,7 +505,6 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
  			}
  		}
--		mutex_lock(&q->debugfs_mutex);
--		blk_mq_debugfs_register_sched_hctx(q, hctx);
--		mutex_unlock(&q->debugfs_mutex);
  	}
-+	blk_mq_sched_reg_debugfs(q);
+-	blk_mq_sched_reg_debugfs(q);
  
  	return 0;
  
-@@ -526,11 +544,9 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+@@ -544,8 +543,6 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
  	unsigned long i;
  	unsigned int flags = 0;
  
--	queue_for_each_hw_ctx(q, hctx, i) {
--		mutex_lock(&q->debugfs_mutex);
--		blk_mq_debugfs_unregister_sched_hctx(hctx);
--		mutex_unlock(&q->debugfs_mutex);
-+	blk_mq_sched_unreg_debugfs(q);
- 
-+	queue_for_each_hw_ctx(q, hctx, i) {
+-	blk_mq_sched_unreg_debugfs(q);
+-
+ 	queue_for_each_hw_ctx(q, hctx, i) {
  		if (e->type->ops.exit_hctx && hctx->sched_data) {
  			e->type->ops.exit_hctx(hctx, i);
- 			hctx->sched_data = NULL;
-@@ -538,10 +554,6 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
- 		flags = hctx->flags;
- 	}
+diff --git a/block/elevator.c b/block/elevator.c
+index 5051a98dc08c..cf48613c6e62 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -459,6 +459,9 @@ int elv_register_queue(struct request_queue *q, bool uevent)
  
--	mutex_lock(&q->debugfs_mutex);
--	blk_mq_debugfs_unregister_sched(q);
--	mutex_unlock(&q->debugfs_mutex);
--
- 	if (e->type->ops.exit_sched)
- 		e->type->ops.exit_sched(e);
- 	blk_mq_sched_tags_teardown(q, flags);
+ 	lockdep_assert_held(&q->elevator_lock);
+ 
++	if (test_bit(ELEVATOR_FLAG_REGISTERED, &e->flags))
++		return 0;
++
+ 	error = kobject_add(&e->kobj, &q->disk->queue_kobj, "iosched");
+ 	if (!error) {
+ 		const struct elv_fs_entry *attr = e->type->elevator_attrs;
+@@ -472,6 +475,7 @@ int elv_register_queue(struct request_queue *q, bool uevent)
+ 		if (uevent)
+ 			kobject_uevent(&e->kobj, KOBJ_ADD);
+ 
++		blk_mq_sched_reg_debugfs(q);
+ 		set_bit(ELEVATOR_FLAG_REGISTERED, &e->flags);
+ 	}
+ 	return error;
+@@ -486,6 +490,8 @@ void elv_unregister_queue(struct request_queue *q)
+ 	if (e && test_and_clear_bit(ELEVATOR_FLAG_REGISTERED, &e->flags)) {
+ 		kobject_uevent(&e->kobj, KOBJ_REMOVE);
+ 		kobject_del(&e->kobj);
++
++		blk_mq_sched_unreg_debugfs(q);
+ 	}
+ }
+ 
+diff --git a/block/elevator.h b/block/elevator.h
+index e4e44dfac503..80ff9b28a66f 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -182,4 +182,7 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
+ #define rq_entry_fifo(ptr)	list_entry((ptr), struct request, queuelist)
+ #define rq_fifo_clear(rq)	list_del_init(&(rq)->queuelist)
+ 
++void blk_mq_sched_reg_debugfs(struct request_queue *q);
++void blk_mq_sched_unreg_debugfs(struct request_queue *q);
++
+ #endif /* _ELEVATOR_H */
 -- 
 2.47.0
 
