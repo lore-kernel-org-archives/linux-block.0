@@ -1,105 +1,96 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5042367D1
-	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 13:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78F31E0DE4
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 13:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744377064; cv=none; b=desw7APsY8VQomu45iEI/LTdQLjhinnNaGaVUG0N1J3WYusXzY88EyakInLeJGxe6aknINASL6VeAnFb3VgCkVUmfaSOe0wYlbnaawblnKtxbzkuBmRKfEBSU5ysIXGUk76NjPVzZQmRHbA3QAmeLVtTErwmOL2LX7T5EJdIMwA=
+	t=1744379319; cv=none; b=qLFbHAaCCiwMGrcg2/hZlwEZhDgd0Vpjd6AhuddlBSpN5VA4qTue4ZIBC92k+b7eupKfkTc11g/FKwTjEAVlwC7nTo3aHjLAfzkHLpTTNHC77GTACLSpP2m+iA6n07O9IEqH1q04eYrluyQ7UOK4yIo8U8VMmP+tzyb/7sZcDRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744377064; c=relaxed/simple;
-	bh=eAFIWIt6j3rAMdwqcH4pcdzRZAYw4+2Ucoav5WKaFB4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DyuKmuoenQwQmsE7S4RHHZUrcc3+hRJ8a1pWmWAqH4bKnSsqtNxAlO+othk7G6uyH4AWEg6aax2qbO+wSyJiT6LtWkaGnlvT8J37KjzKnrZBkPyblJKk9RFKIGGQeaTU1eepDcMuwi+vl/hUEqFYIie8KiEeYc2FnJSkqAQVDr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UhORnLnB; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744379319; c=relaxed/simple;
+	bh=FppYHN/qu2n9iiq/ee/to1M0y8WJPMP+sy5NMHu2ZbA=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=nn8HvUKujmNvI6PanytzOGjeuuw/mcSR/fiH0kr+IPaszvKTCiaIyaVe9JCSG5wzi/Wj2wKW5/lgNWOCF/qfhii8ZeO7X6FFG3TfSjZ+bNSz77jNWdzj9InTaX2g/3AmmwbEPyP6opoT3OUzgxD3XcDlC1yyMBFs3xbtWlrS/RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Buc3s8mA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UhORnLnB"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-85e46f5c50fso183539339f.3
-        for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 06:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744377061; x=1744981861; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QjVCOEySwmgLRw3+r4LCbL5rsgRNuVtTfmLLfJr5KRA=;
-        b=UhORnLnBy//k+j0jyEzt2qMZAKPvWKq0W0t2oGjdrm21Ha/7jY3xhYgtHmqNehjsiT
-         nA2PDcEdRbHdxsiBiYzxUKgYEHgt9c/VLPDm09A85AQ6aByez0Ug1u9ietqkKQVRy0xk
-         rR+il15Av54ge0KpaUs/SEJKbZL54P1KAgp0hgcQvVPYWO/I+qBCcgtFqxD60pdNiCvQ
-         I3nkQO/aMUBnQIxaQGGoMXUQmqUQAojCI7KsvTM0QYWMv9N888XkM12jG35mEzTf9PnX
-         yfh6EiTaI8K7daUU5WJgr71OfzwH3R0HuKKpF/e5SIPWGBds1B6SXzHnCGtsLFiHsk2O
-         b18Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744377061; x=1744981861;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QjVCOEySwmgLRw3+r4LCbL5rsgRNuVtTfmLLfJr5KRA=;
-        b=aMnZ2u97oWEdyRuz34HnCm9u7zPX2uqaEiSVKJ7GdRAhOkfTqWrsI8lcJBeqo1SMse
-         4hGAGHDX0/iH784iWKL9dSe1i3iToupXr1YfEnacCMcq7jsFOLas3ZbxmIqUZe06QTao
-         kvdx9hxLGB/FB7mfUF1wXyvxDwYe6eixqo1tfb+78uAz6hhzRKCvC4yCjJHULsbNIJ0G
-         ZjrmE9S6qkPNyp4aiEp3tle5DbfFDLs9OPTXTqOqqcKKnzLlUFBVyJ3ckEeRyJ+wp3rj
-         Z5v7P68wzM9/Y/2UQYoP+5JWemu/eACpK0RfPQFixz0qT1J7aHffRAUORlfAlioytWod
-         fZmA==
-X-Gm-Message-State: AOJu0YzIz71xVJ0krVFxCzwWQD5g4nPezrslQWm2tAi5FQOlusaXiR3t
-	PgScnOxbd4QU20IPaq9EmhDRkqsgGeTQ+gP+l3sMqjaqHv3233/YytlVdZUnyQU=
-X-Gm-Gg: ASbGncuyScwpYcM4uwAKjxs/fqOYH7S0YAWMJxDJaxDTlG3fbN+aW76Bt6IKA513n2g
-	eNmwjWKu55s42hVD6BNbT2dq+Sq/D0YvAGOiBfI+ijWrhj9NuEEvXeJZAIWOr7OB7U2c9DXp7TA
-	ICh3kJx283Gc0KhOIAEA4SAxTM6Zs9VG83sZHgSJeM7hohTja4bzKvGqTYENBB482fwRv7VOVHA
-	PRiSJOFLmuEQE65pfv9x9IKzh2rnbJXMTv5XrI/3BD+2H+eMcsKwnw2dYFCjYAAKrw0CWtG99pl
-	2+xCbycZmwNrnRj21gZmMsdxJM6U8L0=
-X-Google-Smtp-Source: AGHT+IFYDWFGs85o/BU9KC2T7o5KYrQ+mIxni7M1yZjTZK6fAtYcTZxVSgCcRWhZa4R+QtDF3VO4UA==
-X-Received: by 2002:a05:6602:3788:b0:85e:8c26:170b with SMTP id ca18e2360f4ac-8617cb0568cmr268622939f.2.1744377061450;
-        Fri, 11 Apr 2025 06:11:01 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505e2e610sm1208191173.108.2025.04.11.06.11.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 06:11:00 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Damien Le Moal <dlemoal@kernel.org>, 
- Chaitanya Kulkarni <kch@nvidia.com>, 
- Johannes Thumshirn <johannes.thumshirn@wdc.com>, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Zhu Yanjun <yanjun.zhu@linux.dev>, Zheng Qixing <zhengqixing@huawei.com>, 
- Yu Kuai <yukuai3@huawei.com>, Thorsten Blum <thorsten.blum@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250410154727.883207-1-thorsten.blum@linux.dev>
-References: <20250410154727.883207-1-thorsten.blum@linux.dev>
-Subject: Re: [PATCH] null_blk: Use strscpy() instead of strscpy_pad() in
- null_add_dev()
-Message-Id: <174437705991.412953.12819263778991723071.b4-ty@kernel.dk>
-Date: Fri, 11 Apr 2025 07:10:59 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Buc3s8mA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744379316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ziVNbANRmyi0790QzmsXdsF0qsho9qMRA3TbDUmAaDs=;
+	b=Buc3s8mAmhVLSFE0SruRzfFAAPfGXiQXiKuIGr4Og90sY/7USuWEqIkw5SJhO6jR2dP/0X
+	lchwUwwmpDXN3vGAUeTR9gOPtq+3mndSYNyUZ8+qBMpwgQeX1o2tDm9/fXE263MWk/4sEE
+	OEmS2Zj+SFTgR5oAAlKTSo5fDYRsJ34=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-443-NhptXqgLMby4Ox9QW00kSA-1; Fri,
+ 11 Apr 2025 09:48:33 -0400
+X-MC-Unique: NhptXqgLMby4Ox9QW00kSA-1
+X-Mimecast-MFC-AGG-ID: NhptXqgLMby4Ox9QW00kSA_1744379312
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 836321956087;
+	Fri, 11 Apr 2025 13:48:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.40])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0297619560AD;
+	Fri, 11 Apr 2025 13:48:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <f2b15e2f951e249e98f33b07ee261b9898dd41d3.camel@ibm.com>
+References: <f2b15e2f951e249e98f33b07ee261b9898dd41d3.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-7-dhowells@redhat.com>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
+    "slava@dubeyko.com" <slava@dubeyko.com>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "idryomov@gmail.com" <idryomov@gmail.com>,
+    "jlayton@kernel.org" <jlayton@kernel.org>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 06/35] rbd: Use ceph_databuf for rbd_obj_read_sync()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2370586.1744379306.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Apr 2025 14:48:26 +0100
+Message-ID: <2370587.1744379306@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
+Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
 
-On Thu, 10 Apr 2025 17:47:23 +0200, Thorsten Blum wrote:
-> blk_mq_alloc_disk() already zero-initializes the destination buffer,
-> making strscpy() sufficient for safely copying the disk's name. The
-> additional NUL-padding performed by strscpy_pad() is unnecessary.
-> 
-> If the destination buffer has a fixed length, strscpy() automatically
-> determines its size using sizeof() when the argument is omitted. This
-> makes the explicit size argument unnecessary.
-> 
-> [...]
+> > +	dbuf =3D ceph_databuf_req_alloc(1, sizeof(*ondisk), GFP_KERNEL);
+> =
 
-Applied, thanks!
+> I am slightly worried about such using of ondisk variable. We have garba=
+ge as a
+> value of ondisk pointer on this step yet. And pointer dereferencing coul=
+d look
+> confusing here. Also, potentially, compiler and static analysis tools co=
+uld
+> complain. I don't see a problem here but anyway I am feeling worried. :)
 
-[1/1] null_blk: Use strscpy() instead of strscpy_pad() in null_add_dev()
-      commit: 3b607b75a345b1d808031bf1bb1038e4dac8d521
+It's a sizeof() construction.  We do this all the time:
 
-Best regards,
--- 
-Jens Axboe
+	struct fred *p;
 
+	p =3D kmalloc(sizeof(*p), GFP_KERNEL);
 
+David
 
