@@ -1,85 +1,76 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A993D1E9B09;
-	Fri, 11 Apr 2025 07:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6850528F939
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 07:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744356547; cv=none; b=srr7PujX4xSTQ1gwsqHf+86oJ+mW1xrJsnYJClyedt3F0/hCciAEJ6gWJdGomFj/f+mePQ5U+Y0j/mc9J+WOgaQ97/7zQizeIWZfVtUKOwSD1Ud/mzMTH18ZLvx/WkvFuHqN3y43WGsC+RcXcKutExVERSOC3WJWuUABO/jIJ6M=
+	t=1744357902; cv=none; b=hmnAVJI2NgOVccRabqpvtT1ZOqGJxRSb4BsMidjCVZn4VFeYtFlPzUOpmGGHJvzZlf9p/EM5xs8OiV77euyrD9iJM3svIEhUyEkj0sJe2zhA6n9KJgLllpWzYEUEja1hvt+eDtC+a9sfUMvya0/EEmAydXN82grvNOoEyqG+3ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744356547; c=relaxed/simple;
-	bh=bDqGY1AtiCPNgiPrNANi8hsarVF01F4kRY7ffI9MP0k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AcygXVBrQmitGJNampK1QUkvUSEDs6I39PmMSpFoD8tFKLimHz0ba3h2j5PUMqNqq4dKw1c59p1JCI+fPH9S6zaB+aoF0nSmUgI0DPOD+atCnDfWC0ePGKA4TYojOvg+cefmb9xj7om21F+3TihMdTJlmTKRT8QWoFCF/SukUMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from SHSQR01.spreadtrum.com (localhost [127.0.0.2] (may be forged))
-	by SHSQR01.spreadtrum.com with ESMTP id 53B7T0gl066240;
-	Fri, 11 Apr 2025 15:29:00 +0800 (+08)
-	(envelope-from Yunlong.Xing@unisoc.com)
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 53B7SPXM062369;
-	Fri, 11 Apr 2025 15:28:25 +0800 (+08)
-	(envelope-from Yunlong.Xing@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4ZYpD85X3Gz2M5NG5;
-	Fri, 11 Apr 2025 15:27:20 +0800 (CST)
-Received: from tj10379pcu1.spreadtrum.com (10.5.32.15) by
- BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Fri, 11 Apr 2025 15:28:21 +0800
-From: Yunlong Xing <yunlong.xing@unisoc.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: <niuzhiguo84@gmail.com>, <yunlongxing23@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <yunlong.xing@unisoc.com>,
-        <hao_hao.wang@unisoc.com>, <zhiguo.niu@unisoc.com>
-Subject: [PATCH] loop: aio inherit the ioprio of original request
-Date: Fri, 11 Apr 2025 15:28:16 +0800
-Message-ID: <20250411072816.445035-1-yunlong.xing@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1744357902; c=relaxed/simple;
+	bh=RoaRnEuDGYNZNBysc6IoCuCalvE8roZQ3otz4VDUpFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rzSEN8eVNXrbpV+dEgX5SbLbo/sv1RhEzawdTINsR3qxVnc/MAnzXur0UJM0yqUq2yOHzqe/JLPJTltQGY2vINvzCJ+XPiN3ArtCNWwb2WN17Q6upvUVP7MYurdAQ7JeFsTThhlfm8rk/JHYxT9XFxcUwbgtzq/jXXtVdgMTfeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LeYK3sjX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LeYK3sjX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744357899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/nq9vWKH5vK+LG8V0e3I7yV8cZfspJSlkpTU7meTlsU=;
+	b=LeYK3sjXGqkExKng36z705FohTE2DLGpXtaAtw7+Tj52Y0Z2jfG22m1jia9TOmNEOIDG6z
+	DDW7rQBZFLpssp74tabUMkdDKyIgjeCBcgFwSY9Y4I8CKD1OnZNF6oDVHg47JPTLIhmBUT
+	xo38Cw6TG+P8TsEgzfd6SWfcVA6GYJM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-175-4MRAc9WOPCav8HDlsRdL7Q-1; Fri,
+ 11 Apr 2025 03:51:36 -0400
+X-MC-Unique: 4MRAc9WOPCav8HDlsRdL7Q-1
+X-Mimecast-MFC-AGG-ID: 4MRAc9WOPCav8HDlsRdL7Q_1744357894
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 75B701955BC1;
+	Fri, 11 Apr 2025 07:51:34 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.6])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 49E021828A9E;
+	Fri, 11 Apr 2025 07:51:29 +0000 (UTC)
+Date: Fri, 11 Apr 2025 15:51:24 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: pass ublksrv_ctrl_cmd * instead of io_uring_cmd *
+Message-ID: <Z_jJ_EU28D3C5P6F@fedora>
+References: <20250409012928.3527198-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS01.spreadtrum.com (10.0.1.201) To
- BJMBX02.spreadtrum.com (10.0.64.8)
-X-MAIL:SHSQR01.spreadtrum.com 53B7SPXM062369
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250409012928.3527198-1-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
-The purpose is to inherit the original request ioprio in the aio
-flow.
+On Tue, Apr 08, 2025 at 07:29:26PM -0600, Caleb Sander Mateos wrote:
+> The ublk_ctrl_*() handlers all take struct io_uring_cmd *cmd but only
+> use it to get struct ublksrv_ctrl_cmd *header from the io_uring SQE.
+> Since the caller ublk_ctrl_uring_cmd() has already computed header, pass
+> it instead of cmd.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Signed-off-by: Yunlong Xing <yunlong.xing@unisoc.com>
-Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
----
- drivers/block/loop.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc..ed73627af3ff 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -447,7 +447,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_filp = file;
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
--	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
- 
- 	if (rw == ITER_SOURCE)
- 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
-@@ -1892,6 +1891,9 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		break;
- 	}
- 
-+	/* get original request ioprio */
-+	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
-+
- 	/* always use the first bio's css */
- 	cmd->blkcg_css = NULL;
- 	cmd->memcg_css = NULL;
--- 
-2.25.1
+
+Thanks,
+Ming
 
