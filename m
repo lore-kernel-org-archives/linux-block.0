@@ -1,44 +1,38 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029D517C21C;
-	Fri, 11 Apr 2025 01:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FFC27BF94
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 02:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744335414; cv=none; b=g5eJUrjX5rQCzUOXZsZD8z1/AGbWpEKfUqF5J283jiGVyzkKFchCj5IvoPL8l8PtLVnsnkd+WKFgD6UIVMzQiMD9Pf4mOdzHT7BhORR8T6nPcF9ZnavQ0Wn0Iizg7DSaTQRGdYky4fzWDMl7xJbMfKQ9ecBqy9JKTBef2K7BsIM=
+	t=1744340002; cv=none; b=IW9K1SujKXhhI+eo5sPXNrt1+qmepFc7BqKO7pvdWvhKajhMByRvFuyBZq7MrhlFyS55rmTEy9UA+ErgbMO4nA2o2o2Emwid+s1Pj/G3/u59RHHkwZppg1yq4hreb/4DP6koeYvLupgefAyqB76/hc2XPg36AuoLOkbu4vVecXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744335414; c=relaxed/simple;
-	bh=ZRR2/INA9CZRa8hce9t/BDmx3eaWvex4MtkXrh/QCws=;
+	s=arc-20240116; t=1744340002; c=relaxed/simple;
+	bh=7mbJFZIfk8QKNWHsL0zjjgAbFJnv4uH5nToB/cdTR7k=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=omIp0TeKUAi06/uEkqtteAX7T//cJ7/AMsiiZM1qR3ul557yz+5bV0DDMHVRqasZUT6Vv6B3J9G7hcOwOJbhV4l1akVd5VBXhY+23gB2bZQGX23b803gXbYqOO+2R3fp+CaaJ3X4ZbYSmZXDItZ1dhiA/tma16QLTyXwp7Jm3Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 In-Reply-To:Content-Type; b=oyEExUerWRUvfl7U0Uozq3DsrvCvJuHvNTbOoApXIFMfMqSEieUzYH2wN2n8YSYwGAIMsYQ+7Bc4V9IyoNdi1wAzbc2vCyXOe3lT6YXIqCLPXTBx9cKI79E6eMDBvK3pb9nibzkKHoyr1cvPB6YRN1qgihY4Gkdfo/tChcWJQxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZYfRL311wz4f3jtF;
-	Fri, 11 Apr 2025 09:36:30 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZYh7X5ZWGz4f3jYl
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 10:52:56 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 815711A06D7;
-	Fri, 11 Apr 2025 09:36:48 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id DF8BF1A06DD
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 10:53:14 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAni18ucvhnmjx9JA--.57143S3;
-	Fri, 11 Apr 2025 09:36:48 +0800 (CST)
-Subject: Re: [PATCH RFC v2 00/14] md: introduce a new lockless bitmap
-To: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: xni@redhat.com, colyli@kernel.org, axboe@kernel.dk, agk@redhat.com,
- snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, kbusch@kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
- <Z-aCzTWXzFWe4oxU@infradead.org>
- <c6c608e2-23e7-486f-100a-d1fb6cfff4f2@huaweicloud.com>
- <20250409083208.GA2326@lst.de>
- <115c3b08-aff1-dd97-fe6a-7901452ce62c@huaweicloud.com>
- <20250409094019.GA3890@lst.de>
+	by APP4 (Coremail) with SMTP id gCh0CgAHa18ZhPhnO6WCJA--.42120S3;
+	Fri, 11 Apr 2025 10:53:14 +0800 (CST)
+Subject: Re: [PATCH 3/3] blk-throttle: carry over directly
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+ "yukuai (C)" <yukuai3@huawei.com>, WoZ1zh1 <wozizhi@huawei.com>
+References: <20250305043123.3938491-1-ming.lei@redhat.com>
+ <20250305043123.3938491-4-ming.lei@redhat.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <28bb1c35-5f75-4e1c-4b5d-32bcb87050ce@huaweicloud.com>
-Date: Fri, 11 Apr 2025 09:36:45 +0800
+Message-ID: <14e6c54f-d0d9-0122-1e47-c8a56adbd5db@huaweicloud.com>
+Date: Fri, 11 Apr 2025 10:53:12 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -47,83 +41,209 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250409094019.GA3890@lst.de>
+In-Reply-To: <20250305043123.3938491-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAni18ucvhnmjx9JA--.57143S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF4fKF1kAF43AF47ZrW5KFg_yoW8tr45pF
-	ZrW3Waka1DAr17trs2yws7KF4Ska93JFW7JFySgr98Ar95Xr9agr18KF4Y9Fy3Zr1kt3W2
-	v34jqF93Za15AFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-TRANSID:gCh0CgAHa18ZhPhnO6WCJA--.42120S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3WFyfCFyUuFWfury8WF17Jrb_yoWxAFyxpF
+	WrAF42gw4FqFn7G3ZxA3ZYyay8Xay7AryUJ3yUWwn5AFn0krykKrn8WrZYyayxAF97Aa1I
+	yw1jgr98Jr42kFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Hi, Ming
 
-在 2025/04/09 17:40, Christoph Hellwig 写道:
-> On Wed, Apr 09, 2025 at 05:27:11PM +0800, Yu Kuai wrote:
->>> For that you'd be much better of just creating your own trivial
->>> file_system_type with an inode fully controlled by your driver
->>> that has a trivial set of address_space ops instead of oddly
->>> mixing with the block layer.
->>
->> Yes, this is exactly what I said implement a new file_operations(and
->> address_space ops), I wanted do this the easy way, just reuse the raw
->> block device ops, this way I just need to implement the submit_bio ops
->> for new hidden disk.
->>
->> I can try with new fs type if we really think this solution is too
->> hacky, however, the code line will be much more. :(
+在 2025/03/05 12:31, Ming Lei 写道:
+> Now ->carryover_bytes[] and ->carryover_ios[] only covers limit/config
+> update.
 > 
-> I don't think it should be much more.  It'll also remove the rather
-> unexpected indirection through submit_bio.  Just make sure you use
-> iomap for your operations, and implement the submit_io hook.  That
-> will also be more efficient than the buffer_head based block ops
-> for writes.
+> Actually the carryover bytes/ios can be carried to ->bytes_disp[] and
+> ->io_disp[] directly, since the carryover is one-shot thing and only valid
+> in current slice.
 > 
->>>
->>> Note that either way I'm not sure using the page cache here is an
->>> all that good idea, as we're at the bottom of the I/O stack and
->>> thus memory allocations can very easily deadlock.
->>
->> Yes, for the page from bitmap, this set do the easy way just read and
->> ping all realted pages while loading the bitmap. For two reasons:
->>
->> 1) We don't need to allocate and read pages from IO path;(In the first
->> RFC version, I'm using a worker to do that).
+> Then we can remove the two fields and simplify code much.
 > 
-> You still depend on the worker, which will still deadlock.
+> Type of ->bytes_disp[] and ->io_disp[] has to change as signed because the
+> two fields may become negative when updating limits or config, but both are
+> big enough for holding bytes/ios dispatched in single slice
 > 
->>> What speaks against using your own folios explicitly allocated at
->>> probe time and then just doing manual submit_bio on that?  That's
->>> probably not much more code but a lot more robust.
->>
->> I'm not quite sure if I understand you correctly. Do you means don't use
->> pagecache for bitmap IO, and manually create BIOs like the old bitmap,
->> meanwhile invent a new solution for synchronism instead of the global
->> spin_lock from old bitmap?
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Josef Bacik <josef@toxicpanda.com>
+> Cc: Yu Kuai <yukuai3@huawei.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-throttle.c | 49 +++++++++++++++++++-------------------------
+>   block/blk-throttle.h |  4 ++--
+>   2 files changed, 23 insertions(+), 30 deletions(-)
 > 
-> Yes.  Alternatively you need to pre-populate the page cache and keep
-> extra page references.
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 7271aee94faf..91dab43c65ab 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -478,8 +478,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+>   {
+>   	tg->bytes_disp[rw] = 0;
+>   	tg->io_disp[rw] = 0;
+> -	tg->carryover_bytes[rw] = 0;
+> -	tg->carryover_ios[rw] = 0;
+>   
+>   	/*
+>   	 * Previous slice has expired. We must have trimmed it after last
+> @@ -498,16 +496,14 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+>   }
+>   
+>   static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
+> -					  bool clear_carryover)
+> +					  bool clear)
+>   {
+> -	tg->bytes_disp[rw] = 0;
+> -	tg->io_disp[rw] = 0;
+> +	if (clear) {
+> +		tg->bytes_disp[rw] = 0;
+> +		tg->io_disp[rw] = 0;
+> +	}
+>   	tg->slice_start[rw] = jiffies;
+>   	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
+> -	if (clear_carryover) {
+> -		tg->carryover_bytes[rw] = 0;
+> -		tg->carryover_ios[rw] = 0;
+> -	}
+>   
+>   	throtl_log(&tg->service_queue,
+>   		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
+> @@ -617,20 +613,16 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+>   	 */
+>   	time_elapsed -= tg->td->throtl_slice;
+>   	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
+> -					     time_elapsed) +
+> -		     tg->carryover_bytes[rw];
+> -	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed) +
+> -		  tg->carryover_ios[rw];
+> +					     time_elapsed);
+> +	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
+>   	if (bytes_trim <= 0 && io_trim <= 0)
+>   		return;
+>   
+> -	tg->carryover_bytes[rw] = 0;
+>   	if ((long long)tg->bytes_disp[rw] >= bytes_trim)
+>   		tg->bytes_disp[rw] -= bytes_trim;
+>   	else
+>   		tg->bytes_disp[rw] = 0;
+>   
+> -	tg->carryover_ios[rw] = 0;
+>   	if ((int)tg->io_disp[rw] >= io_trim)
+>   		tg->io_disp[rw] -= io_trim;
+>   	else
+> @@ -645,7 +637,8 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+>   		   jiffies);
+>   }
+>   
+> -static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
+> +static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
+> +				  long long *bytes, int *ios)
+>   {
+>   	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
+>   	u64 bps_limit = tg_bps_limit(tg, rw);
+> @@ -658,26 +651,28 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
+>   	 * configuration.
+>   	 */
+>   	if (bps_limit != U64_MAX)
+> -		tg->carryover_bytes[rw] +=
+> -			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+> +		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+>   			tg->bytes_disp[rw];
+>   	if (iops_limit != UINT_MAX)
+> -		tg->carryover_ios[rw] +=
+> -			calculate_io_allowed(iops_limit, jiffy_elapsed) -
+> +		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
+>   			tg->io_disp[rw];
+> +	tg->bytes_disp[rw] -= *bytes;
+> +	tg->io_disp[rw] -= *ios;
 
-Ok, I'll think about self managed pages and IO path. Meanwhile, please
-let me know if you have questions with other parts.
+This patch is applied before I get a chance to review. :( I think the
+above update should be:
+
+tg->bytes_disp[rw] = -*bytes;
+tg->io_disp[rw] = -*ios;
+
+Otherwise, the result is actually (2 * disp - allowed), which might be a
+huge value, causing long dealy for the next dispatch.
+
+This is what the old carryover fileds do, above change will work, but
+look wried.
 
 Thanks,
 Kuai
 
-> 
-> .
+>   }
+>   
+>   static void tg_update_carryover(struct throtl_grp *tg)
+>   {
+> +	long long bytes[2] = {0};
+> +	int ios[2] = {0};
+> +
+>   	if (tg->service_queue.nr_queued[READ])
+> -		__tg_update_carryover(tg, READ);
+> +		__tg_update_carryover(tg, READ, &bytes[READ], &ios[READ]);
+>   	if (tg->service_queue.nr_queued[WRITE])
+> -		__tg_update_carryover(tg, WRITE);
+> +		__tg_update_carryover(tg, WRITE, &bytes[WRITE], &ios[WRITE]);
+>   
+>   	/* see comments in struct throtl_grp for meaning of these fields. */
+>   	throtl_log(&tg->service_queue, "%s: %lld %lld %d %d\n", __func__,
+> -		   tg->carryover_bytes[READ], tg->carryover_bytes[WRITE],
+> -		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
+> +		   bytes[READ], bytes[WRITE], ios[READ], ios[WRITE]);
+>   }
+>   
+>   static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
+> @@ -695,8 +690,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
+>   
+>   	/* Round up to the next throttle slice, wait time must be nonzero */
+>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
+> -	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
+> -		     tg->carryover_ios[rw];
+> +	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
+>   	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
+>   		return 0;
+>   
+> @@ -729,8 +723,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+>   		jiffy_elapsed_rnd = tg->td->throtl_slice;
+>   
+>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+> -	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
+> -			tg->carryover_bytes[rw];
+> +	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
+>   	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+>   		return 0;
+>   
+> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+> index ba8f6e986994..7964cc041e06 100644
+> --- a/block/blk-throttle.h
+> +++ b/block/blk-throttle.h
+> @@ -102,9 +102,9 @@ struct throtl_grp {
+>   	unsigned int iops[2];
+>   
+>   	/* Number of bytes dispatched in current slice */
+> -	uint64_t bytes_disp[2];
+> +	int64_t bytes_disp[2];
+>   	/* Number of bio's dispatched in current slice */
+> -	unsigned int io_disp[2];
+> +	int io_disp[2];
+>   
+>   	/*
+>   	 * The following two fields are updated when new configuration is
 > 
 
