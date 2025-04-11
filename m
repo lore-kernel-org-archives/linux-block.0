@@ -1,92 +1,114 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998E9277020;
-	Fri, 11 Apr 2025 19:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2024522DF9B
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 19:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744400231; cv=none; b=ruCqC4dW3lhnnjyA5lD18s9XcD5O+Xmzu0inO0qFkoZ310r3EiTtpUN62d0WN2A5XWK2x6Q2I0jCKQEF003MzEbnpkv23Xq6+6euZ5kotujuWGDEUX46iFPix8ps4klDITv7N7xK/6RC9D81eO/WWjiL/X/KVPcTqY5VcN1Ec0g=
+	t=1744401085; cv=none; b=XYbc7XyD3sSBOunLq98zFSnuOxkc9AfANpXYfNfqK/hfBz4IV7TKSEBy1lBeborxHqGumkwALmIEpNYxQlKaOSeNy2iypym0vCbqMeYsl7iafnOqwY3kFhretzBzt5m3hCbnNehn1MYlbs7KX7krh3Wigp6pP64DJTEyAZqHClM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744400231; c=relaxed/simple;
-	bh=YHW+XTYVtG/PWwHSFCFDIMlxixyP18ghixjbBfXKENc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qa2uBRtfOxL7SilxKgXyhzFi2m9phYCixbvOHyjXt5tppgQ0rHCI1YQ18VDqH/2qlbdAxPd6FFg1l6Jpd3vTGNLSZ0K8t/H22iy1ovrUNeyhXo43g6zSY3/MZ2nbj4CH+CVcCH++K+fpWL+z32p9hc2n46A3FljZ6bbQbppmLGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=z5Xj+3mh; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1744401085; c=relaxed/simple;
+	bh=ZNbefensufV6PEA9RWDanN598P4aAIy9WLBjIH8wjHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cd7zO83XSYf/hRjdCzO+XOPKPoPiTVg0s3kh47M5heLCaNg+6imO5zxThxLrGyDadQi68/nXD+YlRz18Lb+b8MYeSh5p5qYqaG6u8dA7QuJejAzbLqUeQHQqp0ToD2OBydZQw8GR4bR7kbFhvZ4RH/mEsb1iwJot8JYPQIg1Jvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WChFlcTA; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="z5Xj+3mh"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZZ6QD3c1Fzlvq7M;
-	Fri, 11 Apr 2025 19:37:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1744400225; x=1746992226; bh=JoLaWsZ1YJpsW8YK4Nxv/ub/
-	PCdEG//HtFwEC2IFQmA=; b=z5Xj+3mh4gRl5vVWgsQHR8wuqUrn6HKftyyzlrQN
-	97LL1aDrB74cIOYCk4PTd+Ftza+E3mb7b0gRaIrk2mr1JTF9DZl7TZcYm2aL1voA
-	fEjvs05z9ZcUIZD92N2madg9eQUuk7bvQEusfgc9s8B0OIby2ASir4IIHO/Cqyjc
-	+Ys9ogELHVGN+reo8S4R5UF5GKtGnmZdE5sxAyWyWSevOmdwF07Wmz+D5IfqqLx3
-	RuSB/agkPITGijaSxTox2WLL+tPglth26xbFe2NmfvKUwyBDmWTyT6LVd30PoOk6
-	7TUV8JD5ZS7e6z15zxy8C0XCnY4lraRgO5tiKfLcKZO8pA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id LHF9YpZ-hNQz; Fri, 11 Apr 2025 19:37:05 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4ZZ6Q50Lckzlnfx9;
-	Fri, 11 Apr 2025 19:36:59 +0000 (UTC)
-Message-ID: <319facaa-f3de-4cca-adf0-6916f30e8c7c@acm.org>
-Date: Fri, 11 Apr 2025 12:36:58 -0700
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WChFlcTA"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff6b9a7f91so369058a91.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 12:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1744401083; x=1745005883; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZNbefensufV6PEA9RWDanN598P4aAIy9WLBjIH8wjHU=;
+        b=WChFlcTA4O8sbwLK5KL2NGF3Vv4HFmMM0THyy4FjrjZshSFqHnMSd2o1oSWUFl0BFn
+         AEeJVtXS7eirRcettmkBG5exhX1/Wuc/b6kSGMAgbvILUvuQESR2z+O77hx5tgwylbgi
+         6YGmxy0iFltb+OccypBuzQr3OWY+DPT7UssuTMUdHSdbJHWcFgFmTTIFbvgfzm+3MRxp
+         HlhbJCiohvrRcBFYyc4ByR1GTrjFVia036yA7jCJG+bB3MS9fHK+PBRmAC8gLFJ5ADHK
+         wWDsHeQJSLsTkYfZ4cIfd9wASdcMxSCSO8lUrU9gnbQRJ5CkVGgF8+iqaa4UwdLxr36s
+         hgaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744401083; x=1745005883;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZNbefensufV6PEA9RWDanN598P4aAIy9WLBjIH8wjHU=;
+        b=ebobD6IKYSQZ/nemZw7Brz+BJm/wU67SGUMYMgRpJjAHNg/wM/HRWl2SvEuqaoSLXG
+         L73yHuTxR3B95a9uMKqJ/A00tXJ92Y2vQgaEw+UrBkC3SNWQFmD+ZMp3Q8u08GvMAk4x
+         Rn/fQn2xyXsqGryO2Cj2NWFf9HiCLenUfqLrizCBxUPJoTboOYFtIkgkAxDermI2+6Qo
+         SU0ofP4tMMa4JbuV2HAP8OfqB8sE/F4rKism7dpcFMfyuEHQwq+5etApUUchNRT5+CNS
+         Gw91vtQN3915+u504HCAvrq5FIIqQkTI8ewc6zXM76NlUAfVkowltH5hAEebxBhcCJFO
+         mnAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSrq77eAqPOdRW7vUez6zXMD2FoDnDqro6suIVzywh5Vs+A+eIhrm52fhVgpXBP5PgRqBxhK0lvcQTDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK7ov9YWqVcJ423TpgFJwPXjI2OaRZwMJafbkvrGSyCSExgVGl
+	i5WfxAB/1xZ6OLZ1iRugBOmz5x3SzUT565B7AItA/RgD3tjkV5WX7eR6xnTBs5/ask0bkdbRktz
+	KwgtMFsPTg30L2xzzTdozArjh3vroeUHHv4hRCA==
+X-Gm-Gg: ASbGncvGAhHeGZsfGidrTl34RK1awk/lIlpqEpooKPLc7DOujZB7eysW44sHOeYVT1V
+	rcpOqLjIQBcKq3mDlsh0/0q/FdQ/Q/ceMgKJbSy2h/vHPPdZyX2kOUkc5WanFG61gnlmh6N8Xzb
+	aOaGSLayVZWYCSXJ2+C1GB
+X-Google-Smtp-Source: AGHT+IHfVGBOlQCdx1hvq2f3G+Q9xeD/L1BI5SF66ACmEbexLDrsnhLO5hkMo6X7kw90iJl5OBJJOl49yxpIK3V26r0=
+X-Received: by 2002:a17:90b:390e:b0:2ff:7970:d2b6 with SMTP id
+ 98e67ed59e1d1-308273f3592mr1634358a91.5.1744401083122; Fri, 11 Apr 2025
+ 12:51:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: aio inherit the ioprio of original request
-To: Yunlong Xing <yunlong.xing@unisoc.com>, axboe@kernel.dk,
- linux-block@vger.kernel.org
-Cc: niuzhiguo84@gmail.com, yunlongxing23@gmail.com,
- linux-kernel@vger.kernel.org, hao_hao.wang@unisoc.com, zhiguo.niu@unisoc.com
-References: <20250411072816.445035-1-yunlong.xing@unisoc.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250411072816.445035-1-yunlong.xing@unisoc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250409024955.3626275-1-csander@purestorage.com> <Z_jLNGzRJAQBN8Nx@fedora>
+In-Reply-To: <Z_jLNGzRJAQBN8Nx@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 11 Apr 2025 12:51:10 -0700
+X-Gm-Features: ATxdqUG_gUcty4tHPgf6uag1CJ_6lddPvCULsnuqPrU5I7O-7tHfq-XvNeIDgYY
+Message-ID: <CADUfDZp=CDAh-2gNB9_LQ4cdhFm--apgRB94cuzqjV4O93hUeQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: skip blk_mq_tag_to_rq() bounds check
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/11/25 12:28 AM, Yunlong Xing wrote:
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 674527d770dc..ed73627af3ff 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -447,7 +447,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
->   	cmd->iocb.ki_filp = file;
->   	cmd->iocb.ki_complete = lo_rw_aio_complete;
->   	cmd->iocb.ki_flags = IOCB_DIRECT;
-> -	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
->   
->   	if (rw == ITER_SOURCE)
->   		ret = file->f_op->write_iter(&cmd->iocb, &iter);
-> @@ -1892,6 +1891,9 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
->   		break;
->   	}
->   
-> +	/* get original request ioprio */
-> +	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
-> +
->   	/* always use the first bio's css */
->   	cmd->blkcg_css = NULL;
->   	cmd->memcg_css = NULL;
+On Fri, Apr 11, 2025 at 12:56=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> On Tue, Apr 08, 2025 at 08:49:54PM -0600, Caleb Sander Mateos wrote:
+> > The ublk driver calls blk_mq_tag_to_rq() in several places.
+> > blk_mq_tag_to_rq() tolerates an invalid tag for the tagset, checking it
+> > against the number of tags and returning NULL if it is out of bounds.
+> > But all the calls from the ublk driver have already verified the tag
+> > against the ublk queue's queue depth. In ublk_commit_completion(),
+> > ublk_handle_need_get_data(), and case UBLK_IO_COMMIT_AND_FETCH_REQ, the
+> > tag has already been checked in __ublk_ch_uring_cmd(). In
+> > ublk_abort_queue(), the loop bounds the tag by the queue depth. In
+> > __ublk_check_and_get_req(), the tag has already been checked in
+> > __ublk_ch_uring_cmd(), in the case of ublk_register_io_buf(), or in
+> > ublk_check_and_get_req().
+> >
+> > So just index the tagset's rqs array directly in the ublk driver.
+> > Convert the tags to unsigned, as blk_mq_tag_to_rq() does.
+>
+> If blk_mq_tag_to_rq() turns out to be not efficient enough, we can kill i=
+t
+> in fast path by storing it in ublk_io and sharing space with 'struct io_u=
+ring_cmd *',
+> since the two's lifetime isn't overlapped basically.
 
-Shouldn't the cmd->iocb.ki_ioprio assignment occur in lo_rw_aio() rather
-than in loop_queue_rq() since the iocb is only used by lo_rw_aio()?
+I agree it would be nice to just store a pointer from in struct
+ublk_io to its current struct request. I guess we would set it in
+ubq_complete_io_cmd() and clear it in ublk_commit_completion()
+(matching when UBLK_IO_FLAG_OWNED_BY_SRV is set), as well as in
+ublk_timeout() for UBLK_F_UNPRIVILEGED_DEV?
 
-Bart.
+I'm not sure it is possible to overlap the fields, though. When using
+UBLK_U_IO_NEED_GET_DATA, the cmd field is overwritten with the a
+pointer to the UBLK_U_IO_NEED_GET_DATA command, but the req would need
+to be recorded earlier upon completion of the
+UBLK_U_IO_(COMMIT_AND_)FETCH_REQ command. Would you be okay with 2
+separate fields?
+
+Best,
+Caleb
