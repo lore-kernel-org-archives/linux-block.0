@@ -1,150 +1,63 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1351FA85A
-	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 15:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C0B126C13
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 15:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744384056; cv=none; b=kZGtEqi5DVixmf3sDDT3A8TnXLBuH4bv2Np/q/iGVrdrp23zh4d2Zl4hnAdn2IB6B16/4I2XauaU3rRrj4IdElrF6qwqX1ygL5bSAG6q93nkcmuknKaBgbpfrK/ob3r76Vxg6Hsw74xtpLAHIZYA3CelJsNV0reu4TVhwtt/AU4=
+	t=1744385991; cv=none; b=Kw5KUhG8D05Tr/WVTjDxC+2oEMuIdYLTM1zNGYQmFb2oJI9NTnGAs2pgmPO4C9uSIestE0CbgyOLoQxDF751DVmP/CYlHub09v1yKFWowbqZ/uUwT5/e4OQq0miSzqVtGpps9hGa7CWM2PVWk6uLZ1VeozP9fyJQBQNhLGOVVE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744384056; c=relaxed/simple;
-	bh=GrUAYb1t15pw2oc3lNLkj2qL1Q8m0DUX54WRC+Eqev4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=eYv6kR28GKvsWx5uxAOHN2IPrkbf8DOOcz+Hc4WP2cIbr+dkz73wmPAmFkZ43bqxDWd1m+QIYfSudrwo8VkTQzthnAEMEReocaykPHJJuamJKlEN6Upatx33dQP1NQpOWtp2sAMr4dHRSU2INVAr4pM2hl1rMqwDLyE2VLoEXzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k6b+TUBO; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744385991; c=relaxed/simple;
+	bh=Jy1s3CMCbom8Y2hjZ41W8PBJuavD9mnXJg3wy2bkhgA=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ZFBraQgXPH5IWonuJ/8DCwzlhagxrtj2EC2kyu79IDczMLFzbpKyqcT1il7ocY0z9P9DnbmZGSFaLJaLSQsNO026z66CAXpmd1/t/+Ajl9huuGSwMMVlm5+AYo8oFv/vP4U63ItXkdtaVcQxkB9BMA/NaAr6FAGyWBUufclv1g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d19gwqMk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k6b+TUBO"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d45875d440so9641195ab.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 08:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744384053; x=1744988853; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBfkfoq/pvt7aKpd/xo7r0z1ZjJBAli5ujUD2cyV2uU=;
-        b=k6b+TUBOQ4pF6WcxC4hi0RJa2JDCb9w7nHhVwhqf0KaAGxcDsG4ZJh+2KM7GZHNmIN
-         JXqT1Qq0gCHXxbkq2Z1H9dCTaJwXG6LK5XKFx1+Of2DNMB00t2ljXayuOUXCzN0YtqD9
-         pqihjJb/Yb6QvlEoGAyD8OrzLPDpD72DMczNeVfU5C4+Vq8VESYoZFzENbRwDlJU5dwW
-         b4CKhrdZx44pIyOiFChG7eYOMqZL9zbD9gUqOHvgI3h/nHMNIsWNfuD3PhveuZk4dPO5
-         vgmoUUcT6P/6Wc+8JJ2n/+x3zecJd3oDG8/oKkHyWLXJpQ+pfZ3oIhQZbi9wVP00cu/d
-         dlSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744384053; x=1744988853;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BBfkfoq/pvt7aKpd/xo7r0z1ZjJBAli5ujUD2cyV2uU=;
-        b=GZx/8Oo2jw9Bwx7Q1Xp02Cy05GVtQ3qzvKvLRTwr8vOc+Q/ZnjtPTU/rH8O3VLYxMt
-         lFjRiv6xhC++RLzht0YP6yC49Mjf7dsCtVYCdTS5KPz5wapvWv0ln/T4XjxFAajnTszO
-         hgSEEmZMBZpIexNyn7WjArx8ZhYby+gLwLx9xOQDQsoIIisN3tTsfFT7hVxgRlI9NEIs
-         yuN50fLo9v0/Ou+9AyjphByvIZQglVBWgMmoEFxcRqdsSaHi8q2aIXDJT18aK2bqAKIk
-         6wruhwWmocqkmBiFO1/NSBM3CTDmAnVY4AWzKNxZ1W+avEWiYmbEVt89PLwx3fGOHuNc
-         i82g==
-X-Gm-Message-State: AOJu0YyFe29WZJtzsLUG4+w6WF2BhfRZGwGiJ/+e85JrnL/WdnmteB6i
-	j7NCawv8nZ5IvLGGevJd8vkwoYGHDN1WBimmx7dGF8SuiPNRwLBEJYYd/+emjNYkDFsY6OXELMW
-	k
-X-Gm-Gg: ASbGncsKky4+KR92vgAV9+7K+9Akkn0GmoqXpi7csFLdHlfUxGzXWME4VAHpf5XIgna
-	92Ti2c9z6AHSq0f1dVgWwbCeKjg1ambYjBoyzJcmgJwhH+fyhkkwSKWhwjvDVTnpsoghjrfOHAd
-	6negC+KceeCktbEaTX/h7+0rBgEFeLiVFPHMED/M/y9esgkBIllXcbGefGBy9DoC/BFLLUsxegc
-	2yP/XWkMbfyDd3D/IKMLx5iEq7hzgYtmtVXmM31I+kKu2sCtr517fLnodRtH30DbOsPiSkvpcvc
-	vhiP5l0pBUUSj89kuXR+t1Qs1Sfc/LxNUziL
-X-Google-Smtp-Source: AGHT+IF8w2AgK4CsgflgzoSpJc7SJ7ZT4PNtiMJU+0bg11rW0E+QNRWsiHrQKSwpJLOcuarBCQm/gg==
-X-Received: by 2002:a05:6e02:3804:b0:3d6:cb9b:cbd6 with SMTP id e9e14a558f8ab-3d7ec227bf0mr28992845ab.13.1744384052509;
-        Fri, 11 Apr 2025 08:07:32 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dc5828cesm13263605ab.47.2025.04.11.08.07.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Apr 2025 08:07:31 -0700 (PDT)
-Message-ID: <8d3e5d98-09b1-4274-af25-124c91342b7a@kernel.dk>
-Date: Fri, 11 Apr 2025 09:07:31 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d19gwqMk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92FE0C4CEE2;
+	Fri, 11 Apr 2025 15:39:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744385990;
+	bh=Jy1s3CMCbom8Y2hjZ41W8PBJuavD9mnXJg3wy2bkhgA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=d19gwqMkmxqk3c4MUJSkjX9tYA6xCyWgKgrdj5/t93UAi7xfmpS7Atqrrifg4zEiX
+	 FAI9UY8MZ3P1R5Z3ROaU310iWFeFE+il1yp6laZ0po5xTPJOjNCKB2I9v0rk1NZcWz
+	 /NohdRBmzX4NxOgEpzjms7EsdPFQwJm0kjHjk8E45BPhWnWivyRUGo/0zezdHEmRiZ
+	 uCVwXwN6Th+xt52Z+6oiX7QCPCk81jRhvJ6Ufc0zBt9AgpKb3SIys92Z7fGb9/26DI
+	 gHc8LHDHimC4REC+FheCotBBEYbSqfmNSHLHNrzOFxk0aaAa4lXsWKz8bjp0S7xKO+
+	 eWW2ER6IWsirg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7117F38111E2;
+	Fri, 11 Apr 2025 15:40:29 +0000 (UTC)
+Subject: Re: [GIT PULL] 2nd set of block fixes for 6.15-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <8d3e5d98-09b1-4274-af25-124c91342b7a@kernel.dk>
+References: <8d3e5d98-09b1-4274-af25-124c91342b7a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <8d3e5d98-09b1-4274-af25-124c91342b7a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.15-20250411
+X-PR-Tracked-Commit-Id: 3b607b75a345b1d808031bf1bb1038e4dac8d521
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ff885625298f83785b7db1b95af051a080aab7b4
+Message-Id: <174438602795.317646.14614437756587686675.pr-tracker-bot@kernel.org>
+Date: Fri, 11 Apr 2025 15:40:27 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] 2nd set of block fixes for 6.15-rc2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+The pull request you sent on Fri, 11 Apr 2025 09:07:31 -0600:
 
-Apparently my internal clock was off, or perhaps it was just wishful
-thinking, but I sent out block fixes yesterday as my brain assumed it
-was Friday. Subsequently, that missed the NVMe fixes that should go into
-this weeks release as well. Hence, here's a followup with those, and
-another simple fix.
+> git://git.kernel.dk/linux.git tags/block-6.15-20250411
 
-This pull request contains:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ff885625298f83785b7db1b95af051a080aab7b4
 
-- NVMe pull request via Christoph
-	- nvmet fc/fcloop refcounting fixes (Daniel Wagner)
-	- fix missed namespace/ANA scans (Hannes Reinecke)
-	- fix a use after free in the new TCP netns support
-	  (Kuniyuki Iwashima)
-	- fix a NULL instead of false review in multipath (Uday Shankar)
-
-- Use strscpy() for null_blk disk name copy
-
-Please pull!
-
-
-The following changes since commit 843c6cec1af85f05971b7baf3704801895e77d76:
-
-  ublk: pass ublksrv_ctrl_cmd * instead of io_uring_cmd * (2025-04-09 07:58:04 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.15-20250411
-
-for you to fetch changes up to 3b607b75a345b1d808031bf1bb1038e4dac8d521:
-
-  null_blk: Use strscpy() instead of strscpy_pad() in null_add_dev() (2025-04-11 07:10:46 -0600)
-
-----------------------------------------------------------------
-block-6.15-20250411
-
-----------------------------------------------------------------
-Daniel Wagner (8):
-      nvmet-fcloop: swap list_add_tail arguments
-      nvmet-fcloop: replace kref with refcount
-      nvmet-fcloop: add ref counting to lport
-      nvmet-fc: inline nvmet_fc_delete_assoc
-      nvmet-fc: inline nvmet_fc_free_hostport
-      nvmet-fc: update tgtport ref per assoc
-      nvmet-fc: take tgtport reference only once
-      nvmet-fc: put ref when assoc->del_work is already scheduled
-
-Hannes Reinecke (2):
-      nvme: requeue namespace scan on missed AENs
-      nvme: re-read ANA log page after ns scan completes
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.15-2025-04-10' of git://git.infradead.org/nvme into block-6.15
-
-Kuniyuki Iwashima (1):
-      nvme-tcp: fix use-after-free of netns by kernel TCP socket.
-
-Thorsten Blum (1):
-      null_blk: Use strscpy() instead of strscpy_pad() in null_add_dev()
-
-Uday Shankar (1):
-      nvme: multipath: fix return value of nvme_available_path
-
- drivers/block/null_blk/main.c |  2 +-
- drivers/nvme/host/core.c      |  9 ++++++
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/tcp.c       |  2 ++
- drivers/nvme/target/fc.c      | 60 ++++++++++++-----------------------
- drivers/nvme/target/fcloop.c  | 74 +++++++++++++++++++++++--------------------
- 6 files changed, 73 insertions(+), 76 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
