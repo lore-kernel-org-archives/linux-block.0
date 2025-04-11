@@ -1,96 +1,231 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78F31E0DE4
-	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 13:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB061DE2DB
+	for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 15:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744379319; cv=none; b=qLFbHAaCCiwMGrcg2/hZlwEZhDgd0Vpjd6AhuddlBSpN5VA4qTue4ZIBC92k+b7eupKfkTc11g/FKwTjEAVlwC7nTo3aHjLAfzkHLpTTNHC77GTACLSpP2m+iA6n07O9IEqH1q04eYrluyQ7UOK4yIo8U8VMmP+tzyb/7sZcDRo=
+	t=1744383738; cv=none; b=fgTnUCHflbm96YW0rknZZtuEacqwtmE9l8oJwW0VVEE1Ex/neuX/j8yqxMv7lPrqVrVsTIj5GRiD9+bNhYqROpDZWkB99aEKFBO0/RJXYlTNgtpR/JxK4Qw2jDFD2WtiKk1rlkH4yZMcmCRKwnWrShy6zevW2sS/ZNau5tCF0OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744379319; c=relaxed/simple;
-	bh=FppYHN/qu2n9iiq/ee/to1M0y8WJPMP+sy5NMHu2ZbA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=nn8HvUKujmNvI6PanytzOGjeuuw/mcSR/fiH0kr+IPaszvKTCiaIyaVe9JCSG5wzi/Wj2wKW5/lgNWOCF/qfhii8ZeO7X6FFG3TfSjZ+bNSz77jNWdzj9InTaX2g/3AmmwbEPyP6opoT3OUzgxD3XcDlC1yyMBFs3xbtWlrS/RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Buc3s8mA; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1744383738; c=relaxed/simple;
+	bh=aT/j4R3ClgLfSmOmk47bRWvhhwQLbLdMsUjKzJ/0rmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHBQY8dk6UwnyxI0g94LEX0y+beaDi9a2Z11kXUIhpSnyOO1Gdgt1O9/UqzVQLpbnoIuYbGVuj1WAdgEqofmNXYQ45Spj6nmvlNemW7RaPbBiVZ6QlNLXtRu0gdWlKlwOglsKo3HAGD7pgPM9ZBfluD/r6RD3RrGxS4g+2BCqg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oe8tDwql; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Buc3s8mA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oe8tDwql"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744379316;
+	s=mimecast20190719; t=1744383735;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ziVNbANRmyi0790QzmsXdsF0qsho9qMRA3TbDUmAaDs=;
-	b=Buc3s8mAmhVLSFE0SruRzfFAAPfGXiQXiKuIGr4Og90sY/7USuWEqIkw5SJhO6jR2dP/0X
-	lchwUwwmpDXN3vGAUeTR9gOPtq+3mndSYNyUZ8+qBMpwgQeX1o2tDm9/fXE263MWk/4sEE
-	OEmS2Zj+SFTgR5oAAlKTSo5fDYRsJ34=
+	bh=72lMSuh+Z5IG+q97iGfYQ0hz+ctmfRs9qbF9OFNZI3A=;
+	b=Oe8tDwqlJRXg+6poSJw2xAQj94QCtBAqcAvrDp5qpy3wT/SKWoB4/dnOzWnqCieIAQt8hR
+	NxDQkb8VnMEDkhH8lJFqvcHL7CKYJHcf2bEQDME0HsS2WqhTP2anZfyJpz093q8ubLHAyF
+	Xex86NpenBavFkLFLinNcv2pu1peCIc=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-443-NhptXqgLMby4Ox9QW00kSA-1; Fri,
- 11 Apr 2025 09:48:33 -0400
-X-MC-Unique: NhptXqgLMby4Ox9QW00kSA-1
-X-Mimecast-MFC-AGG-ID: NhptXqgLMby4Ox9QW00kSA_1744379312
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-27-ocm27zhmOLq00i6B3p7utA-1; Fri,
+ 11 Apr 2025 11:02:10 -0400
+X-MC-Unique: ocm27zhmOLq00i6B3p7utA-1
+X-Mimecast-MFC-AGG-ID: ocm27zhmOLq00i6B3p7utA_1744383729
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 836321956087;
-	Fri, 11 Apr 2025 13:48:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.40])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0297619560AD;
-	Fri, 11 Apr 2025 13:48:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <f2b15e2f951e249e98f33b07ee261b9898dd41d3.camel@ibm.com>
-References: <f2b15e2f951e249e98f33b07ee261b9898dd41d3.camel@ibm.com> <20250313233341.1675324-1-dhowells@redhat.com> <20250313233341.1675324-7-dhowells@redhat.com>
-To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
-Cc: dhowells@redhat.com, Alex Markuze <amarkuze@redhat.com>,
-    "slava@dubeyko.com" <slava@dubeyko.com>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "idryomov@gmail.com" <idryomov@gmail.com>,
-    "jlayton@kernel.org" <jlayton@kernel.org>,
-    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-    "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-    "dongsheng.yang@easystack.cn" <dongsheng.yang@easystack.cn>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 06/35] rbd: Use ceph_databuf for rbd_obj_read_sync()
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17B7619560AD;
+	Fri, 11 Apr 2025 15:02:08 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.17])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C9791801A69;
+	Fri, 11 Apr 2025 15:02:01 +0000 (UTC)
+Date: Fri, 11 Apr 2025 23:01:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	"yukuai (C)" <yukuai3@huawei.com>, WoZ1zh1 <wozizhi@huawei.com>
+Subject: Re: [PATCH 3/3] blk-throttle: carry over directly
+Message-ID: <Z_ku5L3sVZbHdbQ_@fedora>
+References: <20250305043123.3938491-1-ming.lei@redhat.com>
+ <20250305043123.3938491-4-ming.lei@redhat.com>
+ <14e6c54f-d0d9-0122-1e47-c8a56adbd5db@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2370586.1744379306.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Apr 2025 14:48:26 +0100
-Message-ID: <2370587.1744379306@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <14e6c54f-d0d9-0122-1e47-c8a56adbd5db@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Viacheslav Dubeyko <Slava.Dubeyko@ibm.com> wrote:
+On Fri, Apr 11, 2025 at 10:53:12AM +0800, Yu Kuai wrote:
+> Hi, Ming
+> 
+> 在 2025/03/05 12:31, Ming Lei 写道:
+> > Now ->carryover_bytes[] and ->carryover_ios[] only covers limit/config
+> > update.
+> > 
+> > Actually the carryover bytes/ios can be carried to ->bytes_disp[] and
+> > ->io_disp[] directly, since the carryover is one-shot thing and only valid
+> > in current slice.
+> > 
+> > Then we can remove the two fields and simplify code much.
+> > 
+> > Type of ->bytes_disp[] and ->io_disp[] has to change as signed because the
+> > two fields may become negative when updating limits or config, but both are
+> > big enough for holding bytes/ios dispatched in single slice
+> > 
+> > Cc: Tejun Heo <tj@kernel.org>
+> > Cc: Josef Bacik <josef@toxicpanda.com>
+> > Cc: Yu Kuai <yukuai3@huawei.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   block/blk-throttle.c | 49 +++++++++++++++++++-------------------------
+> >   block/blk-throttle.h |  4 ++--
+> >   2 files changed, 23 insertions(+), 30 deletions(-)
+> > 
+> > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> > index 7271aee94faf..91dab43c65ab 100644
+> > --- a/block/blk-throttle.c
+> > +++ b/block/blk-throttle.c
+> > @@ -478,8 +478,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+> >   {
+> >   	tg->bytes_disp[rw] = 0;
+> >   	tg->io_disp[rw] = 0;
+> > -	tg->carryover_bytes[rw] = 0;
+> > -	tg->carryover_ios[rw] = 0;
+> >   	/*
+> >   	 * Previous slice has expired. We must have trimmed it after last
+> > @@ -498,16 +496,14 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+> >   }
+> >   static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
+> > -					  bool clear_carryover)
+> > +					  bool clear)
+> >   {
+> > -	tg->bytes_disp[rw] = 0;
+> > -	tg->io_disp[rw] = 0;
+> > +	if (clear) {
+> > +		tg->bytes_disp[rw] = 0;
+> > +		tg->io_disp[rw] = 0;
+> > +	}
+> >   	tg->slice_start[rw] = jiffies;
+> >   	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
+> > -	if (clear_carryover) {
+> > -		tg->carryover_bytes[rw] = 0;
+> > -		tg->carryover_ios[rw] = 0;
+> > -	}
+> >   	throtl_log(&tg->service_queue,
+> >   		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
+> > @@ -617,20 +613,16 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+> >   	 */
+> >   	time_elapsed -= tg->td->throtl_slice;
+> >   	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
+> > -					     time_elapsed) +
+> > -		     tg->carryover_bytes[rw];
+> > -	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed) +
+> > -		  tg->carryover_ios[rw];
+> > +					     time_elapsed);
+> > +	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
+> >   	if (bytes_trim <= 0 && io_trim <= 0)
+> >   		return;
+> > -	tg->carryover_bytes[rw] = 0;
+> >   	if ((long long)tg->bytes_disp[rw] >= bytes_trim)
+> >   		tg->bytes_disp[rw] -= bytes_trim;
+> >   	else
+> >   		tg->bytes_disp[rw] = 0;
+> > -	tg->carryover_ios[rw] = 0;
+> >   	if ((int)tg->io_disp[rw] >= io_trim)
+> >   		tg->io_disp[rw] -= io_trim;
+> >   	else
+> > @@ -645,7 +637,8 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+> >   		   jiffies);
+> >   }
+> > -static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
+> > +static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
+> > +				  long long *bytes, int *ios)
+> >   {
+> >   	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
+> >   	u64 bps_limit = tg_bps_limit(tg, rw);
+> > @@ -658,26 +651,28 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
+> >   	 * configuration.
+> >   	 */
+> >   	if (bps_limit != U64_MAX)
+> > -		tg->carryover_bytes[rw] +=
+> > -			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+> > +		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+> >   			tg->bytes_disp[rw];
+> >   	if (iops_limit != UINT_MAX)
+> > -		tg->carryover_ios[rw] +=
+> > -			calculate_io_allowed(iops_limit, jiffy_elapsed) -
+> > +		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
+> >   			tg->io_disp[rw];
+> > +	tg->bytes_disp[rw] -= *bytes;
+> > +	tg->io_disp[rw] -= *ios;
+> 
+> This patch is applied before I get a chance to review. :( I think the
+> above update should be:
 
-> > +	dbuf =3D ceph_databuf_req_alloc(1, sizeof(*ondisk), GFP_KERNEL);
-> =
+oops, your review period takes too long(> 1 month), :-(
 
-> I am slightly worried about such using of ondisk variable. We have garba=
-ge as a
-> value of ondisk pointer on this step yet. And pointer dereferencing coul=
-d look
-> confusing here. Also, potentially, compiler and static analysis tools co=
-uld
-> complain. I don't see a problem here but anyway I am feeling worried. :)
+> 
+> tg->bytes_disp[rw] = -*bytes;
+> tg->io_disp[rw] = -*ios;
 
-It's a sizeof() construction.  We do this all the time:
+I think the above is wrong since it simply override the existed dispatched
+bytes/ios.
 
-	struct fred *p;
+The calculation can be understood from two ways:
 
-	p =3D kmalloc(sizeof(*p), GFP_KERNEL);
+1) delta = calculate_bytes_allowed(bps_limit, jiffy_elapsed) - tg->bytes_disp[rw];
 
-David
+`delta` represents difference between theoretical and actual dispatch bytes.
+
+If `delta` > 0, it means we dispatch too less in past, and we have to subtract
+`delta` from ->bytes_disp, so that in future we can dispatch more.
+
+Similar with 'delta < 0'.
+
+2) from consumer viewpoint:
+
+tg_within_bps_limit(): patched
+
+	...
+	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
+	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+		...
+
+tg_within_bps_limit(): before patched
+	...
+    bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
+		tg->carryover_bytes[rw];
+	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+		...
+
+So if `delta` is subtracted from `bytes_allowed` in patched code, we should
+subtract same bytes from ->byte_disp[] side for maintaining the relation.
+
+
+> 
+> Otherwise, the result is actually (2 * disp - allowed), which might be a
+> huge value, causing long dealy for the next dispatch.
+> 
+> This is what the old carryover fileds do, above change will work, but
+> look wried.
+
+As I explained, the patched code follows the original carryover calculation, and it
+passes all throt blktests.
+
+Or do you have test case broken by this patch?
+
+
+
+Thanks.
+Ming
 
