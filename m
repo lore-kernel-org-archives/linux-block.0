@@ -1,168 +1,114 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFC314A62A
-	for <linux-block@vger.kernel.org>; Sat, 12 Apr 2025 05:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6FE18BC1D;
+	Sat, 12 Apr 2025 07:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744435711; cv=none; b=YfUib5L2hjw51FL+sfXzHCcY6qEqiZjMdSz6oD0OuQgJpafzpfHizAhJLaeUSCMXghPp6TKYGAeQIh/0UcZUHZvWLu/Y1NfyvLwANmeylPDM9MIg/h/c1dY5GX25LGCIJ6nGK88Dk3jTgpY5y8+dqCjf16F7TEC7IzAMx4JpuK0=
+	t=1744443534; cv=none; b=jA3aHLEkYNfBLCVzhre/0hLdfwOUAwRxTHIVuqiYSQaCwNkal9/RNpMsHuT7/8vBvkPqdOCziUmJuvhdgf777KOMme1C3K2/7WcsuqwQqY9Hs67hKTtS2QN8ELVLI0zrusBT11gMc9kIH3Ct/p4Tap1+a5kqqIzAjkiaon8q7LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744435711; c=relaxed/simple;
-	bh=vsgLSBOTSiRtvtmw2Vo1/bXr0FCm0q0B8MGzMVsCmjY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y2RpsWYmN4MHxDsHFhocszkQY5qDNYrpslkydKBaFzpyKvSvPhYm963ACF4c+sEj2fla7j0fQ8ZhR39BRBcxIJSWvaa6LAqvXikRF7cOZnp1uTXsa50Q1JhJ4VNh7MgfZ/I5HoeJ6THvuPfDzZ1clfMglZo12fHdBuFkZ27AzDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d43d333855so22215575ab.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Apr 2025 22:28:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744435708; x=1745040508;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fshlYPmQ7QdF9X67GnUsOZ/655gHBJtZ94SgllsrcCk=;
-        b=cpJG/kyfrEQ+lFMSeZGUCSju8E9V8LLzTE+SDTL0BtMUhwrwxt7lm8+CjKOe9qD2BG
-         p+ttZxUMexuleaDHSWppzaKMDgnH+r+efKto+UAOKyboiPDalpry7x3hvps4Fo+OZ1iU
-         0OhmgB4PLBalmC+f7pYgMG/MxjfSpAuySIxfRgme+RRwZjtfGfuKmc+/tdQEWOKhDrv6
-         zOp6DJCe5J+Vn8k0S7PWlqeZyMveYMqNjmW2I46FovvMoF7+bbfaKGzc9Ds31PlCMuYE
-         G/4YWihN7mpMKVyUATRpG5NyEQRG5ERgU58TEKWn58aypi9tEsokX2kNK8vgbpzAI+Sy
-         vtqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViBkKqnYjOgLpHwXxPSw5nYONJckZD7Pxm1UKdORZFjPJlGS9dtt848Jmv/oumgPuPx2x6KhaS39g/iA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi2s8PoeAl+DutPcsikHASGUsBsCBanDTGQmigF/qX8DAhp714
-	eRjTrG/ShnXfuBzDCzOtK9QlbilPEX9iec8izP42iZQZ9apTno0PuDvhBLk9c0xFECWfI7NzM2l
-	8YtS56IS1Rs02Lt7WkVMkpldzeCC/pWVSd1LBJ6vyuPsv3fVxD4qudBA=
-X-Google-Smtp-Source: AGHT+IF3p11549MuftLL6BjRV8V0Bletxi5uWDq/cU/7ytMrkj3IzsvM/kEJn2oYBWzmFzQdR/9/OZpHI+NVoVw9nt8I7daxHQm2
+	s=arc-20240116; t=1744443534; c=relaxed/simple;
+	bh=kubeogLQpHAXcRV4aoJBU/xNkOB3D8QMn02xuklfBvg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hmnQLFYiRT4E86k9tigJfBkdbSv4eNqEjWQTZD7DuStUG1zjFc2iMo6i3sDp+MGEXJTkwT8GDlX5dhsHWjACgPD4rozqOagkJ47KadLqvGVGmXRaEXntA4QmMi2/ExrpBym321x1C841ZyGunEGmqC0p/xOjZuv876MCA0yPUfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZZQQS1YG7z4f3jMV;
+	Sat, 12 Apr 2025 15:38:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id BEF531A06DE;
+	Sat, 12 Apr 2025 15:38:47 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCnC2CFGPpnI5n6JA--.63008S4;
+	Sat, 12 Apr 2025 15:38:47 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	song@kernel.org,
+	yukuai3@huawei.com,
+	xni@redhat.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH 0/4] md: fix is_mddev_idle()
+Date: Sat, 12 Apr 2025 15:31:58 +0800
+Message-Id: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b2f:b0:3d5:d743:8089 with SMTP id
- e9e14a558f8ab-3d7ec1fd1fdmr57598695ab.7.1744435708585; Fri, 11 Apr 2025
- 22:28:28 -0700 (PDT)
-Date: Fri, 11 Apr 2025 22:28:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f9f9fc.050a0220.379d84.0006.GAE@google.com>
-Subject: [syzbot] [block?] WARNING in bio_alloc_bioset
-From: syzbot <syzbot+a7d6ceaba099cc21dee4@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnC2CFGPpnI5n6JA--.63008S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4xuF18XF1ftr1ftw17trb_yoW8WFWDpF
+	WUZa4SvFyj9r9xZr9xJw10yFyrt3yfA390qFy3A348Z3Z8XryrtF43tw4Sq34kJ393Aa42
+	q3W5Ga98C3WjyrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hello,
+From: Yu Kuai <yukuai3@huawei.com>
 
-syzbot found the following issue on:
+If sync_speed is above speed_min, then is_mddev_idle() will be called
+for each sync IO to check if the array is idle, and inflihgt sync_io
+will be limited if the array is not idle.
 
-HEAD commit:    7702d0130dc0 Add linux-next specific files for 20250408
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d07a74580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=91edf513888f57d7
-dashboard link: https://syzkaller.appspot.com/bug?extid=a7d6ceaba099cc21dee4
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103f9070580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1489cc04580000
+However, while mkfs.ext4 for a large raid5 array while recovery is in
+progress, it's found that sync_speed is already above speed_min while
+lots of stripes are used for sync IO, causing long delay for mkfs.ext4.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0603dd3556b9/disk-7702d013.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d384baaee881/vmlinux-7702d013.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1ac172735b6c/bzImage-7702d013.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/27765a0fbde9/mount_0.gz
+Root cause is the following checking from is_mddev_idle():
 
-The issue was bisected to:
+t1: submit sync IO: events1 = completed IO - issued sync IO
+t2: submit next sync IO: events2  = completed IO - issued sync IO
+if (events2 - events1 > 64)
 
-commit f4e35e5f940c0e1ca83ff6274883f7b7eaba04df
-Author: Kent Overstreet <kent.overstreet@linux.dev>
-Date:   Sat Apr 5 21:36:04 2025 +0000
+For consequence, the more sync IO issued, the less likely checking will
+pass. And when completed normal IO is more than issued sync IO, the
+condition will finally pass and is_mddev_idle() will return false,
+however, last_events will be updated hence is_mddev_idle() can only
+return false once in a while.
 
-    bcachefs: RO mounts now use less memory
+Fix this problem by changing the checking as following:
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12a3ed78580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11a3ed78580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16a3ed78580000
+1) mddev doesn't have normal IO completed;
+2) mddev doesn't have normal IO inflight;
+3) if any member disks is partition, and all other partitions doesn't
+   have IO completed.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a7d6ceaba099cc21dee4@syzkaller.appspotmail.com
-Fixes: f4e35e5f940c ("bcachefs: RO mounts now use less memory")
+Yu Kuai (4):
+  block: export part_in_flight()
+  md: add a new api sync_io_depth
+  md: fix is_mddev_idle()
+  md: cleanup accounting for issued sync IO
 
-bcachefs (loop0): dropping and reconstructing all alloc info
-bcachefs (loop0): accounting_read... done
-bcachefs (loop0): alloc_read... done
-bcachefs (loop0): snapshots_read... done
-bcachefs (loop0): done starting filesystem
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5831 at block/bio.c:512 bio_alloc_bioset+0xd61/0x1130 block/bio.c:512
-Modules linked in:
-CPU: 1 UID: 0 PID: 5831 Comm: syz-executor169 Not tainted 6.15.0-rc1-next-20250408-syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:bio_alloc_bioset+0xd61/0x1130 block/bio.c:512
-Code: db f6 ff 81 ce 00 20 09 00 e8 db dd 3f fd 48 85 c0 0f 84 a1 00 00 00 48 89 c5 e8 0a 55 e1 fc e9 7a f8 ff ff e8 00 55 e1 fc 90 <0f> 0b 90 e9 7b fb ff ff e8 f2 54 e1 fc 90 0f 0b 90 44 8b 7c 24 20
-RSP: 0018:ffffc90003f5f050 EFLAGS: 00010293
-RAX: ffffffff84e1f000 RBX: 0000000000000000 RCX: ffff888021b29e00
-RDX: 0000000000000000 RSI: 0000000000000100 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: ffffffff84e1e304 R09: 1ffffd4000143e38
-R10: dffffc0000000000 R11: fffff94000143e39 R12: 0000000000000100
-R13: 0000000000000cc0 R14: 0000000000000001 R15: 0000000000000100
-FS:  0000555556118380(0000) GS:ffff888125089000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdad858000 CR3: 000000007ed30000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bch2_writepage_io_alloc fs/bcachefs/fs-io-buffered.c:510 [inline]
- __bch2_writepage+0x1624/0x2780 fs/bcachefs/fs-io-buffered.c:644
- write_cache_pages+0xd2/0x240 mm/page-writeback.c:2613
- bch2_writepages+0x158/0x390 fs/bcachefs/fs-io-buffered.c:675
- do_writepages+0x38c/0x640 mm/page-writeback.c:2635
- filemap_fdatawrite_wbc mm/filemap.c:386 [inline]
- __filemap_fdatawrite_range mm/filemap.c:419 [inline]
- filemap_write_and_wait_range+0x2ac/0x3d0 mm/filemap.c:691
- bchfs_truncate+0x77c/0xc60 fs/bcachefs/fs-io.c:-1
- notify_change+0xbca/0xe90 fs/attr.c:552
- do_truncate+0x222/0x310 fs/open.c:65
- vfs_truncate+0x4a6/0x540 fs/open.c:115
- do_sys_truncate+0xd8/0x190 fs/open.c:138
- __do_sys_truncate fs/open.c:150 [inline]
- __se_sys_truncate fs/open.c:148 [inline]
- __x64_sys_truncate+0x5b/0x70 fs/open.c:148
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f504c2996b9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdad857aa8 EFLAGS: 00000246 ORIG_RAX: 000000000000004c
-RAX: ffffffffffffffda RBX: 0031656c69662f2e RCX: 00007f504c2996b9
-RDX: 00007f504c2989b0 RSI: 0000000000000002 RDI: 0000200000000800
-RBP: 0000200000000000 R08: 00000000000058fd R09: 0000000000000000
-R10: 00007ffdad857970 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffdad857c88 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+ block/blk.h               |   1 -
+ block/genhd.c             |   1 +
+ drivers/md/md.c           | 181 ++++++++++++++++++++++++++------------
+ drivers/md/md.h           |  15 +---
+ drivers/md/raid1.c        |   3 -
+ drivers/md/raid10.c       |   9 --
+ drivers/md/raid5.c        |   8 --
+ include/linux/blkdev.h    |   1 -
+ include/linux/part_stat.h |   1 +
+ 9 files changed, 130 insertions(+), 90 deletions(-)
 
+-- 
+2.39.2
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
