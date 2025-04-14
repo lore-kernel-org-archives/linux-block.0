@@ -1,110 +1,151 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0157D45C18;
-	Mon, 14 Apr 2025 06:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6CC278144
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 07:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744613316; cv=none; b=bmB4kaXzANVkpgS1XCxMU3GoD96ekNhdUJh5lFqQ/uubWwhnu0aEnBX4ouakyWCyDSQlJypjXEj2jlerqxn1py2AfqKu5mtmAMJxB2kr9cgh3o/gG5AsizcG4mfXCW2Vq5BWZ6nWzUuS5Wk+vULyRCwYd0ORjXDNBV5yMxdZu24=
+	t=1744616146; cv=none; b=IZ8yug/MvisiiWSoJZIdukZcqtjgxxzJ6pJH7azu4N6lzsMeH3ejOGlYOSAk0xUG3F1IbztyM/FgCbCXERtiyRA43tSCWajx6jYtEgxidP9x1kAInB8/1ObZOhsnuyEqBUh8qwmlN1qvcUMx5rlhZO188BALqq+RmpcfgduIPEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744613316; c=relaxed/simple;
-	bh=xOklMPqVNN1X1dewtku3L5mCtFujrl6xMsh3ab6ehfA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=lWKfdFRIL1+R7YbB0qTpT8bmguiNOEK9CnRVzqWzsFc05OeK8r5lpalDy0aj8aNjsTVKqLR9bqHtRTe1uVsOzDDteFE+ukn/6AZXhhT+eE+HZXX1sAdUGWUN2kOYF0YKUCis1Z+G2puli8vKQbccXMi00jA1EWWpiHz/YAIw1cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZbdCN6jVtz4f3lDG;
-	Mon, 14 Apr 2025 14:48:00 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 1D9801A0847;
-	Mon, 14 Apr 2025 14:48:26 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAXe1+4r_xnsGu_JQ--.24636S3;
-	Mon, 14 Apr 2025 14:48:25 +0800 (CST)
-Subject: Re: [PATCH 1/4] block: export part_in_flight()
-To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, song@kernel.org, xni@redhat.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
- <20250412073202.3085138-2-yukuai1@huaweicloud.com>
- <Z_yr67xrbkuQwy0P@infradead.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <12e79682-21a3-9389-9390-14702d6ca389@huaweicloud.com>
-Date: Mon, 14 Apr 2025 14:48:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1744616146; c=relaxed/simple;
+	bh=Ou2vOurVWHondECFpfTMtcoZVsobG8aP/abnWazjfsk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A8wIfjQrrzjWrxEeeUjsjFCKy4O3I03WiuFXDvfMWgXm+X62+oNtXcousHqlNW7LqICbmoCevNgeceKOlc8GN65nPe2feenHqlVt45DXeDPjGbfoImgHAjZycIQgegwJYThNGSs5ZyfN/9CajkxwBKMBaFY20wfQIYdE9RQr+xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1u4ELw-0002p3-QH; Mon, 14 Apr 2025 09:35:36 +0200
+Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1u4ELv-000DDx-2u;
+	Mon, 14 Apr 2025 09:35:35 +0200
+Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
+	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1u4ELv-00BnLF-2i;
+	Mon, 14 Apr 2025 09:35:35 +0200
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Date: Mon, 14 Apr 2025 09:35:31 +0200
+Subject: [PATCH v3] docs: ABI: replace mcroce@microsoft.com with new Meta
+ address
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z_yr67xrbkuQwy0P@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXe1+4r_xnsGu_JQ--.24636S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1ftF1xuw1rZF4ftF1xuFg_yoW8Gr4rpF
-	4ftayUAr4Dur18ZF17ta13Za40yws0gr13Zr1rAr93XrZ8KrySkw10gws8Ka4Sva97tw47
-	Wa1S9F97CF48A37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250414-fix-mcroce-mail-bounce-v3-1-0aed2d71f3d7@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAMK6/GcC/4XNQQ6DIBAF0Ks0rEvDIKJ01Xs0XSiOSlLBgBIb4
+ 92LJl01TXfzJ3/erCSgNxjI9bQSj9EE42wK2flEdF/ZDqlpUiaccQEcFG3NQgftnUY6VOZJazf
+ bNGe8VIyBVILlJB2PHlPzgO+PlHsTJudfx58I+/YvGYECFSpVQNaSSXYb0Xbz5J01y6VBsruRf
+ 6yccSh+WjxZWKqiFTXkuvy2tm17AyCCJoINAQAA
+X-Change-ID: 20241219-fix-mcroce-mail-bounce-328900169405
+To: Matteo Croce <teknoraver@meta.com>, Jens Axboe <axboe@kernel.dk>, 
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>, linux-block@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel@pengutronix.de, Ahmad Fatoum <a.fatoum@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 
-Hi,
+The Microsoft email address is bouncing:
 
-ÔÚ 2025/04/14 14:32, Christoph Hellwig Ð´µÀ:
-> On Sat, Apr 12, 2025 at 03:31:59PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> This helper will be used in mdraid in later patches, check if there
->> are normal IO inflight while generating background sync IO, to fix a
->> problem in mdraid that foreground IO can be starved by background sync
->> IO.
-> 
-> If we export this it needs a kerneldoc comment, and probably also
-> a better name.
+    550 5.4.1 Recipient address rejected: Access denied.
 
-Sure about comment.
-> 
-> Looking at this I'm also a little confused about blk_mq_in_flight_rw vs
-> blk_mq_in_flight and why one needs blk-mq special casing and the other
-> not, maybe we need to dig into the history and try to understand that
-> as well while we're at it.
+So let's replace it with Matteo's current mail address.
 
-There are two kinds of helpers:
+Acked-by: Matteo Croce <teknoraver@meta.com>
+Link: https://lore.kernel.org/all/BYAPR15MB2504E4B02DFFB1E55871955DA1062@BYAPR15MB2504.namprd15.prod.outlook.com/
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+get_maintainers.pl picks off the stale address from the file otherwise
 
-1) part_in_flight and part_in_flight_rw
-2) blk_mq_in_flight and blk_mq_in_flight_rw
+[1]: https://lore.kernel.org/all/20241219-hw_protection-reboot-v1-6-263a0c1df802@pengutronix.de/
+---
+Changes in v3:
+- drop RFC prefix
+- Link to v2: https://lore.kernel.org/r/20250217-fix-mcroce-mail-bounce-v2-1-e897f4b15c80@pengutronix.de
 
-1) is accounted at blk_account_io_start(), while 2) is
-blk_mq_start_request(), I think this is the essential difference.
+Changes in v2:
+- Added Matteo's Acked-by 
+- Link to v1: https://lore.kernel.org/r/20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de
+---
+ Documentation/ABI/stable/sysfs-block          |  2 +-
+ Documentation/ABI/testing/sysfs-kernel-reboot | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-part_in_flight_rw() and blk_mq_in_flight_rw() is also used in sysfs API
-inflight for bio/rq based device. And commit 7be835694dae ("block: fix
-that util can be greater than 100%") convert blk_mq_in_flight() to
-part_in_flight() from disk stats API. Now I just checked there is no use
-for blk_mq_in_flight() anymore and maybe it can be removed.
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 3879963f0f01e5f291e40bb7cf3fb638e7a61d6b..11545c9e2e93f2a15637cef6309d875c4ce8e385 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -77,7 +77,7 @@ Description:
+ 
+ What:		/sys/block/<disk>/diskseq
+ Date:		February 2021
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:
+ 		The /sys/block/<disk>/diskseq files reports the disk
+ 		sequence number, which is a monotonically increasing
+diff --git a/Documentation/ABI/testing/sysfs-kernel-reboot b/Documentation/ABI/testing/sysfs-kernel-reboot
+index e117aba46be0e8d3cdff3abfb678f8847a726122..52571fd5ddba517b86bed8867fe6b84c8ed7a6b9 100644
+--- a/Documentation/ABI/testing/sysfs-kernel-reboot
++++ b/Documentation/ABI/testing/sysfs-kernel-reboot
+@@ -1,7 +1,7 @@
+ What:		/sys/kernel/reboot
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Interface to set the kernel reboot behavior, similarly to
+ 		what can be done via the reboot= cmdline option.
+ 		(see Documentation/admin-guide/kernel-parameters.txt)
+@@ -9,25 +9,25 @@ Description:	Interface to set the kernel reboot behavior, similarly to
+ What:		/sys/kernel/reboot/mode
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Reboot mode. Valid values are: cold warm hard soft gpio
+ 
+ What:		/sys/kernel/reboot/type
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Reboot type. Valid values are: bios acpi kbd triple efi pci
+ 
+ What:		/sys/kernel/reboot/cpu
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	CPU number to use to reboot.
+ 
+ What:		/sys/kernel/reboot/force
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Don't wait for any other CPUs on reboot and
+ 		avoid anything that could hang.
+ 
 
-Thanks,
-Kuai
+---
+base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
+change-id: 20241219-fix-mcroce-mail-bounce-328900169405
 
-> 
-> 
-> .
-> 
+Best regards,
+-- 
+Ahmad Fatoum <a.fatoum@pengutronix.de>
 
