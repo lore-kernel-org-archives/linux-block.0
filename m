@@ -1,59 +1,59 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB33E208CA
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 00:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3974C74
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 00:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744592135; cv=none; b=AUYYa0CLZLzftFitfTGb/o3Rp+ofg+buccNrkqCu7+9Gi5dyv6jIEyi+IIZtcDI2s5JMOOLJv//2iCIMVPsTn1KG9M0EimluC79cmQrKtLmxtsEU0t4GpFxuUJ2z+oOKWu1+/q0TXfSNOD/ZdrIB0vpo5Zd/eWCGjwxzTk3aTt0=
+	t=1744592327; cv=none; b=bpPIm1OahHMxyoOucRrLnEY2wUtwoD5J1DChN0TduuGNNd6gFtMYh2cjyf7Leo4xnPhDHX3HiuXMNMQrFhKox+57M7yWFZMqdUVRhFsFJ5U73GKpb0BbMIMPVHnbZYCc57yUJTS63TFwnpTZzdLEPABNgQSsdxZ9FX9+L9kjc5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744592135; c=relaxed/simple;
-	bh=+teflM9yIK20a1XvjKacPLlsA21Ud1Gt5/waAqiHqEc=;
+	s=arc-20240116; t=1744592327; c=relaxed/simple;
+	bh=BHttNAQagST3r+Wide3RswlPGtBHMuEMCnnKMMZBkXk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bus65cVCVudzmL3hO75Tp60S54JiA/+O+4hH9DXUyTJn/vGSa4MXi9D0umpBytt96z0JsMB2XG5zLWL2YuSQ1my1oZWx6ssYlfmnvoE1f26pp7eVcmiaMFr02O1ywtcBD8exafIgcTBlLCh5P8n9t3LRyRms5bvlHXc6pnt0Z+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DY6WTgd7; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=LxdlGWrZsB48iefU9KM6ZXa4NWr/BmHnD3NwMaznEmZkxTjYQdlvNzSBa7L2Itkp2XukPuqRSawYMhRX45JxHvgcEaO89otjl4YU8g/ohLcMQUEbCcCYw/5bROgXD7dTwNXu6y4qKRMavXCGkN/scglc8ANHgqvL2oAUjZVKNyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xc91dN9l; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DY6WTgd7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xc91dN9l"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744592132;
+	s=mimecast20190719; t=1744592323;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HZLjRmlbciFswUQshINmucgQXfNIrjs1CXpBzzmy29c=;
-	b=DY6WTgd7oRYFx2FRy50QE0l7x7qU1M3S+Yfg8iPZH6l4rimSKd7s3uE35LGtBFvvbJJddw
-	9KUbrUSvg7zcHXLXhj7q45mHAQ48xFTAYdLIzCGF0tGmDLq+OoiXN8Hb06E+4iOvgwt4/e
-	5vPeuD4+8Q9fsrs2UnQ8anE4RCuToOU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=EaXq5xRhNbiz4XL7USNPWFoTiL4W4wUXCuVe4kQn6yk=;
+	b=Xc91dN9lOzLoukWta4DdwVlxMeSKgiiOQGWmqqrmWT3TtS2Jin656o35uKeNNvxJDpA+sw
+	NVhT40iOw1+u4m3hHdbR/RM0KehEyt7VdkUzSWTSsIbTEPM3cL2Mh2NaeiJr9lywwdgfu2
+	QWl51QEdS+ShZXKcJ/NoFST7uvX7Qbg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-152-wxUPaQ3DN22X1dO2zW_c_Q-1; Sun,
- 13 Apr 2025 20:55:26 -0400
-X-MC-Unique: wxUPaQ3DN22X1dO2zW_c_Q-1
-X-Mimecast-MFC-AGG-ID: wxUPaQ3DN22X1dO2zW_c_Q_1744592123
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-Ls6k-oHqOASyLtPCvsQPwA-1; Sun,
+ 13 Apr 2025 20:58:40 -0400
+X-MC-Unique: Ls6k-oHqOASyLtPCvsQPwA-1
+X-Mimecast-MFC-AGG-ID: Ls6k-oHqOASyLtPCvsQPwA_1744592319
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B709195609F;
-	Mon, 14 Apr 2025 00:55:23 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4884180034D;
+	Mon, 14 Apr 2025 00:58:38 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.68])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F174E1808867;
-	Mon, 14 Apr 2025 00:55:18 +0000 (UTC)
-Date: Mon, 14 Apr 2025 08:55:14 +0800
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 36355180B488;
+	Mon, 14 Apr 2025 00:58:33 +0000 (UTC)
+Date: Mon, 14 Apr 2025 08:58:28 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
+To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
 	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 04/15] block: prevent elevator switch during updating
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+Subject: Re: [PATCH 05/15] block: simplify elevator reset for updating
  nr_hw_queues
-Message-ID: <Z_xc8hbIKb23bjtX@fedora>
+Message-ID: <Z_xdtNiZb38ubXVe@fedora>
 References: <20250410133029.2487054-1-ming.lei@redhat.com>
- <20250410133029.2487054-5-ming.lei@redhat.com>
- <3c4350f4-4ab3-493f-b948-22f093e97d16@linux.ibm.com>
+ <20250410133029.2487054-6-ming.lei@redhat.com>
+ <20250410153417.GA12430@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,38 +62,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3c4350f4-4ab3-493f-b948-22f093e97d16@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250410153417.GA12430@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Sat, Apr 12, 2025 at 12:43:10AM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 4/10/25 7:00 PM, Ming Lei wrote:
-> > @@ -5081,7 +5087,18 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >  void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
-> >  {
-> >  	mutex_lock(&set->tag_list_lock);
-> > +	/*
-> > +	 * Mark us in updating nr_hw_queues for preventing switching
-> > +	 * elevator
-> > +	 *
-> > +	 * Elevator switch code can _not_ acquire ->tag_list_lock
-> > +	 */
-> > +	set->flags |= BLK_MQ_F_UPDATE_HW_QUEUES;
-> > +	synchronize_srcu(&set->update_nr_hwq_srcu);
+On Thu, Apr 10, 2025 at 05:34:18PM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 10, 2025 at 09:30:17PM +0800, Ming Lei wrote:
+> > @@ -5071,9 +4984,15 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+> >  		blk_mq_debugfs_register_hctxs(q);
+> >  	}
+> >  
+> > -switch_back:
+> > -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> > -		blk_mq_elv_switch_back(&head, q);
+> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> > +		const char *name = "none";
 > > +
-> >  	__blk_mq_update_nr_hw_queues(set, nr_hw_queues);
-> > +
-> > +	set->flags &= BLK_MQ_F_UPDATE_HW_QUEUES;
+> > +		mutex_lock(&q->elevator_lock);
+> > +		if (q->elevator && !blk_queue_dying(q))
+> > +			name = q->elevator->type->elevator_name;
+> > +		__elevator_change(q, name, true);
+> > +		mutex_unlock(&q->elevator_lock);
+> > +	}
 > 
-> I think here we want to clear BLK_MQ_F_UPDATE_HW_QUEUES, so we need to
-> have set->flags updated as below:
+> Coming back to this after looking through the next patches.
 > 
-> set->flags &= ~BLK_MQ_F_UPDATE_HW_QUEUES;
+> Why do we even need the __elevator_change call here?  We've not
+> actually disabled the elevator, and we prevent other callers
+> from changing it.
+> 
+> As you pass in the force argument this now always calls
+> elevator_switch and thus blk_mq_init_sched.  But why?
 
-Good catch!
+sched tags is built over hctx and depends on ->nr_hw_queues,
+when nr_hw_queues is changed, sched tags has to be rebuilt.
 
 
-Thanks,
+Thanks, 
 Ming
 
