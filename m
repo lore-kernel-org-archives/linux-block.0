@@ -1,151 +1,82 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail-10630.protonmail.ch (mail-10630.protonmail.ch [79.135.106.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6CC278144
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 07:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4501D27CB3B
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 10:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744616146; cv=none; b=IZ8yug/MvisiiWSoJZIdukZcqtjgxxzJ6pJH7azu4N6lzsMeH3ejOGlYOSAk0xUG3F1IbztyM/FgCbCXERtiyRA43tSCWajx6jYtEgxidP9x1kAInB8/1ObZOhsnuyEqBUh8qwmlN1qvcUMx5rlhZO188BALqq+RmpcfgduIPEY=
+	t=1744627991; cv=none; b=dCEDkHE4OWyXYQGgs2hbc0rDDBPoiPrumd1rxjOg2nM/QwPUHNBbXKLfwJzBqnUg5ZQeVQyvK2YAyZ7J0GwU2AQ6Kjt1N0pDOa+gnXFVh0L7UpM6OOkdsjAYEmEWneCggQYQAIPedvlT7sblWL4AMUnnxntGXkXI+Wl5JxqdVTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744616146; c=relaxed/simple;
-	bh=Ou2vOurVWHondECFpfTMtcoZVsobG8aP/abnWazjfsk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A8wIfjQrrzjWrxEeeUjsjFCKy4O3I03WiuFXDvfMWgXm+X62+oNtXcousHqlNW7LqICbmoCevNgeceKOlc8GN65nPe2feenHqlVt45DXeDPjGbfoImgHAjZycIQgegwJYThNGSs5ZyfN/9CajkxwBKMBaFY20wfQIYdE9RQr+xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1u4ELw-0002p3-QH; Mon, 14 Apr 2025 09:35:36 +0200
-Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1u4ELv-000DDx-2u;
-	Mon, 14 Apr 2025 09:35:35 +0200
-Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
-	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1u4ELv-00BnLF-2i;
-	Mon, 14 Apr 2025 09:35:35 +0200
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Date: Mon, 14 Apr 2025 09:35:31 +0200
-Subject: [PATCH v3] docs: ABI: replace mcroce@microsoft.com with new Meta
- address
+	s=arc-20240116; t=1744627991; c=relaxed/simple;
+	bh=hp/iT9vRY4WLbkXBJM0HMTKnmsgkT83gkCn0+xI8TDs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dDYwVvuoEQSIIzbM9dpjjyw06sfNHDtKJMZE+tBe0ubCdStCQM9K4dRhjoa2QUl9l3JRwWQM0woYPXxWRDeubklBKMJfdw7Xra9DepV4qcHkq47jy8jZsvUK5RC7t5y2snEcp1Q/rpbj5rMQHbCzg6ppVdLD3GD2IBGx7Zv8+9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=BegFfWdY; arc=none smtp.client-ip=79.135.106.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="BegFfWdY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=xkpzb5yfxnf2jeuzp7tothlcbe.protonmail; t=1744627980; x=1744887180;
+	bh=cGneafMdb7E/5GcVD98UZZZtBXjzJsDf2In9bf3AS80=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=BegFfWdYH4OhAyD9Vvv7x2GV3KDqo1ZdIa4E1vDwLL1zYU+n0iu7x/BeBvqz8KItD
+	 GDOj/qovBvhDYAgxwurvOPV4B5kaKfgzdIJK90kxmeSI/vZ9nc4wMn2yrjl83TNmRV
+	 aUtOAtPUFwMQ4obXOllmUTSJ1Hb4ggZEdjnCh2xk3po2dfCSfYaV5Fyjns7UdfevHL
+	 TpQNAPlce1lLPOQTB7WtXA13fie3Bytsq41rfbB3b5pSrw6cFQMzsIoPAxgH4iCGnJ
+	 PiyPMQARv9EXxWlP0kBJ4X5NI1T61eWT7rjmyhWhDFsYvfDDkxZgDbb0NKHMbDUr0R
+	 j3CebiM1XQJVw==
+Date: Mon, 14 Apr 2025 10:52:54 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 6/6] rust: enable `clippy::ref_as_ptr` lint
+Message-ID: <D96B00U9SS2Q.1YHLNBOIEWSNE@proton.me>
+In-Reply-To: <20250409-ptr-as-ptr-v8-6-3738061534ef@gmail.com>
+References: <20250409-ptr-as-ptr-v8-0-3738061534ef@gmail.com> <20250409-ptr-as-ptr-v8-6-3738061534ef@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 192a33aecbd50a9b6c4225576203521e98318959
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250414-fix-mcroce-mail-bounce-v3-1-0aed2d71f3d7@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAMK6/GcC/4XNQQ6DIBAF0Ks0rEvDIKJ01Xs0XSiOSlLBgBIb4
- 92LJl01TXfzJ3/erCSgNxjI9bQSj9EE42wK2flEdF/ZDqlpUiaccQEcFG3NQgftnUY6VOZJazf
- bNGe8VIyBVILlJB2PHlPzgO+PlHsTJudfx58I+/YvGYECFSpVQNaSSXYb0Xbz5J01y6VBsruRf
- 6yccSh+WjxZWKqiFTXkuvy2tm17AyCCJoINAQAA
-X-Change-ID: 20241219-fix-mcroce-mail-bounce-328900169405
-To: Matteo Croce <teknoraver@meta.com>, Jens Axboe <axboe@kernel.dk>, 
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>, linux-block@vger.kernel.org, 
- linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, Ahmad Fatoum <a.fatoum@pengutronix.de>
-X-Mailer: b4 0.14.2
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The Microsoft email address is bouncing:
+On Wed Apr 9, 2025 at 4:47 PM CEST, Tamir Duberstein wrote:
+> In Rust 1.78.0, Clippy introduced the `ref_as_ptr` lint [1]:
+>
+>> Using `as` casts may result in silently changing mutability or type.
+>
+> While this doesn't eliminate unchecked `as` conversions, it makes such
+> conversions easier to scrutinize.  It also has the slight benefit of
+> removing a degree of freedom on which to bikeshed. Thus apply the
+> changes and enable the lint -- no functional change intended.
+>
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#ref_as_pt=
+r [1]
+> Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> Link: https://lore.kernel.org/all/D8PGG7NTWB6U.3SS3A5LN4XWMN@proton.me/
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-    550 5.4.1 Recipient address rejected: Access denied.
-
-So let's replace it with Matteo's current mail address.
-
-Acked-by: Matteo Croce <teknoraver@meta.com>
-Link: https://lore.kernel.org/all/BYAPR15MB2504E4B02DFFB1E55871955DA1062@BYAPR15MB2504.namprd15.prod.outlook.com/
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-get_maintainers.pl picks off the stale address from the file otherwise
-
-[1]: https://lore.kernel.org/all/20241219-hw_protection-reboot-v1-6-263a0c1df802@pengutronix.de/
----
-Changes in v3:
-- drop RFC prefix
-- Link to v2: https://lore.kernel.org/r/20250217-fix-mcroce-mail-bounce-v2-1-e897f4b15c80@pengutronix.de
-
-Changes in v2:
-- Added Matteo's Acked-by 
-- Link to v1: https://lore.kernel.org/r/20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de
----
- Documentation/ABI/stable/sysfs-block          |  2 +-
- Documentation/ABI/testing/sysfs-kernel-reboot | 10 +++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 3879963f0f01e5f291e40bb7cf3fb638e7a61d6b..11545c9e2e93f2a15637cef6309d875c4ce8e385 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -77,7 +77,7 @@ Description:
- 
- What:		/sys/block/<disk>/diskseq
- Date:		February 2021
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:
- 		The /sys/block/<disk>/diskseq files reports the disk
- 		sequence number, which is a monotonically increasing
-diff --git a/Documentation/ABI/testing/sysfs-kernel-reboot b/Documentation/ABI/testing/sysfs-kernel-reboot
-index e117aba46be0e8d3cdff3abfb678f8847a726122..52571fd5ddba517b86bed8867fe6b84c8ed7a6b9 100644
---- a/Documentation/ABI/testing/sysfs-kernel-reboot
-+++ b/Documentation/ABI/testing/sysfs-kernel-reboot
-@@ -1,7 +1,7 @@
- What:		/sys/kernel/reboot
- Date:		November 2020
- KernelVersion:	5.11
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:	Interface to set the kernel reboot behavior, similarly to
- 		what can be done via the reboot= cmdline option.
- 		(see Documentation/admin-guide/kernel-parameters.txt)
-@@ -9,25 +9,25 @@ Description:	Interface to set the kernel reboot behavior, similarly to
- What:		/sys/kernel/reboot/mode
- Date:		November 2020
- KernelVersion:	5.11
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:	Reboot mode. Valid values are: cold warm hard soft gpio
- 
- What:		/sys/kernel/reboot/type
- Date:		November 2020
- KernelVersion:	5.11
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:	Reboot type. Valid values are: bios acpi kbd triple efi pci
- 
- What:		/sys/kernel/reboot/cpu
- Date:		November 2020
- KernelVersion:	5.11
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:	CPU number to use to reboot.
- 
- What:		/sys/kernel/reboot/force
- Date:		November 2020
- KernelVersion:	5.11
--Contact:	Matteo Croce <mcroce@microsoft.com>
-+Contact:	Matteo Croce <teknoraver@meta.com>
- Description:	Don't wait for any other CPUs on reboot and
- 		avoid anything that could hang.
- 
+Reviewed-by: Benno Lossin <benno.lossin@proton.me>
 
 ---
-base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
-change-id: 20241219-fix-mcroce-mail-bounce-328900169405
+Cheers,
+Benno
 
-Best regards,
--- 
-Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+>  Makefile                 |  1 +
+>  rust/bindings/lib.rs     |  1 +
+>  rust/kernel/device_id.rs |  3 ++-
+>  rust/kernel/fs/file.rs   |  3 ++-
+>  rust/kernel/str.rs       |  6 ++++--
+>  rust/kernel/uaccess.rs   | 10 ++++------
+>  rust/uapi/lib.rs         |  1 +
+>  7 files changed, 15 insertions(+), 10 deletions(-)
 
