@@ -1,36 +1,36 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ADE25392A
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 13:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA655129A78
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637846; cv=none; b=a8cuYABLobQZPfsX6coU9z89avKD3BxkJ6kbw+AAYk4xCYqLsvgoZ1zzmwivlbA60r1pPZYS9n97+F04RRVeRxG/R/3abkH1PvHhPnqqTPyws8fbZ2d3OZCTvlj0wDfaCnAhK6wzOZ/nNfxSEv6XFy/RLWYkbf0CfgjMIhHMIcc=
+	t=1744637846; cv=none; b=t0hCIlwTqHTUP/NFJJEuft09IzeGr4V0E93gY35IS2bEd2HQxahOPtD5Y3CpeR41KDRpdWze1y6gzx/eODZXfKEnGhey9goSiFLGMXz4g5H8Ad1XfAkLQDwNC/wlv450eEDBo/RjmyhdaGChWtYOeb9U7R954JjUhd4ziRRpKyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744637846; c=relaxed/simple;
-	bh=8BqsgyJ7gZkqz+bmoZDTV8piKYk3wMri8io8ImKw86w=;
+	bh=XKN1pJtUR6eFHYcKN4IiOh5n/NUy1AWx3wv8gj0T6xM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XJB3Sze+2fe+iRS8iF7JGW+rGKxHvuXBbPisK/m6hNbHYErjr03RPed7lQRPJyrG3Q5lx6PJfa62BxQkl88b6pmH0tEAP11X1w7imIdDmNmNO0UJ1bG1yrC/P5JOlq3ndJFh1pDx8XuaV6Ut5LGM44vPcGuih3fo+sHT58XWGp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=i4e8WJ4ggQKwYSjXpz+6VvMv1LY7SBvjNJExVBDgTpbdPfskhhbgSC+FWCAZu8xeQBDHzh46X2FNoa+370TVyx3CyXpNnLpPAVvtREZ48wvMFvgdt8qqW5tF9g+TzHIA2Bgvf7kU7zvGr+LObYbBFTmNQSf5tXGkLN7IcleZvAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZbpCm0zBNzHrPv;
-	Mon, 14 Apr 2025 21:33:56 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4ZbpJS5XmJz27hSJ;
+	Mon, 14 Apr 2025 21:38:00 +0800 (CST)
 Received: from kwepemf100017.china.huawei.com (unknown [7.202.181.16])
-	by mail.maildlp.com (Postfix) with ESMTPS id CD95E140144;
-	Mon, 14 Apr 2025 21:37:21 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4871A1400D4;
+	Mon, 14 Apr 2025 21:37:19 +0800 (CST)
 Received: from localhost.localdomain (10.175.112.188) by
  kwepemf100017.china.huawei.com (7.202.181.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 14 Apr 2025 21:37:21 +0800
+ 15.2.1544.11; Mon, 14 Apr 2025 21:37:18 +0800
 From: Zizhi Wo <wozizhi@huawei.com>
 To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
 CC: <yangerkun@huawei.com>, <yukuai3@huawei.com>, <wozizhi@huawei.com>,
 	<ming.lei@redhat.com>, <tj@kernel.org>
-Subject: [PATCH 5/7] blk-throttle: Split the blkthrotl queue
-Date: Mon, 14 Apr 2025 21:27:29 +0800
-Message-ID: <20250414132731.167620-6-wozizhi@huawei.com>
+Subject: [PATCH 1/7] blk-throttle: Rename tg_may_dispatch() to tg_dispatch_time()
+Date: Mon, 14 Apr 2025 21:27:25 +0800
+Message-ID: <20250414132731.167620-2-wozizhi@huawei.com>
 X-Mailer: git-send-email 2.46.1
 In-Reply-To: <20250414132731.167620-1-wozizhi@huawei.com>
 References: <20250414132731.167620-1-wozizhi@huawei.com>
@@ -45,168 +45,127 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemf100017.china.huawei.com (7.202.181.16)
 
-This patch splits the single queue into separate bps and iops queues. Now,
-an IO request must first pass through the bps queue, then the iops queue,
-and finally be dispatched. Due to the queue splitting, we need to modify
-the throtl add/peek/pop function.
+tg_may_dispatch() can directly indicate whether bio can be dispatched by
+returning the time to wait, without the need for the redundant "wait"
+parameter. Remove it and modify the function's return type accordingly.
 
-Additionally, the patch modifies the logic related to tg_dispatch_time().
-If bio needs to wait for bps, function directly returns the bps wait time;
-otherwise, it charges bps and returns the iops wait time so that bio can be
-directly placed into the iops queue afterward. Note that this may lead to
-more frequent updates to disptime, but the overhead is negligible for the
-slow path.
+Since we have determined by the return time whether bio can be dispatched,
+rename tg_may_dispatch() to tg_dispatch_time().
 
 Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
- block/blk-throttle.c | 49 ++++++++++++++++++++++++++++++--------------
- block/blk-throttle.h |  3 ++-
- 2 files changed, 36 insertions(+), 16 deletions(-)
+ block/blk-throttle.c | 40 +++++++++++++++-------------------------
+ 1 file changed, 15 insertions(+), 25 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index caae2e3b7534..542db54f995c 100644
+index 91dab43c65ab..dc23c961c028 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -143,7 +143,8 @@ static inline unsigned int throtl_bio_data_size(struct bio *bio)
- static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- {
- 	INIT_LIST_HEAD(&qn->node);
--	bio_list_init(&qn->bios);
-+	bio_list_init(&qn->bios_bps);
-+	bio_list_init(&qn->bios_iops);
- 	qn->tg = tg;
+@@ -743,14 +743,13 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
  }
- 
-@@ -160,7 +161,11 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- 				 struct list_head *queued)
- {
--	bio_list_add(&qn->bios, bio);
-+	if (bio_flagged(bio, BIO_TG_BPS_THROTTLED))
-+		bio_list_add(&qn->bios_iops, bio);
-+	else
-+		bio_list_add(&qn->bios_bps, bio);
-+
- 	if (list_empty(&qn->node)) {
- 		list_add_tail(&qn->node, queued);
- 		blkg_get(tg_to_blkg(qn->tg));
-@@ -170,6 +175,10 @@ static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- /**
-  * throtl_peek_queued - peek the first bio on a qnode list
-  * @queued: the qnode list to peek
-+ *
-+ * Always take a bio from the head of the iops queue first. If the queue
-+ * is empty, we then take it from the bps queue to maintain the overall
-+ * idea of fetching bios from the head.
-  */
- static struct bio *throtl_peek_queued(struct list_head *queued)
- {
-@@ -180,7 +189,9 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_peek(&qn->bios);
-+	bio = bio_list_peek(&qn->bios_iops);
-+	if (!bio)
-+		bio = bio_list_peek(&qn->bios_bps);
- 	WARN_ON_ONCE(!bio);
- 	return bio;
- }
-@@ -190,9 +201,10 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
-  * @queued: the qnode list to pop a bio from
-  * @tg_to_put: optional out argument for throtl_grp to put
-  *
-- * Pop the first bio from the qnode list @queued.  After popping, the first
-- * qnode is removed from @queued if empty or moved to the end of @queued so
-- * that the popping order is round-robin.
-+ * Pop the first bio from the qnode list @queued.  Note that we firstly focus
-+ * on the iops list here because bios are ultimately dispatched from it.
-+ * After popping, the first qnode is removed from @queued if empty or moved to
-+ * the end of @queued so that the popping order is round-robin.
-  *
-  * When the first qnode is removed, its associated throtl_grp should be put
-  * too.  If @tg_to_put is NULL, this function automatically puts it;
-@@ -209,10 +221,12 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_pop(&qn->bios);
-+	bio = bio_list_pop(&qn->bios_iops);
-+	if (!bio)
-+		bio = bio_list_pop(&qn->bios_bps);
- 	WARN_ON_ONCE(!bio);
- 
--	if (bio_list_empty(&qn->bios)) {
-+	if (bio_list_empty(&qn->bios_bps) && bio_list_empty(&qn->bios_iops)) {
- 		list_del_init(&qn->node);
- 		if (tg_to_put)
- 			*tg_to_put = qn->tg;
-@@ -805,12 +819,12 @@ static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bi
  
  /*
-  * Returns approx number of jiffies to wait before this bio is with-in IO rate
-- * and can be dispatched.
-+ * and can be moved to other queue or dispatched.
+- * Returns whether one can dispatch a bio or not. Also returns approx number
+- * of jiffies to wait before this bio is with-in IO rate and can be dispatched
++ * Returns approx number of jiffies to wait before this bio is with-in IO rate
++ * and can be dispatched.
   */
- static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
+-static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+-			    unsigned long *wait)
++static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
  {
  	bool rw = bio_data_dir(bio);
--	unsigned long bps_wait, iops_wait;
-+	unsigned long wait;
+-	unsigned long bps_wait = 0, iops_wait = 0, max_wait = 0;
++	unsigned long bps_wait, iops_wait, max_wait;
+ 	u64 bps_limit = tg_bps_limit(tg, rw);
+ 	u32 iops_limit = tg_iops_limit(tg, rw);
+ 
+@@ -765,11 +764,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+ 	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
+-	    tg->flags & THROTL_TG_CANCELING) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
+-	}
++	    tg->flags & THROTL_TG_CANCELING)
++		return 0;
  
  	/*
-  	 * Currently whole state machine of group depends on first bio
-@@ -821,10 +835,17 @@ static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
- 	BUG_ON(tg->service_queue.nr_queued[rw] &&
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 	 * If previous slice expired, start a new one otherwise renew/extend
+@@ -789,21 +785,15 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
  
--	bps_wait = tg_dispatch_bps_time(tg, bio);
--	iops_wait = tg_dispatch_iops_time(tg, bio);
-+	wait = tg_dispatch_bps_time(tg, bio);
-+	if (wait != 0)
-+		return wait;
+ 	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
+ 	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
+-	if (bps_wait + iops_wait == 0) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
+-	}
++	if (bps_wait + iops_wait == 0)
++		return 0;
  
--	return max(bps_wait, iops_wait);
-+	/*
-+	 * Charge bps here because @bio will be directly placed into the
-+	 * iops queue afterward.
-+	 */
-+	throtl_charge_bps_bio(tg, bio);
-+
-+	return tg_dispatch_iops_time(tg, bio);
+ 	max_wait = max(bps_wait, iops_wait);
+ 
+-	if (wait)
+-		*wait = max_wait;
+-
+ 	if (time_before(tg->slice_end[rw], jiffies + max_wait))
+ 		throtl_extend_slice(tg, rw, jiffies + max_wait);
+ 
+-	return false;
++	return max_wait;
  }
  
- /**
-@@ -913,7 +934,6 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- 	bio = throtl_pop_queued(&sq->queued[rw], &tg_to_put);
- 	sq->nr_queued[rw]--;
+ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+@@ -854,16 +844,16 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
+ static void tg_update_disptime(struct throtl_grp *tg)
+ {
+ 	struct throtl_service_queue *sq = &tg->service_queue;
+-	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
++	unsigned long read_wait = -1, write_wait = -1, min_wait, disptime;
+ 	struct bio *bio;
  
--	throtl_charge_bps_bio(tg, bio);
- 	throtl_charge_iops_bio(tg, bio);
+ 	bio = throtl_peek_queued(&sq->queued[READ]);
+ 	if (bio)
+-		tg_may_dispatch(tg, bio, &read_wait);
++		read_wait = tg_dispatch_time(tg, bio);
  
- 	/*
-@@ -1641,7 +1661,6 @@ bool __blk_throtl_bio(struct bio *bio)
- 	while (true) {
- 		if (tg_within_limit(tg, bio, rw)) {
- 			/* within limits, let's charge and dispatch directly */
--			throtl_charge_bps_bio(tg, bio);
- 			throtl_charge_iops_bio(tg, bio);
+ 	bio = throtl_peek_queued(&sq->queued[WRITE]);
+ 	if (bio)
+-		tg_may_dispatch(tg, bio, &write_wait);
++		write_wait = tg_dispatch_time(tg, bio);
  
- 			/*
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 7964cc041e06..5257e5c053e6 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -28,7 +28,8 @@
-  */
- struct throtl_qnode {
- 	struct list_head	node;		/* service_queue->queued[] */
--	struct bio_list		bios;		/* queued bios */
-+	struct bio_list		bios_bps;	/* queued bios for bps limit */
-+	struct bio_list		bios_iops;	/* queued bios for iops limit */
- 	struct throtl_grp	*tg;		/* tg this qnode belongs to */
- };
+ 	min_wait = min(read_wait, write_wait);
+ 	disptime = jiffies + min_wait;
+@@ -941,7 +931,7 @@ static int throtl_dispatch_tg(struct throtl_grp *tg)
+ 	/* Try to dispatch 75% READS and 25% WRITES */
  
+ 	while ((bio = throtl_peek_queued(&sq->queued[READ])) &&
+-	       tg_may_dispatch(tg, bio, NULL)) {
++	       tg_dispatch_time(tg, bio) == 0) {
+ 
+ 		tg_dispatch_one_bio(tg, READ);
+ 		nr_reads++;
+@@ -951,7 +941,7 @@ static int throtl_dispatch_tg(struct throtl_grp *tg)
+ 	}
+ 
+ 	while ((bio = throtl_peek_queued(&sq->queued[WRITE])) &&
+-	       tg_may_dispatch(tg, bio, NULL)) {
++	       tg_dispatch_time(tg, bio) == 0) {
+ 
+ 		tg_dispatch_one_bio(tg, WRITE);
+ 		nr_writes++;
+@@ -1610,7 +1600,7 @@ static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, bool rw)
+ 	if (tg->service_queue.nr_queued[rw])
+ 		return false;
+ 
+-	return tg_may_dispatch(tg, bio, NULL);
++	return tg_dispatch_time(tg, bio) == 0;
+ }
+ 
+ bool __blk_throtl_bio(struct bio *bio)
 -- 
 2.46.1
 
