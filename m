@@ -1,77 +1,99 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-pf1-f228.google.com (mail-pf1-f228.google.com [209.85.210.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A1D1A5B89
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 19:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9A73FC2
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 19:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744658524; cv=none; b=l2PQbLdZks0HlAItNqAl27C2No5kUa//MvnH8LcfVbjAd63Fv4NG8VU6AZNVtgnENS0jij/b03m1T4DVd5DKdabRJytHzqnmWmMMq/jmjORjbWHmKvilXOCFM5IAiZwzRSBqxDlWiL5zljaPHXwvdmaBeUeR2UZRKEimZ4iYIcY=
+	t=1744659891; cv=none; b=JvzEZ2XTnW9pN8FVyHIdD3MyB/eSPZ5PQfBrfxGPnfq+BTLAZQhxyy9zf/l7umiE5aQFGHsa3xrzOVLIrFdRURRLGmf2HNljDJ9vPrmSW5/xihnu/rzrqdaMmvW5ZGrfs27YMIaWRepC4DQki4OLbYzEMCNcBroWdrVj8Ru9g/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744658524; c=relaxed/simple;
-	bh=9xlzt8t5gZAIZhjWScRdd6YWLJYIILohHTFaHDvj5To=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DKnwFj3eD1S7MFEDVueYrg7cMoLOf6jaxe/x3OiduNWsb7quSORXtpohdmw6qCCJc9zG8kgCmeSOT+k0DRMMFht4V5vN/cU8D8NmzN7zB3XFQdFwm3xPcJazb51FD0llTZ0dkD/GZ0R1/fFO3tpaf5A00OpqVbUOnXxLie3ty5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d443811f04so44118355ab.1
-        for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 12:22:02 -0700 (PDT)
+	s=arc-20240116; t=1744659891; c=relaxed/simple;
+	bh=p/UudInTphzTPt36+seJxEDmOreOBfcTL9jZ9oLK7kY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Stt/vFFagw6mY95vyQEHJbIbFhV7yya+dYlMJMja1lHxWTqkBI8/52Gpeg4P2rLCoHSfpyM8bZke8W9PTSaf7gxEPvji/aGw7iDqAO6Vm59fZDapjK3rCuseXIpnSRI6Bd9/4v/tFWTteJ2gRoFmPA2B5/OjhtJxO4eGZ4VVL7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bJ9IMylZ; arc=none smtp.client-ip=209.85.210.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bJ9IMylZ"
+Received: by mail-pf1-f228.google.com with SMTP id d2e1a72fcca58-73972a54919so4006425b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 12:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1744659888; x=1745264688; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lS9UkXaxkSSh7KuHfE8/6BuZXfxxzN+gOlCsAN+DPp8=;
+        b=bJ9IMylZGrspTKbWCG64mTsUhbE5LmfmlACqUynjP/qKVVYCsmnEz1Wd0fdvrtGacA
+         rB5icxiFiauXfkdj6xUk4NhzkldWbhcDfG09vs7HWSW/uTzQMhUbgpN5BPemkEMOTC6Q
+         zmLnElgVVTiB0W6ihqz9Pt9oStce4IcXKO27vZUeW+7X/XVsi+wpLRxvb25dDCPqP5gz
+         FzwC9Criv6TPd7Fqp3dunFDDTRbNsh/4+dcg17wPXiHg8iO5fW03ABsxJdS340zD5Yl3
+         0rrlt+YCwwsUO2D7cX6a95FUM3TGROsl21+l9gtLANGOYxEv1daxnT/K7Oxo2f18q9+y
+         SqSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744658522; x=1745263322;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOv5Jk3XoSN+D2KFShSde9xzzddc9ORjMDXmV9hyXBw=;
-        b=CpUlB98smDmEKwlOAlbFkdynFeoRgA4LEAzD/p3O4v9tp+OQxhw9GYSH1EVwmPyiUk
-         fwMUsKGEQLRFisA1lOawXmO6wKeKahtPER4W/q55XNA8wnKF1xF8aTD3336o513K21kc
-         jtESwqbh/jnHMBciTujQirMpf3PtVS5wWgn0+x036pnc5x/7zD2CJdgAL1n24Csht/MM
-         O2PIu196vCE0ln647HuFQpi9fogaLpN0bus4fJlqouQPFWRtZ5r8XrQhZoYAxkktbv+W
-         rsuFxGpU49AoKUAFMx/bgIRVXlREwelSp1zaFIbFGKGJKmxksOHuus4iZllNE8vo4OOd
-         3PYg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZWGttplMfajMhCEwX7W4rZHT9jo009V1hy0S7olVNbH7peC/ctjEfII26Vfmc4/VC7jy6oT6HG9/jUg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1RXLo1x3TpOVNTVAtJ4nxAyswjJnX5IqmDpo/9YGFJCsjZVRJ
-	YJ43+0QSTTfPiOOjsgg/HObbqoMdB35cd/xnd9ZOMUJqlLLONFV46yDq4HCXYG/SJLKtIgENypq
-	LjRJDvK/58iXTGEAvkh60s6nKiDZH0EJzljXvkKDSoCRGtwaJ/OmQev8=
-X-Google-Smtp-Source: AGHT+IGEmCZcdWbXVW3Yowdl+fqoNrFiXUdx+Br9L+lc28touHs15V4APFkQfiEPqaQnMiuIzgUE1JifdY5R6RYkv3+LJiMpQ6LQ
+        d=1e100.net; s=20230601; t=1744659888; x=1745264688;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lS9UkXaxkSSh7KuHfE8/6BuZXfxxzN+gOlCsAN+DPp8=;
+        b=tPfcjO5mn77p9Hd5OYEfaq6wAW8FUu6o4xjOwDFhbDhng4xUXUuWqlruQO5fbfx/za
+         ZIn2vVrGWPUVytxKn4Frfuv94JU5ipjZm3sFYOqh6paHPBox51Ub0d3t7emcJswCUAU4
+         /cqoTUytijQHVb5LJWsotK49pdQt0glf0/VyZLcQDRzqoUTDQUUpXfPFfNfNDZ5TcsDY
+         AipmLumhMK3OXUo2vLyYkz+ZrfOhZeY4i5Ls7epiX3Znl3kabAgLJhMsTGt9sOT2LVHo
+         ndDbQ1CpARiEyjpWReI7Mnj2a/Du0eA/venqH6l7blmf+ezWwABoB3QVaJOtw+PaHEVw
+         8J9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUocxVf9BcBSmQ+nYzUdJBsfMUJRnX8zogk8z2LxibGkMGQWMEy9jbM12lVjkVKKP5ZICZMS2NXAzDRjA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY0DEFLHiYXYip2z7gPO0iCn0Io0b8kF/n5a1svyKCyeTXPg+7
+	zn+uALxTffpTMRoudYlqKpg2gsYQehDS+n/EsYbZHPW1IzO1TeTixKuvtMhZnqB/eI3eAEhjd+3
+	51VSh29SJrUIbxOlHvhVU4bVIFG3dapojJvTEucCGUl2ReqfN
+X-Gm-Gg: ASbGncsi94riYbC3YGdJes6sHdoaZW+PrsdzVbeeTPyYuUQuhql3NxsyoazL4+ZITf1
+	/gkcdUmKTwrWyKnEu1PjRT3uxjonmvniG/ixwbu2C/HW38lIZZl8BrlzvUx1L06iu/tOrfqXQDX
+	E0CPKm1OHe/nXcf5y5wLMBVJD1nX04gZpfHxyPwIE13x+hSIWzbCStHL+r9QTlVXBiqW01YsEC8
+	qW1fPJwQsLHKy48vn9CZKHlWHsKrIxe2ln2FiNGf5xNFrC5oool7Di339rLxET3untAQhNeMhww
+	QYyuAhuY9KTw6wPQfk2DLDxh6oabOj4=
+X-Google-Smtp-Source: AGHT+IGsV4AW8ry15GyISHqmu/WkwKP2iXHWbAUFvAFMhmpY1dbPB+UtMt9lJ9jBGOhCUaKFbHVFy5aA5VcS
+X-Received: by 2002:a05:6a00:390a:b0:736:fff2:9ac with SMTP id d2e1a72fcca58-73bd12a82dbmr16365343b3a.23.1744659888210;
+        Mon, 14 Apr 2025 12:44:48 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-73bd1fe4f8asm426833b3a.0.2025.04.14.12.44.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 12:44:48 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 73CB03401C3;
+	Mon, 14 Apr 2025 13:44:47 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 694A6E402BD; Mon, 14 Apr 2025 13:44:47 -0600 (MDT)
+Date: Mon, 14 Apr 2025 13:44:47 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 1/9] ublk: don't try to stop disk if ->ub_disk is NULL
+Message-ID: <Z/1lr233+THpllVI@dev-ushankar.dev.purestorage.com>
+References: <20250414112554.3025113-1-ming.lei@redhat.com>
+ <20250414112554.3025113-2-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2143:b0:3d5:eb14:8455 with SMTP id
- e9e14a558f8ab-3d7ec276548mr118949035ab.17.1744658521895; Mon, 14 Apr 2025
- 12:22:01 -0700 (PDT)
-Date: Mon, 14 Apr 2025 12:22:01 -0700
-In-Reply-To: <67b1f949.050a0220.173698.000c.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67fd6059.050a0220.3483fc.0031.GAE@google.com>
-Subject: Re: [syzbot] [bcachefs?] possible deadlock in get_partial_node (2)
-From: syzbot <syzbot+725322cc4ff5c53abfac@syzkaller.appspotmail.com>
-To: anna-maria@linutronix.de, axboe@kernel.dk, frederic@kernel.org, 
-	kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mmpgouride@gmail.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414112554.3025113-2-ming.lei@redhat.com>
 
-syzbot suspects this issue was fixed by commit:
+On Mon, Apr 14, 2025 at 07:25:42PM +0800, Ming Lei wrote:
+> In ublk_stop_dev(), if ublk device state becomes UBLK_S_DEV_DEAD, we
+> will return immediately. This way is correct, but not enough, because
+> ublk device may transition to other state, such UBLK_S_DEV_QUIECED,
+> when it may have been stopped already. Then kernel panic is triggered.
 
-commit 3a04334d6282d08fbdd6201e374db17d31927ba3
-Author: Alan Huang <mmpgouride@gmail.com>
-Date:   Fri Mar 7 16:58:27 2025 +0000
+How can this happen? If a device is stopped, it is in the
+UBLK_S_DEV_DEAD state. Won't that make us fall out of this check in
+ublk_nosrv_work, so we wont transition to UBLK_S_DEV_QUIESCED or other
+nosrv states?
 
-    bcachefs: Fix b->written overflow
+	mutex_lock(&ub->mutex);
+	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+		goto unlock;
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17e4ea3f980000
-start commit:   b7c90e3e717a Merge tag 'x86-urgent-2025-03-08' of git://gi..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=523d3ff8e053340a
-dashboard link: https://syzkaller.appspot.com/bug?extid=725322cc4ff5c53abfac
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137c1fa0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e0fa54580000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: bcachefs: Fix b->written overflow
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
