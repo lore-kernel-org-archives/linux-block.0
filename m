@@ -1,92 +1,80 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AC018C011;
-	Sat, 12 Apr 2025 09:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CA24A07;
+	Mon, 14 Apr 2025 00:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744450366; cv=none; b=M2CiwwBKARz6CoM3Be70qJV7b1nExwr3Q/5SznDNGrT+/3DVCIUPhiCm1+5qXZukdF12tf+kWU95igGrzpqHkIvg1Is3EflZ7SCuRHZP+RS5iPkYHAGXZ1qyFJc/obdkLg9xj1OMoTowOOm3/eqSKib11XH7FbGpaJ6USDj5M5E=
+	t=1744589540; cv=none; b=lKx52hUmOXwxG83la0fFc9qOMkcxX3eMahCuuXkoxoUzlF/3ypZHCK/T3UlDOLpZCU51E2xqSViozSvTQ29NcRwpIAVWaET8HPr9tKBPicjw0/xsfQkCzN0og3PVFu8L1ouOBM6SAKgIW49G/isqO86mvOjOTI6kILl3tj2p0vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744450366; c=relaxed/simple;
-	bh=gUwRljP4XbLx/LC0fbh6grs6LOeDpIl64YWdJzlyaec=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DeGjfrq3Jchw4WqxDYO0rkLjS3zCllntfiZ0OdOApnuHU1am1i9bsE4DJ/Eeie3u9wpK0h47KezeSQ51wUGLFXrOLndJLmET12ir2Tw7fxzoQPCYUl8/gdRKy0jo/4mvRq+Qc1Rdt4u3z8cw4M1PATjO8RUdMhLGc/Ob2QgqKRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZZSxq4zSyz4f3jMV;
-	Sat, 12 Apr 2025 17:32:15 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 42F421A0FC8;
-	Sat, 12 Apr 2025 17:32:39 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgA3m181M_pngHkCJQ--.7961S4;
-	Sat, 12 Apr 2025 17:32:39 +0800 (CST)
-From: Zheng Qixing <zhengqixing@huaweicloud.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	zhengqixing@huawei.com
-Subject: [PATCH] block: fix resource leak in blk_register_queue() error path
-Date: Sat, 12 Apr 2025 17:25:54 +0800
-Message-Id: <20250412092554.475218-1-zhengqixing@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1744589540; c=relaxed/simple;
+	bh=BENLlnhV6obc/Xc5tTfY3/9UWXuwEIUyVe6XJUmn2SA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PodoJxRnOTbWCODxGa5LjHM2xo/X6LJDCgkPQvjB9KXe1HQr3uvMKONoXqWOU2jG3vT3vk098L4/Fe27lDiwSJFVLOio259ROyBxJypQbKhg44gt/J0DX1+Frf/Z9sJNiHKBovZVFaPZ3F40Mw4QWhFSer5EddlbRtHzxcXYoIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kPvDDUXQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kPvDDUXQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13043C4CEDD;
+	Mon, 14 Apr 2025 00:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744589540;
+	bh=BENLlnhV6obc/Xc5tTfY3/9UWXuwEIUyVe6XJUmn2SA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kPvDDUXQ4XmbbnKJ31tHS1xcoTdFtQmVrG0giwsE342TPZ9+FQhV2eXLq+60xti72
+	 V2JYzpCrivQKiZLAHSn8C1oFpEve+McBVPdYOP/KMMV9GHPgtpaBeLer0ClU2ifdJe
+	 OrV4NinG7QgRfYKiy94WW9RGng03B+PdxFAIDb2feqVOqza4pnjImz8vfbzbA7soOm
+	 6Cw/n8R3Fore/tkiFRY2fjEaR11n7HJWtcZAdyvuXNbhaQIMz5tk+Kh5vdtwGIUNGk
+	 cKcfp6OR2/zVExNwaKFhNSyxwFcoiE+LrlBya1ashfumANpakBSwrYqyM2XIZBPLrR
+	 KjgVwNg6FpvJw==
+Date: Sun, 13 Apr 2025 20:12:18 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+	Jens Axboe <axboe@kernel.dk>, "kch@nvidia.com" <kch@nvidia.com>,
+	"yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
+	"zhengqixing@huawei.com" <zhengqixing@huawei.com>,
+	"yukuai3@huawei.com" <yukuai3@huawei.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"hare@suse.de" <hare@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH AUTOSEL 6.14 29/54] null_blk: replace null_process_cmd()
+ call in null_zone_write()
+Message-ID: <Z_xS4iiTNPJ5mP0-@lappy>
+References: <20250403190209.2675485-1-sashal@kernel.org>
+ <20250403190209.2675485-29-sashal@kernel.org>
+ <qytrsydugyz3ksuzg4m3aznskweuhphm7nkhm2faks3oefc7ok@jmteb2yigxj5>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3m181M_pngHkCJQ--.7961S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKF17Gw1kWFyfWr4rZFykGrg_yoWDWFc_Kr
-	yF9r1rWws3Cr45uw12kF10vF42kw4ktF4xWay0qF9Ig3Z7XFn5GwsF9F1rXr429a1xWF45
-	Gr1IgFyUuryI9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbz8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267
-	AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80
-	ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4
-	AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUUUUU
-X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <qytrsydugyz3ksuzg4m3aznskweuhphm7nkhm2faks3oefc7ok@jmteb2yigxj5>
 
-From: Zheng Qixing <zhengqixing@huawei.com>
+On Fri, Apr 04, 2025 at 03:31:03AM +0000, Shinichiro Kawasaki wrote:
+>On Apr 03, 2025 / 15:01, Sasha Levin wrote:
+>> From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>
+>> [ Upstream commit 4f235000b1e88934d1e6117dc43ed814710ef4e2 ]
+>>
+>> As a preparation to support partial data transfer due to badblocks,
+>> replace the null_process_cmd() call in null_zone_write() with equivalent
+>> calls to null_handle_badblocks() and null_handle_memory_backed(). This
+>> commit does not change behavior. It will enable null_handle_badblocks()
+>> to return the size of partial data transfer in the following commit,
+>> allowing null_zone_write() to move write pointers appropriately.
+>
+>Hello Sasha, I don't think this patch should be in stable kernels, since it
+>just refactors code as a preparation for another patch. I suggest to drop it
+>for all stable kernels.
 
-When registering a queue fails after blk_mq_sysfs_register() is
-successful but the function later encounters an error, we need
-to clean up the blk_mq_sysfs resources.
+I'll drop it, thanks!
 
-Add the missing blk_mq_sysfs_unregister() call in the error path
-to properly clean up these resources and prevent a memory leak.
-
-Fixes: 320ae51feed5 ("blk-mq: new multi-queue block IO queueing mechanism")
-Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
----
- block/blk-sysfs.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index a2882751f0d2..1f9b45b0b9ee 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -909,6 +909,8 @@ int blk_register_queue(struct gendisk *disk)
- out_debugfs_remove:
- 	blk_debugfs_remove(disk);
- 	mutex_unlock(&q->sysfs_lock);
-+	if (queue_is_mq(q))
-+		blk_mq_sysfs_unregister(disk);
- out_put_queue_kobj:
- 	kobject_put(&disk->queue_kobj);
- 	return ret;
 -- 
-2.39.2
-
+Thanks,
+Sasha
