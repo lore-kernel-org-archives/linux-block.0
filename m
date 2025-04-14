@@ -1,108 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED3A2DEBAE;
-	Mon, 14 Apr 2025 13:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13B15F306
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637552; cv=none; b=KAn38k8mBPOMY9AuR+w3dFWzL6yFhGQ3veg6Jv+fQDV0v/QP0D2RA5Eq9NX8Vu98aJkYfPeacNEJnFXWKsLdZqDBnmMvVtvTR16lE48b2b4aTHkbFJ5C3xIonzwazWdTFQNutaLBuHq7qGP1YSAE6P0urvb955E9uJ73o9M19BI=
+	t=1744637845; cv=none; b=OLYZ1W7bVigA5B/0EW471JXJGJG/xSoYEMNyHY7JlXgIQdEIJE7LIU8Y9+zCOymF8Q+pCEdgg2pcpzpPdf7+8zodOKGwp1JyV96I1RHmFdTtupLItyEBYVjNSGQx4S+96bOMzhnYZleJ5iUAgS7xE322dxqVSEcTeCKux34Mp2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637552; c=relaxed/simple;
-	bh=Skw2haJGpIZiFYqO2n3E1IxwuSukQmD1H2oxwPBWPho=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XgCDxSOyz7ZCdiW6zRGsJJL0DGTsol3PkXRBoCV5TNxHumXxnpTa53ST58Gm1tO0XPCh2dS5byGyhzlAGvrcIHZZczQM0Rh2OB0tbi7SUk4nQ6uNLpFfFXzwXWkeY1oaF0O4YxPZu+Mq3At1KeIlP+/dwLB6f/sp1Ejgcxg5/bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUTNVUaL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUTNVUaL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB563C4CEE9;
-	Mon, 14 Apr 2025 13:32:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744637552;
-	bh=Skw2haJGpIZiFYqO2n3E1IxwuSukQmD1H2oxwPBWPho=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MUTNVUaL2L3k3s3rUu3JqrBrQN1H0COjzl2Cqw5JUbZJLU/I563U3gKkT3/eaKAXo
-	 I8BIDtlJ+xMdcVpemP5PAgMBbY7W3NTm+O7k3jLLu4f0WlBu64pV6WFj6p5CuTXfA9
-	 uu09WAYwzFyW+jYWkNxxC0tKV6ezaTuu64niztC4XFVDqYWgPVFQzA1sQVYujvzblV
-	 oqxDelpQAabLWAW6IlEImM2pNFI3BpLlXFnAy+Vie5Y+1kNe8vH1H9iaOMqOmB6CeE
-	 JtaYa+c1FOgji9oyQ8joO+9ws9KRJCO+QDNV10xu0tGNnJpos0vhwzSzTruud2tWww
-	 9LOpTNwCdDZbw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	shuah@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 3/5] selftests: ublk: fix test_stripe_04
-Date: Mon, 14 Apr 2025 09:32:21 -0400
-Message-Id: <20250414133223.681195-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250414133223.681195-1-sashal@kernel.org>
-References: <20250414133223.681195-1-sashal@kernel.org>
+	s=arc-20240116; t=1744637845; c=relaxed/simple;
+	bh=aHALtZuZlmwLX902cyZ802hELlO07nD4Z466j2QN5xw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=U4EUIZSAJNIo7Wa9m2llJlfzC+OxkiBUl3gA1c3uuHmoGGYX2gaoZtU+U+pl5d4hmSRe1DpguPSsYp8zJ0+rmSOA1r3loFmzj+j5MnPnSKTyvWPEBTKklLf49nzmrB8RFMWAoejfZrW05aHMdJsGoYFcPX6YLV5n1IAao8mvrb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZbpHX5P9yzsSnH;
+	Mon, 14 Apr 2025 21:37:12 +0800 (CST)
+Received: from kwepemf100017.china.huawei.com (unknown [7.202.181.16])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9FFA31A0188;
+	Mon, 14 Apr 2025 21:37:18 +0800 (CST)
+Received: from localhost.localdomain (10.175.112.188) by
+ kwepemf100017.china.huawei.com (7.202.181.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 14 Apr 2025 21:37:17 +0800
+From: Zizhi Wo <wozizhi@huawei.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <yangerkun@huawei.com>, <yukuai3@huawei.com>, <wozizhi@huawei.com>,
+	<ming.lei@redhat.com>, <tj@kernel.org>
+Subject: [PATCH 0/7] blk-throttle: Split the blkthrotl queue to solve the IO delay issue
+Date: Mon, 14 Apr 2025 21:27:24 +0800
+Message-ID: <20250414132731.167620-1-wozizhi@huawei.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.292
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemf100017.china.huawei.com (7.202.181.16)
 
-From: Ming Lei <ming.lei@redhat.com>
+[BUG]
+The current blkthrotl code provides two types of throttling: BPS limit and
+IOPS limit. When both limits are enabled, an IO is only dispatched if it
+meets both the BPS and IOPS restrictions. However, when both BPS and IOPS
+are limited simultaneously, an IO delayed dispatch issue can occur due to
+IO splitting. For example, if two 1MB IOs are issued with a BPS limit of
+1MB/s and a very high IOPS limit, the IO splitting will cause both IOs to
+complete almost "simultaneously" in 2 seconds.
 
-[ Upstream commit 72070e57b0a518ec8e562a2b68fdfc796ef5c040 ]
+[CAUSE]
+The root cause of this issue is that blkthrotl mixes BPS and IOPS into a
+single queue. When issuing multiple IOs sequentially, the continuously
+split IOs will repeatedly enter the same queue. As they alternately go
+through the throtl process, IOs that have already been throttled will have
+to wait for IOs that have not yet been throttled. As a result, all IOs will
+eventually complete almost together.
 
-Commit 57ed58c13256 ("selftests: ublk: enable zero copy for stripe target")
-added test entry of test_stripe_04, but forgot to add the test script.
+[FIX]
+Since IO requests that have already been split no longer need to go through
+BPS throttling but still require IOPS control, this patchset splits the
+existing blkthrotl queue into two separate queues: BPS and IOPS.
+1) IO requests must first pass through the BPS queue.
+2) Once they meet the BPS limit, they proceed to the IOPS queue before
+being dispatched.
+3) Already split IO requests bypass the BPS queue and go directly to the
+IOPS queue.
 
-So fix the test by adding the script file.
+[OVERVIEW]
+This patchset consists of 7 patches:
+1) Patch 1 is a simple clean_up.
+2) Patch 2-4, to facilitate the subsequent splitting of queues. Patch 2-3
+separate the -dispatch- and -charge- functions based on the BPS and IOPS.
+Patch 4 introduce a new flag to prevent double counting.
+3) Patch 5-6 splits the original single queue into two separate queues(BPS
+and IOPS) without altering the existing code logic.
+4) Patch 7 ensures that split IO requests bypass the BPS queue, preventing
+unnecessary throttling and eliminating the delay issue.
 
-Reported-by: Uday Shankar <ushankar@purestorage.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Uday Shankar <ushankar@purestorage.com>
-Link: https://lore.kernel.org/r/20250404001849.1443064-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- .../testing/selftests/ublk/test_stripe_04.sh  | 24 +++++++++++++++++++
- 1 file changed, 24 insertions(+)
- create mode 100755 tools/testing/selftests/ublk/test_stripe_04.sh
+Zizhi Wo (7):
+  blk-throttle: Rename tg_may_dispatch() to tg_dispatch_time()
+  blk-throttle: Refactor tg_dispatch_time by extracting
+    tg_dispatch_bps/iops_time
+  blk-throttle: Split throtl_charge_bio() into bps and iops functions
+  blk-throttle: Introduce flag "BIO_TG_BPS_THROTTLED"
+  blk-throttle: Split the blkthrotl queue
+  blk-throttle: Split the service queue
+  blk-throttle: Prevents the bps restricted io from entering the bps
+    queue again
 
-diff --git a/tools/testing/selftests/ublk/test_stripe_04.sh b/tools/testing/selftests/ublk/test_stripe_04.sh
-new file mode 100755
-index 0000000000000..1f2b642381d17
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_stripe_04.sh
-@@ -0,0 +1,24 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+TID="stripe_04"
-+ERR_CODE=0
-+
-+_prep_test "stripe" "mkfs & mount & umount on zero copy"
-+
-+backfile_0=$(_create_backfile 256M)
-+backfile_1=$(_create_backfile 256M)
-+dev_id=$(_add_ublk_dev -t stripe -z -q 2 "$backfile_0" "$backfile_1")
-+_check_add_dev $TID $? "$backfile_0" "$backfile_1"
-+
-+_mkfs_mount_test /dev/ublkb"${dev_id}"
-+ERR_CODE=$?
-+
-+_cleanup_test "stripe"
-+
-+_remove_backfile "$backfile_0"
-+_remove_backfile "$backfile_1"
-+
-+_show_result $TID $ERR_CODE
+ block/blk-throttle.c      | 288 +++++++++++++++++++++++++-------------
+ block/blk-throttle.h      |  14 +-
+ include/linux/blk_types.h |   5 +
+ 3 files changed, 202 insertions(+), 105 deletions(-)
+
 -- 
-2.39.5
+2.46.1
 
