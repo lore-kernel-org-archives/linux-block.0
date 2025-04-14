@@ -1,130 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F3F17A2FC
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 11:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEDE280CDC;
+	Mon, 14 Apr 2025 11:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744630054; cv=none; b=upefmkcNMVtTITXCGhAL428dkOBPrSS3FeyMKkLahId3R5uVIR2IiHSG49asZEKHqyTzAR7RLjsCQwl6aLkdGC8cdQN9ncBUsYuadezQ+1R/xqfdA3GmH4URpiI348sGEsTueEjUy98dyOqxn2savkcP2xmwZ45umdRxL+Zs624=
+	t=1744630748; cv=none; b=noFpRon12a5fahCgCNk2ZFMZVfdHbpXuEMQWiophr2fx6o0mBbQKRrcij6MF61kiX2bscMolUCm++A0jZklbElXYK8FGVrL51AB5MXJFHh4U8qsuBoZ6b6m0Xs1q4XSWl6BAEQtXJEGOWNXD7MEilgTartKBD4stCZNjVBhhCsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744630054; c=relaxed/simple;
-	bh=6NjzVSEjN4LMrKPKzIMvzI79mHHxujuaVfKQp+anoRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dyKgKaVDbgOe6lItkQFw6ZTqrWDJu5BXFyinCuih15Ty1zd2DBBnCxW8cEVTBR57y9im2Pq+phNfYYoCNBtMiKmeO3cZLXl1VOZDiDS93OwYhHVRB+jnTu/N3vUe01DjvYFjDplrhVjFi2US/3sjUUhs3DoECPDdmlndShk/Mos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=deWiUPAr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1744630748; c=relaxed/simple;
+	bh=JPHN+jpWD9t+wJ6xtaBll58pm1u68FXkwIkn2RM7j84=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NTyKsNss3ycflLqTAe3eqbJGmwkG74dm4ezis8hGdU+XG3UDlP11dIcAmnt43obYRNdz13zBsFg+wuGMpOMXyqZH/mCyw9jFAu4o3NWpI/0S6xps7nJPmShJ03IBdg76MwTzylUS/eU3nhxNdNNvUVXChsiUEXKYfMcnAbVT250=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=f6GUFixh; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="deWiUPAr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744630050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=16bddCrtd0ailXVFFCZ2NETIOccVIAhkA7wz0NK8u44=;
-	b=deWiUPArqaOqpCpRAK4gJ3/eIo3tqHThgpmU79A6zP7Vi2i2Os6TXHCCNOwKuixKDkdjvc
-	/Z2GFUHcZ41hDv4s3LSdg0H2BW4aXD9+hvQEh8gHcdI1Y4S+5rVAV9f616Gu7b5TnG4F/x
-	gsu5GOlLJGJfrRuf6EKGiCvMGakFq7k=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-n_03gPFDPTub2X6zMgpzNw-1; Mon,
- 14 Apr 2025 07:26:27 -0400
-X-MC-Unique: n_03gPFDPTub2X6zMgpzNw-1
-X-Mimecast-MFC-AGG-ID: n_03gPFDPTub2X6zMgpzNw_1744629986
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 639ED19560B0;
-	Mon, 14 Apr 2025 11:26:26 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.48])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B39E3001D13;
-	Mon, 14 Apr 2025 11:26:25 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 7/9] ublk: remove __ublk_quiesce_dev()
-Date: Mon, 14 Apr 2025 19:25:48 +0800
-Message-ID: <20250414112554.3025113-8-ming.lei@redhat.com>
-In-Reply-To: <20250414112554.3025113-1-ming.lei@redhat.com>
-References: <20250414112554.3025113-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="f6GUFixh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8tXU7TjKACyyS9aliZITUswNNUYWl81wkuwfMZnjmYg=; b=f6GUFixhYRUezBgFjY82+UJqPU
+	LjQPp31MU/rWulduLV3GFImPuHOY67DQT6zth90CNJFtrikdxQPxji4BhXNyqRNzG4KL88doiSFS9
+	yEVeS9nrGeSz0Ii/RNyHLHWgpNqMq1Vq7kx6hAsYnOSX51xdNiSG+9pPaDb9h+pVZMYvD4mqzi4BJ
+	8G1ypN2kMwRfjPnjlFsR4q/mVobtahFpQVO/k7qpNkS/cuGm5oKsCArlMavhbXSAzE8YdMC+YVEOy
+	4MFTsuj7/c4vYm/fU+dPEXhzy6vUNs3K/RTdVjvjg5u+EylXMY8vXRmz5CGriZlcho4jRpiVqoIm6
+	i7brOdTg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u4I9Z-00000001nOb-07yt;
+	Mon, 14 Apr 2025 11:39:05 +0000
+Date: Mon, 14 Apr 2025 04:39:05 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk, song@kernel.org,
+	xni@redhat.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 1/4] block: export part_in_flight()
+Message-ID: <Z_zz2RY3zHVGScCK@infradead.org>
+References: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
+ <20250412073202.3085138-2-yukuai1@huaweicloud.com>
+ <Z_yr67xrbkuQwy0P@infradead.org>
+ <12e79682-21a3-9389-9390-14702d6ca389@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <12e79682-21a3-9389-9390-14702d6ca389@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Remove __ublk_quiesce_dev() and open code for updating device state as
-QUIESCED.
+On Mon, Apr 14, 2025 at 02:48:23PM +0800, Yu Kuai wrote:
+> > If we export this it needs a kerneldoc comment, and probably also
+> > a better name.
+> 
+> Sure about comment.
 
-We needn't to drain inflight requests in __ublk_quiesce_dev() any more,
-because all inflight requests are aborted in ublk char device release
-handler.
+I think a name like bdev_count_inflight might also be helpful as there
+is nothing partition-specific in the helper.
 
-Also we needn't to set ->canceling in __ublk_quiesce_dev() any more
-because it is done unconditionally now in ublk_ch_release().
+> There are two kinds of helpers:
+> 
+> 1) part_in_flight and part_in_flight_rw
+> 2) blk_mq_in_flight and blk_mq_in_flight_rw
+> 
+> 1) is accounted at blk_account_io_start(), while 2) is
+> blk_mq_start_request(), I think this is the essential difference.
+> 
+> part_in_flight_rw() and blk_mq_in_flight_rw() is also used in sysfs API
+> inflight for bio/rq based device. And commit 7be835694dae ("block: fix
+> that util can be greater than 100%") convert blk_mq_in_flight() to
+> part_in_flight() from disk stats API. Now I just checked there is no use
+> for blk_mq_in_flight() anymore and maybe it can be removed.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 22 +---------------------
- 1 file changed, 1 insertion(+), 21 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e02f205f6da4..f827c2ef00a9 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -209,7 +209,6 @@ struct ublk_params_header {
- 
- static void ublk_stop_dev_unlocked(struct ublk_device *ub);
- static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
--static void __ublk_quiesce_dev(struct ublk_device *ub);
- static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
- 		struct ublk_queue *ubq, int tag, size_t offset);
- static inline unsigned int ublk_req_build_flags(struct request *req);
-@@ -1589,11 +1588,8 @@ static int ublk_ch_release(struct inode *inode, struct file *filp)
- 			/*
- 			 * keep request queue as quiesced for queuing new IO
- 			 * during QUIESCED state
--			 *
--			 * request queue will be unquiesced in ending
--			 * recovery, see ublk_ctrl_end_recovery
- 			 */
--			__ublk_quiesce_dev(ub);
-+			ub->dev_info.state = UBLK_S_DEV_QUIESCED;
- 		} else {
- 			ub->dev_info.state = UBLK_S_DEV_FAIL_IO;
- 			for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-@@ -1839,22 +1835,6 @@ static void ublk_wait_tagset_rqs_idle(struct ublk_device *ub)
- 	}
- }
- 
--/* Now all inflight requests have been aborted */
--static void __ublk_quiesce_dev(struct ublk_device *ub)
--{
--	int i;
--
--	pr_devel("%s: quiesce ub: dev_id %d state %s\n",
--			__func__, ub->dev_info.dev_id,
--			ub->dev_info.state == UBLK_S_DEV_LIVE ?
--			"LIVE" : "QUIESCED");
--	/* mark every queue as canceling */
--	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
--		ublk_get_queue(ub, i)->canceling = true;
--	ublk_wait_tagset_rqs_idle(ub);
--	ub->dev_info.state = UBLK_S_DEV_QUIESCED;
--}
--
- static void ublk_force_abort_dev(struct ublk_device *ub)
- {
- 	int i;
--- 
-2.47.0
-
+Yeah.  I'm still confused about having the different methods to count
+the _rw vs non-_rw variants for blk-mq, but I guess that's not really
+in scope for your series.
