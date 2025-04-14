@@ -1,161 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7022D0A54
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 14:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917FC23D2B9
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 14:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744639564; cv=none; b=D/P1QW2xaWT2UxawZ6VWVmgHW9fHIpp9uct4Cbl6lUNe31LpQ5MmfegDMF7yRaAOmbnz+l9k71q+YuFkqVk573nqQR/UxzE08ulmdS3VZnX3a/aKjV5zxCKS0JuGsPetaDkdchVch4IZh5u/Y8vJ+wlDVRfYR/aWmS9QrsDQc7k=
+	t=1744642076; cv=none; b=Z853q24E6hLGRjABhKoo+L81jYRk5DPedU0SbwG5q+f84wdbdmmVin3uCYmrPRT2zCP3gnRhqOe4JiVggidGfGBAOMjgqCEVIeA4oE21uaaED0Q9b7JbKMYwxf1oQeC+xjYv4ef6wgQtNV9xb8eJDyRBPsiH2iyoVscMlbfmO7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744639564; c=relaxed/simple;
-	bh=7Sv5aVE5FdxcIGCABFX+xyDVu2hjevPjbLV0GYczMcw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XZyLJ2AYYBgwo1i0C+7kMdCuSHA4pCq1lyq+r5enC1f7NvIDK09vTcC1eNfOD6P3RF7dUZrqBZxyhHLCih0TnZfxdrAsWu9DHoCsO4gg+7/QBSSrkTy+cIvz3QxjZ36txwwAXs44rR7A+gUoj+mtfqhugWdq3k1OFTjPK6t/b3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a3RUhNSR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744642076; c=relaxed/simple;
+	bh=8Qtn8KlEQvxgVdPrvGuh4Sfq5tYrSo6Kof/1qWPEE88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y//tlosOr5G6SUsRYDz2vVpNm5QL8wkh/oSmcz9xSfrbVDe1E/35VMt9317Ck84d0b3ATsw5c3Ehz0/pOmXjFk1yojKZrbVHRuhuuv3axZsas5XJ38YmD13E9hxm5n1/IoMnUQdVrj/2xRK1oPzRjdRWgrmxd/iiWVA9HjeII+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=A8kfk27k; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a3RUhNSR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F68DC4CEE2;
-	Mon, 14 Apr 2025 14:06:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744639563;
-	bh=7Sv5aVE5FdxcIGCABFX+xyDVu2hjevPjbLV0GYczMcw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=a3RUhNSRbTQn3B2Jd8P8KMmK+APQFaa2WnHEQY19PKk9cwIavICyY+jcIWobNkO+5
-	 PmXV8Xed6AZhCRq2zndtrq0Rrw2ZEhffWG0MtWs1Igm+XUHDrqFXUzUIficNthTVKl
-	 sQE/v5lAIwpflGxLh5fjhE4IhfV+O41w/bxa3kYwtZxfd0GXmZ2+XiulbMqZ3iQR3z
-	 1jUAQy4hNJoaKGU5LKVuZzxeoJixD6LZ2x59pncuG7CE2Pws54Sjgu9TUgwfoEFMUl
-	 0fxjW3BtuW/DsMc5huk2GRGQGXA70sw9fFIRqGWvfuOJCysl+IQegM6tecBFosHMx8
-	 7zpoiWreSQhZw==
-From: Daniel Wagner <wagi@kernel.org>
-Date: Mon, 14 Apr 2025 16:05:53 +0200
-Subject: [PATCH blktests v3 4/4] nvme/061: add test teardown and setup
- fabrics target during I/O
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="A8kfk27k"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3cfce97a3d9so13550485ab.2
+        for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 07:47:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744642073; x=1745246873; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fq48PAOknFOAzKFbEqBjcV5Kzd2DBdHXfQElMB85zFI=;
+        b=A8kfk27kPDo7TcTKi0fMmDCu+ujbGwClggFgN3TgVxfalKaUlRDE/mu17SYUH9uAc3
+         ya1iSH7RwHwxjHgJPqChaWgw5aTVNZj6wKCAzsp4py2kh6kwR2k/wvXLYHSaXDKcq3zJ
+         HvDiyclan2wVxYWoR/BFXVmnjENzS2fHbqJutlsvPOL62H0FUJY5NWol5wNbT9rYzgRO
+         elMijkQtGIHtfO168zkRYs6mSS+ZDK71wPrYMTmAW4L1/9ln71NJc5+bU0rU2xbbcEzV
+         TXYch1BirqHrf8YgWHOPFfxPBMYQCL/y3283Z1/Z6lnAHjOQx7qa9GUsK2I6kUuVTmnm
+         S+BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744642073; x=1745246873;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fq48PAOknFOAzKFbEqBjcV5Kzd2DBdHXfQElMB85zFI=;
+        b=tg/09EbStKy7/Dmttg+BySIrQitj4qH7RwDKbCezw2NbdnV6e+zMM3DmXv06bWSVLG
+         6dITS+wBA2JU/5FPWZYoDETGdrW2k0DT4O6dKLMStV5LyAZH13xVlkVbRLZ8SZ4PM5y+
+         RqWBs3B0n3oMVcuXcHM+hjyVqhYNSZPRBZHg3s51/5rNsf/J4/nesqgs+Z4wdnFP0/MS
+         QEus/kKS5VR8uVT+rwVvL1YQI7LCSWMJIiPnoviexhwRjZKVY6ulBKTZKmLEN19oRLJc
+         Zm7nxkg9v2LGXCFPs9GuV/hQskNIGozrzuNJiL62ge2d5XzbmI8is57J9jKG/pcrQOgY
+         Lj6Q==
+X-Gm-Message-State: AOJu0YyXBxaVpe2r9J31g3z5I/vGiilyPi7WJC77EruaSNI5vaFpqn5s
+	Qq8oIahh6XhejDDh/MgXmYoTNl0UFeRBj2STwKXhRXSipIzDjvv0ciB5NLmgmB5JJWxj3P2rf0R
+	y
+X-Gm-Gg: ASbGncvH1CcSl3taLw1qZxkltC5fCofrgJfSsOOoSkvqBoCTed8NG7PBGWaZY8BHU18
+	gcX6I9FUuhRIpYqg0AvZ0F50nV1ezuuD4LMbweMTusiaTr2ylui+JR+2ppTe2fS13oleIVsB/xS
+	/0l974Ik9HWifOYO7x3U5hWdAJkdVfhDe4QI9mB/l2AUmL+JHc7PzYFnww8viBYw2CRIeXNh18h
+	ktiWQXKSJjodlGq82GuZtK7Z1n7t16UvlRWc7z7k+uVRujjkAasfwCkc0Rd2BQ+HvwImrePnnZi
+	IhWz0JfdjtjpoLWl7Shx5jNNOpXnvSXCKNOXTw==
+X-Google-Smtp-Source: AGHT+IE/jRticyjdHacClb5ym5jstPEP9CrlXUCBcGw7k00gcOTS5NpmDKrmPTfewbzW1VzTeVMVjA==
+X-Received: by 2002:a05:6e02:989:b0:3d6:d162:be12 with SMTP id e9e14a558f8ab-3d7ec277267mr98023065ab.21.1744642073536;
+        Mon, 14 Apr 2025 07:47:53 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dc591f82sm27637385ab.65.2025.04.14.07.47.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Apr 2025 07:47:52 -0700 (PDT)
+Message-ID: <e0dc38e8-9df0-40e3-a0e3-fd4b40b3fd80@kernel.dk>
+Date: Mon, 14 Apr 2025 08:47:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] loop: aio inherit the ioprio of original request
+To: Christoph Hellwig <hch@infradead.org>,
+ Yunlong Xing <yunlong.xing@unisoc.com>
+Cc: linux-block@vger.kernel.org, bvanassche@acm.org, niuzhiguo84@gmail.com,
+ yunlongxing23@gmail.com, linux-kernel@vger.kernel.org,
+ hao_hao.wang@unisoc.com, zhiguo.niu@unisoc.com
+References: <20250414030159.501180-1-yunlong.xing@unisoc.com>
+ <Z_ynTcEZGhPKm5wY@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Z_ynTcEZGhPKm5wY@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250414-test-target-v3-4-024575fcec06@kernel.org>
-References: <20250414-test-target-v3-0-024575fcec06@kernel.org>
-In-Reply-To: <20250414-test-target-v3-0-024575fcec06@kernel.org>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org, 
- Daniel Wagner <wagi@kernel.org>
-X-Mailer: b4 0.14.2
 
-Add a new test case which forcefully removes the target and setup it
-again.
+On 4/14/25 12:12 AM, Christoph Hellwig wrote:
+> On Mon, Apr 14, 2025 at 11:01:59AM +0800, Yunlong Xing wrote:
+>> Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
+>> The purpose is to inherit the original request ioprio in the aio
+>> flow.
+> 
+> This looks good, but has a mechanical conflict with my
+> "loop: stop using vfs_iter_{read,write} for buffered I/O" patch
+> that fixes setting the block size for direct I/O.
+> 
+> Jens, any preference how we should order the patches?  Should I resend
+> on top of this smaller one or the other way around?
 
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
----
- tests/nvme/061     | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/061.out | 21 +++++++++++++++++
- 2 files changed, 87 insertions(+)
-
-diff --git a/tests/nvme/061 b/tests/nvme/061
-new file mode 100755
-index 0000000000000000000000000000000000000000..c22046a6f547ea3325e2f5bdd6fed807f445391d
---- /dev/null
-+++ b/tests/nvme/061
-@@ -0,0 +1,66 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Daniel Wagner, SUSE Labs
-+#
-+# Test if the host keeps running IO when the target is forcefully removed and
-+# added back.
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="test fabric target teardown and setup during I/O"
-+TIMED=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_have_fio
-+	_require_nvme_trtype tcp rdma fc
-+}
-+
-+set_conditions() {
-+	_set_nvme_trtype "$@"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
-+	local ns
-+
-+	_nvmet_target_setup
-+
-+	_nvme_connect_subsys --keep-alive-tmo 1 --reconnect-delay 1
-+
-+	ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+
-+	_run_fio_rand_io --filename="/dev/${ns}" \
-+		--group_reporting \
-+		--time_based --runtime=1d &> /dev/null &
-+	fio_pid=$!
-+	sleep 1
-+
-+	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
-+	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
-+	for ((i = 0; i <= 5; i++)); do
-+		echo "iteration $i"
-+
-+		_nvmet_target_cleanup
-+
-+		_nvmf_wait_for_state "${def_subsysnqn}" "connecting" || return 1
-+		echo "state: $(cat "${state_file}")"
-+
-+		_nvmet_target_setup
-+
-+		_nvmf_wait_for_state "${def_subsysnqn}" "live" || return 1
-+		echo "state: $(cat "${state_file}")"
-+	done
-+
-+	{ kill "${fio_pid}"; wait; } &> /dev/null
-+
-+	_nvme_disconnect_subsys
-+
-+	_nvmet_target_cleanup
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/061.out b/tests/nvme/061.out
-new file mode 100644
-index 0000000000000000000000000000000000000000..75516abdac005854c2be165005c076ef8891c518
---- /dev/null
-+++ b/tests/nvme/061.out
-@@ -0,0 +1,21 @@
-+Running nvme/061
-+iteration 0
-+state: connecting
-+state: live
-+iteration 1
-+state: connecting
-+state: live
-+iteration 2
-+state: connecting
-+state: live
-+iteration 3
-+state: connecting
-+state: live
-+iteration 4
-+state: connecting
-+state: live
-+iteration 5
-+state: connecting
-+state: live
-+disconnected 1 controller(s)
-+Test complete
+I think we layer yours on top of this one, which is something I
+can just do without much trouble. Do we want the vfs_iter removal
+in 6.15 or is 6.16 fine for that?
 
 -- 
-2.49.0
+Jens Axboe
 
