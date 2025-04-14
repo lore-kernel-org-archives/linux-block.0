@@ -1,75 +1,68 @@
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6189C17A31C;
-	Mon, 14 Apr 2025 03:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E23917A303
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 06:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744599790; cv=none; b=i8MYgNEsYSCoVcCGAnErk7F366FnaiPUl63ZbmXyY2ER6IQjwyrLoBiPe9JggIAh4D9TDqzhPE5Kql4uac92WQfVgJ3akggWdl9EI1FmX64kk68//APb39DXwWUQy1TS0r5oXbPiLv4ZZt49MHYB8cWUQ2oRp4Znt1QNm4DDVug=
+	t=1744610888; cv=none; b=Xhl7DaeyDtyVQ+PHf7T6C0xjeEPhXkoVdRN55rKJ6ZTZI8CARrQKsSEWesjsx8QXlqBQBJQ4nAkpoSrexaZcMH9Rty3eS25BPHOD3Chr1m4aZurizVDNlrg5OkXIaF0XOsi+0CJImg3mmRUVebOxlJQjODPEYl/SON+x91NE24c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744599790; c=relaxed/simple;
-	bh=LKIFe5JPppNtFd1XjOtRi87X4iO2e9aUB6eXsxN/luA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MRyMPLMdqswBIzeuvhRb9IT/hXwhbybo3ggPcBlPPtJItJxMcWsbPYD3QijLSIcnpz8nzHG85HvpcDHLupiAwrVacBEgPWNhSPfQ07el4s69ngi0qeX+6Aj7bIr6RFihZMn/RiXwj9Tud8QLDMkjdFntv+9TkXCtMwOLI7mAEV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 53E325NM013800;
-	Mon, 14 Apr 2025 11:02:05 +0800 (+08)
-	(envelope-from Yunlong.Xing@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4ZbX9M5Rf0z2LH777;
-	Mon, 14 Apr 2025 11:00:55 +0800 (CST)
-Received: from tj10379pcu1.spreadtrum.com (10.5.32.15) by
- BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Mon, 14 Apr 2025 11:02:02 +0800
-From: Yunlong Xing <yunlong.xing@unisoc.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <bvanassche@acm.org>
-CC: <niuzhiguo84@gmail.com>, <yunlongxing23@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <hao_hao.wang@unisoc.com>,
-        <zhiguo.niu@unisoc.com>
-Subject: [PATCH V2] loop: aio inherit the ioprio of original request
-Date: Mon, 14 Apr 2025 11:01:59 +0800
-Message-ID: <20250414030159.501180-1-yunlong.xing@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1744610888; c=relaxed/simple;
+	bh=Kf+QZSJyGf/8LOcCP0lU0SPd5AF8/QbFVh6JcNh7ZLs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uP09DIS8dPY7qcQ2UGYHL0VyYaleyqMGGLgERx3fQ5R1dmfpO4HL1eXR2zAtsE6DcJ4ujFz7K6SiPb2cT0GQfrIXPTA3B8pGPOVlVOlxRpj7jEUwGDbqyfjrIcf+gMGM/ysXX6BybxtNIdIgXe8UVav8UEyulfb5f5QbKQsV2T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0BA5B68B05; Mon, 14 Apr 2025 08:07:55 +0200 (CEST)
+Date: Mon, 14 Apr 2025 08:07:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+Subject: Re: [PATCH 04/15] block: prevent elevator switch during updating
+ nr_hw_queues
+Message-ID: <20250414060754.GA6451@lst.de>
+References: <20250410133029.2487054-1-ming.lei@redhat.com> <20250410133029.2487054-5-ming.lei@redhat.com> <20250410143622.GC10701@lst.de> <Z_xczMuX5_yDKdAs@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX02.spreadtrum.com (10.0.64.8)
-X-MAIL:SHSQR01.spreadtrum.com 53E325NM013800
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_xczMuX5_yDKdAs@fedora>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
-The purpose is to inherit the original request ioprio in the aio
-flow.
+On Mon, Apr 14, 2025 at 08:54:36AM +0800, Ming Lei wrote:
+> > >  	elv_iosched_load_module(name);
+> > >  
+> > > +	idx = srcu_read_lock(&set->update_nr_hwq_srcu);
+> > > +
+> > > +	if (set->flags & BLK_MQ_F_UPDATE_HW_QUEUES) {
+> > 
+> > What provides atomicity for field modifications vs reading of set->flags?
+> > i.e. does this need to switch using test/set_bit?
+> 
+> WRITE is serialized via tag set lock with synchronize_srcu().
+> 
+> READ is covered by srcu read lock.
+> 
+> It is typical RCU usage, one writer vs. multiple writer.
 
-Signed-off-by: Yunlong Xing <yunlong.xing@unisoc.com>
-Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>=
----
-V2:
-- Assign cmd->iocb.ki_ioprio in lo_rw_aio()
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, (S)RCU does not help you with atomicy of bitfields.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc..dd7f33d47f4f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -447,7 +447,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_filp = file;
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
--	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
- 
- 	if (rw == ITER_SOURCE)
- 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
--- 
-2.25.1
+> > Also mixing internal state with driver provided flags is always
+> > a bad idea.  So this should probably be a new state field in the
+> > tag_set and not reuse flags.
+>  
+> That is fine, but BLK_MQ_F_TAG_QUEUE_SHARED is used in this way too.
+
+Yes, that should also move over to the state field.  Amd rnbd needs
+to be fixed to not set it diretly which is a good example for why
+they should not be mixed..
 
