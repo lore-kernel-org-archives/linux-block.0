@@ -1,36 +1,36 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66412522BA
-	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 13:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5171B2522A5
+	for <linux-block@vger.kernel.org>; Mon, 14 Apr 2025 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637845; cv=none; b=qppSJp8v+Zzt2N09NZvUzySF37g2Woq6ZMgTp66bz+yJjrcnyAoCYcZDwcRIj2uUj88BCAGJ6yLk6E730quKVrqYAed2nJCy3rs3oNHVVysTt3JeQxbrfvnISerUIjsbFjNZjKV433TWGq3OW3UpCbWI0Js4w0nui9LqRrQSvGg=
+	t=1744637846; cv=none; b=SbkQ/MNGiUr9l+zeK9aNuZ7bXW6PvfyrUTxkA4FUpecXAkvX2Il8cXG3r/0MP/3Sr/z7nDUi+nU/VI7hOll7h5jDNgGJYFTlqWxflQHVCltGBSS2bVWdG2q1H/PcvkCI98M/PIBZMioTWp5O5HmKa2QNeJbx8srdSiRhQEP1KwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637845; c=relaxed/simple;
-	bh=zXXkWZJwPfLE6lx7sQqdHy6crJ+l9NlMTq2p9dlWyaE=;
+	s=arc-20240116; t=1744637846; c=relaxed/simple;
+	bh=4Rs3RIQ/EVL64cZA25Q/Sqt8igFFe7wJWS6u3FWacQo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QRTMr+KaeUkO0TtwpuZTNKF+9MwU0utd/tJuOL3X+90PeD34JkV2e59z6sbWy0r68+x/umd7nW+DM1O5Uib9TwRWVPQjUcfdVMoxMK/7S3DGQdzE6LWsnMh1egmf+r+B7OgFzNM6xHPBSqsxBix7jeuCwDIjEq9W3JHNK9PfkkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 MIME-Version:Content-Type; b=PnCg8rHXHzptYt0v0D230iNr2Ku8q6i6rh3+WqmG1Or2jnEAZJCP+g4rWw4NnTy8xraWhAzbIQNNB20Gl2W0QylCBWOH/suW2Bdk1KfR6BgoywHz5gRVNtUM00J6lp44+eTdq6t178GgK3/ZfiWLpRKNYYQTdK2VXjITmcyUpSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZbpHb6wlZz2TS1K;
-	Mon, 14 Apr 2025 21:37:15 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZbpCk61rXzHrP8;
+	Mon, 14 Apr 2025 21:33:54 +0800 (CST)
 Received: from kwepemf100017.china.huawei.com (unknown [7.202.181.16])
-	by mail.maildlp.com (Postfix) with ESMTPS id 33DFF14027A;
-	Mon, 14 Apr 2025 21:37:21 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 877F4180080;
+	Mon, 14 Apr 2025 21:37:20 +0800 (CST)
 Received: from localhost.localdomain (10.175.112.188) by
  kwepemf100017.china.huawei.com (7.202.181.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 14 Apr 2025 21:37:20 +0800
+ 15.2.1544.11; Mon, 14 Apr 2025 21:37:19 +0800
 From: Zizhi Wo <wozizhi@huawei.com>
 To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
 CC: <yangerkun@huawei.com>, <yukuai3@huawei.com>, <wozizhi@huawei.com>,
 	<ming.lei@redhat.com>, <tj@kernel.org>
-Subject: [PATCH 4/7] blk-throttle: Introduce flag "BIO_TG_BPS_THROTTLED"
-Date: Mon, 14 Apr 2025 21:27:28 +0800
-Message-ID: <20250414132731.167620-5-wozizhi@huawei.com>
+Subject: [PATCH 3/7] blk-throttle: Split throtl_charge_bio() into bps and iops functions
+Date: Mon, 14 Apr 2025 21:27:27 +0800
+Message-ID: <20250414132731.167620-4-wozizhi@huawei.com>
 X-Mailer: git-send-email 2.46.1
 In-Reply-To: <20250414132731.167620-1-wozizhi@huawei.com>
 References: <20250414132731.167620-1-wozizhi@huawei.com>
@@ -45,71 +45,88 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemf100017.china.huawei.com (7.202.181.16)
 
-Subsequent patches will split the single queue into separate bps and iops
-queues. To prevent IO that has already passed through the bps queue at a
-single tg level from being counted toward bps wait time again, we introduce
-"BIO_TG_BPS_THROTTLED" flag. Since throttle and QoS operate at different
-levels, we reuse the value as "BIO_QOS_THROTTLED".
-
-We set this flag when charge bps and clear it when charge iops, as the bio
-will move to the upper-level tg or be dispatched.
-
-This patch does not involve functional changes.
+Split throtl_charge_bio() to facilitate subsequent patches that will
+separately charge bps and iops after queue separation.
 
 Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
- block/blk-throttle.c      | 9 +++++++--
- include/linux/blk_types.h | 5 +++++
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 91ee1c502b41..caae2e3b7534 100644
+index 0633ae0cce90..91ee1c502b41 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -741,12 +741,16 @@ static void throtl_charge_bps_bio(struct throtl_grp *tg, struct bio *bio)
- 	unsigned int bio_size = throtl_bio_data_size(bio);
+@@ -736,6 +736,20 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	return jiffy_wait;
+ }
  
- 	/* Charge the bio to the group */
++static void throtl_charge_bps_bio(struct throtl_grp *tg, struct bio *bio)
++{
++	unsigned int bio_size = throtl_bio_data_size(bio);
++
++	/* Charge the bio to the group */
++	if (!bio_flagged(bio, BIO_BPS_THROTTLED))
++		tg->bytes_disp[bio_data_dir(bio)] += bio_size;
++}
++
++static void throtl_charge_iops_bio(struct throtl_grp *tg, struct bio *bio)
++{
++	tg->io_disp[bio_data_dir(bio)]++;
++}
++
+ /*
+  * If previous slice expired, start a new one otherwise renew/extend existing
+  * slice to make sure it is at least throtl_slice interval long since now.
+@@ -808,18 +822,6 @@ static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
+ 	return max(bps_wait, iops_wait);
+ }
+ 
+-static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+-{
+-	bool rw = bio_data_dir(bio);
+-	unsigned int bio_size = throtl_bio_data_size(bio);
+-
+-	/* Charge the bio to the group */
 -	if (!bio_flagged(bio, BIO_BPS_THROTTLED))
-+	if (!bio_flagged(bio, BIO_BPS_THROTTLED) &&
-+	    !bio_flagged(bio, BIO_TG_BPS_THROTTLED)) {
-+		bio_set_flag(bio, BIO_TG_BPS_THROTTLED);
- 		tg->bytes_disp[bio_data_dir(bio)] += bio_size;
-+	}
- }
+-		tg->bytes_disp[rw] += bio_size;
+-
+-	tg->io_disp[rw]++;
+-}
+-
+ /**
+  * throtl_add_bio_tg - add a bio to the specified throtl_grp
+  * @bio: bio to add
+@@ -906,7 +908,8 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
+ 	bio = throtl_pop_queued(&sq->queued[rw], &tg_to_put);
+ 	sq->nr_queued[rw]--;
  
- static void throtl_charge_iops_bio(struct throtl_grp *tg, struct bio *bio)
- {
-+	bio_clear_flag(bio, BIO_TG_BPS_THROTTLED);
- 	tg->io_disp[bio_data_dir(bio)]++;
- }
+-	throtl_charge_bio(tg, bio);
++	throtl_charge_bps_bio(tg, bio);
++	throtl_charge_iops_bio(tg, bio);
  
-@@ -772,7 +776,8 @@ static unsigned long tg_dispatch_bps_time(struct throtl_grp *tg, struct bio *bio
+ 	/*
+ 	 * If our parent is another tg, we just need to transfer @bio to
+@@ -1633,7 +1636,8 @@ bool __blk_throtl_bio(struct bio *bio)
+ 	while (true) {
+ 		if (tg_within_limit(tg, bio, rw)) {
+ 			/* within limits, let's charge and dispatch directly */
+-			throtl_charge_bio(tg, bio);
++			throtl_charge_bps_bio(tg, bio);
++			throtl_charge_iops_bio(tg, bio);
  
- 	/* no need to throttle if this bio's bytes have been accounted */
- 	if (bps_limit == U64_MAX || tg->flags & THROTL_TG_CANCELING ||
--	    bio_flagged(bio, BIO_BPS_THROTTLED))
-+	    bio_flagged(bio, BIO_BPS_THROTTLED) ||
-+	    bio_flagged(bio, BIO_TG_BPS_THROTTLED))
- 		return 0;
- 
- 	tg_update_slice(tg, rw);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index dce7615c35e7..f9d1230e27a7 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -296,6 +296,11 @@ enum {
- 				 * of this bio. */
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_QOS_THROTTLED,	/* bio went through rq_qos throttle path */
-+	/*
-+	 * This bio has undergone rate limiting at the single throtl_grp level bps
-+	 * queue. Since throttle and QoS are not at the same level, reused the value.
-+	 */
-+	BIO_TG_BPS_THROTTLED = BIO_QOS_THROTTLED,
- 	BIO_QOS_MERGED,		/* but went through rq_qos merge path */
- 	BIO_REMAPPED,
- 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+ 			/*
+ 			 * We need to trim slice even when bios are not being
+@@ -1656,7 +1660,8 @@ bool __blk_throtl_bio(struct bio *bio)
+ 			 * control algorithm is adaptive, and extra IO bytes
+ 			 * will be throttled for paying the debt
+ 			 */
+-			throtl_charge_bio(tg, bio);
++			throtl_charge_bps_bio(tg, bio);
++			throtl_charge_iops_bio(tg, bio);
+ 		} else {
+ 			/* if above limits, break to queue */
+ 			break;
 -- 
 2.46.1
 
