@@ -1,106 +1,150 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9512019F47E
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 13:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42668BE5
+	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 14:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744724906; cv=none; b=g+xPyMUgVzwtRsjMEzH+0ckgUvIlsHuTMNcZRWF2BqvDuoqRdExHGbMUTAwnOXYjk9Dj2dr4kj8PeQdOCvBmtJvJcqnrb8mV3eD2KDNRRflYxB9YUi19VcVWtM71j9R1kNIBBy42joxESS3lZA9Uqakx9QubdmmKi7wIA/MkkI0=
+	t=1744728707; cv=none; b=EvtUGHJ6EMGjlVjfxAyghtwTVHXzulITbTZxtbh5VWk+T2gN4du2AHRdCzXxLMye5jbHl7FcDu9vD3PZ3d3qXebmghLQOLpTHbEyMlayqDzI1Aooi8MVQVNXV3HJ5v4BSMRfWku+4RH8z7OopP9LpCEfYYCLzl3Ci4nshDpEx8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744724906; c=relaxed/simple;
-	bh=Q+sDbI3861ztbo49i0sAnnGzYlZkCzWiWh9KZGjrKpw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=eLi6u5jwbcappz1sDSiHSPA3psJtFBD9oVSK5bZJRznw++oIenfq9ubWhCQdDaG8maizUZtbgB0lrkyM8cvPqJTVBgsFnLeOOzuc8RuCnK2VWR9bwh/GT+eyg/QpmsUQ1W/EJPi5nXho8QAAvDLEOSuqE9euL5RK0gVOtWa9CmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lqqz+gYm; arc=none smtp.client-ip=209.85.166.45
+	s=arc-20240116; t=1744728707; c=relaxed/simple;
+	bh=gR6FFFy0sjufrWzUUrN4/vO7OGKwn4Y73XCEgyDjThc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Cqp9OLsUtKd0a8861d3S5KxFSVXeKJsS5HHlk1dUBgepoWMncDhxHlqbYf3YU9bRiPGPmciRKuEE4Usj1WgxlS5Fzw0kHJ89RCIieTitB9FGU7+2iqqaXpmLbz/Ro02uqphZmie/6wgcvc+Hsl/hK8pUYOIaorFXxi9BVHEz2WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ickUw649; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lqqz+gYm"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-86117e5adb3so181680339f.2
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 06:48:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ickUw649"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d6e11cd7e2so42786815ab.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 07:51:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744724903; x=1745329703; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744728701; x=1745333501; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IEbQBiFiZFwJTl0Yl+XvYCk4r5u+r4E4QzEsUOtsGLs=;
-        b=lqqz+gYmBLQjpE3UMAPt42C2s6qkkCbzRooU3NR5QnNjByUUFk4PNQP68W/4P5mXGm
-         qIlKy5na+Sgf0gCaVRNbBgbZ++ChI0yxnXj2FZpqAPTBjGqqz/cjtzw4capEn9lipjE9
-         pMm7EV49LnYdJI/EVZdZ4tJpRoTXA8yKi04mJ09GpZE31zkg0zrwCwo8tZ7pPrqe0q6E
-         3x/a3IA1tCfr75XVIEgpQsBSWR6Lqs8nymGtlv31xEf88QAV1di/ABWnbk/IgA3PGhMa
-         nHE9NM3A4EnsxSMohllc7qTovOkhphaDzhayLco6fL90c9RO/Dwkj8j/zDgVXXdQthQf
-         RfcQ==
+        bh=0lf3tEQWotFxDCRI1w+F+4wVeEZ+ikqfwdzLLjmnXE0=;
+        b=ickUw649jtFb8G7Vp/UW5RoKsY8DVMcGVIbHU23bG9QYzgkUBvabt00ymhqSvMVZCJ
+         U7x1WPz3oZljGFL3RyBALVOaCChYk8pX6xfIlwyzNA58pi5gk+Stx5EOTECLejsuPSIE
+         D6d6uf36vwabGSfdbSybGxzWbGeuMxOIKSpU/970OHgD0fjT+RZrA18f74PO6zszL0me
+         Eshusea3dFsqVNhT8PIgC/QbBv8L+cD2c12PQLXIww0L+VYee/T6wnC8ohsTPUYwIfkO
+         dUX5MVpY3hkRia/aCU2y+Wa19WPW/ybIJ8fs22ceJRLST7LqCdumrZkQ89YvWaHbgRrA
+         6E8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744724903; x=1745329703;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IEbQBiFiZFwJTl0Yl+XvYCk4r5u+r4E4QzEsUOtsGLs=;
-        b=ObA+gJTJLFINSej8ck2BqepFOqxpQx7iIi5o7fJ41bsgr0q0c5xLjhndEjJdAzD4Mf
-         rEz9D5a6F18BAS1DfSCD5pgWZril7MhClZYSE+3dxRLMevbrytkcvu9H28aTZtqa/UYh
-         PqIDA9G/JgWHD6b1svjnJuHRCgp3u/JxVrRzf2ZfKwB6ytPwKVNKJTLjxCKmh9mPj4E6
-         OJ1cclGIunZhDOX46amSsRInHHDyi50kCFbyJ0mIcrGjDJHmajh54c8rXRI5pI6tf+dZ
-         NQq4XUtoHaq4gmqdTVf5wOZUbU7PZl7DDHbTvtgLcWfnD3DVjNpP3xXddic+10wqdqht
-         aOhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVP2JNbhYbG8gFAlIa7k1VD7GMUNRniAfI5mskRHkeyjfOPEuct3e9OTciiAUl7eLFUh7eO1sebHqS+nQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyvlZ7JIDUPxZe7gJAkd0jEMetNb8bijlwbVeOaJNHKvkNZXDD
-	nGCJxi2gJzH/ryGZ+kZNsXcugQFsHhGOA+wgx5XzDHHTJr8v0si3c0ujgq1s0SA=
-X-Gm-Gg: ASbGncvc8N6wMOE3RNxEAISIyCZ7GpK0NC3u7NTqzOPlw59B8uQOeXBptcoQXoJ2C+1
-	dlscRTk0jvcYOKOJicxZLcptoj2bsoN0TdEASjHruSik+H4xek4PQu521cPTuH1gDnK8DmvGowz
-	7Rfz9SrAGZcjOWwH8d7m73K4NXc/VZM+ezZ6bLSvCVGvQ6vQIrAs7PKdQ0ENxGaD0ku6vDPiDkK
-	fhlnUA18vuvOoojSKfETzrZd6STL5WHPy0Mkg2HXwn7npF4paK8Z/4T2TJlQi3DNzEnN2e00q6V
-	K4Elf/bhoQLCnMfj9gOTD3uYkEscXYfWZUCilIY3erM=
-X-Google-Smtp-Source: AGHT+IEus8WSuQJc6+4zLbZc/MnR/075iVtowh7y7vuln/ACpKCLskT8RvCvla7P/9LF76osem/z8w==
-X-Received: by 2002:a05:6602:3890:b0:85b:6118:db67 with SMTP id ca18e2360f4ac-8617cb59f52mr1693574139f.2.1744724903703;
-        Tue, 15 Apr 2025 06:48:23 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505d3c323sm3123456173.74.2025.04.15.06.48.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 06:48:23 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Martijn Coenen <maco@android.com>, Alyssa Ross <hi@alyssa.is>, 
- Christoph Hellwig <hch@lst.de>, Greg KH <greg@kroah.com>, 
- Jan Kara <jack@suse.cz>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: John Ogness <john.ogness@linutronix.de>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-In-Reply-To: <20250415-loop-uevent-changed-v2-1-0c4e6a923b2a@linutronix.de>
-References: <20250415-loop-uevent-changed-v2-1-0c4e6a923b2a@linutronix.de>
-Subject: Re: [PATCH v2] loop: properly send KOBJ_CHANGED uevent for disk
- device
-Message-Id: <174472490268.143017.12721024881216566078.b4-ty@kernel.dk>
-Date: Tue, 15 Apr 2025 07:48:22 -0600
+        d=1e100.net; s=20230601; t=1744728701; x=1745333501;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0lf3tEQWotFxDCRI1w+F+4wVeEZ+ikqfwdzLLjmnXE0=;
+        b=PyUvMpH1w0/hywXIZsNdIT0YVIN/aZSTuaNhrSiVP3sptT4CSmHfcBz0aEEIQOKqrY
+         BhW2DZtVSazWrXquDE95YINItJvAWlojVQggIQALEOBMt+qEci9E8oiAqJr2iyHqgwIa
+         EV9czyLSDkwmzOMWXpEn3Lj1ETyi+NwyruuB3WqbYHTtI87L+a6QhdfPGxGNc249SnuX
+         z4TUhdBJ1j6rlwLpGHyQk0b1rfiHGFWNh7LTvdP82C875PlaDmIpaxe3sDKJio75/cFp
+         bNoY2XdnpLKXcZemGiyUhkU8Vgfar2bx9KY6bqgK5B2P8sEYPa1js4TjCkDtrg8I8Ljn
+         y9lw==
+X-Gm-Message-State: AOJu0YxWz2NC86A1ka+lmbxyGElwk1Ho7i+5Ev5xnA5NLLaNiMDw17QD
+	j/dz9iI8WpZQcclnV7ub7RitEhJLt40nrANx1KJYxxMA0wH93xH3gIzDTMWifom+/avTzdqpQB4
+	W
+X-Gm-Gg: ASbGncvlgIyg9yY95ATyQiUrmsDLHUn4NtAtJORrQ28aso2suQvxrRa/j4KYndSd1ZK
+	CkgakB4pP5Xt9qFYt0qs8COwJK8kqPQnwX+brc5yCz3ONfymj01ssRtFRqZZJb/35MCBDmocAZ4
+	3S9qGcjPh0XL9wk4dM76rsNgEm7NjcmcRuBmhm9TSIhemJ6it3D1B4e0sWdVs8ZxQv26nGRPy3X
+	3MW1ImJ9G6rXBTuTdJ1Im32f6aJPZFnKXtScFj4quBilpQdZkIXI1Kec2Q0GFvglLGDcD4EO5n+
+	s5hAuTGiLkq5Ri5sHbRUyftJM2MDaftjrq7drbsZVsR9edcc
+X-Google-Smtp-Source: AGHT+IExSeDtlryIjKo7XNxy8tbFmEWN7Ds5uoCxfhnc+F/X6WdYSx/BeZY9XtW3xPdehBzW/Se51Q==
+X-Received: by 2002:a05:6e02:1449:b0:3d3:d4f0:271d with SMTP id e9e14a558f8ab-3d7ec21bb5fmr170284585ab.12.1744728701317;
+        Tue, 15 Apr 2025 07:51:41 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505e02105sm3135968173.90.2025.04.15.07.51.40
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Apr 2025 07:51:40 -0700 (PDT)
+Message-ID: <1720cf81-6170-4cac-abf3-e19a4493653b@kernel.dk>
+Date: Tue, 15 Apr 2025 08:51:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: ensure that struct blk_mq_alloc_data is fully
+ initialized
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On x86, rep stos will be emitted to clear the the blk_mq_alloc_data
+struct, as not all members are being initialied. Depending on the
+type of CPU, this is a noticeable slowdown compared to just ensuring
+that the struct is fully initialized when setup.
 
-On Tue, 15 Apr 2025 10:51:47 +0200, Thomas Weißschuh wrote:
-> The original commit message and the wording "uncork" in the code comment
-> indicate that it is expected that the suppressed event instances are
-> automatically sent after unsuppressing.
-> This is not the case, instead they are discarded.
-> In effect this means that no "changed" events are emitted on the device
-> itself by default.
-> While each discovered partition does trigger a changed event on the
-> device, devices without partitions don't have any event emitted.
-> 
-> [...]
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Applied, thanks!
+---
 
-[1/1] loop: properly send KOBJ_CHANGED uevent for disk device
-      commit: 7ed2a771b5fb3edee9c4608181235c30b40bb042
-
-Best regards,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c2697db59109..9fb43b09a401 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -584,9 +584,13 @@ static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+ 		.flags		= flags,
++		.shallow_depth	= 0,
+ 		.cmd_flags	= opf,
++		.rq_flags	= 0,
+ 		.nr_tags	= plug->nr_ios,
+ 		.cached_rqs	= &plug->cached_rqs,
++		.ctx		= NULL,
++		.hctx		= NULL
+ 	};
+ 	struct request *rq;
+ 
+@@ -646,8 +650,13 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
+ 		struct blk_mq_alloc_data data = {
+ 			.q		= q,
+ 			.flags		= flags,
++			.shallow_depth	= 0,
+ 			.cmd_flags	= opf,
++			.rq_flags	= 0,
+ 			.nr_tags	= 1,
++			.cached_rqs	= NULL,
++			.ctx		= NULL,
++			.hctx		= NULL
+ 		};
+ 		int ret;
+ 
+@@ -675,8 +684,13 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+ 		.flags		= flags,
++		.shallow_depth	= 0,
+ 		.cmd_flags	= opf,
++		.rq_flags	= 0,
+ 		.nr_tags	= 1,
++		.cached_rqs	= NULL,
++		.ctx		= NULL,
++		.hctx		= NULL
+ 	};
+ 	u64 alloc_time_ns = 0;
+ 	struct request *rq;
+@@ -2969,8 +2983,14 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ {
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+-		.nr_tags	= 1,
++		.flags		= 0,
++		.shallow_depth	= 0,
+ 		.cmd_flags	= bio->bi_opf,
++		.rq_flags	= 0,
++		.nr_tags	= 1,
++		.cached_rqs	= NULL,
++		.ctx		= NULL,
++		.hctx		= NULL
+ 	};
+ 	struct request *rq;
+ 
 -- 
 Jens Axboe
-
-
 
