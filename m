@@ -1,77 +1,168 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DB41EA7DE
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 10:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4163327B4EF
+	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 10:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744711624; cv=none; b=Zxzvu9DOqFWOe1ykyRr9yjGBDNSws6O98R1QhV/kJjyPAG9v0cjXn6G0bkgz1VEIHJeW4qve127hyVP13EYtIOHzO0NhjRJ/ZstUVMLFNSl/qczoRidzqR02Onzis1xa51RW9UWDy3loXNRy7q/BqHCL8Ybbxui24ZyWMz57Mzk=
+	t=1744711635; cv=none; b=pYPq7WAFxB+zo6giEjYTg/7OkQdRqOA4l6KhtlittMygRRhh6qmGebOfH+bBmF8JXBQDBwj3EXnScr+U3YdKGlfhMT2ltHW5WS/hts+HA8WFT1/MNnWpqgkv7p9wJe4aiGYOyvDh7Gui22BaXXGsybCN911P6QReTIvO1mzeR5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744711624; c=relaxed/simple;
-	bh=LemxrSgbISHecGwZDg8d1YDEy+VHGq0FxK3EasKvRmc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=EdUEsqF2oixwq6v4BLFWbyY0KJIQs58pCH/RWxo1XmwLwf4jzZgIQ+ZvjLy/3uR1WkJ4NqggQZypamXB3/udWtu4gh3HPtPvHVk9umcu0XDnDfo0/xuZomI1QjOx2sKn1GRsg3Ch3wiDNUmA3evLstUGCXFO9GDi+oO+9fhXAUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3d6e10f8747so50976355ab.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 03:07:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744711622; x=1745316422;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekxtkAYIfj9WYYWGRtuMIkrL5W+mUE1d81+QmoJC3I0=;
-        b=Zy0oVT29VOcAF38rV/QSJfMbFHnov3Db5JgA22sPtY5QmUvYz3HGKGj1JugzrAAiCd
-         S1XkUSY8Z7J2Dy1G8mh56xuGe/g0Yt6RY3mCc/w62g9KnymdfYFclGVDySsg7itxSsqJ
-         seZINAo5asUl4VQ+iaL2vAPVSQRuGMnoVgurZRL+b7gB9MX5bmqklRQHZLPgvDWHiPdy
-         uvO3MxVLKL+cp6P1c3NfPpc4N+SC8B/1xWzAcVQMQFW3+Vwt/d7p4ULHxaA3j84hsd/d
-         gXTzDhET5WQQbPPBLwy/Cuxzce0U0Q3j4OqWiK4ZTL59Hfx5pvDlJs+up7zV+7fwK2PF
-         z6uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSg1ZLdONvLqVj9i+Ez3uAS7wqnsmWQf6yPK6GSXOxOYY7GRcy++hw5MTdvRXlG0F1do9DmNt6O2Zt6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9w0YO7jqTADAsPEmlaOZag33qbO2+8pol1xqd3PC7BaiI00AV
-	sOD+/aPF44ipfHniDYXXykhMh9XM1jhPcvNegz2IlTU47UQq64gbcqByIjhNpscPJiCLnVf3H8j
-	G36xgFkb0cCZVtpDXQv3DJwT5Sn7mVlJlB0UN9hXFmxx2yVJxG3MiBf4=
-X-Google-Smtp-Source: AGHT+IF0T2CRgbXUbT4vmgmK1YTgZn8RZJgbSXksVxvQoT0lh3iTSFP4A3u0nMuYNkC3SkdO7G3r0lGa9db6H/6xjiyKgPaRyX8a
+	s=arc-20240116; t=1744711635; c=relaxed/simple;
+	bh=xtVrwFh5e41vTbYXDsUVTvtC+AGL5L9u1d6CZeCO0yA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J4w3nvO27/y8ilDgEjmBKWKFqXNsCCLxtrybtdfmO3iGgeo75W2xjrIjj301r1+na7wqYolDJbWn1wky+4kHBb0F3hL9rglxbwIxm6+/TX7N20T9r88FUvFg38TUcJW+pjNG29nbstxSbKKXXLzU6P2WQBnt4W33P/m8lwbi4fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VkA1JMbq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkA1JMbq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744711632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3iqVuxZodv/9DdNyAXc6CM9l0J63zHrWcD6alJGhj0c=;
+	b=VkA1JMbqoKDsClPdQiTDmpymxS3n3EXjBeqj6fWMKIgpiUuXqlOx1yxsoyhwcId4/g5QmV
+	sTYoJ5eiF2dqScE+bGeGewscvMY4KIuM/q7JL1xM03iZtn3RSOyA8nWbVvMe9VWr3h/qVy
+	Wokb/A3FoRY+H3T3bd/C4JsfrLIZE8M=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-81-YgMcZQjOO56CTMAQmS-_MQ-1; Tue,
+ 15 Apr 2025 06:07:08 -0400
+X-MC-Unique: YgMcZQjOO56CTMAQmS-_MQ-1
+X-Mimecast-MFC-AGG-ID: YgMcZQjOO56CTMAQmS-_MQ_1744711627
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD9871955BC9;
+	Tue, 15 Apr 2025 10:07:06 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.70])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B64331808867;
+	Tue, 15 Apr 2025 10:07:02 +0000 (UTC)
+Date: Tue, 15 Apr 2025 18:06:57 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 12/15] block: move debugfs/sysfs register out of freezing
+ queue
+Message-ID: <Z_4vwU7HMLCShZUO@fedora>
+References: <20250410133029.2487054-1-ming.lei@redhat.com>
+ <20250410133029.2487054-13-ming.lei@redhat.com>
+ <b28d98a6-b406-45b0-a5db-11bc600be75f@linux.ibm.com>
+ <Z_xn-Zl5FDGdZ_Bk@fedora>
+ <96d870d2-19f2-489e-951f-b92a56b59bf6@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1888:b0:3d3:fdb8:1792 with SMTP id
- e9e14a558f8ab-3d7ec265578mr137221655ab.14.1744711622446; Tue, 15 Apr 2025
- 03:07:02 -0700 (PDT)
-Date: Tue, 15 Apr 2025 03:07:02 -0700
-In-Reply-To: <679fb3a5.050a0220.163cdc.0030.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67fe2fc6.050a0220.3483fc.004c.GAE@google.com>
-Subject: Re: [syzbot] [bcachefs] general protection fault in bioset_exit (2)
-From: syzbot <syzbot+76f13f2acac84df26aae@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, gregkh@linuxfoundation.org, kent.overstreet@linux.dev, 
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mmpgouride@gmail.com, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96d870d2-19f2-489e-951f-b92a56b59bf6@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-syzbot suspects this issue was fixed by commit:
+On Tue, Apr 15, 2025 at 03:07:18PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 4/14/25 7:12 AM, Ming Lei wrote:
+> > On Fri, Apr 11, 2025 at 12:27:17AM +0530, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 4/10/25 7:00 PM, Ming Lei wrote:
+> >>> Move debugfs/sysfs register out of freezing queue in
+> >>> __blk_mq_update_nr_hw_queues(), so that the following lockdep dependency
+> >>> can be killed:
+> >>>
+> >>> 	#2 (&q->q_usage_counter(io)#16){++++}-{0:0}:
+> >>> 	#1 (fs_reclaim){+.+.}-{0:0}:
+> >>> 	#0 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}: //debugfs
+> >>>
+> >>> And registering/un-registering debugfs/sysfs does not require queue to be
+> >>> frozen.
+> >>>
+> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >>> ---
+> >>>  block/blk-mq.c | 20 ++++++++++----------
+> >>>  1 file changed, 10 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> >>> index 7219b01764da..0fb72a698d77 100644
+> >>> --- a/block/blk-mq.c
+> >>> +++ b/block/blk-mq.c
+> >>> @@ -4947,15 +4947,15 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+> >>>  	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+> >>>  		return;
+> >>>  
+> >>> -	memflags = memalloc_noio_save();
+> >>> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> >>> -		blk_mq_freeze_queue_nomemsave(q);
+> >>> -
+> >>>  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> >>>  		blk_mq_debugfs_unregister_hctxs(q);
+> >>>  		blk_mq_sysfs_unregister_hctxs(q);
+> >>>  	}
+> >> As we removed hctx sysfs protection while un-registering it, this might
+> >> cause crash or other side-effect if simultaneously these sysfs attributes
+> >> are accessed. The read access of these attributes are still protected 
+> >> using ->elevator_lock. 
+> > 
+> > The ->elevator_lock in ->show() is useless except for reading the elevator
+> > internal data(sched tags, requests, ...), even for reading elevator data,
+> > it should have been relying on elevator reference, instead of lock, but
+> > that is another topic & improvement in future.
+> > 
+> > Also this patch does _not_ change ->elevator_lock for above debugfs/sysfs
+> > unregistering, does it? It is always done without holding ->elevator_lock.
+> > Also ->show() does not require ->q_usage_counter too.
+> > 
+> > As I mentioned, kobject/sysfs provides protection between ->show()/->store()
+> > and kobject_del(), isn't it the reason why you want to remove ->sys_lock?
+> > 
+> > https://lore.kernel.org/linux-block/20250226124006.1593985-1-nilay@linux.ibm.com/
+> > 
+> Yes you were correct, that was the reason we wanted to remove ->sysfs_lock.
+> However for these particular hctx sysfs attributes (nr_tags and nr_reserved_tags)
+> could be updated simultaneously from another blk-mq sysfs attribute named nr_requests.
+> Hence IMO, the default protection provided by sysfs/kernfs may not be sufficient and
+> so we need to protect those attributes using ->elevator_lock.
 
-commit 3a04334d6282d08fbdd6201e374db17d31927ba3
-Author: Alan Huang <mmpgouride@gmail.com>
-Date:   Fri Mar 7 16:58:27 2025 +0000
+Yes, what is why this patchset doesn't kill more ->elevator_lock uses, such
+as, the uses in blk-mq-debugs, update_nr_requests, but many of them can be
+replaced with grabbing elevator reference.
 
-    bcachefs: Fix b->written overflow
+But with/without this patch, the touched register/unregisger code does not
+require ->elevator_lock:
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11c360cc580000
-start commit:   76544811c850 Merge tag 'drm-fixes-2025-02-28' of https://g..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8de9cc84d5960254
-dashboard link: https://syzkaller.appspot.com/bug?extid=76f13f2acac84df26aae
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=159248b7980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13152a97980000
+                blk_mq_debugfs_unregister_hctxs(q);
+                blk_mq_sysfs_unregister_hctxs(q);
 
-If the result looks correct, please mark the issue as fixed by replying with:
+so I don't understand why you argue here about ->elevator_lock use?
 
-#syz fix: bcachefs: Fix b->written overflow
+> 
+> Consider this case: While blk_mq_update_nr_hw_queues removes hctx attributes,
+> and simultaneously if nr_requests is also updating num of tags, would that not 
+> cause any side effect?
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Why is updating nr_requests related with removing hctx attributes?
+
+Can you explain the side effect in details?
+
+> Maybe we also want to protect blk_mq_update_nr_requests
+> with srcu read lock (set->update_nr_hwq_srcu) so that it couldn't run while  
+> blk_mq_update_nr_hw_queues is in progress?
+
+Yeah, agree, and it can be one new patch for covering race between
+blk_mq_update_nr_requests and blk_mq_update_nr_hw_queues, the point is just
+that nr_hw_queues is being changed, and not related with removing hctx
+attributes, IMO.
+
+
+Thanks,
+Ming
+
