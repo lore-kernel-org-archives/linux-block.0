@@ -1,43 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4915182BD;
-	Tue, 15 Apr 2025 00:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED91F9DA
+	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 01:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744677189; cv=none; b=LnSES1UrZS90ZYBZlsZi5ngqNyDDWCeYSPv6DDeMQzmQ04becH5M9Hg1CLr+L7dNfDbid5X2GKBlAJV6Q6EPIgfInm06mvPdtO7fK7uVnYKW0yXAV4odemKV5Q8Qu5ITWy0wqHkJZhG3tpbw04JkFtd3ZUrY/dZ86bcQZirK5s8=
+	t=1744680778; cv=none; b=L/BcnzC2q/eLcYUr+ZBFc0ooRLQ1gEz8CXicZZBCabRF+nAtqS1B0Sejvmu5SzJ8pKCs63Lq7S7kQSk12lhT7g0faplOMHNsmmFI93ABFpITbzbbF4FXezScW12aM41yhKHNyXpDojvi4PmWXjtQNvDU6KFeKXKOjmvY4GJRHno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744677189; c=relaxed/simple;
-	bh=5Pahrhy8qFJY6lzVfKp6QObVcVFpNTvrdsxGF+Dh6uQ=;
+	s=arc-20240116; t=1744680778; c=relaxed/simple;
+	bh=Jf8bB4o+ns7Wk3y4TdJPoFxrmSi4DwWUhJ8fGuaLGiQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLePsp49h9bklfr2EXQG2TwZGMTTV0k7rgR6rLMPwE/xVUweSsBOQZ4ffDftYyCO0o6jf9Mquukdw6iLpjOKCC4wULs+HigHRH8Zz00KxWYI5/4nmCu/OfWVGldc3mmJaULCe1BO7i7MjVGxVt8mh57384kVTNNAsONfKUIYpdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pZBq0Msh; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=H7kY4Df4Rd2hxhD4jP6N1Hqu2HX0u0GpRVUUKdrK1Z6Sa7PlwAXRNYdKWeITX7Ge+BGrHEc8CGGNJho8nKsaQHt9jQrwhvb8JM7lYlDV9YViIo+a1MUzZJOVYzgIFoc0lUJnb08zbl8KMckASEqwXQzHK7Vt/wBZ1Iv84e1y/TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jv5jqCOX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pZBq0Msh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7CF6C4CEEA;
-	Tue, 15 Apr 2025 00:33:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744677189;
-	bh=5Pahrhy8qFJY6lzVfKp6QObVcVFpNTvrdsxGF+Dh6uQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pZBq0MshnSFZNduirJiPwbcKTnE2HowWM/EX4hWHyY/BnVfdsHJ/faK2GsNKpW9cB
-	 0DIgxg7ge8DhIxRlfNMFF/o9Wv1MO3D+Nx3cA3kgaZiMyrF4zzCPUxH69leM9bHBDR
-	 a9j+tSuX0/k5egVi9qkmBVN/ozNUOEYubebDwtyGAiVMuFuG4l+10x7q4hSuuQllGD
-	 PIM4Rcx/1PJSjezUsLG+lNzfMJn2Kna7QUgiqRa6CCSYao7NE44nKChPIU9GBshz4s
-	 jiDRAWd8ilg6z7TDqPwhoB15HkLeuq8W6G18xgZGAAKEr1hqmcsO/3scUOB/CGoBs1
-	 JnznE0juwnKeA==
-Date: Mon, 14 Apr 2025 17:33:08 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Carlos Maiolino <cem@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	xfs <linux-xfs@vger.kernel.org>, Jack Vogel <jack.vogel@oracle.com>
-Subject: [RF[CRAP] 2/2] xfs: stop using set_blocksize
-Message-ID: <20250415003308.GE25675@frogsfrogsfrogs>
-References: <20250415001405.GA25659@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jv5jqCOX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744680774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JcMYEciBzTMlXECv4QLMrvNLarmdu9OY5+/YDk72U5U=;
+	b=Jv5jqCOXyW/BY5wCXcIgL/uq++5zhvefVroU6/tGoQo1X86+gG2b8WWvvVUf10BHCkpmAh
+	YtiB+K08F/JPcJct3JjxaZ1QrJT1lNKhVnexkXcyQVKdLQWklx8TyExIQ+ckyYs+Uiv0sl
+	moKsYBVTbkwbvKAW+RDnrJ7ojqralEc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-YJpGH6bINMi7ti3GgPsf_Q-1; Mon,
+ 14 Apr 2025 21:32:53 -0400
+X-MC-Unique: YJpGH6bINMi7ti3GgPsf_Q-1
+X-Mimecast-MFC-AGG-ID: YJpGH6bINMi7ti3GgPsf_Q_1744680772
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFE2A18004A9;
+	Tue, 15 Apr 2025 01:32:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.40])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9336B180175D;
+	Tue, 15 Apr 2025 01:32:48 +0000 (UTC)
+Date: Tue, 15 Apr 2025 09:32:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 1/9] ublk: don't try to stop disk if ->ub_disk is NULL
+Message-ID: <Z_23OxWATqNr1fcy@fedora>
+References: <20250414112554.3025113-1-ming.lei@redhat.com>
+ <20250414112554.3025113-2-ming.lei@redhat.com>
+ <Z/1lr233+THpllVI@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,91 +59,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250415001405.GA25659@frogsfrogsfrogs>
+In-Reply-To: <Z/1lr233+THpllVI@dev-ushankar.dev.purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: Darrick J. Wong <djwong@kernel.org>
+On Mon, Apr 14, 2025 at 01:44:47PM -0600, Uday Shankar wrote:
+> On Mon, Apr 14, 2025 at 07:25:42PM +0800, Ming Lei wrote:
+> > In ublk_stop_dev(), if ublk device state becomes UBLK_S_DEV_DEAD, we
+> > will return immediately. This way is correct, but not enough, because
+> > ublk device may transition to other state, such UBLK_S_DEV_QUIECED,
+> > when it may have been stopped already. Then kernel panic is triggered.
+> 
+> How can this happen? If a device is stopped, it is in the
+> UBLK_S_DEV_DEAD state. Won't that make us fall out of this check in
+> ublk_nosrv_work, so we wont transition to UBLK_S_DEV_QUIESCED or other
+> nosrv states?
+> 
+> 	mutex_lock(&ub->mutex);
+> 	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+> 		goto unlock;
 
-XFS has its own buffer cache for metadata that uses submit_bio, which
-means that it no longer uses the block device pagecache for anything.
-Create a more lightweight helper that runs the blocksize checks and
-flushes dirty data and use that instead.  No more truncating the
-pagecache because why would XFS care? ;)
+You are right.
 
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
----
- include/linux/blkdev.h |    1 +
- block/bdev.c           |   23 +++++++++++++++++++++++
- fs/xfs/xfs_buf.c       |    9 ++++++---
- 3 files changed, 30 insertions(+), 3 deletions(-)
+I just verified that all tests can pass after reverting this patch.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f442639dfae224..ae83dd12351c2e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1618,6 +1618,7 @@ static inline void bio_end_io_acct(struct bio *bio, unsigned long start_time)
- 	return bio_end_io_acct_remapped(bio, start_time, bio->bi_bdev);
- }
- 
-+int bdev_use_blocksize(struct file *file, int size);
- int set_blocksize(struct file *file, int size);
- 
- int lookup_bdev(const char *pathname, dev_t *dev);
-diff --git a/block/bdev.c b/block/bdev.c
-index 0cbdac46d98d86..201d61d743592e 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -152,6 +152,29 @@ static void set_init_blocksize(struct block_device *bdev)
- 				    get_order(bsize), get_order(bsize));
- }
- 
-+/*
-+ * For bdev filesystems that do not use buffer heads, check that this block
-+ * size is acceptable and flush dirty pagecache to disk.
-+ */
-+int bdev_use_blocksize(struct file *file, int size)
-+{
-+	struct inode *inode = file->f_mapping->host;
-+	struct block_device *bdev = I_BDEV(inode);
-+
-+	if (blk_validate_block_size(size))
-+		return -EINVAL;
-+
-+	/* Size cannot be smaller than the size supported by the device */
-+	if (size < bdev_logical_block_size(bdev))
-+		return -EINVAL;
-+
-+	if (!file->private_data)
-+		return -EINVAL;
-+
-+	return sync_blockdev(bdev);
-+}
-+EXPORT_SYMBOL_GPL(bdev_use_blocksize);
-+
- int set_blocksize(struct file *file, int size)
- {
- 	struct inode *inode = file->f_mapping->host;
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index 8e7f1b324b3bea..2c8531103c01bb 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -1718,14 +1718,17 @@ xfs_setsize_buftarg(
- 	struct xfs_buftarg	*btp,
- 	unsigned int		sectorsize)
- {
-+	int			error;
-+
- 	/* Set up metadata sector size info */
- 	btp->bt_meta_sectorsize = sectorsize;
- 	btp->bt_meta_sectormask = sectorsize - 1;
- 
--	if (set_blocksize(btp->bt_bdev_file, sectorsize)) {
-+	error = bdev_use_blocksize(btp->bt_bdev_file, sectorsize);
-+	if (error) {
- 		xfs_warn(btp->bt_mount,
--			"Cannot set_blocksize to %u on device %pg",
--			sectorsize, btp->bt_bdev);
-+			"Cannot use blocksize %u on device %pg, err %d",
-+			sectorsize, btp->bt_bdev, error);
- 		return -EINVAL;
- 	}
- 
+
+Thanks,
+Ming
+
