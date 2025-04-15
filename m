@@ -1,64 +1,48 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C309219F13B
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 15:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778022DFA41
+	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 16:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744732757; cv=none; b=UCPMjKYkJBjncBnSw3L9s71BYf2ifKvIduAHAQREsMCbd1JfhN/gRLGmnmdy4Trb599ZK1u/s9y3NQwhoBWQcvxMXWp7xi4Itoz34fVNLLov7fkyJeE5uVEr+XAHhd/dpDNzMBGVvJ8f2tS0hjYin6lSc730qCtIDcYWZ86AamE=
+	t=1744733613; cv=none; b=NaleZFFEx7ydTfTHDOa/gbXorzO5G5kO2UMw6306xxsf+HVp1C3/fGNJFFzB5Wgg54pDk8ITXQBLvJFbdMXwA6qmk277BL8AWe6ThPLQOooCGy1FQLfJiRmNDlETX7az1fSDy/zWzR3jtY3WDd1HogwjItWwvUMYZ5oWaZ1JBGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744732757; c=relaxed/simple;
-	bh=Bm7+K9nfbx8GrUNi/0vN+GliyYNoXH0V+uq8nvy68ew=;
+	s=arc-20240116; t=1744733613; c=relaxed/simple;
+	bh=wkSPPXWFbT2+ljWVwLvkrqluqpYBza3Xn9m2ci+mEhU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HkJH508B+jxizPm5km3pXn+ojVoHg/chX751vVN7XCpqcZRk4X+XgKeoq/0KI7On1D3zVA5xpP/DkSz+gNwRxit/gy3qQEOKZrspV7wx724dHBB9rJLuZlICWb+gkYU7RKd6U83PtzmezeMw3YKv2LyqlvnI94PFb7XXweAlpYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iP1q6zOe; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=ijS25dQ5RD1nDIJFaDhiH7r0D7w8WK/gEyNfiJ0U5jFIfiKnCrkzsRvb8lmxU5//JUbXWFTRog6HR6kcZiu+rryIaJzgUK15S0Exl/+g0Nu24uXW7HIbG71oGrrVCXxIzHsAHVpgHEth8BJyETOHf1COJzd/suRIX1Bm12LUevs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Ne3EgI8G; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iP1q6zOe"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d5ebc2b725so17886015ab.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 08:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744732753; x=1745337553; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DvZ3lEk3LiFTQ514bUef/7CZabDImeQOBm5GUejr5dw=;
-        b=iP1q6zOeGUWWgBb4GCgPSnytBfrLL+h6FbwZBYm/reND8MP/m5pXL9QYsBRA6GGUKI
-         G1UIz8xTQsG14CpZrLHsz/Aj4LTCxxq+6dj4LbxAG5NJvsssovrf0Fy3FlhZDpcjJdXn
-         M0UH41mYtgmE0t0AumfragL7Fh3gXILIgZTmcLr2AVztosmZaTfTkJ6JG9/ScMvMdxzE
-         zooIj1lsvEHRGsj1CcG2PjRiCNjhIhtmGbKJcDAKyZvkRuoEvv3pszyLHaw64F/OKH1n
-         4QVo4pEWsVU45NU5iPMLdoc+Ijk861gSP36QZQ4TmUqGaxWOVGdyPnDP3wusyIpMKuPW
-         WeKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744732753; x=1745337553;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DvZ3lEk3LiFTQ514bUef/7CZabDImeQOBm5GUejr5dw=;
-        b=S8YJX4DIUY4AWnFBmIZbQrhh0EkbtjhH8mdwDtTxJY6GoSwkJJcIjGVPcBQhKCoCEQ
-         ruwhZuzYjiEEublsG8nKRkwpp77rn+LBsy08K+xJzEs6dyw5ahQgeyVrKvFITi2u/OK8
-         k4sZ0JugcL2FnKSYZ+E48DuNwN6W/yUnZI8IACwat4FJB8VM3sXbQ0G8O91A+XrA2/Lj
-         lctkMx3DyPeADMcjHD1GkB2KApmJ7ZrAOZvn0b/gqJfj48TApD12S/zC74oHL3XVUFqu
-         K0UHu0VmNu6tOk2vsDjZ901CSJ6kCO6JhPMY/NwO29hHcoJOAftl4WyYaTdmFRo1vve/
-         K7gg==
-X-Forwarded-Encrypted: i=1; AJvYcCXubjs3Kog/v/i4NpugK4n3M/Knz37IK/hQbmvKwUtc0xIheDt6O5SGiIZqIVjzUivZUkMhkEZE1qFQ+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvsnONeCabAGZaJdl8n47PgYcYqLiHyoU2t04YWu74EF1b+hsM
-	DR9UC2RaLqKghWoNvCIphwk4LEP0tmaYbIQ3+zYpyV1ZybJLMjwVBNLQuD1js/E=
-X-Gm-Gg: ASbGnctSs3b5roPBety5cIgZebj1m6+9JwhVnfmqd3TSa/L6Z/iUw6Za6cAC16nddCH
-	NrcGdqRZwp4cIt96ZbQf4EtXgVsd5wLU07lpFok28B6otFJowBTiJScrehrkHWFLBoGFd9UBrz7
-	PM1/zIpXqM0T7wTQLQEe9JDnFTR6K2UVdW0rXJdsxhb0zLC5w9MSd89k87p4KaLtH3PAt/xeH7E
-	JxzcBf/EEiBLBxw3yW11OmgVJBzGDn9safL7cmsC/sdrgk0dt3A3yp6EcUlej1FKdHTT8CGI8De
-	W27sP78lolLx9zAiEuhv+TzKJFxfkVEyEc/toouVRg5NN8Rv
-X-Google-Smtp-Source: AGHT+IEkTkqUusJJOVmR/+yrncVb9sAmzMM30F2VLLNmLcld8OgoQox3K+fJUKohP3z4ynfXMfjyrg==
-X-Received: by 2002:a05:6e02:2284:b0:3d3:d994:e92e with SMTP id e9e14a558f8ab-3d7ec265561mr153725035ab.17.1744732752707;
-        Tue, 15 Apr 2025 08:59:12 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dc592afcsm33601665ab.66.2025.04.15.08.59.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 08:59:12 -0700 (PDT)
-Message-ID: <4b0eee16-a37b-4770-95f0-c5f02160e0da@kernel.dk>
-Date: Tue, 15 Apr 2025 09:59:11 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Ne3EgI8G"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZcTjQ2cXRzm0yTx;
+	Tue, 15 Apr 2025 16:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1744733609; x=1747325610; bh=eWe/2h1C1UHa5EOAZBySFfNo
+	j4f+JM9P7UzPagskPKA=; b=Ne3EgI8GCacrOt4oFujiRQlzwy0vHfjOt2/ywkZW
+	o7Mzju4jRvHp99woDdT99v2c3e0uUYQKTMPIFEj/ECKMmo89OhWlmp6uYsuKZf9K
+	4QZjees9RAfKbhtCHjh6Ddknh+YXjRbMVSnHqiaA4Ub1WcFQ1nzFprswE5KZGDlR
+	gx1kA3ttEqr49ZgSHZ+RRbLNlSR/zTyanNhUWYZIIXza8MLygFggUffauJqC2+v7
+	57oGuGMX6jiuhKJnXu1kcgEbnlVtZXqxTrd+HRDviTKGnf4yRosJAEWGwl3C8I0w
+	jZtTT6WhHDIAO//TQi3mg88aoSi/wWJy6VII1RfOYKGCmQ==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 1VQqDJUt5OaX; Tue, 15 Apr 2025 16:13:29 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZcTjN1xG9zm0yQ9;
+	Tue, 15 Apr 2025 16:13:26 +0000 (UTC)
+Message-ID: <77aa1c61-dc33-47d0-854d-22e4f1cae60e@acm.org>
+Date: Tue, 15 Apr 2025 09:13:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,29 +52,39 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] block: ensure that struct blk_mq_alloc_data is fully
  initialized
-To: Bart Van Assche <bvanassche@acm.org>,
+To: Jens Axboe <axboe@kernel.dk>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <1720cf81-6170-4cac-abf3-e19a4493653b@kernel.dk>
  <a8074c72-e258-4b34-a629-c253997dfab9@acm.org>
+ <4b0eee16-a37b-4770-95f0-c5f02160e0da@kernel.dk>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <a8074c72-e258-4b34-a629-c253997dfab9@acm.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4b0eee16-a37b-4770-95f0-c5f02160e0da@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/15/25 9:50 AM, Bart Van Assche wrote:
-> On 4/15/25 7:51 AM, Jens Axboe wrote:
->> On x86, rep stos will be emitted to clear the the blk_mq_alloc_data
->> struct, as not all members are being initialied.
+On 4/15/25 8:59 AM, Jens Axboe wrote:
+> On 4/15/25 9:50 AM, Bart Van Assche wrote:
+>> On 4/15/25 7:51 AM, Jens Axboe wrote:
+>>> On x86, rep stos will be emitted to clear the the blk_mq_alloc_data
+>>> struct, as not all members are being initialied.
+>>
+>> "Partial initialization" never happens in the C language when
+>> initializing a data structure. If a data structure is initialized,
+>> members that have not been specified are initialized to zero (the
+>> compiler is not required to initialize padding bytes). In other words,
+>> the description of this patch needs to be improved.
 > 
-> "Partial initialization" never happens in the C language when
-> initializing a data structure. If a data structure is initialized,
-> members that have not been specified are initialized to zero (the
-> compiler is not required to initialize padding bytes). In other words,
-> the description of this patch needs to be improved.
+> How is the description inaccurate? As not all members are being
+> explicitly initialized, rep stos is emitted to do so.
 
-How is the description inaccurate? As not all members are being
-explicitly initialized, rep stos is emitted to do so.
+Hi Jens,
 
--- 
-Jens Axboe
+I think we agree if the word "explicit" would be added to the patch
+description.
+
+Thanks,
+
+Bart.
+
+
