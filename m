@@ -1,50 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A16C188733;
-	Mon, 14 Apr 2025 22:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A323849C;
+	Tue, 15 Apr 2025 00:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744669176; cv=none; b=BTAeIa2Pv0SATusobj3kpk2i+67VeBrXQ8J0bVxWBBe4p+JKOOdCt9dOyM9VlEgcuWY3NZBxTjdIrWvE6itgH2dFpJt2NdVfSGXA/yOXZS/TCzWvqrMLv+OAlMc1caBLPHfRqf2nkilPhwqqzaw/I13LKYlHVpaWL6R5hDUpyQY=
+	t=1744676047; cv=none; b=DdB8zUOutpAvFSktiMNXqmmYji5FgHvp3WxmJtx28IM2Ggob+PCHZPJYYGcQ8WaJx/M2DH+2urf5SeD+2ptZn1ARuUFZrhJnecD7R+X3yUlOzoeSAHHzESqtMFZxEunvXOjB/t47FpMr41wLRFeMfv88kypWhvrStKoMiaWRVqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744669176; c=relaxed/simple;
-	bh=mtdkZa9At4gqYPvemsMEfO3+E3F5DanxmFy4R/Y/aB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ke0hgW8o2ZTSDPf5OqFvFbj4315AKAPULieuyIpJtw7HgjZmBVDuDJmlVUZ82av4cRc68jDE/5bcZ6w/+d0RsQ3okDK8H2BjcyMcqWxESNWjpFdUMOGCLrp3BB6HoyUJU0cd9PopX8q+36iM114CbdlcaCAkYpAIEs3Cwpg7pQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkPm2Eow; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744676047; c=relaxed/simple;
+	bh=a6Lq/GiKmX1UHcnKSF/sNR0mGQolJhfULhsR14qULXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RIhklB7SJmhiCiafgfgSpG7Rslu1bBxODNtYNed1K26v9F9ZmdCfgDFsb51g84qXMUNl7g15PvTtVpqebqc7UZrFX97oCRxgpkK7OvhsTrIyq9QKxJk2DzRMZyORZr+k7i5zj2fIGo1KvMIZpeFx5p7Va1blrWJDWB6aZcEswTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AsQ7eLj0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkPm2Eow"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4551EC4CEE2;
-	Mon, 14 Apr 2025 22:19:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AsQ7eLj0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 743E2C4CEE2;
+	Tue, 15 Apr 2025 00:14:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744669175;
-	bh=mtdkZa9At4gqYPvemsMEfO3+E3F5DanxmFy4R/Y/aB0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KkPm2EowAckq6jWd8gZEXzwMkf2QfMHUiQMFIy70E3iGwRekztQJYTjbsOXAyNgxc
-	 UhZ8s6IeIsggwhrBv2pYCQ1fBM3JGQNTX/oMfFY6BP8O7yQ9C9yjdW8Nyl3O6wEkK4
-	 YQ+smEWeXDZvwpGIJargk+S1j0E82kaQfJ/QzoGdAGJjF9BodZhuHXbn+XJ7nBWHmT
-	 fFXUzBi6mPZ7MMoK6TcqtjAUygbTH+3s4QkYAFxcGX1R8zClgalptG26Hc2tCPGNdz
-	 fZKzSti0QDZc3QQtCzlKxDyPFsh8Gl5TyLAJs1x+AfszKPhoCIDtB/04DnwfKIfMgu
-	 2TlrKfL4qgGHg==
-Date: Mon, 14 Apr 2025 15:19:33 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: brauner@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, riel@surriel.com, dave@stgolabs.net,
-	willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
-	david@redhat.com, axboe@kernel.dk, hare@suse.de,
-	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
-	da.gomez@samsung.com,
-	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
- migration
-Message-ID: <Z_2J9bxCqAUPgq42@bombadil.infradead.org>
-References: <20250410014945.2140781-1-mcgrof@kernel.org>
- <20250410014945.2140781-2-mcgrof@kernel.org>
- <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
- <Z_15mCAv6nsSgRTf@bombadil.infradead.org>
+	s=k20201202; t=1744676046;
+	bh=a6Lq/GiKmX1UHcnKSF/sNR0mGQolJhfULhsR14qULXM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=AsQ7eLj0dGX4n529lXkXZUELeUdaJAAVnzNg2z9UUNhqbtjPwG176LPRevCPscRzl
+	 q60Uz7pVssMqlKBM/x6XHVZln3yRJK6BAx+PyW6MWI4TgAuSJ8/VTX5OLIZvyVDSjc
+	 1SM9RpvTSWPdhz2NesoW7BOWhmzFQz46uLIHTP58L3zlGRWEXra6rqeVUBI4aAKHK3
+	 df7tyUOJRo2XVBW0adl++2ndYTZlSKSs2M6f6aiaAZjDMYk4cc19Bj4Eaq5XSKqxub
+	 ALy1UdHQ5WvvQczH1tGp1hNhhEJ4v+0DMWD8Iq76jsoz0tHLNLR8uh3ZJTj+eWnr96
+	 eBYvmddPJ+5mg==
+Date: Mon, 14 Apr 2025 17:14:05 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: axboe@kernel.dk
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	xfs <linux-xfs@vger.kernel.org>, Jack Vogel <jack.vogel@oracle.com>
+Subject: [RFC[RAP] 1/2] block: fix race between set_blocksize and read paths
+Message-ID: <20250415001405.GA25659@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,42 +45,192 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z_15mCAv6nsSgRTf@bombadil.infradead.org>
 
-On Mon, Apr 14, 2025 at 02:09:46PM -0700, Luis Chamberlain wrote:
-> On Thu, Apr 10, 2025 at 02:05:38PM +0200, Jan Kara wrote:
-> > > @@ -859,12 +862,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
-> > >  			}
-> > >  			bh = bh->b_this_page;
-> > >  		} while (bh != head);
-> > > +		spin_unlock(&mapping->i_private_lock);
-> > 
-> > No, you've just broken all simple filesystems (like ext2) with this patch.
-> > You can reduce the spinlock critical section only after providing
-> > alternative way to protect them from migration. So this should probably
-> > happen at the end of the series.
-> 
-> So you're OK with this spin lock move with the other series in place?
-> 
-> And so we punt the hard-to-reproduce corruption issue as future work
-> to do? Becuase the other alternative for now is to just disable
-> migration for jbd2:
-> 
-> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-> index 1dc09ed5d403..ef1c3ef68877 100644
-> --- a/fs/ext4/inode.c
-> +++ b/fs/ext4/inode.c
-> @@ -3631,7 +3631,6 @@ static const struct address_space_operations ext4_journalled_aops = {
->  	.bmap			= ext4_bmap,
->  	.invalidate_folio	= ext4_journalled_invalidate_folio,
->  	.release_folio		= ext4_release_folio,
-> -	.migrate_folio		= buffer_migrate_folio_norefs,
->  	.is_partially_uptodate  = block_is_partially_uptodate,
->  	.error_remove_folio	= generic_error_remove_folio,
->  	.swap_activate		= ext4_iomap_swap_activate,
+From: Darrick J. Wong <djwong@kernel.org>
 
-BTW I ask because.. are your expectations that the next v3 series also
-be a target for Linus tree as part of a fix for this spinlock
-replacement?
+With the new large sector size support, it's now the case that
+set_blocksize can change i_blksize and the folio order in a manner that
+conflicts with a concurrent reader and causes a kernel crash.
 
-  Luis
+Specifically, let's say that udev-worker calls libblkid to detect the
+labels on a block device.  The read call can create an order-0 folio to
+read the first 4096 bytes from the disk.  But then udev is preempted.
+
+Next, someone tries to mount an 8k-sectorsize filesystem from the same
+block device.  The filesystem calls set_blksize, which sets i_blksize to
+8192 and the minimum folio order to 1.
+
+Now udev resumes, still holding the order-0 folio it allocated.  It then
+tries to schedule a read bio and do_mpage_readahead tries to create
+bufferheads for the folio.  Unfortunately, blocks_per_folio == 0 because
+the page size is 4096 but the blocksize is 8192 so no bufferheads are
+attached and the bh walk never sets bdev.  We then submit the bio with a
+NULL block device and crash.
+
+Therefore, truncate the page cache after flushing but before updating
+i_blksize.  However, that's not enough -- we also need to lock out file
+IO and page faults during the update.  Take both the i_rwsem and the
+invalidate_lock in exclusive mode for invalidations, and in shared mode
+for read/write operations.
+
+I don't know if this is the correct fix, but xfs/259 found it.
+
+Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+---
+ block/bdev.c      |   12 ++++++++++++
+ block/blk-zoned.c |    5 ++++-
+ block/fops.c      |    7 +++++++
+ block/ioctl.c     |    6 ++++++
+ 4 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 7b4e35a661b0c9..0cbdac46d98d86 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -169,11 +169,23 @@ int set_blocksize(struct file *file, int size)
+ 
+ 	/* Don't change the size if it is same as current */
+ 	if (inode->i_blkbits != blksize_bits(size)) {
++		/* Prevent concurrent IO operations */
++		inode_lock(inode);
++		filemap_invalidate_lock(inode->i_mapping);
++
++		/*
++		 * Flush and truncate the pagecache before we reconfigure the
++		 * mapping geometry because folio sizes are variable now.
++		 */
+ 		sync_blockdev(bdev);
++		kill_bdev(bdev);
++
+ 		inode->i_blkbits = blksize_bits(size);
+ 		mapping_set_folio_order_range(inode->i_mapping,
+ 				get_order(size), get_order(size));
+ 		kill_bdev(bdev);
++		filemap_invalidate_unlock(inode->i_mapping);
++		inode_unlock(inode);
+ 	}
+ 	return 0;
+ }
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 0c77244a35c92e..8f15d1aa6eb89a 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -343,6 +343,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		op = REQ_OP_ZONE_RESET;
+ 
+ 		/* Invalidate the page cache, including dirty pages. */
++		inode_lock(bdev->bd_mapping->host);
+ 		filemap_invalidate_lock(bdev->bd_mapping);
+ 		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
+ 		if (ret)
+@@ -364,8 +365,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
+ 
+ fail:
+-	if (cmd == BLKRESETZONE)
++	if (cmd == BLKRESETZONE) {
+ 		filemap_invalidate_unlock(bdev->bd_mapping);
++		inode_unlock(bdev->bd_mapping->host);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/block/fops.c b/block/fops.c
+index be9f1dbea9ce0a..f46ae08fac33dd 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -746,7 +746,9 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 			ret = direct_write_fallback(iocb, from, ret,
+ 					blkdev_buffered_write(iocb, from));
+ 	} else {
++		inode_lock_shared(bd_inode);
+ 		ret = blkdev_buffered_write(iocb, from);
++		inode_unlock_shared(bd_inode);
+ 	}
+ 
+ 	if (ret > 0)
+@@ -757,6 +759,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ {
++	struct inode *bd_inode = bdev_file_inode(iocb->ki_filp);
+ 	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
+ 	loff_t size = bdev_nr_bytes(bdev);
+ 	loff_t pos = iocb->ki_pos;
+@@ -793,7 +796,9 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 			goto reexpand;
+ 	}
+ 
++	inode_lock_shared(bd_inode);
+ 	ret = filemap_read(iocb, to, ret);
++	inode_unlock_shared(bd_inode);
+ 
+ reexpand:
+ 	if (unlikely(shorted))
+@@ -836,6 +841,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+ 
++	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 
+ 	/*
+@@ -868,6 +874,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 
+  fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++	inode_unlock(inode);
+ 	return error;
+ }
+ 
+diff --git a/block/ioctl.c b/block/ioctl.c
+index faa40f383e2736..e472cc1030c60c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -142,6 +142,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	if (err)
+ 		return err;
+ 
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+ 	if (err)
+@@ -174,6 +175,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	blk_finish_plug(&plug);
+ fail:
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
+@@ -199,12 +201,14 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (!err)
+ 		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+ 						GFP_KERNEL);
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
+@@ -236,6 +240,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 		return -EINVAL;
+ 
+ 	/* Invalidate the page cache, including dirty pages */
++	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end);
+ 	if (err)
+@@ -246,6 +251,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 
+ fail:
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
++	inode_unlock(bdev->bd_mapping->host);
+ 	return err;
+ }
+ 
