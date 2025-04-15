@@ -1,87 +1,81 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B9A2DFA2D
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 03:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D622423D2A6;
+	Tue, 15 Apr 2025 05:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744688478; cv=none; b=HeKYcpx1vo3ivZNcTa86mv2b4DhQdF6Q/L57IzEr/gstkn99rjZuD2PFx3Deab0is0G99zxgP4Rvh2I9gKnNihWS7jSoB/dmAWBVTunYzPd8haXmjF5wUHFBZgErGsWQM1PLEbNPYO3Z7rkO6Ds5Rw0z4gNAe0bbypFGT8cuW/k=
+	t=1744695971; cv=none; b=Nqh9/dzUkT1wVIm0ndMofbgJqWVEmRp+ZTp/Ppku/4F8o2UMXWkn12XRwqkuC6YoYqjL+k58wB58u4HOwmnPlDlRhpEDV7Fis9rCEZznl6xPtXHmUf5L7SYWVeVTWTKqJziaL7nuqyhQG8bdqp3i5KGpOkpUjADaQ9am8ECNXQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744688478; c=relaxed/simple;
-	bh=DeAcC7qb9J5+OWpC3mHQ35/IgV9CvYwBBKInwwwE7wY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lg3Qbo2MSRrr4ibSOWTwjpYFKX+2AjhSSWQeOhFPT7qOGY29azOJo9yMa96u89yKsiNFbsnbaeBkBrmpuYI5HOETedCAaRKyADxWRtOlCfnpkbEH5h3nPyNknWWCoaMwHe3X6rdr5LbW6i2OOgtKusqwSxlk8gX53byZdsIBdqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dhNLHymT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhNLHymT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744688475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YOim+E6H7+9bD97lNM+whuRWC0q1RKmjCT4iiA7s74g=;
-	b=dhNLHymTSijiFuHz2yDMbiJ0gfEbWEXs4zEZRGyHBK5w6EyWjgIkCTMndWUdQKFp1AI/ir
-	VweeWVOduHNtPEb6qDqhJgA3qUxHjY/SYbFAzcGWNWPaXDl8Pa/K9Y1t4WvuLl7/b7jLzL
-	InfcUtagXiDNoHSWCjtzp6o5/ceBK08=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-48-YJTTBBgFMz2AGcGGeGeqZA-1; Mon,
- 14 Apr 2025 23:41:11 -0400
-X-MC-Unique: YJTTBBgFMz2AGcGGeGeqZA-1
-X-Mimecast-MFC-AGG-ID: YJTTBBgFMz2AGcGGeGeqZA_1744688470
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AE421800259;
-	Tue, 15 Apr 2025 03:41:10 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.40])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 079681956094;
-	Tue, 15 Apr 2025 03:41:05 +0000 (UTC)
-Date: Tue, 15 Apr 2025 11:41:00 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, djwong@kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] loop: stop using vfs_iter_{read,write} for buffered I/O
-Message-ID: <Z_3VTGpuLQ1BcqvG@fedora>
-References: <20250409130940.3685677-1-hch@lst.de>
+	s=arc-20240116; t=1744695971; c=relaxed/simple;
+	bh=3sgm26iyMkU3DkfYlTLjIW+r07s8dCB3zzsOwOL4xqU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UY/hpHOAvyjtZ2/VeHJH++qadyBwn5wPnvpc02xq71Z366Z8Rnx0f/lyZav+FWlk/e5+yrJtxTxpkw6+RjAmA8lfwISiY+6M4w39TSHH1ukjWutPUO3Cbyqr9TyNHkYLEVMrWYapu05BVzN00bLV0pIlmVzBhz85mhRu52Jhysw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 53F5ip5G094707;
+	Tue, 15 Apr 2025 13:44:51 +0800 (+08)
+	(envelope-from Yunlong.Xing@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4ZcCkf3Dj7z2LKkLf;
+	Tue, 15 Apr 2025 13:43:38 +0800 (CST)
+Received: from tj10379pcu1.spreadtrum.com (10.5.32.15) by
+ BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 15 Apr 2025 13:44:46 +0800
+From: Yunlong Xing <yunlong.xing@unisoc.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <bvanassche@acm.org>,
+        <hch@lst.de>
+CC: <niuzhiguo84@gmail.com>, <yunlongxing23@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <hao_hao.wang@unisoc.com>
+Subject: [PATCH V3] loop: aio inherit the ioprio of original request
+Date: Tue, 15 Apr 2025 13:44:36 +0800
+Message-ID: <20250415054436.512823-1-yunlong.xing@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409130940.3685677-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX02.spreadtrum.com (10.0.64.8)
+X-MAIL:SHSQR01.spreadtrum.com 53F5ip5G094707
 
-On Wed, Apr 09, 2025 at 03:09:40PM +0200, Christoph Hellwig wrote:
-> vfs_iter_{read,write} always perform direct I/O when the file has the
-> O_DIRECT flag set, which breaks disabling direct I/O using the
-> LOOP_SET_STATUS / LOOP_SET_STATUS64 ioctls.
-> 
-> This was recenly reported as a regression, but as far as I can tell
-> was only uncovered by better checking for block sizes and has been
-> around since the direct I/O support was added.
-> 
-> Fix this by using the existing aio code that calls the raw read/write
-> iter methods instead.  Note that despite the comments there is no need
-> for block drivers to ever call flush_dcache_page themselves, and the
-> call is a left-over from prehistoric times.
-> 
-> Fixes: ab1cb278bc70 ("block: loop: introduce ioctl command of LOOP_SET_DIRECT_IO")
-> Reported-by: Darrick J. Wong <djwong@kernel.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
+The purpose is to inherit the original request ioprio in the aio
+flow.
 
-Looks fine,
+Signed-off-by: Yunlong Xing <yunlong.xing@unisoc.com>
+Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20250414030159.501180-1-yunlong.xing@unisoc.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+V3:
+- fix Signed-off-by error in commit message
+---
+V2:
+- Assign cmd->iocb.ki_ioprio in lo_rw_aio()
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-
-Thanks,
-Ming
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 674527d770dc..dd7f33d47f4f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -447,7 +447,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	cmd->iocb.ki_filp = file;
+ 	cmd->iocb.ki_complete = lo_rw_aio_complete;
+ 	cmd->iocb.ki_flags = IOCB_DIRECT;
+-	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
++	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
+ 
+ 	if (rw == ITER_SOURCE)
+ 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
+-- 
+2.25.1
 
