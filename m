@@ -1,269 +1,230 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF711B0430;
-	Tue, 15 Apr 2025 17:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744739963; cv=none; b=O4NcLwcSRlaxjJxXmVg3IsGFWGFoCV5M60y8SycnWdKVNB0xctShe3SYQLU6TjN05ZkaJuRFVle9MjOLkVRgKg8PJRKTdxCOk/9kVYrPzVO6rtY1FYgs4PdtbWrk/fVKWFAFyrvrRTCXUlS3N1nHuSos6J1WB1pGnFsBlHoonD8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744739963; c=relaxed/simple;
-	bh=6vqyFdgSOE1G1XSEDXKMrW726YFh+Kp5ylehEemLq3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AvxjJ8/bFR1b7cqoqyPD/yDASc0jH8wc9PpEaY8jO2P9mzWn0bTVcMbUcEsrVBYAsHn/P51pl/nfd4Nloobhzsa4S4NJOoII3q0vkj7nLYJvq0lYxPC5UK7HLlqMphztFcCM+3ZT/ZNbu8GLdFn77aQig5hz3Xl5AVluS7AFeKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsQ/7fyr; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B625E2DFA3A;
+	Tue, 15 Apr 2025 18:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744740051; cv=fail; b=YrucmZUAOYZESn1ufUnZFOKJ3gbV1nqQBr3J9lqBNsf1usbEQp0pQbmH5MOMHCvubpk3iWhHl27vUiOPlmj4LW7hiqE4S/p7fmMNbQ80A6AgaxmT8p1L+QoyK5+kxI/Fs+HU5xTSdveGzBEwj9k6v7u684jxMVF/3sYEnvPDfQA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744740051; c=relaxed/simple;
+	bh=YHYpX69AnQ1uJw4EGyR04QQOWubJnZkJ9aJuCU4Xl88=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=uUPAOSg4wgsMqPjIf+I1ZKujY9Wwy5d9D5wX7Hj7e41s1KLFlbEjjGFRZV7vSjB5xHugjSJJxHw33QH6BinndHS380r50w0VLwO51qsY663TpUmsRigfKZX5NrCUAhOIVX36q8G2yUkUjEpZg1YVDtLDEdHQX7+IGUXqEmxapPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cVjcVDKl; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsQ/7fyr"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30effbfaf61so63742891fa.0;
-        Tue, 15 Apr 2025 10:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744739959; x=1745344759; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xy3kd4y2fU3jMELcdzdDFGgDJCCLaq6b5me66/U55f4=;
-        b=nsQ/7fyr0HJTTFVzyegRuB6840if4kY6mzutBveQxtDSi1AZQuIsGpGCorXaxilBDO
-         nWi2bQ+w247jBXoEVhq+XnFvu/OuOCgKhtPO6px/m7LQd1zY1moS54U4x6NGoBxxAsmE
-         n6erCRCLzSOQNwjsEs4cVVUVS65d4NsFS2z7GvahQECJgvDyUrCwWMae8D0/VSMPbZ+I
-         j5Q70UPgQxj0pwV9zcrP6WrSlfBW+dNHkkpMTqjKPm/FPBCIhs9jFLVf8Bm47yStuVjr
-         sFCIVwSU0luWc7S2VM/L8shHc2s1GiekfzOdMJZgiBj4fK+YwfydR0zcH88LmO3ibuAk
-         Ocvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744739959; x=1745344759;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xy3kd4y2fU3jMELcdzdDFGgDJCCLaq6b5me66/U55f4=;
-        b=hTLgyF2ZM1ekp8BIMO8aI980pg2l5EgoxfRw0+HvmH16MnJgyKs4vI837IwZ6amYGz
-         xa0vKd/ThXzPdLKwXreYcKj/jM4eJe+w1VVBWvvyygW/7f/OUeTWKymXh8oab9XE25hX
-         E2yVQ+PcauOfzMNo6QiK2GTLDFbDzEOWRBaW34pxvLeBJylI/aTgza1J5lZTwrBCxIUz
-         F9CCbaxZZiNM98fQQotvI+FrZwIXn7q0MYNLAL10yGgNzUm4EPOQdAABnnraoJKehBox
-         47R7M7BnVZhZwZl7hULo/tfMQk5mm0DzGRGZIr/OAZ3v+Swl1WeNEUYTlSIeyh9S7xEJ
-         170Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU8Vc3BybxQj7fzX35NfYdphV+sf4ntR5xIQziIvrcy0WoFXUaUkGdqSiSKna/rU8igsFJvLmyBWlKu+STgY+gp@vger.kernel.org, AJvYcCUKJYDSagEDfznHlkNtKYYJIB8zo+Cxiv3nu1YMSqYTSeOdx997CW4EOCYISMJpxL9Ch4IvN+e0ZHlhl8s7064=@vger.kernel.org, AJvYcCVHM5UvS6mIyiZuQv3ycOTHWTcgLu3GvimB2KR+Zo36WIuB5ko1koYSueHXGkhOa58JJKm7clyWiLfjTfDX@vger.kernel.org, AJvYcCVSfS6CjXfy70HMLwD7PfzNEcyjeAVcvhxYUY/zoL+QuClmpBHhQExFK2Cs/hNz+2SR1+YZowTwdvxm@vger.kernel.org, AJvYcCX5PKagXy3BXuSBcR9yD8RvjVpxc0JDWXKaGeYkKR0YDN5E7kpkkGPFROlnTTPyvUGkBdk0+ETIhH6fRfuG@vger.kernel.org, AJvYcCXKL1U4DC0KS8NxvgfGObzzIQtWqrFMfpKB9atpM/4zY5RLiJrsXqsyROlkq0kuv5ti4ze6ESiDd4U4@vger.kernel.org, AJvYcCXofrmID0mAnwI4o4U+vVp/KcxOzOtXjHaW0ZGqSOkN0pa6VO0jk79yLiu/JoAdEq32yWnYxcqT4SSRlp4=@vger.kernel.org, AJvYcCXxWv1Nu00fpBJM8/VauONXcyX9RRnxrR4r7zHMVk6UzlVpM0aup1sr9HCswPhsJ+Pi0Ft+zCBM@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN8JEPpqlzmdKUgoGV7MwuvOStJt6UVkaTChsBq5Zx978u1oHb
-	6jbero2BhTBPaqvDWvhXrK8886A4jfTpGTdTZ3PdaAsaMDHV+9MaH2MYmr4JilPmYcHxfp50IHg
-	22ZZVLqBa66tTFtHJnoWp46wXF8E=
-X-Gm-Gg: ASbGncur5pqLa993wap1Pr98T/kP07c8hI+37hD/VN+sWaj/DL/hfkP1qTiaJpT+lu7
-	JfUyFTVWJFl2iHQhj0pfkkxnB0CIxUPXE5zM5KWk85Y79CD0fnfoWWsKBuVVHXMWFKS/xUWsO20
-	OaJljxyuaZd3FPOyFjPVF6zjw41+IK61XtnSye7Q==
-X-Google-Smtp-Source: AGHT+IEUNTX9p1/kWuAn/OzmQY0lqmIBQmlqMfDN8hWejN/w4TanfAbwc4EzQ3SRD5P4AkdcwY/5HBDJLXd2VI4DjpM=
-X-Received: by 2002:a05:651c:510:b0:30b:c328:3cdc with SMTP id
- 38308e7fff4ca-3107b567391mr1618391fa.2.1744739958790; Tue, 15 Apr 2025
- 10:59:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cVjcVDKl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744740050; x=1776276050;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=YHYpX69AnQ1uJw4EGyR04QQOWubJnZkJ9aJuCU4Xl88=;
+  b=cVjcVDKlkCbJiw5ThEbskODzxc8WW23wUAbrWORIYcYS/1l6i0QGmpnq
+   9ry+QvsBSH8k4Ey12q1yMcd5C3iCoKsdKuDDEIP98ka95bkgwIzieLUVd
+   mSNZ6WdiLxkXwEYdpr0fm+MqGf175G+1+9qTS8S0o4eATxgA+o9NhVr6Y
+   hJdqsnAJY8pdonM7M136B8xKSZeYaS+Rj+T1jxRDsO5APsV9zMcw1Gq0o
+   dRtwL4rj+Ke+e6Yf7rBkO2JFe4PRjIynZ4sK4vS6CoABIlObwfwNtTIxP
+   wu0Dt9nwU6Hjkn6Z3eRJoni+EtVor/bj4zmqtpQGIA6Co/GUoBnJ8iQGD
+   Q==;
+X-CSE-ConnectionGUID: +qdqTsseQ1u7bC+7IgnP3Q==
+X-CSE-MsgGUID: iHUVXJXkShitsCETDAlpLQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="33882353"
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="33882353"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 11:00:49 -0700
+X-CSE-ConnectionGUID: QFSjw9TPRNeVMf7c80u0dA==
+X-CSE-MsgGUID: GdzupyrSQmO+RgjZWIyJSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="135360709"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 11:00:48 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 15 Apr 2025 11:00:48 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 15 Apr 2025 11:00:48 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 15 Apr 2025 11:00:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ngtuwlern7xwdrtpV3qEbypLR5JTJDBeVXuzaXDk82N2rVsFgzixhQQ4p7ovYtS71SDDbxDKGjBVdBnzPTZ1nEZ4+A4MyZBLe5aN1EAekpz9GjZTTyMAvw/hJl4nmqwj6Odm5w7I1hwWwe4mHLp+wmHL3odmoWHIuL3D7NUv87GQr2ZYi9d5U96GjCyrOxNvI+/HBU14DXt7ksE9BmmQWVkGYWwxdqK2W4V3SLQGSgP3TrjQY8YUue1ZmgpKYhtaJsMefD7yEcLYU6oswDW97rlGJxC1OpFWLreoncsDkexfedTK74SSDAnU5QWCc3WYax91OeV2UMNiSAvmmvU/gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OJN5tHeRsuT0aoCx0SJqmcsYkxaDqUk90ZzW6xkIEw4=;
+ b=BhAURx5N8GPPe6qb9nVSSFAF8vNZNqHdbRvjY88NzUPnW/f4kaQvMphuMfs8xaT7a5VhiI2dFmn+xeSuHSw7aCLNp/8axu80cp5HW5UDAE7vVMJL1N2I03XR/V8BT8PBK+KvpZPlQ8AES46TxEeJaAQk2OVSW+hw9PDufNxwA/3ajIHGdvzASPXDdg33K9D7wpMSL2kdpULKZ4/hwz0vSEyceKXQSuB47ghroBrPjfga669M9ddJ3jyvIn7B+ibznxAOijnU7LCAQ90xWjIoMSCZPPXuZv9jcs2XCVLhADdSptQt+Tu7+80qfAEEJQEivx/f3RKGk1oo6DegHa1xUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by CH3PR11MB8433.namprd11.prod.outlook.com (2603:10b6:610:168::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Tue, 15 Apr
+ 2025 18:00:05 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8632.030; Tue, 15 Apr 2025
+ 18:00:05 +0000
+Date: Tue, 15 Apr 2025 11:00:02 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Dongsheng Yang <dongsheng.yang@linux.dev>, <axboe@kernel.dk>,
+	<hch@lst.de>, <dan.j.williams@intel.com>, <gregory.price@memverge.com>,
+	<John@groves.net>, <Jonathan.Cameron@huawei.com>, <bbhushan2@marvell.com>,
+	<chaitanyak@nvidia.com>, <rdunlap@infradead.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <linux-bcache@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, Dongsheng Yang <dongsheng.yang@linux.dev>
+Subject: Re: [RFC PATCH 00/11] pcache: Persistent Memory Cache for Block
+ Devices
+Message-ID: <67fe9ea2850bc_71fe294d8@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250414014505.20477-1-dongsheng.yang@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250414014505.20477-1-dongsheng.yang@linux.dev>
+X-ClientProxiedBy: MW4PR04CA0369.namprd04.prod.outlook.com
+ (2603:10b6:303:81::14) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250409-ptr-as-ptr-v8-0-3738061534ef@gmail.com>
- <20250409-ptr-as-ptr-v8-6-3738061534ef@gmail.com> <67fe9975.c80a0220.1b5785.66e7@mx.google.com>
-In-Reply-To: <67fe9975.c80a0220.1b5785.66e7@mx.google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Tue, 15 Apr 2025 13:58:41 -0400
-X-Gm-Features: ATxdqUFTqoXZoDoJwXjqPF28obJ4nUC4URNzmlSsg0OP0AFuuXDbvBbZrCOdGZQ
-Message-ID: <CAJ-ks9mzyfvsxkyud_wLXfhLD_zP95bivCQ9i2aC-3ea=Y7+0A@mail.gmail.com>
-Subject: Re: [PATCH v8 6/6] rust: enable `clippy::ref_as_ptr` lint
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CH3PR11MB8433:EE_
+X-MS-Office365-Filtering-Correlation-Id: da3f5fa5-bcb9-4ad9-3716-08dd7c475a41
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Xa3pqnz2gRiQC9lPraFGd9m6OJTM7k5lMJVTZCG4W/POVwMc96xY9yWyYOl6?=
+ =?us-ascii?Q?ZB2SskDH5iAW7FUINziXW6T4C39SwKNMnea9tTe8rNkFVO7R7oYlQ3/rWi84?=
+ =?us-ascii?Q?dx7Oa9imdFiCZtrwBHBUs8oGzJFUfIeSxlyh7yrEseDdsQDovpfPpepVuNOA?=
+ =?us-ascii?Q?aDx74RRe/HRvFb06wcxHYosGBKwEwTpsd/PG57WgNp0Sx3PFiBvR1UNrOT8S?=
+ =?us-ascii?Q?DAlHb/IYGn/L/bYNEN4j54IdaIgUWKba4ztnKfU/X+rn1cdJBdPa+mLDrWgk?=
+ =?us-ascii?Q?TERbWrxebmqFKM6FTWHsoYpbaKG1cWVMSFV50j7QUsrIAqx48mO07ZC4NmXb?=
+ =?us-ascii?Q?p35VAQDKyNne+I58JlIy8ec+S/N7fs+MaBob1j3VT6o72zZ/Vud0fBchrm+d?=
+ =?us-ascii?Q?py/R9zgaJ3zvy9hZ3IPXiN9H8RYDH01BmfUuW3Dg4u32Hqlr20yjOJv1JlR/?=
+ =?us-ascii?Q?dnjYCNklctcyCPxE0kbC37BzrQ73qe8z9Wpi1zcmZX92+Ayww20BVcErVoTZ?=
+ =?us-ascii?Q?RlORPQSaDM3o27c0xWM1V3bOTnebyuiNRuuwjUK0VMFFN+ioW71WHqa1JaVc?=
+ =?us-ascii?Q?7t445Fm84mh46Kt77ZCS/c+jNtxSwnVqWoIJ5nXeUKRGx81WUFxB3z/NO6r0?=
+ =?us-ascii?Q?b3AlNydfhlUpwDSA4Y6ps4Xg8ghuJnvxLgIlLmkASAx0xu605619WMBj+J1m?=
+ =?us-ascii?Q?s8Av2mmHR1VfYCs9cFw4T/WX/M1b6LyCL6dN6/bDGE7e/9BfMptjktoZUy0l?=
+ =?us-ascii?Q?lx+uQKaRyZSJM+XX+B0iByKyrIMm7rnKrrUjYF9boUUaRPx3HUxH9vRqpq2J?=
+ =?us-ascii?Q?3UXsNsp2+plXhZHfPy3rMEOPVbJsN2MBPVUGBISzmN9kPM97XHCsIgEqE3Lt?=
+ =?us-ascii?Q?jcaaPCvuV79nvbsHoYhJIgzg6W428OQXEZE1H06uGBdbP8k/cfazeoEElD4D?=
+ =?us-ascii?Q?6ubkZQUwJBiT9jwkTZHPG0IaCKstGhZxTjy+h2xNw1pgLMlYWd/j2A43zBKy?=
+ =?us-ascii?Q?5xPER0lbsuhEdup8K9whqtlUauBx2zIlPnQz7PH1uh2hqte0rgOf3WJlL5z6?=
+ =?us-ascii?Q?UREF7S0cXDOCRpB+k7xKnXC2YABIGWnl3IqlcTsMpU2W9GO+xeXQJjmVVWbf?=
+ =?us-ascii?Q?PHqM19z6+AynjtZjaS/er3TkTgqvVK/rSAhPF7JQ/3Eqr1iSQRSNi+KYENPM?=
+ =?us-ascii?Q?VLTmnnu5L3ZazSmUV44Jbquze0kobWRCRcCwx/sNXhs5Fxkuodh8mnZkssC0?=
+ =?us-ascii?Q?uJejXSoE4EI/xh5dTU7pYDf7SGr7Ui0PHWRfOF6YP6JKMaRB/RAA1ga71S4a?=
+ =?us-ascii?Q?Puuhg4nVdtmNOUA35PWz4TPKo29fqyhRGC/ykERekwzyajHTJKTZe81604XC?=
+ =?us-ascii?Q?+ASlGf6G4XnujBwxNnCL8oDC9w7ZsBJ9ZhUMbgAYmtbnSNqJ9L/RwBwCmg06?=
+ =?us-ascii?Q?wtQNofsHrTo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8BC217VKN7tTJt6LAdWebQlfDpTZ8gL2fu+j1+frvK0LfQmpfjOvF5eeShkY?=
+ =?us-ascii?Q?3d4Qta7N7GGdZhI6Yuv960JmypY0qRi3pFsBuG70ConTWbIydzF2ilEJ/Ddc?=
+ =?us-ascii?Q?299/LB8PSffyTWecZTlpZziYiOe4KifVMotiAomm00q65ikYFbSIeN2adAFT?=
+ =?us-ascii?Q?RhMQbmV21XkNDGF/P4iK1+y6lx8moHmMHkwAUDb7Ia/wiv9r+SgJgd2XOvMr?=
+ =?us-ascii?Q?StxqaH0Gh+KMuIE6QHBLW5NF/CWf2gpmMnR3zuoFDRUKjark28heue9FoRa4?=
+ =?us-ascii?Q?oFlZZnCcIXENtw2shVPlfRwhDPgR2uuBzKaUBBqQKw1ofVhynFSoNmTgoMLG?=
+ =?us-ascii?Q?Ne4EyjX/AX/GM9tYMfPh2eTw6EaT3f+fUKE6KQ45oRDVTBwAvZz1RTVsScSG?=
+ =?us-ascii?Q?XipWbeXb56xVBDNolmNgOf2hNMea6Z5XE5mOSKUc6sZFZUzgu5+fi9rYTpoZ?=
+ =?us-ascii?Q?m6X7WOlRQAf746BsKqYan7MBv12cjb3HlIux2LMi5ruE5DUCnlDA/cvWj/ET?=
+ =?us-ascii?Q?lcHJWIg0Y4lv2cFj2yUGE+vnnfFa0esAawcNaQVPe4H/vqdMBUNSmp14O16L?=
+ =?us-ascii?Q?G7bNuBmlYbQDWUdSkzEr1174FxhEMybuA58yxXRqrfQnrUcyYiM2m7m/Gu6H?=
+ =?us-ascii?Q?gGjNC43UzP/GrrCDj4/I4eJI0XLqlTUNFoqEb8EhgMABBseEXDckHm/fW8Wc?=
+ =?us-ascii?Q?2Scxp6lfzPzeXF4KnfOhTSpDVUicApGW5VKEjhE6guvu2s8AlQP25jh48KHg?=
+ =?us-ascii?Q?xGcTbI3NRJ0TyM5IXkQUxPWoVhgcbkyThJ8O7vGquTvy/l2x6ZVbZfiUbFyy?=
+ =?us-ascii?Q?+0mkI6qmXNYaadGhazwhWR58RIuFhtY/riJZDlT3ZdlITmjE9Mof1d5HLcLr?=
+ =?us-ascii?Q?lj5yhyugHtXkKU1OsyT3zOZSq7dLZqlTifSUzd53un57vr1X+JKUdWo7f71B?=
+ =?us-ascii?Q?/yK2/f8oGij8+2opUIHJnjD6L4YcI2laQGPpBfklLflNfMR3qFxcutKDsa3Q?=
+ =?us-ascii?Q?VO/dCJpn7EgVZeUwMElRROyJRf6cOTtdIXbFxJZ8VQz8yZD5Q7VkQUgqfq5Q?=
+ =?us-ascii?Q?jHeH4waV9n2SunA2ysvlotc8vS1mRpAGu2wU3+lplCJUTQFUDxqfhF9pGym6?=
+ =?us-ascii?Q?mEr5au4YBzP+8k+HmjrWcgQ/M+fD0na8j4C6xlIb1GKkBQIJT0U2LtR+ld6f?=
+ =?us-ascii?Q?Huf3sYvdflB2ylsiInaIUi2jrKJI/hjUT2EUDF6NztmVak7ZpZkdmKks5jpR?=
+ =?us-ascii?Q?bqEsIu8Wg6VG0m/0d8uemnNOGXOlJYyl9yctnxRDleHZ2fB9pUD0BhogYG9X?=
+ =?us-ascii?Q?vMbofFimsc36OQiXj7qfCp3ESm2fClWHrqpzF4K7fLt5Vk/7kp8nEqAZjFsy?=
+ =?us-ascii?Q?S3zfFxSg+xLxyOpf5njp+TQcjwr0ZAFPjGfel871orUKT7PUEMMCJJvC7MwH?=
+ =?us-ascii?Q?/A71CbaWk3eyPxoR4t0sIfiNHUfTLLFdFmfzIQXfOK3Ggj3JbXxDIyNYsR0z?=
+ =?us-ascii?Q?hRqQB66c8Xh9eOI0B2OJqbsubQKHPOE/WPRpvjKPIfNfmZP7YM7+z2Bqoe0z?=
+ =?us-ascii?Q?PFXf5CsWceUHN4QAoNxcDlCfhho8CkO+WYoMq+VUpL4eUq+iNQQ4X7Q/n1yW?=
+ =?us-ascii?Q?0Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: da3f5fa5-bcb9-4ad9-3716-08dd7c475a41
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 18:00:05.6454
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wCBGYR4hfrdabTFKqJNt18p0opkLSFh+deBAI4xSJzm+78pP3hzrEZgO+WN2AL6wAfiWWxSU/auoLf1H46EeNfc1ROqmpwU4QV0xE1xslbo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8433
+X-OriginatorOrg: intel.com
 
-Hi Boqun, thanks for having a look!
+Dongsheng Yang wrote:
+> Hi All,
+> 
+>     This patchset introduces a new Linux block layer module called
+> **pcache**, which uses persistent memory (pmem) as a cache for block
+> devices.
+> 
+> Originally, this functionality was implemented as `cbd_cache` within the
+> CBD (CXL Block Device). However, after thorough consideration,
+> it became clear that the cache design was not limited to CBD's pmem
+> device or infrastructure. Instead, it is broadly applicable to **any**
+> persistent memory device that supports DAX. Therefore, I have split
+> pcache out of cbd and refactored it into a standalone module.
+> 
+> Although Intel's Optane product line has been discontinued, the Storage
+> Class Memory (SCM) field continues to evolve. For instance, Numemory
+> recently launched their Optane successor product, the NM101 SCM:
+> https://www.techpowerup.com/332914/numemory-releases-optane-successor-nm101-storage-class-memory
+> 
+> ### About pcache
+> 
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Feature                       | pcache                       | bcache                       | dm-writecache                |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | pmem access method            | DAX                          | bio                          | DAX                          |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Write Latency (4K randwrite)  | ~7us                         | ~20us                        | ~7us                         |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Concurrency                   | Multi-tree per backend,      | Shared global index tree,    | single indexing tree and     |
+> |                               | fully utilizing pmem         |                              | global wc_lock               |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | IOPS (4K randwrite 32 numjobs)| 2107K                        | 352K                         | 283K                         |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Read Cache Support            | YES                          | YES                          | NO                           |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Deployment Flexibility        | No reformat needed           | Requires formatting backend  | Depends on dm framework,     |
+> |                               |                              | devices                      | less intuitive to deploy     |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Writeback Model               | log-structure; preserves     | no guarantee between         | no guarantee writeback       |
+> |                               | backing crash-consistency;   | flush order and app IO order;| ordering                     |
+> |                               | important for checkpoint     | may lose ordering in backing |                              |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
+> | Data Integrity                | CRC on both metadata and     | CRC on metadata only         | No CRC                       |
+> |                               | data (data crc is optional)  |                              |                              |
+> +-------------------------------+------------------------------+------------------------------+------------------------------+
 
-On Tue, Apr 15, 2025 at 1:37=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
->
-> On Wed, Apr 09, 2025 at 10:47:23AM -0400, Tamir Duberstein wrote:
-> > In Rust 1.78.0, Clippy introduced the `ref_as_ptr` lint [1]:
-> >
-> > > Using `as` casts may result in silently changing mutability or type.
-> >
-> > While this doesn't eliminate unchecked `as` conversions, it makes such
-> > conversions easier to scrutinize.  It also has the slight benefit of
-> > removing a degree of freedom on which to bikeshed. Thus apply the
-> > changes and enable the lint -- no functional change intended.
-> >
-> > Link: https://rust-lang.github.io/rust-clippy/master/index.html#ref_as_=
-ptr [1]
-> > Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> > Link: https://lore.kernel.org/all/D8PGG7NTWB6U.3SS3A5LN4XWMN@proton.me/
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > ---
-> >  Makefile                 |  1 +
-> >  rust/bindings/lib.rs     |  1 +
-> >  rust/kernel/device_id.rs |  3 ++-
-> >  rust/kernel/fs/file.rs   |  3 ++-
-> >  rust/kernel/str.rs       |  6 ++++--
-> >  rust/kernel/uaccess.rs   | 10 ++++------
-> >  rust/uapi/lib.rs         |  1 +
-> >  7 files changed, 15 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index eb5a942241a2..2a16e02f26db 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -485,6 +485,7 @@ export rust_common_flags :=3D --edition=3D2021 \
-> >                           -Wclippy::no_mangle_with_rust_abi \
-> >                           -Wclippy::ptr_as_ptr \
-> >                           -Wclippy::ptr_cast_constness \
-> > +                         -Wclippy::ref_as_ptr \
-> >                           -Wclippy::undocumented_unsafe_blocks \
-> >                           -Wclippy::unnecessary_safety_comment \
-> >                           -Wclippy::unnecessary_safety_doc \
-> > diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
-> > index b105a0d899cc..2b69016070c6 100644
-> > --- a/rust/bindings/lib.rs
-> > +++ b/rust/bindings/lib.rs
-> > @@ -27,6 +27,7 @@
-> >  #[allow(dead_code)]
-> >  #[allow(clippy::cast_lossless)]
-> >  #[allow(clippy::ptr_as_ptr)]
-> > +#[allow(clippy::ref_as_ptr)]
-> >  #[allow(clippy::undocumented_unsafe_blocks)]
-> >  mod bindings_raw {
-> >      // Manual definition for blocklisted types.
-> > diff --git a/rust/kernel/device_id.rs b/rust/kernel/device_id.rs
-> > index 4063f09d76d9..37cc03d1df4c 100644
-> > --- a/rust/kernel/device_id.rs
-> > +++ b/rust/kernel/device_id.rs
-> > @@ -136,7 +136,8 @@ impl<T: RawDeviceId, U, const N: usize> IdTable<T, =
-U> for IdArray<T, U, N> {
-> >      fn as_ptr(&self) -> *const T::RawType {
-> >          // This cannot be `self.ids.as_ptr()`, as the return pointer m=
-ust have correct provenance
-> >          // to access the sentinel.
-> > -        (self as *const Self).cast()
-> > +        let this: *const Self =3D self;
->
-> Hmm.. so this lint usually just requires to use a let statement instead
-> of as expression when casting a reference to a pointer? Not 100%
-> convinced this results into better code TBH..
+Thanks for making the comparison chart. The immediate question this
+raises is why not add "multi-tree per backend", "log structured
+writeback", "readcache", and "CRC" support to dm-writecache?
+device-mapper is everywhere, has a long track record, and enhancing it
+immediately engages a community of folks in this space.
 
-The rationale is in the lint description and quoted in the commit
-message: "Using `as` casts may result in silently changing mutability
-or type.".
-
->
-> > +        this.cast()
-> >      }
-> >
-> >      fn id(&self, index: usize) -> &T::RawType {
-> > diff --git a/rust/kernel/fs/file.rs b/rust/kernel/fs/file.rs
-> > index 791f493ada10..559a4bfa123f 100644
-> > --- a/rust/kernel/fs/file.rs
-> > +++ b/rust/kernel/fs/file.rs
-> > @@ -359,12 +359,13 @@ impl core::ops::Deref for File {
-> >      type Target =3D LocalFile;
-> >      #[inline]
-> >      fn deref(&self) -> &LocalFile {
-> > +        let this: *const Self =3D self;
-> >          // SAFETY: The caller provides a `&File`, and since it is a re=
-ference, it must point at a
-> >          // valid file for the desired duration.
-> >          //
-> >          // By the type invariants, there are no `fdget_pos` calls that=
- did not take the
-> >          // `f_pos_lock` mutex.
-> > -        unsafe { LocalFile::from_raw_file((self as *const Self).cast()=
-) }
-> > +        unsafe { LocalFile::from_raw_file(this.cast()) }
-> >      }
-> >  }
-> >
-> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-> > index 40034f77fc2f..75b4a18c67c4 100644
-> > --- a/rust/kernel/str.rs
-> > +++ b/rust/kernel/str.rs
-> > @@ -28,8 +28,9 @@ pub const fn is_empty(&self) -> bool {
-> >      /// Creates a [`BStr`] from a `[u8]`.
-> >      #[inline]
-> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
-> > +        let bytes: *const [u8] =3D bytes;
-> >          // SAFETY: `BStr` is transparent to `[u8]`.
-> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
-> > +        unsafe { &*(bytes as *const BStr) }
->
->         unsafe { &*(bytes.cast::<BStr>()) }
->
-> ? I'm curious why this dodged the other lint (ptr_as_ptr).
-
-The reason it has to be written this way is that BStr is !Sized, and
-`pointer::cast` has an implicit Sized bound.
-
-Perhaps the lint is smart enough to avoid the suggestion in that case?
-Seems like yes:
-https://github.com/rust-lang/rust-clippy/blob/d3267e9230940757fde2fcb608605=
-bf8dbfd85e1/clippy_lints/src/casts/ptr_as_ptr.rs#L36.
-
->
-> >      }
-> >
-> >      /// Strip a prefix from `self`. Delegates to [`slice::strip_prefix=
-`].
-> > @@ -289,8 +290,9 @@ pub const fn from_bytes_with_nul(bytes: &[u8]) -> R=
-esult<&Self, CStrConvertError
-> >      /// `NUL` byte (or the string will be truncated).
-> >      #[inline]
-> >      pub unsafe fn from_bytes_with_nul_unchecked_mut(bytes: &mut [u8]) =
--> &mut CStr {
-> > +        let bytes: *mut [u8] =3D bytes;
-> >          // SAFETY: Properties of `bytes` guaranteed by the safety prec=
-ondition.
-> > -        unsafe { &mut *(bytes as *mut [u8] as *mut CStr) }
-> > +        unsafe { &mut *(bytes as *mut CStr) }
->
-> Ditto.
->
-> >      }
-> >
-> >      /// Returns a C pointer to the string.
-> > diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
-> > index 80a9782b1c6e..7a6fc78fc314 100644
-> > --- a/rust/kernel/uaccess.rs
-> > +++ b/rust/kernel/uaccess.rs
-> > @@ -240,9 +240,10 @@ pub fn read_raw(&mut self, out: &mut [MaybeUninit<=
-u8>]) -> Result {
-> >      /// Fails with [`EFAULT`] if the read happens on a bad address, or=
- if the read goes out of
-> >      /// bounds of this [`UserSliceReader`]. This call may modify `out`=
- even if it returns an error.
-> >      pub fn read_slice(&mut self, out: &mut [u8]) -> Result {
-> > +        let out: *mut [u8] =3D out;
-> >          // SAFETY: The types are compatible and `read_raw` doesn't wri=
-te uninitialized bytes to
-> >          // `out`.
-> > -        let out =3D unsafe { &mut *(out as *mut [u8] as *mut [MaybeUni=
-nit<u8>]) };
-> > +        let out =3D unsafe { &mut *(out as *mut [MaybeUninit<u8>]) };
->
-> Ditto.
-
-Same rationale here.
-
-Cheers.
-Tamir
+Then reviewers can spend the time purely on the enhancements and not
+reviewing a new block device-management stacking ABI.
