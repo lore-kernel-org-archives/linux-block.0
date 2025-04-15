@@ -1,173 +1,132 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2049.outbound.protection.outlook.com [40.107.237.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA5920F081
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 15:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731592; cv=fail; b=IwIqiWqjXjN1crpnz95BajKRg7uv6cErR9SCTaVFz5x+2f0OuuXJLR305H4zs4ckj3jMrGAvXx6dSTFhrIRlx0Z15YDKb6JKMINIpM/HJdAMrJB04G0tKd7j5/Z4a4IWt2WWsin9u57lVw4JQK/GRjb34QqRPDuwmwVsmOEJ7j8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731592; c=relaxed/simple;
-	bh=wk34r8mfzKxdFrcvki1Cw+I5WsTf0E3xsydnrdKMSnw=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Zpx7nbKN9S4eIJMg1DcHqImnTJzEHuBGKInCqd2AcZ8GhOEJRykIxMJobs8u6gBlVruLSb/Uo7brJiYTfFSnIN1cj4mjOjRmfIx4G5RQNqhhdtan5ETRR9ECp7KDfOPI0fUR/GQFrnX3rDKVITojHPOoZjHBO8zOU0qsfH7ok+8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aa2Eow0z; arc=fail smtp.client-ip=40.107.237.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E0F19DF48;
+	Tue, 15 Apr 2025 15:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744732073; cv=none; b=U+PztnzRASszrcvwso5s/1dhCLojE01H4ZuAsvifltNiLguhL4vIom6hqePiHkU/L+sgFSYmfLaJ8RUu3pG/jAUIdIaVurFpQQfm8Kcur1YJW3kTLlS975+/U73A3j74IAYrFlkQ8SMG+2EqXKJcK4kZky4rVSg0VKsLLoCt+pE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744732073; c=relaxed/simple;
+	bh=kxmFcQDJ+JlN9IfPV3DM8E3EagG+moUhDz8DUHXPMkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qb3mZakG8HgUn0S06GpuspjvkwygTzy6TBTxzLrOP6fI7s6BfycrvPAdByOkT26qRpIHkEdeTq4QqDgNlqHxQxYxCc8rL5+fV7hv1yqS7Grd89MZGLglz82Pgx6nYrHwez2vd1an5RrWrlaJN8oycAnVqYq7krk9B54k1ejBDv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dr932TZV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aa2Eow0z"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jdXTPE8pdemiFrDS7dYxzxPFO7eNJunap32iyPFDqVtLIQHrzS5TNnqGGydRluYBs5DMK+Gk3ntfASmpM6YfEIXJvGMvifrkpHpSdeCogoErPALOejuxwH04aShFvdf/8Mc9ovF99bIrgSjBfcylGXbUI4ggX9Nau1iceshp5VI6iHswHqY+KF6vhb7RTLS+KwD2wDQ2aOTUU0X3uHlDKrxIoTxghJE/SDFh+VqwoFaO68boq6RrETbXo/r9x5xeih6iqEpzbW/PVOPoXTkTXX7zgomf+h2KQPopURBpWgN/qujazZrMiYP59dZwwFR/zrftue1c2tkFZSAvTYCJQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wk34r8mfzKxdFrcvki1Cw+I5WsTf0E3xsydnrdKMSnw=;
- b=ZPRkJ77o+R5S94txuXgUqLMQebUfJj5d+dfRAEysSfcE9UiOk4zHAs7L2a2lyvH405YbckLqfDzwM6Mk1JtJ8eePCorLbaRrFG9cv4+mePQq2CyDyRpTvm4DvTjXTaH5tFUU+H0Zq1t7gw9BhA5tOVhqaUhzVv9sk0pVIVV1arco56N1TJbeC2FF4G3eoKv/YRwKIHvqb9zP4t3IkULvLOnVQo18SBJPgv0Alfbw1hijxgzPfqzCr0Xl0C3ZdORWnGGbvUrRWYDqHEldom40YpjMbtTJO49ic/eQy+5McGy6+BcUlT3Wabf2vxScxcI65fo3NIYNnQLuK+IznZ+kRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wk34r8mfzKxdFrcvki1Cw+I5WsTf0E3xsydnrdKMSnw=;
- b=aa2Eow0zel04AlvcD8P0yIROzPJlQi2dJ/4jwF6O4VvIBt2D2okmU54vX9fnbgp2ZZWMcZuQb522UG975GG6FkgCKCzcRDWhwGnAZn/y8h22k7Mk3UVU7p8FnasSaFIm/DajdwttcA0VPs//pc289jzZo0Td5/s4cMlJKOmt9dl0wMgYXvLwPXCuWUajOkTZqLeDns7ai7i1jOmv1HOwF1DZjZatbXEeoWXPz8Geqf/h4EeLTszmeqL06S0mcIqAldd4lwtStnudRi5KMuQ2BrIBnmAKR/Rm7/rBxsMUiQVAnEcN/aE9o7wCmX+5YPLn75IRuuNnicf4q1wpCVOaRw==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by DS7PR12MB8249.namprd12.prod.outlook.com (2603:10b6:8:ea::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Tue, 15 Apr
- 2025 15:39:46 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.8632.025; Tue, 15 Apr 2025
- 15:39:46 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: ensure that struct blk_mq_alloc_data is fully
- initialized
-Thread-Topic: [PATCH] block: ensure that struct blk_mq_alloc_data is fully
- initialized
-Thread-Index: AQHbrhXv1kAtGUmFU0KbtJmq2Iv/KbOk3Q4A
-Date: Tue, 15 Apr 2025 15:39:46 +0000
-Message-ID: <f76042e9-6855-4134-bc45-a38c5102b33d@nvidia.com>
-References: <1720cf81-6170-4cac-abf3-e19a4493653b@kernel.dk>
-In-Reply-To: <1720cf81-6170-4cac-abf3-e19a4493653b@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DS7PR12MB8249:EE_
-x-ms-office365-filtering-correlation-id: 29668b74-8e86-4ad2-33ad-08dd7c33c025
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|10070799003|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?TVoxbnZpWHFma3V4a2J1QUl2N1BKalY2R0VGQW9uTEJuby9KNEFCNXhUcUxt?=
- =?utf-8?B?ZHFaRmlHNmFHT1pvc1FOSTBjTzFwMHJac08ybXlsUXdHR1JQczRmV1pNRGNC?=
- =?utf-8?B?Z0RDV2tSVjNZeng3ZG9EdjZmRGFLUis4OHdVT0RJcnloSGhISzhrWi9RWGl1?=
- =?utf-8?B?ODBYWXU1N29CWUd3ZzRiYlpOR1FzV2VieWxZbkVmSTMwSjYyUlVtUEE0cXha?=
- =?utf-8?B?dWx2UVZDcjd5OTdvR2ZieDFkYWpSQm4zSjM3MXRBS0lmbDgxRjB2UDZtR2RR?=
- =?utf-8?B?cDQyUXNLOWduaTY3THo2R1l2MndwU21jWEcxcjlUWE1oMUpHUytWN0VJUlZv?=
- =?utf-8?B?RmkveWJNTE5RVk5hMFlMUFFjNS9ZYWdBSm9vMmhGY25WOXUyNXdFcS9QUFRV?=
- =?utf-8?B?VytuYVI0MzB5dUVWSXRtTXJsclpiTWJScUVwOEpjTFdpd2N2dW12OUt0TElE?=
- =?utf-8?B?dUpHdWR2YWdNQ09vZzBaQ3FTVmxITXREUWMrbGFBZENlU1crQVQ1NEF4TWFP?=
- =?utf-8?B?YVc4NzJFV0RnNjNSRVBpaXgxUld6VFV6YUc1d3Z0bkh6K0ZGVmh4S1ZQYzhQ?=
- =?utf-8?B?cUJHa3J1WVpnMWhGbEdIZ3FzL3M1SXY5Z21JZGZMTlFRNjNmTFBGZVZ5V0Jp?=
- =?utf-8?B?OWhrbDlTd2VRZVc1ZUNKNkxlMEtQdXViQWVnWURtdTlPcFBOWjFZYm55RWFx?=
- =?utf-8?B?RTBJRlduR25pQkJhc2RDV0M1WTAza1FQbmlWdDF5bVl3Vll3RGpUWEh6Y2hM?=
- =?utf-8?B?NmRWRnptaC9oYituUThEMEJreGZZWjFYYnUwZW1KR1RrandQUjhTTDJ1T0Zt?=
- =?utf-8?B?MGR4eC8wZlVhS3pNYVp4cWVNNUMwQnJLczNmcGFIVXBZU2cya0hYb2lhZTlX?=
- =?utf-8?B?OEorQWtRYlNTck5EV24vaWt1d0lHZW1jUXN0SVd1TTlEZ0FVOHdTcW44Nklt?=
- =?utf-8?B?VDVrZ0xXQXN4ZGZMUjlBL0Y2bzlLK1d3TXhiSzJSYmNaZ2JZVkM0RGxyeFJT?=
- =?utf-8?B?VHp5dXUrb3pYendaUWppZkR2TmMrQld6Sm1abVlKMzVMN1A3aVVRL1l6a0V6?=
- =?utf-8?B?aFJCeGsvV213cStCQkI4bE9Db0k4bnlpV0JKVTNxaGptNGFGM3R6WDg3YytE?=
- =?utf-8?B?M3JHbGhxOWVDb0hBakRTcVd5SmRjTnpzVTIxNkpDME8wbVFSWkpqclBadVEv?=
- =?utf-8?B?dkZWQjZoZWxvQlhwbFE5Ykp6WEgyQVkvbkt0c1JUN2lLdTk5UTR0d1UvZHVO?=
- =?utf-8?B?WkVvd0hRdklVNERBRGRGNjM4MHVEY0RmOWoydWRaZUlkZXNRb0VoN282eFc5?=
- =?utf-8?B?MFdEcGxnNk03TzdNWTFoTG1yTmJ5K1Y2eURsUWFUMndaRUwrcWo4Q3pmQWlZ?=
- =?utf-8?B?dVh0TXZLUVZyS1hqSGx4d1BybHVoQmlVUmR2a210bE1VS010c0N1dXFIZXhn?=
- =?utf-8?B?RTlzYzJVS1UrTVAycjlGZFcyM1JBVzdRdmh2T1V5TmxneDZadU1HWndRb29Y?=
- =?utf-8?B?UG9GVlc0aGhBUE5kalkxc0d4WWRWelFjS0VlUmsvRzA2VnREcjRVMkptdkk1?=
- =?utf-8?B?TDdIRHBUenVGSFRsNVBwdWhrYlBsSDdBU0lYRDhMaExIcVlVM2hzRVNZaHFo?=
- =?utf-8?B?K3BocktYZnlwTjRxZjVEWXR0RktZMGVmNXVwYlRuZFRBUmlqSXNUeDZDTDFa?=
- =?utf-8?B?RnB1M2Fob1Rha1Y5cTZNTVB0azQySVg2bzl0YnMxQzVSdWIyWm1mczhCdWVG?=
- =?utf-8?B?VTcwb1BiMk9lVENRM1JSMXFidHdNejY2ZzFGVFVFM0ljV0RSWloybzQwMXhG?=
- =?utf-8?B?L1BKSzRYcEZRWUhxWWRxV3hUWkdUaDRrMXZBYjBNYmtiT0ZVdi9LSGdGREZN?=
- =?utf-8?B?d2d0WDhLcWdvV2Q5b1NIank5QlIrNDN6b3dhYW54dks1eStkUzhkWnJ6QUFo?=
- =?utf-8?B?WWc3OXg1MktqUW12Wmx0T1lheFBURlpXQTRsSjJkdENSKytwenRZTDVtNEE3?=
- =?utf-8?B?QncxVTJPUmx3PT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(10070799003)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?VkRoNVpLWGpOc2FVTEtCNS9uTmF1MmdHNERLdUFweEhqSkpQcmhXM2NFM0J4?=
- =?utf-8?B?dXZTR0ptRlRLaUJScFBsNXd0MThIL3JGSisyb0MrWkRObFlpVDViMFA0bFZt?=
- =?utf-8?B?TWE2bHBXbndqdEZyWFFmTDBlLzNSTG1hR01zaTN0RmZVS2hINDNsM1djNFJu?=
- =?utf-8?B?ZkQ0UUczNmE2UFY2eFlQYzI3anJ4WDMxT3M5Nm5DcHVoQ3VBNUoyVnk1MFFp?=
- =?utf-8?B?QmdVREhGcFlweE04SXBWVEhPOHBUTFhXMTh3cVFVZzIwRUdaMEpjRFdFdGdO?=
- =?utf-8?B?NUJCdTF1RXlDeTI1TkZMd3RKeTY5TkJjTE50YzlCMVdmbEIrVnFNMDIxZTNi?=
- =?utf-8?B?VEVMcGJ0T3B0MGdFRUNjY0lONC9sQjlGK2hpVDJjN0VhbGEvcFYxS2ZzeEdy?=
- =?utf-8?B?V3NDd0lBa1lZWmlHMDNVUkNEcUwvcER6aEU5aGhzQmpHRGUwQjg2WHJwSFM0?=
- =?utf-8?B?Y0xNUVdaNlZoVmVBUUxpN3NOaXhMSUsycGl0ZVZmQkxlOXhYT2RLUTdmUm0v?=
- =?utf-8?B?MW4zU2RiazdrSlZTU1AyQldYODM1NktIOWFEdFpVVFdSdHRHcVFBelZOSzF5?=
- =?utf-8?B?ZWN0dnlOYno2QkNlN3h3bTBWdnp4UlJ2dUFhbmJuTnZ4V3BKakV0ejAvcXFp?=
- =?utf-8?B?ejc5WnZ3amkvbGVjQVhLLzNnUmlCZGFweTlaQ1FXWStSOU4wNVBvMW9obFc2?=
- =?utf-8?B?OXRxZnNBd0VwamJ1ZnNkYXArZnFvR1ZRaG5jbFF5eU9DVzAvUHdDYjlhRUFk?=
- =?utf-8?B?cGlZMVdhcUpwUjlMMjhUc0JQajAxdmp6TXhSZ2VHcjNGbzdNTlhSWnFMREIr?=
- =?utf-8?B?aEV3V3MvYjdMRFl5RmpDblRIYk5PdzVIeVVhUDVySnFDR05uU3U3NW1oeTJU?=
- =?utf-8?B?aTE5LzFMVGFFd0xMakwyRjJ1WVA0RFk3QXRMT1d4Wm5uNTRzNGRYR21qamo2?=
- =?utf-8?B?Q1NSeGwwMTA5VlJCekxuSnM1M2tBNE8wdHhsbHVBdG5FVWRlWFlNMnNFekIy?=
- =?utf-8?B?R3k3eTRWeVFrN1BLS1F5b2V1Mm5WZEk0MTZmS253ZDM4dG9PK3Y2YlFDQi9E?=
- =?utf-8?B?TUprQUQrUFI1eDhOWmJoenlZelp4eDR1UjZBc0ltbUkzZE9WNWJ5RGUyV1Fp?=
- =?utf-8?B?d0ZvRVU3cGVaVXAvWU9sTkQ0YjdMcFdXekNzK21mdTZQYWx4N01CRGFBWCtL?=
- =?utf-8?B?NVJyNmMyLzBCeXNndUpoYlpWcnBYN0VqSUxUMHo3a0RBRnJYeWliTFVzcm4y?=
- =?utf-8?B?VWUvbUFQSmVTcG5Qb3M1YU80VWNTNWZ0ZHdFZktrQnI2SnNTdHczanQ2WjlR?=
- =?utf-8?B?aHIvMWZMVnZvM2tFU1BVWDJqdWlvRGZJN2VaRE83WkthNGVvY3FQbWRzS2My?=
- =?utf-8?B?RFJEZ2d2V2dGYURXZ090bXg3QkJ2UW56VWtuZEF3NDVvMk9ORXlyNEhadlRM?=
- =?utf-8?B?S2lVRWNwbEdmRlBWTGhtME5lV0dveTBmeVk5b2FxYTh0bkVxTmkybDByTksz?=
- =?utf-8?B?eEhQb2sxSjhCM2UvVmxYUkdsOWVrU1VSSSsydElnWWsxbWpZeC9zelVkODRH?=
- =?utf-8?B?QmhWcWhMUGxQOFgwRjE0U2VXNTAycW4vTEZ1aURyZnVWMHM2RGxPVWVkaGdp?=
- =?utf-8?B?MkgyTEFNN3c3aVFPRHF0Ynlmb2VoTVdha2wxZUlCM3ZRclQ0RGZaaWViMDR5?=
- =?utf-8?B?a2ZTRVhjWUNvY2M3NDJUc290R2QwUGRNc0RsbkYzNEVvaGYrTmZlVEZWTFFQ?=
- =?utf-8?B?Q0ZMd0o4c0hDZUZLZmF5R2k5d0ljdmFDNzNzMXdHaHExRERJcERDOXN0ZFBk?=
- =?utf-8?B?WSs0ZHBIYUpTQlN4b2UzeU1tdGZacTlaZWx5bFZNVXp4SDlUVmRmTGFWczFt?=
- =?utf-8?B?eVZ6K3gzSWt2OW9UaWJVNUgrTVpWSEwyM2grSGlGWXkrSXl0YnBRSzFWd2N5?=
- =?utf-8?B?VnBSWm9rZWh3WTkzWkhvUXhaNUVuYkxMaUsyMTFxRkJWNnJGT1ZRWEszWHh2?=
- =?utf-8?B?UUJpdXM2SGo4QzIzTHErUDBCMXZ1bVZLUU00RW8ra2pYOGNmeTZkRVlaYjhH?=
- =?utf-8?B?czl2WWQ1Ylk1alI4ZEU2R3FiMkNkTWZpUGFwWGluZTc1NFU4QkczWFJ2SkFk?=
- =?utf-8?B?bjZWZnN2aldEL3VDNmVSL0ZvMjYrd3VOeTBpVERRQncva0VRQndQZVc4MGlS?=
- =?utf-8?Q?5TFFlHE0cQXpNK8R1hGx99KsPgB3kkbemSK9JR20/tUx?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AC6F666A7F8BCD45B0E54C24BBA2597C@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dr932TZV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C55C4CEEB;
+	Tue, 15 Apr 2025 15:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744732073;
+	bh=kxmFcQDJ+JlN9IfPV3DM8E3EagG+moUhDz8DUHXPMkk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dr932TZVkc9yCxpr4kJ6POc0QEMnT2JGyjYw3eFy0cjgaTuIqDQPyqjKLPss6VFI4
+	 Qa7qjCYibaB6mt+sdNawo5jePudUTkq7svKOPdJyX32IzxSBhoRDGwr/Wi1u2oLDNy
+	 bq1WXDPexYb+N3+LjqtasY5ueOOF09THvoNggnff0CbdQO2FPapLtUMpLbucBLc7E9
+	 KNEDfXq38XRaHDhaQkQyB0fBxSWAqlbZCtQGQop8ZH3x3CWLYO0TNPqv4O1Bj0JmbW
+	 edj3LSONuxjLsv3yTJmjLvV7ih63uD443nMoICh9l4GWybMRggMgRjkEUmVgMuScJc
+	 9er4nsuafOrLA==
+Date: Tue, 15 Apr 2025 08:47:51 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, tytso@mit.edu, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, riel@surriel.com, dave@stgolabs.net,
+	willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
+	david@redhat.com, axboe@kernel.dk, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+	da.gomez@samsung.com,
+	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
+ migration
+Message-ID: <Z_5_p3t_fNUBoG7Y@bombadil.infradead.org>
+References: <20250410014945.2140781-1-mcgrof@kernel.org>
+ <20250410014945.2140781-2-mcgrof@kernel.org>
+ <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
+ <Z_15mCAv6nsSgRTf@bombadil.infradead.org>
+ <Z_2J9bxCqAUPgq42@bombadil.infradead.org>
+ <20250415-freihalten-tausend-a9791b9c3a03@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29668b74-8e86-4ad2-33ad-08dd7c33c025
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Apr 2025 15:39:46.5247
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mMymXMpHtreDleIwJwGkStGBlOm8JNP11gxG5QyfOVGc5jBvLnA4mRzMVjGhCd/MJJYYvKRLZyYKKPFBsG62XA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8249
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250415-freihalten-tausend-a9791b9c3a03@brauner>
 
-T24gNC8xNS8yNSAwNzo1MSwgSmVucyBBeGJvZSB3cm90ZToNCj4gT24geDg2LCByZXAgc3RvcyB3
-aWxsIGJlIGVtaXR0ZWQgdG8gY2xlYXIgdGhlIHRoZSBibGtfbXFfYWxsb2NfZGF0YQ0KPiBzdHJ1
-Y3QsIGFzIG5vdCBhbGwgbWVtYmVycyBhcmUgYmVpbmcgaW5pdGlhbGllZC4gRGVwZW5kaW5nIG9u
-IHRoZQ0KPiB0eXBlIG9mIENQVSwgdGhpcyBpcyBhIG5vdGljZWFibGUgc2xvd2Rvd24gY29tcGFy
-ZWQgdG8ganVzdCBlbnN1cmluZw0KPiB0aGF0IHRoZSBzdHJ1Y3QgaXMgZnVsbHkgaW5pdGlhbGl6
-ZWQgd2hlbiBzZXR1cC4NCj4NCj4gU2lnbmVkLW9mZi1ieTogSmVucyBBeGJvZTxheGJvZUBrZXJu
-ZWwuZGs+DQoNCkxvb2tzIGdvb2QuDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2Fybmkg
-PGtjaEBudmlkaWEuY29tPg0KDQotY2sNCg0KDQo=
+On Tue, Apr 15, 2025 at 11:05:38AM +0200, Christian Brauner wrote:
+> On Mon, Apr 14, 2025 at 03:19:33PM -0700, Luis Chamberlain wrote:
+> > On Mon, Apr 14, 2025 at 02:09:46PM -0700, Luis Chamberlain wrote:
+> > > On Thu, Apr 10, 2025 at 02:05:38PM +0200, Jan Kara wrote:
+> > > > > @@ -859,12 +862,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
+> > > > >  			}
+> > > > >  			bh = bh->b_this_page;
+> > > > >  		} while (bh != head);
+> > > > > +		spin_unlock(&mapping->i_private_lock);
+> > > > 
+> > > > No, you've just broken all simple filesystems (like ext2) with this patch.
+> > > > You can reduce the spinlock critical section only after providing
+> > > > alternative way to protect them from migration. So this should probably
+> > > > happen at the end of the series.
+> > > 
+> > > So you're OK with this spin lock move with the other series in place?
+> > > 
+> > > And so we punt the hard-to-reproduce corruption issue as future work
+> > > to do? Becuase the other alternative for now is to just disable
+> > > migration for jbd2:
+> > > 
+> > > diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+> > > index 1dc09ed5d403..ef1c3ef68877 100644
+> > > --- a/fs/ext4/inode.c
+> > > +++ b/fs/ext4/inode.c
+> > > @@ -3631,7 +3631,6 @@ static const struct address_space_operations ext4_journalled_aops = {
+> > >  	.bmap			= ext4_bmap,
+> > >  	.invalidate_folio	= ext4_journalled_invalidate_folio,
+> > >  	.release_folio		= ext4_release_folio,
+> > > -	.migrate_folio		= buffer_migrate_folio_norefs,
+> > >  	.is_partially_uptodate  = block_is_partially_uptodate,
+> > >  	.error_remove_folio	= generic_error_remove_folio,
+> > >  	.swap_activate		= ext4_iomap_swap_activate,
+> > 
+> > BTW I ask because.. are your expectations that the next v3 series also
+> > be a target for Linus tree as part of a fix for this spinlock
+> > replacement?
+> 
+> Since this is fixing potential filesystem corruption I will upstream
+> whatever we need to do to fix this. Ideally we have a minimal fix to
+> upstream now and a comprehensive fix and cleanup for v6.16.
+
+Despite our efforts we don't yet have an agreement on how to fix the
+ext4 corruption, becuase Jan noted the buffer_meta() check in this patch
+is too broad and would affect other filesystems (I have yet to
+understand how, but will review).
+
+And so while we have agreement we can remove the spin lock to fix the
+sleeping while atomic incurred by large folios for buffer heads by this
+patch series, the removal of the spin lock would happen at the end of
+this series.
+
+And so the ext4 corruption is an existing issue as-is today, its
+separate from the spin lock removal goal to fix the sleeping while
+atomic..
+
+However this series might be quite big for an rc2 or rc3 fix for that spin
+lock removal issue. It should bring in substantial performance benefits
+though, so it might be worthy to consider. We can re-run tests with the
+adjustment to remove the spin lock until the last patch in this series.
+
+The alternative is to revert the spin lock addition commit for Linus'
+tree, ie commit ebdf4de5642fb6 ("mm: migrate: fix reference check race
+between __find_get_block() and migration") and note that it in fact does
+not fix the ext4 corruption as we've noted, and in fact causes an issue
+with sleeping while atomic with support for large folios for buffer
+heads. If we do that then we  punt this series for the next development
+window, and it would just not have the spin lock removal on the last
+patch.
+
+Jan Kara, Christian, thoughts?
+
+  Luis
