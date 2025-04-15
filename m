@@ -1,168 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4163327B4EF
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 10:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB97288C96;
+	Tue, 15 Apr 2025 10:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744711635; cv=none; b=pYPq7WAFxB+zo6giEjYTg/7OkQdRqOA4l6KhtlittMygRRhh6qmGebOfH+bBmF8JXBQDBwj3EXnScr+U3YdKGlfhMT2ltHW5WS/hts+HA8WFT1/MNnWpqgkv7p9wJe4aiGYOyvDh7Gui22BaXXGsybCN911P6QReTIvO1mzeR5s=
+	t=1744712339; cv=none; b=A4exmcYAoO1xXz1Je0J7/F8JfEPkRrsRT8U1gSm2dmFq+/pkxkqoY79ausLbD8rqyrI38r1/35KGimKCYcJ9IUfbfVxHyj/Wq8Fp0P8heCrU0/GZrBSq13x6u94nXLCSFG7eDZTHYgi7cP5axvGslaiS9ZxmJlrG4frqEHdUo30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744711635; c=relaxed/simple;
-	bh=xtVrwFh5e41vTbYXDsUVTvtC+AGL5L9u1d6CZeCO0yA=;
+	s=arc-20240116; t=1744712339; c=relaxed/simple;
+	bh=8k9HyLOQVX2DKJes33OnB1ZdwzaKh2WQzdSqAfqGrUY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J4w3nvO27/y8ilDgEjmBKWKFqXNsCCLxtrybtdfmO3iGgeo75W2xjrIjj301r1+na7wqYolDJbWn1wky+4kHBb0F3hL9rglxbwIxm6+/TX7N20T9r88FUvFg38TUcJW+pjNG29nbstxSbKKXXLzU6P2WQBnt4W33P/m8lwbi4fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VkA1JMbq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkA1JMbq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744711632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3iqVuxZodv/9DdNyAXc6CM9l0J63zHrWcD6alJGhj0c=;
-	b=VkA1JMbqoKDsClPdQiTDmpymxS3n3EXjBeqj6fWMKIgpiUuXqlOx1yxsoyhwcId4/g5QmV
-	sTYoJ5eiF2dqScE+bGeGewscvMY4KIuM/q7JL1xM03iZtn3RSOyA8nWbVvMe9VWr3h/qVy
-	Wokb/A3FoRY+H3T3bd/C4JsfrLIZE8M=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-81-YgMcZQjOO56CTMAQmS-_MQ-1; Tue,
- 15 Apr 2025 06:07:08 -0400
-X-MC-Unique: YgMcZQjOO56CTMAQmS-_MQ-1
-X-Mimecast-MFC-AGG-ID: YgMcZQjOO56CTMAQmS-_MQ_1744711627
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD9871955BC9;
-	Tue, 15 Apr 2025 10:07:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.70])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B64331808867;
-	Tue, 15 Apr 2025 10:07:02 +0000 (UTC)
-Date: Tue, 15 Apr 2025 18:06:57 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 12/15] block: move debugfs/sysfs register out of freezing
- queue
-Message-ID: <Z_4vwU7HMLCShZUO@fedora>
-References: <20250410133029.2487054-1-ming.lei@redhat.com>
- <20250410133029.2487054-13-ming.lei@redhat.com>
- <b28d98a6-b406-45b0-a5db-11bc600be75f@linux.ibm.com>
- <Z_xn-Zl5FDGdZ_Bk@fedora>
- <96d870d2-19f2-489e-951f-b92a56b59bf6@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ooVvomOvwrmcTXy3cvshcuMnwaNnxOjuCUxC7e/tiHzxmGWTAU9cwjCREatOwV4f7gOm8+Xez3zw15kpsempBmqpJB8Tu0ldaqE7q27ebkadOOk7N8NsGStUOcMuybCBMn/XJiztfRRHTMgGhnLyv7RE9SQg7yBu+fNiAkZJVUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0674C4CEDD;
+	Tue, 15 Apr 2025 10:18:57 +0000 (UTC)
+Date: Tue, 15 Apr 2025 12:18:55 +0200
+From: Greg KH <greg@kroah.com>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Martijn Coenen <maco@android.com>,
+	Alyssa Ross <hi@alyssa.is>, Christoph Hellwig <hch@lst.de>,
+	Jan Kara <jack@suse.cz>, John Ogness <john.ogness@linutronix.de>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] loop: properly send KOBJ_CHANGED uevent for disk
+ device
+Message-ID: <2025041548-preplan-reaffirm-510a@gregkh>
+References: <20250415-loop-uevent-changed-v2-1-0c4e6a923b2a@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <96d870d2-19f2-489e-951f-b92a56b59bf6@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250415-loop-uevent-changed-v2-1-0c4e6a923b2a@linutronix.de>
 
-On Tue, Apr 15, 2025 at 03:07:18PM +0530, Nilay Shroff wrote:
+On Tue, Apr 15, 2025 at 10:51:47AM +0200, Thomas Weiﬂschuh wrote:
+> The original commit message and the wording "uncork" in the code comment
+> indicate that it is expected that the suppressed event instances are
+> automatically sent after unsuppressing.
+> This is not the case, instead they are discarded.
+> In effect this means that no "changed" events are emitted on the device
+> itself by default.
+> While each discovered partition does trigger a changed event on the
+> device, devices without partitions don't have any event emitted.
 > 
+> This makes udev miss the device creation and prompted workarounds in
+> userspace. See the linked util-linux/losetup bug.
 > 
-> On 4/14/25 7:12 AM, Ming Lei wrote:
-> > On Fri, Apr 11, 2025 at 12:27:17AM +0530, Nilay Shroff wrote:
-> >>
-> >>
-> >> On 4/10/25 7:00 PM, Ming Lei wrote:
-> >>> Move debugfs/sysfs register out of freezing queue in
-> >>> __blk_mq_update_nr_hw_queues(), so that the following lockdep dependency
-> >>> can be killed:
-> >>>
-> >>> 	#2 (&q->q_usage_counter(io)#16){++++}-{0:0}:
-> >>> 	#1 (fs_reclaim){+.+.}-{0:0}:
-> >>> 	#0 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}: //debugfs
-> >>>
-> >>> And registering/un-registering debugfs/sysfs does not require queue to be
-> >>> frozen.
-> >>>
-> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> >>> ---
-> >>>  block/blk-mq.c | 20 ++++++++++----------
-> >>>  1 file changed, 10 insertions(+), 10 deletions(-)
-> >>>
-> >>> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> >>> index 7219b01764da..0fb72a698d77 100644
-> >>> --- a/block/blk-mq.c
-> >>> +++ b/block/blk-mq.c
-> >>> @@ -4947,15 +4947,15 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >>>  	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
-> >>>  		return;
-> >>>  
-> >>> -	memflags = memalloc_noio_save();
-> >>> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> >>> -		blk_mq_freeze_queue_nomemsave(q);
-> >>> -
-> >>>  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> >>>  		blk_mq_debugfs_unregister_hctxs(q);
-> >>>  		blk_mq_sysfs_unregister_hctxs(q);
-> >>>  	}
-> >> As we removed hctx sysfs protection while un-registering it, this might
-> >> cause crash or other side-effect if simultaneously these sysfs attributes
-> >> are accessed. The read access of these attributes are still protected 
-> >> using ->elevator_lock. 
-> > 
-> > The ->elevator_lock in ->show() is useless except for reading the elevator
-> > internal data(sched tags, requests, ...), even for reading elevator data,
-> > it should have been relying on elevator reference, instead of lock, but
-> > that is another topic & improvement in future.
-> > 
-> > Also this patch does _not_ change ->elevator_lock for above debugfs/sysfs
-> > unregistering, does it? It is always done without holding ->elevator_lock.
-> > Also ->show() does not require ->q_usage_counter too.
-> > 
-> > As I mentioned, kobject/sysfs provides protection between ->show()/->store()
-> > and kobject_del(), isn't it the reason why you want to remove ->sys_lock?
-> > 
-> > https://lore.kernel.org/linux-block/20250226124006.1593985-1-nilay@linux.ibm.com/
-> > 
-> Yes you were correct, that was the reason we wanted to remove ->sysfs_lock.
-> However for these particular hctx sysfs attributes (nr_tags and nr_reserved_tags)
-> could be updated simultaneously from another blk-mq sysfs attribute named nr_requests.
-> Hence IMO, the default protection provided by sysfs/kernfs may not be sufficient and
-> so we need to protect those attributes using ->elevator_lock.
-
-Yes, what is why this patchset doesn't kill more ->elevator_lock uses, such
-as, the uses in blk-mq-debugs, update_nr_requests, but many of them can be
-replaced with grabbing elevator reference.
-
-But with/without this patch, the touched register/unregisger code does not
-require ->elevator_lock:
-
-                blk_mq_debugfs_unregister_hctxs(q);
-                blk_mq_sysfs_unregister_hctxs(q);
-
-so I don't understand why you argue here about ->elevator_lock use?
-
+> Explicitly emit the events and drop the confusingly worded comments.
 > 
-> Consider this case: While blk_mq_update_nr_hw_queues removes hctx attributes,
-> and simultaneously if nr_requests is also updating num of tags, would that not 
-> cause any side effect?
+> Link: https://github.com/util-linux/util-linux/issues/2434
+> Fixes: 498ef5c777d9 ("loop: suppress uevents while reconfiguring the device")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> ---
+> Changes in v2:
+> - Use correct Fixes tag
+> - Rework commit message slightly
+> - Rebase onto v6.15-rc1
+> - Link to v1: https://lore.kernel.org/r/20250317-loop-uevent-changed-v1-1-cb29cb91b62d@linutronix.de
+> ---
+>  drivers/block/loop.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 674527d770dc669e982a2b441af1171559aa427c..09a725710a21171e0adf5888f929ccaf94e98992 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -667,8 +667,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+>  
+>  	error = 0;
+>  done:
+> -	/* enable and uncork uevent now that we are done */
+>  	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> +	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+>  	return error;
+>  
+>  out_err:
+> @@ -1129,8 +1129,8 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+>  	if (partscan)
+>  		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+>  
+> -	/* enable and uncork uevent now that we are done */
+>  	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> +	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+>  
+>  	loop_global_unlock(lo, is_loop);
+>  	if (partscan)
+> 
+> ---
+> base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
+> change-id: 20250307-loop-uevent-changed-aa3690f43e03
+> 
+> Best regards,
+> -- 
+> Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> 
 
-Why is updating nr_requests related with removing hctx attributes?
-
-Can you explain the side effect in details?
-
-> Maybe we also want to protect blk_mq_update_nr_requests
-> with srcu read lock (set->update_nr_hwq_srcu) so that it couldn't run while  
-> blk_mq_update_nr_hw_queues is in progress?
-
-Yeah, agree, and it can be one new patch for covering race between
-blk_mq_update_nr_requests and blk_mq_update_nr_hw_queues, the point is just
-that nr_hw_queues is being changed, and not related with removing hctx
-attributes, IMO.
-
-
-Thanks,
-Ming
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
