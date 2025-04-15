@@ -1,129 +1,96 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD13A1DDC18;
-	Tue, 15 Apr 2025 08:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52E927EC89;
+	Tue, 15 Apr 2025 09:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744707115; cv=none; b=eD+4+NxsnHeOewkZsBiKd8LsCw3X6TI7U+Fb14faPvmxXBlfaMHRuc9hNsOPqXqq3EOfMe89+e3EcpiZDaG7FMAbwcHsvtYwo/3ROIF6azqx6nscACyNlUpwzh8cJDboMi+0HP2gBu45tSbbCCyvrlDhVPQ9EKmP7EGB9+fKYjk=
+	t=1744707946; cv=none; b=hQBJIeF1q0lafGVzkkWItUovRSI1G6JAhOREOnmXsEG1U4MO5aL3s2dBsNUYa/uYUnwN07pikeVu38pqivGxfzCQeOud02rfHbt+qrENRvAuwyLa9E1iuGwr+ot3gweXvjAmU9FLyjZOZacNzv4L1BubW01lvtv/PnxkVQq+JNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744707115; c=relaxed/simple;
-	bh=l6EgTfG/rNsxzj7YblsFEs3VRkJDgFjjSVvMIbcaSIM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ICCQUW5t4yzmDOIIo7TYAA/yNN4I+IG21qf2H14qvdSMoxbkz4niRqVdXPS6ub3z6LvJvNhWE11w3uXascMxQezaT74vxJ6/tHAXphQu19Zd2IBMI2SFrefJODsdrTIVEjg7L45XqlCC3bd9Ce9gKUaKLs7fhka1uN9sckVTbmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3C+0xkhw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=+P38YhTz; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1744707946; c=relaxed/simple;
+	bh=Jk1eZdnZg7G5vh0w7ZZMU2B0/djohjlF/9UhwnoXVqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sl24PJfeP+i/7+hi9qXvOwy8hJkiN04ROFOy0dpgKVPqnW1TTjHO+jq1s2Lb8oeNZWr3vD7mveVtdf4iE8rncFpgYOAX2N2DcDx9xmR6dIlKtvcyZrhOoHfOH316aP7LsRnSFx2oxG6rAYUfU/b7DHph5fEz70eeaZVhXa0x+LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EnDaFjao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3C+0xkhw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+P38YhTz"
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744707110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PH6MVwxzLv8eF6loMN8LTTQbGVnttpn8SLDX1xC+Qgo=;
-	b=3C+0xkhwu9H2ovaJRCfJTMtbdFS7iCD2T4FpT9OJGXFsPq/iLIkH0PqAZreWqL5FMOAb+N
-	oG3T6qoACEytO6vKHY4CMSDNryYfgXO38RkI+7Mt8gPaqoPK6k4sjsT8TEXCFOSTz4eKH+
-	hHNLebtwTopStnDrX+vkK/Qd7v7Cc5jfSGi9kYi2CVL1ZzON0/sZEbXh/C2Gl3ZUyUHfGt
-	nDZ6ed2xg7262wzHPTOZJ6MjfkEXQWJrYNS28LurtZv4w6kyA/lDr/QLTij1z2+MMWLzGk
-	kF6TEJX7x4UA0fJfxDCoiVAai7fQAxCPaVM85HHI3Ge2VOMyEPnRQQtkCifpag==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744707110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PH6MVwxzLv8eF6loMN8LTTQbGVnttpn8SLDX1xC+Qgo=;
-	b=+P38YhTzlVHayzy4c8rI89g2bBdDxGSgZljqDHmgDLArlQpeWoCpZmeBSOhdrBHmHBIRaZ
-	GZYS2M0YJwyVOHCQ==
-Date: Tue, 15 Apr 2025 10:51:47 +0200
-Subject: [PATCH v2] loop: properly send KOBJ_CHANGED uevent for disk device
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EnDaFjao"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D349C4CEDD;
+	Tue, 15 Apr 2025 09:05:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744707946;
+	bh=Jk1eZdnZg7G5vh0w7ZZMU2B0/djohjlF/9UhwnoXVqM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EnDaFjaoBbP4Ukx95bRanjXNjAhy3CPInDT7xMQPQ9yzQiJf4C55jyHbKIXkNhxVl
+	 hJysns7LjdmPe0fO2wmPSEbzyBco46UODoD0j+j+kl3v3SU44XIrnewY70CWY37OeK
+	 pfLLQ72QvzY1o9jaww271/RexBEWW2Dl2FA48OmMXBYk28jE3aJtnOQxnsAPsIchGC
+	 pfwPrGPaUGI5eSOZZxjBYpPhQyunRS/kpgzS9eXFsfU4F3k3uVEEOzlVcLpJLcKmmP
+	 /j5uUgwzbKjkCVPJL18oLf9pDxhAsBPH7tvvbjaZVAi9mx15ZVUEYXjLdU1fB9dN69
+	 /jeeXnNuBORqw==
+Date: Tue, 15 Apr 2025 11:05:38 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, tytso@mit.edu, adilger.kernel@dilger.ca, 
+	linux-ext4@vger.kernel.org, riel@surriel.com, dave@stgolabs.net, willy@infradead.org, 
+	hannes@cmpxchg.org, oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk, 
+	hare@suse.de, david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com, 
+	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
+ migration
+Message-ID: <20250415-freihalten-tausend-a9791b9c3a03@brauner>
+References: <20250410014945.2140781-1-mcgrof@kernel.org>
+ <20250410014945.2140781-2-mcgrof@kernel.org>
+ <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
+ <Z_15mCAv6nsSgRTf@bombadil.infradead.org>
+ <Z_2J9bxCqAUPgq42@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250415-loop-uevent-changed-v2-1-0c4e6a923b2a@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIACIe/mcC/32NywqDMBBFf0WybkoexpKu+h/FRTRjHZBEEg0W8
- d8bddeFzOoM99y7kggBIZJnsZIACSN6l0HcCtL2xn2Aos1MBBOKSfagg/cjnSGBm+iZsNQYWWn
- WlRKYJNkcA3S4HK3vOnOPcfLhe4wkvn+v+xKn+UArZYTUpVCvAd08Be9wuVvYJ06fX/htI3Tba
- N5Uwv759bZtP8wS5cz6AAAA
-X-Change-ID: 20250307-loop-uevent-changed-aa3690f43e03
-To: Jens Axboe <axboe@kernel.dk>, Martijn Coenen <maco@android.com>, 
- Alyssa Ross <hi@alyssa.is>, Christoph Hellwig <hch@lst.de>, 
- Greg KH <greg@kroah.com>, Jan Kara <jack@suse.cz>
-Cc: John Ogness <john.ogness@linutronix.de>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1744707109; l=2327;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=l6EgTfG/rNsxzj7YblsFEs3VRkJDgFjjSVvMIbcaSIM=;
- b=f16o4dJg2nliQLGkEQn1igGREQ/SBPg0rQ+5p2AI7Bx/+OeMl6YOVVVsFs3xLBUycq/uUH9WA
- YIUJ6Uobe/+AaKmVyFyCbbkVVnpvahZfF1NfVp2x4dyAGyKPZ7kfwtH
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z_2J9bxCqAUPgq42@bombadil.infradead.org>
 
-The original commit message and the wording "uncork" in the code comment
-indicate that it is expected that the suppressed event instances are
-automatically sent after unsuppressing.
-This is not the case, instead they are discarded.
-In effect this means that no "changed" events are emitted on the device
-itself by default.
-While each discovered partition does trigger a changed event on the
-device, devices without partitions don't have any event emitted.
+On Mon, Apr 14, 2025 at 03:19:33PM -0700, Luis Chamberlain wrote:
+> On Mon, Apr 14, 2025 at 02:09:46PM -0700, Luis Chamberlain wrote:
+> > On Thu, Apr 10, 2025 at 02:05:38PM +0200, Jan Kara wrote:
+> > > > @@ -859,12 +862,12 @@ static int __buffer_migrate_folio(struct address_space *mapping,
+> > > >  			}
+> > > >  			bh = bh->b_this_page;
+> > > >  		} while (bh != head);
+> > > > +		spin_unlock(&mapping->i_private_lock);
+> > > 
+> > > No, you've just broken all simple filesystems (like ext2) with this patch.
+> > > You can reduce the spinlock critical section only after providing
+> > > alternative way to protect them from migration. So this should probably
+> > > happen at the end of the series.
+> > 
+> > So you're OK with this spin lock move with the other series in place?
+> > 
+> > And so we punt the hard-to-reproduce corruption issue as future work
+> > to do? Becuase the other alternative for now is to just disable
+> > migration for jbd2:
+> > 
+> > diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+> > index 1dc09ed5d403..ef1c3ef68877 100644
+> > --- a/fs/ext4/inode.c
+> > +++ b/fs/ext4/inode.c
+> > @@ -3631,7 +3631,6 @@ static const struct address_space_operations ext4_journalled_aops = {
+> >  	.bmap			= ext4_bmap,
+> >  	.invalidate_folio	= ext4_journalled_invalidate_folio,
+> >  	.release_folio		= ext4_release_folio,
+> > -	.migrate_folio		= buffer_migrate_folio_norefs,
+> >  	.is_partially_uptodate  = block_is_partially_uptodate,
+> >  	.error_remove_folio	= generic_error_remove_folio,
+> >  	.swap_activate		= ext4_iomap_swap_activate,
+> 
+> BTW I ask because.. are your expectations that the next v3 series also
+> be a target for Linus tree as part of a fix for this spinlock
+> replacement?
 
-This makes udev miss the device creation and prompted workarounds in
-userspace. See the linked util-linux/losetup bug.
-
-Explicitly emit the events and drop the confusingly worded comments.
-
-Link: https://github.com/util-linux/util-linux/issues/2434
-Fixes: 498ef5c777d9 ("loop: suppress uevents while reconfiguring the device")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
----
-Changes in v2:
-- Use correct Fixes tag
-- Rework commit message slightly
-- Rebase onto v6.15-rc1
-- Link to v1: https://lore.kernel.org/r/20250317-loop-uevent-changed-v1-1-cb29cb91b62d@linutronix.de
----
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc669e982a2b441af1171559aa427c..09a725710a21171e0adf5888f929ccaf94e98992 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -667,8 +667,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 
- 	error = 0;
- done:
--	/* enable and uncork uevent now that we are done */
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
-+	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- 	return error;
- 
- out_err:
-@@ -1129,8 +1129,8 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	if (partscan)
- 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
- 
--	/* enable and uncork uevent now that we are done */
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
-+	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- 
- 	loop_global_unlock(lo, is_loop);
- 	if (partscan)
-
----
-base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
-change-id: 20250307-loop-uevent-changed-aa3690f43e03
-
-Best regards,
--- 
-Thomas Weißschuh <thomas.weissschuh@linutronix.de>
-
+Since this is fixing potential filesystem corruption I will upstream
+whatever we need to do to fix this. Ideally we have a minimal fix to
+upstream now and a comprehensive fix and cleanup for v6.16.
