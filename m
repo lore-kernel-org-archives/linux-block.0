@@ -1,46 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F07128934F;
-	Tue, 15 Apr 2025 22:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03A529DB90;
+	Tue, 15 Apr 2025 23:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744756586; cv=none; b=WupjYMOZlc/59mH4LLgjS2k8SfFYvt7KCLwzDmkcGfSEAvYuYar/vQaQzYFy7/rHae7LEekV1qRBq/26xb/v/leXnhjIMwh8eG5NcHo7gLwupncbw6bAlxkmHKz2D6XHuZ2M26+Gct4VngOTDamNPZ1FDZbN4ZDQSCtITLJApZU=
+	t=1744758188; cv=none; b=Uxj2CdNy7OBLBSVbFxGjWFg81pKk0vWoeSxzHa22v1XXqcuwQiSOhC3X2fPnI6DfoJFu7pKNgd3/TytoVVbU0rzTSwVMAi4YxD5PS/2tVqi+amPBWq7S97Qq6K5FFsp0xJl3SzmI2Jd2+srUUiWEu8If+C7Ysj/ktf70w96twEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744756586; c=relaxed/simple;
-	bh=WH9UUYC9KfYUqg0sqxc9yszTOLHLDkGjbDfqpf0VXyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h52R8rRFqx9lk9uRNcmGUxaTW00JMwhIc3IEaxSoEh9JHlCB9DG1vxQiTPg2P7nGDqnLr/x4A+6+W+9VO3/nWkGL6xhigZdUrwy67pxAFWQWNthvRmUjUqhZ/Mg7GfnqcT31Lsc/tSM1K7IUZ1vjn2cXsih/Jc1egGsKBBcOHxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ig9yW8xi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744758188; c=relaxed/simple;
+	bh=JZRovcjiwQ33A3xUCMsFycF3ql2BDyl9qeX4yMmp6bA=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iKRSftGgBYL2CMwfWhz9pFK4Ebk0wqaTNX0NzIJfTNoNsd1rFxhbF52wq8ixlzS6g6Sct8YgdBRvVyiO841Y51yFubDQ+t7wVfuqegLa0x5QsgPo3r1mK19PaCHaVVqwGfMcT0/GasJa/8LcvQ9s+Kfx2LFxBU86oL91aB3liAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hqEzR59W; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ig9yW8xi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBFDC4CEE7;
-	Tue, 15 Apr 2025 22:36:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744756586;
-	bh=WH9UUYC9KfYUqg0sqxc9yszTOLHLDkGjbDfqpf0VXyc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ig9yW8xiyq/yYI2T+rIi6tW27/MPx3vy+r3c5uLxC2GrFQAK3emXTIpUTY101glIm
-	 2ARQVigqRQuYnGQ9mqzELsA/P8F0pMP/mxu/bMi2nLPAEPpVoMOkcDJkb1sBt7WI8H
-	 3i48eZufU6uxyYa/NBi6EEbW+CZlybo/fIcmNlhMVOo6gdquB32a/udCnQJI/586Sw
-	 3Fuos32s9IQFIqPxgSNQK2UrWNj9zwbXzPVBjuvLrRrTo4ea2olm4eArXn1m+V3YVj
-	 a+tAQAEIS5awDLzGrgc4YrOvZbZ+6G99WKqTGCxOTlFtZ/QwGWY5vvcmY4gdMP4Dnu
-	 G6Zo+zVfiMxsA==
-Date: Tue, 15 Apr 2025 15:36:25 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: brauner@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk, jack@suse.cz,
-	cem@kernel.org, linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
-	linux-api@vger.kernel.org
-Subject: [PATCH v7.1 14/14] xfs: allow sysadmins to specify a maximum atomic
- write limit at mount time
-Message-ID: <20250415223625.GV25675@frogsfrogsfrogs>
-References: <20250415121425.4146847-1-john.g.garry@oracle.com>
- <20250415121425.4146847-15-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hqEzR59W"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c54b651310so816908785a.0;
+        Tue, 15 Apr 2025 16:03:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744758186; x=1745362986; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q21DKRIHxJEvdt+r1VLoxzAfD1ZQ4fXtiMyb7UHuaZI=;
+        b=hqEzR59W4HhSxePeWOTGxNpwgJPYr/WM4A62sqbNmUn1QQi5g1OHicjbKDu4+i0Pd4
+         RbXKvJLmezjtTZFBgvcZBxS27uuzmbIfkwA1iQsbiFJteBc/G1UorqUF5BfImvV7v74I
+         vApbt1ha5+Q3GexZp/b+gVWwo9vCm9/QN3h0RqNe6Lp7eqv2gtd1/9B0OgNbE/YLvy5l
+         j1LRvjKj51QHZ5r6nfF8GUeu8D37w4jsOj4pl6Ks88Qx29s80a7g17cu5i7BTswtaV7E
+         rlw4REa8iIf/Pi1jgwR5JE/+WY72fXW5FJrV+aOS6PCmiZXQVuIjT38qGaWXyIpEUyWa
+         Brqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744758186; x=1745362986;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q21DKRIHxJEvdt+r1VLoxzAfD1ZQ4fXtiMyb7UHuaZI=;
+        b=mUrwMpiecvYnYgEkm2uyRDqwqCSEeSOrGEhO3LE4icQw0SeVDicrfpgGch5Rq169x+
+         IHSTf9UUAWA5H1UGrHRTgiZKkEBA9Uq5C7q4QR0hQkisMxRyodJWlbkyFCCtQHjoSpjV
+         ei5yOdhtBi56GdQyAamSqiHzkI+coeBvNGnJ9tu+P61fAU8fBSVurYUfUOMyvddfl1Of
+         xY5C2a/KDP7vyUtVJ6DGeMWJjVzX9usEg1PDqNrYDo5v3kirG7BQI6sx7APpB3XYO7EM
+         BFCYXocmpkN6hJCEBwqI079O5iM8ZQAwoy1n3SxpkQqJYC/9XnBAlgej2RH0joDMNqAN
+         Ywhw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3Ijq2ErJCo3hETPn3rVmSttq4vXKMCL9sWYf+ZREC/Mjdb0cUvbVnhJ2nJfkIe0I8g1GIBtVm7NV5egg=@vger.kernel.org, AJvYcCU8GEY4P1jVp0TtmilVzbzJA07UGRo7izGNcCm+/+G9VmYzZbO4RhQVtv90A2Nj9lG4yFHc44b42KwS@vger.kernel.org, AJvYcCUUtGH8qh/J5DM2zPkM67X0tnqowLGkaJJE1zHPlaKmkkZF285hLSsIBUThNYAD7vawuzqR7M0MjInwmj8Zntdr@vger.kernel.org, AJvYcCV9SwtRrS53UjNZvz4WSWrrcYia6tPrPjBoFChGHW1HnVVyc4s8lvZo6uFVtDLPLi9IUdazlPay7L3ShTNw@vger.kernel.org, AJvYcCWPBjMqqu76ifmHVYufb8A8ndS3NAr+kNZmk4sxiQ1dVPW/HLmTHp8PrQBiJdwsjuqdA1oVy2beyCzR@vger.kernel.org, AJvYcCWyfFwA2Hg/NtHFkMIpvcAjfYEfwEEyIFoRvk+cujRPRMxeMe6y/j0mHTjFDLNOHm4ehQ76vLt9FiQ7PjfZG5U=@vger.kernel.org, AJvYcCWzlaNeGQc9TDqP8v2lPZpubzry4eAnn0ibyqxKS1B3vNfU7pul8oe7KZ5SRLQI9vnkcob0ZiY63HDcFFMF@vger.kernel.org, AJvYcCXHcL9ZikTZFzIoWTKhVshXHQ2VXRKOozsEP+CayaxkcG/gB6FM0E5aqW2Hw7nB3PuLXqA4OghN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxe5047ksgl1xC6hXsQqhjwSlnq1oW1P4JaE53yomeaHUQruZVR
+	UZj6ytotYT/rQWl6KG6J/sCQMPd53YCEKkZG0JF+9khhAW0VDD1m
+X-Gm-Gg: ASbGnctxY7Ie9ks5Lwcuz7daJSGS0eTIzHSyLZbkW2nWYzBcDCPYhG4w2j4MaGXbkRW
+	jDT9dOibMajY+SgXTwbON45ex1mYuu5NOrhF9fCyZmC46uoxKrm0ARcXGmTixUnwhZuhqwNDPWL
+	jq5qfGchLRmiS3TJ2vfoLHSgPGXrqEbghloO4LYTqplctoIFHLds3jzPb1wCN8zGaNFaXhlNd8U
+	SUZQd/U1LrYC31cXzFvaXIKz/Ms/0xFDUacTcc7c7RU8wlJ6+n/DBrWliOyick3qUR+/MI4ZrDW
+	8596+y2a3lEo4DCk8HjxxLcNggA+/dz+9w83u/tlpPys+5MvXlWB9w6fFoUy01FzywxcX8MeW7z
+	8yvF+bobI4+ThwQoojlL0Rpn5N2LPfQI=
+X-Google-Smtp-Source: AGHT+IFD/29vIxMjxOFxQ8BkiE/LEbZtqORNAZrDSp4aJ594XboCIC4xgBiV7FVPqr3EbX3zcQVpqw==
+X-Received: by 2002:a05:620a:459f:b0:7c5:4c6d:7fa5 with SMTP id af79cd13be357-7c91428098amr221292185a.48.1744758185614;
+        Tue, 15 Apr 2025 16:03:05 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c7a896a708sm969451385a.58.2025.04.15.16.03.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 16:03:05 -0700 (PDT)
+Message-ID: <67fee5a9.050a0220.25fe78.76d2@mx.google.com>
+X-Google-Original-Message-ID: <Z_7lpfy3H74dI1Ad@winterfell.>
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id C4F0F1200043;
+	Tue, 15 Apr 2025 19:03:03 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 15 Apr 2025 19:03:03 -0400
+X-ME-Sender: <xms:p-X-Zz3WUcQHo5SPerJTk_Pdw6EezJuTH-lYjWN5uKuxBZn4sbkqSQ>
+    <xme:p-X-ZyEihct8Y5-jYRn-hwKhJNfUEQet1OPd2N-am8r60UUrmWLlmSgr1LcjP_tKs
+    b9VG5Lbohie4BDeIg>
+X-ME-Received: <xmr:p-X-Zz6GJVAyNj9lTiZEOMLtdkuSmnFOQWBwbEVDi79-oJdfu-HslPmbdD8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdegjeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeehudejhfekieevvddvgeehhfdutdeggfel
+    gedugfejhffggeelkeeuffdthfetgeenucffohhmrghinhepihgushdrrghspdhkvghrnh
+    gvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
+    ohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvge
+    ehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhm
+    sehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepgeejpdhmohguvgepshhmthhpoh
+    huthdprhgtphhtthhopehtrghmihhrugesghhmrghilhdrtghomhdprhgtphhtthhopehm
+    rghsrghhihhrohihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnrghthhgrnheskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilhdrtghomhdprhgtphhtthhope
+    hgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthhopegsjhhorhhnfegpghhhsehp
+    rhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvghnnhhordhlohhsshhinhesph
+    hrohhtohhnrdhmvgdprhgtphhtthhopegrrdhhihhnuggsohhrgheskhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:p-X-Z41IoaAkSc3EBgjWc6FXL709swaRQ4uUE1JmJ7uwRMFyWIM8qw>
+    <xmx:p-X-Z2FWGrBqGBVjFOLFXxauA-nSn0cOk80DjxXcxIfFi4pNOTsFBw>
+    <xmx:p-X-Z5-JJOXIKKn2Ask5SGKUS8sj6aH_plq-OmVqa5Dc4Y2gCsioRQ>
+    <xmx:p-X-ZzkEZZfroB1PnsAsuNes8k_rpPpUslzDA-16Zho9eYd0LiRujQ>
+    <xmx:p-X-ZyHPCpMV7Nst1ncTZ1st-JDeh20IBOZOttD2KMdbEi0SFLxqXbnu>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 15 Apr 2025 19:03:02 -0400 (EDT)
+Date: Tue, 15 Apr 2025 16:03:01 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 6/6] rust: enable `clippy::ref_as_ptr` lint
+References: <20250409-ptr-as-ptr-v8-0-3738061534ef@gmail.com>
+ <20250409-ptr-as-ptr-v8-6-3738061534ef@gmail.com>
+ <67fe9975.c80a0220.1b5785.66e7@mx.google.com>
+ <CAJ-ks9mzyfvsxkyud_wLXfhLD_zP95bivCQ9i2aC-3ea=Y7+0A@mail.gmail.com>
+ <67fea2d6.050a0220.8fa7f.6690@mx.google.com>
+ <CAJ-ks9=G1ajyT8gwLHyvHW09Z2gG=Geg7LDS6iyRyqx_wyp5Sg@mail.gmail.com>
+ <67fec6c1.0c0a0220.f907e.c6dd@mx.google.com>
+ <CAJ-ks9mZ4qqRwQTWyGYgPy9kf3=od=zbvX67ELVgctU0t6qHuQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,378 +149,124 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250415121425.4146847-15-john.g.garry@oracle.com>
+In-Reply-To: <CAJ-ks9mZ4qqRwQTWyGYgPy9kf3=od=zbvX67ELVgctU0t6qHuQ@mail.gmail.com>
 
-From: Darrick J. Wong <djwong@kernel.org>
+On Tue, Apr 15, 2025 at 04:59:01PM -0400, Tamir Duberstein wrote:
+[...]
+> > > > > > > diff --git a/rust/kernel/device_id.rs b/rust/kernel/device_id.rs
+> > > > > > > index 4063f09d76d9..37cc03d1df4c 100644
+> > > > > > > --- a/rust/kernel/device_id.rs
+> > > > > > > +++ b/rust/kernel/device_id.rs
+> > > > > > > @@ -136,7 +136,8 @@ impl<T: RawDeviceId, U, const N: usize> IdTable<T, U> for IdArray<T, U, N> {
+> > > > > > >      fn as_ptr(&self) -> *const T::RawType {
+> > > > > > >          // This cannot be `self.ids.as_ptr()`, as the return pointer must have correct provenance
+> > > > > > >          // to access the sentinel.
+> > > > > > > -        (self as *const Self).cast()
+> > > > > > > +        let this: *const Self = self;
+> > > > > >
+> > > > > > Hmm.. so this lint usually just requires to use a let statement instead
+> > > > > > of as expression when casting a reference to a pointer? Not 100%
+> > > > > > convinced this results into better code TBH..
+> > > > >
+> > > > > The rationale is in the lint description and quoted in the commit
+> > > > > message: "Using `as` casts may result in silently changing mutability
+> > > > > or type.".
+> > > > >
+> > > >
+> > > > Could you show me how you can silently change the mutability or type? A
+> > > > simple try like below doesn't compile:
+> > > >
+> > > >         let x = &42;
+> > > >         let ptr = x as *mut i32; // <- error
+> > > >         let another_ptr = x as *const i64; // <- error
+> > >
+> > > I think the point is that the meaning of an `as` cast can change when
+> > > the type of `x` changes, which can happen at a distance. The example
+> >
+> > So my example shows that you can only use `as` to convert a `&T` into a
+> > `*const T`, no matter how far it happens, and..
+> 
+> I don't think you're engaging with the point I'm making here. Suppose
+> the type is `&mut T` initially and `as _` is being used to convert it
+> to `*mut T`; now if the type of `&mut T` changes to `*const T`, you have
+> completely different semantics.
+> 
 
-Introduce a mount option to allow sysadmins to specify the maximum size
-of an atomic write.  If the filesystem can work with the supplied value,
-that becomes the new guaranteed maximum.
+You're right, I had some misunderstanding, the "`_`" part of `as _`
+seems to be a red herring, the problematic code snippet you meant can be
+shown as (without a `as _`):
 
-The value mustn't be too big for the existing filesystem geometry (max
-write size, max AG/rtgroup size).  We dynamically recompute the
-tr_atomic_write transaction reservation based on the given block size,
-check that the current log size isn't less than the new minimum log size
-constraints, and set a new maximum.
+	f(x as *mut T); // f() takes a `*mut T`.
 
-The actual software atomic write max is still computed based off of
-tr_atomic_ioend the same way it has for the past few commits.
+where it compiles with `x` being either a `&mut T` or `*const T`, and
+`as` has different meanings in these cases.
 
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
-Signed-off-by: John Garry <john.g.garry@oracle.com>
----
-v7.1: make all the tweaks I already complained about here
----
- fs/xfs/libxfs/xfs_trans_resv.h    |    2 +
- fs/xfs/xfs_mount.h                |    6 ++++
- fs/xfs/xfs_trace.h                |   33 ++++++++++++++++++++
- Documentation/admin-guide/xfs.rst |   11 +++++++
- fs/xfs/libxfs/xfs_trans_resv.c    |   53 +++++++++++++++++++++++++++++++++
- fs/xfs/xfs_mount.c                |   59 ++++++++++++++++++++++++++++++++++++
- fs/xfs/xfs_super.c                |   60 ++++++++++++++++++++++++++++++++++++-
- 7 files changed, 222 insertions(+), 2 deletions(-)
+> >
+> > > shown in the clippy docs uses `as _`, which is where you get into real
+> > > trouble.
+> > >
+> >
+> > ... no matter whether `as _` is used or not. Of course once you have a
+> > `*const T`, using `as` can change it to a different type or mutability,
+> > but that's a different problem. Your argument still lacks convincing
+> > evidences or examples showing this is a real trouble. For example, if
+> > you have a `x` of type `&i32`, and do a `x as _` somewhere, you will
+> > have a compiler error once compilers infers a type that is not `*const
+> > i32` for `_`. If your argument being it's better do the
+> > reference-to-pointer conversion explicitly, then that makes some sense,
+> > but I still don't think we need to do it globablly.
+> 
+> Can you help me understand what it is I need to convince you of? There
+> was prior discussion in
+> https://lore.kernel.org/all/D8PGG7NTWB6U.3SS3A5LN4XWMN@proton.me/,
+> where it was suggested to use this lint.
+> 
+> I suppose in any discussion of a chance, we should also enumerate the
+> costs -- you're taking the position that the status quo is preferable,
+> yes? Can you help me understand why?
+> 
 
-diff --git a/fs/xfs/libxfs/xfs_trans_resv.h b/fs/xfs/libxfs/xfs_trans_resv.h
-index a6d303b836883f..ea50a239c31107 100644
---- a/fs/xfs/libxfs/xfs_trans_resv.h
-+++ b/fs/xfs/libxfs/xfs_trans_resv.h
-@@ -122,5 +122,7 @@ unsigned int xfs_calc_write_reservation_minlogsize(struct xfs_mount *mp);
- unsigned int xfs_calc_qm_dqalloc_reservation_minlogsize(struct xfs_mount *mp);
- 
- xfs_extlen_t xfs_calc_max_atomic_write_fsblocks(struct xfs_mount *mp);
-+bool xfs_calc_atomic_write_reservation(struct xfs_mount *mp,
-+		xfs_extlen_t blockcount);
- 
- #endif	/* __XFS_TRANS_RESV_H__ */
-diff --git a/fs/xfs/xfs_mount.h b/fs/xfs/xfs_mount.h
-index c0eff3adfa31f6..68e2acc00b5321 100644
---- a/fs/xfs/xfs_mount.h
-+++ b/fs/xfs/xfs_mount.h
-@@ -236,6 +236,9 @@ typedef struct xfs_mount {
- 	bool			m_update_sb;	/* sb needs update in mount */
- 	unsigned int		m_max_open_zones;
- 
-+	/* max_atomic_write mount option value */
-+	unsigned long long	m_awu_max_bytes;
-+
- 	/*
- 	 * Bitsets of per-fs metadata that have been checked and/or are sick.
- 	 * Callers must hold m_sb_lock to access these two fields.
-@@ -798,4 +801,7 @@ static inline void xfs_mod_sb_delalloc(struct xfs_mount *mp, int64_t delta)
- 	percpu_counter_add(&mp->m_delalloc_blks, delta);
- }
- 
-+int xfs_set_max_atomic_write_opt(struct xfs_mount *mp,
-+		unsigned long long new_max_bytes);
-+
- #endif	/* __XFS_MOUNT_H__ */
-diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
-index 24d73e9bbe83f4..d41885f1efe25b 100644
---- a/fs/xfs/xfs_trace.h
-+++ b/fs/xfs/xfs_trace.h
-@@ -230,6 +230,39 @@ TRACE_EVENT(xfs_calc_max_atomic_write_fsblocks,
- 		  __entry->blockcount)
- );
- 
-+TRACE_EVENT(xfs_calc_max_atomic_write_reservation,
-+	TP_PROTO(struct xfs_mount *mp, unsigned int per_intent,
-+		 unsigned int step_size, unsigned int blockcount,
-+		 unsigned int min_logblocks, unsigned int logres),
-+	TP_ARGS(mp, per_intent, step_size, blockcount, min_logblocks, logres),
-+	TP_STRUCT__entry(
-+		__field(dev_t, dev)
-+		__field(unsigned int, per_intent)
-+		__field(unsigned int, step_size)
-+		__field(unsigned int, blockcount)
-+		__field(unsigned int, min_logblocks)
-+		__field(unsigned int, cur_logblocks)
-+		__field(unsigned int, logres)
-+	),
-+	TP_fast_assign(
-+		__entry->dev = mp->m_super->s_dev;
-+		__entry->per_intent = per_intent;
-+		__entry->step_size = step_size;
-+		__entry->blockcount = blockcount;
-+		__entry->min_logblocks = min_logblocks;
-+		__entry->cur_logblocks = mp->m_sb.sb_logblocks;
-+		__entry->logres = logres;
-+	),
-+	TP_printk("dev %d:%d per_intent %u step_size %u blockcount %u min_logblocks %u logblocks %u logres %u",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __entry->per_intent,
-+		  __entry->step_size,
-+		  __entry->blockcount,
-+		  __entry->min_logblocks,
-+		  __entry->cur_logblocks,
-+		  __entry->logres)
-+);
-+
- TRACE_EVENT(xlog_intent_recovery_failed,
- 	TP_PROTO(struct xfs_mount *mp, const struct xfs_defer_op_type *ops,
- 		 int error),
-diff --git a/Documentation/admin-guide/xfs.rst b/Documentation/admin-guide/xfs.rst
-index b67772cf36d6dc..0f6e5d4784f9c3 100644
---- a/Documentation/admin-guide/xfs.rst
-+++ b/Documentation/admin-guide/xfs.rst
-@@ -143,6 +143,17 @@ When mounting an XFS filesystem, the following options are accepted.
- 	optional, and the log section can be separate from the data
- 	section or contained within it.
- 
-+  max_atomic_write=value
-+	Set the maximum size of an atomic write.  The size may be
-+	specified in bytes, in kilobytes with a "k" suffix, in megabytes
-+	with a "m" suffix, or in gigabytes with a "g" suffix.  The size
-+	cannot be larger than the maximum write size, larger than the
-+	size of any allocation group, or larger than the size of a
-+	remapping operation that the log can complete atomically.
-+
-+	The default value is to set the maximum I/O completion size
-+	to allow each CPU to handle one at a time.
-+
-   noalign
- 	Data allocations will not be aligned at stripe unit
- 	boundaries. This is only relevant to filesystems created
-diff --git a/fs/xfs/libxfs/xfs_trans_resv.c b/fs/xfs/libxfs/xfs_trans_resv.c
-index f530aa5d72f552..48e75c7ba2bb69 100644
---- a/fs/xfs/libxfs/xfs_trans_resv.c
-+++ b/fs/xfs/libxfs/xfs_trans_resv.c
-@@ -1475,3 +1475,56 @@ xfs_calc_max_atomic_write_fsblocks(
- 
- 	return ret;
- }
-+
-+/*
-+ * Compute the log reservation needed to complete an atomic write of a given
-+ * number of blocks.  Worst case, each block requires separate handling.
-+ * Returns true if the blockcount is supported, false otherwise.
-+ */
-+bool
-+xfs_calc_atomic_write_reservation(
-+	struct xfs_mount	*mp,
-+	xfs_extlen_t		blockcount)
-+{
-+	struct xfs_trans_res	*curr_res = &M_RES(mp)->tr_atomic_ioend;
-+	unsigned int		per_intent, step_size;
-+	unsigned int		logres;
-+	uint			old_logres =
-+		M_RES(mp)->tr_atomic_ioend.tr_logres;
-+	int			min_logblocks;
-+
-+	/*
-+	 * If the caller doesn't ask for a specific atomic write size, then
-+	 * we'll use conservatively use tr_itruncate as the basis for computing
-+	 * a reasonable maximum.
-+	 */
-+	if (blockcount == 0) {
-+		curr_res->tr_logres = M_RES(mp)->tr_itruncate.tr_logres;
-+		return true;
-+	}
-+
-+	/* Untorn write completions require out of place write remapping */
-+	if (!xfs_has_reflink(mp))
-+		return false;
-+
-+	per_intent = xfs_calc_atomic_write_ioend_geometry(mp, &step_size);
-+
-+	if (check_mul_overflow(blockcount, per_intent, &logres))
-+		return false;
-+	if (check_add_overflow(logres, step_size, &logres))
-+		return false;
-+
-+	curr_res->tr_logres = logres;
-+	min_logblocks = xfs_log_calc_minimum_size(mp);
-+
-+	trace_xfs_calc_max_atomic_write_reservation(mp, per_intent, step_size,
-+			blockcount, min_logblocks, curr_res->tr_logres);
-+
-+	if (min_logblocks > mp->m_sb.sb_logblocks) {
-+		/* Log too small, revert changes. */
-+		curr_res->tr_logres = old_logres;
-+		return false;
-+	}
-+
-+	return true;
-+}
-diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
-index cec202cf7803d8..1eda18dfb1f667 100644
---- a/fs/xfs/xfs_mount.c
-+++ b/fs/xfs/xfs_mount.c
-@@ -737,6 +737,61 @@ xfs_compute_atomic_write_unit_max(
- 			max_agsize, max_rgsize);
- }
- 
-+/*
-+ * Try to set the atomic write maximum to a new value that we got from
-+ * userspace via mount option.
-+ */
-+int
-+xfs_set_max_atomic_write_opt(
-+	struct xfs_mount	*mp,
-+	unsigned long long	new_max_bytes)
-+{
-+	xfs_filblks_t		new_max_fsbs = XFS_B_TO_FSBT(mp, new_max_bytes);
-+
-+	if (new_max_bytes) {
-+		xfs_extlen_t	max_write_fsbs =
-+			rounddown_pow_of_two(XFS_B_TO_FSB(mp, MAX_RW_COUNT));
-+		xfs_extlen_t	max_group_fsbs =
-+			max(mp->m_groups[XG_TYPE_AG].blocks,
-+			    mp->m_groups[XG_TYPE_RTG].blocks);
-+
-+		ASSERT(max_write_fsbs <= U32_MAX);
-+
-+		if (new_max_bytes % mp->m_sb.sb_blocksize > 0) {
-+			xfs_warn(mp,
-+ "max atomic write size of %llu bytes not aligned with fsblock",
-+					new_max_bytes);
-+			return -EINVAL;
-+		}
-+
-+		if (new_max_fsbs > max_write_fsbs) {
-+			xfs_warn(mp,
-+ "max atomic write size of %lluk cannot be larger than max write size %lluk",
-+					new_max_bytes >> 10,
-+					XFS_FSB_TO_B(mp, max_write_fsbs) >> 10);
-+			return -EINVAL;
-+		}
-+
-+		if (new_max_fsbs > max_group_fsbs) {
-+			xfs_warn(mp,
-+ "max atomic write size of %lluk cannot be larger than allocation group size %lluk",
-+					new_max_bytes >> 10,
-+					XFS_FSB_TO_B(mp, max_group_fsbs) >> 10);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (!xfs_calc_atomic_write_reservation(mp, new_max_fsbs)) {
-+		xfs_warn(mp,
-+ "cannot support completing atomic writes of %lluk",
-+				new_max_bytes >> 10);
-+		return -EINVAL;
-+	}
-+
-+	xfs_compute_atomic_write_unit_max(mp);
-+	return 0;
-+}
-+
- /* Compute maximum possible height for realtime btree types for this fs. */
- static inline void
- xfs_rtbtree_compute_maxlevels(
-@@ -1158,7 +1213,9 @@ xfs_mountfs(
- 	 * derived from transaction reservations, so we must do this after the
- 	 * log is fully initialized.
- 	 */
--	xfs_compute_atomic_write_unit_max(mp);
-+	error = xfs_set_max_atomic_write_opt(mp, mp->m_awu_max_bytes);
-+	if (error)
-+		goto out_agresv;
- 
- 	return 0;
- 
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index b2dd0c0bf50979..9f422bcf651801 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -111,7 +111,7 @@ enum {
- 	Opt_prjquota, Opt_uquota, Opt_gquota, Opt_pquota,
- 	Opt_uqnoenforce, Opt_gqnoenforce, Opt_pqnoenforce, Opt_qnoenforce,
- 	Opt_discard, Opt_nodiscard, Opt_dax, Opt_dax_enum, Opt_max_open_zones,
--	Opt_lifetime, Opt_nolifetime,
-+	Opt_lifetime, Opt_nolifetime, Opt_max_atomic_write,
- };
- 
- static const struct fs_parameter_spec xfs_fs_parameters[] = {
-@@ -159,6 +159,7 @@ static const struct fs_parameter_spec xfs_fs_parameters[] = {
- 	fsparam_u32("max_open_zones",	Opt_max_open_zones),
- 	fsparam_flag("lifetime",	Opt_lifetime),
- 	fsparam_flag("nolifetime",	Opt_nolifetime),
-+	fsparam_string("max_atomic_write",	Opt_max_atomic_write),
- 	{}
- };
- 
-@@ -241,6 +242,9 @@ xfs_fs_show_options(
- 
- 	if (mp->m_max_open_zones)
- 		seq_printf(m, ",max_open_zones=%u", mp->m_max_open_zones);
-+	if (mp->m_awu_max_bytes)
-+		seq_printf(m, ",max_atomic_write=%lluk",
-+				mp->m_awu_max_bytes >> 10);
- 
- 	return 0;
- }
-@@ -1334,6 +1338,42 @@ suffix_kstrtoint(
- 	return ret;
- }
- 
-+static int
-+suffix_kstrtoull(
-+	const char		*s,
-+	unsigned int		base,
-+	unsigned long long	*res)
-+{
-+	int			last, shift_left_factor = 0;
-+	unsigned long long	_res;
-+	char			*value;
-+	int			ret = 0;
-+
-+	value = kstrdup(s, GFP_KERNEL);
-+	if (!value)
-+		return -ENOMEM;
-+
-+	last = strlen(value) - 1;
-+	if (value[last] == 'K' || value[last] == 'k') {
-+		shift_left_factor = 10;
-+		value[last] = '\0';
-+	}
-+	if (value[last] == 'M' || value[last] == 'm') {
-+		shift_left_factor = 20;
-+		value[last] = '\0';
-+	}
-+	if (value[last] == 'G' || value[last] == 'g') {
-+		shift_left_factor = 30;
-+		value[last] = '\0';
-+	}
-+
-+	if (kstrtoull(value, base, &_res))
-+		ret = -EINVAL;
-+	kfree(value);
-+	*res = _res << shift_left_factor;
-+	return ret;
-+}
-+
- static inline void
- xfs_fs_warn_deprecated(
- 	struct fs_context	*fc,
-@@ -1518,6 +1558,14 @@ xfs_fs_parse_param(
- 	case Opt_nolifetime:
- 		parsing_mp->m_features |= XFS_FEAT_NOLIFETIME;
- 		return 0;
-+	case Opt_max_atomic_write:
-+		if (suffix_kstrtoull(param->string, 10,
-+				     &parsing_mp->m_awu_max_bytes)) {
-+			xfs_warn(parsing_mp,
-+ "max atomic write size must be positive integer");
-+			return -EINVAL;
-+		}
-+		return 0;
- 	default:
- 		xfs_warn(parsing_mp, "unknown mount option [%s].", param->key);
- 		return -EINVAL;
-@@ -2114,6 +2162,16 @@ xfs_fs_reconfigure(
- 	if (error)
- 		return error;
- 
-+	/* Validate new max_atomic_write option before making other changes */
-+	if (mp->m_awu_max_bytes != new_mp->m_awu_max_bytes) {
-+		error = xfs_set_max_atomic_write_opt(mp,
-+				new_mp->m_awu_max_bytes);
-+		if (error)
-+			return error;
-+
-+		mp->m_awu_max_bytes = new_mp->m_awu_max_bytes;
-+	}
-+
- 	/* inode32 -> inode64 */
- 	if (xfs_has_small_inums(mp) && !xfs_has_small_inums(new_mp)) {
- 		mp->m_features &= ~XFS_FEAT_SMALL_INUMS;
+In this case the status quo is not having the lint, which allows users
+to convert a raw pointer from a reference with `as`. What you proposed
+in patch is to do the conversion with a stand-alone let statement, and
+that IMO doesn't suit all the cases: we are dealing with C code a lot,
+that means dealing raw pointers a lot, it's handy and logically tight if
+we have an expression that converts a Rust location into a raw pointer.
+And forcing let statements every time is not really reasonble because of
+this.
+
+Also I didn't get the problematic code the lint can prevent as well
+until very recent discussion in this thread.
+
+I would not say the status quo is preferable, more like your changes in
+this patch complicate some simple patterns which are reasonable to me.
+And it's also weird that we use a lint but don't use its suggestion.
+
+So in short, I'm not against this lint, but if we only use let-statement
+resolution, I need to understand why and as you said, we need to
+evaluate the cost.
+
+> >
+> > > > also from the link document you shared, looks like the suggestion is to
+> > > > use core::ptr::from_{ref,mut}(), was this ever considered?
+> > >
+> > > I considered it, but I thought it was ugly. We don't have a linter to
+> > > enforce it, so I'd be surprised if people reached for it.
+> > >
+> >
+> > I think avoiding the extra line of `let` is a win, also I don't get why
+> > you feel it's *ugly*: having the extra `let` line is ugly to me ;-)
+> 
+> I admit it's subjective, so I'm happy to change it. But I've never
+> seen that syntax used, and we lack enforcement for either one, so I
+> don't find much value in arguing over this.
+> 
+
+If the original code use "as" for conversion purposes, I think it's good
+to be consistent and using from_ref() or from_mut(): they are just
+bullet-proof version of conversions, and having a separate let statement
+looks like a distraction to me. If for new code, and the author has a
+reason for let statement, then it's fine.
+
+Regards,
+Boqun
