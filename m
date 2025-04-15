@@ -1,109 +1,202 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94D6C2F2
-	for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 16:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A2AC2F2;
+	Tue, 15 Apr 2025 16:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744733749; cv=none; b=iciYCapoiuaUXIOjqpdKbqVCVLLVsGNHtncmUYDJ/rEX7HxILNGbhO3kacZBl7VnBNVBmbYj6Y9hbPfzD4L/h+zbYzKzfPQTWwmR0sAhntZYDh5i7LfgFjTdGDd9BDsqYvWAuOlLa33KIQ/AImCbNZkPqYkI75WlCpbzMRB8UAk=
+	t=1744733893; cv=none; b=nsZMWVGMpHVjCqrcJjwrVuRhy8EZGObJJ9DmxKY8awbC7h9wEU3SfxHRwjiMvoXPPKe/GJq6N/aXpIPGVrwwvZAmMtD+PjquOy+gQVzfSoiM+002C2Bj7Vvgp4P/NBsUw+fQHlSAZjz/H1Zs8lCzx0v+dauNjqzZD3yXSNgChMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744733749; c=relaxed/simple;
-	bh=x0q2kSE5hKQj88R4LtBm72cXCEpEpkoA9WYFRDVUlOk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=i5grQ87+roapadX1qH0WyzZrO8u2wJ/XOUXc/X7S3sWchzbzzlxEhVK8pbZf9l/PjDo16rpsgNBHjTczsvdaW7w40emGA3zp0QXA2GXp4atiKynj3QuuhP0unzFZIXE4XRWAkblTaRbohR8MZskfGG3iEijAC21l5uyee5QS6Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IrHYcNKr; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744733893; c=relaxed/simple;
+	bh=TTzt00DG4m8YTP79xAQ6Vc0Czj8pe4Ekm0GuBijqACM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vq70mP6v+ui05FgGEM65ZeNdzA2/N8Zp8tWBpcDgHUCF46ROjPvOOcC5NIXykJXTrTxcmNieZ9EgnBpsElx8BLTu7enQSHT0Ub6zY+XluN70DS1BwcDueRXrtGlCbS2AEb5dzonooHZydnDYAemjKcUDlK3pRa+scz89KBoalJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLZ6pla5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IrHYcNKr"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d4496a34cdso20410975ab.1
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 09:15:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744733745; x=1745338545; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AEZIKS/xchUL+VUG3UTu4pSMzNAu0W+IbyPPSBukn8U=;
-        b=IrHYcNKrU4Nchwsu/ovWXIRfn4MitFUxFjSQPT45qa9PpUVyxxF5kjSn+yK6sPEu4R
-         xslipJ/sbpO0Cmd/60qO06ni8LWFGL2ZN6WRPXC+B1bWmXYG0C8Gw6UdAuo+A2+ovQGu
-         gvqAWhzbpx5Ep6rgtiMKNMcPHIPegTXcQhkL7sgUQXxtNVz6F6qS83UkJIj1CssI9G/P
-         nW3HUqgoSlTbuoYrPolWDSBvpoRgKssdiO0NnXiNpz20Tc4H2PwtTKQhzxn68li1ufvO
-         QN0sQZmAEJRQLF7uliRg3qU6ZGCVx86VDWHKN0pD4rABvFNheizBPJogfQuul0pNSf9i
-         IJpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744733745; x=1745338545;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEZIKS/xchUL+VUG3UTu4pSMzNAu0W+IbyPPSBukn8U=;
-        b=wgV8IxywuiJYl/orvZgajWVQw7+6iQSDkRcdi9yV+gfnk2uIVT7MFNm6ny1XUmbn0E
-         m1pE6tPYLYMyL9YNs7qdFRuVEggz1kzCcydYvcoDgXori5B1gKPGC74EBuIZoBqFm0XS
-         zmWbW0/XqTtDXhuyKO8wxjUKLbpP705v5WxJBmqrSEPX2GdKbaPIkwTby3Vibzyiikmo
-         SCJhoEHKxP20OcofwpnC+4YUivtVKy7Mt/FNxqZZH0A+Rb3nTjXh+i6IK/0fK76FPhh7
-         xiHdRT4c4KTgC+tGfvd/J5EEgvnotIJOY8tV+8TBjgdBK3/TVvYTDjwjbTQyKvLj3oTR
-         rw/g==
-X-Forwarded-Encrypted: i=1; AJvYcCX5ocUYMI4gA5hmqGwYzhuvhyyhFtsIhigMpkp25QPfn/Z55qiRP768jaus2HifC3FLlkWu1DQMX5YxAg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWfyFzZluPgFx3R4qcEm/AwbWl0y4I2agkeVkMdaLcu4Q7GXuh
-	1gGXckvEB2/a8GLQS2aBMoMcsYlfGCsOwkNHCGAOJ0A4N67FRCLufsbnuSncUC8yrT5azACJ8ye
-	d
-X-Gm-Gg: ASbGnctiblRY8ZNurLcNph0mdLNeARN3pONo0SygHNhv8JogieXysAtNt3j+liw3pNT
-	Pz6/9moJRjH5cBfS7D7nfppkj9H5AykG29vAu40rtXsuH+WKLtlJ/XxhDmywiWd3+295IcRmjjK
-	yWmPm8pXfROz+Q87kc+b93lWuz9uUBtYyjCWp5nUm4iS2HgoSKKYgnhEz3guxMOqN1cqpFVaHvZ
-	TmBlPJ2gtm0Qb4oqSZEkTOFFiX/30D+6bxfRpZNcOjX3vu2U/3ZwJfR3mLjRdvSECRByRqifSx3
-	xNXInxZxGmgQ/AnHC8HzCosxETeaFu53f1ua+A==
-X-Google-Smtp-Source: AGHT+IFx5p8HLJM5xmeh9OftbpA0VptbMSR18A/yPKoJohiJFxbgtFvdnlSz2JtoroW/T9hCgpEItQ==
-X-Received: by 2002:a05:6e02:3f05:b0:3d2:aa73:7b7a with SMTP id e9e14a558f8ab-3d7ec22785dmr189759495ab.12.1744733744755;
-        Tue, 15 Apr 2025 09:15:44 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505d15989sm3262781173.31.2025.04.15.09.15.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 09:15:44 -0700 (PDT)
-Message-ID: <6323c463-0d42-4c5f-a7d1-8739dcd34487@kernel.dk>
-Date: Tue, 15 Apr 2025 10:15:43 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLZ6pla5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279FAC4CEEB;
+	Tue, 15 Apr 2025 16:18:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744733892;
+	bh=TTzt00DG4m8YTP79xAQ6Vc0Czj8pe4Ekm0GuBijqACM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lLZ6pla5ACcnqulLMEDJOTd+4m63v1IVlXP4x6W6/Du6+HgglgLZiCuu+l9IVB45n
+	 n0+A4YSLy+MiLY4FfYjs4K5TT/CfXl1GzdOyxFWRjoYScuXo3MS0BqD/nCeudDVLlf
+	 lmfdFLOM2M2sBQu8EOFLStlwmt6eQbENfKRb2Q/YP64GOdwfChLhHFhDbtkvOwdzhP
+	 Hs9rEyYKXwOZhSs6qXnPJ36TiWBBTGoSaAiIEJd9a9LfXgp1oLssjRTL2BHPnzupMP
+	 p/rS+6A54oUZyEzs2rdrm0/9mYGDI1rWuqXztTs9qIvtb6yJm6TfuNw0t36NBuTIKf
+	 hEBy1DNx3NQEQ==
+Date: Tue, 15 Apr 2025 09:18:10 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: brauner@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, riel@surriel.com, dave@stgolabs.net,
+	willy@infradead.org, hannes@cmpxchg.org, oliver.sang@intel.com,
+	david@redhat.com, axboe@kernel.dk, hare@suse.de,
+	david@fromorbit.com, djwong@kernel.org, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, gost.dev@samsung.com, p.raghav@samsung.com,
+	da.gomez@samsung.com,
+	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
+ migration
+Message-ID: <Z_6Gwl6nowYnsO3w@bombadil.infradead.org>
+References: <20250410014945.2140781-1-mcgrof@kernel.org>
+ <20250410014945.2140781-2-mcgrof@kernel.org>
+ <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: ensure that struct blk_mq_alloc_data is fully
- initialized
-To: Bart Van Assche <bvanassche@acm.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <1720cf81-6170-4cac-abf3-e19a4493653b@kernel.dk>
- <a8074c72-e258-4b34-a629-c253997dfab9@acm.org>
- <4b0eee16-a37b-4770-95f0-c5f02160e0da@kernel.dk>
- <77aa1c61-dc33-47d0-854d-22e4f1cae60e@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <77aa1c61-dc33-47d0-854d-22e4f1cae60e@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
 
-On 4/15/25 10:13 AM, Bart Van Assche wrote:
-> On 4/15/25 8:59 AM, Jens Axboe wrote:
->> On 4/15/25 9:50 AM, Bart Van Assche wrote:
->>> On 4/15/25 7:51 AM, Jens Axboe wrote:
->>>> On x86, rep stos will be emitted to clear the the blk_mq_alloc_data
->>>> struct, as not all members are being initialied.
->>>
->>> "Partial initialization" never happens in the C language when
->>> initializing a data structure. If a data structure is initialized,
->>> members that have not been specified are initialized to zero (the
->>> compiler is not required to initialize padding bytes). In other words,
->>> the description of this patch needs to be improved.
->>
->> How is the description inaccurate? As not all members are being
->> explicitly initialized, rep stos is emitted to do so.
+On Thu, Apr 10, 2025 at 02:05:38PM +0200, Jan Kara wrote:
+> On Wed 09-04-25 18:49:38, Luis Chamberlain wrote:
+> > ** Reproduced on vanilla Linux with udelay(2000) **
+> > 
+> > Call trace (ENOSPC journal failure):
+> >   do_writepages()
+> >     → ext4_do_writepages()
+> >       → ext4_map_blocks()
+> >         → ext4_ext_map_blocks()
+> >           → ext4_ext_insert_extent()
+> >             → __ext4_handle_dirty_metadata()
+> >               → jbd2_journal_dirty_metadata() → ERROR -28 (ENOSPC)
 > 
-> Hi Jens,
-> 
-> I think we agree if the word "explicit" would be added to the patch
-> description.
+> Curious. Did you try running e2fsck after the filesystem complained like
+> this? This complains about journal handle not having enough credits for
+> needed metadata update. Either we've lost some update to the journal_head
+> structure (b_modified got accidentally cleared) or some update to extent
+> tree.
 
-Sure
+Just tried it after pkill fsstress and stopping the test:
 
--- 
-Jens Axboe
+root@e1-ext4-2k /var/lib/xfstests # umount /dev/loop5
+root@e1-ext4-2k /var/lib/xfstests # fsck /dev/loop5
+fsck from util-linux 2.41
+e2fsck 1.47.2 (1-Jan-2025)
+/dev/loop5 contains a file system with errors, check forced.
+Pass 1: Checking inodes, blocks, and sizes
+Inode 26 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 129 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 592 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 1095 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 1416 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 1653 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 1929 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 1965 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 2538 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 2765 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 2831 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 2838 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 3595 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 4659 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 5268 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 6400 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 6830 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 8490 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 8555 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 8658 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 8754 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 8996 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9168 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9430 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9468 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9543 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9632 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 9746 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10043 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10280 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10623 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10651 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10691 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 10708 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 11389 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 11564 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 11578 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 11842 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 11900 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 12721 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 12831 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 13531 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyyyInode 16580 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 16740 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 17123 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 17192 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 17412 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 17519 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyInode 18730 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 18974 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 19118 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyInode 19806 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 19942 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 20303 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 20323 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 21047 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 21919 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 22180 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 22856 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 23462 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 23587 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 23775 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 23916 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 24046 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 24161 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 25576 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 25666 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 25992 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 26404 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 26795 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 26862 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 26868 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 27627 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 27959 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 28014 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 29120 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 29308 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyyyInode 30673 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 31127 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 31332 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 31547 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyInode 32727 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 32888 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 33062 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyyInode 34421 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 34508 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyyyInode 35996 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 36258 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yyInode 36867 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 37166 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 37171 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 37548 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 37732 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+yInode 38028 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+Inode 38099 extent tree (at level 1) could be shorter.  Optimize<y>? yes
+....
 
+So I tried:
+
+root@e1-ext4-2k /var/lib/xfstests # fsck /dev/loop5 -y 2>&1 > log
+e2fsck 1.47.2 (1-Jan-2025)
+root@e1-ext4-2k /var/lib/xfstests # wc -l log
+16411 log
+
+root@e1-ext4-2k /var/lib/xfstests # tail log
+
+Free blocks count wrong for group #609 (62, counted=63).
+Fix? yes
+
+Free blocks count wrong (12289, counted=12293).
+Fix? yes
+
+
+/dev/loop5: ***** FILE SYSTEM WAS MODIFIED *****
+/dev/loop5: 1310719/1310720 files (10.7% non-contiguous),
+10473467/10485760 blocks
+
+  Luis
