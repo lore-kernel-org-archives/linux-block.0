@@ -1,76 +1,78 @@
-Received: from mail-io1-f104.google.com (mail-io1-f104.google.com [209.85.166.104])
+Received: from mail-io1-f98.google.com (mail-io1-f98.google.com [209.85.166.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8510218C32C
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 18:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB88417A304
+	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 18:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744826920; cv=none; b=dt575eDW/iMoiNS+gu7Djo+DbPIX/pBFAY4F3KusHZ2LMCLCsp9Ucl7moMKXXARcYfspKY1KuaWVrSJEQdmEuXQkS/Iy8gLbbr41qsoPtmBHMZIL2SL8nvVZrufroncmNyGm10f3eyDCdQtvIXZYz9L0a8PjywYAvn3tycb9eOc=
+	t=1744828526; cv=none; b=ks9/x/obbb6kMwu54D2snwKXwcK0hPEEwg/tfLGf5iUO+5md7c7h5gp4zXnjRM2FQMx0GAkLL8P3BFxt78ol5r8O3u069KDDUVmfRzdB0hGJeshq3718/JGf8zKD7ikMZdwHrt58fM6P/Tr8/JvNLZuAEr9/koLzyZeoxAJ8ag8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744826920; c=relaxed/simple;
-	bh=8OyViLUCHII16I1nEOvw8VBmdRPbm9PLpU/EteHs0ns=;
+	s=arc-20240116; t=1744828526; c=relaxed/simple;
+	bh=ejZ02aGnV55kmoixtT3aBmu2BQnYITm/JRtfslz2Gro=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PIUUrtAg1O9y+vSHbYcuAQj6XE/LAFIExUWP3Ug81eDUWtkAj+g20bbvXjB1YT4BQ0lOxDRoHj5WKIccMat03FT9Y1uQQJ2NoC2pggeiE2zzcUvkNhuxu5KwGzVHhHDRMmLst7iLpkJzFL95RYVGVtfdIieT/8JMHK7qG7RxeHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=M59+Bezv; arc=none smtp.client-ip=209.85.166.104
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dem++qSV9eJl/4+NA9eByLpD+E8IeTAJpPWH7vfwrs+7B31s0Vfrt9xQ2r/pMtUvwjxlpskk6LCri807NrmzGxyP4clkjiQaZM7iQEvc+/2tdW2Y0JCchygrkvTzBdMMsow69cLHaktBLPstVvUf/iNPVun0whBpQm1FA+5sb+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=B07Bp/yK; arc=none smtp.client-ip=209.85.166.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="M59+Bezv"
-Received: by mail-io1-f104.google.com with SMTP id ca18e2360f4ac-85de3e8d0adso147461239f.1
-        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 11:08:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="B07Bp/yK"
+Received: by mail-io1-f98.google.com with SMTP id ca18e2360f4ac-85da5a3667bso193985639f.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 11:35:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1744826917; x=1745431717; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1744828524; x=1745433324; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OyViLUCHII16I1nEOvw8VBmdRPbm9PLpU/EteHs0ns=;
-        b=M59+BezvZC4gDaLIcyIBZM4u8H+AGGT3MejdM6xRyKsRkHDHkn9PFB5h5ajInmOKkP
-         dRDN2UF7DwiZvGv9rmflzrsbX/usY6Oi333rCH4meMkdxwVQnrUM3NKBNi1eLLAIl+Dm
-         KjYDpMIz7Zot0ZA8T8P/0wmz4dRLKmfFE1K8IFot+4dko4XA9NF0GxXGnmTltNAcpx/T
-         yU9ftSqj9PSJexAnUNaXOK2IsXw9e8uLncGb9W6i41GugjOSZcgXI7vqGIIsOxwrsLtC
-         Sil3dK8Z517bF8gjUlp2UQLJv5Pg7c0NrLYRqamUPUqbOV4B65BFDCaVOoBNRk+heIYs
-         OTaw==
+        bh=EAD/3m2XpwXguQYOgtcDYZGmR/oIrcSUpGTic20xf6Y=;
+        b=B07Bp/yKEIhVPb0JLRWIqumDikX3RO8J+4h2/1yuTkkzFp+1vOXWX5NaDVltapivWi
+         Yk3fOcuvNzPGisY4TBzyXo1kx4wxXiNZ9P7uO0BLZPf0ViNUtHG0H0ThtHA2mRF3cc68
+         dPIN1N35Rev5agjhUqa9JxzWV2ksdNQ8OI4aJcgqxwCAu1ZCPOoQo8l+lWL+xUapsLqM
+         HV2yXe5DNNVQ+ha1CT+dBqjQ0Vh3why2et9sZ//a9ecz4z5++tw7bXw0JajeRhkh5y+L
+         Fp0PkbaGMpjTu+ZEKHqaDjklF8br03gTaovGZgQxgqfkR8ptjMTXLF2qrM+As8dxOXCL
+         JT/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744826917; x=1745431717;
+        d=1e100.net; s=20230601; t=1744828524; x=1745433324;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8OyViLUCHII16I1nEOvw8VBmdRPbm9PLpU/EteHs0ns=;
-        b=UL/qhNcxo7nKDq2oj4qHBUSddlHukdCw/LXNVdIfuR7HbkzaXTFmmX6r0cPRQnceb3
-         d7yhNnAr6DwafUeh3sfS/UBohLtWuKgqP3JVV4oUY7fO02GmjI40Q2Y32yzgx+PuEVYn
-         Yzf8+JYpkcvY9Tn5QzEkK/aEEk4L31UO6kxSqeGh2I7Kr2xymDs+8x0tvvhqqkDpo6Bn
-         T16bo7QRiZqC541+vcLBLSEtjbcv2DedrhfQDTZuhEsEOxHJQxlob82nHxmdSB8OJ1mj
-         ziIOrXqd+RVFns8FKZ1nk0baKOIRVLlOp9rV08RUZOTmUFRlqAIj5ynDPSdO0+N6Qz5W
-         vguw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4T/RFAmi112TOvYLTSbGB+H0RRgBBa8VxAIWhedW7wvWiT4l0LObzVDeOurP82lj8DxXrjxx3xgo+aQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLhWhvppi1okiQLPvkpmTJqBtAjLBeeM/m5sNne/No7b/flr1f
-	sam3rXh0uzjKZjWTgKHfJFk1ffUliu5bgVmkIh80AMb9a/O9UBiEUUMDcEq380TPTaTc5eRCRMd
-	HBt+cTstI0wlVksjF6tPnSkxadLAwWs7+d2POiCnbGIdU3RG+
-X-Gm-Gg: ASbGncvcR/M8c8rN6otYXX9HYXikgsORKLFDy6liM5P2WCvnoTe6qHoGx12YXlckLfQ
-	bRVP6rnlLA5KCofCZfkq9B+CIECInecVhG7vhs6OnzwPHWzm3wWtX9UkWFqKjSNEa1OdGlzSmqc
-	A1QunoFXJKdZyowe2Rx1+0EtbnHf8rU0u+O3CX7aX62VMRmf21VGBLrsLFu05sStCR13S16mHN6
-	qoXvbKj19iesSMh0oocWBszybbuGjTYvsCIja1nxzxiphRD5uEK1zCYWmIgCdPQ1ajw0Yok7nr+
-	9+YYBDyvRjackT0Fniq3SVw+Eh9GjQw=
-X-Google-Smtp-Source: AGHT+IHubmPMI3D+iMP9Z4MxiqL5kz//to5CHZZ6BvyWbGkfWWYz2Hn9RKWknQzdAstPB9lXS32dUwQB8QlU
-X-Received: by 2002:a05:6e02:4904:b0:3d8:18f8:fae9 with SMTP id e9e14a558f8ab-3d818f8fd17mr16407925ab.6.1744826917459;
-        Wed, 16 Apr 2025 11:08:37 -0700 (PDT)
+        bh=EAD/3m2XpwXguQYOgtcDYZGmR/oIrcSUpGTic20xf6Y=;
+        b=PV2f/6LSjOS2TQcp6LRq3lBQtzC9ZlADp8ypAur4mWZSWjoki72selrsPtM4en0mVK
+         44JWmM9EIzbQvjYUjGIoeTFeiR3VFAVJQIv04sdmds3rCCGj3Zp+BvPvK0pD/4jOcF2F
+         UfO/VCM3GnzIGlNiJZcV4dPtrjvxvRiBLRr9FD0xpuRJUGaQ+aQmQNtAS0gQkpwIAIgJ
+         XyOjZwnR8FZ6uwZAAQUvJYZ4qgBnoWuDhnfnyVre5h1ITX3AC2MDjL21vKj4Gq9zTI/E
+         HtrPulx14kCkVKUmoUjbhZ5eAC4H5x50ssLhUDMXGE9QsXCugMcesfuOvyDuIpaLJ5Pb
+         O5SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8BEGN1/Ll3lPtfZ2BcezBHGZDsC/n8U1mY2z4nq9yp+F0UUdFUy9KhqoLQs2OHmIW8NLBuv1r4v1hFw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfTiytcgvpqxIEPHAjn3XHka7A/LUv7Q2xOBTjhqxpQIFmzyOj
+	wE1vE2GZO38B0oi4qU9sXUiZj+bF4u6S2yKzdRGiWfu0/cNI545XLUlJ77jE4oGh0e3GWrrG8CC
+	5y+RMEO7D1rM+jqoey8e7HMkVzGiC+Un9ho5cORqEAF170Gpi
+X-Gm-Gg: ASbGncuzeHhru9SvyAO6vE6kFmrwpY9ZaCmNC05oOUWCoUxDywA+5KxJywHoJkPxUsv
+	qDDUQUrs9GKQWQ1Ck6rAL3we64GHN9HqJcBoh3r13xWA/sIaC0RCGyCXrmbS7vP1j2AJSIx+4Xs
+	wylLJpEgO4S+O6mjqq/dia7oUQgFRlcZHHuzfLW4KZUeUkQzvcC18JA+8IXeMQZE5wuO5IoilsZ
+	iRPLE4FBgnmqzsTKutDCdkwXGJ8qmjBbk84+NyMbt48pzKkpZxhO+oMb69rFIogufptMYUS7dHU
+	RDDt62DfC2eEZOHPm8iMkNG1WMfe+5w=
+X-Google-Smtp-Source: AGHT+IG4NAu7Q7dGfYYM/lEODF7SkxZYCqLD0Q1kkTWhvEYbY+yjUyqvZFcYDQo2UbBgE2Kof2eFr0R8hlr0
+X-Received: by 2002:a05:6e02:144a:b0:3d5:8922:77a0 with SMTP id e9e14a558f8ab-3d815b5e58dmr34258835ab.18.1744828523866;
+        Wed, 16 Apr 2025 11:35:23 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-4f505d18f83sm761090173.25.2025.04.16.11.08.37
+        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3d7dbaa4248sm9072865ab.42.2025.04.16.11.35.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 11:08:37 -0700 (PDT)
+        Wed, 16 Apr 2025 11:35:23 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 41E4C34035E;
-	Wed, 16 Apr 2025 12:08:36 -0600 (MDT)
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 2325834035E;
+	Wed, 16 Apr 2025 12:35:23 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 357AFE40318; Wed, 16 Apr 2025 12:08:36 -0600 (MDT)
-Date: Wed, 16 Apr 2025 12:08:36 -0600
+	id 16BF3E40371; Wed, 16 Apr 2025 12:35:23 -0600 (MDT)
+Date: Wed, 16 Apr 2025 12:35:23 -0600
 From: Uday Shankar <ushankar@purestorage.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: pass ubq, req, and io to ublk_commit_completion()
-Message-ID: <Z//yJApTjXvfVnga@dev-ushankar.dev.purestorage.com>
-References: <20250416171934.3632673-1-csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH V2 3/8] ublk: rely on ->canceling for dealing with
+ ublk_nosrv_dev_should_queue_io
+Message-ID: <Z//4ax6RhR7kz3VA@dev-ushankar.dev.purestorage.com>
+References: <20250416035444.99569-1-ming.lei@redhat.com>
+ <20250416035444.99569-4-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,12 +81,99 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416171934.3632673-1-csander@purestorage.com>
+In-Reply-To: <20250416035444.99569-4-ming.lei@redhat.com>
 
-On Wed, Apr 16, 2025 at 11:19:33AM -0600, Caleb Sander Mateos wrote:
-> __ublk_ch_uring_cmd() already computes struct ublk_queue *ubq,
-> struct request *req, and struct ublk_io *io. Pass them to
-> ublk_commit_completion() to avoid repeating the lookups.
+On Wed, Apr 16, 2025 at 11:54:37AM +0800, Ming Lei wrote:
+> Now ublk deals with ublk_nosrv_dev_should_queue_io() by keeping request
+> queue as quiesced. This way is fragile because queue quiesce crosses syscalls
+> or process contexts.
+> 
+> Switch to rely on ubq->canceling for dealing with
+> ublk_nosrv_dev_should_queue_io(), because it has been used for this purpose
+> during io_uring context exiting, and it can be reused before recovering too.
+> In ublk_queue_rq(), the request will be added to requeue list without
+> kicking off requeue in case of ubq->canceling, and finally requests added in
+> requeue list will be dispatched from either ublk_stop_dev() or
+> ublk_ctrl_end_recovery().
+> 
+> Meantime we have to move reset of ubq->canceling from ublk_ctrl_start_recovery()
+> to ublk_ctrl_end_recovery(), when IO handling can be recovered completely.
+> 
+> Then blk_mq_quiesce_queue() and blk_mq_unquiesce_queue() are always used
+> in same context.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-I think this is rolled into https://lore.kernel.org/linux-block/20250415-ublk_task_per_io-v4-2-54210b91a46f@purestorage.com/
+Reviewed-by: Uday Shankar <ushankar@purestorage.com>
 
+> ---
+>  drivers/block/ublk_drv.c | 31 +++++++++++++++++--------------
+>  1 file changed, 17 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index e1b4db2f8a56..a479969fd77e 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1734,13 +1734,19 @@ static void ublk_wait_tagset_rqs_idle(struct ublk_device *ub)
+>  
+>  static void __ublk_quiesce_dev(struct ublk_device *ub)
+>  {
+> +	int i;
+> +
+>  	pr_devel("%s: quiesce ub: dev_id %d state %s\n",
+>  			__func__, ub->dev_info.dev_id,
+>  			ub->dev_info.state == UBLK_S_DEV_LIVE ?
+>  			"LIVE" : "QUIESCED");
+>  	blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +	/* mark every queue as canceling */
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> +		ublk_get_queue(ub, i)->canceling = true;
+>  	ublk_wait_tagset_rqs_idle(ub);
+>  	ub->dev_info.state = UBLK_S_DEV_QUIESCED;
+> +	blk_mq_unquiesce_queue(ub->ub_disk->queue);
+>  }
+>  
+>  static void ublk_force_abort_dev(struct ublk_device *ub)
+> @@ -2961,7 +2967,6 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+>  	/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
+>  	ubq->ubq_daemon = NULL;
+>  	ubq->timeout = false;
+> -	ubq->canceling = false;
+>  
+>  	for (i = 0; i < ubq->q_depth; i++) {
+>  		struct ublk_io *io = &ubq->ios[i];
+> @@ -3048,20 +3053,18 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
+>  			__func__, ublksrv_pid, header->dev_id);
+>  
+> -	if (ublk_nosrv_dev_should_queue_io(ub)) {
+> -		ub->dev_info.state = UBLK_S_DEV_LIVE;
+> -		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> -		pr_devel("%s: queue unquiesced, dev id %d.\n",
+> -				__func__, header->dev_id);
+> -		blk_mq_kick_requeue_list(ub->ub_disk->queue);
+> -	} else {
+> -		blk_mq_quiesce_queue(ub->ub_disk->queue);
+> -		ub->dev_info.state = UBLK_S_DEV_LIVE;
+> -		for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -			ublk_get_queue(ub, i)->fail_io = false;
+> -		}
+> -		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +	blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +	ub->dev_info.state = UBLK_S_DEV_LIVE;
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> +
+> +		ubq->canceling = false;
+> +		ubq->fail_io = false;
+>  	}
+> +	blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +	pr_devel("%s: queue unquiesced, dev id %d.\n",
+> +			__func__, header->dev_id);
+> +	blk_mq_kick_requeue_list(ub->ub_disk->queue);
+>  
+>  	ret = 0;
+>   out_unlock:
+> -- 
+> 2.47.0
+> 
