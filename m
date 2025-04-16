@@ -1,70 +1,71 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9041FCFDB
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 00:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295111FCD1F
+	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 00:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744765185; cv=none; b=V3ThQAzIvREVDtA2pwyaS3IDdmWsLeMS7t+elfrnvVsAb8hY/61qDBWITyTXpX+qD72Mvp5Zjt/wu9ACFhpqkw81hVo6N8xkstt0H18+uTtunjvmgdRTsq/iwECZ8ygGl5O7FjFive48DZa1DX7EIXrNHkpl6s+plbkx/bvKeew=
+	t=1744765185; cv=none; b=ItRjsH4aewgc7IZwzPEDKyS5zCFslQFLTZ8m2hrMAQ2nOdpqCJ2h6pV0QxzM1KEjEAA53SqdR1tQUwZ6AbsGrVzDrdAjD+Ll7zPZp8UUVCSbE0+wXGZlJ8iON1q+COJi2+YisaFflKBhJQrQ0x0ZsiQ39FxxBVA77YEWWI/3O2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744765185; c=relaxed/simple;
-	bh=lEGP9mD7MvUcXDYdqhzYIQGHZMKWftllVNmBTxlRu8E=;
+	bh=yCysyJq8LkAwV59hWlEdr5nm3LuUtyB1MER7+k6KPBM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ahXK0B9Xnvalw7VGkxOLct7o7nc5zHboLsUn9kERsquYunIwzGtzPQdHQxEeTdH2QsrVnJHcQdgHBmpj3BVyJCA1cW7yCSraCqhcnK6zeekGijgdmp8dTBu2mF2uTCKVs/G0pQJk8yQw4xiJGnEBoQmhrrMW0Sz4Woc+Z1vWozQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eAyIsJ8w; arc=none smtp.client-ip=209.85.166.49
+	 MIME-Version:Content-Type; b=vCTiciokIWeg+PWMdmQvNtAdoMirKB8/WQ8sMlwqxsAGrCv8FyBoHIVfjo1Oxk/Brf3NWKfYQAKG2BEl2td2HpyAZHhJV/P5HORfIoFfsk8kR5DACKn3Dc3wZi68fXdptFf94gARSpDhOYV+ozr7TJt2b48ORXR8kWtqZTrwRBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Gr4XCgz7; arc=none smtp.client-ip=209.85.166.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eAyIsJ8w"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-85e751cffbeso466933939f.0
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 17:59:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Gr4XCgz7"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-85df99da233so568695339f.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 17:59:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744765182; x=1745369982; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744765181; x=1745369981; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G1FE2zVZmKw/thcJ104wwO6SRP1SEiJsFxUW9ObMIY4=;
-        b=eAyIsJ8wS4vG1hnrsdcSWviidMwQRPYzGPRlQwMaOnJt9p3dxtoRhwiahrseunP0s9
-         G07Gu885lNmyuayxhF8tQ4H5pRGtMdmhB2fF9KXTbwuXB5odpmDI7qUHeGjwf8KsWG3B
-         kIBOOrJxmftEJlPn3dMvxZKs5DHjGzM/eUhqw+VXNVnQMKvtdnJsJFWTB1ic25RSH8b0
-         DiMx0R2xpcKQojzh/tg5vX9bOmTkzYjq7q38A8O7Z9KE5KG11iUdG/eLg3fLNUwRJoNw
-         gryBX0SiLTqhqrr+FpxwDTtxISF0lCJXo7thkXAwHJcnI3KFh2JCf2pmFvMN+WZ+EShb
-         sq6w==
+        bh=9/C6WM1p4MsFZpOQ+vUj/pJa3LPGBmPGfVUv4yVJVX8=;
+        b=Gr4XCgz7FhqHqidE+z5arTuaxbP5BSU5poRqRFsgdvnifjuf3uhCmMsHZIayp/1e+9
+         b4YQiXiu8ivPZO6G8GV9gQBpsjA4Juvq6cMgd+58wKomgnWLjz5mFseaTD8+8zuFIwBQ
+         X07RHf98I78Lt3faLgf6Tl7veJrW5ExrsBPc3HUcdsNWZ6sQylTsnECKR1FFI99wod5i
+         WcsghRI47q6pIDHbNZyuWS1CqOXSRBDgwCHzGB81jra/1fqAd1lkOR/Z3vsZXxXKEhB/
+         yUb1w6/LaFbDAs3IdVynfNcyLL1jp14ENCmx6Gy5HuDOPEw9G4EzdJnD7uEpS/vRNt5m
+         LvTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744765182; x=1745369982;
+        d=1e100.net; s=20230601; t=1744765181; x=1745369981;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G1FE2zVZmKw/thcJ104wwO6SRP1SEiJsFxUW9ObMIY4=;
-        b=pzTTZO7NoWqavEwLXTr4IGzd8FiP2/SBqM1fmqE2TJAKaJHKuVBCusYTPmZLcocqfs
-         5V2u1WiF26Q2msFrlFZYwVbSnaXMDjP66H5y+uQmKgMULIxV2QzbBh3rEG+5sKBLr2/O
-         POVwm6ZeiQVbjOBQtkrgXUYXdOveBbwHllEiaejMRHRUJaUP14NqPTrVNhWqI/5k/Gjk
-         i+cg9Ic+HbJ98ZSfFE2hYhFe7gEOwHLl6P9xnzBO2ZPLECi1y430GpJrTAZzsE9rcibR
-         KT1Dj7eLQg+n4JlsQ+0lDi/YkR/RVK6HuKA/SfSVFPq7Qe8ieqKiEQc9z2PhevboTr/+
-         QGMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQ76Qf/6zrNCto2JLUt7LC0dEQC8pF+SLYnCuFIX+Qcd74whQ6ueUGqcXysA6cehs4w02VotNenTmt2A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKkzLdzC3/5+DhLTQ4wMJaqXLoR6bPCKDsIHQMzD8gDWmP0Zq5
-	R6kHY74eSBJVfLKLWiYqn+9hQM4OFn3klN8VON1j6XR0NBsBi3cIOF+TtTHcPN8=
-X-Gm-Gg: ASbGncvgsFAx/xIcyq0mYPfnMbB101Tllcqyh/T6vx7+lOKxQBNB8zp8R241AlR8mNS
-	5EWnIZlR/0RZyPtUvHjyIU+lJdkXX8XH7MTEWuppIubwa8bqmxDhBou3JORyj+SGpraPyVWrfub
-	1r9y8cufZn93drq9V1K2J9D85FNe59LM30c9/90dCFrm4GeTxBP/hq+5wGkJZZ/BzQTKFF+MIop
-	l/gBfezHsmOnAZsbodejBpiRDo4thUIhX0yYNeGVxL4uWuBZgEKUkJmXceVMyeld3smBoVjx6OK
-	iZjJKV5+tbZctgAMnkXhxS3CWIcouI12
-X-Google-Smtp-Source: AGHT+IENdPZ5RCxBLNEPTCBRVUprVLI/YIgbzhf1//lZ6SnwHZmdl3X+uIAKaxkTXsVSbRXMnJ/w/g==
-X-Received: by 2002:a05:6602:7215:b0:85b:43a3:66ad with SMTP id ca18e2360f4ac-861bfc4be77mr177425539f.8.1744765182314;
-        Tue, 15 Apr 2025 17:59:42 -0700 (PDT)
+        bh=9/C6WM1p4MsFZpOQ+vUj/pJa3LPGBmPGfVUv4yVJVX8=;
+        b=Nu1oMQWZ06wX7JVKpBjPMKV/tfvXGhIrPLPoOeARCKpK145QqPpg1tY/F3AtDG3p5E
+         KfZ/nIbARBxn9capO5DB8T6uMHoWDH+XZ56dBOFAR0SpdZAFIDvkSqMMmPmgX6Y0W6vu
+         yWUgfRI6JpHSuztjO44bhbEu0fKnl53EidF4MOa0LAW6i+5bBVWQ8WdQ0ruzrTEFFNxU
+         MoJJ44QnI4DeJVWaEUoIh/WluJbqfJbp8js/DcDfiPCNFvGwup/ZOk4mNEPZrVUhgr5z
+         wo+tH3YR+3QOp9f3y7eFJckR3RdtezLzr70vz5/zbBlRsSryKKzFUKJE5Dqzbb2vasQ5
+         vfHg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8wNnqVL3IlQhC5Z9WwYt92uyJNrn/jEPT/GwKu32LUXuiLbTB9T0gZv2BhQdSwqmDLbi/fo8AeTiqeQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbPOpMybkWZ79jcdGezjwWmUa+5Unfaj2RkjLHZNFTMzlRkjhb
+	ipJDW7n+RZfGAxpYGWjlBmswdLRQ4b33qJNhCY26qODDmz9XY/xDGr3/2oBQS7WdvATtZjaGoZP
+	j
+X-Gm-Gg: ASbGncul327AOPDbXHJzkuV19ZwNyS4zKYM7xd2Ci+9cBuaHrRvQ/LlrthGDFlpiB0H
+	jGZku5AaB/r+RmREs34tF9zxptxU41lNEmGQHJUJBRP8wkNskX8mFitJD8dymc760gYuNZfI8cd
+	NRy0aICfu8zeYaJWIfF565sUtPsKU05vbnWdsa4TldZezZ/l8I97szWO6AxnZtbznocKw+lbQxW
+	QbEFqtkKA/4kh9Ajcs2b/Xh1Ole+1jW1GOfLGOkG8mWtFpWy3ZH8Pc0u70c/QHCKL9+9il5A/pr
+	qypd8vbU+ofpZAWjFiDHETqXUQ/5V/AU
+X-Google-Smtp-Source: AGHT+IFMU/Y9GoBLUW+BUKmntYFtkxG6e8ZakeLL0UU+aV4r6KGUyGrf615wsayYrIxH2tPsJvDp4g==
+X-Received: by 2002:a05:6602:358a:b0:85d:9ea6:59a6 with SMTP id ca18e2360f4ac-861bfbfc385mr179209339f.5.1744765180867;
+        Tue, 15 Apr 2025 17:59:40 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
         by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8616522c958sm275458039f.6.2025.04.15.17.59.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 17:59:41 -0700 (PDT)
+        Tue, 15 Apr 2025 17:59:40 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, Ming Lei <ming.lei@redhat.com>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250416004111.3242817-1-csander@purestorage.com>
-References: <20250416004111.3242817-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: don't suggest CONFIG_BLK_DEV_UBLK=Y
-Message-Id: <174476518098.250948.15142433690972812108.b4-ty@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: djwong@kernel.org, linux-block@vger.kernel.org, ming.lei@redhat.com
+In-Reply-To: <20250409130940.3685677-1-hch@lst.de>
+References: <20250409130940.3685677-1-hch@lst.de>
+Subject: Re: [PATCH] loop: stop using vfs_iter_{read,write} for buffered
+ I/O
+Message-Id: <174476518001.250948.9754706283754943028.b4-ty@kernel.dk>
 Date: Tue, 15 Apr 2025 18:59:40 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -77,20 +78,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Tue, 15 Apr 2025 18:41:10 -0600, Caleb Sander Mateos wrote:
-> The CONFIG_BLK_DEV_UBLK help text suggests setting the config option to
-> Y so task_work_add() can be used to dispatch I/O, improving performance.
-> However, this mechanism was removed in commit 29dc5d06613f2 ("ublk: kill
-> queuing request by task_work_add"). So remove this paragraph from the
-> config help text.
+On Wed, 09 Apr 2025 15:09:40 +0200, Christoph Hellwig wrote:
+> vfs_iter_{read,write} always perform direct I/O when the file has the
+> O_DIRECT flag set, which breaks disabling direct I/O using the
+> LOOP_SET_STATUS / LOOP_SET_STATUS64 ioctls.
 > 
+> This was recenly reported as a regression, but as far as I can tell
+> was only uncovered by better checking for block sizes and has been
+> around since the direct I/O support was added.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] ublk: don't suggest CONFIG_BLK_DEV_UBLK=Y
-      commit: 0b7a4817756c7906d0a8112c953ce88d7cd8d4c6
+[1/1] loop: stop using vfs_iter_{read,write} for buffered I/O
+      commit: f2fed441c69b9237760840a45a004730ff324faf
 
 Best regards,
 -- 
