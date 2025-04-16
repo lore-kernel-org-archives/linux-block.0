@@ -1,180 +1,327 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF3F221D8B
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 18:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B760C2F4A
+	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 19:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744829980; cv=none; b=SFddkalXNHFqLYsLCDb9X3eptzIxWqs4kX5gYuMe585OynsVbStnelRA3+60aXUpG0wmc7c+FRHRA8xM+pZ2hX+YhmPEZ4or4EiyU2y+CpXWmjK+Lv52yt/FwHsYNn//st6Izz+lOVB2Ihk9T6fU61xzNprse3pvHAw0YINJ660=
+	t=1744830165; cv=none; b=gnbb+biz/MJMqg/eBnhW9z3DafwSVWn1h9bZd7bIqW3zA/jG9jRYon/TieYYD4s/a+ahP0pWNTdor48CVvC0nMt3JjFmKa6dQPM2sLz3CedTWC6KFgXQ1Z9NYOuAHLkD6n2qoiaBSgKaShoY7yYWMQqYl6xyyHZapGSyX0egcMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744829980; c=relaxed/simple;
-	bh=51nkwLlT5jg0VROfv/tO2kx9Y2MHMUOAVbGk81PhBFk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t0lZW/qTpkcA67bqtpQ5yisbOl9gR+bU7Q8b2SR51a2013LkHNt74uYc7+q9084yv0mz7v4e+9j3QA1hXECDYemwbulbS4eov/nt79TgpF0JNWFJQ4AfVWtMZwC6IItRodV02MgOQYib0nxHDpZC3ZOqPTODuOl57HsbGOcjoHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NtIOQshP; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1744830165; c=relaxed/simple;
+	bh=MERT2tbKPV9U8QPd8TEOl3ysUWqjusJzfGgCk0BTr8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k7LOULJVfVO/8BxVuVTAvgIwt+agcXohM9mCApnItTVsGqLZkQpBu3c6trwwDtWabGW7YRDmHeRPdg9VIhw35LFisEPpYm2kzXDWfJ2VOXFUxM7drR5DhpPX3EoH+JZHPwAlUh14NzHI3F9BkFq7/LGWUCc5/Mmrx8i7Ir0fMXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GeHzHi9+; arc=none smtp.client-ip=209.85.214.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NtIOQshP"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-227e29b6c55so36985ad.1
-        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 11:59:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GeHzHi9+"
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-22c33ac23edso368555ad.0
+        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 12:02:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1744829977; x=1745434777; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BT4C3mEaVrvFwtlJvm7OQIQmXZZGsey90MSNFFjJZxk=;
-        b=NtIOQshPf2jpfpKxV8skjmhcgBUgRxibOo9J4Fz182kdGDSLpzx8cMlx2UF09Y5n9g
-         XuekCo4ZYBqf7qJsJNewzQaZFEtz/UaG44g5o179HWKiCXAXVUuIJAmvuSwdT425FrTg
-         bk5RhhT8TP8NtnHj5BweFkTJT0UfbV+d6x/w2aqTENfCzDmR10tnmDxJQ1ZP7RZKHftu
-         3RS01WzKzYjbSLHRk9oeSyPLM5+xAQf8RgG0mguHIe99gIBX2t7U9oWsD5NOPEV1S3C5
-         EC27zVIwAnqBdB4nZTpL9HGA2yBRYhTlNtYg2WjBEiwCeFnhJn37i7mIF1CjTIa3sz1R
-         zHMg==
+        d=purestorage.com; s=google2022; t=1744830163; x=1745434963; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ymqval34ciZax6YQ7XbnVZOYDGiXYXI2RH1W3fiKfg4=;
+        b=GeHzHi9+dDD1S7btgB8XplF3Q7qjPG5M7zAyVRlfdw/NEtHMYIZB6fVcYgmE4noTBY
+         qLUWh7ChlPhDnBYwmL9ITrGiv2UEo6LIi6/AocQ29AZdiRlM6zdQBYdpjgr7XHwv547c
+         yDHuGSXn6H8WadUHFRVZ4Y0PS49fsKCam9zfgQfB2J63eYDL/EX1GaMLBfjhp3rafbVc
+         r4HEYdGkYsy3dgC112JAajzpO8n3Rm7ZcRGuBOFvl1PjjKSBZIIs4z1btLxJh406wlTu
+         Y82dl3g+kyyzn8yoXUJr7Ict2dp5afN9mqJZ3o4njHCvWVeyTdZEXnhKZfXFtOQDEaAA
+         Ytcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744829977; x=1745434777;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BT4C3mEaVrvFwtlJvm7OQIQmXZZGsey90MSNFFjJZxk=;
-        b=MU/uRhCxgyNgoRQQLCTXQqmjElMcg9x5AZIkOcvtv1t6VkmJdrOfpyecfhMrePpWr6
-         izJbna6xNTOhSl8zPTeKLx2W3HnfKJf64s8i4RCG1YKR7tC0vdlzX0FDKEwn02qlIyT7
-         4NcjFi6TkC5IEvdDK4oVQOqYsYErx8bGEqMSw4UokO1WLGwYKhioKZvNYQrRbRgAZZrB
-         xi4hDT9jQ4d4flX+EaHdH7bkDsps46WiTm7Hrc6v+TJOo5El8+hHU9R7NxQXhUVl9ncB
-         eW9cnaQeC3AZ+ICqK9N9BTHEc3h4Gy9Pjb94vwv/09dkDG3H+Z7VJfvciZiAvKROuw/d
-         Czeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcTgFEl58zHCvoOk3dQunKqWrxxllC8XZVOjUgT7bdCXdBl+rezIfhfBkAN3yi/cnBwraiFFUWZ4+qtg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGTcX5Xu7u22mJ1pgZwadDA2ZtdzkyEgowo3jxElODrcqPjFQA
-	4tF+N6W9lglXyiR1d2BRf63Ur1DsqjDwXeTitr+W+YllbwPO0O05pTEpVj/zPMIK3s3xgnRgoCK
-	o9We1IMNZULVIu/rfLO7vQN6LWlw0eiB5vbe7JQ==
-X-Gm-Gg: ASbGncssP7EYZhjanptwJkmzzy+UD/c2r95NMUKndLD9ceiCvOjes9DRWfcZf+vXuTt
-	GmavaJ7D+4FTd381zdKOjTgXZbGWSWkHQ8cgy7fUJ5f/GZxZOdefNwqE8EkjSrohL3RzacO1GqG
-	u+IDxhdlXHNMPpRw1qP3doLIy5
-X-Google-Smtp-Source: AGHT+IGk1i3RkpdcJp3QcE02uCrxSyG+iRG8aDx/SDyY97zYpvoc3S3Pq0DahgOGXI3ck/al/159MwKjHUp37ZuCwVA=
-X-Received: by 2002:a17:902:dac2:b0:223:5525:622f with SMTP id
- d9443c01a7336-22c3f998c6bmr4546015ad.1.1744829976980; Wed, 16 Apr 2025
- 11:59:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744830163; x=1745434963;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ymqval34ciZax6YQ7XbnVZOYDGiXYXI2RH1W3fiKfg4=;
+        b=Yehh3eY/Py1KD4LVRt3EEh2AEH111ZAXVZpXXU4WTz9C0X+oHBVBJZE2rNcSEJpfLa
+         x/4MgpIKICWSg8I2pzRzhWpfKCZPnVUawQxuAwHpJ0I0L04EFdrdMtRHCgWIYTIcoI3m
+         hrd7awTTLynNarUVS5OaQLG9s2ELmK16ibbWjdx+gbuRpr2ylzJLfxle9Fn217k0TPwe
+         bnCaeGyPcb1q1xz+OG5JmZH397oNtAyhhsxgXo9918gukivkCePA7/pzTE1pgTwaWunx
+         Tv86F/bzEHleVK/7v0S1MFXmPL3xgogKLh/gNnb1IVXSHwDXRK2sX/FMlgql4i3z/+Ji
+         5aCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfIDsgkLdG9FJu81tNG6cdUY7+BDwo3KLX+aUOY3XX8a4Fc8Fe71kRNVIGrAbR4zKVg4wUzGkBl1efzg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmtDHC+XuHhhr0ntUJNtwMsrnBznAIZY8vtxAAv8Jg28Ls+WIP
+	fOX2LzLf3J1gMV8xQhNmKDyjezF240/vinIVaO44qrtmniwmAEfgZTsZ2YMXkKiFn4maXSiWcH1
+	/+luzvrX7Zxf0fXND80UQC3xUSzXGwhFdk3QYT+NBOeA6jr1s
+X-Gm-Gg: ASbGncvB4wkkDVFhC1BAbJGEvrWNpEWFGSy9OLVg2Ay2cghfAWpUcA2RhRQjyoNK4yd
+	CJlVKQXytXXHNgkPERvBLh35RBT7XfEt0/fCdmJxBe/Ck4iEl0egTsGRB6QueU/dNgq1bt3wzUr
+	ynVprvqwkWr9CCEfEGpL+dnq61DoS9yk+D/WHy4NhrIdeThFP0GA2HLQzfOGXgwoXM9g1VI8Wgm
+	CGvakzUEab8EurnjTATuO/5UG6bGNOSpFcMnUS458wdaCQopUN7kxxJ/YpgdRL5pasa0XHP9hcs
+	utMMvYBPGRva+hm2Ttog620Q5GcbyaI=
+X-Google-Smtp-Source: AGHT+IGdJWklYNTnq62MwonXc1jf11lSw0hrcOSMRuxP9eJiAEtfij48iSJVuJcepv4jMSYht8DByWZdEClm
+X-Received: by 2002:a17:902:d48d:b0:224:10a2:cad9 with SMTP id d9443c01a7336-22c3596bf3emr42312815ad.41.1744830162973;
+        Wed, 16 Apr 2025 12:02:42 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-22c33fe4d35sm907425ad.119.2025.04.16.12.02.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 12:02:42 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 274A6340424;
+	Wed, 16 Apr 2025 13:02:42 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 1E090E40318; Wed, 16 Apr 2025 13:02:42 -0600 (MDT)
+Date: Wed, 16 Apr 2025 13:02:42 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH V2 4/8] ublk: move device reset into ublk_ch_release()
+Message-ID: <Z//+0vPyo1/4spfx@dev-ushankar.dev.purestorage.com>
+References: <20250416035444.99569-1-ming.lei@redhat.com>
+ <20250416035444.99569-5-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250415-ublk_task_per_io-v4-0-54210b91a46f@purestorage.com> <20250415-ublk_task_per_io-v4-2-54210b91a46f@purestorage.com>
-In-Reply-To: <20250415-ublk_task_per_io-v4-2-54210b91a46f@purestorage.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 16 Apr 2025 11:59:25 -0700
-X-Gm-Features: ATxdqUFipM7PBblC7CSB15RCGnyvrvx_I-8-TA50XPH4OOX9U_PLbzucYr3kHYM
-Message-ID: <CADUfDZpkDUE8heSFEhA1aCfn3a59D1+=2piWPtRvX3t9FLgjbw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] ublk: mark ublk_queue as const for ublk_commit_and_fetch
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416035444.99569-5-ming.lei@redhat.com>
 
-On Tue, Apr 15, 2025 at 6:00=E2=80=AFPM Uday Shankar <ushankar@purestorage.=
-com> wrote:
->
-> We now allow multiple tasks to operate on I/Os belonging to the same
-> queue concurrently. This means that any writes to ublk_queue in the I/O
-> path are potential sources of data races. Try to prevent these by
-> marking ublk_queue pointers as const when handling COMMIT_AND_FETCH.
-> Move the logic for this command into its own function
-> ublk_commit_and_fetch. Also open code ublk_commit_completion in
-> ublk_commit_and_fetch to reduce the number of parameters/avoid a
-> redundant lookup.
->
-> Suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+On Wed, Apr 16, 2025 at 11:54:38AM +0800, Ming Lei wrote:
+> ublk_ch_release() is called after ublk char device is closed, when all
+> uring_cmd are done, so it is perfect fine to move ublk device reset to
+> ublk_ch_release() from ublk_ctrl_start_recovery().
+> 
+> This way can avoid to grab the exiting daemon task_struct too long.
+> 
+> However, reset of the following ublk IO flags has to be moved until ublk
+> io_uring queues are ready:
+> 
+> - ubq->canceling
+> 
+> For requeuing IO in case of ublk_nosrv_dev_should_queue_io() before device
+> is recovered
+> 
+> - ubq->fail_io
+> 
+> For failing IO in case of UBLK_F_USER_RECOVERY_FAIL_IO before device is
+> recovered
+> 
+> - ublk_io->flags
+> 
+> For preventing using io->cmd
+> 
+> With this way, recovery is simplified a lot.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  drivers/block/ublk_drv.c | 91 +++++++++++++++++++++++-------------------=
-------
->  1 file changed, 43 insertions(+), 48 deletions(-)
->
+>  drivers/block/ublk_drv.c | 121 +++++++++++++++++++++++----------------
+>  1 file changed, 72 insertions(+), 49 deletions(-)
+> 
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 9a0d2547512fc8119460739230599d48d2c2a306..153f67d92248ad45bddd2437b=
-1306bb23df7d1ae 100644
+> index a479969fd77e..1fe39cf85b2f 100644
 > --- a/drivers/block/ublk_drv.c
 > +++ b/drivers/block/ublk_drv.c
-> @@ -1518,30 +1518,6 @@ static int ublk_ch_mmap(struct file *filp, struct =
-vm_area_struct *vma)
->         return remap_pfn_range(vma, vma->vm_start, pfn, sz, vma->vm_page_=
-prot);
+> @@ -1074,7 +1074,7 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
+>  
+>  static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+>  {
+> -	return ubq->ubq_daemon->flags & PF_EXITING;
+> +	return !ubq->ubq_daemon || ubq->ubq_daemon->flags & PF_EXITING;
 >  }
->
-> -static void ublk_commit_completion(struct ublk_device *ub,
-> -               const struct ublksrv_io_cmd *ub_cmd)
+>  
+>  /* todo: handle partial completion */
+> @@ -1470,6 +1470,37 @@ static const struct blk_mq_ops ublk_mq_ops = {
+>  	.timeout	= ublk_timeout,
+>  };
+>  
+> +static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+> +{
+> +	int i;
+> +
+> +	/* All old ioucmds have to be completed */
+> +	ubq->nr_io_ready = 0;
+> +
+> +	/*
+> +	 * old daemon is PF_EXITING, put it now
+> +	 *
+> +	 * It could be NULL in case of closing one quisced device.
+> +	 */
+> +	if (ubq->ubq_daemon)
+> +		put_task_struct(ubq->ubq_daemon);
+> +	/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
+> +	ubq->ubq_daemon = NULL;
+> +	ubq->timeout = false;
+> +
+> +	for (i = 0; i < ubq->q_depth; i++) {
+> +		struct ublk_io *io = &ubq->ios[i];
+> +
+> +		/*
+> +		 * UBLK_IO_FLAG_CANCELED is kept for avoiding to touch
+> +		 * io->cmd
+> +		 */
+> +		io->flags &= UBLK_IO_FLAG_CANCELED;
+> +		io->cmd = NULL;
+> +		io->addr = 0;
+> +	}
+> +}
+> +
+>  static int ublk_ch_open(struct inode *inode, struct file *filp)
+>  {
+>  	struct ublk_device *ub = container_of(inode->i_cdev,
+> @@ -1481,10 +1512,26 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+>  	return 0;
+>  }
+>  
+> +static void ublk_reset_ch_dev(struct ublk_device *ub)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> +		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
+> +
+> +	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
+> +	ub->mm = NULL;
+> +	ub->nr_queues_ready = 0;
+> +	ub->nr_privileged_daemon = 0;
+> +}
+> +
+>  static int ublk_ch_release(struct inode *inode, struct file *filp)
+>  {
+>  	struct ublk_device *ub = filp->private_data;
+>  
+> +	/* all uring_cmd has been done now, reset device & ubq */
+> +	ublk_reset_ch_dev(ub);
+
+Can we take the ub->mutex here? I can't see a concrete data race but I
+feel there is lots of potential for one since the device still may be
+concurrently accessed via ctrl commands.
+
+> +
+>  	clear_bit(UB_STATE_OPEN, &ub->state);
+>  	return 0;
+>  }
+> @@ -1831,6 +1878,24 @@ static void ublk_nosrv_work(struct work_struct *work)
+>  	ublk_cancel_dev(ub);
+>  }
+>  
+> +/* reset ublk io_uring queue & io flags */
+> +static void ublk_reset_io_flags(struct ublk_device *ub)
+> +{
+> +	int i, j;
+> +
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> +
+> +		/* UBLK_IO_FLAG_CANCELED can be cleared now */
+> +		spin_lock(&ubq->cancel_lock);
+> +		for (j = 0; j < ubq->q_depth; j++)
+> +			ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
+> +		spin_unlock(&ubq->cancel_lock);
+> +		ubq->canceling = false;
+> +		ubq->fail_io = false;
+> +	}
+> +}
+> +
+>  /* device can only be started after all IOs are ready */
+>  static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+>  	__must_hold(&ub->mutex)
+> @@ -1844,8 +1909,12 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+>  		if (capable(CAP_SYS_ADMIN))
+>  			ub->nr_privileged_daemon++;
+>  	}
+> -	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
+> +
+> +	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
+> +		/* now we are ready for handling ublk io request */
+> +		ublk_reset_io_flags(ub);
+>  		complete_all(&ub->completion);
+> +	}
+>  }
+>  
+>  static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
+> @@ -2954,41 +3023,14 @@ static int ublk_ctrl_set_params(struct ublk_device *ub,
+>  	return ret;
+>  }
+>  
+> -static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
 > -{
-> -       u32 qid =3D ub_cmd->q_id, tag =3D ub_cmd->tag;
-> -       struct ublk_queue *ubq =3D ublk_get_queue(ub, qid);
-> -       struct ublk_io *io =3D &ubq->ios[tag];
-> -       struct request *req;
+> -	int i;
 > -
-> -       /* now this cmd slot is owned by nbd driver */
-> -       io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV;
-> -       io->res =3D ub_cmd->result;
+> -	WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq)));
 > -
-> -       /* find the io request and complete */
-> -       req =3D blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-> -       if (WARN_ON_ONCE(unlikely(!req)))
-> -               return;
+> -	/* All old ioucmds have to be completed */
+> -	ubq->nr_io_ready = 0;
+> -	/* old daemon is PF_EXITING, put it now */
+> -	put_task_struct(ubq->ubq_daemon);
+> -	/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
+> -	ubq->ubq_daemon = NULL;
+> -	ubq->timeout = false;
 > -
-> -       if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
-> -               req->__sector =3D ub_cmd->zone_append_lba;
+> -	for (i = 0; i < ubq->q_depth; i++) {
+> -		struct ublk_io *io = &ubq->ios[i];
 > -
-> -       if (likely(!blk_should_fake_timeout(req->q)))
-> -               ublk_put_req_ref(ubq, req);
+> -		/* forget everything now and be ready for new FETCH_REQ */
+> -		io->flags = 0;
+> -		io->cmd = NULL;
+> -		io->addr = 0;
+> -	}
 > -}
 > -
->  /*
->   * Called from io task context via cancel fn, meantime quiesce ublk
->   * blk-mq queue, so we are called exclusively with blk-mq and io task
-> @@ -1918,6 +1894,45 @@ static int ublk_unregister_io_buf(struct io_uring_=
-cmd *cmd,
->         return io_buffer_unregister_bvec(cmd, index, issue_flags);
->  }
->
-> +static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
-> +                                struct ublk_io *io, struct io_uring_cmd =
-*cmd,
-> +                                const struct ublksrv_io_cmd *ub_cmd,
-> +                                struct request *req)
-> +{
-> +       if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
-> +               return -EINVAL;
-> +
-> +       if (ublk_need_map_io(ubq)) {
-> +               /*
-> +                * COMMIT_AND_FETCH_REQ has to provide IO buffer if
-> +                * NEED GET DATA is not enabled or it is Read IO.
-> +                */
-> +               if (!ub_cmd->addr && (!ublk_need_get_data(ubq) ||
-> +                                       req_op(req) =3D=3D REQ_OP_READ))
-> +                       return -EINVAL;
-> +       } else if (req_op(req) !=3D REQ_OP_ZONE_APPEND && ub_cmd->addr) {
-> +               /*
-> +                * User copy requires addr to be unset when command is
-> +                * not zone append
-> +                */
-> +               return -EINVAL;
-> +       }
-> +
-> +       ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
-> +
-> +       /* now this cmd slot is owned by ublk driver */
-> +       io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV;
-> +       io->res =3D ub_cmd->result;
-> +
-> +       if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
-> +               req->__sector =3D ub_cmd->zone_append_lba;
-> +
-> +       if (likely(!blk_should_fake_timeout(req->q)))
-> +               ublk_put_req_ref(ubq, req);
-> +
-> +       return -EIOCBQUEUED;
-
-I think it would be clearer to just return 0. __ublk_ch_uring_cmd()
-already takes care of returning -EIOCBQUEUED in the successful case.
-Aside from that,
-
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+>  static int ublk_ctrl_start_recovery(struct ublk_device *ub,
+>  		const struct ublksrv_ctrl_cmd *header)
+>  {
+>  	int ret = -EINVAL;
+> -	int i;
+>  
+>  	mutex_lock(&ub->mutex);
+>  	if (ublk_nosrv_should_stop_dev(ub))
+>  		goto out_unlock;
+> -	if (!ub->nr_queues_ready)
+> -		goto out_unlock;
+>  	/*
+>  	 * START_RECOVERY is only allowd after:
+>  	 *
+> @@ -3012,12 +3054,6 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
+>  		goto out_unlock;
+>  	}
+>  	pr_devel("%s: start recovery for dev id %d.\n", __func__, header->dev_id);
+> -	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> -		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
+> -	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
+> -	ub->mm = NULL;
+> -	ub->nr_queues_ready = 0;
+> -	ub->nr_privileged_daemon = 0;
+>  	init_completion(&ub->completion);
+>  	ret = 0;
+>   out_unlock:
+> @@ -3030,7 +3066,6 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  {
+>  	int ublksrv_pid = (int)header->data[0];
+>  	int ret = -EINVAL;
+> -	int i;
+>  
+>  	pr_devel("%s: Waiting for new ubq_daemons(nr: %d) are ready, dev id %d...\n",
+>  			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
+> @@ -3050,22 +3085,10 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  		goto out_unlock;
+>  	}
+>  	ub->dev_info.ublksrv_pid = ublksrv_pid;
+> +	ub->dev_info.state = UBLK_S_DEV_LIVE;
+>  	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
+>  			__func__, ublksrv_pid, header->dev_id);
+> -
+> -	blk_mq_quiesce_queue(ub->ub_disk->queue);
+> -	ub->dev_info.state = UBLK_S_DEV_LIVE;
+> -	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> -
+> -		ubq->canceling = false;
+> -		ubq->fail_io = false;
+> -	}
+> -	blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> -	pr_devel("%s: queue unquiesced, dev id %d.\n",
+> -			__func__, header->dev_id);
+>  	blk_mq_kick_requeue_list(ub->ub_disk->queue);
+> -
+>  	ret = 0;
+>   out_unlock:
+>  	mutex_unlock(&ub->mutex);
+> -- 
+> 2.47.0
+> 
