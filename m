@@ -1,140 +1,119 @@
-Received: from dog.birch.relay.mailchannels.net (dog.birch.relay.mailchannels.net [23.83.209.48])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A4915E96;
-	Wed, 16 Apr 2025 02:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.209.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744769250; cv=pass; b=XPDNvT86IlV2mZ6aVxWaNpkeodTP2cLKZEio7E2eyYkOVhFdT1JrQrhZoo+0yv76CkfPdIXejsQbyUFMTGHimzEtRIZq9rMKNfsvvMJRY5K0HKSc8Nqhm3q1PD4YOg5r57qD1eTCwdeYrLDHSKsleQsmL5tdLyZD0d0XxSFAXyA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744769250; c=relaxed/simple;
-	bh=EgFwQezJYypIPTLjbAO7+wgBDKuxG1DACqpgT5oKBE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ufEc2l+bQpWXKT5I+oDN8u7vVrRkpSYMUteAFH9ibaloWavTmpFAs9OhHsJUJC66oRzEmd8vUloGeGFnNcy2cfkZnpKePXQWj22VPpnuoBOYeE++ye4n6xso2OZa4k1IbfK4LK5f0rXc+QT56XmKILzCNKPPAbCaNSJJI4MsR8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net; spf=pass smtp.mailfrom=stgolabs.net; dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b=CQPJelMk; arc=pass smtp.client-ip=23.83.209.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stgolabs.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460482DFA49
+	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 03:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744775702; cv=none; b=KRqU1BRe7A3Czqdry8OjVtHbRzXWx0ISfIR1yEOh+qQfU3t92SILPzQ+UUv64Ce+GNeqeZrRxWtdAjsi5TpdR0mYdQa1Cf9jKSD5HKmxQaWFsrA/x+1W076VhttX3/f+NcAgqFq91uZ3Mk8THy1+UcfPguj74avssQOMhX9l6CQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744775702; c=relaxed/simple;
+	bh=5ufKDZ9UgNkslkr8f39Hg8TAxKztyhagrNWkshhrOwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZX6XlQvixWsaMYZgB8R39idypgmZg/vAd6cfXUa+LWgKX7RQr8CCVSwikmM8gbj3CbyTdWlS8xVyK6XMsmxCCNTKaFHNPT3tV0D+bCKDo+dTErvDIX2KWIf5p0mBqmeGZKVF4UxmT0ut2JWM2YBdsi13nn89WJh3kqR5WimM/sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JXg/xNCb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="CQPJelMk"
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 8FCA8458B5;
-	Wed, 16 Apr 2025 02:02:13 +0000 (UTC)
-Received: from pdx1-sub0-mail-a270.dreamhost.com (trex-6.trex.outbound.svc.cluster.local [100.110.51.53])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id E44A645942;
-	Wed, 16 Apr 2025 02:02:12 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1744768933; a=rsa-sha256;
-	cv=none;
-	b=ShPKZgvbJsioWDJ6zr+jN3RuXQx3pXzihIoxXcdZaSyjN9R5n1ACCkvuyN7X1ynEKwIIGY
-	R8GLEc4WHPGi2YxHjgspbU56rRPhzKKeMOhaS3HOIxlSSTIWWXJmDKgW6g8jueiTB+5MOS
-	0b5be/c6VN4uAVl8LeDqWz9iTfaOK8HP39Wn4J0ZhH10leg8DbSoew4l5g5Xxgfe9b1hhv
-	w+nIn0fb8z9cV6LnelyJ2Sr1Q4CAaxrL7Qn4i3hjNw/0+AmXAnmCZ7M7t6UAp7HmTrGpma
-	ogtNCT/bxQXwq+HYkQZ0VY8t4ro3prNAHPfWKpOvwLo+hIyWNNiXI/xr87ARPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1744768933;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXg/xNCb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744775699;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=EgFwQezJYypIPTLjbAO7+wgBDKuxG1DACqpgT5oKBE4=;
-	b=w1Vi/dc5LKt/pF3kalouhzHVe1gKlaQAefi7r4+A6nPgdr/Vcv+OEFNcFeVZprLl10Ehmk
-	xxG41EPehHgismJsEC2a4EyNj8TaSN46COqL6jgv4uvnxKkTxn3mN4z/Pgb41dnmq19u5E
-	hv1PDrdutvORtuSdzhIxjeXkCivOD17/tQd0BWsgk73Ys9RBPaX+74hfz0bj0RvO93ZwW7
-	0Fpzja0Vz8YGHS4C8xHLWbJ+IEsUl/7njEELgFasx0YpUETwi63Fk2RDr1I5cvMtmJbA1n
-	v5+O4LWQ3bE8rHAcSqL1Fm/W5NVFSDPCri4/wcG66b68BWgtjhaA8jvKAk+tgQ==
-ARC-Authentication-Results: i=1;
-	rspamd-5dd7f8b4cd-2pb8p;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
-X-MailChannels-Auth-Id: dreamhost
-X-Spot-Thread: 23261b3b7b19990f_1744768933328_4128009771
-X-MC-Loop-Signature: 1744768933328:3434343757
-X-MC-Ingress-Time: 1744768933328
-Received: from pdx1-sub0-mail-a270.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.110.51.53 (trex/7.0.3);
-	Wed, 16 Apr 2025 02:02:13 +0000
-Received: from offworld (ip72-199-50-187.sd.sd.cox.net [72.199.50.187])
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=yGvLhMEqJdSK11JnMaL/tXoB2sQ4lW3KMWrRH9uHOjs=;
+	b=JXg/xNCb0ptIZIpaLxUpZ69rxvvFHqjKJyjjaAQRNrnRbZOLKPU85aWsbw8St7ufBoIK3c
+	V92OBHzcIFO8TXQLh8KO6v9IHFJKrEF4RW6lAYSVO2SBS7cnVt1bw7KiEGe2pQ7xjuXikq
+	zgI7wILO2Muttl38HvzFbYrGO7k9pCI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-63--c0i9mlPODCktf7M4JlGVQ-1; Tue,
+ 15 Apr 2025 23:54:55 -0400
+X-MC-Unique: -c0i9mlPODCktf7M4JlGVQ-1
+X-Mimecast-MFC-AGG-ID: -c0i9mlPODCktf7M4JlGVQ_1744775694
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: dave@stgolabs.net)
-	by pdx1-sub0-mail-a270.dreamhost.com (Postfix) with ESMTPSA id 4Zckmg3Gr7z2c;
-	Tue, 15 Apr 2025 19:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
-	s=dreamhost; t=1744768932;
-	bh=EgFwQezJYypIPTLjbAO7+wgBDKuxG1DACqpgT5oKBE4=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=CQPJelMkHR9c9PwOQz1qB9oLMoQ0ijerkO/7sTliU3wShQdMiumwtZeUz8qKG4hQH
-	 P/+Ba9DrECHulLQADswnJQAn7N7p6JgJOjhObbZsvwzjl1ctJj9h4ZCrzAkqDRFUXu
-	 p0S045L32lw1PwuZUJqHayjEwt1ltr9Rp+CEuY1ayAOdHWv190+04JcmqhwNHhuIhK
-	 0/2MpjusbdsgGViBxeOeRKPuszsMvIgUOy21txdcZrW66eV/RDnRe9TOYDbaf6ZziO
-	 fxFGoIfQeyeU/EDzaCZ+mmP69qqdonxNJRnFc4V8OBjj/3+x97Y7HdQmSxM8hXxUi1
-	 VFDZD9KTPnAzw==
-Date: Tue, 15 Apr 2025 19:02:07 -0700
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
-	tytso@mit.edu, adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
-	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
-	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
-	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
- migration
-Message-ID: <20250415232501.iypezdhizhttidpc@offworld>
-Mail-Followup-To: Luis Chamberlain <mcgrof@kernel.org>,
-	Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
-	tytso@mit.edu, adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
-	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
-	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
-	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
-References: <20250410014945.2140781-1-mcgrof@kernel.org>
- <20250410014945.2140781-2-mcgrof@kernel.org>
- <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
- <Z_15mCAv6nsSgRTf@bombadil.infradead.org>
- <Z_2J9bxCqAUPgq42@bombadil.infradead.org>
- <20250415-freihalten-tausend-a9791b9c3a03@brauner>
- <Z_5_p3t_fNUBoG7Y@bombadil.infradead.org>
- <dkjq2c57du34wq7ocvtk37a5gkcondxfedgnbdxse55nhlfioy@v6tx45lkopfm>
- <Z_7KTEKEzC9Fh2rn@bombadil.infradead.org>
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AFED61956089;
+	Wed, 16 Apr 2025 03:54:54 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.72])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8AC2E1801A65;
+	Wed, 16 Apr 2025 03:54:53 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/8] ublk: simplify & improve IO canceling
+Date: Wed, 16 Apr 2025 11:54:34 +0800
+Message-ID: <20250416035444.99569-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <Z_7KTEKEzC9Fh2rn@bombadil.infradead.org>
-User-Agent: NeoMutt/20220429
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, 15 Apr 2025, Luis Chamberlain wrote:
+Hello,
 
->On Tue, Apr 15, 2025 at 06:23:54PM +0200, Jan Kara wrote:
->> So I don't like removing that commit because it makes a
->> "reproducible with a heavy stress test" problem become a "reproduced by
->> real world workloads" problem.
->
->So how about just patch 2 and 8 in this series, with the spin lock
->removal happening on the last patch for Linus tree?
+Patch 1st ~ 7th simplifies & improves IO canceling when ublk server daemon
+is exiting by taking two stage canceling:
 
-fyi I sent out a new series (trimmed some recipients), addressing the concerns
-laid out in this approach.
+- canceling active uring_cmd from its cancel function
 
-https://lore.kernel.org/all/20250415231635.83960-1-dave@stgolabs.net/
+- move inflight requests aborting into ublk char device release handler
 
-Similar to adding artificial delays to a vanilla kernel, the only behavior
-these modifications cause is a quicker triggering of the aforementioned
-(yet independent) ext4 warning splat/corruption.
+With this way, implementation is simplified a lot, meantime ub->mutex is
+not required before queue becomes quiesced, so forward progress is
+guaranteed.
+
+This approach & main implementation is from Uday's patch of
+"improve detection and handling of ublk server exit".
+
+The last patch is selftest code for showing the improvement ublk server
+exit, 30sec timeout is avoided, which depends on patchset of
+"[PATCH V2 00/13] selftests: ublk: test cleanup & add more tests"[1].
+
+[1] https://lore.kernel.org/linux-block/20250412023035.2649275-1-ming.lei@redhat.com/T/#medbf7024e57beaf1c53e4cef6e076421463839d0
+
+Pass both ublk kernel selftests and ublksrv 'make test T=generic'.
+
+Thanks,
+
+V2:
+	- drop 1st patch in V1, which isn't necessary
+	- update "ublk: properly serialize all FETCH_REQs", which puts
+	FETCH handling into single function, add comment on NONBLOCK
+	- comment & commit log improvement
+	- small cleanup from 5/8, 6/8
+
+Ming Lei (5):
+  ublk: add ublk_force_abort_dev()
+  ublk: rely on ->canceling for dealing with
+    ublk_nosrv_dev_should_queue_io
+  ublk: move device reset into ublk_ch_release()
+  ublk: remove __ublk_quiesce_dev()
+  ublk: simplify aborting ublk request
+
+Uday Shankar (3):
+  ublk: properly serialize all FETCH_REQs
+  ublk: improve detection and handling of ublk server exit
+  selftests: ublk: add generic_06 for covering fault inject
+
+ drivers/block/ublk_drv.c                      | 532 +++++++++---------
+ tools/testing/selftests/ublk/Makefile         |   4 +-
+ tools/testing/selftests/ublk/fault_inject.c   |  98 ++++
+ tools/testing/selftests/ublk/kublk.c          |   3 +-
+ tools/testing/selftests/ublk/kublk.h          |  12 +-
+ .../testing/selftests/ublk/test_generic_06.sh |  41 ++
+ 6 files changed, 425 insertions(+), 265 deletions(-)
+ create mode 100644 tools/testing/selftests/ublk/fault_inject.c
+ create mode 100755 tools/testing/selftests/ublk/test_generic_06.sh
+
+-- 
+2.47.0
+
