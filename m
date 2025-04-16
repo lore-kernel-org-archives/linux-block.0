@@ -1,185 +1,147 @@
-Received: from mail-yw1-f228.google.com (mail-yw1-f228.google.com [209.85.128.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199822045B7
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 16:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1EB212D69;
+	Wed, 16 Apr 2025 16:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744819706; cv=none; b=gkurU1+/WZ8kf0y+HuZSdNACYnjBhWgKdWRLsN/WcluBwqGnVwB4j9jTC/YBth6KPdQYCthoycn32lWuzwuTuzgzFOrCdUGezKWu/6QPhMMFV2InvZnafAxKblxr4ccjEeZB9S6clJ8QlJJVtSBuGQKCwKVCTSJxJt439Z24VJY=
+	t=1744820810; cv=none; b=I+EsxZvDU7tHaFY5bHgDWYZEZYCz9e9GrgcHrshSxlq4/iyQoMDdFZKQS2pOj5WtBAmA0lbPQyT/zzU5AB5vX29wrOCr2lvLYEBWwNhAp9hNlGxL16rMkJ/GHs5QUTE9KLJ4BDjIdoPjsLINrjt/Ema9Hi1f6j96PBZ2ScJHyNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744819706; c=relaxed/simple;
-	bh=CBsDig6F9DsAhiYnyv8L2iByhzO/LcGrzhJqjFrLOb0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p/NxYyMToSIiRDHmQiShv4RgpR+Wl9yq9SqnWE+Vu1/lxTsiFH+iP6TS+9k9MO4BjL97W9PL9VUQ1YO3GwJaxyxa+XqLwXvvOZ7Tf3r7z7FFlP6SN0cdMK3N3pp08yd0t75HjHrpz0tOC3+3WA7qCeOu93BNi3cvVYA7dBvNROY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fFnsEQgg; arc=none smtp.client-ip=209.85.128.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1744820810; c=relaxed/simple;
+	bh=RYGOuCC7qfaii7HzSw7mAkhXbeZOScoiAgqxLmoftKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kL3EUtCSgokgVYT5lZQ9JyElhSktr1AVKO70yKZQjrv0dHkt5ijpRabiZQIjalsSnbIwS4f+Uy2FfeMtRV4MUsg1FI09umD0nC5IvBl1OvfIzPDK6W7GpdmkmLhNeE0LI5xnTnqkJdpMEMfotQVWzfXVR+LLWmyqJ8C63/9gOeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAVkrKNC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fFnsEQgg"
-Received: by mail-yw1-f228.google.com with SMTP id 00721157ae682-6ef5ae6e7ddso3770967b3.2
-        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 09:08:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1744819703; x=1745424503; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7k4WygtbOq9V/TUXra9P9LV10YW1W6+zkPqQlC9hmIc=;
-        b=fFnsEQggGtfmzefHplkoucwJa9Hyok1JnN/mEKzOILrJa++o49/BxPvnT2CE1DQstg
-         MgeNPyKUt4Z0LBmTWvA+4Rsl9FD2DzWfGomwNRjV/lwWbbnpcmzIJqNvaxkTBXaAONk1
-         RgrnsMxau9yjWU8LHZEZuY01yLSirI8/AIuP5k5uCqPXmEHVZ0fitmqXsEvzaDsubNMk
-         QZMwx2kgs915Wee95OTsJ9ykOHWsmntCqPKQKihot0otroBVG+d8Rk278d0J7t16f9Cx
-         uExIMCvcrw/OJBLLpv/yw2PpMA8nhm4fb3ZAVYVoEeVDrwoe6PH73+EY0ZkwbKNIBynU
-         oQMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744819703; x=1745424503;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7k4WygtbOq9V/TUXra9P9LV10YW1W6+zkPqQlC9hmIc=;
-        b=Vqh8HihairMI9KQ30vAW/9JEkRFO8SaI/tf5+npIv5ykaBS6EE/WGYyWRY4Y7vBpgE
-         zc2DiGySrouHPhQlXl+YD34MUF3TbBOeqh+kv4s/t1y4sqp9GmHOyI5bW/WaEEHvxwNB
-         SWNQGLTmaewLK6n1WgKeq7v39kjiTyxwABgjtwDgO/0NdjDwFj+kCuqcd8V5flKhoaSr
-         Ew/ebOaiqNOrcj3WAUoQ2a5373miwXO2kFLb0mTT5SFJnNtEPDmJ0OuUow3oWEP2wkZ/
-         z031GGp8hBYV0DjFGshzPS6YxVUreuc7y+38eaaJFUOgRCRxS7exwh3cOw6His0DjS0/
-         D6sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0Mj4zJsnGbKiqUkTprZ0p+OH5fkjWX8B49VOBr/9EgO3KATHhrmUf0GfT12T51d59FbaykPOzaPuU5A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa3qZPqh68yWpwviyU3fmHd3AJj/hcI4RFnLQEMooGVOvEu6Cw
-	S9gBf6kPPSBwbp3s+wjffm5eaV144RtU6w8jCS0qvl9zuYdfPDrDM1wr1t48wj07m3uJFv4oKGc
-	Vj+BGpfmcv6pxIBUtLvXg/qKPWIbFMaFg
-X-Gm-Gg: ASbGnctczpjO/jEk8baLzOlo0uWf/2WtQRMmiSyX160Dp8SmUDiA1tlog2mz845Vkge
-	/iqVN/2R6TEg5wJcEvlg14XET+tnM2TUD4tg5UUl65KsuteTUSdq11M/NBuULsBxRXyPHd9azvP
-	dnM1MCIddjYWEDViApR6HPw9Y7Taqy+q5/SK05YsirGkpCSnz8jGU2lfwDV0DpGCYYwusHWaFA2
-	BJt7RPXFpMpJAu5rkI0LXYF/Mxf942kXO++cw5FT3025n8VwAlAP4irCAoaaYdE81OQP13KxjpI
-	UcVeL6SOP2pnEIYAJiCVJ8nPqe1Ma9q7nu7qgWYwUuG2
-X-Google-Smtp-Source: AGHT+IHruA+h68cgYDaioq+gzj1KJHDh5bJmz+QV0BmrVPaqXLWxXSqCMRnBziGF+k21bIDTpr0Ffxe+9IHr
-X-Received: by 2002:a05:690c:399:b0:6f9:558d:538e with SMTP id 00721157ae682-706bb933e6bmr1448397b3.5.1744819702792;
-        Wed, 16 Apr 2025 09:08:22 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-7053e174f86sm11698467b3.36.2025.04.16.09.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 09:08:22 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::418a])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E7038340237;
-	Wed, 16 Apr 2025 10:08:21 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id DA7FDE4186F; Wed, 16 Apr 2025 10:08:21 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] scatterlist: inline sg_next()
-Date: Wed, 16 Apr 2025 10:06:13 -0600
-Message-ID: <20250416160615.3571958-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAVkrKNC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DA67C4CEED;
+	Wed, 16 Apr 2025 16:26:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744820809;
+	bh=RYGOuCC7qfaii7HzSw7mAkhXbeZOScoiAgqxLmoftKM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XAVkrKNCwP2vYfhZWMcATIhRkbwS1dCVXvWCnD05O1ekkxGPTF8zXweoSQBwFjexo
+	 qjf9Wwp14Jt1OUMD+GtBi6kO3Crcp8dkvF7c3SNxbvb4M+ZW0BuePMWQZH6rGvKBej
+	 wLZCk2/LkAtfYfymKuipf04MyynDKNmNI5P+PDAJm0AIVSEBssXElV3JQBGuKSrOrG
+	 l+2MRXGhhvi05MK7a5oiDkxZZicr4oMa5lXqCKCa1xAHWOdVScStdjTdUTIUuya5hr
+	 fkb3cekkDXV0N2cT0o2zqYso0b4v1TZrfy9AdDgk4B6ZiYafukL57X9jXZ8XNesnAz
+	 YSGeXiT6ov/yQ==
+Date: Wed, 16 Apr 2025 09:26:49 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: brauner@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk, jack@suse.cz,
+	cem@kernel.org, linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH v7.1 14/14] xfs: allow sysadmins to specify a maximum
+ atomic write limit at mount time
+Message-ID: <20250416162649.GJ25675@frogsfrogsfrogs>
+References: <20250415121425.4146847-1-john.g.garry@oracle.com>
+ <20250415121425.4146847-15-john.g.garry@oracle.com>
+ <20250415223625.GV25675@frogsfrogsfrogs>
+ <81f0fe3e-4c1a-497d-b20e-1f8d182ed208@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81f0fe3e-4c1a-497d-b20e-1f8d182ed208@oracle.com>
 
-sg_next() is a short function called frequently in I/O paths. Define it
-in the header file so it can be inlined into its callers.
+On Wed, Apr 16, 2025 at 11:08:25AM +0100, John Garry wrote:
+> On 15/04/2025 23:36, Darrick J. Wong wrote:
+> 
+> Thanks for this, but it still seems to be problematic for me.
+> 
+> In my test, I have agsize=22400, and when I attempt to mount with
+> atomic_write_max=8M, it passes when it shouldn't. It should not because
+> max_pow_of_two_factor(22400) = 128, and 8MB > 128 FSB.
+> 
+> How about these addition checks:
+> 
+> > +
+> > +	if (new_max_bytes) {
+> > +		xfs_extlen_t	max_write_fsbs =
+> > +			rounddown_pow_of_two(XFS_B_TO_FSB(mp, MAX_RW_COUNT));
+> > +		xfs_extlen_t	max_group_fsbs =
+> > +			max(mp->m_groups[XG_TYPE_AG].blocks,
+> > +			    mp->m_groups[XG_TYPE_RTG].blocks);
+> > +
+> > +		ASSERT(max_write_fsbs <= U32_MAX);
+> 
+> 		if (!is_power_of_2(new_max_bytes)) {
+> 			xfs_warn(mp,
+>  "max atomic write size of %llu bytes is not a power-of-2",
+> 					new_max_bytes);
+> 			return -EINVAL;
+> 		}
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
-Is it a concern that this would break kernel modules built against old headers?
-If so, I could update the patch to continue compiling and exporting sg_next() in
-scatterlist.c.
+Long-term I'm not convinced that we really need to have all these power
+of two checks because the software fallback can remap just about
+anything, but for now I see no harm in doing this because
+generic_atomic_write_valid enforces that property on the IO length.
 
- include/linux/scatterlist.h | 23 ++++++++++++++++++++++-
- lib/scatterlist.c           | 23 -----------------------
- 2 files changed, 22 insertions(+), 24 deletions(-)
+> > +
+> > +		if (new_max_bytes % mp->m_sb.sb_blocksize > 0) {
+> > +			xfs_warn(mp,
+> > + "max atomic write size of %llu bytes not aligned with fsblock",
+> > +					new_max_bytes);
+> > +			return -EINVAL;
+> > +		}
+> > +
+> > +		if (new_max_fsbs > max_write_fsbs) {
+> > +			xfs_warn(mp,
+> > + "max atomic write size of %lluk cannot be larger than max write size %lluk",
+> > +					new_max_bytes >> 10,
+> > +					XFS_FSB_TO_B(mp, max_write_fsbs) >> 10);
+> > +			return -EINVAL;
+> > +		}
+> > +
+> > +		if (new_max_fsbs > max_group_fsbs) {
+> > +			xfs_warn(mp,
+> > + "max atomic write size of %lluk cannot be larger than allocation group size %lluk",
+> > +					new_max_bytes >> 10,
+> > +					XFS_FSB_TO_B(mp, max_group_fsbs) >> 10);
+> > +			return -EINVAL;
+> > +		}
+> > +	}
+> > +
+> 
+> 	if (new_max_fsbs > max_pow_of_two_factor(max_group_fsbs)) {
+> 		xfs_warn(mp,
+>  "max atomic write size of %lluk not aligned with allocation group size
+> %lluk",
+> 				new_max_bytes >> 10,
+> 				XFS_FSB_TO_B(mp, max_group_fsbs) >> 10);
+> 		return -EINVAL;
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 138e2f1bd08f..0cdbfc42f153 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -92,10 +92,32 @@ static inline bool sg_is_chain(struct scatterlist *sg)
- static inline bool sg_is_last(struct scatterlist *sg)
- {
- 	return __sg_flags(sg) & SG_END;
- }
- 
-+/**
-+ * sg_next - return the next scatterlist entry in a list
-+ * @sg:		The current sg entry
-+ *
-+ * Description:
-+ *   Usually the next entry will be @sg@ + 1, but if this sg element is part
-+ *   of a chained scatterlist, it could jump to the start of a new
-+ *   scatterlist array.
-+ *
-+ **/
-+static inline struct scatterlist *sg_next(struct scatterlist *sg)
-+{
-+	if (sg_is_last(sg))
-+		return NULL;
-+
-+	sg++;
-+	if (unlikely(sg_is_chain(sg)))
-+		sg = sg_chain_ptr(sg);
-+
-+	return sg;
-+}
-+
- /**
-  * sg_assign_page - Assign a given page to an SG entry
-  * @sg:		    SG entry
-  * @page:	    The page
-  *
-@@ -416,11 +438,10 @@ static inline void sg_init_marker(struct scatterlist *sgl,
- 	sg_mark_end(&sgl[nents - 1]);
- }
- 
- int sg_nents(struct scatterlist *sg);
- int sg_nents_for_len(struct scatterlist *sg, u64 len);
--struct scatterlist *sg_next(struct scatterlist *);
- struct scatterlist *sg_last(struct scatterlist *s, unsigned int);
- void sg_init_table(struct scatterlist *, unsigned int);
- void sg_init_one(struct scatterlist *, const void *, unsigned int);
- int sg_split(struct scatterlist *in, const int in_mapped_nents,
- 	     const off_t skip, const int nb_splits,
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index b58d5ef1a34b..7582dfab7fe3 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -11,33 +11,10 @@
- #include <linux/kmemleak.h>
- #include <linux/bvec.h>
- #include <linux/uio.h>
- #include <linux/folio_queue.h>
- 
--/**
-- * sg_next - return the next scatterlist entry in a list
-- * @sg:		The current sg entry
-- *
-- * Description:
-- *   Usually the next entry will be @sg@ + 1, but if this sg element is part
-- *   of a chained scatterlist, it could jump to the start of a new
-- *   scatterlist array.
-- *
-- **/
--struct scatterlist *sg_next(struct scatterlist *sg)
--{
--	if (sg_is_last(sg))
--		return NULL;
--
--	sg++;
--	if (unlikely(sg_is_chain(sg)))
--		sg = sg_chain_ptr(sg);
--
--	return sg;
--}
--EXPORT_SYMBOL(sg_next);
--
- /**
-  * sg_nents - return total count of entries in scatterlist
-  * @sg:		The scatterlist
-  *
-  * Description:
--- 
-2.45.2
+I think I'd rather clean up these bits:
 
+	if (mp->m_ddev_targp->bt_bdev_awu_min > 0)
+		max_agsize = max_pow_of_two_factor(mp->m_sb.sb_agblocks);
+	else
+		max_agsize = mp->m_ag_max_usable;
+
+and
+
+	if (mp->m_rtdev_targp && mp->m_rtdev_targp->bt_bdev_awu_min > 0)
+		max_rgsize = max_pow_of_two_factor(rgs->blocks);
+	else
+		max_rgsize = rgs->blocks;
+
+into a shared helper for xfs_compute_atomic_write_unit_max so that we
+use the exact same logic in both places.  But I agree with the general
+direction.
+
+--D
+
+> 	}
+> 
+> thanks,
+> John
+> 
