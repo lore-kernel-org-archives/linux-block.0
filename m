@@ -1,111 +1,112 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635C72066D4
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 01:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89C2221731
+	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 01:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744766235; cv=none; b=pDEtH2wLapgpBjxFsiwiLw54QpQuRHa901lfcFZbE9809qcbSNcPSIpd1cQNGGz3B/UyLsIbdUiWFcB1zYWFKSwzp1BQs4PIS8dsp1S0Myex+QnI4MhWKIF8xPzd8uZKN6kxzuDDefyqbvqnf6Q6nyzzpvlLaDoju+bqwGmR7+g=
+	t=1744767565; cv=none; b=pHUiiKDCCWWYD4niB+xpjNxrzk/TTUImWdPA0pXMe285MrjBPM2SA20oYjOyQ+7JChUhTg9AYhKezpxv0n8VAIlYTSEKgm1LF7fmdbBYuClcTXuKRJQVcCLemI6DJZ9TMlZ0blCjn6R2zp/xaIJ6aavLXpnwUD5ALs9/5BFl/Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744766235; c=relaxed/simple;
-	bh=ZzNS94P04rypg+LBacON/u30ytgZIaydK7yOsJOBadA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MmlKbAo3Z+k3HsvvkptRMrmHfJ8jq9k9tQHeYVdlxhHQsvQe8F63vwPYolF9oufoAjMmU8/rmjp9puKJB1wrvcsoYCFFh3bklSMjXSfk5fooneKg/QHy53O1Rwlj0qdNfIeYM4cozO7HdHLJVG6l0QQJjTNHxEgos3yXeBKlBT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qJIOko5M; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744767565; c=relaxed/simple;
+	bh=fVJaK2bnIJQnzdjq884fcHjuN/S9eGWwEBEXziHHlJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gtfwUatncyh4dDjjxcSX2rM+SYXi4dPdzmqUPiuKYtrBcFBfSI0YACImGwSJh5Yb8BV8uHKUPu29BVwdjLtYATgOjf45pFRgf5GJcah8HpVhs6VHTa42WU+kQ73VDPCDGb7s6R5lLCHzhlB3T3KQ5MJUPbVUS1jyx6MruEIbXQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iv6HTwyy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qJIOko5M"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-85b3f92c866so144382739f.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Apr 2025 18:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744766231; x=1745371031; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ezaz3PVaSjzi1KweuZ1yyCFtgimOOIZFhnqAtfnSgDA=;
-        b=qJIOko5MetSb3PYyfgk+DdrZVrBa4yntVp73NtgKGIQqSKHhtlqKboR529Rlyz4+u7
-         9fGyP4+Qi3MghZFWAs8tGWBdk8LQSJ3EUdgVQA23IAuyhUS1QZ8ph1mG4kEr9+L2kVt1
-         e+OCmlL9xnuULTHeDlk50YGlrg+NCi5DIa8kIei6cIbbUFXmjIku8nWMcx+8ecR4rYMs
-         v7FLI2HESDXckygSf1dkBR5iEbkIBHdoUuD11iH8aJqfJexE5NHewZgY2UcCc+KYO8q+
-         w3JnFSlFjM46Zhcqpu3SbJicgFB1kzjsPk6p8x8jsZSn0SSN1D/4K5MKWJnARIl9pJPV
-         M71w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744766231; x=1745371031;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ezaz3PVaSjzi1KweuZ1yyCFtgimOOIZFhnqAtfnSgDA=;
-        b=ON9ts4cID1Wg5welshuuBCoopWkYQu+Q+09zXtX2mv9jA1ITVVk5OOEZn7aoa8IP44
-         BUWihxWta2+ano708X7Oxm7yQF2gFnabLEIh50XbPllGmgrKsmU7iqlNpvZivAp4qvUI
-         sYykKlNr45emeSJkj+cRzlxZM+4M4KoNp3JJkqG6jK0iiKBvqb2weohfVYw9UlkPgqqJ
-         R1yhbdD1GLpvdgsFEj75ChqsAW4MlC14pYNW5M9/9wSwNnz3yHTlxRT/jpIxvt+eQ+vP
-         bGPlTzR/oANRiMV8+4qtkrj7d5S1aDrxZPQpjlYPRSJ0xbG0jN8U6aFFWfWi+R+xxVmr
-         AtoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb16Z8q80RBgMzV4elOr9oSjmEPUBpAJcjQP83sM7AhIa8iNTCTndvImpBCX/7WB7SrQpRVAgStbJEnw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzmd5ep8FvDVRYvx0ajN2gFlWcYCmibk4RUV6GVCLIjBsu8h8S1
-	jdLiXCdqIyBppM7USLjveW+OnFEX/4kvMY/jhA578eO76GsFn6YTtHt7gjsH7cU=
-X-Gm-Gg: ASbGncsuKMM0OvVevVHvfFK3rxujzsIIAWZEOoSk/cv24cXRxlZ9KK5fDVVv18/xrCM
-	5qPYgbJodawHp7L9Pt15UQ/Mc5meFlr7fnul4w2nrAVZ2YTtz7awMc3FYVPEHZklvN8lXhkqlk4
-	XzjQTAdATRE+t7pkeXAEZcoaFFYwRLdl0N6UPt2FgDA7ea/1HUwN3QcTkhl2LuJeOlqaw19VCt+
-	36BmIG9v713Iq5b1yt2imXb1lujEnE4WG4exFXFxo0QTn75PnhPHIqdcfLz53OTPniOfJoPp9/6
-	B7vEtwT/eRU4WG6sCw9gUbRhismMwwCV5Bg3lA==
-X-Google-Smtp-Source: AGHT+IHX/hBHRZAf3hH6+amtM2VZxnJ6VB/AV8+Wb/EETF8qutHLrfPCvTF/ynQhZZsNUazIqIGlmQ==
-X-Received: by 2002:a05:6e02:1a4c:b0:3d5:eb14:8455 with SMTP id e9e14a558f8ab-3d8125ab86amr15103215ab.17.1744766231319;
-        Tue, 15 Apr 2025 18:17:11 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dba648d4sm34430105ab.10.2025.04.15.18.17.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 18:17:10 -0700 (PDT)
-Message-ID: <be1d189f-2c00-4b0f-979f-11fe4169d79a@kernel.dk>
-Date: Tue, 15 Apr 2025 19:17:09 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iv6HTwyy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744767561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+lWJvtE2yVM+pSYwHCDbf4OjqJQMOiKHWyefO6Wue7k=;
+	b=Iv6HTwyyd/tV184FcXLkTBz6y6UjnvsiLTRXqDu/vnO5bTTyPPfQTfg8NT2lsJIEmEpmnq
+	asf4fTp/AzcAtXkOh3ZqJcnIrJXFUZPJ4NNxCGb8WEk2COP7vO0zq+r9ziLTWAAaqI0l+T
+	+0gakKsVjuNAhP46P5o3hJBxmtbPUpA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-3t2ceug_OFauwRhPpQEo_w-1; Tue,
+ 15 Apr 2025 21:39:17 -0400
+X-MC-Unique: 3t2ceug_OFauwRhPpQEo_w-1
+X-Mimecast-MFC-AGG-ID: 3t2ceug_OFauwRhPpQEo_w_1744767557
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9A09180035C;
+	Wed, 16 Apr 2025 01:39:16 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.72])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 55EE819560AD;
+	Wed, 16 Apr 2025 01:39:12 +0000 (UTC)
+Date: Wed, 16 Apr 2025 09:39:07 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Yoav Cohen <yoav@nvidia.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: ublk: Graceful Upgrade of ublk server application
+Message-ID: <Z_8KO5uJfkB-SKvT@fedora>
+References: <DM4PR12MB63282BE4C94D28AA2E1CACA0A9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <Z_49m8awtNFsY8pl@fedora>
+ <DM4PR12MB63285A6617D8A9B9F22B912BA9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <Z/7/LTSxqLH7JgAl@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] ublk: properly serialize all FETCH_REQs
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org,
- Caleb Sander Mateos <csander@purestorage.com>
-References: <20250414112554.3025113-1-ming.lei@redhat.com>
- <20250414112554.3025113-3-ming.lei@redhat.com>
- <Z/1o946/z43QETPr@dev-ushankar.dev.purestorage.com>
- <dc912318-f649-46bd-8d7b-e5d18b3c45b5@kernel.dk> <Z_8EQPd_tcY3NyvW@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z_8EQPd_tcY3NyvW@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z/7/LTSxqLH7JgAl@dev-ushankar.dev.purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 4/15/25 7:13 PM, Ming Lei wrote:
-> On Mon, Apr 14, 2025 at 02:39:33PM -0600, Jens Axboe wrote:
->> On 4/14/25 1:58 PM, Uday Shankar wrote:
->>> +static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
->>> +		      struct ublk_queue *ubq, struct ublk_io *io,
->>> +		      const struct ublksrv_io_cmd *ub_cmd,
->>> +		      unsigned int issue_flags)
->>> +{
->>> +	int ret = 0;
->>> +
->>> +	if (issue_flags & IO_URING_F_NONBLOCK)
->>> +		return -EAGAIN;
->>> +
->>> +	mutex_lock(&ub->mutex);
->>
->> This looks like overkill, if we can trylock the mutex that should surely
->> be fine? And I would imagine succeed most of the time, hence making the
->> inline/fastpath fine with F_NONBLOCK?
+On Tue, Apr 15, 2025 at 06:51:57PM -0600, Uday Shankar wrote:
+> On Tue, Apr 15, 2025 at 07:46:51PM +0000, Yoav Cohen wrote:
+> > Hi Ming,
+> > 
+> > Thank you for the fast reply.
+
+oops, looks I didn't get your reply, :-(
+
+> > To be clear, I don't want calling DELETE_DEV or STOP_DEV as I want the kernel bdev will be stay while upgrading the ublk server application.
+
+Can you explain a bit what is upgrading? Is it simple application binary
+replacement?
+
+> > It would be nice to have a nice way to have something like FREEZE_DEV that we may use which will also make all the cmds back with ABORT result but both block and char device will be stay until a new userspace application will reconnect.
 > 
-> The mutex is the innermost lock and it won't block for handling FETCH
-> command, which is just called during queue setting up stage, so I think
-> trylock isn't necessary, but also brings complexity.
 
-Then the NONBLOCK check can go away, and a comment added instead on why
-it's fine. Or maybe even a WARN_ON_ONCE() if trylock fails or something.
-Otherwise it's going to look like a code bug.
+Looks one reasonable requirement, maybe SUSPEND_DEV and RESUME_DEV command,
+which exists on RAID/DM too.
 
--- 
-Jens Axboe
+Also when device is in (new)suspended state, parameter can be re-configured.
+
+Most of recover code can be reused, in theory it shouldn't be hard to
+support, but one trouble could be what if both uring exiting and SUSPEND_DEV
+happen at the same time? This corner case need to be take into account. 
+
+I'd suggest to cover more requirements given it should be one generic
+interface.
+
+> Have you taken a look at the recovery flags? These offer slightly
+> different behaviors around how I/O is handled while the ublk server is
+> dying/when it is dead, but they all keep the block device up even after
+> the ublk server exits.
+> 
+> The flags are documented at https://docs.kernel.org/block/ublk.html
+
+The recovery mechanism is triggered passively, and here the upgrading
+needs to suspend device voluntarily & gracefully.
+
+Maybe add one control command of COOP_CANCEL_FOR_RECOVERY or ABORT_URING_CMD
+to abort active uring_cmd for triggering recovery from userspace? Which looks
+much easier. But it need cooperation between ublk driver and server.
+
+
+Thanks,
+Ming
+
