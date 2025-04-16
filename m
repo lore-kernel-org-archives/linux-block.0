@@ -1,47 +1,47 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9239CDF59;
-	Wed, 16 Apr 2025 04:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6DB1A3144;
+	Wed, 16 Apr 2025 04:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744777967; cv=none; b=N+qyIQOKpaQKJFToydzggmuWYrdi5Dq8GIxb0TnsIevMjF1qjAGfFFvKCuhOxuGVGpAr4dx+vRbYJbFEMyoN1t26BaYqqG72Ct9BD7HOq/efwkJDyG6tHcLZ+fjU7DEgaBh8bUE6JZcTsimU8LyOYxYd4H2kclsToaEmq9B0oj0=
+	t=1744778495; cv=none; b=IAQQwvqtRCaPZy/QOPVWp1zHZaQSrhpDl7Pw+CNhad4QakHSZw6xDvtR3YVD7IgD9CPpTyP3QzJKT5fbMHOT/UKkNY6Pq7Oelv/9NPHXhsVRc94xLYj12BCLVh3Hfom7wapPrim2ykh88JjUjoRP5qwbuIzj6mIsbuLmIC/X1t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744777967; c=relaxed/simple;
-	bh=5xJFzVMWk+E76kKDdhjA8Gw1TaRs8YEhnA6cWqhiAEc=;
+	s=arc-20240116; t=1744778495; c=relaxed/simple;
+	bh=OibJN0w9jAxEe8p3f+GtJU0vGjtOQiICQKSYtbxfulU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kJ8jwAahl0RR04h9dfS7sv3vKUmzcfcBJrsP240ctDjBEfOa/EHoPuo9Oq0LLxj1hFpmRZOvAxHmdn10Ia2MYKnmiaDAQlDdlA/QgptFJC38ohhsv8HmnemA8cukobpbiATg3WFsQLwZNZQUd6S98G8u1Y6Ve2WjvI6Iilalh5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rn8Zu8BQ; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZKVZlQm7XYxti97JL+Ep/wjwJyXfPY6srWBLJGbzleS00pVVVejfdv8M06tDl+/JdquiCAxA107EvvqqdomrXGu1jNU8WNYgU2+155fu4lTgg6ds/USdhH3KcXNZnEZfeVccqcRjBI6bKUJ3F5jWTfc9fecigRdmmC8soGb+uBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Za48eWoZ; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rn8Zu8BQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Za48eWoZ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=OEbKpslmMvpwmpfO6oVXe58NvRWk6dKBaxpuRUYOBA8=; b=rn8Zu8BQzyvF8zNSPAV62MxTjU
-	0ltj4z0k1DARz9b2w8HqsB7ThVZtZDX0ewiQqHPUnbWZ//rSPrfCEjqp2hDUJF9Ytfim1WZnxI2S5
-	J8gmllCaGJlvoiAG5GL49gHq4GT9DyqNY9dykfy23LZVFuoIT1tkJud7aFJ2y+0sl5z+E1ul83cuP
-	mM2ahJQ2SaYXys1ko65H0a2C3RLoTp9s8bVghXiVZdJKrku5M3Zj3vzIzMJvjdZ0ONxn3t8Nbdqra
-	h7IAzZ21AVK+4mdbbg+nPqNMEUFY/P8J8nRragatxsp5urhvpfGCoilKAreSYkGOU72LLVXzD5vpo
-	B4h1J6CQ==;
+	bh=frCeEBjvttsVcdvt8XY/0LGbxQeap/dL5eJvtPFV3rg=; b=Za48eWoZ4XG8NLWu0oYRV/5m9/
+	qHeQ44cmzb28TcGYrfVjeBku36JUEmJpcUPpIx7ACSgCEeihdz+9U6PjEMmoMTX35nVVoMm/quG+i
+	Ek/3Mhu/hK1KlH71XL9KI6FqJv4FBvs2tOO/LGrVJaJY9pi3K/KZKILAsAb3q00OEAqC7TPWu7SEH
+	7TsVLRr+lqriIJ572Ef2iEKzwAknrVZFveeTgo3pfYVdWdRcmPlty3fp0q6ggPSWanusMD2DBX2X5
+	AHsQg4WK1DQiPcTuk2ydR6u6yoZhuqVFEl+rD0R6pTtaxoZiYhNfOr9u0AYJ56b5E8BPaEjXj9P8y
+	YbunwJFA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u4uRz-000000089pv-3MFn;
-	Wed, 16 Apr 2025 04:32:39 +0000
-Date: Tue, 15 Apr 2025 21:32:39 -0700
+	id 1u4uaa-00000008AjM-4ANg;
+	Wed, 16 Apr 2025 04:41:32 +0000
+Date: Tue, 15 Apr 2025 21:41:32 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Yunlong Xing <yunlong.xing@unisoc.com>, linux-block@vger.kernel.org,
-	bvanassche@acm.org, niuzhiguo84@gmail.com, yunlongxing23@gmail.com,
-	linux-kernel@vger.kernel.org, hao_hao.wang@unisoc.com,
-	zhiguo.niu@unisoc.com
-Subject: Re: [PATCH V2] loop: aio inherit the ioprio of original request
-Message-ID: <Z_8y55Y6qgqgEYHW@infradead.org>
-References: <20250414030159.501180-1-yunlong.xing@unisoc.com>
- <Z_ynTcEZGhPKm5wY@infradead.org>
- <e0dc38e8-9df0-40e3-a0e3-fd4b40b3fd80@kernel.dk>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	xfs <linux-xfs@vger.kernel.org>, Jack Vogel <jack.vogel@oracle.com>
+Subject: Re: [RFC[RAP] 1/2] block: fix race between set_blocksize and read
+ paths
+Message-ID: <Z_80_EXzPUiAow2I@infradead.org>
+References: <20250415001405.GA25659@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,17 +50,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0dc38e8-9df0-40e3-a0e3-fd4b40b3fd80@kernel.dk>
+In-Reply-To: <20250415001405.GA25659@frogsfrogsfrogs>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Apr 14, 2025 at 08:47:51AM -0600, Jens Axboe wrote:
-> I think we layer yours on top of this one, which is something I
-> can just do without much trouble. Do we want the vfs_iter removal
-> in 6.15 or is 6.16 fine for that?
+On Mon, Apr 14, 2025 at 05:14:05PM -0700, Darrick J. Wong wrote:
+> From: Darrick J. Wong <djwong@kernel.org>
+> 
+> With the new large sector size support, it's now the case that
+> set_blocksize can change i_blksize and the folio order in a manner that
+> conflicts with a concurrent reader and causes a kernel crash.
+> 
+> Specifically, let's say that udev-worker calls libblkid to detect the
+> labels on a block device.  The read call can create an order-0 folio to
+> read the first 4096 bytes from the disk.  But then udev is preempted.
+> 
+> Next, someone tries to mount an 8k-sectorsize filesystem from the same
+> block device.  The filesystem calls set_blksize, which sets i_blksize to
+> 8192 and the minimum folio order to 1.
+> 
+> Now udev resumes, still holding the order-0 folio it allocated.  It then
+> tries to schedule a read bio and do_mpage_readahead tries to create
+> bufferheads for the folio.  Unfortunately, blocks_per_folio == 0 because
+> the page size is 4096 but the blocksize is 8192 so no bufferheads are
+> attached and the bh walk never sets bdev.  We then submit the bio with a
+> NULL block device and crash.
+> 
 
-Sorry for the late reply, I was travelling to my Easter vacation.
+Do we have a testcase for blktests or xfstests for this?  The issue is
+subtle and some of the code in the patch looks easy to accidentally
+break again (not the fault of this patch primarily).
 
-Given that Darrick somehow managed to hit this old bug due to other
-setup changes 6.15 would be great, and it looks like that's what you
-did even without an answer from me.  Thanks!
+>  	} else {
+> +		inode_lock_shared(bd_inode);
+>  		ret = blkdev_buffered_write(iocb, from);
+> +		inode_unlock_shared(bd_inode);
+
+Does this need a comment why we take i_rwsem?
+
+> +	inode_lock_shared(bd_inode);
+>  	ret = filemap_read(iocb, to, ret);
+> +	inode_unlock_shared(bd_inode);
+
+Same here.  Especially as the protection is now heavier than for most
+file systems.
+
+I also wonder if we need locking asserts in some of the write side
+functions that expect the shared inode lock and invalidate lock now?
 
