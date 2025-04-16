@@ -1,130 +1,158 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3411A233126
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 21:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A601DDDC;
+	Wed, 16 Apr 2025 21:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744839658; cv=none; b=ewisVVEmVRk/npV+joo63PefLJ6uKJaDayp9pomHdyYCQrtFFzjlaNJl2oxbMLK11Nx8M5zMD6E+XjMT1+Dgx2r8ee5Dp1/sksSQaeeSX9N3q182PvbCyRObkOV/sR9/gMLlKu1bOeWTa6LJf9S1NcWMIaQO7humptET4wAUMUQ=
+	t=1744840265; cv=none; b=liyI+5g6IB7xcsjITqvNB2hfb3ez3zLYTQzuVR6wmu7JRmWdrCIL6wXN33RSukL5rREPaPlj8p4h5rZcrElaj3G9v+r9PdS2PoV+wTfjcemJNBXx9Z8MwGqV9rQoQwI+zEgYketrOjLUCnmZdRyTqeV5AFxufFfO3Ro4IESP9bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744839658; c=relaxed/simple;
-	bh=Akuhkguz9lZ7ogV7BZwatXKI1L5hSvQMKf9rfWq+EjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gTXbZOdnwhdxpq10QP04BH4AdpcSp++D34IvtCABK5Asa9c2bRzw3vWvCPo2AmGMc2ZWcq3zN6wC3gc+pwXlV+O9YNVW9GDDdgKDw1TKvxEqvezSC5e5mtPm5hsW4FZopGUE04yQep7C4ZcmM4LJSjqqdTPVm/p2jOwDblwHppQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZVMQ/Jmh; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744840265; c=relaxed/simple;
+	bh=ml9afDM/3Yzyfwll0P+8N2de4+3ysKmPCf/iDrKlRCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pqQYstfbz37/x53+ES6vAMOtf2pYx9ZxEOA46+reb9YTuckjmcpGMQbU30N5TNOf1YiHXTnr8+nNZx4+UkxQGUSotLSmUZ4LW/G/zGGsggNdmArP/beDGKgQmyw5BHwMwuYccEcLhYHr6nOppv1UB2W2gefqEsniwnbfAKAwGWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dnKtegqF; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZVMQ/Jmh"
-Message-ID: <235030ca-93a4-4666-93f8-93f8d81ff650@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744839643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2gOdc+K/KW6LG2lJV2OfaDngWl4h/oV6BdYZhgh8d5M=;
-	b=ZVMQ/Jmhj/6fVk1TZaMu4zk0rK4L/5c8VUb5YiJ3v6Bhp9vz36HOMXyXbSzeu+BSD/SnGa
-	WXxl5wyCDtJLteOBzlJOaIUqPn9Ald2m0CcX29tmfwt8C3KCCZLZ8f1/vD+gZqZOTaLtRO
-	I6JLeES2NCsrJFdnD4VW2tJN/pns55I=
-Date: Thu, 17 Apr 2025 05:40:35 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dnKtegqF"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ac2a81e41e3so20519866b.1;
+        Wed, 16 Apr 2025 14:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744840262; x=1745445062; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UJdJaIYbEx3ZRtOqC4BE7tYp0utl0F2tybjya7bRNag=;
+        b=dnKtegqF0nShYol7EoGMd+jNgx7k4Jv76YRWQKiQQ7Fn73XNnpTJth8zdWaDq/6Uzl
+         siX/3W3xrixVBySRK0z6F67B8/diTRuZM+sdE8UPb+tw9/CEEBKvTBHvZOXJNiNV8dRS
+         dnIZ+zD8WmAJmPpdlje9GP0PXslNnYDl2wcCqLW34qTVbSzTiXFBN0dbWwFd4kuONnTW
+         9WS78dLT0GDdGTATOD4a6ykgO7MIm+qwzwG2+XxSz5PXCCpw4vsCNjJjZilrDcLdZxZT
+         j6pvdx3GfeiX547jxaVu/Ef8X0gHntOMfp1VKfoS5RAUKikkNMf7OEyM6nb+Pe5gSi7j
+         UNzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744840262; x=1745445062;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UJdJaIYbEx3ZRtOqC4BE7tYp0utl0F2tybjya7bRNag=;
+        b=XuddnNi7Ymf0hdPsNTjBCe8yAp4ALO2WGxw8iq24NsmsI+MHKU3k51hhd3M6UjLuj4
+         x0tOZcsfjFPUDUPMKrYITmNFH14alCnkRLzz0hwfmdZD8QMlc4+eeLIh9wVEF09q4Rf8
+         9qUkY+VxE8HqFXsljLtbfjWOnrrwIyzqvELvNtp6Fnhfph1ve9x1YThyPzud5R1Dlr6N
+         ETbkl6PBv4cgVMtUMg1w/5TasB+uzRec1mSlXCKjXSgYvP1sd/zW5I4oOW3qCkiwa00h
+         xbe9rRCGXR1z5K1ydIlX8WkEat2CY5oSg+eZ93BqODmSyzVYJWtOWfyJIUzubbhKv2GS
+         OmqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgppGHn4kvheA8GnwWSne7uyEs4OLbRdF/Unt7Uw4Is8QF8x8Yb76+DCMdM4UcQl5/e6LFcieECHBm/Q==@vger.kernel.org, AJvYcCXpsFtsCIHvfMBZTM7kmp8sE2nahdHCj1F/LK1YStnJUrEP5VkXuRCRcS1+D1XZW+IXm6QQafaMlysYeVIP0g==@vger.kernel.org, AJvYcCXvyM6HQHIHL91huSuE/ZK90bFeqiHLNhljEDJqoDohihG7Er2mygQjBahPn2XhAJ8o1AMRp6E3gWvYu9yO@vger.kernel.org
+X-Gm-Message-State: AOJu0YydtQO1QvfPHGTLc8a2u7VlMfpAjzJkV6hMI7S+JkEW0aM4Ogn0
+	V2GGt0dryX50+yfBamIK7VJNiN120j30QuZY6mDMM1ZNmnXkKyTS
+X-Gm-Gg: ASbGncvp/B8EASerGItDDO+XccBFehz7GPREsZWUQOPsRD/hisOPfqqsTfXBK22Wf32
+	IHyyO124lPjRFLOeJrUBUwUT4xaYg6f12SHapDSVZcRMY4ht/1UwgCclRRBAFtB813sKpN7mljC
+	rOxZvB6sI6LWzv3+ynEwX8+FTay/lsiTeV0fkmB6zWgzRst2FldC9iZOKdhV9IjC7v5LjB4mrZ9
+	oOJvfgkUJY6HgdyP+8SghRavTQWM+Ncr+gheJISpD1so2+4QlNM5ZszG3OYeLqHMeWX/wYlklAy
+	KURQBvDXSHl3d6oXb+9T3PkrzWgIjRYOCqVoSg7gxywiBfWacvaev9HFDNqepTYbJIk9dWgFZxo
+	svC78Zor0
+X-Google-Smtp-Source: AGHT+IFK4dqVh9IwS7sEmyZQt6Kkrhj7u3AOMF7Z1XeZVWstA/f0rOPaMBIQ6cg6ig8xLchc+kWfkw==
+X-Received: by 2002:a17:906:d542:b0:aca:e0b7:de03 with SMTP id a640c23a62f3a-acb428f20d5mr382338566b.16.1744840261325;
+        Wed, 16 Apr 2025 14:51:01 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36f527ee8sm9378835a12.73.2025.04.16.14.51.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 14:51:00 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id CBD3ABE2DE0; Wed, 16 Apr 2025 23:50:59 +0200 (CEST)
+Date: Wed, 16 Apr 2025 23:50:59 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lstoakes@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+	Jeff Layton <jlayton@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Hillf Danton <hdanton@sina.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	regressions@lists.linux.dev,
+	"stable@vger.kernel.org Bernd Rinn" <bb@rinn.ch>,
+	Karri =?iso-8859-1?Q?H=E4m=E4l=E4inen?= <kh.bugreport@outlook.com>,
+	Milan Broz <gmazyland@gmail.com>,
+	Cameron Davidson <bugs@davidsoncj.id.au>, Markus <markus@fritz.box>
+Subject: Re: [regression 6.1.y] Regression from 476c1dfefab8 ("mm: Don't pin
+ ZERO_PAGE in pin_user_pages()") with pci-passthrough for both KVM VMs and
+ booting in xen DomU
+Message-ID: <aAAmQ-sRQhejItzQ@eldamar.lan>
+References: <Z_6sh7Byddqdk1Z-@eldamar.lan>
+ <20250416142645.4392a644.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH 00/11] pcache: Persistent Memory Cache for Block
- Devices
-To: Jens Axboe <axboe@kernel.dk>, Dan Williams <dan.j.williams@intel.com>,
- hch@lst.de, gregory.price@memverge.com, John@groves.net,
- Jonathan.Cameron@huawei.com, bbhushan2@marvell.com, chaitanyak@nvidia.com,
- rdunlap@infradead.org, agk@redhat.com, snitzer@kernel.org,
- mpatocka@redhat.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, linux-bcache@vger.kernel.org,
- nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
-References: <20250414014505.20477-1-dongsheng.yang@linux.dev>
- <67fe9ea2850bc_71fe294d8@dwillia2-xfh.jf.intel.com.notmuch>
- <15e2151a-d788-48eb-8588-1d9a930c64dd@kernel.dk>
- <07f93a57-6459-46e2-8ee3-e0328dd67967@linux.dev>
- <d3231630-9445-4c17-9151-69fe5ae94a0d@kernel.dk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Dongsheng Yang <dongsheng.yang@linux.dev>
-In-Reply-To: <d3231630-9445-4c17-9151-69fe5ae94a0d@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416142645.4392a644.alex.williamson@redhat.com>
 
-+ccing md-devel
+Hi Alex,
 
-On 2025/4/16 23:10, Jens Axboe wrote:
-> On 4/16/25 12:08 AM, Dongsheng Yang wrote:
->> On 2025/4/16 9:04, Jens Axboe wrote:
->>> On 4/15/25 12:00 PM, Dan Williams wrote:
->>>> Thanks for making the comparison chart. The immediate question this
->>>> raises is why not add "multi-tree per backend", "log structured
->>>> writeback", "readcache", and "CRC" support to dm-writecache?
->>>> device-mapper is everywhere, has a long track record, and enhancing it
->>>> immediately engages a community of folks in this space.
->>> Strongly agree.
->>
->> Hi Dan and Jens,
->> Thanks for your reply, that's a good question.
->>
->>      1. Why not optimize within dm-writecache?
->>  From my perspective, the design goal of dm-writecache is to be a
->> minimal write cache. It achieves caching by dividing the cache device
->> into n blocks, each managed by a wc_entry, using a very simple
->> management mechanism. On top of this design, it's quite difficult to
->> implement features like multi-tree structures, CRC, or log-structured
->> writeback. Moreover, adding such optimizations?especially a read
->> cache?would deviate from the original semantics of dm-writecache. So,
->> we didn't consider optimizing dm-writecache to meet our goals.
->>
->>      2. Why not optimize within bcache or dm-cache?
->> As mentioned above, dm-writecache is essentially a minimal write
->> cache. So, why not build on bcache or dm-cache, which are more
->> complete caching systems? The truth is, it's also quite difficult.
->> These systems were designed with traditional SSDs/NVMe in mind, and
->> many of their design assumptions no longer hold true in the context of
->> PMEM. Every design targets a specific scenario, which is why, even
->> with dm-cache available, dm-writecache emerged to support DAX-capable
->> PMEM devices.
->>
->>      3. Then why not implement a full PMEM cache within the dm framework?
->> In high-performance IO scenarios?especially with PMEM hardware?adding
->> an extra DM layer in the IO stack is often unnecessary. For example,
->> DM performs a bio clone before calling __map_bio(clone) to invoke the
->> target operation, which introduces overhead.
->>
->> Thank you again for the suggestion. I absolutely agree that leveraging
->> existing frameworks would be helpful in terms of code review, and
->> merging. I, more than anyone, hope more people can help review the
->> code or join in this work. However, I believe that in the long run,
->> building a standalone pcache module is a better choice.
-> I think we'd need much stronger reasons for NOT adopting some kind of dm
-> approach for this, this is really the place to do it. If dm-writecache
-> etc aren't a good fit, add a dm-whatevercache for it? If dm is
-> unnecessarily cloning bios when it doesn't need to, then that seems like
-> something that would be worthwhile fixing in the first place, or at
-> least eliminate for cases that don't need it. That'd benefit everyone,
-> and we would not be stuck with a new stack to manage.
->
-> Would certainly be worth exploring with the dm folks.
+On Wed, Apr 16, 2025 at 02:26:45PM -0600, Alex Williamson wrote:
+> On Tue, 15 Apr 2025 20:59:19 +0200
+> Salvatore Bonaccorso <carnil@debian.org> wrote:
+> 
+> > Hi
+> > 
+> > [Apologies if this has been reported already but I have not found an
+> > already filled corresponding report]
+> > 
+> > After updating from the 6.1.129 based version to 6.1.133, various
+> > users have reported that their VMs do not boot anymore up (both KVM
+> > and under Xen) if pci-passthrough is involved. The reports are at:
+> > 
+> > https://bugs.debian.org/1102889
+> > https://bugs.debian.org/1102914
+> > https://bugs.debian.org/1103153
+> > 
+> > Milan Broz bisected the issues and found that the commit introducing
+> > the problems can be tracked down to backport of c8070b787519 ("mm:
+> > Don't pin ZERO_PAGE in pin_user_pages()") from 6.5-rc1 which got
+> > backported as 476c1dfefab8 ("mm: Don't pin ZERO_PAGE in
+> > pin_user_pages()") in 6.1.130. See https://bugs.debian.org/1102914#60
+> > 
+> > #regzbot introduced: 476c1dfefab8b98ae9c3e3ad283c2ac10d30c774
+> > 
+> > 476c1dfefab8b98ae9c3e3ad283c2ac10d30c774 is the first bad commit
+> > commit 476c1dfefab8b98ae9c3e3ad283c2ac10d30c774
+> > Author: David Howells <dhowells@redhat.com>
+> > Date:   Fri May 26 22:41:40 2023 +0100
+> > 
+> >     mm: Don't pin ZERO_PAGE in pin_user_pages()
+> > 
+> >     [ Upstream commit c8070b78751955e59b42457b974bea4a4fe00187 ]
+> 
+> It's a bad backport, I've debugged and posted the fix for stable here:
+> 
+> https://lore.kernel.org/all/20250416202441.3911142-1-alex.williamson@redhat.com/
 
-well, introducing dm-pcache (assuming we use this name) could, on one 
-hand, attract more users and developers from the device-mapper community 
-to pay attention to this project, and on the other hand, serve as a way 
-to validate or improve the dm framework’s performance in 
-high-performance I/O scenarios. If necessary, we can enhance the dm 
-framework instead of bypassing it entirely. This indeed sounds like 
-something that would “benefit everyone.”
+Thank you, that worked (replying here as well mainly to fix my mistake
+in the CC to stable@vger.kernel.org, which got truncated to
+table@vger.kernel.org in my initial submission).
 
-Hmm, I will seriously consider this approach.
 
-Hi Alasdair, Mike, Mikulas,  Do you have any suggestions?
+> 
+> Thanks,
+> Alex
+> 
 
-Thanx
-
->
+-- 
+  .-.  Salvatore Bonaccorso --------------- Debian GNU/Linux Developer
+  oo|  ----------------------------------------- http://www.debian.org
+ /`'\  GPG key ID: 0x789D6F057FD863FE --------------------------------
+(\_;/) Fingerprint: 04A4 407C B914 2C23 030C  17AE 789D 6F05 7FD8 63FE
