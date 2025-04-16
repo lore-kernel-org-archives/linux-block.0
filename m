@@ -1,229 +1,324 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC7826AEC
-	for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 08:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744791409; cv=fail; b=TrOxtY6WpQiM0eURYAuRv8Zu88SG8SMwo5IJ47UfMrFkSma5Cpr3brJPv2QU+VlfwoCsU2aSYT+OzalkGjgBP6MBrIg1gun/xlBON0FWkBRoY2AoZWnN7YUzaSDRoD6XwG6VuLmtzzfDSILslP5amt4Tegd7AYVUvC8zHjUmxu0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744791409; c=relaxed/simple;
-	bh=2tuA5i+qnTkveR7BhuTqjWYaXlmfwEhxKGY6fNGy8Uk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DxPjWMnJjllOp/XJyEG7BcVrC+NEGA/yegdrRvl++YuW03kAgJbGOXTgijJE3Ee2zS2XZTi8c4cgkepuicTvF1acINAU8H6NyTyBrktSmZAVEJGyaqhV4rUKipl8hOliGeOz3FYwsPXAQJHpW9j5dCUOBfo6geidVU81QNeYQTY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Jg7vHlFx; arc=fail smtp.client-ip=40.107.220.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Jg7vHlFx"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UPHsvjj8Vf9SziO1gLctdmj3DcPhYRxitE+XJsNm401JdKkn+bZfly1ungiEaPfbcRF/T11C6fNGIo/ksScBDiqnwf7+8Ud0r0nitqFm5AKseVu8PPRAMmGWT4vbbF/LVVeL8qkftkYrngkVggLWISOrktljTB3toKqnNiZ1UVNk0/RUpWpWu8Tj8L7xEW4JFo2IjlHH2DgsHJVRr/raOf5AfM/x3BbXlOwk7p2BGTVOPgZqYT9HCCpI7Zzv26KMRz1qHjZEeuXFcZsw5vYprVIb1Oz55QheRKlq2MNXJIafNie8aUCE12dsT2APjs1amFEbqLu5m8IXwm9xApTVhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2tuA5i+qnTkveR7BhuTqjWYaXlmfwEhxKGY6fNGy8Uk=;
- b=vs4A32J45Ojx9KPXGs+U870kqLwnBAfKqzo8dHJ3XKZMCYdivPL/0JtWjF035omlC0jR8ydjvkd8I2/BAezHj6tgm03FhHHLGyj8GxEz0K/oKQElflY2ajCGfIg5ujUGaOH9kEYzYy9mJx1Err9GMTjIACn6b4yKpTu/5s9d9Ma9tzDZNJiafPZ9qpQLZYrJdxgv8yY4XYwhCzRPMOB5rpnErRayxN48Jh8oOOqkRe9CPENUbQozCjWjI9epjUJi1sPMQ9YlydePZfjL9PzjLTngf62ZSaaIgq4FfQ54OlytNjFXVah8l/nPbcLzf8wThLSz2pIZC/shI1iIlXipeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2tuA5i+qnTkveR7BhuTqjWYaXlmfwEhxKGY6fNGy8Uk=;
- b=Jg7vHlFxoswK+WbT+vMI0y7lgLX6xxZNdm5pby/1lf8gvVdQoHL3SOQpkgrG79h6vW0SvYtUaKVcLutN6C5I7tLGaAzzg/t/JsUfg+15ZxR8G3xwfiMwKoc4uNrsrBc7pIlTvP5Yp+vWRHST8NGGRZl70EqbyZbhqTZS8yHnWOCiAhQtlziYF8nbBdelH7KlogJdFv47XQ5/Rg39IUWz5GPrIZpSR+K43nymiU3cXNNl7V1BdoUguHOKNyo9fzHmcjK4M0ti6Tkiqta6mQ53fpojzLIeiH13bKLefDm6lA58VTBcjZtiBZnBKVH8FpyaJnyczg/xZa8NX/L1jIW4gA==
-Received: from DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) by
- IA1PR12MB7615.namprd12.prod.outlook.com (2603:10b6:208:428::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Wed, 16 Apr
- 2025 08:16:44 +0000
-Received: from DM4PR12MB6328.namprd12.prod.outlook.com
- ([fe80::35dd:a6f9:6b74:3caa]) by DM4PR12MB6328.namprd12.prod.outlook.com
- ([fe80::35dd:a6f9:6b74:3caa%4]) with mapi id 15.20.8632.030; Wed, 16 Apr 2025
- 08:16:44 +0000
-From: Yoav Cohen <yoav@nvidia.com>
-To: Ming Lei <ming.lei@redhat.com>, Uday Shankar <ushankar@purestorage.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: ublk: Graceful Upgrade of ublk server application
-Thread-Topic: ublk: Graceful Upgrade of ublk server application
-Thread-Index: AQHbrd5cAekQDakHykq2J5wD805DDLOkkQSAgACQ35uAAFXigIAADS2AgABtzQc=
-Date: Wed, 16 Apr 2025 08:16:44 +0000
-Message-ID:
- <DM4PR12MB632890760804D06B3CBC357AA9BD2@DM4PR12MB6328.namprd12.prod.outlook.com>
-References:
- <DM4PR12MB63282BE4C94D28AA2E1CACA0A9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
- <Z_49m8awtNFsY8pl@fedora>
- <DM4PR12MB63285A6617D8A9B9F22B912BA9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
- <Z/7/LTSxqLH7JgAl@dev-ushankar.dev.purestorage.com> <Z_8KO5uJfkB-SKvT@fedora>
-In-Reply-To: <Z_8KO5uJfkB-SKvT@fedora>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR12MB6328:EE_|IA1PR12MB7615:EE_
-x-ms-office365-filtering-correlation-id: 93b60298-94a1-422b-386f-08dd7cbf0641
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?3S8Kd/1xhgH6AnQ+wb/xz6r00Gs1DUz47g9vCr0CuhwMaaLIIA0QHsETIM?=
- =?iso-8859-1?Q?3fmgDDJN/sc3kQGTdZmXQYZiIsyr6r41o8Eh18qiOjsYBefJcOhjrSjaDc?=
- =?iso-8859-1?Q?6MB3HUDAwutNlmjiHOyUaYjNS66ZZRL0oQ7UJx2nuIb+1U/Qf5PUCKeMH9?=
- =?iso-8859-1?Q?J01H8h2sypvtOvWOy5r3SmTA0T3a8J4Rg92Hx1zDv+KlNINuOesd/wUgo7?=
- =?iso-8859-1?Q?/gOgZXsdW446Wf5ChAmQ9+A70J4dj3TXrXEfDc8ddkl3tIsJowpaSPxP6/?=
- =?iso-8859-1?Q?Y/jLXNqhuXLTywMPDCmr+9WWfIeUMpWqJMZXzGKyrzVANHepduFxSIqdyb?=
- =?iso-8859-1?Q?+Sc2AoYls4lbchJac0Kb+7FyOlrQa8pFniMmJJ5QDuU9Dvs8Bo29Eo8Wih?=
- =?iso-8859-1?Q?09Pk2cjioKMQBObit3HGCl63kkkzjTPDhXULgfMURISMyVj9lw4Ue6TI42?=
- =?iso-8859-1?Q?+Hr8GEVycxOk8dajxXnxzo1bu1EPdUrXFPo/vQLDV9cQWcOPl4vlFR5P5D?=
- =?iso-8859-1?Q?50dSxmMpz1vF4r4mEj2hPH2ehzV3sxVstiKQkxGBIXoOKT1DDOfZCYv4Tn?=
- =?iso-8859-1?Q?cqCqm+elb/Rq7Vx95gx5qAs/eb2lHsc4aR0pK9exuUdWB6mWvTp3kNwjTR?=
- =?iso-8859-1?Q?NA++w+3Kvl9Lf+5qcvbrxtn4Y+HKH7ZePLshwTMrpRHjdYkkv9HlIwxYtI?=
- =?iso-8859-1?Q?pUu9ed96cUHi/lClEERCjl4YDzMAcYy9KkzHsrJmWgjXqXuv/fZ0GTqbZb?=
- =?iso-8859-1?Q?E5Wu44RFfBFsTF4iRdC28E7USlNL9CCWg8YY2ybOmEsHqJacKW4ONqpuVC?=
- =?iso-8859-1?Q?UCAbbhsfSyO6lzFNp5A4qQN0nLjBYpSB+ugHhP7sm0DWOxC2xXwX36fTcu?=
- =?iso-8859-1?Q?fEUe4llfCbvCBSckmHyI4sdUXAq8qygNPe+yA4yALBwmc4WdhvCE5oMuAJ?=
- =?iso-8859-1?Q?LMm+E+B8+vLlB4jjseMSRhUDUKdkSYA78hkWMd2lUj28JQ29CLl/sIX9Nf?=
- =?iso-8859-1?Q?jIcUt0sqZOx/86tF3eRXyFCkkSqxZbfrM67O2XW9UQukg/8iye2YYC4Re+?=
- =?iso-8859-1?Q?AlyEI8pnI8Tm6tsvoDyPrIrIRI5twlUJOgmGRyXcHSo1k+RygN2wrTtPJ/?=
- =?iso-8859-1?Q?QCcq04gNUhGkmxeHJwhXJHQLJsa1dMc6O1LgKvf1F+yBPQFKqAyKfIPLgJ?=
- =?iso-8859-1?Q?azGVcbcMqH4ZXLF2QpoGSGKtIfFZ/22RpYpnZOmlVsLm4icNc1qLbiKJVY?=
- =?iso-8859-1?Q?7YLyFVEbHzdZ0LE2KK9xwpPJREw3G7t5SBZsO9kw+LkPywWJDrqrXoeUfm?=
- =?iso-8859-1?Q?SM5+f77wLoiZ/uCWAZ56rs00lGSqxt0mEvM0RYbr4pcZJ5k5R6wB0AWdd9?=
- =?iso-8859-1?Q?Dzefd3tjcKaqI/L7lre2mS1djlFhczMg8/T+IrMCuDc/9LMhj8tuEY6Dl1?=
- =?iso-8859-1?Q?PwDg0BgOi7T3+CETtTQZ+P8sYUYNyhYNwiHNO5u+wM1aFmSEGjXnv+0iwr?=
- =?iso-8859-1?Q?dmBjJAFoHH66dQus4fXrdeUcFB+p4RfR/i+GKC3cZMKX1SpT9mXEqeAcJP?=
- =?iso-8859-1?Q?fpDwlyg=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6328.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?aTzRepHt+psDo6Ct039Hi7NMiy8tI2YE17FUUCGKrwnz+x6j9VbOaXUEU8?=
- =?iso-8859-1?Q?acidu3Yx7JC41a/80bXEGw9KcO/QSfChOTLuWg7dr3LecU9KNLsKLNiSpO?=
- =?iso-8859-1?Q?ART3uDHryO2sNgLLFFPGTlqMCpyYtLvIfSAkfMTsNYNVv+MFZ6qd5KbftU?=
- =?iso-8859-1?Q?I56eDYqVic3Izo+lUHAbF7dNGPgr/aeRLzDDdKEG8IPjyL28kX6wE8gZcP?=
- =?iso-8859-1?Q?3PejD806NQNQ/WBtLRR5ZH8A+kkOrl6tGHj/PB9W8pWZYFN4AHIdpii/Mm?=
- =?iso-8859-1?Q?akmfvDJQGvgVjUjyDX4MuSVj9njyHOphnVDJqaULFS4D/Ihvgw290epDhV?=
- =?iso-8859-1?Q?HwkoJ89QoGY/5i2wkWRj3jX+Bo5BDvRuHf6JI9Z2FerE3wy7FUxXuSRybX?=
- =?iso-8859-1?Q?i+YIbIGZrP1JwkscJOaGodd8iF8PRd35VHlc3P7NPTnigyks2SIVCat7GK?=
- =?iso-8859-1?Q?N4IKSFpmvanT8slSDgZE76tLESd3laIrTE7nG1AuTfmB2AdDCkwu9nAsGP?=
- =?iso-8859-1?Q?3pjn5kYJqXWt5YUsxpbxgEnhfgLjLRbRPzcJdcGPAGOtvYxJJ8CYD/G6EI?=
- =?iso-8859-1?Q?aeoIUttVlJg1cPlxNQE4QeCfJ6HzBRfmlehlJHdDAAoI30RzoGwD+Otbj9?=
- =?iso-8859-1?Q?XoY18/cjh24rbxquEPQzZPH8TIvqORtmXshSQfifPD+D7SgalujaczyGgO?=
- =?iso-8859-1?Q?0L1CizMGps5TKF5Y3ezBcuBA4Pf2lR/zvG7dbj0yjheWWWJcj7c7pwZTkg?=
- =?iso-8859-1?Q?2hqmJCwYA75Xt8f1z2PEMWIJrsmXFwdt2p8b/F9DP7uDZk+mOX0Jlf4xRi?=
- =?iso-8859-1?Q?8dyWMKsJLd0VNkc7wJwZCDUG8ZhC9VVdp6qL4K1ewiJtDJ5+Y8FyGdfFiU?=
- =?iso-8859-1?Q?XbjeOHsmwGABPOqmPqJrWDUD36bqymHqM/lImji1SL1DbfgrjLRhDPqB3C?=
- =?iso-8859-1?Q?Ra4lBJ8kKhJezZVV7i0w3sg9N7XyJ1OOnhgz/SmQ7MVQXWnVyMGn5YflU1?=
- =?iso-8859-1?Q?FjWfqphdNKJSd3YHQtI4z2O1ZT6ugd1VQL2RoENcBbZUFH1uH2Cg1id3ee?=
- =?iso-8859-1?Q?Om4GgbVM7XFdl7BPrksWigvF6VnnIARp6moK2Ans55pFq3twfPYoBBCxUc?=
- =?iso-8859-1?Q?TVgiMo4eMdRjZDfoBtb1NrM1iGeZSMX1k6g8ThwRJbDBVrTkcOxz7+EdDt?=
- =?iso-8859-1?Q?54mk+F2k/6TMTBP410f9nMnMoq9s9bYwn4ZlGGuZ/SmsjU6aQc0gk385oG?=
- =?iso-8859-1?Q?KMmorld6Q9NYyhbuZzk52yREGdpeauJ9ddj2gkMRRM/6uyHQGVB1R/ui2G?=
- =?iso-8859-1?Q?qB6rPiz1zf7vYw2MIDePbTuFRmZsoP8mvfa2egH9gWsK/eDAD7CUkJFlw4?=
- =?iso-8859-1?Q?0gGlL9hkQE5o2yhMTPmswVsXOCpUee7oEHB6VZV/Z8YaGmyVzj7oagC+WU?=
- =?iso-8859-1?Q?0ZFA3Z1yMbJRsJwRlif64SXKVIoaMGXBoUD3PVP/gj+qOqL6f2gOltUZaY?=
- =?iso-8859-1?Q?zrzzLCvIGEHpsdQ8JIx/uYqfHKHX9ERkxD74LBxa55aw/kO4dc9qmwJifm?=
- =?iso-8859-1?Q?8K2ftMb9kHIEFI4tk2xfgzj09IyOJn0SqKTOzCe7EXwA/Vuci35AN8PYXW?=
- =?iso-8859-1?Q?D0fttG0FQQcxc=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E2F158520;
+	Wed, 16 Apr 2025 08:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744791603; cv=none; b=lO29YJC9cIgBFOYci8Ab7iaJF/53LuTzjaNV78FbA+QoVOu2oYgdJ6foScCOYJjL+ESOlN/fJqPAeYejFDL5lk2IM5hn4tAthgzDsP8EhDC7FtXPF2syLW60NKRqPE4Tr4rYOZwMFtsYqfUQSy16bsHndilyAPYZ9OK7im0Mw3k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744791603; c=relaxed/simple;
+	bh=LEdsZgYyyJn3eLhzBrsi9GDJWL/o/T+gL45WIcdg/HM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=LPPG7UOFpcC1AFIZ3a6QZZ+Tc4A9yGV1olfmI4zClqv4mBkZHN5QSTaH0qH5VGTZ5hx7v+Wylj/h+BAe39u6sw2AOicIs+NkjjUuw/iXdky4Vq/HKEqSOZQXgaOI+kf0HtcnuE+4JDI0LiHeHlZqnNsdpx4n6wGrIZCFccfolmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zcv834t74z4f3jYS;
+	Wed, 16 Apr 2025 16:19:31 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 5D9011A06DC;
+	Wed, 16 Apr 2025 16:19:55 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgC3Gl8paP9nR7WNJg--.53124S3;
+	Wed, 16 Apr 2025 16:19:55 +0800 (CST)
+Subject: Re: [PATCH 2/4] md: add a new api sync_io_depth
+To: Xiao Ni <xni@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
+ <20250412073202.3085138-3-yukuai1@huaweicloud.com>
+ <CALTww29xMyNq0SpPGvVqp6YPmCVu+N+d_neeJD_mogiviiZpYw@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bf3deb80-4ed2-21b4-e919-a96cf329e947@huaweicloud.com>
+Date: Wed, 16 Apr 2025 16:19:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6328.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93b60298-94a1-422b-386f-08dd7cbf0641
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2025 08:16:44.1540
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6am9sNUbWd7OKEIvvA5nX5Rh4xsQKK5EjwU6pNXsPUOveJVgwMC4hukjLKM/ta+Z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7615
+In-Reply-To: <CALTww29xMyNq0SpPGvVqp6YPmCVu+N+d_neeJD_mogiviiZpYw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgC3Gl8paP9nR7WNJg--.53124S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw18uF47CF15Xr17Cw4xXrb_yoW3WFWfpa
+	yUJFW3Gr4UXrZxXry2qFsxCa4Sqw4fKrWjy3y7G3WfJFnI9r9xGF1FgrW5WFykua4rCrn2
+	v3WUJa9xua1ftrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,=0A=
-=0A=
-The use case is as you say to replace the binary (update) without making th=
-e bdev to disappear.=0A=
-Currently I don't even use the user_copy(to avoid the 1 more system call) s=
-o the io buffer is also part of the sqe which is prevent me from free it fr=
-om userspace perspective.=0A=
-So yes, even ABORT_URING_CMD by given tag can be enough.=0A=
-What do you think?=0A=
-=0A=
-=0A=
-Thank you=0A=
-________________________________________=0A=
-From: Ming Lei <ming.lei@redhat.com>=0A=
-Sent: Wednesday, April 16, 2025 4:39 AM=0A=
-To: Uday Shankar=0A=
-Cc: Yoav Cohen; linux-block@vger.kernel.org; axboe@kernel.dk=0A=
-Subject: Re: ublk: Graceful Upgrade of ublk server application=0A=
-=0A=
-External email: Use caution opening links or attachments=0A=
-=0A=
-=0A=
-On Tue, Apr 15, 2025 at 06:51:57PM -0600, Uday Shankar wrote:=0A=
-> On Tue, Apr 15, 2025 at 07:46:51PM +0000, Yoav Cohen wrote:=0A=
-> > Hi Ming,=0A=
-> >=0A=
-> > Thank you for the fast reply.=0A=
-=0A=
-oops, looks I didn't get your reply, :-(=0A=
-=0A=
-> > To be clear, I don't want calling DELETE_DEV or STOP_DEV as I want the =
-kernel bdev will be stay while upgrading the ublk server application.=0A=
-=0A=
-Can you explain a bit what is upgrading? Is it simple application binary=0A=
-replacement?=0A=
-=0A=
-> > It would be nice to have a nice way to have something like FREEZE_DEV t=
-hat we may use which will also make all the cmds back with ABORT result but=
- both block and char device will be stay until a new userspace application =
-will reconnect.=0A=
->=0A=
-=0A=
-Looks one reasonable requirement, maybe SUSPEND_DEV and RESUME_DEV command,=
-=0A=
-which exists on RAID/DM too.=0A=
-=0A=
-Also when device is in (new)suspended state, parameter can be re-configured=
-.=0A=
-=0A=
-Most of recover code can be reused, in theory it shouldn't be hard to=0A=
-support, but one trouble could be what if both uring exiting and SUSPEND_DE=
-V=0A=
-happen at the same time? This corner case need to be take into account.=0A=
-=0A=
-I'd suggest to cover more requirements given it should be one generic=0A=
-interface.=0A=
-=0A=
-> Have you taken a look at the recovery flags? These offer slightly=0A=
-> different behaviors around how I/O is handled while the ublk server is=0A=
-> dying/when it is dead, but they all keep the block device up even after=
-=0A=
-> the ublk server exits.=0A=
->=0A=
-> The flags are documented at https://docs.kernel.org/block/ublk.html=0A=
-=0A=
-The recovery mechanism is triggered passively, and here the upgrading=0A=
-needs to suspend device voluntarily & gracefully.=0A=
-=0A=
-Maybe add one control command of COOP_CANCEL_FOR_RECOVERY or ABORT_URING_CM=
-D=0A=
-to abort active uring_cmd for triggering recovery from userspace? Which loo=
-ks=0A=
-much easier. But it need cooperation between ublk driver and server.=0A=
-=0A=
-=0A=
-Thanks,=0A=
-Ming=0A=
-=0A=
+Hi,
+
+在 2025/04/16 13:32, Xiao Ni 写道:
+> On Sat, Apr 12, 2025 at 3:39 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Currently if sync speed is above speed_min and below speed_max,
+>> md_do_sync() will wait for all sync IOs to be done before issuing new
+>> sync IO, means sync IO depth is limited to just 1.
+>>
+>> This limit is too low, in order to prevent sync speed drop conspicuously
+>> after fixing is_mddev_idle() in the next patch, add a new api for
+>> limiting sync IO depth, the default value is 32.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   drivers/md/md.c | 103 +++++++++++++++++++++++++++++++++++++++---------
+>>   drivers/md/md.h |   1 +
+>>   2 files changed, 85 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/drivers/md/md.c b/drivers/md/md.c
+>> index 438e71e45c16..8966c4afc62a 100644
+>> --- a/drivers/md/md.c
+>> +++ b/drivers/md/md.c
+>> @@ -111,32 +111,42 @@ static void md_wakeup_thread_directly(struct md_thread __rcu *thread);
+>>   /* Default safemode delay: 200 msec */
+>>   #define DEFAULT_SAFEMODE_DELAY ((200 * HZ)/1000 +1)
+>>   /*
+>> - * Current RAID-1,4,5 parallel reconstruction 'guaranteed speed limit'
+>> - * is 1000 KB/sec, so the extra system load does not show up that much.
+>> - * Increase it if you want to have more _guaranteed_ speed. Note that
+>> - * the RAID driver will use the maximum available bandwidth if the IO
+>> - * subsystem is idle. There is also an 'absolute maximum' reconstruction
+>> - * speed limit - in case reconstruction slows down your system despite
+>> - * idle IO detection.
+> 
+> These comments are useful. They only describe the meaning of those
+> control values. Is it good to keep them?
+
+Sure
+> 
+>> + * Background sync IO speed control:
+>>    *
+>> - * you can change it via /proc/sys/dev/raid/speed_limit_min and _max.
+>> - * or /sys/block/mdX/md/sync_speed_{min,max}
+>> + * - below speed min:
+>> + *   no limit;
+>> + * - above speed min and below speed max:
+>> + *   a) if mddev is idle, then no limit;
+>> + *   b) if mddev is busy handling normal IO, then limit inflight sync IO
+>> + *   to sync_io_depth;
+>> + * - above speed max:
+>> + *   sync IO can't be issued;
+>> + *
+>> + * Following configurations can be changed via /proc/sys/dev/raid/ for system
+>> + * or /sys/block/mdX/md/ for one array.
+>>    */
+>> -
+>>   static int sysctl_speed_limit_min = 1000;
+>>   static int sysctl_speed_limit_max = 200000;
+>> -static inline int speed_min(struct mddev *mddev)
+>> +static int sysctl_sync_io_depth = 32;
+>> +
+>> +static int speed_min(struct mddev *mddev)
+>>   {
+>>          return mddev->sync_speed_min ?
+>>                  mddev->sync_speed_min : sysctl_speed_limit_min;
+>>   }
+>>
+>> -static inline int speed_max(struct mddev *mddev)
+>> +static int speed_max(struct mddev *mddev)
+>>   {
+>>          return mddev->sync_speed_max ?
+>>                  mddev->sync_speed_max : sysctl_speed_limit_max;
+>>   }
+>>
+>> +static int sync_io_depth(struct mddev *mddev)
+>> +{
+>> +       return mddev->sync_io_depth ?
+>> +               mddev->sync_io_depth : sysctl_sync_io_depth;
+>> +}
+>> +
+>>   static void rdev_uninit_serial(struct md_rdev *rdev)
+>>   {
+>>          if (!test_and_clear_bit(CollisionCheck, &rdev->flags))
+>> @@ -293,14 +303,21 @@ static const struct ctl_table raid_table[] = {
+>>                  .procname       = "speed_limit_min",
+>>                  .data           = &sysctl_speed_limit_min,
+>>                  .maxlen         = sizeof(int),
+>> -               .mode           = S_IRUGO|S_IWUSR,
+>> +               .mode           = 0644,
+> 
+> Is it better to use macro rather than number directly here?
+
+checkpatch will suggest 0644 over S_IRUGO|S_IWUSR.
+
+Thanks,
+Kuai
+
+> 
+>>                  .proc_handler   = proc_dointvec,
+>>          },
+>>          {
+>>                  .procname       = "speed_limit_max",
+>>                  .data           = &sysctl_speed_limit_max,
+>>                  .maxlen         = sizeof(int),
+>> -               .mode           = S_IRUGO|S_IWUSR,
+>> +               .mode           = 0644,
+>> +               .proc_handler   = proc_dointvec,
+>> +       },
+>> +       {
+>> +               .procname       = "sync_io_depth",
+>> +               .data           = &sysctl_sync_io_depth,
+>> +               .maxlen         = sizeof(int),
+>> +               .mode           = 0644,
+>>                  .proc_handler   = proc_dointvec,
+>>          },
+>>   };
+>> @@ -5091,7 +5108,7 @@ static ssize_t
+>>   sync_min_show(struct mddev *mddev, char *page)
+>>   {
+>>          return sprintf(page, "%d (%s)\n", speed_min(mddev),
+>> -                      mddev->sync_speed_min ? "local": "system");
+>> +                      mddev->sync_speed_min ? "local" : "system");
+>>   }
+>>
+>>   static ssize_t
+>> @@ -5100,7 +5117,7 @@ sync_min_store(struct mddev *mddev, const char *buf, size_t len)
+>>          unsigned int min;
+>>          int rv;
+>>
+>> -       if (strncmp(buf, "system", 6)==0) {
+>> +       if (strncmp(buf, "system", 6) == 0) {
+>>                  min = 0;
+>>          } else {
+>>                  rv = kstrtouint(buf, 10, &min);
+>> @@ -5120,7 +5137,7 @@ static ssize_t
+>>   sync_max_show(struct mddev *mddev, char *page)
+>>   {
+>>          return sprintf(page, "%d (%s)\n", speed_max(mddev),
+>> -                      mddev->sync_speed_max ? "local": "system");
+>> +                      mddev->sync_speed_max ? "local" : "system");
+>>   }
+>>
+>>   static ssize_t
+>> @@ -5129,7 +5146,7 @@ sync_max_store(struct mddev *mddev, const char *buf, size_t len)
+>>          unsigned int max;
+>>          int rv;
+>>
+>> -       if (strncmp(buf, "system", 6)==0) {
+>> +       if (strncmp(buf, "system", 6) == 0) {
+>>                  max = 0;
+>>          } else {
+>>                  rv = kstrtouint(buf, 10, &max);
+>> @@ -5145,6 +5162,35 @@ sync_max_store(struct mddev *mddev, const char *buf, size_t len)
+>>   static struct md_sysfs_entry md_sync_max =
+>>   __ATTR(sync_speed_max, S_IRUGO|S_IWUSR, sync_max_show, sync_max_store);
+>>
+>> +static ssize_t
+>> +sync_io_depth_show(struct mddev *mddev, char *page)
+>> +{
+>> +       return sprintf(page, "%d (%s)\n", sync_io_depth(mddev),
+>> +                      mddev->sync_io_depth ? "local" : "system");
+>> +}
+>> +
+>> +static ssize_t
+>> +sync_io_depth_store(struct mddev *mddev, const char *buf, size_t len)
+>> +{
+>> +       unsigned int max;
+>> +       int rv;
+>> +
+>> +       if (strncmp(buf, "system", 6) == 0) {
+>> +               max = 0;
+>> +       } else {
+>> +               rv = kstrtouint(buf, 10, &max);
+>> +               if (rv < 0)
+>> +                       return rv;
+>> +               if (max == 0)
+>> +                       return -EINVAL;
+>> +       }
+>> +       mddev->sync_io_depth = max;
+>> +       return len;
+>> +}
+>> +
+>> +static struct md_sysfs_entry md_sync_io_depth =
+>> +__ATTR_RW(sync_io_depth);
+>> +
+>>   static ssize_t
+>>   degraded_show(struct mddev *mddev, char *page)
+>>   {
+>> @@ -5671,6 +5717,7 @@ static struct attribute *md_redundancy_attrs[] = {
+>>          &md_mismatches.attr,
+>>          &md_sync_min.attr,
+>>          &md_sync_max.attr,
+>> +       &md_sync_io_depth.attr,
+>>          &md_sync_speed.attr,
+>>          &md_sync_force_parallel.attr,
+>>          &md_sync_completed.attr,
+>> @@ -8927,6 +8974,23 @@ static sector_t md_sync_position(struct mddev *mddev, enum sync_action action)
+>>          }
+>>   }
+>>
+>> +static bool sync_io_within_limit(struct mddev *mddev)
+>> +{
+>> +       int io_sectors;
+>> +
+>> +       /*
+>> +        * For raid456, sync IO is stripe(4k) per IO, for other levels, it's
+>> +        * RESYNC_PAGES(64k) per IO.
+>> +        */
+>> +       if (mddev->level == 4 || mddev->level == 5 || mddev->level == 6)
+>> +               io_sectors = 8;
+>> +       else
+>> +               io_sectors = 128;
+>> +
+>> +       return atomic_read(&mddev->recovery_active) <
+>> +               io_sectors * sync_io_depth(mddev);
+>> +}
+>> +
+>>   #define SYNC_MARKS     10
+>>   #define        SYNC_MARK_STEP  (3*HZ)
+>>   #define UPDATE_FREQUENCY (5*60*HZ)
+>> @@ -9195,7 +9259,8 @@ void md_do_sync(struct md_thread *thread)
+>>                                  msleep(500);
+>>                                  goto repeat;
+>>                          }
+>> -                       if (!is_mddev_idle(mddev, 0)) {
+>> +                       if (!sync_io_within_limit(mddev) &&
+>> +                           !is_mddev_idle(mddev, 0)) {
+>>                                  /*
+>>                                   * Give other IO more of a chance.
+>>                                   * The faster the devices, the less we wait.
+>> diff --git a/drivers/md/md.h b/drivers/md/md.h
+>> index 1cf00a04bcdd..63be622467c6 100644
+>> --- a/drivers/md/md.h
+>> +++ b/drivers/md/md.h
+>> @@ -483,6 +483,7 @@ struct mddev {
+>>          /* if zero, use the system-wide default */
+>>          int                             sync_speed_min;
+>>          int                             sync_speed_max;
+>> +       int                             sync_io_depth;
+>>
+>>          /* resync even though the same disks are shared among md-devices */
+>>          int                             parallel_resync;
+>> --
+>> 2.39.2
+>>
+> 
+> This part looks good to me.
+> 
+> Acked-by: Xiao Ni <xni@redhat.com>
+> 
+> 
+> 
+> .
+> 
+
