@@ -1,55 +1,71 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE89120330
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 02:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550B120330
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 02:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744857322; cv=none; b=iV7ABe5NR8Ex5Y9cjbW5fD5875gk87MX3E0V3/U/laKizGDH+sPyCNt7mDls4F1wc3eDBecvM1d6G6Trc9/eMW6Hw2sA5T1xOkOPswO8pr0wEwuOJHvLF0/HnCwklGZ21kUpOQhth1AH4aZu1WcTbBKbpeuQ8RniZ9VaZ5ENvVQ=
+	t=1744857356; cv=none; b=g1m3anTFhUgB41B3NfdXF8cR5gPaCI8ZOg1OOjpjDCDfRNd6sRC3IV703hWNT56juiuIN2OVi5KnkW2VvWgu7dhyr8B3Z8IFdfar/TxYDrcML2hdv5hbF1a3dCdzIPszCgbLCFYlgjAxH1Nh0Z8o/tUmQ6dQJ8CBaC/G1C0psvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744857322; c=relaxed/simple;
-	bh=hYSdu5+f7ctVKzgxFTIV7fiNg1IcENMYX8wmlhNNMF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=h+y6+wzxoZUScTzCXzCJv2e7ROP7bCIE5zvK/D0f1duBgAYaeq4SvLd7dnZR0xoPTbo/ND1yEE867TY+WF45Hh4JmvoFcrYxwwYQXkPEa9HFTnyHRxuTRs89almXuCDXcQ728TTpthNLPH12e0x34Wy7NO0JYLvfKZhjFhYQWuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZdMMX07fSzvWtr;
-	Thu, 17 Apr 2025 10:31:04 +0800 (CST)
-Received: from kwepemf100017.china.huawei.com (unknown [7.202.181.16])
-	by mail.maildlp.com (Postfix) with ESMTPS id 53E9A140259;
-	Thu, 17 Apr 2025 10:35:10 +0800 (CST)
-Received: from [10.174.176.88] (10.174.176.88) by
- kwepemf100017.china.huawei.com (7.202.181.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 17 Apr 2025 10:35:09 +0800
-Message-ID: <5649c4cc-b88f-42ae-ab5d-528df8a4b875@huawei.com>
-Date: Thu, 17 Apr 2025 10:35:08 +0800
+	s=arc-20240116; t=1744857356; c=relaxed/simple;
+	bh=TWHBUv3ib6qpSe4M4EVdli+aREv2uxYmQd87ARlRcuI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ngIGcBZsCi8d0llWCOJYWKk+2Z66hegtc1OeyQleXNK8jH+WLSjlTJMjRao9POQsSUgd4U9gXLGD+aJr3POM4qXLpMYBesIZslsRhyL0q5WvsROYyr3aBKUsWRcEmINsrg6p5bKlfd7k9IYKMO82PWnjy+lKTwBrNHAhrWzsvvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZdMSX41k3z4f3lWG
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 10:35:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id CDF6D1A0359
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 10:35:49 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAXe18EaQBonwHZJg--.651S3;
+	Thu, 17 Apr 2025 10:35:49 +0800 (CST)
+Subject: Re: [PATCH 1/3] blk-throttle: Fix wrong tg->[bytes/io]_disp update in
+ __tg_update_carryover()
+To: Ming Lei <ming.lei@redhat.com>, Zizhi Wo <wozizhi@huawei.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, yangerkun@huawei.com,
+ tj@kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250417015033.512940-1-wozizhi@huawei.com>
+ <20250417015033.512940-2-wozizhi@huawei.com> <aABnBBp4ZZ6pQAOM@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5ad661ae-0e16-130a-15cc-1de53a5f7b8f@huaweicloud.com>
+Date: Thu, 17 Apr 2025 10:35:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] blk-throttle: Fix wrong tg->[bytes/io]_disp update in
- __tg_update_carryover()
-To: Ming Lei <ming.lei@redhat.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <yangerkun@huawei.com>,
-	<yukuai3@huawei.com>, <tj@kernel.org>
-References: <20250417015033.512940-1-wozizhi@huawei.com>
- <20250417015033.512940-2-wozizhi@huawei.com> <aABnBBp4ZZ6pQAOM@fedora>
-From: Zizhi Wo <wozizhi@huawei.com>
 In-Reply-To: <aABnBBp4ZZ6pQAOM@fedora>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemf100017.china.huawei.com (7.202.181.16)
+X-CM-TRANSID:gCh0CgAXe18EaQBonwHZJg--.651S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFWDWF4UJFyUtFWxWrWrGrg_yoW5CF1Upr
+	WxtFsxGw1DXF13G3sxX3WSqFyrX3ykA347JrZ8Gw1rAFn8CrnYgr1rCrZ0krWIvFyfGayv
+	vw12q3srCF48ZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-
-åœ¨ 2025/4/17 10:27, Ming Lei å†™é“:
+ÔÚ 2025/04/17 10:27, Ming Lei Ð´µÀ:
 > On Thu, Apr 17, 2025 at 09:50:31AM +0800, Zizhi Wo wrote:
 >> In commit 6cc477c36875 ("blk-throttle: carry over directly"), the carryover
 >> bytes/ios was be carried to [bytes/io]_disp. However, its update mechanism
@@ -111,10 +127,16 @@ X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
 > It should be fine to do	'tg->bytes_disp[rw] = -*bytes;' directly
 > because `*bytes` is initialized as zero.
 
-Indeed, I didn't notice that the incoming bytes/io is initialized to 0.
+It took me a while to understand, I think you mean
 
-Thanks,
-Zizhi Wo
+if ()
+  *bytes =xxx;
+
+tg->bytes_disp[rw] = -*bytes;
+
+I'm good with or without this change.
+
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
 > 
 >> +
@@ -137,3 +159,6 @@ Zizhi Wo
 > Ming
 > 
 > 
+> .
+> 
+
