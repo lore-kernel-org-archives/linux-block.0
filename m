@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B324C91
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 02:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E5E19DF75
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 02:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744856856; cv=none; b=ijJtOUQCGBF72W0SfzqGRk4JGX5blGAE0LUx+a4iRfXtWbPylqQHGU/Wp8BjL+SDDwDltIg8wxVrDEfXqsbg6Ylks4CQfQX+MCr5AttJoxUANHGX1rlCLqSa1AaJwrlVGa0ffv2eE4XjIg7oF4PdDEhcy8oEbhcmZ/VQUzuVdLA=
+	t=1744857296; cv=none; b=MHiJz3Q5/kVbB9LNcmSe7aZlQBwQzUZD63aR8wPKLmmyhgDyprt834fm4xnU43TBT6s+SPqZ3L9ta3AlRnMRHzr4+qcXMTPaE1sqdhO5Qf+3PhIy52MY5WlQyNK+i2kBsdsdnxTo+u/YIQtqNElm+2gQGBNn45Yu+9zK/n1zq30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744856856; c=relaxed/simple;
-	bh=gk1MRrEmtV9egtDbqwJSyD7dNzchEjKLcPl2N4tDGbA=;
+	s=arc-20240116; t=1744857296; c=relaxed/simple;
+	bh=X7HvDZl2+FHdPyMNMyxH82P1e141BwUbSTy6TCCxx3A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pSJ6LXAEgchdWclULfd5gPLllOpuFpu+tjYuzlzIQea0ZilO6cJCjzd3AU5x8guWjhp5eC+FEAVUxu1TLbvOZON1d9kFNoRC7WZjvYhApfkz/YYbfvysNMPAbLtBVQGe5Tk+oyeVt37kCEaLOYRGDvylX4KKOOJWS++3MwtP3Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQVMJSCy; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=SkHIL73u3xGqd4toQbA7kI+vcyrTQNYvU217ADPRwu3eTsI19c0v8ljd4/tbBBHtR/3tXP/JZPw8TC6U/SmS1v4Nfbhwpi3r3/Y9sBW0R8SZJmgjT1dv8xpbQV+S6ZJM9zBjz5mlzGkF3rPCQfl3Pc0SZuiCIz5wKKTF1SC/tcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ull4izG5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQVMJSCy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ull4izG5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744856852;
+	s=mimecast20190719; t=1744857294;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ksirz+LTX+iskMwRR+nNUXM6YfxyjDotAyofeKPDojI=;
-	b=JQVMJSCy7SeFVbXe6iNk1iO8jJAZkulvHS6Zay29tt5J6omF1yxLNMraSYsn0OOwWzrYWo
-	qEEwnCo7GGmfqr5egnZgxyGaqP6KjZkV4imoYJwjVcC/ywwj5NaPjZJAV+DoXzK92BZruH
-	zHIK+Eg4CtfkinB3OV2S2MXMyVpmZvU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=vZKbyHc0Cl+oVOTotourtqo+isdQB2ExSoV5izW7iCw=;
+	b=Ull4izG5HMAKCBfAyLZ0JclmDvKjbgyz+HadTCYENa9Pmj1kcIwrEJ//ewq/zcXq3UOgPW
+	9G3qtc+KQ76pxvhu7mu5kpcAg0+mZoHVoxNXl/4cK69Z6KR2ebZQICTmX1Z8CsCgX6asq5
+	eU7rZU/jVKXGCOPm5uPyUnBJEFFsEp4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-190-rQ0f5JQGPtC-urEpLZdlhg-1; Wed,
- 16 Apr 2025 22:27:28 -0400
-X-MC-Unique: rQ0f5JQGPtC-urEpLZdlhg-1
-X-Mimecast-MFC-AGG-ID: rQ0f5JQGPtC-urEpLZdlhg_1744856847
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-570-IK7gYm2dPKWLInR4Mf0B_w-1; Wed,
+ 16 Apr 2025 22:34:50 -0400
+X-MC-Unique: IK7gYm2dPKWLInR4Mf0B_w-1
+X-Mimecast-MFC-AGG-ID: IK7gYm2dPKWLInR4Mf0B_w_1744857289
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3EA00195608C;
-	Thu, 17 Apr 2025 02:27:27 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA76519560BD;
+	Thu, 17 Apr 2025 02:34:48 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.90])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 44266180045B;
-	Thu, 17 Apr 2025 02:27:21 +0000 (UTC)
-Date: Thu, 17 Apr 2025 10:27:16 +0800
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF9ED19560A3;
+	Thu, 17 Apr 2025 02:34:44 +0000 (UTC)
+Date: Thu, 17 Apr 2025 10:34:37 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Zizhi Wo <wozizhi@huawei.com>
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org, yangerkun@huawei.com,
 	yukuai3@huawei.com, tj@kernel.org
-Subject: Re: [PATCH 1/3] blk-throttle: Fix wrong tg->[bytes/io]_disp update
- in __tg_update_carryover()
-Message-ID: <aABnBBp4ZZ6pQAOM@fedora>
+Subject: Re: [PATCH 2/3] blk-throttle: Delete unnecessary carryover-related
+ fields from throtl_grp
+Message-ID: <aABovTv568BjFng5@fedora>
 References: <20250417015033.512940-1-wozizhi@huawei.com>
- <20250417015033.512940-2-wozizhi@huawei.com>
+ <20250417015033.512940-3-wozizhi@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,86 +59,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250417015033.512940-2-wozizhi@huawei.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250417015033.512940-3-wozizhi@huawei.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, Apr 17, 2025 at 09:50:31AM +0800, Zizhi Wo wrote:
-> In commit 6cc477c36875 ("blk-throttle: carry over directly"), the carryover
-> bytes/ios was be carried to [bytes/io]_disp. However, its update mechanism
-> has some issues.
+On Thu, Apr 17, 2025 at 09:50:32AM +0800, Zizhi Wo wrote:
+> We no longer need carryover_[bytes/ios] in tg, so it is removed. The
+> related comments about carryover in tg are also merged into
+> [bytes/io]_disp, and modify other related comments.
 > 
-> In __tg_update_carryover(), we calculate "bytes" and "ios" to represent the
-> carryover, but the computation when updating [bytes/io]_disp is incorrect.
-> This patch fixes the issue.
-> 
-> And if the bps/iops limit was previously set to max and later changed to a
-> smaller value, we may not update tg->[bytes/io]_disp to 0 in
-> tg_update_carryover(). Relying solely on throtl_trim_slice() is not
-> sufficient, which can lead to subsequent bio dispatches not behaving as
-> expected. We should set tg->[bytes/io]_disp to 0 in non_carryover case.
-> The same handling applies when nr_queued is 0.
-> 
-> Fixes: 6cc477c36875 ("blk-throttle: carry over directly")
 > Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-> ---
->  block/blk-throttle.c | 33 +++++++++++++++++++++++++--------
->  1 file changed, 25 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 91dab43c65ab..df9825eb83be 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -644,20 +644,39 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
->  	u64 bps_limit = tg_bps_limit(tg, rw);
->  	u32 iops_limit = tg_iops_limit(tg, rw);
->  
-> +	/*
-> +	 * If the queue is empty, carryover handling is not needed. In such cases,
-> +	 * tg->[bytes/io]_disp should be reset to 0 to avoid impacting the dispatch
-> +	 * of subsequent bios. The same handling applies when the previous BPS/IOPS
-> +	 * limit was set to max.
-> +	 */
-> +	if (tg->service_queue.nr_queued[rw] == 0) {
-> +		tg->bytes_disp[rw] = 0;
-> +		tg->io_disp[rw] = 0;
-> +		return;
-> +	}
-> +
->  	/*
->  	 * If config is updated while bios are still throttled, calculate and
->  	 * accumulate how many bytes/ios are waited across changes. And
->  	 * carryover_bytes/ios will be used to calculate new wait time under new
->  	 * configuration.
->  	 */
-> -	if (bps_limit != U64_MAX)
-> +	if (bps_limit != U64_MAX) {
->  		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
->  			tg->bytes_disp[rw];
-> -	if (iops_limit != UINT_MAX)
-> +		tg->bytes_disp[rw] = -*bytes;
-> +	} else {
-> +		tg->bytes_disp[rw] = 0;
-> +	}
 
-It should be fine to do	'tg->bytes_disp[rw] = -*bytes;' directly
-because `*bytes` is initialized as zero.
-
-> +
-> +	if (iops_limit != UINT_MAX) {
->  		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
->  			tg->io_disp[rw];
-> -	tg->bytes_disp[rw] -= *bytes;
-> -	tg->io_disp[rw] -= *ios;
-> +		tg->io_disp[rw] = -*ios;
-> +	} else {
-> +		tg->io_disp[rw] = 0;
-> +	}
-
-Same with above.
-
-Otherwise, this patch looks fine.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
-thanks,
+Thanks,
 Ming
 
