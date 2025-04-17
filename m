@@ -1,147 +1,132 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F30157E99;
-	Thu, 17 Apr 2025 01:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80953D2FB
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 02:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744854435; cv=none; b=HjgjAvNa+qZXg/mEw+mXiYwssU70s+QTZzCGvmShNmx0VaIwGiWMuN0JNhuZqEcu1QUyr+mBhXoHGumsNDKEo17WaB8JFSfr8r6a4UYKwiFshWbIddvocZKzAfxlQkWkrr9/mGv8efRADBdLny+H6UJQTs7N9lAUsOosmf112Zk=
+	t=1744855235; cv=none; b=bZ9+mpn7TkDDw7K8iMgSWlka4n6GI0uDPNfYchRAN4BaMhvGg2Q3qA9Af40FXIsC4sw49QCaTAY4LoEqFNOoLjEPVarLAFlrBo7kAEyxznGpixMifE2XkyLfC5SeKpjr7uCO0/lLpIG4e4t6xyw9JFakLl+hm27yHjeJLpqq+Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744854435; c=relaxed/simple;
-	bh=vAcIja/yPzEK6VYFQ9AlYR0BZHj9McAx2cs4ghgRe8M=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YIQQ1p46w+78En6R1qDBpeSklbUto58hsARw6SynOfnhCTi7Q9v3CLd2ew75BZ3ND14ddgfr3p1i2Iqy3f+x2LsiV30FVEXFZxqRu/JW+0EYrd43b/Gq/+NXw/9I4Vq4gubfdZ4F0M5rMxL1rVnfGkyCCodEz7BsSZDqvX8S4x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZdLNN1q5Xz4f3jdC;
-	Thu, 17 Apr 2025 09:46:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EF9051A1332;
-	Thu, 17 Apr 2025 09:47:07 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgD3W2CaXQBok7DVJg--.731S3;
-	Thu, 17 Apr 2025 09:47:07 +0800 (CST)
-Subject: Re: [PATCH 3/4] md: fix is_mddev_idle()
-To: Xiao Ni <xni@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
- <20250412073202.3085138-4-yukuai1@huaweicloud.com>
- <c085664e-3a52-4a1c-b973-8d2ba6e5d509@redhat.com>
- <42cbe72e-1db5-1723-789d-a93b5dc95f8f@huaweicloud.com>
- <4358e07e-f78b-cd32-bbed-c597b8bb4c19@huaweicloud.com>
- <CALTww294r=ZFrmyK4=s8NMs4MZfdvZ-m6cLTQqXy+b+tW7gkBA@mail.gmail.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2acd0bd5-f514-6c59-e90e-18a6d46174c2@huaweicloud.com>
-Date: Thu, 17 Apr 2025 09:47:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1744855235; c=relaxed/simple;
+	bh=7fQUoX0FPCcKNWlQ4BiupIBThKS2yKB8zYvdF89Q+u0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=plKAld97wiArSweCO0AZS3Fjt1fk/CUvvqaM/NNVaOr/Vmn/1ngD972hxdSl4kcVNOL5kJBaWnKqDFqVq78hxnuF9cYBqYRZmGH4RTp3zZ7b1FgMk+ur6j2UhhEUaDLYxFK+Oj/JIyv+6SFCicmvkphJDDpEYllP83vZF2G8HXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZdLf03MP9z1R7Ys;
+	Thu, 17 Apr 2025 09:58:32 +0800 (CST)
+Received: from kwepemf100017.china.huawei.com (unknown [7.202.181.16])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5EE431A016C;
+	Thu, 17 Apr 2025 10:00:29 +0800 (CST)
+Received: from localhost.localdomain (10.175.112.188) by
+ kwepemf100017.china.huawei.com (7.202.181.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 17 Apr 2025 10:00:28 +0800
+From: Zizhi Wo <wozizhi@huawei.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <yangerkun@huawei.com>, <yukuai3@huawei.com>, <wozizhi@huawei.com>,
+	<ming.lei@redhat.com>, <tj@kernel.org>
+Subject: [PATCH 1/3] blk-throttle: Fix wrong tg->[bytes/io]_disp update in __tg_update_carryover()
+Date: Thu, 17 Apr 2025 09:50:31 +0800
+Message-ID: <20250417015033.512940-2-wozizhi@huawei.com>
+X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20250417015033.512940-1-wozizhi@huawei.com>
+References: <20250417015033.512940-1-wozizhi@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CALTww294r=ZFrmyK4=s8NMs4MZfdvZ-m6cLTQqXy+b+tW7gkBA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3W2CaXQBok7DVJg--.731S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF18XrW8ZrWfAw1kJF47urg_yoW8CFyfpa
-	4Uu3W5tFWUGry3KwsFv3Z3Wa45t3yfXwnIqr15tr17u398KrnYkay8t3s5u34rWr1kZr1j
-	qw4jgay7AF15AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemf100017.china.huawei.com (7.202.181.16)
 
-Hi,
+In commit 6cc477c36875 ("blk-throttle: carry over directly"), the carryover
+bytes/ios was be carried to [bytes/io]_disp. However, its update mechanism
+has some issues.
 
-在 2025/04/16 17:44, Xiao Ni 写道:
-> On Wed, Apr 16, 2025 at 5:29 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
->>
->> Hi,
->>
->> 在 2025/04/16 15:42, Yu Kuai 写道:
->>> Hi,
->>>
->>> 在 2025/04/16 14:20, Xiao Ni 写道:
->>>>> +static bool is_rdev_idle(struct md_rdev *rdev, bool init)
->>>>> +{
->>>>> +    unsigned long last_events = rdev->last_events;
->>>>> +
->>>>> +    if (!bdev_is_partition(rdev->bdev))
->>>>> +        return true;
->>>>
->>>>
->>>> For md array, I think is_rdev_idle is not useful. Because
->>>> mddev->last_events must be increased while upper ios come in and idle
->>>> will be set to false. For dm array, mddev->last_events can't work. So
->>>> is_rdev_idle is for dm array. If member disk is one partition,
->>>> is_rdev_idle alwasy returns true, and is_mddev_idle always return
->>>> true. It's a bug here. Do we need to check bdev_is_partition here?
->>>
->>> is_rdev_idle() is not used for current array, for example:
->>>
->>> sda1 is used for array md0, and user doesn't issue IO to md0, while
->>> user issues IO to sda2. In this case, is_mddev_idle() still fail for
->>> array md0 because is_rdev_idle() fail.
-> 
-> Thanks very much for the explanation. It makes sense :)
-> 
->>
->> Perhaps the name is_rdev_holder_idle() is better.
-> 
-> Your suggestion is better. And it's better to add some comments before
-> this function.
-> 
-> But how about dm-raid? Can this patch work for dm-raid?
+In __tg_update_carryover(), we calculate "bytes" and "ios" to represent the
+carryover, but the computation when updating [bytes/io]_disp is incorrect.
+This patch fixes the issue.
 
-is_rdev_holder_idle() can work for dm-raid, however, the part to
-check if normal IO is inflight or completed can't work for dm-raid,
-currently there is no way to grab dm gendisk from mddev. However, I
-think there won't be regression since the old buggy is_mddev_idle()
-almost always return false.
+And if the bps/iops limit was previously set to max and later changed to a
+smaller value, we may not update tg->[bytes/io]_disp to 0 in
+tg_update_carryover(). Relying solely on throtl_trim_slice() is not
+sufficient, which can lead to subsequent bio dispatches not behaving as
+expected. We should set tg->[bytes/io]_disp to 0 in non_carryover case.
+The same handling applies when nr_queued is 0.
 
-Thanks,
-Kuai
+Fixes: 6cc477c36875 ("blk-throttle: carry over directly")
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+---
+ block/blk-throttle.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
-> 
-> Regards
-> Xiao
-> 
->>
->> Thanks,
->> Kuai
->>
->>>
->>> This is just inherited from the old behaviour.
->>>
->>> Thanks,
->>> Kuai
->>>
->>>>
->>>> Best Regards
->>>>
->>>> Xiao
->>>
->>> .
->>>
->>
-> 
-> 
-> .
-> 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 91dab43c65ab..df9825eb83be 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -644,20 +644,39 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
+ 	u64 bps_limit = tg_bps_limit(tg, rw);
+ 	u32 iops_limit = tg_iops_limit(tg, rw);
+ 
++	/*
++	 * If the queue is empty, carryover handling is not needed. In such cases,
++	 * tg->[bytes/io]_disp should be reset to 0 to avoid impacting the dispatch
++	 * of subsequent bios. The same handling applies when the previous BPS/IOPS
++	 * limit was set to max.
++	 */
++	if (tg->service_queue.nr_queued[rw] == 0) {
++		tg->bytes_disp[rw] = 0;
++		tg->io_disp[rw] = 0;
++		return;
++	}
++
+ 	/*
+ 	 * If config is updated while bios are still throttled, calculate and
+ 	 * accumulate how many bytes/ios are waited across changes. And
+ 	 * carryover_bytes/ios will be used to calculate new wait time under new
+ 	 * configuration.
+ 	 */
+-	if (bps_limit != U64_MAX)
++	if (bps_limit != U64_MAX) {
+ 		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+ 			tg->bytes_disp[rw];
+-	if (iops_limit != UINT_MAX)
++		tg->bytes_disp[rw] = -*bytes;
++	} else {
++		tg->bytes_disp[rw] = 0;
++	}
++
++	if (iops_limit != UINT_MAX) {
+ 		*ios = calculate_io_allowed(iops_limit, jiffy_elapsed) -
+ 			tg->io_disp[rw];
+-	tg->bytes_disp[rw] -= *bytes;
+-	tg->io_disp[rw] -= *ios;
++		tg->io_disp[rw] = -*ios;
++	} else {
++		tg->io_disp[rw] = 0;
++	}
+ }
+ 
+ static void tg_update_carryover(struct throtl_grp *tg)
+@@ -665,10 +684,8 @@ static void tg_update_carryover(struct throtl_grp *tg)
+ 	long long bytes[2] = {0};
+ 	int ios[2] = {0};
+ 
+-	if (tg->service_queue.nr_queued[READ])
+-		__tg_update_carryover(tg, READ, &bytes[READ], &ios[READ]);
+-	if (tg->service_queue.nr_queued[WRITE])
+-		__tg_update_carryover(tg, WRITE, &bytes[WRITE], &ios[WRITE]);
++	__tg_update_carryover(tg, READ, &bytes[READ], &ios[READ]);
++	__tg_update_carryover(tg, WRITE, &bytes[WRITE], &ios[WRITE]);
+ 
+ 	/* see comments in struct throtl_grp for meaning of these fields. */
+ 	throtl_log(&tg->service_queue, "%s: %lld %lld %d %d\n", __func__,
+-- 
+2.46.1
 
