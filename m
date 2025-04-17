@@ -1,113 +1,147 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5D818FDAB
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 01:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F30157E99;
+	Thu, 17 Apr 2025 01:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744853626; cv=none; b=gvfKjQQusWEVKholf5i3SppI4BAdO2keQZry/7J7e7k04YHFqY8oIWPOCAE6dhgMrfbf4+ahpYdUTExzNm7PJ8sIFe4CdDZSkupqmuebxFSRaQ7vmjnhbvMGHNHAFmCts08desgRrPxkzSmwBk9J4BuKXx2/EBkGPA8rczRCMp8=
+	t=1744854435; cv=none; b=HjgjAvNa+qZXg/mEw+mXiYwssU70s+QTZzCGvmShNmx0VaIwGiWMuN0JNhuZqEcu1QUyr+mBhXoHGumsNDKEo17WaB8JFSfr8r6a4UYKwiFshWbIddvocZKzAfxlQkWkrr9/mGv8efRADBdLny+H6UJQTs7N9lAUsOosmf112Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744853626; c=relaxed/simple;
-	bh=oU6ngNnkAwQGdS++jwKyRlJAq153BtDInEERFIy7bBI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=c4zYJzsGyHYi753EjTdr4rj5qUlxYKT1OxIjNnbsDKoqAcvUkD2DB/7rEOfVjEcoA3vsFyi8CB5lBbm3Xlr5o0xTcR93hIxrBU1J3cuVZC4aLSeDlwBFwL2RPA76hufc+0sPlDQ5ZVR63LnjbnKoJmgYTaxwNjg/N1qOhR8yyCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fzVKRXcH; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fzVKRXcH"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-8616987c261so8454739f.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Apr 2025 18:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744853622; x=1745458422; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KBH+E77P4o6YKMaqBWYxiMqd3Ph7K3lMOstE/KOvA00=;
-        b=fzVKRXcHrnqMs+C1QFbkR59fOcPhcm+YA4Wap9BsvU+xALkPTXn0dFSad7LlW2enGt
-         MRC/pb2XWLIYUaosfeGCEdh1T5QahbPhsWFqBiwUE9zP6pvyp0XCwSoqTRBnAZ2L87Vx
-         A4tvFv4LPGgP2Qyg3Bwx7b9yaNZunMzG0HHSE2NA9DPKBIb+VM0QSWnO/Bu++S2YvP4V
-         HG7uRgWf/V/cVu6LXy5fPPzlXwlOjp8JJawoRcxaRD2wc1TOkQZkF7JywPKj1QHtC57E
-         dMD1YYRfv5whPKujjZeUmIOE3SmYv5ESBw2gX9Fs9Y4v3h3+sd6CPL49+0u01QH3cPN6
-         zGfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744853622; x=1745458422;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KBH+E77P4o6YKMaqBWYxiMqd3Ph7K3lMOstE/KOvA00=;
-        b=vX9OPpZWSjXJtvXEmRZx4Bq7QmJggolpO4BNhXMcjDAl9PHsWLl6DYpvjdrlzYCxrc
-         howM5mY31C9xeP2+/mJJFaBPTayn3fXXtjMPQLEf3gqiYZAHO2lhMp29/dDicpmY6Cov
-         bbzAO56wP7CUPgBv24smbmOB4dNXlhSvbTm4CAqgRxuNdDyOM7rHrxizlwuVehvtDOHu
-         cj2BTn4TWRlhxXwhmk9YQfhLC26hR5lNCdG1nKcMQ3eviF6yyAtMipbE/5A+UkuUqzcp
-         rQ4L5gttjTfflOI56vlCROLL/Fnb3IRWtGfHUxnLH9ucTqlqurTJQTWtdle7DblPuIuQ
-         SzwQ==
-X-Gm-Message-State: AOJu0YyZPDya398sDuDD2Ck+5AwDBYmclqE/1LswBW3Bb4npqM7ZIVOw
-	2CcJvKBQ1YEzdX15dWmj/jdW//eFoMY6e9W7Z7iRs60CBqI2iFLMA2ouwfdaKD0=
-X-Gm-Gg: ASbGnct1kVfCt6ev7g8luZH2N8L2KS0Nj7N8mMdl3AbgOr7kPaqUgbcnyVF4OP40Qu6
-	valcf1LD78iR4GoKm0bqMgA0WQboxY5uMIoAphXyGZpWQhXiyLpaHrfhQ6zqcQMvbRjvlqUBNfx
-	YnkQOdAaDukmlYy/Leqf5mQ9n24gV8vhcI+DUp98fX2wNnkgbyVnJ6uxljDfbZ28BEHKlyjdnQ1
-	PUVdv876aqSizq562jYq3SbV3I5Y+rJjinc8fpVGXSf2AsGNsCSU76fiRnIJHi9uEb3Geb/CJBM
-	vuQYMIX7eI6y4u9AN+BQkw2BnLMKLFo1
-X-Google-Smtp-Source: AGHT+IH8zg+D+WLSAmc9eisDyH1exKeNxLyQ5mH93Wcns5jEF+K5EubMZyFS5b8ZZRSGpN9+pz5k3Q==
-X-Received: by 2002:a05:6e02:1905:b0:3d0:21aa:a752 with SMTP id e9e14a558f8ab-3d815af7f23mr40218415ab.2.1744853622224;
-        Wed, 16 Apr 2025 18:33:42 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505cf8294sm3877562173.17.2025.04.16.18.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 18:33:41 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>
-In-Reply-To: <20250416035444.99569-1-ming.lei@redhat.com>
-References: <20250416035444.99569-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2 0/8] ublk: simplify & improve IO canceling
-Message-Id: <174485362142.496169.9833775455671712927.b4-ty@kernel.dk>
-Date: Wed, 16 Apr 2025 19:33:41 -0600
+	s=arc-20240116; t=1744854435; c=relaxed/simple;
+	bh=vAcIja/yPzEK6VYFQ9AlYR0BZHj9McAx2cs4ghgRe8M=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=YIQQ1p46w+78En6R1qDBpeSklbUto58hsARw6SynOfnhCTi7Q9v3CLd2ew75BZ3ND14ddgfr3p1i2Iqy3f+x2LsiV30FVEXFZxqRu/JW+0EYrd43b/Gq/+NXw/9I4Vq4gubfdZ4F0M5rMxL1rVnfGkyCCodEz7BsSZDqvX8S4x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZdLNN1q5Xz4f3jdC;
+	Thu, 17 Apr 2025 09:46:44 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id EF9051A1332;
+	Thu, 17 Apr 2025 09:47:07 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2CaXQBok7DVJg--.731S3;
+	Thu, 17 Apr 2025 09:47:07 +0800 (CST)
+Subject: Re: [PATCH 3/4] md: fix is_mddev_idle()
+To: Xiao Ni <xni@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250412073202.3085138-1-yukuai1@huaweicloud.com>
+ <20250412073202.3085138-4-yukuai1@huaweicloud.com>
+ <c085664e-3a52-4a1c-b973-8d2ba6e5d509@redhat.com>
+ <42cbe72e-1db5-1723-789d-a93b5dc95f8f@huaweicloud.com>
+ <4358e07e-f78b-cd32-bbed-c597b8bb4c19@huaweicloud.com>
+ <CALTww294r=ZFrmyK4=s8NMs4MZfdvZ-m6cLTQqXy+b+tW7gkBA@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <2acd0bd5-f514-6c59-e90e-18a6d46174c2@huaweicloud.com>
+Date: Thu, 17 Apr 2025 09:47:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+In-Reply-To: <CALTww294r=ZFrmyK4=s8NMs4MZfdvZ-m6cLTQqXy+b+tW7gkBA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3W2CaXQBok7DVJg--.731S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF18XrW8ZrWfAw1kJF47urg_yoW8CFyfpa
+	4Uu3W5tFWUGry3KwsFv3Z3Wa45t3yfXwnIqr15tr17u398KrnYkay8t3s5u34rWr1kZr1j
+	qw4jgay7AF15AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-On Wed, 16 Apr 2025 11:54:34 +0800, Ming Lei wrote:
-> Patch 1st ~ 7th simplifies & improves IO canceling when ublk server daemon
-> is exiting by taking two stage canceling:
+在 2025/04/16 17:44, Xiao Ni 写道:
+> On Wed, Apr 16, 2025 at 5:29 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> Hi,
+>>
+>> 在 2025/04/16 15:42, Yu Kuai 写道:
+>>> Hi,
+>>>
+>>> 在 2025/04/16 14:20, Xiao Ni 写道:
+>>>>> +static bool is_rdev_idle(struct md_rdev *rdev, bool init)
+>>>>> +{
+>>>>> +    unsigned long last_events = rdev->last_events;
+>>>>> +
+>>>>> +    if (!bdev_is_partition(rdev->bdev))
+>>>>> +        return true;
+>>>>
+>>>>
+>>>> For md array, I think is_rdev_idle is not useful. Because
+>>>> mddev->last_events must be increased while upper ios come in and idle
+>>>> will be set to false. For dm array, mddev->last_events can't work. So
+>>>> is_rdev_idle is for dm array. If member disk is one partition,
+>>>> is_rdev_idle alwasy returns true, and is_mddev_idle always return
+>>>> true. It's a bug here. Do we need to check bdev_is_partition here?
+>>>
+>>> is_rdev_idle() is not used for current array, for example:
+>>>
+>>> sda1 is used for array md0, and user doesn't issue IO to md0, while
+>>> user issues IO to sda2. In this case, is_mddev_idle() still fail for
+>>> array md0 because is_rdev_idle() fail.
 > 
-> - canceling active uring_cmd from its cancel function
+> Thanks very much for the explanation. It makes sense :)
 > 
-> - move inflight requests aborting into ublk char device release handler
+>>
+>> Perhaps the name is_rdev_holder_idle() is better.
 > 
-> [...]
+> Your suggestion is better. And it's better to add some comments before
+> this function.
+> 
+> But how about dm-raid? Can this patch work for dm-raid?
 
-Applied, thanks!
+is_rdev_holder_idle() can work for dm-raid, however, the part to
+check if normal IO is inflight or completed can't work for dm-raid,
+currently there is no way to grab dm gendisk from mddev. However, I
+think there won't be regression since the old buggy is_mddev_idle()
+almost always return false.
 
-[1/8] ublk: properly serialize all FETCH_REQs
-      commit: b69b8edfb27dfa563cd53f590ec42b481f9eb174
-[2/8] ublk: add ublk_force_abort_dev()
-      commit: 00b3b0d7cb454d614117c93f33351cdcd20b5b93
-[3/8] ublk: rely on ->canceling for dealing with ublk_nosrv_dev_should_queue_io
-      commit: 7e26cb69c5e62152a6f05a2ae23605a983a8ef31
-[4/8] ublk: move device reset into ublk_ch_release()
-      commit: 728cbac5fe219d3b8a21a0688a08f2b7f8aeda2b
-[5/8] ublk: improve detection and handling of ublk server exit
-      commit: 82a8a30c581bbbe653d33c6ce2ef67e3072c7f12
-[6/8] ublk: remove __ublk_quiesce_dev()
-      commit: 736b005b413a172670711ee17cab3c8ccab83223
-[7/8] ublk: simplify aborting ublk request
-      commit: e63d2228ef831af36f963b3ab8604160cfff84c1
-[8/8] selftests: ublk: add generic_06 for covering fault inject
-      commit: 81586652bb1f6c797159161db8d59c18d66b9eb3
+Thanks,
+Kuai
 
-Best regards,
--- 
-Jens Axboe
-
-
+> 
+> Regards
+> Xiao
+> 
+>>
+>> Thanks,
+>> Kuai
+>>
+>>>
+>>> This is just inherited from the old behaviour.
+>>>
+>>> Thanks,
+>>> Kuai
+>>>
+>>>>
+>>>> Best Regards
+>>>>
+>>>> Xiao
+>>>
+>>> .
+>>>
+>>
+> 
+> 
+> .
+> 
 
