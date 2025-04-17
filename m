@@ -1,116 +1,105 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-yw1-f225.google.com (mail-yw1-f225.google.com [209.85.128.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96EC2566F2
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 17:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C3B223710
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 18:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744912530; cv=none; b=CcsdwPKnMpH9QSla+Xan4qWCrd3O8fEjb/BYx+WpmFYGQIIO1p/TtGZ/dPzM2Gyuli1UDz1InqbD7sbMlOjXHjBPeOiaRQlJa7cg3vkZCBh1DNYmYfzuZTcHAIi9PYOj6UxQ2t+C+Qx7FeGZFyTYBs9E/z3cTK9HXZKazKd9gvg=
+	t=1744913538; cv=none; b=csfxbDli4JICT8JpaVvtueZBx6f1yguzWekTVfF11AvDfqW4q1S1BRVxg3jhvzbNaUGQ02cF5KlqdgmK5h27ZY0X3wEpPYP/Ruwx/ZMiGNhdQ7hlMu37HUroBOJ88WABSFtR0BH0RBfJPYLFrX4zKuBnTk6o5yU9KCYxHcuizHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744912530; c=relaxed/simple;
-	bh=5GUBODVqbrbXC+oeqNCm+JoN5ybg4Iu+dLTbMlmaaDI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r3ujFsW3+oyXfsYy4/p/cQpfiGKeFXlmrzu37ng+YOfdEoxTqnI0b/b8nGz+bw+wl3HUAwSdKGgY7hy4UWgyAySdxgXrhO1S/yfGxdEspBqd/BZGjM71Oa9bUUe76IGlsE1IA2wjOZ2Hs567lZhYlSNqHSlo0xW1F7r28OIE3zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvM0enqJ; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744913538; c=relaxed/simple;
+	bh=rTuiRxzxitZgLIT1XC5cZUwi283dZi3TKrPCYJvkdCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JtSzpTnR2RW0P6iLC7qxEGmh4/zfTaw/N0dr39jRKb+VRTEubzplT62sAOuX+xJI6I7P9wQm/aIwNE5Pbz+Ngd3uoP6OgCVW82MrlUINCc27Nz5703bk1rOLtpjslg+W9QP4Mf1QQ4qMIVONw+NyDm2VF5YBBGMW8mn5wyoB4Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FJzQ4E7D; arc=none smtp.client-ip=209.85.128.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvM0enqJ"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-30363975406so138121a91.0
-        for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 10:55:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FJzQ4E7D"
+Received: by mail-yw1-f225.google.com with SMTP id 00721157ae682-7054f0e933cso9847787b3.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 11:12:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744912528; x=1745517328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8gBsXVnMamKirJ8phDM/1SZO4d+WSZ0MEP1U7vrEKXE=;
-        b=BvM0enqJIMUh5sD+kEKYOsmnHFAwA5x49TQnhg4iXTl+jYLDpQoBZDx+CDHoOFIKIB
-         ijnjhDfFa/KgHkDZlvbjmYpAOKvYOov3ExX8bBnlCoCQw3QgIx64ScHv9pT4hqnI4Bcz
-         GvL3X6AkhuvQCp3nFFMU+jhx1QubhJPGGjzYAFU5x10tCT6B5cRg17O+e+zEfKkMhDwW
-         GSz9ERkRIVXUSiRrdyKDbBVI1a02wvek3WQ/X87dsnA1t5X4p31szxkhqdQRs5RNxUpD
-         LSpxd+BgkU0WoeT1ClEB/CYabBbngilHFoH8oMSRmVOgQ1dFba/isMEpKF3SRjscYXs3
-         0y8w==
+        d=purestorage.com; s=google2022; t=1744913535; x=1745518335; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ETLbdoCGYCxOBaDoBm8VOLVwDOcbDf1iRxC1csRkQmc=;
+        b=FJzQ4E7DnlmW7FOw5vbVd5m07ymrFmB5TRaY5Ay7MuYtOEiC3DGOLRhuY1hxpddIhQ
+         FTjPlcFwNa/7jIRhmTE8LEKE8F8GEz6SD/Ir0O4Ncwi8denFDXrqyZTgdkdHAKU/yDab
+         +nGhO1QJ7hoGzDxY92hiN6z5ib9GbQkfbc29LloPF93y8u6e/nZ7oCs2H/x+LAqJgf3F
+         3B3XavJhvtMZfHnZ1zcUs6DoscpFkWs5spNVLl27LLfrYf6dOKBBLkKdxYO5npWiRrAR
+         z7mMaN5v4OvmsOrzRAedzxcLF3eq+PgBgfVtOMBYuMF8UBH3jDKja9uF8uLAh41FmZxJ
+         M96w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744912528; x=1745517328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8gBsXVnMamKirJ8phDM/1SZO4d+WSZ0MEP1U7vrEKXE=;
-        b=V2PaAaxN+v08iLPmZ2xEv03RIf0Kq2gTyM8a8olj/L66ZyeQ4aA5Ha0kgxp+Fo9JYw
-         EVETtmmXgXpmlr3P9yrHv0JPezHzKrQZan1fe1MvbhwV6ysrSH8x1P5a3rYJNjC7Ldm8
-         5Cl1EHG0W4tCc5zqGGWimgFJFNKcTmEGPCosjcH7PijmEHzvsZJAlGba8jHFac4n0MDb
-         g30orKZMBRwStO9+Pp/D5zLrguws2yiziMud9q1EMuGi+ar/6k0jIOh8xl1NST1JhhQu
-         zFTzF+VgoW6MlrNlfMv0wpP12aIYCLT7XXHaTK7GUE4IwkaVFsBcpNHts4F87AyECsEr
-         S4gA==
-X-Gm-Message-State: AOJu0Yw+IGXztTprIg503EEG7DDnVqee+P6BhTAmW0a4s78wzDX7vKRa
-	S7Fdg23vqLY1aFpM5IZS0r56hdB58Kh1H2rpRw3Ok6K9F6cBfgjdioEgfVQYmo9jcKUtX9tuKp6
-	gczup+ihI0lWxVs3Oac0bq0U0XP8=
-X-Gm-Gg: ASbGncucF0K56RMmqWvotNgpMyHAS6hXTc4QiR4OKsC8xOLtk52vbQpZjRsmnujYpjA
-	5zB4BTm5z2PB3jbgQSGTsUgkHaO7FOhu7LVYdRdtG69VKuxzoCd1PM4mX1RhyChYWs2nNzz6vdn
-	3yH1JoXWwQijl3FPwwx4oSKQ==
-X-Google-Smtp-Source: AGHT+IGiv913bZ0B2z+Elvnqpog1Ik+R+aujpb113LI2xREZxdylIhsMPym7pjhS42kg91LECtHu9R31WlfEyjm+BE0=
-X-Received: by 2002:a17:90b:3852:b0:306:b6ae:4d7a with SMTP id
- 98e67ed59e1d1-3086efc52c0mr1919414a91.3.1744912527976; Thu, 17 Apr 2025
- 10:55:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744913535; x=1745518335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ETLbdoCGYCxOBaDoBm8VOLVwDOcbDf1iRxC1csRkQmc=;
+        b=hhFdqtGyFWYi2txK7UxReQYq2fPPEhuij+Ji7I2DX085gT8dIRo+4xuOTqLW7WIKhd
+         N4x0/Hcgkb+EBBEEjOaYFUDzxSAOQzqa3/P4MN+0VAO5YMBf9pQtDIfcrnPCI477ZH68
+         uklNT+Wc8/MgrgWdlt/H5HlOQyh8l8xdoI71XcHLy67CKRpNSvN8kwiVHfWPPJGGrLEo
+         ZEY+eW52KSoRc9Ky3rB4wZT7RnCv7Td6jQ6K6RXLq1L8OCUPthhInqRMSeoUlxpFP77E
+         QpIdol5c/nsDwUE8MCGUvg0BTJ0DorROwKOxI0mTKa7w/fs31AfkgUiI0roQWRSwpuuB
+         iqmw==
+X-Gm-Message-State: AOJu0Yx0tHUvxzvAchdwOfrvFD+061sKyq9GU+cqqz7V1/muz1PQWEKO
+	FFH5pIONXtg9+4hqtm5YuaKBoui6AfO6QtMrlvk7kFGwRjU51EiIsEBLQncb1Jn+ddkb43Gk42W
+	rU62BTQ3xD2KRBpUFvBOaD14H+jit7T7HcikUo19PC81vlqQb
+X-Gm-Gg: ASbGnctdEkEiJoBCup2INDJZ0U93tKtsb75ciEGptPvBtOPDVZ0SHmjdGbl9ZLeNck9
+	mOalMyj/hE4d6kqgkecYxE4kK7gamuvTYFK4OiylgsY6iq41MpJSXifhQTD5PXWxGOHBlqC9MO5
+	fuSaRr7IcSmXsxBpHkWtL9CC1jGxJjcXyUXtwki0jaNYgeKdp/CFLuS0sCRQxuwauTjW02/0rCf
+	9BGx8IohMZelguGwqVRq0zAyQdINI0qu2PMFkTSjFqldwCSst+PGVXk0j9IfZO8amwVhCL8zHOo
+	4X5/s6JE0awyjJj3nrGppTqpP3WZbZw=
+X-Google-Smtp-Source: AGHT+IF0R9MbSLsT2Vf0NFI3ZDq6M/6emvDo2HpFeNuloZsJLbRj1Z0ZjpzMDkIMThAG9TRxSL9xGop+EkMs
+X-Received: by 2002:a05:690c:3809:b0:6fd:2b7d:9a4e with SMTP id 00721157ae682-706b32cb478mr103101587b3.18.1744913535406;
+        Thu, 17 Apr 2025 11:12:15 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-706ca476ae3sm128917b3.9.2025.04.17.11.12.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 11:12:15 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 56B2834023F;
+	Thu, 17 Apr 2025 12:12:14 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 4B616E40371; Thu, 17 Apr 2025 12:12:14 -0600 (MDT)
+Date: Thu, 17 Apr 2025 12:12:14 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Yoav Cohen <yoav@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	Guy Eisenberg <geisenberg@nvidia.com>,
+	Jared Holzman <jholzman@nvidia.com>
+Subject: Re: ublk: slow recovery process when io queue depth is low
+Message-ID: <aAFEfqhdRikKfMnu@dev-ushankar.dev.purestorage.com>
+References: <DM4PR12MB6328BA60A2F4C041C3181BC3A9BC2@DM4PR12MB6328.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417163432.1336124-1-prasad.singamsetty@oracle.com>
-In-Reply-To: <20250417163432.1336124-1-prasad.singamsetty@oracle.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 17 Apr 2025 19:55:15 +0200
-X-Gm-Features: ATxdqUFFMtn63bhEBuiiN6HDneSSgURDYEiAlw0vdds5OOv6Q0u4vxVwJNMiMOE
-Message-ID: <CANiq72k-i-hDCWgfqu2OZU=FGKe3MJh5FxnnpGx1Jz866tXY6Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] block: prevent calls to should_fail_bio() optimized
- by gcc
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, arnd@arndb.de, 
-	ojeda@kernel.org, nathan@kernel.org, martin.petersen@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM4PR12MB6328BA60A2F4C041C3181BC3A9BC2@DM4PR12MB6328.namprd12.prod.outlook.com>
 
-On Thu, Apr 17, 2025 at 6:31=E2=80=AFPM Prasad Singamsetty
-<prasad.singamsetty@oracle.com> wrote:
->
-> When CONFIG_FAIL_MAKE_REQUEST is not enabled, gcc may optimize out
-> calls to should_fail_bio() because the content of should_fail_bio()
-> is empty returning always 'false'. The gcc compiler then detects
+On Thu, Apr 17, 2025 at 10:06:36AM +0000, Yoav Cohen wrote:
+> Hi,
+> 
+> I'm running ublk on Ubuntu Kenrel 6.8.0-56-generic.
+> I notice that if I'm running an IO commands that causing the IO queues to be full (at least the ublk hw queue) it seems like some of the IO's are done 30 seconds~ after they where submitted.
+> Enlarging the IO queues fixed the issue, and I'm pretty sure the 30 seconds magic number may be result of blk_mq_tag_set timeout filed default(see blk_mq_init_allocated_queue where it set to 30 * HZ)
 
-`should_fail_request` is the one that returns `false`, no? i.e.
-`should_fail_bio` is the one that gets optimized due to that to return
-`0`.
+Correct, that's where the 30s comes from.
 
-> This issue is seen with gcc compiler version 14. Previous versions
-> of gcc compiler (checked 9, 11, 12, 13) don't have this optimization.
+> Can you guys explain the behaviour? 
 
-I wonder if whatever changed could be making other things fail.
+The behavior you describe was actually just fixed yesterday by [1]; see
+that commit message for a more detailed explanation. You might also be
+interested in [2], which is a test that recreates exactly the behavior
+you describe. Before the fix in [1], the test saw an I/O take ~30s to
+complete, but after the fix, the I/O completes quickly.
 
-Anyway, given what Jens said, this may not be needed to begin with.
+[1] https://lore.kernel.org/linux-block/20250416035444.99569-6-ming.lei@redhat.com/
+[2] https://lore.kernel.org/linux-block/20250416035444.99569-9-ming.lei@redhat.com/
 
-But if it is, then as far as I recall, we try to avoid that kind of
-"don't optimize" attribute (the one you used for Clang). So it would
-be nice to find other ways to do it.
-
-For instance, if what you need is to keep the actual calls to
-`should_fail_bio` (not `should_fail_request`), then adding a side
-effect like the GCC manual suggests in the `noinline` attribute seems
-also to work from a quick test:
-
-    Even if a function is declared with the noinline attribute, there
-are optimizations other than inlining that can cause calls to be
-optimized away if it does not have side effects, although the function
-call is live. To keep such calls from being optimized away, put asm
-(""); in the called function, to serve as a special side effect.
-
-And if you also need to keep the function name emitted as-is, then
-`__used` is also needed in GCC, but that would make sense to add
-anyway if these functions were expected to be there. Given what Jens
-said, I imagine that is why they aren't annotated like that already.
-
-I hope that helps.
-
-Cheers,
-Miguel
