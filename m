@@ -1,28 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B721E19E96A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F0117E00E
 	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 13:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744896656; cv=none; b=MHxTo/vRR3rfqwvt/u9qy22fXH/dkAM6LdihTr0UxmSERf675Gg2KFx7hRsJAdMHE16O2HceF4wYxgTkhqzKWutsAxSuqlwQHs3nTP6quvlVyjuKKAL+MMUouZsxRbB6xpW7/WmnnJpMvppKPKxzQ2q0B9QdLuJVYD0GrbGpH4A=
+	t=1744896657; cv=none; b=FMM/ydKSlyGi/7zvG4TIzwRsFuT1bq3evM/OQxN3o/+ZyKujyJbdKRbnsVPQpf4tWt9iPIy0kSciQwCw25Y7zkp62JJd/rTXlwg5hnVw5rqeL54ulMKbPuYVTzs4jcdh33M27MuXX6GdDcB4rQ+4PIRkJg1MC3u1ykzKZz6yww0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744896656; c=relaxed/simple;
-	bh=y93Fzk6LVw9QOoH46kv3J8hV0gcjYJEGw7gYB0MeVVw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G+W8ATTL8te55iLBs2sdkRN+gyqrSlSK415ti40duB8Mq5XkVVUDdjWEtBGw9yAtzgT30tXrOzpqi15RPOp3MaGvzBrSLJIwt6QGohDKjkBF+7mwChXFvVNyfMIKQ+iS+7l4Vzi8FgeohXhUSLF+dkjAEevWXBqo5VAjpofyCWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	s=arc-20240116; t=1744896657; c=relaxed/simple;
+	bh=u1alj+Qix8CevZwSf56DQzAQ1XpFM/axvjDx3sybMFs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D9/Nrh7qh8+c/6mDcq+K2wr9Q4+BbFfarvcIDZscKN6PFzII3ODlX0vyxvtoMYHi/y47Bis329TOPqsprZRrKqhiplcULTane9e5YakBRO7S1CkwuSScwlRzHwW87AoJCHVFoXtNW8ZD1uNI5oQiGc5TgCYO3SHuk1PITXBRtTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zdf0L3QhQz4f3m7H
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 21:30:26 +0800 (CST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zdf0K5f0wz4f3lg9
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 21:30:25 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BCCA81A111D
+	by mail.maildlp.com (Postfix) with ESMTP id 1473A1A06DC
 	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 21:30:51 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.112.188])
-	by APP4 (Coremail) with SMTP id gCh0CgDXOl+KAgFoiwYGJw--.9194S6;
-	Thu, 17 Apr 2025 21:30:51 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgDXOl+KAgFoiwYGJw--.9194S4;
+	Thu, 17 Apr 2025 21:30:50 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org
@@ -31,12 +30,10 @@ Cc: yangerkun@huawei.com,
 	wozizhi@huaweicloud.com,
 	ming.lei@redhat.com,
 	tj@kernel.org
-Subject: [PATCH V2 2/3] blk-throttle: Delete unnecessary carryover-related fields from throtl_grp
-Date: Thu, 17 Apr 2025 21:20:53 +0800
-Message-ID: <20250417132054.2866409-3-wozizhi@huaweicloud.com>
+Subject: [PATCH V2 0/3] blk-throttle: Some bugfixes and modifications
+Date: Thu, 17 Apr 2025 21:20:51 +0800
+Message-ID: <20250417132054.2866409-1-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20250417132054.2866409-1-wozizhi@huaweicloud.com>
-References: <20250417132054.2866409-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,97 +41,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXOl+KAgFoiwYGJw--.9194S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxGw17ur4kWw48Wr18GryxGrg_yoW5Cr15pF
-	Wag3W8W3WUtFnxWa13G3WftFWUX393Gry5J398Gr1SyFyakr929r95Cr1Fya10yF93CFW0
-	qw1jqr9rAF1UuFDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBG14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAVWUtw
-	CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
-	6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64
-	vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0x
-	vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUoBT5UUUUU=
+X-CM-TRANSID:gCh0CgDXOl+KAgFoiwYGJw--.9194S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKF4DAFy5Cw4DurW8XryDGFg_yoW3Jrc_XF
+	Z7tFyrJw1UXa4rAFZ3GFn5uryjka1jgr18C3Z8KFW3Ary7J3W5Xr97t3yxWFsrZayI9FyD
+	Jrn0qF1rAr1SqjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb4xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUvXd8UUU
+	UU=
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-From: Zizhi Wo <wozizhi@huawei.com>
+Changes since V1:
+Modified patch 1 and 3 to make the changes more concise, without
+introducing additional logic changes.
 
-We no longer need carryover_[bytes/ios] in tg, so it is removed. The
-related comments about carryover in tg are also merged into
-[bytes/io]_disp, and modify other related comments.
+The patchset mainly address the update logic of tg->[bytes/io]_disp and add
+related overflow checks. The last patch also simplified the process.
 
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c |  8 ++++----
- block/blk-throttle.h | 19 ++++++++-----------
- 2 files changed, 12 insertions(+), 15 deletions(-)
+Zizhi Wo (3):
+  blk-throttle: Fix wrong tg->[bytes/io]_disp update in
+    __tg_update_carryover()
+  blk-throttle: Delete unnecessary carryover-related fields from
+    throtl_grp
+  blk-throttle: Add an additional overflow check to the call
+    calculate_bytes/io_allowed
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8ac8db116520..66a9044a5207 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -658,9 +658,9 @@ static void __tg_update_carryover(struct throtl_grp *tg, bool rw,
- 
- 	/*
- 	 * If config is updated while bios are still throttled, calculate and
--	 * accumulate how many bytes/ios are waited across changes. And
--	 * carryover_bytes/ios will be used to calculate new wait time under new
--	 * configuration.
-+	 * accumulate how many bytes/ios are waited across changes. And use the
-+	 * calculated carryover (@bytes/@ios) to update [bytes/io]_disp, which
-+	 * will be used to calculate new wait time under new configuration.
- 	 */
- 	if (bps_limit != U64_MAX)
- 		*bytes = calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
-@@ -680,7 +680,7 @@ static void tg_update_carryover(struct throtl_grp *tg)
- 	__tg_update_carryover(tg, READ, &bytes[READ], &ios[READ]);
- 	__tg_update_carryover(tg, WRITE, &bytes[WRITE], &ios[WRITE]);
- 
--	/* see comments in struct throtl_grp for meaning of these fields. */
-+	/* see comments in struct throtl_grp for meaning of carryover. */
- 	throtl_log(&tg->service_queue, "%s: %lld %lld %d %d\n", __func__,
- 		   bytes[READ], bytes[WRITE], ios[READ], ios[WRITE]);
- }
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 7964cc041e06..8bd16535302c 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -101,19 +101,16 @@ struct throtl_grp {
- 	/* IOPS limits */
- 	unsigned int iops[2];
- 
--	/* Number of bytes dispatched in current slice */
--	int64_t bytes_disp[2];
--	/* Number of bio's dispatched in current slice */
--	int io_disp[2];
--
- 	/*
--	 * The following two fields are updated when new configuration is
--	 * submitted while some bios are still throttled, they record how many
--	 * bytes/ios are waited already in previous configuration, and they will
--	 * be used to calculate wait time under new configuration.
-+	 * Number of bytes/bio's dispatched in current slice.
-+	 * When new configuration is submitted while some bios are still throttled,
-+	 * first calculate the carryover: the amount of bytes/IOs already waited
-+	 * under the previous configuration. Then, [bytes/io]_disp are represented
-+	 * as the negative of the carryover, and they will be used to calculate the
-+	 * wait time under the new configuration.
- 	 */
--	long long carryover_bytes[2];
--	int carryover_ios[2];
-+	int64_t bytes_disp[2];
-+	int io_disp[2];
- 
- 	unsigned long last_check_time;
- 
+ block/blk-throttle.c | 113 +++++++++++++++++++++++++++++++------------
+ block/blk-throttle.h |  19 +++-----
+ 2 files changed, 90 insertions(+), 42 deletions(-)
+
 -- 
 2.46.1
 
