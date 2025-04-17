@@ -1,169 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE6E111A8;
-	Thu, 17 Apr 2025 16:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79382DFA36
+	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 16:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744906830; cv=none; b=czBgtHno9Uwu+2CL+EPZ+uT/MogkyfWS//zR0BynMGFPZMAAw0AA+A8c4C9er3lbdySjFgMAcZivxICpT7G8+sTZCaIJPPah7fWhCPrJE5aM61n5pZx9Mg0aQ3DJ2W1E6HNGs97JK5FyJHGTRRzOctzW4gAh5h8prty89/a1GGA=
+	t=1744907481; cv=none; b=rzyLW++1QYx8VZnjyJVR7GssvM4kZz5j6NfN7TzGNtqxtRb+WjlAmOMEHfQrlyOGimqNfqqUUiP2mi1+B4ijZc7k+vd/mHQtb0+X6YsJXZiVR8UBOSpDs7dANM/i6pSxcK3KxHh7l+1V6Er7gusoJ6VlMRkivrZKi52fTQfSwxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744906830; c=relaxed/simple;
-	bh=kGndQ9NUqxvyRKeTtx7cf9T0tiiJ9o7q56mTnhwuY38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZhNNrgA7CL0eQ4NiLaZXCGeZd0syhPj0eh2sDJ8v6aBOzuur9bs6m18p8Y6q4RMQx0NaEoDFERMxaoNMN2Ooi32g6Yhg7xjMw9wqJhDl28wabKuBm/VL+Gir3s7pSDpCCBKjXyketmBk8o3FGo40+v87uTslGkyrlx3GxDIlvQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AAv2Hcch; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744907481; c=relaxed/simple;
+	bh=7HGsYQoek00cZK6/1MDP9yCaqwyEWuxfX6aNwc7rew0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MiWwTHdsjnZPu8q6Pbm+g9CtqDNdpd6JbdzupXwEHCXtrFcqfKnAY/6OtJwp+2xZvlOIgDpV8KNNk8qrFhyllqRUrpdTs9NfYTQ7z913Af0BvqVs4cXka1GChJkOTxx1vy+r9VK0wwWcuIv8N5K75luRKrur1x+aP1jx1Jhk8Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=I4TFnj/d; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AAv2Hcch"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF2BC4CEE4;
-	Thu, 17 Apr 2025 16:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744906829;
-	bh=kGndQ9NUqxvyRKeTtx7cf9T0tiiJ9o7q56mTnhwuY38=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AAv2Hcch0w/nkdmVgq0WW7ED4hnPbw4zpThyNyUX9AnQ7t6Nk5mDnrm/BrbYeN5T5
-	 ZlQDsNAsIlkD0LbOw8kJYiLPRTbGsGB8xNku1hAX7e/ptqudBlEZTW5r69eOvy7wpY
-	 4N4TMdvVXgizbbnC3IkS0Dacxojc8TQAmukcztSQX4uBsJR6ztBgw19ryVhDJXHPcv
-	 vjBnuAVmPWUI+/RLk15do932ejyxYdesTZ4zDa9K/IIbOBFh3vu7TV5VwohSuaA6xg
-	 fTBgD5BAt2pbexf6l2GTz1CJGwPAChJBRbnOee8hn8cMAheaBS2pUtMujLdKIEaOf8
-	 Vl2OZixdk5r/Q==
-Date: Thu, 17 Apr 2025 09:20:29 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: brauner@kernel.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-	ebiggers@google.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
-Message-ID: <20250417162029.GH25659@frogsfrogsfrogs>
-References: <20250417064042.712140-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I4TFnj/d"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53HGMvI8009922;
+	Thu, 17 Apr 2025 16:31:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=zKgoN7hFRFIDJS/nrfAR2mC0ZzUWh
+	P97gqYicaCFAzg=; b=I4TFnj/doQeuOUgY/RAoRkMvJ1nDvrhURjPAr8G47PsWd
+	NfUJXCjSbnQsWhKvEjteRZojGlTZ/ct1cZtNHbMfwquW0jvuRsOAn5WUYilL/Dwn
+	vrK755Z8USn9lJXmFyQe/RSq4hfhLzof3KhH69+FEnDYZouMyBRu+3mvoffqKV7r
+	BBucg0HsmHVSox8LkMN6MrzOjAMJHo4c5E4hyQCUM8dDYZ92xBRj02Rmyzzx4jDg
+	+pQbwPN2fjJQhsxUYC+t11KqvGdbOHT6N8y6AOxM80/j/iZ/43DAeWR91394f4HD
+	N1IAti+fELk1Me2gIRekO6SbJE8IW9q68wRbaKsyQ==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46187xxu56-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Apr 2025 16:31:13 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53HG8nli008496;
+	Thu, 17 Apr 2025 16:31:13 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 460d2th0w2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Apr 2025 16:31:13 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 53HGVCin021221;
+	Thu, 17 Apr 2025 16:31:12 GMT
+Received: from ca-ldom148.us.oracle.com.com (ca-ldom148.us.oracle.com [10.129.68.133])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 460d2th0uw-1;
+	Thu, 17 Apr 2025 16:31:12 +0000
+From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+To: linux-block@vger.kernel.org, axboe@kernel.dk
+Cc: prasad.singamsetty@oracle.com, arnd@arndb.de, ojeda@kernel.org,
+        nathan@kernel.org, martin.petersen@oracle.com
+Subject: [PATCH 1/1] block: prevent calls to should_fail_bio() optimized by gcc
+Date: Thu, 17 Apr 2025 09:34:32 -0700
+Message-ID: <20250417163432.1336124-1-prasad.singamsetty@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250417064042.712140-1-hch@lst.de>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-17_05,2025-04-17_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ phishscore=0 bulkscore=0 suspectscore=0 mlxscore=0 mlxlogscore=986
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2504170121
+X-Proofpoint-GUID: yjbzJsz_BIluWsJp_D89MBmRHbLxz_TE
+X-Proofpoint-ORIG-GUID: yjbzJsz_BIluWsJp_D89MBmRHbLxz_TE
 
-On Thu, Apr 17, 2025 at 08:40:42AM +0200, Christoph Hellwig wrote:
-> Currently bdex_statx is only called from the very high-level
-> vfs_statx_path function, and thus bypassing it for in-kernel calls
-> to vfs_getattr or vfs_getattr_nosec.
-> 
-> This breaks querying the block ѕize of the underlying device in the
-> loop driver and also is a pitfall for any other new kernel caller.
-> 
-> Move the call into the lowest level helper to ensure all callers get
-> the right results.
-> 
-> Fixes: 2d985f8c6b91 ("vfs: support STATX_DIOALIGN on block devices")
-> Fixes: f4774e92aab8 ("loop: take the file system minimum dio alignment into account")
-> Reported-by: Darrick J. Wong <djwong@kernel.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+When CONFIG_FAIL_MAKE_REQUEST is not enabled, gcc may optimize out
+calls to should_fail_bio() because the content of should_fail_bio()
+is empty returning always 'false'. The gcc compiler then detects
+the function call to should_fail_bio() being empty and optimizes
+out the call to it. This prevents block I/O error injection programs
+attached to it from working. The compiler is not aware of the side
+effect of calling this probe function.
 
-This appears to solve the problem as well.
+This issue is seen with gcc compiler version 14. Previous versions
+of gcc compiler (checked 9, 11, 12, 13) don't have this optimization.
 
-Tested-by: "Darrick J. Wong" <djwong@kernel.org>
+Clang compiler (seen with version 18.1.18) has the same issue of
+optimizing out calls to should_fail_bio().
 
---D
+Adding the compiler attribute __attribute__((noipa)) to should_fail_bio()
+function avoids this optimization. This attribute is available starting
+from gcc compiler version 8.1. Adding this attribute avoids the issue
+and only side effect is the slight increase in the code size of the
+binary blk-core.o (e.g. 16 bytes with gcc version 11 and 48 bytes
+with gcc version 14) as expected.
 
-> ---
->  block/bdev.c           |  3 +--
->  fs/stat.c              | 32 ++++++++++++++++++--------------
->  include/linux/blkdev.h |  6 +++---
->  3 files changed, 22 insertions(+), 19 deletions(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 4844d1e27b6f..6a34179192c9 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -1272,8 +1272,7 @@ void sync_bdevs(bool wait)
->  /*
->   * Handle STATX_{DIOALIGN, WRITE_ATOMIC} for block devices.
->   */
-> -void bdev_statx(struct path *path, struct kstat *stat,
-> -		u32 request_mask)
-> +void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
->  {
->  	struct inode *backing_inode;
->  	struct block_device *bdev;
-> diff --git a/fs/stat.c b/fs/stat.c
-> index f13308bfdc98..3d9222807214 100644
-> --- a/fs/stat.c
-> +++ b/fs/stat.c
-> @@ -204,12 +204,25 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
->  				  STATX_ATTR_DAX);
->  
->  	idmap = mnt_idmap(path->mnt);
-> -	if (inode->i_op->getattr)
-> -		return inode->i_op->getattr(idmap, path, stat,
-> -					    request_mask,
-> -					    query_flags);
-> +	if (inode->i_op->getattr) {
-> +		int ret;
-> +
-> +		ret = inode->i_op->getattr(idmap, path, stat, request_mask,
-> +				query_flags);
-> +		if (ret)
-> +			return ret;
-> +	} else {
-> +		generic_fillattr(idmap, request_mask, inode, stat);
-> +	}
-> +
-> +	/*
-> +	 * If this is a block device inode, override the filesystem attributes
-> +	 * with the block device specific parameters that need to be obtained
-> +	 * from the bdev backing inode.
-> +	 */
-> +	if (S_ISBLK(stat->mode))
-> +		bdev_statx(path, stat, request_mask);
->  
-> -	generic_fillattr(idmap, request_mask, inode, stat);
->  	return 0;
->  }
->  EXPORT_SYMBOL(vfs_getattr_nosec);
-> @@ -295,15 +308,6 @@ static int vfs_statx_path(struct path *path, int flags, struct kstat *stat,
->  	if (path_mounted(path))
->  		stat->attributes |= STATX_ATTR_MOUNT_ROOT;
->  	stat->attributes_mask |= STATX_ATTR_MOUNT_ROOT;
-> -
-> -	/*
-> -	 * If this is a block device inode, override the filesystem
-> -	 * attributes with the block device specific parameters that need to be
-> -	 * obtained from the bdev backing inode.
-> -	 */
-> -	if (S_ISBLK(stat->mode))
-> -		bdev_statx(path, stat, request_mask);
-> -
->  	return 0;
->  }
->  
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index e39c45bc0a97..678dc38442bf 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1685,7 +1685,7 @@ int sync_blockdev(struct block_device *bdev);
->  int sync_blockdev_range(struct block_device *bdev, loff_t lstart, loff_t lend);
->  int sync_blockdev_nowait(struct block_device *bdev);
->  void sync_bdevs(bool wait);
-> -void bdev_statx(struct path *, struct kstat *, u32);
-> +void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask);
->  void printk_all_partitions(void);
->  int __init early_lookup_bdev(const char *pathname, dev_t *dev);
->  #else
-> @@ -1703,8 +1703,8 @@ static inline int sync_blockdev_nowait(struct block_device *bdev)
->  static inline void sync_bdevs(bool wait)
->  {
->  }
-> -static inline void bdev_statx(struct path *path, struct kstat *stat,
-> -				u32 request_mask)
-> +static inline void bdev_statx(const struct path *path, struct kstat *stat,
-> +		u32 request_mask)
->  {
->  }
->  static inline void printk_all_partitions(void)
-> -- 
-> 2.47.2
-> 
-> 
+For Clang case, 'noipa' attribute is not available but it has a similar
+attribute, 'optnone', with the same effect and fixes the issue. So, the
+patch adds either 'noipa' attribute for gcc case or 'optnone' for
+Clang case.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+---
+ block/blk-core.c                    |  2 +-
+ include/linux/compiler_attributes.h | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e8cc270a453f..fb1da9ea92bb 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -539,7 +539,7 @@ static inline void bio_check_ro(struct bio *bio)
+ 	}
+ }
+ 
+-static noinline int should_fail_bio(struct bio *bio)
++static noipa noinline int should_fail_bio(struct bio *bio)
+ {
+ 	if (should_fail_request(bdev_whole(bio->bi_bdev), bio->bi_iter.bi_size))
+ 		return -EIO;
+diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
+index c16d4199bf92..9d4726c3426e 100644
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -230,6 +230,21 @@
+  */
+ #define   noinline                      __attribute__((__noinline__))
+ 
++/*
++ * Optional: only supported since gcc >= 8
++ * Optional: Not supported by clang. "optnone" is used to
++ *	     disable all otipmizations
++ *
++ * gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noipa-function-attribute
++ */
++#if __has_attribute(__noipa__)
++#define   noipa                      __attribute__((__noipa__))
++#elif __has_attribute(__optnone__)
++#define   noipa                      __attribute__((__optnone__))
++#else
++#define   noipa
++#endif
++
+ /*
+  * Optional: only supported since gcc >= 8
+  * Optional: not supported by clang
+
+base-commit: 1a1d569a75f3ab2923cb62daf356d102e4df2b86
+-- 
+2.43.5
+
