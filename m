@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71985213E71
-	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8959208A7
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744994270; cv=none; b=pqEH/a+WFjnSA6KtKbXEjeCMet8w8Eo12gEdd6/BhPB9q3omX6cxwEfg6BHPdBuh8LI15xbcMBUv3hirm3SJ1vDxqZ/eLfpZItfckkz9HKtg2O0S4sL8QPR8BdgBsS9y5yUjsKCkC7W8IOzzJs6YFv6cbNQHdYWSWeru5N6/RA4=
+	t=1744994275; cv=none; b=uFCoDI2ot8UTRnkJhgqyKicyTUkdphkA9AucEaTakosL0qp9uDLNH1WYipsP+grnP1SPBlx8l0u4pdNTnRxcPrQkqr2VsF4FYXq45EV55uzZXq+M6K4b895K3lStDS51v5tl6HJwWAoSfz+JIvqGu+YP0+RC8CLkq4KWRnetZYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744994270; c=relaxed/simple;
-	bh=dBS/j8Rw0TlgkqwNXurMc0QN3YOINorYTIJ6hFVUIYI=;
+	s=arc-20240116; t=1744994275; c=relaxed/simple;
+	bh=b/MSZZsD+HCnboRalqnYxzjKQ8CYWeV0BzzDNKGiOdk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jp2sqj7xhqnLSwUbD+/w2iWpma3F7PdIpvxeUI6cw1vWFTdBMe52G6yb4UaGtci8xI4tIs0jIlXehn6NAXKqWVe59uuEPieIkb0OT5UIEOqQeXZZbQSeECyWsXqL3G7ZMqcEiM2ojXdzQEycmRMdjh2dDRTECvpRb1f8RpfzhTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CIkK2y4M; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=A8zqZlYWI3O6wnlt6esl0Lv+hsIpigTnAJ9u0sdoC7swCnf1vcmhMhbVEAB6iOlX3o/iq8tl+MKWlFkAdaqMA/2y5TU6iPas0sGrsXnECo69TEiWg5ohwR+X0NQTC50qFrkxgNsyswZ/vmOBPw35nPiqD5+8n8WcWHAuyUgvQ/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=He6TsD+2; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIkK2y4M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="He6TsD+2"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744994267;
+	s=mimecast20190719; t=1744994272;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sQNGHwXdkGsB87pTkvJtPUoq1bBw6AOdCjyb1IuON4g=;
-	b=CIkK2y4Mz1t8pH5Q0mqNv8zpx5BauHxYes32c/SV+kS6CQAcpBXJNDxZJ8MsB18dE7s3MF
-	4aXk1Awe1asGkmWH2l/46x+5brgVsRFZJS6snO928qeifKJRoVxB2OoUIs6iB6uL6/vC0p
-	J7gL4cM07eSOs0SdMAUXje8BuWCGAKU=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=76SV8HuxVR187jaN0G5ISTMO24o9l6sktx4O1GP+5hs=;
+	b=He6TsD+2kCIwsL6mWtHAHcg8YwGVhs3+fHB4xgQVJYwbBK4anZmtAAI2oXp71yeFpUmP+p
+	SSbaq3mm2sdDa7yPHXxp+5NSB6EjhefbkKo71JNDP/ka0Gd+48yliMPQvQ1uzGBElrDKm8
+	CFA7zf9ZA5JDagn8Blch2ojhudYlaVY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-510-U_v6r0zlNPSJt7CNoy7bBA-1; Fri,
- 18 Apr 2025 12:37:44 -0400
-X-MC-Unique: U_v6r0zlNPSJt7CNoy7bBA-1
-X-Mimecast-MFC-AGG-ID: U_v6r0zlNPSJt7CNoy7bBA_1744994263
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-mo8bE56hOjms3fup_aGOnQ-1; Fri,
+ 18 Apr 2025 12:37:48 -0400
+X-MC-Unique: mo8bE56hOjms3fup_aGOnQ-1
+X-Mimecast-MFC-AGG-ID: mo8bE56hOjms3fup_aGOnQ_1744994267
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CCE6D1800ECA;
-	Fri, 18 Apr 2025 16:37:42 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5F2011800263;
+	Fri, 18 Apr 2025 16:37:47 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.50])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B04A219560BA;
-	Fri, 18 Apr 2025 16:37:41 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE6A819560A3;
+	Fri, 18 Apr 2025 16:37:45 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -50,9 +50,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 05/20] block: move sched debugfs register into elvevator_register_queue
-Date: Sat, 19 Apr 2025 00:36:46 +0800
-Message-ID: <20250418163708.442085-6-ming.lei@redhat.com>
+Subject: [PATCH V2 06/20] block: add & pass 'struct gendisk_data' for retrying add/del disk in updating nr_hw_queues
+Date: Sat, 19 Apr 2025 00:36:47 +0800
+Message-ID: <20250418163708.442085-7-ming.lei@redhat.com>
 In-Reply-To: <20250418163708.442085-1-ming.lei@redhat.com>
 References: <20250418163708.442085-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -62,129 +62,177 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-sched debugfs shares same lifetime with scheduler's kobject, and same
-lock(elevator lock), so move sched debugfs register/unregister into
-elevator_register_queue() and elevator_unregister_queue().
+Add/del gendisk code is actually reader of 'nr_hw_queues' in case of blk-mq:
 
-Then we needn't blk_mq_debugfs_register() for us to register sched
-debugfs any more.
+- debugfs / hctx sysfs register
+
+- setup scheduler since ->sched_tags depends on hctx, which relies on
+'nr_hw_queues'
+
+Add & pass 'struct gendisk_data' to add/del disk helper and prepare for
+retrying add/del disk when updating nr_hw_queues is in-progress.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 11 -----------
- block/blk-mq-sched.c   | 11 ++---------
- block/elevator.c       |  8 ++++++++
- block/elevator.h       |  3 +++
- 4 files changed, 13 insertions(+), 20 deletions(-)
+ block/genhd.c | 105 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 67 insertions(+), 38 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 31e249a18407..0fa0f8836b7d 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -625,20 +625,9 @@ void blk_mq_debugfs_register(struct request_queue *q)
+diff --git a/block/genhd.c b/block/genhd.c
+index c2bd86cd09de..4370c5be1f34 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -33,6 +33,13 @@
+ #include "blk-rq-qos.h"
+ #include "blk-cgroup.h"
  
- 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
- 
--	/*
--	 * blk_mq_init_sched() attempted to do this already, but q->debugfs_dir
--	 * didn't exist yet (because we don't know what to name the directory
--	 * until the queue is registered to a gendisk).
--	 */
--	if (q->elevator && !q->sched_debugfs_dir)
--		blk_mq_debugfs_register_sched(q);
--
--	/* Similarly, blk_mq_init_hctx() couldn't do this previously. */
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (!hctx->debugfs_dir)
- 			blk_mq_debugfs_register_hctx(q, hctx);
--		if (q->elevator && !hctx->sched_debugfs_dir)
--			blk_mq_debugfs_register_sched_hctx(q, hctx);
- 	}
- 
- 	if (q->rq_qos) {
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 2abc5e0704e8..336a15ffecfa 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -434,7 +434,7 @@ static int blk_mq_init_sched_shared_tags(struct request_queue *queue)
- 	return 0;
- }
- 
--static void blk_mq_sched_reg_debugfs(struct request_queue *q)
-+void blk_mq_sched_reg_debugfs(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
-@@ -446,7 +446,7 @@ static void blk_mq_sched_reg_debugfs(struct request_queue *q)
- 	mutex_unlock(&q->debugfs_mutex);
- }
- 
--static void blk_mq_sched_unreg_debugfs(struct request_queue *q)
-+void blk_mq_sched_unreg_debugfs(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
-@@ -503,10 +503,6 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 			}
- 		}
- 	}
--
--	/* sched is initialized, it is ready to export it via debugfs */
--	blk_mq_sched_reg_debugfs(q);
--
- 	return 0;
- 
- err_free_map_and_rqs:
-@@ -544,9 +540,6 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
- 	unsigned long i;
- 	unsigned int flags = 0;
- 
--	/* unexport via debugfs before exiting sched */
--	blk_mq_sched_unreg_debugfs(q);
--
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (e->type->ops.exit_hctx && hctx->sched_data) {
- 			e->type->ops.exit_hctx(hctx, i);
-diff --git a/block/elevator.c b/block/elevator.c
-index 5051a98dc08c..d25b9cc6c509 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -472,6 +472,11 @@ int elv_register_queue(struct request_queue *q, bool uevent)
- 		if (uevent)
- 			kobject_uevent(&e->kobj, KOBJ_ADD);
- 
-+		/*
-+		 * Sched is initialized, it is ready to export it via
-+		 * debugfs
-+		 */
-+		blk_mq_sched_reg_debugfs(q);
- 		set_bit(ELEVATOR_FLAG_REGISTERED, &e->flags);
- 	}
- 	return error;
-@@ -486,6 +491,9 @@ void elv_unregister_queue(struct request_queue *q)
- 	if (e && test_and_clear_bit(ELEVATOR_FLAG_REGISTERED, &e->flags)) {
- 		kobject_uevent(&e->kobj, KOBJ_REMOVE);
- 		kobject_del(&e->kobj);
++struct gendisk_data {
++	struct gendisk *disk;
++	struct device *parent;
++	const struct attribute_group **groups;
++	struct fwnode_handle *fwnode;
++};
 +
-+		/* unexport via debugfs before exiting sched */
-+		blk_mq_sched_unreg_debugfs(q);
- 	}
+ static struct kobject *block_depr;
+ 
+ /*
+@@ -389,21 +396,9 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 	return ret;
  }
  
-diff --git a/block/elevator.h b/block/elevator.h
-index e27af5492cdb..9198676644a9 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -181,4 +181,7 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
- #define rq_entry_fifo(ptr)	list_entry((ptr), struct request, queuelist)
- #define rq_fifo_clear(rq)	list_del_init(&(rq)->queuelist)
+-/**
+- * add_disk_fwnode - add disk information to kernel list with fwnode
+- * @parent: parent device for the disk
+- * @disk: per-device partitioning information
+- * @groups: Additional per-device sysfs groups
+- * @fwnode: attached disk fwnode
+- *
+- * This function registers the partitioning information in @disk
+- * with the kernel. Also attach a fwnode to the disk device.
+- */
+-int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+-				 const struct attribute_group **groups,
+-				 struct fwnode_handle *fwnode)
+-
++static int __add_disk_fwnode(struct gendisk_data *data)
+ {
++	struct gendisk *disk = data->disk;
+ 	struct device *ddev = disk_to_dev(disk);
+ 	int ret;
  
-+void blk_mq_sched_reg_debugfs(struct request_queue *q);
-+void blk_mq_sched_unreg_debugfs(struct request_queue *q);
+@@ -463,11 +458,11 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+ 	/* delay uevents, until we scanned partition table */
+ 	dev_set_uevent_suppress(ddev, 1);
+ 
+-	ddev->parent = parent;
+-	ddev->groups = groups;
++	ddev->parent = data->parent;
++	ddev->groups = data->groups;
+ 	dev_set_name(ddev, "%s", disk->disk_name);
+-	if (fwnode)
+-		device_set_node(ddev, fwnode);
++	if (data->fwnode)
++		device_set_node(ddev, data->fwnode);
+ 	if (!(disk->flags & GENHD_FL_HIDDEN))
+ 		ddev->devt = MKDEV(disk->major, disk->first_minor);
+ 	ret = device_add(ddev);
+@@ -572,6 +567,30 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+ 	}
+ 	return ret;
+ }
 +
- #endif /* _ELEVATOR_H */
++/**
++ * add_disk_fwnode - add disk information to kernel list with fwnode
++ * @parent: parent device for the disk
++ * @disk: per-device partitioning information
++ * @groups: Additional per-device sysfs groups
++ * @fwnode: attached disk fwnode
++ *
++ * This function registers the partitioning information in @disk
++ * with the kernel. Also attach a fwnode to the disk device.
++ */
++int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
++				 const struct attribute_group **groups,
++				 struct fwnode_handle *fwnode)
++{
++	struct gendisk_data data = {
++		.disk	= disk,
++		.parent	= parent,
++		.groups	= groups,
++		.fwnode = fwnode,
++	};
++
++	return __add_disk_fwnode(&data);
++}
+ EXPORT_SYMBOL_GPL(add_disk_fwnode);
+ 
+ /**
+@@ -652,27 +671,9 @@ void blk_mark_disk_dead(struct gendisk *disk)
+ }
+ EXPORT_SYMBOL_GPL(blk_mark_disk_dead);
+ 
+-/**
+- * del_gendisk - remove the gendisk
+- * @disk: the struct gendisk to remove
+- *
+- * Removes the gendisk and all its associated resources. This deletes the
+- * partitions associated with the gendisk, and unregisters the associated
+- * request_queue.
+- *
+- * This is the counter to the respective __device_add_disk() call.
+- *
+- * The final removal of the struct gendisk happens when its refcount reaches 0
+- * with put_disk(), which should be called after del_gendisk(), if
+- * __device_add_disk() was used.
+- *
+- * Drivers exist which depend on the release of the gendisk to be synchronous,
+- * it should not be deferred.
+- *
+- * Context: can sleep
+- */
+-void del_gendisk(struct gendisk *disk)
++static void __del_gendisk(struct gendisk_data *data)
+ {
++	struct gendisk *disk = data->disk;
+ 	struct request_queue *q = disk->queue;
+ 	struct block_device *part;
+ 	unsigned long idx;
+@@ -766,6 +767,34 @@ void del_gendisk(struct gendisk *disk)
+ }
+ EXPORT_SYMBOL(del_gendisk);
+ 
++/**
++ * del_gendisk - remove the gendisk
++ * @disk: the struct gendisk to remove
++ *
++ * Removes the gendisk and all its associated resources. This deletes the
++ * partitions associated with the gendisk, and unregisters the associated
++ * request_queue.
++ *
++ * This is the counter to the respective __device_add_disk() call.
++ *
++ * The final removal of the struct gendisk happens when its refcount reaches 0
++ * with put_disk(), which should be called after del_gendisk(), if
++ * __device_add_disk() was used.
++ *
++ * Drivers exist which depend on the release of the gendisk to be synchronous,
++ * it should not be deferred.
++ *
++ * Context: can sleep
++ */
++void del_gendisk(struct gendisk *disk)
++{
++	struct gendisk_data data = {
++		.disk	= disk,
++	};
++
++	__del_gendisk(&data);
++}
++
+ /**
+  * invalidate_disk - invalidate the disk
+  * @disk: the struct gendisk to invalidate
 -- 
 2.47.0
 
