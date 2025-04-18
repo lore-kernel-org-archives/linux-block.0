@@ -1,244 +1,271 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAEF6BFC0
-	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 14:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFA3202C39;
+	Fri, 18 Apr 2025 15:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744987576; cv=none; b=YDgkSLVwHtT/KTY17P9ogr5VrENS4Ma5aMb7Z0/dcG8gBB3zr5DBs/0k4ou7Af2Vxr3Vj3ktWUqQ560BTpCcaK8lA87MC8K/KdJcd8PGk8yKrNorO8Mb7SL3BVbs14HmcviFxeqQC4meUX0BQYdZPQ4kCLt6z4sDKg0NrVHrH0E=
+	t=1744988992; cv=none; b=goRAiUmyRkELJljBuGev0uefJNmE67lgpy1GAXOmYxxaZdgWmhxglETziL84mJCe+MPJOxh/YRDNjwMQeJcy4blnEwC2/iK+Y/I+eO2qZvToO4wOc3FEOurmStZPqXtGHALe8rDtA41Yx9WKwag9JSdWCYBFXJdPwxfW6JiDpn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744987576; c=relaxed/simple;
-	bh=fkgEP82sL36Bu8aaBQzYl5A3DPm247dW8LN+3zwqGi4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=cw1aizKVpN0NrANcNl250a1MpyIfiLj8JTnE0WBIPjsmv6tnFRalL5W4cnP7ko/FWgH2Y+x+G70Ak8arixh84TPeJY9Umy2Pb/GW7SjxJMNZml5cCyWNGonCudKCgHMkHjaAX9UfpejwfAAeO9ONpgqYXOvcG2DiSccgiv2UnZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=T423JlTs; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1744988992; c=relaxed/simple;
+	bh=2qohQ+xSG/GqE5kuEePnSypo3ajAJaZ5/gr7rkBrLoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s4poZHnDMQY2u6lkIeS8uatVs5NcLVW0ScvujjTtGdy5YPGISLfw44crhBslJtv2L775CbM0/5hftW1Q9KTIRYrWJ0CIkpRjYPoKUkCckAogSiXn6getlN/4LgI+VMru1TiBCKMmuCrPcfX4Po/X8KLk3zm1i2OdtzMjW77Sgmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bi3OhdQb; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="T423JlTs"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-85de3e8d0adso29297339f.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 07:46:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bi3OhdQb"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-476b4c9faa2so22816711cf.3;
+        Fri, 18 Apr 2025 08:09:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744987573; x=1745592373; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r1v9dYbC10aYDB5Oides3qJLDSYw1vqTQG3xIkm5XB8=;
-        b=T423JlTs6D03mvBPlN4rrnTwKyssV86ZBLeHt60wphOofgNmdROHWDz4Iz8Dfw9pnn
-         2LKP+m0IS1OpN10NtJ6FsjMVHgLEECyRG3xgqthrMyURqy+wyGL8X+HXGlJpzlyZZLzr
-         E63+iCqrVcqw72x28LBAyGFrSuVX1E+2/yyTQAE1QRy0YennWuZlax8r9oSSH0ZvXr0z
-         uROTH2VbuenyV9wfY1dL2pkZ36ujSHy2io4ySj8YrbxPtOb69i3RXXFAUaHjoL0xwT7+
-         TzcLCXqzHhEzGsO77Q+pLPhLHDBMnT640KIPqr6dRLsQPToUUbm4M33yyix1qaX2JIW1
-         BEzw==
+        d=gmail.com; s=20230601; t=1744988990; x=1745593790; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Dsv3z7t+31gGPh4O3y1P8SBdY+OOoan8i9lPYxKHL8=;
+        b=Bi3OhdQbQQwgpPckuvzFmLzxW64q3Y2diZixS5QPIp/XlRhgJhdx6kaTO0Eol+JI7X
+         w0VIylmo+d92yv/I2iB7duLMsGywqTMn0Hiqod1Xppq4eZbvumCp9G48flvIk5oQJcnu
+         VtjE10sbCKB9QnklwKSRWH3/zdb48PXDxUqwvGqfSjTSX61afDa4JAFMBqGGJ0XKS8oE
+         8iO1ioAEpn3Z9lZMYcHoivkHBEUbWZ6r9eDHv6ik4x7V+lOAoxUHMlRi8t2+P2U/MeAT
+         +H8z06grvrOJOZcLeN4z/f5YY9nRcj2knbw30FKyE2zQXFUeJbUJ57DiiQykMO6/1F9M
+         mh2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744987573; x=1745592373;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r1v9dYbC10aYDB5Oides3qJLDSYw1vqTQG3xIkm5XB8=;
-        b=GfO2f9/BeQX/DanT3oxfsJa+BV243U9xGJLHCu3tmKmaD/Zmfj6Xp167LEfzcyjqmV
-         XqOlSIia5XRwIELUxYw0MD1cRgQOJCHLzwNKNjoYEgN/8NpeJJSRK+6u+O4dcorBzZ7X
-         zVjisxanDj7Utld+uR7EBzl0asBfnfEWjPJ45dzukxjEBc0/VqDdWWMeEHepmJiV3FZq
-         VwbsAAESCSf8oEZYD8rWO817crYeUMk5YgAcO38gGP3obgMp/GLz771/0xIDVxn5ixyS
-         9akBZZKemEgzbg5borKsxhkb8SnT0Z6KroMtpjcMNuArLgWx8cpVz5WVvwczOOvzX7tB
-         lqiw==
-X-Gm-Message-State: AOJu0Yy17Z5jJDBCbsdrcWc9dTPXlMebnkl06tnH5wXuvmtkEgwIg8Zc
-	XZA9P9l2DGY7cvp2YG8TmJh6TDLSEqw6xXKFFkBBWW62Lvj93z/0vUfA7y3JoFFHMwIgkYs+v+1
-	Y
-X-Gm-Gg: ASbGncuFBbqT+FrpLnI9gjOJPz1gOz1phl+kn32iPQmfS0ALWQB3DK8zMz7dSAnmDUF
-	TR3iyVTAtVXgP2h1SUuSMv+aaWcM9igD5m0VVetqJu2rNalO2M1/JQ9j902ThIYdobO9JLli9Pl
-	eD2pIyAV+O47eJABNVI6FpMCzXS7WA8Kbkfu0lAFegl8tBzH05gVYgups8B+HQUNkNYty3URjPn
-	mfGoq84EvlwkBCYtKW4jUD7HDzc0MJJ+CcQd7EuWJ+yeQ0NUNWWMcTxB5PTe5VTqz8FHt7VRTqx
-	hqdoPJQQTkoNfH2vwhGAQ+Idr3Nz7V5nTkDF
-X-Google-Smtp-Source: AGHT+IEuEUQoOEdqE53CjWsw7A596YL8mnP2YWKQ/a+aCCdL1QVWook+SFvhpPwU7568YBUskNWtjA==
-X-Received: by 2002:a05:6602:3789:b0:85b:3885:159e with SMTP id ca18e2360f4ac-861dbdc71e1mr309429139f.3.1744987572700;
-        Fri, 18 Apr 2025 07:46:12 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-861d95f7ae0sm39366739f.16.2025.04.18.07.46.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Apr 2025 07:46:12 -0700 (PDT)
-Message-ID: <441e0e5d-a493-4197-b64c-29c407c67bfb@kernel.dk>
-Date: Fri, 18 Apr 2025 08:46:11 -0600
+        d=1e100.net; s=20230601; t=1744988990; x=1745593790;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0Dsv3z7t+31gGPh4O3y1P8SBdY+OOoan8i9lPYxKHL8=;
+        b=o5SqWBz0IQMtuSFOSBGoNaMe55mIsHJ4hqZQiE3yOy6LLnwvKuqpsOxGKCGFMSS4KO
+         tCqFTgTQVUkwqk+BEzZUaFz862mbP+k3JFD2Xr5w0XozpkopjBWMMO5rqyxbCCn4DmW/
+         TeewxOlHabvickqYAJv+iPxShpFa6L8lAI/DG16mmF8H9MCjpVwfcwRt4ft90YvB8Yf+
+         nChld5dpEErm3jSnk+NQdRC0niEbkGdLBVjpaTFfXuCni7AojtJwd0Eth7JCkPkWjaVz
+         m614iBKO8Uvv1kspB3hFR40dOpLAg42lWH8V5XvVobcgbMaSuifKNfJ2HEnWIbzWHChY
+         lcmg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/+6xxA3alYA8CBEha/rhvzmTg33sB39Azi9zOSUhuJB2soH0u4s0IzTO1eatAOcBzNGbkVc38NbM2UqyDOlY=@vger.kernel.org, AJvYcCUHxRZSWzAARPbwVMTX+iVtu72PfhH1lNoaCbSBXVotQfY2+sMT0SmGIEpQ9mg2LQfGLhLjhCcfADPxddYL@vger.kernel.org, AJvYcCUk6vZdlxRs+3oMZrJSE/6FTONDL1Qw26E/hq/++HSwvhFcDLPvnDjwCwoKlYu83XJnskILGqe0a+lh@vger.kernel.org, AJvYcCVucwZMJjnRpXzfrPCIXQTEkfLhQZPjEM3G5jKUF1Zwozp5R0U0ZcBzQNqolckPWDu94pMZ9BXX@vger.kernel.org, AJvYcCW5p3xDIAuOKp8naDhjSo7EgIpil/MTP/V1+BomOT/hQRkgZWJsDmWBrvFUw1ShvRBu6bCDLT4OTqOs@vger.kernel.org, AJvYcCWAuyb64KdXtnuBPcFZrih0aZ21SQ0QeWFPLq/OkKeF8mTUyelSSBc8bK1p8Z3LdxEIVmVYJsDsNZqkqXi/1Imm@vger.kernel.org, AJvYcCWpBzr6uFe6DbN0P1mmpWMBm+osd+PDPIojrKBxhSPr2ivcI62VXZC2Wp1cWJMeZQ61htAPI0HLiV/9owFS@vger.kernel.org, AJvYcCWrx2yQSdNg08wfPDWKuLTqS3tJxkMwxaGeTnRwBG4gghcVJCMddANpK7iCalXtHUtVodIVl8oIYxycloU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz/AkLKz9WIutj7BduOWiFi4jSIJyeLD84rl/lsdKPxi+BSyL0
+	EpJFIhjhWHv9jF9s6lDQMwUNopUgkGfWfL34y5t3xL7U6DW/BLps
+X-Gm-Gg: ASbGncvRa63ieqR4P9+ymmvBQKMZ0aMxFoHvmGKpDlRk4CJPa/CLf+MN8rs4wZVKnyi
+	RYZOtovZlx49TcLnoS1AmvU4ZnmH1Ye/ssQom4/MB986jDgf4+Lh7TiP9toPa03m55wbu4VfhyE
+	cNoKLNLAbwhnpwIxIpW3X7zZXqsfA5yCDl/hhfZc0ktHtjcXs5YqXymAZKZ64aRJIIce4ofAGJf
+	sD1+oFMaGVfwNx9nu0pU4RSIy7dW6XJ1I/UUf6fM5GaM/QlrBFJ+G5PIz4MbNV0vpa+kj4H4yi0
+	tEs5NgiRu44vuFlTrBImu/FrBjmU/hDEORfazazL6Ijy6vrjv4VYwFyihjWXDV7lHUcmPDWLztL
+	OwiQwIWUMyXRFvkGHCLwL+84zKcLKxCMcqNCymKqgSQ==
+X-Google-Smtp-Source: AGHT+IENEr3mX6PNJMlR4IakA2btIJgcBi6yGsy3CWuKCMQCTZa3fx5UCe5roskHzM+fY4R7JQ9Zyg==
+X-Received: by 2002:a05:622a:149:b0:478:e507:f6ec with SMTP id d75a77b69052e-47aec3cbeb8mr46335091cf.23.1744988989483;
+        Fri, 18 Apr 2025 08:09:49 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9ce265esm11369861cf.61.2025.04.18.08.09.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 08:09:48 -0700 (PDT)
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 7C0111200068;
+	Fri, 18 Apr 2025 11:09:47 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Fri, 18 Apr 2025 11:09:47 -0400
+X-ME-Sender: <xms:O2sCaLMhqtSLrMPEVrBKEwlEADIQtbU9grYGxMnfCXzawkEVjnGAgg>
+    <xme:O2sCaF9Hsfk4vAzVRky2EsF4PC_6jpyZYHwU41x5RVIaqUX2JSllDSSSubBpMT13J
+    XqULEmQuEZoaZFvEg>
+X-ME-Received: <xmr:O2sCaKQVj7sXB8lrgwyiHjq21aI9bjI-fTGTdf7KQDlG9haG8hKooPPo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvgeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
+    tdejnecuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnhepgeekgeettdelffekfedtveelueeiudev
+    jeegieekvdegkedufeetfeeiiedvueelnecuffhomhgrihhnpehgihhthhhusgdrtghomh
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhq
+    uhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqud
+    ejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgv
+    rdhnrghmvgdpnhgspghrtghpthhtohepgeejpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehtrghmihhrugesghhmrghilhdrtghomhdprhgtphhtthhopehmrghsrghhihhr
+    ohihsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    rghlvgigrdhgrgihnhhorhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesgh
+    grrhihghhuohdrnhgvthdprhgtphhtthhopegsjhhorhhnfegpghhhsehprhhothhonhhm
+    rghilhdrtghomhdprhgtphhtthhopegsvghnnhhordhlohhsshhinhesphhrohhtohhnrd
+    hmvgdprhgtphhtthhopegrrdhhihhnuggsohhrgheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:O2sCaPv6cNkYR1L3v22OmPBlaF5_uj-Gtc9bYF5g5p9BJfOt4b_5dw>
+    <xmx:O2sCaDcjQFwv41gesK7o9bhI6QS8B6tcOIUZ-7q4OhbhpwXN0jPYmg>
+    <xmx:O2sCaL0EjZCSXp9otVr_7pj1-H_eEXfRqUCHCt8XuygwskGmVCfBrg>
+    <xmx:O2sCaP9jJvWQyVCMOnIEGzRC47Id55SrzRt6ZAN9OQaN3PR42rfEvw>
+    <xmx:O2sCaG969DiVW1gusFm6htOCOhywAJcscNqrIN65Wdqy4Pjto7nvliKg>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 18 Apr 2025 11:09:46 -0400 (EDT)
+Date: Fri, 18 Apr 2025 08:09:45 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v9 4/6] rust: enable `clippy::as_underscore` lint
+Message-ID: <aAJrOV88S-4Qb5o0@Mac.home>
+References: <20250416-ptr-as-ptr-v9-0-18ec29b1b1f3@gmail.com>
+ <20250416-ptr-as-ptr-v9-4-18ec29b1b1f3@gmail.com>
+ <68014084.0c0a0220.394e75.122c@mx.google.com>
+ <CAJ-ks9muaNU9v2LZ5=cmfXV6R5AO+joNOoPP=+hs-GJN=APfKQ@mail.gmail.com>
+ <680160b8.050a0220.223d09.180f@mx.google.com>
+ <CAJ-ks9=TXjk8W18ZMG4mx0JpYvXr4nwnUJqjCnqvW9zu2Y1xjA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.15-rc3
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ-ks9=TXjk8W18ZMG4mx0JpYvXr4nwnUJqjCnqvW9zu2Y1xjA@mail.gmail.com>
 
-Hi Linus,
+On Fri, Apr 18, 2025 at 08:08:02AM -0400, Tamir Duberstein wrote:
+> On Thu, Apr 17, 2025 at 4:12 PM Boqun Feng <boqun.feng@gmail.com> wrote:
+> >
+> > On Thu, Apr 17, 2025 at 03:26:14PM -0400, Tamir Duberstein wrote:
+> > [...]
+> > > >
+> > > > >          Ok(())
+> > > > >      }
+> > > > > diff --git a/rust/kernel/device_id.rs b/rust/kernel/device_id.rs
+> > > > > index e5859217a579..4063f09d76d9 100644
+> > > > > --- a/rust/kernel/device_id.rs
+> > > > > +++ b/rust/kernel/device_id.rs
+> > > > > @@ -82,7 +82,7 @@ impl<T: RawDeviceId, U, const N: usize> IdArray<T, U, N> {
+> > > > >              unsafe {
+> > > > >                  raw_ids[i]
+> > > > >                      .as_mut_ptr()
+> > > > > -                    .byte_offset(T::DRIVER_DATA_OFFSET as _)
+> > > > > +                    .byte_add(T::DRIVER_DATA_OFFSET)
+> > > > >                      .cast::<usize>()
+> > > > >                      .write(i);
+> > > > >              }
+> > > > > diff --git a/rust/kernel/devres.rs b/rust/kernel/devres.rs
+> > > > > index f7e8f5f53622..70d12014e476 100644
+> > > > > --- a/rust/kernel/devres.rs
+> > > > > +++ b/rust/kernel/devres.rs
+> > > > > @@ -45,7 +45,7 @@ struct DevresInner<T> {
+> > > > >  /// # Example
+> > > > >  ///
+> > > > >  /// ```no_run
+> > > > > -/// # use kernel::{bindings, c_str, device::Device, devres::Devres, io::{Io, IoRaw}};
+> > > > > +/// # use kernel::{bindings, c_str, device::Device, devres::Devres, ffi::c_void, io::{Io, IoRaw}};
+> > > > >  /// # use core::ops::Deref;
+> > > > >  ///
+> > > > >  /// // See also [`pci::Bar`] for a real example.
+> > > > > @@ -59,19 +59,19 @@ struct DevresInner<T> {
+> > > > >  ///     unsafe fn new(paddr: usize) -> Result<Self>{
+> > > > >  ///         // SAFETY: By the safety requirements of this function [`paddr`, `paddr` + `SIZE`) is
+> > > > >  ///         // valid for `ioremap`.
+> > > > > -///         let addr = unsafe { bindings::ioremap(paddr as _, SIZE as _) };
+> > > > > +///         let addr = unsafe { bindings::ioremap(paddr as bindings::phys_addr_t, SIZE) };
+> > > >
+> > > >
+> > > > ///         let addr = unsafe { bindings::ioremap(bindings::phys_addr_t::from(paddr), SIZE) };
+> > > >
+> > > > better? Or even with .into()
+> > > >
+> > > > ///         let addr = unsafe { bindings::ioremap(paddr.into(), SIZE) };
+> > >
+> > > This doesn't compile because `paddr` is usize, and
+> > > `bindings::phys_addr_t` is u64 (on my machine, which is aarch64).
+> > >
+> >
+> > Ok, looks like Rust yet doesn't provide From/Into between usize and u64
+> > even if the pointer size is fixed. Latest discussion can be found at:
+> >
+> >         https://github.com/rust-lang/rust/issues/41619#issuecomment-2056902943
+> >
+> > Lemme see if we can get an issue tracking this. Thanks for taking a
+> > look.
+> >
+> > > > >  ///         if addr.is_null() {
+> > > > >  ///             return Err(ENOMEM);
+> > > > >  ///         }
+> > > > >  ///
+> > > > > -///         Ok(IoMem(IoRaw::new(addr as _, SIZE)?))
+> > > > > +///         Ok(IoMem(IoRaw::new(addr as usize, SIZE)?))
+> > > > >  ///     }
+> > > > >  /// }
+> > > > >  ///
+> > > > >  /// impl<const SIZE: usize> Drop for IoMem<SIZE> {
+> > > > >  ///     fn drop(&mut self) {
+> > > > >  ///         // SAFETY: `self.0.addr()` is guaranteed to be properly mapped by `Self::new`.
+> > > > > -///         unsafe { bindings::iounmap(self.0.addr() as _); };
+> > > > > +///         unsafe { bindings::iounmap(self.0.addr() as *mut c_void); };
+> > > > >  ///     }
+> > > > >  /// }
+> > > > >  ///
+> > > > [...]
+> > > > > diff --git a/rust/kernel/dma.rs b/rust/kernel/dma.rs
+> > > > > index 43ecf3c2e860..851a6339aa90 100644
+> > > > > --- a/rust/kernel/dma.rs
+> > > > > +++ b/rust/kernel/dma.rs
+> > > > > @@ -38,7 +38,7 @@
+> > > > >  impl Attrs {
+> > > > >      /// Get the raw representation of this attribute.
+> > > > >      pub(crate) fn as_raw(self) -> crate::ffi::c_ulong {
+> > > > > -        self.0 as _
+> > > > > +        self.0 as crate::ffi::c_ulong
+> > > >
+> > > >         crate::ffi::c_ulong::from(self.0)
+> > > >
+> > > > maybe, a C unsigned long should always be able to hold the whole `Attr`
+> > > > and a lossly casting is what this function does.
+> > >
+> > > This also doesn't compile: "the trait `core::convert::From<u32>` is
+> > > not implemented for `usize`". Upstream has ambitions of running on
+> > > 16-bit, I guess :)
+> > >
+> >
+> > They do but they also have the target_pointer_width cfg, so they can
+> > totally provide these functions. It's just they want to find a better
+> > way (like the link I post above).
+> 
+> Did you want me to hold off on the respin on this point, or shall I go ahead?
 
-Set of fixes for block that should go into the 6.15 kernel release. This
-pull request contains:
+No need to wait. This doesn't affect your current patch. But we do need
+to start making some decisions about how we handle the conversions *32
+=> *size, *size => *64 and c*long <=> *size, they should all be lossless
+in the context of kernel. We have 3 options:
 
-- MD pull via Yu
-	- fix raid10 missing discard IO accounting (Yu Kuai)
-	- fix bitmap stats for bitmap file (Zheng Qixing)
-	- fix oops while reading all member disks failed during
-	  check/repair (Meir Elisha)
+1.	Using `as`.
+2.	Having our own to_*size(*32), to_*64(*size), to_*size(*64),
+	to_c*long(*size) and to_*size(c*long) helper functions.
+3.	Waiting and using what Rust upstream comes up.
 
-- NVMe pull via Christoph
-	- fix scan failure for non-ANA multipath controllers
-	  (Hannes Reinecke)
-	- fix multipath sysfs links creation for some cases
-	  (Hannes Reinecke)
-	- PCIe endpoint fixes (Damien Le Moal)
-	- use NULL instead of 0 in the auth code (Damien Le Moal)
+I'm leaning towards to 2 and then 3, because using `as` can sometimes
+surprise you when you change the type. Thoughts?
 
-- Various ublk fixes
-	- Slew of selftest additions
-	- Improvements and fixes for IO cancelation
-	- Tweak to Kconfig verbiage
-
-- Fix for page dirtying for blk integrity mapped pages
-
-- loop buffered IO fix
-
-- loop uevent fixe
-
-- loop request priority inheritance fix
-
-- Various little fixes
-
-Please pull!
-
-
-The following changes since commit 3b607b75a345b1d808031bf1bb1038e4dac8d521:
-
-  null_blk: Use strscpy() instead of strscpy_pad() in null_add_dev() (2025-04-11 07:10:46 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.15-20250417
-
-for you to fetch changes up to 81dd1feb19c7a812e51fa6e2f988f4def5e6ae39:
-
-  Merge tag 'nvme-6.15-2025-04-17' of git://git.infradead.org/nvme into block-6.15 (2025-04-17 06:18:49 -0600)
-
-----------------------------------------------------------------
-block-6.15-20250417
-
-----------------------------------------------------------------
-Bird, Tim (1):
-      block: add SPDX header line to blk-throttle.h
-
-Caleb Sander Mateos (1):
-      ublk: don't suggest CONFIG_BLK_DEV_UBLK=Y
-
-Christoph Hellwig (1):
-      loop: stop using vfs_iter_{read,write} for buffered I/O
-
-Damien Le Moal (4):
-      nvmet: auth: use NULL to clear a pointer in nvmet_auth_sq_free()
-      nvmet: pci-epf: always fully initialize completion entries
-      nvmet: pci-epf: clear CC and CSTS when disabling the controller
-      nvmet: pci-epf: cleanup link state management
-
-Hannes Reinecke (2):
-      nvme: fixup scan failure for non-ANA multipath controllers
-      nvme-multipath: sysfs links may not be created for devices
-
-Jens Axboe (2):
-      Merge tag 'md-6.15-20250416' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.15
-      Merge tag 'nvme-6.15-2025-04-17' of git://git.infradead.org/nvme into block-6.15
-
-Martin K. Petersen (1):
-      block: integrity: Do not call set_page_dirty_lock()
-
-Meir Elisha (1):
-      md/raid1: Add check for missing source disk in process_checks()
-
-Ming Lei (18):
-      selftests: ublk: fix ublk_find_tgt()
-      selftests: ublk: add io_uring uapi header
-      selftests: ublk: cleanup backfile automatically
-      selftests: ublk: make sure _add_ublk_dev can return in sub-shell
-      selftests: ublk: run stress tests in parallel
-      selftests: ublk: add two stress tests for zero copy feature
-      selftests: ublk: setup ring with IORING_SETUP_SINGLE_ISSUER/IORING_SETUP_DEFER_TASKRUN
-      selftests: ublk: set queue pthread's cpu affinity
-      selftests: ublk: increase max nr_queues and queue depth
-      selftests: ublk: support target specific command line
-      selftests: ublk: support user recovery
-      selftests: ublk: add test_stress_05.sh
-      selftests: ublk: move creating UBLK_TMP into _prep_test()
-      ublk: add ublk_force_abort_dev()
-      ublk: rely on ->canceling for dealing with ublk_nosrv_dev_should_queue_io
-      ublk: move device reset into ublk_ch_release()
-      ublk: remove __ublk_quiesce_dev()
-      ublk: simplify aborting ublk request
-
-Thomas Weißschuh (2):
-      loop: properly send KOBJ_CHANGED uevent for disk device
-      loop: LOOP_SET_FD: send uevents for partitions
-
-Uday Shankar (3):
-      ublk: properly serialize all FETCH_REQs
-      ublk: improve detection and handling of ublk server exit
-      selftests: ublk: add generic_06 for covering fault inject
-
-Yu Kuai (1):
-      md/raid10: fix missing discard IO accounting
-
-Yunlong Xing (1):
-      loop: aio inherit the ioprio of original request
-
-Zheng Qixing (2):
-      md/md-bitmap: fix stats collection for external bitmaps
-      block: fix resource leak in blk_register_queue() error path
-
- block/bio-integrity.c                           |  17 +-
- block/blk-sysfs.c                               |   2 +
- block/blk-throttle.h                            |   1 +
- drivers/block/Kconfig                           |   6 -
- drivers/block/loop.c                            | 121 +-----
- drivers/block/ublk_drv.c                        | 532 ++++++++++++------------
- drivers/md/md-bitmap.c                          |   5 +-
- drivers/md/raid1.c                              |  26 +-
- drivers/md/raid10.c                             |   1 +
- drivers/nvme/host/core.c                        |   2 +-
- drivers/nvme/host/multipath.c                   |  14 +-
- drivers/nvme/target/auth.c                      |   2 +-
- drivers/nvme/target/pci-epf.c                   |  88 ++--
- tools/testing/selftests/ublk/Makefile           |   9 +-
- tools/testing/selftests/ublk/fault_inject.c     |  98 +++++
- tools/testing/selftests/ublk/kublk.c            | 343 +++++++++++++--
- tools/testing/selftests/ublk/kublk.h            |  47 ++-
- tools/testing/selftests/ublk/stripe.c           |  28 +-
- tools/testing/selftests/ublk/test_common.sh     | 142 ++++++-
- tools/testing/selftests/ublk/test_generic_04.sh |  40 ++
- tools/testing/selftests/ublk/test_generic_05.sh |  44 ++
- tools/testing/selftests/ublk/test_generic_06.sh |  41 ++
- tools/testing/selftests/ublk/test_loop_01.sh    |   8 +-
- tools/testing/selftests/ublk/test_loop_02.sh    |   8 +-
- tools/testing/selftests/ublk/test_loop_03.sh    |   8 +-
- tools/testing/selftests/ublk/test_loop_04.sh    |   9 +-
- tools/testing/selftests/ublk/test_loop_05.sh    |   8 +-
- tools/testing/selftests/ublk/test_stress_01.sh  |  45 +-
- tools/testing/selftests/ublk/test_stress_02.sh  |  45 +-
- tools/testing/selftests/ublk/test_stress_03.sh  |  38 ++
- tools/testing/selftests/ublk/test_stress_04.sh  |  37 ++
- tools/testing/selftests/ublk/test_stress_05.sh  |  64 +++
- tools/testing/selftests/ublk/test_stripe_01.sh  |  12 +-
- tools/testing/selftests/ublk/test_stripe_02.sh  |  13 +-
- tools/testing/selftests/ublk/test_stripe_03.sh  |  12 +-
- tools/testing/selftests/ublk/test_stripe_04.sh  |  13 +-
- 36 files changed, 1325 insertions(+), 604 deletions(-)
- create mode 100644 tools/testing/selftests/ublk/fault_inject.c
- create mode 100755 tools/testing/selftests/ublk/test_generic_04.sh
- create mode 100755 tools/testing/selftests/ublk/test_generic_05.sh
- create mode 100755 tools/testing/selftests/ublk/test_generic_06.sh
- create mode 100755 tools/testing/selftests/ublk/test_stress_03.sh
- create mode 100755 tools/testing/selftests/ublk/test_stress_04.sh
- create mode 100755 tools/testing/selftests/ublk/test_stress_05.sh
-
--- 
-Jens Axboe
-
+Regards,
+Boqun
