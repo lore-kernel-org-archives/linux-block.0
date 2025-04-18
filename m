@@ -1,106 +1,121 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B6126B2D0;
-	Fri, 18 Apr 2025 12:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AFB45009
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 14:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744979555; cv=none; b=AoC0fHXvX00gmKPTOyrt8LJEbOOtl74nDgr1v2MYCyfi5HLkaLEsP/cQHbJYpzh5THJeE4SN6QwYHuvlTiSpCxrQTl1sG8kAlmiW7o03X3EzTiKIKjL8U3KUrXTsYXxYnfFmzAHWQmHaB5M7i1rWmZCcewXbs/IyI4l5XuuDP0w=
+	t=1744986158; cv=none; b=jflGa7aIKj5OO+RmrxBjYYTCthtRgkA32h/gZflbLj80n5VdQ6AHxZ/Uij+/XOHEelZ5p2KkG5OPbZWo62LmasG5nsVGKgi1uX4HsXWliGxGpi7PZVmb/k8HaBeEq0VfY3Y3z9av5O8pGIBJ8D/8J5rVtKmY0Op59omkquxOfFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744979555; c=relaxed/simple;
-	bh=fi1DbYhlrqF0U7IzqDP/M+/r8vdH95UNS8kWonbjyGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KIoZhD7Ffg+M/xPJWapzig5LnZlDBmnFwb1A28LzfMaVvQ6WzJsT4ZgDCzZKJCmHEW608XXt0z+40IDuqLLiJIxTdy2AtkTdrYWrK/z1Va8WIBp5RTOaeTugf9+H5DebNpKS6ecAxkEaWqygH7IElXDPE+WemuVbi0I6XqGBb04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AG4qW+0i; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744986158; c=relaxed/simple;
+	bh=j3W8bdpKI+gNKHXc6Mb+lEq5ildQoi6jsaJ5QSDUR20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tDQTR/m6+EkVloPeE/wklsWXAx0zM8OztjEzh7iS53WugAXipP6cY3oMOCN4JyLr7SYtrs2OoZ7tqK7/wINlukeFVXYn8soA2niz8p+pogI6LRfvbnuTwbqsyOCi+flUZ7LdKAF221KdGr0elKl+oYUvpYaOTxj/u/vC+rRVYQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AWGHqNab; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AG4qW+0i"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-736a72220edso1749800b3a.3;
-        Fri, 18 Apr 2025 05:32:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744979554; x=1745584354; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4uxNqOBD/ogCW1O0rrQ2A0HcfFujRPCySOpF/YO01oA=;
-        b=AG4qW+0iMjdDMp9h8+u/8MODMx2ZhRnrNeqNWksxxmnvYLNp1sN4cPNqgxJBWkQHHw
-         6ja9kaz4Q5fz4VjSFoqmUKZeGQbCa5MpqyumvCPwfXpggT9WqPVXrihSm6janzBMx1CX
-         QahHls910enJIkb/u6kPH7kZ9EqesycJDcnqFE0q+OOiA3HMPiOVjVeakoi/lbPr4Cjd
-         OH3ErFFt9pia9G3CJL80MeQHQRPI40Y0lC78IBPn165jnjxBbcTiPNLFYjPB6FrNnIQQ
-         OZEpshOMLzwQFEUo4i4UG9KzJMrFW9AIXX/IL3hoMw5zYNyxzSTxDyk9XU+zwlcGeNY3
-         2rNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744979554; x=1745584354;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4uxNqOBD/ogCW1O0rrQ2A0HcfFujRPCySOpF/YO01oA=;
-        b=vRmpnqsDdwES8Ved1XXA5WUyZ10QGRrfzKC7wL3blLScA8gKL5v/MChN//vVrA58JX
-         PjzAE4lZkddCOZn7MnP3IOQ2LYM/gYYp7Ht06SJCdFHCqweGYynyQ5LcPVk3+LqNBEGI
-         nfVOhDuuv635V/J2tVPFk2JgChEeufkmiafBUro3mG948rWOeWmzVipinSCsOmOaQXU5
-         v8oZ/7P6l3zq4qLXCYRGN06eJp/5AV19PIs4V5ksGZOohlP1xEVY934cbAlRz/oKDS5t
-         fGR7AbxWu9NwDyxLeqga8HbNv3RZ3K9OYBGaksOWM47Mxgf6MD/RvHko6vsJ8cYLNaEy
-         6CzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU20zLeXPB6GHQ2HsaK94sCZjgarLZMO/rUlfvYKDUbvUXJhMceLe2uGCrH1Rrb5m1146TokGcTkJ8vxtQ=@vger.kernel.org, AJvYcCWTnfrUz8cv0ZcTGkQumsnERYk9lbIbL4WUP/5Dr6x49QCDiwTyAEFZ2i+aQBTsGnKTcB/RTnkd+Ht5DA==@vger.kernel.org, AJvYcCWdV06fK+ZAcwDMQvkyDhOH3GBiXD9UptK+gwwd9kbw3U+jFwcnfhckNRfVvzmH4Fj94KY=@vger.kernel.org, AJvYcCWu25HxhOwetbOX2cRRICTSRLul3OhmhQfq8b+6qSBpGOzodaY4rCV6B62MQHS8a9oK3jkn0ZoW1Oqd@vger.kernel.org, AJvYcCXUgGTrkNaeV1NRXsKeQuskAw/PFFcRNiB7ojigcp9xA8oHm9qxjNedjcZBfg1EGI9WeyoFxcVe2af8swZL@vger.kernel.org, AJvYcCXZYDcsUiaWnvJKYozdMCulF7X59X7RJV2i4AUqdK4JEV4vGK2c+4o5AzgJHt4cuqSs6vqZ0XaJ9xEQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywwe1rsioiPYtQHWizUlzgI4WF5R0IfOLDoO16JpxiBcx/gR2gE
-	+0tqo2v6GT1CgKTiv1QV8DkQ+fAE5beAuCg8uMfoO5sxpdUuM35UQ4MMXjaWZk0B1PFyeXG8SvN
-	tgEost9lgnBY6YGHrFMONnhDQJ4w=
-X-Gm-Gg: ASbGnctUBpR+gUSetI7U5hzaGXrS3uz79DnUr/DNOUwx3Bf5/joR9nuD2B4BvIjq1Rs
-	O5BCvJUlt9JUUp0K3EF9UlJJFcV7bWGvhPZqT7c0ocqvWAzcfl+KiD4ryHSx318uij79oWZjx+7
-	0c2dFb/ojfP3WnyGglLH6TOtwjh+nMA/px9LL7b6Ro/glkvc6LB+zYPzaC
-X-Google-Smtp-Source: AGHT+IE6KPLtDnTScFEtJJlvCdwmMFGgLV6Sh+PZ7MHmYiMb3jtvP1cSpc1ynbu9LO+7GJYkCunnvOZCbjH4BPDTV0s=
-X-Received: by 2002:a17:90b:2e03:b0:2fc:c262:ef4b with SMTP id
- 98e67ed59e1d1-3087bb6f117mr4849982a91.18.1744979553652; Fri, 18 Apr 2025
- 05:32:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AWGHqNab"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53IBTCqK019255;
+	Fri, 18 Apr 2025 14:22:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=a3Cf4+
+	5znQawmv06mXcSZw7fd4AQqZlTEDiNv9WvQ7E=; b=AWGHqNabuZ2brhDVBwuPJW
+	+PhC3/amIm23nDWsrhFUxEyCmrkxfsH41xqYfF/lOGd/w0HY5qxrLCbQAOFN+Az1
+	8+Xpl37jwElZ16lBVbPS6t7Dm98vddYqvXMn99VrtH7NY+ZLFbxvdwmn1Jm+hdNQ
+	wUa9dTwTfM8aZeAmzMTGWgum0C3pOn6FiANFHwkq5jdsNRhluZCG2oHP/If65Kr6
+	Pe5QailIcwyPuZWHGyYCKPIkIWSfC4LSTUxB7mdJWC/ZxfgLgbELXMguHyQukGC2
+	iUz6GMRgecss1VmUwe7ArsSi8xxM0sv1Vyfh88ayjzTjbfc0R96ixZBxzO8Dc57g
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 463bm12vk7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Apr 2025 14:22:11 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53IDCkot016722;
+	Fri, 18 Apr 2025 14:22:11 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 460572jput-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Apr 2025 14:22:11 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53IEMAFt26018494
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 18 Apr 2025 14:22:10 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 05D8858052;
+	Fri, 18 Apr 2025 14:22:10 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 654BB58056;
+	Fri, 18 Apr 2025 14:22:07 +0000 (GMT)
+Received: from [9.111.33.1] (unknown [9.111.33.1])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 18 Apr 2025 14:22:07 +0000 (GMT)
+Message-ID: <e50e568c-9a9b-4306-a2f4-e108791e83d2@linux.ibm.com>
+Date: Fri, 18 Apr 2025 19:52:06 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1744825142.git.leon@kernel.org> <670389227a033bd5b7c5aa55191aac9943244028.1744825142.git.leon@kernel.org>
- <1284adf3-7e93-4530-9921-408c5eaeb337@kernel.org>
-In-Reply-To: <1284adf3-7e93-4530-9921-408c5eaeb337@kernel.org>
-From: Kanchan Joshi <joshiiitr@gmail.com>
-Date: Fri, 18 Apr 2025 18:02:08 +0530
-X-Gm-Features: ATxdqUGyYBEsfK-IN2nZn9q0XDVh1xSRZINsNgbIk6fSYXOiPXAs6WAhmbL1EUw
-Message-ID: <CA+1E3r+9kEs-fqND-VD+y6FWfiGqr1vN8M0GufD3oHdwLdFcrQ@mail.gmail.com>
-Subject: Re: [PATCH v8 24/24] nvme-pci: optimize single-segment handling
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
-	Yishai Hadas <yishaih@nvidia.com>, 
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org, 
-	Niklas Schnelle <schnelle@linux.ibm.com>, Chuck Lever <chuck.lever@oracle.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Matthew Wilcox <willy@infradead.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Nitesh Shetty <nj.shetty@samsung.com>, Leon Romanovsky <leonro@nvidia.com>, vishak.g@samsung.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/2] nvme-multipath: remove multipath module param
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, hare@suse.de, sagi@grimberg.me, jmeneghi@redhat.com,
+        axboe@kernel.dk, gjoyce@ibm.com
+References: <20250321063901.747605-1-nilay@linux.ibm.com>
+ <20250321063901.747605-3-nilay@linux.ibm.com> <20250407144555.GB12216@lst.de>
+ <f05dd764-9299-4c20-998a-f3b1d45bacf8@linux.ibm.com>
+ <20250409104515.GB5359@lst.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250409104515.GB5359@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=WaUMa1hX c=1 sm=1 tr=0 ts=68026014 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=_EqFHIO4WOhHW-ejzvAA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: ZPMG74TzNc1ujRm5jyNMKy-f8Dmr2jay
+X-Proofpoint-ORIG-GUID: ZPMG74TzNc1ujRm5jyNMKy-f8Dmr2jay
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-18_04,2025-04-17_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 adultscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 mlxlogscore=716 suspectscore=0 phishscore=0 malwarescore=0
+ spamscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504180104
 
-> > +     if (nr_segments == 1 && (iod->flags & IOD_SINGLE_SEGMENT)) {
->
-> nvme_pci_setup_prps() calls nvme_try_setup_prp_simple() which sets
-> IOD_SINGLE_SEGMENT if and only if the req has a single phys segment. So why do
-> you need to count the segments again here ? Looking at the flag only should be
-> enough, no ?
 
-Yes, the flag will be enough.
-I started with nr_segments first, but felt the need of a flag when I
-reached to handle the unmap part.
 
-This can be changed if the series requires an iteration.
-Or I can do this as part of the cleanup which I anyway need to do to
-replace the "iod->aborted" field with a flag.
+On 4/9/25 4:15 PM, Christoph Hellwig wrote:
+> On Tue, Apr 08, 2025 at 08:05:20PM +0530, Nilay Shroff wrote:
+>> Okay, we can add an option to avoid making this behavior "the default".
+>> So do you recommend adding a module option for opting in this behavior 
+>> change or something else?
+> 
+> I guess a module option as default makes sense.  I'd still love to figure
+> out a way to have per-controller options of some kind as e.g. this
+> option make very little sense for thunderbolt-attached external devices.
+> 
+> But unfortunately I'm a bit lost what a good interface for that would be.
+> 
+> 
+I don't know how to make this option per-controller as you know the 
+head node, typically, refers to namespace paths and each path then 
+refers to different controller. So if we were to make this option
+per controller then how could we handle it in case one controller has
+this option set but then the another controller doesn't set this 
+option. It could be confusing. 
+ 
+How about module option "nvme_core.multipath_head_always"? The default is
+set to false. So now it becomes two step process:
+1. modprobe nvme_core multipath_head_always=Y && modprobe nvme
+2. echo "<val>" > /sys/block/nvme0XnY/delayed_shutdown_sec     
 
--- 
-Kanchan
+Thanks,
+--Nilay
