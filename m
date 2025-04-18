@@ -1,202 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8371FE469
-	for <linux-block@vger.kernel.org>; Thu, 17 Apr 2025 23:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FAB262A6;
+	Fri, 18 Apr 2025 01:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744932925; cv=none; b=bIyU5/zn690HcbvNG6eTlXf+B5wjcYPBztAKngHJtXC/ZRBmJbOlYt3gWr+0nTZMrDuSSonj1h7HsDnwlI1Bt+yfEaAwiDZCcR0oUdvI3tPBscsxQmpkCNYZ1NWXplPWQICvedlmge97ZRAVqGJPERaBK21GMnHxt42YpXkCIO8=
+	t=1744939013; cv=none; b=ce3b1QKx0TQqMKQAWF6KTD4TiyluZ3yw2bQspr3DiLrMoAu2e9tvvcayhvBG4VQQSVOqeGBQiOML3hVLAeveb2ZvEJrJvQ3jNYMk28gzBD6RMXOfwUfcVw+6Zp31siHKp4H6ex3e9MRdSrFbHpj8k8s4Pe89145X4k7Tbs04vJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744932925; c=relaxed/simple;
-	bh=aH3DrWcjqAF+Nd7X8ManoDKIrjr1yKeC0bWIgEiMV0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chtIhDkWihIoSzwgfmtzhbQAHumnw6vJF3ZNwhhq9W9DQ10llHbeelvQO6EeBaTdXqxJ1IaN1xACyaqbQhy7Np028Up0y/N4dXllIGNixgGmyUWsI02UNDeNdY33qySBroHzE8IqYkOeRlPcvddIPQki3puil1kAqrcMipXDQ0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e5Iw+X4S; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5Iw+X4S"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744932922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YmkqdOC0y+GDsIUkmanR2brjgYplniigba6f4Ghrhuo=;
-	b=e5Iw+X4SjaYgFUqsTu8/EescbSmI0jRqd0MdpGxfvoumYwZVUGaZ88zQEf5HrXbMpc/a7W
-	AnQ3DK+zpC5wrBkFYKL5hkvSFerxCUG/J72mEUKQFHtiErR0Ky7AFeGBmyhK4RJePL4HsG
-	zv+HJpfxyUsAeAqduZpo93uc6MrpSpI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-28-73gMbh6yPQ2JZLXIWuqkwA-1; Thu,
- 17 Apr 2025 19:35:18 -0400
-X-MC-Unique: 73gMbh6yPQ2JZLXIWuqkwA-1
-X-Mimecast-MFC-AGG-ID: 73gMbh6yPQ2JZLXIWuqkwA_1744932918
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 726D51800446;
-	Thu, 17 Apr 2025 23:35:17 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.13])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 02D351801770;
-	Thu, 17 Apr 2025 23:35:13 +0000 (UTC)
-Date: Fri, 18 Apr 2025 07:35:09 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jared Holzman <jholzman@nvidia.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, csander@purestorage.com
-Subject: Re: [PATCH v4]: ublk: Add UBLK_U_CMD_UPDATE_SIZE
-Message-ID: <aAGQLYDOFY5PyUMJ@fedora>
-References: <918750ec-42e8-46d4-bbfb-e01d3dce6ed0@nvidia.com>
+	s=arc-20240116; t=1744939013; c=relaxed/simple;
+	bh=hPc6DBVAgHf3AAvxQmsrwxhdgE3m6XoH1iucbIr/omo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aEvpRe+zRUcPRZP5CLHaEDVQ39mJ2XESarSzgRWRreoA03EvkTmXLSLpmZHZOII3FtMfHz2cXLBUh1BD2o1Gmgl32uwaCQECd7CTAC7mSiFmEagTSgZbzKyAZPHtvy9giQjQgfJ/OZDDZ4wofg/2jnpug89ufsHkC5F37CE2+io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zdxfv2zyhz4f3kFM;
+	Fri, 18 Apr 2025 09:16:23 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 2CFD71A06D7;
+	Fri, 18 Apr 2025 09:16:47 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgDHK2D8pwFoK5w2Jw--.18201S4;
+	Fri, 18 Apr 2025 09:16:46 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	xni@redhat.com,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	song@kernel.org,
+	yukuai3@huawei.com,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	nadav.amit@gmail.com,
+	ubizjak@gmail.com,
+	cl@linux.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v2 0/5] md: fix is_mddev_idle()
+Date: Fri, 18 Apr 2025 09:09:36 +0800
+Message-Id: <20250418010941.667138-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <918750ec-42e8-46d4-bbfb-e01d3dce6ed0@nvidia.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-CM-TRANSID:gCh0CgDHK2D8pwFoK5w2Jw--.18201S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7XrW8ZFWkGryxuF1rtw17trb_yoW3Krg_ua
+	ykZFy3tF4xX3W3Aa43tF13ZrWjkrWxW3ykuFyUtrZIva4fXF1UK3y5Cw4Yq3W5WFZrua15
+	Jry8XrW8Ar4xXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Apr 16, 2025 at 01:07:47PM +0300, Jared Holzman wrote:
-> Currently ublk only allows the size of the ublkb block device to be
-> set via UBLK_CMD_SET_PARAMS before UBLK_CMD_START_DEV is triggered.
-> 
-> This does not provide support for extendable user-space block devices
-> without having to stop and restart the underlying ublkb block device
-> causing IO interruption.
-> 
-> This patch adds a new ublk command UBLK_U_CMD_UPDATE_SIZE to allow the
-> ublk block device to be resized on-the-fly.
-> 
-> Feature flag UBLK_F_UPDATE_SIZE is also added to indicate support for this
-> command.
-> 
-> Signed-off-by: Omri Mann <omri@nvidia.com>
-> ---
->  drivers/block/ublk_drv.c      | 18 +++++++++++++++++-
->  include/uapi/linux/ublk_cmd.h |  7 +++++++
->  2 files changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index cdb1543fa4a9..128f094efbad 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -64,7 +64,8 @@
->          | UBLK_F_CMD_IOCTL_ENCODE \
->          | UBLK_F_USER_COPY \
->          | UBLK_F_ZONED \
-> -        | UBLK_F_USER_RECOVERY_FAIL_IO)
-> +        | UBLK_F_USER_RECOVERY_FAIL_IO \
-> +        | UBLK_F_UPDATE_SIZE)
-> 
->  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->          | UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -3067,6 +3068,16 @@ static int ublk_ctrl_get_features(const struct
-> ublksrv_ctrl_cmd *header)
+From: Yu Kuai <yukuai3@huawei.com>
 
-I try to apply this patch downloaded from both lore or patchwork, and 'git
-am' always complains the patch is broken:
+Changes in v2:
+ - more cleanps in patch 1;
+ - add patch 2, to record dm-raid gendisk, and also handle dm-raid in
+ patch 4;
+ - keep the old commnts in patch 3;
 
-[root@ktest-40 linux]# git am raw
-warning: Patch sent with format=flowed; space at the end of lines might be lost.
-Applying: ublk: Add UBLK_U_CMD_UPDATE_SIZE
-error: corrupt patch at line 11
-Patch failed at 0001 ublk: Add UBLK_U_CMD_UPDATE_SIZE
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config advice.mergeConflict false"
-[root@ktest-40 linux]# patch -p1 < raw
-patching file drivers/block/ublk_drv.c
-Hunk #1 FAILED at 64.
-patch: **** malformed patch at line 192: ublksrv_ctrl_cmd *header)
+Yu Kuai (5):
+  block: cleanup and export bdev IO inflight APIs
+  md: record dm-raid gendisk in mddev
+  md: add a new api sync_io_depth
+  md: fix is_mddev_idle()
+  md: cleanup accounting for issued sync IO
 
-Please use 'git-format-patch' to make patch and run `./scripts/checkpatch.pl -g HEAD`
-in kernel top directory to make sure no ERROR.
+ block/blk-core.c          |   2 +-
+ block/blk-mq.c            |  15 +--
+ block/blk-mq.h            |   7 +-
+ block/blk.h               |   1 -
+ block/genhd.c             |  48 +++++-----
+ drivers/md/dm-raid.c      |   3 +
+ drivers/md/md.c           | 193 +++++++++++++++++++++++++++-----------
+ drivers/md/md.h           |  18 +---
+ drivers/md/raid1.c        |   3 -
+ drivers/md/raid10.c       |   9 --
+ drivers/md/raid5.c        |   8 --
+ include/linux/blkdev.h    |   1 -
+ include/linux/part_stat.h |  10 ++
+ 13 files changed, 184 insertions(+), 134 deletions(-)
 
->      return 0;
->  }
-> 
-> +static void ublk_ctrl_set_size(struct ublk_device *ub, const struct
-> ublksrv_ctrl_cmd *header)
-> +{
-> +    struct ublk_param_basic *p = &ub->params.basic;
-> +    u64 new_size = header->data[0];
-> +
-> +    mutex_lock(&ub->mutex);
-> +    p->dev_sectors = new_size;
-> +    set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
-> +    mutex_unlock(&ub->mutex);
-> +}
->  /*
->   * All control commands are sent via /dev/ublk-control, so we have to check
->   * the destination device's permission
-> @@ -3152,6 +3163,7 @@ static int ublk_ctrl_uring_cmd_permission(struct
-> ublk_device *ub,
->      case UBLK_CMD_SET_PARAMS:
->      case UBLK_CMD_START_USER_RECOVERY:
->      case UBLK_CMD_END_USER_RECOVERY:
-> +    case _IOC_NR(UBLK_U_CMD_UPDATE_SIZE):
-
-Here it could be more clean to add one private definition:
-
-	#define UBLK_CMD_UPDATE_SIZE _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
-
-just like what we did for `UBLK_CMD_DEL_DEV_ASYNC`.
-
-Then use UBLK_CMD_UPDATE_SIZE directly.
-
->          mask = MAY_READ | MAY_WRITE;
->          break;
->      default:
-> @@ -3243,6 +3255,10 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd
-> *cmd,
->      case UBLK_CMD_END_USER_RECOVERY:
->          ret = ublk_ctrl_end_recovery(ub, header);
->          break;
-> +    case _IOC_NR(UBLK_U_CMD_UPDATE_SIZE):
-
-Same with above.
-
-> +        ublk_ctrl_set_size(ub, header);
-> +        ret = 0;
-> +        break;
->      default:
->          ret = -EOPNOTSUPP;
->          break;
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index 583b86681c93..587a54b3cfe1 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -51,6 +51,8 @@
->      _IOR('u', 0x13, struct ublksrv_ctrl_cmd)
->  #define UBLK_U_CMD_DEL_DEV_ASYNC    \
->      _IOR('u', 0x14, struct ublksrv_ctrl_cmd)
-> +#define UBLK_U_CMD_UPDATE_SIZE        \
-> +    _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
-> 
->  /*
->   * 64bits are enough now, and it should be easy to extend in case of
-> @@ -211,6 +213,11 @@
->   */
->  #define UBLK_F_USER_RECOVERY_FAIL_IO (1ULL << 9)
-> 
-> +/*
-> + * Resizing a block device is possible with UBLK_U_CMD_UPDATE_SIZE
-> + */
-> +#define UBLK_F_UPDATE_SIZE         (1ULL << 10)
-
-Please document how size is passed, and the unit is sector.
-
-With above addressed, this patch looks fine.
-
-
-Thanks,
-Ming
+-- 
+2.39.2
 
