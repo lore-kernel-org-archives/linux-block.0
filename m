@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD137462
-	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA217462
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744994299; cv=none; b=gxEW76Aeh9DnM6HyRz0BUEtIX36nrFvNXTDpk+pIgTryImYrA7sZUqfZOVpknimWPExPrPhxCu98/jJEzfuE/miSgiRvXlNtYEQ3BxAQFELCOcSDD+HINgfBnt3LMKv4qPrB/jIeJ9/eXmbjyWS92AO3qDh9C6RinIBR9oEzv68=
+	t=1744994302; cv=none; b=lwKYLm5XvDsmwWxdmqcDW6aIHrxR5H91B/6Pkx4m1E+e1Cg5vTmTjdeeMlU1GFgMzaROimAt4ruCkdU+884DMeOzmZfwintoqxC7RmL0THFaIjlrziDDaB82rApW1EborTn3r7Ced3eynIeHMV4h0WupeP/rYDXZF0s/OZX8c/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744994299; c=relaxed/simple;
-	bh=dWiGyVnze8iyTTOSQcPeHmem5mrMIPAMUWmsaLD5BA4=;
+	s=arc-20240116; t=1744994302; c=relaxed/simple;
+	bh=l5iDY4vdG3/Wa1qbY8/v6ioEt/nxba7rJYqtEEy5Ib4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cBJA9OC5RCa/nDWZ+PSd9mLQO99kyWsjtH4NpeyOR38lPGNfqsa/88SHp3JvjrC+S7ShRLGGhveWr/0YbQlw61mNANOhsryoqJEDjn4Mssw0pdZ6G5ew2EuinZYODfMqAb3W4KCk6c2RKMmliQkFcfPQTIUEf5ZEnF3Rl0rfwOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAytdnjY; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=RqJGt105AMnCra09SHp+bCGP/ZLWOaqI9ejAhKsTCeiK+1fgtbMbzZudCbenHioSktsJSB5KW2PxYf0tVrkqmhQBHu/ou0ijH0Bb8RGMbrwfPPWLqAWSexV6obVmHy+lOg+U7ndMRJPo8fDp7Ikoqg4Twg9Yv42UEIDJk7sZaLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WWEykqlu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAytdnjY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWEykqlu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744994295;
+	s=mimecast20190719; t=1744994299;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WPMeHn70SahxC5BWbKKirz+/N0HSPtcsBxvwuyrkJWI=;
-	b=DAytdnjY80x7fknFWx1n2mZv+UFX8k8NdBFUmryLaFDvXqpHQXn5SFIqvYhKFsmouzEe5Y
-	45Z2RqPqzvW1TbrZZMpvh1zQ4YbHfVnMJXpoJDdXh7lNt42NezWiLhjPX5+bwdKWi2DS+B
-	xvSlUziVePiiwiO2/HbhOS9e/b50o+I=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=nbQZm7VSQJbTqnwa0krZSA8qprnhb3/LlpIvYBXnaUk=;
+	b=WWEykqlu1gPYrsVRb21o+gxiHRJeW+Dl6MxNHmU3GSa9dLurflsM4ef6iPZqH7lvIzE1pZ
+	EdYpsanvCsLTiUAySTbNp/84u/OanCq2swGBbsBzBzU43Uw2Zg/9HaqgckQUQoCgxAnN2M
+	YvbKqZz1cFiVjVFQehsva4d4ygIWSWw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-CpWK5XexPZW_agwG-PLapw-1; Fri,
- 18 Apr 2025 12:38:12 -0400
-X-MC-Unique: CpWK5XexPZW_agwG-PLapw-1
-X-Mimecast-MFC-AGG-ID: CpWK5XexPZW_agwG-PLapw_1744994291
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-MZjpWt8DOXyXkw3aoD43bg-1; Fri,
+ 18 Apr 2025 12:38:16 -0400
+X-MC-Unique: MZjpWt8DOXyXkw3aoD43bg-1
+X-Mimecast-MFC-AGG-ID: MZjpWt8DOXyXkw3aoD43bg_1744994295
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2EF6619560A1;
-	Fri, 18 Apr 2025 16:38:11 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00FD219560BD;
+	Fri, 18 Apr 2025 16:38:15 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.50])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCE9019560A3;
-	Fri, 18 Apr 2025 16:38:09 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E5BD1954B0B;
+	Fri, 18 Apr 2025 16:38:13 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -50,9 +50,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 12/20] block: add `struct elv_change_ctx` for unifying elevator_change
-Date: Sat, 19 Apr 2025 00:36:53 +0800
-Message-ID: <20250418163708.442085-13-ming.lei@redhat.com>
+Subject: [PATCH V2 13/20] block: unifying elevator change
+Date: Sat, 19 Apr 2025 00:36:54 +0800
+Message-ID: <20250418163708.442085-14-ming.lei@redhat.com>
 In-Reply-To: <20250418163708.442085-1-ming.lei@redhat.com>
 References: <20250418163708.442085-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -64,205 +64,310 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add `struct elv_change_ctx` and prepare for unifying elevator_change(),
-with this way, any input & output parameter can be provided & observed
-in top caller.
+elevator change is one well-define behavior:
 
-This way also helps to move kobject & debugfs things out of
-->elevator_lock & freezing queue.
+- tear down current elevator if it exists
+
+- setup new elevator
+
+It is supposed to cover any case for changing elevator by single
+internal API, typically the following cases:
+
+- setup default elevator in add_disk()
+
+- switch to none in del_disk()
+
+- reset elevator in blk_mq_update_nr_hw_queues()
+
+- switch elevator in sysfs `store` elevator attribute
+
+This patch uses elevator_change() to cover all above cases:
+
+- every elevator switch is serialized with each other: add_disk/del_disk/
+store elevator is serialized already, blk_mq_update_nr_hw_queues() uses
+srcu for syncing with the other three cases
+
+- for both add_disk()/del_disk(), queue freeze works at atomic mode
+or has been froze, so the freeze in elevator_change() won't add extra
+delay
+
+- `struct elev_change_ctx` instance holds any info for changing elevator
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c   | 16 ++++++++++------
- block/blk.h      |  4 ++--
- block/elevator.c | 33 +++++++++++++++++++--------------
- block/elevator.h |  7 +++++++
- 4 files changed, 38 insertions(+), 22 deletions(-)
+ block/blk-sysfs.c | 18 ++++-------
+ block/blk.h       |  5 ++-
+ block/elevator.c  | 81 ++++++++++++++++++++++++++---------------------
+ block/elevator.h  |  1 +
+ block/genhd.c     | 19 +----------
+ 5 files changed, 55 insertions(+), 69 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0f4a5e674874..1a287c2e791c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4984,16 +4984,20 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	}
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index a2882751f0d2..58c50709bc14 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -869,14 +869,8 @@ int blk_register_queue(struct gendisk *disk)
+ 	if (ret)
+ 		goto out_unregister_ia_ranges;
  
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
--		const char *name = "none";
--
--		mutex_lock(&q->elevator_lock);
--		if (q->elevator && !blk_queue_dying(q))
--			name = q->elevator->type->elevator_name;
- 		/*
- 		 * nr_hw_queues is changed and elevator data depends on
- 		 * it, so we have to force to rebuild elevator
- 		 */
--		__elevator_change(q, name, true);
-+		struct elv_change_ctx ctx = {
-+			.name	= "none",
-+			.force	= true,
-+			.uevent	= true,
-+		};
-+
-+		mutex_lock(&q->elevator_lock);
-+		if (q->elevator && !blk_queue_dying(q))
-+			ctx.name = q->elevator->type->elevator_name;
-+		__elevator_change(q, &ctx);
- 		mutex_unlock(&q->elevator_lock);
- 	}
++	elevator_set_default(q);
+ 	mutex_lock(&q->elevator_lock);
+-	if (q->elevator) {
+-		ret = elv_register_queue(q, false);
+-		if (ret) {
+-			mutex_unlock(&q->elevator_lock);
+-			goto out_crypto_sysfs_unregister;
+-		}
+-	}
+ 	wbt_enable_default(disk);
+ 	mutex_unlock(&q->elevator_lock);
  
+@@ -902,8 +896,6 @@ int blk_register_queue(struct gendisk *disk)
+ 
+ 	return ret;
+ 
+-out_crypto_sysfs_unregister:
+-	blk_crypto_sysfs_unregister(disk);
+ out_unregister_ia_ranges:
+ 	disk_unregister_independent_access_ranges(disk);
+ out_debugfs_remove:
+@@ -949,9 +941,11 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		blk_mq_sysfs_unregister(disk);
+ 	blk_crypto_sysfs_unregister(disk);
+ 
+-	mutex_lock(&q->elevator_lock);
+-	elv_unregister_queue(q);
+-	mutex_unlock(&q->elevator_lock);
++	if (q->elevator) {
++		blk_mq_quiesce_queue(q);
++		elevator_set_none(q);
++		blk_mq_unquiesce_queue(q);
++	}
+ 
+ 	mutex_lock(&q->sysfs_lock);
+ 	disk_unregister_independent_access_ranges(disk);
 diff --git a/block/blk.h b/block/blk.h
-index 0c3cc1af2525..be01cb9f3910 100644
+index be01cb9f3910..0e19c09009ed 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -12,6 +12,7 @@
- #include "blk-crypto-internal.h"
- 
- struct elevator_type;
-+struct elv_change_ctx;
- 
- #define	BLK_DEV_MAX_SECTORS	(LLONG_MAX >> 9)
- #define	BLK_MIN_SEGMENT_SIZE	4096
-@@ -319,8 +320,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- 
+@@ -321,9 +321,8 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
  bool blk_insert_flush(struct request *rq);
  
--int __elevator_change(struct request_queue *q, const char *elevator_name,
--		      bool force);
-+int __elevator_change(struct request_queue *q, struct elv_change_ctx *ctx);
- void elevator_exit(struct request_queue *q);
- int elv_register_queue(struct request_queue *q, bool uevent);
- void elv_unregister_queue(struct request_queue *q);
+ int __elevator_change(struct request_queue *q, struct elv_change_ctx *ctx);
+-void elevator_exit(struct request_queue *q);
+-int elv_register_queue(struct request_queue *q, bool uevent);
+-void elv_unregister_queue(struct request_queue *q);
++void elevator_set_default(struct request_queue *q);
++void elevator_set_none(struct request_queue *q);
+ 
+ ssize_t part_size_show(struct device *dev, struct device_attribute *attr,
+ 		char *buf);
 diff --git a/block/elevator.c b/block/elevator.c
-index 6bf3871c7164..836138fc148a 100644
+index 836138fc148a..936d8ec9e9f0 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -53,7 +53,8 @@ static LIST_HEAD(elv_list);
-  */
- #define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
+@@ -151,7 +151,7 @@ static void elevator_release(struct kobject *kobj)
+ 	kfree(e);
+ }
  
--static int elevator_change(struct request_queue *q, const char *name);
-+static int elevator_change(struct request_queue *q,
-+			   struct elv_change_ctx *ctx);
+-void elevator_exit(struct request_queue *q)
++static void elevator_exit(struct request_queue *q)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+@@ -455,7 +455,7 @@ static const struct kobj_type elv_ktype = {
+ 	.release	= elevator_release,
+ };
+ 
+-int elv_register_queue(struct request_queue *q, bool uevent)
++static int elv_register_queue(struct request_queue *q, bool uevent)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 	int error;
+@@ -485,7 +485,7 @@ int elv_register_queue(struct request_queue *q, bool uevent)
+ 	return error;
+ }
+ 
+-void elv_unregister_queue(struct request_queue *q)
++static void elv_unregister_queue(struct request_queue *q)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+@@ -562,60 +562,59 @@ EXPORT_SYMBOL_GPL(elv_unregister);
+  * For single queue devices, default to using mq-deadline. If we have multiple
+  * queues or mq-deadline is not available, default to "none".
+  */
+-static struct elevator_type *elevator_get_default(struct request_queue *q)
++static bool use_default_elevator(struct request_queue *q)
+ {
+ 	if (q->tag_set->flags & BLK_MQ_F_NO_SCHED_BY_DEFAULT)
+-		return NULL;
++		return false;
+ 
+ 	if (q->nr_hw_queues != 1 &&
+ 	    !blk_mq_is_shared_tags(q->tag_set->flags))
+-		return NULL;
++		return false;
+ 
+-	return elevator_find_get("mq-deadline");
++	return true;
+ }
  
  /*
-  * Query io scheduler to see if the current process issuing bio may be
-@@ -623,7 +624,8 @@ void elevator_init_mq(struct request_queue *q)
-  * If switching fails, we are most likely running out of memory and not able
-  * to restore the old io scheduler, so leaving the io scheduler being none.
+  * Use the default elevator settings. If the chosen elevator initialization
+  * fails, fall back to the "none" elevator (no elevator).
   */
--static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
-+static int elevator_switch(struct request_queue *q, struct elevator_type *new_e,
-+			   struct elv_change_ctx *ctx)
+-void elevator_init_mq(struct request_queue *q)
++void elevator_set_default(struct request_queue *q)
  {
- 	int ret;
+-	struct elevator_type *e;
+-	unsigned int memflags;
++	struct elv_change_ctx ctx = {
++		.init = true,
++	};
+ 	int err;
  
-@@ -641,7 +643,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	if (ret)
- 		goto out_unfreeze;
+-	WARN_ON_ONCE(blk_queue_registered(q));
+-
+-	if (unlikely(q->elevator))
++	if (!queue_is_mq(q))
+ 		return;
  
--	ret = elv_register_queue(q, true);
-+	ret = elv_register_queue(q, ctx->uevent);
- 	if (ret) {
- 		elevator_exit(q);
- 		goto out_unfreeze;
-@@ -679,9 +681,9 @@ static void elevator_disable(struct request_queue *q)
+-	e = elevator_get_default(q);
+-	if (!e)
++	ctx.name = use_default_elevator(q) ? "mq-deadline" : "none";
++	if (!q->elevator && !strcmp(ctx.name, "none"))
+ 		return;
++	err = elevator_change(q, &ctx);
++	if (err < 0)
++		pr_warn("\"%s\" set elevator failed %d, "
++			"falling back to \"none\"\n", ctx.name, err);
++}
+ 
+-	/*
+-	 * We are called before adding disk, when there isn't any FS I/O,
+-	 * so freezing queue plus canceling dispatch work is enough to
+-	 * drain any dispatch activities originated from passthrough
+-	 * requests, then no need to quiesce queue which may add long boot
+-	 * latency, especially when lots of disks are involved.
+-	 *
+-	 * Disk isn't added yet, so verifying queue lock only manually.
+-	 */
+-	memflags = blk_mq_freeze_queue(q);
+-
+-	blk_mq_cancel_work_sync(q);
+-
+-	err = blk_mq_init_sched(q, e);
++void elevator_set_none(struct request_queue *q)
++{
++	struct elv_change_ctx ctx = {
++		.name	= "none",
++		.uevent = true,
++		.init = true,
++	};
++	int err;
+ 
+-	blk_mq_unfreeze_queue(q, memflags);
++	if (!queue_is_mq(q))
++		return;
+ 
+-	if (err) {
+-		pr_warn("\"%s\" elevator initialization failed, "
+-			"falling back to \"none\"\n", e->elevator_name);
+-	}
++	if (!q->elevator)
++		return;
+ 
+-	elevator_put(e);
++	err = elevator_change(q, &ctx);
++	if (err < 0)
++		pr_warn("%s: set none elevator failed %d\n", __func__, err);
+ }
+ 
  /*
-  * Switch this queue to the given IO scheduler.
-  */
--int __elevator_change(struct request_queue *q, const char *elevator_name,
--		      bool force)
-+int __elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
- {
-+	const char *elevator_name = ctx->name;
- 	struct elevator_type *e;
+@@ -688,7 +687,7 @@ int __elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
  	int ret;
  
-@@ -695,19 +697,20 @@ int __elevator_change(struct request_queue *q, const char *elevator_name,
- 		return 0;
+ 	/* Make sure queue is not in the middle of being removed */
+-	if (!blk_queue_registered(q))
++	if (!ctx->init && !blk_queue_registered(q))
+ 		return -ENOENT;
+ 
+ 	if (!strncmp(elevator_name, "none", 4)) {
+@@ -723,6 +722,16 @@ static int elevator_change(struct request_queue *q,
  	}
  
--	if (!force && q->elevator &&
-+	if (!ctx->force && q->elevator &&
- 	    elevator_match(q->elevator->type, elevator_name))
- 		return 0;
- 
- 	e = elevator_find_get(elevator_name);
- 	if (!e)
- 		return -EINVAL;
--	ret = elevator_switch(q, e);
-+	ret = elevator_switch(q, e, ctx);
- 	elevator_put(e);
- 	return ret;
- }
- 
--static int elevator_change(struct request_queue *q, const char *name)
-+static int elevator_change(struct request_queue *q,
-+			   struct elv_change_ctx *ctx)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	unsigned int memflags;
-@@ -721,7 +724,7 @@ static int elevator_change(struct request_queue *q, const char *name)
- 
  	memflags = blk_mq_freeze_queue(q);
++	/*
++	 * May be called before adding disk, when there isn't any FS I/O,
++	 * so freezing queue plus canceling dispatch work is enough to
++	 * drain any dispatch activities originated from passthrough
++	 * requests, then no need to quiesce queue which may add long boot
++	 * latency, especially when lots of disks are involved.
++	 *
++	 * Disk isn't added yet, so verifying queue lock only manually.
++	 */
++	blk_mq_cancel_work_sync(q);
  	mutex_lock(&q->elevator_lock);
--	ret = __elevator_change(q, name, false);
-+	ret = __elevator_change(q, ctx);
+ 	ret = __elevator_change(q, ctx);
  	mutex_unlock(&q->elevator_lock);
- 	blk_mq_unfreeze_queue(q, memflags);
- exit:
-@@ -729,7 +732,7 @@ static int elevator_change(struct request_queue *q, const char *name)
- 	return ret;
- }
- 
--static void elv_iosched_load_module(char *elevator_name)
-+static void elv_iosched_load_module(const char *elevator_name)
- {
- 	struct elevator_type *found;
- 
-@@ -746,7 +749,9 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
- {
- 	struct request_queue *q = disk->queue;
- 	char elevator_name[ELV_NAME_MAX];
--	char *name;
-+	struct elv_change_ctx ctx = {
-+		.uevent = true,
-+	};
- 	int ret;
- 
- 	/*
-@@ -755,11 +760,11 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
- 	 * queue is the one for the device storing the module file.
- 	 */
- 	strscpy(elevator_name, buf, sizeof(elevator_name));
--	name = strstrip(elevator_name);
-+	ctx.name = strstrip(elevator_name);
- 
--	elv_iosched_load_module(name);
-+	elv_iosched_load_module(ctx.name);
- 
--	ret = elevator_change(q, name);
-+	ret = elevator_change(q, &ctx);
- 	if (!ret)
- 		ret = count;
- 	return ret;
 diff --git a/block/elevator.h b/block/elevator.h
-index 9198676644a9..63fc4cad16cc 100644
+index 63fc4cad16cc..e74e27dd6586 100644
 --- a/block/elevator.h
 +++ b/block/elevator.h
-@@ -122,6 +122,13 @@ struct elevator_queue
+@@ -127,6 +127,7 @@ struct elv_change_ctx {
+ 	const char *name;
+ 	bool force;
+ 	bool uevent;
++	bool init;
+ };
  
- #define ELEVATOR_FLAG_REGISTERED	0
- 
-+/* Holding context data for changing elevator */
-+struct elv_change_ctx {
-+	const char *name;
-+	bool force;
-+	bool uevent;
-+};
-+
  /*
-  * block elevator interface
-  */
+diff --git a/block/genhd.c b/block/genhd.c
+index 86c3db5b9305..de227aa923ed 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -438,12 +438,6 @@ static int __add_disk_fwnode(struct gendisk_data *data)
+ 		 */
+ 		if (disk->fops->submit_bio || disk->fops->poll_bio)
+ 			return -EINVAL;
+-
+-		/*
+-		 * Initialize the I/O scheduler code and pick a default one if
+-		 * needed.
+-		 */
+-		elevator_init_mq(disk->queue);
+ 	} else {
+ 		if (!disk->fops->submit_bio)
+ 			return -EINVAL;
+@@ -587,11 +581,7 @@ static int __add_disk_fwnode(struct gendisk_data *data)
+ 	if (disk->major == BLOCK_EXT_MAJOR)
+ 		blk_free_ext_minor(disk->first_minor);
+ out_exit_elevator:
+-	if (disk->queue->elevator) {
+-		mutex_lock(&disk->queue->elevator_lock);
+-		elevator_exit(disk->queue);
+-		mutex_unlock(&disk->queue->elevator_lock);
+-	}
++	elevator_set_none(disk->queue);
+ 	return ret;
+ }
+ 
+@@ -771,14 +761,7 @@ static int __del_gendisk(struct gendisk_data *data)
+ 	if (queue_is_mq(q))
+ 		blk_mq_cancel_work_sync(q);
+ 
+-	blk_mq_quiesce_queue(q);
+-	if (q->elevator) {
+-		mutex_lock(&q->elevator_lock);
+-		elevator_exit(q);
+-		mutex_unlock(&q->elevator_lock);
+-	}
+ 	rq_qos_exit(q);
+-	blk_mq_unquiesce_queue(q);
+ 
+ 	/*
+ 	 * If the disk does not own the queue, allow using passthrough requests
 -- 
 2.47.0
 
