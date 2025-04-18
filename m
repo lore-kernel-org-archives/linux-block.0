@@ -1,57 +1,57 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C3D1BD50C
-	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 01:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17060184E
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 01:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744939826; cv=none; b=Pqwm62NV25jR1lT9Ed970gAAUDdI5XmLDXmhv3bHoNdcExScgV4ICd8n/QnbIBNTAwPG38J/xe72lw3frv9oP9qddhuc8lrWHuZHw/0aMSeOI4pzwvVVNg9+rsR8oTYC0BOZPRe9g1xAQ+XO/emz7tUiDcrLFXTXEufQPWoZ1II=
+	t=1744940166; cv=none; b=dfpxTwipxVKz0VO5RjtobG4RWpoLR9OzmZgU5OfmYB1dxDQL9iSFyqFFmvgq+Y2/VoQhOJfUVicxi/BTQTN2iJRTSMuxsI3Fih5VjNZuGV8GEkftHukZh2z2OOfu6HsS0ALFxiiM6wJnoQ291FiyJ9YTGizkpwHoRUMVwWDykSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744939826; c=relaxed/simple;
-	bh=MEgZjNtskQXm6HFNYZJ7iMSGrAMiDzT+N/Kb1iu9daA=;
+	s=arc-20240116; t=1744940166; c=relaxed/simple;
+	bh=k8J7hG9/vrA9FNCiw18EaeVhil9DtKEoGVnqQ893A4M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cz+CEUxuAUKZ990NaXOBJKroE08cNRmijmXo+X1kVYZKJW3FbQsXaJUkpUkWtnXq8zMnu6aw7Qw2lJluaazaoyykwcRZNGLxKxv4+q6XN8ubnHRS4Qky5tWCl3hhyEujAKobxIvr7d9mgxHhwkPpErykFP6xjbLqJEZymafNlUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZOmXLAjj; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=NMnT9DkTLMPJAQOIEoSGwFAgYHYxrKttZYmn9j0kLQuFMjxq8e6wBPk68bPzmZf23PWdGuqWBDeJoaOs/+zDMpaubtbl7OokOPwGv0eLqwDgMvij/ZxYa/RXyN93XaYcPDKRq5nIxAZ+ACgLBRcfvHl74SYg1Zdtk5UhA53A6m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avLkQGO4; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZOmXLAjj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avLkQGO4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744939823;
+	s=mimecast20190719; t=1744940162;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a1zlgXQPsuy4r3lGn9hZVrkLc3Vo0/KGwnhy/QIVqNk=;
-	b=ZOmXLAjjxnSH5V+0v96DlpJ8aaDeLzhUmMGLV5ocFQyDLBiTjb0hK0pkwNi2Vlu7go3Pk7
-	2QSBrkE1AX9bwODd1yVaaZtZMom5QvBGZCa6uTZWvUQM76u5lNOlFmbCK5WHKSOzvC6hRu
-	BgqIqrWbt3zXrYHEJG/+fo4Ssol/kSI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=StCEkDFSO5ad1eauSPUv5vvsP4duU0OTrS4bvTblyrI=;
+	b=avLkQGO425Tn3z66zchSZPuKQKrCcmEdFOFmhQ9xYfv0VDKgdefHtgj7/Qds9nnE0g+RBz
+	TM0T95M8ewY3BE7omckzz9zbFCGPLjNDPreo/s+3VYvyStC7wR0V6V3K2w1BGX3kpCOAW7
+	3A5Y4KA/TwQqFsDPGE/QZYWwnU0iWlw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-VO7Gw8YJPO2CTSg2dR5JaQ-1; Thu,
- 17 Apr 2025 21:30:21 -0400
-X-MC-Unique: VO7Gw8YJPO2CTSg2dR5JaQ-1
-X-Mimecast-MFC-AGG-ID: VO7Gw8YJPO2CTSg2dR5JaQ_1744939820
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-331-srSt5sSRMIWVBoaQR0bU1w-1; Thu,
+ 17 Apr 2025 21:35:59 -0400
+X-MC-Unique: srSt5sSRMIWVBoaQR0bU1w-1
+X-Mimecast-MFC-AGG-ID: srSt5sSRMIWVBoaQR0bU1w_1744940158
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B20B91800878;
-	Fri, 18 Apr 2025 01:30:20 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2FB511955DAF;
+	Fri, 18 Apr 2025 01:35:58 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.88])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8F9A19560BA;
-	Fri, 18 Apr 2025 01:30:16 +0000 (UTC)
-Date: Fri, 18 Apr 2025 09:30:11 +0800
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C936319560A3;
+	Fri, 18 Apr 2025 01:35:53 +0000 (UTC)
+Date: Fri, 18 Apr 2025 09:35:48 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Uday Shankar <ushankar@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/4] ublk: require unique task per io instead of
- unique task per hctx
-Message-ID: <aAGrI8wqLLCWzqNe@fedora>
+Subject: Re: [PATCH v5 2/4] ublk: mark ublk_queue as const for
+ ublk_commit_and_fetch
+Message-ID: <aAGsdAdnkAwTRWg0@fedora>
 References: <20250416-ublk_task_per_io-v5-0-9261ad7bff20@purestorage.com>
- <20250416-ublk_task_per_io-v5-1-9261ad7bff20@purestorage.com>
+ <20250416-ublk_task_per_io-v5-2-9261ad7bff20@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,73 +60,74 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416-ublk_task_per_io-v5-1-9261ad7bff20@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <20250416-ublk_task_per_io-v5-2-9261ad7bff20@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Apr 16, 2025 at 01:46:05PM -0600, Uday Shankar wrote:
-> Currently, ublk_drv associates to each hardware queue (hctx) a unique
-> task (called the queue's ubq_daemon) which is allowed to issue
-> COMMIT_AND_FETCH commands against the hctx. If any other task attempts
-> to do so, the command fails immediately with EINVAL. When considered
-> together with the block layer architecture, the result is that for each
-> CPU C on the system, there is a unique ublk server thread which is
-> allowed to handle I/O submitted on CPU C. This can lead to suboptimal
-> performance under imbalanced load generation. For an extreme example,
-> suppose all the load is generated on CPUs mapping to a single ublk
-> server thread. Then that thread may be fully utilized and become the
-> bottleneck in the system, while other ublk server threads are totally
-> idle.
+On Wed, Apr 16, 2025 at 01:46:06PM -0600, Uday Shankar wrote:
+> We now allow multiple tasks to operate on I/Os belonging to the same
+> queue concurrently. This means that any writes to ublk_queue in the I/O
+> path are potential sources of data races. Try to prevent these by
+> marking ublk_queue pointers as const when handling COMMIT_AND_FETCH.
+> Move the logic for this command into its own function
+> ublk_commit_and_fetch. Also open code ublk_commit_completion in
+> ublk_commit_and_fetch to reduce the number of parameters/avoid a
+> redundant lookup.
 > 
-> This issue can also be addressed directly in the ublk server without
-> kernel support by having threads dequeue I/Os and pass them around to
-> ensure even load. But this solution requires inter-thread communication
-> at least twice for each I/O (submission and completion), which is
-> generally a bad pattern for performance. The problem gets even worse
-> with zero copy, as more inter-thread communication would be required to
-> have the buffer register/unregister calls to come from the correct
-> thread.
-> 
-> Therefore, address this issue in ublk_drv by requiring a unique task per
-> I/O instead of per queue/hctx. Imbalanced load can then be balanced
-> across all ublk server threads by having threads issue FETCH_REQs in a
-> round-robin manner. As a small toy example, consider a system with a
-> single ublk device having 2 queues, each of queue depth 4. A ublk server
-> having 4 threads could issue its FETCH_REQs against this device as
-> follows (where each entry is the qid,tag pair that the FETCH_REQ
-> targets):
-> 
-> poller thread:	T0	T1	T2	T3
-> 		0,0	0,1	0,2	0,3
-> 		1,3	1,0	1,1	1,2
-> 
-> Since tags appear to be allocated in sequential chunks, this setup
-> provides a rough approximation to distributing I/Os round-robin across
-> all ublk server threads, while letting I/Os stay fully thread-local.
-> 
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
 > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 > Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 > ---
+>  drivers/block/ublk_drv.c | 91 +++++++++++++++++++++++-------------------------
+>  1 file changed, 43 insertions(+), 48 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 4e4863d873e6593ad94c72cbf971f792df5795ae..b44cbcbcc9d1735c398dc9ac7e93f4c8736b9201 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1518,30 +1518,6 @@ static int ublk_ch_mmap(struct file *filp, struct vm_area_struct *vma)
+>  	return remap_pfn_range(vma, vma->vm_start, pfn, sz, vma->vm_page_prot);
+>  }
+>  
+> -static void ublk_commit_completion(struct ublk_device *ub,
+> -		const struct ublksrv_io_cmd *ub_cmd)
+> -{
+> -	u32 qid = ub_cmd->q_id, tag = ub_cmd->tag;
+> -	struct ublk_queue *ubq = ublk_get_queue(ub, qid);
+> -	struct ublk_io *io = &ubq->ios[tag];
+> -	struct request *req;
+> -
+> -	/* now this cmd slot is owned by nbd driver */
+> -	io->flags &= ~UBLK_IO_FLAG_OWNED_BY_SRV;
+> -	io->res = ub_cmd->result;
+> -
+> -	/* find the io request and complete */
+> -	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
+> -	if (WARN_ON_ONCE(unlikely(!req)))
+> -		return;
+> -
+> -	if (req_op(req) == REQ_OP_ZONE_APPEND)
+> -		req->__sector = ub_cmd->zone_append_lba;
+> -
+> -	if (likely(!blk_should_fake_timeout(req->q)))
+> -		ublk_put_req_ref(ubq, req);
+> -}
+> -
+>  /*
+>   * Called from io task context via cancel fn, meantime quiesce ublk
+>   * blk-mq queue, so we are called exclusively with blk-mq and io task
+> @@ -1918,6 +1894,45 @@ static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+>  	return io_buffer_unregister_bvec(cmd, index, issue_flags);
+>  }
+>  
+> +static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> +				 struct ublk_io *io, struct io_uring_cmd *cmd,
+> +				 const struct ublksrv_io_cmd *ub_cmd,
+> +				 struct request *req)
 
-I guess this patch need to rebase against yesterday Jens's merge.
+request argument can be removed by getting it inside this function directly,
+and it is helpful to switch to retrieve & store it from 'ublk_io' later.
 
-Given this change is big from ublk serer viewpoint, it should aim at
-v6.16
-
-As I suggested on V3[1]:
-
-- it is nice to make it as one feature, so you can make any optimization
-for this feature only, such as applying BLK_MQ_F_TAG_RR for improving
-IO locality
-
-- add selftest for this usage, which is helpful for
-
-	- verify this usage
-
-	- avoid to break the feature with new change
-
-	- and evaluate performance effect
-
-[1] https://lore.kernel.org/linux-block/aABZl4Yxdf3yew4q@fedora/
+Otherwise, looks nice cleanup.
 
 
 thanks,
