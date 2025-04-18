@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8959208A7
-	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A3E208A7
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744994275; cv=none; b=uFCoDI2ot8UTRnkJhgqyKicyTUkdphkA9AucEaTakosL0qp9uDLNH1WYipsP+grnP1SPBlx8l0u4pdNTnRxcPrQkqr2VsF4FYXq45EV55uzZXq+M6K4b895K3lStDS51v5tl6HJwWAoSfz+JIvqGu+YP0+RC8CLkq4KWRnetZYw=
+	t=1744994278; cv=none; b=qnp243ENZjhLZwo7TTUKwpF88IKmv6T/kS7qb4PAhMlIrXEUorKGy8Cs/7uOnvIDuHtdlADruo1cClg9PVBOVCGAjy8rH+Ca2xcgJsbvw308M/wcXArWXiv21/LDXdkerBFcht1nsWQxS/9lU1L3dqIvWG2U9OXNhZgOwkMVuNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744994275; c=relaxed/simple;
-	bh=b/MSZZsD+HCnboRalqnYxzjKQ8CYWeV0BzzDNKGiOdk=;
+	s=arc-20240116; t=1744994278; c=relaxed/simple;
+	bh=lSVEvALNSLKI3ZAiS7XJzcwM2mn1yvCus3Ne7vwRfMg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A8zqZlYWI3O6wnlt6esl0Lv+hsIpigTnAJ9u0sdoC7swCnf1vcmhMhbVEAB6iOlX3o/iq8tl+MKWlFkAdaqMA/2y5TU6iPas0sGrsXnECo69TEiWg5ohwR+X0NQTC50qFrkxgNsyswZ/vmOBPw35nPiqD5+8n8WcWHAuyUgvQ/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=He6TsD+2; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=srruRph6hHjaqCSE7j3MRT9xTQ7FGByR2c8Gn0SbHJ+/ho7lQm2rHHCmDO/XQibuJfy+kW8r8b2XUNstemded1MYw1aRDKDAdFdUwRDjnyzxLNlOLk80yQOUFWi7D7rj96bEy+rSGpnRvp6C56CGQIAPTrabSOIluBkYCub+k3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JKUjGKcN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="He6TsD+2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKUjGKcN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744994272;
+	s=mimecast20190719; t=1744994275;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=76SV8HuxVR187jaN0G5ISTMO24o9l6sktx4O1GP+5hs=;
-	b=He6TsD+2kCIwsL6mWtHAHcg8YwGVhs3+fHB4xgQVJYwbBK4anZmtAAI2oXp71yeFpUmP+p
-	SSbaq3mm2sdDa7yPHXxp+5NSB6EjhefbkKo71JNDP/ka0Gd+48yliMPQvQ1uzGBElrDKm8
-	CFA7zf9ZA5JDagn8Blch2ojhudYlaVY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=OuGjHwRqAOnTVi/MB2ZbCXB1MH3VBU/S7SnAnHKEq44=;
+	b=JKUjGKcNYf98yUFCBtGqKQgEh/u6iPj1ws9Q6BZ7imURh7UitE1XCywqZXQCHIefBjZ/ta
+	qeSsglMQhpBcwG7bDv/0j0Ez+DrOYoLfsQOg6/c15ChCFbSaHtCS6t0bFWcOY8TnFtePse
+	oSs03aG6NFH18K9t32w4Js66QVRyFzE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-mo8bE56hOjms3fup_aGOnQ-1; Fri,
- 18 Apr 2025 12:37:48 -0400
-X-MC-Unique: mo8bE56hOjms3fup_aGOnQ-1
-X-Mimecast-MFC-AGG-ID: mo8bE56hOjms3fup_aGOnQ_1744994267
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-LaaQyoQWM2GKeRmqhwmqxA-1; Fri,
+ 18 Apr 2025 12:37:52 -0400
+X-MC-Unique: LaaQyoQWM2GKeRmqhwmqxA-1
+X-Mimecast-MFC-AGG-ID: LaaQyoQWM2GKeRmqhwmqxA_1744994271
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5F2011800263;
-	Fri, 18 Apr 2025 16:37:47 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33BEE180048E;
+	Fri, 18 Apr 2025 16:37:51 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.50])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE6A819560A3;
-	Fri, 18 Apr 2025 16:37:45 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F23B19560A3;
+	Fri, 18 Apr 2025 16:37:49 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -50,9 +50,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 06/20] block: add & pass 'struct gendisk_data' for retrying add/del disk in updating nr_hw_queues
-Date: Sat, 19 Apr 2025 00:36:47 +0800
-Message-ID: <20250418163708.442085-7-ming.lei@redhat.com>
+Subject: [PATCH V2 07/20] block: prevent adding/deleting disk during updating nr_hw_queues
+Date: Sat, 19 Apr 2025 00:36:48 +0800
+Message-ID: <20250418163708.442085-8-ming.lei@redhat.com>
 In-Reply-To: <20250418163708.442085-1-ming.lei@redhat.com>
 References: <20250418163708.442085-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -62,177 +62,179 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add/del gendisk code is actually reader of 'nr_hw_queues' in case of blk-mq:
+Both adding/deleting disk code are reader of `nr_hw_queues`, so we can't
+allow them in-progress when updating nr_hw_queues, kernel panic and
+kasan has been reported in [1].
 
-- debugfs / hctx sysfs register
+Prevent adding/deleting disk during updating nr_hw_queues by setting
+set->updating_nr_hwq, and use SRCU to fail & retry to add/delete disk.
 
-- setup scheduler since ->sched_tags depends on hctx, which relies on
-'nr_hw_queues'
+This way avoids lot of trouble.
 
-Add & pass 'struct gendisk_data' to add/del disk helper and prepare for
-retrying add/del disk when updating nr_hw_queues is in-progress.
-
+Reported-by: Nilay Shroff <nilay@linux.ibm.com>
+Closes: https://lore.kernel.org/linux-block/a5896cdb-a59a-4a37-9f99-20522f5d2987@linux.ibm.com/
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/genhd.c | 105 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 67 insertions(+), 38 deletions(-)
+ block/blk-mq.c         | 22 +++++++++++++++++++++-
+ block/genhd.c          | 36 ++++++++++++++++++++++++++++++++----
+ include/linux/blk-mq.h |  5 +++++
+ 3 files changed, 58 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7cda919fafba..e1662617cc7a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4782,12 +4782,18 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 			goto out_free_srcu;
+ 	}
+ 
++	mutex_init(&set->update_nr_hwq_lock);
++	init_waitqueue_head(&set->update_nr_hwq_wq);
++	ret = init_srcu_struct(&set->update_nr_hwq_srcu);
++	if (ret)
++		goto out_cleanup_srcu;
++
+ 	ret = -ENOMEM;
+ 	set->tags = kcalloc_node(set->nr_hw_queues,
+ 				 sizeof(struct blk_mq_tags *), GFP_KERNEL,
+ 				 set->numa_node);
+ 	if (!set->tags)
+-		goto out_cleanup_srcu;
++		goto out_cleanup_hwq_srcu;
+ 
+ 	for (i = 0; i < set->nr_maps; i++) {
+ 		set->map[i].mq_map = kcalloc_node(nr_cpu_ids,
+@@ -4816,6 +4822,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	}
+ 	kfree(set->tags);
+ 	set->tags = NULL;
++out_cleanup_hwq_srcu:
++	cleanup_srcu_struct(&set->update_nr_hwq_srcu);
+ out_cleanup_srcu:
+ 	if (set->flags & BLK_MQ_F_BLOCKING)
+ 		cleanup_srcu_struct(set->srcu);
+@@ -5077,9 +5085,21 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+ {
++	mutex_lock(&set->update_nr_hwq_lock);
++	/*
++	 * Mark us in updating nr_hw_queues for preventing reader of
++	 * nr_hw_queues, such as adding/deleting disk.
++	 */
++	set->updating_nr_hwq = true;
++	synchronize_srcu(&set->update_nr_hwq_srcu);
++
+ 	mutex_lock(&set->tag_list_lock);
+ 	__blk_mq_update_nr_hw_queues(set, nr_hw_queues);
+ 	mutex_unlock(&set->tag_list_lock);
++
++	set->updating_nr_hwq = false;
++	wake_up_all(&set->update_nr_hwq_wq);
++	mutex_unlock(&set->update_nr_hwq_lock);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
+ 
 diff --git a/block/genhd.c b/block/genhd.c
-index c2bd86cd09de..4370c5be1f34 100644
+index 4370c5be1f34..d22fdc0d5383 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -33,6 +33,13 @@
- #include "blk-rq-qos.h"
- #include "blk-cgroup.h"
- 
-+struct gendisk_data {
-+	struct gendisk *disk;
-+	struct device *parent;
-+	const struct attribute_group **groups;
-+	struct fwnode_handle *fwnode;
-+};
-+
- static struct kobject *block_depr;
- 
- /*
-@@ -389,21 +396,9 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+@@ -396,6 +396,33 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
  	return ret;
  }
  
--/**
-- * add_disk_fwnode - add disk information to kernel list with fwnode
-- * @parent: parent device for the disk
-- * @disk: per-device partitioning information
-- * @groups: Additional per-device sysfs groups
-- * @fwnode: attached disk fwnode
-- *
-- * This function registers the partitioning information in @disk
-- * with the kernel. Also attach a fwnode to the disk device.
-- */
--int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
--				 const struct attribute_group **groups,
--				 struct fwnode_handle *fwnode)
--
-+static int __add_disk_fwnode(struct gendisk_data *data)
- {
-+	struct gendisk *disk = data->disk;
- 	struct device *ddev = disk_to_dev(disk);
- 	int ret;
- 
-@@ -463,11 +458,11 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
- 	/* delay uevents, until we scanned partition table */
- 	dev_set_uevent_suppress(ddev, 1);
- 
--	ddev->parent = parent;
--	ddev->groups = groups;
-+	ddev->parent = data->parent;
-+	ddev->groups = data->groups;
- 	dev_set_name(ddev, "%s", disk->disk_name);
--	if (fwnode)
--		device_set_node(ddev, fwnode);
-+	if (data->fwnode)
-+		device_set_node(ddev, data->fwnode);
- 	if (!(disk->flags & GENHD_FL_HIDDEN))
- 		ddev->devt = MKDEV(disk->major, disk->first_minor);
- 	ret = device_add(ddev);
-@@ -572,6 +567,30 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
- 	}
- 	return ret;
- }
-+
-+/**
-+ * add_disk_fwnode - add disk information to kernel list with fwnode
-+ * @parent: parent device for the disk
-+ * @disk: per-device partitioning information
-+ * @groups: Additional per-device sysfs groups
-+ * @fwnode: attached disk fwnode
-+ *
-+ * This function registers the partitioning information in @disk
-+ * with the kernel. Also attach a fwnode to the disk device.
-+ */
-+int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups,
-+				 struct fwnode_handle *fwnode)
++static int retry_on_updating_nr_hwq(struct gendisk_data *data,
++				    int (*cb)(struct gendisk_data *data))
 +{
-+	struct gendisk_data data = {
-+		.disk	= disk,
-+		.parent	= parent,
-+		.groups	= groups,
-+		.fwnode = fwnode,
-+	};
++	struct gendisk *disk = data->disk;
++	struct blk_mq_tag_set *set;
 +
-+	return __add_disk_fwnode(&data);
++	if (!queue_is_mq(disk->queue))
++		return cb(data);
++
++	set = disk->queue->tag_set;
++	do {
++		int idx, ret;
++
++		idx = srcu_read_lock(&set->update_nr_hwq_srcu);
++		if (set->updating_nr_hwq) {
++			srcu_read_unlock(&set->update_nr_hwq_srcu, idx);
++			goto wait;
++		}
++		ret = cb(data);
++		srcu_read_unlock(&set->update_nr_hwq_srcu, idx);
++		return ret;
++ wait:
++		wait_event_interruptible(set->update_nr_hwq_wq,
++				!set->updating_nr_hwq);
++	} while (true);
 +}
++
+ static int __add_disk_fwnode(struct gendisk_data *data)
+ {
+ 	struct gendisk *disk = data->disk;
+@@ -589,7 +616,7 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+ 		.fwnode = fwnode,
+ 	};
+ 
+-	return __add_disk_fwnode(&data);
++	return retry_on_updating_nr_hwq(&data, __add_disk_fwnode);
+ }
  EXPORT_SYMBOL_GPL(add_disk_fwnode);
  
- /**
-@@ -652,27 +671,9 @@ void blk_mark_disk_dead(struct gendisk *disk)
+@@ -671,7 +698,7 @@ void blk_mark_disk_dead(struct gendisk *disk)
  }
  EXPORT_SYMBOL_GPL(blk_mark_disk_dead);
  
--/**
-- * del_gendisk - remove the gendisk
-- * @disk: the struct gendisk to remove
-- *
-- * Removes the gendisk and all its associated resources. This deletes the
-- * partitions associated with the gendisk, and unregisters the associated
-- * request_queue.
-- *
-- * This is the counter to the respective __device_add_disk() call.
-- *
-- * The final removal of the struct gendisk happens when its refcount reaches 0
-- * with put_disk(), which should be called after del_gendisk(), if
-- * __device_add_disk() was used.
-- *
-- * Drivers exist which depend on the release of the gendisk to be synchronous,
-- * it should not be deferred.
-- *
-- * Context: can sleep
-- */
--void del_gendisk(struct gendisk *disk)
-+static void __del_gendisk(struct gendisk_data *data)
+-static void __del_gendisk(struct gendisk_data *data)
++static int __del_gendisk(struct gendisk_data *data)
  {
-+	struct gendisk *disk = data->disk;
+ 	struct gendisk *disk = data->disk;
  	struct request_queue *q = disk->queue;
- 	struct block_device *part;
- 	unsigned long idx;
-@@ -766,6 +767,34 @@ void del_gendisk(struct gendisk *disk)
+@@ -682,7 +709,7 @@ static void __del_gendisk(struct gendisk_data *data)
+ 	might_sleep();
+ 
+ 	if (WARN_ON_ONCE(!disk_live(disk) && !(disk->flags & GENHD_FL_HIDDEN)))
+-		return;
++		return 0;
+ 
+ 	disk_del_events(disk);
+ 
+@@ -764,6 +791,7 @@ static void __del_gendisk(struct gendisk_data *data)
+ 
+ 	if (start_drain)
+ 		blk_unfreeze_release_lock(q);
++	return 0;
  }
  EXPORT_SYMBOL(del_gendisk);
  
-+/**
-+ * del_gendisk - remove the gendisk
-+ * @disk: the struct gendisk to remove
-+ *
-+ * Removes the gendisk and all its associated resources. This deletes the
-+ * partitions associated with the gendisk, and unregisters the associated
-+ * request_queue.
-+ *
-+ * This is the counter to the respective __device_add_disk() call.
-+ *
-+ * The final removal of the struct gendisk happens when its refcount reaches 0
-+ * with put_disk(), which should be called after del_gendisk(), if
-+ * __device_add_disk() was used.
-+ *
-+ * Drivers exist which depend on the release of the gendisk to be synchronous,
-+ * it should not be deferred.
-+ *
-+ * Context: can sleep
-+ */
-+void del_gendisk(struct gendisk *disk)
-+{
-+	struct gendisk_data data = {
-+		.disk	= disk,
-+	};
-+
-+	__del_gendisk(&data);
-+}
-+
+@@ -792,7 +820,7 @@ void del_gendisk(struct gendisk *disk)
+ 		.disk	= disk,
+ 	};
+ 
+-	__del_gendisk(&data);
++	retry_on_updating_nr_hwq(&data, __del_gendisk);
+ }
+ 
  /**
-  * invalidate_disk - invalidate the disk
-  * @disk: the struct gendisk to invalidate
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 8eb9b3310167..afe76dcfaa3c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -527,6 +527,11 @@ struct blk_mq_tag_set {
+ 	struct mutex		tag_list_lock;
+ 	struct list_head	tag_list;
+ 	struct srcu_struct	*srcu;
++
++	bool			updating_nr_hwq;
++	struct mutex		update_nr_hwq_lock;
++	struct srcu_struct	update_nr_hwq_srcu;
++	wait_queue_head_t	update_nr_hwq_wq;
+ };
+ 
+ /**
 -- 
 2.47.0
 
