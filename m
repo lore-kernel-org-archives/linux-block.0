@@ -1,263 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A36F13FD86;
-	Fri, 18 Apr 2025 16:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C54E7462
+	for <linux-block@vger.kernel.org>; Fri, 18 Apr 2025 16:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744992155; cv=none; b=PFyP0AB7OZW2NpPEszq9St2kfRnWMvsLRDtfMGtegzM9M0KnF2RGYJeDwlbUIqieJb7S07XJ8ZW4M27vVZaCTfQSdcQEfaRTyq2oI+yq088Za9tUDKNHyiKlaiqjyXjAcSHsfi4isB0F54RtuzuH1V49Y88/nr9+xDY/+jN0KAQ=
+	t=1744994249; cv=none; b=lRY/WrYsdO7BZ0Pt7YLx+0oPUtQeLi6o8RRdFWNSkKgCwykUpx7TCPe6Pw9VjXXeG/TuxZmkr1cLCEJy0nHtF9ID5EQC0gqPTUAWniALlUJIc0Z1eyTko3rQLar3aOAJSdnUcg00831wVeLUysStF7ayxOB7+J+hjG/ZSo8y3zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744992155; c=relaxed/simple;
-	bh=rKsF9PWrs8dZSiA87OFZvZCoTwD5UL7VWhc3BJxoJvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0wKOoSOPDPsjW0z+2OfTek76i8ny65F+iFxHqyX3bVWz4Mwtj8WkGNMv4JId/QEWsnMzI4RrT7eWOrb4CHrUTifNc5CDeDgaOrzAkt6gkqww/jnJFqoRM7XsNpYz7AxVigZCeI00r5QRCr8U5qMfuIBSK6iZmuMoZPCYMXQAmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxsndsK7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744994249; c=relaxed/simple;
+	bh=DhaxAfrdHGY5YDfHrXoEnLtGRmBHp7Q88Rp7T9fdblo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cGIKdk7c7RKiYnsZ0abiCygC0oZhnShLY6l/OKOLe5T+P+GD1t97I4Gj7nwkdc+GKV8mxyT0c0qKvfX7rbB1SII5JVlbeiZyQ/uSJ+4uHeOzL9c+Ar59TbyOrlPpuhFo4EdfeYkevpv7RSTgZNL7l2nFlbD7+j1cTFgiI2jxY2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TRq3Ubeq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxsndsK7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4883C4CEE2;
-	Fri, 18 Apr 2025 16:02:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744992155;
-	bh=rKsF9PWrs8dZSiA87OFZvZCoTwD5UL7VWhc3BJxoJvs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fxsndsK7R+LXbvT4VVl9fkCTCAbQ5G/Xcn5NsGLk7QjL/Bx7MiixnBeD5ozrXR5hQ
-	 ceXuT/2ns4og7e1MwTlUdFOndkHpuOfS1LFscm6wO6AJb9ITRhAZl5fE1T7K9qTbjZ
-	 s1JdIT44rzN/Mq97CAlBfaqtKWNuEsEMd+eTFA6vuhisFqG4lVTxoUfo0rGU6ZmnON
-	 dZuh1nMXIV+tSlK2AykjjBeEpzSp+KCA0+zvZN4r2PrArEZOCl0Oq26MuPQWZ7BxIC
-	 8Xagch7IU4BkRLviUkxsD82xW2i32kufSBeU9HhtpZD5gFw8JPUdRaL3agZ5P75KzW
-	 3zIZi5aM91zmg==
-Date: Fri, 18 Apr 2025 09:02:34 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRq3Ubeq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744994247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/x/5B+1AeBPBo8nZIo0xWonar/Sl1BdzST3rgcQuSKs=;
+	b=TRq3UbeqFnHs4+4qk2XdUv15KAE8Ud2yLKD/lryrPrl+AnYnJiGaT0UDu2Q1aUnKXl/JX+
+	YVSSoPMq2b39hXqxdFqpgYtXm2RoPfo9FD8Rc2qeLUhm1Khg4pthxP2y/Z+zgwajY+09j3
+	EUUSbRXw9RgtCX7kxTjKRQSu0kBSsNk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-tgmirXT1PS2mkFiKlbk1tg-1; Fri,
+ 18 Apr 2025 12:37:23 -0400
+X-MC-Unique: tgmirXT1PS2mkFiKlbk1tg-1
+X-Mimecast-MFC-AGG-ID: tgmirXT1PS2mkFiKlbk1tg_1744994242
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D759119560A7;
+	Fri, 18 Apr 2025 16:37:21 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.50])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6BF0A180177D;
+	Fri, 18 Apr 2025 16:37:19 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	xfs <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH 1/2] block: fix race between set_blocksize and read paths
-Message-ID: <20250418160234.GT25675@frogsfrogsfrogs>
-References: <20250418155458.GR25675@frogsfrogsfrogs>
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 00/20] block: unify elevator changing and fix lockdep warning
+Date: Sat, 19 Apr 2025 00:36:41 +0800
+Message-ID: <20250418163708.442085-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418155458.GR25675@frogsfrogsfrogs>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Apr 18, 2025 at 08:54:58AM -0700, Darrick J. Wong wrote:
-> From: Darrick J. Wong <djwong@kernel.org>
-> 
-> With the new large sector size support, it's now the case that
-> set_blocksize can change i_blksize and the folio order in a manner that
-> conflicts with a concurrent reader and causes a kernel crash.
-> 
-> Specifically, let's say that udev-worker calls libblkid to detect the
-> labels on a block device.  The read call can create an order-0 folio to
-> read the first 4096 bytes from the disk.  But then udev is preempted.
-> 
-> Next, someone tries to mount an 8k-sectorsize filesystem from the same
-> block device.  The filesystem calls set_blksize, which sets i_blksize to
-> 8192 and the minimum folio order to 1.
-> 
-> Now udev resumes, still holding the order-0 folio it allocated.  It then
-> tries to schedule a read bio and do_mpage_readahead tries to create
-> bufferheads for the folio.  Unfortunately, blocks_per_folio == 0 because
-> the page size is 4096 but the blocksize is 8192 so no bufferheads are
-> attached and the bh walk never sets bdev.  We then submit the bio with a
-> NULL block device and crash.
-> 
-> Therefore, truncate the page cache after flushing but before updating
-> i_blksize.  However, that's not enough -- we also need to lock out file
-> IO and page faults during the update.  Take both the i_rwsem and the
-> invalidate_lock in exclusive mode for invalidations, and in shared mode
-> for read/write operations.
-> 
-> I don't know if this is the correct fix, but xfs/259 found it.
-> 
-> Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+Hello Jens,
 
-I think this could also have the tag:
-Fixes: 3c20917120ce61 ("block/bdev: enable large folio support for large logical block sizes")
+This patchset cleans up elevator change code, and unifying it via single
+helper, meantime moves kobject_add/del & debugfs register/unregister out of
+queue freezing & elevator_lock. This way fixes many lockdep warnings
+reported recently, especially since fs_reclaim is connected with freeze lock
+manually by commit ffa1e7ada456 ("block: Make request_queue lockdep splats
+show up earlier").
 
-Not sure anyone cares about that for a fix for 6.15-rc1 though.
 
---D
+Thanks,
 
-> ---
->  block/bdev.c      |   17 +++++++++++++++++
->  block/blk-zoned.c |    5 ++++-
->  block/fops.c      |   16 ++++++++++++++++
->  block/ioctl.c     |    6 ++++++
->  4 files changed, 43 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 7b4e35a661b0c9..1313ad256593c5 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -169,11 +169,28 @@ int set_blocksize(struct file *file, int size)
->  
->  	/* Don't change the size if it is same as current */
->  	if (inode->i_blkbits != blksize_bits(size)) {
-> +		/*
-> +		 * Flush and truncate the pagecache before we reconfigure the
-> +		 * mapping geometry because folio sizes are variable now.  If a
-> +		 * reader has already allocated a folio whose size is smaller
-> +		 * than the new min_order but invokes readahead after the new
-> +		 * min_order becomes visible, readahead will think there are
-> +		 * "zero" blocks per folio and crash.  Take the inode and
-> +		 * invalidation locks to avoid racing with
-> +		 * read/write/fallocate.
-> +		 */
-> +		inode_lock(inode);
-> +		filemap_invalidate_lock(inode->i_mapping);
-> +
->  		sync_blockdev(bdev);
-> +		kill_bdev(bdev);
-> +
->  		inode->i_blkbits = blksize_bits(size);
->  		mapping_set_folio_order_range(inode->i_mapping,
->  				get_order(size), get_order(size));
->  		kill_bdev(bdev);
-> +		filemap_invalidate_unlock(inode->i_mapping);
-> +		inode_unlock(inode);
->  	}
->  	return 0;
->  }
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index 0c77244a35c92e..8f15d1aa6eb89a 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -343,6 +343,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
->  		op = REQ_OP_ZONE_RESET;
->  
->  		/* Invalidate the page cache, including dirty pages. */
-> +		inode_lock(bdev->bd_mapping->host);
->  		filemap_invalidate_lock(bdev->bd_mapping);
->  		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
->  		if (ret)
-> @@ -364,8 +365,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
->  	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
->  
->  fail:
-> -	if (cmd == BLKRESETZONE)
-> +	if (cmd == BLKRESETZONE) {
->  		filemap_invalidate_unlock(bdev->bd_mapping);
-> +		inode_unlock(bdev->bd_mapping->host);
-> +	}
->  
->  	return ret;
->  }
-> diff --git a/block/fops.c b/block/fops.c
-> index be9f1dbea9ce0a..e221fdcaa8aaf8 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -746,7 +746,14 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  			ret = direct_write_fallback(iocb, from, ret,
->  					blkdev_buffered_write(iocb, from));
->  	} else {
-> +		/*
-> +		 * Take i_rwsem and invalidate_lock to avoid racing with
-> +		 * set_blocksize changing i_blkbits/folio order and punching
-> +		 * out the pagecache.
-> +		 */
-> +		inode_lock_shared(bd_inode);
->  		ret = blkdev_buffered_write(iocb, from);
-> +		inode_unlock_shared(bd_inode);
->  	}
->  
->  	if (ret > 0)
-> @@ -757,6 +764,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  
->  static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
->  {
-> +	struct inode *bd_inode = bdev_file_inode(iocb->ki_filp);
->  	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
->  	loff_t size = bdev_nr_bytes(bdev);
->  	loff_t pos = iocb->ki_pos;
-> @@ -793,7 +801,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
->  			goto reexpand;
->  	}
->  
-> +	/*
-> +	 * Take i_rwsem and invalidate_lock to avoid racing with set_blocksize
-> +	 * changing i_blkbits/folio order and punching out the pagecache.
-> +	 */
-> +	inode_lock_shared(bd_inode);
->  	ret = filemap_read(iocb, to, ret);
-> +	inode_unlock_shared(bd_inode);
->  
->  reexpand:
->  	if (unlikely(shorted))
-> @@ -836,6 +850,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
->  	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
->  		return -EINVAL;
->  
-> +	inode_lock(inode);
->  	filemap_invalidate_lock(inode->i_mapping);
->  
->  	/*
-> @@ -868,6 +883,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
->  
->   fail:
->  	filemap_invalidate_unlock(inode->i_mapping);
-> +	inode_unlock(inode);
->  	return error;
->  }
->  
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index faa40f383e2736..e472cc1030c60c 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -142,6 +142,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
->  	if (err)
->  		return err;
->  
-> +	inode_lock(bdev->bd_mapping->host);
->  	filemap_invalidate_lock(bdev->bd_mapping);
->  	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
->  	if (err)
-> @@ -174,6 +175,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
->  	blk_finish_plug(&plug);
->  fail:
->  	filemap_invalidate_unlock(bdev->bd_mapping);
-> +	inode_unlock(bdev->bd_mapping->host);
->  	return err;
->  }
->  
-> @@ -199,12 +201,14 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
->  	    end > bdev_nr_bytes(bdev))
->  		return -EINVAL;
->  
-> +	inode_lock(bdev->bd_mapping->host);
->  	filemap_invalidate_lock(bdev->bd_mapping);
->  	err = truncate_bdev_range(bdev, mode, start, end - 1);
->  	if (!err)
->  		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
->  						GFP_KERNEL);
->  	filemap_invalidate_unlock(bdev->bd_mapping);
-> +	inode_unlock(bdev->bd_mapping->host);
->  	return err;
->  }
->  
-> @@ -236,6 +240,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
->  		return -EINVAL;
->  
->  	/* Invalidate the page cache, including dirty pages */
-> +	inode_lock(bdev->bd_mapping->host);
->  	filemap_invalidate_lock(bdev->bd_mapping);
->  	err = truncate_bdev_range(bdev, mode, start, end);
->  	if (err)
-> @@ -246,6 +251,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
->  
->  fail:
->  	filemap_invalidate_unlock(bdev->bd_mapping);
-> +	inode_unlock(bdev->bd_mapping->host);
->  	return err;
->  }
->  
-> 
+V2:
+	- retry add/del disk when blk_mq_update_nr_hw_queues() is in-progress
+
+	- swap blk_mq_add_queue_tag_set() with blk_mq_map_swqueue() in
+	blk_mq_init_allocated_queue() (Nilay Shroff)
+
+	- move ELEVATOR_FLAG_DISABLE_WBT to request queue's flags (Nilay Shoff) 
+
+	- fix race because of delaying elevator unregister
+
+	- define flags of `elv_change_ctx` as `bool` (Christoph)
+
+	- improve comment and commit log (Christoph)
+
+Ming Lei (20):
+  block: move blk_mq_add_queue_tag_set() after blk_mq_map_swqueue()
+  block: move ELEVATOR_FLAG_DISABLE_WBT as request queue flag
+  block: don't call freeze queue in elevator_switch() and
+    elevator_disable()
+  block: add two helpers for registering/un-registering sched debugfs
+  block: move sched debugfs register into elvevator_register_queue
+  block: add & pass 'struct gendisk_data' for retrying add/del disk in
+    updating nr_hw_queues
+  block: prevent adding/deleting disk during updating nr_hw_queues
+  block: don't allow to switch elevator if updating nr_hw_queues is
+    in-progress
+  block: simplify elevator rebuild for updating nr_hw_queues
+  block: add helper of elevator_change()
+  block: move blk_unregister_queue() & device_del() after freeze wait
+  block: add `struct elv_change_ctx` for unifying elevator_change
+  block: unifying elevator change
+  block: pass elevator_queue to elv_register_queue & unregister_queue
+  block: fail to show/store elevator sysfs attribute if elevator is
+    dying
+  block: move elv_register[unregister]_queue out of elevator_lock
+  block: move debugfs/sysfs register out of freezing queue
+  block: remove several ->elevator_lock
+  block: move hctx cpuhp add/del out of queue freezing
+  block: move wbt_enable_default() out of queue freezing from sched
+    ->exit()
+
+ block/bfq-iosched.c    |   6 +-
+ block/blk-mq-debugfs.c |  12 +--
+ block/blk-mq-sched.c   |  41 +++++---
+ block/blk-mq.c         | 172 ++++++++++--------------------
+ block/blk-sysfs.c      |  18 ++--
+ block/blk-wbt.c        |   3 +-
+ block/blk.h            |  10 +-
+ block/elevator.c       | 231 +++++++++++++++++++++++++++--------------
+ block/elevator.h       |  19 +++-
+ block/genhd.c          | 158 +++++++++++++++++-----------
+ include/linux/blk-mq.h |   5 +
+ include/linux/blkdev.h |   3 +
+ 12 files changed, 374 insertions(+), 304 deletions(-)
+
+-- 
+2.47.0
+
