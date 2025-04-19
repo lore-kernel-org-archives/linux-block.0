@@ -1,30 +1,30 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FB915A85E
-	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 08:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F70619D8AC
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 09:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745053163; cv=none; b=jOPKDp2We5fYvAxg9eBsikLittc4xsHMLlYe/NK3w9m8QtXcuovWZzOEPJsb2oR6qji++HzUhWbfVuR1URSciWoI+lOWzj9wSqpNu8c7wEpm8e667jZ7KVHb/rVuUE2CLQGDUG9gN99Oistt65WB/HuKvC0gWnN288h+G1jDKVw=
+	t=1745053304; cv=none; b=HZxNIVlOrd+xwb/V5TnKKKHy+vO5VdMwJdgxdZ4cgsLLKFqzhcLp/4xGndGohhEaf5WfLlFpvhCg83wWNEBVWEKhsZMZmhOCl3PJOe+HnIaGDdfVXH03e7IzcO2xKV0n7N01pNVooyCO7MHheRWRLrWKdgx3FgNJE7s7eJqn8YA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745053163; c=relaxed/simple;
-	bh=43fnOyDSHiKoD0Kd+OaYH8zu03CTphbjs1OSQj0X+ZA=;
+	s=arc-20240116; t=1745053304; c=relaxed/simple;
+	bh=eltpGH2h3Gx9suOx1o6Flhk5+aqdx0YQeGUEYOpHkzw=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=LEQk6iMsyB14SnOzyB9t7PqX5BBoMVUFb1OBYte3nWoupv+11F0UPZnsvhLNAP/HtvmEQfn+mjG0gARVdowGd/VOd4R7OJCKQzSqrMoRgqzYRT6JJAb4bb9w/GHHPLZupfks1fEkK3lSV4zIalOr/3FEzqgKiXdTRHqk/nk4gnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 In-Reply-To:Content-Type; b=I43jgOzqhgPnrg6ym27EMZ5mcy7aPYcrZuTIhArlqXGA1C5emh3RemES873wdn19CPWaE2FGJcnb3IjFpYLPUc2yQZgi+rmaFVkZDxDzHTQ76Em6GRZJXPXpdLbGzVq/C97E98pG1gAV0rwuHE3P3yUYR5JZQ0/lVMaw+/OSMkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zflt33hZ8z4f3lfH
-	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 16:58:51 +0800 (CST)
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zflwn6ktcz4f3jXg
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 17:01:13 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id D4FFB1A018D
-	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 16:59:16 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id BAD2B1A058E
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 17:01:37 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDXOl_kZQNo+7+4Jw--.34339S3;
-	Sat, 19 Apr 2025 16:59:16 +0800 (CST)
-Subject: Re: [PATCH V2 02/20] block: move ELEVATOR_FLAG_DISABLE_WBT as request
- queue flag
+	by APP4 (Coremail) with SMTP id gCh0CgBXul5wZgNolui4Jw--.30448S3;
+	Sat, 19 Apr 2025 17:01:37 +0800 (CST)
+Subject: Re: [PATCH V2 03/20] block: don't call freeze queue in
+ elevator_switch() and elevator_disable()
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
  linux-block@vger.kernel.org
 Cc: Nilay Shroff <nilay@linux.ibm.com>,
@@ -32,10 +32,10 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
  =?UTF-8?Q?Thomas_Hellstr=c3=b6m?= <thomas.hellstrom@linux.intel.com>,
  Christoph Hellwig <hch@lst.de>, "yukuai (C)" <yukuai3@huawei.com>
 References: <20250418163708.442085-1-ming.lei@redhat.com>
- <20250418163708.442085-3-ming.lei@redhat.com>
+ <20250418163708.442085-4-ming.lei@redhat.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6d497b76-c128-259f-76af-6af184786b1f@huaweicloud.com>
-Date: Sat, 19 Apr 2025 16:59:15 +0800
+Message-ID: <e884f679-4308-a16e-cc90-83cdc6cf25ee@huaweicloud.com>
+Date: Sat, 19 Apr 2025 17:01:36 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -44,14 +44,14 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250418163708.442085-3-ming.lei@redhat.com>
+In-Reply-To: <20250418163708.442085-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXOl_kZQNo+7+4Jw--.34339S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAw1UAFWrWw1kKF4Utry5Arb_yoWrXrWkp3
-	ykGF40k3W2qF4vqFy8K3W3Zw17Gr1q9r13Cr4rCryYyw1SgrnIga10kFyUJF4kZrs7AFsI
-	qr1rta4qva4Yg3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+X-CM-TRANSID:gCh0CgBXul5wZgNolui4Jw--.30448S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw4DtFW8Jr4fZF4kXw4fXwb_yoW8Zr1rpr
+	Z5GanrKr10qr4UZa4UAwsrX342g39Ygry3urWfA34Y9F9xKa1fW3WUGF15uF40yr4kJFsa
+	vry8tFZ2ka48ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
 	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
 	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
@@ -62,116 +62,72 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxAw1UAFWrWw1kKF4Utry5Arb_yoWrXrWkp3
 	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
 	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
 	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZSd
-	gUUUUU=
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUFB
+	T5DUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
-
 ÔÚ 2025/04/19 0:36, Ming Lei Ð´µÀ:
-> ELEVATOR_FLAG_DISABLE_WBT is only used by BFQ to disallow wbt when BFQ is
-> in use. The flag is set in BFQ's init(), and cleared in BFQ's exit().
+> Both elevator_switch() and elevator_disable() are called from sysfs
+> store and updating nr_hw_queue code paths only.
 > 
-> Making it as request queue flag, so that we can avoid to deal with elevator
-> switch race. Also it isn't graceful to checking one scheduler flag in
-> wbt_enable_default().
+> And in the two code paths, queue has been frozen already, so don't call
+> freeze queue in the two functions.
 > 
+> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/bfq-iosched.c    | 4 ++--
->   block/blk-mq-debugfs.c | 1 +
->   block/blk-wbt.c        | 3 +--
->   block/elevator.h       | 1 -
->   include/linux/blkdev.h | 3 +++
->   5 files changed, 7 insertions(+), 5 deletions(-)
+>   block/elevator.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index abd80dc13562..40e4106a71e7 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -7210,7 +7210,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
->   #endif
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+
+> diff --git a/block/elevator.c b/block/elevator.c
+> index b4d08026b02c..5051a98dc08c 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -615,12 +615,11 @@ void elevator_init_mq(struct request_queue *q)
+>    */
+>   int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+>   {
+> -	unsigned int memflags;
+>   	int ret;
 >   
->   	blk_stat_disable_accounting(bfqd->queue);
-> -	clear_bit(ELEVATOR_FLAG_DISABLE_WBT, &e->flags);
-> +	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT, bfqd->queue);
->   	wbt_enable_default(bfqd->queue->disk);
+> +	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+>   	lockdep_assert_held(&q->elevator_lock);
 >   
->   	kfree(bfqd);
-> @@ -7397,7 +7397,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
->   	/* We dispatch from request queue wide instead of hw queue */
->   	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
+> -	memflags = blk_mq_freeze_queue(q);
+>   	blk_mq_quiesce_queue(q);
 >   
-> -	set_bit(ELEVATOR_FLAG_DISABLE_WBT, &eq->flags);
-> +	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT, q);
->   	wbt_disable_default(q->disk);
->   	blk_stat_enable_accounting(q);
+>   	if (q->elevator) {
+> @@ -641,7 +640,6 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
 >   
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 3421b5521fe2..31e249a18407 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -93,6 +93,7 @@ static const char *const blk_queue_flag_name[] = {
->   	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
->   	QUEUE_FLAG_NAME(HCTX_ACTIVE),
->   	QUEUE_FLAG_NAME(SQ_SCHED),
-> +	QUEUE_FLAG_NAME(DISABLE_WBT),
->   };
->   #undef QUEUE_FLAG_NAME
+>   out_unfreeze:
+>   	blk_mq_unquiesce_queue(q);
+> -	blk_mq_unfreeze_queue(q, memflags);
 >   
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index f1754d07f7e0..29cd2e33666f 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -704,8 +704,7 @@ void wbt_enable_default(struct gendisk *disk)
->   	struct rq_qos *rqos;
->   	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
+>   	if (ret) {
+>   		pr_warn("elv: switch to \"%s\" failed, falling back to \"none\"\n",
+> @@ -653,11 +651,9 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
 >   
-> -	if (q->elevator &&
-> -	    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags))
-> +	if (blk_queue_disable_wbt(q))
->   		enable = false;
+>   void elevator_disable(struct request_queue *q)
+>   {
+> -	unsigned int memflags;
+> -
+> +	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+>   	lockdep_assert_held(&q->elevator_lock);
 >   
->   	/* Throttling already enabled? */
-> diff --git a/block/elevator.h b/block/elevator.h
-> index e4e44dfac503..e27af5492cdb 100644
-> --- a/block/elevator.h
-> +++ b/block/elevator.h
-> @@ -121,7 +121,6 @@ struct elevator_queue
->   };
+> -	memflags = blk_mq_freeze_queue(q);
+>   	blk_mq_quiesce_queue(q);
 >   
->   #define ELEVATOR_FLAG_REGISTERED	0
-> -#define ELEVATOR_FLAG_DISABLE_WBT	1
+>   	elv_unregister_queue(q);
+> @@ -668,7 +664,6 @@ void elevator_disable(struct request_queue *q)
+>   	blk_add_trace_msg(q, "elv switch: none");
+>   
+>   	blk_mq_unquiesce_queue(q);
+> -	blk_mq_unfreeze_queue(q, memflags);
+>   }
 >   
 >   /*
->    * block elevator interface
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index e39c45bc0a97..10410d9b03ad 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -644,6 +644,7 @@ enum {
->   	QUEUE_FLAG_RQ_ALLOC_TIME,	/* record rq->alloc_time_ns */
->   	QUEUE_FLAG_HCTX_ACTIVE,		/* at least one blk-mq hctx is active */
->   	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
-> +	QUEUE_FLAG_DISABLE_WBT,		/* for sched to disable/enable wbt */
-
-In fact, user can still enabel wbt by sysfs api. Perhaps change the name
-to QUEUE_FLAG_WBT_DISABLE_DEFAULT?
-
-Thanks,
-Kuai
-
->   	QUEUE_FLAG_MAX
->   };
->   
-> @@ -679,6 +680,8 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
->   #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
->   #define blk_queue_skip_tagset_quiesce(q) \
->   	((q)->limits.features & BLK_FEAT_SKIP_TAGSET_QUIESCE)
-> +#define blk_queue_disable_wbt(q)	\
-> +	test_bit(QUEUE_FLAG_DISABLE_WBT, &(q)->queue_flags)
->   
->   extern void blk_set_pm_only(struct request_queue *q);
->   extern void blk_clear_pm_only(struct request_queue *q);
 > 
 
