@@ -1,45 +1,41 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCE22AE8C;
-	Sat, 19 Apr 2025 08:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74767462
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 08:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745052372; cv=none; b=R7kh56RKZWDQQVgypt5WcXNr0h7RldrBKOKCphUFSpRB2nsL3Q9v1TG52zNKY81hL8oN4ny2dhduBKs8yHNOz+ect/1uQo7lO0R87XA84jwNr+uAHmQVt8MKAXNYkxUihT0sHfZLplPsEiXI54Qns6mqrCKGI22LR7c5d4DIorM=
+	t=1745053068; cv=none; b=nEwwK6gqJwsSG3ZBaLHkla2H3ZjKQ/az5tszR2hVT9bu+yZI0u7wbHZ8rxwGbpx6lXqObG7a5u0Y9mO8s+kyX9Klea4JKZg/CRE5XeqBIFygb7k2z4GVOlQMpUERh/AN8C2CSa4LdBfzb+za0MnNgnSK8iArBk1Xj1uDJSMeYyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745052372; c=relaxed/simple;
-	bh=sKecEVGccN2Gsv7wSldTED5rOsVAxlOK2KmQYKt+9Vo=;
+	s=arc-20240116; t=1745053068; c=relaxed/simple;
+	bh=B2iZLl7U7MvrQm1lhSSkmo2y7QZgNp9D5b0SXJUQeg0=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WKO7pjiM/XrxWVHL5vLjLza/2IfKdHanCeBiLTyClpuQQUj8yqQVYfClHKtSC0Zqyl7LwkdXXKFA3ZSi4IfK/p4AywmbVXzwelFDjLKH5kIo7xnVdYkrflBaAL3T9bAAUsNXtcB2vtguVtMt1F6QqGWm9gwcACDq5Jq1DUAvpuI=
+	 In-Reply-To:Content-Type; b=og0pjsW5b7jeX3nzvmSm+iIZBW45HZQ26twwGhrQqxYIaOvPnuDCt8HKyBjYou/rZt6csytSddooyeKL70nKLXlHGu/GGYlY4NGnfU3XzCI6x+u5zPRADWXOA28VfJilN8grzfGG0ERlePYyOrjEMJ5R2nXlZB0+GVXZJ27mAoE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZflZr3GSDz4f3m6r;
-	Sat, 19 Apr 2025 16:45:40 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZflrL3SLTz4f3jtP
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 16:57:22 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id C3F9B1A06DC;
-	Sat, 19 Apr 2025 16:46:05 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id EA4E31A1BB1
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 16:57:40 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBXu1_LYgNo_N23Jw--.38949S3;
-	Sat, 19 Apr 2025 16:46:05 +0800 (CST)
-Subject: Re: [PATCH RFC v2 00/14] md: introduce a new lockless bitmap
-To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
-Cc: xni@redhat.com, colyli@kernel.org, axboe@kernel.dk, agk@redhat.com,
- snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, kbusch@kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
- <Z-aCzTWXzFWe4oxU@infradead.org>
- <c6c608e2-23e7-486f-100a-d1fb6cfff4f2@huaweicloud.com>
- <20250409083208.GA2326@lst.de>
- <115c3b08-aff1-dd97-fe6a-7901452ce62c@huaweicloud.com>
- <20250409094019.GA3890@lst.de>
- <28bb1c35-5f75-4e1c-4b5d-32bcb87050ce@huaweicloud.com>
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2CBZQNoDKS4Jw--.31843S3;
+	Sat, 19 Apr 2025 16:57:39 +0800 (CST)
+Subject: Re: [PATCH V2 01/20] block: move blk_mq_add_queue_tag_set() after
+ blk_mq_map_swqueue()
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ =?UTF-8?Q?Thomas_Hellstr=c3=b6m?= <thomas.hellstrom@linux.intel.com>,
+ Christoph Hellwig <hch@lst.de>, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-2-ming.lei@redhat.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <54ab4291-9152-44d1-bf6c-675b58cfcea8@huaweicloud.com>
-Date: Sat, 19 Apr 2025 16:46:03 +0800
+Message-ID: <6d5a0068-4be8-62d3-f1f0-118671e29956@huaweicloud.com>
+Date: Sat, 19 Apr 2025 16:57:37 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -48,204 +44,64 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <28bb1c35-5f75-4e1c-4b5d-32bcb87050ce@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20250418163708.442085-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXu1_LYgNo_N23Jw--.38949S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr43AF43Aw1UKryDXrW5KFg_yoWrKr18pF
-	W7Xa4jkrs8Jr13Xr18trZrAF1Syrs7JFsrJrWSk34rC3sFyrnxKF1kKFyYkFy5W3ykWF12
-	vrs8Kw43Ar4rZF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-TRANSID:gCh0CgD3W2CBZQNoDKS4Jw--.31843S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZryfGF1rCF4kXw4DAFW5KFg_yoW8Gr1UpF
+	WxJ3W2k34xtF4UX3y0qa1fWFy5tws8Wr13Gwsaqrn8u3sFgrs2vr1IqF4DXr4vvrWkCFsx
+	tr1xJFWkKa4DWa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
+	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07Upyx
+	iUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Christoph!
+Hi,
 
-在 2025/04/11 9:36, Yu Kuai 写道:
-> Hi,
+�� 2025/04/19 0:36, Ming Lei д��:
+> Move blk_mq_add_queue_tag_set() after blk_mq_map_swqueue(), and publish
+> this request queue to tagset after everything is setup.
 > 
-> 在 2025/04/09 17:40, Christoph Hellwig 写道:
->> On Wed, Apr 09, 2025 at 05:27:11PM +0800, Yu Kuai wrote:
->>>> For that you'd be much better of just creating your own trivial
->>>> file_system_type with an inode fully controlled by your driver
->>>> that has a trivial set of address_space ops instead of oddly
->>>> mixing with the block layer.
->>>
->>> Yes, this is exactly what I said implement a new file_operations(and
->>> address_space ops), I wanted do this the easy way, just reuse the raw
->>> block device ops, this way I just need to implement the submit_bio ops
->>> for new hidden disk.
->>>
->>> I can try with new fs type if we really think this solution is too
->>> hacky, however, the code line will be much more. :(
->>
->> I don't think it should be much more.  It'll also remove the rather
->> unexpected indirection through submit_bio.  Just make sure you use
->> iomap for your operations, and implement the submit_io hook.  That
->> will also be more efficient than the buffer_head based block ops
->> for writes.
->>
->>>>
->>>> Note that either way I'm not sure using the page cache here is an
->>>> all that good idea, as we're at the bottom of the I/O stack and
->>>> thus memory allocations can very easily deadlock.
->>>
->>> Yes, for the page from bitmap, this set do the easy way just read and
->>> ping all realted pages while loading the bitmap. For two reasons:
->>>
->>> 1) We don't need to allocate and read pages from IO path;(In the first
->>> RFC version, I'm using a worker to do that).
->>
->> You still depend on the worker, which will still deadlock.
->>
->>>> What speaks against using your own folios explicitly allocated at
->>>> probe time and then just doing manual submit_bio on that?  That's
->>>> probably not much more code but a lot more robust.
->>>
->>> I'm not quite sure if I understand you correctly. Do you means don't use
->>> pagecache for bitmap IO, and manually create BIOs like the old bitmap,
->>> meanwhile invent a new solution for synchronism instead of the global
->>> spin_lock from old bitmap?
->>
->> Yes.  Alternatively you need to pre-populate the page cache and keep
->> extra page references.
+> This way is safe because BLK_MQ_F_TAG_QUEUE_SHARED isn't used by
+> blk_mq_map_swqueue(), and this flag is mainly checked in fast IO code
+> path.
 > 
-> Ok, I'll think about self managed pages and IO path. Meanwhile, please
-> let me know if you have questions with other parts.
+> Prepare for removing ->elevator_lock from blk_mq_map_swqueue() which
+> is supposed to be called when elevator switch isn't possible.
 
-So, today I implement a version, and I do admit this way is much
-simpler, turns out total 200 less code lines. And can you check the
-following untested code if you agree with the implementation? I'll
-start to work a new version if you agree.
-
-Thanks,
-Kuai
-
-static int llbitmap_rdev_page_io(struct md_rdev *rdev, struct page *page,
-                                 ┊int idx, bool rw)
-{
-         struct bio bio;
-         int ret;
-
-         bio_init(&bio, rdev->bdev, bio.bi_inline_vecs, BIO_INLINE_VECS,
-                 ┊REQ_SYNC | REQ_IDLE | REQ_META);
-         if (rw)
-                 bio.bi_opf |= REQ_OP_WRITE;
-         else
-                 bio.bi_opf |= REQ_OP_READ;
-
-         __bio_add_page(&bio, page, PAGE_SIZE, 0);
-         bio.bi_iter.bi_size = PAGE_SIZE;
-         bio.bi_iter.bi_sector = rdev->sb_start +
-                                 rdev->mddev->bitmap_info.offset +
-                                 (PAGE_SECTORS << PAGE_SECTORS_SHIFT);
-
-         ret = submit_bio_wait(&bio);
-         bio_uninit(&bio);
-
-         if (ret)
-                 md_error(rdev->mddev, rdev);
-         return ret;
-}
-
-static struct page *llbitmap_read_page(struct llbitmap *llbitmap, int idx)
-{
-         struct page *page = llbitmap->pages[idx];
-         struct mddev *mddev = llbitmap->mddev;
-         struct md_rdev *rdev;
-         int err = -EIO;
-
-         if (page)
-                 return page;
-
-         page = alloc_page(GFP_KERNEL);
-         if (!page)
-                 return ERR_PTR(-ENOMEM);
-
-         rdev_for_each(rdev, mddev) {
-                 if (rdev->raid_disk < 0 || test_bit(Faulty, &rdev->flags))
-                         continue;
-
-                 err = llbitmap_rdev_page_io(rdev, page, idx, READ);
-                 if (!err)
-                         break;
-         }
-
-         if (err) {
-                 __free_page(page);
-                 return ERR_PTR(err);
-         }
-
-         return page;
-}
-
-static int llbitmap_write_page(struct llbitmap *llbitmap, int idx)
-{
-         struct page *page = llbitmap->pages[idx];
-         struct mddev *mddev = llbitmap->mddev;
-         struct md_rdev *rdev;
-         int err = -EIO;
-
-         if (!page)
-                 return err;
-
-         rdev_for_each(rdev, mddev) {
-                 if (rdev->raid_disk < 0 || test_bit(Faulty, &rdev->flags))
-                         continue;
-
-                 if (!llbitmap_rdev_page_io(rdev, page, idx, WRITE))
-                         err = 0;
-         }
-
-         return err;
-}
-
-static bool llbitmap_dirty(struct llbitmap *llbitmap)
-{
-         int i;
-
-         for (i = 0; i < llbitmap->nr_pages; ++i) {
-                 struct llbitmap_barrier *barrier = &llbitmap->barrier[i];
-
-                 if (test_bit(BitmapPageDirty, &barrier->flags))
-                         return true;
-         }
-
-         return false;
-}
-
-static void llbitmap_flush_dirty_page(struct llbitmap *llbitmap)
-{
-         int i;
-
-         for (i = 0; i < llbitmap->nr_pages; ++i) {
-                 struct llbitmap_barrier *barrier = &llbitmap->barrier[i];
-
-                 if (!test_and_clear_bit(BitmapPageDirty, &barrier->flags))
-                         continue;
-                 llbitmap_write_page(llbitmap, i);
-         }
-}
-
+I think you mean *is* possible? Or to protect against switching
+elevator concurrently?
 > 
-> Thanks,
-> Kuai
+> Reported-by: Nilay Shroff <nilay@linux.ibm.com>
+> Closes: https://lore.kernel.org/linux-block/567cb7ab-23d6-4cee-a915-c8cdac903ddd@linux.ibm.com/
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->>
->> .
->>
-> 
-> .
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e0fe12f1320f..7cda919fafba 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4561,8 +4561,8 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   	q->nr_requests = set->queue_depth;
+>   
+>   	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+> -	blk_mq_add_queue_tag_set(set, q);
+>   	blk_mq_map_swqueue(q);
+> +	blk_mq_add_queue_tag_set(set, q);
+>   	return 0;
+>   
+>   err_hctxs:
 > 
 
