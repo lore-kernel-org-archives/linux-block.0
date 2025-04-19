@@ -1,127 +1,144 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962A1D5CEA
-	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 12:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCCD15383A
+	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 12:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745065450; cv=none; b=G17osSu63gvRb4hWcMEIMt7dbV5Qvwqq5rOl7lz4owN3Pkg+fLXJm2Wsux0SMxI7uMPMo9WZT0Ea9j54V1SFUEhaU6DFo3PD/oXRD7YkPCcuZqvB6j9w6xmpCcPhRs/QBJew17i+aJp3Nw/1/Sz3Ud46mh1lOfYJ8g4tfC1ilmE=
+	t=1745066329; cv=none; b=F3vMI8EFWQmbntsrLoSoKgbSkNwPrZQfcSU8aIhLyYNUVsGGbVN2PsWp66sluG2jlLz+U3KxBd3mfaVOvGYb1jJXiRBawkeZvJpid6gmRMGiai1Ca5MzLVGvQRMkmOJ0mHm3EJekP4RrbJVJBBRwZVGXtySkdwJiV+ffp+i/eec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745065450; c=relaxed/simple;
-	bh=j8/MUr1MyygQOk8ubdVi1sJpGwQva+0NEJRupbdkZwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E8h0J9kzj3QPymQjvoWQK479paLVLwCK/RJYFMA0IY+FY8CRKIqbmGovH8HnMMSPcjxdkNYro6Q7REnl6gidsJO/PtyH6grBi+xJAu3RB3Y2p/7eSjXcGDMMTsAG5fXf9m4+++WtaWk6KNc6kejVNVDiNyDjoi52AkviQCqFlVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TQXgIQJ9; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745066329; c=relaxed/simple;
+	bh=ujOMY6D3mGzL9Wh0v/kz4VxzCyIgMCE/58Ps9/cBPlA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iv2hsuhZVYAku6HTTVRbhjVC7ZdbhswM3XJyoJdnRPNb9oIMKcJ2da1SukWsNiwnuNZUbOnSPRyCWeNmSW9I0L2jANujG9uh1Qg01LnQuv3BU1iVmYOpeLdwq4OU/k+ReQ778wA9JgcpP9cja8OY9Shlw8dyLq6z7wPfOBazOZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RLHW34mH; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TQXgIQJ9"
-Date: Sat, 19 Apr 2025 08:23:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745065434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tt+jF7G4CGjh2IXVN9sKaN3Nb29JLgTyUceQNQrrCX8=;
-	b=TQXgIQJ97D1C9dP/4NY0UB4qmJTgcLLpoYsknXzQJd/JAYYNQuHjdpMSc8Fudtry8Zi2B2
-	d6R21uS/tmxVXjsGLgOf/Iqzn3l5xZ8dTNnvEoGor0hBzJjepkUtXGIrV2bTEEHImk3dxs
-	Ne8Fy1u7aY4D6O5Fzc91Ly0FULhtvzc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: syzbot <syzbot+4eb503ec2b8156835f24@syzkaller.appspotmail.com>
-Cc: brauner@kernel.org, jack@suse.cz, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: [syzbot] [block?] [bcachefs?] kernel panic: KASAN: panic_on_warn
- set ...
-Message-ID: <7mzjrydosm7fnkskvwjwvzpdverxidzfdqgjjyfmqljffen5ou@jy6c626sjrxr>
-References: <68036084.050a0220.297747.0018.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RLHW34mH"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53JAs5og016691;
+	Sat, 19 Apr 2025 12:38:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=XvMS6u
+	AldUeiL+0nZ9cbiUAqFLvIUMfNPpK82c83bDA=; b=RLHW34mHCiVufZkKoPU+P0
+	MrkgdYJsjuaMiEqCLNhEys2O2wzQ2cYadTUTyyett49qmvTyBqMOQRCZQt58+MRT
+	jGIHRtiJxyAS5go1uDC74DHaevto5DNHqdMabdGIr99gYJ2LoTxWt10nKtr2j/ZF
+	F/xSs/6qrVo7t++dwPfZx1ihWCC2Ut5vpBvIA+aZNewaQ+h+9hunr1CANnI2D87c
+	EYAcWtrTLLPYOp+H00LrrdOJpnl3wuoogDU/ci3k350G3n62H0yC+EDVwzmiu2id
+	zYjE1DtQdUaTbSyozWkwJNlyXv0CgDQuM1sNi9dRWQlNaa1rycNCsyWfSPU6Z1Sw
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4649rj0cg2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 19 Apr 2025 12:38:36 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53J7rXtU000901;
+	Sat, 19 Apr 2025 12:38:34 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4602w0fkx4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 19 Apr 2025 12:38:34 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53JCcXRL26804824
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 19 Apr 2025 12:38:34 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC72C5805B;
+	Sat, 19 Apr 2025 12:38:33 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3F2A58058;
+	Sat, 19 Apr 2025 12:38:31 +0000 (GMT)
+Received: from [9.111.34.38] (unknown [9.111.34.38])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sat, 19 Apr 2025 12:38:31 +0000 (GMT)
+Message-ID: <97eb54b7-25f1-4691-bbcb-6db18c7bd056@linux.ibm.com>
+Date: Sat, 19 Apr 2025 18:08:30 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68036084.050a0220.297747.0018.GAE@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 11/20] block: move blk_unregister_queue() &
+ device_del() after freeze wait
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-12-ming.lei@redhat.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250418163708.442085-12-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: U7hVrKzLnog_u5A7EmvRJk9qxbhCv_Cg
+X-Proofpoint-GUID: U7hVrKzLnog_u5A7EmvRJk9qxbhCv_Cg
+X-Authority-Analysis: v=2.4 cv=LYY86ifi c=1 sm=1 tr=0 ts=6803994c cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=20KFwNOVAAAA:8 a=XLzEhEau88RLmSzP14cA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-19_05,2025-04-17_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ clxscore=1015 impostorscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2504190102
 
-I'm not sure which subsystem this is, but it's definitely not bcachefs -
-we don't use buffer heads.
 
-On Sat, Apr 19, 2025 at 01:36:20AM -0700, syzbot wrote:
-> Hello,
+
+On 4/18/25 10:06 PM, Ming Lei wrote:
+> Move blk_unregister_queue() & device_del() after freeze wait, and prepare
+> for unifying elevator switch.
 > 
-> syzbot found the following issue on:
+> This way is just fine, since bdev has been unhashed at the beginning of
+> del_gendisk(), both blk_unregister_queue() & device_del() are dealing
+> with kobject & debugfs thing only.
 > 
-> HEAD commit:    3088d26962e8 Merge tag 'x86-urgent-2025-04-18' of git://gi..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17aed470580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2a31f7155996562
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4eb503ec2b8156835f24
-> compiler:       Debian clang version 15.0.6, Debian LLD 15.0.6
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-3088d269.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/5ec84510bfc9/vmlinux-3088d269.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/af58d0bee0a4/bzImage-3088d269.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4eb503ec2b8156835f24@syzkaller.appspotmail.com
-> 
-> Kernel panic - not syncing: KASAN: panic_on_warn set ...
-> CPU: 0 UID: 0 PID: 47 Comm: kworker/u4:3 Not tainted 6.15.0-rc2-syzkaller-00400-g3088d26962e8 #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> Workqueue: loop0 loop_workfn
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:94 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
->  panic+0x349/0x880 kernel/panic.c:354
->  check_panic_on_warn+0x86/0xb0 kernel/panic.c:243
->  end_report+0x77/0x160 mm/kasan/report.c:227
->  kasan_report+0x154/0x180 mm/kasan/report.c:636
->  check_region_inline mm/kasan/generic.c:-1 [inline]
->  kasan_check_range+0x28f/0x2a0 mm/kasan/generic.c:189
->  instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
->  atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
->  put_bh include/linux/buffer_head.h:301 [inline]
->  end_buffer_read_sync+0xc1/0xd0 fs/buffer.c:161
->  end_bio_bh_io_sync+0xbf/0x120 fs/buffer.c:2748
->  blk_update_request+0x5e5/0x1160 block/blk-mq.c:983
->  blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1145
->  lo_rw_aio_do_completion drivers/block/loop.c:317 [inline]
->  lo_rw_aio_complete drivers/block/loop.c:325 [inline]
->  lo_rw_aio+0xdfd/0xf80 drivers/block/loop.c:398
->  do_req_filebacked drivers/block/loop.c:-1 [inline]
->  loop_handle_cmd drivers/block/loop.c:1866 [inline]
->  loop_process_work+0x8e3/0x11f0 drivers/block/loop.c:1901
->  process_one_work kernel/workqueue.c:3238 [inline]
->  process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
->  worker_thread+0x870/0xd50 kernel/workqueue.c:3400
->  kthread+0x7b7/0x940 kernel/kthread.c:464
-> 
-> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>  block/genhd.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+> diff --git a/block/genhd.c b/block/genhd.c
+> index d22fdc0d5383..86c3db5b9305 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -749,8 +749,6 @@ static int __del_gendisk(struct gendisk_data *data)
+>  		bdi_unregister(disk->bdi);
+>  	}
+>  
+> -	blk_unregister_queue(disk);
+> -
+>  	kobject_put(disk->part0->bd_holder_dir);
+>  	kobject_put(disk->slave_dir);
+>  	disk->slave_dir = NULL;
+> @@ -759,10 +757,12 @@ static int __del_gendisk(struct gendisk_data *data)
+>  	disk->part0->bd_stamp = 0;
+>  	sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+>  	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+> -	device_del(disk_to_dev(disk));
+>  
+>  	blk_mq_freeze_queue_wait(q);
+>  
+> +	blk_unregister_queue(disk);
+> +	device_del(disk_to_dev(disk));
+> +
+>  	blk_throtl_cancel_bios(disk);
+>  
+>  	blk_sync_queue(q);
+As we first freeze the queue and then enter blk_unregister_queue which 
+deals with kobject/debufs, do we need to create memalloc GFP_NOIO scope
+while running blk_unregister_queue? I see that device_del already defines
+the GFP_NOIO scope. 
+
+Thanks,
+--Nilay
+
+
+
