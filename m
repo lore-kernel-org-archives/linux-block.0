@@ -1,128 +1,251 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28860194080
-	for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 08:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCE22AE8C;
+	Sat, 19 Apr 2025 08:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745051782; cv=none; b=Mv6xW5rHq+2wwP1L9fu8+AY0oVJXolxGs2JWj+YzvcILXFD85xDiuT5yVEYAVQ71cIrfyUKVwA9NK6qCXJRmoDoOG7MaxSP72C7OZy/ebDjAcE27QyTHlmA2riu+vNW1/cGojB6+05cZ0eeB8CY13eJBiEpykwtz/5l8RA16eP8=
+	t=1745052372; cv=none; b=R7kh56RKZWDQQVgypt5WcXNr0h7RldrBKOKCphUFSpRB2nsL3Q9v1TG52zNKY81hL8oN4ny2dhduBKs8yHNOz+ect/1uQo7lO0R87XA84jwNr+uAHmQVt8MKAXNYkxUihT0sHfZLplPsEiXI54Qns6mqrCKGI22LR7c5d4DIorM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745051782; c=relaxed/simple;
-	bh=2muuX7Ih62Wo7gja35Okue8CWnhgSewdoNusaP2V7P0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eICr1LZ8qZRdApH+eTu6/Bsrj0exf5ZpY4N0+pwsf5pAhO1NVTMMYtBFT8A0eNeXZJvD7arE9JKgwQfAfP7S+iJ54W1V5VAwrGx7b/3sDgFkcxLwhE/qCM5KxRFrqcsS7TvNHOZ3cp17d9UAia9RvsPQ3IvyvmOSXXMUWZg6Rf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d458e61faaso24710335ab.0
-        for <linux-block@vger.kernel.org>; Sat, 19 Apr 2025 01:36:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745051780; x=1745656580;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=viXqPNMRsD79f0RGNVXeE0kyOUVbU86j7clKbfA/SQM=;
-        b=nNSAb8XjGI5rYgL39ml9JbbVfKLt5TEVS2YVRx1F0JuqqkmSakJ5ZP/RpFWv7xfQZ9
-         +IKKJmMFda/qAdHwcNoeBvb3JGmfITvT2DOl0qaOC03PK9aH4YE2ywBRs9g8tvLL90l0
-         2zK8cNDIBaGTez/FKHCZwIsY9XWLvO6VHTnMlHax8a5T7HXp9j2Shl3AKu5PJiIxr+u1
-         x42WwCPOdJ0l/pO4omjrGR0BbxbXY/Fw5NYbWtkJqmYeR51x/qiMEaXz/nST0DoOTAPU
-         ghYX9Fzzsw9iYnt/Zyi6KxAZGVFP0e1VnqqUPpKt/obOhDn/scfBih0Jeemklw9ulwo9
-         AHLA==
-X-Forwarded-Encrypted: i=1; AJvYcCWS21qNJgho7uR3A30SDzDttC9h8o/RxQnUINDrgn9BQGhzXTUz1zJ3fko4G1vC80/owUangaxCaQMgrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxul66I6in1e29XhWM02E3QtG/mAnqavTRWQ0h91KH2XJb+qezl
-	8Rg2dbUOFDu9VG4f47P/bIrawm7XVhxAG195T+ttfVjodQn4Ww42iWHgrW7xujtG4Qqj/AJHg9f
-	7MPIpREIaJf5CBnvHI3YSGzXcgjGMCqo/soZFxO5Js5e2us0bQSujibk=
-X-Google-Smtp-Source: AGHT+IHkH/wwUf5d8lEEpuJxnz3SCVRu5KO/+QNvaticspBogfzuSTTlnBcBEi4bqi+Aeol4UGA5h8ZFt1vmaZ6fdEINgQ1UFwDV
+	s=arc-20240116; t=1745052372; c=relaxed/simple;
+	bh=sKecEVGccN2Gsv7wSldTED5rOsVAxlOK2KmQYKt+9Vo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WKO7pjiM/XrxWVHL5vLjLza/2IfKdHanCeBiLTyClpuQQUj8yqQVYfClHKtSC0Zqyl7LwkdXXKFA3ZSi4IfK/p4AywmbVXzwelFDjLKH5kIo7xnVdYkrflBaAL3T9bAAUsNXtcB2vtguVtMt1F6QqGWm9gwcACDq5Jq1DUAvpuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZflZr3GSDz4f3m6r;
+	Sat, 19 Apr 2025 16:45:40 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id C3F9B1A06DC;
+	Sat, 19 Apr 2025 16:46:05 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBXu1_LYgNo_N23Jw--.38949S3;
+	Sat, 19 Apr 2025 16:46:05 +0800 (CST)
+Subject: Re: [PATCH RFC v2 00/14] md: introduce a new lockless bitmap
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
+Cc: xni@redhat.com, colyli@kernel.org, axboe@kernel.dk, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, kbusch@kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250328060853.4124527-1-yukuai1@huaweicloud.com>
+ <Z-aCzTWXzFWe4oxU@infradead.org>
+ <c6c608e2-23e7-486f-100a-d1fb6cfff4f2@huaweicloud.com>
+ <20250409083208.GA2326@lst.de>
+ <115c3b08-aff1-dd97-fe6a-7901452ce62c@huaweicloud.com>
+ <20250409094019.GA3890@lst.de>
+ <28bb1c35-5f75-4e1c-4b5d-32bcb87050ce@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <54ab4291-9152-44d1-bf6c-675b58cfcea8@huaweicloud.com>
+Date: Sat, 19 Apr 2025 16:46:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b41:b0:3d5:890b:d9e1 with SMTP id
- e9e14a558f8ab-3d8b694907emr40125955ab.1.1745051780294; Sat, 19 Apr 2025
- 01:36:20 -0700 (PDT)
-Date: Sat, 19 Apr 2025 01:36:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68036084.050a0220.297747.0018.GAE@google.com>
-Subject: [syzbot] [block?] [bcachefs?] kernel panic: KASAN: panic_on_warn set ...
-From: syzbot <syzbot+4eb503ec2b8156835f24@syzkaller.appspotmail.com>
-To: brauner@kernel.org, jack@suse.cz, kent.overstreet@linux.dev, 
-	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <28bb1c35-5f75-4e1c-4b5d-32bcb87050ce@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXu1_LYgNo_N23Jw--.38949S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr43AF43Aw1UKryDXrW5KFg_yoWrKr18pF
+	W7Xa4jkrs8Jr13Xr18trZrAF1Syrs7JFsrJrWSk34rC3sFyrnxKF1kKFyYkFy5W3ykWF12
+	vrs8Kw43Ar4rZF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hello,
+Hi, Christoph!
 
-syzbot found the following issue on:
+在 2025/04/11 9:36, Yu Kuai 写道:
+> Hi,
+> 
+> 在 2025/04/09 17:40, Christoph Hellwig 写道:
+>> On Wed, Apr 09, 2025 at 05:27:11PM +0800, Yu Kuai wrote:
+>>>> For that you'd be much better of just creating your own trivial
+>>>> file_system_type with an inode fully controlled by your driver
+>>>> that has a trivial set of address_space ops instead of oddly
+>>>> mixing with the block layer.
+>>>
+>>> Yes, this is exactly what I said implement a new file_operations(and
+>>> address_space ops), I wanted do this the easy way, just reuse the raw
+>>> block device ops, this way I just need to implement the submit_bio ops
+>>> for new hidden disk.
+>>>
+>>> I can try with new fs type if we really think this solution is too
+>>> hacky, however, the code line will be much more. :(
+>>
+>> I don't think it should be much more.  It'll also remove the rather
+>> unexpected indirection through submit_bio.  Just make sure you use
+>> iomap for your operations, and implement the submit_io hook.  That
+>> will also be more efficient than the buffer_head based block ops
+>> for writes.
+>>
+>>>>
+>>>> Note that either way I'm not sure using the page cache here is an
+>>>> all that good idea, as we're at the bottom of the I/O stack and
+>>>> thus memory allocations can very easily deadlock.
+>>>
+>>> Yes, for the page from bitmap, this set do the easy way just read and
+>>> ping all realted pages while loading the bitmap. For two reasons:
+>>>
+>>> 1) We don't need to allocate and read pages from IO path;(In the first
+>>> RFC version, I'm using a worker to do that).
+>>
+>> You still depend on the worker, which will still deadlock.
+>>
+>>>> What speaks against using your own folios explicitly allocated at
+>>>> probe time and then just doing manual submit_bio on that?  That's
+>>>> probably not much more code but a lot more robust.
+>>>
+>>> I'm not quite sure if I understand you correctly. Do you means don't use
+>>> pagecache for bitmap IO, and manually create BIOs like the old bitmap,
+>>> meanwhile invent a new solution for synchronism instead of the global
+>>> spin_lock from old bitmap?
+>>
+>> Yes.  Alternatively you need to pre-populate the page cache and keep
+>> extra page references.
+> 
+> Ok, I'll think about self managed pages and IO path. Meanwhile, please
+> let me know if you have questions with other parts.
 
-HEAD commit:    3088d26962e8 Merge tag 'x86-urgent-2025-04-18' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17aed470580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2a31f7155996562
-dashboard link: https://syzkaller.appspot.com/bug?extid=4eb503ec2b8156835f24
-compiler:       Debian clang version 15.0.6, Debian LLD 15.0.6
+So, today I implement a version, and I do admit this way is much
+simpler, turns out total 200 less code lines. And can you check the
+following untested code if you agree with the implementation? I'll
+start to work a new version if you agree.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks,
+Kuai
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-3088d269.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5ec84510bfc9/vmlinux-3088d269.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/af58d0bee0a4/bzImage-3088d269.xz
+static int llbitmap_rdev_page_io(struct md_rdev *rdev, struct page *page,
+                                 ┊int idx, bool rw)
+{
+         struct bio bio;
+         int ret;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4eb503ec2b8156835f24@syzkaller.appspotmail.com
+         bio_init(&bio, rdev->bdev, bio.bi_inline_vecs, BIO_INLINE_VECS,
+                 ┊REQ_SYNC | REQ_IDLE | REQ_META);
+         if (rw)
+                 bio.bi_opf |= REQ_OP_WRITE;
+         else
+                 bio.bi_opf |= REQ_OP_READ;
 
-Kernel panic - not syncing: KASAN: panic_on_warn set ...
-CPU: 0 UID: 0 PID: 47 Comm: kworker/u4:3 Not tainted 6.15.0-rc2-syzkaller-00400-g3088d26962e8 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: loop0 loop_workfn
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- panic+0x349/0x880 kernel/panic.c:354
- check_panic_on_warn+0x86/0xb0 kernel/panic.c:243
- end_report+0x77/0x160 mm/kasan/report.c:227
- kasan_report+0x154/0x180 mm/kasan/report.c:636
- check_region_inline mm/kasan/generic.c:-1 [inline]
- kasan_check_range+0x28f/0x2a0 mm/kasan/generic.c:189
- instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
- atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
- put_bh include/linux/buffer_head.h:301 [inline]
- end_buffer_read_sync+0xc1/0xd0 fs/buffer.c:161
- end_bio_bh_io_sync+0xbf/0x120 fs/buffer.c:2748
- blk_update_request+0x5e5/0x1160 block/blk-mq.c:983
- blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1145
- lo_rw_aio_do_completion drivers/block/loop.c:317 [inline]
- lo_rw_aio_complete drivers/block/loop.c:325 [inline]
- lo_rw_aio+0xdfd/0xf80 drivers/block/loop.c:398
- do_req_filebacked drivers/block/loop.c:-1 [inline]
- loop_handle_cmd drivers/block/loop.c:1866 [inline]
- loop_process_work+0x8e3/0x11f0 drivers/block/loop.c:1901
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
- worker_thread+0x870/0xd50 kernel/workqueue.c:3400
- kthread+0x7b7/0x940 kernel/kthread.c:464
+         __bio_add_page(&bio, page, PAGE_SIZE, 0);
+         bio.bi_iter.bi_size = PAGE_SIZE;
+         bio.bi_iter.bi_sector = rdev->sb_start +
+                                 rdev->mddev->bitmap_info.offset +
+                                 (PAGE_SECTORS << PAGE_SECTORS_SHIFT);
 
+         ret = submit_bio_wait(&bio);
+         bio_uninit(&bio);
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+         if (ret)
+                 md_error(rdev->mddev, rdev);
+         return ret;
+}
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+static struct page *llbitmap_read_page(struct llbitmap *llbitmap, int idx)
+{
+         struct page *page = llbitmap->pages[idx];
+         struct mddev *mddev = llbitmap->mddev;
+         struct md_rdev *rdev;
+         int err = -EIO;
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+         if (page)
+                 return page;
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+         page = alloc_page(GFP_KERNEL);
+         if (!page)
+                 return ERR_PTR(-ENOMEM);
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+         rdev_for_each(rdev, mddev) {
+                 if (rdev->raid_disk < 0 || test_bit(Faulty, &rdev->flags))
+                         continue;
 
-If you want to undo deduplication, reply with:
-#syz undup
+                 err = llbitmap_rdev_page_io(rdev, page, idx, READ);
+                 if (!err)
+                         break;
+         }
+
+         if (err) {
+                 __free_page(page);
+                 return ERR_PTR(err);
+         }
+
+         return page;
+}
+
+static int llbitmap_write_page(struct llbitmap *llbitmap, int idx)
+{
+         struct page *page = llbitmap->pages[idx];
+         struct mddev *mddev = llbitmap->mddev;
+         struct md_rdev *rdev;
+         int err = -EIO;
+
+         if (!page)
+                 return err;
+
+         rdev_for_each(rdev, mddev) {
+                 if (rdev->raid_disk < 0 || test_bit(Faulty, &rdev->flags))
+                         continue;
+
+                 if (!llbitmap_rdev_page_io(rdev, page, idx, WRITE))
+                         err = 0;
+         }
+
+         return err;
+}
+
+static bool llbitmap_dirty(struct llbitmap *llbitmap)
+{
+         int i;
+
+         for (i = 0; i < llbitmap->nr_pages; ++i) {
+                 struct llbitmap_barrier *barrier = &llbitmap->barrier[i];
+
+                 if (test_bit(BitmapPageDirty, &barrier->flags))
+                         return true;
+         }
+
+         return false;
+}
+
+static void llbitmap_flush_dirty_page(struct llbitmap *llbitmap)
+{
+         int i;
+
+         for (i = 0; i < llbitmap->nr_pages; ++i) {
+                 struct llbitmap_barrier *barrier = &llbitmap->barrier[i];
+
+                 if (!test_and_clear_bit(BitmapPageDirty, &barrier->flags))
+                         continue;
+                 llbitmap_write_page(llbitmap, i);
+         }
+}
+
+> 
+> Thanks,
+> Kuai
+> 
+>>
+>> .
+>>
+> 
+> .
+> 
+
