@@ -1,115 +1,78 @@
-Received: from mail-pj1-f104.google.com (mail-pj1-f104.google.com [209.85.216.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9385B1E51E3
-	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 23:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D927139D
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 00:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745279205; cv=none; b=CMuSyxnDC850hYlv0nG7OpbiNpycojV5QrMZTfkeTSiz4DL16UJ0tWe7gQ7ut0lKPH53J+dZ47Iu66CBZ/4oPV6EhUOzlWeEnMkh2bGB/EHfL+Z+Z8rGZAX+oO8d2uMeI7FV8lYodciQuWrS7Azt0TRvYhcLKr4GDLj/2VTCu98=
+	t=1745280003; cv=none; b=EPf9kUNMg2YUorzZ7SZUyrDBn119SrW5Q3ceUuYA5RHle6deGPUx5JdW3xa3xDV3WqVmaYyGmSSJtM4k5NaHgLIeT5CGUX7eWd6IrPLduAUL2onAfudUHJJx3dfKnHULqBCyO0hKHtwcep1dfWTPpH9S8SYEmEvIfeOOqNKlIqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745279205; c=relaxed/simple;
-	bh=MgZlolvtjiXQgwF7T8ugwhe+ecGe6HjkZ/Z4cLljf0U=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UkL7DE0+nZKEGNMdIxDzs9A6bHBT5Q0lVSSBo+ZNZvcZq0VXRC4YzxALV4SlkGhfmgvm9BgdAUjjgAZEv9lEjjBor7upJ6jVBZbwDV05O4e8hWR/Hnxt/TW8os7lF2kjngoBAWSpeH6Z5FFfOGWrVm5+duYIXomR28Inz74wpjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dmE+0fG8; arc=none smtp.client-ip=209.85.216.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1745280003; c=relaxed/simple;
+	bh=ERQr4h9JHECXQg9Qx+AdDxjhPkmj9l+qjz8mHA631o0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWSm0ZkM1c0T2LmtBn9oK5apYflryEHFuTE94xXKGePeV1eSYm81YObvrZPfgdiXOsiFRleoS3B5wv8RN0CiS6mm2srtPrx2oWRfEU3bnhzYDOK5/bwTzHmHwP1z4g+eWRO+DLEA5U8esgi+olcBZuRWni7Pbf2rGEZKEmqbEfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W8E+U49u; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dmE+0fG8"
-Received: by mail-pj1-f104.google.com with SMTP id 98e67ed59e1d1-30863b48553so4732706a91.0
-        for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 16:46:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745279202; x=1745884002; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KTxwRN46KxmBWYrElcrYvw4CJWFiySXxgp0fC8wvHYQ=;
-        b=dmE+0fG8Umu7oOMaqaDc+fhyyrd6/CxYzo76k4ezgdrPx8HX4zniM6EFiSuZIOrUvM
-         kn7flimx8cV5i/QJEutxqh4nCTFxZy5erG5ffYqgi07XfmU6bob4/BWhIUrtd358KWhm
-         QpkCjC8Q+HxeveRqjq0KBGolcq8kwHi13OwcyXUXeVYrBh2ADOhfeDwDBQ96TphiqV2j
-         iqIgL5FhLIwubUqRCyJDpQSa7TJxhylOKEAzrmVEq5AozkJja3i3Xbu3Tjs8RZ77Q4P7
-         mvSwyHw43UfnbIzua9ibzLx5HFMEg40xpRQUmqlqqJe1k4xOeARgmgOEXXZNioOUXFI9
-         Qfbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745279202; x=1745884002;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KTxwRN46KxmBWYrElcrYvw4CJWFiySXxgp0fC8wvHYQ=;
-        b=kKBXc7v7my8Z6brzRzu5xuJfeSaEtx2mqYok+O8BJhkPyAJDnSFZCxCYU97jLUsTcm
-         GcXcdkBhCM/JqLEbX8PGRpMh8BRUNZT4cNxuV+FP7/Q23BPjlwiaYl/LhiX3z7EkCjAK
-         MnY7/cmtA2awgmEVucdBuH14RXN2YgiShonqMoZFZWv/+imoSEvitshWeeaShX3g7Bjf
-         U2/adegN6YIOPdHaW6vGzssknHJmfumWOMP8/togoNX9r3xOcjRzgIdUf0DVzRsBVMpB
-         Jtxm7rzlueLMMPUDaanP95SykYjnq3Th/4sJb98dCa49YHsTBp+TaBWS9KfanDkd4q06
-         3XFg==
-X-Gm-Message-State: AOJu0Ywi/RwZ9tm7lorfNEg/fDIsdi4ddlj72tl6WmOJoEERXXCYR1cG
-	fFnqlOSKxHXiTf2za6BuzYThsq1h83fhDMa0YuO8AZb6sHOfAeU5xqvDvURSG8ncjz4STJ6hxfG
-	xryvmc0Ew6GBs4DKE7YVSAexXrpO1q2AfhGokcBNaNFk8M82X
-X-Gm-Gg: ASbGnct1Z/VNmvEj89VvBrenQXHPaf+cGPRq7Rxh6CELML7OP0YiP+RJJ+3P59wDtsk
-	70VU9YpEDRkzLWcuqShTFOZk5IBO/AKe/iIltpxZIWDN66eZSqRwqwkVhOGzkPPJrkKgrXKYuav
-	Os5M17YAVpO75p6dcK8Xrvko0oTMmzoMJ4Fubc5e00r2Dk7TRPxOCw+lxxK6AfN9QWaFHCybhIC
-	GyxoEdv0cws1FaxcckNWg02m2I4S0i5njJJUqjaYnxYlNIqkJGDILI9Bj4FiVPV+XM2smMv
-X-Google-Smtp-Source: AGHT+IG5VlJ1RIxmxTNJQSsKgUu08tRnQu4AxwH+uNxOrySYInQwR2aUQ0baLfIWdUvV8P/PJ+ZEdv6C/VZb
-X-Received: by 2002:a17:90b:2705:b0:2ee:8cbb:de28 with SMTP id 98e67ed59e1d1-3087c2ca65fmr21290540a91.8.1745279201745;
-        Mon, 21 Apr 2025 16:46:41 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3087e05ee89sm512928a91.15.2025.04.21.16.46.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 16:46:41 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E2FEC3403C6;
-	Mon, 21 Apr 2025 17:46:40 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id D7462E4055F; Mon, 21 Apr 2025 17:46:40 -0600 (MDT)
-From: Uday Shankar <ushankar@purestorage.com>
-Subject: [PATCH 0/4] ublk: refactor __ublk_ch_uring_cmd
-Date: Mon, 21 Apr 2025 17:46:39 -0600
-Message-Id: <20250421-ublk_constify-v1-0-3371f9e9f73c@purestorage.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8E+U49u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745279999;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OGZ59D5xSbt4+QuxkQmnqmaWIrsABMYX/8X7u0TqSH4=;
+	b=W8E+U49u4/5Aov3cknTVyOg3uKvtXUuldmrTAyc5gGGY8GlvWMH4C2xCuWfEJmzUJ+P+lj
+	QeaX0Lg+YyovgtHYu318zGCssHsWzrkZQZgyMN/R09KcviDMbdtSeGlxGnsw48wxcJZ/+w
+	d2piZalhq/+tHtngoSDAFcw4UQSSX6o=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-280-6vwHZdyEP0O3rw-q6rxt6A-1; Mon,
+ 21 Apr 2025 19:59:57 -0400
+X-MC-Unique: 6vwHZdyEP0O3rw-q6rxt6A-1
+X-Mimecast-MFC-AGG-ID: 6vwHZdyEP0O3rw-q6rxt6A_1745279996
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D7AA180034E;
+	Mon, 21 Apr 2025 23:59:56 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.24])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 64714180045C;
+	Mon, 21 Apr 2025 23:59:54 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 6.15 0/2] selftests: ublk: two fixes
+Date: Tue, 22 Apr 2025 07:59:40 +0800
+Message-ID: <20250421235947.715272-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAN/YBmgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDEyND3dKknOz45Py84pLMtEpdY+PUVMNEMxMLs8RkJaCegqLUtMwKsHn
- RsbW1AA0uycxfAAAA
-X-Change-ID: 20250421-ublk_constify-33ee1a6486ac
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Uday Shankar <ushankar@purestorage.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Refactor __ublk_ch_uring_cmd to:
+Hello Jens,
 
-- Have one function per operation instead of handling operations
-  directly in the switch statement.
-- Mark most ublk_queue pointers as const. Given efforts to allow
-  concurrent operations on one ublk_queue [1], it is important that
-  ublk_queue be read-only (or accesses to it be properly synchronized)
-  to avoid data races.
+The 1st patch fixes recover test & ublk utility, and the 2nd patch removes
+one useless variable from 'struct dev_ctx', both are introduced recently.
 
-This series is split off from [1]. No functional changes are expected.
+Thanks,
 
-[1] https://lore.kernel.org/linux-block/20250416-ublk_task_per_io-v5-0-9261ad7bff20@purestorage.com/
+Ming Lei (2):
+  selftests: ublk: fix recover test
+  selftests: ublk: remove useless 'delay_us' from 'struct dev_ctx'
 
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
----
-Uday Shankar (4):
-      ublk: factor out ublk_commit_and_fetch
-      ublk: mark ublk_queue as const for ublk_register_io_buf
-      ublk: factor out ublk_get_data
-      ublk: factor out error handling in __ublk_ch_uring_cmd
+ tools/testing/selftests/ublk/kublk.c            | 1 +
+ tools/testing/selftests/ublk/kublk.h            | 3 ---
+ tools/testing/selftests/ublk/test_generic_05.sh | 2 +-
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
- drivers/block/ublk_drv.c | 133 +++++++++++++++++++++++------------------------
- 1 file changed, 65 insertions(+), 68 deletions(-)
----
-base-commit: edbaa72ba1bd21040df81f7c63851093264c7955
-change-id: 20250421-ublk_constify-33ee1a6486ac
-
-Best regards,
 -- 
-Uday Shankar <ushankar@purestorage.com>
+2.47.0
 
