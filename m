@@ -1,99 +1,105 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C561C84B2
-	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 15:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055671E0E1A;
+	Mon, 21 Apr 2025 16:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745249167; cv=none; b=VE3sIsfJp1MO/2x1gHGdFlaHh8eLHAqKpZwV+PdRk9q4rXx8wvt+qMqx6a5TuQT7llwJfPJ3S8HAzLVURuYMi9z1Wg2mrcj5ER4e75afFJsavg5Wvz2hdGxRkb8TuyB9TcsgpPUQ/PSaPKq95aR1bSezNdg24w3AkZUdCtlYSSU=
+	t=1745253763; cv=none; b=Rbdtskl0lAehD5esrLw08Yx8IRWdL+3z8iAhFg9/eR7g1nHR+nzn2yZqFcUHnqQYkP2lv9vmFFeaAuPnSeLn8JvC9T7jeOJTXgChAp/52zMfFbdwMOm4oVsOjHPdJlMDHCEBi3fYcKsur/Nc0RZ63T3WasuvfmwYVheVSbkfh84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745249167; c=relaxed/simple;
-	bh=oyFDL0tEsBmkIRbx0EJ12DAGw3V6d2obR28xoFCrRcE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=o8uSFHVB1r9p6T9s8W3sxBIF4noDpcRRDSnKL/rGOcIDfZisLTDj08oqfh71QF/FCIMSaldKsGXtEY8dYmxFKupEv52uZv1PzUtplAd4Eo0lAV2IF/REFtb7s047myW2n9Bh9aZdcOP90W736b5DX40py3bISzn/RaEUcVGy7pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YTAV1Rl2; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1745253763; c=relaxed/simple;
+	bh=m3m6glZ88p1UicyITupTeA+hfX/BSoFrF6K0y4udo00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=scTSEiOuSm2l69WwFzw7QlH70NIVt/WlYE6DE5gmwc/QeAeFL8ql+3ZiHDiGITGMFS5OnCee/1v4qlfH8Dd3jXdAolC8hRKWm0FuEKPRNi1FWqEMSVHBUOsdNIdW/+91o4/b+/gddsfSCblRl8Vg+MWwIPqq8hHsy54SUiTpDrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeKMtDRP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YTAV1Rl2"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-86142446f3fso81400939f.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 08:26:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745249164; x=1745853964; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9ScjabGJtaO0rM/C7HSW9TUBYDvPcVX/rnHRwpfBEg=;
-        b=YTAV1Rl2YpOfu9MWbCV4cMThb3FCaEEDWJzTbQ1R8Mat1zjZxh7zldsvJPhz7Z0o78
-         iw8y+4nQV3HqTDB/TK17/8Ff1fbN5QW6GZkTj+v0l1cr1KKnjsoJj5FACTLTgUwJBoGx
-         9xUjNmh8yEeLl424q3/8UoNWYs/w06BF7Nz5Ki+bIvTVL3psvYOu28SJBuKqld2bTQ2U
-         6c+8Ls5mwSuEIiU1FH7uy6lErpZ8meZd0RmU/38LGKmroVkfNgiWbS8pr2qgzXMCqiTp
-         yocQ5Z+6eQVPEYUTmRoQ7JXh6PqUOY2tDrkvepwYWkwRWPKWIcZuzegSInQsKTmtRxZD
-         uiuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745249164; x=1745853964;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/9ScjabGJtaO0rM/C7HSW9TUBYDvPcVX/rnHRwpfBEg=;
-        b=We3Shi9MWkrCt3kXf2EI4UbWqMfoERHmhxS4KQIbvXT9g/ufDADf3Gf/56RDtNzuXw
-         p1dMoX5g5Iyiccew4luwTjcN+p34nPPq0umJS6/gQEw6IdixxKrKFzARCpl42u7wsyRw
-         ryFnQ9WY7tVSWDINbju6Hn9HR78q2BtzKYf7lMMc9tdsQsIG2K8lZDnIqJ2vrVzhP7x9
-         olnllb9XaRH83x2xC9xv19srEf80mZsE3ZwZYPNIf769COgB5zvgz60SV5ETCiKIsu6g
-         ea2xAldzD7vVxo5CczFlV4lBQ4h3pB6Pvdm5i6DpWyW0TZAjxbLL07C5dD8kKhhy/etm
-         LhkA==
-X-Gm-Message-State: AOJu0YwJ2j46SXI4ar7GnCtLgb4E/9KYYVk35ViE4ftEWdfRqXaKifKD
-	XnsLC17iBDrr+462n3B84+mixx+nNZxU/QtLmP4vSO8yOSN8kYKzuU4U5SfNjk4=
-X-Gm-Gg: ASbGncsObo1B0xUH7OPOKoqc6zYjQHbsAhHFu3rqfUBIUiOrIgTcmWQfw348S8ogLJW
-	LTNq9FpfEWq6YyElpOTPPSlM/6J7SjX4U8Y1+3dJ2j9+gXhczqehTCEfB8JD34aBw0i/ZrTlOWH
-	I0YqUO+45MoyRVcyQDntqeMSHa9YfEDnHwIFzfe9Im9PxDMUs2QSzr9ZUPPm4yTnlL/LZXQ6fDE
-	Tt6zotaPcAMWyTtCBJ/D4ZO0DmvipRniHXQgGuHwPgiJlgXW+A51CrPbLVpmkQy4H66leLpA4GF
-	m0I3Th04UK/2mDS4NbmAk6DdRt5aLoE=
-X-Google-Smtp-Source: AGHT+IF01T6wmSj7KoQYmRqwlp03sRX4209ENV+s7X3xwtCVlC7c9y68dEoHiQsVp5xHpX7SucNoHw==
-X-Received: by 2002:a05:6602:418e:b0:85b:41cc:f709 with SMTP id ca18e2360f4ac-861dbee316dmr1056536339f.14.1745249164247;
-        Mon, 21 Apr 2025 08:26:04 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f6a37cb943sm1816250173.4.2025.04.21.08.26.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 08:26:03 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Jared Holzman <jholzman@nvidia.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <2a370ab1-d85b-409d-b762-f9f3f6bdf705@nvidia.com>
-References: <20250421105708.512852-1-jholzman@nvidia.com>
- <2a370ab1-d85b-409d-b762-f9f3f6bdf705@nvidia.com>
-Subject: Re: [PATCH v6] ublk: Add UBLK_U_CMD_UPDATE_SIZE
-Message-Id: <174524916290.914665.10011985049741221768.b4-ty@kernel.dk>
-Date: Mon, 21 Apr 2025 09:26:02 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeKMtDRP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 661C9C4CEF0;
+	Mon, 21 Apr 2025 16:42:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745253762;
+	bh=m3m6glZ88p1UicyITupTeA+hfX/BSoFrF6K0y4udo00=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FeKMtDRPmgXNmdhOA2xuD1QtibJmcPrU2MV3eJXwpFfhIQw+NCP/LjD+7WTJfTrLZ
+	 VyXdxSX6qP2Bb961hC0FJn3ZqerqqplYKwIhUnbAW8fLneHGm1lcA+vTlj4pmNBZhp
+	 +3EEg7d6NI6mryu6B9O8Cp7eFn12cu0iRgAAC+uFM1xIhY6Gv5A2BKlSC+bLkaWnoL
+	 PPoHHiDSmAJA6xr4IPmYwR3+nA69HxDAeJ93AMGLY+ERqa7oExNJXK+WjRWDZnXUFY
+	 /d3XLatgTugglsFLw5yzg2WQuJit58K9D3U1x89Z6fRLnAWYextGfQfV6KyM1lmGU2
+	 Lh0+VjqHWGzcA==
+Date: Mon, 21 Apr 2025 09:42:41 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: brauner@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk, jack@suse.cz,
+	cem@kernel.org, linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH v7 11/14] xfs: add xfs_file_dio_write_atomic()
+Message-ID: <20250421164241.GD25700@frogsfrogsfrogs>
+References: <20250415121425.4146847-1-john.g.garry@oracle.com>
+ <20250415121425.4146847-12-john.g.garry@oracle.com>
+ <20250421040002.GU25675@frogsfrogsfrogs>
+ <2467484b-382b-47c2-ae70-4a41d63cf4fc@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2467484b-382b-47c2-ae70-4a41d63cf4fc@oracle.com>
 
-
-On Mon, 21 Apr 2025 13:59:50 +0300, Jared Holzman wrote:
-> Currently ublk only allows the size of the ublkb block device to be
-> set via UBLK_CMD_SET_PARAMS before UBLK_CMD_START_DEV is triggered.
+On Mon, Apr 21, 2025 at 06:47:44AM +0100, John Garry wrote:
+> On 21/04/2025 05:00, Darrick J. Wong wrote:
+> > > @@ -843,6 +909,8 @@ xfs_file_dio_write(
+> > >   		return xfs_file_dio_write_unaligned(ip, iocb, from);
+> > >   	if (xfs_is_zoned_inode(ip))
+> > >   		return xfs_file_dio_write_zoned(ip, iocb, from);
+> > What happens to an IOCB_ATOMIC write to a zoned file?  I think the
+> > ioend for an atomic write to a zoned file involves a similar change as
+> > an outofplace atomic write to a file (one big transaction to absorb
+> > all the mapping changes) but I don't think the zoned code quite does
+> > that...?
 > 
-> This does not provide support for extendable user-space block devices
-> without having to stop and restart the underlying ublkb block device
-> causing IO interruption.
-> 
-> [...]
+> Correct. For now, I don't think that we should try to support zoned device
+> atomic writes. However we don't have proper checks for this. How about
+> adding a xfs_has_zoned() check in xfs_get_atomic_write_{min, max, opt}()?
 
-Applied, thanks!
+Well it turns out that was a stupid question -- zoned=1 can't be enabled
+with reflink, which means there's no cow fallback so atomic writes just
+plain don't work:
 
-[1/1] ublk: Add UBLK_U_CMD_UPDATE_SIZE
-      commit: 98b995660bff011d8e00af03abd74ac7d1ac1390
+$ xfs_info /mnt
+meta-data=/dev/sda               isize=512    agcount=4, agsize=32768 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=1
+         =                       reflink=0    bigtime=1 inobtcount=1 nrext64=1
+         =                       exchange=1   metadir=1
+data     =                       bsize=4096   blocks=131072, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=1
+log      =internal log           bsize=4096   blocks=16384, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =internal               extsz=4096   blocks=5061632, rtextents=5061632
+         =                       rgcount=78   rgsize=65536 extents
+         =                       zoned=1      start=131072 reserved=0
+$ xfs_io -c 'statx -r -m 0x10000' /mnt/a | grep atomic
+stat.atomic_write_unit_min = 0
+stat.atomic_write_unit_max = 0
+stat.atomic_write_segments_max = 0
+stat.atomic_write_unit_max_opt = 0
 
-Best regards,
--- 
-Jens Axboe
+I /think/ all you'd have to do is create an xfs_zoned_end_atomic_io
+function that does what xfs_zoned_end_io but with a single
+tr_atomic_ioend transaction; figure out how to convey "this is an
+atomic out of place write" to xfs_end_ioend so that it knows to call
+xfs_zoned_end_atomic_io; and then update the xfs_get_atomic_write*
+helpers.
 
+--D
 
-
+> Thanks,
+> John
