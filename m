@@ -1,148 +1,148 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835B71B21BF
-	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 07:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD0C1C5D5E
+	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 07:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745220439; cv=none; b=ISWRlOO0z0j42Ns2kb3e/65FdWHmv+ViBTS8f9VRKKNVrH004mbITI+9IyhuQzzJ1YTP4WTTEJmE9Ix68O8HqL0tjIkhiSkhhci0E7EDha2ZAnvWWhof3D/TttwtnazOtokj64irWns1JLUkTP+rRqWfQ/+RukvEbIAl+aYGUZo=
+	t=1745220451; cv=none; b=FF45iXEEoIZ6ozdxrhrt8UVPhdHV8k+BZpz95Pk3jND1ohJOEyLS81e0Dimf/8ADyOjCK97wDyxSf4wPtRF1AGGvVXAw1tlEdaHYImbG10mwqvaLTIQrhe8a/93ODPrTHy1BoIt0O9i+h2WdrGtQSK8ydk+8dRv0d5Gq1HRcHhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745220439; c=relaxed/simple;
-	bh=/uiS1far/JlBYz4avglnZjgL6T1pW+4M29l6EWZzEug=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aq4eYxIkBRXcrmoEnXd3o30y1OBKqgEkYGlyQ8rLDnW8YrPo6DCp0DFcluXEk4uYBEXHVgYv5OoqjV+plxqF5LLPNbVyujIj1VjnRZ2/+8xB37MNQ1NxlfjcjyG36BAzkCtom9GtAq4QwzbJlTEwIaN8uhGBWNAmEYFpFNKmgZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XK7kKSas; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1745220451; c=relaxed/simple;
+	bh=4zI5mQOWPDMxU0CL4PYocCfgFycpaWX1hKRzmm8L9so=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7+z7R9r+/56Y853C6neM5KsFTJLkbMlgYpn2uk1uVHD+rcleBNNAuU7WiR4RUfi9Y4dt074WUd5mi6biF/sYECzkohnNeO/rpIDcIE6ty91i+5J191iZu7qD9X6b3bYADm2t0pMawg4bgAWGza8BThosehaFCByVkdDK7KfrJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WbvCRIUg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XK7kKSas"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=b8S6O16FZwOzow767bmfyPDaHZKiuKSpdg+87NbQ+Ak=; b=XK7kKSasIisO1oVozhvLJT3ars
-	VChc3TG18BGTzInRZ4HNjdB7b3aGM+i5ONYB1gzsdC/zHSGCjolfvHQV//5Ay1FZXK6IwyTTRYJKj
-	bP9yBvCZQ0134VaAkz/FAjZVqtyNgdjhH3D3xLPEMQFz3Z90FfMxNCpUlvkEQcPSFZl8TUebl8ubV
-	tB3VO1xEFQi9agfpsnPx9qc96aXnBP1j+F675uoPmziJJhEFa4fUuYs1mMmaTieG5b6FrOSoA0gHD
-	TU7RBZs8LxBrK7rLA6ovS70Tkd2/F7Op3vGUBc/23tnNxKmbwdg2h+3vaO1LNFxUtJ/z+xAkQJe99
-	MOEMN25A==;
-Received: from [213.208.157.109] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u6lYg-00000003n5E-2O3Y;
-	Mon, 21 Apr 2025 07:27:15 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 5/5] brd: use memcpy_{to,from]_page in brd_rw_bvec
-Date: Mon, 21 Apr 2025 09:26:09 +0200
-Message-ID: <20250421072641.1311040-6-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250421072641.1311040-1-hch@lst.de>
-References: <20250421072641.1311040-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbvCRIUg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745220448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FT6/N92L9aYAKkz0EMnSgRHQehhOpyLQRiOGW0cujrc=;
+	b=WbvCRIUgst3O9w8VB6CQM6+5+nnxDtnSgqdL5suH29TOAl5u/Fq77MaYgKcKV5GhY8X7Ft
+	US1VKRJ8UBQrjFDRzLDAPFXwm4n7lSAgM14XU1uXxa8rD8ICfi8n9+2Rt5hu859/snsK7v
+	jptoPgCQ+PCy8iXp2m6SrPTtV96/SaY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-489-hN5nh-XcOlC0lNVbCSxhJA-1; Mon,
+ 21 Apr 2025 03:27:21 -0400
+X-MC-Unique: hN5nh-XcOlC0lNVbCSxhJA-1
+X-Mimecast-MFC-AGG-ID: hN5nh-XcOlC0lNVbCSxhJA_1745220440
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19B151800876;
+	Mon, 21 Apr 2025 07:27:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.136])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CEE41801770;
+	Mon, 21 Apr 2025 07:27:14 +0000 (UTC)
+Date: Mon, 21 Apr 2025 15:27:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 20/20] block: move wbt_enable_default() out of queue
+ freezing from sched ->exit()
+Message-ID: <aAXzToqtIlAoUP7t@fedora>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-21-ming.lei@redhat.com>
+ <261d7b81-e611-47f4-ad55-6f7716c278c7@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <261d7b81-e611-47f4-ad55-6f7716c278c7@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Use the proper helpers to copy to/from potential highmem pages, which
-do a local instead of atomic kmap underneath, and perform
-flush_dcache_page where needed.  This also simplifies the code so much
-that the separate read write helpers are not required any more.
+On Sat, Apr 19, 2025 at 08:09:04PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 4/18/25 10:07 PM, Ming Lei wrote:
+> > scheduler's ->exit() is called with queue frozen and elevator lock is held, and
+> > wbt_enable_default() can't be called with queue frozen, otherwise the
+> > following lockdep warning is triggered:
+> > 
+> > 	#6 (&q->rq_qos_mutex){+.+.}-{4:4}:
+> > 	#5 (&eq->sysfs_lock){+.+.}-{4:4}:
+> > 	#4 (&q->elevator_lock){+.+.}-{4:4}:
+> > 	#3 (&q->q_usage_counter(io)#3){++++}-{0:0}:
+> > 	#2 (fs_reclaim){+.+.}-{0:0}:
+> > 	#1 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
+> > 	#0 (&q->debugfs_mutex){+.+.}-{4:4}:
+> > 
+> > Fix the issue by moving wbt_enable_default() out of bfq's exit(), and
+> > call it from elevator_change_done().
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/bfq-iosched.c | 2 +-
+> >  block/elevator.c    | 5 +++++
+> >  block/elevator.h    | 1 +
+> >  3 files changed, 7 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> > index 40e4106a71e7..310ce1d8c41e 100644
+> > --- a/block/bfq-iosched.c
+> > +++ b/block/bfq-iosched.c
+> > @@ -7211,7 +7211,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+> >  
+> >  	blk_stat_disable_accounting(bfqd->queue);
+> >  	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT, bfqd->queue);
+> > -	wbt_enable_default(bfqd->queue->disk);
+> > +	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
+> >  
+> >  	kfree(bfqd);
+> >  }
+> > diff --git a/block/elevator.c b/block/elevator.c
+> > index 8652fe45a2db..378553fce5d8 100644
+> > --- a/block/elevator.c
+> > +++ b/block/elevator.c
+> > @@ -687,8 +687,13 @@ int elevator_change_done(struct request_queue *q, struct elv_change_ctx *ctx)
+> >  	int ret = 0;
+> >  
+> >  	if (ctx->old) {
+> > +		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
+> > +				&ctx->old->flags);
+> > +
+> >  		elv_unregister_queue(q, ctx->old);
+> >  		kobject_put(&ctx->old->kobj);
+> > +		if (enable_wbt)
+> > +			wbt_enable_default(q->disk);
+> >  	}
+> >  	if (ctx->new) {
+> >  		ret = elv_register_queue(q, ctx->new, ctx->uevent);
+> > diff --git a/block/elevator.h b/block/elevator.h
+> > index 486be0690499..b14c611c74b6 100644
+> > --- a/block/elevator.h
+> > +++ b/block/elevator.h
+> > @@ -122,6 +122,7 @@ struct elevator_queue
+> >  
+> >  #define ELEVATOR_FLAG_REGISTERED	0
+> >  #define ELEVATOR_FLAG_DYING		1
+> > +#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
+> >  
+> >  /* Holding context data for changing elevator */
+> >  struct elv_change_ctx {
+> 
+> It seems invoking wbt_enable_default from elevator_change_done could probably
+> still race with ioc_qos_write or queue_wb_lat_store. Both ioc_qos_write and 
+> queue_wb_lat_store run with ->freeze_lock and ->elevator_lock protection.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/brd.c | 57 ++++++++++-----------------------------------
- 1 file changed, 12 insertions(+), 45 deletions(-)
+Actually wbt_enable_default() and wbt_init() needn't the above protection,
+especially since the patch 2/20 removes q->elevator use in
+wbt_enable_default().
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 580b2d8ce99c..79e96221f887 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -99,43 +99,6 @@ static void brd_free_pages(struct brd_device *brd)
- 	xa_destroy(&brd->brd_pages);
- }
- 
--/*
-- * Copy n bytes from src to the brd starting at sector. Does not sleep.
-- */
--static void copy_to_brd(struct brd_device *brd, const void *src,
--			sector_t sector, size_t n)
--{
--	struct page *page;
--	void *dst;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--
--	page = brd_lookup_page(brd, sector);
--	BUG_ON(!page);
--
--	dst = kmap_atomic(page);
--	memcpy(dst + offset, src, n);
--	kunmap_atomic(dst);
--}
--
--/*
-- * Copy n bytes to dst from the brd starting at sector. Does not sleep.
-- */
--static void copy_from_brd(void *dst, struct brd_device *brd,
--			sector_t sector, size_t n)
--{
--	struct page *page;
--	void *src;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--
--	page = brd_lookup_page(brd, sector);
--	if (page) {
--		src = kmap_atomic(page);
--		memcpy(dst, src + offset, n);
--		kunmap_atomic(src);
--	} else
--		memset(dst, 0, n);
--}
--
- /*
-  * Process a single segment.  The segment is capped to not cross page boundaries
-  * in both the bio and the brd backing memory.
-@@ -146,7 +109,8 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 	sector_t sector = bio->bi_iter.bi_sector;
- 	u32 offset = (sector & (PAGE_SECTORS - 1)) << SECTOR_SHIFT;
- 	blk_opf_t opf = bio->bi_opf;
--	void *mem;
-+	struct page *page;
-+	void *kaddr;
- 
- 	bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
- 
-@@ -168,15 +132,18 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 		}
- 	}
- 
--	mem = bvec_kmap_local(&bv);
--	if (!op_is_write(opf)) {
--		copy_from_brd(mem, brd, sector, bv.bv_len);
--		flush_dcache_page(bv.bv_page);
-+	page = brd_lookup_page(brd, sector);
-+
-+	kaddr = bvec_kmap_local(&bv);
-+	if (op_is_write(opf)) {
-+		BUG_ON(!page);
-+		memcpy_to_page(page, offset, kaddr, bv.bv_len);
-+	} else if (page) {
-+		memcpy_from_page(kaddr, page, offset, bv.bv_len);
- 	} else {
--		flush_dcache_page(bv.bv_page);
--		copy_to_brd(brd, mem, sector, bv.bv_len);
-+		memset(kaddr, 0, bv.bv_len);
- 	}
--	kunmap_local(mem);
-+	kunmap_local(kaddr);
- 
- 	bio_advance_iter_single(bio, &bio->bi_iter, bv.bv_len);
- 	return true;
--- 
-2.47.2
+Thanks,
+Ming
 
