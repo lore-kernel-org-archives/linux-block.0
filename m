@@ -1,150 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214A3B652
-	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 02:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6A31EB3E;
+	Mon, 21 Apr 2025 02:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745203423; cv=none; b=LrTrVpbVeUs+quSiCFYS8mL8F08kyEjh6BYlraU4ORmG5MH7HHC4ySVTBSsrbO0T+Goal9ZnM3Qw6dVo3HYZhIgKIVQHxYr2BlF/bIlu/80cgJMz4HCgby5cIq1TidK/T1rYSR2jceVI5n8LT9G2dJL6Jn18VqsgX8OviFT+6UI=
+	t=1745203456; cv=none; b=uLEtcou5IVfdf6IVkIPbSYdj+eGrwG3nQceEx0v0JnUwhcUmNsSCA5bfV+lyjqLniFSOFgpD5GsEVmZ8Hq8U0kJihddPVgT3YHZ/cl/64NQ/Jvhk0L3PFCRXxoIBSxwI6anb5VDFLeA7uVPTR7Sh0YeuFOq+Z+7hVYPxsKyzu5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745203423; c=relaxed/simple;
-	bh=In0TgZWdjobO06X+6Ca59UCerldO8QKLHBS0UcAOvHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TEbVM/iwEq3PsyOwZ0dwN0OUc/7x34fvaCDjbNBGZIL+1SBqJjOW2XfHETBgz5QEEcwaXQhjpQt92uqY1b2yxez00ln2tj3RuNttmpGKPLSBS11+FgQzj+WDuaOC+kb7d+8QYHI1cYobQXcmNVHNBiWrzJOLyHe5S7ZETFVUVpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LE3EJQkM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LE3EJQkM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745203420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r2L/wtxlkH2lkJo+AcH/YHxqs0ANqUne/vfFYH13GNg=;
-	b=LE3EJQkMS7ia0RcdPHl+CuHmhcQ67i44el7ArA5hyEGH2dGchmRkYX6lKXCl0X95h+g1lB
-	/aTFlmIX+O8es/AjleoO13UHdTQDiek0rQ2mQ3y8bX5xa6ogLRJvb/yFt6P5XGAVU4PwCQ
-	S9y14wUGMNPtDGmEJhTCtKgFtCUEcjg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-Mwz9dLu1OzimqV9gTRYdYQ-1; Sun,
- 20 Apr 2025 22:43:35 -0400
-X-MC-Unique: Mwz9dLu1OzimqV9gTRYdYQ-1
-X-Mimecast-MFC-AGG-ID: Mwz9dLu1OzimqV9gTRYdYQ_1745203414
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AA6F1956087;
-	Mon, 21 Apr 2025 02:43:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.114])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3D0291801778;
-	Mon, 21 Apr 2025 02:43:30 +0000 (UTC)
-Date: Mon, 21 Apr 2025 10:43:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yoav Cohen <yoav@nvidia.com>
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: ublk: Graceful Upgrade of ublk server application
-Message-ID: <aAWwzm3IdpL8odQf@fedora>
-References: <DM4PR12MB63282BE4C94D28AA2E1CACA0A9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
- <Z_49m8awtNFsY8pl@fedora>
- <DM4PR12MB63285A6617D8A9B9F22B912BA9B22@DM4PR12MB6328.namprd12.prod.outlook.com>
- <Z/7/LTSxqLH7JgAl@dev-ushankar.dev.purestorage.com>
- <Z_8KO5uJfkB-SKvT@fedora>
- <DM4PR12MB632890760804D06B3CBC357AA9BD2@DM4PR12MB6328.namprd12.prod.outlook.com>
- <Z_90hHRXe7R3fQuk@fedora>
- <DM4PR12MB632807AB7CDCE77D1E5AB7D0A9B92@DM4PR12MB6328.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1745203456; c=relaxed/simple;
+	bh=pB7viRc1r2JGTE6pXLj5K8q7cEpzje4VepltOd+V8BI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tBLDN4z/1HxE9K4F/5v3Oi3qW5fqQ4Mg17ToAS15oiyYuK1ZrJEDo81MnU7Px7DBMuKrPD6A3Ejdaea9iFrpmM9NmaIYxKpGdGk+cvMPoamXcdcyOzYM63RqN+5EeOmrcqbqS93QRGLEvxx6AnEfM5fylcF3Q/n9SMXJfhDhqCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zgq2n35y2z4f3jY1;
+	Mon, 21 Apr 2025 10:25:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 47A121A018D;
+	Mon, 21 Apr 2025 10:25:29 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.112.188])
+	by APP4 (Coremail) with SMTP id gCh0CgA3m1+MrAVoFxZkKA--.3102S6;
+	Mon, 21 Apr 2025 10:25:28 +0800 (CST)
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org
+Cc: linux-xfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hch@lst.de,
+	tytso@mit.edu,
+	djwong@kernel.org,
+	john.g.garry@oracle.com,
+	bmarzins@redhat.com,
+	chaitanyak@nvidia.com,
+	shinichiro.kawasaki@wdc.com,
+	brauner@kernel.org,
+	yi.zhang@huawei.com,
+	yi.zhang@huaweicloud.com,
+	chengzhihao1@huawei.com,
+	yukuai3@huawei.com,
+	yangerkun@huawei.com
+Subject: [RFC PATCH v4 02/11] nvme: set BLK_FEAT_WRITE_ZEROES_UNMAP if device supports DEAC bit
+Date: Mon, 21 Apr 2025 10:15:00 +0800
+Message-ID: <20250421021509.2366003-3-yi.zhang@huaweicloud.com>
+X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
+References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM4PR12MB632807AB7CDCE77D1E5AB7D0A9B92@DM4PR12MB6328.namprd12.prod.outlook.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgA3m1+MrAVoFxZkKA--.3102S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7ury8Ar4xJF4kuF15CrWUCFg_yoW8Cw4kpF
+	W3Xa42k348WF47C3sxXw47AFy3Gw1kGa4jgFn7K345Wr13A34Fgr1rKa43XFWkX3s3uayY
+	yFZ8G3s7Ca15XwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmY14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42
+	IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIev
+	Ja73UjIFyTuYvjTRNiSHDUUUU
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-Hi Yoav,
+From: Zhang Yi <yi.zhang@huawei.com>
 
-On Sun, Apr 20, 2025 at 08:57:23AM +0000, Yoav Cohen wrote:
-> Hi Ming,
-> 
-> Thank you very much!
-> The above seems to match our requirements.
-> Just to be sure, Do you want me to Implement it and issue a patch or do you plan add it to your plan?
+When the device supports the Write Zeroes command and the DEAC bit, it
+indicates that the deallocate bit in the Write Zeroes command is
+supported, and the bytes read from a deallocated logical block are
+zeroes. This means the device supports unmap Write Zeroes, so set the
+BLK_FEAT_WRITE_ZEROES_UNMAP feature to the device's queue limit.
 
-It is great if you'd like to implement the feature, and please add one
-selftest case(add quiesce command & one test case) together with the
-driver change.
+Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+---
+ drivers/nvme/host/core.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-Otherwise, I can add it to my todo list.
-
-Thanks,
-Ming
-
-> 
-> Thanks
-> 
-> ________________________________________
-> From: Ming Lei <ming.lei@redhat.com>
-> Sent: Wednesday, April 16, 2025 12:12 PM
-> To: Yoav Cohen
-> Cc: Uday Shankar; linux-block@vger.kernel.org; axboe@kernel.dk
-> Subject: Re: ublk: Graceful Upgrade of ublk server application
-> 
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Wed, Apr 16, 2025 at 08:16:44AM +0000, Yoav Cohen wrote:
-> > Hi,
-> >
-> > The use case is as you say to replace the binary (update) without making the bdev to disappear.
-> > Currently I don't even use the user_copy(to avoid the 1 more system call) so the io buffer is also part of the sqe which is prevent me from free it from userspace perspective.
-> > So yes, even ABORT_URING_CMD by given tag can be enough.
-> > What do you think?
-> 
-> I think the requirement is reasonable, which could be one QUIESCE_DEV command:
-> 
-> - only usable for UBLK_F_USER_RECOVERY
-> 
-> - need ublk server cooperation for handling inflight IO command
-> 
-> - fallback to normal cancel code path in case that io_uring is exiting
-> 
-> The implementation shouldn't be hard:
-> 
-> - mark ubq->canceling as ture
->         - freeze request queue
->         - mark ubq->canceling as true
->         - unfreeze request queue
-> 
-> - canceling all uring_cmd with UBLK_IO_RES_ABORT (*)
->         - now there can't be new ublk IO request coming, and ublk server won't
->         send new uring_cmd too,
-> 
->         - the gatekeeper code of __ublk_ch_uring_cmd() should be reliable to prevent
->         any new uring_cmd from malicious application, maybe need audit & refactoring
->         a bit
-> 
->         - need ublk server to handle UBLK_IO_RES_ABORT correctly: release all
->           kinds resource, close ublk char device...
-> 
-> - wait until ublk char device is released by checking UB_STATE_OPEN
-> 
-> - now ublk state becomes UBLK_S_DEV_QUIESCED or UBLK_S_DEV_FAIL_IO,
-> and userspace can replace the binary and recover device with new
-> application via UBLK_CMD_START_USER_RECOVERY & UBLK_CMD_END_USER_RECOVERY
-> 
-> Please let us know if the above works for your requirement.
-> 
-> Thanks,
-> Ming
-> 
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index b502ac07483b..b2cece376f30 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2223,22 +2223,25 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+ 	if (!nvme_init_integrity(ns->head, &lim, info))
+ 		capacity = 0;
+ 
+-	ret = queue_limits_commit_update(ns->disk->queue, &lim);
+-	if (ret) {
+-		blk_mq_unfreeze_queue(ns->disk->queue, memflags);
+-		goto out;
+-	}
+-
+-	set_capacity_and_notify(ns->disk, capacity);
+-
+ 	/*
+ 	 * Only set the DEAC bit if the device guarantees that reads from
+ 	 * deallocated data return zeroes.  While the DEAC bit does not
+ 	 * require that, it must be a no-op if reads from deallocated data
+ 	 * do not return zeroes.
+ 	 */
+-	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3)))
++	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3))) {
+ 		ns->head->features |= NVME_NS_DEAC;
++		if (lim.max_write_zeroes_sectors)
++			lim.features |= BLK_FEAT_WRITE_ZEROES_UNMAP;
++	}
++
++	ret = queue_limits_commit_update(ns->disk->queue, &lim);
++	if (ret) {
++		blk_mq_unfreeze_queue(ns->disk->queue, memflags);
++		goto out;
++	}
++
++	set_capacity_and_notify(ns->disk, capacity);
+ 	set_disk_ro(ns->disk, nvme_ns_is_readonly(ns, info));
+ 	set_bit(NVME_NS_READY, &ns->flags);
+ 	blk_mq_unfreeze_queue(ns->disk->queue, memflags);
 -- 
-Ming
+2.46.1
 
