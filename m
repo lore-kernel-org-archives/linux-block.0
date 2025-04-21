@@ -1,135 +1,123 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6A31EB3E;
-	Mon, 21 Apr 2025 02:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA021184
+	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 02:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745203456; cv=none; b=uLEtcou5IVfdf6IVkIPbSYdj+eGrwG3nQceEx0v0JnUwhcUmNsSCA5bfV+lyjqLniFSOFgpD5GsEVmZ8Hq8U0kJihddPVgT3YHZ/cl/64NQ/Jvhk0L3PFCRXxoIBSxwI6anb5VDFLeA7uVPTR7Sh0YeuFOq+Z+7hVYPxsKyzu5A=
+	t=1745203929; cv=none; b=UYRg7ww3oOXfk/tTViXa+80EZKboVc4nFw+GHKNn7CAUkjlkYH2bUy2NGfMMJzsVdhZIJxvvor9ExUNC5hszcAGGo9Zv3Zc8GOwh8s++5e6cNEH1LxDm7qE0+XcGEIAeSRlWQb4b+wFWLWtdSJgxYQpd224X0aCeDbKV2uQXLjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745203456; c=relaxed/simple;
-	bh=pB7viRc1r2JGTE6pXLj5K8q7cEpzje4VepltOd+V8BI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tBLDN4z/1HxE9K4F/5v3Oi3qW5fqQ4Mg17ToAS15oiyYuK1ZrJEDo81MnU7Px7DBMuKrPD6A3Ejdaea9iFrpmM9NmaIYxKpGdGk+cvMPoamXcdcyOzYM63RqN+5EeOmrcqbqS93QRGLEvxx6AnEfM5fylcF3Q/n9SMXJfhDhqCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zgq2n35y2z4f3jY1;
-	Mon, 21 Apr 2025 10:25:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 47A121A018D;
-	Mon, 21 Apr 2025 10:25:29 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.112.188])
-	by APP4 (Coremail) with SMTP id gCh0CgA3m1+MrAVoFxZkKA--.3102S6;
-	Mon, 21 Apr 2025 10:25:28 +0800 (CST)
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org
-Cc: linux-xfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	tytso@mit.edu,
-	djwong@kernel.org,
-	john.g.garry@oracle.com,
-	bmarzins@redhat.com,
-	chaitanyak@nvidia.com,
-	shinichiro.kawasaki@wdc.com,
-	brauner@kernel.org,
-	yi.zhang@huawei.com,
-	yi.zhang@huaweicloud.com,
-	chengzhihao1@huawei.com,
-	yukuai3@huawei.com,
-	yangerkun@huawei.com
-Subject: [RFC PATCH v4 02/11] nvme: set BLK_FEAT_WRITE_ZEROES_UNMAP if device supports DEAC bit
-Date: Mon, 21 Apr 2025 10:15:00 +0800
-Message-ID: <20250421021509.2366003-3-yi.zhang@huaweicloud.com>
-X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
-References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
+	s=arc-20240116; t=1745203929; c=relaxed/simple;
+	bh=Oclm9dmXWhIcgSHwh1RuruOhxVe1JUzmy9uE33V89u4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YbC3flbueioUEHJqWRoTeda4SVLSryBTNWXQ4hFKw3kV/AW97ptdobr0KF3rEhmjc2rOmejHH62qZKjAcrJGEWfDug3QuxfChAg5hbiqlfwRRISo49gw/vAT/FmdkM6BVlQyAEKu/u6jnth0aWTPxdRPvEQUEpYQFEmJJlXZ/C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9Iw/9Yn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9Iw/9Yn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745203926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YI1Pypu2FW7l3S7IiGzxy1fl9eACeynpKO3foEAvve4=;
+	b=Y9Iw/9Yng0Vas7C2UG/G82iC98tPpKZAkOpQNzOf+mkQkCH8za1w7eawjZ0olljP7tPW7v
+	Qr81OrfPuAWew9ygfdS5CEuJgS3jrosle4VsXk92EWERGn1h24L32onQPh77HYHXleJBVI
+	sZNh4lAnYM7Hl1/cZrnEkr2YJt3A+Vc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-YlK2rDJ5MmS9yXBXAa10Xw-1; Sun,
+ 20 Apr 2025 22:52:05 -0400
+X-MC-Unique: YlK2rDJ5MmS9yXBXAa10Xw-1
+X-Mimecast-MFC-AGG-ID: YlK2rDJ5MmS9yXBXAa10Xw_1745203924
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D3F418001EA;
+	Mon, 21 Apr 2025 02:52:04 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.114])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 95CB219560A3;
+	Mon, 21 Apr 2025 02:52:00 +0000 (UTC)
+Date: Mon, 21 Apr 2025 10:51:55 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jared Holzman <jholzman@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, csander@purestorage.com
+Subject: Re: [PATCH v4]: ublk: Add UBLK_U_CMD_UPDATE_SIZE
+Message-ID: <aAWyy9qFlURHabHM@fedora>
+References: <918750ec-42e8-46d4-bbfb-e01d3dce6ed0@nvidia.com>
+ <aAGQLYDOFY5PyUMJ@fedora>
+ <26675f4e-07c5-4a76-ba98-463c5bd0406c@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3m1+MrAVoFxZkKA--.3102S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7ury8Ar4xJF4kuF15CrWUCFg_yoW8Cw4kpF
-	W3Xa42k348WF47C3sxXw47AFy3Gw1kGa4jgFn7K345Wr13A34Fgr1rKa43XFWkX3s3uayY
-	yFZ8G3s7Ca15XwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmY14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
-	kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
-	6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42
-	IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIev
-	Ja73UjIFyTuYvjTRNiSHDUUUU
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+In-Reply-To: <26675f4e-07c5-4a76-ba98-463c5bd0406c@nvidia.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Zhang Yi <yi.zhang@huawei.com>
+On Sun, Apr 20, 2025 at 11:06:17AM +0300, Jared Holzman wrote:
+> 
+> 
+> On 18/04/2025 2:35, Ming Lei wrote:
+> > On Wed, Apr 16, 2025 at 01:07:47PM +0300, Jared Holzman wrote:
+> > > Currently ublk only allows the size of the ublkb block device to be
+> > > set via UBLK_CMD_SET_PARAMS before UBLK_CMD_START_DEV is triggered.
+> > > 
+> > > This does not provide support for extendable user-space block devices
+> > > without having to stop and restart the underlying ublkb block device
+> > > causing IO interruption.
+> > > 
+> > > This patch adds a new ublk command UBLK_U_CMD_UPDATE_SIZE to allow the
+> > > ublk block device to be resized on-the-fly.
+> > > 
+> > > Feature flag UBLK_F_UPDATE_SIZE is also added to indicate support for this
+> > > command.
+> > > 
+> > > Signed-off-by: Omri Mann <omri@nvidia.com>
+> > > ---
+> > >   drivers/block/ublk_drv.c      | 18 +++++++++++++++++-
+> > >   include/uapi/linux/ublk_cmd.h |  7 +++++++
+> > >   2 files changed, 24 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index cdb1543fa4a9..128f094efbad 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -64,7 +64,8 @@
+> > >           | UBLK_F_CMD_IOCTL_ENCODE \
+> > >           | UBLK_F_USER_COPY \
+> > >           | UBLK_F_ZONED \
+> > > -        | UBLK_F_USER_RECOVERY_FAIL_IO)
+> > > +        | UBLK_F_USER_RECOVERY_FAIL_IO \
+> > > +        | UBLK_F_UPDATE_SIZE)
+> > > 
+> > >   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> > >           | UBLK_F_USER_RECOVERY_REISSUE \
+> > > @@ -3067,6 +3068,16 @@ static int ublk_ctrl_get_features(const struct
+> > > ublksrv_ctrl_cmd *header)
+> > 
+> > I try to apply this patch downloaded from both lore or patchwork, and 'git
+> > am' always complains the patch is broken:
+> 
+> I think this is because of my workflow. I cannot send email outside of our
+> network using git send-mail so I've been copy-pasting the patch into
+> Thunderbird.
 
-When the device supports the Write Zeroes command and the DEAC bit, it
-indicates that the deallocate bit in the Write Zeroes command is
-supported, and the bytes read from a deallocated logical block are
-zeroes. This means the device supports unmap Write Zeroes, so set the
-BLK_FEAT_WRITE_ZEROES_UNMAP feature to the device's queue limit.
+oops, copy-paste usually breaks patch style, probably `xclip` can help you
+if copy-paste can't be avoided.
 
-Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
----
- drivers/nvme/host/core.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+You probably need to find one email client to support importing patch plain
+text from file or sending patch directly, such as mutt/msmtp,...
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index b502ac07483b..b2cece376f30 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2223,22 +2223,25 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
- 	if (!nvme_init_integrity(ns->head, &lim, info))
- 		capacity = 0;
- 
--	ret = queue_limits_commit_update(ns->disk->queue, &lim);
--	if (ret) {
--		blk_mq_unfreeze_queue(ns->disk->queue, memflags);
--		goto out;
--	}
--
--	set_capacity_and_notify(ns->disk, capacity);
--
- 	/*
- 	 * Only set the DEAC bit if the device guarantees that reads from
- 	 * deallocated data return zeroes.  While the DEAC bit does not
- 	 * require that, it must be a no-op if reads from deallocated data
- 	 * do not return zeroes.
- 	 */
--	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3)))
-+	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3))) {
- 		ns->head->features |= NVME_NS_DEAC;
-+		if (lim.max_write_zeroes_sectors)
-+			lim.features |= BLK_FEAT_WRITE_ZEROES_UNMAP;
-+	}
-+
-+	ret = queue_limits_commit_update(ns->disk->queue, &lim);
-+	if (ret) {
-+		blk_mq_unfreeze_queue(ns->disk->queue, memflags);
-+		goto out;
-+	}
-+
-+	set_capacity_and_notify(ns->disk, capacity);
- 	set_disk_ro(ns->disk, nvme_ns_is_readonly(ns, info));
- 	set_bit(NVME_NS_READY, &ns->flags);
- 	blk_mq_unfreeze_queue(ns->disk->queue, memflags);
--- 
-2.46.1
+Thanks,
+Ming
 
