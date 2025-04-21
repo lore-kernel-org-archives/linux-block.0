@@ -1,96 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D04171CD;
-	Mon, 21 Apr 2025 17:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B9A1E990E
+	for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 18:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745255964; cv=none; b=eTXWQdV6wADVegft4gPhL3d98w9qdraNVR6IecNkPG078hsj4VC7UPwMrFLwikSylBoY9XJiG+vTzr9oN6rSdX8UzjztPRSUaKX2Hqum4EX5gisWZCW7x66TyxXVmJr29rbF9pJ3B0ABg+PWBidd6EQCTFDDcjyw3V6bVA+KLkc=
+	t=1745260205; cv=none; b=u5aAz7noJQBo7+sDKCVOuY1qNFQu64iVdtjuuIoBc9DCmicE3/XQsFSpc/BdV1tjfaJiOqBuC4PKJ+YQgjCrlOLvQcZCUyqzO+yhOX4d4Ugb0FuiBh/JhpKO/PVnnkgNGsuA1D5xdg/1RxDrUOUW4EE7xM3qHf6mc5eaTJU+sDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745255964; c=relaxed/simple;
-	bh=ZOmyRXmRoEyIIWzuCFtXPMy0+SkSJbikUvZaUoGvQcU=;
-	h=Date:Subject:From:To:Cc:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rEcG4t5bBZmDGeJnDL4fUBlLGzdKN0MVHde61WAlCu5A/kRbOBwH/JNW18PvdQ4yw20i6EsBSdY1olkxRwhZkJF4006MA/TIKfX2n44LciOnTqS1W9mHInYMhFc1mHE+Vzd9/wHpJkZu7wBnLtC9e1ZWjyCQ2g92py3urM8/6s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJCuQvip; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745260205; c=relaxed/simple;
+	bh=jCdOVNRAWAR9DqJFWEEs04l5X11ER7Or5ifEH0NF0vQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=swPaoJ57oJORsnHgCWI4N/mpE4RrpraupuM/uZEOYCZqCCLWcLS9PohWYvdFo5ufU4oX34s/wqUaGofpCTxZkHchxDH/QnhtpsyjsH1M25QUJ5Rz0cdXfe8aiaxJifgiyJIEh+vXdPFJDTSn5Ad0uJBbZmdZDakdAbRTb/vM8nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=G156DrdZ; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJCuQvip"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D66CBC4CEE4;
-	Mon, 21 Apr 2025 17:19:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745255963;
-	bh=ZOmyRXmRoEyIIWzuCFtXPMy0+SkSJbikUvZaUoGvQcU=;
-	h=Date:Subject:From:To:Cc:In-Reply-To:References:From;
-	b=EJCuQvipDVnY7id7jE4MK9n5lGKrbLeIYtiuKJhYyaNmqemhOz6tlamK0cMp+JFWd
-	 u4g9WYtQuzsn9aKVlpaJ+hLd0p/wNI4WpN4G5PM1LHLFGRa25fS8DxRQLq7j0Tmdon
-	 CFY/79wHx6dwdhFy7JTMJqR9JNhr+jExU2myFOGjNla1a/GwAroSQ2umF/HqG2G0nQ
-	 M3TO99CfyD/dwtkLArTLIaNZd+98UnM9uW0d2QM7vr0pxgp1POL/lz3iHkbhozv0sH
-	 qi5Ic/SkR237M0LkTpuy/Lg7WPopws1Jh8xOK7EZV6dtMFqGas/GhAQ+PfCAy4f4Bn
-	 J57HQMt14lvIw==
-Date: Mon, 21 Apr 2025 10:19:23 -0700
-Subject: [PATCH 3/3] xfs: stop using set_blocksize
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: djwong@kernel.org, cem@kernel.org, axboe@kernel.dk
-Cc: shinichiro.kawasaki@wdc.com, linux-mm@kvack.org, mcgrof@kernel.org,
- linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
- willy@infradead.org, hch@infradead.org, linux-block@vger.kernel.org
-Message-ID: <174525589090.2138337.6822381628832847466.stgit@frogsfrogsfrogs>
-In-Reply-To: <174525589013.2138337.16473045486118778580.stgit@frogsfrogsfrogs>
-References: <174525589013.2138337.16473045486118778580.stgit@frogsfrogsfrogs>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="G156DrdZ"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-85b3f92c866so63846539f.3
+        for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 11:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745260201; x=1745865001; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGkg6fJfEeqQsskmUDXVrcnD2zKVMxuHFOsr406hQA0=;
+        b=G156DrdZtaYM/Y+a5/XnVZP4hvSxrhjB+tSS4+82b/OFeW1NxMJhJDhSVNVKb7c+L8
+         oY/2NKPkvPjX50Ll4UUgnju7y5NQvV0nUMS4cexa1biONZXZmHlWhmGz9INadAz90k1u
+         x+gfr+9qNs7oYT9sxn4bp8at0EVTUQhjzV3M4g0ek5qKDImlNdZXZ7oH9KkKZJG54Txl
+         caOyjiTiNSUxC+/aNjyBv+sq0WMrbZa21PBW0c2f4SdoXad6jqMRVedAHp8c9DhJ6alf
+         TX3qtp8KZ1emhJy6nvEEbA4WuajOOC+yDvpd95LYrD+L1MKJmCj7TID84A+o31Pa05ah
+         SDnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745260201; x=1745865001;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vGkg6fJfEeqQsskmUDXVrcnD2zKVMxuHFOsr406hQA0=;
+        b=d9LWlkjZRAM9EcIaL/2nACMgPWIgTzOSSYPz5eUj7Qcj9L0yvevqAd5DR5zpspnwA/
+         Nd0iAWP/vIUzFcbg7ZsJWD+gNzd5CAs2zIuPIpgQrexk9Zjyz/Z13UfajbbAfjLwElyK
+         blfmbg1DVZpM5qs8t/cqJXDlyp3lJ6jJQ+cgErEPbAXPZtLK3KEsIPC6dHfMbnoE+7we
+         POndcAsDViWclZwyfWlruCJlrnKpXzBfvUfsb0yr705yyx3/b23aThVLZEWkhXQgGn9u
+         paoH4/2Sn3BZ2pvJ6wWOkHM3kvV+dTNq/QwdHBZIusMDboI+eKuJvT4P7KkrjTY0mz9o
+         QFqw==
+X-Gm-Message-State: AOJu0YzHYWlunXXic0mBQjCnB0xQ6uaGqsyPqKoQ42VvKqvIfrkLDwJB
+	ZVCibQ4qfD0qV4fu2nBwyWWaYc4z0QPMGWBspY/0HB7RRI9YmqJChdaLzbfb0lXiOuc/3h4WtO9
+	Y
+X-Gm-Gg: ASbGncuDO94qS3wJrbbEBKleUtSicWSHW2IGQmJ85OjeNPgWRk9k37HmMy8PQHwFvWY
+	djVVh99nsAIk5alX7wjzxAcsUhhBjqmulZS8tScuH4crFOH+x57S+rfuGJOUUWza7J5IxQXlI9u
+	wp+tP/V8bgx/D4SY7HlQu6QKs8rP2EviY/SvCWw6wY0UZ9zowdAv7O2AjeIg0v+ounAmqbYh2Tt
+	xY04YXy57ZRSuOgyLLaaKGI8WsPYLH68DeO8OS5ALXdvwsfOpLKSvLbQnlqEaeu6Xp3cpoUiC9L
+	4/SifPm+P9zeoA763iI8k/JAcwesokiQBSBezX1gnNUklag=
+X-Google-Smtp-Source: AGHT+IGs+RY6yuQIDSZ+7ZuvnOYwO/eV79WXKG2RfxjH69TJj3I/337jZDquAm7a3dq3yNkCxgc1lw==
+X-Received: by 2002:a05:6602:7216:b0:85b:3407:c8c with SMTP id ca18e2360f4ac-861dbe93745mr1237803239f.11.1745260201114;
+        Mon, 21 Apr 2025 11:30:01 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-861d96129aasm179946339f.23.2025.04.21.11.30.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Apr 2025 11:30:00 -0700 (PDT)
+Message-ID: <b858ce52-212e-4913-963b-07fcead96f30@kernel.dk>
+Date: Mon, 21 Apr 2025 12:29:59 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: for-6.16/block rebased
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-From: Darrick J. Wong <djwong@kernel.org>
+Hi,
 
-XFS has its own buffer cache for metadata that uses submit_bio, which
-means that it no longer uses the block device pagecache for anything.
-Create a more lightweight helper that runs the blocksize checks and
-flushes dirty data and use that instead.  No more truncating the
-pagecache because XFS does not use it or care about it.
+Just a heads-up that I rebased the 6.16 tree this morning, as there's
+been a good amount of changes flowing into the 6.15-rc tree. If you have
+a tree that is based on the block tree, and you already started it for
+the 6.16 series, please rebase as well. It's early enough that I didn't
+think this would be much of a concern.
 
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
----
- fs/xfs/xfs_buf.c |   15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index 1a2b3f06fa717e..5ae77ffdc947b1 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -1719,18 +1719,25 @@ xfs_setsize_buftarg(
- 	struct xfs_buftarg	*btp,
- 	unsigned int		sectorsize)
- {
-+	int			error;
-+
- 	/* Set up metadata sector size info */
- 	btp->bt_meta_sectorsize = sectorsize;
- 	btp->bt_meta_sectormask = sectorsize - 1;
- 
--	if (set_blocksize(btp->bt_bdev_file, sectorsize)) {
-+	error = bdev_validate_blocksize(btp->bt_bdev, sectorsize);
-+	if (error) {
- 		xfs_warn(btp->bt_mount,
--			"Cannot set_blocksize to %u on device %pg",
--			sectorsize, btp->bt_bdev);
-+			"Cannot use blocksize %u on device %pg, err %d",
-+			sectorsize, btp->bt_bdev, error);
- 		return -EINVAL;
- 	}
- 
--	return 0;
-+	/*
-+	 * Flush the block device pagecache so our bios see anything dirtied
-+	 * before mount.
-+	 */
-+	return sync_blockdev(btp->bt_bdev);
- }
- 
- int
+-- 
+Jens Axboe
 
