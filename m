@@ -1,87 +1,73 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E0178C91;
-	Tue, 22 Apr 2025 06:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3092C78C91
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 06:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745302320; cv=none; b=aRdwBMXoLAzOxd9a+sl/gcX6kH//tPRLdb+VgYYfPgy30MnmYpK7c7ROyw6FIJ5aaK/jbj3nJsi+8ZMTkV6aTeDXzsSy+foXhfnYvUIS1iNI1hojlMha2I5jofPRiSghuEz5X6eWjnGOhe88OQkokO16+sKcqh2VJa/L44syATs=
+	t=1745302389; cv=none; b=FyApgwPO48IshFNbTiC2AWNjNXYTrGdgkttkvJQ5Pe7+EuW6X8C8eaLnCGVI0+RNqzPBC1+z6otUQR+eIBwg9IepBmBNc+GWYqZZImLfSEmT4/a7DNkJsrB1GrTMemy39vT+cWJvL347Vh7Uf0dc98dJEMJrPxfAPc55SdXBm9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745302320; c=relaxed/simple;
-	bh=3U6SSAwI++1mMarBQrCnXaUsz8plHo4CysXh50ykFH4=;
+	s=arc-20240116; t=1745302389; c=relaxed/simple;
+	bh=kRbhIwWWUsJB195/toGbzC6O/f350hCQHWhvsZNmzXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lj6MWyIFkyqxZWS7FBFjkF+LyJlh4RMwQ2O1fbEDKweuJYA0xuPt9VQqg1ruyJK0u+rQb/y680fvP5gWTCAb+Sg6VnH8QyBPzM5k4KRB0xjpqp2vvi5mtxGYMtSY16LFHkDb6ZuNZ0cvJkUqE7lCLMa+gOjuTaznej6qH8yPWtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IfJgyzCR; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUxWdX1Wgsvvz/3O5vB894htIz6sccZt8v7mrvirp02SghI8ywFz7uxRy4Ls9IudAdKErhPQYuG7nAeRCNIJIn2KfIGERFvIARcVvhreQAs4G+BtJs6or00emFfL5iyIHXsMJjScb5iw/FW/6Xu8iP6FJDg0i19qWMxztv0xEAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vrMgQ9cM; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IfJgyzCR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vrMgQ9cM"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=i9IDz0JyHUWXPtjTKZlN6b5bZEngPXaM8Z/wmtOSlTc=; b=IfJgyzCRY3hexpQwQo3ixEoWxK
-	/1LEeNL6/goAyEsYXJZAbBev1+aHqotUrm7a7BhLKJf3iUSS/ieq+qXhNpOo2p+/fwqN9oiMUjFmY
-	zn4owcYOy9LwGIeVYYx0PQ4oD6vNIAgW+N19UTNCjhic8NNYpSzw2L8qbbbxIhQ9HgBbaCIWa9MYj
-	h2f6u6/TMpt53ZqgT3xrq5Mjp8EdM7XDk473nrJ+b2fShwDOTd5+5MQf074BUnVG7Scdug5X6PoW1
-	5UsUEJP4sVyq2G5YWvSt/NUNAFVYsXf4x5RAUDS6aoATjL+ptGY2s9dLcBPFCtO55FvEl4Ea4G/G3
-	t7GpDpCg==;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yXl/h38b4Qmh3WpWz+JYMYZT8mmdPHwI2Y1SwU1cyUU=; b=vrMgQ9cMfkagXslRE8q3uZaxmo
+	g4XfY7qsTl3z/zEGevCrN1qJdf40bgaLcENEcCz0DGkIbKQFH60UQIanKOuTAPoGXL7zdNsbCR7Q5
+	RS2IF2suNesUSjhcL169LAuHw2hGVsJqSk4qyzkjXzbhZ5yF1fC9A1gamfKWrMfpWWA53BAltyAvr
+	Rq+bF7fCSGvVqle2TanwwweSYOK66LAUXWxCR0gld9R1gwULSd383rfEUVOcpMZx5oygP/Iz81rwX
+	+9U0rELmDhL8TXfDwAyyPGQUR/3xESeXHw9Tu/OvlPqMDk27YuDz5fI00tX9Nunjqfw4qXnQtrn7b
+	gG9NKlAg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u76rH-00000005vDV-1Qlj;
-	Tue, 22 Apr 2025 06:11:51 +0000
-Date: Mon, 21 Apr 2025 23:11:51 -0700
+	id 1u76sV-00000005vJr-08mq;
+	Tue, 22 Apr 2025 06:13:07 +0000
+Date: Mon, 21 Apr 2025 23:13:07 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk, xni@redhat.com,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	song@kernel.org, viro@zeniv.linux.org.uk, akpm@linux-foundation.org,
-	nadav.amit@gmail.com, ubizjak@gmail.com, cl@linux.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 1/5] block: cleanup and export bdev IO inflight APIs
-Message-ID: <aAczJzofvwrCUUNa@infradead.org>
-References: <20250418010941.667138-1-yukuai1@huaweicloud.com>
- <20250418010941.667138-2-yukuai1@huaweicloud.com>
- <aAYzPYGR_eF7qveO@infradead.org>
- <f01cb2d7-d69c-1565-d3e4-09c4b70856f6@huaweicloud.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, axboe@kernel.dk,
+	Matthew Wilcox <willy@infradead.org>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH] block: integrity: Do not call set_page_dirty_lock()
+Message-ID: <aAczcwHDWmlDgtdy@infradead.org>
+References: <yq1v7r3ev9g.fsf@ca-mkp.ca.oracle.com>
+ <aACcuGpErEsBcxop@infradead.org>
+ <yq1jz7idh39.fsf@ca-mkp.ca.oracle.com>
+ <aAXTz3e8-X1SlGvX@infradead.org>
+ <yq1a5899caj.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f01cb2d7-d69c-1565-d3e4-09c4b70856f6@huaweicloud.com>
+In-Reply-To: <yq1a5899caj.fsf@ca-mkp.ca.oracle.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Apr 21, 2025 at 09:13:57PM +0800, Yu Kuai wrote:
-> > I'm not sure why this is needed or related, or even what additional
-> > distinction is added here.
+On Mon, Apr 21, 2025 at 10:14:27PM -0400, Martin K. Petersen wrote:
+> > I do not personally have a use case. But we support using file backed
+> > memory right now and have since adding these user interfaces. Suddenly
+> > removing the dirtying will cause silent data corruptions for these use
+> > cases if they exist, which is not a good change.
 > 
-> Because for rq-based device, there are two different stage,
-> blk_account_io_start() while allocating new rq, and
-> blk_mq_start_request() while issuing the rq to driver.
-> 
-> When will we think the reqeust is inflight? For iostat, my anser is the
-> former one, because rq->start_time_ns is set here as well. And noted in
-> iostats api diskstats_show（/proc/diskstats) and part_stat_show
-> (/sys/block/sda/stat), inflight is get by part_in_flight, which is
-> different from disk sysfs api(/sys/block/sda/inflight).
+> Oopsing in the common use case isn't desirable either, though :(
 
-Trying to express this in a not very obvious function name isn't
-going to work very well.  Documenting your findings in comments is
-much better.
+Agreed.
 
-> > 
-> > I'd just change this helper to call blk_mq_count_in_driver_rw for
-> > blk-mq devices and remove the conditional from the sysfs code instead.
-> > That gives us a much more robust and easier to understand API.
-> 
-> Ok, and another separate patch, right?
+> In any case I'll work some more on this tomorrow unless you beat me to
+> it.
 
-Yes.
+I'm not going to get to this today, I'm still in holiday catchup mode
+with a huge unread inbox.
 
