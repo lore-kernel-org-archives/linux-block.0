@@ -1,45 +1,56 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0756196;
-	Tue, 22 Apr 2025 04:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7AD18A6AB;
+	Tue, 22 Apr 2025 04:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745295600; cv=none; b=gB1KadOcg64PEURNhBcR3milh8GvszBCa3VPvasE6oPknQE2xiUdiZEXL7dMFd+WAoSu/lptndesstXhlY7HtmLjLs2vRXkvQCzVQXk/jx4h60vBOVRHDwXWNPqrzyB6HqOb+++elTRJDEfuIka9zM2Kldfepmdg6bTsQrYOQv4=
+	t=1745295819; cv=none; b=W8U4DKMbYI7kJPrTrF1DGgg98pnfL4m05E9q3QVfrWeEg9nfOTvFrJ7hXqO39sDZfr/3o9dDIFPbA/4+Cgo7Sjqek6wvv3f5v0mEB5yRpPdP2YG5Syp/XcV0VMprozE9Nu4yF1ou8oDgkB54qa99LAYngFkL9pQWxhIPFM55PRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745295600; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1745295819; c=relaxed/simple;
+	bh=ZsL/pPv9Fie+gQQJKm5n3DFw8zPfnFLMFMmjcCsXAtk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NCfa5/3o7an3Z3TfuSvRdD9Nm1h9lgXlm9Rxei+KLC35LHHW8auULWQQN4A1UXW36W5JllBLclXQmILgbH5+zQH1Kfq+j1/UBLkyblOLum/wMdcwCvsX/MP2I/CsszuD6vfULbgCgOZNnsvUEIPVIRzlpxXS6iyWRvMYqRdYLmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vZEUFcWx; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vZEUFcWx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=vZEUFcWxXnhc+35qpFFROnZsl1
-	vfTqHnVyYvuCMGGWzK/aqmouXxp/l/KxRDk1EoO79DF3rxzT8NKN5cJn8BVHSxRG21PP2X0ql3dBJ
-	aZFr6bLv2ECpjrquEOq2yEW6/u4Z1PIISz/Vz6qlmzAVjeuAvwMBbrkhqdcKqq4ypC3p4Y8QMd+DA
-	avQ9gNpLSFCUmQKTpgrYX9FOytIffBRRgScE+jHS7vUWPqT7R2hSwiIXHbyYamzBbaBj/nlygjsLN
-	tYqFTZwJMBekIlygWaOkuvGzg/PTxzeEyecu2WHpx/IrCnyZwrhzsYhcMUbTXEi9GTm2wCT53E4sj
-	r3ofwSrQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u7570-00000005mQL-1VUL;
-	Tue, 22 Apr 2025 04:19:58 +0000
-Date: Mon, 21 Apr 2025 21:19:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: cem@kernel.org, axboe@kernel.dk, mcgrof@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	shinichiro.kawasaki@wdc.com, linux-xfs@vger.kernel.org,
-	hch@infradead.org, willy@infradead.org
-Subject: Re: [PATCH 3/3] xfs: stop using set_blocksize
-Message-ID: <aAcY7sxXHUFWBsC_@infradead.org>
-References: <174528466886.2551621.12802195876907852208.stgit@frogsfrogsfrogs>
- <174528466963.2551621.17345314319654390051.stgit@frogsfrogsfrogs>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dl540kjUs74H43ype5hpehida0zKhqqhXqzFxW8fsStsQZvnJ9Vdxt2LIub3dRyZRU4ajnlq+eqeZTPf2GK1wGpz6aO+I72QKsoVVkX0tVEeGz0E5enCaXcoIWcbRKClUK0ubrh6WILn3uha+eSMNyZNSCFQN+6LCdQND4YHC9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A64FD68BFE; Tue, 22 Apr 2025 06:23:30 +0200 (CEST)
+Date: Tue, 22 Apr 2025 06:23:30 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v8 04/24] iommu: add kernel-doc for iommu_unmap and
+ iommu_unmap_fast
+Message-ID: <20250422042330.GA27723@lst.de>
+References: <cover.1744825142.git.leon@kernel.org> <d3ad1e84d896aea97ebbd01c414fb1f07dc791d3.1744825142.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,10 +59,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <174528466963.2551621.17345314319654390051.stgit@frogsfrogsfrogs>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <d3ad1e84d896aea97ebbd01c414fb1f07dc791d3.1744825142.git.leon@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+On Fri, Apr 18, 2025 at 09:47:34AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
+> existing limitation of underlying functions which can't split individual
+> ranges.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This actually only adds kerneldoc to iommu_unmap_fast.
 
