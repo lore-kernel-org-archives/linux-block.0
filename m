@@ -1,111 +1,140 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204B0EEBB;
-	Tue, 22 Apr 2025 15:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E8B1494A8;
+	Tue, 22 Apr 2025 15:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745334931; cv=none; b=OFt6RvxrgBAK1d1uH5ZuXbFMb7Pu1NRlLjSDGhtbqX82u9aRc8u4+oFCrW6oK4x5sdZI7bsjOqmaue8Rk6MdbD48UEK02BZ4ZmuBFJ9wiLUpWUl9wSUUF5Ri3IbcYwzki3c5l374K0uugZngZkqJV7ZOV6kxfQ/SIagb2UZOzbk=
+	t=1745336162; cv=none; b=oxd6bAZJrxfR/Gv/J3omjr+4S7UHjz/beGx3pdkhZPEU/Ddp5ol8PPuy9NELQIl7/YDPQw1Xe5ZzjvvgcKchKT664VKLg/osVolQ7ilJCL5Ft5YLnTkroWhmu8HM2O1KnelcGLrnjgLtyEmQKSyrzDqtjQ+Lyf7ZJYpNr3KxmZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745334931; c=relaxed/simple;
-	bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NQsLCmduvc+NTPoXud6xxbT3R6pkkO68nC2hEx3SnQz9w4JWDCgjHAtHxxf8Jzs71jbbgl5k11KiX+Xb+/Wz98N0WXbXr2Jnw0iQPqn1DrafS+kqIWm9MGXMi1vBDdimz7CFARG+2fKbzaw4POGZ2Qm+5GwKMBO7dD1WfCFN0pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1seoP+A; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745336162; c=relaxed/simple;
+	bh=mPUjzTsoFC/NJnHC63CpAKhwboTnx8d1kgG3aqCLZmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SpVLF4Q6S/dhdJlWihPC25jbbrow0mBmpldfNq5T2EftZMOwvhAfeDav3qmEsVr+Z/9poM+cERWlTq3sH/LATmjaPnUzJk2WhDIDEJUZroiAwFle9AcM4F6jcxxsr/TkpDIXWQHTLzD0rYJfa5/zin8qB9kzdkRp1jabWm9Cemg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qNCi+Qtl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1seoP+A"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-af8cb6258bcso239816a12.3;
-        Tue, 22 Apr 2025 08:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745334929; x=1745939729; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
-        b=Z1seoP+AZVnbXBhyUfCB5LcGeR/jQwabr+dVjCbLXVgwwBtYX3fHEbWVrxb+z/VIor
-         /1KXQkom5I1Mqmzupqc7HjQr5Sg7ISLOO+YTkUboHFAatku/Li1/+XUEHh0cw4iev5I7
-         PS9yMJGIa7HF4+A8WxdaQipy/OtcpWE2HmytJSID++6qHYjDRqjX+W9nX2Dzw7e21H7v
-         3iokcj/DJ2ezKxBY2zidC+eHC20IgmAdc4Xh8hOG1VMgw15VYU6ILbHkBKt1IcMQC19r
-         tQEHi0rH8dQQ3Maa0OGycOcan6FwnNSIOqo/DJH7aS7PjMSkTdaJ5flA7THRVlM0aBx1
-         J9+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745334929; x=1745939729;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
-        b=r+DCZHJixW1FxhfWCpLsiremgsGnIf3NWJptAqcVdt6CktPMODu92KveFQjcc8wzjO
-         SAmRzk9bSimYGFSrcT5U/3p3dKi9I/NRy0AgQMKuFQdtk4hPM92Nv6z2dBf67YYGR9d7
-         pZvXaqEoPXM5rVUR2RRFeE446szAtvwV0KVF7Q460F3COq0oSr1bNTnl/hGjRtHw+6/I
-         l8v4BGTiRAVmBs0FE0/LGMMyZLf/yuyf6J72FpRnzC8gDkZ1lC3hxon45+t4/2+mBH2a
-         8f72ZRYP4tuktIwrqKPgHRm1JD47PR3TYXHkFytOvTkaJRxrVHF31Z6H9mYDrwKNCUcn
-         3WeA==
-X-Forwarded-Encrypted: i=1; AJvYcCU8WoPXH7Ly5lHdsjLzD3BjhUdiLkXNiSIvRIxY/JvSpFo+kPMoDiCJXGeOSx+rCYre1tAgg4IRnBjCtrCb@vger.kernel.org, AJvYcCUbk6jUOADrQWGooGnCdGaowN/f52dCs0sm8u6u1dSIRnffBuxI+uq9YUVa3RcLtaBqgZw1IJ3xMirIZjE3CjTV@vger.kernel.org, AJvYcCUevxR7Ij5CySBz9r95QYMaQxRCQDeF5ld0jnxwO0Gb059dwTQk8Cn/E3roybov1VKMYHWFpPMDfU1A6bA=@vger.kernel.org, AJvYcCVtqx1wSdGvEaZrAQK+R1ZeaCxsQQUfli3Nm09aldhyTQ44ATI2X1In8HbC3by/CTtbc83gOvBiS/sD@vger.kernel.org, AJvYcCVymSz5SKJXWKsHsTdJlNS0fxYADwqvkKAwaFqOVw5tUrmrgekxF6XIgEouKytlrqOC+sKuBZhNvubBfBhuskA=@vger.kernel.org, AJvYcCWKgGM6Z007qiWPCPjpzMN9VDbE4tSoMbsc4msQgiWQ6uKcT9f8nosUyH2nCI9ENcJgBevrpsv1JTBz@vger.kernel.org, AJvYcCWOH0OKf/VsJ4z6o3vufLSv+qRFC2UNL8/pJJ5M+GDc6WX8caXYytMb1Ttz09eopP5Cj9BIFBmpfXHUytwM@vger.kernel.org, AJvYcCXViCqsSfu1rijaOTBgaKmZqlGH3yjGiWUFadRzCF49g1UON8ESzM/xf9yTPUlY0XlAC/6sZfuH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+lng6FjWA2ZOhYq7FnlJ1f2Wzgyb7voiCOODwmVWV8sfO/IWw
-	+U7z30+fE1/GJCEkxtIyLznKS1+hWB7534AHVH8tzP1MxwLGQHoJ5W66iJwSQB7ucIdrgAaD4I9
-	nKpNTY8NCBb26hMK3TkB8qP2ECYo=
-X-Gm-Gg: ASbGncuxu90GAftl1muSeiY+m6S59aO7p3e9MnfY78sEvaDHab+uDTTo/7OTRAApnHM
-	pOHa4/BkMN3vMVoP/x/Nhl/OVgfrbHLTjsgIKW9VvUV+I6LtuO7D4Krv1grES0TJDd3JnZ1G/2U
-	F3pgHvzQaBWQGayHsoN6prGQ==
-X-Google-Smtp-Source: AGHT+IEuT6KxYsdhSw5cCeMrUaqYdXW9YE/wChmli/G+cfCYNzLRiA7m7gmwaKew+OoBnqvuuEbFo8HJGHR2tvaOM7M=
-X-Received: by 2002:a17:90b:3501:b0:2ff:7970:d2b6 with SMTP id
- 98e67ed59e1d1-3087bde06ddmr9204562a91.5.1745334929331; Tue, 22 Apr 2025
- 08:15:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qNCi+Qtl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB819C4CEE9;
+	Tue, 22 Apr 2025 15:35:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745336161;
+	bh=mPUjzTsoFC/NJnHC63CpAKhwboTnx8d1kgG3aqCLZmI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qNCi+QtlmV3zMddqk2AxBkg13aO6TKuCcLsUovdpOGQPNpLStJPME4FMt8ji8KSNQ
+	 07/3fLS3oUys8Af/ghB5nx/U28u7S3ucANeLNt1b3Ndf26wdnmkCBDYXAQOAQdOlSq
+	 Mcy/vKD6HO8+1d/N62//eUDtkx6Dlh2GUmlKqqaESrH3uaJLytH+ljiUcaEEiv8puj
+	 CsjQ14zFex5k0ClOBTlxYym9hNAh/WRpWBkPMHchg8TLysprWkZxRkr4pe21pPXsOw
+	 5TifmZAZG5rTMRGFQwiZDC/sHvA0F+gRi3rHU0WHpc2GXeq0vIMuXds4+cLYQDyInx
+	 /7nFYP0/IrrCQ==
+Date: Tue, 22 Apr 2025 17:35:56 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: hch <hch@lst.de>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "axboe@kernel.dk" <axboe@kernel.dk>, 
+	"djwong@kernel.org" <djwong@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	Xiao Ni <xni@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>
+Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
+Message-ID: <20250422-goldkette-hitzig-95ddd8f86168@brauner>
+References: <20250417064042.712140-1-hch@lst.de>
+ <xrvvwm7irr6dldsbfka3c4qjzyc4zizf3duqaroubd2msrbjf5@aiexg44ofiq3>
+ <20250422055149.GB29356@lst.de>
+ <20250422-angepackt-reisen-bc24fbec2702@brauner>
+ <20250422081736.GA674@lst.de>
+ <20250422141505.GA25426@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416-ptr-as-ptr-v9-0-18ec29b1b1f3@gmail.com>
- <20250416-ptr-as-ptr-v9-4-18ec29b1b1f3@gmail.com> <68014084.0c0a0220.394e75.122c@mx.google.com>
- <CAJ-ks9muaNU9v2LZ5=cmfXV6R5AO+joNOoPP=+hs-GJN=APfKQ@mail.gmail.com>
- <680160b8.050a0220.223d09.180f@mx.google.com> <CAJ-ks9=TXjk8W18ZMG4mx0JpYvXr4nwnUJqjCnqvW9zu2Y1xjA@mail.gmail.com>
- <aAJrOV88S-4Qb5o0@Mac.home>
-In-Reply-To: <aAJrOV88S-4Qb5o0@Mac.home>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 22 Apr 2025 17:15:16 +0200
-X-Gm-Features: ATxdqUEzkXpfnBhiY7k29QsDY3HizJvfa3BhU5YB5Skka6eAvbENy4JVzwfqVy4
-Message-ID: <CANiq72meaJr5noasX+4p7r5BM1H4tCa33eLrsta00Vpk-cF7VQ@mail.gmail.com>
-Subject: Re: [PATCH v9 4/6] rust: enable `clippy::as_underscore` lint
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250422141505.GA25426@lst.de>
 
-On Fri, Apr 18, 2025 at 5:09=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
->
-> I'm leaning towards to 2 and then 3, because using `as` can sometimes
-> surprise you when you change the type. Thoughts?
+On Tue, Apr 22, 2025 at 04:15:05PM +0200, hch wrote:
+> Turns out this doesn't work.  We used to have the request_mask, but it
+> got removed in 25fbcd62d2e1 ("bdev: use bdev_io_min() for statx block
+> size") so that stat can expose the block device min I/O size in
+> st_blkdev, and as the blksize doesn't have it's own request_mask flag
+> is hard to special case.
+> 
+> So maybe the better question is why devtmpfs even calls into
+> vfs_getattr?  As far as I can tell handle_remove is only ever called on
+> the actual devtmpfs file system, so we don't need to go through the
+> VFS to query i_mode.  i.e. the patch should also fix the issue.  The
 
-Having explicit functions sounds good to me, and would also help
-migrating later easily to anything else (because all cases are
-explicitly tagged and easy to grep for).
+Hm, yes. Just looked at the history and it dates back to Kay's original
+devtmpfs patch.
 
-Cheers,
-Miguel
+> modify_change is probably not needed either, but for now I'm aiming
+> for the minimal fix.
+> 
+> diff --git a/drivers/base/devtmpfs.c b/drivers/base/devtmpfs.c
+> index 6dd1a8860f1c..53fb0829eb7b 100644
+> --- a/drivers/base/devtmpfs.c
+> +++ b/drivers/base/devtmpfs.c
+> @@ -296,7 +296,7 @@ static int delete_path(const char *nodepath)
+>  	return err;
+>  }
+>  
+> -static int dev_mynode(struct device *dev, struct inode *inode, struct kstat *stat)
+> +static int dev_mynode(struct device *dev, struct inode *inode)
+>  {
+>  	/* did we create it */
+>  	if (inode->i_private != &thread)
+
+It seems off that there are deletion requests coming in for a files that
+weren't created by devtmpfsd. But maybe that can somehow happen.
+
+> @@ -304,13 +304,13 @@ static int dev_mynode(struct device *dev, struct inode *inode, struct kstat *sta
+>  
+>  	/* does the dev_t match */
+>  	if (is_blockdev(dev)) {
+> -		if (!S_ISBLK(stat->mode))
+> +		if (!S_ISBLK(inode->i_mode))
+>  			return 0;
+>  	} else {
+> -		if (!S_ISCHR(stat->mode))
+> +		if (!S_ISCHR(inode->i_mode))
+>  			return 0;
+>  	}
+> -	if (stat->rdev != dev->devt)
+> +	if (inode->i_rdev != dev->devt)
+>  		return 0;
+>  
+>  	/* ours */
+> @@ -321,8 +321,7 @@ static int handle_remove(const char *nodename, struct device *dev)
+>  {
+>  	struct path parent;
+>  	struct dentry *dentry;
+> -	struct kstat stat;
+> -	struct path p;
+> +	struct inode *inode;
+>  	int deleted = 0;
+>  	int err;
+>  
+> @@ -330,11 +329,8 @@ static int handle_remove(const char *nodename, struct device *dev)
+>  	if (IS_ERR(dentry))
+>  		return PTR_ERR(dentry);
+>  
+> -	p.mnt = parent.mnt;
+> -	p.dentry = dentry;
+> -	err = vfs_getattr(&p, &stat, STATX_TYPE | STATX_MODE,
+> -			  AT_STATX_SYNC_AS_STAT);
+> -	if (!err && dev_mynode(dev, d_inode(dentry), &stat)) {
+> +	inode = d_inode(dentry);
+> +	if (dev_mynode(dev, inode)) {
+>  		struct iattr newattrs;
+>  		/*
+>  		 * before unlinking this node, reset permissions
+> @@ -342,7 +338,7 @@ static int handle_remove(const char *nodename, struct device *dev)
+>  		 */
+>  		newattrs.ia_uid = GLOBAL_ROOT_UID;
+>  		newattrs.ia_gid = GLOBAL_ROOT_GID;
+> -		newattrs.ia_mode = stat.mode & ~0777;
+> +		newattrs.ia_mode = inode->i_mode & ~0777;
+>  		newattrs.ia_valid =
+>  			ATTR_UID|ATTR_GID|ATTR_MODE;
+>  		inode_lock(d_inode(dentry));
