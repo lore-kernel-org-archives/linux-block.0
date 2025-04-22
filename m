@@ -1,100 +1,149 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC461F1500
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24115201261
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745314175; cv=none; b=mAXTldiis6qfdmtotIqJjkhi1u6QKYzLOo4RSVJn9OyD6w0GFnEf1PjQORh5kCsk9jbfpBhLmfAPoFgoIiUCOub1kW1h5wrPy7cyKcWw0rC51j/99ZYMIt/SBAfGIzIl6CS1crEfpji4wHeYKQp7tDSVwNfaXdVf4H1vBjFrMR8=
+	t=1745314220; cv=none; b=et3e0pQ8WnhDdciw/6GIHuuwABS1YU3X/wuPgUgUoxjcsQG6E7rq0Mn6fUGlLn9IjTPoAdK0LJysWFlqk967kgFEwRswDfuwI15KYsdd29j6bT9o63Gd/zeMZzUKcVQ2cYDK+/6xR7ij5lkVJQzfqasr207xq9iubqLZXsCw+Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745314175; c=relaxed/simple;
-	bh=pKQIoEhRnLFOHy6kojlmcNTfTpbN47DqyFCRgdApEn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jJXQO4gUb8nBCyjVfJ2FV0Z8QwdzsX2flhjycLAsdyJqNSicpSxZhwOm2FzEWrNpEDCq85RcndKVNAc4v56biWNfV7r6TbSOzBAtqPK4n9guUAqwmcwR42BTweNBSEObFhPvDEmRt502VoKAA3ESSwoH7uZRpsloN989h2oM5Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3hxwWxe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1745314220; c=relaxed/simple;
+	bh=F4xj8uFItZXngYyRxK4Om6c/Df+Jde5SIdIKlsdLQ5E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zo1jxTQm10XxF7vYnD3gytPr1pFPCWsIX8YIagoYB5VKTUToSuvdJZg1KKgI2Y0mKbhTVf3W1ZmlNKRekhZqrZODD7kKN0v787ZM2pZFxZnBTsfe2epb23xSDZ00SPow+3H48jccM8BZllKzNx3gzmwXXKAJG+y/QfNEH+gXx9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t8uY9qr3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v3Y67OK8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t8uY9qr3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v3Y67OK8; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3hxwWxe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745314172;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e5RsruNrH3UlUOtkSbkB1T/xnaz6GZuHSOHiVKBGw40=;
-	b=H3hxwWxeZ1l535DU/IS/66tiidMwQJCxuBzO0P1K61xugukBRy1V8uyQmXcgMz0LMLRDpB
-	jvGZS99CMBrn7Rk7kIsW5HnF50dKUrQwVV9xsP6211YbCsLsKubxAGZzwXTVx5ddtVNn6r
-	OFbm8cmm5sUp7VFeiSGFBizE1nKbQHc=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-j4x4HFFmMm61UqBP4vLsIQ-1; Tue,
- 22 Apr 2025 05:29:28 -0400
-X-MC-Unique: j4x4HFFmMm61UqBP4vLsIQ-1
-X-Mimecast-MFC-AGG-ID: j4x4HFFmMm61UqBP4vLsIQ_1745314167
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t8uY9qr3";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v3Y67OK8";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t8uY9qr3";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v3Y67OK8"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC0CE18001E0;
-	Tue, 22 Apr 2025 09:29:26 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.157])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A86C01956095;
-	Tue, 22 Apr 2025 09:29:22 +0000 (UTC)
-Date: Tue, 22 Apr 2025 17:29:17 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
-Subject: Re: [PATCH V2 07/20] block: prevent adding/deleting disk during
- updating nr_hw_queues
-Message-ID: <aAdhbUAzFSxtCWzR@fedora>
-References: <20250418163708.442085-1-ming.lei@redhat.com>
- <20250418163708.442085-8-ming.lei@redhat.com>
- <094c312a-38ec-4c5b-9db3-2269c37de36a@linux.ibm.com>
- <aAWv3NPtNIKKvJZc@fedora>
- <20250422070432.GB30990@lst.de>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 396AC1F38D;
+	Tue, 22 Apr 2025 09:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745314215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
+	b=t8uY9qr3k3PwZ9kkOjnxDh2XX6kjmRLamiw1jfMHW64xLN4Y8qufG/7UZB21+Vc4dS0/yy
+	VwYAXlnzybeo841LTvqvHqyTe0y+V2eZKzwUskgl7J5k4dDcpYdEqLyR8UlCB0KnjNW4nC
+	hGk8i/6+F9/B4GPeeCQgvgYxvYTkA5Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745314215;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
+	b=v3Y67OK8NpAechMkLS6yZKC4ZDHhBG3d7Ui9Z7y931kp9hSltbM23BYG6zpz1Hm91aQxQV
+	19FsMwxBtzkNNhCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=t8uY9qr3;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=v3Y67OK8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745314215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
+	b=t8uY9qr3k3PwZ9kkOjnxDh2XX6kjmRLamiw1jfMHW64xLN4Y8qufG/7UZB21+Vc4dS0/yy
+	VwYAXlnzybeo841LTvqvHqyTe0y+V2eZKzwUskgl7J5k4dDcpYdEqLyR8UlCB0KnjNW4nC
+	hGk8i/6+F9/B4GPeeCQgvgYxvYTkA5Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745314215;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
+	b=v3Y67OK8NpAechMkLS6yZKC4ZDHhBG3d7Ui9Z7y931kp9hSltbM23BYG6zpz1Hm91aQxQV
+	19FsMwxBtzkNNhCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1E238139D5;
+	Tue, 22 Apr 2025 09:30:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3EjkBqdhB2h/ZAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 22 Apr 2025 09:30:15 +0000
+Message-ID: <21f5f86b-f524-410b-a839-25cb6356e411@suse.de>
+Date: Tue, 22 Apr 2025 11:30:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422070432.GB30990@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/5] brd: split I/O at page boundaries
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org
+References: <20250421072641.1311040-1-hch@lst.de>
+ <20250421072641.1311040-5-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250421072641.1311040-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 396AC1F38D
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,lst.de:email];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Tue, Apr 22, 2025 at 09:04:32AM +0200, Christoph Hellwig wrote:
-> On Mon, Apr 21, 2025 at 10:39:24AM +0800, Ming Lei wrote:
-> > > In my view, RCU is optimized for read-heavy workloads with:
-> > > - Non-blocking readers
-> > 
-> > srcu allows blocking reader
+On 4/21/25 09:26, Christoph Hellwig wrote:
+> A lot of complexity in brd stems from the fact that it tries to handle
+> I/O spanning two backing pages.  Instead limit the size of a single
+> bvec iteration so that it never crosses a page boundary and remove all
+> the now unneeded code.
 > 
-> It does.  But it's certainly not optimized for long blocking readers.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/block/brd.c | 116 +++++++++++++-------------------------------
+>   1 file changed, 34 insertions(+), 82 deletions(-)
 > 
-> > Basically I agree with you that rwsem(instead of rwlock) should match with
-> > this case in theory, but I feel that rwsem is stronger than srcu from lock
-> > viewpoint, and we will add new dependency if rwsem is held inside
-> > ->store(), such as the following splat.
-> 
-> How does manually implementing a reader/write lock using SRCU avoid
-> that dependency vs just hiding it?
-> 
-> I'd rather sort this out as a rwsem is very natural her as Nilay pointed
-> out, and also avoids the whole giv up and retry pattern.
- 
-Thinking of further, the warning triggered from rwsem is false positive,
-because elevator switch can't happen until disk is added, and the splat
-can be avoided by switching to down_read_nested() in elevator_change(),
-which need to be nested too.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-So looks fine to use rwsem.
+Cheers,
 
-
-Thanks,
-Ming
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
