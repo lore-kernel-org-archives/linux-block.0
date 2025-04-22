@@ -1,88 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C5726FA76;
-	Tue, 22 Apr 2025 02:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B204310A1F;
+	Tue, 22 Apr 2025 03:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745288332; cv=none; b=KBtF4y8J4XaPZtwJQEwzTHN6stbbGg8DueGRRNMBCuq//MXIMA6cbihY+W8ga/leKQn8H+uvfckcOeAFTYw/d2vEhF+CvxN8d2Lf4eEtYYpxYFxo37OUVg2MhjO37+mdtvr1/t0rLXq288yLiPsgSp7GiN2oWwxWZ+d04H2z7C0=
+	t=1745290993; cv=none; b=RoRvZVPbq8HAlJ9WZqmvXfJqvW7Ocw9/UdYxNmZo9rniK0/p2qLe7LyVgyu8N9pluYnhdqCEINMHSotjYGi52nhaa8y+LoVqR4z0GZKuQivzDj1+FDIf6xaSi0zRuA5D58ur+DQQncGOvCY6edJaVxSCMr9XwNiAri81Ab0N8U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745288332; c=relaxed/simple;
-	bh=1AOoWB8Qal5mN/kSUMXxbm5YmswbNgetkMmE1rfW8mI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uDrFRDuXwIHB22NLJXqpl6ncBH8fmlJtgyt/Nl6bBkrFkcpQuZTrEyQ5UbtDCN9n5DS+Rhp1RB72NK+cxMNwKEPQA4OqGGix+ZvVzX9Q12dwzX8BLbpdMMfB8G1nfudcHmZZJvtaHgWfcY91JJkIrS8As/3ek1lYvfDd+s7Olh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUAilTgh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUAilTgh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08F93C4CEEC;
-	Tue, 22 Apr 2025 02:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745288332;
-	bh=1AOoWB8Qal5mN/kSUMXxbm5YmswbNgetkMmE1rfW8mI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mUAilTgh9vvaf/67JRlaxcJROAf50lK+x/5siYL37F5WerNVwNR4MZfDBs1vV+c78
-	 w0AaFAD53DeDbjVlH/IRisAkU13y1Mb8jg51LnKgYz2KjlfFLmMh0lTpxcjG5RqcM3
-	 mKJ1WIJsZ6lK2DeTsKinBO2o9um/gkCk6Oy9sNYr/ISVckR3G6i7Aj2kdMmuaisMpq
-	 n5m6/aZ3ORwt6XYkQEvGNTnsRqncCIej94otcDKuZ/qJ9Ey8+FmqcquOYblvMLzhQ5
-	 9gtU6qyg9n6Cf++cIzfOLvtcYO3Xpk56DzMZSeRqnNIvGnI4uwwoygGJE/q3vZPUgG
-	 HT1oRGv3OItMA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Yunlong Xing <yunlong.xing@unisoc.com>,
-	Zhiguo Niu <zhiguo.niu@unisoc.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 3/6] loop: aio inherit the ioprio of original request
-Date: Mon, 21 Apr 2025 22:18:43 -0400
-Message-Id: <20250422021846.1941972-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250422021846.1941972-1-sashal@kernel.org>
-References: <20250422021846.1941972-1-sashal@kernel.org>
+	s=arc-20240116; t=1745290993; c=relaxed/simple;
+	bh=Uq7MMe7AeeZt9Qok1hStV+tYZiwjOTGaEkdNt5tijCQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Woic1cBSsVJ7mODHhXzam60lcAl7vHvvqufVPmYnPal0+BJSW8jwnn5OH2/9peeueaToCYRI3PTdgosnbyWXHmA04RezchsDRy9tUHs8FbgPM3Wd1RzsyaGQ1ado4JLACluNduiqsS/UdYbghdvoVaM4pl5x1QH6VkzWfJ5GgNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4ZhRqZ2Y9Bz4f3jY9;
+	Tue, 22 Apr 2025 11:02:34 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 412921A01A5;
+	Tue, 22 Apr 2025 11:02:58 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDXOl_gBgdomaHKKA--.12010S3;
+	Tue, 22 Apr 2025 11:02:58 +0800 (CST)
+Subject: Re: 10x I/O await times in 6.12
+To: Keith Busch <kbusch@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Matt Fleming <mfleming@cloudflare.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team <kernel-team@cloudflare.com>, "yukuai (C)" <yukuai3@huawei.com>
+References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
+ <aAZiwGy1A7J4spDk@kbusch-mbp.dhcp.thefacebook.com>
+ <ad67b397-9483-d3c3-203e-687cefb9e481@huaweicloud.com>
+ <aAbzW1POQP9z5BWS@kbusch-mbp.dhcp.thefacebook.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <98915ccf-4fe8-5d96-0b59-b3f3d5a66f81@huaweicloud.com>
+Date: Tue, 22 Apr 2025 11:02:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.180
+In-Reply-To: <aAbzW1POQP9z5BWS@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDXOl_gBgdomaHKKA--.12010S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4fCFW7Xw4fJFW8Zr4DCFg_yoW8Aw4UpF
+	Z0qa1ftr4UAFy0yw4Ivrs7XryrK347Gry2vryrGryavryDKrnakrW2kws09a47ZF1rC3yI
+	yFWrK347X34jyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUBVbkUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Yunlong Xing <yunlong.xing@unisoc.com>
+Hi,
 
-[ Upstream commit 1fdb8188c3d505452b40cdb365b1bb32be533a8e ]
+在 2025/04/22 9:39, Keith Busch 写道:
+> On Tue, Apr 22, 2025 at 09:28:02AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/04/21 23:22, Keith Busch 写道:
+>>> On Mon, Apr 21, 2025 at 09:53:10AM +0100, Matt Fleming wrote:
+>>>> Hey there,
+>>>>
+>>>> We're moving to 6.12 at Cloudflare and noticed that write await times
+>>>> in iostat are 10x what they were in 6.6. After a bit of bpftracing
+>>>> (script to find all plug times above 10ms below), it seems like this
+>>>> is an accounting error caused by the plug->cur_ktime optimisation
+>>>> rather than anything more material.
+>>>>
+>>>> It appears as though a task can enter __submit_bio() with ->plug set
+>>>> and a very stale cur_ktime value on the order of milliseconds. Is this
+>>>> expected behaviour? It looks like it leads to inaccurate I/O times.
+>>>
+>>> There are places with a block plug that call cond_resched(), which
+>>> doesn't invalidate the plug's cached ktime. You could end up with a
+>>> stale ktime if your process is scheduled out.
+>>
+>> This is wrong, scheduled out will clear cached ktime. You can check
+>> it easily since there are not much caller to clear ktime.
+> 
+> Huh? cond_resched() calls __schedule() directly via
+> preempt_schedule_common(), which most certainly does not clear the
+> plug's time.
 
-Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
-The purpose is to inherit the original request ioprio in the aio
-flow.
+Yes, this is the preempt case, where pluged IO is not issued, this
+behaviour is already known. I thought you mean the normal case, like
+you said below. :(
+> 
+> The timestamp is only invalidated from schedule() or
+> rt_mutex_post_schedule(). You can check it ... "easily".
 
-Signed-off-by: Yunlong Xing <yunlong.xing@unisoc.com>
-Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20250414030159.501180-1-yunlong.xing@unisoc.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So, either preempt takes a long time, or generate lots of bio to plug
+takes a long time can both results in larger iostat IO latency. I still
+think delay setting request start_time to blk_mq_flush_plug_list() might
+be a reasonable fix.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1d60d5ac0db80..cae3cda6a482a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -605,7 +605,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_filp = file;
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
--	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
- 
- 	if (rw == WRITE)
- 		ret = call_write_iter(file, &cmd->iocb, &iter);
--- 
-2.39.5
+Thanks,
+Kuai
+> 
+> .
+> 
 
