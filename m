@@ -1,149 +1,212 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861C51EF395
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FAFD530
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745314246; cv=none; b=p6wVj0Vo8jPPj/8N9qE4PkJrC0ClfB1ZyDMUPnJa+2JwXaNKopi4RTu2nQb3bB+sV49sqnzsNuIG/3cwzZTE0s0nd/6q6grzI5YUqpLvRFERSfG8UbvLlZjq1u1lqDz8oJ3dUUtRZHPnKj67sXUrJjaHtPVtzr3HgckNszGNDG0=
+	t=1745314401; cv=none; b=lYInbnAaHnFlaMImTIMiR91ozX6/NTiMBlz7llGa+P8gPIqyYuJ7Z0hy2qs7lgX+0jKJFEQos7/sJxWUIci9Awt2fUgOK/MZMhSm03q9Gafi7cwLMcHOjx6W5b/uvuGRWWEzTIPOQVF6HqjL2XIIEr0mZeQ///YTS6U4mrpUORk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745314246; c=relaxed/simple;
-	bh=LCNEJoisySBIX1GTlsm/Qm8KNnoU9rD9YzBAO2Ayrxw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ecSNw7gJPMyqAXV9GH/JeIexv/DLh6fQdsQUy41xApI8O6EuFuDoJ5n9e3VZpl++WE/DMKvtplsBhjdzi95+ewe4iEM3X9Qq/+C322PhK+cQrgt3xhuiXen5XaWhYBdbV/z2ezqyq+TGyU2FhQEzBgsBf52qNCkWR1dG98ba+Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FaOjUw1t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9IWSSKIR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FaOjUw1t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9IWSSKIR; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1745314401; c=relaxed/simple;
+	bh=+tN/vKI2HcIV+MfJByZ5jdwjxbTgkUeXeK7BNpx1LGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mLSNe0yYCPFWsp7xVHBk1UpHXF26a7/aNVwwzMvl4t0JJ31C4SztuRckgr2g+4UpX2MPZA5oY2GWTV+20DIB99GWv5gTsODkHzxK+p0NPgSvxFKm1GSjB+Oi5lfEjUgJIssdHTuihgFB8GqOl7jVawCXRLK5ifOhjBJs1OkHEus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OX4ydxvB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FaOjUw1t";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9IWSSKIR";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FaOjUw1t";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9IWSSKIR"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OX4ydxvB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745314398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Esj5bVg8gsakAt5oCv1heDCSYEX/0D3/tUM+UBrmHQ=;
+	b=OX4ydxvBwVyDFfxbQFhjj65/xUeRXK3ICDaOr5ReuNQ/sNC5cmbwGm9OkW6BSL/L74rked
+	QOG26nL0KtIKaDWJ+eqiRwj7DKoKK8DsstQDcdVA+030pM3gb7INzdh6gbjbtUP9dlgpfb
+	QrcdLXD7aKswEmxpQ/neJLciYIjDhuw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-gca0qg-cOTe-NMY5TqzryQ-1; Tue,
+ 22 Apr 2025 05:33:14 -0400
+X-MC-Unique: gca0qg-cOTe-NMY5TqzryQ-1
+X-Mimecast-MFC-AGG-ID: gca0qg-cOTe-NMY5TqzryQ_1745314392
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B16A221179;
-	Tue, 22 Apr 2025 09:30:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745314242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
-	b=FaOjUw1t8ywKMLcBM836zaWYwcfx3MewaJHTdxFs4OLctpNWYdYnqxYSmrMyiENrT9Sw+K
-	0YooBaXAtyOwxVh7dN57W0sZnNYUqpKzGDTXiCe6DGySnzA7jomo8dU55PViRw+uhgjMLy
-	PRUQqRqxV/q2EOh5AuWj8ef+a4xGLCo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745314242;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
-	b=9IWSSKIRyB1VsrmkaNfKP/6zWxO1F9kNnUi35RhhlugrjwdBUZxLKjjpXzH55CcOLT9+g0
-	QFU6GUIi80sCYMDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=FaOjUw1t;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=9IWSSKIR
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745314242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
-	b=FaOjUw1t8ywKMLcBM836zaWYwcfx3MewaJHTdxFs4OLctpNWYdYnqxYSmrMyiENrT9Sw+K
-	0YooBaXAtyOwxVh7dN57W0sZnNYUqpKzGDTXiCe6DGySnzA7jomo8dU55PViRw+uhgjMLy
-	PRUQqRqxV/q2EOh5AuWj8ef+a4xGLCo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745314242;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
-	b=9IWSSKIRyB1VsrmkaNfKP/6zWxO1F9kNnUi35RhhlugrjwdBUZxLKjjpXzH55CcOLT9+g0
-	QFU6GUIi80sCYMDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A19F1139D5;
-	Tue, 22 Apr 2025 09:30:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /FgLJ8JhB2ipZAAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 22 Apr 2025 09:30:42 +0000
-Message-ID: <a7b3b9dd-f7ad-4bbb-a119-21bc5c2033be@suse.de>
-Date: Tue, 22 Apr 2025 11:30:42 +0200
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87BFE180036D;
+	Tue, 22 Apr 2025 09:33:12 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.157])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EEEB1955BCB;
+	Tue, 22 Apr 2025 09:33:07 +0000 (UTC)
+Date: Tue, 22 Apr 2025 17:33:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 20/20] block: move wbt_enable_default() out of queue
+ freezing from sched ->exit()
+Message-ID: <aAdiT3j5ptl_NdZm@fedora>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-21-ming.lei@redhat.com>
+ <261d7b81-e611-47f4-ad55-6f7716c278c7@linux.ibm.com>
+ <aAXzToqtIlAoUP7t@fedora>
+ <286f9d0e-b782-4062-b0eb-cba6fa81e388@linux.ibm.com>
+ <aAdPn-47ctywQGIT@fedora>
+ <8c07d251-bafc-4601-b14d-5771c4615703@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] brd: use memcpy_{to,from]_page in brd_rw_bvec
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org
-References: <20250421072641.1311040-1-hch@lst.de>
- <20250421072641.1311040-6-hch@lst.de>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250421072641.1311040-6-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B16A221179
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,lst.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c07d251-bafc-4601-b14d-5771c4615703@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 4/21/25 09:26, Christoph Hellwig wrote:
-> Use the proper helpers to copy to/from potential highmem pages, which
-> do a local instead of atomic kmap underneath, and perform
-> flush_dcache_page where needed.  This also simplifies the code so much
-> that the separate read write helpers are not required any more.
+On Tue, Apr 22, 2025 at 02:57:01PM +0530, Nilay Shroff wrote:
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/block/brd.c | 57 ++++++++++-----------------------------------
->   1 file changed, 12 insertions(+), 45 deletions(-)
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> On 4/22/25 1:43 PM, Ming Lei wrote:
+> > On Tue, Apr 22, 2025 at 11:44:59AM +0530, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 4/21/25 12:57 PM, Ming Lei wrote:
+> >>> On Sat, Apr 19, 2025 at 08:09:04PM +0530, Nilay Shroff wrote:
+> >>>>
+> >>>>
+> >>>> On 4/18/25 10:07 PM, Ming Lei wrote:
+> >>>>> scheduler's ->exit() is called with queue frozen and elevator lock is held, and
+> >>>>> wbt_enable_default() can't be called with queue frozen, otherwise the
+> >>>>> following lockdep warning is triggered:
+> >>>>>
+> >>>>> 	#6 (&q->rq_qos_mutex){+.+.}-{4:4}:
+> >>>>> 	#5 (&eq->sysfs_lock){+.+.}-{4:4}:
+> >>>>> 	#4 (&q->elevator_lock){+.+.}-{4:4}:
+> >>>>> 	#3 (&q->q_usage_counter(io)#3){++++}-{0:0}:
+> >>>>> 	#2 (fs_reclaim){+.+.}-{0:0}:
+> >>>>> 	#1 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
+> >>>>> 	#0 (&q->debugfs_mutex){+.+.}-{4:4}:
+> >>>>>
+> >>>>> Fix the issue by moving wbt_enable_default() out of bfq's exit(), and
+> >>>>> call it from elevator_change_done().
+> >>>>>
+> >>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >>>>> ---
+> >>>>>  block/bfq-iosched.c | 2 +-
+> >>>>>  block/elevator.c    | 5 +++++
+> >>>>>  block/elevator.h    | 1 +
+> >>>>>  3 files changed, 7 insertions(+), 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> >>>>> index 40e4106a71e7..310ce1d8c41e 100644
+> >>>>> --- a/block/bfq-iosched.c
+> >>>>> +++ b/block/bfq-iosched.c
+> >>>>> @@ -7211,7 +7211,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+> >>>>>  
+> >>>>>  	blk_stat_disable_accounting(bfqd->queue);
+> >>>>>  	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT, bfqd->queue);
+> >>>>> -	wbt_enable_default(bfqd->queue->disk);
+> >>>>> +	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
+> >>>>>  
+> >>>>>  	kfree(bfqd);
+> >>>>>  }
+> >>>>> diff --git a/block/elevator.c b/block/elevator.c
+> >>>>> index 8652fe45a2db..378553fce5d8 100644
+> >>>>> --- a/block/elevator.c
+> >>>>> +++ b/block/elevator.c
+> >>>>> @@ -687,8 +687,13 @@ int elevator_change_done(struct request_queue *q, struct elv_change_ctx *ctx)
+> >>>>>  	int ret = 0;
+> >>>>>  
+> >>>>>  	if (ctx->old) {
+> >>>>> +		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
+> >>>>> +				&ctx->old->flags);
+> >>>>> +
+> >>>>>  		elv_unregister_queue(q, ctx->old);
+> >>>>>  		kobject_put(&ctx->old->kobj);
+> >>>>> +		if (enable_wbt)
+> >>>>> +			wbt_enable_default(q->disk);
+> >>>>>  	}
+> >>>>>  	if (ctx->new) {
+> >>>>>  		ret = elv_register_queue(q, ctx->new, ctx->uevent);
+> >>>>> diff --git a/block/elevator.h b/block/elevator.h
+> >>>>> index 486be0690499..b14c611c74b6 100644
+> >>>>> --- a/block/elevator.h
+> >>>>> +++ b/block/elevator.h
+> >>>>> @@ -122,6 +122,7 @@ struct elevator_queue
+> >>>>>  
+> >>>>>  #define ELEVATOR_FLAG_REGISTERED	0
+> >>>>>  #define ELEVATOR_FLAG_DYING		1
+> >>>>> +#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
+> >>>>>  
+> >>>>>  /* Holding context data for changing elevator */
+> >>>>>  struct elv_change_ctx {
+> >>>>
+> >>>> It seems invoking wbt_enable_default from elevator_change_done could probably
+> >>>> still race with ioc_qos_write or queue_wb_lat_store. Both ioc_qos_write and 
+> >>>> queue_wb_lat_store run with ->freeze_lock and ->elevator_lock protection.
+> >>>
+> >>> Actually wbt_enable_default() and wbt_init() needn't the above protection,
+> >>> especially since the patch 2/20 removes q->elevator use in
+> >>> wbt_enable_default().
+> >>>
+> >> Yes agreed, and as I understand XXX_FLAG_DISABLE_WBT was earlier elevator_queue->flags 
+> >> but now (with patch 2/20) it has been moved to request_queue->flags. As elevator_change_done 
+> >> first puts elevator_queue object which would potentially releases/frees the  elevator_queue 
+> >> object. Next while we enable wbt (in elevator_change_done)  we may not have access to the 
+> >> elevator_queue object and so now we reference  QUEUE_FLAG_DISABLE_WBT using request_queue->flags. 
+> >> That's, I believe, the purpose of patch 2/20.
+> >>
+> >> However even with patch 2/20 change, both elevator_change_done and ioc_qos_write or
+> >> queue_wb_lat_store may run in parallel, isn't it?
+> >>
+> >> therad1:
+> >> blk_mq_update_nr_hw_queues
+> >>   -> __blk_mq_update_nr_hw_queues
+> >>     -> elevator_change_done
+> >>       -> wbt_enable_default
+> >>         -> wbt_init
+> >>          -> wbt_update_limits
+> > 
+> > Here wbt_update_limits() is called on un-attached `struct rq_wb` instance,
+> > which is just allocated from heap.
+> > 
+> >>
+> >> therad2:
+> >> queue_wb_lat_store
+> >>   -> wbt_set_min_lat
+> >>    -> wbt_update_limits
+> > 
+> > The above one is run on attached `struct rq_wb` instance.
+> > 
+> > And there can only be one attached `struct rq_wb` instance, so the above
+> > race doesn't exist because attaching wbt to queue/disk is covered by `q->rq_qos_mutex`.
+> > 
+> Yes you were correct, however, what if throttling is already enabled/attached to 
+> the queue? In that case we'd race updating rq_wb->enable_state, no? For instance,
+> 
+> thread1:
+> blk_mq_update_nr_hw_queues
+>   -> elevator_change_done
+>     -> wbt_enable_default ==> (updates ->enable_state)
+> 
+> thread2: 
+> queue_wb_lat_store
+>   -> wbt_set_min_lat ==> (updates ->enable_state)
+> 
+> thread3:
+> ioc_qos_write
+>   -> wbt_disable_default ==> (updates ->enable_state)
 
-Cheers,
+OK, that is one race, but should have been handled by one rqos dedicated
+lock instead of ->elevator_lock.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
+Thanks,
+Ming
+
