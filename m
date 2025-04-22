@@ -1,118 +1,101 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83732147F9;
-	Tue, 22 Apr 2025 14:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AF227CB30;
+	Tue, 22 Apr 2025 14:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745331494; cv=none; b=kNYNjEV326dRwtCHOJRDpuG2l4jxzx2+SH2Lum8aVvF9BFulf6bnqPvokgIGYrDnC9R6LUPyAqhItEdHmPo+YJISuB6lRFb7SVsvLkuJsJqQLs7olUB9ZypbdPA9trT2RjWINc7TwzAbrhKNmSvGDYbO/RmDIs2qB2QLkQfR7hM=
+	t=1745331996; cv=none; b=Eijrp4V5c/+qByO67X3h7yiPbSvazASj6lv7ZMXm10vhMwxzYcpAC32UkCcv++cA5ISak6JV8RcUNufNJfGgD7N5VVnZvWua2CKKWUep8udB20mT//DNFMRvu//IDzk+r9VSFEW4CJr4QXk+d4exX72alK5sjgFGFVNsZPxpSYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745331494; c=relaxed/simple;
-	bh=gzHXyyvPdqokUSWEtJaxbHF/Iqlrfyd6Ei4drrmlu4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t3CoPKHyUUfzsJkuZCeAhHChI7CfhT61Vzj1pDi3aPhWto8ADZOaI1yws4M2RRYhAPLkzlUgfETUyKZoD5UlsDXW/yMHMrwwSbfR+iNT4Fii5rbWFhd/4FJAqKmGKRsjVyys90N25n3pZe+GwVw8V6VGT3hIe421dSYeRYuAqiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NjfaHC82; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1745331996; c=relaxed/simple;
+	bh=Crj6FNVi7mDhiVzWMlIqnYV4VfaXwOklDJNvmzIXW3o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pdK39KQDHgdlMdSfhgPEqvT8SiKD2kXcBuBl5nkUMUX38JxV9udzQ6Dd+f0fMLPMAQQwKoZjxfBo15Fg6sd5qFuYk0DnC3J5q6eUr3xvB5x51BzuXhWd9oPMqPdHGAdR8SZWe0SuDaCIGD/qNowrxNyb7ZxikTAZSulvhDLiT5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Wbo/YkAc; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NjfaHC82"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53MAbWRa020829;
-	Tue, 22 Apr 2025 14:18:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=BTEoSrOv+Dgz6HNRfznfZ5u9n3jpL/
-	TFFdeLmZLnQ/I=; b=NjfaHC82CjOJjhl4b7mKbnUc4xFd9b9d+JKwzGBzqGKGCp
-	Fo5Dg+PV40YNfs3gUo5GM4vh2+5XlwKhHSSn/AXQC3af0MtK8EmUyynCVDBotQwi
-	Te5Dh3Ppx1pKLXGwV7GPwQcjA3/0LM0pEA84NGUruxZYRbywWJB7wSAhF0ySiI82
-	iEKSk8m+1hUZeBwQJQcfDsrOfpQ6MOuHlMSzIMIANLv3M48md6xUjbj0vls6UoZM
-	mKQG/okOLvQcSC+kI5CKPb3iV5bMaTF0maoY3fvX+REoVj4IKUggK2jJ5sv06Ygo
-	uoMIJ3S8HdjpgMcAxsosIPIj0I8+7YO3LKvt5UnA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4669h1h2y9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Apr 2025 14:18:05 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 53MDusdw020425;
-	Tue, 22 Apr 2025 14:18:05 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4669h1h2y6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Apr 2025 14:18:05 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53MAJ1Ow032544;
-	Tue, 22 Apr 2025 14:18:04 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 464phykbnf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Apr 2025 14:18:03 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53MEI2q257016620
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 22 Apr 2025 14:18:02 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E9EDF2004B;
-	Tue, 22 Apr 2025 14:18:01 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 86D9920043;
-	Tue, 22 Apr 2025 14:18:01 +0000 (GMT)
-Received: from osiris (unknown [9.87.146.239])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 22 Apr 2025 14:18:01 +0000 (GMT)
-Date: Tue, 22 Apr 2025 16:18:00 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: hch <hch@lst.de>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "brauner@kernel.org" <brauner@kernel.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
-Message-ID: <20250422141800.40615A23-hca@linux.ibm.com>
-References: <20250417064042.712140-1-hch@lst.de>
- <xrvvwm7irr6dldsbfka3c4qjzyc4zizf3duqaroubd2msrbjf5@aiexg44ofiq3>
- <20250422055149.GB29356@lst.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wbo/YkAc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=svFwjk5mDlegrlNjoyNVDlQrYp0eiPHyH4DQI4cVX3M=; b=Wbo/YkAcvVzWpPhyUQpQKOmA1G
+	mTD7QdQKJ0YrfWElD2Zo+VU9LwlA9TtAUt/XiX2a3w+j5/y51x+SURVViniD+VH57mava+Vm4Ijxy
+	pWwiixY+N13qjJcC0rnrUIhXLO61TJB+cyJuiVAxfVMWXOEHG6hdYk/KqwdiiBmXjetaVSXzNiWqe
+	vcmoIh0ChZBTReSCu1zxNNPSApFNGbu+TsyA9NcLynok/WdekMyOjBr+HzkWuv1qAeshNBX23wcQU
+	4ZaEVKrAXLVBbKFBkrbJy32z/o2QoqxtImBpPmfBHVMdyiAYifijDpzUezWhen0qpQ9iwm1yBQFvV
+	kC5cyLGw==;
+Received: from [2001:4bb8:2fc:38c3:78fb:84a5:c78c:68b6] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u7Ea0-00000007U8i-03JY;
+	Tue, 22 Apr 2025 14:26:32 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Coly Li <colyli@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@kernel.org>,
+	linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-btrfs@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-pm@vger.kernel.org
+Subject: add more bio helper
+Date: Tue, 22 Apr 2025 16:26:01 +0200
+Message-ID: <20250422142628.1553523-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422055149.GB29356@lst.de>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=XvP6OUF9 c=1 sm=1 tr=0 ts=6807a51d cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=VnNF1IyMAAAA:8 a=lvXfNf97AKID-M7_zB8A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: aRWJbqBrJB_sokzVdD5EBI-UFkJfW5A9
-X-Proofpoint-ORIG-GUID: B5dYCGBhRGQwF8cLu-gb1eNcl1lnURSa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-22_07,2025-04-22_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 bulkscore=0 clxscore=1011 suspectscore=0 spamscore=0
- malwarescore=0 impostorscore=0 adultscore=0 mlxlogscore=654 phishscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504220106
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Apr 22, 2025 at 07:51:49AM +0200, hch wrote:
-> On Tue, Apr 22, 2025 at 05:03:19AM +0000, Shinichiro Kawasaki wrote:
-> > I ran blktests with the kernel v6.15-rc3, and found the test case md/001 hangs.
-> > The hang is recreated in stable manner. I bisected and found this patch as the
-> > commit 777d0961ff95 is the trigger. When I revert the commit from v6.15-rc3
-> > kernel, the hang disappeared.
-> > 
-> > Actions for fix will be appreciated.
-> > 
-> > FYI, the kernel INFO messages recorded functions relevant to the trigger commit,
-> > such as bdev_statx or vfs_getattr_nosec [1].
-> 
-> This should fix it:
+Hi all,
 
-FWIW, I was also about to report the same problem. Any reboot with dm
-targets hangs. Your patch fixes it also for me.
+this series adds more block layer helpers to remove boilerplate code when
+adding memory to a bio or to even do the entire synchronous I/O.
 
-Tested-by: Heiko Carstens <hca@linux.ibm.com>
+The main aim is to avoid having to convert to a struct page in the caller
+when adding kernel direct mapping or vmalloc memory.
+
+Diffstat:
+ block/bio.c                   |   57 ++++++++++++++++++++++
+ block/blk-map.c               |  108 ++++++++++++++++--------------------------
+ drivers/block/pktcdvd.c       |    2 
+ drivers/block/rnbd/rnbd-srv.c |    7 --
+ drivers/block/ublk_drv.c      |    3 -
+ drivers/block/virtio_blk.c    |    4 -
+ drivers/md/bcache/super.c     |    3 -
+ drivers/md/dm-bufio.c         |    2 
+ drivers/md/dm-integrity.c     |   16 ++----
+ drivers/nvme/host/core.c      |    2 
+ drivers/scsi/scsi_ioctl.c     |    2 
+ drivers/scsi/scsi_lib.c       |    3 -
+ fs/btrfs/scrub.c              |   10 ---
+ fs/gfs2/ops_fstype.c          |   24 +++------
+ fs/hfsplus/wrapper.c          |   46 +++--------------
+ fs/xfs/xfs_bio_io.c           |   30 ++++-------
+ fs/xfs/xfs_buf.c              |   27 +++-------
+ fs/zonefs/super.c             |   34 ++++---------
+ include/linux/bio.h           |   39 ++++++++++++++-
+ include/linux/blk-mq.h        |    4 -
+ kernel/power/swap.c           |  103 +++++++++++++++++-----------------------
+ 21 files changed, 253 insertions(+), 273 deletions(-)
