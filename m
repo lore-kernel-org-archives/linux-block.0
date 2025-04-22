@@ -1,67 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31171F30CC;
-	Tue, 22 Apr 2025 09:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC461F1500
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745314147; cv=none; b=Ief0DVGFLFbmNiZU1485aRJU0NRxfVyId15QvgfmYp4RmYgFvez4SFrPNHi1v/LnLDw+tBTTolDnvVxynd/2X1++0fY7+rHWUNx3vUF54TLifB20yeyBu6dT/r8VY6Ktt2vWIzQtsmHHWpSDi92qXd+3ZX50+Rk+tZ7CIuaG4Ao=
+	t=1745314175; cv=none; b=mAXTldiis6qfdmtotIqJjkhi1u6QKYzLOo4RSVJn9OyD6w0GFnEf1PjQORh5kCsk9jbfpBhLmfAPoFgoIiUCOub1kW1h5wrPy7cyKcWw0rC51j/99ZYMIt/SBAfGIzIl6CS1crEfpji4wHeYKQp7tDSVwNfaXdVf4H1vBjFrMR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745314147; c=relaxed/simple;
-	bh=NEX2z9kU4Vi8WmZ63Y0Gc55AKQh+cgsP9ewt+J6eGSU=;
+	s=arc-20240116; t=1745314175; c=relaxed/simple;
+	bh=pKQIoEhRnLFOHy6kojlmcNTfTpbN47DqyFCRgdApEn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nGyr/YGG9VYGLX+4IVhT2oydPDmsawKCaiVCo33/pqv+jPj6OykQYF6lojlwInAFj5WSuvxJHfCxnWsSDTUQCaAp5+PkrHmYWFqPPWu1odoWpW1/MkHLP7/xE2ZeTmu8h04JTS2kVwHZevnjuH0qwLYTgtxY5d73CePPxGhzArE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ArfsoAdS; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jJXQO4gUb8nBCyjVfJ2FV0Z8QwdzsX2flhjycLAsdyJqNSicpSxZhwOm2FzEWrNpEDCq85RcndKVNAc4v56biWNfV7r6TbSOzBAtqPK4n9guUAqwmcwR42BTweNBSEObFhPvDEmRt502VoKAA3ESSwoH7uZRpsloN989h2oM5Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3hxwWxe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ArfsoAdS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2187EC4CEE9;
-	Tue, 22 Apr 2025 09:29:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745314147;
-	bh=NEX2z9kU4Vi8WmZ63Y0Gc55AKQh+cgsP9ewt+J6eGSU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ArfsoAdSA130xPl3M2aPlw+EBNPJy+wINPcpW7hHDbXqyrounzaoILrNOT1p4GMkq
-	 rIgmql3DAJZCXkyIt4suIv69liZ0Ib1sshx9M7yva9OwRT2ccgAmGrmEYf3ionWKnA
-	 GU2UbI5MQHVlLxNbkvGBsan4QXHW9KYKraH56jXULTccQq6zjnazgnEj1n5Nuytowt
-	 A12H2P4bdXPEB09yowrXVsPHxEXQnLl/WayP0k5YKfgXteWqogMyCpiZAIvYUpouk1
-	 MsXXkkwL1ZaXz6vi45rPu0Tp6VPVk9Q8ZobqHQoqZAc4VsWMd8XX7pI+n0KIHophMc
-	 PN727xA+WU/GQ==
-Date: Tue, 22 Apr 2025 11:29:02 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: hch <hch@lst.de>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	"djwong@kernel.org" <djwong@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
-Message-ID: <20250422-gehofft-erdwall-a387c8909e42@brauner>
-References: <20250417064042.712140-1-hch@lst.de>
- <xrvvwm7irr6dldsbfka3c4qjzyc4zizf3duqaroubd2msrbjf5@aiexg44ofiq3>
- <20250422055149.GB29356@lst.de>
- <20250422-angepackt-reisen-bc24fbec2702@brauner>
- <20250422081736.GA674@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3hxwWxe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745314172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e5RsruNrH3UlUOtkSbkB1T/xnaz6GZuHSOHiVKBGw40=;
+	b=H3hxwWxeZ1l535DU/IS/66tiidMwQJCxuBzO0P1K61xugukBRy1V8uyQmXcgMz0LMLRDpB
+	jvGZS99CMBrn7Rk7kIsW5HnF50dKUrQwVV9xsP6211YbCsLsKubxAGZzwXTVx5ddtVNn6r
+	OFbm8cmm5sUp7VFeiSGFBizE1nKbQHc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-j4x4HFFmMm61UqBP4vLsIQ-1; Tue,
+ 22 Apr 2025 05:29:28 -0400
+X-MC-Unique: j4x4HFFmMm61UqBP4vLsIQ-1
+X-Mimecast-MFC-AGG-ID: j4x4HFFmMm61UqBP4vLsIQ_1745314167
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC0CE18001E0;
+	Tue, 22 Apr 2025 09:29:26 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.157])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A86C01956095;
+	Tue, 22 Apr 2025 09:29:22 +0000 (UTC)
+Date: Tue, 22 Apr 2025 17:29:17 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+Subject: Re: [PATCH V2 07/20] block: prevent adding/deleting disk during
+ updating nr_hw_queues
+Message-ID: <aAdhbUAzFSxtCWzR@fedora>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-8-ming.lei@redhat.com>
+ <094c312a-38ec-4c5b-9db3-2269c37de36a@linux.ibm.com>
+ <aAWv3NPtNIKKvJZc@fedora>
+ <20250422070432.GB30990@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422081736.GA674@lst.de>
+In-Reply-To: <20250422070432.GB30990@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Tue, Apr 22, 2025 at 10:17:36AM +0200, hch wrote:
-> On Tue, Apr 22, 2025 at 10:15:48AM +0200, Christian Brauner wrote:
-> > > -	bdev = blkdev_get_no_open(backing_inode->i_rdev);
-> > > +	if (!(request_mask & (STATX_DIOALIGN | STATX_WRITE_ATOMIC)))
-> > > +		return;
+On Tue, Apr 22, 2025 at 09:04:32AM +0200, Christoph Hellwig wrote:
+> On Mon, Apr 21, 2025 at 10:39:24AM +0800, Ming Lei wrote:
+> > > In my view, RCU is optimized for read-heavy workloads with:
+> > > - Non-blocking readers
 > > 
-> > This leaks the block device reference if blkdev_get_no_open() succeeds.
-> > 
-> > > +
-> > > +	bdev = blkdev_get_no_open(d_backing_inode(path->dentry)->i_rdev);
+> > srcu allows blocking reader
 > 
-> The one removed by the patch above, or the one added after the check
-> below? :)
+> It does.  But it's certainly not optimized for long blocking readers.
+> 
+> > Basically I agree with you that rwsem(instead of rwlock) should match with
+> > this case in theory, but I feel that rwsem is stronger than srcu from lock
+> > viewpoint, and we will add new dependency if rwsem is held inside
+> > ->store(), such as the following splat.
+> 
+> How does manually implementing a reader/write lock using SRCU avoid
+> that dependency vs just hiding it?
+> 
+> I'd rather sort this out as a rwsem is very natural her as Nilay pointed
+> out, and also avoids the whole giv up and retry pattern.
+ 
+Thinking of further, the warning triggered from rwsem is false positive,
+because elevator switch can't happen until disk is added, and the splat
+can be avoided by switching to down_read_nested() in elevator_change(),
+which need to be nested too.
 
-Ah, I got confused by the inline diff.
+So looks fine to use rwsem.
+
+
+Thanks,
+Ming
+
