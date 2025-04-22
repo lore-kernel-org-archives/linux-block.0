@@ -1,31 +1,65 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6ED1E5716
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 07:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AFD1AA7BF;
+	Tue, 22 Apr 2025 07:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745307419; cv=none; b=Qb8+fCD+ZZnUms6NKS9Y9HpcLZzMt3rIrxrONj5Um0DZFUHpHnyiBdVlwOJKFhcx5qox9PXChqeAH7UP7EqkBeR+Bw2TdKMnDtbFTY/rBcXim/7swPQEkods5xNNPaacEDls7p1GDm0JX0V7qLnuUFV1KHFg/RUdkdvRotf2RRc=
+	t=1745307865; cv=none; b=cO17jTsCO7oSyOR3r1LNStvi1N5Jk7hq6pOjo5R30LiL787IV+AmwzaADxGIhXBECqNdb4On6GCDRAQRaxAkWOh/AOCmO3yFzMxjEzzYAEeT7mJEPFr747hNBAzQyKPt4XTJvuNKO814Hf6FshZ93AaxNjwtUAeVV1OVbIGzWDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745307419; c=relaxed/simple;
-	bh=iNihTPx0YQ94AQJ814kSF6wonckzKRuRjqkzps1QNFY=;
+	s=arc-20240116; t=1745307865; c=relaxed/simple;
+	bh=IkpCJe6iK3e0zmgzu4HOe7msfQx4RRcdkVXQ/zE59nM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btWw0cs4R7bBhayboLTRSR+StonxJFeojqqBIZAsqCTmIItSitEILYxYku9lxwjpWSeBTk+hqcBJM3oL9dT3xowE34QtW5k2FYMV7GK30JSHilAl7v8v5arpor2xi+uWzD0bFH/ksXGXFCSKINLx6Gq40BqB7HiINNo3Zl8gYZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2CD9268AA6; Tue, 22 Apr 2025 09:36:54 +0200 (CEST)
-Date: Tue, 22 Apr 2025 09:36:54 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, kbusch@kernel.org, hare@suse.de,
-	sagi@grimberg.me, jmeneghi@redhat.com, axboe@kernel.dk,
-	gjoyce@ibm.com
-Subject: Re: [RFC PATCH 2/2] nvme-multipath: remove multipath module param
-Message-ID: <20250422073654.GB31849@lst.de>
-References: <20250321063901.747605-1-nilay@linux.ibm.com> <20250321063901.747605-3-nilay@linux.ibm.com> <20250407144555.GB12216@lst.de> <f05dd764-9299-4c20-998a-f3b1d45bacf8@linux.ibm.com> <20250409104515.GB5359@lst.de> <e50e568c-9a9b-4306-a2f4-e108791e83d2@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ghuAmtZq9agKJWtBtrJ4QVSApCurcl/OHo3VzjYE3LoRXfQG064ckH44pn10T8cDP8YjSj/cvjZHRe295IHPKvm1pg8zus3fP2TIEdC+WrLT/eoPByVru5ZdFOTa9VLdEtVC5sYMQZ4bVrMISbblcpHSwltQwnANaZKMvGgpeUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UWT8zpQs; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWT8zpQs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1566FC4CEE9;
+	Tue, 22 Apr 2025 07:44:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745307865;
+	bh=IkpCJe6iK3e0zmgzu4HOe7msfQx4RRcdkVXQ/zE59nM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UWT8zpQsdCGRmAI20Z+3AYlApwN36Cmhj6cwB5IbEbE/IARvNVu0tWdo4mIoQ7tla
+	 jNP/ANqauZjnvPJUDWeJ8zADeaD5f36aQ2RWsAs+HUooXKhuTuo6yu/E07zazBROX6
+	 xznqv+BPsU6Ncghg2SNTxJe37syfeyaxQcr9WAF/Foen5407hErRIFOLLYGI7pgvGN
+	 CyJIqFICxTnqDUBmc1sGRXnHfviqEbMmgDyblOZ2xNZJFl02u19GY6Nbpt7EgtHA8c
+	 CrDGpNwLguDhhfqO7ogHBVTsHjC7XaO9VuKIwQLJaY5iHytN6aNXhIGafF6/jV6lt1
+	 HqZxDZY2NWy3Q==
+Date: Tue, 22 Apr 2025 10:44:19 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Kanchan Joshi <joshi.k@samsung.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH v8 24/24] nvme-pci: optimize single-segment handling
+Message-ID: <20250422074419.GD48485@unreal>
+References: <cover.1744825142.git.leon@kernel.org>
+ <670389227a033bd5b7c5aa55191aac9943244028.1744825142.git.leon@kernel.org>
+ <20250422043955.GA28077@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,21 +68,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e50e568c-9a9b-4306-a2f4-e108791e83d2@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250422043955.GA28077@lst.de>
 
-On Fri, Apr 18, 2025 at 07:52:06PM +0530, Nilay Shroff wrote:
-> I don't know how to make this option per-controller as you know the 
-> head node, typically, refers to namespace paths and each path then 
-> refers to different controller. So if we were to make this option
-> per controller then how could we handle it in case one controller has
-> this option set but then the another controller doesn't set this 
-> option. It could be confusing. 
->  
-> How about module option "nvme_core.multipath_head_always"? The default is
-> set to false. So now it becomes two step process:
-> 1. modprobe nvme_core multipath_head_always=Y && modprobe nvme
-> 2. echo "<val>" > /sys/block/nvme0XnY/delayed_shutdown_sec     
+On Tue, Apr 22, 2025 at 06:39:56AM +0200, Christoph Hellwig wrote:
+> On Fri, Apr 18, 2025 at 09:47:54AM +0300, Leon Romanovsky wrote:
+> > From: Kanchan Joshi <joshi.k@samsung.com>
+> > 
+> > blk_rq_dma_map API is costly for single-segment requests.
+> > Avoid using it and map the bio_vec directly.
+> 
+> This needs to be folded into the earlier patches or split prep patches
+> instead of undoing work done earlier, preferably combined with a bit
+> of code movement so that the new nvme_try_setup_prp_simple stays in
+> the same place as before and the diff shows it reusing code.
+> 
+> E.g. change
+> 
+> "nvme-pci: use a better encoding for small prp pool allocations" to
+> already use the flags instead of my boolean, and maybe include 
+> abort in the flags instead of using a separate bool so that we
+> don't increase hte iod size.
+> 
+> Slot in a new patch after that that dropping the single SGL segment
+> fastpath if we think we don't need that, although if we need the PRP
+> one I suspect that one would still be very helpful as well.
+> 
+> Add a patch if we want the try_ version of, although when keeping
+> the optimization for SGLs as well that are will look a bit different.
+> 
+> I'm happy to give away my patch authorship credits if that helps with
+> the folding.
 
-That's probably the best we can do.
+I used this patch separation for two reasons:
+1. Your conversion patch is absolutely correct and this patch is an
+optimization.
+2. Wanted to make sure that I'll post to the ML the code exactly as it
+was tested.
 
+I'll try to split/fold this patch now.
+
+Thanks
