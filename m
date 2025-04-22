@@ -1,104 +1,159 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66D76FB9;
-	Tue, 22 Apr 2025 07:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53EE239567;
+	Tue, 22 Apr 2025 07:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745306730; cv=none; b=MkPNu2erfp5zXhj7dcrZP+Nu43tL+ZZvKo9Op9/Zm92IbT7Ek9YcMKqYASeU6AyJJsZvG+dBshUjZzIMp90lEs9MRqWCjh+kytMqjP9EQ20DzNwSecT3nbPA4B5zw6J16whlUzhARxm5su3nNrRsS1NQX7Jd+sKvtWJIpbWM4Y0=
+	t=1745306771; cv=none; b=AM57Yv6J5AvGTrPTgrDSDcgFyg+LI+eOdi4QOaDcB7dshdbObNQxrQFAQbJdIkJf5qpBC3cGqGbFCWWYxTwj13q3cMsfTOaZb5h2TgN7vggSBA3zdrr+mCsbl6O0BFb7JGR6LEd2zs7MOoPhbZ3JDgIf7/0npXXgnLWqLIsDd6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745306730; c=relaxed/simple;
-	bh=rQsJbOmcDtEhKQH7dgzzmbawJS4pLSBqfLHSlw5lvqo=;
+	s=arc-20240116; t=1745306771; c=relaxed/simple;
+	bh=xN+WXXtReip5UqyzmA8L0bQhenwCbDjSz9Q+yfqmAMs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VT+IajAPoFmpyuVPn5ohyw7ydZB7pGMzx+fcEEM1WywxhOD2SQBYq4I5pe5P5JoatvcrGzUnStuMid0tPC+1cQtrhoNocIQHu293qPKARXZKQEQ0HnIvX0UqrLjrRBedZwrSchU7I03eDdQ0xexFZJhbtjirdXATsDzn9FI84YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSY0K4SI; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jVaB2UlwTrVWY4XNGcFDOISDU82a9CcIMcDGB78jl3wJPP0JcgvPi0LtrMfbYB5IkCcUuucYOESMmbrD/KZst1hYRSd/G0Cfvw7N3Wy8GUzRwzx2Qzxxb8FyWXdcsv4vFucGqKbu0OjIkbIT/POcAgYWKNhjuIR7/taZa/yZtSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T+kjxQ3D; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSY0K4SI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9629FC4CEE9;
-	Tue, 22 Apr 2025 07:25:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T+kjxQ3D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D2DEC4CEE9;
+	Tue, 22 Apr 2025 07:26:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745306729;
-	bh=rQsJbOmcDtEhKQH7dgzzmbawJS4pLSBqfLHSlw5lvqo=;
+	s=k20201202; t=1745306771;
+	bh=xN+WXXtReip5UqyzmA8L0bQhenwCbDjSz9Q+yfqmAMs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QSY0K4SIz3e1Skk3BzdXiorXuYljecjTCOncpoN2OlfEtrCKv/7oEq2E4HmsX6sYk
-	 zRlA+pGVgRF3IhvGz++I0O5qJMlQsXe6zATGjWgq54bvawEQ2Zmcxm1iZ51D7FINmO
-	 o+TpkYYq2AIFDosWQjtHO8Aud/Kr/rHccc4L8ncbXhDE6SIx+b8iaPwZxbROfIOsRO
-	 eVxh9JJOamspT00GizUFQahXK8UY9MhCCgbYfZmFYT7lnXeQOCePur5LWkb15PR1/1
-	 puwqEUrklJGhAklZbVsBllQJGyS1EHjLaOI8UMg1kSWOz9IcWZyQoUMO++eVGl6+9N
-	 Hu+5eBqRUi6Bg==
-Date: Tue, 22 Apr 2025 09:25:24 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: hch <hch@lst.de>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	"djwong@kernel.org" <djwong@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
-Message-ID: <20250422-auswies-feinschliff-b89c231316db@brauner>
-References: <20250417064042.712140-1-hch@lst.de>
- <xrvvwm7irr6dldsbfka3c4qjzyc4zizf3duqaroubd2msrbjf5@aiexg44ofiq3>
- <20250422055149.GB29356@lst.de>
+	b=T+kjxQ3DEPfKwlnz4ZsUDQJrurgBpYIvnlrJCi1o7bGuhNceV40t7HE/1xO8wR9Yb
+	 XqXYR6OJwsS92ouacGloivohWNsdc7yQTCXlieXHyMZSDeI4gKtISD5bdXJ7qypls6
+	 6bZi9HB9VfNpBB8VY/FRmXpBsoECeH0PTBRIxfT9fPPKnqee23MIdkAqBcDi3rUZ+4
+	 /BJqBQFefNqgzuto6SdwGElfoODTNQUBkGR4gebKND6VNauPo2sYytZqQICgsqeqij
+	 kpC9oyp1tE0IjwFexsb18IzStSzuJpdjBQFiXvjt/3to/J7JYYIZd8gnhECeIAhlc7
+	 0z3AdWi9XN8uA==
+Date: Tue, 22 Apr 2025 10:26:06 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v8 23/24] nvme-pci: convert to blk_rq_dma_map
+Message-ID: <20250422072606.GC48485@unreal>
+References: <cover.1744825142.git.leon@kernel.org>
+ <f06a04098cb14e1051bddec8a7bdebe1c384d983.1744825142.git.leon@kernel.org>
+ <20250422050050.GB28077@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422055149.GB29356@lst.de>
+In-Reply-To: <20250422050050.GB28077@lst.de>
 
-On Tue, Apr 22, 2025 at 07:51:49AM +0200, hch wrote:
-> On Tue, Apr 22, 2025 at 05:03:19AM +0000, Shinichiro Kawasaki wrote:
-> > I ran blktests with the kernel v6.15-rc3, and found the test case md/001 hangs.
-> > The hang is recreated in stable manner. I bisected and found this patch as the
-> > commit 777d0961ff95 is the trigger. When I revert the commit from v6.15-rc3
-> > kernel, the hang disappeared.
-> > 
-> > Actions for fix will be appreciated.
-> > 
-> > FYI, the kernel INFO messages recorded functions relevant to the trigger commit,
-> > such as bdev_statx or vfs_getattr_nosec [1].
+On Tue, Apr 22, 2025 at 07:00:50AM +0200, Christoph Hellwig wrote:
+> > +	dma_len = min_t(u32, length, NVME_CTRL_PAGE_SIZE - (dma_addr & (NVME_CTRL_PAGE_SIZE - 1)));
 > 
-> This should fix it:
+> And overly long line slipped in here during one of the rebases.
+> 
+> > +		/*
+> > +		 * We are in this mode as IOVA path wasn't taken and DMA length
+> > +		 * is morethan two sectors. In such case, mapping was perfoormed
+> > +		 * per-NVME_CTRL_PAGE_SIZE, so unmap accordingly.
+> > +		 */
+> 
+> Where does this comment come from?  Lots of spelling errors, and I
+> also don't understand what it is talking about as setors are entirely
+> irrelevant here.
 
-Can you send this as a proper patch so I can pick it up, please?
-It needs to go upstream.
+I'm trying to say when this do {} while is taken and sector is a wrong
+word to describe NVME_CTRL_PAGE_SIZE. Let's remove this comment.
 
 > 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 6a34179192c9..97d4c0ab1670 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -1274,18 +1274,23 @@ void sync_bdevs(bool wait)
->   */
->  void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
->  {
-> -	struct inode *backing_inode;
->  	struct block_device *bdev;
->  
-> -	backing_inode = d_backing_inode(path->dentry);
-> -
->  	/*
-> -	 * Note that backing_inode is the inode of a block device node file,
-> -	 * not the block device's internal inode.  Therefore it is *not* valid
-> -	 * to use I_BDEV() here; the block device has to be looked up by i_rdev
-> -	 * instead.
-> +	 * Note that d_backing_inode() returnsthe inode of a block device node
-> +	 * file, not the block device's internal inode.
-> +	 *
-> +	 * Therefore it is *not* valid to use I_BDEV() here; the block device
-> +	 * has to be looked up by i_rdev instead.
-> +	 *
-> +	 * Only do this lookup if actually needed to avoid the performance
-> +	 * overhead of the lookup, and to avoid injecting bdev lifetime issues
-> +	 * into devtmpfs.
->  	 */
-> -	bdev = blkdev_get_no_open(backing_inode->i_rdev);
-> +	if (!(request_mask & (STATX_DIOALIGN | STATX_WRITE_ATOMIC)))
-> +		return;
-> +
-> +	bdev = blkdev_get_no_open(d_backing_inode(path->dentry)->i_rdev);
->  	if (!bdev)
->  		return;
->  
+> > +	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_state, iod->total_len)) {
+> > +		if (iod->cmd.common.flags & NVME_CMD_SGL_METABUF)
+> > +			nvme_free_sgls(dev, req);
+> 
+> With the addition of metadata SGL support this also needs to check
+> NVME_CMD_SGL_METASEG.
+> 
+> The commit message should also really mentioned that someone
+> significantly altered the patch for merging with latest upstream,
+> as I as the nominal author can't recognize some of that code.
+
+Someone :), I thought that adding my SOB is enough.
+
+> 
+> > +	unsigned int entries = req->nr_integrity_segments;
+> >  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+> >  
+> > +	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_meta_state,
+> > +			      iod->total_meta_len)) {
+> > +		if (entries == 1) {
+> > +			dma_unmap_page(dev->dev, iod->meta_dma,
+> > +				       rq_integrity_vec(req).bv_len,
+> > +				       rq_dma_dir(req));
+> > +			return;
+> >  		}
+> >  	}
+> >  
+> > +	dma_pool_free(dev->prp_small_pool, iod->meta_list, iod->meta_dma);
+> 
+> This now doesn't unmap for entries > 1 in the non-IOVA case.
+
+I forgot to unmap SGL metadata, in non-SGL, the metadata is the size of
+one entry. There is no "entries > 1" for non-SGL path.
+
+WDYT?
+
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index a9c298a45bf1..73dbedd7daf6 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -839,13 +839,21 @@ static __always_inline void nvme_unmap_metadata(struct nvme_dev *dev,
+ {
+        unsigned int entries = req->nr_integrity_segments;
+        struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
++       struct nvme_sgl_desc *sg_list = iod->meta_list;
++       enum dma_data_direction dir = rq_dma_dir(req);
+
+        if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_meta_state,
+                              iod->total_meta_len)) {
+-               if (entries == 1) {
++               if (iod->cmd.common.flags & NVME_CMD_SGL_METASEG) {
++                       unsigned int i;
++
++                       for (i = 0; i < entries; i++)
++                               dma_unmap_page(dev->dev,
++                                      le64_to_cpu(sg_list[i].addr),
++                                      le32_to_cpu(sg_list[i].length), dir);
++               } else {
+                        dma_unmap_page(dev->dev, iod->meta_dma,
+-                                      rq_integrity_vec(req).bv_len,
+-                                      rq_dma_dir(req));
++                                      rq_integrity_vec(req).bv_len, dir);
+                        return;
+                }
+        }
+
+
+
+> 
