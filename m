@@ -1,54 +1,50 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6A2EED6;
-	Tue, 22 Apr 2025 05:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1261AA791
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 05:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745298061; cv=none; b=lYVP/2254zc5oA3I+idXj8TwVTBKuiVMQv9tl/7YkGbNMOP2bIcn9gPXk/74PW8RKjo+udyX0Yyyl8Hmj14kuCnGUryT2txgPLoN60NIFua728xtq3yx/X/7JLlpqaTznnN/RMO9yJO+pMzMOdiH+otfSgoen1SvTTrfUHW5qhM=
+	t=1745298193; cv=none; b=JA+PkXt4Pu7PHVG7Anb95K5U6OTiSqJfjj/zUXjvb+aMW+qK2oRlnlLdEQ6bb0Zw70g0Ldu/AZNCi0ezIvmn4wxKAVRUmgawyXU06q7zL4pX2sjalgXPjvp0zuThLBRLbow5/YFzA0vPby5gkVBbzcGmMjA5bxki9VPNHvO0OE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745298061; c=relaxed/simple;
-	bh=/ELFZKv4e0D7TteJyW9Rpn8e4XtrEsidyb7gbxlwYqY=;
+	s=arc-20240116; t=1745298193; c=relaxed/simple;
+	bh=u7KiBX9i9mxqqLW1b7mTqCXmJ8F8AULP3w3amNiQAP8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFHEzZDzPNVr2hmgdvvdnOqGOORVR1np0nRqkQmPpUOpPK2xkiH4P9M7Q64VrqPNJoo45rzC22XmMAJvtdeU2zI9H9Gvq0Ezy/7MEewzougAP63tKLhxQI621BRNOVCUnLO1mtgCtK/HMqSVtOvJl1kN+WAxOLcUzMOeLDHKVwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1414268BFE; Tue, 22 Apr 2025 07:00:51 +0200 (CEST)
-Date: Tue, 22 Apr 2025 07:00:50 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v8 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <20250422050050.GB28077@lst.de>
-References: <cover.1744825142.git.leon@kernel.org> <f06a04098cb14e1051bddec8a7bdebe1c384d983.1744825142.git.leon@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k38TburtawzrVjBhzVqRrb3hpcNsWINwk6zVB1dN6IpYcGi2hcZUw4YmZgLGQVb9Ia57EQLVr5nOMLHkZh6719zDaqQCrJyWjQyubNX6oy1y3cevBUpamfcu97ukUp63iOMRtuRsxWV0t7p0kQdlAwttp//N5haKrBdjyFnvr1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4hIqqFNQ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4hIqqFNQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=u7KiBX9i9mxqqLW1b7mTqCXmJ8F8AULP3w3amNiQAP8=; b=4hIqqFNQzHHTJc0Lt/AeUzPgu9
+	2TSs/T3d7m7Nu7PcjREmDahWDdV/nLmVlwfUe8gNgbtB88MKp4aZ9NNjmOxf+7a7ehSbbSbL6LDzT
+	zI3bBWwSqgUMhpfQJdCVDblz1VdSD2A6r4vVySmU1ZLWH49eGZY/GXOTp5U1o/tOeZhCTnWs8Apkn
+	tsK/+Lnf92dx4a+TokDctDG13Duw1aQBym3mbULgzkpzGJQVlTZV16PPAZBjF6TvRnz7JCZ6jNsJq
+	fGFnOxqwhxjFdfI+kON9+f1rXYIiRHT60ZsJyagB/ihtD+WHFb4Vl9HS/CQhEboKRssaZXbsdAIIU
+	LgK1EH5g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u75mo-00000005pPH-1dkx;
+	Tue, 22 Apr 2025 05:03:10 +0000
+Date: Mon, 21 Apr 2025 22:03:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Zizhi Wo <wozizhi@huawei.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, yangerkun@huawei.com,
+	yukuai3@huawei.com, ming.lei@redhat.com, tj@kernel.org
+Subject: Re: [PATCH V3 4/7] blk-throttle: Introduce flag
+ "BIO_TG_BPS_THROTTLED"
+Message-ID: <aAcjDvCvmSiLd4zx@infradead.org>
+References: <20250418040924.486324-1-wozizhi@huaweicloud.com>
+ <20250418040924.486324-5-wozizhi@huaweicloud.com>
+ <aAY0GNzcJH28OEtA@infradead.org>
+ <818c7a4b-50b7-4933-ae01-e6fbb93417b9@huawei.com>
+ <aAY9jhJr1VOh0sMm@infradead.org>
+ <a5d1f436-9d31-407a-9653-5fd48f3dc80f@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,48 +53,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f06a04098cb14e1051bddec8a7bdebe1c384d983.1744825142.git.leon@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <a5d1f436-9d31-407a-9653-5fd48f3dc80f@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-> +	dma_len = min_t(u32, length, NVME_CTRL_PAGE_SIZE - (dma_addr & (NVME_CTRL_PAGE_SIZE - 1)));
+On Mon, Apr 21, 2025 at 08:53:10PM +0800, Zizhi Wo wrote:
+> Yes, otherwise they will interfere with each other. We can currently
+> ensure that this flag is cleared in the throttle process.
 
-And overly long line slipped in here during one of the rebases.
-
-> +		/*
-> +		 * We are in this mode as IOVA path wasn't taken and DMA length
-> +		 * is morethan two sectors. In such case, mapping was perfoormed
-> +		 * per-NVME_CTRL_PAGE_SIZE, so unmap accordingly.
-> +		 */
-
-Where does this comment come from?  Lots of spelling errors, and I
-also don't understand what it is talking about as setors are entirely
-irrelevant here.
-
-> +	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_state, iod->total_len)) {
-> +		if (iod->cmd.common.flags & NVME_CMD_SGL_METABUF)
-> +			nvme_free_sgls(dev, req);
-
-With the addition of metadata SGL support this also needs to check
-NVME_CMD_SGL_METASEG.
-
-The commit message should also really mentioned that someone
-significantly altered the patch for merging with latest upstream,
-as I as the nominal author can't recognize some of that code.
-
-> +	unsigned int entries = req->nr_integrity_segments;
->  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->  
-> +	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_meta_state,
-> +			      iod->total_meta_len)) {
-> +		if (entries == 1) {
-> +			dma_unmap_page(dev->dev, iod->meta_dma,
-> +				       rq_integrity_vec(req).bv_len,
-> +				       rq_dma_dir(req));
-> +			return;
->  		}
->  	}
->  
-> +	dma_pool_free(dev->prp_small_pool, iod->meta_list, iod->meta_dma);
-
-This now doesn't unmap for entries > 1 in the non-IOVA case.
+Can you explain that a bit better in the comment?
 
