@@ -1,91 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880E55234;
-	Tue, 22 Apr 2025 01:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164B828E7;
+	Tue, 22 Apr 2025 01:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745284750; cv=none; b=rDB4L0r8MRSNTcUYTOy3fPZ004NOcd1KCuxbiS5BJTjXy4xZrDafkBcMQyMYVQAd3ca1moBo4q3S/8Sb8liobvU3VuHcye+DkZ0GFwugK7Mt0IMvmxcwp96Y80hfz2AAjBl8mVXxJVwxHh9VMg3RD2t3ULkEXBJxjwoDZVJKKr0=
+	t=1745285291; cv=none; b=ZgMWtTjoMbOivTQWVpWP5nYhfYCl6KWOq4nJsCd8oUp7lRLb499pgJVeiprxCNklZMcjky0PsNP/HCFfyc2FzkFOAGrfhF59Wy8AjLLwG1ll8IPvQ/SGgS6xB2k0hHW4CWJIjJoPRgLcWFi0i33mEQDUCaSEwwQgmGNUZWnoZuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745284750; c=relaxed/simple;
-	bh=eP9ll7giGUWiL/szu57fjosnt0vGjzvon7UdDIRlSyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DwL4yqxTu+lBEyqop8yDek+iTQVQqlKHo39x5A4krAohIn301dUtqJU26c59w/f2YRQXmWspa8PFPf0RL5rIz3my48drToS5cJhQX3p+e3k6iTxrEN89MacZyHEaU0vpLoQ5MoJZoOoCCGwmna2YkPgg72SRS58KuUmOPaRA0xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I77RryVh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I77RryVh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC476C4CEE4;
-	Tue, 22 Apr 2025 01:19:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745284748;
-	bh=eP9ll7giGUWiL/szu57fjosnt0vGjzvon7UdDIRlSyQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I77RryVhwIKu8+tKW9NNVt3+RfUNmS3w5F0QEe+CcVq3lY+7Fz5LRkwGYBlpEnU09
-	 7/1wDdRtRNrBkt9DPdYSNxjHFzOvSk3/Vc6WuFI118GmNOAqsmlhqHYG6wfqsLHNVZ
-	 SZXU2ov+kNxI8DPd/i7IoUHQQLYEDCct+0dCWiDB72Qq2qS3UjTvmzdWh4rxTvRsUY
-	 iSttD1+WwC1WJSv9Un0fkfLshs46Xm9a1zVSuVYLyLtpGOmKRAl9w5Tj3x8rS1pQtG
-	 oBHV17V5nnYIPDk3zRkmCk2trCS2dDDdq6xdSYXZ0KxEbW4K2F4BuBC3SFypcKiOCk
-	 xQSquRSsu5DeA==
-Date: Mon, 21 Apr 2025 18:19:08 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: cem@kernel.org, hch@lst.de, shinichiro.kawasaki@wdc.com,
-	linux-mm@kvack.org, mcgrof@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	willy@infradead.org, hch@infradead.org, linux-block@vger.kernel.org
-Subject: Re: [PATCHSET V2] block/xfs: bdev page cache bug fixes for 6.15
-Message-ID: <20250422011908.GV25675@frogsfrogsfrogs>
-References: <174525589013.2138337.16473045486118778580.stgit@frogsfrogsfrogs>
- <8cb99c46-d362-4158-aa1e-882f7e0c304a@kernel.dk>
- <98e7e90e-0ebe-4cbc-96f3-ce7f536d8884@kernel.dk>
- <20250421205116.GF25700@frogsfrogsfrogs>
- <c6bcce15-647c-4de8-aa01-6cd3ec5bf904@kernel.dk>
+	s=arc-20240116; t=1745285291; c=relaxed/simple;
+	bh=nn33IC7GZ/Qaed8ufVwx/6yqba3Rxu170mvlRR9kvH8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=MsgLfXOp3JC/t2io3ifDJY+mLjWOdfy7q8HEXxVxM7fFYVWqXHvaxxES+/tuMoMSBCEBAbJWnvMVPk/MSvX9MRmm2ena+25tbxahf4IwCuj2ZQaNH37qm19qEfmC7eetJPjabW1jCoMdFCOn0QsT2Y2V1FDBc1p9zQrwWLTnLPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZhPk95GVLz4f3jkr;
+	Tue, 22 Apr 2025 09:27:45 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 4CCD41A19ED;
+	Tue, 22 Apr 2025 09:28:04 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCnCl+i8AZoDwPEKA--.5830S3;
+	Tue, 22 Apr 2025 09:28:04 +0800 (CST)
+Subject: Re: 10x I/O await times in 6.12
+To: Keith Busch <kbusch@kernel.org>, Matt Fleming <mfleming@cloudflare.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
+ <aAZiwGy1A7J4spDk@kbusch-mbp.dhcp.thefacebook.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ad67b397-9483-d3c3-203e-687cefb9e481@huaweicloud.com>
+Date: Tue, 22 Apr 2025 09:28:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6bcce15-647c-4de8-aa01-6cd3ec5bf904@kernel.dk>
+In-Reply-To: <aAZiwGy1A7J4spDk@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnCl+i8AZoDwPEKA--.5830S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GF4UAr17tFy5try7ur48Zwb_yoWDXrc_W3
+	s8GFyDGr17Zrs2kFyfCw45ZrZFqr1rZFy7XrWUJrnrXwn7ZasrWFsFg3sIvFZxGrW0grsr
+	urWDK34jqr9akjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb4AYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
+	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHD
+	UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Apr 21, 2025 at 02:53:42PM -0600, Jens Axboe wrote:
-> On 4/21/25 2:51 PM, Darrick J. Wong wrote:
-> > On Mon, Apr 21, 2025 at 02:26:54PM -0600, Jens Axboe wrote:
-> >> On 4/21/25 2:24 PM, Jens Axboe wrote:
-> >>> On 4/21/25 11:18 AM, Darrick J. Wong wrote:
-> >>>> Hi all,
-> >>>>
-> >>>> Here are a handful of bugfixes for 6.15.  The first patch fixes a race
-> >>>> between set_blocksize and block device pagecache manipulation; the rest
-> >>>> removes XFS' usage of set_blocksize since it's unnecessary.
-> >>>>
-> >>>> If you're going to start using this code, I strongly recommend pulling
-> >>>> from my git trees, which are linked below.
-> >>>>
-> >>>> With a bit of luck, this should all go splendidly.
-> >>>> Comments and questions are, as always, welcome.
-> >>>
-> >>> block changes look good to me - I'll tentatively queue those up.
-> >>
-> >> Hmm looks like it's built on top of other changes in your branch,
-> >> doesn't apply cleanly.
-> > 
-> > Yeah, I'm still waiting for hch (or anyone) to RVB patches 2 and 3.
+Hi,
+
+ÔÚ 2025/04/21 23:22, Keith Busch Ð´µÀ:
+> On Mon, Apr 21, 2025 at 09:53:10AM +0100, Matt Fleming wrote:
+>> Hey there,
+>>
+>> We're moving to 6.12 at Cloudflare and noticed that write await times
+>> in iostat are 10x what they were in 6.6. After a bit of bpftracing
+>> (script to find all plug times above 10ms below), it seems like this
+>> is an accounting error caused by the plug->cur_ktime optimisation
+>> rather than anything more material.
+>>
+>> It appears as though a task can enter __submit_bio() with ->plug set
+>> and a very stale cur_ktime value on the order of milliseconds. Is this
+>> expected behaviour? It looks like it leads to inaccurate I/O times.
 > 
-> Maybe I wasn't 100% clear, but what I mean is that patches 1 and 2 don't
-> apply to the upstream kernel, as they are sitting on top of other
-> patches that block block/bdev.c in your tree. So even if acked, they
-> can't go in as-is. Well they can, I'd just have to hand apply them.
-> Which isn't the end of the world, but the dependency wasn't clear (to
-> me, at least) in the sent out patches.
+> There are places with a block plug that call cond_resched(), which
+> doesn't invalidate the plug's cached ktime. You could end up with a
+> stale ktime if your process is scheduled out.
 
-Oh!  Silly me, I forgot that there were debug patches.  Will attach
-Luis' review tags, rebase, and resend.  Sorry about that. :/
+This is wrong, scheduled out will clear cached ktime. You can check
+it easily since there are not much caller to clear ktime.
 
---D
+Thanks,
+Kuai
 
-> -- 
-> Jens Axboe
 > 
+> .
+> 
+
