@@ -1,81 +1,81 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24115201261
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861C51EF395
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 09:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745314220; cv=none; b=et3e0pQ8WnhDdciw/6GIHuuwABS1YU3X/wuPgUgUoxjcsQG6E7rq0Mn6fUGlLn9IjTPoAdK0LJysWFlqk967kgFEwRswDfuwI15KYsdd29j6bT9o63Gd/zeMZzUKcVQ2cYDK+/6xR7ij5lkVJQzfqasr207xq9iubqLZXsCw+Tw=
+	t=1745314246; cv=none; b=p6wVj0Vo8jPPj/8N9qE4PkJrC0ClfB1ZyDMUPnJa+2JwXaNKopi4RTu2nQb3bB+sV49sqnzsNuIG/3cwzZTE0s0nd/6q6grzI5YUqpLvRFERSfG8UbvLlZjq1u1lqDz8oJ3dUUtRZHPnKj67sXUrJjaHtPVtzr3HgckNszGNDG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745314220; c=relaxed/simple;
-	bh=F4xj8uFItZXngYyRxK4Om6c/Df+Jde5SIdIKlsdLQ5E=;
+	s=arc-20240116; t=1745314246; c=relaxed/simple;
+	bh=LCNEJoisySBIX1GTlsm/Qm8KNnoU9rD9YzBAO2Ayrxw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zo1jxTQm10XxF7vYnD3gytPr1pFPCWsIX8YIagoYB5VKTUToSuvdJZg1KKgI2Y0mKbhTVf3W1ZmlNKRekhZqrZODD7kKN0v787ZM2pZFxZnBTsfe2epb23xSDZ00SPow+3H48jccM8BZllKzNx3gzmwXXKAJG+y/QfNEH+gXx9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t8uY9qr3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v3Y67OK8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t8uY9qr3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v3Y67OK8; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=ecSNw7gJPMyqAXV9GH/JeIexv/DLh6fQdsQUy41xApI8O6EuFuDoJ5n9e3VZpl++WE/DMKvtplsBhjdzi95+ewe4iEM3X9Qq/+C322PhK+cQrgt3xhuiXen5XaWhYBdbV/z2ezqyq+TGyU2FhQEzBgsBf52qNCkWR1dG98ba+Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FaOjUw1t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9IWSSKIR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FaOjUw1t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9IWSSKIR; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t8uY9qr3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v3Y67OK8";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t8uY9qr3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v3Y67OK8"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FaOjUw1t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9IWSSKIR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FaOjUw1t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9IWSSKIR"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 396AC1F38D;
-	Tue, 22 Apr 2025 09:30:15 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B16A221179;
+	Tue, 22 Apr 2025 09:30:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745314215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1745314242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
-	b=t8uY9qr3k3PwZ9kkOjnxDh2XX6kjmRLamiw1jfMHW64xLN4Y8qufG/7UZB21+Vc4dS0/yy
-	VwYAXlnzybeo841LTvqvHqyTe0y+V2eZKzwUskgl7J5k4dDcpYdEqLyR8UlCB0KnjNW4nC
-	hGk8i/6+F9/B4GPeeCQgvgYxvYTkA5Y=
+	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
+	b=FaOjUw1t8ywKMLcBM836zaWYwcfx3MewaJHTdxFs4OLctpNWYdYnqxYSmrMyiENrT9Sw+K
+	0YooBaXAtyOwxVh7dN57W0sZnNYUqpKzGDTXiCe6DGySnzA7jomo8dU55PViRw+uhgjMLy
+	PRUQqRqxV/q2EOh5AuWj8ef+a4xGLCo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745314215;
+	s=susede2_ed25519; t=1745314242;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
-	b=v3Y67OK8NpAechMkLS6yZKC4ZDHhBG3d7Ui9Z7y931kp9hSltbM23BYG6zpz1Hm91aQxQV
-	19FsMwxBtzkNNhCg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=t8uY9qr3;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=v3Y67OK8
+	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
+	b=9IWSSKIRyB1VsrmkaNfKP/6zWxO1F9kNnUi35RhhlugrjwdBUZxLKjjpXzH55CcOLT9+g0
+	QFU6GUIi80sCYMDA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=FaOjUw1t;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=9IWSSKIR
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745314215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1745314242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
-	b=t8uY9qr3k3PwZ9kkOjnxDh2XX6kjmRLamiw1jfMHW64xLN4Y8qufG/7UZB21+Vc4dS0/yy
-	VwYAXlnzybeo841LTvqvHqyTe0y+V2eZKzwUskgl7J5k4dDcpYdEqLyR8UlCB0KnjNW4nC
-	hGk8i/6+F9/B4GPeeCQgvgYxvYTkA5Y=
+	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
+	b=FaOjUw1t8ywKMLcBM836zaWYwcfx3MewaJHTdxFs4OLctpNWYdYnqxYSmrMyiENrT9Sw+K
+	0YooBaXAtyOwxVh7dN57W0sZnNYUqpKzGDTXiCe6DGySnzA7jomo8dU55PViRw+uhgjMLy
+	PRUQqRqxV/q2EOh5AuWj8ef+a4xGLCo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745314215;
+	s=susede2_ed25519; t=1745314242;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gvnq7RRpbANJOQulWb2Jv++b6xT4uB29m5w8D0xJrds=;
-	b=v3Y67OK8NpAechMkLS6yZKC4ZDHhBG3d7Ui9Z7y931kp9hSltbM23BYG6zpz1Hm91aQxQV
-	19FsMwxBtzkNNhCg==
+	bh=l/0wNDSSPBApU9sdynDLKPLyoL2XCsKtKgTJE/XLudw=;
+	b=9IWSSKIRyB1VsrmkaNfKP/6zWxO1F9kNnUi35RhhlugrjwdBUZxLKjjpXzH55CcOLT9+g0
+	QFU6GUIi80sCYMDA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1E238139D5;
-	Tue, 22 Apr 2025 09:30:15 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A19F1139D5;
+	Tue, 22 Apr 2025 09:30:42 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 3EjkBqdhB2h/ZAAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 22 Apr 2025 09:30:15 +0000
-Message-ID: <21f5f86b-f524-410b-a839-25cb6356e411@suse.de>
-Date: Tue, 22 Apr 2025 11:30:14 +0200
+	id /FgLJ8JhB2ipZAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 22 Apr 2025 09:30:42 +0000
+Message-ID: <a7b3b9dd-f7ad-4bbb-a119-21bc5c2033be@suse.de>
+Date: Tue, 22 Apr 2025 11:30:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,18 +83,18 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] brd: split I/O at page boundaries
+Subject: Re: [PATCH 5/5] brd: use memcpy_{to,from]_page in brd_rw_bvec
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
  Yu Kuai <yukuai1@huaweicloud.com>
 Cc: linux-block@vger.kernel.org
 References: <20250421072641.1311040-1-hch@lst.de>
- <20250421072641.1311040-5-hch@lst.de>
+ <20250421072641.1311040-6-hch@lst.de>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250421072641.1311040-5-hch@lst.de>
+In-Reply-To: <20250421072641.1311040-6-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 396AC1F38D
+X-Rspamd-Queue-Id: B16A221179
 X-Spam-Score: -4.51
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-4.51 / 50.00];
@@ -127,15 +127,15 @@ X-Spam-Flag: NO
 X-Spam-Level: 
 
 On 4/21/25 09:26, Christoph Hellwig wrote:
-> A lot of complexity in brd stems from the fact that it tries to handle
-> I/O spanning two backing pages.  Instead limit the size of a single
-> bvec iteration so that it never crosses a page boundary and remove all
-> the now unneeded code.
+> Use the proper helpers to copy to/from potential highmem pages, which
+> do a local instead of atomic kmap underneath, and perform
+> flush_dcache_page where needed.  This also simplifies the code so much
+> that the separate read write helpers are not required any more.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   drivers/block/brd.c | 116 +++++++++++++-------------------------------
->   1 file changed, 34 insertions(+), 82 deletions(-)
+>   drivers/block/brd.c | 57 ++++++++++-----------------------------------
+>   1 file changed, 12 insertions(+), 45 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
