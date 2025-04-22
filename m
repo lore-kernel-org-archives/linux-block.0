@@ -1,154 +1,177 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD9B2820C9
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 13:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88491632E6
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 13:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745328255; cv=none; b=X7PAX6NJi3jzJqd5WmKG+rGcxjlwfvGxaiqRGxkGUcG/YXTgsTewV0fC0G5lRSHZw0sbroScLGziTrRBsflfVkCuYCNvcKuQnYcTtS7gAzzeoMGGhpJNeW3+ZNwSjPYezg6fOaJppHQOAiLEp4Brz7fTpwE0D/V3B015gevNom8=
+	t=1745329343; cv=none; b=EB5ymUB/VeAT5QVspzhPc1jIpS8+GYargNX5IZPEHkPolNlolLWNu8OyZscBAk0FIyjkxYKwTHybdgoVwme1rjC8lIKv7BldQUNht6p6U8L85fPgrdpYCeETw5LB+jAVK99hQVJ+1xsrdz3YOz6jHSzYAUeq1xtSfY5AFaiPuiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745328255; c=relaxed/simple;
-	bh=ch74M5gwke3IpuxZFue4DFh7OqtxFpGswgMoOAIW8dQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K25f7Yp6BqVNSozOzPiw1hsU8Ml7jq5xtBRp8JJ69bPTVLsiIZWHmY4vDUasgRfRBm8yV9uRnfwmjEA4klvmJD9E+pLfK1cTyHClqurdBWHGka/g9EBHN5SbTznRNaK2y1G6mloPFWjuOunaXWJX6A3LZXOXjEKrhl9k8q0qD24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CwDZ4v20; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745329343; c=relaxed/simple;
+	bh=43J95R7UkS9ZHu2TmFroJYkPJAiTXS4NSfCxQK3oim0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZdmlbwi5px2DE0rbrKPwXDgCmTVH3VcMPzbQ4Uvo6isE+MMIvcUESah7WF9xOm2/TVqc8HRCwDDLqyraM5EVtyWO9XHNih7Pkt3mttzyZYiTThODo8ELAeBmchEK4YMIjMPRK56aNXey/lLpQXUMzg1OjY77juUGrroYG4nBHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iuONssol; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CwDZ4v20"
-Message-ID: <3b9a2b25-9476-4806-be91-254dda385f38@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745328241;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuONssol"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745329340;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yxPypqLDgGtdwJxcEcCayVfWENXwv6JuKnCdt8mdTtg=;
-	b=CwDZ4v203UYOq3NuBK0L4KWMa91rgo0fmLTpPArwhlNpGpfqnpv8yO5QB2X/6VxqeIzhOM
-	64ys++yDmVKOm4Xng7anf3Lmpl9IdDq3ILC/pSpd1EhChnIgIRrR00GzblmiUnJdBYqO2f
-	p0YwvnCFOnHwLHGta0eMi0EAxNYir7I=
-Date: Tue, 22 Apr 2025 21:23:52 +0800
+	bh=MfU1WoBfg608dgNwhGpErGuQKN5XxOOIy1gdIjz+LLA=;
+	b=iuONssolHZ6O1LBTBRtFxOp/QcB8ErgHcRO1k7anZsd6dhC4KLG39Jvzolm56WGFCAkHbY
+	9dW/GsuRlJ7mPwyyz+8VhJNm25SYCB2isw/LADitnishso6ESEvd+KStBvDz+Qd8XA5HSh
+	lXipmZ/yqS2mXp96ffwtvqV6MOZVhYI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-647-SKaJ08JYOOmBLKT0wSU7Fw-1; Tue,
+ 22 Apr 2025 09:42:16 -0400
+X-MC-Unique: SKaJ08JYOOmBLKT0wSU7Fw-1
+X-Mimecast-MFC-AGG-ID: SKaJ08JYOOmBLKT0wSU7Fw_1745329334
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C080119560A0;
+	Tue, 22 Apr 2025 13:42:14 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.15])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A1C7F1800378;
+	Tue, 22 Apr 2025 13:42:09 +0000 (UTC)
+Date: Tue, 22 Apr 2025 21:42:04 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jared Holzman <jholzman@nvidia.com>
+Cc: Guy Eisenberg <geisenberg@nvidia.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, Yoav Cohen <yoav@nvidia.com>,
+	Omri Levi <omril@nvidia.com>, Ofer Oshri <ofer@nvidia.com>,
+	io-uring@vger.kernel.org
+Subject: Re: ublk: kernel crash when killing SPDK application
+Message-ID: <aAecrLIivK5ioeOk@fedora>
+References: <IA1PR12MB645841796CB4C76F62F24522A9B22@IA1PR12MB6458.namprd12.prod.outlook.com>
+ <Z_5XdWPQa7cq1nDJ@fedora>
+ <d2179120-171b-47ba-b664-23242981ef19@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH 00/11] pcache: Persistent Memory Cache for Block
- Devices
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Dan Williams <dan.j.williams@intel.com>,
- hch@lst.de, gregory.price@memverge.com, John@groves.net,
- Jonathan.Cameron@huawei.com, bbhushan2@marvell.com, chaitanyak@nvidia.com,
- rdunlap@infradead.org, agk@redhat.com, snitzer@kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, linux-bcache@vger.kernel.org,
- nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
-References: <20250414014505.20477-1-dongsheng.yang@linux.dev>
- <67fe9ea2850bc_71fe294d8@dwillia2-xfh.jf.intel.com.notmuch>
- <15e2151a-d788-48eb-8588-1d9a930c64dd@kernel.dk>
- <07f93a57-6459-46e2-8ee3-e0328dd67967@linux.dev>
- <d3231630-9445-4c17-9151-69fe5ae94a0d@kernel.dk>
- <235030ca-93a4-4666-93f8-93f8d81ff650@linux.dev>
- <3bdad772-9710-2763-c9a3-fefb3723fdf6@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Dongsheng Yang <dongsheng.yang@linux.dev>
-In-Reply-To: <3bdad772-9710-2763-c9a3-fefb3723fdf6@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2179120-171b-47ba-b664-23242981ef19@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
+On Tue, Apr 22, 2025 at 02:43:06PM +0300, Jared Holzman wrote:
+> On 15/04/2025 15:56, Ming Lei wrote:
+> > On Tue, Apr 15, 2025 at 10:58:37AM +0000, Guy Eisenberg wrote:
 
-On 2025/4/22 18:29, Mikulas Patocka wrote:
-> Hi
->
->
-> On Thu, 17 Apr 2025, Dongsheng Yang wrote:
->
->> +ccing md-devel
->>
->> On 2025/4/16 23:10, Jens Axboe wrote:
->>> On 4/16/25 12:08 AM, Dongsheng Yang wrote:
->>>> On 2025/4/16 9:04, Jens Axboe wrote:
->>>>> On 4/15/25 12:00 PM, Dan Williams wrote:
->>>>>> Thanks for making the comparison chart. The immediate question this
->>>>>> raises is why not add "multi-tree per backend", "log structured
->>>>>> writeback", "readcache", and "CRC" support to dm-writecache?
->>>>>> device-mapper is everywhere, has a long track record, and enhancing it
->>>>>> immediately engages a community of folks in this space.
->>>>> Strongly agree.
->>>> Hi Dan and Jens,
->>>> Thanks for your reply, that's a good question.
->>>>
->>>>       1. Why not optimize within dm-writecache?
->>>>   From my perspective, the design goal of dm-writecache is to be a
->>>> minimal write cache. It achieves caching by dividing the cache device
->>>> into n blocks, each managed by a wc_entry, using a very simple
->>>> management mechanism. On top of this design, it's quite difficult to
->>>> implement features like multi-tree structures, CRC, or log-structured
->>>> writeback. Moreover, adding such optimizations?especially a read
->>>> cache?would deviate from the original semantics of dm-writecache. So,
->>>> we didn't consider optimizing dm-writecache to meet our goals.
->>>>
->>>>       2. Why not optimize within bcache or dm-cache?
->>>> As mentioned above, dm-writecache is essentially a minimal write
->>>> cache. So, why not build on bcache or dm-cache, which are more
->>>> complete caching systems? The truth is, it's also quite difficult.
->>>> These systems were designed with traditional SSDs/NVMe in mind, and
->>>> many of their design assumptions no longer hold true in the context of
->>>> PMEM. Every design targets a specific scenario, which is why, even
->>>> with dm-cache available, dm-writecache emerged to support DAX-capable
->>>> PMEM devices.
->>>>
->>>>       3. Then why not implement a full PMEM cache within the dm framework?
->>>> In high-performance IO scenarios?especially with PMEM hardware?adding
->>>> an extra DM layer in the IO stack is often unnecessary. For example,
->>>> DM performs a bio clone before calling __map_bio(clone) to invoke the
->>>> target operation, which introduces overhead.
-> Device mapper performs (in the common fast case) one allocation per
-> incoming bio - the allocation contains the outgoing bio and a structure
-> that may be used for any purpose by the target driver. For interlocking,
-> it uses RCU, so there is no synchronizing instruction. So, DM overhead is
-> not big.
->
->>>> Thank you again for the suggestion. I absolutely agree that leveraging
->>>> existing frameworks would be helpful in terms of code review, and
->>>> merging. I, more than anyone, hope more people can help review the
->>>> code or join in this work. However, I believe that in the long run,
->>>> building a standalone pcache module is a better choice.
->>> I think we'd need much stronger reasons for NOT adopting some kind of dm
->>> approach for this, this is really the place to do it. If dm-writecache
->>> etc aren't a good fit, add a dm-whatevercache for it? If dm is
->>> unnecessarily cloning bios when it doesn't need to, then that seems like
->>> something that would be worthwhile fixing in the first place, or at
->>> least eliminate for cases that don't need it. That'd benefit everyone,
->>> and we would not be stuck with a new stack to manage.
->>>
->>> Would certainly be worth exploring with the dm folks.
->> well, introducing dm-pcache (assuming we use this name) could, on one hand,
->> attract more users and developers from the device-mapper community to pay
->> attention to this project, and on the other hand, serve as a way to validate
->> or improve the dm framework’s performance in high-performance I/O scenarios.
->> If necessary, we can enhance the dm framework instead of bypassing it
->> entirely. This indeed sounds like something that would “benefit everyone.”
->>
->> Hmm, I will seriously consider this approach.
->>
->> Hi Alasdair, Mike, Mikulas,  Do you have any suggestions?
->>
->> Thanx
-> If you create a new self-contained target that doesn't need changes in the
-> generic dm or block code, it's OK and I would accept that.
+...
 
+> 
+> Hi Ming,
+> 
+> Unfortunately your patch did not solve the issue, it is still happening (6.14 Kernel)
+> 
+> I believe the issue is that ublk_cancel_cmd() is calling io_uring_cmd_done() on a uring_cmd that is currently scheduled as a task work by io_uring_cmd_complete_in_task()
+> 
+> I reproduced with the patch below and saw the warning I added shortly before the crash. The dmesg log is attached.
+> 
+> I'm not sure how to solve the issue though. Unless we wait for the task work to complete in ublk_cancel cmd. I can't see any way to cancel the task work
+> 
+> Would appreciate your assistance,
+> 
+> Regards,
+> 
+> Jared
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index ca9a67b5b537..d9f544206b36 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -72,6 +72,10 @@
+>  	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
+>  	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
+>  
+> +#ifndef IORING_URING_CMD_TW_SCHED
+> +        #define IORING_URING_CMD_TW_SCHED (1U << 31)
+> +#endif
+> +
+>  struct ublk_rq_data {
+>  	struct llist_node node;
+>  
+> @@ -1236,6 +1240,7 @@ static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
+>  	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+>  	struct ublk_queue *ubq = pdu->ubq;
+>  
+> +	cmd->flags &= ~IORING_URING_CMD_TW_SCHED;
+>  	ublk_forward_io_cmds(ubq, issue_flags);
+>  }
+>  
+> @@ -1245,7 +1250,7 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+>  
+>  	if (llist_add(&data->node, &ubq->io_cmds)) {
+>  		struct ublk_io *io = &ubq->ios[rq->tag];
+> -
+> +		io->cmd->flags |= IORING_URING_CMD_TW_SCHED;
+>  		io_uring_cmd_complete_in_task(io->cmd, ublk_rq_task_work_cb);
+>  	}
+>  }
+> @@ -1498,8 +1503,10 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, struct ublk_io *io,
+>  		io->flags |= UBLK_IO_FLAG_CANCELED;
+>  	spin_unlock(&ubq->cancel_lock);
+>  
+> -	if (!done)
+> +	if (!done) {
+> +		WARN_ON_ONCE(io->cmd->flags & IORING_URING_CMD_TW_SCHED);
+>  		io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
+> +        }
+>  }
+>  
+>  /*
+> @@ -1925,6 +1932,7 @@ static inline int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+>  static void ublk_ch_uring_cmd_cb(struct io_uring_cmd *cmd,
+>  		unsigned int issue_flags)
+>  {
+> +	cmd->flags &= ~IORING_URING_CMD_TW_SCHED;
+>  	ublk_ch_uring_cmd_local(cmd, issue_flags);
+>  }
+>  
+> @@ -1937,6 +1945,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>  
+>  	/* well-implemented server won't run into unlocked */
+>  	if (unlikely(issue_flags & IO_URING_F_UNLOCKED)) {
+> +		cmd->flags |= IORING_URING_CMD_TW_SCHED;
+>  		io_uring_cmd_complete_in_task(cmd, ublk_ch_uring_cmd_cb);
+>  		return -EIOCBQUEUED;
+>  	}
+> diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+> index abd0c8bd950b..3ac2ef7bd99a 100644
+> --- a/include/linux/io_uring/cmd.h
+> +++ b/include/linux/io_uring/cmd.h
+> @@ -7,6 +7,7 @@
+>  
+>  /* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
+>  #define IORING_URING_CMD_CANCELABLE	(1U << 30)
+> +#define IORING_URING_CMD_TW_SCHED	(1U << 31)
+>  
+>  struct io_uring_cmd {
+>  	struct file	*file;
+> 
 
-I will try to port pcache into dm to be a new self-contained target.
+Nice debug patch!
 
+Your patch and the dmesg log has shown the race between io_uring_cmd_complete_in_task()
+and io_uring_cmd_done() <- ublk_cancel_cmd().
 
-Thanx
+In theory, io_uring should have the knowledge to cover it, but I guess it
+might be a bit hard.
 
-Dongsheng
+I will try to cook a ublk fix tomorrow for you to test.
 
->
-> Improving dm-writecache is also possible.
->
-> Mikulas
+Thanks,
+Ming
+
