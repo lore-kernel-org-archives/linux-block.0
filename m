@@ -1,187 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C092367D4
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 08:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E5E2F3E;
+	Tue, 22 Apr 2025 08:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745309622; cv=none; b=TrB+8lIPkmvxX8+0wZP2rJYJUgwxTTn3mxyCqQWJc6gO3pSDk9N0UxtIYVkOMGntM9qviFH57NsxbSn4VBYOe3CGlFVFhJSfLBam4qusBeZTVadH2nhQW2nsVsph+cZ5S9jxAG7FYHLPjiYnxlDxHMOd4s1sKrrN5+/wnLsLWGQ=
+	t=1745309753; cv=none; b=Qc3ywW8omqn6fUhHc7VDe9xd2AGjWE14pRWmGdcK4OY8TeDKq/fde1xIHA0nnQ5RQzPbwyjRcWPjOJvJnwVQCN0Z/bxtSjKYJl3HKKocWPp97uVxRF6SlVUv6SU9TJRstTPSyd8QaXCo7DK7GbjPbCveJHJfzWWTE18oFlun8K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745309622; c=relaxed/simple;
-	bh=4kViGjaLUDqCGRUiYHO6Me6JaGQHEDdOSt28cLBTMyo=;
+	s=arc-20240116; t=1745309753; c=relaxed/simple;
+	bh=ly/S3vGiyt4p19c1V/A+YbeYTEbIH4jV0pHO+LqIk/U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j45W6i0Sj5PmKUW/vIv89HFuCOx9Giebt5isFjdA8jv+VLsFb/hutV/XElepuoA3GVBHNtwoK0V3RfsFLnw6TMpOc6F9SaMOxImjCmpGNh7cIs05GCVVgs9Aw92JfJpxVqy2MTO4pNGVRjKI1evFtfo1WzcG6gMgjZ3fC+1ckhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V15kyF0I; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=odP6IOTpbyNUkekhc5DbZE+jbo0FOYuLRYe9Biv9khfBw1+ilmIgx81RI4c5o/OP14oLsjvWotLbPQ/ldGZ48vTBm2dnKlPgQJ958JD4AS/BJhhbGd6ZW0IzEJ1YTAwXSD3+nGCSKRzNrVL6X3TOVR3LX31CgDRMM+vUXsBH/Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5/yO5lm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V15kyF0I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745309616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eGWGrWcObjRUQxZy2lXHI+7olCXX0Ahq60KcQQO/EAk=;
-	b=V15kyF0Ie2VtJZTmfeRkEDBy6HUTkTbHUsWFbHCE8VcKYJell1B92HUWw9UkmKXMPEhB/U
-	//mxEm++mP08ZCJ0xbMwQkUPAiepbQFLsQ/NAsTeo8camfhrA7Xrbi3bcv4TzxffRM1J78
-	UdduQf/ZoNfNnnoMIxJ5NLaAdxfv6oA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-320-GF6PEemsOSSMgWl7xRmwVA-1; Tue,
- 22 Apr 2025 04:13:30 -0400
-X-MC-Unique: GF6PEemsOSSMgWl7xRmwVA-1
-X-Mimecast-MFC-AGG-ID: GF6PEemsOSSMgWl7xRmwVA_1745309609
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9A931800368;
-	Tue, 22 Apr 2025 08:13:28 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.157])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 654E9180047F;
-	Tue, 22 Apr 2025 08:13:23 +0000 (UTC)
-Date: Tue, 22 Apr 2025 16:13:19 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V2 20/20] block: move wbt_enable_default() out of queue
- freezing from sched ->exit()
-Message-ID: <aAdPn-47ctywQGIT@fedora>
-References: <20250418163708.442085-1-ming.lei@redhat.com>
- <20250418163708.442085-21-ming.lei@redhat.com>
- <261d7b81-e611-47f4-ad55-6f7716c278c7@linux.ibm.com>
- <aAXzToqtIlAoUP7t@fedora>
- <286f9d0e-b782-4062-b0eb-cba6fa81e388@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5/yO5lm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE657C4CEE9;
+	Tue, 22 Apr 2025 08:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745309753;
+	bh=ly/S3vGiyt4p19c1V/A+YbeYTEbIH4jV0pHO+LqIk/U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C5/yO5lmXtMKDjG8aOCEO4Cf+7/Re9bp9A0Ovh22niJ04fFiJSybzjT5SsHv5z5jR
+	 wmcuQyR204/bVBv7cyUjVZGHPmM3kYS97MZG4LALk2BuXTQtIhhsJqK3voGNjmdv1b
+	 HTdJxCBthg3IPaADPQnCw+Og3RVRanxgAJeORHZjOfcxmFrcIakBcVHvg2aDSxoa5F
+	 +pDX/xqX/JtuTNRnw40kgfy3OLPkSztLIs+yiVNMd1vmqHwUkWnrTrOOKQfOY0h+7r
+	 6bNd44XtaaGkNfx8B3LOHPVADGQImfaxHnCT/4fvYx+XfTXqwVhPY6PUkRoJnd7jJc
+	 VJFB94zd6n0+A==
+Date: Tue, 22 Apr 2025 10:15:48 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: hch <hch@lst.de>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "axboe@kernel.dk" <axboe@kernel.dk>, 
+	"djwong@kernel.org" <djwong@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] fs: move the bdex_statx call to vfs_getattr_nosec
+Message-ID: <20250422-angepackt-reisen-bc24fbec2702@brauner>
+References: <20250417064042.712140-1-hch@lst.de>
+ <xrvvwm7irr6dldsbfka3c4qjzyc4zizf3duqaroubd2msrbjf5@aiexg44ofiq3>
+ <20250422055149.GB29356@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <286f9d0e-b782-4062-b0eb-cba6fa81e388@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250422055149.GB29356@lst.de>
 
-On Tue, Apr 22, 2025 at 11:44:59AM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 4/21/25 12:57 PM, Ming Lei wrote:
-> > On Sat, Apr 19, 2025 at 08:09:04PM +0530, Nilay Shroff wrote:
-> >>
-> >>
-> >> On 4/18/25 10:07 PM, Ming Lei wrote:
-> >>> scheduler's ->exit() is called with queue frozen and elevator lock is held, and
-> >>> wbt_enable_default() can't be called with queue frozen, otherwise the
-> >>> following lockdep warning is triggered:
-> >>>
-> >>> 	#6 (&q->rq_qos_mutex){+.+.}-{4:4}:
-> >>> 	#5 (&eq->sysfs_lock){+.+.}-{4:4}:
-> >>> 	#4 (&q->elevator_lock){+.+.}-{4:4}:
-> >>> 	#3 (&q->q_usage_counter(io)#3){++++}-{0:0}:
-> >>> 	#2 (fs_reclaim){+.+.}-{0:0}:
-> >>> 	#1 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
-> >>> 	#0 (&q->debugfs_mutex){+.+.}-{4:4}:
-> >>>
-> >>> Fix the issue by moving wbt_enable_default() out of bfq's exit(), and
-> >>> call it from elevator_change_done().
-> >>>
-> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> >>> ---
-> >>>  block/bfq-iosched.c | 2 +-
-> >>>  block/elevator.c    | 5 +++++
-> >>>  block/elevator.h    | 1 +
-> >>>  3 files changed, 7 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> >>> index 40e4106a71e7..310ce1d8c41e 100644
-> >>> --- a/block/bfq-iosched.c
-> >>> +++ b/block/bfq-iosched.c
-> >>> @@ -7211,7 +7211,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
-> >>>  
-> >>>  	blk_stat_disable_accounting(bfqd->queue);
-> >>>  	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT, bfqd->queue);
-> >>> -	wbt_enable_default(bfqd->queue->disk);
-> >>> +	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
-> >>>  
-> >>>  	kfree(bfqd);
-> >>>  }
-> >>> diff --git a/block/elevator.c b/block/elevator.c
-> >>> index 8652fe45a2db..378553fce5d8 100644
-> >>> --- a/block/elevator.c
-> >>> +++ b/block/elevator.c
-> >>> @@ -687,8 +687,13 @@ int elevator_change_done(struct request_queue *q, struct elv_change_ctx *ctx)
-> >>>  	int ret = 0;
-> >>>  
-> >>>  	if (ctx->old) {
-> >>> +		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
-> >>> +				&ctx->old->flags);
-> >>> +
-> >>>  		elv_unregister_queue(q, ctx->old);
-> >>>  		kobject_put(&ctx->old->kobj);
-> >>> +		if (enable_wbt)
-> >>> +			wbt_enable_default(q->disk);
-> >>>  	}
-> >>>  	if (ctx->new) {
-> >>>  		ret = elv_register_queue(q, ctx->new, ctx->uevent);
-> >>> diff --git a/block/elevator.h b/block/elevator.h
-> >>> index 486be0690499..b14c611c74b6 100644
-> >>> --- a/block/elevator.h
-> >>> +++ b/block/elevator.h
-> >>> @@ -122,6 +122,7 @@ struct elevator_queue
-> >>>  
-> >>>  #define ELEVATOR_FLAG_REGISTERED	0
-> >>>  #define ELEVATOR_FLAG_DYING		1
-> >>> +#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
-> >>>  
-> >>>  /* Holding context data for changing elevator */
-> >>>  struct elv_change_ctx {
-> >>
-> >> It seems invoking wbt_enable_default from elevator_change_done could probably
-> >> still race with ioc_qos_write or queue_wb_lat_store. Both ioc_qos_write and 
-> >> queue_wb_lat_store run with ->freeze_lock and ->elevator_lock protection.
+On Tue, Apr 22, 2025 at 07:51:49AM +0200, hch wrote:
+> On Tue, Apr 22, 2025 at 05:03:19AM +0000, Shinichiro Kawasaki wrote:
+> > I ran blktests with the kernel v6.15-rc3, and found the test case md/001 hangs.
+> > The hang is recreated in stable manner. I bisected and found this patch as the
+> > commit 777d0961ff95 is the trigger. When I revert the commit from v6.15-rc3
+> > kernel, the hang disappeared.
 > > 
-> > Actually wbt_enable_default() and wbt_init() needn't the above protection,
-> > especially since the patch 2/20 removes q->elevator use in
-> > wbt_enable_default().
+> > Actions for fix will be appreciated.
 > > 
-> Yes agreed, and as I understand XXX_FLAG_DISABLE_WBT was earlier elevator_queue->flags 
-> but now (with patch 2/20) it has been moved to request_queue->flags. As elevator_change_done 
-> first puts elevator_queue object which would potentially releases/frees the  elevator_queue 
-> object. Next while we enable wbt (in elevator_change_done)  we may not have access to the 
-> elevator_queue object and so now we reference  QUEUE_FLAG_DISABLE_WBT using request_queue->flags. 
-> That's, I believe, the purpose of patch 2/20.
+> > FYI, the kernel INFO messages recorded functions relevant to the trigger commit,
+> > such as bdev_statx or vfs_getattr_nosec [1].
 > 
-> However even with patch 2/20 change, both elevator_change_done and ioc_qos_write or
-> queue_wb_lat_store may run in parallel, isn't it?
+> This should fix it:
 > 
-> therad1:
-> blk_mq_update_nr_hw_queues
->   -> __blk_mq_update_nr_hw_queues
->     -> elevator_change_done
->       -> wbt_enable_default
->         -> wbt_init
->          -> wbt_update_limits
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 6a34179192c9..97d4c0ab1670 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -1274,18 +1274,23 @@ void sync_bdevs(bool wait)
+>   */
+>  void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
+>  {
+> -	struct inode *backing_inode;
+>  	struct block_device *bdev;
+>  
+> -	backing_inode = d_backing_inode(path->dentry);
+> -
+>  	/*
+> -	 * Note that backing_inode is the inode of a block device node file,
+> -	 * not the block device's internal inode.  Therefore it is *not* valid
+> -	 * to use I_BDEV() here; the block device has to be looked up by i_rdev
+> -	 * instead.
+> +	 * Note that d_backing_inode() returnsthe inode of a block device node
+> +	 * file, not the block device's internal inode.
+> +	 *
+> +	 * Therefore it is *not* valid to use I_BDEV() here; the block device
+> +	 * has to be looked up by i_rdev instead.
+> +	 *
+> +	 * Only do this lookup if actually needed to avoid the performance
+> +	 * overhead of the lookup, and to avoid injecting bdev lifetime issues
+> +	 * into devtmpfs.
+>  	 */
+> -	bdev = blkdev_get_no_open(backing_inode->i_rdev);
+> +	if (!(request_mask & (STATX_DIOALIGN | STATX_WRITE_ATOMIC)))
+> +		return;
 
-Here wbt_update_limits() is called on un-attached `struct rq_wb` instance,
-which is just allocated from heap.
+This leaks the block device reference if blkdev_get_no_open() succeeds.
 
-> 
-> therad2:
-> queue_wb_lat_store
->   -> wbt_set_min_lat
->    -> wbt_update_limits
-
-The above one is run on attached `struct rq_wb` instance.
-
-And there can only be one attached `struct rq_wb` instance, so the above
-race doesn't exist because attaching wbt to queue/disk is covered by `q->rq_qos_mutex`.
-
-
-Thanks,
-Ming
-
+> +
+> +	bdev = blkdev_get_no_open(d_backing_inode(path->dentry)->i_rdev);
+>  	if (!bdev)
+>  		return;
+>  
