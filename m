@@ -1,203 +1,339 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AE71F4CA4
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 06:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DE1DF60
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 06:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745302515; cv=none; b=tDy3tuCWb69LYbAmIlJflGsu60moDP8lZ+k5OqfrDsupeUHYlRdaIprs10b+SsYVq0KRGINVed5GfqRk0J56Wj5kI1BRtC+c6MoHXUgPLeUZ9l0viEvBCnFLlXH0GWKSeWBAJF3rLTzgZOsVmEEvCaML94dUQw1zk+xhebg1d6w=
+	t=1745302576; cv=none; b=FvhJlDLOfykwfyn0HGjyBwtgqVihUnxyFucpYtd4/m9tFlo6J6BEbN6e9bexoxB8Lo4VXqtkBSdoxNL7kua4Qhdlr7zqbb4A1GURjLijrzDRuYWUnG7owet3vEUyDmkoGEm6q4/V1yq/MngixboFn325HAz6julGxa7AbQgApZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745302515; c=relaxed/simple;
-	bh=Vs466jqbndUc0mgUrmOx51Sc4REMNetoxGTPotNGKwc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LaUGemov4o5jONlep0IfUaXsIueLi65uPROXeO+WbWlbTiTAdupaf6pOBcS5y6sWDLZXQO+Hp3E3Wd7D5qsSccFkRwMGem8ilYsDXB4LgcDftoxJI0tjAhu14y6Wvnf1LGRlfOBYQMA1x/iw3i1y2qB2jGFCWoNonQxrISMaskg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SjZ/qIRj; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1745302576; c=relaxed/simple;
+	bh=jZ0wNJE4sCAD2Wxg3QqyirSWVQF9ciu8w3HYSQANqx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZI4YIVK4JrBCAogogN0ayfMT8XGag9pHo6nySpwSvYa3Vu5axOte8UYTgjvbUozYbSo/LgBjG22UmsaWZKvyhOfgG1DkfybgPKG4zvXJoK74sCvRYHNH9foaONy/CcG4llZcTFdUO1UIcA+vXE9bfJ1Mm5hPnvkJhTI45Kqp/G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aw8yO/gN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SjZ/qIRj"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53LLgF9u028919;
-	Tue, 22 Apr 2025 06:15:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9Uyt5S
-	9YuMrNuCeTjbDdv/S27ehim1Ww3Yo3aONzfvQ=; b=SjZ/qIRjiFwUVtsEdWvGIW
-	ALPmMmVwelECzCwxofbdOvUaDuqY9cGmun3/dyBuOesH3OrKg/EP4n/MMv2SFs2B
-	rj3LjwJPDH+3AD4Ic23YxJRzQ7w6Iz24J+ns2bLh00y5m36Rig3VH1T3XCJ/bWly
-	d9KgQZYjlEeA+w2vcLnFzB0SWUb6ToCej/oCvZhtrlVGpGnjeicedoEWBaxbaoQ1
-	YqN3Alf+YsqLsM7CNCCXcDrVavigbl5noYN41KSz6rWFlXsp2o18SXUJPKYovb31
-	O6rftGjLZ2CHnk5NNHnJMpIeaf99oANA/0IahAOs7BwI9VI3YW7bhShYtPZGNSEQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 465x5vsff2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Apr 2025 06:15:05 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53M5Go0x012490;
-	Tue, 22 Apr 2025 06:15:05 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 464p5t1rwu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Apr 2025 06:15:05 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53M6F4T513370058
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 22 Apr 2025 06:15:04 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 658CD5806D;
-	Tue, 22 Apr 2025 06:15:04 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 58CB85805A;
-	Tue, 22 Apr 2025 06:15:01 +0000 (GMT)
-Received: from [9.43.46.43] (unknown [9.43.46.43])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 22 Apr 2025 06:15:00 +0000 (GMT)
-Message-ID: <286f9d0e-b782-4062-b0eb-cba6fa81e388@linux.ibm.com>
-Date: Tue, 22 Apr 2025 11:44:59 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aw8yO/gN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745302573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qOfM+9BQZOzvEWdY0TkOTsLL5sU/pbh/yn6VnJiXCsc=;
+	b=aw8yO/gNiPyB9BZdhSXTgyZ3rVsFoD+crpTLFKK5zi526MTTVfofr68jpN/C4MWETa8JVp
+	1cPHwUOhhbp0eFc2b7aPvaPFNfebx4U/Aj9TPkIUH/UsNrdHBe2kqXYIpwTGBCVKZEUa2t
+	AeMOOhe4dpM5RKAYZQKz7xd/7IENDpM=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-132-ViRW4d5bOPiqXmg7sn_Zgg-1; Tue, 22 Apr 2025 02:16:11 -0400
+X-MC-Unique: ViRW4d5bOPiqXmg7sn_Zgg-1
+X-Mimecast-MFC-AGG-ID: ViRW4d5bOPiqXmg7sn_Zgg_1745302570
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-30bf6bae757so16161811fa.0
+        for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 23:16:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745302570; x=1745907370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qOfM+9BQZOzvEWdY0TkOTsLL5sU/pbh/yn6VnJiXCsc=;
+        b=SR2qeekQvVzEwgwahP28xMyxKeW5eiObia2lajGLLJqDvdu6A7UYjGR3n19I/qpi4z
+         Rnxqv2OFh/vkHaMngsG1hEJMCz46nTSInwga2iL+44yh9q9QAfj1lfDLoi/oR1Mj0fwL
+         GKULil/E9gSORgckj+uqSpu9bJ3LOTzsTsUnjMnIlsVFgs6LOi/mSxEN7AIzFrROIsLO
+         Ia3ra/BQyNAz6Qzxhdgz0zLVMBIkjluAyCSAqtl/x3jOhq4bDElI2EeyqH+lNXbB7up4
+         VO0P9Hd0APfJuTKbKefN6IEQJ8KRS0Yh4oB2/3dibn6yGnBh4cqQc6V+aXv+mBtzOmZV
+         bPgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhxrLAomDS/rjGlWHiJ1Lbd+XB7tuMjJz+nyEdT6/DxzwVIkKG/vTFCucv8gnCQ454m0totXB2LDsSig==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFf230yHtg/w33ndrtBDzIw+TcLFCC6TgZC2Nz/vy9z9h0Khr8
+	h49iujqYQY9mRFyfJ+2PXLoNp/MoJl7kdauMBh/X/x757vswsOZuV0ZlOVD7TNl9gkWPvQ+gBNA
+	PDCyEngI1lSwmtXbJk/9WaOiDXVzvleJUgsDnBxeOwlsHyycpCEFAq5mEeHChYm5+Ynb00mIGxN
+	fgf8c5XEJTRxNxzhNhxrJDWLcMOBtnZ51QG8GwJfJXaFirw0by
+X-Gm-Gg: ASbGncsYYOI8TcduYafHalv8hlG4SVmLycmpwSCq/FORfB2rC5oiHmjHWkTbjuSMHZm
+	ycJLhJqbIfwH99dnwcphFQ9IJBLdTVPlNHa+913SWROS3NjwilgbXzPwZeFsEfhHGlAzDVQ==
+X-Received: by 2002:a05:6512:3ba4:b0:549:7145:5d2f with SMTP id 2adb3069b0e04-54d6e638d0cmr3680178e87.33.1745302569750;
+        Mon, 21 Apr 2025 23:16:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEW4N/JuPGFeAu0EpKla93By/oSeFcB7iGfr/v0RLsztSrXlNeRJzg1bZJfh7bTTHAlED5kxv5pAmzghwhBFOU=
+X-Received: by 2002:a05:6512:3ba4:b0:549:7145:5d2f with SMTP id
+ 2adb3069b0e04-54d6e638d0cmr3680155e87.33.1745302569284; Mon, 21 Apr 2025
+ 23:16:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 20/20] block: move wbt_enable_default() out of queue
- freezing from sched ->exit()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20250418163708.442085-1-ming.lei@redhat.com>
- <20250418163708.442085-21-ming.lei@redhat.com>
- <261d7b81-e611-47f4-ad55-6f7716c278c7@linux.ibm.com>
- <aAXzToqtIlAoUP7t@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aAXzToqtIlAoUP7t@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -7PU0W34OrjwfKqQGHq_F5-L8oLsyIr9
-X-Proofpoint-ORIG-GUID: -7PU0W34OrjwfKqQGHq_F5-L8oLsyIr9
-X-Authority-Analysis: v=2.4 cv=CuO/cm4D c=1 sm=1 tr=0 ts=680733ea cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=20KFwNOVAAAA:8 a=wgIqA3w2QWIHfQYZNoAA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-22_03,2025-04-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 bulkscore=0
- adultscore=0 impostorscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504220045
+References: <20250418010941.667138-1-yukuai1@huaweicloud.com> <20250418010941.667138-4-yukuai1@huaweicloud.com>
+In-Reply-To: <20250418010941.667138-4-yukuai1@huaweicloud.com>
+From: Xiao Ni <xni@redhat.com>
+Date: Tue, 22 Apr 2025 14:15:57 +0800
+X-Gm-Features: ATxdqUHrtlSkNDqa4JXDX3hYzDaUY94bOJQAo195qAV37KLheagYDY464qOKJXs
+Message-ID: <CALTww2_JMiwp=QMuRTFDXQkuqMivR=k7yyw1CAMDxSrJX_WUvg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] md: add a new api sync_io_depth
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, 
+	song@kernel.org, yukuai3@huawei.com, viro@zeniv.linux.org.uk, 
+	akpm@linux-foundation.org, nadav.amit@gmail.com, ubizjak@gmail.com, 
+	cl@linux.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com, johnny.chenyi@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Apr 18, 2025 at 9:17=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> From: Yu Kuai <yukuai3@huawei.com>
+>
+> Currently if sync speed is above speed_min and below speed_max,
+> md_do_sync() will wait for all sync IOs to be done before issuing new
+> sync IO, means sync IO depth is limited to just 1.
+>
+> This limit is too low, in order to prevent sync speed drop conspicuously
+> after fixing is_mddev_idle() in the next patch, add a new api for
+> limiting sync IO depth, the default value is 32.
+>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  drivers/md/md.c | 109 +++++++++++++++++++++++++++++++++++++++---------
+>  drivers/md/md.h |   1 +
+>  2 files changed, 91 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 438e71e45c16..52cadfce7e8d 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -111,32 +111,48 @@ static void md_wakeup_thread_directly(struct md_thr=
+ead __rcu *thread);
+>  /* Default safemode delay: 200 msec */
+>  #define DEFAULT_SAFEMODE_DELAY ((200 * HZ)/1000 +1)
+>  /*
+> - * Current RAID-1,4,5 parallel reconstruction 'guaranteed speed limit'
+> - * is 1000 KB/sec, so the extra system load does not show up that much.
+> - * Increase it if you want to have more _guaranteed_ speed. Note that
+> - * the RAID driver will use the maximum available bandwidth if the IO
+> - * subsystem is idle. There is also an 'absolute maximum' reconstruction
+> - * speed limit - in case reconstruction slows down your system despite
+> - * idle IO detection.
+> + * Current RAID-1,4,5,6,10 parallel reconstruction 'guaranteed speed lim=
+it'
+> + * is sysctl_speed_limit_min, 1000 KB/sec by default, so the extra syste=
+m load
+> + * does not show up that much. Increase it if you want to have more guar=
+anteed
+> + * speed. Note that the RAID driver will use the maximum bandwidth
+> + * sysctl_speed_limit_max, 200 MB/sec by default, if the IO subsystem is=
+ idle.
+>   *
+> - * you can change it via /proc/sys/dev/raid/speed_limit_min and _max.
+> - * or /sys/block/mdX/md/sync_speed_{min,max}
+> + * Background sync IO speed control:
+> + *
+> + * - below speed min:
+> + *   no limit;
+> + * - above speed min and below speed max:
+> + *   a) if mddev is idle, then no limit;
+> + *   b) if mddev is busy handling normal IO, then limit inflight sync IO
+> + *   to sync_io_depth;
+> + * - above speed max:
+> + *   sync IO can't be issued;
+> + *
+> + * Following configurations can be changed via /proc/sys/dev/raid/ for s=
+ystem
+> + * or /sys/block/mdX/md/ for one array.
+>   */
+> -
+>  static int sysctl_speed_limit_min =3D 1000;
+>  static int sysctl_speed_limit_max =3D 200000;
+> -static inline int speed_min(struct mddev *mddev)
+> +static int sysctl_sync_io_depth =3D 32;
+> +
+> +static int speed_min(struct mddev *mddev)
+>  {
+>         return mddev->sync_speed_min ?
+>                 mddev->sync_speed_min : sysctl_speed_limit_min;
+>  }
+>
+> -static inline int speed_max(struct mddev *mddev)
+> +static int speed_max(struct mddev *mddev)
+>  {
+>         return mddev->sync_speed_max ?
+>                 mddev->sync_speed_max : sysctl_speed_limit_max;
+>  }
+>
+> +static int sync_io_depth(struct mddev *mddev)
+> +{
+> +       return mddev->sync_io_depth ?
+> +               mddev->sync_io_depth : sysctl_sync_io_depth;
+> +}
+> +
+>  static void rdev_uninit_serial(struct md_rdev *rdev)
+>  {
+>         if (!test_and_clear_bit(CollisionCheck, &rdev->flags))
+> @@ -293,14 +309,21 @@ static const struct ctl_table raid_table[] =3D {
+>                 .procname       =3D "speed_limit_min",
+>                 .data           =3D &sysctl_speed_limit_min,
+>                 .maxlen         =3D sizeof(int),
+> -               .mode           =3D S_IRUGO|S_IWUSR,
+> +               .mode           =3D 0644,
+>                 .proc_handler   =3D proc_dointvec,
+>         },
+>         {
+>                 .procname       =3D "speed_limit_max",
+>                 .data           =3D &sysctl_speed_limit_max,
+>                 .maxlen         =3D sizeof(int),
+> -               .mode           =3D S_IRUGO|S_IWUSR,
+> +               .mode           =3D 0644,
+> +               .proc_handler   =3D proc_dointvec,
+> +       },
+> +       {
+> +               .procname       =3D "sync_io_depth",
+> +               .data           =3D &sysctl_sync_io_depth,
+> +               .maxlen         =3D sizeof(int),
+> +               .mode           =3D 0644,
+>                 .proc_handler   =3D proc_dointvec,
+>         },
+>  };
+> @@ -5091,7 +5114,7 @@ static ssize_t
+>  sync_min_show(struct mddev *mddev, char *page)
+>  {
+>         return sprintf(page, "%d (%s)\n", speed_min(mddev),
+> -                      mddev->sync_speed_min ? "local": "system");
+> +                      mddev->sync_speed_min ? "local" : "system");
+>  }
+>
+>  static ssize_t
+> @@ -5100,7 +5123,7 @@ sync_min_store(struct mddev *mddev, const char *buf=
+, size_t len)
+>         unsigned int min;
+>         int rv;
+>
+> -       if (strncmp(buf, "system", 6)=3D=3D0) {
+> +       if (strncmp(buf, "system", 6) =3D=3D 0) {
+>                 min =3D 0;
+>         } else {
+>                 rv =3D kstrtouint(buf, 10, &min);
+> @@ -5120,7 +5143,7 @@ static ssize_t
+>  sync_max_show(struct mddev *mddev, char *page)
+>  {
+>         return sprintf(page, "%d (%s)\n", speed_max(mddev),
+> -                      mddev->sync_speed_max ? "local": "system");
+> +                      mddev->sync_speed_max ? "local" : "system");
+>  }
+>
+>  static ssize_t
+> @@ -5129,7 +5152,7 @@ sync_max_store(struct mddev *mddev, const char *buf=
+, size_t len)
+>         unsigned int max;
+>         int rv;
+>
+> -       if (strncmp(buf, "system", 6)=3D=3D0) {
+> +       if (strncmp(buf, "system", 6) =3D=3D 0) {
+>                 max =3D 0;
+>         } else {
+>                 rv =3D kstrtouint(buf, 10, &max);
+> @@ -5145,6 +5168,35 @@ sync_max_store(struct mddev *mddev, const char *bu=
+f, size_t len)
+>  static struct md_sysfs_entry md_sync_max =3D
+>  __ATTR(sync_speed_max, S_IRUGO|S_IWUSR, sync_max_show, sync_max_store);
+>
+> +static ssize_t
+> +sync_io_depth_show(struct mddev *mddev, char *page)
+> +{
+> +       return sprintf(page, "%d (%s)\n", sync_io_depth(mddev),
+> +                      mddev->sync_io_depth ? "local" : "system");
+> +}
+> +
+> +static ssize_t
+> +sync_io_depth_store(struct mddev *mddev, const char *buf, size_t len)
+> +{
+> +       unsigned int max;
+> +       int rv;
+> +
+> +       if (strncmp(buf, "system", 6) =3D=3D 0) {
+> +               max =3D 0;
+> +       } else {
+> +               rv =3D kstrtouint(buf, 10, &max);
+> +               if (rv < 0)
+> +                       return rv;
+> +               if (max =3D=3D 0)
+> +                       return -EINVAL;
+> +       }
+> +       mddev->sync_io_depth =3D max;
+> +       return len;
+> +}
+> +
+> +static struct md_sysfs_entry md_sync_io_depth =3D
+> +__ATTR_RW(sync_io_depth);
+> +
+>  static ssize_t
+>  degraded_show(struct mddev *mddev, char *page)
+>  {
+> @@ -5671,6 +5723,7 @@ static struct attribute *md_redundancy_attrs[] =3D =
+{
+>         &md_mismatches.attr,
+>         &md_sync_min.attr,
+>         &md_sync_max.attr,
+> +       &md_sync_io_depth.attr,
+>         &md_sync_speed.attr,
+>         &md_sync_force_parallel.attr,
+>         &md_sync_completed.attr,
+> @@ -8927,6 +8980,23 @@ static sector_t md_sync_position(struct mddev *mdd=
+ev, enum sync_action action)
+>         }
+>  }
+>
+> +static bool sync_io_within_limit(struct mddev *mddev)
+> +{
+> +       int io_sectors;
+> +
+> +       /*
+> +        * For raid456, sync IO is stripe(4k) per IO, for other levels, i=
+t's
+> +        * RESYNC_PAGES(64k) per IO.
+> +        */
+> +       if (mddev->level =3D=3D 4 || mddev->level =3D=3D 5 || mddev->leve=
+l =3D=3D 6)
+> +               io_sectors =3D 8;
+> +       else
+> +               io_sectors =3D 128;
+> +
+> +       return atomic_read(&mddev->recovery_active) <
+> +               io_sectors * sync_io_depth(mddev);
+> +}
+> +
+>  #define SYNC_MARKS     10
+>  #define        SYNC_MARK_STEP  (3*HZ)
+>  #define UPDATE_FREQUENCY (5*60*HZ)
+> @@ -9195,7 +9265,8 @@ void md_do_sync(struct md_thread *thread)
+>                                 msleep(500);
+>                                 goto repeat;
+>                         }
+> -                       if (!is_mddev_idle(mddev, 0)) {
+> +                       if (!sync_io_within_limit(mddev) &&
+> +                           !is_mddev_idle(mddev, 0)) {
+>                                 /*
+>                                  * Give other IO more of a chance.
+>                                  * The faster the devices, the less we wa=
+it.
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index 9d55b4630077..b57842188f18 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -484,6 +484,7 @@ struct mddev {
+>         /* if zero, use the system-wide default */
+>         int                             sync_speed_min;
+>         int                             sync_speed_max;
+> +       int                             sync_io_depth;
+>
+>         /* resync even though the same disks are shared among md-devices =
+*/
+>         int                             parallel_resync;
+> --
+> 2.39.2
+>
 
+Looks good to me, reviewed-by: Xiao Ni <xni@redhat.com>
 
-On 4/21/25 12:57 PM, Ming Lei wrote:
-> On Sat, Apr 19, 2025 at 08:09:04PM +0530, Nilay Shroff wrote:
->>
->>
->> On 4/18/25 10:07 PM, Ming Lei wrote:
->>> scheduler's ->exit() is called with queue frozen and elevator lock is held, and
->>> wbt_enable_default() can't be called with queue frozen, otherwise the
->>> following lockdep warning is triggered:
->>>
->>> 	#6 (&q->rq_qos_mutex){+.+.}-{4:4}:
->>> 	#5 (&eq->sysfs_lock){+.+.}-{4:4}:
->>> 	#4 (&q->elevator_lock){+.+.}-{4:4}:
->>> 	#3 (&q->q_usage_counter(io)#3){++++}-{0:0}:
->>> 	#2 (fs_reclaim){+.+.}-{0:0}:
->>> 	#1 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
->>> 	#0 (&q->debugfs_mutex){+.+.}-{4:4}:
->>>
->>> Fix the issue by moving wbt_enable_default() out of bfq's exit(), and
->>> call it from elevator_change_done().
->>>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  block/bfq-iosched.c | 2 +-
->>>  block/elevator.c    | 5 +++++
->>>  block/elevator.h    | 1 +
->>>  3 files changed, 7 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>> index 40e4106a71e7..310ce1d8c41e 100644
->>> --- a/block/bfq-iosched.c
->>> +++ b/block/bfq-iosched.c
->>> @@ -7211,7 +7211,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
->>>  
->>>  	blk_stat_disable_accounting(bfqd->queue);
->>>  	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT, bfqd->queue);
->>> -	wbt_enable_default(bfqd->queue->disk);
->>> +	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
->>>  
->>>  	kfree(bfqd);
->>>  }
->>> diff --git a/block/elevator.c b/block/elevator.c
->>> index 8652fe45a2db..378553fce5d8 100644
->>> --- a/block/elevator.c
->>> +++ b/block/elevator.c
->>> @@ -687,8 +687,13 @@ int elevator_change_done(struct request_queue *q, struct elv_change_ctx *ctx)
->>>  	int ret = 0;
->>>  
->>>  	if (ctx->old) {
->>> +		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
->>> +				&ctx->old->flags);
->>> +
->>>  		elv_unregister_queue(q, ctx->old);
->>>  		kobject_put(&ctx->old->kobj);
->>> +		if (enable_wbt)
->>> +			wbt_enable_default(q->disk);
->>>  	}
->>>  	if (ctx->new) {
->>>  		ret = elv_register_queue(q, ctx->new, ctx->uevent);
->>> diff --git a/block/elevator.h b/block/elevator.h
->>> index 486be0690499..b14c611c74b6 100644
->>> --- a/block/elevator.h
->>> +++ b/block/elevator.h
->>> @@ -122,6 +122,7 @@ struct elevator_queue
->>>  
->>>  #define ELEVATOR_FLAG_REGISTERED	0
->>>  #define ELEVATOR_FLAG_DYING		1
->>> +#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
->>>  
->>>  /* Holding context data for changing elevator */
->>>  struct elv_change_ctx {
->>
->> It seems invoking wbt_enable_default from elevator_change_done could probably
->> still race with ioc_qos_write or queue_wb_lat_store. Both ioc_qos_write and 
->> queue_wb_lat_store run with ->freeze_lock and ->elevator_lock protection.
-> 
-> Actually wbt_enable_default() and wbt_init() needn't the above protection,
-> especially since the patch 2/20 removes q->elevator use in
-> wbt_enable_default().
-> 
-Yes agreed, and as I understand XXX_FLAG_DISABLE_WBT was earlier elevator_queue->flags 
-but now (with patch 2/20) it has been moved to request_queue->flags. As elevator_change_done 
-first puts elevator_queue object which would potentially releases/frees the  elevator_queue 
-object. Next while we enable wbt (in elevator_change_done)  we may not have access to the 
-elevator_queue object and so now we reference  QUEUE_FLAG_DISABLE_WBT using request_queue->flags. 
-That's, I believe, the purpose of patch 2/20.
-
-However even with patch 2/20 change, both elevator_change_done and ioc_qos_write or
-queue_wb_lat_store may run in parallel, isn't it?
-
-therad1:
-blk_mq_update_nr_hw_queues
-  -> __blk_mq_update_nr_hw_queues
-    -> elevator_change_done
-      -> wbt_enable_default
-        -> wbt_init
-         -> wbt_update_limits
-
-therad2:
-queue_wb_lat_store
-  -> wbt_set_min_lat
-   -> wbt_update_limits
-
-Thanks,
---Nilay
-
-
- 
