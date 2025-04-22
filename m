@@ -1,93 +1,121 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652F22D600
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 10:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835B5FB95
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 10:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745318719; cv=none; b=p1WPfPjQIyv8CEjm/7dSk6Wi/GXhMl2f35fPI7gN4HbnPdP+E1rEkux1wi5ujA8ika68uvA3zxtUgr/dB5TC9QKk5aVVOBF50txz+A+P/sMx6PStIOig8NwYU9m/a1gwOLVcSzSmNBnY8q8aPtQ4DV03h1rr5WdlQEBdgBn5DGc=
+	t=1745319065; cv=none; b=YIS4NIETgl3Cje5XGKWqxsCaQ++fkuZ7Bqk0ocU+SSF6/V544Yt0wSZi5J579MXdEfHc30y5oE3BkGP3rEtcq5ivMSNSvrV2o2UoA1UgVHDy5nhosJyV10L9hGGlYnAE5Y9WY9wE7UftfvYbmk3H/OWKbNDkm3zvzZSUsQ0lMb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745318719; c=relaxed/simple;
-	bh=m2RHOwNehHpqHHo8iTUQFAX2G1uH1oLG9AUA3ukXizo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qJsX++r7+2UEoWPUtH1mTHRoWCmWaLE4xO+H3eXQiOhkOXPEMkRy0fs6xBCzf4glxHDtdPQS+9lPM6b0vTHgbmxa6ma+WWU7iAaR3Pto+Z2NXY248TGOY++Qw6ovz9BcI9w78G8796YJfemoQ8VjbIGP+pd0avQCY9VsOlQYqfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FlwJgQ+0; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1745319065; c=relaxed/simple;
+	bh=TzfCKUE8nNhw8ChmZapQVsov6szyvwV+4eI6sOUTxlk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TaCaL63h/2r7wC3sMasrtAZwH6CSzAaWygAr5tf5tGULhmpsh1TKaBeuN3dz61cBfh+rodHcPDwzcnSwQJ58CNglkMu0V08hUofBXIdmtj9DtFM86e6Q8xqrIC7rJYWCjQ8y+J+5o+lGQ+Dl4C0IL8n7ulYK8QN0mrvkM+XWVsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ND5eSUXX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FlwJgQ+0"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac2963dc379so736860666b.2
-        for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 03:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1745318716; x=1745923516; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=m2RHOwNehHpqHHo8iTUQFAX2G1uH1oLG9AUA3ukXizo=;
-        b=FlwJgQ+0d/7BWCpfHKy7fLb0o1MzFwHJoEWXh75Llt05G3TuYuwBqX7fPEXuW1Qq3U
-         o2+LTyZ+MoXlXX+gsdLtraRKo3YOd7q/c4MmZ9QAsTE8Cafs7aj+B7jhZPDZZ98Jk2bO
-         DJtamS589LLghamNAtzB3I0mg0+SLFdP0C/1kR6idJaU9I4ryI4870Xj7q8BEmcNvlRh
-         kdcZgP+p68rnbeo1w4dRN27BvMFKufQpNnYTPIM46f7lFOZA6NVXDGWqS/uidotmkgDa
-         ozq755AnwZeUBOuLwXG/zwT0J6C1/sHsr9PxSQmFvL3VUvlaYrexXX6pQ7DsV4SEm8kk
-         CAXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745318716; x=1745923516;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m2RHOwNehHpqHHo8iTUQFAX2G1uH1oLG9AUA3ukXizo=;
-        b=k38enUvJHidpwsyrq2mgQHcM8HtzVBI2u+77TwYSehu/oJ//aIFEGXllGpgf5CJkgj
-         55EEISCymWNvJ34T0IPG/h7FAFGkDZtkbk7GoEv3Tek7XzRYVrta0kAfsAjBdM3W9ia2
-         30BXFfBi25YfLNtUdgnl6phfjdLlbzbP6VV9gk8pNaGtXEe8dLUWuBJf5u4mDZMJKGcc
-         I05Xa7PsLF0kJvJaeGr2Qnw+w2xsBd5mmAd14SXBAx6V+EfsQ4t/iVtWr32sU7bwR6Ac
-         B46jfibKSNqBi5UnzBYmao4fC1VVYMPI+pgU2Y7X/L/Hv9GJm/Zb9Zh8LxKoMToBYS0A
-         M/IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURoK1sJvlCq/VAkxBCSiL+cGtBkUEiSOLpTcERgqTsPjjMVEWlNTi82/i0aFu22thFuPntYShyU5UhTw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtCyEMIHs2cMD1EavemN0uQ591Bp6wp0UmXHYXIYia89+zaagx
-	gUZzRUzZYIclyia/AYxu1BBfdxE5Tbc3RBz/zBEzLjx+DM9EoL9CfXOf6r/voh8Hc6NIbQ36LeO
-	/niNfpBc5Yb8WZFix6T7mbKETi2Wq85V7aCAMUg==
-X-Gm-Gg: ASbGncsIW2o92u7BH2/kNt+/Y4PwXpLKd+mHrvTcT/sFkJRpRJTV4Hh+gLZchAMPYNB
-	0nCsXg6YQv2bBbfaPF4kExbvOlm8EOjygli8hvxE4PQNTD7xPLeDENheL328rCYy9FT/PmGoZeT
-	f3Hlm0EyMnTnf3/C3kW0iL+fQb3iQnv4ikLVBkwA==
-X-Google-Smtp-Source: AGHT+IHx+3eNU+W1xgJPDHKdP9KuoPOiU85NmVMn/OQC3c3TyiEnbo5rA2WMCiD1pOnvJZdMuo/65psXoAv60jJaYi4=
-X-Received: by 2002:a17:907:9450:b0:ac2:9c7d:e144 with SMTP id
- a640c23a62f3a-acb74dd546dmr1353350066b.40.1745318715647; Tue, 22 Apr 2025
- 03:45:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ND5eSUXX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745319062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6JqnxpNP6Sw5lWQfMVZCyNlXRIb4JneVeUrvXP7ojI8=;
+	b=ND5eSUXXxtVtAzPszr/lmZDt18IX084MxQxMaej2r7hpyl8eQesgAMrlvVW7yHjXD8uiX+
+	gFuQUbRvNOVaslePET/8NwhI9v8ULwmjMtfs3cho0EY6OWQiq5TO/4Hcu2dwphFAes0WmF
+	WIKc4lV2PgX72oEN7ZmDEgF0UMUCUeM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-yQocWRyLNQGZvBZNDkCT3A-1; Tue,
+ 22 Apr 2025 06:50:58 -0400
+X-MC-Unique: yQocWRyLNQGZvBZNDkCT3A-1
+X-Mimecast-MFC-AGG-ID: yQocWRyLNQGZvBZNDkCT3A_1745319057
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E2241800874;
+	Tue, 22 Apr 2025 10:50:57 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.5])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C6A1180045C;
+	Tue, 22 Apr 2025 10:50:52 +0000 (UTC)
+Date: Tue, 22 Apr 2025 18:50:47 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 11/20] block: move blk_unregister_queue() &
+ device_del() after freeze wait
+Message-ID: <aAd0h_4jQAcAca4u@fedora>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-12-ming.lei@redhat.com>
+ <97eb54b7-25f1-4691-bbcb-6db18c7bd056@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
- <aAZiwGy1A7J4spDk@kbusch-mbp.dhcp.thefacebook.com> <ad67b397-9483-d3c3-203e-687cefb9e481@huaweicloud.com>
- <aAbzW1POQP9z5BWS@kbusch-mbp.dhcp.thefacebook.com> <98915ccf-4fe8-5d96-0b59-b3f3d5a66f81@huaweicloud.com>
-In-Reply-To: <98915ccf-4fe8-5d96-0b59-b3f3d5a66f81@huaweicloud.com>
-From: Matt Fleming <mfleming@cloudflare.com>
-Date: Tue, 22 Apr 2025 11:45:04 +0100
-X-Gm-Features: ATxdqUEU6a1Z9Pu86iXO3XxDIu9CG7yYHsljL0Nlj0AZhY84eugrTgGJsExwkc0
-Message-ID: <CAGis_TV7gq1fHM0YFz798G91poeKQWYo2cZq0eEo7ydT1Qen+A@mail.gmail.com>
-Subject: Re: 10x I/O await times in 6.12
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97eb54b7-25f1-4691-bbcb-6db18c7bd056@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, 22 Apr 2025 at 04:03, Yu Kuai <yukuai1@huaweicloud.com> wrote:
->
-> So, either preempt takes a long time, or generate lots of bio to plug
-> takes a long time can both results in larger iostat IO latency. I still
-> think delay setting request start_time to blk_mq_flush_plug_list() might
-> be a reasonable fix.
+On Sat, Apr 19, 2025 at 06:08:30PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 4/18/25 10:06 PM, Ming Lei wrote:
+> > Move blk_unregister_queue() & device_del() after freeze wait, and prepare
+> > for unifying elevator switch.
+> > 
+> > This way is just fine, since bdev has been unhashed at the beginning of
+> > del_gendisk(), both blk_unregister_queue() & device_del() are dealing
+> > with kobject & debugfs thing only.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/genhd.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index d22fdc0d5383..86c3db5b9305 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -749,8 +749,6 @@ static int __del_gendisk(struct gendisk_data *data)
+> >  		bdi_unregister(disk->bdi);
+> >  	}
+> >  
+> > -	blk_unregister_queue(disk);
+> > -
+> >  	kobject_put(disk->part0->bd_holder_dir);
+> >  	kobject_put(disk->slave_dir);
+> >  	disk->slave_dir = NULL;
+> > @@ -759,10 +757,12 @@ static int __del_gendisk(struct gendisk_data *data)
+> >  	disk->part0->bd_stamp = 0;
+> >  	sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+> >  	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+> > -	device_del(disk_to_dev(disk));
+> >  
+> >  	blk_mq_freeze_queue_wait(q);
+> >  
+> > +	blk_unregister_queue(disk);
+> > +	device_del(disk_to_dev(disk));
+> > +
+> >  	blk_throtl_cancel_bios(disk);
+> >  
+> >  	blk_sync_queue(q);
+> As we first freeze the queue and then enter blk_unregister_queue which 
+> deals with kobject/debufs, do we need to create memalloc GFP_NOIO scope
+> while running blk_unregister_queue? I see that device_del already defines
+> the GFP_NOIO scope. 
 
-I'll try out your proposed fix also. Is it not possible for a task to
-be preempted during a blk_mq_flush_plug_list() call, e.g. in the
-driver layer?
+We actually need to do that with the read lock together.
 
-I understand that you might not want to issue I/O on preempt, but
-that's a distinct problem from clearing the cached ktime no? There is
-no upper bound on the amount of time a task might be scheduled out due
-to preempt which means there is no limit to the staleness of that
-value. I would assume the only safe thing to do (like is done for
-various other timestamps) is reset it when the task gets scheduled
-out.
+
+Thanks,
+Ming
+
