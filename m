@@ -1,88 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E50523373A;
-	Tue, 22 Apr 2025 02:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC68254AED
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 02:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745288182; cv=none; b=cljvQjf/TRtsfj+Xx8BOunYpMXBcJcj4MG8tGJO0zGhGjB8GJbitCr1DV/ZppWUdTsWw1qUv4usEscRQSNm2TjCC4SjyT8nWJNxH18EDpq4a+hYZBEkj8HNgryKLGhEFKq6WfiLY9yOIZ1VvBk5aLdMJT3RdsvnjhEikEEdkGs8=
+	t=1745288202; cv=none; b=quIb8as6jw8ngJKLTbBNMlQEgXHSz+Qpg7A4bhiqzp3rrACQNOAuThCESosN5yXa3b70JJpQ1PwOIE4jabL3p86IeLRRZ3ozpDfkb4sRsHWupX4U8vfMu6bDV2m3Y1rh6T5tcS6ifOZiMMviwrV9pNpAGIO8vQLY6sLIVoY3Wxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745288182; c=relaxed/simple;
-	bh=sj1bRN6e8Wglz53+XZXogI3wtEn/6aQTHxnLrj5Me/M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UsR6DX/6mvz5ABPePHEnDtFbNgL8c5/FTMrReMhf2Mw3uZfqXviEyzhYTUBAf5eg8AqxmeUKKYKrw1Gb33PqBBDRjTUNzv8l48ECsBCbNrujLZINTwiuKA5eqkzRtQymgL+C0wHWSbmMFmNVCJXjKlrYQTCUmdElPyHeUeoydSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ktjs5zpg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745288202; c=relaxed/simple;
+	bh=m4SH1HDvHugwMTrd3sTk2tokzTcOFXyDZ2ZZ77+0jfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UdDnx5eWAz34DZmwYz44hPB+o9RwSbxeOweG/uINzVM2iBBq/fwpXyqQUwmvtBPfjcHEnjy1blx49Dv41leZxV5Etbn0iFk9DOKsYqkr1pZwBdQwsLrNb5RMEY3GOLIRS+htMNM3zXP+XlCRjxzJSdUsQ4Lu9lqF/czv0oG55D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cAaKazv9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ktjs5zpg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D89CFC4CEED;
-	Tue, 22 Apr 2025 02:16:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745288180;
-	bh=sj1bRN6e8Wglz53+XZXogI3wtEn/6aQTHxnLrj5Me/M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ktjs5zpgs7FhlVIHqLaMPjz6AKBuci1Qfa8cdRQhRS5y1Xy/zOWdw/o7XxPBdunFH
-	 4NXEQi2O0insb9fynV6rVKq5va33HSiXkQMfpE+yFprAm8GNSu1Z2LiqwGD6UDJbki
-	 jr+iTasnzi29qWvhPyEY6p5v7NKEneiiNg1N8/ZZSBgYMYtuO+a8tn0feJ5y5ngWAM
-	 AdUrCidGZqGNVjySxf1sgvtBsuX9rIy54n6/CcukmYFHvDOkjsPTLNop/0nTxkjfz6
-	 suTjAsYoeHkKIZjZbiGplAVWZSPIkKmVe76ZVQZbfYrnPl3wOH9TNFLdJS3fsdzCiJ
-	 m3GaUOUkFwRMw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Yunlong Xing <yunlong.xing@unisoc.com>,
-	Zhiguo Niu <zhiguo.niu@unisoc.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 16/30] loop: aio inherit the ioprio of original request
-Date: Mon, 21 Apr 2025 22:15:36 -0400
-Message-Id: <20250422021550.1940809-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250422021550.1940809-1-sashal@kernel.org>
-References: <20250422021550.1940809-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAaKazv9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745288199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7gdgW5eS93if/nqlNpCjp3rr+e7Hdfk5SuDUBkR/RYQ=;
+	b=cAaKazv9/BOSBZAeDnUG0XUXdJ7lJIUueVKUMPFbNnyLdXE9XPUkFXTU6P77A7C0uMDHO6
+	18JW34nHAp//gqvgrRerN7Jmlazn7SmpD7UsVYljx8oaajRj4LGh3MRgVsiORmDImnToAc
+	M2PXwLLuWLoBjvWvLSNbfxZ3sgBP1kA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-42-sTJXc5RTNJG1oQ1umttCFg-1; Mon,
+ 21 Apr 2025 22:16:35 -0400
+X-MC-Unique: sTJXc5RTNJG1oQ1umttCFg-1
+X-Mimecast-MFC-AGG-ID: sTJXc5RTNJG1oQ1umttCFg_1745288194
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 114141800264;
+	Tue, 22 Apr 2025 02:16:34 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.137])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47F4D195608F;
+	Tue, 22 Apr 2025 02:16:29 +0000 (UTC)
+Date: Tue, 22 Apr 2025 10:16:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 1/4] ublk: factor out ublk_commit_and_fetch
+Message-ID: <aAb7-Wjj6xgymVve@fedora>
+References: <20250421-ublk_constify-v1-0-3371f9e9f73c@purestorage.com>
+ <20250421-ublk_constify-v1-1-3371f9e9f73c@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.3
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250421-ublk_constify-v1-1-3371f9e9f73c@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Yunlong Xing <yunlong.xing@unisoc.com>
+On Mon, Apr 21, 2025 at 05:46:40PM -0600, Uday Shankar wrote:
+> Move the logic for the UBLK_IO_COMMIT_AND_FETCH_REQ opcode into its own
+> function. This also allows us to mark ublk_queue pointers as const for
+> that operation, which can help prevent data races since we may allow
+> concurrent operation on one ublk_queue in the future. Also open code
+> ublk_commit_completion in ublk_commit_and_fetch to reduce the number of
+> parameters/avoid a redundant lookup.
+> 
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-[ Upstream commit 1fdb8188c3d505452b40cdb365b1bb32be533a8e ]
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Set cmd->iocb.ki_ioprio to the ioprio of loop device's request.
-The purpose is to inherit the original request ioprio in the aio
-flow.
 
-Signed-off-by: Yunlong Xing <yunlong.xing@unisoc.com>
-Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20250414030159.501180-1-yunlong.xing@unisoc.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c05fe27a96b64..1a4dbd4116069 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -471,7 +471,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_filp = file;
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
--	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
- 
- 	if (rw == ITER_SOURCE)
- 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
--- 
-2.39.5
+Thanks,
+Ming
 
