@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD981F5859;
-	Tue, 22 Apr 2025 02:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C5726FA76;
+	Tue, 22 Apr 2025 02:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745288315; cv=none; b=Scid4prtqM/LKsSysBO6h7gemdaaRWrQnt6rwNF/7IbWz2NhAS2Gf6UwIkveuhv7AsLvkGiYXt28soNk0V2MNmDtuJ2rmsdGPFx+Q0F2sHbipiXrEaQEhL84QTeJrR1r6AO86ezLntSG06YZ54wCCJCvvKbuSnol0PPhSZy4uCY=
+	t=1745288332; cv=none; b=KBtF4y8J4XaPZtwJQEwzTHN6stbbGg8DueGRRNMBCuq//MXIMA6cbihY+W8ga/leKQn8H+uvfckcOeAFTYw/d2vEhF+CvxN8d2Lf4eEtYYpxYFxo37OUVg2MhjO37+mdtvr1/t0rLXq288yLiPsgSp7GiN2oWwxWZ+d04H2z7C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745288315; c=relaxed/simple;
-	bh=+yKm82fZjm2+yiM0PzkgbSKHxyzkfY0x9pSi3Z5THGA=;
+	s=arc-20240116; t=1745288332; c=relaxed/simple;
+	bh=1AOoWB8Qal5mN/kSUMXxbm5YmswbNgetkMmE1rfW8mI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g4NvfSB3c8XlLtupIKfI2qweWugKQHNZwM6cb23/XTd4s08SprBv4NSewkdflipwQFIKsGxeP/NawqKB6flVpB71Gse5a39qaI9kEF96c1Mr3g3oTf+aLJWY3rIntXWXRf0y8coSOz0nLMpumsIdSu0xA8ZWG8GKhEMg2DrSPsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbOPPayi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=uDrFRDuXwIHB22NLJXqpl6ncBH8fmlJtgyt/Nl6bBkrFkcpQuZTrEyQ5UbtDCN9n5DS+Rhp1RB72NK+cxMNwKEPQA4OqGGix+ZvVzX9Q12dwzX8BLbpdMMfB8G1nfudcHmZZJvtaHgWfcY91JJkIrS8As/3ek1lYvfDd+s7Olh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUAilTgh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbOPPayi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D63AC4CEED;
-	Tue, 22 Apr 2025 02:18:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUAilTgh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08F93C4CEEC;
+	Tue, 22 Apr 2025 02:18:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745288315;
-	bh=+yKm82fZjm2+yiM0PzkgbSKHxyzkfY0x9pSi3Z5THGA=;
+	s=k20201202; t=1745288332;
+	bh=1AOoWB8Qal5mN/kSUMXxbm5YmswbNgetkMmE1rfW8mI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tbOPPayieTD12hiWJ0cRvDLONDFfDbgUrbSzGFojXfnJuDMyP34Z0m+B6PpJj91kY
-	 2foWywFlkPGWmH7SqaNa0WSi/i1um45v9UbzUQZLhFBk/0X1Me8dtIRbQCNZ1J4nW3
-	 SiVhdeBZO4bulFxHbwgv3MALFxsvtxXuQwYQaDiu6RSQNWSoXFuzu5/fG4Sk3hi0ct
-	 qNG2o49hawQJP4qAXxiOPmbEb3qNIjiiQoUXg0OkPap/vUIZgHwLByhWb47EWc1Em+
-	 za6Ud8cwLvlSgWnZbhP3f9b7Gl1H7qzo51GfZb56t+Lun4kHb9FEdde6ERL7W2Pg8T
-	 zBz4RimT2nyVg==
+	b=mUAilTgh9vvaf/67JRlaxcJROAf50lK+x/5siYL37F5WerNVwNR4MZfDBs1vV+c78
+	 w0AaFAD53DeDbjVlH/IRisAkU13y1Mb8jg51LnKgYz2KjlfFLmMh0lTpxcjG5RqcM3
+	 mKJ1WIJsZ6lK2DeTsKinBO2o9um/gkCk6Oy9sNYr/ISVckR3G6i7Aj2kdMmuaisMpq
+	 n5m6/aZ3ORwt6XYkQEvGNTnsRqncCIej94otcDKuZ/qJ9Ey8+FmqcquOYblvMLzhQ5
+	 9gtU6qyg9n6Cf++cIzfOLvtcYO3Xpk56DzMZSeRqnNIvGnI4uwwoygGJE/q3vZPUgG
+	 HT1oRGv3OItMA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Yunlong Xing <yunlong.xing@unisoc.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 05/12] loop: aio inherit the ioprio of original request
-Date: Mon, 21 Apr 2025 22:18:19 -0400
-Message-Id: <20250422021826.1941778-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 3/6] loop: aio inherit the ioprio of original request
+Date: Mon, 21 Apr 2025 22:18:43 -0400
+Message-Id: <20250422021846.1941972-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250422021826.1941778-1-sashal@kernel.org>
-References: <20250422021826.1941778-1-sashal@kernel.org>
+In-Reply-To: <20250422021846.1941972-1-sashal@kernel.org>
+References: <20250422021846.1941972-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.134
+X-stable-base: Linux 5.15.180
 Content-Transfer-Encoding: 8bit
 
 From: Yunlong Xing <yunlong.xing@unisoc.com>
@@ -71,17 +71,17 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 041d307a2f280..cdc6cf3917bbc 100644
+index 1d60d5ac0db80..cae3cda6a482a 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -441,7 +441,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+@@ -605,7 +605,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
  	cmd->iocb.ki_filp = file;
  	cmd->iocb.ki_complete = lo_rw_aio_complete;
  	cmd->iocb.ki_flags = IOCB_DIRECT;
 -	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
 +	cmd->iocb.ki_ioprio = req_get_ioprio(rq);
  
- 	if (rw == ITER_SOURCE)
+ 	if (rw == WRITE)
  		ret = call_write_iter(file, &cmd->iocb, &iter);
 -- 
 2.39.5
