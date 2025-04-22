@@ -1,82 +1,266 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D7C22B5A3
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 06:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C25A22578A
+	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 06:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745303716; cv=none; b=eilyjynq/yEeCD8pNh1KS3OiOpToelg2kGl0rHA+MS5CW8qE+3Im8GQGCe2PGenBY+YDoViQaTqT2jynMHfmOIKaglkQEACRh7+tX5atpa6wLZlqQiHnOez0czC53tCxUBHSYioiIycSWNBf0VFoNrIYuhXNSEnCgVBg100WZls=
+	t=1745303779; cv=none; b=sfPuf4H60ARED9Lx64MEEPEnblwD6scDglbXUKE4x3PFMpPl2au5Q7OPupFXwjgH5PxihCB7CfjTZ8bXuP8NDsbXii0w4xnYyk41p2p9s+azoDz8CZbd70Qz3MC9MGdwK6hhd1dsbmPZnRgAOj9+CG9Co7VOcwbRUsF+lhTsCcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745303716; c=relaxed/simple;
-	bh=Fq7AilgiTM+sNlg8wggbnA+8TeVQf/YvMrN25uU1sO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YxLRxzguRaBWbSnw5LILsseNKguTFZc7TDl27BmzZWPaIvgt2LIiq8BrqYeM00BcemPrir+NKFi1De5UxmoC2nl1dDvnLArjiANVI9BQSAAq8aJ2U6zkJpEUdJk+mY8pxGg9SV5hN7opsz6TQ6DT1l9lPMy66oPcGCtTFuveoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZhXXH0VRbz4f3lDq
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 14:34:39 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 81F371A0359
-	for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 14:35:04 +0800 (CST)
-Received: from [10.174.176.88] (unknown [10.174.176.88])
-	by APP4 (Coremail) with SMTP id gCh0CgB32l6WOAdoFlzZKA--.8287S3;
-	Tue, 22 Apr 2025 14:35:04 +0800 (CST)
-Message-ID: <2c8bb20c-2268-47b4-8d60-cfdc36a1b9ae@huaweicloud.com>
-Date: Tue, 22 Apr 2025 14:35:02 +0800
+	s=arc-20240116; t=1745303779; c=relaxed/simple;
+	bh=HOCJIP6MfuBcbEYwlShFo6R8XO6wPX7NytrYcTaLe/k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QQO9l6mcTB0fskH6DVxQsKmG44X1JBXzz0zdjo8gxVqlt4xXCjh9ZH0dI3+fWP6sNM249gpTkCZLnnOkbpSevvj/tttFqVKvAPF6Vr4VtnjxyADBjHzIJEHhfyxBl7iFyneFAYpqaRbM6UebuwIkqVgP8FnJ7ShgyBZ8Fg6fXEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Db1GEMCv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Db1GEMCv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745303775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jrIWyO/DUdPSXiNycEKxPuw75tcdlf8kCKE7QHwl16c=;
+	b=Db1GEMCvI+9g9xxbgzzv1Ayz2IvR721BXTJAvoin2ZGZ6t5CsUcLO+vvYCf/vpRLwJivwr
+	qwV+gtkyNnwUCNK+wdSO8tw1g+KSiPuozKisoVfzwuiz/UNQD2fGk5whuNZ/+iE/BFScCy
+	1Ly6PzQQyjqCuu4e+Cv8IdKAhV5PsyU=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-R4X48MdhOBWJ1m2LcIGwOA-1; Tue, 22 Apr 2025 02:36:13 -0400
+X-MC-Unique: R4X48MdhOBWJ1m2LcIGwOA-1
+X-Mimecast-MFC-AGG-ID: R4X48MdhOBWJ1m2LcIGwOA_1745303772
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-549979903c8so1896547e87.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Apr 2025 23:36:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745303772; x=1745908572;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jrIWyO/DUdPSXiNycEKxPuw75tcdlf8kCKE7QHwl16c=;
+        b=CE9HfMeS2gE618OtkK0FEdemiisqsVOxPeVokD24EZitTzT1xUxzcdPYcNlWl3SAZN
+         d4eGs4vZ0qgDdrHEguc8Sd23k8ovOzLQFA6AKtm3b4721Piv/wYUtVzuXl3KFz+ZS04K
+         9VXiNc3N7uc9Awk6XkPCHWA6tKnHzsnH8DUKUGDZJ49JqxPKCklybAprG4AA7pegtbIG
+         8TisN8mwqPQzq9tNbBKoMx0pcQdPHRDxAKeR36almdsWLGwnfHtYHeLjBsF23WzCABsB
+         Zf8q21y0BHlMnNhJaY1mqzNnxCvbhCZ37kbRHKM7JoAXNGKBEjN2hjcglQRUDK+w0mqn
+         J32w==
+X-Forwarded-Encrypted: i=1; AJvYcCUoGAjLlY66wejSkg3CUB3CajGawScTZGod8v5s2aPrSUrOsh3OP/UqfB4789CLb+gH6jPCY1Cs1rhGkQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPkSUM5ld9IWA6s4gd+1qT/GvNAH5I1XQHXZxd26YkayOSr+I+
+	sPYL1BsYxn9MrFXRsx6btYMkKeNzToywQ+nRIr5r1nLNDFC6tx0BSRwayqoZe8r8BIS9jyENAil
+	1eG6BvBxJcibloowjDinyoMWqASWjH6fX5KgbfRQP+7Gw48dcOA5ltAbMCF8ckOHPpZGGW+FxNl
+	EBFpd5vYJ9tJCZDCYpYRdn9nJ0/qFm7TBuKXQ=
+X-Gm-Gg: ASbGncvuKXaZIi9wdrbSFRXjEg9pVaIXlHCqdbjEa15zYWf1ODFtbUTB7d1BL/aGzVZ
+	+6QtK4P0u81c9ZqmNJkz6xFKIimA0jlXjeK756Ff3zJfY04j+n8fHLWtT/X70MfOtoiOAcQ==
+X-Received: by 2002:a05:6512:3ca1:b0:542:28b4:23ad with SMTP id 2adb3069b0e04-54d6e62773amr3723520e87.16.1745303771726;
+        Mon, 21 Apr 2025 23:36:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrWDkSSdbmMshxE2ULkXdtov++cbLYyqfNTXxJtqEM4WFkORqqRIhlDPVrYpFRbsuwY92DsN/TmYU+2QyeHe0=
+X-Received: by 2002:a05:6512:3ca1:b0:542:28b4:23ad with SMTP id
+ 2adb3069b0e04-54d6e62773amr3723505e87.16.1745303771324; Mon, 21 Apr 2025
+ 23:36:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 4/7] blk-throttle: Introduce flag
- "BIO_TG_BPS_THROTTLED"
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk,
- linux-block@vger.kernel.org, yangerkun@huawei.com, yukuai3@huawei.com,
- ming.lei@redhat.com, tj@kernel.org
-References: <20250418040924.486324-1-wozizhi@huaweicloud.com>
- <20250418040924.486324-5-wozizhi@huaweicloud.com>
- <aAY0GNzcJH28OEtA@infradead.org>
- <818c7a4b-50b7-4933-ae01-e6fbb93417b9@huawei.com>
- <aAY9jhJr1VOh0sMm@infradead.org>
- <a5d1f436-9d31-407a-9653-5fd48f3dc80f@huawei.com>
- <aAcjDvCvmSiLd4zx@infradead.org>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <aAcjDvCvmSiLd4zx@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB32l6WOAdoFlzZKA--.8287S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYz7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAI
-	w28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14v26r126r1DMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa
-	73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+References: <20250418010941.667138-1-yukuai1@huaweicloud.com> <20250418010941.667138-5-yukuai1@huaweicloud.com>
+In-Reply-To: <20250418010941.667138-5-yukuai1@huaweicloud.com>
+From: Xiao Ni <xni@redhat.com>
+Date: Tue, 22 Apr 2025 14:35:59 +0800
+X-Gm-Features: ATxdqUEVb2RGoAb5zjQK6sahRUDwea7fbNAnPxgCG5MAo5fJDLunHFKcf0Unk0U
+Message-ID: <CALTww29aehPQcbcy0j+V69r+RVgzNPwNhpAQ-7wWMdD-VPfNgQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/5] md: fix is_mddev_idle()
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, 
+	song@kernel.org, yukuai3@huawei.com, viro@zeniv.linux.org.uk, 
+	akpm@linux-foundation.org, nadav.amit@gmail.com, ubizjak@gmail.com, 
+	cl@linux.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com, johnny.chenyi@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Apr 18, 2025 at 9:17=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> From: Yu Kuai <yukuai3@huawei.com>
+>
+> If sync_speed is above speed_min, then is_mddev_idle() will be called
+> for each sync IO to check if the array is idle, and inflihgt sync_io
+> will be limited if the array is not idle.
+>
+> However, while mkfs.ext4 for a large raid5 array while recovery is in
+> progress, it's found that sync_speed is already above speed_min while
+> lots of stripes are used for sync IO, causing long delay for mkfs.ext4.
+>
+> Root cause is the following checking from is_mddev_idle():
+>
+> t1: submit sync IO: events1 =3D completed IO - issued sync IO
+> t2: submit next sync IO: events2  =3D completed IO - issued sync IO
+> if (events2 - events1 > 64)
+>
+> For consequence, the more sync IO issued, the less likely checking will
+> pass. And when completed normal IO is more than issued sync IO, the
+> condition will finally pass and is_mddev_idle() will return false,
+> however, last_events will be updated hence is_mddev_idle() can only
+> return false once in a while.
+>
+> Fix this problem by changing the checking as following:
+>
+> 1) mddev doesn't have normal IO completed;
+> 2) mddev doesn't have normal IO inflight;
+> 3) if any member disks is partition, and all other partitions doesn't
+>    have IO completed.
+>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  drivers/md/md.c | 84 +++++++++++++++++++++++++++----------------------
+>  drivers/md/md.h |  3 +-
+>  2 files changed, 48 insertions(+), 39 deletions(-)
+>
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 52cadfce7e8d..dfd85a5d6112 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -8625,50 +8625,58 @@ void md_cluster_stop(struct mddev *mddev)
+>         put_cluster_ops(mddev);
+>  }
+>
+> -static int is_mddev_idle(struct mddev *mddev, int init)
+> +static bool is_rdev_holder_idle(struct md_rdev *rdev, bool init)
+>  {
+> +       unsigned long last_events =3D rdev->last_events;
+> +
+> +       if (!bdev_is_partition(rdev->bdev))
+> +               return true;
+> +
+> +       /*
+> +        * If rdev is partition, and user doesn't issue IO to the array, =
+the
+> +        * array is still not idle if user issues IO to other partitions.
+> +        */
+> +       rdev->last_events =3D part_stat_read_accum(rdev->bdev->bd_disk->p=
+art0,
+> +                                                sectors) -
+> +                           part_stat_read_accum(rdev->bdev, sectors);
+> +
+> +       if (!init && rdev->last_events > last_events)
+> +               return false;
+> +
+> +       return true;
+> +}
+> +
+> +/*
+> + * mddev is idle if following conditions are match since last check:
+> + * 1) mddev doesn't have normal IO completed;
+> + * 2) mddev doesn't have inflight normal IO;
+> + * 3) if any member disk is partition, and other partitions doesn't have=
+ IO
+> + *    completed;
+> + *
+> + * Noted this checking rely on IO accounting is enabled.
+> + */
+> +static bool is_mddev_idle(struct mddev *mddev, int init)
+> +{
+> +       unsigned long last_events =3D mddev->last_events;
+> +       struct gendisk *disk;
+>         struct md_rdev *rdev;
+> -       int idle;
+> -       int curr_events;
+> +       bool idle =3D true;
+>
+> -       idle =3D 1;
+> -       rcu_read_lock();
+> -       rdev_for_each_rcu(rdev, mddev) {
+> -               struct gendisk *disk =3D rdev->bdev->bd_disk;
+> +       disk =3D mddev_is_dm(mddev) ? mddev->dm_gendisk : mddev->gendisk;
+> +       if (!disk)
+> +               return true;
+>
+> -               if (!init && !blk_queue_io_stat(disk->queue))
+> -                       continue;
+> +       mddev->last_events =3D part_stat_read_accum(disk->part0, sectors)=
+;
+> +       if (!init && (mddev->last_events > last_events ||
+> +                     bdev_count_inflight(disk->part0)))
+> +               idle =3D false;
+>
+> -               curr_events =3D (int)part_stat_read_accum(disk->part0, se=
+ctors) -
+> -                             atomic_read(&disk->sync_io);
+> -               /* sync IO will cause sync_io to increase before the disk=
+_stats
+> -                * as sync_io is counted when a request starts, and
+> -                * disk_stats is counted when it completes.
+> -                * So resync activity will cause curr_events to be smalle=
+r than
+> -                * when there was no such activity.
+> -                * non-sync IO will cause disk_stat to increase without
+> -                * increasing sync_io so curr_events will (eventually)
+> -                * be larger than it was before.  Once it becomes
+> -                * substantially larger, the test below will cause
+> -                * the array to appear non-idle, and resync will slow
+> -                * down.
+> -                * If there is a lot of outstanding resync activity when
+> -                * we set last_event to curr_events, then all that activi=
+ty
+> -                * completing might cause the array to appear non-idle
+> -                * and resync will be slowed down even though there might
+> -                * not have been non-resync activity.  This will only
+> -                * happen once though.  'last_events' will soon reflect
+> -                * the state where there is little or no outstanding
+> -                * resync requests, and further resync activity will
+> -                * always make curr_events less than last_events.
+> -                *
+> -                */
+> -               if (init || curr_events - rdev->last_events > 64) {
+> -                       rdev->last_events =3D curr_events;
+> -                       idle =3D 0;
+> -               }
+> -       }
+> +       rcu_read_lock();
+> +       rdev_for_each_rcu(rdev, mddev)
+> +               if (!is_rdev_holder_idle(rdev, init))
+> +                       idle =3D false;
+>         rcu_read_unlock();
+> +
+>         return idle;
+>  }
+>
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index b57842188f18..1d51c2405d3d 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -132,7 +132,7 @@ struct md_rdev {
+>
+>         sector_t sectors;               /* Device size (in 512bytes secto=
+rs) */
+>         struct mddev *mddev;            /* RAID array if running */
+> -       int last_events;                /* IO event timestamp */
+> +       unsigned long last_events;      /* IO event timestamp */
+>
+>         /*
+>          * If meta_bdev is non-NULL, it means that a separate device is
+> @@ -520,6 +520,7 @@ struct mddev {
+>                                                          * adding a spare
+>                                                          */
+>
+> +       unsigned long                   last_events;    /* IO event times=
+tamp */
 
+Can we use another name? Because mddev has events counter. This name
+can easily be confused with that counter.
 
-在 2025/4/22 13:03, Christoph Hellwig 写道:
-> On Mon, Apr 21, 2025 at 08:53:10PM +0800, Zizhi Wo wrote:
->> Yes, otherwise they will interfere with each other. We can currently
->> ensure that this flag is cleared in the throttle process.
-> 
-> Can you explain that a bit better in the comment?
-> 
-Okay, I will explain it in more detail in the comments.
+Regards
+Xiao
 
-Thanks,
-Zizhi Wo
+>         atomic_t                        recovery_active; /* blocks schedu=
+led, but not written */
+>         wait_queue_head_t               recovery_wait;
+>         sector_t                        recovery_cp;
+> --
+> 2.39.2
+>
 
