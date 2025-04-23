@@ -1,67 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A6D269B07;
-	Wed, 23 Apr 2025 15:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E971D28E61A;
+	Wed, 23 Apr 2025 15:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420753; cv=none; b=ELJSRVoqs6mUrxRLtJbYjie9Bkw29bgmOCNV8i/T7VJD8xe345Y1iOhGwmdrN04csahAlWGd+mpnozo2Qwr3Pdm9hIQAp6dRnx+2Zy2YQ5JT07OlPnKUt+OIA+gYrSqkRyVKh9KJ6N6Y7p4E8WKBP8CdYXR5xJeAlh8s1L0yJ50=
+	t=1745420799; cv=none; b=dwyUAu+mTen9F7PgyVEzpg1Cbn8xJGeG4U16gMbUWJHqec7nvMAWGNg8xVqWSBeSMsihEWv3jo/xYDYJAqA4cE0toXFYWwTJ8LlgfStuql/oGLRu/Zh0hoTs0uIukKN7cruI0173pQoprONoEnAzrmLKWZKivtJg1HWdNtf5VhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420753; c=relaxed/simple;
-	bh=+pgwEq/v7P8f/AIzuDnfFPRQJNNWeIXj7j55MF1ARFk=;
+	s=arc-20240116; t=1745420799; c=relaxed/simple;
+	bh=CWuXBa/3BXzP9DGq30t6Um3x4Mn6OezMOQl57MsTF/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYKsmoLF1IX2WZMtgUJKcxDPYHH85sedbtne76t45j1KEuqAombzUP1SIpuOIBCf8Xn4FRmG0r2eKT8SdgP4Tz3FTs5+/qhtmbNxtmHdKikJKGbOc3oZvbzNs6gREJdiMtYwx7qwyMKPlPnZ8xi7e/eAoui4mXpPEYcNxhJ1ZjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFJx/822; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=KHz0hDghVloIvciDhQe8R82+wlSdnnj9KSw/d3RpIPhq+mXQLecA/sjplm66In5pFbALaOSOKiymMXKyvGeuVmacAHLLJ5zuC7iyBfWh2ktS0K6yoNhUvFVTZ/lKrCh0A7niEZNtw/h8AP3hSW8FWBeokiJT2dS0cSyPOBsBAPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqFCgjGr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFJx/822"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 901EFC4CEE3;
-	Wed, 23 Apr 2025 15:05:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqFCgjGr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 898E3C4CEEB;
+	Wed, 23 Apr 2025 15:06:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745420752;
-	bh=+pgwEq/v7P8f/AIzuDnfFPRQJNNWeIXj7j55MF1ARFk=;
+	s=k20201202; t=1745420798;
+	bh=CWuXBa/3BXzP9DGq30t6Um3x4Mn6OezMOQl57MsTF/g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dFJx/822j4GTOfsd2flNm5Ey/TaUnXvZT5qb1IFKN8MDVYAFjFrSYj2QuqzBXOI34
-	 cCL2AjpTOhK3gqFdVzm60QZZvEA+ZIjYjEMhAIT2Om4kk9CpVlY+UMwZFizRz2A4FV
-	 x2Kc0vTLaMJFho4pwEjsYBGAdyZMrqxDedEJqMD9wYE2ukoG/n7seIhucFhuW31zDW
-	 UmvL8uviiKFbeGy65gClBxfYw6dpkBtsqH4du4EF8WICj2EuxnuXGLSAWwcwRzUmrc
-	 x84yDhW8Ij5YIQpP/JKhV3PMooMVAUA5y9/B5QkJayW+yclq7f2CrbG5CDNIkG4bD0
-	 7IzL5VKJcHazg==
-Date: Wed, 23 Apr 2025 09:05:48 -0600
-From: Keith Busch <kbusch@kernel.org>
+	b=RqFCgjGry8oZEnY339wyWGJrZ4nHsE1BzO0r39Pnj8fu1KO9R6fAxYp+/M2hUWaaZ
+	 41uwFMOQVrCGSJ4WAfPI2uEzwOm0I9qmMqPP0Z0cuKwQVYiQkmPtk84uf/OTaej+Qz
+	 jmCBePX8wgOJ0asxifVm4TZgn5iLFED4MbXU8gsr3bsTGsR71PjwGqe8WhH/GwVaXW
+	 CAQHGE0UDmSMBMaAJ6CYH65yxM4zoiUtF5Y8Sb4MwVsVFDCQ3201MuA6wQ3EETJQ6a
+	 JkeYBoFSRAeuUee5LH8sIAVdkz1+mp6RSeSfJCL0GXU4n/+jtZx0FGhaJ/1tZWAjUD
+	 ubGpK04lOeYjA==
+Date: Wed, 23 Apr 2025 05:06:37 -1000
+From: Tejun Heo <tj@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v9 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <aAkBzDgjiWkbeP8P@kbusch-mbp.dhcp.thefacebook.com>
-References: <cover.1745394536.git.leon@kernel.org>
- <7c5c5267cba2c03f6650444d4879ba0d13004584.1745394536.git.leon@kernel.org>
- <20250423092437.GA1895@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+	Christian Brauner <christian@brauner.io>,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: don't autoload block drivers on stat (and cgroup configuration)
+Message-ID: <aAkB_Vj-ukOPeoTn@slm.duckdns.org>
+References: <20250423053810.1683309-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,22 +43,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423092437.GA1895@lst.de>
+In-Reply-To: <20250423053810.1683309-1-hch@lst.de>
 
-On Wed, Apr 23, 2025 at 11:24:37AM +0200, Christoph Hellwig wrote:
-> Right now I don't have a test setup for metasgl, though.  Keith,
-> do you have a good qemu config for that?  Or anyone else?
+On Wed, Apr 23, 2025 at 07:37:38AM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> Christian pointed out that the addition of the block device lookup
+> from stat can cause the legacy driver autoload to trigger from a plain
+> stat, which is a bad idea.
+> 
+> This series fixes that and also stops autoloading from blk-cgroup
+> configuration, which isn't quite as bad but still silly.
 
-QEMU does support it, and reports support for it by default (you may
-need to upgrade qemu if yours is more than a year old). You just need to
-format your namespace with metadata then you can send commands with
-either SGL or MPTR.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-QEMU supports 0, 8, 16, and 64 metadata bytes on either 512b or 4k block
-sizes.
+Thanks.
 
-If you want 8 bytes for metadata on start up, attach parameter "ms=8" to
-the '-device nvme-ns' qemu setup.
-
-Alternatively, you can use the 'nvme format' command after booting to
-change it whenever you want.
+-- 
+tejun
