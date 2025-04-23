@@ -1,27 +1,28 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E111F16B
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 02:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6672F202961
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 02:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745375605; cv=none; b=bc85SYKqA9o9LhEXggB2hNB21PAFPhEynye2AWcoMlva6LfAuQkgBVhh7O0y7HLl4BTMwhA06dj46Rz9c+7ZzEGL3RFZBLiBRoZLqgS9hqNDkCiLd5wcT5N46yOociEsolGkZUxHcdvmmrBEurSb/Vr2h42Oum7L3QiSxxtuK3M=
+	t=1745375606; cv=none; b=ODrEsNCeorGj58WLFlxGWTQvw1Uyo7et+OLnIrEeU7+XfvhNe1UA+5MYInzpYNQNYIwNYz6/LX6S0FlyuDeYWToMpxKk+QJ/Xa/AOdPnmwyOl+MvWt7IAtwFxhVqlcknY4kRbKi5wol4fWR+JMNO0G+0tRdlnPlHbpC2dDrST7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745375605; c=relaxed/simple;
-	bh=q8iNEepY34XyAFsk9ihOW1EbKY18bisuBlVuVP8CCDE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kSN7DleoGppTHx918Lz+QdT3XHmmzqmE7nOczD+7f2XatJxUavOATSns5XrpzbKlMzM6sheI5fA2lMo196FN3E2Iej7ZSnYyZ9qHTp74taWFIr4xJYWpyIgPTNoe0Q8X5EZ8DaR1vZlP2ZqFJyxDSU0wPYz4X1WF0w+9LpxNFYM=
+	s=arc-20240116; t=1745375606; c=relaxed/simple;
+	bh=lpSt3/53AP7oKX50lG0DMWsKDhkZVWBMpNbqQ3BSIxc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=g6J20HCsYaLMYMfEGbKMCiU4m4fNR1W2B09+wYNRo52WNdUz5kP2rrv3reTQJJw0CCddIP8ERewq73Vj1SZwLRSuXWYe3+zQsgsOBq9jpV64iobRKw+HNsouM7oEF/CrSovBDgoBqrzHsx7SmghCFqgLzX7X7cSrEbupz64VEfY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zj3711LFhz4f3kJw
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:01 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zj36v59q6z4f3lCm
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:32:55 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id CDA2E1A07BB
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:19 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 360B41A06D7
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:21 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.112.188])
-	by APP4 (Coremail) with SMTP id gCh0CgB3219rUQhoCGcsKQ--.37591S4;
-	Wed, 23 Apr 2025 10:33:17 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgB3219rUQhoCGcsKQ--.37591S8;
+	Wed, 23 Apr 2025 10:33:21 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org
@@ -30,10 +31,12 @@ Cc: yangerkun@huawei.com,
 	wozizhi@huaweicloud.com,
 	ming.lei@redhat.com,
 	tj@kernel.org
-Subject: [PATCH V4 0/7] blk-throttle: Split the blkthrotl queue to solve the IO delay issue
-Date: Wed, 23 Apr 2025 10:22:54 +0800
-Message-ID: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
+Subject: [PATCH V4 4/7] blk-throttle: Introduce flag "BIO_TG_BPS_THROTTLED"
+Date: Wed, 23 Apr 2025 10:22:58 +0800
+Message-ID: <20250423022301.3354136-5-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
+References: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,88 +44,97 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3219rUQhoCGcsKQ--.37591S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFyfuryfAw4rAFW8Wr13XFb_yoW5Aw47pr
-	WfWw4Yk3WkJFsrK34fWrnIqaySq3ykJrZrCr97JrW3J3WkZrW0qr1fKrW8ZFWxAF9xWa1a
-	gryUtrs5uF1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUU
-	UU=
+X-CM-TRANSID:gCh0CgB3219rUQhoCGcsKQ--.37591S8
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFWfWw43Wr17GF1DZw1kKrg_yoW5Ww48pF
+	y8urs8Cw18Gr4vgr93J3W7Xa92yr4xCryYyrZxJr1av3W2gr1qqr1kZF18Aa1Fkasa9F4U
+	ZFsYgrWxC3W8JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAV
+	WUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2
+	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUvYLPUUUUU
+	=
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Changes since V1-3:
-1) Updated the comments in patches 4 and 6 for greater specificity.
-2) In patch 6, replaced the @queued parameter with @sq in both
-throtl_qnode_add_bio and throtl_pop_queued to facilitate internal changes.
-And the potential problem of null pointer dereference has been fixed.
+From: Zizhi Wo <wozizhi@huawei.com>
 
-[BUG]
-The current blkthrotl code provides two types of throttling: BPS limit and
-IOPS limit. When both limits are enabled, an IO is only dispatched if it
-meets both the BPS and IOPS restrictions. However, when both BPS and IOPS
-are limited simultaneously, an IO delayed dispatch issue can occur due to
-IO splitting. For example, if two 1MB IOs are issued with a BPS limit of
-1MB/s and a very high IOPS limit, the IO splitting will cause both IOs to
-complete almost "simultaneously" in 2 seconds.
+Subsequent patches will split the single queue into separate bps and iops
+queues. To prevent IO that has already passed through the bps queue at a
+single tg level from being counted toward bps wait time again, we introduce
+"BIO_TG_BPS_THROTTLED" flag. Since throttle and QoS operate at different
+levels, we reuse the value as "BIO_QOS_THROTTLED".
 
-[CAUSE]
-The root cause of this issue is that blkthrotl mixes BPS and IOPS into a
-single queue. When issuing multiple IOs sequentially, the continuously
-split IOs will repeatedly enter the same queue. As they alternately go
-through the throtl process, IOs that have already been throttled will have
-to wait for IOs that have not yet been throttled. As a result, all IOs will
-eventually complete almost together.
+We set this flag when charge bps and clear it when charge iops, as the bio
+will move to the upper-level tg or be dispatched.
 
-[FIX]
-Since IO requests that have already been split no longer need to go through
-BPS throttling but still require IOPS control, this patchset splits the
-existing blkthrotl queue into two separate queues: BPS and IOPS.
-1) IO requests must first pass through the BPS queue.
-2) Once they meet the BPS limit, they proceed to the IOPS queue before
-being dispatched.
-3) Already split IO requests bypass the BPS queue and go directly to the
-IOPS queue.
+This patch does not involve functional changes.
 
-[OVERVIEW]
-This patchset consists of 7 patches:
-1) Patch 1 is a simple clean_up.
-2) Patch 2-4, to facilitate the subsequent splitting of queues. Patch 2-3
-separate the -dispatch- and -charge- functions based on the BPS and IOPS.
-Patch 4 introduce a new flag to prevent double counting.
-3) Patch 5-6 splits the original single queue into two separate queues(BPS
-and IOPS) without altering the existing code logic.
-4) Patch 7 ensures that split IO requests bypass the BPS queue, preventing
-unnecessary throttling and eliminating the delay issue.
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c      | 9 +++++++--
+ include/linux/blk_types.h | 8 ++++++++
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-Noted, a regression test is posted earlier:
-https://lore.kernel.org/all/20250307080318.3860858-3-yukuai1@huaweicloud.com/
-
-Zizhi Wo (7):
-  blk-throttle: Rename tg_may_dispatch() to tg_dispatch_time()
-  blk-throttle: Refactor tg_dispatch_time by extracting
-    tg_dispatch_bps/iops_time
-  blk-throttle: Split throtl_charge_bio() into bps and iops functions
-  blk-throttle: Introduce flag "BIO_TG_BPS_THROTTLED"
-  blk-throttle: Split the blkthrotl queue
-  blk-throttle: Split the service queue
-  blk-throttle: Prevents the bps restricted io from entering the bps
-    queue again
-
- block/blk-throttle.c      | 302 ++++++++++++++++++++++++--------------
- block/blk-throttle.h      |  17 ++-
- include/linux/blk_types.h |   8 +
- 3 files changed, 214 insertions(+), 113 deletions(-)
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0c12ad9b4aaa..959cbf54f764 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -741,12 +741,16 @@ static void throtl_charge_bps_bio(struct throtl_grp *tg, struct bio *bio)
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	if (!bio_flagged(bio, BIO_BPS_THROTTLED))
++	if (!bio_flagged(bio, BIO_BPS_THROTTLED) &&
++	    !bio_flagged(bio, BIO_TG_BPS_THROTTLED)) {
++		bio_set_flag(bio, BIO_TG_BPS_THROTTLED);
+ 		tg->bytes_disp[bio_data_dir(bio)] += bio_size;
++	}
+ }
+ 
+ static void throtl_charge_iops_bio(struct throtl_grp *tg, struct bio *bio)
+ {
++	bio_clear_flag(bio, BIO_TG_BPS_THROTTLED);
+ 	tg->io_disp[bio_data_dir(bio)]++;
+ }
+ 
+@@ -772,7 +776,8 @@ static unsigned long tg_dispatch_bps_time(struct throtl_grp *tg, struct bio *bio
+ 
+ 	/* no need to throttle if this bio's bytes have been accounted */
+ 	if (bps_limit == U64_MAX || tg->flags & THROTL_TG_CANCELING ||
+-	    bio_flagged(bio, BIO_BPS_THROTTLED))
++	    bio_flagged(bio, BIO_BPS_THROTTLED) ||
++	    bio_flagged(bio, BIO_TG_BPS_THROTTLED))
+ 		return 0;
+ 
+ 	tg_update_slice(tg, rw);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index dce7615c35e7..a5c1067fbf06 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -296,6 +296,14 @@ enum {
+ 				 * of this bio. */
+ 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
+ 	BIO_QOS_THROTTLED,	/* bio went through rq_qos throttle path */
++	/*
++	 * This bio has completed bps throttling at the single tg granularity,
++	 * which is different from BIO_BPS_THROTTLED. When the bio is enqueued
++	 * into the sq->queued of the upper tg, or is about to be dispatched,
++	 * this flag needs to be cleared. Since blk-throttle and rq_qos are not
++	 * on the same hierarchical level, reuse the value.
++	 */
++	BIO_TG_BPS_THROTTLED = BIO_QOS_THROTTLED,
+ 	BIO_QOS_MERGED,		/* but went through rq_qos merge path */
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
 -- 
 2.46.1
 
