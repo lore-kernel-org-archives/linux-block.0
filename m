@@ -1,160 +1,75 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E98264638
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 06:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380E21DE4E7
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 06:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745388852; cv=none; b=enoVpWtK7r8xkBBwCSnQk7PzMRaE9GAPHaCAkUJZwtchMwoIBfMb1zV2jAgBXNNl7Fc+3FSSIAit7PzYFi9sQ+3pFnAWZac3Ss3/QwtLQ/UtyZe9NMj78PYe/6CT0GCjxJuGvJT8S8Pw8K1GXJ7wA9BjBJ/p3HAhdQUJQI591L4=
+	t=1745390134; cv=none; b=gJtBqvPeIXrx8wgLDLkF2F6wKTnCeqO4NPzbrM8CtvuptxfWk55lQ7Emvk1tJ2W4qWoOS3NV6OUijGbZfjbje/NIz4wFMkySSqoTLqGxtUoj/AMNNNsKrcXjmgQLGV7VDOojZpFDJK5JL/j8yhWSTjoOJvRrxMZ+waYkMiyiAzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745388852; c=relaxed/simple;
-	bh=pwmo35Kc1fWuu5GDx2NmfXVpfRLvnNEHE8iHLNzgBtA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GiOvk9rrH53ghsWbvkSk/wUDdpW3JyXNm3dCpQg1IBmhx9kLHGRK6NCOV22hCDDGF8MUYslJ5E4dXT6ZEwV99lIPBfPaFmqhkyfvzSwfvNylAktmdBrSjkg+diwOJh4p/Dg5dft3w1yypVNDuEH2moNbM2FOonXfT6wtp0TyXNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F8cAso5q; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+s19Z0kv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F8cAso5q; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+s19Z0kv; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1745390134; c=relaxed/simple;
+	bh=LdWtT4VMXyHZ7rQULCNGUKLGTGpd5XC0N8OxyNQHuaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sz3yy4RwPi+2bsbb9s3I5NZlCxBDEIi5KDS1dEnbnWHbrZ9FzWv/+9gpdMuQBdZKrQ/q4z+qBt2LLxXU0GRY6vbZg1av+6yTSpn7V0b9Wm42w3z5xksAj+p6EoyN0IN31XdnJydxwT1qzzFEHPYue+7XUTsdJxft8S46c5Q6FxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YxEUmtA/; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F8cAso5q";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+s19Z0kv";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F8cAso5q";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+s19Z0kv"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 4E64D1F38D;
-	Wed, 23 Apr 2025 06:14:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745388848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hwrW2MxJC76CZWFRTLUaCgGNQLEQh1XVj/R+ebNcNyo=;
-	b=F8cAso5qfqiF8lfWAjIcaGNRSc/yudVVAA2MFq4/VoHcJlDUtQq56skPKslelj07VY1NKL
-	F8PvWu6Z27zrzQhPT2Xej/efWn/kAzoljI1j+LNxR+BAHYiv93Qqgqtw7CKjYhQTCk1TOt
-	0c9Xz77+2cnPjcgjpHzwOOQUKCbXdkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745388848;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hwrW2MxJC76CZWFRTLUaCgGNQLEQh1XVj/R+ebNcNyo=;
-	b=+s19Z0kvIHaA05FA/gZlTkg/tDLa86qY/56Vgn0ODeo/8KSLt4M57B71ZGQbdNyMKw8wPA
-	RFr3L8p248yx0eCA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=F8cAso5q;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+s19Z0kv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745388848; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hwrW2MxJC76CZWFRTLUaCgGNQLEQh1XVj/R+ebNcNyo=;
-	b=F8cAso5qfqiF8lfWAjIcaGNRSc/yudVVAA2MFq4/VoHcJlDUtQq56skPKslelj07VY1NKL
-	F8PvWu6Z27zrzQhPT2Xej/efWn/kAzoljI1j+LNxR+BAHYiv93Qqgqtw7CKjYhQTCk1TOt
-	0c9Xz77+2cnPjcgjpHzwOOQUKCbXdkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745388848;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hwrW2MxJC76CZWFRTLUaCgGNQLEQh1XVj/R+ebNcNyo=;
-	b=+s19Z0kvIHaA05FA/gZlTkg/tDLa86qY/56Vgn0ODeo/8KSLt4M57B71ZGQbdNyMKw8wPA
-	RFr3L8p248yx0eCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 470F013691;
-	Wed, 23 Apr 2025 06:14:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Oh4eDy+FCGj4TQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 23 Apr 2025 06:14:07 +0000
-Message-ID: <c6107977-c8c6-4a28-8b53-d4d4c8951a65@suse.de>
-Date: Wed, 23 Apr 2025 08:14:06 +0200
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YxEUmtA/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=OuocT9B0/z1/BEcxr/8CqLWaTv/LfMtLcHmjckk81l8=; b=YxEUmtA/nxLRSBFeclh/s21PNy
+	O5BZrBYft84WupKYZwZ17vJALG5LOrIEBn36aAD0FvKI9ixDNxE8WwnWNWb5g8FFLIbMlVhm0nhS2
+	mfTbkMfaumvo7CzNy5h2f3Gxzqi1zMJLyIvzlHkyZ8zMCXQ6NgqJmLRz1AfdyTZCJijUo6+82YNDG
+	pQQ6XOtT6GHKylfrTSFQTfcUxqVv+g32ZRAIzqSbrym3HLYlfnSknUXh46iV5jiC24ufcsDvVwD8O
+	8KFU3ndNPVrZEW/qqSSQoWKVX2DJgjlX/bpjN6TikUi82frOmutIgPbls05lyrCmBqxrG1k6sX9H3
+	KnNrW9eQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u7Thj-00000009MAS-2Rrc;
+	Wed, 23 Apr 2025 06:35:31 +0000
+Date: Tue, 22 Apr 2025 23:35:31 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>
+Cc: linux-block <linux-block@vger.kernel.org>
+Subject: Re: Block device's sysfs setting getting lost after suspend-resume
+ cycle
+Message-ID: <aAiKM0-1JJulHLW7@infradead.org>
+References: <32c5ca62-eeef-5fb5-51f5-80dac4effc98@applied-asynchrony.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/17] block: simplify bio_map_kern
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
- Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>,
- Kent Overstreet <kent.overstreet@linux.dev>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, Andreas Gruenbacher <agruenba@redhat.com>,
- Carlos Maiolino <cem@kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
- Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>,
- linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-pm@vger.kernel.org
-References: <20250422142628.1553523-1-hch@lst.de>
- <20250422142628.1553523-7-hch@lst.de>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250422142628.1553523-7-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4E64D1F38D
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[to_ip_from(RL94xbwdgyorksiizmbcmor9ro)];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,lst.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32c5ca62-eeef-5fb5-51f5-80dac4effc98@applied-asynchrony.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 4/22/25 16:26, Christoph Hellwig wrote:
-> Split bio_map_kern into a simple version that can use bio_add_virt_nofail
-> for kernel direct mapping addresses and a more complex bio_map_vmalloc
-> with the logic to chunk up and map vmalloc ranges using the
-> bio_add_vmalloc helper.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/blk-map.c | 74 +++++++++++++++++++------------------------------
->   1 file changed, 29 insertions(+), 45 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Holger,
 
-Cheers,
+can you try the patch below?  It fixes losing the read-ahead value in
+my little test. 
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 6b2dbe645d23..4817e7ca03f8 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -61,8 +61,14 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+ 	/*
+ 	 * For read-ahead of large files to be effective, we need to read ahead
+ 	 * at least twice the optimal I/O size.
++	 *
++	 * There is no hardware limitation for the read-ahead size and the user
++	 * might have increased the read-ahead size through sysfs, so don't ever
++	 * decrease it.
+ 	 */
+-	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
++	bdi->ra_pages = max3(bdi->ra_pages,
++				lim->io_opt * 2 / PAGE_SIZE,
++				VM_READAHEAD_PAGES);
+ 	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
+ }
+ 
