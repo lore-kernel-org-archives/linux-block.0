@@ -1,28 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DCD7F9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E111F16B
 	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 02:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745375605; cv=none; b=edAFXY5ZNN2TNCpiRsZ5fPjxORlcitKa7jOzKCJN/pFueH9qbhswAYAWrGk+3GHaaYp4hExm2G48Sha8Ymv0PSw8H2x1a9zxz5xszJTR60vAhWebokWtJVbQuQHWz+l/3e+yFYhUfJAtvY36VuRciRyPRdsIaZfRnc8/5wzVJu4=
+	t=1745375605; cv=none; b=bc85SYKqA9o9LhEXggB2hNB21PAFPhEynye2AWcoMlva6LfAuQkgBVhh7O0y7HLl4BTMwhA06dj46Rz9c+7ZzEGL3RFZBLiBRoZLqgS9hqNDkCiLd5wcT5N46yOociEsolGkZUxHcdvmmrBEurSb/Vr2h42Oum7L3QiSxxtuK3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745375605; c=relaxed/simple;
-	bh=Dn40j7CegTDN/INKZBVLf/lAG+2TGSzvPcRQHzn/Zv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X8f7/dc0buvJghga+KzaxYTkCc4xWDWXRs2w5gL7Dz0Sl5AWDiJE+n8v1jRN07ybEH1np3UPjIWK2ZJl0m+sN/gG4mTVB/IPNRlH8vOmRDtjWW5RSmO2xjibP8twN90x1Qf8hD3LTKD72JyRLzNr41HwVUnnxHv2ARzOa9WTxyI=
+	bh=q8iNEepY34XyAFsk9ihOW1EbKY18bisuBlVuVP8CCDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kSN7DleoGppTHx918Lz+QdT3XHmmzqmE7nOczD+7f2XatJxUavOATSns5XrpzbKlMzM6sheI5fA2lMo196FN3E2Iej7ZSnYyZ9qHTp74taWFIr4xJYWpyIgPTNoe0Q8X5EZ8DaR1vZlP2ZqFJyxDSU0wPYz4X1WF0w+9LpxNFYM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zj3716KXkz4f3jqb
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zj3711LFhz4f3kJw
 	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:01 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 811A51A058E
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:20 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id CDA2E1A07BB
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:19 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.112.188])
-	by APP4 (Coremail) with SMTP id gCh0CgB3219rUQhoCGcsKQ--.37591S6;
-	Wed, 23 Apr 2025 10:33:20 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgB3219rUQhoCGcsKQ--.37591S4;
+	Wed, 23 Apr 2025 10:33:17 +0800 (CST)
 From: Zizhi Wo <wozizhi@huaweicloud.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org
@@ -31,12 +30,10 @@ Cc: yangerkun@huawei.com,
 	wozizhi@huaweicloud.com,
 	ming.lei@redhat.com,
 	tj@kernel.org
-Subject: [PATCH V4 2/7] blk-throttle: Refactor tg_dispatch_time by extracting tg_dispatch_bps/iops_time
-Date: Wed, 23 Apr 2025 10:22:56 +0800
-Message-ID: <20250423022301.3354136-3-wozizhi@huaweicloud.com>
+Subject: [PATCH V4 0/7] blk-throttle: Split the blkthrotl queue to solve the IO delay issue
+Date: Wed, 23 Apr 2025 10:22:54 +0800
+Message-ID: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
 X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
-References: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,185 +41,88 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3219rUQhoCGcsKQ--.37591S6
-X-Coremail-Antispam: 1UD129KBjvJXoW3WF4fKFWDGr4kAFykuF15Jwb_yoW7try8pr
-	W3Ca1jqF48XFn7KFW3Zwn8GayYkws7Ar9rJa9rGr9rAF4YvFyDKF1kZryYvFW5AF97ua17
-	Aryqv347Ca1qyrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBG14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAVWUtw
-	CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
-	6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64
-	vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0x
-	vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUFoGdUUUUU=
+X-CM-TRANSID:gCh0CgB3219rUQhoCGcsKQ--.37591S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxJFyfuryfAw4rAFW8Wr13XFb_yoW5Aw47pr
+	WfWw4Yk3WkJFsrK34fWrnIqaySq3ykJrZrCr97JrW3J3WkZrW0qr1fKrW8ZFWxAF9xWa1a
+	gryUtrs5uF1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUU
+	UU=
 X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-From: Zizhi Wo <wozizhi@huawei.com>
+Changes since V1-3:
+1) Updated the comments in patches 4 and 6 for greater specificity.
+2) In patch 6, replaced the @queued parameter with @sq in both
+throtl_qnode_add_bio and throtl_pop_queued to facilitate internal changes.
+And the potential problem of null pointer dereference has been fixed.
 
-tg_dispatch_time() contained both bps and iops throttling logic. We now
-split its internal logic into tg_dispatch_bps/iops_time() to improve code
-consistency for future separation of the bps and iops queues.
+[BUG]
+The current blkthrotl code provides two types of throttling: BPS limit and
+IOPS limit. When both limits are enabled, an IO is only dispatched if it
+meets both the BPS and IOPS restrictions. However, when both BPS and IOPS
+are limited simultaneously, an IO delayed dispatch issue can occur due to
+IO splitting. For example, if two 1MB IOs are issued with a BPS limit of
+1MB/s and a very high IOPS limit, the IO splitting will cause both IOs to
+complete almost "simultaneously" in 2 seconds.
 
-Besides, merge time_before() from caller into throtl_extend_slice() to make
-code cleaner.
+[CAUSE]
+The root cause of this issue is that blkthrotl mixes BPS and IOPS into a
+single queue. When issuing multiple IOs sequentially, the continuously
+split IOs will repeatedly enter the same queue. As they alternately go
+through the throtl process, IOs that have already been throttled will have
+to wait for IOs that have not yet been throttled. As a result, all IOs will
+eventually complete almost together.
 
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 98 +++++++++++++++++++++++++-------------------
- 1 file changed, 55 insertions(+), 43 deletions(-)
+[FIX]
+Since IO requests that have already been split no longer need to go through
+BPS throttling but still require IOPS control, this patchset splits the
+existing blkthrotl queue into two separate queues: BPS and IOPS.
+1) IO requests must first pass through the BPS queue.
+2) Once they meet the BPS limit, they proceed to the IOPS queue before
+being dispatched.
+3) Already split IO requests bypass the BPS queue and go directly to the
+IOPS queue.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index dc23c961c028..00f99c417647 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -520,6 +520,9 @@ static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
- static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
- 				       unsigned long jiffy_end)
- {
-+	if (!time_before(tg->slice_end[rw], jiffy_end))
-+		return;
-+
- 	throtl_set_slice_end(tg, rw, jiffy_end);
- 	throtl_log(&tg->service_queue,
- 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
-@@ -682,10 +685,6 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 	int io_allowed;
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 
--	if (iops_limit == UINT_MAX) {
--		return 0;
--	}
--
- 	jiffy_elapsed = jiffies - tg->slice_start[rw];
- 
- 	/* Round up to the next throttle slice, wait time must be nonzero */
-@@ -711,11 +710,6 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 	unsigned int bio_size = throtl_bio_data_size(bio);
- 
--	/* no need to throttle if this bio's bytes have been accounted */
--	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_BPS_THROTTLED)) {
--		return 0;
--	}
--
- 	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
- 
- 	/* Slice has just started. Consider one slice interval */
-@@ -742,6 +736,54 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	return jiffy_wait;
- }
- 
-+/*
-+ * If previous slice expired, start a new one otherwise renew/extend existing
-+ * slice to make sure it is at least throtl_slice interval long since now. New
-+ * slice is started only for empty throttle group. If there is queued bio, that
-+ * means there should be an active slice and it should be extended instead.
-+ */
-+static void tg_update_slice(struct throtl_grp *tg, bool rw)
-+{
-+	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
-+		throtl_start_new_slice(tg, rw, true);
-+	else
-+		throtl_extend_slice(tg, rw, jiffies + tg->td->throtl_slice);
-+}
-+
-+static unsigned long tg_dispatch_bps_time(struct throtl_grp *tg, struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+	u64 bps_limit = tg_bps_limit(tg, rw);
-+	unsigned long bps_wait;
-+
-+	/* no need to throttle if this bio's bytes have been accounted */
-+	if (bps_limit == U64_MAX || tg->flags & THROTL_TG_CANCELING ||
-+	    bio_flagged(bio, BIO_BPS_THROTTLED))
-+		return 0;
-+
-+	tg_update_slice(tg, rw);
-+	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
-+	throtl_extend_slice(tg, rw, jiffies + bps_wait);
-+
-+	return bps_wait;
-+}
-+
-+static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+	u32 iops_limit = tg_iops_limit(tg, rw);
-+	unsigned long iops_wait;
-+
-+	if (iops_limit == UINT_MAX || tg->flags & THROTL_TG_CANCELING)
-+		return 0;
-+
-+	tg_update_slice(tg, rw);
-+	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
-+	throtl_extend_slice(tg, rw, jiffies + iops_wait);
-+
-+	return iops_wait;
-+}
-+
- /*
-  * Returns approx number of jiffies to wait before this bio is with-in IO rate
-  * and can be dispatched.
-@@ -749,9 +791,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
- {
- 	bool rw = bio_data_dir(bio);
--	unsigned long bps_wait, iops_wait, max_wait;
--	u64 bps_limit = tg_bps_limit(tg, rw);
--	u32 iops_limit = tg_iops_limit(tg, rw);
-+	unsigned long bps_wait, iops_wait;
- 
- 	/*
-  	 * Currently whole state machine of group depends on first bio
-@@ -762,38 +802,10 @@ static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
- 	BUG_ON(tg->service_queue.nr_queued[rw] &&
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
- 
--	/* If tg->bps = -1, then BW is unlimited */
--	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
--	    tg->flags & THROTL_TG_CANCELING)
--		return 0;
--
--	/*
--	 * If previous slice expired, start a new one otherwise renew/extend
--	 * existing slice to make sure it is at least throtl_slice interval
--	 * long since now. New slice is started only for empty throttle group.
--	 * If there is queued bio, that means there should be an active
--	 * slice and it should be extended instead.
--	 */
--	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
--		throtl_start_new_slice(tg, rw, true);
--	else {
--		if (time_before(tg->slice_end[rw],
--		    jiffies + tg->td->throtl_slice))
--			throtl_extend_slice(tg, rw,
--				jiffies + tg->td->throtl_slice);
--	}
--
--	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
--	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
--	if (bps_wait + iops_wait == 0)
--		return 0;
--
--	max_wait = max(bps_wait, iops_wait);
--
--	if (time_before(tg->slice_end[rw], jiffies + max_wait))
--		throtl_extend_slice(tg, rw, jiffies + max_wait);
-+	bps_wait = tg_dispatch_bps_time(tg, bio);
-+	iops_wait = tg_dispatch_iops_time(tg, bio);
- 
--	return max_wait;
-+	return max(bps_wait, iops_wait);
- }
- 
- static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+[OVERVIEW]
+This patchset consists of 7 patches:
+1) Patch 1 is a simple clean_up.
+2) Patch 2-4, to facilitate the subsequent splitting of queues. Patch 2-3
+separate the -dispatch- and -charge- functions based on the BPS and IOPS.
+Patch 4 introduce a new flag to prevent double counting.
+3) Patch 5-6 splits the original single queue into two separate queues(BPS
+and IOPS) without altering the existing code logic.
+4) Patch 7 ensures that split IO requests bypass the BPS queue, preventing
+unnecessary throttling and eliminating the delay issue.
+
+Noted, a regression test is posted earlier:
+https://lore.kernel.org/all/20250307080318.3860858-3-yukuai1@huaweicloud.com/
+
+Zizhi Wo (7):
+  blk-throttle: Rename tg_may_dispatch() to tg_dispatch_time()
+  blk-throttle: Refactor tg_dispatch_time by extracting
+    tg_dispatch_bps/iops_time
+  blk-throttle: Split throtl_charge_bio() into bps and iops functions
+  blk-throttle: Introduce flag "BIO_TG_BPS_THROTTLED"
+  blk-throttle: Split the blkthrotl queue
+  blk-throttle: Split the service queue
+  blk-throttle: Prevents the bps restricted io from entering the bps
+    queue again
+
+ block/blk-throttle.c      | 302 ++++++++++++++++++++++++--------------
+ block/blk-throttle.h      |  17 ++-
+ include/linux/blk_types.h |   8 +
+ 3 files changed, 214 insertions(+), 113 deletions(-)
+
 -- 
 2.46.1
 
