@@ -1,63 +1,67 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2532CCC1
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 05:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31AA2581;
+	Wed, 23 Apr 2025 05:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745386419; cv=none; b=hMFF2ddoC7WGg8Xcs9dqvRYrEuBFVjJUJhSSt2zoXdqY/9rucIoxIDaECm3dMa4XohRJnbGRnEkEsGgme/EB6rdGCLdQtagWUm4m+6EJSIwRx7sq0ExsJAe5HPd1Y6UgwtG1xUuqF1Aot9q+qzdoutKWntrWme533xnCgsuw0I4=
+	t=1745386697; cv=none; b=nkoIxwxSWW4/3Fa7OtyjUzxFLQyE7BeF5ea5LcJvIvAUxEXpnXDpgLFoLDBUfGQ8+wgVKnJnOx78Z2OkxS1yE20d5Wwj9MPjC1Qr8/lnj1G136CebQCHxvFrwHnMsALK6X/0cQFjgBxPs0s1YqSYBLm8ZvghofG+Zh8UYJUgyoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745386419; c=relaxed/simple;
-	bh=HGhiS7hvt9IIyLP+Ar4BAZXMZ4DSA8d3OaBys9JkNSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qDwJYwipTYksSWXD/DO7uQyU+/0bOZINKKtvTgQ/hE8DVYCRJaxfyx2XQfrZwteBFaimju8hmAOehEKOyrzr9jSGsCO98m+auzUlAIGhRB/iUpnS8AJcW2IAnj52ZWhzLqB50fab/vrIlZOfvbWJvBu/Qi6bs3xUujMCbBns1FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0yqBgHFj; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	s=arc-20240116; t=1745386697; c=relaxed/simple;
+	bh=3ZQJLDtbum9O3NBC5xy0L1tGp20uivvq/7Ie414DyU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y/1gtelECiv2YHFTTZoHq+QFsdS3W4RFzQBfBJJubf0EVaDLfTyAzBKkKGytaJXp1NgGejG3Qiyk9Use7FwGC1T/QgnXNGkBFgRBjg1k6h4MOoq0OwYmjixO6wNphTari7h0cXtOY1zrOmmUvC2klyNafTbQRzzo9CqeGe/oGck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MXGn9ZF+; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0yqBgHFj"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MXGn9ZF+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2R2Uwm2W/xsx1uDfl+ypjxS38Szxio+2XCM3jzDr198=; b=0yqBgHFjvlvKFZc0e/LNrdjmuB
-	pGSbGkrjyXUPe6mtQ7yOyLnZC2AN2SdKOqQiVR+cCtxVTCvfH+X276VZeC3kDU1ingDpdfKtoZq2N
-	m94u7WpJmrDcdqSCDkXmI4ok5RhrvU/LbANYySkeyJwfK3QNDAYYzV5DQP1wmH3Du0aCMOWvoMzGZ
-	zmERvnlfpGOAxT8sCWztRtDQ8PXPawws71MY5GmJUaK2mlOdJbYMvHsIP8tvfrm1rmSVRSVRjvAWt
-	iLAlPuN/9Q3XxL+OEkww3N/B/3KM3Jp9ek8DpJateQu0gy7BqnGC1e8uZ6XfHd4v2oj1zoC52EVZ9
-	l5YPt+jQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u7Sjn-00000009FIt-4AS1;
-	Wed, 23 Apr 2025 05:33:35 +0000
-Date: Tue, 22 Apr 2025 22:33:35 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, "arnd@arndb.de" <arnd@arndb.de>,
-	"ojeda@kernel.org" <ojeda@kernel.org>,
-	"nathan@kernel.org" <nathan@kernel.org>,
-	Martin Petersen <martin.petersen@oracle.com>
-Subject: Re: [PATCH 1/1] block: prevent calls to should_fail_bio() optimized
- by gcc
-Message-ID: <aAh7rymjazruoMTM@infradead.org>
-References: <20250417163432.1336124-1-prasad.singamsetty@oracle.com>
- <aAYxSOxeM-mQgNyF@infradead.org>
- <91C42F53-51CB-4529-9139-3CF4AA2DD935@oracle.com>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=IW9/oDnIXjpVtM5oSxACWrPIRV9xnJ97IsPB0qW4bhc=; b=MXGn9ZF+mzqM75+OIdcTVvyIbA
+	2VSPK9t6vOBqqZRepet1IIxVdZ6zuV5CQHgJkN5yOh8UW9ayVZPdQJwRSILXtF/Gcn+FeNItZNKac
+	npc317mMVg016zV6vLvEAQ64KfnGXNUtGySW9RJGRx0nha5c4G37OCfXJgH23P+KkFthrIe4gRHgI
+	gBZ0CmwhSKSXivG7UdE28aym+0lwgcWYYJmbwSypGN1ku2nR856ta2Ak2zFwVLuhJ0dXjzIf1CXAX
+	9i3L4glC+O3meHNFYah+txKmeCGmYjzX9BEYcY5N/PasFRYEDI+ixeuqxDnSUjTGb18jMfnLUYqXH
+	NVhDzs7g==;
+Received: from 2a02-8389-2341-5b80-c0c9-6b8d-e783-b2cd.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:c0c9:6b8d:e783:b2cd] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u7SoH-00000009FlH-1Ish;
+	Wed, 23 Apr 2025 05:38:13 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Christian Brauner <christian@brauner.io>,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org
+Subject: don't autoload block drivers on stat (and cgroup configuration)
+Date: Wed, 23 Apr 2025 07:37:38 +0200
+Message-ID: <20250423053810.1683309-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <91C42F53-51CB-4529-9139-3CF4AA2DD935@oracle.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Apr 22, 2025 at 09:58:34PM +0000, Prasad Singamsetty wrote:
-> We are also aware of the block filter project that was active and not sure about
-> the current status of it. We will look into that. 
+Hi all,
 
-Please help with upstreaming it and your code depending on it.
+Christian pointed out that the addition of the block device lookup
+from stat can cause the legacy driver autoload to trigger from a plain
+stat, which is a bad idea.
 
+This series fixes that and also stops autoloading from blk-cgroup
+configuration, which isn't quite as bad but still silly.
+
+Diffstat:
+ block/bdev.c           |   17 +++++++----------
+ block/blk-cgroup.c     |    2 +-
+ block/blk.h            |    3 +++
+ block/fops.c           |    2 +-
+ include/linux/blkdev.h |    4 ----
+ 5 files changed, 12 insertions(+), 16 deletions(-)
