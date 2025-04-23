@@ -1,116 +1,130 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF4E280CF8
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 16:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFCE27F4F4
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745427002; cv=none; b=rquZZnF7IOJoV7BM70T4nN43W0ijXWJIe9eADR10UT/4FWhF6SHzAAVj3a2Qxpy/oCymZajRmn+eNyyUCRUNut5/t6iZqmQCSkoJiCu788VV1l6ZzabiM6LmHpWDuGQHkeSmzLvO/9M+ZnyT9cDFu6R7OGvQk8be9ghd5bJ4IWs=
+	t=1745427624; cv=none; b=C9g33oReBTML8qHwzFZ2VfO1pd7XPWLLa7q78+8G0GbiGDBaPCFE0LQfsOsOI0E/mkHyrWTQpfR7FwCuhrxuy2FSw1RWBY9T8N6LHDZL4l+DDq5ebSxk6Z1jpnASqDg7hVRltn+RsHQqddZ3dXdlkSBTvk4nhGrWCYwbyO2ou8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745427002; c=relaxed/simple;
-	bh=Z1m/PU2hY956olAe1YOGTf/XalzrqqMHd4NU2/31BMU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ff9qGunbjVXyO74DSUYaM8xNT8Z/Al/0EiItG/oR9ojDCWeVQ6mzWbkDT/Hl8gcZ0MlByvQvq/ebF/QUW0kkaPKvDTaa1lGTZFSVQoRqFsGsM+QWSGMJcM302IRvKsBjh6YjEIqrLbNeKkWH1EJQ5ZM9DVvryUycGVOlRx8/aog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J91+tXAI; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745427624; c=relaxed/simple;
+	bh=Oq+RUVKXoierg4o0zQGaueU+iLWLxzwb7ZA+t/XFi9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JdDamWCZweHXydtbnwb6gv4yD37n9CiME2nHEziUuhYgFFp+69qz59d2e5sjCfK7Paud/kxXULrcBT4n0ObRigdreKNw7YP5YDlFV5ODOCjTiLHADeETYVMZXpefbyYD/ebOoADGNv1ADIUflbhKX3IhyLmQK0XR2IAxkpZJToI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UARDqsgx; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J91+tXAI"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-47666bd7026so63401cf.2
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 09:50:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UARDqsgx"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4766cb762b6so1237351cf.0
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745427000; x=1746031800; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=34RjNwR8wpSYhrDbyQGJjUvc/aPNOKAfCSR8EYSOfYQ=;
-        b=J91+tXAIZhWIhECeD5kQ+TV+6lbAnbgyJuYCTi+5qsLWEpfTYYioBYw8x/JwBqceVe
-         LprsSE1xkLbYszUQRJItEA8WuJKLccoe193NHpM85A0IpKQPlJtXHlM8w3KR+Ec/iEgC
-         yuXvgEXtEFzwdKnngPVYm6BQkbGnEMAxTt5OHJsPWEF2RWFkCQc6aiL8osIN/1kFqKAO
-         ++/0yAZA+lpuZdnE3eA1T2EyK15guQrGy3yc6g8eWBB6uyFSaEpSXZnxNWOqf+TtRqmX
-         bePihNGrN7NoMpU+mWYZizGcWe7/lCRTy4f9Sr5CtymNvL6dX2T39O151gubv06+e8OB
-         KKPQ==
+        d=ziepe.ca; s=google; t=1745427621; x=1746032421; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWxVg46eMCFdiWQ6X6K5wh7BwyllE/TFgcnWyILw7vo=;
+        b=UARDqsgxOC+cJtWdyN+NC2FY/WCTVe7z3WFx7smCC0E32+wheWqdAVaqyZuMIN2aMg
+         bYi30GQ5/MbJgUzSusKZHoKpetThYKOQb6prIavNr2Nm8nhyRI5OLVpd03M6nJutlPIQ
+         8X8itz0LgQdwoScBesYqaixgUfPxwTIkwGLN1aIVBGVRnkq8PGzRrPN5ygxBtf6jtGJ5
+         9oD9uONx64IyINlPGGwW6qOrIH8DeRKjy/bUyPoubWzTdYFhG1OSbmgg8Bgs/Rfee3Dt
+         xUQTD9Igf9RC5VSQJ6fdAqzjen7lbn1D0IWGZSegnpLfXYufUFsFYPjfslA9NpLe2QAc
+         jKkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745427000; x=1746031800;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=34RjNwR8wpSYhrDbyQGJjUvc/aPNOKAfCSR8EYSOfYQ=;
-        b=X3pItRPEZEeEFw0EqZapAu7i73cEQ6Z0Cm1KA/t18KnI4NzbQf26pQe0A5rjgvZU5w
-         7Wy+8gOpwLfluRyKcafFhyGWqnxqd1TIajWpW+9xWL8LjJFNkw5z16uNxoQ6ACOyY+2P
-         KXIJlWFcD8O03O0No3zU76pspE8dv3Cz/LfZZJyWoSLp1YtvEuNLU2XBDWpLMZAPb9uo
-         Fdn7uZfSZmF2i+IEuzSRL4ltR2njjUTZkPUisRFnIj6A0IBcQvZidHzvkxMjJQqU9LEW
-         5SjR8xKtvdW9HpItYDuj5s0/iNcNUTKqC3qY3C09PAi7MtC6wDpPsSMTPKTz5ryDht3c
-         MQ6w==
-X-Forwarded-Encrypted: i=1; AJvYcCW0plvw33KDCBTVUX7tuKdW4lDqfa7h56FlPdMT4L/eJrF7l9dpiGm5uAB/65fQFOeYpZRx9omKJVjy1A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YywMvcep+Dsr6LbuM6N1m58tK5cjsaYHwPfF+ZCGJtto6qJVzFJ
-	mmfJpJHav+ITlS8mwEkfNnPlz9EwrjmLHDx3NXvuiHlSSDT2U5vI
-X-Gm-Gg: ASbGnct2KgVVRBImAMjEKhyjUeyPDzNm4NVv9uar0QqLVkXNnWzjXsGjEDlRmrXrKzy
-	2eXXDGILB01y/El4R3uA2rmg6ZgRjzFcIy55N06iCp4FMr+eSD+o4ODzBGPLQrzSJvVWXDKmvu2
-	Js7vTvh0xj5Ymqmwyl12dAxOBWVyhafQ98NgURedanyEq6PU8QtC78EB224BaYCB2wESc8kM/6x
-	n5rUHlfIc0pOLW42CHqIlDypd6s0HMtI/U2bNMWfyvTPJX59PB9kWU9hNc5d1qhyPL9auxE6oO2
-	MIKj0lXY8ApDz4iqZsWaBtpT0NBk7GtYIHp7SJ7mKt6QZX48wHcPoslEmfGf5cC9gktXVon1Ak/
-	3JGPdL+Tz
-X-Google-Smtp-Source: AGHT+IE2FYWO0M6glcgAeGw7XLBCKWyf2JU75wQSimzHYYgzYSX72p+RdgkCSTAu2CisNdfpCeDcig==
-X-Received: by 2002:a05:622a:118c:b0:472:15be:54ad with SMTP id d75a77b69052e-47d1f119f63mr21345731cf.14.1745426999529;
-        Wed, 23 Apr 2025 09:49:59 -0700 (PDT)
-Received: from localhost (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-47ae9c179f1sm70380351cf.16.2025.04.23.09.49.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 09:49:58 -0700 (PDT)
-From: Sean Anderson <seanga2@gmail.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org
-Cc: Sean Anderson <seanga2@gmail.com>
-Subject: [PATCH blktests] zbd/005: Limit block size to zone length
-Date: Wed, 23 Apr 2025 12:49:57 -0400
-Message-Id: <20250423164957.2293594-1-seanga2@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        d=1e100.net; s=20230601; t=1745427621; x=1746032421;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wWxVg46eMCFdiWQ6X6K5wh7BwyllE/TFgcnWyILw7vo=;
+        b=bYDZPzaFaxvLUgvnK9y8JCC1CQmped37ob4um5KlgIp6LbFFBXWJ7QatGAmwmysxeq
+         g8azLoBxGcKT1OVlqe1K7wW9HFrURlslS/SKj5Xtu2ZRnwwgJ1RFe/HPAE+ufTD8MPXj
+         LOmBHdCsGNGV9vgbkmR0cvWTHcDmerObJPU3GYATeqcIl6EqSa5OP88en/04eOC/vWVN
+         +0cTVxEF4LDc3ntEjmEbhcBgEY5E6mB+bF5xlwZQsy5IJ7wnR+gJHPizBVB/vL/1NNk/
+         CY+wV1is0cZlW8EH1rT6cT172cTMk8xYQTdGv1sJCkIxrh2y55tJuEfq/5TjVC7QeAOy
+         c5Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWipXuCls94JLSgmSz63takGLxWYZQdyRUkw1diouOCa6siU3OjLbkm9mT0YzT8xkY+eAXs+dLpKOwgSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDZSFDD7xYOyUHhlWDYxH9wqR2QiabpuHSVWRAnL/SYgfXjaFj
+	53Sx7ann52BsSEP8Yw4XJA5O59gkFQLB3qYpQWBhsNB0vvWd3sOIh00QbwVbVbc=
+X-Gm-Gg: ASbGncua1iNyrLWfU+E9xLnTeCf0Or669P9l0e1XPsijDNPQemypXD0z4I8nbu4HQCr
+	+OHEJpgtj8NbepD91PZURunkFQTZ0skHXiqzaQ/U84xUqGzx55Tnhj4HlwbjnX1duz0+E+Zh/HM
+	GgMN0qms14e//wfCztFtdmtMJv3DqesQyClYSjszQk2rPjOuNkKKCPWioS7OnVRZlaDzFX4/KYA
+	+SD59O2Nniil8bUJ4ZdVFSnZKipCvc41M4CRqFG1OXEhnyl6enKkcP54y+CGzPsFyRxCmnHEb0O
+	OFr2l16HLFZLP64sdSNFR5S8iNorIGtjn5hDQBaMtnuVVSn+Dozm2pGhAzFiuPylgadASHIpgCf
+	DyT3kLKECqQa3/LzT8M6PPg9I0hBsxA==
+X-Google-Smtp-Source: AGHT+IHksHmB8zXVAbJv0K8R7XmlcjQan86yStXGt3YpvcZVpCrvagDTNNdOsaaJ2R0ZGC6sR1O+4g==
+X-Received: by 2002:a05:622a:118f:b0:47e:641:9665 with SMTP id d75a77b69052e-47e0641979dmr20773641cf.5.1745427621264;
+        Wed, 23 Apr 2025 10:00:21 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2bfcfd0sm72347416d6.82.2025.04.23.10.00.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 10:00:20 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1u7dSO-00000007LHo-0vIz;
+	Wed, 23 Apr 2025 14:00:20 -0300
+Date: Wed, 23 Apr 2025 14:00:20 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH v9 23/24] nvme-pci: convert to blk_rq_dma_map
+Message-ID: <20250423170020.GI1213339@ziepe.ca>
+References: <cover.1745394536.git.leon@kernel.org>
+ <7c5c5267cba2c03f6650444d4879ba0d13004584.1745394536.git.leon@kernel.org>
+ <20250423092437.GA1895@lst.de>
+ <20250423100314.GH48485@unreal>
+ <20250423154712.GA32009@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423154712.GA32009@lst.de>
 
-The block size must be smaller than the zone length, otherwise fio will
-fail immediately.
+On Wed, Apr 23, 2025 at 05:47:12PM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 23, 2025 at 01:03:14PM +0300, Leon Romanovsky wrote:
+> > On Wed, Apr 23, 2025 at 11:24:37AM +0200, Christoph Hellwig wrote:
+> > > I don't think the meta SGL handling is quite right yet, and the
+> > > single segment data handling also regressed.  Totally untested
+> > > patch below, I'll try to allocate some testing time later today.
+> > 
+> > Christoph,
+> > 
+> > Can we please progress with the DMA patches and leave NVMe for later?
+> > NVMe is one the users for new DMA API, let's merge API first.
+> 
+> We'll need to merge the block/nvme patches through the block tree
+> anyway to avoid merges from hell, so yes.
 
-Signed-off-by: Sean Anderson <seanga2@gmail.com>
----
+RDMA has been having conflicts on the ODP patches too, so yeah we need
+a shared branch and this thing into each trees. I'd rely on Marek to
+make the shared branch and I'll take the RDMA parts on top.
 
- tests/zbd/005 | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/tests/zbd/005 b/tests/zbd/005
-index 4aa1ab5..3e1ded9 100755
---- a/tests/zbd/005
-+++ b/tests/zbd/005
-@@ -29,6 +29,7 @@ test_device() {
- 	local -i zone_idx
- 	local -i offset
- 	local -i moaz
-+	local -i block_size
- 	local -a zbdmode=()
- 
- 	echo "Running ${TEST_NAME}"
-@@ -38,6 +39,8 @@ test_device() {
- 	zone_idx=$(_find_first_sequential_zone) || return $?
- 	offset=$((ZONE_STARTS[zone_idx] * 512))
- 	moaz=$(_test_dev_max_open_active_zones)
-+	block_size=$(((ZONE_LENGTHS[zone_idx] > 512 ? \
-+		       512 : ZONE_LENGTHS[zone_idx]) * 512))
- 
- 	# If the test target zone has smaller zone capacity than zone size,
- 	# or if the test target device has max open/active zones limit, enable
-@@ -53,7 +56,7 @@ test_device() {
- 	: "${TIMEOUT:=30}"
- 	FIO_PERF_FIELDS=("write io" "write iops")
- 	_fio_perf --filename="${TEST_DEV}" --name zbdwo --rw=write --direct=1 \
--		  --ioengine=libaio --iodepth=128 --bs=256k \
-+		  --ioengine=libaio --iodepth=128 --bs="${block_size}" \
- 		  --offset="${offset}" "${zbdmode[@]}"
- 
- 	_put_blkzone_report
--- 
-2.37.1
-
+Thanks,
+Jason
