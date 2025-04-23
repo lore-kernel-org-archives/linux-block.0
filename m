@@ -1,67 +1,67 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D7C28B50A
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A9428C5B2
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428557; cv=none; b=LAXgtHZbCdBv3000PfYUJ5F22jrGn5Towzdj3AJenL2ddm66GRczNbWgTvGz/jhkoeAAycNMD4zk4roUaak+8TRWKtPRtEVJRL2HiPJZoVS/Dqr1VKWBvWPAaj4M2cYuDhji6k1OY5VBJLk/PEGMw3JVL29+cM+eylccwD7pBpQ=
+	t=1745428644; cv=none; b=HaALqzsAmXNpkurpgww2h6KilIebE79HyvBBsjRIofy0uv+3lF1O0MEhJlGijKMTLX9YJJrGtOg7/uZ9tDuuINkQOtQqXSNVtupCN4wkauOZjDZj5RtnKdiHtnr09Sg5H2uso4wSHFptjoF547Y6iISZNgHmvVKB+v8lrxwi7/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428557; c=relaxed/simple;
-	bh=vMXucndq2S6GHUftC4QAjKIvCRBxtQ3mQadyEEn05iE=;
+	s=arc-20240116; t=1745428644; c=relaxed/simple;
+	bh=EiBhyUfzV2Z7UDyJtWT+jDVz3vG5z4pmjKVdd/tf4pw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=on30cp1LYW3RdJXvGBsQTHiVuxJLM1z6yzIHGVA4tkBjMcaNQSe0BhvW49oDaDAH/COBJHD2oRaYGCekLTxtavjOhgJZxLjRmZJKcpNSlfU8XvCRWF1Psf0LBO4cp97eUY5MFqTKXUWj9LCNkMNhYoXoC6MQcpqcincKjf/TOm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=igc8GuoA; arc=none smtp.client-ip=209.85.222.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=oNhjfVrKFSeBk/r6bcx6ql+BH44IrWbOJd4UYX2XAk8r4AXmciOfNKPvXMb3+IjbhMNwB8Sib+WVnJO7m/8aJ3lKqVx5EY9fFKQCLFWukgimV1qP9iXiwQ2S8JbifiQ+KEdmP3d00xboGwkJ38vMJVlvMU0xF9H0EmivRL4bfOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=npaeDpuZ; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="igc8GuoA"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c560c55bc1so5671385a.1
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:15:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="npaeDpuZ"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4766631a6a4so837491cf.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:17:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745428555; x=1746033355; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1745428641; x=1746033441; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K5HpTnu16aeUYpErbp5yUwht+j3Mgf+r7FFUrUseQ0w=;
-        b=igc8GuoAzkxq23x3zTwtP5oibqkeQg53VG0Iq7gad/MlX8rlFoaVwdhQ0apeqpKH2h
-         U63IQo5nrNVr/aYRLNtMYNdCv4gydkVivRxSKp9R7pa6wsgSApmCtQMmO9kL+FNLuCYl
-         X/+CooWu7xCeo0ATpiDWk+fOrcm0n3wgS7PLKA/bTH1rXQkbm6fbMji0uJQNUxm58yoB
-         Rqu6j7oRTifpHPPn+9M3hN6fwsO7KeVdJS2pUvi/LGbn6oETIDds/1hWRCeug9xrcImW
-         WzY6PYLDgjbbO+z5bnOFm9GEuBEpX2dZ4T7e+CqVXT1fnIfwTIv3FZayq4iQBioe8nnf
-         CfWA==
+        bh=dFsItIzcNoABKT1tTnR+L3KluEl/QW6UiWkd3yuS4gc=;
+        b=npaeDpuZ5VPkOZqrigtgKEO3dCkGR0IX2y98q9Ii9PH6a4ySKU1Jl4WwtNJ6vivJox
+         7hEhKgYIFPYqeHFyrzJiO3d33Z8ckzVE0eaA8fEtLnT8cYn03BrtVZuBiETLqrfiK/nf
+         gFTPKeLi7Cpt7+qx2b+ZjMHPmjzmah7oNakivA1lRSbQMUGY1if5wHCAKmZlpI9uAt6a
+         Zy6Lvyyn98F2uzFdf2FiWobaepLTsF6ukZ61MMk+0nGEE0Blu0FjWpPxnQrpfafrFL4m
+         rX9Cge4tjMFyn+s+tbrBkE7lZCL4t6Rs9j2pRiBe6X2c5Xq9grXs9D9XN/yfjfw31f4z
+         4q3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745428555; x=1746033355;
+        d=1e100.net; s=20230601; t=1745428641; x=1746033441;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K5HpTnu16aeUYpErbp5yUwht+j3Mgf+r7FFUrUseQ0w=;
-        b=nVs2mybj6pZATVjEQdH8aWhXSyrKxgJZu5uwWEN9a717FmMfdLhT9sibm+e3YUHPIY
-         mqnFIDkdOIVl6cD/qUV2uydWuCFm49meOeWV1xXpwOoODGNWdk8gpvuT/ije7BvTJ+m5
-         GRnHojTtGS9vniCcAbG90Mcrodi23DIyUn7Cb7UItwMVHLOjRNDIWlbAYfsYTcgd65DZ
-         oYUsZC4IxAtnrbjdi4r38vvYpz7NyzZBICXZE+u8ICXdUfQqrEP52GahSuZ+y+vyS4EV
-         w7NWMZtsNc38sSQIKF377vpik5ApgnmcyFYXzc9y/1S/3jdYP/K2QQEhWvOaf3eaCD10
-         BqQg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3L0RM+M8kQxjmCWaieEeown/4lxIyGZA8iMhMV0Szt+C3lZKBcKJuZVmd4/kejcfp3SRhZzkPHm7k0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLlBBzdBPvyCBSyipnT+QmiUwpechGImnw6Nq3fmC7ehjsQfl8
-	N2NY5p5utxoOQfjfAuTgez3sit1CBDNLsoKVZnP+DyR9aWEod5TpXZYC8uAWSFI=
-X-Gm-Gg: ASbGncvt9BeJKN3d1P0XBN3WQhqO0KSn8LTAbTQvg8w0N4B79PPuOVjNbX2ZVs7uUue
-	4Z51I3T6Wd08ZZPO7/Vo7rkEt3sLeOcY5Xqze9hIfYWy4U9UWMoyN+oedM25PNBgmAv1NKWoy85
-	Vd/Mf0LAfuvYbLqyTftgM4dETpQ1N4cdopM52aV92/lOJY5IFN/gDgSNVHq89ovotq51Ukz/g6c
-	8TEmSK1WACEXJ8fu0lTA1dcAAG3oIZssnvds5J/JcVA+p2Dxt5P0lc6dwyxv2QBWTaBgnbgjwDt
-	QeYGUCNqzbHGPeW8XMNjJAzmfQkCMMa/YszZnaOl/XBTgkPeawHP12UEdpPFa9qzsLjeV0h2GZI
-	8T4CTn8ZdXr8+PvvMftI=
-X-Google-Smtp-Source: AGHT+IHusnUQ6QwwVsDnvg+0qYOM6lcQLPltCEX7WmRgNJP3vwJodfip7PxZnn5pgy7BG5cQ6pnE/Q==
-X-Received: by 2002:a05:620a:4456:b0:7c7:a5e1:f204 with SMTP id af79cd13be357-7c955e14768mr54555485a.56.1745428554903;
-        Wed, 23 Apr 2025 10:15:54 -0700 (PDT)
+        bh=dFsItIzcNoABKT1tTnR+L3KluEl/QW6UiWkd3yuS4gc=;
+        b=aWzRQcX3gsCXxAFkLGV9QDhvIR7hBIIxEy3ThD/5CFqZIxJG5bydK5w4+Tez8ah/bX
+         MTw3FPpKRDytl8/NpdOyCun2/x9Ee2CjVFaKOFpiuhMVOhW49QM/Qm6ea96sUKrPnLTG
+         zKJ1OMZz/htfIyPIfEFmRHOhgwbZK2GUk7FamZkjW2wOkCdJLSZtn7o1xI3hTm+7SU0F
+         9v8A30fjkVWg7DWd7JZaE8fzZfwxIBuap6cee5xPJPQix2ejzv9h0wPRwkX4xX8A9dGW
+         3sJYKMuFgACbPVku2lLUw2+c4amak58L8f+LJdB03rrGmU2o9DNLeQtk6FMpoMtVXBZL
+         kwDA==
+X-Forwarded-Encrypted: i=1; AJvYcCX9TPCoX9Cnlyc/8PUL7umY1iYUwZOwa6K3x5W2YGS0QQJeUHi5QTi3e0iWYNlmqer5tTsZR/u1xDnVnw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuG/ogszQ8n3Mn9WQJq5YCy57kHWZNNG4j6iCO5tFbeBECX97a
+	rV02+qBVGiZ0UIK1YbEybYjTxg1m8go9j3Zvh0Px6GbjRZVY77vg0aZGtc0o9hw=
+X-Gm-Gg: ASbGncugeSSBwUElcj9pKeUmY2RVhkecDdOyOh6wjRpkTA5cRGDjH7kbYBhkPAkkDZi
+	CEve26IyifQp+oPR5gYTz4Mlx/WP7WZLS9mQdYfHBtwqpdklYI3fJopJuFgSQpMcxborb35h+8V
+	IzNVt3EsJwCrLWGy9GAR4cEhjYuTBxBxQ7FVMjpe0AumYWIJrBoMu8qw5ZERfSkgId9sGOgOVs7
+	FIe9kak+5Apnd0y1DakfTpoiJKPe3WNXyA6tWgOJwWiSouXcs5DD59ycdCOanmBAP4wTQT4CBAb
+	ZYnkyX2pZR5I6j6aJFa1aXZAEWVLJN9XLtZTqxUIGaGuFC07D+NKngxHkqHGvP3s18IrdtBDj51
+	4NEckt6Nk7lM3xRG5ojc=
+X-Google-Smtp-Source: AGHT+IFtKlYmuMPWfMKQK8kh2VV5wwxeBA4j6ePEQHIEvAPMlC2NtpfOcLZrcYI7RZQRiXVuJwSHAw==
+X-Received: by 2002:ac8:7f51:0:b0:476:838c:b0ce with SMTP id d75a77b69052e-47e7607d5ddmr844071cf.13.1745428641397;
+        Wed, 23 Apr 2025 10:17:21 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925b4e93asm705867885a.70.2025.04.23.10.15.54
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9cf9f29sm70808611cf.71.2025.04.23.10.17.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 10:15:54 -0700 (PDT)
+        Wed, 23 Apr 2025 10:17:20 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1u7dhR-00000007LQy-3kud;
-	Wed, 23 Apr 2025 14:15:53 -0300
-Date: Wed, 23 Apr 2025 14:15:53 -0300
+	id 1u7diq-00000007LSZ-1iS9;
+	Wed, 23 Apr 2025 14:17:20 -0300
+Date: Wed, 23 Apr 2025 14:17:20 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
@@ -90,10 +90,11 @@ Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 04/24] iommu: add kernel-doc for iommu_unmap_fast
-Message-ID: <20250423171553.GK1213339@ziepe.ca>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250423171720.GL1213339@ziepe.ca>
 References: <cover.1745394536.git.leon@kernel.org>
- <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -102,23 +103,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
+In-Reply-To: <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
 
-On Wed, Apr 23, 2025 at 11:12:55AM +0300, Leon Romanovsky wrote:
+On Wed, Apr 23, 2025 at 11:13:01AM +0300, Leon Romanovsky wrote:
 > From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Add kernel-doc section for iommu_unmap_fast to document existing
-> limitation of underlying functions which can't split individual ranges.
+> Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
+> by HMM range fault. Such flag allows users to tag specific PFNs with
+> information if this specific PFN was already DMA mapped.
 > 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Acked-by: Will Deacon <will@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Tested-by: Jens Axboe <axboe@kernel.dk>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->  drivers/iommu/iommu.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+>  include/linux/hmm.h | 17 +++++++++++++++
+>  mm/hmm.c            | 51 ++++++++++++++++++++++++++++-----------------
+>  2 files changed, 49 insertions(+), 19 deletions(-)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+This would be part of the RDMA bits
 
 Jason
