@@ -1,99 +1,228 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6477D263F45
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 02:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DCD7F9
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 02:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745374172; cv=none; b=FOHcUfc6hmAtO6bAcBV2WI4+iREwBeODaNOxfqVz5JeuCtlKC7+UEOAmyzsN42g8rSyabYP/VFJVAHUhCPBAHk80uxnZLQPkdSp/29OEi4Ny+EcoAua2yzGwYOhYwq+CvNF4WD0+zyRCflGth7LS5N25Gsry9TFANzEewcTGano=
+	t=1745375605; cv=none; b=edAFXY5ZNN2TNCpiRsZ5fPjxORlcitKa7jOzKCJN/pFueH9qbhswAYAWrGk+3GHaaYp4hExm2G48Sha8Ymv0PSw8H2x1a9zxz5xszJTR60vAhWebokWtJVbQuQHWz+l/3e+yFYhUfJAtvY36VuRciRyPRdsIaZfRnc8/5wzVJu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745374172; c=relaxed/simple;
-	bh=/NMem5ifgNES89PzacLrSaCky+MNKn14k07t4KV28GM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=QAVA1pZchwFr5pNKII4gzk+YOWJRYzt0hHggLHPIDCe/aMypgte/KayUh0GxvIETpcecMeGqaDqyGxDECEEWpfEBmbmT1qP1DRTC4oNYjrsq3+LTkLPMv9S2J7gF2qtNwKN40zsGzN7jamZD338s8VyTWPAZTeuviT9F5uxFlYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HmpxRr9X; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HmpxRr9X"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-86135d11760so134931739f.2
-        for <linux-block@vger.kernel.org>; Tue, 22 Apr 2025 19:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745374168; x=1745978968; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bDncI1nPVws6EBYZHfi3/MSZu0PJAZs4upykCL1QGVY=;
-        b=HmpxRr9XLvbg9aiOvT5GTRaVODwGD7ofjXEmI0NwV4mXDTX9c9xT18WKlMiNLLzLhe
-         xrij/9gDLXH5y3jEZZp+vLbhb7n/F0CC3QeLEGCnDMKzNWQ8L1y1AQNZ+Ta1qm18l9z2
-         wE07bVYvVwuek2g3oLKugarlNElfoB5gQ4Xzw0hSGK1A4m/IaRqmWM3Teb8fwU2h4sTi
-         jiH3ukql4dSeqmrFEPft6vrv+cUKY4DfHEHGXF/NK6ux0GkmlmQ65lUI3TcDy6izoMQU
-         X71XS1GRKJj2c/L/7J8meH0hOz9bXh5EEtQ8+TNpVIYwcpvc6MuAwuz4P9jow5t4l00t
-         suiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745374168; x=1745978968;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bDncI1nPVws6EBYZHfi3/MSZu0PJAZs4upykCL1QGVY=;
-        b=wQK8STfCmBz6AHGOms83tYRqiKDar9TJN2sI/tc8OrPcd9DrskO0zGCkYsINBwqmk1
-         aKQkXTjCZYw2TEacfkQa+yDYlqLDskwix4VDt8/1reNidEMStpeYU+PgR7pT/MzG9l1q
-         J8ycXdrgxWQZc7p+p2KG+mjhUKRAl3/RnbpEuzYezL3ctv8CJ1I7Tc9iWbLMhhbqiok7
-         +WhY1bGjWBHPQl8zzMsTpgmgug0XarbvmZmZ9gmXIKSEH0gYSOO6s4LJ0qcefnj4vgaM
-         v7JxOdXmhrXPuRrzn27NBTFAQTteTfFtjwAGkCWtaKZx3pSbubb0aJpyrixxWsu8BJ6I
-         eGzw==
-X-Gm-Message-State: AOJu0YyFZER/gwzOMuFzlgt2zie/8eimC2nA6V+eyFUEWxAzzIjUCHml
-	AlBHG3IUmHexsYRq15pnWztIwle3/JABFkBu0O8wNc2ugDUn3P0sjp5INbtYVlE=
-X-Gm-Gg: ASbGnctuXzm/tlu6exWwOsdulXtz+ZM4AXkxTXLRyq6PR79uiVWMbILlcuhgEZ5bFTP
-	Pi3Uw6rGz2ytp4FSHaufSZBqKEYEbyL+mTL6oEtR7SpUiUv7pKmxiHZQkKVGyVvdVSN/XpCfzvR
-	5Y+atVRW0z203i/Ktp1ONHTIjrswTH0lzTcVGNo9FVPBhTKv4n+nbTxV1auFRFnwIw6pJRDisEV
-	tdZzCa1l7v1AdTv+aKVmGwxnE4g1GjirruFgXEJ8n48nGurMao9V0v4zsvl/TVmeX/jywmpNLjj
-	qULM26Wr/IU614Q3Xoi47kPAjQDro7Bc
-X-Google-Smtp-Source: AGHT+IEgm4a1sBAZfV84Lo+Jj62woBUyaarGSN3fVcO/fQpfQe7SP2Yo0ZBKUHqWAvQ1YYJuA9QRsQ==
-X-Received: by 2002:a05:6602:7506:b0:861:722e:2cbc with SMTP id ca18e2360f4ac-861dbedeb19mr2091941839f.12.1745374168145;
-        Tue, 22 Apr 2025 19:09:28 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f6a3933d27sm2593769173.90.2025.04.22.19.09.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 19:09:27 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250416170154.3621609-1-csander@purestorage.com>
-References: <20250416170154.3621609-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: remove unnecessary ubq checks
-Message-Id: <174537416718.373753.18092056116763739728.b4-ty@kernel.dk>
-Date: Tue, 22 Apr 2025 20:09:27 -0600
+	s=arc-20240116; t=1745375605; c=relaxed/simple;
+	bh=Dn40j7CegTDN/INKZBVLf/lAG+2TGSzvPcRQHzn/Zv4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=X8f7/dc0buvJghga+KzaxYTkCc4xWDWXRs2w5gL7Dz0Sl5AWDiJE+n8v1jRN07ybEH1np3UPjIWK2ZJl0m+sN/gG4mTVB/IPNRlH8vOmRDtjWW5RSmO2xjibP8twN90x1Qf8hD3LTKD72JyRLzNr41HwVUnnxHv2ARzOa9WTxyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zj3716KXkz4f3jqb
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:01 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 811A51A058E
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:33:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.112.188])
+	by APP4 (Coremail) with SMTP id gCh0CgB3219rUQhoCGcsKQ--.37591S6;
+	Wed, 23 Apr 2025 10:33:20 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com,
+	yukuai3@huawei.com,
+	wozizhi@huaweicloud.com,
+	ming.lei@redhat.com,
+	tj@kernel.org
+Subject: [PATCH V4 2/7] blk-throttle: Refactor tg_dispatch_time by extracting tg_dispatch_bps/iops_time
+Date: Wed, 23 Apr 2025 10:22:56 +0800
+Message-ID: <20250423022301.3354136-3-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
+References: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgB3219rUQhoCGcsKQ--.37591S6
+X-Coremail-Antispam: 1UD129KBjvJXoW3WF4fKFWDGr4kAFykuF15Jwb_yoW7try8pr
+	W3Ca1jqF48XFn7KFW3Zwn8GayYkws7Ar9rJa9rGr9rAF4YvFyDKF1kZryYvFW5AF97ua17
+	Aryqv347Ca1qyrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBG14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAVWUtw
+	CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
+	6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64
+	vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0x
+	vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUFoGdUUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
+From: Zizhi Wo <wozizhi@huawei.com>
 
-On Wed, 16 Apr 2025 11:01:53 -0600, Caleb Sander Mateos wrote:
-> ublk_init_queues() ensures that all nr_hw_queues queues are initialized,
-> with each ublk_queue's q_id set to its index. And ublk_init_queues() is
-> called before ublk_add_chdev(), which creates the cdev. Is is therefore
-> impossible for the !ubq || ub_cmd->q_id != ubq->q_id condition to hit in
-> __ublk_ch_uring_cmd(). Remove it to avoids some branches in the I/O path.
-> 
-> 
-> [...]
+tg_dispatch_time() contained both bps and iops throttling logic. We now
+split its internal logic into tg_dispatch_bps/iops_time() to improve code
+consistency for future separation of the bps and iops queues.
 
-Applied, thanks!
+Besides, merge time_before() from caller into throtl_extend_slice() to make
+code cleaner.
 
-[1/1] ublk: remove unnecessary ubq checks
-      commit: 4c7d3c88c77bf227c12ef13e8461a0c940f775e8
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 98 +++++++++++++++++++++++++-------------------
+ 1 file changed, 55 insertions(+), 43 deletions(-)
 
-Best regards,
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index dc23c961c028..00f99c417647 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -520,6 +520,9 @@ static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
+ static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
+ 				       unsigned long jiffy_end)
+ {
++	if (!time_before(tg->slice_end[rw], jiffy_end))
++		return;
++
+ 	throtl_set_slice_end(tg, rw, jiffy_end);
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
+@@ -682,10 +685,6 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
+ 	int io_allowed;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 
+-	if (iops_limit == UINT_MAX) {
+-		return 0;
+-	}
+-
+ 	jiffy_elapsed = jiffies - tg->slice_start[rw];
+ 
+ 	/* Round up to the next throttle slice, wait time must be nonzero */
+@@ -711,11 +710,6 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+-	/* no need to throttle if this bio's bytes have been accounted */
+-	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_BPS_THROTTLED)) {
+-		return 0;
+-	}
+-
+ 	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+ 
+ 	/* Slice has just started. Consider one slice interval */
+@@ -742,6 +736,54 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	return jiffy_wait;
+ }
+ 
++/*
++ * If previous slice expired, start a new one otherwise renew/extend existing
++ * slice to make sure it is at least throtl_slice interval long since now. New
++ * slice is started only for empty throttle group. If there is queued bio, that
++ * means there should be an active slice and it should be extended instead.
++ */
++static void tg_update_slice(struct throtl_grp *tg, bool rw)
++{
++	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
++		throtl_start_new_slice(tg, rw, true);
++	else
++		throtl_extend_slice(tg, rw, jiffies + tg->td->throtl_slice);
++}
++
++static unsigned long tg_dispatch_bps_time(struct throtl_grp *tg, struct bio *bio)
++{
++	bool rw = bio_data_dir(bio);
++	u64 bps_limit = tg_bps_limit(tg, rw);
++	unsigned long bps_wait;
++
++	/* no need to throttle if this bio's bytes have been accounted */
++	if (bps_limit == U64_MAX || tg->flags & THROTL_TG_CANCELING ||
++	    bio_flagged(bio, BIO_BPS_THROTTLED))
++		return 0;
++
++	tg_update_slice(tg, rw);
++	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
++	throtl_extend_slice(tg, rw, jiffies + bps_wait);
++
++	return bps_wait;
++}
++
++static unsigned long tg_dispatch_iops_time(struct throtl_grp *tg, struct bio *bio)
++{
++	bool rw = bio_data_dir(bio);
++	u32 iops_limit = tg_iops_limit(tg, rw);
++	unsigned long iops_wait;
++
++	if (iops_limit == UINT_MAX || tg->flags & THROTL_TG_CANCELING)
++		return 0;
++
++	tg_update_slice(tg, rw);
++	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
++	throtl_extend_slice(tg, rw, jiffies + iops_wait);
++
++	return iops_wait;
++}
++
+ /*
+  * Returns approx number of jiffies to wait before this bio is with-in IO rate
+  * and can be dispatched.
+@@ -749,9 +791,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
+ {
+ 	bool rw = bio_data_dir(bio);
+-	unsigned long bps_wait, iops_wait, max_wait;
+-	u64 bps_limit = tg_bps_limit(tg, rw);
+-	u32 iops_limit = tg_iops_limit(tg, rw);
++	unsigned long bps_wait, iops_wait;
+ 
+ 	/*
+  	 * Currently whole state machine of group depends on first bio
+@@ -762,38 +802,10 @@ static unsigned long tg_dispatch_time(struct throtl_grp *tg, struct bio *bio)
+ 	BUG_ON(tg->service_queue.nr_queued[rw] &&
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+-	/* If tg->bps = -1, then BW is unlimited */
+-	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
+-	    tg->flags & THROTL_TG_CANCELING)
+-		return 0;
+-
+-	/*
+-	 * If previous slice expired, start a new one otherwise renew/extend
+-	 * existing slice to make sure it is at least throtl_slice interval
+-	 * long since now. New slice is started only for empty throttle group.
+-	 * If there is queued bio, that means there should be an active
+-	 * slice and it should be extended instead.
+-	 */
+-	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
+-		throtl_start_new_slice(tg, rw, true);
+-	else {
+-		if (time_before(tg->slice_end[rw],
+-		    jiffies + tg->td->throtl_slice))
+-			throtl_extend_slice(tg, rw,
+-				jiffies + tg->td->throtl_slice);
+-	}
+-
+-	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
+-	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
+-	if (bps_wait + iops_wait == 0)
+-		return 0;
+-
+-	max_wait = max(bps_wait, iops_wait);
+-
+-	if (time_before(tg->slice_end[rw], jiffies + max_wait))
+-		throtl_extend_slice(tg, rw, jiffies + max_wait);
++	bps_wait = tg_dispatch_bps_time(tg, bio);
++	iops_wait = tg_dispatch_iops_time(tg, bio);
+ 
+-	return max_wait;
++	return max(bps_wait, iops_wait);
+ }
+ 
+ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
 -- 
-Jens Axboe
-
-
+2.46.1
 
