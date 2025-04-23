@@ -1,84 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E501BEF77;
-	Wed, 23 Apr 2025 10:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2616B270569
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745402601; cv=none; b=WQzHX7rf8FlrPyWhI0SOUn/BYL97et3s4MrZgI6PqrXmc5GV8QPe1gwEeIcvSUnr+BK4IVf6ESpYjEub1ksaWEBPcU+2uwt/RLvXymPYGuSto/V8pu5DYhPx5jjlu3gTKo2rfO3TYuJFmXFrYjzeV+t0sL8+upWRYFDN9Fd4NZo=
+	t=1745403110; cv=none; b=JfuSsEUQIzZVaa4WM61VyG5JJSUVZ6H23mWDg+Gm8mBq9f3vjUYJeZqDCtjS+uMNeU97L46mCCbWnHTSdHqHhhddLHtbZqYGLSjmQr1NwmknTc69H/oQgU1FwxcpPJBWT1Z7YyIx9RyoJv2kpXZmJiF5HCDbJYut5RpQlmcxVg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745402601; c=relaxed/simple;
-	bh=ngFXadZZHp3LPPaxf54ODFSjNSzh1Ht+VnoqS5cPk+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kgDvXq+Alenvy7HgrJYkF5Yx1SpVYfLjGMykW3nCnFBb3wNdbmR7gRPddJkqojOnGl4Dr3Me6dsBWo+fLDClsTSs46Att6xStpJvvxNXvmYHr4oTkki+5v7j5nWW8ssPI70td0XN/CSrRbrfMtczEE4qc5QlfqJCsMDeaYJDM/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZVOvTXy; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZVOvTXy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306B7C4CEF0;
-	Wed, 23 Apr 2025 10:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745402599;
-	bh=ngFXadZZHp3LPPaxf54ODFSjNSzh1Ht+VnoqS5cPk+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hZVOvTXyIaWu4bWId/pgxHxX3JrlaR2NClh5I234YwqF4+sVvvroq/dIj+b8OjPW3
-	 8orSr5dvocbOlvIf0eFunxzGREOoUPlzqIip2kuqN0MhBpEz0dNLFk9675T/YjxGz+
-	 RpafWcy0eGJ6cWbhqqpSjQkJNob79JzSWhPiR9jAtFbZN6VWaYovYldutOlXgPlHkY
-	 DDy7D7JXKoau0CdAa1x6kIMY8EFuRXqN0o+H/pshkFrr5423vPoezWmpzPSxrwuAnP
-	 GDNBoXhQDCW3daIwdE2ndGPPWwR835rpe3Wze8PBHYJYp2ZHjHNeCXv2uyCrCUPv4I
-	 aEpVIWzBnV4Aw==
-Date: Wed, 23 Apr 2025 13:03:14 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v9 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <20250423100314.GH48485@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <7c5c5267cba2c03f6650444d4879ba0d13004584.1745394536.git.leon@kernel.org>
- <20250423092437.GA1895@lst.de>
+	s=arc-20240116; t=1745403110; c=relaxed/simple;
+	bh=0rzldctYCd5gvWIfDIgHHJXEgT7zpTZ6vRCeMpSt1E0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=HYu7wcsXOnTd30s5glATmbG/3vYKuZ0MiSubJRVp/MOIEcaUSzV77SporgSuJe8MxHG3OHFnLEi4+lhGV+zIJW1QbkSzzTg+s4gvcQyzdgSAuJ99LKjwa1p2gRsjwTzrruYJrsqz+rLUQL/PX9t5yCvvkbXtJiTVqiaqvmYN0OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
+Received: from tux.applied-asynchrony.com (p5b07e9b7.dip0.t-ipconnect.de [91.7.233.183])
+	by mail.itouring.de (Postfix) with ESMTPSA id 9ACDA108B;
+	Wed, 23 Apr 2025 12:11:42 +0200 (CEST)
+Received: from [192.168.100.223] (ragnarok.applied-asynchrony.com [192.168.100.223])
+	by tux.applied-asynchrony.com (Postfix) with ESMTP id 3CA50600BE060;
+	Wed, 23 Apr 2025 12:11:42 +0200 (CEST)
+Subject: Re: Block device's sysfs setting getting lost after suspend-resume
+ cycle
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block <linux-block@vger.kernel.org>
+References: <32c5ca62-eeef-5fb5-51f5-80dac4effc98@applied-asynchrony.com>
+ <aAiKM0-1JJulHLW7@infradead.org>
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Organization: Applied Asynchrony, Inc.
+Message-ID: <cceea022-a5e3-97b3-62ed-7ead174565a3@applied-asynchrony.com>
+Date: Wed, 23 Apr 2025 12:11:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423092437.GA1895@lst.de>
+In-Reply-To: <aAiKM0-1JJulHLW7@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 23, 2025 at 11:24:37AM +0200, Christoph Hellwig wrote:
-> I don't think the meta SGL handling is quite right yet, and the
-> single segment data handling also regressed.  Totally untested
-> patch below, I'll try to allocate some testing time later today.
+On 2025-04-23 08:35, Christoph Hellwig wrote:
+> Hi Holger,
+> 
+> can you try the patch below?  It fixes losing the read-ahead value in
+> my little test.
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 6b2dbe645d23..4817e7ca03f8 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -61,8 +61,14 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+>   	/*
+>   	 * For read-ahead of large files to be effective, we need to read ahead
+>   	 * at least twice the optimal I/O size.
+> +	 *
+> +	 * There is no hardware limitation for the read-ahead size and the user
+> +	 * might have increased the read-ahead size through sysfs, so don't ever
+> +	 * decrease it.
+>   	 */
+> -	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+> +	bdi->ra_pages = max3(bdi->ra_pages,
+> +				lim->io_opt * 2 / PAGE_SIZE,
+> +				VM_READAHEAD_PAGES);
+>   	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
+>   }
+>   
+> 
 
-Christoph,
+Tried several different readahead values across multiple
+suspend/resume cycles and it retained them properly again.
 
-Can we please progress with the DMA patches and leave NVMe for later?
-NVMe is one the users for new DMA API, let's merge API first.
+Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
 
-Thanks
+Thank you!
+
+cheers
+Holger
