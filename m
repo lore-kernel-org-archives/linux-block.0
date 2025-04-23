@@ -1,293 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2EF289351
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778F428A1F8
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 18:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745430855; cv=none; b=gKDeYvJIoJ5Clt5M4Y7lb2rTLpLQEZt9tZpMdadPcvKWMZxkIGLpKMK0XSy8oskAUNM5oVjYUvD9PUemDA47vEF7T/sk6GsghlZPhsBwmlY04cZbK5oj36E1wIB9w8dqslWh9hjeT+BHjzL+JoNXk8NDFfI0+oN4G10SltxDqno=
+	t=1745431343; cv=none; b=IHE08qHIMFujq8Bagb8v0mzA84Z//fsVhODOmR6c4S7XLGkkSFw9Hlcao2pibVO9F7Uj/+cscVl/5BJlDmOjJL1Np+EMpFtenIAMR4JPKLNP1Xei21Wasr4gPd0HW58kgamLuSWVHsuEtra8AsUohh6sXs6MrSxxtiyXNsYNG9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745430855; c=relaxed/simple;
-	bh=mt+GEqVwIjWA95oaLQYfJjWsfuLTCwWdKipansAd/NY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HLP2Fo1Q2pC39fE/55/LQLNiZ2GvIWGgPonmfN3tO8xHMjD6Ebs4iCWlUQKQ7TKIcBWfAAYnQBII3AznozQnFyEfspkOIXJjxpokgSaJcyy/DdVJZJK25ovwgeuBmY7JT0Q6QWa/6U3iaK5edWpo4G9IZUHfWagp4SP11p5aK+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O6Le4mBm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1745431343; c=relaxed/simple;
+	bh=jMGBnlKKS3wriE0M2t3GS1b7w0yLhTPXvhMeTWbbHrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KdONRS+ZJSZ2zk6COyZSxE2ZoaElQhK370dSgF/Mc99josyY97G+Q4mr5d/JT+mmN0+LnC5uS8cV3mnGzC2m4SvkSgj2Kqp3OY65oT0lZGnUbgPPxWUPVoQwcXdAeOHyGb5RGaLz3G5tNr7QbzsOZvJNRdrgIdcltj26uWCvK3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=oME2bGbG; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6Le4mBm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745430851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QESgbLfbNX2Y3UvNxy+rKh4qRh0SduwfR4pzjcuKRTw=;
-	b=O6Le4mBmh8dUB5uyef2IyP3k2oXB5joXxcgu/MFlRTv1Afp0jFoYGfc2Kz1SkgIU6IRdOs
-	ONEqGnDlbLi4AGVZWz2uTjYPOM88WTwBXGvcUyLviLsoTi6svI3xtYvPlOGwA7amnnhehF
-	L1mN15lqCSfR14tMiVb64prvBtjzFFo=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-108-dbrvu-EtP22YKYobRECqag-1; Wed, 23 Apr 2025 13:54:10 -0400
-X-MC-Unique: dbrvu-EtP22YKYobRECqag-1
-X-Mimecast-MFC-AGG-ID: dbrvu-EtP22YKYobRECqag_1745430849
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-549999af7bfso38571e87.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:54:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="oME2bGbG"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6eeb7589db4so2217646d6.1
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 11:02:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1745431340; x=1746036140; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v/H5CAwHQKAGhhgyjSbvaHcVayhHkcFdusJoJuYFxH8=;
+        b=oME2bGbGIz+n8qPmjxlLjGtl64CvjZEPLK7vic6PtKju9KvsD8hbQoAkwLgEIUXBXg
+         iqMA9uiI8nIhmBox8Z7ZtsEVF9rde1sOPnx8+Ic/YkmuJ9mTOLkrk722E5IWEIRNAYGR
+         CVnGLdLxvEKtC2PTbivi1fVVAU/xnbJH1e3h1aYaD6xXqyyQUWxXFa7Xe/FlDmqtEMBh
+         M2vt6LSy6VXOVecd3pdAWZPlsCrclj/UmngB8o9ubhNBU5XVxQpZ9ogcCm6n3z5DL56T
+         4rghcIF1xc2841w2V+rvve+AZ1efnzAOOk4mZhF4CMwBHIR6quQkjZVOdYpgnKUYZnoy
+         QpAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745430849; x=1746035649;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QESgbLfbNX2Y3UvNxy+rKh4qRh0SduwfR4pzjcuKRTw=;
-        b=dhstinCU8YtpvfTv+k+4FqzjnBO4dnf5qc2MRCUqUoDFhJy1vMLHsNxUvZsSUVcSjm
-         zV6B6P8qHDGpRKQaUVEMhOJEHOaM2O8+d9L/cBV0fC+Suhoca6a9Qj3r7+wPU1ai3+tC
-         NeEihjSWARjFKDTaL2ZkepJhW9EPJI5AjXnaCArhA0wP3/1mZih4w23qEGUSQ+qvJlwc
-         pRN4TVxs0fQ5KB2XweyvljiGLR/0968DQ98B0tvW4r4n5tveoDE0WdsdumXrYozHwnZM
-         m77+k9dZpSo2hangm/5xXV4+GSAXUviBAtp6T3F+JfDw+CEeYiCix9Qsfgi3mz/PJ/TI
-         2p5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVYF30TasW6c01eweH+5tE+0vR9GR11rlLWHdIIVqW7RPGHYUODadBCbIHaGuXs16o38OK3EMm9uEhQbA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIZchkxdr9aStiqqLCgTz8dbgeu73QBnVYEQpe+W6EHQSKwp0p
-	vESTbnhZSYy4ioqCHmH4husSIN0J7etdvpBpQybegX0dDrA1TJXzxRoewwmoZCFtmyV+v4NE0hu
-	5lS+60/+TCi4R3KNO0OjaIZtL7p3S61L8fCH4ULDOeyTlNae0DyX6ILlDxqc=
-X-Gm-Gg: ASbGncumLtLhcAzGPOeGqvfhzSx81lsDiAdROkGdDT5PZrDKICeoGtFT5dIISXbzmSU
-	x5Wth1AFdKAbTUJuRb7HxOvTSMashLz2HAsLjha5LQBcFO9MNwxBKFy63C/J5MQdBLZCUTJWBJC
-	v6d7PtqQip36U5macrXchEHHCb+IdYmuP+kp9d+mdShbhh4gJrQjmbD8cyw/leIPl4f312kaP/q
-	mKDDt5iLyULx/WWp/5b9lYdAxb3B/jVdTynTh/uJq2ZZERMXgbwQoWid7cuXyJAuKL8nolEKhAe
-	3xb6QHfkDWYSIPG7gussllXqqR0VVQx1tG2ttg==
-X-Received: by 2002:a05:6512:1318:b0:545:2b24:c714 with SMTP id 2adb3069b0e04-54d6e62c9c2mr6285116e87.18.1745430848635;
-        Wed, 23 Apr 2025 10:54:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzJrFtBxv3ILf8kxudvvXLLQMA4k/wXdgyXDUK6/Kq+MOMB6h4q33zBlb3xTdNXEt/3B1MQg==
-X-Received: by 2002:a05:6512:1318:b0:545:2b24:c714 with SMTP id 2adb3069b0e04-54d6e62c9c2mr6285107e87.18.1745430848074;
-        Wed, 23 Apr 2025 10:54:08 -0700 (PDT)
-Received: from [192.168.1.86] (85-23-48-6.bb.dnainternet.fi. [85.23.48.6])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54d6e540ec1sm1595753e87.85.2025.04.23.10.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 10:54:07 -0700 (PDT)
-Message-ID: <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
-Date: Wed, 23 Apr 2025 20:54:05 +0300
+        d=1e100.net; s=20230601; t=1745431340; x=1746036140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v/H5CAwHQKAGhhgyjSbvaHcVayhHkcFdusJoJuYFxH8=;
+        b=mVx1gPbyAkKo5sNBgOvW5u+2wXNk+3jm7XJwwgMmlPOUuEVC3XNZ99RgMPf58Z8rGh
+         eNMvmsD4BSyiW9OFSmwGjG3J2h1DVeNNtpahHmESagvb74IKOMLRhO/XGaOP1JDhhjRK
+         hIEMmoc7NI5U2M9hI/vGbzAT4JE6C0YSb2DHU1ZovPTFjlzRev8TlbvLoLeKJDNVuhEA
+         gSa4i53jpc93vJ/sgwmGjuR+la7m8OabWHtQKGwlZXmrEwb2+8ttwMmc33oySRhsdUFb
+         FzECPHmNW7aLC68J6HUI4JSROoaUT7AdRiZd4YMzW72Eft4j4Y9VpKB2qGM+5aIey/jY
+         /RhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWs3yFAh15x5AkVv5pmNkaogiSQIGOPy0T/aAnhn6ym5WXgVCyIpNwysrCb9fQ/Kt6Gq7Vm+7WoilBlWw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww1a7QC7Lc5twPeQVVySG8RBHKx5s64iIEFtE5F6OVmCKNHQPR
+	sFUMu+HGo/vtW3Gr1MlQQS90PgAbr1l7EVlHZ5T4xPJvUeSopASwxa257l2/MKU=
+X-Gm-Gg: ASbGncuGMcC6ttYASzkGWqVwC7wyKGR8IT+dvywbFmyo/ZeHAJoq7IqhagYaS+MnEOg
+	anDm/A2MQkMLdbpSEHr4bGe/NG6hco4JPMTQhfqL5iUl8iSF8ibVsN9s9hH2w5W40y6liuFbVid
+	3UigOKNnOcpflkZrBGgGndUPk1Lk9/wThwaYkkuLjze9Xgov+gJ6neUoCs2/3KqRf1zveLWseoW
+	VRxdnghXCxsnNvqIJYSXOQQKQ3IyzPLcTtdBLjUo1rVkDiZVKyplF/VbH0OQZI9QwuuzH/qXQay
+	1sYDMxMi523JcPcWRBrNaM3hZx5G7eIsOQkvwoVpSt/nAKzmZ5hmV16nYENHpBYgemIB3JggJbm
+	grUywNiWkJ3ABZxHH0cU=
+X-Google-Smtp-Source: AGHT+IHxXzsMEe6MN5UQygppndiI4ddaFnTKWUy8FtozhFzNSVoZsB8f3DMDl3MfRyMHEIrbMun+Mw==
+X-Received: by 2002:a05:6214:19c8:b0:6ee:ba58:e099 with SMTP id 6a1803df08f44-6f2c454e522mr330593466d6.15.1745431340219;
+        Wed, 23 Apr 2025 11:02:20 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2c3ba3fsm73300796d6.125.2025.04.23.11.02.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 11:02:19 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1u7eQN-00000007LrM-0sGN;
+	Wed, 23 Apr 2025 15:02:19 -0300
+Date: Wed, 23 Apr 2025 15:02:19 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 16/24] vfio/mlx5: Rewrite create mkey flow to allow
+ better code reuse
+Message-ID: <20250423180219.GR1213339@ziepe.ca>
+References: <cover.1745394536.git.leon@kernel.org>
+ <eefe5ad450fd434dff981963ec3c61df7b3734e1.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-To: Leon Romanovsky <leon@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
- Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
- Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Dan Williams
- <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Chaitanya Kulkarni <kch@nvidia.com>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>
-In-Reply-To: <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eefe5ad450fd434dff981963ec3c61df7b3734e1.1745394536.git.leon@kernel.org>
 
-Hi,
-
-On 4/23/25 11:13, Leon Romanovsky wrote:
+On Wed, Apr 23, 2025 at 11:13:07AM +0300, Leon Romanovsky wrote:
 > From: Leon Romanovsky <leonro@nvidia.com>
->
-> Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
-> by HMM range fault. Such flag allows users to tag specific PFNs with
-> information if this specific PFN was already DMA mapped.
->
+> 
+> Change the creation of mkey to be performed in multiple steps:
+> data allocation, DMA setup and actual call to HW to create that mkey.
+> 
+> In this new flow, the whole input to MKEY command is saved to eliminate
+> the need to keep array of pointers for DMA addresses for receive list
+> and in the future patches for send list too.
+> 
+> In addition to memory size reduce and elimination of unnecessary data
+> movements to set MKEY input, the code is prepared for future reuse.
+> 
 > Tested-by: Jens Axboe <axboe@kernel.dk>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->  include/linux/hmm.h | 17 +++++++++++++++
->  mm/hmm.c            | 51 ++++++++++++++++++++++++++++-----------------
->  2 files changed, 49 insertions(+), 19 deletions(-)
->
-> diff --git a/include/linux/hmm.h b/include/linux/hmm.h
-> index 126a36571667..a1ddbedc19c0 100644
-> --- a/include/linux/hmm.h
-> +++ b/include/linux/hmm.h
-> @@ -23,6 +23,8 @@ struct mmu_interval_notifier;
->   * HMM_PFN_WRITE - if the page memory can be written to (requires HMM_PFN_VALID)
->   * HMM_PFN_ERROR - accessing the pfn is impossible and the device should
->   *                 fail. ie poisoned memory, special pages, no vma, etc
-> + * HMM_PFN_DMA_MAPPED - Flag preserved on input-to-output transformation
-> + *                      to mark that page is already DMA mapped
->   *
->   * On input:
->   * 0                 - Return the current state of the page, do not fault it.
-> @@ -36,6 +38,13 @@ enum hmm_pfn_flags {
->  	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
->  	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
->  	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
-> +
-> +	/*
-> +	 * Sticky flags, carried from input to output,
-> +	 * don't forget to update HMM_PFN_INOUT_FLAGS
-> +	 */
-> +	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
-> +
+>  drivers/vfio/pci/mlx5/cmd.c | 157 ++++++++++++++++++++----------------
+>  drivers/vfio/pci/mlx5/cmd.h |   4 +-
+>  2 files changed, 91 insertions(+), 70 deletions(-)
 
-How is this playing together with the mapped order usage?
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-
-> HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 8),
->  
->  	/* Input flags */
-> @@ -57,6 +66,14 @@ static inline struct page *hmm_pfn_to_page(unsigned long hmm_pfn)
->  	return pfn_to_page(hmm_pfn & ~HMM_PFN_FLAGS);
->  }
->  
-> +/*
-> + * hmm_pfn_to_phys() - return physical address pointed to by a device entry
-> + */
-> +static inline phys_addr_t hmm_pfn_to_phys(unsigned long hmm_pfn)
-> +{
-> +	return __pfn_to_phys(hmm_pfn & ~HMM_PFN_FLAGS);
-> +}
-> +
->  /*
->   * hmm_pfn_to_map_order() - return the CPU mapping size order
->   *
-> diff --git a/mm/hmm.c b/mm/hmm.c
-> index 082f7b7c0b9e..51fe8b011cc7 100644
-> --- a/mm/hmm.c
-> +++ b/mm/hmm.c
-> @@ -39,13 +39,20 @@ enum {
->  	HMM_NEED_ALL_BITS = HMM_NEED_FAULT | HMM_NEED_WRITE_FAULT,
->  };
->  
-> +enum {
-> +	/* These flags are carried from input-to-output */
-> +	HMM_PFN_INOUT_FLAGS = HMM_PFN_DMA_MAPPED,
-> +};
-> +
->  static int hmm_pfns_fill(unsigned long addr, unsigned long end,
->  			 struct hmm_range *range, unsigned long cpu_flags)
->  {
->  	unsigned long i = (addr - range->start) >> PAGE_SHIFT;
->  
-> -	for (; addr < end; addr += PAGE_SIZE, i++)
-> -		range->hmm_pfns[i] = cpu_flags;
-> +	for (; addr < end; addr += PAGE_SIZE, i++) {
-> +		range->hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
-> +		range->hmm_pfns[i] |= cpu_flags;
-> +	}
->  	return 0;
->  }
->  
-> @@ -202,8 +209,10 @@ static int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
->  		return hmm_vma_fault(addr, end, required_fault, walk);
->  
->  	pfn = pmd_pfn(pmd) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
-> -	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++)
-> -		hmm_pfns[i] = pfn | cpu_flags;
-> +	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++) {
-> +		hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
-> +		hmm_pfns[i] |= pfn | cpu_flags;
-> +	}
->  	return 0;
->  }
->  #else /* CONFIG_TRANSPARENT_HUGEPAGE */
-> @@ -230,14 +239,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
->  	unsigned long cpu_flags;
->  	pte_t pte = ptep_get(ptep);
->  	uint64_t pfn_req_flags = *hmm_pfn;
-> +	uint64_t new_pfn_flags = 0;
->  
->  	if (pte_none_mostly(pte)) {
->  		required_fault =
->  			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
->  		if (required_fault)
->  			goto fault;
-> -		*hmm_pfn = 0;
-> -		return 0;
-> +		goto out;
->  	}
->  
->  	if (!pte_present(pte)) {
-> @@ -253,16 +262,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
->  			cpu_flags = HMM_PFN_VALID;
->  			if (is_writable_device_private_entry(entry))
->  				cpu_flags |= HMM_PFN_WRITE;
-> -			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
-> -			return 0;
-> +			new_pfn_flags = swp_offset_pfn(entry) | cpu_flags;
-> +			goto out;
->  		}
->  
->  		required_fault =
->  			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
-> -		if (!required_fault) {
-> -			*hmm_pfn = 0;
-> -			return 0;
-> -		}
-> +		if (!required_fault)
-> +			goto out;
->  
->  		if (!non_swap_entry(entry))
->  			goto fault;
-> @@ -304,11 +311,13 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
->  			pte_unmap(ptep);
->  			return -EFAULT;
->  		}
-> -		*hmm_pfn = HMM_PFN_ERROR;
-> -		return 0;
-> +		new_pfn_flags = HMM_PFN_ERROR;
-> +		goto out;
->  	}
->  
-> -	*hmm_pfn = pte_pfn(pte) | cpu_flags;
-> +	new_pfn_flags = pte_pfn(pte) | cpu_flags;
-> +out:
-> +	*hmm_pfn = (*hmm_pfn & HMM_PFN_INOUT_FLAGS) | new_pfn_flags;
->  	return 0;
->  
->  fault:
-> @@ -448,8 +457,10 @@ static int hmm_vma_walk_pud(pud_t *pudp, unsigned long start, unsigned long end,
->  		}
->  
->  		pfn = pud_pfn(pud) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
-> -		for (i = 0; i < npages; ++i, ++pfn)
-> -			hmm_pfns[i] = pfn | cpu_flags;
-> +		for (i = 0; i < npages; ++i, ++pfn) {
-> +			hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
-> +			hmm_pfns[i] |= pfn | cpu_flags;
-> +		}
->  		goto out_unlock;
->  	}
->  
-> @@ -507,8 +518,10 @@ static int hmm_vma_walk_hugetlb_entry(pte_t *pte, unsigned long hmask,
->  	}
->  
->  	pfn = pte_pfn(entry) + ((start & ~hmask) >> PAGE_SHIFT);
-> -	for (; addr < end; addr += PAGE_SIZE, i++, pfn++)
-> -		range->hmm_pfns[i] = pfn | cpu_flags;
-> +	for (; addr < end; addr += PAGE_SIZE, i++, pfn++) {
-> +		range->hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
-> +		range->hmm_pfns[i] |= pfn | cpu_flags;
-> +	}
->  
->  	spin_unlock(ptl);
->  	return 0;
-
+Jason
