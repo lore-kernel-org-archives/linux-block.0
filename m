@@ -1,119 +1,142 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466DB535D8
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 23:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D761F2B8E
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 23:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745450913; cv=none; b=QeLuDvBW0gddeMWpMBLp5HTQnruB2fdizWGk5gB4Ac8XXPxMqwgjDKCcZOjhluBQJT+JTZ0GjCCLf1D8uW4p9p6go3t4wmWtQpZifQmC3HuNCR7i5VfgZBYpmQTCuRzV986jVFrXSBgO/IQOCEGRUd5LOHwsWMj63BN1Grc0ue4=
+	t=1745451219; cv=none; b=XTalxNUIfoOVvlTd8uLpoz+QdWkdsqHL8A2duTJo2EY5tC3iK1bS7Xo6VkClffCG9gzXx//rsG8pOiZorn56+4as+3GbSyMFY1xf34s87ogZTrizzPNwGCCguBMYExkLuU+6muRDqrEwViyK5vjDo1z5Rx6q4Mgo4F4nu691X9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745450913; c=relaxed/simple;
-	bh=a/m1kWZ0mMaRN3QIj2DGTgl1rk+XNi+SIx+XcpVWSeY=;
+	s=arc-20240116; t=1745451219; c=relaxed/simple;
+	bh=El3tntKet6XFP5tu5jRccRiIHcbcsNXplDjGS1RgqqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=allkhwKxv4wAIXGZtPZpuui//C9/eQAKjXV6RzuqWGnafZrkYE0n5qHXXy0XgEcaKteEV895KnvP0G8dtz4ONT42XXxlsGz7E2wWRIRojKDV5TpmeJUcPYUXeKNyxKEfFTJbqdVVD9DuhGYzPsFvoE4Vu4dPRmEX2L9qgLBNrO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=V9t8UuGX; arc=none smtp.client-ip=209.85.222.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHg28Z0gQdRgUfsZj78uaevs7a+SQ3SrmMRmDUD9VLH3X0zMuTjzu0oXX3l9ErUFJ0edlcH+WAEs8K5mSwUBZicTMNBHre26m4qudb8tF/8BVSIazgmq/muj749+4HXeCepGVK67a+9PzmlY7l1K/YGnF0FnveFFLv2os1Azyu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=oxpQR22A; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="V9t8UuGX"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c5f720c717so178628885a.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 16:28:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="oxpQR22A"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-477296dce76so3318501cf.3
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 16:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745450910; x=1746055710; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Go7qZaXvLQqCMqWTP9/Yf9f9Qu/B9pFeocBe+GrV9o=;
-        b=V9t8UuGXDFmTJrX2GuNBpF+35WEPvkVNvWY8r1L9hjJapeb+jb7Ce88japOM3vnENz
-         3RwZrf657MtShlvVnMrGuC7cZcKU8ofbe7YGWOVvN91vUualRrIH/gRseGCvdGkj9NG/
-         Ouh4B3Kf/ageHGydKSIQu5E4Ne4rxYQgQmsW8gojTKaxUbHSyTUGCmhEj1Or+XTQhcN4
-         cxLKHyHSpA42e+eoUA+JjP0yQSOGnfyrqmBZZumfsndKzCQ6HbTG3ahQv812gpJDwreu
-         eB5QSugKVOAWTM+tZ6x30M9o8jgtjt8moswwujXVwmrrloZkzEmh5UCv+a0Y8CpCAvud
-         VkTg==
+        d=ziepe.ca; s=google; t=1745451216; x=1746056016; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L7oRP2YqJwVB6GeEu4BqvXzZqclhisHpp0fN6LY14JQ=;
+        b=oxpQR22AuCBUupk33WzKrsqOuEfDjGF5EniClxzPYJi+H/2OHhj3xqGjwCfB3IjXj1
+         IS44abUFubw81ik89SK+dFDMZisPitToRy3EjPnxuoq9OkV+yz2s0Dd26VYZBM4RiMKf
+         LNZPMNSpZe8jxWLp38ZCMDDKtCWhhAEaNccFys3J39EgF9Oa5YZ6+Oi0PJ9u2qeAGeb+
+         x42QOq7flqmXeNRLssg9BL3MbzD8TDfAQ3F1ZEg2N3dERLvQfW0Wo9v5YoPExvUsoEdC
+         IJPMcscXB538yc3/hVCCR4MgBTNPsBOr+AloLAvkeppeSsp27pJkz8n/J7Twj4P35Hbl
+         gDmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745450910; x=1746055710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Go7qZaXvLQqCMqWTP9/Yf9f9Qu/B9pFeocBe+GrV9o=;
-        b=QNSBCW1hWHxFpoFQVtHWqAgtAXc6OiYNdndfKVtwuFi558aw9LLNsS6vggkTGyTqQV
-         /Y4a8eF/Q6fQtxkbX5J6H/802GKhDmmOtDSU98+ndrzYl8ZxqnMArXJ9vnmeKb3vMdmW
-         FwAHxp4Gdr6PAetNCSC2BngIVqyAd0KYBdQHVA7HoHTlQhGxCcq/TeZ03LCub4qFc4db
-         0/CAYWDT17h/lN9v9KzyWrS8MLw3O3yEJoSwdiWbDgDXAUoJxcDW1WTGW+7K5PYahSAT
-         oQvOSNiKhCjzoBRk2m62qyYPri58EjTkwNbmDpS7DeSEkaE6MJNQR+yu3Q3+XEbBvzPD
-         mlBg==
-X-Forwarded-Encrypted: i=1; AJvYcCULTEbfw07awSacHBJ9cLfhCxez7n7TDPapwbHLdHeq28cANhU/X7JhrLrLhEHRfk7Hi+Gl4H8H1oc7HQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmDGQXi2p12D6Kj/cBXJ/ugpFwdjqWzFDTdpUFsLX4oH/T3bVX
-	MMvWuFG+IjNmT+z6iS5TJkM27t3TmX3pf5+Xc1PRCNUY5uo+xryDDDHJ/DJkr6k=
-X-Gm-Gg: ASbGncv7ZrMKc1IKgZHeLBpfIbCFOIF/Dzoyw18kdoXb+5DjBY0yNKfmGOByk2/HvCS
-	BAtpK0BnyJ0GbLNapofnTdG4iXU1XjaTJwTJfAzVLR3s08TLPbW23pT6tcDxfSGFYJxwiIZDY4Y
-	BGlcgeVyJoKm/IwZDdP8hWQiDVc9+EXcgRC6QtHopPQn3Adm/z7b2C4599YeurYS+xy037H3IUi
-	RBeBRTtxtWtaeCdtego+nt+dsaaHemwgNlHvsicG4jeV2+vh0r8htsfXbP+jJ/mx0M4ovlM1wcV
-	G05ixO1B/3/ArZ1sOS5Z1204oUYcAqf3bgB4t5MlZjKChhFaMovjuPpkfmgJUhJPtFoCUAi8QJc
-	l3+MmTUGeCB5TsPWj6Qo=
-X-Google-Smtp-Source: AGHT+IHQwoUGFyqXOFOgVitrB4+AxVC8d+UTNu2w6OYf0KswkT4EXsvYxHqs0LgYSSaBSDPbedDu/w==
-X-Received: by 2002:a05:620a:2887:b0:7c0:a1c8:1db3 with SMTP id af79cd13be357-7c9585c5877mr36268185a.11.1745450909829;
-        Wed, 23 Apr 2025 16:28:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745451216; x=1746056016;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L7oRP2YqJwVB6GeEu4BqvXzZqclhisHpp0fN6LY14JQ=;
+        b=adDmXlVLoEiJdWR05JAih0eHlR8nAqfOSUt9s5YILRiHhDsGbihi4aV0/Ha8fI+D9j
+         jgYuYI+3sxB8060+2z8noxg8WhnXSBHuaxDGhzC/NkTceBsi2VqipaRE2aSA95zYx/ib
+         k7W/zdUqv0rEX4Mn71PMFP9IpF6fiBxS2OQ+0Ai5miMtQ6t3DDPF/nwPBUMr/3OurC4Z
+         FW1pphGuTUmZMju1o32DWRao08fUxag750fS7sVrbmyCNDxhwrHD2qYdngBuGA2uDKMl
+         A5G9j49qsEVptZ0CR+ylMOPZC0QlOi8j0LGY7WJfrV1h5JkWmEQYhvbfI8ERFbDuB6HX
+         7yeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCEQEEC3clzopO2ChFAPGhTroBoHPt2CIRxxoajkX7/5XyyPupiccsxgUv1GhQO06WzN/S/JBfrXEWyw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt1vkmUvnNgACKe+N33LQRDp5yQz9KxuYf6T6xoP8CVw+1Fdp6
+	MA7X498f175zjrMPF+4o4ga4tkZLSzfmyO4ka68b2D2h9CteyoWZAjwO9LTzRMk=
+X-Gm-Gg: ASbGncsSOMexDN+h56v9QTJKY/SqNdC2Kt0egKOSeCLneL8AgirS0mBSsFItJ4ccW7E
+	nhpCMzXFfuXz7+1nBCEzkV+74ZjGsfndh+WfJco8YkW4CAzdfuODtHB3BoeVnb7mr7yiYGgc1k7
+	l+2KYx5C2Pua0kP6s89ISpNmT1DT9lPztaQ2mcvJvbPzc2AzzXOwiZA9SdssA5HOXuSimISBRhR
+	0wQh5NqmOO26kR+OSmVUzqpCqWnDrdv28bDi1q9ejm5R76xRV4F4ALsr3qvCpJW5azRcJCBJH5B
+	p4WW5UmURoPCMFDSzRyVvBfljdczsrioEXYkPNkH/zSWSJ27dC7y9NLI8j6osn6juJwURAQbW1X
+	gEfioN53mjAOKi4tNi40=
+X-Google-Smtp-Source: AGHT+IHp4LWhqR/rJc6pqFU95w2BqdqjYtJ4SAe1Mvc/v+Ufccgyj7hWc7Mm96oBr3hzP4lBlnfnCQ==
+X-Received: by 2002:a05:622a:388:b0:476:b783:c94d with SMTP id d75a77b69052e-47eb4fbb928mr6490361cf.35.1745451216599;
+        Wed, 23 Apr 2025 16:33:36 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958e7f154sm2581385a.76.2025.04.23.16.28.28
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ea1ba154asm2538601cf.67.2025.04.23.16.33.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 16:28:29 -0700 (PDT)
+        Wed, 23 Apr 2025 16:33:35 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1u7jW0-00000007PIX-0JOv;
-	Wed, 23 Apr 2025 20:28:28 -0300
-Date: Wed, 23 Apr 2025 20:28:28 -0300
+	id 1u7jax-00000007PKl-19Zx;
+	Wed, 23 Apr 2025 20:33:35 -0300
+Date: Wed, 23 Apr 2025 20:33:35 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: jane.chu@oracle.com
-Cc: logane@deltatee.com, hch@lst.de, gregkh@linuxfoundation.org,
-	willy@infradead.org, kch@nvidia.com, axboe@kernel.dk,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: Re: Report: Performance regression from ib_umem_get on zone device
- pages
-Message-ID: <20250423232828.GV1213339@ziepe.ca>
-References: <fe761ea8-650a-4118-bd53-e1e4408fea9c@oracle.com>
+To: Mika =?utf-8?B?UGVudHRpbMOk?= <mpenttil@redhat.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250423233335.GW1213339@ziepe.ca>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+ <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fe761ea8-650a-4118-bd53-e1e4408fea9c@oracle.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
 
-On Wed, Apr 23, 2025 at 12:21:15PM -0700, jane.chu@oracle.com wrote:
+On Wed, Apr 23, 2025 at 09:37:24PM +0300, Mika Penttilä wrote:
+> 
+> On 4/23/25 21:17, Jason Gunthorpe wrote:
+> > On Wed, Apr 23, 2025 at 08:54:05PM +0300, Mika Penttilä wrote:
+> >>> @@ -36,6 +38,13 @@ enum hmm_pfn_flags {
+> >>>  	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+> >>>  	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+> >>>  	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+> >>> +
+> >>> +	/*
+> >>> +	 * Sticky flags, carried from input to output,
+> >>> +	 * don't forget to update HMM_PFN_INOUT_FLAGS
+> >>> +	 */
+> >>> +	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
+> >>> +
+> >> How is this playing together with the mapped order usage?
+> > Order shift starts at bit 8, DMA_MAPPED is at bit 7
+> 
+> hmm bits are the high bits, and order is 5 bits starting from
+> (BITS_PER_LONG - 8)
 
-> So this looks like a case of CPU cache thrashing, but I don't know to fix
-> it. Could someone help address the issue?  I'd be happy to help verifying.
+I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
 
-I don't know that we can even really fix it if that is the cause.. But
-it seems suspect, if you are only doing 2M at a time per CPU core then
-that is only 512 struct pages or 32k of data. The GUP process will
-have touched all of that if device-dax is not creating folios. So why
-did it fall out of the cache?
-
-If it is creating folios then maybe we can improve things by
-recovering the folios before adding the pages.
-
-Or is something weird going on like the device-dax is using 1G folios
-and all of these pins and checks are sharing and bouncing the same
-struct page cache lines?
-
-Can the device-dax implement memfd_pin_folios()?
-
-> The flow of a single test run:
->   1. reserve virtual address space for (61440 * 2MB) via mmap with PROT_NONE
-> and MAP_ANONYMOUS | MAP_NORESERVE| MAP_PRIVATE
->   2. mmap ((61440 * 2MB) / 12) from each of the 12 device-dax to the
-> reserved virtual address space sequentially to form a continual VA
-> space
-
-Like is there any chance that each of these 61440 VMA's is a single
-2MB folio from device-dax, or could it be?
-
-IIRC device-dax does could not use folios until 6.15 so I'm assuming
-it is not folios even if it is a pmd mapping?
+Probably testing didn't hit this because the usual 2M order of 9 only
+sets bits -4 and -8 .. The way the order works it doesn't clear the
+0 bits, which I wonder if is a little bug..
 
 Jason
