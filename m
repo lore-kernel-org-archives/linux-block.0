@@ -1,67 +1,67 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F230828CF44
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0C6284695
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745429341; cv=none; b=btF0hycSRrpWPDfE7zPkqsVcCCj/QkiX5KWlFHTNX/59K1wW9zq/7CAsuM1MCcenbyR94fdi4PSRLTJ1EZqrgCYt5EpHJiX0vZj2hG2X9tB9o0xxdBgIpFABhIk06gCFDQcA532MPkYRj0Q+TBDKDJ8VfB0yD6lypgAhPtMyUUw=
+	t=1745429699; cv=none; b=ixaJsXmUUfI0FXlxVbLE7pWd3OkG/Mo3S52Le/pWnP5OfcPsmvuGmN+5hOKzR244ccLsSHKhk1xVRrf2pvpvIUb5rU2Yw7PnKXF1uOX1a/kux0C0jSR5K0pV7NrfwXfFdIej5p3TxYOKSYnqiG6SVFKn5eE2lcH7G6QYU0p+8p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745429341; c=relaxed/simple;
-	bh=mRc8M0gxR/bW04Xju3faBLjTBvHDMb62s/e3kfp1ILA=;
+	s=arc-20240116; t=1745429699; c=relaxed/simple;
+	bh=zB24IJl1jZzMHzgO4K1Iy0NHxHgoWs9FaxvjZYsQalw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IwbWrEYi01m3kX8OkiLwXD5h1Bl0tOMG320YjhZ1VQUC8G/GQ7MIWYelNmUkW6dNb5TpMdQJ1eWbYFit5Vu49IDxIXQYzmdHvf/TeX7kS+9plp9bpQ0C8QWtwiI+U2xahQd74pKrCSZCooWPeT+nBke0PfOlZpkAsSHI1n+QC2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=eVuwq0RO; arc=none smtp.client-ip=209.85.160.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODHvKcoz25qHk5sIHKs9NB552JzPiDJgEsLCR5bU4fJifjdrnsZCzKq9/b3Bd7PQEwVj2U0LiFOUy2OwDVeDgdGHE65X60j6+f7VN4N4PNPlB/UDbwnPwCJBYNT2/pg9M0aBZbG93+nuzQWAzNu5+Ucq41L3hmlKS5MOnUVl5HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jKeC0wG0; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="eVuwq0RO"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-476a1acf61eso869191cf.1
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:28:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jKeC0wG0"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7be49f6b331so8411485a.1
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745429338; x=1746034138; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1745429696; x=1746034496; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IO21pmrwIRca1fPgD174SCTD3P5B2ca9Ykqyd/DD35Q=;
-        b=eVuwq0ROZifuNzkRrXIXgbkbi4hO8TSorC1cVxQ1W8OJWpaf636zG1H79y/OsoNiEv
-         QJoHdOMGmdOg3qWXE6oHeMbIm7NKTfE3i9KQN7Fh9+P1J/7HKW0XNl6v6OYA9tbrbphh
-         9I+2ZXWcvuiOHhgiMd/sD39MAb+UODVgxMr2qWzwIlCIGN3Nk+M97jNtSjELBr4MXOVW
-         +jwYX/4xi8FewzktEuOaSqhFxeoB5SOsVD8U1CDOCff3ofu0NT61y4q5M1pmsq6xHNmL
-         EwbV/ud7hFmATuIADKNLOAC+tlRqNf5RiVptJYelfbQHfkpq/CUpCWnNZ4bOE476qgWk
-         onKg==
+        bh=I+fayQ/PBTnrOfxtrw3IgFnI1QJK9xAjEiHuuXs7Kpg=;
+        b=jKeC0wG0Rxs29aLtFTXrwvm6sCjBlI+WjPNCPmALgo/mjnmuyNi8RzQ8EoTi2n9ato
+         G2uR8+wTHeXdzUwlwgxBh5NicR8ymrLhg0bWgtzToqLWFgmbk1yR2sBCKvTWpQ2XzEqK
+         c+gqSngWmaHabqIMpagt+bie9Wb3ZUbIY0uf9WN8dkBe5oq6/jz0Omc/q/isRe5XxD6s
+         wIyd2QIvWZ+V+k8HV/tY0iBuNr8JlAnZaGxdHRzWwWJdpEc7zUCULfC7NElEQ7ugzKS1
+         ukaL0jDlfBwfBtKiA5JthSNqw13rTy4KL+WCFZHxth3Teiilhqthip7KWkPBUKtkiX7c
+         Z7dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745429338; x=1746034138;
+        d=1e100.net; s=20230601; t=1745429696; x=1746034496;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IO21pmrwIRca1fPgD174SCTD3P5B2ca9Ykqyd/DD35Q=;
-        b=tt4O+O5FA0C2SEj476aEs0C4r+rUysrePbxlEWdoqKZU+ADvn68U6Al2SpEemin/MK
-         FjGv02H6MLRETVPljgcd4qr1f7d+tHJOKV/uK0zTtWeqo4cZy5wftYdWKD4sUGxfxFZR
-         +05sWCFTqPg7sz+4rIIr+j6PyQlSp0tITNsPhwz6tSTmnsTTqO4oBIOzneuJH+uYL0bJ
-         GZn0BYPePMT7GfS1sw59ZmNOU7c2PqsrC2mpS6urskJ+W8c+9t6+X90kHfFEA9jcOu8e
-         2e7TYHfjjdLNEbpX3+bMa/XdNVh9XPK0KX+/jQmiEjV9jlo/ToJJDW2kWjShwLksv/IA
-         OixA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGLyr1dSl3THnxiYa1Pobap0WJit8MIzPD4YTfEKuvQ+UNeyy2REdqvDlETpobZNxZSdiygGEh+04/Lw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb9ow9T5h+XnCWnLDlgXu9tVecBOFkIxcknic7kbeTP8tFZXKw
-	SGrRJu2v/7X8S8k6YLELBJfERyzWSodNMXb1DeWJzZbUoL6RPCefpO5Mu9Xj4lw=
-X-Gm-Gg: ASbGnctg1TWnw4GHWipber1K2P1wUoamPutFpy+IRT5Hr4do6RHs8A4RL0b0hgEPOXG
-	Ia84duwhN05FWA45NsNEAvvWYB3cQa5UfQhIxB/hPBjsPXb3X/+irR28pQC7ohTLtmo5HhT05Fs
-	v8Pko7rmaTE5Xpq/Jb4Bo4zjIZvO0yDePUMA9pcGYxP9mTMq75dJekJQn/2K4mmHZS9cDq6rC6/
-	3Uxyd84npf9o4+yPnXj5xNo2aEH1aLws8xUkjZL1KWnlwSb6L9qVekVDviz4eBYeV7cZIzZiGmW
-	rsLZgDdL8C/DiMaavJslVXjk5/+upO5VpQ0p7FJjMbhwsnAA8INOmZIud8S0gAbxFJroZqQbfEm
-	1f2wvnjL+rvKoM8zWuTg=
-X-Google-Smtp-Source: AGHT+IFhccZU7hwIpoqF9kdgyBZNm8CDnNWVmBsNPQQ6+B1QKTjLAh4Uz8aWpAuaS2cilFrr6VCiig==
-X-Received: by 2002:a05:622a:18a6:b0:477:5c21:2e1f with SMTP id d75a77b69052e-47e77a9e41emr774971cf.34.1745429337818;
-        Wed, 23 Apr 2025 10:28:57 -0700 (PDT)
+        bh=I+fayQ/PBTnrOfxtrw3IgFnI1QJK9xAjEiHuuXs7Kpg=;
+        b=cqbd1srdH9s/8klMdxdzOImDmngPNgqTnioTmQxcNEa9EAVPo4EdG/a3qEMGdaT54c
+         oq2pISzABSmzanNeHlkn9eSd1AF/Slb4ZXTlc8fjxVt7Okf2x4pYTL7n/ulGCDI9Mvue
+         7F5vqJmQcTF8XoafaF/M7O6xVtRkgxsu/Yd+sfIIqHPdGzUhi3fjZVODSl2sNnNC8u4j
+         lbKmO/leq/PBnT1KQgmJn7oSW1Fo8bgtk0foN2tZP49Z2JJ0lAOvxODJgJ13oUWlDkFx
+         rIRJ+6LTzsYwTshDGXjBSlibYXTNqgZx/JPGp1DRu1RbZ6WI7OQ8gCYl4T92JOyfDapJ
+         Xqvw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7F0sBFs9Rey+tX2mlGoWScFHtcR8fsiaFhk1EkQcBTwiWSj3TVQ0+4hUPHkByYvpEsUChSGNGsN03RA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YweOs+XxASEnrGnFYdKGayu6QLY2USaeHfYU47ypWmqVkpw/FT+
+	XN9arUjUbt8nZnPTaecbhoZUxA4GwM7c0u6iz3rIkUrrTqY1qXGe+D9FFWfARAI=
+X-Gm-Gg: ASbGncveMijNhWAFkAo7t4/a5e5jmVRg2sBCO67ksVRosQT+BlP+KZGR7Kvmr/CIz16
+	zOQlfJjIsTcMWiMM577pbbtCTa7kVSrl4hwNU19QoUMvnlaE3vqGSdPbcqWzeKZNMzaF4DdPu0M
+	WnrHU3ttBXNKToUnmdp16b4WQ/4fSsRA+rMHKH7gvpVDx9OImtiE43nIjCf55cMZRC/l9OYue8U
+	tmDyjtRGWZiQ1FEegxCefsbUUpuQZC5CA4UFmVt1Gyt1zmAYRyQFwSyb1gLe55tCc2fAy7C+1MO
+	8IvBo2ZO3ylH+SYQNArryRRd7myKy6+4xtXN3Ksd32/MrunbzjJhQ9lZzfmB6LU4QM22kUlSFqE
+	t2MJxV3lTJVlqzfnl+H4=
+X-Google-Smtp-Source: AGHT+IHrcKTZfJXCAhkO2WaOum0PT2hRMW3vGaRhpe2sCjwAXzgjbldqD9beTUKDcznlrIIPKNuBAw==
+X-Received: by 2002:a05:620a:2953:b0:7c7:97ff:ca42 with SMTP id af79cd13be357-7c955e7c7d7mr65261285a.41.1745429696505;
+        Wed, 23 Apr 2025 10:34:56 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9c3b5c3sm71026671cf.21.2025.04.23.10.28.57
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925a8bf65sm707741185a.25.2025.04.23.10.34.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 10:28:57 -0700 (PDT)
+        Wed, 23 Apr 2025 10:34:56 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1u7du4-00000007LYP-3LLk;
-	Wed, 23 Apr 2025 14:28:56 -0300
-Date: Wed, 23 Apr 2025 14:28:56 -0300
+	id 1u7dzr-00000007LbA-2PtY;
+	Wed, 23 Apr 2025 14:34:55 -0300
+Date: Wed, 23 Apr 2025 14:34:55 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
@@ -90,10 +90,11 @@ Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 11/24] mm/hmm: provide generic DMA managing logic
-Message-ID: <20250423172856.GM1213339@ziepe.ca>
+Subject: Re: [PATCH v9 12/24] RDMA/umem: Store ODP access mask information in
+ PFN
+Message-ID: <20250423173455.GN1213339@ziepe.ca>
 References: <cover.1745394536.git.leon@kernel.org>
- <3abc42885831f841dd5dfe78d7c4e56c620670ea.1745394536.git.leon@kernel.org>
+ <f81331e55cf95b941e6c57f940a2a204141bf2e1.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -102,55 +103,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3abc42885831f841dd5dfe78d7c4e56c620670ea.1745394536.git.leon@kernel.org>
+In-Reply-To: <f81331e55cf95b941e6c57f940a2a204141bf2e1.1745394536.git.leon@kernel.org>
 
-On Wed, Apr 23, 2025 at 11:13:02AM +0300, Leon Romanovsky wrote:
+On Wed, Apr 23, 2025 at 11:13:03AM +0300, Leon Romanovsky wrote:
 > From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> HMM callers use PFN list to populate range while calling
-> to hmm_range_fault(), the conversion from PFN to DMA address
-> is done by the callers with help of another DMA list. However,
-> it is wasteful on any modern platform and by doing the right
-> logic, that DMA list can be avoided.
-> 
-> Provide generic logic to manage these lists and gave an interface
-> to map/unmap PFNs to DMA addresses, without requiring from the callers
-> to be an experts in DMA core API.
+> As a preparation to remove dma_list, store access mask in PFN pointer
+> and not in dma_addr_t.
 > 
 > Tested-by: Jens Axboe <axboe@kernel.dk>
-
-I don't think Jens tested the RDMA and hmm parts :)
-
-> +	/*
-> +	 * The HMM API violates our normal DMA buffer ownership rules and can't
-> +	 * transfer buffer ownership.  The dma_addressing_limited() check is a
-> +	 * best approximation to ensure no swiotlb buffering happens.
-> +	 */
-
-This is a bit unclear, HMM inherently can't do cache flushing or
-swiotlb bounce buffering because its entire purpose is to DMA directly
-and coherently to a mm_struct's page tables. There are no sensible
-points we could put the required flushing that wouldn't break the
-entire model.
-
-FWIW I view that fact that we now fail back to userspace in these
-cases instead of quietly malfunction to be a big improvement.
-
-> +bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
-> +{
-> +	struct dma_iova_state *state = &map->state;
-> +	dma_addr_t *dma_addrs = map->dma_list;
-> +	unsigned long *pfns = map->pfn_list;
-> +	unsigned long attrs = 0;
-> +
-> +#define HMM_PFN_VALID_DMA (HMM_PFN_VALID | HMM_PFN_DMA_MAPPED)
-> +	if ((pfns[idx] & HMM_PFN_VALID_DMA) != HMM_PFN_VALID_DMA)
-> +		return false;
-> +#undef HMM_PFN_VALID_DMA
-
-If a v10 comes I'd put this in a const function level variable:
-
-          const unsigned int HMM_PFN_VALID_DMA = HMM_PFN_VALID | HMM_PFN_DMA_MAPPED;
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/infiniband/core/umem_odp.c   | 103 +++++++++++----------------
+>  drivers/infiniband/hw/mlx5/mlx5_ib.h |   1 +
+>  drivers/infiniband/hw/mlx5/odp.c     |  37 +++++-----
+>  drivers/infiniband/sw/rxe/rxe_odp.c  |  14 ++--
+>  include/rdma/ib_umem_odp.h           |  14 +---
+>  5 files changed, 70 insertions(+), 99 deletions(-)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
