@@ -1,100 +1,51 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778F428A1F8
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 18:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BE88F40;
+	Wed, 23 Apr 2025 18:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745431343; cv=none; b=IHE08qHIMFujq8Bagb8v0mzA84Z//fsVhODOmR6c4S7XLGkkSFw9Hlcao2pibVO9F7Uj/+cscVl/5BJlDmOjJL1Np+EMpFtenIAMR4JPKLNP1Xei21Wasr4gPd0HW58kgamLuSWVHsuEtra8AsUohh6sXs6MrSxxtiyXNsYNG9g=
+	t=1745431344; cv=none; b=joCX8SncRnyWqc0WtwyOcT8BQXOF6DZcYpDsx2K9H+QQtiWOvsWhl/90KhsnG0jbPe7N1XaIIzI1He1bXtWI5JdejneTwIJ4AiuTDF0mNpXGrGLbBvrdy6MaHzRBM0Mjp8khKEy/32WTfev1zPwGER54AWmRg9YezQBtk0zpwHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745431343; c=relaxed/simple;
-	bh=jMGBnlKKS3wriE0M2t3GS1b7w0yLhTPXvhMeTWbbHrA=;
+	s=arc-20240116; t=1745431344; c=relaxed/simple;
+	bh=BSV2S5axVk3jR2Dj4hy0PRdYG9l3BhCOacRqX+is/5o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KdONRS+ZJSZ2zk6COyZSxE2ZoaElQhK370dSgF/Mc99josyY97G+Q4mr5d/JT+mmN0+LnC5uS8cV3mnGzC2m4SvkSgj2Kqp3OY65oT0lZGnUbgPPxWUPVoQwcXdAeOHyGb5RGaLz3G5tNr7QbzsOZvJNRdrgIdcltj26uWCvK3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=oME2bGbG; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=ueX93QKMJeiOFeyvvMkLeLm17+wCyZ+nNcYLEgjZF+8wby3hODSleoBYpDBx89npiZ48ow+ExzDORlf1+q8fiJ3an3jprCHWYMITQirJ6/krkn/wTm7KOpWwh2BD7rE/ja1frTHwmfaVH/tRVKBiDag4siiMApOdmPKIq0giUEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WKzXkeLy; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="oME2bGbG"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6eeb7589db4so2217646d6.1
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 11:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745431340; x=1746036140; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/H5CAwHQKAGhhgyjSbvaHcVayhHkcFdusJoJuYFxH8=;
-        b=oME2bGbGIz+n8qPmjxlLjGtl64CvjZEPLK7vic6PtKju9KvsD8hbQoAkwLgEIUXBXg
-         iqMA9uiI8nIhmBox8Z7ZtsEVF9rde1sOPnx8+Ic/YkmuJ9mTOLkrk722E5IWEIRNAYGR
-         CVnGLdLxvEKtC2PTbivi1fVVAU/xnbJH1e3h1aYaD6xXqyyQUWxXFa7Xe/FlDmqtEMBh
-         M2vt6LSy6VXOVecd3pdAWZPlsCrclj/UmngB8o9ubhNBU5XVxQpZ9ogcCm6n3z5DL56T
-         4rghcIF1xc2841w2V+rvve+AZ1efnzAOOk4mZhF4CMwBHIR6quQkjZVOdYpgnKUYZnoy
-         QpAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745431340; x=1746036140;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/H5CAwHQKAGhhgyjSbvaHcVayhHkcFdusJoJuYFxH8=;
-        b=mVx1gPbyAkKo5sNBgOvW5u+2wXNk+3jm7XJwwgMmlPOUuEVC3XNZ99RgMPf58Z8rGh
-         eNMvmsD4BSyiW9OFSmwGjG3J2h1DVeNNtpahHmESagvb74IKOMLRhO/XGaOP1JDhhjRK
-         hIEMmoc7NI5U2M9hI/vGbzAT4JE6C0YSb2DHU1ZovPTFjlzRev8TlbvLoLeKJDNVuhEA
-         gSa4i53jpc93vJ/sgwmGjuR+la7m8OabWHtQKGwlZXmrEwb2+8ttwMmc33oySRhsdUFb
-         FzECPHmNW7aLC68J6HUI4JSROoaUT7AdRiZd4YMzW72Eft4j4Y9VpKB2qGM+5aIey/jY
-         /RhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWs3yFAh15x5AkVv5pmNkaogiSQIGOPy0T/aAnhn6ym5WXgVCyIpNwysrCb9fQ/Kt6Gq7Vm+7WoilBlWw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww1a7QC7Lc5twPeQVVySG8RBHKx5s64iIEFtE5F6OVmCKNHQPR
-	sFUMu+HGo/vtW3Gr1MlQQS90PgAbr1l7EVlHZ5T4xPJvUeSopASwxa257l2/MKU=
-X-Gm-Gg: ASbGncuGMcC6ttYASzkGWqVwC7wyKGR8IT+dvywbFmyo/ZeHAJoq7IqhagYaS+MnEOg
-	anDm/A2MQkMLdbpSEHr4bGe/NG6hco4JPMTQhfqL5iUl8iSF8ibVsN9s9hH2w5W40y6liuFbVid
-	3UigOKNnOcpflkZrBGgGndUPk1Lk9/wThwaYkkuLjze9Xgov+gJ6neUoCs2/3KqRf1zveLWseoW
-	VRxdnghXCxsnNvqIJYSXOQQKQ3IyzPLcTtdBLjUo1rVkDiZVKyplF/VbH0OQZI9QwuuzH/qXQay
-	1sYDMxMi523JcPcWRBrNaM3hZx5G7eIsOQkvwoVpSt/nAKzmZ5hmV16nYENHpBYgemIB3JggJbm
-	grUywNiWkJ3ABZxHH0cU=
-X-Google-Smtp-Source: AGHT+IHxXzsMEe6MN5UQygppndiI4ddaFnTKWUy8FtozhFzNSVoZsB8f3DMDl3MfRyMHEIrbMun+Mw==
-X-Received: by 2002:a05:6214:19c8:b0:6ee:ba58:e099 with SMTP id 6a1803df08f44-6f2c454e522mr330593466d6.15.1745431340219;
-        Wed, 23 Apr 2025 11:02:20 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2c3ba3fsm73300796d6.125.2025.04.23.11.02.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 11:02:19 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u7eQN-00000007LrM-0sGN;
-	Wed, 23 Apr 2025 15:02:19 -0300
-Date: Wed, 23 Apr 2025 15:02:19 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 16/24] vfio/mlx5: Rewrite create mkey flow to allow
- better code reuse
-Message-ID: <20250423180219.GR1213339@ziepe.ca>
-References: <cover.1745394536.git.leon@kernel.org>
- <eefe5ad450fd434dff981963ec3c61df7b3734e1.1745394536.git.leon@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WKzXkeLy"
+Date: Wed, 23 Apr 2025 14:02:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745431337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8BS6PilBZgvTDPZhVhVWu7ww97sBPTJLkhr1PmWiCpA=;
+	b=WKzXkeLyNYDwk/eCKuYZUCO+ERfNfkrsogpUfK8yviZk5KF8v/jUkJdnJU+r8oZr+ubgz5
+	x6V9oP+fLmYCwLsnSZd82pB9eEkKHjvuhiG4VRWZPCOzP6wYwxgwjmy1iiuNhSzk9iSRcj
+	k8plvwA+ho8NM7aL2D7SLNCO8wUepbA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>, 
+	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, Carlos Maiolino <cem@kernel.org>, 
+	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
+	Johannes Thumshirn <jth@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: add more bio helper
+Message-ID: <q53k4x5nshvr2zatrgyhygxouv7ijyepe6cj2pfooemi6gbu4y@lpxxcvozazzu>
+References: <20250422142628.1553523-1-hch@lst.de>
+ <jetduw7zshrmp4gl7zfpwqjweycwesxiod7xvtnxqwqekgtvdf@idwnvfzvhgik>
+ <20250423093621.GA2578@lst.de>
+ <sl4oibdxpjygqfpy6llq237zuckz7ym4fmzcfvxn2raofr37a5@hvevbcgm5trn>
+ <20250423160733.GA656@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -103,28 +54,80 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eefe5ad450fd434dff981963ec3c61df7b3734e1.1745394536.git.leon@kernel.org>
+In-Reply-To: <20250423160733.GA656@lst.de>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Apr 23, 2025 at 11:13:07AM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On Wed, Apr 23, 2025 at 06:07:33PM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 23, 2025 at 06:37:41AM -0400, Kent Overstreet wrote:
+> > > It also don't support bio chaining or error handling and requires a
+> > > single bio that is guaranteed to fit the required number of vectors.
+> > 
+> > Why would bio chaining ever be required? The caller allocates both the
+> > buf and the bio, I've never seen an instance where you'd want that; just
+> > allocate a bio with the correct number of vecs, which your
+> > bio_vmalloc_max_vecs() helps with.
 > 
-> Change the creation of mkey to be performed in multiple steps:
-> data allocation, DMA setup and actual call to HW to create that mkey.
-> 
-> In this new flow, the whole input to MKEY command is saved to eliminate
-> the need to keep array of pointers for DMA addresses for receive list
-> and in the future patches for send list too.
-> 
-> In addition to memory size reduce and elimination of unnecessary data
-> movements to set MKEY input, the code is prepared for future reuse.
-> 
-> Tested-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/vfio/pci/mlx5/cmd.c | 157 ++++++++++++++++++++----------------
->  drivers/vfio/pci/mlx5/cmd.h |   4 +-
->  2 files changed, 91 insertions(+), 70 deletions(-)
+> If you go beyond 1MB I/O for vmalloc you need it because a single
+> bio can't hold enough page size chunks.  That is unless you want
+> to use your own allocation for it and call bio_init which has various
+> other downsides.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Allocating your own bio doesn't allow you to safely exceed the
+BIO_MAX_VECS limit - there's places in the io path that need to bounce,
+and they all use biosets.
 
-Jason
+That may be an issue even for non vmalloc bios, unless everything that
+bounces has been converted to bounce to a folio of the same order.
+
+> > The "abstract over vmalloc and normal physically contigious allocations"
+> > bit that bch2_bio_map() does is the important part.
+> > 
+> > It's not uncommon to prefer physically contiguous allocations but have a
+> > vmalloc fallback; bcachefs does, and  xfs does with a clever "try the
+> > big allocation if it's cheap, fall back to vmalloc to avoid waiting on
+> > compaction" that I might steal.
+> > 
+> > is_vmalloc_addr() is also cheap, it's just a pointer comparison (and it
+> > really should be changed to a static inline).
+> 
+> The problem with transparent vmalloc handling is that it's not possible.
+> The magic handling for virtually indexed caches can be hidden on the
+> submission side, but the completion side also needs to call
+> invalidate_kernel_vmap_range for reads.  Requiring the caller to know
+> they deal vmalloc is a way to at least keep that on the radar.
+
+yeesh, that's a landmine.
+
+having a separate bio_add_vmalloc as a hint is still a really bad
+"solution", unfortunately. And since this is something we don't have
+sanitizers or debug code for, and it only shows up on some archs -
+that's nasty.
+
+> The other benefit is that by forcing different calls it is much
+> easier to pick the optimal number of bvecs (1) for the non-vmalloc
+> path, although that is of course also possible without it.
+
+Your bio_vmalloc_max_vecs() could trivially handle both vmalloc and non
+vmalloc addresses.
+
+> Not for a purely synchronous helper we could handle both, but so far
+> I've not seen anything but the xfs log recovery code that needs it,
+> and we'd probably get into needing to pass a bio_set to avoid
+> deadlock when used deeper in the stack, etc.  I can look into that
+> if we have more than a single user, but for now it doesn't seem
+> worth it.
+
+bcache and bcachefs btree buffers can also be vmalloc backed. Possibly
+also the prio_set path in bcache, for reading/writing bucket gens, but
+I'd have to check.
+
+> Having a common helper for vmalloc and the kernel direct mapping
+> is actually how I started, but then I ran into all the issues with
+> it and with the extremely simple helpers for the direct mapping
+> which are used a lot, and the more complicated version for vmalloc
+> which just has a few users instead.
+
+*nod*
+
+What else did you run into? invalidate_kernel_vmap_range() seems like
+the only problematic one, given that is_vmalloc_addr() is cheap.
