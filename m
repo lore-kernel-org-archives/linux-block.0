@@ -1,120 +1,86 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F64288CAF
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 15:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEA72820C2;
+	Wed, 23 Apr 2025 15:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420911; cv=none; b=VAqe1qcSOUKIk87Ud/cQvUrG9yaen2ForjAUEpOHeaRhOwNE2V7uHIjG1f2RZj/SrU+FK5RFCshfLa7hvl0kjyfJfmz9DX6S/AcfnSQmA9BQXfs/WxWuTY++sqmXf1Hrf97b1ASRCr7v6lb4dBj4ckNUHU/7Ip+itSxfbpvn7fc=
+	t=1745421144; cv=none; b=vEomUWouwVIk/3MdalCW2Wh+9E3IdeHuOsy62pNpfljyPjzk62EqblelzrqeDJQWYS0+Bb2RW73PHoywzals0Qt4h4dmOGroaQW/IBdCX7KwLmEymEvrZzAXjR+E9ylgdUfuvn8ubHU0s40wYl1d0TrEW2ZC1m3z4rbv2Z9Z0EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420911; c=relaxed/simple;
-	bh=vfHRK1Z78x7MzBkK1umX8iFjMXqR4+VI8MlzVzX0rYU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tQudZXFeFahFD+jxT6Hxg8UezDS2+ksGdV9OWyiDYtlJC1/4brGYQBQBCuVxPctp7IJncd7Z1yRW7fiYzhGl2NY0xHodW3lasyD0kVJM34bKJ364qNjz5m137FC+u3L1g0Sq287mJRis/d2tT4aIN7do6Wh6CUaU1YkUY9fu8/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Ip/lXu76; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1745421144; c=relaxed/simple;
+	bh=zx/Oy6A5lqsXTBmfLcAGRgtyQAq3DSyvj2acgQbiHZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oi9KfaOGP179tWMfo++NdENPtR8S8wcH3tLPFpVP5EfjwhTnQXJBIT2ysa9IFqQLpSdgAV9s0Tfl7bRC1+Iqj+yBJ9iL7rWM4KnQMzRvDJHbkvgt4WyW5xtKPkZShxI70tGhtT3MHJw/Wc6XHcejzChGzdSwHSrye7A53xcvdbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3v3rKRv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Ip/lXu76"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff6b9a7f91so803724a91.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 08:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745420908; x=1746025708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f0FB6YT/XT7xdqqt/W5ciOk4D/IqF32FPJRyWTT7GCU=;
-        b=Ip/lXu76mKl1O6Bnny4yZsekDB7x3CeA87IKfI4fXckQvN17PVK3MpUeaj5Plc1+VH
-         N3SZEpkSYSJmjc3mtbrloRlx0uAIfWC69vOqOiH8LNyE3z43dckyvBHvdFZC5qF0d+qn
-         Z2W2ClzrUgdSfULe/ejmuk7LbNnLTdGJOyspwXU/ZLM8aLmhPWfuE6tfKjfA6ncONWK5
-         NeFDUCOhRNKaBph9EOMRjAwcQV+9M6LtJ5nPg1wAh67yLrv0bgCAiUMcFVVhtx8pCixQ
-         uUFEDHteDOR716H6adED46I5aXxqiouRhJY628kzYhWycaiFvelIz/bPbEcj6cMdBuLP
-         2guA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420908; x=1746025708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f0FB6YT/XT7xdqqt/W5ciOk4D/IqF32FPJRyWTT7GCU=;
-        b=STxBT0XT6qlbHNZfcIlSvtY7hKteYk5t/5a1evpsRqC3bswMHm6tMb3siUbbic3dR2
-         dtyqqfAhXtyxKVfmkWJF+6hyGvz4vg6/5k/nqC4ASMWuGLk55jPRpWzvIKIC80ipJdjR
-         whkulH6kOyomOHx7sv1kayliKEjJZ/AX37TgXvsygEwrvYcbMx4i3IIRrADVgK+aeEfg
-         LvIa3eb1QlIEK+LHNGoiIpfoJUuC6pzg/BpYRfGrkNNSj7r1lcArRrBa8bpc7FIQFUsY
-         hljQMGHN3dVckVVoUWKjNW0nG4OO83aUeXbQOqJFQXbRaTVvWmw1e/a8vi7ha7/P5LDl
-         PgYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWL7ALicB1ehfo5gbQztyEI6L7hT8e09thEWalI9hnUyyju+U82TPuDDwjOliKf0uV80TRPd2pD+Maw5w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCUanAb2W/Zeh37i5dwYdS0Ra2dp0Kd1+rkYuUP9ebKZv2TX/l
-	08Q+8/1IMQgH1plDE1gTPd6+DQ0uOcdhPB9fyMzsICDwbN756J53vCDKs0jR4meLOHmBgXNWTMG
-	NhWLJcN462NFu1W4Q4Rt+bxqJwX0Zm226EpSCNg==
-X-Gm-Gg: ASbGncumhI+PcUsvgFfqym44EJ7SJWir1Uz5XGeSXn+Jz+WELTZH2n3ROM4WYtGVlZz
-	rorPQtdhy3PFWqtueUIRfcJ2Xfg6cBkZ0j6Tn6z0JIhKRZHZdpaCg0hfGvg+Jbfc+CMm9kXStKM
-	fZawX2osVaqFbxDuQlWIqjSyFATNrfQNg=
-X-Google-Smtp-Source: AGHT+IGPbRUmU9NIa5Dff50RQhWqrdWV7Xkmsm33Xakcu9kdxn7L87X4G1kjJscfva0xnVwpsnHrM5iB/v4F9Xg4bMs=
-X-Received: by 2002:a17:90b:4f46:b0:2ff:4be6:c5bd with SMTP id
- 98e67ed59e1d1-3087be01afemr10955712a91.8.1745420908406; Wed, 23 Apr 2025
- 08:08:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3v3rKRv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D01C4CEE3;
+	Wed, 23 Apr 2025 15:12:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745421144;
+	bh=zx/Oy6A5lqsXTBmfLcAGRgtyQAq3DSyvj2acgQbiHZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q3v3rKRvbDCRGJfaIyHi/pkzwLyfKW/Q5OmN7Tp2CSSl1mLmtDyMsoZnGKDaSw3Hr
+	 c1VyMsbQmPXCpl7HMrKUTzloMBAUTV2L2Okf7JGSQEtXGLRJxjb3e3QiV8N5l7KLx4
+	 SgRA3OB2TohvCyZipNabA1AZ78fwyeAgYuSdHEHrfYs/zQmLs5vPwG9U/l4Xh6o5ch
+	 awi4NHeUstrRkanpy+V6T93PuMi4D+Kkp1oIDWruIo+eVuM1npdUySmBy7HlbezUuA
+	 +LgNDaZbXRJY4JSJMIzkBnxPaNzIm2ZWZeCJBWrUgB5eAADoaQaAU8aAzEQncxtUI3
+	 WQ5Z82Av1ehtQ==
+Date: Wed, 23 Apr 2025 08:12:24 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: John Garry <john.g.garry@oracle.com>, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, cem@kernel.org,
+	linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH v8 05/15] xfs: ignore HW which cannot atomic write a
+ single block
+Message-ID: <20250423151224.GC25675@frogsfrogsfrogs>
+References: <20250422122739.2230121-1-john.g.garry@oracle.com>
+ <20250422122739.2230121-6-john.g.garry@oracle.com>
+ <20250423003823.GW25675@frogsfrogsfrogs>
+ <f467a921-e7dd-4f5b-ac9f-c6e8c043143c@oracle.com>
+ <20250423081055.GA28307@lst.de>
+ <f27ea8f7-700a-4fb1-b9cd-a0cba04c9e47@oracle.com>
+ <20250423083317.GB30432@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423092405.919195-1-ming.lei@redhat.com> <20250423092405.919195-3-ming.lei@redhat.com>
-In-Reply-To: <20250423092405.919195-3-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 23 Apr 2025 08:08:17 -0700
-X-Gm-Features: ATxdqUHleI5AiWqfs362jtTdn9Dn7hoSqC67blzKfFqpqucBidXyjDUIwpOOEiY
-Message-ID: <CADUfDZp4zMWBjGGsVXSXqvP2aoo2O1-SXCeyzfVj==FfKmAtcg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ublk: fix race between io_uring_cmd_complete_in_task
- and ublk_cancel_cmd
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Guy Eisenberg <geisenberg@nvidia.com>, 
-	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>, Omri Levi <omril@nvidia.com>, 
-	Ofer Oshri <ofer@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423083317.GB30432@lst.de>
 
-On Wed, Apr 23, 2025 at 2:24=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> ublk_cancel_cmd() calls io_uring_cmd_done() to complete uring_cmd, but
-> we may have scheduled task work via io_uring_cmd_complete_in_task() for
-> dispatching request, then kernel crash can be triggered.
->
-> Fix it by not trying to canceling the command if ublk block request is
-> coming to this slot.
->
-> Reported-by: Jared Holzman <jholzman@nvidia.com>
-> Closes: https://lore.kernel.org/linux-block/d2179120-171b-47ba-b664-23242=
-981ef19@nvidia.com/
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c | 37 +++++++++++++++++++++++++++++++------
->  1 file changed, 31 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c4d4be4f6fbd..fbfb5b815c8d 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1334,6 +1334,12 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw=
-_ctx *hctx,
->         if (res !=3D BLK_STS_OK)
->                 return res;
->
-> +       /*
-> +        * Order writing to rq->state in blk_mq_start_request() and
-> +        * reading ubq->canceling, see comment in ublk_cancel_command()
-> +        * wrt. the pair barrier.
-> +        */
-> +       smp_mb();
+On Wed, Apr 23, 2025 at 10:33:17AM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 23, 2025 at 09:28:14AM +0100, John Garry wrote:
+> >> But maybe we should just delay setting the atomic values until later so
+> >> that it can be done in a single pass?  E.g. into xfs_setsize_buftarg
+> >> which then should probably be rename to something like
+> >> xfs_buftarg_setup.
+> >>
+> >
+> > How about just do away with btp->bt_bdev_awu_{min, max} struct members, and 
+> > call bdev_atomic_write_unit_max(mp->m_ddev_targp->bt_bdev) [and same for 
+> > RT] to later to set the mp awu max values at mountfs time? I think that 
+> > would work..
+> 
+> Sounds reasonable.
 
-Adding an mfence to every ublk I/O would be really unfortunate. Memory
-barriers are very expensive in a system with a lot of CPUs. Why can't
-we rely on blk_mq_quiesce_queue() to prevent new requests from being
-queued? Is the bug that ublk_uring_cmd_cancel_fn() alls
-ublk_start_cancel() (which calls blk_mq_quiesce_queue()), but
-ublk_cancel_dev() does not?
+I disagree, leaving the hardware awu_min/max in the buftarg makes more
+sense to me because the buftarg is our abstraction for a block device,
+and these fields describe the atomic write units that we can use with
+that block device.
 
-Best,
-Caleb
+IOWs, I don't like dumping even more into struct xfs_mount.  xfs_group
+has an awu_max for the software fallback, xfs_buftarg has an awu_min/max
+for hardware, and even this V8 has yet a third pair of awu_min/max in
+xfs_mount which I think is just the buftarg version but possibly
+truncated.  I find those last two pairs confusing.
+
+--D
