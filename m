@@ -1,119 +1,122 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5677F21FF5E
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEF126B0A9
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745404681; cv=none; b=pmTGOo0CYW1oV/g8AzH8jqX9C+hc5SNOod+819Qyx5rW4LwcHUUh6Vzobe49OFxsdWUZxT4V+vMoQ73KhtpkG6ugssQliQF5zXLhljGQvr8aELM7PEc+oQ7TfAVYNgQZX4jyIstcdgf87Mro7W90qASJpoYpamab9nV4UUupaR8=
+	t=1745405524; cv=none; b=F0cGenLB5Qltyy31f/bU+2TsqsqbI9h1w9yApRtDBXIPsJJ9pm0u/xZXnZgOiiA0WmFVp0FZUC0At4uRR+eWcQdbDrLJdKEAfVgZZDWyb8l42oPxZ7nwzxEPLxTlGjOkkjdZYN8+ztyU5hk2f/YLMyABPlevVwW9ydWZPSSX7xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745404681; c=relaxed/simple;
-	bh=H4yB2VqdHW5Mx37gnKyyS6SHLyLBKUckwyP7mf95yYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D7MOElLGwU+2HoocaVz6E7NG3GnGd2uZtydKboN0qbltb4lN/j6QhbaYTOfYW9waUUtbeHAJk94HtPWmJCW5gV0OPiCJug34CYpSjTSjETYxuA5fZtu6x8xdKNfyjN3qIyS/gL1GvTFzVXGb9P/dt4Gj9l/McAF6xQ6xNLTR4Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NZlBfTS0; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745405524; c=relaxed/simple;
+	bh=2F36LOlrnYgPW+20PAv1FMuxvBNKqoBjcgw/bp9pnBw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HeQOo03xYezl+0uQznQu3mHjxLTUC+2jiHE+ryLTIjDp7hRzXIfeGFp52w4bAJGI7QzEDCr0tErpb8jDRbkmQhx0D2PJIF+OoDeZSg+3OAa02hg4lF1E81xfHPF9QkA2Dj8H5qD/eS+4e1WNUvqaiOoWztvp8guQuei1QR0Cr+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DntL0SC+; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NZlBfTS0"
-Date: Wed, 23 Apr 2025 06:37:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745404666;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h1X705brQVpSptGLrhJRMpaEPjNIn6bUE+IhmWlVE2o=;
-	b=NZlBfTS0IpoVJRDdMvVxxcB/Lpwrab9NO5G3uKZDmuyi8mzIO86I/PUXd88XgzTuZn49ST
-	gLriQ//WfXAV/lq3WsPhVF0GKJr+Bfeylib4vQvVxRXxFayAYBivCT7jC8OAWmtGBUIn4/
-	DcUPlLzvzWL7UaMq94B3xWZYQRWCxS4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>, 
-	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>, 
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, Carlos Maiolino <cem@kernel.org>, 
-	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
-	Johannes Thumshirn <jth@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
-	linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: add more bio helper
-Message-ID: <sl4oibdxpjygqfpy6llq237zuckz7ym4fmzcfvxn2raofr37a5@hvevbcgm5trn>
-References: <20250422142628.1553523-1-hch@lst.de>
- <jetduw7zshrmp4gl7zfpwqjweycwesxiod7xvtnxqwqekgtvdf@idwnvfzvhgik>
- <20250423093621.GA2578@lst.de>
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DntL0SC+"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ac2c663a3daso1017364366b.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 03:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1745405520; x=1746010320; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zFO2mmTugaYerF/bVgaeCak/CfVfIQBIS6clL7bKh/Y=;
+        b=DntL0SC+b7F3f9EXZqzvb0ezIHqQCid+R8PWFcfxbpFWXyTIdX1UWTLZ/9BGvYovFj
+         5vyRNLM9OZ94RkMc8XiNYnhy3WoQzYRUWLU88IOW+3A8/teoU/8jMfmUXW2K26kT28Yi
+         YDn++RnlWxuszJ+4nYso5EIvG6ugMCZIcNIE0qbXjKascooFfP4mT3BSfNPUNhNUdcld
+         Ou54gs9kFQwLAJymJXVOckp0aRamyUDvCwcjlAeV3oyYFIZ01iUGR3IgbNjndc6rpy4/
+         SqsVU3olACa+bTHmo8ONbk2nmev/E7vzeP7Ue290xvPW5zEHR5CbsUDnKqZFpRD2SGSo
+         sh0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745405520; x=1746010320;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zFO2mmTugaYerF/bVgaeCak/CfVfIQBIS6clL7bKh/Y=;
+        b=eNN6mSttdO4i4IiSJ0TLp3ZaOJqpGDibjg/hUslgy+sXe+B18tTH5rEc2NHhjo6+Hd
+         X5QBl+KJwdbjTwr+ZDEMcjETIYFYUb/IU6hl4gRivJMQaa8sKlRHPb3rq9M9dbM1sLQw
+         5kx6zE3xUcFm+qMGIWOq9QUaVkqvb7m2nbkCOyS/a1JCbSUjv5GBX28pQdjF9pwWQDjd
+         M8dkC+9PJfdd5BqVaCeSrc3hL+ze5w1JSg8SG32fV1/+O2iquOyvYv1OrSBDeU7zck6I
+         mo6n6eb1e3ZIrHERN4hrWD0UGe92MumzzXHnrj/nswjZugMFSSUShbWZq7Sn7ktlBzg2
+         3ulQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBNwGyG5W/EpHtAONrgQHhY2NW4P3INQ07D3D+8y4ZLASw72O/y3/XUhnT5tlnR1hwyVOzpO65sqUNJQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyqv4aCkgBicuX8JLQv9bneVjKQ5VIbsyWBqpSWr8MqsxNnlAoZ
+	hVkgdPmqNLFRWz/UI210/WGSL+ovLyI9qs86wR/tPGvvVlw4kKlB0BvWcA4Ftb/GDP/fAN+nHKs
+	dQPynbnntHV/t6qq+fyiX7qBDQW2/nO/L19o9pw==
+X-Gm-Gg: ASbGnctyldybZ8M3S1Orx2OQmt4wHhlu/NFiLLnIltdtlCc68YVh1fPeB7CZLhuuSh7
+	Io8bhT9zhrLC3J50OONY27kH5lAaBD5jMPTMvVd2DIUgikEKmIPHQb/82dpISRhr329j0vqZfIC
+	5fHYAGMEmytbOBuRNIEhq62aicHE1+G5GL+QPANQ==
+X-Google-Smtp-Source: AGHT+IE/6pYUsMYMqhI2sEYVYX9i4m5CojtOxAROai1tsh+YLxDn4eQAJh180vtKXL3rYE+ymaXy85dh6zaYjIY7VKo=
+X-Received: by 2002:a17:907:7e84:b0:ac7:6222:4869 with SMTP id
+ a640c23a62f3a-acb74dbf2demr1572534466b.37.1745405520636; Wed, 23 Apr 2025
+ 03:52:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423093621.GA2578@lst.de>
-X-Migadu-Flow: FLOW_OUT
+References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
+ <dd2db843-843f-db15-c54f-f2c44548dee3@huaweicloud.com>
+In-Reply-To: <dd2db843-843f-db15-c54f-f2c44548dee3@huaweicloud.com>
+From: Matt Fleming <mfleming@cloudflare.com>
+Date: Wed, 23 Apr 2025 11:51:49 +0100
+X-Gm-Features: ATxdqUHvdxhkEJsQjh9v6htOzoAzXGkLqhK6uEUE3jiVW8bPlhzCFKk6UwnvJNs
+Message-ID: <CAGis_TWtWMK93nVBa_D_Y2D3Su8x_dDNwNw9h=v=8zoaHuAXBA@mail.gmail.com>
+Subject: Re: 10x I/O await times in 6.12
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Apr 23, 2025 at 11:36:21AM +0200, Christoph Hellwig wrote:
-> On Tue, Apr 22, 2025 at 10:47:03AM -0400, Kent Overstreet wrote:
-> > On Tue, Apr 22, 2025 at 04:26:01PM +0200, Christoph Hellwig wrote:
-> > > Hi all,
-> > > 
-> > > this series adds more block layer helpers to remove boilerplate code when
-> > > adding memory to a bio or to even do the entire synchronous I/O.
-> > > 
-> > > The main aim is to avoid having to convert to a struct page in the caller
-> > > when adding kernel direct mapping or vmalloc memory.
-> > 
-> > have you seen (bch,bch2)_bio_map?
-> 
-> Now I have.
-> 
-> > 
-> > it's a nicer interface than your bio_add_vmalloc(), and also handles the
-> > if (is_vmalloc_addr())
-> 
-> Can you explain how it's nicer?
-> 
-> For use with non-vmalloc memory it does a lot of extra work
-> and generates less optimal bios using more vecs than required, but
-> maybe that wasn't the point?
-> 
-> For vmalloc it might also build suboptimal bios when using large vmalloc
-> mappings due to the lack of merging, but I don't think anyone does I/O to
-> those yet.
-> 
-> It lacks a API description and it or the callers miss handling for VIVT
-> caches, maybe because of that.
-> 
-> Besides optimizing the direct map case that always needs just one vec
-> that is also one of the reasons why I want the callers to know about
-> vmalloc vs non-vmalloc memory.
+On Mon, 21 Apr 2025 at 13:21, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>
+> Can you drop this expensive bpftrace script which might affect IO
+> performance, and replace __submit_bio directly to __blk_flush_plug? If
+> nsecs - plug->cur_ktime is still milliseconds, can you check if the
+> following patch can fix your problem?
 
-Sure, that code predates multipage bvecs - the interface is what I was
-referring to.
+Yep, the below patch fixes the regression and restores I/O wait times
+that are comparable to 6.6. Thanks!
 
-> It also don't support bio chaining or error handling and requires a
-> single bio that is guaranteed to fit the required number of vectors.
-
-Why would bio chaining ever be required? The caller allocates both the
-buf and the bio, I've never seen an instance where you'd want that; just
-allocate a bio with the correct number of vecs, which your
-bio_vmalloc_max_vecs() helps with.
-
-> OTOH for callers where that applies it would be nice to have a
-> helper that loops over bio_add_vmalloc.  I actually had one initially,
-> but given that I only found two obvious users I dropped it for now.
-> If we get more we can add one.
-
-The "abstract over vmalloc and normal physically contigious allocations"
-bit that bch2_bio_map() does is the important part.
-
-It's not uncommon to prefer physically contiguous allocations but have a
-vmalloc fallback; bcachefs does, and  xfs does with a clever "try the
-big allocation if it's cheap, fall back to vmalloc to avoid waiting on
-compaction" that I might steal.
-
-is_vmalloc_addr() is also cheap, it's just a pointer comparison (and it
-really should be changed to a static inline).
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ae8494d88897..37197502147e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1095,7 +1095,9 @@ static inline void blk_account_io_start(struct
+> request *req)
+>                  return;
+>
+>          req->rq_flags |= RQF_IO_STAT;
+> -       req->start_time_ns = blk_time_get_ns();
+> +
+> +       if (!current->plug)
+> +               req->start_time_ns = blk_time_get_ns();
+>
+>          /*
+>           * All non-passthrough requests are created from a bio with one
+> @@ -2874,6 +2876,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug,
+> bool from_schedule)
+>   {
+>          struct request *rq;
+>          unsigned int depth;
+> +       u64 now;
+>
+>          /*
+>           * We may have been called recursively midway through handling
+> @@ -2887,6 +2890,10 @@ void blk_mq_flush_plug_list(struct blk_plug
+> *plug, bool from_schedule)
+>          depth = plug->rq_count;
+>          plug->rq_count = 0;
+>
+> +       now = ktime_get_ns();
+> +       rq_list_for_each(&plug->mq_list, rq)
+> +               rq->start_time_ns = now;
+> +
+>          if (!plug->multiple_queues && !plug->has_elevator &&
+> !from_schedule) {
+>                  struct request_queue *q;
+>
