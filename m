@@ -1,72 +1,73 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD98E289360
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D7C28B50A
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 17:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428541; cv=none; b=hyzu452K+nol0zOg1+xjaw8S5MVMQLKJ/YHokZKV5FrgcOXuu2CLQwE/wun6TMtXb+3qoTylyDCl0lo+QLBPpQW6Kupt0nJ9+GUSCMd4G/Fz54dN1eSA3687uvXo6U7CthH2JnxLmCX3l+Lu+onzejglww6RPJSD6reSm+n91gw=
+	t=1745428557; cv=none; b=LAXgtHZbCdBv3000PfYUJ5F22jrGn5Towzdj3AJenL2ddm66GRczNbWgTvGz/jhkoeAAycNMD4zk4roUaak+8TRWKtPRtEVJRL2HiPJZoVS/Dqr1VKWBvWPAaj4M2cYuDhji6k1OY5VBJLk/PEGMw3JVL29+cM+eylccwD7pBpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428541; c=relaxed/simple;
-	bh=ZSWmIXnoHeqHpg22is4DCb+FQUxyjWQhdchI0xl2uAo=;
+	s=arc-20240116; t=1745428557; c=relaxed/simple;
+	bh=vMXucndq2S6GHUftC4QAjKIvCRBxtQ3mQadyEEn05iE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tqf00ac7tqg6A1JztbHOCyp8DYkyFcIxGe0Bpb5+jVNEj6PGih1SE85TBOR++lRxYTAGowYWa3EYano2c+VpYs2qjSGKTx7P9qGvEeCXqZs2Hda6AXrwbmxvNQknBPbf/ryXp7bAs4ttwpeLtCMDc599Qv3/BB2pUR3beMascLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=f3RJOF+9; arc=none smtp.client-ip=209.85.222.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=on30cp1LYW3RdJXvGBsQTHiVuxJLM1z6yzIHGVA4tkBjMcaNQSe0BhvW49oDaDAH/COBJHD2oRaYGCekLTxtavjOhgJZxLjRmZJKcpNSlfU8XvCRWF1Psf0LBO4cp97eUY5MFqTKXUWj9LCNkMNhYoXoC6MQcpqcincKjf/TOm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=igc8GuoA; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="f3RJOF+9"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-86cce5dac90so71140241.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:15:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="igc8GuoA"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c560c55bc1so5671385a.1
+        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745428539; x=1746033339; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1745428555; x=1746033355; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sAA3ahIS+2Nb+9ARKVTXCSjk2uwR/TOFzjA5DEQnqxg=;
-        b=f3RJOF+9I5aUeLfKwhY41cyNNsV/7gzE8mnt0B7y7vbeRVxS8lsyPkRNroBYBI3tAJ
-         LoOcUnWESA/cjHCPlWjRHA3M+53oDTrejya0NpMfeL6ljH+lfqQ/w5WsXx5ptqIdwRDv
-         nsp4EdSeE1qB0xl7OhzzYJKM36aE0m+MI2XLpfk6xpvXrCfNBJoewKHE7+njIVYSVVE9
-         uh237S2zCPLxHmND8hCSoBynFpTclSrt0aPYz/VfLhJATgS9agmNsggyOtAJAI5FOQCt
-         Odf2Xxn7vp+XAbxZin8Yl6xswoHmQ5A7Db9GS23ti5naaSYjMpciujFTq8n0nXWju1+8
-         8EaA==
+        bh=K5HpTnu16aeUYpErbp5yUwht+j3Mgf+r7FFUrUseQ0w=;
+        b=igc8GuoAzkxq23x3zTwtP5oibqkeQg53VG0Iq7gad/MlX8rlFoaVwdhQ0apeqpKH2h
+         U63IQo5nrNVr/aYRLNtMYNdCv4gydkVivRxSKp9R7pa6wsgSApmCtQMmO9kL+FNLuCYl
+         X/+CooWu7xCeo0ATpiDWk+fOrcm0n3wgS7PLKA/bTH1rXQkbm6fbMji0uJQNUxm58yoB
+         Rqu6j7oRTifpHPPn+9M3hN6fwsO7KeVdJS2pUvi/LGbn6oETIDds/1hWRCeug9xrcImW
+         WzY6PYLDgjbbO+z5bnOFm9GEuBEpX2dZ4T7e+CqVXT1fnIfwTIv3FZayq4iQBioe8nnf
+         CfWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745428539; x=1746033339;
+        d=1e100.net; s=20230601; t=1745428555; x=1746033355;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sAA3ahIS+2Nb+9ARKVTXCSjk2uwR/TOFzjA5DEQnqxg=;
-        b=r1GrBgVnyWIwYT4fl8luUJoHyDF561Uw7mPgbZSDYdDbVvZt5oc55Gn8e8b4Xe45YC
-         67IMKGqRLo34V0/Iv4/vO68PQpM4786LFxex1Bx5+QPbMCaondq8OXM6JMBrexKGmhy9
-         KTHD4hquzNYBB8Si+BJkXVIDNxu/958gjyB3jN/0Kat671pyKoptTiCu8BaiNOYBAVvx
-         5ehN+UJPXxJTB5cBwOGuCQ20ciKkm987j1p3uSz34H/v4vYHGXT4erPQr9zN2cBlQ+fV
-         60RwswbUcGwM89Aovo4WkCpFUxPy4vtFSKsrF4HdU6yOCMxsYMpr42sfZ8B+C2AT19Wx
-         lIMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUev5CjSQ7/31+ZEqSPBGZvu3y46RKmmrqV4pumXXDQwL2Mgv+KS/VZcaSNqJYmyET4YjO3i5Tk3HtksQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqojO5/udXhzD+5/jiV9qcORV+po4YItpm07reJCECEgvk/b99
-	wAK4IOzR8+ucFSdtlRtWRZLUu+8GQT9hwQg/XAsFnsXrlN7flMV1OCn37yueNig=
-X-Gm-Gg: ASbGnctyOx+lMbYeY/Pl3CFnEVVXPGAbFhX+A3taJLsjEDGnlnm91BP49GZ9Xt+OICe
-	jyaOnTykLOGvYX8+2Mllze0cjDcWt4aQFIxS8mpECYI9fJ/+BGfTjFdUDOEQi2rQ3XPWtXc56O8
-	hYKUNI/9+KHlT+hanTeW+K9A/hY3TbWDb2Hv9qTpzomdbUF1Mkr/AteJ+nBsRzJeqBWZ4s4Z+v2
-	KvLi9K35/jlbGp76hZtbjgfovWFYYxSo3//kAXBSbGTK7CY1HTce73buM6TxkQgzZTGgc8/9agx
-	mmIzFDvF30zmBk/iKc/PX5v0OC3tPNmRlP3IgoXKDaZws4l8v9CVMcFJQIHzY/8TIs85Sdp1qLS
-	w/MYZRw835uWUqT7gyjRXb9/ihGfkNg==
-X-Google-Smtp-Source: AGHT+IG91ka296h4XrJ4QPDo73jdYlZoOj1Zkc9PInMILwbVuqXEZMd5w4C/WgEttaatAxBubBvu3Q==
-X-Received: by 2002:a05:6122:3c54:b0:529:24f8:dbdd with SMTP id 71dfb90a1353d-529253da601mr17813854e0c.4.1745428538734;
-        Wed, 23 Apr 2025 10:15:38 -0700 (PDT)
+        bh=K5HpTnu16aeUYpErbp5yUwht+j3Mgf+r7FFUrUseQ0w=;
+        b=nVs2mybj6pZATVjEQdH8aWhXSyrKxgJZu5uwWEN9a717FmMfdLhT9sibm+e3YUHPIY
+         mqnFIDkdOIVl6cD/qUV2uydWuCFm49meOeWV1xXpwOoODGNWdk8gpvuT/ije7BvTJ+m5
+         GRnHojTtGS9vniCcAbG90Mcrodi23DIyUn7Cb7UItwMVHLOjRNDIWlbAYfsYTcgd65DZ
+         oYUsZC4IxAtnrbjdi4r38vvYpz7NyzZBICXZE+u8ICXdUfQqrEP52GahSuZ+y+vyS4EV
+         w7NWMZtsNc38sSQIKF377vpik5ApgnmcyFYXzc9y/1S/3jdYP/K2QQEhWvOaf3eaCD10
+         BqQg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3L0RM+M8kQxjmCWaieEeown/4lxIyGZA8iMhMV0Szt+C3lZKBcKJuZVmd4/kejcfp3SRhZzkPHm7k0Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLlBBzdBPvyCBSyipnT+QmiUwpechGImnw6Nq3fmC7ehjsQfl8
+	N2NY5p5utxoOQfjfAuTgez3sit1CBDNLsoKVZnP+DyR9aWEod5TpXZYC8uAWSFI=
+X-Gm-Gg: ASbGncvt9BeJKN3d1P0XBN3WQhqO0KSn8LTAbTQvg8w0N4B79PPuOVjNbX2ZVs7uUue
+	4Z51I3T6Wd08ZZPO7/Vo7rkEt3sLeOcY5Xqze9hIfYWy4U9UWMoyN+oedM25PNBgmAv1NKWoy85
+	Vd/Mf0LAfuvYbLqyTftgM4dETpQ1N4cdopM52aV92/lOJY5IFN/gDgSNVHq89ovotq51Ukz/g6c
+	8TEmSK1WACEXJ8fu0lTA1dcAAG3oIZssnvds5J/JcVA+p2Dxt5P0lc6dwyxv2QBWTaBgnbgjwDt
+	QeYGUCNqzbHGPeW8XMNjJAzmfQkCMMa/YszZnaOl/XBTgkPeawHP12UEdpPFa9qzsLjeV0h2GZI
+	8T4CTn8ZdXr8+PvvMftI=
+X-Google-Smtp-Source: AGHT+IHusnUQ6QwwVsDnvg+0qYOM6lcQLPltCEX7WmRgNJP3vwJodfip7PxZnn5pgy7BG5cQ6pnE/Q==
+X-Received: by 2002:a05:620a:4456:b0:7c7:a5e1:f204 with SMTP id af79cd13be357-7c955e14768mr54555485a.56.1745428554903;
+        Wed, 23 Apr 2025 10:15:54 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a74d3a2d0sm79186e0c.40.2025.04.23.10.15.38
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925b4e93asm705867885a.70.2025.04.23.10.15.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 10:15:38 -0700 (PDT)
+        Wed, 23 Apr 2025 10:15:54 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1u7dhB-00000007LQW-2UhV;
-	Wed, 23 Apr 2025 14:15:37 -0300
-Date: Wed, 23 Apr 2025 14:15:37 -0300
+	id 1u7dhR-00000007LQy-3kud;
+	Wed, 23 Apr 2025 14:15:53 -0300
+Date: Wed, 23 Apr 2025 14:15:53 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
 	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
 	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
 	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
@@ -88,13 +89,11 @@ Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Matthew Wilcox <willy@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v9 03/24] iommu: generalize the batched sync after map
- interface
-Message-ID: <20250423171537.GJ1213339@ziepe.ca>
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 04/24] iommu: add kernel-doc for iommu_unmap_fast
+Message-ID: <20250423171553.GK1213339@ziepe.ca>
 References: <cover.1745394536.git.leon@kernel.org>
- <2ce6a74ddf5e13a7fdb731984aa781a15f17749d.1745394536.git.leon@kernel.org>
+ <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -103,43 +102,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2ce6a74ddf5e13a7fdb731984aa781a15f17749d.1745394536.git.leon@kernel.org>
+In-Reply-To: <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
 
-On Wed, Apr 23, 2025 at 11:12:54AM +0300, Leon Romanovsky wrote:
-> From: Christoph Hellwig <hch@lst.de>
+On Wed, Apr 23, 2025 at 11:12:55AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> For the upcoming IOVA-based DMA API we want to use the interface batch the
-> sync after mapping multiple entries from dma-iommu without having a
-> scatterlist.
-
-Grammer:
-
- For the upcoming IOVA-based DMA API we want to batch the
- ops->iotlb_sync_map() call after mapping multiple IOVAs from
- dma-iommu without having a scatterlist. Improve the API.
-
- Add a wrapper for the map_sync as iommu_sync_map() so that callers don't
- need to poke into the methods directly.
-
- Formalize __iommu_map() into iommu_map_nosync() which requires the
- caller to call iommu_sync_map() after all maps are completed.
-
- Refactor the existing sanity checks from all the different layers
- into iommu_map_nosync().
-
->  drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
->  include/linux/iommu.h |  4 +++
->  2 files changed, 33 insertions(+), 36 deletions(-)
+> Add kernel-doc section for iommu_unmap_fast to document existing
+> limitation of underlying functions which can't split individual ranges.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Will Deacon <will@kernel.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Tested-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/iommu/iommu.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-> +	/* Discourage passing strange GFP flags */
-> +	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
-> +				__GFP_HIGHMEM)))
-> +		return -EINVAL;
-
-There is some kind of overlap with the new iommu_alloc_pages_node()
-here that does a similar check, nothing that can be addressed in this
-series but maybe a TBD for later..
 
 Jason
