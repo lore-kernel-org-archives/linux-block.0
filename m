@@ -1,102 +1,125 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B099522CBD8
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 20:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C54686331;
+	Wed, 23 Apr 2025 20:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745438419; cv=none; b=F75WkR4gl9nHzsAQRWPVrviAj6UZb8A4CDkN7lSw92gwJySvHUPA/Q823KRnXzx+zN/UGZxbBz+AJ79POFRf7lfcxtVQcqfO7JpKisPwXOA5FBOeN+5eyHNM/C2gGcG9uvguVS8RW7g2yIy76fmn26BkzdxrO4GmvkuqTxV8qTM=
+	t=1745440230; cv=none; b=JQhMdnkTDNFFGwPdy2oAt96tQ8mWM8NNROKpulKfTbE+i7oQAvpwpPEiqQaXZLGvbC5ly1VbVyc+HCbRXNN5yseMIjh0Omrb+aEZnU2d+gesjwjNz8mcCjPKMbVmahuDgRQOixArHpCqe4+oeFezc6fYD36o+82Sd9m32zKEBXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745438419; c=relaxed/simple;
-	bh=4bbi7NDy07wMJzw64qGfm2Jbjv847+MXgGQv5hf6eH4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=s1LGWRvjJdgAJFrjqZMahvSpb+texmyIHCFVbRr4K9hPqf7tFHWiB6Jwzj+GMoOTWSMj7wOovPH8Z6cE4WATwdKSXt6isI5HgXDOwCXvZ7yK/DIoKMO1y6oylVpyUu7Iadd6YnnRsBuG0qbyNeTCJYl+XjSLia1I/EOGJKzoH3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uLBqstVa; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1745440230; c=relaxed/simple;
+	bh=zfnpkNpzO3aNFO+OP3lzklECKkdME0YLtwNkLDKthmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kDzncxWFQOGzKuQjNJYn6yQVtIFWuvR4y890u3MMF7+fiVoKD3WyR6odx4QLbpZ0uMIlcw2Qn3SyZzgOtFazRvpBSpYrQe7o2PnS5nKrWMc1IvrKawEk0YDG184vtYIVT86zrxJdj9nuhxgyB+vdDBPendJEs3lxU4vgi6cKocU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGUzH74f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uLBqstVa"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-85de3e8d0adso7214039f.1
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 13:00:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745438417; x=1746043217; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1KIIo1bqEG5SvgHN69g3RJUY47BgOVsVAm290Lkm7Hc=;
-        b=uLBqstVan6ocfnh/nXT3zrNfcMKc2zR8OcpVK83HEpiep9txyeSt7MHJMoi0KRhHgj
-         Gzd5QDjeV+SBC4aUZeKy9nQn2JXu3SocygmQHnot8wIgvxLSOlP7LrGDHL6fBFiG5L8g
-         Aa90jtRl3EHlreb+sD6pLh4/mgcIg3PHYpCXgmio5tW9Xa4Sq+9ONMA7Phje1b+AIIKm
-         zRczVUQleO2DdUgfaiIcbR3MOihc3wGAY8T9mTfYk1pHXPenRS/nZZWkS+DTr3OhBPhH
-         Wtc5etJBaLkLzLgPwp5A4gPARyJizp9vSbn6PbhGoY4YBkmfHtz0wMERNXGCGGi2iYhK
-         amig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745438417; x=1746043217;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1KIIo1bqEG5SvgHN69g3RJUY47BgOVsVAm290Lkm7Hc=;
-        b=wrzkxcVXySiiewdMMep8IVRjecQIDhJJfr/FQvKJ7d1o0iTpgMvpNHJNlC4Jpcg7l7
-         1abWCmptzR3+2/UsQBcK0rCAf6FV2ejpV0Ltn1E0gYRAYvCGfzlTL0bNvO0ujVjOmekf
-         FLmR9d83vfSwWezZ8pHGr+g5Mp9zVvhb0HNO41rt9eT/IyQluDXDDvppf4EQG5Y89kSG
-         U+TxnlFDk/4ECTjDpMutNT1anYA7sX6obLWhm3i8IcEtrhG15JCMXCjhqRFKJRa1CL79
-         Dyzd1BCS8CFXH7yYfDleLO7+b1rKFbi0jvD6OI85Kk2PmkN8JRrCVfFSU44q2pG50Gue
-         KITg==
-X-Gm-Message-State: AOJu0YwRoJrbQ12MhcQwzb8kDvW1L2jtEIXMrZBAb5++dOlI+wNeYQX0
-	bcANdbVSnHn6TWhQ5F3wSjTkFgFI5c5uidO6Zr+t7S50G9va8Hkoj/995hYxY2w=
-X-Gm-Gg: ASbGnct2r3NfAgLz1l+SzNtmf7T4A5SXl9NQFjPrjBV+CRtxKPoQsr7SnW4wdwrGnly
-	o3eFGyqPOQQrRjhvh3wDE8l5wy0vQgPgvfiyE4cOhf6PmnGfkWojnasTyv773WQ/MyK/IOTev9e
-	w8UIrIzrxAMViPCndvSdmiZq/zvb3r/+WYnwUPAdx7IP3ALo4t6LE4ZQOIsURshrlduOVQack0U
-	epkcE7PiXpPxbeXm9JHNcoBp/aDv0xTzS5GHOV2URwr3qEJOx4PmqIEgVDQnWzLunAz2HOGMxJ9
-	giUC/pMXdGOmWC2ScOV8cNZXIVDGz2QUGrxoYoYyxw==
-X-Google-Smtp-Source: AGHT+IF+WbABm2eh4a1u03UF9HXXMuRB+RXlNNiix90Qo818dM8h3AVHlLwzvjtG8Qm98lqCR4uyEg==
-X-Received: by 2002:a05:6602:485:b0:85b:476e:ede2 with SMTP id ca18e2360f4ac-8644fa6e62fmr30229539f.13.1745438416711;
-        Wed, 23 Apr 2025 13:00:16 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f6a37cbb91sm2953925173.18.2025.04.23.13.00.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 13:00:16 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>
-In-Reply-To: <20250421235947.715272-1-ming.lei@redhat.com>
-References: <20250421235947.715272-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 6.15 0/2] selftests: ublk: two fixes
-Message-Id: <174543841586.540172.7321390733661548928.b4-ty@kernel.dk>
-Date: Wed, 23 Apr 2025 14:00:15 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGUzH74f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D447C4CEE2;
+	Wed, 23 Apr 2025 20:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745440229;
+	bh=zfnpkNpzO3aNFO+OP3lzklECKkdME0YLtwNkLDKthmg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TGUzH74f/LbW6NCs62Zff+JfuLGq6keOuX4IvbzDuB7DNJNOg0P2wi/F/C8ehdk/k
+	 ko8avwyRSiYSNEzgOsF4orsz8i9yDCmLrQxklSvOxJvkHTtlgat36TbLOwMPEdgKks
+	 KqHhJjwCXz5fTZQzE9VhKvnXn4xGy5U/r+Dj3pIlWPS9FsefEAqf4rDvIG4/soxd3m
+	 QrGvXKFNUMWec92qJbCiTboJ5duU4pSb/Wu0PuCu6Hh2mhTKjgtQG2gC3sbfUSoxRP
+	 w2Ye2tW/1DgeFAXPwVlFyc7gyNmbc/Ij6EHFU/3HxoeSkLq0+6GWFKN4+/OrtRCoKf
+	 y27BZigv4ldQA==
+Date: Wed, 23 Apr 2025 13:30:27 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: dave@stgolabs.net, brauner@kernel.org, tytso@mit.edu,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
+	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
+	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
+	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
+ migration
+Message-ID: <aAlN4-pMHoc-PZ1G@bombadil.infradead.org>
+References: <20250410014945.2140781-1-mcgrof@kernel.org>
+ <20250410014945.2140781-2-mcgrof@kernel.org>
+ <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
+ <Z_6Gwl6nowYnsO3w@bombadil.infradead.org>
+ <mxmnbr6gni2lupljf7pzkhs6f3hynr2lq2nshbgcmzg77jduwk@wn76alaoxjts>
+ <Z__hthNd2nj9QjrM@bombadil.infradead.org>
+ <jwciumjkfwwjeoklsi6ubcspcjswkz5s5gtttzpjqft6dtb7sp@c4ae6y5pix5w>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <jwciumjkfwwjeoklsi6ubcspcjswkz5s5gtttzpjqft6dtb7sp@c4ae6y5pix5w>
 
-
-On Tue, 22 Apr 2025 07:59:40 +0800, Ming Lei wrote:
-> The 1st patch fixes recover test & ublk utility, and the 2nd patch removes
-> one useless variable from 'struct dev_ctx', both are introduced recently.
+On Wed, Apr 23, 2025 at 07:09:28PM +0200, Jan Kara wrote:
+> On Wed 16-04-25 09:58:30, Luis Chamberlain wrote:
+> > On Tue, Apr 15, 2025 at 06:28:55PM +0200, Jan Kara wrote:
+> > > > So I tried:
+> > > > 
+> > > > root@e1-ext4-2k /var/lib/xfstests # fsck /dev/loop5 -y 2>&1 > log
+> > > > e2fsck 1.47.2 (1-Jan-2025)
+> > > > root@e1-ext4-2k /var/lib/xfstests # wc -l log
+> > > > 16411 log
+> > > 
+> > > Can you share the log please?
+> > 
+> > Sure, here you go:
+> > 
+> > https://github.com/linux-kdevops/20250416-ext4-jbd2-bh-migrate-corruption
+> > 
+> > The last trace-0004.txt is a fresh one with Davidlohr's patches
+> > applied. It has trace-0004-fsck.txt.
 > 
-> Thanks,
+> Thanks for the data! I was staring at them for some time and at this point
+> I'm leaning towards a conclusion that this is actually not a case of
+> metadata corruption but rather a bug in ext4 transaction credit computation
+> that is completely independent of page migration.
 > 
-> Ming Lei (2):
->   selftests: ublk: fix recover test
->   selftests: ublk: remove useless 'delay_us' from 'struct dev_ctx'
+> Based on the e2fsck log you've provided the only damage in the filesystem
+> is from the aborted transaction handle in the middle of extent tree growth.
+> So nothing points to a lost metadata write or anything like that. And the
+> credit reservation for page writeback is indeed somewhat racy - we reserve
+> number of transaction credits based on current tree depth. However by the
+> time we get to ext4_ext_map_blocks() another process could have modified
+> the extent tree so we may need to modify more blocks than we originally
+> expected and reserved credits for.
 > 
-> [...]
+> Can you give attached patch a try please?
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
 
-Applied, thanks!
+> From 4c53fb9f4b9b3eb4a579f69b7adcb6524d55629c Mon Sep 17 00:00:00 2001
+> From: Jan Kara <jack@suse.cz>
+> Date: Wed, 23 Apr 2025 18:10:54 +0200
+> Subject: [PATCH] ext4: Fix calculation of credits for extent tree modification
+> 
+> Luis and David are reporting that after running generic/750 test for 90+
+> hours on 2k ext4 filesystem, they are able to trigger a warning in
+> jbd2_journal_dirty_metadata() complaining that there are not enough
+> credits in the running transaction started in ext4_do_writepages().
+> 
+> Indeed the code in ext4_do_writepages() is racy and the extent tree can
+> change between the time we compute credits necessary for extent tree
+> computation and the time we actually modify the extent tree. Thus it may
+> happen that the number of credits actually needed is higher. Modify
+> ext4_ext_index_trans_blocks() to count with the worst case of maximum
+> tree depth.
+> 
+> Link: https://lore.kernel.org/all/20250415013641.f2ppw6wov4kn4wq2@offworld
+> Reported-by: Davidlohr Bueso <dave@stgolabs.net>
+> Reported-by: Luis Chamberlain <mcgrof@kernel.org>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-[1/2] selftests: ublk: fix recover test
-      commit: 5533bc70aedc7c9872841ac8649344f8cbc6bc4c
-[2/2] selftests: ublk: remove useless 'delay_us' from 'struct dev_ctx'
-      commit: 8f503637898313c048bf21e386e09be90e30cc31
+I kicked off tests! Let's see after ~ 90 hours!
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+  Luis
