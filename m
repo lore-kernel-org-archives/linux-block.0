@@ -1,80 +1,119 @@
-Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2616B270569
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5677F21FF5E
+	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 10:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745403110; cv=none; b=JfuSsEUQIzZVaa4WM61VyG5JJSUVZ6H23mWDg+Gm8mBq9f3vjUYJeZqDCtjS+uMNeU97L46mCCbWnHTSdHqHhhddLHtbZqYGLSjmQr1NwmknTc69H/oQgU1FwxcpPJBWT1Z7YyIx9RyoJv2kpXZmJiF5HCDbJYut5RpQlmcxVg0=
+	t=1745404681; cv=none; b=pmTGOo0CYW1oV/g8AzH8jqX9C+hc5SNOod+819Qyx5rW4LwcHUUh6Vzobe49OFxsdWUZxT4V+vMoQ73KhtpkG6ugssQliQF5zXLhljGQvr8aELM7PEc+oQ7TfAVYNgQZX4jyIstcdgf87Mro7W90qASJpoYpamab9nV4UUupaR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745403110; c=relaxed/simple;
-	bh=0rzldctYCd5gvWIfDIgHHJXEgT7zpTZ6vRCeMpSt1E0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HYu7wcsXOnTd30s5glATmbG/3vYKuZ0MiSubJRVp/MOIEcaUSzV77SporgSuJe8MxHG3OHFnLEi4+lhGV+zIJW1QbkSzzTg+s4gvcQyzdgSAuJ99LKjwa1p2gRsjwTzrruYJrsqz+rLUQL/PX9t5yCvvkbXtJiTVqiaqvmYN0OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
-Received: from tux.applied-asynchrony.com (p5b07e9b7.dip0.t-ipconnect.de [91.7.233.183])
-	by mail.itouring.de (Postfix) with ESMTPSA id 9ACDA108B;
-	Wed, 23 Apr 2025 12:11:42 +0200 (CEST)
-Received: from [192.168.100.223] (ragnarok.applied-asynchrony.com [192.168.100.223])
-	by tux.applied-asynchrony.com (Postfix) with ESMTP id 3CA50600BE060;
-	Wed, 23 Apr 2025 12:11:42 +0200 (CEST)
-Subject: Re: Block device's sysfs setting getting lost after suspend-resume
- cycle
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block <linux-block@vger.kernel.org>
-References: <32c5ca62-eeef-5fb5-51f5-80dac4effc98@applied-asynchrony.com>
- <aAiKM0-1JJulHLW7@infradead.org>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <cceea022-a5e3-97b3-62ed-7ead174565a3@applied-asynchrony.com>
-Date: Wed, 23 Apr 2025 12:11:42 +0200
+	s=arc-20240116; t=1745404681; c=relaxed/simple;
+	bh=H4yB2VqdHW5Mx37gnKyyS6SHLyLBKUckwyP7mf95yYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D7MOElLGwU+2HoocaVz6E7NG3GnGd2uZtydKboN0qbltb4lN/j6QhbaYTOfYW9waUUtbeHAJk94HtPWmJCW5gV0OPiCJug34CYpSjTSjETYxuA5fZtu6x8xdKNfyjN3qIyS/gL1GvTFzVXGb9P/dt4Gj9l/McAF6xQ6xNLTR4Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NZlBfTS0; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NZlBfTS0"
+Date: Wed, 23 Apr 2025 06:37:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745404666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h1X705brQVpSptGLrhJRMpaEPjNIn6bUE+IhmWlVE2o=;
+	b=NZlBfTS0IpoVJRDdMvVxxcB/Lpwrab9NO5G3uKZDmuyi8mzIO86I/PUXd88XgzTuZn49ST
+	gLriQ//WfXAV/lq3WsPhVF0GKJr+Bfeylib4vQvVxRXxFayAYBivCT7jC8OAWmtGBUIn4/
+	DcUPlLzvzWL7UaMq94B3xWZYQRWCxS4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>, 
+	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, Carlos Maiolino <cem@kernel.org>, 
+	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
+	Johannes Thumshirn <jth@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: add more bio helper
+Message-ID: <sl4oibdxpjygqfpy6llq237zuckz7ym4fmzcfvxn2raofr37a5@hvevbcgm5trn>
+References: <20250422142628.1553523-1-hch@lst.de>
+ <jetduw7zshrmp4gl7zfpwqjweycwesxiod7xvtnxqwqekgtvdf@idwnvfzvhgik>
+ <20250423093621.GA2578@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aAiKM0-1JJulHLW7@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423093621.GA2578@lst.de>
+X-Migadu-Flow: FLOW_OUT
 
-On 2025-04-23 08:35, Christoph Hellwig wrote:
-> Hi Holger,
+On Wed, Apr 23, 2025 at 11:36:21AM +0200, Christoph Hellwig wrote:
+> On Tue, Apr 22, 2025 at 10:47:03AM -0400, Kent Overstreet wrote:
+> > On Tue, Apr 22, 2025 at 04:26:01PM +0200, Christoph Hellwig wrote:
+> > > Hi all,
+> > > 
+> > > this series adds more block layer helpers to remove boilerplate code when
+> > > adding memory to a bio or to even do the entire synchronous I/O.
+> > > 
+> > > The main aim is to avoid having to convert to a struct page in the caller
+> > > when adding kernel direct mapping or vmalloc memory.
+> > 
+> > have you seen (bch,bch2)_bio_map?
 > 
-> can you try the patch below?  It fixes losing the read-ahead value in
-> my little test.
+> Now I have.
 > 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 6b2dbe645d23..4817e7ca03f8 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -61,8 +61,14 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
->   	/*
->   	 * For read-ahead of large files to be effective, we need to read ahead
->   	 * at least twice the optimal I/O size.
-> +	 *
-> +	 * There is no hardware limitation for the read-ahead size and the user
-> +	 * might have increased the read-ahead size through sysfs, so don't ever
-> +	 * decrease it.
->   	 */
-> -	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
-> +	bdi->ra_pages = max3(bdi->ra_pages,
-> +				lim->io_opt * 2 / PAGE_SIZE,
-> +				VM_READAHEAD_PAGES);
->   	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
->   }
->   
+> > 
+> > it's a nicer interface than your bio_add_vmalloc(), and also handles the
+> > if (is_vmalloc_addr())
 > 
+> Can you explain how it's nicer?
+> 
+> For use with non-vmalloc memory it does a lot of extra work
+> and generates less optimal bios using more vecs than required, but
+> maybe that wasn't the point?
+> 
+> For vmalloc it might also build suboptimal bios when using large vmalloc
+> mappings due to the lack of merging, but I don't think anyone does I/O to
+> those yet.
+> 
+> It lacks a API description and it or the callers miss handling for VIVT
+> caches, maybe because of that.
+> 
+> Besides optimizing the direct map case that always needs just one vec
+> that is also one of the reasons why I want the callers to know about
+> vmalloc vs non-vmalloc memory.
 
-Tried several different readahead values across multiple
-suspend/resume cycles and it retained them properly again.
+Sure, that code predates multipage bvecs - the interface is what I was
+referring to.
 
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+> It also don't support bio chaining or error handling and requires a
+> single bio that is guaranteed to fit the required number of vectors.
 
-Thank you!
+Why would bio chaining ever be required? The caller allocates both the
+buf and the bio, I've never seen an instance where you'd want that; just
+allocate a bio with the correct number of vecs, which your
+bio_vmalloc_max_vecs() helps with.
 
-cheers
-Holger
+> OTOH for callers where that applies it would be nice to have a
+> helper that loops over bio_add_vmalloc.  I actually had one initially,
+> but given that I only found two obvious users I dropped it for now.
+> If we get more we can add one.
+
+The "abstract over vmalloc and normal physically contigious allocations"
+bit that bch2_bio_map() does is the important part.
+
+It's not uncommon to prefer physically contiguous allocations but have a
+vmalloc fallback; bcachefs does, and  xfs does with a clever "try the
+big allocation if it's cheap, fall back to vmalloc to avoid waiting on
+compaction" that I might steal.
+
+is_vmalloc_addr() is also cheap, it's just a pointer comparison (and it
+really should be changed to a static inline).
