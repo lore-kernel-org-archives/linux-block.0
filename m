@@ -1,157 +1,138 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A902420322
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 01:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837D22701BA;
+	Thu, 24 Apr 2025 02:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745459650; cv=none; b=ZFAtx6H+ObH5EbDpa4Wdr3PRD5OqmRdYYa8b4nTPyz9Rol3Aeb07PBlPpRyXjOpD04VVS32/Z70eomhL7Zgb9OLDagyd1iP6mU9GGn9BIob2vtmNKmpjOVZ975Up4TTtUXiljOTOH/wtsfkE+6KpyHn0z0k+ZnA0z4TNRwtqyZM=
+	t=1745462125; cv=none; b=f0v6cVG1BLDRephgVkIXPGqRxnXiYFeihuL2GDu6hq4lMrTL668RQvJMTpnJJ7juH0XIs7r9979TWC64Jo5+VL3r7PBhzuMildRSL/WPzA4Nv/H6oPnlgg5iB4K7fPv1CUp2LwDVN/wawoqWrpJkRfT2lHypsipgV2TRhj6g4GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745459650; c=relaxed/simple;
-	bh=A+4TRpl4uVyfLxEmUw6gc2R/mxt6IHtcHPcUF0SzGV0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfGemWYhf7UsUJEZ/rT3PblYw4A30twFYbiNkd7J5JcVgdGiQVgcXYmAFanrySg8IwoBMaXWUYy5BeajtxIOn4VHsOMKolTiKUkh/eqjd/dVrrc6wX/bw3TlMUk9PN/T06xGea4Cs7dXNfdXf/7QhpZ+gDPFiN09As5/OnjDHl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CH3pdFus; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CH3pdFus"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745459646;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KuIsw35HSnvLni7HaK50xc2Kw6jlgdcRYW/pX9/vtJA=;
-	b=CH3pdFusz1zNsCwshB1ZznloWlWMrVlZxKoar6PQwMBA4ALesgJZmu0JpS8x6SG7AWK4pA
-	1KLMD78oRIPbqSq0Kok6MaKFzaPHPYAQAC/g/vIEGWz/NQ1Yl8vYAXOmvlJ5od6Zdj6YBd
-	luaRH/L0pRcvJUjUmu/gFJwGA5c5BUM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-63ENfR8JOOWwD4Mj78JY-g-1; Wed,
- 23 Apr 2025 21:54:02 -0400
-X-MC-Unique: 63ENfR8JOOWwD4Mj78JY-g-1
-X-Mimecast-MFC-AGG-ID: 63ENfR8JOOWwD4Mj78JY-g_1745459641
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 649E11800360;
-	Thu, 24 Apr 2025 01:54:01 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.12])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E27191800374;
-	Thu, 24 Apr 2025 01:53:55 +0000 (UTC)
-Date: Thu, 24 Apr 2025 09:53:50 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
+	s=arc-20240116; t=1745462125; c=relaxed/simple;
+	bh=l5VhaPblEjCMuhNE8DZY2F3Srkk0u7b+ljx3T5DrYMQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=OJi+gSnu+f2Kc29m10rbbKaAtXOBRxls5el7tf6jO+0JZIYDXudQ624vCIItF0ACKFVj0eZpE/QNiRNEUvzK+B4bT3Z5oEK+mwNkgc0eQW8uM9GcLJcJTSAT0rNaqOyCfDfA5BnvPGRgWLIfNzKbtiimRYfyfrLxwPyoSKCXY+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zjg6g1sPWz4f3lDK;
+	Thu, 24 Apr 2025 10:34:51 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id BF1A41A0359;
+	Thu, 24 Apr 2025 10:35:16 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAXe19iowloxAWRKQ--.43174S3;
+	Thu, 24 Apr 2025 10:35:16 +0800 (CST)
+Subject: Re: 10x I/O await times in 6.12
+To: Matt Fleming <mfleming@cloudflare.com>, Yu Kuai <yukuai1@huaweicloud.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Guy Eisenberg <geisenberg@nvidia.com>,
-	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>,
-	Omri Levi <omril@nvidia.com>, Ofer Oshri <ofer@nvidia.com>
-Subject: Re: [PATCH 1/2] ublk: call ublk_dispatch_req() for handling
- UBLK_U_IO_NEED_GET_DATA
-Message-ID: <aAmZrnruWd6aYS4k@fedora>
-References: <20250423092405.919195-1-ming.lei@redhat.com>
- <20250423092405.919195-2-ming.lei@redhat.com>
- <CADUfDZrh6pO6rCXN-QbTY3EX+EyYFvRW96o0Lf_kuEBMQ8ysEQ@mail.gmail.com>
- <CADUfDZohH1b75w6pnNduEpTCUp6RFbWv0HCoNT-d2k9yUvmCuA@mail.gmail.com>
+ linux-kernel@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
+ <dd2db843-843f-db15-c54f-f2c44548dee3@huaweicloud.com>
+ <CAGis_TWtWMK93nVBa_D_Y2D3Su8x_dDNwNw9h=v=8zoaHuAXBA@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <2bb4f6ef-c25a-887f-6a0b-434fc8e1e54e@huaweicloud.com>
+Date: Thu, 24 Apr 2025 10:35:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <CAGis_TWtWMK93nVBa_D_Y2D3Su8x_dDNwNw9h=v=8zoaHuAXBA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZohH1b75w6pnNduEpTCUp6RFbWv0HCoNT-d2k9yUvmCuA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-CM-TRANSID:gCh0CgAXe19iowloxAWRKQ--.43174S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ar15Cw1xAw48ur1fXrWUurg_yoW8uF15pr
+	W5Ja1Ykrs5JrW0ga1Iqa1UWFyrKw4Utry7Gr4Dta1rCwn0gry3KF1F9w4j9rWxArs5uw47
+	ZF4Y9asrX3ZxKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+	Y487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa
+	73UjIFyTuYvjfUYCJmUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Apr 23, 2025 at 07:52:19AM -0700, Caleb Sander Mateos wrote:
-> On Wed, Apr 23, 2025 at 7:44 AM Caleb Sander Mateos
-> <csander@purestorage.com> wrote:
-> >
-> > On Wed, Apr 23, 2025 at 2:24 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > >
-> > > The in-tree code calls io_uring_cmd_complete_in_task() to schedule
-> > > task_work for dispatching this request to handle
-> > > UBLK_U_IO_NEED_GET_DATA.
-> > >
-> > > This ways is really not necessary because the current context is exactly
-> > > the ublk queue context, so call ublk_dispatch_req() directly for handling
-> > > UBLK_U_IO_NEED_GET_DATA.
-> >
-> > Indeed, I was planning to make the same change!
-> >
-> > >
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c | 14 +++-----------
-> > >  1 file changed, 3 insertions(+), 11 deletions(-)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index 2de7b2bd409d..c4d4be4f6fbd 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -1886,15 +1886,6 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
-> > >         }
-> > >  }
-> > >
-> > > -static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
-> > > -               int tag)
-> > > -{
-> > > -       struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
-> > > -       struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[q_id], tag);
-> > > -
-> > > -       ublk_queue_cmd(ubq, req);
-> > > -}
-> >
-> > Looks like this will conflict with Uday's patch:
-> > https://lore.kernel.org/linux-block/20250421-ublk_constify-v1-3-3371f9e9f73c@purestorage.com/
-> > . Since that series already has reviews, I expect it will land first.
-> >
-> > > -
-> > >  static inline int ublk_check_cmd_op(u32 cmd_op)
-> > >  {
-> > >         u32 ioc_type = _IOC_TYPE(cmd_op);
-> > > @@ -2103,8 +2094,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
-> > >                 if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
-> > >                         goto out;
-> > >                 ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
-> > > -               ublk_handle_need_get_data(ub, ub_cmd->q_id, ub_cmd->tag);
-> > > -               break;
-> > > +               req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
-> > > +               ublk_dispatch_req(ubq, req, issue_flags);
-> >
-> > Maybe it would make sense to factor the UBLK_IO_NEED_GET_DATA handling
-> > out of ublk_dispatch_req()? Then ublk_dispatch_req() (called only for
-> > incoming ublk requests) could assume the UBLK_IO_FLAG_NEED_GET_DATA
-> > flag is not yet set, and this path wouldn't need to pay the cost of
-> > re-checking current != ubq->ubq_daemon, ublk_need_get_data(ubq) &&
-> > ublk_need_map_req(req), etc.
-> >
-> > > +               return -EIOCBQUEUED;
-> >
-> > It's probably possible to return the result here synchronously to
-> > avoid the small overhead of io_uring_cmd_done(). That may be easier to
-> > do if the UBLK_IO_NEED_GET_DATA path is separated from
-> > ublk_dispatch_req().
+Hi, Jens!
+
+在 2025/04/23 18:51, Matt Fleming 写道:
+> On Mon, 21 Apr 2025 at 13:21, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> Can you drop this expensive bpftrace script which might affect IO
+>> performance, and replace __submit_bio directly to __blk_flush_plug? If
+>> nsecs - plug->cur_ktime is still milliseconds, can you check if the
+>> following patch can fix your problem?
 > 
-> And if we can avoid using io_uring_cmd_done(), calling
-> ublk_fill_io_cmd() for UBLK_IO_NEED_GET_DATA would no longer be
-> necessary. (This was my original motivation to handle
-> UBLK_IO_NEED_GET_DATA synchronously; UBLK_IO_NEED_GET_DATA overwriting
-> io->cmd is an obstacle to introducing a struct request * field that
-> aliases io->cmd.)
+> Yep, the below patch fixes the regression and restores I/O wait times
+> that are comparable to 6.6. Thanks!
 
-All your comments are reasonable.
+Thanks for the test.
 
-Here I just want to keep it simple for backport purpose, and we can clean
-up them all by one followup.
+Do you have any suggestions? For now, I can think of two different
+fixes:
 
+1) clear time for the preempt case. On the one hand, preempt can be
+frequent, cauing performance degradation; On the other hand, this can't
+solve all the problems, for example, lots of interrupt or lots of BIO
+issued into one round of plug.
+
+2) delay setting rq start time to flush plug, however, the latency value
+is still not accurate, and will be slightly smaller instead of greater.
 
 Thanks,
-Ming
+Kuai
+
+> 
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index ae8494d88897..37197502147e 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1095,7 +1095,9 @@ static inline void blk_account_io_start(struct
+>> request *req)
+>>                   return;
+>>
+>>           req->rq_flags |= RQF_IO_STAT;
+>> -       req->start_time_ns = blk_time_get_ns();
+>> +
+>> +       if (!current->plug)
+>> +               req->start_time_ns = blk_time_get_ns();
+>>
+>>           /*
+>>            * All non-passthrough requests are created from a bio with one
+>> @@ -2874,6 +2876,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug,
+>> bool from_schedule)
+>>    {
+>>           struct request *rq;
+>>           unsigned int depth;
+>> +       u64 now;
+>>
+>>           /*
+>>            * We may have been called recursively midway through handling
+>> @@ -2887,6 +2890,10 @@ void blk_mq_flush_plug_list(struct blk_plug
+>> *plug, bool from_schedule)
+>>           depth = plug->rq_count;
+>>           plug->rq_count = 0;
+>>
+>> +       now = ktime_get_ns();
+>> +       rq_list_for_each(&plug->mq_list, rq)
+>> +               rq->start_time_ns = now;
+>> +
+>>           if (!plug->multiple_queues && !plug->has_elevator &&
+>> !from_schedule) {
+>>                   struct request_queue *q;
+>>
+> 
+> .
+> 
 
