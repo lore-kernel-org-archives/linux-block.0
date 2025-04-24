@@ -1,71 +1,73 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF8E43146
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76A855E69
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745501555; cv=none; b=WkGh5tJe5NwqZFy2gBlL0rqetgnGLgxP8OKgn7M0OAF5mDfvYJN+A19+C2DRnKFiqg9A35QVXwKHZzUGBvxmL3QHnGSyPkK7zg3MWAzeufBu9MfS65qm7C88dT/h+oGgGsF6rwO93yOvHxpRJFo2oIePyzVkxQZK+nLTwnJP5FY=
+	t=1745501758; cv=none; b=JbOmRvmvOHkgv2kI+rCfeS14HFzpHVnJ58C1BI8jLXokfM1xtVfcCHXuMkEJWmcV/mrTUFrSVJVz4ry199QzpRnXuOaQJt8upNxqubSyse8a43FkLxNqvMNQ9aLq8ygeeH6nhKytPF8nG72sf3nybHASa4yHeESReec2Mmo2uTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745501555; c=relaxed/simple;
-	bh=9Pes+HFfjTx+aWeU3Ug+lxiJazTJM7vd6I5bpka3f/g=;
+	s=arc-20240116; t=1745501758; c=relaxed/simple;
+	bh=WPtzaI6gzO+Ao9RQi1VweoMaU/O7Z60bQSJbDKqCmOY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AKMyds1mMRWJOXugWoXZYiTjSQt7E7LXP8EZNPAWiZwS1GTtbWpqPdGngJZ24JDJ4kS5UMNIwcbOJI8Y/Sh7YH8nKmgCmPWJm3NNGFR8xnnurxDEM6F6jFyaPAwxw8Bur49Ga3sdAuxbgzam0oM+YE0qCyxMfkt/bB5TZDXzd1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=igPUAr6i; arc=none smtp.client-ip=209.85.166.52
+	 MIME-Version:Content-Type; b=UA2UVblLQXqmZPQiYXfnWf34wkc/GXL0a2kgfIbKohrS0k4ZgojNVxjxtCb2XAI7E6H1fFqMg3kvfB6IHFK4MM9Vy626/25jyGybXVcIIpeBTN7aeBX67dmEB0m/I4N68Vkfy1J/JEuuV19sVdB1JkkG9BIPWJliBmHBsrqhl2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WpFPaRKz; arc=none smtp.client-ip=209.85.166.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="igPUAr6i"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-85e15dc8035so35192739f.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:32:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WpFPaRKz"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d90208e922so5357535ab.3
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:35:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745501551; x=1746106351; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745501756; x=1746106556; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ChPc153/Ue0vh+ZUNhFsJPP4Dkg3KNnQf39LzkHyXJI=;
-        b=igPUAr6iVxCQtRPd5U32Zrryj3VLV8z1VkE3Wnh2eZER8vCPv2suUn1pMmE66zmTks
-         r1vzKxfmSOq49ituIxEeiF8eoGEye8TL5J8aCIezc2YU6mUX+OegK6wsdBc8EmTaLa4Q
-         LS6eDiOXEkBSZHz+s/wHSifANkzNfT77kXav3vXaiQIPqXGsRDk3pyTpIIfQQHpXjrSl
-         PsOfltkJxeghP2om2OqSwD1So4s72724p7Cq0TqxSGC6KaIFHorq1O3aqpZWZ4mmg1z+
-         MFkJPCxcdvnXc+K43Z7GY+0pWQH6I5QuqxS4ebJlpv7ZDvSA65Iudvpu3zsAaqo+/8Qa
-         d1Sg==
+        bh=5y3kb7tbL35mrW374ozZ5zHoQ8x5ddd9COLH2ecrXT4=;
+        b=WpFPaRKz0O7NIIA9IeGDNE5RIzQrP6u281XLpXkUtjG7MK31SOudfgRBWn6ciC/o74
+         y/PPLkG6LYFqxeOnBxb55sXuZdg3W93rzV42d+CoRpFm2BpzVGzrfVJUdfnGbo26TXbG
+         TRDcWNb/4PIOTTvTLx7lgY+qknDf8EPZq41YKaTUmJiiB9LZWwpmMQs9sEScLUMpQ5Zs
+         ADN4+bouAJJ9Yt2lH524moLBwuMmZNs39/V84+QhlwtiGIlGNESImiz61sK5xu1Vyqhb
+         3o38osX/jGESNj/opUoWouLXOqO3EEkwtb4wllC888SV38CTOfzVcP7B+QCtGlD+V6OJ
+         Htww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745501551; x=1746106351;
+        d=1e100.net; s=20230601; t=1745501756; x=1746106556;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ChPc153/Ue0vh+ZUNhFsJPP4Dkg3KNnQf39LzkHyXJI=;
-        b=otifchHWpuFqFwwxfqQUmYs8nRKvEvP/vWwCvwXCSRPHLxHnrksPS3XD0/9DDIzjuZ
-         n3lVIUAO49YgMl6fwCZWpXVQtlR9cViKE97hBtt4o8Rj5UKvOfZOvrb81fr3GYnklysl
-         gpiasJsGH4eDdyNgo3XbTIv1/5FPUFdu+C0M92x6eneE5mTfdIw9yMPQKxZ7Z6IEktcg
-         0m/y/euR7TvFlyMW7J2ghMNbdYpKtO13haN/C0xkqZQd97G8oVFAUCgU7tLr3votg4FJ
-         AlnWsGJLE/RZoQVpi5kMgYHqqdXAnJ+8UgAERPyKNlECTTYm4tTLorPBxhkWYhcDFKuf
-         Yuzg==
-X-Gm-Message-State: AOJu0YyeFOgq3WxgK34pCeth2J/YKBK2dEXMz+NzApNr6HOj12rd0Zfg
-	xA7QwrG6vNoLFxWhn0uuVpRWaBz3k/0IwqxKYUkhdG+ndtgprSHJCricoCpE0Lh20vhyLqJRkC0
-	l
-X-Gm-Gg: ASbGnctnJlAMxz+ys7TPiM5LU2HQl7yKqpl7VHyLIWz0xWyPZi+1tWkLUCNOg4ahOmD
-	0M3DAbCanedhlBc4QqUt8EWpgXkAEuJqhvwEojmwGE62CRvKXCylo3PCKIEXe6yuxeKVY0Vg4t0
-	dgEMYERpQjHyuWxePe+58E8KDye7iOxz9T9w7yz6+zS40lZUKGU8g20a3om4loe4TqCPbb7pIA3
-	OgNkQkWm8Kpc1c5ApgMarbpDz5txLArgZG/aQvksrRgcvFWAYnkqQs5voV3jdxlJXWqKUyXCvCl
-	lfOBLp5RkSpqz53ot/S05AYc1uqJNU0=
-X-Google-Smtp-Source: AGHT+IFvxy18rgWsXoEf6L02qIK3qlKJRZvDGAoM+Z5s69C0Q5lNtzzn39YRy6V3EDiD1F7r8+pzcg==
-X-Received: by 2002:a05:6602:6414:b0:85e:a8db:fa10 with SMTP id ca18e2360f4ac-8644f973f37mr282545739f.1.1745501550704;
-        Thu, 24 Apr 2025 06:32:30 -0700 (PDT)
+        bh=5y3kb7tbL35mrW374ozZ5zHoQ8x5ddd9COLH2ecrXT4=;
+        b=WnhuS1BDRfNLNAwbBMJ5hB72hdW+7gvghPkOmKucCVdu2P8rE0iZqPc6/cKTz7MHro
+         Y4jIrf5AflW28Y7nls0L7irdskp2VGbyef4ouk6mjn/DIWUPpS99Twx2sUGAoAru9irf
+         Z5P2aSDXZfP/WQ/pf9voTG+tmuNgpZ3xeemdkun2CQtwoZdz3Fbu7VP2hzwy5b37U2VJ
+         zwXZmz0jBPPGQCb3dCc3yT61927JYiqujGN/lPIn5SHEVbH1rF7YRe21olL+/KG4IA4g
+         PVpSqi6TcT3MjqprTaxWxK0/1ODSVe94d4VlW0o5iR6btOqf/Cv7Z1mRsvERFi8Iw50V
+         7Vew==
+X-Forwarded-Encrypted: i=1; AJvYcCXeB2YMvl0U8PCX+QWAldJKnyLUONENDSLPrTpNj0t6fwpCbGuyPV9vxuiJCkEkR+riQ6XkSmp7CYe2vA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM+kIV8mpk6VYC7ntHrn/HzYw8WXPxLP21DTFGlHgGiLpk94VX
+	05MPAqfz+e9QrVuJD1l9vzqcIc9ot6bp6HueYesVbH/gNEJqvCt0GO0JD1bn8Sw=
+X-Gm-Gg: ASbGnctM88Nt4t0E6Wiu6PaicNhnVcMSkT+a98nwKkJZlmY1vxv0C8RfuHy3t4/Xmih
+	XSXCf84JnWo8c0bZxGnEHVLJaKCmqiwNoJHNm5wUuC7+CBK1JaHrZ9DbetkkWJsMikkQ1DFPUBc
+	QwmiWa+2NwkUuWUvBMRPhikzMwMeKoNaJgnDL/9rlVVSGhmcwtCUbgTRy+/GtS5GWYK46KLrKWr
+	so0rRRguK2QBdtMrfXdeUUu6gQ0at/pI4Dwd2pEtVohOO4/aU7/I6aza8er79MfmlBBp8sM+zzD
+	kgfcXnM+I3cMsIdyaFQG3oaSjYxQo74=
+X-Google-Smtp-Source: AGHT+IHGUYup65Csh37WQAuNVZgmXMs0428N1C4YOSpFb5unVA+hY8Q9IKjnnn2p20qNo3hrxDTuOA==
+X-Received: by 2002:a05:6e02:398e:b0:3d4:276:9a1b with SMTP id e9e14a558f8ab-3d93041e398mr26411495ab.16.1745501755935;
+        Thu, 24 Apr 2025 06:35:55 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a3bab1sm274941173.36.2025.04.24.06.32.29
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824b80d63sm286172173.94.2025.04.24.06.35.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 06:32:30 -0700 (PDT)
+        Thu, 24 Apr 2025 06:35:55 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, 
- =?utf-8?q?Holger_Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
-In-Reply-To: <20250424082521.1967286-1-hch@lst.de>
-References: <20250424082521.1967286-1-hch@lst.de>
-Subject: Re: [PATCH] block: never reduce ra_pages in blk_apply_bdi_limits
-Message-Id: <174550154991.655590.32611122624973762.b4-ty@kernel.dk>
-Date: Thu, 24 Apr 2025 07:32:29 -0600
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+ linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
+ Christian Brauner <brauner@kernel.org>
+In-Reply-To: <20250423053810.1683309-1-hch@lst.de>
+References: <20250423053810.1683309-1-hch@lst.de>
+Subject: Re: don't autoload block drivers on stat (and cgroup
+ configuration)
+Message-Id: <174550175513.658353.8577093198336589021.b4-ty@kernel.dk>
+Date: Thu, 24 Apr 2025 07:35:55 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,21 +79,26 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Thu, 24 Apr 2025 10:25:21 +0200, Christoph Hellwig wrote:
-> When the user increased the read-ahead size through sysfs this value
-> currently get lost if the device is reprobe, including on a resume
-> from suspend.
+On Wed, 23 Apr 2025 07:37:38 +0200, Christoph Hellwig wrote:
+> Christian pointed out that the addition of the block device lookup
+> from stat can cause the legacy driver autoload to trigger from a plain
+> stat, which is a bad idea.
 > 
-> As there is no hardware limitation for the read-ahead size there is
-> no real need to reset it or track a separate hardware limitation
-> like for max_sectors.
+> This series fixes that and also stops autoloading from blk-cgroup
+> configuration, which isn't quite as bad but still silly.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: never reduce ra_pages in blk_apply_bdi_limits
-      commit: 7b720c720253e2070459420b2628a7b9ee6733b3
+[1/4] block: move blkdev_{get,put} _no_open prototypes out of blkdev.h
+      commit: c63202140d4b411d27380805c4d68eb11407b7f2
+[2/4] block: remove the backing_inode variable in bdev_statx
+      commit: d13b7090b2510abaa83a25717466decca23e8226
+[3/4] block: don't autoload drivers on stat
+      commit: 5f33b5226c9d92359e58e91ad0bf0c1791da36a1
+[4/4] block: don't autoload drivers on blk-cgroup configuration
+      commit: c4d2519c6ad854dc2114e77d693b3cf1baf55330
 
 Best regards,
 -- 
