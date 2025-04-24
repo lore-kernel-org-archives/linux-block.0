@@ -1,44 +1,53 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4645B223DF9;
-	Thu, 24 Apr 2025 11:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F73422B8C6
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745494701; cv=none; b=eVOTnrM49miPPikLDPRh9M2f9ixCX/MED3x7fIFE80I0nNj1VrtfTlNWT59XG+mAwIjVncdTwD2rcK4+2lkajLs15AZp3F3lkbu9S8l4zCzyb3UWdYHn3ST28+jHyRJox2qApAguBsAqzXvRL2g7+W9p4JdjiUYo5XVEPordS7E=
+	t=1745496102; cv=none; b=eYbvTXDJiYepHf5BOdQfawTUU5rarZe2qaRVgOr0o6DUqrPYnpQu5v1vFEqdhaB2PdNwMhum/SjUEBcFe8ajfcdsgYwLcDTL+th59niF5opWJujgECR2VsCfJ4VaIXWIYYK+BWbn1NCHT8kPq1qAwWHS6Ff2ZpeYvtGbbqRc9yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745494701; c=relaxed/simple;
-	bh=8kAW3azTvQ3wTRLJEl/2C0kREX99xZi13pA/UOSxPtc=;
+	s=arc-20240116; t=1745496102; c=relaxed/simple;
+	bh=RDRKZeNKN55umrzQ5oGHsI+0KYc+ooDByqGf/CbRS4M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HT1Xyu0TlXEMyrwOj69Cge42QmYLj5YWb0GHPFpid9fkoQhllbK9Orw2scnlHLFf7rGcO9H9f1MVKGVDx2+mmnVxtORjsZI54/hRN9Ube8Xuh5TikJPn/RYT1HdYqXmnaahls9/bPbIWIJajE19p1ksrEq7npMUuzHy6j+E+vRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Pd+ay/gH; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=HBdtnJqRVSz3UwEAaLb63DsuKTq/HGPrrlvenDcEaXVlFvoSeZ8xJgxSzjsLzRchyXFKjLscFHmpLdKq9YZUogDOrnYxQC2UqivZoZEy81A3tBoV1MM1tjuDTbJuxTNUpUiZoHHLYCBwFS2V3Ut4PNEFU1EyrwbgTgQU3LXTlsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u9gRpvYC; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Pd+ay/gH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pNbO8WPypc/MomTtjMKRl+jdj9wSKdOc5ZgIbTWg7Yk=; b=Pd+ay/gHiNWOdH/+lO5Xsp/is7
-	oBsdg/RZy6QiBPQZIGYJPhNcW0MzwXfCkxcEJwbtaZo+D+bBeQ0PNdDeaqPaHnIrYMm24ypH6hgE9
-	nEQ26LHGpxoipBHhoGHCuVBAOv4nJbDWpDMLBow1YAaPnobvqMsjy6RLY1NZdQ6Df1/xk/UW0xFAx
-	BujAeW3phiUqcMBabya+/XdSmsNpAzDikKO83228K/VgNC3TrtHL1RuP0NOelJfmXQ5GBktV90u+V
-	omk69bL1UJH2oOhjRHAfp3tBcWTXd1SbNZgyl9FHY3mx0+FoQCHuznvwxg/ypZSyi1d6AJeHrh3gv
-	CA+JwxuA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u7uuJ-0000000DtHH-3OGA;
-	Thu, 24 Apr 2025 11:38:19 +0000
-Date: Thu, 24 Apr 2025 04:38:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] block: avoid hctx spinlock for plug with multiple
- queues
-Message-ID: <aAoiq1AsoD-k_kp3@infradead.org>
-References: <20250423205127.2976981-1-csander@purestorage.com>
- <20250423205127.2976981-4-csander@purestorage.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u9gRpvYC"
+Date: Thu, 24 Apr 2025 08:01:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745496087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T2MMeEmusMY/E/i/SQKbyFaL7BU6CcGYmFZRFD2drdA=;
+	b=u9gRpvYCA7IkAb0B4poNcSjWcfnEIwKuPsuUltPGgb8dOqhtvOFUuqTpBE1musH7/BVP9b
+	38vbULDjl6NCX/pmhSnebe2rg3ejQKWdffXIWBn1CsORMSUQcA3dgQXk9yIE8/M4BAoo1k
+	1DBuUEL/zkkYq7EeqOTzQe9EbZUJZTQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>, 
+	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, Carlos Maiolino <cem@kernel.org>, 
+	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
+	Johannes Thumshirn <jth@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: add more bio helper
+Message-ID: <anc2qstnukiwtskc4pd3kqajfswm3dzljxwa3awrxjs7mzppoc@nziz3h4ilqpd>
+References: <20250422142628.1553523-1-hch@lst.de>
+ <jetduw7zshrmp4gl7zfpwqjweycwesxiod7xvtnxqwqekgtvdf@idwnvfzvhgik>
+ <20250423093621.GA2578@lst.de>
+ <sl4oibdxpjygqfpy6llq237zuckz7ym4fmzcfvxn2raofr37a5@hvevbcgm5trn>
+ <20250423160733.GA656@lst.de>
+ <q53k4x5nshvr2zatrgyhygxouv7ijyepe6cj2pfooemi6gbu4y@lpxxcvozazzu>
+ <20250424083740.GA24723@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,53 +56,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423205127.2976981-4-csander@purestorage.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250424083740.GA24723@lst.de>
+X-Migadu-Flow: FLOW_OUT
 
-> +static void blk_mq_extract_queue_requests(struct rq_list *rqs,
-> +					  struct rq_list *queue_rqs,
-> +					  unsigned *queue_depth)
-> +{
-> +	struct rq_list matched_rqs = {}, unmatched_rqs = {};
-> +	struct request *rq = rq_list_pop(rqs);
-> +	struct request_queue *this_q = rq->q;
-> +	unsigned depth = 1;
-> +
-> +	rq_list_add_tail(&matched_rqs, rq);
-> +	while ((rq = rq_list_pop(rqs))) {
-> +		if (rq->q == this_q) {
-> +			rq_list_add_tail(&matched_rqs, rq);
-> +			depth++;
-> +		} else {
-> +			rq_list_add_tail(&unmatched_rqs, rq);
-> +		}
+On Thu, Apr 24, 2025 at 10:37:40AM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 23, 2025 at 02:02:11PM -0400, Kent Overstreet wrote:
+> > Allocating your own bio doesn't allow you to safely exceed the
+> > BIO_MAX_VECS limit - there's places in the io path that need to bounce,
+> > and they all use biosets.
+> 
+> Yes.  Another reason not to do it, which I don't want to anyway.
+> 
+> But we do have a few places that do it like squashs which we need to
+> weed out.  And/or finally kill the bounce bufferingreal, which is long
+> overdue.
+> 
+> > That may be an issue even for non vmalloc bios, unless everything that
+> > bounces has been converted to bounce to a folio of the same order.
+> 
+> Anything that actually hits the bounce buffering is going to
+> cause problems because it hasn't kept up with the evolution of
+> the block layer, and is basically not used for anything relevant.
 
-This might be moe efficient if you keep an extra iterator and never
-mode the request for another queue.
+It's not just block/bounce.c that does bouncing, though.
 
-> +	}
-> +
-> +	*queue_rqs = matched_rqs;
-> +	*rqs = unmatched_rqs;
-> +	*queue_depth = depth;
+e.g. bcache has to bounce on a cache miss that will be written to the
+cache - we don't want to wait for the write to the backing device to
+complete before returning the read completion, and we can't write to the
+backing device with the original buffer if it was mapped to userspace.
 
-.. and I'd return the queue depth here instead of making it another
-output argument.
+I'm pretty sure I've seen bouncing in dm and maybe md as well, but it's
+been years.
 
-> +static void blk_mq_dispatch_multiple_queue_requests(struct rq_list *rqs)
-> +{
-> +	do {
-> +		struct rq_list queue_rqs;
-> +		unsigned depth;
-> +
-> +		blk_mq_extract_queue_requests(rqs, &queue_rqs, &depth);
-> +		blk_mq_dispatch_queue_requests(&queue_rqs, depth);
-> +		while (!rq_list_empty(&queue_rqs)) {
-> +			blk_mq_dispatch_list(&queue_rqs, false);
-> +		}
+> > > The problem with transparent vmalloc handling is that it's not possible.
+> > > The magic handling for virtually indexed caches can be hidden on the
+> > > submission side, but the completion side also needs to call
+> > > invalidate_kernel_vmap_range for reads.  Requiring the caller to know
+> > > they deal vmalloc is a way to at least keep that on the radar.
+> > 
+> > yeesh, that's a landmine.
+> > 
+> > having a separate bio_add_vmalloc as a hint is still a really bad
+> > "solution", unfortunately. And since this is something we don't have
+> > sanitizers or debug code for, and it only shows up on some archs -
+> > that's nasty.
+> 
+> Well, we can't do it in the block stack because that doesn't have the
+> vmalloc address available.  So the caller has to do it, and having a
+> very visible sign is the best we can do.  Yes, signs aren't the
+> best cure for landmines, but they are better than nothing.
 
-No need for the braces in the inner while loop here.
+Given that only a few architectures need it, maybe sticking the vmalloc
+address in struct bio is something we should think about.
 
-The other caller of blk_mq_dispatch_list loops until the list is empty,
-why don't we need that here?
+Obviously not worth it if only 2-3 codepaths need it, but if vmalloc
+fallbacks become more common it's something to think about.
 
+> > > Not for a purely synchronous helper we could handle both, but so far
+> > > I've not seen anything but the xfs log recovery code that needs it,
+> > > and we'd probably get into needing to pass a bio_set to avoid
+> > > deadlock when used deeper in the stack, etc.  I can look into that
+> > > if we have more than a single user, but for now it doesn't seem
+> > > worth it.
+> > 
+> > bcache and bcachefs btree buffers can also be vmalloc backed. Possibly
+> > also the prio_set path in bcache, for reading/writing bucket gens, but
+> > I'd have to check.
+> 
+> But do you do synchronous I/O, i.e. using sumit_bio_wait on them?
+
+Most btree node reads are synchronous, but not when we're prefetching.
