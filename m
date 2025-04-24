@@ -1,95 +1,174 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4214926FDB7
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4938F58
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745497870; cv=none; b=eVSluBIybG8TZ4D8b9XG1nxE/GPMt4YCADPHgIhg9DwBkcwp0k91d7bCtoUEF10pc72yr2PTWhex2n85alZi3rc8utclMMgKE7QgQFKIioGw6q60sLt3yw9DpyFsSkXLWefkGIpDhnHj4gl5Mqr21P2SbAhfhkV0ufhSUuZRTvA=
+	t=1745498152; cv=none; b=HIatXpH9p5+HGAY5eG4ABzCHbTy2de+59/V7Q3sUbmjRztOJR/0VkrYUXB3KWZlGw+A+9GtoC+Mv0wMev5V9T8hOe7J72XnPzFHbGz5dDzE6ZWe2i/SJh3f1aGbpHV82XLgMtYUk/zhaMzaR5V2z6LnjZe62o+DoTi4oyW+MU78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745497870; c=relaxed/simple;
-	bh=WPftREPW4/qo/5xHH+9LLqlgxhde25Fhn0/iIWIwpuY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=eJKlYGCIxxuwHtwYxHKBjCn9LQLWJKxqkdx/xEUHR873F+OkhVOBqwkR4xyiuqcAxC/F4pdF63GUIgMWAOskUxQvpZBqSB12tIydL/xbdhEo3jvLACLo5Ga2pr2LonDgHqD22pdYuCxzko5L9dYeT4NQT1sq1J1tS4A5NIRCQhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eX5YrhpX; arc=none smtp.client-ip=209.85.210.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1745498152; c=relaxed/simple;
+	bh=MhJ/vkYI+8fueY4l1qkMYtgHHocXj41xXFtljroDbKU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OUCmZqCae9N3c8ZpIbddvPCZf2JAfRrFxjcorZq7rmfynbyn23xNFF8VSmuNpjgdwHpwieY9osx7IgU2LN1pUoRZHRBAZQoGJ+tj96N9aY6vz56MfF4m/cbbqHql1rr+F7AyBQFK/p2Iwp9cv5tT/Ph5/8cEJx9eyjCm+B8OFhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbQAGkrK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eX5YrhpX"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72ec926e828so319509a34.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 05:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745497867; x=1746102667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pps9V8ncwYdRycRJbT3v3474lDbFCNoVouzd6mCKRd4=;
-        b=eX5YrhpXLWESEHDAQA6W29/SJ6NRb7hcv3THQcMZZ5CoZ/HFJLJAtkP6gKZyw+nhZn
-         O/clCzNY06950aNnz2byPPXcJcjU6/YJRNXPnMservILBght2mAm/BOZPKYaicULcZoq
-         yq38fvvPTRo5uV/MiWPxSvNH1U7Yh2DiihkUhdC1fEbL+R9lvMIVRVM1LnxnOmV3MtaR
-         Q2Z0kEyMW9csxK/JkM4hanYTPXkv9ZLZgyfkLP4+kYIEMl2pUsNOjlTIum5d0XmyLhiN
-         SlkCIjqgTsXGaJ59ggN7wy+TVWlT5bq2F5J+Qyv00PYwe9FEB+3WoQeem9qPGdPeF8j2
-         I/Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745497867; x=1746102667;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pps9V8ncwYdRycRJbT3v3474lDbFCNoVouzd6mCKRd4=;
-        b=p5R3/+30+fDzxOLvV6n3pTPB6arMY01HCVNdHsmlkdGbb+IqxbxC+Pjt6trGYaZcjF
-         3yczXtR4jXInlP0u+j5uJgD8pKXOwvI2miiGzZZDWIFXPbDVm8yhAK6hZGIfxXC6pMR3
-         vTPC7qQNLLpvMm/Q60vZrUmFbBwpjVVBxeZESU4l9WeUmmWJdXy+yR3k/JXh8ttN+0a1
-         OExAwz0NwgnNIZwwzjfIED8iO4FRGopqeOSokypFK3EedTYk5h5OHrK5WlWzp1NOF4Gf
-         F9Iz2OlDUpa4yI8ajytg9wwUcjKUjOw8GeesTtGh/dHPNX97qJPsQF87ZvmHTRByi1fz
-         imdQ==
-X-Gm-Message-State: AOJu0YyH88Trkiu6yuRTGN3PWrKkwrzNtCRprh+IpoH2Vnq3Y5ID0gzy
-	rLFz4gR5nMp3qr9Yn1MypkPAoGxbP75eYJdgnvWpz4hAfF1kzJ6yhPvQwc5X2gM=
-X-Gm-Gg: ASbGnctR61ZwAbscn70LC3gUHzlM2Pw/tGuyhMKEXMGg9rL+z9CQhIaGpApzsQv0zQU
-	MRgVpLEdeKRc4WDTbvzCNkdXzJgbZPXpwE+WkACiA/YKjYrjwpx5CQYaHMWCc+S/h+bjd5VkHwa
-	uRIN/FDUKrApEDxDDcofydnF7tNxzMlbS/HZunPKk5b/5NldfdBGx8+UfN4lJBV7R6vUnYJ5col
-	49rgGykMewOY7WHdeEyAOEK9vljUzR0IiT7dOIsT5AfJCSg/fFpGxAi193A0Q4eL/Ng4RTIVrLt
-	eY7KK+/WYViOjBEUStkoW5tB3KExIGkE
-X-Google-Smtp-Source: AGHT+IHcDAhbNIdVSY+XYgylitasV2oC9fI4HWvx3NtkldPFUlYRuJvXAwP5NGZRmvjfiIpdimj8HA==
-X-Received: by 2002:a05:6871:5809:b0:2d9:45b7:8ffc with SMTP id 586e51a60fabf-2d96e21adf2mr1149904fac.3.1745497867264;
-        Thu, 24 Apr 2025 05:31:07 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f8249f8c91sm259639173.15.2025.04.24.05.31.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 05:31:06 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com>
-References: <20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com>
-Subject: Re: (subset) [PATCH 0/2] selftests: ublk: misc fixes
-Message-Id: <174549786571.628784.9329773694519239539.b4-ty@kernel.dk>
-Date: Thu, 24 Apr 2025 06:31:05 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbQAGkrK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745498149;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QS1AIzkf2IVDN4tpd8D5Zm5m0TtZMhIzPDa7XSbKRWE=;
+	b=CbQAGkrKr6cnyfW1KPlHkka6niEpm0UNqCR8bvCIU5+WZDW+oGUOFtztn3dSQ2n/BP+Nn2
+	FBGNuSTQFm1qOBrehM6uRR4B9/1uhSqurTGcQAAEROMhVujrxok2Tx63vvuygUtffCwMaH
+	xMD0kCfnXo7g+ye9hTzqyaQyo5M85vs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-Qzl1iDDhO9ey8XRHKq8vtw-1; Thu,
+ 24 Apr 2025 08:35:45 -0400
+X-MC-Unique: Qzl1iDDhO9ey8XRHKq8vtw-1
+X-Mimecast-MFC-AGG-ID: Qzl1iDDhO9ey8XRHKq8vtw_1745498144
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 13BC61800988;
+	Thu, 24 Apr 2025 12:35:44 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.127])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE63619560AB;
+	Thu, 24 Apr 2025 12:35:42 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] selftests: ublk: fix UBLK_F_NEED_GET_DATA
+Date: Thu, 24 Apr 2025 20:35:34 +0800
+Message-ID: <20250424123534.1046690-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
+Commit 57e13a2e8cd2 ("selftests: ublk: support user recovery") starts to
+support UBLK_F_NEED_GET_DATA for covering recovery related test, however the
+ublk utility implementation isn't done correctly.
 
-On Wed, 23 Apr 2025 15:29:01 -0600, Uday Shankar wrote:
-> Fix a couple of small issues in the ublk selftests
-> 
-> 
+Fix it by pulling intact UBLK_F_NEED_GET_DATA support to ublk utility.
 
-Applied, thanks!
+Also add test generic_07 for covering UBLK_F_NEED_GET_DATA.
 
-[2/2] selftests: ublk: common: fix _get_disk_dev_t for pre-9.0 coreutils
-      commit: 1d019736b6f812bebf3ef89d6e887d06e2a822fc
+Fixes: 57e13a2e8cd2 ("selftests: ublk: support user recovery")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tools/testing/selftests/ublk/Makefile         |  1 +
+ tools/testing/selftests/ublk/kublk.c          | 11 +++++---
+ tools/testing/selftests/ublk/kublk.h          |  1 +
+ .../testing/selftests/ublk/test_generic_07.sh | 25 +++++++++++++++++++
+ 4 files changed, 35 insertions(+), 3 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_07.sh
 
-Best regards,
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index ec4624a283bc..f34ac0bac696 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -9,6 +9,7 @@ TEST_PROGS += test_generic_03.sh
+ TEST_PROGS += test_generic_04.sh
+ TEST_PROGS += test_generic_05.sh
+ TEST_PROGS += test_generic_06.sh
++TEST_PROGS += test_generic_07.sh
+ 
+ TEST_PROGS += test_null_01.sh
+ TEST_PROGS += test_null_02.sh
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index e57a1486bb48..701b47f98902 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -538,10 +538,12 @@ int ublk_queue_io_cmd(struct ublk_queue *q, struct ublk_io *io, unsigned tag)
+ 
+ 	/* we issue because we need either fetching or committing */
+ 	if (!(io->flags &
+-		(UBLKSRV_NEED_FETCH_RQ | UBLKSRV_NEED_COMMIT_RQ_COMP)))
++		(UBLKSRV_NEED_FETCH_RQ | UBLKSRV_NEED_COMMIT_RQ_COMP | UBLKSRV_NEED_GET_DATA)))
+ 		return 0;
+ 
+-	if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
++	if (io->flags & UBLKSRV_NEED_GET_DATA)
++		cmd_op = UBLK_U_IO_NEED_GET_DATA;
++	else if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
+ 		cmd_op = UBLK_U_IO_COMMIT_AND_FETCH_REQ;
+ 	else if (io->flags & UBLKSRV_NEED_FETCH_RQ)
+ 		cmd_op = UBLK_U_IO_FETCH_REQ;
+@@ -658,6 +660,9 @@ static void ublk_handle_cqe(struct io_uring *r,
+ 		assert(tag < q->q_depth);
+ 		if (q->tgt_ops->queue_io)
+ 			q->tgt_ops->queue_io(q, tag);
++	} else if (cqe->res == UBLK_IO_RES_NEED_GET_DATA) {
++		io->flags |= UBLKSRV_NEED_GET_DATA | UBLKSRV_IO_FREE;
++		ublk_queue_io_cmd(q, io, tag);
+ 	} else {
+ 		/*
+ 		 * COMMIT_REQ will be completed immediately since no fetching
+@@ -1313,7 +1318,7 @@ int main(int argc, char *argv[])
+ 
+ 	opterr = 0;
+ 	optind = 2;
+-	while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:az",
++	while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:g:az",
+ 				  longopts, &option_idx)) != -1) {
+ 		switch (opt) {
+ 		case 'a':
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index 918db5cd633f..44ee1e4ac55b 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -115,6 +115,7 @@ struct ublk_io {
+ #define UBLKSRV_NEED_FETCH_RQ		(1UL << 0)
+ #define UBLKSRV_NEED_COMMIT_RQ_COMP	(1UL << 1)
+ #define UBLKSRV_IO_FREE			(1UL << 2)
++#define UBLKSRV_NEED_GET_DATA           (1UL << 3)
+ 	unsigned short flags;
+ 	unsigned short refs;		/* used by target code only */
+ 
+diff --git a/tools/testing/selftests/ublk/test_generic_07.sh b/tools/testing/selftests/ublk/test_generic_07.sh
+new file mode 100755
+index 000000000000..5d82b5955006
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_07.sh
+@@ -0,0 +1,25 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++TID="generic_07"
++ERR_CODE=0
++
++_prep_test "generic" "test UBLK_F_NEED_GET_DATA"
++
++_create_backfile 0 256M
++dev_id=$(_add_ublk_dev -t loop -q 2 -g 1 "${UBLK_BACKFILES[0]}")
++_check_add_dev $TID $?
++
++# run fio over the ublk disk
++if ! _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M; then
++	_cleanup_test "generic"
++	_show_result $TID 255
++fi
++
++_mkfs_mount_test /dev/ublkb"${dev_id}"
++ERR_CODE=$?
++
++_cleanup_test "generic"
++_show_result $TID $ERR_CODE
 -- 
-Jens Axboe
-
-
+2.47.0
 
