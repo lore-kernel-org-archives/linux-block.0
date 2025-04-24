@@ -1,44 +1,72 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7514020E700;
-	Thu, 24 Apr 2025 08:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19071F75A9;
+	Thu, 24 Apr 2025 08:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745483868; cv=none; b=ipGuBkfbpbuz8wOyMPcw7cWMlJjL9rRdbXLXYTNrylCcbWu9ykVxg39rjUwD+vslyZXN80gn5zn8My71szbhUrkC2tOxKimyC6PSeoSkzSbt/kx5oD8HRH/A4KY0EfxGHGklL24o50zVnJS5AZz6d0Bbp9uMK1Q97XRCokQuxiQ=
+	t=1745484392; cv=none; b=pL9DsDAkCX/fxLcXEJxof8o9OgwUfHfuBYY6ZPZS4okvKofoHWnXxbbTudwOx9yKStz+nl/1B/bnLPyTqiXPECu/YLMiVoet7M61JIeA5a+fxiMzuhItLS366x1L8moLq3kNNXI/9srDg5U8ENc2K2HCwM+D1xBlyxp77Fnc8Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745483868; c=relaxed/simple;
-	bh=uV5SOxe11nIMXSY79Utbf7Y4n7mYRE75YQ+Yie0DOkg=;
+	s=arc-20240116; t=1745484392; c=relaxed/simple;
+	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bFPO7KLdSfS91tEtJS/aE6svIe+bYnlSDmBLTrJ/Gi00rlzXxci1FvBF/GaVKbiDKTJlfVdwc8KDpSqpIZLB+4ongYWU1tV0BLEde4YX3CqdMnF8mXnoyunIVgWSPXJaBaDLK4zpGMsFpcUjHnR5z9w2iHj7l8T1qD1japlD++g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 778C567373; Thu, 24 Apr 2025 10:37:40 +0200 (CEST)
-Date: Thu, 24 Apr 2025 10:37:40 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-btrfs@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: add more bio helper
-Message-ID: <20250424083740.GA24723@lst.de>
-References: <20250422142628.1553523-1-hch@lst.de> <jetduw7zshrmp4gl7zfpwqjweycwesxiod7xvtnxqwqekgtvdf@idwnvfzvhgik> <20250423093621.GA2578@lst.de> <sl4oibdxpjygqfpy6llq237zuckz7ym4fmzcfvxn2raofr37a5@hvevbcgm5trn> <20250423160733.GA656@lst.de> <q53k4x5nshvr2zatrgyhygxouv7ijyepe6cj2pfooemi6gbu4y@lpxxcvozazzu>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jwQxNc/ZuT3VuulgzV2KYPEtABJ4/9dQc8PpG6UTr1vR0kb0kMiATqo2p3awTQc/Lj1BdgDs5Zc6nTeeDU+WbrtfK5NK8Ui8Wc3i9tx6jmv3oiUNM/5ZS1H5bvCWjH+LYA+dq+1zbZJVB2IN/BC6oHREtYldPLccPYer0w+CZ7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSR+lBTu; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSR+lBTu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4A0C4CEED;
+	Thu, 24 Apr 2025 08:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745484392;
+	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uSR+lBTuzs9lAfUp6ETUwd/e83HDQBPN+bi2x6d+WcXRuXqISLxR1KnZmPcANDNPl
+	 XcusVwWrcgl5ZwxaQMTClZZp6wv04VyBadsXr0ChBep2yGTn0yT6aRBkv0qe3YHnsu
+	 Xbfy/GOWPkZiF5ouAX9EAiGXmE23jYsBtArkcpCT8edU46pm2SHyttUmmiowtlF9le
+	 jBdsLZ0dV8tCc+abgC1OkQo4yqWtl296bgiFLL3P131EcMwOFukXU6T1YRIKWY0DCS
+	 vfhRiecYS5EGzJ47VScGPAGcWrDrAIXqhECCrbNzQ/i5dx+Y8dYPFcg8gKvkI2s3k1
+	 MO9hwaOX8jurQ==
+Date: Thu, 24 Apr 2025 11:46:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250424084626.GQ48485@unreal>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+ <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+ <20250423233335.GW1213339@ziepe.ca>
+ <20250424080744.GP48485@unreal>
+ <20250424081101.GA22989@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,70 +75,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <q53k4x5nshvr2zatrgyhygxouv7ijyepe6cj2pfooemi6gbu4y@lpxxcvozazzu>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250424081101.GA22989@lst.de>
 
-On Wed, Apr 23, 2025 at 02:02:11PM -0400, Kent Overstreet wrote:
-> Allocating your own bio doesn't allow you to safely exceed the
-> BIO_MAX_VECS limit - there's places in the io path that need to bounce,
-> and they all use biosets.
-
-Yes.  Another reason not to do it, which I don't want to anyway.
-
-But we do have a few places that do it like squashs which we need to
-weed out.  And/or finally kill the bounce bufferingreal, which is long
-overdue.
-
-> That may be an issue even for non vmalloc bios, unless everything that
-> bounces has been converted to bounce to a folio of the same order.
-
-Anything that actually hits the bounce buffering is going to
-cause problems because it hasn't kept up with the evolution of
-the block layer, and is basically not used for anything relevant.
-
-> > The problem with transparent vmalloc handling is that it's not possible.
-> > The magic handling for virtually indexed caches can be hidden on the
-> > submission side, but the completion side also needs to call
-> > invalidate_kernel_vmap_range for reads.  Requiring the caller to know
-> > they deal vmalloc is a way to at least keep that on the radar.
+On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
+> > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+> > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+> > 
+> > Thanks for the fix.
 > 
-> yeesh, that's a landmine.
+> Maybe we can use the chance to make the scheme less fragile?  i.e.
+> put flags in the high bits and derive the first valid bit from the
+> pfn order?
 > 
-> having a separate bio_add_vmalloc as a hint is still a really bad
-> "solution", unfortunately. And since this is something we don't have
-> sanitizers or debug code for, and it only shows up on some archs -
-> that's nasty.
 
-Well, we can't do it in the block stack because that doesn't have the
-vmalloc address available.  So the caller has to do it, and having a
-very visible sign is the best we can do.  Yes, signs aren't the
-best cure for landmines, but they are better than nothing.
+It can be done too. This is what I got:
 
-> > Not for a purely synchronous helper we could handle both, but so far
-> > I've not seen anything but the xfs log recovery code that needs it,
-> > and we'd probably get into needing to pass a bio_set to avoid
-> > deadlock when used deeper in the stack, etc.  I can look into that
-> > if we have more than a single user, but for now it doesn't seem
-> > worth it.
-> 
-> bcache and bcachefs btree buffers can also be vmalloc backed. Possibly
-> also the prio_set path in bcache, for reading/writing bucket gens, but
-> I'd have to check.
+   38 enum hmm_pfn_flags {
+   39         /* Output fields and flags */
+   40         HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+   41         HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+   42         HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+   43         /*
+   44          * Sticky flags, carried from input to output,
+   45          * don't forget to update HMM_PFN_INOUT_FLAGS
+   46          */
+   47         HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 4),
+   48         HMM_PFN_P2PDMA     = 1UL << (BITS_PER_LONG - 5),
+   49         HMM_PFN_P2PDMA_BUS = 1UL << (BITS_PER_LONG - 6),
+   50
+   51         HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 11),
+   52
+   53         /* Input flags */
+   54         HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
+   55         HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
+   56
+   57         HMM_PFN_FLAGS = ~((1UL << HMM_PFN_ORDER_SHIFT) - 1),
+   58 };
 
-But do you do synchronous I/O, i.e. using sumit_bio_wait on them?
+So now, we just need to move HMM_PFN_ORDER_SHIFT if we add new flags
+and HMM_PFN_FLAGS will be updated automatically.
 
-> 
-> > Having a common helper for vmalloc and the kernel direct mapping
-> > is actually how I started, but then I ran into all the issues with
-> > it and with the extremely simple helpers for the direct mapping
-> > which are used a lot, and the more complicated version for vmalloc
-> > which just has a few users instead.
-> 
-> *nod*
-> 
-> What else did you run into? invalidate_kernel_vmap_range() seems like
-> the only problematic one, given that is_vmalloc_addr() is cheap.
-
-invalidate_kernel_vmap_range is the major issue that can't be
-worked around.  Everything else was mentioned before and can be
-summarized as minor inconveniences.
+Thanks
