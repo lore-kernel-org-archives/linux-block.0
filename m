@@ -1,117 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2E1153BE8;
-	Thu, 24 Apr 2025 12:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71AEE545
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499057; cv=none; b=RJB0gTby8euN3gN4n+jWDvTuILGEK6zgX7t0PGEZsLCBUy6QOz5P3Is6YXGDI69+E/hFIFvYw+b5QaNV0oq2dygj7yW1W3ODMQMTUMhLTxoT/FVOu4i399iHVV2vH8zIkoYysIbXp+b4ty2/AfUAjpdYWCMTuf5pOk3dRjsibI0=
+	t=1745499998; cv=none; b=pAZHt4uPP3l4yTDf7WIZjuL5T0SZWysVfR6AEvIK0k5fgcoZF3F7Dc6qpM8WF8Nd+MzUICclMMMbjsLJRPgD1xPSO2AcGbzS4rlRpt8bdiNXFf3ReWy4Zt+yCs7raJGd15ob9ieRd5hjt9n5070ob8DRcrHDehVaU1G0mTwO7QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499057; c=relaxed/simple;
-	bh=8H9DLsIGypKjg5EA6FxGNO666pgvRrUO/QmIpk1Dbt4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AbGu0W7aLEcKekvvQzLIS2KX8Lzf+93H2jVheWFWQMitKRUeCMZqxDBw8cCl+vc6T07w2M8/1NQCtVyUuRWw9KFggEFC3fgKOzjaSt2RPB9m/NFlaDFFCsnlRxdYN+Ncqk/8Fy5qyPfZzddsjbydd4iSi9X/JJqDM1nYkq+4jIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NF+hNjrG; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NF+hNjrG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73038C4CEE8;
-	Thu, 24 Apr 2025 12:50:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745499057;
-	bh=8H9DLsIGypKjg5EA6FxGNO666pgvRrUO/QmIpk1Dbt4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NF+hNjrGDHMWirFNyLpGK+CGY/Wtnrcaz8GKXJy/bE0XGkdVLaecqnHgHaxGfEhML
-	 7jpVM/H7S49o+1K+eHQ2EgfO2HX4uAVtcvGRrWZJiMPUTyBYsPFQrSWaQDyWiksE4I
-	 zYCVGwUO0Zy3g+Q9YtT5JjZ6L4/EJc4YcANsfzc5P8J46J4DvIu422Ekpr+LWz/xu5
-	 1tDTRL8fevCgQaBA+DwfgEVIfNxbm2kn1CppO/72VC+Bxe/6aX19AeSe+j5ZVvsX6c
-	 jKIeV1sk1Atk76qflMRZe3BT+0W+nn49+KZBrII6YRZh59RXG6gb+f1yfN7sBXtrbi
-	 XI5m2BF99M4Cw==
-Date: Thu, 24 Apr 2025 15:50:52 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20250424125052.GS48485@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
- <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
- <20250423181706.GT1213339@ziepe.ca>
- <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
- <20250423233335.GW1213339@ziepe.ca>
- <20250424080744.GP48485@unreal>
- <20250424081101.GA22989@lst.de>
- <20250424084626.GQ48485@unreal>
- <20250424120703.GY1213339@ziepe.ca>
+	s=arc-20240116; t=1745499998; c=relaxed/simple;
+	bh=7VL9LiXP1QjnMSDEGVK4cAk83076PlWPAU4NQ9KCkSs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gdIyS2ZW3Y5SqHEgYow3wZlEQ/KMPGubiJafJjwPIfyv3boIyaYQWjcsbQh7/cLZOZ5xymdxZMqrirhe3CelAqk8pJVz7Bah4iUC1HYExVXgUeLWtripyMJ2FMnUIOMgSfX8S7fw9K4Xg4X/nRSih8vFrNeV19YesfhCv4Sn7os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d81b9bb1b3so10665735ab.1
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:06:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745499996; x=1746104796;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x+nl8Emi7VbtHDYLJ2yQ20exakEQsVh/t4kfvAlXQQQ=;
+        b=LdgfLMtdLxcD27amuTFMfaZm0BMQQ56pFTx8dEJPD31Et49f8RzeCXlyPdrQ3OlUoj
+         Y+qDGHE7VNEppoIYQ/7Ar+aEfeiIiyHqREG4XbmQjFXDhURA2siQDKEUav+L4ebhZh2z
+         Z3vvhZ0SaqrtwwuDkv2RR67FckVZMx1rZhg+yqMwhiB+ea1KqDZhm7c/+VitamIjlSm/
+         DS3a7PtXbtHlwelDibudXOvIDvIpI6rbZ/9ensnkHS5d8k0sMGcOhIZeKRWVTKStrbDT
+         H7tFOhx4CeqOqvtybIpvt9r0NAmduCVumlk9Zlprup0fRMIakWYMQ6LXXGsm6VuxTCK4
+         NkgQ==
+X-Gm-Message-State: AOJu0Yy/joIZPvgf5pQJq9lhY78AoU/8fKWY4pQoL9dkL1rua/UTIBYg
+	wA1RWSbVrZbs9Fo35/Is34r7HxJFP9ovUxHVUYACZ3+jtIC7BZLqQFdhKDkLwKoqYQwj6Csw0eY
+	OVEJsd23nsyZMjOaO4iR8otFJIQuh1J1RKNF23ecm8WjouE5mfU9Vd74=
+X-Google-Smtp-Source: AGHT+IHwrQ15VoiMCXG3EA2MlCv9tCPaplQJ11oIQkga7gS5vwHlMdNpnmddGPiIVw+fw3swdW/85S0mSCgjTV+3WvCAuU1Z0Cz/
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424120703.GY1213339@ziepe.ca>
+X-Received: by 2002:a05:6e02:1569:b0:3d8:975:b808 with SMTP id
+ e9e14a558f8ab-3d93038630cmr25022615ab.5.1745499996022; Thu, 24 Apr 2025
+ 06:06:36 -0700 (PDT)
+Date: Thu, 24 Apr 2025 06:06:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <680a375c.050a0220.10d98e.0007.GAE@google.com>
+Subject: [syzbot] Monthly block report (Apr 2025)
+From: syzbot <syzbot+list14b5741b0fc59d7d464f@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 24, 2025 at 09:07:03AM -0300, Jason Gunthorpe wrote:
-> On Thu, Apr 24, 2025 at 11:46:26AM +0300, Leon Romanovsky wrote:
-> > On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
-> > > On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
-> > > > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
-> > > > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
-> > > > 
-> > > > Thanks for the fix.
-> > > 
-> > > Maybe we can use the chance to make the scheme less fragile?  i.e.
-> > > put flags in the high bits and derive the first valid bit from the
-> > > pfn order?
-> >
-> > It can be done too. This is what I got:
-> 
-> Use genmask:
+Hello block maintainers/developers,
 
-I can do it too, will change.
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
-> 
-> enum hmm_pfn_flags {
-> 	HMM_FLAGS_START = BITS_PER_LONG - PAGE_SHIFT,
-> 	HMM_PFN_FLAGS = GENMASK(BITS_PER_LONG - 1, HMM_FLAGS_START),
-> 
-> 	/* Output fields and flags */
-> 	HMM_PFN_VALID = 1UL << HMM_FLAGS_START + 0,
-> 	HMM_PFN_WRITE = 1UL << HMM_FLAGS_START + 1,
-> 	HMM_PFN_ERROR = 1UL << HMM_FLAGS_START + 2,
-> 	HMM_PFN_ORDER_MASK = GENMASK(HMM_FLAGS_START + 7, HMM_FLAGS_START + 3),
-> 
-> 	/* Input flags */
-> 	HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
-> 	HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
-> };
-> 
-> Jason
+During the period, 3 new issues were detected and 1 were fixed.
+In total, 34 issues are still open and 96 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  10734   Yes   possible deadlock in loop_set_status
+                   https://syzkaller.appspot.com/bug?extid=9b145229d11aa73e4571
+<2>  5418    Yes   KMSAN: kernel-infoleak in filemap_read
+                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+<3>  3359    Yes   possible deadlock in blk_mq_freeze_queue_nomemsave
+                   https://syzkaller.appspot.com/bug?extid=9dd7dbb1a4b915dee638
+<4>  2520    Yes   INFO: task hung in bdev_release
+                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+<5>  648     Yes   INFO: task hung in bdev_open
+                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
+<6>  363     No    INFO: task hung in read_part_sector (2)
+                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+<7>  312     Yes   possible deadlock in blk_mq_update_nr_hw_queues
+                   https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
+<8>  81      No    KCSAN: data-race in block_uevent / inc_diskseq (2)
+                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
+<9>  63      Yes   possible deadlock in queue_requests_store
+                   https://syzkaller.appspot.com/bug?extid=48928935f5008dde0a41
+<10> 51      Yes   WARNING in blk_register_tracepoints
+                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
