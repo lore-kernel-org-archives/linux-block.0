@@ -1,72 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19071F75A9;
-	Thu, 24 Apr 2025 08:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C7C210F5A
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 09:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745484392; cv=none; b=pL9DsDAkCX/fxLcXEJxof8o9OgwUfHfuBYY6ZPZS4okvKofoHWnXxbbTudwOx9yKStz+nl/1B/bnLPyTqiXPECu/YLMiVoet7M61JIeA5a+fxiMzuhItLS366x1L8moLq3kNNXI/9srDg5U8ENc2K2HCwM+D1xBlyxp77Fnc8Mo=
+	t=1745485395; cv=none; b=VzWlKeD6HzTQnIp2Go8nDuo5zNN5GJ+9Co3gtoHUxA4bn/P1FOs/ueg5rxst7DBOjoa8UmVjDeTklKU5kMl3VsV3EhcFQ3SAS+i/VzxYp6EAr6JLmUqWPPocnIXR/YWs0ZjydfOnXDGD/OpbW0gEOs4l7Oc2EzDlRDtFzC4J0Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745484392; c=relaxed/simple;
-	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
+	s=arc-20240116; t=1745485395; c=relaxed/simple;
+	bh=LxxZ3PnM3GnSmQVc4b35vmUhaH1YtHOD2luSa1Hv2FA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jwQxNc/ZuT3VuulgzV2KYPEtABJ4/9dQc8PpG6UTr1vR0kb0kMiATqo2p3awTQc/Lj1BdgDs5Zc6nTeeDU+WbrtfK5NK8Ui8Wc3i9tx6jmv3oiUNM/5ZS1H5bvCWjH+LYA+dq+1zbZJVB2IN/BC6oHREtYldPLccPYer0w+CZ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSR+lBTu; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=k9YdX0ZFXhPnGjnscPs0yDnDgGpeE0KfkrdDPurOaFQYVNxAVd8NsK55Jb3U7+vcGUwGPBt48NE/CQq75AILMWxnrrSSJZQlkAAn6hk4F4UkdDfiVxIT3wyyfn3tn+CwH2RoE43kroTufktBVVH/a1FysOXBsItVdJdUYwrRDqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTIoglLA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSR+lBTu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4A0C4CEED;
-	Thu, 24 Apr 2025 08:46:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745484392;
-	bh=ki3q6dIyPVLY9OlwYT9gx2mvHOve0ih8UQqOIXQy4sw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uSR+lBTuzs9lAfUp6ETUwd/e83HDQBPN+bi2x6d+WcXRuXqISLxR1KnZmPcANDNPl
-	 XcusVwWrcgl5ZwxaQMTClZZp6wv04VyBadsXr0ChBep2yGTn0yT6aRBkv0qe3YHnsu
-	 Xbfy/GOWPkZiF5ouAX9EAiGXmE23jYsBtArkcpCT8edU46pm2SHyttUmmiowtlF9le
-	 jBdsLZ0dV8tCc+abgC1OkQo4yqWtl296bgiFLL3P131EcMwOFukXU6T1YRIKWY0DCS
-	 vfhRiecYS5EGzJ47VScGPAGcWrDrAIXqhECCrbNzQ/i5dx+Y8dYPFcg8gKvkI2s3k1
-	 MO9hwaOX8jurQ==
-Date: Thu, 24 Apr 2025 11:46:26 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20250424084626.GQ48485@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
- <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
- <20250423181706.GT1213339@ziepe.ca>
- <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
- <20250423233335.GW1213339@ziepe.ca>
- <20250424080744.GP48485@unreal>
- <20250424081101.GA22989@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTIoglLA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745485391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yQlNEGSJgij/t3GaaKCbDm9GBD8YV1Z5HMPR6Qwn3Uc=;
+	b=WTIoglLAwCsjONgPVN/lCHkTDkABPk/XrsEOGGR07s/NT11rDNUd2CvoQiwwguO3Pm8+Jm
+	xFfJFxEDbMK7rgiSIaD9TFMr4fEUilz3M8x9E8+In1RTFI1PjtFAblpE0v1fw+aaVb4CZs
+	J2KUro2Vzf/5Gm9xjBWkBlXOaQbmPIA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-fEpUFpxbOZGKJ5sRVGC3Mw-1; Thu,
+ 24 Apr 2025 05:03:07 -0400
+X-MC-Unique: fEpUFpxbOZGKJ5sRVGC3Mw-1
+X-Mimecast-MFC-AGG-ID: fEpUFpxbOZGKJ5sRVGC3Mw_1745485386
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E95ED180036E;
+	Thu, 24 Apr 2025 09:03:05 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.127])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4303D1800374;
+	Thu, 24 Apr 2025 09:03:00 +0000 (UTC)
+Date: Thu, 24 Apr 2025 17:02:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 13/20] block: unifying elevator change
+Message-ID: <aAn-QPbsIadxZQhe@fedora>
+References: <20250418163708.442085-1-ming.lei@redhat.com>
+ <20250418163708.442085-14-ming.lei@redhat.com>
+ <28d4f3b8-1e42-451e-9754-ebf639b05aa2@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,45 +61,112 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250424081101.GA22989@lst.de>
+In-Reply-To: <28d4f3b8-1e42-451e-9754-ebf639b05aa2@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
-> On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
-> > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
-> > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+On Sat, Apr 19, 2025 at 06:56:14PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 4/18/25 10:06 PM, Ming Lei wrote:
+> > elevator change is one well-define behavior:
 > > 
-> > Thanks for the fix.
-> 
-> Maybe we can use the chance to make the scheme less fragile?  i.e.
-> put flags in the high bits and derive the first valid bit from the
-> pfn order?
-> 
+> > - tear down current elevator if it exists
+> > 
+> > - setup new elevator
+> > 
+> > It is supposed to cover any case for changing elevator by single
+> > internal API, typically the following cases:
+> > 
+> > - setup default elevator in add_disk()
+> > 
+> > - switch to none in del_disk()
+> > 
+> > - reset elevator in blk_mq_update_nr_hw_queues()
+> > 
+> > - switch elevator in sysfs `store` elevator attribute
+> > 
+> > This patch uses elevator_change() to cover all above cases:
+> > 
+> > - every elevator switch is serialized with each other: add_disk/del_disk/
+> > store elevator is serialized already, blk_mq_update_nr_hw_queues() uses
+> > srcu for syncing with the other three cases
+> > 
+> > - for both add_disk()/del_disk(), queue freeze works at atomic mode
+> > or has been froze, so the freeze in elevator_change() won't add extra
+> > delay
+> > 
+> > - `struct elev_change_ctx` instance holds any info for changing elevator
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-sysfs.c | 18 ++++-------
+> >  block/blk.h       |  5 ++-
+> >  block/elevator.c  | 81 ++++++++++++++++++++++++++---------------------
+> >  block/elevator.h  |  1 +
+> >  block/genhd.c     | 19 +----------
+> >  5 files changed, 55 insertions(+), 69 deletions(-)
+> > 
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index a2882751f0d2..58c50709bc14 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -869,14 +869,8 @@ int blk_register_queue(struct gendisk *disk)
+> >  	if (ret)
+> >  		goto out_unregister_ia_ranges;
+> >  
+> > +	elevator_set_default(q);
+> >  	mutex_lock(&q->elevator_lock);
+> > -	if (q->elevator) {
+> > -		ret = elv_register_queue(q, false);
+> > -		if (ret) {
+> > -			mutex_unlock(&q->elevator_lock);
+> > -			goto out_crypto_sysfs_unregister;
+> > -		}
+> > -	}
+> >  	wbt_enable_default(disk);
+> >  	mutex_unlock(&q->elevator_lock);
+> >  
+> [...]
+> [...]
+> >  /*
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index 86c3db5b9305..de227aa923ed 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -438,12 +438,6 @@ static int __add_disk_fwnode(struct gendisk_data *data)
+> >  		 */
+> >  		if (disk->fops->submit_bio || disk->fops->poll_bio)
+> >  			return -EINVAL;
+> > -
+> > -		/*
+> > -		 * Initialize the I/O scheduler code and pick a default one if
+> > -		 * needed.
+> > -		 */
+> > -		elevator_init_mq(disk->queue);
+> >  	} else {
+> >  		if (!disk->fops->submit_bio)
+> >  			return -EINVAL;
+> > @@ -587,11 +581,7 @@ static int __add_disk_fwnode(struct gendisk_data *data)
+> >  	if (disk->major == BLOCK_EXT_MAJOR)
+> >  		blk_free_ext_minor(disk->first_minor);
+> >  out_exit_elevator:
+> > -	if (disk->queue->elevator) {
+> > -		mutex_lock(&disk->queue->elevator_lock);
+> > -		elevator_exit(disk->queue);
+> > -		mutex_unlock(&disk->queue->elevator_lock);
+> > -	}
+> > +	elevator_set_none(disk->queue);
+> >  	return ret;
+> >  }
+> As we moved elevator init function (elevator_set_default) inside blk_register_queue, 
+> we probably now don't need label out_exit_elevator in __add_disk_fwnode. In fact,
+> no code in __add_disk_fwnode shall jump to this label.
+> I think, elevator_set_none may be called anytime after we see failure post 
+> blk_register_queue returns.
 
-It can be done too. This is what I got:
+Good catch, 'out_exit_elevator' can rename as 'out', and the last
+elevator_set_none() can be dropped.
 
-   38 enum hmm_pfn_flags {
-   39         /* Output fields and flags */
-   40         HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
-   41         HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
-   42         HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
-   43         /*
-   44          * Sticky flags, carried from input to output,
-   45          * don't forget to update HMM_PFN_INOUT_FLAGS
-   46          */
-   47         HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 4),
-   48         HMM_PFN_P2PDMA     = 1UL << (BITS_PER_LONG - 5),
-   49         HMM_PFN_P2PDMA_BUS = 1UL << (BITS_PER_LONG - 6),
-   50
-   51         HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 11),
-   52
-   53         /* Input flags */
-   54         HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
-   55         HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
-   56
-   57         HMM_PFN_FLAGS = ~((1UL << HMM_PFN_ORDER_SHIFT) - 1),
-   58 };
+Thanks,
+Ming
 
-So now, we just need to move HMM_PFN_ORDER_SHIFT if we add new flags
-and HMM_PFN_FLAGS will be updated automatically.
-
-Thanks
