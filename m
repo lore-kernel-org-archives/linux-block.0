@@ -1,42 +1,55 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29A6205501
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 08:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5ADE552;
+	Thu, 24 Apr 2025 08:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482155; cv=none; b=pLDfJphCrVK9ue427jGMBpOxUsVfPvrJoNVuC6BLCQGu9SkX8228WyqGylXA66lSv3u8KUyonH75dc0aLBOr+RUQ5ip6+TuuIhYxWW9OhBMqdcVIsw242GM8DLqPO68rmWBpRDepSSkgCjFPhWd4jQ9stYYGoQ7/PGSb1qwLB7A=
+	t=1745482276; cv=none; b=CAVJN0JWMmcGyI0sz53vADj2uYM5ZMHYWaxFthQ+z1vXNMgLbturC+qNLOUdkRm2RAy8UcAFcxYjhHk3a0kD3tAB0QzNSXfbcWmirpqFPXtdtVZM4OQGWxLanuKZrECOc/TXkWVbMsrmQR+wk9m+1JNvKpxHkqN0xPTnz/NenFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482155; c=relaxed/simple;
-	bh=VtOKR7jOavUe/jCC4djqumVgh37976aK9RtTKXRWO2s=;
+	s=arc-20240116; t=1745482276; c=relaxed/simple;
+	bh=JGL3psGtkPH2/js8ND1zwM6GdWFnAznTJQ556NVu1Dw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhKkbAzAsD2ZNWUu9PcU0/aNKBFPaUAxWC/Gv66oq4utvi26+j2M9KFvuE0PgVuJ/7RDFdMTXq2s1V0patkroMXF4oCktZX4G2128U0tbRN7PSoRmaJUmisSqlE/b8CP0VBAcSSrD+qjB6VE9bdOYSXqqBh+wSTtJZbyfXN4fFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=yX/4HBm5; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yX/4HBm5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5SMA0LNudvRcjgz7q/tVM5DxXjonXOCKdU+oAluI23o=; b=yX/4HBm54xW19xiQ8rFX5Y1Pow
-	hoWG6C4SLWRUGYCuktytJJCWr7dQYndMgXa0zzTGR+7mygmWiSn7LDPjzvfCc9bm4OZ7ktiynvG5U
-	C+Z5rFWUFCKC2FcybxGnKtxqMqlq4jcll1kzpgEpRXeEQLqfwDMq3GN6P9VWd3zUVqG+gN8El3OVu
-	BkiC3Q0nW9+G/7rgmsCTZj58bLisgtC02qe7zv4GjxFUBdvMBgk4UgfScNFJta9A1oU3BvqhlSDUC
-	YnuiQECdwpD7hplow9XRC+eMtHbb79Vwyw9okSKFOz8/MJA6jug/rbl8s7DGwWSZDQ369VbqyOuhV
-	LxnexHMQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u7rdw-0000000DHmw-2V43;
-	Thu, 24 Apr 2025 08:09:12 +0000
-Date: Thu, 24 Apr 2025 01:09:12 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Sean Anderson <seanga2@gmail.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
-Message-ID: <aAnxqAv41Quh66Q1@infradead.org>
-References: <20250423164957.2293594-1-seanga2@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rHO4u/Y/lGtHRuH0Uk2/BW6hQZ6oL9oPpn8lmUi3ivcOLa0NoaU8eFySORTnhjI+Q6UL3pfWMUC4Zl8MmW3qVCyBZABRVYTC4vpdutK9tbqj5BfDd2GtKaqvHVJ+wCRbrzrC8QtwY0nLsjhMAGvgaVoEtfYhF/z8+VpalxsjW9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2F45667373; Thu, 24 Apr 2025 10:11:01 +0200 (CEST)
+Date: Thu, 24 Apr 2025 10:11:01 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with
+ DMA mapped bit
+Message-ID: <20250424081101.GA22989@lst.de>
+References: <cover.1745394536.git.leon@kernel.org> <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org> <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com> <20250423181706.GT1213339@ziepe.ca> <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com> <20250423233335.GW1213339@ziepe.ca> <20250424080744.GP48485@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,16 +58,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423164957.2293594-1-seanga2@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250424080744.GP48485@unreal>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Apr 23, 2025 at 12:49:57PM -0400, Sean Anderson wrote:
-> The block size must be smaller than the zone length, otherwise fio will
-> fail immediately.
+On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
+> > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+> > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+> 
+> Thanks for the fix.
 
-In theory yes.  In practice such a zone size makes zero sense, and will
-not work with any zoned file systems or other users.
-
-So instead we should just warn about a silly zone size here instead
-of trying to handle it.
-
+Maybe we can use the chance to make the scheme less fragile?  i.e.
+put flags in the high bits and derive the first valid bit from the
+pfn order?
