@@ -1,145 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44910294A0F;
-	Thu, 24 Apr 2025 18:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE131FC0EA
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 18:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745518812; cv=none; b=Tr2xTvWyE4qaA4guyed7VQiMu14QNuM/RXCRombc3UC6aAWtEExLmBfpxVw0qktK1GxiUo8o9VZxvfI+1SSRiTweX5Y2CBZQIeX/Hq44vqYvdJG0/oWHNY5VqjiZrDUdAZBh10UFkEvcMwHPG1v90xmQBvCo32yeXspMO+zv/K8=
+	t=1745519329; cv=none; b=VvP1O8sZuU3nnYcZuKUEp984UdQYYZFn69y/Chc/0m2xZcq+vcbNy/mOUQPYCrpmLUgrhr2gIjlDVKMhmXtkRoY5dGUABIdEfSf+x2OYKuwJzit3eSRYbK+As+R4aP8f8rpAa6F6ZGQtTQFzjLP6LascEyfyiRA2HdGWfgXUq8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745518812; c=relaxed/simple;
-	bh=AXA4x2vMWdvsJD5ZZl+of9Llu+mBLzfjSGJCkdx0VW0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LpQ2SJTY2Lhj+K77UuAaCN6h7Nlkzd2WfmBpyq+0/U2S/4NhkVzc1lSdvPyaJwol19tRBHwIfftjZbWrhhxhjqUssy7exBbDAOBVTDpeK/yEdbiYRcYqfWr/h3t8ZHfVtKz3SgtzdDiWOofEm9YD81abiKp8V1PuRvsIH5mzlZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=how6HOg4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745519329; c=relaxed/simple;
+	bh=2fw2xFj7P/zVtxlbQXcdM2QNVnsHC3V5Cck93HORh0E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s76Dvi7xh5VOcqKAACPcAaMUEJvmwVqDQdkzXFCHUozAG+7drlEv+OzqesjnUqQt93lRzIer+SVb/1F3+zBUsA0OvJHnMMCgSLs/b+hcjaXQaGpsh6XqMWIL232iGG6uXJ9dmRVkfM26hw2SckGXTUtLYDdA1U1f9CZhGoaUi6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=U3pRzCrN; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="how6HOg4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 802EAC4CEEA;
-	Thu, 24 Apr 2025 18:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745518812;
-	bh=AXA4x2vMWdvsJD5ZZl+of9Llu+mBLzfjSGJCkdx0VW0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=how6HOg4xUd6cxF5Runi3vtMopYXzUiZqPCkh7yY5A/H6/k5svrmHDM7XiIz1q3ma
-	 SCF02zEuUcIuA5CgDZOYO5ohyY0Hl+8gJ45yLDzOE5zjzceogSpzKcqViPBB1vwyAE
-	 adOYVggFJIH2aIm2JAgS6zQEN7IcZngXyv5ZXJdLXkIU4W7Fl7MXvnJ/WcgwzAc1qt
-	 2gK72HuBkvXifXx+WDd7V8ycU3/XlsFnP5XDYDE5fm/wBSRGtg5BB/ObPyXrMT+5mf
-	 MKDTAQxnd07mHXF6gm14HkmEHDir9usojRd/B6GzJS3AlUT33zOUOq/02ruSNDwxum
-	 9pixCn0zcieOg==
-From: Daniel Wagner <wagi@kernel.org>
-Date: Thu, 24 Apr 2025 20:19:48 +0200
-Subject: [PATCH v6 9/9] blk-mq: prevent offlining hk CPU with associated
- online isolated CPUs
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="U3pRzCrN"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b07698318ebso129599a12.2
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 11:28:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1745519327; x=1746124127; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2fw2xFj7P/zVtxlbQXcdM2QNVnsHC3V5Cck93HORh0E=;
+        b=U3pRzCrNc0WchRXyjHCQ2KiAdG1buX/GUflzw8LnhhFzk3ra7/y7ZKMQ3k5BQs0yOp
+         otZcwQR+I53gQar9HbezK6zQcTNWIH7hgYUong2AM1WeidvUkO8ZPBIKiIec3y8EEo+x
+         QGfBSjKMo+ok/4Y4H8sh/rkmlOdnc2XHyLbo3Cp8JOHHyXQ9dBQyWm89JwpB5HJWAZB+
+         UEXKwp9GZLTxnQ4/pZ8oBFogxCjOdnplaPBMsxBrRBDQkxlXS7yaU79Nyst9e0qYRN8H
+         wmtdCrk37iSyl0nKe5udpcXqVuHHJEUAEnyAA1i8cD+4XNARgxdvNMy93UFyqHud+TcC
+         oDwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745519327; x=1746124127;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2fw2xFj7P/zVtxlbQXcdM2QNVnsHC3V5Cck93HORh0E=;
+        b=IlHWgn95OJcBBMuTfSSMTGyunL88ESIs7c673XCc8/C60TzxY9eqV9WMBpJOdd+uPE
+         A4kHfe2R9VXSIdpg/VNCv0/Z905JkcN3AOKfAzzSGqsArzO3V7YdSJSfx0l+pP4zJsBr
+         Gw5pZYPmL3gnP9onamvF5rjkCebXL96odtpDo4nxjHjO2XLHbxKK0QGMRB8SmfxIEOj9
+         LCctBKRbx0F3Zi7c8zeC8vjAclqWFm49y2+WLNUdOG2LuoaZkk02xOMaWpM9DZqy8G/V
+         /cMSWaGFTNcftMkq8n/L1Tc2heRiO18i/4CJ0F+O9Gr37WwaA4YkzLFK8bHYtSEK13ZM
+         8klw==
+X-Gm-Message-State: AOJu0YwTBs6yAMKmFo3biasx6WYUHEQ57JZU5NXIHlo+Fs/X2TMjvhCt
+	nzAYAmvVmtnOQk7M//DIy3JsaGiGLTywC5jFrOudMKvzVPYZTjM8ZpRORjl3oDqWKEoJ5Sr/GC0
+	PFBd4WqMBPKMVpmEkS4XQfoNUZz/MGPHsL9tPxQ==
+X-Gm-Gg: ASbGncuaBF6zLPuQVqHTs+8DHfTs4DdUG4idgA6XN4cd7tGV5vv0cUcpx1eWxiYJUt0
+	cSJ5aMNaYw6jpjaVOIavbmXXYGr+iGkFkdoUjaFTHDreyhOwJGvn2GF8guss+EJB6f+fFQvO7fJ
+	4/RLz0DUJwDLKi6yvgKLY9qLaUw+sxdz8=
+X-Google-Smtp-Source: AGHT+IE9EvgDWBK/qsH8CsvxI91wl7QkpQQp9AeIcRilAQxFR+AmebFHc+W1MWGrkTTVanmWAMeEAAaaN9FaDAMck58=
+X-Received: by 2002:a17:90b:4c4c:b0:301:ba2b:3bc6 with SMTP id
+ 98e67ed59e1d1-309ed58334bmr1717412a91.7.1745519326695; Thu, 24 Apr 2025
+ 11:28:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250424-isolcpus-io-queues-v6-9-9a53a870ca1f@kernel.org>
-References: <20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org>
-In-Reply-To: <20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Thomas Gleixner <tglx@linutronix.de>, 
- Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
- Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
- Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
- Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, 
- linux-scsi@vger.kernel.org, storagedev@microchip.com, 
- virtualization@lists.linux.dev, GR-QLogic-Storage-Upstream@marvell.com, 
- Daniel Wagner <wagi@kernel.org>
-X-Mailer: b4 0.14.2
+References: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
+In-Reply-To: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 24 Apr 2025 11:28:35 -0700
+X-Gm-Features: ATxdqUEH426T98gaMe5WG8gZetr-kpkKcH5IGVtZBoGGXZHVa20UxJSOIMbCs3Y
+Message-ID: <CADUfDZo=uEno=4-3PJAD+_5sLRMaoFvMUGpckbD3tdbhCxTW4A@mail.gmail.com>
+Subject: Re: ublk: RFC fetch_req_multishot
+To: Ofer Oshri <ofer@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>, 
+	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>, 
+	Guy Eisenberg <geisenberg@nvidia.com>, Omri Levi <omril@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When isolcpus=io_queue is enabled, and the last housekeeping CPU for a
-given hctx would go offline, there would be no CPU left which handles
-the IOs. To prevent IO stalls, prevent offlining housekeeping CPUs which
-are still severing isolated CPUs..
+On Thu, Apr 24, 2025 at 11:19=E2=80=AFAM Ofer Oshri <ofer@nvidia.com> wrote=
+:
+>
+> Hi,
+>
+> Our code uses a single io_uring per core, which is shared among all block=
+ devices - meaning each block device on a core uses the same io_uring.
+>
+> Let=E2=80=99s say the size of the io_uring is N. Each block device submit=
+s M UBLK_U_IO_FETCH_REQ requests. As a result, with the current implementat=
+ion, we can only support up to P block devices, where P =3D N / M. This mea=
+ns that when we attempt to support block device P+1, it will fail due to io=
+_uring exhaustion.
 
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
----
- block/blk-mq.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+What do you mean by "size of the io_uring", the submission queue size?
+Why can't you submit all P * M UBLK_U_IO_FETCH_REQ operations in
+batches of N?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c2697db591091200cdb9f6e082e472b829701e4c..aff17673b773583dfb2b01cb2f5f010c456bd834 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3627,6 +3627,48 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 	return data.has_rq;
- }
- 
-+static bool blk_mq_hctx_check_isolcpus_online(struct blk_mq_hw_ctx *hctx, unsigned int cpu)
-+{
-+	const struct cpumask *hk_mask;
-+	int i;
-+
-+	if (!housekeeping_enabled(HK_TYPE_IO_QUEUE))
-+		return true;
-+
-+	hk_mask = housekeeping_cpumask(HK_TYPE_IO_QUEUE);
-+
-+	for (i = 0; i < hctx->nr_ctx; i++) {
-+		struct blk_mq_ctx *ctx = hctx->ctxs[i];
-+
-+		if (ctx->cpu == cpu)
-+			continue;
-+
-+		/*
-+		 * Check if this context has at least one online
-+		 * housekeeping CPU in this case the hardware context is
-+		 * usable.
-+		 */
-+		if (cpumask_test_cpu(ctx->cpu, hk_mask) &&
-+		    cpu_online(ctx->cpu))
-+			break;
-+
-+		/*
-+		 * The context doesn't have any online housekeeping CPUs
-+		 * but there might be an online isolated CPU mapped to
-+		 * it.
-+		 */
-+		if (cpu_is_offline(ctx->cpu))
-+			continue;
-+
-+		pr_warn("%s: trying to offline hctx%d but there is still an online isolcpu CPU %d mapped to it\n",
-+			hctx->queue->disk->disk_name,
-+			hctx->queue_num, ctx->cpu);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
- 		unsigned int this_cpu)
- {
-@@ -3647,7 +3689,7 @@ static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
- 
- 		/* this hctx has at least one online CPU */
- 		if (this_cpu != cpu)
--			return true;
-+			return blk_mq_hctx_check_isolcpus_online(hctx, this_cpu);
- 	}
- 
- 	return false;
-@@ -3659,7 +3701,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 
- 	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
--		return 0;
-+		return -EINVAL;
- 
- 	/*
- 	 * Prevent new request from being allocated on the current hctx.
-
--- 
-2.49.0
-
+Best,
+Caleb
