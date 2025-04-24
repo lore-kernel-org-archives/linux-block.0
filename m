@@ -1,102 +1,95 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115022288C3
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4214926FDB7
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745497702; cv=none; b=JfR7iL1hze5x57RxY4UCx3/P+HT+U63KBU1mqYk/rACK0pC2+uAM5mJVBLAQraN7p+JNovM4Xd616lBO69HNvcJbwQdoJyQkhswvReqSDeiObWPijJ6zGr5hI/fusgoC7CSmxccQ9rhFD+/CIgKBRbreZVW0xeBM/OipVCAsXeU=
+	t=1745497870; cv=none; b=eVSluBIybG8TZ4D8b9XG1nxE/GPMt4YCADPHgIhg9DwBkcwp0k91d7bCtoUEF10pc72yr2PTWhex2n85alZi3rc8utclMMgKE7QgQFKIioGw6q60sLt3yw9DpyFsSkXLWefkGIpDhnHj4gl5Mqr21P2SbAhfhkV0ufhSUuZRTvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745497702; c=relaxed/simple;
-	bh=duNKhmzxoU62cimrbYFzjeTfzKcykPtZNqQcgqxlpXY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y8kgMOn4kaT7X1GoVTAgLUbtIA51vIKKfVfFa2G3/Tya+IWpdlk9JUgH8ZcpqrYcDpHiZ3jRagSV7ulb+TMmd7pLSr/g1nhxl0cXPPLmS/D1uFX8w+iQymhr59WLlIG73XNDl4+1oJsYPIuEO+XZlSFX7Tc2fcVLzO+lOZtvhyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rsm2bvPD; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1745497870; c=relaxed/simple;
+	bh=WPftREPW4/qo/5xHH+9LLqlgxhde25Fhn0/iIWIwpuY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=eJKlYGCIxxuwHtwYxHKBjCn9LQLWJKxqkdx/xEUHR873F+OkhVOBqwkR4xyiuqcAxC/F4pdF63GUIgMWAOskUxQvpZBqSB12tIydL/xbdhEo3jvLACLo5Ga2pr2LonDgHqD22pdYuCxzko5L9dYeT4NQT1sq1J1tS4A5NIRCQhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eX5YrhpX; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rsm2bvPD"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d7f11295f6so3284535ab.3
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 05:28:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eX5YrhpX"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72ec926e828so319509a34.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 05:31:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745497698; x=1746102498; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YqXVyyxnuwcD1BIG99/aSq9M/jNFiAFkfCwzRkuTtlE=;
-        b=rsm2bvPDpfX9+Wjw9Ia3lsoACs+JQ4IXn7Akm5DcYaUjcRG8JIKLA0hqnXr+Sd2/Lj
-         lw24h1UCCq39Q05bt8vvQ6Z3RQsRsI+GXLovI9skpMFv7BsvtcUDK9PshT60sAJIUu0K
-         f1UIqliwbfOciCkFfNS9cPrifvLxcC3H0F39ffJx8Wj8MZ9Sk4V8Sj5vdaPCSdQ4RDvT
-         BsMyqjqEmOy6dP+/7D7dkoIHJuYzGKAUvxEDLrVpSuLEnlv3mDY+sao23KcTF93PKNvx
-         OLq4wFS5QVbCg39aLc9c9inEsjGfMjGJo7RCBhqUlAceXQNbmMeTtFn2iZANoIaU9zFk
-         2QWg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745497867; x=1746102667; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pps9V8ncwYdRycRJbT3v3474lDbFCNoVouzd6mCKRd4=;
+        b=eX5YrhpXLWESEHDAQA6W29/SJ6NRb7hcv3THQcMZZ5CoZ/HFJLJAtkP6gKZyw+nhZn
+         O/clCzNY06950aNnz2byPPXcJcjU6/YJRNXPnMservILBght2mAm/BOZPKYaicULcZoq
+         yq38fvvPTRo5uV/MiWPxSvNH1U7Yh2DiihkUhdC1fEbL+R9lvMIVRVM1LnxnOmV3MtaR
+         Q2Z0kEyMW9csxK/JkM4hanYTPXkv9ZLZgyfkLP4+kYIEMl2pUsNOjlTIum5d0XmyLhiN
+         SlkCIjqgTsXGaJ59ggN7wy+TVWlT5bq2F5J+Qyv00PYwe9FEB+3WoQeem9qPGdPeF8j2
+         I/Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745497698; x=1746102498;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YqXVyyxnuwcD1BIG99/aSq9M/jNFiAFkfCwzRkuTtlE=;
-        b=UvGB3/nofy9EhKJGeu9dKNM3OtfmnbdiSoNiZY4hs6l/FaqiMyRYFA6ragV71xRQiW
-         iQZ2w6Rco19KMdffK2UvOEVhtruiT/pzdZZ+RKyciAmWDlrgDequYgf3vHvK3YyLG3td
-         5CzJq3cqce6CaCtKXwPbiRlXhyz3DrDgLnaB0oizJLeKPN2mI32Kv/DEwIdJ62liKlJ9
-         hkz9/32wFR30DVNNTQYvqYuQZS9EgtyFe+fFkenyZtcwAfAeH6PCY8gqFqOQPNVjO+1P
-         HN1XKsiFMf/7qQwA5Mg/itE0F3pYqMKETRx6RapWSRZEgF8km58AUwUmiNgSibq9bYLk
-         jzyA==
-X-Gm-Message-State: AOJu0YwqtRM106BUW6JKlsavzV4kCJ68c2R2UCEG6fyXgwHvzfyE0ryM
-	h+x5Qo6EaD40rXsNfpqatkh2tVWsjdKMlEFaG/V5BoM4N2DlLyWBdTyzLdI8rfk=
-X-Gm-Gg: ASbGncul395g+I5Zz7sksfvNeFNvmad05bkfMhte5ThQtTyxon4P4rqvg+V+RHW0slG
-	hd3kkR1wo/PXZ4NIbtAoTRc05x8jHN4uy/HLdQXin3XU8HLc57y8aDAuw6Tbe1lmuJ+zLo1upNi
-	KTHNBcFcCYAktAAf477XNyCQhP4NbjLnkcvq6Sju6L8gHMx3d1ZvvOkx9Wi9HzHN2mb5/572RZ9
-	DNZ9C66EKehrTFbHfvzURzGiaaOOsT3dO8fELGb5euMxQgnW2WxRnz92M/C2v5Z43WWAtzo5rL7
-	IzCkQxpm2wcjiCHHrnSgCXr8hKA3Ua1xfivegQ==
-X-Google-Smtp-Source: AGHT+IG1bJLMbknqw2vpRhpLjNKOGnQXUnkNLIjQIrHWKNvSaX55zTaj96I5pBS/AwFgSDAJr+z7eA==
-X-Received: by 2002:a05:6e02:19cf:b0:3d1:97dc:2f93 with SMTP id e9e14a558f8ab-3d93041ad0bmr23964145ab.20.1745497697784;
-        Thu, 24 Apr 2025 05:28:17 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a40ab1sm256606173.40.2025.04.24.05.28.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 05:28:17 -0700 (PDT)
-Message-ID: <faf4ed42-1842-469b-b052-c88a8324ef3b@kernel.dk>
-Date: Thu, 24 Apr 2025 06:28:16 -0600
+        d=1e100.net; s=20230601; t=1745497867; x=1746102667;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pps9V8ncwYdRycRJbT3v3474lDbFCNoVouzd6mCKRd4=;
+        b=p5R3/+30+fDzxOLvV6n3pTPB6arMY01HCVNdHsmlkdGbb+IqxbxC+Pjt6trGYaZcjF
+         3yczXtR4jXInlP0u+j5uJgD8pKXOwvI2miiGzZZDWIFXPbDVm8yhAK6hZGIfxXC6pMR3
+         vTPC7qQNLLpvMm/Q60vZrUmFbBwpjVVBxeZESU4l9WeUmmWJdXy+yR3k/JXh8ttN+0a1
+         OExAwz0NwgnNIZwwzjfIED8iO4FRGopqeOSokypFK3EedTYk5h5OHrK5WlWzp1NOF4Gf
+         F9Iz2OlDUpa4yI8ajytg9wwUcjKUjOw8GeesTtGh/dHPNX97qJPsQF87ZvmHTRByi1fz
+         imdQ==
+X-Gm-Message-State: AOJu0YyH88Trkiu6yuRTGN3PWrKkwrzNtCRprh+IpoH2Vnq3Y5ID0gzy
+	rLFz4gR5nMp3qr9Yn1MypkPAoGxbP75eYJdgnvWpz4hAfF1kzJ6yhPvQwc5X2gM=
+X-Gm-Gg: ASbGnctR61ZwAbscn70LC3gUHzlM2Pw/tGuyhMKEXMGg9rL+z9CQhIaGpApzsQv0zQU
+	MRgVpLEdeKRc4WDTbvzCNkdXzJgbZPXpwE+WkACiA/YKjYrjwpx5CQYaHMWCc+S/h+bjd5VkHwa
+	uRIN/FDUKrApEDxDDcofydnF7tNxzMlbS/HZunPKk5b/5NldfdBGx8+UfN4lJBV7R6vUnYJ5col
+	49rgGykMewOY7WHdeEyAOEK9vljUzR0IiT7dOIsT5AfJCSg/fFpGxAi193A0Q4eL/Ng4RTIVrLt
+	eY7KK+/WYViOjBEUStkoW5tB3KExIGkE
+X-Google-Smtp-Source: AGHT+IHcDAhbNIdVSY+XYgylitasV2oC9fI4HWvx3NtkldPFUlYRuJvXAwP5NGZRmvjfiIpdimj8HA==
+X-Received: by 2002:a05:6871:5809:b0:2d9:45b7:8ffc with SMTP id 586e51a60fabf-2d96e21adf2mr1149904fac.3.1745497867264;
+        Thu, 24 Apr 2025 05:31:07 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f8249f8c91sm259639173.15.2025.04.24.05.31.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 05:31:06 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Uday Shankar <ushankar@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com>
+References: <20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com>
+Subject: Re: (subset) [PATCH 0/2] selftests: ublk: misc fixes
+Message-Id: <174549786571.628784.9329773694519239539.b4-ty@kernel.dk>
+Date: Thu, 24 Apr 2025 06:31:05 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.15
-To: hch@infradead.org
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-References: <aAofJOcb2NzkXsP9@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aAofJOcb2NzkXsP9@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On 4/24/25 5:23 AM, hch@infradead.org wrote:
-> The following changes since commit 81dd1feb19c7a812e51fa6e2f988f4def5e6ae39:
-> 
->   Merge tag 'nvme-6.15-2025-04-17' of git://git.infradead.org/nvme into block-6.15 (2025-04-17 06:18:49 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.15-2025-04-24
-> 
-> for you to fetch changes up to 3d7aa0c7b4e96cd460826d932e44710cdeb3378b:
-> 
->   nvmet: fix out-of-bounds access in nvmet_enable_port (2025-04-22 09:50:28 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 6.15
-> 
->  - fix an out-of-bounds access in nvmet_enable_port (Richard Weinberger)
 
-Pulled, thanks.
+On Wed, 23 Apr 2025 15:29:01 -0600, Uday Shankar wrote:
+> Fix a couple of small issues in the ublk selftests
+> 
+> 
 
+Applied, thanks!
+
+[2/2] selftests: ublk: common: fix _get_disk_dev_t for pre-9.0 coreutils
+      commit: 1d019736b6f812bebf3ef89d6e887d06e2a822fc
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
