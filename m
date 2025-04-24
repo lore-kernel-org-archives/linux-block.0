@@ -1,108 +1,100 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76A855E69
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5A615B0EC
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745501758; cv=none; b=JbOmRvmvOHkgv2kI+rCfeS14HFzpHVnJ58C1BI8jLXokfM1xtVfcCHXuMkEJWmcV/mrTUFrSVJVz4ry199QzpRnXuOaQJt8upNxqubSyse8a43FkLxNqvMNQ9aLq8ygeeH6nhKytPF8nG72sf3nybHASa4yHeESReec2Mmo2uTo=
+	t=1745502975; cv=none; b=IGFTK6Zr6WHEKuDBCX0BWBlePMGihlYu+o8jPV/Gxz+bCXJVNAL3aDAvDYVgCAjv4dQErkzk4XVYxoWhzIE8xE8X/itjfUevYkRaku2PU08GswsU1iLigbTWUP6DyalW032Lo2MqbP4YBo5kuhMsVX6RJP258J/wRuPzYmRBwqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745501758; c=relaxed/simple;
-	bh=WPtzaI6gzO+Ao9RQi1VweoMaU/O7Z60bQSJbDKqCmOY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=UA2UVblLQXqmZPQiYXfnWf34wkc/GXL0a2kgfIbKohrS0k4ZgojNVxjxtCb2XAI7E6H1fFqMg3kvfB6IHFK4MM9Vy626/25jyGybXVcIIpeBTN7aeBX67dmEB0m/I4N68Vkfy1J/JEuuV19sVdB1JkkG9BIPWJliBmHBsrqhl2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WpFPaRKz; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1745502975; c=relaxed/simple;
+	bh=XfSGw2P+fraHHNLx6VvTul8E6ytb2Eflh5JcLsOmNCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PHGJrSXpxYZqYwF0ypzASSJI42Pu5tJUd3iKnP8i8S7k7H+v/HennY76QmZoA8EclmlyvhB92IJTUVsJmCznu2slnhfcmEr9io4HT4H47jIDFM889cSWgxEDdN4ONX0sbTnp298GGTcZtDfPJ4SmLgP8sPg8yRwAbTrnPv4c6T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FP4GS77S; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WpFPaRKz"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d90208e922so5357535ab.3
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:35:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FP4GS77S"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c553948ab4so10013485a.2
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745501756; x=1746106556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5y3kb7tbL35mrW374ozZ5zHoQ8x5ddd9COLH2ecrXT4=;
-        b=WpFPaRKz0O7NIIA9IeGDNE5RIzQrP6u281XLpXkUtjG7MK31SOudfgRBWn6ciC/o74
-         y/PPLkG6LYFqxeOnBxb55sXuZdg3W93rzV42d+CoRpFm2BpzVGzrfVJUdfnGbo26TXbG
-         TRDcWNb/4PIOTTvTLx7lgY+qknDf8EPZq41YKaTUmJiiB9LZWwpmMQs9sEScLUMpQ5Zs
-         ADN4+bouAJJ9Yt2lH524moLBwuMmZNs39/V84+QhlwtiGIlGNESImiz61sK5xu1Vyqhb
-         3o38osX/jGESNj/opUoWouLXOqO3EEkwtb4wllC888SV38CTOfzVcP7B+QCtGlD+V6OJ
-         Htww==
+        d=gmail.com; s=20230601; t=1745502973; x=1746107773; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=irqlq+RBcYnX5dKtn8fIfja3VUtfm9geSOe2lZBIeAI=;
+        b=FP4GS77SflJRjO5EEHNZ/m18Tl9E8Qeb+M61CW1KueYhZ8+KmgscLrnDodXhhNvTTx
+         ZTEgtj4Y5i/KL+lo6z90CweLF/Gh+3+GkaJklSM+SpExkKzN0IOd648yPZthedNN0DSB
+         D56V3F5qwD9VJRylJE/9i8Bl+VHgGssFvue7QP0rUfV77T2b7lP0YyOhmguLG4rZRcq6
+         7G1IvLQ7HUX8XCPn2ejL1m7VhWZe9+A08Ts29b/Jo3RF88PkBvljpCh2b1xL47r7Zn3v
+         ly0xwgd46OEdDLLoO/iwrpyxuPS+HMs2rK1zmFcCeTxR7VX6xSVOM5R38z/ruygnohLk
+         9UxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745501756; x=1746106556;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5y3kb7tbL35mrW374ozZ5zHoQ8x5ddd9COLH2ecrXT4=;
-        b=WnhuS1BDRfNLNAwbBMJ5hB72hdW+7gvghPkOmKucCVdu2P8rE0iZqPc6/cKTz7MHro
-         Y4jIrf5AflW28Y7nls0L7irdskp2VGbyef4ouk6mjn/DIWUPpS99Twx2sUGAoAru9irf
-         Z5P2aSDXZfP/WQ/pf9voTG+tmuNgpZ3xeemdkun2CQtwoZdz3Fbu7VP2hzwy5b37U2VJ
-         zwXZmz0jBPPGQCb3dCc3yT61927JYiqujGN/lPIn5SHEVbH1rF7YRe21olL+/KG4IA4g
-         PVpSqi6TcT3MjqprTaxWxK0/1ODSVe94d4VlW0o5iR6btOqf/Cv7Z1mRsvERFi8Iw50V
-         7Vew==
-X-Forwarded-Encrypted: i=1; AJvYcCXeB2YMvl0U8PCX+QWAldJKnyLUONENDSLPrTpNj0t6fwpCbGuyPV9vxuiJCkEkR+riQ6XkSmp7CYe2vA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM+kIV8mpk6VYC7ntHrn/HzYw8WXPxLP21DTFGlHgGiLpk94VX
-	05MPAqfz+e9QrVuJD1l9vzqcIc9ot6bp6HueYesVbH/gNEJqvCt0GO0JD1bn8Sw=
-X-Gm-Gg: ASbGnctM88Nt4t0E6Wiu6PaicNhnVcMSkT+a98nwKkJZlmY1vxv0C8RfuHy3t4/Xmih
-	XSXCf84JnWo8c0bZxGnEHVLJaKCmqiwNoJHNm5wUuC7+CBK1JaHrZ9DbetkkWJsMikkQ1DFPUBc
-	QwmiWa+2NwkUuWUvBMRPhikzMwMeKoNaJgnDL/9rlVVSGhmcwtCUbgTRy+/GtS5GWYK46KLrKWr
-	so0rRRguK2QBdtMrfXdeUUu6gQ0at/pI4Dwd2pEtVohOO4/aU7/I6aza8er79MfmlBBp8sM+zzD
-	kgfcXnM+I3cMsIdyaFQG3oaSjYxQo74=
-X-Google-Smtp-Source: AGHT+IHGUYup65Csh37WQAuNVZgmXMs0428N1C4YOSpFb5unVA+hY8Q9IKjnnn2p20qNo3hrxDTuOA==
-X-Received: by 2002:a05:6e02:398e:b0:3d4:276:9a1b with SMTP id e9e14a558f8ab-3d93041e398mr26411495ab.16.1745501755935;
-        Thu, 24 Apr 2025 06:35:55 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824b80d63sm286172173.94.2025.04.24.06.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 06:35:55 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>
-In-Reply-To: <20250423053810.1683309-1-hch@lst.de>
-References: <20250423053810.1683309-1-hch@lst.de>
-Subject: Re: don't autoload block drivers on stat (and cgroup
- configuration)
-Message-Id: <174550175513.658353.8577093198336589021.b4-ty@kernel.dk>
-Date: Thu, 24 Apr 2025 07:35:55 -0600
+        d=1e100.net; s=20230601; t=1745502973; x=1746107773;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=irqlq+RBcYnX5dKtn8fIfja3VUtfm9geSOe2lZBIeAI=;
+        b=El1JpiEsuCkCFWu6bthXmCT4vJaAUlkdwrFu+CswEQJEt4CNRocFM6w2zW9W2llBwd
+         nNNyo71H6zD+5Sqnk4+FWPTvS7IueFzUU3d6jf5e3x8pWMUfCAMdqP6NaNNVH49YCteq
+         69/P8aBySWxyHzH69FlVTzSMuJESG7a1/xWvicOYab9BgjIX3gVyX+/uLB/gV1j353VG
+         IQ9pZXkhhOyv3LZixpLdUbeNNXkyj/IKjmD24mAA9ZuBCfLeqSel6/6renGc1VjWtDI+
+         DIHxbqNpAnUVKahNFm4eEc2Gsy9OtWfbn4hNN2GDe8ncrI4rsLAYIZdTgsByZbRGXUGv
+         95pw==
+X-Gm-Message-State: AOJu0YwW0LpQ4/E1PTgkmNStksYj0dNR7hKfkIJVETWpsTkRTFE+5ZKk
+	qipUGPQp1fKnnyFMtUebJNhbeoltBMr5sUZrjZxZTjx6NtFkNLZ+
+X-Gm-Gg: ASbGncu0xT/JEOWQfoBw5WaGGq6ge/ncJWSizuubdaFruAJM04KOZFRkNy2aQRnJaWB
+	KMh1EhipMnjbTey+PTk0b+IeCyyURX/WLHFuIH9wiEzt4+oOL+LpmLLSMDMYb3fvhUhgrIUMnkU
+	qZycVloRfrupG2xNh0WTQKgvju1+0zjtldH0E2u+tBOzxI8hk/iv564WnFQmBw2jeN/vRrRK0S8
+	ERBn7hhlweEdvPg7PGK+H0Z0idfBaY2r7juzNfZLAprepBZQCAOHCR/qVRSI2G7qwWADoFm9VR1
+	OOgPaO4OGR5xiG7n/ZDjNM9Wazh1P2LNEQ6kiwRfxDKt8UUaGhtkLPhhLlAGm5aet2wLQfW5UI5
+	ANxuDhmHJaAHcPA68
+X-Google-Smtp-Source: AGHT+IHmaDuA8dHNLw+vvYl3r9trKs7AdNHmttJhMd73NJWk8iHrw6Nkmwi4sLQ6kRaC7lYeyhrqyw==
+X-Received: by 2002:a05:620a:258d:b0:7c5:8ece:8b56 with SMTP id af79cd13be357-7c958347a9emr104115785a.4.1745502972714;
+        Thu, 24 Apr 2025 06:56:12 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958d86d65sm89859985a.86.2025.04.24.06.56.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 06:56:12 -0700 (PDT)
+Message-ID: <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
+Date: Thu, 24 Apr 2025 09:56:11 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
+Content-Language: en-US
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "hch@infradead.org" <hch@infradead.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20250423164957.2293594-1-seanga2@gmail.com>
+ <aAnxqAv41Quh66Q1@infradead.org>
+ <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
 
-
-On Wed, 23 Apr 2025 07:37:38 +0200, Christoph Hellwig wrote:
-> Christian pointed out that the addition of the block device lookup
-> from stat can cause the legacy driver autoload to trigger from a plain
-> stat, which is a bad idea.
+On 4/24/25 07:30, Shinichiro Kawasaki wrote:
+> On Apr 24, 2025 / 01:09, Christoph Hellwig wrote:
+>> On Wed, Apr 23, 2025 at 12:49:57PM -0400, Sean Anderson wrote:
+>>> The block size must be smaller than the zone length, otherwise fio will
+>>> fail immediately.
+>>
+>> In theory yes.  In practice such a zone size makes zero sense, and will
+>> not work with any zoned file systems or other users.
+>>
+>> So instead we should just warn about a silly zone size here instead
+>> of trying to handle it.
 > 
-> This series fixes that and also stops autoloading from blk-cgroup
-> configuration, which isn't quite as bad but still silly.
-> 
-> [...]
+> As a similar idea, how about to skip the test case if the test target device's
+> zone size is too small?
 
-Applied, thanks!
+Why would I want that? The test passes with an appropriate block size.
 
-[1/4] block: move blkdev_{get,put} _no_open prototypes out of blkdev.h
-      commit: c63202140d4b411d27380805c4d68eb11407b7f2
-[2/4] block: remove the backing_inode variable in bdev_statx
-      commit: d13b7090b2510abaa83a25717466decca23e8226
-[3/4] block: don't autoload drivers on stat
-      commit: 5f33b5226c9d92359e58e91ad0bf0c1791da36a1
-[4/4] block: don't autoload drivers on blk-cgroup configuration
-      commit: c4d2519c6ad854dc2114e77d693b3cf1baf55330
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+--Sean
