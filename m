@@ -1,41 +1,40 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FF7433B1
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 08:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2072E1F2BB5
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 08:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745483128; cv=none; b=qmHAiWrLjfVlMjweKP8LzUO8JiL55gHGtpXpJX6dHJ/c/spganHYf3n5k8kXleAMmFIVoDy7jhhZJQIYhy5v0xUviLxiAMPzTpMksWIUphv3egyrtQ1vMuTBmc/LaeEjbqKInlTwqHu7iHIneQKzqHvLMKCH1sLq5oKZfzTcIps=
+	t=1745483277; cv=none; b=qyZoyWemuj0W/ECn6BZ84v3VUIouOEi7ipMqPxVzAfDegoDVHUVZMKiu7LgQbC0XNrI6Rng8/tVNpuLcu4Yy+t5qtmQ9ldInL+ElegM5Up2iTQkeC+0peFIFgvVxWy7OoiajpYIrmc1mxsD6PoL/3gZixGGZOKNWR5vTqHIxe9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745483128; c=relaxed/simple;
-	bh=IZ+tTDQycYIHtNv/Sa0hTo0ZBv2bOI0KeQTCm6pQvEc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MwpQSs7aAWg4yE3t/MNzfYroOMGlrwl8CMdi4BbeGFyri5TX1a6aiN7JsGXCQ9thsHFfz2wG/5wrb4gn8b6DWuGcI+RMP3jNOW9G1M/5DZiLh3Hq6GRGWufkJLQzZ3lmGYqg4k1VPI2+FtZ9Pn2K+R9/fG5Xfx9C6yBIdrdeB2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ukXvIZje; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1745483277; c=relaxed/simple;
+	bh=n36yaEG5Ro4mv98Z2qH5jINmH1R6umwVMUiSkiskgUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1Mro1FzXgu4u9Hi3+/+/nIJVZrodSajfPUknLtqMnA9X8wzWTyPW+aNKJ0Mr7ST0fRMcmiHGUG0XGePf/B3k8hvyUmZwx0yt1O3/7Qrq8/3/UdoHwWyaGL5TZBMt+SxEHiEpmDXBVw514uXYmATv75g70PsrjvjSkzkX3d/FCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Uwhmjxuv; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ukXvIZje"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Uwhmjxuv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
 	Content-ID:Content-Description:In-Reply-To:References;
-	bh=owZti9WPF3PNyiDP5DDnK2bXGmpmq159Noo6pTk10Us=; b=ukXvIZjeSMUGud/+TjUsLvJ6g1
-	N1gZi078J35mZzenZpo4lTdjhe/D5jCPCRDtNCL9yE8XOzodttw9dTFxF9m927qM+DBO2GM4sp/Hu
-	O57MFlFFVPATcEEdZGVJCWTp0MDbbEglWH9I78FPiCrRoVgqjICZnyqkw547JKIgtI19zd/fcU7J3
-	47bpQUu9iMuUY4hId93TawFl+vmBr73qSBgXTDxnXih+Ex9Po8KdZRVXHg4RXD+9E/pHFn5kOdBR2
-	RRhdC4yxp1FMaWe56+WFka+VBGRIqjHsYmQHeUQce4qO2cV27bRX8/bFAehj7pDeKChNdyRC3UCZf
-	JlFoCwKg==;
+	bh=xmxXBUBVlM1ZTpBsIaWVAWml6wigWmXpNQI86+EdB4k=; b=UwhmjxuvUTvgmUweYrqN08dGwP
+	oeoCsX4+MpOK+V4I5369/c5yAdT4tUcMhsfT9f1pUMr/UVvVBq1ZdbZUSDmM0lo9/K4DM0D2NA5kj
+	ZHe21Ea1wfP84ANehgJGMXQniaYyvnFXjuzCkyZfiGWOcFVRo92VShgUMGbuSWI7S2pIQs1ucnWot
+	u066qGVa4PRR2j37hYFowopWLUsRq7yXGlcN6VfSuBAVZc45twRZ3YF2Sg7IFWDtpF/eN2E+68wVp
+	KuQlx8ncNWdiY0q4u3Gb6JeB/S+Z9S/rBZvTGlfCRrEJ3jYNe49z1veJwqd1oEJMdWz+jTV5Zbjd8
+	v8807pgQ==;
 Received: from [213.208.157.40] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u7rtb-0000000DJoa-3XbE;
-	Thu, 24 Apr 2025 08:25:24 +0000
+	id 1u7rw2-0000000DK8z-0Mpx;
+	Thu, 24 Apr 2025 08:27:54 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	=?UTF-8?q?Holger=20Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
-Subject: [PATCH] block: never reduce ra_pages in blk_apply_bdi_limits
-Date: Thu, 24 Apr 2025 10:25:21 +0200
-Message-ID: <20250424082521.1967286-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] block: use writeback_iter
+Date: Thu, 24 Apr 2025 10:27:52 +0200
+Message-ID: <20250424082752.1967679-1-hch@lst.de>
 X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -43,53 +42,37 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-When the user increased the read-ahead size through sysfs this value
-currently get lost if the device is reprobe, including on a resume
-from suspend.
+Use writeback_iter instead of the deprecated write_cache_pages wrapper
+in blkdev_writepages.  This removes an indirect call per folio.
 
-As there is no hardware limitation for the read-ahead size there is
-no real need to reset it or track a separate hardware limitation
-like for max_sectors.
-
-This restores the pre-atomic queue limit behavior in the sd driver as
-sd did not use blk_queue_io_opt and thus never updated the read ahead
-size to the value based of the optimal I/O, but changes behavior for
-all other drivers.  As the new behavior seems useful and sd is the
-driver for which the readahead size tweaks are most useful that seems
-like a worthwhile trade off.
-
-Fixes: 804e498e0496 ("sd: convert to the atomic queue limits API")
-Reported-by: Holger Hoffstätte <holger@applied-asynchrony.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
 ---
- block/blk-settings.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/fops.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 6b2dbe645d23..4817e7ca03f8 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -61,8 +61,14 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
- 	/*
- 	 * For read-ahead of large files to be effective, we need to read ahead
- 	 * at least twice the optimal I/O size.
-+	 *
-+	 * There is no hardware limitation for the read-ahead size and the user
-+	 * might have increased the read-ahead size through sysfs, so don't ever
-+	 * decrease it.
- 	 */
--	bdi->ra_pages = max(lim->io_opt * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
-+	bdi->ra_pages = max3(bdi->ra_pages,
-+				lim->io_opt * 2 / PAGE_SIZE,
-+				VM_READAHEAD_PAGES);
- 	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
- }
+diff --git a/block/fops.c b/block/fops.c
+index be9f1dbea9ce..f073ef6d3f27 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -451,12 +451,13 @@ static int blkdev_get_block(struct inode *inode, sector_t iblock,
+ static int blkdev_writepages(struct address_space *mapping,
+ 		struct writeback_control *wbc)
+ {
++	struct folio *folio = NULL;
+ 	struct blk_plug plug;
+ 	int err;
  
+ 	blk_start_plug(&plug);
+-	err = write_cache_pages(mapping, wbc, block_write_full_folio,
+-			blkdev_get_block);
++	while ((folio = writeback_iter(mapping, wbc, folio, &err)))
++		err = block_write_full_folio(folio, wbc, blkdev_get_block);
+ 	blk_finish_plug(&plug);
+ 
+ 	return err;
 -- 
 2.47.2
 
