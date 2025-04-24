@@ -1,147 +1,102 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4F522AE48
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115022288C3
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 12:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745496427; cv=none; b=WJ57wjhYoQ25QYiFO0DdlwYPWoC3krCQx9MgMQBB8b+IKkqsYFkbSjaihAdIcbRz9ArtviBwSwxh+jubIBT5m7xcP6ee/GZiSDVPwD69u2ssl+h8zO3AJhMZmVvyfqLFkCaITrS40PmjLJDhiBnZfYp8z5K5wJsKUWVv7NhIMHw=
+	t=1745497702; cv=none; b=JfR7iL1hze5x57RxY4UCx3/P+HT+U63KBU1mqYk/rACK0pC2+uAM5mJVBLAQraN7p+JNovM4Xd616lBO69HNvcJbwQdoJyQkhswvReqSDeiObWPijJ6zGr5hI/fusgoC7CSmxccQ9rhFD+/CIgKBRbreZVW0xeBM/OipVCAsXeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745496427; c=relaxed/simple;
-	bh=nEDDMXWDWQ8vbMZ4RzV5iFaKUbMAXslQJ0AI2qRKz1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ly8D1xwhrpK0c4uJvH4jU9KuBpyL0xJMcStPMSNpghKYVEtm2elAaZ6TohKl0sjut7Cr956Z3eFgAGfLxC6UoYmBSWvGJHiT5b8iE0AgNBNgM1MVfnDUXhsGOa0T9KVhrC6GSLMpOn/ixbIH8tqCfnIlqycD5Q8paGOsWm4I9sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=f7cJVsfp; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1745497702; c=relaxed/simple;
+	bh=duNKhmzxoU62cimrbYFzjeTfzKcykPtZNqQcgqxlpXY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y8kgMOn4kaT7X1GoVTAgLUbtIA51vIKKfVfFa2G3/Tya+IWpdlk9JUgH8ZcpqrYcDpHiZ3jRagSV7ulb+TMmd7pLSr/g1nhxl0cXPPLmS/D1uFX8w+iQymhr59WLlIG73XNDl4+1oJsYPIuEO+XZlSFX7Tc2fcVLzO+lOZtvhyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rsm2bvPD; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="f7cJVsfp"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e8ffa00555so9175716d6.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 05:07:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rsm2bvPD"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d7f11295f6so3284535ab.3
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 05:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745496424; x=1746101224; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R6hXpeFv17Go1fQZO2l00KUq0djvqX4j0LhOJE1RpTI=;
-        b=f7cJVsfp4HZOCBfgkFOjS8VB5UTPsgQN5/v4PKJJdeYmvMHpeUUjyFBtxq625zmmXj
-         k3EsNWrVm4OjvneO9B/ZGxtL/rpaonVPAAjjGFX+l5BRWixEkwxmCTZhWGhVjWXavZvy
-         SR/X9vSe8/xbMouYwZ0dwG5aRWBzfCS3VEs2YuNNu7WhqNoJC87NmU1ITldY/q5keuFB
-         UocYb0O5T6DZQQAxBy2eHshKKb6ic/dU+u02pKYO63/pAn9VmdibNn0xnBEaWsAUreBJ
-         Z1PzPeTOw4bJhhuyXLg188k6/2/iJ0jeryJvUMqbo4ULLvgDt2S3svr6dQXCb60ytHgh
-         QMuA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745497698; x=1746102498; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YqXVyyxnuwcD1BIG99/aSq9M/jNFiAFkfCwzRkuTtlE=;
+        b=rsm2bvPDpfX9+Wjw9Ia3lsoACs+JQ4IXn7Akm5DcYaUjcRG8JIKLA0hqnXr+Sd2/Lj
+         lw24h1UCCq39Q05bt8vvQ6Z3RQsRsI+GXLovI9skpMFv7BsvtcUDK9PshT60sAJIUu0K
+         f1UIqliwbfOciCkFfNS9cPrifvLxcC3H0F39ffJx8Wj8MZ9Sk4V8Sj5vdaPCSdQ4RDvT
+         BsMyqjqEmOy6dP+/7D7dkoIHJuYzGKAUvxEDLrVpSuLEnlv3mDY+sao23KcTF93PKNvx
+         OLq4wFS5QVbCg39aLc9c9inEsjGfMjGJo7RCBhqUlAceXQNbmMeTtFn2iZANoIaU9zFk
+         2QWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745496424; x=1746101224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R6hXpeFv17Go1fQZO2l00KUq0djvqX4j0LhOJE1RpTI=;
-        b=rCx7u5mgMdIDSnO+2fGi82ENaR77vhMlbWLoyMhnZNtvGsUuDxfVynCP7teJvPdsaR
-         m8ru1TbRAaiKFtSx1zzOMOSxkoV4Wj18UT5I8tsRCvCmQLg4QnhKcpdouDb3MYbV7K2u
-         MT0UZgJNPmqiNZTyNPAWgkvYacbZF/kwaK2be5J/l/DjJpfddHDyygOk3jpN+bSCGjW7
-         HO1zfaiB8BoAuYkMRUbFPbgWaugJjtDYoxbY2zw0eoY17w2l7hQAHyC8FnRnVixShckf
-         4PbDAF9IQj6xMYJ76IOPUJDXrnHzEeerDf01ZAia8l5UkfXY2AYCg2KyX+SP7POW0uhQ
-         XKpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFazIvz7ZHH6ZOvbd1NTodQipy8A8NQ3+TqdQANb/IQe+O8ep6mVQ+2fdLA7PYM05ZPDI8nbn7pQCwGA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWg2dbYjLgtEXLiTv+ZmpFV65guAnwZH01u2B+IynNFoKx0C9e
-	pwc5yGzL7cZh/omWzDQJI713+a+8MABKy5HinhYPYPyNbZiLHSpRkHcjyzAd6qM=
-X-Gm-Gg: ASbGncuQ43ChGNU379jsYyXAp25QLGNj77uXaO0LrZAVV+k2r5enMJdfPYwMS0+3UnM
-	y+aDNsmMKspgC1UUFkMA54CvZ8fHTQ+PZ4t7bA+Qli5T9qMoOeAz/YWuu9R/dpqdzt8SCUJ0USy
-	yIGi0nGw+E2Sb+Un3tIfp5ScmTP3fJ0pa3cn7NvGrvVIhUs4EuvoipzkrE1Tv+sOFJIdL/JAx5P
-	hXJFmoiII17F68rUTAG71W9pTCp2Pa6+VG+YgwsUK7SemiLqhFoTuxFpfHAhL1e2JOkek8mMf8r
-	OetGwtANIPr8iVMYee5XacHBGnqd9JmSm90ZEruJ5X4DcNykrrpwfdRHcEvf7BOVkQAs0ivTWhU
-	Iz921EYOqXyKQFa4oM64=
-X-Google-Smtp-Source: AGHT+IHFhKOxhA0o2WRAa+GJNDxvcX1iIXnEJwZa2QwM9rbiZA2VutZzFm82YY72gKJwza388e3Bog==
-X-Received: by 2002:a05:6214:518c:b0:6e6:65a6:79a4 with SMTP id 6a1803df08f44-6f4bfc85415mr35084026d6.44.1745496424198;
-        Thu, 24 Apr 2025 05:07:04 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f4c0aae668sm8460536d6.113.2025.04.24.05.07.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 05:07:03 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u7vM7-00000007TSP-0PWP;
-	Thu, 24 Apr 2025 09:07:03 -0300
-Date: Thu, 24 Apr 2025 09:07:03 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Mika =?utf-8?B?UGVudHRpbMOk?= <mpenttil@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20250424120703.GY1213339@ziepe.ca>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
- <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
- <20250423181706.GT1213339@ziepe.ca>
- <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
- <20250423233335.GW1213339@ziepe.ca>
- <20250424080744.GP48485@unreal>
- <20250424081101.GA22989@lst.de>
- <20250424084626.GQ48485@unreal>
+        d=1e100.net; s=20230601; t=1745497698; x=1746102498;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YqXVyyxnuwcD1BIG99/aSq9M/jNFiAFkfCwzRkuTtlE=;
+        b=UvGB3/nofy9EhKJGeu9dKNM3OtfmnbdiSoNiZY4hs6l/FaqiMyRYFA6ragV71xRQiW
+         iQZ2w6Rco19KMdffK2UvOEVhtruiT/pzdZZ+RKyciAmWDlrgDequYgf3vHvK3YyLG3td
+         5CzJq3cqce6CaCtKXwPbiRlXhyz3DrDgLnaB0oizJLeKPN2mI32Kv/DEwIdJ62liKlJ9
+         hkz9/32wFR30DVNNTQYvqYuQZS9EgtyFe+fFkenyZtcwAfAeH6PCY8gqFqOQPNVjO+1P
+         HN1XKsiFMf/7qQwA5Mg/itE0F3pYqMKETRx6RapWSRZEgF8km58AUwUmiNgSibq9bYLk
+         jzyA==
+X-Gm-Message-State: AOJu0YwqtRM106BUW6JKlsavzV4kCJ68c2R2UCEG6fyXgwHvzfyE0ryM
+	h+x5Qo6EaD40rXsNfpqatkh2tVWsjdKMlEFaG/V5BoM4N2DlLyWBdTyzLdI8rfk=
+X-Gm-Gg: ASbGncul395g+I5Zz7sksfvNeFNvmad05bkfMhte5ThQtTyxon4P4rqvg+V+RHW0slG
+	hd3kkR1wo/PXZ4NIbtAoTRc05x8jHN4uy/HLdQXin3XU8HLc57y8aDAuw6Tbe1lmuJ+zLo1upNi
+	KTHNBcFcCYAktAAf477XNyCQhP4NbjLnkcvq6Sju6L8gHMx3d1ZvvOkx9Wi9HzHN2mb5/572RZ9
+	DNZ9C66EKehrTFbHfvzURzGiaaOOsT3dO8fELGb5euMxQgnW2WxRnz92M/C2v5Z43WWAtzo5rL7
+	IzCkQxpm2wcjiCHHrnSgCXr8hKA3Ua1xfivegQ==
+X-Google-Smtp-Source: AGHT+IG1bJLMbknqw2vpRhpLjNKOGnQXUnkNLIjQIrHWKNvSaX55zTaj96I5pBS/AwFgSDAJr+z7eA==
+X-Received: by 2002:a05:6e02:19cf:b0:3d1:97dc:2f93 with SMTP id e9e14a558f8ab-3d93041ad0bmr23964145ab.20.1745497697784;
+        Thu, 24 Apr 2025 05:28:17 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a40ab1sm256606173.40.2025.04.24.05.28.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 05:28:17 -0700 (PDT)
+Message-ID: <faf4ed42-1842-469b-b052-c88a8324ef3b@kernel.dk>
+Date: Thu, 24 Apr 2025 06:28:16 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424084626.GQ48485@unreal>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] nvme fixes for Linux 6.15
+To: hch@infradead.org
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+ Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
+References: <aAofJOcb2NzkXsP9@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aAofJOcb2NzkXsP9@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 11:46:26AM +0300, Leon Romanovsky wrote:
-> On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
-> > On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
-> > > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
-> > > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
-> > > 
-> > > Thanks for the fix.
-> > 
-> > Maybe we can use the chance to make the scheme less fragile?  i.e.
-> > put flags in the high bits and derive the first valid bit from the
-> > pfn order?
->
-> It can be done too. This is what I got:
+On 4/24/25 5:23 AM, hch@infradead.org wrote:
+> The following changes since commit 81dd1feb19c7a812e51fa6e2f988f4def5e6ae39:
+> 
+>   Merge tag 'nvme-6.15-2025-04-17' of git://git.infradead.org/nvme into block-6.15 (2025-04-17 06:18:49 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-6.15-2025-04-24
+> 
+> for you to fetch changes up to 3d7aa0c7b4e96cd460826d932e44710cdeb3378b:
+> 
+>   nvmet: fix out-of-bounds access in nvmet_enable_port (2025-04-22 09:50:28 +0200)
+> 
+> ----------------------------------------------------------------
+> nvme fixes for Linux 6.15
+> 
+>  - fix an out-of-bounds access in nvmet_enable_port (Richard Weinberger)
 
-Use genmask:
+Pulled, thanks.
 
-enum hmm_pfn_flags {
-	HMM_FLAGS_START = BITS_PER_LONG - PAGE_SHIFT,
-	HMM_PFN_FLAGS = GENMASK(BITS_PER_LONG - 1, HMM_FLAGS_START),
+-- 
+Jens Axboe
 
-	/* Output fields and flags */
-	HMM_PFN_VALID = 1UL << HMM_FLAGS_START + 0,
-	HMM_PFN_WRITE = 1UL << HMM_FLAGS_START + 1,
-	HMM_PFN_ERROR = 1UL << HMM_FLAGS_START + 2,
-	HMM_PFN_ORDER_MASK = GENMASK(HMM_FLAGS_START + 7, HMM_FLAGS_START + 3),
-
-	/* Input flags */
-	HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
-	HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
-};
-
-Jason
