@@ -1,142 +1,90 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D761F2B8E
-	for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 23:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884C3634
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 00:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745451219; cv=none; b=XTalxNUIfoOVvlTd8uLpoz+QdWkdsqHL8A2duTJo2EY5tC3iK1bS7Xo6VkClffCG9gzXx//rsG8pOiZorn56+4as+3GbSyMFY1xf34s87ogZTrizzPNwGCCguBMYExkLuU+6muRDqrEwViyK5vjDo1z5Rx6q4Mgo4F4nu691X9w=
+	t=1745453308; cv=none; b=f8VLmNpe6JrBjuM5WmCWIKFPQAPkj+YoMBwzMmPySV0eK6TkUnoRofYCpMVMuwQUMhLWWv06WoIehstUAhTTjrp2xmvf9I0MZQJsdRsrxzvomARTQeKYbs2AszDD7/UCUDpyCZet9BZ6tXiAISOSDTC3Mkcw9C8ioX1jP3UCI3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745451219; c=relaxed/simple;
-	bh=El3tntKet6XFP5tu5jRccRiIHcbcsNXplDjGS1RgqqY=;
+	s=arc-20240116; t=1745453308; c=relaxed/simple;
+	bh=pntiiw4yG1RuPMTSRoxZvtxa1aWvBAbMHKY3Z9snog4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PHg28Z0gQdRgUfsZj78uaevs7a+SQ3SrmMRmDUD9VLH3X0zMuTjzu0oXX3l9ErUFJ0edlcH+WAEs8K5mSwUBZicTMNBHre26m4qudb8tF/8BVSIazgmq/muj749+4HXeCepGVK67a+9PzmlY7l1K/YGnF0FnveFFLv2os1Azyu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=oxpQR22A; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ec+N0GBmzU+fCIxeN4/YVLFIxsxJ6Y5BeeTN8mJNW+cvZsIjmwM7oDLG9BBLb0NnRZKsJlT4JapEvsAWdF2+XNrnXEGPZtRRcWppJqmlQH0A+gMMHzN1ZBiS+sRT1KpQFy987VSTIZnplKchyU2+FisLEHcarHX0Fa/X+e1l8rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GNR6nOza; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="oxpQR22A"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-477296dce76so3318501cf.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Apr 2025 16:33:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745451216; x=1746056016; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L7oRP2YqJwVB6GeEu4BqvXzZqclhisHpp0fN6LY14JQ=;
-        b=oxpQR22AuCBUupk33WzKrsqOuEfDjGF5EniClxzPYJi+H/2OHhj3xqGjwCfB3IjXj1
-         IS44abUFubw81ik89SK+dFDMZisPitToRy3EjPnxuoq9OkV+yz2s0Dd26VYZBM4RiMKf
-         LNZPMNSpZe8jxWLp38ZCMDDKtCWhhAEaNccFys3J39EgF9Oa5YZ6+Oi0PJ9u2qeAGeb+
-         x42QOq7flqmXeNRLssg9BL3MbzD8TDfAQ3F1ZEg2N3dERLvQfW0Wo9v5YoPExvUsoEdC
-         IJPMcscXB538yc3/hVCCR4MgBTNPsBOr+AloLAvkeppeSsp27pJkz8n/J7Twj4P35Hbl
-         gDmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745451216; x=1746056016;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L7oRP2YqJwVB6GeEu4BqvXzZqclhisHpp0fN6LY14JQ=;
-        b=adDmXlVLoEiJdWR05JAih0eHlR8nAqfOSUt9s5YILRiHhDsGbihi4aV0/Ha8fI+D9j
-         jgYuYI+3sxB8060+2z8noxg8WhnXSBHuaxDGhzC/NkTceBsi2VqipaRE2aSA95zYx/ib
-         k7W/zdUqv0rEX4Mn71PMFP9IpF6fiBxS2OQ+0Ai5miMtQ6t3DDPF/nwPBUMr/3OurC4Z
-         FW1pphGuTUmZMju1o32DWRao08fUxag750fS7sVrbmyCNDxhwrHD2qYdngBuGA2uDKMl
-         A5G9j49qsEVptZ0CR+ylMOPZC0QlOi8j0LGY7WJfrV1h5JkWmEQYhvbfI8ERFbDuB6HX
-         7yeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCEQEEC3clzopO2ChFAPGhTroBoHPt2CIRxxoajkX7/5XyyPupiccsxgUv1GhQO06WzN/S/JBfrXEWyw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt1vkmUvnNgACKe+N33LQRDp5yQz9KxuYf6T6xoP8CVw+1Fdp6
-	MA7X498f175zjrMPF+4o4ga4tkZLSzfmyO4ka68b2D2h9CteyoWZAjwO9LTzRMk=
-X-Gm-Gg: ASbGncsSOMexDN+h56v9QTJKY/SqNdC2Kt0egKOSeCLneL8AgirS0mBSsFItJ4ccW7E
-	nhpCMzXFfuXz7+1nBCEzkV+74ZjGsfndh+WfJco8YkW4CAzdfuODtHB3BoeVnb7mr7yiYGgc1k7
-	l+2KYx5C2Pua0kP6s89ISpNmT1DT9lPztaQ2mcvJvbPzc2AzzXOwiZA9SdssA5HOXuSimISBRhR
-	0wQh5NqmOO26kR+OSmVUzqpCqWnDrdv28bDi1q9ejm5R76xRV4F4ALsr3qvCpJW5azRcJCBJH5B
-	p4WW5UmURoPCMFDSzRyVvBfljdczsrioEXYkPNkH/zSWSJ27dC7y9NLI8j6osn6juJwURAQbW1X
-	gEfioN53mjAOKi4tNi40=
-X-Google-Smtp-Source: AGHT+IHp4LWhqR/rJc6pqFU95w2BqdqjYtJ4SAe1Mvc/v+Ufccgyj7hWc7Mm96oBr3hzP4lBlnfnCQ==
-X-Received: by 2002:a05:622a:388:b0:476:b783:c94d with SMTP id d75a77b69052e-47eb4fbb928mr6490361cf.35.1745451216599;
-        Wed, 23 Apr 2025 16:33:36 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ea1ba154asm2538601cf.67.2025.04.23.16.33.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 16:33:35 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u7jax-00000007PKl-19Zx;
-	Wed, 23 Apr 2025 20:33:35 -0300
-Date: Wed, 23 Apr 2025 20:33:35 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mika =?utf-8?B?UGVudHRpbMOk?= <mpenttil@redhat.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20250423233335.GW1213339@ziepe.ca>
-References: <cover.1745394536.git.leon@kernel.org>
- <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
- <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
- <20250423181706.GT1213339@ziepe.ca>
- <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GNR6nOza"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745453305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dOkTAG7rDCrI4h+SXECSRWbl/N8iWgru3VS8SSYRxFA=;
+	b=GNR6nOzaYBfP+zqp7kBeX9BrrS15zqMFH0KsqwxdspariDfd8EHHjQk0FwkI8P0hNCswiB
+	0vtS/MTbEckkoTAMdmqnkQAAhkPCpyWD9o87izID9rvrH9y/vPugFJvXG/FlM2wsW9/6BA
+	2TJISJeHn0NlHl54uFFnZXPucg2SLgw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-60-QGbGuUtGO0a0ny6jxi4-Qg-1; Wed,
+ 23 Apr 2025 20:08:21 -0400
+X-MC-Unique: QGbGuUtGO0a0ny6jxi4-Qg-1
+X-Mimecast-MFC-AGG-ID: QGbGuUtGO0a0ny6jxi4-Qg_1745453300
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99E2519560BB;
+	Thu, 24 Apr 2025 00:08:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.12])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C46DC195608D;
+	Thu, 24 Apr 2025 00:08:16 +0000 (UTC)
+Date: Thu, 24 Apr 2025 08:08:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] selftests: ublk: kublk: build with -Werror
+Message-ID: <aAmA6kjGb8ZVJgTJ@fedora>
+References: <20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com>
+ <20250423-ublk_selftests-v1-1-7d060e260e76@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+In-Reply-To: <20250423-ublk_selftests-v1-1-7d060e260e76@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Apr 23, 2025 at 09:37:24PM +0300, Mika Penttilä wrote:
+On Wed, Apr 23, 2025 at 03:29:02PM -0600, Uday Shankar wrote:
+> Heeding compiler warnings is generally a good idea, and is easy to do
+> for kublk since there is not much source code. Turn warnings into errors
+> so that anyone making changes is forced to heed them.
 > 
-> On 4/23/25 21:17, Jason Gunthorpe wrote:
-> > On Wed, Apr 23, 2025 at 08:54:05PM +0300, Mika Penttilä wrote:
-> >>> @@ -36,6 +38,13 @@ enum hmm_pfn_flags {
-> >>>  	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
-> >>>  	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
-> >>>  	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
-> >>> +
-> >>> +	/*
-> >>> +	 * Sticky flags, carried from input to output,
-> >>> +	 * don't forget to update HMM_PFN_INOUT_FLAGS
-> >>> +	 */
-> >>> +	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
-> >>> +
-> >> How is this playing together with the mapped order usage?
-> > Order shift starts at bit 8, DMA_MAPPED is at bit 7
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+>  tools/testing/selftests/ublk/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> hmm bits are the high bits, and order is 5 bits starting from
-> (BITS_PER_LONG - 8)
+> diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+> index ec4624a283bce2ebeed80509be6573c1b7a3623d..57e580253a68bc497b4292d07ab94d21f4feafdd 100644
+> --- a/tools/testing/selftests/ublk/Makefile
+> +++ b/tools/testing/selftests/ublk/Makefile
+> @@ -1,6 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> -CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)
+> +CFLAGS += -O3 -Wl,-no-as-needed -Wall -Werror -I $(top_srcdir)
+>  LDLIBS += -lpthread -lm -luring
 
-I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
-DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Probably testing didn't hit this because the usual 2M order of 9 only
-sets bits -4 and -8 .. The way the order works it doesn't clear the
-0 bits, which I wonder if is a little bug..
 
-Jason
+Thanks,
+Ming
+
