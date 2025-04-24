@@ -1,96 +1,101 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71AEE545
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF8E43146
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 13:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499998; cv=none; b=pAZHt4uPP3l4yTDf7WIZjuL5T0SZWysVfR6AEvIK0k5fgcoZF3F7Dc6qpM8WF8Nd+MzUICclMMMbjsLJRPgD1xPSO2AcGbzS4rlRpt8bdiNXFf3ReWy4Zt+yCs7raJGd15ob9ieRd5hjt9n5070ob8DRcrHDehVaU1G0mTwO7QU=
+	t=1745501555; cv=none; b=WkGh5tJe5NwqZFy2gBlL0rqetgnGLgxP8OKgn7M0OAF5mDfvYJN+A19+C2DRnKFiqg9A35QVXwKHZzUGBvxmL3QHnGSyPkK7zg3MWAzeufBu9MfS65qm7C88dT/h+oGgGsF6rwO93yOvHxpRJFo2oIePyzVkxQZK+nLTwnJP5FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499998; c=relaxed/simple;
-	bh=7VL9LiXP1QjnMSDEGVK4cAk83076PlWPAU4NQ9KCkSs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gdIyS2ZW3Y5SqHEgYow3wZlEQ/KMPGubiJafJjwPIfyv3boIyaYQWjcsbQh7/cLZOZ5xymdxZMqrirhe3CelAqk8pJVz7Bah4iUC1HYExVXgUeLWtripyMJ2FMnUIOMgSfX8S7fw9K4Xg4X/nRSih8vFrNeV19YesfhCv4Sn7os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d81b9bb1b3so10665735ab.1
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:06:36 -0700 (PDT)
+	s=arc-20240116; t=1745501555; c=relaxed/simple;
+	bh=9Pes+HFfjTx+aWeU3Ug+lxiJazTJM7vd6I5bpka3f/g=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=AKMyds1mMRWJOXugWoXZYiTjSQt7E7LXP8EZNPAWiZwS1GTtbWpqPdGngJZ24JDJ4kS5UMNIwcbOJI8Y/Sh7YH8nKmgCmPWJm3NNGFR8xnnurxDEM6F6jFyaPAwxw8Bur49Ga3sdAuxbgzam0oM+YE0qCyxMfkt/bB5TZDXzd1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=igPUAr6i; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="igPUAr6i"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-85e15dc8035so35192739f.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 06:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745501551; x=1746106351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ChPc153/Ue0vh+ZUNhFsJPP4Dkg3KNnQf39LzkHyXJI=;
+        b=igPUAr6iVxCQtRPd5U32Zrryj3VLV8z1VkE3Wnh2eZER8vCPv2suUn1pMmE66zmTks
+         r1vzKxfmSOq49ituIxEeiF8eoGEye8TL5J8aCIezc2YU6mUX+OegK6wsdBc8EmTaLa4Q
+         LS6eDiOXEkBSZHz+s/wHSifANkzNfT77kXav3vXaiQIPqXGsRDk3pyTpIIfQQHpXjrSl
+         PsOfltkJxeghP2om2OqSwD1So4s72724p7Cq0TqxSGC6KaIFHorq1O3aqpZWZ4mmg1z+
+         MFkJPCxcdvnXc+K43Z7GY+0pWQH6I5QuqxS4ebJlpv7ZDvSA65Iudvpu3zsAaqo+/8Qa
+         d1Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745499996; x=1746104796;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=x+nl8Emi7VbtHDYLJ2yQ20exakEQsVh/t4kfvAlXQQQ=;
-        b=LdgfLMtdLxcD27amuTFMfaZm0BMQQ56pFTx8dEJPD31Et49f8RzeCXlyPdrQ3OlUoj
-         Y+qDGHE7VNEppoIYQ/7Ar+aEfeiIiyHqREG4XbmQjFXDhURA2siQDKEUav+L4ebhZh2z
-         Z3vvhZ0SaqrtwwuDkv2RR67FckVZMx1rZhg+yqMwhiB+ea1KqDZhm7c/+VitamIjlSm/
-         DS3a7PtXbtHlwelDibudXOvIDvIpI6rbZ/9ensnkHS5d8k0sMGcOhIZeKRWVTKStrbDT
-         H7tFOhx4CeqOqvtybIpvt9r0NAmduCVumlk9Zlprup0fRMIakWYMQ6LXXGsm6VuxTCK4
-         NkgQ==
-X-Gm-Message-State: AOJu0Yy/joIZPvgf5pQJq9lhY78AoU/8fKWY4pQoL9dkL1rua/UTIBYg
-	wA1RWSbVrZbs9Fo35/Is34r7HxJFP9ovUxHVUYACZ3+jtIC7BZLqQFdhKDkLwKoqYQwj6Csw0eY
-	OVEJsd23nsyZMjOaO4iR8otFJIQuh1J1RKNF23ecm8WjouE5mfU9Vd74=
-X-Google-Smtp-Source: AGHT+IHwrQ15VoiMCXG3EA2MlCv9tCPaplQJ11oIQkga7gS5vwHlMdNpnmddGPiIVw+fw3swdW/85S0mSCgjTV+3WvCAuU1Z0Cz/
+        d=1e100.net; s=20230601; t=1745501551; x=1746106351;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ChPc153/Ue0vh+ZUNhFsJPP4Dkg3KNnQf39LzkHyXJI=;
+        b=otifchHWpuFqFwwxfqQUmYs8nRKvEvP/vWwCvwXCSRPHLxHnrksPS3XD0/9DDIzjuZ
+         n3lVIUAO49YgMl6fwCZWpXVQtlR9cViKE97hBtt4o8Rj5UKvOfZOvrb81fr3GYnklysl
+         gpiasJsGH4eDdyNgo3XbTIv1/5FPUFdu+C0M92x6eneE5mTfdIw9yMPQKxZ7Z6IEktcg
+         0m/y/euR7TvFlyMW7J2ghMNbdYpKtO13haN/C0xkqZQd97G8oVFAUCgU7tLr3votg4FJ
+         AlnWsGJLE/RZoQVpi5kMgYHqqdXAnJ+8UgAERPyKNlECTTYm4tTLorPBxhkWYhcDFKuf
+         Yuzg==
+X-Gm-Message-State: AOJu0YyeFOgq3WxgK34pCeth2J/YKBK2dEXMz+NzApNr6HOj12rd0Zfg
+	xA7QwrG6vNoLFxWhn0uuVpRWaBz3k/0IwqxKYUkhdG+ndtgprSHJCricoCpE0Lh20vhyLqJRkC0
+	l
+X-Gm-Gg: ASbGnctnJlAMxz+ys7TPiM5LU2HQl7yKqpl7VHyLIWz0xWyPZi+1tWkLUCNOg4ahOmD
+	0M3DAbCanedhlBc4QqUt8EWpgXkAEuJqhvwEojmwGE62CRvKXCylo3PCKIEXe6yuxeKVY0Vg4t0
+	dgEMYERpQjHyuWxePe+58E8KDye7iOxz9T9w7yz6+zS40lZUKGU8g20a3om4loe4TqCPbb7pIA3
+	OgNkQkWm8Kpc1c5ApgMarbpDz5txLArgZG/aQvksrRgcvFWAYnkqQs5voV3jdxlJXWqKUyXCvCl
+	lfOBLp5RkSpqz53ot/S05AYc1uqJNU0=
+X-Google-Smtp-Source: AGHT+IFvxy18rgWsXoEf6L02qIK3qlKJRZvDGAoM+Z5s69C0Q5lNtzzn39YRy6V3EDiD1F7r8+pzcg==
+X-Received: by 2002:a05:6602:6414:b0:85e:a8db:fa10 with SMTP id ca18e2360f4ac-8644f973f37mr282545739f.1.1745501550704;
+        Thu, 24 Apr 2025 06:32:30 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a3bab1sm274941173.36.2025.04.24.06.32.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 06:32:30 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, 
+ =?utf-8?q?Holger_Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
+In-Reply-To: <20250424082521.1967286-1-hch@lst.de>
+References: <20250424082521.1967286-1-hch@lst.de>
+Subject: Re: [PATCH] block: never reduce ra_pages in blk_apply_bdi_limits
+Message-Id: <174550154991.655590.32611122624973762.b4-ty@kernel.dk>
+Date: Thu, 24 Apr 2025 07:32:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1569:b0:3d8:975:b808 with SMTP id
- e9e14a558f8ab-3d93038630cmr25022615ab.5.1745499996022; Thu, 24 Apr 2025
- 06:06:36 -0700 (PDT)
-Date: Thu, 24 Apr 2025 06:06:36 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <680a375c.050a0220.10d98e.0007.GAE@google.com>
-Subject: [syzbot] Monthly block report (Apr 2025)
-From: syzbot <syzbot+list14b5741b0fc59d7d464f@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-Hello block maintainers/developers,
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+On Thu, 24 Apr 2025 10:25:21 +0200, Christoph Hellwig wrote:
+> When the user increased the read-ahead size through sysfs this value
+> currently get lost if the device is reprobe, including on a resume
+> from suspend.
+> 
+> As there is no hardware limitation for the read-ahead size there is
+> no real need to reset it or track a separate hardware limitation
+> like for max_sectors.
+> 
+> [...]
 
-During the period, 3 new issues were detected and 1 were fixed.
-In total, 34 issues are still open and 96 have already been fixed.
+Applied, thanks!
 
-Some of the still happening issues:
+[1/1] block: never reduce ra_pages in blk_apply_bdi_limits
+      commit: 7b720c720253e2070459420b2628a7b9ee6733b3
 
-Ref  Crashes Repro Title
-<1>  10734   Yes   possible deadlock in loop_set_status
-                   https://syzkaller.appspot.com/bug?extid=9b145229d11aa73e4571
-<2>  5418    Yes   KMSAN: kernel-infoleak in filemap_read
-                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<3>  3359    Yes   possible deadlock in blk_mq_freeze_queue_nomemsave
-                   https://syzkaller.appspot.com/bug?extid=9dd7dbb1a4b915dee638
-<4>  2520    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<5>  648     Yes   INFO: task hung in bdev_open
-                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<6>  363     No    INFO: task hung in read_part_sector (2)
-                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
-<7>  312     Yes   possible deadlock in blk_mq_update_nr_hw_queues
-                   https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
-<8>  81      No    KCSAN: data-race in block_uevent / inc_diskseq (2)
-                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
-<9>  63      Yes   possible deadlock in queue_requests_store
-                   https://syzkaller.appspot.com/bug?extid=48928935f5008dde0a41
-<10> 51      Yes   WARNING in blk_register_tracepoints
-                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
+Best regards,
+-- 
+Jens Axboe
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
