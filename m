@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357731C5D53
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 15:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6BA1C2335
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 15:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745508131; cv=none; b=hr9AYslIfuggiI3PWktwfDxh85M/U2N8I45tPg3j9TVBzJ+numNQeUJ6zP2JrqfbHeP1rWE5QbMNJSM9uMLo8fUgXIvQIfsSnw6xGxxgAmU/9rMIv1iU79tbPFo8YENcCGaum8ytWniW7nGEp07Sk/dorgcP2jpSX4TLoOuyzP0=
+	t=1745508134; cv=none; b=eqUOG8Sg4Ts9AAMSBMQ/BeT9oF6CtQqQc+IG/yvo6zdYzQSih89kH4Ro3FfQT0+m+iLaBGeJnBJXswdpRrkDC8ATnHZnj//Fp6QE56hDGeKfyvRd/8jgWXIrb9oTGPm8MM0crhioZojPu8OUn9vmTwG4DW8KOGg7XJ8FPeAsVSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745508131; c=relaxed/simple;
-	bh=XRPdX90fDf0BmpsXlyXVPVS2esbmPgoePhAkRXrJtSs=;
+	s=arc-20240116; t=1745508134; c=relaxed/simple;
+	bh=+zQxJzDR4/G5EjDqUHGoJu+1K9HCntN2r93QQqXnk1g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=utbqP1CC4IukTod+4fPRnb8oR9PrrQTYdi+4IQ194BDfNzQz9DK84Cv0VVM8StL2Rl8eJ/tLtN4URF90AY5zPxbYqqUVTP/x5uZykq+RnLvYIYT7gUtoUoBsOXQKBDtHHdmTR1RJzuA/ZwCUyt2wqaW7pO/YiUmhwi2suLgGbDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PJtrdX6W; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=HuaJtw/XInUFZnwz+mv5q3G192XHiUqNxw44f52rWBPhTIGCYJjzmAR5GDyRI/gOY0fv3INxclNycso60yI0F6YC5r0FYiwtNj3O8uazSevsI8p8qGCIsaIvXVEL7WPBYzRpBhmOT+EA4WoNBUosbERZE2QeSnqtx5mT1HpldMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jwzfj8OV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJtrdX6W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jwzfj8OV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745508128;
+	s=mimecast20190719; t=1745508132;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DXRb4EAgKM4F0VrL0L7kM3G1bI4DRTaWvwCZ2ZYw9+g=;
-	b=PJtrdX6W0ICMq+pXcf7lrfgGJR8u9OLFssp7EFy6+ij8m0zwPUKNZdhKwxTaudnyUJfUKL
-	0Df2xalSYxcvVkRAV0SQdDiFiSUx0PxU1sHhTdi8qf7O4i+sb7wZDYDyaomlzNsruPu+W+
-	qQM6Wg7pEh1nqsnweqZj2v0prPthFz4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=FgpqlMYxmzfKfku0sZvPpiCoIF/0prbIIVS83wNReS4=;
+	b=Jwzfj8OV6x+8bUFNhykTS0y6RSoKTHKvEC13ncS2F0m/x0smqcFJ6QTjXE1aS3Wvr156Zi
+	48QikwrNFziftADMjsuMJOE51sqIQKzDZ+VcZtwVhWPV1bltSSg1gMYKTlYLQfwM0zBKkQ
+	2FhblEvFSzJxrutjOL/JKPKPLNf8niI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-vp-zlOibMKi-xavnaJb66A-1; Thu,
- 24 Apr 2025 11:22:05 -0400
-X-MC-Unique: vp-zlOibMKi-xavnaJb66A-1
-X-Mimecast-MFC-AGG-ID: vp-zlOibMKi-xavnaJb66A_1745508123
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-N-TcWf2YMK-Hw32iU9kC4Q-1; Thu,
+ 24 Apr 2025 11:22:08 -0400
+X-MC-Unique: N-TcWf2YMK-Hw32iU9kC4Q-1
+X-Mimecast-MFC-AGG-ID: N-TcWf2YMK-Hw32iU9kC4Q_1745508127
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BB401801A0D;
-	Thu, 24 Apr 2025 15:22:03 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF1C4180034E;
+	Thu, 24 Apr 2025 15:22:06 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.90])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 238C31956095;
-	Thu, 24 Apr 2025 15:22:01 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 137EF1800374;
+	Thu, 24 Apr 2025 15:22:05 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V3 02/20] block: move ELEVATOR_FLAG_DISABLE_WBT a request queue flag
-Date: Thu, 24 Apr 2025 23:21:25 +0800
-Message-ID: <20250424152148.1066220-3-ming.lei@redhat.com>
+Subject: [PATCH V3 03/20] block: don't call freeze queue in elevator_switch() and elevator_disable()
+Date: Thu, 24 Apr 2025 23:21:26 +0800
+Message-ID: <20250424152148.1066220-4-ming.lei@redhat.com>
 In-Reply-To: <20250424152148.1066220-1-ming.lei@redhat.com>
 References: <20250424152148.1066220-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,107 +63,68 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-ELEVATOR_FLAG_DISABLE_WBT is only used by BFQ to disallow wbt when BFQ is
-in use. The flag is set in BFQ's init(), and cleared in BFQ's exit().
+Both elevator_switch() and elevator_disable() are only called from the
+two code paths, in which queue is guaranteed to be frozen.
 
-Making it as request queue flag, so that we can avoid to deal with elevator
-switch race. Also it isn't graceful to checking one scheduler flag in
-wbt_enable_default().
+So don't call freeze queue in the two functions, also add asserts for
+queue freeze.
 
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.c    | 4 ++--
- block/blk-mq-debugfs.c | 1 +
- block/blk-wbt.c        | 3 +--
- block/elevator.h       | 1 -
- include/linux/blkdev.h | 3 +++
- 5 files changed, 7 insertions(+), 5 deletions(-)
+ block/elevator.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index abd80dc13562..cc6f59836dcd 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7210,7 +7210,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
- #endif
+diff --git a/block/elevator.c b/block/elevator.c
+index b4d08026b02c..5051a98dc08c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -615,12 +615,11 @@ void elevator_init_mq(struct request_queue *q)
+  */
+ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ {
+-	unsigned int memflags;
+ 	int ret;
  
- 	blk_stat_disable_accounting(bfqd->queue);
--	clear_bit(ELEVATOR_FLAG_DISABLE_WBT, &e->flags);
-+	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT_DEF, bfqd->queue);
- 	wbt_enable_default(bfqd->queue->disk);
++	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 	lockdep_assert_held(&q->elevator_lock);
  
- 	kfree(bfqd);
-@@ -7397,7 +7397,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	/* We dispatch from request queue wide instead of hw queue */
- 	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
+-	memflags = blk_mq_freeze_queue(q);
+ 	blk_mq_quiesce_queue(q);
  
--	set_bit(ELEVATOR_FLAG_DISABLE_WBT, &eq->flags);
-+	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, q);
- 	wbt_disable_default(q->disk);
- 	blk_stat_enable_accounting(q);
+ 	if (q->elevator) {
+@@ -641,7 +640,6 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
  
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 3421b5521fe2..7710c409e432 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -93,6 +93,7 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
- 	QUEUE_FLAG_NAME(HCTX_ACTIVE),
- 	QUEUE_FLAG_NAME(SQ_SCHED),
-+	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
- };
- #undef QUEUE_FLAG_NAME
+ out_unfreeze:
+ 	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q, memflags);
  
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index f1754d07f7e0..29cd2e33666f 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -704,8 +704,7 @@ void wbt_enable_default(struct gendisk *disk)
- 	struct rq_qos *rqos;
- 	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
+ 	if (ret) {
+ 		pr_warn("elv: switch to \"%s\" failed, falling back to \"none\"\n",
+@@ -653,11 +651,9 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
  
--	if (q->elevator &&
--	    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags))
-+	if (blk_queue_disable_wbt(q))
- 		enable = false;
+ void elevator_disable(struct request_queue *q)
+ {
+-	unsigned int memflags;
+-
++	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 	lockdep_assert_held(&q->elevator_lock);
  
- 	/* Throttling already enabled? */
-diff --git a/block/elevator.h b/block/elevator.h
-index e4e44dfac503..e27af5492cdb 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -121,7 +121,6 @@ struct elevator_queue
- };
+-	memflags = blk_mq_freeze_queue(q);
+ 	blk_mq_quiesce_queue(q);
  
- #define ELEVATOR_FLAG_REGISTERED	0
--#define ELEVATOR_FLAG_DISABLE_WBT	1
+ 	elv_unregister_queue(q);
+@@ -668,7 +664,6 @@ void elevator_disable(struct request_queue *q)
+ 	blk_add_trace_msg(q, "elv switch: none");
+ 
+ 	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q, memflags);
+ }
  
  /*
-  * block elevator interface
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 678dc38442bf..228b2e5ad493 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -644,6 +644,7 @@ enum {
- 	QUEUE_FLAG_RQ_ALLOC_TIME,	/* record rq->alloc_time_ns */
- 	QUEUE_FLAG_HCTX_ACTIVE,		/* at least one blk-mq hctx is active */
- 	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
-+	QUEUE_FLAG_DISABLE_WBT_DEF,	/* for sched to disable/enable wbt */
- 	QUEUE_FLAG_MAX
- };
- 
-@@ -679,6 +680,8 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
- #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
- #define blk_queue_skip_tagset_quiesce(q) \
- 	((q)->limits.features & BLK_FEAT_SKIP_TAGSET_QUIESCE)
-+#define blk_queue_disable_wbt(q)	\
-+	test_bit(QUEUE_FLAG_DISABLE_WBT_DEF, &(q)->queue_flags)
- 
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
 -- 
 2.47.0
 
