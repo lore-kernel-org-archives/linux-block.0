@@ -1,172 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C7C210F5A
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 09:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B028E221261;
+	Thu, 24 Apr 2025 09:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745485395; cv=none; b=VzWlKeD6HzTQnIp2Go8nDuo5zNN5GJ+9Co3gtoHUxA4bn/P1FOs/ueg5rxst7DBOjoa8UmVjDeTklKU5kMl3VsV3EhcFQ3SAS+i/VzxYp6EAr6JLmUqWPPocnIXR/YWs0ZjydfOnXDGD/OpbW0gEOs4l7Oc2EzDlRDtFzC4J0Kg=
+	t=1745487594; cv=none; b=E9/MGxfU415m9iOlVbr3V5zZeWWDH0Win+ryPgifspZu4U1nodKBzvNAsPryHyrF9BZuKp/DJop+Pu8qN4JbGgnOSsap7VfjTTezFMOHSYOLc+tjk6r5gxnbPR9c2BzTMX6L9GrYlLVoJZDdxVz1yGTZiEytERCm8oMNjf+XAgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745485395; c=relaxed/simple;
-	bh=LxxZ3PnM3GnSmQVc4b35vmUhaH1YtHOD2luSa1Hv2FA=;
+	s=arc-20240116; t=1745487594; c=relaxed/simple;
+	bh=Fu1D6/3SMuBcvONuuAZrd45zEnd8X8dCBTBRjeIPM7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k9YdX0ZFXhPnGjnscPs0yDnDgGpeE0KfkrdDPurOaFQYVNxAVd8NsK55Jb3U7+vcGUwGPBt48NE/CQq75AILMWxnrrSSJZQlkAAn6hk4F4UkdDfiVxIT3wyyfn3tn+CwH2RoE43kroTufktBVVH/a1FysOXBsItVdJdUYwrRDqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTIoglLA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJAA1EnfZBHCln5MN8/uGSxr22xTU2wOAehhYIrKNfy1DBjwnKrm9XGuxKEn2+oPVx0NAKJL/vspVFd7jYHB163wCFdNfSonuljYYg0178GLB3l1OCbQownizZGMgGo/EgmfhYx1odj/mMI9qF2i58IZl7NJ5ONIakPNadz/TJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlHe8hh3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTIoglLA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745485391;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yQlNEGSJgij/t3GaaKCbDm9GBD8YV1Z5HMPR6Qwn3Uc=;
-	b=WTIoglLAwCsjONgPVN/lCHkTDkABPk/XrsEOGGR07s/NT11rDNUd2CvoQiwwguO3Pm8+Jm
-	xFfJFxEDbMK7rgiSIaD9TFMr4fEUilz3M8x9E8+In1RTFI1PjtFAblpE0v1fw+aaVb4CZs
-	J2KUro2Vzf/5Gm9xjBWkBlXOaQbmPIA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-fEpUFpxbOZGKJ5sRVGC3Mw-1; Thu,
- 24 Apr 2025 05:03:07 -0400
-X-MC-Unique: fEpUFpxbOZGKJ5sRVGC3Mw-1
-X-Mimecast-MFC-AGG-ID: fEpUFpxbOZGKJ5sRVGC3Mw_1745485386
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E95ED180036E;
-	Thu, 24 Apr 2025 09:03:05 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.127])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4303D1800374;
-	Thu, 24 Apr 2025 09:03:00 +0000 (UTC)
-Date: Thu, 24 Apr 2025 17:02:56 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V2 13/20] block: unifying elevator change
-Message-ID: <aAn-QPbsIadxZQhe@fedora>
-References: <20250418163708.442085-1-ming.lei@redhat.com>
- <20250418163708.442085-14-ming.lei@redhat.com>
- <28d4f3b8-1e42-451e-9754-ebf639b05aa2@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlHe8hh3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A40C4CEED;
+	Thu, 24 Apr 2025 09:39:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745487594;
+	bh=Fu1D6/3SMuBcvONuuAZrd45zEnd8X8dCBTBRjeIPM7o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qlHe8hh3EbdSEoUlNGm4cBIefYx+vHJdO0uU4/yuNv/U9SlAaWsBbzZyUfzGe+spU
+	 lVEt8UKB6tvYJIcSshD9apuyoJuB6KdPjjBWtMCCi4GPtkG8g63XwqTxKNKtjeiQ2L
+	 NwDnbsl1ODeMudm6OVZdPphLQRVJXvioGjsXf1tVTQyn8leDo96O1UUYz1vlFu954b
+	 1pdmBPX3ipq2sm3tijmFxkUhIZiRAB76CHtGPWiUH5iOrqLm8TlrjU+0lqho+Y/S+y
+	 CV288iHU1kOtUr+h7NPhP9pUyxWpmiYSzheZlTh0kjO8z4qXPkgRYjy9vmRr66vrQj
+	 xlxPB4+6JS1+Q==
+Date: Thu, 24 Apr 2025 11:39:50 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Josef Bacik <josef@toxicpanda.com>, Christian Brauner <christian@brauner.io>, 
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: don't autoload block drivers on stat (and cgroup configuration)
+Message-ID: <20250424-grabmal-storch-1899923883a0@brauner>
+References: <20250423053810.1683309-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <28d4f3b8-1e42-451e-9754-ebf639b05aa2@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250423053810.1683309-1-hch@lst.de>
 
-On Sat, Apr 19, 2025 at 06:56:14PM +0530, Nilay Shroff wrote:
+On Wed, Apr 23, 2025 at 07:37:38AM +0200, Christoph Hellwig wrote:
+> Hi all,
 > 
+> Christian pointed out that the addition of the block device lookup
+
+Thank you! And sorry I just sent you a mail complaining about this
+again. I didn't see this patch series until just now. Thanks for doing
+this!
+
+Reviewed-by: Christian Brauner <brauner@kernel.org>
+
+> from stat can cause the legacy driver autoload to trigger from a plain
+> stat, which is a bad idea.
 > 
-> On 4/18/25 10:06 PM, Ming Lei wrote:
-> > elevator change is one well-define behavior:
-> > 
-> > - tear down current elevator if it exists
-> > 
-> > - setup new elevator
-> > 
-> > It is supposed to cover any case for changing elevator by single
-> > internal API, typically the following cases:
-> > 
-> > - setup default elevator in add_disk()
-> > 
-> > - switch to none in del_disk()
-> > 
-> > - reset elevator in blk_mq_update_nr_hw_queues()
-> > 
-> > - switch elevator in sysfs `store` elevator attribute
-> > 
-> > This patch uses elevator_change() to cover all above cases:
-> > 
-> > - every elevator switch is serialized with each other: add_disk/del_disk/
-> > store elevator is serialized already, blk_mq_update_nr_hw_queues() uses
-> > srcu for syncing with the other three cases
-> > 
-> > - for both add_disk()/del_disk(), queue freeze works at atomic mode
-> > or has been froze, so the freeze in elevator_change() won't add extra
-> > delay
-> > 
-> > - `struct elev_change_ctx` instance holds any info for changing elevator
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-sysfs.c | 18 ++++-------
-> >  block/blk.h       |  5 ++-
-> >  block/elevator.c  | 81 ++++++++++++++++++++++++++---------------------
-> >  block/elevator.h  |  1 +
-> >  block/genhd.c     | 19 +----------
-> >  5 files changed, 55 insertions(+), 69 deletions(-)
-> > 
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index a2882751f0d2..58c50709bc14 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -869,14 +869,8 @@ int blk_register_queue(struct gendisk *disk)
-> >  	if (ret)
-> >  		goto out_unregister_ia_ranges;
-> >  
-> > +	elevator_set_default(q);
-> >  	mutex_lock(&q->elevator_lock);
-> > -	if (q->elevator) {
-> > -		ret = elv_register_queue(q, false);
-> > -		if (ret) {
-> > -			mutex_unlock(&q->elevator_lock);
-> > -			goto out_crypto_sysfs_unregister;
-> > -		}
-> > -	}
-> >  	wbt_enable_default(disk);
-> >  	mutex_unlock(&q->elevator_lock);
-> >  
-> [...]
-> [...]
-> >  /*
-> > diff --git a/block/genhd.c b/block/genhd.c
-> > index 86c3db5b9305..de227aa923ed 100644
-> > --- a/block/genhd.c
-> > +++ b/block/genhd.c
-> > @@ -438,12 +438,6 @@ static int __add_disk_fwnode(struct gendisk_data *data)
-> >  		 */
-> >  		if (disk->fops->submit_bio || disk->fops->poll_bio)
-> >  			return -EINVAL;
-> > -
-> > -		/*
-> > -		 * Initialize the I/O scheduler code and pick a default one if
-> > -		 * needed.
-> > -		 */
-> > -		elevator_init_mq(disk->queue);
-> >  	} else {
-> >  		if (!disk->fops->submit_bio)
-> >  			return -EINVAL;
-> > @@ -587,11 +581,7 @@ static int __add_disk_fwnode(struct gendisk_data *data)
-> >  	if (disk->major == BLOCK_EXT_MAJOR)
-> >  		blk_free_ext_minor(disk->first_minor);
-> >  out_exit_elevator:
-> > -	if (disk->queue->elevator) {
-> > -		mutex_lock(&disk->queue->elevator_lock);
-> > -		elevator_exit(disk->queue);
-> > -		mutex_unlock(&disk->queue->elevator_lock);
-> > -	}
-> > +	elevator_set_none(disk->queue);
-> >  	return ret;
-> >  }
-> As we moved elevator init function (elevator_set_default) inside blk_register_queue, 
-> we probably now don't need label out_exit_elevator in __add_disk_fwnode. In fact,
-> no code in __add_disk_fwnode shall jump to this label.
-> I think, elevator_set_none may be called anytime after we see failure post 
-> blk_register_queue returns.
-
-Good catch, 'out_exit_elevator' can rename as 'out', and the last
-elevator_set_none() can be dropped.
-
-Thanks,
-Ming
-
+> This series fixes that and also stops autoloading from blk-cgroup
+> configuration, which isn't quite as bad but still silly.
+> 
+> Diffstat:
+>  block/bdev.c           |   17 +++++++----------
+>  block/blk-cgroup.c     |    2 +-
+>  block/blk.h            |    3 +++
+>  block/fops.c           |    2 +-
+>  include/linux/blkdev.h |    4 ----
+>  5 files changed, 12 insertions(+), 16 deletions(-)
