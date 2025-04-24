@@ -1,150 +1,100 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E809515E5DC
-	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 14:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C545119D890
+	for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 14:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745503710; cv=none; b=CQQ3sn11cwW8mlFMCDLB9S0d+Np9dqwLncbaAaeb4B7f1n4CBB0nSZWI1qMWGjqglcxvImbSttrkdieOX219Z3sLFX5kSfHlITHksEOLgug/zV20L9M0vvZVkuiknpvskyZkD/B9aqqBhXCGtUujkSylgonBPmd2fqNGSFHQEro=
+	t=1745504413; cv=none; b=J2RQvr/NJPbpzjGVeFEh4Bo5VYGoGbdVmI18AOcboZcKPoDU4QjAMlD44i36a7/Y1phIcHp3jfpMJ5mgjzqKzrPFSrDHV0r71vGSRxa3Uvkp7msSkx1NG6nQloiirZu1pdnmrInJk0m5YrJn/SEivYEC69FX27cQYEw5Ye+0+vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745503710; c=relaxed/simple;
-	bh=GIcJyjVE9QXvNyMLGN5MR/9NOdLBqq5K6m1VPsn9ZXc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Nf1TrKSV72K39LTwOoRblTFj3zhr5MacinlCSKFlcx0WQbZ6W4Ftrd5WNJz13YmN5ACm3rbi315uAzertDN+U2FXCH6D+7iuZN4El/tjeDPjmACtjBiDHOskd067deq3I9eQnGEPW10P7J5SMmXG3rIbRva7r7Fi6HfChuAiTdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d81bc8ebc8so11628205ab.2
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 07:08:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745503708; x=1746108508;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1745504413; c=relaxed/simple;
+	bh=E/HfRhUv/vN50Kixio/MbazHdJokuFjRRDR+3/M0SKg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ubTx982/aADl7OPPzbbp329x6wqmUalrSvI76OqYm9QhIX1cMtDjpil8HuR3B+ZUW6wY6eX/9D6xaSaPhov2LqAMIw/aThVmxW9xhXw6QZwvwgDlJcGkgTtkTNEh9V0T3RtMsrXMKEiAt88o9/0OToyESutAShtspZ/9TcmEM7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNh+psi7; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNh+psi7"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c5f619cc01so17388385a.3
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 07:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745504410; x=1746109210; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=7RhSriLOhs53nUa6Jt3KOnRleTlrCpK0HB+OykHogjo=;
-        b=UJhlUqhfB7nR8m5DdfJesH+qeFbPsKrGIJLCcllkjN3ybKOZEy2mafiUKDlPtzt6O5
-         DNPLMXzE6gPBTirZd/hFIlPoE3MaGpDKE1ed7dBWvmtIFYANwgii/a8SkTBGH2YRifnh
-         Diy7UNYKpuCAR1JBfdv2JxddAhQh+4nFD7KQYo4o+QiEVe2eaDiCbBYF07Yqy/ivPYjF
-         ay5Iu+6+r6cVLUj+j/P0rQqXufcf/jyxRHAYuAe2Opp8YWfmorH2RDG4ptQJajljZ9bj
-         7rXSqR1ZUF6uuXq4AC/vDdHTLLQfSjH2S/msoO8Rz46VTDzdmNm59n/0mXySNqOgaRvu
-         UmzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXL+L1pN/oD9fUiznof0IogzMxjibtZB5hhuwVxk/SIgISQs2o5B//kyPozXu0z3f4SFzaRckCIwhzW6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcEyLKk2sPWqXluTyyuHPrrmG7gbtx++utN+s9jAbfMOtJB8hM
-	BjFgOA6O3Et45Oasa7724VT+qGX/anotgsamqjQ8u/0OAJFgcCGqQ9VcltU8UlcIuulRyJhLsQn
-	HnagwZxs6YkgjSvYnT9VbDkpycDAeOOLfUcIWXCxke3kyZC8URhW7ZtA=
-X-Google-Smtp-Source: AGHT+IGglOtcgTfuSuz1kG93dSZbd7GhY7gT/KZdoUcGNi8rweM0oC2rNNcXPLD2qftLJ0fW7E6Qc50+E94hdBUSv6dSGhHznJCI
+        bh=6Wl/701O0YiDCZmHuscPK+uRrUMN8SkqfHmcaGCKw+M=;
+        b=mNh+psi7AH7+kaArOu6KLAEUcKRMHPNC818VU6kr5q+QOmrUk+ptC0aSYrRjWxvns7
+         NQIfc2P+OaPucZzCWGUYR/NTfx20hk2m+cMMj9qfRrEqIBdMFY3oVExjC4o9haqOO2SD
+         E1wq/o3Xjbalw/l0ABiUOCT6vQU79Us2Ua12mGR2PhnU40ahVTtQ/bj5/E+LRzuubshN
+         3Bzko3FE1OrYVpfTxpngpIiwiDus2VMHCWrn//p6vP8jr/U9RRDPAErtMTrqk/t5z4+m
+         EWVIP0fTdBsW5pcIvkDad0UC8iB9pO0VOKgIkPfP6gCZyGbb1BZhct/6H8jlT9Le/85U
+         ejvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745504410; x=1746109210;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Wl/701O0YiDCZmHuscPK+uRrUMN8SkqfHmcaGCKw+M=;
+        b=EOpaS9eeYw1DVBEDK8tHi1nMySDuOxb7EZfBgG+q8c9xv3jHSI9u9+NmesRQYAY5jq
+         8leK1x7gCqZYcskri/ezBg+hUzcnUUPRGjZo3n8ESy5cqZRPj65HEPhmDuDX7nGvj6oe
+         BcHzeEAGkzXBZFhYCISXYYfKbkegj3NQBOf54xgGsmtYjt1RU/hru01lC7DFzct5QqnP
+         aJR2c6J0HqYQ5Vgaj4uJ0+GF/Yx6TK8iX2WeYoqYr6ytfsaGvyJHZDA9fH/y8441WEVe
+         dMEcSwV4SsBZ1w34sEm6DGic97WSO7OQsYYud+N9KNcyNOEJAPuioeJ9Z3jhmIaWyIC3
+         hwzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtWUzNNI9u59Rr2BX7wT1vJtSkLELa5auGidt/GUzyDskBtQcU6zTtg1yts8J8pIwsBhLSGz06f6uCvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv6yLuucQAPj8SVtO5/9qp4ltSPAUiOHOawyeeYosjr+5+GoV5
+	TlsKQlTKR3kHCXhty3hWyZJqN9oqb6Gn4+vpYMtQ+OyWxf/CHuvo
+X-Gm-Gg: ASbGncs2LHM1tTEawv7GCz46LLO+yGSrVzynKrUjouqL+um4VdpD71gLwwTeDzZBXtL
+	MzmR6wAyVfwcSwVBEM/CeMPC95fTpDZspdkiWGbXYsEpJqC9ewZpsLPRt6NJLuIEp8jetB1NDXc
+	LUOEUqzd3D2hymyY7CMMxVci0JXnhjuRLqUlEFYaRZzLc7C8y6EMJrkhVsrweMCWp3t5+0+OmK4
+	Kl574Ff6E44kS4Irx6L93E01yWlU31pGKxNj7Ccb39B2lE0xaWpvo40+ZhvrLJMKiI5QJ/OJz/l
+	xyxKHT6G5SK7L9yAbEHnGhQ6UaveTYaU8kLQVJEg6EWfb17qj2H/NOBiG63XYT3DXr3lub6M7BO
+	nR4wAsj0uPgDlZyl1
+X-Google-Smtp-Source: AGHT+IHbp/yFIlfYQPfvprqUH9LFqmXIbjUmDQTjDf/7c/0h2NTcZKkXeulgy7qCQtKH6rEiWjmsUQ==
+X-Received: by 2002:a05:620a:28cc:b0:7c7:aee7:b959 with SMTP id af79cd13be357-7c956f9b389mr156143485a.15.1745504410504;
+        Thu, 24 Apr 2025 07:20:10 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958d86c6dsm92080985a.71.2025.04.24.07.20.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 07:20:10 -0700 (PDT)
+Message-ID: <e94e55a6-a93d-2c7b-2c3b-8829ab53848b@gmail.com>
+Date: Thu, 24 Apr 2025 10:20:09 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:188f:b0:3d6:cbed:330c with SMTP id
- e9e14a558f8ab-3d9303b7774mr26950505ab.11.1745503707896; Thu, 24 Apr 2025
- 07:08:27 -0700 (PDT)
-Date: Thu, 24 Apr 2025 07:08:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <680a45db.050a0220.10d98e.000a.GAE@google.com>
-Subject: [syzbot] [block?] BUG: unable to handle kernel NULL pointer
- dereference in lo_rw_aio
-From: syzbot <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
+Content-Language: en-US
+To: "hch@infradead.org" <hch@infradead.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20250423164957.2293594-1-seanga2@gmail.com>
+ <aAnxqAv41Quh66Q1@infradead.org>
+ <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+ <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
+ <aApFcW-fsdUP4Ztj@infradead.org>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <aApFcW-fsdUP4Ztj@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 4/24/25 10:06, hch@infradead.org wrote:
+> On Thu, Apr 24, 2025 at 09:56:11AM -0400, Sean Anderson wrote:
+>>> As a similar idea, how about to skip the test case if the test target device's
+>>> zone size is too small?
+>>
+>> Why would I want that? The test passes with an appropriate block size.
+> 
+> Because this is a completely stupid device that can't actually be used
+> by any file system or storage system designed for zones.  Why would we
+> make a mess of our tests for a highschool science fair project?
+> 
 
-syzbot found the following issue on:
+Because the test is trivially wrong.
 
-HEAD commit:    119009db2674 Merge tag 'vfs-6.15-rc3.fixes.2' of git://git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c93fe4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7a7c679f880028f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179aeccc580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=100b5b98580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-119009db.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1cd1adb50b98/vmlinux-119009db.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d1e790c57be7/bzImage-119009db.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
-
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-#PF: supervisor instruction fetch in kernel mode
-#PF: error_code(0x0010) - not-present page
-PGD 0 P4D 0 
-Oops: Oops: 0010 [#1] SMP KASAN NOPTI
-CPU: 0 UID: 0 PID: 12 Comm: kworker/u32:0 Not tainted 6.15.0-rc2-syzkaller-00471-g119009db2674 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: loop8 loop_rootcg_workfn
-RIP: 0010:0x0
-Code: Unable to access opcode bytes at 0xffffffffffffffd6.
-RSP: 0018:ffffc900000f7a38 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffffff8beceec0 RCX: ffffffff86084265
-RDX: 1ffffffff17d9ddd RSI: ffffc900000f7b28 RDI: ffff8880261b3128
-RBP: ffff8880261b3128 R08: 0000000000000005 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000002be0 R12: ffffc900000f7b28
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880d69b2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd6 CR3: 000000000e180000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lo_rw_aio.isra.0+0x9c2/0xd90 drivers/block/loop.c:393
- do_req_filebacked drivers/block/loop.c:424 [inline]
- loop_handle_cmd drivers/block/loop.c:1866 [inline]
- loop_process_work+0x8a4/0x10d0 drivers/block/loop.c:1901
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
-CR2: 0000000000000000
----[ end trace 0000000000000000 ]---
-RIP: 0010:0x0
-Code: Unable to access opcode bytes at 0xffffffffffffffd6.
-RSP: 0018:ffffc900000f7a38 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffffff8beceec0 RCX: ffffffff86084265
-RDX: 1ffffffff17d9ddd RSI: ffffc900000f7b28 RDI: ffff8880261b3128
-RBP: ffff8880261b3128 R08: 0000000000000005 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000002be0 R12: ffffc900000f7b28
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880d69b2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd6 CR3: 000000000e180000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--Sean
