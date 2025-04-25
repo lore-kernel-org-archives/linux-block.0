@@ -1,105 +1,115 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04F8187332;
-	Fri, 25 Apr 2025 03:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BCA1BC2A
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 04:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745552466; cv=none; b=nO/gLtZYCXJLqnykLyphdLMAIMoRfsEX8blWdS+1RX5cbp8xiWIAqgvrCH7oz9Bk02sNlCU4fP4ytXNKywhpGlqZ5/WLVpWcd+ZYK2xeY5mxgfR35PC/AyNpS7lT+fDzY0TY1VhF9/ZjE6l65VEYZOC8pGE1bnKGxQPQpu9C/98=
+	t=1745553884; cv=none; b=CCgMX1PKIpNcLAgc1lWEgpCneTGLef1Ep/eLCKjcXobPgNdh1DZwgS1Sn9o9FOYe+EBxhbmz1iZhPDts+z21OJl8we29UYqkifm8yhEfr1DmFSYcnuPMzARmI858r+7pCRk7iQQevKhV+YhsTHqXWo4wmDhViujgG0t/qlpsNoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745552466; c=relaxed/simple;
-	bh=wPvyuyfU1DAjAWhrRG/W1tcYDV8l4b+Yl+1azMhL93k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sYrTk/pfwd/u3euZGm8oTiIOUmOkz6iP3Ibf0BOLuP8zCR1HyQYKvjKHbS2vufIHGEWmeOW5bVAHaGcRQ93TJQpfKpVV16qFIpybd+PVYGlzgwiyhaBk21Gnad4zNsVv4rAQ6z6JyfkbEAcgynxs7hurgTKxSgGQQ7nisU0Ba6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P33LLm029783;
-	Thu, 24 Apr 2025 20:41:00 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 466jhd384p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 24 Apr 2025 20:41:00 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Thu, 24 Apr 2025 20:40:59 -0700
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Thu, 24 Apr 2025 20:40:57 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH] loop: Add sanity check for read/write_iter
-Date: Fri, 25 Apr 2025 11:40:57 +0800
-Message-ID: <20250425034057.3133195-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <680a45db.050a0220.10d98e.000a.GAE@google.com>
-References: <680a45db.050a0220.10d98e.000a.GAE@google.com>
+	s=arc-20240116; t=1745553884; c=relaxed/simple;
+	bh=Kwof+fO62y7e/RHa0On3RX/TwZu9uzYKZRQz19L5h0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YO5KCBFWynC0LtAeRXFXeDpS+akzF2Isw7uK1XKS6OvyoygvkNN22MtPhn0CySracaFYKLfj38j50JiGV7x01+JkgrTeg8hkP4TUaWZKuxMvNRzF3nkrHNIv/rz12WawHxzB1gw6YFneuwdL0bvOYDaqgTgKQr+dRfVvcHv0vN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TqWiWq1z; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TqWiWq1z"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c55d853b54so22757285a.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 21:04:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745553881; x=1746158681; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mT5VjZuJoUlawhbHokQ45PcTHgcGF9j1l+eGww/vtv4=;
+        b=TqWiWq1z9jXsNeLtwE073Akj1Wl3QT0/FVKL9+MkrnnRsqcaYlgg2HEP0dpYe02xga
+         WOXxeCO54P1Dc7P2UEnxmLuSisO+QtQyp6KzYjlYhDueZxJeuryXCHI4hOXGoGq2nwxD
+         yzsvO3OuMeaCM66PvBCZiI4taEVs6bsuRlkXrIXNdxPiZ4aODQfRwzTk9iQ/5CKGmS1n
+         rOiHz0rWVack2f8KRxf+ddhsycaX6sFFhfKItpRef5aKGE3sX8spcnUelYVddqhGLDVA
+         NlaqxALvf6VlUTHnMZvJBfmNTzCVQO861BVV2I9LZI9aDNHLDp1QFpZ4PPYwxrJzG4mm
+         NHZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745553881; x=1746158681;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mT5VjZuJoUlawhbHokQ45PcTHgcGF9j1l+eGww/vtv4=;
+        b=CjFR5pEJYByHvH9jQC/MrY6Ypwoh+oFmOkv+U4QAg+ev8BnoxXbVsDUZz9XKbVTwmx
+         BNVH7BNAlBB6XhIcB/2ohfNRDbVWU5omWj3/6cBaLQj1Aa0mOBXUPUiefaFeXClwa2VV
+         UZ0uyCz8yrUkrDrb/UwgG7SQni313AkjinRC70oMQRpXxdjCzkUXtE4Lamn1rQ2NnVK4
+         Ky6FX/FFotNNDQif9wPfc0iArfPKwB8t+PyvkQ/Z3cM2DjiHwsutD2/8bSO1ty9ZptN5
+         5Zy7Oz57uKzE1iVNMRHRxDy6mkivUIY3Gim8j+XldPFtAoclPc+A0Vt6Ce7MvILJHs3E
+         h2hA==
+X-Forwarded-Encrypted: i=1; AJvYcCUL36mZjXtFY9vYOB43CNolW3G4Tnrsrw7zZd3C+P3vq1e5alo/sL/+lWoWPbqsXisdpvoPnFqSJcpN+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzveqgV77nn53X3250TDrS/Ud0mEV3dA/u86vUkEPRmZ7eMij4t
+	nlGAgRdWUu2VqhYOSSpE5RFet0Auna/kmP4ISF2Z5uR1Uz3d96Nppdgj302b
+X-Gm-Gg: ASbGnctM8hioFPmrWLVzJw2j66RYCUkTdcdvvOAj+MtPpSy2k589KjduVWXeg7s00KS
+	5TuCDIEtYw3Nmj48b3ZUSnjUjyuK24TMrCs82Oe4xRajDnisCKO+wfgERujLqOMo3BaM23f8cZe
+	soyreRHCK53MLKm7J5KIVav9EftLemX1AlLRKcRBBPVCmwf38HTdLLS7nac5Ts6rsJPOvEq0X1S
+	0e6jIWJbZ+vM55xIYb55ONYY0GPLh8yC6oaCAB6aQINLhmLucqhOjsCna+zBQqHfyFh0oZ+5XQW
+	iQzs+twy39jcF5JzmgTmQvKdJspCsghhLuFNyItd75kFH6+drFWZC8skIty7MHslemys9beIsTG
+	QPnumu5s2mLdupAwF
+X-Google-Smtp-Source: AGHT+IGvsgdYcMJOawYzasIKw0eOoRQ4FqFhC8ackjUTEfEj1ILDqHFQItCppOQxLJuGi62ODhURjQ==
+X-Received: by 2002:a05:622a:1a28:b0:471:f08e:d65d with SMTP id d75a77b69052e-4801c88b9b5mr4759931cf.6.1745553881515;
+        Thu, 24 Apr 2025 21:04:41 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47e9f5bcf0dsm20764211cf.35.2025.04.24.21.04.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 21:04:41 -0700 (PDT)
+Message-ID: <790260c8-09b4-96b3-310f-f9c5a93ef7ff@gmail.com>
+Date: Fri, 25 Apr 2025 00:04:39 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=ZNDXmW7b c=1 sm=1 tr=0 ts=680b044c cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=5yON4tJlvpFzjYmBgeMA:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-ORIG-GUID: lqNWFcyHey-Bm6QNdnYGMW3-o9h4qBYy
-X-Proofpoint-GUID: lqNWFcyHey-Bm6QNdnYGMW3-o9h4qBYy
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDAyNCBTYWx0ZWRfX7V26i8R6fC+b DFQHxqIDwy3XF8AlzTzA+TbNH+WWJ14inoiE2zBjce3R9em5gHWOCmnAIlBPhsDWnpMgtWaASeP cgJMZOx38Gku7zMr0jukIZW7BXoP/Q6Afw3eIAbO7q5avshA+/o0qwVtJc0WxiIjqWBnrRkWp34
- 4WTVOfxjTO3hlaxHLXoaSZBHiy3mubV/c15qEM4baziqeknKTRfXb3K423lmnR/CEVvHVpttXAh kecvMVstrmq7WvH2g/BcxvFgjU8X7H0utMGWHDGzSck+krI8+wd/BjTZeYzsCioYnNYCVUYSuNL IknxDUudOG2IozPKH8EC4Jez83rjK4Zyy5k9FWcgiYt1jLydwApUlcZt1/GSxZQxpPE5gmn7LlM
- JUYadnABwQd1w4An56dFfeWdfSny9qmAXxWYAjgbgh2hkAi6yAja+shDoGVhQZ/zn5Qun3an
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-25_01,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1011 adultscore=0 spamscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=893 mlxscore=0 suspectscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
- definitions=main-2504250024
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
+Content-Language: en-US
+To: "hch@infradead.org" <hch@infradead.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20250423164957.2293594-1-seanga2@gmail.com>
+ <aAnxqAv41Quh66Q1@infradead.org>
+ <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+ <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
+ <aApFcW-fsdUP4Ztj@infradead.org>
+ <e94e55a6-a93d-2c7b-2c3b-8829ab53848b@gmail.com>
+ <aApJWu1KLw7607Vz@infradead.org>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <aApJWu1KLw7607Vz@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some file systems do not support read_iter or write_iter, such as selinuxfs
-in this issue.
-So before calling them, first confirm that the interface is supported and
-then call it.
+On 4/24/25 10:23, hch@infradead.org wrote:
+> On Thu, Apr 24, 2025 at 10:20:09AM -0400, Sean Anderson wrote:
+>> Because the test is trivially wrong.
+> 
+> I stronly disagree with that.  We also don't support < 512 byte LBA
+> sizes to give an example.
 
-Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
- drivers/block/loop.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+fio already supports it
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc..4f968e3071ed 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -449,10 +449,15 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
- 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
- 
--	if (rw == ITER_SOURCE)
--		ret = file->f_op->write_iter(&cmd->iocb, &iter);
--	else
--		ret = file->f_op->read_iter(&cmd->iocb, &iter);
-+	ret = 0;
-+	if (rw == ITER_SOURCE) {
-+		if (likely(file->f_op->write_iter))
-+			ret = file->f_op->write_iter(&cmd->iocb, &iter);
-+	}
-+	else {
-+		if (likely(file->f_op->read_iter))
-+			ret = file->f_op->read_iter(&cmd->iocb, &iter);
-+	}
- 
- 	lo_rw_aio_do_completion(cmd);
- 
--- 
-2.43.0
+you are just passing a wrong parameter
 
+< 512 LBA is a different case because there is so much both in kernel
+and in userspace that assumes 512-byte granularity. But there is no
+such deeply-ingrained assumption for zones. You just have to set the
+parameter correctly.
+
+Plus, smaller zones are more efficient at reducing write amplification,
+in the same way as smaller block sizes.
+
+If you really think such zone sizes should not be supported, then go
+add such a restriction to all the zone standards.
+
+> Yes, it would be nice to have a sanity check for that and reject it
+> early, but no one is going to rewrite tests to remove that "assumption".
+
+This assumption is very weak. It can easily be removed.
+
+--Sean
