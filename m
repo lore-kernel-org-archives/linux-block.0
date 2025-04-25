@@ -1,33 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798717483
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 02:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E9C7483
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 02:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745548650; cv=none; b=BtNGd3zak7u7jwGCUDAcQAiH8nC0o0UVZy93+rM0sNQk3b3byA+7FRLNBA7eCn932hzqWWbbgyaB4HV2N/0+f6aPvSDDhnXAT+qIoCi4kLiAxt/t+7RDM9ytrhnQ6m2uig4Tib4RkhApkdMM6gbq1MJsnuth+IWDbc5B7IytITw=
+	t=1745548828; cv=none; b=CjPQg6sdm6unHV9lOpkWfSNbc0zM15mkCHb9w9ckwIMYljQVqN57n3iPt+CbXMkvqb/88pqhVBdwsnKq8FJAU3vPWUcq/1oJTUxUXPQfzwPNMdgv+O/7jUqGzlZzRoexnM7tRcWHgViw1DdIQiYhNF/SR+50j+le7VFdj5RSHBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745548650; c=relaxed/simple;
-	bh=M5B06ByfF7RcAeRqx8pWCRo36Cl5bRmp9BxcFYLKFXw=;
+	s=arc-20240116; t=1745548828; c=relaxed/simple;
+	bh=IOc9ugYjCFV82Pir4bUEbckx+boiU5DHn+5MOzPNxAE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W7WSh0MkVF8xy0UPJMfxVxzoVfC4vh+xi51RtguyIJIfzJKV7ssA1kWniNQLT/dge33Wclmq/kLyirR881TiOBVYQZMDUlyC6m9sFrSlG8VluXMPAC1RZ8ozKAhWmP+Zdjrk0OsSeRmbUhw+KOsMTSLSvjPt/HFL6GxEzSHu2jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Og1gwpha; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=CVw//5fOhbIme3VFvgG+lJlB86eeB3ItayGmBcgciAi3MyS1455sZLmS2UI/wMhravOcswRUIMQ30xge0Vz/wXIj/gdzm2ZWiWxd7glnLAGrfImege8M9/wffX1+Iecm+2GIlfBEOS6j2Us0idQ6DVDkJpbs7D3GzB6ZS52oFFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k89EETB2; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Og1gwpha"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E8DC4CEE8;
-	Fri, 25 Apr 2025 02:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745548649;
-	bh=M5B06ByfF7RcAeRqx8pWCRo36Cl5bRmp9BxcFYLKFXw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Og1gwphamrXolN5ZPs9YHTEqpfPSNniBra6il38GqwZJ85LeyOJqynHzGubiBMLIj
-	 T5RrneTw1TvAEi+JH/+vJ+62yCEQg+LdymugvITM0XCmvZk7zUeuMO2LdoVIfUzQeS
-	 bFFQkKpn6+xPo4d+Uhns64I9woEPbPGtB+c8qCFnGQjvXhZXJ9QhmHivd/BjggL9Aq
-	 Sl5N8IIINrOyU91MFrXRl09AUYAJRbGx2Rt55CfFNxwDH15ipJRzbzfIRCoR8zqkEa
-	 x5c3gp0d2fnlTY84U6R6twvsGfcpV1kWqrBmEw0i/aw1YJRxamFNADeZA1ibnhZOG3
-	 FYxWdWPyFaW5A==
-Message-ID: <9d14a000-49fe-4cc6-9720-9894d1b3fade@kernel.org>
-Date: Fri, 25 Apr 2025 11:37:28 +0900
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k89EETB2"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3cda56e1dffso9651065ab.1
+        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 19:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745548824; x=1746153624; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=viKGbo00S5J9vQp5avpf40UBRQJ3a3rob14D32XEglU=;
+        b=k89EETB2BxL0ZZPgqwjO7H+bxACT24dsI7bEyfJY9uKSPmbUsyhaN1Zcl+74l0JyVZ
+         uGW9s5XJkyHhGnCPJGtUuJcuoNOf77JRd1IHy/SG6SDBI1+/XrA3nj02Ca/6xowlD8Ai
+         QJCkwGmFzW4hUaipVy+uCAQclozJ3mxkzM/3aFvXRL7z75qVkPbtGQXqV4JGBB6hpAac
+         X8lBvO5duu7Ei3p2Rosy717Docb50OenF4mOHlJEdepp2BXx6vvWbti5yd9sfceCzH30
+         eg4tn7Bm9mLnsQvJLbhRCS5k5rJ1UD7jWgz0Jb2OK3NlsHyefbIiRBE8fMpcOTEvjrxZ
+         rgUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745548824; x=1746153624;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=viKGbo00S5J9vQp5avpf40UBRQJ3a3rob14D32XEglU=;
+        b=dBehpwJ3hWzPuG+6KphRuRowsYNZVJqzpFt3LhiA4bzANkIpHabWzLX3EMiHwGznMy
+         RMc5aeRcqjf9GoUJ9yBIh+52CGtQPjYIBiHyHnRtTTY/Ya6+yuQ9LKOeACoMy41/z9m+
+         EVOKTWWSHkzWYBTumKh5HE7sBomtmFhF9gNC/fkEW8KhBP7+xZv1t9+t/nrx2H7xefkP
+         HMp7LjsA4x+q3ItLMCj3beaXXedhR4mro1MXEbCgWAJykDUCecWfbBfKA28ZwGMZOcQC
+         xBX7K6Q7CDyHWulTDI2ENxymR4MA0wX9NpvujyuFGzzPbDRjf6gB9WTbF1cwhNvKEiOG
+         08fQ==
+X-Gm-Message-State: AOJu0Yx4sUNFLFBNVebLMXK7AvZJ6gH63M1cfx0hE8XRk7vTBq5djuTY
+	CCK+6oDOKAAG1uBXGVMvMXT+7cKjqdD9MvtYuhkfs5J0/yV5UWfE4MzkJed+6HA=
+X-Gm-Gg: ASbGncvEwSOK+rDLgtz5qkjegHORXnrz+clOOc8fo4j5BXPKHXv/cUjbXKvx9UtIm7k
+	lfPHS4NzD+Jn8uf0cCog7+jY3Yzg2hyZWtzuE4KKqmX7vMChJSfm5TJaicErpkjp6Hc4BlRkLsI
+	Pjo5kVa8A5OkVeHm0bLeCI4EBO8jJIrDvnd2zMcHH38jMB42q7nB7QiAcVVN/S6Z3U7NNoeae/t
+	XqYAvaOunN0ENKUQOCkclJi3kMFYmoGQPnfcLN+5+fsJSzORPS+OKDuZVXZ4TiP4MSDtX2W5rvr
+	9n0udSnMryT4/QzYVNpYE/qRg9axbixgDpTpLQ==
+X-Google-Smtp-Source: AGHT+IECJV8CCdR02FZ0JRlS5jxcu364IcbtNEm57VRDcxWQt6J8PPzMYUElfcOziYG+iGtCrCI6bA==
+X-Received: by 2002:a05:6602:608b:b0:85b:4ad2:16ef with SMTP id ca18e2360f4ac-8645cd5b2c8mr80694539f.9.1745548824606;
+        Thu, 24 Apr 2025 19:40:24 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a7fc65sm566012173.71.2025.04.24.19.40.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 19:40:23 -0700 (PDT)
+Message-ID: <55e0a09d-08fc-450e-ad8a-8f4ff8cbcfbd@kernel.dk>
+Date: Thu, 24 Apr 2025 20:40:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,64 +65,28 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "hch@infradead.org" <hch@infradead.org>
-Cc: Sean Anderson <seanga2@gmail.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20250423164957.2293594-1-seanga2@gmail.com>
- <aAnxqAv41Quh66Q1@infradead.org>
- <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+Subject: Re: [PATCH 0/4] ublk: refactor __ublk_ch_uring_cmd
+To: Uday Shankar <ushankar@purestorage.com>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Caleb Sander Mateos <csander@purestorage.com>
+References: <20250421-ublk_constify-v1-0-3371f9e9f73c@purestorage.com>
+ <aAqyM1DyLL22b7S9@dev-ushankar.dev.purestorage.com>
 Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aAqyM1DyLL22b7S9@dev-ushankar.dev.purestorage.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/24/25 20:30, Shinichiro Kawasaki wrote:
-> On Apr 24, 2025 / 01:09, Christoph Hellwig wrote:
->> On Wed, Apr 23, 2025 at 12:49:57PM -0400, Sean Anderson wrote:
->>> The block size must be smaller than the zone length, otherwise fio will
->>> fail immediately.
->>
->> In theory yes.  In practice such a zone size makes zero sense, and will
->> not work with any zoned file systems or other users.
->>
->> So instead we should just warn about a silly zone size here instead
->> of trying to handle it.
+On 4/24/25 3:50 PM, Uday Shankar wrote:
+> Hi Jens,
 > 
-> As a similar idea, how about to skip the test case if the test target device's
-> zone size is too small?
-> 
-> Sean, could you try out the patch below? It will skip the test case for your
-> device, and you will not see the test case failing.
-> 
-> diff --git a/tests/zbd/005 b/tests/zbd/005
-> index 4aa1ab5..d23eabe 100755
-> --- a/tests/zbd/005
-> +++ b/tests/zbd/005
-> @@ -36,6 +36,13 @@ test_device() {
->  	_get_blkzone_report "${TEST_DEV}" || return $?
->  
->  	zone_idx=$(_find_first_sequential_zone) || return $?
-> +
-> +	# Ensure the zone size is large enough for the fio command below
-> +	if ((ZONE_LENGTHS[zone_idx] < 512)); then
-> +		SKIP_REASONS+=("too small zone size")
+> Can this series get queued up? They all have reviews from Caleb and/or
+> Ming.
 
-Nit: "zone size too small" would be better.
-
-> +		return
-> +	fi
-> +
->  	offset=$((ZONE_STARTS[zone_idx] * 512))
->  	moaz=$(_test_dev_max_open_active_zones)
->  
-> 
-> 
-
+It can, but I was assuming we'd have conflicts between 6.16 ublk patches
+and what is queued up in block-6.15. And looks like I'm right... I'll
+merge block-6.15 into for-6.16/block, and then please re-post a version
+against that.
 
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
