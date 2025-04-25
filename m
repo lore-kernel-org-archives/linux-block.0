@@ -1,65 +1,68 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549FA20102B
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 10:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89356215F43
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 10:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745577239; cv=none; b=DmUNeySG2RrztZ4415BEO6NBvSfqfO1exGeoz2zvPeaRKdT8ma3frdhb223MPeJqB0XjGHQy0SZPCLlklcqQCM+MDY8uRVDMvhxs/ViCMceKu1hQ1I2nPbpnezI21m8uMznhxlcTAjko2XkMJWY3ajMOQB/Iy2wiZRAzyxSptSQ=
+	t=1745577239; cv=none; b=NR2uEWCKaCmt5d80AScohVpymkUJh63SHtKu2z+oe8J7Yf3Vl1G45g0i0TEtgQD+aaExWsDWLy+ejXyWv9D6ARtm2Yr/9Gz3qm86dx5k8IadTlaOIFGuwDPoh18wePHCugyNbl/JBaOEokcEvKypFrJG98fgUQ+xbq2q/jltKJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745577239; c=relaxed/simple;
-	bh=igcYz/L6Ab150PMarOKiRTEJ4k+OD0mC6k3Ha2eImnE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lTcwySsiTHiAueMwrmdpjClkXJjQ5FfupGAMsKtCj5ST4FcoODpD3rR21CLuacJjzeM+oQDV91zdbloX6ygFrTB0W0oShY4dSnZDy0uCaunjOFpEw2tD6tc/Nji9GNXyEykw5UbLo/k8To/8+KId14str2efaQqv29tpNC1CIGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hmu2loh5; arc=none smtp.client-ip=148.163.158.5
+	bh=EcjmjH+OlM3YO76HSKQ+OH3Y3/y9bfcJSQdE2zQMGaU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=I63a/25VSUKTGSz+qB7wuafM/pZLcbh/CD2DHdEoqvow5FTHEiHm4U5fEvKeBzcktaGXf+YZo23gOApw03BLhZXE9kaOCt3Eh9BIji5i0ekQ7aqBFq06RxMGtgJiki0fhhCQkQw3l3ViKaaB3s/DwgvYy2SWW/qT1Hg2cO7muxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XroaAwiP; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hmu2loh5"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P9jsI9025843;
-	Fri, 25 Apr 2025 10:33:27 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XroaAwiP"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P7NTq9020648;
+	Fri, 25 Apr 2025 10:33:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=1Jm8Wwm8ypDbV+3LHaBooGsLA7z5orOub9/v/ehTS
-	yo=; b=hmu2loh5bDjk3YRSjcQ+koX7wU4Xdny5O1tPsyxMgD0/kF0YwN4UVevXJ
-	xW5zMn8dIUY9ll3NjtLXbRWqKC+nlwSu3R6LugJ9eM32Uhqu51fG7uJmGUZKdvAb
-	lc1eKcM8wyP+x+cu0nq5PDhMG9zD4aSY8bvaJlOdMjjKkaE5KVL4w4PG1EiKGVdR
-	PnL1DOxXUcn3eBTzuxcx3d7U2s/gAWaaflBmQr6UmkOT4JMUrbYuo+BsLVpU/04Z
-	MoVFwYLToJMD2gXsuDxl41M9AF62Dt3jy444SVzIBwzrr4KXh3bHJ8ERK1G9BqzH
-	Qcjh2ICuOuR4sxEhSKN0VL8ZavZzQ==
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=O6O54bH7hkf6RUC3+
+	9ePoJR5ddAuKnYf7XiGNejU4Fw=; b=XroaAwiPoSzk0IhtvUsfysNXFcINLe4ia
+	WNsV7U84XCjfN18YzxqYzXLp48L9eXHcKfB7AN1Gw31w2XZGZql1N+jGkmO478Kn
+	Vn+FzlSlcj2CIez5Dg02hENqociABUc/GtKJkGKiwEedoPczzuoVP77mr4kybcD+
+	1DEAeY5+Gp20E6si+tWR4MZJL4i++U2PkjVCqup+gvH1OT2QWBtt9iWZZr0QOlld
+	r4xitQzQG6YUJzBPmzixG08aokvCfG1D9T2PBvMf23aBEqoqcjRyLTM4TBc8KoOo
+	DnlqkrZ7BoRwAgtZaAT5BkDm7cu+JKlXawivnS4rC3mMGHSqUkcFw==
 Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 467y90t9dp-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 467krswsf5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Apr 2025 10:33:27 +0000 (GMT)
+	Fri, 25 Apr 2025 10:33:38 +0000 (GMT)
 Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53P8UWvc028447;
-	Fri, 25 Apr 2025 10:33:26 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 466jfvvrkv-1
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53P87Lcp028388;
+	Fri, 25 Apr 2025 10:33:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 466jfvvrme-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Apr 2025 10:33:26 +0000
+	Fri, 25 Apr 2025 10:33:37 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53PAXO2440304990
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53PAXZ4N36241678
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Apr 2025 10:33:24 GMT
+	Fri, 25 Apr 2025 10:33:35 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 86D6120043;
-	Fri, 25 Apr 2025 10:33:24 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 777F420043;
+	Fri, 25 Apr 2025 10:33:35 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6D4D520040;
-	Fri, 25 Apr 2025 10:33:21 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 903D720040;
+	Fri, 25 Apr 2025 10:33:32 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.102.9])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 25 Apr 2025 10:33:21 +0000 (GMT)
+	Fri, 25 Apr 2025 10:33:32 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 Cc: hch@lst.de, kbusch@kernel.org, hare@suse.de, sagi@grimberg.me,
         jmeneghi@redhat.com, axboe@kernel.dk, martin.petersen@oracle.com,
         gjoyce@ibm.com
-Subject: [RFC PATCHv2 0/3] improve NVMe multipath handling
-Date: Fri, 25 Apr 2025 16:03:07 +0530
-Message-ID: <20250425103319.1185884-1-nilay@linux.ibm.com>
+Subject: [RFC PATCHv2 3/3] nvme: rename nvme_mpath_shutdown_disk to nvme_mpath_remove_disk
+Date: Fri, 25 Apr 2025 16:03:10 +0530
+Message-ID: <20250425103319.1185884-4-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250425103319.1185884-1-nilay@linux.ibm.com>
+References: <20250425103319.1185884-1-nilay@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,93 +71,157 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=aZRhnQot c=1 sm=1 tr=0 ts=680b64f7 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=JfrnYn6hAAAA:8 a=9r6QK0OtAAAA:8 a=VnNF1IyMAAAA:8 a=j6BUnaCqT4P7MYeGl-oA:9
- a=1CNFftbPRP8L7MoqJWF3:22 a=TxIH8fH_K59pr5-VUUuU:22
-X-Proofpoint-GUID: NhMmGBaqEXdsqtqKqQ7s7fI2tcpUK8w8
-X-Proofpoint-ORIG-GUID: NhMmGBaqEXdsqtqKqQ7s7fI2tcpUK8w8
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDA3MyBTYWx0ZWRfX7heYKteHaZ8U PMYJ4d0EYxihQRuce7Gr9XwGggZyHepxYM/ZRFq4dtQQnf/FfI1ADHChZorucIg2CUCR+RjdUUS TdrZyaysDZQGGYV1eztH/+0rlUrExJ6rAPnqDg43dLdeW2ehEh2tjbEAFp/myJZ3ipyO63lzHkD
- wK3jSl6MlIqZfBY5jBCd+uPaR0FBApGmWM/vHSObMgi0gbqxtviaWa7aMBLBZydGDbx8p4EuTKA WJodlkq5jvMK2HCcn/ALxw5HtbDIwCTT0a3I9ualyIUfzq3+N95ub1mxJ7KVy24XXjyujWNZXhR muQgzhWt0eSDqPDMk/n1V4nU4C27aOlJzPxZNKWXiJJR89dQH0SbVpUrN39+gQc+SatpZd6FNOF
- aPoIYckgPaM7v0f3kTLY9Fu96CKUH5pdnKtXBU5PjpE2UORzs3rTV15t/ZWxX6TYbwcDyuGp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDA3MyBTYWx0ZWRfX20c3Jt4vp6HU liSF0xPLspMZEphUWBayl1K8uxJ+dNtz9kehl5Q/CA8jtvw0mVzq1ncSJ7EaTf140Dk16NG3c8/ ifs6ibmcOS3dneqG3E3qNqitPV1zsvnCNH8ym7aPRQdenw3h4aRR4B0M46o2DEkGtGJGrv0Y7o3
+ S9qZ9KHXe3K677wEGdhQcpdOaEfG/5+OPblkKUSZ7DR/AeT/8pnnO2J8I3ibkcJy5HEsJMphvLT WMcSghwrF6sP/5F5szM0fabFtP+2qsCNY/UvHkvuv6Z4J8hCfsA5Pg6HmfOJ1ZxgRCm1Ck5SzUk GhFLsxROOqLhhzb4HNR1LeRYsGxWA5gHMATJkJbQ2xYImjqD0j7ID0gCRoi30vHUwN7YfuSvg9A
+ aVxoztn2OoF5vYq3XO6Z+cUdG29LHP3Q2WtHRb7PdrF4pHVNsvlNTSxMLY9QLupLnq5yOc42
+X-Proofpoint-GUID: xj1OpRZtvGzQ2srTqCeXpCMdG6FjaSmt
+X-Authority-Analysis: v=2.4 cv=IciHWXqa c=1 sm=1 tr=0 ts=680b6502 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=XR8D0OoHHMoA:10 a=VnNF1IyMAAAA:8 a=3Nj66fidHWVfShYRhO0A:9
+X-Proofpoint-ORIG-GUID: xj1OpRZtvGzQ2srTqCeXpCMdG6FjaSmt
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-04-25_02,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 adultscore=0 priorityscore=1501
- clxscore=1015 mlxlogscore=999 impostorscore=0 mlxscore=0 malwarescore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=898 mlxscore=0 impostorscore=0
+ phishscore=0 bulkscore=0 clxscore=1015 spamscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
  definitions=main-2504250073
 
-Hi,
+In the NVMe context, the term "shutdown" has a specific technical
+meaning. To avoid confusion, this commit renames the nvme_mpath_
+shutdown_disk function to nvme_mpath_remove_disk to better reflect
+its purpose (i.e. removing the disk from the system). However,
+nvme_mpath_remove_disk was already in use, and its functionality
+is related to releasing or putting the head node disk. To resolve
+this naming conflict and improve clarity, the existing nvme_mpath_
+remove_disk function is also renamed to nvme_mpath_put_disk.
 
-This patch series introduces improvements to NVMe multipath handling by
-refining the removal behavior of the multipath head node and simplifying
-configuration options. The idea/POC for this change was originally
-proposed by Christoph[1] and Keith[2]. I worked upon their original
-idea/POC and implemented this series.
+This renaming improves code readability and better aligns function
+names with their actual roles.
 
-The first patch in the series addresses an issue where the multipath
-head node of a PCIe NVMe disk is removed immediately when all disk paths
-are lost. This can cause problems in scenarios such as:
-- Hot removal and re-addition of a disk.
-- Transient PCIe link failures that trigger re-enumeration,
-  briefly removing and restoring the disk.
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ drivers/nvme/host/core.c      |  4 ++--
+ drivers/nvme/host/multipath.c | 16 ++++++++--------
+ drivers/nvme/host/nvme.h      |  8 ++++----
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-In such cases, premature removal of the head node may result in a device
-node name change, requiring applications to reopen device handles if
-they were performing I/O during the failure. To mitigate this, we
-introduce a delayed removal mechanism. Instead of removing the head node
-immediately, the system waits for a configurable timeout, allowing the
-disk to recover. If the disk comes back online within this window, the
-head node remains unchanged, ensuring uninterrupted workloads.
-
-A new sysfs attribute, delayed_removal_secs, allows users to configure
-this timeout. By default, it is set to 0 seconds, preserving the
-existing behavior unless explicitly changed.
-
-The second patch in the series introduced multipath_head_always module
-param. When this option is set, it force creating multipath head disk
-node even for single ported NVMe disks or private namespaces and thus
-allows delayed head node removal. This would help handle transient PCIe
-link failures transparently even in case of single ported NVMe disk or a
-private namespace
-
-The third patch in the series doesn't make any functional changes but
-just renames few of the function name which improves code readability
-and it better aligns function names with their actual roles.
-
-These changes should help improve NVMe multipath reliability and simplify
-configuration. Feedback and testing are welcome!
-
-[1] https://lore.kernel.org/linux-nvme/Y9oGTKCFlOscbPc2@infradead.org/
-[2] https://lore.kernel.org/linux-nvme/Y+1aKcQgbskA2tra@kbusch-mbp.dhcp.thefacebook.com/
-
-Changes from v1:
-    - Renamed delayed_shutdown_sec to delayed_removal_secs as "shutdown"
-      has a special meaning when used with NVMe device (Martin Petersen)
-    - Instead of adding mpath head disk node always by default, added new
-      module option nvme_core.multipath_head_always which when set creates
-      mpath head disk node (even for a private namespace or a namespace
-      backed by single ported nvme disk). This way we can preserve the
-      default old behavior.(hch)
-    - Renamed nvme_mpath_shutdown_disk function as shutdown as in the NVMe
-      context, the term "shutdown" has a specific technical meaning. (hch)
-    - Undo changes which removed multipath module param as this param is
-      still useful and used for many different things.
-
-Link to v1: https://lore.kernel.org/all/20250321063901.747605-1-nilay@linux.ibm.com/
-
-Nilay Shroff (3):
-  nvme-multipath: introduce delayed removal of the multipath head node
-  nvme: introduce multipath_head_always module param
-  nvme: rename nvme_mpath_shutdown_disk to nvme_mpath_remove_disk
-
- drivers/nvme/host/core.c      |  18 ++--
- drivers/nvme/host/multipath.c | 193 ++++++++++++++++++++++++++++++----
- drivers/nvme/host/nvme.h      |  20 +++-
- drivers/nvme/host/sysfs.c     |  13 +++
- 4 files changed, 211 insertions(+), 33 deletions(-)
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 5755069e6974..306ac36eb812 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -664,7 +664,7 @@ static void nvme_free_ns_head(struct kref *ref)
+ 	struct nvme_ns_head *head =
+ 		container_of(ref, struct nvme_ns_head, ref);
+ 
+-	nvme_mpath_remove_disk(head);
++	nvme_mpath_put_disk(head);
+ 	ida_free(&head->subsys->ns_ida, head->instance);
+ 	cleanup_srcu_struct(&head->srcu);
+ 	nvme_put_subsystem(head->subsys);
+@@ -4025,7 +4025,7 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 	mutex_unlock(&ns->ctrl->namespaces_lock);
+ 	synchronize_srcu(&ns->ctrl->srcu);
+ 
+-	nvme_mpath_shutdown_disk(ns->head);
++	nvme_mpath_remove_disk(ns->head);
+ 	nvme_put_ns(ns);
+ }
+ 
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 1acdbbddfe01..a392b4825dc3 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -703,15 +703,15 @@ static void nvme_remove_head_work(struct work_struct *work)
+ {
+ 	struct nvme_ns_head *head = container_of(to_delayed_work(work),
+ 			struct nvme_ns_head, remove_work);
+-	bool shutdown = false;
++	bool remove = false;
+ 
+ 	mutex_lock(&head->subsys->lock);
+ 	if (list_empty(&head->list)) {
+ 		list_del_init(&head->entry);
+-		shutdown = true;
++		remove = true;
+ 	}
+ 	mutex_unlock(&head->subsys->lock);
+-	if (shutdown)
++	if (remove)
+ 		nvme_remove_head(head);
+ 
+ 	module_put(THIS_MODULE);
+@@ -1280,9 +1280,9 @@ void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid)
+ #endif
+ }
+ 
+-void nvme_mpath_shutdown_disk(struct nvme_ns_head *head)
++void nvme_mpath_remove_disk(struct nvme_ns_head *head)
+ {
+-	bool shutdown = false;
++	bool remove = false;
+ 
+ 	mutex_lock(&head->subsys->lock);
+ 
+@@ -1301,15 +1301,15 @@ void nvme_mpath_shutdown_disk(struct nvme_ns_head *head)
+ 	} else {
+ 		list_del_init(&head->entry);
+ 		if (head->disk)
+-			shutdown = true;
++			remove = true;
+ 	}
+ out:
+ 	mutex_unlock(&head->subsys->lock);
+-	if (shutdown)
++	if (remove)
+ 		nvme_remove_head(head);
+ }
+ 
+-void nvme_mpath_remove_disk(struct nvme_ns_head *head)
++void nvme_mpath_put_disk(struct nvme_ns_head *head)
+ {
+ 	if (!head->disk)
+ 		return;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 74cd569882ce..591df076522d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -963,7 +963,7 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
+ void nvme_mpath_add_sysfs_link(struct nvme_ns_head *ns);
+ void nvme_mpath_remove_sysfs_link(struct nvme_ns *ns);
+ void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid);
+-void nvme_mpath_remove_disk(struct nvme_ns_head *head);
++void nvme_mpath_put_disk(struct nvme_ns_head *head);
+ int nvme_mpath_init_identify(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id);
+ void nvme_mpath_init_ctrl(struct nvme_ctrl *ctrl);
+ void nvme_mpath_update(struct nvme_ctrl *ctrl);
+@@ -972,7 +972,7 @@ void nvme_mpath_stop(struct nvme_ctrl *ctrl);
+ bool nvme_mpath_clear_current_path(struct nvme_ns *ns);
+ void nvme_mpath_revalidate_paths(struct nvme_ns *ns);
+ void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl);
+-void nvme_mpath_shutdown_disk(struct nvme_ns_head *head);
++void nvme_mpath_remove_disk(struct nvme_ns_head *head);
+ void nvme_mpath_start_request(struct request *rq);
+ void nvme_mpath_end_request(struct request *rq);
+ 
+@@ -1020,7 +1020,7 @@ static inline int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,
+ static inline void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid)
+ {
+ }
+-static inline void nvme_mpath_remove_disk(struct nvme_ns_head *head)
++static inline void nvme_mpath_put_disk(struct nvme_ns_head *head)
+ {
+ }
+ static inline void nvme_mpath_add_sysfs_link(struct nvme_ns *ns)
+@@ -1039,7 +1039,7 @@ static inline void nvme_mpath_revalidate_paths(struct nvme_ns *ns)
+ static inline void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl)
+ {
+ }
+-static inline void nvme_mpath_shutdown_disk(struct nvme_ns_head *head)
++static inline void nvme_mpath_remove_disk(struct nvme_ns_head *head)
+ {
+ }
+ static inline void nvme_trace_bio_complete(struct request *req)
 -- 
 2.49.0
 
