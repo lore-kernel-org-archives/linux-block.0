@@ -1,110 +1,106 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B9D1E1DE7
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 07:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194A02327A1;
+	Fri, 25 Apr 2025 08:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745566350; cv=none; b=tV8c/2Ij7NhYY4z9jPx/26Wx7b4TGG6JLowgnfX6imRkVjPNj+e7cnI2aqpHodZ8fnw5V0B15kvqns1J/hz/KdDYxXtIC5WWnP8xypVInQ+bADMJZYyuaKnvyAiB+Kvt/FsqIcWmad/PXnKU6GkkOjPJWwrY9+krq2x6Tcs/igM=
+	t=1745568221; cv=none; b=jpt1ie9X43BVaUpizFRvHhe+afFTS1I/9BBbw/qCmUYn49d2Hlu7DHxXSoa6PA+txSQn0eIqd/erF/QXvTmm40kOSiI4OYSN/JQ7TMwnF0dWxYAcyaFPtm2NqBkQ0qBpaAXbYbmI0/IwU0aCQGKQa3LlKM3mhQTDy6oe0LjN9oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745566350; c=relaxed/simple;
-	bh=qh3+deB5RfXkp3djJ1R95fy9ZiJQodi7eJFwTJQylFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s39tiyUw8Cdj+fBJGfMdiCUs2Tn7DT4RbUBFjVRSDGhS0VvVCsnUG4IC6FVUbJH92RGvLoR67HdcS/F/hSVR8fGsFe/Jg8kHKKicvV1jSGHWWEC9WoUOL6DfA0Ye8f3Lal6O9Wwb5pSdsi83f6QtkeS2lVLDs2d/MRLK/xEz0qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CC7D8210F9;
-	Fri, 25 Apr 2025 07:32:25 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A597113A79;
-	Fri, 25 Apr 2025 07:32:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id i4FpKIk6C2iYbwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Fri, 25 Apr 2025 07:32:25 +0000
-Date: Fri, 25 Apr 2025 09:32:16 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Costa Shulyupin <costa.shul@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Valentin Schneider <vschneid@redhat.com>, 
-	Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
-	storagedev@microchip.com, virtualization@lists.linux.dev, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v6 6/9] isolation: introduce io_queue isolcpus type
-Message-ID: <dd4719dc-5ac4-44d9-bccb-e867d322864e@flourine.local>
-References: <20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org>
- <20250424-isolcpus-io-queues-v6-6-9a53a870ca1f@kernel.org>
- <2db989db-4849-46a9-9bad-0b67d85d1650@suse.de>
+	s=arc-20240116; t=1745568221; c=relaxed/simple;
+	bh=0of4Pe0B74UUX5ddSapTzsqiD760rR5Wz5g2YOMY22I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mebE0NVwMsoMMWLBidlBmAfadS1+6ts/UTnuhr64IQIRv14uBzHFh8u5ehJun3OJxIUIsPCSrMkZAaCbhdcWiPPp/99S1hjU5G1LBV5ipLEjAAD06QR9YvdD1lQ+hoZ1lFvV0iGYUXQlDj3R57oRpZKACv8IRE7Bv5Fj1DeTWVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YVt/FIE7; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVt/FIE7"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-225477548e1so21816275ad.0;
+        Fri, 25 Apr 2025 01:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745568219; x=1746173019; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fv4DhFkRJnMG7smQDWj1JOpxtW3NapnM29vYnhj7I2o=;
+        b=YVt/FIE7XIg45StWY5jxxcXnS0rAado2eh3Rrtio8SLXfb1XR36x0qKKzXeRlTBm6D
+         fhebSsDHFPDTJbknUAEwZjpQNeDxtie0JZ8hnPfLJVT9P1fZD69/K59lqSz/WUK05jSy
+         wc+NAQyIy6q/NdAKKFEgUQzwi7adyt/ViDXKmhVh9Y2ZRS5cikn0tLdgv0tlP4n6EtqU
+         e4sD4pQvcYwXbDxy3ErIoRtaLxMtRFEj0Tr86anVjKQc5Wp+aVw3D+FAg+mOZ8lDEY3s
+         WqnudKdalNzYxDWbF3IsKU1aLl8YMB+iE+niVA06knOAg5Nnf0Ys4XAXKqvzkvTUjdpd
+         7Dwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745568219; x=1746173019;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fv4DhFkRJnMG7smQDWj1JOpxtW3NapnM29vYnhj7I2o=;
+        b=goVvvXRyul+ZaCfeVi8FIFzfsu8GVoDW9odNZqlMuTDDzLx2FDvcub3F6ILug+MFIw
+         W+n/dqA/FpuKljRAanBVMkxG+Kn0XiBkvpN9ViS/t8ztGaWgbPN0UgzJ88fO41OOGsht
+         gI+mGl2C5RPA8QgA5BImEAV/Y3jRVSOB3cJyE3vMWlEIfI92tjuLf7GyoObby3k3KJ4/
+         S2nWL0qZB4XMEAq/IwG2AhQow0iONEonMmUCz46kS8ufZsPhAy14ZDNGE7M+fnBav4ff
+         bTj0dQqb0Rm663Jq5vkXyapyUPPfXeXbYbYSDtIThdtphwMmg0npoQJ+JE1HLSuKeQRI
+         GS6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXJdQwXy7tl9p66yV9Dt11VsAOPptOQA5d2ZDwqc/UBZL9lKa4pYbhoK++PoA+8KRehBR9X3ong6pFjrRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJQpB4PI85ey+M/giyK7F7quDfVpi72jCYNxvxUw+CfLNdKCnG
+	wWIEqTL7j4G4n+j2s+L50sTkDuE9y1ZQB3ECwIhVQ/bFjLg+q8EFr/tvApuW8QI=
+X-Gm-Gg: ASbGncvGPkAThTQYkYErKLLbETorbr2pPIMw61JqaM9mFi/CoWCSHPjrQcOxCoMdpyy
+	C2U/PXeLsxeYj2yQwcoIvdlrPJVKSMnY58z6k3iTEZK3nAi6hfE1xKRWk7ru/w0ctEk/ZjT++e9
+	5/RY1fVgAbNCfPF2Cu6dEMZGwLiLb97n5MqWqavL9MW2mJb8W+8QHevr/K2mdagSu5rnQfCdfnH
+	1bnAht/kTbLqds836S4FAMoguQCcD3m+1UA/gq2B5JMlAvIFLlz3MTTFSIAoGjjxH8QPGvSiL2L
+	CIj+GyLn6wkkYvgMnFDS625y+zr8f2YsMMdux6UBOtVPiUctj5lSl6lZ97VI
+X-Google-Smtp-Source: AGHT+IHV3jRIT2KOzsYhCy1v72FuGHVBf2+S6Ziyn5ch88wa8KepJnHTG4jVJZgIfksfyjntVzV6+Q==
+X-Received: by 2002:a17:903:1b0f:b0:22c:35c5:e30a with SMTP id d9443c01a7336-22dbf5ecd36mr22023185ad.16.1745568219137;
+        Fri, 25 Apr 2025 01:03:39 -0700 (PDT)
+Received: from localhost.localdomain ([2405:201:c408:a0b5:82a7:fae4:9cf0:3b75])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db5216bb0sm26362825ad.235.2025.04.25.01.03.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 01:03:38 -0700 (PDT)
+From: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kevinpaul468@gmail.com
+Subject: [PATCH] block: make bio_check_eod work for zero sized devices
+Date: Fri, 25 Apr 2025 13:33:05 +0530
+Message-Id: <20250425080305.45100-1-kevinpaul468@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2db989db-4849-46a9-9bad-0b67d85d1650@suse.de>
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Spam-Score: -4.00
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: CC7D8210F9
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 25, 2025 at 08:26:22AM +0200, Hannes Reinecke wrote:
-> On 4/24/25 20:19, Daniel Wagner wrote:
-> > Multiqueue drivers spreading IO queues on all CPUs for optimal
-> > performance. The drivers are not aware of the CPU isolated requirement
-> > and will spread all queues ignoring the isolcpus configuration.
-> > 
-> > Introduce a new isolcpus mask which allows the user to define on which
-> > CPUs IO queues should be placed. This is similar to the managed_irq but
-> > for drivers which do not use the managed IRQ infrastructure.
-> > 
-> > Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> > ---
-> >   include/linux/sched/isolation.h | 1 +
-> >   kernel/sched/isolation.c        | 7 +++++++
-> >   2 files changed, 8 insertions(+)
-> > 
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+commit 3eb96946f0be6bf447cbdf219aba22bc42672f92 upstream
 
-Just realized I forgot to also add some document on this new argument:
+Since the dawn of time bio_check_eod has a check for a non-zero size of
+the device.  This doesn't really make any sense as we never want to send
+I/O to a device that's been set to zero size, or never moved out of that.
 
-			io_queue
-			  Isolate from IO queue work caused by multiqueue
-			  device drivers. Restrict the placement of
-			  queues to housekeeping CPUs only, ensuring that
-			  all IO work is processed by a housekeeping CPU.
+I am a bit surprised we haven't caught this for a long time, but the
+removal of the extra validation inside of zram caused syzbot to trip
+over this issue recently.  I've added a Fixes tag for that commit, but
+the issue really goes back way before git history.
 
-			  Note: When an isolated CPU issues an IO, it is
-			  forwarded to a housekeeping CPU. This will
-			  trigger a software interrupt on the completion
-			  path.
+Signed-off-by: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+---
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-			  Note: It is not possible to offline housekeeping
-			  CPUs that serve isolated CPUs.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 94941e3ce219..6a66f4f6912f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -515,7 +515,7 @@ static inline int bio_check_eod(struct bio *bio)
+ 	sector_t maxsector = bdev_nr_sectors(bio->bi_bdev);
+ 	unsigned int nr_sectors = bio_sectors(bio);
+ 
+-	if (nr_sectors && maxsector &&
++	if (nr_sectors &&
+ 	    (nr_sectors > maxsector ||
+ 	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+ 		pr_info_ratelimited("%s: attempt to access beyond end of device\n"
+-- 
+2.39.5
+
