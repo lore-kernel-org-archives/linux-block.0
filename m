@@ -1,141 +1,89 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08224C83
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 01:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF5649620
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 01:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745542830; cv=none; b=mR93VXPWLTBbZe4T3p4xCoXPRE3XN4WhaS3NZnJPevExDavNt73cYsC7RvMZFYfU4xUVHO1ZaEBr9AEa97Uv9iBLXoEspz5ltN6RaK36EFXU++RyBQI3bXYhiS+5jKrklX5L7umbN2gtmsgXMaFM1hh8aHE+VwGwXxlfG4tLWBY=
+	t=1745545081; cv=none; b=fmwEGjxdAzSk7/Y80erarNyKyWXI48nGVJ3XG6BGgMALaAgADaLGp5nK5Ar4jX8Wm6yw32MtMtTgiQkewQQ/LjoZxPW61//aBIwGXiWewBQf3LPv8DM/7HdtnpyGS0TXuWOr7X03ODBqBt0MoFDW6Q8SU/AGZ38SMks6JkPOB9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745542830; c=relaxed/simple;
-	bh=+110KUY/xR4mN9EPy2VveR/SqdtfMuUoBJeg1u4C3tI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B+tfiN+TUkNCTuxKTVRPDIEsfcURCR6z6amSCh07XBfc2h+Up3dm5GjY6kB+gI1R0kes/K2g4erj67AOI6ycqbayx3rokb5KibSdgtAQ9mQurz2G4xPIRfBOFvid0/4YmFafwaThsMTiH1Opuf/2O3jmZfs/Vz/AG250fYmU9wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GD/V85Ai; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1745545081; c=relaxed/simple;
+	bh=tLzEIFXjANDgXnkRh3uzgP60L+v30ewVyx8OilQj6hw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGw2p/lFPOm4giqAGIR34rVhrO6VL2D9Azqx6Vs/SXho2ZEdF9wrvmZGv38Qg5EHCC7PGH7v5r7Uwc3+vIhqX7r0RtILwCgN1oQr/vr0YFVGK6eSAxjLcSL9Q1kFLtsUer4WebGKExjTt+NZlmfD03n5AP8LISh+puW73hycZf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KH/Srwh5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GD/V85Ai"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22403c99457so3560285ad.3
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 18:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745542828; x=1746147628; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VgVKQefSPO6v/paTmlYFEPshSYpszOpPFJZJH+sNyKc=;
-        b=GD/V85AiTR+POsbB2qW2YQ3H6l5tbRnMJgt1XhMjrb2owEiXdr4WxWPfr0i0DqZeVf
-         9V9dIAFm0CFjPbsc41O7AmSEipxShdwATrN1+WKiEgwicIRSHrPFXTHGrEEB4d10jWNI
-         33KZQjh8Gv4doz0edPUPF+K64kNkVoXhDVS2phAhsuZ+xgz6v0KWNi1N/IxyP080wTq7
-         81FtQuL7M9xRFy9nNFQMG5+wBJTQHsDrBvrwEx4npe9LL5NuQG2Gror6p30ktvLMq8Nb
-         pq+Tlj/pwZ7VH07KaVZM4tu6AiCb9GLTV3wDNY1kJM2uCcwCL4lIhorOVAGkLXPMYdhN
-         K+nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745542828; x=1746147628;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VgVKQefSPO6v/paTmlYFEPshSYpszOpPFJZJH+sNyKc=;
-        b=QyZprKSkUuZMtYdWYdqIcO/3O2lu4+oohO5um2Bpde2kbGeVUBmHapYtjfHXeCgbYp
-         GIgANB1oyjpPlG9mT0pkYY+hw4TKPt9gqLk4epe7XnUc6yMzcaEvEhiMpn7jNQjPYlOd
-         LesNckLCt0DmwB0JYjay7up5MztqJkuVrgvQ2TLXFzWzJYgAAEQs4O5n56uM85/FrAmW
-         N3MccH2PqBhYEoYfTYDLN+rvMa99Z5ehCRyNS/vDuqeKcddFd7G/jVXq/KErSN+zkRuj
-         s5OetYGLdIYd18HAHzl5S6UYuI6vNj3zZ66vsjQhnJ3Y80qEoQd1HV4SSuQzux2Bhi3/
-         Zk6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUwPU20vaYgSFQbMMO0JYQWa/tsR3bS4xAup6MQxkrn7dJzwitBqu6OmGomC/qeg8cEYChgLbCRKRIoGA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFXXNpMVbi+ivGlNt5AcP1b3/Ml4DvewSGZRlIfFFUtfz0/W9D
-	ksB/gfZTh/UegzqvK/eMm5I2ZSB89wZX78yE3G/zj+j5jyYuUVkOI+xvHboHCKCPANkh4MsCVW6
-	AFufQiqJfpmo2il8IEcRVKkgD3HslPrAcdM6Vtw==
-X-Gm-Gg: ASbGnctJZPptWSiA+ylsCuyJcJMZrPn6rZdbnhq0kYerF/FArYzwVYtO7g6Ak3qgPu7
-	cO4SucZtBPcwC0brBpuTi2m7y/JluwgxPtcvvdgP/V0m6md6YZEYOq5v5RiDe5RGkLCB2vtY7pn
-	XQyh+g4y2YbwiD/zdwSbmm
-X-Google-Smtp-Source: AGHT+IGCb4UYqBB8ozaTmvNC2LbrKC8acJbrLTqjrzO9z4hNn35hiWgqpQh7i/O7NLqRTJ/YYJh3Itk7bz6cJYtrTBc=
-X-Received: by 2002:a17:902:d483:b0:224:e0e:e08b with SMTP id
- d9443c01a7336-22dbf155e64mr2476255ad.0.1745542827993; Thu, 24 Apr 2025
- 18:00:27 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KH/Srwh5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745545078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KP5iLD6bnnXwgZQ0vOD3nb7PtPFdYGCT6qlJV0z2cr8=;
+	b=KH/Srwh58VR7RNy6wKkCeRT/8JfsNDV3L+4gJI+ZBVPpYnDcPOY+02vx8W0LAM2Z9XOb0M
+	wCzYbTpsoL+DC4kEDfqDQnWFBoEulBmO3uCku4NkTxyG+1ePAWKbGHwzTgu9XJjOoNleIL
+	IXAy9/xLyODrXwp6piVL5dVZlYg6tcU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-623-LFlyK1qZNRyENIyxX2VoVQ-1; Thu,
+ 24 Apr 2025 21:37:52 -0400
+X-MC-Unique: LFlyK1qZNRyENIyxX2VoVQ-1
+X-Mimecast-MFC-AGG-ID: LFlyK1qZNRyENIyxX2VoVQ_1745545071
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF97E1800373;
+	Fri, 25 Apr 2025 01:37:50 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.62])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C671D19560AB;
+	Fri, 25 Apr 2025 01:37:49 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Guy Eisenberg <geisenberg@nvidia.com>,
+	Jared Holzman <jholzman@nvidia.com>,
+	Yoav Cohen <yoav@nvidia.com>,
+	Omri Levi <omril@nvidia.com>,
+	Ofer Oshri <ofer@nvidia.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/2] ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd
+Date: Fri, 25 Apr 2025 09:37:38 +0800
+Message-ID: <20250425013742.1079549-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423205127.2976981-1-csander@purestorage.com>
- <20250423205127.2976981-4-csander@purestorage.com> <aAoiq1AsoD-k_kp3@infradead.org>
-In-Reply-To: <aAoiq1AsoD-k_kp3@infradead.org>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Thu, 24 Apr 2025 18:00:16 -0700
-X-Gm-Features: ATxdqUF2Kg7I4OqvugG6rzIUHrQVccl2R2M4E_rPalYCcq-E9ht0LATbrfNqQKQ
-Message-ID: <CADUfDZpDg5hXeShhd9GX70uVbqv7RU+u-grf7S8j2qdgFXDxYw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] block: avoid hctx spinlock for plug with multiple queues
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, Apr 24, 2025 at 4:38=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> > +static void blk_mq_extract_queue_requests(struct rq_list *rqs,
-> > +                                       struct rq_list *queue_rqs,
-> > +                                       unsigned *queue_depth)
-> > +{
-> > +     struct rq_list matched_rqs =3D {}, unmatched_rqs =3D {};
-> > +     struct request *rq =3D rq_list_pop(rqs);
-> > +     struct request_queue *this_q =3D rq->q;
-> > +     unsigned depth =3D 1;
-> > +
-> > +     rq_list_add_tail(&matched_rqs, rq);
-> > +     while ((rq =3D rq_list_pop(rqs))) {
-> > +             if (rq->q =3D=3D this_q) {
-> > +                     rq_list_add_tail(&matched_rqs, rq);
-> > +                     depth++;
-> > +             } else {
-> > +                     rq_list_add_tail(&unmatched_rqs, rq);
-> > +             }
->
-> This might be moe efficient if you keep an extra iterator and never
-> mode the request for another queue.
+Hello Jens,
 
-Sure, will do.
+The 2 patches try to fix race between between io_uring_cmd_complete_in_task
+and ublk_cancel_cmd.
 
->
-> > +     }
-> > +
-> > +     *queue_rqs =3D matched_rqs;
-> > +     *rqs =3D unmatched_rqs;
-> > +     *queue_depth =3D depth;
->
-> .. and I'd return the queue depth here instead of making it another
-> output argument.
+Thanks,
+Ming
 
-Okay.
+V2:
+	- improve comment and commit log
+	- remove useless memory barrier(Caleb Sander Mateos)
+	- add tested-by fixes tag
 
->
-> > +static void blk_mq_dispatch_multiple_queue_requests(struct rq_list *rq=
-s)
-> > +{
-> > +     do {
-> > +             struct rq_list queue_rqs;
-> > +             unsigned depth;
-> > +
-> > +             blk_mq_extract_queue_requests(rqs, &queue_rqs, &depth);
-> > +             blk_mq_dispatch_queue_requests(&queue_rqs, depth);
-> > +             while (!rq_list_empty(&queue_rqs)) {
-> > +                     blk_mq_dispatch_list(&queue_rqs, false);
-> > +             }
->
-> No need for the braces in the inner while loop here.
+Ming Lei (2):
+  ublk: call ublk_dispatch_req() for handling UBLK_U_IO_NEED_GET_DATA
+  ublk: fix race between io_uring_cmd_complete_in_task and
+    ublk_cancel_cmd
 
-Old habits die hard :)
+ drivers/block/ublk_drv.c | 41 +++++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 17 deletions(-)
 
->
-> The other caller of blk_mq_dispatch_list loops until the list is empty,
-> why don't we need that here?
+-- 
+2.47.0
 
-This loop does continue calling blk_mq_dispatch_list() until queue_rqs
-is empty. And the outer loop keeps repopulating queue_rqs until the
-entire rqs list is empty. Am I misunderstanding you?
-
-Thanks for the review,
-Caleb
