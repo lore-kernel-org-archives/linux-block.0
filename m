@@ -1,131 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7E1205513
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 04:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5610015C158;
+	Fri, 25 Apr 2025 04:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745554258; cv=none; b=GN3ixxMdMsedB5GPMqA+E653YME9OHfRJ6cGQRNAV9XWFNm69d8XjTAQb3xOctTK9TC4PlpQs0XVGOXob5JR3D6Bfh2QEllY1J1rEuaxkUirqwqMxv32TW9zcXSgM+/pzfzZyao2H6EHSCUnkIdF0a1lH48wzyGr5lxRsHlVhXU=
+	t=1745554797; cv=none; b=He9MwhTSLERb5Bx+IS+SO0l+dcsAeMLudXHwpRP58j6Lcu2MoA0OeT2P5y19GdGxppoYyWI2X3scX3f43Y//oeuoLhAr0ieKoZYnTPBwWN7ug20uj2hCPtd+wVinGie15rOA3mFLVIZx9q5YmT7xqG3TcwE7Rlw8vM20I0q6Cik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745554258; c=relaxed/simple;
-	bh=D/hcbHnyMSqeD0W8JyJTl0jgD2JVlNuy3egJ++7Jmuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jbcFFryQgqHo+evTng63U16JHv0DyW2RzHa+iUqKmVFBO9KZ5fx9m4/fAPYQfea+cYT2uP1MNr++HyQ2FK31OTHneW7nPBshzYAsm3wzzkTRU1q2zEENTRXFNmAPnczjjLCu5qDIzYxNgxRt//FA1xCsyCchpddonoay1kWbiYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYcUegXY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYcUegXY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745554255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Saep6Q8BHgH5BzZhrQAUfvhl3egE4nte6wKx6JG6V1A=;
-	b=aYcUegXYnQ1c8QViAUgsPCFHLmNuhBgesb2oI0mPviGNX435A1St+djEVJcwY4xu49yugq
-	k605h+Wvd0PPzm5HaNdOnUk1L65ph5P66+6q7YSdFKtE85+ztbtxhpqLTvVAEPnNm9r9Sf
-	qF1Sa7BeXUO71ukmTf4LxS58vF8uuWs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-296-SvhvGMGkNJm0cIzX-Mje1Q-1; Fri,
- 25 Apr 2025 00:10:51 -0400
-X-MC-Unique: SvhvGMGkNJm0cIzX-Mje1Q-1
-X-Mimecast-MFC-AGG-ID: SvhvGMGkNJm0cIzX-Mje1Q_1745554249
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60153195609F;
-	Fri, 25 Apr 2025 04:10:49 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.62])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 249061800378;
-	Fri, 25 Apr 2025 04:10:43 +0000 (UTC)
-Date: Fri, 25 Apr 2025 12:10:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Ofer Oshri <ofer@nvidia.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>,
-	Guy Eisenberg <geisenberg@nvidia.com>, Omri Levi <omril@nvidia.com>,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: Re: ublk: RFC fetch_req_multishot
-Message-ID: <aAsLPk6x0a2HUG4m@fedora>
-References: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1745554797; c=relaxed/simple;
+	bh=ioR4skgPOyOn8QsgJ+wTTSYELuK/OKgKf03OMzprBTU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ochDZXkoO8ukhiOM4fby87+nAf7RDD8fBPN0aBOI5EnXdhHyU07o2H2lnVj3zS8RX0A5CblRYJCpi0rDgeSLuV8T8GceFbgwmGLR1+lQUyUqScgcBeaRsDqt2ooNKtiRF0WZy5Niy5CGvsvEJqbEVTatcl4oG52tNRwtloWSK0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P4GuL0007467;
+	Thu, 24 Apr 2025 21:19:43 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 466jhd38wd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 24 Apr 2025 21:19:42 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Thu, 24 Apr 2025 21:19:42 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Thu, 24 Apr 2025 21:19:40 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <yanjun.zhu@linux.dev>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH] loop: Add sanity check for read/write_iter
+Date: Fri, 25 Apr 2025 12:19:39 +0800
+Message-ID: <20250425041939.3388803-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <8352c76d-ad30-4c2e-91bd-9676df21b293@linux.dev>
+References: <8352c76d-ad30-4c2e-91bd-9676df21b293@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=ZNDXmW7b c=1 sm=1 tr=0 ts=680b0d5f cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=x9mcN1thFNAw6uWNoUEA:9
+X-Proofpoint-ORIG-GUID: WGApeCznCFB7YWr6BMh3tTgl8PLkEL2z
+X-Proofpoint-GUID: WGApeCznCFB7YWr6BMh3tTgl8PLkEL2z
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDAyOSBTYWx0ZWRfX3Vl37cFQb80B 4C4TfTV6ePTYx4d3VyKxbJN5Fyzm6U9gXYCQXFopnIGi73oJX3DQ66MHXjfcgB+BzNTS+QysHWd AqmTudfWRE9rym1/hRSfarD5ynsQhU4cyWF+nMoD4zgMXAZ/B/xtd0bKxLu/YTBILPGb6jk0/o1
+ F28WBY4r4VQ86Xw5VodEpYscvDwQn/ktwD+3bzsWGk3FLUO6hzmp+qnekI2vfuMcnmWHgyweJK7 fAwAacWsPRWr02099PyIgNMZt47vB89PSmm2XAwjQhiH5tocTu7aQVTQh6PfJ2GIrguCK52lDsv yy5bBo2av2BLAdN3KBXBRW6Lc779C8vl9D2WtZLH577M8V0gy4QYZ2XOyzo5MZhHYHBJu+ilxna
+ nT9R5tXg+5lC2ELhN4EHu7lzEMvRc0jOrBS7fX5A26bi9QugmfGq+r9nFEmzQShzkuabdiJh
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-25_01,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1011 adultscore=0 spamscore=0 bulkscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=808 mlxscore=0 suspectscore=0
+ phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2504250029
 
-On Thu, Apr 24, 2025 at 06:19:29PM +0000, Ofer Oshri wrote:
-> Hi,
+On Fri, 25 Apr 2025 06:06:51 +0200, Zhu Yanjun wrote:
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 674527d770dc..4f968e3071ed 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -449,10 +449,15 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+> >       cmd->iocb.ki_flags = IOCB_DIRECT;
+> >       cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
+> >
+> > -     if (rw == ITER_SOURCE)
+> > -             ret = file->f_op->write_iter(&cmd->iocb, &iter);
+> > -     else
+> > -             ret = file->f_op->read_iter(&cmd->iocb, &iter);
+> > +     ret = 0;
+> > +     if (rw == ITER_SOURCE) {
+> > +             if (likely(file->f_op->write_iter))
+> > +                     ret = file->f_op->write_iter(&cmd->iocb, &iter);
+> > +     }
+> > +     else {
+> > +             if (likely(file->f_op->read_iter))
 > 
-> Our code uses a single io_uring per core, which is shared among all block devices - meaning each block device on a core uses the same io_uring.
-> 
-
-Can I understand you are using single io_uring for serving one hw queue of
-multiple ublk device?
-
-> Let’s say the size of the io_uring is N. Each block device submits M UBLK_U_IO_FETCH_REQ requests. As a result, with the current implementation, we can only support up to P block devices, where P = N / M. This means that when we attempt to support block device P+1, it will fail due to io_uring exhaustion.
-> 
-
-Suppose N is the SQ size, the supported count of ublk device can be much bigger
-than N/M, because any SQE is freed & available after it is issued to kernel, here
-the SQE should be free for reuse after one UBLK_U_IO_FETCH_REQ uring_cmd is
-issued to ublk driver.
-
-That is said you can queue arbitrary number of uring_cmd with fixed SQ
-size since N is just the submission batch size.
-
-But it needs the ublk server implementation to flush queued SQE if
-io_uring_get_sqe() returns NULL.
-
-> To address this, we’d like to propose an enhancement to the ublk driver. The idea is inspired by the multi-shot concept, where a single request allows multiple replies.
-> 
-> We propose adding:
-> 
-> 1. A method to register a pool of ublk_io commands.
-> 
-> 2. Introduce a new UBLK_U_IO_FETCH_REQ_MULTISHOT operation, where a pool of ublk_io commands is bound to a block device. Then, upon receiving a new BIO, the ublk driver can select a reply from the pre-registered pool and push it to the io_uring.
-> 
-> 3. Introduce a new UBLK_U_IO_COMMIT_REQ command to explicitly mark the completion of a request. In this case, the ublk driver returns the request to the pool.  We can retain the existing UBLK_U_IO_COMMIT_AND_FETCH_REQ command, but for multi-shot scenarios, the “FETCH” operation would simply mean returning the request to the pool.
-> 
-> What are your thoughts on this approach?
-
-I think we need to understand the real problem you want to address
-before digging into the uring_cmd pool concept.
-
-1) for save memory for lots of ublk device ?
-
-- so far, the main preallocation should be from blk-mq request, and
-as Caleb mentioned, the state memory from both ublk and io_uring isn't
-very big
-
-2) need to support as many as ublk device in single io_uring context with
-limited SQ/CQ size ?
-
-- it may not be one big problem because fixed SQ size allows to issue
-arbitrary number of uring_cmd
-
-- but CQ size may limit number of completed uring_cmd for notifying
-incoming ublk request, is this your problem? Jens has added ring resize
-via IORING_REGISTER_RESIZE_RINGS:
-
-https://lore.kernel.org/io-uring/20241022021159.820925-1-axboe@kernel.dk/
-
-
-3) or other requirement?
-
-
-
-Thanks,
-Ming
-
+> "else if" is better?
+There is nothing wrong with writing it this way logically, but it will
+destroy the clarity of the original context regarding the read/write logical
+relationship.
