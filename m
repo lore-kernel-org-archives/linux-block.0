@@ -1,239 +1,291 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886481ACEDE;
-	Fri, 25 Apr 2025 16:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745599656; cv=fail; b=UA8BI8+m/iWPB6jt9fDcy21yq09D0qUsYN6AdsH+wX8PD3zOJDn7GsWsWF8vwlZqQdFMTbMbhl3Ig676lK6WLRuLQ8lIIxaE21c+ILGWIjxnhgD+yttzDoo08mfIA7vgYFd6PsEgqlrG01rUI8IVTQgqsjM7UNOijKdx1ZglOaw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745599656; c=relaxed/simple;
-	bh=c8JUi8wAZniC8AQJslOqFhNGOVk8BQNgs5nAEdWV5t4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A3kf+/zXR9MeBLvhP6MG1XrdAKBm+g/Ti0DZXkng5CEMinOg77llLmkPkzxPPBCPOKLBdmCZMumgEI0qBq8Yec8OwoGdj2ipjfUX4nPvCHldNKLtlA4t+Bmr1zxplZ6tES3DYDdG/7vTP5w7j75i92M9PVQguZfoT4vqAxW0Mbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kLXLbynD; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=qZMQFQAU; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9E51BD9CE
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 16:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745599661; cv=none; b=E1FVS0+7ZdNb8PdWJliq77SKFpgK8ZUidSkWDzkeqovWfQOHKuR0t6/QIBrimB547Odl01frQKjY0cpGzc69NMwIixGn+qw1czMMl3Zfskk3ImA6hpvs1QDzq2cqf5n+hfbxBBHTCmvo1ekvuTi3nMv+ouq7GLXsNt5ihGwEhdI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745599661; c=relaxed/simple;
+	bh=hwG+pdjLnd6wglShxbgGb83Rzua664zBs06F82XQdZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gb43c9bb5hu+DIsny4roh1cT2R/6DCXzEENubS9gn+jBDDUXSjNOniXIQDzuBVEQlTCi+mOk72MyTEDd6Xe57WMhcL8P3zmhaOALSQdgtnt+GdW4i7tg0o9h1tPfCH7zL9VCJXh8ZiEzh4VfAC7qCxB0lbSnXf5NenNy2z9Dnbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T1wUYNsa; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kLXLbynD";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qZMQFQAU"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53PGWH2W005082;
-	Fri, 25 Apr 2025 16:45:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=DD+eRmg1IIjzfeaimxvw2fJxbBnhpj9ektV8Are4M64=; b=
-	kLXLbynDkGRhqUv0J2GxSWnyQgL0aMQNiOWcJfJ5WND0SJSUB6xGNf/KlLuwF+G7
-	Wzvi/TTkXGPIVHc95lPBgwFtbtzNoAJZDjVa2nvyPjmRZrhjruiDpeECzOfV/WqE
-	Ao5Qz9yjYO/Ejb4oBsTVs54BTEO5MKo/YQrlg4Au2pvsGgHAXEmuyXir9//+uniy
-	qHROBHSaXKqfxkELhSKez8JgBx8TxPYIypnhiYpxks01mFt+rtymi3ILLwihgTqh
-	bQyc7NP0DtGlG5FqqtGiD4ajWBDzmXqv8KC8qQ8lm+KCe2R1d5G/Mtp+7IzHvecy
-	kj42vEO6rN+hzqQnXNbDwg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 468e0b01s1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Apr 2025 16:45:41 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53PFfdoi025324;
-	Fri, 25 Apr 2025 16:45:40 GMT
-Received: from sj2pr03cu002.outbound.protection.outlook.com (mail-westusazlp17013077.outbound.protection.outlook.com [40.93.1.77])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 466jbtnft7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Apr 2025 16:45:40 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rs7b/m6JH/ARj3E5WQjFyXQCxj92z99i+yaXDj+bp8J6ZN+kR+A8dQppJnuNL6nsfGDZrGUJvbg1n170GreERIaVid70MM36ipuYZ5rRXMb0FBjQRNNys8X0NzsuIKNYEH6aThNGILApZvDRiqg3ZaiHgwJUycb44uKJFrVawKZZK0kK6qBrSdxbka6utJRWKIDYmuDJClqMiIcpOtXvqoJy9bU990rBuPfc7zyFXkGzqcDiwltKrDL0Qw5WKxQFzr63Ft9M2Qbm9sxSvAVyIyP51UISHRomMKVKiNNUX8ySrgTYcZZZA4/AAtUojTwnhVLwz1GN7+LrC6yNvj/iVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DD+eRmg1IIjzfeaimxvw2fJxbBnhpj9ektV8Are4M64=;
- b=bNhwnLiRcrR9BzavFLhd9iN5ssC7bIXHjpLwsS32Uv1jjfN+UIVmsHvAep0X9HKtCobHwFDCJ0n+OB/BYmoM8QDVSXz4sCcPAydScHSvvI2O+/lcgkRTaCsmYX7z6YWMYqkUoH8NZNHIoGQrygVu/zwE6XgPYrkHR+IqBkb0230LY4xwhtx8udlTP863MR5jpSy83H+qy1wq/2byd1KVLDmlrpAmxJ2uVZBE90/Kf+ACkMAtpzwM4VXQPvdDQqRQl+MaO1HAs++I0xhtLsjmvZ8WHEQxAhIOr6Qqa4DjhAGEdGbsLWvSjNfLSGHbQWH6wad9b40OvtY5Ge36h4bQ4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DD+eRmg1IIjzfeaimxvw2fJxbBnhpj9ektV8Are4M64=;
- b=qZMQFQAU/XODhd6shfX2G1erSk20RiNUpzg7UTXvaoMTHqGOarrxaeSwJRPY/mCFt533x7NLAtGSeTHeY5RJoOMe3HNIxymxbISe6qLohX8I/82Rnt7rq06P2doSGQgwETe9RZLsnwpGZQ7J6j/J/qPqjbfQGS1fKQJzOQy9KRY=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by PH7PR10MB5699.namprd10.prod.outlook.com (2603:10b6:510:127::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.40; Fri, 25 Apr
- 2025 16:45:37 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%4]) with mapi id 15.20.8678.025; Fri, 25 Apr 2025
- 16:45:37 +0000
-From: John Garry <john.g.garry@oracle.com>
-To: brauner@kernel.org, djwong@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk,
-        jack@suse.cz, cem@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ojaswin@linux.ibm.com, ritesh.list@gmail.com,
-        martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, catherine.hoang@oracle.com,
-        linux-api@vger.kernel.org, John Garry <john.g.garry@oracle.com>
-Subject: [PATCH v9 04/15] xfs: rename xfs_inode_can_atomicwrite() -> xfs_inode_can_hw_atomic_write()
-Date: Fri, 25 Apr 2025 16:44:53 +0000
-Message-Id: <20250425164504.3263637-5-john.g.garry@oracle.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250425164504.3263637-1-john.g.garry@oracle.com>
-References: <20250425164504.3263637-1-john.g.garry@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0028.namprd05.prod.outlook.com
- (2603:10b6:a03:c0::41) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T1wUYNsa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745599659; x=1777135659;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=hwG+pdjLnd6wglShxbgGb83Rzua664zBs06F82XQdZ8=;
+  b=T1wUYNsacdAo28U8sullKB2v2oghm/0vy0LkWul+aZk7IuQ4eolghB2L
+   Qy05sJ0JQl3W1vi649uH/wVPWGInycJFfu5nFWBeJb2Q6DVKi0u3ejtsR
+   OLDPkwVGCWMRtmuDC8R6louulLC6Od3Nrg/NaX+UTdeBJZU6iBsEFj7Ii
+   5y4tps6jUUD+IYLUOU9n+UGB7qibkruGwtSQiYkYT+bt5g7Q+Sket+bXE
+   WbKQu575MH7vRh0M37JG8tau9pdWD1hEafUMaHlihzDmHwQGIB3GmPQog
+   k0tGryYqaZCJFAI10X0JzmKeEWtpbX/HQvyXzLudLerC+Ot6B2BuRu8EC
+   g==;
+X-CSE-ConnectionGUID: tq4/HJaTT5yPbvNsoRqC2A==
+X-CSE-MsgGUID: On1f+06OTO2isxFlLsAB/Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11414"; a="57464918"
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="57464918"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2025 09:47:38 -0700
+X-CSE-ConnectionGUID: i0TzlsbCToCnmfU2Y8MLDg==
+X-CSE-MsgGUID: 4F/7qLmVQAaoWn0AJrx5cA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="137004382"
+Received: from lkp-server01.sh.intel.com (HELO 050dd05385d1) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 25 Apr 2025 09:47:35 -0700
+Received: from kbuild by 050dd05385d1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1u8MD7-0005N3-0a;
+	Fri, 25 Apr 2025 16:47:33 +0000
+Date: Sat, 26 Apr 2025 00:46:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH V3 07/20] block: prevent adding/deleting disk during
+ updating nr_hw_queues
+Message-ID: <202504260007.SFrJbSQ8-lkp@intel.com>
+References: <20250424152148.1066220-8-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|PH7PR10MB5699:EE_
-X-MS-Office365-Filtering-Correlation-Id: 92d638dc-f71c-4768-9ef7-08dd84189b37
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?VWfYCbl15eLvjoIdh3qO/QhGB28QJenNnqnJCwQChpi0VddJFNO7NJuGlL1M?=
- =?us-ascii?Q?rvAjyDKBj8ENBMFAqIpgYkJaMtHL56XkLCwjgti4iecjJQZGhZEk/rsGA3wz?=
- =?us-ascii?Q?RLN/jkGAe40nFM+PObPYe6L8k1XxY3U4Yn9/0FrStnvHXwlP/uMXd4kDkSxp?=
- =?us-ascii?Q?rjNbJFiVRRn6TuvmGYLtETZxrOKlPNKKIV8+n/LagLRW4oxSdXbiMJMRkzA1?=
- =?us-ascii?Q?o+CHGD8aSBWUC18wTf0xyQrbuhCfbJQS8pDQ39/gJs09iPdiTPh3gaOR1dkS?=
- =?us-ascii?Q?mm3QFdCwo1CNFxQ0T8giDW+Ffz+jq5nsjScsOvwxmMwVwmB+qcAVjt5Ev34n?=
- =?us-ascii?Q?PRtAN1cNPe+IDqw8colQ0ImCdP08rtw3TIOEdyHup+dZbXkuzDb/Cn2oOkHK?=
- =?us-ascii?Q?Z2qGTLCgdWFhcyZKx1nTc9JAXkDTTMhVmIhh01IWAho6tPhYI6Qn6jJazrcz?=
- =?us-ascii?Q?SqUX2+XC0oB+J8r1eM3e0BFFquRvx6odm0sGymT4G/Cmx4pUrnOAFFJ/dMlX?=
- =?us-ascii?Q?4boQ71HIdM94U7lxtA/lpq4+twNeyxBLEBQzJLYFsQQOJEdJhrvmaMvTYqLU?=
- =?us-ascii?Q?W7O9o6PRmPWj+Ftu8cZzLu9ireXEVVGvUPV0uzU5BJY4UuFlqEKY1FiXHBIl?=
- =?us-ascii?Q?rOKtd1HQOtomOfTqrR2AQq+nBWEwcpFvzbUYejVm/j+HcEVTS4Px2Puqxv0l?=
- =?us-ascii?Q?i/R5cUJt4RJxvfSX2ZzlWiQ84FhKjA2tELsZkfa3qvGKi4+CUdbH5tqzPq9E?=
- =?us-ascii?Q?aIUsu0f4MnJoe/DAskXp6LA8KXQHwSGsg8e363wvGTyZ/S5Gs7L9+Rl9TAko?=
- =?us-ascii?Q?/Cg9bvVGC9O8A4KiJhSEgATtpri/8EOyOFAcadTQVxwU10GoD/vBUMhvVhV+?=
- =?us-ascii?Q?cp+/9J/n+YVx/Tk0wDHCHvf7eVtlyeTlstMTbXjS7Nt6PRZh+546yXoOG7AW?=
- =?us-ascii?Q?8V/9jsuwVbINZVXR2WaaEWJySQEH0QttJJd73z08VTAqWmvS7WQTtj3tN62x?=
- =?us-ascii?Q?yLyJpZrwDGjkEZ2A1lghU3IwEg4uO0zj9+QKHoClNx27fGSZF9fP/F5syGAb?=
- =?us-ascii?Q?snsRP1zjpLsGNHuzklCaWqKPuKObfySAj1p6amssNYZQpWQbNUyTLB7tLq0v?=
- =?us-ascii?Q?mFoONpKYTURdFQeGAl3qA6HmLD6Ni4u5OIiuO3aNvvnnoej+Ct9TuFwko6MS?=
- =?us-ascii?Q?P4pmGxSYNCUVLlliK0UM1WF0iMErQ84ISbZR3F8RHwiQ87LHnkt91haOdru9?=
- =?us-ascii?Q?Z6eKjnX2zWRLON1d4KT0qdz8dnstafFkpFr43TfVhH3cxBBcbsrriglgQcmW?=
- =?us-ascii?Q?/D6qUsC0WjyOmvIY8+fH+EL/y37RWaA8xI+7PlaHdc7AEb3Xfyiivmj3hivY?=
- =?us-ascii?Q?rkTxq5vfkwMOYiTrrCIAYhjxOr/ABVIlgp510dz1Fn+eengPfw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3N7nNgFFIEW5iZM76F1WhZFNRBPP0PbGissjT1ZAaqKrLMoFMWrF+GRD8ky8?=
- =?us-ascii?Q?q5rf2hUW7WLaAc/XuAh77GB0qODhumpEFRjbeUrw8X2kp8dDffZrkvb9wG9d?=
- =?us-ascii?Q?rDkEWtumTAAhxrOP10yuhQdDawJKafR4hzY9P8X+h/W76V9U7JgkzW7Ov9Y4?=
- =?us-ascii?Q?qpR1VLlZNfa4lrwWoe3aprJdiPmB6I0uKy+HgPKpvEvEoCzZgAnKhmAlDgoJ?=
- =?us-ascii?Q?Xv9+fuf2AJyHdWRdqp4ZHjds+dDsEq04EjcyD6TLxC660GXxHtx54dE8tduK?=
- =?us-ascii?Q?L2bRZExwgnPKiEXAENHF6J4y1utjTVZs5cUJ0V1+vIoKuQtaxIu06nH+9nHV?=
- =?us-ascii?Q?8mVUky1C+hZ9K+otNNZFdm11kfVEIxcGIFMmpr8FfzbFquBr6kFwcMfjOnGW?=
- =?us-ascii?Q?hQSaGZlZecU6apKVkh/i8HUCBxpcW4D7OPu0Poh3hFpUVnaIw11PXAXqaVEX?=
- =?us-ascii?Q?/kAoKkG+jmo8VnUsYLOE3LU7SFx6mZOPRkRzvE0N28RXaSokVwGsS8wwFd2I?=
- =?us-ascii?Q?fZK2hBxsF/4qIe14FNXaJx/qRhSy1oGSwhgFiJlbskeKx2hoa6p9B/sE0Jop?=
- =?us-ascii?Q?9iBqe6J817EOwMaSixmmVKTNjaEQEXJysE2293bRQN7ZJoiSAfdgf12qg8R2?=
- =?us-ascii?Q?iS8YyJNwcL6R+g5phZxoCYK6wXL7PCmp3sSkZyYPzPifAyTIC2G0vS9iwhtz?=
- =?us-ascii?Q?NglRBTnBW4njPFKF8UsZBl0W73R0rVgx/hlcgggS51/Hi8WOU3IUlwtgzyy2?=
- =?us-ascii?Q?Du3vTriaEsRlbIawQVQZYdAARVUyUKoi8CZ/56YdyPvdpGhFgOwQLoURagDL?=
- =?us-ascii?Q?P4RPl4/91y9V1L3WaZ8g5hlI/vjxDDE5gNchUpzavy9R4oLXqhvMC7BTlUUN?=
- =?us-ascii?Q?wZZSpGmRB1sK90WPvRzjKXxIgCzK0y8jlSZq+alONLoihfhbzdnowz1zXImB?=
- =?us-ascii?Q?ASMsdd+LIeHq9rNSqrK4SJW8jpEv/AFszrS9nK5Y2GH8TlZ7dqcA2A5qgb1w?=
- =?us-ascii?Q?c84FrW4Ntwk/MQxSvEpgZmn9N5ppHyb5fkFWf3dehX8xH44oVlvP3V4p6sC8?=
- =?us-ascii?Q?64zTOxjm/ZCT4dwptsk8d1zYuUzK3BwekxiAJucRicP1x4Z6X97IE+NUjTFO?=
- =?us-ascii?Q?XKHPuVma3TRrjGAvkYvO9XhGy3fvXDbIERrTFQ3dliGwZXYa4BA+BMj5NcAp?=
- =?us-ascii?Q?I+eCHwk4aXTZ9ec4QAeT1iZ9Q6psiUjPPjKYBHjXZ6kok5jpktyZ8me8zEz1?=
- =?us-ascii?Q?2pnRcUJlTk0xbNw+nU83T8EYeEtR6vh4AjqIFlPJnQsW3XjylTPkxKLGlw7V?=
- =?us-ascii?Q?g5e0ZSdzl3lBZQbEmyCph01Rn/Lz3dIyyXTdfmccZxubV6GnmAlmBGJvtjPd?=
- =?us-ascii?Q?3UNlM0p+Kfpx1hC8BlHcTH8Tr42BdwgB4YdYp1g9n6aOvafhd6NxUsqzDJTT?=
- =?us-ascii?Q?PUhz/DPeByt/1+EYwWkrQCZmPrq2Belxrw2AS/WWkB5aa10EvhzuTOpvvAdx?=
- =?us-ascii?Q?ZzmJ48lg/WIy6Upthcvth6uMo9j9yGacVKURdiyDWut9GgftGJj7YN/VxFcF?=
- =?us-ascii?Q?FOawwBJsJ8dP/EEuyExIdUPlXW2mV/kn/h1WBIPlWgzfkH4frZ/WQ4w63VNZ?=
- =?us-ascii?Q?9g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	EnR6Os9+yO9hzbu9z4YrOWeK0cWfpRo+DNwgA7Kno0bBKhUtlj/qWyf8tFEkSr6TDE4xBTeAoj4a7cT6hUy0XPiW6o2H3dsWAwryOVdDq6FZKApZlM8IB2DZ/J19d4CD2sfzNpWt35vc25tkkfyaS5CtIURodxmbpEvcyeowi6VUbQg4RgnwT4kJhYWMIkSAjIlsJLUUqKshjni97BdbFYfVQQlh/X2GK3Wd4aNFb4LGSFvjxdxZ7CcfwGdRWaWGypMfwhoOkJTvXS2PMnErGH8vZzMjoInYRc7WHiTbnQo8L9aBvTlvPuyWCJt+LPi9S4N56O0d43qy58JjTt7C6k3LBJuACddxQTpfeU5PUy1ps0AjdzmRApOKk9jDaSwXiOa4F2LDBqyUD5mrq84sqTOghxfTge+KQ3vZlXrgRIc85s/BUS7VjiCVsB4QUcJZ8Ksl+NWByr6eqtWOf8MfXSEKa05hNxStpfMWbLgJ/B3PCxl3wH+exnxqk4cXlSq1TNyTz4hQp/CB3KXVBAo/Ayi9dFT1jUjcQHXMiUF+NxUxZwLogyGvvyGcYs8QdwgV9PXUz7ojnMDWmtfiRVNfmqBnpvHHUN3DpSf4FriqcX0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92d638dc-f71c-4768-9ef7-08dd84189b37
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2025 16:45:37.6118
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 34FyLQlqLhKGo6K4/5yk3Srv7BO1s6vH6nU73UCywX+rKhyKNWj0zTLIkNp24N5o5VFTiUUnmd2wvyvmo6dyeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5699
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-25_05,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2504070000 definitions=main-2504250118
-X-Proofpoint-ORIG-GUID: -vC8XZ-L6Vyn7v5eHQMM9wtGTdK7b_np
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDExOCBTYWx0ZWRfX01EAqRzMvux3 zKWVayFs4P37EJAe2WBZbkvPA/SWVx3zVDcno7NfSh5JiFZETUK1Eo7CWSY+sR++koTSLJ/fyVT p+3rey2xAaczZPL1SmWVP2qYKpvUj58xlJjaVIPyvauZET8A7s69OXjhvMpGuQUriOkM4yevKO1
- ZEzVgsYcCv0oapOnrHcdzDKlcon95206/TQXpgZdVz5z2Jsb/vArv5II6p+eqGWUxxFF07Xkdtx zq5HG6/Fz0fXoS0LiRSUd6xMF0uN4mUi+JsXDtEsvO57YwM+Eo0TBDL61E3OzgyvPJHEUfQFfk9 nxO4dBccTa0HhqCC0fISFV5vOqYVpekH6YY2mmbWqEhWSL50ICxKHX+MY0w1Z+IkM/W1w7Ze6HS cRbTazsC
-X-Proofpoint-GUID: -vC8XZ-L6Vyn7v5eHQMM9wtGTdK7b_np
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250424152148.1066220-8-ming.lei@redhat.com>
 
-In future we will want to be able to check if specifically HW offload-based
-atomic writes are possible, so rename xfs_inode_can_atomicwrite() ->
-xfs_inode_can_hw_atomicwrite().
+Hi Ming,
 
-Signed-off-by: John Garry <john.g.garry@oracle.com>
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-[djwong: add an underscore to be consistent with everything else]
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
----
- fs/xfs/xfs_file.c  | 2 +-
- fs/xfs/xfs_inode.h | 2 +-
- fs/xfs/xfs_iops.c  | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 84f08c976ac4..55bdae44e42a 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -1488,7 +1488,7 @@ xfs_file_open(
- 	if (xfs_is_shutdown(XFS_M(inode->i_sb)))
- 		return -EIO;
- 	file->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
--	if (xfs_inode_can_atomicwrite(XFS_I(inode)))
-+	if (xfs_inode_can_hw_atomic_write(XFS_I(inode)))
- 		file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
- 	return generic_file_open(inode, file);
- }
-diff --git a/fs/xfs/xfs_inode.h b/fs/xfs/xfs_inode.h
-index eae0159983ca..bdbbff0d8d99 100644
---- a/fs/xfs/xfs_inode.h
-+++ b/fs/xfs/xfs_inode.h
-@@ -357,7 +357,7 @@ static inline bool xfs_inode_has_bigrtalloc(const struct xfs_inode *ip)
- 		(ip)->i_mount->m_rtdev_targp : (ip)->i_mount->m_ddev_targp)
- 
- static inline bool
--xfs_inode_can_atomicwrite(
-+xfs_inode_can_hw_atomic_write(
- 	struct xfs_inode	*ip)
- {
- 	struct xfs_mount	*mp = ip->i_mount;
-diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-index f0e5d83195df..22432c300fd7 100644
---- a/fs/xfs/xfs_iops.c
-+++ b/fs/xfs/xfs_iops.c
-@@ -608,7 +608,7 @@ xfs_report_atomic_write(
- {
- 	unsigned int		unit_min = 0, unit_max = 0;
- 
--	if (xfs_inode_can_atomicwrite(ip))
-+	if (xfs_inode_can_hw_atomic_write(ip))
- 		unit_min = unit_max = ip->i_mount->m_sb.sb_blocksize;
- 	generic_fill_statx_atomic_writes(stat, unit_min, unit_max, 0);
- }
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.15-rc3 next-20250424]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-move-blk_mq_add_queue_tag_set-after-blk_mq_map_swqueue/20250424-232508
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20250424152148.1066220-8-ming.lei%40redhat.com
+patch subject: [PATCH V3 07/20] block: prevent adding/deleting disk during updating nr_hw_queues
+config: i386-buildonly-randconfig-004-20250425 (https://download.01.org/0day-ci/archive/20250426/202504260007.SFrJbSQ8-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250426/202504260007.SFrJbSQ8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504260007.SFrJbSQ8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> block/genhd.c:406: warning: expecting prototype for add_disk_fwnode(). Prototype was for __add_disk_fwnode() instead
+
+
+vim +406 block/genhd.c
+
+9301fe73438499 block/genhd.c         Christoph Hellwig 2020-09-21  391  
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  392  /**
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  393   * add_disk_fwnode - add disk information to kernel list with fwnode
+e63a46bef01ff3 block/genhd.c         Dan Williams      2016-06-15  394   * @parent: parent device for the disk
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  395   * @disk: per-device partitioning information
+fef912bf860e8e block/genhd.c         Hannes Reinecke   2018-09-28  396   * @groups: Additional per-device sysfs groups
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  397   * @fwnode: attached disk fwnode
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  398   *
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  399   * This function registers the partitioning information in @disk
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  400   * with the kernel. Also attach a fwnode to the disk device.
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  401   */
+54650b49b7412c block/genhd.c         Ming Lei          2025-04-24  402  static int __add_disk_fwnode(struct device *parent, struct gendisk *disk,
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  403  			     const struct attribute_group **groups,
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  404  			     struct fwnode_handle *fwnode)
+d1254a8749711e block/genhd.c         Christoph Hellwig 2021-08-04  405  
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16 @406  {
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  407  	struct device *ddev = disk_to_dev(disk);
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  408  	int ret;
+cf0ca9fe5dd9e3 block/genhd.c         Peter Zijlstra    2008-04-30  409  
+3d9a9e9a77c5eb block/genhd.c         Ming Lei          2025-01-15  410  	if (WARN_ON_ONCE(bdev_nr_sectors(disk->part0) > BLK_DEV_MAX_SECTORS))
+3d9a9e9a77c5eb block/genhd.c         Ming Lei          2025-01-15  411  		return -EINVAL;
+3d9a9e9a77c5eb block/genhd.c         Ming Lei          2025-01-15  412  
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  413  	if (queue_is_mq(disk->queue)) {
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  414  		/*
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  415  		 * ->submit_bio and ->poll_bio are bypassed for blk-mq drivers.
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  416  		 */
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  417  		if (disk->fops->submit_bio || disk->fops->poll_bio)
+69fe0f29892077 block/genhd.c         Ming Lei          2022-03-04  418  			return -EINVAL;
+69fe0f29892077 block/genhd.c         Ming Lei          2022-03-04  419  
+737eb78e82d52d block/genhd.c         Damien Le Moal    2019-09-05  420  		/*
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  421  		 * Initialize the I/O scheduler code and pick a default one if
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  422  		 * needed.
+737eb78e82d52d block/genhd.c         Damien Le Moal    2019-09-05  423  		 */
+737eb78e82d52d block/genhd.c         Damien Le Moal    2019-09-05  424  		elevator_init_mq(disk->queue);
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  425  	} else {
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  426  		if (!disk->fops->submit_bio)
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  427  			return -EINVAL;
+ac2b6f9dee8f41 block/genhd.c         Al Viro           2024-04-12  428  		bdev_set_flag(disk->part0, BD_HAS_SUBMIT_BIO);
+6783811569aef2 block/genhd.c         Christoph Hellwig 2025-01-06  429  	}
+9f4107b07b17b5 block/genhd.c         Jens Axboe        2023-04-14  430  
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  431  	/*
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  432  	 * If the driver provides an explicit major number it also must provide
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  433  	 * the number of minors numbers supported, and those will be used to
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  434  	 * setup the gendisk.
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  435  	 * Otherwise just allocate the device numbers for both the whole device
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  436  	 * and all partitions from the extended dev_t space.
+3e1a7ff8a0a7b9 block/genhd.c         Tejun Heo         2008-08-25  437  	 */
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  438  	ret = -EINVAL;
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  439  	if (disk->major) {
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  440  		if (WARN_ON(!disk->minors))
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  441  			goto out_exit_elevator;
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  442  
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  443  		if (disk->minors > DISK_MAX_PARTS) {
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  444  			pr_err("block: can't allocate more than %d partitions\n",
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  445  				DISK_MAX_PARTS);
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  446  			disk->minors = DISK_MAX_PARTS;
+2e3c73fa0c419f block/genhd.c         Christoph Hellwig 2021-05-21  447  		}
+4c434392c47778 block/genhd.c         Li Nan            2023-12-19  448  		if (disk->first_minor > MINORMASK ||
+4c434392c47778 block/genhd.c         Li Nan            2023-12-19  449  		    disk->minors > MINORMASK + 1 ||
+4c434392c47778 block/genhd.c         Li Nan            2023-12-19  450  		    disk->first_minor + disk->minors > MINORMASK + 1)
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  451  			goto out_exit_elevator;
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  452  	} else {
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  453  		if (WARN_ON(disk->minors))
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  454  			goto out_exit_elevator;
+3e1a7ff8a0a7b9 block/genhd.c         Tejun Heo         2008-08-25  455  
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  456  		ret = blk_alloc_ext_minor();
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  457  		if (ret < 0)
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  458  			goto out_exit_elevator;
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  459  		disk->major = BLOCK_EXT_MAJOR;
+539711d7d6fe38 block/genhd.c         Christoph Hellwig 2021-08-24  460  		disk->first_minor = ret;
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  461  	}
+7c3f828b522b07 block/genhd.c         Christoph Hellwig 2021-05-21  462  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  463  	/* delay uevents, until we scanned partition table */
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  464  	dev_set_uevent_suppress(ddev, 1);
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  465  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  466  	ddev->parent = parent;
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  467  	ddev->groups = groups;
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  468  	dev_set_name(ddev, "%s", disk->disk_name);
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  469  	if (fwnode)
+9dfd9ea93aeab5 block/genhd.c         Christian Marangi 2024-10-03  470  		device_set_node(ddev, fwnode);
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  471  	if (!(disk->flags & GENHD_FL_HIDDEN))
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  472  		ddev->devt = MKDEV(disk->major, disk->first_minor);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  473  	ret = device_add(ddev);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  474  	if (ret)
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  475  		goto out_free_ext_minor;
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  476  
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  477  	ret = disk_alloc_events(disk);
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  478  	if (ret)
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  479  		goto out_device_del;
+99d8690aae4b2f block/genhd.c         Christoph Hellwig 2021-12-21  480  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  481  	ret = sysfs_create_link(block_depr, &ddev->kobj,
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  482  				kobject_name(&ddev->kobj));
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  483  	if (ret)
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  484  		goto out_device_del;
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  485  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  486  	/*
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  487  	 * avoid probable deadlock caused by allocating memory with
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  488  	 * GFP_KERNEL in runtime_resume callback of its all ancestor
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  489  	 * devices
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  490  	 */
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  491  	pm_runtime_set_memalloc_noio(ddev, true);
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  492  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  493  	disk->part0->bd_holder_dir =
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  494  		kobject_create_and_add("holders", &ddev->kobj);
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  495  	if (!disk->part0->bd_holder_dir) {
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  496  		ret = -ENOMEM;
+ff53cd52d9bdbf block/genhd.c         Thomas Weißschuh  2023-03-18  497  		goto out_del_block_link;
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  498  	}
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  499  	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  500  	if (!disk->slave_dir) {
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  501  		ret = -ENOMEM;
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  502  		goto out_put_holder_dir;
+fe7d064fa3faec block/genhd.c         Luis Chamberlain  2021-11-03  503  	}
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  504  
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  505  	ret = blk_register_queue(disk);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  506  	if (ret)
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  507  		goto out_put_slave_dir;
+75f4dca59694df block/genhd.c         Christoph Hellwig 2021-08-18  508  
+9f18db572c97bc block/genhd.c         Christoph Hellwig 2021-11-22  509  	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  510  		ret = bdi_register(disk->bdi, "%u:%u",
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  511  				   disk->major, disk->first_minor);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  512  		if (ret)
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  513  			goto out_unregister_queue;
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  514  		bdi_set_owner(disk->bdi, ddev);
+9d5ee6767c8576 block/genhd.c         Christoph Hellwig 2021-08-18  515  		ret = sysfs_create_link(&ddev->kobj,
+9d5ee6767c8576 block/genhd.c         Christoph Hellwig 2021-08-18  516  					&disk->bdi->dev->kobj, "bdi");
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  517  		if (ret)
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  518  			goto out_unregister_bdi;
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  519  
+e5cfefa97bccf9 block/genhd.c         Yu Kuai           2023-02-17  520  		/* Make sure the first partition scan will be proceed */
+140ce28dd3bee8 block/genhd.c         Christoph Hellwig 2024-05-02  521  		if (get_capacity(disk) && disk_has_partscan(disk))
+e5cfefa97bccf9 block/genhd.c         Yu Kuai           2023-02-17  522  			set_bit(GD_NEED_PART_SCAN, &disk->state);
+e5cfefa97bccf9 block/genhd.c         Yu Kuai           2023-02-17  523  
+9d5ee6767c8576 block/genhd.c         Christoph Hellwig 2021-08-18  524  		bdev_add(disk->part0, ddev->devt);
+e16e506ccd673a block/genhd.c         Christoph Hellwig 2021-11-22  525  		if (get_capacity(disk))
+05bdb9965305bb block/genhd.c         Christoph Hellwig 2023-06-08  526  			disk_scan_partitions(disk, BLK_OPEN_READ);
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  527  
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  528  		/*
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  529  		 * Announce the disk and partitions after all partitions are
+8235b5c1e8c1c0 block/genhd.c         Christoph Hellwig 2021-08-18  530  		 * created. (for hidden disks uevents remain suppressed forever)
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  531  		 */
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  532  		dev_set_uevent_suppress(ddev, 0);
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  533  		disk_uevent(disk, KOBJ_ADD);
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  534  	} else {
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  535  		/*
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  536  		 * Even if the block_device for a hidden gendisk is not
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  537  		 * registered, it needs to have a valid bd_dev so that the
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  538  		 * freeing of the dynamic major works.
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  539  		 */
+a0a6314ae774f8 block/genhd.c         Christoph Hellwig 2022-10-10  540  		disk->part0->bd_dev = MKDEV(disk->major, disk->first_minor);
+8ddcd653257c18 block/genhd.c         Christoph Hellwig 2017-11-02  541  	}
+52b85909f85d06 block/genhd.c         Christoph Hellwig 2021-08-18  542  
+73781b3b81e765 block/genhd.c         Christoph Hellwig 2024-06-26  543  	blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
+77ea887e433ad8 block/genhd.c         Tejun Heo         2010-12-08  544  	disk_add_events(disk);
+76792055c4c8b2 block/genhd.c         Christoph Hellwig 2022-02-15  545  	set_bit(GD_ADDED, &disk->state);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  546  	return 0;
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  547  
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  548  out_unregister_bdi:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  549  	if (!(disk->flags & GENHD_FL_HIDDEN))
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  550  		bdi_unregister(disk->bdi);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  551  out_unregister_queue:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  552  	blk_unregister_queue(disk);
+fa81cbafbf5764 block/genhd.c         Chen Zhongjin     2022-10-29  553  	rq_qos_exit(disk->queue);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  554  out_put_slave_dir:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  555  	kobject_put(disk->slave_dir);
+d90db3b1c8676b block/genhd.c         Christoph Hellwig 2022-11-15  556  	disk->slave_dir = NULL;
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  557  out_put_holder_dir:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  558  	kobject_put(disk->part0->bd_holder_dir);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  559  out_del_block_link:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  560  	sysfs_remove_link(block_depr, dev_name(ddev));
+5fa3d1a00c2d4b block/genhd.c         Li Nan            2023-12-11  561  	pm_runtime_set_memalloc_noio(ddev, false);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  562  out_device_del:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  563  	device_del(ddev);
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  564  out_free_ext_minor:
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  565  	if (disk->major == BLOCK_EXT_MAJOR)
+83cbce9574462c block/genhd.c         Luis Chamberlain  2021-08-18  566  		blk_free_ext_minor(disk->first_minor);
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  567  out_exit_elevator:
+1bf70d08cc3b55 block/genhd.c         Nilay Shroff      2025-03-04  568  	if (disk->queue->elevator) {
+1bf70d08cc3b55 block/genhd.c         Nilay Shroff      2025-03-04  569  		mutex_lock(&disk->queue->elevator_lock);
+02341a08c9dec5 block/genhd.c         Yu Kuai           2022-10-22  570  		elevator_exit(disk->queue);
+1bf70d08cc3b55 block/genhd.c         Nilay Shroff      2025-03-04  571  		mutex_unlock(&disk->queue->elevator_lock);
+1bf70d08cc3b55 block/genhd.c         Nilay Shroff      2025-03-04  572  	}
+278167fd2f8ffe block/genhd.c         Luis Chamberlain  2021-11-09  573  	return ret;
+^1da177e4c3f41 drivers/block/genhd.c Linus Torvalds    2005-04-16  574  }
+54650b49b7412c block/genhd.c         Ming Lei          2025-04-24  575  
+
 -- 
-2.31.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
