@@ -1,81 +1,81 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C582F32
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 06:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34502F32
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 06:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745563518; cv=none; b=AXdVaTYyTRllOfMv7pc4MOpuQ80ebBR4F7Q9sOX8VVSl9AEEfex3hNoV6bxNSA/vesHA61D24kYDKwRYUOISw+4m/L24A02j6PWrkIVZTSYhEwkwGGAoDJugO8LQo+b69YoyhrTeEXfiGZmOtiPhbV0mA01nBudxr2kPZ5qc//4=
+	t=1745563598; cv=none; b=oKKr0A+D0tuj8zfI9x7iX4QI2L+p8Vh7eqSK92qnhc4oLaEWfIHPwEohFfEYJwUlo1TUQBNbnzHibtH5iRZpPQpbkccYchZKWrIXYRDubixzpGfp5hlDPmrYQ8In3Zwtqx4STaR+F6PzCye6zMA62cK81Xnwp8ap40RhSnSHdrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745563518; c=relaxed/simple;
-	bh=fppw8mAGqBzzKckcSPCeuVXvuwuPgEBuIHrfUoShB8k=;
+	s=arc-20240116; t=1745563598; c=relaxed/simple;
+	bh=4ez5w1y/YZWIsRMzfnrGPSen2SIV44XOBtoLes20kQE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hhMjN7p8usVczeEPSMZS1x+iLOAJeX8eyYLlY9ITjPibrY3knfwccucoR+HX1Fztky/jpUHwhse0ywBOrhiMVbYXRE9G5f2ozHdKv9HTSS3j77noX0/mJBQnivS0RD+NFWKpoyFt6wji4/kQeYH2ZhihxQLKQx6TV50AnLJpnGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QDp0q5KW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YKZPgG8D; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QDp0q5KW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YKZPgG8D; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=XCcyBQAFRwYMBSts9WD5TA/ZxxthEZXZoVLDsR+9MBxbMJoOc2Q7ykEjVuJ/ffBIv1MiQcEoRdLON7S/+Y49n3rj8LhDsy6UT4aydrQGn0NKbm+dRVq3tXhovCmTlm40YT3mq2tD0vq4A2u4wzKhbibfQAKg0QaCBoy1p7o3OCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lngQBToF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F5gV5mde; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lngQBToF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F5gV5mde; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QDp0q5KW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YKZPgG8D";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QDp0q5KW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YKZPgG8D"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lngQBToF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F5gV5mde";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lngQBToF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F5gV5mde"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9D166210F9;
-	Fri, 25 Apr 2025 06:45:14 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B7D442116C;
+	Fri, 25 Apr 2025 06:46:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745563514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1745563594; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y2VloUgf+dZ8HVD2q4pyh1O1FNhttdCiVnMpAxCviNE=;
-	b=QDp0q5KWlsAeJAHifZbMoDfmW4dbHM7H574GktFYjC/ejPrX4cm0shBfaR/7LhJOQpojsB
-	WMK+KEiyB/qDkY7UdWPAnnwNMQjmkQ9OyVbCfOz2uGCy5HANDLeHlsQwgSrjzi8vT+0Pbv
-	CLH6kjzGs3FPDdTwKvuZI2xDIUo/oDE=
+	bh=vPSWiIwKTxd9Ed1+0hgQOuUEL96ZWgFuT1bv8To0O3Y=;
+	b=lngQBToFGIUfaUdX9j36ujSxA9pLdJM34ZTOng1zqWUw8ZgInPaNYf2+9LWCa0Tobf+fYA
+	AOzRjNDrkAjGwDhv5fhH+ei0/gOGxXR4odeECM/n9cpBB+tt1v1a6fAlMtuXjX4ARdcvzt
+	gkF5O6TjH8BGIXU7o6tDg+qN6fthFNw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745563514;
+	s=susede2_ed25519; t=1745563594;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y2VloUgf+dZ8HVD2q4pyh1O1FNhttdCiVnMpAxCviNE=;
-	b=YKZPgG8DFGLIb8VJHPIJIgpwJSL327dSUl5OnzDT0CP2n4R8q6kJQTvHI2aIf1NiG/Hi/u
-	6J9/oVtYfyfq/KBA==
+	bh=vPSWiIwKTxd9Ed1+0hgQOuUEL96ZWgFuT1bv8To0O3Y=;
+	b=F5gV5mdeqq7oyPGki1o7Zax1qv2DKh6tXWJ2dkTL7k1VNSvX8vOeV07Dj3J1ghyWxXdlQZ
+	PVyYTUqCQrqvGICg==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QDp0q5KW;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=YKZPgG8D
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=lngQBToF;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=F5gV5mde
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1745563514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1745563594; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y2VloUgf+dZ8HVD2q4pyh1O1FNhttdCiVnMpAxCviNE=;
-	b=QDp0q5KWlsAeJAHifZbMoDfmW4dbHM7H574GktFYjC/ejPrX4cm0shBfaR/7LhJOQpojsB
-	WMK+KEiyB/qDkY7UdWPAnnwNMQjmkQ9OyVbCfOz2uGCy5HANDLeHlsQwgSrjzi8vT+0Pbv
-	CLH6kjzGs3FPDdTwKvuZI2xDIUo/oDE=
+	bh=vPSWiIwKTxd9Ed1+0hgQOuUEL96ZWgFuT1bv8To0O3Y=;
+	b=lngQBToFGIUfaUdX9j36ujSxA9pLdJM34ZTOng1zqWUw8ZgInPaNYf2+9LWCa0Tobf+fYA
+	AOzRjNDrkAjGwDhv5fhH+ei0/gOGxXR4odeECM/n9cpBB+tt1v1a6fAlMtuXjX4ARdcvzt
+	gkF5O6TjH8BGIXU7o6tDg+qN6fthFNw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1745563514;
+	s=susede2_ed25519; t=1745563594;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y2VloUgf+dZ8HVD2q4pyh1O1FNhttdCiVnMpAxCviNE=;
-	b=YKZPgG8DFGLIb8VJHPIJIgpwJSL327dSUl5OnzDT0CP2n4R8q6kJQTvHI2aIf1NiG/Hi/u
-	6J9/oVtYfyfq/KBA==
+	bh=vPSWiIwKTxd9Ed1+0hgQOuUEL96ZWgFuT1bv8To0O3Y=;
+	b=F5gV5mdeqq7oyPGki1o7Zax1qv2DKh6tXWJ2dkTL7k1VNSvX8vOeV07Dj3J1ghyWxXdlQZ
+	PVyYTUqCQrqvGICg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D75313A79;
-	Fri, 25 Apr 2025 06:45:14 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6B13E13A79;
+	Fri, 25 Apr 2025 06:46:34 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ScQwFXovC2hRYwAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 25 Apr 2025 06:45:14 +0000
-Message-ID: <fc9aa614-8d67-4671-add0-37013fa0d5ec@suse.de>
-Date: Fri, 25 Apr 2025 08:45:14 +0200
+	id BmVfFcovC2iTYwAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 25 Apr 2025 06:46:34 +0000
+Message-ID: <55828969-8ab1-4c4a-9d7d-01ff6756b93f@suse.de>
+Date: Fri, 25 Apr 2025 08:46:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 15/20] block: fail to show/store elevator sysfs
- attribute if elevator is dying
+Subject: Re: [PATCH V3 16/20] block: move elv_register[unregister]_queue out
+ of elevator_lock
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
  linux-block@vger.kernel.org
 Cc: Nilay Shroff <nilay@linux.ibm.com>,
@@ -92,13 +92,13 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
  =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
  Christoph Hellwig <hch@lst.de>
 References: <20250424152148.1066220-1-ming.lei@redhat.com>
- <20250424152148.1066220-16-ming.lei@redhat.com>
+ <20250424152148.1066220-17-ming.lei@redhat.com>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250424152148.1066220-16-ming.lei@redhat.com>
+In-Reply-To: <20250424152148.1066220-17-ming.lei@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9D166210F9
+X-Rspamd-Queue-Id: B7D442116C
 X-Spam-Level: 
 X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
@@ -107,51 +107,51 @@ X-Spamd-Result: default: False [-4.51 / 50.00];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
-	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
 	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ARC_NA(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
 	RCVD_COUNT_TWO(0.00)[2];
 	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid]
 X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 X-Rspamd-Action: no action
 X-Spam-Score: -4.51
 X-Spam-Flag: NO
 
 On 4/24/25 17:21, Ming Lei wrote:
-> Prepare for moving elv_register[unregister]_queue out of elevator_lock
-> & queue freezing, so we may have to call elv_unregister_queue() after
-> elevator ->exit() is called, then there is small window for user to
-> call into ->show()/store(), and user-after-free can be caused.
+> Move elv_register[unregister]_queue out of ->elevator_lock & queue freezing,
+> so we can kill many lockdep warnings.
 > 
-> Fail to show/store elevator sysfs attribute if elevator is dying by
-> adding one new flag of ELEVATOR_FLAG_DYNG, which is protected by
-> elevator ->sysfs_lock.
+> elv_register[unregister]_queue() is serialized, and just dealing with sysfs/
+> debugfs things, no need to be done with queue frozen.
 > 
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> With this change, elevator's ->exit() is called before calling
+> elv_unregister_queue, then user may call into ->show()/store() of elevator's
+> sysfs attributes, and we have covered this issue by adding `ELEVATOR_FLAG_DYNG`.
+> 
+> For blk-mq debugfs, hctx->sched_tags is always checked with ->elevator_lock by
+> debugfs code, meantime hctx->sched_tags is updated with ->elevator_lock, so
+> there isn't such issue.
+> 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-mq-sched.c |  1 +
->   block/elevator.c     | 10 ++++++++--
->   block/elevator.h     |  1 +
->   3 files changed, 10 insertions(+), 2 deletions(-)
+>   block/blk-mq.c   |  3 +-
+>   block/elevator.c | 80 ++++++++++++++++++++++++++++++++++++------------
+>   2 files changed, 62 insertions(+), 21 deletions(-)
 > 
-Not particularly happy about this, but I fear it's the best we can do
-for now.
-
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
