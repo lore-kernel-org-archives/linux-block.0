@@ -1,160 +1,363 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1D81C5D44
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 16:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BE6134CF
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 18:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745599866; cv=none; b=eXUN3VihplO+cBH/NDWu6tF+2jlXMYOni52sb/RNbBQk9x06No7F8+HwxQMCOXD4/4vgLudOgJhit+N0RS6PeRbhFVPT0vRjcxafv1Q5iIgMDf52SVYqgqyU6U0wMR1T3Zq1Ri8IZE/dZ7jLu+RE9YORIfIX2V76uXD40DPjLCQ=
+	t=1745604758; cv=none; b=Cm8hrxeFLtiOTeq12FHczq/3yWUTBkH9npPSViYmEOJjoEJ8BaULJp31hMeQsY9aX4pWfI5O+xKHTvO4WW/LMdyVh6pqCZ1jQEssnNcH6VivYyVsJe9jVkkQjwKUCPZKGEAajlvNRbs4O0OBgtqKyVG7Y/a7mEmFJSm6ZNYVpfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745599866; c=relaxed/simple;
-	bh=hp4LMtMt4NNJ3KzXuRuCcEaD8LGvWoh08vS2qaC4gPs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=VgbmYv3uDfAlFeHhuoadrMVM2/q0supXHKGvGupsvseXppmaStzI4EmHtUmUjVGTPUyahTPEsblhGI2hCOIrGz/vI34r0znGRPcD3V6H8llcHe9ENCdt/mBsBAVesk428rBDkLuilsmQE7D2AhbSLlEwSu9G0OiLjYTKn9XMp5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=PjK2MH3O; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PjK2MH3O"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-8644aa73dfcso87707939f.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 09:51:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745599862; x=1746204662; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CilvDteVvgbX68Q+b26gfS2F2r3PzeLuznn06QzGy60=;
-        b=PjK2MH3OTd60rS16vgiEkHLOOPO8zSem+4ag0xIGFiqzmJmjiJBP4RfvW5KpGPMDRg
-         Nv7z7BJ1ZjTt4CZ5PGoD76CMCkwraseNIjw5YbAd3r4QYZmysL0hv/wl+Citnd8ZQcPM
-         PoPmRHqJ7BhvsPA7LY0iKh6l+hu2OXQ0lVog3tfJdIKPkJNkvfWJa53EtWuOmM/QhgzI
-         NuMuU3O7sFxh//ILXFKAnc6/4n2WV+viLCWdhnvJ3wx05XjGgZ5zWtVZ59W5200oVigo
-         voqFBUlqE8/q2GZYySwYq0ASdhYjkpYPzN6vGs1CY9t8A6wkELhnnl9gpmSimB1jBe1s
-         7O1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745599862; x=1746204662;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CilvDteVvgbX68Q+b26gfS2F2r3PzeLuznn06QzGy60=;
-        b=BapmSbv85y6QrlRdnRfz3aiVly9tld99iYzsK4dkz/ooAG6ILH1i15x3iG7uvrzfzd
-         VvD0UHqrWKdW4zusbD4NRFf/my2uVPJwaibMd8WxBZDHjTfuofGmxecRl+dg7x00HyWz
-         ftTtfcjRwIN7uOkQMncGvSl0xGhH6j1OeuKbwUEMl8fSy99jtjZn9PRNePHVa5FQv1yP
-         55NQSF1kZ6O8SlV2XaSw1heIa6/nzsZGTpfNH4w9X29k3Mjf+7sAADIwxjFvj7/qNuCz
-         eybQhv1nl/EyLdueg30F89nyBTNkjL0SYy5OFlNdIQw6w4Amv5iDZeY0BxM66StNoDBk
-         ctog==
-X-Gm-Message-State: AOJu0YzgF1C0Vx3DQ/soH71LATw6KbS5HWfT1iO3bWvGf3iz3ONUHnUT
-	yv4g0fgoWcwegFcBQK6PkGyQK3yQpIrs26Qh9m0fD0LytwAD55U5/gJWE4Re6XdMquuBvFCxxiw
-	u
-X-Gm-Gg: ASbGncsE33vY8V4nPqACMMRX/aiovoqdrOoSZRxzRRemPfpsE7Np+RKbPLWUSIZpums
-	Hcw3rXawz5gHKeHHKdM9v8zm8tHQBEtoz3PuED7HhL9yMojzMJRAEzQ4KYL/Lgvh7Ykvvg1QuGW
-	G/zFABownpkRqWDnvi6W50dr8ewtWiScxq4jm5tcB/rw0hcAIHrpKp63bXoJ7lwqDwt7ErWc36i
-	uRdEDxHlsL7WX4rzbOmJkRPO7i2AW3RJyQPoLez8Jr68Cj9tZ0W16wKJqHj+dC8Dzp2Z0TDAwaF
-	c1i0XGzmJxK6RjBsjQ==
-X-Google-Smtp-Source: AGHT+IGY1ik3t9swPDQmdn7x0j5yaYVg/VkOzWGHtEndDUM/CDF+yqsOfqIMhV1QCtIY2akm7GZo+Q==
-X-Received: by 2002:a05:6602:13c3:b0:85b:3763:9551 with SMTP id ca18e2360f4ac-8645ccd5f87mr391797439f.7.1745599862487;
-        Fri, 25 Apr 2025 09:51:02 -0700 (PDT)
-Received: from [172.19.0.90] ([99.196.129.216])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a3bab1sm854916173.36.2025.04.25.09.50.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Apr 2025 09:51:01 -0700 (PDT)
-Message-ID: <011eb55a-9a9e-4d59-8efc-8b51037fc306@kernel.dk>
-Date: Fri, 25 Apr 2025 10:50:54 -0600
+	s=arc-20240116; t=1745604758; c=relaxed/simple;
+	bh=Py7gwV5nJwef16fCU/CwzoX88xDsSUbfm/bLipqX82U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XLKJkxYe9aOkeFweVTibAaFHbolWgD1Ioq3xfFmqT5uPRKxMBYgMad+U4mAjBxV6DodeNuXhAzAA0xIjNhGYcuy7V5Z+PVDDu/Xmp2mv2VmzGjox+D1Zeufh+K+/nmMdmkqEbr/yFDOkGtXKbHVr7DTqVD7xn+odw5OenH0tiC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id D81F368BEB; Fri, 25 Apr 2025 20:12:27 +0200 (CEST)
+Date: Fri, 25 Apr 2025 20:12:27 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V3 09/20] block: simplify elevator reattachment for
+ updating nr_hw_queues
+Message-ID: <20250425181227.GA25925@lst.de>
+References: <20250424152148.1066220-1-ming.lei@redhat.com> <20250424152148.1066220-10-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.15-rc4
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-Hi Linus,
-
-Set of fixes for block that should go into the 6.15 release. This pull
-request contains:
-
-- Fix autoloading of drivers from stat*(2)
-
-- Fix losing read-ahead setting one suspend/resume, when a device is
-  re-probed.
-
-- Fix race between setting the block size and page cache updates.
-  Includes a helper that a coming XFS fix will use as well.
-
-- ublk cancelation fixes.
-
-- ublk selftest additions and fixes.
-
-- NVMe pull via Christoph
-	- fix an out-of-bounds access in nvmet_enable_port
-	  (Richard Weinberger) 
-
-Please pull!
+Content-Type: multipart/mixed; boundary="liOOAslEiF7prFVr"
+Content-Disposition: inline
+In-Reply-To: <20250424152148.1066220-10-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
 
-The following changes since commit 81dd1feb19c7a812e51fa6e2f988f4def5e6ae39:
+--liOOAslEiF7prFVr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-  Merge tag 'nvme-6.15-2025-04-17' of git://git.infradead.org/nvme into block-6.15 (2025-04-17 06:18:49 -0600)
+On Thu, Apr 24, 2025 at 11:21:32PM +0800, Ming Lei wrote:
+> +static int __elevator_change(struct request_queue *q,
+> +			     const char *elevator_name)
 
-are available in the Git repository at:
+There's still not good reason for this helper.
 
-  git://git.kernel.dk/linux.git tags/block-6.15-20250424
+I'd suggest you add the two first attached patches before this one
+(it'll need a bi of reabsing as all of them are after your entire
+sweries right now) and then fold the third one into this, which will
+give us less code and a cleaner interface.
 
-for you to fetch changes up to f40139fde5278d81af3227444fd6e76a76b9506d:
 
-  ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd (2025-04-24 19:52:20 -0600)
+--liOOAslEiF7prFVr
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0001-block-look-up-the-elevator-type-in-elevator_switch.patch"
 
-----------------------------------------------------------------
-block-6.15-20250424
+From 44da16a97ef758d1d9fe7c54c8360388f585d0c5 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 25 Apr 2025 07:01:39 -0700
+Subject: block: look up the elevator type in elevator_switch
 
-----------------------------------------------------------------
-Christoph Hellwig (5):
-      block: never reduce ra_pages in blk_apply_bdi_limits
-      block: move blkdev_{get,put} _no_open prototypes out of blkdev.h
-      block: remove the backing_inode variable in bdev_statx
-      block: don't autoload drivers on stat
-      block: don't autoload drivers on blk-cgroup configuration
+That makes the function nicely self-contained and can be used
+to avoid code duplication.
 
-Darrick J. Wong (2):
-      block: fix race between set_blocksize and read paths
-      block: hoist block size validation code to a separate function
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/elevator.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-Jens Axboe (1):
-      Merge tag 'nvme-6.15-2025-04-24' of git://git.infradead.org/nvme into block-6.15
-
-Ming Lei (4):
-      selftests: ublk: fix recover test
-      selftests: ublk: remove useless 'delay_us' from 'struct dev_ctx'
-      ublk: call ublk_dispatch_req() for handling UBLK_U_IO_NEED_GET_DATA
-      ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd
-
-Richard Weinberger (1):
-      nvmet: fix out-of-bounds access in nvmet_enable_port
-
-Uday Shankar (1):
-      selftests: ublk: common: fix _get_disk_dev_t for pre-9.0 coreutils
-
- block/bdev.c                                    | 67 +++++++++++++++++++------
- block/blk-cgroup.c                              |  2 +-
- block/blk-settings.c                            |  8 ++-
- block/blk-zoned.c                               |  5 +-
- block/blk.h                                     |  3 ++
- block/fops.c                                    | 18 ++++++-
- block/ioctl.c                                   |  6 +++
- drivers/block/ublk_drv.c                        | 41 ++++++++-------
- drivers/nvme/target/core.c                      |  3 ++
- include/linux/blkdev.h                          |  5 +-
- tools/testing/selftests/ublk/kublk.c            |  1 +
- tools/testing/selftests/ublk/kublk.h            |  3 --
- tools/testing/selftests/ublk/test_common.sh     |  4 +-
- tools/testing/selftests/ublk/test_generic_05.sh |  2 +-
- 14 files changed, 121 insertions(+), 47 deletions(-)
-
+diff --git a/block/elevator.c b/block/elevator.c
+index a637426da56d..773b8931d874 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -591,14 +591,18 @@ static bool use_default_elevator(struct request_queue *q)
+  * If switching fails, we are most likely running out of memory and not able
+  * to restore the old io scheduler, so leaving the io scheduler being none.
+  */
+-static int elevator_switch(struct request_queue *q, struct elevator_type *new_e,
+-			   struct elv_change_ctx *ctx)
++static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ {
++	struct elevator_type *new_e;
+ 	int ret;
+ 
+ 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 	lockdep_assert_held(&q->elevator_lock);
+ 
++	new_e = elevator_find_get(ctx->name);
++	if (!new_e)
++		return -EINVAL;
++
+ 	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+@@ -621,6 +625,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e,
+ 			new_e->elevator_name);
+ 	}
+ 
++	elevator_put(new_e);
+ 	return ret;
+ }
+ 
+@@ -686,8 +691,6 @@ static int __elevator_change(struct request_queue *q,
+ 			     struct elv_change_ctx *ctx)
+ {
+ 	const char *elevator_name = ctx->name;
+-	struct elevator_type *e;
+-	int ret;
+ 
+ 	lockdep_assert_held(&q->tag_set->update_nr_hwq_sema);
+ 
+@@ -701,12 +704,7 @@ static int __elevator_change(struct request_queue *q,
+ 		return 0;
+ 	}
+ 
+-	e = elevator_find_get(elevator_name);
+-	if (!e)
+-		return -EINVAL;
+-	ret = elevator_switch(q, e, ctx);
+-	elevator_put(e);
+-	return ret;
++	return elevator_switch(q, ctx);
+ }
+ 
+ static int elevator_change(struct request_queue *q,
 -- 
-Jens Axboe
+2.47.2
 
+
+--liOOAslEiF7prFVr
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0002-block-fold-elevator_disable-into-elevator_switch.patch"
+
+From 1bfce1a308b9e46734ed56196b4e9fe31b5a0036 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 25 Apr 2025 07:10:35 -0700
+Subject: block: fold elevator_disable into elevator_switch
+
+This removes duplicate code, and keeps the callers tidy.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/elevator.c | 59 ++++++++++++++++--------------------------------
+ 1 file changed, 20 insertions(+), 39 deletions(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 773b8931d874..59ff0abde920 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -593,15 +593,17 @@ static bool use_default_elevator(struct request_queue *q)
+  */
+ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ {
+-	struct elevator_type *new_e;
+-	int ret;
++	struct elevator_type *new_e = NULL;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 	lockdep_assert_held(&q->elevator_lock);
+ 
+-	new_e = elevator_find_get(ctx->name);
+-	if (!new_e)
+-		return -EINVAL;
++	if (strncmp(ctx->name, "none", 4)) {
++		new_e = elevator_find_get(ctx->name);
++		if (!new_e)
++			return -EINVAL;
++	}
+ 
+ 	blk_mq_quiesce_queue(q);
+ 
+@@ -610,12 +612,17 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ 		__elevator_exit(q);
+ 	}
+ 
+-	ret = blk_mq_init_sched(q, new_e);
+-	if (ret)
+-		goto out_unfreeze;
+-
+-	ctx->new = q->elevator;
+-	blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
++	if (new_e) {
++		ret = blk_mq_init_sched(q, new_e);
++		if (ret)
++			goto out_unfreeze;
++		ctx->new = q->elevator;
++	} else {
++		blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
++		q->elevator = NULL;
++		q->nr_requests = q->tag_set->queue_depth;
++	}
++	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
+ 
+ out_unfreeze:
+ 	blk_mq_unquiesce_queue(q);
+@@ -625,28 +632,11 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ 			new_e->elevator_name);
+ 	}
+ 
+-	elevator_put(new_e);
++	if (new_e)
++		elevator_put(new_e);
+ 	return ret;
+ }
+ 
+-static void elevator_disable(struct request_queue *q,
+-			     struct elv_change_ctx *ctx)
+-{
+-	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+-	lockdep_assert_held(&q->elevator_lock);
+-
+-	blk_mq_quiesce_queue(q);
+-
+-	ctx->old = q->elevator;
+-	__elevator_exit(q);
+-	blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
+-	q->elevator = NULL;
+-	q->nr_requests = q->tag_set->queue_depth;
+-	blk_add_trace_msg(q, "elv switch: none");
+-
+-	blk_mq_unquiesce_queue(q);
+-}
+-
+ static void elv_exit_and_release(struct request_queue *q)
+ {
+ 	struct elevator_queue *e;
+@@ -690,20 +680,11 @@ static int elevator_change_done(struct request_queue *q,
+ static int __elevator_change(struct request_queue *q,
+ 			     struct elv_change_ctx *ctx)
+ {
+-	const char *elevator_name = ctx->name;
+-
+ 	lockdep_assert_held(&q->tag_set->update_nr_hwq_sema);
+ 
+ 	/* Make sure queue is not in the middle of being removed */
+ 	if (!ctx->init && !blk_queue_registered(q))
+ 		return -ENOENT;
+-
+-	if (!strncmp(elevator_name, "none", 4)) {
+-		if (q->elevator)
+-			elevator_disable(q, ctx);
+-		return 0;
+-	}
+-
+ 	return elevator_switch(q, ctx);
+ }
+ 
+-- 
+2.47.2
+
+
+--liOOAslEiF7prFVr
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0003-block-remove-__elevator_change.patch"
+
+From dcda3f508e5f938cb27d4b743226ca4d8af75e28 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 25 Apr 2025 07:18:42 -0700
+Subject: block: remove __elevator_change
+
+Not much of a point in sharing code between callers with very different
+expectations.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/elevator.c | 45 ++++++++++++++++++++-------------------------
+ 1 file changed, 20 insertions(+), 25 deletions(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 59ff0abde920..b358858387a0 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -674,25 +674,13 @@ static int elevator_change_done(struct request_queue *q,
+ 	return ret;
+ }
+ 
+-/*
+- * Switch this queue to the given IO scheduler.
+- */
+-static int __elevator_change(struct request_queue *q,
+-			     struct elv_change_ctx *ctx)
+-{
+-	lockdep_assert_held(&q->tag_set->update_nr_hwq_sema);
+-
+-	/* Make sure queue is not in the middle of being removed */
+-	if (!ctx->init && !blk_queue_registered(q))
+-		return -ENOENT;
+-	return elevator_switch(q, ctx);
+-}
+-
+ static int elevator_change(struct request_queue *q,
+ 			   struct elv_change_ctx *ctx)
+ {
+ 	unsigned int memflags;
+-	int ret = 0;
++	int ret;
++
++	lockdep_assert_held(&q->tag_set->update_nr_hwq_sema);
+ 
+ 	memflags = blk_mq_freeze_queue(q);
+ 	/*
+@@ -706,14 +694,20 @@ static int elevator_change(struct request_queue *q,
+ 	 */
+ 	blk_mq_cancel_work_sync(q);
+ 	mutex_lock(&q->elevator_lock);
+-	if (!q->elevator || !elevator_match(q->elevator->type, ctx->name))
+-		ret = __elevator_change(q, ctx);
++	/* Make sure queue is not in the middle of being removed */
++	ret = -ENOENT;
++	if (!ctx->init && !blk_queue_registered(q))
++		goto out_unlock;
++	ret = 0;
++	if (q->elevator && elevator_match(q->elevator->type, ctx->name))
++		goto out_unlock;
++	ret = elevator_switch(q, ctx);
++out_unlock:
+ 	mutex_unlock(&q->elevator_lock);
+ 	blk_mq_unfreeze_queue(q, memflags);
+-	if (!ret)
+-		ret = elevator_change_done(q, ctx);
+-
+-	return ret;
++	if (ret)
++		return ret;
++	return elevator_change_done(q, ctx);
+ }
+ 
+ /*
+@@ -768,17 +762,18 @@ void elevator_set_none(struct request_queue *q)
+ void elv_update_nr_hw_queues(struct request_queue *q)
+ {
+ 	struct elv_change_ctx ctx = {
+-		.name	= "none",
+ 		.uevent	= true,
+ 	};
+-	int ret = -ENODEV;
++	int ret = -ENOENT;
+ 
++	lockdep_assert_held(&q->tag_set->update_nr_hwq_sema);
+ 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 
+ 	mutex_lock(&q->elevator_lock);
+-	if (q->elevator && !blk_queue_dying(q))
++	if (blk_queue_registered(q) && !blk_queue_dying(q) && q->elevator) {
+ 		ctx.name = q->elevator->type->elevator_name;
+-	ret = __elevator_change(q, &ctx);
++		ret = elevator_switch(q, &ctx);
++	}
+ 	mutex_unlock(&q->elevator_lock);
+ 	blk_mq_unfreeze_queue_nomemrestore(q);
+ 
+-- 
+2.47.2
+
+
+--liOOAslEiF7prFVr--
