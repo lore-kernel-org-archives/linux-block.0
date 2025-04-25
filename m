@@ -1,115 +1,92 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BCA1BC2A
-	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 04:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1548205513
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 04:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745553884; cv=none; b=CCgMX1PKIpNcLAgc1lWEgpCneTGLef1Ep/eLCKjcXobPgNdh1DZwgS1Sn9o9FOYe+EBxhbmz1iZhPDts+z21OJl8we29UYqkifm8yhEfr1DmFSYcnuPMzARmI858r+7pCRk7iQQevKhV+YhsTHqXWo4wmDhViujgG0t/qlpsNoY=
+	t=1745554021; cv=none; b=FcbaVgHPmzMb+YIV+1E2vQjfr/qCP0WjiG6qo7mKThfKvYZ0Ddle/rhCHppIYBT+brgL4YhtN/tqM0gDraCY3VEWfuTP5PLY+ejNb/Nk7v8gBxgKwAwIn9xqmPF5W6FAjb7ZCnVpuEAvng8SJwfpEJoQoNdAaoyju79eRHty6Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745553884; c=relaxed/simple;
-	bh=Kwof+fO62y7e/RHa0On3RX/TwZu9uzYKZRQz19L5h0o=;
+	s=arc-20240116; t=1745554021; c=relaxed/simple;
+	bh=WtJMnjwowPfe+6KgXjjmyyZyeGpcViFHXukmWXOJLbQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YO5KCBFWynC0LtAeRXFXeDpS+akzF2Isw7uK1XKS6OvyoygvkNN22MtPhn0CySracaFYKLfj38j50JiGV7x01+JkgrTeg8hkP4TUaWZKuxMvNRzF3nkrHNIv/rz12WawHxzB1gw6YFneuwdL0bvOYDaqgTgKQr+dRfVvcHv0vN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TqWiWq1z; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=WKaENH6bYu4np2weEW/CS62isG0+DS6KOrS25VkrpQPlt18j3Qow8sYzrRaqVz3T3Mer7l0R8RaaC3ARojkvVIzUo0j3va+IRM/mWl6Mh5+QvFDfiNgw5ILJ331CtUVuUnzUsZLp5TgbItYRrHZXzgQrV1qihQSKwGPLn1WshkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e7mlQmc5; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TqWiWq1z"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c55d853b54so22757285a.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Apr 2025 21:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745553881; x=1746158681; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mT5VjZuJoUlawhbHokQ45PcTHgcGF9j1l+eGww/vtv4=;
-        b=TqWiWq1z9jXsNeLtwE073Akj1Wl3QT0/FVKL9+MkrnnRsqcaYlgg2HEP0dpYe02xga
-         WOXxeCO54P1Dc7P2UEnxmLuSisO+QtQyp6KzYjlYhDueZxJeuryXCHI4hOXGoGq2nwxD
-         yzsvO3OuMeaCM66PvBCZiI4taEVs6bsuRlkXrIXNdxPiZ4aODQfRwzTk9iQ/5CKGmS1n
-         rOiHz0rWVack2f8KRxf+ddhsycaX6sFFhfKItpRef5aKGE3sX8spcnUelYVddqhGLDVA
-         NlaqxALvf6VlUTHnMZvJBfmNTzCVQO861BVV2I9LZI9aDNHLDp1QFpZ4PPYwxrJzG4mm
-         NHZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745553881; x=1746158681;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mT5VjZuJoUlawhbHokQ45PcTHgcGF9j1l+eGww/vtv4=;
-        b=CjFR5pEJYByHvH9jQC/MrY6Ypwoh+oFmOkv+U4QAg+ev8BnoxXbVsDUZz9XKbVTwmx
-         BNVH7BNAlBB6XhIcB/2ohfNRDbVWU5omWj3/6cBaLQj1Aa0mOBXUPUiefaFeXClwa2VV
-         UZ0uyCz8yrUkrDrb/UwgG7SQni313AkjinRC70oMQRpXxdjCzkUXtE4Lamn1rQ2NnVK4
-         Ky6FX/FFotNNDQif9wPfc0iArfPKwB8t+PyvkQ/Z3cM2DjiHwsutD2/8bSO1ty9ZptN5
-         5Zy7Oz57uKzE1iVNMRHRxDy6mkivUIY3Gim8j+XldPFtAoclPc+A0Vt6Ce7MvILJHs3E
-         h2hA==
-X-Forwarded-Encrypted: i=1; AJvYcCUL36mZjXtFY9vYOB43CNolW3G4Tnrsrw7zZd3C+P3vq1e5alo/sL/+lWoWPbqsXisdpvoPnFqSJcpN+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzveqgV77nn53X3250TDrS/Ud0mEV3dA/u86vUkEPRmZ7eMij4t
-	nlGAgRdWUu2VqhYOSSpE5RFet0Auna/kmP4ISF2Z5uR1Uz3d96Nppdgj302b
-X-Gm-Gg: ASbGnctM8hioFPmrWLVzJw2j66RYCUkTdcdvvOAj+MtPpSy2k589KjduVWXeg7s00KS
-	5TuCDIEtYw3Nmj48b3ZUSnjUjyuK24TMrCs82Oe4xRajDnisCKO+wfgERujLqOMo3BaM23f8cZe
-	soyreRHCK53MLKm7J5KIVav9EftLemX1AlLRKcRBBPVCmwf38HTdLLS7nac5Ts6rsJPOvEq0X1S
-	0e6jIWJbZ+vM55xIYb55ONYY0GPLh8yC6oaCAB6aQINLhmLucqhOjsCna+zBQqHfyFh0oZ+5XQW
-	iQzs+twy39jcF5JzmgTmQvKdJspCsghhLuFNyItd75kFH6+drFWZC8skIty7MHslemys9beIsTG
-	QPnumu5s2mLdupAwF
-X-Google-Smtp-Source: AGHT+IGvsgdYcMJOawYzasIKw0eOoRQ4FqFhC8ackjUTEfEj1ILDqHFQItCppOQxLJuGi62ODhURjQ==
-X-Received: by 2002:a05:622a:1a28:b0:471:f08e:d65d with SMTP id d75a77b69052e-4801c88b9b5mr4759931cf.6.1745553881515;
-        Thu, 24 Apr 2025 21:04:41 -0700 (PDT)
-Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47e9f5bcf0dsm20764211cf.35.2025.04.24.21.04.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 21:04:41 -0700 (PDT)
-Message-ID: <790260c8-09b4-96b3-310f-f9c5a93ef7ff@gmail.com>
-Date: Fri, 25 Apr 2025 00:04:39 -0400
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e7mlQmc5"
+Message-ID: <8352c76d-ad30-4c2e-91bd-9676df21b293@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745554015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=McgZG3+kgRVX1m1JTnpDAlQQ4f5/9JzIXvGUQ0n2AG8=;
+	b=e7mlQmc5secbcKyizKg9GNyiWPCUKFVJxMmaikba9aLEHzAw03yTr5rJrlS0h2qx4tnOk1
+	qmFn7/hxKlzyHOhynFgHAODkM6HYsMLFfRHzSD4IODbaxEM2jQlgJxV/CFjDAxhni0oGW2
+	seUQ99KLl3t0+NCpWikuVSaaD5Prtuc=
+Date: Fri, 25 Apr 2025 06:06:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
-Content-Language: en-US
-To: "hch@infradead.org" <hch@infradead.org>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20250423164957.2293594-1-seanga2@gmail.com>
- <aAnxqAv41Quh66Q1@infradead.org>
- <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
- <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
- <aApFcW-fsdUP4Ztj@infradead.org>
- <e94e55a6-a93d-2c7b-2c3b-8829ab53848b@gmail.com>
- <aApJWu1KLw7607Vz@infradead.org>
-From: Sean Anderson <seanga2@gmail.com>
-In-Reply-To: <aApJWu1KLw7607Vz@infradead.org>
+Subject: Re: [PATCH] loop: Add sanity check for read/write_iter
+To: Lizhi Xu <lizhi.xu@windriver.com>,
+ syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <680a45db.050a0220.10d98e.000a.GAE@google.com>
+ <20250425034057.3133195-1-lizhi.xu@windriver.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20250425034057.3133195-1-lizhi.xu@windriver.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 4/24/25 10:23, hch@infradead.org wrote:
-> On Thu, Apr 24, 2025 at 10:20:09AM -0400, Sean Anderson wrote:
->> Because the test is trivially wrong.
+在 2025/4/25 5:40, Lizhi Xu 写道:
+> Some file systems do not support read_iter or write_iter, such as selinuxfs
+> in this issue.
+> So before calling them, first confirm that the interface is supported and
+> then call it.
 > 
-> I stronly disagree with that.  We also don't support < 512 byte LBA
-> sizes to give an example.
+> Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
+> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> ---
+>   drivers/block/loop.c | 13 +++++++++----
+>   1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 674527d770dc..4f968e3071ed 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -449,10 +449,15 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>   	cmd->iocb.ki_flags = IOCB_DIRECT;
+>   	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
+>   
+> -	if (rw == ITER_SOURCE)
+> -		ret = file->f_op->write_iter(&cmd->iocb, &iter);
+> -	else
+> -		ret = file->f_op->read_iter(&cmd->iocb, &iter);
+> +	ret = 0;
+> +	if (rw == ITER_SOURCE) {
+> +		if (likely(file->f_op->write_iter))
+> +			ret = file->f_op->write_iter(&cmd->iocb, &iter);
+> +	}
+> +	else {
+> +		if (likely(file->f_op->read_iter))
 
-fio already supports it
+"else if" is better?
 
-you are just passing a wrong parameter
+Zhu Yanjun
+> +			ret = file->f_op->read_iter(&cmd->iocb, &iter);
+> +	}
+>   
+>   	lo_rw_aio_do_completion(cmd);
+>   
 
-< 512 LBA is a different case because there is so much both in kernel
-and in userspace that assumes 512-byte granularity. But there is no
-such deeply-ingrained assumption for zones. You just have to set the
-parameter correctly.
-
-Plus, smaller zones are more efficient at reducing write amplification,
-in the same way as smaller block sizes.
-
-If you really think such zone sizes should not be supported, then go
-add such a restriction to all the zone standards.
-
-> Yes, it would be nice to have a sanity check for that and reject it
-> early, but no one is going to rewrite tests to remove that "assumption".
-
-This assumption is very weak. It can easily be removed.
-
---Sean
