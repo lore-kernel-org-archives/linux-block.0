@@ -1,117 +1,142 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862EB22A1C0;
-	Fri, 25 Apr 2025 05:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9E82701D7
+	for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 06:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745559494; cv=none; b=gVutvOo+JlZF9VuqG0NVJJXx2BbiTtW+A4u5XzKAqAjj7rJ2eBz90PSayC3JJx0DgJXz4XKxqCtFQy9AMeOOtEXj0pz+pgsEj1sfi4syPq+a5god6sbEWa3iQ3WgEwGGTNHwAOUbcjzuj44R9BgSL4dkF0cTfBVwNTbzDyEKmjE=
+	t=1745561301; cv=none; b=TDCsQ6hM0V1hwAk25xwq8Ww7eXp+txujNzPd+xAy9fWCSUXLR6mfptETHqWj0dnbTNAGlQEmYEs/CCcD928Vdisg5huzWFLeCFTaCau75HeoLRaukohdjsU4oc1jXv1RuD7g5icDhkBQTe1hYpO76sy/smiORGYgmBK4T8IeshE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745559494; c=relaxed/simple;
-	bh=tCq1TMcBi/EJFu3yiehmqYHr+5YiokYp40hNMkdBeww=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jZbaA/s3knXMGLTvdmYQ+Hn2gzsgkX/JuvWjmKOhm1NWgrHXqioLoRKNHbPkFTvWC45mRA7rasSHm8nqswbmfCPcxKQbL/+4Kq9+XR1JllDvxCrdFZKUpjtKI/MOd7wZYNotOJfCq3RtYOkhvFqKo4tf/D8Xt+/wB6ErMST/VjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53P5QRW3011328;
-	Thu, 24 Apr 2025 22:38:07 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 466jhd3ans-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 24 Apr 2025 22:38:07 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Thu, 24 Apr 2025 22:38:06 -0700
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Thu, 24 Apr 2025 22:38:04 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <ming.lei@redhat.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V2] loop: Add sanity check for read/write_iter
-Date: Fri, 25 Apr 2025 13:38:03 +0800
-Message-ID: <20250425053803.3614260-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAFj5m9LVuekp_n6pEfs17n6QB3Q0yu-qRP67NOJb9ZXRNyhP3Q@mail.gmail.com>
-References: <CAFj5m9LVuekp_n6pEfs17n6QB3Q0yu-qRP67NOJb9ZXRNyhP3Q@mail.gmail.com>
+	s=arc-20240116; t=1745561301; c=relaxed/simple;
+	bh=Si0zxM1ssUf8lB4MTmLFW6QKrOZt531QRQdtgx2s9JY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z2vgw9jlBQeHjF9kP88IkmYZE27jCSIu7BgQtFBqKcva3GNeHQwwwvbYFqFsOiF+r3MTvbPaELwMEQPD6ApIoCEvFPBujn1hZ4K2b6u0U/cPMmElCo88dYabBQ2TGBSMaF8pbsGx+qrp5cBM0FFhObkCMdJKz5COutunlIGeoz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fbzjAjdF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1d4E319k; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fbzjAjdF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1d4E319k; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fbzjAjdF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1d4E319k";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fbzjAjdF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1d4E319k"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id F2F822116B;
+	Fri, 25 Apr 2025 06:08:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745561295; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0asHzsYchsnU8ObT1tpU4c9+Idj2lnKi3ysOVfxJYps=;
+	b=fbzjAjdF8ugBuBI9emUqY7+mLudlynYtJu4JapNY3mJUiItF+OXIlFEbVDZTGTYfOafooi
+	tVuYScan7g2tcKbW3Haw0FTAkhPIHRiBrxsz7b6vGq9roerGMIIOooivlVS4hcrjUuS7mV
+	HA6yn6+9uT6rBmy+WarSJL/vzKFMDfE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745561295;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0asHzsYchsnU8ObT1tpU4c9+Idj2lnKi3ysOVfxJYps=;
+	b=1d4E319k/wyQBjIctQZrBXke2iBZwhZSjODzKnE6v1K8WuiktfcW27L2Om/61t6hl6xmi2
+	iatkz2tBcgcUVhBw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745561295; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0asHzsYchsnU8ObT1tpU4c9+Idj2lnKi3ysOVfxJYps=;
+	b=fbzjAjdF8ugBuBI9emUqY7+mLudlynYtJu4JapNY3mJUiItF+OXIlFEbVDZTGTYfOafooi
+	tVuYScan7g2tcKbW3Haw0FTAkhPIHRiBrxsz7b6vGq9roerGMIIOooivlVS4hcrjUuS7mV
+	HA6yn6+9uT6rBmy+WarSJL/vzKFMDfE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745561295;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0asHzsYchsnU8ObT1tpU4c9+Idj2lnKi3ysOVfxJYps=;
+	b=1d4E319k/wyQBjIctQZrBXke2iBZwhZSjODzKnE6v1K8WuiktfcW27L2Om/61t6hl6xmi2
+	iatkz2tBcgcUVhBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AC23D13A80;
+	Fri, 25 Apr 2025 06:08:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id szgLKM4mC2h4WgAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 25 Apr 2025 06:08:14 +0000
+Message-ID: <08d5760b-45b5-44fb-a49b-a8cadf4c178a@suse.de>
+Date: Fri, 25 Apr 2025 08:08:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 04/20] block: use q->elevator with ->elevator_lock held
+ in elv_iosched_show()
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Christoph Hellwig <hch@lst.de>
+References: <20250424152148.1066220-1-ming.lei@redhat.com>
+ <20250424152148.1066220-5-ming.lei@redhat.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250424152148.1066220-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=ZNDXmW7b c=1 sm=1 tr=0 ts=680b1fbf cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=5yON4tJlvpFzjYmBgeMA:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-ORIG-GUID: FpZcOjmb2kLse7D_SJIQHczlaX8wGweY
-X-Proofpoint-GUID: FpZcOjmb2kLse7D_SJIQHczlaX8wGweY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDAzOSBTYWx0ZWRfXx59o8i9e5iwR jEVbskttJzNY5b0KoXfMX9pCsi4thmrMg0SS0Pp4AfRXzm/XtAf7v7SbxveekH591b/oatynPW0 X8YDguDzrqkmvcVDU9wIl9zRHgsGq+Z6crIMJ80shEEjq3jKwEn3I9rSvgxY06+ddtYvL1fZnE+
- k0+Lb1CQvbttRoy+WQH1gUV6p9+0u/pd0PYJlk0eCBbWyKDeIxECSkbZyp/AP2IFR7dAms+81cn zFTmfTQ5eocc9HifGawFvvSo3wNm4zlhYbKbr0m0D5kMCsVXpr7pwlDVBdnQCLMU5DpXOUhYret 6WHABOUB8Oj/vxZUEIaPFlWFlGbV7eq7qnlmzohFmQgm34pn6pT1OIa4RzMVXYpSHZH/QXRn8It
- 8x2yiHx2KnniZ664zc/x39xGkeMFjg6MB5TAbWwEgy/NnU15YH6PUe84lnLSiXVCn/UMBxTN
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-25_01,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 adultscore=0 spamscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=932 mlxscore=0 suspectscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
- definitions=main-2504250039
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-Some file systems do not support read_iter or write_iter, such as selinuxfs
-in this issue.
-So before calling them, first confirm that the interface is supported and
-then call it.
+On 4/24/25 17:21, Ming Lei wrote:
+> Use q->elevator with ->elevator_lock held in elv_iosched_show(), since
+> the local cached elevator reference may become stale after getting
+> ->elevator_lock.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/elevator.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
-V1 -> V2: move check to loop_configure and loop_change_fd
+Cheers,
 
- drivers/block/loop.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc..d2651e3b5142 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -603,6 +603,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (!file)
- 		return -EBADF;
- 
-+	if (unlikely(!file->f_op->read_iter))
-+		return -EINVAL;
-+
-+	if (file->f_mode & FMODE_WRITE && unlikely(!file->f_op->write_iter))
-+		return -EINVAL;
-+
- 	/* suppress uevents while reconfiguring the device */
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
- 
-@@ -1039,6 +1045,14 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 
- 	if (!file)
- 		return -EBADF;
-+
-+	if (unlikely(!file->f_op->read_iter))
-+		return -EINVAL;
-+
-+	if (((file->f_mode & FMODE_WRITE) || (mode & BLK_OPEN_WRITE)) &&
-+	    unlikely(!file->f_op->write_iter))
-+		return -EINVAL;
-+
- 	is_loop = is_loop_device(file);
- 
- 	/* This is safe, since we have a reference from open(). */
+Hannes
 -- 
-2.43.0
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
