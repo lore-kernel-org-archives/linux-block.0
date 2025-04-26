@@ -1,112 +1,111 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6771A3161
-	for <linux-block@vger.kernel.org>; Sat, 26 Apr 2025 05:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC962221FC1
+	for <linux-block@vger.kernel.org>; Sat, 26 Apr 2025 09:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745644993; cv=none; b=KEY1XXN56MG38Cw/L2GazsYvbyPEIgRi5pTUVHs4cD5wkyOmxx4QCUP6FI6SmiM9iX27396NDXSTE604Z3Wm2iue2td7Ecqq2ikuN8UPlhyHqXjkJdQyi0651XNejPgOyODnGA4iwYrrrowBwnldGcGJuFoJWbtVTdFFm+xhCxk=
+	t=1745660488; cv=none; b=YTSeVgDwefPIN6Ezy7OKompIC8Dqv0+cswjhfOYccEYXxqvsFa9tblTlZXJrV5CP6FOh9EExS4jiADWhlKbUK9JKwMa7iTMOR5f4LH4Cd/Zu4K/YkKZQNkyo4FXOa2g7shNcSKttMTxgC/nF27tIbGcr9mWIlDCC3R7eir2MYQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745644993; c=relaxed/simple;
-	bh=BIfhBLGcJnbdsDdXfw3ZF/aHVFjnxifj1ZDRpnZLl9I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AdE9hunj4Hr4OnGyhTq3L1r2XiFMLx95xNdYweR2K53zzBETPdW0B6NidMgRHDqfrGo6PRVrDrhXpCieR9X8BDHSnTm/yAkRy3fbTN0J1q+8Imvtc1L3bPZ8YtiJjxI0ZEKC/ylg5K/hlflato4SbQlMYoqntZ0WuiXkm4qBv0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlAw626W; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745660488; c=relaxed/simple;
+	bh=cSvfXMWl00m70lT8oM2ogW4ycYtBP4A24mCMLa/Pm1E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWUExyvd6o0EOiD62pv//nXcEjtboXOdxVXitSCYjc619iUHj8xt45eEdX9wlffaQKm+KR3NSODgb1a0V/1fNtWeSr+ZEywCnoa1yrZCTxE638eqPjxnOSi37oB9+xM9apYsa2VtjyzOAqhpl4Uw1pCQOtWOl20nDSTTHlq3+NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b2r02Tji; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlAw626W"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f2b58f0d09so5189886d6.3
-        for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 22:23:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745644990; x=1746249790; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pVadqEPdp/e84xV25n6o7wokbtAabn+EHDeUNuX6gbY=;
-        b=YlAw626WkuCDLLcvEsg2mQlp+z10U5cFqulSZ6rVlXE30xi8/lgR/g8EV8+KsFtzEl
-         3jGWypY2Ge22EM8bxkTmr8Qx6EACJVJ4U9cp1rxQnYWaL5+iWpiyEOnepOt+5z9NI0PE
-         UvyLGuZe2rcPkDKzEIq0aaJSvlg4VTbeIYh639iRxQPX09PufGJckACYHjjN6CnAhnUM
-         kXY6uUpWeDSEuuwQHHjwxDKi4R8Jpg4yYg5LbwtnhUAvRLK798S1apMswj/Tx8EEJuWJ
-         kEaIRNq7IsNsmVS5qGtONy9LPy/F/OR14JqUfE3xGAqXLm+A0DRCEOK7sV/EOwwOUb47
-         92kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745644990; x=1746249790;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pVadqEPdp/e84xV25n6o7wokbtAabn+EHDeUNuX6gbY=;
-        b=V81kp9lvaCWFvuYEbmAcJjYcVdYE95PBdLLnH3UoFn8ZMr7VKICTyl3EZKIx/DiIfj
-         ni6Or2cH8maHonupxiAtdBK+nvkScs2StK7hJkcNyVhnf6o+URM/2W0fwIXfkU7w1sHv
-         O0QEQDjNizw7CdBFWBGHvsFPvUGoqScG74jT8Nfliu6PD6rVIWrTO0m8+B80SYD71P6X
-         RtWip3XQ3gTsTZrE9GirivOfmdyWzGiTgsYknhprnULQplSkNRO+PDrotlnGxjaWlEp5
-         eAnV3dtC5MSL5Wl/W8Xrf69cW9wG6yYwGws6/NZhEVdSbhtFKNIKlPnV6CUZudRHX/3j
-         E6GA==
-X-Forwarded-Encrypted: i=1; AJvYcCWygulZ9VKJfLcZraIDKLWr6tZ8UoD0MKAN7AJ+80dDtSPFaS2p3NbtoV4hQt4IHelGNwmAnzmk/rGHJw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvSRepqwkSceOU5sWmapq5ZfwfIlxjfljT9hla9TS1mczVfEdx
-	wvBmgDj61bqB7PTfviXHjqo7iMb+HK48lZYbFGjwH+jWVxMcTw8ix7Eod0nS
-X-Gm-Gg: ASbGncuzIqrUPe7W5lNHkpP6tzk8AuAsd3RbYTH4iSXZM41tVl4ST/cpqUnKVH5cFTp
-	XyQHBjAlOhoEEgQ13N1jtYumtDUY/Gmz1sJBDz4EyCXNq2OTih/zm62+jFB3H6DBoIts/zKAvv9
-	NIYVqtwhaSrU91VrceNek6Voc/Wj588dkmI10uLFHWxfgfJZ+Xk9zp17bHo6ZjpiyjeJhh7lZ9U
-	kRyyVfnfGj1ZepbWDp8+blrAKScdp+pYvMQlQdVW+RHsJdjL77YE/XRFRuhbALR2ItAUj30N6FM
-	Rdkzd//0KccyR2Pct360O+ir1l/DvPpJCe+omBo92giFHgCXo7AnmTqQNe1Frx9hwPvO2W4E2hH
-	gcbBuLSM7aaP5z62w
-X-Google-Smtp-Source: AGHT+IEtk64oRJy3raLokL4h3BwfhgYNozhtVCWL3OyhDcEwsyXUQwXwV4X8mpZCgbtHIIpBAkOlcw==
-X-Received: by 2002:a05:620a:244a:b0:7c0:b43c:b36c with SMTP id af79cd13be357-7c9606f5841mr313763985a.6.1745644990332;
-        Fri, 25 Apr 2025 22:23:10 -0700 (PDT)
-Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958c94880sm309077785a.14.2025.04.25.22.23.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Apr 2025 22:23:09 -0700 (PDT)
-Message-ID: <8d8fa127-3bf8-c6b2-71e6-90ce5abcc3df@gmail.com>
-Date: Sat, 26 Apr 2025 01:23:08 -0400
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2r02Tji"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745660484;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Lu7aG5MgdTX3eULB3Z4HgwJjhh1oQpgT6jbnvweR0N4=;
+	b=b2r02TjinSo3JhZIaF0ynhH75biX6d0Un+ygDIXSEZ09n+hrEqZJET2PDYph+R8O6KDVsy
+	Vc5ovpazLqMjQLLmC5jCbtuD30MeZ8IFeOL7NOCjH4knu6RNuwGM6QOq+snuyYkDe/iuhA
+	ECMrpi6FZ7RsHF0eSAFCW6fdFbJ9W/o=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-384-H0cGnaatPvCI2eYVQZ7V4w-1; Sat,
+ 26 Apr 2025 05:41:22 -0400
+X-MC-Unique: H0cGnaatPvCI2eYVQZ7V4w-1
+X-Mimecast-MFC-AGG-ID: H0cGnaatPvCI2eYVQZ7V4w_1745660481
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 302D41956094;
+	Sat, 26 Apr 2025 09:41:21 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.13])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 130F6180045C;
+	Sat, 26 Apr 2025 09:41:19 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/4] ublk: two fixes and support UBLK_F_AUTO_ZERO_COPY
+Date: Sat, 26 Apr 2025 17:41:05 +0800
+Message-ID: <20250426094111.1292637-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
-Content-Language: en-US
-To: "hch@infradead.org" <hch@infradead.org>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20250423164957.2293594-1-seanga2@gmail.com>
- <aAnxqAv41Quh66Q1@infradead.org>
- <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
- <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
- <aApFcW-fsdUP4Ztj@infradead.org>
- <e94e55a6-a93d-2c7b-2c3b-8829ab53848b@gmail.com>
- <aApJWu1KLw7607Vz@infradead.org>
- <790260c8-09b4-96b3-310f-f9c5a93ef7ff@gmail.com>
- <aAuSYhnxwpJns5Cs@infradead.org>
-From: Sean Anderson <seanga2@gmail.com>
-In-Reply-To: <aAuSYhnxwpJns5Cs@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 4/25/25 09:47, hch@infradead.org wrote:
-> On Fri, Apr 25, 2025 at 12:04:39AM -0400, Sean Anderson wrote:
->> and in userspace that assumes 512-byte granularity. But there is no
->> such deeply-ingrained assumption for zones. You just have to set the
->> parameter correctly.
-> 
-> There are everywhere in software actually using zones.  You still
-> haven't answered whay your intended use case is, btw.
+Hi Jens,
 
-I'm working on testing... I thought I would send a few bug fixes upstream in advance...
+The 1st patch fixes UBLK_F_NEED_GET_DATA implementation in selftest ublk utility,
+meantime add test to cover this feature.
 
-who knew I would get such a hostile response
+The 2nd patch enhances check for register/unregister IO buffer uring command.
 
->> Plus, smaller zones are more efficient at reducing write amplification,
->> in the same way as smaller block sizes.
-> 
-> No, they aren't.  If you zones are only a few kb you will waste a lot
-> of effort to actually track their state.
+The 3rd patch adds UBLK_F_AUTO_ZERO_COPY by registering zc buffer before delivering
+io command to ublk server and un-registering zc buffer when completing io command.
+This way not only improves zero copy perf, but also makes it much easier to use:
 
-The state is perhaps 4-8 bytes at most? And in any case it's proportional to
-the number of zones. If you have a smaller drive you will naturally have smaller zones.
+- ublk/null: iops is improved by 50%(--auto_zc vs. -z, -q 2)
 
---Sean
+- ublk server needn't to register/unregister io buffer uring_cmd any more,
+  which is done automatically by ublk driver
+
+- ublk server zc buffer consumer OPs need to depend on register/unregister
+  io buffer uring_cmd any more. Without this feature, buffer consumer OP
+  has to respect the dependency by IOSQE_IO_LINK.
+
+The last patch adds function & stress tests for UBLK_F_AUTO_ZERO_COPY.
+
+Thanks,
+Ming
+
+Ming Lei (4):
+  selftests: ublk: fix UBLK_F_NEED_GET_DATA
+  ublk: enhance check for register/unregister io buffer command
+  ublk: add feature UBLK_F_AUTO_ZERO_COPY
+  selftests: ublk: support UBLK_F_AUTO_ZERO_COPY
+
+ drivers/block/ublk_drv.c                      | 110 +++++++++++++++---
+ include/uapi/linux/ublk_cmd.h                 |  20 ++++
+ tools/testing/selftests/ublk/Makefile         |   3 +
+ tools/testing/selftests/ublk/file_backed.c    |   9 +-
+ tools/testing/selftests/ublk/kublk.c          |  24 +++-
+ tools/testing/selftests/ublk/kublk.h          |   7 ++
+ tools/testing/selftests/ublk/null.c           |  43 +++++--
+ tools/testing/selftests/ublk/stripe.c         |  14 +--
+ .../testing/selftests/ublk/test_generic_07.sh |  25 ++++
+ .../testing/selftests/ublk/test_generic_08.sh |  28 +++++
+ .../testing/selftests/ublk/test_stress_03.sh  |   6 +
+ .../testing/selftests/ublk/test_stress_04.sh  |   6 +
+ .../testing/selftests/ublk/test_stress_05.sh  |   8 ++
+ 13 files changed, 257 insertions(+), 46 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_07.sh
+ create mode 100755 tools/testing/selftests/ublk/test_generic_08.sh
+
+-- 
+2.47.0
+
