@@ -1,135 +1,112 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFA310F9;
-	Sat, 26 Apr 2025 02:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6771A3161
+	for <linux-block@vger.kernel.org>; Sat, 26 Apr 2025 05:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745633476; cv=none; b=VrinoPohedvQmi7k4AikrqgNoFMcKRCP35m5LUfsKzOKkkVkANAXFwgg7Sfl0zJmShTiaf1i6i607zz7/hZQmbbwSTnfGaiAn58O7MIcDgiB+2OYkwcmEEZ65joq5Inr+hC0vmi5/DqGJTpKBkCTfRhhAwTtjN/lVzAkSXzbYxU=
+	t=1745644993; cv=none; b=KEY1XXN56MG38Cw/L2GazsYvbyPEIgRi5pTUVHs4cD5wkyOmxx4QCUP6FI6SmiM9iX27396NDXSTE604Z3Wm2iue2td7Ecqq2ikuN8UPlhyHqXjkJdQyi0651XNejPgOyODnGA4iwYrrrowBwnldGcGJuFoJWbtVTdFFm+xhCxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745633476; c=relaxed/simple;
-	bh=Jw7F1D6YkLAty219ZY+jebJe6PoKEARc/QsYTfjiD00=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ttEk57CLxwf7TII+PcAEnWUKgko4lEAZq/gRikCpItu0EAsXgNX6jXLGo4gJ5fMF1CZKvDZaHANoVTcCN/UBXX8NwILOctkNB+7eW90PLdpaUkGHzaDpLuXEfxHodj1QMGmR5oRBGhlEdi30b+y9k1/tpnS7XfupzWfIuo37SG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53Q2AT5i029409;
-	Fri, 25 Apr 2025 19:11:00 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 466jhd4c3q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 25 Apr 2025 19:10:59 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Fri, 25 Apr 2025 19:10:58 -0700
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Fri, 25 Apr 2025 19:10:56 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <hch@infradead.org>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <ming.lei@redhat.com>,
-        <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V3] loop: Add sanity check for read/write_iter
-Date: Sat, 26 Apr 2025 10:10:55 +0800
-Message-ID: <20250426021055.312912-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aAuOC8djgRrq-Gdj@infradead.org>
-References: <aAuOC8djgRrq-Gdj@infradead.org>
+	s=arc-20240116; t=1745644993; c=relaxed/simple;
+	bh=BIfhBLGcJnbdsDdXfw3ZF/aHVFjnxifj1ZDRpnZLl9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AdE9hunj4Hr4OnGyhTq3L1r2XiFMLx95xNdYweR2K53zzBETPdW0B6NidMgRHDqfrGo6PRVrDrhXpCieR9X8BDHSnTm/yAkRy3fbTN0J1q+8Imvtc1L3bPZ8YtiJjxI0ZEKC/ylg5K/hlflato4SbQlMYoqntZ0WuiXkm4qBv0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlAw626W; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlAw626W"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f2b58f0d09so5189886d6.3
+        for <linux-block@vger.kernel.org>; Fri, 25 Apr 2025 22:23:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745644990; x=1746249790; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pVadqEPdp/e84xV25n6o7wokbtAabn+EHDeUNuX6gbY=;
+        b=YlAw626WkuCDLLcvEsg2mQlp+z10U5cFqulSZ6rVlXE30xi8/lgR/g8EV8+KsFtzEl
+         3jGWypY2Ge22EM8bxkTmr8Qx6EACJVJ4U9cp1rxQnYWaL5+iWpiyEOnepOt+5z9NI0PE
+         UvyLGuZe2rcPkDKzEIq0aaJSvlg4VTbeIYh639iRxQPX09PufGJckACYHjjN6CnAhnUM
+         kXY6uUpWeDSEuuwQHHjwxDKi4R8Jpg4yYg5LbwtnhUAvRLK798S1apMswj/Tx8EEJuWJ
+         kEaIRNq7IsNsmVS5qGtONy9LPy/F/OR14JqUfE3xGAqXLm+A0DRCEOK7sV/EOwwOUb47
+         92kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745644990; x=1746249790;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pVadqEPdp/e84xV25n6o7wokbtAabn+EHDeUNuX6gbY=;
+        b=V81kp9lvaCWFvuYEbmAcJjYcVdYE95PBdLLnH3UoFn8ZMr7VKICTyl3EZKIx/DiIfj
+         ni6Or2cH8maHonupxiAtdBK+nvkScs2StK7hJkcNyVhnf6o+URM/2W0fwIXfkU7w1sHv
+         O0QEQDjNizw7CdBFWBGHvsFPvUGoqScG74jT8Nfliu6PD6rVIWrTO0m8+B80SYD71P6X
+         RtWip3XQ3gTsTZrE9GirivOfmdyWzGiTgsYknhprnULQplSkNRO+PDrotlnGxjaWlEp5
+         eAnV3dtC5MSL5Wl/W8Xrf69cW9wG6yYwGws6/NZhEVdSbhtFKNIKlPnV6CUZudRHX/3j
+         E6GA==
+X-Forwarded-Encrypted: i=1; AJvYcCWygulZ9VKJfLcZraIDKLWr6tZ8UoD0MKAN7AJ+80dDtSPFaS2p3NbtoV4hQt4IHelGNwmAnzmk/rGHJw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvSRepqwkSceOU5sWmapq5ZfwfIlxjfljT9hla9TS1mczVfEdx
+	wvBmgDj61bqB7PTfviXHjqo7iMb+HK48lZYbFGjwH+jWVxMcTw8ix7Eod0nS
+X-Gm-Gg: ASbGncuzIqrUPe7W5lNHkpP6tzk8AuAsd3RbYTH4iSXZM41tVl4ST/cpqUnKVH5cFTp
+	XyQHBjAlOhoEEgQ13N1jtYumtDUY/Gmz1sJBDz4EyCXNq2OTih/zm62+jFB3H6DBoIts/zKAvv9
+	NIYVqtwhaSrU91VrceNek6Voc/Wj588dkmI10uLFHWxfgfJZ+Xk9zp17bHo6ZjpiyjeJhh7lZ9U
+	kRyyVfnfGj1ZepbWDp8+blrAKScdp+pYvMQlQdVW+RHsJdjL77YE/XRFRuhbALR2ItAUj30N6FM
+	Rdkzd//0KccyR2Pct360O+ir1l/DvPpJCe+omBo92giFHgCXo7AnmTqQNe1Frx9hwPvO2W4E2hH
+	gcbBuLSM7aaP5z62w
+X-Google-Smtp-Source: AGHT+IEtk64oRJy3raLokL4h3BwfhgYNozhtVCWL3OyhDcEwsyXUQwXwV4X8mpZCgbtHIIpBAkOlcw==
+X-Received: by 2002:a05:620a:244a:b0:7c0:b43c:b36c with SMTP id af79cd13be357-7c9606f5841mr313763985a.6.1745644990332;
+        Fri, 25 Apr 2025 22:23:10 -0700 (PDT)
+Received: from [192.168.1.201] (pool-108-48-176-137.washdc.fios.verizon.net. [108.48.176.137])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958c94880sm309077785a.14.2025.04.25.22.23.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Apr 2025 22:23:09 -0700 (PDT)
+Message-ID: <8d8fa127-3bf8-c6b2-71e6-90ce5abcc3df@gmail.com>
+Date: Sat, 26 Apr 2025 01:23:08 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=ZNDXmW7b c=1 sm=1 tr=0 ts=680c40b3 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=LV0KdC98gc1ixML1xO8A:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-ORIG-GUID: Z6NCK6Faewv0NcLTu7p9XuCbvFHNivMq
-X-Proofpoint-GUID: Z6NCK6Faewv0NcLTu7p9XuCbvFHNivMq
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI2MDAxNCBTYWx0ZWRfX36t69HVb4iNb 9OGoam/8PVy0YAbU9RbN5ikQFtWiv9eMuDcBpD3Wqrw+NUiMr+97FfLXK+MJtju9the5iAiY1xF J9VcXPlL6UmehvZtK1Nz8jNCEswCofNvsKbRJ4a9XdX700PANxrJ5+LJfyM9kVWn1BgHLd1f8aC
- yGDQhLr3sa9oqcNqUfF9buapoWqLspHNqxR4Tz8g78BXH+urHI7Fkbgay2jMIQ6Ab0htQtKg0me gHlI8TtlKkkn9WKlBRq3tr/cRVR1J9LMJSh6zQrShc6y6RNwTt/yWWWtuLJx/orgDof0CwqVPFT ts6x7eHjeZ7xKwsDP2fTDAac89n391xoaWGNoB/7ZsbD6rHZ7GAZekyxURrdutVoVUtTtbDiCg2
- Glg6lDbWUCucYRBmR7RLqlMWkmA9RqYaUkDyzq+90tECP3hwUEB/wF3Zibc3DrxplP0J2gij
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-25_07,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 adultscore=0 spamscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=943 mlxscore=0 suspectscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
- definitions=main-2504260014
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH blktests] zbd/005: Limit block size to zone length
+Content-Language: en-US
+To: "hch@infradead.org" <hch@infradead.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20250423164957.2293594-1-seanga2@gmail.com>
+ <aAnxqAv41Quh66Q1@infradead.org>
+ <jzrhzy3qdj7tt2tlmoayo7pi367etl3furcbk3yvuh4zru2q7q@ikekotau7jvl>
+ <d683d1fe-7817-f692-addc-93d2fdab39db@gmail.com>
+ <aApFcW-fsdUP4Ztj@infradead.org>
+ <e94e55a6-a93d-2c7b-2c3b-8829ab53848b@gmail.com>
+ <aApJWu1KLw7607Vz@infradead.org>
+ <790260c8-09b4-96b3-310f-f9c5a93ef7ff@gmail.com>
+ <aAuSYhnxwpJns5Cs@infradead.org>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <aAuSYhnxwpJns5Cs@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some file systems do not support read_iter/write_iter, such as selinuxfs
-in this issue.
-So before calling them, first confirm that the interface is supported and
-then call it.
+On 4/25/25 09:47, hch@infradead.org wrote:
+> On Fri, Apr 25, 2025 at 12:04:39AM -0400, Sean Anderson wrote:
+>> and in userspace that assumes 512-byte granularity. But there is no
+>> such deeply-ingrained assumption for zones. You just have to set the
+>> parameter correctly.
+> 
+> There are everywhere in software actually using zones.  You still
+> haven't answered whay your intended use case is, btw.
 
-Fixes: f2fed441c69b ("loop: stop using vfs_iter__{read,write} for buffered I/O")
-Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
-V1 -> V2: move check to loop_configure and loop_change_fd
-V2 -> V3: using helper for this check
+I'm working on testing... I thought I would send a few bug fixes upstream in advance...
 
- drivers/block/loop.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+who knew I would get such a hostile response
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 674527d770dc..7b78ddf7b819 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -582,6 +582,19 @@ static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
- 	lo->lo_min_dio_size = loop_query_min_dio_size(lo);
- }
- 
-+static int loop_check_backing_file(struct file *file, blk_mode_t mode, bool change)
-+{
-+	if (!file->f_op->read_iter)
-+		return -EINVAL;
-+
-+	if (((file->f_mode & FMODE_WRITE) ||
-+	     (!change && (mode & BLK_OPEN_WRITE))) &&
-+	    (!file->f_op->write_iter))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- /*
-  * loop_change_fd switched the backing store of a loopback device to
-  * a new file. This is useful for operating system installers to free up
-@@ -603,6 +616,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (!file)
- 		return -EBADF;
- 
-+	error = loop_check_backing_file(file, 0, true);
-+	if (error)
-+		return error;
-+
- 	/* suppress uevents while reconfiguring the device */
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
- 
-@@ -1039,6 +1056,11 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 
- 	if (!file)
- 		return -EBADF;
-+
-+	error = loop_check_backing_file(file, mode, false);
-+	if (error)
-+		return error;
-+
- 	is_loop = is_loop_device(file);
- 
- 	/* This is safe, since we have a reference from open(). */
--- 
-2.43.0
+>> Plus, smaller zones are more efficient at reducing write amplification,
+>> in the same way as smaller block sizes.
+> 
+> No, they aren't.  If you zones are only a few kb you will waste a lot
+> of effort to actually track their state.
 
+The state is perhaps 4-8 bytes at most? And in any case it's proportional to
+the number of zones. If you have a smaller drive you will naturally have smaller zones.
+
+--Sean
