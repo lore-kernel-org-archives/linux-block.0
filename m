@@ -1,161 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DB153363
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 01:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B86C5661;
+	Sun, 27 Apr 2025 01:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745717838; cv=none; b=FBqlHs0+43JUaSQXvVIjkifBvomiL4sVlIFQfJZTY20vs+C872a/v4f4+9sB6l17Hp1wkAo2sKC1syEHWWZqlwtBTddcQoaBLU37qD14JiRCbnic0srGIJGNpoOEkFypZUOTOasUBNdQbWDFk+Tbnd8cFNYXc1eVEJ0R5VDYUck=
+	t=1745717838; cv=none; b=fJLUWz8YESQtjodFa1vds99e1Q3UjnHoarOeJdjOdJxQq9MHfZTtG4rF88MvI8AWzf7s3GJHrtv4AjS9SzmCSfAL/IMy4VFywxkGYa4RnO+B64g//ol7LTCcg38A4X9FBd9+JaWGCPJnX1d890h6jDBGiJzRxZk367opvlorTaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745717838; c=relaxed/simple;
-	bh=YiqhXuu0GW/+g3KTLQ3qekuXU016yBPfQY/i5ZiLVT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NzWQOO9lMMUoiw6QDSB5WGYJ48abWPQc4Ri/p026Rq/JQELZpyrm+2mHzwnCz4EbuCB1kZKHo7zb674M+iyskIBGayRqN/XPDVHBTGtN41HivAns/I+a1zYcYN/Z+FJ3eJr/rmsuTsgn/l5oR1j1KJ9PWxyj3svht+apzfQCV3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6EHfltq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6EHfltq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745717834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kb/FSSpP0Nxh4u8Fxe4NHveWWp43zVYLJzpG9+OKgZo=;
-	b=d6EHfltqEphsnx+it/eBlxXZ3HxfffFqd+YVyuGyQK7RNbKcLVgzXW4zfajTY0yGHPEU0Y
-	/b6QTKpEa64oNTqGGCw9acmsf0lSueHMmaxVv9fsRWSebrdFmPaX2U8BQ8NbvNnSlcW8GL
-	d4h/+kDwc9Q9EwISSa1WHq434QIsI1Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-323-umw8ShknOnadmxsEdrRCIQ-1; Sat,
- 26 Apr 2025 21:37:12 -0400
-X-MC-Unique: umw8ShknOnadmxsEdrRCIQ-1
-X-Mimecast-MFC-AGG-ID: umw8ShknOnadmxsEdrRCIQ_1745717831
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38B99195608C;
-	Sun, 27 Apr 2025 01:37:11 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.41])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1089180047F;
-	Sun, 27 Apr 2025 01:37:07 +0000 (UTC)
+	bh=FvBxvV778LoatI+v+YK3cVyGvx8TJr8MXzRsyaqkYbU=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=T9WAA1gI3g8wwJt1wRuHgilG1XTtPEW/545A2yEuoHnCLP03+5UEp9vKxCXMFL2Tz/4qaVoS+5fSomRkzgYLiyE4W/QS+kFT7eFqwnPNzLTi5tmntHRqB7QDvZgH1hZsh1vMngnB2stAe9THk+vVKqXx40RlTX7zTNEzCoWm2wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZlTh80Dlsz4f3kvh;
+	Sun, 27 Apr 2025 09:36:40 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A05181A06D7;
+	Sun, 27 Apr 2025 09:37:05 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCH618+ig1obRS4Kg--.18096S3;
+	Sun, 27 Apr 2025 09:37:05 +0800 (CST)
+Subject: Re: [PATCH v2 4/5] md: fix is_mddev_idle()
+To: Xiao Ni <xni@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+ song@kernel.org, viro@zeniv.linux.org.uk, akpm@linux-foundation.org,
+ nadav.amit@gmail.com, ubizjak@gmail.com, cl@linux.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250418010941.667138-1-yukuai1@huaweicloud.com>
+ <20250418010941.667138-5-yukuai1@huaweicloud.com>
+ <CALTww29aehPQcbcy0j+V69r+RVgzNPwNhpAQ-7wWMdD-VPfNgQ@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <f14eac30-ab65-85b2-3e65-de6d50ea15e2@huaweicloud.com>
 Date: Sun, 27 Apr 2025 09:37:02 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH 2/4] ublk: enhance check for register/unregister io
- buffer command
-Message-ID: <aA2KPuQl1_hTlplG@fedora>
-References: <20250426094111.1292637-1-ming.lei@redhat.com>
- <20250426094111.1292637-3-ming.lei@redhat.com>
- <CADUfDZrF71gPfCghE+wNyLXTmtAUprMfpo1XtP1C7kxx-=eP+w@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <CALTww29aehPQcbcy0j+V69r+RVgzNPwNhpAQ-7wWMdD-VPfNgQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrF71gPfCghE+wNyLXTmtAUprMfpo1XtP1C7kxx-=eP+w@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-CM-TRANSID:gCh0CgCH618+ig1obRS4Kg--.18096S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_GFv_Wryl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6r
+	W5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	OmhFUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sat, Apr 26, 2025 at 01:38:14PM -0700, Caleb Sander Mateos wrote:
-> On Sat, Apr 26, 2025 at 2:41 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > The simple check of UBLK_IO_FLAG_OWNED_BY_SRV can avoid incorrect
-> > register/unregister io buffer easily, so check it before calling
-> > starting to register/un-register io buffer.
-> >
-> > Also only allow io buffer register/unregister uring_cmd in case of
-> > UBLK_F_SUPPORT_ZERO_COPY.
-> 
-> Indeed, both these checks make sense. (Hopefully there aren't any
-> applications depending on the ability to use ublk zero-copy without
-> setting the flag.) I too was thinking of adding the
-> UBLK_IO_FLAG_OWNED_BY_SRV check because it could allow the
-> kref_get_unless_zero() to be replaced with the cheaper kref_get(). I
-> think the checks could be split into 2 separate commits, but up to
-> you.
+Hi,
 
-Let's do it in single patch for making everyone easier.
+在 2025/04/22 14:35, Xiao Ni 写道:
+>> +       unsigned long                   last_events;    /* IO event timestamp */
+> Can we use another name? Because mddev has events counter. This name
+> can easily be confused with that counter.
 
-> 
-> >
-> > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 23 ++++++++++++++++++++++-
-> >  1 file changed, 22 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 40f971a66d3e..347790b3a633 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -609,6 +609,11 @@ static void ublk_apply_params(struct ublk_device *ub)
-> >                 ublk_dev_param_zoned_apply(ub);
-> >  }
-> >
-> > +static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
-> > +{
-> > +       return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
-> > +}
-> > +
-> >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
-> >  {
-> >         return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
-> > @@ -1950,9 +1955,16 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
-> >                                 unsigned int index, unsigned int issue_flags)
-> >  {
-> >         struct ublk_device *ub = cmd->file->private_data;
-> > +       struct ublk_io *io = &ubq->ios[tag];
-> 
-> I thought you had mentioned in
-> https://lore.kernel.org/linux-block/aAmYJxaV1-yWEMRo@fedora/ wanting
-> to the ability to offload the ublk zero-copy buffer registration to a
-> thread other than ubq_daemon. Are you still planning to do that, or
-> does the "auto-register" feature supplant the need for that?
+Sorry for the late reply.
 
-The auto-register idea is actually thought of when I was working on ublk
-selftest offload function.
+Sure, how about, normal_IO_events?
 
-If this auto-register feature is supported, it becomes less important to
-relax the ubq_daemon limit for register_io_buffer command, then I jump
-on this feature & post put the patch.
-
-But I will continue to work on the offload test code and finally relax
-the limit for register/unregister io buffer command, hope it can be
-done in next week.
-
-> Accessing
-> the ublk_io here only seems safe when on the ubq_daemon thread.
-
-Both ublk_register_io_buf()/ublk_unregister_io_buf() just reads ublk_io or
-the request buffer only, so it is just fine for the two to run from other
-contexts.
-
-> 
-> >         struct request *req;
-> >         int ret;
-> >
-> > +       if (!ublk_support_zero_copy(ubq))
-> > +               return -EINVAL;
-> > +
-> > +       if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
-> > +               return -EINVAL;
-> 
-> Every opcode except UBLK_IO_FETCH_REQ now checks io->flags &
-> UBLK_IO_FLAG_OWNED_BY_SRV. Maybe it would make sense to lift the check
-> up to __ublk_ch_uring_cmd() to avoid duplicating it?
-
-Good point.
-
-
-Thanks, 
-Ming
+Thanks,
+Kuai
 
