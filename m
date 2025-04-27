@@ -1,140 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA96A10E0
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 02:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8101D198E91
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 02:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745720886; cv=none; b=R60E2EvCkihej6wxo7YDuR5r44nkCiANbasia+fwsczbLWV0sPud44RB1TXs6OH5yzTIFG2/EFokb7r+f1dbxc3lTB6sjHab5zqqxeGeEBtHLzkWklA74I8mZooUlNQYpUu+9o7HI90XLP0jfvwodls7J8LhzzC8p6uNbsHWuPo=
+	t=1745721284; cv=none; b=Anc15LP5L7y2SXuCweMmNrZ3is/lvA01Od46/dYGYk4zSEfvEVqWz4Wnzlqev4Xo0CtxQlc1K95yP0D/ir6zSeov3iO6c9EJrNw3wcnT8+zfnZgoQb2bPj6MpYptOS9kPuS0g9EM+NKgxx7JcIgLSHm1lNDUAa7LPAPrdFBG3fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745720886; c=relaxed/simple;
-	bh=4n2S5ZUkjlNjLGFV7iru2NgvfgzoJQEyD0nmiuXuFz4=;
+	s=arc-20240116; t=1745721284; c=relaxed/simple;
+	bh=03LbawJe26o6L/mUYPX1dN2FGVGEkmIPbKjTCYLCn/I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWPKEJR77pW6RhAbWIk7w/t1BikTsjOh7869mng2ZtxWK6HwNB6EgCJuv0XE1j6iZ2753OFbf1EJNyW4DSCa1cMEH3esxQztitd7A0q5C/FjCu3HqeKmXeekTdexCx6nC5HpAIE0eZiYGwprjffWEjDvQaGz5n3i2aWmWZ6qnRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PZ+oOZJJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VlSyunH/JLXFOl/rjC6Obhoh4XdqxFDBayVBXd6MQGjJQN/CHhjXAWzMweAk70Z7kLRNWvTvsU6P6O5728jByAGaFfQa0+fmCOcrOKMor/rogIsgTBOQ5AjSRkh24DJCh+uLUmUVe/ILtsxrnsQy6FA61I2ECM4n29FiL0Veq2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ygh3807D; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZ+oOZJJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745720883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BLKXhYIPwsLJ3tXNG8rbtsFqMEchlwn75cIzhXLT5Lo=;
-	b=PZ+oOZJJjfmG6dwrWqJZyGB/Ildcn15c6h2QgGYHF/XFnyV9D3avSY4i2Yonfbct18QzcE
-	0SdUOESgjvDDM2x7wOZMwMH7FPq+G0UJwsmHI66tOB5rs5wglcvMp6+6CIwNVIJ5FlUVk9
-	6hXDLf6Sb8EKhz1zgCxFtWHRst3+C8Y=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-281-mrAYYaiCP3SQ8_xdalIWDw-1; Sat,
- 26 Apr 2025 22:27:58 -0400
-X-MC-Unique: mrAYYaiCP3SQ8_xdalIWDw-1
-X-Mimecast-MFC-AGG-ID: mrAYYaiCP3SQ8_xdalIWDw_1745720877
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 529BC1800368;
-	Sun, 27 Apr 2025 02:27:56 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.41])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 102E41956094;
-	Sun, 27 Apr 2025 02:27:51 +0000 (UTC)
-Date: Sun, 27 Apr 2025 10:27:46 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V3 08/20] block: don't allow to switch elevator if
- updating nr_hw_queues is in-progress
-Message-ID: <aA2WIiHJprr_bmJ5@fedora>
-References: <20250424152148.1066220-1-ming.lei@redhat.com>
- <20250424152148.1066220-9-ming.lei@redhat.com>
- <748f3e46-51c1-47f8-8614-64efb30dd4ff@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ygh3807D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CB83C4CEE2;
+	Sun, 27 Apr 2025 02:34:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745721284;
+	bh=03LbawJe26o6L/mUYPX1dN2FGVGEkmIPbKjTCYLCn/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ygh3807DSdl523G8ec7VuFDRCwRyunnguyliNQUxJOvgQXry1vGNiyc1DQoUjCLos
+	 CNJ7mGdREDQFIg3v/99rcSpbhPAVWzc5xpAuNWD8olAFXqR75zJwe6l6Xaf+hU+fbc
+	 /zSqzq88riMaCUhegje3KrevPzoeQOo+vz/VXiuOwuUotn3dHWgB2fzsK/yu9xRPW9
+	 wrgfZJwDa5pJcGatEcu8WOLcdqjM1Mtk+6xJucL2mLFFn/UoG1DzuP2CLsQLEafYvj
+	 14jRqIaBGyNG7pjYnIgm9LqR0DSS1/IsNJ3go7wSoGX0XlxGXYBq7pzjgpVyEqGdoR
+	 O2BqVz8REkBBw==
+Date: Sat, 26 Apr 2025 20:34:40 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 3/4] ublk: add feature UBLK_F_AUTO_ZERO_COPY
+Message-ID: <aA2XwIcOPysPTra9@kbusch-mbp.dhcp.thefacebook.com>
+References: <20250426094111.1292637-1-ming.lei@redhat.com>
+ <20250426094111.1292637-4-ming.lei@redhat.com>
+ <CADUfDZqQ_xvFMP=yjUYvvnn6u36iNBmcgoONBoBVhDjyiZQfjA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <748f3e46-51c1-47f8-8614-64efb30dd4ff@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqQ_xvFMP=yjUYvvnn6u36iNBmcgoONBoBVhDjyiZQfjA@mail.gmail.com>
 
-On Fri, Apr 25, 2025 at 06:18:33PM +0530, Nilay Shroff wrote:
+On Sat, Apr 26, 2025 at 03:42:59PM -0700, Caleb Sander Mateos wrote:
+> On Sat, Apr 26, 2025 at 2:41 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > UBLK_F_SUPPORT_ZERO_COPY requires ublk server to issue explicit buffer
+> > register/unregister uring_cmd for each IO, this way is not only inefficient,
+> > but also introduce dependency between buffer consumer and buffer register/
+> > unregister uring_cmd, please see tools/testing/selftests/ublk/stripe.c
+> > in which backing file IO has to be issued one by one by IOSQE_IO_LINK.
 > 
-> 
-> On 4/24/25 8:51 PM, Ming Lei wrote:
-> > Elevator switch code is another `nr_hw_queue` reader in non-fast-IO code
-> > path, so it can't be done if updating `nr_hw_queues` is in-progress.
-> > 
-> > Take same approach with not allowing add/del disk when updating
-> > nr_hw_queues is in-progress, by grabbing read lock of
-> > set->update_nr_hwq_sema.
-> > 
-> > Take the nested variant for avoiding the following false positive
-> > splat[1], and this way is correct because:
-> > 
-> > - the read lock in elv_iosched_store() is not overlapped with the read lock
-> > in adding/deleting disk:
-> > 
-> > - kobject attribute is only available after the kobject is added and
-> > before it is deleted
-> > 
-> >   -> #4 (&q->q_usage_counter(queue){++++}-{0:0}:
-> >   -> #3 (&q->limits_lock){+.+.}-{4:4}:
-> >   -> #2 (&disk->open_mutex){+.+.}-{4:4}:
-> >   -> #1 (&set->update_nr_hwq_lock){.+.+}-{4:4}:
-> >   -> #0 (kn->active#103){++++}-{0:0}:
-> > 
-> > Link: https://lore.kernel.org/linux-block/aAWv3NPtNIKKvJZc@fedora/ [1]
-> > Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > Closes: https://lore.kernel.org/linux-block/mz4t4tlwiqjijw3zvqnjb7ovvvaegkqganegmmlc567tt5xj67@xal5ro544cnc/
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/elevator.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/block/elevator.c b/block/elevator.c
-> > index 4400eb8fe54f..56da6ab7691a 100644
-> > --- a/block/elevator.c
-> > +++ b/block/elevator.c
-> > @@ -723,6 +723,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
-> >  	int ret;
-> >  	unsigned int memflags;
-> >  	struct request_queue *q = disk->queue;
-> > +	struct blk_mq_tag_set *set = q->tag_set;
-> >  
-> >  	/*
-> >  	 * If the attribute needs to load a module, do it before freezing the
-> > @@ -734,6 +735,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
-> >  
-> >  	elv_iosched_load_module(name);
-> >  
-> > +	down_read_nested(&set->update_nr_hwq_sema, 1);
-> 
-> Why do we need to add nested read lock here? The lockdep splat[1] which
-> you reported earlier is possibly due to the same reader lock being acquired
-> recursively in elv_iosched_store and then elevator_change? 
+> This is a great idea!
 
-The splat isn't related with the nested read lock.
+This is very similiar to something I proposed off-list, and the feedback
+back then was this won't work because the back-end ring that wants to
+use the zero-copy buffer isn't the same as the ublk server ring
+recieving notification of a new command; the ublk driver has no idea
+which uring to register the bvec with. Also, this is using the request
+"tag" as the io_uring buf index, which wouldn't work when the ublk
+server ring handles multiple ublk devices due to the tag collisions.
 
-If you replace down_read_nested() with down_read(), the same splat can be
-triggered again when running `blktests block/001`.
-
->  
-> On another note, if we suspect possible one-depth recursion for the same 
-> class of lock then then we should use SINGLE_DEPTH_NESTING (instead of using
-> 1 here) for subclass. But still I am not clear why this lock needs nesting.
-
-It is just one false positive, because elv_iosched_store() won't happen
-when adding disk.
-
-
-Thanks,
-Ming
-
+If you're can make those trade-offs, then this is a great simplification
+to the whole thing.
