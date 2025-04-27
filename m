@@ -1,64 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823868BE7;
-	Sun, 27 Apr 2025 07:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD2A22172E
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 07:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745738712; cv=none; b=m8A1ONpjtDWfN/06FtimLX3dQUc+seGSV4cjYLxQVMBr3T10zSz6OFjQoOxNo/vvC/XrBxC/VSFYdJYooEj1qdTGZdCYZN3CrKSgR54MQePw8lkspeS2n/Jnn/ZuLwa0lyrVnwE8mdxNfpDTLCqEjBGEkNq8nzuP/d7gQXe6Yaw=
+	t=1745739167; cv=none; b=kSQrmg3iKV9XuiOUFoVOQLjTRqJbk0kKaopeJ4eQcMKLAY1B6CMlYqlnWncPrXtUjVk2YnNKmSURKb0WZdNf6Pgaop7f8ODmipWCHCuHl/7K0SHuRopoUTs1LUZ1H48WwQtCgaLWBKnLkWZJ5ZhR+FePl5hXXF9QbpLWDsVDB4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745738712; c=relaxed/simple;
-	bh=bERqNoVKbx4P/SwDDUOXyFXrxjwzNnYFUoDcCNKCVfw=;
+	s=arc-20240116; t=1745739167; c=relaxed/simple;
+	bh=Zdwz87QxT759PZpE2s7uB0XNbkojnzBVnW6fTAj+jjU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cje/cKoF1gV8pQ6CBVfcjehbzOMIoEQZAq5pRKC5DnsU0sjL+HkCw1AJ2j5bQTYwXwMbRQx64JkMHr+CcWJL8pOCh/7WtryWX/aZesAYAJdMRHKZ/YjOtGyq3Fj1m5c3cLNk95Cwpq1xI76PEdDKquujyhEuzRooHD6IzJX/PFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1xqE+mq; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKpodwW5OTTAtveLkRQ8yaDNVOCCzbLpVrYxzYD8tlS02kwJNErh2lEwEhFxFEZVUJcL/jcGBQ9gOXZt5nwsaBK8bJg7D1VS0y70kOFNzCRb+3oBv7UZS26k2hBWckiND+LNk6gxyrusESPVkrjY7Qa6eYa09k+OXaV2jn3pqhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M4uCMMTt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1xqE+mq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40495C4CEE3;
-	Sun, 27 Apr 2025 07:25:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745738712;
-	bh=bERqNoVKbx4P/SwDDUOXyFXrxjwzNnYFUoDcCNKCVfw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O1xqE+mqwh8U+55fROspjUrKNzRVSIzJfDGM+Ls83njMJYStvF3kCZtrxDGnS8SVT
-	 FH2Y3/4QmPSaIrhVwSXIBJfNKQb2jOqg/0R9XOlNO+8e0XTTOVDsgTNzItS/cuPjFL
-	 PJCX+bYuGxOwMqFXAxDt9oJubodYIurQ+knbiSyXMkoJmOUGIl6AyOiN49LQkcuXwW
-	 lX4Zt8yUC+E7ZRN3ptmo7qa1Dn9p3RQqNw+5yoy5YM9m0zO7K7IBGHJkXHsUDSieM4
-	 qCQegX3jtiPkdIH87I9vQ2L9GafYOjlgT1bfZh8UZrFfu8pXhN2WP2XoeZGCszveQ5
-	 tJLYM5tBLk6AQ==
-Date: Sun, 27 Apr 2025 10:25:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 01/24] PCI/P2PDMA: Refactor the p2pdma mapping helpers
-Message-ID: <20250427072507.GB5848@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <3a962f9039f0265de939f4c81924ee8208fc93a6.1745394536.git.leon@kernel.org>
- <aAwnJwLeOs7rfkHL@bombadil.infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M4uCMMTt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745739162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7c0ULzx108dZoXxppyx3B84/87j4EvvxFBauQ1lv+QM=;
+	b=M4uCMMTtfUvDZPjst3QEV2Mnf7IhcKAPxuEqMiHqrdf5sbOEwr0V7YKdkTS7BH2OpIa/Xm
+	8D20/WKFbBGeyDZN6T4KIwX+ftJdmpBTIWJb7EwUmDWbjo//NM8HSQMn0LYzrRiRQDBXyW
+	MwqKk3T+f3aQfaKrgiM/JaVOGwnqL0Q=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-116-GIT6A_q0PJOP1KRxqXuYqg-1; Sun,
+ 27 Apr 2025 03:32:37 -0400
+X-MC-Unique: GIT6A_q0PJOP1KRxqXuYqg-1
+X-Mimecast-MFC-AGG-ID: GIT6A_q0PJOP1KRxqXuYqg_1745739156
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8E8AC195608E;
+	Sun, 27 Apr 2025 07:32:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.119])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 09BBD180045C;
+	Sun, 27 Apr 2025 07:32:32 +0000 (UTC)
+Date: Sun, 27 Apr 2025 15:32:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 3/4] ublk: add feature UBLK_F_AUTO_ZERO_COPY
+Message-ID: <aA3dil8q-69jruIq@fedora>
+References: <20250426094111.1292637-1-ming.lei@redhat.com>
+ <20250426094111.1292637-4-ming.lei@redhat.com>
+ <CADUfDZqQ_xvFMP=yjUYvvnn6u36iNBmcgoONBoBVhDjyiZQfjA@mail.gmail.com>
+ <aA2XwIcOPysPTra9@kbusch-mbp.dhcp.thefacebook.com>
+ <aA2gJqKs31-_diER@fedora>
+ <aA2s3oVFfOF1X485@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,51 +63,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAwnJwLeOs7rfkHL@bombadil.infradead.org>
+In-Reply-To: <aA2s3oVFfOF1X485@kbusch-mbp.dhcp.thefacebook.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, Apr 25, 2025 at 05:21:59PM -0700, Luis Chamberlain wrote:
-> On Wed, Apr 23, 2025 at 11:12:52AM +0300, Leon Romanovsky wrote:
-> > From: Christoph Hellwig <hch@lst.de>
+On Sat, Apr 26, 2025 at 10:04:46PM -0600, Keith Busch wrote:
+> On Sun, Apr 27, 2025 at 11:10:30AM +0800, Ming Lei wrote:
+> > On Sat, Apr 26, 2025 at 08:34:40PM -0600, Keith Busch wrote:
+> > > 
+> > > This is very similiar to something I proposed off-list, and the feedback
 > > 
-> > The current scheme with a single helper to determine the P2P status
-> > and map a scatterlist segment force users to always use the map_sg
-> > helper to DMA map, which we're trying to get away from because they
-> > are very cache inefficient.
+> > Looks we both think of it, :-)
+> 
+> Yeah, for real. I was a bit dismayed when I learned of such use cases.
+> So much simplicity and elegance went away...
+
+That is reality, and probably these use cases may be addressed elegantly too
+in future...
+
+>  
+> > > back then was this won't work because the back-end ring that wants to
+> > > use the zero-copy buffer isn't the same as the ublk server ring
+> > > recieving notification of a new command; the ublk driver has no idea
+> > > which uring to register the bvec with. Also, this is using the request
+> > > "tag" as the io_uring buf index, which wouldn't work when the ublk
+> > > server ring handles multiple ublk devices due to the tag collisions.
+> > > 
+> > > If you're can make those trade-offs, then this is a great simplification
+> > > to the whole thing.
 > > 
-> > Refactor the code so that there is a single helper that checks the P2P
-> > state for a page, including the result that it is not a P2P page to
-> > simplify the callers, and a second one to perform the address translation
-> > for a bus mapped P2P transfer that does not depend on the scatterlist
-> > structure.
+> > The io_uring fd & buffer index can be provided from 'ublksrv_io_cmd'.
 > > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > Tested-by: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > https://lore.kernel.org/linux-block/aA2RNG3-WzuQqEN6@fedora/
+> > 
+> > If we only support IORING_ENTER_REGISTERED_RING, 32bit is enough for
+> > io_uring fd & buffer index, and there is still 64bits available if not
+> > taking UBLK_F_ZONED into account.
 > 
-> Might make it easier for patch review to split off adding
-> __pci_p2pdma_update_state() in a seprate patch first.
+> We still need a registered sparse table for the backend ring. I think
+> maybe a simple ida from the ublk driver to select an index may let the
+> daemon register something reasonably small.
 
-Original code __pci_p2pdma_update_state() had this code and was
-dependent on SG, which we are removing in this patch.
+Yeah, I think it is reasonable to let userspace register the sparse table,
+and we can document it in UAPI.
 
-       if (state->map == PCI_P2PDMA_MAP_BUS_ADDR) {
-               sg->dma_address = sg_phys(sg) + state->bus_off;
-               sg_dma_len(sg) = sg->length;
-               sg_dma_mark_bus_address(sg);
-       }
 
-So to split, we would need to introduce new version of __pci_p2pdma_update_state(),
-rename existing one to something like __pci_p2pdma_update_state2() and
-remove it in next patch. Such pattern of adding and immediately deleting
-code is not welcomed.
+thanks,
+Ming
 
-> Other than that, looks good.
-> 
-> Reviewed-by: Luis Chamberlain <mcgrof@kenrel.org>
-
-Thanks
-
-> 
->   Luis
