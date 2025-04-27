@@ -1,57 +1,58 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113CA17C91
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 01:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DB153363
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 01:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745717189; cv=none; b=BDuQBwFggXI9l8XzRmPDvFAZ2121Vo2FCkZVawOtZTnQsymut+BIHysF/OnIRfMpjmzxN+n2CsNxdDXDFnRIEE6x5sOt1uACgDvjTsJ563XxSLPIH3sJIjw2CwsB351Qlb3hLMy0qcagJ3tufI2LNbpBFrFV/wW4CZqxhdy2r6Q=
+	t=1745717838; cv=none; b=FBqlHs0+43JUaSQXvVIjkifBvomiL4sVlIFQfJZTY20vs+C872a/v4f4+9sB6l17Hp1wkAo2sKC1syEHWWZqlwtBTddcQoaBLU37qD14JiRCbnic0srGIJGNpoOEkFypZUOTOasUBNdQbWDFk+Tbnd8cFNYXc1eVEJ0R5VDYUck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745717189; c=relaxed/simple;
-	bh=LAauA1t2p/T8IfzM3YUFW1sC6Ik7MGlFPYmcBco6lTY=;
+	s=arc-20240116; t=1745717838; c=relaxed/simple;
+	bh=YiqhXuu0GW/+g3KTLQ3qekuXU016yBPfQY/i5ZiLVT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KQvE2jYkjf3LaoJOopet4uBwLeX4t3d+10lgeuNhUYehZaHIM32nSayo/xNBem4LddWIZMUm8/yXrzW/aDB6iUjlZ5Dt6XLikbM0DrcLcT/t5ioFEb19cddohkImE8XdT6itUmMU0eqAmwfmhUGzZUr6Y2OR39Fhnv8+MK4O9VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yt4WyB7X; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=NzWQOO9lMMUoiw6QDSB5WGYJ48abWPQc4Ri/p026Rq/JQELZpyrm+2mHzwnCz4EbuCB1kZKHo7zb674M+iyskIBGayRqN/XPDVHBTGtN41HivAns/I+a1zYcYN/Z+FJ3eJr/rmsuTsgn/l5oR1j1KJ9PWxyj3svht+apzfQCV3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6EHfltq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yt4WyB7X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6EHfltq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745717185;
+	s=mimecast20190719; t=1745717834;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mWBKW94kK3rvtGGVcXAV595CfInb3nXTmlwJBdxCNz8=;
-	b=Yt4WyB7XSWsLaxAiWiZN2GqCaKvKj0fGZmn38jQzzNzUAOU3pwfmcuhSaSd/TG8czD0zgD
-	zoDOZRxgchtXo8o7o7KLHzbe2NDoQ//GlRXX6iUAgGYQJ33I5y2uwajLAZvJZItIas+aTL
-	CKuWHaUlVR5pBPXv1m9792nZAqFQTLE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=kb/FSSpP0Nxh4u8Fxe4NHveWWp43zVYLJzpG9+OKgZo=;
+	b=d6EHfltqEphsnx+it/eBlxXZ3HxfffFqd+YVyuGyQK7RNbKcLVgzXW4zfajTY0yGHPEU0Y
+	/b6QTKpEa64oNTqGGCw9acmsf0lSueHMmaxVv9fsRWSebrdFmPaX2U8BQ8NbvNnSlcW8GL
+	d4h/+kDwc9Q9EwISSa1WHq434QIsI1Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-245-S-zGSGT8M36pfKYVPgcAFg-1; Sat,
- 26 Apr 2025 21:26:23 -0400
-X-MC-Unique: S-zGSGT8M36pfKYVPgcAFg-1
-X-Mimecast-MFC-AGG-ID: S-zGSGT8M36pfKYVPgcAFg_1745717182
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-323-umw8ShknOnadmxsEdrRCIQ-1; Sat,
+ 26 Apr 2025 21:37:12 -0400
+X-MC-Unique: umw8ShknOnadmxsEdrRCIQ-1
+X-Mimecast-MFC-AGG-ID: umw8ShknOnadmxsEdrRCIQ_1745717831
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6720B1800261;
-	Sun, 27 Apr 2025 01:26:22 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38B99195608C;
+	Sun, 27 Apr 2025 01:37:11 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.41])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE89118002AD;
-	Sun, 27 Apr 2025 01:26:18 +0000 (UTC)
-Date: Sun, 27 Apr 2025 09:26:13 +0800
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1089180047F;
+	Sun, 27 Apr 2025 01:37:07 +0000 (UTC)
+Date: Sun, 27 Apr 2025 09:37:02 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH 1/4] selftests: ublk: fix UBLK_F_NEED_GET_DATA
-Message-ID: <aA2HtRzfVEVmJeUG@fedora>
+Subject: Re: [PATCH 2/4] ublk: enhance check for register/unregister io
+ buffer command
+Message-ID: <aA2KPuQl1_hTlplG@fedora>
 References: <20250426094111.1292637-1-ming.lei@redhat.com>
- <20250426094111.1292637-2-ming.lei@redhat.com>
- <CADUfDZobcEmDMOYTJh5E5FFsLdYaio3xK96amLm1_MCtpyv0FA@mail.gmail.com>
+ <20250426094111.1292637-3-ming.lei@redhat.com>
+ <CADUfDZrF71gPfCghE+wNyLXTmtAUprMfpo1XtP1C7kxx-=eP+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,145 +62,98 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZobcEmDMOYTJh5E5FFsLdYaio3xK96amLm1_MCtpyv0FA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <CADUfDZrF71gPfCghE+wNyLXTmtAUprMfpo1XtP1C7kxx-=eP+w@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Sat, Apr 26, 2025 at 01:15:58PM -0700, Caleb Sander Mateos wrote:
+On Sat, Apr 26, 2025 at 01:38:14PM -0700, Caleb Sander Mateos wrote:
 > On Sat, Apr 26, 2025 at 2:41 AM Ming Lei <ming.lei@redhat.com> wrote:
 > >
-> > Commit 57e13a2e8cd2 ("selftests: ublk: support user recovery") starts to
-> > support UBLK_F_NEED_GET_DATA for covering recovery feature, however the
-> > ublk utility implementation isn't done correctly.
+> > The simple check of UBLK_IO_FLAG_OWNED_BY_SRV can avoid incorrect
+> > register/unregister io buffer easily, so check it before calling
+> > starting to register/un-register io buffer.
 > >
-> > Fix it by supporting UBLK_F_NEED_GET_DATA correctly.
+> > Also only allow io buffer register/unregister uring_cmd in case of
+> > UBLK_F_SUPPORT_ZERO_COPY.
+> 
+> Indeed, both these checks make sense. (Hopefully there aren't any
+> applications depending on the ability to use ublk zero-copy without
+> setting the flag.) I too was thinking of adding the
+> UBLK_IO_FLAG_OWNED_BY_SRV check because it could allow the
+> kref_get_unless_zero() to be replaced with the cheaper kref_get(). I
+> think the checks could be split into 2 separate commits, but up to
+> you.
+
+Let's do it in single patch for making everyone easier.
+
+> 
 > >
-> > Also add test generic_07 for covering UBLK_F_NEED_GET_DATA.
-> 
-> Looks good to me, just a few minor comments.
-> 
-> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-> 
-> >
-> > Fixes: 57e13a2e8cd2 ("selftests: ublk: support user recovery")
+> > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
 > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > > ---
-> >  tools/testing/selftests/ublk/Makefile         |  1 +
-> >  tools/testing/selftests/ublk/kublk.c          | 11 +++++---
-> >  tools/testing/selftests/ublk/kublk.h          |  1 +
-> >  .../testing/selftests/ublk/test_generic_07.sh | 25 +++++++++++++++++++
-> >  4 files changed, 35 insertions(+), 3 deletions(-)
-> >  create mode 100755 tools/testing/selftests/ublk/test_generic_07.sh
+> >  drivers/block/ublk_drv.c | 23 ++++++++++++++++++++++-
+> >  1 file changed, 22 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-> > index ec4624a283bc..f34ac0bac696 100644
-> > --- a/tools/testing/selftests/ublk/Makefile
-> > +++ b/tools/testing/selftests/ublk/Makefile
-> > @@ -9,6 +9,7 @@ TEST_PROGS += test_generic_03.sh
-> >  TEST_PROGS += test_generic_04.sh
-> >  TEST_PROGS += test_generic_05.sh
-> >  TEST_PROGS += test_generic_06.sh
-> > +TEST_PROGS += test_generic_07.sh
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 40f971a66d3e..347790b3a633 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -609,6 +609,11 @@ static void ublk_apply_params(struct ublk_device *ub)
+> >                 ublk_dev_param_zoned_apply(ub);
+> >  }
 > >
-> >  TEST_PROGS += test_null_01.sh
-> >  TEST_PROGS += test_null_02.sh
-> > diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-> > index e57a1486bb48..701b47f98902 100644
-> > --- a/tools/testing/selftests/ublk/kublk.c
-> > +++ b/tools/testing/selftests/ublk/kublk.c
-> > @@ -538,10 +538,12 @@ int ublk_queue_io_cmd(struct ublk_queue *q, struct ublk_io *io, unsigned tag)
-> >
-> >         /* we issue because we need either fetching or committing */
-> >         if (!(io->flags &
-> > -               (UBLKSRV_NEED_FETCH_RQ | UBLKSRV_NEED_COMMIT_RQ_COMP)))
-> > +               (UBLKSRV_NEED_FETCH_RQ | UBLKSRV_NEED_COMMIT_RQ_COMP | UBLKSRV_NEED_GET_DATA)))
-> 
-> Comment could use an update
-> 
-> >                 return 0;
-> >
-> > -       if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
-> > +       if (io->flags & UBLKSRV_NEED_GET_DATA)
-> > +               cmd_op = UBLK_U_IO_NEED_GET_DATA;
-> > +       else if (io->flags & UBLKSRV_NEED_COMMIT_RQ_COMP)
-> >                 cmd_op = UBLK_U_IO_COMMIT_AND_FETCH_REQ;
-> >         else if (io->flags & UBLKSRV_NEED_FETCH_RQ)
-> >                 cmd_op = UBLK_U_IO_FETCH_REQ;
-> > @@ -658,6 +660,9 @@ static void ublk_handle_cqe(struct io_uring *r,
-> >                 assert(tag < q->q_depth);
-> >                 if (q->tgt_ops->queue_io)
-> >                         q->tgt_ops->queue_io(q, tag);
-> > +       } else if (cqe->res == UBLK_IO_RES_NEED_GET_DATA) {
-> > +               io->flags |= UBLKSRV_NEED_GET_DATA | UBLKSRV_IO_FREE;
-> > +               ublk_queue_io_cmd(q, io, tag);
-> >         } else {
-> >                 /*
-> >                  * COMMIT_REQ will be completed immediately since no fetching
-> > @@ -1313,7 +1318,7 @@ int main(int argc, char *argv[])
-> >
-> >         opterr = 0;
-> >         optind = 2;
-> > -       while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:az",
-> > +       while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:g:az",
-> >                                   longopts, &option_idx)) != -1) {
-> 
-> It's a little strange for -g to take an argument since it's basically
-> a boolean flag. But it looks like several other flags behave the same
-> way.
-
-Yeah, we can make it one bool flag.
-
-
-> 
-> >                 switch (opt) {
-> >                 case 'a':
-> > diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-> > index 918db5cd633f..44ee1e4ac55b 100644
-> > --- a/tools/testing/selftests/ublk/kublk.h
-> > +++ b/tools/testing/selftests/ublk/kublk.h
-> > @@ -115,6 +115,7 @@ struct ublk_io {
-> >  #define UBLKSRV_NEED_FETCH_RQ          (1UL << 0)
-> >  #define UBLKSRV_NEED_COMMIT_RQ_COMP    (1UL << 1)
-> >  #define UBLKSRV_IO_FREE                        (1UL << 2)
-> > +#define UBLKSRV_NEED_GET_DATA           (1UL << 3)
-> >         unsigned short flags;
-> >         unsigned short refs;            /* used by target code only */
-> >
-> > diff --git a/tools/testing/selftests/ublk/test_generic_07.sh b/tools/testing/selftests/ublk/test_generic_07.sh
-> > new file mode 100755
-> > index 000000000000..5d82b5955006
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/ublk/test_generic_07.sh
-> > @@ -0,0 +1,25 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
+> > +static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
+> > +{
+> > +       return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
+> > +}
 > > +
-> > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > +
-> > +TID="generic_07"
-> > +ERR_CODE=0
-> > +
-> > +_prep_test "generic" "test UBLK_F_NEED_GET_DATA"
-> > +
-> > +_create_backfile 0 256M
-> > +dev_id=$(_add_ublk_dev -t loop -q 2 -g 1 "${UBLK_BACKFILES[0]}")
-> > +_check_add_dev $TID $?
-> > +
-> > +# run fio over the ublk disk
-> > +if ! _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M; then
-> > +       _cleanup_test "generic"
-> > +       _show_result $TID 255
+> >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+> >  {
+> >         return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
+> > @@ -1950,9 +1955,16 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+> >                                 unsigned int index, unsigned int issue_flags)
+> >  {
+> >         struct ublk_device *ub = cmd->file->private_data;
+> > +       struct ublk_io *io = &ubq->ios[tag];
 > 
-> Propagate the return code from fio?
+> I thought you had mentioned in
+> https://lore.kernel.org/linux-block/aAmYJxaV1-yWEMRo@fedora/ wanting
+> to the ability to offload the ublk zero-copy buffer registration to a
+> thread other than ubq_daemon. Are you still planning to do that, or
+> does the "auto-register" feature supplant the need for that?
 
-OK.
+The auto-register idea is actually thought of when I was working on ublk
+selftest offload function.
+
+If this auto-register feature is supported, it becomes less important to
+relax the ubq_daemon limit for register_io_buffer command, then I jump
+on this feature & post put the patch.
+
+But I will continue to work on the offload test code and finally relax
+the limit for register/unregister io buffer command, hope it can be
+done in next week.
+
+> Accessing
+> the ublk_io here only seems safe when on the ubq_daemon thread.
+
+Both ublk_register_io_buf()/ublk_unregister_io_buf() just reads ublk_io or
+the request buffer only, so it is just fine for the two to run from other
+contexts.
 
 > 
-> > +fi
+> >         struct request *req;
+> >         int ret;
+> >
+> > +       if (!ublk_support_zero_copy(ubq))
+> > +               return -EINVAL;
+> > +
+> > +       if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+> > +               return -EINVAL;
 > 
-> All the other tests that use _run_fio_verify_io appear to check
-> _have_program fio first. Is that necessary here too?
+> Every opcode except UBLK_IO_FETCH_REQ now checks io->flags &
+> UBLK_IO_FLAG_OWNED_BY_SRV. Maybe it would make sense to lift the check
+> up to __ublk_ch_uring_cmd() to avoid duplicating it?
 
-Will add the check.
+Good point.
 
 
 Thanks, 
