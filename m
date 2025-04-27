@@ -1,55 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5592210942
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 12:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AFA84A35
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 13:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745758715; cv=none; b=IFp0S/wZdD0QxIHiwk5bIouh+kjipOacE1gc1N3BRdUSbg57gtLvEqxOdsDtsHX4DY1vfWXorP6Q8hqVWAeYnhREAQbbyjeF2E3MZyqPbHmgx02L8kJFVFkvWrjjw/NaSDnDVYDqzyrP3zET2+B7hC/Z4olBEJ1LCcupmKgN1xk=
+	t=1745758908; cv=none; b=WmGAdN0+zRAd1/mJ4HSloa9kme/XW8gGrR3fRxFwDxiK+UwM4R6o0TrqV2QluNtupW4EOSNwVgWoaH3Q63Xl2OLPTbO9knRvwpe/kc0/0QovRWcAivcU2VDNWMkTyL6lnKzxRGQ9qhjBWXJEEXpk+v+aC7wAfGe+AVkSpLlYr6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745758715; c=relaxed/simple;
-	bh=LuIU5a4+RaKhmxjmGZ/A3rHG2uBu7Z2ONKOEnOeInjY=;
+	s=arc-20240116; t=1745758908; c=relaxed/simple;
+	bh=ZglE8CasNQkRyZwqQ07x19uhJCcBvo7NtP6MxqxWpbE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ovmp6Z/PsIY5w0QsSmj3rLHvs6W4IXFYkHyZJpgqphX6DdCl3YMGLjWH0bPlvB/L5kHTuzx2dBejeJU0tDaojPngahkA1sdtz7CT8jp2uJataamzRIjhKvaxssK226s8pXFoExV8q5vV7ptwOC70sJqM8MpfJP41Sn07o4oBLX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSzWxPhi; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=WczCqJGwcBOfbTWPKXSEnkP8aJOUdyfJoTYCtfsEs3Oohl2gRYwFdVlQ52l/JnlbrPg1WNDyIuzwZr2Gs8izOYUqjBKxrQOfyH33pMLwBeMDrDg28cEiBx8pJQUjgYPzE9HgQzftCuOlQitLcOpDAKkT2OmioEG8lEBzRJYfTTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtvar8yG; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSzWxPhi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtvar8yG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745758712;
+	s=mimecast20190719; t=1745758904;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iWgEc8ufAgptgVygRVS205l4twTMcaOQPmrxzOh7Ubw=;
-	b=HSzWxPhigFHyyPypIxlKsU897x90DXYJ5qGr16prIvKbSdSSEp8lwwZup8ycjC1NtH2CUo
-	+29LjWkvIHdtZQY+4KL6UXRpP1el5dZnhmtX2yxVhxeYU4Qh3nhDNDcx8GeWgJf5gMdpp3
-	PtNI22f54Te7IcMZEC5XA7xqce3T5H4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=XBmV6ADRgSJ8LWAWXhID2kwENoWgHwUt/9lB9Waom7Y=;
+	b=gtvar8yGl1x2VebaixxyOewjXYLxvF468KaXdnVjFUFepL+JgRv9WSpl+nI6jS/wMMmuok
+	kr9o7nrlwz5ImKz8jgkz2BFPTtTN+fA5+gW0DYr16X3/G20a/TjunrZRe9qU4+KbCCSThp
+	hpPXMtvBGVyFKcv8l1GOmsMRnLS1IbE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-78-8wBr4P9XMGuY3BAiGqhvaA-1; Sun,
- 27 Apr 2025 08:58:28 -0400
-X-MC-Unique: 8wBr4P9XMGuY3BAiGqhvaA-1
-X-Mimecast-MFC-AGG-ID: 8wBr4P9XMGuY3BAiGqhvaA_1745758707
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-623-kXjJx-vhPeaIZojRNwztHQ-1; Sun,
+ 27 Apr 2025 09:01:40 -0400
+X-MC-Unique: kXjJx-vhPeaIZojRNwztHQ-1
+X-Mimecast-MFC-AGG-ID: kXjJx-vhPeaIZojRNwztHQ_1745758899
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CAFB180048E;
-	Sun, 27 Apr 2025 12:58:27 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C0AF0195608A;
+	Sun, 27 Apr 2025 13:01:39 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.119])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5A3A195608D;
-	Sun, 27 Apr 2025 12:58:23 +0000 (UTC)
-Date: Sun, 27 Apr 2025 20:58:18 +0800
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17FA3180045B;
+	Sun, 27 Apr 2025 13:01:35 +0000 (UTC)
+Date: Sun, 27 Apr 2025 21:01:31 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] ublk: fix "immepdately" typo in comment
-Message-ID: <aA4p6n7eIX9-fhAM@fedora>
+Subject: Re: [PATCH 3/8] ublk: remove misleading "ubq" in
+ "ubq_complete_io_cmd()"
+Message-ID: <aA4qqwHaEM42pzN_@fedora>
 References: <20250427045803.772972-1-csander@purestorage.com>
- <20250427045803.772972-3-csander@purestorage.com>
+ <20250427045803.772972-4-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,11 +59,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250427045803.772972-3-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20250427045803.772972-4-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Sat, Apr 26, 2025 at 10:57:57PM -0600, Caleb Sander Mateos wrote:
-> Looks like "immediately" was intended.
+On Sat, Apr 26, 2025 at 10:57:58PM -0600, Caleb Sander Mateos wrote:
+> ubq_complete_io_cmd() doesn't interact with a ublk queue, so "ubq" in
+> the name is confusing. Most likely "ubq" was meant to be "ublk".
 > 
 > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
