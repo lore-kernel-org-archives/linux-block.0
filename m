@@ -1,175 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192A679E1
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 03:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9770979C4
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 04:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745725766; cv=none; b=es6TNV3slat4cwd18gZVhlI1aFfFNfASrgdD6uLjrNaf+KWymXDQkUwXmcDlSjJ9KiVC0Hz4FVNBju2ezb3reWkxwDDFsaYdiw+ARjJprDO9gLB3BtCi2toxkqpa9W4YJR+0xHTLy3w9yb9WzBMURGlT/ysXuw5fPNQWu4c9kNA=
+	t=1745726689; cv=none; b=gsNRX6Rb7r4tH/dthqRfQ28s5M+3xDfDgK8iVF+N8H8X9xwfTswM2a/5VEIdrpiMoR9Zrxmyo8MScdMtsFCNfgA/KoBfwOhswXtRZhM6XdEIowYWROCwIHPohD1KBGgDXX8hBShWGg/7WPLPxs28K57IY+nt6Pv326He0T586OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745725766; c=relaxed/simple;
-	bh=E1BPr3GtuwYh8FkFUKd7erSIvmQhHcf0eLSF3NEKN+c=;
+	s=arc-20240116; t=1745726689; c=relaxed/simple;
+	bh=rJMCC+V4FvScaxiFmF/rYhupUAOpp72DqYenxJuTPlc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nrdkje9yXAr/k4ie+Y5lKIUVNK2Y+BryIZmqNjklqKsOK4wLEzs5HR7g2ktxoDe+ZILTLaprbD5h7CTsj+iLHDuBhy8LIj0ER1vixkPY5Cp/iK9FiPfr9kLn6KMu6JlrhNNN4GIolhukaTewzWADEEcl+33YYW03SLMpJGfsSoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MH9vEOI1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=SWuqLx7sP4NBYNYFh7y1igZNW8qGnxdbYUI55tYuJtaZCb3Bdr4qZJPzrtoxi8AE+q+wDk9SnJV7L4wEfvBi3qf8tJFovbmQXyw0rb0/dq0OeyfU5G0sBoJCtR/opCx67JUOB6ocZqNOYNu0mR7ulPB1pBHkHCXvuH0qs1Df8lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FgvotdSg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MH9vEOI1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745725762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XhfD+j2G2AHOQvkmnOjWOYdRZ85utLbedsLhVDg6iB0=;
-	b=MH9vEOI1V5FqS03HibCij0Op0laLiLJpo43VCNRMJybR6R2TrxUALNqQ4t3t1ZmlRfGiZW
-	jbYxB69RDy63xKhBZ10a2CV1SOkdi3v2vKDX165prGeh9WW4ZsxZ2O4R71gBzPe70tfkPZ
-	6PvP7xGZGTKeQLPQczPZJ8jf+0SdoVI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-6YgAeruOPku_5mXStTcfyA-1; Sat,
- 26 Apr 2025 23:49:19 -0400
-X-MC-Unique: 6YgAeruOPku_5mXStTcfyA-1
-X-Mimecast-MFC-AGG-ID: 6YgAeruOPku_5mXStTcfyA_1745725758
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D72D1800876;
-	Sun, 27 Apr 2025 03:49:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.41])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E4D3195608D;
-	Sun, 27 Apr 2025 03:49:14 +0000 (UTC)
-Date: Sun, 27 Apr 2025 11:49:09 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FgvotdSg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7424C4CEE3;
+	Sun, 27 Apr 2025 04:04:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745726689;
+	bh=rJMCC+V4FvScaxiFmF/rYhupUAOpp72DqYenxJuTPlc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FgvotdSgGCfxj3WmA1VL9DX2GuEHEdzrWkAkeeDCp295kYd/pyPTWescIZTTXZNtq
+	 7Gi7wGbTduTylbx6ztwV66eP6NHCls1tJXvxgAnGt18UcjEmDg/eYsGdHE15+POoye
+	 dkpnMsV06Fl3nro6MWWuy2i9GJvD6XA1L0mQ/bRdHqpGpUzz4OI3m3PQgsnkVSI6Cb
+	 P1o01YM3iT6d3gVcNtDdxIA7pBRWDgNyW7mKy8H21jg+Fam9djFz0tlWM6vxv/gnIL
+	 fjjMV4uFgFE9AY/ZINDcEkNcfEGnJ2Fac6dEOxAUXp3bnf7gbfPuxegbzqoaZF39MI
+	 i5GQqAqBAh1VA==
+Date: Sat, 26 Apr 2025 22:04:46 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH 2/4] ublk: enhance check for register/unregister io
- buffer command
-Message-ID: <aA2pNRkBhgKsofRP@fedora>
+Subject: Re: [PATCH 3/4] ublk: add feature UBLK_F_AUTO_ZERO_COPY
+Message-ID: <aA2s3oVFfOF1X485@kbusch-mbp.dhcp.thefacebook.com>
 References: <20250426094111.1292637-1-ming.lei@redhat.com>
- <20250426094111.1292637-3-ming.lei@redhat.com>
- <CADUfDZrF71gPfCghE+wNyLXTmtAUprMfpo1XtP1C7kxx-=eP+w@mail.gmail.com>
- <aA2KPuQl1_hTlplG@fedora>
- <CADUfDZqZ_9O7vUAYtxrrujWqPBuP05nBhCbzNuNsc9kJTmX2sA@mail.gmail.com>
+ <20250426094111.1292637-4-ming.lei@redhat.com>
+ <CADUfDZqQ_xvFMP=yjUYvvnn6u36iNBmcgoONBoBVhDjyiZQfjA@mail.gmail.com>
+ <aA2XwIcOPysPTra9@kbusch-mbp.dhcp.thefacebook.com>
+ <aA2gJqKs31-_diER@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqZ_9O7vUAYtxrrujWqPBuP05nBhCbzNuNsc9kJTmX2sA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <aA2gJqKs31-_diER@fedora>
 
-On Sat, Apr 26, 2025 at 08:14:18PM -0700, Caleb Sander Mateos wrote:
-> On Sat, Apr 26, 2025 at 6:37 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Sat, Apr 26, 2025 at 01:38:14PM -0700, Caleb Sander Mateos wrote:
-> > > On Sat, Apr 26, 2025 at 2:41 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > The simple check of UBLK_IO_FLAG_OWNED_BY_SRV can avoid incorrect
-> > > > register/unregister io buffer easily, so check it before calling
-> > > > starting to register/un-register io buffer.
-> > > >
-> > > > Also only allow io buffer register/unregister uring_cmd in case of
-> > > > UBLK_F_SUPPORT_ZERO_COPY.
-> > >
-> > > Indeed, both these checks make sense. (Hopefully there aren't any
-> > > applications depending on the ability to use ublk zero-copy without
-> > > setting the flag.) I too was thinking of adding the
-> > > UBLK_IO_FLAG_OWNED_BY_SRV check because it could allow the
-> > > kref_get_unless_zero() to be replaced with the cheaper kref_get(). I
-> > > think the checks could be split into 2 separate commits, but up to
-> > > you.
-> >
-> > Let's do it in single patch for making everyone easier.
-> >
-> > >
-> > > >
-> > > > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
-> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > ---
-> > > >  drivers/block/ublk_drv.c | 23 ++++++++++++++++++++++-
-> > > >  1 file changed, 22 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > index 40f971a66d3e..347790b3a633 100644
-> > > > --- a/drivers/block/ublk_drv.c
-> > > > +++ b/drivers/block/ublk_drv.c
-> > > > @@ -609,6 +609,11 @@ static void ublk_apply_params(struct ublk_device *ub)
-> > > >                 ublk_dev_param_zoned_apply(ub);
-> > > >  }
-> > > >
-> > > > +static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
-> > > > +{
-> > > > +       return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
-> > > > +}
-> > > > +
-> > > >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
-> > > >  {
-> > > >         return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
-> > > > @@ -1950,9 +1955,16 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
-> > > >                                 unsigned int index, unsigned int issue_flags)
-> > > >  {
-> > > >         struct ublk_device *ub = cmd->file->private_data;
-> > > > +       struct ublk_io *io = &ubq->ios[tag];
-> > >
-> > > I thought you had mentioned in
-> > > https://lore.kernel.org/linux-block/aAmYJxaV1-yWEMRo@fedora/ wanting
-> > > to the ability to offload the ublk zero-copy buffer registration to a
-> > > thread other than ubq_daemon. Are you still planning to do that, or
-> > > does the "auto-register" feature supplant the need for that?
-> >
-> > The auto-register idea is actually thought of when I was working on ublk
-> > selftest offload function.
-> >
-> > If this auto-register feature is supported, it becomes less important to
-> > relax the ubq_daemon limit for register_io_buffer command, then I jump
-> > on this feature & post put the patch.
-> >
-> > But I will continue to work on the offload test code and finally relax
-> > the limit for register/unregister io buffer command, hope it can be
-> > done in next week.
-> >
-> > > Accessing
-> > > the ublk_io here only seems safe when on the ubq_daemon thread.
-> >
-> > Both ublk_register_io_buf()/ublk_unregister_io_buf() just reads ublk_io or
-> > the request buffer only, so it is just fine for the two to run from other
-> > contexts.
+On Sun, Apr 27, 2025 at 11:10:30AM +0800, Ming Lei wrote:
+> On Sat, Apr 26, 2025 at 08:34:40PM -0600, Keith Busch wrote:
+> > 
+> > This is very similiar to something I proposed off-list, and the feedback
 > 
-> Isn't it racy to check io->flags when it could be concurrently
-> modified by another thread (the ubq_daemon)?
+> Looks we both think of it, :-)
 
-Good question!
+Yeah, for real. I was a bit dismayed when I learned of such use cases.
+So much simplicity and elegance went away...
+ 
+> > back then was this won't work because the back-end ring that wants to
+> > use the zero-copy buffer isn't the same as the ublk server ring
+> > recieving notification of a new command; the ublk driver has no idea
+> > which uring to register the bvec with. Also, this is using the request
+> > "tag" as the io_uring buf index, which wouldn't work when the ublk
+> > server ring handles multiple ublk devices due to the tag collisions.
+> > 
+> > If you're can make those trade-offs, then this is a great simplification
+> > to the whole thing.
+> 
+> The io_uring fd & buffer index can be provided from 'ublksrv_io_cmd'.
+> 
+> https://lore.kernel.org/linux-block/aA2RNG3-WzuQqEN6@fedora/
+> 
+> If we only support IORING_ENTER_REGISTERED_RING, 32bit is enough for
+> io_uring fd & buffer index, and there is still 64bits available if not
+> taking UBLK_F_ZONED into account.
 
-Yeah, it becomes tricky if registering buffer from other pthread, such as:
-
-- one io handler thread is registering buffer for tag 0 from cpu 0
-
-- UBLK_IO_COMMIT_AND_FETCH_REQ comes on tag 0 from one bad ublk daemon
-
-Then the io handler thread may observe UBLK_IO_FLAG_OWNED_BY_SRV, but
-meantime UBLK_IO_COMMIT_AND_FETCH_REQ clears it and completes the request,
-and this request may be freed or recycled immediately.  Then the io handler
-pthread sees wrong request data.
-
-
-The approach I mentioned in the following link may help to support 'offload':
-
-https://lore.kernel.org/linux-block/aAscRPVcTBiBHNe7@fedora/
-
-The nice thing is that one batch of commands can be delivered via single or
-multiple READ_MULTISHOT, and per-queue spin lock can be used. Same with io
-command completion side. And it becomes easier to remove the ubq_daemon
-constraint with the per-queue lock.
-
-Thanks,
-Ming
-
+We still need a registered sparse table for the backend ring. I think
+maybe a simple ida from the ublk driver to select an index may let the
+daemon register something reasonably small.
