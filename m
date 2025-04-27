@@ -1,104 +1,73 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0F41A9B53;
-	Sun, 27 Apr 2025 10:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5592210942
+	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 12:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745748032; cv=none; b=WSCCQwyPvZfMIn1Nz6n8BtJQtwLfdTDLJRYx4fnyByUHzaxBAqrkxYr2/ZuChbI3jgm1qpH+YUI9i3JD4XsJy1y1d+PsGhs9mXeBv1hG9lH1fo3AcDfUMfiYbmDhWgL0d6o3FYbi+ywnC21Rc5YYOYtCtWa5tqgEz1mzQZRyCac=
+	t=1745758715; cv=none; b=IFp0S/wZdD0QxIHiwk5bIouh+kjipOacE1gc1N3BRdUSbg57gtLvEqxOdsDtsHX4DY1vfWXorP6Q8hqVWAeYnhREAQbbyjeF2E3MZyqPbHmgx02L8kJFVFkvWrjjw/NaSDnDVYDqzyrP3zET2+B7hC/Z4olBEJ1LCcupmKgN1xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745748032; c=relaxed/simple;
-	bh=2AJESlIzrICkfNVKItN+ZI13DbHRQ2WIsWRmd0Gg2bQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YcesudXeWRCk900HMFEFrTmB8Iop1q8nNz10enKcCvcYRmuzVwjeIVBT4UNt0LIIX/+wARq0ZpwTGFlIXSuCUbAfCzE4/iS22rvqtgyZjSMcRH/MwkhYmcJIMbYEyJ1Nl9O0v2afnUORFxU+xEyzUEuLYL5Dd7R4r/r/ohhd5es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aecdf.dynamic.kabel-deutschland.de [95.90.236.223])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	s=arc-20240116; t=1745758715; c=relaxed/simple;
+	bh=LuIU5a4+RaKhmxjmGZ/A3rHG2uBu7Z2ONKOEnOeInjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ovmp6Z/PsIY5w0QsSmj3rLHvs6W4IXFYkHyZJpgqphX6DdCl3YMGLjWH0bPlvB/L5kHTuzx2dBejeJU0tDaojPngahkA1sdtz7CT8jp2uJataamzRIjhKvaxssK226s8pXFoExV8q5vV7ptwOC70sJqM8MpfJP41Sn07o4oBLX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSzWxPhi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSzWxPhi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745758712;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iWgEc8ufAgptgVygRVS205l4twTMcaOQPmrxzOh7Ubw=;
+	b=HSzWxPhigFHyyPypIxlKsU897x90DXYJ5qGr16prIvKbSdSSEp8lwwZup8ycjC1NtH2CUo
+	+29LjWkvIHdtZQY+4KL6UXRpP1el5dZnhmtX2yxVhxeYU4Qh3nhDNDcx8GeWgJf5gMdpp3
+	PtNI22f54Te7IcMZEC5XA7xqce3T5H4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-78-8wBr4P9XMGuY3BAiGqhvaA-1; Sun,
+ 27 Apr 2025 08:58:28 -0400
+X-MC-Unique: 8wBr4P9XMGuY3BAiGqhvaA-1
+X-Mimecast-MFC-AGG-ID: 8wBr4P9XMGuY3BAiGqhvaA_1745758707
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2CCF561E647A7;
-	Sun, 27 Apr 2025 11:59:42 +0200 (CEST)
-Message-ID: <5b26202c-475f-48be-b6d4-b32b62eff7b1@molgen.mpg.de>
-Date: Sun, 27 Apr 2025 11:59:41 +0200
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CAFB180048E;
+	Sun, 27 Apr 2025 12:58:27 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.119])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5A3A195608D;
+	Sun, 27 Apr 2025 12:58:23 +0000 (UTC)
+Date: Sun, 27 Apr 2025 20:58:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/8] ublk: fix "immepdately" typo in comment
+Message-ID: <aA4p6n7eIX9-fhAM@fedora>
+References: <20250427045803.772972-1-csander@purestorage.com>
+ <20250427045803.772972-3-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/9] md: fix is_mddev_idle()
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@infradead.org, axboe@kernel.dk, xni@redhat.com, agk@redhat.com,
- snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
- yukuai3@huawei.com, cl@linux.com, nadav.amit@gmail.com, ubizjak@gmail.com,
- akpm@linux-foundation.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com
-References: <20250427082928.131295-1-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250427082928.131295-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250427045803.772972-3-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Dear Kuai,
-
-
-Thank you for your patch series. Some minor comments below.
-
-
-Am 27.04.25 um 10:29 schrieb Yu Kuai:
-> From: Yu Kuai <yukuai3@huawei.com>
-
-If a full cover letter is not warranted, maybe state, what patch to look 
-at? (In this case 8/9.)
-
-> Changes in v2:
->   - add patch 1-5
->   - add reviewed-by in patch 6,7,9
->   - rename mddev->last_events to mddev->normal_IO_events in patch 8
+On Sat, Apr 26, 2025 at 10:57:57PM -0600, Caleb Sander Mateos wrote:
+> Looks like "immediately" was intended.
 > 
-> Yu Kuai (9):
->    blk-mq: remove blk_mq_in_flight()
->    block: reuse part_in_flight_rw for part_in_flight
->    block: WARN if bdev inflight counter is negative
->    block: cleanup blk_mq_in_flight_rw()
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-cleanup → clean up
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
->    block: export API to get the number of bdev inflight IO
->    md: record dm-raid gendisk in mddev
->    md: add a new api sync_io_depth
+Thanks,
+Ming
 
-add a new → add new
-
->    md: fix is_mddev_idle()
->    md: cleanup accounting for issued sync IO
-
-cleanup → clean up
-
->   block/blk-core.c          |   2 +-
->   block/blk-mq.c            |  22 ++---
->   block/blk-mq.h            |   5 +-
->   block/blk.h               |   1 -
->   block/genhd.c             |  69 ++++++++------
->   drivers/md/dm-raid.c      |   3 +
->   drivers/md/md.c           | 193 +++++++++++++++++++++++++++-----------
->   drivers/md/md.h           |  18 +---
->   drivers/md/raid1.c        |   3 -
->   drivers/md/raid10.c       |   9 --
->   drivers/md/raid5.c        |   8 --
->   include/linux/blkdev.h    |   1 -
->   include/linux/part_stat.h |   2 +
->   13 files changed, 194 insertions(+), 142 deletions(-)
-
-
-
-Kind regards,
-
-Paul
