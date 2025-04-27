@@ -1,28 +1,28 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB8B2475CB;
-	Sun, 27 Apr 2025 08:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7912472BD;
+	Sun, 27 Apr 2025 08:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745743035; cv=none; b=nTmrhuyuTxIAhbSCdGOLzg4ea1/QSig7zDPFy+uk4kdXOUvDwFPlNajmfjnpgjBzLOtvY3/ByeebQeIlXNkv/vKMldrjLazLSYaRQ8TiRwLKVLXrM+AhDK72D62FWrvJKwd+zdEIBKvD8Oo1aIjBIVOn2ZcXcTCW/S3xq8ucmXE=
+	t=1745743036; cv=none; b=n3AzPoj0JAMUW51O+8urYGpRvCBx5TLBWjGoERkRIwAWRUBHvQ//kh+8RPuJ9aWf8qn+KvYKa9/7rxNAEZze/CJZgO5fW1FntXjfhGpYSaKiqHcjVrWkw5eMiGqEtQDIPOVbjT8TezK2ULJ8p4ihkcb5f2PPD/qxg30+hTBvhn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745743035; c=relaxed/simple;
-	bh=fXcNQwWqeVyBqzxcd5v2VPNaXfbyZPMYGJAkOljc/Ac=;
+	s=arc-20240116; t=1745743036; c=relaxed/simple;
+	bh=3Zm8ayzm+HKCEu5hYRFXLS/uWZqvyuAb/t6xkLJTbOE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g12tvrsahpblczQitw2wg7iplKZFMrpwGx/FnZ/fvTneroCyxDTy8D/B1pOVJuSUppXyeyuEzjc0dEq62VAeqjrDetBZdMJh3PAbG/IHPtR+D0ftZlT9q0dSqJh1RtJo+makircFuCxhJAyuqyNAYZ3ZmyltwvwvFEnEsHfmYTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=nBnKT7OQv4xqWUYARluRMrLWyD6aclQYmUD3KEiGq0JiIz8Hd8qSML8v/EzmBBP8BmQZwU8odfWlm2bvUdeoPjpejXk3XG5TtyY1l7GghywESK6iHcQLfM8mG6nD8wBy3nGZJu7tHoml3iPTxZtrkf/1wUM1kYpZEhMzCyelxH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zlg0y2Pmqz4f3jqb;
-	Sun, 27 Apr 2025 16:36:50 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zlg0v1XwVz4f3jcx;
+	Sun, 27 Apr 2025 16:36:47 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 2656D1A0ECD;
-	Sun, 27 Apr 2025 16:37:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 4A9061A1E06;
+	Sun, 27 Apr 2025 16:37:11 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP3 (Coremail) with SMTP id _Ch0CgDHGsWx7A1oOv4xKg--.7274S6;
-	Sun, 27 Apr 2025 16:37:08 +0800 (CST)
+	by APP3 (Coremail) with SMTP id _Ch0CgDHGsWx7A1oOv4xKg--.7274S9;
+	Sun, 27 Apr 2025 16:37:11 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: hch@infradead.org,
 	axboe@kernel.dk,
@@ -44,9 +44,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH v2 2/9] block: reuse part_in_flight_rw for part_in_flight
-Date: Sun, 27 Apr 2025 16:29:21 +0800
-Message-Id: <20250427082928.131295-3-yukuai1@huaweicloud.com>
+Subject: [PATCH v2 5/9] block: export API to get the number of bdev inflight IO
+Date: Sun, 27 Apr 2025 16:29:24 +0800
+Message-Id: <20250427082928.131295-6-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250427082928.131295-1-yukuai1@huaweicloud.com>
 References: <20250427082928.131295-1-yukuai1@huaweicloud.com>
@@ -57,77 +57,143 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgDHGsWx7A1oOv4xKg--.7274S6
-X-Coremail-Antispam: 1UD129KBjvJXoWrtFyUXryDCr48Xr1UGF43GFg_yoW8Jr48pr
-	4SkasIyFWDGr1fur10qr4xXa4ftw4UK34xZ343A34ftF4UJFnxZr93Kwn2yrySvr97Zay5
-	u34YyFy7GF1UZw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmY14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
-	kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
-	6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42
-	IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIev
-	Ja73UjIFyTuYvjTRNiSHDUUUU
+X-CM-TRANSID:_Ch0CgDHGsWx7A1oOv4xKg--.7274S9
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF13Xr13Cr1Uuw1rJw1DZFb_yoWrAFWDpr
+	1UGas8ArZ0gr1fuF4Dtw4xWr1Sqw4qk34Ivw1xA34akF4DtrySvas2yr92yr4SvrZ7AFWU
+	u34YkF97CF1jkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+	kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
+	AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
+	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
+	daVFxhVjvjDU0xZFpf9x0pRQJ5wUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-They are almost identical, to make code cleaner.
+- rename part_in_{flight, flight_rw} to bdev_count_{inflight, inflight_rw}
+- export bdev_count_inflight, to fix a problem in mdraid that foreground
+  IO can be starved by background sync IO in later patches
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/genhd.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+ block/blk-core.c          |  2 +-
+ block/blk.h               |  1 -
+ block/genhd.c             | 22 ++++++++++++++++------
+ include/linux/part_stat.h |  2 ++
+ 4 files changed, 19 insertions(+), 8 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e8cc270a453f..b862c66018f2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1018,7 +1018,7 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
+ 	stamp = READ_ONCE(part->bd_stamp);
+ 	if (unlikely(time_after(now, stamp)) &&
+ 	    likely(try_cmpxchg(&part->bd_stamp, &stamp, now)) &&
+-	    (end || part_in_flight(part)))
++	    (end || bdev_count_inflight(part)))
+ 		__part_stat_add(part, io_ticks, now - stamp);
+ 
+ 	if (bdev_is_partition(part)) {
+diff --git a/block/blk.h b/block/blk.h
+index 006e3be433d2..f476f233f195 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -418,7 +418,6 @@ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+ int blk_dev_init(void);
+ 
+ void update_io_ticks(struct block_device *part, unsigned long now, bool end);
+-unsigned int part_in_flight(struct block_device *part);
+ 
+ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+ {
 diff --git a/block/genhd.c b/block/genhd.c
-index c2bd86cd09de..f671d9ee00c4 100644
+index 2470099b492b..fdaeafddfc4c 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -125,21 +125,6 @@ static void part_stat_read_all(struct block_device *part,
+@@ -125,7 +125,7 @@ static void part_stat_read_all(struct block_device *part,
  	}
  }
  
--unsigned int part_in_flight(struct block_device *part)
--{
--	unsigned int inflight = 0;
--	int cpu;
--
--	for_each_possible_cpu(cpu) {
--		inflight += part_stat_local_read_cpu(part, in_flight[0], cpu) +
--			    part_stat_local_read_cpu(part, in_flight[1], cpu);
--	}
--	if ((int)inflight < 0)
--		inflight = 0;
--
--	return inflight;
--}
--
- static void part_in_flight_rw(struct block_device *part,
- 		unsigned int inflight[2])
+-static void part_in_flight_rw(struct block_device *part,
++static void bdev_count_inflight_rw(struct block_device *part,
+ 		unsigned int inflight[2], bool mq_driver)
  {
-@@ -157,6 +142,15 @@ static void part_in_flight_rw(struct block_device *part,
- 		inflight[1] = 0;
+ 	int cpu;
+@@ -147,14 +147,24 @@ static void part_in_flight_rw(struct block_device *part,
+ 		inflight[WRITE] = 0;
  }
  
-+unsigned int part_in_flight(struct block_device *part)
-+{
-+	unsigned int inflight[2];
-+
-+	part_in_flight_rw(part, inflight);
-+
-+	return inflight[READ] + inflight[WRITE];
-+}
-+
+-unsigned int part_in_flight(struct block_device *part)
++/**
++ * bdev_count_inflight - get the number of inflight IOs for a block device.
++ *
++ * @part: the block device.
++ *
++ * Inflight here means started IO accounting, from bdev_start_io_acct() for
++ * bio-based block device, and from blk_account_io_start() for rq-based block
++ * device.
++ */
++unsigned int bdev_count_inflight(struct block_device *part)
+ {
+ 	unsigned int inflight[2] = {0};
+ 
+-	part_in_flight_rw(part, inflight, false);
++	bdev_count_inflight_rw(part, inflight, false);
+ 
+ 	return inflight[READ] + inflight[WRITE];
+ }
++EXPORT_SYMBOL_GPL(bdev_count_inflight);
+ 
  /*
   * Can be deleted altogether. Later.
-  *
+@@ -1004,7 +1014,7 @@ ssize_t part_stat_show(struct device *dev,
+ 	struct disk_stats stat;
+ 	unsigned int inflight;
+ 
+-	inflight = part_in_flight(bdev);
++	inflight = bdev_count_inflight(bdev);
+ 	if (inflight) {
+ 		part_stat_lock();
+ 		update_io_ticks(bdev, jiffies, true);
+@@ -1053,7 +1063,7 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	unsigned int inflight[2] = {0};
+ 
+-	part_in_flight_rw(bdev, inflight, queue_is_mq(q));
++	bdev_count_inflight_rw(bdev, inflight, queue_is_mq(q));
+ 
+ 	return sysfs_emit(buf, "%8u %8u\n", inflight[READ], inflight[WRITE]);
+ }
+@@ -1308,7 +1318,7 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 		if (bdev_is_partition(hd) && !bdev_nr_sectors(hd))
+ 			continue;
+ 
+-		inflight = part_in_flight(hd);
++		inflight = bdev_count_inflight(hd);
+ 		if (inflight) {
+ 			part_stat_lock();
+ 			update_io_ticks(hd, jiffies, true);
+diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
+index c5e9cac0575e..eeeff2a04529 100644
+--- a/include/linux/part_stat.h
++++ b/include/linux/part_stat.h
+@@ -79,4 +79,6 @@ static inline void part_stat_set_all(struct block_device *part, int value)
+ #define part_stat_local_read_cpu(part, field, cpu)			\
+ 	local_read(&(part_stat_get_cpu(part, field, cpu)))
+ 
++unsigned int bdev_count_inflight(struct block_device *part);
++
+ #endif /* _LINUX_PART_STAT_H */
 -- 
 2.39.2
 
