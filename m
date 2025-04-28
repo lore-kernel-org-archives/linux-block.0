@@ -1,47 +1,46 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1797C26982E
-	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 14:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3EA2F29;
+	Mon, 28 Apr 2025 14:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745849430; cv=none; b=eImagwxIWf6npVXBpLcX4qLpbIBZfJGW9BoIkoPf4HHRg9eY2PQ0l6fD1I6xiq46ob8Lc+/9mXLyxfRvUSaEamMlwvAv0T268YW0oKCpBt9k2GZweDvxsRFoZFn/hkjQrQAzG/ockMdE5VAZOMnhNSb2m/Fr3TtOMdZd/0E3oBo=
+	t=1745849759; cv=none; b=hZ5qWqQZV149CC1Ke+sWHT7o/oQC8e3yygLG4S4i27L94iX1s4h3R9C9ETS6p3/YJ5xYIfS89xWJtLm1gO4qRAXl/kIXNEr1ygSi75xIUC2/ON3jaH6cF9jQ/Ap8K0kc469irA22Bq5ydlGkoRQix3FcC4JCJGVSqdBra2GOUlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745849430; c=relaxed/simple;
-	bh=CtfSV6t3L4YvfppiFpfNO7jXCwoONUfgVnzKo9WuRL4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GM8YH6KjkF+3TTOLOG98oLamc6DNS1VIfe4n/AyTtJAWetAINUKG557eWq6FzpGoV56wOfXipZyinMN7hFiTjZBvhW8Y9mogS0plSNQKB+tVPYeOPKSCvc1/BTzgFhFM8CcdpVdHCDLtc7pZ0T3uyteW9Bg/GS9RZvsOaYWwwf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=25FjkK7A; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="25FjkK7A"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=VuYrWrx1Ws51I5TCe49sBi+KByJbn8TyH2PPTR+R3Cc=; b=25FjkK7AwmTvAmMCdXJQtuPRnw
-	/iAp2VnYp3AZXFT8Tyo+Ln8XC0wFidsuWdUrXE1mSct+OuT7giMtxYu3vqnJT1t/Ay1Hb8Vg1hEjt
-	l/FAJsLyYQdu91BffQk8GO/e1UcmVB3zuAmtm+aEyCXe1l0k1sQFYRKfqp3rrtxpBZR/pBoHPBAYu
-	rL0mjFj2T+f53Qwsm5gzezm0IYrN1sEoLF+Bzi05Ng5aeHoyla+Y0lIIIlgJicJxQANZNXPEksupJ
-	uSQQsAF1+pEYZz9On3bUwYUnWsjFXQkL5GNLERJjf8Qzp6ikeHKzSU+KJxjJCnFBVwdLBye7C0zr2
-	v1if39qQ==;
-Received: from [206.0.71.28] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u9PBk-00000006aWv-0ZFB;
-	Mon, 28 Apr 2025 14:10:28 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH 5/5] brd: use memcpy_{to,from]_page in brd_rw_bvec
-Date: Mon, 28 Apr 2025 07:09:51 -0700
-Message-ID: <20250428141014.2360063-6-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250428141014.2360063-1-hch@lst.de>
-References: <20250428141014.2360063-1-hch@lst.de>
+	s=arc-20240116; t=1745849759; c=relaxed/simple;
+	bh=CdY+cIeg1FgAwQ7kpo+CRDFaQy0LFC7gh5Gu2uEZak4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BY/FU1eDpl2TwAE3QvU4nEx/G+GKZCC4uriM0YT83zHq3/jm8WAFrkCefpVBozzt0moKPiGThMhdPDcHjEI5HvOOJMbC1gMtSxgJfErP094Ba1rQgEXSpMq7oY/kOEMmdO6UEIvorle6IHueZrx8U17rW22lACEYKHRjxAio2yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53SA1TJE023835;
+	Mon, 28 Apr 2025 14:15:49 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 468pf93133-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 28 Apr 2025 14:15:49 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Mon, 28 Apr 2025 07:15:47 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Mon, 28 Apr 2025 07:15:45 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <hch@infradead.org>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <ming.lei@redhat.com>,
+        <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH V4] loop: Add sanity check for read/write_iter
+Date: Mon, 28 Apr 2025 22:15:44 +0800
+Message-ID: <20250428141544.3279719-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <aA-HSxKfbM6WCgek@infradead.org>
+References: <aA-HSxKfbM6WCgek@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,105 +48,93 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-Proofpoint-GUID: 6ae_ElCPFn3Ruwk847cF5EN3yD1tWAMN
+X-Authority-Analysis: v=2.4 cv=EavIQOmC c=1 sm=1 tr=0 ts=680f8d95 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=XR8D0OoHHMoA:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=-zdqMli4Fx4ttb73DeEA:9 a=DcSpbTIhAlouE1Uv7lRv:22
+ a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI4MDExNyBTYWx0ZWRfXwnZWVEew/fqx +ZRA8pu5IG2SurvLjjJtCcD82Jeu3Yg3tD6jPJdoAZcgHblJcwvC5IvNoQ5je+lbyYNpZkjjBDB ctuOCTtL/tu6eq471dtl0ubzwDafHCccyZz+kU5resfJ4BQ9bCAjcrJ0BhnpbAXxznTRYxEcNaZ
+ 7j1es0impZV/iWVohLNyo4pJTuImy+NV+vV99ozGmwgjgzEfQkh9G1OxQuolTMgefwu9kDnGhAJ PmeCVRek7JQ8+X0DyveH3YkOGJTHNZvVxAst2i2EnkpBVrSlm4PH/h+k2BXrnVeZUFWQlrTUj1J OaoAADV53qFLhDZBDBX3OJ/7TNCO71z54vPakB5IWSFNKCnoummHDnE1rt5q9Jtr4c9wO49i1rV
+ itN4DcI/YFvLtJgui2+iI8VxdFVni7CMTVhBwNtai1HgGYCp0QuwHHJKI+9Oyb+mdAg8iCrW
+X-Proofpoint-ORIG-GUID: 6ae_ElCPFn3Ruwk847cF5EN3yD1tWAMN
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-28_05,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ adultscore=0 suspectscore=0 phishscore=0 mlxscore=0 clxscore=1015
+ mlxlogscore=990 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2504280117
 
-Use the proper helpers to copy to/from potential highmem pages, which
-do a local instead of atomic kmap underneath, and perform
-flush_dcache_page where needed.  This also simplifies the code so much
-that the separate read write helpers are not required any more.
+Some file systems do not support read_iter/write_iter, such as selinuxfs
+in this issue.
+So before calling them, first confirm that the interface is supported and
+then call it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+It is releavant in that vfs_iter_read/write have the check, and removal
+of their used caused szybot to be able to hit this issue.
+
+Fixes: f2fed441c69b ("loop: stop using vfs_iter__{read,write} for buffered I/O")
+Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
 ---
- drivers/block/brd.c | 58 ++++++++++-----------------------------------
- 1 file changed, 13 insertions(+), 45 deletions(-)
+V1 -> V2: move check to loop_configure and loop_change_fd
+V2 -> V3: using helper for this check
+V3 -> V4: remove input parameters change and mode
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 580b2d8ce99c..fa1290992a7f 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -99,43 +99,6 @@ static void brd_free_pages(struct brd_device *brd)
- 	xa_destroy(&brd->brd_pages);
+ drivers/block/loop.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 46cba261075f..655d33e63cb9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -505,6 +505,17 @@ static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
+ 	lo->lo_min_dio_size = loop_query_min_dio_size(lo);
  }
  
--/*
-- * Copy n bytes from src to the brd starting at sector. Does not sleep.
-- */
--static void copy_to_brd(struct brd_device *brd, const void *src,
--			sector_t sector, size_t n)
--{
--	struct page *page;
--	void *dst;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--
--	page = brd_lookup_page(brd, sector);
--	BUG_ON(!page);
--
--	dst = kmap_atomic(page);
--	memcpy(dst + offset, src, n);
--	kunmap_atomic(dst);
--}
--
--/*
-- * Copy n bytes to dst from the brd starting at sector. Does not sleep.
-- */
--static void copy_from_brd(void *dst, struct brd_device *brd,
--			sector_t sector, size_t n)
--{
--	struct page *page;
--	void *src;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--
--	page = brd_lookup_page(brd, sector);
--	if (page) {
--		src = kmap_atomic(page);
--		memcpy(dst, src + offset, n);
--		kunmap_atomic(src);
--	} else
--		memset(dst, 0, n);
--}
--
- /*
-  * Process a single segment.  The segment is capped to not cross page boundaries
-  * in both the bio and the brd backing memory.
-@@ -146,7 +109,8 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 	sector_t sector = bio->bi_iter.bi_sector;
- 	u32 offset = (sector & (PAGE_SECTORS - 1)) << SECTOR_SHIFT;
- 	blk_opf_t opf = bio->bi_opf;
--	void *mem;
-+	struct page *page;
-+	void *kaddr;
- 
- 	bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
- 
-@@ -168,15 +132,19 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 		}
- 	}
- 
--	mem = bvec_kmap_local(&bv);
--	if (!op_is_write(opf)) {
--		copy_from_brd(mem, brd, sector, bv.bv_len);
--		flush_dcache_page(bv.bv_page);
-+	page = brd_lookup_page(brd, sector);
++static int loop_check_backing_file(struct file *file)
++{
++	if (!file->f_op->read_iter)
++		return -EINVAL;
 +
-+	kaddr = bvec_kmap_local(&bv);
-+	if (op_is_write(opf)) {
-+		BUG_ON(!page);
-+		memcpy_to_page(page, offset, kaddr, bv.bv_len);
- 	} else {
--		flush_dcache_page(bv.bv_page);
--		copy_to_brd(brd, mem, sector, bv.bv_len);
-+		if (page)
-+			memcpy_from_page(kaddr, page, offset, bv.bv_len);
-+		else
-+			memset(kaddr, 0, bv.bv_len);
- 	}
--	kunmap_local(mem);
-+	kunmap_local(kaddr);
++	if ((file->f_mode & FMODE_WRITE) && (!file->f_op->write_iter))
++		return -EINVAL;
++
++	return 0;
++}
++
+ /*
+  * loop_change_fd switched the backing store of a loopback device to
+  * a new file. This is useful for operating system installers to free up
+@@ -526,6 +537,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	if (!file)
+ 		return -EBADF;
  
- 	bio_advance_iter_single(bio, &bio->bi_iter, bv.bv_len);
- 	return true;
++	error = loop_check_backing_file(file);
++	if (error)
++		return error;
++
+ 	/* suppress uevents while reconfiguring the device */
+ 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
+ 
+@@ -963,6 +978,14 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 
+ 	if (!file)
+ 		return -EBADF;
++
++	if ((mode & BLK_OPEN_WRITE) && (!file->f_op->write_iter))
++		return -EINVAL;
++
++	error = loop_check_backing_file(file);
++	if (error)
++		return error;
++
+ 	is_loop = is_loop_device(file);
+ 
+ 	/* This is safe, since we have a reference from open(). */
 -- 
-2.47.2
+2.43.0
 
