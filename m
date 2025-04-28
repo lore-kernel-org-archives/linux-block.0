@@ -1,913 +1,355 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108C5264616;
-	Mon, 28 Apr 2025 09:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745832265; cv=none; b=MGlpPj2yCodwFgeG/bp2TA/GsmTf73RaNkG98V244AgUT/rA69cxdgs97HAg5iAqmfVa+AI65+P58IYZ1uPfE43S6vBRIBliPUUDuKseTWzOg0Jq1ldHvMAL0L+Htxxlrkh7iqNLaAjQD0xCMoOK820ZztAb39DCRijNMKIDL7Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745832265; c=relaxed/simple;
-	bh=9vP4KAaf7eHx9mt8ZdGXz9CUCxSxRLWpwXr/m0S1xfs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qLnc96NaCHGMzaxIZK2E3U56GwLJBJGZC5uEq8JASUtyMKXGzJjmga5lH0FxogTjme/d7Bee6IF1gZWq4aBDIzFdd9GZ7VjS0Hh5cw0Vu9NBcjRnqOErXvdotuzJAGBqGQFFzYbE8d8R2IAWnpBSNH+7/ysJGcfrAzrqLWqa5oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTlAXiAg; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F83925F7BC;
+	Mon, 28 Apr 2025 09:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745832322; cv=fail; b=mdtwHBNEXfh9wiLdl31l/JU0N/zglhd0/S8iLt+VeUQKe3qIv1pM8k77AQoDY2Wz6AuEpWUPeu/DJO5qpskXKh3FoBbOMoumruv2zeS9l20L9yqZh4WyIdK+KNor0Wv4+Knf+cAS8pQer8uouBxieddUAWrgPziiRDsi5ldxIak=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745832322; c=relaxed/simple;
+	bh=oX6nXmeBS/Juxjb3OgiZnajNxDLm1ZaubWkzP/j7Qgk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CqH9330MYrWQKcWdjOpmNubh/4oHLpL6Ayt53efzKjWlXfVnxgGlFWCvgHhFWXsNk4YSY40gGgO5iobF3b35GfYG4PBzFCAF2HH9AFCiTjUDPKJd11JSaRW8KdckbUSD3Nq14O1UnRWv4ZzucLGZONOzS8VLC+HOJI0WuqYcLvY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=iB0aYg5Z; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=gXjgYK4C; arc=fail smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTlAXiAg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA21AC4CEE4;
-	Mon, 28 Apr 2025 09:24:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745832264;
-	bh=9vP4KAaf7eHx9mt8ZdGXz9CUCxSxRLWpwXr/m0S1xfs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DTlAXiAgqfXWqTa/ZRpoyze2KOjtuLs8Hmwqw1wFHLtj0zOYR6v52T4Fnt0GZdS7p
-	 V+B2eZtFyDfV6P98uiromPF4qPW+Y6flq/8OxlmrwHybt0FqXw8rKHLpAT+Fn6nUDD
-	 PPPN0fuxUud8EjyFn9neTKQ4svCvuxVUC/eFsXE8FGBk0AaL1NgDEF9MMf44YdOST4
-	 TRsBkkxdFmLTUbzLi6WHSD+ibWRgIv/IPX8AmztCQB7y5PuI6/H1NV/wSeSQtuBrzq
-	 azRv+KaqDurKP1ubcGlPWrYwHgQSS9I/RA2EeWuyaXsfMiF4FN7zSgLXTKYptxvI8U
-	 x7KLvin4isKfg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>
-Cc: Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH v10 23/24] nvme-pci: convert to blk_rq_dma_map
-Date: Mon, 28 Apr 2025 12:22:29 +0300
-Message-ID: <007e00134d49160d5edab94a72c35b7b91429b09.1745831017.git.leon@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1745831017.git.leon@kernel.org>
-References: <cover.1745831017.git.leon@kernel.org>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iB0aYg5Z";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="gXjgYK4C"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1745832320; x=1777368320;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=oX6nXmeBS/Juxjb3OgiZnajNxDLm1ZaubWkzP/j7Qgk=;
+  b=iB0aYg5ZgFWyQbnVKVOyxbFE7cG8VwT3N0vZY5E2BuEmW1tTPbtlOC/k
+   /hfIY7NJUIUBf/SV8LrbKSQr8P+XW5uY+FjGT/ajeSS3z7pyeZhfVS+af
+   lTL1YcSBmYNQn5yxSD8TvAti6SOFAQ268RsRtqjYonpyS7gfEnKorb018
+   nCeFxHowWEkeAQq3UCosIFUlrmFsxM9iLmg8bsQDAoZwVTGGv6PtYuOR3
+   F0lJldbEaMO2CNpcbEUN3nkND4TEKW4n48tJGzWdhPLEHQsEkPd3pEVEV
+   TdFnjtAeVCJqsBcA+b3K4EZ+2OCC5+zYMFXDyRgm5JCpIgNRJSLIb5QMD
+   Q==;
+X-CSE-ConnectionGUID: kLupZn4oTqaGgf4jrcqyYw==
+X-CSE-MsgGUID: 9pFFNAFyS4qNzH4EyiWHFw==
+X-IronPort-AV: E=Sophos;i="6.15,245,1739808000"; 
+   d="scan'208";a="76688501"
+Received: from mail-co1nam11lp2174.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.174])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2025 17:25:18 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bSdKaZ5iFoVmV4VjQDo8a6z2oIVPIQ6mITpwAMk2zSVFUbq84SwzRoA5mBdEd3VzMoqf5F8BQeO1BH3RP7LAw16RpfazoYP4LFdzpk5jTciphS8B4JkMOqZ5lykpDreTIZvy1R/wFtMdGif50W21wNoYVDKZC7viagBw7FRuCA5k2Px0wfuO+WoAuBU1vTlXcG3u1oQntPSSscUgG1+yA/y470eWPg/d5CQL0R+f3gV8dfqdKJpcWvrAX8AB1lfz8X4WfbYxRD1bQOLVS1r2uVhyklqeFiZpmU8QRX6x4HEgRob3/qojpgYgNUhr/Nf28yUQThg2GDStf5Bbq7vwZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hR9wgLkVZkbE+w9MPva/OMGPacKKZD7ap4VMuuIUVkM=;
+ b=YAyZhdrK/5/prpHOU6TiYxdOrhPO+fvg9tSSfb2bO0oynxdSDnnRKh0OXEmgqmddBizWxIUgFm+8VIS24//el+JhWrmIjlhPLFuvH0hzXvOqYAEy9+uOWEddyPjxT5DtWx5jKP7+dovIqNFSo8l0NYWz0M71K4XwAp79Me+V+My7XCA0sCChQRe+6hZst24ySGugY02htSFUOj20rcUxpm1J73Qb5GT/bJskFIJ8UdjDTUJNLHcGoh2CxDzsY4yC0frTZL8fQ6ZXGH/RgVKnoq/vboQQe3Fyicuig50yCwnUAr4/hsdMcpaVSYuW5YvZMHaujvvBVR4uNPInPoqPVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hR9wgLkVZkbE+w9MPva/OMGPacKKZD7ap4VMuuIUVkM=;
+ b=gXjgYK4C5UVaM6Od69EdkihiVMhnqHTkJKoHtCVLImNQAWwunzXvAhyG0yliGXike5s5uJXXIMOMFXV5hpHHSAJfjkP3SMYoJR4eC6gvaf3AYieKr8pglKSx/FjwuN4s03iM2QTbIaV/WJDfVVgTqaEGbUEXBApBNJiDecFbOrU=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SJ2PR04MB8535.namprd04.prod.outlook.com (2603:10b6:a03:4f7::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.29; Mon, 28 Apr
+ 2025 09:25:14 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%7]) with mapi id 15.20.8678.028; Mon, 28 Apr 2025
+ 09:25:13 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, hch
+	<hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>, "djwong@kernel.org"
+	<djwong@kernel.org>, "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
+	"bmarzins@redhat.com" <bmarzins@redhat.com>, "chaitanyak@nvidia.com"
+	<chaitanyak@nvidia.com>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+	"chengzhihao1@huawei.com" <chengzhihao1@huawei.com>, "yukuai3@huawei.com"
+	<yukuai3@huawei.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>
+Subject: Re: [PATCH blktests 2/3] dm/003: add unmap write zeroes tests
+Thread-Topic: [PATCH blktests 2/3] dm/003: add unmap write zeroes tests
+Thread-Index: AQHbl9iSuzW1B+y3X0qB2g4C3g3UvLORqIwAgCcUv4CAAD3pAIAADjkAgAAFxYA=
+Date: Mon, 28 Apr 2025 09:25:13 +0000
+Message-ID: <pbuxtmwqk5bdmxckwwkjob3lh6mg3et52w3xdvsnjjwmofschm@pkotcbnp4ypt>
+References: <20250318072835.3508696-1-yi.zhang@huaweicloud.com>
+ <20250318072835.3508696-3-yi.zhang@huaweicloud.com>
+ <t4vmmsupkbffrp3p33okbdjtf6il2ahp5omp2s5fvuxkngipeo@4thxzp4zlcse>
+ <7b0319ac-cad4-4285-800c-b1e18ee4d92b@huaweicloud.com>
+ <6p2dh577oiqe7lfaexv4fzct4aqhc56lxrz2ecwwctvbuxrjx3@oual7hmxfiqc>
+ <a5d847d1-9799-4294-ac8f-e78d73e3733d@huaweicloud.com>
+In-Reply-To: <a5d847d1-9799-4294-ac8f-e78d73e3733d@huaweicloud.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ2PR04MB8535:EE_
+x-ms-office365-filtering-correlation-id: 36fcb551-a641-47ac-fed1-08dd863694c0
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?6Z0VzYIIgHU4EAWOLL10s/uByuNeC8bRqrYId1qm252xs6F8YKYfifSzG2h5?=
+ =?us-ascii?Q?k6GvPiQDQJ1FRcKPTDPxskFwhGt7cXdpbs0lCeplnnuUPG12QvBHCQIilszL?=
+ =?us-ascii?Q?dfVDfubVpzZAV5ID0EDifUta5TvL9e28tHr+CP6cP3tZ0+tiJ5NIQfqribnl?=
+ =?us-ascii?Q?jnlzf2/zOG/u//+1KkN5Rk1OkZog0lMkHPW3iTs7EintNGlA7wIR4bQC9/bq?=
+ =?us-ascii?Q?zTkNTyTpy0VWtSEuqh4HXQ4PZylVsCaJqtPTUjdxDpKdnH8GGYVaRODpq5iR?=
+ =?us-ascii?Q?m47OVbGu+FnHdNAohysqSZ/IJQMGDXpgrZTzTcyZxEXhJCgUY03KeizD6Eft?=
+ =?us-ascii?Q?c7V9qpAzerwAO06xVhODWwnwzV3nSz++LS5YdVRXES0wveXLB6lASRvMQXr4?=
+ =?us-ascii?Q?XikDQVOIOq/Jwo2M6E3z4RUkE168Ay4eASehGEeN0XeMYoaOoD2YfwzyZ1gK?=
+ =?us-ascii?Q?HLrBF7uXj375FyzfoFQ9lbwhEFZ2Vw7Hl2F2eQhQWuFrju0YzzGil+Po8oJg?=
+ =?us-ascii?Q?TjvJoKDKlJYW7UX0U2MfS8vEsCnCVgmoqBzB4yZXaMEBrtZPUGwjfffHL4VE?=
+ =?us-ascii?Q?I8y+mEYd4UdDB4h9NdsbmVy6kZzLyO1jtVv/K4j9qJ6jtOGnjfwboXjOC3Ki?=
+ =?us-ascii?Q?po/qGbczeuw+pocBgi9ryji2eZHYEQcyDKNqtROtSEVCun5Eb2k2hCE2Ma3S?=
+ =?us-ascii?Q?b9Md6HUm33/OLF/QGCVEvAknkbfkM7JDEBQ98D++4FOzEkqISgKfFryB705a?=
+ =?us-ascii?Q?tRjeho0osARKSJhHm0VN8hN1VaUi9L42HWaSSJRw3huqENaM5wxAEL9LRbXW?=
+ =?us-ascii?Q?GwqJ8krhcRgKjqdTBw8DxXgsWmRAjf2kgZsJboPPOGZY+ixR0d7a0ITkY0i/?=
+ =?us-ascii?Q?02ItctBijpXzoZ8RmR34fNKIgOP6K30x5YrlQK7G0nh/DibaWBAU4wU2jqa9?=
+ =?us-ascii?Q?silPXDQJoAc5Ecy+DS3hbO/Hl24nz8vOPOtFQGQTXZXJy+5IYTnhLV5uzh0/?=
+ =?us-ascii?Q?ete/0wqUilZ2JMG8RuKJW6i0gw1NiDv8pFBKomGmhRXqrHc+dME8eI6S2u7j?=
+ =?us-ascii?Q?j334DOTqoqJO9bWwAebyAdkspnStL5v8+itTVrquXEZIYWBlD5gghmKbJjU2?=
+ =?us-ascii?Q?mus/PfVFXmcRhx/+iaHBAG6RF46pouzJ1PFOhLqECNrcFn9WmFczSY1Cap1c?=
+ =?us-ascii?Q?7ulK1+YAXKvsDSMIuxv6eMw4/RyH+1hSmWQj7RQ4/v5xCufQaL3prCesBYI+?=
+ =?us-ascii?Q?eMJobnnQu6BP0k7nBtfZvR8NYdOmOFeBTq/riH8wn4XgFpObsSlDrkkxXHkL?=
+ =?us-ascii?Q?D60KErCkgYbTYB3LAvPCb4+SQrsPqFRbA8rQCJAv8s4virSV8nY6pMHUw20Q?=
+ =?us-ascii?Q?YGzYETJXDQ9QPcq4lVrnWd9qBiuiHtarOA/l+P8ZoQpd7oQvy42WKqPZEU+L?=
+ =?us-ascii?Q?WrjHrCcPZSydzogFZSYd/RVu/iBu9Xwp+qx00uFAd8rPUN0QOrsqfw=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?s6ESpwzyDOVkmNDYGOGhPKBUJf3XwDABDSGiWXTozoXr9KRsAeEB3cu15gjf?=
+ =?us-ascii?Q?9Mb9jNbZlRZ94tRfJVmXqfUXc/KA1tW4afLqPYoHoJNaa6c0bDr90txUskPG?=
+ =?us-ascii?Q?5LxQtb2jrou3D30Ir46A/3MVY5jcWL7B3KfaqQKHg8HXlT2Uq1//D5JL0qOx?=
+ =?us-ascii?Q?VIHJALInFbn0ims90n1yWZ+4nk/n45n4oZGKuAL8CROMpmh2mLKRKLHID+W7?=
+ =?us-ascii?Q?kZXR6WclYI6jVVBKmgweHw2FTV62qZCIY6BMF1+BJ2GVq8OsGWegOE9Yssu1?=
+ =?us-ascii?Q?+TMaGGxn19pPs+cuz4MkQGmtTzzoYH4G0uVnNesxDx5WZ2eFr4uImS+TRLiJ?=
+ =?us-ascii?Q?qB2Xz3QKTiUb8VmWmqUPpUZt6+saoxG1L0l5KeASQ5EFuz1VsrI/y/dsM/fq?=
+ =?us-ascii?Q?cBeNa70V8ksMmIiy3oazbXLm5+x41QVdvKNxR2bJcdttzLYD5sbZ7O4Fe/sk?=
+ =?us-ascii?Q?V0k2ddP8Nn5S/IkynmR6Hs0P7ClyuErrr1CDw6kHTwtvgViOAtrNORagqMVo?=
+ =?us-ascii?Q?RGaO29oi3jsr9B/jxQPdHq2L0Dw8mid33gN2WY93etOfArg76CwRXUJCdrnI?=
+ =?us-ascii?Q?5KgX3qfxTD3dnLUacP5AIga/7sIpU/py2bP4VK5Dn8ETxr+rCOAe3cCDREZE?=
+ =?us-ascii?Q?7V88q6/CQiO8qOPGJFyAuSXiT+jIUNqu4/ym4VzHbiZaG1ZeAC+MULlsBocZ?=
+ =?us-ascii?Q?ufeijcrmguupvEhAo7fHys/tRvofw0ZBJEKxtkQAFK7vPh0wBZzFrVpRWtIW?=
+ =?us-ascii?Q?Y97GOstyb+F5fw3E5sVJ/657B7ZVh+CUKGtC0VM39bYLLRjfllHJ1eHPUlZM?=
+ =?us-ascii?Q?nSo7+hpdoKCCq80w27gMwrdJhOvk8DYWryaXJrl/nsQAOvrsw8jGme4+mhpP?=
+ =?us-ascii?Q?KyhJ/0PjOEd67WXJEan+3HvYVsopURN/msCFQJL9MM0Uk2JLW3/XKZLLDkW0?=
+ =?us-ascii?Q?5i/ve5b2AM0982MFOiPCxfOUa9ofn8BvcQcaF5mU33kq6VJWI9yfAx/VtiSM?=
+ =?us-ascii?Q?fWuUDUvaZNodunnkU7HYBw/q99n4w7v1+D13GkmxUp5VxpGJ8LoswIBj5zny?=
+ =?us-ascii?Q?htgDb2+m2tZBXNDkzMHq7q0a8I07qaZzY3EPVkC2gZw08FxMkH2MQL2ReS2a?=
+ =?us-ascii?Q?my13Ps/BVdcOtXguh7Pjiu2YEFGqmfohvIu0REw+TfBqWgEJJrPh/+Q8JiQO?=
+ =?us-ascii?Q?zg1/5JoW0X8iwgfutPlDpE4FJFkVE4HulIStkkybNIAu8JZIfUtT7YHZjS5a?=
+ =?us-ascii?Q?XWXH7o6hB1q0PrqdXZMgdaeqsI2wbj2lyjEPmGJ1+iJhux4lUs+1J2cRq8Fn?=
+ =?us-ascii?Q?XuE9cYvy1eQnW8eVmFzcKpQMU+EBIlAmCHRRB8LTIZclHiJCK9Bgey/StQRK?=
+ =?us-ascii?Q?0mtHB/jAGemuLTPbYVFSvZhC/R8eAGfO+3iL0cr2rjODSjE5ohfGkiKfUq91?=
+ =?us-ascii?Q?ICKho1+bEO6wePkF6o51rr+6uZR+LysE7X3IpzjIrhE8KTucguaAuczElrWB?=
+ =?us-ascii?Q?uPI4Q6vyEkpEEETcDKjB11Efr7b9erAWGxkkPyYGNGxcAir2T4tSEsF317BL?=
+ =?us-ascii?Q?U+WrygHA0ETWt2rLjiEb18StczzU/mHUyeCWHo5/o3CsvBABT9vONXgPoZe4?=
+ =?us-ascii?Q?ge1cs5vBlRdmd0eaJ5sOZzc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <DB648B97E4A7044F8780DE4778F92023@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	XxGo3dX+VbqXcSNcc0ltxWRXJ3F9kAIG0Pqiijx6wjB6OOVH9q2EGU7CS7I1ufGOM9/0OFHDDDmnqVCpHRttlvd7UixapowH8PnE5ebKHFeiz/WZJGJjo7E0Mzb0MTXUwgvPdN6F4F4tabbsoKIfxQ9A2RTCCVqsB7u5+rNg9+dFCNStpWNgC2S31vK4yrQmrhAxPG8cOBAHLw83oWAl+lgRhaXoOLYiNlgMtVglnz6oqOzGI0GbmGn+Ge9EVYvY+fUFFPbM3kfmgLHEJOTJbNTB+f0Xxb3dK98A29KE0RUwA+5tw1Z2zgKos4QxzBdQ0fq+9XfKtPxcolpJBIfOn+9uECNp3NAacOKSGF33UadpskMTyXlqvISgK+OmH3kONV+iRLpO41J3vwz71Du/j+32fSJpjxl237siV4m8tTEbesilmr0cORkgey1Rms67WZPrTPpZ+JshIzAfT1U4VtXDQy6c0D4Wk2NJpp7MhRAbGQ9+ntNssPp4JDVEaYMSgF/lAFFTpLxiaDIR/uwhzRscIHYyb5MHDI+mqA2Ddb3yYsTN25y0OZGiRzBIO7s0tbAAkXNxvzLgjMecyL9U7pw8ikoj/g/d6PZ7cABtpYxQTQEkrLGDiW86a3SjtiYI
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36fcb551-a641-47ac-fed1-08dd863694c0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2025 09:25:13.8326
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gEXtk+5X5HfVtp4OVGK4dMm48wN9Afg6gv2e4a6A4a1WArcN4PkPWMQmJyzST/ZKNND1Z8YIHr3MaNkKJHjStOBXw+kATm6MH9SGWHmfARM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR04MB8535
 
-From: Christoph Hellwig <hch@lst.de>
+On Apr 28, 2025 / 17:04, Zhang Yi wrote:
+> On 2025/4/28 16:13, Shinichiro Kawasaki wrote:
+> > On Apr 28, 2025 / 12:32, Zhang Yi wrote:
+> >> On 2025/4/3 15:43, Shinichiro Kawasaki wrote:
+> > [...]
+> >>>> +
+> >>>> +setup_test_device() {
+> >>>> +	if ! _configure_scsi_debug "$@"; then
+> >>>> +		return 1
+> >>>> +	fi
+> >>>
+> >>> In same manner as the 1st patch, I suggest to check /queue/write_zero=
+es_unmap
+> >>> here.
+> >>>
+> >>> 	if [[ ! -f /sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/write_zeroes_un=
+map ]]; then
+> >>> 		_exit_scsi_debug
+> >>> 		SKIP_REASONS+=3D("kernel does not support unmap write zeroes sysfs =
+interface")
+> >>> 		return 1
+> >>> 	fi
+> >>>
+> >>> The caller will need to check setup_test_device() return value.
+> >>
+> >> Sure.
+> >>
+> >>>
+> >>>> +
+> >>>> +	local dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
+> >>>> +	local blk_sz=3D"$(blockdev --getsz "$dev")"
+> >>>> +	dmsetup create test --table "0 $blk_sz linear $dev 0"
+> >>>
+> >>> I suggest to call _real_dev() here, and echo back the device name.
+> >>>
+> >>> 	dpath=3D$(_real_dev /dev/mapper/test)
+> >>> 	echo ${dpath##*/}
+> >>>
+> >>> The bash parameter expansion ${xxx##*/} works in same manner as the b=
+asename
+> >>> command. The caller can receive the device name in a local variable. =
+This will
+> >>> avoid a bit of code duplication, and allow to avoid _short_dev().
+> >>>
+> >>
+> >> I'm afraid this approach will not work since we may set the
+> >> SKIP_REASONS parameter. We cannot pass the device name in this
+> >> manner as it will overlook the SKIP_REASONS setting when the caller
+> >> invokes $(setup_test_device xxx), this function runs in a subshell.
+> >=20
+> > Ah, that's right. SKIP_REASONS modification in subshell won't work.
+> >=20
+> >>
+> >> If you don't like _short_dev(), I think we can pass dname through a
+> >> global variable, something like below:
+> >>
+> >> setup_test_device() {
+> >> 	...
+> >> 	dpath=3D$(_real_dev /dev/mapper/test)
+> >> 	dname=3D${dpath##*/}
+> >> }
+> >>
+> >> if ! setup_test_device lbprz=3D0; then
+> >> 	return 1
+> >> fi
+> >> umap=3D"$(< "/sys/block/${dname}/queue/write_zeroes_unmap")"
+> >>
+> >> What do you think?
+> >=20
+> > I think global variable is a bit dirty. So my suggestion is to still ec=
+ho back
+> > the short device name from the helper, and set the SKIP_REASONS after c=
+alling
+> > the helper, as follows:
+> >=20
+> > diff --git a/tests/dm/003 b/tests/dm/003
+> > index 1013eb5..e00fa99 100755
+> > --- a/tests/dm/003
+> > +++ b/tests/dm/003
+> > @@ -20,13 +20,23 @@ device_requries() {
+> >  }
+> > =20
+> >  setup_test_device() {
+> > +	local dev blk_sz dpath
+> > +
+> >  	if ! _configure_scsi_debug "$@"; then
+> >  		return 1
+>=20
+> Hmm, if we encounter an error here, the test will be skipped instead of
+> returning a failure. This is not the expected outcome.
 
-Use the blk_rq_dma_map API to DMA map requests instead of
-scatterlists.
+Ah, rigth. That's not good.
+How about to return differnt values for the failure case above,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Jens Axboe <axboe@kernel.dk>
-[ Leon: squashed optimization patch from Kanchan ]
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-[ Leon: rewrote original patch due to rebases and addition of metadata support ]
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/nvme/host/pci.c | 593 ++++++++++++++++++++++------------------
- 1 file changed, 329 insertions(+), 264 deletions(-)
+>=20
+> Thanks,
+> Yi.
+>=20
+> >  	fi
+> > =20
+> > -	local dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
+> > -	local blk_sz=3D"$(blockdev --getsz "$dev")"
+> > +        if [[ ! -f /sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/write_zer=
+oes_unmap ]]; then
+> > +		_exit_scsi_debug
+> > +                return 1
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 270fb5146b5b..eb835425b496 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -7,7 +7,7 @@
- #include <linux/acpi.h>
- #include <linux/async.h>
- #include <linux/blkdev.h>
--#include <linux/blk-mq.h>
-+#include <linux/blk-mq-dma.h>
- #include <linux/blk-integrity.h>
- #include <linux/dmi.h>
- #include <linux/init.h>
-@@ -26,7 +26,6 @@
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/io-64-nonatomic-hi-lo.h>
- #include <linux/sed-opal.h>
--#include <linux/pci-p2pdma.h>
- 
- #include "trace.h"
- #include "nvme.h"
-@@ -144,9 +143,6 @@ struct nvme_dev {
- 	bool hmb;
- 	struct sg_table *hmb_sgt;
- 
--	mempool_t *iod_mempool;
--	mempool_t *iod_meta_mempool;
--
- 	/* shadow doorbell buffer support: */
- 	__le32 *dbbuf_dbs;
- 	dma_addr_t dbbuf_dbs_dma_addr;
-@@ -222,6 +218,7 @@ struct nvme_queue {
- 
- enum {
- 	IOD_LARGE_DESCRIPTORS = 1 << 0, /* uses the full page sized descriptor pool */
-+	IOD_SINGLE_SEGMENT = 1 << 1, /* single segment dma mapping */
- };
- 
- /*
-@@ -233,11 +230,11 @@ struct nvme_iod {
- 	bool aborted;
- 	u8 nr_descriptors;	/* # of PRP/SGL descriptors */
- 	u8 flags;
--	unsigned int dma_len;	/* length of single DMA segment mapping */
--	dma_addr_t first_dma;
-+	unsigned int total_len; /* length of the entire transfer */
-+	unsigned int total_meta_len; /* length of the entire metadata transfer */
- 	dma_addr_t meta_dma;
--	struct sg_table sgt;
--	struct sg_table meta_sgt;
-+	struct dma_iova_state dma_state;
-+	struct dma_iova_state dma_meta_state;
- 	void *meta_list;
- 	void *descriptors[NVME_MAX_NR_DESCRIPTORS];
- };
-@@ -546,9 +543,14 @@ static void nvme_free_descriptors(struct nvme_dev *dev, struct request *req)
- {
- 	const int last_prp = NVME_CTRL_PAGE_SIZE / sizeof(__le64) - 1;
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	dma_addr_t dma_addr = iod->first_dma;
-+	dma_addr_t dma_addr;
- 	int i;
- 
-+	if (iod->cmd.common.flags & NVME_CMD_SGL_METABUF)
-+		dma_addr = le64_to_cpu(iod->cmd.common.dptr.sgl.addr);
-+	else
-+		dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp2);
-+
- 	if (iod->nr_descriptors == 1) {
- 		dma_pool_free(nvme_dma_pool(dev, iod), iod->descriptors[0],
- 				dma_addr);
-@@ -564,67 +566,182 @@ static void nvme_free_descriptors(struct nvme_dev *dev, struct request *req)
- 	}
- }
- 
-+static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
-+{
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	enum dma_data_direction dir = rq_dma_dir(req);
-+	int length = iod->total_len;
-+	dma_addr_t dma_addr;
-+	int i, desc;
-+	__le64 *prp_list;
-+	u32 dma_len;
-+
-+	dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp1);
-+	dma_len = min_t(u32, length,
-+		NVME_CTRL_PAGE_SIZE - (dma_addr & (NVME_CTRL_PAGE_SIZE - 1)));
-+	length -= dma_len;
-+	if (!length) {
-+		dma_unmap_page(dev->dev, dma_addr, dma_len, dir);
-+		return;
-+	}
-+
-+	if (length <= NVME_CTRL_PAGE_SIZE) {
-+		dma_unmap_page(dev->dev, dma_addr, dma_len, dir);
-+		dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp2);
-+		dma_unmap_page(dev->dev, dma_addr, length, dir);
-+		return;
-+	}
-+
-+	i = 0;
-+	desc = 0;
-+	prp_list = iod->descriptors[desc];
-+	do {
-+		dma_unmap_page(dev->dev, dma_addr, dma_len, dir);
-+		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
-+			prp_list = iod->descriptors[++desc];
-+			i = 0;
-+		}
-+
-+		dma_addr = le64_to_cpu(prp_list[i++]);
-+		dma_len = min(length, NVME_CTRL_PAGE_SIZE);
-+		length -= dma_len;
-+	} while (length);
-+}
-+
-+
-+static void nvme_free_sgls(struct nvme_dev *dev, struct request *req)
-+{
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	dma_addr_t sqe_dma_addr = le64_to_cpu(iod->cmd.common.dptr.sgl.addr);
-+	unsigned int sqe_dma_len = le32_to_cpu(iod->cmd.common.dptr.sgl.length);
-+	struct nvme_sgl_desc *sg_list = iod->descriptors[0];
-+	enum dma_data_direction dir = rq_dma_dir(req);
-+
-+	if (iod->nr_descriptors) {
-+		unsigned int nr_entries = sqe_dma_len / sizeof(*sg_list), i;
-+
-+		for (i = 0; i < nr_entries; i++)
-+			dma_unmap_page(dev->dev, le64_to_cpu(sg_list[i].addr),
-+				le32_to_cpu(sg_list[i].length), dir);
-+	} else {
-+		dma_unmap_page(dev->dev, sqe_dma_addr, sqe_dma_len, dir);
-+	}
-+}
-+
- static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	dma_addr_t dma_addr;
- 
--	if (iod->dma_len) {
--		dma_unmap_page(dev->dev, iod->first_dma, iod->dma_len,
--			       rq_dma_dir(req));
-+	if (iod->flags & IOD_SINGLE_SEGMENT) {
-+		if (iod->cmd.common.flags &
-+		    (NVME_CMD_SGL_METABUF | NVME_CMD_SGL_METASEG))
-+			dma_addr = le64_to_cpu(iod->cmd.common.dptr.sgl.addr);
-+		else
-+			dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp1);
-+		dma_unmap_page(dev->dev, dma_addr, iod->total_len,
-+				rq_dma_dir(req));
- 		return;
- 	}
- 
--	WARN_ON_ONCE(!iod->sgt.nents);
-+	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_state, iod->total_len)) {
-+		if (iod->cmd.common.flags & NVME_CMD_SGL_METABUF)
-+			nvme_free_sgls(dev, req);
-+		else
-+			nvme_free_prps(dev, req);
-+	}
- 
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
--	nvme_free_descriptors(dev, req);
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-+	if (iod->nr_descriptors)
-+		nvme_free_descriptors(dev, req);
- }
- 
--static void nvme_print_sgl(struct scatterlist *sgl, int nents)
-+static bool nvme_try_setup_prp_simple(struct nvme_dev *dev, struct request *req,
-+				      struct nvme_rw_command *cmnd,
-+				      struct blk_dma_iter *iter)
- {
--	int i;
--	struct scatterlist *sg;
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct bio_vec bv = req_bvec(req);
-+	unsigned int first_prp_len;
-+
-+	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && (req->cmd_flags & REQ_P2PDMA))
-+		return false;
-+
-+	if ((bv.bv_offset & (NVME_CTRL_PAGE_SIZE - 1)) + bv.bv_len >
-+	    NVME_CTRL_PAGE_SIZE * 2)
-+		return false;
- 
--	for_each_sg(sgl, sg, nents, i) {
--		dma_addr_t phys = sg_phys(sg);
--		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
--			"dma_address:%pad dma_length:%d\n",
--			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
--			sg_dma_len(sg));
-+	iter->addr = dma_map_bvec(dev->dev, &bv, rq_dma_dir(req), 0);
-+	if (dma_mapping_error(dev->dev, iter->addr)) {
-+		iter->status = BLK_STS_RESOURCE;
-+		return true;
- 	}
-+	iod->total_len = bv.bv_len;
-+	cmnd->dptr.prp1 = cpu_to_le64(iter->addr);
-+
-+	first_prp_len = NVME_CTRL_PAGE_SIZE -
-+			(bv.bv_offset & (NVME_CTRL_PAGE_SIZE - 1));
-+	if (bv.bv_len > first_prp_len)
-+		cmnd->dptr.prp2 = cpu_to_le64(iter->addr + first_prp_len);
-+	else
-+		cmnd->dptr.prp2 = 0;
-+
-+	iter->status = BLK_STS_OK;
-+	iod->flags |= IOD_SINGLE_SEGMENT;
-+	return true;
- }
- 
- static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmnd)
-+					struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	int length = blk_rq_payload_bytes(req);
--	struct scatterlist *sg = iod->sgt.sgl;
--	int dma_len = sg_dma_len(sg);
--	u64 dma_addr = sg_dma_address(sg);
--	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
-+	struct nvme_rw_command *cmnd = &iod->cmd.rw;
-+	unsigned int length = blk_rq_payload_bytes(req);
-+	struct blk_dma_iter iter;
-+	dma_addr_t prp1_dma, prp2_dma = 0;
-+	unsigned int prp_len, i;
- 	__le64 *prp_list;
--	dma_addr_t prp_dma;
--	int i;
-+	unsigned int nr_segments = blk_rq_nr_phys_segments(req);
- 
--	length -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (length <= 0) {
--		iod->first_dma = 0;
--		goto done;
-+	if (nr_segments == 1) {
-+		if (nvme_try_setup_prp_simple(dev, req, cmnd, &iter))
-+			return iter.status;
- 	}
- 
--	dma_len -= (NVME_CTRL_PAGE_SIZE - offset);
--	if (dma_len) {
--		dma_addr += (NVME_CTRL_PAGE_SIZE - offset);
--	} else {
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
-+	if (!blk_rq_dma_map_iter_start(req, dev->dev, &iod->dma_state, &iter))
-+		return iter.status;
-+
-+	/*
-+	 * PRP1 always points to the start of the DMA transfers.
-+	 *
-+	 * This is the only PRP (except for the list entries) that could be
-+	 * non-aligned.
-+	 */
-+	prp1_dma = iter.addr;
-+	prp_len = min(length, NVME_CTRL_PAGE_SIZE -
-+			(iter.addr & (NVME_CTRL_PAGE_SIZE - 1)));
-+	iod->total_len += prp_len;
-+	iter.addr += prp_len;
-+	iter.len -= prp_len;
-+	length -= prp_len;
-+	if (!length)
-+		goto done;
-+
-+	if (!iter.len) {
-+		if (!blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_state,
-+				&iter)) {
-+			if (WARN_ON_ONCE(!iter.status))
-+				goto bad_sgl;
-+			goto done;
-+		}
- 	}
- 
-+	/*
-+	 * PRP2 is usually a list, but can point to data if all data to be
-+	 * transferred fits into PRP1 + PRP2:
-+	 */
- 	if (length <= NVME_CTRL_PAGE_SIZE) {
--		iod->first_dma = dma_addr;
-+		prp2_dma = iter.addr;
-+		iod->total_len += length;
- 		goto done;
- 	}
- 
-@@ -633,58 +750,83 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
- 		iod->flags |= IOD_LARGE_DESCRIPTORS;
- 
- 	prp_list = dma_pool_alloc(nvme_dma_pool(dev, iod), GFP_ATOMIC,
--			&prp_dma);
--	if (!prp_list)
--		return BLK_STS_RESOURCE;
-+			&prp2_dma);
-+	if (!prp_list) {
-+		iter.status = BLK_STS_RESOURCE;
-+		goto done;
-+	}
- 	iod->descriptors[iod->nr_descriptors++] = prp_list;
--	iod->first_dma = prp_dma;
-+
- 	i = 0;
- 	for (;;) {
-+		prp_list[i++] = cpu_to_le64(iter.addr);
-+		prp_len = min(length, NVME_CTRL_PAGE_SIZE);
-+		if (WARN_ON_ONCE(iter.len < prp_len))
-+			goto bad_sgl;
-+
-+		iod->total_len += prp_len;
-+		iter.addr += prp_len;
-+		iter.len -= prp_len;
-+		length -= prp_len;
-+		if (!length)
-+			break;
-+
-+		if (iter.len == 0) {
-+			if (!blk_rq_dma_map_iter_next(req, dev->dev,
-+					&iod->dma_state, &iter)) {
-+				if (WARN_ON_ONCE(!iter.status))
-+					goto bad_sgl;
-+				goto done;
-+			}
-+		}
-+
-+		/*
-+		 * If we've filled the entire descriptor, allocate a new that is
-+		 * pointed to be the last entry in the previous PRP list.  To
-+		 * accommodate for that move the last actual entry to the new
-+		 * descriptor.
-+		 */
- 		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
- 			__le64 *old_prp_list = prp_list;
-+			dma_addr_t prp_list_dma;
- 
- 			prp_list = dma_pool_alloc(dev->prp_page_pool,
--					GFP_ATOMIC, &prp_dma);
--			if (!prp_list)
--				goto free_prps;
-+					GFP_ATOMIC, &prp_list_dma);
-+			if (!prp_list) {
-+				iter.status = BLK_STS_RESOURCE;
-+				goto done;
-+			}
- 			iod->descriptors[iod->nr_descriptors++] = prp_list;
-+
- 			prp_list[0] = old_prp_list[i - 1];
--			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
-+			old_prp_list[i - 1] = cpu_to_le64(prp_list_dma);
- 			i = 1;
- 		}
--		prp_list[i++] = cpu_to_le64(dma_addr);
--		dma_len -= NVME_CTRL_PAGE_SIZE;
--		dma_addr += NVME_CTRL_PAGE_SIZE;
--		length -= NVME_CTRL_PAGE_SIZE;
--		if (length <= 0)
--			break;
--		if (dma_len > 0)
--			continue;
--		if (unlikely(dma_len < 0))
--			goto bad_sgl;
--		sg = sg_next(sg);
--		dma_addr = sg_dma_address(sg);
--		dma_len = sg_dma_len(sg);
- 	}
-+
- done:
--	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
--	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
--	return BLK_STS_OK;
--free_prps:
--	nvme_free_descriptors(dev, req);
--	return BLK_STS_RESOURCE;
-+	/*
-+	 * nvme_unmap_data uses the DPT field in the SQE to tear down the
-+	 * mapping, so initialize it even for failures.
-+	 */
-+	cmnd->dptr.prp1 = cpu_to_le64(prp1_dma);
-+	cmnd->dptr.prp2 = cpu_to_le64(prp2_dma);
-+	if (unlikely(iter.status))
-+		nvme_unmap_data(dev, req);
-+	return iter.status;
-+
- bad_sgl:
--	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
--			"Invalid SGL for payload:%d nents:%d\n",
--			blk_rq_payload_bytes(req), iod->sgt.nents);
-+	dev_err_once(dev->dev,
-+		"Incorrectly formed request for payload:%d nents:%d\n",
-+		blk_rq_payload_bytes(req), blk_rq_nr_phys_segments(req));
- 	return BLK_STS_IOERR;
- }
- 
- static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
--		struct scatterlist *sg)
-+		struct blk_dma_iter *iter)
- {
--	sge->addr = cpu_to_le64(sg_dma_address(sg));
--	sge->length = cpu_to_le32(sg_dma_len(sg));
-+	sge->addr = cpu_to_le64(iter->addr);
-+	sge->length = cpu_to_le32(iter->len);
- 	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
- }
- 
-@@ -696,21 +838,54 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
- 	sge->type = NVME_SGL_FMT_LAST_SEG_DESC << 4;
- }
- 
-+static bool nvme_try_setup_sgl_simple(struct nvme_dev *dev, struct request *req,
-+				      struct nvme_rw_command *cmnd,
-+				      struct blk_dma_iter *iter)
-+{
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct bio_vec bv = req_bvec(req);
-+
-+	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && (req->cmd_flags & REQ_P2PDMA))
-+		return false;
-+
-+	iter->addr = dma_map_bvec(dev->dev, &bv, rq_dma_dir(req), 0);
-+	if (dma_mapping_error(dev->dev, iter->addr)) {
-+		iter->status = BLK_STS_RESOURCE;
-+		return true;
-+	}
-+	iod->total_len = bv.bv_len;
-+	iter->len = bv.bv_len;
-+	nvme_pci_sgl_set_data(&cmnd->dptr.sgl, iter);
-+	iter->status = BLK_STS_OK;
-+	iod->flags |= IOD_SINGLE_SEGMENT;
-+	return true;
-+}
-+
- static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmd)
-+					struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct nvme_rw_command *cmd = &iod->cmd.rw;
-+	unsigned int entries = blk_rq_nr_phys_segments(req);
- 	struct nvme_sgl_desc *sg_list;
--	struct scatterlist *sg = iod->sgt.sgl;
--	unsigned int entries = iod->sgt.nents;
-+	struct blk_dma_iter iter;
- 	dma_addr_t sgl_dma;
--	int i = 0;
-+	unsigned int mapped = 0;
- 
- 	/* setting the transfer type as SGL */
- 	cmd->flags = NVME_CMD_SGL_METABUF;
- 
- 	if (entries == 1) {
--		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
-+		if (nvme_try_setup_sgl_simple(dev, req, cmd, &iter))
-+			return iter.status;
-+	}
-+
-+	if (!blk_rq_dma_map_iter_start(req, dev->dev, &iod->dma_state, &iter))
-+		return iter.status;
-+
-+	if (entries == 1 || blk_rq_dma_map_coalesce(&iod->dma_state)) {
-+		nvme_pci_sgl_set_data(&cmd->dptr.sgl, &iter);
-+		iod->total_len += iter.len;
- 		return BLK_STS_OK;
- 	}
- 
-@@ -721,168 +896,109 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 	if (!sg_list)
- 		return BLK_STS_RESOURCE;
- 	iod->descriptors[iod->nr_descriptors++] = sg_list;
--	iod->first_dma = sgl_dma;
- 
--	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
- 	do {
--		nvme_pci_sgl_set_data(&sg_list[i++], sg);
--		sg = sg_next(sg);
--	} while (--entries > 0);
-+		if (WARN_ON_ONCE(mapped == entries)) {
-+			iter.status = BLK_STS_IOERR;
-+			break;
-+		}
-+		nvme_pci_sgl_set_data(&sg_list[mapped++], &iter);
-+		iod->total_len += iter.len;
-+	} while (blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_state,
-+				&iter));
- 
--	return BLK_STS_OK;
-+	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, mapped);
-+	if (unlikely(iter.status))
-+		nvme_free_sgls(dev, req);
-+	return iter.status;
- }
- 
--static blk_status_t nvme_setup_prp_simple(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmnd,
--		struct bio_vec *bv)
-+static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req)
- {
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	unsigned int offset = bv->bv_offset & (NVME_CTRL_PAGE_SIZE - 1);
--	unsigned int first_prp_len = NVME_CTRL_PAGE_SIZE - offset;
--
--	iod->first_dma = dma_map_bvec(dev->dev, bv, rq_dma_dir(req), 0);
--	if (dma_mapping_error(dev->dev, iod->first_dma))
--		return BLK_STS_RESOURCE;
--	iod->dma_len = bv->bv_len;
--
--	cmnd->dptr.prp1 = cpu_to_le64(iod->first_dma);
--	if (bv->bv_len > first_prp_len)
--		cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma + first_prp_len);
--	else
--		cmnd->dptr.prp2 = 0;
--	return BLK_STS_OK;
-+	if (nvme_pci_use_sgls(dev, req, blk_rq_nr_phys_segments(req)))
-+		return nvme_pci_setup_sgls(dev, req);
-+	return nvme_pci_setup_prps(dev, req);
- }
- 
--static blk_status_t nvme_setup_sgl_simple(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmnd,
--		struct bio_vec *bv)
-+static void nvme_unmap_metadata(struct nvme_dev *dev, struct request *req)
- {
-+	unsigned int entries = req->nr_integrity_segments;
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct nvme_sgl_desc *sg_list = iod->meta_list;
-+	enum dma_data_direction dir = rq_dma_dir(req);
- 
--	iod->first_dma = dma_map_bvec(dev->dev, bv, rq_dma_dir(req), 0);
--	if (dma_mapping_error(dev->dev, iod->first_dma))
--		return BLK_STS_RESOURCE;
--	iod->dma_len = bv->bv_len;
--
--	cmnd->flags = NVME_CMD_SGL_METABUF;
--	cmnd->dptr.sgl.addr = cpu_to_le64(iod->first_dma);
--	cmnd->dptr.sgl.length = cpu_to_le32(iod->dma_len);
--	cmnd->dptr.sgl.type = NVME_SGL_FMT_DATA_DESC << 4;
--	return BLK_STS_OK;
--}
--
--static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
--		struct nvme_command *cmnd)
--{
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	blk_status_t ret = BLK_STS_RESOURCE;
--	int rc;
--
--	if (blk_rq_nr_phys_segments(req) == 1) {
--		struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
--		struct bio_vec bv = req_bvec(req);
--
--		if (!is_pci_p2pdma_page(bv.bv_page)) {
--			if (!nvme_pci_metadata_use_sgls(dev, req) &&
--			    (bv.bv_offset & (NVME_CTRL_PAGE_SIZE - 1)) +
--			     bv.bv_len <= NVME_CTRL_PAGE_SIZE * 2)
--				return nvme_setup_prp_simple(dev, req,
--							     &cmnd->rw, &bv);
--
--			if (nvmeq->qid && sgl_threshold &&
--			    nvme_ctrl_sgl_supported(&dev->ctrl))
--				return nvme_setup_sgl_simple(dev, req,
--							     &cmnd->rw, &bv);
--		}
-+	/*
-+	 * If the NVME_CMD_SGL_METASEG flag is not set and we're using the
-+	 * non-SGL linear meta buffer we know that we have a single input
-+	 * segment as well.
-+	 *
-+	 * Note that it would be nice to always use the linear buffer when
-+	 * using IOVA mappings and kernel buffers to avoid the SGL
-+	 * indirection, but that's left for a future optimization.
-+	 */
-+	if (!(iod->cmd.common.flags & NVME_CMD_SGL_METASEG)) {
-+		dma_unmap_page(dev->dev, le64_to_cpu(iod->cmd.common.dptr.prp1),
-+			       iod->total_len, rq_dma_dir(req));
-+		return;
- 	}
- 
--	iod->dma_len = 0;
--	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
--	if (!iod->sgt.sgl)
--		return BLK_STS_RESOURCE;
--	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
--	iod->sgt.orig_nents = blk_rq_map_sg(req, iod->sgt.sgl);
--	if (!iod->sgt.orig_nents)
--		goto out_free_sg;
-+	if (!blk_rq_dma_unmap(req, dev->dev, &iod->dma_meta_state,
-+			      iod->total_meta_len)) {
-+		unsigned int i;
- 
--	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
--			     DMA_ATTR_NO_WARN);
--	if (rc) {
--		if (rc == -EREMOTEIO)
--			ret = BLK_STS_TARGET;
--		goto out_free_sg;
-+		for (i = 0; i < entries; i++)
-+			dma_unmap_page(dev->dev, le64_to_cpu(sg_list[i].addr),
-+				       le32_to_cpu(sg_list[i].length), dir);
- 	}
- 
--	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
--		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
--	else
--		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
--	if (ret != BLK_STS_OK)
--		goto out_unmap_sg;
--	return BLK_STS_OK;
--
--out_unmap_sg:
--	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
--out_free_sg:
--	mempool_free(iod->sgt.sgl, dev->iod_mempool);
--	return ret;
-+	dma_pool_free(dev->prp_small_pool, iod->meta_list, iod->meta_dma);
- }
- 
- static blk_status_t nvme_pci_setup_meta_sgls(struct nvme_dev *dev,
- 					     struct request *req)
- {
-+	unsigned int entries = req->nr_integrity_segments;
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct nvme_rw_command *cmnd = &iod->cmd.rw;
-+	struct nvme_rw_command *cmd = &iod->cmd.rw;
- 	struct nvme_sgl_desc *sg_list;
--	struct scatterlist *sgl, *sg;
--	unsigned int entries;
-+	struct blk_dma_iter iter;
-+	unsigned int mapped = 0;
- 	dma_addr_t sgl_dma;
--	int rc, i;
--
--	iod->meta_sgt.sgl = mempool_alloc(dev->iod_meta_mempool, GFP_ATOMIC);
--	if (!iod->meta_sgt.sgl)
--		return BLK_STS_RESOURCE;
- 
--	sg_init_table(iod->meta_sgt.sgl, req->nr_integrity_segments);
--	iod->meta_sgt.orig_nents = blk_rq_map_integrity_sg(req,
--							   iod->meta_sgt.sgl);
--	if (!iod->meta_sgt.orig_nents)
--		goto out_free_sg;
-+	cmd->flags = NVME_CMD_SGL_METASEG;
- 
--	rc = dma_map_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req),
--			     DMA_ATTR_NO_WARN);
--	if (rc)
--		goto out_free_sg;
-+	if (!blk_rq_dma_map_iter_start(req, dev->dev, &iod->dma_meta_state,
-+				       &iter))
-+		return iter.status;
- 
- 	sg_list = dma_pool_alloc(dev->prp_small_pool, GFP_ATOMIC, &sgl_dma);
- 	if (!sg_list)
--		goto out_unmap_sg;
-+		return BLK_STS_RESOURCE;
- 
--	entries = iod->meta_sgt.nents;
- 	iod->meta_list = sg_list;
- 	iod->meta_dma = sgl_dma;
-+	cmd->metadata = cpu_to_le64(sgl_dma);
- 
--	cmnd->flags = NVME_CMD_SGL_METASEG;
--	cmnd->metadata = cpu_to_le64(sgl_dma);
--
--	sgl = iod->meta_sgt.sgl;
--	if (entries == 1) {
--		nvme_pci_sgl_set_data(sg_list, sgl);
-+	if (entries == 1 || blk_rq_dma_map_coalesce(&iod->dma_meta_state)) {
-+		nvme_pci_sgl_set_data(sg_list, &iter);
-+		iod->total_meta_len += iter.len;
- 		return BLK_STS_OK;
- 	}
- 
--	sgl_dma += sizeof(*sg_list);
--	nvme_pci_sgl_set_seg(sg_list, sgl_dma, entries);
--	for_each_sg(sgl, sg, entries, i)
--		nvme_pci_sgl_set_data(&sg_list[i + 1], sg);
--
--	return BLK_STS_OK;
-+	do {
-+		if (WARN_ON_ONCE(mapped == entries)) {
-+			iter.status = BLK_STS_IOERR;
-+			break;
-+		}
-+		nvme_pci_sgl_set_data(&sg_list[mapped++], &iter);
-+		iod->total_len += iter.len;
-+	} while (blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_meta_state,
-+				 &iter));
- 
--out_unmap_sg:
--	dma_unmap_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req), 0);
--out_free_sg:
--	mempool_free(iod->meta_sgt.sgl, dev->iod_meta_mempool);
--	return BLK_STS_RESOURCE;
-+	nvme_pci_sgl_set_seg(sg_list, sgl_dma, mapped);
-+	if (unlikely(iter.status))
-+		nvme_unmap_metadata(dev, req);
-+	return iter.status;
- }
- 
- static blk_status_t nvme_pci_setup_meta_mptr(struct nvme_dev *dev,
-@@ -914,15 +1030,15 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- 	iod->aborted = false;
- 	iod->nr_descriptors = 0;
- 	iod->flags = 0;
--	iod->sgt.nents = 0;
--	iod->meta_sgt.nents = 0;
-+	iod->total_len = 0;
-+	iod->total_meta_len = 0;
- 
- 	ret = nvme_setup_cmd(req->q->queuedata, req);
- 	if (ret)
- 		return ret;
- 
- 	if (blk_rq_nr_phys_segments(req)) {
--		ret = nvme_map_data(dev, req, &iod->cmd);
-+		ret = nvme_map_data(dev, req);
- 		if (ret)
- 			goto out_free_cmd;
- 	}
-@@ -1026,23 +1142,6 @@ static void nvme_queue_rqs(struct rq_list *rqlist)
- 	*rqlist = requeue_list;
- }
- 
--static __always_inline void nvme_unmap_metadata(struct nvme_dev *dev,
--						struct request *req)
--{
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--
--	if (!iod->meta_sgt.nents) {
--		dma_unmap_page(dev->dev, iod->meta_dma,
--			       rq_integrity_vec(req).bv_len,
--			       rq_dma_dir(req));
--		return;
--	}
--
--	dma_pool_free(dev->prp_small_pool, iod->meta_list, iod->meta_dma);
--	dma_unmap_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req), 0);
--	mempool_free(iod->meta_sgt.sgl, dev->iod_meta_mempool);
--}
--
- static __always_inline void nvme_pci_unmap_rq(struct request *req)
- {
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-@@ -2860,31 +2959,6 @@ static void nvme_release_prp_pools(struct nvme_dev *dev)
- 	dma_pool_destroy(dev->prp_small_pool);
- }
- 
--static int nvme_pci_alloc_iod_mempool(struct nvme_dev *dev)
--{
--	size_t meta_size = sizeof(struct scatterlist) * (NVME_MAX_META_SEGS + 1);
--	size_t alloc_size = sizeof(struct scatterlist) * NVME_MAX_SEGS;
--
--	dev->iod_mempool = mempool_create_node(1,
--			mempool_kmalloc, mempool_kfree,
--			(void *)alloc_size, GFP_KERNEL,
--			dev_to_node(dev->dev));
--	if (!dev->iod_mempool)
--		return -ENOMEM;
--
--	dev->iod_meta_mempool = mempool_create_node(1,
--			mempool_kmalloc, mempool_kfree,
--			(void *)meta_size, GFP_KERNEL,
--			dev_to_node(dev->dev));
--	if (!dev->iod_meta_mempool)
--		goto free;
--
--	return 0;
--free:
--	mempool_destroy(dev->iod_mempool);
--	return -ENOMEM;
--}
--
- static void nvme_free_tagset(struct nvme_dev *dev)
- {
- 	if (dev->tagset.tags)
-@@ -3253,15 +3327,11 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (result)
- 		goto out_dev_unmap;
- 
--	result = nvme_pci_alloc_iod_mempool(dev);
--	if (result)
--		goto out_release_prp_pools;
--
- 	dev_info(dev->ctrl.device, "pci function %s\n", dev_name(&pdev->dev));
- 
- 	result = nvme_pci_enable(dev);
- 	if (result)
--		goto out_release_iod_mempool;
-+		goto out_release_prp_pools;
- 
- 	result = nvme_alloc_admin_tag_set(&dev->ctrl, &dev->admin_tagset,
- 				&nvme_mq_admin_ops, sizeof(struct nvme_iod));
-@@ -3328,9 +3398,6 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	nvme_dev_remove_admin(dev);
- 	nvme_dbbuf_dma_free(dev);
- 	nvme_free_queues(dev, 0);
--out_release_iod_mempool:
--	mempool_destroy(dev->iod_mempool);
--	mempool_destroy(dev->iod_meta_mempool);
- out_release_prp_pools:
- 	nvme_release_prp_pools(dev);
- out_dev_unmap:
-@@ -3395,8 +3462,6 @@ static void nvme_remove(struct pci_dev *pdev)
- 	nvme_dev_remove_admin(dev);
- 	nvme_dbbuf_dma_free(dev);
- 	nvme_free_queues(dev, 0);
--	mempool_destroy(dev->iod_mempool);
--	mempool_destroy(dev->iod_meta_mempool);
- 	nvme_release_prp_pools(dev);
- 	nvme_dev_unmap(dev);
- 	nvme_uninit_ctrl(&dev->ctrl);
--- 
-2.49.0
+and this "should skip" case?
 
+
+diff --git a/tests/dm/003 b/tests/dm/003
+index 1013eb5..5e617fd 100755
+--- a/tests/dm/003
++++ b/tests/dm/003
+@@ -19,14 +19,26 @@ device_requries() {
+ 	_require_test_dev_sysfs queue/write_zeroes_unmap
+ }
+=20
++readonly TO_SKIP=3D255
++
+ setup_test_device() {
++	local dev blk_sz dpath
++
+ 	if ! _configure_scsi_debug "$@"; then
+ 		return 1
+ 	fi
+=20
+-	local dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
+-	local blk_sz=3D"$(blockdev --getsz "$dev")"
++        if [[ ! -f /sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/write_zeroes_=
+unmap ]]; then
++		_exit_scsi_debug
++		return $TO_SKIP
++	fi
++
++	dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
++	blk_sz=3D"$(blockdev --getsz "$dev")"
+ 	dmsetup create test --table "0 $blk_sz linear $dev 0"
++
++	dpath=3D$(_real_dev /dev/mapper/test)
++	echo "${dpath##*/}"
+ }
+=20
+ cleanup_test_device() {
+@@ -38,17 +50,25 @@ test() {
+ 	echo "Running ${TEST_NAME}"
+=20
+ 	# disable WRITE SAME with unmap
+-	setup_test_device lbprz=3D0
+-	umap=3D"$(cat "/sys/block/$(_short_dev /dev/mapper/test)/queue/write_zero=
+es_unmap")"
++	local dname
++	dname=3D$(setup_test_device lbprz=3D0)
++	ret=3D$?
++	if ((ret)); then
++		if ((ret =3D=3D TO_SKIP)); then
++			SKIP_REASONS+=3D("kernel does not support unmap write zeroes sysfs inte=
+rface")
++		fi
++		return 1
++	fi
++	umap=3D"$(cat "/sys/block/${dname}/queue/zoned")"
+ 	if [[ $umap -ne 0 ]]; then
+ 		echo "Test disable WRITE SAME with unmap failed."
+ 	fi
+ 	cleanup_test_device
+ =
