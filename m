@@ -1,140 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A51FDE33;
-	Mon, 28 Apr 2025 23:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDA4211C
+	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 23:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745881734; cv=none; b=p0ujX1j8tEtMaLnh1HpiqE/OU4nBiMB+4B8sMexUDXHM/4o4VI39OVHb68MOdP/Nld/zdpMX4ROzzmjeDsv4/0vCD8iXcxM5S7hoQV61zVZz+Stxg8xq1DHFYl9KhI8DpVlz6BnQYvsEi2V7QLMZDAppL8Oq4Miced57aHrLbJw=
+	t=1745881844; cv=none; b=NUJGLqdCu1pNm7BYT4AjtbYG2MDdgHb6ScoEIvEOn4aiuAwX/Z3ZHXZ3yrNnSXdtNIFFCzBHmSq3Ok1aqo3vaENWk0zq6tFbpJ0OM5vJ25ISVFStEFjjvWM/9trX6zVG26EWQGbaA57uxt6nli05IFN7Gdm8SfhA5qiR8BHABZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745881734; c=relaxed/simple;
-	bh=vqxx5ITJdSbi8gq6eMAJPI6323cJXEPOZV0uX68kTH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HMDvgKKDVLWdgod4YnuUx/8UoK54+Y/pJoFu+avEyvl8wvPROmFRSJ/lqJF2e8WAIyUIEcvMinmC874lyQWuN7gB+Ly9f02YZX1QLi8a3NnI4lS6cRNQUTRjQpAv+PmIXUfnvBHPe2UY0OzLwwLWEVPkw4mwkCMPJQLsiUepJ5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iAo2m5kD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745881844; c=relaxed/simple;
+	bh=5R1ihXWNblpTcigqrOrVvxreW0nOHeJ3fH4HtMTNR2o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=PKWw1NQC0OUWpUhooPysOq+9gL9z0QNF3JTh8Ibw113jAsM6eVqXUDJeg1Lyyajfn47WunlSzqdbgeMglmilnLHXcaHoXTgaKIeSk/Tm6KBKTmJx0lMhlPqV4sisdQRwTGm1RvWcA7BrjVO6ZpMM4+Y2KA1i+PGNMBsUfPcOweM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=AD1oepuu; arc=none smtp.client-ip=209.85.214.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iAo2m5kD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 758BEC4CEEA;
-	Mon, 28 Apr 2025 23:08:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745881734;
-	bh=vqxx5ITJdSbi8gq6eMAJPI6323cJXEPOZV0uX68kTH8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iAo2m5kDb/pyyuC1rocXxoL0N1J5litPpu4IU4vvH9RlaSurRgMiRuC0StJYwJ6ZX
-	 Q1I0GxiJP02d1MFtoUl9pIlXptXQyJ2X9XqF6jAH++8FsnuYu4V36TsMG3GG5HMK3k
-	 n91FsddH55UK4FiM12V+6iRlQTSUXLjGuCw4MVwqScW6T0TSxTl1vsJ9MWlHNasAUJ
-	 q/Jaw/mD4HJtSHOu5rpx/hNziVnnZCnj6+RcGXaNcueNqwzfTTCKL32m2Doe0t5fnV
-	 AUhQ6ESgl/O4EI59CoEIXtx/PIZ7OnE590VpI1x6QJ1rLGuowPdRY28JebcVDePVNg
-	 0xMYFw45xkBpw==
-Date: Mon, 28 Apr 2025 16:08:52 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: dave@stgolabs.net, brauner@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-	riel@surriel.com, willy@infradead.org, hannes@cmpxchg.org,
-	oliver.sang@intel.com, david@redhat.com, axboe@kernel.dk,
-	hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
-	syzbot+f3c6fda1297c748a7076@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 1/8] migrate: fix skipping metadata buffer heads on
- migration
-Message-ID: <aBAKhPBAdGVrII2Y@bombadil.infradead.org>
-References: <20250410014945.2140781-1-mcgrof@kernel.org>
- <20250410014945.2140781-2-mcgrof@kernel.org>
- <dpn6pb7hwpmajoh5k5zla6x7fsmh4rlttstj3hkuvunp6tok3j@ikz2fxpikfv4>
- <Z_6Gwl6nowYnsO3w@bombadil.infradead.org>
- <mxmnbr6gni2lupljf7pzkhs6f3hynr2lq2nshbgcmzg77jduwk@wn76alaoxjts>
- <Z__hthNd2nj9QjrM@bombadil.infradead.org>
- <jwciumjkfwwjeoklsi6ubcspcjswkz5s5gtttzpjqft6dtb7sp@c4ae6y5pix5w>
- <aAlN4-pMHoc-PZ1G@bombadil.infradead.org>
- <aAwSCSG1c-t8ATr3@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="AD1oepuu"
+Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-224019ad9edso81116395ad.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 16:10:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1745881842; x=1746486642; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yN6X8qy6iIXBeRkDCjdD0w88qJ6dcCiPtrqiszUMgAY=;
+        b=AD1oepuu0paRzg6wueEwG+FWx0b0H/PPA7MRK5MOvWF+apvUqAxkD0pj40F5oWvqIk
+         FgPL4hxJI5cOMfO4a4wcEga+8JC7uWbCksIknxRel7aTj39VA4A+xk5pQGFMHjp52aD2
+         4DoMArpUz1+OtD7HEwvHqShjvo5B4T2u/q5FBthbQsrwDVALlzWiHLQ3VFGxe5DbHSFQ
+         Bo01dyN/fQViqn34hPG2T/wLsO2BgRJIynTwO84LAIzFyvrLKVjXSimdKgypGsJvCQKN
+         gtK8sA1QB2Sw7n2HmIJtO/FphR3xVNrbdT2TuuJFUQbgabzPr6LkCpXVaCnsH5uz+Nsy
+         8DQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745881842; x=1746486642;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yN6X8qy6iIXBeRkDCjdD0w88qJ6dcCiPtrqiszUMgAY=;
+        b=WDGZdmqCU9Z6r/qceTc4EKtCbX06tNtPNQwo+Dqn8l15QsHh0AmMT8DMFGOGuRQL+w
+         s9uIVxq9shKDgrlLXog2qPMEw/CR9PoWorZV3f1TdODDS3vRusO2OmEOAvpCGZLPpbOR
+         sdgQYAxMfC6QlOs0pIE3GQG0DUzifu98+Oru5kcvMVi5/7JeSUcWZfnQCSsb4kpU2tub
+         YAog7Vo1uX1ZmANkWF1zrK3uoglC8V0hckG0OafdxUDyqR35BphIll0ou0wP+171spH8
+         TgxvkKOVUHc57QIyuIte65QGQwNaq6VopTT3ikUmshwYvHKMCXrf+gedwkROywHCr1VP
+         9XMg==
+X-Gm-Message-State: AOJu0Yxkx6DRUoEw1O1BCrKUw5ZveSTi+6tKdLBWzN0UwB2EeCKxk24u
+	Q3RuVElYR7rrQgY9r8EHBHBrhYP2yWnut8wnkkq8xp4NVJWbB10gdsnHGP/GDO0E6nd8SI/LwCH
+	/pj7edYxXn0s7Dtn7FGiAfby+sf7i/NGCQ/qma4WOxA/x2crt
+X-Gm-Gg: ASbGncsT/F5LBqnMXa6ChxL8I885LjpQct2P2BfO4Z23Wydsad8jAS3A+C5TkDkb9BW
+	aEXG1FG2qfWPl4wPUEh9CHmNsW5eeOkuGGoYvxFlo4vzvbPDl3FWY64XS1DZeiSOgjPPQ4TRyJX
+	QHf0O51QyFTyXJfnjLql5VDMO7bivKEMqmO8PS9qdUsu+kga87EY9H86hMlJqJbdIJyW6ctJyZb
+	5pusoWQTDpdEnSDyxj43eob0ugR47MlTvqRPi6NpARICQE3LAfm9TNThrHc9gKHaolNx3HuIi0v
+	1Xy4VD0f0KNotDuW30rDups0QRvhDnc=
+X-Google-Smtp-Source: AGHT+IGLl7TOqKFNXF5fmwjy9nOE7m0hNA10OLnBEeDkYFZQHcoN4UwcAMLHuXqjIk6lJT7AmRIwF17PnTRk
+X-Received: by 2002:a17:903:2284:b0:216:3d72:1712 with SMTP id d9443c01a7336-22de7024ab6mr13691355ad.48.1745881842017;
+        Mon, 28 Apr 2025 16:10:42 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-22db4de9303sm12508135ad.45.2025.04.28.16.10.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 16:10:42 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4008734065D;
+	Mon, 28 Apr 2025 17:10:41 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 35C66E40B9B; Mon, 28 Apr 2025 17:10:41 -0600 (MDT)
+From: Uday Shankar <ushankar@purestorage.com>
+Date: Mon, 28 Apr 2025 17:10:20 -0600
+Subject: [PATCH 1/3] selftests: ublk: kublk: build with -Werror iff
+ CONFIG_WERROR=y
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAwSCSG1c-t8ATr3@bombadil.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250428-ublk_selftests-v1-1-5795f7b00cda@purestorage.com>
+References: <20250428-ublk_selftests-v1-0-5795f7b00cda@purestorage.com>
+In-Reply-To: <20250428-ublk_selftests-v1-0-5795f7b00cda@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
+X-Mailer: b4 0.14.2
 
-On Fri, Apr 25, 2025 at 03:51:55PM -0700, Luis Chamberlain wrote:
-> On Wed, Apr 23, 2025 at 01:30:29PM -0700, Luis Chamberlain wrote:
-> > On Wed, Apr 23, 2025 at 07:09:28PM +0200, Jan Kara wrote:
-> > > On Wed 16-04-25 09:58:30, Luis Chamberlain wrote:
-> > > > On Tue, Apr 15, 2025 at 06:28:55PM +0200, Jan Kara wrote:
-> > > > > > So I tried:
-> > > > > > 
-> > > > > > root@e1-ext4-2k /var/lib/xfstests # fsck /dev/loop5 -y 2>&1 > log
-> > > > > > e2fsck 1.47.2 (1-Jan-2025)
-> > > > > > root@e1-ext4-2k /var/lib/xfstests # wc -l log
-> > > > > > 16411 log
-> > > > > 
-> > > > > Can you share the log please?
-> > > > 
-> > > > Sure, here you go:
-> > > > 
-> > > > https://github.com/linux-kdevops/20250416-ext4-jbd2-bh-migrate-corruption
-> > > > 
-> > > > The last trace-0004.txt is a fresh one with Davidlohr's patches
-> > > > applied. It has trace-0004-fsck.txt.
-> > > 
-> > > Thanks for the data! I was staring at them for some time and at this point
-> > > I'm leaning towards a conclusion that this is actually not a case of
-> > > metadata corruption but rather a bug in ext4 transaction credit computation
-> > > that is completely independent of page migration.
-> > > 
-> > > Based on the e2fsck log you've provided the only damage in the filesystem
-> > > is from the aborted transaction handle in the middle of extent tree growth.
-> > > So nothing points to a lost metadata write or anything like that. And the
-> > > credit reservation for page writeback is indeed somewhat racy - we reserve
-> > > number of transaction credits based on current tree depth. However by the
-> > > time we get to ext4_ext_map_blocks() another process could have modified
-> > > the extent tree so we may need to modify more blocks than we originally
-> > > expected and reserved credits for.
-> > > 
-> > > Can you give attached patch a try please?
-> > > 
-> > > 								Honza
-> > > -- 
-> > > Jan Kara <jack@suse.com>
-> > > SUSE Labs, CR
-> > 
-> > > From 4c53fb9f4b9b3eb4a579f69b7adcb6524d55629c Mon Sep 17 00:00:00 2001
-> > > From: Jan Kara <jack@suse.cz>
-> > > Date: Wed, 23 Apr 2025 18:10:54 +0200
-> > > Subject: [PATCH] ext4: Fix calculation of credits for extent tree modification
-> > > 
-> > > Luis and David are reporting that after running generic/750 test for 90+
-> > > hours on 2k ext4 filesystem, they are able to trigger a warning in
-> > > jbd2_journal_dirty_metadata() complaining that there are not enough
-> > > credits in the running transaction started in ext4_do_writepages().
-> > > 
-> > > Indeed the code in ext4_do_writepages() is racy and the extent tree can
-> > > change between the time we compute credits necessary for extent tree
-> > > computation and the time we actually modify the extent tree. Thus it may
-> > > happen that the number of credits actually needed is higher. Modify
-> > > ext4_ext_index_trans_blocks() to count with the worst case of maximum
-> > > tree depth.
-> > > 
-> > > Link: https://lore.kernel.org/all/20250415013641.f2ppw6wov4kn4wq2@offworld
-> > > Reported-by: Davidlohr Bueso <dave@stgolabs.net>
-> > > Reported-by: Luis Chamberlain <mcgrof@kernel.org>
-> > > Signed-off-by: Jan Kara <jack@suse.cz>
-> > 
-> > I kicked off tests! Let's see after ~ 90 hours!
-> 
-> Tested-by: kdevops@lists.linux.dev
-> 
-> I have run the test over 3 separate guests and each one has tested this
-> over 48 hours each. There is no ext4 fs corruption reported, all is
-> good, so I do believe thix fixes the issue. One of the guests was on
-> Linus't tree which didn't yet have Davidlorh's fixes for folio migration.
-> And so I believe this patch should have a stable tag fix so stable gets it.
+Compiler warnings can catch bugs at compile time. They can also produce
+annoying false positives. Due to this duality, the kernel provides
+CONFIG_WERROR so that the developer can choose whether or not they want
+compiler warnings to fail the build. Use this same config options to
+control whether or not warnings in building kublk fail its build.
 
-Jan, my testing has passed 120 hours now on multiple guests. This is
-certainly a fixed bug with your patch.
+Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+---
+ tools/testing/selftests/ublk/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-  Luis
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index ec4624a283bce2ebeed80509be6573c1b7a3623d..86474cfe8d03b2df3f8c9bc1a5902701a0f72f58 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)
++CONFIG = $(top_srcdir)/include/config/auto.conf
++WERROR = $(if $(shell grep CONFIG_WERROR=y ${CONFIG}),-Werror,)
++CFLAGS += -O3 -Wl,-no-as-needed -Wall ${WERROR} -I $(top_srcdir)
+ LDLIBS += -lpthread -lm -luring
+ 
+ TEST_PROGS := test_generic_01.sh
+
+-- 
+2.34.1
+
