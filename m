@@ -1,174 +1,142 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B462A18DB24
-	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 14:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B00267B6F;
+	Mon, 28 Apr 2025 14:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745850502; cv=none; b=oVCd73grA6/ZP6bHdoQaGBYnYxi22ZJmlZGAYHlj42GOkSaWM/Ou21qgc46N9v7cF3Z+ZxKQkfeh2yd/phEiwiaBd4hwRzQJcmrqxhgxOod8lTNQANalsWOrokcHA0bHPadbO/erOZr43WIBcn4ZwC34VTXvmJNfEGkmpLTF+aE=
+	t=1745851001; cv=none; b=FbMrxAnrko59yshJz1CCNtplN+fYwkMjD5GuikBiRXhLwf2t1GwE5k94H/CWKBHnCskHC8gBJifn4WGUm4MvYBtMprnfO4CRZJd3EGksBl2ztHNZTIlMMdcQnLsGS+0pzQidQwU133SiNcNBSK5H9pkGMNGMVs4S51jabMAN77c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745850502; c=relaxed/simple;
-	bh=Q1rwHvBu4qxAJ3au0VkVzcq1N7TF2axF0QJN7r0M3bs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jI2HYciWNtZEJq2U8zE4q3xOJAmbbBiqKRLRI1M6LKWEifvk5oqjkeRRDRQajTNXm2o8mJoGdokrrKMAkpqkrs8+8r8fut/xFKIiaXcDRQ7hBu33h/VhhpKg00SdFdOfA76S760fBSAtPLWvvEmpQ4gBLPNqSz+N0P9snN5LEas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=b8sJHIWt; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="b8sJHIWt"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ff53b26af2so393651a91.0
-        for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 07:28:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745850499; x=1746455299; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GDr5IGzdbQjvzsBJWEvUjA0SpBUuryn1nv5p9QOyO0I=;
-        b=b8sJHIWtQc5JoraZk97g4oZzB3Qmye0+Curyoo/K6BY0yrlkgzNhxTToPRaKN7whzK
-         ej9RhS36t2ouBDXGn4LjxbqxZKLyLY0lPVSPLtUDWLGt+snkMKiYkL3oAUdlncqMbZIK
-         X+xRioJGAK/Vz/oTKPOaUG2/qsKtca4XDjMEf/AszscVmT18wHBU4KlRIneVlXhM98Hw
-         4gpFOmxzMkWLk2KPSIdbZYDsF9xlwAhpp2asRYoX9x+jCaHYtTv7T2fNEm6tPZRwBUvz
-         rmqA9U9PjtC0XP2Q/U0WeB9lAQWPeuIHmDBz8mOFbQEy3kL9qas09vnvdGsdeAlkJx/c
-         zHTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745850499; x=1746455299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GDr5IGzdbQjvzsBJWEvUjA0SpBUuryn1nv5p9QOyO0I=;
-        b=tJHUbIO8i3Z7bU4VyZBfo8tUxDnO9Yn3oopASSJm5gyYrOvE7M43hjbSKH2nvd/F1x
-         PZ5k/pOQklSvLaW+P1NCZAv4ERaebucfQNRyvvmge0UqL+ueZrFAvqfp+K1G9sHDXZic
-         xa24NrAwBp2FtKmTuvEb9CTVPNvdGRxtzMwYE+KeOUXa/L5Nx1zOdXE235pqYLOonASX
-         kHoE3CvKP3IgaMHgbHmGrV4ag8uCBkDaqzLRFUXB/ZqI5CVwfPlxQxg7dZNGLvgHlGcR
-         emaDLrRmpClJtSnj7/8utJbrv2JQNUkpb6ICmyNLslrjuHlyLdg14sLPUPuJx8QYSnxQ
-         y9Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGW78BvPEYG06IQqnPIkzQQwNwBqp8IgIvSA+kAdygR3fvk/GGmadYVKOz43EoZTNNv50WI4dDCksMKQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnlvVYRMW+6kqr/fKqZJ9OBicfxmbzwmYmdI02ZQOoSFKr00G5
-	4Q9ESDlN7w4IqTXBj1WCzf11MYfevRvotol0xPEkinYLugugj7Uv47d7pVYefz9QqQ9DyvlOoyU
-	uPPJbVrqsquw0GKasiytWIYffTbgzafTNU05aWw==
-X-Gm-Gg: ASbGncvV2vPofRd0y3DImIczft8/mwJRz2hnpSmZITv4UUXn0VYTxs5tmQL6IcwlqqZ
-	7d0i8qWXgdVfzyGkFBB4LhNm2SrLw5yWBSvmVMCs0g1SMJnzccL0LKYwARWbfmua1dke3LseUcs
-	VXXi+vD5qHljV9LTP5FRXw7g==
-X-Google-Smtp-Source: AGHT+IFK0QLC6BCqnPQEezaBSjWk6KdQCSE5+Gfet1RkZ2FmHbJ+YhxaEeLLuvKg+wmx+n353gipyz4JSkMSRj0+L4M=
-X-Received: by 2002:a17:90b:1c91:b0:306:b593:4551 with SMTP id
- 98e67ed59e1d1-309f7ebaff5mr6351648a91.6.1745850498795; Mon, 28 Apr 2025
- 07:28:18 -0700 (PDT)
+	s=arc-20240116; t=1745851001; c=relaxed/simple;
+	bh=eRJ32s+d626xp2LcU1QZZ530a+v5i3bNHCiXe1GEmKs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DE4L0KOlvBtDFFrvxjlFSKM8qlJLVvl77TKXRBARDK+UTs06xJGyjB7GvztrpXjN7hN0DGtDRVzHEkLRBg0pbLnmpdfaM6yOfqMT6Ar3zpNifSK0XW34n62HgiXgXeDyh2CgCjHC6RgipMZS7Su8uq5x13IE6OyYYdbTfDYgdB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53SACpON002698;
+	Mon, 28 Apr 2025 07:36:30 -0700
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 468ts3rsdk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 28 Apr 2025 07:36:30 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Mon, 28 Apr 2025 07:36:29 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Mon, 28 Apr 2025 07:36:27 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <hch@infradead.org>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <ming.lei@redhat.com>,
+        <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH V5] loop: Add sanity check for read/write_iter
+Date: Mon, 28 Apr 2025 22:36:26 +0800
+Message-ID: <20250428143626.3318717-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <aA-QB7Iu6u9PdgHg@infradead.org>
+References: <aA-QB7Iu6u9PdgHg@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250427045803.772972-1-csander@purestorage.com>
- <20250427045803.772972-6-csander@purestorage.com> <aA4rqcpC01SzUn_g@fedora>
-In-Reply-To: <aA4rqcpC01SzUn_g@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 28 Apr 2025 07:28:07 -0700
-X-Gm-Features: ATxdqUHtsQExf7Ca3a6na1mNH0B2aXQMhUfJn0rd5iFTOraQL3F8E_fyTkhvdRo
-Message-ID: <CADUfDZpEGVLzEZJtPiScWgf6PVroQvKKhGed1cb8AJiyUr_RYg@mail.gmail.com>
-Subject: Re: [PATCH 5/8] ublk: factor out ublk_start_io() helper
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI4MDEyMCBTYWx0ZWRfX9dfyde8x5nki CY3ZLvWuxLdj42OarYcNSYKdCy+NS187KP2vG9hOaoxfMCoY5z7GTUKg8Wc8nxmdemvxSBKRM3B sIvGbEaO0pISMGe1qflhX6qXVqbvxFj/4atiMR5lYDabhydQ3LNjrFjHN6/AZSCFcCZtN7cbxW/
+ OhMlddX7ihQ3cyojEyV+SaexS1oYz2RyI7Yv3EKNJR6x946u1naeMivw9v8dNmKmB0aoo7SyzGV 3UrsGWRNfDm6KQme3d/rHFFFPSzeRZ6WIM3wARvUgXjuJwINJ0L2RZa6w8w40TlCfntEgbYCWmf DfAxBhOtgWF0K0Q7PvryxrckwrG+qqG5tDArdPql22/LJMxZJGSXnY3b2/hsHq6fFc7x3jW2Cmp
+ BrMEE9qqQpFhpa6eFF0m1/Mn4bi0ZJ5Qw3Wy/GF1s8jWbHzE3gkFalzbjDGOnvOR3W276HWD
+X-Proofpoint-GUID: 9VEYUVOuDzyBhUEUgr43TLOVLILbv1xt
+X-Proofpoint-ORIG-GUID: 9VEYUVOuDzyBhUEUgr43TLOVLILbv1xt
+X-Authority-Analysis: v=2.4 cv=YJifyQGx c=1 sm=1 tr=0 ts=680f926e cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=XR8D0OoHHMoA:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=rNDPuYlyMNBSQ_icSEMA:9 a=DcSpbTIhAlouE1Uv7lRv:22
+ a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-28_05,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 phishscore=0 clxscore=1015
+ suspectscore=0 mlxlogscore=988 mlxscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.21.0-2504070000 definitions=main-2504280120
 
-On Sun, Apr 27, 2025 at 6:05=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Sat, Apr 26, 2025 at 10:58:00PM -0600, Caleb Sander Mateos wrote:
-> > In preparation for calling it from outside ublk_dispatch_req(), factor
-> > out the code responsible for setting up an incoming ublk I/O request.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 53 ++++++++++++++++++++++------------------
-> >  1 file changed, 29 insertions(+), 24 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 01fc92051754..90a38a82f8cc 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -1151,17 +1151,44 @@ static inline void __ublk_abort_rq(struct ublk_=
-queue *ubq,
-> >               blk_mq_requeue_request(rq, false);
-> >       else
-> >               blk_mq_end_request(rq, BLK_STS_IOERR);
-> >  }
-> >
-> > +static void ublk_start_io(struct ublk_queue *ubq, struct request *req,
-> > +                       struct ublk_io *io)
-> > +{
-> > +     unsigned mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > +
-> > +     /* partially mapped, update io descriptor */
-> > +     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > +             /*
-> > +              * Nothing mapped, retry until we succeed.
-> > +              *
-> > +              * We may never succeed in mapping any bytes here because
-> > +              * of OOM. TODO: reserve one buffer with single page pinn=
-ed
-> > +              * for providing forward progress guarantee.
-> > +              */
-> > +             if (unlikely(!mapped_bytes)) {
-> > +                     blk_mq_requeue_request(req, false);
-> > +                     blk_mq_delay_kick_requeue_list(req->q,
-> > +                                     UBLK_REQUEUE_DELAY_MS);
-> > +                     return;
-> > +             }
-> > +
-> > +             ublk_get_iod(ubq, req->tag)->nr_sectors =3D
-> > +                     mapped_bytes >> 9;
-> > +     }
-> > +
-> > +     ublk_init_req_ref(ubq, req);
-> > +}
-> > +
-> >  static void ublk_dispatch_req(struct ublk_queue *ubq,
-> >                             struct request *req,
-> >                             unsigned int issue_flags)
-> >  {
-> >       int tag =3D req->tag;
-> >       struct ublk_io *io =3D &ubq->ios[tag];
-> > -     unsigned int mapped_bytes;
-> >
-> >       pr_devel("%s: complete: qid %d tag %d io_flags %x addr %llx\n",
-> >                       __func__, ubq->q_id, req->tag, io->flags,
-> >                       ublk_get_iod(ubq, req->tag)->addr);
-> >
-> > @@ -1204,33 +1231,11 @@ static void ublk_dispatch_req(struct ublk_queue=
- *ubq,
-> >               pr_devel("%s: update iod->addr: qid %d tag %d io_flags %x=
- addr %llx\n",
-> >                               __func__, ubq->q_id, req->tag, io->flags,
-> >                               ublk_get_iod(ubq, req->tag)->addr);
-> >       }
-> >
-> > -     mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > -
-> > -     /* partially mapped, update io descriptor */
-> > -     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > -             /*
-> > -              * Nothing mapped, retry until we succeed.
-> > -              *
-> > -              * We may never succeed in mapping any bytes here because
-> > -              * of OOM. TODO: reserve one buffer with single page pinn=
-ed
-> > -              * for providing forward progress guarantee.
-> > -              */
-> > -             if (unlikely(!mapped_bytes)) {
-> > -                     blk_mq_requeue_request(req, false);
-> > -                     blk_mq_delay_kick_requeue_list(req->q,
-> > -                                     UBLK_REQUEUE_DELAY_MS);
-> > -                     return;
-> > -             }
->
-> Here it needs to break ublk_dispatch_req() for not completing the
-> uring_cmd, however ublk_start_io() can't support it.
+Some file systems do not support read_iter/write_iter, such as selinuxfs
+in this issue.
+So before calling them, first confirm that the interface is supported and
+then call it.
 
-Good catch. How about I change ublk_start_io() to return a bool
-indicating whether the I/O was successfully started?
+It is releavant in that vfs_iter_read/write have the check, and removal
+of their used caused szybot to be able to hit this issue.
 
-Thanks,
-Caleb
+Fixes: f2fed441c69b ("loop: stop using vfs_iter__{read,write} for buffered I/O")
+Reported-by: syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6af973a3b8dfd2faefdc
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+V1 -> V2: move check to loop_configure and loop_change_fd
+V2 -> V3: using helper for this check
+V3 -> V4: remove input parameters change and mode
+V4 -> V5: remove braces around !file->f_op->write_iter
+
+ drivers/block/loop.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 46cba261075f..655d33e63cb9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -505,6 +505,17 @@ static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
+ 	lo->lo_min_dio_size = loop_query_min_dio_size(lo);
+ }
+ 
++static int loop_check_backing_file(struct file *file)
++{
++	if (!file->f_op->read_iter)
++		return -EINVAL;
++
++	if ((file->f_mode & FMODE_WRITE) && !file->f_op->write_iter)
++		return -EINVAL;
++
++	return 0;
++}
++
+ /*
+  * loop_change_fd switched the backing store of a loopback device to
+  * a new file. This is useful for operating system installers to free up
+@@ -526,6 +537,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	if (!file)
+ 		return -EBADF;
+ 
++	error = loop_check_backing_file(file);
++	if (error)
++		return error;
++
+ 	/* suppress uevents while reconfiguring the device */
+ 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
+ 
+@@ -963,6 +978,14 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 
+ 	if (!file)
+ 		return -EBADF;
++
++	if ((mode & BLK_OPEN_WRITE) && !file->f_op->write_iter)
++		return -EINVAL;
++
++	error = loop_check_backing_file(file);
++	if (error)
++		return error;
++
+ 	is_loop = is_loop_device(file);
+ 
+ 	/* This is safe, since we have a reference from open(). */
+-- 
+2.43.0
+
