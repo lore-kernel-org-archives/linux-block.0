@@ -1,191 +1,191 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F9225F7BA
-	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 15:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745853186; cv=none; b=e4QERCqygXpt/DqH4hwbxGRJotA0IpZ9i/gVGrqQJ1aEY+rN+7roTj/HyhQHg84/krQzj2LTfN45MIaJ4TJH62ddQO2BkA1FM3WE4I1AIa33hTs6/CDijpBPy4FGkvIHH5Nw22x16M/0XnKT7//J7fAdPKg99vChvwqe2Ems06Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745853186; c=relaxed/simple;
-	bh=9t97CFKV4rACJktBVSdAAFmMi8vnZOYAszVcOFq/szA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dtQ9Swb594G+qrd75QLJMlNlAjUiNqZQgQIySmKM7G5Pkyuz5qwLx+fm/xTSgI1xJI6V8tqYC1FCMG5ZfeIVMSSuzVgI6SodGIFCtAndttUW+LTYeEzBFePZ8Az0UwkFmGs6+NjEKI0EDksZQ3/kIQhmZiNQ11l6nvmsjz12AbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=aBz1iSYm; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B0D29D0D
+	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 15:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745854229; cv=fail; b=qaf83F0dW7VTOnV0zqY7HJZCJBaola76fIeZz6leu02Q9Cf6VeonXoFlTgN0IpD3QQALSKwfTwyFHoerL3jJcQByuMfonhSP0LEVfSaHezUfXuDLQZvHqplkM2dt3gaotm41kE4m1TWAgLaUwpBpjfmLHCwXLqUSfdkFup+PKQU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745854229; c=relaxed/simple;
+	bh=QzXjLRQ63O5Lb/KvNSmYGdzsWn7SsURKoYFsTZaG38E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gmDzK9ckjZ8GkVb6z1vZiln3ke8AJIkIymbd5kF7eS9PPb30NIwucYWrJVC2Qtwzv93fuuPqvDZeEcP04BndrDVnlBfY4XUS/D8yzRQyxpB4BW040PkP+mWVs02Ac6QhVRUm6W+6qbsrpIT1+BfyhBfyjpCROcQghfrwfY3Xr8I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ZWKbrBU3; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=dwE4pEsW; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="aBz1iSYm"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-af5499ca131so511613a12.3
-        for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 08:13:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZWKbrBU3";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="dwE4pEsW"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1745854228; x=1777390228;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=QzXjLRQ63O5Lb/KvNSmYGdzsWn7SsURKoYFsTZaG38E=;
+  b=ZWKbrBU3bnQ4ZLGzJ8pit+luu9ZF6ENr2Gy11RlmvoqseX2IDmJkTl1+
+   QuCKyYcKOP0w3oNviv2F6UK9Zp8g+dwIs8b085tX0C1djiFOhNj38iSZP
+   5uomfiDoeWfTONRFB8OwTVZu26TIHf61JPJMfEe5XrQYj7Bt399NQ/bQO
+   ykjCgNP8b5MTk+xt5TrRwiLugM1S99drv4d5whu+Ie2GABMveUdevvg+q
+   cZZBsvQbxQub9Ty1+hDJQh9SlMazPsu94tjI7mVTH1Hv966ObbfIOHW8W
+   BMn2d4DdFldO5qok5ozljcWpF2hlKrrQP+M3r3/AYDaGLgNxTjYMfTt9Z
+   w==;
+X-CSE-ConnectionGUID: tVMj3gJRQBKRCF3gFsfMKQ==
+X-CSE-MsgGUID: OUp370niSGqWgyFuV2ECKQ==
+X-IronPort-AV: E=Sophos;i="6.15,246,1739808000"; 
+   d="scan'208";a="83589090"
+Received: from mail-northcentralusazlp17012050.outbound.protection.outlook.com (HELO CH5PR02CU005.outbound.protection.outlook.com) ([40.93.20.50])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2025 23:30:26 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V2MiQiKrkKg3z8lcavaByxVPE+PFrik3lezHnM3vQ7uO0yHCUdrRoInGzlxXAZKxmRF7tJQXhbX2u8rq7GjaWoq8ydhPFjwZLSF7q15Q5u8zUEwA0zDVJAZBiEUR5KulpINiM9Y/BKyW1bDzNDMF/y1urAhkB9hFlwZirfYYxZ/9Dwgk2XZZCxSbmo3kmtBJPeYkeSdKHRzh1naZE70et77QMaCwLx6+Wv5UdcH9nNkswyi0j1s+iA0lpIqly30sSaVRBqEY8Ku6wiTOvq86GjUs0CNeaTNuCUhHVYm/vWeJaL4IakUnqzz6u/+uYBWVThgaSTYZ9+1fI6JaGbpczg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QzXjLRQ63O5Lb/KvNSmYGdzsWn7SsURKoYFsTZaG38E=;
+ b=BUZCnoiO1eiO4N04FCchT1ilmNcw8SgyORy99NHhel43R6BLj+OUM4jMICstAKkS5q6u/23JPS20gpKiflJpzSLDghFmsF7tXXMrnSpeCPLy8SRcHkWgzy+dWlgDzw5ipc2ze5Bo1E4WMsEugDh0dZ2rDbA+1Fo5lkqE4nkTvm5iErgeNPxdWyZ3EKGLMSij4gc3iDiZSNG1ZUlub/kkMzQ6f3FjVXCP7hATQzb3twYWSPe+m9n900QKxHQSpg/JsKNqdeS5tCgazXN7enx8jq/oz/qiSJvZkT8fe9gzXkMva8JKa/2U/auE30pXlGNDEBuXhkfIRDLFNnJuvft3WQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745853184; x=1746457984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w6D5EgZHIMdc/gfZZ8/yCt5JK/51JYrU9cgDLfIs1bQ=;
-        b=aBz1iSYm2nAinOTwvbJZNCVXpzqtyGplskWtSjvFAxRHZNVs+LySGYxcIH25zLghrI
-         Vir+kD5r1MzZtTWFDI3aGFUt+nCcVFVhpAs8USme2PKZHPUy63WKUNVGY7KFQ2Dp2ZhV
-         UA2y9HDR41Pv7EgjEn1WV8Pr9rQDhSUGkRKAWF3Fr49FMcpp61klDQkbOPW25RryBQw/
-         0evuvuFdjG4h19lpiA+8VuJAK+2K+1GJLoVs8N9UiefYfnhRHaiULUhU90lNOubaCg/U
-         aEQsOxQSJQNtLs/EChFPtdje9xnqHcUZ7XBvniT8RmWnRVpPBPt8qfmn0mSQqXcQIJ8h
-         WmDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745853184; x=1746457984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w6D5EgZHIMdc/gfZZ8/yCt5JK/51JYrU9cgDLfIs1bQ=;
-        b=WADJOnGWCE+Zpp/UQVwN8cuvHnQKamXb/vxVz58qBsQulm6/ESZ0O6ErnLzhgG0jNg
-         Iu28uKeQAN7NETx4oS4VZsBTnr0sc6ErNHpzg1saUKkISSi847xFCb0q/splJ4ijkr2L
-         B7x5U7D+6XnsahmCaJtArwWQkbEGT0x2qqbPDRP/SZb+QhUe3EVDhAnt2yqdEcxw8gJV
-         TH9ce9xXSrbbhfTvyMmzNTicRK05T7fxEOEMxcp3HeBrnDzscVjDtRlaDdCMS+H4z1YE
-         Siwtn+lfZOJu9LXLtWMy0KHFp3rikyKilkUCIaeSTKF8LyP9/pys3zT+mBJCU1NPiC9O
-         hArg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3SMpi3JRsyHgaSzljle6r6alKO+AoVLGj/YEe0syuw3dUqEIctDxeSUlN44cA1NF87B+AzPmi9Zwfiw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdfXc3ADvtJX1wzLyuKR7YBvv9vhBIwBTmGVs2/sWrUpNB684J
-	ZA0EzGTGITbxTT00GSevUnf5OAfbWnNkv0awf9lhBb3bowZCWgVCrcp9zFjRb5L6SUXziNG5EhX
-	GplvEWXhAjcnBBwwn1ZrhJvwwBV6h/ZJY7H//SQ==
-X-Gm-Gg: ASbGncsrMKr3j4ZYHSNcv7JHiwOKgIwY9zA8barbG3fkBfszQW7TLLIQi8Dii6QwDGb
-	RdzAuNy8Hus/ZQhIJum09bwm7dKj2L0BXlH2bTCye6tuFfw25GspmVPPum1wnmi114jwtcJFc2Y
-	rRasRqNpyXuA/cl7Y28jUIrQ==
-X-Google-Smtp-Source: AGHT+IElsGgyK2Ufu+rFPEsxOiI15Po+x417riW1AfSQaCP4JKx/Jfxtjnmk66ODNW+a750tGEstk3DeBMFYUawtJ74=
-X-Received: by 2002:a17:90b:1c90:b0:305:5f31:6c63 with SMTP id
- 98e67ed59e1d1-309f7ec9d1fmr6407335a91.6.1745853184249; Mon, 28 Apr 2025
- 08:13:04 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QzXjLRQ63O5Lb/KvNSmYGdzsWn7SsURKoYFsTZaG38E=;
+ b=dwE4pEsW18iCM87lM8+I3U+c3+0KsvCjuwOFWEgQ2ZP+S4h3r7NK8E9+ZbqJ0N3mdszZpuJNFIbSm9JZmAhwbhxmVC2mzmuZ/EjrHkO7UDGSrVQlEw4uA4pkjlDWD2wfr0qx977nZEZoRLRMckundjrYxRs6bHhHvZPmYqk2ptU=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by PH0PR04MB7605.namprd04.prod.outlook.com (2603:10b6:510:57::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Mon, 28 Apr
+ 2025 15:30:25 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969%5]) with mapi id 15.20.8678.025; Mon, 28 Apr 2025
+ 15:30:25 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Yu Kuai
+	<yukuai1@huaweicloud.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: brd cleanups v2
+Thread-Topic: brd cleanups v2
+Thread-Index: AQHbuEdLVzCeF5AUb02JY06zKErb97O5NFwA
+Date: Mon, 28 Apr 2025 15:30:25 +0000
+Message-ID: <25bad830-2c09-41d2-8fab-00237814ecc2@wdc.com>
+References: <20250428141014.2360063-1-hch@lst.de>
+In-Reply-To: <20250428141014.2360063-1-hch@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|PH0PR04MB7605:EE_
+x-ms-office365-filtering-correlation-id: 94b356be-b8dd-45ca-ed5a-08dd866998f2
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?ellDWWFBNllZTWZaUExIU3I5blRuRGdSZDNrWmsxaGN1bDUxU0FVVEVwaG9s?=
+ =?utf-8?B?SGFjSUxNQ3I3Y0lyVTJnSHVVeE1NTlIyM25wbUNIaURRVnQzTk00ZFlTS0tS?=
+ =?utf-8?B?Y0x3aUhRYTgyMlFzUEh3eXRMR3JmQ2Z5bTIvUFdWME9tdGpCNHgvc0pOSGVO?=
+ =?utf-8?B?Y1NkN0VNNExGSCt0RFZkclNlTDJxT2c3OE9CN29vSmFKcVhhTFFZNE9VOWVJ?=
+ =?utf-8?B?bnM5RXV4SFFJWjYxM0ZuSElzUTFnSVRGaGl1TWF4dVcrV2pEM3Y2emZwNW01?=
+ =?utf-8?B?UUFBRjJrQjM4QjROb0Q4cjVQeVZOWEFXQm45a1BxandmdDRKOG1PY28zYkxZ?=
+ =?utf-8?B?WFFibnBaTGFLNy9qQ1V2b0gzeVkzczd6OFo5YUd3ZmNta21VQ0hHQ0F3YWVO?=
+ =?utf-8?B?d1h4eEM2VkgrdVJQcXVEelpBOHpIN0RuNDhremJEOTNPWHJEWEVOT044RXNs?=
+ =?utf-8?B?cGpZSzd6OVZyWGZXNFdQTVBtMmxPK3ZCWFBRbUU4TG83QlhPalJmdHFjOUlL?=
+ =?utf-8?B?bS95UThSaE1BY1RWaDJQWjUzb2J0ZEJwOTJWSWdDMXFuQ2FtcEEvNkk5UGgy?=
+ =?utf-8?B?YjJNdk8yekRWeDZ6Y2puWUp1VGJWUnQvNHl6ZHNhWWUrVC9Fd2huYzJ6T2gz?=
+ =?utf-8?B?Z29MUm8xWXlPVHQwTUs5OXR1RG1mcTNpM2s4SXNYL3g1U3Nmd2s5QTVpak9J?=
+ =?utf-8?B?Y2o5M2dvcGJyclR6VVlxMGxxRHlWamJBWHNibVE2ZUlzQlVRdXdCQ0VoM1p2?=
+ =?utf-8?B?emc1ekhLcDU1UUxtZjhUakxTTjAzVjY3OU5SVU1ZSDZuRkRuekd3ZFlrZkQw?=
+ =?utf-8?B?TGc0Y1JuZFpJYTdqVmZtdEcvd3h4K3ZuUi8xUmgvSko5dG5NYVlSNElUUTJG?=
+ =?utf-8?B?V1BPN0hIY2g4K0pIUStQUDNJVlc1dzhIODVMRDFYSFpmVFJRTmFtU2Rzalpy?=
+ =?utf-8?B?U0VTeFExTkFFZkZVV3lWZUZ1UVFncVFnbnNOL1BFbEE4eVpycTVPdk5sdEM2?=
+ =?utf-8?B?UkxYYXVjVXlwTEp0U0dBYWtFazFCM0VTNlkyQmpyZVVPMjJDQ25FbHpOcGRz?=
+ =?utf-8?B?YUFmNzNPWGV0TFFzMUs0c3FFTjhCMmJRNUxidkJ0bmlncGRaMTQxb1BSQytr?=
+ =?utf-8?B?N3VRWjNmQ1lGbTRsSHdvcERFZlowdHk0aEE3Sk0xVEsyRzhwaGhlUzNmT3F6?=
+ =?utf-8?B?dW44ZC83SGVYUGk3Q09aQ0RsS0ZpZlovRDUrbkVBWVBzdDJGdzFlZVRlYXhS?=
+ =?utf-8?B?RWtOUXMyNG9GVVk5NytROVpiSWoxNTU1TURqYk9tRkZaMHNQbXdQSkk5dnJx?=
+ =?utf-8?B?YjlEVEc2dmVlakdSYVVzNEhBRXJvV2padUszaEZsZEdnMEZqaFQwTkRaTFZx?=
+ =?utf-8?B?bDMvWUVueHl5WnhaYkw1M1Zrb2I5ZHYxRUx2NUJ1ZWFsajRvWjNFUTkwVWZy?=
+ =?utf-8?B?amN5SFkzdlNKbUZRQzJxZTlpV3lBMjhaRXJxQjJCOVpYY2duSS9sUlgzQzd0?=
+ =?utf-8?B?SG5RcFNueEkvZDFYUDhpZ2M4NU5yL1phTVp2d0hmcDNpbjAxSmEzdTh1aE5S?=
+ =?utf-8?B?M2J5aytQeXYwbnBaRHh0cG16YzZGS0JuMmxqR3Q5Ym5aQVp1STArdThMNytJ?=
+ =?utf-8?B?dmlaKzV5dXd3akRGekk2eGI0RUM1ekZYaEIrVHZuVkhYcW1adTMzZjR2c0dN?=
+ =?utf-8?B?REl2QnpTYXVPMkZFU0tJMWJrSmZ0YnIwdVkwcnRMM1J1blFZZ3dEZ2FicDcv?=
+ =?utf-8?B?ZTBjQ2VhTjFpckxlRjljbXp6dGV4U1p3UVBSRUdLOUNjSHN3M2lXbnVtMzJm?=
+ =?utf-8?B?aE1tMW9pRkVFd0VNTzQwR2Y0SVYyeWNDZS8wajlrSEhGandRMjB2NWhBZDRU?=
+ =?utf-8?B?TllXZHEybDJYMUI0Y285M0Y2SWE1NkJDRVRzQ0VhbWVCaDZxUGUxekNQN3RV?=
+ =?utf-8?B?ZlVydWJMT09JTXBOWHpremlrWktsMUdPK1FtNGd3eE45YUo0YVhTK2hyMDhn?=
+ =?utf-8?B?Z3Z3SmFCRHdRPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?YnRpSEpzNzdSL0RGbHdEVThJQVdOTk5taDRQektyTHRnSEl6RC9RQytKZzNl?=
+ =?utf-8?B?YStZWi9BWnRKUWpVU0NkdmxsQSs0OGNQanlNOUZrQm1MN3Y4TTVPaHorTkth?=
+ =?utf-8?B?aGpxd08wdWl3eHlaNjFNTHAyTW9ybFQ3M1JURFZzRDlwbXZlWmRvSnhLdXRT?=
+ =?utf-8?B?RjhLQkFXTW5GaTJncU5iblNXSnhUVkprbjRGNkI0MTFoVVg0T1l2UG9HYUFH?=
+ =?utf-8?B?S3J5VlllcXUzbXJWdTRDRjRZWnI5ZzBCYkZleEczQ1BmMTVPd1QwVjRkd3ph?=
+ =?utf-8?B?NVFLaEUzWkhvL1BFanNtRERYZTZ6cXE0WGFCaS9hcGpNY0E4NzBNenVWZER1?=
+ =?utf-8?B?RlhmT1V3VkpCbk4rY0syUitZMFRIZTI2MTJDU25GWXUzWHkwRnQrNFhZam9y?=
+ =?utf-8?B?TnZpNUVqVVhzVTZsSkpwMXRnbVk3QmlkUlhEM25vOHg3Nzl4RGhvSFRuRzVl?=
+ =?utf-8?B?Vkt2VVlpVFBXNEoxOHhkK2xtc0NmRHpZRURqTndITE40c2ZJbE1meG10M1ZJ?=
+ =?utf-8?B?TTFJd3JVVVVka3dxSVkwZlV1R1owWlN3aWd3Z1V3eGxlMVNoaDhLZElCY0M3?=
+ =?utf-8?B?WThYNzBsSHFnbDBJdEJWbG81Z2VEK3RyVzJhTEdqcVYrMFpOZnJZNkJlQ211?=
+ =?utf-8?B?ZWkzY2dIQVJYWEdZeVVNZEJ5eFJCOUx4TEZrN05KdExKenRSV2Fqb0swa2Y2?=
+ =?utf-8?B?eG1RTUlyV1Z1bGZWWmkxTEpwMFpKTlFZRjl4YnZtVUNQMkxnVTBWV0JmTjBy?=
+ =?utf-8?B?c2ZFSVN3bEtLVXVLcStKUzZGNWVuNXFnaHNxMGZzTnZSMXl0TVhheWxub1JK?=
+ =?utf-8?B?amNmRmViTG9CSjF6ZVd3NC85bkVrT0tnc3g1YjRrTGRCSEFJcnkwMDQwUmpm?=
+ =?utf-8?B?TUQxTmhqTnFOZXFrLzR2N2RnNWpMR0Izd1FFRFlVSk03OStzMzdOdlJGWGV5?=
+ =?utf-8?B?V2NpbVgwdFFvMXh4OTd2RUlMSys1dEZnZU94eW1ISE5ML2N1bmxURXI4dnVk?=
+ =?utf-8?B?S2RkZUxXNHU0NEZrSW9mRHErdllZaUdseG5UMmlkMHFvMkdWOWNsNDFmRmtI?=
+ =?utf-8?B?Z21iNnd6ZlZoc1U5QXFnbE1TUTFsZzNKTkpFNUlydElUYk1mVGdITkJDTVhP?=
+ =?utf-8?B?aFdlUlNtais0L2VCQmJUdm81S1c0WURlUWxHZFNTVUdReGQ0alZYT3A2bzBF?=
+ =?utf-8?B?Szkwek8xVzBMWElZUTJIMUhweHFEQjBha3pwRlhTWWM5Q2hVNjRLL3dLWkJK?=
+ =?utf-8?B?SWhTVGxmNi9OZWc0Q0hTWXNxWk9zbkxidUI3UE9aRTRaRlJDNSs3TzFoZ0NO?=
+ =?utf-8?B?MllaZXM2b05BWWlXUnhjVld6ZktHZWVYazhTQjBRcGE4R3pTNHJDSE5lc3ZG?=
+ =?utf-8?B?NWJZMW1KVC81aitZNjJqK1ZpNTlZUUo2V2NIMWxra0FTdGlKdVNNRzRqNGdq?=
+ =?utf-8?B?Ky9pTnhCWFl6bGJpL2FxQkQ2VGJ3OUJsTTYzTTh5ZXp0L096cmt2Z3dVUi9a?=
+ =?utf-8?B?UmRCTmNoNFUrTzFVVVBDVW9URDlqTmhrT3dMeGlydE9lYm5Wb0I1NlExeUNK?=
+ =?utf-8?B?dTFuR3d0MzhlU1hqYlRuOVZuSTdxRXczQ21qcjU5K0NmOXVlcHJmZ3ZUUWNk?=
+ =?utf-8?B?ekhQSlBhb05yai9xby9QN3F1Sk9WcmF6UjZ6aEUzbkVJM1JpU0x1VzZyZkdm?=
+ =?utf-8?B?NUltVFlNdEtQdEd6TVJ6cEY4UWRSdnkvR251L1B6dVJZeXFLdGVJZThoRWlF?=
+ =?utf-8?B?QmFHZXhLeFJBQWhoWlJRdUJaYWRmT3F3M1NiU0lMTzRWUnRJVTNsYzJ3bmZP?=
+ =?utf-8?B?U2NiYTdEYWFSeDNRTW4yeGMwNkJ6MXF4Y3JBM1Rtd1NsbWJZZE43NXJ4SHBI?=
+ =?utf-8?B?WE00QjdoYjIrOU9ndFRXOUtsbTZxSTlSMlVNSTVmNWhKT0FURDdCMVd3QjRt?=
+ =?utf-8?B?REpnTXVUQS9EVGJjaHVsODVrWE9ITGd6cDBSdWN5TU1qQmRkMGhVbkJOVjdP?=
+ =?utf-8?B?bWRUNXI1L2xEU2o2MU00VTdBTDl2dHhaQWR0WUQrU0g2cWMvMVBTOHo1MUdO?=
+ =?utf-8?B?M0RGL2wxa25qYnVJTTZaOFpqS2phVllsd0Q2NTFzS244czlnbjR0aTU3WVdj?=
+ =?utf-8?B?dm8reGxrb2ZNTmdSeEd6Yzd2Q2N1RlhIaFZ1UWVwbTQySmcvb1V4bm1JemJx?=
+ =?utf-8?B?S2c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <312358FB76BABF4D8F5F6A38F6909D5A@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250427045803.772972-1-csander@purestorage.com>
- <20250427045803.772972-6-csander@purestorage.com> <aA4rqcpC01SzUn_g@fedora> <CADUfDZpEGVLzEZJtPiScWgf6PVroQvKKhGed1cb8AJiyUr_RYg@mail.gmail.com>
-In-Reply-To: <CADUfDZpEGVLzEZJtPiScWgf6PVroQvKKhGed1cb8AJiyUr_RYg@mail.gmail.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 28 Apr 2025 08:12:52 -0700
-X-Gm-Features: ATxdqUHWv7K013iZ72EzRXMzcUVb0J6A1Zk3mvLKz4fmZFJAp6l9ML8z8-isNS4
-Message-ID: <CADUfDZqqeeBTbgvCfHa8sr7Y7BetGbPzHYA1hMoN83kz+Bi54A@mail.gmail.com>
-Subject: Re: [PATCH 5/8] ublk: factor out ublk_start_io() helper
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	7qKwJj9t/I34/MRjS/t2W8r/PdKGoor9tZx8tbilVJIN5ZpQFOlJqfdotCnC9B4EZETBXVJM1PAXw05BlOF2YJphTdaAWpdoC8M6aBvmcWij2u12Vc+GerMxUc/RQEfn2ShBSTY7HmbsNUzVxaYthNN1RaEmnuYfPcupEb+eo4g5q6OKlCrRSxTtfKqHHt15Jid7O6tVIv793fzLtqxDxrjqMUIbY41epT2j1e+PfhQoQ0LHUdVZr2DRPLLgny7yWpY2BVEqdAm1R9+5GF3G1edv1aHsyFSJaC6IMr5JJmBSkkeJZRVcV34XVtmwKLl7RN9avX1ET0qI4EEyJzJKEgcWh9+qFYe3hiYr5TFlscnIG/pv1+20vBsm6b7ZNtpLN3XjGvHqZM5vWKc/+NK7p7I0H5a3SePElgPmuhlcm4jrsfOgKTXtcQbG3l5bj4bvFMLLrzwhmodqHAS87H70871Sa4rvE8lXe3MHcqO2ysYhaZXnuQBaroRYQbeGxeaHxOFeda8p8N/J8PBfvqNnhnQLOSCGUzf5e6eCAsUBkoPlus4qEYCbGrbp4z83yhP+rqD+VuQHRk5dgYYbUBRj7bveyOa8HGawcJ6zAAqfedosisvnBLAW/fps/cV8NM6/
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94b356be-b8dd-45ca-ed5a-08dd866998f2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2025 15:30:25.2073
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: x4ZeQoHPJIoQN9+KFCNkfJYwatTpILoUrfT41og9/HDx2krDu7+F28kQ3PuhUZemz1TRjV+E47eqX94HSk7QT13qZI6Fx4tYUA12h0JbqjM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7605
 
-On Mon, Apr 28, 2025 at 7:28=E2=80=AFAM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> On Sun, Apr 27, 2025 at 6:05=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wr=
-ote:
-> >
-> > On Sat, Apr 26, 2025 at 10:58:00PM -0600, Caleb Sander Mateos wrote:
-> > > In preparation for calling it from outside ublk_dispatch_req(), facto=
-r
-> > > out the code responsible for setting up an incoming ublk I/O request.
-> > >
-> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c | 53 ++++++++++++++++++++++----------------=
---
-> > >  1 file changed, 29 insertions(+), 24 deletions(-)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index 01fc92051754..90a38a82f8cc 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -1151,17 +1151,44 @@ static inline void __ublk_abort_rq(struct ubl=
-k_queue *ubq,
-> > >               blk_mq_requeue_request(rq, false);
-> > >       else
-> > >               blk_mq_end_request(rq, BLK_STS_IOERR);
-> > >  }
-> > >
-> > > +static void ublk_start_io(struct ublk_queue *ubq, struct request *re=
-q,
-> > > +                       struct ublk_io *io)
-> > > +{
-> > > +     unsigned mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > > +
-> > > +     /* partially mapped, update io descriptor */
-> > > +     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > > +             /*
-> > > +              * Nothing mapped, retry until we succeed.
-> > > +              *
-> > > +              * We may never succeed in mapping any bytes here becau=
-se
-> > > +              * of OOM. TODO: reserve one buffer with single page pi=
-nned
-> > > +              * for providing forward progress guarantee.
-> > > +              */
-> > > +             if (unlikely(!mapped_bytes)) {
-> > > +                     blk_mq_requeue_request(req, false);
-> > > +                     blk_mq_delay_kick_requeue_list(req->q,
-> > > +                                     UBLK_REQUEUE_DELAY_MS);
-> > > +                     return;
-> > > +             }
-> > > +
-> > > +             ublk_get_iod(ubq, req->tag)->nr_sectors =3D
-> > > +                     mapped_bytes >> 9;
-> > > +     }
-> > > +
-> > > +     ublk_init_req_ref(ubq, req);
-> > > +}
-> > > +
-> > >  static void ublk_dispatch_req(struct ublk_queue *ubq,
-> > >                             struct request *req,
-> > >                             unsigned int issue_flags)
-> > >  {
-> > >       int tag =3D req->tag;
-> > >       struct ublk_io *io =3D &ubq->ios[tag];
-> > > -     unsigned int mapped_bytes;
-> > >
-> > >       pr_devel("%s: complete: qid %d tag %d io_flags %x addr %llx\n",
-> > >                       __func__, ubq->q_id, req->tag, io->flags,
-> > >                       ublk_get_iod(ubq, req->tag)->addr);
-> > >
-> > > @@ -1204,33 +1231,11 @@ static void ublk_dispatch_req(struct ublk_que=
-ue *ubq,
-> > >               pr_devel("%s: update iod->addr: qid %d tag %d io_flags =
-%x addr %llx\n",
-> > >                               __func__, ubq->q_id, req->tag, io->flag=
-s,
-> > >                               ublk_get_iod(ubq, req->tag)->addr);
-> > >       }
-> > >
-> > > -     mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > > -
-> > > -     /* partially mapped, update io descriptor */
-> > > -     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > > -             /*
-> > > -              * Nothing mapped, retry until we succeed.
-> > > -              *
-> > > -              * We may never succeed in mapping any bytes here becau=
-se
-> > > -              * of OOM. TODO: reserve one buffer with single page pi=
-nned
-> > > -              * for providing forward progress guarantee.
-> > > -              */
-> > > -             if (unlikely(!mapped_bytes)) {
-> > > -                     blk_mq_requeue_request(req, false);
-> > > -                     blk_mq_delay_kick_requeue_list(req->q,
-> > > -                                     UBLK_REQUEUE_DELAY_MS);
-> > > -                     return;
-> > > -             }
-> >
-> > Here it needs to break ublk_dispatch_req() for not completing the
-> > uring_cmd, however ublk_start_io() can't support it.
->
-> Good catch. How about I change ublk_start_io() to return a bool
-> indicating whether the I/O was successfully started?
-
-Thinking a bit more about this, is the existing behavior of returning
-early from ublk_dispatch_req() correct for UBLK_IO_NEED_GET_DATA? It
-makes sense for the initial ublk_dispatch_req() because the req will
-be requeued without consuming the ublk fetch request, allowing it to
-be reused for a subsequent I/O. But for UBLK_IO_NEED_GET_DATA, doesn't
-it mean the io_uring_cmd will never complete? I would think it would
-be better to return an error code in this case.
-
-Best,
-Caleb
+Rm9yIHRoZSBzZXJpZXM6DQpSZXZpZXdlZC1ieTogSm9oYW5uZXMgVGh1bXNoaXJuIDxqb2hhbm5l
+cy50aHVtc2hpcm5Ad2RjLmNvbT4NCg==
