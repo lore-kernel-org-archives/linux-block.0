@@ -1,64 +1,30 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B12701C4
-	for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 22:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00F14A11;
+	Mon, 28 Apr 2025 03:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745791405; cv=none; b=jFauAr9XJrI40qQOP6K0Duf/l8NB/dv/qkHvDBJBOEhYVDD+a+Hhhdt08W9aW+Xgm0ZOFq4qxDrXMDBVc8b8U8loBwmyAJ3w0+DzxJDKUu8bBjM7VtfwJgdqZuOSpZKKv+OSTIxYWT2QBlOZWbFtvpZCVyOSXSamEb43KC8BsQU=
+	t=1745811181; cv=none; b=ca4CWR0fwazAo/JDw5/ZGlow81shiXUpeqjjeCd/lyh3H1fAZGL5BBoU1vCS7q9z0jfR9vXwBFhEwQ1dPkfqXbZ0e3XdpDZE8gspg0YNb1FSdcbnYhjxQhl1Dl7/PYEDEiWFP5L8fHK8NUmc9JfOxyQ81aDsksi4Ivpcv8aL9h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745791405; c=relaxed/simple;
-	bh=wbWIQsG0TRi0Z69jTSR/6qQLHNml0VY3lWNXqp2lK74=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ZOf4838mED9SpygpD43KCF1ncRQkjbLaIm94em6mFDw5+WUo/EExfZEKSG8RGvMzoCiTkRJ48F7qa2BJk8nx6jabLjvRHZOanns0XsMk/L2CpJqfbLZ3DLKdRQNmtZXycMPFJVHyN8M3IVNPckTUtGrLtUdcZ2nK09MDS1cq1ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sVwmnSMN; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sVwmnSMN"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-861525e9b0aso395594539f.3
-        for <linux-block@vger.kernel.org>; Sun, 27 Apr 2025 15:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745791401; x=1746396201; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iNCX7jQ7H/so529jI/n/le9Q7aHsjoCS5ZZgId6Z/yc=;
-        b=sVwmnSMNmyED1KlmSA2O2DWYL8qBOCeqgKjDwG/OM9DL+OrHdi71+vlXzHK1nD5iOs
-         drFkHPc1+rteWEpTwrr4PLAKeG5ZigLa0HlG0GFRqhK1KyJjDETw00+BBIb0EzEBLf/x
-         Ki+11mHqM8UbB7jEoXU3bp34bqe8kXU7RVoKTC6gAKIEF+zpzj4k+lH/RxZhvXKqU2LI
-         QVg49wGGroz/WJShJUKOXNJoF+NFLWI2JDc5DVEUofYoITUmRokB1NRzISFXZZcTRtO1
-         Nnoc0nloexBbEO58XkkXjef00iOw/qVKoKiJdihFXCt3uBoiuyErOtYmJFdenGATURYn
-         HqSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745791401; x=1746396201;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNCX7jQ7H/so529jI/n/le9Q7aHsjoCS5ZZgId6Z/yc=;
-        b=LeG2SVqc2Sduba4g8w3HG1qbAp7DIYvNGocnObrSJgWd0qNaQ/gFsnk3Tjys7vvpWj
-         nUerNZJykfWZAX1OWD/HuAmyTuf3vuudpAIn5YT1h3cZgy/pBO4n4n+SnxIE3fUbHQRr
-         lIu9DEFCVqwwtEZFQK0Bo8T9Xkn/AFJwn0cTA/PCvuyrGSbQaLFeL+FkfZcbj90aGyzV
-         by3Q1+W5gioaLkvIcrtbKQb+uW2Wbwz5mXMGxdVWWuURvqSUVflDK7koB5P82I2H+XDU
-         xRW9Bu+dUiIDhCIIdHXkOEL4oqzpJVGj5BIPf9dSac7aqf11hSE8v1V4vguJoBnnZfij
-         y2WA==
-X-Forwarded-Encrypted: i=1; AJvYcCUy3VUeaTlnYKztg3sVHmjzC2tuNFm5xWmloj8los7cOBPaDx+tUbJpNFqHP/V9Q2fwV4X/UXhPFv+HeQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy/fCbpDwyg3/HRrbb5FEdwPgdEs7LnVL8UhI4F0Jcavbt7FWQ
-	OaKl/8xVC/riJAB335OX3TBOCo7f00kE3i36WzjMxerX1brKRUy/5XgZN9ZLoUA=
-X-Gm-Gg: ASbGncvwpuzYQPuM7mxchAuiUW/3CvJ2DYnWarvtbaNhgjSAWN9Qw7o9WjMmNZeHE7s
-	RJGfzcnCFEbTPN6pwRGD+xo3OYW63/NqjiIBAJi8jzBRC3uZaRIn2wzosiWKgf/JKYYaD1FcsfW
-	WKuVCr+dZ5FIbMozlvCWzhrdh1ZiaQ5Sm9ZmKvvJDsglDgtBzoovIlx5eFzqnXHlcwReCJrF9gM
-	k1ioBAwPwcHZczM/q18EHviUzcjf5WetsV5AuljO86SCIJGvS3LaqoREd+v6ySt2l2iU3ldPgTr
-	X+Sgiz+cNrKHckL44eRWZrilgHqRSW5TqHCWkw==
-X-Google-Smtp-Source: AGHT+IH8E48JkKAwtfL07JN1fQUrwgYyFUebyUWasSyzEypQDtEo25xd4qLu7SAT4RR9O351jR9ePQ==
-X-Received: by 2002:a05:6602:4915:b0:864:677e:ddae with SMTP id ca18e2360f4ac-864677f0f9fmr543606539f.6.1745791400964;
-        Sun, 27 Apr 2025 15:03:20 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824b84a22sm1919686173.92.2025.04.27.15.03.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Apr 2025 15:03:20 -0700 (PDT)
-Message-ID: <fb3add67-c469-483e-ac51-e53dea7df360@kernel.dk>
-Date: Sun, 27 Apr 2025 16:03:19 -0600
+	s=arc-20240116; t=1745811181; c=relaxed/simple;
+	bh=rZPb+nYyN6fqWnBmjxisPyPRLgUVCz2sdtg+z7gQqTk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YrMNRzSPwh6WMIfgOgD/o4RBGxiibJAuwgdVb7OUg/GsqXpN+Id62Rlhu7nPh9R8bNOjKWBUBTRnBPCF6bz5Z+w/91HZ7wb6ncDHx/OSZ6MqrrpMhheG13MSgjPvbxjPTYPzSCnQvjE5k8gM76nE92L5xfsP718gxyYvpmaaWSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zm8CB3ynMz4f3kvw;
+	Mon, 28 Apr 2025 11:32:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 344901A1AF2;
+	Mon, 28 Apr 2025 11:32:48 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgBXu1_d9g5ov1YkKw--.49750S3;
+	Mon, 28 Apr 2025 11:32:47 +0800 (CST)
+Message-ID: <6db8d3e6-44ce-4b2b-b496-ec0104aee997@huaweicloud.com>
+Date: Mon, 28 Apr 2025 11:32:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,26 +32,136 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: rnbd: add .release to rnbd_dev_ktype
-To: Salah Triki <salah.triki@gmail.com>,
- "Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <aA5Rzse_xM5JWjgg@pc>
+Subject: Re: [PATCH blktests 1/3] scsi/010: add unmap write zeroes tests
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ hch <hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>,
+ "djwong@kernel.org" <djwong@kernel.org>,
+ "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
+ "bmarzins@redhat.com" <bmarzins@redhat.com>,
+ "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
+ "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+ "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
+ "yukuai3@huawei.com" <yukuai3@huawei.com>,
+ "yangerkun@huawei.com" <yangerkun@huawei.com>
+References: <20250318072835.3508696-1-yi.zhang@huaweicloud.com>
+ <20250318072835.3508696-2-yi.zhang@huaweicloud.com>
+ <krhbty6cnaj3zv4bka4jmpwmm74v7k3cts6csp6yoc7xjexoyu@6yrwd7rr2rip>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aA5Rzse_xM5JWjgg@pc>
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <krhbty6cnaj3zv4bka4jmpwmm74v7k3cts6csp6yoc7xjexoyu@6yrwd7rr2rip>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXu1_d9g5ov1YkKw--.49750S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFy8Cw48GryUuFyUZFWrXwb_yoW5Gry5pF
+	WxGa9Ykr1ktr17G3WSvF45Wr13J3yfAr47AFWxCw1UCr98Zryakr1IgrWUWa4fGrZ8Gw1F
+	y3WUXFySkryUt3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On 4/27/25 9:48 AM, Salah Triki wrote:
-> Every ktype must provides a .release function that will be called after
-> the last kobject_put.
+Hello Shinichiro！
 
-This commit needs:
+I apologize for the significant delay, and I greatly appreciate your
+review and suggestions.
 
-1) A description of the problem. There's just a vague statement in
-   there.
-2) A Fixes tag
+On 2025/4/3 15:26, Shinichiro Kawasaki wrote:
+> Hello Zhang, thank you for the patches.
+> 
+> On Mar 18, 2025 / 15:28, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
+>>
+>> Test block device unmap write zeroes sysfs interface with various SCSI
+>> debug devices. The /sys/block/<disk>/queue/write_zeroes_unmap interface
+>> should return 1 if the SCSI device enable the WRITE SAME command with
+>> unmap functionality, and it should return 0 otherwise.
+>>
+>> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+>> ---
+>>  tests/scsi/010     | 56 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  tests/scsi/010.out |  2 ++
+>>  2 files changed, 58 insertions(+)
+>>  create mode 100755 tests/scsi/010
+>>  create mode 100644 tests/scsi/010.out
+>>
+>> diff --git a/tests/scsi/010 b/tests/scsi/010
+>> new file mode 100755
+>> index 0000000..27a672c
+>> --- /dev/null
+>> +++ b/tests/scsi/010
+>> @@ -0,0 +1,56 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2025 Huawei.
+>> +#
+>> +# Test block device unmap write zeroes sysfs interface with various scsi
+>> +# devices.
+>> +
+>> +. tests/scsi/rc
+>> +. common/scsi_debug
+>> +
+>> +DESCRIPTION="test unmap write zeroes sysfs interface with scsi devices"
+>> +QUICK=1
+>> +
+>> +requires() {
+>> +	_have_scsi_debug
+>> +}
+>> +
+>> +device_requries() {
+>> +	_require_test_dev_sysfs queue/write_zeroes_unmap
+>> +}
+> 
+> The device_requries() hook does not work for test cases which implement test().
+> It is rather dirty, but I think we need to delay the check for
+> write_zeroes_unmap sysfs attribute availability until test() gets called.
+> See below for my idea.
+> 
 
--- 
-Jens Axboe
+Indeed, I completely missed that.
+
+>> +
+>> +test() {
+>> +	echo "Running ${TEST_NAME}"
+>> +
+>> +	# disable WRITE SAME with unmap
+>> +	if ! _configure_scsi_debug lbprz=0; then
+>> +		return 1
+>> +	fi
+> 
+> I suggest to check queue/write_zeroes_unmap here. If it's not available, set
+> SKIP_REASONS and return like this (totally untested):
+> 
+> 	if [[ ! -f /sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/write_zeroes_unmap ]]; then
+> 		_exit_scsi_debug
+> 		SKIP_REASONS+=("kernel does not support unmap write zeroes sysfs interface")
+> 		return 1
+> 	fi
+> 
+
+Yeah, I agree with you. For now, there is no helper available for
+checking the sysfs interface of the SCSI debugging device.
+
+I will add a new helper setup_test_device() in this test as the
+following two patches do, and put this check into that helper.
+
+Thanks,
+Yi.
+
