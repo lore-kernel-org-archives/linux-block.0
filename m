@@ -1,110 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E50153808;
-	Mon, 28 Apr 2025 17:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD8F18DB0A
+	for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 17:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745861439; cv=none; b=JKVMCE2OP921/4Gzo3q/K5uW380QulmKutpljMGRc8EgITNC7kUsIt8RP2WdvdOFs0EYn/o4R4HXUj2ST0okwtUZQJhLiaSW/fAgTYyH5M+Ocfa/lWMGMlWDysw70lKqm008PJ3MGEvzcJWuyKTcqdvYwHJen9IiOD+PwwNQth4=
+	t=1745862372; cv=none; b=aHyDN6bI1Y14ZnzpAhQZYnu5NJA80mJJaXyTE94SCYsu15KcV0yhPAeYxDrC+xG1AlnI1CYLdsSkAm2MjMnhGx8n1qEGjYjXdPLL8lChpdX+G7wbXPMIiNp+mEghDo2QLpQA3Sqi3NymFIcmPEj+RM54xeWssRYMx4eINuTCfEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745861439; c=relaxed/simple;
-	bh=ab2ae8e/65ivTF8ecHo7+deewxqwGOGmR1WVeufmqHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6vQSr+KFjAhqKUIaFEe3o1YiqKQNQXIUEeefYK8tKgcb/PcdqglhuRcXZCBXRVqM+ZV7V7QuF0vHQNiwcqBQuj8u5P7WqWDS0U/n34v9XzLQH9k4azIG7ABXVfObK0wN1Zoe5ncZz0mnVYuKXIFC4T8OyzAOd4NfrysDGkbK4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFNCyztK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745862372; c=relaxed/simple;
+	bh=+pA/bsVQYfd8F4vf3qxb79sjzTXnaUGuMu8FEgLyJZM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=NuomgzOzQoNPgaEA753EYzNGsoyprKiut0/Y8L8JUn6Lxo+4duikKA1i4yfQQMET1wtByutrQRAh0t0lBcDqWCqUGZvlg+kZioQrimrhL2CRQU77MX5GjKb/DaX/T7QmOX/FengshQVIpMz14xZ69O9Y1Pgr/wQK7r5H9gBVB6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fmQLvjqX; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFNCyztK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78575C4CEE4;
-	Mon, 28 Apr 2025 17:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745861438;
-	bh=ab2ae8e/65ivTF8ecHo7+deewxqwGOGmR1WVeufmqHc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EFNCyztKW7+/Evx7uEJGPtK2SefAgYmqtED4ANsvGmvDwBuQlhn5S/nOmqu3WBR1z
-	 +VFQyVwyP+0O2cMp8wyAXepn0PBELCi0ksp0PKLJBKlMwsEdig7AFEj4wICYu3fAJQ
-	 /zZeikIV4GSdae/Y2/DwH4bks++gRwmwp9dpfRTMH4Z1ZCpPgQcQmi4pOO08SmuMpb
-	 PTiv7J0eh/bS37eMFbiD7C8K8hWZiVIArkSUuuY+DzvZ8SoAg2vgkigVBG4ZUgJkdE
-	 7Vrm2LUXRrJhMi9MPNfGblL+7IObYzGv0HZAEJnZAxGsJP7ubWBtZWh1DwAjICEoUP
-	 0fglvd90xB7zw==
-Date: Mon, 28 Apr 2025 11:30:34 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v10 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <aA-7Oh4T-mDGvLXh@kbusch-mbp.dhcp.thefacebook.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <007e00134d49160d5edab94a72c35b7b91429b09.1745831017.git.leon@kernel.org>
- <aA-w20gOKus5hyAV@kbusch-mbp.dhcp.thefacebook.com>
- <20250428172225.GG5848@unreal>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fmQLvjqX"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-85d9a87660fso494553439f.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 10:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745862367; x=1746467167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=puc5HN0yRTqK72IwWtHK5+PoK9XuiD9s8i1FJNDSDrA=;
+        b=fmQLvjqX2rxZyGnADKVJtfXw26uvl4duNAOw+Jn6+hFKInIeEvdKrVTA1ZEAEnhESW
+         CoUuN2yab5Z8nLZGWAAsIp4jU0ZUrNmuQ8ob62X6873m8nsP1qtCafwdn+fjYJvqQRKA
+         1vFY0yg99wt0D6ExC2DemuPgbSgUvHQC8RzezUXczYwe7hEADPd6uzMcXGvPeuUiiiJl
+         HxF6NaRMW1pkWb82uyA1ZCZQG12pwOWQhx6Md692/YK5UUDf6ZJnKz4jOGrxPXi8YMDa
+         p7FjUeFGN90uYRkaODovEqXysPrcr9Txqu2PrWgktKTKUqBAFzRv1lueprtw/GoPct0B
+         meaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745862367; x=1746467167;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=puc5HN0yRTqK72IwWtHK5+PoK9XuiD9s8i1FJNDSDrA=;
+        b=TfluWCFNSS4RCth3yidOEwHHUGbSWR0HP44hV3Uyx/s82ifCrYAY6ZPaeiFjK9EYam
+         6jIeCNkCIBR/q0b2wCeXx/mngtbdilJxgyzsEZJNu2JlDlkDI236UsK2+L6+AEPEnHCT
+         +gDpzKArTPN2j8WdHpO46IwdIHv8BBmQ19Zbl59Sn6ZmNSnavTbaF69W1Rwk9z0PtHBm
+         Bnnk8ruAMLm6yFvgm1tKGPpC8uVnCitRD7qkC+KjwClyx0gG3kJromdvRgUo1BQt+H6m
+         TFsIQ/iQZvUvVPIJC3S2p59OIYa28LYFUEBlPbFlmwsrQXjMmjxu0hW518nAf0m+LXAl
+         r80A==
+X-Gm-Message-State: AOJu0YxndN/PZ6OJ8JB7OwMBf8ip0kDzn72qAxuHDi/9eKf768F5BO0b
+	BI8nC8Yk5AxHX5PQAA8MK5krkoBvVQybdpqQ3ojweSTyjUftiA+2iQMk9VO4HSs+0piDVnVu6Au
+	I
+X-Gm-Gg: ASbGncsP0duKztFcDl2vVp20LMmklVbEyv4g0pN0bjzMNCbeBDgXNf1HN3hQ5gsz5pk
+	FZlZz0XPITY/mG1u3CONdumwR0/Kd8SnCHHJxpDCpyWEVdVx0u28Fo6NfMCQoHdCIFYWwquAe3o
+	5UbutCUWd53yKjiYhTM/dgL6Zrg3fFXuqi70TZdwSf+/4lGIISNhOKzv0SxRpeF8Dek8E9toXcL
+	bnEyvNod6DF8VIaGK35HvHi4MukHNj1L/R/G8xnYBVoiIxhe25EoIB7xE6YpLgoVfghjzGlNXpW
+	Wx6RE7RlGzZh34JKjzd13/YyXA9USQU=
+X-Google-Smtp-Source: AGHT+IGvrfQEuJWtPAVbyMggXJAttbqoLgusWRT+yphHCUhS2wvZKkrcABBy/rO+mSzgx2sshesnJg==
+X-Received: by 2002:a05:6e02:12c3:b0:3d4:2409:ce6 with SMTP id e9e14a558f8ab-3d942d1dd78mr102653585ab.5.1745862366721;
+        Mon, 28 Apr 2025 10:46:06 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a38488sm2359217173.31.2025.04.28.10.46.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 10:46:06 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20250428141014.2360063-1-hch@lst.de>
+References: <20250428141014.2360063-1-hch@lst.de>
+Subject: Re: brd cleanups v2
+Message-Id: <174586236594.1436445.8417246444528945370.b4-ty@kernel.dk>
+Date: Mon, 28 Apr 2025 11:46:05 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428172225.GG5848@unreal>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Mon, Apr 28, 2025 at 08:22:25PM +0300, Leon Romanovsky wrote:
-> On Mon, Apr 28, 2025 at 10:46:19AM -0600, Keith Busch wrote:
-> > On Mon, Apr 28, 2025 at 12:22:29PM +0300, Leon Romanovsky wrote:
-> > > +	do {
-> > > +		if (WARN_ON_ONCE(mapped == entries)) {
-> > > +			iter.status = BLK_STS_IOERR;
-> > > +			break;
-> > > +		}
-> > > +		nvme_pci_sgl_set_data(&sg_list[mapped++], &iter);
-> > 
-> > I think this should say "++mapped" so that the data blocks start at
-> > index 1 (continued below...)
-> > 
-> > > +		iod->total_len += iter.len;
-> > > +	} while (blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_meta_state,
-> > > +				 &iter));
-> > >  
-> > > -out_unmap_sg:
-> > > -	dma_unmap_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req), 0);
-> > > -out_free_sg:
-> > > -	mempool_free(iod->meta_sgt.sgl, dev->iod_meta_mempool);
-> > > -	return BLK_STS_RESOURCE;
-> > > +	nvme_pci_sgl_set_seg(sg_list, sgl_dma, mapped);
-> > 
-> > because this here is setting sg_list index 0 to be the segment
-> > descriptor.
-> > 
-> > And you also need to increment sgl_dma to point to the element after
-> > sg_list, otherwise it's pointing right back to itself, creating a looped
-> > list.
+
+On Mon, 28 Apr 2025 07:09:46 -0700, Christoph Hellwig wrote:
+> this series has various brd cleanups mostly to get rid kmap_atomic and
+> poking into the bvec fields.  It is used as the baseline for the discard
+> fixes from Yu Kuai.
 > 
-> Thanks for pointing to the difference between data_map and metadata_map,
+> Changes since v1:
+>  - fix a subject
+>  - minor tweaks to formating in brd_rw_bvec
+> 
+> [...]
 
-Yeah, They're different because the SQE has 16 bytes available for the
-data map, so the command can fit an SGL descriptor directly in its
-submission entry. The metadata field only has 8 bytes in the SQE, so we
-have to set it to the address of an external SGL segment descriptor.
+Applied, thanks!
+
+[1/5] brd: pass a bvec pointer to brd_do_bvec
+      commit: 75d99aa279561fc6d91afec8bdd1b56548f860a2
+[2/5] brd: remove the sector variable in brd_submit_bio
+      commit: 857aba38b56a0d8fa868706c57053dcd4282e436
+[3/5] brd: use bvec_kmap_local in brd_do_bvec
+      commit: 95a375a3bed3b8734059351ba046a6fabdbde485
+[4/5] brd: split I/O at page boundaries
+      commit: 3185444f0504ca8ff54e2a7275f1ff60a6a6cf0c
+[5/5] _page in brd_rw_bvec
+      commit: 53ec1abce79c986dc59e59d0c60d00088bcdf32a
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
