@@ -1,109 +1,233 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6B72C10BB
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 12:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2AE1519BF
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 12:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745928136; cv=none; b=f66d9zYpyxOKywwGmE3xqHb1jyGhi5+JnpJ5Z1d0HgzR8/AzGsvC+RAlyMJMn57QDNz2nexbcIvSVx2XTdJkz+FYiYuYEdqoH3fTrDoBJecO7tWiJiIqmOVceEjg1D67tW/3CLQDsE0PteSuvPJcAo0dxqL0q0U4M/TeyslCfAc=
+	t=1745928698; cv=none; b=B6W+GAQ+CJ9njiuQsq+km0hMKIlQ3F3E1kAOipDrSnGAFbzeypbtN/luwYhnEc3Jj7lSpM9wDn3Ws9zSKOHnBemMOcNLJOS4JPn7SLc1O2YMdQ76w2w8v/XaA+wOS3Tq7r3/ONfRlvzeeozb+tsNtwWYSCQTTMGW8dG61NjJYjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745928136; c=relaxed/simple;
-	bh=YJ8IzNaIKQrQlJznsODIN2icpNZCmKCJE4SknKr+sbk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=otanea8n7IAhrV2vbxnrpG5Qz0G6ivbEJiVKPFnLKasrxuqsf5+PYqqIj0Wy88XE7Kqbmvb6DtGkmuwl53Gl0/WYJyGFSSFWbe8h9B/N/NvxkAbPXnqcoCbJBvx1be3pcuFPTfloUEwNFLLOG2KWJxc/Nf9DoL069btRylKCl1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NlBv304M; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1745928698; c=relaxed/simple;
+	bh=1bJ16CTqR+fKfEMYOepaX5K3Rd86yWIDW0+6rIoQOkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q99W4lNMcJxPj8bfLd5rxw2svsiEdoERSREvK4dyWGJCnxx5dR3/slNhPw1vI6yM/U58IV+8iFJl/o5VJvauJkzUSa8I89/WJKsp9LSxCZoG3IwWFH2cOJtTEmG12w629UmwQGAKe/mgqbBHDWFp09MFJ6lxjPYCho60CT1MpBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=etQKo9O+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NlBv304M"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22401f4d35aso71165275ad.2
-        for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 05:02:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1745928132; x=1746532932; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vyu59SCAErzgHc20ISxNwMVyVp/sHSdcy9ZP8BRPzik=;
-        b=NlBv304MC1LNgoXEssvr7FrMlgZ+tcNxzkCh5/b9LTpv/nExbAhcV79Lf+J8hgH/8v
-         FaXkG/IdFCIG+EG11vSgH5afDFn8Txghig8kULFkn8SVQCcm7ftHWpM7rJSCRsyGp+FI
-         GeaFTK0DrEh8dMAxkjazuvJE1ksUB/LnlkQ4y9sVqQIXSTUxOSmhdtcIPLQHdg72CR0/
-         VwlxF9CC6YZDSR4rS9q2XxqsU0PudIge5AlU2rjzc//PYMcciZWPc9YZl7b02DdYOdIS
-         JqXQBIR9zDW8W/5ClCpc2GkfkUt5w6etz29QUS934Ai4SkeWNRba/7oNZMKW4YoRFznE
-         0I6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745928132; x=1746532932;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vyu59SCAErzgHc20ISxNwMVyVp/sHSdcy9ZP8BRPzik=;
-        b=CeNArYatPitEm2JnsJlNGOrcdIA8ur3t8npbaAdULa6db1pmCJhyBe50fT/jjxkUvB
-         Op2f4kLaVMX6H4vAixViNNUgTeLRpT4F7OaJySU9O/bZ2diqcfqzKzN0kpO/htkozghW
-         nL4YzgS2iq/EbJEfvjzCyfNQqqxt6mvtyLTcmnM0Iec5BYDfML+1KtZw3f1c6JvpHbne
-         1o4CIL6DudNlNcAIwT00cuv4vu7XmEYXBE+zmkKLs7wOW3H04HA3vRPmu0CFibNOQ7dJ
-         zMGB2ZsdG9azA6+zD5W1gr6Zs0oDdtnc61vzkrc+X/UfxNJ3pSN4PWMlvkU+tuqG92H7
-         oh2A==
-X-Gm-Message-State: AOJu0YzKqSRJTvN3Nrl84ZNfDwFKZaYQvdwN2lI7K9vZTTjpfbG6NCJB
-	nYZjndh/rjS1DjBT1TfhcoMCdnwdEOSu0UTS7JbJes6UlejYP/kMGY3j/daaLtQ=
-X-Gm-Gg: ASbGnctehnIYtKn1x6lIEYdlK2SXKtrHN7Ki/Unfz1nPXOYRt4xPvcVV+arOA6M1w5y
-	GLSQziqhAhWrBNjsljlcOlunn+kd0K7RxRlDr52TEGL42K3KJrPuPsUz3pc6hnZzLNrQRmDjz1j
-	HH6gdlvceBZEUFudbnn8Jfc52xveC0ihIH4HzuA+qiZpCZaWLBFDDBxLY1TsgwmeMiD95kytx0R
-	Qgj/i7hkVBIV/5wjzK0PfLTiReWAHKg3PLFLHWkD90oS55qMuN5imbJoDe7zwBaMsFlunE4wwzu
-	AAS25UOBN1Ccx9I2cjVLSgReC/1j/SKq
-X-Google-Smtp-Source: AGHT+IEjxITJMJSOjgo20yhY2ej5Q/o8cvs8rT2RPJsEN+5WaaJxUloSxWRBo+KO/HFJXvA1UQvvNw==
-X-Received: by 2002:a17:902:d547:b0:224:1220:7f40 with SMTP id d9443c01a7336-22de700731emr34759295ad.3.1745928131889;
-        Tue, 29 Apr 2025 05:02:11 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f862e0f9dfsm255180173.23.2025.04.29.05.02.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 05:02:11 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20250429022941.1718671-1-ming.lei@redhat.com>
-References: <20250429022941.1718671-1-ming.lei@redhat.com>
-Subject: Re: [PATCH v6.15 v2 0/4] ublk: one selftest fix and two zero copy
- fixes
-Message-Id: <174592813102.36727.9732335212853748171.b4-ty@kernel.dk>
-Date: Tue, 29 Apr 2025 06:02:11 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etQKo9O+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745928695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9+hLUZuSLbAdk4jI9bcgcaDcAUCcjmjmXFjH3khji7c=;
+	b=etQKo9O++2sbcFR4s4M6uA8tonTTqfUeKKbUCy6z6Tc12m3PLSuCWE+Vz1GyNS8/4h6ESc
+	eB8ZaR55AE6RfhLKVE7xpgqnK3ssAY5DxfNlMmtNHYVNJRbMpEC3foyDz9mwFaky6nM7XX
+	wFmQZr69mwnhMqEJX1kqu862K16GcmU=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-spouMhALO6yc7_P7jIIxRQ-1; Tue,
+ 29 Apr 2025 08:11:33 -0400
+X-MC-Unique: spouMhALO6yc7_P7jIIxRQ-1
+X-Mimecast-MFC-AGG-ID: spouMhALO6yc7_P7jIIxRQ_1745928692
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 817411956048;
+	Tue, 29 Apr 2025 12:11:32 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.24])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE89C180047F;
+	Tue, 29 Apr 2025 12:11:27 +0000 (UTC)
+Date: Tue, 29 Apr 2025 20:11:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Stefan Haberland <sth@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V3 00/20] block: unify elevator changing and fix lockdep
+ warning
+Message-ID: <aBDB6sJS8dVxwe6x@fedora>
+References: <20250424152148.1066220-1-ming.lei@redhat.com>
+ <0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-
-On Tue, 29 Apr 2025 10:29:35 +0800, Ming Lei wrote:
-> The 1st patch fixes UBLK_F_NEED_GET_DATA support in ublk selftest side.
+On Tue, Apr 29, 2025 at 02:00:27PM +0200, Stefan Haberland wrote:
+> Am 24.04.25 um 17:21 schrieb Ming Lei:
 > 
-> The other two patches enhances check for zero copy feature.
+> > Hello Jens,
+> >
+> > This patchset cleans up elevator change code, and unifying it via single
+> > helper, meantime moves kobject_add/del & debugfs register/unregister out of
+> > queue freezing & elevator_lock. This way fixes many lockdep warnings
+> > reported recently, especially since fs_reclaim is connected with freeze lock
+> > manually by commit ffa1e7ada456 ("block: Make request_queue lockdep splats
+> > show up earlier").
+> >
+> >
+> > Thanks,
+> > Ming
+> >
+> > V3:
+> > 	- replace srcu with rw_sem for avoiding race between add/del disk &
+> > 	  elevator switch and updating nr_hw_queues (Nilay Shoff)
+> >
+> > 	- add elv_update_nr_hw_queues() for elevator reattachment in case of
+> > 	updating nr_hw_queues, meantime keep elv_change_ctx as local structure
+> > 	(Christoph)
+> >
+> > 	- replace ->elevator_lock with disk->rqos_state_mutex for covering wbt
+> > 	state change
+> >
+> > 	- add new patch "block: use q->elevator with ->elevator_lock held in elv_iosched_show()"
+> >
+> > 	- small cleanup & commit log improvement
+> >
+> > V2:
+> > 	- retry add/del disk when blk_mq_update_nr_hw_queues() is in-progress
+> >
+> > 	- swap blk_mq_add_queue_tag_set() with blk_mq_map_swqueue() in
+> > 	blk_mq_init_allocated_queue() (Nilay Shroff)
+> >
+> > 	- move ELEVATOR_FLAG_DISABLE_WBT to request queue's flags (Nilay Shoff) 
+> >
+> > 	- fix race because of delaying elevator unregister
+> >
+> > 	- define flags of `elv_change_ctx` as `bool` (Christoph)
+> >
+> > 	- improve comment and commit log (Christoph)
+> >
+> > Ming Lei (20):
+> >   block: move blk_mq_add_queue_tag_set() after blk_mq_map_swqueue()
+> >   block: move ELEVATOR_FLAG_DISABLE_WBT a request queue flag
+> >   block: don't call freeze queue in elevator_switch() and
+> >     elevator_disable()
+> >   block: use q->elevator with ->elevator_lock held in elv_iosched_show()
+> >   block: add two helpers for registering/un-registering sched debugfs
+> >   block: move sched debugfs register into elvevator_register_queue
+> >   block: prevent adding/deleting disk during updating nr_hw_queues
+> >   block: don't allow to switch elevator if updating nr_hw_queues is
+> >     in-progress
+> >   block: simplify elevator reattachment for updating nr_hw_queues
+> >   block: move blk_unregister_queue() & device_del() after freeze wait
+> >   block: move queue freezing & elevator_lock into elevator_change()
+> >   block: add `struct elv_change_ctx` for unifying elevator change
+> >   block: unifying elevator change
+> >   block: pass elevator_queue to elv_register_queue & unregister_queue
+> >   block: fail to show/store elevator sysfs attribute if elevator is
+> >     dying
+> >   block: move elv_register[unregister]_queue out of elevator_lock
+> >   block: move debugfs/sysfs register out of freezing queue
+> >   block: remove several ->elevator_lock
+> >   block: move hctx cpuhp add/del out of queue freezing
+> >   block: move wbt_enable_default() out of queue freezing from sched
+> >     ->exit()
+> >
+> >  block/bfq-iosched.c    |   6 +-
+> >  block/blk-mq-debugfs.c |  12 +-
+> >  block/blk-mq-sched.c   |  41 +++---
+> >  block/blk-mq.c         | 132 +++---------------
+> >  block/blk-sysfs.c      |  24 ++--
+> >  block/blk-wbt.c        |  13 +-
+> >  block/blk.h            |   8 +-
+> >  block/elevator.c       | 302 ++++++++++++++++++++++++++++-------------
+> >  block/elevator.h       |   6 +-
+> >  block/genhd.c          | 129 +++++++++++-------
+> >  include/linux/blk-mq.h |   3 +
+> >  include/linux/blkdev.h |   5 +
+> >  12 files changed, 365 insertions(+), 316 deletions(-)
 > 
-> The final patch removes one unnecessary check.
+> Hi,
+> while testing the patchset on s390 I still get the following lockdep splat on each boot:
 > 
-> Thanks,
-> Ming
+> ======================================================
+>  WARNING: possible circular locking dependency detected
+>  6.15.0-rc4-gc2b4d8dcb3d2 #3 Not tainted
+>  ------------------------------------------------------
+>  (udev-worker)/1810 is trying to acquire lock:
+>  0000005fb84de3a8 (&q->elevator_lock){+.+.}-{4:4}, at: elevator_change+0x54/0x130
 > 
-> [...]
+>  but task is already holding lock:
+>  0000005fb84dde18 (&q->q_usage_counter(io)#34){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x26/0x40
+> 
+>  which lock already depends on the new lock.
+> 
+>  the existing dependency chain (in reverse order) is:
+> 
+>  -> #3 (&q->q_usage_counter(io)#34){++++}-{0:0}:
+>         __lock_acquire+0x6da/0xcc0
+>         lock_acquire.part.0+0x10c/0x290
+>         lock_acquire+0xb0/0x1a0
+>         blk_alloc_queue+0x306/0x340
+>         blk_mq_alloc_queue+0x60/0xd0
+>         scsi_alloc_sdev+0x27c/0x3b0
+>         scsi_probe_and_add_lun+0x31a/0x480
+>         scsi_report_lun_scan+0x382/0x430
+>         __scsi_scan_target+0x11a/0x240
+>         scsi_scan_target+0xdc/0x100
+>         fc_scsi_scan_rport+0xc2/0xd0
+>         process_one_work+0x2a6/0x5d0
+>         worker_thread+0x220/0x410
+>         kthread+0x164/0x2d0
+>         __ret_from_fork+0x3c/0x60
+>         ret_from_fork+0xa/0x38
+> 
+>  -> #2 (fs_reclaim){+.+.}-{0:0}:
+>         __lock_acquire+0x6da/0xcc0
+>         lock_acquire.part.0+0x10c/0x290
+>         lock_acquire+0xb0/0x1a0
+>         __fs_reclaim_acquire+0x44/0x50
+>         fs_reclaim_acquire+0xba/0x100
+>         __kmalloc_noprof+0xae/0x5e0
+>         pcpu_alloc_chunk+0x30/0x170
+>         pcpu_create_chunk+0x22/0x130
+>         pcpu_alloc_noprof+0x842/0x970
+>         do_kmem_cache_create+0x1e0/0x4b0
+>         __kmem_cache_create_args+0x238/0x340
+>         register_ftrace_graph+0x438/0x460
+>         trace_selftest_startup_function_graph+0x62/0x260
+>         run_tracer_selftest+0x116/0x1b0
+>         register_tracer+0x192/0x260
+>         do_one_initcall+0x4a/0x180
+>         do_initcalls+0x146/0x170
+>         kernel_init_freeable+0x230/0x270
+>         kernel_init+0x2e/0x188
+>         __ret_from_fork+0x3c/0x60
+>         ret_from_fork+0xa/0x38
+> 
+>  -> #1 (pcpu_alloc_mutex){+.+.}-{4:4}:
+>         __lock_acquire+0x6da/0xcc0
+>         lock_acquire.part.0+0x10c/0x290
+>         lock_acquire+0xb0/0x1a0
+>         __mutex_lock+0xae/0xa20
+>         mutex_lock_killable_nested+0x32/0x40
+>         pcpu_alloc_noprof+0x6ea/0x970
 
-Applied, thanks!
+It is one known dependency on percpu alloc lock, and we can't cover every
+one in single patchset, especially this patchset is becoming bigger.
 
-[1/4] selftests: ublk: fix UBLK_F_NEED_GET_DATA
-      commit: 730d837979bac203c786f2c5b0707f5426275c0d
-[2/4] ublk: decouple zero copy from user copy
-      commit: 69edf98be844375807f299397c516fb1e962b3cc
-[3/4] ublk: enhance check for register/unregister io buffer command
-      commit: 6240f43b29f285a40eebeb789756673af7a7d67c
-[4/4] ublk: remove the check of ublk_need_req_ref() from __ublk_check_and_get_req
-      commit: a584b2630b0d31f8a20e4ccb4de370b160177b8a
+And this percpu lock splat becomes much easier to address after the elevator
+patchset is merged.
 
-Best regards,
--- 
-Jens Axboe
+We can move the elevator data allocation out of queue freeze, then the
+dependency can be cut.
 
 
+Thanks
+Ming
 
