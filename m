@@ -1,211 +1,337 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3257E20969A;
-	Tue, 29 Apr 2025 11:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745927639; cv=fail; b=oq1hQTdSpBjSKNvmwhLYR99qGHSX9OWjlO+86NvNkCQnSjqaUDrJ84oW1DLfYMvLEgee+lRKC9VW94sKMGdKmXfLfpuyA1fp/BvpAeDxMRu9xkJpiieQpm3IUOV0M4/sUhyPXOLc5QQzvHYThG2Xq8rT+/A55ME90CB65fizeeE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745927639; c=relaxed/simple;
-	bh=e0G3aqGKJS4HJV4ryjQvt216LRtg97h8NnYHn+7NO/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hZqdxcC3yr+/OyyyH5dvVgXspbw5LTwmo+HzEQSlyWOBRgzy5P/8loJO4a6CZe65UJYI0IJwmdry4fCMccZULPGGO/Wlb78MDgKaOloa1V/xdchLYlKFxJks1uXab7FBUYRUxNiE1J0tGmAOwPEagzcG6Git2VoNepEnFv0AbRA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BX2BCRWM; arc=fail smtp.client-ip=40.107.93.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C09211C
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 12:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745928041; cv=none; b=GruSNm3CPf5JSaQGibQuDDCpgNdhLa9R9Ai58j5jmESxridwAoxzxT0o0/9lA4McVXGaEvXNuiLnhF3qqO8w0J/sFKP59KL5hSd0Hyrirbsn69ejl9KpSvKRt9oTbHyrGumU33qp+ceiu/WtN0BchJxiD20wG7QCLICIkBhStck=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745928041; c=relaxed/simple;
+	bh=ve+9WjNuWfpdE6KKfR+ryFX+g7yArKG/Cau1R4qoI5I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X53kt+2pKIUDb4UZ+9CKmST2aljrj2IGXTssiGJAXMyxMJbdH21DSl7lHtaOc9OCmVg7oOaPORK2avw1nKo5LGbErW+rpSaWc2qnBBOqXz3prB1+Vfs/ZzW1a7/FCM5/2W3HPY1tAmEKIQs5VZEV95IK2/AV4Fusbt5pedfdsiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fxug+4gr; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BX2BCRWM"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aHkK74+f2TvAAdmxtPjoqPaXr7vSbN7fyEARy8J3Knh0PCjStXQ4RsvpG4mG0PxvJymHZj0RqBwcEDcrPGAqPM/rTMOXdO5Q1MYZpx2VTqpvp/0lcDGPXI3gbZH0OWEhQ2G7Cgt8hGAxuHSiG71OZQZYLduxtogaZUN5OrRGKMPjJtb3NmuaaKr8i9ax8o/K8+vZU6JMuzlTk+FEdKHMXk+2vAlEFS/Ao1YLoZ4QemaUAT/BsMR2YVyTvg/2Vjsl20MRGT46TxNR0OsR6BUlfdvUNiuR5iNRoozllxQUuCGB3jfSAevEuPkvMBbdd3r6CAfa7BLxcyFAkxDbmKFPvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8fEZmgm5M6RSMETKWpbIYtmCdRPp4M+CCmDk7MXSVew=;
- b=xqcNqovjLqrIWb9viUNxQUqSKzUQAIiLhPpVhS9XlVAqHDOC3k8/r0tmyR6v3B5TEyUE1Oja5N35lwrmLpG1s9P+5XXh9e69UDJKaucDiNr/AiZQhvNTEWj+eWisFHw/b6l4JUf27iUO7CP3dHvDqYJ9lV+3Y7k154YK/o/gl0pKtZ0TPiiZpkWvC7oxX4xcp7YKbHnpTpBJYUo1HyXv4X41Qell4wDXbHfxKhqdd7FUfd2XRimvheWtH8Nxfg8vUUWVRGrrtzrLb0mp4dG5l5OAWDKvPQOxojzMzBZhyDxvhuLNBElOP7KXiTHBl729TP2VE9z6L7FWIEZYW7jzeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8fEZmgm5M6RSMETKWpbIYtmCdRPp4M+CCmDk7MXSVew=;
- b=BX2BCRWMJwRVmNr31YulOR1zz3zXPrht9kYuzu7vieIGsOBOgZSLuCofUkkxRN0dWNLz/EezF6ohSZh/xN+sNtUVWrhHNUnzI5P7T088RfES/gYwmUbePrKhkHmB+RA4AQmIAWHT5OM/5chpWWNjfh3zrC6pkWPxZJmUE1aYQV9xxABEXIG9Z4nUpSJe322xo4wgb5ZORbRaVfmNE/caZmUYym1ZPiZRJ6+/eoN5XH+DYSuA8kqyxuyT3vJIBj9WSVoG2FEArDPRMdaufNu0u4ZXQvReNowpUiOlxbgbzEzqcTGe+JlkpR5iu/zVosiL64aVk5X5DiYgW6bFv3dfaA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by BL4PR12MB9723.namprd12.prod.outlook.com (2603:10b6:208:4ed::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Tue, 29 Apr
- 2025 11:53:56 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
- 11:53:55 +0000
-Date: Tue, 29 Apr 2025 08:53:54 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Baolu Lu <baolu.lu@linux.intel.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v10 03/24] iommu: generalize the batched sync after map
- interface
-Message-ID: <20250429115354.GA2260709@nvidia.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <69da19d2cc5df0be5112f0cf2365a0337b00d873.1745831017.git.leon@kernel.org>
- <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
-X-ClientProxiedBy: BN0PR03CA0014.namprd03.prod.outlook.com
- (2603:10b6:408:e6::19) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fxug+4gr"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T4El9K026893;
+	Tue, 29 Apr 2025 12:00:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=KlXHtE
+	MGNGn6R0VJxWCwrpOzl6/U42EXZvvX5lDsrn4=; b=fxug+4gr4cGN5Gs6cCxN7M
+	rZFmwfsLgOkNic7vLt/zqyXjZT6VxHhDDb1i409BGKk7qNNxXf+h/3cu86r+xMu3
+	F2GfN0v87T0HciRJmQftshPpaeXZDiVxQXvdMscHDakyEK++wMSMtTHExydWTi/6
+	QoOfbn8b43l/B1dVpBauQap9nlhk6IlyGU4mkxR6AIyRyq3bbIE9yXq36O9cWNEp
+	+huo7KUmz53qt2/lkxmAwZlf2VQmle1qNUJhmavUmgWOALUEOi4J5cvs2+oimBg3
+	9vSh+Yh2LYVUYmsooSvtNHTb8rRIb0DF5cHwCe/4ft5IqOmpewbNoZ+53RL9J0cQ
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46ahtwjrcw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Apr 2025 12:00:30 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53TArRZ1008494;
+	Tue, 29 Apr 2025 12:00:30 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 469ch32raj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Apr 2025 12:00:30 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53TC0ShQ32899568
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Apr 2025 12:00:28 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4E40620043;
+	Tue, 29 Apr 2025 12:00:28 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 031B420040;
+	Tue, 29 Apr 2025 12:00:28 +0000 (GMT)
+Received: from [9.152.212.246] (unknown [9.152.212.246])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 29 Apr 2025 12:00:27 +0000 (GMT)
+Message-ID: <0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com>
+Date: Tue, 29 Apr 2025 14:00:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|BL4PR12MB9723:EE_
-X-MS-Office365-Filtering-Correlation-Id: aad3d614-0e59-4958-fea9-08dd871484cd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xQxr7PbUALSAzpW+8au/fVr2/1eTM4HMKyqQglZ7v+/SpDlzfFhMNvDB8T8+?=
- =?us-ascii?Q?LsKsaABb2ErClFVxRXrJ6lkA+5USMIhjWD86qBGXEe8qwfyskbVuR9hUoibZ?=
- =?us-ascii?Q?XnUCwvIiASurfL5IOgjiDOgJrWKRf8qLBbVXH6H90UxXK29/qvjJQWDbqpBK?=
- =?us-ascii?Q?EURf4LkMk5np9uLm1XqNoRBW/9RvaC9CgzmADgSSFOmB8Q0XNki/VEso1y7H?=
- =?us-ascii?Q?biG1V2ke0S9r21rfcvPHYYZ8XL/m7i1I+WXJk66V0yJzg8d0dNv5sp++PzCd?=
- =?us-ascii?Q?6+LIujpX/trAbxYSm7hM/Fcd0SRcHs2ldN7BUClu3BJ3oMJo5G4MaLq2sPau?=
- =?us-ascii?Q?3KjQcIUN9i55HWHIgBf+cjYG4SSiDy9Po5qQnVosCcJzVZYMU4MjMy4q0hzV?=
- =?us-ascii?Q?f0xyAOTgEKk+wha0w5hpPQqQp9NFapuo3itqThv7FI4xClmwowIUb0VrX2hw?=
- =?us-ascii?Q?vTatbUfA4s/wwzsBXGijmEdrYrMzM0Sn+Vb7HMTDp/qUa2UMBYCk92bwp+az?=
- =?us-ascii?Q?qineCr8ct7FL27Hl8LGptzaxqoOGCqyEQ1Q0w6BjkMrUk+42oK2V2T+by1Gc?=
- =?us-ascii?Q?XXcHE+NfEpx/8j9IK591sIIZ1NMel2hzW6AvrrJFvGw5E1gdHMEYLlpphtsD?=
- =?us-ascii?Q?pouGGFMwGicxlBwEPnhQvW9BCtEUf7wiHM0kBYfneSFfJCc18FiTTCBs8an4?=
- =?us-ascii?Q?XY5ioSSW4QottHkcJjS0hwISb+jqYT9Tj1kdwQZEYxhcoSQhoSu5+rn55VVG?=
- =?us-ascii?Q?9dRJ+j/uSFmvrfZ4/R8OkkBz5zt9EY2stBUZ0nbSBoLskf+1pmKbFDlpZ/tY?=
- =?us-ascii?Q?OyKicC8GtkCe9G2a7v7t4T5uPj5BGB0cCh2j8t7LfpvOFiaMcrCAhphNPBJk?=
- =?us-ascii?Q?UNRUJLFwJGhHcmPJRRUAVHxLUuX4Es6SdxzWkRjswhDqf0mVKlymhpWpM56G?=
- =?us-ascii?Q?MRkSjmYeuM6+tSHb5Umy1USbXI/wbnfwAV7+D+hmD+MMPNYHhd04OqDKHKPH?=
- =?us-ascii?Q?04MCFicpUqcObuF5x8GZYoUWicQXYNk40S9BJjrHKosLBAf7yiAE35FjXLU+?=
- =?us-ascii?Q?iO4bm4XKeFsrbCUu2aCN2UPLXhpvmlnAq+2eNG3At8p4MIbHZ5C8wiIuSF5Q?=
- =?us-ascii?Q?CYqdcKSTTqgLu5vk0HNVMlpj+cvOwCM6h6RIu8NMaw+KYjuZpCrXSYqz1dRy?=
- =?us-ascii?Q?kHlnJs4EyYpIwnjQVN8c0TrmdujhWNdiUjA2B9hSEMdUMYXougkBBCNmXnK+?=
- =?us-ascii?Q?hLNpMgR6SYmfhUA7gOp0NLio+Ir+BORNeKF+RzpEOILOJlzF2xvOAuK/VtFX?=
- =?us-ascii?Q?mgj67R1glaToAAtBMh4KBuxuSf1EJ7yIxweHItnByjxahj4iyxa4HPl5g+BH?=
- =?us-ascii?Q?A5fx0kWHp9Ryz17y8h+3ZZFCPfDPBA/6E3ooBPh9Glk5wI+qxREB6C4ZqpxT?=
- =?us-ascii?Q?Y/o7qM94tlk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?wC3FIEAsz2w7nfXfG3Y9QutckGdvDqtgvT10ArxZrnBzJJ7IXU/PzVQsx7JW?=
- =?us-ascii?Q?fFZeHTa4SHWeclfkOJNBHFM2crgeD2O7RC/HS8YrPYJvGd3Jvxd3NzFdlSSU?=
- =?us-ascii?Q?s7C7UwSw80lBN9Oq8n/uHwoFMu0afo6BNu8NL/+pAx1hvmGzjhHjLYREZEyU?=
- =?us-ascii?Q?FebclJ3xXddoe1DAM6FExjVPy7sa5S3mTgsOEOyWF7JPkg6eEASx0cvAp7Fi?=
- =?us-ascii?Q?+xMaQGNkN3n44Bhv9ziHH0h3mqzxXspNe68TVtUwHw6pSV5Vf58y+fbsLH+e?=
- =?us-ascii?Q?p9kEtQ4aZhcAR3l81mDzfTwPPgYXYhbe9byQJ+jTJZyI2GftlrhdCqRESZ4r?=
- =?us-ascii?Q?TkzuzoJd6Fi1zYOkcUJV52K6jhC8x8ndvY7BiWugVGDrkbX9Gj5BSo8JwmN4?=
- =?us-ascii?Q?C/Emyx+70hhQYTfX3bj+9zs1MleKuaLRP1Ski4eQydIlqQyjb7WGkslDGcXV?=
- =?us-ascii?Q?E5u+I5ASOTgF2NELBLCP5ZxnrNQzwkViKTsq5IQpIrnGce4vdcyvs10A3e3a?=
- =?us-ascii?Q?ELxhtFEEIHHl52HeloAMuoxibCP9wccEpWPIQqVpX29i8+TwfmhREmcAmsur?=
- =?us-ascii?Q?o3FAoIk6fGEJcu1us7+14ObWMmq9vG5JG3yMAxhsuctSbimH8t9fpqZPv91g?=
- =?us-ascii?Q?XVEcvhOPT6WDZqi+50kU6vLemgqDF3sTOUDTNtJBh2LeeaPpsET586eTlTIt?=
- =?us-ascii?Q?PhPF9o4oFdPUQpAPxiM3QA/EQNQ7MwSyAeiSJLH/CI9iMoIopNM3uE/+c+mg?=
- =?us-ascii?Q?/c8Is05w6XIznajchzaLMt45TT+ydBIzjuIHLMSVxKo+WqNSL6JIEpXQm6vb?=
- =?us-ascii?Q?qLJGalJKUMPqRp9qkq8m2KnbmfIdSABHEKjW5mxDgAAAysIY+zSMHDv5jZ7L?=
- =?us-ascii?Q?VCyhEghaOhNd4gwzvp2t9XG5EIVUktp3oKDyYjAs5n2j3wLdaf3vt2JTSpDR?=
- =?us-ascii?Q?rLCGXVqG/eHi3CGhILTYs9wPR7SGXnFAiUMzQHDyfH5Qx6RU1UsI2bO0stwn?=
- =?us-ascii?Q?EmnX6Xkc0hnJKtNg1Ms9pTYRqZt42Sylijnuj8EmaT0vQhvSeKr1KLEYcJOf?=
- =?us-ascii?Q?WuMe9G9NNNtXX69mg/Ni7X3DnUdAOhK59421Pnj6+8Y6Pcx/+1rBVOX60uQY?=
- =?us-ascii?Q?26IWx6ExxXIzKOIQhHBOQaKrGlQnqZf34h/eAFKKKpIYNV+IDn3xhZ/FQVNG?=
- =?us-ascii?Q?VSoO0/RvoMeYWmybkgofExjLUYxZC43UBhDlOyB5EeAq2BmQfOWKtXiqsVzL?=
- =?us-ascii?Q?vaHNzKfqWnQ7vhSjTTFikLd9jWwq/Rr5SAw1UijcDgKKBo7geKf+CCGy978T?=
- =?us-ascii?Q?OtbdJ4xlQU4RNEMS2/FQWW/x+t3ueUyr+q61QrUEUZ7jDac37zWg7jThifjM?=
- =?us-ascii?Q?6jE23jMlBAUd1frQvffgPu2zWqu2Xe9pSnjea4xrthKtCIQCoPAZG4bKlxR3?=
- =?us-ascii?Q?aSZ7Ix6UgWF/hpkGlo6CPxWS38DJERZ3eIRFT6O54vZuKiQHUVXjR4GVzRM6?=
- =?us-ascii?Q?QmGUJgYi86vp5/ZesJFdwTXBUglM+MRZt4lX8nKigd0FvP3oVGw9uXj4sySt?=
- =?us-ascii?Q?JbTygTkkInjUO1J6SvNd5z+bUy9N4qVr94AP7tlM?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aad3d614-0e59-4958-fea9-08dd871484cd
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 11:53:55.6003
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q0j5hm7cJQm/YijapTFank/q+P2iDLcv55P2edOp/4Y+cgQK4R4AG59xlTVPLS8m
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9723
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 00/20] block: unify elevator changing and fix lockdep
+ warning
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20250424152148.1066220-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Stefan Haberland <sth@linux.ibm.com>
+In-Reply-To: <20250424152148.1066220-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA4NiBTYWx0ZWRfX+mr59cyxk1jI VFH4fNmNi41tutM8gZCJyJa1bCS7LAJQermaf3TywwL3L9cdT7gYDbzfp/aSZa8/SL3kGnEPqtH 9ggfnAbZko/2zWdmSBLAo+bDEd3PgZsJs+Sigu9rMifcyn1Gf0rSVSH998nUbtAmGyTawBzsc1f
+ Br6go7CKD2GNMB4FZLF1B/GZgAPvPiM9tqIFGlV485CzwuJF9nwykcwn9sY/Y/qfc/S8Cg0tLeA wSvviuzObJbNxKDVGCamj7xUJCDzAjdtb5JPngp9vqjIRvOKBvXiOSOlUq6b5W9zIq9aGBaz0Ua JfEkjdTa9EwsKhw6HzfA54TLuBUko2prTKg65OeLYgfDVB/jU7FN7G6O0Nz+rL29rkP7sMbzyqZ
+ bFOnYj7Jk57wOSQoLTKdiYpv7IEQDH1KvQRlyVtdMzOBt/dPlMMonxLCegaQltWMGtZOwE8M
+X-Proofpoint-GUID: 7za0crO_rGh6Zemzss7R5MRKmp9tI0IW
+X-Authority-Analysis: v=2.4 cv=KtxN2XWN c=1 sm=1 tr=0 ts=6810bf5e cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=sWKEhP36mHoA:10 a=3--Im_O7JaeRZpZWgPsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: 7za0crO_rGh6Zemzss7R5MRKmp9tI0IW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-29_04,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ priorityscore=1501 mlxlogscore=999 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ spamscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2504290086
 
-On Tue, Apr 29, 2025 at 10:19:46AM +0800, Baolu Lu wrote:
-> > -int iommu_map(struct iommu_domain *domain, unsigned long iova,
-> > -	      phys_addr_t paddr, size_t size, int prot, gfp_t gfp)
-> > +int iommu_sync_map(struct iommu_domain *domain, unsigned long iova, size_t size)
-> >   {
-> >   	const struct iommu_domain_ops *ops = domain->ops;
-> > -	int ret;
-> > -
-> > -	might_sleep_if(gfpflags_allow_blocking(gfp));
-> > -	/* Discourage passing strange GFP flags */
-> > -	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
-> > -				__GFP_HIGHMEM)))
-> > -		return -EINVAL;
-> > +	if (!ops->iotlb_sync_map)
-> > +		return 0;
-> > +	return ops->iotlb_sync_map(domain, iova, size);
-> > +}
-> 
-> I am wondering whether iommu_sync_map() needs a return value. The
-> purpose of this callback is just to sync the TLB cache after new
-> mappings are created, which should effectively be a no-fail operation.
+Am 24.04.25 um 17:21 schrieb Ming Lei:
 
-Yeah, it is pretty much nonsense, the other flushes don't fail:
+> Hello Jens,
+>
+> This patchset cleans up elevator change code, and unifying it via single
+> helper, meantime moves kobject_add/del & debugfs register/unregister out of
+> queue freezing & elevator_lock. This way fixes many lockdep warnings
+> reported recently, especially since fs_reclaim is connected with freeze lock
+> manually by commit ffa1e7ada456 ("block: Make request_queue lockdep splats
+> show up earlier").
+>
+>
+> Thanks,
+> Ming
+>
+> V3:
+> 	- replace srcu with rw_sem for avoiding race between add/del disk &
+> 	  elevator switch and updating nr_hw_queues (Nilay Shoff)
+>
+> 	- add elv_update_nr_hw_queues() for elevator reattachment in case of
+> 	updating nr_hw_queues, meantime keep elv_change_ctx as local structure
+> 	(Christoph)
+>
+> 	- replace ->elevator_lock with disk->rqos_state_mutex for covering wbt
+> 	state change
+>
+> 	- add new patch "block: use q->elevator with ->elevator_lock held in elv_iosched_show()"
+>
+> 	- small cleanup & commit log improvement
+>
+> V2:
+> 	- retry add/del disk when blk_mq_update_nr_hw_queues() is in-progress
+>
+> 	- swap blk_mq_add_queue_tag_set() with blk_mq_map_swqueue() in
+> 	blk_mq_init_allocated_queue() (Nilay Shroff)
+>
+> 	- move ELEVATOR_FLAG_DISABLE_WBT to request queue's flags (Nilay Shoff) 
+>
+> 	- fix race because of delaying elevator unregister
+>
+> 	- define flags of `elv_change_ctx` as `bool` (Christoph)
+>
+> 	- improve comment and commit log (Christoph)
+>
+> Ming Lei (20):
+>   block: move blk_mq_add_queue_tag_set() after blk_mq_map_swqueue()
+>   block: move ELEVATOR_FLAG_DISABLE_WBT a request queue flag
+>   block: don't call freeze queue in elevator_switch() and
+>     elevator_disable()
+>   block: use q->elevator with ->elevator_lock held in elv_iosched_show()
+>   block: add two helpers for registering/un-registering sched debugfs
+>   block: move sched debugfs register into elvevator_register_queue
+>   block: prevent adding/deleting disk during updating nr_hw_queues
+>   block: don't allow to switch elevator if updating nr_hw_queues is
+>     in-progress
+>   block: simplify elevator reattachment for updating nr_hw_queues
+>   block: move blk_unregister_queue() & device_del() after freeze wait
+>   block: move queue freezing & elevator_lock into elevator_change()
+>   block: add `struct elv_change_ctx` for unifying elevator change
+>   block: unifying elevator change
+>   block: pass elevator_queue to elv_register_queue & unregister_queue
+>   block: fail to show/store elevator sysfs attribute if elevator is
+>     dying
+>   block: move elv_register[unregister]_queue out of elevator_lock
+>   block: move debugfs/sysfs register out of freezing queue
+>   block: remove several ->elevator_lock
+>   block: move hctx cpuhp add/del out of queue freezing
+>   block: move wbt_enable_default() out of queue freezing from sched
+>     ->exit()
+>
+>  block/bfq-iosched.c    |   6 +-
+>  block/blk-mq-debugfs.c |  12 +-
+>  block/blk-mq-sched.c   |  41 +++---
+>  block/blk-mq.c         | 132 +++---------------
+>  block/blk-sysfs.c      |  24 ++--
+>  block/blk-wbt.c        |  13 +-
+>  block/blk.h            |   8 +-
+>  block/elevator.c       | 302 ++++++++++++++++++++++++++++-------------
+>  block/elevator.h       |   6 +-
+>  block/genhd.c          | 129 +++++++++++-------
+>  include/linux/blk-mq.h |   3 +
+>  include/linux/blkdev.h |   5 +
+>  12 files changed, 365 insertions(+), 316 deletions(-)
 
-	void (*flush_iotlb_all)(struct iommu_domain *domain);
-	int (*iotlb_sync_map)(struct iommu_domain *domain, unsigned long iova,
-			      size_t size);
-	void (*iotlb_sync)(struct iommu_domain *domain,
-			   struct iommu_iotlb_gather *iotlb_gather);
+Hi,
+while testing the patchset on s390 I still get the following lockdep splat on each boot:
 
-> Furthermore, currently no iommu driver implements this callback in a way
-> that returns a failure. 
+======================================================
+ WARNING: possible circular locking dependency detected
+ 6.15.0-rc4-gc2b4d8dcb3d2 #3 Not tainted
+ ------------------------------------------------------
+ (udev-worker)/1810 is trying to acquire lock:
+ 0000005fb84de3a8 (&q->elevator_lock){+.+.}-{4:4}, at: elevator_change+0x54/0x130
 
-Given s390 does weirdly fail sync_map but not sync this needs a bigger
-touch than just that.
+ but task is already holding lock:
+ 0000005fb84dde18 (&q->q_usage_counter(io)#34){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x26/0x40
 
-But what I really want to do is get rid of iotlb_sync_map and replace it
-with iotlb_sync, and feed the gather through the iommu_map path.
+ which lock already depends on the new lock.
 
-It doesn't really make sense to have a special interface for this.
+ the existing dependency chain (in reverse order) is:
 
-So I think this patch is fine as is..
+ -> #3 (&q->q_usage_counter(io)#34){++++}-{0:0}:
+        __lock_acquire+0x6da/0xcc0
+        lock_acquire.part.0+0x10c/0x290
+        lock_acquire+0xb0/0x1a0
+        blk_alloc_queue+0x306/0x340
+        blk_mq_alloc_queue+0x60/0xd0
+        scsi_alloc_sdev+0x27c/0x3b0
+        scsi_probe_and_add_lun+0x31a/0x480
+        scsi_report_lun_scan+0x382/0x430
+        __scsi_scan_target+0x11a/0x240
+        scsi_scan_target+0xdc/0x100
+        fc_scsi_scan_rport+0xc2/0xd0
+        process_one_work+0x2a6/0x5d0
+        worker_thread+0x220/0x410
+        kthread+0x164/0x2d0
+        __ret_from_fork+0x3c/0x60
+        ret_from_fork+0xa/0x38
 
-Jason
+ -> #2 (fs_reclaim){+.+.}-{0:0}:
+        __lock_acquire+0x6da/0xcc0
+        lock_acquire.part.0+0x10c/0x290
+        lock_acquire+0xb0/0x1a0
+        __fs_reclaim_acquire+0x44/0x50
+        fs_reclaim_acquire+0xba/0x100
+        __kmalloc_noprof+0xae/0x5e0
+        pcpu_alloc_chunk+0x30/0x170
+        pcpu_create_chunk+0x22/0x130
+        pcpu_alloc_noprof+0x842/0x970
+        do_kmem_cache_create+0x1e0/0x4b0
+        __kmem_cache_create_args+0x238/0x340
+        register_ftrace_graph+0x438/0x460
+        trace_selftest_startup_function_graph+0x62/0x260
+        run_tracer_selftest+0x116/0x1b0
+        register_tracer+0x192/0x260
+        do_one_initcall+0x4a/0x180
+        do_initcalls+0x146/0x170
+        kernel_init_freeable+0x230/0x270
+        kernel_init+0x2e/0x188
+        __ret_from_fork+0x3c/0x60
+        ret_from_fork+0xa/0x38
+
+ -> #1 (pcpu_alloc_mutex){+.+.}-{4:4}:
+        __lock_acquire+0x6da/0xcc0
+        lock_acquire.part.0+0x10c/0x290
+        lock_acquire+0xb0/0x1a0
+        __mutex_lock+0xae/0xa20
+        mutex_lock_killable_nested+0x32/0x40
+        pcpu_alloc_noprof+0x6ea/0x970
+        sbitmap_init_node+0x11a/0x230
+        sbitmap_queue_init_node+0x3e/0x1c0
+        blk_mq_init_tags+0xac/0x140
+        blk_mq_alloc_map_and_rqs+0xb0/0x180
+        blk_mq_init_sched+0xfc/0x200
+        elevator_switch+0x74/0x260
+        __elevator_change+0xde/0x150
+        elevator_change+0xe4/0x130
+        elevator_set_default+0x6c/0xc0
+        blk_register_queue+0x188/0x210
+        __add_disk_fwnode+0x202/0x420
+        add_disk_fwnode+0x7a/0xb0
+        sd_probe+0x22e/0x3f0
+        really_probe+0x2ac/0x430
+        driver_probe_device+0x3c/0xc0
+        __device_attach_driver+0xc0/0x140
+        bus_for_each_drv+0x90/0xe0
+        __device_attach_async_helper+0x94/0xf0
+        async_run_entry_fn+0x4a/0x180
+        process_one_work+0x2a6/0x5d0
+        worker_thread+0x220/0x410
+        kthread+0x164/0x2d0
+        __ret_from_fork+0x3c/0x60
+        ret_from_fork+0xa/0x38
+
+ -> #0 (&q->elevator_lock){+.+.}-{4:4}:
+        check_prev_add+0x16c/0xff0
+        validate_chain+0x734/0x9f0
+        __lock_acquire+0x6da/0xcc0
+        lock_acquire.part.0+0x10c/0x290
+        lock_acquire+0xb0/0x1a0
+        __mutex_lock+0xae/0xa20
+        mutex_lock_nested+0x32/0x40
+        elevator_change+0x54/0x130
+        elv_iosched_store+0xec/0x140
+        kernfs_fop_write_iter+0x166/0x230
+        vfs_write+0x1ac/0x480
+        ksys_write+0x7c/0x100
+        __do_syscall+0x156/0x290
+        system_call+0x74/0x98
+
+        other info that might help us debug this:
+
+ Chain exists of:
+                 &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter(io)#34
+
+  Possible unsafe locking scenario:
+
+        CPU0                    CPU1
+        ----                    ----
+   lock(&q->q_usage_counter(io)#34);
+                                lock(fs_reclaim);
+                                lock(&q->q_usage_counter(io)#34);
+   lock(&q->elevator_lock);
+
+                *** DEADLOCK ***
+
+ 6 locks held by (udev-worker)/1810:
+  #0: 0000005f9d141450 (sb_writers#3){.+.+}-{0:0}, at: ksys_write+0x7c/0x100
+  #1: 0000005f8ee55090 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x12a/0x230
+  #2: 0000005fd0be69a0 (kn->active#68){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x136/0x230
+  #3: 00000066feee93c0 (&set->update_nr_hwq_sema/1){.+.+}-{4:4}, at: elv_iosched_store+0xde/0x140
+  #4: 0000005fb84dde18 (&q->q_usage_counter(io)#34){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x26/0x40
+  #5: 0000005fb84dde58 (&q->q_usage_counter(queue)#11){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x26/0x40
+
+               stack backtrace:
+ CPU: 18 UID: 0 PID: 1810 Comm: (udev-worker) Not tainted 6.15.0-rc4-gc2b4d8dcb3d2 #3 PREEMPT
+ Hardware name: IBM 9175 ME1 701 (LPAR)
+ Call Trace:
+  [<00000162f415409a>] dump_stack_lvl+0xa2/0xe8
+  [<00000162f424cf9c>] print_circular_bug+0x18c/0x210
+  [<00000162f424d198>] check_noncircular+0x178/0x190
+  [<00000162f424e57c>] check_prev_add+0x16c/0xff0
+  [<00000162f424fb34>] validate_chain+0x734/0x9f0
+  [<00000162f4251f8a>] __lock_acquire+0x6da/0xcc0
+  [<00000162f425267c>] lock_acquire.part.0+0x10c/0x290
+  [<00000162f42528b0>] lock_acquire+0xb0/0x1a0
+  [<00000162f525695e>] __mutex_lock+0xae/0xa20
+  [<00000162f5257302>] mutex_lock_nested+0x32/0x40
+  [<00000162f4c00a54>] elevator_change+0x54/0x130
+  [<00000162f4c0136c>] elv_iosched_store+0xec/0x140
+  [<00000162f46b6f66>] kernfs_fop_write_iter+0x166/0x230
+  [<00000162f45cbe3c>] vfs_write+0x1ac/0x480
+  [<00000162f45cc2ac>] ksys_write+0x7c/0x100
+  [<00000162f524e956>] __do_syscall+0x156/0x290
+  [<00000162f525ff94>] system_call+0x74/0x98
+ INFO: lockdep is turned off.
+
+
+The trigger is a udev rule changing the scheduler for the device.
+
+thanks,
+Stefan
