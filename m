@@ -1,212 +1,190 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDEC1D5ABF;
-	Tue, 29 Apr 2025 03:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4096327470
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 04:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745896519; cv=none; b=Dk4KRA5f/wqz4JGhjkmgamD3RF31cm2H26/SFwDv6ezKMJf2nY3nAUP9rHGYUzWZ9mGTR1RPJr03G5+6uM8ptOR2OLXzZxDUggisWlzG+reVdMk3ZMO2eLLkMg8KJ4VYRPJVbOIMQp+5tebf9YuI3CsSX39M+wztZynrvEGbphw=
+	t=1745899559; cv=none; b=q+QhOmMy3bz9S1aC5/siCsFO4rK2RP1h8ef0kHPhsZgOhvIwc2VnjNqkEuawc1ejIWMZ4cG6woACMQ03JHkdfMOVrV9zJfM25QKXKUGa7uM4RNBWIQcTn/4x3uak8B1JhzenxBkreAAd7LEcOThif6OLCWzTGamOm50oVTGuofc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745896519; c=relaxed/simple;
-	bh=gF3+aJs3Gf/hJScKyT1fbK46ZtYQ+FrmHh+AQDsrL0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=heqSH1TPJsLFKMaFUE/tF8+V91M7BoXGULmJ+GpR2w0no6pdGzEcwAUpSe+3l/24zDKS7d6/EIWT12IUi7fUycR0Iocp2vvn+7ThurtwuE1wU0q9DkoCqcL5LWSvYUrX+5MbeMzV3fnVQCMcuaAjy7F5guhNthMB5lmZ/1ZOmnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ko1kScYs; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1745899559; c=relaxed/simple;
+	bh=mC064HA8cxmc5ppK0VWh3u7DcKPWkvHvnlU7CKsJHgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZsZmEf+goi2daogLWQFaAJOzKcM73POnCdUXqrDjbXn3SfEtRAzJY9EUbmPPYU9fOAdqPO0nC4JehnOnbNXrte2p1PX/rDCb5GRroFvNi/UGsvNIZjA8KWsVoyqKdc0ml0gDndFuJxbi4KHRX1m/FbQ+0BwDd2JRv6dT/7sTRUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOnHQXSx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ko1kScYs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745896517; x=1777432517;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=gF3+aJs3Gf/hJScKyT1fbK46ZtYQ+FrmHh+AQDsrL0w=;
-  b=Ko1kScYsg+YyREB4A+YRch1TOVHQz8KWGhn4Ui5UZUtAbUzkIixv78bP
-   tXJSAHQmEb8eIu+/GG3ieYLFsMuFQR2COmLPRMX09BiOBXXDL/CjzNdHn
-   jwDDCAEFxi4fXFoPytugtHDg3E4Y3iV9VwW8eLQ+AxCoh/T/uonwZIt/g
-   eecJ7JzHceD+e8vNmIf87SOmNktZ/NYD/kfTEabHadtuCdWdpQnrtA9Ag
-   A8l1UgR31LKxhfK+uloIJg9DDyl0HJb9STYzIiwDANRcMXKu+n6fM0iDF
-   zWD/2zhQdz5jdvbUljCu3sHRwNUSoWVLY92N8JukW/abJXRIXscBYttDU
-   g==;
-X-CSE-ConnectionGUID: /+1i8YPtRcKh0efR4BJNsA==
-X-CSE-MsgGUID: naMycftATTinNUijWUxKfg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="50164771"
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="50164771"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 20:15:16 -0700
-X-CSE-ConnectionGUID: ed4rLAGbTImlyIcMdAHXJw==
-X-CSE-MsgGUID: 8LoauE1fTyG98pnYRixuDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="133600998"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 20:15:07 -0700
-Message-ID: <0086302d-1cb3-43dd-a989-e4b1995a0d22@linux.intel.com>
-Date: Tue, 29 Apr 2025 11:10:54 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOnHQXSx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745899556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T35C5vWq4hYFn/I8gNZPS9eGF+vOp3+hGnioAT17dSw=;
+	b=DOnHQXSx1Is/WB7S9uEOJa8N0lNf20ADWsxTTUDhtXZ8YWHwv4p1zdTrJ2VCZlP6KTMTkq
+	C/fR6bQlJBidVC6idXvEFzG78Vn6m+5gukJgmN3yoHsG3ZLnk1/8L6b3pWydbeoVv21qUp
+	Mj8Al0x68FEFZU25H5luPYGV6Q344Jk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-i0h5bgxMMbShf-Hlnf_5MQ-1; Tue,
+ 29 Apr 2025 00:05:50 -0400
+X-MC-Unique: i0h5bgxMMbShf-Hlnf_5MQ-1
+X-Mimecast-MFC-AGG-ID: i0h5bgxMMbShf-Hlnf_5MQ_1745899542
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 815081800264;
+	Tue, 29 Apr 2025 04:05:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.57])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27B8319560AB;
+	Tue, 29 Apr 2025 04:05:38 +0000 (UTC)
+Date: Tue, 29 Apr 2025 12:05:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/8] ublk: factor out ublk_start_io() helper
+Message-ID: <aBBQDjLDkGWE63vT@fedora>
+References: <20250427045803.772972-1-csander@purestorage.com>
+ <20250427045803.772972-6-csander@purestorage.com>
+ <aA4rqcpC01SzUn_g@fedora>
+ <CADUfDZpEGVLzEZJtPiScWgf6PVroQvKKhGed1cb8AJiyUr_RYg@mail.gmail.com>
+ <CADUfDZqqeeBTbgvCfHa8sr7Y7BetGbPzHYA1hMoN83kz+Bi54A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 05/24] dma-mapping: Provide an interface to allow
- allocate IOVA
-To: Leon Romanovsky <leon@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
- Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
- Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Dan Williams
- <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Chaitanya Kulkarni <kch@nvidia.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <30f0601d400711b3859deeb8fef3090f5b2020a4.1745831017.git.leon@kernel.org>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <30f0601d400711b3859deeb8fef3090f5b2020a4.1745831017.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqqeeBTbgvCfHa8sr7Y7BetGbPzHYA1hMoN83kz+Bi54A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 4/28/25 17:22, Leon Romanovsky wrote:
-> From: Leon Romanovsky<leonro@nvidia.com>
+On Mon, Apr 28, 2025 at 08:12:52AM -0700, Caleb Sander Mateos wrote:
+> On Mon, Apr 28, 2025 at 7:28 AM Caleb Sander Mateos
+> <csander@purestorage.com> wrote:
+> >
+> > On Sun, Apr 27, 2025 at 6:05 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > >
+> > > On Sat, Apr 26, 2025 at 10:58:00PM -0600, Caleb Sander Mateos wrote:
+> > > > In preparation for calling it from outside ublk_dispatch_req(), factor
+> > > > out the code responsible for setting up an incoming ublk I/O request.
+> > > >
+> > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > > ---
+> > > >  drivers/block/ublk_drv.c | 53 ++++++++++++++++++++++------------------
+> > > >  1 file changed, 29 insertions(+), 24 deletions(-)
+> > > >
+> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > index 01fc92051754..90a38a82f8cc 100644
+> > > > --- a/drivers/block/ublk_drv.c
+> > > > +++ b/drivers/block/ublk_drv.c
+> > > > @@ -1151,17 +1151,44 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+> > > >               blk_mq_requeue_request(rq, false);
+> > > >       else
+> > > >               blk_mq_end_request(rq, BLK_STS_IOERR);
+> > > >  }
+> > > >
+> > > > +static void ublk_start_io(struct ublk_queue *ubq, struct request *req,
+> > > > +                       struct ublk_io *io)
+> > > > +{
+> > > > +     unsigned mapped_bytes = ublk_map_io(ubq, req, io);
+> > > > +
+> > > > +     /* partially mapped, update io descriptor */
+> > > > +     if (unlikely(mapped_bytes != blk_rq_bytes(req))) {
+> > > > +             /*
+> > > > +              * Nothing mapped, retry until we succeed.
+> > > > +              *
+> > > > +              * We may never succeed in mapping any bytes here because
+> > > > +              * of OOM. TODO: reserve one buffer with single page pinned
+> > > > +              * for providing forward progress guarantee.
+> > > > +              */
+> > > > +             if (unlikely(!mapped_bytes)) {
+> > > > +                     blk_mq_requeue_request(req, false);
+> > > > +                     blk_mq_delay_kick_requeue_list(req->q,
+> > > > +                                     UBLK_REQUEUE_DELAY_MS);
+> > > > +                     return;
+> > > > +             }
+> > > > +
+> > > > +             ublk_get_iod(ubq, req->tag)->nr_sectors =
+> > > > +                     mapped_bytes >> 9;
+> > > > +     }
+> > > > +
+> > > > +     ublk_init_req_ref(ubq, req);
+> > > > +}
+> > > > +
+> > > >  static void ublk_dispatch_req(struct ublk_queue *ubq,
+> > > >                             struct request *req,
+> > > >                             unsigned int issue_flags)
+> > > >  {
+> > > >       int tag = req->tag;
+> > > >       struct ublk_io *io = &ubq->ios[tag];
+> > > > -     unsigned int mapped_bytes;
+> > > >
+> > > >       pr_devel("%s: complete: qid %d tag %d io_flags %x addr %llx\n",
+> > > >                       __func__, ubq->q_id, req->tag, io->flags,
+> > > >                       ublk_get_iod(ubq, req->tag)->addr);
+> > > >
+> > > > @@ -1204,33 +1231,11 @@ static void ublk_dispatch_req(struct ublk_queue *ubq,
+> > > >               pr_devel("%s: update iod->addr: qid %d tag %d io_flags %x addr %llx\n",
+> > > >                               __func__, ubq->q_id, req->tag, io->flags,
+> > > >                               ublk_get_iod(ubq, req->tag)->addr);
+> > > >       }
+> > > >
+> > > > -     mapped_bytes = ublk_map_io(ubq, req, io);
+> > > > -
+> > > > -     /* partially mapped, update io descriptor */
+> > > > -     if (unlikely(mapped_bytes != blk_rq_bytes(req))) {
+> > > > -             /*
+> > > > -              * Nothing mapped, retry until we succeed.
+> > > > -              *
+> > > > -              * We may never succeed in mapping any bytes here because
+> > > > -              * of OOM. TODO: reserve one buffer with single page pinned
+> > > > -              * for providing forward progress guarantee.
+> > > > -              */
+> > > > -             if (unlikely(!mapped_bytes)) {
+> > > > -                     blk_mq_requeue_request(req, false);
+> > > > -                     blk_mq_delay_kick_requeue_list(req->q,
+> > > > -                                     UBLK_REQUEUE_DELAY_MS);
+> > > > -                     return;
+> > > > -             }
+> > >
+> > > Here it needs to break ublk_dispatch_req() for not completing the
+> > > uring_cmd, however ublk_start_io() can't support it.
+> >
+> > Good catch. How about I change ublk_start_io() to return a bool
+> > indicating whether the I/O was successfully started?
+
+That is doable.
+
 > 
-> The existing .map_page() callback provides both allocating of IOVA
+> Thinking a bit more about this, is the existing behavior of returning
+> early from ublk_dispatch_req() correct for UBLK_IO_NEED_GET_DATA? It
 
-.map_pages()
+The requeue isn't related with UBLK_IO_NEED_GET_DATA actually, when
+UBLK_IO_FLAG_NEED_GET_DATA is cleared.
 
-> and linking DMA pages. That combination works great for most of the
-> callers who use it in control paths, but is less effective in fast
-> paths where there may be multiple calls to map_page().
-> 
-> These advanced callers already manage their data in some sort of
-> database and can perform IOVA allocation in advance, leaving range
-> linkage operation to be in fast path.
-> 
-> Provide an interface to allocate/deallocate IOVA and next patch
-> link/unlink DMA ranges to that specific IOVA.
-> 
-> In the new API a DMA mapping transaction is identified by a
-> struct dma_iova_state, which holds some recomputed information
-> for the transaction which does not change for each page being
-> mapped, so add a check if IOVA can be used for the specific
-> transaction.
-> 
-> The API is exported from dma-iommu as it is the only implementation
-> supported, the namespace is clearly different from iommu_* functions
-> which are not allowed to be used. This code layout allows us to save
-> function call per API call used in datapath as well as a lot of boilerplate
-> code.
-> 
-> Reviewed-by: Christoph Hellwig<hch@lst.de>
-> Tested-by: Jens Axboe<axboe@kernel.dk>
-> Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
-> Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
-> ---
->   drivers/iommu/dma-iommu.c   | 86 +++++++++++++++++++++++++++++++++++++
->   include/linux/dma-mapping.h | 48 +++++++++++++++++++++
->   2 files changed, 134 insertions(+)
-> 
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 9ba8d8bc0ce9..d3211a8d755e 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -1723,6 +1723,92 @@ size_t iommu_dma_max_mapping_size(struct device *dev)
->   	return SIZE_MAX;
->   }
->   
-> +/**
-> + * dma_iova_try_alloc - Try to allocate an IOVA space
-> + * @dev: Device to allocate the IOVA space for
-> + * @state: IOVA state
-> + * @phys: physical address
-> + * @size: IOVA size
-> + *
-> + * Check if @dev supports the IOVA-based DMA API, and if yes allocate IOVA space
-> + * for the given base address and size.
-> + *
-> + * Note: @phys is only used to calculate the IOVA alignment. Callers that always
-> + * do PAGE_SIZE aligned transfers can safely pass 0 here.
+It is usually caused by running out of pages, so we have to requeue until
+ublk_map_io() can make progress.
 
-Have you considered adding a direct alignment parameter to
-dma_iova_try_alloc()? '0' simply means the default PAGE_SIZE alignment.
+> makes sense for the initial ublk_dispatch_req() because the req will
+> be requeued without consuming the ublk fetch request, allowing it to
+> be reused for a subsequent I/O. But for UBLK_IO_NEED_GET_DATA, doesn't
+> it mean the io_uring_cmd will never complete? I would think it would
+> be better to return an error code in this case.
 
-I'm imagining that some devices might have particular alignment needs
-for better performance, especially for the ATS cache efficiency. This
-would allow those device drivers to express the requirements directly
-during iova allocation.
+The same request will be requeued and re-dispatched to ublk driver after
+a short delay, so the uring_cmd won't be never complete.
 
-> + *
-> + * Returns %true if the IOVA-based DMA API can be used and IOVA space has been
-> + * allocated, or %false if the regular DMA API should be used.
-> + */
-> +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-> +		phys_addr_t phys, size_t size)
-> +{
-> +	struct iommu_dma_cookie *cookie;
-> +	struct iommu_domain *domain;
-> +	struct iova_domain *iovad;
-> +	size_t iova_off;
-> +	dma_addr_t addr;
-> +
-> +	memset(state, 0, sizeof(*state));
-> +	if (!use_dma_iommu(dev))
-> +		return false;
-> +
-> +	domain = iommu_get_dma_domain(dev);
-> +	cookie = domain->iova_cookie;
-> +	iovad = &cookie->iovad;
-> +	iova_off = iova_offset(iovad, phys);
-> +
-> +	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
-> +	    iommu_deferred_attach(dev, iommu_get_domain_for_dev(dev)))
-> +		return false;
-> +
-> +	if (WARN_ON_ONCE(!size))
-> +		return false;
-> +
-> +	/*
-> +	 * DMA_IOVA_USE_SWIOTLB is flag which is set by dma-iommu
-> +	 * internals, make sure that caller didn't set it and/or
-> +	 * didn't use this interface to map SIZE_MAX.
-> +	 */
-> +	if (WARN_ON_ONCE((u64)size & DMA_IOVA_USE_SWIOTLB))
-
-I'm a little concerned that device drivers might inadvertently misuse
-the state->__size by forgetting about the high bit being used for
-DMA_IOVA_USE_SWIOTLB. Perhaps adding a separate flag within struct
-dma_iova_state to prevent such issues?
-
-> +		return false;
-> +
-> +	addr = iommu_dma_alloc_iova(domain,
-> +			iova_align(iovad, size + iova_off),
-> +			dma_get_mask(dev), dev);
-> +	if (!addr)
-> +		return false;
-> +
-> +	state->addr = addr + iova_off;
-> +	state->__size = size;
-> +	return true;
-> +}
-> +EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
+Anyway, it isn't another story, which shouldn't be added into this
+cleanup patch.
 
 Thanks,
-baolu
+Ming
+
