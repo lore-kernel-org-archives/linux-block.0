@@ -1,65 +1,54 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B51E274670
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 12:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3E31EEF9;
+	Tue, 29 Apr 2025 12:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745928938; cv=none; b=LXIJG4Z6ZV593r5C/F8/8sSvezO+vxV9Tmpy1PtOSchdOvEoElD+Q5xYiJ05ReOcyoABgeTR7WIzHvVMZk8EVj22B82fTrh8zNpMNS/FEjfRgnOt40NOlC5cIt32RgsPc9qWNVxc89DUsljJZFVuVAwpWydI4T1d4T4kU1fYLy0=
+	t=1745929273; cv=none; b=V7LwX66+//xjAzk92JvFHRJgccpacVsfBM7FWYwrqpR69wN7aBTrjZ/Y5IgvrKU9UjXpGBl5m24nAqdTdpIh5Ywz6dvJ9ZkkJR64net341RLOTjtG8kdd9WQmJ4Sc6TletZvJg9EmUjMI0etaxbj5/PxmvSWP85jsKxLn57Rhok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745928938; c=relaxed/simple;
-	bh=GJ9B6+bKqDDwxcNkZrP+yt93SoL4Iw3VBDJ05KXYi7Y=;
+	s=arc-20240116; t=1745929273; c=relaxed/simple;
+	bh=DC0aTXhhoWmpIEPa7Hz685vjS+D+REZ0uS+r300WJns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ky/thauD4klTcDnhLllWGMBC1sz1aPO3x11MJ5V/4mxDc+IHTpdAgTkPKyA/l8OXKinYf8DsyQNV3FPhRjBKRKxP4QgKevPWq3gaiyYnQx8OS0UOha6fbSSUGWHrbHwZo5tNxXtfCKYrFs953bBBvKfMM1q7kmCTAOcum2eNbjs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=TFs2evcm2/ao/4tSeR1K8EgpkzeW82qEQSHOgKgNUOhlNdj7TLa3L6+Kq+qjseL8wWBPGgtTPTBxEqwI2kfbvl89ME2ZrT6e4JH7F4o/O/6YIzBDED5kNBPx3NyJ8r4SgFLZXKdWesjlIlqzTZIFM2dpAn38xGpq69SQb4Nbbpw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id A939E68AA6; Tue, 29 Apr 2025 14:15:30 +0200 (CEST)
-Date: Tue, 29 Apr 2025 14:15:29 +0200
+	id EE84668AA6; Tue, 29 Apr 2025 14:21:05 +0200 (CEST)
+Date: Tue, 29 Apr 2025 14:21:05 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 4/5] brd: split I/O at page boundaries
-Message-ID: <20250429121529.GB12411@lst.de>
-References: <20250428141014.2360063-1-hch@lst.de> <20250428141014.2360063-5-hch@lst.de> <aA_Dyp97AIAqJ70G@kbusch-mbp.dhcp.thefacebook.com> <221bce43-83b7-b5ac-c6d2-ded23158dd06@huaweicloud.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: brauner@kernel.org, djwong@kernel.org, hch@lst.de,
+	viro@zeniv.linux.org.uk, jack@suse.cz, cem@kernel.org,
+	linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH v9 05/15] xfs: ignore HW which cannot atomic write a
+ single block
+Message-ID: <20250429122105.GA12603@lst.de>
+References: <20250425164504.3263637-1-john.g.garry@oracle.com> <20250425164504.3263637-6-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <221bce43-83b7-b5ac-c6d2-ded23158dd06@huaweicloud.com>
+In-Reply-To: <20250425164504.3263637-6-john.g.garry@oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Apr 29, 2025 at 09:38:28AM +0800, Yu Kuai wrote:
-> Hi,
->
-> 在 2025/04/29 2:07, Keith Busch 写道:
->> On Mon, Apr 28, 2025 at 07:09:50AM -0700, Christoph Hellwig wrote:
->>> A lot of complexity in brd stems from the fact that it tries to handle
->>> I/O spanning two backing pages.  Instead limit the size of a single
->>> bvec iteration so that it never crosses a page boundary and remove all
->>> the now unneeded code.
->>
->> Doesn't bio_for_each_segment() already limit bvecs on page boundaries?
->> You'd need to use bio_for_each_bvec() to get multi-page bvecs.
->
-> I think it only limit bvecs on page boundaries on the issue side, not
-> disk side.
->
-> For example, if user issue an IO (2k + 4k), will bio_for_each_segment()
-> split this IO into (2k + 2k) and (4k + 2k), I do not test yet, but I
-> think the answer is no.
+On Fri, Apr 25, 2025 at 04:44:54PM +0000, John Garry wrote:
+> +	/* Configure hardware atomic write geometry */
+> +	xfs_buftarg_config_atomic_writes(mp->m_ddev_targp);
+> +	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp)
+> +		xfs_buftarg_config_atomic_writes(mp->m_logdev_targp);
+> +	if (mp->m_rtdev_targp && mp->m_rtdev_targp != mp->m_ddev_targp)
+> +		xfs_buftarg_config_atomic_writes(mp->m_rtdev_targp);
 
-Exactly.  I got this wrong with zram, where it only triggers with larger
-than 4k page sizes, and I got this wrong here on my first attempt as
-well.  Fortunately testing found it quickly.  I thought the comment and
-commit message document the issue well enough, but I'm open to better
-wording.
-
+So this can't be merged into xfs_setsize_buftarg as suggeted last round
+instead of needing yet another per-device call into the buftarg code?
