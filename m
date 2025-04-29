@@ -1,192 +1,94 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981002FB2
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 01:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E60513C9B3;
+	Tue, 29 Apr 2025 01:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745890742; cv=none; b=tKJ1ys3h6iloQA4bDgntbXkDiCLAFlJ+qk6+HYjgMMFKk/HKn8M1Y08I2+EHAsOtgdoiRJJZgL2V3nHdtPz92Gu6xjUo9RVm6A1IhXQDklrH5lxiu79P8pEw46Xfyj6dFHTgX4itq5CNMjg72qv9RSm+qt1Gz0uB0hW4u3FA5V4=
+	t=1745890830; cv=none; b=icy9u/yBQEp4oKjlk2lIeSTwj4TDRdQ9wrc8yn8bJDHh1/ACjnG8V+Y5W3CSzqBQPoZfKxaxJ3rQinRok6gZNLniWxG8f/rstYyxlBuUfxIGmMAu0wcJBEXTfXUV9vqj0V1bnOrdiLaTN3f03eMzLeY1TKBxLbbgjQQ8WjvE+iI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745890742; c=relaxed/simple;
-	bh=xryzTqB5n/UH4p0Qu5M1iIFoYmGG+nNTbZO0s3WmTf8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VLA8SfG8p5WMX7AiJ0L0irkVp34+gn5LZmGbb7hQgkJqmhAjgjpAfw8lZgFsXb3OgW6TN738xr+cDcifFhPZ9nuq/PK5vx9avLtz70zv05ThdoHe/Rxr7+ATUOzEl1ZRUSeUOdiPqMmk3kvwq7AloVDC0vLTLo5cJzz6pDRLw6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XVsUr0nC; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XVsUr0nC"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-736c8cee603so535629b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Apr 2025 18:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745890740; x=1746495540; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pPslriOkEvhefBRQkFVEFT+YSJZ3pLDNZnAHYqb3FUo=;
-        b=XVsUr0nCquvSzwvlKMdMlBuCw3O2Dea74QQ1Gi1TS2vSDsIE/plQ3qbyKEWEPbeUQI
-         2IM+62iuFGRhkTS7VoczfiQHuQxtITzcafZ6tu9/q0+h4jOZYQ0DjT8elQHU0fciLvNr
-         bdOnDJaMmGC5R+EMehy03AXapdzz7wrccB169U1O/Z62Qp2tt9kNskY5VOd69HcVmPHh
-         zS0bhdJpyxtt6auJFebclHx+AysbHJBH7fSo+SHahSW4HAJvChmGPOH+GQ92cOmF/9Vv
-         CgUy1LE0btTjr8EhmjiO26BvlZqB5eanri+U/1XDNUXbmpigJnDEzVkSUTwmtWQOPlJ1
-         Z7KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745890740; x=1746495540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pPslriOkEvhefBRQkFVEFT+YSJZ3pLDNZnAHYqb3FUo=;
-        b=c+Pfsld4+9kqVBJixwEkX0n7iQqEpImXReyo+Zpl4r0uA9ZtQ0e0OAqBOKM9mGS2rp
-         pRGi3flM8AjLicv9/Msm9nptXVb14bZ/Av/Q+JDwdPcEoHnY7E617bK3lHl3n1I29WV0
-         EfUimpsIV+1WwgLrpPfTb0UmzjHoky1GK5GWfDLiqIAW8Zy4yIDWMWFjBxLavCIyrjhI
-         a4hJbwWEsvpSLrLbEfDR7tgjES3xpIZ1xn8L/t1rFNxlulSbBYpOxT2fFtuuLKkdjQzh
-         /SZIBc2mprN5iy/uqvSPLpazz3qy+/OMPFGnyogYI2oLOnMdvuEdo9X5FJZV8YDCk401
-         3aOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUo8p2pwKO87zNSd32FhapPlnu3kgCCBVoGTi3dGRFZrrOKKhHjZkgVXWyYqZ53r+ywXrBbBi1cAeGl4Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzY6WVjuo6pootDA4qkAErTBqoXotpOVzzi4336UWGX2lVbbkmP
-	QiU1RZlhe9FjjljRTDSqdg8Bl6+f5PgVrbp2V4zaH9iahg4Mo3HKIbRLAELeqgp4lAmhjfg1k00
-	4kYET+56dSHYvVgh9YXRIQAFdmUPE3dPBygxlAm58GBRijKo4enI=
-X-Gm-Gg: ASbGncu3tcK3WNH+P79uZ4RQb1Hvtu+mR7IUikE1NzaZm32kky8mjfjRyiBpdvU0ekr
-	XDh76DMEmiPie2/yt1Meshdx9kxZD/Df9r7/2bi2xfbZknC5f5XRvoKaZ2Aq1PMfz3lA89ZZjXj
-	6CbXKy0eDi6ZbppTOUGPwz
-X-Google-Smtp-Source: AGHT+IHlt3vaK3BliTnw0lI+Ms8NzrqZUrhNlyJ12QRDWbUcQa+5VsGoQpeDOY5/5ZvA15HNNRKeXOyLkblnIxiWR74=
-X-Received: by 2002:a17:90b:2248:b0:2ff:7970:d2bd with SMTP id
- 98e67ed59e1d1-30a220e1803mr780794a91.5.1745890739528; Mon, 28 Apr 2025
- 18:38:59 -0700 (PDT)
+	s=arc-20240116; t=1745890830; c=relaxed/simple;
+	bh=12cEaqd+nPFPiuGXls/Wex6cbqwVkBYaSc6LG/ur2uM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ncOUcIpC3X1wR3vKWLzhezDrrIv+RZHHr+2duU83lmAhyjXeYduf33fWLwVh06kiHMGKUORW0X40mri6lPHJ/QFzLBgJMNDbRQWCE5bJArjvZu1+sv/8Q0UjQOfT3fNJuVjpQvHBa4IkZp0EQu5223xsZ+61P//FcEk++q+rET0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zmjg33mMxz4f3l7g;
+	Tue, 29 Apr 2025 09:39:59 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id AA1701A19D3;
+	Tue, 29 Apr 2025 09:40:23 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCH618GLhBoB_2AKw--.51220S3;
+	Tue, 29 Apr 2025 09:40:23 +0800 (CST)
+Subject: Re: [PATCH v2 1/9] blk-mq: remove blk_mq_in_flight()
+To: John Garry <john.g.garry@oracle.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@infradead.org, axboe@kernel.dk, xni@redhat.com, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org, cl@linux.com,
+ nadav.amit@gmail.com, ubizjak@gmail.com, akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250427082928.131295-1-yukuai1@huaweicloud.com>
+ <20250427082928.131295-2-yukuai1@huaweicloud.com>
+ <0296cc37-d56c-405a-84c7-4b814496e4df@oracle.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <02558808-78e9-d7c2-1826-8c9551f4f3e5@huaweicloud.com>
+Date: Tue, 29 Apr 2025 09:40:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250427134932.1480893-1-ming.lei@redhat.com> <20250427134932.1480893-3-ming.lei@redhat.com>
- <CADUfDZq4m2ndHPmbWnECXWCYO_o7X-ys37=10gqMMYcO+xEJhA@mail.gmail.com>
- <aBAjlJXxz97F4ZOC@fedora> <aBAtIf4cvR_Xd9Hb@fedora>
-In-Reply-To: <aBAtIf4cvR_Xd9Hb@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 28 Apr 2025 18:38:48 -0700
-X-Gm-Features: ATxdqUHOugEPJ7XizH789e8LR-t8STK4nLoLEL6uSVgCP0Eytr-k_pXVtsliydo
-Message-ID: <CADUfDZoUVe0CJ_1nrUE2y6xehoTMP0_w_mc9or5AB4y2pzx5pA@mail.gmail.com>
-Subject: Re: [PATCH v6.15 2/3] ublk: decouple zero copy from user copy
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Keith Busch <kbusch@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0296cc37-d56c-405a-84c7-4b814496e4df@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCH618GLhBoB_2AKw--.51220S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_GFv_Wryl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6r
+	W5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	F0eHDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Apr 28, 2025 at 6:36=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Tue, Apr 29, 2025 at 08:55:48AM +0800, Ming Lei wrote:
-> > On Mon, Apr 28, 2025 at 09:01:04AM -0700, Caleb Sander Mateos wrote:
-> > > On Sun, Apr 27, 2025 at 6:49=E2=80=AFAM Ming Lei <ming.lei@redhat.com=
-> wrote:
-> > > >
-> > > > UBLK_F_USER_COPY and UBLK_F_SUPPORT_ZERO_COPY are two different
-> > > > features, and shouldn't be coupled together.
-> > > >
-> > > > Commit 1f6540e2aabb ("ublk: zc register/unregister bvec") enables
-> > > > user copy automatically in case of UBLK_F_SUPPORT_ZERO_COPY, this w=
-ay
-> > > > isn't correct.
-> > > >
-> > > > So decouple zero copy from user copy, and use independent helper to
-> > > > check each one.
-> > >
-> > > I agree this makes sense.
-> > >
-> > > >
-> > > > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
-> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > ---
-> > > >  drivers/block/ublk_drv.c | 35 +++++++++++++++++++++++------------
-> > > >  1 file changed, 23 insertions(+), 12 deletions(-)
-> > > >
-> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > index 40f971a66d3e..0a3a3c64316d 100644
-> > > > --- a/drivers/block/ublk_drv.c
-> > > > +++ b/drivers/block/ublk_drv.c
-> > > > @@ -205,11 +205,6 @@ static inline struct request *__ublk_check_and=
-_get_req(struct ublk_device *ub,
-> > > >  static inline unsigned int ublk_req_build_flags(struct request *re=
-q);
-> > > >  static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_que=
-ue *ubq,
-> > > >                                                    int tag);
-> > > > -static inline bool ublk_dev_is_user_copy(const struct ublk_device =
-*ub)
-> > > > -{
-> > > > -       return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPP=
-ORT_ZERO_COPY);
-> > > > -}
-> > > > -
-> > > >  static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
-> > > >  {
-> > > >         return ub->dev_info.flags & UBLK_F_ZONED;
-> > > > @@ -609,14 +604,19 @@ static void ublk_apply_params(struct ublk_dev=
-ice *ub)
-> > > >                 ublk_dev_param_zoned_apply(ub);
-> > > >  }
-> > > >
-> > > > +static inline bool ublk_support_zero_copy(const struct ublk_queue =
-*ubq)
-> > > > +{
-> > > > +       return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
-> > > > +}
-> > > > +
-> > > >  static inline bool ublk_support_user_copy(const struct ublk_queue =
-*ubq)
-> > > >  {
-> > > > -       return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO=
-_COPY);
-> > > > +       return ubq->flags & UBLK_F_USER_COPY;
-> > > >  }
-> > > >
-> > > >  static inline bool ublk_need_map_io(const struct ublk_queue *ubq)
-> > > >  {
-> > > > -       return !ublk_support_user_copy(ubq);
-> > > > +       return !ublk_support_user_copy(ubq) && !ublk_support_zero_c=
-opy(ubq);
-> > > >  }
-> > > >
-> > > >  static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
-> > > > @@ -624,8 +624,11 @@ static inline bool ublk_need_req_ref(const str=
-uct ublk_queue *ubq)
-> > > >         /*
-> > > >          * read()/write() is involved in user copy, so request refe=
-rence
-> > > >          * has to be grabbed
-> > > > +        *
-> > > > +        * for zero copy, request buffer need to be registered to i=
-o_uring
-> > > > +        * buffer table, so reference is needed
-> > > >          */
-> > > > -       return ublk_support_user_copy(ubq);
-> > > > +       return ublk_support_user_copy(ubq) || ublk_support_zero_cop=
-y(ubq);
-> > > >  }
-> > > >
-> > > >  static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
-> > > > @@ -2245,6 +2248,9 @@ static struct request *ublk_check_and_get_req=
-(struct kiocb *iocb,
-> > > >         if (!ubq)
-> > > >                 return ERR_PTR(-EINVAL);
-> > > >
-> > > > +       if (!ublk_support_user_copy(ubq))
-> > > > +               return ERR_PTR(-EACCES);
-> > >
-> > > This partly overlaps with the existing ublk_need_req_ref() check in
-> > > __ublk_check_and_get_req() (although that allows
-> > > UBLK_F_SUPPORT_ZERO_COPY too). Can that check be removed now that the
-> > > callers explicitly check ublk_support_user_copy() or
-> > > ublk_support_zero_copy()?
-> >
-> > Yeah, it can be removed.
->
-> Actually the removal can only be done after the 3rd patch is applied with
-> zero copy check is added.
+Hi,
 
-Right, I just meant it can be removed in this series.
+在 2025/04/28 21:45, John Garry 写道:
+> On 27/04/2025 09:29, Yu Kuai wrote:
+>> From: Yu Kuai<yukuai3@huawei.com>
+>>
+>> It's not used and can be removed.
+>>
+> 
+> it's nice to mention when it stopped being used.
+
+Ok
+> 
+>> Signed-off-by: Yu Kuai<yukuai3@huawei.com>
+> 
+> Regardless, FWIW:
+> Reviewed-by: John Garry <john.g.garry@oracle.com>
 
 Thanks,
-Caleb
+Kuai
+
+> 
+> .
+> 
+
