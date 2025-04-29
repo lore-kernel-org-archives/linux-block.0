@@ -1,102 +1,68 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FA0218ABD;
-	Tue, 29 Apr 2025 13:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB1B2163A0;
+	Tue, 29 Apr 2025 14:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745934188; cv=none; b=u93Bu2HsIqvElTkRBpzDa/dV7Yn9Z1DJ5LEwVr9Bmqo7y+rsFFxItroe4LYNu1qx5TP4020/cx0H/7pTucSE6AuEzlsJcXghT7TnzGK0iY3nB2J5N2I2+NEFWsDMDZT5xSTCmZ3wpLDvT0QyGFHrGQNsATkuuBPvq6FzcYPb1YY=
+	t=1745937528; cv=none; b=hmI1OQvqICLy3iM0P9SxV9NfkHgzD8U2KJCLAh1pJpmLTXmctFD3scmiWcUw1HWBl0tik5wgG46S0MBRXerJeQkZble1/tBnMRHXJeTvvxBAH9BOrUkLyneAGGcGWMfPmK+GfebBOOHWcXlq1i7Kw1nL7aerQ1zK+YerfdxwM8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745934188; c=relaxed/simple;
-	bh=Vx+bHAFekPXfETD9fq70pqDMxN6RbR5TAqSYQi+2Gtg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FnOA6DJ4dyeG2xUkzRPE0CJpi96gcUjpuB8P9Td5eSsa9hWhNKQUDSLVXDD2YyaUWI9nTvBu1aWByMlqxts91qj66sjUH54Iun2XrQGVvxEB6q7yJ58s8m7lIPAKEtx+N2xkZW7kRHv+OIosvpNCAH5NFEImDj6v4ludA8Gohy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf848528aso43240845e9.2;
-        Tue, 29 Apr 2025 06:43:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745934184; x=1746538984;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w3HYGQoa2zNu9TAqoGEmSFG4Pv03gni7UfWB5sdbBAU=;
-        b=QD1IhVUppSTotJwlXU4SokD5MJiAbb8V/Z6d/78F5s/bZ/U6GoezR3U+Hxw6E9xgu8
-         XPQB5DyWOHcOgOH23zWgg5Bevvg+tgqQK3/kCbEVg4QlGD16Y6xAuwrQRrnnY3JnlQ29
-         DJfcBNkKHa3izAqvRRQguVRrmOhHWErbGHIvGngaiT7+xtvlixSAUfrE7HFg/Q27vg4f
-         9dlmKayDPP7htcF+8xnlKAHjExeAOCRGXhCgKDrCXcOEux/p10hBMo2VkDuQdm2rWmU3
-         JZ4UL2uPN+tQmUu0ORmAyX69/rH7Q7aFUANuq5PpAiI1SLvID3jCZDlEVUJdOMwxwhZn
-         gy+A==
-X-Gm-Message-State: AOJu0Yy/hYzdT3oE+leMFPZ3V+mtWdpJKhc+9/ftTs3LZCWBjFgGSZxe
-	tNzNzeQrczjAE+RClRFOPVBzpcINW9JqA+6Mkwa7AtMAmwB/N/Hf8BWrYA==
-X-Gm-Gg: ASbGnct5ihxbynPvoLJCr9VR+4nD4ybTrnfAFkqncybbndcKHM+u5jOUrShpfyv9o/7
-	VloqNPDFnIpQZf3VSHg9hMV8Ot0zL90PBcFRPu4i/0fAudTa8WzFRYpVoenAMlu5kimIUNbN2F+
-	5tSfje4Mt4PpmN4RL3dJ2yklDf4zfONSAtCiynsPSKysEFDmnzN9sYJxzd6s5S+6Qfnkb+beMkm
-	LD6B/R7zx8Eu2erF/3q2Tx3O5GF+3Nt1Y34GbGpX3qBVtSIgtoZ4MVLr0P5CUkBNh4iA+LQgDT3
-	L/9x2bS9XcZQea08kyvAvPoPduNa5eahLux4iGntq6GLjMpWE07mHtfBjBA96N3cDAr+KdJdd79
-	YW3ZISKU2Oj7uwlow7Aov+fdPiDi8QofIpw==
-X-Google-Smtp-Source: AGHT+IG+E02YDGlPfIKtmJhmx+M82MgB5nZwuA2e2fPiATl9VAv4dxXeMZl5jOtmc2LOxP9zm4GpSA==
-X-Received: by 2002:a05:600c:a44:b0:43d:1824:aadc with SMTP id 5b1f17b1804b1-441ad4fee66mr22871575e9.29.1745934183531;
-        Tue, 29 Apr 2025 06:43:03 -0700 (PDT)
-Received: from nuc.fritz.box (p200300f6f721c200fa633ffffe02074c.dip0.t-ipconnect.de. [2003:f6:f721:c200:fa63:3fff:fe02:74c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441af9c8769sm11156705e9.16.2025.04.29.06.43.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 06:43:03 -0700 (PDT)
-From: Johannes Thumshirn <jth@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH] zonefs: use ZONEFS_SUPER_SIZE instead of PAGE_SIZE
-Date: Tue, 29 Apr 2025 15:42:53 +0200
-Message-ID: <c14f62628e0417498ace0caaa1f4fef2cb0f8477.1745934166.git.jth@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1745937528; c=relaxed/simple;
+	bh=kZjoUjt4BR6vPfSrpHj0Lg/HIVD3ZWL+zVGn7l59AbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yx9ZDoZMNRuZb2G0jvRR27IDkbvBfQeSZxclqs0ycg5Gz7bNexa+qRhR4eB2i2A+QsuNUBEM2nZkj0tAJrVgW6WiHOOQ1JLjVXhyludK6fBNHgcReWrL0RjO+cU62xuZ0T3JGE65Kn6z47b6ggTCPYFIFQ1n608lwokC1wA5Fts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BRyZ9rE3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BRyZ9rE3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618DFC4CEE3;
+	Tue, 29 Apr 2025 14:38:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745937528;
+	bh=kZjoUjt4BR6vPfSrpHj0Lg/HIVD3ZWL+zVGn7l59AbA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BRyZ9rE3f4fbT4LnQMwNFbP6EQrMEoABbqfy7/Df7fT7KBqdg1FlZppyWExOEtlMY
+	 E9BQaSxZWJW3tQut/x7QiKf39Z/fK/zvCUA8Nva4s/XKsKUx05WDrQN7jBoTA6lKeJ
+	 u9OwkjDV+eOWwD3U9tTSvqSTaRIrbm9HF1G00SVBgRrB7+WP5TarDg2zcWlX13sCoW
+	 puL+IDASQBDh3yFhTglld7Ju7Zw8rdlKM/5Z/dJZqgEkcFGUS+TW89jrIk0ND51mN6
+	 0SmInBfQ2l/XIH2zy02rKNzW29vgEO5UqftsfV4nWTzlG4N9tCZl98pN0NnaEehNuY
+	 s/Nz9Q94Gk/QA==
+Date: Tue, 29 Apr 2025 07:38:47 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: John Garry <john.g.garry@oracle.com>, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, cem@kernel.org,
+	linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH v9 15/15] xfs: allow sysadmins to specify a maximum
+ atomic write limit at mount time
+Message-ID: <20250429143847.GC25655@frogsfrogsfrogs>
+References: <20250425164504.3263637-1-john.g.garry@oracle.com>
+ <20250425164504.3263637-16-john.g.garry@oracle.com>
+ <20250429122211.GB12603@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250429122211.GB12603@lst.de>
 
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+On Tue, Apr 29, 2025 at 02:22:11PM +0200, Christoph Hellwig wrote:
+> So I guess the property variant didn't work out based on the replies
+> from Darrick last round?
 
-Use ZONEFS_SUPER_SIZE constant instead of PAGE_SIZE allocating memory for
-reading the super block in zonefs_read_super().
+Correct.  Calling setxattr on the property wouldn't call
+xfs_set_max_atomic_write_opt to change the operational limit, and I
+don't want to start up the whole magic xattrs discussion again by making
+xfs_xattr_set do extra things if name=="trusted.xfs:max_atomic_write".
 
-While PAGE_SIZE technically isn't incorrect as Linux doesn't support pages
-smaller than 4k ZONEFS_SUPER_SIZE is semantically more correct.
+(Though iirc you were the most opposed to magic xattrs, and my
+opposition is 45% yuck factor and 55% "hch will nak it anyway" ;) )
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-
----
-This patch is based on top of Christoph's series titled "add more bio
-helper" specifically on top of "[PATCH 16/17] zonefs: use bdev_rw_virt in
-zonefs_read_super"
----
- fs/zonefs/super.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index d165eb979f21..4dc7f967c861 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -1113,11 +1113,12 @@ static int zonefs_read_super(struct super_block *sb)
- 	u32 crc, stored_crc;
- 	int ret;
- 
--	super = kmalloc(PAGE_SIZE, GFP_KERNEL);
-+	super = kmalloc(ZONEFS_SUPER_SIZE, GFP_KERNEL);
- 	if (!super)
- 		return -ENOMEM;
- 
--	ret = bdev_rw_virt(sb->s_bdev, 0, super, PAGE_SIZE, REQ_OP_READ);
-+	ret = bdev_rw_virt(sb->s_bdev, 0, super, ZONEFS_SUPER_SIZE,
-+			   REQ_OP_READ);
- 	if (ret)
- 		goto free_super;
- 
--- 
-2.43.0
-
+--D
