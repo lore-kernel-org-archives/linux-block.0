@@ -1,207 +1,178 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F342C259F;
-	Tue, 29 Apr 2025 11:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745926756; cv=fail; b=i6IHNpSwKCgUwJjkAXniLMZ6mfFI62suwzrtbyrPzmhNUy14eTyjKVrN0VDPENVpaskh/PLadEch9EuVJcAnJjInlsVW470Xzt70qSQauc+scBlL533PWiC54VKsZ/MUn0a3aTC3b9aXWglrw6PdfWS4A4PvmQ353htvbxUu7iI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745926756; c=relaxed/simple;
-	bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=S65AqDLztO/DLZvycPuoWolCN/afgEWkwAfphqp4KJak4c0twmZdaZ7pld0Pk0twYCysC97nErDg7TBJCZovSl16n4CLzYF8fwzmY2bEuiaR791D5W0lffW/7ItA/4vAo2XTFlorByaPBclFj6OCZkz0/jLwe6iL1F5ONpGMQkA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=H4ueW39v; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Ui/8cS8S; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24582D322E
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 11:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745927077; cv=none; b=igrjdMzzR+jo265VOaRRE6usuWjVUXwRhhhCyQ6pKUT0OdARIdBVUto5on85bltkTWN4/c5JDwu5Dejj0gx11ERI5MYJWyKFImTDBAC/LOqRm90VsRzYeSezvSxy8MnnR8yNWgZgDeaZd/VJXuMDT4UEf8QugY8fSeIpq/OjzXU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745927077; c=relaxed/simple;
+	bh=4vcRTEE1p4gHLVkWgtf0fYhZp+LO0lNCHFeQzHhFmk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WRTfxF0QIKDO7GSgSs328pLHuXbW8mTpB4LKS8/XjX7gPlHi2glXBTJmEneBiHoaUn+oZSSXA3eL1dsCBDHuLtwyXdUA7U8hLaxzLXfWxPE3t1ZMq02w9azjqMhi1hHVvrD21e7j912O7WeLlBvJiZlq3ZezDrsR1+8oP4B1BjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=kXP45FYg; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="H4ueW39v";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Ui/8cS8S"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1745926752; x=1777462752;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=H4ueW39vQcceUFG6Xhp0EQfrHoEH8D0CqNY8ABN0FzKKAUeT5Ravub/h
-   acV2H33F2fr8MQlsXg3W3yqX+kBYih8Jdbt7/Ho8YlwPfNwls6h8wEmOK
-   WSu++9UOhpjIqQpyCMFwFBdBr0bVKaW/V1uYubLeyKTKJNj7Alug9fruf
-   YOAiVkP1i1Q1LXdp1XPxY9DnXsjkJlMA9jRyJ0BlXv2DZ+bw31guS1Odh
-   lIy1gO7bHJDXVLNp/b7HrnI371QwN9dRu86UxWR4kZ61f0DUTolfHDqbf
-   m/QteOxAR3zB0Pm0Ar7L1DzZmWFNAkYpVLpDesbqlRD5efBChJa0fnWJo
-   A==;
-X-CSE-ConnectionGUID: zVNUFkc0TqCDqGH0hAq6vA==
-X-CSE-MsgGUID: RhwmsS89SIy45cigUXG9pQ==
-X-IronPort-AV: E=Sophos;i="6.15,249,1739808000"; 
-   d="scan'208";a="76813483"
-Received: from mail-northcentralusazlp17010000.outbound.protection.outlook.com (HELO CH1PR05CU001.outbound.protection.outlook.com) ([40.93.20.0])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Apr 2025 19:39:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cpg/Z+XAwTtK8zecIeCnhrUGs342oxaiSYKMiUYPZCEqpoaDwUq9KjuVIvV7jMThKJ8k30whsm0Kstafi2FOD55byqFc/wygqaZfsiznAJ92HoCRl+UzLl7ZoCNyPQ0bQK58Zd2UNGIN441OIm8ve4p+xDnn5DoOlOxr2C5/LjM38m7fk2emw9qRguk3oha/pVzmhUQw0FoCux4D97BMHGSIriDyggBbq4OuDq5dw318mN1Qx0Qnsw7bOBDDvmQDj3EM2Clv04O+B85fxFsAvkcZMZ7ioE5uVPS83r+xiSWIx5DX4Q0wCa3T6ylEYYgNxrTsBkS/PGodE9EN4FKjDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=i42WKfZ14GRT4qKc7Jc1klnMyaHVkVPYhUY5ixoPdLrLKrM0IHm3SAUQNFWaH8CoXj3SknNzTR5CiA15ZCsBZRm8lOAocwb4Y4+mSdUuEYJWGMUfMb91tEXshoRvWCjSNY67h7Pg3MhY1EmeW2JfCPswAk9SXGR9z/u2Nv+PjpnJ4zDiJyt0DGtnorNf6PmDJHmwWCI+x0rZtKdwEpU/X9Qv20HR1PJ/r5IoUQsTVPLa3ALdu05OjYiLE+L/iCJfHOAAETI8AkK89oa/bnyfDHt+K/Cj7YliFQ7c9MDKaSXECnAi5nAuobroA9QqaijMR++k8+Ot2JWeQb14bYRPaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kXP45FYg"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-736b98acaadso5584379b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 04:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=Ui/8cS8S4Mr8LsFF4knzveP77/1BEZo8AorOXh29KER8lV4mii+XnAUssQD4OunWRo9t3Z++doxzBPHHup+LBJ5+T7bWldhNychiI4tiuyObcylgxjuzLWYw39WBYLI6Qg0ww8Fuj7PtZEMwt0rlmiwcXjpW/asBX13n4PqsLG4=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by DM8PR04MB7749.namprd04.prod.outlook.com (2603:10b6:8:3a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Tue, 29 Apr
- 2025 11:39:06 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%5]) with mapi id 15.20.8678.025; Tue, 29 Apr 2025
- 11:39:06 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Md. Haris
- Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>, Coly Li
-	<colyli@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Mike
- Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Chris
- Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
-	<dsterba@suse.com>, Andreas Gruenbacher <agruenba@redhat.com>, Carlos
- Maiolino <cem@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota
-	<Naohiro.Aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>,
-	"linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"gfs2@lists.linux.dev" <gfs2@lists.linux.dev>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
-Subject: Re: [PATCH 14/17] hfsplus: use bdev_rw_virt in hfsplus_submit_bio
-Thread-Topic: [PATCH 14/17] hfsplus: use bdev_rw_virt in hfsplus_submit_bio
-Thread-Index: AQHbs5NPa54zHskPPEe7I4gNgsuIvrO6j3kA
-Date: Tue, 29 Apr 2025 11:39:06 +0000
-Message-ID: <167bb670-b4dc-4b92-a078-459e96a20f36@wdc.com>
-References: <20250422142628.1553523-1-hch@lst.de>
- <20250422142628.1553523-15-hch@lst.de>
-In-Reply-To: <20250422142628.1553523-15-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DM8PR04MB7749:EE_
-x-ms-office365-filtering-correlation-id: 3524908e-b5c3-4252-5d7a-08dd87127327
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?MUJWUGd0K001NXljSFJpNCtMS2hVMVUxZENKYzZvYi8vcnpreGxYWTlLbTVX?=
- =?utf-8?B?OWxZbWJvWWNwbHFwN1NveXVMWXp4RFR1dXNjZm1GUlgwcFRWcjE4d0JVZVo3?=
- =?utf-8?B?RDJlZ2FGcUtEODR2MkFPNGJXWldRaWdVQXVRUDVwZGYvUm9pdHVNS3phOE5Q?=
- =?utf-8?B?TnBLZThyNlJlcjgrYW5vVXY4SUdKWitodFg2Q1NPdTJEcDVhVWM1TndLd2pD?=
- =?utf-8?B?ZDBOa1pqZlprMkRYUWhPNHJwLzBlVEtlZVdMWkJha1NYVG5wM1NFc3VLVytB?=
- =?utf-8?B?WXlDYTZGWjlXNkJnUHQrLzhrZHROUUxzYVZGbUdISDNTRU1qbU1WeUJjY2F2?=
- =?utf-8?B?Zms0YnFuQTV1WFdOeGpXamhkeTUzb294TU5qY3RXdzRhWlVBc2VFMGVjQ3BQ?=
- =?utf-8?B?OE1OZlFwYmZiVmo2RTRDTE9RUjdWYy93N1Fkd3BpQlNvY3Qva2duNy82Rkhs?=
- =?utf-8?B?WFQwYlkxbnlRbktDaDRhMGhXeXRuNVMvZFcvb3FieGs1YWJnc1JsYjJUakxG?=
- =?utf-8?B?b1ZxWEZOUmV4bWhPMWlpNjhCM3VESDhJQzdCUVlld3ZaUElRbHhLUk1jRHZq?=
- =?utf-8?B?bFJ2VS8xaWpWekxDODN6dUdmUHhyTklKQ0FKcW5lejhsVWlIU3R1UnVOZ25Q?=
- =?utf-8?B?dStGa2RNcy9OT1pWQzhTYUdybVlKWXJoRU1FY1l5K3ZRMWZ0YUJPbXRHWHRV?=
- =?utf-8?B?MjFxanlFem13ZFJ6YlpYVExFNTg3TkFXMEI2ZytER1loOXAxY09mbTU4TVRT?=
- =?utf-8?B?ZDhJeGtIRWZUcE5FU3J4Wm9LN29JZGM1R25wNFV2TjJBdWFGSkwxZ3JRdXVv?=
- =?utf-8?B?T1FmYWRFMndoUmlzVW4vM2tlUTVQR1ppdEk0UnZDQU5XbnJnVEY1cmRLd0lQ?=
- =?utf-8?B?bDV5Nk4yTDg3WU9lVHJZbDZIWWFpY0t0UjZjVURxeUdhRC8yS1cyRjh3M28x?=
- =?utf-8?B?Nkc1YUs5bmZjMGxpZDZIVEoyZlJYV2RidlFGSTJER1JQR3hzNmdnQ0U2NGVt?=
- =?utf-8?B?cGJHTmNDZTlWMFRZbS9XcTEza1VjREhVeHdnQ3JIaGpxNjNhUmRyZ2xKWVBF?=
- =?utf-8?B?RUttY0RuSTI1eXVCSVgwNGNicGpNd05MNCszeTgvNWt6aFFPWSsxZlloNUZC?=
- =?utf-8?B?UTRWK3NWNjFUQURhenpFbmRldEhIR2NCbVRUMm9oY0JiOXJwcDRod1lYZ0Fk?=
- =?utf-8?B?NnhhdnZrZFpka2dQU09YM2xTSTdWSG9iVCtnS1hHMTV5L3Rub3p4R2wwT3Vp?=
- =?utf-8?B?WHh0cnlwejRrOWcvRmJIVy9nOW02bXliVVdtcStOOWlGTjlCWEY4em1sejRB?=
- =?utf-8?B?cmxVd2kybXBwZGk1UEcvZVhLeWFWdVBWenl0OTJEanJKb2VVS2JBM2JMT3hH?=
- =?utf-8?B?cng5TjJoMkZ4d2VSZm8wNVE5Rm5pdUxPeldEcDdXN1huSjdMNDNJcWM4U1Jz?=
- =?utf-8?B?NmJPSTJNREtQRDJVc0w5NnVtUlJrSWY2S0RsaGpPMUVIT3Myay9NaFJlSkNO?=
- =?utf-8?B?Y3NPMjlNcGltQUFsVnlyWHpYRmNmMHd6d3JvNkVxeVRCSmtXZ1h5MVU5YWhY?=
- =?utf-8?B?M0xzMk1OcFJkbkc1ZlNRVUxMSUhIbG1mK0hubWltK2ZpcTQvNzFOWEV5S1Ft?=
- =?utf-8?B?WmZjME5ObFhCOUlVT0MyaEhNQk1Ndm5pMEwyTm10Mm9rT2xYVDNGbkJ6b0FE?=
- =?utf-8?B?bTRiUitDcmJ3bkx6aGJBQTBlcjlrSGM3ZEgvMTBaY05ETUd3TDNwNGt0T0ZM?=
- =?utf-8?B?ZHdyZVpFd0JNc1F1eWRrbGM0ZVE4K1FYdGM3R05GYm5INGZpQUlBaHdod1Rh?=
- =?utf-8?B?bVdiS2VNUnBadm5HWXJGeTQ5eDA2M1NqUURXUkFRNkVBbkg2WmNSVjJwR2Jk?=
- =?utf-8?B?L2hyNzQ0c3JQUGZlTVJ1SVJsYnk2RXNrcE5DdHBEK2NFekUxZ2ZpRW5ocFov?=
- =?utf-8?B?dkY1T1Z2QTVHNklOZnBNMkVXb1FIZ2I4R3dicEtkN0lrNmZrdjMrL1hxRzk3?=
- =?utf-8?B?R2VCTXVmbzlRPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?S2RlanphWUVRMWxmdzVpTFZZRGZmaXdWL2x2UTJ3MEcxQUYzNEs3VG5TUTU4?=
- =?utf-8?B?SXBBZmtFZGMrYzZnTkY1djdXbTgxcUcrWGhtMUZTb0dscnpjT0tJVXgwTi8z?=
- =?utf-8?B?eWZZQlRVdGZpa0lHS0l2c2U3UzUzQ2Y0NDhCZE9zMUF5VlRBUEM2eW1LbzBP?=
- =?utf-8?B?d2loSFdGQ01XcExnVnZwTmtTNllEdDMrNGJBSlViRWRTMW9mUFEwMjFmaG1u?=
- =?utf-8?B?OVY5OGQzWmlESk9qczlHZnhFNkhpYlNJVWo0dXlrTy94cmhiQXMwWnF2Mzk2?=
- =?utf-8?B?QisyaitpRDJlOXZNUTg1aXFkMmszUDhGN3B3QUM0QStBQUJFd0czNERxNzdO?=
- =?utf-8?B?UndSWXNqcmtySEdNTkl0VWd1Tk1NSjBqd21XamZ3VzFPMktaVGE1dndGQ0Rv?=
- =?utf-8?B?cFRNL1BPVjBFSVl3UG1wNDlrZTN2NGZxYTFwcTZzY1hkL2RpUng3QzBRTVFV?=
- =?utf-8?B?QnJGNXYraTJBdG1qUlVvQkFYS3dVaGlqVnRpZUJXUEVtNGh3S3RtT3VhUU4y?=
- =?utf-8?B?STF0bmhydDdjVlk0L1RueXlYRElhOFRqN2NWNVRqUDQ4cDNSOTY4OVBuQ2JT?=
- =?utf-8?B?QS9jVjF2ejRWU3RlU3FvVk9Ja2hNVVcyNktKRS8yYllITEliNWJ4d2dZL09X?=
- =?utf-8?B?NFlJRzlUd0RReVY2YVRFelpRMENSZzFEMld0OXRqV2tOUG1VMzMrMTViTmtl?=
- =?utf-8?B?ZzVXbitJUFp0M2VNMkcwUDlCSnoxcWZhSVZqVkkxS0prcnN1MlJXQ3dQSmpx?=
- =?utf-8?B?VW1FMExlYzgrcXJOSVBtQjdHWG42eHZSQ0hUUnowd0ZHZWswOVdYWlg5VWds?=
- =?utf-8?B?VWZpZFdJeVcvdERwenRRQ3dxWjR0dEsySytJb1lXc0tGVFlaUytLQkdMWFkx?=
- =?utf-8?B?NGZtWlh5NDRWRUo2YTk2ZDBXNUY1RHFXSXU5MlVFWklDbHRwSHZMT1d6MFhw?=
- =?utf-8?B?N3BwV2ZseGdhUDRMUzlsK0pVZFhVaThBRGZwYVk0bmxrak04eUpsbEdrUndy?=
- =?utf-8?B?K2ZrMmpjUWNxam4wemdaZkVZSXpGdFFPYnF2QkU4TWxlNWJsU0NsdXJBZnFm?=
- =?utf-8?B?TUFaZlRMV3ZBSVRyOFU1NUliVUdkeDYwQnp1VVhtN1d6cGZ0M0YwTzREMjlE?=
- =?utf-8?B?cU9ZSmlCUzRDT1FzWTgxSFJTNGtBUVNzd01IWnRMckErVzhvWkdtUG9UOUxL?=
- =?utf-8?B?OHVqeXgvT3l4dkVJQVRmSmJjKzQyOVNlV21FU3dNakN4d0Q3TUdNQTJwMWlz?=
- =?utf-8?B?eW4zc2d3SjZTTWJadjF0MVZkMWFxVVJNUXB3T3F2c1pOUExmWEVyNGlsM0Vz?=
- =?utf-8?B?YlpmSzR6UFhKemNBeXFrZzJsZEQySElUMkNZUTQ3ZStRQkhiRGdYdXdkNjRV?=
- =?utf-8?B?c2NMeXpIL0R6aWlYVkRBdzJVamxCeUYxWlNpVXB2K1p3TzFqWnF3UEZPakI4?=
- =?utf-8?B?VGRJcG1tOFlJKzVKTXArYmJuY1ZCdnZWTUtaREpncHozSENaTVRYVnZoUVdp?=
- =?utf-8?B?ZWZoVmdpUm9mNzJHa3BXMHVNdHQ3T0l0WHM2R2srK003ZjlseWdtdWhVaHVs?=
- =?utf-8?B?ZkkzSVl0ZFRQSUxRRW13ZUpnNk5Jck5ldjY3cXd4R2dydi90bU5rOGFteEJB?=
- =?utf-8?B?ZFRYTzZwbFVuNlA5YjArSVZoeTlTUHdzVkN5cDhheHJwdG5jcmhhbklTd2pF?=
- =?utf-8?B?VERMSjVmMVBpOVJuZ0RRbjlacjkxM2pSK0hKQTdQaHpsZjV3aWlORGdndDR4?=
- =?utf-8?B?eURPbXA4S2pjU21hVFBMMFlZRHhtQUdML25UbmlRQkQ4SWhTditTOEJZa0k4?=
- =?utf-8?B?MU9rTHhaVzljbHZJdEk4aGhiWkNTQUlLckRMTHVnOFFOV3RiRXJRb0Jmenpz?=
- =?utf-8?B?cThxRGFTL1NVRUZVYjJXYUR2a1NIdGRLZ2RLYm91TDVMcFZpRm5zSU9rdlFL?=
- =?utf-8?B?UTlZa3J4eWVhTXV4eTI0RVJJWkNyWk1sNyttb0hwVnpZYVNYTGUzamhFMStG?=
- =?utf-8?B?elVWdTJjZkRyQU5FNFVNaERNaStnWVVMaXh3OUMzSnRhQUxzR3ZJMHBydHJ2?=
- =?utf-8?B?RWkrQnA0NnQyUnNvZlFGcXpjZlRmVEpFYkNXZ2JNYXZzL3JHeXhjWmdDRkFo?=
- =?utf-8?B?WXZmRXp1ZVlVNy8rQzFrUHFoY0RHMFgyVjRWb0puSXNYcjJXUUUwWVJETTBD?=
- =?utf-8?B?WEE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <60D6CAB77479B0429826DAA05E812DBC@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=bytedance.com; s=google; t=1745927074; x=1746531874; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzJHSP3MS0syJfOa/96YV4wvogpjUA3oAjisshOP/+Y=;
+        b=kXP45FYgSt3zfwvFt/ln0igXoDO18HD6sno0F5xmrv/GhqPimsAVErVgvxNJI8mFh0
+         kbcuRWnx79XBZIr+02xBOJVI2mKcp10Fu0n+WGK6Ym2lsQCv/F/UEUivl7scsrnXRoTB
+         db/3FDapQBUJkgRd8dG05RSMX5n3CusWPf6mbv1PQB+BNsL8djm79snWTREAl/Hgn2CA
+         76+xSYBB3G/7wfGzlkP6UbvRLGo/PEGyD1+ppByMoWd3dbjPwarNE/4CgMq8Vvwim0L7
+         9+gO6UaOAc+Gm+mRZuu/J1p3GRyeTD3+ucxMFaB0XKPeFAn1j2AdZ2Zkw66ajDOcVj7e
+         9VpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745927074; x=1746531874;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yzJHSP3MS0syJfOa/96YV4wvogpjUA3oAjisshOP/+Y=;
+        b=cQk9AtaL1eJd6qAwVt+Ggqb/QUs4OExeCkKdg6yCU/T7bIFcJNMygki971jPpHndaK
+         xRUxuQgcSnNNmC23vpZb6zkzmMq6eKfvH3svP09tYT/Xh2U1pmR4nJXXyYdBy/ZO8D0V
+         Pck2i2Cze6Cw8mx5q2c851ULQcKYSjsU2KnJEP7HWK2eAaNcmmnBqj2Fc0bJ0RImTFfv
+         E0rHzmP5dJrAGrM69RwW87Z6vikO359EH4XgWd8YOBuFxbQgRQYunQYNurribv4buMbD
+         UnWlr7pPvv6w1X/YONjOClgZ20bkHBw7nt/MVSGXeQA4ep1YnICFuMUEDZYqoRO6JoVt
+         HeSw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyCFwrzdw5TNFPJcg76Xr65407UliTWBduFedUYs5Io4mS+Z7cej1QdWlv/BEvYEZVztBQbT09YCb4cg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVc1yWn4TPgQCZtSEX5td13E/sxp+gc90nzmaCy6whXo2tqam8
+	MVoaf2x/Z5FSDPx6CSxCjocHzKLD8opGzPBBf5aH3x90jXioyH+tFaREVWpK7g==
+X-Gm-Gg: ASbGncsRIeJqVL0c56H4ScrKtLqUZItKLLWboPYH1EoExjzrb7y8pq3r4trl7mbDZNP
+	CqvY5LtvivR5LFGqLBcRacmhaFsu9HAJnG0y05ZvmGVaO0DlSyG6eAowvkV/JIFshB79TE6oSJ2
+	J+oP033krSqoCSlDdG8RfRpxFb7gzdshh7gXsgnxRuNyCdVyinOMiF07XrRzSRQxd96LxSdq2iR
+	V6FK93yl9NNCqPTDg+bFr32PYYxDCsA42weDvRFGac4SfcoJIeqTRZt4s6GC1mGmfYaoQ7BX5nI
+	raFbD90/gG0vZ2j96OauBsrQvyhpsZICd7vT7M6z
+X-Google-Smtp-Source: AGHT+IEYgwsVKsbtIYVQP9gwgDywBl/zdKA1+1Yjlt44G10TJc3OlBVSAXYAq91oHtaPyzunvUH2RQ==
+X-Received: by 2002:a05:6a20:9f8d:b0:1f5:591b:4f73 with SMTP id adf61e73a8af0-2095cec6f1fmr4302271637.34.1745927073977;
+        Tue, 29 Apr 2025 04:44:33 -0700 (PDT)
+Received: from bytedance ([115.190.40.14])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25912ad3sm9981561b3a.13.2025.04.29.04.44.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 04:44:33 -0700 (PDT)
+Date: Tue, 29 Apr 2025 19:44:28 +0800
+From: Aaron Lu <ziqianlu@bytedance.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Kexin Wei <ys.weikexin@h3c.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [External] Re: [PATCH] block: remove test of io priority level
+Message-ID: <20250429114428.GB3896701@bytedance>
+References: <20250429082934.GA3896701@bytedance>
+ <adca39d3-04fc-45f5-8e34-0d06714f0ff9@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	8zHdnfqeDkIz1OIZaY66i2/nqEEIfChq7wTmrezM4LxxKgyg+8i/6C3FH6MhHOpW3Z0qPjeE+tNDcER4lySnj9c0lMlPadT0l9P4SdIHotidpY31jSFkN8h1KR8PZvBiI0phr9yCgbXMPar2Fojzi2NU9T4/WHP+vbEwsTa22hYm93osTt4DPYpHEOTOfXr5db4xGfPSksxQLtQTq4bWDEYa0ZGzI41SiptMGtmizj+3nylCifpwy6lJAVNrmJvG0HoJRi6meDfSzbjFape2npnOk8WOSiOmtiIvWQ2uZo0IjyIYdBxGL34nSqLm8Ou7589yFAukbSWMShdwYfpxdmC5Iqu4nSKY3N75nxkoH4ytF2noZrdc3xyDd0vQoJgSrErZTHv7H9Ea1f5cwHCDi6KKuTfVRmjotCh7yuQ4diyE4U0WopT8miZr31vXvgAcCWKsRXVGyLWItHj0mNDkFAQTZj5QVK6/A56tLmbfFHkQf8LBS0xMKMYlVkr2J8F6opGq6+elNg7UNWagIN0g6vBJjyUJ8eOAAO1z28G+kChkl6uQ44LAA5frkSznca0u7J5edYpGhqvFuO5iwPCSfHNOojt+cGy+G0q+aDr30Ce8yY2gsnjxG4fHWQMSqaZ8
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3524908e-b5c3-4252-5d7a-08dd87127327
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2025 11:39:06.7180
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9Tfx29GEzQfXDer8EzikR3d5kSuFcz26CdvpOGR35FpNWDA8imXJiqLlpuKnRDNxeRL/JjKzwG4R81gRES/VPUxwLc5LmXnvBmi59D0l58U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR04MB7749
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <adca39d3-04fc-45f5-8e34-0d06714f0ff9@kernel.org>
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+On Tue, Apr 29, 2025 at 07:50:11PM +0900, Damien Le Moal wrote:
+> On 4/29/25 17:29, Aaron Lu wrote:
+> > Ever since commit eca2040972b4("scsi: block: ioprio: Clean up interface
+> > definition"), the io priority level is masked and can no longer be larger
+> > than IOPRIO_NR_LEVELS so remove this now useless test.
+> > 
+> > The actual test of io prio level is done in ioprio_value() where any
+> > invalid input of class/level/hint will result in an invalid class being
+> > passed to the syscall, this is introduced in commit 01584c1e2337("scsi: 
+> > block: Improve ioprio value validity checks").
+> > 
+> > Reported-by: Kexin Wei <ys.weikexin@h3c.com>
+> > Cc: Damien Le Moal <dlemoal@kernel.org>
+> > Signed-off-by: Aaron Lu <ziqianlu@bytedance.com>
+> > ---
+> > Kexin reported a LTP/ioprio_set03 case failure, where the test would
+> > pass IOPRIO_CLASS_BE with priority level 8 and see if kernel would
+> > return error. Turned out she is using an old kernel header where the
+> > change introduced in commit 01584c1e2337("scsi: block: Improve ioprio
+> > value validity checks") isn't available. During troubleshooting, I find
+> > this priority level test confusing and misleading so I think it should
+> > be removed.
+> 
+> What is confusing and misleading about the fact that we support only 8 priority
+> levels (0 to 7) and should check for it ?
+
+I meant when I'm troubleshooting this LTP issue, I looked at this level
+test and had no idea why it didn't work.
+
+> With that said, the test is indeed redundant for the BE and RT class because we
+> have:
+> 
+> int ioprio_check_cap(int ioprio)
+> {
+> 	int class = IOPRIO_PRIO_CLASS(ioprio);
+> 	int level = IOPRIO_PRIO_LEVEL(ioprio);
+> 
+> And the macro IOPRIO_PRIO_LEVEL() will mask the level value to something between
+> 0 and 7, always. So necessarily, level will always be lower than
+> IOPRIO_NR_LEVELS. So please reword your commit message to explain that rather
+> than describe what a user may or may not use when setting an ioprio field.
+
+No problem. Does something below look OK to you?
+
+"
+Ever since commit eca2040972b4("scsi: block: ioprio: Clean up interface
+definition"), the macro IOPRIO_PRIO_LEVEL() will mask the level value to
+something between 0 and 7 so necessarily, level will always be lower than
+IOPRIO_NR_LEVELS.
+
+Remove this obsolete check.
+"
+
+> And also simplify the patch:
+> 
+> diff --git a/block/ioprio.c b/block/ioprio.c
+> index 73301a261429..f0ee2798539c 100644
+> --- a/block/ioprio.c
+> +++ b/block/ioprio.c
+> @@ -46,12 +46,8 @@ int ioprio_check_cap(int ioprio)
+>                          */
+>                         if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
+>                                 return -EPERM;
+> -                       fallthrough;
+> -                       /* rt has prio field too */
+> -               case IOPRIO_CLASS_BE:
+> -                       if (level >= IOPRIO_NR_LEVELS)
+> -                               return -EINVAL;
+>                         break;
+> +               case IOPRIO_CLASS_BE:
+>                 case IOPRIO_CLASS_IDLE:
+>                         break;
+>                 case IOPRIO_CLASS_NONE:
+> 
+>
+
+Will do.
+
+Thanks,
+Aaron
+
+> >  block/ioprio.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > 
+> > diff --git a/block/ioprio.c b/block/ioprio.c
+> > index 73301a261429f..60364d3faf800 100644
+> > --- a/block/ioprio.c
+> > +++ b/block/ioprio.c
+> > @@ -46,11 +46,8 @@ int ioprio_check_cap(int ioprio)
+> >  			 */
+> >  			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
+> >  				return -EPERM;
+> > -			fallthrough;
+> > -			/* rt has prio field too */
+> > +			break;
+> >  		case IOPRIO_CLASS_BE:
+> > -			if (level >= IOPRIO_NR_LEVELS)
+> > -				return -EINVAL;
+> >  			break;
+> >  		case IOPRIO_CLASS_IDLE:
+> >  			break;
