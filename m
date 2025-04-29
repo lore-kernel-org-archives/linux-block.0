@@ -1,224 +1,95 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2696B218EB0
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 14:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9250C231A2D
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 15:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745938526; cv=none; b=LgeBWLct+ygPXVyEXBVOffcoO36tCoLAeQqJxyYoxDWgJ8+p8HTIFf4VFlXG5NpN/Nl9pR7SW1KssujGHJuwTWs/KLIqLFxxK+NvA6DbtPnv/hJTJzMzeXHOV8ZrU4wzdFg/soTMCOS1JIs0MzU83F2SuWsYn9N66nNH9ZrSNmE=
+	t=1745941528; cv=none; b=uHzO9dtBjK/omGqW4wFlYYVBoOv7KPLwwWMgw/0Y/J+1oro9/Wu6T3SiXB+0XhbKFlZp5aD4c844fANEDrNxRloZiLik3mkpGU5Wo59vp4v+C+VSdp/MmLrmSg+aB0l9S6n1pocpq79XNPio2pfVnKOy69dZyz5v5udibeEsmcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745938526; c=relaxed/simple;
-	bh=6pjN8xbnxV9pDtEawDx5cmq+vBu7qG8f7meQFUIddqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c/7a0XpBL+TLC25K7EK8mgREuJvwYP5rTYvBYkEObEMXxRAo2ca5Mae1mY6Lq8C/F0jLZ8CX1qVu1Een90g6xt/5yLbvnxgHsSZX157mjd6IpuI0U2ZV1O4BGxloc/bp4pR6Rug47Kk8uqR3RDxfWpaSbQx3uraY+AUzw14EMzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Hl4XiLXn; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1745941528; c=relaxed/simple;
+	bh=3MJTkSMRRpXFCWhSot8Iqy2tdbklUpjt22NZ3bR+UTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M9tzG6DQCmRGdviMHGdtY0gtDDbL+nB9segqCtRyblCpR79dV87+hw3GmNcY418qlfIizqiVL+9HtoHvr/KdyimitjVu9pcbnrdfl2kup1h5k8Ze1vjLvpVbib8YNUUkIgf/KXns+bdNkAGJWBmub0qwibTaLkXfD7MXH9esjNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YcR7bcsr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Hl4XiLXn"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ff6b9a7f91so561131a91.3
-        for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 07:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1745938523; x=1746543323; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eF2cytyryKmEKcUAK+pBobxZN4rDC3VGSqrUogsqSw0=;
-        b=Hl4XiLXnT1BlgiDRyDEmLJAGKCZNjFzl4ExL78v+EgpFLoy/xapT0WmzQ+PdZOZE8N
-         dP64A7fxULN1D4AyvpoAQS6ZRs0SbM1YzhIq9XgShABTD1NzqJ34qzJUC/SpU6xavAWF
-         ZOafFcQZ2jmxxCPCQ6gLz4eEiYySs/Bo93ZIPPBgq/lT4R8ZMKnkhusFmOojTAJZI2dp
-         +blU9l3O8mDEG0r4MBmN5f4faA91TrYDsKGGI/reVDJlz9a1TPJ3o0vvcw5Rhu+GnS2R
-         b0fKMRBt7VAHTwdGWO7rJ0y9LfLbskbiD1Axgg9d3FV5d2ciX18wQWvivSr3pl2EhhXS
-         ed7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745938523; x=1746543323;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eF2cytyryKmEKcUAK+pBobxZN4rDC3VGSqrUogsqSw0=;
-        b=uzDUuxhdrvvDqmpHwC0Y6XxSzmYl9vK/NdCENgTyTPN2sJ537yrA9iGmiQsu7YUgWa
-         lS8qw06iZ07YCMkN5dwlydbbygkYM5nelc2PFzCe62A0CI4oPDORHoegVIyddvogxoc3
-         LuSMLVKnTcfnr1pXnKoaLxgF6ok+6rTbO+QvR0+3bzo8RoagupIprFCmtwzlTIRPcm+D
-         kdJQPBxa74+OKveQVS7kX+iPSFwwxeiujp5oOKWLut9S7UWuX7/c85w8oiST1S5bL+Bf
-         xQ+jyQPO8Ov4qqUqed075fFWJmh1ZxqULZxm/iD3vt9LGG9msVA9lAiIUhaMOSfHSIob
-         OKRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWU9ylaWHghC0QEmdn/3QPvoWi1xXgyhu7DivTzhyIxC1orZTXwVY/u2ABiDNlnJSsSjWtD9MiQIS6bSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5IqHUJzg2X8Xl6rfl1nQbB+uFhgM/A6+Esx19mYM/fcHQPvGi
-	bGbB5LIdrqjGzGaN6L+ap8i9qOu2GwfzcerrsTExBXwmrqDQE2e53h5PJtNSFX3QndR/53WoQPV
-	L3b1qZUILDcs70e7V0JKoiz8IrErHE6SgsWXFEw==
-X-Gm-Gg: ASbGnct0z3sqjlBeLl4qM49PDx0cfETKxVNxOLvGRN1a6OtLeYwBlG/G/f7xGkjxqeQ
-	QpC2DhYBQnH77YOosnfWpxbVavcbr3p8qwlg5X7wilGt6FRsGENkKITMl1zc65GsbboChBOdOxi
-	XkBJRK75XygJ9gEqDi6Qz4
-X-Google-Smtp-Source: AGHT+IEZdJ+noq7oxgaFMD1JayQtdWBsSaMvnm7kH5BOp2vha1U9lmP2efZQGH+3bkKDZG9FbSMQqHluyZa5+swZHyI=
-X-Received: by 2002:a17:90b:4a05:b0:2ff:7970:d2b6 with SMTP id
- 98e67ed59e1d1-309f7e9e312mr8896247a91.5.1745938523216; Tue, 29 Apr 2025
- 07:55:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcR7bcsr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745941525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWcK/7Jr2iRRF1J0P5sy55MMnsxOmivfmu57fbgbRi8=;
+	b=YcR7bcsrfPk/+V0XienFpcul6s696y5TiUhjhlD9l9sDoigynirs8q5bgMNWdq9bhZ4aII
+	eV1nZvVY1RqzQ5i1hQl13Ri/VHheo/R/H2qOICJL04dpSsNsxMBAhzpfIsYGn9+Ln/SApM
+	b342+ahp+goV/2Eb5SG7n5D4B9PFHJ8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-5dZ-ro-hMGyAGYAX_EDziQ-1; Tue,
+ 29 Apr 2025 11:45:21 -0400
+X-MC-Unique: 5dZ-ro-hMGyAGYAX_EDziQ-1
+X-Mimecast-MFC-AGG-ID: 5dZ-ro-hMGyAGYAX_EDziQ_1745941520
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3C8019560A3;
+	Tue, 29 Apr 2025 15:45:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.13])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 831C91800378;
+	Tue, 29 Apr 2025 15:45:15 +0000 (UTC)
+Date: Tue, 29 Apr 2025 23:45:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+Subject: Re: [PATCH V3 12/20] block: add `struct elv_change_ctx` for unifying
+ elevator change
+Message-ID: <aBD0Bp3WUhCJd3Yz@fedora>
+References: <20250424152148.1066220-1-ming.lei@redhat.com>
+ <20250424152148.1066220-13-ming.lei@redhat.com>
+ <20250425182341.GA26154@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250427045803.772972-1-csander@purestorage.com>
- <20250427045803.772972-6-csander@purestorage.com> <aA4rqcpC01SzUn_g@fedora>
- <CADUfDZpEGVLzEZJtPiScWgf6PVroQvKKhGed1cb8AJiyUr_RYg@mail.gmail.com>
- <CADUfDZqqeeBTbgvCfHa8sr7Y7BetGbPzHYA1hMoN83kz+Bi54A@mail.gmail.com> <aBBQDjLDkGWE63vT@fedora>
-In-Reply-To: <aBBQDjLDkGWE63vT@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 29 Apr 2025 07:55:10 -0700
-X-Gm-Features: ATxdqUH5bTmTqX44Hzi533MxE4zSI0TaCZXtg4vOlrldrq4Do_Wue3jkeG-JLN4
-Message-ID: <CADUfDZroQ4zHanPjytcEUhn4tQc3BYMPZD2uLOik7jAXvOCjGg@mail.gmail.com>
-Subject: Re: [PATCH 5/8] ublk: factor out ublk_start_io() helper
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250425182341.GA26154@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Apr 28, 2025 at 9:05=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Mon, Apr 28, 2025 at 08:12:52AM -0700, Caleb Sander Mateos wrote:
-> > On Mon, Apr 28, 2025 at 7:28=E2=80=AFAM Caleb Sander Mateos
-> > <csander@purestorage.com> wrote:
-> > >
-> > > On Sun, Apr 27, 2025 at 6:05=E2=80=AFAM Ming Lei <ming.lei@redhat.com=
-> wrote:
-> > > >
-> > > > On Sat, Apr 26, 2025 at 10:58:00PM -0600, Caleb Sander Mateos wrote=
-:
-> > > > > In preparation for calling it from outside ublk_dispatch_req(), f=
-actor
-> > > > > out the code responsible for setting up an incoming ublk I/O requ=
-est.
-> > > > >
-> > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c | 53 ++++++++++++++++++++++------------=
-------
-> > > > >  1 file changed, 29 insertions(+), 24 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index 01fc92051754..90a38a82f8cc 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -1151,17 +1151,44 @@ static inline void __ublk_abort_rq(struct=
- ublk_queue *ubq,
-> > > > >               blk_mq_requeue_request(rq, false);
-> > > > >       else
-> > > > >               blk_mq_end_request(rq, BLK_STS_IOERR);
-> > > > >  }
-> > > > >
-> > > > > +static void ublk_start_io(struct ublk_queue *ubq, struct request=
- *req,
-> > > > > +                       struct ublk_io *io)
-> > > > > +{
-> > > > > +     unsigned mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > > > > +
-> > > > > +     /* partially mapped, update io descriptor */
-> > > > > +     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > > > > +             /*
-> > > > > +              * Nothing mapped, retry until we succeed.
-> > > > > +              *
-> > > > > +              * We may never succeed in mapping any bytes here b=
-ecause
-> > > > > +              * of OOM. TODO: reserve one buffer with single pag=
-e pinned
-> > > > > +              * for providing forward progress guarantee.
-> > > > > +              */
-> > > > > +             if (unlikely(!mapped_bytes)) {
-> > > > > +                     blk_mq_requeue_request(req, false);
-> > > > > +                     blk_mq_delay_kick_requeue_list(req->q,
-> > > > > +                                     UBLK_REQUEUE_DELAY_MS);
-> > > > > +                     return;
-> > > > > +             }
-> > > > > +
-> > > > > +             ublk_get_iod(ubq, req->tag)->nr_sectors =3D
-> > > > > +                     mapped_bytes >> 9;
-> > > > > +     }
-> > > > > +
-> > > > > +     ublk_init_req_ref(ubq, req);
-> > > > > +}
-> > > > > +
-> > > > >  static void ublk_dispatch_req(struct ublk_queue *ubq,
-> > > > >                             struct request *req,
-> > > > >                             unsigned int issue_flags)
-> > > > >  {
-> > > > >       int tag =3D req->tag;
-> > > > >       struct ublk_io *io =3D &ubq->ios[tag];
-> > > > > -     unsigned int mapped_bytes;
-> > > > >
-> > > > >       pr_devel("%s: complete: qid %d tag %d io_flags %x addr %llx=
-\n",
-> > > > >                       __func__, ubq->q_id, req->tag, io->flags,
-> > > > >                       ublk_get_iod(ubq, req->tag)->addr);
-> > > > >
-> > > > > @@ -1204,33 +1231,11 @@ static void ublk_dispatch_req(struct ublk=
-_queue *ubq,
-> > > > >               pr_devel("%s: update iod->addr: qid %d tag %d io_fl=
-ags %x addr %llx\n",
-> > > > >                               __func__, ubq->q_id, req->tag, io->=
-flags,
-> > > > >                               ublk_get_iod(ubq, req->tag)->addr);
-> > > > >       }
-> > > > >
-> > > > > -     mapped_bytes =3D ublk_map_io(ubq, req, io);
-> > > > > -
-> > > > > -     /* partially mapped, update io descriptor */
-> > > > > -     if (unlikely(mapped_bytes !=3D blk_rq_bytes(req))) {
-> > > > > -             /*
-> > > > > -              * Nothing mapped, retry until we succeed.
-> > > > > -              *
-> > > > > -              * We may never succeed in mapping any bytes here b=
-ecause
-> > > > > -              * of OOM. TODO: reserve one buffer with single pag=
-e pinned
-> > > > > -              * for providing forward progress guarantee.
-> > > > > -              */
-> > > > > -             if (unlikely(!mapped_bytes)) {
-> > > > > -                     blk_mq_requeue_request(req, false);
-> > > > > -                     blk_mq_delay_kick_requeue_list(req->q,
-> > > > > -                                     UBLK_REQUEUE_DELAY_MS);
-> > > > > -                     return;
-> > > > > -             }
-> > > >
-> > > > Here it needs to break ublk_dispatch_req() for not completing the
-> > > > uring_cmd, however ublk_start_io() can't support it.
-> > >
-> > > Good catch. How about I change ublk_start_io() to return a bool
-> > > indicating whether the I/O was successfully started?
->
-> That is doable.
->
-> >
-> > Thinking a bit more about this, is the existing behavior of returning
-> > early from ublk_dispatch_req() correct for UBLK_IO_NEED_GET_DATA? It
->
-> The requeue isn't related with UBLK_IO_NEED_GET_DATA actually, when
-> UBLK_IO_FLAG_NEED_GET_DATA is cleared.
->
-> It is usually caused by running out of pages, so we have to requeue until
-> ublk_map_io() can make progress.
->
-> > makes sense for the initial ublk_dispatch_req() because the req will
-> > be requeued without consuming the ublk fetch request, allowing it to
-> > be reused for a subsequent I/O. But for UBLK_IO_NEED_GET_DATA, doesn't
-> > it mean the io_uring_cmd will never complete? I would think it would
-> > be better to return an error code in this case.
->
-> The same request will be requeued and re-dispatched to ublk driver after
-> a short delay, so the uring_cmd won't be never complete.
+On Fri, Apr 25, 2025 at 08:23:41PM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 24, 2025 at 11:21:35PM +0800, Ming Lei wrote:
+> > +struct elv_change_ctx {
+> > +	const char *name;
+> > +	bool uevent;
+> 
+> There's only one caller that wants to supress the uevents.  So maybe
+> invert the polarity so that it only has to be set in one place,
+> which also documents how setting the initial scheduler is special a
+> bit better.
 
-I am referring to the UBLK_IO_NEED_GET_DATA uring_cmd, not the FETCH
-one. Doesn't the early return in ublk_dispatch_req() mean
-ublk_complete_io_cmd() won't be called? How else can the
-UBLK_IO_NEED_GET_DATA complete?
+OK.
 
->
-> Anyway, it isn't another story, which shouldn't be added into this
-> cleanup patch.
+> 
+> > -	ret = elv_register_queue(q, true);
+> > +	ret = elv_register_queue(q, ctx->uevent);
+> 
+> .. and pass the ctx on to elv_register_queue instead of converting
+> paramter types.  Although that might be woeth doing later when
+> another argument derived from ctx gets passed as well.
 
-I agree it belongs in a separate patch.
+ctx isn't very useful for elv_register_queue(), which can't figure out
+the exact elevator queue to use from `ctx` since there are two(old, new).
 
-Best,
-Caleb
+
+Thanks,
+Ming
+
