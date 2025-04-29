@@ -1,241 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D930276046;
-	Tue, 29 Apr 2025 06:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF24C7405A
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 06:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745907534; cv=none; b=MoisXsWJm788O/KUFOo10kvuHfeox3wN4gE4FiirGHOFA7uaqAnfT6SCQwKurb+D1LbIBqGcoaGFdqmOCou+oDBkQ9VQNz+iwXPFYrp7nHDhNOymWARq5aXnw42DrVyQYc8cV1KxsksOtYOcgRBAL9LGB3sej6etg6SJoPlFdAo=
+	t=1745907921; cv=none; b=ahVBLtDXkEXlWWUeg9ZXS127mXHZ7UVPc+HLJOjZkmE2IUYbUkm//GF3CPGhAyUhecRMbOjlTFWwGBgm36IeFWsANeGcvRTrRlmwsCGKb2hFA3JY2H/oHpArLzyvYeAFEuZob8w2dnn6V0TKUyB4UKeHs/8vjSgqjHdX0XhLK6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745907534; c=relaxed/simple;
-	bh=vExQvIRKgBFgSfzxHEyrFALVuzPRUmMmvaWq9RovN60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1oTR+Lk3dcq0scby1EjfHnjtlDQ23cXHbvslB9GuJDHp11E8eh13kQ1vK81UTit35v4zIqRHl5r+3tcEmJsjAgyL52rEkZ82dxHIB42ZVpsQEX5A9q+VpcbNDuGavsoP9AaKsuBY2oFF1oHpQgj5tYhJ2LGgXDVyS683XjNXPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTGc5PsS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745907921; c=relaxed/simple;
+	bh=bKcNvkurb0C53xVtt7pncvlCwYNwPh2zE66ifzcQoik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D4Fqe4eRIxpctpfD24lIvAFXnbOTPFnHFGYLGjhNkfvDipIPCE1TPkZEFgskyBMMjwTKWhmrADobMN7FR4wkgNY7vQoAmjvyfrqa0BIDBn7WtFUUZyN/vWjSLvR6IHaH0WXL5WASmF3V9If28s8n4UAbxz3EqhHn5fF/gRZcRzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V7iFANtx; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kTGc5PsS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F91C4CEE3;
-	Tue, 29 Apr 2025 06:18:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745907533;
-	bh=vExQvIRKgBFgSfzxHEyrFALVuzPRUmMmvaWq9RovN60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kTGc5PsSm7YoP9EmrE3/tfdAeh2ilrH28OMMhkA1i7TaGCseb+D12f8U4iRskFrE0
-	 RSM+Ykr/eeWEOV3E2nvuETPKv5WgV2r3K5S0fSLkCufCBscRZZxm5uTAwOKKZQ34F/
-	 w5YLetGv0DGVj4FS79jc9/KMtke5/3tgrMHoSQ+QeJcqJgLI/MgFlbbaDFejjar1j7
-	 p+0iatgN6tx2738QkPeIAJSzLkpoG/pCdY9ka1HCzAgLK31eNn58UEn17swH4oZLFI
-	 lBdvSt34FC1+vbqL/TFGUu3Gtp8x21gTZM2GnLCqybPJvtISk7Z3RIRONLDJ0zW3JA
-	 NWZpkM6/vXKLw==
-Date: Tue, 29 Apr 2025 09:18:49 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Baolu Lu <baolu.lu@linux.intel.com>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v10 06/24] iommu/dma: Factor out a iommu_dma_map_swiotlb
- helper
-Message-ID: <20250429061849.GL5848@unreal>
-References: <cover.1745831017.git.leon@kernel.org>
- <f9a6a7874760a2919bea1f255bb3c81c6369ed1c.1745831017.git.leon@kernel.org>
- <8416e94f-171e-4956-b8fe-246ed12a2314@linux.intel.com>
- <20250429055339.GJ5848@unreal>
- <9d1abdbc-4b21-47e2-bcaf-6bc8ca365b01@linux.intel.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V7iFANtx"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T4EOjP015214;
+	Tue, 29 Apr 2025 06:24:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=tndWkq
+	H9+u9g4zJKS7PWKHzNDZe1A2u9eX1ScL08R7w=; b=V7iFANtxuLYX17/8Fjv6zR
+	ZX20cKuNIfn0SH7Go1zNF66mShRYTVT8T7LiL3huuIaIE9GO2u8PS7Vu+H6NtA5A
+	paalLbR5wiHpN9TkLCZV9Fz4GuY+HlHMVxAEBYVvmMnmbZSiGZ7srCgcJHjPzAMs
+	y0ZSsVW4jvP0fcbYtQsNhytj+aJy9mGYvkcy5gpZF9Itf4vzQJD44xYCTUKJqKNx
+	4RQM8dxqCVGXB1cQeQkk1X7XDhlC3W5e1/LECNqIq1awDVPpJFrEx+f2JAPM7Mrd
+	vPyOea4Oyd4mIJoZVwCt6+efFcO7n5sAiVDZwBBfAqAihUFNuaHMXpvHHHZAuOeQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46a7kk4n8b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Apr 2025 06:24:57 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53T3nPdp031617;
+	Tue, 29 Apr 2025 06:24:56 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4699tu24b1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Apr 2025 06:24:56 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53T6OtiQ29622950
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Apr 2025 06:24:55 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9C6125805E;
+	Tue, 29 Apr 2025 06:24:55 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7363358062;
+	Tue, 29 Apr 2025 06:24:52 +0000 (GMT)
+Received: from [9.109.198.140] (unknown [9.109.198.140])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 29 Apr 2025 06:24:52 +0000 (GMT)
+Message-ID: <cdbd9209-420e-4c1b-a0f4-30b2c7e9cfb3@linux.ibm.com>
+Date: Tue, 29 Apr 2025 11:54:50 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d1abdbc-4b21-47e2-bcaf-6bc8ca365b01@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCHv2 2/3] nvme: introduce multipath_head_always module
+ param
+To: Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, jmeneghi@redhat.com,
+        axboe@kernel.dk, martin.petersen@oracle.com, gjoyce@ibm.com
+References: <20250425103319.1185884-1-nilay@linux.ibm.com>
+ <20250425103319.1185884-3-nilay@linux.ibm.com>
+ <38a93938-8a9c-4d6a-9f74-af1aa957fd74@suse.de>
+ <a33c691a-d4f6-4cd8-96e0-17e2e4078d37@linux.ibm.com>
+ <89f3680d-442e-47cc-822e-f00f474dd597@suse.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <89f3680d-442e-47cc-822e-f00f474dd597@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=OYSYDgTY c=1 sm=1 tr=0 ts=681070b9 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=VnNF1IyMAAAA:8 a=d1kF6yshcwiWocLH8UsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: nDqAAM4u93ES7YrUxDpiNRyskpLZeipq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA0NSBTYWx0ZWRfX94ByyJ0k5SZ0 442ix56FoLz/myUlg/UhZUlPRiSaqXp1Wp9xUdBMgshv2hr03ADiVEUeOVsHBAHe50zZ7LvakZV tEzzXrFvXAAarhpId2aASyl9VqQLI6A6yxa+YrGKuqCLoX0Dz/BzwCn9DQnL45nfLHZHcTWcmjU
+ mjCynqQ7ibfnFVCKay/n+TCWF6uBri3Ldd2JfrBGTgkukLXDoRpFxqbHVjeftvJFkOdYzaM2XKG tptX4KKbOolBXfB7PKCDiWhj6vRRxoSVcrmtH3fG1bYbFxprOOxsWhBSDnrWBqIUL3NDB9AI2Zh I87T8ABgPx4v8aTOSci1Jt+CoeGKUu3hplVSlJRy/WpheKUlXLZRE1nfxGl0Rosz6L37WAJGGL3
+ U3JeXQK51BortwufZgmnSnHR7luigSWxW/09TLruxyY6teCk/Tcbcu6sGghDrL+ifSoddJVq
+X-Proofpoint-ORIG-GUID: nDqAAM4u93ES7YrUxDpiNRyskpLZeipq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-29_02,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 phishscore=0 mlxscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2504290045
 
-On Tue, Apr 29, 2025 at 01:58:06PM +0800, Baolu Lu wrote:
-> On 4/29/25 13:53, Leon Romanovsky wrote:
-> > On Tue, Apr 29, 2025 at 12:58:18PM +0800, Baolu Lu wrote:
-> > > On 4/28/25 17:22, Leon Romanovsky wrote:
-> > > > From: Christoph Hellwig<hch@lst.de>
-> > > > 
-> > > > Split the iommu logic from iommu_dma_map_page into a separate helper.
-> > > > This not only keeps the code neatly separated, but will also allow for
-> > > > reuse in another caller.
-> > > > 
-> > > > Signed-off-by: Christoph Hellwig<hch@lst.de>
-> > > > Tested-by: Jens Axboe<axboe@kernel.dk>
-> > > > Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
-> > > > Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
-> > > 
-> > > Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-> > > 
-> > > with a nit below ...
-> > > 
-> > > > ---
-> > > >    drivers/iommu/dma-iommu.c | 73 ++++++++++++++++++++++-----------------
-> > > >    1 file changed, 41 insertions(+), 32 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> > > > index d3211a8d755e..d7684024c439 100644
-> > > > --- a/drivers/iommu/dma-iommu.c
-> > > > +++ b/drivers/iommu/dma-iommu.c
-> > > > @@ -1138,6 +1138,43 @@ void iommu_dma_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
-> > > >    			arch_sync_dma_for_device(sg_phys(sg), sg->length, dir);
-> > > >    }
-> > > > +static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
-> > > > +		size_t size, enum dma_data_direction dir, unsigned long attrs)
-> > > > +{
-> > > > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > > > +	struct iova_domain *iovad = &domain->iova_cookie->iovad;
-> > > > +
-> > > > +	if (!is_swiotlb_active(dev)) {
-> > > > +		dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
-> > > > +		return (phys_addr_t)DMA_MAPPING_ERROR;
-> > > > +	}
-> > > > +
-> > > > +	trace_swiotlb_bounced(dev, phys, size);
-> > > > +
-> > > > +	phys = swiotlb_tbl_map_single(dev, phys, size, iova_mask(iovad), dir,
-> > > > +			attrs);
-> > > > +
-> > > > +	/*
-> > > > +	 * Untrusted devices should not see padding areas with random leftover
-> > > > +	 * kernel data, so zero the pre- and post-padding.
-> > > > +	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
-> > > > +	 * the contents of the original memory buffer.
-> > > > +	 */
-> > > > +	if (phys != (phys_addr_t)DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
-> > > > +		size_t start, virt = (size_t)phys_to_virt(phys);
-> > > > +
-> > > > +		/* Pre-padding */
-> > > > +		start = iova_align_down(iovad, virt);
-> > > > +		memset((void *)start, 0, virt - start);
-> > > > +
-> > > > +		/* Post-padding */
-> > > > +		start = virt + size;
-> > > > +		memset((void *)start, 0, iova_align(iovad, start) - start);
-> > > > +	}
-> > > > +
-> > > > +	return phys;
-> > > > +}
-> > > > +
-> > > >    dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> > > >    	      unsigned long offset, size_t size, enum dma_data_direction dir,
-> > > >    	      unsigned long attrs)
-> > > > @@ -1151,42 +1188,14 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> > > >    	dma_addr_t iova, dma_mask = dma_get_mask(dev);
-> > > >    	/*
-> > > > -	 * If both the physical buffer start address and size are
-> > > > -	 * page aligned, we don't need to use a bounce page.
-> > > > +	 * If both the physical buffer start address and size are page aligned,
-> > > > +	 * we don't need to use a bounce page.
-> > > >    	 */
-> > > >    	if (dev_use_swiotlb(dev, size, dir) &&
-> > > >    	    iova_offset(iovad, phys | size)) {
-> > > > -		if (!is_swiotlb_active(dev)) {
-> > > 
-> > > ... Is it better to move this check into the helper? Simply no-op if a
-> > > bounce page is not needed:
-> > > 
-> > > 	if (!dev_use_swiotlb(dev, size, dir) ||
-> > > 	    !iova_offset(iovad, phys | size))
-> > > 		return phys;
-> > 
-> > Am I missing something? iommu_dma_map_page() has more code after this
-> > check, so it is not correct to return immediately:
-> > 
-> >    1189 dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> >    1190               unsigned long offset, size_t size, enum dma_data_direction dir,
-> >    1191               unsigned long attrs)
-> >    1192 {
-> > 
-> > <...>
-> > 
-> >    1201         /*
-> >    1202          * If both the physical buffer start address and size are page aligned,
-> >    1203          * we don't need to use a bounce page.
-> >    1204          */
-> >    1205         if (dev_use_swiotlb(dev, size, dir) &&
-> >    1206             iova_unaligned(iovad, phys, size)) {
-> >    1207                 phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
-> >    1208                 if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
-> >    1209                         return DMA_MAPPING_ERROR;
-> >    1210         }
-> >    1211
-> >    1212         if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
-> >    1213                 arch_sync_dma_for_device(phys, size, dir);
-> >    1214
-> >    1215         iova = __iommu_dma_map(dev, phys, size, prot, dma_mask);
-> >    1216         if (iova == DMA_MAPPING_ERROR)
-> >    1217                 swiotlb_tbl_unmap_single(dev, phys, size, dir, attrs);
-> >    1218         return iova;
-> >    1219 }
+
+
+On 4/29/25 11:19 AM, Hannes Reinecke wrote:
+> On 4/28/25 09:39, Nilay Shroff wrote:
+>>
+>>
+>> On 4/28/25 12:27 PM, Hannes Reinecke wrote:
+>>> On 4/25/25 12:33, Nilay Shroff wrote:
+>>>> Currently, a multipath head disk node is not created for single-ported
+>>>> NVMe adapters or private namespaces. However, creating a head node in
+>>>> these cases can help transparently handle transient PCIe link failures.
+>>>> Without a head node, features like delayed removal cannot be leveraged,
+>>>> making it difficult to tolerate such link failures. To address this,
+>>>> this commit introduces nvme_core module parameter multipath_head_always.
+>>>>
+>>>> When this param is set to true, it forces the creation of a multipath
+>>>> head node regardless NVMe disk or namespace type. So this option allows
+>>>> the use of delayed removal of head node functionality even for single-
+>>>> ported NVMe disks and private namespaces and thus helps transparently
+>>>> handling transient PCIe link failures.
+>>>>
+>>>> By default multipath_head_always is set to false, thus preserving the
+>>>> existing behavior. Setting it to true enables improved fault tolerance
+>>>> in PCIe setups. Moreover, please note that enabling this option would
+>>>> also implicitly enable nvme_core.multipath.
+>>>>
+>>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>>>> ---
+>>>>    drivers/nvme/host/multipath.c | 70 +++++++++++++++++++++++++++++++----
+>>>>    1 file changed, 63 insertions(+), 7 deletions(-)
+>>>>
+>>> I really would model this according to dm-multipath where we have the
+>>> 'fail_if_no_path' flag.
+>>> This can be set for PCIe devices to retain the current behaviour
+>>> (which we need for things like 'md' on top of NVMe) whenever the
+>>> this flag is set.
+>>>
+>> Okay so you meant that when sysfs attribute "delayed_removal_secs"
+>> under head disk node is _NOT_ configured (or delayed_removal_secs
+>> is set to zero) we have internal flag "fail_if_no_path" is set to
+>> true. However in other case when "delayed_removal_secs" is set to
+>> a non-zero value we set "fail_if_no_path" to false. Is that correct?
+>>
+> Don't make it overly complicated.
+> 'fail_if_no_path' (and the inverse 'queue_if_no_path') can both be
+> mapped onto delayed_removal_secs; if the value is '0' then the head
+> disk is immediately removed (the 'fail_if_no_path' case), and if it's
+> -1 it is never removed (the 'queue_if_no_path' case).
 > 
-> static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t
-> phys,
-> 		size_t size, enum dma_data_direction dir, unsigned long attrs)
-> {
-> <...>
-> 	/*
-> 	 * If both the physical buffer start address and size are page aligned,
-> 	 * we don't need to use a bounce page.
-> 	 */
-> 	if (!dev_use_swiotlb(dev, size, dir) ||
-> 	    !iova_offset(iovad, phys | size))
-> 		return phys;
-> <...>
-> }
+Yes if the value of delayed_removal_secs is 0 then the head is immediately
+removed, however if value of delayed_removal_secs is anything but zero 
+(i.e. greater than zero as delayed_removal_secs is unsigned) then head 
+is removed only after delayed_removal_secs is elapsed and hence disk 
+couldn't recover from transient link failure. We never pin head node 
+indefinitely.  
+
+> Question, though: How does it interact with the existing 'ctrl_loss_tmo'? Both describe essentially the same situation...
 > 
-> Then,
-> 
-> dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> 	unsigned long offset, size_t size, enum dma_data_direction dir,
-> 	unsigned long attrs)
-> {
-> <...>
-> 	phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
-> 	if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
-> 		return DMA_MAPPING_ERROR;
-> <...>
-> }
+The delayed_removal_secs is modeled for NVMe PCIe adapter. So it really
+doesn't interact or interfere with ctrl_loss_tmo which is fabric controller
+option.
 
-Such change will cause to extra function call for everyone who doesn't
-use SWIOTLB (RDMA, HMM e.t.c).
+Thanks,
+--Nilay
 
-In addition, iommu_dma_map_swiotlb() is called through
-dma_iova_link -> 
-	iommu_dma_iova_link_swiotlb -> 
-		iommu_dma_iova_bounce_and_link() -> 
-			iommu_dma_map_swiotlb()
-and dma_iova_link() has this "if (dev_use_swiotlb(dev, size, dir) && iova_unaligned(iovad, phys, size))"
-very early at call stack.
-
-So, in dma_iova_link() we will find ourselves with same check twice.
-
-Thanks
-
-> 
-> Thanks,
-> baolu
-> 
