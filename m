@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3AA256987;
-	Tue, 29 Apr 2025 23:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C122DDCFD;
+	Tue, 29 Apr 2025 23:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745970678; cv=none; b=Jnp7ErVzRnyRlqX1BNyhdkH0P/43GFgz6EyeeEgpUZCjPiFsW9wMD+cG53bf/fFdNrlSQaCxqe9BxnpftvRQcDdylNp/2+8NFp+HITbxakul1vRjMp/10hFHU6wRl0kF1VEsg09+S0tWvVh9LEWTj6/RDIvRr245SrdzPcYx5yk=
+	t=1745970748; cv=none; b=KH9eeGfNW3V3ojCfkoi/dDWHaTdqwx4leMoHZabbMvCbfBy83V9awm5t/N3TTY87QNFJnqQcKVCaIeXEkBOf6AlBfDBdIsHs0/byEbI8YXs/hWi79x6cPSygXHJBHrShWzcYFOk2eBCTeirzjJoisb+v1Av70sSbnMIDheXxRJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745970678; c=relaxed/simple;
-	bh=3Hq0+3fikZdKmWGQCgTuNKo8TznptLpGgnA0iUcVDuw=;
+	s=arc-20240116; t=1745970748; c=relaxed/simple;
+	bh=6gn5xHXVJM5z/QfQEmL4yn0FdBBtunL2zWcyJq1EO78=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DnxpRdun45XoC+yXpirC1ieGk+tqXZpMCOI2Ycth7vXrsTRSVYuVBenVtS/93eD7tdvzzyCuEmQILSNkO4ZpVaLEPWrvZEotATwwqixVM5Ku3PRMcG+JTSGAQVsng5zU/K8pt1XTd3JW64Qq6Xc48AsWcCyrJzZchmb1oFD6I00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aggCRTar; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=gIpXyJZREnZwk9BF58fScW9EqJTS20xpY/LBI8TB/7YZNyPogx+PQkON66iPq8cqcQQqNJ2dfbSu/euq3N9kvRZfBQsFFKWWoORlRs60UrUsNmL50esxygvd0TMOJQ/3GrxHaziYAx/LLW42MTe9MdYDqM1GB4qel3zRtYz/69o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgEf+oSv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aggCRTar"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19BCFC4CEE3;
-	Tue, 29 Apr 2025 23:51:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgEf+oSv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 120BDC4CEED;
+	Tue, 29 Apr 2025 23:52:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745970676;
-	bh=3Hq0+3fikZdKmWGQCgTuNKo8TznptLpGgnA0iUcVDuw=;
+	s=k20201202; t=1745970748;
+	bh=6gn5xHXVJM5z/QfQEmL4yn0FdBBtunL2zWcyJq1EO78=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aggCRTarJKYqwUgaRFKtk+RTgbdQCmfxgVFrS2skZTLJxTiA891KTuqJ7wCtU93qb
-	 GPgfnrm0M9k5LqTdudorlv4RMx8112If9s36wRyMb6XanTQCKt8BIpFJV5pJbUUdCe
-	 6lHw1QqTVnvaeIyDHMQ6O7SwmVfCm4ISrXllUnCt+7QmJYpxLTmXfDqfYMujYVHf+m
-	 ZFzcv+c6wxJIo7J21qRwAMyh3Zc/fLj9GkQFMGEhAipNy1TyqS+IlCgjNVhz3WOqH9
-	 X1R1d3WAv7IRHrk6f1hozlzzWzGQaGnD2ACcFMwE7Aj9a/8NGdLc35VVv6wHaXbUiU
-	 Lh4KQYTDmKgkA==
+	b=qgEf+oSvMX3cHU6oRzTlVKQgxhE4beX4oRavnelBHTh5mF3LpoFIUuJMTzNjj8PWE
+	 Lmd7QOjyaOjUkwLc1F1P9lgbn5AkpFqHdZ2msPrSyQoBqG14rOCo2qT3yoHedrbcxh
+	 ibRJnfrjaDWkTBXDbTplLy12mqInd3c6fD0fNspxA5i0zob0E4+HQtzAyBAMeydokF
+	 TGY8C3y8o8bNVV+AxkqNP4rgNYhGLH+a0Mrcdb08fDCGckcBAX4gQxChefJdUCRk9Q
+	 TPwHtf6Pk6Wlif6czyc+ROC7fXwg40ZiBrZS+mh1SOB3rn7IK8XvOb2QzWJCZ89Lvg
+	 7dCbqqTzPAYOg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: "Darrick J. Wong" <djwong@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 35/39] block: fix race between set_blocksize and read paths
-Date: Tue, 29 Apr 2025 19:50:02 -0400
-Message-Id: <20250429235006.536648-35-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 34/37] block: fix race between set_blocksize and read paths
+Date: Tue, 29 Apr 2025 19:51:19 -0400
+Message-Id: <20250429235122.537321-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250429235006.536648-1-sashal@kernel.org>
-References: <20250429235006.536648-1-sashal@kernel.org>
+In-Reply-To: <20250429235122.537321-1-sashal@kernel.org>
+References: <20250429235122.537321-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.4
+X-stable-base: Linux 6.12.25
 Content-Transfer-Encoding: 8bit
 
 From: "Darrick J. Wong" <djwong@kernel.org>
@@ -99,10 +99,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  4 files changed, 43 insertions(+), 1 deletion(-)
 
 diff --git a/block/bdev.c b/block/bdev.c
-index 9d73a8fbf7f99..06b8cab31d759 100644
+index 738e3c8457e7f..e7daca6565ea6 100644
 --- a/block/bdev.c
 +++ b/block/bdev.c
-@@ -167,9 +167,26 @@ int set_blocksize(struct file *file, int size)
+@@ -168,9 +168,26 @@ int set_blocksize(struct file *file, int size)
  
  	/* Don't change the size if it is same as current */
  	if (inode->i_blkbits != blksize_bits(size)) {
@@ -130,10 +130,10 @@ index 9d73a8fbf7f99..06b8cab31d759 100644
  	return 0;
  }
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 0c77244a35c92..8f15d1aa6eb89 100644
+index c11db5be25324..414118435240a 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -343,6 +343,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+@@ -347,6 +347,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
  		op = REQ_OP_ZONE_RESET;
  
  		/* Invalidate the page cache, including dirty pages. */
@@ -141,7 +141,7 @@ index 0c77244a35c92..8f15d1aa6eb89 100644
  		filemap_invalidate_lock(bdev->bd_mapping);
  		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
  		if (ret)
-@@ -364,8 +365,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+@@ -368,8 +369,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
  	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
  
  fail:
@@ -154,10 +154,10 @@ index 0c77244a35c92..8f15d1aa6eb89 100644
  	return ret;
  }
 diff --git a/block/fops.c b/block/fops.c
-index be9f1dbea9ce0..e221fdcaa8aaf 100644
+index 43983be5a2b3b..d4b1d942f2700 100644
 --- a/block/fops.c
 +++ b/block/fops.c
-@@ -746,7 +746,14 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+@@ -721,7 +721,14 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
  			ret = direct_write_fallback(iocb, from, ret,
  					blkdev_buffered_write(iocb, from));
  	} else {
@@ -172,7 +172,7 @@ index be9f1dbea9ce0..e221fdcaa8aaf 100644
  	}
  
  	if (ret > 0)
-@@ -757,6 +764,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+@@ -732,6 +739,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
  
  static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
  {
@@ -180,7 +180,7 @@ index be9f1dbea9ce0..e221fdcaa8aaf 100644
  	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
  	loff_t size = bdev_nr_bytes(bdev);
  	loff_t pos = iocb->ki_pos;
-@@ -793,7 +801,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+@@ -768,7 +776,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
  			goto reexpand;
  	}
  
@@ -194,7 +194,7 @@ index be9f1dbea9ce0..e221fdcaa8aaf 100644
  
  reexpand:
  	if (unlikely(shorted))
-@@ -836,6 +850,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+@@ -811,6 +825,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
  	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
  		return -EINVAL;
  
@@ -202,7 +202,7 @@ index be9f1dbea9ce0..e221fdcaa8aaf 100644
  	filemap_invalidate_lock(inode->i_mapping);
  
  	/*
-@@ -868,6 +883,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+@@ -843,6 +858,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
  
   fail:
  	filemap_invalidate_unlock(inode->i_mapping);
