@@ -1,169 +1,117 @@
-Received: from mail.189.cn (189sx01-ptr.21cn.com [14.18.100.240])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C2D3595D
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 08:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.18.100.240
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410DB136352
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 08:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745913747; cv=none; b=TCtlCj+OnQSlGsbE++ye9yrWCk+eJGcpVGCWk21A07qeCctDqrif+hrBXN4DKrpMg1G0bS/C7JY0s4fnF0GqlgMtnKnjPHYmMpwYjyWYWB+QN3CIv5/Ag55k1n2myO8DGi3YHVdDdaZw9IgRVM3RVt9LCaJUhuKzxW6p1nZ2NJ8=
+	t=1745915390; cv=none; b=PU/dLeIgf1fLsMN+RALB240/dHQw9OKVNLeZ8gfItlvR5X7SFMdirJIBFECQPjvPL9hJFhbPRYkrQ8U+j/6Gl9mK2imqImliCek0S3mXA7VzNV9haHzQD96US/Nr+q8eAJrkDzh8V1Vf79wJa9wEiGD0v6E3qs/NYFIrf5lSX/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745913747; c=relaxed/simple;
-	bh=5/U9gFfps0ehR1zoPuhN16tcvhhKgjWX0kC65Ye0loE=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=LQWduuHj97jbf2X5ZCcW6zt6oaZsvfHyGEpidqirMlcbxz+wyYDG36tCHrWqRHiWyrBCtPpXDlJLAzS7Zxn8T3IcuP2lzEjGAUACiXIUMAcghT9h9lKVYoA13DDjnAuZQOwl9gO00RNuk61GAdTd0LdmXfbt6ke7f3ohc/U+7IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn; spf=pass smtp.mailfrom=189.cn; arc=none smtp.client-ip=14.18.100.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=189.cn
-HMM_SOURCE_IP:10.158.243.220:0.201711066
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-221.238.56.49 (unknown [10.158.243.220])
-	by mail.189.cn (HERMES) with SMTP id 9E946400089
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 15:57:16 +0800 (CST)
-Received: from  ([221.238.56.49])
-	by gateway-153622-dep-589669576-lvbzc with ESMTP id 1165d7e8f4df45c4a717f55f8e74983f for linux-block@vger.kernel.org;
-	Tue, 29 Apr 2025 15:57:16 CST
-X-Transaction-ID: 1165d7e8f4df45c4a717f55f8e74983f
-X-Real-From: chensong_2000@189.cn
-X-Receive-IP: 221.238.56.49
-X-MEDUSA-Status: 0
-Sender: chensong_2000@189.cn
-Message-ID: <46249efa-4848-4dd7-a3f4-e0fb9781b6c5@189.cn>
-Date: Tue, 29 Apr 2025 15:57:15 +0800
+	s=arc-20240116; t=1745915390; c=relaxed/simple;
+	bh=NZvHln3bcfSZ/TQLs4xr3IKvbwiNkKQxP5LZ2Fgfd5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IFPR39XOZxvHe1rHt7Bi9I2tKAlztRYyCm0aZEJFme4hScpgWperN4x3gn4cDwKS4hdqXg1Jr1AUM+YiYez1YuLgyfQivP1EalK2JrQsxrM+J3/JsTQDOJV3BUtyvvFONlJB1OaR+Bi1b517Gx0p53Sz6WodLu2+Nb7Zg5gSW7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=fxBV8f+p; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="fxBV8f+p"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2243803b776so95031045ad.0
+        for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 01:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1745915387; x=1746520187; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DHdRz/EtmBEiEa3gK3w++o5QutFIQ/a6w+5iRyEUy5Y=;
+        b=fxBV8f+pfGgJYYFOavC57essN5m3eX35d0hvu+KXKWUUigmrVfNiW+X6N7xZ0+wWpR
+         RpJ/UoO7y+68iJ8kk5yIlenijdLG70e8DQHItSqParCTeNcTSG1VyXz38A+Qg2G686Y/
+         phJ2IgWLvUq78OVnUGC4dSBGtwOGIeRbzz3QOfY6f1WBFRgGCsOO1GXxc9H51pAvIcdV
+         F/BY/YFIVo64dAnq3PxbutA7SVYKE+Cu2gl0Ul5ByueRreFDd1Vu1WRu236RKZ2Lqyy5
+         EUFdLFSSkLQcz1GPN429h8NklVkA1VlgqoRP57L8mswjdCj4HgK5rK9gK5sGlyp7BhmK
+         Pbrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745915387; x=1746520187;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DHdRz/EtmBEiEa3gK3w++o5QutFIQ/a6w+5iRyEUy5Y=;
+        b=N3O1uRTmY049X6kwS5koA2KloaXA+rTx9fHNplYbhMa3aT14sXH3R1QvUovMZFyr/g
+         4+G+BcMFB2u/g9wq52Itgnd+g71WAPOA0pgiWnA8/hiFhBcQbRq6nGd5png15A/jvmAv
+         v984rIG8WH00foXU12jZ79CZwwPqHPLjNufkGT/5w9aOy8qyC+xOmC85uRc32px8FyHe
+         seu8tfF2dEdFR7GaF+meZivHZW1pG45IpAVj5OuYYjurshoyqTB8ErRDStblTE1n8x+b
+         9HS5156lWK7WP9v5clTnfemJ/+e7NpYY3dqxELL+COLoqf9WZWidN8x5rFibEAw/TpVn
+         Tmag==
+X-Forwarded-Encrypted: i=1; AJvYcCV/XL4f8UINio45PJ6PMyaYrwdlwoP1kITEgeOEKBhtUXggyE+rgPv5wsNZeeRjk+VTgoGYTW7Uy2HRCg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzwVBnulhVcGgYELQwQQLwZcW+CTCk5akw5fLL7wxW0TJexnHE
+	DcHGhscQaVv202C39cyQAiPb0Pxf2EkyVQx7n3+ll6KRrmNDB72WSE5uUPK8rA==
+X-Gm-Gg: ASbGncuzmoYD4FODcdJRe+2dynCEuQur6HDtl8gWCrvFBEk4gPp9onVOXYKvkupJ0t1
+	ma4O9Hwy1pAxBXyHCOzjXZJW/ayEVtuIwIalpJyQoUL5X1TxmwP6TBDEuXRBNUDlLQD9lL13yWU
+	9h8234zmzK9DjyBN4vkOsp2Ic/HVi/sWFs/bkLzD+vTEmy/xwUaNHIGutdrPgeBHb7kQbnK7WpY
+	OXP42wJFnW4gpchdRJLtEc4pMntkvBQ/fhvEy/fp08Xq7zahAjlMZsuFVZKweQwC7t1fOLwnhTj
+	NNZqDzhZLdDUYxG8Q9yO1wwmV3oyLn7DKMEZR3v4
+X-Google-Smtp-Source: AGHT+IHtyasg1PY+dWv82Tx3oLvGNB5rgnrxkjELFD38XpCHt8wN8rT0V6Wq89ygKYgaphfBMh3T1g==
+X-Received: by 2002:a17:902:f70f:b0:224:8bf:6d81 with SMTP id d9443c01a7336-22de7022ec2mr33292685ad.46.1745915387470;
+        Tue, 29 Apr 2025 01:29:47 -0700 (PDT)
+Received: from bytedance ([115.190.40.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db5100c13sm96762425ad.162.2025.04.29.01.29.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 01:29:46 -0700 (PDT)
+Date: Tue, 29 Apr 2025 16:29:34 +0800
+From: Aaron Lu <ziqianlu@bytedance.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Kexin Wei <ys.weikexin@h3c.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] block: remove test of io priority level
+Message-ID: <20250429082934.GA3896701@bytedance>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-block@vger.kernel.org
-From: Song Chen <chensong_2000@189.cn>
-Subject: a question about direct IO
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Dear experts,
+Ever since commit eca2040972b4("scsi: block: ioprio: Clean up interface
+definition"), the io priority level is masked and can no longer be larger
+than IOPRIO_NR_LEVELS so remove this now useless test.
 
-I was trying to improve the performance of loading a big file to memory, 
-inspired by this patchset[1], i used direct IO to read this file to the 
-CMA memory i reserved, in order to reduce the overhead of memory copy 
-from page cache to its destination.
+The actual test of io prio level is done in ioprio_value() where any
+invalid input of class/level/hint will result in an invalid class being
+passed to the syscall, this is introduced in commit 01584c1e2337("scsi: 
+block: Improve ioprio value validity checks").
 
-below is detail:
-1, i used cma=6G in cmdline to reserve memory
-2, allocate memory with "addr = dma_alloc_coherent"
-3, open file with O_RIRECT
-int fd = open(FILE_PATH, O_RDONLY | O_DIRECT);
-4, read file
-    while (copied < fsz) {
-         ssize_t bytes;
-         ssize_t wanted = fsz - copied;
+Reported-by: Kexin Wei <ys.weikexin@h3c.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Aaron Lu <ziqianlu@bytedance.com>
+---
+Kexin reported a LTP/ioprio_set03 case failure, where the test would
+pass IOPRIO_CLASS_BE with priority level 8 and see if kernel would
+return error. Turned out she is using an old kernel header where the
+change introduced in commit 01584c1e2337("scsi: block: Improve ioprio
+value validity checks") isn't available. During troubleshooting, I find
+this priority level test confusing and misleading so I think it should
+be removed.
 
-         bytes = kernel_read(file, addr + copied, wanted, &pos);
-         if (bytes <= 0) {
-	    printk("%s, error , bytes:%ld, wanted:%ld, cpoied:%ld\n", 
-__FUNCTION__, bytes, wanted, copied);
-             return bytes;
-         }
+ block/ioprio.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-         copied += bytes;
-     }
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 73301a261429f..60364d3faf800 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -46,11 +46,8 @@ int ioprio_check_cap(int ioprio)
+ 			 */
+ 			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
+ 				return -EPERM;
+-			fallthrough;
+-			/* rt has prio field too */
++			break;
+ 		case IOPRIO_CLASS_BE:
+-			if (level >= IOPRIO_NR_LEVELS)
+-				return -EINVAL;
+ 			break;
+ 		case IOPRIO_CLASS_IDLE:
+ 			break;
+-- 
+2.39.5
 
-ftrace log shows every single pair of block_rq_issue and 
-block_rq_complete spends 0.07s.
-
-test-2991    0.....   119.255974: block_rq_issue:       8,0 R 1310720 () 
-505083904 + 2560 0x0,0,0 [test]
-test-2991    0.....   119.255974: scsi_dispatch_cmd_start: host_no=0 
-channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 driver_tag=19 
-scheduler_tag=40 cmnd=(READ_10 lba=505083904 txlen=2560 protect=0 raw=28 
-00 1e 1a f8 00 00 0a 00 00)
-     test-2991    0d..1.   119.255977: ata_qc_issue:         [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=19 cmd=96 dev=64 lbal=0 lbam=248 lbah=26 
-nsect=152 feature=0 hob_lbal=30 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=10 ctl=0 proto=6 flags=0x0
-     test-2991    0.....   119.255979: block_rq_issue:       8,0 R 
-1310720 () 505086464 + 2560 0x0,0,0 [test]
-     test-2991    0.....   119.255994: scsi_dispatch_cmd_start: 
-host_no=0 channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 
-driver_tag=20 scheduler_tag=41 cmnd=(READ_10 lba=505086464 txlen=2560 
-protect=0 raw=28 00 1e 1b 02 00 00 0a 00 00)
-     test-2991    0d..1.   119.255997: ata_qc_issue:         [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=20 cmd=96 dev=64 lbal=0 lbam=2 lbah=27 
-nsect=160 feature=0 hob_lbal=30 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=10 ctl=0 proto=6 flags=0x0
-     ......
-   <idle>-0       4d.h2.   119.323158: ata_qc_complete_done: [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=19 status=64 dev=0 lbal=0 lbam=0 lbah=0 
-nsect=1 error=0 hob_lbal=0 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=0 ctl=0 flags=0xf
-   <idle>-0       4d.h2.   119.323166: scsi_dispatch_cmd_done: host_no=0 
-channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 driver_tag=19 
-scheduler_tag=40 cmnd=(READ_10 lba=505083904 txlen=2560 protect=0 raw=28 
-00 1e 1a f8 00 00 0a 00 00) result=(driver=DRIVER_OK host=0x0 
-message=COMMAND_COMPLETE status=0x0) sense=(key=0 asc=0 ascq=0)
-   <idle>-0       4..s1.   119.323172: block_rq_complete:    8,0 R () 
-505083904 + 2560 0x0,0,0 [0]
-
-sorry for the mess, this request applies to read 2560 sectors from 
-sector 505083904, it takes 119.323172 - 119.255974 = 0.067s.
-
-however, i also used buffered IO to compare, instead of opening with 
-O_DIRECT, i only open it with O_RDONLY. Turns out, it only takes 0.003 
-second for each block_rq_issue and block_rq_complete pair(read 2560 
-sectors from sector 505083904). below is ftrace log:
-
-     test-3136    2.....   284.024657: block_rq_issue:       8,0 RA 
-1310720 () 505083904 + 2560 0x0,0,0 [test]
-     test-3136    2.....   284.024659: scsi_dispatch_cmd_start: 
-host_no=0 channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 
-driver_tag=10 scheduler_tag=12 cmnd=(READ_10 lba=505083904 txlen=2560 
-protect=0 raw=28 00 1e 1a f8 00 00 0a 00 00)
-     test-3136    2d..1.   284.024672: ata_qc_issue:         [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=10 cmd=96 dev=64 lbal=0 lbam=248 lbah=26 
-nsect=80 feature=0 hob_lbal=30 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=10 ctl=0 proto=6 flags=0x0
-   <idle>-0       4d.h2.   284.025808: ata_qc_complete_done: [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=9 status=64 dev=0 lbal=0 lbam=0 lbah=0 
-nsect=0 error=0 hob_lbal=0 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=0 ctl=0 flags=0xf
-   <idle>-0       4d.h2.   284.025819: scsi_dispatch_cmd_done: host_no=0 
-channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 driver_tag=9 
-scheduler_tag=11 cmnd=(READ_10 lba=505081344 txlen=2560 protect=0 raw=28 
-00 1e 1a ee 00 00 0a 00 00) result=(driver=DRIVER_OK host=0x0 
-message=COMMAND_COMPLETE status=0x0) sense=(key=0 asc=0 ascq=0)
-   <idle>-0       4..s1.   284.025825: block_rq_complete:    8,0 RA () 
-505081344 + 2560 0x0,0,0 [0]
-     test-3136    2.....   284.026912: block_rq_issue:       8,0 RA 
-1310720 () 505086464 + 2560 0x0,0,0 [test]
-     test-3136    2.....   284.026914: scsi_dispatch_cmd_start: 
-host_no=0 channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 
-driver_tag=11 scheduler_tag=13 cmnd=(READ_10 lba=505086464 txlen=2560 
-protect=0 raw=28 00 1e 1b 02 00 00 0a 00 00)
-     test-3136    2d..1.   284.026927: ata_qc_issue:         [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=11 cmd=96 dev=64 lbal=0 lbam=2 lbah=27 
-nsect=88 feature=0 hob_lbal=30 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=10 ctl=0 proto=6 flags=0x0
-   <idle>-0       4d.h2.   284.028022: ata_qc_complete_done: [FAILED TO 
-PARSE] ata_port=1 ata_dev=0 tag=10 status=64 dev=0 lbal=0 lbam=0 lbah=0 
-nsect=0 error=0 hob_lbal=0 hob_lbam=0 hob_lbah=0 hob_nsect=0 
-hob_feature=0 ctl=0 flags=0xf
-   <idle>-0       4d.h2.   284.028033: scsi_dispatch_cmd_done: host_no=0 
-channel=0 id=0 lun=0 data_sgl=20 prot_sgl=0 prot_op=0x0 driver_tag=10 
-scheduler_tag=12 cmnd=(READ_10 lba=505083904 txlen=2560 protect=0 raw=28 
-00 1e 1a f8 00 00 0a 00 00) result=(driver=DRIVER_OK host=0x0 
-message=COMMAND_COMPLETE status=0x0) sense=(key=0 asc=0 ascq=0)
-   <idle>-0       4..s1.   284.028039: block_rq_complete:    8,0 RA () 
-505083904 + 2560 0x0,0,0 [0]
-
-284.028039 - 284.024657 = 0.003382.
-
-It seems the ssd returns data immediately but i don't know what is the 
-problem of direct IO read. I would appreciate it if anyone of you gives 
-me some advice about this case.
-
-My OS is ubuntu 24.04, kernel is 6.14, from upstream no change, with 
-CONFIG_CMA and CONFIG_DMA_CMA. Intel i5, 16G DDR, 500G SATA SSD(Kingston).
-
-/Song
-
-[1]:https://lore.kernel.org/all/20240730075755.10941-1-link@vivo.com/
