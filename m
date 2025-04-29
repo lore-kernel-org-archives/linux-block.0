@@ -1,60 +1,80 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB5D1D6AA
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 06:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6EC2749CF
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 06:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745907996; cv=none; b=UGO0Fp6XqNAcH0vy1J2+9eKEZuk2YAare5dO/8v6IpgwzJERQVVEe2DJsltvtmsWxL0328X0156L0cp/c1zPslk6cZ4DZl9CqHNAVL7D8ESYg/RHep1tF8s9NVtIJwoHrx25nPyC7HSvlDjP+bX2E0HsxVT9VRpoX6ogoKChnFM=
+	t=1745908054; cv=none; b=MxVtGr8j7rwedqDIJcIehg1TYxyqw75BpNqZik1M2F51bkr18jbJN2tmFqWpEoVMsQaTLXvo6fAJp6LNNJYHh3ja6HTTGTI0rTUj7fipA8fLbuEAjIp+/SyHPO2ope0wbWw/dyO82hMYlzedc0EXCXjdm4GT53coDYqKYWsQjMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745907996; c=relaxed/simple;
-	bh=w5xmDrnv+yRAYk+8SLEfOxgC7M2f5UCClkgMAHF3J+8=;
+	s=arc-20240116; t=1745908054; c=relaxed/simple;
+	bh=xrsciajtCOMDU/0+6efvQVMaAL+7MADLRTwjTRj09ks=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gJutY5osyrAweKrDpUKQEWnVbG79gsZdXI9mJYXdpxYLr76LHtaDFcIhgKonqQvmQaPFqaiH/skoBZ8lpxwTWUP7/FcDc7IFja/v1wbCobv26wT/TvKHjJnUuyAZqoQfFXDY85O4ugkKbhB1RlKUGPQ2NCFdUskWlREi+lsaMac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CMEvcfX7; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=XAGD13KGdRDvIRNnsP08fGlYyQXcO8lBhV2H6RQSaoWFWHNinQZT9HUMBuN8DvFSga4xkR4z8jBDHWDRKHBohE+68wtJN+qwSu+ovjPxh16Jm+LNQQ2GNVyfNJQeeC8KikIngcNA0i2lXwonF6ft5CqA00sw8rcrXc8gn2S3N/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AUmGM2iG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eqtIOKc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AUmGM2iG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eqtIOKc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CMEvcfX7"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T4EPYS029711;
-	Tue, 29 Apr 2025 06:26:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=t2f/Jk
-	ZToUzJH7eA3ipwspXv3VhrZyo1pxPEv1R9nj0=; b=CMEvcfX7qmtNMa19osy3um
-	BuuUoO3efRKkEgpWlD1B7AP6hyPnwFWEyOMFWnygL1wbW0m9Y2eoUPZQFMhJS/iO
-	weZ/eussS/4FdVZ0oktNWQlvoTfx2hE/a58SqtqaRFpXYNehDpGh8zuVh1PuyHaz
-	O8h3JI0l0pBkBROAE48rBHwoejoinODZU6XtU1us3Un1UIfU2Keb7ZLgrFtJfVe+
-	4Idz7H2NbvfDjFoTnBEkehN7RgoRf8ArboxGgIl6ngkSqOKOBWpXPKCNWTTf3GM0
-	hx15Jn+PlPXKJt8MkkSuGc1+MjezomGlN4sy7LYtbkIvfTGZp1Hrvek6BQLw2AMw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46a84s4eay-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Apr 2025 06:26:11 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53T3qfYD016174;
-	Tue, 29 Apr 2025 06:26:11 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 469a70a3d3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Apr 2025 06:26:11 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53T6QAFb32834082
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 29 Apr 2025 06:26:10 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6BEE358056;
-	Tue, 29 Apr 2025 06:26:10 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1AE1C58062;
-	Tue, 29 Apr 2025 06:26:07 +0000 (GMT)
-Received: from [9.109.198.140] (unknown [9.109.198.140])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 29 Apr 2025 06:26:06 +0000 (GMT)
-Message-ID: <9a4245ed-bd5d-4a42-b8ef-3d4e557c69c8@linux.ibm.com>
-Date: Tue, 29 Apr 2025 11:56:05 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AUmGM2iG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eqtIOKc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AUmGM2iG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eqtIOKc"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 07AAE1FE8B;
+	Tue, 29 Apr 2025 06:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745908050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3lIoiG/zUZmf47pO1+oR2n+5TkpPk63GEaSXHmTgwjs=;
+	b=AUmGM2iGx9XAG941Tcsw0PMu5mCYnd/zrJIKbGYjKe0E3LuplaRy0i2QT2IvDdBOF+ERD2
+	xpIOlZOWa6sjo/Fp3WPEdOULKPktlL88hgBwTopI8SgZyRLm+qA6qaWql+A6FJEazhvVJv
+	faZUd/lFF2aZyuV11VTEs3/HOdRvUJE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745908050;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3lIoiG/zUZmf47pO1+oR2n+5TkpPk63GEaSXHmTgwjs=;
+	b=3eqtIOKc6l4/3gsdycDOR1zVHT4jte8WTXsNmgHkDQoCK5TD1tPtrD30ng4IKHi2AvKlFs
+	eD7FiAs1llRmiRDw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1745908050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3lIoiG/zUZmf47pO1+oR2n+5TkpPk63GEaSXHmTgwjs=;
+	b=AUmGM2iGx9XAG941Tcsw0PMu5mCYnd/zrJIKbGYjKe0E3LuplaRy0i2QT2IvDdBOF+ERD2
+	xpIOlZOWa6sjo/Fp3WPEdOULKPktlL88hgBwTopI8SgZyRLm+qA6qaWql+A6FJEazhvVJv
+	faZUd/lFF2aZyuV11VTEs3/HOdRvUJE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1745908050;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3lIoiG/zUZmf47pO1+oR2n+5TkpPk63GEaSXHmTgwjs=;
+	b=3eqtIOKc6l4/3gsdycDOR1zVHT4jte8WTXsNmgHkDQoCK5TD1tPtrD30ng4IKHi2AvKlFs
+	eD7FiAs1llRmiRDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 49DD913931;
+	Tue, 29 Apr 2025 06:27:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bMscEFFxEGjMXwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 29 Apr 2025 06:27:29 +0000
+Message-ID: <23ba6efd-de51-408c-bc8d-225bb265d1e2@suse.de>
+Date: Tue, 29 Apr 2025 08:27:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,79 +82,70 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCHv2 2/3] nvme: introduce multipath_head_always module
- param
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, hare@suse.de, sagi@grimberg.me, jmeneghi@redhat.com,
-        axboe@kernel.dk, martin.petersen@oracle.com, gjoyce@ibm.com
-References: <20250425103319.1185884-1-nilay@linux.ibm.com>
- <20250425103319.1185884-3-nilay@linux.ibm.com>
- <20250425144540.GB12179@lst.de>
+Subject: Re: [PATCH v2 3/9] block: WARN if bdev inflight counter is negative
+To: Yu Kuai <yukuai1@huaweicloud.com>, hch@infradead.org, axboe@kernel.dk,
+ xni@redhat.com, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+ song@kernel.org, yukuai3@huawei.com, cl@linux.com, nadav.amit@gmail.com,
+ ubizjak@gmail.com, akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20250427082928.131295-1-yukuai1@huaweicloud.com>
+ <20250427082928.131295-4-yukuai1@huaweicloud.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250425144540.GB12179@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Mchsu4/f c=1 sm=1 tr=0 ts=68107103 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=yCh3Tjrm5dVL9IxFuOcA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA0NSBTYWx0ZWRfX0hgqJxtWUuDx D5OPMEvkHaqzjTmHjeW7ZqIMAQWi2P2L29SR5myrFiJ5aJOTfYVSXpbRnAfNuKHkYYIMoARrPnp GAZA6EBaPi5CjhjjzlJJwkG+TtOZCvsFj/S3Nq7tlxbAW9BoY3BwxrHQqL+OkZTkJclNlT5ihWG
- xmWQeBTJvLcD+KLk3piyXB4hU7QmoywnB+wl/HVhrUwOigpCl5xolonRFMUxo09T9a/6cSTyen2 UeQAyaZtprtoRfQ7r8hPsiXopMKs+KrRBnFgbiE/wBPqFD88qiI4yxv2mcuygdb5z3pESHjrNUp +I9ykOy4E8i1QKlOFpGsAxAk7URanVW3jP2q6rrhzkUqdBMZPtO0EfYI8W39zXphrzfZN9tqSbM
- QVO1tzeEMCPETlbt2GBNNdbQ/+whdNT6/w2k8AQ2fE/bFfHJWkdUNcZ/hXYuQ/P8drNvUebG
-X-Proofpoint-ORIG-GUID: SOEuAPuWgIZZS8Nnh7dz_B_69vKvyCq8
-X-Proofpoint-GUID: SOEuAPuWgIZZS8Nnh7dz_B_69vKvyCq8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-29_02,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=870 impostorscore=0 bulkscore=0
- malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0 mlxscore=0
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2504290045
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250427082928.131295-4-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_TO(0.00)[huaweicloud.com,infradead.org,kernel.dk,redhat.com,kernel.org,huawei.com,linux.com,gmail.com,linux-foundation.org];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
+On 4/27/25 10:29, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Which means there is a BUG for related bio-based disk driver, or blk-mq
+> for rq-based disk, it's better not to hide the BUG.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/genhd.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+Please make 'BUG' lowercase.
 
+Otherwise:
 
-On 4/25/25 8:15 PM, Christoph Hellwig wrote:
-> On Fri, Apr 25, 2025 at 04:03:09PM +0530, Nilay Shroff wrote:
->> +static int multipath_param_set(const char *val, const struct kernel_param *kp)
->> +{
->> +	int ret;
->> +
->> +	ret = param_set_bool(val, kp);
->> +	if (ret)
->> +		return ret;
->> +
->> +	if (multipath_head_always && !*(bool *)kp->arg) {
->> +		pr_err("Can't disable multipath when multipath_head_always is configured.\n");
->> +		*(bool *)kp->arg = true;
-> 
-> This reads much nicer if you add a local bool * variable and avoid
-> all the casting, i.e.
-> 
-> 	bool *arg = kp->arg;
-> 
-> 	...
-> 
-> 	if (multipath_head_always && !*kp->arg) {
-> 		pr_err("Can't disable multipath when multipath_head_always is configured.\n");
-> 		*arg = true;
-> 
->> +static int multipath_head_always_set(const char *val,
->> +		const struct kernel_param *kp)
->> +{
->> +	int ret;
->> +
->> +	ret = param_set_bool(val, kp);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	if (*(bool *)kp->arg)
->> +		multipath = true;
-> 
-> Same here.
-> 
-Agreed, will change in the next patch.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Thanks,
---Nilay
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
