@@ -1,94 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272B2147EB
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 02:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28EA221DAE;
+	Tue, 29 Apr 2025 02:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745893816; cv=none; b=iKyxxSUg64xNaOqeOhiLLeeiBdg7CI47mzfajCloWkaFgnUr5WCVmFWsTZ6VI0VFMRbDCNaAwCUqL6y7ICRPPX+nLjlC2WZalxDoXmpQFz/cy4fzGMSfl2A54J0Vmks6CFKyI3ivx5oSYnJiVIqOMsH8Dqzv7jve/0iq8CqVLMM=
+	t=1745894533; cv=none; b=biTI8FdNhF+b6cbTWcIXQ/76JnRH2iQesHMEOGSsEQmhE0VRe0LmeVHZ6IudWUpMIuHXw//pL7b1kg4QMwq7nzA+aA5ElM3nRDkbvCO00DCb7DXwoqM7Ct95qd7gQDUZlKhk7V3+/kslBpM/hJ5HdIACZFWc/bm1n6ZDwYjyzA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745893816; c=relaxed/simple;
-	bh=lWkgMxc1zosAnB9QOKhz2RulLILw3ULoMZVId57HWrQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dUMeYmBZF3w2NraU2bqzhU2Cl4prOeb059kfKr310kpCZMFKvphAQmUJfGCt/Soec7qEhKJ5omv/CooAitltiJ6X9XM9a8UCwZTY9VjuNk3CAQv4czPGWOVOdFKfjSKGTw440E/C7l8qJ2XkC28OOz1YrcJ8ndxQNfRpj7aGcvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DdVZ7TYI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1745894533; c=relaxed/simple;
+	bh=JEB13Q6qCJ3b8dvOA+ykH/XIbk5dBywfURD7c4iY0Ts=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JV676utP/05rf96U8eaJwMyJj/Y09KiwrOWMn34urByEs9GsRCskO71w9yejDz7PllKh46jhOH2bb48rr0ez+ib0ZIqGZA9HKAsjJk80i1ArwPZMChT6+Xs4CyB1Y6yZdOAjDY+dyr2ohMeUXbTzXi8RbrBuJcwMaDYVnnuAnTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q8QhjQYS; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DdVZ7TYI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745893813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=otv72E7kb538clJy+u0MrT/qtl6HQd6KboFOKcH7OMU=;
-	b=DdVZ7TYIC9RHWSonDh5CGaL7FKBAS4VjqcdDsSCopDHZ95gsefBd7EGjj+IoNFNY8EmeTi
-	bqQWFy9xAx9zeF+8siVYIB2FGFTSdk93AFxPnlcW7IJfQn9prtRA4ju0m2VdKBryzDRHb5
-	zSCsrMfnYQBE6ZxYHVU3yEGZNOU7g2o=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-183-tyUUgaUzO2-XLIYhF2CaQA-1; Mon,
- 28 Apr 2025 22:30:08 -0400
-X-MC-Unique: tyUUgaUzO2-XLIYhF2CaQA-1
-X-Mimecast-MFC-AGG-ID: tyUUgaUzO2-XLIYhF2CaQA_1745893806
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 251071800446;
-	Tue, 29 Apr 2025 02:30:06 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.57])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A3B51956096;
-	Tue, 29 Apr 2025 02:30:04 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v6.15 v2 4/4] ublk: remove the check of ublk_need_req_ref() from __ublk_check_and_get_req
-Date: Tue, 29 Apr 2025 10:29:39 +0800
-Message-ID: <20250429022941.1718671-5-ming.lei@redhat.com>
-In-Reply-To: <20250429022941.1718671-1-ming.lei@redhat.com>
-References: <20250429022941.1718671-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q8QhjQYS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745894532; x=1777430532;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JEB13Q6qCJ3b8dvOA+ykH/XIbk5dBywfURD7c4iY0Ts=;
+  b=Q8QhjQYS24waaN/SWgpvOP0bm6SkSh6m9QIOTyXOwxAQkSGvaaUNhlE2
+   xIc2K0zbFWQxC9e89+wglhnGRCLjOvftQjBzZnn+CSXhK0WagBOyjdkF7
+   9iByWTKjuTeahNIZjEl5u7SBlXW4IyQ0Bfr3YzM6tz7oha6GA+tso3Kyd
+   4pwc359bRKvoTOpG7QiYLnzZ7+5knPWlYrZaSoByyZDqYOTIVfrwVW+Mp
+   oIIjfiopIKBUGtRqaSkc+o82ZsVJh9UzPfVujcwv5dS9zjEb0k0OYysbv
+   kUJ+oinmQWgpgOtkxMi9X2SSJ3Ug1ngND9aJxCYFfwGjQCSqubNqcOzgz
+   Q==;
+X-CSE-ConnectionGUID: qQW6BDQsQmOKHlwQN4Sovg==
+X-CSE-MsgGUID: RakiDtEjTd23kC1p+81D6A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="58492526"
+X-IronPort-AV: E=Sophos;i="6.15,247,1739865600"; 
+   d="scan'208";a="58492526"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 19:42:11 -0700
+X-CSE-ConnectionGUID: cHWLk+ReRtiizI2k9hpzsQ==
+X-CSE-MsgGUID: QL4CnKgYSfSVf8FrilpuPA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,247,1739865600"; 
+   d="scan'208";a="134208058"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 19:42:03 -0700
+Message-ID: <73184520-4853-49cb-a3e2-8bb7311c91e1@linux.intel.com>
+Date: Tue, 29 Apr 2025 10:37:50 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 04/24] iommu: add kernel-doc for iommu_unmap_fast
+To: Leon Romanovsky <leon@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org,
+ Niklas Schnelle <schnelle@linux.ibm.com>,
+ Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Dan Williams
+ <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1745831017.git.leon@kernel.org>
+ <6c4bbb539bec7b827b9e9cc24779c9e9c43fc3ed.1745831017.git.leon@kernel.org>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <6c4bbb539bec7b827b9e9cc24779c9e9c43fc3ed.1745831017.git.leon@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-__ublk_check_and_get_req() is only called from ublk_check_and_get_req()
-and ublk_register_io_buf(), the same check has been covered in the two
-calling sites.
+On 4/28/25 17:22, Leon Romanovsky wrote:
+> From: Leon Romanovsky<leonro@nvidia.com>
+> 
+> Add kernel-doc section for iommu_unmap_fast to document existing
+> limitation of underlying functions which can't split individual ranges.
+> 
+> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
+> Acked-by: Will Deacon<will@kernel.org>
+> Reviewed-by: Christoph Hellwig<hch@lst.de>
+> Tested-by: Jens Axboe<axboe@kernel.dk>
+> Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
+> Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
+> Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
 
-So remove the check from __ublk_check_and_get_req().
-
-Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c624d8f653ae..f9032076bc06 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2148,9 +2148,6 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
- {
- 	struct request *req;
- 
--	if (!ublk_need_req_ref(ubq))
--		return NULL;
--
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
- 	if (!req)
- 		return NULL;
--- 
-2.47.0
-
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
