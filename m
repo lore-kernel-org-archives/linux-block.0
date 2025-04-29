@@ -1,165 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2127A2FB2
-	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 01:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20802FB2
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 01:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745890610; cv=none; b=BDiZEUGWrc1yiEDghRL/LAoLO4lc3DwpQU8CusAIY+xXzlS6FoH2Mu2pR+8reQUHdWJKyZ0p6YIa+AqmVbdYt7L+H//Nzk1POoXzfV7SKR6fA+zhWgpqEM07FFCD+n97tTCUj3BV+63sXvv3NpbjdCFnGG9sJyMt1fpX13/a8NU=
+	t=1745890718; cv=none; b=A9PaG2fkO6eA3Z/oRogOf67dy97TWJe8WA2NE/HBS1eCI0+8YNeiXTiyFApmSLmuTHB139YaIOJEzGjsF6piMcEt3ygyWjsblPpCYBhP7NJO45xfaB94OkOCPhx0+awI8sOXinSi4eRhhkmGokb+ihWPpEV3ZWl02ObR4VNwjaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745890610; c=relaxed/simple;
-	bh=nJKacFpU1WSa+/Jl/F+L1fpik1X7EwRizCAZhU7Akew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aVgB2bnR/W4aetsS/oX6dWAUGl8fri5wJM8Vh+45DsoD7vfrvPg8a8Qz/x9srmhsjHzLzhi7DZ70NsuUyivm0Km95aNFy/dhd5XpzL9LExTuEihGOnHW5W5P92+sW3zH/TdwiyrjtCfpeuuHx7bBClfvzCMaVptGE2rnpE/5+8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MRaDQqBU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRaDQqBU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745890607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oaECNEITXR8YE73AoCrpiKvZypWzmz8xCsvjNKxtt08=;
-	b=MRaDQqBUVefyiVmby/6EEYf1COXvsW/5yImAqzGZfrv5W0LC0eC0vq4dIQkzawmtFPAB6R
-	2j8mqu6jSVPVYp2+aEsh+ZK1xjd1bIAR0BrJATUgUOZcqw4K2yrUsOdvQtJenU/gJslgV0
-	bQAhvb/+HnP54B/SuHbxr8x6YTIHbCw=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-340-ol9o-WRiMG2lSmqdoUOz7g-1; Mon,
- 28 Apr 2025 21:36:44 -0400
-X-MC-Unique: ol9o-WRiMG2lSmqdoUOz7g-1
-X-Mimecast-MFC-AGG-ID: ol9o-WRiMG2lSmqdoUOz7g_1745890603
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0CC101956048;
-	Tue, 29 Apr 2025 01:36:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.57])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CBA01956094;
-	Tue, 29 Apr 2025 01:36:38 +0000 (UTC)
-Date: Tue, 29 Apr 2025 09:36:33 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v6.15 2/3] ublk: decouple zero copy from user copy
-Message-ID: <aBAtIf4cvR_Xd9Hb@fedora>
-References: <20250427134932.1480893-1-ming.lei@redhat.com>
- <20250427134932.1480893-3-ming.lei@redhat.com>
- <CADUfDZq4m2ndHPmbWnECXWCYO_o7X-ys37=10gqMMYcO+xEJhA@mail.gmail.com>
- <aBAjlJXxz97F4ZOC@fedora>
+	s=arc-20240116; t=1745890718; c=relaxed/simple;
+	bh=kXS7/kZVR001fMZ12batfBQDY1uf8Kby8PphRf8Yb5M=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qdbnE4BDZwPJveM+m6T4qIBsBs02C6pjucdxk9U85VsbhJX9+pq1/HAldU4LkASvfoczAttrd+0MZmNTtb7uOMhNMb8BXZZbQFRAaTGlhNot0p+kAICFDhNDblJpCdfMkSsLVhmLZm7bvAZBmS4GNwsV8XgOl4ySsm64Tvn5wYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zmjcz2qPxz4f3jt7
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 09:38:11 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 49E821A0B19
+	for <linux-block@vger.kernel.org>; Tue, 29 Apr 2025 09:38:30 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBXvGCULRBoOduAKw--.54194S3;
+	Tue, 29 Apr 2025 09:38:30 +0800 (CST)
+Subject: Re: [PATCH 4/5] brd: split I/O at page boundaries
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
+ linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250428141014.2360063-1-hch@lst.de>
+ <20250428141014.2360063-5-hch@lst.de>
+ <aA_Dyp97AIAqJ70G@kbusch-mbp.dhcp.thefacebook.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <221bce43-83b7-b5ac-c6d2-ded23158dd06@huaweicloud.com>
+Date: Tue, 29 Apr 2025 09:38:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <aA_Dyp97AIAqJ70G@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aBAjlJXxz97F4ZOC@fedora>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-CM-TRANSID:gCh0CgBXvGCULRBoOduAKw--.54194S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrury3XF4fWF1xGFW5Jry3twb_yoW3Xrc_ZF
+	n5Cr97KwsrAFWkJF4ft3sxAFyft3WFgry5tr48Xa13Ww1xJanxWF4v9ryfur1rGrnxtFn5
+	Wwnag3yUAr4YgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbVxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+	Y487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa
+	73UjIFyTuYvjfUYCJmUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Apr 29, 2025 at 08:55:48AM +0800, Ming Lei wrote:
-> On Mon, Apr 28, 2025 at 09:01:04AM -0700, Caleb Sander Mateos wrote:
-> > On Sun, Apr 27, 2025 at 6:49â€¯AM Ming Lei <ming.lei@redhat.com> wrote:
-> > >
-> > > UBLK_F_USER_COPY and UBLK_F_SUPPORT_ZERO_COPY are two different
-> > > features, and shouldn't be coupled together.
-> > >
-> > > Commit 1f6540e2aabb ("ublk: zc register/unregister bvec") enables
-> > > user copy automatically in case of UBLK_F_SUPPORT_ZERO_COPY, this way
-> > > isn't correct.
-> > >
-> > > So decouple zero copy from user copy, and use independent helper to
-> > > check each one.
-> > 
-> > I agree this makes sense.
-> > 
-> > >
-> > > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c | 35 +++++++++++++++++++++++------------
-> > >  1 file changed, 23 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index 40f971a66d3e..0a3a3c64316d 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -205,11 +205,6 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
-> > >  static inline unsigned int ublk_req_build_flags(struct request *req);
-> > >  static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
-> > >                                                    int tag);
-> > > -static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
-> > > -{
-> > > -       return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
-> > > -}
-> > > -
-> > >  static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
-> > >  {
-> > >         return ub->dev_info.flags & UBLK_F_ZONED;
-> > > @@ -609,14 +604,19 @@ static void ublk_apply_params(struct ublk_device *ub)
-> > >                 ublk_dev_param_zoned_apply(ub);
-> > >  }
-> > >
-> > > +static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
-> > > +{
-> > > +       return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
-> > > +}
-> > > +
-> > >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
-> > >  {
-> > > -       return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
-> > > +       return ubq->flags & UBLK_F_USER_COPY;
-> > >  }
-> > >
-> > >  static inline bool ublk_need_map_io(const struct ublk_queue *ubq)
-> > >  {
-> > > -       return !ublk_support_user_copy(ubq);
-> > > +       return !ublk_support_user_copy(ubq) && !ublk_support_zero_copy(ubq);
-> > >  }
-> > >
-> > >  static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
-> > > @@ -624,8 +624,11 @@ static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
-> > >         /*
-> > >          * read()/write() is involved in user copy, so request reference
-> > >          * has to be grabbed
-> > > +        *
-> > > +        * for zero copy, request buffer need to be registered to io_uring
-> > > +        * buffer table, so reference is needed
-> > >          */
-> > > -       return ublk_support_user_copy(ubq);
-> > > +       return ublk_support_user_copy(ubq) || ublk_support_zero_copy(ubq);
-> > >  }
-> > >
-> > >  static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
-> > > @@ -2245,6 +2248,9 @@ static struct request *ublk_check_and_get_req(struct kiocb *iocb,
-> > >         if (!ubq)
-> > >                 return ERR_PTR(-EINVAL);
-> > >
-> > > +       if (!ublk_support_user_copy(ubq))
-> > > +               return ERR_PTR(-EACCES);
-> > 
-> > This partly overlaps with the existing ublk_need_req_ref() check in
-> > __ublk_check_and_get_req() (although that allows
-> > UBLK_F_SUPPORT_ZERO_COPY too). Can that check be removed now that the
-> > callers explicitly check ublk_support_user_copy() or
-> > ublk_support_zero_copy()?
+Hi,
+
+ÔÚ 2025/04/29 2:07, Keith Busch Ð´µÀ:
+> On Mon, Apr 28, 2025 at 07:09:50AM -0700, Christoph Hellwig wrote:
+>> A lot of complexity in brd stems from the fact that it tries to handle
+>> I/O spanning two backing pages.  Instead limit the size of a single
+>> bvec iteration so that it never crosses a page boundary and remove all
+>> the now unneeded code.
 > 
-> Yeah, it can be removed.
+> Doesn't bio_for_each_segment() already limit bvecs on page boundaries?
+> You'd need to use bio_for_each_bvec() to get multi-page bvecs.
 
-Actually the removal can only be done after the 3rd patch is applied with
-zero copy check is added.
+I think it only limit bvecs on page boundaries on the issue side, not
+disk side.
 
-
+For example, if user issue an IO (2k + 4k), will bio_for_each_segment()
+split this IO into (2k + 2k) and (4k + 2k), I do not test yet, but I
+think the answer is no.
 
 Thanks,
-Ming
+Kuai
+
+> 
+> .
+> 
 
