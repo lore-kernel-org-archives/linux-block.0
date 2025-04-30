@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3851DC994
-	for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 04:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B236AD3
+	for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 04:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745987821; cv=none; b=equ3M/EQDVRO3RzrKr3W+GipOZi6EAsF1N3A4/5Y8OfA5Miq65Mow8rY5iEa/eOHqhBe7bAyB9SKFSZT6P8sGIIGmg+djYN+vJhYYvq4PVRN9ZLM/3/FFgAxlXKzxMYFvY8qj5zHeljtiOCLMPboOx4uOOtT9bhZ4/4sE8rPHZU=
+	t=1745987827; cv=none; b=PQZh5B8Y/yp6904iaDhuzNbGWaLqYolWnva57HKSwyvlKIMC7Jh1jxZDbwCL19YT2wnFvpF8tosw/ZoomtdvOzZvYJfaHw9/JMt00NpD7CIFHAO0xpbJJV1W9QaEzVBcMmIjfAWXAC7p57qORZy0UY8WvnpDQFjYOxZovMJZTt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745987821; c=relaxed/simple;
-	bh=fADfJ58SKKOe4I4T7vCscygY8mI/hsdSnh5GFd5cyR4=;
+	s=arc-20240116; t=1745987827; c=relaxed/simple;
+	bh=teGegAnYkf192UAsagneKAJVehhoU7eUsM33FHFgqbI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SCAhYHc01CScqbBr8HrHhe6Hk82dQ+j0y+KQv3HB6qUIXCXK9MEPZQZvZ1quSofv078Vd8CB0pNTkEdIW5xzZ83hUkERgR6w7ZUsLNqmn16keYKLdCIkppfTrCGWBrjPlFBJ0l8BK04Ldle69+U3RecQcVKNCBXUVBLkf8FXHcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iVlWlZk2; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=YC3HfifPVByLVAzDRiDdvOY8pnPEqzWtuhUV9d8RGTolFIKJmOZTpsx3rWbrxJTKxh3WVlHNvGZiyEMMR614izczfp8KzgL5/Tq1P7lzvcAZucbbEthMZANtZGxS5v2IB2uim7twYRYV9AhcttkVwB60xOh8xXm3CL3MBLkzh1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YqFi5MOC; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVlWlZk2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YqFi5MOC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745987819;
+	s=mimecast20190719; t=1745987824;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=srd591/YPbnDU2xDt6HEaTn8Qde2FWe00GRnbdXtvA0=;
-	b=iVlWlZk2pP1YQgdGbh1X/VMuznwmScEbKMq7OVuIc71vPDgoQc0ild5hgbJYCYTSgp/1SI
-	pBJurPmj8XgHT+nSgPbBUxJ1I+8AlD618odRkNWawJzWihNNQSsbHMJpvWPg6WJDNHdpn3
-	V2I2vzZ+zSuSBOFWIRTObNQp+MPGVAY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=CCQ+Fi2e0gmOJkkf4POtzMsJVzv7tmA+RILZOlFUy30=;
+	b=YqFi5MOCt5lJ2yXJeVaDSSQ19aNnurSaMxQhaW04M7LsaJaB3peMPXvS0tZJOPW0DXUXD2
+	AFrSoQ5k/+HKsJ0NYRyEzKc0vMU46fBEfzwQyHcLp40m674JGKl8XBTrTGLAXlAQXuRVso
+	j1XxeNq6WiUsRqGp9M0gqKe2lvH9IPU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-y2EknbmgOTaWVgZim9lbvA-1; Wed,
- 30 Apr 2025 00:36:57 -0400
-X-MC-Unique: y2EknbmgOTaWVgZim9lbvA-1
-X-Mimecast-MFC-AGG-ID: y2EknbmgOTaWVgZim9lbvA_1745987815
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-cfVwBzf3Oy-znZt9p5Y04w-1; Wed,
+ 30 Apr 2025 00:37:00 -0400
+X-MC-Unique: cfVwBzf3Oy-znZt9p5Y04w-1
+X-Mimecast-MFC-AGG-ID: cfVwBzf3Oy-znZt9p5Y04w_1745987819
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 96E1B19560BB;
-	Wed, 30 Apr 2025 04:36:55 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51BB31956095;
+	Wed, 30 Apr 2025 04:36:59 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.48])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C62611956094;
-	Wed, 30 Apr 2025 04:36:54 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5273F180045B;
+	Wed, 30 Apr 2025 04:36:57 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V4 21/24] block: move hctx debugfs/sysfs registering out of freezing queue
-Date: Wed, 30 Apr 2025 12:35:23 +0800
-Message-ID: <20250430043529.1950194-22-ming.lei@redhat.com>
+Subject: [PATCH V4 22/24] block: don't acquire ->elevator_lock in blk_mq_map_swqueue and blk_mq_realloc_hw_ctxs
+Date: Wed, 30 Apr 2025 12:35:24 +0800
+Message-ID: <20250430043529.1950194-23-ming.lei@redhat.com>
 In-Reply-To: <20250430043529.1950194-1-ming.lei@redhat.com>
 References: <20250430043529.1950194-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,79 +63,83 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Move hctx debugfs/sysfs register out of freezing queue in
-__blk_mq_update_nr_hw_queues(), so that the following lockdep dependency
-can be killed:
+Both blk_mq_map_swqueue() and blk_mq_realloc_hw_ctxs() are called before
+the request queue is added to tagset list, so the two won't run concurrently
+with blk_mq_update_nr_hw_queues().
 
-	#2 (&q->q_usage_counter(io)#16){++++}-{0:0}:
-	#1 (fs_reclaim){+.+.}-{0:0}:
-	#0 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}: //debugfs
+When the two functions are only called from queue initialization or
+blk_mq_update_nr_hw_queues(), elevator switch can't happen.
 
-And registering/un-registering hctx debugfs/sysfs does not require queue to
-be frozen:
-
-- hctx sysfs attributes show() are drained when removing kobject, and
-  there isn't store() implementation for hctx sysfs attributes
-
-- debugfs entry read() is drained too when removing debugfs directory,
-  and there isn't write() implementation for hctx debugfs too
-
-- so it is safe to register/unregister hctx sysfs/debugfs without
-  freezing queue because the cod paths changes nothing, and we just
-  need to keep hctx live
+So remove ->elevator_lock uses from the two functions.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ block/blk-mq.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a4bcfce4c4b9..33bffacc33db 100644
+index 33bffacc33db..4e6bc065c955 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -4961,14 +4961,14 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		return;
+@@ -4112,8 +4112,6 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_tag_set *set = q->tag_set;
  
- 	memflags = memalloc_noio_save();
--	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		blk_mq_freeze_queue_nomemsave(q);
+-	mutex_lock(&q->elevator_lock);
 -
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		cpumask_clear(hctx->cpumask);
+ 		hctx->nr_ctx = 0;
+@@ -4218,8 +4216,6 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 		hctx->next_cpu = blk_mq_first_mapped_cpu(hctx);
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+ 	}
+-
+-	mutex_unlock(&q->elevator_lock);
+ }
+ 
+ /*
+@@ -4523,16 +4519,9 @@ static void __blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ }
+ 
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+-				   struct request_queue *q, bool lock)
++				   struct request_queue *q)
+ {
+-	if (lock) {
+-		/* protect against switching io scheduler  */
+-		mutex_lock(&q->elevator_lock);
+-		__blk_mq_realloc_hw_ctxs(set, q);
+-		mutex_unlock(&q->elevator_lock);
+-	} else {
+-		__blk_mq_realloc_hw_ctxs(set, q);
+-	}
++	__blk_mq_realloc_hw_ctxs(set, q);
+ 
+ 	/* unregister cpuhp callbacks for exited hctxs */
+ 	blk_mq_remove_hw_queues_cpuhp(q);
+@@ -4564,7 +4553,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 
+ 	xa_init(&q->hctx_table);
+ 
+-	blk_mq_realloc_hw_ctxs(set, q, false);
++	blk_mq_realloc_hw_ctxs(set, q);
+ 	if (!q->nr_hw_queues)
+ 		goto err_hctxs;
+ 
+@@ -4975,7 +4964,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ fallback:
+ 	blk_mq_update_queue_map(set);
  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_debugfs_unregister_hctxs(q);
- 		blk_mq_sysfs_unregister_hctxs(q);
- 	}
+-		blk_mq_realloc_hw_ctxs(set, q, true);
++		blk_mq_realloc_hw_ctxs(set, q);
  
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		blk_mq_freeze_queue_nomemsave(q);
-+
- 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
- 		goto reregister;
- 
-@@ -4991,16 +4991,15 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_map_swqueue(q);
- 	}
- 
-+	/* elv_update_nr_hw_queues() unfreeze queue for us */
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		elv_update_nr_hw_queues(q);
-+
- reregister:
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_sysfs_register_hctxs(q);
- 		blk_mq_debugfs_register_hctxs(q);
- 	}
--
--	/* elv_update_nr_hw_queues() unfreeze queue for us */
--	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		elv_update_nr_hw_queues(q);
--
- 	memalloc_noio_restore(memflags);
- 
- 	/* Free the excess tags when nr_hw_queues shrink. */
+ 		if (q->nr_hw_queues != set->nr_hw_queues) {
+ 			int i = prev_nr_hw_queues;
 -- 
 2.47.0
 
