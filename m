@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64DC15D1
-	for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 04:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4183B672
+	for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 04:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745987757; cv=none; b=AoY8TarzApVtrWb8p0rFzXmnphbE5S/VucQfc87mwNK3sbxALDDAmH1HOJ5+kXhmV89kc4dl4mHvxp2ZduA23hRsgviAV2zEFyGTgyEOAaoN3OcDVyVNIQ4N7EBiYnZDJPaX8xZfLRzPrUhdnZacPvJffaJdc9XsT9ors2rYSgw=
+	t=1745987760; cv=none; b=Oq1seW2WBC0rEt3Rcu064hI8fr6/LI/AlDM+rExQRCO+FkKTuMOKrwjlTV46syj043cZRkTIrIt5WKTUJDx5eHi1TF8N7UvX83o7MUbq44mlV8KcObw8Huj/X+PHzGGest0lEbuq+TitIPPG99Kkin5ZwwJArZaaY9DpH9iWMrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745987757; c=relaxed/simple;
-	bh=LsfXwNqRpDQAyLzNaTANepclIeFuC9WRBct8a93kfw0=;
+	s=arc-20240116; t=1745987760; c=relaxed/simple;
+	bh=f6Ws/aKl0hiCia4kpVjXMlUuPlZwZmZuHl7Ufkgnw2A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pbB6g6S1QowOxeyM5LcdZaZ4KF1YXlbFEqxXaETWKwxsTY5pBKhopKreH/fnWIHEEuVMrYSE5gTqKMIyDxJxzvAJoE8HBqvjwBpjBTri6uDxSGbVSRbEj3ZuwQYjOWkMjRMbxwrlzVFV522WJp/HoxVz+68E1rZNIZ6UvnYchl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X4aiKqtH; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=I7IZQwn9I4z8FHPGX8sXzoiIXLi7fxkdCbQIorC/qlHt1nGvW8xVZj4Wj06EruNHmeR1jx5Wz1uqpB9lC5reCOXmcaM/P9WTrAYJTxs8s6zmUwcclwp6r4YooLJXsWPi09KJ3wxJComGWQjAN2/zBa6t064mFfX77M6kE65f+s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TF5D+vZS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X4aiKqtH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TF5D+vZS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745987754;
+	s=mimecast20190719; t=1745987757;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4dyz5GBTte5X+YCwXlGFtXtVmY2gcRgIvBXwoOgTjgQ=;
-	b=X4aiKqtHZqLnN0LJAv+n/w+grI96CPkR1YqgX7uARnXohfqVp+4Mg5oxen0Hvj2yoi3L1q
-	jdkQP/EkMjxlPonqMe2LA3dy8+gCFK5ujto/PIRl7QH17ysBEEesWdaaDRs06t2n/8mC/n
-	pDvxYaVSwm2SqVA4jGMD/c23eWlZOT0=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=wA36hOWRz4zzOanRIrOPG4cgnHK+c3+IavYbiJBSkbA=;
+	b=TF5D+vZS9y4p2B7wEkaDnwnmq7Sa7mzG4DK6UUmEMiEO4kcDJW4jbsPswsM+b63UOYsjye
+	I5uei3OtQsRuxXDhpW023ko6AorrkyIFMAoPgoEYFgSLns17u1ENDOv/PO5w3+W1yXLw+W
+	AaKmdyZNYfQouX2ry5vb+9K3AprmdQk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-361-yJrXHYTrO_WpDIQO-9luYw-1; Wed,
- 30 Apr 2025 00:35:50 -0400
-X-MC-Unique: yJrXHYTrO_WpDIQO-9luYw-1
-X-Mimecast-MFC-AGG-ID: yJrXHYTrO_WpDIQO-9luYw_1745987748
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-375-msZ3vjdEMimfwoqLZKzJBQ-1; Wed,
+ 30 Apr 2025 00:35:53 -0400
+X-MC-Unique: msZ3vjdEMimfwoqLZKzJBQ-1
+X-Mimecast-MFC-AGG-ID: msZ3vjdEMimfwoqLZKzJBQ_1745987752
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1D67180010A;
-	Wed, 30 Apr 2025 04:35:48 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 78EF9180036F;
+	Wed, 30 Apr 2025 04:35:52 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.48])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AE526180045B;
-	Wed, 30 Apr 2025 04:35:47 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 79723180045B;
+	Wed, 30 Apr 2025 04:35:51 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V4 03/24] block: don't call freeze queue in elevator_switch() and elevator_disable()
-Date: Wed, 30 Apr 2025 12:35:05 +0800
-Message-ID: <20250430043529.1950194-4-ming.lei@redhat.com>
+Subject: [PATCH V4 04/24] block: use q->elevator with ->elevator_lock held in elv_iosched_show()
+Date: Wed, 30 Apr 2025 12:35:06 +0800
+Message-ID: <20250430043529.1950194-5-ming.lei@redhat.com>
 In-Reply-To: <20250430043529.1950194-1-ming.lei@redhat.com>
 References: <20250430043529.1950194-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -65,67 +65,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Both elevator_switch() and elevator_disable() are only called from the
-two code paths, in which queue is guaranteed to be frozen.
+Use q->elevator with ->elevator_lock held in elv_iosched_show(), since
+the local cached elevator reference may become stale after getting
+->elevator_lock.
 
-So don't call freeze queue in the two functions, also add asserts for
-queue freeze.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ block/elevator.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/block/elevator.c b/block/elevator.c
-index b4d08026b02c..5051a98dc08c 100644
+index 5051a98dc08c..b32815594892 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -615,12 +615,11 @@ void elevator_init_mq(struct request_queue *q)
-  */
- int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+@@ -739,7 +739,6 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
  {
--	unsigned int memflags;
- 	int ret;
+ 	struct request_queue *q = disk->queue;
+-	struct elevator_queue *eq = q->elevator;
+ 	struct elevator_type *cur = NULL, *e;
+ 	int len = 0;
  
-+	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 	lockdep_assert_held(&q->elevator_lock);
+@@ -748,7 +747,7 @@ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
+ 		len += sprintf(name+len, "[none] ");
+ 	} else {
+ 		len += sprintf(name+len, "none ");
+-		cur = eq->type;
++		cur = q->elevator->type;
+ 	}
  
--	memflags = blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
- 	if (q->elevator) {
-@@ -641,7 +640,6 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 
- out_unfreeze:
- 	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q, memflags);
- 
- 	if (ret) {
- 		pr_warn("elv: switch to \"%s\" failed, falling back to \"none\"\n",
-@@ -653,11 +651,9 @@ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 
- void elevator_disable(struct request_queue *q)
- {
--	unsigned int memflags;
--
-+	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 	lockdep_assert_held(&q->elevator_lock);
- 
--	memflags = blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
- 	elv_unregister_queue(q);
-@@ -668,7 +664,6 @@ void elevator_disable(struct request_queue *q)
- 	blk_add_trace_msg(q, "elv switch: none");
- 
- 	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q, memflags);
- }
- 
- /*
+ 	spin_lock(&elv_list_lock);
 -- 
 2.47.0
 
