@@ -1,71 +1,77 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7A32D1126;
-	Wed, 30 Apr 2025 21:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B662690C4
+	for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 21:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746048180; cv=none; b=E8m5/4lOXdQG66R9y5fnc+o0qL1et9hy7warudr5QZxLPiLTQ4MsPAiGfGXs9dsmtCdZO2h4A797FYJGQpLYtR1xitTjXdRhbl+fIwuAwiokOrkVoVHu+JsD2O3M5/TJtOCJKlW1WekU2/npqaarRxudSv8+eOPEluB5GniuZxI=
+	t=1746048710; cv=none; b=SNLvjiH8uGx6nMhZRz5RNMKmXLm5hwP6Hb+QuxeGbgrvvvSIwZSfGujZPZ3TRvXAKzxvMe3pifnnmx4ZFbnwe1rSSo32rnl0+LRfzEiZjRnwq8C64Sjp0mYDm5XeB/QxRtH7hnjTp79iX4OHDOXSfFIgS9kcfpM7BZzGKG0Td+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746048180; c=relaxed/simple;
-	bh=LWH2IeIHBETWvdlPK8EFEn8CgwqV7CCSowakSE/YpAI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qlVBD01XJzvvfugSAsDzDvpOahrwKDeANt+/4i8TC5jiZESOeeRVxAFdAZoNhhEYNiuUytPDaYVxPe+J4gJLiYWBf6d/66n+xZ9et47HU13YUKhb1gxADyrC5cMjZsrKoOcg+7IRtnb0rk8vKTtTF0YKciMJ5aVZGE5c8F9ffOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hlKeK5R6; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1746048710; c=relaxed/simple;
+	bh=13Lb1ENEytkmOyjRQhWQw++cdiq7YvJSKwVsRLTVCmQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V7Qrz9iso1sjLuYRaaa0/Qvho3rkgC23CVnrL+7Odi1fxbstCDhIEajEZjCBUS1+okoFkxR+5JhNfA3n0ckTLQGL06gET0YKQ43G343KSYSiTfN029chf+4iNTa3VFKB+ABLnA2oF6EQm0G591S6YKiru2VEnVfCUqXRJIj9ZDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FWHMJmhc; arc=none smtp.client-ip=209.85.214.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hlKeK5R6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=xUb6OpV1cKOqoxjJg2NB06rtM4y9TqsotfYyIOWBJdg=; b=hlKeK5R6xaQB9XX4joAbRt/N65
-	9eyPL7ErrBQbr5/fz/5756ctrAAsSHMr2M5iYII8ppGKBLjVOcYcGUWI7WSTITAnt2zaUeFr/Vz86
-	NzKU0l5Nl9fJVNzR3JaSHGxfL0VPOdpQURCLw0t3e/9PX2yLGqSIZstrknTKmaLY4whrcJ2SasH1b
-	uAHvL/NHjPDh6o/PWdLZDF/gLZXGy2t42r+DCwh/KQ8BZpPyeIUtZp6KookUZ+r+/6PfDxymSUX2v
-	+y+542I2F2PiPXU4Yd6qiU96mMLR1cGIsvG/r+PH2/z/sSYipsHZrTtixgHaHxps3WDpWbdcfUvSH
-	lBSsUl5A==;
-Received: from [206.0.71.65] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uAEtN-0000000E2kd-49Pf;
-	Wed, 30 Apr 2025 21:22:58 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>,
-	Coly Li <colyli@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@kernel.org>,
-	slava@dubeyko.com,
-	glaubitz@physik.fu-berlin.de,
-	frank.li@vivo.com,
-	linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-btrfs@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 19/19] hfsplus: use bdev_rw_virt in hfsplus_submit_bio
-Date: Wed, 30 Apr 2025 16:21:49 -0500
-Message-ID: <20250430212159.2865803-20-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250430212159.2865803-1-hch@lst.de>
-References: <20250430212159.2865803-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FWHMJmhc"
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2241c95619eso536525ad.0
+        for <linux-block@vger.kernel.org>; Wed, 30 Apr 2025 14:31:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1746048707; x=1746653507; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AowIOLsR5bCOYMWlibArmMsMF726MWG71cvx56FgS1U=;
+        b=FWHMJmhcv2aPsb86mFE6XVJ1dR8LPtZA50SOj/1jkZ2Z051yWCtO3mi1Pkqb7NUnhX
+         ZNg6EJBwrEDqn0bB600jtZjPiy3CKGq3Jqg022e3ViAL8L7RHCloOMgDSu7mRdvT5uCZ
+         BXCk2HRReTbccYWgfKXaDRdQA1HJt3XW7qij0Y4jnZ/gkTLR8+1NnjXVGn3LEyjO2K8b
+         A4+4Jrut9rweF8dDpBeQwYrew9B4AIja8duHRzChx8SGdg3MxlDKWWxr2pcVXTDtKCqv
+         vqrpnwpRiIg1O2PgotvAzKxGmSNdQiyCIdMuAOZ/vSsgj5FoSDrGM1sYk+4UHHX+C1rf
+         9qYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746048707; x=1746653507;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AowIOLsR5bCOYMWlibArmMsMF726MWG71cvx56FgS1U=;
+        b=hJ1Dm1TBG82b7AMy+XNGH+CwAC4q5dEuRGCNnEiW0xSXnybWPEr8u60TmK88jWKHr5
+         JiN+s0IyJkQPRXNI1+Q0V6f4PtvoFMyVYFnVT2K4AlVKYF0Sz75TGHoaGIYij+4vBNmv
+         ofif4u+jVIr1uVpmKZfaJwPl4eVMYmNiuJCOtvVoTgzPq1D5WxUBhZ9/NQ/dD1o71FlW
+         hD+ZgkdASdf+XF+sdUYSbV2+7DfOpfJdoWG0nYm+jFCokOIWApB6oH9+3T0LE/Kd7l3l
+         dALmsaqohKt/zJ1rm3zd5hU9Af5PwaEb+qR1cO/4cwEbWMmJANxo9XDTwX11PfEzLoar
+         MMPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLqUoTWqtGigwWi4Bwhl2ieCldi7dx3W6bb5Z+WLYaDXDiq8rV/BRHEWKqO2M5t2KfKOug4SU0oZA7fw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTWqqCnMVZAYAXzWs0++9owv/7Nk5oagBHn0kugwONaSAeh9vs
+	ynMs+Ma9kEBqRuGwVUhQH/cGXw1pOmIZTWFSqLu1Mz5FPTKLrresVKzVyXCWRVtZGv7e9vWn3ql
+	1xsCHqYT+9zEeJAh0NACc+Hn5us3RjoXt8sj0ZHxJeVTxSANm
+X-Gm-Gg: ASbGnct/+j2iIrCMbdhCH8+vr+QBgMqWoNpk5AI8B97FC7dhdncT91GWYO8av8hn2Q0
+	C8tF6wrGy2rHiojqOkGYaz7OG/HZYaz3u7AZtasBSL8BUKg4l3OfTp3hCQJJV/YMOivRdK6DlFI
+	BqX7VtgAcZK+YTHS4Qlv/oIb97O878GK8UcwpP3dUder9khif9kN+aLBGsDBny78MquRoNP2jxA
+	p7B0jhGsY0oSyHiVgPkfRcbGY1FnD3rxFyHmwXf37XQczV/yIpEFlTyiXwbrsbJZaFaKOgTpIRs
+	dy+g97y/CkZqv8FkVCMlyXKdS4ilaA==
+X-Google-Smtp-Source: AGHT+IEMz8JKMg0IjBz2In3YtU1v2RE7FTghMie4XT2Fs6EgCtrCNUHUNw7hVYhLHl5Z9YvcSiYBYtpOoL4O
+X-Received: by 2002:a17:902:d2cb:b0:224:88c:9253 with SMTP id d9443c01a7336-22df578c625mr24120655ad.6.1746048707346;
+        Wed, 30 Apr 2025 14:31:47 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-22db5216c1fsm14989235ad.106.2025.04.30.14.31.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Apr 2025 14:31:47 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::418a])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 9DA113400C9;
+	Wed, 30 Apr 2025 15:31:46 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 97F8BE41981; Wed, 30 Apr 2025 15:31:46 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: consolidate UBLK_IO_FLAG_OWNED_BY_SRV checks
+Date: Wed, 30 Apr 2025 15:31:43 -0600
+Message-ID: <20250430213144.2625274-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,79 +79,121 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Replace the code building a bio from a kernel direct map address and
-submitting it synchronously with the bdev_rw_virt helper.
+Every ublk I/O command except UBLK_IO_FETCH_REQ checks that the ublk_io
+has UBLK_IO_FLAG_OWNED_BY_SRV set. Consolidate the separate checks into
+a single one in __ublk_ch_uring_cmd(), analogous to those for
+UBLK_IO_FLAG_ACTIVE and UBLK_IO_FLAG_NEED_GET_DATA.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- fs/hfsplus/wrapper.c | 46 +++++++++-----------------------------------
- 1 file changed, 9 insertions(+), 37 deletions(-)
+This is targeted at for-6.16/block, but depends on a recent commit that's only
+on block-6.15.
 
-diff --git a/fs/hfsplus/wrapper.c b/fs/hfsplus/wrapper.c
-index 74801911bc1c..30cf4fe78b3d 100644
---- a/fs/hfsplus/wrapper.c
-+++ b/fs/hfsplus/wrapper.c
-@@ -48,47 +48,19 @@ struct hfsplus_wd {
- int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
- 		       void *buf, void **data, blk_opf_t opf)
+ drivers/block/ublk_drv.c | 24 +++++++-----------------
+ 1 file changed, 7 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index f9032076bc06..692590fcd967 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1951,20 +1951,16 @@ static void ublk_io_release(void *priv)
+ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 				const struct ublk_queue *ubq, unsigned int tag,
+ 				unsigned int index, unsigned int issue_flags)
  {
--	const enum req_op op = opf & REQ_OP_MASK;
--	struct bio *bio;
--	int ret = 0;
--	u64 io_size;
--	loff_t start;
--	int offset;
-+	u64 io_size = hfsplus_min_io_size(sb);
-+	loff_t start = (loff_t)sector << HFSPLUS_SECTOR_SHIFT;
-+	int offset = start & (io_size - 1);
-+
-+	if ((opf & REQ_OP_MASK) != REQ_OP_WRITE && data)
-+		*data = (u8 *)buf + offset;
+ 	struct ublk_device *ub = cmd->file->private_data;
+-	const struct ublk_io *io = &ubq->ios[tag];
+ 	struct request *req;
+ 	int ret;
  
- 	/*
--	 * Align sector to hardware sector size and find offset. We
--	 * assume that io_size is a power of two, which _should_
--	 * be true.
-+	 * Align sector to hardware sector size and find offset. We assume that
-+	 * io_size is a power of two, which _should_ be true.
- 	 */
--	io_size = hfsplus_min_io_size(sb);
--	start = (loff_t)sector << HFSPLUS_SECTOR_SHIFT;
--	offset = start & (io_size - 1);
- 	sector &= ~((io_size >> HFSPLUS_SECTOR_SHIFT) - 1);
+ 	if (!ublk_support_zero_copy(ubq))
+ 		return -EINVAL;
+ 
+-	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-		return -EINVAL;
 -
--	bio = bio_alloc(sb->s_bdev, 1, opf, GFP_NOIO);
--	bio->bi_iter.bi_sector = sector;
--
--	if (op != REQ_OP_WRITE && data)
--		*data = (u8 *)buf + offset;
--
--	while (io_size > 0) {
--		unsigned int page_offset = offset_in_page(buf);
--		unsigned int len = min_t(unsigned int, PAGE_SIZE - page_offset,
--					 io_size);
--
--		ret = bio_add_page(bio, virt_to_page(buf), len, page_offset);
--		if (ret != len) {
--			ret = -EIO;
--			goto out;
--		}
--		io_size -= len;
--		buf = (u8 *)buf + len;
--	}
--
--	ret = submit_bio_wait(bio);
--out:
--	bio_put(bio);
--	return ret < 0 ? ret : 0;
-+	return bdev_rw_virt(sb->s_bdev, sector, buf, io_size, opf);
+ 	req = __ublk_check_and_get_req(ub, ubq, tag, 0);
+ 	if (!req)
+ 		return -EINVAL;
+ 
+ 	ret = io_buffer_register_bvec(cmd, req, ublk_io_release, index,
+@@ -1976,21 +1972,16 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 
+ 	return 0;
  }
  
- static int hfsplus_read_mdb(void *bufptr, struct hfsplus_wd *wd)
+ static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+-				  const struct ublk_queue *ubq, unsigned int tag,
++				  const struct ublk_queue *ubq,
+ 				  unsigned int index, unsigned int issue_flags)
+ {
+-	const struct ublk_io *io = &ubq->ios[tag];
+-
+ 	if (!ublk_support_zero_copy(ubq))
+ 		return -EINVAL;
+ 
+-	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-		return -EINVAL;
+-
+ 	return io_buffer_unregister_bvec(cmd, index, issue_flags);
+ }
+ 
+ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+ 		      struct ublk_io *io, __u64 buf_addr)
+@@ -2072,10 +2063,15 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 	/* there is pending io cmd, something must be wrong */
+ 	if (io->flags & UBLK_IO_FLAG_ACTIVE) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
++ 
++	/* only UBLK_IO_FETCH_REQ is allowed if io is not OWNED_BY_SRV */
++	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV) &&
++	    _IOC_NR(cmd_op) != UBLK_IO_FETCH_REQ)
++		goto out;
+ 
+ 	/*
+ 	 * ensure that the user issues UBLK_IO_NEED_GET_DATA
+ 	 * iff the driver have set the UBLK_IO_FLAG_NEED_GET_DATA.
+ 	 */
+@@ -2090,22 +2086,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 	ret = -EINVAL;
+ 	switch (_IOC_NR(cmd_op)) {
+ 	case UBLK_IO_REGISTER_IO_BUF:
+ 		return ublk_register_io_buf(cmd, ubq, tag, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_UNREGISTER_IO_BUF:
+-		return ublk_unregister_io_buf(cmd, ubq, tag, ub_cmd->addr, issue_flags);
++		return ublk_unregister_io_buf(cmd, ubq, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_FETCH_REQ:
+ 		ret = ublk_fetch(cmd, ubq, io, ub_cmd->addr);
+ 		if (ret)
+ 			goto out;
+ 		break;
+ 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
+ 		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
+-
+-		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-			goto out;
+-
+ 		if (ublk_need_map_io(ubq)) {
+ 			/*
+ 			 * COMMIT_AND_FETCH_REQ has to provide IO buffer if
+ 			 * NEED GET DATA is not enabled or it is Read IO.
+ 			 */
+@@ -2123,12 +2115,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 
+ 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+ 		ublk_commit_completion(ub, ub_cmd);
+ 		break;
+ 	case UBLK_IO_NEED_GET_DATA:
+-		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-			goto out;
+ 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+ 		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
+ 		ublk_dispatch_req(ubq, req, issue_flags);
+ 		return -EIOCBQUEUED;
+ 	default:
 -- 
-2.47.2
+2.45.2
 
