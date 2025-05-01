@@ -1,60 +1,33 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1191D63C2;
-	Thu,  1 May 2025 17:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C1B44C7C
+	for <linux-block@vger.kernel.org>; Thu,  1 May 2025 18:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746120047; cv=none; b=b3WsssbTPiwQ9sqd2fcWuzHf3E/4Dyc2mdYmrK2bJXarSOpuFDR04ekbR2NzurNSJVY9qsBjTHZ/oAlVKXz+GS3/+u1or3KgJh7+mW7lwEquV3F9Z30jH82aeGGdPy+chQx+Rq/LdIq3yxu/4qMC/scFb5PKdMQCsvw8Ra7LzaU=
+	t=1746124187; cv=none; b=VYdbbU01Sx4HlyEvsOylFBmmSUckES4/f2RE5ffdowIf6PzAbmu91EE5ZG2+qoNyobgD6lDnmhQWnSTZ5UCbqXrY/Rh+nLWGI1ZS+VQ9J3XYOxavugM4NzZsQHTikxkM9HeniCf/+yvZBHXB/YmqOJi9HeDqh6ArhE3St/E0PxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746120047; c=relaxed/simple;
-	bh=acBPApzxTpprHyo+6xpY5LPCWh0/CkNHXvy88Ue/ESc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mT6JQxn6CgD1JxGcduc8oBeblFIG1+qoE7I14al+8dwHEU2NXvRn34zN7vOo0y4uKhJw29HXZAn8CYsxrOZBK+KA85Dy+7JIUGjWZntP4pai7UVccY6vvhMIQUPrimD6JqbHN6MltrQTgoR62gB+DxXA9Cddq+kucoGvprE0o7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IjqL74YY; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1746124187; c=relaxed/simple;
+	bh=RWo1Xjllp+oFZDJjpCJgNl7Y+4Znnw+WUps+DutqeLo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jd14t/49NLIh+BYarW0M47zth1LqsI5K4E6vh5t5kdcqcSJY2VAC4TEGRr1Zgn70jKS7+0atb9C6bE6oJy41K2IwNKwNDXTydvKiIkOdng+jH9txpufIV8Q7QQbmPH4IRg2RPJhDZvHnHVajDpa1he/m8z2WNmbjDhxizj9LHLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=esXmwKIK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IjqL74YY"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 541Bowar027369;
-	Thu, 1 May 2025 17:20:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OsoKPL
-	+baE+yVMzmUQNx2jGhX/elt6Pm7VwccCxz0zA=; b=IjqL74YYFmK0evfgbTEmcY
-	C4VnB1dUqbag6KxQg8nKZyeByW6XSRwgOoMpQD+DoswIG5Q/JFQa9ZLpzq98Erz7
-	FZ5oE5dtIuSYwpJT1iCIZzQR9Ef+shipZDibO3SFV2ajzEf2k2nN7vinw1V0QFVJ
-	K3WE2k5ZsVzUz+OICZRgS9Yukl+vWp6E32aNXnYZMJjl0+4OYBxyJk5MixTrNUw5
-	MqWaDfSLKHVm/IGQzxlolm6RTyma541EZBlvOADITznPmNlqQBh2s3hDkUCPZ4oV
-	SEgJKmZdL7pk8FrCrTNSnaFPVFpMrWxtYQ594RmxnfEmQXDx3WtkMA0t4xcDtcPA
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46buy94c4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 May 2025 17:20:37 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 541HIJku001880;
-	Thu, 1 May 2025 17:20:35 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 469bamx10f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 May 2025 17:20:35 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 541HKZBc27394802
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 May 2025 17:20:35 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C2795805D;
-	Thu,  1 May 2025 17:20:35 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4088158052;
-	Thu,  1 May 2025 17:20:32 +0000 (GMT)
-Received: from [9.67.25.149] (unknown [9.67.25.149])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 May 2025 17:20:31 +0000 (GMT)
-Message-ID: <03cf3cd2-8ddc-45ed-81ee-3cf8537f4163@linux.ibm.com>
-Date: Thu, 1 May 2025 22:50:30 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="esXmwKIK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A2FC4CEE3;
+	Thu,  1 May 2025 18:29:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746124186;
+	bh=RWo1Xjllp+oFZDJjpCJgNl7Y+4Znnw+WUps+DutqeLo=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=esXmwKIKZHvoY52uCqudksor8esRl0sUJUVbp1K/gd4s+kxZOonwc+BY1jdZoEpN7
+	 7ZrrxG+o90fcorxbcyfohFb6zn17hli5q0jaB0emGLkqmZ/F9QXGnC8aE71HADAUhQ
+	 Uc/bhqkuyfrPyLEgj/oUDll2aPJotqeNZVzxO9t4D/7KWPH2APJxccqc/uHPboZC9R
+	 7Wh28xNHHFj09T8QCRnxFhD60mO0YdIIqg66r3DlR3h1XAZVFU04RrGv1P8ABvV83g
+	 gw25P0+NpEaLGK4LylgMxWJzKek19anpwBWGG5SujrTE8hY1fnWDos3CDUeWXNLaCz
+	 ctpn1U+Sc0rkA==
+Message-ID: <ba60ec9d-170f-4107-9f9a-4c4ffbbc5e63@kernel.org>
+Date: Fri, 2 May 2025 03:29:45 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,60 +35,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND] Circular locking dependency involving, elevator_lock,
- rq_qos_mutex and pcpu_alloc_mutex
-To: Tejun Heo <tj@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-References: <Z_QjW7zJLsuO0xp6@slm.duckdns.org>
- <Z_QjxCZW7dh_v22Z@slm.duckdns.org>
- <16ed195d-7f26-41bb-86d6-ea961b3fa691@linux.ibm.com>
- <aBOosuedqt15xS1K@slm.duckdns.org>
+Subject: Re: [PATCH v3 0/2] New zoned loop block device driver
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20250407075222.170336-1-dlemoal@kernel.org>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aBOosuedqt15xS1K@slm.duckdns.org>
+Organization: Western Digital Research
+In-Reply-To: <20250407075222.170336-1-dlemoal@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAxMDEzMCBTYWx0ZWRfX0JDWXh1wxDHm 634egpdyDBc66J+9W+T+lNNaVlqmksFIAAbdListyuYjFnCgffb4OBOfW/+/qmfvW3UCnaDoLgF bxS6FM5Vw9FJz5n7SL2DoKTaeAUxc7zzKah6rh4XGuv0JvLLcNA6UrWH2kj3DcbVcQhwmpJkCwP
- tXLeiDHF4zsydfdbeCjfuOXutFEUv+o3rKlAlN+Ypy0W5a3nk4NxY/3uJYZLis+1+rSRaJLOPGj atg5lXT0skIMSsTAy8G/kwfMQL3QFMWvaYLuhfbR8Ywbu3JV9EAi5KsgPnwKcQjk2Ejud86ZLq8 qz8TFkyux9fYweaJuWeTQsMef0R1u8j1rzq2cAJcKCFpkpyrQjMVy0ak2quwk6k1s43ZZpKyygn
- YuIiX2ZTZpJnChuayR65GrhgYkJb9md6Hz0TqaQDVrrHo9El8/mf/banrNxb1FoOHmBoVbFc
-X-Authority-Analysis: v=2.4 cv=FOYbx/os c=1 sm=1 tr=0 ts=6813ad65 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=_59lq8m8a_vSe2DXwIAA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: r-WYz8SopHU7u6eDCPTtrQgAzrVM9WOt
-X-Proofpoint-GUID: r-WYz8SopHU7u6eDCPTtrQgAzrVM9WOt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-01_06,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 adultscore=0 malwarescore=0 mlxlogscore=810 spamscore=0
- lowpriorityscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- bulkscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505010130
+
+On 4/7/25 16:52, Damien Le Moal wrote:
+> This patch series implements the new "zloop" zoned block device driver
+> which allows creating zoned block devices using one regular file per
+> zone as backing storage. This driver is an alternative to the RUST
+> rublk driver which provide a similar functionality using ublk
+> (See https://github.com/ublk-org/rublk.git). However, zloop is far
+> simpler to use (a single shell command to setup and teardown a device)
+> and does not have any user space dependencies. These characteristics
+> make zloop a better solution for integration in test environments (such
+> as xfstests) using small VMs.
+
+Jens,
+
+Can we get this queued ?
+
+> 
+> zloop and rublk performance is generally comparable. zloop is a bit
+> faster for large sequential write operations than rublk, while rublk is
+> faster for small zone-random write IOs.
+> 
+> The first patch implements the "zloop" zoned block device driver under
+> drivers/block. The second patch adds documentation for this driver
+> (overview and usage examples).
+> 
+> About half of the code of the first patch is from Christoph Hellwig.
+> 
+> Damien Le Moal (2):
+>   block: new zoned loop block device driver
+>   Documentation: Document the new zoned loop block device driver
+> 
+> Changes from v2:
+>  - Rebased on 6.15-rc1
+>  - Some corrections of the documentation
+> 
+> Changes from v1:
+>  - Corrected Kconfig description in patch 1 (outdated example was shown)
+>  - Added missing request sector update on completion of zone append
+>    request (I had not pushed that...)
+>  - Added reference to the documentation in the kconfig entry in patch 2
+> 
+> Damien Le Moal (2):
+>   block: new zoned loop block device driver
+>   Documentation: Document the new zoned loop block device driver
+> 
+>  Documentation/admin-guide/blockdev/index.rst  |    1 +
+>  .../admin-guide/blockdev/zoned_loop.rst       |  169 ++
+>  MAINTAINERS                                   |    8 +
+>  drivers/block/Kconfig                         |   19 +
+>  drivers/block/Makefile                        |    1 +
+>  drivers/block/zloop.c                         | 1385 +++++++++++++++++
+>  6 files changed, 1583 insertions(+)
+>  create mode 100644 Documentation/admin-guide/blockdev/zoned_loop.rst
+>  create mode 100644 drivers/block/zloop.c
+> 
 
 
-
-On 5/1/25 10:30 PM, Tejun Heo wrote:
-> Hello,
-> 
-> On Tue, Apr 08, 2025 at 12:32:50PM +0530, Nilay Shroff wrote:
->> Thanks for the report! This is now a known issue. And we're currently working on
->> it to cut dependency of q->io_lockdep_map (or queue freeze-lock) on q->elevator_lock. 
->> Please see below :https://lore.kernel.org/linux-block/67e6b425.050a0220.2f068f.007b.GAE@google.com/
->> https://lore.kernel.org/all/20250403105402.1334206-1-ming.lei@redhat.com/
-> 
-> Any progress on this? The last activity on the threads seems to be back on
-> Apr 10th and we're getting close to rc5. If we need to revert, I think it's
-> about time to decide.
-> 
-> Thanks.
-> 
-This is currently actively being worked upon. 
-Please see here : https://lore.kernel.org/all/20250430043529.1950194-1-ming.lei@redhat.com/
-We expect it to be soon ready for merge.
-
-Thanks,
---Nilay
+-- 
+Damien Le Moal
+Western Digital Research
