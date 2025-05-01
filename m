@@ -1,108 +1,99 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7400F1D61BB
-	for <linux-block@vger.kernel.org>; Thu,  1 May 2025 10:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925392AF04
+	for <linux-block@vger.kernel.org>; Thu,  1 May 2025 13:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746095527; cv=none; b=B5mXpxB99FOKDcI83fYVYFV629x2fRKh6FhzVBWImbz2So2WCqleOtXoM5XsMxNmeC2RejHxdETBY77/hpIpQUDRxs+Aa6jq21m17WKL1s4bKtioXklSX4qcFy/LcvJd+0eA89kTF+17We8xdvs4OTYB5sE99Sh6Pbj4MeBjpBM=
+	t=1746106406; cv=none; b=oV2fa8DCLAtk2XqQtUjqxFScCfMBzcE1/J1SKtQpfFdzc16gPZSY94fXWdWvGjd65/aNbBBtzrl44Hc4GxdULcpUK4/YT1Fb8Pc463URIEqfJojnLReqvmvzRYhAp9agmZy1KLyPCBF4Y8rmIfhYZrYrBDFNtNeTSaGga+QoLWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746095527; c=relaxed/simple;
-	bh=69d7RGDNfx1skyoiY3LDogq1EbbMV3Lxru1XDbEk8Bk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sJg1/o5czjtmlhMSzmQyAivVSh7pOubzxu9f57XFv1UezYyANqdwCwl+72A6LDcOjT9BhL7Gr5l3v7ECZnAX4ao4tbgqMmxaDkzQ+IicEKJz/JZbAgi6BYqp3yfLBmEqfwL/ZygPYZpw1goGZfYDgY7XRULnW0o7+2UynYnngkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=saPA2fYX; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1746106406; c=relaxed/simple;
+	bh=URmeTrG+Cmrkzm89LRTSKtuLRr2LMcd7NxywMSFhlOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=F9jvt4itnb3vQz1NdHvGSqZ62b+LmeSeF+Z7FhhsoRfJ6JjX6Q84lq83y+0Uc2/Dm39dR7EpbCdH1Kuc/9KpT9XREUyivDWTM1d9mAyuzLycb0/rPrqsOhJoer0h9V9zgiJfYT/WdfxSy2woiHMOkAYw/v8xQCcPOQUeoZlnCy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A3YFREao; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="saPA2fYX"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 541A3vvD000686;
-	Thu, 1 May 2025 10:31:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=4hVQZw
-	fJYZeP0+qLbHjhypSQJ6fyyfb/efCylUP1MIU=; b=saPA2fYX4+GAe0d3Ic5MRS
-	pSoIsKppqJ1kevs+OnZyVjsMHpLBk9o/ukp6+8sCxLABLemDWvf2UQK4FaQTKUZp
-	n+lGf9aGv95Szi2pfAHZussie71/4aoVBGHgsjzCeOaC9c7U/sq5bCm6QJDhZmpy
-	+erfnRU60uCdlprgp7es0/iU9nVcWrf8eosdZiJx8/6KTlGXsVVs+EQRjBpSOmUI
-	ULBQCRQhinLET0NAA730aln7MszvgOLJ3twp2yrRAkP3fmsxfLVN09X4CWGUD/Ly
-	pCiLBQxkpt1tpU4fGnM3aHT5t7kA/UeToGJTcPLgCKJ84cDNHHaoCeeqJCW8qKuw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46c6vjg2qn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 May 2025 10:31:59 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 541AQ5m8001880;
-	Thu, 1 May 2025 10:31:58 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 469bamv9sb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 May 2025 10:31:58 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 541AVvda25756398
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 May 2025 10:31:58 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A0CA758056;
-	Thu,  1 May 2025 10:31:57 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1232E58052;
-	Thu,  1 May 2025 10:31:55 +0000 (GMT)
-Received: from [9.43.8.50] (unknown [9.43.8.50])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 May 2025 10:31:54 +0000 (GMT)
-Message-ID: <2ab75f7d-ac00-405a-8c28-6aabffa937eb@linux.ibm.com>
-Date: Thu, 1 May 2025 16:01:53 +0530
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A3YFREao"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=f/rYEcwn8rWojhSbupuGw1x9rDfspVAzKTDyTUlJoUM=; b=A3YFREaoyhM8cY3+K/ZmQhm/Og
+	X1DnHGzcCVeEO9f6mNhfYMJoEWKLjWQlDkavYnL1EsYESVA6N0gARBb9DxVOjka5ymsPlkPQj6Ybv
+	a9wocU2Ea6o0DZNmwGeZirWMg+6bFHVHbVIyQ/7UKEP2fWXvdlfU4mtzbV0hY/QYspd7F2LOJjdD2
+	ST6PdkNo2gNEAAS0y6W4WQd1rd/vBV9hY87NcB4vM9cRvv+Xzl6EmlcvKxJoLMoeXubKqw89ch6nH
+	XFygBE6o+SxMuinKhLcLlgK4rJL2QfHR8D5l0Of9WkwUegTrNcoX0GDzbQZggPi+0i3LN/Ntrti1f
+	1SXdrkjA==;
+Received: from [104.254.106.146] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uAU2U-0000000FpkN-40tc;
+	Thu, 01 May 2025 13:33:23 +0000
+Date: Thu, 1 May 2025 08:33:21 -0500
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.15
+Message-ID: <aBN4IW2wlSfRIfjU@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 17/24] block: remove elevator queue's type check in
- elv_attr_show/store()
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20250430043529.1950194-1-ming.lei@redhat.com>
- <20250430043529.1950194-18-ming.lei@redhat.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250430043529.1950194-18-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAxMDA3NyBTYWx0ZWRfX7+N+Q3XTtbdj lZaM9y4sbFOjf6sM855wiyjq3xFlHmwLzWOGZ2pplTdgMvWfY4nKq6zyOQTt+3JJAEbbmLwwjPM ea/EtEzY6DiV8x7LFuSH+lFlAt+/gBoL3WG57m+NRjCX0Ec24I4BrwSsUASAdjtwHc/hh5f07WT
- mqsQSnuMzbmVvyiJf8zD9qYoO64bPI1NFrL4p9gkEBrYgakA8t3MpIdDWJPe/d34nY5xyxR1Yzt GL8HmRDKHdBIy8X1S3tj7kJtpEgEhJcEbY7TMGPpli/TnrSfT9CDhnYWTKOHG0rJ5yBtxTIwvTi ZVGo+CLq56qQ4xUmQfaj5P9dI7PuudeKSszdJ0WCI9G+gg/ZYJV0BrKdUtF07N7GNDZfPGUG0VR
- itQ68oyGAtiBx43sSHbuZkDIKK/IqOYRyR/mS2z73UXt5I19ZAsRLBNg35sZCbTsp/BJzsQs
-X-Authority-Analysis: v=2.4 cv=GI8IEvNK c=1 sm=1 tr=0 ts=68134d9f cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=LWOdSK4r3EOMzDvpZzAA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: pfBzS3BCsxAho2xlTcs51JsU1XSsTpsY
-X-Proofpoint-ORIG-GUID: pfBzS3BCsxAho2xlTcs51JsU1XSsTpsY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-01_03,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- mlxlogscore=855 mlxscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 suspectscore=0 adultscore=0
- impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505010077
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+The following changes since commit a584b2630b0d31f8a20e4ccb4de370b160177b8a:
 
+  ublk: remove the check of ublk_need_req_ref() from __ublk_check_and_get_req (2025-04-29 06:01:36 -0600)
 
-On 4/30/25 10:05 AM, Ming Lei wrote:
-> elevatore queue's type is assigned since its allocation, and never
-> get cleared until it is released.
-> 
-> So its ->type is always not NULL, remove the unnecessary check.
-> 
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+are available in the Git repository at:
 
-Looks good to me:
-Reviewed-by : Nilay Shroff <nilay@linux.ibm.com>
+  git://git.infradead.org/nvme.git tags/nvme-6.15-2025-05-01
+
+for you to fetch changes up to 8edb86b2ed1d63cc400aecae8eb8c8114837171a:
+
+  nvmet-auth: always free derived key data (2025-04-30 08:09:09 -0500)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.15
+
+ - fix queue unquiesce check on PCI slot_reset (Keith Busch)
+ - fix premature queue removal and I/O failover in nvme-tcp
+   (Michael Liang)
+ - don't restore null sk_state_change (Alistair Francis)
+ - select CONFIG_TLS where needed (Alistair Francis)
+ - always free derived key data (Hannes Reinecke)
+ - more quirks (Wentao Guan)
+
+----------------------------------------------------------------
+Alistair Francis (3):
+      nvme-tcp: select CONFIG_TLS from CONFIG_NVME_TCP_TLS
+      nvmet-tcp: select CONFIG_TLS from CONFIG_NVME_TARGET_TCP_TLS
+      nvmet-tcp: don't restore null sk_state_change
+
+Hannes Reinecke (1):
+      nvmet-auth: always free derived key data
+
+Keith Busch (1):
+      nvme-pci: fix queue unquiesce check on slot_reset
+
+Michael Liang (1):
+      nvme-tcp: fix premature queue removal and I/O failover
+
+Wentao Guan (2):
+      nvme-pci: add quirks for device 126f:1001
+      nvme-pci: add quirks for WDC Blue SN550 15b7:5009
+
+ drivers/nvme/host/Kconfig   |  1 +
+ drivers/nvme/host/pci.c     |  8 +++++++-
+ drivers/nvme/host/tcp.c     | 31 +++++++++++++++++++++++++++++--
+ drivers/nvme/target/Kconfig |  1 +
+ drivers/nvme/target/auth.c  |  3 +--
+ drivers/nvme/target/tcp.c   |  3 +++
+ 6 files changed, 42 insertions(+), 5 deletions(-)
