@@ -1,154 +1,176 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EF81A3174;
-	Fri,  2 May 2025 19:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F7B1EBFFF;
+	Fri,  2 May 2025 20:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746214599; cv=none; b=eC8BcSkTRIov+sd6GxAkKot2/B+QyMnFguldR/tjRx5jPrdjqbctARobMzkmGAr3QymqzdTdu6kDzInm0Vab8jHYauAJvLnYrjL46jryp/LL2oU+DO8cbB0sKg2EXu6yIqrzrAAc8zu1JYLXzmz2d8Jjvb+0J0KyWdV5+pwJ4rU=
+	t=1746216721; cv=none; b=qEOpiBJe2RNuSPhiYQLvRAUC8j1jvQ5A0ka/PKtjbk4slK/p8UyzwMjyYCCtwL6psCgGN4FxY2V2j6ExlNxmDmf0RdYof4OH/5xuhRsk+SHyEGFv+me9pq0oxD7MnqH48UI5x+DM92Q1fk0oTxQYTwC4RFrNkjf1oA0dfAPWLnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746214599; c=relaxed/simple;
-	bh=fgGG7QrhOKoZpiUcmgMoK+3yVi0OST6qgUklpczJDy8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GAtjoodSZJdLUPbZMVWU3/JNlyvRgg8QJOMmxXiA9s+ap4cxl7Q8HPBkFW4VYjaaZnN42ycf/QuVFy5d09gYA6SeryvQioNTJe4ieuN50/lYHMmr2KCiUuTQDFVOtutLnIcNyxNEHLhjAnph+pHNOcZg7bEyjBDEAyuIYeiIf2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6PCVVho; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746216721; c=relaxed/simple;
+	bh=u5Z8wpvFxHNyn281JUcC5aJjExa9fXKR0LlwurFoJOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=sqSAPZncN33naM7TGdeMmoBzhTot+MOmeIvMt/9fapZGHF2ZbGMrBTNAoGPtSYf04tTRoq6oUqDqitz1dCXroFhyzq07L4NJn7NLsgzQXTUlI/8Kayvj+WSJzAJ3gkq4BVfWMVRyoAdEAbDME4uwBGgpcO0ZZ7aekhvN0yIPg6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1zXSQCA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6PCVVho"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4769b16d4fbso16604901cf.2;
-        Fri, 02 May 2025 12:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746214597; x=1746819397; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=li9KWmA/pSaEUOrVMYX9FezW9V8Hws+6p3tdXCs68iY=;
-        b=a6PCVVhoIQlf3ybSq7lp2xs8SXgH5KxF8QWmuAic8fxw2c0Tc+Zq83dUV/AIJ4aoYU
-         eVe6g48Z0gkZnSLEqceqgJXIu9v/SaVj9l71tOHQu8JLPTWI1Yy9s299oRxSUmgeE9tE
-         IvUIWpdr4hnlCZ4K2c/OwETGi59nCVdyIERCcVu6Aeh8hl6c8+nXx70nS1qHcnbuYYxo
-         v2nAOKaHV6leCDr07WNebvvvo7uCrn/9D8DEXwOrZ1voV5u97t4oRgwLbaUYevcXTBNT
-         LYR/k8CAD3dqPc7OVyN0Xk+E+wsK/SvDWDPxrsxgH5+kpOiq1zK1nfHA3IlVAET+McX+
-         u4ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746214597; x=1746819397;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=li9KWmA/pSaEUOrVMYX9FezW9V8Hws+6p3tdXCs68iY=;
-        b=RxiUeBDiL1nr8NyUcRMe00uA5NPl6dr75Uluvg74Q3WLEzMZSgkOdphU1VvP0sPxPF
-         da2yKaJORGGPUn48aCGqxt0VClSO2CBG7Y9A/4gyQ/Fhrzn+1GI993JAHwWjv78yDo91
-         xuu3Oz0MXv6ohIdyim6Loonr3a1Ng4wppMpM2qpYIzvB+dHqKMelalHiAtSAF8xNjpb9
-         SO5j5EpEcptUXZnMNytJFIRSo+cinBZFS7FUv+sQloTf/erz9aAGclepIPwXRGjTvYiH
-         g3R13toPtTS1Gl8cYr+dPmnzYZiqu53G3zxYag3GFTHD24NsDVH/PB33Zjn1U9hJOjDh
-         83kg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCTpkLPyZBY5idzwH5NSJRcoxce7lRYrukOyQy8Mp9R0yRh3AsGtKmauvs2e72XbcwiIY4zrhEUQCwvw==@vger.kernel.org, AJvYcCXb5eAxP6inUHR6OywWi0pg8WlK6kReAmS1kS+I6DEzLroMm5B3N0hx6wkQ0EdxQSAhCVcP8XKiS+kZdg==@vger.kernel.org, AJvYcCXdqjQL85N6YKn32c0ChlwMX/wKXEaydOFnvNnLpIaW4tdf/XGTmpcPO/+pPjU0XwaXZjY2m/zBgmqY/U3r@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBLuI+JlIUvnYnC40msOodfXzbyAIq2LSf0eyNXQv6jQNSbKn3
-	HgJbiqtcc/BlWJ9edJWjVclu7ODlngY4ffV1O6Gda51W5zv/buiSobLpjv2Z
-X-Gm-Gg: ASbGncs6vyDe/k5UGYhf2/eixF21wWdCU2NccCFzA/DZnV4AjJ0BsdaDf53uDZuJGm/
-	GED+KTxJYGkIE2mjHnLMDBt5AEKizbWnWbGn8olIyWd+D58gew6Uh8phf2kzH24XmY7tghS6mQI
-	QEZ9lZK3vTAHrZQAncqoFkhDs5D7+mZ6LDmZWKY+Ga+ZfrtJmSU+G9CieYqrzjnopM7jAWihJoX
-	LxbgLzHwPuXhbJG7ZqCNz2/pKFMfOeiG9wHJZCFL/kw+IP+KlnnU7hwhzu78sSDYf58qtA30Ggo
-	l5bHTT3lcUitTZGuwvbmSJKVaAlo+fOpbIbn+WqMFkQcl+8e23KwDhVUhrOnmXpZirU=
-X-Google-Smtp-Source: AGHT+IH7LI2EE0zppHkYHV2lHFgz2fjtbkObPtUdGJG/+lgDSbfOuTtGVHcwGS06scKChD60MP9RHQ==
-X-Received: by 2002:a05:622a:5819:b0:476:76bc:cfb8 with SMTP id d75a77b69052e-48c31a23f58mr68709061cf.31.1746214596785;
-        Fri, 02 May 2025 12:36:36 -0700 (PDT)
-Received: from localhost.localdomain.com (sw.attotech.com. [208.69.85.34])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-48b966cdafasm22424951cf.24.2025.05.02.12.36.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 12:36:36 -0700 (PDT)
-From: Steve Siwinski <stevensiwinski@gmail.com>
-X-Google-Original-From: Steve Siwinski <ssiwinski@atto.com>
-To: hch@infradead.org
-Cc: James.Bottomley@hansenpartnership.com,
-	bgrove@atto.com,
-	dlemoal@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	martin.petersen@oracle.com,
-	ssiwinski@atto.com,
-	stevensiwinski@gmail.com,
-	axboe@kernel.dk,
-	tdoedline@atto.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH v2] block, scsi: sd_zbc: Respect bio vector limits for report zones buffer
-Date: Fri,  2 May 2025 15:35:54 -0400
-Message-ID: <20250502193554.113928-1-ssiwinski@atto.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <aBIucgM0vrlfE2f9@infradead.org>
-References: <aBIucgM0vrlfE2f9@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1zXSQCA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE2AC4CEE4;
+	Fri,  2 May 2025 20:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746216720;
+	bh=u5Z8wpvFxHNyn281JUcC5aJjExa9fXKR0LlwurFoJOo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Z1zXSQCA6uvZog8m73AsLZiKFKCo/9ZgdhCii6J5RUCUt2HIxFvCq6DiA7/W+8foD
+	 DH7NXB5sgdG046YyxnOxDDEx5qpRWQAzFICFm2YO98Lf61l71s2iO8PUn4rLUsLtA4
+	 AtUyHDZXcXd/r/tyF6h4eQ+9Gb2GgzmEfAHNemv7AwMjdxp/GwZkAZAjnld40MOFML
+	 sR0E8bGJJU1dQDkmJEPbcMtjtefojiU7YTTWmatlY6maRZFm0gywcMaAfHYNUtPlHI
+	 yHhLrX1U4i16+k8L9DNEeChBsXdNYdNly2tUxZEnpmzhKlh9RyqWPsFTIINt3yq/EH
+	 TEMV3sj9OGU6A==
+Date: Fri, 2 May 2025 13:12:00 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: brauner@kernel.org, hch@lst.de, viro@zeniv.linux.org.uk, jack@suse.cz,
+	cem@kernel.org, linux-fsdevel@vger.kernel.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ojaswin@linux.ibm.com, ritesh.list@gmail.com,
+	martin.petersen@oracle.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, catherine.hoang@oracle.com,
+	linux-api@vger.kernel.org
+Subject: [PATCH v10.1 1.1/15] xfs: only call xfs_setsize_buftarg once per
+ buffer target
+Message-ID: <20250502201200.GU25675@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250501165733.1025207-2-john.g.garry@oracle.com>
 
-The report zones buffer size is currently limited by the HBA's
-maximum segment count to ensure the buffer can be mapped. However,
-the block layer further limits the number of iovec entries to
-1024 when allocating a bio.
+From: Darrick J. Wong <djwong@kernel.org>
 
-To avoid allocation of buffers too large to be mapped, further
-restrict the maximum buffer size to BIO_MAX_INLINE_VECS.
+It's silly to call xfs_setsize_buftarg from xfs_alloc_buftarg with the
+block device LBA size because we don't need to ask the block layer to
+validate a geometry number that it provided us.  Instead, set the
+preliminary bt_meta_sector* fields to the LBA size in preparation for
+reading the primary super.
 
-Replace the UIO_MAXIOV symbolic name with the more contextually
-appropriate BIO_MAX_INLINE_VECS.
+However, we still want to flush and invalidate the pagecache for all
+three block devices before we start reading metadata from those devices.
+Move the sync_blockdev calls into a separate helper function, and call
+it immediately after xfs_open_devices creates the buftargs.
 
-Signed-off-by: Steve Siwinski <ssiwinski@atto.com>
+This will enable a subsequent patch to validate hw atomic write geometry
+against the filesystem geometry.
+
+Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
 ---
- block/bio.c           | 2 +-
- drivers/scsi/sd_zbc.c | 3 +++
- include/linux/bio.h   | 2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+v10.1: call sync_blockdev on open for all the devices and move this to
+immediately after the vfs change
+---
+ fs/xfs/xfs_buf.h   |    5 +++++
+ fs/xfs/xfs_buf.c   |   14 +++++---------
+ fs/xfs/xfs_super.c |   33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 9 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 4e6c85a33d74..4be592d37fb6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -611,7 +611,7 @@ struct bio *bio_kmalloc(unsigned short nr_vecs, gfp_t gfp_mask)
- {
- 	struct bio *bio;
+diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
+index d0b065a9a9f0d2..132210705602b4 100644
+--- a/fs/xfs/xfs_buf.h
++++ b/fs/xfs/xfs_buf.h
+@@ -383,6 +383,11 @@ int xfs_buf_reverify(struct xfs_buf *bp, const struct xfs_buf_ops *ops);
+ bool xfs_verify_magic(struct xfs_buf *bp, __be32 dmagic);
+ bool xfs_verify_magic16(struct xfs_buf *bp, __be16 dmagic);
  
--	if (nr_vecs > UIO_MAXIOV)
-+	if (nr_vecs > BIO_MAX_INLINE_VECS)
- 		return NULL;
- 	return kmalloc(struct_size(bio, bi_inline_vecs, nr_vecs), gfp_mask);
++static inline int xfs_buftarg_sync(struct xfs_buftarg *btp)
++{
++	return sync_blockdev(btp->bt_bdev);
++}
++
+ /* for xfs_buf_mem.c only: */
+ int xfs_init_buftarg(struct xfs_buftarg *btp, size_t logical_sectorsize,
+ 		const char *descr);
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 5ae77ffdc947b1..292891d6ff69ac 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1733,11 +1733,7 @@ xfs_setsize_buftarg(
+ 		return -EINVAL;
+ 	}
+ 
+-	/*
+-	 * Flush the block device pagecache so our bios see anything dirtied
+-	 * before mount.
+-	 */
+-	return sync_blockdev(btp->bt_bdev);
++	return 0;
  }
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 7a447ff600d2..a5364fdc2824 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -180,12 +180,15 @@ static void *sd_zbc_alloc_report_buffer(struct scsi_disk *sdkp,
- 	 * Furthermore, since the report zone command cannot be split, make
- 	 * sure that the allocated buffer can always be mapped by limiting the
- 	 * number of pages allocated to the HBA max segments limit.
-+	 * Since max segments can be larger than the max inline bio vectors,
-+	 * further limit the allocated buffer to BIO_MAX_INLINE_VECS.
+ 
+ int
+@@ -1810,10 +1806,10 @@ xfs_alloc_buftarg(
+ 	 * When allocating the buftargs we have not yet read the super block and
+ 	 * thus don't know the file system sector size yet.
  	 */
- 	nr_zones = min(nr_zones, sdkp->zone_info.nr_zones);
- 	bufsize = roundup((nr_zones + 1) * 64, SECTOR_SIZE);
- 	bufsize = min_t(size_t, bufsize,
- 			queue_max_hw_sectors(q) << SECTOR_SHIFT);
- 	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
-+	bufsize = min_t(size_t, bufsize, BIO_MAX_INLINE_VECS << PAGE_SHIFT);
+-	if (xfs_setsize_buftarg(btp, bdev_logical_block_size(btp->bt_bdev)))
+-		goto error_free;
+-	if (xfs_init_buftarg(btp, bdev_logical_block_size(btp->bt_bdev),
+-			mp->m_super->s_id))
++	btp->bt_meta_sectorsize = bdev_logical_block_size(btp->bt_bdev);
++	btp->bt_meta_sectormask = btp->bt_meta_sectorsize - 1;
++
++	if (xfs_init_buftarg(btp, btp->bt_meta_sectorsize, mp->m_super->s_id))
+ 		goto error_free;
  
- 	while (bufsize >= SECTOR_SIZE) {
- 		buf = kvzalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index cafc7c215de8..7cf9506a6c36 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -11,6 +11,8 @@
- #include <linux/uio.h>
+ 	return btp;
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index b2dd0c0bf50979..83de3ac39ae53b 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -519,6 +519,35 @@ xfs_open_devices(
+ 	return error;
+ }
  
- #define BIO_MAX_VECS		256U
-+/* BIO_MAX_INLINE_VECS must be at most the size of UIO_MAXIOV */
-+#define BIO_MAX_INLINE_VECS	1024
++/*
++ * Flush and invalidate all devices' pagecaches before reading any metadata
++ * because XFS doesn't use the bdev pagecache.
++ */
++STATIC int
++xfs_preflush_devices(
++	struct xfs_mount	*mp)
++{
++	int			error;
++
++	error = xfs_buftarg_sync(mp->m_ddev_targp);
++	if (error)
++		return error;
++
++	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
++		error = xfs_buftarg_sync(mp->m_ddev_targp);
++		if (error)
++			return error;
++	}
++
++	if (mp->m_rtdev_targp) {
++		error = xfs_buftarg_sync(mp->m_rtdev_targp);
++		if (error)
++			return error;
++	}
++
++	return 0;
++}
++
+ /*
+  * Setup xfs_mount buffer target pointers based on superblock
+  */
+@@ -1671,6 +1700,10 @@ xfs_fs_fill_super(
+ 	if (error)
+ 		return error;
  
- struct queue_limits;
- 
--- 
-2.43.5
-
++	error = xfs_preflush_devices(mp);
++	if (error)
++		goto out_shutdown_devices;
++
+ 	if (xfs_debugfs) {
+ 		mp->m_debugfs = xfs_debugfs_mkdir(mp->m_super->s_id,
+ 						  xfs_debugfs);
