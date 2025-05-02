@@ -1,82 +1,87 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BCF2581;
-	Fri,  2 May 2025 09:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5609B20C488
+	for <linux-block@vger.kernel.org>; Fri,  2 May 2025 11:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746177657; cv=none; b=lkGHk5ciEaNNrlUXFt3qOaQ9Oty1raje0mRSkXJ2TklSWsBn9x2Q6DU6HrzaY9re3Ow0j/SH17DvVyLr5AC7b07Ov39TWw6Cxc5OKajcdJHPNJLKbr6pAs3YVhRd4szQtRjjC+CQ+1pQEnPkEtmr0hPmBsOCVYpvXTw3ZXL2DpQ=
+	t=1746186664; cv=none; b=qrlAjYemYHTmLZmxyiAqxUKGyB+doMIlsisdxAomCDcdRYLmYW8YlJPldjw5vTAC1tlLWt+W9+N9vZKl9ztBXFpHmVs+zDd1rCbAjsCWU25IvMKx7TobUWLkyRViy39kB44iCClTYbrYfgCJSH5HVvAQ59OxO6AGPqie3xFZVR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746177657; c=relaxed/simple;
-	bh=h1UF7RGtB1Pbog0NUMV8tDJBLwjc+mTRVhKiphrplxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d251SIS0NgVnp6q6ZKa+6rcR4vlEG0M8yFIUwS39sSGXaW4dCGf2nH8AEzp5bEd7ElOYTcxRwOqcjNTIGRKry8oIxkPdeBsx8o31WwmtFzd4/hIol4BFDj5WNng2mc1TdDXy/PfroCq6Fm6m8zMatZdjbi0t8mKtLtdSMaM781M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so13036985e9.3;
-        Fri, 02 May 2025 02:20:55 -0700 (PDT)
+	s=arc-20240116; t=1746186664; c=relaxed/simple;
+	bh=lxZ8rOkDSCsFVW2WQ32zs3zoTVWUyymf0py48Q98j4E=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=cH0NkCrKeBhoYSPSX8/oCVhaPSwEvY1v5mGhV1zqfg+S3MI3xDU3wq2tVH/PigmEqIr2n/dZ00O8vNclE5H4mJO9yVYELya7lLZzrjRk4J4WV2JvQZQErTCsBjujbpW15sl3g3BnMTJvPOuVFa7vPlcQUHNcAZAenHiYOb5XYB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-85b3b781313so431241939f.1
+        for <linux-block@vger.kernel.org>; Fri, 02 May 2025 04:51:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746177654; x=1746782454;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1746186662; x=1746791462;
+        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
+         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h1UF7RGtB1Pbog0NUMV8tDJBLwjc+mTRVhKiphrplxs=;
-        b=U1DIn3GaLRTVVzNmvDrdfvfv2nHagj10/ffZxyXZz9s3Hkt/xwHpgilAxSV4ejK1/o
-         /WuJnvvj1Dd+/Iu9xf7/s9sC2RNFQwCI0RadVycoVD9fOaWV2dFI3uNCq1vVt1E/4BUm
-         CccyMqKcPCnkLJvMsG5ZLckIQdaK2pvcVdE/DLrfhWw5XB4n7M2uWcyovahiyoXZdhWb
-         +K6ECrjG3Txb0K3/fy6f1ybnuTOC+RH2ObneEWERUEeAVsjuwDD4Bd4VHbDPk1FaWQMw
-         SW4mN87A1aFoV4dAy+SqHacND7VE5E2xSKwG6xPDh0hHCigNHgw/VzFArLlsOiGLZWhb
-         xs7w==
-X-Forwarded-Encrypted: i=1; AJvYcCURwfP3XT0tbazW3EDOFTCIusRvNZ+yA701cnA+vQFnxMs649P+r/B6+fO1JU+E32liKX9RAc6iOJkK@vger.kernel.org, AJvYcCUYoDkx3FxJDyYSdX9sRzNDCMMb17Xd+AYjQy8RKbbD4I5S2TdX2NS4ToPCno6YCmrclhKpkxNB1n1mkIQ=@vger.kernel.org, AJvYcCUdvGQf/zbzAMdZrd43TPwHTDeZeJnReGPjFFvp8aVk8pA9Kr1EI52Fe3En4XVu8hk6wdhMLapHOrj6QXkE4g==@vger.kernel.org, AJvYcCUhD+FrKGd758fXGKLoj0NHzBWO7AdPhVn4Ycp43Flj+DC375GmJpnHM/5LuQL1ceLgjGgFbp3m0hk8VqI=@vger.kernel.org, AJvYcCVictzNH/8LSq7ypbVTSRe+MsTj2yzEn1cj/nqGCdL0Hm0N8+fObiqVckphkPvRo3++K/IJZvkvGbE=@vger.kernel.org, AJvYcCVvWbaYCtYKk5WwYMHM83YExn5zuLggbhCehi10vgzXMtCp9tuoJCaBVvskZPa1lpqs6G63TQDxVeWlxUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6UtHaSXqbRxHDrBNqPUGvcYVWi+vzgHLj1PFmRATgoSGVED33
-	kadjvLDRthlpvzXEu4iqq6UIcQ6m+j0bfZwL+3jp4xUKzvWrPZQK
-X-Gm-Gg: ASbGncumY110CLmKeW449aEYgUltUh5ZPpiq3hY2h/6J9G4sYwwNqW1dGVjMw5rROfP
-	7OGZQn0eIScgusMLlwoi8z1Yz36IGytN/VIGEZutA4HX5T3AANi6DKJXf70NNQ+dvmgVrSVlASB
-	IHAIRHFMJOLTvE6hybAmf2BxROEIgFTJo/LzN/xAeMkVulEhZyIxpEJ2M9Q50FOcd+vZsLc458v
-	ChRqgmk+B4CpvObMOdBTDcsbJfJ5D2y0kxEOOS3SpB0tGdbXTAmhQo3noNZGeX3kzeEWRuzgX79
-	CtJ93uVV5DRPDXCZLRuNG+akU6g+aCItxeIX84luxh3VtItH6JLhen8buQ==
-X-Google-Smtp-Source: AGHT+IFgGSam1M2eyL/4Vk4mDkIaVvxS1jdjCI6lel5HYbzONYXZiJZ8VWNJWL/XzxR8+LguUZV9dA==
-X-Received: by 2002:a05:600c:3b20:b0:43c:fb95:c76f with SMTP id 5b1f17b1804b1-441bbeb0efbmr17223385e9.9.1746177654117;
-        Fri, 02 May 2025 02:20:54 -0700 (PDT)
-Received: from fedora (p54ad9a78.dip0.t-ipconnect.de. [84.173.154.120])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae0b9fsm1571335f8f.4.2025.05.02.02.20.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 02:20:53 -0700 (PDT)
-Date: Fri, 2 May 2025 11:20:51 +0200
-From: Johannes Thumshirn <jth@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>, Coly Li <colyli@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, slava@dubeyko.com,
-	glaubitz@physik.fu-berlin.de, frank.li@vivo.com,
-	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-btrfs@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-pm@vger.kernel.org
-Subject: Re: [PATCH 04/19] block: add a bio_add_vmalloc helpers
-Message-ID: <aBSOc4-xWw9JLUgB@fedora>
-References: <20250430212159.2865803-1-hch@lst.de>
- <20250430212159.2865803-5-hch@lst.de>
+        bh=2GzGElVwrpn7WgINKNMDTHEhcwHxNIwhUYezPmIaX74=;
+        b=dvvmVLdMdRSKFD20C436oTIDotUPV4ZIdOL/MQRWmPOSG0sLXw2RjjS1ZwX5+9aAVq
+         NuJ83zvuV6Xth1QhDECt/tHOui+SQ6dFnJcprabRvUv19lk2g5c67pdiTayD7R6MvSDo
+         P2W+00MJNRvzl7btM8tPN26uqDUzhA+K23f5wRJerVEXNrNrNDYVX76XIy2/ppPZv1Pd
+         VHozv8LxMojGMdvcr+kRvpzUMqY2PF7Sl/SWXvFCAxRHMzuqcyZ0B+7FSGlkrhChh04k
+         DFHgPIGXeZacyJEiBpiCH5oMzDhbE/Udn5A4FAEcWRrywuliEBql8gNtXohS7alUtnLv
+         mXMg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7fayUtEGw+jHl93NBPuhLd5bgFIULsw7biWTZacQzLtr0g2gCjcz8rBnZJ2lWUSIqkrVeACbD4ZS3+g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2vs4JAhhcJ4yY7JT5Dq/ccMWMBHU953TUcTvawA4VkfeMsu/T
+	7fcnwoUHuVCCJuCo40WOnHZ3pu/LFh5eFHUD5Z94yhuaP2MY1t1Q/MAEygvg5rpJBf+3pRoy1t9
+	VlMvBtzaqcgh6WEzg4j//49wBIv/B4wMZS8ime1lVemcugqb/c3P0QvA=
+X-Google-Smtp-Source: AGHT+IHT9JnGD6WZpxKelt2uNR6CpHn9e5gtYlpxij1xhxDfwiXUAGH0J9rZZR1TszCZi4HVFfYfbExKCA7vaSyyEDPyBvQLsgxq
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250430212159.2865803-5-hch@lst.de>
+X-Received: by 2002:a05:6602:388b:b0:861:c758:ec35 with SMTP id
+ ca18e2360f4ac-866b424e36emr311382439f.11.1746186662541; Fri, 02 May 2025
+ 04:51:02 -0700 (PDT)
+Date: Fri, 02 May 2025 04:51:02 -0700
+In-Reply-To: <6741e9d0.050a0220.1cc393.0014.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6814b1a6.050a0220.33cf57.0000.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in loop_set_status
+From: syzbot <syzbot+9b145229d11aa73e4571@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, hdanton@sina.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, ming.lei@redhat.com, 
+	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+syzbot has bisected this issue to:
+
+commit ffa1e7ada456087c2402b37cd6b2863ced29aff0
+Author: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
+Date:   Tue Mar 18 09:55:48 2025 +0000
+
+    block: Make request_queue lockdep splats show up earlier
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1411b7745800=
+00
+start commit:   f1a3944c860b Merge tag 'bpf-fixes' of git://git.kernel.org.=
+.
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D1611b7745800=
+00
+console output: https://syzkaller.appspot.com/x/log.txt?x=3D1211b774580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3D90837c100b88a63=
+6
+dashboard link: https://syzkaller.appspot.com/bug?extid=3D9b145229d11aa73e4=
+571
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D163650d458000=
+0
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D11652270580000
+
+Reported-by: syzbot+9b145229d11aa73e4571@syzkaller.appspotmail.com
+Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earl=
+ier")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
+n
