@@ -1,87 +1,117 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5609B20C488
-	for <linux-block@vger.kernel.org>; Fri,  2 May 2025 11:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C9F2AF14
+	for <linux-block@vger.kernel.org>; Fri,  2 May 2025 12:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746186664; cv=none; b=qrlAjYemYHTmLZmxyiAqxUKGyB+doMIlsisdxAomCDcdRYLmYW8YlJPldjw5vTAC1tlLWt+W9+N9vZKl9ztBXFpHmVs+zDd1rCbAjsCWU25IvMKx7TobUWLkyRViy39kB44iCClTYbrYfgCJSH5HVvAQ59OxO6AGPqie3xFZVR0=
+	t=1746190023; cv=none; b=LG/i4QI7ZSgVN+u/Hs8S+/DU72Jv7MtgH8K8i1ylHlioCF/NrauYvLkiK750PKM8uC2oQwYOwvZA9hfxURUbYRpWuzrN5hjWuSNjR56csB+Y9tSM1wd957/ltaC7BHqdhomndj+hvlHqP5HVBDkIlyfD2jvkocmBPRMJoisuO7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746186664; c=relaxed/simple;
-	bh=lxZ8rOkDSCsFVW2WQ32zs3zoTVWUyymf0py48Q98j4E=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=cH0NkCrKeBhoYSPSX8/oCVhaPSwEvY1v5mGhV1zqfg+S3MI3xDU3wq2tVH/PigmEqIr2n/dZ00O8vNclE5H4mJO9yVYELya7lLZzrjRk4J4WV2JvQZQErTCsBjujbpW15sl3g3BnMTJvPOuVFa7vPlcQUHNcAZAenHiYOb5XYB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-85b3b781313so431241939f.1
-        for <linux-block@vger.kernel.org>; Fri, 02 May 2025 04:51:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746186662; x=1746791462;
-        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2GzGElVwrpn7WgINKNMDTHEhcwHxNIwhUYezPmIaX74=;
-        b=dvvmVLdMdRSKFD20C436oTIDotUPV4ZIdOL/MQRWmPOSG0sLXw2RjjS1ZwX5+9aAVq
-         NuJ83zvuV6Xth1QhDECt/tHOui+SQ6dFnJcprabRvUv19lk2g5c67pdiTayD7R6MvSDo
-         P2W+00MJNRvzl7btM8tPN26uqDUzhA+K23f5wRJerVEXNrNrNDYVX76XIy2/ppPZv1Pd
-         VHozv8LxMojGMdvcr+kRvpzUMqY2PF7Sl/SWXvFCAxRHMzuqcyZ0B+7FSGlkrhChh04k
-         DFHgPIGXeZacyJEiBpiCH5oMzDhbE/Udn5A4FAEcWRrywuliEBql8gNtXohS7alUtnLv
-         mXMg==
-X-Forwarded-Encrypted: i=1; AJvYcCV7fayUtEGw+jHl93NBPuhLd5bgFIULsw7biWTZacQzLtr0g2gCjcz8rBnZJ2lWUSIqkrVeACbD4ZS3+g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2vs4JAhhcJ4yY7JT5Dq/ccMWMBHU953TUcTvawA4VkfeMsu/T
-	7fcnwoUHuVCCJuCo40WOnHZ3pu/LFh5eFHUD5Z94yhuaP2MY1t1Q/MAEygvg5rpJBf+3pRoy1t9
-	VlMvBtzaqcgh6WEzg4j//49wBIv/B4wMZS8ime1lVemcugqb/c3P0QvA=
-X-Google-Smtp-Source: AGHT+IHT9JnGD6WZpxKelt2uNR6CpHn9e5gtYlpxij1xhxDfwiXUAGH0J9rZZR1TszCZi4HVFfYfbExKCA7vaSyyEDPyBvQLsgxq
+	s=arc-20240116; t=1746190023; c=relaxed/simple;
+	bh=J04/UQ90y9K+J9JYM0Ea8vjHuoee8+vN68H1obMDeBQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQx87fZu0Ob8hZ/9MAK7rH6ZCnXIbwmqPjcFlObiVXLKLuDd3qaZ5uBlF7LN6OqXNBRFQwz01YgR6oaNESmJZH5a/DhXbSJxocnNE6m+i+N7UrIqaCtMO9+ys//LmeBiKhw0TxO9el9JQcj/g2qNJGF4sUXivzuyLiANw8p259w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UgTQfgul; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgTQfgul"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746190020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/qR+26RAxK2TwKm2uQr96iwt4cshLMU2dX+ei3mIW0o=;
+	b=UgTQfgulT3Dw9bGDbM4Larjxa1BFeQiSPKc4QQhfXIUrJsoPCbPs6JCoA/nThmmL45NAtw
+	l28hsa+bLWuT0AWLywUJkW1sws6WpeKZC2SIP1gBRfjlaMLljXpY3+XwzM4NEnqs48H5jo
+	+snCA+hD+S3Yw7Bls7vVE+ar8uomdPg=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-45-eemoC189NNenPFsjuQ3plg-1; Fri,
+ 02 May 2025 08:46:55 -0400
+X-MC-Unique: eemoC189NNenPFsjuQ3plg-1
+X-Mimecast-MFC-AGG-ID: eemoC189NNenPFsjuQ3plg_1746190013
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4FC6A19560A7;
+	Fri,  2 May 2025 12:46:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.6])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADCFF195608D;
+	Fri,  2 May 2025 12:46:48 +0000 (UTC)
+Date: Fri, 2 May 2025 20:46:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V4 11/24] block: move blk_queue_registered() check into
+ elv_iosched_store()
+Message-ID: <aBS-s1uZV3SFROoa@fedora>
+References: <20250430043529.1950194-1-ming.lei@redhat.com>
+ <20250430043529.1950194-12-ming.lei@redhat.com>
+ <1b9ddb33-2db2-490a-a3f3-cd91d8837c7a@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:388b:b0:861:c758:ec35 with SMTP id
- ca18e2360f4ac-866b424e36emr311382439f.11.1746186662541; Fri, 02 May 2025
- 04:51:02 -0700 (PDT)
-Date: Fri, 02 May 2025 04:51:02 -0700
-In-Reply-To: <6741e9d0.050a0220.1cc393.0014.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6814b1a6.050a0220.33cf57.0000.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in loop_set_status
-From: syzbot <syzbot+9b145229d11aa73e4571@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hdanton@sina.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, 
-	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b9ddb33-2db2-490a-a3f3-cd91d8837c7a@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-syzbot has bisected this issue to:
+On Thu, May 01, 2025 at 03:25:01PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 4/30/25 10:05 AM, Ming Lei wrote:
+> > Move blk_queue_registered() check into elv_iosched_store() and prepare
+> > for using elevator_change() for covering any kind of elevator change in
+> > adding/deleting disk and updating nr_hw_queue.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/elevator.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/block/elevator.c b/block/elevator.c
+> > index df3e59107a2a..ac72c4f5a542 100644
+> > --- a/block/elevator.c
+> > +++ b/block/elevator.c
+> > @@ -676,10 +676,6 @@ int elevator_switch(struct request_queue *q, const char *name)
+> >   */
+> >  static int elevator_change(struct request_queue *q, const char *elevator_name)
+> >  {
+> > -	/* Make sure queue is not in the middle of being removed */
+> > -	if (!blk_queue_registered(q))
+> > -		return -ENOENT;
+> > -
+> >  	if (q->elevator && elevator_match(q->elevator->type, elevator_name))
+> >  		return 0;
+> >  
+> > @@ -708,6 +704,10 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+> >  	struct request_queue *q = disk->queue;
+> >  	struct blk_mq_tag_set *set = q->tag_set;
+> >  
+> > +	/* Make sure queue is not in the middle of being removed */
+> > +	if (!blk_queue_registered(q))
+> > +		return -ENOENT;
+> > +
+> >  	/*
+> >  	 * If the attribute needs to load a module, do it before freezing the
+> >  	 * queue to ensure that the module file can be read when the request
+> 
+> Shouldn't blk_queue_registered needs protection? For instance, I see here a race 
 
-commit ffa1e7ada456087c2402b37cd6b2863ced29aff0
-Author: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
-Date:   Tue Mar 18 09:55:48 2025 +0000
+I think it isn't needed because both blk_queue_flag_set() and blk_queue_registered()
+are atomic operation, and almost all check of blk_queue_registered() isn't
+protected too.
 
-    block: Make request_queue lockdep splats show up earlier
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1411b7745800=
-00
-start commit:   f1a3944c860b Merge tag 'bpf-fixes' of git://git.kernel.org.=
-.
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D1611b7745800=
-00
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D1211b774580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D90837c100b88a63=
-6
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D9b145229d11aa73e4=
-571
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D163650d458000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D11652270580000
+thanks,
+Ming
 
-Reported-by: syzbot+9b145229d11aa73e4571@syzkaller.appspotmail.com
-Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earl=
-ier")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
-n
