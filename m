@@ -1,107 +1,104 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3682B2D6455
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 22:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0E935A751
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 22:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485709; cv=none; b=bnJSYZcT1SWdaEAeB7Na3Jznl4KayPteP4nD8mbEemilw0NWJSQLDbDRp2k/5EoG5BsFbz3m06vJI4WqNEcFn1QW50kr9u9lQV6ZXlgyWtS0EPCQvcHuUSm8G+ntZu5XQU6AlHj6pH3qPaJoZZ3E6ALxvK8wiiiv8P6wwDcm0xs=
+	t=1746485713; cv=none; b=He1i/90zXthev1GWfEYb34o6RMYJpgmnSO0YnAHYBE+JDSBit1LzEBibgtb330QKPz5UM9Ws+gEgZXxm9x97cwsK++6k80U9rRLlfWY6KucC8335L8rEsUSA3BwACaczCCmGbbuhxCfhYGRxXzbelv1kbcHcxid2aGDKY72k3lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485709; c=relaxed/simple;
-	bh=Mg2CXirr6UvTh7WdZZfM5Ugt9d72LzrmXthHN3w72ec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OORbrXCEDmRuAldr8iydwOgJQ86KoPe7v9/o35O62Xni92OvHIbJadPVZWSHstAXp7E4jlERTBENvgm77byB6bZs7Tc1A1DmQGyfo6Bzmx9zftRagyYqMqY9XfLi2dO9FdkWZgWQAzF90bT7q6WdJHd2gmXo0gvI/Qu9nCbeqHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=blIsO1yF; arc=none smtp.client-ip=209.85.166.175
+	s=arc-20240116; t=1746485713; c=relaxed/simple;
+	bh=o4dmr7QeNk6BMAJDX5IeyPT/JPkokyGq6C8SqU2UR/M=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=XCjsqCXRRv9KpvWKKTpdpiGeB6utM9KRBooumhU6hTz8ImSwh2m+CzqEn3iWO+LFBNRQtjnzjKBCqp+Q6qd2JL3I69JIkqsZMEg8mngAMvSXUW+vIinwp01x5ieow7T09cXSydFDVb57C7loTGbmR+l8j911MGEhINohT0I4CkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wv9Dbus7; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="blIsO1yF"
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d818add2a3so17076015ab.1
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 15:55:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wv9Dbus7"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d817bc6eb0so15895525ab.1
+        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 15:55:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746485706; x=1747090506; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Yv0MzPmtdmRQ2wegGs8YL88YA21hMeqRHBV5NTQWj3A=;
-        b=blIsO1yFR1IS5CrCYFZYFmR327mV7FkydBSGwie6Tjvt3b98gzF8pnEsl8F5Vguv7K
-         i/qgSoFkZU3KHommCYOvrE+AS0gItoRUfQdp8RltmPYg0cUFJOB8f6PDHs+U2u6I8aQC
-         RJDWdDyYKasyW2UzoO7dT//Szhq3mzOHcisv/1YvGgYf999lVrJmzd87M5oIbxvpCwDp
-         CZnyt2HjMo7V2jhgnICrsQJSgohO31XdfkCVzLL9fjV9tDOm6i/SX2Nueo4mwHR57Rtn
-         3AnezZ4eJCR6CnY4pYCFjk3tY7b/1cGQxiGL+uWEy9g0FMMsP4mb/189u7AoS/Uv6j5V
-         AEuQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746485710; x=1747090510; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y9IWRogWT+IHbngw4rVJPf1yqVTJMP/POXHV9mjNlM8=;
+        b=wv9Dbus73jy6Mm6xL20KyvmYpfzIX6HJsbfIBUFeLlsJpFnBc1LuN44v/oomA5FiR2
+         hrTIR+hsTIC/fcDcOzHUTgPJ3csw/VXKz2pjj6vBhINPmSz58JXvnQ+kSG+ABruoVh2o
+         D08giiS2eiYqPSDNAjf0B++kBzB70e7g5k6APYCVjcrX/DIgNCE/+FlTGTJb7RegqJ5u
+         nPLHJUix55gJQiOxb6hYyz1ljpPgRi0fGjdhyTZxBNuS+zJ0wiDm5zNt/ZQMi+znEdPt
+         aooaSY6e4xkm6+ZHGGUtTIPT3qmR8HU/SXe31XrsI9QjRquX2OClByMyMnR3Qt8B/BP6
+         hufQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746485706; x=1747090506;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yv0MzPmtdmRQ2wegGs8YL88YA21hMeqRHBV5NTQWj3A=;
-        b=QoJbASpStZZ1gnf4W+Cx25D7qciTapo9jTIqhyDaHh7v7f1JSMLbX3OZQVQErntXxb
-         vWDxIt3CKCr3Xgjrw+oTl9v/L3EXWq12gQnSF+R/P+a9j/+yRExHpcbCiAr/F48Uvczo
-         kCPgS2/V9602SXcWR/8oUE8BVvGV3yrAbegBchzDlS8V5ACT10tbbzk8AO0+CG1YA123
-         Etilx5At2P6iMEz8SX1uB1/NUV8/Vnsk/Gz5weGfFIQnrohmZYUy03Ffp+8zMkj1wdB3
-         Kw73lbIm21LHMZSoEczxw9apficM3wOeBXp35i5QlYoWtBxwD3G+rH5MnChsLV1X0Dt8
-         yn+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDeLQtGbu/PDmhiLp4O4oNxSGKHlwHz5v53QNoK5WwcTcRnrtd5MQIGcC5ZD1XL178xky8hDxSSIB66Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2ZNWnNJ8Is5FzDj2gisFzWUKEdOnj4OOE7UxjcoGgZR0aMx9F
-	vEbgSPT3/H5oIcQqO/C6zsQLkw/LRRm3fRD5JqY9wTPQpfm3XSfvoJLJByb+C2E=
-X-Gm-Gg: ASbGnctTt6hHizrAmSsPX0jxQ53BhaYel18SQwGArYo5HVwDHaI3SafX0UPs5qy4IF0
-	QtsZ1Vb+WgGItoYE7hrN5E2rIzbysSMcUs98f43/VsvccJpMYwsspl74ewPR7mMiTUhTDDZABTc
-	pSHtZXfbhNHxiem9EG8oJtjnUrmHAquaRCrdK7ojRyA5bfy9adKE5YBN9hrj9ZXDHdAj2RyiGCD
-	qGmGKSJs3Ryld0rwRNUuGkiwf4QBbzGCqM9mS3Tvo3Zgl1thsPgd2kiKS6Htb0SfOh49JnLbdj0
-	tPLRXuv3VwHRowjNhFYQMGb16zHpJcbhjuBE5A==
-X-Google-Smtp-Source: AGHT+IHD8ML20CAJxh1aMxoelraKxk40IzV2DcR6+Tf1u925PW2sSl5JHvnPoT+pcjPADCDtKFI1gg==
-X-Received: by 2002:a05:6e02:219c:b0:3d0:26a5:b2c with SMTP id e9e14a558f8ab-3da6cab0417mr15472125ab.8.1746485706305;
-        Mon, 05 May 2025 15:55:06 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d975f6dd89sm22445675ab.66.2025.05.05.15.55.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 15:55:05 -0700 (PDT)
-Message-ID: <818fd481-3925-43bf-af04-a10244a52d66@kernel.dk>
-Date: Mon, 5 May 2025 16:55:04 -0600
+        d=1e100.net; s=20230601; t=1746485710; x=1747090510;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y9IWRogWT+IHbngw4rVJPf1yqVTJMP/POXHV9mjNlM8=;
+        b=EeR6EZkuWcwkAUG1Yrejwa95+1DlrkefCegI+1+qtXEzJfOqt/+Tp2RjK7/CZaHr03
+         aRC+vl6OJedBqgMYX2cS8LEvwjrKy6MaByCsAo3tY0AA53XsZ9D5+RJqFXWufu9KC/rV
+         i4FOqUTLrtaq2Da98L1/iktImSIEj91XeH8uDMIz6NLsCRMyOBD1ReznAN+mkuPZPhT3
+         JRKBmls3kJASx6WlZjJzNr7fXdeB++LT3Y4nKMQBbIo1/OXGnt+vJ/sHjJPnlXmg85dc
+         mERCSqHHcdoarKHS9x5uFcfzbcAMEy20SOqW0e4mT1TOVsqxhsUDtalESV8Ct/TPAJCz
+         cxMg==
+X-Gm-Message-State: AOJu0YyJVohrRuRfftQvhE0K4EfYQyFXND94JUIUmftZjV9ZtaTyi1nm
+	qV9ERML+t2GQo1DmyaOrdpRvcvyzJpH/PK6+vWBJxQ08Xiagw9OsNmHmZfwYvfY=
+X-Gm-Gg: ASbGncvTkTplpgdbWmluFF3ZQl1qiIjxqCszhaL5TU+vc2Fr+qUvMadxT28c9seIYAX
+	6n2UyNbpwOl05W6uZz4a60cbr4mZcsycxIK9/UTao8huWYVgRSx8sgTRvHpZnI487872/I0EQn6
+	LXujt5+wiZfYesauHtIn9XtSuEIqzupCRvVUdhltT6yIm8b3RTLGRMpfPEYYAKhQ7/pOQJRxx+q
+	zbcuHL+7aoCk6JqPGqiGWPD2E1CAwgSoDDs941poz6imksanDRiYCyI9Md6Ndsb6rcsb/Y9KCZy
+	BxWaTXawEUK193sf97Phztaq9esDd5yx
+X-Google-Smtp-Source: AGHT+IFpcNPaFzZ/vhh/4FSViYGaK4KRsBfwCvdYltBjqw6DGBuUksSFjecGP6VWziUl79QtWsppOA==
+X-Received: by 2002:a05:6e02:1f81:b0:3d9:36bd:8c5f with SMTP id e9e14a558f8ab-3da5b2a02dcmr79548175ab.11.1746485710125;
+        Mon, 05 May 2025 15:55:10 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f88aac8004sm1921031173.145.2025.05.05.15.55.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 May 2025 15:55:09 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Uday Shankar <ushankar@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Caleb Sander Mateos <csander@purestorage.com>
+In-Reply-To: <20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com>
+References: <20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com>
+Subject: Re: [PATCH v2 0/3] selftests: ublk: more misc fixes
+Message-Id: <174648570900.1422154.9689058645460558381.b4-ty@kernel.dk>
+Date: Mon, 05 May 2025 16:55:09 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] selftests: ublk: more misc fixes
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250428-ublk_selftests-v1-0-5795f7b00cda@purestorage.com>
- <aBkgLOxWLp74TShe@dev-ushankar.dev.purestorage.com>
- <aBkg0LW5YO6Osdnw@dev-ushankar.dev.purestorage.com>
- <3a6050b3-03f6-4c22-a2c3-33ab6a453376@kernel.dk>
- <aBlBdBl8uKCIVOPG@dev-ushankar.dev.purestorage.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aBlBdBl8uKCIVOPG@dev-ushankar.dev.purestorage.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On 5/5/25 4:53 PM, Uday Shankar wrote:
-> On Mon, May 05, 2025 at 04:44:19PM -0600, Jens Axboe wrote:
->> On 5/5/25 2:34 PM, Uday Shankar wrote:
->>> On Mon, May 05, 2025 at 02:31:40PM -0600, Uday Shankar wrote:
->>>> Hi Jens,
->>>>
->>>> Can you take a look at Ming's comment on the first patch and merge the
->>>> set if things look good? I can rebase/repost it as needed.
->>>
->>> Bleh, sorry, I meant to send this as a reply to v2:
->>>
->>> https://lore.kernel.org/linux-block/20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com/
->>
->> Let's give Ming a chance to review v2, then I can get it queued up.
+
+On Tue, 29 Apr 2025 16:41:02 -0600, Uday Shankar wrote:
+> Fix some more minor issues in ublk selftests.
 > 
-> It looks like he has already reviewed all the patches in the set.
+> The first patch is from
+> https://lore.kernel.org/linux-block/20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com/
+> with a modification requested by Jens. The others are new.
+> 
+> 
+> [...]
 
-You're right, was looking at the other v2 that you posted today.
-Now queued up!
+Applied, thanks!
 
+[1/3] selftests: ublk: kublk: build with -Werror iff WERROR!=0
+      commit: 3d6ee575d0d49be35dbb787db4d05bdf94e2cdbb
+[2/3] selftests: ublk: make test_generic_06 silent on success
+      commit: 254827a32118ddb171680dc2143c777cc68f2cbc
+[3/3] selftests: ublk: kublk: fix include path
+      commit: e371b9d3368ccb6b55fe9747be12c3107b2817b3
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
