@@ -1,651 +1,241 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203FA1F7580;
-	Mon,  5 May 2025 10:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746442257; cv=none; b=C/dvYaZvS+Sg/pOk9+hnhPNI7m6FTssrMSnVxrEwgJGv4/V/pN3ziHBseaZq1jNY7fyoXKJkLza1B/KsMxG/OtcV69bNjRsTW8lElo0ZYfVRzboC+6N8W40ReHH6Xb7EY+lcscv7AvSSCp6ItjBJEjB/DeXXQg4Rjh78czncV0Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746442257; c=relaxed/simple;
-	bh=OadpNniwh9U1HU2o/5b6wsoaUE8vTuQIe4cjw+qCToc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=gsY37sYNZqzlnWzYGv1y0hhUSHbuWp0MuTrLWom6tuk4OBrk7SJe1FNUAA+RtKPN7KUpwMCLP9MkO0gcxMDEwdgk5LehewBe87OMbL479ea+GzU3+EpIAUy/SeqNQM5Y5Ci5i+UeErCBUypXWr4fs060CRHVDTNujD0IGZvJjnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0UFpoFc; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74FB1FC0F3;
+	Mon,  5 May 2025 10:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746442542; cv=fail; b=oXP+mEPoiNChK9/xpRvuPT0exTjol9STB0P92zIUi5bCj31FhwQJrRcsthOva79FJrGPeVEpxMKXuRTJxzkhS63pwJ7iZAGDWJsCldzEPkG9f5KM3lFhYYrygp9UZ+gBa9UzBHTMyi2ogYxkr8VbbuDL7lhbVQPMEI3nE/jI8tI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746442542; c=relaxed/simple;
+	bh=RLiUF+4m0Tln7USgjHxaFyMCdFo69kaRVO9xvvEMCuE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=T+T0yrThWVNSRUNlee3G2D5JB6alywt73SXTk83S16yDSrmo1RRKAVymIqDCEssorwarS1ZAU8I38o9Uw7TEiNN5StZtgwWMq1hNNVKsbQTXeDuKqD+5TIFk4RQmNejq7dAuJFc+fNEGFcOe43oh9TysXfdSO/xmOvv8yoevi0M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jELqov31; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=C3z6F1Bo; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0UFpoFc"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7306482f958so2790549a34.0;
-        Mon, 05 May 2025 03:50:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jELqov31";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="C3z6F1Bo"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 545AMKdD015673;
+	Mon, 5 May 2025 10:55:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=jYXQaSboLRvKxtMit4R2JvqoCbtEblBJ308p79UwmWU=; b=
+	jELqov31pqlLqGm5WM+KvTzLvB3sYpJ+dw02SEYc49eI1lZynTMi9TNxnB2pLFEk
+	7dvIPE2/Bl+opDuPBrGNNklRKLLZTpzLYfzkOZ+Bi06aiJhzxg4IgZInMyctkRyL
+	2ynUxIOuvA9ezHxfEXemx8BTxfEevthKkAIY2wPREXVqn4ZrCHmP370LWCYK8k0x
+	7wrDB9Veajjqbx8++gAj1HsNglOkkOsOOhYiwYpGqGzyZST/lw5jDDhPoPLRfH+f
+	353Tdve35hOCONENxw9Yh0bFvnWF2HwSi+23ceEDV0mexquSjeiP/rhAhECMwL/K
+	n/4Q6Qdghl3fKi4j7Y2sFg==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46eugy81kf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 05 May 2025 10:55:26 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5458IBFZ037578;
+	Mon, 5 May 2025 10:55:26 GMT
+Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazlp17013063.outbound.protection.outlook.com [40.93.20.63])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46d9k79kp6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 05 May 2025 10:55:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dD4ZgKkPrtoBiQ7o8afNAPGs9QVVcDCcCFjswefoZDgjleVvAijVxq8XIuGrIWzBrP51tgdXnWqPl7KAd3PX4hpZiWYBUGLFKc3XxwOA9d3IS7zk3XO08sFKoPzd05MyKmjWh8Lmkq+sBVh8wQV/Z/jlLs7RdT9jgbAxLcqYWT0GnnvXZuta0VB0dDK+BDUYpbIYC2c0BxCLYkYqZ72NwlUHaDJTOGcr52UN2L2s822ANIRzoMjU7RO8tGbity2o5AW7JEuAAeRkxZbElmxewWSXg4eoqhkZwgpmf3SOzN1BYthkJ5CbE78oIm+Ogdb4KGhzylyZmqZqNz396VC63A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jYXQaSboLRvKxtMit4R2JvqoCbtEblBJ308p79UwmWU=;
+ b=r8NvaAWLBNLywvLIesddWKZBmzhpsIqX10fPwPBIkL/Qpa8Q1XA64KGnZgXkwdFYmQIrCgHWyOylBMWlP0MNYP+qiy2U2nTOfGBuUzYqu8+/KMjRBjQNA8ZKOsAtWsVhGWUY1zRbDdvOGW2Q+vAPdi1Dol8vBkmCfKy7DDHwu5Vi8ZlBSl0aXQ1Pt+9kNcYhl2VpiVCDQALK7yX926W3cypDBen2hTMulG5Vw1E96QfmrQ+QQ7ET8R1vlJXyYywyCObxdzSGyfAmsX9MbZWJB398Tw4uOHlqa1WuQlm5UOhkTVKOELQJH1vSAQDZup2aEz0MuB08RMzysbUzArHWvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746442254; x=1747047054; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8z2HYf6C5msKU0LievF4dPNUD54sRQqBRtv3P+JbzPI=;
-        b=Q0UFpoFcaddR4TFftxiCf+UqnNowfwSEx/C0YKkDx+z3PluIzQdQCIaiW6c8tsrj4P
-         lSNTfo1iP7qZvf6iDDuxEbpRheFS/ZCH4kp+ts8ni9mzbvOcq4p/apT7NXbfwTMgzu6x
-         qfdR+1NUl9I1gLgJ+vdGskJiHq/ryUn/ru8l8liEQbE+EwTciEVLHeH/rCc4TUMwo07g
-         OxrjdD12ax4clbiiHKIA4cpf3OkhCR7zyltQkutRrafBt2Pr+AnfsdRPCody68rr3dwa
-         lbdi0JoykSrDsDr+IWt6+vz5pcch3qETaL4YZSwb2LJpn9XJmnC7kn+UUtd212WINT81
-         ttGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746442254; x=1747047054;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8z2HYf6C5msKU0LievF4dPNUD54sRQqBRtv3P+JbzPI=;
-        b=GfmJy2PBXAXU0kntDRZO1EIVJtAUrFLsFBtOYn41jurAIAUVPEw3RugqyBUhAVe1uO
-         ksp+9ZSUfLPNhPjgkFB2hZoQN3kVcPF7eEKjMqSaUs90j6tgfDoxeFxlPXzd1yv1ly90
-         vw8pJmojtszQ0WlkhcrKdhCGHKh5Az6BkOALLSqt5sXnPDafRSp4ek8xgbWbbeS2jI/r
-         XHz15FLM7HSqw1FfF8QfBC2+m07xt7YyncDzUy+WuThfX0+U+nvumUuYAFlVTeh6QhVN
-         rqU37XKFKiD6OoLCB92Mp0kZKG9CMUhV8PfdX/6+1GuN3n0sN9TEJD/pvWPQOKws4fTY
-         s+5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWlSMHOgSeYdO74cIAdahS5jA1YB6PyXz4SqiR9aR5XdrCLexpsfXryBUHTgHY7HYmamyPyIQ7+H9LL24ga@vger.kernel.org, AJvYcCXnVpY9uNs9RaNE/9go4WHPGy2Xn8OTTrk0NGqmKCoFrOIMLY9dvLmzUElWHr+D5b6geSM9zm0oKX4bZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR24M8Xk38X8AmT0XUfxdiJQhmOBwHhafdG9ipiWpxZPJHgMvG
-	JaUo7sZbRsqOMdAU247SEzlwzfacddWnEO0OYHg2y7MGzFNQIep2Xbzi1pAzWQL1e7U8XT0RzcD
-	szYqfkHs2LPJ7jWgInUH7gWwas3Q=
-X-Gm-Gg: ASbGncvFdpb1ik25YzbMkUSIE5LaobUW4nGNc3J+wx66VrOotiriX7uwRhSEIy+XpkB
-	XpM+MvPvRP5IDxDefEfn9zSC8iFQz+uZniLsP0y8KSDQj/kfKYv1akT/9pkPxqtdYv9WjQs/LVV
-	YHLuYiMY3I3hZE2RUrwKZq
-X-Google-Smtp-Source: AGHT+IE/GsPX1uW2/avIU5l39TViYkPVD2RbkI77lsDNz+M+/jSD/4I1UQBTJcDlIiQ7uZGOeV3KSOiXB9gbnW1XjrY=
-X-Received: by 2002:a05:6830:7009:b0:72b:823c:8f66 with SMTP id
- 46e09a7af769-731ead9b055mr4683607a34.9.1746442253915; Mon, 05 May 2025
- 03:50:53 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jYXQaSboLRvKxtMit4R2JvqoCbtEblBJ308p79UwmWU=;
+ b=C3z6F1Bo7FIXmTBMpXZ42uYRtEaa2Gcen6D5K8lgJW1HiQ4Qqdl0pR8D+FJ0W/lJ0asCABeohhYIdOTUBswJulLPwN14pZIMPME/GX3gHNxfXZh0ANXxiq+O0sPhwIFDZRMDxOJ6J+uMT/2o4/XBQyLaDwpl8vESiyAJP7+KZ4g=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by MW4PR10MB5883.namprd10.prod.outlook.com (2603:10b6:303:18f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.24; Mon, 5 May
+ 2025 10:55:18 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%7]) with mapi id 15.20.8699.022; Mon, 5 May 2025
+ 10:55:17 +0000
+Message-ID: <bb8efa28-19e6-42f5-9a26-cdc0bc48926e@oracle.com>
+Date: Mon, 5 May 2025 11:55:13 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 02/16] xfs: only call xfs_setsize_buftarg once per
+ buffer target
+To: Christoph Hellwig <hch@lst.de>
+Cc: brauner@kernel.org, djwong@kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, cem@kernel.org, linux-fsdevel@vger.kernel.org,
+        dchinner@redhat.com, linux-xfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ojaswin@linux.ibm.com,
+        ritesh.list@gmail.com, martin.petersen@oracle.com,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+        catherine.hoang@oracle.com, linux-api@vger.kernel.org
+References: <20250504085923.1895402-1-john.g.garry@oracle.com>
+ <20250504085923.1895402-3-john.g.garry@oracle.com>
+ <20250505054031.GA20925@lst.de>
+ <8ea91e81-9b96-458e-bd4e-64eada31e184@oracle.com>
+ <20250505104901.GA10128@lst.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20250505104901.GA10128@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO3P265CA0015.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:bb::20) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABXGCsMM3L+9_eGiDxjyhr4s2cW-2m+nntqgA49JS_eN9TEwog@mail.gmail.com>
-In-Reply-To: <CABXGCsMM3L+9_eGiDxjyhr4s2cW-2m+nntqgA49JS_eN9TEwog@mail.gmail.com>
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Date: Mon, 5 May 2025 15:50:43 +0500
-X-Gm-Features: ATxdqUEDRfHj5CF5Cko89BVpqkr1pQ-so0LyxPW_jQ9LQ7uj3oMqkUJLmSOJ5zo
-Message-ID: <CABXGCsPpaHg6AuAErqwGAVrsoXbxKvVTdu1HRqYy94BwKNvyVA@mail.gmail.com>
-Subject: Re: 6.15-rc1/regression/bisected - commit ffa1e7ada456 introduced
- circular locking dependency at udev-worker
-To: homas.hellstrom@linux.intel.com, axboe@kernel.dk, 
-	linux-block@vger.kernel.org, 
-	Linux List Kernel Mailing <linux-kernel@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>, 
-	Linux regressions mailing list <regressions@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|MW4PR10MB5883:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78e12f90-cbed-47ef-6bbf-08dd8bc35292
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?V29mTWhKamxTRURWSGhJbXdtR1hnQk5KWmJwNmw1V0tQZFVLbE80ZlpNMi9m?=
+ =?utf-8?B?VlpSYklBdktXcTkyNGJmMHVPWHhpSXljQkx4M2t5MUZnMWdYRi9CV0hmd3NB?=
+ =?utf-8?B?dExUV1pFTjVYdlFJeEtHem1TVmZJd3EyZjVySEsrRUxNdFprU2hvS3MwR241?=
+ =?utf-8?B?d1dWNGxpTmpsY2NqR1FJYlJXcFg1R2E2alI3eDJqM3kzSWFHQkpuR3NqNW1p?=
+ =?utf-8?B?MldaNk5OR2ttbEY4ZFU2dXludkhkcjRkZEwrM1djL3h3bG9BclBETUNGY0Y3?=
+ =?utf-8?B?QnBseFR0WUY0WDROMjJmdmtwbjVnM05BNnJaL2pGZWRaNVNzTXc3TkNaSmJv?=
+ =?utf-8?B?ZUV2WU1QdEZjOG00SzZKbEh1YVgrbkd1UnVQNWNUQ3hTRjVpZUlLb2ppY2la?=
+ =?utf-8?B?Yk5mdUpUZW9SWUMzQUYwZThYRUxkMFdJZ2hob3JUaWwrVC9vY3dNUmJheEgv?=
+ =?utf-8?B?eURmWnZSZ2Y4UTdZeWNlUTUzdjRMbzZaS2RxSHh1OUhPSzltM2pIekFXaGhS?=
+ =?utf-8?B?c2Y3S1J5MWpLRklUMXM3RW5ubmlzbittMlpqOE5VTFBtUTlad1VKWXZ2K3Nz?=
+ =?utf-8?B?b0p6OUxMenJKdGFuay8zT2h3dUdSWTdEK1Q2Q3JENFgyazhpQzdCMjVqVHFZ?=
+ =?utf-8?B?Nk1Xc2RZWWVpd3ZDS295WEc4TFRKZjBINS90RG11QW8xeEh6R3R4cGVXVkp4?=
+ =?utf-8?B?WFRqcmo4aytUbVJUTXpTNTUyM2RZWWwyd1hXV1dUYnB3V0VCM1FpZEVvL042?=
+ =?utf-8?B?LzhXeVBTbzZiVjA2dXk0Kzh3dGNOR2REU2pyZUVxNHZzZTNGYU1qZHZIVWxE?=
+ =?utf-8?B?SEQxTHdteDhLWXJNYmF6UFNIVWpkK1o2NnQ4UGhXd3VyZVgxU3hwYmdvWm9D?=
+ =?utf-8?B?ZTZRU09USW1QVEhLd1MzUUhrRG4zUFl3a08wRlhPVjJZODd4VFhZeHZVS0ZD?=
+ =?utf-8?B?dG85WTNBZTEySzkxZGZJVnV3K0I5dllpcWlmT2xUczVkdHUyU05pSlMxaVlw?=
+ =?utf-8?B?dE5qR3Rhc2xMckFkakxEYWlTeVNXSTI5bmF1cDVaZkJXMWVTaUl0Q21lUGR4?=
+ =?utf-8?B?bThpWHBzeXRNSUVHbWZuejlJWmNRMWxwSjFMaUpMSFZMS0hOYXZtTytjMUZM?=
+ =?utf-8?B?aWJqWjhoVlFQOXNGTGtSV2t3cmRXVEh0SUVrMzExMDlQV0JnQWNQaXpQaXdL?=
+ =?utf-8?B?aXZWSWpySlFrK0Z0eEhQVU9tQy90MFZ0VklMaFVmeHlnRnFtaDRRKzdPdERF?=
+ =?utf-8?B?SENiSVlZSERQYmVGS0FUelMvSTNSZkNTVW4zdHdSbzlHTGVubE8yb2I4MTgy?=
+ =?utf-8?B?Q3cyVUl6dEx5OTNoOGNjbjlMamZDaGF4QzNkekV0RDEwQTgxS0toWEZMK2o0?=
+ =?utf-8?B?K2Z6SHU2bFBWbjVMSzFjT0NmU0V5Rm1ENjN3cnNiNUg4ZE9ZWmF2eHBaTjZi?=
+ =?utf-8?B?WHplSkVubVNkelVVWDdEZWtpL3BzR2pTUStNNWZCWlJEc0hHMCtoYnUrNnJi?=
+ =?utf-8?B?cEpmbmFiMGZQVVJUWkt3UHFvbjk5MnBuNk5EU2l5aHlEcEZrdWExMHhkMFhZ?=
+ =?utf-8?B?UWhHSlVram5Xc3cvL0paTUJxT1dJWDNPK0QyTkhlQ0NQVUttWXZyL1c3WTRk?=
+ =?utf-8?B?UVA5VVU2OG05MkJCdXBaNk9XYmdqMERmNk42bzZTRUJhTmZtMUIzcGUrSE5S?=
+ =?utf-8?B?NnRVVmdXN2p1QmtTQ1NQejhYRU9YRHlBVlRGUSt5YzFUSG9wQXBOalpydmxs?=
+ =?utf-8?B?TUlTOHpSajFTNU1VcW5DOE9vaDFHeGJXeGVER1V3clVFYjcwYnJ6b05rdGdG?=
+ =?utf-8?B?eFVGc0xXeDNUZUtrV0ZSMEUrdmpzbTBPYVRJK1dYS3dqWmY2UUFZcXNncFdG?=
+ =?utf-8?B?K3B2dUY1VllXRVJ4aml2aFdRcXc2R0l2RkNqUnRzaTB0eVRtNzIvVUFvMmtM?=
+ =?utf-8?Q?CgmYjejZSjE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S01KRi9FclZFalZLTEllWmJteW9WTnRRNWxzVUcvMm5Ia3o0ZDF2ZGt2WU5m?=
+ =?utf-8?B?cFc0Y0E4RjR1SUJSNHV4TTZOMzE0VWF5UXdDK25CYS93a3VFd3FTWDNqVjds?=
+ =?utf-8?B?SFQvYjdJL0ViQ29rV0lLWTlxS216aFVodlF4NXZ3SENOSndJMjlyd3RPaCtO?=
+ =?utf-8?B?cHo5YWlUNGJUeW9ySCtKYm4rVGhzRllYZkZJUHdxN1FWZ2tOa29VbGg0V0po?=
+ =?utf-8?B?blhBc1Y0Y2dzY1p0c296MzdObXJXUDZ2WURvRXhBQnVHK1NUdDFxa1JIYjQw?=
+ =?utf-8?B?aUlHRGRtQnkzMWlZSFpmTFBBZjZsWElBa1lqQVUzQnlKMDhUdVNCdUdZeE1h?=
+ =?utf-8?B?c1ZvWWo0TUpzNXlFV3U5bDZLRHdmK2VEeGxJbWxJUkJDNVpZa0dVUGxzQXNE?=
+ =?utf-8?B?Nlc3Y1gwRkxhVkM1bnVZNStFaTk4aXFWeFdnYUpYdDFDVGVxRnJTdnJTVjBJ?=
+ =?utf-8?B?WDRiS1Y2VnVsTEVaaVh5NUk5VFhvYmw1bzNHZWVzYlV1cS96eTdOaWh5c01n?=
+ =?utf-8?B?bmM4YXZ5amlPMVdPNzdDMnRSZGtIdVhqOGtFNXJpdjZwTEMvWmpJUGtHM0t0?=
+ =?utf-8?B?bWJjWlhxMUp3MlU3RFMxTkZvUUpLY0Z5dm13L3l6UXY4WmJPSVZNbmU2cVE0?=
+ =?utf-8?B?d2huKzVjVEJ5c3AxZGpzWkc2UFp4by9nOTNKaHhQcHowZUw2WUswdm82NURB?=
+ =?utf-8?B?YzhLSUhwK3krYTMrUnJOenJyTWFxVFBxRmE1MW9NRFdDcGdhZFk4WU1zaU9L?=
+ =?utf-8?B?ZzE4MUw2MVRuUEs3L2U5VUJUSWNHdDkwYlVhOHVoSkZGbWl3d080L01sck4r?=
+ =?utf-8?B?RnlpdmdZOFZzZ20wR3V1bm95SlFwTm9JNTBMYm5BTVpJNTQzQVJJS3FPYmtD?=
+ =?utf-8?B?Ry9DRks1ZktLVVNrV3FXNFMzSDAvcHV4bzF1Qzc5K1kzdWt1M0xmazMxWm9K?=
+ =?utf-8?B?a3J4RTU1cGxjeDBHUUk5WVAvNTVTcjZ2RnBwN090bUI5eGo2aWhwR1Z5NUNN?=
+ =?utf-8?B?UGFmYm13MDFLZVgxUHkxWHF3eGI5N0E0QXl0NEZrZU1UVUNvSG12aXN6ZE95?=
+ =?utf-8?B?dVp4c2MwYVhwVk5IWWFTL2k0Vk1kUUpPejZsQXE4NzNOMHlZRzBrbE5MY2FB?=
+ =?utf-8?B?UDN2Z3FyQXM3WlZEOUJMNjlUR2RtNkhyTVJtSm04RlBVaDl0UnpqSVZtS0pS?=
+ =?utf-8?B?eWZ1WHJ3d3R1Y29uTzlYdnVsOGpFNkNBWmpVSmFScVdhSGtoZlJoR0lOVTRQ?=
+ =?utf-8?B?N1Q3aXFEekgvVS9qd2lybmNjY09lYmlpOTZncW1vdFlrREs0VTE1Zm8wUk16?=
+ =?utf-8?B?TndQYVdxUkoxakNuVUF2cUhpK1FXbU03V0s5dU11YXVRU3lxYU9NS1ErZE02?=
+ =?utf-8?B?a1JDLzBtS0JrWkt0a09BWlFDRjJNaTk3dTZEOUJYaE5jeXpRN29kbTh3RVRL?=
+ =?utf-8?B?VXNmdGl2UU1FZmtwVk5hTSs2MDNCeXExYkFZVDJFSnJHR0dGaGM2ZWMxTlQx?=
+ =?utf-8?B?VnlZMjVhcmdmQ3MwNWhQc2QyV3l5dWo3VkNEcW5WclhSaWFpR0tyTFN1WXJi?=
+ =?utf-8?B?K2crcWc0U3AxMndTSVpwUWNRa0FPRmtaM0Q3UDJKZGJvbTlUR01hZ1RBVFlm?=
+ =?utf-8?B?SHRuL2xydksvZTVvdXU5YkdBZDBmK1Y5WS9BRWVSWWRiaUNQN2RKZDhNSjEy?=
+ =?utf-8?B?V2tWMnh1aFZUVEJuUGhoVC9HT2JtRGFUbmpxeXpJbWhyckdWeU5XTExHYmh0?=
+ =?utf-8?B?NWJrMld3dmRXRXB1VWZ5ckp3bFlXZGo5SmY5bEZnL1RBV1J3SnpFbGE2aHFX?=
+ =?utf-8?B?bEI0WEhiMG1LSGZKOFRvbW1HSlhhbTlCUzRtQnpUZUMreWlqMnp1NEIrVVJx?=
+ =?utf-8?B?YTB5T2VpNnlpZHZVQm5wNmlsY24xbW1qd3Y5MUwyelpKZ0dKRWJQNzBwL3Fh?=
+ =?utf-8?B?Vmt6OXRJUk0weFhsdzJtN3lxSGxWZ0JxMVRMRFdSRWlwVitIa2w1SmNLQUZT?=
+ =?utf-8?B?aDBIQllsM2VYeFFrVnFQZkEyZXpWS1VmL3UwT3kyUGcyMkcrZlRXMlpqa2JF?=
+ =?utf-8?B?VklQaXhicnNhOWc4ZE5KSjJqaGZoeTFDVmVwWnc4WWp2NlkwUmR4V1RVTW1R?=
+ =?utf-8?B?eXJuNk1ocGdIOVllUkE1MjFWeTlialJmRkZUR1lnNGhRQ1FZZUJleWZvdVVQ?=
+ =?utf-8?B?akE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	gZfSl/VE6ei7hco4DuswK34YRSXEVy85J34y0C6lX1iYCzr3me+kUk4zCsi/Vfid173KhHYH4qaDjVxDDza83WjyB6hBa6nMHt5k+2BV7xJiosnfnixETsU6LuRWvjq6wSmOGhJWRriQifWiUfL0RxHYbYD7Ds9wSmBi0flvHWUeq7ub6eq/YcK8Oy5V2tYKTAtDwYGlnpIPJHps0OtRZl3Fh6h8WF2WprpKfS8e56VFZZ0JQzal9g0Zxhu4gr/t24TmUg5xrXlcbDfcsI1QL9lpRhvnQtIIdumyaWF5t71y3XTctc2dXkE2aFmYFcdHsYYdueDuQd0NptWXGe1lw4TX7CV17vltGaBWLeeag0KEcrWjLiXIDeoQjMq+9y8CXmxt8S48vOjT1U+zhan/6OCLXuIVRGINWA0c1UHWIik2SULhZFLWFs/jIuBRvatxcp46XjqMVyJ5i49BPjUc0CLyT2uT573J9koR1InHDZZf87gQw4/9wIXaxEhWedNhz1SwX2aVcXPLL7NX7b2RnXr0s8vhUcZOOKIw2rMrVsCzHootJkOL+Ghp8au3k/HJDmdl+bNSVngeQNn02WqOELHY22Q6z8iVvZ1lDXdQfoE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78e12f90-cbed-47ef-6bbf-08dd8bc35292
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2025 10:55:17.9405
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CCuxgShZINn9YTtuqmAGoE+V8B3J/cMxBwltli9RW06h/zusIATyn2f9jE4fdFBPwxnd9ZikdZvQXKnFd0BBCQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB5883
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-05_05,2025-04-30_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 malwarescore=0
+ adultscore=0 mlxscore=0 spamscore=0 mlxlogscore=989 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
+ definitions=main-2505050104
+X-Proofpoint-GUID: ZQYJ4753WVdCHDA_HRIM7pchIX-qKO75
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA1MDEwMyBTYWx0ZWRfX7y3zClcwGP05 hzg7pg6r+ZZSDvVyzE77H0T6PvFzvk4Xq/aUUBAV0X1MbaCIHEhLx4ZsPLlQRZ9LxI1F02lZWVE 5crQ8emH9TR+idRdIzfvKSqOZcrM9tUZ89KoUsUx9/NRuGra4xmWhvAx/4mv1CifwFcjVy5fag0
+ G8rrO0/TANk9Av1zlprIF9XPPzp/O+sOOwCpAvMTRZoz//ZIgNhMY6nYpt557qaOHmXMzlR97vQ 4kUcK+rCW7RYz98v2Phh1t4n8m5EJqbD99aW9LM4s9exezzlhVo3YW5DOlplbgFgBvDkRgVIgVT I3IncRqKOl7BUhWmJzYIKykblWhOqI/j3r5kp9J9JwQupBw8K3+8MC+9yhrUM+0apKpjd1IAxkV
+ z9s370qnFieVSqvPAEdXKkt9dQQOJJWRzSWwRCYs4K6ojZW4KCSW7FD+nlRw/JRA3U/dImFr
+X-Proofpoint-ORIG-GUID: ZQYJ4753WVdCHDA_HRIM7pchIX-qKO75
+X-Authority-Analysis: v=2.4 cv=NOPV+16g c=1 sm=1 tr=0 ts=6818991e cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10
+ a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=15AC0CraAwGHpATqzikA:9 a=QEXdDO2ut3YA:10
 
-On Mon, Apr 7, 2025 at 8:57=E2=80=AFPM Mikhail Gavrilov
-<mikhail.v.gavrilov@gmail.com> wrote:
->
-> Hi,
-> In the new 6.15 release cycle, I spotted a new possible circular
-> locking dependency in the kernel log, which was never before.
->
-> [   19.601251] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [   19.601252] WARNING: possible circular locking dependency detected
-> [   19.601254] 6.15.0-rc1 #4 Tainted: G        W    L
-> [   19.601257] ------------------------------------------------------
-> [   19.601258] (udev-worker)/1069 is trying to acquire lock:
-> [   19.601260] ffff888188934578 (&q->elevator_lock){+.+.}-{4:4}, at:
-> elv_iosched_store+0x17c/0x4e0
-> [   19.601272]
->                but task is already holding lock:
-> [   19.601273] ffff888188933fe0
-> (&q->q_usage_counter(io)#5){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x20
-> [   19.601283]
->                which lock already depends on the new lock.
->
-> [   19.601284]
->                the existing dependency chain (in reverse order) is:
-> [   19.601285]
->                -> #2 (&q->q_usage_counter(io)#5){++++}-{0:0}:
-> [   19.601290]        __lock_acquire+0x551/0xbb0
-> [   19.601294]        lock_acquire.part.0+0xc8/0x270
-> [   19.601296]        blk_alloc_queue+0x5ca/0x710
-> [   19.601298]        blk_mq_alloc_queue+0x152/0x240
-> [   19.601299]        scsi_alloc_sdev+0x85c/0xc90
-> [   19.601302]        scsi_probe_and_add_lun+0x4d6/0xbd0
-> [   19.601303]        __scsi_scan_target+0x18d/0x3b0
-> [   19.601305]        scsi_scan_channel+0xfa/0x1a0
-> [   19.601306]        scsi_scan_host_selected+0x1ff/0x2b0
-> [   19.601308]        do_scan_async+0x42/0x450
-> [   19.601309]        async_run_entry_fn+0x97/0x4f0
-> [   19.601311]        process_one_work+0x88d/0x14b0
-> [   19.601313]        worker_thread+0x5f3/0xfe0
-> [   19.601314]        kthread+0x3b1/0x770
-> [   19.601316]        ret_from_fork+0x31/0x70
-> [   19.601318]        ret_from_fork_asm+0x1a/0x30
-> [   19.601320]
->                -> #1 (fs_reclaim){+.+.}-{0:0}:
-> [   19.601322]        __lock_acquire+0x551/0xbb0
-> [   19.601324]        lock_acquire.part.0+0xc8/0x270
-> [   19.601326]        fs_reclaim_acquire+0xc9/0x110
-> [   19.601327]        kmem_cache_alloc_noprof+0x56/0x4d0
-> [   19.601329]        __kernfs_new_node+0xcb/0x780
-> [   19.601331]        kernfs_new_node+0xef/0x1b0
-> [   19.601332]        kernfs_create_dir_ns+0x2b/0x150
-> [   19.601334]        sysfs_create_dir_ns+0x130/0x280
-> [   19.601335]        kobject_add_internal+0x272/0x800
-> [   19.601337]        kobject_add+0x135/0x1a0
-> [   19.601339]        elv_register_queue+0xbb/0x220
-> [   19.601340]        blk_register_queue+0x31e/0x480
-> [   19.601341]        add_disk_fwnode+0x716/0x1030
-> [   19.601343]        sd_probe+0x887/0xe30
-> [   19.601346]        really_probe+0x1e0/0x8a0
-> [   19.601348]        __driver_probe_device+0x18c/0x370
-> [   19.601349]        driver_probe_device+0x4a/0x120
-> [   19.601350]        __device_attach_driver+0x162/0x270
-> [   19.601351]        bus_for_each_drv+0x114/0x1a0
-> [   19.601353]        __device_attach_async_helper+0x19e/0x240
-> [   19.601354]        async_run_entry_fn+0x97/0x4f0
-> [   19.601355]        process_one_work+0x88d/0x14b0
-> [   19.601357]        worker_thread+0x5f3/0xfe0
-> [   19.601358]        kthread+0x3b1/0x770
-> [   19.601360]        ret_from_fork+0x31/0x70
-> [   19.601361]        ret_from_fork_asm+0x1a/0x30
-> [   19.601362]
->                -> #0 (&q->elevator_lock){+.+.}-{4:4}:
-> [   19.601364]        check_prev_add+0xf1/0xcd0
-> [   19.601366]        validate_chain+0x463/0x590
-> [   19.601367]        __lock_acquire+0x551/0xbb0
-> [   19.601368]        lock_acquire.part.0+0xc8/0x270
-> [   19.601370]        __mutex_lock+0x1a9/0x1a70
-> [   19.601371]        elv_iosched_store+0x17c/0x4e0
-> [   19.601373]        queue_attr_store+0x237/0x300
-> [   19.601374]        kernfs_fop_write_iter+0x3a0/0x5a0
-> [   19.601376]        vfs_write+0x5f8/0xe90
-> [   19.601378]        ksys_write+0xf9/0x1c0
-> [   19.601379]        do_syscall_64+0x97/0x190
-> [   19.601382]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [   19.601383]
->                other info that might help us debug this:
->
-> [   19.601384] Chain exists of:
->                  &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter=
-(io)#5
->
-> [   19.601387]  Possible unsafe locking scenario:
->
-> [   19.601387]        CPU0                    CPU1
-> [   19.601388]        ----                    ----
-> [   19.601388]   lock(&q->q_usage_counter(io)#5);
-> [   19.601389]                                lock(fs_reclaim);
-> [   19.601391]                                lock(&q->q_usage_counter(io=
-)#5);
-> [   19.601392]   lock(&q->elevator_lock);
-> [   19.601393]
->                 *** DEADLOCK ***
->
-> [   19.601393] 5 locks held by (udev-worker)/1069:
-> [   19.601394]  #0: ffff8881144a2450 (sb_writers#4){.+.+}-{0:0}, at:
-> ksys_write+0xf9/0x1c0
-> [   19.601399]  #1: ffff88819d1f6090 (&of->mutex#2){+.+.}-{4:4}, at:
-> kernfs_fop_write_iter+0x260/0x5a0
-> [   19.601402]  #2: ffff888191d42d98 (kn->active#102){.+.+}-{0:0}, at:
-> kernfs_fop_write_iter+0x283/0x5a0
-> [   19.601406]  #3: ffff888188933fe0
-> (&q->q_usage_counter(io)#5){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x20
-> [   19.601410]  #4: ffff888188934020
-> (&q->q_usage_counter(queue)#5){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x20
-> [   19.601413]
->                stack backtrace:
-> [   19.601415] CPU: 3 UID: 0 PID: 1069 Comm: (udev-worker) Tainted: G
->       W    L      6.15.0-rc1 #4 PREEMPT(lazy)
-> [   19.601418] Tainted: [W]=3DWARN, [L]=3DSOFTLOCKUP
-> [   19.601419] Hardware name: ASUS System Product Name/ROG STRIX
-> B650E-I GAMING WIFI, BIOS 3222 03/05/2025
-> [   19.601421] Call Trace:
-> [   19.601422]  <TASK>
-> [   19.601423]  dump_stack_lvl+0x84/0xd0
-> [   19.601426]  print_circular_bug.cold+0x38/0x45
-> [   19.601428]  check_noncircular+0x148/0x160
-> [   19.601431]  check_prev_add+0xf1/0xcd0
-> [   19.601433]  validate_chain+0x463/0x590
-> [   19.601435]  __lock_acquire+0x551/0xbb0
-> [   19.601437]  ? finish_task_switch.isra.0+0x1c5/0x880
-> [   19.601439]  lock_acquire.part.0+0xc8/0x270
-> [   19.601441]  ? elv_iosched_store+0x17c/0x4e0
-> [   19.601442]  ? rcu_is_watching+0x12/0xc0
-> [   19.601444]  ? lock_acquire+0xee/0x130
-> [   19.601446]  __mutex_lock+0x1a9/0x1a70
-> [   19.601447]  ? elv_iosched_store+0x17c/0x4e0
-> [   19.601449]  ? elv_iosched_store+0x17c/0x4e0
-> [   19.601450]  ? mark_held_locks+0x40/0x70
-> [   19.601451]  ? __raw_spin_unlock_irqrestore+0x5d/0x80
-> [   19.601453]  ? __pfx___mutex_lock+0x10/0x10
-> [   19.601454]  ? __raw_spin_unlock_irqrestore+0x46/0x80
-> [   19.601456]  ? blk_mq_freeze_queue_wait+0x15e/0x170
-> [   19.601458]  ? __pfx_autoremove_wake_function+0x10/0x10
-> [   19.601459]  ? lock_acquire+0xee/0x130
-> [   19.601461]  ? elv_iosched_store+0x17c/0x4e0
-> [   19.601462]  elv_iosched_store+0x17c/0x4e0
-> [   19.601464]  ? __pfx_elv_iosched_store+0x10/0x10
-> [   19.601465]  ? kernfs_fop_write_iter+0x260/0x5a0
-> [   19.601467]  ? kernfs_fop_write_iter+0x260/0x5a0
-> [   19.601469]  ? __pfx_sysfs_kf_write+0x10/0x10
-> [   19.601470]  queue_attr_store+0x237/0x300
-> [   19.601472]  ? __pfx_queue_attr_store+0x10/0x10
-> [   19.601474]  ? __lock_acquire+0x551/0xbb0
-> [   19.601476]  ? local_clock_noinstr+0xd/0x100
-> [   19.601479]  ? __lock_release.isra.0+0x1a8/0x2f0
-> [   19.601481]  ? sysfs_file_kobj+0xb3/0x1c0
-> [   19.601483]  ? sysfs_file_kobj+0xbd/0x1c0
-> [   19.601485]  ? __pfx_sysfs_kf_write+0x10/0x10
-> [   19.601487]  kernfs_fop_write_iter+0x3a0/0x5a0
-> [   19.601489]  vfs_write+0x5f8/0xe90
-> [   19.601491]  ? __pfx_vfs_write+0x10/0x10
-> [   19.601494]  ? __lock_release.isra.0+0x1a8/0x2f0
-> [   19.601496]  ksys_write+0xf9/0x1c0
-> [   19.601498]  ? __pfx_ksys_write+0x10/0x10
-> [   19.601501]  do_syscall_64+0x97/0x190
-> [   19.601502]  ? __pfx_sched_clock_cpu+0x10/0x10
-> [   19.601505]  ? irqentry_exit_to_user_mode+0xa2/0x290
-> [   19.601506]  ? rcu_is_watching+0x12/0xc0
-> [   19.601508]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [   19.601509] RIP: 0033:0x7f2b95e7d406
-> [   19.601514] Code: 5d e8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75
-> 19 83 e2 39 83 fa 08 75 11 e8 26 ff ff ff 66 0f 1f 44 00 00 48 8b 45
-> 10 0f 05 <48> 8b 5d f8 c9 c3 0f 1f 40 00 f3 0f 1e fa 55 48 89 e5 48 83
-> ec 08
-> [   19.601515] RSP: 002b:00007ffe6800fe20 EFLAGS: 00000202 ORIG_RAX:
-> 0000000000000001
-> [   19.601517] RAX: ffffffffffffffda RBX: 000055a2dbb57460 RCX: 00007f2b9=
-5e7d406
-> [   19.601518] RDX: 0000000000000003 RSI: 00007ffe68010170 RDI: 000000000=
-0000013
-> [   19.601519] RBP: 00007ffe6800fe40 R08: 0000000000000000 R09: 000000000=
-0000000
-> [   19.601520] R10: 0000000000000000 R11: 0000000000000202 R12: 000000000=
-0000003
-> [   19.601521] R13: 0000000000000003 R14: 00007ffe68010170 R15: 00007ffe6=
-8010170
-> [   19.601527]  </TASK>
->
-> Git bisect find this commit:
->
-> commit ffa1e7ada456087c2402b37cd6b2863ced29aff0
-> Author: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
-> Date:   Tue Mar 18 10:55:48 2025 +0100
->
->     block: Make request_queue lockdep splats show up earlier
->
->     In recent kernels, there are lockdep splats around the
->     struct request_queue::io_lockdep_map, similar to [1], but they
->     typically don't show up until reclaim with writeback happens.
->
->     Having multiple kernel versions released with a known risc of kernel
->     deadlock during reclaim writeback should IMHO be addressed and
->     backported to -stable with the highest priority.
->
->     In order to have these lockdep splats show up earlier,
->     preferrably during system initialization, prime the
->     struct request_queue::io_lockdep_map as GFP_KERNEL reclaim-
->     tainted. This will instead lead to lockdep splats looking similar
->     to [2], but without the need for reclaim + writeback
->     happening.
->
->     [1]:
->     [  189.762244] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->     [  189.762432] WARNING: possible circular locking dependency detected
->     [  189.762441] 6.14.0-rc6-xe+ #6 Tainted: G     U
->     [  189.762450] ------------------------------------------------------
->     [  189.762459] kswapd0/119 is trying to acquire lock:
->     [  189.762467] ffff888110ceb710
-> (&q->q_usage_counter(io)#26){++++}-{0:0}, at: __submit_bio+0x76/0x230
->     [  189.762485]
->                    but task is already holding lock:
->     [  189.762494] ffffffff834c97c0 (fs_reclaim){+.+.}-{0:0}, at:
-> balance_pgdat+0xbe/0xb00
->     [  189.762507]
->                    which lock already depends on the new lock.
->
->     [  189.762519]
->                    the existing dependency chain (in reverse order) is:
->     [  189.762529]
->                    -> #2 (fs_reclaim){+.+.}-{0:0}:
->     [  189.762540]        fs_reclaim_acquire+0xc5/0x100
->     [  189.762548]        kmem_cache_alloc_lru_noprof+0x4a/0x480
->     [  189.762558]        alloc_inode+0xaa/0xe0
->     [  189.762566]        iget_locked+0x157/0x330
->     [  189.762573]        kernfs_get_inode+0x1b/0x110
->     [  189.762582]        kernfs_get_tree+0x1b0/0x2e0
->     [  189.762590]        sysfs_get_tree+0x1f/0x60
->     [  189.762597]        vfs_get_tree+0x2a/0xf0
->     [  189.762605]        path_mount+0x4cd/0xc00
->     [  189.762613]        __x64_sys_mount+0x119/0x150
->     [  189.762621]        x64_sys_call+0x14f2/0x2310
->     [  189.762630]        do_syscall_64+0x91/0x180
->     [  189.762637]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
->     [  189.762647]
->                    -> #1 (&root->kernfs_rwsem){++++}-{3:3}:
->     [  189.762659]        down_write+0x3e/0xf0
->     [  189.762667]        kernfs_remove+0x32/0x60
->     [  189.762676]        sysfs_remove_dir+0x4f/0x60
->     [  189.762685]        __kobject_del+0x33/0xa0
->     [  189.762709]        kobject_del+0x13/0x30
->     [  189.762716]        elv_unregister_queue+0x52/0x80
->     [  189.762725]        elevator_switch+0x68/0x360
->     [  189.762733]        elv_iosched_store+0x14b/0x1b0
->     [  189.762756]        queue_attr_store+0x181/0x1e0
->     [  189.762765]        sysfs_kf_write+0x49/0x80
->     [  189.762773]        kernfs_fop_write_iter+0x17d/0x250
->     [  189.762781]        vfs_write+0x281/0x540
->     [  189.762790]        ksys_write+0x72/0xf0
->     [  189.762798]        __x64_sys_write+0x19/0x30
->     [  189.762807]        x64_sys_call+0x2a3/0x2310
->     [  189.762815]        do_syscall_64+0x91/0x180
->     [  189.762823]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
->     [  189.762833]
->                    -> #0 (&q->q_usage_counter(io)#26){++++}-{0:0}:
->     [  189.762845]        __lock_acquire+0x1525/0x2760
->     [  189.762854]        lock_acquire+0xca/0x310
->     [  189.762861]        blk_mq_submit_bio+0x8a2/0xba0
->     [  189.762870]        __submit_bio+0x76/0x230
->     [  189.762878]        submit_bio_noacct_nocheck+0x323/0x430
->     [  189.762888]        submit_bio_noacct+0x2cc/0x620
->     [  189.762896]        submit_bio+0x38/0x110
->     [  189.762904]        __swap_writepage+0xf5/0x380
->     [  189.762912]        swap_writepage+0x3c7/0x600
->     [  189.762920]        shmem_writepage+0x3da/0x4f0
->     [  189.762929]        pageout+0x13f/0x310
->     [  189.762937]        shrink_folio_list+0x61c/0xf60
->     [  189.763261]        evict_folios+0x378/0xcd0
->     [  189.763584]        try_to_shrink_lruvec+0x1b0/0x360
->     [  189.763946]        shrink_one+0x10e/0x200
->     [  189.764266]        shrink_node+0xc02/0x1490
->     [  189.764586]        balance_pgdat+0x563/0xb00
->     [  189.764934]        kswapd+0x1e8/0x430
->     [  189.765249]        kthread+0x10b/0x260
->     [  189.765559]        ret_from_fork+0x44/0x70
->     [  189.765889]        ret_from_fork_asm+0x1a/0x30
->     [  189.766198]
->                    other info that might help us debug this:
->
->     [  189.767089] Chain exists of:
->                      &q->q_usage_counter(io)#26 -->
-> &root->kernfs_rwsem --> fs_reclaim
->
->     [  189.767971]  Possible unsafe locking scenario:
->
->     [  189.768555]        CPU0                    CPU1
->     [  189.768849]        ----                    ----
->     [  189.769136]   lock(fs_reclaim);
->     [  189.769421]                                lock(&root->kernfs_rwse=
-m);
->     [  189.769714]                                lock(fs_reclaim);
->     [  189.770016]   rlock(&q->q_usage_counter(io)#26);
->     [  189.770305]
->                     *** DEADLOCK ***
->
->     [  189.771167] 1 lock held by kswapd0/119:
->     [  189.771453]  #0: ffffffff834c97c0 (fs_reclaim){+.+.}-{0:0}, at:
-> balance_pgdat+0xbe/0xb00
->     [  189.771770]
->                    stack backtrace:
->     [  189.772351] CPU: 4 UID: 0 PID: 119 Comm: kswapd0 Tainted: G
-> U             6.14.0-rc6-xe+ #6
->     [  189.772353] Tainted: [U]=3DUSER
->     [  189.772354] Hardware name: ASUS System Product Name/PRIME
-> B560M-A AC, BIOS 2001 02/01/2023
->     [  189.772354] Call Trace:
->     [  189.772355]  <TASK>
->     [  189.772356]  dump_stack_lvl+0x6e/0xa0
->     [  189.772359]  dump_stack+0x10/0x18
->     [  189.772360]  print_circular_bug.cold+0x17a/0x1b7
->     [  189.772363]  check_noncircular+0x13a/0x150
->     [  189.772365]  ? __pfx_stack_trace_consume_entry+0x10/0x10
->     [  189.772368]  __lock_acquire+0x1525/0x2760
->     [  189.772368]  ? ret_from_fork_asm+0x1a/0x30
->     [  189.772371]  lock_acquire+0xca/0x310
->     [  189.772372]  ? __submit_bio+0x76/0x230
->     [  189.772375]  ? lock_release+0xd5/0x2c0
->     [  189.772376]  blk_mq_submit_bio+0x8a2/0xba0
->     [  189.772378]  ? __submit_bio+0x76/0x230
->     [  189.772380]  __submit_bio+0x76/0x230
->     [  189.772382]  ? trace_hardirqs_on+0x1e/0xe0
->     [  189.772384]  submit_bio_noacct_nocheck+0x323/0x430
->     [  189.772386]  ? submit_bio_noacct_nocheck+0x323/0x430
->     [  189.772387]  ? __might_sleep+0x58/0xa0
->     [  189.772390]  submit_bio_noacct+0x2cc/0x620
->     [  189.772391]  ? count_memcg_events+0x68/0x90
->     [  189.772393]  submit_bio+0x38/0x110
->     [  189.772395]  __swap_writepage+0xf5/0x380
->     [  189.772396]  swap_writepage+0x3c7/0x600
->     [  189.772397]  shmem_writepage+0x3da/0x4f0
->     [  189.772401]  pageout+0x13f/0x310
->     [  189.772406]  shrink_folio_list+0x61c/0xf60
->     [  189.772409]  ? isolate_folios+0xe80/0x16b0
->     [  189.772410]  ? mark_held_locks+0x46/0x90
->     [  189.772412]  evict_folios+0x378/0xcd0
->     [  189.772414]  ? evict_folios+0x34a/0xcd0
->     [  189.772415]  ? lock_is_held_type+0xa3/0x130
->     [  189.772417]  try_to_shrink_lruvec+0x1b0/0x360
->     [  189.772420]  shrink_one+0x10e/0x200
->     [  189.772421]  shrink_node+0xc02/0x1490
->     [  189.772423]  ? shrink_node+0xa08/0x1490
->     [  189.772424]  ? shrink_node+0xbd8/0x1490
->     [  189.772425]  ? mem_cgroup_iter+0x366/0x480
->     [  189.772427]  balance_pgdat+0x563/0xb00
->     [  189.772428]  ? balance_pgdat+0x563/0xb00
->     [  189.772430]  ? trace_hardirqs_on+0x1e/0xe0
->     [  189.772431]  ? finish_task_switch.isra.0+0xcb/0x330
->     [  189.772433]  ? __switch_to_asm+0x33/0x70
->     [  189.772437]  kswapd+0x1e8/0x430
->     [  189.772438]  ? __pfx_autoremove_wake_function+0x10/0x10
->     [  189.772440]  ? __pfx_kswapd+0x10/0x10
->     [  189.772441]  kthread+0x10b/0x260
->     [  189.772443]  ? __pfx_kthread+0x10/0x10
->     [  189.772444]  ret_from_fork+0x44/0x70
->     [  189.772446]  ? __pfx_kthread+0x10/0x10
->     [  189.772447]  ret_from_fork_asm+0x1a/0x30
->     [  189.772450]  </TASK>
->
->     [2]:
->     [    8.760253] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->     [    8.760254] WARNING: possible circular locking dependency detected
->     [    8.760255] 6.14.0-rc6-xe+ #7 Tainted: G     U
->     [    8.760256] ------------------------------------------------------
->     [    8.760257] (udev-worker)/674 is trying to acquire lock:
->     [    8.760259] ffff888100e39148 (&root->kernfs_rwsem){++++}-{3:3},
-> at: kernfs_remove+0x32/0x60
->     [    8.760265]
->                    but task is already holding lock:
->     [    8.760266] ffff888110dc7680
-> (&q->q_usage_counter(io)#27){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x30
->     [    8.760272]
->                    which lock already depends on the new lock.
->
->     [    8.760272]
->                    the existing dependency chain (in reverse order) is:
->     [    8.760273]
->                    -> #2 (&q->q_usage_counter(io)#27){++++}-{0:0}:
->     [    8.760276]        blk_alloc_queue+0x30a/0x350
->     [    8.760279]        blk_mq_alloc_queue+0x6b/0xe0
->     [    8.760281]        scsi_alloc_sdev+0x276/0x3c0
->     [    8.760284]        scsi_probe_and_add_lun+0x22a/0x440
->     [    8.760286]        __scsi_scan_target+0x109/0x230
->     [    8.760288]        scsi_scan_channel+0x65/0xc0
->     [    8.760290]        scsi_scan_host_selected+0xff/0x140
->     [    8.760292]        do_scsi_scan_host+0xa7/0xc0
->     [    8.760293]        do_scan_async+0x1c/0x160
->     [    8.760295]        async_run_entry_fn+0x32/0x150
->     [    8.760299]        process_one_work+0x224/0x5f0
->     [    8.760302]        worker_thread+0x1d4/0x3e0
->     [    8.760304]        kthread+0x10b/0x260
->     [    8.760306]        ret_from_fork+0x44/0x70
->     [    8.760309]        ret_from_fork_asm+0x1a/0x30
->     [    8.760312]
->                    -> #1 (fs_reclaim){+.+.}-{0:0}:
->     [    8.760315]        fs_reclaim_acquire+0xc5/0x100
->     [    8.760317]        kmem_cache_alloc_lru_noprof+0x4a/0x480
->     [    8.760319]        alloc_inode+0xaa/0xe0
->     [    8.760322]        iget_locked+0x157/0x330
->     [    8.760323]        kernfs_get_inode+0x1b/0x110
->     [    8.760325]        kernfs_get_tree+0x1b0/0x2e0
->     [    8.760327]        sysfs_get_tree+0x1f/0x60
->     [    8.760329]        vfs_get_tree+0x2a/0xf0
->     [    8.760332]        path_mount+0x4cd/0xc00
->     [    8.760334]        __x64_sys_mount+0x119/0x150
->     [    8.760336]        x64_sys_call+0x14f2/0x2310
->     [    8.760338]        do_syscall_64+0x91/0x180
->     [    8.760340]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
->     [    8.760342]
->                    -> #0 (&root->kernfs_rwsem){++++}-{3:3}:
->     [    8.760345]        __lock_acquire+0x1525/0x2760
->     [    8.760347]        lock_acquire+0xca/0x310
->     [    8.760348]        down_write+0x3e/0xf0
->     [    8.760350]        kernfs_remove+0x32/0x60
->     [    8.760351]        sysfs_remove_dir+0x4f/0x60
->     [    8.760353]        __kobject_del+0x33/0xa0
->     [    8.760355]        kobject_del+0x13/0x30
->     [    8.760356]        elv_unregister_queue+0x52/0x80
->     [    8.760358]        elevator_switch+0x68/0x360
->     [    8.760360]        elv_iosched_store+0x14b/0x1b0
->     [    8.760362]        queue_attr_store+0x181/0x1e0
->     [    8.760364]        sysfs_kf_write+0x49/0x80
->     [    8.760366]        kernfs_fop_write_iter+0x17d/0x250
->     [    8.760367]        vfs_write+0x281/0x540
->     [    8.760370]        ksys_write+0x72/0xf0
->     [    8.760372]        __x64_sys_write+0x19/0x30
->     [    8.760374]        x64_sys_call+0x2a3/0x2310
->     [    8.760376]        do_syscall_64+0x91/0x180
->     [    8.760377]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
->     [    8.760380]
->                    other info that might help us debug this:
->
->     [    8.760380] Chain exists of:
->                      &root->kernfs_rwsem --> fs_reclaim -->
-> &q->q_usage_counter(io)#27
->
->     [    8.760384]  Possible unsafe locking scenario:
->
->     [    8.760384]        CPU0                    CPU1
->     [    8.760385]        ----                    ----
->     [    8.760385]   lock(&q->q_usage_counter(io)#27);
->     [    8.760387]                                lock(fs_reclaim);
->     [    8.760388]
-> lock(&q->q_usage_counter(io)#27);
->     [    8.760390]   lock(&root->kernfs_rwsem);
->     [    8.760391]
->                     *** DEADLOCK ***
->
->     [    8.760391] 6 locks held by (udev-worker)/674:
->     [    8.760392]  #0: ffff8881209ac420 (sb_writers#4){.+.+}-{0:0},
-> at: ksys_write+0x72/0xf0
->     [    8.760398]  #1: ffff88810c80f488 (&of->mutex#2){+.+.}-{3:3},
-> at: kernfs_fop_write_iter+0x136/0x250
->     [    8.760402]  #2: ffff888125d1d330 (kn->active#101){.+.+}-{0:0},
-> at: kernfs_fop_write_iter+0x13f/0x250
->     [    8.760406]  #3: ffff888110dc7bb0 (&q->sysfs_lock){+.+.}-{3:3},
-> at: queue_attr_store+0x148/0x1e0
->     [    8.760411]  #4: ffff888110dc7680
-> (&q->q_usage_counter(io)#27){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x30
->     [    8.760416]  #5: ffff888110dc76b8
-> (&q->q_usage_counter(queue)#27){++++}-{0:0}, at:
-> blk_mq_freeze_queue_nomemsave+0x12/0x30
->     [    8.760421]
->                    stack backtrace:
->     [    8.760422] CPU: 7 UID: 0 PID: 674 Comm: (udev-worker) Tainted:
-> G     U             6.14.0-rc6-xe+ #7
->     [    8.760424] Tainted: [U]=3DUSER
->     [    8.760425] Hardware name: ASUS System Product Name/PRIME
-> B560M-A AC, BIOS 2001 02/01/2023
->     [    8.760426] Call Trace:
->     [    8.760427]  <TASK>
->     [    8.760428]  dump_stack_lvl+0x6e/0xa0
->     [    8.760431]  dump_stack+0x10/0x18
->     [    8.760433]  print_circular_bug.cold+0x17a/0x1b7
->     [    8.760437]  check_noncircular+0x13a/0x150
->     [    8.760441]  ? save_trace+0x54/0x360
->     [    8.760445]  __lock_acquire+0x1525/0x2760
->     [    8.760446]  ? irqentry_exit+0x3a/0xb0
->     [    8.760448]  ? sysvec_apic_timer_interrupt+0x57/0xc0
->     [    8.760452]  lock_acquire+0xca/0x310
->     [    8.760453]  ? kernfs_remove+0x32/0x60
->     [    8.760457]  down_write+0x3e/0xf0
->     [    8.760459]  ? kernfs_remove+0x32/0x60
->     [    8.760460]  kernfs_remove+0x32/0x60
->     [    8.760462]  sysfs_remove_dir+0x4f/0x60
->     [    8.760464]  __kobject_del+0x33/0xa0
->     [    8.760466]  kobject_del+0x13/0x30
->     [    8.760467]  elv_unregister_queue+0x52/0x80
->     [    8.760470]  elevator_switch+0x68/0x360
->     [    8.760472]  elv_iosched_store+0x14b/0x1b0
->     [    8.760475]  queue_attr_store+0x181/0x1e0
->     [    8.760479]  ? lock_acquire+0xca/0x310
->     [    8.760480]  ? kernfs_fop_write_iter+0x13f/0x250
->     [    8.760482]  ? lock_is_held_type+0xa3/0x130
->     [    8.760485]  sysfs_kf_write+0x49/0x80
->     [    8.760487]  kernfs_fop_write_iter+0x17d/0x250
->     [    8.760489]  vfs_write+0x281/0x540
->     [    8.760494]  ksys_write+0x72/0xf0
->     [    8.760497]  __x64_sys_write+0x19/0x30
->     [    8.760499]  x64_sys_call+0x2a3/0x2310
->     [    8.760502]  do_syscall_64+0x91/0x180
->     [    8.760504]  ? trace_hardirqs_off+0x5d/0xe0
->     [    8.760506]  ? handle_softirqs+0x479/0x4d0
->     [    8.760508]  ? hrtimer_interrupt+0x13f/0x280
->     [    8.760511]  ? irqentry_exit_to_user_mode+0x8b/0x260
->     [    8.760513]  ? clear_bhb_loop+0x15/0x70
->     [    8.760515]  ? clear_bhb_loop+0x15/0x70
->     [    8.760516]  ? clear_bhb_loop+0x15/0x70
->     [    8.760518]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->     [    8.760520] RIP: 0033:0x7aa3bf2f5504
->     [    8.760522] Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f
-> 1f 84 00 00 00 00 00 f3 0f 1e fa 80 3d c5 8b 10 00 00 74 13 b8 01 00
-> 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec
-> 20 48 89
->     [    8.760523] RSP: 002b:00007ffc1e3697d8 EFLAGS: 00000202
-> ORIG_RAX: 0000000000000001
->     [    8.760526] RAX: ffffffffffffffda RBX: 0000000000000003 RCX:
-> 00007aa3bf2f5504
->     [    8.760527] RDX: 0000000000000003 RSI: 00007ffc1e369ae0 RDI:
-> 000000000000001c
->     [    8.760528] RBP: 00007ffc1e369800 R08: 00007aa3bf3f51c8 R09:
-> 00007ffc1e3698b0
->     [    8.760528] R10: 0000000000000000 R11: 0000000000000202 R12:
-> 0000000000000003
->     [    8.760529] R13: 00007ffc1e369ae0 R14: 0000613ccf21f2f0 R15:
-> 00007aa3bf3f4e80
->     [    8.760533]  </TASK>
->
->     v2:
->     - Update a code comment to increase readability (Ming Lei).
->
->     Cc: Jens Axboe <axboe@kernel.dk>
->     Cc: linux-block@vger.kernel.org
->     Cc: linux-kernel@vger.kernel.org
->     Cc: Ming Lei <ming.lei@redhat.com>
->     Signed-off-by: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.co=
-m>
->     Reviewed-by: Ming Lei <ming.lei@redhat.com>
->     Link: https://lore.kernel.org/r/20250318095548.5187-1-thomas.hellstro=
-m@linux.intel.com
->     Signed-off-by: Jens Axboe <axboe@kernel.dk>
->
-> Of course I checked revert of commit ffa1e7ada456
-> And I can confirm that without ffa1e7ada456 this new circular locking
-> dependency is not happening.
->
-> My machine spec: https://linux-hardware.org/?probe=3D619658e7cf
-> And I attached below my build config and full kernel log.
->
-> Thomas, can you look please?
+On 05/05/2025 11:49, Christoph Hellwig wrote:
+> On Mon, May 05, 2025 at 11:04:55AM +0100, John Garry wrote:
+>> @@ -503,6 +509,9 @@ xfs_open_devices(
+>>   		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev_file);
+>>   		if (!mp->m_logdev_targp)
+>>   			goto out_free_rtdev_targ;
+>> +		error = sync_blockdev(mp->m_logdev_targp->bt_bdev);
+>> +		if (error)
+>> +			goto out_free_rtdev_targ;
+>>   	} else {
+>>   		mp->m_logdev_targp = mp->m_ddev_targp;
+>>   		/* Handle won't be used, drop it */
+>>
+>>
+>> Right?
+> Yes.  Or in fact just folding it into xfs_alloc_buftarg, which might
+> be even simpler.
 
-Excuse me, there's very little time left before the 6.15 release.
-Perhaps it's time to address this regression?
+Yes, that was my next question..
 
---=20
-Best Regards,
-Mike Gavrilov.
+>  While you're at it adding a command why we are doing
+> the sync would also be really useful, and having it in just one place
+> helps with that.
+
+ok, there was such comment in xfs_preflush_devices().
+
+@Darrick, please comment on whether happy with changes discussed.
+
+Thanks,
+John
+
