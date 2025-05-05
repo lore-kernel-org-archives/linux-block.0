@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29F825A647
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 14:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E1425C81A
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 14:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746454778; cv=none; b=sPxW+q7WUBFp8kFC6DDEv82bHjYqQMK91xmyKud4LjwpdqKH4op2T/tY5fSo4fARiQeU6NQbCJwxoZVx+7Z5O0SbtM9vi31vtZEP9dB35LssI/HeQszqnqDwcEAnppLR/gvIHcL17TxHZpMFa6hChIQMvYl4Z95RJ/siYWaSYwE=
+	t=1746454785; cv=none; b=dR0OdOjLbUjOYhVMs0tdii9g7kwvYtJ7rBUAuqcNtVO7Np4mXrBMJbjIpgeHTJtTMsjrEhO/34E/GCQYTpKIBGX7lSviLzD09nhjp654tBHpRbDSOFqjZrG3/cqiy9llp6uATsv0BNjt2lFffYOHncC9A66pz9zc6DV+6WuYovA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746454778; c=relaxed/simple;
-	bh=Um8T6b4cSmFwwW1MvXCVa6u2PuTHetm7pvF9ebLePT4=;
+	s=arc-20240116; t=1746454785; c=relaxed/simple;
+	bh=E9GN+l3LzfEhnMIBAljfdCROu+pKR/DuulO/gp/ZPb4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z7h1MmVd5nuoo0WuTu9DlevPQDoZlSoDbp/R4BKYv4IX3h8p3JgkQhV5n+LPcAAxCMri3yP3PllexmTM4COmJn/j472VuptbVFjlWmRTEFypPF0sxpUg6/e/b0KT8Bi/Jeo15cXZxQz2xlgh2tNATZu5PUYQlbp154UdFdMYOYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sdh64H+Q; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=BhZYbWUPnhUadfYNwybF7dwRpzNjYT7TeFwuW3i4sMqivaIJzg6cBgG0j9eJBlIuV+kRXtq9qctt/9RScMLoy4UZLGzQ1HreDyYLIF+FbRzbPGwPmh9GL8ASjIU1E7EAxXaeJ/SABYuFp9IF341OeEXNaDhL2BP+fywVbs1c9R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b44QqlRs; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sdh64H+Q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b44QqlRs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746454774;
+	s=mimecast20190719; t=1746454780;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ri1aBOm3ff7Dx5/qf5HdzQvsz4TKsruSrd76qFlOgmY=;
-	b=Sdh64H+QHRJB2EHX760IGAIaWkfSRkRuSvnJR5whfH5RHPBWdUQhV8kQYT8BF5x/RG88MP
-	oUh/CAKsJpxIm4E5QnlEB7J52In1OdZ0H0i9X63K1nb20Hwkdy/8n+G/kHLdShJpy7AmDn
-	PZdk002oFpAkCNaD4Xnneg7QF0DegYE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=7dI1dwx0ykGMws0QspXDytUlEQk513wpGL0mp4S8K1I=;
+	b=b44QqlRsQgxC0htdgWvZUyt7JCWekQt4vJ3BJgr7RmynSeWwI3J7o84BdgOqHPqBEhTAmM
+	5guz4GqNJXZUxKCUoZ0BE3zVGTzesKtjeQxnjY+pFoBqt61Dx3fuc64v7vzjKE+i7MQR7t
+	sQOBqI7CA5DPiTX61kf26jTffitv1AU=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-55HTdkHBNAWMsO808eMfkQ-1; Mon,
- 05 May 2025 10:19:29 -0400
-X-MC-Unique: 55HTdkHBNAWMsO808eMfkQ-1
-X-Mimecast-MFC-AGG-ID: 55HTdkHBNAWMsO808eMfkQ_1746454768
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-zUEg51OnOOuP0Cmi2raubg-1; Mon,
+ 05 May 2025 10:19:37 -0400
+X-MC-Unique: zUEg51OnOOuP0Cmi2raubg-1
+X-Mimecast-MFC-AGG-ID: zUEg51OnOOuP0Cmi2raubg_1746454776
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6705118001CA;
-	Mon,  5 May 2025 14:19:28 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6EFEB1956088;
+	Mon,  5 May 2025 14:19:36 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 838CF30001A2;
-	Mon,  5 May 2025 14:19:27 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 69D5C180036E;
+	Mon,  5 May 2025 14:19:35 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -49,11 +49,10 @@ Cc: Nilay Shroff <nilay@linux.ibm.com>,
 	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V5 17/25] block: pass elevator_queue to elv_register_queue & unregister_queue
-Date: Mon,  5 May 2025 22:17:55 +0800
-Message-ID: <20250505141805.2751237-18-ming.lei@redhat.com>
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 19/25] block: fail to show/store elevator sysfs attribute if elevator is dying
+Date: Mon,  5 May 2025 22:17:57 +0800
+Message-ID: <20250505141805.2751237-20-ming.lei@redhat.com>
 In-Reply-To: <20250505141805.2751237-1-ming.lei@redhat.com>
 References: <20250505141805.2751237-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,72 +62,89 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Pass elevator_queue reference to elv_register_queue() & elv_unregister_queue().
+Prepare for moving elv_register[unregister]_queue out of elevator_lock
+& queue freezing, so we may have to call elv_unregister_queue() after
+elevator ->exit() is called, then there is small window for user to
+call into ->show()/store(), and user-after-free can be caused.
 
-No functional change, and prepare for moving the two out of elevator
-lock & freezing queue, when we need to store the old & new elevator
-queue in `struct elv_change_ctx` instance, then both two can co-exist
-for short while, so we have to pass the exact elevator_queue instance
-to elv_register_queue & unregister_queue.
+Fail to show/store elevator sysfs attribute if elevator is dying by
+adding one new flag of ELEVATOR_FLAG_DYNG, which is protected by
+elevator ->sysfs_lock.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/blk-mq-sched.c |  1 +
+ block/elevator.c     | 10 ++++++----
+ block/elevator.h     |  1 +
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 336a15ffecfa..55a0fd105147 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -551,5 +551,6 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+ 	if (e->type->ops.exit_sched)
+ 		e->type->ops.exit_sched(e);
+ 	blk_mq_sched_tags_teardown(q, flags);
++	set_bit(ELEVATOR_FLAG_DYING, &q->elevator->flags);
+ 	q->elevator = NULL;
+ }
 diff --git a/block/elevator.c b/block/elevator.c
-index 540542cee21c..eb7140a678d5 100644
+index fa436417da3b..2edaf84900fc 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -458,9 +458,10 @@ static const struct kobj_type elv_ktype = {
- 	.release	= elevator_release,
- };
- 
--static int elv_register_queue(struct request_queue *q, bool uevent)
-+static int elv_register_queue(struct request_queue *q,
-+			      struct elevator_queue *e,
-+			      bool uevent)
+@@ -418,14 +418,15 @@ elv_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
  {
--	struct elevator_queue *e = q->elevator;
- 	int error;
+ 	const struct elv_fs_entry *entry = to_elv(attr);
+ 	struct elevator_queue *e;
+-	ssize_t error;
++	ssize_t error = -ENODEV;
  
- 	lockdep_assert_held(&q->elevator_lock);
-@@ -488,10 +489,9 @@ static int elv_register_queue(struct request_queue *q, bool uevent)
+ 	if (!entry->show)
+ 		return -EIO;
+ 
+ 	e = container_of(kobj, struct elevator_queue, kobj);
+ 	mutex_lock(&e->sysfs_lock);
+-	error = entry->show(e, page);
++	if (!test_bit(ELEVATOR_FLAG_DYING, &e->flags))
++		error = entry->show(e, page);
+ 	mutex_unlock(&e->sysfs_lock);
  	return error;
  }
- 
--static void elv_unregister_queue(struct request_queue *q)
-+static void elv_unregister_queue(struct request_queue *q,
-+				 struct elevator_queue *e)
+@@ -436,14 +437,15 @@ elv_attr_store(struct kobject *kobj, struct attribute *attr,
  {
--	struct elevator_queue *e = q->elevator;
--
- 	lockdep_assert_held(&q->elevator_lock);
+ 	const struct elv_fs_entry *entry = to_elv(attr);
+ 	struct elevator_queue *e;
+-	ssize_t error;
++	ssize_t error = -ENODEV;
  
- 	if (e && test_and_clear_bit(ELEVATOR_FLAG_REGISTERED, &e->flags)) {
-@@ -584,7 +584,7 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
- 	blk_mq_quiesce_queue(q);
+ 	if (!entry->store)
+ 		return -EIO;
  
- 	if (q->elevator) {
--		elv_unregister_queue(q);
-+		elv_unregister_queue(q, q->elevator);
- 		elevator_exit(q);
- 	}
+ 	e = container_of(kobj, struct elevator_queue, kobj);
+ 	mutex_lock(&e->sysfs_lock);
+-	error = entry->store(e, page, length);
++	if (!test_bit(ELEVATOR_FLAG_DYING, &e->flags))
++		error = entry->store(e, page, length);
+ 	mutex_unlock(&e->sysfs_lock);
+ 	return error;
+ }
+diff --git a/block/elevator.h b/block/elevator.h
+index 9198676644a9..76a90a1b7ed6 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -121,6 +121,7 @@ struct elevator_queue
+ };
  
-@@ -592,7 +592,7 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
- 		ret = blk_mq_init_sched(q, new_e);
- 		if (ret)
- 			goto out_unfreeze;
--		ret = elv_register_queue(q, !ctx->no_uevent);
-+		ret = elv_register_queue(q, q->elevator, !ctx->no_uevent);
- 		if (ret) {
- 			elevator_exit(q);
- 			goto out_unfreeze;
+ #define ELEVATOR_FLAG_REGISTERED	0
++#define ELEVATOR_FLAG_DYING		1
+ 
+ /*
+  * block elevator interface
 -- 
 2.47.0
 
