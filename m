@@ -1,94 +1,109 @@
-Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3FA20DF4
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 20:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EA4270EC8
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 21:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746477267; cv=none; b=SNYKJMEh3vbSsEOC3keeRQpa4OAegwCWRBvhWq47t9CSv5gAtyO2rTqZVHQUrg73lX0GJa7WmLAWEPwSe5to+8JuCkIuEsUgGDiyuAQUWnuk3a3x7mGGvgUNGP4XKVtPHTVhhKbemsZgO04vuI/r9kZuGQ61xzRaW1ctSHBAMY4=
+	t=1746478916; cv=none; b=lUu7nDisiDtbwNCsIawDTPzkYBaIo3wK/VxdtxvHlVJTfQWSbL5GJxPV3WBR8aJ+hWKQbS2volOb6MS2OozfDcGYcn8+ldW2XGLWPsgPBTN4lSzBs1mLlbzRMYD7I21l9i24+FsY7JU7kCe6whZNC9Aab+dscW65kE+Y38we6nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746477267; c=relaxed/simple;
-	bh=AQiFzZ+hioF3/4ec4StyGYUiDu4auMssToRPssmrwCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ifobu1oww+YHHRp1YZoOvQr61d/Sh/uraJej4HE+Hra+iHxFNgZIVwhhpSZtLgq2otFc/qufpp9NYZUHDu4Vecn04E1N9tIYX7QBoyJI3g8qJOZRlr2rW+uIIpkqIu12fQ6R9bSKcJmBkV+az7E+hvVrooggF4Nb6F+38IsLRx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RXfuiU2B; arc=none smtp.client-ip=209.85.219.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1746478916; c=relaxed/simple;
+	bh=rTFXvpoFOiDsJ0MIB+jbnVwtIFoe/zbuCTQ6dEySNdc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=J/rT68h/NdLSEhdDdgzVp1cRVnMcNZ9gYgUE5POM9ISwq82H4znOqy6unksThAgE3Jh9ZPO9NEsGwxc2yfQy+zc+K5HneCxG31utiL0CLoORjL75sMfl+dc4aFMaoxTN/HXyBdP2xDpmpZCsVD3NXP0FZj5q3rtp2D7bdJ9Ceew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OdbCHshN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RXfuiU2B"
-Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-6f0ad744811so40090336d6.1
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 13:34:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1746477265; x=1747082065; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sjt5SetEQVeK+FSr50cmz95zo5QuMyYcarl0Ii5W2m4=;
-        b=RXfuiU2BCnC37wgciCr7iHmhUKd6bP4+1IFDfwyTw66vCVCCqbZEao0yy1xaZwthmI
-         27v6GVqW7vj1EJ8hFCc7gai1I5tWu881PtmUD7UkE7R8gHFLRXnaMWLkQMYvL/t+RmZE
-         J+ikBAmPthXN87sVI5JouelGD9TrrZO3r1l88CcNMFJ3mXS8hK3lF4ZarGaXys1n5tgQ
-         0a+JTX6Uqq3oAdaJk5yHY4hUJImQ9d2JNGc2fi0YqGNshlnNHu2KvkSnPkyX2bMPCDEN
-         +ie59/N60uz9kSKpCY9wrJxV2ZTUaXlL78P6pTIszkGfXil7KRw8wSiuj0Ivb4B9ZXpa
-         1bXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746477265; x=1747082065;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sjt5SetEQVeK+FSr50cmz95zo5QuMyYcarl0Ii5W2m4=;
-        b=jBEBg9v0SQQ06/FRZ2SJGrR7CLzXcXkmkrDU+CsYfOWqCfaJUgrrufxrK5cLuBYd3L
-         mMUDbE+KH9e8u6A3zhP0IE8QCzMZKIstRQao6U7RuZJ8LGn01m0pWUuHiPidJjsnyqyA
-         P3DxOhrXbAwkafWMWVXdq49qXWpuOSYwQHjlvFP1qJR46MO3LPJ7eloaxx1mTzAsazv+
-         Aluj8HNgl34EpKAGI7tyh/7N1tYTPSEGtRy8pdtgiVy2iHPSNxZpWKKM6pfPBLAeWuZ6
-         cJ53JlV5CkvDmbvRdg5sK3DSPMkXzLKZj0elnhV6S0qbw8d4YGkJQ9kDZQm+uSfMiKxx
-         2k0Q==
-X-Gm-Message-State: AOJu0YyXOqItggF4fasltD/x5Ke0Bc3qhDlWyb+F8zT9ECnTrmgqrRik
-	t8jstqoRUhbClZjzMEkVaNiM7qwBe7dQIVyewLXx/65nRRN2U/6v8MaBupsRFMlszNVq/bkDbev
-	dfu/jDVz/BjxaBiXSbAJVcPJhTzm1S54/
-X-Gm-Gg: ASbGnctRfIxVN0lqi9XrUhDFHoVYJIG9GVE+kEalxmY8Pq4EzPjr0DQRS3M+YbLWnLF
-	KVR4gQTmDZHIYSPiWgWGvAzCcAnwduCb0coEfyF6tuIN8eMMMsm5ybOeaUBQh/Dnp84HstEwzq2
-	ZbmY1ZkJMLptmXFS9deaG/DkfJp2dGMXQS4KLvGZUugBI+uQ1lU4QKMvPUY85b8EgvpN5Ht9OQy
-	zRYOumiiL0qA7qNH/N/oRJ+ZIJkNBEZPS3+1hJvpRMnyzYH4uCYiMljazYAhCVicN9pd/s03FvL
-	5zN9B1zC+2Y3WvY7e8YB2hQN/C6cwf+wX2WBHdgD0cNDWA==
-X-Google-Smtp-Source: AGHT+IHDhruxKjn2niV28wBPJpKZJOMbtoa+Ime0L962AGQ61i+87oKEyyTGXvRQxnnGlsuLIRHOP/l8m+Wf
-X-Received: by 2002:ad4:5c8a:0:b0:6f2:c81f:9ef9 with SMTP id 6a1803df08f44-6f528cf8e94mr138201146d6.33.1746477265123;
-        Mon, 05 May 2025 13:34:25 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6f50f3c3363sm22898456d6.27.2025.05.05.13.34.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 13:34:25 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5D95A3401B7;
-	Mon,  5 May 2025 14:34:24 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 52ACCE401BF; Mon,  5 May 2025 14:34:24 -0600 (MDT)
-Date: Mon, 5 May 2025 14:34:24 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] selftests: ublk: more misc fixes
-Message-ID: <aBkg0LW5YO6Osdnw@dev-ushankar.dev.purestorage.com>
-References: <20250428-ublk_selftests-v1-0-5795f7b00cda@purestorage.com>
- <aBkgLOxWLp74TShe@dev-ushankar.dev.purestorage.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdbCHshN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746478913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lkCRFfNqatPCh1SRs3dEvTgyEfbqqLQiDH+3i3waEkI=;
+	b=OdbCHshN5PSytLQ7xOnxEIiIy/lw5YOJ47nh0mz5/lcfxOdrsEPdOah/+p7BMtYVDzcrXU
+	p+lCetb6Z1GKO9526QJxEI+q2gDGAzWlwUercTbrJ1SZ+to2fUipzuQ7N9HGTcRlodAjbH
+	6DuCQr5zX+O5Zd4c1EjuuMGPqc19uSg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-F1MtIffoMpi8p4RZ4ZYCEw-1; Mon,
+ 05 May 2025 17:01:47 -0400
+X-MC-Unique: F1MtIffoMpi8p4RZ4ZYCEw-1
+X-Mimecast-MFC-AGG-ID: F1MtIffoMpi8p4RZ4ZYCEw_1746478905
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74CAE1955E8C;
+	Mon,  5 May 2025 21:01:45 +0000 (UTC)
+Received: from [10.22.80.45] (unknown [10.22.80.45])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9337430001A2;
+	Mon,  5 May 2025 21:01:42 +0000 (UTC)
+Date: Mon, 5 May 2025 23:01:38 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+cc: dm-devel@lists.linux.dev, Alasdair Kergon <agk@redhat.com>, 
+    Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+    Bartosz Golaszewski <brgl@bgdev.pl>, 
+    Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Subject: Re: [PATCH v2 2/2] dm: pass through operations on wrapped inline
+ crypto keys
+In-Reply-To: <20250505170336.GA197153@sol>
+Message-ID: <5ca7e728-96ed-4419-6689-f36081b7e2da@redhat.com>
+References: <20250501212320.8281-1-ebiggers@kernel.org> <20250501212320.8281-3-ebiggers@kernel.org> <af9771ce-5e88-02d1-3595-fd18a6f2eb28@redhat.com> <20250505170336.GA197153@sol>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBkgLOxWLp74TShe@dev-ushankar.dev.purestorage.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, May 05, 2025 at 02:31:40PM -0600, Uday Shankar wrote:
-> Hi Jens,
+
+
+On Mon, 5 May 2025, Eric Biggers wrote:
+
+> On Mon, May 05, 2025 at 06:15:01PM +0200, Mikulas Patocka wrote:
+> > 
+> > I have a dumb question - if it doesn't matter through which block device 
+> > do you set up the keys, why do you set them up through a block device at 
+> > all?
+> > 
+> > What about making functions that set up the keys without taking block 
+> > device as an argument, calling these functions directly and bypassing 
+> > device mapper entirely?
 > 
-> Can you take a look at Ming's comment on the first patch and merge the
-> set if things look good? I can rebase/repost it as needed.
+> Userspace needs to direct the key setup operations, so we'd need a UAPI for it
+> to do so.  We could add a custom syscall, or some hacked-up extension of
+> add_key(), and add a custom registration mechanism to allow a single
+> implementation of wrapped keys (e.g. from ufs-qcom) to register itself as the
 
-Bleh, sorry, I meant to send this as a reply to v2:
+What happens if there are multiple ufs-qcom controllers? Is it 
+unsupported?
 
-https://lore.kernel.org/linux-block/20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com/
+> system's wrapped key provider which the syscall would then use.
+> 
+> But it seemed cleaner to instead use block device ioctls and take advantage of
+> the existing blk-crypto-profile.  That already handles registering and
+> unregistering the implementation, and it also already handles things like
+> locking, and resuming the UFS controller if it's in suspend.
+> 
+> It also keeps the door open to supporting the case where different
+> wrapped-key-capable block devices don't necessarily accept the same keys, even
+> if that isn't the case currently.
+> 
+> - Eric
+
+I think that using ioctl on block device is ok.
+
+But I don't see why do you need to perform the ioctl on device mapper 
+device and let device mapper select a random underlying device where the 
+ioctl is forwarded? You can as well select a random physical disk in your 
+userspace application and call the ioctl on it.
+
+Mikulas
 
