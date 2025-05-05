@@ -1,370 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8B0EEC3
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 17:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5972701B6
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 19:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746466787; cv=none; b=fYotKYLZRPmesZezDYh7V2zx0Bd+flxFrmuLQoN4YyT/tJCgUTBj4ONbVx5OwlcUFJJJRgqp4a0VJiJkmy3yzxXVwwSrxoUE2CNy9xxRinRrnBu0nfdlKeq+NdfLoD1+R+lZOg6xMHH3ZUgpemFjy5z//bfihqGQeNppSHExLCk=
+	t=1746472995; cv=none; b=mDJxLsceANossqqtTPr+lVkgoIQymB+MPbJQJ3aHGMLDfZTna7u5tMR2bXthu5ph0B5dqvzf4se3wmWfVBL+GtLKBkZdksBWuV/Jk8xeA1u8FHkbiPKao+G6SLfIu8kybq2JokH8ZLaeA5IDvwpZle5ovlgtCqEam/RhP/6YFHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746466787; c=relaxed/simple;
-	bh=4gqj4IKfowjhS7yJesgnnk7dRGXsZAc5d3w6jmzxpmc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DHcFtky3m3bO60BSagdbG7qnVV956WOT8Kg0pI9d8vwjAhNDYOv/ly7nKS40KQmKlyiBzx3cVSvgM56xX1wL34WErr5uQxxfFufdapLqF3x3viHy5cnIijuYJYK9KSwRFSWRp9yPd0dNGNCzwwUGkq6eGrer7glsWTw2vEQdKMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xy8R0hA2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746472995; c=relaxed/simple;
+	bh=ENSwrslkI8QKccIUjGOSW7JPQFj0MtcxngdcS/b7F70=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=C+ZZWSgLrv4uNwXxm7mXCj14atiI+aU2eI5ZBsHfETm4gjl3PXMGPsJFD6Q83c2o4HTrM2rx3wnq2ymNy9Nnp5KW8S2qpopEKVLr6NglC4dX/rKOeJJ9bLIgY9kCJQR0s8zJSLU4RmyvEQiW+rTo4wN6w9FD3pGT6XWtnb/RqbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KzU7a7o/; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xy8R0hA2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746466783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DZjDCWLBWppfLIf1lVpwg5xPpW/Yo5QAf9SglCRqzlU=;
-	b=Xy8R0hA22oY8HntOSJsNAgmsrooQLxqSfr6LYKX5MSMDnL5oiOiMDb9YdbWzDXQY+N7NcQ
-	fgk65MslDNsbKBIXzQ4jei1ylAGJrRn4h+GRWUWz4iA4d820dQoxP1UaliG4vInhtadgJo
-	sTZfTMeV6EL9rQCc4KZe0tGzpNIUv/s=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-421-O45FVRPuMbefquD1d6DgAg-1; Mon, 05 May 2025 13:39:42 -0400
-X-MC-Unique: O45FVRPuMbefquD1d6DgAg-1
-X-Mimecast-MFC-AGG-ID: O45FVRPuMbefquD1d6DgAg_1746466779
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-603fd09171cso3942191eaf.2
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 10:39:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KzU7a7o/"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3d93c060279so18437635ab.3
+        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 12:23:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746472992; x=1747077792; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZMVeIpMgFF4mocy+t3rzmtkLWK0EgWsZb4AtQGZnRAs=;
+        b=KzU7a7o/03NOU83+KXDRr4VoaKCThhQSEhWpcfsB7BOO+72SsMmlp/k2fW3HG7h9q7
+         /NePk6i84NyiHnYHIjqsxWXZexMHD+r7oiLb8a6eElueMmWS9Uxt8tRB7wjYzbVK6DAt
+         VxnZNa7MuHcswUyv3Mko6USTaFAh4/SUVniSguPryCGnAyzMgrNgLIJsLHrjXidqjeUj
+         KE+tFdJHX/hELKBMw1JWT7u4NKGmMoas2agkcC9koVmMNxEvM4tU/TOcTLwmE+cLbR+k
+         8dKIqWuGwhfNFgltPDo4O8LM0y8pbBslX3urLbQPpRJAimwzD96UaEAoMOzOlnyiuiYX
+         o4xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746466779; x=1747071579;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DZjDCWLBWppfLIf1lVpwg5xPpW/Yo5QAf9SglCRqzlU=;
-        b=SK1DuFFgYNUbGcixF3fWWkdHEaKkb0meb9X78GH/CN8bBt2mJs+D17BfduV01+ilEf
-         UIdojok2Nc7HSfgD7fKJ4zaCN0I02KpLkIyNdZC0l5+s9APE0mydMg3LH850SXMs0nsE
-         O9nGTDKZHtAxCpdRv4+ZiZcE9+3DGZN/FbppPMeSynNpmaDWAX3/HSUB0EYhlXnSEHam
-         qH+IOOZyj9+FD+a1oKzwe4Xsn1uNEKB7SRRFspeam0rd9jityHbdAzqmJSM7eMn79vIw
-         CQ9ufvS4eV7xoOQbsmTEHmj7cR9jU9leyYcwIsRpQeD1T4xuujvRbSTCk9ggs6OPY9x1
-         IF9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVkDyl/jkrSeR0QidFwnGhm9vnRuBePXu5MDPaADc7pNd1ydUkfnJcWcVA/2uYGxbdoKvWAWVe3TnJYuw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrqoMU/bOZSrvVah8aJvoPTxB8Ys8io55Ium8TOXZo9eNGqZmp
-	QhZNioKNJUn6UxK0ysHM/b4tpgEbt3ZhwJl4CtbWLP7TSSgof/zCPol5AvK0L7+C3dOBlrEwE0M
-	KgahOuR5kC/IyKnFRZWunMKBNk6rD4S1gzPTxcTk2UXBzd3wPCJaOGihss08Y
-X-Gm-Gg: ASbGncthSHRgh+rm+HlL3kzLGdZiszZr1LFbQqJQmtpErpwIIi/WgcQhozpB6a4RKQC
-	QVEAmQb6J12gSpRFGDtFn6PBE+pJ34iDHN/SML1I80PJooALmNl+sGkb18vmSVKyLdnkz49qV21
-	tS8GsxadsElPbNHm9/wpqQqCDEbSjmXRiRgP8AKGX0hZ6H+Q8Ze0UEkNxm4gduiZ7kX0UiDIW91
-	ko3gTeYVzZ4ObnT2IE96Erd721iaqTfS1qjwH6PcmrpHpGy1FzyOAxYhDHVDJF5Pnsy3UUcdIUi
-	LQK+cFWGxvs8BSa628IfxyWFK0DQSDtwHAe9FSDWAAmElQX9j5O7kBCgmnkpYg==
-X-Received: by 2002:a05:6808:f0f:b0:3f6:abbf:bb88 with SMTP id 5614622812f47-40368d4e908mr108717b6e.29.1746466778694;
-        Mon, 05 May 2025 10:39:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGReTNNUFYrjgbs74oSofvlDjZqRtgrc46MPsTn7B81WhqlgiehhISI+8cXyOX4wAKnjssjuA==
-X-Received: by 2002:a05:6808:f0f:b0:3f6:abbf:bb88 with SMTP id 5614622812f47-40368d4e908mr108699b6e.29.1746466778288;
-        Mon, 05 May 2025 10:39:38 -0700 (PDT)
-Received: from ?IPv6:2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a? ([2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4033dc83da7sm1989265b6e.47.2025.05.05.10.39.36
+        d=1e100.net; s=20230601; t=1746472992; x=1747077792;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZMVeIpMgFF4mocy+t3rzmtkLWK0EgWsZb4AtQGZnRAs=;
+        b=SRSzSGgpjbzGC6DD/mC+/fvNSUlPLlOhfgsfQT5EayEXvp0KQdmMW1YQ6SQLOf9dDB
+         QDGsUEi2xjdvKTGCQjRPE810nx2tyvF2ffsUgBHVgNQLmbr60tN928XQAebh7gmgCGem
+         65J9D9TY2FKFoOrdW7psP6bdXNmG6DEckz1JtUpqCtopoM9X7p1Gk6skS+E7xxo7Py8i
+         cYSJDyo6d+wDSB7Qwg/O/03I8RJ8aPMl3GMHuOvmsm4jhAfO0JbLvlmkD/E6DAC/H/G4
+         EnfXpgEtleec26rZFZ86DzSWzWuEfWlDysliF7yzEuCjgDXegbMoNq67GivD7qxXVgNF
+         U8og==
+X-Forwarded-Encrypted: i=1; AJvYcCUnP+dJ/y99FButIt3ouA1siDKINZONjgJPtD02xFVeZfz3EzhQCoXnw6GtpcplP/eLGsGTvZ/DzJ3LOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvrnP7K3Nl5CuOnBDgRA5175/hNr9i+kny07qLDpeHzpZdATIo
+	xtabZy+TywOK8DPU6KBqUKVSJVbL+lvDVE4/sHNie3jItzAkf+IuEQh5A/hrNZ4=
+X-Gm-Gg: ASbGncv66ysAjuOk9s84mRFgLSs//mHQeUaq6j/1ofbvFarkJS0cpoleBctlinbAh5O
+	jw8fE7WLSp/akHy23wLLuD57qvvisgzSNbUBgxp7nHm2jDeO0NBHR0KwaA52yYIKroY/IWvkamg
+	1J7Dvl36JKEVUxto4voaulrdmeZhurhj3wwxJYJ0kdTxZJlq0eS4Ug9su7yR7/SrXOg6+966aik
+	0QyIWXYWHKt5IJY4ocURol5D9xsinttCA3k8CCmOweME3FN13ww5SXDdofu5d4UO4RDY5e2oks7
+	CEI3EyS95ggNHwjJlFTM2w9BpX0vTvrH
+X-Google-Smtp-Source: AGHT+IE4U0Nel01JtHK/rX8QBl2qPC8iA3WLhlaneMKSKU+x8aeNWP3CpSNUZacnFBxkOoaqFfb6GQ==
+X-Received: by 2002:a05:6e02:378a:b0:3d3:dfb6:2203 with SMTP id e9e14a558f8ab-3da5b34518cmr82097595ab.19.1746472991964;
+        Mon, 05 May 2025 12:23:11 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d975f6d771sm21077235ab.63.2025.05.05.12.23.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 10:39:37 -0700 (PDT)
-Message-ID: <f01719b1901f9d796837669086d7c1cd14c9922c.camel@redhat.com>
-Subject: Re: Sequential read from NVMe/XFS twice slower on Fedora 42 than on
- Rocky 9.5
-From: Laurence Oberman <loberman@redhat.com>
-To: Dave Chinner <david@fromorbit.com>, Anton Gavriliuk
- <antosha20xx@gmail.com>
-Cc: linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Date: Mon, 05 May 2025 13:39:35 -0400
-In-Reply-To: <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
-References: 
-	<CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-QzmZBMmtr1oC=fOOgAQ@mail.gmail.com>
-	 <aBaVsli2AKbIa4We@dread.disaster.area>
-	 <CAAiJnjor+=Zn62n09f-aJw2amX2wxQOb-2TB3rea9wDCU7ONoA@mail.gmail.com>
-	 <aBfhDQ6lAPmn81j0@dread.disaster.area>
-	 <7c33f38a52ccff8b94f20c0714b60b61b061ad58.camel@redhat.com>
-	 <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Mon, 05 May 2025 12:23:11 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ "Juergen E. Fischer" <fischer@norbit.de>, 
+ Alan Stern <stern@rowland.harvard.edu>, 
+ Andrew Morton <akpm@linux-foundation.org>, linux-block@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, 
+ usb-storage@lists.one-eyed-alien.net, linux-mm@kvack.org
+In-Reply-To: <20250505081138.3435992-1-hch@lst.de>
+References: <20250505081138.3435992-1-hch@lst.de>
+Subject: Re: remove block layer bounce buffering v2
+Message-Id: <174647299114.1416870.3005554851862973144.b4-ty@kernel.dk>
+Date: Mon, 05 May 2025 13:23:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-On Mon, 2025-05-05 at 09:21 -0400, Laurence Oberman wrote:
-> On Mon, 2025-05-05 at 08:29 -0400, Laurence Oberman wrote:
-> > On Mon, 2025-05-05 at 07:50 +1000, Dave Chinner wrote:
-> > > [cc linux-block]
-> > >=20
-> > > [original bug report:
-> > > https://lore.kernel.org/linux-xfs/CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-Qzm=
-ZBMmtr1oC=3DfOOgAQ@mail.gmail.com/
-> > > =C2=A0]
-> > >=20
-> > > On Sun, May 04, 2025 at 10:22:58AM +0300, Anton Gavriliuk wrote:
-> > > > > What's the comparitive performance of an identical read
-> > > > > profile
-> > > > > directly on the raw MD raid0 device?
-> > > >=20
-> > > > Rocky 9.5 (5.14.0-503.40.1.el9_5.x86_64)
-> > > >=20
-> > > > [root@localhost ~]# df -mh /mnt
-> > > > Filesystem=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Size=C2=A0 Used Avail Use%=
- Mounted on
-> > > > /dev/md127=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 35T=C2=A0 1.3T=C2=A0=
-=C2=A0 34T=C2=A0=C2=A0 4% /mnt
-> > > >=20
-> > > > [root@localhost ~]# fio --name=3Dtest --rw=3Dread --bs=3D256k
-> > > > --filename=3D/dev/md127 --direct=3D1 --numjobs=3D1 --iodepth=3D64 -=
--
-> > > > exitall
-> > > > --group_reporting --ioengine=3Dlibaio --runtime=3D30 --time_based
-> > > > test: (g=3D0): rw=3Dread, bs=3D(R) 256KiB-256KiB, (W) 256KiB-256KiB=
-,
-> > > > (T)
-> > > > 256KiB-256KiB, ioengine=3Dlibaio, iodepth=3D64
-> > > > fio-3.39-44-g19d9
-> > > > Starting 1 process
-> > > > Jobs: 1 (f=3D1): [R(1)][100.0%][r=3D81.4GiB/s][r=3D334k IOPS][eta
-> > > > 00m:00s]
-> > > > test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D43189: Sun May=C2=A0=
- 4
-> > > > 08:22:12
-> > > > 2025
-> > > > =C2=A0 read: IOPS=3D363k, BW=3D88.5GiB/s (95.1GB/s)(2656GiB/30001ms=
-ec)
-> > > > =C2=A0=C2=A0=C2=A0 slat (nsec): min=3D971, max=3D312380, avg=3D1817=
-.92,
-> > > > stdev=3D1367.75
-> > > > =C2=A0=C2=A0=C2=A0 clat (usec): min=3D78, max=3D1351, avg=3D174.46,=
- stdev=3D28.86
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0 lat (usec): min=3D80, max=3D1352, avg=3D17=
-6.27, stdev=3D28.81
-> > > >=20
-> > > > Fedora 42 (6.14.5-300.fc42.x86_64)
-> > > >=20
-> > > > [root@localhost anton]# df -mh /mnt
-> > > > Filesystem=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Size=C2=A0 Used Avail Use%=
- Mounted on
-> > > > /dev/md127=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 35T=C2=A0 1.3T=C2=A0=
-=C2=A0 34T=C2=A0=C2=A0 4% /mnt
-> > > >=20
-> > > > [root@localhost ~]# fio --name=3Dtest --rw=3Dread --bs=3D256k
-> > > > --filename=3D/dev/md127 --direct=3D1 --numjobs=3D1 --iodepth=3D64 -=
--
-> > > > exitall
-> > > > --group_reporting --ioengine=3Dlibaio --runtime=3D30 --time_based
-> > > > test: (g=3D0): rw=3Dread, bs=3D(R) 256KiB-256KiB, (W) 256KiB-256KiB=
-,
-> > > > (T)
-> > > > 256KiB-256KiB, ioengine=3Dlibaio, iodepth=3D64
-> > > > fio-3.39-44-g19d9
-> > > > Starting 1 process
-> > > > Jobs: 1 (f=3D1): [R(1)][100.0%][r=3D41.0GiB/s][r=3D168k IOPS][eta
-> > > > 00m:00s]
-> > > > test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D5685: Sun May=C2=A0 =
-4
-> > > > 10:14:00
-> > > > 2025
-> > > > =C2=A0 read: IOPS=3D168k, BW=3D41.0GiB/s (44.1GB/s)(1231GiB/30001ms=
-ec)
-> > > > =C2=A0=C2=A0=C2=A0 slat (usec): min=3D3, max=3D273, avg=3D 5.63, st=
-dev=3D 1.48
-> > > > =C2=A0=C2=A0=C2=A0 clat (usec): min=3D67, max=3D2800, avg=3D374.99,=
- stdev=3D29.90
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0 lat (usec): min=3D72, max=3D2914, avg=3D38=
-0.62, stdev=3D30.22
-> > >=20
-> > > So the MD block device shows the same read performance as the
-> > > filesystem on top of it. That means this is a regression at the
-> > > MD
-> > > device layer or in the block/driver layers below it. i.e. it is
-> > > not
-> > > an XFS of filesystem issue at all.
-> > >=20
-> > > -Dave.
-> >=20
-> > I have a lab setup, let me see if I can also reproduce and then
-> > trace
-> > this to see where it is spending the time
-> >=20
->=20
->=20
-> Not seeing 1/2 the bandwidth but also significantly slower on
-> Fedora42
-> kernel.
-> I will trace it
->=20
-> 9.5 kernel - 5.14.0-503.40.1.el9_5.x86_64
->=20
-> Run status group 0 (all jobs):
-> =C2=A0=C2=A0 READ: bw=3D14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8GB=
-/s-
-> 15.8GB/s), io=3D441GiB (473GB), run=3D30003-30003msec
->=20
-> Fedora42 kernel - 6.14.5-300.fc42.x86_64
->=20
-> Run status group 0 (all jobs):
-> =C2=A0=C2=A0 READ: bw=3D10.4GiB/s (11.2GB/s), 10.4GiB/s-10.4GiB/s (11.2GB=
-/s-
-> 11.2GB/s), io=3D313GiB (336GB), run=3D30001-30001msec
->=20
->=20
->=20
->=20
-
-Fedora42 kernel issue
-
-While my difference is not as severe we do see a consistently lower
-performance on the Fedora
-kernel. (6.14.5-300.fc42.x86_64)
-
-When I remove the software raid and run against a single NVME we
-converge to be much closer.
-Also latest upstream does not show this regression either.
-
-Not sure yet what is in our Fedora kernel causing this.=20
-We will work it via the Bugzilla
-
-Regards
-Laurence
-
-TLDR
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-Fedora Kernel
--------------
-root@penguin9 blktracefedora]# uname -a
-Linux penguin9.2 6.14.5-300.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Fri May
-2 14:16:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+On Mon, 05 May 2025 10:11:19 +0200, Christoph Hellwig wrote:
+> the block layer bounce buffering from the early days of highmem keeps
+> being a wart in the block layer despite usage by only four drivers,
+> all through the SCSI layer.  One of them is an old PIO-only ISA
+> card, two are parallel port adapters, and the fourth is the usb-storage
+> driver.
+> 
+> This series makes the first three depend on !HIGHMEM and for the fourth
+> rejects the probe only when used on highmem system and the HCD is one
+> of the few annoying one that does not support DMA.
+> 
+> [...]
 
-5 runs of the fio against /dev/md1
+Applied, thanks!
 
-[root@penguin9 ~]# for i in 1 2 3 4 5
-> do
-> ./run_fio.sh | grep -A1 "Run status group"
-> done
-Run status group 0 (all jobs):
-   READ: bw=3D11.3GiB/s (12.2GB/s), 11.3GiB/s-11.3GiB/s (12.2GB/s-
-12.2GB/s), io=3D679GiB (729GB), run=3D60001-60001msec
-Run status group 0 (all jobs):
-   READ: bw=3D11.2GiB/s (12.0GB/s), 11.2GiB/s-11.2GiB/s (12.0GB/s-
-12.0GB/s), io=3D669GiB (718GB), run=3D60001-60001msec
-Run status group 0 (all jobs):
-   READ: bw=3D11.4GiB/s (12.2GB/s), 11.4GiB/s-11.4GiB/s (12.2GB/s-
-12.2GB/s), io=3D682GiB (733GB), run=3D60001-60001msec
-Run status group 0 (all jobs):
-   READ: bw=3D11.1GiB/s (11.9GB/s), 11.1GiB/s-11.1GiB/s (11.9GB/s-
-11.9GB/s), io=3D664GiB (713GB), run=3D60001-60001msec
-Run status group 0 (all jobs):
-   READ: bw=3D11.3GiB/s (12.1GB/s), 11.3GiB/s-11.3GiB/s (12.1GB/s-
-12.1GB/s), io=3D678GiB (728GB), run=3D60001-60001msec
+[1/7] scsi: make aha152x depend on !HIGHMEM
+      commit: 7b32cb540bff6d6c8a1659babf930e9f66283c2c
+[2/7] scsi: make imm depend on !HIGHMEM
+      commit: bf69bd3fc26a107611e76b342027bb60b2411d4e
+[3/7] scsi: make ppa depend on !HIGHMEM
+      commit: 27a0918d4b701d4825e191448e44b9f14dc0a3b3
+[4/7] usb-storage: reject probe of device one non-DMA HCDs when using highmem
+      commit: 48610ec22f0cf7ee5b5658b2b3bab27a8f2ef78b
+[5/7] scsi: remove the no_highmem flag in the host
+      commit: a9437f6a1d8d0b3787fe6ff03d9aab4d3fe9b940
+[6/7] block: remove bounce buffering support
+      commit: eeadd68e2a5f6bfe0bf1038ec49e3a8d99eb5fe8
+[7/7] mm: remove NR_BOUNCE zone stat
+      commit: 194df9f66db8d6f74f03c78c2ad47b74a5a8b886
 
-RHEL9.5
-------------
-Linux penguin9.2 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC
-Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+Best regards,
+-- 
+Jens Axboe
 
-[root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1 "Run
-status group"; done
-Run status group 0 (all jobs):
-   READ: bw=3D14.9GiB/s (16.0GB/s), 14.9GiB/s-14.9GiB/s (16.0GB/s-
-16.0GB/s), io=3D894GiB (960GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.6GiB/s (15.6GB/s), 14.6GiB/s-14.6GiB/s (15.6GB/s-
-15.6GB/s), io=3D873GiB (938GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.9GiB/s (16.0GB/s), 14.9GiB/s-14.9GiB/s (16.0GB/s-
-16.0GB/s), io=3D892GiB (958GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.5GiB/s (15.6GB/s), 14.5GiB/s-14.5GiB/s (15.6GB/s-
-15.6GB/s), io=3D872GiB (936GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8GB/s-
-15.8GB/s), io=3D884GiB (950GB), run=3D60003-60003msec
-
-
-Remove software raid from the layers and test just on a single nvme
-----------------------------------------------------------------------
-
-fio --name=3Dtest --rw=3Dread --bs=3D256k --filename=3D/dev/nvme23n1 --dire=
-ct=3D1
---numjobs=3D1 --iodepth=3D64 --exitall --group_reporting --ioengine=3Dlibai=
-o
---runtime=3D60 --time_based
-
-Linux penguin9.2 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC
-Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
-
-[root@penguin9 ~]# ./run_nvme_fio.sh
-
-Run status group 0 (all jobs):
-   READ: bw=3D3207MiB/s (3363MB/s), 3207MiB/s-3207MiB/s (3363MB/s-
-3363MB/s), io=3D188GiB (202GB), run=3D60005-60005msec
-
-
-Back to fedora kernel
-
-[root@penguin9 ~]# uname -a
-Linux penguin9.2 6.14.5-300.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Fri May
-2 14:16:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
-
-Within the margin of error
-
-Run status group 0 (all jobs):
-   READ: bw=3D3061MiB/s (3210MB/s), 3061MiB/s-3061MiB/s (3210MB/s-
-3210MB/s), io=3D179GiB (193GB), run=3D60006-60006msec
-
-
-Try recent upstream kernel
----------------------------
-[root@penguin9 ~]# uname -a
-Linux penguin9.2 6.13.0-rc7+ #2 SMP PREEMPT_DYNAMIC Mon May  5 10:59:12
-EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
-
-[root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1 "Run
-status group"; done
-Run status group 0 (all jobs):
-   READ: bw=3D14.6GiB/s (15.7GB/s), 14.6GiB/s-14.6GiB/s (15.7GB/s-
-15.7GB/s), io=3D876GiB (941GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.8GiB/s (15.9GB/s), 14.8GiB/s-14.8GiB/s (15.9GB/s-
-15.9GB/s), io=3D891GiB (957GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.8GiB/s (15.9GB/s), 14.8GiB/s-14.8GiB/s (15.9GB/s-
-15.9GB/s), io=3D890GiB (956GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D14.5GiB/s (15.6GB/s), 14.5GiB/s-14.5GiB/s (15.6GB/s-
-15.6GB/s), io=3D871GiB (935GB), run=3D60003-60003msec
-
-
-Update to latest upstream
--------------------------
-
-[root@penguin9 ~]# uname -a
-Linux penguin9.2 6.15.0-rc5 #1 SMP PREEMPT_DYNAMIC Mon May  5 12:18:22
-EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
-
-Single nvme device is once again fine
-
-Run status group 0 (all jobs):
-   READ: bw=3D3061MiB/s (3210MB/s), 3061MiB/s-3061MiB/s (3210MB/s-
-3210MB/s), io=3D179GiB (193GB), run=3D60006-60006msec
-
-
-[root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1 "Run
-status group"; done
-Run status group 0 (all jobs):
-   READ: bw=3D14.7GiB/s (15.7GB/s), 14.7GiB/s-14.7GiB/s (15.7GB/s-
-15.7GB/s), io=3D880GiB (945GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D18.1GiB/s (19.4GB/s), 18.1GiB/s-18.1GiB/s (19.4GB/s-
-19.4GB/s), io=3D1087GiB (1167GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D18.0GiB/s (19.4GB/s), 18.0GiB/s-18.0GiB/s (19.4GB/s-
-19.4GB/s), io=3D1082GiB (1162GB), run=3D60003-60003msec
-Run status group 0 (all jobs):
-   READ: bw=3D18.2GiB/s (19.5GB/s), 18.2GiB/s-18.2GiB/s (19.5GB/s-
-19.5GB/s), io=3D1090GiB (1170GB), run=3D60005-60005msec
 
 
