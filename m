@@ -1,141 +1,205 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f225.google.com (mail-yw1-f225.google.com [209.85.128.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F4826B2B0;
-	Mon,  5 May 2025 17:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E4526B2DF
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 17:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746464623; cv=none; b=XQtH34oV7gEN5LHh5tL//2eXY91NSXFeLiFBk2sh83m+iudNiXRt17psOKOMNaF3932T2OQSB2XFnWyfCbFAG+y6xLoS4KkCoixrd01OOhaqfYaLSKHf2+nzmz05fP2Ic+0YbA16j88a97lLtAdQgyxC0n/mrA19eAeVxtDkHP0=
+	t=1746465994; cv=none; b=SZ0lBaOly2CZm/2CL7wxc0RcweqQ7JQNNi7++RZB8usUoWf1+4I50++xyPJ/SUdSpb6aAoTKi0uQzW6iOW0HWNdn4BgPRpJQRDqHN6cTRrTGYiCwqEiC6sn/uO2k241f4ld/9qub3+iQfSfdjqFroFBEC6rZ5G7Q7MQk/2ACHvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746464623; c=relaxed/simple;
-	bh=HrusCc9SBsT/pb7NKHxA3xrw80w8tMv119nD1CjzK+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EP1pD/ZUHeIv4cRsPd+D3SAieVGZNF5LzlYeAQ7Kg2tOdb74U7E2xIpp6x1DxTCCRqL6gIqxIlQkBljIK27n0OE6BYeJRvqB6Syh+VoNs0pmnYQ6gNA281jyEyfTvF4ACtsfz59vYT3DiTWIaOjKt02DnvdoYJ3XmzZ4Gyl+PYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvubux5p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746465994; c=relaxed/simple;
+	bh=aODsyg3joXcQ287FoVhkIV5aJfVBMDhrX2MPoMsF9/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hWgE7MmOnOHtDWb7ErcMkj5KnnEchgdONnB34AJktfZw3ItaAzAgASCCIeUJfRjW6IwK+hdrB4VhY22njua5dzp3/yoF/L+0vOI56bGoKXwvKrdk1IWseyLBQY4ckFg8NFhZjj+ag+y6mj+A1Ue93k2iS7ALJ24S1GxNUeyrfAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GbKWrNHz; arc=none smtp.client-ip=209.85.128.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvubux5p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BFDC4CEE4;
-	Mon,  5 May 2025 17:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746464620;
-	bh=HrusCc9SBsT/pb7NKHxA3xrw80w8tMv119nD1CjzK+I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hvubux5pL2EOx+kHP1U90MusMRROW6uMVmzZrOMwGL1OkdOm+EGwA3NRRo/u96oqI
-	 lPW4AOB0NjOAv1hMaEV3MVkiW9fjyLqhnRpPClxqdYm3GSL/afBpH4faP7tHqN9+p4
-	 Kn6OafJCkdT0njX3PkrTQ+MGgX7NB/XjdoH91FqGxcvHkq9fd3FkxaGhESnpeEyIko
-	 NrgqUWZy9dB1bPvhpT/0+HbD4x3kYpsPj130Fid8tq/KZITK7l8nppMDqLeS3hptgV
-	 hUl0tZ8TPp2TXKsMr/Ljib2TsW9INPsmX4HTZV5jkrWqozhnAJvrfnxBJjw4mUR0iu
-	 VdNZ7So4f39VQ==
-Date: Mon, 5 May 2025 10:03:36 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: dm-devel@lists.linux.dev, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Subject: Re: [PATCH v2 2/2] dm: pass through operations on wrapped inline
- crypto keys
-Message-ID: <20250505170336.GA197153@sol>
-References: <20250501212320.8281-1-ebiggers@kernel.org>
- <20250501212320.8281-3-ebiggers@kernel.org>
- <af9771ce-5e88-02d1-3595-fd18a6f2eb28@redhat.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GbKWrNHz"
+Received: by mail-yw1-f225.google.com with SMTP id 00721157ae682-7087349ce74so1791867b3.3
+        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 10:26:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1746465991; x=1747070791; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DDBk+OYzCApSnK8VVZgyIgA3ncZhmRQ/48wNK7Y0ijk=;
+        b=GbKWrNHzT5fOlzhH4jPGQXmfFjRfiWXRy59ev1xoqxCppbyi8GibE+zJcxyLeZXoIM
+         MiqJt4b59XkuZvrmywTbQk0UT2C/hJ4A6o8y8yUSAX+FpaQOpct7UppFRzejtPy836I3
+         tUUtvxiJF4KWhqD5V27jjxACWBypiU30O/+iX21UIr0EXro2aN+zSUFjfwIfgZTSOoHU
+         6dI6FCLy1mwNUkQtPHI9bTjlSc0ySERArgUFBw5Ll53jhPtXGpKIPQT9GD4EnXoILd5G
+         Ty+0A3Mpclxtgd2ewYJ/9eM2XEBt0qVA8ah4lKeQ9pTyn8ExHVJt9tyS5xodUUJfAadB
+         jTIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746465991; x=1747070791;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DDBk+OYzCApSnK8VVZgyIgA3ncZhmRQ/48wNK7Y0ijk=;
+        b=k6/sa+VYuCttcKWblPmT14yGPk3sz6mSdh8xFp0N6LmaChZRiLRfT3SHqKwPgcA/lx
+         alLmT+5mwpqA5mTNjIe8i81yh9M+95As6p1eQly+2dqMV9EN237uOeV6zOl3BmsqS+pG
+         nlm2+UoOn5QeqVTxW+gIK8M2yjEiKHQ2jD1AoJvN06slAej9Afh4LvqiLF6VsziyyueJ
+         odLAV9naF2h8+lcYHnzt4ONfXKXbQy0X1wAu3ihX/jz9GOhxG5B5wkJS9fGxp1u5Jxe4
+         eg/G/OWt8BKoEcWW8F1/QYKPUjNNJUblBMGOUOHguB6wKKM844Ri3qHHb1Pd/2oQ7+Jv
+         mkig==
+X-Forwarded-Encrypted: i=1; AJvYcCUaZb01XlSBROfGJ62NSb6sT8Fr6cgd1czguhuUIG6xCJpkK83y2CBhWNPWsGpXjagKRzSVGhcYIopH7w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1LDYDcc4cVaiSDSp/jTFSz+J2SnE7kdyCAQKr4M1v1wCDTEW4
+	IF/vA+wE1sGYgSYE8gTZYRU0uCgakG7mNMtUVdEz1MGqfOcBQxXs9n4y0BFnJwjtvJL+25E1ehs
+	lQ8zqU4Uv7utxYyR/JijS8yfM2kRy2lrjPubwOibpUxu0CPU1
+X-Gm-Gg: ASbGncs4X4vPkj6GGzBUpEvIN9lFxdzVRIMe5TrcZqVmSbkVThxpgNPWpLMujUrFj93
+	71JnjEZb9QQLJztgBu3u+5sMiQE/IPuxQPSwRX1BWt2sWgAtFfPr9t9TuNnBiDQm1NSLTMT69V+
+	AhX+I2rXACvtV1nBuZozGaY2upaNZt09DHf5mARntKTxE5YwIvMggBHPMFqRVlcyu2RvQcKAGbM
+	rg5sIrede7e5UWnDupady03tlSGsRnFlEYeaQ4YPRxkJQTM1b2Hp9gm/D1R1vxPFgR8ruDIJrgn
+	fENuHlAzK5bch5JJ2N+sMlmTBjystA==
+X-Google-Smtp-Source: AGHT+IF8JQQZ9iJZET0yqNKPYRUGBpoq1VA7CgS5xHctkCNPAgyxmvjK72Iq3Quz/EaHkhR44JzXhXdmNEo9
+X-Received: by 2002:a05:690c:7108:b0:6ff:8418:5afb with SMTP id 00721157ae682-708cedf5b65mr78859887b3.5.1746465990790;
+        Mon, 05 May 2025 10:26:30 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-708c46f219csm20088657b3.60.2025.05.05.10.26.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 May 2025 10:26:30 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 2FBB2340350;
+	Mon,  5 May 2025 11:26:30 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 29BA6E41993; Mon,  5 May 2025 11:26:30 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] ublk: consolidate UBLK_IO_FLAG_OWNED_BY_SRV checks
+Date: Mon,  5 May 2025 11:26:23 -0600
+Message-ID: <20250505172624.1121839-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af9771ce-5e88-02d1-3595-fd18a6f2eb28@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 05, 2025 at 06:15:01PM +0200, Mikulas Patocka wrote:
-> 
-> 
-> On Thu, 1 May 2025, Eric Biggers wrote:
-> 
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > Make the device-mapper layer pass through the derive_sw_secret,
-> > import_key, generate_key, and prepare_key blk-crypto operations when all
-> > underlying devices support hardware-wrapped inline crypto keys and are
-> > passing through inline crypto support.
-> > 
-> > Commit ebc4176551cd ("blk-crypto: add basic hardware-wrapped key
-> > support") already made BLK_CRYPTO_KEY_TYPE_HW_WRAPPED be passed through
-> > in the same way that the other crypto capabilities are.  But the wrapped
-> > key support also includes additional operations in blk_crypto_ll_ops,
-> > and the dm layer needs to implement those to pass them through.
-> > derive_sw_secret is needed by fscrypt, while the other operations are
-> > needed for the new blk-crypto ioctls to work on device-mapper devices
-> > and not just the raw partitions.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  drivers/md/dm-table.c | 177 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 177 insertions(+)
-> > 
-> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> > index a937e1e12482e..0a71bedff81c5 100644
-> > --- a/drivers/md/dm-table.c
-> > +++ b/drivers/md/dm-table.c
-> > +
-> > +static int dm_exec_wrappedkey_op(struct blk_crypto_profile *profile,
-> > +				 struct dm_wrappedkey_op_args *args)
-> > +{
-> > +	struct mapped_device *md =
-> > +		container_of(profile, struct dm_crypto_profile, profile)->md;
-> > +	struct dm_target *ti;
-> > +	struct dm_table *t;
-> > +	int srcu_idx;
-> > +	int i;
-> > +
-> > +	args->err = -EOPNOTSUPP;
-> > +
-> > +	t = dm_get_live_table(md, &srcu_idx);
-> > +	if (!t)
-> > +		goto out;
-> > +
-> > +	/*
-> > +	 * blk-crypto currently has no support for multiple incompatible
-> > +	 * implementations of wrapped inline crypto keys on a single system.
-> > +	 * It was already checked earlier that support for wrapped keys was
-> > +	 * declared on all underlying devices.  Thus, all the underlying devices
-> > +	 * should support all wrapped key operations and they should behave
-> > +	 * identically, i.e. work with the same keys.  So, just executing the
-> > +	 * operation on the first device on which it works suffices for now.
-> > +	 */
-> > +	for (i = 0; i < t->num_targets; i++) {
-> > +		ti = dm_table_get_target(t, i);
-> > +		if (!ti->type->iterate_devices)
-> > +			continue;
-> > +		ti->type->iterate_devices(ti, dm_wrappedkey_op_callback, args);
-> > +		if (!args->err)
-> > +			break;
-> > +	}
-> 
-> I have a dumb question - if it doesn't matter through which block device 
-> do you set up the keys, why do you set them up through a block device at 
-> all?
-> 
-> What about making functions that set up the keys without taking block 
-> device as an argument, calling these functions directly and bypassing 
-> device mapper entirely?
+Every ublk I/O command except UBLK_IO_FETCH_REQ checks that the ublk_io
+has UBLK_IO_FLAG_OWNED_BY_SRV set. Consolidate the separate checks into
+a single one in __ublk_ch_uring_cmd(), analogous to those for
+UBLK_IO_FLAG_ACTIVE and UBLK_IO_FLAG_NEED_GET_DATA.
 
-Userspace needs to direct the key setup operations, so we'd need a UAPI for it
-to do so.  We could add a custom syscall, or some hacked-up extension of
-add_key(), and add a custom registration mechanism to allow a single
-implementation of wrapped keys (e.g. from ufs-qcom) to register itself as the
-system's wrapped key provider which the syscall would then use.
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+v2: rebase
 
-But it seemed cleaner to instead use block device ioctls and take advantage of
-the existing blk-crypto-profile.  That already handles registering and
-unregistering the implementation, and it also already handles things like
-locking, and resuming the UFS controller if it's in suspend.
+ drivers/block/ublk_drv.c | 26 ++++++++------------------
+ 1 file changed, 8 insertions(+), 18 deletions(-)
 
-It also keeps the door open to supporting the case where different
-wrapped-key-capable block devices don't necessarily accept the same keys, even
-if that isn't the case currently.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 2c8f28c0d0a1..3650bab40dd0 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1924,20 +1924,16 @@ static void ublk_io_release(void *priv)
+ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 				const struct ublk_queue *ubq, unsigned int tag,
+ 				unsigned int index, unsigned int issue_flags)
+ {
+ 	struct ublk_device *ub = cmd->file->private_data;
+-	const struct ublk_io *io = &ubq->ios[tag];
+ 	struct request *req;
+ 	int ret;
+ 
+ 	if (!ublk_support_zero_copy(ubq))
+ 		return -EINVAL;
+ 
+-	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-		return -EINVAL;
+-
+ 	req = __ublk_check_and_get_req(ub, ubq, tag, 0);
+ 	if (!req)
+ 		return -EINVAL;
+ 
+ 	ret = io_buffer_register_bvec(cmd, req, ublk_io_release, index,
+@@ -1949,21 +1945,16 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+ 
+ 	return 0;
+ }
+ 
+ static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+-				  const struct ublk_queue *ubq, unsigned int tag,
++				  const struct ublk_queue *ubq,
+ 				  unsigned int index, unsigned int issue_flags)
+ {
+-	const struct ublk_io *io = &ubq->ios[tag];
+-
+ 	if (!ublk_support_zero_copy(ubq))
+ 		return -EINVAL;
+ 
+-	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-		return -EINVAL;
+-
+ 	return io_buffer_unregister_bvec(cmd, index, issue_flags);
+ }
+ 
+ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+ 		      struct ublk_io *io, __u64 buf_addr)
+@@ -2013,16 +2004,12 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+ 
+ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+ 				 struct ublk_io *io, struct io_uring_cmd *cmd,
+ 				 const struct ublksrv_io_cmd *ub_cmd)
+ {
+-	struct request *req;
+-
+-	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-		return -EINVAL;
++	struct request *req = io->req;
+ 
+-	req = io->req;
+ 	if (ublk_need_map_io(ubq)) {
+ 		/*
+ 		 * COMMIT_AND_FETCH_REQ has to provide IO buffer if
+ 		 * NEED GET DATA is not enabled or it is Read IO.
+ 		 */
+@@ -2102,10 +2089,15 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 	if (io->flags & UBLK_IO_FLAG_ACTIVE) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
+ 
++	/* only UBLK_IO_FETCH_REQ is allowed if io is not OWNED_BY_SRV */
++	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV) &&
++	    _IOC_NR(cmd_op) != UBLK_IO_FETCH_REQ)
++		goto out;
++
+ 	/*
+ 	 * ensure that the user issues UBLK_IO_NEED_GET_DATA
+ 	 * iff the driver have set the UBLK_IO_FLAG_NEED_GET_DATA.
+ 	 */
+ 	if ((!!(io->flags & UBLK_IO_FLAG_NEED_GET_DATA))
+@@ -2119,11 +2111,11 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 	ret = -EINVAL;
+ 	switch (_IOC_NR(cmd_op)) {
+ 	case UBLK_IO_REGISTER_IO_BUF:
+ 		return ublk_register_io_buf(cmd, ubq, tag, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_UNREGISTER_IO_BUF:
+-		return ublk_unregister_io_buf(cmd, ubq, tag, ub_cmd->addr, issue_flags);
++		return ublk_unregister_io_buf(cmd, ubq, ub_cmd->addr, issue_flags);
+ 	case UBLK_IO_FETCH_REQ:
+ 		ret = ublk_fetch(cmd, ubq, io, ub_cmd->addr);
+ 		if (ret)
+ 			goto out;
+ 		break;
+@@ -2131,12 +2123,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 		ret = ublk_commit_and_fetch(ubq, io, cmd, ub_cmd);
+ 		if (ret)
+ 			goto out;
+ 		break;
+ 	case UBLK_IO_NEED_GET_DATA:
+-		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+-			goto out;
+ 		io->addr = ub_cmd->addr;
+ 		if (!ublk_get_data(ubq, io))
+ 			return -EIOCBQUEUED;
+ 
+ 		return UBLK_IO_RES_OK;
+-- 
+2.45.2
 
-- Eric
