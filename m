@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F581D88BE;
-	Mon,  5 May 2025 22:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E4E277815;
+	Mon,  5 May 2025 22:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485223; cv=none; b=cEVFNzhK/6Qsj94UyJasIS5P0I/7DHfXeqaxHAXYaLGEime96wKcqL1qrDyPKUat9whRXa4OZSLgbxfm4DB8oB73kfFO4VHu93aIsRHvpPefIuGFt3O64zK02mKak93RvGtsZWrUIVgB+XrXeMK8GH/FvEuWIhHfBcSzbNZx+vU=
+	t=1746485104; cv=none; b=KgFwCoB/gGNyeca2nxW4qto8vvrLrrdupGYsZE/rbZI+w7pWpXUMk7lbgHRQ0VN4SpCBMgxmahC1Qv6wRThRAw02eqFscXrfQXIR/p7mL0uPS9m0tQ4ZJ+Y4Z52ZCO5TOrbDuT7jxy3X5RDkC83QeWaf0FbZh0kZJn6Dj0sTOFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485223; c=relaxed/simple;
-	bh=HvXI5JY7ZUo1VtaL6xdtKZzJ312mMM79yGF5Q5ULP3s=;
+	s=arc-20240116; t=1746485104; c=relaxed/simple;
+	bh=OGEmbQrUFdVZHyv53Gw+XrgRi5QoqkjyJgMiANsk2VM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qxL6NtcDBFU5ZnvSE53HffeqRShuCY8cnwuWqCjj98wVnesJBi0x62mvlrHTXoYAvExQE9+3rfELw11TYqDHQsQAJ3wYYI0jA/pqj1fWO4D6HxRKEF2JmsOkZWU/pzFigj+iOfGYOYFgSWgy291KIhV+N6n2JkRllloBU0uYm6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTOYTq/Z; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Kovgte84Gy/71bkB75cgfqbCdkdZ5V4TZk+NXaf34CNJ3yNh/V80WYEArTKTzoX/U2PSZwZwMW3hPCPStqwhmL0wzN2r/uAMQFUyWoI9TVX0V+Ve3M55ozGof5YW9fkbP0yfDZOyramIojQ8gQhLPFN8HqgGOBEZmzJWSpRs2TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKMAxRLm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTOYTq/Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B21A3C4CEED;
-	Mon,  5 May 2025 22:47:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKMAxRLm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BD11C4CEE4;
+	Mon,  5 May 2025 22:45:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485222;
-	bh=HvXI5JY7ZUo1VtaL6xdtKZzJ312mMM79yGF5Q5ULP3s=;
+	s=k20201202; t=1746485104;
+	bh=OGEmbQrUFdVZHyv53Gw+XrgRi5QoqkjyJgMiANsk2VM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eTOYTq/ZXFVMDv7ex6AMQkhvPR0tCs7WQ5QbqiZe9CQIOkkuSb9RFwyimT6nnFj4c
-	 yuyY6+eqErVjKHUyey2jLfVFitDyVVGis16of1YviZaG2DJDP4zhuBNM7cP+H1K1Tv
-	 HIg5ee7ovvUOiQH1uX7fxO9H9pctP9GDCQG3OKFUFsfmSIXQWqntS+GL/0K3tkc5Ws
-	 mOUX9hnB49L/pHRXdyvVTM0ipsulPLVLQDKnBQZFwC+iI90LBUSIfCUcwZAr3Ya+SM
-	 rOu2RN8NY4X8CYNvjDoEWC9I5oVjAr5uKrFIWRqAlvWt7jLlOeGxJErll68BwPwcHA
-	 sryrohjKBI38w==
+	b=iKMAxRLmRFST8T1BZQbJA/nnc4z/QUyEEkOLD6x7NK+b3SR+XCYcR2nuNLjFR2RUb
+	 hw+K8Wn/iLwP4mE2WBNvWGCOmYTmpgYI1nqXLP7RAUnKIsf5DxrBv9hee72kb+h4dy
+	 2/RNoHV3LPwBUDTLgSNEazbuwBU0xKdXCA8kFOv6s7dkJQ/q8ZiiSm5tZmz8ZDXZOm
+	 C3MXYfOudk50CAK7hVDJvSVXezSyYDmaFLT7U0ayVAxlRrq4lU+mYwG/8rRvYaHQMG
+	 PltmyXxmQd9GRhVincba4GbG5o8N30s+bk5pkGfPoKnIr1urvVium04eo04WK8wWKF
+	 NJmU9X48jCTWQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <kbusch@kernel.org>,
+Cc: Coly Li <colyli@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Yu Kuai <yukuai3@huawei.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 219/486] ublk: complete command synchronously on error
-Date: Mon,  5 May 2025 18:34:55 -0400
-Message-Id: <20250505223922.2682012-219-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 163/486] badblocks: Fix a nonsense WARN_ON() which checks whether a u64 variable < 0
+Date: Mon,  5 May 2025 18:33:59 -0400
+Message-Id: <20250505223922.2682012-163-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -52,72 +52,52 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Caleb Sander Mateos <csander@purestorage.com>
+From: Coly Li <colyli@kernel.org>
 
-[ Upstream commit 603f9be21c1894e462416e3324962d6c9c2b95f8 ]
+[ Upstream commit 7e76336e14de9a2b67af96012ddd46c5676cf340 ]
 
-In case of an error, ublk's ->uring_cmd() functions currently return
--EIOCBQUEUED and immediately call io_uring_cmd_done(). -EIOCBQUEUED and
-io_uring_cmd_done() are intended for asynchronous completions. For
-synchronous completions, the ->uring_cmd() function can just return the
-negative return code directly. This skips io_uring_cmd_del_cancelable(),
-and deferring the completion to task work. So return the error code
-directly from __ublk_ch_uring_cmd() and ublk_ctrl_uring_cmd().
+In _badblocks_check(), there are lines of code like this,
+1246         sectors -= len;
+[snipped]
+1251         WARN_ON(sectors < 0);
 
-Update ublk_ch_uring_cmd_cb(), which currently ignores the return value
-from __ublk_ch_uring_cmd(), to call io_uring_cmd_done() for synchronous
-completions.
+The WARN_ON() at line 1257 doesn't make sense because sectors is
+unsigned long long type and never to be <0.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Link: https://lore.kernel.org/r/20250225212456.2902549-1-csander@purestorage.com
+Fix it by checking directly checking whether sectors is less than len.
+
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Signed-off-by: Coly Li <colyli@kernel.org>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Link: https://lore.kernel.org/r/20250309160556.42854-1-colyli@kernel.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/ublk_drv.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/badblocks.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 5ec5d580ef506..a01a547c562f3 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1881,10 +1881,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 	return -EIOCBQUEUED;
+diff --git a/block/badblocks.c b/block/badblocks.c
+index db4ec8b9b2a8c..a9709771a1015 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -1349,14 +1349,15 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 	len = sectors;
  
-  out:
--	io_uring_cmd_done(cmd, ret, 0, issue_flags);
- 	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
- 			__func__, cmd_op, tag, ret, io->flags);
--	return -EIOCBQUEUED;
-+	return ret;
- }
- 
- static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
-@@ -1940,7 +1939,10 @@ static inline int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
- static void ublk_ch_uring_cmd_cb(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
--	ublk_ch_uring_cmd_local(cmd, issue_flags);
-+	int ret = ublk_ch_uring_cmd_local(cmd, issue_flags);
+ update_sectors:
++	/* This situation should never happen */
++	WARN_ON(sectors < len);
 +
-+	if (ret != -EIOCBQUEUED)
-+		io_uring_cmd_done(cmd, ret, 0, issue_flags);
- }
+ 	s += len;
+ 	sectors -= len;
  
- static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
-@@ -3065,10 +3067,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (ub)
- 		ublk_put_device(ub);
-  out:
--	io_uring_cmd_done(cmd, ret, 0, issue_flags);
- 	pr_devel("%s: cmd done ret %d cmd_op %x, dev id %d qid %d\n",
- 			__func__, ret, cmd->cmd_op, header->dev_id, header->queue_id);
--	return -EIOCBQUEUED;
-+	return ret;
- }
+ 	if (sectors > 0)
+ 		goto re_check;
  
- static const struct file_operations ublk_ctl_fops = {
+-	WARN_ON(sectors < 0);
+-
+ 	if (unacked_badblocks > 0)
+ 		rv = -1;
+ 	else if (acked_badblocks > 0)
 -- 
 2.39.5
 
