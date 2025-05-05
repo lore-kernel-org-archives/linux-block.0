@@ -1,104 +1,127 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0E935A751
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 22:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C76436AAE3
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 22:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485713; cv=none; b=He1i/90zXthev1GWfEYb34o6RMYJpgmnSO0YnAHYBE+JDSBit1LzEBibgtb330QKPz5UM9Ws+gEgZXxm9x97cwsK++6k80U9rRLlfWY6KucC8335L8rEsUSA3BwACaczCCmGbbuhxCfhYGRxXzbelv1kbcHcxid2aGDKY72k3lU=
+	t=1746485781; cv=none; b=ZUdDB7g/rWM5cUkMQLp/yrZpxv0Lshd0+EU+Sr3VhDE7IbWI02veczHDfLF5q2b3GtrlrnqtwLzVuLi1q83TZqg8qh0QdHhavi1JpeDNVKqZGnGRhNbumsMpN+D9OeZaB+n/WR7uGlLhM/VL4ZXn7iJkt6VDAXee14msh5kx6qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485713; c=relaxed/simple;
-	bh=o4dmr7QeNk6BMAJDX5IeyPT/JPkokyGq6C8SqU2UR/M=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=XCjsqCXRRv9KpvWKKTpdpiGeB6utM9KRBooumhU6hTz8ImSwh2m+CzqEn3iWO+LFBNRQtjnzjKBCqp+Q6qd2JL3I69JIkqsZMEg8mngAMvSXUW+vIinwp01x5ieow7T09cXSydFDVb57C7loTGbmR+l8j911MGEhINohT0I4CkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wv9Dbus7; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1746485781; c=relaxed/simple;
+	bh=wHRy5AQPRQxiU54IBvGuKaPKDlgm5NQZxV6K6w1Qve0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I2Me5uWGMugXw5sSFfRbuefWONWIujVW9mjPfiJkslNnS/DNCkAZl+jTOfj0yEXg4cnPwChuUyL92flCRtgRsLnt9yu0IKCZi+EF19Ix5R58YBd9d0jW6g50Zkx0WISPsE1DE1Y2FiNwOVP2pvxXZPKyaCGyxysm8EAq5iFCLK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=sFlCGbSi; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wv9Dbus7"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d817bc6eb0so15895525ab.1
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 15:55:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="sFlCGbSi"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so4082152b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 15:56:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746485710; x=1747090510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y9IWRogWT+IHbngw4rVJPf1yqVTJMP/POXHV9mjNlM8=;
-        b=wv9Dbus73jy6Mm6xL20KyvmYpfzIX6HJsbfIBUFeLlsJpFnBc1LuN44v/oomA5FiR2
-         hrTIR+hsTIC/fcDcOzHUTgPJ3csw/VXKz2pjj6vBhINPmSz58JXvnQ+kSG+ABruoVh2o
-         D08giiS2eiYqPSDNAjf0B++kBzB70e7g5k6APYCVjcrX/DIgNCE/+FlTGTJb7RegqJ5u
-         nPLHJUix55gJQiOxb6hYyz1ljpPgRi0fGjdhyTZxBNuS+zJ0wiDm5zNt/ZQMi+znEdPt
-         aooaSY6e4xkm6+ZHGGUtTIPT3qmR8HU/SXe31XrsI9QjRquX2OClByMyMnR3Qt8B/BP6
-         hufQ==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1746485777; x=1747090577; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TZtudP8whc5JWyiBQCvGvrdC2CkTXwDmcdreRv5eyPQ=;
+        b=sFlCGbSihnoYn+Kn6Ve0Gh8tuPRq1NcVQO2MQUIv+qmjUC3NmvPzE7viNKog5tDLZ+
+         ef+tNdSxOUt4ulpPQlh06Vgvll1qBPPgxa2WhC9W5hNViNNwfPfcaduA3iOUtuncKOMA
+         M1fNiPLON5L5Xsje0BSrNVkykZyTVwl3CK8bEB/TEXykNXuECeJG5EgoK84jlorpYPNP
+         STpGGXncQR5ljQ0Vx7J26PvhGYGDWrU74vUTcVPyaqyVE9lO5Z3ZcmdBnnpuqPx/0JEU
+         3Zh4NjfBW87ron4uEOvysJuKRHDq79F21+0eExMuABzRsIED8r89PtVmd+pkrkuFupwP
+         I6fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746485710; x=1747090510;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y9IWRogWT+IHbngw4rVJPf1yqVTJMP/POXHV9mjNlM8=;
-        b=EeR6EZkuWcwkAUG1Yrejwa95+1DlrkefCegI+1+qtXEzJfOqt/+Tp2RjK7/CZaHr03
-         aRC+vl6OJedBqgMYX2cS8LEvwjrKy6MaByCsAo3tY0AA53XsZ9D5+RJqFXWufu9KC/rV
-         i4FOqUTLrtaq2Da98L1/iktImSIEj91XeH8uDMIz6NLsCRMyOBD1ReznAN+mkuPZPhT3
-         JRKBmls3kJASx6WlZjJzNr7fXdeB++LT3Y4nKMQBbIo1/OXGnt+vJ/sHjJPnlXmg85dc
-         mERCSqHHcdoarKHS9x5uFcfzbcAMEy20SOqW0e4mT1TOVsqxhsUDtalESV8Ct/TPAJCz
-         cxMg==
-X-Gm-Message-State: AOJu0YyJVohrRuRfftQvhE0K4EfYQyFXND94JUIUmftZjV9ZtaTyi1nm
-	qV9ERML+t2GQo1DmyaOrdpRvcvyzJpH/PK6+vWBJxQ08Xiagw9OsNmHmZfwYvfY=
-X-Gm-Gg: ASbGncvTkTplpgdbWmluFF3ZQl1qiIjxqCszhaL5TU+vc2Fr+qUvMadxT28c9seIYAX
-	6n2UyNbpwOl05W6uZz4a60cbr4mZcsycxIK9/UTao8huWYVgRSx8sgTRvHpZnI487872/I0EQn6
-	LXujt5+wiZfYesauHtIn9XtSuEIqzupCRvVUdhltT6yIm8b3RTLGRMpfPEYYAKhQ7/pOQJRxx+q
-	zbcuHL+7aoCk6JqPGqiGWPD2E1CAwgSoDDs941poz6imksanDRiYCyI9Md6Ndsb6rcsb/Y9KCZy
-	BxWaTXawEUK193sf97Phztaq9esDd5yx
-X-Google-Smtp-Source: AGHT+IFpcNPaFzZ/vhh/4FSViYGaK4KRsBfwCvdYltBjqw6DGBuUksSFjecGP6VWziUl79QtWsppOA==
-X-Received: by 2002:a05:6e02:1f81:b0:3d9:36bd:8c5f with SMTP id e9e14a558f8ab-3da5b2a02dcmr79548175ab.11.1746485710125;
-        Mon, 05 May 2025 15:55:10 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f88aac8004sm1921031173.145.2025.05.05.15.55.09
+        d=1e100.net; s=20230601; t=1746485777; x=1747090577;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZtudP8whc5JWyiBQCvGvrdC2CkTXwDmcdreRv5eyPQ=;
+        b=fSvcItn2eGMlHcl9TW61BlDwYTbsuVVuo3U3fSdrv9ofUoeGw8MGYbf+jhsNax2Tcn
+         LgAu+58KdsO9MqGjZnyTWzdMvzOXQ+yyzJEQxhul1Ua9vrAvMx4Ug0DnrT4mhiPPYF6J
+         yxlptvMrXxRV53FZuaKO2RY4uXnEG/89UDiQERUCuDUWr+Y8cvvD2z7Q3Jw65ekFJEMU
+         W3MfotovsOUDp3/x5vzY8OVOhXnhqr4IQedVvwKY9lKmczvDfGdaYAQoYzIOPW2BJBPH
+         Xcz/Le+FSCUjPbODNioY+YfcNVyz+0Tx6pEE2+fIfhJqVi//vJ+sL9/+hiNwBs7OBEUX
+         Qo3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWzY9mAMmiKd74PV7oSXKKFHqxkWDaQqKcb2rtm56rn59ME4a29L8j9pVcwQwL8EtLEPFO8jgwkS14/vA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI6izuWHGevPFG8UWVLLkN2/Cg2dWmVBv/UGygq/yzZAyISfnL
+	mZecPKGyzUiGkNcVvWk1APXz2b6pjJn1zFz5ca7agLxqLHl/K8CjF+Ddsn4DimM=
+X-Gm-Gg: ASbGncsXmcg39U/qMvFJZGBfo0N8XEWQJLbKtdyH+pIGAp55KHhPXb9qj+YNkx/0mKV
+	vgcrGdjM3kDNx8Ikmlsd7rff4CmnShsGNMm5X3EAzYcl4jTkVlt0RW59PQF0yQqXzzeFDllhug2
+	Y8LFPP/ajDC4do5nU4YpJjUcjZWDYaq2oCpWg1muN25lobKhdi65P+4kq1isBIRRBQrk4VIWh7b
+	MQpiAH/3Kzm7U9R1HOqYaHRRLt1dBueOb5xFf+zrp4C8QyYYIdJhghoibpzYL2lCG6kGvrcKYyt
+	A6LCo4DuF3P3ZW4Dn1pIDvV3Ayc55y7N5SWEIgUb7en8DYvwynzy79xLgL5XwT0USqk/eipLSxB
+	paH+N/kCOzqgxCQ==
+X-Google-Smtp-Source: AGHT+IG0junclw7g29Tiqwx2VjZpghoTqY/gPZ70p9955vnBkCywMNmCzZAK8v7YO3Z5zsZcGqWWmQ==
+X-Received: by 2002:a05:6a20:cf90:b0:1f5:64a4:aeac with SMTP id adf61e73a8af0-21182ec067cmr1039329637.33.1746485777257;
+        Mon, 05 May 2025 15:56:17 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-60-96.pa.nsw.optusnet.com.au. [49.181.60.96])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058db9200sm7423761b3a.42.2025.05.05.15.56.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 15:55:09 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Caleb Sander Mateos <csander@purestorage.com>
-In-Reply-To: <20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com>
-References: <20250429-ublk_selftests-v2-0-e970b6d9e4f4@purestorage.com>
-Subject: Re: [PATCH v2 0/3] selftests: ublk: more misc fixes
-Message-Id: <174648570900.1422154.9689058645460558381.b4-ty@kernel.dk>
-Date: Mon, 05 May 2025 16:55:09 -0600
+        Mon, 05 May 2025 15:56:16 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1uC4jN-0000000HT0R-0Pro;
+	Tue, 06 May 2025 08:56:13 +1000
+Date: Tue, 6 May 2025 08:56:13 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Laurence Oberman <loberman@redhat.com>
+Cc: Anton Gavriliuk <antosha20xx@gmail.com>, linux-nvme@lists.infradead.org,
+	linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: Sequential read from NVMe/XFS twice slower on Fedora 42 than on
+ Rocky 9.5
+Message-ID: <aBlCDTm-grqM4WtY@dread.disaster.area>
+References: <CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-QzmZBMmtr1oC=fOOgAQ@mail.gmail.com>
+ <aBaVsli2AKbIa4We@dread.disaster.area>
+ <CAAiJnjor+=Zn62n09f-aJw2amX2wxQOb-2TB3rea9wDCU7ONoA@mail.gmail.com>
+ <aBfhDQ6lAPmn81j0@dread.disaster.area>
+ <7c33f38a52ccff8b94f20c0714b60b61b061ad58.camel@redhat.com>
+ <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
 
-
-On Tue, 29 Apr 2025 16:41:02 -0600, Uday Shankar wrote:
-> Fix some more minor issues in ublk selftests.
+On Mon, May 05, 2025 at 09:21:19AM -0400, Laurence Oberman wrote:
+> On Mon, 2025-05-05 at 08:29 -0400, Laurence Oberman wrote:
+> > On Mon, 2025-05-05 at 07:50 +1000, Dave Chinner wrote:
+> > > So the MD block device shows the same read performance as the
+> > > filesystem on top of it. That means this is a regression at the MD
+> > > device layer or in the block/driver layers below it. i.e. it is not
+> > > an XFS of filesystem issue at all.
+> > > 
+> > > -Dave.
+> > 
+> > I have a lab setup, let me see if I can also reproduce and then trace
+> > this to see where it is spending the time
+> > 
 > 
-> The first patch is from
-> https://lore.kernel.org/linux-block/20250423-ublk_selftests-v1-0-7d060e260e76@purestorage.com/
-> with a modification requested by Jens. The others are new.
 > 
+> Not seeing 1/2 the bandwidth but also significantly slower on Fedora42
+> kernel.
+> I will trace it
 > 
-> [...]
+> 9.5 kernel - 5.14.0-503.40.1.el9_5.x86_64
+> 
+> Run status group 0 (all jobs):
+>    READ: bw=14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8GB/s-
+> 15.8GB/s), io=441GiB (473GB), run=30003-30003msec
+> 
+> Fedora42 kernel - 6.14.5-300.fc42.x86_64
+> 
+> Run status group 0 (all jobs):
+>    READ: bw=10.4GiB/s (11.2GB/s), 10.4GiB/s-10.4GiB/s (11.2GB/s-
+> 11.2GB/s), io=313GiB (336GB), run=30001-30001msec
 
-Applied, thanks!
+So is this MD chunk size related? i.e. what is the chunk size
+the MD device? Is it smaller than the IO size (256kB) or larger?
+Does the regression go away if the chunk size matches the IO size,
+or if the IO size vs chunk size relationship is reversed?
 
-[1/3] selftests: ublk: kublk: build with -Werror iff WERROR!=0
-      commit: 3d6ee575d0d49be35dbb787db4d05bdf94e2cdbb
-[2/3] selftests: ublk: make test_generic_06 silent on success
-      commit: 254827a32118ddb171680dc2143c777cc68f2cbc
-[3/3] selftests: ublk: kublk: fix include path
-      commit: e371b9d3368ccb6b55fe9747be12c3107b2817b3
-
-Best regards,
+-Dave.
 -- 
-Jens Axboe
-
-
-
+Dave Chinner
+david@fromorbit.com
