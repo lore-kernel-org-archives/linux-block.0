@@ -1,140 +1,184 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC0B1F9F70
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 14:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F85818DB26
+	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 14:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746454430; cv=none; b=dsg5zolG67Z2jgYHwljQmnaBzxmjXJd/Bz6jpof+ydoDF0tbwI0pu0xCdP5pHat3kbBRguG4bp9hjNuxew/vImBW7QorA8Bn7O6iFtxDQiSrM1Lp3o/RpEbQKne3iuqeDyK43iCZaEUoCty+Ud0dCOU6sShq7I9llY4+8tfL9DU=
+	t=1746454701; cv=none; b=BGmTg4YKJq6GIlyDLBjaUWlPfvFwaiFJFnPXe270V0UcZihvs8xiQm1odYop2hXqzo1H/NkmiFlDijlv6devw9kesyL5YexUvTLkKMayBrviw/FAPgvrVYUl1LaFTvo4OQg/lSNGUxJ5LAG3lxRf+QgXCftH+FWuY+Z04A4coPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746454430; c=relaxed/simple;
-	bh=A2zxAUOPLV3bNvLbAu3RCEqZwUjdKzQAa87eBOyOC90=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YhwA4P2GoAtAq8WUyBOLvLdvvClncaezlGU7wHPj0imctT6oBltosy5b7o0t8mrDjH9FRVjzGglTkn7gbULft60rizxj8x6ixRlUxeR8LWXif456uff8phJxwjppUHzLszZt/OSGbv7QNlKqtZJgoSMA43ocgQ6PFh3CnEKcjoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=t84ibPae; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+	s=arc-20240116; t=1746454701; c=relaxed/simple;
+	bh=btfrHnJMDRjeXfR3GIBEVLBqlgnnmysnNCxwRLptffI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HPTO11ECe1I3gkjOQzxQ033JzbgP0ErweLbMpVCHGEtHS1a9FlPZ6bdvOdib1b78V/jEEUWeS62CNBiTmfHTKvnylXzcgZXcHZRVeIhANDqwf1hboCniD66dOJlnTIXEpbq8zFthAzHVh1RCQbS5rk2F+8X/0g5STDCwLZ7nqQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y1dgFrHV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="t84ibPae"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c922169051so252780985a.0
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 07:13:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1746454427; x=1747059227; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Km2nNwCy9nfUMi5n8/eIW1Pg+DKWEU9DbSVEm6yXt90=;
-        b=t84ibPaeSevucUprToXcROsr1kvuYloz3/zxUnXayigNnhV1eyxIzbAzfDlAJuFnsB
-         2N3tvzHeJ72xyIyuUBswMUx+wmXClT6EkXdw8Y5ZSq63rjJJEFl7T7N/Q613b13qt/cJ
-         6sIM8f2KYWipH1zMaWVgL8J0tR9lkRKEr/swnRX0Uf+waeyhLrSrbVxsP3WhG30frRhU
-         Hvl3PAN3wb6TVDtMn9Wl2UmzA6itsFnszfHsujz8QzmEdc9flwBNNeahDT64272rbxMa
-         GmQTdNzZRHcoB9haCoqzKRzRguRxq5Pfc6lVCBNLz7Hgd/oXtkI7CWAjUYTujKJ8tiHC
-         jRtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746454427; x=1747059227;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Km2nNwCy9nfUMi5n8/eIW1Pg+DKWEU9DbSVEm6yXt90=;
-        b=IuyYSTsKjDH8dMlZIyIzZWp1i+iE0N5jnhMZcrbq5AN2ksdjkOLY688ZYgVusR/N9N
-         s+I5CPxdzwwZrx2D5xGNLNehH5S3FYlNRPQBJ1TQ68/3dUjVEnc6H09lJjG1hnWd46vX
-         dMyp02pmNJrsttck+7lm+tNuOYWaDQHlZgkMmXaxG2NAwt4rVlLYly4moTQY4mXvfTdQ
-         t0DMjpNROaiASkro5RTwgWxbBxjbdm08ZS8ChgciiP14NaN5CctV5v16p4egH9wQRcLB
-         y2oAPuojpPPrhYC0yUD91FO3pteuvYeSQHj3SqM3ViOYKixxMWRsdG4gu2QidPJFcmvC
-         WmTw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvV7kxYy1oedH6yrbBkg7H9/YG17D3vKSaKIseZh807ZJSYK/YS8u+Y2mkV7uLCMizVS5rWH6zMz//xg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCCR1ra8AQo9rtVQK44XAPYGHy98qq4Gewqt2DKMZZNs7adIYb
-	pyH1h3h4Ql8TqaGftcJTe97Wg5L/efKEcBES+bWd12uhwm3ugLrknTcHGD98NA==
-X-Gm-Gg: ASbGncuoWmsIGv/STVOaF0VAPvVdvCSrPQ/PoJjlVe5G1gD94pgC4GlVKD7kIeYJJva
-	uTw4tleOEBckCK4q0lq2jSib3wti5/CR1+A4cxZiTmQxaSiGOpSuYIfA4ZyoemregdK1fV+4d4x
-	lRfX4J4eO7HMn+sFK130CrqQveLsUwJP+OWSCLACQN1dO6PK97MYwAPygPSBcN29nRPyKReCUH5
-	ny+KZ0cfcqtQCJaDMR1xbINYDFSahh3P1CgggCnSeAxz/fn0uL5qwUI3GDFZBHDR5RO00XIqCOp
-	LkVOk8mr+S9Qze2L14+37A283SdVyS8MMMcVWxNMzHmntfQgG81h7AKQ5g8=
-X-Google-Smtp-Source: AGHT+IE0jGXZkHeqo5VP6fuLU3UosiL4RXVAh+fS3HVNKXlvLlMRZFj24Qgw4HiEH1QgtxUBKzrCRQ==
-X-Received: by 2002:a05:620a:4884:b0:7ca:ca21:23d9 with SMTP id af79cd13be357-7cae3a88445mr1253233785a.7.1746454427156;
-        Mon, 05 May 2025 07:13:47 -0700 (PDT)
-Received: from rowland.harvard.edu ([140.247.181.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cad2146a3fsm574523185a.0.2025.05.05.07.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 07:13:46 -0700 (PDT)
-Date: Mon, 5 May 2025 10:13:44 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"Juergen E. Fischer" <fischer@norbit.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 4/7] usb-storage: reject probe of device one non-DMA HCDs
- when using highmem
-Message-ID: <f75fe6a2-b751-4839-b811-6eed2eecb177@rowland.harvard.edu>
-References: <20250505081138.3435992-1-hch@lst.de>
- <20250505081138.3435992-5-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1dgFrHV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746454698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nWYvBTVFnWQ+b2uUqHKlAT2vIYEponOSpHX1D07GOXc=;
+	b=Y1dgFrHVGxCMYXoHhbED0/0AY8niCEGQuwcuZs2VqaBNzyYjYPeuWdgy40KImWSADbLyn9
+	lvil5g+7omvcOH/Y9NMaa/Doy9n+cn4PNGZzJYosSW7NtqZu19FYF1LiuA7Xxq+ImPK4bD
+	V8Sag7vYwc7VcYaXwIhamKVbVdR3EmY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-64-fWO0Ua4MPmiUkP5Fcdu6PQ-1; Mon,
+ 05 May 2025 10:18:15 -0400
+X-MC-Unique: fWO0Ua4MPmiUkP5Fcdu6PQ-1
+X-Mimecast-MFC-AGG-ID: fWO0Ua4MPmiUkP5Fcdu6PQ_1746454693
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5423E19560B4;
+	Mon,  5 May 2025 14:18:13 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 17EBA30001A2;
+	Mon,  5 May 2025 14:18:11 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 00/25] block: unify elevator changing and fix lockdep warning
+Date: Mon,  5 May 2025 22:17:38 +0800
+Message-ID: <20250505141805.2751237-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250505081138.3435992-5-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, May 05, 2025 at 10:11:23AM +0200, Christoph Hellwig wrote:
-> usb-storage is the last user of the block layer bounce buffering now,
-> and only uses it for HCDs that do not support DMA on highmem configs.
-> 
-> Remove this support and fail the probe so that the block layer bounce
-> buffering can go away.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hello Jens,
 
-Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
+This patchset cleans up elevator change code, and unifying it via single
+helper, meantime moves kobject_add/del & debugfs register/unregister out of
+queue freezing & elevator_lock. This way fixes many lockdep warnings
+reported recently, especially since fs_reclaim is connected with freeze lock
+manually by commit ffa1e7ada456 ("block: Make request_queue lockdep splats
+show up earlier").
 
-> ---
->  drivers/usb/storage/usb.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/usb/storage/usb.c b/drivers/usb/storage/usb.c
-> index d36f3b6992bb..152ee3376550 100644
-> --- a/drivers/usb/storage/usb.c
-> +++ b/drivers/usb/storage/usb.c
-> @@ -1056,13 +1056,20 @@ int usb_stor_probe1(struct us_data **pus,
->  		goto BadDevice;
->  
->  	/*
-> -	 * Some USB host controllers can't do DMA; they have to use PIO.
-> -	 * For such controllers we need to make sure the block layer sets
-> -	 * up bounce buffers in addressable memory.
-> +	 * Some USB host controllers can't do DMA: They have to use PIO, or they
-> +	 * have to use a small dedicated local memory area, or they have other
-> +	 * restrictions on addressable memory.
-> +	 *
-> +	 * We can't support these controllers on highmem systems as we don't
-> +	 * kmap or bounce buffer.
->  	 */
-> -	if (!hcd_uses_dma(bus_to_hcd(us->pusb_dev->bus)) ||
-> -	    bus_to_hcd(us->pusb_dev->bus)->localmem_pool)
-> -		host->no_highmem = true;
-> +	if (IS_ENABLED(CONFIG_HIGHMEM) &&
-> +	    (!hcd_uses_dma(bus_to_hcd(us->pusb_dev->bus)) ||
-> +	     bus_to_hcd(us->pusb_dev->bus)->localmem_pool)) {
-> +		dev_warn(&intf->dev, "USB Mass Storage not supported on this host controller\n");
-> +		result = -EINVAL;
-> +		goto release;
-> +	}
->  
->  	/* Get the unusual_devs entries and the descriptors */
->  	result = get_device_info(us, id, unusual_dev);
-> @@ -1081,6 +1088,7 @@ int usb_stor_probe1(struct us_data **pus,
->  
->  BadDevice:
->  	usb_stor_dbg(us, "storage_probe() failed\n");
-> +release:
->  	release_everything(us);
->  	return result;
->  }
+
+Thanks,
+Ming
+
+V5:
+	- replace down_read_nested() with down_read(), by adding
+	  helper of add_disk_final()
+
+	- fix race between elv_iosched_store and __del_gendisk (Nilay Shoff)
+
+	- improve elv_update_nr_hw_queues() (Christoph)
+
+V4:
+	- pull Christoph's two elevator change/switch cleanup patches first,
+	then the following elevator change unifying is simplified a lot(Christoph)
+
+	- fold Nilay's patch into the last patch for avoiding one new
+	lock warning on rqos_state_mutex (Nilay Shoff)
+
+	- drop patch "block: move blk_unregister_queue() & device_del() after freeze
+	wait" which may cause MD hang during shutdown, and add new patch "block: add
+    new helper for disabling elevator switch when deleting disk" for dealing with
+    one small race window (Christoph)
+
+	- add patch "block: remove elevator queue's type check in elv_attr_show/store()"
+	(Christoph)
+
+    - rename ->update_nr_hwq_sema as ->update_nr_hwq_lock (Christoph)
+
+	- add small patch "block: move blk_queue_registered() check into elv_iosched_store()"
+
+V3:
+	- replace srcu with rw_sem for avoiding race between add/del disk &
+	  elevator switch and updating nr_hw_queues (Nilay Shoff)
+
+	- add elv_update_nr_hw_queues() for elevator reattachment in case of
+	updating nr_hw_queues, meantime keep elv_change_ctx as local structure
+	(Christoph)
+
+	- replace ->elevator_lock with disk->rqos_state_mutex for covering wbt
+	state change
+
+	- add new patch "block: use q->elevator with ->elevator_lock held in elv_iosched_show()"
+
+	- small cleanup & commit log improvement
+
+V2:
+	- retry add/del disk when blk_mq_update_nr_hw_queues() is in-progress
+
+	- swap blk_mq_add_queue_tag_set() with blk_mq_map_swqueue() in
+	blk_mq_init_allocated_queue() (Nilay Shroff)
+
+	- move ELEVATOR_FLAG_DISABLE_WBT to request queue's flags (Nilay Shoff) 
+
+	- fix race because of delaying elevator unregister
+
+	- define flags of `elv_change_ctx` as `bool` (Christoph)
+
+	- improve comment and commit log (Christoph)
+
+
+
+Christoph Hellwig (2):
+  block: look up the elevator type in elevator_switch
+  block: fold elevator_disable into elevator_switch
+
+Ming Lei (23):
+  block: move blk_mq_add_queue_tag_set() after blk_mq_map_swqueue()
+  block: move ELEVATOR_FLAG_DISABLE_WBT a request queue flag
+  block: don't call freeze queue in elevator_switch() and
+    elevator_disable()
+  block: use q->elevator with ->elevator_lock held in elv_iosched_show()
+  block: add two helpers for registering/un-registering sched debugfs
+  block: move sched debugfs register into elvevator_register_queue
+  block: add helper add_disk_final()
+  block: prevent adding/deleting disk during updating nr_hw_queues
+  block: don't allow to switch elevator if updating nr_hw_queues is
+    in-progress
+  block: move blk_queue_registered() check into elv_iosched_store()
+  block: simplify elevator reattachment for updating nr_hw_queues
+  block: move queue freezing & elevator_lock into elevator_change()
+  block: add `struct elv_change_ctx` for unifying elevator change
+  block: unifying elevator change
+  block: pass elevator_queue to elv_register_queue & unregister_queue
+  block: remove elevator queue's type check in elv_attr_show/store()
+  block: fail to show/store elevator sysfs attribute if elevator is
+    dying
+  block: add new helper for disabling elevator switch when deleting disk
+  block: move elv_register[unregister]_queue out of elevator_lock
+  block: move hctx debugfs/sysfs registering out of freezing queue
+  block: don't acquire ->elevator_lock in blk_mq_map_swqueue and
+    blk_mq_realloc_hw_ctxs
+  block: move hctx cpuhp add/del out of queue freezing
+  block: move wbt_enable_default() out of queue freezing from sched
+    ->exit()
+
+ block/bfq-iosched.c    |   6 +-
+ block/blk-mq-debugfs.c |  13 +-
+ block/blk-mq-sched.c   |  41 +++--
+ block/blk-mq.c         | 132 +++--------------
+ block/blk-sysfs.c      |  29 ++--
+ block/blk-wbt.c        |   9 +-
+ block/blk.h            |   8 +-
+ block/elevator.c       | 329 ++++++++++++++++++++++++-----------------
+ block/elevator.h       |   6 +-
+ block/genhd.c          | 197 +++++++++++++++---------
+ include/linux/blk-mq.h |   3 +
+ include/linux/blkdev.h |   8 +
+ 12 files changed, 402 insertions(+), 379 deletions(-)
+
+-- 
+2.47.0
+
