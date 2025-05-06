@@ -1,108 +1,102 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9BB277021;
-	Tue,  6 May 2025 11:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F1D27C16F
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 11:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746530713; cv=none; b=EBlpECZN2/bM5Lbi10xw8fAcnlDPfy3nuexXmzRb2jNtTucg8ldd3suvRunOn6Y0hHhhL6Q1245gLJTHSoMDqlquVb3nEr1ZEmCCWAlTgylcmwQzWC8QP6fMSfj4Hf8zZtGxxnC6Hwb+ECWR+ZfwGBBqAMndgQIfsO9dGbJPh/o=
+	t=1746530868; cv=none; b=u1+0pZFYPMCmsey55tONyWL2qpUGbX7SzXloyNuMtWR98n+IdoahzzhA3FFL3YGINfLqPST4oZVADUuZHlR9LAMffMYe2N6EvfwHQ4ovK37jXzRTKE6ZN0XHT1AZz6aB7/npqZULG2/aG/LkNY7GmpxMRmaeZAv9Sq0BQD1VsVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746530713; c=relaxed/simple;
-	bh=LYEoDqW9Aw3HirRWc3fZPPqmXKbhw5VH1R/eJ7s7ey0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DbaBIHPJLzFbldzhHAqlBiBjSiWaKpArC6BKQDNIJYQ4+Kzlr0I6qBUl0rxqjB8vC5YvAOPZi2kDUmXL2eucqao6UKj0Vk/IohWmvbSaYh/v2jdLkdg9lwlIXiiPljz3toxtkcuirU+D4aPbHYLh4lRgo+aKmEBeGshUfzZ1R9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4ZsGK03YjSzYQv9t;
-	Tue,  6 May 2025 19:25:08 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id D0A9F1A1041;
-	Tue,  6 May 2025 19:25:07 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgD3Wl+S8RlowhVpLg--.31381S3;
-	Tue, 06 May 2025 19:25:07 +0800 (CST)
-Message-ID: <c3105509-9d63-4fa2-afaf-5b508ddeeaca@huaweicloud.com>
-Date: Tue, 6 May 2025 19:25:06 +0800
+	s=arc-20240116; t=1746530868; c=relaxed/simple;
+	bh=kW/DwVkxNOnEbo1a4gTlVHFHPlWOXWPJvJuJO3BeUMA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n8AncOccb6ld9jG+bdqa4KNghuECpcFb3LjZOPKC2XFkwJ7N+ngAP1B4eaXRANJHJuQ4QV/ZXvieZ/GBfo4BKuSayh8n6wLSSCOlek731PWOXusN63raiu0ZQFBxhAiNAoYMdbctpbPSSHuIN1NTSN1BxsXwWwWSsTtdC+P5Gpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-441d1ed827cso2905775e9.1
+        for <linux-block@vger.kernel.org>; Tue, 06 May 2025 04:27:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746530865; x=1747135665;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F5GgZRZD/L8csWJFbnAXPLR0XYntr51fyV49ak2W5xU=;
+        b=nNmJWSa37bN+XQ+LXX3YYhhRdTwgT++rLwoDrNd+MPvmF0Zm6KXVa60ZIgMMTstQed
+         MGap/+o9zTgiabZbrsDPMzu6mOl3LUfM4iEAHZsotbK22wfXQ39SsO0DYVC/TuoV6pyZ
+         8x6QZkgYE94myx0tX0SrWTmLPk7rtY27B2XSDTHcoe7mjkL3XlhjrQr77Kh9XFmK49lX
+         +hiW/50Q9hDe1KOWYHvxQbAdh3XCytOviPnEsLVCevx1pO5oPogKjOJqb76nXQSv92y+
+         lJWpXMlpTqUYtEZp2syoynCvfXWF/AHiQfudJqBwOA2teq2Xm2Vbcv/L+y5kS9Xa5gf7
+         9yxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAWUETwVmjutYZzQm6JmZpxZq4VxLR3DUzpwvifXFXu6ju2QyJudfYkkfxP9fhAFEvDIZZYpI5EeajOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsKV9yOFrvardFNJK7ime2BVtoArSOvJ//wMVgJLGrXG+2Zsvd
+	Y3g2DtKcUO41cfIMfzF1VCeyJhjSbSeX7QW+NdHNFl4EqiHsuAgrItaTdA==
+X-Gm-Gg: ASbGncvLfwK+UqDtTswEDR/K1goyzqf8VQLke7hnfDudNJnx4SLgEeCyVUtfFsk0NHT
+	/poV/tDu3PQK9tUfr8g0JveaJ/6FunkTRKJMNbmhusi8iVswZX+chwQVLFUu0O/l7hfVdFK+dfB
+	7KVW6rgPUfgEd2IE1ARNDSIePjE/f8LBXFKMuOtShpoYkRRT202P5jssUVp79NyzpEPByhfzEIY
+	rMuILC/TuFKdk0l5THEV564kIh8M0X91TdQesa565xY6JhIkYi6ZQdMSabmbV7wpBro72Le5mbx
+	lbfamH78yrP9CYYQMhwwMn3ganB5Zbvw2nLsVwUAxtHKkXTFG7m7NHkpQkuUoiaj4zopev7srqQ
+	8i7SmLsWIIoNdKZWGFBZbUnE=
+X-Google-Smtp-Source: AGHT+IHXcGqz3Bt3miJP51F7T+9yJ48SpjUKETiVNAZDwqaTrjPvlo/diWb45o4Wpw5sTKGIbAFdyg==
+X-Received: by 2002:a05:6000:ecf:b0:3a0:aeba:23b1 with SMTP id ffacd0b85a97d-3a0aeba23f9mr1179147f8f.49.1746530864555;
+        Tue, 06 May 2025 04:27:44 -0700 (PDT)
+Received: from nuc.fritz.box (p200300f6f7133d00fa633ffffe02074c.dip0.t-ipconnect.de. [2003:f6:f713:3d00:fa63:3fff:fe02:74c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b16f00sm13129754f8f.84.2025.05.06.04.27.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 04:27:44 -0700 (PDT)
+From: Johannes Thumshirn <jth@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] block: only update request sector if needed
+Date: Tue,  6 May 2025 13:27:30 +0200
+Message-ID: <dea089581cb6b777c1cd1500b38ac0b61df4b2d1.1746530748.git.jth@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 07/11] fs: statx add write zeroes unmap attribute
-To: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, tytso@mit.edu,
- john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
- shinichiro.kawasaki@wdc.com, brauner@kernel.org, yi.zhang@huawei.com,
- chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
-References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
- <20250421021509.2366003-8-yi.zhang@huaweicloud.com>
- <20250505132208.GA22182@lst.de> <20250505142945.GJ1035866@frogsfrogsfrogs>
- <20250506050239.GA27687@lst.de> <20250506053654.GA25700@frogsfrogsfrogs>
- <20250506054722.GA28781@lst.de>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20250506054722.GA28781@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgD3Wl+S8RlowhVpLg--.31381S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr4rXrW8WF4fKryrZw43ZFb_yoW8GF47pF
-	WkCFyIkr4IkF47Ga1kZw1Ivr1Y9rn7JFy7C3s5Kr12yay2qrn7uFn5Ca42kFnaqr93uw4Y
-	qFZxX342va1093DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07
-	j7l19UUUUU=
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Transfer-Encoding: 8bit
 
-On 2025/5/6 13:47, Christoph Hellwig wrote:
-> On Mon, May 05, 2025 at 10:36:54PM -0700, Darrick J. Wong wrote:
->> I think STATX_* (i.e. not STATX_ATTR_*) flags have two purposes: 1) to
->> declare that specific fields in struct statx actually have meaning, most
->> notably in scenarios where zeroes are valid field contents; and 2) if
->> filling out the field is expensive, userspace can elect not to have it
->> filled by leaving the bit unset.  I don't know how userspace is supposed
->> to figure out which fields are expensive.
-> 
-> Yes.
-> 
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-IIUC, it seems I was misled by STATX_ATTR_WRITE_ATOMIC, adding this
-STATX_ATTR_WRITE_ZEROES_UNMAP attribute flag is incorrect. The right
-approach should be to add STATX_WRITE_ZEROES_UNMAP, setting it in the
-result_mask if the request_mask includes this flag and
-bdev_write_zeroes_unmap(bdev) returns true. Something like below. Is
-my understanding right?
+In case of a ZONE APPEND write, regardless of native ZONE APPEND or the
+emulation layer in the zone write plugging code, the sector the data got
+written to by the device needs to be updated in the bio.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 4ba48b8735e7..e1367f30dbce 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1303,9 +1303,9 @@ void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
-                        queue_atomic_write_unit_max_bytes(bd_queue));
-        }
+At the moment, this is done for every native ZONE APPEND write and every
+request that is flagged with 'BIO_ZONE_WRITE_PLUGGING'. But thus
+superfluously updates the sector for regular writes to a zoned block
+device.
 
-+       if (request_mask & STATX_WRITE_ZEROES_UNMAP &&
-+           bdev_write_zeroes_unmap(bdev))
-+               stat->result_mask |= STATX_WRITE_ZEROES_UNMAP;
+Check if a bio is a native ZONE APPEND write or if the bio is flagged as
+'BIO_EMULATES_ZONE_APPEND', meaning the block layer's zone write plugging
+code handles the ZONE APPEND and translates it into a regular write and
+back. Only if one of these two criterion is met, update the sector in the
+bio upon completion.
 
-        stat->blksize = bdev_io_min(bdev);
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ block/blk.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks,
-Yi.
+diff --git a/block/blk.h b/block/blk.h
+index 328075787814..594eeba7b949 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -480,7 +480,8 @@ static inline void blk_zone_update_request_bio(struct request *rq,
+ 	 * the original BIO sector so that blk_zone_write_plug_bio_endio() can
+ 	 * lookup the zone write plug.
+ 	 */
+-	if (req_op(rq) == REQ_OP_ZONE_APPEND || bio_zone_write_plugging(bio))
++	if (req_op(rq) == REQ_OP_ZONE_APPEND ||
++	    bio_flagged(bio, BIO_EMULATES_ZONE_APPEND))
+ 		bio->bi_iter.bi_sector = rq->__sector;
+ }
+ void blk_zone_write_plug_bio_endio(struct bio *bio);
+-- 
+2.43.0
 
