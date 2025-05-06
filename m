@@ -1,64 +1,64 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE6F281539
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74D328152D
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746534415; cv=none; b=QTbz5MI8SQ7tvuI7WLslDy2G1Mk+N17Rh0LDrOs9gTmOUARu3NGNxqE8usJm90gM4SOF5IFsDbUcJqXuAIZxEiw7rSpp9gkEM7qZM+Lt6NgrH1yNQlpWwQTnTqnTQHOwasMSWM5F35jtlt+LCmwS2Tje0ikwhzEQb6Kka6MEK28=
+	t=1746534419; cv=none; b=dj564cULvmUefst+1QUdnrDIayblN18Om8jn3aWqcGs7vTNnRuIoh0/Iw9i72RNZRde+B5vVYvbWRyIQ8MWRG7Tqas2hf6pMc15tnT0an1/WGY/M0GqcxFZJVcBxw+Rb2cnUFyO9sM8Gkn5BKHZ9wF6MqtgxsRiCEe1CgKSAUtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746534415; c=relaxed/simple;
-	bh=7sLPRrU3oIzJC/KkjNaKpExR9NAtaXcX6VWwAPNpNZQ=;
+	s=arc-20240116; t=1746534419; c=relaxed/simple;
+	bh=i8c4uUrUpHqyKCWuBJhFo0rwlKuwu2Q+QbCajtrihmU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=hqFlMq+hVf9meXkbnkS4702Ntj9SN4W2xSZ/yn81fLqYnw3kkouf7BQvIQKZZ5lyWEx6Me98Ea+dPZp8H+B2UR5ULZ3UkuwpUVym65xKkqGhZg6HFIm8/5FPKhsjvUesU8hH+LJ+Oraap68ZJBnAv+h8Bvh0hkHt3nJKdRJ6hp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Cfg59xa3; arc=none smtp.client-ip=203.254.224.34
+	 Content-Type:References; b=l7PqCoUUPa9UlqrRwhSoKTMorzE6WQfIYPm/34XUs6twyYq4Cu4dc/KVWQaDo4cOYKtQ2jfazLBn3YlbcQRdvYiLNOXCF76qwBHAGyj6wrZRsO+lKDTQ/8SUGJXHg64zDGVSOGWxnuE2NeuftLL6JCTEg9EY6LU+0WwXU23Gh4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NoWiVmDQ; arc=none smtp.client-ip=203.254.224.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Cfg59xa3"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250506122652epoutp046aecf7dc16b1b60b8b72c93b3e75829b~878tWXg0V1138611386epoutp041
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:26:52 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250506122652epoutp046aecf7dc16b1b60b8b72c93b3e75829b~878tWXg0V1138611386epoutp041
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NoWiVmDQ"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250506122656epoutp02e033d8b1ced2f94c65443ebfd5a0bde2~878xGvusU0473504735epoutp02U
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:26:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250506122656epoutp02e033d8b1ced2f94c65443ebfd5a0bde2~878xGvusU0473504735epoutp02U
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1746534412;
-	bh=hQ558UFkkMsgoK6EW4IQmznV6d1CVID5eydr5s05kY8=;
+	s=mail20170921; t=1746534416;
+	bh=eAt1TC33VEZKhra4JdmMfO0QKM/NIeusGmijSmzNAoM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Cfg59xa3E6AfPczKMPOhnex/YzGyvOFd8pYNaJUVDkaLHyLk56DD1RCDNfvm9tVHT
-	 Dg8kPMsHcsVlR6A9MYpKGEIjIpQwvxgMZJtl5ZekbKuvIuQfoVHQVnCvNbCBck7oYi
-	 TjdufjL96SqnKtaQP+KdF8W/JK/hKLBrkyTsqwak=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20250506122651epcas5p4b369a38a55dd499052ac2efc71cf593a~878sqOBer2065220652epcas5p48;
-	Tue,  6 May 2025 12:26:51 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4ZsHhB17Dhz2SSKY; Tue,  6 May
-	2025 12:26:50 +0000 (GMT)
+	b=NoWiVmDQEZUfT2ZpaVFQMyQV3Yq+IU9yx11r8ZHo8526edorEqAfePIAYsbQ1qUNY
+	 8ZrujfOCB1uygcqDtgVTdN3cGZGQTmoznN7hzPv4bK5XKhginqwHn7EGgERp5ro/SS
+	 qw2eUjByMMPCDpvS/+TORl9wESJxwTa0UcJG10U8=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20250506122655epcas5p3963211a08a66813ef441cbf8ed7a413a~878wkyES03215232152epcas5p31;
+	Tue,  6 May 2025 12:26:55 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4ZsHhF6Jvmz6B9m4; Tue,  6 May
+	2025 12:26:53 +0000 (GMT)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
 	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250506122649epcas5p1294652bcfc93f08dd12e6ba8a497c55b~878rBbl4u0911609116epcas5p1B;
-	Tue,  6 May 2025 12:26:49 +0000 (GMT)
+	20250506122653epcas5p1824d4af64d0b599fde2de831d8ebf732~878uko59V0784707847epcas5p1N;
+	Tue,  6 May 2025 12:26:53 +0000 (GMT)
 Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
 	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250506122649epsmtrp262ea50c65204de25f1f3a186110a90ed~878rAuOmx0521905219epsmtrp2X;
-	Tue,  6 May 2025 12:26:49 +0000 (GMT)
-X-AuditID: b6c32a2a-d63ff70000002265-6a-681a00096753
+	20250506122653epsmtrp268652cf3359e450be94a9d41ddbf4d4a~878ujGNsm0522005220epsmtrp2T;
+	Tue,  6 May 2025 12:26:53 +0000 (GMT)
+X-AuditID: b6c32a2a-d63ff70000002265-6e-681a000dccfd
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
 	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	33.6E.08805.9000A186; Tue,  6 May 2025 21:26:49 +0900 (KST)
+	F3.6E.08805.D000A186; Tue,  6 May 2025 21:26:53 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.99.41.245]) by
 	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250506122647epsmtip2ed850290d0cc40fa92afdf6e15605f31~878pcVnnz1679416794epsmtip2e;
-	Tue,  6 May 2025 12:26:47 +0000 (GMT)
+	20250506122651epsmtip2c19c1d52165df07f6ff54d495a437a19~878s2hELM1663216632epsmtip2X;
+	Tue,  6 May 2025 12:26:51 +0000 (GMT)
 From: Kanchan Joshi <joshi.k@samsung.com>
 To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, asml.silence@gmail.com
 Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org, Hannes
 	Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>, Kanchan
 	Joshi <joshi.k@samsung.com>
-Subject: [PATCH v16 09/11] nvme: add FDP definitions
-Date: Tue,  6 May 2025 17:47:30 +0530
-Message-Id: <20250506121732.8211-10-joshi.k@samsung.com>
+Subject: [PATCH v16 11/11] nvme: use fdp streams if write stream is provided
+Date: Tue,  6 May 2025 17:47:32 +0530
+Message-Id: <20250506121732.8211-12-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250506121732.8211-1-joshi.k@samsung.com>
 Precedence: bulk
@@ -68,190 +68,119 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSvC4ng1SGwdnXihZzVm1jtFh9t5/N
-	Ys+iSUwWK1cfZbJ413qOxeLo/7dsFpMOXWO02HtL22LP3pMsFvOXPWW32PZ7PrMDt8fOWXfZ
-	PS6fLfXYtKqTzWPzknqP3Tcb2Dz6tqxi9Nh8utrj8ya5AI4oLpuU1JzMstQifbsErozOk8tY
-	Cw4pVJz7P425gfGyZBcjJ4eEgInEtmkzmLsYuTiEBHYzSnydsZMFIiEu0XztBzuELSyx8t9z
-	doiij4wSE16cY+1i5OBgE9CUuDC5FKRGRCBA4uXix2CDmAU+MErsmTibESQhDLLhwDawehYB
-	VYkJG3lAwrwCFhIbbpxmhZgvLzHz0newXZxA8eV7ZoG1CgmYS7w4eoQdol5Q4uTMJ2C3MQPV
-	N2+dzTyBUWAWktQsJKkFjEyrGCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCY0JLawfj
-	nlUf9A4xMnEwHmKU4GBWEuG9f18yQ4g3JbGyKrUoP76oNCe1+BCjNAeLkjjvt9e9KUIC6Ykl
-	qdmpqQWpRTBZJg5OqQamIu8AN32DznWH/x/mf30/VS5y9r+FTj8KLEOm9xS3PTnixu+ylnOX
-	8nyFkwf1X72XWH7o12kOgRymJOFbvWyiJ5km2Vwt+XXqmLG+9QzVaZOUT5w6tmK6dtaWXeve
-	ZXu7Rflp3fuQ2Hb3SdPz2P7XQbazp7412OzwWlqaVf3tmm/FE9cJxnJNvuC8avfXswn3jbpf
-	Kh1Mmv8w7sT5c60S9cud/detuCTrvKek1PTopHSh8xKTvmvaPoia/trXf5LfjG0OHs9EQg0m
-	uiV2udyX82/UW7B2dcg+nhcPC+QdTd6fmsjKbjDhduLFP5H7z2clvV7q/uvPZO1pF+dcOKp5
-	UXu3X7Hbz0ezbHV327+LOqHEUpyRaKjFXFScCABw252y+AIAAA==
-X-CMS-MailID: 20250506122649epcas5p1294652bcfc93f08dd12e6ba8a497c55b
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGLMWRmVeSWpSXmKPExsWy7bCSvC4vg1SGwbUeLos5q7YxWqy+289m
+	sWfRJCaLlauPMlm8az3HYnH0/1s2i0mHrjFa7L2lbbFn70kWi/nLnrJbbPs9n9mB22PnrLvs
+	HpfPlnpsWtXJ5rF5Sb3H7psNbB59W1Yxemw+Xe3xeZNcAEcUl01Kak5mWWqRvl0CV8ae5iNM
+	Ba9FK7qeXWNpYPwq2MXIySEhYCJxfsN6ti5GLg4hgd2MEssPf2eESIhLNF/7wQ5hC0us/Pec
+	HaLoI6PE+UUNQA4HB5uApsSFyaUgNSICARIvFz9mBqlhFvjAKLFn4mywQcICPhIzZ+5jBbFZ
+	BFQl7kycCmbzClhIzL77igligbzEzEvfwZZxAsWX75kF1iskYC7x4ugRdoh6QYmTM5+wgNjM
+	QPXNW2czT2AUmIUkNQtJagEj0ypGydSC4tz03GLDAqO81HK94sTc4tK8dL3k/NxNjOCo0NLa
+	wbhn1Qe9Q4xMHIyHGCU4mJVEeO/fl8wQ4k1JrKxKLcqPLyrNSS0+xCjNwaIkzvvtdW+KkEB6
+	YklqdmpqQWoRTJaJg1OqgUlBTeBT2h7hgHXmVbrvY9/1/g2WN5hVzxe45NFBuYpp0ue3Pr6a
+	o1T4LK3+mr6MD6NI2/OH9d1FVs5nJWWll5st7fu2Wui+1ooFqmbTbvbVR/rUPdkRvzvA51Pf
+	r99rGRiUDBkWaC/fvctqh5qB8jLhKaY52Y+fNPyokl97YM30xqtne7LOLjN/a9OkYPTEwWCl
+	g55x3M3She38gQ8SheqO8tqx/V1etGRa4ZpQ/zfXN3yWTL3Yc2GlX21k88STMqm/mmbP8FmQ
+	Wipff+M1y6c9OYbc/Yv3qeVkBFW1qBs+NZnYqvHE/tnSvyGZrJPWPbF4V8V9Lnfp6i79hJ35
+	ua0+UUEx7pd8PgTozOc5pMRSnJFoqMVcVJwIAMo9x6P5AgAA
+X-CMS-MailID: 20250506122653epcas5p1824d4af64d0b599fde2de831d8ebf732
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 cpgsPolicy: CPGSC10-542,Y
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250506122649epcas5p1294652bcfc93f08dd12e6ba8a497c55b
+X-CMS-RootMailID: 20250506122653epcas5p1824d4af64d0b599fde2de831d8ebf732
 References: <20250506121732.8211-1-joshi.k@samsung.com>
-	<CGME20250506122649epcas5p1294652bcfc93f08dd12e6ba8a497c55b@epcas5p1.samsung.com>
+	<CGME20250506122653epcas5p1824d4af64d0b599fde2de831d8ebf732@epcas5p1.samsung.com>
 
-From: Christoph Hellwig <hch@lst.de>
+From: Keith Busch <kbusch@kernel.org>
 
-Add the config feature result, config log page, and management receive
-commands needed for FDP.
-
-Partially based on a patch from Kanchan Joshi <joshi.k@samsung.com>.
+Maps a user requested write stream to an FDP placement ID if possible.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- include/linux/nvme.h | 77 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
+ drivers/nvme/host/core.c | 31 ++++++++++++++++++++++++++++++-
+ drivers/nvme/host/nvme.h |  1 +
+ 2 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 2479ed10f53e..51308f65b72f 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -303,6 +303,7 @@ enum nvme_ctrl_attr {
- 	NVME_CTRL_ATTR_TBKAS		= (1 << 6),
- 	NVME_CTRL_ATTR_ELBAS		= (1 << 15),
- 	NVME_CTRL_ATTR_RHII		= (1 << 18),
-+	NVME_CTRL_ATTR_FDPS		= (1 << 19),
- };
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f25e03ff03df..52331a14bce1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -672,6 +672,7 @@ static void nvme_free_ns_head(struct kref *ref)
+ 	ida_free(&head->subsys->ns_ida, head->instance);
+ 	cleanup_srcu_struct(&head->srcu);
+ 	nvme_put_subsystem(head->subsys);
++	kfree(head->plids);
+ 	kfree(head);
+ }
  
- struct nvme_id_ctrl {
-@@ -689,6 +690,44 @@ struct nvme_rotational_media_log {
- 	__u8	rsvd24[488];
- };
+@@ -995,6 +996,18 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+ 	if (req->cmd_flags & REQ_RAHEAD)
+ 		dsmgmt |= NVME_RW_DSM_FREQ_PREFETCH;
  
-+struct nvme_fdp_config {
-+	__u8			flags;
-+#define FDPCFG_FDPE	(1U << 0)
-+	__u8			fdpcidx;
-+	__le16			reserved;
-+};
++	if (op == nvme_cmd_write && ns->head->nr_plids) {
++		u16 write_stream = req->bio->bi_write_stream;
 +
-+struct nvme_fdp_ruh_desc {
-+	__u8			ruht;
-+	__u8			reserved[3];
-+};
++		if (WARN_ON_ONCE(write_stream > ns->head->nr_plids))
++			return BLK_STS_INVAL;
 +
-+struct nvme_fdp_config_desc {
-+	__le16			dsze;
-+	__u8			fdpa;
-+	__u8			vss;
-+	__le32			nrg;
-+	__le16			nruh;
-+	__le16			maxpids;
-+	__le32			nns;
-+	__le64			runs;
-+	__le32			erutl;
-+	__u8			rsvd28[36];
-+	struct nvme_fdp_ruh_desc ruhs[];
-+};
++		if (write_stream) {
++			dsmgmt |= ns->head->plids[write_stream - 1] << 16;
++			control |= NVME_RW_DTYPE_DPLCMT;
++		}
++	}
 +
-+struct nvme_fdp_config_log {
-+	__le16			numfdpc;
-+	__u8			ver;
-+	__u8			rsvd3;
-+	__le32			sze;
-+	__u8			rsvd8[8];
-+	/*
-+	 * This is followed by variable number of nvme_fdp_config_desc
-+	 * structures, but sparse doesn't like nested variable sized arrays.
-+	 */
-+};
-+
- struct nvme_smart_log {
- 	__u8			critical_warning;
- 	__u8			temperature[2];
-@@ -915,6 +954,7 @@ enum nvme_opcode {
- 	nvme_cmd_resv_register	= 0x0d,
- 	nvme_cmd_resv_report	= 0x0e,
- 	nvme_cmd_resv_acquire	= 0x11,
-+	nvme_cmd_io_mgmt_recv	= 0x12,
- 	nvme_cmd_resv_release	= 0x15,
- 	nvme_cmd_zone_mgmt_send	= 0x79,
- 	nvme_cmd_zone_mgmt_recv	= 0x7a,
-@@ -936,6 +976,7 @@ enum nvme_opcode {
- 		nvme_opcode_name(nvme_cmd_resv_register),	\
- 		nvme_opcode_name(nvme_cmd_resv_report),		\
- 		nvme_opcode_name(nvme_cmd_resv_acquire),	\
-+		nvme_opcode_name(nvme_cmd_io_mgmt_recv),	\
- 		nvme_opcode_name(nvme_cmd_resv_release),	\
- 		nvme_opcode_name(nvme_cmd_zone_mgmt_send),	\
- 		nvme_opcode_name(nvme_cmd_zone_mgmt_recv),	\
-@@ -1087,6 +1128,7 @@ enum {
- 	NVME_RW_PRINFO_PRCHK_GUARD	= 1 << 12,
- 	NVME_RW_PRINFO_PRACT		= 1 << 13,
- 	NVME_RW_DTYPE_STREAMS		= 1 << 4,
-+	NVME_RW_DTYPE_DPLCMT		= 2 << 4,
- 	NVME_WZ_DEAC			= 1 << 9,
- };
+ 	if (req->cmd_flags & REQ_ATOMIC && !nvme_valid_atomic_write(req))
+ 		return BLK_STS_INVAL;
  
-@@ -1174,6 +1216,38 @@ struct nvme_zone_mgmt_recv_cmd {
- 	__le32			cdw14[2];
- };
+@@ -2240,7 +2253,7 @@ static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *info)
+ 	struct nvme_fdp_config fdp;
+ 	struct nvme_command c = {};
+ 	size_t size;
+-	int ret;
++	int i, ret;
  
-+struct nvme_io_mgmt_recv_cmd {
-+	__u8			opcode;
-+	__u8			flags;
-+	__u16			command_id;
-+	__le32			nsid;
-+	__le64			rsvd2[2];
-+	union nvme_data_ptr	dptr;
-+	__u8			mo;
-+	__u8			rsvd11;
-+	__u16			mos;
-+	__le32			numd;
-+	__le32			cdw12[4];
-+};
-+
-+enum {
-+	NVME_IO_MGMT_RECV_MO_RUHS	= 1,
-+};
-+
-+struct nvme_fdp_ruh_status_desc {
-+	__le16			pid;
-+	__le16			ruhid;
-+	__le32			earutr;
-+	__le64			ruamw;
-+	__u8			reserved[16];
-+};
-+
-+struct nvme_fdp_ruh_status {
-+	__u8			rsvd0[14];
-+	__le16			nruhsd;
-+	struct nvme_fdp_ruh_status_desc ruhsd[];
-+};
-+
- enum {
- 	NVME_ZRA_ZONE_REPORT		= 0,
- 	NVME_ZRASF_ZONE_REPORT_ALL	= 0,
-@@ -1309,6 +1383,7 @@ enum {
- 	NVME_FEAT_PLM_WINDOW	= 0x14,
- 	NVME_FEAT_HOST_BEHAVIOR	= 0x16,
- 	NVME_FEAT_SANITIZE	= 0x17,
-+	NVME_FEAT_FDP		= 0x1d,
- 	NVME_FEAT_SW_PROGRESS	= 0x80,
- 	NVME_FEAT_HOST_ID	= 0x81,
- 	NVME_FEAT_RESV_MASK	= 0x82,
-@@ -1329,6 +1404,7 @@ enum {
- 	NVME_LOG_ANA		= 0x0c,
- 	NVME_LOG_FEATURES	= 0x12,
- 	NVME_LOG_RMI		= 0x16,
-+	NVME_LOG_FDP_CONFIGS	= 0x20,
- 	NVME_LOG_DISC		= 0x70,
- 	NVME_LOG_RESERVATION	= 0x80,
- 	NVME_FWACT_REPL		= (0 << 3),
-@@ -1923,6 +1999,7 @@ struct nvme_command {
- 		struct nvmf_auth_receive_command auth_receive;
- 		struct nvme_dbbuf dbbuf;
- 		struct nvme_directive_cmd directive;
-+		struct nvme_io_mgmt_recv_cmd imr;
- 	};
- };
+ 	/*
+ 	 * The FDP configuration is static for the lifetime of the namespace,
+@@ -2280,6 +2293,22 @@ static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *info)
+ 	}
  
+ 	head->nr_plids = le16_to_cpu(ruhs->nruhsd);
++	if (!head->nr_plids)
++		goto free;
++
++	head->plids = kcalloc(head->nr_plids, sizeof(head->plids),
++			      GFP_KERNEL);
++	if (!head->plids) {
++		dev_warn(ctrl->device,
++			 "failed to allocate %u FDP placement IDs\n",
++			 head->nr_plids);
++		head->nr_plids = 0;
++		ret = -ENOMEM;
++		goto free;
++	}
++
++	for (i = 0; i < head->nr_plids; i++)
++		head->plids[i] = le16_to_cpu(ruhs->ruhsd[i].pid);
+ free:
+ 	kfree(ruhs);
+ 	return ret;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 3e14daa4ed3e..7aad581271c7 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -498,6 +498,7 @@ struct nvme_ns_head {
+ 	struct gendisk		*disk;
+ 
+ 	u16			nr_plids;
++	u16			*plids;
+ #ifdef CONFIG_NVME_MULTIPATH
+ 	struct bio_list		requeue_list;
+ 	spinlock_t		requeue_lock;
 -- 
 2.25.1
 
