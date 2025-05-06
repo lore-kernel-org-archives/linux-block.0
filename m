@@ -1,27 +1,27 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE04C72620;
-	Tue,  6 May 2025 06:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA9A7261D;
+	Tue,  6 May 2025 06:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746512776; cv=none; b=VwTNPEz33RhjQHHi9DlP1NG9eA7XUNVLfKLXxDs3fLOOgNd4iEFRj7algOSxDt6fUOu9YBpcFkXXMXJnrf2Mff+68QDBGBNE69oHFWyuOJjJMF8tSSNypSX8tnGabGll9k4e/adnh9LCaP9t3QfWFIT8NOKhr1eqRu/CpZzOw60=
+	t=1746512776; cv=none; b=HbXfF6qwoHaUuK9ybijFAIMYU9OXxmXC00u2UWyWL3xys3yyLwqyWsqWf1IBar7NbwX5765j1BpD7Q+GgIYtaLcanoZcM17pElDVDWe84Kn1Ci/A0Xv0C4clcXc9Qjt3j9TO7aVPqXxGjBH93ZCJ4C/7fC4Ons25AFljTA0ruzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746512776; c=relaxed/simple;
-	bh=0j/acZtSYPFi2KyRkFRQqfl6iD1su31uZ5KJ3CDk2iA=;
+	bh=i+4CpUcjYi2IJC4QF70+5uiAh/GJf2E+2qi1DVoBrHI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pptxWop3Dw/U+i6RxyMGOY5YszPrfy2E5jiRLR7q8tmVGRj3X19heqkBv9hPjePog1FuP9yrVmiCedbzUWoYj7VO3qRH9IGfFmbPaDERp836/yGGegZBxMOFmEXTdSF0oFlKjLmXD6Si2bx6a7+UsAfPuDok5ysRv2jqDm4SUMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=hZXy5cfDnqpVBastr4/Xdp/ZAmxHChCDmw6TXG6vSxHd0QrRFE8Qy+XEOYSe7zoT0h4VZ1HPVIhp/5pvS/2gaeAbnGg8RLVx37dgSaL022rrFUANMe37rLXuyNw4AlY3aXywdYAQ+URpAfRMZGT23BdIuzYtAvd2Rb8VLz+AbVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4Zs7h35Z4FzKHMWT;
-	Tue,  6 May 2025 14:26:11 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zs7gY0Gqfz4f3lDF;
+	Tue,  6 May 2025 14:25:45 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 8FA0D1A1AF7;
-	Tue,  6 May 2025 14:26:10 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 021621A07BB;
+	Tue,  6 May 2025 14:26:11 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDXOl9+qxlox3JULg--.34792S5;
+	by APP4 (Coremail) with SMTP id gCh0CgDXOl9+qxlox3JULg--.34792S6;
 	Tue, 06 May 2025 14:26:10 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH v3 for-6.16/block 1/3] brd: protect page with rcu
-Date: Tue,  6 May 2025 14:17:54 +0800
-Message-Id: <20250506061756.2970934-2-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 for-6.16/block 2/3] brd: fix aligned_sector from brd_do_discard()
+Date: Tue,  6 May 2025 14:17:55 +0800
+Message-Id: <20250506061756.2970934-3-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506061756.2970934-1-yukuai1@huaweicloud.com>
 References: <20250506061756.2970934-1-yukuai1@huaweicloud.com>
@@ -47,107 +47,50 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXOl9+qxlox3JULg--.34792S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr4xtF4fGr43ury5uryrtFb_yoW8KFWkpF
-	47XFyIyrW5AF4akw17Xwn8AryrJ3s7Kay8KayxW3yYkw4fGr1qya4kAa4Sq345GrykCFZx
-	ArsYya4rZr1kZwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUQv14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-	x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF54CYxVCY1x0262kKe7AK
-	xVWUtVW8ZwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
-	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
-	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
-	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUqkskUUUUU=
+X-CM-TRANSID:gCh0CgDXOl9+qxlox3JULg--.34792S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr4fXFW7ur45Ar1fXF1kKrg_yoWfGwc_C3
+	WYvF4xXr95Jr1jkr1Yya4fZrZIv3WjvrZ5uF1Sqr93XFW8X3ZrZ34qvrZ8ZryUWFW5Aa4a
+	y3ZrXr47Xw42gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbQxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
+	0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+	wVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+	vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+	v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14v2
+	6r1q6r43MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUj5Ef7UUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Currently, after fetching the page by xa_load() in IO path, there is no
-protection and page can be freed concurrently by discard:
-
-cpu0
-brd_submit_bio
- brd_do_bvec
-  page = brd_lookup_page
-                          cpu1
-                          brd_submit_bio
-                           brd_do_discard
-                            page = __xa_erase()
-                            __free_page()
-  // page UAF
-
-Fix the problem by protecting page with rcu.
-
-Meanwhile, if page is already freed, also prevent BUG_ON() by skipping
-the write, and user will get zero data later if there is no page.
+The calculation is just wrong, fix it by round_up().
 
 Fixes: 9ead7efc6f3f ("brd: implement discard support")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/brd.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ drivers/block/brd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index fa1290992a7f..fc793d48a9c6 100644
+index fc793d48a9c6..2753fb21410b 100644
 --- a/drivers/block/brd.c
 +++ b/drivers/block/brd.c
-@@ -132,12 +132,18 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 		}
- 	}
+@@ -166,7 +166,7 @@ static void brd_free_one_page(struct rcu_head *head)
  
-+	rcu_read_lock();
- 	page = brd_lookup_page(brd, sector);
- 
- 	kaddr = bvec_kmap_local(&bv);
- 	if (op_is_write(opf)) {
--		BUG_ON(!page);
--		memcpy_to_page(page, offset, kaddr, bv.bv_len);
-+		/*
-+		 * Page can be removed by concurrent discard, it's fine to skip
-+		 * the write and user will read zero data if page does not
-+		 * exist.
-+		 */
-+		if (page)
-+			memcpy_to_page(page, offset, kaddr, bv.bv_len);
- 	} else {
- 		if (page)
- 			memcpy_from_page(kaddr, page, offset, bv.bv_len);
-@@ -145,11 +151,19 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
- 			memset(kaddr, 0, bv.bv_len);
- 	}
- 	kunmap_local(kaddr);
-+	rcu_read_unlock();
- 
- 	bio_advance_iter_single(bio, &bio->bi_iter, bv.bv_len);
- 	return true;
- }
- 
-+static void brd_free_one_page(struct rcu_head *head)
-+{
-+	struct page *page = container_of(head, struct page, rcu_head);
-+
-+	__free_page(page);
-+}
-+
  static void brd_do_discard(struct brd_device *brd, sector_t sector, u32 size)
  {
- 	sector_t aligned_sector = (sector + PAGE_SECTORS) & ~PAGE_SECTORS;
-@@ -160,7 +174,7 @@ static void brd_do_discard(struct brd_device *brd, sector_t sector, u32 size)
- 	while (size >= PAGE_SIZE && aligned_sector < rd_size * 2) {
- 		page = __xa_erase(&brd->brd_pages, aligned_sector >> PAGE_SECTORS_SHIFT);
- 		if (page) {
--			__free_page(page);
-+			call_rcu(&page->rcu_head, brd_free_one_page);
- 			brd->brd_nr_pages--;
- 		}
- 		aligned_sector += PAGE_SECTORS;
+-	sector_t aligned_sector = (sector + PAGE_SECTORS) & ~PAGE_SECTORS;
++	sector_t aligned_sector = round_up(sector, PAGE_SECTORS);
+ 	struct page *page;
+ 
+ 	size -= (aligned_sector - sector) * SECTOR_SIZE;
 -- 
 2.39.2
 
