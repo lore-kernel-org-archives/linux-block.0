@@ -1,74 +1,92 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D39227781D
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 01:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9934D221297
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 02:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746494183; cv=none; b=AafpsJs6gGRKa/h14yfQ17cuxNXQSp/5HpCC0rbx2SkSh4a9Ni1zalY4QSaWIZp8Xtg8qEe8ntMnxMAFr2rZYiinP/fxPeHMbVHUS5tiqbfQRAcgUTI+guDwm+NQuu04QcRDAZmxkJyKotXEpjFmKh8lUu/ILNddwP/Li4OcpCE=
+	t=1746497629; cv=none; b=sq05y2p775KjYm0H7NAcNyhKZqoDP+D+/4vuq6TXeuss1ywHAEu/UJ1Jt+kNC2lgxSrZ7vJ9YEEV3h1PAwwD9z068vXZwwJ7fu9swlp7uV5/MIWtBWH9ovTZ/J7SAs7pgDnQ62FMvCj15wLA9sxLGhfWZFjXrS5siuoRSSwGw/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746494183; c=relaxed/simple;
-	bh=qiTe14huLmlHiwl3FHYgs486rdlT3RT5flZF+uDmyng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jZB9dvEwb9Pp1L5A27w/IC4/mixA0YKk4bHPilOp/B1VTeC8xdOhIQUHSbyEngroEG3M6QDr4TJDCq5XbPU0nBcGQd1Yqx1tUCNEaf7es/+SyhMNeyRHDIvimGlY/uVYBKFqefA1aVzexgvlQljSpNkX9a1o0Vje6UYsOPlwFDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4Zs0pX2PDnzKHMpS
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 09:16:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 24DCF1A06E2
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 09:16:19 +0800 (CST)
-Received: from [10.174.176.88] (unknown [10.174.176.88])
-	by APP4 (Coremail) with SMTP id gCh0CgD3W2DiYhlosfg+Lg--.29341S3;
-	Tue, 06 May 2025 09:16:19 +0800 (CST)
-Message-ID: <8d87eb9d-bb04-4d9c-8c96-809032130d87@huaweicloud.com>
-Date: Tue, 6 May 2025 09:16:18 +0800
+	s=arc-20240116; t=1746497629; c=relaxed/simple;
+	bh=pGHuY53mTIBAsi0F04ITJ3ONgN0kSqoNs7XhlwNe12A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=peIP49Rio4MKO/k+S+obV+e/YDmPvVlszjrDi1e5f+xkEHQ6TLN8BA8spJdfriWGhxMMcmkjsej+J+54gCzC46qYSpCLNhjZuuyudxbcjcRt2WgI5QGMTFOPBuEo0FdMMz9p2t9vBF6COiMCiwI/y7UdEZ9ms5ZWRaod3zBjHn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WldYqO2x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WldYqO2x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746497626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eVL8gs3Yhq/srlGDSTgjUKW/IXRRnfqHKmU0Evzgiyo=;
+	b=WldYqO2xwGEjvmnRQU1FMD4f/3kSGTEFHeN9S8owg0kv+VjmX0WXiZrzMWXUUh5iXeyRVV
+	UMHOrzP8MP7DWQNjErdmXQ261wFUDXu22Fg+imcDpKdJcRtsrBtMwBIq5Em7YbE6Cg9Z/G
+	q7pra/MDbZ++OBIs944g42StGvl66zE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-JiHRFEOyMwWsqglsWnNmGQ-1; Mon,
+ 05 May 2025 22:13:43 -0400
+X-MC-Unique: JiHRFEOyMwWsqglsWnNmGQ-1
+X-Mimecast-MFC-AGG-ID: JiHRFEOyMwWsqglsWnNmGQ_1746497622
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3D78B1800983;
+	Tue,  6 May 2025 02:13:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.13])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9038C30001AB;
+	Tue,  6 May 2025 02:13:39 +0000 (UTC)
+Date: Tue, 6 May 2025 10:13:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jared Holzman <jholzman@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: Port to 6.14-stable - ublk: fix race between
+ io_uring_cmd_complete_in_task and ublk_cancel_cmd
+Message-ID: <aBlwTtmeZErD4gnH@fedora>
+References: <9a10100c-9d76-4522-9f6c-d0a6ad32ca81@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 0/7] blk-throttle: Split the blkthrotl queue to solve
- the IO delay issue
-To: Jens Axboe <axboe@kernel.dk>, Zizhi Wo <wozizhi@huawei.com>,
- linux-block@vger.kernel.org
-Cc: yangerkun@huawei.com, yukuai3@huawei.com, ming.lei@redhat.com,
- tj@kernel.org
-References: <20250423022301.3354136-1-wozizhi@huaweicloud.com>
- <7df3b05d-0e44-43b5-9d79-687e6297136c@huawei.com>
- <0f5ae9f4-05fd-48d1-924a-66ae159389bd@kernel.dk>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <0f5ae9f4-05fd-48d1-924a-66ae159389bd@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3W2DiYhlosfg+Lg--.29341S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYb7kC6x804xWl14x267AKxVW8JVW5JwAF
-	c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-	0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-	wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-	x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-	64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r
-	1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCF04k20xvY0x0EwIxGrwCF
-	54CYxVCY1x0262kKe7AKxVWUAVWUtwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UQzV
-	bUUUUU=
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a10100c-9d76-4522-9f6c-d0a6ad32ca81@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-
-
-在 2025/5/6 9:09, Jens Axboe 写道:
-> On 5/5/25 7:04 PM, Zizhi Wo wrote:
->> friendly ping
+On Mon, May 05, 2025 at 07:06:37PM +0300, Jared Holzman wrote:
+> Hi Ming,
 > 
-> It's not applying to the current 6.16 tree, please resend it.
+> I'm attempting to back port the fix for this issue to the 6.14-stable branch.
 > 
-OK, I will quickly resend a new version.
+> Greg Kroah-Hartman has already applied d6aa0c178bf8 - "ublk: call ublk_dispatch_req() for handling UBLK_U_IO_NEED_GET_DATA",
+> but was unable to apply f40139fde527 cleanly.
+> 
+> I created the patch below. It applies and compiles, but when I rerun the scenario I get several hung tasks waiting on the ub->mutex
+> which is being held by the following task:
+
+Hi Jared,
+
+You need to pull in the following patchset too:
+
+https://lore.kernel.org/linux-block/20250416035444.99569-1-ming.lei@redhat.com/
+
+which avoids ub->mutex in error handling code path.
+
+I just picked them in the following tree:
+
+https://github.com/ming1/linux/commits/linux-6.14.y/
+
+Please test and see if they work for you.
+
+
+Thanks,
+Ming
 
