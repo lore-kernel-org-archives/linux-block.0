@@ -1,72 +1,86 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F14121882F;
-	Tue,  6 May 2025 05:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE00872610;
+	Tue,  6 May 2025 06:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746510456; cv=none; b=Z1zDHjii0JmnBznguzHo2Smmn9eXloAH09o8p4qPZPg1S8rTK1Ro98aMw1+1st2s+6K94UxtE+SdAk/hzaFxDigrJ0ku2UoaZ9BgrWDYrKubXUb+DmGQ0GdV8C+i8s4OxuW3ajMyZStNhhRwiCHgAobLfnoyNhb/eJGDn9upUhw=
+	t=1746512775; cv=none; b=KJSmp1GTeUqAUT0/lauH8NM+jQmTbC6JwrWRJhW4IT3pZ9f8HIwQatOgb8CDn9WLjC713Tlehjdt2/tETEH3MNaUxORv4YkrAyS4Z8Nud2Sv/N/15fxk7DaYjOPE7jwi5ribyzjEslkIf7UiwYd0RbF/uKIn8ghVBJzmUZZ7mSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746510456; c=relaxed/simple;
-	bh=Kja15JnQcWh9hBhq9PpQeyg/ixVWzLRhidOCQ9f/PCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKsLX+kWHgvD0+wQtzuxEAj3OGhrYyZHOKZj3S5HBVxjHjDUyHu9D/eMX6yQ81hUbpfB93EdrlwQctHKHvVUgltAwratS6Rq1eH6NdAnBnc5nm3IkIvCs1n9QUG1LYr/O4gCe2kkszqrJOFteoC7dTEtkAJ8ZrgW2VXBpRXzgTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 16BA567373; Tue,  6 May 2025 07:47:23 +0200 (CEST)
-Date: Tue, 6 May 2025 07:47:22 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@huaweicloud.com>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tytso@mit.edu, john.g.garry@oracle.com, bmarzins@redhat.com,
-	chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
-	brauner@kernel.org, yi.zhang@huawei.com, chengzhihao1@huawei.com,
-	yukuai3@huawei.com, yangerkun@huawei.com
-Subject: Re: [RFC PATCH v4 07/11] fs: statx add write zeroes unmap attribute
-Message-ID: <20250506054722.GA28781@lst.de>
-References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com> <20250421021509.2366003-8-yi.zhang@huaweicloud.com> <20250505132208.GA22182@lst.de> <20250505142945.GJ1035866@frogsfrogsfrogs> <20250506050239.GA27687@lst.de> <20250506053654.GA25700@frogsfrogsfrogs>
+	s=arc-20240116; t=1746512775; c=relaxed/simple;
+	bh=+rLW/GojQM9QaDMJX5J3wxVEX9HCHp6XobkrV/YVbic=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ASGnIYwWjmCYQpQQP897m3zDnLQmmSDSuzJyXZQCsu58y1q0ZxN+mkKCi1zYcpEvHwNL4apoN4RJzgsMYDzDhNQ9/RAcZgt9W8+366JUtA7zy0TocgNOa/Sa05pXWFl+yWRjyXzSMmlvsTrTktx+up/aXOPh2C9qJ5o1ofTeasE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Zs7gY5BJWz4f3jHv;
+	Tue,  6 May 2025 14:25:45 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 2E8421A0359;
+	Tue,  6 May 2025 14:26:10 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgDXOl9+qxlox3JULg--.34792S4;
+	Tue, 06 May 2025 14:26:07 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: hch@lst.de,
+	axboe@kernel.dk,
+	kbusch@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v3 for-6.16/block 0/3] brd: discard bugfix
+Date: Tue,  6 May 2025 14:17:53 +0800
+Message-Id: <20250506061756.2970934-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250506053654.GA25700@frogsfrogsfrogs>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-CM-TRANSID:gCh0CgDXOl9+qxlox3JULg--.34792S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYP7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+	M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14
+	v26r1q6r43MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
+	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42
+	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY
+	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, May 05, 2025 at 10:36:54PM -0700, Darrick J. Wong wrote:
-> I think STATX_* (i.e. not STATX_ATTR_*) flags have two purposes: 1) to
-> declare that specific fields in struct statx actually have meaning, most
-> notably in scenarios where zeroes are valid field contents; and 2) if
-> filling out the field is expensive, userspace can elect not to have it
-> filled by leaving the bit unset.  I don't know how userspace is supposed
-> to figure out which fields are expensive.
+From: Yu Kuai <yukuai3@huawei.com>
 
-Yes.
+changes in v3:
+ - rebase on the top of for-6.16/block
+ - add comments in patch 1 about NULL page.
 
-> (I'm confused about the whole premise of /this/ patch -- it's a "fast
-> zeroing" fallocate flag that causes the *device* to unmap, so that the
-> filesystem can preallocate and avoid unwritten extent conversions?
+changes in v2:
+ - rebase on the top of the other patchset:
+ https://lore.kernel.org/all/20250421072641.1311040-1-hch@lst.de/
+ - merge top 2 patches from v1 into one patch;
+ - add reviewed-by for patch 2,3
 
-Yes.
+Yu Kuai (3):
+  brd: protect page with rcu
+  brd: fix aligned_sector from brd_do_discard()
+  brd: fix discard end sector
 
-> What happens if the block device is thinp and it runs out of space?
-> That seems antithetical to fallocate...)
+ drivers/block/brd.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-While the origin posix_fallocate was about space preallocatіon, these
-days fallocate seems to be more about extent layout and/or fast
-zeroing.
+-- 
+2.39.2
 
-I'm not a huge fan of either this or the hardware atomics as they
-force a FTL layer world view which is quite ingrained but also
-rather stupid, but some folks really want to go down there full
-throttle, so..
