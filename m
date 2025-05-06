@@ -1,66 +1,49 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F27264620
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9ED8F5E;
+	Tue,  6 May 2025 12:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746534860; cv=none; b=JjHLFeHCaMOGHP40X/PydISb84PYL9EwLDCRXxGF0BOcoriAAH8bAgWn8EA06QI+xxj8/dkAu7UZ04NRa75rRnQVp+2ZSfNzGcNLDh7JF1kSpP/vITrzCBZdD60Q+18BJ4CZO7heeJ+clCoNQwkltV5SlN5OQ8k8P6P6O5IQP9E=
+	t=1746536117; cv=none; b=Frtozp5nHFaYW+kv/bhO9fcpg6KTUDP76EKpKmrpxobjx+0tqRklUhhVSCDebrmMvDVwHZ6L+S3Y2MWbsXMl8MqcELvV3gz8KaXa/Mp8VtVB5AH4Qv+ZYApvJ4B4xTfsqLYr/M9bvQhppb88Y5mDir+xSyDGnT6jIkYD4JUjeps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746534860; c=relaxed/simple;
-	bh=ABoNIgz/xgY495NHkDYsEf6ooXrqrPeOIrxvg8twSO0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=U/neYifMX9wIZe8lj5xM9tgFTW1xnKm1rEgCKXpLvWLVPjOKySDgSPKpYUs1QaFXnBj6sQ7kfuK8NhmYV66lUI2+xrskZNHj2WtzQ4H0PKU1li0EQD7pc/JtGcbML0NqQ3DcLe9DQ3JjuwdI1m2mA/IgotDEwbsHM38mx0aChoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=dHwExi6p; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dHwExi6p"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250506122642epoutp01ac160d2d56c205f980384b7ccce4c3e5~878kOdvCj2796927969epoutp014
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 12:26:42 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250506122642epoutp01ac160d2d56c205f980384b7ccce4c3e5~878kOdvCj2796927969epoutp014
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1746534402;
-	bh=8aC0iu4ntzgbduxwIsWFSVIL0mxp4STZHoEOULQX0RI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dHwExi6pr6dQMg27zg3uk7spIStYQ7EFVrDFG30UDg8IQ3CUxhltSixDggT6aXj+E
-	 25ON2uZ7Ky0/YxDFcJK9i1asw1t9YGCRpVl2Psag0C1nDhQGF2XDRfzK1kxOaEVhbh
-	 XgHplos/e9wAUdLUrTBlqhfPc3nySk/SYr05Hzu8=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20250506122641epcas5p35019744778d94ee4ce88bbde6da04ef6~878jidzAM0387503875epcas5p3M;
-	Tue,  6 May 2025 12:26:41 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4ZsHgz6Ytpz6B9m4; Tue,  6 May
-	2025 12:26:39 +0000 (GMT)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250506122638epcas5p364107da78e115a57f1fa91436265edeb~878g9s7uU1254712547epcas5p3E;
-	Tue,  6 May 2025 12:26:38 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250506122638epsmtrp101da3f6a9a86b6e08723a626b726585f~878g9A6w62555625556epsmtrp10;
-	Tue,  6 May 2025 12:26:38 +0000 (GMT)
-X-AuditID: b6c32a2a-d57fe70000002265-59-6819fffe1864
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B1.6E.08805.EFFF9186; Tue,  6 May 2025 21:26:38 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250506122637epsmtip2acc13ee0a12e95a5610fc0d10b7183c9~878fZJoHZ1679416794epsmtip2a;
-	Tue,  6 May 2025 12:26:37 +0000 (GMT)
-From: Kanchan Joshi <joshi.k@samsung.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, asml.silence@gmail.com
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org, Hannes
-	Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>, Kanchan
-	Joshi <joshi.k@samsung.com>
-Subject: [PATCH v16 03/11] block: introduce max_write_streams queue limit
-Date: Tue,  6 May 2025 17:47:24 +0530
-Message-Id: <20250506121732.8211-4-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250506121732.8211-1-joshi.k@samsung.com>
+	s=arc-20240116; t=1746536117; c=relaxed/simple;
+	bh=226HvrpzIggRv7+P11Xi1OD0yG8CL9+835GwM5RSIDM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CJcaI2cgWWv54HOd4wk0JlBqggsRSdofc7RPVn7SjKMRtjStdl8Ad0El32U8I4DputiQ3bLC01Uri5ScaEfBsqQWTE9T+VlEdPawfmB99a1tct+zv3DaJqVrDo9UiotTn8Se66ciCYMKDMl50GTbJfpENN2TrgfldDiFd/VuEGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4ZsJJw1gb3zKHMh6;
+	Tue,  6 May 2025 20:55:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 090771A0359;
+	Tue,  6 May 2025 20:55:11 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgDnSl+sBhpo8C9vLg--.36407S4;
+	Tue, 06 May 2025 20:55:10 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	song@kernel.org,
+	hch@lst.de,
+	john.g.garry@oracle.com,
+	hare@suse.de,
+	xni@redhat.com,
+	pmenzel@molgen.mpg.de
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v3 0/9] md: fix is_mddev_idle()
+Date: Tue,  6 May 2025 20:46:47 +0800
+Message-Id: <20250506124658.2537886-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,120 +51,61 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCLMWRmVeSWpSXmKPExsWy7bCSvO6//5IZBju+aVvMWbWN0WL13X42
-	iz2LJjFZrFx9lMniXes5Fouj/9+yWUw6dI3RYu8tbYs9e0+yWMxf9pTdYtvv+cwO3B47Z91l
-	97h8ttRj06pONo/NS+o9dt9sYPPo27KK0WPz6WqPz5vkAjiiuGxSUnMyy1KL9O0SuDJ+XPrH
-	XNAgU9HyqZOpgXGeRBcjJ4eEgInEhZ65rCC2kMBuRompz5Qg4uISzdd+sEPYwhIr/z0HsrmA
-	aj4ySuyd8ZSxi5GDg01AU+LC5FKQGhGBAImXix8zg9QwC3xglNgzcTYjSEJYwFNi+ZsNzCD1
-	LAKqEr1rqkDCvALmEuf/z2WDmC8vMfPSd7BdnAIWEsv3zGKEuMdc4sXRI+wQ9YISJ2c+YQGx
-	mYHqm7fOZp7AKDALSWoWktQCRqZVjJKpBcW56bnFhgVGeanlesWJucWleel6yfm5mxjBEaGl
-	tYNxz6oPeocYmTgYDzFKcDArifDevy+ZIcSbklhZlVqUH19UmpNafIhRmoNFSZz32+veFCGB
-	9MSS1OzU1ILUIpgsEwenVAMT04R7xtk/2/YvOJeVNMV1hq5wtET28qfXzzF/52gz/dbj2fRb
-	hv2il/Mlx+WXT6++yrNC8qawT/ID+0uMHCH/3mb8rm098epPmcvHqvY+kSPSBWurpB6lPtXb
-	eezWnuxUdb2bk0S1z9w+lXx5m1bu8/hi5VkzS16cZDqdlpFX1PREUXqi6WdFlycKq6M5JR75
-	X3+mX7CmtrC2rMIm/n8s867Lr/h/R4rP2lxW2tozUYavXuLJ1paiZ4ISsr+6/z2MPjzBOMv+
-	QeBBTvMpPbGhN2qsSoUFnjDK+ou1FfekfFF7O+98w6OvhVkPAo/NPJ10LtPLSyL0kMXuqqUv
-	Ti7Y1JHx8sDz1BWPXrDpulQosRRnJBpqMRcVJwIAIR4M4vcCAAA=
-X-CMS-MailID: 20250506122638epcas5p364107da78e115a57f1fa91436265edeb
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250506122638epcas5p364107da78e115a57f1fa91436265edeb
-References: <20250506121732.8211-1-joshi.k@samsung.com>
-	<CGME20250506122638epcas5p364107da78e115a57f1fa91436265edeb@epcas5p3.samsung.com>
+X-CM-TRANSID:gCh0CgDnSl+sBhpo8C9vLg--.36407S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr18Ww1xAFyUJFyDKryUWrg_yoWDKwc_uF
+	WkZFyaqF4xXF13AF90kF13ZrW0krW8X3s8XFySqrZ5Zr93Xr98K398K39Yq398WFW3u3ZY
+	yr18ur48Ar1IqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3AFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
+	nIWIevJa73UjIFyTuYvjTRNJ5oDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Keith Busch <kbusch@kernel.org>
+From: Yu Kuai <yukuai3@huawei.com>
 
-Drivers with hardware that support write streams need a way to export how
-many are available so applications can generically query this.
+Changes in v3:
+ - add review tag for patch 1-5;
+ - fix some typo and words;
+Changes in v2:
+ - add patch 1-5;
+ - add reviewed-by in patch 6,7,9;
+ - rename mddev->last_events to mddev->normal_IO_events in patch 8;
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-[hch: renamed hints to streams, removed stacking]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- Documentation/ABI/stable/sysfs-block | 7 +++++++
- block/blk-sysfs.c                    | 3 +++
- include/linux/blkdev.h               | 9 +++++++++
- 3 files changed, 19 insertions(+)
+Yu Kuai (9):
+  blk-mq: remove blk_mq_in_flight()
+  block: reuse part_in_flight_rw for part_in_flight
+  block: WARN if bdev inflight counter is negative
+  block: clean up blk_mq_in_flight_rw()
+  block: export API to get the number of bdev inflight IO
+  md: record dm-raid gendisk in mddev
+  md: add a new api sync_io_depth
+  md: fix is_mddev_idle()
+  md: clean up accounting for issued sync IO
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 11545c9e2e93..8bbe1eca28df 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -547,6 +547,13 @@ Description:
- 		[RO] Maximum size in bytes of a single element in a DMA
- 		scatter/gather list.
- 
-+What:		/sys/block/<disk>/queue/max_write_streams
-+Date:		November 2024
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RO] Maximum number of write streams supported, 0 if not
-+		supported. If supported, valid values are 1 through
-+		max_write_streams, inclusive.
- 
- What:		/sys/block/<disk>/queue/max_segments
- Date:		March 2010
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 1f9b45b0b9ee..986cdba4f550 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -134,6 +134,7 @@ QUEUE_SYSFS_LIMIT_SHOW(max_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_discard_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_integrity_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_segment_size)
-+QUEUE_SYSFS_LIMIT_SHOW(max_write_streams)
- QUEUE_SYSFS_LIMIT_SHOW(logical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(physical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(chunk_sectors)
-@@ -488,6 +489,7 @@ QUEUE_LIM_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
- QUEUE_LIM_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_LIM_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_LIM_RO_ENTRY(queue_max_segment_size, "max_segment_size");
-+QUEUE_LIM_RO_ENTRY(queue_max_write_streams, "max_write_streams");
- QUEUE_RW_ENTRY(elv_iosched, "scheduler");
- 
- QUEUE_LIM_RO_ENTRY(queue_logical_block_size, "logical_block_size");
-@@ -642,6 +644,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_max_discard_segments_entry.attr,
- 	&queue_max_integrity_segments_entry.attr,
- 	&queue_max_segment_size_entry.attr,
-+	&queue_max_write_streams_entry.attr,
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a9bd945e87b9..3747fbbd65fa 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -402,6 +402,8 @@ struct queue_limits {
- 	unsigned short		max_integrity_segments;
- 	unsigned short		max_discard_segments;
- 
-+	unsigned short		max_write_streams;
-+
- 	unsigned int		max_open_zones;
- 	unsigned int		max_active_zones;
- 
-@@ -1285,6 +1287,13 @@ static inline unsigned int bdev_max_segments(struct block_device *bdev)
- 	return queue_max_segments(bdev_get_queue(bdev));
- }
- 
-+static inline unsigned short bdev_max_write_streams(struct block_device *bdev)
-+{
-+	if (bdev_is_partition(bdev))
-+		return 0;
-+	return bdev_limits(bdev)->max_write_streams;
-+}
-+
- static inline unsigned queue_logical_block_size(const struct request_queue *q)
- {
- 	return q->limits.logical_block_size;
+ block/blk-core.c          |   2 +-
+ block/blk-mq.c            |  22 ++---
+ block/blk-mq.h            |   5 +-
+ block/blk.h               |   1 -
+ block/genhd.c             |  69 ++++++++------
+ drivers/md/dm-raid.c      |   3 +
+ drivers/md/md.c           | 190 ++++++++++++++++++++++++++------------
+ drivers/md/md.h           |  18 +---
+ drivers/md/raid1.c        |   3 -
+ drivers/md/raid10.c       |   9 --
+ drivers/md/raid5.c        |   8 --
+ include/linux/blkdev.h    |   1 -
+ include/linux/part_stat.h |   2 +
+ 13 files changed, 191 insertions(+), 142 deletions(-)
+
 -- 
-2.25.1
+2.39.2
 
