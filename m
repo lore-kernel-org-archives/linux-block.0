@@ -1,80 +1,30 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850108F66
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 11:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AB38F66;
+	Tue,  6 May 2025 11:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746529758; cv=none; b=fqxn8FlT3bbHlqR5UxfpKI5vQhffLfIlQ3fCYJQSmQRxjlcngrfdZRdnIfGJcrXBTMq6uMV+TYkDHA2LzqLZUqutd3LuxBR7Y6L4Bz0zgp8hmB3GgpOhYJZNemydn5ZU7sd1NKKI5+PxQGqLaqqZL8U/ahCoLKqHyW+JbGr4Eu8=
+	t=1746530225; cv=none; b=RpJOvHfQk/T1Bk5FU2eqkSUUSRac4pSfovZ2PSZPlWAbLD2xLXwLgtPw3lLQYkrwvqX9hF887q9dg8nmPY0+lck79tXDvG0dlqo+lkJchYKMgOR2srh/Deacy0iERtwF4dhedRIgcOvO4q5rKl+fiA2XgSc5VNCWgz58SGAvZgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746529758; c=relaxed/simple;
-	bh=A2JgRp6XbAjvxFJNoEzNAU4QNnJXkuyI2SO7RCC8ii8=;
+	s=arc-20240116; t=1746530225; c=relaxed/simple;
+	bh=Z7jOwuEBTaEvhsLGSpRE/ZPVJ70iFQdIT9GmLOYv7TU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ScmRoMqvp6GkNy+F76ZgXR44tkrXaOIBt6vtqzPeIfUui8MG0dwE7TTPh6zmXrfUeucHs7Xu0wgR74B9VWZGplxSzgF66wp7f60MRVMJ4UjFZUtzIIOUVCvvXPV+LNbbB5vaoXo6dU1/gPFsQ1TVCePUYqtysTnmljC8miFd7xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iOExpqwo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WFuh2sC+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=q4MGRVId; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2OdLInaI; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iOExpqwo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WFuh2sC+";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="q4MGRVId";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2OdLInaI"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B5ED3211A7;
-	Tue,  6 May 2025 11:09:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1746529754; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pcv1FhfOhCwRVjfge5eeTxumKTkawmjfTGEBWPZU3ak=;
-	b=iOExpqwohJRb+Dn5x7y9kjEOCGtkTmLMvNkXFXUu4v8+q2gj807fMIEYDjSQZf634EDFmK
-	otNR+Kmg3E86cLIgZOhpeRcmDxDST0dieQeDZtl94bo/CZuhtvutPNQwZw3XhuhGDxByhL
-	mEfCw59Hip8ZL3Ts7NdEWYcGEo9gJcg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1746529754;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pcv1FhfOhCwRVjfge5eeTxumKTkawmjfTGEBWPZU3ak=;
-	b=WFuh2sC+m14FU9eGIht/dTrj4KyumIhfMXvHroiHWfRwK3fGQp+TfbcAtGBGmNbnREFRWv
-	BHRBUNH5pPYsKUCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1746529753; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pcv1FhfOhCwRVjfge5eeTxumKTkawmjfTGEBWPZU3ak=;
-	b=q4MGRVId/z4cC3u6XCYBxs7eEesglFVs3u/wjOeFtEM4+yCvmSL32E0DwM1lL2Y3PuJj85
-	o73JF5h/ErkZwRS+MfzQ+NMJunfnXbZKR6yH6/AOUMxcj8cowHgYhnmDNmL9psJJvqTpJC
-	gOV0CyulmYzJepL89hcmJLRdXMgjCiw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1746529753;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pcv1FhfOhCwRVjfge5eeTxumKTkawmjfTGEBWPZU3ak=;
-	b=2OdLInaIINxK2MJsoICl+HrSO8LSBCPemV9rtK8pMAnaaxNuDjhn+l+P2gUdAm0csdGchF
-	9o1GBupMQMOJXoCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7792D137CF;
-	Tue,  6 May 2025 11:09:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id y8CfG9ntGWieEAAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 06 May 2025 11:09:13 +0000
-Message-ID: <d6278d6e-9e9b-4f62-830e-b09d7ecedeaf@suse.de>
-Date: Tue, 6 May 2025 13:09:13 +0200
+	 In-Reply-To:Content-Type; b=l+SVea76V2dRL+7pwEbbxyuHY2+oUIIYHoB3drCikJrIjWCSe+2rfNOeyTqqpSQQW5BmHi4J3TIc2roXptO9lKtITaHFCH+ZP0HeogRj/Ew1e2ZiI1QG4R87fohGt7Q3yTWHygd5ZgZvz7wSjr09F7Tk5Tx+AAN4LNKCXEtM//A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4ZsG7449SCz4f3lCf;
+	Tue,  6 May 2025 19:16:32 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 83A261A1BAF;
+	Tue,  6 May 2025 19:16:58 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgDXOl+o7xlohYhoLg--.37289S3;
+	Tue, 06 May 2025 19:16:58 +0800 (CST)
+Message-ID: <64c8b62a-83ba-45be-a83e-62b6ad8d6f22@huaweicloud.com>
+Date: Tue, 6 May 2025 19:16:56 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,70 +32,68 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 19/25] block: fail to show/store elevator sysfs
- attribute if elevator is dying
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Christoph Hellwig <hch@lst.de>
-References: <20250505141805.2751237-1-ming.lei@redhat.com>
- <20250505141805.2751237-20-ming.lei@redhat.com>
+Subject: Re: [RFC PATCH v4 07/11] fs: statx add write zeroes unmap attribute
+To: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, tytso@mit.edu,
+ john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
+ shinichiro.kawasaki@wdc.com, brauner@kernel.org, yi.zhang@huawei.com,
+ chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
+ <20250421021509.2366003-8-yi.zhang@huaweicloud.com>
+ <20250505132208.GA22182@lst.de> <20250505142945.GJ1035866@frogsfrogsfrogs>
+ <c7d8d0c3-7efa-4ee6-b518-f8b09ec87b73@huaweicloud.com>
+ <20250506043907.GA27061@lst.de>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250505141805.2751237-20-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250506043907.GA27061@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgDXOl+o7xlohYhoLg--.37289S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Xr1rZFyDCrWUGw4rKFy3Jwb_yoW8JrWDpa
+	yUKFyqyw4DKr15Xwn7uw4vgrn5Zrs5JFn8Gw4rKr18Zws8X3WxKF9Yg3WDGF9xWr1fAa4U
+	ArsxK34DXayfC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	jIksgUUUUU=
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On 5/5/25 16:17, Ming Lei wrote:
-> Prepare for moving elv_register[unregister]_queue out of elevator_lock
-> & queue freezing, so we may have to call elv_unregister_queue() after
-> elevator ->exit() is called, then there is small window for user to
-> call into ->show()/store(), and user-after-free can be caused.
+On 2025/5/6 12:39, Christoph Hellwig wrote:
+> On Tue, May 06, 2025 at 12:28:54PM +0800, Zhang Yi wrote:
+>> OK, since this statx reporting flag is not strongly tied to
+>> FALLOC_FL_WRITE_ZEROES in vfs_fallocate(), I'll split this patch into
+>> three separate patches.
 > 
-> Fail to show/store elevator sysfs attribute if elevator is dying by
-> adding one new flag of ELEVATOR_FLAG_DYNG, which is protected by
-> elevator ->sysfs_lock.
+> I don't think that is the right thing to do do.  Keep the flag addition
+> here, and then report it in the ext4 and bdev patches adding
+> FALLOC_FL_WRITE_ZEROES as the reporting should be consistent with
+> the added support.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   block/blk-mq-sched.c |  1 +
->   block/elevator.c     | 10 ++++++----
->   block/elevator.h     |  1 +
->   3 files changed, 8 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Cheers,
+Sorry, but I don't understand your suggestion. The
+STATX_ATTR_WRITE_ZEROES_UNMAP attribute only indicate whether the bdev
+and the block device that under the specified file support unmap write
+zeroes commoand. It does not reflect whether the bdev and the
+filesystems support FALLOC_FL_WRITE_ZEROES. The implementation of
+FALLOC_FL_WRITE_ZEROES doesn't fully rely on the unmap write zeroes
+commoand now, users simply refer to this attribute flag to determine
+whether to use FALLOC_FL_WRITE_ZEROES when preallocating a file.
+So, STATX_ATTR_WRITE_ZEROES_UNMAP and FALLOC_FL_WRITE_ZEROES doesn't
+have strong relations, why do you suggested to put this into the ext4
+and bdev patches that adding FALLOC_FL_WRITE_ZEROES?
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Thanks,
+Yi.
+
