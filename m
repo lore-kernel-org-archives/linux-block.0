@@ -1,90 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F181FF5E3
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 17:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12EC283C93;
+	Tue,  6 May 2025 18:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746551667; cv=none; b=oOwlwtJoY1Z+0/2OZL0wmzT37C5fBzVEjgIsiXehcQ4LfabZ0kzmuSpLHdqGyMoFijT6TAWwnesU0akrYLJHVp9I+FmZwfZoCrPW0L7O0YZIQZ+EGbQ0ldc2a9p6dSf4vTfNl6dN+x7ZnufzawRdzmM03oLr1Pkl1NCw7X4RJTE=
+	t=1746555296; cv=none; b=NVFm3zyICAKYYiCMgC+UHctdWHvjiaubvRHOzmK188JfjTSn9MHjkbn1yRcyrgFkfq6BFlthuZtM3np1eU/dWgLF6MTIWUAHK/2n7s1DuGSqbRk/aWzE/PnlxyZCZvjhgadfH9pLgVw6mPO575m6z50HInU15h+jiVxPGAwuT1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746551667; c=relaxed/simple;
-	bh=YJlIiL2as+FQzRYLAmfyUw6lBk0apgvBss0amf+RMTg=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Yd2gBVwzXmjLQN9+V9kncArh9YLybpRP0UL4Bz6SKCPUK0z35DIffLwv5vmZK9caOhAepwGlgEYCjxMI5yv8NmPp3nKtscyaWbWXaQ1p3N0szWhTfh2+vsKF2wkxjWtw+M3p/uiV2/9lofEJd1/9aLphmbp58XfFRQxEat+0CkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K53VR70/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746555296; c=relaxed/simple;
+	bh=aZkpd2dcF5uB3syEqGA8WZiEqSkxrG768idsWlJZohA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uj8U95vUoZbvIfx/7S5rolbKKNXYmd7bVulvTMo5I1TDixEnA1GvwS26QO5ADmex8rP7+tzb/HBthVNsocpK6mKl87Yg2zm36NzPd85UrgME2vtYtBWYVeqzjrM0rxw1UuWWyakHgwgr8qaO36yT4n21MEvKiwnJvxK5HZfqMGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DcrI+Mt8; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K53VR70/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746551663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SDuv8z2Zer1kzmJsg6JfkCgHosBhI0/BOFDH4XiwtSw=;
-	b=K53VR70//tECJJO7HTRbFGebuGZvWWs1Hi9oZUnqGokSdUJVrJbsmKci6+NOHm5aw4nFgv
-	Y7EKZVSirH5hW7b1chT/MncTcPkggaYJI8dIYfoWlXEACdJYKpaw+CNFV1Z0R/iWesnuzz
-	pH2cdLWMNN3DiksJZY+VGOG1Twk//VM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-248-hZeuOhmVOcCR-ecxitQPig-1; Tue,
- 06 May 2025 13:14:17 -0400
-X-MC-Unique: hZeuOhmVOcCR-ecxitQPig-1
-X-Mimecast-MFC-AGG-ID: hZeuOhmVOcCR-ecxitQPig_1746551654
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BCD0C1800ECA;
-	Tue,  6 May 2025 17:14:13 +0000 (UTC)
-Received: from [10.22.80.45] (unknown [10.22.80.45])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 03A30195608F;
-	Tue,  6 May 2025 17:14:10 +0000 (UTC)
-Date: Tue, 6 May 2025 19:14:06 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-cc: dm-devel@lists.linux.dev, Alasdair Kergon <agk@redhat.com>, 
-    Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-    Bartosz Golaszewski <brgl@bgdev.pl>, 
-    Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Subject: Re: [PATCH v2 2/2] dm: pass through operations on wrapped inline
- crypto keys
-In-Reply-To: <20250505211428.GA10047@google.com>
-Message-ID: <3a0ef010-ec08-de32-134f-80286a3960c9@redhat.com>
-References: <20250501212320.8281-1-ebiggers@kernel.org> <20250501212320.8281-3-ebiggers@kernel.org> <af9771ce-5e88-02d1-3595-fd18a6f2eb28@redhat.com> <20250505170336.GA197153@sol> <5ca7e728-96ed-4419-6689-f36081b7e2da@redhat.com>
- <20250505211428.GA10047@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DcrI+Mt8"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-30a452d3b38so5300939a91.3;
+        Tue, 06 May 2025 11:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746555294; x=1747160094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LgUTLFyRDWkYKDEpuIhDqP9z1m1Yv8U7iugtqQBuYj8=;
+        b=DcrI+Mt8RujXBdJgfpEHGVuXWW/OIOe4zk5wKTDDHDVsbXGotXaaIkClQQyw41h6y1
+         iitityQ6AR2pmKGhV/eTtqWDCMxbJ6mlQEaEFSCwBqY/jZXtyuhWc3elYph8xsVsCmyl
+         QAm6gS+J6RGbsW3A8qlKVy1WDEJTYF/SNlwvJxnP+lf7SnCCdEzJ/3lfMgEIYvbRHIYE
+         bURN21F/1D2PIkPaeOPtV4n1OtvoPf0Aw9y3M8ucZt1tWLlhdgujU75qudTmg3B0Li7Y
+         Ogd2nmKzsJdovc7jRamsnoTvI8ksDFKZIO/JEEye5a74WjpeIPwP2YST6n9vW6N8W/ht
+         Y0Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746555294; x=1747160094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LgUTLFyRDWkYKDEpuIhDqP9z1m1Yv8U7iugtqQBuYj8=;
+        b=RkVxVdUWgH9prykgyg+5cRtWc1/3e9AEND/+peqeihABdMUceWmr1OdbwDspreak0K
+         011BtSi8RYLaADOeYuwPz06JYHxokei69/1OQG+78l4FoCVArDOxU2wrzpn/+z1nqtvQ
+         VSUFxEx97IOhitoFBLPvQjZp82+sA7jQAyYH3XjC5ARoiUuOuMQo5b0uMx9laBUyPm/B
+         fSs3EkMs4/z1nLdAsULOMQs140NNh8+Lb5ywgtxkSJpNjlWoXwS3j9F/icmk9/xdIqnt
+         SkTF70NfBe55JOpcSjduQEfaWw1W/jBZHM2/KtkcWDXHeEx58jVLaxKqILZFF0hEVSYY
+         wlPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUggVTu6e78MMyS6XE54ecU2UPFMwHpeyrhmP/HjhiOk7B35Zv1o3SUfpJaEJclrnEQJ3TTHRjR9aF4Ks4=@vger.kernel.org, AJvYcCVaUzFjUOUTD1t4bm1568Tt+na8xK5Jcwv1id1biWij7lMYutV675yM58qBnwdDcwsVcT+oMy30YNNCanOjFQ==@vger.kernel.org, AJvYcCX7uGGTAgeiL7q34An/2jdQBtg1JNYZ98XF4CvduZ0tF6LfNxH+RrvRCu+zt0QnYYdfdMYkwJZcug==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRidb95n8c91IOHYYi86QSwDIM7ZFdGp2JvE5QCkQNCZpaedDN
+	faEzo8l80jIa6xmnFiKqCN7JavMEnkkN9FhyL7y2Jb90kbE4wHcA+sV+De1S0oLxTMaAB6rjhNH
+	I7DlDlDifTmXUZo37GRqPbe8Joqs=
+X-Gm-Gg: ASbGnctA7UDQs9O+656zEGTOL4lMSKQFfIV9WHcg2sSzlqP7oCdJ0+0sn5+e1pC+waG
+	B9Hbx8UnzXGrVKjdiBOnC0bvf65cEfmw/yvQvECgFz+H1hOF1pe2aDONVHexekEXquf7Ozp9M0W
+	4j4lBhqvJC51zRXqy73FmN8DEFGIvvrSau6BhYMuvKl8ewHYnYqpveWhgP
+X-Google-Smtp-Source: AGHT+IGwp2IFUitVkyl1IAWa+05GwLKsvMJm418R5rpT8coYjf649UgitPuIXI5xNWy57+nYxUYyxUOZvofrUpHZ/pg=
+X-Received: by 2002:a17:90b:394f:b0:305:5f55:899 with SMTP id
+ 98e67ed59e1d1-30aac184a9fmr718325a91.11.1746555294071; Tue, 06 May 2025
+ 11:14:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <CGME20250506122651epcas5p4100fd5435ce6e6686318265b414c1176@epcas5p4.samsung.com>
+ <20250506121732.8211-1-joshi.k@samsung.com> <20250506121732.8211-11-joshi.k@samsung.com>
+ <CADUfDZqqqQVHqMpVaMWre1=GZfu42_SOQ5W9m0vhSZYyp1BBUA@mail.gmail.com> <aBo4OiOOY3tCh_02@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <aBo4OiOOY3tCh_02@kbusch-mbp.dhcp.thefacebook.com>
+From: Kanchan Joshi <joshiiitr@gmail.com>
+Date: Tue, 6 May 2025 23:44:27 +0530
+X-Gm-Features: ATxdqUG9RIoJxTdSYclAXfevasZNEUaF6CXTR24bqSobnO_8A3U2eC19Wgde8B0
+Message-ID: <CA+1E3rJx3Ch2POT_t4DWiqb2nJiX7bHPrGVMW_ZviJ_b0o9UvQ@mail.gmail.com>
+Subject: Re: [PATCH v16 10/11] nvme: register fdp parameters with the block layer
+To: Keith Busch <kbusch@kernel.org>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, 
+	hch@lst.de, asml.silence@gmail.com, io-uring@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Hannes Reinecke <hare@suse.de>, 
+	Nitesh Shetty <nj.shetty@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 6, 2025 at 9:56=E2=80=AFPM Keith Busch <kbusch@kernel.org> wrot=
+e:
+>
+> On Tue, May 06, 2025 at 09:13:33AM -0700, Caleb Sander Mateos wrote:
+> > On Tue, May 6, 2025 at 5:31=E2=80=AFAM Kanchan Joshi <joshi.k@samsung.c=
+om> wrote:
+> > > @@ -2225,6 +2361,12 @@ static int nvme_update_ns_info_block(struct nv=
+me_ns *ns,
+> > >         if (!nvme_init_integrity(ns->head, &lim, info))
+> > >                 capacity =3D 0;
+> > >
+> > > +       lim.max_write_streams =3D ns->head->nr_plids;
+> > > +       if (lim.max_write_streams)
+> > > +               lim.write_stream_granularity =3D max(info->runs, U32_=
+MAX);
+> >
+> > What is the purpose of this max(..., U32_MAX)? Should it be min() inste=
+ad?
+>
+> You're right, should have been min. Because "runs" is a u64 and the
+> queue_limit is a u32, so U32_MAX is the upper limit, but it's not
+> supposed to exceed "runs".
 
-
-On Mon, 5 May 2025, Eric Biggers wrote:
-
-> We have to forward derive_sw_secret anyway, since that's invoked by the
-> filesystem, not by the ioctls.
-> 
-> The other operations are for the ioctls, but I don't see a reason to make things
-> harder for userspace by forcing userspace to implement logic like:
-> 
->     if (is_dm(blkdev))
->         blkdev = underlying_device(blkdev)
->     ioctl(blkdev)
-> 
-> The device-mapper block device has a blk-crypto profile that declares wrapped
-> key support.  We should just make the ioctls work on that block device, so that
-> upper layers don't need to care whether it's device-mapper or native.
-> 
-> - Eric
-
-OK, I accepted both patches for the next merge window.
-
-Mikulas
-
+Would it be better to change write_stream_granularity to "long
+unsigned int" so that it matches with what is possible in nvme?
