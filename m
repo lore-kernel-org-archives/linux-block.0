@@ -1,109 +1,334 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FA927FD6F
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 16:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0757B283FDB
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 16:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746547388; cv=none; b=nX3k8VLMvMbfyyAYG8WwbXN4nv4fik16EUgyz5c5iuddmCcxN9ZwdzYvuB7S3hKiRAP4jShIT3lTxry7omftdcrOFtOpobW9CsP5dEwj1UyQLdWqEGxN0oubdnK3XquVkDR8zIw8YOIjhWHhUsJuKA+52d8zGTWW9gCEEnmBjsc=
+	t=1746548037; cv=none; b=KeJIOTiVWilGWFGmE6z5/AsQlzReyowy6Y5o6iSGLPcudKshaFMOTrjkBepRgIrA66efo/BeQ8VgiqRV+HyNpKy52fBNHtAOFztGb3AszwIezKg5UQyzAm9iQClE+wL/rvryVSMgqcZJpjeAOrIIse2df46XKMP+I7XeYu1afFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746547388; c=relaxed/simple;
-	bh=24uoHi10i0HxqHGkDnd9Rec0+Fi2ODT6fqrdzLAuiWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lzFoKrYmuwKfUBaFDwb3J7+Mn+EDBCKUa/9+okr9g2+GziLTI83mVN6l7YY5W39knnh32YvjWT7G4MWT9ISzwhTr1QBK4CFaQ3Ps9/89Zk76YZq3pbYMTxwOvbNGfoTNzlLXt8ADpmiY37ZMItHM2nWNKTZW8ELMki3cnb8eZdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=q/wd5W1a; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1746548037; c=relaxed/simple;
+	bh=ctEJGduRkC2qEEhy+2LbPD9UxeStYYphXNtfefVEQbY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=moK4rSC4fsVmnMsmOGhb+KnujglBEMj+VNrixpPntxL3Qp2vPPTAO92HthmZhlPSuIvVFIwsSgFyqcFHF7tfONQUB20dE4Ie1qaMnHn8s0yOwcPtUTW8HJ0i+Ub4NO/hBf/fEBpsfPfFnsA47YmjMpex2DOzN7urqlO9zlNZnt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=VolozZ25; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="q/wd5W1a"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZsNTc0jSvzm1Hbj;
-	Tue,  6 May 2025 16:03:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1746547378; x=1749139379; bh=q0xTY3WI8VBpOIjZtLXdosAU
-	uO9Yybi00N1fF2k+GeQ=; b=q/wd5W1alGgiy8WFfuDJCrYvqaRMkxpDDe8uEEkj
-	4jA5BFekCtOAIm4EsahcGczDzXMTataNm3e3rjTToNiuo/iVSLVXN2B6ssRht+Dr
-	fKypaFm4Iy5j97CMqZNEyh7+GfW+/u+vGltBV8ZzojvVJvfQKdOrX8xTouk1Os68
-	nm+UbqcBhPUk1JnsHl3J96NDNLQoCMDdNUuClPAIeThYuCb/pyVqQTRVlDJGkX+P
-	AgPBpS+Jw9N/kckFqxFmizl2XQX/bOFK3jlfV+vTmllPV6VKQ6BLsH7OYkQ6vU6T
-	xxhnfDciOaZ/n93wfpFRTe096wInVQCkEu0ZdR9OflMp1Q==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id g01OzY2N1wgC; Tue,  6 May 2025 16:02:58 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZsNTT4j7Zzm0ysb;
-	Tue,  6 May 2025 16:02:52 +0000 (UTC)
-Message-ID: <5ccb451e-f13b-40d8-9494-e5a2cedc84a3@acm.org>
-Date: Tue, 6 May 2025 09:02:50 -0700
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="VolozZ25"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-30a8831e462so116160a91.0
+        for <linux-block@vger.kernel.org>; Tue, 06 May 2025 09:13:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1746548035; x=1747152835; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LYWN5cRoGfT1PfSiqnzPsV4NQG6bqVTjCaW1CwrUJcM=;
+        b=VolozZ256Rjn+7z/1yPNGVRV2dWyQz7KeNP+GPWRI27v7l4LDHNdarr+IO0roMDhHi
+         QJdN8FpiAfP2cIMaWWfIOx1P+BKxoaWixKq3Aaqu1lDJtYG0K3A9R6HUrxLRFnvsFmQ/
+         l97DHLF1PzselBbPbVyqge5o2j+gwG3be5QV7bNmpkCz74aVyO5MrjE5wM3hLpgtWb6P
+         tePYqkt++pdXtZvhk9BSjDwB3Haxpyqa61aYdBPKs5xQ+0gNdnOXAfCieurCoi9VZaEU
+         3p9/ySYSXXjLvGB0FZE7Z8O29F0Uqc7ogumV9jWtsRTgx9c1ZnPXxL1FXY74hgnoP01c
+         qO+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746548035; x=1747152835;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LYWN5cRoGfT1PfSiqnzPsV4NQG6bqVTjCaW1CwrUJcM=;
+        b=magVNs/xY2Zo05AqWKfynUsXWUExNAYTjEVda6BFyX6Q+3MdCiYMU5fJ2iQnqCfz9+
+         ulUadxZVjIegucASYio0a/k1K4V/UVG1fdYdIIJs0Vr6Sh26Y09ZDbtWfSs2eqGAFjt7
+         tOwy43P5p5nNNQS6ddcry4TSvQsuA+BNo9F9zxBfI2al1/Y9e6f8cdvORy98PGLiPxAO
+         TQKyGvoWrsntJwVx39bnig0BDBkuee5LuSK/w6VoCyw2ndNJuU8gSB8SeLsM7mE+ORtG
+         7yrhS6MJ5bw5tVOPX+gBwajQ/gC6RV68sz6VMbfD75SbawZKPlpYKFeXKfqkP2cCZqX5
+         QHaA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3/f4mdsoWfkxegJ2aNb8SvGY0WK/6MgHTz3um3A54D/D/uWQ3SmgUiY5eIbw1nBJM6Cu5/3Xzfg5Z9w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8iBgvYNbxh3Fm18gvS7YTgGgLy55is7OAQRh/9tKZqTd5sLfr
+	R8f5rWoMMYVez2xYD13xyEHDU86NdyKcJVpezGxZq0wx6WNmX6Zqamte0ZSMci5Z0g4aJ5AF18R
+	G6KR+MbIcFVg2UX7cGdxHqBR+d71E8kgljM2Z0g==
+X-Gm-Gg: ASbGnctwH1gMwkTTBfUtge7WhZOBalFyev5PGXhmOL7yPtskHdmLynYh5d3Ic6fGR16
+	vfD9l0e2c+owGQyakVC9j4pXG1bW3tEQLuWwOOF8UFOJrbbFcCDYvrdsdIjnrfdYU8fb+mpGyjc
+	c7s9Va0eAtBsWgNr86hG4K
+X-Google-Smtp-Source: AGHT+IGOvJyPbLr4kwXZSGT/2CsH/jVCIq02WBu70npsFnHamIQl6sWwQf+KO12hU6AkAJPFapxgBzCBfCm4l5n/zjI=
+X-Received: by 2002:a17:90b:33c1:b0:2ff:5759:549a with SMTP id
+ 98e67ed59e1d1-30aac16c2e2mr36846a91.1.1746548035169; Tue, 06 May 2025
+ 09:13:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: only update request sector if needed
-To: Johannes Thumshirn <jth@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- linux-block@vger.kernel.org, Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <dea089581cb6b777c1cd1500b38ac0b61df4b2d1.1746530748.git.jth@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <dea089581cb6b777c1cd1500b38ac0b61df4b2d1.1746530748.git.jth@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CGME20250506122651epcas5p4100fd5435ce6e6686318265b414c1176@epcas5p4.samsung.com>
+ <20250506121732.8211-1-joshi.k@samsung.com> <20250506121732.8211-11-joshi.k@samsung.com>
+In-Reply-To: <20250506121732.8211-11-joshi.k@samsung.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 6 May 2025 09:13:33 -0700
+X-Gm-Features: ATxdqUE6maBvoXv4TdPf4qTULxuJw6-FSb-pKV6qaK5B-HKqjYsETzXEW4MddQU
+Message-ID: <CADUfDZqqqQVHqMpVaMWre1=GZfu42_SOQ5W9m0vhSZYyp1BBUA@mail.gmail.com>
+Subject: Re: [PATCH v16 10/11] nvme: register fdp parameters with the block layer
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, asml.silence@gmail.com, 
+	io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/6/25 4:27 AM, Johannes Thumshirn wrote:
-> From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> 
-> In case of a ZONE APPEND write, regardless of native ZONE APPEND or the
-> emulation layer in the zone write plugging code, the sector the data got
-> written to by the device needs to be updated in the bio.
-> 
-> At the moment, this is done for every native ZONE APPEND write and every
-> request that is flagged with 'BIO_ZONE_WRITE_PLUGGING'. But thus
-> superfluously updates the sector for regular writes to a zoned block
-> device.
-> 
-> Check if a bio is a native ZONE APPEND write or if the bio is flagged as
-> 'BIO_EMULATES_ZONE_APPEND', meaning the block layer's zone write plugging
-> code handles the ZONE APPEND and translates it into a regular write and
-> back. Only if one of these two criterion is met, update the sector in the
-> bio upon completion.
-> 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+On Tue, May 6, 2025 at 5:31=E2=80=AFAM Kanchan Joshi <joshi.k@samsung.com> =
+wrote:
+>
+> From: Keith Busch <kbusch@kernel.org>
+>
+> Register the device data placement limits if supported. This is just
+> registering the limits with the block layer. Nothing beyond reporting
+> these attributes is happening in this patch.
+>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 > ---
->   block/blk.h | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk.h b/block/blk.h
-> index 328075787814..594eeba7b949 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -480,7 +480,8 @@ static inline void blk_zone_update_request_bio(struct request *rq,
->   	 * the original BIO sector so that blk_zone_write_plug_bio_endio() can
->   	 * lookup the zone write plug.
->   	 */
-> -	if (req_op(rq) == REQ_OP_ZONE_APPEND || bio_zone_write_plugging(bio))
-> +	if (req_op(rq) == REQ_OP_ZONE_APPEND ||
-> +	    bio_flagged(bio, BIO_EMULATES_ZONE_APPEND))
->   		bio->bi_iter.bi_sector = rq->__sector;
->   }
->   void blk_zone_write_plug_bio_endio(struct bio *bio);
+>  drivers/nvme/host/core.c | 144 +++++++++++++++++++++++++++++++++++++++
+>  drivers/nvme/host/nvme.h |   2 +
+>  2 files changed, 146 insertions(+)
+>
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index dd71b4c2b7b7..f25e03ff03df 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -38,6 +38,8 @@ struct nvme_ns_info {
+>         u32 nsid;
+>         __le32 anagrpid;
+>         u8 pi_offset;
+> +       u16 endgid;
+> +       u64 runs;
+>         bool is_shared;
+>         bool is_readonly;
+>         bool is_ready;
+> @@ -1611,6 +1613,7 @@ static int nvme_ns_info_from_identify(struct nvme_c=
+trl *ctrl,
+>         info->is_shared =3D id->nmic & NVME_NS_NMIC_SHARED;
+>         info->is_readonly =3D id->nsattr & NVME_NS_ATTR_RO;
+>         info->is_ready =3D true;
+> +       info->endgid =3D le16_to_cpu(id->endgid);
+>         if (ctrl->quirks & NVME_QUIRK_BOGUS_NID) {
+>                 dev_info(ctrl->device,
+>                          "Ignoring bogus Namespace Identifiers\n");
+> @@ -1651,6 +1654,7 @@ static int nvme_ns_info_from_id_cs_indep(struct nvm=
+e_ctrl *ctrl,
+>                 info->is_ready =3D id->nstat & NVME_NSTAT_NRDY;
+>                 info->is_rotational =3D id->nsfeat & NVME_NS_ROTATIONAL;
+>                 info->no_vwc =3D id->nsfeat & NVME_NS_VWC_NOT_PRESENT;
+> +               info->endgid =3D le16_to_cpu(id->endgid);
+>         }
+>         kfree(id);
+>         return ret;
+> @@ -2155,6 +2159,132 @@ static int nvme_update_ns_info_generic(struct nvm=
+e_ns *ns,
+>         return ret;
+>  }
+>
+> +static int nvme_query_fdp_granularity(struct nvme_ctrl *ctrl,
+> +                                     struct nvme_ns_info *info, u8 fdp_i=
+dx)
+> +{
+> +       struct nvme_fdp_config_log hdr, *h;
+> +       struct nvme_fdp_config_desc *desc;
+> +       size_t size =3D sizeof(hdr);
+> +       void *log, *end;
+> +       int i, n, ret;
+> +
+> +       ret =3D nvme_get_log_lsi(ctrl, 0, NVME_LOG_FDP_CONFIGS, 0,
+> +                              NVME_CSI_NVM, &hdr, size, 0, info->endgid)=
+;
+> +       if (ret) {
+> +               dev_warn(ctrl->device,
+> +                        "FDP configs log header status:0x%x endgid:%d\n"=
+, ret,
+> +                        info->endgid);
+> +               return ret;
+> +       }
+> +
+> +       size =3D le32_to_cpu(hdr.sze);
+> +       if (size > PAGE_SIZE * MAX_ORDER_NR_PAGES) {
+> +               dev_warn(ctrl->device, "FDP config size too large:%zu\n",
+> +                        size);
+> +               return 0;
+> +       }
+> +
+> +       h =3D kvmalloc(size, GFP_KERNEL);
+> +       if (!h)
+> +               return -ENOMEM;
+> +
+> +       ret =3D nvme_get_log_lsi(ctrl, 0, NVME_LOG_FDP_CONFIGS, 0,
+> +                              NVME_CSI_NVM, h, size, 0, info->endgid);
+> +       if (ret) {
+> +               dev_warn(ctrl->device,
+> +                        "FDP configs log status:0x%x endgid:%d\n", ret,
+> +                        info->endgid);
+> +               goto out;
+> +       }
+> +
+> +       n =3D le16_to_cpu(h->numfdpc) + 1;
+> +       if (fdp_idx > n) {
+> +               dev_warn(ctrl->device, "FDP index:%d out of range:%d\n",
+> +                        fdp_idx, n);
+> +               /* Proceed without registering FDP streams */
+> +               ret =3D 0;
+> +               goto out;
+> +       }
+> +
+> +       log =3D h + 1;
+> +       desc =3D log;
+> +       end =3D log + size - sizeof(*h);
+> +       for (i =3D 0; i < fdp_idx; i++) {
+> +               log +=3D le16_to_cpu(desc->dsze);
+> +               desc =3D log;
+> +               if (log >=3D end) {
+> +                       dev_warn(ctrl->device,
+> +                                "FDP invalid config descriptor list\n");
+> +                       ret =3D 0;
+> +                       goto out;
+> +               }
+> +       }
+> +
+> +       if (le32_to_cpu(desc->nrg) > 1) {
+> +               dev_warn(ctrl->device, "FDP NRG > 1 not supported\n");
+> +               ret =3D 0;
+> +               goto out;
+> +       }
+> +
+> +       info->runs =3D le64_to_cpu(desc->runs);
+> +out:
+> +       kvfree(h);
+> +       return ret;
+> +}
+> +
+> +static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *=
+info)
+> +{
+> +       struct nvme_ns_head *head =3D ns->head;
+> +       struct nvme_ctrl *ctrl =3D ns->ctrl;
+> +       struct nvme_fdp_ruh_status *ruhs;
+> +       struct nvme_fdp_config fdp;
+> +       struct nvme_command c =3D {};
+> +       size_t size;
+> +       int ret;
+> +
+> +       /*
+> +        * The FDP configuration is static for the lifetime of the namesp=
+ace,
+> +        * so return immediately if we've already registered this namespa=
+ce's
+> +        * streams.
+> +        */
+> +       if (head->nr_plids)
+> +               return 0;
+> +
+> +       ret =3D nvme_get_features(ctrl, NVME_FEAT_FDP, info->endgid, NULL=
+, 0,
+> +                               &fdp);
+> +       if (ret) {
+> +               dev_warn(ctrl->device, "FDP get feature status:0x%x\n", r=
+et);
+> +               return ret;
+> +       }
+> +
+> +       if (!(fdp.flags & FDPCFG_FDPE))
+> +               return 0;
+> +
+> +       ret =3D nvme_query_fdp_granularity(ctrl, info, fdp.fdpcidx);
+> +       if (!info->runs)
+> +               return ret;
+> +
+> +       size =3D struct_size(ruhs, ruhsd, S8_MAX - 1);
+> +       ruhs =3D kzalloc(size, GFP_KERNEL);
+> +       if (!ruhs)
+> +               return -ENOMEM;
+> +
+> +       c.imr.opcode =3D nvme_cmd_io_mgmt_recv;
+> +       c.imr.nsid =3D cpu_to_le32(head->ns_id);
+> +       c.imr.mo =3D NVME_IO_MGMT_RECV_MO_RUHS;
+> +       c.imr.numd =3D cpu_to_le32(nvme_bytes_to_numd(size));
+> +       ret =3D nvme_submit_sync_cmd(ns->queue, &c, ruhs, size);
+> +       if (ret) {
+> +               dev_warn(ctrl->device, "FDP io-mgmt status:0x%x\n", ret);
+> +               goto free;
+> +       }
+> +
+> +       head->nr_plids =3D le16_to_cpu(ruhs->nruhsd);
+> +free:
+> +       kfree(ruhs);
+> +       return ret;
+> +}
+> +
+>  static int nvme_update_ns_info_block(struct nvme_ns *ns,
+>                 struct nvme_ns_info *info)
+>  {
+> @@ -2192,6 +2322,12 @@ static int nvme_update_ns_info_block(struct nvme_n=
+s *ns,
+>                         goto out;
+>         }
+>
+> +       if (ns->ctrl->ctratt & NVME_CTRL_ATTR_FDPS) {
+> +               ret =3D nvme_query_fdp_info(ns, info);
+> +               if (ret < 0)
+> +                       goto out;
+> +       }
+> +
+>         lim =3D queue_limits_start_update(ns->disk->queue);
+>
+>         memflags =3D blk_mq_freeze_queue(ns->disk->queue);
+> @@ -2225,6 +2361,12 @@ static int nvme_update_ns_info_block(struct nvme_n=
+s *ns,
+>         if (!nvme_init_integrity(ns->head, &lim, info))
+>                 capacity =3D 0;
+>
+> +       lim.max_write_streams =3D ns->head->nr_plids;
+> +       if (lim.max_write_streams)
+> +               lim.write_stream_granularity =3D max(info->runs, U32_MAX)=
+;
 
-Does this patch need a "Fixes:" tag? Is the below correct?
+What is the purpose of this max(..., U32_MAX)? Should it be min() instead?
 
-Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+Best,
+Caleb
 
-Thanks,
-
-Bart.
-
+> +       else
+> +               lim.write_stream_granularity =3D 0;
+> +
+>         ret =3D queue_limits_commit_update(ns->disk->queue, &lim);
+>         if (ret) {
+>                 blk_mq_unfreeze_queue(ns->disk->queue, memflags);
+> @@ -2328,6 +2470,8 @@ static int nvme_update_ns_info(struct nvme_ns *ns, =
+struct nvme_ns_info *info)
+>                         ns->head->disk->flags |=3D GENHD_FL_HIDDEN;
+>                 else
+>                         nvme_init_integrity(ns->head, &lim, info);
+> +               lim.max_write_streams =3D ns_lim->max_write_streams;
+> +               lim.write_stream_granularity =3D ns_lim->write_stream_gra=
+nularity;
+>                 ret =3D queue_limits_commit_update(ns->head->disk->queue,=
+ &lim);
+>
+>                 set_capacity_and_notify(ns->head->disk, get_capacity(ns->=
+disk));
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index aedb734283b8..3e14daa4ed3e 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -496,6 +496,8 @@ struct nvme_ns_head {
+>         struct device           cdev_device;
+>
+>         struct gendisk          *disk;
+> +
+> +       u16                     nr_plids;
+>  #ifdef CONFIG_NVME_MULTIPATH
+>         struct bio_list         requeue_list;
+>         spinlock_t              requeue_lock;
+> --
+> 2.25.1
+>
+>
