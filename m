@@ -1,127 +1,290 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C76436AAE3
-	for <linux-block@vger.kernel.org>; Mon,  5 May 2025 22:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9482BEC4B
+	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 02:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485781; cv=none; b=ZUdDB7g/rWM5cUkMQLp/yrZpxv0Lshd0+EU+Sr3VhDE7IbWI02veczHDfLF5q2b3GtrlrnqtwLzVuLi1q83TZqg8qh0QdHhavi1JpeDNVKqZGnGRhNbumsMpN+D9OeZaB+n/WR7uGlLhM/VL4ZXn7iJkt6VDAXee14msh5kx6qM=
+	t=1746499573; cv=none; b=JSDvMNxpMJN2AGA5gwQs4Q6yLkU7NmAKNcd58ocg4u9dfKG9R9jowag0ORa52k7JPc0zTlbbu4uX5Aby/I0niJNe3sk1dQS0tmu4unZzGJ7fBcNs++8pOfnLYDKFJ67GJilPO6XgaGlk4P2iWldJU5TL3KFdpgioCopOaQvYfMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485781; c=relaxed/simple;
-	bh=wHRy5AQPRQxiU54IBvGuKaPKDlgm5NQZxV6K6w1Qve0=;
+	s=arc-20240116; t=1746499573; c=relaxed/simple;
+	bh=MuBiG0/S7UIZBD5rKs0TbzCcJT2CaK2ppbhy9ywFbOw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I2Me5uWGMugXw5sSFfRbuefWONWIujVW9mjPfiJkslNnS/DNCkAZl+jTOfj0yEXg4cnPwChuUyL92flCRtgRsLnt9yu0IKCZi+EF19Ix5R58YBd9d0jW6g50Zkx0WISPsE1DE1Y2FiNwOVP2pvxXZPKyaCGyxysm8EAq5iFCLK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=sFlCGbSi; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sd+dI0qFXRYj7tlntrA2hGWkhYIJVmZGKjiDvUsSwqIUqU8aXt2hNkhtehIyiGMHYNNup5kvLsl5Nvqg6bSFDDSBcW1mBJMIdE+8E4pL5fveby15Oyl/kPjomGccazLdmuQ7ZAnIcBTbbKh8acuTBkoxZTEwfrLn3oCOUL8n6nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UPy+Q0BG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="sFlCGbSi"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so4082152b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 05 May 2025 15:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1746485777; x=1747090577; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TZtudP8whc5JWyiBQCvGvrdC2CkTXwDmcdreRv5eyPQ=;
-        b=sFlCGbSihnoYn+Kn6Ve0Gh8tuPRq1NcVQO2MQUIv+qmjUC3NmvPzE7viNKog5tDLZ+
-         ef+tNdSxOUt4ulpPQlh06Vgvll1qBPPgxa2WhC9W5hNViNNwfPfcaduA3iOUtuncKOMA
-         M1fNiPLON5L5Xsje0BSrNVkykZyTVwl3CK8bEB/TEXykNXuECeJG5EgoK84jlorpYPNP
-         STpGGXncQR5ljQ0Vx7J26PvhGYGDWrU74vUTcVPyaqyVE9lO5Z3ZcmdBnnpuqPx/0JEU
-         3Zh4NjfBW87ron4uEOvysJuKRHDq79F21+0eExMuABzRsIED8r89PtVmd+pkrkuFupwP
-         I6fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746485777; x=1747090577;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TZtudP8whc5JWyiBQCvGvrdC2CkTXwDmcdreRv5eyPQ=;
-        b=fSvcItn2eGMlHcl9TW61BlDwYTbsuVVuo3U3fSdrv9ofUoeGw8MGYbf+jhsNax2Tcn
-         LgAu+58KdsO9MqGjZnyTWzdMvzOXQ+yyzJEQxhul1Ua9vrAvMx4Ug0DnrT4mhiPPYF6J
-         yxlptvMrXxRV53FZuaKO2RY4uXnEG/89UDiQERUCuDUWr+Y8cvvD2z7Q3Jw65ekFJEMU
-         W3MfotovsOUDp3/x5vzY8OVOhXnhqr4IQedVvwKY9lKmczvDfGdaYAQoYzIOPW2BJBPH
-         Xcz/Le+FSCUjPbODNioY+YfcNVyz+0Tx6pEE2+fIfhJqVi//vJ+sL9/+hiNwBs7OBEUX
-         Qo3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWzY9mAMmiKd74PV7oSXKKFHqxkWDaQqKcb2rtm56rn59ME4a29L8j9pVcwQwL8EtLEPFO8jgwkS14/vA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI6izuWHGevPFG8UWVLLkN2/Cg2dWmVBv/UGygq/yzZAyISfnL
-	mZecPKGyzUiGkNcVvWk1APXz2b6pjJn1zFz5ca7agLxqLHl/K8CjF+Ddsn4DimM=
-X-Gm-Gg: ASbGncsXmcg39U/qMvFJZGBfo0N8XEWQJLbKtdyH+pIGAp55KHhPXb9qj+YNkx/0mKV
-	vgcrGdjM3kDNx8Ikmlsd7rff4CmnShsGNMm5X3EAzYcl4jTkVlt0RW59PQF0yQqXzzeFDllhug2
-	Y8LFPP/ajDC4do5nU4YpJjUcjZWDYaq2oCpWg1muN25lobKhdi65P+4kq1isBIRRBQrk4VIWh7b
-	MQpiAH/3Kzm7U9R1HOqYaHRRLt1dBueOb5xFf+zrp4C8QyYYIdJhghoibpzYL2lCG6kGvrcKYyt
-	A6LCo4DuF3P3ZW4Dn1pIDvV3Ayc55y7N5SWEIgUb7en8DYvwynzy79xLgL5XwT0USqk/eipLSxB
-	paH+N/kCOzqgxCQ==
-X-Google-Smtp-Source: AGHT+IG0junclw7g29Tiqwx2VjZpghoTqY/gPZ70p9955vnBkCywMNmCzZAK8v7YO3Z5zsZcGqWWmQ==
-X-Received: by 2002:a05:6a20:cf90:b0:1f5:64a4:aeac with SMTP id adf61e73a8af0-21182ec067cmr1039329637.33.1746485777257;
-        Mon, 05 May 2025 15:56:17 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-60-96.pa.nsw.optusnet.com.au. [49.181.60.96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058db9200sm7423761b3a.42.2025.05.05.15.56.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 15:56:16 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.98.2)
-	(envelope-from <david@fromorbit.com>)
-	id 1uC4jN-0000000HT0R-0Pro;
-	Tue, 06 May 2025 08:56:13 +1000
-Date: Tue, 6 May 2025 08:56:13 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Laurence Oberman <loberman@redhat.com>
-Cc: Anton Gavriliuk <antosha20xx@gmail.com>, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: Sequential read from NVMe/XFS twice slower on Fedora 42 than on
- Rocky 9.5
-Message-ID: <aBlCDTm-grqM4WtY@dread.disaster.area>
-References: <CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-QzmZBMmtr1oC=fOOgAQ@mail.gmail.com>
- <aBaVsli2AKbIa4We@dread.disaster.area>
- <CAAiJnjor+=Zn62n09f-aJw2amX2wxQOb-2TB3rea9wDCU7ONoA@mail.gmail.com>
- <aBfhDQ6lAPmn81j0@dread.disaster.area>
- <7c33f38a52ccff8b94f20c0714b60b61b061ad58.camel@redhat.com>
- <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPy+Q0BG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746499569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dw4JE7DaO2HFUMVygjFqgHglIdpP20re07MpV/DiLWg=;
+	b=UPy+Q0BGvmKMofyNsVs6rtmFiAoDktAMshh977+UrP6tWFhvtuDomxBlt/5v3hM6HqXzLn
+	cVI3tXeFSoS0iaZCFim+/7UereT07CCBnbOrRNq4A2oumP1onhqQVf9XITFaWGpevelCES
+	X10TSX+O9VuFjnioNNz0nL8VyV7IB0U=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-212-rM5Jc4Q6NzWz8f_0MAVCmw-1; Mon,
+ 05 May 2025 22:46:04 -0400
+X-MC-Unique: rM5Jc4Q6NzWz8f_0MAVCmw-1
+X-Mimecast-MFC-AGG-ID: rM5Jc4Q6NzWz8f_0MAVCmw_1746499559
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C38FC19560AD;
+	Tue,  6 May 2025 02:45:58 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.13])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4CC419560AF;
+	Tue,  6 May 2025 02:45:54 +0000 (UTC)
+Date: Tue, 6 May 2025 10:45:49 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC PATCH 3/7] io_uring: support to register bvec buffer to
+ specified io_uring
+Message-ID: <aBl33aVsZ-s2-Kpx@fedora>
+References: <20250428094420.1584420-1-ming.lei@redhat.com>
+ <20250428094420.1584420-4-ming.lei@redhat.com>
+ <CADUfDZrXTzXM4tA6vRcOz1qn61he+Y6p5UsLeprbmhDVJe0gbg@mail.gmail.com>
+ <aBJDClTlYV48h3P3@fedora>
+ <CADUfDZoROJeDKNWOzbgEqrs_B7kU2qNWwZxfnS2TDqYxiXrY0w@mail.gmail.com>
+ <aBTr5fz5KOgd9RiD@fedora>
+ <CADUfDZqetfAE_s8-GDSLmYTdgrqFLv+YZ1vndg0uD38NuXW3Nw@mail.gmail.com>
+ <aBVqndZc-FjlHG-V@fedora>
+ <CADUfDZoypP63aBjwUB50hZTiZ_ouN1Bt73-hHBY75xsNq9OGZQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZoypP63aBjwUB50hZTiZ_ouN1Bt73-hHBY75xsNq9OGZQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, May 05, 2025 at 09:21:19AM -0400, Laurence Oberman wrote:
-> On Mon, 2025-05-05 at 08:29 -0400, Laurence Oberman wrote:
-> > On Mon, 2025-05-05 at 07:50 +1000, Dave Chinner wrote:
-> > > So the MD block device shows the same read performance as the
-> > > filesystem on top of it. That means this is a regression at the MD
-> > > device layer or in the block/driver layers below it. i.e. it is not
-> > > an XFS of filesystem issue at all.
-> > > 
-> > > -Dave.
-> > 
-> > I have a lab setup, let me see if I can also reproduce and then trace
-> > this to see where it is spending the time
-> > 
+On Sat, May 03, 2025 at 11:55:05AM -0700, Caleb Sander Mateos wrote:
+> On Fri, May 2, 2025 at 6:00 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Fri, May 02, 2025 at 02:21:05PM -0700, Caleb Sander Mateos wrote:
+> > > On Fri, May 2, 2025 at 8:59 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > On Thu, May 01, 2025 at 06:31:03PM -0700, Caleb Sander Mateos wrote:
+> > > > > On Wed, Apr 30, 2025 at 8:34 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > > > >
+> > > > > > On Mon, Apr 28, 2025 at 05:43:12PM -0700, Caleb Sander Mateos wrote:
+> > > > > > > On Mon, Apr 28, 2025 at 2:44 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > Extend io_buffer_register_bvec() and io_buffer_unregister_bvec() for
+> > > > > > > > supporting to register/unregister bvec buffer to specified io_uring,
+> > > > > > > > which FD is usually passed from userspace.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > > > > > ---
+> > > > > > > >  include/linux/io_uring/cmd.h |  4 ++
+> > > > > > > >  io_uring/rsrc.c              | 83 +++++++++++++++++++++++++++---------
+> > > > > > > >  2 files changed, 67 insertions(+), 20 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+> > > > > > > > index 78fa336a284b..7516fe5cd606 100644
+> > > > > > > > --- a/include/linux/io_uring/cmd.h
+> > > > > > > > +++ b/include/linux/io_uring/cmd.h
+> > > > > > > > @@ -25,6 +25,10 @@ struct io_uring_cmd_data {
+> > > > > > > >
+> > > > > > > >  struct io_buf_data {
+> > > > > > > >         unsigned short index;
+> > > > > > > > +       bool has_fd;
+> > > > > > > > +       bool registered_fd;
+> > > > > > > > +
+> > > > > > > > +       int ring_fd;
+> > > > > > > >         struct request *rq;
+> > > > > > > >         void (*release)(void *);
+> > > > > > > >  };
+> > > > > > > > diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+> > > > > > > > index 5f8ab130a573..701dd33fecf7 100644
+> > > > > > > > --- a/io_uring/rsrc.c
+> > > > > > > > +++ b/io_uring/rsrc.c
+> > > > > > > > @@ -969,21 +969,6 @@ static int __io_buffer_register_bvec(struct io_ring_ctx *ctx,
+> > > > > > > >         return 0;
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > -int io_buffer_register_bvec(struct io_uring_cmd *cmd,
+> > > > > > > > -                           struct io_buf_data *buf,
+> > > > > > > > -                           unsigned int issue_flags)
+> > > > > > > > -{
+> > > > > > > > -       struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
+> > > > > > > > -       int ret;
+> > > > > > > > -
+> > > > > > > > -       io_ring_submit_lock(ctx, issue_flags);
+> > > > > > > > -       ret = __io_buffer_register_bvec(ctx, buf);
+> > > > > > > > -       io_ring_submit_unlock(ctx, issue_flags);
+> > > > > > > > -
+> > > > > > > > -       return ret;
+> > > > > > > > -}
+> > > > > > > > -EXPORT_SYMBOL_GPL(io_buffer_register_bvec);
+> > > > > > > > -
+> > > > > > > >  static int __io_buffer_unregister_bvec(struct io_ring_ctx *ctx,
+> > > > > > > >                                        struct io_buf_data *buf)
+> > > > > > > >  {
+> > > > > > > > @@ -1006,19 +991,77 @@ static int __io_buffer_unregister_bvec(struct io_ring_ctx *ctx,
+> > > > > > > >         return 0;
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > -int io_buffer_unregister_bvec(struct io_uring_cmd *cmd,
+> > > > > > > > -                             struct io_buf_data *buf,
+> > > > > > > > -                             unsigned int issue_flags)
+> > > > > > > > +static inline int do_reg_unreg_bvec(struct io_ring_ctx *ctx,
+> > > > > > > > +                                   struct io_buf_data *buf,
+> > > > > > > > +                                   unsigned int issue_flags,
+> > > > > > > > +                                   bool reg)
+> > > > > > > >  {
+> > > > > > > > -       struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
+> > > > > > > >         int ret;
+> > > > > > > >
+> > > > > > > >         io_ring_submit_lock(ctx, issue_flags);
+> > > > > > > > -       ret = __io_buffer_unregister_bvec(ctx, buf);
+> > > > > > > > +       if (reg)
+> > > > > > > > +               ret = __io_buffer_register_bvec(ctx, buf);
+> > > > > > > > +       else
+> > > > > > > > +               ret = __io_buffer_unregister_bvec(ctx, buf);
+> > > > > > >
+> > > > > > > It feels like unifying __io_buffer_register_bvec() and
+> > > > > > > __io_buffer_unregister_bvec() would belong better in the prior patch
+> > > > > > > that changes their signatures.
+> > > > > >
+> > > > > > Can you share how to do above in previous patch?
+> > > > >
+> > > > > I was thinking you could define do_reg_unreg_bvec() in the previous
+> > > > > patch. It's a logical step once you've extracted out all the
+> > > > > differences between io_buffer_register_bvec() and
+> > > > > io_buffer_unregister_bvec() into the helpers
+> > > > > __io_buffer_register_bvec() and __io_buffer_unregister_bvec(). But
+> > > > > either way is fine.
+> > > >
+> > > > 'has_fd' and 'ring_fd' fields isn't added yet, the defined do_reg_unreg_bvec()
+> > > > could be quite simple, looks no big difference, I can do that...
+> > > >
+> > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > >         io_ring_submit_unlock(ctx, issue_flags);
+> > > > > > > >
+> > > > > > > >         return ret;
+> > > > > > > >  }
+> > > > > > > > +
+> > > > > > > > +static int io_buffer_reg_unreg_bvec(struct io_ring_ctx *ctx,
+> > > > > > > > +                                   struct io_buf_data *buf,
+> > > > > > > > +                                   unsigned int issue_flags,
+> > > > > > > > +                                   bool reg)
+> > > > > > > > +{
+> > > > > > > > +       struct io_ring_ctx *remote_ctx = ctx;
+> > > > > > > > +       struct file *file = NULL;
+> > > > > > > > +       int ret;
+> > > > > > > > +
+> > > > > > > > +       if (buf->has_fd) {
+> > > > > > > > +               file = io_uring_register_get_file(buf->ring_fd, buf->registered_fd);
+> > > > > > > > +               if (IS_ERR(file))
+> > > > > > > > +                       return PTR_ERR(file);
+> > > > > > >
+> > > > > > > It would be good to avoid the overhead of this lookup and
+> > > > > > > reference-counting in the I/O path. Would it be possible to move this
+> > > > > > > lookup to when UBLK_IO_FETCH_REQ (and UBLK_IO_COMMIT_AND_FETCH_REQ, if
+> > > > > > > it specifies a different ring_fd) is submitted? I guess that might
+> > > > > > > require storing an extra io_ring_ctx pointer in struct ublk_io.
+> > > > > >
+> > > > > > Let's start from the flexible way & simple implementation.
+> > > > > >
+> > > > > > Any optimization & improvement can be done as follow-up.
+> > > > >
+> > > > > Sure, we can start with this as-is. But I suspect the extra
+> > > > > reference-counting here will significantly decrease the benefit of the
+> > > > > auto-register register feature.
+> > > >
+> > > > The reference-counting should only be needed for registering buffer to
+> > > > external ring, which may have been slow because of the cross-ring thing...
+> > >
+> > > The current code is incrementing and decrementing the io_uring file
+> > > reference count even if the remote_ctx == ctx, right? I agree it
+> >
+> > Yes, but it can be changed to drop the inc/dec file reference easily since we
+> > have a flag field.
+> >
+> > > should definitely be possible to skip the reference count in that
+> > > case, as this code is already running in task work context for a
+> > > command on the io_uring.
+> >
+> > The current 'uring_cmd' instance holds one reference of the
+> > io_ring_ctx instance.
+> >
+> > > It should also be possible to avoid atomic
+> > > reference-counting in the UBLK_AUTO_BUF_REGISTERED_RING case too.
+> >
+> > For registering buffer to external io_ring, it is hard to avoid to grag
+> > the io_uring_ctx reference when specifying the io_uring_ctx via its FD.
 > 
-> 
-> Not seeing 1/2 the bandwidth but also significantly slower on Fedora42
-> kernel.
-> I will trace it
-> 
-> 9.5 kernel - 5.14.0-503.40.1.el9_5.x86_64
-> 
-> Run status group 0 (all jobs):
->    READ: bw=14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8GB/s-
-> 15.8GB/s), io=441GiB (473GB), run=30003-30003msec
-> 
-> Fedora42 kernel - 6.14.5-300.fc42.x86_64
-> 
-> Run status group 0 (all jobs):
->    READ: bw=10.4GiB/s (11.2GB/s), 10.4GiB/s-10.4GiB/s (11.2GB/s-
-> 11.2GB/s), io=313GiB (336GB), run=30001-30001msec
+> If the io_uring is specified by a file descriptor (not using
+> UBLK_AUTO_BUF_REGISTERED_RING), I agree reference counting is
+> necessary.
+> But the whole point of registering ring fds is to avoid reference
+> counting of the io_uring file. See how IORING_ENTER_REGISTERED_RING is
+> handled in io_uring_enter(). It simply indexes
+> current->io_uring->registered_rings to get the file, skipping the
+> fget() and fput(). Since the auto register is running in task work
+> context, it should also be able to access the task-local
+> registered_rings without reference counting.
 
-So is this MD chunk size related? i.e. what is the chunk size
-the MD device? Is it smaller than the IO size (256kB) or larger?
-Does the regression go away if the chunk size matches the IO size,
-or if the IO size vs chunk size relationship is reversed?
+registered ring requires the io_uring is registered & used in the local
+pthread, which usage is still very limited.
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> 
+> >
+> > >
+> > > >
+> > > > Maybe we can start automatic buffer register for ubq_daemon context only,
+> > > > meantime allow to register buffer from external io_uring by adding per-io
+> > > > spin_lock, which may help the per-io task Uday is working on too.
+> > >
+> > > I'm not sure I understand why a spinlock would be required? In Uday's
+> > > patch set, each ublk_io still belongs to a single task. So no
+> > > additional locking should be required.
+> >
+> > I think it is very useful to allow to register io buffer in the
+> > other(non-ubq_daemon) io_uring context by the offload style.
+> >
+> > Especially the register/unregister io buffer uring_cmd is for handling
+> > target IO, which should have been issued in same context of target io
+> > handling.
+> >
+> > Without one per-io spinlock, it is hard to avoid one race you mentioned:
+> 
+> I don't believe a spinlock is necessary. It should be possible to
+> avoid accessing the ublk_io at all when registering the request
+> buffer. __ublk_check_and_get_req() calls kref_get_unless_zero() on the
+> request, which already ensures the request is owned by the ublk server
+
+I thought the request still may be completed & recycled before calling
+__ublk_check_and_get_req(). But it can be treated as one ublk server
+logic bug since use-after-free doesn't exist actually.
+
+> and prevents it from completing while its buffer is registered. This
+> is analogous to how UBLK_F_USER_COPY works;
+> ublk_ch_read_iter()/ublk_ch_write_iter() can be safely called from any
+> thread.
+
+OK, spinlock isn't needed.
+
+
+Thanks,
+Ming
+
