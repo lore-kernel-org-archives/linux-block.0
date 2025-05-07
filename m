@@ -1,59 +1,43 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157132BB13
-	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 04:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2D515B971
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 06:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746592791; cv=none; b=C/xoje8INl4oEXcXFXac5kvInf/F92/m3ls5o0SanFQaH+8Am9bTX/UB+H//cZ2DEQ8Qmo5QqTPuJsb+9gVSwSrO2hYtdz+pa8tMTiUIhmo0X6PsCbuDPDP8E7/ip85jHJsEzV3JbDR1XG0COp3QLUCQ6eA+68lRR08oJP2bPO8=
+	t=1746598026; cv=none; b=VqUuv2P0CoQ8chggp05ror9GJWgsz5fVyFIH+JPO+5h+mdKflk9ms0/f29AMpoyg7YlZ29s4yBlz7TaKD3wTGchBE45LO/gHNlY37ztwkhMCfX8BcMWkfU/y7gpmN5dPnEel0C2+7dQitfb3TJlQR1XOUIKD+4gB7LVWpAMihH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746592791; c=relaxed/simple;
-	bh=4FGX9sSYwqwqQ6klMa2YNItRzQ6zSNxI89bef06sTnU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F6vYKmXqo/3mxSf5nP/aPu346qX4pmNK2Y0373xqBrztDADQeco1rHzoVmHNN1BHacCIzCMo6MbihRZQOicGWSc+LIMsUX4NBdhyzi6VjJ/9hcAs+/URNjLNNT9iqIrTcUjxj24mG/65sF5uUdraREs852+cWHeiGgbfK6FdYyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OIwmHsEf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746598026; c=relaxed/simple;
+	bh=F24lvu0SEwZhwoFC/g+FbX9M2Vzc1HBYO/pfhRh/uqI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=syGccf5LK0ZyoPZuG0h3iAcgLEy4UgijahEvILdUDt0Ew98ZgRrkVFXmnJ6ARmKdgmUPn18kLt87Ei9bIixFZGAVuIaUru20SSpg12r3hgNJMB3jZkihgut6KondBfsmpqKUZcpjaOV7vPEpVW0fypXXeO3D2qHyGjD5GFOTAio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3AjnUdmO; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIwmHsEf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746592787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aEEK/9QMyixQyId9Xvj0JoIIOLG0PKdje5lVksfPGcg=;
-	b=OIwmHsEftlp/vmeveNA3KBYswTeT8yqYsKVld5UCRTwWK0B7lhAWtw+yWhSfbi9bmbkgST
-	7xkPUAVEOlaXZf3crC6yuf2kC8a9SfLvwwV0qMPxUfg7Xv7wL+lMyKR9QGd7k+mLNtkKiQ
-	UmSUSqs05quH/30HKKJ+WolzSa8fdLQ=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-ZHhVAhjtOpmb_uJkRHFfIg-1; Wed,
- 07 May 2025 00:39:46 -0400
-X-MC-Unique: ZHhVAhjtOpmb_uJkRHFfIg-1
-X-Mimecast-MFC-AGG-ID: ZHhVAhjtOpmb_uJkRHFfIg_1746592785
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 330E01956048;
-	Wed,  7 May 2025 04:39:45 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.61])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D7753195608D;
-	Wed,  7 May 2025 04:39:43 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3AjnUdmO"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=EFsN+niu8trHEilCYaGAz/pHjGxJAcZSNAa+sidG8JI=; b=3AjnUdmOpL6lvmsjKd5hnZ6Njk
+	W7zsDfYYDB5iV8YNPVvC0XzGTlGklumJod78Wn0u7UGI/qwnXTWA4uHZ5addSqh9cy09dn1Q4TdrH
+	+fVBK19y8hIzjk8xtEAhZOvCOJdvExaXx93ojrmYggXO0Isogs3wgTcICg1jvDRnk/cvLrQ9c/4ul
+	sibZ7yhT0VrpapEvjc2ZxORUVlawAqdgsAwQvxUx7X/FtmonsdeZ9YZCMeTuO1CYG3TnR1E71ISk9
+	TbxzmJ5NBEvhz3LBuSToHoBE5J7OjOe0MWOX0yR7irrCX12jUlh0TO55upzL+WHKwyNH+mcG66R4K
+	ZEkPg0rQ==;
+Received: from 2a02-8389-2341-5b80-3ba7-83fe-7065-4f0b.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:3ba7:83fe:7065:4f0b] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uCXvr-0000000EKYe-0QAj;
+	Wed, 07 May 2025 06:07:03 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: yukuai1@huaweicloud.com,
+	kbusch@kernel.org,
 	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 6/6] selftests: ublk: add test for covering UBLK_AUTO_BUF_REG_FALLBACK
-Date: Wed,  7 May 2025 12:38:57 +0800
-Message-ID: <20250507043859.2978132-7-ming.lei@redhat.com>
-In-Reply-To: <20250507043859.2978132-1-ming.lei@redhat.com>
-References: <20250507043859.2978132-1-ming.lei@redhat.com>
+Subject: [PATCH v2] brd: avoid extra xarray lookups on first write
+Date: Wed,  7 May 2025 08:06:35 +0200
+Message-ID: <20250507060700.3929430-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,356 +45,138 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Add test for covering UBLK_AUTO_BUF_REG_FALLBACK:
+The xarray can return the previous entry at a location.  Use this
+fact to simplify the brd code when there is no existing page at
+a location.  This also slighly improves the handling of racy
+discards as we now always have a page under RCU protection by the
+time we are ready to copy the data.
 
-- pass '--auto_zc_fallback' to null target, which requires both F_AUTO_BUF_REG
-and F_SUPPORT_ZERO_COPY for handling UBLK_AUTO_BUF_REG_FALLBACK
-
-- add ->buf_index() method for returning invalid buffer index to trigger
-UBLK_AUTO_BUF_REG_FALLBACK
-
-- add generic_09 for running the test
-
-- add --auto_zc_fallback test in stress_03/stress_04/stress_05
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/fault_inject.c   |  5 +++
- tools/testing/selftests/ublk/file_backed.c    |  5 +++
- tools/testing/selftests/ublk/kublk.c          | 36 +++++++++++++++----
- tools/testing/selftests/ublk/kublk.h          | 11 ++++++
- tools/testing/selftests/ublk/null.c           | 14 +++++++-
- tools/testing/selftests/ublk/stripe.c         |  5 +++
- .../testing/selftests/ublk/test_generic_09.sh | 28 +++++++++++++++
- .../testing/selftests/ublk/test_stress_03.sh  |  1 +
- .../testing/selftests/ublk/test_stress_04.sh  |  1 +
- .../testing/selftests/ublk/test_stress_05.sh  |  1 +
- 11 files changed, 101 insertions(+), 7 deletions(-)
- create mode 100755 tools/testing/selftests/ublk/test_generic_09.sh
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 14d574ac142c..2a2ef0cb54bc 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -16,6 +16,7 @@ TEST_PROGS += test_generic_06.sh
- TEST_PROGS += test_generic_07.sh
+Changes since v1:
+ - use __xa_cmpxchg
+ - keep the brd_insert_page helper
+
+ drivers/block/brd.c | 76 ++++++++++++++++++++-------------------------
+ 1 file changed, 33 insertions(+), 43 deletions(-)
+
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index a3725673cf16..b1be6c510372 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -54,32 +54,33 @@ static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
+ /*
+  * Insert a new page for a given sector, if one does not already exist.
+  */
+-static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
++static struct page *brd_insert_page(struct brd_device *brd, sector_t sector,
++		blk_opf_t opf)
++	__releases(rcu)
++	__acquires(rcu)
+ {
+-	pgoff_t idx = sector >> PAGE_SECTORS_SHIFT;
+-	struct page *page;
+-	int ret = 0;
+-
+-	page = brd_lookup_page(brd, sector);
+-	if (page)
+-		return 0;
++	gfp_t gfp = (opf & REQ_NOWAIT) ? GFP_NOWAIT : GFP_NOIO;
++	struct page *page, *ret;
  
- TEST_PROGS += test_generic_08.sh
-+TEST_PROGS += test_generic_09.sh
++	rcu_read_unlock();
+ 	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
++	rcu_read_lock();
+ 	if (!page)
+-		return -ENOMEM;
++		return ERR_PTR(-ENOMEM);
  
- TEST_PROGS += test_null_01.sh
- TEST_PROGS += test_null_02.sh
-diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
-index 94a8e729ba4c..5421774d7867 100644
---- a/tools/testing/selftests/ublk/fault_inject.c
-+++ b/tools/testing/selftests/ublk/fault_inject.c
-@@ -16,6 +16,11 @@ static int ublk_fault_inject_tgt_init(const struct dev_ctx *ctx,
- 	const struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
- 	unsigned long dev_size = 250UL << 30;
- 
-+	if (ctx->auto_zc_fallback) {
-+		ublk_err("%s: not support auto_zc_fallback\n", __func__);
-+		return -EINVAL;
-+	}
-+
- 	dev->tgt.dev_size = dev_size;
- 	dev->tgt.params = (struct ublk_params) {
- 		.types = UBLK_PARAM_TYPE_BASIC,
-diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
-index 9dc00b217a66..509842df9bee 100644
---- a/tools/testing/selftests/ublk/file_backed.c
-+++ b/tools/testing/selftests/ublk/file_backed.c
-@@ -149,6 +149,11 @@ static int ublk_loop_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 		},
- 	};
- 
-+	if (ctx->auto_zc_fallback) {
-+		ublk_err("%s: not support auto_zc_fallback\n", __func__);
-+		return -EINVAL;
-+	}
-+
- 	ret = backing_file_tgt_init(dev);
- 	if (ret)
- 		return ret;
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index bf666bfd7ddd..23175d32d94f 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -405,7 +405,8 @@ static void ublk_queue_deinit(struct ublk_queue *q)
- 		free(q->ios[i].buf_addr);
+ 	xa_lock(&brd->brd_pages);
+-	ret = __xa_insert(&brd->brd_pages, idx, page, gfp);
+-	if (!ret)
+-		brd->brd_nr_pages++;
+-	xa_unlock(&brd->brd_pages);
+-
+-	if (ret < 0) {
++	ret = __xa_cmpxchg(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT, NULL,
++			page, gfp);
++	if (ret) {
++		xa_unlock(&brd->brd_pages);
+ 		__free_page(page);
+-		if (ret == -EBUSY)
+-			ret = 0;
++		if (xa_is_err(ret))
++			return ERR_PTR(xa_err(ret));
++		return ret;
+ 	}
+-	return ret;
++	brd->brd_nr_pages++;
++	xa_unlock(&brd->brd_pages);
++	return page;
  }
  
--static int ublk_queue_init(struct ublk_queue *q)
-+static int ublk_queue_init(struct ublk_queue *q,
-+			   unsigned char auto_zc_fallback)
- {
- 	struct ublk_dev *dev = q->dev;
- 	int depth = dev->dev_info.queue_depth;
-@@ -424,8 +425,11 @@ static int ublk_queue_init(struct ublk_queue *q)
- 		q->state |= UBLKSRV_NO_BUF;
- 		if (dev->dev_info.flags & UBLK_F_SUPPORT_ZERO_COPY)
- 			q->state |= UBLKSRV_ZC;
--		if (dev->dev_info.flags & UBLK_F_AUTO_BUF_REG)
-+		if (dev->dev_info.flags & UBLK_F_AUTO_BUF_REG) {
- 			q->state |= UBLKSRV_AUTO_BUF_REG;
-+			if (auto_zc_fallback)
-+				q->state |= UBLKSRV_AUTO_BUF_REG_FALLBACK;
-+		}
- 	}
+ /*
+@@ -114,36 +115,17 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
  
- 	cmd_buf_size = ublk_queue_cmd_buf_sz(q);
-@@ -583,8 +587,13 @@ int ublk_queue_io_cmd(struct ublk_queue *q, struct ublk_io *io, unsigned tag)
- 		cmd->addr	= 0;
+ 	bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
  
- 	if (q->state & UBLKSRV_AUTO_BUF_REG) {
--		cmd->auto_buf.index = tag;
-+		if (q->tgt_ops->buf_index)
-+			cmd->auto_buf.index = q->tgt_ops->buf_index(q, tag);
-+		else
-+			cmd->auto_buf.index = tag;
- 		cmd->auto_buf.flags = 0;
-+		if (q->state & UBLKSRV_AUTO_BUF_REG_FALLBACK)
-+			cmd->auto_buf.flags |= UBLK_AUTO_BUF_REG_FALLBACK;
- 	}
- 
- 	user_data = build_user_data(tag, _IOC_NR(cmd_op), 0, 0);
-@@ -738,6 +747,7 @@ struct ublk_queue_info {
- 	struct ublk_queue 	*q;
- 	sem_t 			*queue_sem;
- 	cpu_set_t 		*affinity;
-+	unsigned char 		auto_zc_fallback;
- };
- 
- static void *ublk_io_handler_fn(void *data)
-@@ -747,7 +757,7 @@ static void *ublk_io_handler_fn(void *data)
- 	int dev_id = q->dev->dev_info.dev_id;
- 	int ret;
- 
--	ret = ublk_queue_init(q);
-+	ret = ublk_queue_init(q, info->auto_zc_fallback);
- 	if (ret) {
- 		ublk_err("ublk dev %d queue %d init queue failed\n",
- 				dev_id, q->q_id);
-@@ -840,6 +850,7 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 		qinfo[i].q = &dev->q[i];
- 		qinfo[i].queue_sem = &queue_sem;
- 		qinfo[i].affinity = &affinity_buf[i];
-+		qinfo[i].auto_zc_fallback = ctx->auto_zc_fallback;
- 		pthread_create(&dev->q[i].thread, NULL,
- 				ublk_io_handler_fn,
- 				&qinfo[i]);
-@@ -1255,7 +1266,7 @@ static void __cmd_create_help(char *exe, bool recovery)
- 
- 	printf("%s %s -t [null|loop|stripe|fault_inject] [-q nr_queues] [-d depth] [-n dev_id]\n",
- 			exe, recovery ? "recover" : "add");
--	printf("\t[--foreground] [--quiet] [-z] [--auto_zc] [--debug_mask mask] [-r 0|1 ] [-g]\n");
-+	printf("\t[--foreground] [--quiet] [-z] [--auto_zc] [--auto_zc_fallback] [--debug_mask mask] [-r 0|1 ] [-g]\n");
- 	printf("\t[-e 0|1 ] [-i 0|1]\n");
- 	printf("\t[target options] [backfile1] [backfile2] ...\n");
- 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
-@@ -1310,7 +1321,8 @@ int main(int argc, char *argv[])
- 		{ "recovery_fail_io",	1,	NULL, 'e'},
- 		{ "recovery_reissue",	1,	NULL, 'i'},
- 		{ "get_data",		1,	NULL, 'g'},
--		{ "auto_zc",		0,	NULL,  0},
-+		{ "auto_zc",		0,	NULL,  0 },
-+		{ "auto_zc_fallback", 	0,	NULL,  0 },
- 		{ 0, 0, 0, 0 }
- 	};
- 	const struct ublk_tgt_ops *ops = NULL;
-@@ -1381,6 +1393,8 @@ int main(int argc, char *argv[])
- 				ctx.fg = 1;
- 			if (!strcmp(longopts[option_idx].name, "auto_zc"))
- 				ctx.flags |= UBLK_F_AUTO_BUF_REG;
-+			if (!strcmp(longopts[option_idx].name, "auto_zc_fallback"))
-+				ctx.auto_zc_fallback = 1;
- 			break;
- 		case '?':
- 			/*
-@@ -1404,6 +1418,16 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
-+	/* auto_zc_fallback depends on F_AUTO_BUF_REG & F_SUPPORT_ZERO_COPY */
-+	if (ctx.auto_zc_fallback &&
-+	    !((ctx.flags & UBLK_F_AUTO_BUF_REG) &&
-+		    (ctx.flags & UBLK_F_SUPPORT_ZERO_COPY))) {
-+		ublk_err("%s: auto_zc_fallback is set but neither "
-+				"F_AUTO_BUF_REG nor F_SUPPORT_ZERO_COPY is enabled\n",
-+					__func__);
-+		return -EINVAL;
+-	if (op_is_write(opf)) {
+-		int err;
+-
+-		/*
+-		 * Must use NOIO because we don't want to recurse back into the
+-		 * block or filesystem layers from page reclaim.
+-		 */
+-		err = brd_insert_page(brd, sector,
+-				(opf & REQ_NOWAIT) ? GFP_NOWAIT : GFP_NOIO);
+-		if (err) {
+-			if (err == -ENOMEM && (opf & REQ_NOWAIT))
+-				bio_wouldblock_error(bio);
+-			else
+-				bio_io_error(bio);
+-			return false;
+-		}
+-	}
+-
+ 	rcu_read_lock();
+ 	page = brd_lookup_page(brd, sector);
++	if (!page && op_is_write(opf)) {
++		page = brd_insert_page(brd, sector, opf);
++		if (IS_ERR(page))
++			goto out_error;
 +	}
-+
- 	i = optind;
- 	while (i < argc && ctx.nr_files < MAX_BACK_FILES) {
- 		ctx.files[ctx.nr_files++] = argv[i++];
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index ebbfad9e70aa..fb38b0d6ca7f 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -84,6 +84,7 @@ struct dev_ctx {
- 	unsigned int	all:1;
- 	unsigned int	fg:1;
- 	unsigned int	recovery:1;
-+	unsigned int	auto_zc_fallback:1;
  
- 	int _evtfd;
- 	int _shmid;
-@@ -141,6 +142,9 @@ struct ublk_tgt_ops {
- 	 */
- 	void (*parse_cmd_line)(struct dev_ctx *ctx, int argc, char *argv[]);
- 	void (*usage)(const struct ublk_tgt_ops *ops);
-+
-+	/* return buffer index for UBLK_F_AUTO_BUF_REG */
-+	unsigned short (*buf_index)(struct ublk_queue *, int tag);
- };
+ 	kaddr = bvec_kmap_local(&bv);
+ 	if (op_is_write(opf)) {
+-		/*
+-		 * Page can be removed by concurrent discard, it's fine to skip
+-		 * the write and user will read zero data if page does not
+-		 * exist.
+-		 */
+-		if (page)
+-			memcpy_to_page(page, offset, kaddr, bv.bv_len);
++		memcpy_to_page(page, offset, kaddr, bv.bv_len);
+ 	} else {
+ 		if (page)
+ 			memcpy_from_page(kaddr, page, offset, bv.bv_len);
+@@ -155,6 +137,14 @@ static bool brd_rw_bvec(struct brd_device *brd, struct bio *bio)
  
- struct ublk_tgt {
-@@ -170,6 +174,7 @@ struct ublk_queue {
- #define UBLKSRV_NO_BUF		(1U << 2)
- #define UBLKSRV_ZC		(1U << 3)
- #define UBLKSRV_AUTO_BUF_REG		(1U << 4)
-+#define UBLKSRV_AUTO_BUF_REG_FALLBACK	(1U << 5)
- 	unsigned state;
- 	pid_t tid;
- 	pthread_t thread;
-@@ -205,6 +210,12 @@ struct ublk_dev {
- extern unsigned int ublk_dbg_mask;
- extern int ublk_queue_io_cmd(struct ublk_queue *q, struct ublk_io *io, unsigned tag);
- 
+ 	bio_advance_iter_single(bio, &bio->bi_iter, bv.bv_len);
+ 	return true;
 +
-+static inline int ublk_io_auto_zc_fallback(const struct ublksrv_io_desc *iod)
-+{
-+	return !!(iod->op_flags & UBLK_IO_F_NEED_REG_BUF);
-+}
-+
- static inline int is_target_io(__u64 user_data)
- {
- 	return (user_data & (1ULL << 63)) != 0;
-diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
-index 1362dd422c6e..4cee7f15a8d9 100644
---- a/tools/testing/selftests/ublk/null.c
-+++ b/tools/testing/selftests/ublk/null.c
-@@ -116,7 +116,7 @@ static int ublk_null_queue_io(struct ublk_queue *q, int tag)
- 	unsigned zc = ublk_queue_use_zc(q);
- 	int queued;
- 
--	if (auto_zc)
-+	if (auto_zc && !ublk_io_auto_zc_fallback(iod))
- 		queued = null_queue_auto_zc_io(q, tag);
- 	else if (zc)
- 		queued = null_queue_zc_io(q, tag);
-@@ -128,9 +128,21 @@ static int ublk_null_queue_io(struct ublk_queue *q, int tag)
- 	return 0;
++out_error:
++	rcu_read_unlock();
++	if (PTR_ERR(page) == -ENOMEM && (opf & REQ_NOWAIT))
++		bio_wouldblock_error(bio);
++	else
++		bio_io_error(bio);
++	return false;
  }
  
-+/*
-+ * return invalid buffer index for triggering auto buffer register failure,
-+ * then UBLK_IO_RES_NEED_REG_BUF handling is covered
-+ */
-+static unsigned short ublk_null_buf_index(struct ublk_queue *q, int tag)
-+{
-+	if (q->state & UBLKSRV_AUTO_BUF_REG_FALLBACK)
-+		return (unsigned short)-1;
-+	return tag;
-+}
-+
- const struct ublk_tgt_ops null_tgt_ops = {
- 	.name = "null",
- 	.init_tgt = ublk_null_tgt_init,
- 	.queue_io = ublk_null_queue_io,
- 	.tgt_io_done = ublk_null_io_done,
-+	.buf_index = ublk_null_buf_index,
- };
-diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
-index 8fd8faeb5e76..404a143bf3d6 100644
---- a/tools/testing/selftests/ublk/stripe.c
-+++ b/tools/testing/selftests/ublk/stripe.c
-@@ -288,6 +288,11 @@ static int ublk_stripe_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 	loff_t bytes = 0;
- 	int ret, i, mul = 1;
- 
-+	if (ctx->auto_zc_fallback) {
-+		ublk_err("%s: not support auto_zc_fallback\n", __func__);
-+		return -EINVAL;
-+	}
-+
- 	if ((chunk_size & (chunk_size - 1)) || !chunk_size) {
- 		ublk_err("invalid chunk size %u\n", chunk_size);
- 		return -EINVAL;
-diff --git a/tools/testing/selftests/ublk/test_generic_09.sh b/tools/testing/selftests/ublk/test_generic_09.sh
-new file mode 100755
-index 000000000000..bb6f77ca5522
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_09.sh
-@@ -0,0 +1,28 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+TID="generic_09"
-+ERR_CODE=0
-+
-+if ! _have_feature "AUTO_BUF_REG"; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+if ! _have_program fio; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+_prep_test "null" "basic IO test"
-+
-+dev_id=$(_add_ublk_dev -t null -z --auto_zc --auto_zc_fallback)
-+_check_add_dev $TID $?
-+
-+# run fio over the two disks
-+fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
-+ERR_CODE=$?
-+
-+_cleanup_test "null"
-+
-+_show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testing/selftests/ublk/test_stress_03.sh
-index b5a5520dcae6..7d728ce50774 100755
---- a/tools/testing/selftests/ublk/test_stress_03.sh
-+++ b/tools/testing/selftests/ublk/test_stress_03.sh
-@@ -37,6 +37,7 @@ if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_remove 8G -t null -q 4 --auto_zc &
- 	ublk_io_and_remove 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_remove 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
- fi
- wait
- 
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 5b49a8025002..9bcfa64ea1f0 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -36,6 +36,7 @@ if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc &
- 	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
- fi
- wait
- 
-diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
-index 6f758f6070a5..bcfc904cefc6 100755
---- a/tools/testing/selftests/ublk/test_stress_05.sh
-+++ b/tools/testing/selftests/ublk/test_stress_05.sh
-@@ -64,6 +64,7 @@ if _have_feature "AUTO_BUF_REG"; then
- 	for reissue in $(seq 0 1); do
- 		ublk_io_and_remove 8G -t null -q 4 -g --auto_zc -r 1 -i "$reissue" &
- 		ublk_io_and_remove 256M -t loop -q 4 -g --auto_zc -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
-+		ublk_io_and_remove 8G -t null -q 4 -g -z --auto_zc --auto_zc_fallback -r 1 -i "$reissue" &
- 		wait
- 	done
- fi
+ static void brd_free_one_page(struct rcu_head *head)
 -- 
-2.47.0
+2.47.2
 
