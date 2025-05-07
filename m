@@ -1,115 +1,239 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D301ACEAC
-	for <linux-block@vger.kernel.org>; Tue,  6 May 2025 21:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C667A13A
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 03:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746567967; cv=none; b=eo0ORWxiGxqVCFEzvBuqTWpbFmIbSpG/K+/YozsqNKMV63ua53X5REE0QosxyWPmR7PZnY3h+B0eYItM4Bb3hVSxdKAUA3d5KiPJ+1rSqTrRiAI9nK+tlgeAX3oHK0wgjJghqlxySaGTCnSeN/Jn8xJV/r29O/e7ZnP9OJFaLOg=
+	t=1746587620; cv=none; b=PS/n2LXwjZPuaHNHdTzJxmLX8hHZZGau5AX/9+sHEMlVFVNeBJEv+kc6bjW5ZHfYPBYLB4HGuOIgxT/FePs1aB4dhX8HotKF3lqwwnHT5G9wzh1B/SxAtP2AZWoVXqjsUnoJPIw07Dh/16MMM6Lx+1VSukH1xxxweCh2/gjXMKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746567967; c=relaxed/simple;
-	bh=KVW/T+gm+GPCNqz7HicdG6nlwrN2CY3RP+2Ja9Vvb/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IO40LA1wICqSLxaou0oBuWvLNbm4i9gxLOxqjyJwghV6i6yqz57ZCvr7ZqfaTuABdsuKrWKPXbaQ0I36osAIa+b4kEBYXlDH9VL+vpjfTUvj40dXz4HYT8ym3KfqZzAT7Yvq7ePawA6qqyPODcpde66SbXLX4G8oDwPepAuM05s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=w/x83CS0; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="w/x83CS0"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-736a7e126c7so5536539b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 06 May 2025 14:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1746567964; x=1747172764; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yMIauxUIuW+HoqF685ItcdozcY2TEvm8DOxp+4JrKME=;
-        b=w/x83CS0Vm6SW5XiyQoTWIfcfp2zGwj+A1VC5vGVkmnSqrhqtjxK1qxRSXpjzlPyZn
-         J57Yc7bL2CLevK1I/TVY3SvjlmREoQ0aRSIKPDDw+uaeq9UGGM4cSQtyBJ0X9sPR9PAW
-         aAQRtr+9rsjJyGzmJTF+Ehddm8pT93CLk6IVKPfVraeGNG8ucAV+FjA2vGouYRFkcICL
-         AlsXlxMVUURV8q1IqAwavWRaK+eZvTvDYiIiMicKQQ4n/7pMG2XbtRI+7QFOK0ZwiQhA
-         iPjVHc8TbbtSvzltvFATfYyKJvg+iQXVTXcGz/Gdy9pBGQpSbkhob7+aXmSbc6OVyU32
-         1A1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746567964; x=1747172764;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yMIauxUIuW+HoqF685ItcdozcY2TEvm8DOxp+4JrKME=;
-        b=Sl5Ipy7KDnV9wbjUY7fe7G8T2dLzg4P39RBV9gSYXtYK4jZE9F0NWY2YcfyxrLS3Qr
-         kM6/50YhB+TuO45trWw6xVRgzNyhnHltXKVdAo3aFBEeGtDrP2aPhMcmXR1TZrOfRhao
-         uBcj1T1+US4w2J+qkhM5n5S+BL167Cf12+imOawKRMvjZs9ZQECK+6usHg9fWGmYLmF3
-         ejOBpOxwKWWBd1Ao0dVZs7C6H/+MdLzTwgLy574lRBr170NlNdWgLH27+hb9cHrvnpUa
-         YoOB9Hk1E1Xr4eGWoXE4SZAZheliRN2dwZstkU2DqfzJ2UCLbUVtgqUZ75s6aNOqPfIl
-         DCow==
-X-Forwarded-Encrypted: i=1; AJvYcCXnsJTHbt5PsEgy934FlTIG1E/0zisXWmcNFmZwDdkySPw/bR5g099tGBnhzC9Fk+SCmBPk5Xt2uXYcqQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6uEv0HoDXUG5isvcUxl5n+Lz3493W/Jh2LU4bCwz2jzHlkvUZ
-	lBPe4C9W1npMYBNwycoJiWAl9bScJBm8p3f1TrjWBcQYl9ydBkSzIUOaSdSr3MA=
-X-Gm-Gg: ASbGnctSHEHbm4aXpsKc1CCG1+KGUAcwGPKw2bYG1ANE27wSv0nzQ4yWeWxKS0UkpCv
-	1d9pfY7ldEiXDlFpd0cKfJgAs3pElJs43rOrBb8WnPxGQBHQzgpyJnBNofo9R2IO4xZazBgMBwl
-	KTQXXury11Bvkpwzt24T0qxoM1zGGQ90CX9MdDHt5t5pinnwJmltyv2IbA3jvCVXPtF/uFYm7MC
-	h4bkA5UJwKDTaJYfxGvz79rAP50/xT4VARtUg4pLV0w6/ZNQotgMPXozTweeyf73FuiJLikFyex
-	kVRx/BxySK4wBB9qoubTwHNWgl2qCKkX1BGv6nFBwL6SCa76Lpr64DufbRl1Kj7fUC6YQOPZCIV
-	qGabxmjxsZVRjwQ==
-X-Google-Smtp-Source: AGHT+IEDv1UiP/xCxZrA1w8m+KQBBlf4+RMLlDiU6bPNRxHPNwXX75ish2am3Kh1zQ+4fNgAJNLx6A==
-X-Received: by 2002:a05:6a20:9e49:b0:203:becd:f98c with SMTP id adf61e73a8af0-2148bc12e8cmr1101048637.13.1746567964591;
-        Tue, 06 May 2025 14:46:04 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-60-96.pa.nsw.optusnet.com.au. [49.181.60.96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740590a463fsm9917368b3a.173.2025.05.06.14.46.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 14:46:04 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.98.2)
-	(envelope-from <david@fromorbit.com>)
-	id 1uCQ6z-00000000GTQ-0jbm;
-	Wed, 07 May 2025 07:46:01 +1000
-Date: Wed, 7 May 2025 07:46:01 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Anton Gavriliuk <antosha20xx@gmail.com>
-Cc: Laurence Oberman <loberman@redhat.com>, linux-nvme@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: Sequential read from NVMe/XFS twice slower on Fedora 42 than on
- Rocky 9.5
-Message-ID: <aBqDGY1i3RePyzaB@dread.disaster.area>
-References: <CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-QzmZBMmtr1oC=fOOgAQ@mail.gmail.com>
- <aBaVsli2AKbIa4We@dread.disaster.area>
- <CAAiJnjor+=Zn62n09f-aJw2amX2wxQOb-2TB3rea9wDCU7ONoA@mail.gmail.com>
- <aBfhDQ6lAPmn81j0@dread.disaster.area>
- <7c33f38a52ccff8b94f20c0714b60b61b061ad58.camel@redhat.com>
- <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
- <aBlCDTm-grqM4WtY@dread.disaster.area>
- <CAAiJnjo87CEeFrkHbXtQM-=+K9M8uEpythLthWTwM_-i4HMA_Q@mail.gmail.com>
+	s=arc-20240116; t=1746587620; c=relaxed/simple;
+	bh=Uhbp/LVZBJtLQ6ZNL2EGebSEp7A/3bLg7OAMI5c+2XA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=aNLLFBR8X5CVTBz8TqRVs/rsNV35Pb310e66yswuky0lDLvULAhs3zI8BOHoiq1JObplmsgB6qFYHZ8zqDnTUAjedMz1+4x0zCkzKTXwDz/465k7BYuT2fz8gMAsL3Sf6kZFPeSamjk360nOLwb8RRnkLf9SaCDx8rsT2+Xf3R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Zsfxs6f2sz4f3lVM
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 10:54:57 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E74D51A0359
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 10:55:23 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDnSl+ayxpoEgOpLg--.43748S3;
+	Wed, 07 May 2025 10:55:23 +0800 (CST)
+Subject: Re: [PATCH] brd: avoid extra xarray lookups on first write
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, yukuai1@huaweicloud.com, linux-block@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250506143836.3793765-1-hch@lst.de>
+ <aBotzukGcxHQ0LIX@kbusch-mbp.dhcp.thefacebook.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <122ac0f6-74df-1ea8-15ba-8ca4f2bc3de9@huaweicloud.com>
+Date: Wed, 7 May 2025 10:55:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAiJnjo87CEeFrkHbXtQM-=+K9M8uEpythLthWTwM_-i4HMA_Q@mail.gmail.com>
+In-Reply-To: <aBotzukGcxHQ0LIX@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDnSl+ayxpoEgOpLg--.43748S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWw15CFWxGFW8tFyfXw18Krg_yoWrAF4UpF
+	WkGry8A398Zry5Gw17ZFZ8ur1Fvw1IgFWxKFy8W3WUur4fur9ayasFkryFg3W5CrZrCrZ8
+	Aa15tr1DZrs5Ja7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUbSfO7UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, May 06, 2025 at 02:03:37PM +0300, Anton Gavriliuk wrote:
-> > So is this MD chunk size related? i.e. what is the chunk size
-> > the MD device? Is it smaller than the IO size (256kB) or larger?
-> > Does the regression go away if the chunk size matches the IO size,
-> > or if the IO size vs chunk size relationship is reversed?
+Hi,
+
+ÔÚ 2025/05/06 23:42, Keith Busch Ð´µÀ:
+> On Tue, May 06, 2025 at 04:38:36PM +0200, Christoph Hellwig wrote:
+>> +	rcu_read_lock();
+>> +	page = brd_lookup_page(brd, sector);
+>> +	if (!page && op_is_write(opf)) {
+>>   		/*
+>>   		 * Must use NOIO because we don't want to recurse back into the
+>>   		 * block or filesystem layers from page reclaim.
+>>   		 */
+>> -		err = brd_insert_page(brd, sector,
+>> -				(opf & REQ_NOWAIT) ? GFP_NOWAIT : GFP_NOIO);
+>> -		if (err) {
+>> -			if (err == -ENOMEM && (opf & REQ_NOWAIT))
+>> -				bio_wouldblock_error(bio);
+>> -			else
+>> -				bio_io_error(bio);
+>> -			return false;
+>> +		gfp_t gfp = (opf & REQ_NOWAIT) ? GFP_NOWAIT : GFP_NOIO;
+>> +
+>> +		rcu_read_unlock();
+>> +		page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+>> +		if (!page) {
+>> +			err = -ENOMEM;
+>> +			goto out_error;
+>> +		}
+>> +		rcu_read_lock();
+>> +
+>> +		xa_lock(&brd->brd_pages);
+>> +		ret = __xa_store(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT,
+>> +				page, gfp);
 > 
-> According to the output below, the chunk size is 512K,
+> On success, __xa_store() says it replaces the old entry ("ret"), with
+> your new entry ("page"). I think you want to store the new entry only if
+> there is no old entry, so shouldn't this instead be:
+> 
+> 		ret = __xa_cmpxchg(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT,
+> 				   NULL, page, gfp);
+> 
+> ?
 
-Ok.
+Looks this is right, comments from xa_store:
 
-`iostat -dxm 5` output during the fio run on both kernels will give
-us some indication of the differences in IO patterns, queue depths,
-etc.
+After this function returns, loads from this index will return @entry.
+> 
+>> +		if (!ret)
+>> +			brd->brd_nr_pages++;
+>> +		xa_unlock(&brd->brd_pages);
+>> +
+>> +		if (ret) {
+>> +			__free_page(page);
+>> +			err = xa_err(ret);
+>> +			if (err < 0)
+>> +				goto out_error;
+>> +			page = ret;
+>>   		}
+> 
+> .
+> 
 
-Silly question: if you use DM to create the same RAID 0 array
-with a dm table such as:
+BTW, can we keep the old brd_insert_page, and return inserted page
+directly? This change should be simplier.
 
-0 75011629056 striped 12 1024 /dev/nvme7n1 0 /dev/nvme0n1 0 ....  /dev/nvme12n1 0
+Thanks,
+Kuai
 
-to create a similar 38TB raid 0 array, do you see the same perf
-degradation?
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index a3725673cf16..ea481422e53e 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -54,7 +54,7 @@ static struct page *brd_lookup_page(struct brd_device 
+*brd, sector_t sector)
+  /*
+   * Insert a new page for a given sector, if one does not already exist.
+   */
+-static int brd_insert_page(struct brd_device *brd, sector_t sector, 
+gfp_t gfp)
++static struct page *brd_insert_page(struct brd_device *brd, sector_t 
+sector, gfp_t gfp)
+  {
+         pgoff_t idx = sector >> PAGE_SECTORS_SHIFT;
+         struct page *page;
+@@ -62,24 +62,30 @@ static int brd_insert_page(struct brd_device *brd, 
+sector_t sector, gfp_t gfp)
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+         page = brd_lookup_page(brd, sector);
+         if (page)
+-               return 0;
++               return page;
+
++       rcu_read_unlock();
+         page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+-       if (!page)
+-               return -ENOMEM;
++       if (!page) {
++               rcu_read_lock();
++               return ERR_PTR(-ENOMEM);
++       }
+
++       rcu_read_lock();
+         xa_lock(&brd->brd_pages);
+         ret = __xa_insert(&brd->brd_pages, idx, page, gfp);
+         if (!ret)
+                 brd->brd_nr_pages++;
+         xa_unlock(&brd->brd_pages);
+
+-       if (ret < 0) {
+-               __free_page(page);
+-               if (ret == -EBUSY)
+-                       ret = 0;
+-       }
+-       return ret;
++       if (likely(!ret))
++               return page;
++
++       __free_page(page);
++       if (unlikely(ret == -EBUSY))
++               return brd_lookup_page(brd, sector);
++
++       return ERR_PTR(ret);
+  }
+
+  /*
+@@ -114,36 +120,31 @@ static bool brd_rw_bvec(struct brd_device *brd, 
+struct bio *bio)
+
+         bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
+
++       rcu_read_lock();
+         if (op_is_write(opf)) {
+-               int err;
+-
+                 /*
+                  * Must use NOIO because we don't want to recurse back 
+into the
+                  * block or filesystem layers from page reclaim.
+                  */
+-               err = brd_insert_page(brd, sector,
++               page = brd_insert_page(brd, sector,
+                                 (opf & REQ_NOWAIT) ? GFP_NOWAIT : 
+GFP_NOIO);
+-               if (err) {
++               if (IS_ERR(page)) {
++                       int err = PTR_ERR(page);
++
++                       rcu_read_unlock();
+                         if (err == -ENOMEM && (opf & REQ_NOWAIT))
+                                 bio_wouldblock_error(bio);
+                         else
+                                 bio_io_error(bio);
+                         return false;
+                 }
++       } else {
++               page = brd_lookup_page(brd, sector);
+         }
+
+-       rcu_read_lock();
+-       page = brd_lookup_page(brd, sector);
+-
+         kaddr = bvec_kmap_local(&bv);
+         if (op_is_write(opf)) {
+-               /*
+-                * Page can be removed by concurrent discard, it's fine 
+to skip
+-                * the write and user will read zero data if page does not
+-                * exist.
+-                */
+-               if (page)
+-                       memcpy_to_page(page, offset, kaddr, bv.bv_len);
++               memcpy_to_page(page, offset, kaddr, bv.bv_len);
+         } else {
+                 if (page)
+                         memcpy_from_page(kaddr, page, offset, bv.bv_len);
+
