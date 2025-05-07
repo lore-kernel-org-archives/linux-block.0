@@ -1,120 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f97.google.com (mail-oa1-f97.google.com [209.85.160.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2287202F83;
-	Wed,  7 May 2025 21:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7497253F24
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 21:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746651792; cv=none; b=tSgSR3YHPOkbeE9L15qP7uQEIWMX73s7j/CRnykYic2NibDPGKUDZTkzHfiIcsAQ0+emMv3i8NWmGkiyQSeFejcnnRPZvIjRaWhFxehtTFYDE4Oz9U7E1mtAgXJD8gk2RWnnoFlSJtXFNmBi1kvBhjHuTUL/U7+qUMySzyXro5g=
+	t=1746654593; cv=none; b=ovB1mUNDL6O4DdQyQL1wqnRpxlB/0NQhvWYiau9w3y5q87rUacH26vkPP0ubpE/bm3FcAYxNfxQwF6L7gT29lGW/H87lhhqdjpmr0zieTUJxg41O25UZoGqstm8/OMIKCvkjO6G1mru7mW8tXLY0zXO14XMYVVdzB4cwEDB4Ajc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746651792; c=relaxed/simple;
-	bh=cnPOQ8rH8mGEWg2SZAMmFPn+K66GqaSykHvHWUjRJFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwQ9scGayCQ05N3YqjBmMMRM0npvbcH7vLMMxiXOJ7F7KX0wknWPeBKkre1f5TqD0vnleB15iBTXTXwtewWa1TmgvlQaCe2r2105qeceG3seMu9CLHROnRwXlY3RWJ4nH5m/UXdjSg9aAVIcbrDfv0nZD4r/Nq2zMciBGCyczH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ou5UvFB7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746654593; c=relaxed/simple;
+	bh=f/xTZ8BJxeNBMZ86V1uElFpd5cDr7++FrMMuSPkUyhY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=LKKMJeEGq/2pIhTeHCPXB8cw6ZkIMs1ABn4RsVGuZyexJoT722NNZfDLLWB2Bo48d0Pi6AtExWhwpemV6ZHDau+PDMs9FoYiqXWwcYYBaSQ8JOzUDqqzXfV67O6XNywJGdD5M20RWJL0G5ybMnetvRZ9uv7xU2lYc+WMUy8uGkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WYILmm/u; arc=none smtp.client-ip=209.85.160.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ou5UvFB7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59BAC4CEE2;
-	Wed,  7 May 2025 21:03:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746651792;
-	bh=cnPOQ8rH8mGEWg2SZAMmFPn+K66GqaSykHvHWUjRJFM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ou5UvFB7TRZFqaxnYiEakdi8Tv4V4TzoEj9Wbs7Q232VF867LOvRSZU+HZuD0Bq29
-	 6CsCTPAn0pECDaosSJX8x976KW3ktLd9AEIM0HbZDqa6j9FdJY0JVbrPH5Nv3bO1hF
-	 iIRu+OKZ1opelRfc+PFgGG2aRNfJhh4De1IHrOez/LdSHTTOSeQKEui3LTnMMeRTT9
-	 W+5W3K5rrPfVhLUgD3gPmbJZPXu0JaLwoj23F/peyg6pNFb6IhrHsA/7+Eet9shIt4
-	 Sng0fra5pNs4VfCOHaFQ+hSm5RXYO+syELa8jv0hYssg/oKu0kM6h7bFr8uzfaXdN3
-	 ajieBlH8ExtxQ==
-Date: Wed, 7 May 2025 14:03:10 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Zhang Yi <yi.zhang@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tytso@mit.edu,
-	john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
-	shinichiro.kawasaki@wdc.com, brauner@kernel.org,
-	yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com,
-	yangerkun@huawei.com
-Subject: Re: [RFC PATCH v4 07/11] fs: statx add write zeroes unmap attribute
-Message-ID: <20250507210310.GG25675@frogsfrogsfrogs>
-References: <20250421021509.2366003-1-yi.zhang@huaweicloud.com>
- <20250421021509.2366003-8-yi.zhang@huaweicloud.com>
- <20250505132208.GA22182@lst.de>
- <20250505142945.GJ1035866@frogsfrogsfrogs>
- <c7d8d0c3-7efa-4ee6-b518-f8b09ec87b73@huaweicloud.com>
- <20250506043907.GA27061@lst.de>
- <64c8b62a-83ba-45be-a83e-62b6ad8d6f22@huaweicloud.com>
- <20250506121102.GA21905@lst.de>
- <a39a6612-89ac-4255-b737-37c7d16b3185@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WYILmm/u"
+Received: by mail-oa1-f97.google.com with SMTP id 586e51a60fabf-2dab7a32fb7so273905fac.0
+        for <linux-block@vger.kernel.org>; Wed, 07 May 2025 14:49:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1746654590; x=1747259390; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jtOqL5v5hGaLj2nSYEbTs7MVaDma8jT2Iux9zNB98wA=;
+        b=WYILmm/ulrWDuvRg7mGH0sDMJTqwudXYEx7iA38slj1nHr3LROdGYf9Cu7pXyuD2HH
+         KRTx65WwbA0ExJBK+ADGs50so2g0A37+cLpB0kC09+3CC9MymgwmaWP7OO0IKmL4f0sT
+         X9pn33qGlpaFIeIab8tSeUfEmYgCc1ahsqCT9RprPqhJQKprOsleCDS6Hm8aBMQ1QwhI
+         FGXlKlKxPdLQ06Aun+fkUAzKCOFwaOkD/qTHz1Y5EVojVa0pkd710gGebYLxU+aTxb0r
+         eiwQb6yeHrytusErUsXoRKs5iS4rx2zVsmWTsjMpsNzJI/awq/GByTekAYUiByGhbf3L
+         EnKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746654590; x=1747259390;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jtOqL5v5hGaLj2nSYEbTs7MVaDma8jT2Iux9zNB98wA=;
+        b=XXnj0G3wstmFUNWiVf9wbYLECz/An71UfvuJ0xlzliWz9qGaZ8RxGgmFTN0771GykD
+         utB78tbwn4BSby3/HeEXBLaoiOF6yO3wNDGIXm4x+1SRiebxAESTGdCTvmhmBGMEFvCX
+         m3lze5nYK2i5H8We5F7DmJnw0LLx7lERb3ofRy/ZNZhnIIJRMSuL2KJlsgFrkKazuWto
+         IqLLk7Hqte4EpD3dtu3VR/9Hxn6JA9cpL6QmzXNSrr2r+7VGN6PyqI/M4gRvLX3GvGBV
+         J0+KaWUed1jtclMg25dhvybClM8EHR2KHsxfaSekRPkLNoCJ1FYq9KXT1l6gpTFR5vEc
+         pImQ==
+X-Gm-Message-State: AOJu0YxTjts3aLbSmXAGcwpZOnQ7n59ziorhoSfFLMH2ilh11q+90BUR
+	63w0nPT0qSjZsoNqHAocY3Xgpj7cf9u7crnOTA7SVuIwMUrOoGCi76UF0QIsZjzr6u8Z5nsTQOy
+	+9bqnybXH/dv8TIKPQSF6aBHRN1OAsd7XMt9Wx1A+IVLj/Nab
+X-Gm-Gg: ASbGncviZewtyn/+xIfeazlzBDIT76CRJBYXJsqEE29tC3pXztvSL199YM/zHtF8C0I
+	HPkMj1o3+p00EfdA6elgzbdNTWeKy8zZ4Hmq9Ek6ytr0J2p4wzUQCbk7hBM5JkqcMWOYD3XmDYN
+	TMhL/ROVjXPq4LTPkrqrScvOxZ9UZq2Nizz7es1mTauVmQ8Cg6zsiDgtxNzTlzRw5Rvj7NrS06q
+	l7NKaBKBhaelax5n+uADuUmUTOlMoW80u0MkRKQkgJxSbbASbqztnCuog6ZJ243kGbJ/fvxkSRn
+	xP9pdtkSqwmEqWfTxuuKhQVns4gOc+c=
+X-Google-Smtp-Source: AGHT+IGMnFiY0xyQc6c4BYgqiuOS8Lq+bjP0JIRCUEyTMPXHCZjKDaIlzWCuY20vgwE60gGjQrKqLLEmav5O
+X-Received: by 2002:a05:6870:8901:b0:2c2:561c:47e3 with SMTP id 586e51a60fabf-2db814c514cmr694916fac.21.1746654589745;
+        Wed, 07 May 2025 14:49:49 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2db5cd9e153sm144323fac.23.2025.05.07.14.49.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 14:49:49 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 444503406B0;
+	Wed,  7 May 2025 15:49:49 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 38F63E413C6; Wed,  7 May 2025 15:49:49 -0600 (MDT)
+From: Uday Shankar <ushankar@purestorage.com>
+Date: Wed, 07 May 2025 15:49:36 -0600
+Subject: [PATCH v6 2/8] sbitmap: fix off-by-one when wrapping hint
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a39a6612-89ac-4255-b737-37c7d16b3185@huaweicloud.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250507-ublk_task_per_io-v6-2-a2a298783c01@purestorage.com>
+References: <20250507-ublk_task_per_io-v6-0-a2a298783c01@purestorage.com>
+In-Reply-To: <20250507-ublk_task_per_io-v6-0-a2a298783c01@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+ Caleb Sander Mateos <csander@purestorage.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Uday Shankar <ushankar@purestorage.com>
+X-Mailer: b4 0.14.2
 
-On Wed, May 07, 2025 at 03:33:23PM +0800, Zhang Yi wrote:
-> On 2025/5/6 20:11, Christoph Hellwig wrote:
-> > On Tue, May 06, 2025 at 07:16:56PM +0800, Zhang Yi wrote:
-> >> Sorry, but I don't understand your suggestion. The
-> >> STATX_ATTR_WRITE_ZEROES_UNMAP attribute only indicate whether the bdev
-> >> and the block device that under the specified file support unmap write
-> >> zeroes commoand. It does not reflect whether the bdev and the
-> >> filesystems support FALLOC_FL_WRITE_ZEROES. The implementation of
-> >> FALLOC_FL_WRITE_ZEROES doesn't fully rely on the unmap write zeroes
-> >> commoand now, users simply refer to this attribute flag to determine
-> >> whether to use FALLOC_FL_WRITE_ZEROES when preallocating a file.
-> >> So, STATX_ATTR_WRITE_ZEROES_UNMAP and FALLOC_FL_WRITE_ZEROES doesn't
-> >> have strong relations, why do you suggested to put this into the ext4
-> >> and bdev patches that adding FALLOC_FL_WRITE_ZEROES?
-> > 
-> > So what is the point of STATX_ATTR_WRITE_ZEROES_UNMAP?
-> 
-> My idea is not to strictly limiting the use of FALLOC_FL_WRITE_ZEROES to
-> only bdev or files where bdev_unmap_write_zeroes() returns true. In
-> other words, STATX_ATTR_WRITE_ZEROES_UNMAP and FALLOC_FL_WRITE_ZEROES
-> are not consistent, they are two independent features. Even if some
-> devices STATX_ATTR_WRITE_ZEROES_UNMAP are not set, users should still be
-> allowed to call fallcoate(FALLOC_FL_WRITE_ZEROES). This is because some
-> devices and drivers currently cannot reliably ascertain whether they
-> support the unmap write zero command; however, certain devices, such as
-> specific cloud storage devices, do support it. Users of these devices
-> may also wish to use FALLOC_FL_WRITE_ZEROES to expedite the zeroing
-> process.
-> 
-> Therefore, I think that the current point of
-> STATX_ATTR_WRITE_ZEROES_UNMAP (possibly STATX_WRITE_ZEROES_UNMAP) should
-> be to just indicate whether a bdev or file supports the unmap write zero
-> command (i.e., whether bdev_unmap_write_zeroes() returns true). If we
-> use standard SCSI and NVMe storage devices, and the
-> STATX_ATTR_WRITE_ZEROES_UNMAP attribute is set, users can be assured
-> that FALLOC_FL_WRITE_ZEROES is fast and can choose to use
-> fallocate(FALLOC_FL_WRITE_ZEROES) immediately.
-> 
-> Would you prefer to make STATX_ATTR_WRITE_ZEROES_UNMAP and
-> FALLOC_FL_WRITE_ZEROES consistent, which means
-> fallcoate(FALLOC_FL_WRITE_ZEROES) will return -EOPNOTSUPP if the block
-> device doesn't set STATX_ATTR_WRITE_ZEROES_UNMAP ?
-> 
-> If so, I'd suggested we need to:
-> 1) Remove STATX_ATTR_WRITE_ZEROES_UNMAP since users can check the
->    existence by calling fallocate(FALLOC_FL_WRITE_ZEROES) directly, this
->    statx flag seems useless.
-> 2) Make the BLK_FEAT_WRITE_ZEROES_UNMAP sysfs interface to RW, allowing
->    users to adjust the block device's support state according to the
->    real situation.
+In update_alloc_hint_after_get, we wrap the new hint back to 0 one bit
+too early. This breaks round robin tag allocation (BLK_MQ_F_TAG_RR) -
+some tags get skipped, so we don't get round robin tags even in the
+simple case of single-threaded load on a single hctx. Fix the off-by-one
+in the wrapping condition so that round robin tag allocation works
+properly.
 
-Sounds fine to me... ;)
+The same pattern occurs in __sbitmap_get_word, so fix it there too.
 
---D
+Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+---
+ lib/sbitmap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Thanks,
-> Yi.
-> 
-> 
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index d3412984170c03dc6600bbe53f130404b765ac5a..aa1cec78b9649f1f3e8ef2d617dd7ee724391a8c 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -51,7 +51,7 @@ static inline void update_alloc_hint_after_get(struct sbitmap *sb,
+ 	} else if (nr == hint || unlikely(sb->round_robin)) {
+ 		/* Only update the hint if we used it. */
+ 		hint = nr + 1;
+-		if (hint >= depth - 1)
++		if (hint >= depth)
+ 			hint = 0;
+ 		this_cpu_write(*sb->alloc_hint, hint);
+ 	}
+@@ -182,7 +182,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			break;
+ 
+ 		hint = nr + 1;
+-		if (hint >= depth - 1)
++		if (hint >= depth)
+ 			hint = 0;
+ 	}
+ 
+
+-- 
+2.34.1
+
