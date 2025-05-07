@@ -1,96 +1,144 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9460A232367
-	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 11:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3DE1FF7B4
+	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 12:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746617892; cv=none; b=YLIQfT1VWV1zLqNCk8ABpprbw+xX9GYZSpIuI61643JZKZqthShEQx5ywBx9hDI2k4HWZwea3ZZohqX+kp6u90PI3wom5IqZimiM+1ip0Jw/pBPQ63o8RHupsZ6Q+WjSlRPTpQGH5oFS8DLxgRV5tZN/MA1IOtua5IAgauL85dI=
+	t=1746619466; cv=none; b=budjM6YYsTi0M22OYgxyIao7rwWZHw+kxI22WEoU66l0Pl4mcKqcI3y/wDNBwgzYdgf8aco8swGv0/uSc7b+G/oxkU5GGyl6jFhg6pbhzIgvTutDIW3uwFE9LrEo1RRBbKs7lvHamdolABBTW4YtN5AOq3FXK8sjevB0stk46Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746617892; c=relaxed/simple;
-	bh=lwx047rGbrFkawU8qBzJimbB0KtPvNw4gWZ/kXPAafQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jn+gRnsKkeI8gpnUdVBCs1osS+NFB0y7ZQ/Jhd59+8UcZe/A9M49MsXCj98KR3nT+0rXW+CcA4HfovOniflHEJbSUtri4NN7inR9Iqt7W93g8EPe5YwbNVywlbCu/VDTz+Z+Bi7HgFYRrUOpz7jz6YyxJTp+lFwp7LPhUEXw3hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nkT6+9Nq; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1746619466; c=relaxed/simple;
+	bh=RHV6DwAF3cBIS3Qj8g4BfW6t4rgbyAyMlxQuDgPEF6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eW4Xqtt/UVw4MZVJj7zE3VzWABcfdZGXivxx+txDISZMIknzRyXdWnc23i/GFf3th8nFrKXxFV3fqemhs624kEYXjkI/OTnYccw+lsra3dxdfRSjW+OaVTHts88Z2GprNAQ2NEitmIjCuCWCV6kOBz+Tt1btBo+X2QLlgY6bvro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JGK1fMs3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nkT6+9Nq"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso9461923b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 07 May 2025 04:38:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746617889; x=1747222689; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KkT+tiv19cX2cFuziOZDznr5oqsLqy+oJ6rHVO98yfg=;
-        b=nkT6+9NqDcyNSaQvDcxt4n5c1S3KuCMEL2Ez91hLLc6LcZQsGGp6A3DVL3CWDRwzJI
-         AIkBAbvX+jcTkjxSiZxO1dT3lWFkVlO2YuppzDrIeTm3pejMOTT+wyMkFVM6+FzRs1f7
-         ddcPp26yKWEf/hbBDTTU1oWwcihWcBmM6LIDLsOqONvnUu/nZ4E0n8rNK63mkg+OwaH3
-         l4lWH+oxBVJHKvLEfg2H7tDMa6pQ/1z6endp9xJa7p/PoqJS1WraaoqgX6SM6FlyHk/n
-         H9zI6wxiX7gfSNMJWxHiYlLDBJ3VA9vOUo1/H+kVkFYyDk2RLbdEdwRCJg52ocUS3SCT
-         YijQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746617889; x=1747222689;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KkT+tiv19cX2cFuziOZDznr5oqsLqy+oJ6rHVO98yfg=;
-        b=jpYxsdIjXJIE9OLvlSUJ7QotQAATwyiwtU4uxh4o+dPNRT+UhTbiojRa9kvxloKuou
-         +T2Zeqny/gq1bXuoWGJogo7c3XsqSq7tYQf4U7c/bwcetwb90BKeZDXmoKrcCL+SxM1u
-         WwaQTjPDq+0y90ca+i9i5vdLgQ0DYuByMsQVjLqin3VOsDOV+FXVPYCOrfUN2LPyVWcU
-         rDKhu7P11dKkl1mOK9EraxxV3WdDKuUOcWm5wWMiISYe4hUvbWxoI6ng9v9EHtK3Ip0d
-         TAV5fyKOJ2xoUeAIF+h0VOeR4J/sCiKS1h0ElQVWeL73cO/OtmkOzc+YnrdOsIpBNm8/
-         4OwA==
-X-Gm-Message-State: AOJu0Yyd6OnwlIzzkRTlXPnZScHUFVcgEpmJukwBrqhLXjbIX7hTIddL
-	ZBq2Vaer/vzaIUHXLWpm7LDY0XvlGm1EmLKldYavs/jEQw5VkOTx2gphOomt+Q5tqrlkKnY7XX8
-	v
-X-Gm-Gg: ASbGncuodtZ7LhKKtgo5B2403EJ5ePq+Z8vTR7hgJl6HDlLGqEZSh77UEgCHyeUukxR
-	o/cvZkENJY9dunwBDTwy8qsaMSNND8AhU1pYG0lyxbO/91PqAvC37hzlZp1iZxAcspcbjDnLsJ0
-	D40L3cczYZloB0wtcrcfDTJswDO9JbfyCVWE8h4Ni+iVJMp+GI936dJ7YlSKH1a6O0Ta5/B7EGE
-	8FaddwLYKh8i9Ufh7aHxaZPZGFu8D2PdrtjiqA3Tb4rm4EHwpwIqocoxOJOvpUIltqOw2YYAEwe
-	lZPhCiDiNyc5gm8hHawpRIYh51nO65a1
-X-Google-Smtp-Source: AGHT+IEXgE5gvpCD2i/FMJ2BBc0XnzFtTx8OS/CVSPhhWEoXph+k2xqwyvz9qCEqorfUj8MbG4mnPQ==
-X-Received: by 2002:a05:6e02:1947:b0:3a7:820c:180a with SMTP id e9e14a558f8ab-3da739326ecmr25693975ab.19.1746617879155;
-        Wed, 07 May 2025 04:37:59 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d975f6d809sm30095175ab.65.2025.05.07.04.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 04:37:58 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-In-Reply-To: <20250507092537.3009112-1-ming.lei@redhat.com>
-References: <20250507092537.3009112-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: fix warning on 'make htmldocs'
-Message-Id: <174661787810.1789654.3857004286432977507.b4-ty@kernel.dk>
-Date: Wed, 07 May 2025 05:37:58 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGK1fMs3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746619463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+mVFQXK6zEkidtBLklwr0Aa8nWQaiOitQfPvErp+9cw=;
+	b=JGK1fMs3ksjoVrxZWO7GK4me8bEy2jlIMFEhIDLKxIxKNYW4gTaYKC6P+yIWTmgHGBzCJj
+	hR93kGZNo6chTd2Pz7q3qE3A2vHdSubDmG3i0ICp9C89x+7GcfbM/IlkRkOAM0g3T+/8Hj
+	XSB3fwWLNaVC/d63xVTjz8UUqAzMTnk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-304-IEuLtno4NiSDAeVgRq1_2w-1; Wed,
+ 07 May 2025 08:04:20 -0400
+X-MC-Unique: IEuLtno4NiSDAeVgRq1_2w-1
+X-Mimecast-MFC-AGG-ID: IEuLtno4NiSDAeVgRq1_2w_1746619459
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4153B1956046;
+	Wed,  7 May 2025 12:04:19 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.52])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1C2A61953B80;
+	Wed,  7 May 2025 12:04:17 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/2] block: move queue quiesce into elevator_change()
+Date: Wed,  7 May 2025 20:04:02 +0800
+Message-ID: <20250507120406.3028670-2-ming.lei@redhat.com>
+In-Reply-To: <20250507120406.3028670-1-ming.lei@redhat.com>
+References: <20250507120406.3028670-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
+blk_mq_freeze_queue() can't be called on quiesced queue, otherwise it may
+never return if there is any queued requests.
 
-On Wed, 07 May 2025 17:25:37 +0800, Ming Lei wrote:
-> Fix the following warning when running 'make htmldocs':
-> 
-> +WARNING: include/linux/blk-mq.h:532 struct member 'update_nr_hwq_lock' not described in 'blk_mq_tag_set'
-> 
-> 
+Fix it by moving queue quiesce int elevator_change() by adding one flag to
+'struct elv_change_ctx' for controlling this behavior.
 
-Applied, thanks!
+Fixes: 1e44bedbc921 ("block: unifying elevator change")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-sysfs.c | 5 +----
+ block/elevator.c  | 9 +++++++++
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-[1/1] block: fix warning on 'make htmldocs'
-      commit: f31acff017b1d80e649f674450d3b64d3265848c
-
-Best regards,
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 386374ff655b..8be2390c3c19 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -948,11 +948,8 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		blk_mq_sysfs_unregister(disk);
+ 	blk_crypto_sysfs_unregister(disk);
+ 
+-	if (queue_is_mq(q)) {
+-		blk_mq_quiesce_queue(q);
++	if (queue_is_mq(q))
+ 		elevator_set_none(q);
+-		blk_mq_unquiesce_queue(q);
+-	}
+ 
+ 	mutex_lock(&q->sysfs_lock);
+ 	disk_unregister_independent_access_ranges(disk);
+diff --git a/block/elevator.c b/block/elevator.c
+index f8d72bd20610..e1386b84a415 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -49,6 +49,7 @@
+ struct elv_change_ctx {
+ 	const char *name;
+ 	bool no_uevent;
++	bool quiesce_queue;
+ 
+ 	/* for unregistering old elevator */
+ 	struct elevator_queue *old;
+@@ -658,12 +659,17 @@ static int elevator_change_done(struct request_queue *q,
+  */
+ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+ {
++	bool quiesce_queue = ctx->quiesce_queue;
+ 	unsigned int memflags;
+ 	int ret = 0;
+ 
+ 	lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
+ 
++	WARN_ON_ONCE(blk_queue_quiesced(q));
++
+ 	memflags = blk_mq_freeze_queue(q);
++	if (quiesce_queue)
++		blk_mq_quiesce_queue(q);
+ 	/*
+ 	 * May be called before adding disk, when there isn't any FS I/O,
+ 	 * so freezing queue plus canceling dispatch work is enough to
+@@ -678,6 +684,8 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+ 	if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
+ 		ret = elevator_switch(q, ctx);
+ 	mutex_unlock(&q->elevator_lock);
++	if (quiesce_queue)
++		blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q, memflags);
+ 	if (!ret)
+ 		ret = elevator_change_done(q, ctx);
+@@ -744,6 +752,7 @@ void elevator_set_none(struct request_queue *q)
+ {
+ 	struct elv_change_ctx ctx = {
+ 		.name	= "none",
++		.quiesce_queue = true,
+ 	};
+ 	int err;
+ 
 -- 
-Jens Axboe
-
-
+2.47.0
 
