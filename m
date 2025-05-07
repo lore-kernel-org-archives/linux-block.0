@@ -1,58 +1,67 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0002C258CC8
-	for <linux-block@vger.kernel.org>; Wed,  7 May 2025 12:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375931FF7B4;
+	Wed,  7 May 2025 12:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746619470; cv=none; b=SiUoZtLqSVc9sDehkYzM4tU73ucFqqcrZxQvDV6Hy4fmSmKsAM96UMHKz2ZyxLnpUOMOWeywmmEvqxwIR4HyQUXpfIiLXkupBXnuP3GOdTQLip/1iW5ThM4GbF4zYQi1YX2VAGfCubkC9KtLacIa+zRAlflZrlFOeMetgxWxoWE=
+	t=1746619497; cv=none; b=RsdeOCfsd4EoiVeRIEwvKvv+q50A4guYt9KvNtBnQzbOpUsONNWbLTKoUbcEVb2ypKeTES6caPo0y5ESGuth1hVyZSUOkPxoxY0d2c1RWe5nxnB1FaXMK2NMKHzS0dv4RTFX2KdX+C1HcgfEi3ZZQ1smH3kzgkBktEIAWMSZc+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746619470; c=relaxed/simple;
-	bh=jDdr9+1dqFbh6bc5Wu3sE5rkR0pQLXaWkqok5h/w9n0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uc8YpF1ya4Lg//rvwihnU2T1yujvbC057LUMO/aiSamF9Q2sYJgvrVRJAVPpzJVaVu72qdnYgQfkkWoLcHCkHEomMg2BOANkLxeMItXgqFSWyMI68IQmiWHpK+X8YtjSDIVqIlwWFs1Rj+Mi63K1jI/Zo6koQFhjSx7UJL6h5NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VS09G4Du; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746619497; c=relaxed/simple;
+	bh=S7C0i6guyQUxOmCmzpSvqnFdBd5hRF8ZNROLA+/7kxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JRFPh7arbif3yah10F5m9BZHqHASvXad6V40pn1Ls/3hESoAuO4lj5QNf9COL6944mnXn4otRhfgEzQQJEBGnvMiAhGOa0Nfp0g040VSpVB1bwjoqX99DsHmYaf4nuJlcQIpvcJWu48TXUXBubV92upi7et1tIltHO5bZoXkD2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A9TWos8G; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VS09G4Du"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746619467;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qbiums1SZlRXR91ijnSXg7/lh9j/5RGs/vH/Ar9axvE=;
-	b=VS09G4Du6J86LBmuiTVO5McbM05Wdrtk2DxtqiFfSn+7vWH+ldL2XkwjYsYeZCNpRi7GJy
-	dLmAgDSSMrTFTOfyZe01hh63JSu6lVIihmsxP4VZpMxr+spmIxnKl8OB7H4Tpu1O9LD72K
-	mab2vHYeKqYPXh9idpmGw/41vACor9g=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-492-0hnVKSHNMp2i8Em9YU8SFg-1; Wed,
- 07 May 2025 08:04:24 -0400
-X-MC-Unique: 0hnVKSHNMp2i8Em9YU8SFg-1
-X-Mimecast-MFC-AGG-ID: 0hnVKSHNMp2i8Em9YU8SFg_1746619463
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF656180036D;
-	Wed,  7 May 2025 12:04:23 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.52])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 655B319560A7;
-	Wed,  7 May 2025 12:04:21 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] block: avoid unnecessary queue freeze in elevator_set_none()
-Date: Wed,  7 May 2025 20:04:03 +0800
-Message-ID: <20250507120406.3028670-3-ming.lei@redhat.com>
-In-Reply-To: <20250507120406.3028670-1-ming.lei@redhat.com>
-References: <20250507120406.3028670-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A9TWos8G"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=taTa50vCOqf4qXYa/4iG8HTZJGZUASEUn4x1pmkgTG0=; b=A9TWos8GWPhEHAZOpDq5FqK2Ni
+	wmHmUL7vq5tnXVsJAPlg2Fd3H9Lyc3vEC3ayp0PZ0pQcxwbZCyOUYrBt9eNGl/RAPXFBg0bRkKXi0
+	iuL8IqEVadvqhfYRBsbbPGCTeb0Ab3N3iyFYBp9Ai/eJNUYqN0kDTYTzEQCEWgIeDf5khCiE+MA6R
+	O52BIR//+QAbHZXgMEJ6gb6UG9lhMnh8/PT5xZXP13vn0u2Q5R4GnOhLAV3yZKjntb2cM18o8EksU
+	Vv7KVXVQt+ANVEI5gW15AkwboYZR+caE7YC8AWsetDxrPZQQUzxg2rlSd+H1f3HZfmvhXoQYfoxMj
+	wacMh52w==;
+Received: from [2001:4bb8:2cc:5a47:1fe7:c9d0:5f76:7c02] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uCdW9-0000000FJ3e-424a;
+	Wed, 07 May 2025 12:04:54 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Coly Li <colyli@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@kernel.org>,
+	slava@dubeyko.com,
+	glaubitz@physik.fu-berlin.de,
+	frank.li@vivo.com,
+	linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-btrfs@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-pm@vger.kernel.org
+Subject: add more bio helpers v3
+Date: Wed,  7 May 2025 14:04:24 +0200
+Message-ID: <20250507120451.4000627-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,42 +69,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-elevator_set_none() is called when deleting disk, in which queue has been
-un-registered, and elevator switch can't happen any more.
+Hi all,
 
-So if q->elevator is NULL, it is not necessary to freeze queue and drain
-IO any more.
+this series adds more block layer helpers to remove boilerplate code when
+adding memory to a bio or to even do the entire synchronous I/O.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/elevator.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+The main aim is to avoid having to convert to a struct page in the caller
+when adding kernel direct mapping or vmalloc memory.
 
-diff --git a/block/elevator.c b/block/elevator.c
-index e1386b84a415..35f4de749dcd 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -754,8 +754,18 @@ void elevator_set_none(struct request_queue *q)
- 		.name	= "none",
- 		.quiesce_queue = true,
- 	};
-+	bool need_change;
- 	int err;
- 
-+	WARN_ON_ONCE(blk_queue_registered(q));
-+
-+	/* queue has been unregisted, elevator can't be switched anymore */
-+	mutex_lock(&q->elevator_lock);
-+	need_change = !!q->elevator;
-+	mutex_unlock(&q->elevator_lock);
-+	if (!need_change)
-+		return;
-+
- 	err = elevator_change(q, &ctx);
- 	if (err < 0)
- 		pr_warn("%s: set none elevator failed %d\n", __func__, err);
--- 
-2.47.0
+Changes since v2:
+ - rebase on top of the latest block for-next branch to resolve
+   conflicts with the bonuce buffering removal
 
+Changes since v1:
+ - typo fixes
+ - improve commit messages and kerneldoc comments
+ - move bio_add_virt_nofail out of line
+ - make the number of bio_vecs calculation helper more generic
+ - add another vmalloc helper for the common case
+
+Diffstat:
+ block/bio.c                   |  101 +++++++++++++++++++++++++++++++++++++++++
+ block/blk-map.c               |   92 +++++++++----------------------------
+ drivers/block/pktcdvd.c       |    2 
+ drivers/block/rnbd/rnbd-srv.c |    7 --
+ drivers/block/ublk_drv.c      |    3 -
+ drivers/block/virtio_blk.c    |    4 -
+ drivers/md/bcache/super.c     |    3 -
+ drivers/md/dm-bufio.c         |    2 
+ drivers/md/dm-integrity.c     |   16 ++----
+ drivers/nvme/host/core.c      |    2 
+ drivers/scsi/scsi_ioctl.c     |    2 
+ drivers/scsi/scsi_lib.c       |    3 -
+ fs/btrfs/scrub.c              |   10 ----
+ fs/gfs2/ops_fstype.c          |   24 +++------
+ fs/hfsplus/wrapper.c          |   46 +++---------------
+ fs/xfs/xfs_bio_io.c           |   30 ++++--------
+ fs/xfs/xfs_buf.c              |   43 +++--------------
+ fs/xfs/xfs_log.c              |   32 ++-----------
+ fs/zonefs/super.c             |   34 ++++---------
+ include/linux/bio.h           |   25 +++++++++-
+ include/linux/blk-mq.h        |    4 -
+ kernel/power/swap.c           |  103 ++++++++++++++++++------------------------
+ 22 files changed, 270 insertions(+), 318 deletions(-)
