@@ -1,253 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBF0221568
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 07:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819C815748F
+	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 08:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746689823; cv=none; b=lGzSRWRPGH8UpgwiNp6GIy8XhFAUTGJzFSoEHmRwBuLL4RzjdhXC1KiBd9JGLlAL6Ect/rCGYPGU/ZZLKSI/oMHdKPbjLP8mUktxrQmIM7dvOvcl85GcrMDesmig9bVlH2NwdFXBHNpdkAIiE/AlpmKBWIw48JIUii3Vbxa831g=
+	t=1746691461; cv=none; b=P00bO7VwdDMM0bMpT2S8obC+TdmK/LP81A8x72GJRDf5WdiFXUL1Pg7uqnMv9pdl8x0xePqO2nS3Ks5nGj6mfis0m3gUFWAYuGCX7CuyTbj7WgyEZ7QVfMdOLfcdW6SIdtZSxjqQ3hyBEPhsXBAqL13EFn5dSP0+hFcmfLn7CSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746689823; c=relaxed/simple;
-	bh=UyudNj8jsYij4dkc08q2Csn7AOkH4eCsxDhrrTlIpiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uaknoT8nJnipT4RNvGxCLHaXedS+Ljhpj3ho5MUnfXik8E6sQhizfBVGWRCiSZrt3h8Z2+a+2QXMfRBNFf0zRkxjV0ZXs9b0kwcTexMn/A06DgMkLWhW988xU3AIqf3Yofwh2Xb0bGoHfLf7zq2M/7COuGLnvdkN4t5a60qEivc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QX9G3370; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1746691461; c=relaxed/simple;
+	bh=SY7s85Yp+JuhVPzfHfUkzqQ3d+ZPIIkZzob4Xo6dHVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TIGidRklaB8XKRYuiojoLDJ43B8LeW17NbwouXtjI+V8kmnan7EDs5lCPXxN6O77o09lTRkWAOiqsewtiZ231Jn747Sf7KrYnZvVQaXad7W0iy9AeBBwbZcWqPL5g3vkY74ZpIABFuGoqNUB6JycoqQeAICvodA8s843IB765EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=epCg0bpX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QX9G3370"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epCg0bpX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746689819;
+	s=mimecast20190719; t=1746691454;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qfpELmsMlIjDbBoLb7SKYzxZXv0bQCaJBscgT2aoxGA=;
-	b=QX9G3370slNY81uAol7tgdiS5fTCkhEXbBn1qKbdTt6885TbymPfazEUmK12Cb0AWkrOA1
-	mAf5T7CuNDN5zfccJhTIkjJecTUCJCGmGZlLPUGg0MUIWqD+5TEFqDTbRrwoV89Q5L8pnS
-	W13m4Rn7/jK7K/eHtDf9eadhZSw3wc0=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-CYZh7AGJNrq1xqd4DhcYEg-1; Thu, 08 May 2025 03:36:58 -0400
-X-MC-Unique: CYZh7AGJNrq1xqd4DhcYEg-1
-X-Mimecast-MFC-AGG-ID: CYZh7AGJNrq1xqd4DhcYEg_1746689817
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b0e0c573531so461638a12.3
-        for <linux-block@vger.kernel.org>; Thu, 08 May 2025 00:36:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746689817; x=1747294617;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qfpELmsMlIjDbBoLb7SKYzxZXv0bQCaJBscgT2aoxGA=;
-        b=Ow6jbF8d4F5sF5dNLu9XJiadLKJ8zFZKhjQkYUDqO+jucBVaIFaJHDv4k0GUKXriBt
-         jHXxtJAQEqLMZsoAKrtyx1x2dAu0x6Bx7Mk++N3sybbcit6Kq4rz6xJW9ErXHj77cK7f
-         jceS+luVa7Ab2vx+XydKAW2PGDtCWhWfAAbDidr/bfgK46S/QvJO4pk3oSnYXr1azQmG
-         8peWCzKXxmT7/RTKYZ2tLmqNCNzQSoyCg/KrZZoZifHyk4J9EF+sm7XYnvzjbmOku/Q8
-         GTyaO+Ae8cS8M1CT5Y2a2mcRLOiVctvIovp5H2dzQr3pDKziQZgqfuRbL9dw8vfEcrmu
-         anXw==
-X-Gm-Message-State: AOJu0YxWEn8ePgDZEeHU45x2FW7vo8FjJ1fdAfCXzjw9dy46sn9xVpAL
-	kUiiLusVMKs7nrUea6pWex0jwQSok4XPapuxRjE4UN+si3H4Yii0ZCfgao8tuPB2L0Qlbb+A5/a
-	rH0jPD/LS2BIRfj60t8XaKI8KOgA2j4yZaQ6n4Qf5Af9DoFP5bxIMybXAwG4U
-X-Gm-Gg: ASbGncueZugNLpJv4rhI7vbwTYMr93MC3SlM+6t3M8c5G9WLOtgWwk3D8LH9HfKPJcs
-	8PDOUHNx/79DKE6vm9UWaD4jpjQHyPWHikGfBb6CqbY4tn/PLNpZ/f5q3Tl9UU0dJf80Kf6AoPX
-	QhUvurYRvdohBzFfW7ORL+vhhF6l4EUQKSRQqxOWgOanq3tXI2NOJnYRmUbxHKocFWeD+c+Ymzf
-	UHvLbOXMjRa+uEL57ZNOMk8tHpn6cnXXJ2zhpM+IJLnfMob8tgQJQK5xMkbqR/Zv46RETmj6q4m
-	BGqkgC0xtlGrPcBCtg==
-X-Received: by 2002:a17:902:f552:b0:220:e156:63e0 with SMTP id d9443c01a7336-22e5ea1919bmr81061025ad.8.1746689817378;
-        Thu, 08 May 2025 00:36:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIp9mU4ALROa7MseJf7VbJ3xMqjgH+d2m1FTA51FX0ZMyejG1Jqn1rF0RHRIm4Vvn3E5OXEQ==
-X-Received: by 2002:a17:902:f552:b0:220:e156:63e0 with SMTP id d9443c01a7336-22e5ea1919bmr81060765ad.8.1746689816987;
-        Thu, 08 May 2025 00:36:56 -0700 (PDT)
-Received: from [10.72.120.7] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e151e998bsm106310115ad.67.2025.05.08.00.36.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 00:36:55 -0700 (PDT)
-Message-ID: <4c1b573b-7258-4086-af15-b220a91a5017@redhat.com>
-Date: Thu, 8 May 2025 15:36:48 +0800
+	bh=Z+S4iUnyWRIBBL2RMuVyr2IVpguXXa8m5C9Z3FBtc8I=;
+	b=epCg0bpXocF+5xs781/grJsYMZ/FidXNNHWWh+IKc3vZ83AS/MObDy4BtcVQFgTWIQg53r
+	5a6S8HV6uRVW/H4950fyciE4mDivgHtujzE9yp+0xdH/hk0MatUixueSMT2LpBq2qvlb45
+	PT2AyYkTp6n7LXNjYOM4mawxsUKLWVk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-630-58zpIT3cOGuWMn576sJeVA-1; Thu,
+ 08 May 2025 04:04:09 -0400
+X-MC-Unique: 58zpIT3cOGuWMn576sJeVA-1
+X-Mimecast-MFC-AGG-ID: 58zpIT3cOGuWMn576sJeVA_1746691445
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 537DA18004AD;
+	Thu,  8 May 2025 08:04:05 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.149])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0F60619560B3;
+	Thu,  8 May 2025 08:04:01 +0000 (UTC)
+Date: Thu, 8 May 2025 16:03:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH 1/2] block: move queue quiesce into elevator_change()
+Message-ID: <aBxlbJIAYZ6s4L9y@fedora>
+References: <20250507120406.3028670-1-ming.lei@redhat.com>
+ <20250507120406.3028670-2-ming.lei@redhat.com>
+ <20250507135349.GA1019@lst.de>
+ <aBtuCDKTQK1PReDg@fedora>
+ <20250508050317.GA27049@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 8/9] md: fix is_mddev_idle()
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, agk@redhat.com,
- song@kernel.org, hch@lst.de, john.g.garry@oracle.com, hare@suse.de,
- pmenzel@molgen.mpg.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, yukuai3@huawei.com,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-References: <20250506124658.2537886-1-yukuai1@huaweicloud.com>
- <20250506124903.2540268-1-yukuai1@huaweicloud.com>
- <20250506124903.2540268-9-yukuai1@huaweicloud.com>
-From: Xiao Ni <xni@redhat.com>
-In-Reply-To: <20250506124903.2540268-9-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250508050317.GA27049@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+
+On Thu, May 08, 2025 at 07:03:17AM +0200, Christoph Hellwig wrote:
+> On Wed, May 07, 2025 at 10:28:24PM +0800, Ming Lei wrote:
+> > On Wed, May 07, 2025 at 03:53:49PM +0200, Christoph Hellwig wrote:
+> > > On Wed, May 07, 2025 at 08:04:02PM +0800, Ming Lei wrote:
+> > > > blk_mq_freeze_queue() can't be called on quiesced queue, otherwise it may
+> > > > never return if there is any queued requests.
+> > > > 
+> > > > Fix it by moving queue quiesce int elevator_change() by adding one flag to
+> > > > 'struct elv_change_ctx' for controlling this behavior.
+> > > 
+> > > Why do we even need to quiesce the queue here, and not anywhere else?
+> > 
+> > Quiesce is for draining the in-progress critical area, which can't be
+> > covered by queue freeze.
+> 
+> I know.  But why do we care about that for removing a scheduler, but
+> not for changing it?
+
+Actually elevator_switch() does quiesce queue, so we can just remove the
+queue quiesce around elevator_set_none().
 
 
-在 2025/5/6 下午8:49, Yu Kuai 写道:
-> From: Yu Kuai <yukuai3@huawei.com>
->
-> If sync_speed is above speed_min, then is_mddev_idle() will be called
-> for each sync IO to check if the array is idle, and inflight sync_io
-> will be limited if the array is not idle.
->
-> However, while mkfs.ext4 for a large raid5 array while recovery is in
-> progress, it's found that sync_speed is already above speed_min while
-> lots of stripes are used for sync IO, causing long delay for mkfs.ext4.
->
-> Root cause is the following checking from is_mddev_idle():
->
-> t1: submit sync IO: events1 = completed IO - issued sync IO
-> t2: submit next sync IO: events2  = completed IO - issued sync IO
-> if (events2 - events1 > 64)
->
-> For consequence, the more sync IO issued, the less likely checking will
-> pass. And when completed normal IO is more than issued sync IO, the
-> condition will finally pass and is_mddev_idle() will return false,
-> however, last_events will be updated hence is_mddev_idle() can only
-> return false once in a while.
->
-> Fix this problem by changing the checking as following:
->
-> 1) mddev doesn't have normal IO completed;
-> 2) mddev doesn't have normal IO inflight;
-> 3) if any member disks is partition, and all other partitions doesn't
->     have IO completed.
->
-> Also change rdev->last_events to unsigned long to cleanup type casting.
->
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   drivers/md/md.c | 81 ++++++++++++++++++++++++++-----------------------
->   drivers/md/md.h |  3 +-
->   2 files changed, 45 insertions(+), 39 deletions(-)
->
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 541151bcfe81..0fde115e921f 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -8625,50 +8625,55 @@ void md_cluster_stop(struct mddev *mddev)
->   	put_cluster_ops(mddev);
->   }
->   
-> -static int is_mddev_idle(struct mddev *mddev, int init)
-> +static bool is_rdev_holder_idle(struct md_rdev *rdev, bool init)
->   {
-> +	unsigned long last_events = rdev->last_events;
-> +
-> +	if (!bdev_is_partition(rdev->bdev))
-> +		return true;
-> +
-> +	/*
-> +	 * If rdev is partition, and user doesn't issue IO to the array, the
-> +	 * array is still not idle if user issues IO to other partitions.
-> +	 */
-> +	rdev->last_events = part_stat_read_accum(rdev->bdev->bd_disk->part0,
-> +						 sectors) -
-> +			    part_stat_read_accum(rdev->bdev, sectors);
-> +
-> +	return init || rdev->last_events <= last_events;
-> +}
-> +
-> +/*
-> + * mddev is idle if following conditions are matched since last check:
-> + * 1) mddev doesn't have normal IO completed;
-> + * 2) mddev doesn't have inflight normal IO;
-> + * 3) if any member disk is partition, and other partitions don't have IO
-> + *    completed;
-> + *
-> + * Noted this checking rely on IO accounting is enabled.
-> + */
-> +static bool is_mddev_idle(struct mddev *mddev, int init)
-> +{
-> +	unsigned long last_events = mddev->normal_io_events;
-> +	struct gendisk *disk;
->   	struct md_rdev *rdev;
-> -	int idle;
-> -	int curr_events;
-> +	bool idle = true;
->   
-> -	idle = 1;
-> -	rcu_read_lock();
-> -	rdev_for_each_rcu(rdev, mddev) {
-> -		struct gendisk *disk = rdev->bdev->bd_disk;
-> +	disk = mddev_is_dm(mddev) ? mddev->dm_gendisk : mddev->gendisk;
-> +	if (!disk)
-> +		return true;
->   
-> -		if (!init && !blk_queue_io_stat(disk->queue))
-> -			continue;
-> +	mddev->normal_io_events = part_stat_read_accum(disk->part0, sectors);
-> +	if (!init && (mddev->normal_io_events > last_events ||
-> +		      bdev_count_inflight(disk->part0)))
-> +		idle = false;
->   
-> -		curr_events = (int)part_stat_read_accum(disk->part0, sectors) -
-> -			      atomic_read(&disk->sync_io);
-> -		/* sync IO will cause sync_io to increase before the disk_stats
-> -		 * as sync_io is counted when a request starts, and
-> -		 * disk_stats is counted when it completes.
-> -		 * So resync activity will cause curr_events to be smaller than
-> -		 * when there was no such activity.
-> -		 * non-sync IO will cause disk_stat to increase without
-> -		 * increasing sync_io so curr_events will (eventually)
-> -		 * be larger than it was before.  Once it becomes
-> -		 * substantially larger, the test below will cause
-> -		 * the array to appear non-idle, and resync will slow
-> -		 * down.
-> -		 * If there is a lot of outstanding resync activity when
-> -		 * we set last_event to curr_events, then all that activity
-> -		 * completing might cause the array to appear non-idle
-> -		 * and resync will be slowed down even though there might
-> -		 * not have been non-resync activity.  This will only
-> -		 * happen once though.  'last_events' will soon reflect
-> -		 * the state where there is little or no outstanding
-> -		 * resync requests, and further resync activity will
-> -		 * always make curr_events less than last_events.
-> -		 *
-> -		 */
-> -		if (init || curr_events - rdev->last_events > 64) {
-> -			rdev->last_events = curr_events;
-> -			idle = 0;
-> -		}
-> -	}
-> +	rcu_read_lock();
-> +	rdev_for_each_rcu(rdev, mddev)
-> +		if (!is_rdev_holder_idle(rdev, init))
-> +			idle = false;
->   	rcu_read_unlock();
-> +
->   	return idle;
->   }
->   
-> diff --git a/drivers/md/md.h b/drivers/md/md.h
-> index b57842188f18..1982f1f18627 100644
-> --- a/drivers/md/md.h
-> +++ b/drivers/md/md.h
-> @@ -132,7 +132,7 @@ struct md_rdev {
->   
->   	sector_t sectors;		/* Device size (in 512bytes sectors) */
->   	struct mddev *mddev;		/* RAID array if running */
-> -	int last_events;		/* IO event timestamp */
-> +	unsigned long last_events;	/* IO event timestamp */
->   
->   	/*
->   	 * If meta_bdev is non-NULL, it means that a separate device is
-> @@ -520,6 +520,7 @@ struct mddev {
->   							 * adding a spare
->   							 */
->   
-> +	unsigned long			normal_io_events; /* IO event timestamp */
->   	atomic_t			recovery_active; /* blocks scheduled, but not written */
->   	wait_queue_head_t		recovery_wait;
->   	sector_t			recovery_cp;
-
-
-Looks good to me
-
-Reviewed-by: Xiao Ni <xni@redhat.com>
+Thanks, 
+Ming
 
