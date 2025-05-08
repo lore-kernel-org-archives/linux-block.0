@@ -1,109 +1,270 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0414C239E7A
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 08:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33371953A1;
+	Thu,  8 May 2025 09:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746694712; cv=none; b=lkCQZdVdANgUlPjCf7Z8bPqJloNQSYoykSw+y/OghCthi7LIJskAtZAoPy8bNFto5oojpCXawZI/rVFa70/2AHxXECsNxJ/XmtseumjWT9vr84T+H2Bf9slm9gAFC0Nk7cuqhxq99lZwfkq2OCUDPj1NaJGDzuiZ8RNWVd7NXY0=
+	t=1746696991; cv=none; b=S4gMmbeb31VlgtXtKMTEsRkYTAkX6P7z778WiHxCB8/T/DO4LdAEBKJQliOdYglmfmlykN23TOuGl4cThmKezkINeP3AQpLvxcEl/mBw/sa7ge/8rMaN26K0FTeq7c2pw/aDRj+bNMDDbjdmc638zX5N0qm6dXr7zXNDsLjqx58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746694712; c=relaxed/simple;
-	bh=I9ipHg4dJF/BPcXllOG4sXkI86fXyicTDv5G4kbgFZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FeoumWZiQIh8mVde0V7F+bWicNTaj6Rah8p2OwIeKg1Dvc8Tr/igiF/LdgdPWXUYAeqfYite8CmCl208L7V9OXUTYojno8cR9rvIcc8Icn4ed6TnyOkOJLaC4nSAzNqmHbB7NviKWvXKIgHQWMR1dVFoqD3YqFQ6P9DLDskLZfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VzcX9nVo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VzcX9nVo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746694707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vOpwlRdGJTOhHRjpjXfIanRvLHq7IBM8HuE2P1omRoE=;
-	b=VzcX9nVoPvu0maJNLVh/FQk86i+DT4IeaMlT6YUKQc9Zn+B+l3bdqYdrK8x1NM38lrlt25
-	lI5jBlldHDn/Bi3mST/qGdmAoQ3WmZeZaT5lynls7XMzbNwfwQiw4B8yc0e/s9o74PMlt6
-	P6K4nqpdM0Mp2p6VWvVm6Lj1JHb0/jk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-7YzdQrFYMy6zeD-qGO1oyA-1; Thu,
- 08 May 2025 04:58:23 -0400
-X-MC-Unique: 7YzdQrFYMy6zeD-qGO1oyA-1
-X-Mimecast-MFC-AGG-ID: 7YzdQrFYMy6zeD-qGO1oyA_1746694702
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5A0A818004AD;
-	Thu,  8 May 2025 08:58:22 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.149])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3BE1C19560B4;
-	Thu,  8 May 2025 08:58:20 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] block: move removing elevator after deleting disk->queue_kobj
-Date: Thu,  8 May 2025 16:58:05 +0800
-Message-ID: <20250508085807.3175112-3-ming.lei@redhat.com>
-In-Reply-To: <20250508085807.3175112-1-ming.lei@redhat.com>
-References: <20250508085807.3175112-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1746696991; c=relaxed/simple;
+	bh=VkHnSmmkUmNi08WUZn30fA5b8cau5tzOHLUi6IdUjvE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JDyjHn2P5CGackx+t3qCYBlMoVOh9DVtSHAFiTUp7XUSddk3k942DgXEZiZbLOhqsv7EfSDxFrXQklc1dDLbPgVTLquFSni32Bb3Eq9nyrAzrZ0ZEGV1vy+JtGBo9LSCqQsFCIT/ZxZL0jZG9WsXf+HH+JKKIZn3GoOvJ/kYT/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 61EAB426DF;
+	Thu,  8 May 2025 11:36:25 +0200 (CEST)
+Message-ID: <2e7d6a7e-4a82-4da5-ab39-267a7400ca49@proxmox.com>
+Date: Thu, 8 May 2025 11:36:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 08/19] scsi: detect support for command duration limits
+To: Damien Le Moal <dlemoal@kernel.org>, Friedrich Weber
+ <f.weber@proxmox.com>, Niklas Cassel <nks@flawful.org>,
+ Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+ Niklas Cassel <niklas.cassel@wdc.com>
+References: <20230511011356.227789-1-nks@flawful.org>
+ <20230511011356.227789-9-nks@flawful.org>
+ <3dee186c-285e-4c1c-b879-6445eb2f3edf@proxmox.com>
+ <6fb8499a-b5bc-4d41-bf37-32ebdea43e9a@kernel.org>
+Content-Language: en-US
+From: Mira Limbeck <m.limbeck@proxmox.com>
+In-Reply-To: <6fb8499a-b5bc-4d41-bf37-32ebdea43e9a@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When blk_unregister_queue() is called from add_disk() failure path,
-there is race in registering/unregistering elevator queue kobject
-from the two code paths, because commit 559dc11143eb ("block: move
-elv_register[unregister]_queue out of elevator_lock") moves elevator
-queue register/unregister out of elevator lock.
+On 4/30/25 15:39, Damien Le Moal wrote:
+> On 2025/04/30 7:13, Friedrich Weber wrote:
+>> Hi,
+>>
+>> One of our users reports that, in their setup, hotplugging new disks doesn't
+>> work anymore with recent kernels (details below). The issue appeared somewhere
+>> between kernels 6.4 and 6.5, and they bisected the change to this patch:
+>>
+>>   624885209f31 (scsi: core: Detect support for command duration limits)
+>>
+>> The issue is also reproducible on a mainline kernel 6.14.4 build from [1]. When
+>> hotplugging a disk under 6.14.4, the following is logged (I've redacted some
+>> identifiers, let me know in case I've been too overzealous with that):
+>>
+>> Apr 28 16:41:13 pbs-disklab kernel: mpt3sas_cm0: handle(0xa) sas_address(0xREDACTED_SAS_ADDR) port_type(0x1)
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: Direct-Access     WDC      REDACTED_SN  C5C0 PQ: 0 ANSI: 7
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: SSP: handle(0x000a), sas_addr(0xREDACTED_SAS_ADDR), phy(2), device_name(REDACTED_DEVICE_NAME)
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: enclosure logical id (REDACTED_LOGICAL_ID), slot(0) 
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: enclosure level(0x0000), connector name(     )
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: qdepth(254), tagged(1), scsi_level(8), cmd_que(1)
+>> Apr 28 16:41:13 pbs-disklab kernel: scsi 5:0:1:0: Power-on or device reset occurred
+>> Apr 28 16:41:16 pbs-disklab kernel: mpt3sas_cm0: log_info(0x31110e05): originator(PL), code(0x11), sub_code(0x0e05)
+> 
+> This decodes to:
+> 
+> Code:     	00110000h	PL_LOGINFO_CODE_RESET See Sub-Codes below (PL_LOGINFO_SUB_CODE)
+> Sub Code: 	00000E00h	PL_LOGINFO_SUB_CODE_DISCOVERY_SATA_ERR
+> 
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: log_info(0x31130000): originator(PL), code(0x13), sub_code(0x0000)
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: Attached scsi generic sg1 type 0
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Test Unit Ready failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Read Capacity(16) failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Sense not available.
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Read Capacity(10) failed: Result: hostbyte=DID_NO_CONNECT driverbyte=DRIVER_OK
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Sense not available.
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] 0 512-byte logical blocks: (0 B/0 B)
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] 0-byte physical blocks
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Test WP failed, assume Write Enabled
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Asking for cache data failed
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Assuming drive cache: write through
+>> Apr 28 16:41:18 pbs-disklab kernel:  end_device-5:1: add: handle(0x000a), sas_addr(0xREDACTED_SAS_ADDR)
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: handle(0x000a), ioc_status(0x0022) failure at drivers/scsi/mpt3sas/mpt3sas_transport.c:225/_transport_set_identify()!
+>> Apr 28 16:41:18 pbs-disklab kernel: sd 5:0:1:0: [sdb] Attached SCSI disk
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: mpt3sas_transport_port_remove: removed: sas_addr(0xREDACTED_SAS_ADDR)
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: removing handle(0x000a), sas_addr(0xREDACTED_SAS_ADDR)
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: enclosure logical id(REDACTED_LOGICAL_ID), slot(0)
+>> Apr 28 16:41:18 pbs-disklab kernel: mpt3sas_cm0: enclosure level(0x0000), connector name(     )
+>>
+>> and the block device isn't accessible afterwards. It does seem to be visible
+>> after a reboot.
+>>
+>> lspci on this host shows:
+>>
+>> 02:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3008 PCI-Express Fusion-MPT SAS-3 [1000:0097] (rev 02)
+>> 	Subsystem: Broadcom / LSI SAS9300-8i [1000:30e0]
+>> 	Kernel driver in use: mpt3sas
+>> 	Kernel modules: mpt3sas
+>>
+>> The HBA is placed on a PCIe 3.0 x8 slot (not bifurcated) and connected via
+>> SFF-8643 to a simple 2U 12xLFF SAS3 Supermicro box. The user can also reproduce
+>> the issue with other HBAs with e.g. the SAS3108 and SAS3816 chipsets.
+>>
+>> The device doesn't seem to support CDL. So if I see correctly, the only
+>> effective change introduced by the patch are the four scsi_cdl_check_cmd (and
+>> thus scsi_report_opcode) calls to check for CDL support. Hence we wondered
+>> whether may be the cause of the issue. We ran a few tests to verify:
+>>
+>> - disabling "REPORT SUPPORTED OPERATION CODES" by passing
+>>   `scsi_mod.dev_flags=WDC:REDACTED_SN:536870912` (the flag being
+>>   BLIST_NO_RSOC) resolves the issue (hotplug works again), but I imagine
+>>   disabling RSOC altogether isn't a good workaround. This test was not done
+>>   on a mainline kernel, but I don't think it would make a difference.
+> 
+> So it seems that the HBA SAT is choking on the report supported opcode command.
+> I have several mpt3sas HBAs and I have never seen this issue running the latest
+> FW version for these (EOL) HBAs. So I am tempted to say that an HBA FW update
+> should resolve the issue, BUT, I do not recall doing any drive hotplug tests
+> though. This issue may trigger only with hotplug and not with a cold start...
+> Can you confirm that ?
+> 
+Yes, a cold boot works. With hotplug it enters a broken state and any
+subsequent reboots don't fix the issue.
+Removing power is needed to fix the issue again.
 
-Fix the race by removing elevator after deleting disk->queue_kobj,
-because kobject_del(&disk->queue_kobj) drains in-progress sysfs
-show()/store() of all attributes.
+They mentioned the following tests:
 
-Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
-Reported-by: Nilay Shroff <nilay@linux.ibm.com>
-Suggested-by: Nilay Shroff <nilay@linux.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-sysfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+- Get the 20TB disk in a faulty state by booting kernels 6.5 and above
+(6.14.X in this case, diskcaddy light on server keeps blinking, dmesg
+shows power-reset)
+- Reboot server, reboot into same kernel (6.14.X)
+- Disk remains in faulty state, does not attached to system or show up
+under any path (lsblk, df, blkid)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 8be2390c3c19..b2b9b89d6967 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -948,9 +948,6 @@ void blk_unregister_queue(struct gendisk *disk)
- 		blk_mq_sysfs_unregister(disk);
- 	blk_crypto_sysfs_unregister(disk);
- 
--	if (queue_is_mq(q))
--		elevator_set_none(q);
--
- 	mutex_lock(&q->sysfs_lock);
- 	disk_unregister_independent_access_ranges(disk);
- 	mutex_unlock(&q->sysfs_lock);
-@@ -959,5 +956,8 @@ void blk_unregister_queue(struct gendisk *disk)
- 	kobject_uevent(&disk->queue_kobj, KOBJ_REMOVE);
- 	kobject_del(&disk->queue_kobj);
- 
-+	if (queue_is_mq(q))
-+		elevator_set_none(q);
-+
- 	blk_debugfs_remove(disk);
- }
--- 
-2.47.0
+and
+
+- Get 20TB disk into faulty state by hotswapping on kern 6.5 and above.
+- Shut off machine, remove from power & reattach.
+- Start machine
+- 20TB disk mounts during boot, accessible in OS as block-device after.
+
+
+>>
+>> - we patched out the four calls to scsi_cdl_check_cmd and unconditionally set
+>>   cdl_supported to 0, see [2] for the patch (on top of 6.14.4). This resolves
+>>   the issue.
+>>
+>> - I suspected that particularly the two latter scsi_cdl_check_cmd calls with a
+>>   nonzero service action might be problematic, so we patched them out
+>>   specifically but kept the other two calls without a service action, see [3]
+>>   for the patch (on top of 6.14.4). But with this patch, hotplug still does
+>>   not work.
+>>
+>> - the RSOC commands themselves don't seem to be problematic per se. We asked
+>>   the user to boot a (non-mainline) kernel with the `scsi_mod.dev_flags`
+>>   parameter to disable RSOC as above, hotplug the disk (this succeeds), and
+>>   then query the four opcodes/service actions using `sg_opcodes`, and this
+>>   looks okay [4] (reporting that CDL is not supported).
+>>
+>> I wonder whether these results might suggest the RSOC queries are problematic
+>> not in general, but at this particular point (during device initialization) in
+>> this particular hardware setup? If this turns out to be the case -- would it be
+>> feasible to suppress these RSOC queries if CDL is not enabled via sysfs?
+> 
+> I would be tempted to say that indeed it is the RSOC command handling in the HBA
+> SAT that has issues. But your command line checks [4] tend to indicate
+> otherwise. The issue may trigger only with timing differences with hotplug though.
+> 
+> The other possible problem may be that the RSOC command translation is actually
+> fine but ends up generating an ATA command that the drive is not happy about,
+> either because of a drive FW bug or because of the timing the drive receives
+> that command. Given that this is a WD drive, I can probably check that if you
+> can send to me the drive model and FW rev (sending that information off-list is
+> fine).
+> 
+>> If you have any ideas for further troubleshooting, we're happy to gather more
+>> data. I'll be AFK for a few weeks, but Mira (in CC) will take over in the
+>> meantime.
+> 
+> Checking the HBA FW version would be a start, and also if you can confirm if
+> this issue happens only on hotplug or also during cold boot would be nice. I am
+> traveling right now and will not be able to test hot-plugging drives on my
+> setups until end of next week.
+> 
+
+They provided controller information via `sas3ircu` and `storcli`:
+
+sas3ircu:
+
+  Controller type                         : SAS3008
+  BIOS version                            : 8.37.00.00
+  Firmware version                        : 16.00.16.00
+
+storcli:
+
+Firmware Package Build = 24.18.0-0021
+Firmware Version = 4.670.00-6500
+CPLD Version = 26515-00A
+Bios Version = 6.34.01.0_4.19.08.00_0x06160200
+HII Version = 03.23.06.00
+Ctrl-R Version = 5.18-0400
+Preboot CLI Version = 01.07-05:#%0000
+NVDATA Version = 3.1611.00-0005
+Boot Block Version = 3.07.00.00-0003
+Driver Name = megaraid_sas
+Driver Version = 07.727.03.00-rc1
+
+And the disk information from `smartctl --xall`
+
+20T:
+
+=== START OF INFORMATION SECTION ===
+Vendor:               WDC
+Product:              WUH722020BL5204
+Revision:             C5C0
+Compliance:           SPC-5
+User Capacity:        20,000,588,955,648 bytes [20.0 TB]
+Logical block size:   512 bytes
+Physical block size:  4096 bytes
+LU is fully provisioned
+Rotation Rate:        7200 rpm
+Form Factor:          3.5 inches
+Logical Unit id:      <id>
+Serial number:        <S/N>
+Device type:          disk
+Transport protocol:   SAS (SPL-4)
+Local Time is:        Thu May  1 15:23:35 2025 CEST
+SMART support is:     Available - device has SMART capability.
+SMART support is:     Enabled
+Temperature Warning:  Enabled
+Read Cache is:        Enabled
+Writeback Cache is:   Enabled
+
+18T:
+
+=== START OF INFORMATION SECTION ===
+Vendor:               WDC
+Product:              WUH721818AL5204
+Revision:             C8C2
+Compliance:           SPC-5
+User Capacity:        18,000,207,937,536 bytes [18.0 TB]
+Logical block size:   512 bytes
+Physical block size:  4096 bytes
+LU is fully provisioned
+Rotation Rate:        7200 rpm
+Form Factor:          3.5 inches
+Logical Unit id:      <id>
+Serial number:        <S/N>
+Device type:          disk
+Transport protocol:   SAS (SPL-4)
+Local Time is:        Thu May  1 15:25:27 2025 CEST
+SMART support is:     Available - device has SMART capability.
+SMART support is:     Enabled
+Temperature Warning:  Enabled
+Read Cache is:        Enabled
+Writeback Cache is:   Enabled
+
+The 18T disk is not affected by this issue. Hotplug works as expected
+with it.
+
+
+If you need any additional information, please let us know!
+
 
