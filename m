@@ -1,187 +1,171 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB69028C03F
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 20:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AA51E4BE
+	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 20:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746735930; cv=none; b=GQsUbemmhoPB1/dMDkp2cBzCIpU94K/I19zCADwgTR3/ihWLhUiyf7FCXDxEEg3yE+X18JJqgI7iCu9QHYOhG9hOgYX8cCxfNzUp0r7SGXjydJzEgfa+8wpoH0uipb2NNB+DokLFNbgkN9CugknKPtBe5nQdXnSP9TnPmRl6Qmw=
+	t=1746736399; cv=none; b=PQMaaH6s6w8rTT9GBnX7x34BrYp4HS2+E9SfxOg9zeknVv8GZdJrZV/u4CotzEdtql/t0+x2tVQ2eWv5dZtDNmzi6OW4a/Vg4Flfaa2OWWZnFyE7pv5vKzQp2l7/9Z4WPhWqS+vyXfLekAXFpeMzfEnXbe0sFm8lfuvTdrAc390=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746735930; c=relaxed/simple;
-	bh=GkFms8Q6aKyCL3Gr2QweKHG4yGXfIq2w7/Eg1rsvABA=;
+	s=arc-20240116; t=1746736399; c=relaxed/simple;
+	bh=2pxxVg6ucofHn2X624h2XN7Ow3CzaH9J+r52My7e+3U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JlWoKoZOx/xdU+GkRjHNLQ+bj09Qk8JYlG1uwTIz1bjQtDSLP0eTDozukiJWexnM0JSxhSw2mZ8wqesoV1mhC8rrM9QK4f2Q0NDv9uUhqgGwGCqasX0jV51GVscPKPHBrgAyXY2xrzVlmKRsDbBZ+KQnavZvy0lh3ODwNiVp6bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from trampoline.thunk.org (pool-173-48-82-148.bstnma.fios.verizon.net [173.48.82.148])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 548KOOaX022511
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 8 May 2025 16:24:25 -0400
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 371DE2E00E1; Thu, 08 May 2025 16:24:24 -0400 (EDT)
-Date: Thu, 8 May 2025 16:24:24 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Zhang Yi <yi.zhang@huaweicloud.com>
-Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
-        shinichiro.kawasaki@wdc.com, brauner@kernel.org, yi.zhang@huawei.com,
-        chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
-Subject: Re: [RFC PATCH v4 07/11] fs: statx add write zeroes unmap attribute
-Message-ID: <20250508202424.GA30222@mit.edu>
-References: <20250421021509.2366003-8-yi.zhang@huaweicloud.com>
- <20250505132208.GA22182@lst.de>
- <20250505142945.GJ1035866@frogsfrogsfrogs>
- <c7d8d0c3-7efa-4ee6-b518-f8b09ec87b73@huaweicloud.com>
- <20250506043907.GA27061@lst.de>
- <64c8b62a-83ba-45be-a83e-62b6ad8d6f22@huaweicloud.com>
- <20250506121102.GA21905@lst.de>
- <a39a6612-89ac-4255-b737-37c7d16b3185@huaweicloud.com>
- <20250508050147.GA26916@lst.de>
- <68172a9e-cf68-4962-8229-68e283e894e1@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nb9/Kr+BJqQewflenq8i0e9yGWPDnfZA44te/R9PdurdQ8tOODQDFY6+PzaO16fkRIFiN9NyRKQ0xq3v6PUfS5Ky+7TiwlL9Kc5Gpyzjx7SRzHBrGqvleh+OF2Tm88hedLkMhBJiWFsts2Mza+dPEsJZHYDrsgQIRzYxtBnoZfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VSmoWUL2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSmoWUL2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746736397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uPjo1DnO8ulenSWBmnvj2r4RZVHNByjFyUW3rTAU7Tc=;
+	b=VSmoWUL2Ere6/TyQRpjiVbKAH1p0JsWUQg+3jP5P7B/56K7n+3gWXOAceWmnfHYuL0bDmL
+	iAw8XouSr7PafAvY/Q6KjHyT/ciUiTLU5GLFLouNaV/RIhyXGuNRlnsSe2vocbYP0QGHhl
+	Wlu189f3WlzuMMjhQGEFbHqZUOP22ko=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-459-OXxvorqZPDqmqU4gSmQ10Q-1; Thu,
+ 08 May 2025 16:33:15 -0400
+X-MC-Unique: OXxvorqZPDqmqU4gSmQ10Q-1
+X-Mimecast-MFC-AGG-ID: OXxvorqZPDqmqU4gSmQ10Q_1746736394
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8483C1956078
+	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 20:33:14 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.22])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 230071953B85;
+	Thu,  8 May 2025 20:33:13 +0000 (UTC)
+Date: Thu, 8 May 2025 16:33:13 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Alberto Faria <afaria@redhat.com>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [RFC 1/2] virtio_blk: add fua write support
+Message-ID: <20250508203313.GA63568@fedora>
+References: <20250508001951.421467-1-afaria@redhat.com>
+ <20250508001951.421467-2-afaria@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="W/nof75SiCfAtC1k"
+Content-Disposition: inline
+In-Reply-To: <20250508001951.421467-2-afaria@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+
+
+--W/nof75SiCfAtC1k
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <68172a9e-cf68-4962-8229-68e283e894e1@huaweicloud.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 08, 2025 at 08:17:14PM +0800, Zhang Yi wrote:
-> On 2025/5/8 13:01, Christoph Hellwig wrote:
-> >>
-> >> My idea is not to strictly limiting the use of FALLOC_FL_WRITE_ZEROES to
-> >> only bdev or files where bdev_unmap_write_zeroes() returns true. In
-> >> other words, STATX_ATTR_WRITE_ZEROES_UNMAP and FALLOC_FL_WRITE_ZEROES
-> >> are not consistent, they are two independent features. Even if some
-> >> devices STATX_ATTR_WRITE_ZEROES_UNMAP are not set, users should still be
-> >> allowed to call fallcoate(FALLOC_FL_WRITE_ZEROES). This is because some
-> >> devices and drivers currently cannot reliably ascertain whether they
-> >> support the unmap write zero command; however, certain devices, such as
-> >> specific cloud storage devices, do support it. Users of these devices
-> >> may also wish to use FALLOC_FL_WRITE_ZEROES to expedite the zeroing
-> >> process.
-> > 
-> > What are those "cloud storage devices" where you set it reliably,
-> > i.e.g what drivers?
-> 
-> I don't have these 'cloud storage devices' now, but Ted had mentioned
-> those cloud-emulated block devices such as Google's Persistent Desk or
-> Amazon's Elastic Block Device in. I'm not sure if they can accurately
-> report the BLK_FEAT_WRITE_ZEROES_UNMAP feature, maybe Ted can give more
-> details.
-> 
-> https://lore.kernel.org/linux-fsdevel/20250106161732.GG1284777@mit.edu/
+On Thu, May 08, 2025 at 01:19:50AM +0100, Alberto Faria wrote:
+> Add the proposed VIRTIO_BLK_{F,T}_OUT_FUA uapi definitions and
+> corresponding virtio-blk support.
+>=20
+> Signed-off-by: Alberto Faria <afaria@redhat.com>
+> ---
+>  drivers/block/virtio_blk.c      | 10 +++++++---
+>  include/uapi/linux/virtio_blk.h |  4 ++++
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 7cffea01d868c..021f05c469c50 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -256,7 +256,8 @@ static blk_status_t virtblk_setup_cmd(struct virtio_d=
+evice *vdev,
+>  		sector =3D blk_rq_pos(req);
+>  		break;
+>  	case REQ_OP_WRITE:
+> -		type =3D VIRTIO_BLK_T_OUT;
+> +		type =3D req->cmd_flags & REQ_FUA ?
+> +			VIRTIO_BLK_T_OUT_FUA : VIRTIO_BLK_T_OUT;
+>  		sector =3D blk_rq_pos(req);
+>  		break;
+>  	case REQ_OP_FLUSH:
+> @@ -1500,6 +1501,9 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	if (virtblk_get_cache_mode(vdev))
+>  		lim.features |=3D BLK_FEAT_WRITE_CACHE;
+> =20
+> +	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_OUT_FUA))
+> +		lim.features |=3D BLK_FEAT_FUA;
+> +
+>  	vblk->disk =3D blk_mq_alloc_disk(&vblk->tag_set, &lim, vblk);
+>  	if (IS_ERR(vblk->disk)) {
+>  		err =3D PTR_ERR(vblk->disk);
+> @@ -1650,7 +1654,7 @@ static unsigned int features_legacy[] =3D {
+>  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
+>  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
+>  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
+> -	VIRTIO_BLK_F_SECURE_ERASE,
+> +	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_OUT_FUA,
 
-There's nothing really exotic about what I was referring to in terms
-of "cloud storage devices".  Perhaps a better way of describing them
-is to consider devices such as dm-thin, or a Ceph Block Device, which
-is being exposed as a SCSI or NVME device.
+This is a new feature. Legacy VIRTIO devices don't support it.
+VIRTIO_BLK_F_ZONED was not added to features_legacy[] when it was
+introduced either.
 
-The distinction I was trying to make is performance-related.  Suppose
-you call WRITE_ZEROS on a 14TB region.  After the WRITES_ZEROS
-complete, a read anywhere on that 14TB region will return zeros.
-That's easy.  But the question is when you call WRITE_ZEROS, will the
-storage device (a) go away for a day or more before it completes (which
-would be the case if it is a traditional spinning rust platter), or
-(b) will it be basically instaneous, because all dm-thin or a Ceph Block
-Device needs to do is to delete one or more entries in its mapping
-table.
+>  }
+>  ;
+>  static unsigned int features[] =3D {
+> @@ -1658,7 +1662,7 @@ static unsigned int features[] =3D {
+>  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
+>  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
+>  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
+> -	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_ZONED,
+> +	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_ZONED, VIRTIO_BLK_F_OUT_FUA,
+>  };
+> =20
+>  static struct virtio_driver virtio_blk =3D {
+> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_=
+blk.h
+> index 3744e4da1b2a7..52be7943f6b8d 100644
+> --- a/include/uapi/linux/virtio_blk.h
+> +++ b/include/uapi/linux/virtio_blk.h
+> @@ -42,6 +42,7 @@
+>  #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
+>  #define VIRTIO_BLK_F_SECURE_ERASE	16 /* Secure Erase is supported */
+>  #define VIRTIO_BLK_F_ZONED		17	/* Zoned block device */
+> +#define VIRTIO_BLK_F_OUT_FUA		18	/* FUA write is supported */
+> =20
+>  /* Legacy feature bits */
+>  #ifndef VIRTIO_BLK_NO_LEGACY
+> @@ -206,6 +207,9 @@ struct virtio_blk_config {
+>  /* Reset All zones command */
+>  #define VIRTIO_BLK_T_ZONE_RESET_ALL 26
+> =20
+> +/* FUA write command */
+> +#define VIRTIO_BLK_T_OUT_FUA        27
+> +
+>  #ifndef VIRTIO_BLK_NO_LEGACY
+>  /* Barrier before this op. */
+>  #define VIRTIO_BLK_T_BARRIER	0x80000000
+> --=20
+> 2.49.0
+>=20
 
-The problem is two-fold.  First, there's no way for the kernel to know
-whether a storage device will behave as (a) or (b), because SCSI and
-other storage specifications say that performance is out of scope.
-They only talk about the functional results (afterwards, if yout try
-to read from the region, you will get zeros), and are utterly silent
-about how long it migt take.  The second problem is that if you are an
-application program, there is no way you will be willing to call
-fallocate(WRITE_ZEROS, 14TB) if you don't know whether the disk will
-go away for a day or whether it will be instaneous.
+--W/nof75SiCfAtC1k
+Content-Type: application/pgp-signature; name=signature.asc
 
-But because there is no way for the kernel to know whether WRITE_ZEROS
-will be fast or not, how would you expect the kernel to expose
-STATX_ATTR_WRITE_ZEROES_UNMAP?  Cristoph's formulation "breaking the
-abstraction" perfectly encapsulate the SCSI specification's position
-on the matter, and I agree it's a valid position.  It's just not
-terribly useful for the application programmer.
+-----BEGIN PGP SIGNATURE-----
 
-Things which some programs/users might want to know or rely upon, but which is normally quite impossible are: 
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmgdFQgACgkQnKSrs4Gr
+c8jOKgf+JpY8Q3Zfe8vGbjf0hNMFhEavqjKl7TblOQJpWiI9LlpqVWpB+efW4lnr
+m/WdXM+DJz5OUuSTUnEz66ayY7OPQeY5FuhcPuu7tCRvIBZu6wA72AWdEiyGUskS
+z3e1JXJnsUPpFo7+BCBy2ueKvaBbHiAZGKNA/c1MHNLDb9eOif1vKj2IpYsJ8KJa
+uVUHYbfkPOW6ZVoiPAuP14b3XMWdqZFR8YbayURw+eUOBy3V78q1qDWYa4qBuJ9G
+gLfC1QUkceiNVclUNf7bydqqTcK3dGIST8x2RoM5GaTorq+/v6WJrReVfVZjKcxT
+ibOpnq71Lbu8QmLa7jCcikgoKVymgQ==
+=XSju
+-----END PGP SIGNATURE-----
 
-* Will the write zero / discard operation take a "reasonable" amount
-  of time?  (Yes, not necessarilly well defined, but we know it when
-  we see it, and hours or days is generally not reasonable.)
+--W/nof75SiCfAtC1k--
 
-* Is the operation reliable --- i.e., is the device allowed to
-  randomly decide that it won't actually zero the requested blocks (as
-  is the case of discard) whenever it feels like it.
-
-* Is the operation guaranteed to make the data irretreviable even in
-  face of an attacker with low-level access to the device.  (And this
-  is also not necessarily well defined; does the attacker have access
-  to a scanning electronic microscope, or can do a liquid nitrogen
-  destructive access of the flash device?)
-
-The UFS (Universal Flash Storage) spec comes the closest to providing
-commands that distinguish between these various cases, but for most
-storage specifications, like SCSI, it is absolutely requires peaking
-behind the abstraction barrier defined by the specification, and so
-ultimately, the kernel can't know.
-
-About the best you can do is to require manual configuration; perhaps a
-config file at the database or userspace cluster file system level
-because the system adminsitrator knows --- maybe because the hyperscale
-cloud provider has leaned on the storage vendor to tell them under
-NDA, storage specs be damned or they won't spend $$$ millions with
-that storage vendor ---  or because the database administrator discovers
-that using fallocate(WRITE_ZEROS) causes performance to tank, so they
-manually disable the use of WRITE_ZEROS.
-
-Could this be done in the kernel?  Sure.  We could have a file, say,
-/sys/block/sdXX/queue/write_zeros where the write_zeros file is
-writeable, and so the administrator can force-disable WRITES_ZERO by
-writing 0 into the file.  And could this be queried via a STATX
-attribute?  I suppose, although to be honest, I'm used to doing this
-by looking at the sysfs files.  For example, just recently I coded up
-the following:
-
-static int is_rotational (const char *device_name EXT2FS_ATTR((unused)))
-{
-	int		rotational = -1;
-#ifdef __linux__
-	char		path[1024];
-	struct stat	st;
-	FILE		*f;
-
-	if ((stat(device_name, &st) < 0) || !S_ISBLK(st.st_mode))
-		return -1;
-
-	snprintf(path, sizeof(path), "/sys/dev/block/%d:%d/queue/rotational",
-		major(st.st_rdev), minor(st.st_rdev));
-	f = fopen(path, "r");
-	if (!f) {
-		snprintf(path, sizeof(path),
-			"/sys/dev/block/%d:%d/../queue/rotational",
-			major(st.st_rdev), minor(st.st_rdev));
-		f = fopen(path, "r");
-	}
-	if (f) {
-		if (fscanf(f, "%d", &rotational) != 1)
-			rotational = -1;
-		fclose(f);
-	}
-#endif
-	return rotational;
-}
-
-Easy-peasy!   Who needs statx?   :-)
-
-
-						- Ted
