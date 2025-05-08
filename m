@@ -1,261 +1,166 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401C62253B2
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 17:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BA429A0;
+	Thu,  8 May 2025 20:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746727121; cv=none; b=XmUvp7XCPxsHKC0hN+y83CR11eBH+XmXenS5gX+R+PRaPzA2B54ETyu9af26jLEEDlnRay/2rM5Ycacdh6OuH8K2f5uYEEgZdlYkcQgpkG4Yst+zDgCLURLXcNI+bb31EE7zI69HuEeBfHPE+/MwP41DtXDZ5D80UreAA0sduFg=
+	t=1746734504; cv=none; b=ZZVmUijFoI9Wi0pj1CT4a/N8oyAFhN9f6NkqIsWYwSk8c+odNVEvTBfpjp+EdtK+eXckEz8GxPF8ry7cd67SkeJYACK8hY0MGzmC0KiuMJMOGa1Ed8FSQkHBCJ7JBHdPsZhVqIiCP4yN0m/02xAcKr3P3RjlDd9qLiP8tgHr9FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746727121; c=relaxed/simple;
-	bh=vShxz2bLpB81H/PuYpWy9czAw3LNpjmBKeQFFgC03zY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ul2gG8hk1ExF468sU2Jnwx9wDz1YKfI4XJprrb86ZgLSWS/4/xzDhj7ATtNqM69qyg5/lQhM2Ja6jyvPz0vOCGZCXFPBGZio1e+lzMLj3auXyTCy9i6P4txroxki+FuLGXYIaozbyj5gXBJ4cOjsyNVbt8wRmK4CCjCA2A+lHbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=d25tfjuN; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1746734504; c=relaxed/simple;
+	bh=o1lVW46PXTWWdu/UpHD+IYP3tsrSGXwyJV65NS1S7k4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A7HpfbWFcuFz1kO315TOQkOMT4om2w/HHjPDP5SymqQnzbwGnY+kTw3zf92RW2Bru/rftaHzV2vkAS/gXTwqrWucrme1ktvGEnf/PMKfsSbUs5HRwEBgtAl9IHeOcDcRw0f7fW9579RrJol06L1zU/nM3hYgwbpBgimdvEAH8OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gn+wy42R; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="d25tfjuN"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 548HWf5m008180
-	for <linux-block@vger.kernel.org>; Thu, 8 May 2025 10:58:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=HmJzFzAFkRF/5tT0VM
-	rsBSy50bXGMAVvFOqr9BZ5g1w=; b=d25tfjuN0kyld0AzTvJ3bjkUS1+8NTxQWq
-	bnEP+jLZmXhjpFDLdMvEMq49ByKFaEoIuvhw/sQXm5Ye2HKCuWXqT2bgiMg/bP78
-	MkZndMkJzzphBXhtZGBnddMK57uoT1+jjLA72+za0WGXYC2RbP3tsmb1b6aQSiBo
-	AQJTitlkPODuuZMGHLa/YoH6efq6UvCJLydf0q7pLeyl4BuopZ7BoYTrMmvSdQec
-	sEM1hORscd4ZOEnnyg0rR/YlUZisLDYAB/BtkD7d4ffHI3yPmKz7pH9VpEBys2aB
-	AaLCxRPRO9LTNwT4rL5ntptPy7PkTT2FCIIWJQoj+hWa5xrYlXKQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 46gtvjb8kf-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 08 May 2025 10:58:38 -0700 (PDT)
-Received: from twshared18153.09.ash9.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1748.10; Thu, 8 May 2025 17:58:27 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id DB9061B7D02E0; Thu,  8 May 2025 10:58:15 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <martin.petersen@oracle.com>, <hch@lst.de>
-CC: <linux-nvme@lists.infradead.org>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: always allocate integrity buffer when required
-Date: Thu, 8 May 2025 10:58:14 -0700
-Message-ID: <20250508175814.1176459-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gn+wy42R"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c55500d08cso148881185a.0;
+        Thu, 08 May 2025 13:01:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746734501; x=1747339301; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kgM6c6LraGF3CFvj1Ab2yrgYuKDmDrIThr6mCkYZ2qc=;
+        b=gn+wy42Rpo4BG03Myg51OhJ5/HjygooBG9rjt32Ovwe4W6FQU8iwsf1ZvT8u1wg64/
+         mLLL/TVgjLPV6S5d1hWTrZQADle210b1i2YOfpcVGOch81kDq3I+/alMl+kKpQ4JqdA6
+         EFSHRSVXRYo9/YNKZrqeV3/8NQ0Wzw/qfKrarOAILT7e3QP3lfvCgf3unTzYhdDknzUe
+         thX1BFwYBtfai5bfmk8WuMKJP3J24+kNKd87N8IS4V+9m3xkYQMdYpHgYaz/1p7e7yck
+         OQDnw01k7sMlPtmAJ6kooHY5bQsuA39l8/IUJ2WCVJBkZh7TowdUxTFbuZTJceNy2xfL
+         69TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746734501; x=1747339301;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kgM6c6LraGF3CFvj1Ab2yrgYuKDmDrIThr6mCkYZ2qc=;
+        b=suI9I5IRIN6dRJdwqJmjZxp+Ol/3RerF1yzeOv+U+AAcyn5SjSVkhHgbgdWL1C7ry9
+         YW9XJccphayX7Rnbw8WvppGXEyjCfDG51QkubqkN6oJEiwhZ6Nf3xUpMrZttyjW8xLlF
+         jv6I+EDaCZ1FMEfn8mDs9XjR2Q4xAaIIisDBhbFWwCob2xcdOiYn/M74YzB3FbZ46DDJ
+         iP0yRWOejVrK8d9m6cFn0p1wtXuqp6AkpLLw6kcWzjiVlG0X/E+4M97f/dscA1K2KvZc
+         2hu/SwffUmoJJinMkLreLVJ1m0/lEUppBByp5ARN5SUIUQcVWsv9UN5OL+4Pi4+98fIN
+         Dtrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpAGTZ2PBEqfpoAwX9ePhi4zXyUhZ9x2348BOnKIUJYW16NzRWnu/WnPcCkUb/wZ0SZU+loEKO93OZoQ==@vger.kernel.org, AJvYcCWeGZhBXT6Ukf/8K1RtVPDdO3sLcyG+EQVU6y6Zt+mNffFdEQtcxAZQ17+rEIGK7SWJoYLumn0I@vger.kernel.org, AJvYcCXD+Z7JMuJCy3yWgqCRERqqrLN64AgQk5hEYv/POodZTqCi6wmDFzrA74hrWtIbwmjpyy5XK+nrxVP7uel0@vger.kernel.org, AJvYcCXtYdu1CekUUzLmMikmaV3ldaL5idslavUYRdFlmw7W9bQLrxnPT+CB288zG1bWNKU9io91l7FtOOKahQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ0nqe6zDvF4jjAFxc0YHbaK8ViK3EQFXq/6BDIUG6gmrDQuKw
+	BtPmKOXX2Y0m37u+AT4Z5JW2PUp4/p9BRvnO5jZYENKXMIyf/73Y
+X-Gm-Gg: ASbGncuO5Vv0BvQfPr/HUUyGciR52O0EayEpVytNVupIBjXXKMlzswLfn3Vohrxe8Bu
+	gEiPr8VbKtV2B2H771uwN4NzLpH3LWAUol8vTIFGoJr0DVqEfgjSqihLMlXZ9X364JEC7vlm3SN
+	52dmUf4Eiy7uuVsbMsEYUBGSDf8s0YHN6pGu2X16esGdBnXnDMRpi9rZhyJCKvJCkSGD6OZPBx5
+	rOzR/CXDKbAmm3/77cO9w+Hchh9QI/9Wx1DyrCf49n8eiDKZVUW7neyhuMIQPhPgGZpO9CIgdXL
+	LW1e1zuynjJHV2o+rad6I21tEXWolBxVHImVeuTA5WwvyOT+ArypMqkwgqrPXbRcVmWcR4eBeiI
+	nxw==
+X-Google-Smtp-Source: AGHT+IFewyOueSH4VcN5bLw+ZFthO2Ya/CLXTWm+zH5sTHftdu9/7mh7k0vUBEcGTs6EWcx2G1Pofw==
+X-Received: by 2002:a05:620a:2688:b0:7c5:4adb:782a with SMTP id af79cd13be357-7cd010eeaccmr145817085a.9.1746734501085;
+        Thu, 08 May 2025 13:01:41 -0700 (PDT)
+Received: from localhost.localdomain.com (sw.attotech.com. [208.69.85.34])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd00f637e3sm34235685a.31.2025.05.08.13.01.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 May 2025 13:01:40 -0700 (PDT)
+From: Steve Siwinski <stevensiwinski@gmail.com>
+X-Google-Original-From: Steve Siwinski <ssiwinski@atto.com>
+To: dlemoal@kernel.org
+Cc: James.Bottomley@hansenpartnership.com,
+	axboe@kernel.dk,
+	bgrove@atto.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	martin.petersen@oracle.com,
+	ssiwinski@atto.com,
+	stevensiwinski@gmail.com,
+	tdoedline@atto.com,
+	stable@vger.kernel.org
+Subject: [PATCH v3] block, scsi: sd_zbc: Respect bio vector limits for report zones buffer
+Date: Thu,  8 May 2025 16:01:22 -0400
+Message-ID: <20250508200122.243129-1-ssiwinski@atto.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <32a7f1ad-e28a-4494-9293-96237c4ed70b@kernel.org>
+References: <32a7f1ad-e28a-4494-9293-96237c4ed70b@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=JpDxrN4C c=1 sm=1 tr=0 ts=681cf0ce cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=MMEpNDq4WQhFf5z5bX4A:9
-X-Proofpoint-ORIG-GUID: ucqwEvLzaJJeJSCjikCRx8w7qFugz1d1
-X-Proofpoint-GUID: ucqwEvLzaJJeJSCjikCRx8w7qFugz1d1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA4MDE1OSBTYWx0ZWRfX/lQFbhXcEcTA 5ylCvpj42iyWqN+yvDqxyYvw9Qlkv37X9Wijj+ZaQLRiINhQi4wIfpWdgInALERH9puFjpIVoJ/ 5rVy+AKvFoAZ8cCtFJANzMsXBCgiH2jqnWGLW+NVMI5jbxqlNnQO899ZbiJ0QGJuKSfjQAwIMsk
- CEGDAmmoZJ+sUebB5/utK/BAFe3u05VawBEhtWzlxm0V05Zh+YR2wp6mwQLUZ5nSaUwe7MqYpqr cvyUdV6gEigB+OU0sqzDsV8tFatn2TdvCKVy2AC3jeE+CZeFAzx9xT3NIf5dzW9aAo8iiPtezlp 5OnUt3FQ6Vf9s7pRbrMvUdCbnmk2EjPfQEHw6CHif5SStAeNdfbq2rozvI2EzOpKLao9KFMVUgq
- e27qTu1lT+DeQscr1CC8wLdJu06dXVXacZJOnXTsFULOIGzdYuYypmrRtf4jzqFYS8C5TE59
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-08_05,2025-05-08_02,2025-02-21_01
+Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+The report zones buffer size is currently limited by the HBA's
+maximum segment count to ensure the buffer can be mapped. However,
+the block layer further limits the number of iovec entries to
+1024 when allocating a bio.
 
-Many nvme metadata formats can not strip or generate the metadata on the
-controller side. For these, a host provided integrity buffer is
-mandatory, even if it isn't checked.
+To avoid allocation of buffers too large to be mapped, further
+restrict the maximum buffer size to BIO_MAX_INLINE_VECS.
 
-The block integrity read_verify and write_generate attributes prevent
-allocating the metadata buffer, but we need it when the format requires
-it, otherwise reads and writes will be rejected by the driver with IO
-errors.
+Replace the UIO_MAXIOV symbolic name with the more contextually
+appropriate BIO_MAX_INLINE_VECS.
 
-Add a new blk_integrity flag to indicate if the disk format requires an
-integrity buffer. When this flag is set, provide an unchecked buffer if
-the sysfs attributes disabled verify or generation. This fixes the
-following nvme warning:
-
- ------------[ cut here ]------------
- WARNING: CPU: 1 PID: 371 at drivers/nvme/host/core.c:1036 nvme_setup_rw+=
-0x122/0x210
- ...
- RIP: 0010:nvme_setup_rw+0x122/0x210
- ...
- Call Trace:
-  <TASK>
-  nvme_setup_cmd+0x1b4/0x280
-  nvme_queue_rqs+0xc4/0x1f0 [nvme]
-  blk_mq_dispatch_queue_requests+0x24a/0x430
-  blk_mq_flush_plug_list+0x50/0x140
-  __blk_flush_plug+0xc1/0x100
-  __submit_bio+0x1c1/0x360
-  ? submit_bio_noacct_nocheck+0x2d6/0x3c0
-  submit_bio_noacct_nocheck+0x2d6/0x3c0
-  ? submit_bio_noacct+0x47/0x4c0
-  submit_bio_wait+0x48/0xa0
-  __blkdev_direct_IO_simple+0xee/0x210
-  ? current_time+0x1d/0x100
-  ? current_time+0x1d/0x100
-  ? __bio_clone+0xb0/0xb0
-  blkdev_read_iter+0xbb/0x140
-  vfs_read+0x239/0x310
-  ksys_read+0x58/0xc0
-  do_syscall_64+0x6c/0x180
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
+Fixes: b091ac616846 ("sd_zbc: Fix report zones buffer allocation")
+Cc: stable@vger.kernel.org
+Signed-off-by: Steve Siwinski <ssiwinski@atto.com>
 ---
-v2->v3:
+ block/bio.c           | 2 +-
+ drivers/scsi/sd_zbc.c | 6 +++++-
+ include/linux/bio.h   | 1 +
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-  Use a helper function to test if an integrity payload needs to be
-  checked. And use all the different kinds of check flags.
-
-  Allocate an unchecked buffer only if the integrity format requires it.
-  The nvme formats that don't work with PRACT is the first subscriber to
-  this new flag.
-
- block/bio-integrity-auto.c    | 44 +++++++++++++++++++++++------------
- drivers/nvme/host/core.c      |  3 +++
- include/linux/blk-integrity.h |  1 +
- 3 files changed, 33 insertions(+), 15 deletions(-)
-
-diff --git a/block/bio-integrity-auto.c b/block/bio-integrity-auto.c
-index e524c609be506..da07212087e06 100644
---- a/block/bio-integrity-auto.c
-+++ b/block/bio-integrity-auto.c
-@@ -43,6 +43,12 @@ static void bio_integrity_verify_fn(struct work_struct=
- *work)
- 	bio_endio(bio);
+diff --git a/block/bio.c b/block/bio.c
+index 4e6c85a33d74..4be592d37fb6 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -611,7 +611,7 @@ struct bio *bio_kmalloc(unsigned short nr_vecs, gfp_t gfp_mask)
+ {
+ 	struct bio *bio;
+ 
+-	if (nr_vecs > UIO_MAXIOV)
++	if (nr_vecs > BIO_MAX_INLINE_VECS)
+ 		return NULL;
+ 	return kmalloc(struct_size(bio, bi_inline_vecs, nr_vecs), gfp_mask);
  }
-=20
-+#define BIP_CHECK_FLAGS (BIP_CHECK_GUARD | BIP_CHECK_REFTAG | BIP_CHECK_=
-APPTAG)
-+static bool bip_should_check(struct bio_integrity_payload *bip)
-+{
-+	return bip->bip_flags & BIP_CHECK_FLAGS;
-+}
-+
- /**
-  * __bio_integrity_endio - Integrity I/O completion function
-  * @bio:	Protected bio
-@@ -54,12 +60,12 @@ static void bio_integrity_verify_fn(struct work_struc=
-t *work)
-  */
- bool __bio_integrity_endio(struct bio *bio)
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 7a447ff600d2..a8db66428f80 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -169,6 +169,7 @@ static void *sd_zbc_alloc_report_buffer(struct scsi_disk *sdkp,
+ 					unsigned int nr_zones, size_t *buflen)
  {
--	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
- 	struct bio_integrity_payload *bip =3D bio_integrity(bio);
- 	struct bio_integrity_data *bid =3D
- 		container_of(bip, struct bio_integrity_data, bip);
-=20
--	if (bio_op(bio) =3D=3D REQ_OP_READ && !bio->bi_status && bi->csum_type)=
- {
-+	if (bio_op(bio) =3D=3D REQ_OP_READ && !bio->bi_status &&
-+	    bip_should_check(bip)) {
- 		INIT_WORK(&bid->work, bio_integrity_verify_fn);
- 		queue_work(kintegrityd_wq, &bid->work);
- 		return false;
-@@ -84,6 +90,7 @@ bool bio_integrity_prep(struct bio *bio)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
- 	struct bio_integrity_data *bid;
-+	bool set_flags =3D true;
- 	gfp_t gfp =3D GFP_NOIO;
- 	unsigned int len;
+ 	struct request_queue *q = sdkp->disk->queue;
++	unsigned int max_segments;
+ 	size_t bufsize;
  	void *buf;
-@@ -100,19 +107,24 @@ bool bio_integrity_prep(struct bio *bio)
-=20
- 	switch (bio_op(bio)) {
- 	case REQ_OP_READ:
--		if (bi->flags & BLK_INTEGRITY_NOVERIFY)
--			return true;
-+		if (bi->flags & BLK_INTEGRITY_NOVERIFY) {
-+			if (!(bi->flags & BLK_INTEGRITY_BUFFER_REQUIRED))
-+				return true;
-+			set_flags =3D false;
-+		}
- 		break;
- 	case REQ_OP_WRITE:
--		if (bi->flags & BLK_INTEGRITY_NOGENERATE)
--			return true;
--
- 		/*
- 		 * Zero the memory allocated to not leak uninitialized kernel
- 		 * memory to disk for non-integrity metadata where nothing else
- 		 * initializes the memory.
- 		 */
--		if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_NONE)
-+		if (bi->flags & BLK_INTEGRITY_NOGENERATE) {
-+			if (!(bi->flags & BLK_INTEGRITY_BUFFER_REQUIRED))
-+				return true;
-+			gfp |=3D __GFP_ZERO;
-+			set_flags =3D false;
-+		} else if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_NONE)
- 			gfp |=3D __GFP_ZERO;
- 		break;
- 	default:
-@@ -137,19 +149,21 @@ bool bio_integrity_prep(struct bio *bio)
- 	bid->bip.bip_flags |=3D BIP_BLOCK_INTEGRITY;
- 	bip_set_seed(&bid->bip, bio->bi_iter.bi_sector);
-=20
--	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_IP)
--		bid->bip.bip_flags |=3D BIP_IP_CHECKSUM;
--	if (bi->csum_type)
--		bid->bip.bip_flags |=3D BIP_CHECK_GUARD;
--	if (bi->flags & BLK_INTEGRITY_REF_TAG)
--		bid->bip.bip_flags |=3D BIP_CHECK_REFTAG;
-+	if (set_flags) {
-+		if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_IP)
-+			bid->bip.bip_flags |=3D BIP_IP_CHECKSUM;
-+		if (bi->csum_type)
-+			bid->bip.bip_flags |=3D BIP_CHECK_GUARD;
-+		if (bi->flags & BLK_INTEGRITY_REF_TAG)
-+			bid->bip.bip_flags |=3D BIP_CHECK_REFTAG;
-+	}
-=20
- 	if (bio_integrity_add_page(bio, virt_to_page(buf), len,
- 			offset_in_page(buf)) < len)
- 		goto err_end_io;
-=20
- 	/* Auto-generate integrity metadata if this is a write */
--	if (bio_data_dir(bio) =3D=3D WRITE)
-+	if (bio_data_dir(bio) =3D=3D WRITE && bip_should_check(&bid->bip))
- 		blk_integrity_generate(bio);
- 	else
- 		bid->saved_bio_iter =3D bio->bi_iter;
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index af871d268fcb6..f0992a4e59512 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1867,6 +1867,9 @@ static bool nvme_init_integrity(struct nvme_ns_head=
- *head,
- 		break;
- 	}
-=20
-+	if (!nvme_ns_has_pi(head))
-+		bi->flags |=3D BLK_INTEGRITY_BUFFER_REQUIRED;
-+
- 	bi->tuple_size =3D head->ms;
- 	bi->pi_offset =3D info->pi_offset;
- 	return true;
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.=
-h
-index c7eae0bfb013f..ad657d086e715 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -13,6 +13,7 @@ enum blk_integrity_flags {
- 	BLK_INTEGRITY_DEVICE_CAPABLE	=3D 1 << 2,
- 	BLK_INTEGRITY_REF_TAG		=3D 1 << 3,
- 	BLK_INTEGRITY_STACKED		=3D 1 << 4,
-+	BLK_INTEGRITY_BUFFER_REQUIRED	=3D 1 << 5,
- };
-=20
- const char *blk_integrity_profile_name(struct blk_integrity *bi);
---=20
-2.47.1
+ 
+@@ -180,12 +181,15 @@ static void *sd_zbc_alloc_report_buffer(struct scsi_disk *sdkp,
+ 	 * Furthermore, since the report zone command cannot be split, make
+ 	 * sure that the allocated buffer can always be mapped by limiting the
+ 	 * number of pages allocated to the HBA max segments limit.
++	 * Since max segments can be larger than the max inline bio vectors,
++	 * further limit the allocated buffer to BIO_MAX_INLINE_VECS.
+ 	 */
+ 	nr_zones = min(nr_zones, sdkp->zone_info.nr_zones);
+ 	bufsize = roundup((nr_zones + 1) * 64, SECTOR_SIZE);
+ 	bufsize = min_t(size_t, bufsize,
+ 			queue_max_hw_sectors(q) << SECTOR_SHIFT);
+-	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
++	max_segments = min(BIO_MAX_INLINE_VECS, queue_max_segments(q));
++	bufsize = min_t(size_t, bufsize, max_segments << PAGE_SHIFT);
+ 
+ 	while (bufsize >= SECTOR_SIZE) {
+ 		buf = kvzalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index cafc7c215de8..b786ec5bcc81 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -11,6 +11,7 @@
+ #include <linux/uio.h>
+ 
+ #define BIO_MAX_VECS		256U
++#define BIO_MAX_INLINE_VECS	UIO_MAXIOV
+ 
+ struct queue_limits;
+ 
+-- 
+2.43.5
 
