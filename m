@@ -1,116 +1,81 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2A4262FF1
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 08:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75562397A4
+	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 08:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746693603; cv=none; b=PPYG7zyhS4g9bbdRsaTgTduc1mK5TWAhy9Y5GdoXouY9cotPENaqNSZ7HlQub7Yq9YLvKMOEd1lEU64+tuPUOLHurXK7Cl6Jiw1paK++DG9wUnmso8S7APKq56C4MLeKXprN8baAlfpUvdANZbN7KXBA29Vn02R0Ks1emPaMQhw=
+	t=1746694701; cv=none; b=GZV1P+x1g491qCPwWSn4jyjDN94dFMsbf13/s/q8zSXQC34Ue+szN2VK9vvajHWaVRJBRy8MUVT1ryBzvD7G/BWKoLv/r/z+zoo0vtp8JE7Wi+o16A8dm0hFtbcgV0/tmnGP6pW7cU8mP9uaJiBdMuxl5DaWibbFgQ0Bc7SJcm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746693603; c=relaxed/simple;
-	bh=AluxxiQOUGxhTw15wWCjpaQPmP8CI9T/W3mX2V0Iq4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVvQRlMZpP3pQNJ2nWxUX8q83wUZJh8tvl42cviobd2rH2+L5jNduNhbyZm9cb+VcZdjC8Oy278NgIFeMD0QT+D4QZt2XQhPlQ98CkngQo0q6ZNP1DGifynlOStI6YknZpvSaNLleJFWVEFvsDWVI9mIucHgV7/XLzQN6IZWfKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=D4OGt+SD; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1746694701; c=relaxed/simple;
+	bh=hA04ymrVMQ05ZQJAIS5E9WLyrYpOaHFPU2MpTMQYTxo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfxfvZsCq9YJjksdnoOIIdIfYCOSl+dQ1IB1FFV06CRG7HRkj6vSm9AzKxnyJ+hz08sq/9GiXnu5PX2b1emvHRbgyRAHiDXuHZ41tRjYSORGLCfHXUCFMVdtps2fM0bUixlOnahqYnjzE6+jYeEk0zv9T4LEwKJmLkZEZjER+C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EUUZVzdA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="D4OGt+SD"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac3b12e8518so141069766b.0
-        for <linux-block@vger.kernel.org>; Thu, 08 May 2025 01:40:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1746693599; x=1747298399; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tAMMoFnFLjgC9AxWVKUIqDWBuYeiF74xsSdBNFfpxcI=;
-        b=D4OGt+SDnDMyklMDVifOQA3o9GfBp6d9wMNIH8hef2ZOyjpOPHTZk9M71NeltyhGkF
-         mtgkfC3EzEmXgWMVRi16hErQ+Bxor4MKfjcd+1URNgJ+skBii/dPrQ+YN/6OkDNR5mVy
-         ZPsk8L3OMkCSeVngIA6AWUY401/W6FOthd4nF2ULd6qz2Fo/+9SIOhu4Lqvgb/2Z4wrD
-         kS+1XhDQr/adHXaOoHMUHK9H79jKsu0BWVZvnwVY5/YpSQkQxAs/JOxCnpDk7mf1FOpZ
-         /ECtLMAsn7cCprbm9zjG86sFmjvSoa/GVRUJNfBVB6eSjiAQD4FIuK14fkdUX5lZoLxy
-         oE6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746693599; x=1747298399;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tAMMoFnFLjgC9AxWVKUIqDWBuYeiF74xsSdBNFfpxcI=;
-        b=cqwJZsG0K2SyAPARVb7cmYzLMfmTfi/3pVIl/Y11nyZAZ6WPWuQstQDEnN9HTXCUlL
-         UNkuXeM96D0aVLPy8bVsL8DsgMz5wmVGwSgxQhwE/YXXYS8jEAPv9vqd2gA9rcD0o8m+
-         cz6ZtbMBazftWae3OkhPsOiSKYQwUb23IqJ7pfVI9EjBpZMT0reIoUDzh88cqrbSj5+u
-         aYcKKhJH1OkLZHOmNard5ehZkDogfiNdQx0PY0MP0r2J0v0J8WY4RuDFeA5nMm8Lubv2
-         aBEP2DGGVRybBnWGRhN1Z95y/z1VlSyg13koZLtYQDNxuJs4lfEUus9AfKoYAZpv0cLR
-         Po0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVNhVHLxmnDN8h0CMOjBWde6icWyqaEWYLrdbzViBGs+GqAV54Z/JlQfdtRgjVX7v1INr3yfqUWTpLm4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9gXV6FjX/ciLkmTLGkuQlnEds7KbsD8CEgs7VTQlEa1R3sluJ
-	hxmqKqt/2Uac+/+0Fw2UX0845fRNAy5ZAscI9ambFvrbUkgtUQ0YY8qbfLdxE/o=
-X-Gm-Gg: ASbGncvKKehgaRTRbKN7JvXeppx/C3V1ZOE8eBcm9C0qoT5L7M0SZzAnSbjhIhBVVWY
-	ZQeLOnpx8mLU0x06shDAogLr/IvImcsMNU7gOME5ShvTjzg+YCq3Z1Qf9kTj7mbfxTVCzgkJMly
-	iM03oYxi2LJdRm+H+aF3aVZeSwmmAyqFc67xXRdCZnOHbtY6Vr6sv7Le4kGP2P6wGE3XO/AYer9
-	Gj1PONSloQyOG253PJon5xkKIopyx6L0cLXSmRIK8EMF18V90f/M+tfLxoQSljT4jbk5bfbq5j5
-	N4f7+mwDaweXtEN4EvMX9PZ8oRs0I+OM3Gz7KoKFad+UUa1K8ZeQlq6fDkT51rbBG23R2dS18Ct
-	v890mCEHEQtIO
-X-Google-Smtp-Source: AGHT+IFS5ug7hwtAoPOrOpPdMHvCmuTo+K9+sWESa0b8bvZDBXVxf650X6+wfe/41qLd+PNEDUKe3w==
-X-Received: by 2002:a17:907:a08f:b0:acb:34b2:851 with SMTP id a640c23a62f3a-ad1e8cd6495mr655012666b.44.1746693599036;
-        Thu, 08 May 2025 01:39:59 -0700 (PDT)
-Received: from grappa.linbit (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad1e1292696sm402542566b.111.2025.05.08.01.39.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 01:39:58 -0700 (PDT)
-Date: Thu, 8 May 2025 10:39:56 +0200
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: Re: transferring bvecs over the network in drbd
-Message-ID: <aBxt3NsJcofxhV5P@grappa.linbit>
-Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-References: <aBxTHl8UIwr9Ehuv@infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EUUZVzdA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746694697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ahJSZBZ7dWT1WLVTbKGHNzCkr/5WJ258Guqd5U5N7pA=;
+	b=EUUZVzdA8dgx4WtQD6y+TFOvgW/nkiBGJ3JjKtUjRPHOT0B4J59ro1bU0Q+83BK5RX0rcE
+	cMRM0emNztam7oIglOj2d2NCttK3Jco9/NeRGKKK5HaLqjHyiwr52uZDfNdtQqxB6Sdeet
+	6WDuBEkK3VVWOLz0h7APSz09RTeq0gQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-374-TzSgHMLxN1CwwXvL4ApiWQ-1; Thu,
+ 08 May 2025 04:58:16 -0400
+X-MC-Unique: TzSgHMLxN1CwwXvL4ApiWQ-1
+X-Mimecast-MFC-AGG-ID: TzSgHMLxN1CwwXvL4ApiWQ_1746694694
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8EA419560AF;
+	Thu,  8 May 2025 08:58:13 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.149])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E2E7519560AD;
+	Thu,  8 May 2025 08:58:12 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/2] block: two fixes on recent elevator change
+Date: Thu,  8 May 2025 16:58:03 +0800
+Message-ID: <20250508085807.3175112-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBxTHl8UIwr9Ehuv@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Wed, May 07, 2025 at 11:45:50PM -0700, Christoph Hellwig wrote:
-> Hi all,
-> 
-> I recently went over code that directly access the bio_vec bv_page/
-> bv_offset members and the code in _drbd_send_bio/_drbd_send_zc_bio
-> came to my attention.
-> 
-> It iterates the bio to kmap all segments, and then either does a
-> sock_sendmsg on a newly created kvec iter, or one one a new bvec iter
-> for each segment.  The former can't work on highmem systems and both
-> versions are rather inefficient.
-> 
-> What is preventing drbd from doing a single sock_sendmsg with the
-> bvec payload?  nvme-tcp (nvme_tcp_init_iter0 is a good example for
-> doing that, or the sunrpc svcsock code using it's local bvec list
-> (svc_tcp_sendmsg).
+Hello Jens,
 
-For async replication, we want to actually copy data into send buffer,
-we cannot have the network stack hold a reference to a page for which
-we signalled io completion already.
+The 1st patch fixes one hang in del_gendisk().
 
-For sync replication we want to avoid additional data copy if possible,
-so try to use "zero copy sendpage".
+The 2nd patch fixes one race in case that add_disk() fails.
 
-That's why we have two variants of what looks to be the same thing.
+Thanks,
+Ming
 
-Why we do it that way: probably when we wrote that part,
-a better infrastructure was not available, or we were not aware of it.
-Thanks for the pointers, we'll look into it.
-Using more efficient ways to do stuff sounds good.
 
-    Lars
+Ming Lei (2):
+  block: don't quiesce queue for calling elevator_set_none()
+  block: move removing elevator after deleting disk->queue_kobj
+
+ block/blk-sysfs.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+-- 
+2.47.0
 
