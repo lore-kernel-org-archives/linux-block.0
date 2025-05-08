@@ -1,102 +1,79 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC29D27A93D
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 15:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2724E27B4E2
+	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 16:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746717258; cv=none; b=YgHDfCNwNBv+h2+SmVDNaNjPwDha/wUCsXA5bKpAwqlKp2PJU8AWdIrdnbyWbWz8yVoHaHx8dH1O/HhYz6ePCar7nRHitJ7WWG+2sGRy6yhm8r29MvFW81URyS+M3I+cjU+JlTQmg7nlzKJd7RlPR9QF+lCs9rstYLsGXlmBp0I=
+	t=1746720856; cv=none; b=kn/X1q4drLjw8jntyfpRoc5Pg/p7lm6qf1yR6DwQ+ztw6gNA2H9ETiQ43n47FLosBxrA7OZTW2vRdb7Ce0OpFOOuN/euHiykq8HaOFrFY8dPj57AV2Rrd8zLNQ9hwaeK7Gn3FpZ+ZrW5oSb/wV4PQ6BrZE/IkStlR5hR3aD3NbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746717258; c=relaxed/simple;
-	bh=zNo3OqL2O8vDEakkQUSSbaHVMSbhS7nZS2spa5Y6Qms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOi0WlgWueyeEZIcQgGE+c+DHMEiHpSC6H9lGpuAlj19AMzvFaHR/Ht6ElTdJH+8BliVK0DOK2G4l8wmBsWA37NbIgR0gYLxRuG0iOTSH36FS4fmqdy/teXtIwYZl1EGdMcTLJnTB/q25AvY9WK7GG19BNn6IXZpt5K78wlTqSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Cs+8XEfq; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1746720856; c=relaxed/simple;
+	bh=MtFzcLugXYZj1qlG+xp9Qx0bVPoSmqXuvhOtHbpexEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kp3ih4mz/xsyDShXa9/oc4pN7NdZvUSSpQTj+AwzKdJOxfHD2CTHOvK6qD94l7tV1oERCmt0KqoEwDo1gaL7cDRnjUftZPoJMkZfhTKbABe6221GoTDXoMx+ZUtHAWvZv+eICNXJ1L5gyr0LRBZ9lr5h1jmWFUXnwgbdeXjaIQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOBWKKA9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Cs+8XEfq"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3da739653b2so3530655ab.0
-        for <linux-block@vger.kernel.org>; Thu, 08 May 2025 08:14:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746717255; x=1747322055; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pP1HhmeHBLveNBlNnV+UToK3//ptG+M9b2h3DJVfCS0=;
-        b=Cs+8XEfqMr+E7ocMo/WMGqF4rTMw6oriTtVNz9Rb40/Lm1BqTPFXjYt7w8qUgET8EM
-         0LJ9t223aDpnzNih0UMCJO1wa5r6y4XFxsNdjwBKCHSOY83W0Wj0S7PiURuhkZM6jNb7
-         FmHD+nWBlwaW3NN/9P/El7kIkDeGIn2eu5p5Fw3ykeJurYaaCgwwJGL9M+fYRZVEGxC7
-         8n2kRvHvw3oIrGeJW2uu36hkgusXNE+Tny+i9dBv3xRZ52HflYsmOxppHDCxnwuB0/Gu
-         4jE0nNrWEURvEF3gKFwEQtDJAdwoV0bq/t3mpKSLXpAMHQmZAmtkeMFZYRrFgi6kn/KC
-         YVJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746717255; x=1747322055;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pP1HhmeHBLveNBlNnV+UToK3//ptG+M9b2h3DJVfCS0=;
-        b=OCV9IQrL18sMHJ3PIcW7veoOcj1fxGgcDXwSm10wy0LMOZ6lV2YZDDNM4f4I5ez6AV
-         nY1UMESvA2gPbeAkBPjetCoiiJrjWT8IYIcWVg/1EcpLRDAgt+DBaaV2FLJnD5hiUxwW
-         6PqdazLgdIzQQGuMW/cTV8PxSh3OcZ/m9C4XxkhCfo6fNTrUuqdz5+y5aH4r5Xjs9jZZ
-         KuN5FC0VjSVXIeMkMgnfZwe4p0E77wx7z1Vx1xh4ySXApX1mj4rE26er96RWkVLkMLHT
-         92b+qvScxDfQnCSzNf+Bgj2fkyyySnB4TNwcrYrDtiNQh4ynWbCL7sKE4wZxvFfCM0zc
-         zDFg==
-X-Gm-Message-State: AOJu0YzFyVWttBOmeoZ991nqxEVlkpNVa4vbo4K4wWsBCI9Xb1s2+mOr
-	vT9OsQmoOR3K8ghotdBoBfvTU7ymScIAP9gAmg6kjueikgNDeBynyiiYRmszdpY=
-X-Gm-Gg: ASbGncvvLOg3KQrrm8EI3xRg53DCub+TMDuXsX52LeYbEEsuh5NqCglsQE//VcME79v
-	CXIRFDJCKQj273Z41BPwEWwOZQ1jiTMFJGDboLxWIsX+gRF9AjU7sDbTD45XdMOE4qYsQTOeRuZ
-	XG4/c7HN5db2oRDX7GSRwfSOeSL4HNSUfkRd4WKl2izZE5kljzEaptOwSlmA59l94+VbhU03rHj
-	Gwc6qFJhKHTenaOwp4yulmpHtjYCjVYbW3M2tTEUUMeOQ8ehUxp96dtPLswhwDOpfTQZ0XisJXp
-	UqnfBvQUf1U2Cc78IK1TJUA/OIUtsvRrb5eB
-X-Google-Smtp-Source: AGHT+IH8RZwgW3alkS++WNfAs4ztxtBsAFcQwltyiZQ9W6aCxVaVNDkliLlu5+QTwQQt4C2jyZU+XQ==
-X-Received: by 2002:a05:6e02:378e:b0:3d8:8900:9a30 with SMTP id e9e14a558f8ab-3da785a5601mr53099995ab.20.1746717255587;
-        Thu, 08 May 2025 08:14:15 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f88aa8f0a7sm3177198173.123.2025.05.08.08.14.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 08:14:15 -0700 (PDT)
-Message-ID: <40fdf1f1-8e14-4c20-8057-1001dda22c80@kernel.dk>
-Date: Thu, 8 May 2025 09:14:14 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOBWKKA9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42227C4CEE7;
+	Thu,  8 May 2025 16:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746720855;
+	bh=MtFzcLugXYZj1qlG+xp9Qx0bVPoSmqXuvhOtHbpexEA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pOBWKKA94rcufDELYCdIUo3YjCWatG80OkgzrT4EN21y4cw9MUOk/1xP2mVPSNMNR
+	 mw8zfG/1rZVmNKloFLEQ6FOpPDY2Gjtp935DqVD/qbgQkP4tc0IWhMWGrbJX3KBbqv
+	 wFjWc425maSGgGn2Q7C6IM4/h0lEu/MbZmfESXinBWUAeF6e8sZe7WDIFxAGTYIdWZ
+	 3AuRa+Uw1keNt2kM4MOfexXfUaUGMZQZ7R7XpX5ZiemrOHgCwt3aoo+YS2wX1zUJcS
+	 YQQcYKi3hegvRa6Mk/lT/3O270BkVVwQ/03vCjGLkjJSxWvwHFzIm70uqbH0TZPYNv
+	 k7ts3i6LstiBA==
+Date: Thu, 8 May 2025 10:14:13 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCHv2] block: always allocate integrity buffer
+Message-ID: <aBzYVf3qZkzgFAgy@kbusch-mbp>
+References: <20250507191424.2436350-1-kbusch@meta.com>
+ <20250508051233.GA27118@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.15
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-References: <aBzIw5ojzLmaen2g@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aBzIw5ojzLmaen2g@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250508051233.GA27118@lst.de>
 
-On 5/8/25 9:07 AM, Christoph Hellwig wrote:
-> The following changes since commit db492e24f9b05547ba12b4783f09c9d943cf42fe:
+On Thu, May 08, 2025 at 07:12:33AM +0200, Christoph Hellwig wrote:
+> > allocated and attached to the bio entirely. We only want to suppress the
+> > protection checks on the device and host, but we still need the buffer.
+> > 
+> > Otherwise, reads and writes will just get IO errors and this nvme warning:
 > 
->   block: only update request sector if needed (2025-05-06 07:45:59 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.15-2025-05-08
-> 
-> for you to fetch changes up to 650415fca0a97472fdd79725e35152614d1aad76:
-> 
->   nvme: unblock ctrl state transition for firmware update (2025-05-07 09:01:20 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for linux 6.15
-> 
->  - unblock ctrl state transition for firmware update (Daniel Wagner)
+> But to a point - the metadata buffer is only required for non-PI
+> metadata.  I think from looking at the code that is exactly what
+> this patch does, but the commit log sounds different.
 
-Pulled, thanks.
+Not exactly. If anyone's intention was to use this specifically to force
+nvme pract for those special PI formats, then this patch would change
+that. The driver would just get an unchecked metadata buffer instead.
 
--- 
-Jens Axboe
+This is more about just preventing the kernel from sending a request
+that the driver is going to reject. Like if someone mistakenly messes
+with these attributes on formats where PRACT doesn't work.
 
+One use case is like when the kernel started supporting PI offsets
+(~6.8?), and that broke the upgrade path since previously written data
+wouldn't pass the newly enforced checksum on reads, so we need ways to
+disable the checks.
+
+But since you mention it, maybe someone does want to force PRACT on the
+generic read/write path? I considered it a fallback when the kernel
+doesn't have CONFIG_BLK_DEV_INTEGRITY, but we could control it at
+runtime through these attributes too. It would just need a new flag in
+the blk_integrity profile to say if format supports controller-side
+strip/generation and use that to decide if we need to attach an
+unchecked integrity payload or not.
