@@ -1,97 +1,77 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61641E4BE
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 20:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F5021883C;
+	Thu,  8 May 2025 23:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746736491; cv=none; b=Y228CrbevV2NSuQVZ0M778gHUI/t4Nf56B6y3LqruXxH+jsq9hBrT+3sWLAF/u0thIpuwC2jzfS/+bSIY/xxFPppG0FRTBPKwE8BXS3F7geUdlrnc7Am57Ez5kbxCJsIsfkzfPqKk6dEXuCDkFbBjWEh5y8obKZmoy6Xq6Poi+M=
+	t=1746745765; cv=none; b=CZI63S7PPadybq37cdFe1+IPAVVEtW5AbifXYk8KKIijqtHYk31F6w0k0D4wPR+Tje2ijZAO5Tdl+YpNFv6PLXaxJ2D+248ooP4dBU69Ou5yinePPLvpWdwdpxcrd12cFCLAgEY068RMpbZVMY8n0CdfUJbFyJBLiHaKovAHick=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746736491; c=relaxed/simple;
-	bh=b14bnvnMSL7EIp+F6vVtj72Wd7mxL4hLAT5cYFXG8/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X5/qPW9/yIj80nElyi51f2jtl6NzkM6Lqx7hGiM3BTnA8DruL2o3+PWg2kXKjJisXGktL1L9AMTIC/49ewkQgPuIW8X35ukl3jjtZ/eLaYCpKEloxPIAIsk/ZzCE3Bps99844Aphe8IG3+0l2yPkXz9f/kV3LT4etHIwlZOHKZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJ11TlYc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746745765; c=relaxed/simple;
+	bh=pxybTN/WFgrRbAVCsZ8haDtMdQXB0q77B7phekNhxoY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BJcnIGjozffHUBK54I9e68dEjYnLCgBDtzw/3pT4tddlyvI+AXH54WXVE4QLUM9Ag7JDGLCkDg34ucMfgMU9WRMf5FN9z0BTYD/Jm/ehGxd0XYcH5i4O5hkkWBjAzTsONGIcGKTt5zUiVdsOICM+hc+7SzImOd2ECqyx2fHQhTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cnnn3NnP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJ11TlYc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746736485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n/PeUOM0a7VEtjts0jUZZtBmahW0Dt4o+ddVzOKi39E=;
-	b=BJ11TlYc9F7XH3M9Q1dQDRt8LgiYztnDSLK/iIvWebPeMdwqhm6B8Nl39vdMFpoqZ0Sr6q
-	e/rhbuk1XHVxnr0hzsVOhIX1dckCYrwLOaYisdLnONZhQyrND+hHmGQFWVySraun8pkCWi
-	eYW3W7spL+urAuqQFN5/E9x/9Xw481E=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-55-Xv85KHT2OgaE_Mu57yNG9w-1; Thu,
- 08 May 2025 16:34:44 -0400
-X-MC-Unique: Xv85KHT2OgaE_Mu57yNG9w-1
-X-Mimecast-MFC-AGG-ID: Xv85KHT2OgaE_Mu57yNG9w_1746736483
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C238195608E
-	for <linux-block@vger.kernel.org>; Thu,  8 May 2025 20:34:43 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.22])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C675318003FC;
-	Thu,  8 May 2025 20:34:42 +0000 (UTC)
-Date: Thu, 8 May 2025 16:34:41 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alberto Faria <afaria@redhat.com>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [RFC 2/2] vdpa_sim_blk: add support for fua write commands
-Message-ID: <20250508203441.GB63568@fedora>
-References: <20250508001951.421467-1-afaria@redhat.com>
- <20250508001951.421467-3-afaria@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnnn3NnP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DBFDC4CEE7;
+	Thu,  8 May 2025 23:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746745765;
+	bh=pxybTN/WFgrRbAVCsZ8haDtMdQXB0q77B7phekNhxoY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cnnn3NnPvzw+2CweegY/sbCnmu+9BxlNfueOs1eJM3aHOe6A5y44z4HKCJPa+VUE9
+	 cdQEr2VsiGtbSniJjtZa4r8TDC3ywEFAP3dSl6tgnAVFNx9TCM39X6hEwkAxLBnXzO
+	 UkjJPB5rUkL8ZTLHs7L0uOX71NqKXAViJyCtsPI8ALHKtDActvv+z8SL46bYPhMz4I
+	 nmTTu/vmbQxeSbHMzdiT/oDk/ATISb4BW7X/C6VzYm3aDwqUxzhkAOFe3IDEUUbN0c
+	 E4MWwXDi0DBSC+VnwA9SOv/wZo/8Px4BoepEEuvWI0MZVOGsqD6CDXJMZUaEvtbWZy
+	 CEvrAPoYRo8zQ==
+Message-ID: <8d605e7b-e4f7-48eb-ad06-0e8a87b620b5@kernel.org>
+Date: Fri, 9 May 2025 08:08:12 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w32g57vw010zhI4t"
-Content-Disposition: inline
-In-Reply-To: <20250508001951.421467-3-afaria@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] block, scsi: sd_zbc: Respect bio vector limits for
+ report zones buffer
+To: Steve Siwinski <stevensiwinski@gmail.com>
+Cc: James.Bottomley@hansenpartnership.com, axboe@kernel.dk, bgrove@atto.com,
+ hch@infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+ martin.petersen@oracle.com, ssiwinski@atto.com, tdoedline@atto.com,
+ stable@vger.kernel.org
+References: <32a7f1ad-e28a-4494-9293-96237c4ed70b@kernel.org>
+ <20250508200122.243129-1-ssiwinski@atto.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250508200122.243129-1-ssiwinski@atto.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 5/9/25 5:01 AM, Steve Siwinski wrote:
+> The report zones buffer size is currently limited by the HBA's
+> maximum segment count to ensure the buffer can be mapped. However,
+> the block layer further limits the number of iovec entries to
+> 1024 when allocating a bio.
+> 
+> To avoid allocation of buffers too large to be mapped, further
+> restrict the maximum buffer size to BIO_MAX_INLINE_VECS.
+> 
+> Replace the UIO_MAXIOV symbolic name with the more contextually
+> appropriate BIO_MAX_INLINE_VECS.
+> 
+> Fixes: b091ac616846 ("sd_zbc: Fix report zones buffer allocation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Steve Siwinski <ssiwinski@atto.com>
 
---w32g57vw010zhI4t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Looks good to me.
 
-On Thu, May 08, 2025 at 01:19:51AM +0100, Alberto Faria wrote:
-> Expose VIRTIO_BLK_F_OUT_FUA to drivers. The simulator is a ramdisk, so
-> it handles VIRTIO_BLK_T_OUT and VIRTIO_BLK_T_OUT_FUA in the same way.
->=20
-> Signed-off-by: Alberto Faria <afaria@redhat.com>
-> ---
->  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---w32g57vw010zhI4t
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmgdFWEACgkQnKSrs4Gr
-c8jDdggAmlc21JxehZsnxB+KdNsKPgfa+o+WGExSdcuhrxz2GK1bQQYS42iXp1mf
-2Fza8RyDRtjeKNrT8RFT8BU65sqP+dgdhTeALmLAXj+K9wATk+Oi8t9KSbjpDUMr
-I9JycGLCdVswA3nr96+W6IrT1O9ojkM1WZe5i2KGikE0C2FhTwKDiVlC8wT0H9Ba
-woN3bQQSoURvPlGxhQQSda/lsU/VouoezOU7zVwChzZlYx1Osj1VspcVm81neykV
-II3x/OHNGkQsvjO0i1N1DW5Edzf0K4J6Y0cQOClgkj2mRm+4vP4LaX89qHYSfJfU
-dN9hUfKFX+SYQSPwNWtJwB5m39+M4g==
-=AixW
------END PGP SIGNATURE-----
-
---w32g57vw010zhI4t--
-
+-- 
+Damien Le Moal
+Western Digital Research
