@@ -1,63 +1,63 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DFE24E01D;
-	Mon, 12 May 2025 02:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D1524FBFF;
+	Mon, 12 May 2025 02:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747018196; cv=none; b=b4Re2t6J0JmmgNc5CdcrvvHTd8tn69xLYeovE4j/Y1h5bRUGpqcWBOeUnd0GZKwJZbzRIKASU970rft+lbb6c+anLFQZeyYkIOTSX00sBv/jnRDxVbmk9E9NUDGwuu7Sbf2sbNWIDh8UWoi+VZm6R3FnQBPYcQG4vvc4/Hll4A8=
+	t=1747018199; cv=none; b=hZ2ZvznwoTj1UQPC23jAeaV6cTPSqZpqYlXU94e3flkD7Hmmj5WfUfa0MnUNKVDWzdMSX2Rdz0QnCFkkJDFsfxnnuyuWMwzTIqyoYjptNoy5aBkAEKhJqNZCYSXP1tFgGcBUUl6stEhYo3Cwwq0UJpX7jzYZ60DrM4AQMzqBWR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747018196; c=relaxed/simple;
-	bh=O1EXH+l1ID26lSZ86I0mvDbHzUMWrsHZJtxcXeDMpqA=;
+	s=arc-20240116; t=1747018199; c=relaxed/simple;
+	bh=GWd0OhtOGaHtFqvA+97TszWCfujVfsGuoJ8lWKxPCfo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D1mnrsJ5VZdKGqYHOrGRkr/0nv0lYVwt7NszogDz9icGo1Oc0MpHaig2u8+DsB0uVR9Ok6e25N63mfT9As5GlG16Qw/pO7LWYU1ty6B+Mk2hcPfRxATn1I+cT/iYnpZFpEF9kIzAOK5vhNlM+7wlcieg3AX5ftvnRm7dvIu0fGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZyDICHj; arc=none smtp.client-ip=209.85.216.44
+	 MIME-Version; b=u1R9K/Ag20qEH4a9CY5i4b33pI6TI1eZCcGuVnPGUqvZ1qb3r/npGDM4/h1Qe0CKgG6gq4YzMseRaspS2DN4icjScTIY7K+ijs6psZWNGjj3iiK5VBTZEYl/ssdUEIPemO5NM46fkEUBL1nDaRXmeq58RQxZ/21Cw7qGuTluDQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hORiPeKB; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZyDICHj"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-30c47918d84so2375773a91.3;
-        Sun, 11 May 2025 19:49:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hORiPeKB"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-af908bb32fdso3042033a12.1;
+        Sun, 11 May 2025 19:49:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747018194; x=1747622994; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747018197; x=1747622997; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mS6PUiD9waxM/dvO4DQO9mPdxsKh+3Ov1Y+KBYunw0A=;
-        b=BZyDICHjo6OdEFUkyX5ONX8uBvL55TVW+EW1v3/tUlWPnwSHXx9jhgg3zpD/CdS87y
-         Mwt4k5hDhwH+r6ghdu/d+a1axgVkjJFCEbIowDJM2zlWBfgy9qirbRtaIavjg5Qi9fQe
-         h1ykjJyRja5vxJfyWIK4ZbpNhbnZwKJ13rv8Pq+lZhWCWmsigSKPILOpGoasti+M0Hfe
-         UvMLqaFlBVvqKDtaP7ZatdrqC0DAQhIOGPFv91CUBTyoRXU7wYvTaL5Njd3En8/fGH7s
-         TCg7mepVRe+HuyxiaMwRpbbdomluhiAif6fKmphvhc1HThFqSNzCI6PdmAeJmQJ7ja8P
-         avrA==
+        bh=0Xn0UxaC2ldBuSBix2lJVTliOIsmpfCjFQjnK6KyfHY=;
+        b=hORiPeKBvIGjtbMuei+7taNrQ6Bj2qXrlyScAFDkP1zounE2jOstWFncbE5DhQoIjB
+         QsSm3dw4KwsScMCucB1aukf77lIUIpOQF2zMrJvGP7fSSOricoTRcRki2ixCkJwbJeRm
+         /REwDg1tIvps0YSSEd3iS68ENiG1ZVZrfXUhe58fMtDhMon1H3Px5p/a8ICsLLRk8axX
+         hu3LUsBiJliBMiXtoaHel/sS/bDauQUQx5UDlxzAdXEPdLpJD1+lNMnWT2A2viOA3cki
+         qZvZg3QVwyJD4w3gyjz51quwZY1juo1J1xxvTg/08FBcJ0nFP4HFI3kysMSxUqmI7Axi
+         MSpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747018194; x=1747622994;
+        d=1e100.net; s=20230601; t=1747018197; x=1747622997;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mS6PUiD9waxM/dvO4DQO9mPdxsKh+3Ov1Y+KBYunw0A=;
-        b=Udv8QSh5fMrMO6HGVy45DvQjAOjRId3+26WmCLOJAmbO5m1U+MkHeHL7YWOfuS7Jxh
-         PhSzH99BaKZgklnL69xyeUWXOwsMHSNLJfbc3J/6dgzsZDGhXGg3prpKxjc8JW5c0Qd/
-         r2PYL/kJBFkjrn72QQlsEegzLoCg1/EoS1r23am0zhqcruXTZpyFTJtzn7ny0WJN1PBs
-         9RUDksIpCVwLBY1PZK0qBpihuXcWrL1DMhoPeLuFApJExWEMryoQSAHXKPzt8aJO0kjr
-         3ifcovC8vH//2BVtLdphpYl8feBARAVC9RZQ1GCnEmP3q1GTUIwKpSvuEjx6e0Q/E5TG
-         sYQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0b4wNFwSj3mdiY6BFxG9kmuv+DCKLpFVEmDTlG5Sn6YBu9g2zrQ0og7XxWJUYq/Jg6VgPmrBm7ut5ng==@vger.kernel.org, AJvYcCXhr2BEL3FyfLH1Cm2ErBLB2cTJ9zm5uztJJAud/x9rCLuW/ilplXmGubHDhvgQOKfH51h4fz4oHWekMj5D1u+JeG8D@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7TCfNi8pwXtzqjtGz5zDGg1LWmuv6FwcJDzRlJ0jLHp+nqHhr
-	jnHQ66yN77NBjLPM7l5azDouk0LH2JMKpCGIxVDDCMMsKjKZYfqB
-X-Gm-Gg: ASbGncvg2YVzyZpCvDowivmLCeyb2FaqeGjcfAyN6efoEosD/uRsgdbW9WXh/kEApRv
-	+FLBMRQJxsVttvP67P086qJW0lCsbIaCbhi9WDDEZPME4/XUXHFTJf/pzbFk0Hl1WRbz/mzFfrP
-	4F6YXn+znmrVUiVYdZp6wuhiakRNuEPWvOOho6vz7Eu9wqWxXzmJtcuSK/wYKpG7ujzzNealB/y
-	pqM1KUDz2XsRAZk3iG7hqkMuAhMtJNc2FzbisMYb8rwmoadlwuh3WUaU+paGUvzxiCBycHrn/6p
-	5xv6PvQlcJw/If2zfz/RLf5lIOJon85AjFxizb0jHWlRlUDJps/AIqGKD3vECOT7e8ywmlkGZnS
-	q3iCSmSluLHYNbptsr4ym55U=
-X-Google-Smtp-Source: AGHT+IGA0zyFbcpHHaKTnaWWOHklp6y67rFn7VGo74DPABBPXABJMpelZJxIekOVWdWin2jO2bcjgA==
-X-Received: by 2002:a17:90b:35d0:b0:2ee:693e:ed7a with SMTP id 98e67ed59e1d1-30c3d65cc3cmr16994555a91.35.1747018194025;
-        Sun, 11 May 2025 19:49:54 -0700 (PDT)
+        bh=0Xn0UxaC2ldBuSBix2lJVTliOIsmpfCjFQjnK6KyfHY=;
+        b=XZ9Ya6inb+ZYgBfsvN72LjzrD6VmeOsJI/gYFkKXcnZPGevKba3ZGgfl1wteIVm1w8
+         Oz4qAsy63MqgTQJSWUXsFP98vG0eUB2daPCy0FARxVl5kFusdZ7TF0BLO5UX8+/ZvRlG
+         dsR+b3QFXHwiQxeZrmBr9egbJZV3JCXyfxPXjn7R3P3EiVH4h99VDJBA7U1reA/5ykz9
+         JY1rh+iYOeJeVZHsBqmnVq0ZWtQf6BRYk5CK3wwc3+h0rnJbUt/bJL1hKonRPy3zgmgT
+         hnznd9OmRxRTWk7qJlAX+2Hdatmc3IhPWSxxUb5VSzLqxFQS4KHgA1KQTbqpx1Au8Vkj
+         kjXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIN2hwgEON5Z0e9Ocmk0KTa6RB9N3S2pAmIf84olSoKwCkBdQ7+Y2BzzV/mOppZUQyYDI9uRzB+HTDN8rtuKj+ySqO@vger.kernel.org, AJvYcCULoLZbjer7IMIKvVUE+S3+QUMKVeaqa9jYVhGqYoEZX5DFMmrpTCdj69zAxtYLqjXgVuhhRkWO0Obl6g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMS0DcNK9pHN0RZxf+P5oQd/P8LXZ6SMQgWDg7hqiAvo19sdJf
+	418KnxHoyx/DB1FIGscpOKgVnuMctZ0gIosV8gduAi3V0w943UO1
+X-Gm-Gg: ASbGncsjajbsn3PMHspjWbiMvspiZ1tIu4TEUfMGqcJOzIDkC74AlXcYbRTZTC5b8+S
+	5Wm7+lzaIyd3+p3hOYmTutENyGoVAsEkzjQu7QUFtu6dU2CKZ3FxPSUdpbPb7WnAsJMjSUZslE+
+	IEpgxT3psVLu3LtiB6wk9UtZGJ8UlO+yZXB6yhH9JUGG4xxLiGLeIbqnGjHPhMXeKK/x910jYYP
+	jS+sJQ803jVuin8ILLMaRXSgC8niqsS0rxAov24brc2YXUUvHuRXB2z7xiGn4yiB4vXyav+zejJ
+	N4/WdZL4NajmlDeB2t+xjsuIemTXrZYNrGLMuDETJx2xAE51cyMhHpjabiNCnCIUrqIicXq7xHE
+	eeig8Wyknbvt8WWFtbL6rHGs=
+X-Google-Smtp-Source: AGHT+IEZLb0tNMDYG2FFIR2NAfhSeoHWZDgQb/fQeyOLRn/4m4pOM35xlZM3JgnSVKmonPOsoLs3/w==
+X-Received: by 2002:a05:6a21:150a:b0:204:594e:29a5 with SMTP id adf61e73a8af0-215ab4ab9b7mr19064407637.4.1747018196810;
+        Sun, 11 May 2025 19:49:56 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.51
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 19:49:53 -0700 (PDT)
+        Sun, 11 May 2025 19:49:56 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -69,9 +69,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>,
 	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH v1 4/5] relayfs: support a counter tracking if data is too big to write
-Date: Mon, 12 May 2025 10:49:34 +0800
-Message-Id: <20250512024935.64704-5-kerneljasonxing@gmail.com>
+Subject: [PATCH v1 5/5] relayfs: uniformally use possible cpu iteration
+Date: Mon, 12 May 2025 10:49:35 +0800
+Message-Id: <20250512024935.64704-6-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250512024935.64704-1-kerneljasonxing@gmail.com>
 References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
@@ -85,123 +85,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-It doesn't really matter to let the user/admin know what the last too
-big value is. Just record how many times this case is triggered.
-
-Also solve the issue where relay_reset() doesn't restore the value.
-
-Store the counter in the per-cpu buffer structure instead of the global
-buffer structure. It also solves the previous racy condition because
-in terms of the global structure, it is likely to happen when a few of
-per-cpu buffers encounter the too big data case.
-
-Remove the printk in relay_close() since kernel module can directly call
-relay_dump() as they want.
+Use for_each_possible_cpu to create per-cpu relayfs file to avoid later
+hotplug cpu which doesn't have its own file.
 
 Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/linux/relay.h |  5 +++--
- kernel/relay.c        | 19 +++++++++++--------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ kernel/relay.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/relay.h b/include/linux/relay.h
-index 7a442c4cbead..0f5f6ff17824 100644
---- a/include/linux/relay.h
-+++ b/include/linux/relay.h
-@@ -33,8 +33,9 @@
-  */
- enum {
- 	RELAY_DUMP_BUF_FULL = (1 << 0),
-+	RELAY_DUMP_WRT_BIG = (1 << 1),
- 
--	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
-+	RELAY_DUMP_LAST = RELAY_DUMP_WRT_BIG,
- 	RELAY_DUMP_MASK = (RELAY_DUMP_LAST - 1) | RELAY_DUMP_LAST
- };
- 
-@@ -43,6 +44,7 @@ enum {
- struct rchan_buf_error_stats
- {
- 	unsigned int full;		/* counter for buffer full */
-+	unsigned int big;		/* counter for too big to write */
- };
- 
- /*
-@@ -82,7 +84,6 @@ struct rchan
- 	const struct rchan_callbacks *cb; /* client callbacks */
- 	struct kref kref;		/* channel refcount */
- 	void *private_data;		/* for user-defined data */
--	size_t last_toobig;		/* tried to log event > subbuf size */
- 	struct rchan_buf * __percpu *buf; /* per-cpu channel buffers */
- 	int is_global;			/* One global buffer ? */
- 	struct list_head list;		/* for channel list */
 diff --git a/kernel/relay.c b/kernel/relay.c
-index 0e675a77285c..27f7e701724f 100644
+index 27f7e701724f..dcb099859e83 100644
 --- a/kernel/relay.c
 +++ b/kernel/relay.c
-@@ -304,6 +304,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
- 	buf->data = buf->start;
- 	buf->offset = 0;
- 	buf->stats.full = 0;
-+	buf->stats.big = 0;
+@@ -519,7 +519,7 @@ struct rchan *relay_open(const char *base_filename,
+ 	kref_init(&chan->kref);
  
- 	for (i = 0; i < buf->chan->n_subbufs; i++)
- 		buf->padding[i] = 0;
-@@ -712,7 +713,7 @@ size_t relay_switch_subbuf(struct rchan_buf *buf, size_t length)
- 	return length;
- 
- toobig:
--	buf->chan->last_toobig = length;
-+	buf->stats.big++;
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(relay_switch_subbuf);
-@@ -772,11 +773,6 @@ void relay_close(struct rchan *chan)
- 			if ((buf = *per_cpu_ptr(chan->buf, i)))
- 				relay_close_buf(buf);
- 
--	if (chan->last_toobig)
--		printk(KERN_WARNING "relay: one or more items not logged "
--		       "[item size (%zd) > sub-buffer size (%zd)]\n",
--		       chan->last_toobig, chan->subbuf_size);
--
- 	list_del(&chan->list);
- 	kref_put(&chan->kref, relay_destroy_channel);
- 	mutex_unlock(&relay_channels_mutex);
-@@ -819,7 +815,7 @@ EXPORT_SYMBOL_GPL(relay_flush);
-  */
- void relay_dump(struct rchan *chan, char *buf, int len, int flags)
- {
--	unsigned int i, full_counter = 0;
-+	unsigned int i, full_counter = 0, big_counter = 0;
- 	struct rchan_buf *rbuf;
- 	int offset = 0;
- 
-@@ -832,15 +828,22 @@ void relay_dump(struct rchan *chan, char *buf, int len, int flags)
- 	if (chan->is_global) {
- 		rbuf = *per_cpu_ptr(chan->buf, 0);
- 		full_counter = rbuf->stats.full;
-+		big_counter = rbuf->stats.big;
- 	} else {
- 		for_each_possible_cpu(i) {
--			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
-+			if ((rbuf = *per_cpu_ptr(chan->buf, i))) {
- 				full_counter += rbuf->stats.full;
-+				big_counter += rbuf->stats.big;
-+			}
-+		}
- 	}
- 
- 	if (flags & RELAY_DUMP_BUF_FULL)
- 		offset += snprintf(buf, sizeof(unsigned int), "%u", full_counter);
- 
-+	if (flags & RELAY_DUMP_WRT_BIG)
-+		offset += snprintf(buf, sizeof(unsigned int), "%u", big_counter);
-+
- 	snprintf(buf + offset, 1, "\n");
- }
- EXPORT_SYMBOL_GPL(relay_dump);
+ 	mutex_lock(&relay_channels_mutex);
+-	for_each_online_cpu(i) {
++	for_each_possible_cpu(i) {
+ 		buf = relay_open_buf(chan, i);
+ 		if (!buf)
+ 			goto free_bufs;
+@@ -615,7 +615,7 @@ int relay_late_setup_files(struct rchan *chan,
+ 	 * no files associated. So it's safe to call relay_setup_buf_file()
+ 	 * on all currently online CPUs.
+ 	 */
+-	for_each_online_cpu(i) {
++	for_each_possible_cpu(i) {
+ 		buf = *per_cpu_ptr(chan->buf, i);
+ 		if (unlikely(!buf)) {
+ 			WARN_ONCE(1, KERN_ERR "CPU has no buffer!\n");
 -- 
 2.43.5
 
