@@ -1,63 +1,63 @@
 Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E651624C079;
-	Mon, 12 May 2025 02:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DFE24E01D;
+	Mon, 12 May 2025 02:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747018193; cv=none; b=Dlvy4GE3yW31g6j7o7VwWdPCRb7qLmG85rOfwv92WYzvLn6I+vGZ5H/Vqj49o1jhfxmrUi71q6w7Kaa4+C69519ufRk3GEZlOdScgC7ggPTlR2TI5cPBIm4SRcgrFXQMMOUJNjJ63bHM6UMuJbT9knkU2FgFLMhF4D+OmHqyzBQ=
+	t=1747018196; cv=none; b=b4Re2t6J0JmmgNc5CdcrvvHTd8tn69xLYeovE4j/Y1h5bRUGpqcWBOeUnd0GZKwJZbzRIKASU970rft+lbb6c+anLFQZeyYkIOTSX00sBv/jnRDxVbmk9E9NUDGwuu7Sbf2sbNWIDh8UWoi+VZm6R3FnQBPYcQG4vvc4/Hll4A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747018193; c=relaxed/simple;
-	bh=jt8mz/LIeqRGvCoOHtTSkpLfQQkOGg13bmuG1diMBwQ=;
+	s=arc-20240116; t=1747018196; c=relaxed/simple;
+	bh=O1EXH+l1ID26lSZ86I0mvDbHzUMWrsHZJtxcXeDMpqA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FBpzHS27OdR7wUb3pAIurPzuC7Qz0XeDNhtDzT8H31SWwctkKj58RuwBmrlPRzrcsv0Ev8JI/+SNLDnJYSqrUNGx/ixBnDoxrk3fNWUgZw+7eyS7Ob6jksyy4ZZXwNCXvWXG8zXNLCob7dAmqIH/F6lctFALj8KQ3IoSFxpufzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9t1w7tR; arc=none smtp.client-ip=209.85.216.44
+	 MIME-Version; b=D1mnrsJ5VZdKGqYHOrGRkr/0nv0lYVwt7NszogDz9icGo1Oc0MpHaig2u8+DsB0uVR9Ok6e25N63mfT9As5GlG16Qw/pO7LWYU1ty6B+Mk2hcPfRxATn1I+cT/iYnpZFpEF9kIzAOK5vhNlM+7wlcieg3AX5ftvnRm7dvIu0fGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZyDICHj; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9t1w7tR"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-30abb2d5663so3847010a91.2;
-        Sun, 11 May 2025 19:49:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZyDICHj"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-30c47918d84so2375773a91.3;
+        Sun, 11 May 2025 19:49:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747018191; x=1747622991; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747018194; x=1747622994; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QN9dQhzLwM+Yz6+OcH81L0tELj+gC9AsU7SNrehA9n0=;
-        b=k9t1w7tRrfEqbdK8RlVBbczf2m0E1jFCs7goZIbcOWMQblRHllxMm3wGfDmWJX2hXD
-         l4kgvMECZSSDs97/clQ/n9+FaeTyfpLVMqnd7Mc8s1+ENj7qZEmfPnBaLmaYsoa67A4U
-         pMC8pcjJLq5p2Zl0dVJ1tvkGOV1WEEYOBAT8FxVYOF496S2rGoMc1MEn/H6G0zNgiy2o
-         oK960dgkkgXIgWLLg2RNbDlJycRkhmbfEmWhimolK+5V58yO0Z1LSrQ/bo0z9v6PcJQT
-         70WNd/gv6WLOS2Pxq8ad+xXUr8npsbLcgJ5SWHeJ7o5lyY4F1OdUsqMWYzdJKJiqGy6d
-         Q6Lg==
+        bh=mS6PUiD9waxM/dvO4DQO9mPdxsKh+3Ov1Y+KBYunw0A=;
+        b=BZyDICHjo6OdEFUkyX5ONX8uBvL55TVW+EW1v3/tUlWPnwSHXx9jhgg3zpD/CdS87y
+         Mwt4k5hDhwH+r6ghdu/d+a1axgVkjJFCEbIowDJM2zlWBfgy9qirbRtaIavjg5Qi9fQe
+         h1ykjJyRja5vxJfyWIK4ZbpNhbnZwKJ13rv8Pq+lZhWCWmsigSKPILOpGoasti+M0Hfe
+         UvMLqaFlBVvqKDtaP7ZatdrqC0DAQhIOGPFv91CUBTyoRXU7wYvTaL5Njd3En8/fGH7s
+         TCg7mepVRe+HuyxiaMwRpbbdomluhiAif6fKmphvhc1HThFqSNzCI6PdmAeJmQJ7ja8P
+         avrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747018191; x=1747622991;
+        d=1e100.net; s=20230601; t=1747018194; x=1747622994;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QN9dQhzLwM+Yz6+OcH81L0tELj+gC9AsU7SNrehA9n0=;
-        b=g3tmdLLi44yRwV0B0TevU/3bzY5uaNF9dEQlTf5gEqUWzEubwt/VhoHgbxDMwXQjR6
-         6T6aAke+IZmKat42pBCcPXIvYqJT9cDypdgg2dfkVxFZpJoivuzxpKj7Rm1gBG0uBYVJ
-         4IAZNzBwJFxk6LSV0m3nV8BupsoG4PfkMmtntT4SETs7Kx0n/JwueWHLD51KhpOfWPOj
-         jeSyEuzSFDpcq0iN8hOXTJeId9vZ0rFBtw/hCSTu1UanPIiHB6dvVrvI1EqPjHQPvMpS
-         lz1bFR1p33SCa6UIRudnxCmZiVl4Dy5bZ9Yub1f+u9/ny7Z29iV/9LwbKewYbyptifHJ
-         IWKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDhXPlxAWoVsu95ZiXC3BQEQff+Wc+x38tvEIGoB1H8wkZdBIccGhFQN0rJ+G0AW5p/7Ofnbnvp+Uh+g==@vger.kernel.org, AJvYcCXqXRK7ITZop+dyy4qJ+OE4ZeWAghAfsr1ZKvZuoI3CQcw/JLQ5UF4WeGyg5vhZV/ok9AzFq+W2cvsyvp6L/lCS1Cqx@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6UJFynV1b80NznwyHBw8Mx4G2VHkCJ1TExtuPrHq6TWGzDyBH
-	otQuqJBv6q3V/1m7cDmLMT+aP0gGW+colzYzhCGcpyKb1srnjTb8
-X-Gm-Gg: ASbGncvKuPA4fXtkrzRXTEhRYAyvVtFUg8ZkZTlszTl5I6faYbbPK8Am6otioVpnmoB
-	NSVEvwFEEdIoFbYsUPqy0yDLc1DeLw9KQ2hbSnG0YOjrmQooSl93xTQh0LOAJEW62Sw8rupYNXH
-	sH7fYTLFfbFuPplCL8N/isd5DdQpI6Y7FU/YHJ0CoH6vs3drowlzRVW/PQMEPkSs7IMT7DmqH2k
-	mrKqnRv9WyJMnBPJmbgyPzq0VbSsH2VtgE/oPvXfBr8JI2mSo3UbQFzLYm40ANXP9D27j8zQh4j
-	M1DaNwTR5knl7JWYQOOwSk/B+zTTdzPVe4uVkgVzrMPCm2qIu3f8gJPzTpCnUcx+xroWtH4x9ZE
-	6sDdbbDIGeNFJdUKYGXdGwro=
-X-Google-Smtp-Source: AGHT+IEIEObMTQTvXSOyvDjt/MLwZV0MY84O4o1a9TA0eyEKAH8W6OJsN+rRuimiKIw7u+busrns6g==
-X-Received: by 2002:a17:90b:28ce:b0:2f6:dcc9:38e0 with SMTP id 98e67ed59e1d1-30c3b91025amr22737353a91.0.1747018191041;
-        Sun, 11 May 2025 19:49:51 -0700 (PDT)
+        bh=mS6PUiD9waxM/dvO4DQO9mPdxsKh+3Ov1Y+KBYunw0A=;
+        b=Udv8QSh5fMrMO6HGVy45DvQjAOjRId3+26WmCLOJAmbO5m1U+MkHeHL7YWOfuS7Jxh
+         PhSzH99BaKZgklnL69xyeUWXOwsMHSNLJfbc3J/6dgzsZDGhXGg3prpKxjc8JW5c0Qd/
+         r2PYL/kJBFkjrn72QQlsEegzLoCg1/EoS1r23am0zhqcruXTZpyFTJtzn7ny0WJN1PBs
+         9RUDksIpCVwLBY1PZK0qBpihuXcWrL1DMhoPeLuFApJExWEMryoQSAHXKPzt8aJO0kjr
+         3ifcovC8vH//2BVtLdphpYl8feBARAVC9RZQ1GCnEmP3q1GTUIwKpSvuEjx6e0Q/E5TG
+         sYQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0b4wNFwSj3mdiY6BFxG9kmuv+DCKLpFVEmDTlG5Sn6YBu9g2zrQ0og7XxWJUYq/Jg6VgPmrBm7ut5ng==@vger.kernel.org, AJvYcCXhr2BEL3FyfLH1Cm2ErBLB2cTJ9zm5uztJJAud/x9rCLuW/ilplXmGubHDhvgQOKfH51h4fz4oHWekMj5D1u+JeG8D@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7TCfNi8pwXtzqjtGz5zDGg1LWmuv6FwcJDzRlJ0jLHp+nqHhr
+	jnHQ66yN77NBjLPM7l5azDouk0LH2JMKpCGIxVDDCMMsKjKZYfqB
+X-Gm-Gg: ASbGncvg2YVzyZpCvDowivmLCeyb2FaqeGjcfAyN6efoEosD/uRsgdbW9WXh/kEApRv
+	+FLBMRQJxsVttvP67P086qJW0lCsbIaCbhi9WDDEZPME4/XUXHFTJf/pzbFk0Hl1WRbz/mzFfrP
+	4F6YXn+znmrVUiVYdZp6wuhiakRNuEPWvOOho6vz7Eu9wqWxXzmJtcuSK/wYKpG7ujzzNealB/y
+	pqM1KUDz2XsRAZk3iG7hqkMuAhMtJNc2FzbisMYb8rwmoadlwuh3WUaU+paGUvzxiCBycHrn/6p
+	5xv6PvQlcJw/If2zfz/RLf5lIOJon85AjFxizb0jHWlRlUDJps/AIqGKD3vECOT7e8ywmlkGZnS
+	q3iCSmSluLHYNbptsr4ym55U=
+X-Google-Smtp-Source: AGHT+IGA0zyFbcpHHaKTnaWWOHklp6y67rFn7VGo74DPABBPXABJMpelZJxIekOVWdWin2jO2bcjgA==
+X-Received: by 2002:a17:90b:35d0:b0:2ee:693e:ed7a with SMTP id 98e67ed59e1d1-30c3d65cc3cmr16994555a91.35.1747018194025;
+        Sun, 11 May 2025 19:49:54 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.48
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 19:49:50 -0700 (PDT)
+        Sun, 11 May 2025 19:49:53 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -69,9 +69,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>,
 	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH v1 3/5] blktrace: use rbuf->stats.full as a drop indicator in relayfs
-Date: Mon, 12 May 2025 10:49:33 +0800
-Message-Id: <20250512024935.64704-4-kerneljasonxing@gmail.com>
+Subject: [PATCH v1 4/5] relayfs: support a counter tracking if data is too big to write
+Date: Mon, 12 May 2025 10:49:34 +0800
+Message-Id: <20250512024935.64704-5-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250512024935.64704-1-kerneljasonxing@gmail.com>
 References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
@@ -85,78 +85,123 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Replace internal subbuf_start with the default policy in relayfs.
+It doesn't really matter to let the user/admin know what the last too
+big value is. Just record how many times this case is triggered.
 
-Remove dropped field from struct blk_trace. Correspondingly, use per-cpu
-buffer mechanism to replace atomic operation. Through incrementing
-full counter to keep track of how many times we encountered a full
-subbuffer, it aids the user space app in telling how many lost events
-there were.
+Also solve the issue where relay_reset() doesn't restore the value.
 
-Sum up all the fields gathered from all cpus when application is reading.
+Store the counter in the per-cpu buffer structure instead of the global
+buffer structure. It also solves the previous racy condition because
+in terms of the global structure, it is likely to happen when a few of
+per-cpu buffers encounter the too big data case.
+
+Remove the printk in relay_close() since kernel module can directly call
+relay_dump() as they want.
 
 Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- kernel/trace/blktrace.c | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ include/linux/relay.h |  5 +++--
+ kernel/relay.c        | 19 +++++++++++--------
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index d1a89714e805..09d42c40ac9f 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -415,9 +415,9 @@ static ssize_t blk_dropped_read(struct file *filp, char __user *buffer,
- 				size_t count, loff_t *ppos)
- {
- 	struct blk_trace *bt = filp->private_data;
--	char buf[16];
-+	char buf[RELAY_DUMP_BUF_MAX_LEN];
+diff --git a/include/linux/relay.h b/include/linux/relay.h
+index 7a442c4cbead..0f5f6ff17824 100644
+--- a/include/linux/relay.h
++++ b/include/linux/relay.h
+@@ -33,8 +33,9 @@
+  */
+ enum {
+ 	RELAY_DUMP_BUF_FULL = (1 << 0),
++	RELAY_DUMP_WRT_BIG = (1 << 1),
  
--	snprintf(buf, sizeof(buf), "%u\n", atomic_read(&bt->dropped));
-+	relay_dump(bt->rchan, buf, RELAY_DUMP_BUF_MAX_LEN, RELAY_DUMP_BUF_FULL);
- 
- 	return simple_read_from_buffer(buffer, count, ppos, buf, strlen(buf));
- }
-@@ -456,23 +456,6 @@ static const struct file_operations blk_msg_fops = {
- 	.llseek =	noop_llseek,
+-	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
++	RELAY_DUMP_LAST = RELAY_DUMP_WRT_BIG,
+ 	RELAY_DUMP_MASK = (RELAY_DUMP_LAST - 1) | RELAY_DUMP_LAST
  };
  
--/*
-- * Keep track of how many times we encountered a full subbuffer, to aid
-- * the user space app in telling how many lost events there were.
-- */
--static int blk_subbuf_start_callback(struct rchan_buf *buf, void *subbuf,
--				     void *prev_subbuf)
--{
--	struct blk_trace *bt;
--
--	if (!relay_buf_full(buf))
--		return 1;
--
--	bt = buf->chan->private_data;
--	atomic_inc(&bt->dropped);
--	return 0;
--}
--
- static int blk_remove_buf_file_callback(struct dentry *dentry)
+@@ -43,6 +44,7 @@ enum {
+ struct rchan_buf_error_stats
  {
- 	debugfs_remove(dentry);
-@@ -491,7 +474,6 @@ static struct dentry *blk_create_buf_file_callback(const char *filename,
- }
- 
- static const struct rchan_callbacks blk_relay_callbacks = {
--	.subbuf_start		= blk_subbuf_start_callback,
- 	.create_buf_file	= blk_create_buf_file_callback,
- 	.remove_buf_file	= blk_remove_buf_file_callback,
+ 	unsigned int full;		/* counter for buffer full */
++	unsigned int big;		/* counter for too big to write */
  };
-@@ -580,7 +562,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 
+ /*
+@@ -82,7 +84,6 @@ struct rchan
+ 	const struct rchan_callbacks *cb; /* client callbacks */
+ 	struct kref kref;		/* channel refcount */
+ 	void *private_data;		/* for user-defined data */
+-	size_t last_toobig;		/* tried to log event > subbuf size */
+ 	struct rchan_buf * __percpu *buf; /* per-cpu channel buffers */
+ 	int is_global;			/* One global buffer ? */
+ 	struct list_head list;		/* for channel list */
+diff --git a/kernel/relay.c b/kernel/relay.c
+index 0e675a77285c..27f7e701724f 100644
+--- a/kernel/relay.c
++++ b/kernel/relay.c
+@@ -304,6 +304,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
+ 	buf->data = buf->start;
+ 	buf->offset = 0;
+ 	buf->stats.full = 0;
++	buf->stats.big = 0;
+ 
+ 	for (i = 0; i < buf->chan->n_subbufs; i++)
+ 		buf->padding[i] = 0;
+@@ -712,7 +713,7 @@ size_t relay_switch_subbuf(struct rchan_buf *buf, size_t length)
+ 	return length;
+ 
+ toobig:
+-	buf->chan->last_toobig = length;
++	buf->stats.big++;
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(relay_switch_subbuf);
+@@ -772,11 +773,6 @@ void relay_close(struct rchan *chan)
+ 			if ((buf = *per_cpu_ptr(chan->buf, i)))
+ 				relay_close_buf(buf);
+ 
+-	if (chan->last_toobig)
+-		printk(KERN_WARNING "relay: one or more items not logged "
+-		       "[item size (%zd) > sub-buffer size (%zd)]\n",
+-		       chan->last_toobig, chan->subbuf_size);
+-
+ 	list_del(&chan->list);
+ 	kref_put(&chan->kref, relay_destroy_channel);
+ 	mutex_unlock(&relay_channels_mutex);
+@@ -819,7 +815,7 @@ EXPORT_SYMBOL_GPL(relay_flush);
+  */
+ void relay_dump(struct rchan *chan, char *buf, int len, int flags)
+ {
+-	unsigned int i, full_counter = 0;
++	unsigned int i, full_counter = 0, big_counter = 0;
+ 	struct rchan_buf *rbuf;
+ 	int offset = 0;
+ 
+@@ -832,15 +828,22 @@ void relay_dump(struct rchan *chan, char *buf, int len, int flags)
+ 	if (chan->is_global) {
+ 		rbuf = *per_cpu_ptr(chan->buf, 0);
+ 		full_counter = rbuf->stats.full;
++		big_counter = rbuf->stats.big;
+ 	} else {
+ 		for_each_possible_cpu(i) {
+-			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
++			if ((rbuf = *per_cpu_ptr(chan->buf, i))) {
+ 				full_counter += rbuf->stats.full;
++				big_counter += rbuf->stats.big;
++			}
++		}
  	}
  
- 	bt->dev = dev;
--	atomic_set(&bt->dropped, 0);
- 	INIT_LIST_HEAD(&bt->running_list);
+ 	if (flags & RELAY_DUMP_BUF_FULL)
+ 		offset += snprintf(buf, sizeof(unsigned int), "%u", full_counter);
  
- 	ret = -EIO;
++	if (flags & RELAY_DUMP_WRT_BIG)
++		offset += snprintf(buf, sizeof(unsigned int), "%u", big_counter);
++
+ 	snprintf(buf + offset, 1, "\n");
+ }
+ EXPORT_SYMBOL_GPL(relay_dump);
 -- 
 2.43.5
 
