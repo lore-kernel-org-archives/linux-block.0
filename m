@@ -1,63 +1,63 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFCB20C00B;
-	Mon, 12 May 2025 02:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADF924A06C;
+	Mon, 12 May 2025 02:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747018187; cv=none; b=ls+60tT6g5l5tsqf7Q1hTKCWBQadIpmtiU4+HMq735KxNWHbsxKDEwAHtjPCkBOWl+9Il9IofNIY3jb/x5wWnx2FPXyvdB/XdPkGhhJn5Xw/Ih+IxvDjZ0I3xeKrZypKypkjHLV+v8VwEEvQHRsaLdmh8kimEKMv1dc0hXB/hlo=
+	t=1747018190; cv=none; b=j34/BA5e8Y3as1xgj5Z68EkJAlZPVtaMPaok8kdsuVTTPkLf+Gm5fAUOPCp5+/mrNoKJOp9zQrhMw2OQwuBfkoAsnKJ+lmbNfUzqyR5AyKnMilVditCVhXT8p1Zh0fm7vjq0WxwX514OWR1OQ9P7QTsKcW5vvWNuNLIKs4iRG5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747018187; c=relaxed/simple;
-	bh=bGoIp65pg/jPGkK8GR9O0A+GZrnrbxBDUI1wzJAXPLs=;
+	s=arc-20240116; t=1747018190; c=relaxed/simple;
+	bh=fA6uYb+HYMswsWxeRu8N7UkfiZFXVi5+QE26hPaat58=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YosNcZuiNULrZWpmrieN/Ur3CNy77D0v6wylaScfeTv9CUdemBylxs+BuU8VWgHsaLY0xXFws8kOP3wcZ2L81pGxkzzXW7UZ0Bc62O7ZfjHKfWvCo3y2dCzZejHDKK+JxFTEZx8KdP61KZoZ/i8W6CVI+y/IY6S2PGZbnqG4t60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1uNq7aG; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=Msqa7aLz+CyPAGs8/b5G4ghjq0kEOtIQRX+6JEnuXfTicBd8xHDg4MrdBRfcHIQqSyYX22VG4fe5iBePySPWdoUTFptijQv3AG8grnPV/Ik+yWf0xdQeoxvt1iUSMt82mBrb1x9c7CxOQfkl0R1mzFMR74gRuJsmtpxpTpgoVWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOcmQFaT; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1uNq7aG"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-73712952e1cso3749200b3a.1;
-        Sun, 11 May 2025 19:49:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JOcmQFaT"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-30ac268a8e0so3715411a91.0;
+        Sun, 11 May 2025 19:49:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747018185; x=1747622985; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747018188; x=1747622988; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oAgDSdrNCjR7M0F+IDPRCBxlQPpiR4RIsUl7gCVqBBA=;
-        b=K1uNq7aGisD1Tpwy8rZH9qpb8rnjVUMoQvcYC84dDEAThOgQbfKsIDBiZGmSt95hqY
-         /x2l3c/iN8oKMKuJ4HiR84EgZHFoDmdZfQbJYln86Y6ZekPqBYfRvL6BByzXL/k1lobp
-         i46eSdKT1to6p5jp5V5yZ+4Shc/R5gzG8bQYZM/3qb3iwPDTuaBqiwsAKPIRS2y2EVsc
-         HBX8bf5lIf5kVUltRpyMAEgS75RSpQAtDK6nhdk2RhVRG84R0ZiRoGv05alWi02+iD/5
-         9FENq++astzOooPd1E3cJ2ZeGzBMbvoeVIbTQDVwojTt/t72+9ddaW5vmje4dFqJeX0g
-         KM9w==
+        bh=RdC7+50ea9TIOTR9LDnaVPHr54N1c7Zvh2HZXjranp0=;
+        b=JOcmQFaT8AjWg2Okq4lpaPkjm9H2UIcBrPlYHPT2DeRL8i5YMGgGOMmg5UxTvQSssT
+         dqeRWrqbdT9xzPw/dicpQZwSAjafILZ8J44kHRq7nEJT/srxl9DcIeL9kQ7TexyGEkIx
+         2DEckOy3vJAw4ubk+kmweBytoxdl65MHhFVc/8x7uY+L/eIHlm/XAjTpqYA7jlxDgh5I
+         47D8Q1tTZr7n7SjAUkN8tkeW5xFxaMcBOs+a5dTzU+VOGAbN85bcwovC2gUpg2wVOzlm
+         NpiyhrekR2bf/7RvyzRSYho82Lklet0KQ7+JnjBt/IJjHTJ9fVAv0ro8KyzNRPneDA4z
+         heqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747018185; x=1747622985;
+        d=1e100.net; s=20230601; t=1747018188; x=1747622988;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oAgDSdrNCjR7M0F+IDPRCBxlQPpiR4RIsUl7gCVqBBA=;
-        b=I4rPj3UXna475IBJulMPPv+sqbU1mVEgs6AsrR0XhR+/62ayLgE7QL5iFisreKxUyD
-         T4yA9/mcNlRAqdAcWeXdCzCYxGyKFllewnhNeajglemT21xGX1heTlFwVaAPPnnq/9Kl
-         qPJjQMARMckKXnqMhk9Ootuqr/wk4NFD7ENQlzT4QTjUsufdtndTVW+kr5JidQ3PQhHv
-         0uc30P4DUypPUmhHtDe5b/hoSeq5h8c07xDoWOvhhvsfF9ulz2pN56Vn7NKSTJNFW7Nm
-         famHtJH8utzU2vojwBrVrGKQPn8PCXHNEClWMuYdK91tnGB6G+5UObb4kSNCrERBIaFe
-         mXZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGk0W0X5fsKnIdpjH0OQ6W2eF0JJqJkNYOpZktXJGZhmR2ZfrO9yHh+LBVpaknQvwrBTAWO8dlUmTpng==@vger.kernel.org, AJvYcCXF3hPa/LSL3jeLm4/yzqhbbGewvT6kuZTl9Phh0/6vZFPhxjR1VFGA2PqQmte6G8SrCkkz+ch1bB9FoZvkdPx/turZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVqD965TNyPpoIk6pYTQPbnBU9QcoUfpdo/nmCtmo8mUsohYSa
-	Eay5S8MxYE3QY9+HfSYo+YvH2kRniJiV0SNjFfNCmT4BEtBHRYiKE1DJN+lI
-X-Gm-Gg: ASbGncv5jg97dzcOPKf6Qz0qC/rfQpYMu6vsqbE0SWkvrxBfTpkFlt+iV47wjOYHysU
-	oQJ0Vmhgle1NrHr4PuIZEYAbfgJXpcOAV+MZA7SrvZqUim/636lygc5HJUumq3n08E+Tnm1QXbG
-	n+Dgucpfj3DXh8xsoHgi23DOJ5eDrl237QaLsmjFPRNuT/Emns3WEAD7CMZdQ3S6n2ng6+0I8Kg
-	TrsNIqFUrgFFuDOi/SmPxkvp3yNFgQzFHRy0E92Qd+Zz3lxEho6XRoMqmeuAVwQzMnBzZ/PmD+6
-	8oFie9ZOoS/YwKqkSPloDby4X6/Thf8Zts5y8NrVpzpA5s3n1I7VLOyXsq/Ow4u8fLjRjvoUNjr
-	aepk4Qm1pbXVruvDlaV8iQaM=
-X-Google-Smtp-Source: AGHT+IF2pD/3WNehgQKRqb0NRE5telzzjqJbi/MWknVHnDbyv7BiB1CTonFFm41CEv+bBKH2hbbQGQ==
-X-Received: by 2002:a05:6a20:7fa4:b0:1f5:8622:5ecb with SMTP id adf61e73a8af0-215abc17ab1mr19142427637.34.1747018185136;
-        Sun, 11 May 2025 19:49:45 -0700 (PDT)
+        bh=RdC7+50ea9TIOTR9LDnaVPHr54N1c7Zvh2HZXjranp0=;
+        b=oM/vCQjmhlAA12NvB+YARmKL0lZIL7Ag2dM3DLIzYVLW3uOIJG9veDOiIXa8q1iHc8
+         bMrfB79rw10I7471CBf0Ywvkuf6rBjE2rdvCojx3eXLg/Q5YydtdgwBjiXNqQ/yVW+W9
+         k9bOWRSRnMNXP4VErIN3JqECEZsf4RPKY/R7Vi+xC2GKJzwRyJPtNycxRRXk0zjiJDWl
+         Y18F6blffA29qkyi9wgb+4xyJmRO3ylCSu4wQCCDkBj4//HPmgcQ/QzkgLrtgh1qaDO/
+         /JgdMLyb/hUl8sG8FxAm2vZeaX8s7/fbz5hWhv4GICtP2Nplsh1YkhwY2Dd1dtJXNtd1
+         rrcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY/+v3e5m+NE2NMgwMkZoCrLrHUD/YuHW0lvIiKZCwmDK+48+XznBT+ib7KbU/LsfutqreoCZN/l+IDA==@vger.kernel.org, AJvYcCWh9i93CARbjzRVztl7SHvkiRbiVbzWaiPKCeKCmlfpvccb5PYr5AGo8eaBgxaIicgPIlSEzxDSt8eImx8A5DxUC3Rm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFbnOGxeJvEPdfI48+9prsurYSv1ZVyhi5PAMSz+MYhwZxLn3M
+	jJVgOleclRcvJk2tQvJrgmw5b7UOTH8/wr/SbrOa5I6YMYZi7D+7
+X-Gm-Gg: ASbGncvetXEUIAszPta5bCdzn1l1D18r+QPlJSRsne6FZ18ppGxzwVm6sDnKRY5hm8C
+	GyCLACtRqUp9pY1/POD4pEYjlc9Axfj3h2LwF9xH+R+CqRGZJs9yTEUbINocKsn9GT/VaM/KOv/
+	KlfaJzr+X2JokhfubLheytWiQ7DBQ/1/KG1djEQxJoKERHm4mrfU2zjKivszvHJpQ69wmctuj5G
+	wc9s5bjhw6eHiRsJKv2eOJezFgzoCvoU6f++sJ1F5H3f3W5VWTf97nsP2f3Mc8OPW6T4Lrni67O
+	px+DJmWcSOeJ7GQXVyIjrI88M8tbwvzxdsuNDH6AX11BLe73NB26Ow6IiTSFpFEJ+NruQPZQ4B8
+	1OiyQFAC5M+0qkJPRP5HYbSw=
+X-Google-Smtp-Source: AGHT+IEuCbE/fWTwMzhtQWYiP9Xt6EE1kBOowFD1v8jevbAVJQTUuOfx3NVHBGeE0t+E+flU9XvkTg==
+X-Received: by 2002:a17:90b:3805:b0:2ee:5c9b:35c0 with SMTP id 98e67ed59e1d1-30c3fc08554mr15488424a91.9.1747018188092;
+        Sun, 11 May 2025 19:49:48 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.42
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234af2c287sm3938761a12.41.2025.05.11.19.49.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 19:49:44 -0700 (PDT)
+        Sun, 11 May 2025 19:49:47 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -69,9 +69,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>,
 	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH v1 1/5] relayfs: support a counter tracking if per-cpu buffers is full
-Date: Mon, 12 May 2025 10:49:31 +0800
-Message-Id: <20250512024935.64704-2-kerneljasonxing@gmail.com>
+Subject: [PATCH v1 2/5] relayfs: introduce dump of relayfs statistics function
+Date: Mon, 12 May 2025 10:49:32 +0800
+Message-Id: <20250512024935.64704-3-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250512024935.64704-1-kerneljasonxing@gmail.com>
 References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
@@ -85,88 +85,98 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Add 'full' field in per-cpu buffer structure to detect if the buffer is
-full, which means: 1) relayfs doesn't intend to accept new data in
-non-overwrite mode that is also by default, or 2) relayfs is going to
-start over again and overwrite old unread data when kernel module has
-its own subbuf_start callback to support overwrite mode. This counter
-works for both overwrite and non-overwrite modes.
+In this version, only support dumping the counter for buffer full and
+implement the framework of how it works. Users MUST pass a valid @buf
+with a valid @len that is required to be larger than RELAY_DUMP_BUF_MAX_LEN
+to acquire which information indicated by @flags to dump.
 
-This counter doesn't have any explicit lock to protect from being
-modified by different threads at the same time for the better
-performance consideration. In terms of the atomic operation, it's not
-introduced for incrementing the counter like blktrace because side
-effect may arise when multiple threads access the counter simultaneously
-on the machine equipped with many cpus, say, more than 200. As we can
-see in relay_write() and __relay_write(), the writer at the beginning
-should consider how to use the lock for the whole write process, thus
-it's not necessary to add another lock to make sure the counter is
-accurate.
+RELAY_DUMP_BUF_MAX_LEN shows the maximum len of the buffer if users
+choose to dump all the values.
 
-Using 'pahole --hex -C rchan_buf vmlinux' so you can see this field just
-fits into one 4-byte hole in the cacheline 2.
+Users can use this buffer to do whatever they expect in their own kernel
+module, say, print to console/dmesg or write them into the relay buffer.
 
 Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/linux/relay.h | 9 +++++++++
- kernel/relay.c        | 8 +++++++-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ include/linux/relay.h | 10 ++++++++++
+ kernel/relay.c        | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
 diff --git a/include/linux/relay.h b/include/linux/relay.h
-index f80b0eb1e905..022cf11e5a92 100644
+index 022cf11e5a92..7a442c4cbead 100644
 --- a/include/linux/relay.h
 +++ b/include/linux/relay.h
-@@ -28,6 +28,14 @@
+@@ -31,6 +31,15 @@
+ /*
+  * Relay buffer error statistics dump
   */
- #define RELAYFS_CHANNEL_VERSION		7
- 
-+/*
-+ * Relay buffer error statistics dump
-+ */
-+struct rchan_buf_error_stats
-+{
-+	unsigned int full;		/* counter for buffer full */
++enum {
++	RELAY_DUMP_BUF_FULL = (1 << 0),
++
++	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
++	RELAY_DUMP_MASK = (RELAY_DUMP_LAST - 1) | RELAY_DUMP_LAST
 +};
 +
- /*
-  * Per-cpu relay channel buffer
-  */
-@@ -43,6 +51,7 @@ struct rchan_buf
- 	struct irq_work wakeup_work;	/* reader wakeup */
- 	struct dentry *dentry;		/* channel file dentry */
- 	struct kref kref;		/* channel buffer refcount */
-+	struct rchan_buf_error_stats stats; /* error stats */
- 	struct page **page_array;	/* array of current buffer pages */
- 	unsigned int page_count;	/* number of current buffer pages */
- 	unsigned int finalized;		/* buffer has been finalized */
++#define RELAY_DUMP_BUF_MAX_LEN 32
++
+ struct rchan_buf_error_stats
+ {
+ 	unsigned int full;		/* counter for buffer full */
+@@ -170,6 +179,7 @@ extern int relay_late_setup_files(struct rchan *chan,
+ 				  struct dentry *parent);
+ extern void relay_close(struct rchan *chan);
+ extern void relay_flush(struct rchan *chan);
++extern void relay_dump(struct rchan *chan, char *buf, int len, int flags);
+ extern void relay_subbufs_consumed(struct rchan *chan,
+ 				   unsigned int cpu,
+ 				   size_t consumed);
 diff --git a/kernel/relay.c b/kernel/relay.c
-index 5aeb9226e238..b5db4aa60da1 100644
+index b5db4aa60da1..0e675a77285c 100644
 --- a/kernel/relay.c
 +++ b/kernel/relay.c
-@@ -252,8 +252,13 @@ EXPORT_SYMBOL_GPL(relay_buf_full);
- static int relay_subbuf_start(struct rchan_buf *buf, void *subbuf,
- 			      void *prev_subbuf)
- {
-+	int buf_full = relay_buf_full(buf);
-+
-+	if (buf_full)
-+		buf->stats.full++;
-+
- 	if (!buf->chan->cb->subbuf_start)
--		return !relay_buf_full(buf);
-+		return !buf_full;
+@@ -810,6 +810,41 @@ void relay_flush(struct rchan *chan)
+ }
+ EXPORT_SYMBOL_GPL(relay_flush);
  
- 	return buf->chan->cb->subbuf_start(buf, subbuf,
- 					   prev_subbuf);
-@@ -298,6 +303,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
- 	buf->finalized = 0;
- 	buf->data = buf->start;
- 	buf->offset = 0;
-+	buf->stats.full = 0;
- 
- 	for (i = 0; i < buf->chan->n_subbufs; i++)
- 		buf->padding[i] = 0;
++/**
++ *	relay_dump - dump statistics of the specified channel buffer
++ *	@chan: the channel
++ *	@buf: buf to store statistics
++ *	@len: len of buf to check
++ *	@flags: select particular information to dump
++ */
++void relay_dump(struct rchan *chan, char *buf, int len, int flags)
++{
++	unsigned int i, full_counter = 0;
++	struct rchan_buf *rbuf;
++	int offset = 0;
++
++	if (!chan || !buf || flags & ~RELAY_DUMP_MASK)
++		return;
++
++	if (len < RELAY_DUMP_BUF_MAX_LEN)
++		return;
++
++	if (chan->is_global) {
++		rbuf = *per_cpu_ptr(chan->buf, 0);
++		full_counter = rbuf->stats.full;
++	} else {
++		for_each_possible_cpu(i) {
++			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
++				full_counter += rbuf->stats.full;
++	}
++
++	if (flags & RELAY_DUMP_BUF_FULL)
++		offset += snprintf(buf, sizeof(unsigned int), "%u", full_counter);
++
++	snprintf(buf + offset, 1, "\n");
++}
++EXPORT_SYMBOL_GPL(relay_dump);
++
+ /**
+  *	relay_file_open - open file op for relay files
+  *	@inode: the inode
 -- 
 2.43.5
 
