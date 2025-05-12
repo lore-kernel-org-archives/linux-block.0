@@ -1,233 +1,588 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311904A23
-	for <linux-block@vger.kernel.org>; Mon, 12 May 2025 22:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F0018024
+	for <linux-block@vger.kernel.org>; Mon, 12 May 2025 22:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747089926; cv=none; b=GAkzgUp3Q+aCaPY//gz9lNvjvsAlRi0TzZh+u6m8rwWMrp1wuFPp31M6qmIX/l6jaNB7RaPXXQvacfG/TKeeaxzuekzY22SthinVgPgcdYGJhdRW7+ZEThYV8jgMQPi87qx4TlIzBhUk5whhtvpgSGiK+XRHS7ZgY3G9Uz0Pfk4=
+	t=1747090627; cv=none; b=Yru6GcCMr//hkQh/12X131tS1V2oLJlvlnTBAkOsMC9hyCO4sDeirvZi/RC6ih3Us1jZoa1OaITmgYt60ndCmxsIe2AhoUWtbnLjI8JaIjjW5O8tn/bLb3WuBYZUUZ5WgcFarqBy/EONbjPO9SBPDHrBiwkdIvlbd/MGkgwFOr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747089926; c=relaxed/simple;
-	bh=uaa3Owup0TtDpVlS5L1P9nRSvP7SjLwelY9IzYa3yMw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZlkAD32JPQ/j0O3hTsVBf50C5Ll0RUdhjZyGwnbYdfFcwnm9HJsdmUPLJU2hYMpCjIpRhwmUFs3eXqmg6tU2Z0si3+QdLsyzH66bTC0d0cGZ5mE7SnqDU9OGgO8Jgg1NYo83EHaLaCkuvKhxP1D3yO7Bwe4/5nl8nHDfh7W3zog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3da73959f96so62722155ab.1
-        for <linux-block@vger.kernel.org>; Mon, 12 May 2025 15:45:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747089924; x=1747694724;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hqbhKFiX0gkaWgzt5g7mGnx9EKqaLGog2TNAwQZBVGM=;
-        b=CH2OwfG6otHw6Xc8dpJNg2er5K3EoVKFz9T5SeTqgeiGGMmFoIf364Lwq7kgkHA+5/
-         4c4VpUje8CnOo8jI5Z+2yfiw1U6bzdJV6P7n8pzRRNRvpolSGg9nr2b7QfYHI6Pk8tAD
-         mIz5KvirHma7uNxbxg6nriK6ItkGWCRXthEeKY1N0SwfYWjIMqQptnl0czJzOwzGfwNU
-         XQeRlvTRSkotq1tIsePFcqroWz1JsYDV3gKehpEQfnVXIUp1IgVR3HWiOg8PVYzI+tdA
-         uL+pIcUKjq7fXG2riEm8cq90rBam0Zrr3MPfHCpwzWXs/BIBXJsymSHVh72zZ5Gx08Up
-         mNHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqYEMb1x3yzdQad0eY9jPUmL9KIi818b3U/tn68SD+8cJbxwAImgNR+Bh/WAEflE4fq61dHLPpGfECPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfwO63RqSNXz5COPZTZHHi9JzFQdbZ8tbtOi5FL9jYIyGulun1
-	XUhN43gwjQCsWQCca+xYiAZo5mClV8VaP+2gjiBhpuAHEwNsst3tt1F7KAew90zVNho5S3OtnA6
-	YvueTAPMhRGfuP9QQaXGYmlMtRUod5P2m1QntzO42nWN3QQ/Y/Ey5nzI=
-X-Google-Smtp-Source: AGHT+IEwmwUiXthAE0Eb4/SyWnRzE1nYBkFptOFOiTynfSoqxDq5YXpRpAGxRrkepKJ1TPB79Fc2ZO+VeHWofvsDAammt/5RywVx
+	s=arc-20240116; t=1747090627; c=relaxed/simple;
+	bh=+alqnPC3oM3iyAALfFpbzsrHifdwuLhT3x6RnKSB8cw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tz+vgomuDupBtbt36fmrPc4mfJzL834LmQYP5arBnZUDkyxzWYAVnXtk3/2JVekuA7KixFK5ucs5VAFid5rQy3pbwqmQZcLLvfzBp/+7I1KCqkawj5wPuxz9n1uQVcEDHGTbg2ZwtHdOL6M8ayBFDE8N4ul+LDrNjz8ZnuwG6GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=0sFC8FTo; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="0sFC8FTo"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZxFNb67B8zm0ysq;
+	Mon, 12 May 2025 22:57:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1747090622; x=1749682623; bh=xpbq17nV7SDQSQpvI6imFhfT1OiOxdW6mj/
+	BgMdT1rk=; b=0sFC8FToXyxkOAbexbVhrpmnq36/mBu/gdNWUoDqZUAvKfDckfA
+	cqszbfBE7Pqrajd6vg88beTi0JtTyALlJggGaWdXTauf2fSeth6ka7bYuX+eILqH
+	2aMpj1zi5vSOMhhdeom4yxkIPLFgfzvXxnF/IjZpV8TOHcZjxj4gAkXkskUsH3uC
+	JM1h5eiVNXtE32Z+4hSwhROn2MnR42ceTzN/vP1uPRUa8ZdLimFaI6T38DY06xy1
+	LRvWlTtduALiKLpht7EFAQykv1ijRqfREax6cIBfHuQx6jN+hQNdmNii9+X2j1B/
+	2tP29R83YJR3+6eiRcdTVKXhXX8WUFcdt8Q==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id u4n_4d_qMxQG; Mon, 12 May 2025 22:57:02 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZxFNV3vHzzm0yTN;
+	Mon, 12 May 2025 22:56:57 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: Split bios in LBA order
+Date: Mon, 12 May 2025 15:56:23 -0700
+Message-ID: <20250512225623.243507-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b09:b0:3d3:fa69:6755 with SMTP id
- e9e14a558f8ab-3db663b8eb2mr14244235ab.5.1747089924226; Mon, 12 May 2025
- 15:45:24 -0700 (PDT)
-Date: Mon, 12 May 2025 15:45:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68227a04.050a0220.f2294.00b5.GAE@google.com>
-Subject: [syzbot] [nbd?] KASAN: slab-use-after-free Write in recv_work (2)
-From: syzbot <syzbot+48240bab47e705c53126@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+The block layer submits bio fragments in opposite LBA order. Fix this as
+follows:
+- Introduce a new function bio_split_to_limits_and_submit() that has the
+  same behavior as the existing bio_split_to_limits() function. This
+  involves splitting a bio and submitting the fragment with the highest
+  LBA by calling submit_bio_noacct().
+- Use the new function bio_split_to_limits_and_submit() in all drivers
+  that are fine with submitting split bios in opposite LBA order.
+- Modify bio_split_to_limits() such that it returns two bio pointers
+  instead of submitting one of the two bio fragments in case a bio has
+  been split.
+- Modify blk_mq_submit_bio() and dm_split_and_process_bio() such that
+  bio fragments are submitted in LBA order.
 
-syzbot found the following issue on:
+This patch fixes unaligned write errors that I encountered with F2FS
+submitting zoned writes to a dm driver stacked on top of a zoned UFS
+device.
 
-HEAD commit:    2c89c1b655c0 Merge tag 'net-6.15-rc6' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10a38768580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b39cb28b0a399ed3
-dashboard link: https://syzkaller.appspot.com/bug?extid=48240bab47e705c53126
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=154bd4f4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1578c670580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2c89c1b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/597b69724951/vmlinux-2c89c1b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ff3b903b9d6f/bzImage-2c89c1b6.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+48240bab47e705c53126@syzkaller.appspotmail.com
-
-block nbd6: Receive control failed (result -104)
-block nbd6: shutting down sockets
-==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
-BUG: KASAN: slab-use-after-free in atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
-BUG: KASAN: slab-use-after-free in recv_work+0x694/0xa80 drivers/block/nbd.c:1022
-Write of size 4 at addr ffff8880295de478 by task kworker/u33:0/67
-
-CPU: 2 UID: 0 PID: 67 Comm: kworker/u33:0 Not tainted 6.15.0-rc5-syzkaller-00123-g2c89c1b655c0 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: nbd6-recv recv_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xc3/0x670 mm/kasan/report.c:521
- kasan_report+0xe0/0x110 mm/kasan/report.c:634
- check_region_inline mm/kasan/generic.c:183 [inline]
- kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
- instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
- atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
- recv_work+0x694/0xa80 drivers/block/nbd.c:1022
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Allocated by task 5940:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- nbd_alloc_and_init_config+0x97/0x2a0 drivers/block/nbd.c:1659
- nbd_genl_connect+0x490/0x1c20 drivers/block/nbd.c:2121
- genl_family_rcv_msg_doit+0x206/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16a/0x440 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x53a/0x7f0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- ____sys_sendmsg+0xa95/0xc70 net/socket.c:2566
- ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
- __sys_sendmsg+0x16d/0x220 net/socket.c:2652
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 67:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2380 [inline]
- slab_free mm/slub.c:4642 [inline]
- kfree+0x2b6/0x4d0 mm/slub.c:4841
- nbd_config_put+0x3c1/0x750 drivers/block/nbd.c:1449
- recv_work+0x681/0xa80 drivers/block/nbd.c:1021
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff8880295de400
- which belongs to the cache kmalloc-256 of size 256
-The buggy address is located 120 bytes inside of
- freed 256-byte region [ffff8880295de400, ffff8880295de500)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x295de
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b442b40 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801b442b40 0000000000000000 dead000000000001
-head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 00fff00000000001 ffffea0000a57781 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 13520876544, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x181/0x1b0 mm/page_alloc.c:1718
- prep_new_page mm/page_alloc.c:1726 [inline]
- get_page_from_freelist+0x135c/0x3920 mm/page_alloc.c:3688
- __alloc_frozen_pages_noprof+0x263/0x23a0 mm/page_alloc.c:4970
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2301
- alloc_slab_page mm/slub.c:2450 [inline]
- allocate_slab mm/slub.c:2618 [inline]
- new_slab+0x244/0x340 mm/slub.c:2672
- ___slab_alloc+0xd9c/0x1940 mm/slub.c:3858
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3948
- __slab_alloc_node mm/slub.c:4023 [inline]
- slab_alloc_node mm/slub.c:4184 [inline]
- __do_kmalloc_node mm/slub.c:4326 [inline]
- __kmalloc_noprof+0x2f2/0x510 mm/slub.c:4339
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- rh_call_control drivers/usb/core/hcd.c:491 [inline]
- rh_urb_enqueue drivers/usb/core/hcd.c:821 [inline]
- usb_hcd_submit_urb+0x5cf/0x1c60 drivers/usb/core/hcd.c:1529
- usb_submit_urb+0x87c/0x1730 drivers/usb/core/urb.c:581
- usb_start_wait_urb+0x104/0x4b0 drivers/usb/core/message.c:59
- usb_internal_control_msg drivers/usb/core/message.c:103 [inline]
- usb_control_msg+0x326/0x4a0 drivers/usb/core/message.c:154
- usb_get_string+0xab/0x1a0 drivers/usb/core/message.c:844
- usb_string_sub+0x107/0x390 drivers/usb/core/message.c:883
- usb_string+0x307/0x670 drivers/usb/core/message.c:988
- usb_cache_string+0x80/0x150 drivers/usb/core/message.c:1030
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff8880295de300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8880295de380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff8880295de400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                                ^
- ffff8880295de480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880295de500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-merge.c             | 81 +++++++++++++++++++++++++----------
+ block/blk-mq.c                | 27 ++++++++----
+ block/blk.h                   | 26 ++++++-----
+ drivers/block/drbd/drbd_req.c |  2 +-
+ drivers/block/pktcdvd.c       |  2 +-
+ drivers/md/dm.c               | 14 ++++--
+ drivers/md/md.c               |  2 +-
+ drivers/nvme/host/multipath.c |  2 +-
+ include/linux/blkdev.h        |  3 +-
+ 9 files changed, 108 insertions(+), 51 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 782308b73b53..1076e5e1fa9c 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -105,8 +105,15 @@ static unsigned int bio_allowed_max_sectors(const st=
+ruct queue_limits *lim)
+ 	return round_down(UINT_MAX, lim->logical_block_size) >> SECTOR_SHIFT;
+ }
+=20
+-static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
++/*
++ * Split a bio and prepare the bio that has been split off for submissio=
+n.
++ * Returns %NULL upon error or the prefix bio upon success and stores a =
+pointer
++ * to the suffix in *@bio_ptr.
++ */
++static struct bio *bio_submit_split(struct bio **bio_ptr, int split_sect=
+ors)
+ {
++	struct bio *bio =3D *bio_ptr;
++
+ 	if (unlikely(split_sectors < 0))
+ 		goto error;
+=20
+@@ -124,8 +131,9 @@ static struct bio *bio_submit_split(struct bio *bio, =
+int split_sectors)
+ 		bio_chain(split, bio);
+ 		trace_block_split(split, bio->bi_iter.bi_sector);
+ 		WARN_ON_ONCE(bio_zone_write_plugging(bio));
+-		submit_bio_noacct(bio);
+ 		return split;
++	} else {
++		*bio_ptr =3D NULL;
+ 	}
+=20
+ 	return bio;
+@@ -135,7 +143,7 @@ static struct bio *bio_submit_split(struct bio *bio, =
+int split_sectors)
+ 	return NULL;
+ }
+=20
+-struct bio *bio_split_discard(struct bio *bio, const struct queue_limits=
+ *lim,
++struct bio *bio_split_discard(struct bio **bio, const struct queue_limit=
+s *lim,
+ 		unsigned *nsegs)
+ {
+ 	unsigned int max_discard_sectors, granularity;
+@@ -149,11 +157,13 @@ struct bio *bio_split_discard(struct bio *bio, cons=
+t struct queue_limits *lim,
+ 	max_discard_sectors =3D
+ 		min(lim->max_discard_sectors, bio_allowed_max_sectors(lim));
+ 	max_discard_sectors -=3D max_discard_sectors % granularity;
+-	if (unlikely(!max_discard_sectors))
+-		return bio;
++	if (unlikely(!max_discard_sectors) ||
++	    bio_sectors(*bio) <=3D max_discard_sectors) {
++		struct bio *orig_bio =3D *bio;
+=20
+-	if (bio_sectors(bio) <=3D max_discard_sectors)
+-		return bio;
++		*bio =3D NULL;
++		return orig_bio;
++	}
+=20
+ 	split_sectors =3D max_discard_sectors;
+=20
+@@ -161,7 +171,7 @@ struct bio *bio_split_discard(struct bio *bio, const =
+struct queue_limits *lim,
+ 	 * If the next starting sector would be misaligned, stop the discard at
+ 	 * the previous aligned sector.
+ 	 */
+-	tmp =3D bio->bi_iter.bi_sector + split_sectors -
++	tmp =3D (*bio)->bi_iter.bi_sector + split_sectors -
+ 		((lim->discard_alignment >> 9) % granularity);
+ 	tmp =3D sector_div(tmp, granularity);
+=20
+@@ -374,12 +384,12 @@ int bio_split_rw_at(struct bio *bio, const struct q=
+ueue_limits *lim,
+ }
+ EXPORT_SYMBOL_GPL(bio_split_rw_at);
+=20
+-struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim=
+,
++struct bio *bio_split_rw(struct bio **bio, const struct queue_limits *li=
+m,
+ 		unsigned *nr_segs)
+ {
+ 	return bio_submit_split(bio,
+-		bio_split_rw_at(bio, lim, nr_segs,
+-			get_max_io_size(bio, lim) << SECTOR_SHIFT));
++		bio_split_rw_at(*bio, lim, nr_segs,
++			get_max_io_size(*bio, lim) << SECTOR_SHIFT));
+ }
+=20
+ /*
+@@ -389,22 +399,22 @@ struct bio *bio_split_rw(struct bio *bio, const str=
+uct queue_limits *lim,
+  * a good sanity check that the submitter built the bio correctly is nic=
+e to
+  * have as well.
+  */
+-struct bio *bio_split_zone_append(struct bio *bio,
++struct bio *bio_split_zone_append(struct bio **bio,
+ 		const struct queue_limits *lim, unsigned *nr_segs)
+ {
+ 	int split_sectors;
+=20
+-	split_sectors =3D bio_split_rw_at(bio, lim, nr_segs,
++	split_sectors =3D bio_split_rw_at(*bio, lim, nr_segs,
+ 			lim->max_zone_append_sectors << SECTOR_SHIFT);
+ 	if (WARN_ON_ONCE(split_sectors > 0))
+ 		split_sectors =3D -EINVAL;
+ 	return bio_submit_split(bio, split_sectors);
+ }
+=20
+-struct bio *bio_split_write_zeroes(struct bio *bio,
++struct bio *bio_split_write_zeroes(struct bio **bio,
+ 		const struct queue_limits *lim, unsigned *nsegs)
+ {
+-	unsigned int max_sectors =3D get_max_io_size(bio, lim);
++	unsigned int max_sectors =3D get_max_io_size(*bio, lim);
+=20
+ 	*nsegs =3D 0;
+=20
+@@ -414,15 +424,38 @@ struct bio *bio_split_write_zeroes(struct bio *bio,
+ 	 * I/O completion handler, and we can race and see this.  Splitting to =
+a
+ 	 * zero limit obviously doesn't make sense, so band-aid it here.
+ 	 */
+-	if (!max_sectors)
+-		return bio;
+-	if (bio_sectors(bio) <=3D max_sectors)
+-		return bio;
++	if (!max_sectors || bio_sectors(*bio) <=3D max_sectors) {
++		struct bio *orig_bio =3D *bio;
++
++		*bio =3D NULL;
++		return orig_bio;
++	}
+ 	return bio_submit_split(bio, max_sectors);
+ }
+=20
+ /**
+  * bio_split_to_limits - split a bio to fit the queue limits
++ * @bio:     pointer to the bio to be split
++ *
++ * Check if *@bio needs splitting based on the queue limits of (*@bio)->=
+bi_bdev,
++ * and if so split off a bio fitting the limits from the beginning of *@=
+bio and
++ * return it.  *@bio is shortened to the remainder if the bio has been s=
+plit.
++ * *@bio is cleared if splitting is not required.
++ *
++ * The split bio is allocated from @q->bio_split, which is provided by t=
+he
++ * block layer.
++ */
++struct bio *bio_split_to_limits(struct bio **bio)
++{
++	unsigned int nr_segs;
++
++	return __bio_split_to_limits(bio, bdev_limits((*bio)->bi_bdev),
++				     &nr_segs);
++}
++EXPORT_SYMBOL(bio_split_to_limits);
++
++/**
++ * bio_split_to_limits_and_submit - split a bio to fit the queue limits
+  * @bio:     bio to be split
+  *
+  * Check if @bio needs splitting based on the queue limits of @bio->bi_b=
+dev, and
+@@ -432,13 +465,15 @@ struct bio *bio_split_write_zeroes(struct bio *bio,
+  * The split bio is allocated from @q->bio_split, which is provided by t=
+he
+  * block layer.
+  */
+-struct bio *bio_split_to_limits(struct bio *bio)
++struct bio *bio_split_to_limits_and_submit(struct bio *bio)
+ {
+-	unsigned int nr_segs;
++	struct bio *split =3D bio_split_to_limits(&bio);
+=20
+-	return __bio_split_to_limits(bio, bdev_limits(bio->bi_bdev), &nr_segs);
++	if (split && bio)
++		submit_bio_noacct(bio);
++	return split;
+ }
+-EXPORT_SYMBOL(bio_split_to_limits);
++EXPORT_SYMBOL(bio_split_to_limits_and_submit);
+=20
+ unsigned int blk_recalc_rq_segments(struct request *rq)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cbc9a9f97a31..d9a84d0282ae 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3122,6 +3122,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	struct blk_plug *plug =3D current->plug;
+ 	const int is_sync =3D op_is_sync(bio->bi_opf);
+ 	struct blk_mq_hw_ctx *hctx;
++	struct bio *remainder =3D NULL;
+ 	unsigned int nr_segs;
+ 	struct request *rq;
+ 	blk_status_t ret;
+@@ -3169,18 +3170,19 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		goto queue_exit;
+ 	}
+=20
+-	bio =3D __bio_split_to_limits(bio, &q->limits, &nr_segs);
++	remainder =3D bio;
++	bio =3D __bio_split_to_limits(&remainder, &q->limits, &nr_segs);
+ 	if (!bio)
+ 		goto queue_exit;
+=20
+ 	if (!bio_integrity_prep(bio))
+-		goto queue_exit;
++		goto submit_remainder_and_exit;
+=20
+ 	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+-		goto queue_exit;
++		goto submit_remainder_and_exit;
+=20
+ 	if (blk_queue_is_zoned(q) && blk_zone_plug_bio(bio, nr_segs))
+-		goto queue_exit;
++		goto submit_remainder_and_exit;
+=20
+ new_request:
+ 	if (rq) {
+@@ -3190,7 +3192,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		if (unlikely(!rq)) {
+ 			if (bio->bi_opf & REQ_NOWAIT)
+ 				bio_wouldblock_error(bio);
+-			goto queue_exit;
++			goto submit_remainder_and_exit;
+ 		}
+ 	}
+=20
+@@ -3205,18 +3207,18 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		bio->bi_status =3D ret;
+ 		bio_endio(bio);
+ 		blk_mq_free_request(rq);
+-		return;
++		goto submit_remainder;
+ 	}
+=20
+ 	if (bio_zone_write_plugging(bio))
+ 		blk_zone_write_plug_init_request(rq);
+=20
+ 	if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
+-		return;
++		goto submit_remainder;
+=20
+ 	if (plug) {
+ 		blk_add_rq_to_plug(plug, rq);
+-		return;
++		goto submit_remainder;
+ 	}
+=20
+ 	hctx =3D rq->mq_hctx;
+@@ -3227,8 +3229,17 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	} else {
+ 		blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq));
+ 	}
++
++submit_remainder:
++	if (remainder)
++		submit_bio_noacct(remainder);
++
+ 	return;
+=20
++submit_remainder_and_exit:
++	if (remainder)
++		submit_bio_noacct(remainder);
++
+ queue_exit:
+ 	/*
+ 	 * Don't drop the queue reference if we were trying to use a cached
+diff --git a/block/blk.h b/block/blk.h
+index 665b3d1fb504..31fd9a2208a0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -340,13 +340,13 @@ ssize_t part_timeout_show(struct device *, struct d=
+evice_attribute *, char *);
+ ssize_t part_timeout_store(struct device *, struct device_attribute *,
+ 				const char *, size_t);
+=20
+-struct bio *bio_split_discard(struct bio *bio, const struct queue_limits=
+ *lim,
++struct bio *bio_split_discard(struct bio **bio, const struct queue_limit=
+s *lim,
+ 		unsigned *nsegs);
+-struct bio *bio_split_write_zeroes(struct bio *bio,
++struct bio *bio_split_write_zeroes(struct bio **bio,
+ 		const struct queue_limits *lim, unsigned *nsegs);
+-struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim=
+,
++struct bio *bio_split_rw(struct bio **bio, const struct queue_limits *li=
+m,
+ 		unsigned *nr_segs);
+-struct bio *bio_split_zone_append(struct bio *bio,
++struct bio *bio_split_zone_append(struct bio **bio,
+ 		const struct queue_limits *lim, unsigned *nr_segs);
+=20
+ /*
+@@ -370,27 +370,30 @@ static inline bool bio_may_need_split(struct bio *b=
+io,
+=20
+ /**
+  * __bio_split_to_limits - split a bio to fit the queue limits
+- * @bio:     bio to be split
++ * @bio:     pointer to the bio to be split
+  * @lim:     queue limits to split based on
+  * @nr_segs: returns the number of segments in the returned bio
+  *
+  * Check if @bio needs splitting based on the queue limits, and if so sp=
+lit off
+  * a bio fitting the limits from the beginning of @bio and return it.  @=
+bio is
+- * shortened to the remainder and re-submitted.
++ * shortened to the remainder and stored in *@bio.
+  *
+  * The split bio is allocated from @q->bio_split, which is provided by t=
+he
+  * block layer.
+  */
+-static inline struct bio *__bio_split_to_limits(struct bio *bio,
++static inline struct bio *__bio_split_to_limits(struct bio **bio,
+ 		const struct queue_limits *lim, unsigned int *nr_segs)
+ {
+-	switch (bio_op(bio)) {
++	struct bio *orig_bio =3D *bio;
++
++	switch (bio_op(*bio)) {
+ 	case REQ_OP_READ:
+ 	case REQ_OP_WRITE:
+-		if (bio_may_need_split(bio, lim))
++		if (bio_may_need_split(*bio, lim))
+ 			return bio_split_rw(bio, lim, nr_segs);
+ 		*nr_segs =3D 1;
+-		return bio;
++		*bio =3D NULL;
++		return orig_bio;
+ 	case REQ_OP_ZONE_APPEND:
+ 		return bio_split_zone_append(bio, lim, nr_segs);
+ 	case REQ_OP_DISCARD:
+@@ -401,7 +404,8 @@ static inline struct bio *__bio_split_to_limits(struc=
+t bio *bio,
+ 	default:
+ 		/* other operations can't be split */
+ 		*nr_segs =3D 0;
+-		return bio;
++		*bio =3D NULL;
++		return orig_bio;
+ 	}
+ }
+=20
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.=
+c
+index 380e6584a4ee..1076fa616a25 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1612,7 +1612,7 @@ void drbd_submit_bio(struct bio *bio)
+ {
+ 	struct drbd_device *device =3D bio->bi_bdev->bd_disk->private_data;
+=20
+-	bio =3D bio_split_to_limits(bio);
++	bio =3D bio_split_to_limits_and_submit(bio);
+ 	if (!bio)
+ 		return;
+=20
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index d5cc7bd2875c..e165ce11dce2 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2431,7 +2431,7 @@ static void pkt_submit_bio(struct bio *bio)
+ 	struct device *ddev =3D disk_to_dev(pd->disk);
+ 	struct bio *split;
+=20
+-	bio =3D bio_split_to_limits(bio);
++	bio =3D bio_split_to_limits_and_submit(bio);
+ 	if (!bio)
+ 		return;
+=20
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 5ab7574c0c76..2974e95f671a 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1939,6 +1939,7 @@ static blk_status_t __send_zone_reset_all(struct cl=
+one_info *ci)
+ static void dm_split_and_process_bio(struct mapped_device *md,
+ 				     struct dm_table *map, struct bio *bio)
+ {
++	struct bio *remainder =3D NULL;
+ 	struct clone_info ci;
+ 	struct dm_io *io;
+ 	blk_status_t error =3D BLK_STS_OK;
+@@ -1961,7 +1962,8 @@ static void dm_split_and_process_bio(struct mapped_=
+device *md,
+ 		 * emulation to ensure that the BIO does not cross zone
+ 		 * boundaries.
+ 		 */
+-		bio =3D bio_split_to_limits(bio);
++		remainder =3D bio;
++		bio =3D bio_split_to_limits(&remainder);
+ 		if (!bio)
+ 			return;
+ 	}
+@@ -1971,7 +1973,7 @@ static void dm_split_and_process_bio(struct mapped_=
+device *md,
+ 	 * need zone append emulation (e.g. dm-crypt).
+ 	 */
+ 	if (static_branch_unlikely(&zoned_enabled) && dm_zone_plug_bio(md, bio)=
+)
+-		return;
++		goto submit_remainder;
+=20
+ 	/* Only support nowait for normal IO */
+ 	if (unlikely(bio->bi_opf & REQ_NOWAIT) && !is_abnormal) {
+@@ -1982,13 +1984,13 @@ static void dm_split_and_process_bio(struct mappe=
+d_device *md,
+ 		 */
+ 		if (bio->bi_opf & REQ_PREFLUSH) {
+ 			bio_wouldblock_error(bio);
+-			return;
++			goto submit_remainder;
+ 		}
+ 		io =3D alloc_io(md, bio, GFP_NOWAIT);
+ 		if (unlikely(!io)) {
+ 			/* Unable to do anything without dm_io. */
+ 			bio_wouldblock_error(bio);
+-			return;
++			goto submit_remainder;
+ 		}
+ 	} else {
+ 		io =3D alloc_io(md, bio, GFP_NOIO);
+@@ -2036,6 +2038,10 @@ static void dm_split_and_process_bio(struct mapped=
+_device *md,
+ 		dm_io_dec_pending(io, error);
+ 	} else
+ 		dm_queue_poll_io(bio, io);
++
++submit_remainder:
++	if (remainder)
++		submit_bio_noacct(remainder);
+ }
+=20
+ static void dm_submit_bio(struct bio *bio)
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 9daa78c5fe33..40c20398a9cc 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -418,7 +418,7 @@ static void md_submit_bio(struct bio *bio)
+ 		return;
+ 	}
+=20
+-	bio =3D bio_split_to_limits(bio);
++	bio =3D bio_split_to_limits_and_submit(bio);
+ 	if (!bio)
+ 		return;
+=20
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.=
+c
+index 250f3da67cc9..d84cf3e3f979 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -457,7 +457,7 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
+ 	 * different queue via blk_steal_bios(), so we need to use the bio_spli=
+t
+ 	 * pool from the original queue to allocate the bvecs from.
+ 	 */
+-	bio =3D bio_split_to_limits(bio);
++	bio =3D bio_split_to_limits_and_submit(bio);
+ 	if (!bio)
+ 		return;
+=20
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6ebd8e7f3ac9..1d8267f389bb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -934,7 +934,8 @@ void blk_request_module(dev_t devt);
+ extern int blk_register_queue(struct gendisk *disk);
+ extern void blk_unregister_queue(struct gendisk *disk);
+ void submit_bio_noacct(struct bio *bio);
+-struct bio *bio_split_to_limits(struct bio *bio);
++struct bio *bio_split_to_limits(struct bio **bio);
++struct bio *bio_split_to_limits_and_submit(struct bio *bio);
+=20
+ extern int blk_lld_busy(struct request_queue *q);
+ extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t f=
+lags);
