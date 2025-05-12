@@ -1,157 +1,99 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B2025178A
-	for <linux-block@vger.kernel.org>; Mon, 12 May 2025 17:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D4D298242;
+	Mon, 12 May 2025 18:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747071611; cv=none; b=er0UT/sAhZoNDYyoPcciEAJ76nAldjvmCGNwXVMzdwSaF/B0UwZYvHTnrcxOSBNVMyGTsvAdEB79tBXhVdnVN7U446V7k7YCA7nXwCX5bGz/NvN13eGMfzBfj2nAudNvrA8zS0F9yB9n9v3kL7yJ57NqkE1qxu6T6MwRemriJQM=
+	t=1747073054; cv=none; b=fB6zlKIjP51vLfi2i17+Fxl7smkkNcn01g5nin2aXiYiIWJtlH4kwnXRjgPvolay90hhDG0khBxXEQoApDkoYFRou+FrtT7kx8fHHDZP1oJmidrDU9JM1bLZGfGXmFiEub3YeUaXIKQtQB/4PBOY1iFYzQjg4XXTSuK45nFVIek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747071611; c=relaxed/simple;
-	bh=jfMJguNy7KP1f8dfjRlpGKCvHAvmMUQdTLAXZWe/HOg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oBWN3txZUXuqDZJz4dxq17NsxyiIAK4qIYuSaDfdcccUCysB3NX8Tj2Rp4XvtDZWnYBBBvcSRt8ROOhRkxVRszCrC1eLNKi+JGVnnafzXUJJtVx4+FBwxjfmXmPic4jH8HuWrc4aA0C5hXf+R3teXJi813EBLr20nOSfxvJeliw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WSTKq5b7; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1747073054; c=relaxed/simple;
+	bh=L2k7cRkMJazui1TkT/w4yjvjzTYhEraMo91sqqKHc0A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EfgsczNzdjvOYVFERi2VwArA7mhJS8jmKuPtqVwGu7NKlu0oG4ErImDIJ2yon5qcT2ej5/T4Ncnlx3a3wEMyptPhK/8UrY7XE9mapXuT54OFBs4Py0eDfxZJjg9XJsH4sDXbwDp5doAbOqhLNzlv6hV5v/ai1KEsMThgTe5/aVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNib/Eek; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WSTKq5b7"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b2414d565edso228692a12.1
-        for <linux-block@vger.kernel.org>; Mon, 12 May 2025 10:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1747071608; x=1747676408; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ypP5iD4c0wcoN82wgQ8cULjPKQS3qu6K5cMT5U5Jo8o=;
-        b=WSTKq5b7uMfbznl3v+s7uS/Vt/k9OJj7zzPG2DShRvVrbRIt7Ri0zdT1t5Gvztx2vp
-         S/uoSwauan2JpIADO5WKlcbUumJXPeQdYDUpGzoz+YzCzGfAHPJXASHkjO0rSGO7rpwM
-         qCm+tZHlG8T2f5qZHBKuc701mKGjrE4YtV0zxX3aAwRJVcfI1myJX6Br+dAwXZ+SoyNH
-         hcsGsd1aLUAMKnYAD8j3hwYaUJnhfMaSrk14leOHZNoTnCp3X7xu2UcxeEIIyuJHmkDa
-         78Oz96sckoiSKBrpTc5CGRtHhlK/dLc39V9gWKwGCxzyJx2O4TCY29dgdetWFRPzsp61
-         aViA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747071608; x=1747676408;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ypP5iD4c0wcoN82wgQ8cULjPKQS3qu6K5cMT5U5Jo8o=;
-        b=l9yRVGvByxglgzrpL5xlewmXiCy6dSKJyOeFpzHj5DM9TXiMLdvDhQd0qizjzxbWBr
-         mrl8lVdELo6zXNCcDVMXTXDlDayAIfuLwjtAewYO6hW/zNiuwJlwP4fRsd0PztQpZv6v
-         jSQFAfKb9gt9lw/x0RJLTra662z5GE7HPo5L1Z+Ns+NcR7IIjRoRwfhcxtdGs9mhD/8f
-         n170z2YgJFtXnWwEfCkHrlN9zh9A5AtR075IpLO0qKjCvEM0aWcu4+nTjK4g0BNa+RN1
-         +mVG8GNdtZ3+ra3kHkQiDb6e7w3HlCAN/YpwR/BDA/MBQLrtAjo57zqqFg0KnkocIlgh
-         pcqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEm7xCY3VKcg3eEF7KShKhy2Yk3Kmgi76MN3og5h+jF/LBx9buUu6urVBT25FmKob3O/KDp5+dHK+vQQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7s36s5E2el0mpN4B4mVuyBchUD+ayjwsAHnDtvzzDloegUQ+4
-	PY1t6oZsEDh/CVein+GvV1iE6v9vmEOXzVS4Ss2wCaKRmqzpQpx3GnY6piec2uHrJa+BDDzQIYq
-	FdrM3otFUhhjckiYE5x1I8ThKz1/qbM/mLvcRmQ==
-X-Gm-Gg: ASbGncun6LLt0bAPZm3kNyUv3ZqbzYNT4RAwhYsph1+rrePHBgXsbcxTqst2osH8mK7
-	SYb77KhMnTt8jQ9Cm7FcqtUqsHVrZciG2nmN70DPL8K6qc1IUGJoUCFmVyvANNaYtS8FLHby0CW
-	AeduVPkhpgWV8u4a/6Bopn2FGwQn9axbw=
-X-Google-Smtp-Source: AGHT+IEhGX+VOP8JRV3PKBQ0e8ItEaK5lhq2CAV6tXNDC8fNKHaoaYjuda0RnfSiNau/4INxqwvMqHfpR8B+o0HMZT0=
-X-Received: by 2002:a17:902:ea01:b0:216:3dd1:5460 with SMTP id
- d9443c01a7336-22fc8b0cbdfmr78835025ad.2.1747071608542; Mon, 12 May 2025
- 10:40:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNib/Eek"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ACCAC4CEF0;
+	Mon, 12 May 2025 18:04:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747073053;
+	bh=L2k7cRkMJazui1TkT/w4yjvjzTYhEraMo91sqqKHc0A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tNib/Eekp66m5LPPzZWoExUbqNvHYCrju1FWqQ+HzyB1i4ux3iQteYIMX17slpdPC
+	 kdI5tAU2Dvi250OBMF04SaCcrPP6IVizJ35Li0k/IVxjJearTxJ8chnE/OFPMJGsda
+	 FEFP8Akzz4DgoLCg1yNdhpRdij1NiHnrRBVOh8NLbn/xTCX6VvB5uxRgWhO3ayv0lz
+	 qPseUQcTu0ZXr5XiiX++Eo7RE4dIMVmdjJpsv2+MnQpQ6KjD6Xl+ELgO0mMO02DrxH
+	 TC5L9H6QO9yU5DC1igvZsklFHTz+LGtOFGjK0kqxQ+GL5GWlF7+WEfXENcNp5uD7TP
+	 lCQ8mCWVS+sAQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 10/15] block: only update request sector if needed
+Date: Mon, 12 May 2025 14:03:45 -0400
+Message-Id: <20250512180352.437356-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250512180352.437356-1-sashal@kernel.org>
+References: <20250512180352.437356-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250509150611.3395206-1-ming.lei@redhat.com> <20250509150611.3395206-2-ming.lei@redhat.com>
-In-Reply-To: <20250509150611.3395206-2-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 12 May 2025 10:39:57 -0700
-X-Gm-Features: AX0GCFto4Z93-Hjr-vxU-18YXHcc1Qm7JKyqvRC6HYdfOMzv929WTcDhHqj-s80
-Message-ID: <CADUfDZqfEnOM1hmZJw7VTNUUu_zqf1fBcju_ZvDt9tNe3-KcHw@mail.gmail.com>
-Subject: Re: [PATCH V3 1/6] ublk: allow io buffer register/unregister command
- issued from other task contexts
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Keith Busch <kbusch@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.14.6
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 9, 2025 at 8:06=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> `ublk_queue` is read only for io buffer register/unregister command. Both
-> `ublk_io` and block layer request are read-only for IO buffer register/
-> unregister command.
->
-> So the two command can be issued from other task contexts.
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-I mentioned this before in
-https://lore.kernel.org/linux-block/CADUfDZqZ_9O7vUAYtxrrujWqPBuP05nBhCbzNu=
-Nsc9kJTmX2sA@mail.gmail.com/
+[ Upstream commit db492e24f9b05547ba12b4783f09c9d943cf42fe ]
 
-But UBLK_IO_(UN)REGISTER_IO_BUF still reads io->flags. So it would be
-a race condition to handle it on a thread other than ubq_daemon, as
-ubq_daemon may concurrently modify io->flags. If you do want to
-support UBLK_IO_(UN)REGISTER_IO_BUF on other threads, the writes to
-io->flags should use WRITE_ONCE() and the reads on other threads
-should use READ_ONCE(). With those modifications, it should be safe
-because __ublk_check_and_get_req() atomically checks the state of the
-request and increments its reference count.
+In case of a ZONE APPEND write, regardless of native ZONE APPEND or the
+emulation layer in the zone write plugging code, the sector the data got
+written to by the device needs to be updated in the bio.
 
-Best,
-Caleb
+At the moment, this is done for every native ZONE APPEND write and every
+request that is flagged with 'BIO_ZONE_WRITE_PLUGGING'. But thus
+superfluously updates the sector for regular writes to a zoned block
+device.
 
+Check if a bio is a native ZONE APPEND write or if the bio is flagged as
+'BIO_EMULATES_ZONE_APPEND', meaning the block layer's zone write plugging
+code handles the ZONE APPEND and translates it into a regular write and
+back. Only if one of these two criterion is met, update the sector in the
+bio upon completion.
 
->
-> Not same with other three ublk commands, these two are for handling targe=
-t
-> IO only, we shouldn't limit their issue task context, otherwise it become=
-s
-> hard for ublk server(backend) to use zero copy feature.
->
-> Reported-by: Uday Shankar <ushankar@purestorage.com>
-> Closes: https://lore.kernel.org/linux-block/20250410-ublk_task_per_io-v3-=
-2-b811e8f4554a@purestorage.com/
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index cb612151e9a1..31f06e734250 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2057,6 +2057,12 @@ static bool ublk_get_data(const struct ublk_queue =
-*ubq, struct ublk_io *io)
->         return ublk_start_io(ubq, req, io);
->  }
->
-> +static bool is_io_buf_reg_unreg_cmd(unsigned int cmd_op)
-> +{
-> +       return _IOC_NR(cmd_op) =3D=3D UBLK_IO_REGISTER_IO_BUF ||
-> +               _IOC_NR(cmd_op) =3D=3D UBLK_IO_UNREGISTER_IO_BUF;
-> +}
-> +
->  static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
->                                unsigned int issue_flags,
->                                const struct ublksrv_io_cmd *ub_cmd)
-> @@ -2076,8 +2082,15 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
- *cmd,
->                 goto out;
->
->         ubq =3D ublk_get_queue(ub, ub_cmd->q_id);
-> -       if (ubq->ubq_daemon && ubq->ubq_daemon !=3D current)
-> -               goto out;
-> +       /*
-> +        * Both `ublk_io` and block layer request are read-only for IO
-> +        * buffer register/unregister command, so the two are allowed to =
-be
-> +        * issued from other task contexts
-> +        */
-> +       if (!is_io_buf_reg_unreg_cmd(cmd_op)) {
-> +               if (ubq->ubq_daemon && ubq->ubq_daemon !=3D current)
-> +                       goto out;
-> +       }
->
->         if (tag >=3D ubq->q_depth)
->                 goto out;
-> --
-> 2.47.0
->
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/dea089581cb6b777c1cd1500b38ac0b61df4b2d1.1746530748.git.jth@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk.h b/block/blk.h
+index 9dcc92c7f2b50..c14f415de5228 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -480,7 +480,8 @@ static inline void blk_zone_update_request_bio(struct request *rq,
+ 	 * the original BIO sector so that blk_zone_write_plug_bio_endio() can
+ 	 * lookup the zone write plug.
+ 	 */
+-	if (req_op(rq) == REQ_OP_ZONE_APPEND || bio_zone_write_plugging(bio))
++	if (req_op(rq) == REQ_OP_ZONE_APPEND ||
++	    bio_flagged(bio, BIO_EMULATES_ZONE_APPEND))
+ 		bio->bi_iter.bi_sector = rq->__sector;
+ }
+ void blk_zone_write_plug_bio_endio(struct bio *bio);
+-- 
+2.39.5
+
