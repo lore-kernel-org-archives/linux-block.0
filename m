@@ -1,131 +1,104 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F9E2609CE
-	for <linux-block@vger.kernel.org>; Mon, 12 May 2025 09:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2773D6F;
+	Mon, 12 May 2025 10:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747042211; cv=none; b=kac1I6PWkrUsN8gXVw8Bv9Ffeiv399JAu6W9UAV26VL479KclsoNYEL+TcylP9jldGTQdpRQkmIf6IvBwu43tJkn81jx7WSd42wRCTkCMsXG6q5LMMF3Ex9TVcq83SzV6Nq9itofc/+ILB4T98M4Z7sf2spAT4DoAoecfomaAxE=
+	t=1747044463; cv=none; b=EIID5DfV8PNatCUB+rMg0sb9D9KerywosRGw+AnyFoSCbs3K3YkD6mKchuULXn5imEAKVC5kp9SFg28/1jN5wW+4g51ItQKPq5ScgPXMMaRu5OEpFMjlCJ20c+BQYOFN9iJ7GVs1hC9QUUVBMmoXaFy6M70olO7MTTRXSVIgBDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747042211; c=relaxed/simple;
-	bh=V3/NloPURu6IoIFKSUMSCjmmrzfIlelF/VYBLzHwyVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HYKrSu17ozskLK6b+O7E5kvWUQ+ig3CXQp7IZL4hBuOnZg1JCTdQ9ZItg08HaicvugwHIwHy8PcSCt5p9XDFENkOtn+h4I4p9TwOcTtwgCR6c876INvu8cbMde1z3cDlu3DQdhk9LCf/eXU5dJ4lzZUG7dMjy3OzbgNvWmQdZb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mDd7BkkY; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1747044463; c=relaxed/simple;
+	bh=XALDZKGpGWCIJWhewU5QYMsRfS47+UV8sY1D37V1fag=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Nybdvx2ZdWNu7OS0ZnQ31Q/9BpbkoRtGx6qGfcRuYn1nMRjK8GzSRzY/ElKPzlHW64Mv2ju+WMaqA/DM3y0kgkEWY9CWyWjTaPiXGxllsQlqTKzOb4QVUIsjv9A3uJbLabhie1iBdiy0WLGAPEg9Xwu/bKT1FSextRn8qZkFG6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BeyENDX1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mDd7BkkY"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C8pgaL007300;
-	Mon, 12 May 2025 09:30:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=aML892QLmQO5eVMBLiVVE2avjHAa
-	SEHYRBIhnqIQlwc=; b=mDd7BkkYqql0EqDV5Mzj5++3ThC27ZI/M/hl/HgJ7xua
-	lceHPIS6tSbkfhO3fEX5ITiEsz0NU2L4h0fzgiyrUbf3RfLDT1Qsye1D4N1Di+YC
-	CHkpNuGhu2mrIITzI9LpTwIjOFANCSLiLiYSwtx/8gIWdRjrlkS5kplPlWCRyQMM
-	dihuYnbHiW+La0ZRt6Xqu1T2SpV1SBUZKOBonn4tlUofIST9FehUBAAoyN+QbUl9
-	rjl+D9IALmKh7NWEpRRrBj0zW36KoZIzf5LGhdd21d/5gYOXYrBdz2k6ZXBS7SzT
-	Uw2HOGQPATQYt6jY4nHwhJ5k963/9K8oAYxm/NgaAg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46kdug84wm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 09:30:01 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54C5BEZo024437;
-	Mon, 12 May 2025 09:30:00 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46jjmkw5cg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 09:30:00 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54C9TwxE52691328
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 12 May 2025 09:29:58 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1836C2009B;
-	Mon, 12 May 2025 09:29:58 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 856C02009D;
-	Mon, 12 May 2025 09:29:55 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.67.16.128])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 12 May 2025 09:29:55 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com, hch@lst.de, axboe@kernel.dk, gjoyce@ibm.com
-Subject: [PATCH] block: unfreeze queue if realloc tag set fails during nr_hw_queues update
-Date: Mon, 12 May 2025 14:43:38 +0530
-Message-ID: <20250512092952.135887-1-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BeyENDX1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D8BFC4CEE7;
+	Mon, 12 May 2025 10:07:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747044463;
+	bh=XALDZKGpGWCIJWhewU5QYMsRfS47+UV8sY1D37V1fag=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=BeyENDX1we8D7zgGY2YFHTUWMiCzVu93YRbpelQHdSlaheD+E4xFo6XlsqdFYu1rO
+	 OMUWFCIMYeOEhF2Ftyv4XUS1LDLbcA4j0JvDm6EA4JEImJAttTKP06IJLp9A9u8CcM
+	 uxHLrn5uu2FDZi4XcTsRIeS+I3RpwrtIoaOTAJOTLAoAe2x2x7Ef8nX7qtsKut4UPg
+	 qDKP6aXKb5r2IAdBjjX9qriiZB5CWNeYA1nNkpKxYMGnIpwSPLaeliNgTHIZMNYimK
+	 3RmL7XRyHrqgqC6XnDz3TtwoBF9SKm0u/B0OaEK3EK7c3aduRxwL5VSsLJ1/v4a8x6
+	 2MRGp9GSeJgrA==
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>, 
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+ Keith Busch <kbusch@kernel.org>, Leon Romanovsky <leon@kernel.org>
+Cc: Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>, 
+ Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, 
+ Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
+ Yishai Hadas <yishaih@nvidia.com>, 
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
+ Kevin Tian <kevin.tian@intel.com>, 
+ Alex Williamson <alex.williamson@redhat.com>, 
+ =?utf-8?q?J=C3=A9r=C3=B4me_Glisse?= <jglisse@redhat.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-mm@kvack.org, 
+ Niklas Schnelle <schnelle@linux.ibm.com>, 
+ Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Matthew Wilcox <willy@infradead.org>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Kanchan Joshi <joshi.k@samsung.com>, Chaitanya Kulkarni <kch@nvidia.com>
+In-Reply-To: <cover.1745831017.git.leon@kernel.org>
+References: <cover.1745831017.git.leon@kernel.org>
+Subject: Re: (subset) [PATCH v10 00/24] Provide a new two step DMA mapping
+ API
+Message-Id: <174704445979.583981.12854692160586160920.b4-ty@kernel.org>
+Date: Mon, 12 May 2025 06:07:39 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=OOUn3TaB c=1 sm=1 tr=0 ts=6821bf99 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=7ZNjnjnpTjzHF3BlZ_YA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 7PyGhDj-kNRUWNT5yUIJm5_xGuCfbckC
-X-Proofpoint-GUID: 7PyGhDj-kNRUWNT5yUIJm5_xGuCfbckC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDA5NSBTYWx0ZWRfX4kuW/7CYsBEO wpBse7bx/NSpyxokv5OOQVE8gRTZyRiqW4mZ6ntIr/QRiiQg71SGNMicKwIU9AGHfohG9cdZM1p m4eXW/u5x4bCJHnATsCnJKfHjizkmbGc8wk8nQan/2UiPdohWcKfwIzScR/5T2/PLqWQaCoPv2j
- 3RqWH1OWCEWN9FvGqO95ZZsXTQzidjb6KvVfJucI03xUSgX+8D2nOkAbe1yhsAg9Qa4TRCCTv2X uDFLdMX3gzz+KXmSchJ01c7ohe/ulVCOTx5Y8WhMOospi4W5zCAjT2Vq/jU2td6sd24AgrItZ+5 /nMKSDohzLrri+sIw4cO61KvkmC1HMAEEmRRr13GiD1jAFoobhFPK+gxDzJuMpxXOg0tKo8IdkZ
- Bc/Wk8nwUIm/RBrkq8XxLKGt8Ind2VHcJ+JgvXyxzKknupIfUTOsdtxFT/kzLn2v7nMNLobR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_03,2025-05-09_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
- clxscore=1015 bulkscore=0 malwarescore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505120095
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-37811
 
-In __blk_mq_update_nr_hw_queues(), the current sequence involves:
 
-1. unregistering sysfs/debugfs attributes
-2. freeze the queue
-3. reallocating the tag set
-4. updating the queue map
-5. reallocating hardware contexts
-6. updating the elevator (which unfreeze the queue again)
-7. re-register sysfs/debugfs attributes
+On Mon, 28 Apr 2025 12:22:06 +0300, Leon Romanovsky wrote:
+> Following recent on site LSF/MM 2025 [1] discussion, the overall
+> response was extremely positive with many people expressed their
+> desire to see this series merged, so they can base their work on it.
+> 
+> It includes, but not limited:
+>  * Luis's "nvme-pci: breaking the 512 KiB max IO boundary":
+>    https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
+>  * Chuck's NFS conversion to use one structure (bio_vec) for all types
+>    of RPC transports:
+>    https://lore.kernel.org/all/913df4b4-fc4a-409d-9007-088a3e2c8291@oracle.com
+>  * Matthew's vision for the world without struct page:
+>    https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
+>  * Confidential computing roadmap from Dan:
+>    https://lore.kernel.org/all/6801a8e3968da_71fe29411@dwillia2-xfh.jf.intel.com.notmuch
+> 
+> [...]
 
-If tag set reallocation fails at step 3, the function skips steps 4–6
-and proceeds directly to step 7, re-registering the sysfs/debugfs
-attributes without unfreezing the queue first. This is incorrect and
-can lead to a system hang or lockdep splat, as the queue remains frozen
-and is never properly unfrozen.
+Applied, thanks!
 
-This patch addresses the issue by explicitly unfreezing the queue before
-re-registering the sysfs/debugfs attributes in the event of a tag set
-reallocation failure.
+[10/24] mm/hmm: let users to tag specific PFN with DMA mapped bit
+        https://git.kernel.org/rdma/rdma/c/285e871884ff3d
+[11/24] mm/hmm: provide generic DMA managing logic
+        https://git.kernel.org/rdma/rdma/c/8cad4713056612
+[12/24] RDMA/umem: Store ODP access mask information in PFN
+        https://git.kernel.org/rdma/rdma/c/eedd5b1276e76d
+[13/24] RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page linkage
+        https://git.kernel.org/rdma/rdma/c/1efe8c0670d6a6
+[14/24] RDMA/umem: Separate implicit ODP initialization from explicit ODP
+        https://git.kernel.org/rdma/rdma/c/15a9f67e286b37
 
-Fixes: 9dc7a882ce96 ("block: move hctx debugfs/sysfs registering out of freezing queue")
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
- block/blk-mq.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4f79a9808fd1..cbc9a9f97a31 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -5002,8 +5002,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_freeze_queue_nomemsave(q);
- 
--	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
-+	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
-+		list_for_each_entry(q, &set->tag_list, tag_set_list)
-+			blk_mq_unfreeze_queue_nomemrestore(q);
- 		goto reregister;
-+	}
- 
- fallback:
- 	blk_mq_update_queue_map(set);
+Best regards,
 -- 
-2.49.0
+Leon Romanovsky <leon@kernel.org>
 
