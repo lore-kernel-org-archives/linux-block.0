@@ -1,58 +1,58 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A844A2BFC6B
-	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 19:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787DB1E51F5
+	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 19:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747165820; cv=none; b=iJK6E3t7nKUeiycm5hBRUsQa0XljKmLWhRqH0KDDUOGxxwzGX18/gTNswvT24d0yjTeJAy9ne32fE1DrX69sKgGcmKKcs5Elo0FwgTr9M+gL+Bp5laM+i/NPSb/88NFvZ1IOgaDkw7QwfUiBsKbK5ead4Xn13hPQV7wt9MnhYxI=
+	t=1747166110; cv=none; b=PUY6YLwvS/JozmHsVeRGO2LSadidUOs3XTIq1/8skuizVNa5Jxky7EchNbez3whN303B9yLr23lb45YFtr1qkVsoroNtwJ2wGts/96stcwAQdOTWtJykq//dkZNxU/CKDvV0NWG5s3xEXt5+pYUs75Uy/F2rvcY6c2VbaghZt2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747165820; c=relaxed/simple;
-	bh=IK7IjRXTOeJfprvQgg3frSuQgjcPR7WvKAfe3HpajZM=;
+	s=arc-20240116; t=1747166110; c=relaxed/simple;
+	bh=vRNsSI5K3ncaEN7G8l9ac6eD1MNt+/Agn0gMrWMYAiY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CgGmXZ6ho7gdZV8fchdvm+cT9K06yhclY4PmKgVssu+zG7DDWtA31QUvSUR15HZVS1YgiM/V2nX6nUMGgdw+APYRk85t9TFTy+P5WuKmtd8CK8lzNbs4iLoURl7xXEBJojuv4FsAnuIfIpTCu0A0uF12yanryGqheQYPlU7hRxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FQqtzyh7; arc=none smtp.client-ip=209.85.214.176
+	 To:Cc:Content-Type; b=Z4xvzHmWzYnPHP9BN9a2FE1ttuLw1HDgi53lCPKHiP9t6bj/r1/h71HRzTXgWfXKPQqAFkTB8PDFG3kBnMccQR25jy+M2ChCnGLMCmd5f8nISXZ4cKvdW1xRPUeHfFVzg90EHL5wv/L8WNOkkTJBYsG73OpthNXltj+CBPjvXjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IgJs/4O7; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FQqtzyh7"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22e53c8b816so6942765ad.3
-        for <linux-block@vger.kernel.org>; Tue, 13 May 2025 12:50:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IgJs/4O7"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22e1782cbb2so6952745ad.0
+        for <linux-block@vger.kernel.org>; Tue, 13 May 2025 12:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1747165816; x=1747770616; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1747166107; x=1747770907; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=44c+++aEp5c5uagRWSyuBY2gmLHzpbm5oJJV+RBGdDI=;
-        b=FQqtzyh7AZS3byx70F4uzw9MWR1w3RfACFdYMtBUnRBs/WsLDUTYAb97+F2E+R7MCI
-         450Mbj4P0az2wms9Z6pD3Og3AuCdLvXHu7Rh9qr9wVPhHO8u+gsqutCTq23FkIW0lMNe
-         rT4L0yCV5gjdle8D7PKLvRIkA2w8G10I6MWhNJi+879z+K1TsTFyxatvtNDqW0MZh/z/
-         dNe9KK6YpIRyOfWZnVCrNfmbVgFkt/gGB1rlVqOsJOFTbY1MM/V85hq7FAEV8FMwdpwT
-         Wj1BylXrjKc+oMdK4aT8RvCIfYDb3N+dhIt8TqYgW5JHxIJAjDc+Q9rfZk9/4lL8aSwi
-         jAkg==
+        bh=Rg17gub/dNiSEVxjEQDiEZkA8370s/TDeU04HZJYO4w=;
+        b=IgJs/4O7e6fRz8nrw60xVabo4T0kZ0Nf5KVidH3XOOKVxN+NH5MaWGJGsn+JpWZK8R
+         nOm+Aavvy5A9RjAiHhRJmlIUPK8ScA9SLYq4k3eIUTJMqp01ZO5SkXHyg/gOiPljQ9tA
+         cjjQeqSBxr45Oexo+AcgyPBy/o8i1zKjk9O/ebyP9PklHoz9taIZ2lkv1X50QzJq3Q6o
+         O+g4qpcidk+gqv5A6I6fA87+8bYuVt1wkgK7GSEogSAON7pg7UcDMWoG6bz6MomHn8Fp
+         FQzltjMJyJLGflPi1YUmnNleaYsL7jcif/CzSegNPkcKvVr/6YuWT2810BV+Wf56CYN6
+         gp/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747165816; x=1747770616;
+        d=1e100.net; s=20230601; t=1747166107; x=1747770907;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=44c+++aEp5c5uagRWSyuBY2gmLHzpbm5oJJV+RBGdDI=;
-        b=B0j0MrEiMvnUkmcdrkwcKTSkCoeXznlbo+fGq8Z2uJMeB/N6xqLlexOsuvzTHFwny3
-         tTeP1dhf4FC+R2iRTnQXZ85gk5AwatEz+OFeUAytABjKZ9vhfQHMXYMliYU58LJ5M8LD
-         IYwYkdAu1Lvdu6DKb2udy2jZNIFA/7EMFVU7SwgfV8VT6FcRTf9c+MrasjvSlF6HTu1y
-         w1xhwTczAETumP5nCm2sSEy07rb+90xUDpgmVn1lYFkWv278w8kzFd6VTYpMuMuqRITW
-         h3d2wR4TK3Ih+A0Z+obAwWilfcKDX67bTbmu/CRqDWw9LJQ3aQsj/wQVeyyv7l7nstNT
-         fJcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNUNYtO7EBDFx3qlVkJSeZF3ktb7iNwyaesqtormQzlONqoajn9S/gf9KBzbEbS61tEqR2VjAtG1XLkw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5ArXStUNXXMwHlYWtPbZGhwUEoPKaFSbhC0YCxOdLwMRImrPD
-	MLapqyO91ukFsUJ30JitIQ9X+QIqHGx6JSbvfs5sZzjsdIXnBabUEE7iS5rRIlfGzMvoMXGwdcU
-	gwvmAyCRx2uM5BFOyqPG1f+3QXzAm2hNMJik9GA==
-X-Gm-Gg: ASbGnctduG9YYhMSMnkI1zalo4lOo3ctLAyuUZPC4xa0oTUnttWy0aJyAN2axTInOgs
-	9ghZ9wRnkwnPDMjWr9jt/J/8RhFq4yCEHLSelKGH6OOmaPuVIg1/1WtT/5GEQS3OS1CB2qhbJTp
-	XCHhEG1O20FOBftRkTiNw4QJikkpZZZaA=
-X-Google-Smtp-Source: AGHT+IETwTA9nbm4c3g6qBBfqyT4pi5g4lScVm76VMAhuhcEA3CDecEQhLL8bMyVHlJUx0swl7fduZY+HnWdAXjFjXM=
-X-Received: by 2002:a17:903:1984:b0:231:7fbc:19c9 with SMTP id
- d9443c01a7336-2319810ea4cmr4049795ad.1.1747165815760; Tue, 13 May 2025
- 12:50:15 -0700 (PDT)
+        bh=Rg17gub/dNiSEVxjEQDiEZkA8370s/TDeU04HZJYO4w=;
+        b=FVM6VHgeTVAcPY7GcTlOtOldRUn3gyrEtigvKQ6F9c5bU9sMNj2c7bkMVMdC+V+chG
+         BwVS8Cl+OfQAQVlnp1WjuLqpQPTuIl+4NLkh3BQ933wryXGNY9uOU7Z42sgvahdmeUuo
+         AZ8d3uuSCmGx9Zt6V0pi27yt+8eWgu/nY/FKTaHwSC8rlcA2dHHMYU68w5pnuLRa79z9
+         XOwERb2HtYO5aMDzr4hc4QD8qlhI4rjj39DskipTVwnGNd4hfSLhVzsii4f+ARpTRmVp
+         58XqhyN7t5DOBhdj1vBTtzAIR9sDIgNvSqjoXDnpMBR3E2z8DA4ub7aeiA4Vm3iD4HIx
+         NPzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7Lal0rlAk0qSxjM0/SbX/RaEBe+17DqImYq9nOvRtZzFNqfqRX2gEIbB2X0YiKpn861kdOvUyoHaVSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLytkZTN3GhiJ9z0VVhvFwuOANCF9wlUkbc1dz7gjaRl0x4V8d
+	XytwxR6kB4Gt8oSN+gyIhSj7EFjuZVD40bsuYN7+WfZOjOK6gnGDoNS6t3TCrTwuqFqLQ3Z29ZP
+	SzBecBW+K6euLK/T/C0nal1fmzFu74RG0Zm4dJw==
+X-Gm-Gg: ASbGncsfPt9y1nX3Jddht0YIb5CUTEZUgXp9KAUgkE41jkP3X6x5mcYVZLhB7katjQi
+	UKIrPnVy3WgVR46nA4wza7aD1/8Mox1YgJ6PvHA0DB0r8v+Fsu5rUzgjrWZ6upQNJDVZTKjb5cd
+	2UNJfFyixU9mtCvAuXkt5jniHU7ZBth44=
+X-Google-Smtp-Source: AGHT+IGjTldGLJbT/+DUcxb6Ef7HbIM/0gQw4SAUfrSRs8Ky6CdGXNefAdvPrTjLLTxW5Aq5jcRjtlMGOQt9x0Tw/gg=
+X-Received: by 2002:a17:903:41d0:b0:224:1936:698a with SMTP id
+ d9443c01a7336-2319812a845mr4262315ad.5.1747166107519; Tue, 13 May 2025
+ 12:55:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,9 +62,9 @@ MIME-Version: 1.0
 References: <20250509150611.3395206-1-ming.lei@redhat.com> <20250509150611.3395206-5-ming.lei@redhat.com>
 In-Reply-To: <20250509150611.3395206-5-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 13 May 2025 12:50:04 -0700
-X-Gm-Features: AX0GCFs7xUiX2PKmVLjUHo_KZr-olNsCDYayjpzN4BRt2movUsa_OqnUROsoVXI
-Message-ID: <CADUfDZqbwsXCqiR0gxPEpcdt+QeBiybmk4HU_Yv=_VFr_ohKFg@mail.gmail.com>
+Date: Tue, 13 May 2025 12:54:55 -0700
+X-Gm-Features: AX0GCFtSqueHua7jpc5APLpeQsmgV29mhMnWG1HqqaO_xV79AEt2_TZdpDKAAHo
+Message-ID: <CADUfDZqmGPUm6brjD54x9j7M6ngRZoJh44R68610o_H-K7zsiQ@mail.gmail.com>
 Subject: Re: [PATCH V3 4/6] ublk: register buffer to local io_uring with
  provided buf index via UBLK_F_AUTO_BUF_REG
 To: Ming Lei <ming.lei@redhat.com>
@@ -116,9 +116,6 @@ nd
 > +
 > +       /* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
 > +       unsigned short buf_index;
-
-Can you use a fixed-size integer, i.e. u16?
-
 >  };
 >
 >  struct ublk_uring_cmd_pdu {
@@ -153,20 +150,12 @@ io *io,
 > +                                      unsigned int issue_flags)
 > +{
 > +       const struct ublk_queue *ubq =3D req->mq_hctx->driver_data;
-
-It would be nice to pass ubq into ublk_auto_buf_reg() and
-ublk_auto_buf_reg_fallback() so it doesn't need to be looked up again.
-
 > +       struct ublksrv_io_desc *iod =3D ublk_get_iod(ubq, req->tag);
 > +       struct ublk_rq_data *data =3D blk_mq_rq_to_pdu(req);
 > +
 > +       iod->op_flags |=3D UBLK_IO_F_NEED_REG_BUF;
 > +       refcount_set(&data->ref, 1);
 > +       ublk_complete_io_cmd(io, req, UBLK_IO_RES_OK, issue_flags);
-
-Can this just return true from ublk_auto_buf_reg() in this case? Then
-ublk_dispatch_req() will call ublk_complete_io_cmd(), as normal.
-
 > +}
 > +
 >  static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
@@ -181,13 +170,6 @@ ublk_dispatch_req() will call ublk_complete_io_cmd(), as normal.
 > -                                     issue_flags);
 > +       ret =3D io_buffer_register_bvec(io->cmd, req, ublk_io_release,
 > +                                     pdu->buf.index, issue_flags);
-
-Hmm, I find it a bit awkward to add this code in one commit with the
-wrong arguments and fix it up in a separate commit. I think it would
-make more sense to combine the commits. If you feel the commit is too
-large, I think it would make more sense to split out
-UBLK_AUTO_BUF_REG_FALLBACK to a separate commit. But up to you.
-
 >         if (ret) {
 > -               blk_mq_end_request(req, BLK_STS_IOERR);
 > +               if (pdu->buf.flags & UBLK_AUTO_BUF_REG_FALLBACK)
@@ -263,12 +245,6 @@ queue *ubq,
 > +       if (ublk_support_auto_buf_reg(ubq) && !ublk_set_auto_buf_reg(cmd)=
 )
 > +               return -EINVAL;
-
-Don't we want to check for this error condition first, before making
-this ublk I/O available for incoming requests? Otherwise,
-ublk_dispatch_req() may be called on this command with an invalid
-pdu->buf.
-
 > +
 >         ublk_prep_cancel(cmd, issue_flags, ubq, tag);
 >         return -EIOCBQUEUED;
@@ -300,22 +276,6 @@ COPY))
 COPY |
 > +                               UBLK_F_AUTO_BUF_REG))
 >                 ub->dev_info.flags &=3D ~UBLK_F_NEED_GET_DATA;
-
-Does this logic also need to be updated to allow UBLK_F_AUTO_BUF_REG
-for zoned ublk devices?
-
-/*
- * Zoned storage support requires reuse `ublksrv_io_cmd->addr` for
- * returning write_append_lba, which is only allowed in case of
- * user copy or zero copy
- */
-if (ublk_dev_is_zoned(ub) &&
-    (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) || !(ub->dev_info.flags &
-     (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY)))) {
-        ret =3D -EINVAL;
-        goto out_free_dev_number;
-}
-
 >
 >         /*
 > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
@@ -433,25 +393,22 @@ and.
 > +
 > +static inline __u64
 > +ublk_auto_buf_reg_to_sqe_addr(const struct ublk_auto_buf_reg *buf)
-
-Pass by value since it's only 8 bytes?
-
 > +{
 > +       __u64 addr =3D buf->index | buf->flags << 16 | buf->reserved0 << =
 24 |
-> +               (__u64)buf->reserved1 << 32;
-> +
-> +       return addr;
-> +}
 
-How about just memcpy()ing between u64 and struct ublk_auto_buf_reg?
-If you do want to keep these explicit conversions, you could at least
-omit the unnecessary masking in ublk_sqe_addr_to_auto_buf_reg().
+buf->reserved0 should be cast to a u64 (or u32) here. Otherwise,
+buf->reserved0 << 24 gets promoted to an int and sign-extended to 64
+bits. It would probably be good to cast the other fields too to avoid
+assuming a 32-bit int.
 
 Best,
 Caleb
 
-
+> +               (__u64)buf->reserved1 << 32;
+> +
+> +       return addr;
+> +}
 > +
 >  /* issued to ublk driver via /dev/ublkcN */
 >  struct ublksrv_io_cmd {
