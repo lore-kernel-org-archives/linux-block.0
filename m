@@ -1,104 +1,141 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7FB41C7F
-	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 02:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF441C7F;
+	Tue, 13 May 2025 02:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747103233; cv=none; b=bykLtGItUbFDA5xa0MVOxJI7Pv1Msgr+RxI76pdM2s9kczlLL7pRqAu8+6ybYe20zP26U5Ef8/ByLGwotMAvhgfb7AIyFBLn9X4yj6BUfnrSgJT54Uyk11Ne6V0dJPGkrlPXUsnROZRIMU+EQOC5yId6awowI8iyLV/9xPvVaFQ=
+	t=1747103244; cv=none; b=k+HcYtWkOwN+Ur+ULVBlx9oX3F1ksZ6Cng5hsZ1tZ8vs67TZbWSVVI8wiZ0KEVEy3OVprP8m/J8L9ehKRTrBquJhwUnh2v9Rh3aWHtPIijmkt3zhQnOwxW9tmbe0S1Da6A29TarkBrAjklsezBOf3DR/8xTiXyijhxz8JN7k56Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747103233; c=relaxed/simple;
-	bh=na/1HPVz+HYITHvaCGk9iiMtT9bsj58Tf2mN3phDHbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BAIPl0Q90lsFol4DygaEeAduc3PlIpcqCmVJmRartRneKUB+9yI6KAK9GVwpTVjYT/xD4aQzV6pXLbLYNeW8cx8NCn5Lqd+GtBojam9StUdd/6ctjx0ENgZonPlPLvyMryI3oOeOFgvUN65zVRtW+S5obJMr+Z04KOIbFLRrRbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cupWqqFP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747103244; c=relaxed/simple;
+	bh=98a6Snc/NXc0TR9PbEOFzsCdszqsYw9UelW69TWeBR8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f1RuaWUiwtehIxn074Xt1MKMXT4cXvqWaSMSo8XE6xzl5Z+s+GvyqQ05Qf0FRJ3PpUPhauE55lq0naPS3LCYfyKJoW6Xax7cRy8xGaOYTs0nJZy/fd8wRSmu8fMYxUB0iAdQWzsk22htZ9j5Fm84FzxmUEMye7UuF4/Hn6AgjhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTOcduti; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cupWqqFP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747103231;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=abkHAFhf7HZGnuP3f7x/0GcEC+3xW5U7lyBGHFO+BEI=;
-	b=cupWqqFPNxUIAvdVuBIBMALCDESAxTac4KeuP6jj3dHe0B6g4SMfi+/p7MMQ0UpfTi/LU6
-	7jy1mSw5/VyX7a4szODCBDbJDNkoFYDjZnNTz3vBGBJnKeomfCFSXU5KXsdDX10OapQ2rS
-	5LKqPvOeuBoSVJFhrNwmoC0GXk/v3HU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-168-qz0N9VwLPUiDRIbEs5YsqA-1; Mon,
- 12 May 2025 22:27:07 -0400
-X-MC-Unique: qz0N9VwLPUiDRIbEs5YsqA-1
-X-Mimecast-MFC-AGG-ID: qz0N9VwLPUiDRIbEs5YsqA_1747103226
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87A841955E72;
-	Tue, 13 May 2025 02:27:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.23])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8455C1945CB4;
-	Tue, 13 May 2025 02:27:02 +0000 (UTC)
-Date: Tue, 13 May 2025 10:26:57 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V3 1/6] ublk: allow io buffer register/unregister command
- issued from other task contexts
-Message-ID: <aCKt8ZLpZctP020J@fedora>
-References: <20250509150611.3395206-1-ming.lei@redhat.com>
- <20250509150611.3395206-2-ming.lei@redhat.com>
- <CADUfDZqfEnOM1hmZJw7VTNUUu_zqf1fBcju_ZvDt9tNe3-KcHw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTOcduti"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-861b1f04b99so138093039f.0;
+        Mon, 12 May 2025 19:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747103242; x=1747708042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=azq0tGUBdBCpe+b8W3cDnCoHuYkgjMlpC0CbksCxYv0=;
+        b=KTOcduti2X8HMMMfngP988ohN5FKLlY++FAcXLsErwDc4TEr5p01f289WtWz+SQ4vI
+         VqQUiUCmsMig9HRo+Pz1mkeCDaPqAEKAzGphu53YjJR9Y9jdq50Lu8tmKrO00pXvuOPz
+         j+NO4Ceb7BUqIpMGw5MN2iW4/gc5SGlUWFvEGHrvIY5A9m5oV9UNnPzeVRom9IxdggsL
+         FyGOTWvGrvpAbAAno95FfU236urxARHwENMzyJPkyacqhbGyd1EDmLickYoWfssMBWK6
+         iy+huLb1HD54eyyP/weJIUWX5kNvmeMwVW0xyOjX+nIiqWSNGMFgKKohRd91D67yVn8x
+         NWuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747103242; x=1747708042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=azq0tGUBdBCpe+b8W3cDnCoHuYkgjMlpC0CbksCxYv0=;
+        b=iFRUniXpEN3oCOkYa2mbduAEbwPvsVPuoK3PjqxXl3suE+GPjq/PNctB/4uJ0OdvyG
+         Kqj78cZQmxbHZo2s3oNdc2f3nu122Yj6JuFFnRIHHjBT//Arp5j3fCSH3uEj7kRRXbW6
+         qKeaSuO8zHKz8+M3uNJdbWLx6dN6nrpzqlUa5VncPFk4xCj2MkOTTfVO1eCHxO/HIBRE
+         s9ZGcA9St1zTsO3q07y7M2UWKxBQPyc0F17HQdaiaXU/ktQ0o0B+Hiw5kPGHG9udQw8h
+         yA78nMDsJkLhMKBpaincDq6NOUiWJuSv+fAZ/PHupas5uRdw7ZLH199uBqy2xVSyVu91
+         A0IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4/mNUuVt0VQ9CQDrKcgrcBzN+Iql4h76Zkc9/Z5Dmytz0yPTpPUzCJ0VC15s61m19UjdTwS3p0mU8Vw==@vger.kernel.org, AJvYcCXNbvWTqYlO+zgocf5B+Pi/IAk3a8V1LT1O9ZaRo4j/dpZtYEuwF68TLzllImrwsQAvpuA44toQLUAOiT2K/Z8M/nmA@vger.kernel.org, AJvYcCXgDcxQeXvwmfJ3hOiddwIcnxp+f0W+qmyd+g9OJpHVGC2YdaXd/pR35wj2n1leJWO9PkFc+39L3xaci9P5@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP2Bn5UF0QHumPIS4YmzT7KbI2E44GEgdHzsDmcjr+SRRdnbJA
+	MEDNfjecCh2k5Jb++FgYm8C/V7WEmhDvrT2cZZtl5dD/SY2txghEdUmPIZtXQCV87Uhd3Frusiz
+	kbaMbUT9ILDIiEvsP5Wwwjo743qhnRq0YYIO1EA==
+X-Gm-Gg: ASbGnctkFeRmQBEqWj5vJAPAiGpuMiTmKRPctya4kjVgJmdz6gvWebO/h3+N29h72Ia
+	WH8/oxn83ueojdl+CFI8PDM/pmqb9AyPUDpyiArgyf02Met2C3H2l2lcXkJdI0w5UP1JGG36ZJu
+	oZpWRmVoJ4PL0lDw0JLvQOBXgn4xgW6gY=
+X-Google-Smtp-Source: AGHT+IFfqqqM0qYp1RV8b6+aJrLmSHYVs776COusec5YkuRmhO78WWK5gbTx99FVP7Iy1g3PjpggMOHyAQxltVnIERQ=
+X-Received: by 2002:a05:6e02:1a8d:b0:3d8:1d2d:60b0 with SMTP id
+ e9e14a558f8ab-3da7e1e26e9mr165032355ab.5.1747103242248; Mon, 12 May 2025
+ 19:27:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqfEnOM1hmZJw7VTNUUu_zqf1fBcju_ZvDt9tNe3-KcHw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
+ <20250512024935.64704-3-kerneljasonxing@gmail.com> <20250512175156.7d3d4db53d40c7a34c1f68d6@linux-foundation.org>
+ <CAL+tcoDk2TFwAWPwBN+dQQ+guxe71F_R1rFX_f9wozjPpujBAQ@mail.gmail.com> <20250512190427.b7fb67f6b78fd8699ea2811d@linux-foundation.org>
+In-Reply-To: <20250512190427.b7fb67f6b78fd8699ea2811d@linux-foundation.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 13 May 2025 10:26:45 +0800
+X-Gm-Features: AX0GCFt-It6JU-VSizNKEH2nMqzT2SRUTafCnyqDEsiL8cxKunhyC1lIzE3Gk_U
+Message-ID: <CAL+tcoD+VrRfAGMjj=9uAbanMO=W+cW0xgxMzVwrpiTgagmQ2w@mail.gmail.com>
+Subject: Re: [PATCH v1 2/5] relayfs: introduce dump of relayfs statistics function
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 12, 2025 at 10:39:57AM -0700, Caleb Sander Mateos wrote:
-> On Fri, May 9, 2025 at 8:06 AM Ming Lei <ming.lei@redhat.com> wrote:
+On Tue, May 13, 2025 at 10:04=E2=80=AFAM Andrew Morton
+<akpm@linux-foundation.org> wrote:
+>
+> On Tue, 13 May 2025 09:48:15 +0800 Jason Xing <kerneljasonxing@gmail.com>=
+ wrote:
+>
+> > > > +{
+> > > > +     unsigned int i, full_counter =3D 0;
+> > > > +     struct rchan_buf *rbuf;
+> > > > +     int offset =3D 0;
+> > > > +
+> > > > +     if (!chan || !buf || flags & ~RELAY_DUMP_MASK)
+> > > > +             return;
+> > > > +
+> > > > +     if (len < RELAY_DUMP_BUF_MAX_LEN)
+> > > > +             return;
+> > >
+> > > So we left the memory at *buf uninitialized but failed to tell the
+> > > caller this.  The caller will then proceed to use uninitialized memor=
+y.
+> > >
+> > > It's a programming error, so simply going BUG seems OK.
 > >
-> > `ublk_queue` is read only for io buffer register/unregister command. Both
-> > `ublk_io` and block layer request are read-only for IO buffer register/
-> > unregister command.
-> >
-> > So the two command can be issued from other task contexts.
-> 
-> I mentioned this before in
-> https://lore.kernel.org/linux-block/CADUfDZqZ_9O7vUAYtxrrujWqPBuP05nBhCbzNuNsc9kJTmX2sA@mail.gmail.com/
-> 
-> But UBLK_IO_(UN)REGISTER_IO_BUF still reads io->flags. So it would be
-> a race condition to handle it on a thread other than ubq_daemon, as
-> ubq_daemon may concurrently modify io->flags. If you do want to
-> support UBLK_IO_(UN)REGISTER_IO_BUF on other threads, the writes to
-> io->flags should use WRITE_ONCE() and the reads on other threads
-> should use READ_ONCE(). With those modifications, it should be safe
-> because __ublk_check_and_get_req() atomically checks the state of the
-> request and increments its reference count.
+> > Are you suggesting that I should remove the above check because
+> > developers should take care of the length of the buffer to write
+> > outside of the relay_dump function? or use this instead:
+> > WARN_ON_ONCE(len < RELAY_DUMP_BUF_MAX_LEN);
+> > ?
+>
+> It's a poor interface - it returns uninitialized data while not
+> alerting the caller to this.  You'll figure something out ;)
+>
+> Perhaps
+>
+>         BUG_ON(len < RELAY_DUMP_BUF_MAX_LEN);
 
-UBLK_IO_(UN)REGISTER_IO_BUF just reads the flag, if
-UBLK_IO_FLAG_OWNED_BY_SRV is cleared, the OP is failed.
+I'm unsure if BUG_ON is appropriate here since technically speaking
+it's not a bug. For now, only sizeof(u32) is used in the buffer.
 
-Otherwise, __ublk_check_and_get_req() covers everything because both
-'ublk_io' and 'request' are pre-allocation. The only race is that new
-recycled request buffer is registered, that is fine, because it can be
-treated as logic bug.
+>         *buf =3D '\0';
+>         if (!chan || (flags & ~RELAY_DUMP_MASK))
+>                 return;
+>
+> We don't need to check for !buf - the oops message contains the same info=
+.
 
-So I think it isn't necessary to use READ_ONCE/WRITE_ONCE, or can you show
-what the exact issue is?
+Got it. Thanks.
 
+>
+> Maybe we don't need to check !chan either.  Can it be NULL here?
 
-Thanks, 
-Ming
+It depends on how users call this. If users call this without
+initialization of chan, relay_dump() can avoid the crash. It works
+like kfree() which prevents the NULL object from being freed.
 
+BTW, should I merge this commit [1] into the series in V2 so that you
+can easily review?
+
+[1]: https://lore.kernel.org/all/20250507134225.63248-1-kerneljasonxing@gma=
+il.com/
+
+Thanks,
+Jason
