@@ -1,58 +1,58 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB70628F3;
-	Tue, 13 May 2025 03:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A574B1E520F;
+	Tue, 13 May 2025 05:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747108166; cv=none; b=iPoWJ4/W1+xsoq/Fyt8q7NdWsBe0wGj4xR/F2/XgvKa5SQgMQFpdCTX12Av9caXqp6e2MeYJPaIRiQ2+0sVwecF38HK6HyrCAgg9co+TJN9LCBjVu+bETu3AOB6JUTPr8fPEk19BaSv1xAInp8gQS/8J8PmFye6GvN23qdD7oa4=
+	t=1747115582; cv=none; b=ArnFg9Pw+2RUlCvqKf7dOJSw8BfnMaVAZYMEdG+OHMdVYBchN6d3JakV2qVgTNcLhkhycFaCHJHyko6QFPjCBBQIXwLBgasrDuJJYsXCgZG3+XMjTBJxhunCHOEPwOOB8/5Ap+Ewqt1k9mFPCR06/jC+JSrcalvVSYfHrkYyExQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747108166; c=relaxed/simple;
-	bh=B5emnEhV7rK6+h317wLkrvu0naAun4R/A9NHuDUw7EY=;
+	s=arc-20240116; t=1747115582; c=relaxed/simple;
+	bh=qzoEG/KSWyPHrzMMAY6A0/isDGnZiB/gJkrsON+qzwI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IyEm1DcP90VcCYVhOjlPiFYadC0om/TBDR/TiShCxTHwr1rje8faikIsFUhsgRk0AUTBJyRC1EVqkp/nmJPqDVKEDXFw3+WRA8zr3ID+/RTtGWicloqiBKJrm2xU6geiHj8JVNoQ3NZsTFD7s/HNsoGTvvPrXtj5TcRLxX2kV14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mq34X/uN; arc=none smtp.client-ip=209.85.166.52
+	 To:Cc:Content-Type; b=KlB3awfJJOL1Mmj4WxfklLFOAGk8OwtnqEYC6ZCFwJYvofkRHOk0HGr297mIhWKBFJmlZzFpD1NkkcNrDYGkcwtGN/NUg8eWXRW2VemEEHUGR56MDTPJ0Xnoe9f8K+6H8UVu9u2GHIyY5GeDScSLijnxA1OW14eyjFXwBwvpOMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9LHC095; arc=none smtp.client-ip=209.85.166.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mq34X/uN"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-85e15dc801aso517579139f.2;
-        Mon, 12 May 2025 20:49:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9LHC095"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3d8020ba858so58123185ab.0;
+        Mon, 12 May 2025 22:52:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747108164; x=1747712964; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747115578; x=1747720378; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kelwimxw1J10EuWJN16N1wQc1iJ7Z8c/Be+MQbkhh30=;
-        b=Mq34X/uNJk3rHp+s1i+hkBiYIy/Hxil5rG2IuUVyGdApRGvZmoKo/uf5oHxkiU9wSY
-         Hf5OhrEWrGCVl3DxmjiuQa6HMzc59xCOpbTv4468ML48SAOT504BMebRLLqZXHp2XLpc
-         PYYBqmpZifg73FYkw7ngn0cWe2i0CRgFYqvMFjIftYIorg/7Df2ttfdqvWszzeGG1DDf
-         sKwehd+TtrYzGXkgBEY7AxJcQnufRq9EQr8m97cmnZxSrju4jTgI9Br+1/vLnknYOI9i
-         rIfqknNvdQsijsm7QgDoYlXNQeYGgKK/QorYhPhbamlBjq1hkGfTkG+TKuzuzTK5FGJr
-         lnFg==
+        bh=1UNv9BVa0wuw40fppKUR+rAamisYbCt010QW3EVI8dY=;
+        b=X9LHC0956XgfSG5eabE4yV1+gQFTSZRT8keckQ6HY54YHy89un7bY5SqXM9ozhoRxa
+         ReeNCOeCHzTbO+uwgWhhRAylKMZkfmEJnwmZd+Lt8N45QeGcV4JnKRTfWmISEz9fVzwW
+         Majuj9/qSKv6SA757SC0Ny+DnxS/Txu2WjiKQkMbzyPkYdxsQz4mg6NhFbQBE1yC+QvT
+         /q7JHnTx8MHyxHJO5XuvO6Z+4VS7FVoGrtbv1Gtdxm0v2VKlUYxbtnbScBZufvG1XzmW
+         kO93W97HWMax+0ybLhbgTBGXe6KbarMpB0S8ojAZ+hZshPOZgxxMAH0YjPeXyXSs4oN0
+         lDZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747108164; x=1747712964;
+        d=1e100.net; s=20230601; t=1747115578; x=1747720378;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kelwimxw1J10EuWJN16N1wQc1iJ7Z8c/Be+MQbkhh30=;
-        b=QdogOdr6PKuhcEqKPkOJOMCp5suF4WothMCWfKQ/X3TMrk/hdJfbGUjOBCce90XZ1x
-         lNwptdqxWDaFPdbqIVwAs7eEWw5jagXXjEeQDCpbbwFuP5aY8+osRKQ3FYndCQOii1JN
-         geZoNvJuRbitOAJeSMSaCkJwAxYOo5+9SRCZE2OgVERChwYW+3pMLP3wEo4W+WOzfuky
-         9XEgXW+UEHvHnIAIC3m8ihvhnSd1/V7TmRaMA+JVAUlDzx2i8d1QfPW/PaDKRboXGEEi
-         kr/82fRou9jyg0mgYQH5KFAXZgc2TIT4k+beP4V3Yymc59sdXxb/fxpEX7lnmqcbcFM/
-         IfNw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx88gznZkm3ncmvUPYoXXKdf70qWpumNDW9qJaUxhMZ2qdzneVGOnnhOLwDz2gjZLmekeXJM2/eNVVrVJ19KPltZiA@vger.kernel.org, AJvYcCVPQ+vSVx3akGTrjYRjCCkfDhu8M1tSNAWmHO3KIxX6zHIyW99Pnryc3ZCsG9NXsZEdC/swGUkNvowIkA==@vger.kernel.org, AJvYcCX8nHsPXoxXj+oBMTuw0hgj9RPEmHP+17h6ECQDHr8jFTVLqnkyEF9RnLkPsRr1SGXIkiabRJtuAzmyPq7g@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJn8xvfobGLrKnXlsQ7raRvBT4F8uDfH+idnjF9ySgcWlXZiPS
-	vOSW6QyfWWTK1DIG5EWe/hO948dB+IYU8oQMp62jFWEl55MmBGMzmAvM7xYHg7n85BT80lSmEf3
-	mx6idINpHzUVusgaaH9wfaRs/h+c=
-X-Gm-Gg: ASbGncvj86SK4nh7uv5zPFRBxXbCzSNVZ3XmR3o8r7ZcglG++VxPQDWnVA0hSARwnra
-	U4iV6zhyCFfbjWSluph1u9xUQ+tFpo8WyiP6wamAoNVxnJTx1/h0nBghZFjFx4CxhKSOYMtbil3
-	ME93ecJKpyxgdbw7E0M7oEBFdVW2ZUuEqG
-X-Google-Smtp-Source: AGHT+IFjE4FbRR/B8od/jgDW1SV6SY3oauWIMT351boohnWbN7HnY+B9vHiMvhPZCtIpx+vClsUD+E5FWaAU6tEmsGk=
-X-Received: by 2002:a05:6e02:1fc6:b0:3d9:6485:3a03 with SMTP id
- e9e14a558f8ab-3da7e1e1905mr169654485ab.4.1747108163755; Mon, 12 May 2025
- 20:49:23 -0700 (PDT)
+        bh=1UNv9BVa0wuw40fppKUR+rAamisYbCt010QW3EVI8dY=;
+        b=ITfo9wELtpCqh+4n1W4w7p9jaM4WO7nmFYSyUwpkmk4eE7HDD4moYr6kCVgEby7If4
+         tMQ1Yx2pfRKMVaqgpj3gQZWYI6GKtRroU91iDW/Te0JWsXYuvIpiGYK/h+WbC/T/HSg2
+         rh4WYYCyd0ys2WdVvv5g+RhlLVrf8ghCSCbxil/Q09U9k5JREJECLBXXX5wPTUXFHsZN
+         aNaaW3cyi25I5slYOxYqIVK3ozIOTvKo/fpIXueEU+Lhwp8c8fhPSL49hB2ImBSqHBr3
+         aRSnSJ0fDD4DmdCsMQOTY1caNzaZBfDtAGGl4b+YpCJzsDwvBSPjSG41RrhX0PumQJCh
+         PhvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUquVPe/SCjoi6BBekG+/uAYRfZphMUVBC2WUz3RwmVAVtt7QjQsaqrFN7a1TUHQC2lwpuILII2Qamrwg==@vger.kernel.org, AJvYcCVUuVhJcA5HMso+Cbz4KLSv3QlYm0UoYrZUTlmDLPGMD146PYnz/6v0K8Q0qT573vaDaO31MB/3S1fJhpST@vger.kernel.org, AJvYcCXki/xFv065AJsaOckq6LwVObLyNWEkZ9rX1Ug/+7k4USUOprdcFj4R3OBCJYLP26CpJjKU016Ko3FGInHCJsuRcPO0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1uMdqErRP3TF/CSdMxI3+ahrk9zuSTc4xqmJnmiCmbQ7kuJuT
+	fV4lLbTM3ZysM7TwEWf+As4oUAI1rAtwHBm5lFTBghSwWDT7hbp9uuKnygpqgqWd6CNv+ZQPmDO
+	oCltMSf0IRP6l9o0ZyGXEjrD+wqM=
+X-Gm-Gg: ASbGncuotTbFDEXDmNRyJDASKkxgmzCPxURMUePS0nG6U3AJRV+EL17CF8uHFIQvSju
+	uOPNXGmqH5pA71yZnI2eriAdMg/Nj1sbw7p6MvfwPaUYmDu05Y1pA2ZC5DHEvxS8fQzcZ2Rj1tr
+	/TDPvCB6gKAvPg0eSTC5wV7eKVvuaWncjv
+X-Google-Smtp-Source: AGHT+IG3hAXI4zZ0Ldsnxik78Vl6FoTPwK50ThHikc2cnUovntlaGx/YFJIOwEVPB3vcPgJY63ae+LGHOAWlwtG8Jhc=
+X-Received: by 2002:a05:6e02:2292:b0:3d0:4e0c:2c96 with SMTP id
+ e9e14a558f8ab-3da7e1dd00amr175999105ab.2.1747115578565; Mon, 12 May 2025
+ 22:52:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,16 +60,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
- <20250512024935.64704-3-kerneljasonxing@gmail.com> <20250512175156.7d3d4db53d40c7a34c1f68d6@linux-foundation.org>
- <CAL+tcoDk2TFwAWPwBN+dQQ+guxe71F_R1rFX_f9wozjPpujBAQ@mail.gmail.com>
- <20250512190427.b7fb67f6b78fd8699ea2811d@linux-foundation.org>
- <CAL+tcoD+VrRfAGMjj=9uAbanMO=W+cW0xgxMzVwrpiTgagmQ2w@mail.gmail.com> <20250512204124.5f201b7bcc394f773f2d40b9@linux-foundation.org>
-In-Reply-To: <20250512204124.5f201b7bcc394f773f2d40b9@linux-foundation.org>
+ <20250512024935.64704-6-kerneljasonxing@gmail.com> <20250512175204.8faa5fd646da7247137db14b@linux-foundation.org>
+In-Reply-To: <20250512175204.8faa5fd646da7247137db14b@linux-foundation.org>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 13 May 2025 11:48:47 +0800
-X-Gm-Features: AX0GCFs2F_R-Ar4I-kMwOiHRqfkRg38oeoffIIbXFDYnprxeRzCgc0CI1SjEfdA
-Message-ID: <CAL+tcoAQ9MMXC1sMvFrdMhJWTooshODxoaz8Ew-hP5+V3TN9JA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/5] relayfs: introduce dump of relayfs statistics function
+Date: Tue, 13 May 2025 13:52:22 +0800
+X-Gm-Features: AX0GCFsxQg_UtKWDCvOgy-HP5BnemXBkwL31IwrPtx5Xmq4NlyGSASE3erfnXAE
+Message-ID: <CAL+tcoCN56fmQadhikyeg-PziM8OF7PitXufPR-rfGb1ko5Gcg@mail.gmail.com>
+Subject: Re: [PATCH v1 5/5] relayfs: uniformally use possible cpu iteration
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
 	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org, 
@@ -78,49 +75,65 @@ Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 13, 2025 at 11:41=E2=80=AFAM Andrew Morton
-<akpm@linux-foundation.org> wrote:
+On Tue, May 13, 2025 at 8:52=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
+n.org> wrote:
 >
-> On Tue, 13 May 2025 10:26:45 +0800 Jason Xing <kerneljasonxing@gmail.com>=
+> On Mon, 12 May 2025 10:49:35 +0800 Jason Xing <kerneljasonxing@gmail.com>=
  wrote:
 >
-> > >
-> > > Maybe we don't need to check !chan either.  Can it be NULL here?
+> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > It depends on how users call this. If users call this without
-> > initialization of chan, relay_dump() can avoid the crash. It works
-> > like kfree() which prevents the NULL object from being freed.
+> > Use for_each_possible_cpu to create per-cpu relayfs file to avoid later
+> > hotplug cpu which doesn't have its own file.
 >
-> hm, OK.  Generally, I don't think that kernel code should be very
-> tolerant of bugs in the caller.  If the caller passes us bad stuff then
-> that's the caller's fault and the caller should be fixed.  If the
-> client code responds to bad input with a nice solid oops, then great!
-> The caller will get fixed.
-
-I learned. Thanks. I will skip the check for that.
-
+> I don't understand this.  Exactly what problem are we trying to solve?
 >
-> > BTW, should I merge this commit [1] into the series in V2 so that you
-> > can easily review?
+> > Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  kernel/relay.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 > >
-> > [1]: https://lore.kernel.org/all/20250507134225.63248-1-kerneljasonxing=
-@gmail.com/
+> > diff --git a/kernel/relay.c b/kernel/relay.c
+> > index 27f7e701724f..dcb099859e83 100644
+> > --- a/kernel/relay.c
+> > +++ b/kernel/relay.c
+> > @@ -519,7 +519,7 @@ struct rchan *relay_open(const char *base_filename,
+> >       kref_init(&chan->kref);
+> >
+> >       mutex_lock(&relay_channels_mutex);
+> > -     for_each_online_cpu(i) {
+> > +     for_each_possible_cpu(i) {
 >
-> That seems unrelated to this work so it seems inappropriate to combine
-> the two.
+> num_possible_cpus() can sometimes greatly exceed num_online_cpus(), so
+> this is an unfortunate change.  It would be better to implement the
+> hotplug notifier?
 
-This series is built on top of [1].
+For the record, the hotplug notifier has been retired by the commit
+530e9b76ae8f("cpu/hotplug: Remove obsolete cpu hotplug
+register/unregister functions"). And now in relay, a similar feature
+called hotplug state machine has already been implemented by the
+commit e6d4989a9ad1 ("relayfs: Convert to hotplug state machine"). So
+the relay has hotplug support.
 
->
-> I skipped [1] because I'm waiting for overall clarity on what's
-> happening with relay[fs].
-
-Do you refer to this thread[2]? Well, that conversation/reply made me
-feel lost. I believe you've already seen that. If so, it seems we're
-working on the dead code together....
-
-[2]: https://lore.kernel.org/all/70293376-71b0-4b9d-b3c1-224b640f470b@kerne=
-l.dk/
+Sorry for missing this point. I would drop this patch.
 
 Thanks,
 Jason
+
+>
+> >               buf =3D relay_open_buf(chan, i);
+> >               if (!buf)
+> >                       goto free_bufs;
+> > @@ -615,7 +615,7 @@ int relay_late_setup_files(struct rchan *chan,
+> >        * no files associated. So it's safe to call relay_setup_buf_file=
+()
+> >        * on all currently online CPUs.
+> >        */
+> > -     for_each_online_cpu(i) {
+> > +     for_each_possible_cpu(i) {
+> >               buf =3D *per_cpu_ptr(chan->buf, i);
+> >               if (unlikely(!buf)) {
+> >                       WARN_ONCE(1, KERN_ERR "CPU has no buffer!\n");
+> > --
+> > 2.43.5
