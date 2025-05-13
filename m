@@ -1,164 +1,229 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399C02F85B;
-	Tue, 13 May 2025 09:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2369C242D77;
+	Tue, 13 May 2025 10:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747130294; cv=none; b=lAmjC0u+Sm8/q6VYfmm7+OZxNib3CC73vX6iuEDsPsI+6luVTz3zJFRjV9SsJFUS574P+EOYinoTDt5tWyV/f2KNwDmu2+mT53WS8UQPqptzPosJD5TTpMjJsE+9aIo2sletX5KudjKumeQlHtWewz+HbS3EQ+ZfBJEtPdcgDM8=
+	t=1747130868; cv=none; b=h38qKvHnO+IhMrbKVl05YpeJDRAdvC6YU9ynDSVHlMd4dRF/GglaWGiNWVHrgqAKeHybFeFxbiqZhel4YYjuP1L8IYpgH4dOb3cBgyP1/9K4ZpLe9cDvECCpRCbROUwo3RutY+MfCS1T7Kx1dKDbqzA7VaVBQzA/QDqMcTBX6QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747130294; c=relaxed/simple;
-	bh=CIStumLbA7h8G3wMXshXEHGNUXbJZDxIRH0X9c6sHTU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=keruMmktWKp8KoeOaxfgys/e8ooS7LailMVQwg+gavmyOPMA8CeAObhvjUvFsd3vldgVhYsaUAu3tV8t9h3Xea7spz33Ki/K+3FlPYwSlpBi66ThEGUTXUVEG7PmkF62QbW/52YiPBTf0w4gY6QSr9Qn0mxOTzfI/3K9yLl7Mss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lACNBNeA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lACNBNeA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F1F3C4CEE4;
-	Tue, 13 May 2025 09:58:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747130293;
-	bh=CIStumLbA7h8G3wMXshXEHGNUXbJZDxIRH0X9c6sHTU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lACNBNeAFNJHMSbGN8Y0rEVZExrT2X3GN3yGaxx5LbGfACukoHjGdnWQ8MM3F2FJk
-	 3ulaYt0WnYZgFyRQH1Xru3j31iXdFhwvJh+L6/ym4Jou98Skp2Wd23AnqnYrFVpGwm
-	 dRWUN26sqgM6aTBRv/J3PC6xdiFFnQqSs4IdgqZetVS9EKO/S0JV6blwQ4kE1ONJeN
-	 BsCbPxgp0h4aylet1HJ8bC0+xu+rwNwikN2VcUtuccxOAqp5UkBQKkt3qhhMLDXYbP
-	 XZcutSYDosNt2D3e1yIyqqdFKQRSlJT+HD6AEMkB45TvWurcgPok+0cYP3EfcuAprr
-	 Wgf6mgQHOI1iQ==
-Date: Tue, 13 May 2025 18:58:10 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: axboe@kernel.dk, rostedt@goodmis.org, mathieu.desnoyers@efficios.com,
- akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Jason Xing
- <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
-Subject: Re: [PATCH v1 2/5] relayfs: introduce dump of relayfs statistics
- function
-Message-Id: <20250513185810.3d57dfe2a0c05784ddf8f0a9@kernel.org>
-In-Reply-To: <20250512024935.64704-3-kerneljasonxing@gmail.com>
-References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
-	<20250512024935.64704-3-kerneljasonxing@gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747130868; c=relaxed/simple;
+	bh=QBX5hyho5OMfGnKSjp0Bq0FcSRd46hiVm1ArD8Nb7ms=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=WbqRY0D1F4ALJlC66hCrx26aSXwR8iUcj3zAkfEYl0cr2hzfsP+T/cKRspDsayb6omer2UU/EiHXaIzZcfEM5splZemEjJhbCbiuglvlY2XUSkbizq8I/4ls9fjhdmkBTH7HItrb0cqhbiELWN6BuRhVOzGKlF1dhLfI6beUf90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-ea-682319edb95d
+From: Byungchul Park <byungchul@sk.com>
+To: linux-kernel@vger.kernel.org
+Cc: kernel_team@skhynix.com,
+	torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org,
+	mingo@redhat.com,
+	peterz@infradead.org,
+	will@kernel.org,
+	tglx@linutronix.de,
+	rostedt@goodmis.org,
+	joel@joelfernandes.org,
+	sashal@kernel.org,
+	daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com,
+	johannes.berg@intel.com,
+	tj@kernel.org,
+	tytso@mit.edu,
+	willy@infradead.org,
+	david@fromorbit.com,
+	amir73il@gmail.com,
+	gregkh@linuxfoundation.org,
+	kernel-team@lge.com,
+	linux-mm@kvack.org,
+	akpm@linux-foundation.org,
+	mhocko@kernel.org,
+	minchan@kernel.org,
+	hannes@cmpxchg.org,
+	vdavydov.dev@gmail.com,
+	sj@kernel.org,
+	jglisse@redhat.com,
+	dennis@kernel.org,
+	cl@linux.com,
+	penberg@kernel.org,
+	rientjes@google.com,
+	vbabka@suse.cz,
+	ngupta@vflare.org,
+	linux-block@vger.kernel.org,
+	josef@toxicpanda.com,
+	linux-fsdevel@vger.kernel.org,
+	jack@suse.cz,
+	jlayton@kernel.org,
+	dan.j.williams@intel.com,
+	hch@infradead.org,
+	djwong@kernel.org,
+	dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com,
+	melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com,
+	harry.yoo@oracle.com,
+	chris.p.wilson@intel.com,
+	gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com,
+	boqun.feng@gmail.com,
+	longman@redhat.com,
+	yskelg@gmail.com,
+	yunseong.kim@ericsson.com,
+	yeoreum.yun@arm.com,
+	netdev@vger.kernel.org,
+	matthew.brost@intel.com,
+	her0gyugyu@gmail.com
+Subject: [PATCH v15 03/43] dept: add single event dependency tracker APIs
+Date: Tue, 13 May 2025 19:06:50 +0900
+Message-Id: <20250513100730.12664-4-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20250513100730.12664-1-byungchul@sk.com>
+References: <20250513100730.12664-1-byungchul@sk.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUxTZxSHfd/7SeWSazV60Tm1xpihIhg0x0SNWTS7M36QLEHFmNnJja0r
+	YIqiNS6h8jGHQpgbNApoKUttaCtQyMaQEqilgs5aFbGYgkqcGeFroG1EYFvL9J+TJ+d3znP+
+	OSwh76QWs+qMk5I2Q6lR0DJSNhJtWjcSu1KV0JS7GYJvL5BQUWujwXfTisDWqMcw2PEFPA0N
+	I5i6/4AAQ6kPQdXLPgIaPf0InJbzNDx+FQPdwTEaukov0pBbXUvDw6FpDIGyyxisjj3w3Pya
+	hHslJgyGQRrKDbk4XP7CMGmuYcCcswoGLFcZmH6ZCF39PRQ4n62BK9cCNLQ4u0jwNA1geNxc
+	QUO/7V8K7nk6SQgVLwHfj0UU2EdNNAyFzASYg2MMPGozYvAYF0JdXlhY8OYfCu4UtWEo+KUe
+	Q3fvLQStF15gcNh6aLgdHMbQ4Cgl4P2NDgQDxSMM5F+aZKBcX4zgYn4ZCXmBjTD1Lny58m0i
+	6K/XkWCf6UHbt4q2azYk3h4eI8S8htPi++ATWnSGjKR41ySIv1/tY8S81meMaHScEhsscWJ1
+	yyAWqyaClOio+YEWHROXGbFwpBuLo14vk/xJqmxLmqRRZ0va9duOyFR9MwXUiZ+FM67RKSIH
+	fT+/EEWxAp8k+P9oZz7yT7kTs0zzqwW/f5KI8AJ+udBQ9JoqRDKW4HvmCk8re1EkmM9/KdRX
+	dMwyya8SagNuHGGO3yh4csrp/6XLBGtd26woit8kzNzwkhGWh2dKjFYyIhX48ihh9M/rHxZi
+	hXaLnyxBnBHNqUFydUZ2ulKtSYpX6TLUZ+KPZqY7UPi/zN9NH2pCE76vXIhnkSKa6xxcoZJT
+	yuwsXboLCSyhWMDpfwu3uDSl7qykzfxae0ojZbnQEpZULOI2hE6nyfljypPSt5J0QtJ+TDEb
+	tTgHofzjBrXbObNfu/zI0rLtyQkrtumqvrlzfB7mfk1J3RnHJdcEljXX6w/0ZrcMKfPtjayq
+	Iu2crrX9vpE77PEaPk1waSqTPnv+Zvfaz1fGH0zxxZTtG48mz+rcfycWmOy2Zn9sjNc6xzK+
+	f1xX7UthYoaS7O6mVPfeg5m32nYFdijILJUyMY7QZin/AyHKe6xbAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0yTZxTHfZ73Vio1r0jmq8ZbjdFodKJAjnGSfdJHvH8gRoNKI6+2EZC0
+	gjI00lGYq9LgBVEoWAEroVWgaESkhhSpMCaiICABFKJklZsCbcbNrXXZl5Nfzv/kd778JVRA
+	CbNQooo7LarjFDFyVkpL92xJXTe0YIVyw+Vvi8E9fpEGY6mVheYHFgTWh1oMrrrt0O4ZRDD1
+	8hUF2VnNCO70dlPw0NmDwF78KwstH+dAq3uEhYasSyykFpay8HpgGkPXjasYLLbd8N7cT0Nj
+	ZgGGbBcLudmp2Dv+wjBhLuHAnLIS+opzOJjuDYKGnjYGavMaGLB3roVb+V0sVNsbaHBW9mFo
+	qTKy0GP9h4FGZz0NHsMiaL6SwcD94QIWBjxmCszuEQ7e1JgwOE0/QJnOa00f+8bAi4waDOlF
+	5Rha3z1F8OziBww2axsLte5BDBW2LAom79Uh6DMMcZB2eYKDXK0BwaW0GzToukJg6m/v57zx
+	INDeLqPh/kwb+jmMWPOtiNQOjlBEV3GGTLrfssTuMdHkjwKBPMnp5ojuWSdHTLYEUlG8hhRW
+	uzC5M+pmiK3kd5bYRq9yRD/UislwUxO3b/Eh6U/RYowqUVT/GBYlVXbPpDPx14WzjuEpKgX9
+	Nk+P/CQCHyxcSx3lfMzyq4SOjgnKx4H8MqEio5/RI6mE4ttmC+1575AvmMfvEMqNdd+Z5lcK
+	pV3PsY9lfIjgTMll/5MuFSxlNd9FfnyoMHOvifZxgPcm02ShM5HUhGaVoEBVXGKsQhUTsl5z
+	UpkUpzq7/tipWBvyNsh8fvpKJRpv2e5AvATJ/WX1ruXKAEaRqEmKdSBBQskDZdrH3pUsWpH0
+	i6g+dVSdECNqHGiRhJbPl4UfEKMC+BOK0+JJUYwX1f+nWOK3MAWV7w9uP1wUjncnhX96ZDSE
+	6bY5jic3fZ06uFr/yWo4pHCV+28rHDMmb22srzvXv2Tdha9BkeaIN9zcTb32kMhBsjNN1Ebx
+	uzbnD0Rv9A/uqN9q+ayv6jmo/fLxyJL4u8mhEZWTVXvl1WOe5aF+vQ7yYtoQ/2rfgT+RZsGG
+	SPvND4VyWqNUBK2h1BrFv1Hq/mE9AwAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-Hi Jason,
+Wrapped the base APIs for easier annotation on wait and event.  Start
+with supporting waiters on each single event.  More general support for
+multiple events is a future work.  Do more when the need arises.
 
-On Mon, 12 May 2025 10:49:32 +0800
-Jason Xing <kerneljasonxing@gmail.com> wrote:
+How to annotate:
 
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> In this version, only support dumping the counter for buffer full and
-> implement the framework of how it works. Users MUST pass a valid @buf
-> with a valid @len that is required to be larger than RELAY_DUMP_BUF_MAX_LEN
-> to acquire which information indicated by @flags to dump.
-> 
-> RELAY_DUMP_BUF_MAX_LEN shows the maximum len of the buffer if users
-> choose to dump all the values.
-> 
-> Users can use this buffer to do whatever they expect in their own kernel
-> module, say, print to console/dmesg or write them into the relay buffer.
-> 
-> Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  include/linux/relay.h | 10 ++++++++++
->  kernel/relay.c        | 35 +++++++++++++++++++++++++++++++++++
->  2 files changed, 45 insertions(+)
-> 
-> diff --git a/include/linux/relay.h b/include/linux/relay.h
-> index 022cf11e5a92..7a442c4cbead 100644
-> --- a/include/linux/relay.h
-> +++ b/include/linux/relay.h
-> @@ -31,6 +31,15 @@
->  /*
->   * Relay buffer error statistics dump
->   */
-> +enum {
-> +	RELAY_DUMP_BUF_FULL = (1 << 0),
-> +
-> +	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
-> +	RELAY_DUMP_MASK = (RELAY_DUMP_LAST - 1) | RELAY_DUMP_LAST
-> +};
-> +
-> +#define RELAY_DUMP_BUF_MAX_LEN 32
-> +
->  struct rchan_buf_error_stats
->  {
->  	unsigned int full;		/* counter for buffer full */
-> @@ -170,6 +179,7 @@ extern int relay_late_setup_files(struct rchan *chan,
->  				  struct dentry *parent);
->  extern void relay_close(struct rchan *chan);
->  extern void relay_flush(struct rchan *chan);
-> +extern void relay_dump(struct rchan *chan, char *buf, int len, int flags);
->  extern void relay_subbufs_consumed(struct rchan *chan,
->  				   unsigned int cpu,
->  				   size_t consumed);
-> diff --git a/kernel/relay.c b/kernel/relay.c
-> index b5db4aa60da1..0e675a77285c 100644
-> --- a/kernel/relay.c
-> +++ b/kernel/relay.c
-> @@ -810,6 +810,41 @@ void relay_flush(struct rchan *chan)
->  }
->  EXPORT_SYMBOL_GPL(relay_flush);
->  
-> +/**
-> + *	relay_dump - dump statistics of the specified channel buffer
-> + *	@chan: the channel
-> + *	@buf: buf to store statistics
-> + *	@len: len of buf to check
-> + *	@flags: select particular information to dump
-> + */
-> +void relay_dump(struct rchan *chan, char *buf, int len, int flags)
-> +{
-> +	unsigned int i, full_counter = 0;
-> +	struct rchan_buf *rbuf;
-> +	int offset = 0;
-> +
-> +	if (!chan || !buf || flags & ~RELAY_DUMP_MASK)
-> +		return;
-> +
-> +	if (len < RELAY_DUMP_BUF_MAX_LEN)
-> +		return;
-> +
-> +	if (chan->is_global) {
-> +		rbuf = *per_cpu_ptr(chan->buf, 0);
-> +		full_counter = rbuf->stats.full;
-> +	} else {
-> +		for_each_possible_cpu(i) {
-> +			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
-> +				full_counter += rbuf->stats.full;
-> +	}
-> +
-> +	if (flags & RELAY_DUMP_BUF_FULL)
-> +		offset += snprintf(buf, sizeof(unsigned int), "%u", full_counter);
-> +
-> +	snprintf(buf + offset, 1, "\n");
+1. Initaialize a map for the interesting wait.
 
-Is there any reason to return the value as string?
-If it returns a digit value and the caller makes it a string,
-it could be more flexible for other use cases.
+   /*
+    * Place along with the wait instance.
+    */
+   struct dept_map my_wait;
 
-Thank you,
+   /*
+    * Place in the initialization code.
+    */
+   sdt_map_init(&my_wait);
 
-> +}
-> +EXPORT_SYMBOL_GPL(relay_dump);
-> +
->  /**
->   *	relay_file_open - open file op for relay files
->   *	@inode: the inode
-> -- 
-> 2.43.5
-> 
+2. Place the following at the wait code.
 
+   sdt_wait(&my_wait);
 
+3. Place the following at the event code.
+
+   sdt_event(&my_wait);
+
+That's it!
+
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+ include/linux/dept_sdt.h | 64 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+ create mode 100644 include/linux/dept_sdt.h
+
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+new file mode 100644
+index 000000000000..93d772c71905
+--- /dev/null
++++ b/include/linux/dept_sdt.h
+@@ -0,0 +1,64 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Single-event Dependency Tracker
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2020 LG Electronics, Inc., Byungchul Park
++ */
++
++#ifndef __LINUX_DEPT_SDT_H
++#define __LINUX_DEPT_SDT_H
++
++#include <linux/kernel.h>
++#include <linux/dept.h>
++
++#ifdef CONFIG_DEPT
++#define sdt_map_init(m)							\
++	do {								\
++		static struct dept_key __key;				\
++		dept_map_init(m, &__key, 0, #m);			\
++	} while (0)
++
++#define sdt_map_init_key(m, k)		dept_map_init(m, k, 0, #m)
++
++#define sdt_wait(m)							\
++	do {								\
++		dept_request_event(m);					\
++		dept_wait(m, 1UL, _THIS_IP_, __func__, 0);		\
++	} while (0)
++
++/*
++ * sdt_might_sleep() and its family will be committed in __schedule()
++ * when it actually gets to __schedule(). Both dept_request_event() and
++ * dept_wait() will be performed on the commit.
++ */
++
++/*
++ * Use the code location as the class key if an explicit map is not used.
++ */
++#define sdt_might_sleep_start(m)					\
++	do {								\
++		struct dept_map *__m = m;				\
++		static struct dept_key __key;				\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__);\
++	} while (0)
++
++#define sdt_might_sleep_end()		dept_clean_stage()
++
++#define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
++#define sdt_request_event(m)		dept_request_event(m)
++#else /* !CONFIG_DEPT */
++#define sdt_map_init(m)			do { } while (0)
++#define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
++#define sdt_wait(m)			do { } while (0)
++#define sdt_might_sleep_start(m)	do { } while (0)
++#define sdt_might_sleep_end()		do { } while (0)
++#define sdt_ecxt_enter(m)		do { } while (0)
++#define sdt_event(m)			do { } while (0)
++#define sdt_ecxt_exit(m)		do { } while (0)
++#define sdt_request_event(m)		do { } while (0)
++#endif
++#endif /* __LINUX_DEPT_SDT_H */
 -- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+2.17.1
+
