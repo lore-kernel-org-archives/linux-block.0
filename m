@@ -1,103 +1,164 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE291F0E2D
-	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 07:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399C02F85B;
+	Tue, 13 May 2025 09:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747121310; cv=none; b=pPYdUZ4NHYQdWEVqhF89IukY2EKpRLKryM77JBNRDCwbONiAbehg5reObmpZrplIk2A0bCzkO8MRqifNdk6fNaHXU7ZH80ysFE9DdqN0coj4BA3DYWp/ksVAor6uPP3rk93pX3p2yWwAFvBtMJXxdXQ9PrTjRlOGvmJJJC+ntro=
+	t=1747130294; cv=none; b=lAmjC0u+Sm8/q6VYfmm7+OZxNib3CC73vX6iuEDsPsI+6luVTz3zJFRjV9SsJFUS574P+EOYinoTDt5tWyV/f2KNwDmu2+mT53WS8UQPqptzPosJD5TTpMjJsE+9aIo2sletX5KudjKumeQlHtWewz+HbS3EQ+ZfBJEtPdcgDM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747121310; c=relaxed/simple;
-	bh=I0B5cI8vwYMFJkwICCQC1+sytlx+0wbuHC5G+/c/kig=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=tsTXNL4KHuNSwggOWUGNj/qqs5gnSSXIbORvqpsDIyfJ7z5XtcTTULRGGMVA+uNNDAQPxtxyQfOzYxZyBV5KOMirx37/7tL8zi/VwKxOc5SNW8BTXhUt62bTPqFk1WjsAEU+9TVzYJAaOd4WdBzRyf6+yjhTv7QNCgrFjMPUwD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4ZxSkf0PFWzYQtt0
-	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 15:28:26 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 571331A0933
-	for <linux-block@vger.kernel.org>; Tue, 13 May 2025 15:28:25 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDHK2CX9CJoqYETMQ--.13250S3;
-	Tue, 13 May 2025 15:28:25 +0800 (CST)
-Subject: Re: [PATCH] block: Split bios in LBA order
-To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250512225623.243507-1-bvanassche@acm.org>
- <20250513064434.GA1199@lst.de>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <35de5e1e-1594-d861-7836-78c4a04dd73e@huaweicloud.com>
-Date: Tue, 13 May 2025 15:28:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1747130294; c=relaxed/simple;
+	bh=CIStumLbA7h8G3wMXshXEHGNUXbJZDxIRH0X9c6sHTU=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=keruMmktWKp8KoeOaxfgys/e8ooS7LailMVQwg+gavmyOPMA8CeAObhvjUvFsd3vldgVhYsaUAu3tV8t9h3Xea7spz33Ki/K+3FlPYwSlpBi66ThEGUTXUVEG7PmkF62QbW/52YiPBTf0w4gY6QSr9Qn0mxOTzfI/3K9yLl7Mss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lACNBNeA; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lACNBNeA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F1F3C4CEE4;
+	Tue, 13 May 2025 09:58:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747130293;
+	bh=CIStumLbA7h8G3wMXshXEHGNUXbJZDxIRH0X9c6sHTU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lACNBNeAFNJHMSbGN8Y0rEVZExrT2X3GN3yGaxx5LbGfACukoHjGdnWQ8MM3F2FJk
+	 3ulaYt0WnYZgFyRQH1Xru3j31iXdFhwvJh+L6/ym4Jou98Skp2Wd23AnqnYrFVpGwm
+	 dRWUN26sqgM6aTBRv/J3PC6xdiFFnQqSs4IdgqZetVS9EKO/S0JV6blwQ4kE1ONJeN
+	 BsCbPxgp0h4aylet1HJ8bC0+xu+rwNwikN2VcUtuccxOAqp5UkBQKkt3qhhMLDXYbP
+	 XZcutSYDosNt2D3e1yIyqqdFKQRSlJT+HD6AEMkB45TvWurcgPok+0cYP3EfcuAprr
+	 Wgf6mgQHOI1iQ==
+Date: Tue, 13 May 2025 18:58:10 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: axboe@kernel.dk, rostedt@goodmis.org, mathieu.desnoyers@efficios.com,
+ akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Jason Xing
+ <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Subject: Re: [PATCH v1 2/5] relayfs: introduce dump of relayfs statistics
+ function
+Message-Id: <20250513185810.3d57dfe2a0c05784ddf8f0a9@kernel.org>
+In-Reply-To: <20250512024935.64704-3-kerneljasonxing@gmail.com>
+References: <20250512024935.64704-1-kerneljasonxing@gmail.com>
+	<20250512024935.64704-3-kerneljasonxing@gmail.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20250513064434.GA1199@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHK2CX9CJoqYETMQ--.13250S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr15Ww1rGF17KFy8CFW3KFg_yoW8Jw47pF
-	yq9a4fCFs8JFs3KwnrXr4Ut3ZYy3Z8Wr1UJFWFgrZxJrn0qF1Ikr47JF1Yvas5Jr18u34x
-	X340va45Kan8CFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUot
-	CzDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Jason,
 
-ÔÚ 2025/05/13 14:44, Christoph Hellwig Ð´µÀ:
-> On Mon, May 12, 2025 at 03:56:23PM -0700, Bart Van Assche wrote:
->> The block layer submits bio fragments in opposite LBA order. Fix this as
->> follows:
+On Mon, 12 May 2025 10:49:32 +0800
+Jason Xing <kerneljasonxing@gmail.com> wrote:
 
-I don't understand this as well, for example, if bio is 8k and it splits
-at 4k: bio: 0->4k, split_bio 4k->8k. And then split_bio is added to
-current->bio_list while the old bio is submitted first.
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> In this version, only support dumping the counter for buffer full and
+> implement the framework of how it works. Users MUST pass a valid @buf
+> with a valid @len that is required to be larger than RELAY_DUMP_BUF_MAX_LEN
+> to acquire which information indicated by @flags to dump.
+> 
+> RELAY_DUMP_BUF_MAX_LEN shows the maximum len of the buffer if users
+> choose to dump all the values.
+> 
+> Users can use this buffer to do whatever they expect in their own kernel
+> module, say, print to console/dmesg or write them into the relay buffer.
+> 
+> Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  include/linux/relay.h | 10 ++++++++++
+>  kernel/relay.c        | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 45 insertions(+)
+> 
+> diff --git a/include/linux/relay.h b/include/linux/relay.h
+> index 022cf11e5a92..7a442c4cbead 100644
+> --- a/include/linux/relay.h
+> +++ b/include/linux/relay.h
+> @@ -31,6 +31,15 @@
+>  /*
+>   * Relay buffer error statistics dump
+>   */
+> +enum {
+> +	RELAY_DUMP_BUF_FULL = (1 << 0),
+> +
+> +	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
+> +	RELAY_DUMP_MASK = (RELAY_DUMP_LAST - 1) | RELAY_DUMP_LAST
+> +};
+> +
+> +#define RELAY_DUMP_BUF_MAX_LEN 32
+> +
+>  struct rchan_buf_error_stats
+>  {
+>  	unsigned int full;		/* counter for buffer full */
+> @@ -170,6 +179,7 @@ extern int relay_late_setup_files(struct rchan *chan,
+>  				  struct dentry *parent);
+>  extern void relay_close(struct rchan *chan);
+>  extern void relay_flush(struct rchan *chan);
+> +extern void relay_dump(struct rchan *chan, char *buf, int len, int flags);
+>  extern void relay_subbufs_consumed(struct rchan *chan,
+>  				   unsigned int cpu,
+>  				   size_t consumed);
+> diff --git a/kernel/relay.c b/kernel/relay.c
+> index b5db4aa60da1..0e675a77285c 100644
+> --- a/kernel/relay.c
+> +++ b/kernel/relay.c
+> @@ -810,6 +810,41 @@ void relay_flush(struct rchan *chan)
+>  }
+>  EXPORT_SYMBOL_GPL(relay_flush);
+>  
+> +/**
+> + *	relay_dump - dump statistics of the specified channel buffer
+> + *	@chan: the channel
+> + *	@buf: buf to store statistics
+> + *	@len: len of buf to check
+> + *	@flags: select particular information to dump
+> + */
+> +void relay_dump(struct rchan *chan, char *buf, int len, int flags)
+> +{
+> +	unsigned int i, full_counter = 0;
+> +	struct rchan_buf *rbuf;
+> +	int offset = 0;
+> +
+> +	if (!chan || !buf || flags & ~RELAY_DUMP_MASK)
+> +		return;
+> +
+> +	if (len < RELAY_DUMP_BUF_MAX_LEN)
+> +		return;
+> +
+> +	if (chan->is_global) {
+> +		rbuf = *per_cpu_ptr(chan->buf, 0);
+> +		full_counter = rbuf->stats.full;
+> +	} else {
+> +		for_each_possible_cpu(i) {
+> +			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
+> +				full_counter += rbuf->stats.full;
+> +	}
+> +
+> +	if (flags & RELAY_DUMP_BUF_FULL)
+> +		offset += snprintf(buf, sizeof(unsigned int), "%u", full_counter);
+> +
+> +	snprintf(buf + offset, 1, "\n");
 
-Thanks,
-Kuai
+Is there any reason to return the value as string?
+If it returns a digit value and the caller makes it a string,
+it could be more flexible for other use cases.
 
->> - Introduce a new function bio_split_to_limits_and_submit() that has the
->>    same behavior as the existing bio_split_to_limits() function. This
->>    involves splitting a bio and submitting the fragment with the highest
->>    LBA by calling submit_bio_noacct().
->> - Use the new function bio_split_to_limits_and_submit() in all drivers
->>    that are fine with submitting split bios in opposite LBA order.
-> 
-> If you have to rename a user visible symbol, please do that in a
-> preparation patch.
-> 
-> Also how do you determine some drivers are fine with one order while
-> others are not?
-> 
->> - Modify blk_mq_submit_bio() and dm_split_and_process_bio() such that
->>    bio fragments are submitted in LBA order.
-> 
-> blk_mq_submit_bio calls __bio_split_to_limits, which returns the
-> bio split off the beginning of the passed in bio by bio_submit_split.
-> I don't see how that would reorder anything.
-> 
-> 
-> .
+Thank you,
+
+> +}
+> +EXPORT_SYMBOL_GPL(relay_dump);
+> +
+>  /**
+>   *	relay_file_open - open file op for relay files
+>   *	@inode: the inode
+> -- 
+> 2.43.5
 > 
 
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
