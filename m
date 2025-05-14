@@ -1,81 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372DE277813
-	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 12:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1451E3762
+	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 16:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747226519; cv=none; b=aZK76xvzjzEuQjYIvJLiaFjOWKRWWU9HuXdgH3GQVWKGRIiqOLYLI0W5sjyO3Ha/sSq8sQtMqKdmE7Zqk093tlCcKyVMcSu/QwAz+KFU7HlWaD/iGhhFysthm8LDCrSgUesedbgzprNvVCAw/jogNK3Q9mKapm16iU3KcwB4WPU=
+	t=1747238928; cv=none; b=hbLW8kKclIUmNrXX7fZHELZ8KmQY5gA66PpBb8kivR2l1wnPkGN4pjzBCtRFTMYSi9hzAIjVDm7Fs77pZilmcgFV1qQPr/n2G/Op7VWBReOfl4PumzfU9fXilZ8ZAKoaUr/3bonjIND4aMx0xCUVU5uU6nLdfcxmTVEAlDgb85Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747226519; c=relaxed/simple;
-	bh=EEGfYDjUdSZy0/RFIcEvsmm9uPhga5AdR3yZjbpPimk=;
+	s=arc-20240116; t=1747238928; c=relaxed/simple;
+	bh=5fAT4CSDvQk622hLuqJhH4j1jI7xnRXlu4+YkixUDqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QoNH1bzZ6/fY1bhdqg5BYcS7bqx9DSdxuPlYxH9uFZmQoD0cvJ7Ba4I2LOHdd9l7XJjJcoDxCBeKcUgHHbINvVXnxbdB6W9KkHh7A9Jh0PPMrH/na6k8JoEsd8/OxlfKYjCdbndv25uQk8yDLgM97byGiU2MSseHUEzvcE37Tvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6WiB3SC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AlhQiLcwHxx7o7K20xIptQ5noj7D9GpMrXkIKdOnJNfinted6CaXabI9TFAA/5WTUzN33fMMzDGAj/wljFRDZ5fSOUwvMdbuqHeNU5Fw9Y7B4CWtkUgTzs1FAnw0e0IxHn2cPXjuHFE0F2diIXEy6ct2RN5ktBeneF2AjpWagw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HP9Skt9r; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3ZEaJ1jc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HP9Skt9r; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3ZEaJ1jc; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6WiB3SC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747226517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HP9Skt9r";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3ZEaJ1jc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HP9Skt9r";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3ZEaJ1jc"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 64FC6211C6;
+	Wed, 14 May 2025 16:08:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747238925; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BHHDRyYIIxfuAzn8skJQ0/Rzmdn0HuqApROcitBMMpk=;
-	b=f6WiB3SCdX+5nhu3DI5XmdOFThx8ui/Msp+rmck/QgaNmAtqt6UTz22MLO7ezOeJKiiewN
-	eIXEA26hf4W7cnkpN8zHhHFwd6J6YgmQRRh5puXE10DcUITeq0mdHHooL+JhEWz2Bg+NBw
-	HbYmjThHsf4Ssy9UuvRrEO9FCh5fm24=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-NJn7WB8fN2-FCOeF0RUvaw-1; Wed, 14 May 2025 08:41:55 -0400
-X-MC-Unique: NJn7WB8fN2-FCOeF0RUvaw-1
-X-Mimecast-MFC-AGG-ID: NJn7WB8fN2-FCOeF0RUvaw_1747226515
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ea256f039so49768325e9.0
-        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 05:41:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747226514; x=1747831314;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BHHDRyYIIxfuAzn8skJQ0/Rzmdn0HuqApROcitBMMpk=;
-        b=kIgE4inV1IX1oMmEci3v7m4+D9rpUTN9XI52gq1E7jPI0KrHqlxvT/7FCfa/hNLfz/
-         kAHdREREKWBUA7lyklWtjMwLDFon/PSNi6s+PtUrjChmwyTPtnGwFOhYpnJOn6FP1jHD
-         zxMq+qADsvQbuWp6J2actygQzDxBhlGdSbsWnbDQEZKjB6dwKxx1oOXX4VZ53ENBeIhw
-         kc9EqXZHkrGlLiM9h068fX7WlVdiDCgyVLUcf7LsvfueI9OmckTN14/CkGBqfaBkS3GK
-         qcQfA15kUoPBzg2GPZrb0wij6kqoaTH4R/2y5oxn1MThl4Y/eC1S7jHYbTCQTCGegp7N
-         w7Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKSb4coEqbmFprwA8LF8xY54Tsh7l7X0Dand0q3XFFEg6AYx13fFJXtyCmfdfGZpENT90IUSksWFTqIg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4EMcL7R09Yq7MNhrA5GKe5aOjbV25aceh9R1H8UbUaOfv6MUh
-	2FTcFhG/+FZeudrJHqDbtj4opis83myOEUqRSj16HRrfdWbjfMQsAkIMlz98aBof14shyJR+IxZ
-	EpLp6zrurjdkpqvfOKMK47X7AvzR5pybzV36okECSly9wRqQo45eo6nZfbLFQ
-X-Gm-Gg: ASbGnctJkeMZ/oldsscrwW+pEpEcLu5onjyc8+9bpsP3RDn3BZIEhK5vR4nxSZS28nO
-	nbEPQQLb7LZomWawYkJDu6F7Xc0ypSK4SBWnqVzrjAeryFcaB/gOJiUWKxHU+Sj2DWzOMmnOMfs
-	ePF1YnIkU6N23JRRf70xa9NXvZjPYfGAygC4TrFElQPTFj+I1JltngUXwDc+92vHaBox0KnPgnh
-	s7Sfp2i6OM/S6jrI62bIlT07iSE1A7JkUb7xBJwTTjEnHVuJkv37onu0DBzmwgaAwoyLEhZ5WDh
-	lNMqtA==
-X-Received: by 2002:a05:600c:4e0e:b0:43c:fdbe:4398 with SMTP id 5b1f17b1804b1-442f20bae9amr29141635e9.6.1747226514679;
-        Wed, 14 May 2025 05:41:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE48EoGZ2uk0nrpc2KvJ3SdazvxaUIGvnXn9PXwiAZf3ac9pN6HJ4xaShBQmCTJtS3wZo97WQ==
-X-Received: by 2002:a05:600c:4e0e:b0:43c:fdbe:4398 with SMTP id 5b1f17b1804b1-442f20bae9amr29141345e9.6.1747226514281;
-        Wed, 14 May 2025 05:41:54 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58f2f8csm19330179f8f.42.2025.05.14.05.41.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 05:41:53 -0700 (PDT)
-Date: Wed, 14 May 2025 08:41:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc: israelr@nvidia.com, stefanha@redhat.com, virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
-	dbenbasat@nvidia.com, smalin@nvidia.com, larora@nvidia.com,
-	izach@nvidia.com, aaptel@nvidia.com, parav@nvidia.com,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] virtio_blk: add length check for device writable
- portion
-Message-ID: <20250514084133-mutt-send-email-mst@kernel.org>
-References: <20250224233106.8519-1-mgurtovoy@nvidia.com>
- <20250224233106.8519-2-mgurtovoy@nvidia.com>
+	bh=PwemYqSx1joAsHvddH5vUeTn++S/Lwwkxkdrd/VN3vE=;
+	b=HP9Skt9rm7WKGVr9FhJS2qwWSQVBH16kWhzGzuXqPtnM/6MWapaWsEltEX2cHd7ywkHXvq
+	0E1gGk0BDq0FfYCf0huIb9Nnnqf3kxOH2itS/Zdcz2F61nXWPZ2WD1YuyhF5cX29N06GNW
+	325yGH3/h6im5SHcyN/Pr9/EpGCTqvw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747238925;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PwemYqSx1joAsHvddH5vUeTn++S/Lwwkxkdrd/VN3vE=;
+	b=3ZEaJ1jculhnrIBINmPnOy5TNzJkzkJPwTpxmwz3MwwbjatG7zMWo8waQCnZUs40+mCAsJ
+	syFDyZQ1ARf5iiAQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747238925; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PwemYqSx1joAsHvddH5vUeTn++S/Lwwkxkdrd/VN3vE=;
+	b=HP9Skt9rm7WKGVr9FhJS2qwWSQVBH16kWhzGzuXqPtnM/6MWapaWsEltEX2cHd7ywkHXvq
+	0E1gGk0BDq0FfYCf0huIb9Nnnqf3kxOH2itS/Zdcz2F61nXWPZ2WD1YuyhF5cX29N06GNW
+	325yGH3/h6im5SHcyN/Pr9/EpGCTqvw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747238925;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PwemYqSx1joAsHvddH5vUeTn++S/Lwwkxkdrd/VN3vE=;
+	b=3ZEaJ1jculhnrIBINmPnOy5TNzJkzkJPwTpxmwz3MwwbjatG7zMWo8waQCnZUs40+mCAsJ
+	syFDyZQ1ARf5iiAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3E58C13306;
+	Wed, 14 May 2025 16:08:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1RI1Dw3AJGhoNgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 14 May 2025 16:08:45 +0000
+Date: Wed, 14 May 2025 18:08:40 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Daniel Wagner <wagi@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+	storagedev@microchip.com, virtualization@lists.linux.dev, 
+	GR-QLogic-Storage-Upstream@marvell.com
+Subject: Re: [PATCH v6 6/9] isolation: introduce io_queue isolcpus type
+Message-ID: <706b08be-781c-45d6-8c16-93d6d97b4330@flourine.local>
+References: <20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org>
+ <20250424-isolcpus-io-queues-v6-6-9a53a870ca1f@kernel.org>
+ <2db989db-4849-46a9-9bad-0b67d85d1650@suse.de>
+ <dd4719dc-5ac4-44d9-bccb-e867d322864e@flourine.local>
+ <aB1iolILQcvvHDE9@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -84,81 +98,55 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250224233106.8519-2-mgurtovoy@nvidia.com>
+In-Reply-To: <aB1iolILQcvvHDE9@fedora>
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
-On Tue, Feb 25, 2025 at 01:31:05AM +0200, Max Gurtovoy wrote:
-> Add a safety check to ensure that the length of data written by the
-> device is at least as large the expected length. If this condition is
-> not met, it indicates a potential error in the device's response.
+On Fri, May 09, 2025 at 10:04:18AM +0800, Ming Lei wrote:
+> > 			io_queue
+> > 			  Isolate from IO queue work caused by multiqueue
+> > 			  device drivers. Restrict the placement of
+> > 			  queues to housekeeping CPUs only, ensuring that
+> > 			  all IO work is processed by a housekeeping CPU.
+> > 
+> > 			  Note: When an isolated CPU issues an IO, it is
+> > 			  forwarded to a housekeeping CPU. This will
+> > 			  trigger a software interrupt on the completion
+> > 			  path.
+> > 
+> > 			  Note: It is not possible to offline housekeeping
+> > 			  CPUs that serve isolated CPUs.
 > 
-> This change aligns with the virtio specification, which states:
-> "The driver MUST NOT make assumptions about data in device-writable
-> buffers beyond the first len bytes, and SHOULD ignore this data."
+> This patch adds kernel parameter only, but not apply it at all, the above
+> words just confuses everyone, so I'd suggest to not expose the kernel
+> command line & document until the whole mechanism is supported.
+
+I'll add this doc update as last patch.
+
+> Especially 'irqaffinity=0 isolcpus=io_queue' requires the application
+> to offline CPU in order, which has to be documented:
 > 
-> By setting an error status when len is insufficient, we ensure that the
-> driver does not process potentially invalid or incomplete data from the
-> device.
-> 
-> Reviewed-by: Aurelien Aptel <aaptel@nvidia.com>
-> Signed-off-by: Lokesh Arora <larora@nvidia.com>
-> Signed-off-by: Israel Rukshin <israelr@nvidia.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
+> https://lore.kernel.org/all/cc5e44dd-e1dc-4f24-88d9-ce45a8b0794f@flourine.local/
 
-
-
-my question is, is the device out of spec, too?
-
-
-
->  drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 6a61ec35f426..58407cfee3ee 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -331,6 +331,20 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
->  	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
->  }
->  
-> +static inline void virtblk_vbr_set_err_status_upon_len_err(struct virtblk_req *vbr,
-> +		struct request *req, unsigned int len)
-> +{
-> +	unsigned int expected_len = vbr->in_hdr_len;
-> +
-> +	if (rq_dma_dir(req) == DMA_FROM_DEVICE)
-> +		expected_len += blk_rq_payload_bytes(req);
-> +
-> +	if (unlikely(len < expected_len)) {
-> +		u8 *status_ptr = (u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1;
-> +		*status_ptr = VIRTIO_BLK_S_IOERR;
-> +	}
-> +}
-> +
->  static inline void virtblk_request_done(struct request *req)
->  {
->  	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> @@ -362,6 +376,9 @@ static void virtblk_done(struct virtqueue *vq)
->  		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
->  			struct request *req = blk_mq_rq_from_pdu(vbr);
->  
-> +			/* Check device writable portion length, and fail upon error */
-> +			virtblk_vbr_set_err_status_upon_len_err(vbr, req, len);
-> +
->  			if (likely(!blk_should_fake_timeout(req->q)))
->  				blk_mq_complete_request(req);
->  			req_done = true;
-> @@ -1208,6 +1225,9 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
->  	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
->  		struct request *req = blk_mq_rq_from_pdu(vbr);
->  
-> +		/* Check device writable portion length, and fail upon error */
-> +		virtblk_vbr_set_err_status_upon_len_err(vbr, req, len);
-> +
->  		found++;
->  		if (!blk_mq_complete_request_remote(req) &&
->  		    !blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
-> -- 
-> 2.18.1
-
+Okay, so you want me to extend the above second note in this case. I'll
+give it a go.
