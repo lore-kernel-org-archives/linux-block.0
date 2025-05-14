@@ -1,81 +1,81 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E927A2777F9
-	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 12:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372DE277813
+	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 12:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747226437; cv=none; b=DlbA3jTsLDjcksnrpHAVtO5NzwdbKiQqJR11pZEC1cFtOSUd8Sdm71gKDp3y+Mf3cRDQVOC+lTk0TR0DNxv76z4EiccThllL+oChsqwxIwVAjoR4vjj9o8ENOAkCatxcNdHqKNxR/8fQpaizHSYJcaRpdGP2/oAqgpoaGXWIEk0=
+	t=1747226519; cv=none; b=aZK76xvzjzEuQjYIvJLiaFjOWKRWWU9HuXdgH3GQVWKGRIiqOLYLI0W5sjyO3Ha/sSq8sQtMqKdmE7Zqk093tlCcKyVMcSu/QwAz+KFU7HlWaD/iGhhFysthm8LDCrSgUesedbgzprNvVCAw/jogNK3Q9mKapm16iU3KcwB4WPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747226437; c=relaxed/simple;
-	bh=l4VZADMEVJnFAQXvFf7wgOzQJUelFDiQAhhzyWvjj6o=;
+	s=arc-20240116; t=1747226519; c=relaxed/simple;
+	bh=EEGfYDjUdSZy0/RFIcEvsmm9uPhga5AdR3yZjbpPimk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uUfMohErGAFH0/vryw++OMkBIOrd/au33uO52A4WOkMjWHCQR9182+Ak/bikTqae0k4v/bgg+E1L1WjKHaZl/Vo7jj7hLcTQf434kQESS9N+IHtrRhBd4T9dVTLER/GZTW8jHunuHrg4aYZxfc+z/yEQlNqG8RW8XM9Cx24pGh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i9t8gw9/; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=QoNH1bzZ6/fY1bhdqg5BYcS7bqx9DSdxuPlYxH9uFZmQoD0cvJ7Ba4I2LOHdd9l7XJjJcoDxCBeKcUgHHbINvVXnxbdB6W9KkHh7A9Jh0PPMrH/na6k8JoEsd8/OxlfKYjCdbndv25uQk8yDLgM97byGiU2MSseHUEzvcE37Tvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6WiB3SC; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i9t8gw9/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6WiB3SC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747226432;
+	s=mimecast20190719; t=1747226517;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fw0llZnGO4F7e+OkKHs7xd6962MpvChnUrZgYDDb9I0=;
-	b=i9t8gw9/jRIxZUg5E8dQEBfurTXN+hd/ga6gWOO+djgPKwPgiE4MMemQYjXRkoad+dHC3r
-	T0uvteG2WjF3OOBmQhYtd6725T+eYviiQoDEFZEBhqZ0ugqMq6RN0EOYrPG5P6ASRIVWcg
-	muXr2QYLG8PtQJHo+lLQKtBj2uP7IGQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=BHHDRyYIIxfuAzn8skJQ0/Rzmdn0HuqApROcitBMMpk=;
+	b=f6WiB3SCdX+5nhu3DI5XmdOFThx8ui/Msp+rmck/QgaNmAtqt6UTz22MLO7ezOeJKiiewN
+	eIXEA26hf4W7cnkpN8zHhHFwd6J6YgmQRRh5puXE10DcUITeq0mdHHooL+JhEWz2Bg+NBw
+	HbYmjThHsf4Ssy9UuvRrEO9FCh5fm24=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-265-qbpL7V0FOYWdcEwedgII3A-1; Wed, 14 May 2025 08:40:31 -0400
-X-MC-Unique: qbpL7V0FOYWdcEwedgII3A-1
-X-Mimecast-MFC-AGG-ID: qbpL7V0FOYWdcEwedgII3A_1747226430
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39ee4b91d1cso434232f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 05:40:31 -0700 (PDT)
+ us-mta-113-NJn7WB8fN2-FCOeF0RUvaw-1; Wed, 14 May 2025 08:41:55 -0400
+X-MC-Unique: NJn7WB8fN2-FCOeF0RUvaw-1
+X-Mimecast-MFC-AGG-ID: NJn7WB8fN2-FCOeF0RUvaw_1747226515
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ea256f039so49768325e9.0
+        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 05:41:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747226430; x=1747831230;
+        d=1e100.net; s=20230601; t=1747226514; x=1747831314;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fw0llZnGO4F7e+OkKHs7xd6962MpvChnUrZgYDDb9I0=;
-        b=Y7N1Z2W1QOKj5yy8jMWewdPh98yBI4kdHlzqpnCcUiDg1aJrjEYxcAcECy2JT2bYa3
-         37yQtFpSMbUja+JAoOPwjQtuKJLuqv+EajVfzGj93BUzHk1blyfbxD87LaNYpPXqcGuM
-         TDuU1FlUzyo3wlMh/cfsajz5yyNq08Mf6AAP97qx5rpev+5rDp15x6v6hsRDILKLI5zw
-         hn0gf0PDmTKslzAHZTXDScFXj/IRAiyTX5QQRbpxo5YF4uixgBeqHJUj5U1GiuKUXEtG
-         GDet7kTqdSb3V+4wBNRl1wEQWfLX9WqaZ5RyczEh6sN1QcoxhCdpiTp3ifxWxRpwRkQR
-         DRfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQCFEAMzr1ZN0MZPE5gcgABUuY3Y1N0oMnmmLT6y5CRy2kF+HF5AOXndSY4+9KOobiL5l10d//+CMepQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnvagXW0QlHS9KWbWqnwyLczX4vVDCNp7/PVeH8ZVezSXD/QcO
-	wCQXsqoXLOa+he+bXRlAHP21UwJfw+PjBYNrz7Vlue9DJ9w4xu/ubFzKTjpsHo0JMa/wyT1Az89
-	HaVcs3XdQ4fHubbYttZEVBKIM4I8hoTiRYAvkHV2DX8Pg3dUceYFKwdKRyop8
-X-Gm-Gg: ASbGnculx0Qe2x5Zh5JvX2/Ffjj52hMGepZq1LpzaJA7hs9qeBBcVYjrTVCmV2oWVYU
-	16ZBBBU9/3lwUujZV6BS02XFnANe2EriUJJNt6lKqfXPNexpyDhi0gcrnR6RBoBqqlMXsKRGiV6
-	/zJhIHm6TWQgK2PwS/rLso2Uf9wuXNXp1iCPkuwAUmxLI5uEgvTKDIjL8FxbSTeMJ5uB9efQtKZ
-	0uPmeL25vaa44QaJUcA40MFpFTlNcIzzI0tUrACuduNFXN6eBaDacjMDWOPLrUWTIF7ev/JUr+C
-	kamt8g==
-X-Received: by 2002:a5d:5888:0:b0:3a1:f70a:1f65 with SMTP id ffacd0b85a97d-3a348ac78demr3422305f8f.0.1747226430085;
-        Wed, 14 May 2025 05:40:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF/IcHyOtPZThhQmfsHZwZgx5RVpTsWbFQFnsQ1d9kN5ycuPeVc3HAClS1rLwLne8I1m0Er5A==
-X-Received: by 2002:a5d:5888:0:b0:3a1:f70a:1f65 with SMTP id ffacd0b85a97d-3a348ac78demr3422283f8f.0.1747226429725;
-        Wed, 14 May 2025 05:40:29 -0700 (PDT)
+        bh=BHHDRyYIIxfuAzn8skJQ0/Rzmdn0HuqApROcitBMMpk=;
+        b=kIgE4inV1IX1oMmEci3v7m4+D9rpUTN9XI52gq1E7jPI0KrHqlxvT/7FCfa/hNLfz/
+         kAHdREREKWBUA7lyklWtjMwLDFon/PSNi6s+PtUrjChmwyTPtnGwFOhYpnJOn6FP1jHD
+         zxMq+qADsvQbuWp6J2actygQzDxBhlGdSbsWnbDQEZKjB6dwKxx1oOXX4VZ53ENBeIhw
+         kc9EqXZHkrGlLiM9h068fX7WlVdiDCgyVLUcf7LsvfueI9OmckTN14/CkGBqfaBkS3GK
+         qcQfA15kUoPBzg2GPZrb0wij6kqoaTH4R/2y5oxn1MThl4Y/eC1S7jHYbTCQTCGegp7N
+         w7Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKSb4coEqbmFprwA8LF8xY54Tsh7l7X0Dand0q3XFFEg6AYx13fFJXtyCmfdfGZpENT90IUSksWFTqIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4EMcL7R09Yq7MNhrA5GKe5aOjbV25aceh9R1H8UbUaOfv6MUh
+	2FTcFhG/+FZeudrJHqDbtj4opis83myOEUqRSj16HRrfdWbjfMQsAkIMlz98aBof14shyJR+IxZ
+	EpLp6zrurjdkpqvfOKMK47X7AvzR5pybzV36okECSly9wRqQo45eo6nZfbLFQ
+X-Gm-Gg: ASbGnctJkeMZ/oldsscrwW+pEpEcLu5onjyc8+9bpsP3RDn3BZIEhK5vR4nxSZS28nO
+	nbEPQQLb7LZomWawYkJDu6F7Xc0ypSK4SBWnqVzrjAeryFcaB/gOJiUWKxHU+Sj2DWzOMmnOMfs
+	ePF1YnIkU6N23JRRf70xa9NXvZjPYfGAygC4TrFElQPTFj+I1JltngUXwDc+92vHaBox0KnPgnh
+	s7Sfp2i6OM/S6jrI62bIlT07iSE1A7JkUb7xBJwTTjEnHVuJkv37onu0DBzmwgaAwoyLEhZ5WDh
+	lNMqtA==
+X-Received: by 2002:a05:600c:4e0e:b0:43c:fdbe:4398 with SMTP id 5b1f17b1804b1-442f20bae9amr29141635e9.6.1747226514679;
+        Wed, 14 May 2025 05:41:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE48EoGZ2uk0nrpc2KvJ3SdazvxaUIGvnXn9PXwiAZf3ac9pN6HJ4xaShBQmCTJtS3wZo97WQ==
+X-Received: by 2002:a05:600c:4e0e:b0:43c:fdbe:4398 with SMTP id 5b1f17b1804b1-442f20bae9amr29141345e9.6.1747226514281;
+        Wed, 14 May 2025 05:41:54 -0700 (PDT)
 Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ebd6asm19922424f8f.35.2025.05.14.05.40.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58f2f8csm19330179f8f.42.2025.05.14.05.41.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 05:40:28 -0700 (PDT)
-Date: Wed, 14 May 2025 08:40:25 -0400
+        Wed, 14 May 2025 05:41:53 -0700 (PDT)
+Date: Wed, 14 May 2025 08:41:50 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Max Gurtovoy <mgurtovoy@nvidia.com>, israelr@nvidia.com,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	oren@nvidia.com, nitzanc@nvidia.com, dbenbasat@nvidia.com,
-	smalin@nvidia.com, larora@nvidia.com, izach@nvidia.com,
-	aaptel@nvidia.com, parav@nvidia.com, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 0/2] virtio: Add length checks for device writable
- portions
-Message-ID: <20250514083313-mutt-send-email-mst@kernel.org>
+To: Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc: israelr@nvidia.com, stefanha@redhat.com, virtualization@lists.linux.dev,
+	linux-block@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
+	dbenbasat@nvidia.com, smalin@nvidia.com, larora@nvidia.com,
+	izach@nvidia.com, aaptel@nvidia.com, parav@nvidia.com,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] virtio_blk: add length check for device writable
+ portion
+Message-ID: <20250514084133-mutt-send-email-mst@kernel.org>
 References: <20250224233106.8519-1-mgurtovoy@nvidia.com>
- <20250227081747.GE85709@fedora>
+ <20250224233106.8519-2-mgurtovoy@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -84,76 +84,81 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250227081747.GE85709@fedora>
+In-Reply-To: <20250224233106.8519-2-mgurtovoy@nvidia.com>
 
-On Thu, Feb 27, 2025 at 04:17:47PM +0800, Stefan Hajnoczi wrote:
-> On Tue, Feb 25, 2025 at 01:31:04AM +0200, Max Gurtovoy wrote:
-> > Hi,
-> > 
-> > This patch series introduces safety checks in virtio-blk and virtio-fs
-> > drivers to ensure proper handling of device-writable buffer lengths as
-> > specified by the virtio specification.
-> > 
-> > The virtio specification states:
-> > "The driver MUST NOT make assumptions about data in device-writable
-> > buffers beyond the first len bytes, and SHOULD ignore this data."
-> > 
-> > To align with this requirement, we introduce checks in both drivers to
-> > verify that the length of data written by the device is at least as
-> > large as the expected/needed payload.
-> > 
-> > If this condition is not met, we set an I/O error status to prevent
-> > processing of potentially invalid or incomplete data.
-> > 
-> > These changes improve the robustness of the drivers and ensure better
-> > compliance with the virtio specification.
-> > 
-> > Max Gurtovoy (2):
-> >   virtio_blk: add length check for device writable portion
-> >   virtio_fs: add length check for device writable portion
-> > 
-> >  drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
-> >  fs/fuse/virtio_fs.c        |  9 +++++++++
-> >  2 files changed, 29 insertions(+)
-> > 
-> > -- 
-> > 2.18.1
-> > 
+On Tue, Feb 25, 2025 at 01:31:05AM +0200, Max Gurtovoy wrote:
+> Add a safety check to ensure that the length of data written by the
+> device is at least as large the expected length. If this condition is
+> not met, it indicates a potential error in the device's response.
 > 
-> There are 3 cases:
-> 1. The device reports len correctly.
-> 2. The device reports len incorrectly, but the in buffers contain valid
->    data.
-> 3. The device reports len incorrectly and the in buffers contain invalid
->    data.
+> This change aligns with the virtio specification, which states:
+> "The driver MUST NOT make assumptions about data in device-writable
+> buffers beyond the first len bytes, and SHOULD ignore this data."
 > 
-> Case 1 does not change behavior.
+> By setting an error status when len is insufficient, we ensure that the
+> driver does not process potentially invalid or incomplete data from the
+> device.
 > 
-> Case 3 never worked in the first place. This patch might produce an
-> error now where garbage was returned in the past.
+> Reviewed-by: Aurelien Aptel <aaptel@nvidia.com>
+> Signed-off-by: Lokesh Arora <larora@nvidia.com>
+> Signed-off-by: Israel Rukshin <israelr@nvidia.com>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+
+
+
+my question is, is the device out of spec, too?
+
+
+
+>  drivers/block/virtio_blk.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> It's case 2 that I'm worried about: users won't be happy if the driver
-> stops working with a device that previously worked.
-
-Interestingly, when virtio core unmaps buffers, it always syncronizes
-the whole range.
-virtio net jumps through hoops to only sync a part.
-
-So Max, my suggestion is to maybe try a combination of dma sync +
-unmap, and then this becomes an optimization.
-
-It might be worth it, for when using swiotlb - but the gain will
-have to be measured.
-
-
-
-
-
-> Should we really risk breakage for little benefit?
-> 
-> I remember there were cases of invalid len values reported by devices in
-> the past. Michael might have thoughts about this.
-> 
-> Stefan
-
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 6a61ec35f426..58407cfee3ee 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -331,6 +331,20 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
+>  	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+>  }
+>  
+> +static inline void virtblk_vbr_set_err_status_upon_len_err(struct virtblk_req *vbr,
+> +		struct request *req, unsigned int len)
+> +{
+> +	unsigned int expected_len = vbr->in_hdr_len;
+> +
+> +	if (rq_dma_dir(req) == DMA_FROM_DEVICE)
+> +		expected_len += blk_rq_payload_bytes(req);
+> +
+> +	if (unlikely(len < expected_len)) {
+> +		u8 *status_ptr = (u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1;
+> +		*status_ptr = VIRTIO_BLK_S_IOERR;
+> +	}
+> +}
+> +
+>  static inline void virtblk_request_done(struct request *req)
+>  {
+>  	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+> @@ -362,6 +376,9 @@ static void virtblk_done(struct virtqueue *vq)
+>  		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
+>  			struct request *req = blk_mq_rq_from_pdu(vbr);
+>  
+> +			/* Check device writable portion length, and fail upon error */
+> +			virtblk_vbr_set_err_status_upon_len_err(vbr, req, len);
+> +
+>  			if (likely(!blk_should_fake_timeout(req->q)))
+>  				blk_mq_complete_request(req);
+>  			req_done = true;
+> @@ -1208,6 +1225,9 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+>  	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
+>  		struct request *req = blk_mq_rq_from_pdu(vbr);
+>  
+> +		/* Check device writable portion length, and fail upon error */
+> +		virtblk_vbr_set_err_status_upon_len_err(vbr, req, len);
+> +
+>  		found++;
+>  		if (!blk_mq_complete_request_remote(req) &&
+>  		    !blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
+> -- 
+> 2.18.1
 
