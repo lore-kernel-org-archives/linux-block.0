@@ -1,147 +1,112 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128371A9B4D
-	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 17:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A127D1ACEDA;
+	Wed, 14 May 2025 18:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747244969; cv=none; b=UMHPtgiA7D3mEczoMUEsYbvsjAL0HIfkXNhnW9S/f4xxY0SAj2IVn1HQ7UQF1qXvpgpBkOYLyG/MqTwNqXt3pVEAembL+vXv6FjmNWpeZgFA2LK9jyzSoJLyaR12MBE6Ut8USAn69buKLe59Oy76DgyRanIRZE1O3VFhfFgMF80=
+	t=1747246825; cv=none; b=mzYkruE0O4iQeGiRJT81v2a+VXXDz2RX8th0vFAO5XL2qPh6JKZCci+r/J8z1G0ZjEZoRcPE0QgCkz7L5COvcyVcCkUkBXS0SuVO6LKwUuWjUW16JpV2Tp2wwsLTfu4AS8xnXKCSdE2k/hXhoYrIdNHQVEOkVexYq4gnjPWnjEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747244969; c=relaxed/simple;
-	bh=LxTfSd/7IAwsDPnzSG3cxLZevfygYzh7L/1opFHyldA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FEnbUXC7iRVsTuprnM9wqVfyI3tI1Q9IhnjNLV8xEmHhTnpfS4Fe4el2Lv3eM2+GCJuYgy3Obgn55vhLYHe0H0hmmwjBU0wMbBMFk4RLtKSpKmRSmV0OxmInIQiX3w/COo2cYFZQJoIMoWdY6KxYZbjknS4YiSamOxePYaKk2gQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=c3z0KGJT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=k5sUYedm; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=slKEHsve; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MN5gXTrk; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1747246825; c=relaxed/simple;
+	bh=LShLumqkihJQzxK2oSUHJJEnrPGHQ9OvLbKc+cZLSzU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ae5b0zevEsUQiARnRC5f+Pf06Jvpv8ukz2JwRo+KYNiugSTeDofRyNQPNi9pTUJ4jIGbWgJgBN8alhSMa8SlloJjIJy/vJwahhuNHIiXbmhqzrC7KZUoIHgAwZTBrfavPDnqvfVx5pss9E9BckHbqwc2Q10eet9AWO1HFsCvXyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kE05pZ4+; arc=none smtp.client-ip=209.85.214.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="c3z0KGJT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="k5sUYedm";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="slKEHsve";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MN5gXTrk"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 130111F399;
-	Wed, 14 May 2025 17:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747244966; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DmGO+NabaKpfrrkQS+LCDqhwMzhbABcI3RxnkP+9bj4=;
-	b=c3z0KGJTV2vnFpdTSyoUNzljvLnILUDEMaasdHw6Oy/kgmK5QP/4WAG2U5oGk/5IHTzO80
-	QchKXHJ42LcNvWBb95zDXyUHEY8mFVS7vrpd/7W2cphVwkywbvRDTqjCmDLElXUJl2VEAc
-	To3oJEh5ubYJIkUefzGn20v+kPsgd2E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747244966;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DmGO+NabaKpfrrkQS+LCDqhwMzhbABcI3RxnkP+9bj4=;
-	b=k5sUYedmbXgKVYrKaS+vGV9REJF5079skawrmBEuivZnSzCWop+lC8+K9qbKY4J5EVM6hz
-	OsUhOKvlfZSR4FCw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747244965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DmGO+NabaKpfrrkQS+LCDqhwMzhbABcI3RxnkP+9bj4=;
-	b=slKEHsveynpUG2MSh7A2qlx3v72ZYhuw7/NON85cE9u9CLH0L3QIoV+Qy0HNHySNg+6SKm
-	L/EY/qawjhjhgFQIxsc3Q8KkB4VO1eYwU5v565MmjThEAK/pTrDyjMfnCIFZAei3XH3wac
-	EUXiwfN9YHqXZELr5ZcFf3jdeOEpeZ4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747244965;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DmGO+NabaKpfrrkQS+LCDqhwMzhbABcI3RxnkP+9bj4=;
-	b=MN5gXTrkQKzK9YZEOjvXI5BWfonVrNqEbB2mOKVNSZWDE28CQr9myrvNbNCRc63QukAJIM
-	z6O/jWSZdT7tvwAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DE9A413306;
-	Wed, 14 May 2025 17:49:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9B1SNqTXJGiNUwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 14 May 2025 17:49:24 +0000
-Date: Wed, 14 May 2025 19:49:20 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Waiman Long <llong@redhat.com>
-Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Costa Shulyupin <costa.shul@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Valentin Schneider <vschneid@redhat.com>, 
-	Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
-	storagedev@microchip.com, virtualization@lists.linux.dev, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v6 7/9] lib/group_cpus: honor housekeeping config when
- grouping CPUs
-Message-ID: <770522cc-79fd-415b-9f4e-f25f8c73194e@flourine.local>
-References: <20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org>
- <20250424-isolcpus-io-queues-v6-7-9a53a870ca1f@kernel.org>
- <cd1576ee-82a3-4899-b218-2e5c5334af6e@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kE05pZ4+"
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-23198fcdeb0so1226425ad.2;
+        Wed, 14 May 2025 11:20:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747246823; x=1747851623; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QgkpdbQA01DcUJClm3tXU5YnYdU7zJmZW671sYK0pa4=;
+        b=kE05pZ4+kcnDx7WisPilNjoMXufMMNgTjFWSwwZA8gviVvIcXCCQf3d3R153ZQl6zN
+         v0n5pKtwSobrdcRjUfOyrgVbzAq5Lo956vW3MMei6RHRihM2sCGlSL2366dym1GBjfOV
+         ecB36o3usXfCR9rXVLlKyaD4HlSep9Qr5GJTnLyHOqx0ReWYu7O1TyiwuQdmzB7Y9Zmv
+         QRIsfT2oiQuh/C0E++AbuRhf85X+v3oSyxpd0v9UrJfJp3MVGp30vzShGlxtI2s3SKoj
+         IkCwbar3r3kg7R79yz2TU2PIi4NqnDAdLuo2iJP1NZDer0e8qg0VgAXzxMxIDIL5m7A7
+         Cc/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747246823; x=1747851623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QgkpdbQA01DcUJClm3tXU5YnYdU7zJmZW671sYK0pa4=;
+        b=N8IDg83o2Q67noV3IsSOmSuChdgphFxmGQ9pBAJUSmpQebLsFsXaZgtEpw+wc1glXy
+         adZP7EqZ5FEfAWLh27ptrsYKwxeT1sr7wAuyp4BpEw5DT7etokERvC50BtuGqSzOU0gq
+         PWEMJGmHnGdsLcStYgAjlaUM/EgJN1ayNDKJvnrmXRXFqGe9Jalvv/HDlb7DCmy+nzQ1
+         QLxivAIIEsE4DOW7DCMYZJbdKRf6At4QJQcDM1rrIj8jCnoqenqczQmHlg+ZUXf2uLTv
+         5mxzbkIo6g4VWfHrRQ+fALgdiuGwrjqmsG7uDU6D+ulhqNJUPTM95L3EHF8RXX0+KVpV
+         XOrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2k10+nK051F65TGwGH7fKr9u3Xkd9LRojKUTou80ZzjXnMdMpVjeRQbV8SaA586d4ZGPzb41q00s5@vger.kernel.org, AJvYcCWMgjkWhZ1XNypPdlTv9hlYsu0c/s35XhiMud1bpmC4y9V1tCe4XjcYQ2nfMnLyEPW333Dcr9HzWTsCA0M=@vger.kernel.org, AJvYcCWNS6F2Mfs2ct26EiRokfh56NMzGvQ78EG8XEpDHbFgU7IOokXktvDUj+GU7wMRNs4sio7GKXEFL+8aHU6x@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2i8UfAIin8KMBuqlp6Dr/9q9Vyx87YcuZDFZgpTZpeec9ZplV
+	kKkAY4Mm47cAhUmkAL10YVvE4ziygKQXqeFx5mwRteFxUlJtvEDPuv7oC9lD
+X-Gm-Gg: ASbGncv2S8TaqX3H12gCkPuYzIDkqar0LZItbOjGiZNp+2eQVlpwxh8GuGNHvwizq2V
+	8RZneZ38SSM8KpZT/q2b42gMiNa3eiWrtSkkh/PyKhpyS5xvHb774oAGao2BhF+KePyCSmGkpDn
+	K0PDnlTGLHugZR/u+9MgwnuF/JjKt7toJw0RDqtiEIZ2rO/KTvHRex7sEYnBKIDpypdKtg6bhx9
+	gwjKBz59jeLAAGThy8bQ5u/IP37HiIaHp/TKAtZM726lQWZu2I7C0LhnQ5LyYz2WAzxJZ43VyP7
+	BekOt3vHWUJ8pyuF1Nss5BfvMx+S6RDuX9BrnKIqY5B+dFOeTgFaXAtaQS2PaTalgsS5Cw==
+X-Google-Smtp-Source: AGHT+IFN9UctYMQlaAiLxuxtHAyS1yTR41k3TKQuKvdDE0nUJljmffGv5faKmGgk4C8wB16wzDcS9Q==
+X-Received: by 2002:a17:903:234a:b0:224:a74:28cd with SMTP id d9443c01a7336-23198124c72mr53403505ad.31.1747246822676;
+        Wed, 14 May 2025 11:20:22 -0700 (PDT)
+Received: from sid-Inspiron-15-3525.. ([106.222.228.33])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc828b422sm101914245ad.186.2025.05.14.11.20.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 11:20:22 -0700 (PDT)
+From: Siddarth Gundu <siddarthsgml@gmail.com>
+To: idryomov@gmail.com
+Cc: dongsheng.yang@easystack.cn,
+	axboe@kernel.dk,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Siddarth Gundu <siddarthsgml@gmail.com>
+Subject: [PATCH] rbd: replace strcpy() with strscpy()
+Date: Wed, 14 May 2025 23:50:15 +0530
+Message-ID: <20250514182015.163117-1-siddarthsgml@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd1576ee-82a3-4899-b218-2e5c5334af6e@redhat.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[flourine.local:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.30
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 06, 2025 at 02:18:32PM -0400, Waiman Long wrote:
-> > +static struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
-> > +					      const struct cpumask *cpu_mask,
-> > +					      unsigned int *nummasks)
+strcpy() is deprecated; use strscpy() instead.
 
-> > +struct cpumask *group_cpus_evenly(unsigned int numgrps,
-> > +				  unsigned int *nummasks)
-> > +{
-> > +	if (housekeeping_enabled(HK_TYPE_IO_QUEUE)) {
-> > +		return group_mask_cpus_evenly(numgrps,
-> > +				housekeeping_cpumask(HK_TYPE_IO_QUEUE),
-> > +				nummasks);
-> > +	}
-> > +
-> > +	return group_possible_cpus_evenly(numgrps, nummasks);
-> > +}
-> 
-> The group_cpus_evenly() isn't just used by block I/O. So you can't make it
-> check only HK_TYPE_IO_QUEUE here. I will suggest to make it a bit more
-> general and add helper function to specify the isolated cpumask the caller
-> want to skip.
+Both the destination and source buffer are of fixed length
+so strscpy with 2-arguments is used.
 
-Okay, in this case I'd make group_mask_cpus_evenly a public interface
-and drop the houskeeping bits in group_cpus_evenly.
+Link: https://github.com/KSPP/linux/issues/88
+Signed-off-by: Siddarth Gundu <siddarthsgml@gmail.com>
+---
+ drivers/block/rbd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index faafd7ff43d6..92b38972db1c 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -39,6 +39,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/device.h>
++#include <linux/string.h>
+ #include <linux/module.h>
+ #include <linux/blk-mq.h>
+ #include <linux/fs.h>
+@@ -3654,7 +3655,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
+ 	struct rbd_client_id cid = rbd_get_cid(rbd_dev);
+ 
+ 	rbd_dev->lock_state = RBD_LOCK_STATE_LOCKED;
+-	strcpy(rbd_dev->lock_cookie, cookie);
++	strscpy(rbd_dev->lock_cookie, cookie);
+ 	rbd_set_owner_cid(rbd_dev, &cid);
+ 	queue_work(rbd_dev->task_wq, &rbd_dev->acquired_lock_work);
+ }
+-- 
+2.43.0
+
