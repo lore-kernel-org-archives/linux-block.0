@@ -1,136 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69C120E026
-	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 07:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181142253FB
+	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 11:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747207757; cv=none; b=JX3uA0EypGYGTYq58EJyC5b16oKLDDc4M8okKM1Jvz5m85CnR+sQoOrTJNG1bM3IcegXYIvXtk/Qw6+128NRigz2pnfp/5OSPMNY99MGfwRPaduo1T4AputYCbnkNEClGGZTwVLHUyZXZEKgJvbVq2fB4/Z0b57KnUHH95L2B8A=
+	t=1747223087; cv=none; b=WuL9uClC/dd+KUuBzrfulIXaaaar2fOJUO6d+LuXj9RmhrXaga0Q8T1uKu1y2fIV6mg55UeV1YJYrosptQYqD9DPI0utd2u2gKPAQpAVk9V4MpMdZ+7obvsBmSAmTk5DSNr59HZlkt4z8DYE9w7hXZSlJJpx4jhlH3AEbDjzz4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747207757; c=relaxed/simple;
-	bh=WY9nxPgCvde8fX6n7zhRAyJTTq9PldQtI0rtg67w0yE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qhZF2UqhW+z2zYlWuIvx8MHpJXLeAhdTFs4B2RsvQ9fwI3ND/IjHJoJF37rALezHiCV3LHqj1wp09c6Ic0t/5HEHFmGmAVotPoEg2FUsaq11nXlQs21D+tTunpxKQl78EMKnBWd0OGimZs5qK/gFi9rH7v1PYuTEAp4vbd+IflQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kgh4HGDO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747223087; c=relaxed/simple;
+	bh=CtIPS/hKLdU/F6w3T5VT9pOXUurgZ+Di58tMkLUT3ds=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=p0P2A9uWDbhwHMO5AZTrskXVttMiy2luz6SOGB7U2aT23ObWz0cpdvu55QUn6W7yATiSsOnFr/3mJKjZvUhjYSGgot0NZBsjlxAdAVjlIhzKSHLdkvbNkzA4paAZ9K/74cbaEkx5VaXedK5o8A8JVzOSOFv044sPt1FEoyhC45k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hWBzoaGe; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kgh4HGDO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747207754;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WY9nxPgCvde8fX6n7zhRAyJTTq9PldQtI0rtg67w0yE=;
-	b=Kgh4HGDOqszb19RmdeCgIrbvN7pIHMv3Q79AFAGO604RHXomqVOyev4EWqnbnLC5mAM1cO
-	jopO0AoqWIhdSqqAMUJhf5IGA8dR1Dld3OF2B74NWybHz8Ne9EQ/NeNe3+y2hvz837xj2+
-	G6ZB55yD+4uDowohzP0HMH8dh1G7QmM=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-mJ6Nf5TBPYWoMjNx7TNW6A-1; Wed, 14 May 2025 03:29:13 -0400
-X-MC-Unique: mJ6Nf5TBPYWoMjNx7TNW6A-1
-X-Mimecast-MFC-AGG-ID: mJ6Nf5TBPYWoMjNx7TNW6A_1747207752
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-30c371c34e7so5724044a91.1
-        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 00:29:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hWBzoaGe"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3da82c6c5d4so43519625ab.1
+        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 04:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747223085; x=1747827885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1NfGL5UGYpWD1+PtheuzgaQ9BfAKYj3Frz5hjYBHz0M=;
+        b=hWBzoaGeM09NFZPa2Z9KE0y9noPgfLA1HHW5AObmqr8WndH3F6x4pV4KbS5CYSDAqX
+         sVaEseYogGT7bzEodTlR3iOMveMQsaN/juxlmbwxylAz7jH+l9BUNwkCk0B9JFkm155s
+         mA0G/CeubVJ6SY/6kXWt4maShj0lt0i1O2IH5PRgJOxPbkau71+W0mNJ/eEFyW2/zSlw
+         sAaG9wjRukaIGja5hVrcED1s4Nby+m0ZF3p6vxVdwL396AFTsfdfF75rqEpsqo4WHKG6
+         jg1d+ZfLZZn/c5sk7/7fJYGMdwEXE6VuSWY3ARk3hX3J7xlliJ/urpHDgbVJiMHHByuY
+         LmNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747207752; x=1747812552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1747223085; x=1747827885;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WY9nxPgCvde8fX6n7zhRAyJTTq9PldQtI0rtg67w0yE=;
-        b=XXYabt3VCDXYEtkmXl3q7WCE1rqY2H3DsYuPcFVOzf28zwnIayyJ37DEH8LDDHvX9X
-         A1uNctM16k4rdGgnzMReKZCdTcwRLMbkwRY3WGwF4/Mfs0YnVNtH0H+sNkNLWHlTTYuX
-         L3kd8j/JP0aKJCvXwLcElQEokjeve7oNHjf6fue49ma6FyByZPRttOK5e2VfT7rLVjRx
-         avPblEENAlqW0pZlKXYYC8UoFYlicSlXUbKhgbF7FB8Fzy/V/TQ2kvKc8WWi0J7vZ7Sm
-         A5aggNjH4cV1b6FCfeA6n9UWqZw6azNSM/dhFQpt6yAaSiwGJmunkMdA/kzcIVjDC2cm
-         TNCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxJnlPTGg27CpFEZ2Xz7aypr/T/qEsRsMUnp1Vk4YsITtm3Prf7A04HR2gBpCB7to+Y9uWwEhVSxs65w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAsB5swAcvIWqw+fNplNAas4GmuxxEJ49eMik2xOILFyw5Y5gb
-	+mNYuGfBMYflBJ01JDiJuh8Shf2j4vOZ0SSIMmfYEfPgw2jslbIDT7x0s7OhMPmW1Ecd0Arq0Iw
-	CquZ6taA188+YpTO1XxY+j1C4XorpKZ+5ke+lmN2/jyTy52iKRqH8tUI9FClqF9KkIKEZ78Cr1b
-	Uu2remcDGYj3igtILLw6aTPeJvub+KNnIq43U=
-X-Gm-Gg: ASbGncsADaUFI3kRdskjmctsYsStqjclgFPJc2hBQW/cKk8bLfOuqTTZJgpqyP22RzI
-	BIhW9nkHZaOfiXG/dWaPv5XjxG0MOREJKVOTyD+WGjF8xfhz7Sgz1IyI35qiv62SKR2snlW7klJ
-	xTXfQvUc0ERs3m3qp1m/+T2+5wog==
-X-Received: by 2002:a17:90b:58ef:b0:2ff:64c3:3bd9 with SMTP id 98e67ed59e1d1-30e2e625f04mr2998508a91.23.1747207752301;
-        Wed, 14 May 2025 00:29:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErZhOIhtd3hI4AKZUHoezz+kYbi9KNoNaaRDKtt38OZ6UI/QdvxrBZC4rk+6QrFDTtDOghmI+q8BJtDQ8PcGA=
-X-Received: by 2002:a17:90b:58ef:b0:2ff:64c3:3bd9 with SMTP id
- 98e67ed59e1d1-30e2e625f04mr2998476a91.23.1747207751899; Wed, 14 May 2025
- 00:29:11 -0700 (PDT)
+        bh=1NfGL5UGYpWD1+PtheuzgaQ9BfAKYj3Frz5hjYBHz0M=;
+        b=P12Y4gvkvCnCEqLpkmW2sjB5c9M7LcB1f0VD72gWLWEBGdWrIJeETUtxJM5AKWONYI
+         WkdgbD5kr3HDaVfueFd1YssHYow1dlr1PSn6ectshYRX8DiDJWOiByZl/ndgatYS3wTh
+         96+iPxiumSmMgMhuaC1ajC7dOr9rvhw3FhifZ+jPVLy5VhKeKwp2fbZS0OsPHkpywkU9
+         LeKNBSLnwLN8Z098PjbdX+q24tT56OlbdvzM6J03UtZ2K0DYpi61eigMVsXmTTvb6rYO
+         697NfZ8E2dz2mNrWIKVltxcTRnYh8fDJb/3g8H/eGYr/7dW1w/Pd3h5vldflrwmOb2BK
+         0oIg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0TtM18p71ZspWey9nDf4UrRRFdgCI7/ILf9zHSD0if400pJbx9MQ86T94kD1nYlX6QvWBepwIlPVREg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5PrGxNFrxaVqFMgx+0EkS8DPIB3D8SwiWw4DXBqhfl4viuw2p
+	UGimm3dw0sHLKsmgyCPV09lnLkWz0XlWoYaKC7gT6kewwUjGxLtJlTLwuE3LOPg=
+X-Gm-Gg: ASbGncsxEVuAF5149Ea0U/hr2gRcxQ0Wh6m36DGlJ0UQjREuXDQjDl2vQ+M7xMEf6BQ
+	amg86G53cywUtGnvo0oomcJ7l3C83LcTsAnbjhYEjQio0B3y1Xb39Vy2ooIoQC1oozUYvhBl0Uh
+	240DYmFGV0MWdWTAzbupeVhaccNecj7JtGY1VHvdEkmuBMNH9/n+I6Xw1NNPk57TW8VKmH9Q4y6
+	qEKkv/bGC0rBE0kakxPHNzNkYAV2BuVRYx1r8xpdtPC8MthhRZIgIwnWL7aDxyvY0CkQ/dxeoJW
+	LR794RIf95XQSi7Q3eU0AH4VtOxeB83sNKUJ167XRcs=
+X-Google-Smtp-Source: AGHT+IFj/J89/IEtP0qvOubE/HRqWUhe1V/jh3bBm19Nx9qKHrI0X4MPceNHXOrbKARdcImnJ+G7mQ==
+X-Received: by 2002:a05:6e02:2606:b0:3d8:1cba:1854 with SMTP id e9e14a558f8ab-3db6f79a452mr34387775ab.1.1747223085022;
+        Wed, 14 May 2025 04:44:45 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3da7e161d47sm33988065ab.62.2025.05.14.04.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 04:44:44 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Daniel Wagner <wagi@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, 
+ John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org, 
+ Lukas Bulwahn <lbulwahn@redhat.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>
+In-Reply-To: <20250514065513.463941-1-lukas.bulwahn@redhat.com>
+References: <20250514065513.463941-1-lukas.bulwahn@redhat.com>
+Subject: Re: [PATCH] block: Remove obsolete configs BLK_MQ_{PCI,VIRTIO}
+Message-Id: <174722308378.101960.14079135866679670041.b4-ty@kernel.dk>
+Date: Wed, 14 May 2025 05:44:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250514065513.463941-1-lukas.bulwahn@redhat.com> <a0c3a812-8a24-481c-9354-4475ac71d68b@flourine.local>
-In-Reply-To: <a0c3a812-8a24-481c-9354-4475ac71d68b@flourine.local>
-From: Lukas Bulwahn <lbulwahn@redhat.com>
-Date: Wed, 14 May 2025 09:28:59 +0200
-X-Gm-Features: AX0GCFvvwL92M4FGbZOgsDbYBNn-v06sRogm_7vOCHV7R_FGPG5EmYFbXDI9rTs
-Message-ID: <CAOc5a3M2Nvv0oREzWN_kzOJqt4s+0zzmqWdG4tM58RJSWAb4BQ@mail.gmail.com>
-Subject: Re: [PATCH] block: Remove obsolete configs BLK_MQ_{PCI,VIRTIO}
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Daniel Wagner <wagi@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, John Garry <john.g.garry@oracle.com>, 
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Lukas Bulwahn <lukas.bulwahn@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Wed, May 14, 2025 at 9:10=E2=80=AFAM Daniel Wagner <dwagner@suse.de> wro=
-te:
->
-> On Wed, May 14, 2025 at 08:55:13AM +0200, Lukas Bulwahn wrote:
-> > From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
-> >
-> > Commit 9bc1e897a821 ("blk-mq: remove unused queue mapping helpers") mak=
-es
-> > the two config options, BLK_MQ_PCI and BLK_MQ_VIRTIO, have no remaining
-> > effect.
-> >
-> > Remove the two obsolete config options.
->
-> A quick grep revealed that there is at least a test config still in the
-> tree which uses BLK_MQ_VIRTIO:
->
-> drivers/gpu/drm/ci/x86_64.config
-> 108:CONFIG_BLK_MQ_VIRTIO=3Dy
->
-> Not sure how this is supposed to be handled.
->
 
-I noticed that as well, but that is really yet another clean up.
+On Wed, 14 May 2025 08:55:13 +0200, Lukas Bulwahn wrote:
+> Commit 9bc1e897a821 ("blk-mq: remove unused queue mapping helpers") makes
+> the two config options, BLK_MQ_PCI and BLK_MQ_VIRTIO, have no remaining
+> effect.
+> 
+> Remove the two obsolete config options.
+> 
+> 
+> [...]
 
-Generally, these config files in the kernel tree are ill designed and
-terribly maintained.
+Applied, thanks!
 
-They are ill designed, because when they are created, they are dropped
-as complete kernel configurations, whereas they intend to set a
-specific fragment of options, and have the rest as default. That
-creates needless large files, distracts from what is important in
-those files, and creates some record of the default of various options
-at this random point of time where the config was created, which now
-makes the clean-up pretty complicated.
+[1/1] block: Remove obsolete configs BLK_MQ_{PCI,VIRTIO}
+      commit: 1e332795d00655305cf0ae40be4e2eaa9a399d79
 
-They are terribly maintained, i.e., the command
-./scripts/checkkconfigsymbols.py | grep "configs" -B 1, will show all
-the references to config options in those config files, for config
-options that do not exist anymore in the current tree. In the current
-linux-next tree, there are over 200 references to non-existing config
-options from such config files. At this point, I do not worry about
-adding one more such reference in one of those files.
+Best regards,
+-- 
+Jens Axboe
 
-This whole proper clean-up of those files is a larger project, though;
-maybe for some later day.
 
-Lukas
-
-> > Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
->
-> Reviewed-by: Daniel Wagner <dwagner@suse.de>
->
 
