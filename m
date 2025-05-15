@@ -1,118 +1,127 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA4B4174A
-	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 13:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD6A4B1E41
+	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 13:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747316727; cv=none; b=LJpd1RlfvPlG28HKgxNh8F3278ywXIpxq0JVMnBFKZ7/HkMP0k3+e/05Vx6Z1cwKrencgf9hI+M3GoUl9damWQV9VWYeeboBHm08qV+3VLw+GAvvbOUvLXZ4260DRJv8a6gHPKyln1dUzBpbbynlCdexX51GaHcQ+mocIeYgG4g=
+	t=1747316853; cv=none; b=N+wJPI4RJCvwejm4YzXZP54db5DCUX5fiWpVGgrnOqICV9RNTQ5hnRn9/Ohp4yZJd6h99QwQ7pGLZ+V2GSFfJuJVM8SpfG8yiZLKhKF4ykBIFxEyaWqCLP9jCqI92Fe8iQCKhwwhEQCTJwxrAOmiEXMtWbByqVVeDGhDMrNIgNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747316727; c=relaxed/simple;
-	bh=q2ET9/+bt9Vsa8AzZ/oFr3h320hweDn/KGwxG8vX0J4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cZ5gjRbyZ+8WhShleCg8L+EAipIKg3DwNAdRlBXJJ+JuZPL7GzREebN5AazeUUK8Jxi8LtDH8v944x3yy53aA6QBlQD8VuVGXKMTMqB0940ILl0/xanq0ShxFHAmXcyLE699d47edFj6okEV43ZQcj+NyMw+R09FnXKD39vGFTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cArfjUCc; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1747316853; c=relaxed/simple;
+	bh=4ZrF0APFhrMgIHAqsve+BN1SiVoV3kDNWUfsW2Gk7Io=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=ETyRB76sgyIAWZ6B8eS23qFBI7H8TjKs9GSaQyJNwEFdIsOyzqoLITZEEw03d2GTRANm4UjHuw8Il4ksi6JuyEBqpfTd2BDAe7w0PEcT/9PF22cS64eWVcpqZZzcd0EBfmQsV6f0S0MbDTqhSCPixjQ0njQAkMGaS4RzDOz3TDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=biozm+4w; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cArfjUCc"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54FCg8nm002405;
-	Thu, 15 May 2025 13:45:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=kdS23tOsPLpqZdLQGNakVcWlKLUAKKDNbZMv5lebe
-	wM=; b=cArfjUCcAqRHz1IR+1ERQggFwfUExhvtJjTPGeTtAQulnZBI3siCoQhFU
-	6gMuoFeP/IlGLl7hH7JJxS36K2z2RBUZDnY9O/KG3t8wv4qRIFAJdF+wx5XtjMBL
-	6DXJEmPLSRG8ll0I77duUEW+wb1bJv4yQRTbKsw9YZSqt7VGy4K69mIBP0mGQ4UD
-	5bM65zXRjABIipUVdWmOAAYXFlsNnvLL1MVzZzMpSdbZfYYmyKkq0bon+5z9piNp
-	wd9UcBhCHWnzrS6hNRMeXOE82IdO16eHkLtmBvAZ05Lq2K7z2k8/4KBarWP157on
-	MSznGpWo5skr8xQD5kwcDcLSikGIg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46n0v6mqw4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 May 2025 13:45:16 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54FAlGJi026939;
-	Thu, 15 May 2025 13:45:15 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46mbfpjfpd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 May 2025 13:45:15 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54FDjEnu43647398
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 May 2025 13:45:14 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 01230200C8;
-	Thu, 15 May 2025 13:45:14 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A5734200C5;
-	Thu, 15 May 2025 13:45:12 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.223])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 15 May 2025 13:45:12 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com, hch@lst.de, hare@suse.de, axboe@kernel.dk,
-        gjoyce@ibm.com
-Subject: [PATCH] block: fix elv_update_nr_hw_queues() to reattach elevator
-Date: Thu, 15 May 2025 19:14:39 +0530
-Message-ID: <20250515134511.548270-1-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="biozm+4w"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7426c44e014so955967b3a.3
+        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 06:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747316851; x=1747921651; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=J0YhKGodUV/0q2pt8iV2yRhh8Df+ryeJNwrffyqF4gk=;
+        b=biozm+4w+re78dtz72Uaz3sX3SlfPJWKmXxyaLPsV1WNsF+I5SNsZeU9eAC5HMIYi0
+         mSqkZC5cC0GihQMz+xXGpkfkSzGKzto5ElhPwz2k1uVbHBBveCMFyjv5CZRtefwYoxRU
+         aPkeFLTtLqJ0mgF29njCfTZQjR0+pEbbB3df+27kNKzGtKU0p1I0h1sCe2g9Pge1M/J3
+         sDrDRcPflLUtpGNtMNbxOPy6IaWs4BhG0rZhYHbO7W2sIHfuOi0cnmiIZ9nOJk1aOYkh
+         iASddNMImWEC11qAuO1buOaQNr4NGu7QAI8SbQbL7fobA90SXDLKovupraQueHpZQtUR
+         g2RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747316851; x=1747921651;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J0YhKGodUV/0q2pt8iV2yRhh8Df+ryeJNwrffyqF4gk=;
+        b=CV0a+iOcVkr1XsE0HC76aBw6LWpx9qw8eyyp97kIb3dzFlbFafgU1poIGgZNGvBNyQ
+         jurYuhcBDozcPvFEomxx0GuEXnHpzCAwiu6X3Chsv0tUlkUgO4mMgJ5pxcDeSdfs1y/S
+         /MFNoqh9WUEjhq3oqTXBP0CItX1Op6qMMiImEn+ozbDe7b4goTsoAfoCK86bl1/Tw9a5
+         xk52PRnJ2Ojtg1W1TpTTzPgJSHkB/9eT2SOU1MyoHJ8eodQmpjyP/fJF6mosBWaDcygu
+         o1bo+P2LC1sIyQJW5OW3qKqU9/JBajVhCIi5Qt3vwT3fsbzG1+no7kWR/ZYjSkepIahk
+         1QYA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrz/lWhaeZShEnPK/fmM7jL3BRi/eGllwtgh8nDwVP4IrdW4qOpMMGEyVQkdqIm43/hywscrs71uwktQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMT62snZmEEA/kmLXWJJRdaBsc1Dy0pNkmC7JORQiNwT9FaQsH
+	hqmkbYgC/cyPyB+rvHquKQytEw9+tVeKXKitZgXWX4Y0R/IeTnfMDJ3H9I8zHhGrZg==
+X-Gm-Gg: ASbGncuwcLcQKNgm3BDp2k5f6fT8tGB4oG3QfwmV9RWlihM2VqLzsX0t20PnNr3fMJ/
+	kMehFINuRbzrKHRRiZFw8UETWtk40+di/vz0lUvk8EjDuLmxeNC3NAUwzmJB1PypUrJ+mPbPGwt
+	mKIEM5a55q7HqJXEX7ONEMyCATuVrjwugC7P0ABO9gT+syE1P6wOK5WcxrWEnJ/ODO5QLAX65/P
+	BXqVe/yGBwWlz52TaW2k5iVHaH5t9FQkh/XXKkAdpV1gmkbnifE8U5hPO0RNfqz/ro5qAcTFocf
+	YuYeMIiLg5UaldxPjEB3NqyHqAsLLynHvvaTTVN8nA8Ckw7bQ/M=
+X-Google-Smtp-Source: AGHT+IEpyHJoBB4dmhaedmwTZgOUMqpUUgWGbygHY9za/uKYFLCs1scIBeDT9k/HepXpP2WDmQZJzQ==
+X-Received: by 2002:a05:6a00:a83:b0:736:6ecd:8e32 with SMTP id d2e1a72fcca58-74289377eadmr11356450b3a.21.1747316851409;
+        Thu, 15 May 2025 06:47:31 -0700 (PDT)
+Received: from [127.0.0.1] ([103.56.52.49])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74237a97de2sm11617779b3a.175.2025.05.15.06.47.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 May 2025 06:47:31 -0700 (PDT)
+Date: Thu, 15 May 2025 21:47:23 +0800
+From: Yu Kuai <yukuai1994@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Aishwarya <aishwarya.tcv@arm.com>, wozizhi@huawei.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_for-next=5D_block/blk-throttle=3A_s?=
+ =?US-ASCII?Q?ilence_!BLK=5FDEV=5FIO=5FTRACE_variable_warnings?=
+User-Agent: Thunderbird for Android
+In-Reply-To: <0687b8cb-d543-4166-9d92-d22fc7188707@kernel.dk>
+References: <0687b8cb-d543-4166-9d92-d22fc7188707@kernel.dk>
+Message-ID: <4072C2B2-4D09-4C64-ADC0-AB2F6BE37C79@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=IqAecK/g c=1 sm=1 tr=0 ts=6825efec cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=cr-Vr6duBYozg7E4TfkA:9
-X-Proofpoint-ORIG-GUID: 1k7XDSEDDzHV-oLN6Yjwx-mz3T-u8Out
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE1MDEzNCBTYWx0ZWRfXwCLi80tcSdAQ 5860CdrseLAFlRzIAH2R6BCymrcU6xjqwvUTu7yzrcQ9KQvanhbRwME5IinAu20rko/TsmdaZ4S jcyvsiyq5aZ58HoP0Jbloj7wk/sBJfSbNq5guuGKfQZ5Pb8DEi/3/IeTRzKQTg1hwEg9/HvM3KV
- kIG/Em56AzBdG5/paRcenXWPx9kCK37XybfvBPDJEftCdtlk5h2ylTr4Y11fyujrPtjgVNtmQRY E4WldCrx1TwjowC1xPScFirQ98hxNQRuUQBktd4kIRW0TWz2Eu0ZIkPosNJZtvu/KE7KAlU5NUB L4oMZkSFDRwTOuy7Y4w2JEwfx8VqObi+xOpugOfuINbM2ddQ1FfYjL0a3GYu1ViNs2tVknWOZvH
- URkXN+UhPaVrrm+T/6buBenIrvzgdltC2SKtGsIArL+eh7S62Jwti/UpWZ7XSDgfGFs6ozzk
-X-Proofpoint-GUID: 1k7XDSEDDzHV-oLN6Yjwx-mz3T-u8Out
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-15_06,2025-05-14_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0
- priorityscore=1501 clxscore=1015 spamscore=0 mlxlogscore=999 bulkscore=0
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505150134
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When nr_hw_queues is updated, the elevator needs to be switched to
-ensure that we exit elevator and reattach it to ensure that hctx->
-sched_tags is correctly allocated for the new hardware queues.
-However, elv_update_nr_hw_queues() currently only switches the
-elevator if the queue is not registered. This is incorrect, as it
-prevents reattaching the elevator after updating nr_hw_queues, which
-in turn inhibits allocation of sched_tags.
 
-Fix this by allowing the elevator switch if the queue is registered,
-ensuring proper reattachment and resource allocation.
 
-Fixes: 596dce110b7d ("block: simplify elevator reattachment for updating nr_hw_queues")
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
- block/elevator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+=E4=BA=8E 2025=E5=B9=B45=E6=9C=8815=E6=97=A5 GMT+08:00 21:42:02=EF=BC=8CJe=
+ns Axboe <axboe@kernel=2Edk> =E5=86=99=E9=81=93=EF=BC=9A
+>If blk-throttle is enabled but blktrace is not, then the compiler will
+>notice that the following two variables are unused:
+>
+>=2E=2E/block/blk-throttle=2Ec: In function 'throtl_pending_timer_fn':
+>=2E=2E/block/blk-throttle=2Ec:1153:30: warning: unused variable 'bio_cnt_=
+w' [-Wunused-variable]
+> 1153 |                 unsigned int bio_cnt_w =3D sq_queued(sq, WRITE);
+>      |                              ^~~~~~~~~
+>=2E=2E/block/blk-throttle=2Ec:1152:30: warning: unused variable 'bio_cnt_=
+r' [-Wunused-variable]
+> 1152 |                 unsigned int bio_cnt_r =3D sq_queued(sq, READ);
+>      |                              ^~~~~~~~~
+>
+>Silence that my annotating them with __maybe_unused=2E
+>
+>Fixes: 28ad83b774a6 ("blk-throttle: Split the service queue")
+>Link: https://lore=2Ekernel=2Eorg/all/20250515130830=2E9671-1-aishwarya=
+=2Etcv@arm=2Ecom/
+>Reported-by: Aishwarya <aishwarya=2Etcv@arm=2Ecom>
+>Signed-off-by: Jens Axboe <axboe@kernel=2Edk>
+>
+>---
+>
+Thanks for the fix
+Reviewed-by: Yu Kuai <yukuai3@huawei=2Ecom>
 
-diff --git a/block/elevator.c b/block/elevator.c
-index f8d72bd20610..ab22542e6cf0 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -697,7 +697,7 @@ void elv_update_nr_hw_queues(struct request_queue *q)
- 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 
- 	mutex_lock(&q->elevator_lock);
--	if (q->elevator && !blk_queue_dying(q) && !blk_queue_registered(q)) {
-+	if (q->elevator && !blk_queue_dying(q) && blk_queue_registered(q)) {
- 		ctx.name = q->elevator->type->elevator_name;
- 
- 		/* force to reattach elevator after nr_hw_queue is updated */
--- 
-2.49.0
-
+>diff --git a/block/blk-throttle=2Ec b/block/blk-throttle=2Ec
+>index bf4faac83662=2E=2Ebd15357f23bd 100644
+>--- a/block/blk-throttle=2Ec
+>+++ b/block/blk-throttle=2Ec
+>@@ -1149,8 +1149,8 @@ static void throtl_pending_timer_fn(struct timer_li=
+st *t)
+> 	dispatched =3D false;
+>=20
+> 	while (true) {
+>-		unsigned int bio_cnt_r =3D sq_queued(sq, READ);
+>-		unsigned int bio_cnt_w =3D sq_queued(sq, WRITE);
+>+		unsigned int __maybe_unused bio_cnt_r =3D sq_queued(sq, READ);
+>+		unsigned int __maybe_unused bio_cnt_w =3D sq_queued(sq, WRITE);
+>=20
+> 		throtl_log(sq, "dispatch nr_queued=3D%u read=3D%u write=3D%u",
+> 			   bio_cnt_r + bio_cnt_w, bio_cnt_r, bio_cnt_w);
+>
