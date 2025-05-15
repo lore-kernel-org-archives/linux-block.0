@@ -1,61 +1,63 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20D718C02E;
-	Thu, 15 May 2025 06:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2A828F505;
+	Thu, 15 May 2025 06:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747289865; cv=none; b=MrhvGepRlvai7vGuagdWmR4TBCBZO8zdTYTXZVpN1sxMD50H4sp+gOZJFZRd1rgvlyNB9aKGJLCm9c50AQ6HS8telqVUP8KG8j72dT6MfCsSKMqVeYFk2dIfAp8WBlPTYF3pTD0Po4nd2rxR65i0SV3d7aVPBY7ryepsng4l9Gg=
+	t=1747289868; cv=none; b=mKkyIdoC9NkuRTRdYFYPmG3sFA1PVi/irEdpPkHDPf6SwWwBzsSQ1TgF+CImmjw75TDFHWLmozew/8FOhOwGP7PUKJBLgTO5rXU0RZj9pJgdEd8wt/o/R/uyAYPBrGwC3J+vJY5iiloro1aznybWdZI+oA1jLNzkfX/5HTEm4ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747289865; c=relaxed/simple;
-	bh=oru/zjh4HWQQQVjgjm5hZII0Yl/eTwNGeswMe2zOaG0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QCfJtQlA9ihXi6ceuhActQesdviAJPXB4JQQEBsobBENFG7hfibaqu2ey/XWWe/p0QR9a9uQhLunKHZKjgGLeSDk0VjKbfK5/pX/mP2Dfh+ElatQsttWs0frix/20Pt+Z+kkKvPu2l6zrM7gO9F/TjRKWg2WLUaTWKUaVy8t8D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bx6YLr8G; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1747289868; c=relaxed/simple;
+	bh=uDkhdQ/vAx2/PbGIaPmEEm6uGZdGF+cJqEASXGZbMQ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=A80uC2nb1HlA11W09uEGU4xARolCT7CgRqYQ/4+dfA9hXCxDHcAt8AHrKotdRSqe4L2Q+F/kHmyiuceanmwma/BCw7+bBQkIUFkNSF3ti8NdbBDXMI4gyly25svr1ONL3cEHoZFcNQK0O41PRMO8OmCtjUVSJGk4BDKxVDnyAWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XyrpeXhP; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bx6YLr8G"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b13e0471a2dso285682a12.2;
-        Wed, 14 May 2025 23:17:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyrpeXhP"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22e7e5bce38so5360805ad.1;
+        Wed, 14 May 2025 23:17:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747289863; x=1747894663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hubB3bq5hrgLVSF8PoDBX4VrowZwZMhu6qQo8MKJuAA=;
-        b=bx6YLr8GbrKYX8N+26a/RctPWo5g6LFsVEEVgjhenNHK9kf5kwFlZWxKimXV5Aku9X
-         JcwW+tyYW5rwrbr2eyKf1+Xtp/6OL9stj0fO1R7cmIMgUMkXSjgPnh9jdn6m5PClXVZi
-         +igRxbr7cJDLKYuz19nKKqzT3SLKIPHf2QzqZ+IOgkXfb4z1X6iKul1KugnuRyZcv+zz
-         e7zTvp6DuOJd7ngDVSq2/hgNe+NBB7kCi995Pig1KvOa2v5eV4X8cbH1MxTK3Fuul0b+
-         xdiSKfbL3c9WkBMfSNZQhK7Kuo/8yfcV5WhHp1EAKA2FX3DX9xCksMK//cdLzofkRUPr
-         0p2Q==
+        d=gmail.com; s=20230601; t=1747289866; x=1747894666; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/RZLOZ8gksptFkVkG04qlk3kBG1rmwyUoxt+cMI+4zw=;
+        b=XyrpeXhP/83SL7DOgjRwSOAdOY1CoPcqJiQSlNwJCf0h1WHYVYV6R5r1gVzjhIDATy
+         T02sFbBUPqNN/pBripAQkkMcBys/QHWxuTyZYC6M3GbRUFfd6igqYnxxtZqfeZtBpwiH
+         t3iyE0iAejtbZqiynhKjBtKXCX8MhgQaHJn/dUruh9M8ApO17HrmOUVdXuaCV90xBJj+
+         FyCiRcuPJf5ehONf8B0DuPZGmWE6VToeo1OExruDKMprTp6USYEem+s9SyhMwqjua8o/
+         fPVEVSPh9Q63YLrZZ3+X346qiYRzI1fF/ACPljMQGPRRwPcS0vs7Pz+KvNBpxhJAbw/j
+         83kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747289863; x=1747894663;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hubB3bq5hrgLVSF8PoDBX4VrowZwZMhu6qQo8MKJuAA=;
-        b=Korh+bvt8lJQRAw/o7GD3OpGtpMLdpz+3dfIttXMdV/2UC/KuxUi9b6XHddrwVZjeY
-         ChuFVhxns3a7kPmZ2iQz8dT5TDP69nHkpY6ekTb/j+Gsyl0mskpW0osyH46s9hFSdMrJ
-         nhs28XFtAOiT+q44hl6Nc1CYdNpZ4tx8RKk0Knlhr83xsEweAJhUJQHcwSNq1LeSqkLR
-         sHw9JZoQjCeBHTfMwZBR1U8rHSnmICg+BCicsA73PC9qdqgx0BZaOfFnsTffY+nzGCa7
-         4ocfBSNOScPqTBamcLIeQrofJ+G8VEzjvKvd60vYGeHOnmQg62YMT2Vfu1YfpkrOuqSK
-         wYuw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0G06Yn9SUp3QPIGIQiHkC0OnldPMb8kiZbxVkKV/R1fWE+aGP/DYsZJK+UbPdr1GMn5Hc4HB0nX+LcQ==@vger.kernel.org, AJvYcCXo7qMmeoIiFYpVYT8C+KpRsmPqhnnQ/c7rTQGSOkoTsOqQts2+yL/262YpXo8prULglR5fNCB8GD0UCOoDghD52xRi@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjwiOiKeprAkgr2Up5n+iaZfpAlzhEI8htsk+d/AAjCoMpmrAW
-	zHJBUrhwnTRWCDdLJZrffK4EQzYlbDkgd8TJOiULp4BWG9AbCT7e
-X-Gm-Gg: ASbGnctmqet+STCXihzV6J1xxDeomm/dBdnTk2nmlgDbgA7coiH1w6wWlKRL3nEN7/b
-	kAz3PEzPuEpsrtp8Kpxr6ZXBcKwmbNDRGVCLtaaXDAgUsfdIKZDDELK1zqoikKytIWn6CT/yAwr
-	inchVkLLS9pIKPXGbx4IVIGva1TtkvylS8cl5Znt0u1Se+YILVlYyLxDJeGqyNsm2ihGaHnVcHT
-	umr11Wj198c8ZiKrPRCTSvfd5yxK9tp4mNcBPgChLVgONoKuQn/OPUdfF9JgvhIGNXy29AvmLwa
-	G7Dj+bVrDV5IArx+92TEp9XNIsbH3QNP+0JwIyr0+0V4uwAZ8SukCqbTF5mczD1qZhEl61Gjtwg
-	tkqhmoUhSME10UOBtfueMcAWEBG6MiKdKNQ==
-X-Google-Smtp-Source: AGHT+IGlYnQb7Enm3HGEax4wj7K5Yq5K1lhUoJJzjXGCVjDzOtMUonq2TACY0cPT/bA97WY+fMSi6A==
-X-Received: by 2002:a17:903:228f:b0:21f:85d0:828 with SMTP id d9443c01a7336-231b5eba1e0mr21553355ad.41.1747289862974;
-        Wed, 14 May 2025 23:17:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747289866; x=1747894666;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/RZLOZ8gksptFkVkG04qlk3kBG1rmwyUoxt+cMI+4zw=;
+        b=BFyGca2un0ZC4OSg7dSCebX5X8uxOvwLBia+34cbeSAUudhkHYwE5y98WkP7kZ36sD
+         qbX+a57+yLh2OHjiZ8lxEIWPzUDQrSI2VCITTALsduCvgXhRUxUJONSIaADBMn+ueZiL
+         m+9nwl+FI9tdmdJ4vc61uZweDCb7Fwl/KaM2ugvx4iLNmguehHI8ziB77yhRl7uTRCgt
+         wfh0q2O4gzRuyBun5oeBbI5HdxU+aqtKvEKZ6xe50jWN+keqF6ZweQcc/TStBAOH9MgT
+         3gkKwtB+BzOdhNmoVS8cLbKlh9Uz4UBlwWrJqS4hRcEXw7ZVamsGfg8NJcnjLuAyH4yu
+         kHvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJLW+03QxVcKe+23nw7QtO8Lfncu3h528YqE1MDDIcHHjuf/TJWGmcJ34lBiwpO9gKm7eGv/ZtVIwE3A==@vger.kernel.org, AJvYcCVLy+9vaJuk1i5uvSWalrtU8rBegcdFr4MLh3HfjAorIuZVMw8kiZA+4kGUVjbyMc6PPgBCQLMeI2cheUg/9C98EFY/@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlXCHMbrWZPg9sB6K+4yYTid8PYEbxTu7cLjg0X5zfoyt0Hj+T
+	dw+OSGL6vbeLPcLV/lwAEDKaI4FtpKcSHCKgMeDcaTXnR80snITn
+X-Gm-Gg: ASbGncs6aG30PDyLaGmHV9cJqWh6DBGrMPytMfNU8RrB1cuzo1Enui5mKtmpW2lAXOc
+	lXCnXopr3R4VLSfftE9x9l8V50h1wFApNzRtrcz/TSX4yJmL4S0wejbkH3j/8x3z4GhDgAkvICK
+	yU+Va1UTsZZbdWmadFcPoy5TQf6gNXF5Kz2fjwQUeKFVDlYq4zAc6H4RlZ97kjpysgzW39iWxGS
+	F3v0Tg5HgtuhRMpJ2UOQQbGGtO+GW4vWPC99bR0x6gBv/jeWeLK5oieF1xKLs7LKB8MR4kMYs3f
+	mflcjVIGMf1uR+b/6PKDoO71saErAk8po3faMnQBMiuFIfrjyDsJKWHfQNTw2T8YZoCd3rWY6bH
+	pv2UHhtGLDwZ9C2KvVRr01hw=
+X-Google-Smtp-Source: AGHT+IFNWJurSt0Mj07t8pLKz0vCE/rtZKXXhoqh9jxa2NXOqdlxtIwC92o4H6pBvBlMveleP3Bnsg==
+X-Received: by 2002:a17:902:d1cd:b0:22e:6c96:ebd8 with SMTP id d9443c01a7336-231980bbecemr68671505ad.11.1747289865817;
+        Wed, 14 May 2025 23:17:45 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc8273d93sm109242375ad.150.2025.05.14.23.17.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc8273d93sm109242375ad.150.2025.05.14.23.17.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 23:17:42 -0700 (PDT)
+        Wed, 14 May 2025 23:17:45 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -65,11 +67,14 @@ To: axboe@kernel.dk,
 Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH v2 0/4] relayfs: misc changes
-Date: Thu, 15 May 2025 14:16:39 +0800
-Message-Id: <20250515061643.31472-1-kerneljasonxing@gmail.com>
+	Jason Xing <kernelxing@tencent.com>,
+	Yushan Zhou <katrinzhou@tencent.com>
+Subject: [PATCH v2 1/4] relayfs: support a counter tracking if per-cpu buffers is full
+Date: Thu, 15 May 2025 14:16:40 +0800
+Message-Id: <20250515061643.31472-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20250515061643.31472-1-kerneljasonxing@gmail.com>
+References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,28 +85,91 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-The series mostly focuss on the error counters which helps every user
-debug their own kernel module. More patches making the relayfs more
-robust and functional are around the corner :)
+When using relay mechanism, we often encounter the case where new data
+are lost or old unconsumed data are overwritten because of slow reader.
 
+Add 'full' field in per-cpu buffer structure to detect if the above case
+is happening.  Relay has two modes: 1) non-overwrite mode, 2) overwrite
+mode. So buffer being full here respectively means: 1) relayfs doesn't
+intend to accept new data and then simply drop them, or 2) relayfs is
+going to start over again and overwrite old unread data with new data.
+
+Note: this counter doesn't need any explicit lock to protect from being
+modified by different threads for the better performance consideration.
+Writers calling __relay_write/relay_write should consider how to use
+the lock and ensure it performs under the lock protection, thus it's
+not necessary to add a new small lock here.
+
+Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-Note: this series is made on top of this cleanup[1] and unmerged commit[1]
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/log/?h=mm-nonmm-unstable
-[2]: https://lore.kernel.org/all/20250507134225.63248-1-kerneljasonxing@gmail.com/
+v2
+1. rename full member
+2. revise the commit log
+I still chose to keep struct rchan_buf_stats to help later patches
+implementing relay_dump() to dump more statistics from buffer. It means
+more fields can/will be added. But I have to say, I have no strong favor
+on this kind of organization. If you don't like it, I will remove in the
+next re-spin :)
+---
+ include/linux/relay.h | 9 +++++++++
+ kernel/relay.c        | 8 +++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-*** BLURB HERE ***
-
-Jason Xing (4):
-  relayfs: support a counter tracking if per-cpu buffers is full
-  relayfs: introduce dump of relayfs statistics function
-  blktrace: use rbuf->stats.full as a drop indicator in relayfs
-  relayfs: support a counter tracking if data is too big to write
-
- include/linux/relay.h   | 19 ++++++++++++++-
- kernel/relay.c          | 51 +++++++++++++++++++++++++++++++++++------
- kernel/trace/blktrace.c | 22 ++----------------
- 3 files changed, 64 insertions(+), 28 deletions(-)
-
+diff --git a/include/linux/relay.h b/include/linux/relay.h
+index e10a0fdf4325..ce7a1b396872 100644
+--- a/include/linux/relay.h
++++ b/include/linux/relay.h
+@@ -28,6 +28,14 @@
+  */
+ #define RELAYFS_CHANNEL_VERSION		7
+ 
++/*
++ * Relay buffer statistics dump
++ */
++struct rchan_buf_stats
++{
++	unsigned int full_count;	/* counter for buffer full */
++};
++
+ /*
+  * Per-cpu relay channel buffer
+  */
+@@ -43,6 +51,7 @@ struct rchan_buf
+ 	struct irq_work wakeup_work;	/* reader wakeup */
+ 	struct dentry *dentry;		/* channel file dentry */
+ 	struct kref kref;		/* channel buffer refcount */
++	struct rchan_buf_stats stats;	/* buffer stats */
+ 	struct page **page_array;	/* array of current buffer pages */
+ 	unsigned int page_count;	/* number of current buffer pages */
+ 	unsigned int finalized;		/* buffer has been finalized */
+diff --git a/kernel/relay.c b/kernel/relay.c
+index 94f79f52d826..eb3f630f3896 100644
+--- a/kernel/relay.c
++++ b/kernel/relay.c
+@@ -252,8 +252,13 @@ EXPORT_SYMBOL_GPL(relay_buf_full);
+ static int relay_subbuf_start(struct rchan_buf *buf, void *subbuf,
+ 			      void *prev_subbuf)
+ {
++	int full = relay_buf_full(buf);
++
++	if (full)
++		buf->stats.full_count++;
++
+ 	if (!buf->chan->cb->subbuf_start)
+-		return !relay_buf_full(buf);
++		return !full;
+ 
+ 	return buf->chan->cb->subbuf_start(buf, subbuf,
+ 					   prev_subbuf);
+@@ -298,6 +303,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
+ 	buf->finalized = 0;
+ 	buf->data = buf->start;
+ 	buf->offset = 0;
++	buf->stats.full_count = 0;
+ 
+ 	for (i = 0; i < buf->chan->n_subbufs; i++)
+ 		buf->padding[i] = 0;
 -- 
 2.43.5
 
