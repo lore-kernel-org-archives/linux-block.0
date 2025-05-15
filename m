@@ -1,166 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560C9191
-	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 00:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4214269839;
+	Thu, 15 May 2025 03:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747268078; cv=none; b=BHqREW+JxXc2EnSkYghUEgYMhof8wm4GX+sjXFWWde8i50S82OvpLo+adAGuPcNEqSmyxfO2tex0pVjOa+wFqqTDbyX0R0LEKydDc9JsaZZTyUnDPbYLtxJIxK7FLTSQmbBirwhD4/5UugXaLWx2g8E/O0lu/9npprLUAWjK7XU=
+	t=1747278065; cv=none; b=qysVOStKTHSd++IrEh3agHO50lgqtySNTLpZKzwP2CsTNcYlgWjq94MZdEosVIsYuB1hPY+P9v9fws2XkNwTSohzYjCWDHFaND9SI7kmEbQGPhhCy0DnqoIh03OWWYgm0fq30Qpr89cMjzlD36LFQodsgrrx+htTY3/RPyPzfhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747268078; c=relaxed/simple;
-	bh=quYQ44lNL28NGsGxFsC3r6wlm1Y7jznRiSlxIni8Rlc=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dtoTJB8t9XTX+pNNMlKnMJuDtkaVMxv+egKDkhLi8qTVzqpzf+ZK1g+7FrDCflt5mzTueHT2qyYw9sH4lOAP2+3wgYjZGZ818F5K23/WUKMqj6lUrHUjK1f9A+NJXx40Jtiem1rgISct26YXKIr7m7G5cIByn4FeNMa7HQcmsoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICIVapwT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICIVapwT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747268074;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kNzHUEUeO2dhjTSVzvgUR5Z+U81BlGK7DOEGqJYrY1c=;
-	b=ICIVapwT+ltb/ndbQX4pHJikd3vnPZvfsaSJrlAUwZNwyBEIyFnMjwaJfuv4NtXrjUyn5N
-	BlW7XCgIGshn3CQAA9JgAqtMxE1mdMrDLDnGsG0gc9iBCwryvsbIk5vi7jzPb+z7CgnG7d
-	KLTqH0DxGlZcEneuCR95/+UAdaOW7pw=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-551-Z4tWkiRSMvOlK3JZJTMIiw-1; Wed, 14 May 2025 20:14:33 -0400
-X-MC-Unique: Z4tWkiRSMvOlK3JZJTMIiw-1
-X-Mimecast-MFC-AGG-ID: Z4tWkiRSMvOlK3JZJTMIiw_1747268072
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f6e59df2f3so8090646d6.3
-        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 17:14:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747268072; x=1747872872;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kNzHUEUeO2dhjTSVzvgUR5Z+U81BlGK7DOEGqJYrY1c=;
-        b=HkCwOZoAZOTCW9erl/YxY9WBE1Z1ltPihIexrdHZgNz4AXIc88tyCSw0zHrXcyZ2zO
-         2Yip792PP9Z5ppgLR+i+WU/vrtq8jofHyj10fcVQ2Xz520MNJ/M/RgkL+2XQfTvgnszm
-         hdbdrwnHQLBNn6i4QRQNpCfwYEMoQL56QLEVJplLXfETW5ThnF+E1Af5y/5sCPmnDo2n
-         XikOEbq28Up8fkdrQoEFAxarm1fmMyxSia2ihdR0E0ebpT3sD9f7mrMdWrVg1CI86Rvn
-         WiXlVd6aOOthW/SP7kiKhl3vOa3O89+PJdJEIWey/tIQzMsGb/PK6AvhKakenDJ/Tqz+
-         NGEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXKSgFKSD3FvDYybNF6PDmItzhqq0GH+A3LiYFGPCynxeQOiuIo7NKPkCt6eY9P8YOcmdWb+1LjkBj5A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3vKyy5yI8pbwVCVPOChY2V7IYY76mCVY0jQ1iVsHux/6XMQts
-	c+xjoBxKFUQjSWDOvqv5M44Ua+TyMHWBEGaZtvLbOMI7LVg0EG7rCsUddOyUY3En+J+1tZ/akpF
-	Nwe3/qq2NbWrOLIOjcsZl9YmerBF3o/Fy1L7vmFeHdR7QGPQ3lcITq1Jj5jP5
-X-Gm-Gg: ASbGncvpuzVYrdqavK6R5Hse6BBvoT4a/ZrKCMiQi2ImPVZ+aZpsQ21GrEE9L15xbq0
-	EyRDqDSC4sCKtY6kHqeu/UvxJQnLlKPytQKOdcFxSmep2Lj9RQvaSz5ccf3ifbbbaOWRzWQKFrB
-	3Y5EsEt7s4cZKb2gEHQKc8g80iC2Ha5eVQ1oED7NzfAxe+yhtuwCp164dw7T4SsfNi2ltb+jTYp
-	VwX1BMToAa8dIQy9kM7ZwXjDN4fe7pniODtDUP7HmTc7gqzUV8EShirio9fJiQI8QUXQAABLE+K
-	6zqTGe3XL1tp11bbpme6bwo3wz379JyOGubRDu1EVXoQJeuLw3Vf0F0V9Q==
-X-Received: by 2002:a05:6214:d0c:b0:6e8:fe16:4d44 with SMTP id 6a1803df08f44-6f896ea9057mr99475006d6.31.1747268072562;
-        Wed, 14 May 2025 17:14:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsr7IFrS3iOvG8LAJsmK3Z9rLV7eHpX1e12kq9yRd9jWKqc02gH6HkR1aDUM2ojcwgcm4bmg==
-X-Received: by 2002:a05:6214:d0c:b0:6e8:fe16:4d44 with SMTP id 6a1803df08f44-6f896ea9057mr99474556d6.31.1747268072185;
-        Wed, 14 May 2025 17:14:32 -0700 (PDT)
-Received: from ?IPV6:2601:408:c101:1d00:6621:a07c:fed4:cbba? ([2601:408:c101:1d00:6621:a07c:fed4:cbba])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f6e39e0c8csm87119136d6.18.2025.05.14.17.14.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 May 2025 17:14:31 -0700 (PDT)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
-Date: Wed, 14 May 2025 20:14:26 -0400
+	s=arc-20240116; t=1747278065; c=relaxed/simple;
+	bh=WMtRPrTV5SKlwbqCnRpNmAVaeiJHq6e0YXcmEs9v6gM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G5+cYgcxXXErKDNGnhfk9x8wV2DkGb4fyMG3kQwoqieu594EjJ794xtGQEOfPmZELRNtoEnzb9sSA0EkzAULgEpaQnfL3CdVrdQrdnPmsrcq2wt0UeAwd9rzcc49acTCUhIM3TvY/JN8soeT9lw64NDAPDRhvnDiqp1cTXusNhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-13-682558e73367
+Date: Thu, 15 May 2025 12:00:50 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Waiman Long <llong@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	yskelg@gmail.com, yunseong.kim@ericsson.com, yeoreum.yun@arm.com,
+	netdev@vger.kernel.org, matthew.brost@intel.com,
+	her0gyugyu@gmail.com
+Subject: Re: [PATCH v15 01/43] llist: move llist_{head,node} definition to
+ types.h
+Message-ID: <20250515030050.GB1851@system.software.com>
+References: <20250513100730.12664-1-byungchul@sk.com>
+ <20250513100730.12664-2-byungchul@sk.com>
+ <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 01/43] llist: move llist_{head,node} definition to
- types.h
-To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
- damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
- adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
- peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
- rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
- daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
- tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
- amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
- linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
- minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
- sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
- penberg@kernel.org, rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
- linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
- max.byungchul.park@gmail.com, boqun.feng@gmail.com, yskelg@gmail.com,
- yunseong.kim@ericsson.com, yeoreum.yun@arm.com, netdev@vger.kernel.org,
- matthew.brost@intel.com, her0gyugyu@gmail.com
-References: <20250513100730.12664-1-byungchul@sk.com>
- <20250513100730.12664-2-byungchul@sk.com>
-Content-Language: en-US
-In-Reply-To: <20250513100730.12664-2-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxjHd+69vfe2WnYtOo+w+aHCZnBzQnA8SzZDsmU7ydhm4kwWt0SL
+	XNe6Aq68CM4l5TUKkyBbYRQmtWyVYFUsxlQFZBhqOh1WCxUdoDI0QHlf2w0FXCkx88uTX57/
+	//zO+XB4WlHGRvCatExRl6bSKlkZIxtfbn5j+PNo9aaH5RLw+w4xUHvGyoLr9EkE1nN5FIx0
+	fgi3A2MInvxxg4YqgwvB8Qf9NJxzDCBobchnwT0UBt3+SRachlIWCurPsHDTO0dBX2UFBSdt
+	H8M9yyMGrpWbKagaYaGmqoAKjmEKZi2NHFj00TDYYORg7kEsOAc8Emi9uwGqj/Wx0NLqZMBh
+	H6TAfbGWhQHrUwl4S6ZoCJRFguvoEQmcmjCz4A1YaLD4Jzm41W6iwGF6CZoKg8LivxckcPVI
+	OwXFv5yloPvOJQRth+5TYLN6WLjiH6Og2Wag4fGJTgSDZeMcFH0/y0FNXhmC0qJKBgr7NsOT
+	f4M3/+yLhby6JgZOzXtQ4rvEesyKyJWxSZoUNu8nj/09LGkNmBjyuxmTC8Z+jhS23eWIyZZF
+	mhtiSH3LCEWOz/glxNZ4mCW2mQqOlIx3U2Siq4vb+vIO2TspolaTLere3LJLpm50VDD7fg3L
+	6fT10HpUs6wESXksxGP9+I/cMz5a5ZYsMiNE474KO73IrPAa7u2dDfFKQYn9sy6mBMl4Wqhc
+	hi84pqnFIFz4DI9N94dEciEBm53uUEkhGBAuzR9lloIV2Fk9FGJaiMG9CyPBw3yQI/GJBX5x
+	LRW24LbAvVBllbAOt5+/Si09ziPF1Y6DS7wG/9bQy5Qjwfic1fic1fi/1YToRqTQpGWnqjTa
+	+I3q3DRNzsbd6ak2FPyllu/mvrCjGde2DiTwSLlc3l4UpVZIVNkZuakdCPO0cqX89t51aoU8
+	RZV7QNSl79RlacWMDhTJM8rV8rjA/hSF8JUqU/xaFPeJumcpxUsj9EgkOZ9OuV9Izg9cb1o9
+	H/uR95/3kwt++ivrh2tR2ydHrdtPh492vBr39sSu9w4nXg//oL9+TVwX3jN/48/zL+qmkg0p
+	tZsuZ3ter9PefMuZ7ttb882X9rUJO3w9ez5Zsap4fdh0XkTCxcGknYneAweTpVGZzLf37S1J
+	w3rV5qd1Q91rI+JfUTIZalVsDK3LUP0HPfruQ6EDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH8zz3tZWau47pjY1+qMMXFlFU4llc0CVm3Cxz0czERU1moze2
+	k1ZtEekUB1KMg0mEBYhFsZZZCJThilNQSwhIsahYLSIqoBAyh60CjttZYbCWZZlfTn45//M7
+	58thCeUYNY/VGdJEo0GTqqblpPzLtTnLnn8dp11x5dxikMZPkHCmzkmD75caBM5L2RiG21Lg
+	YSiIYOLOXQJKi30Izg/0EXDJ04/AXXWMBv/QbOiSRmjwFufTkFNRR8O9wCSG3pIiDDWujfDU
+	8TsJt07ZMZQO01BWmoMj5Q8MYUc1A46sOBissjIwOZAI3v5uClrPeilwP/4ITpf30nDd7SXB
+	0zCIwX/1DA39zmkKAnmjBIQKVOArPElB7Ss7DYGQgwCHNMLA/WYbBo9tDly0RLYe/3OKgvaT
+	zRiO//wrhq5H1xA0nXiGweXspqFVCmKodxUT8LayDcFgwUsGcn8MM1CWXYAgP7eEBEtvEky8
+	iVw+O54I2ecuklD7dzdanyw4y51IaA2OEIKl/pDwVnpAC+6QjRQ67LzQaO1jBEvTY0awuQ4K
+	9VXxQsX1YSycfy1Rgqv6B1pwvS5ihLyXXVh41dnJbJq/Tf7JbjFVly4alyfvlGurPUXk/guz
+	M9rGHxBZqGxWHpKxPLeaLyz1U1EmuTi+t6iBiDLNLeZ7esIzHMupeSnsI/OQnCW4kll8o2cM
+	R4P3uS18cKyPibKCW8Pbvf6ZISVXjPj8Yy/If4P3eO/poRkmuHi+Z2o4IrMRVvGVU2y0LeOS
+	+abQ05mRD7iFfPPldnwKKazv2NZ3bOv/tg0R1ShWZ0jXa3SpSQmmvVqzQZeRsGuf3oUij+jI
+	nCxsQOP+lBbEsUgdo2jO/VCrpDTpJrO+BfEsoY5VPPx2oVap2K0xfyca931jPJgqmlqQiiXV
+	cxWfbxV3Krk9mjRxryjuF43/pZiVzctCGQ5WVT+Qu6UirSCY5V4w+mR95tYL4dCiUN9vgcwb
+	n/o87WMbhj6eeF65Y/rQEfFNjP3A6Lru0a7bc/LL//rKeXWHbEVj50+fLf3+cswG87Tqi5WG
+	joHDSVZ9x2CK8eaqmtrtCds23lh5WMJlC1TBJUH9UUtd+sRmySzLsQZxYEndajVp0moS4wmj
+	SfMPr7iiAoQDAAA=
+X-CFilter-Loop: Reflected
 
-On 5/13/25 6:06 AM, Byungchul Park wrote:
-> llist_head and llist_node can be used by very primitives. For example,
+On Wed, May 14, 2025 at 08:14:26PM -0400, Waiman Long wrote:
+> On 5/13/25 6:06 AM, Byungchul Park wrote:
+> > llist_head and llist_node can be used by very primitives. For example,
+> 
+> I suppose you mean "every primitives". Right? However, the term "primitive"
+> may sound strange. Maybe just saying that it is used by some other header
+> files.
 
-I suppose you mean "every primitives". Right? However, the term 
-"primitive" may sound strange. Maybe just saying that it is used by some 
-other header files.
+Thank you.  I will apply it.
 
-Cheers,
-Longman
-
-> dept for tracking dependencies uses llist in its header. To avoid header
-> dependency, move those to types.h.
->
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> ---
->   include/linux/llist.h | 8 --------
->   include/linux/types.h | 8 ++++++++
->   2 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/include/linux/llist.h b/include/linux/llist.h
-> index 2c982ff7475a..3ac071857612 100644
-> --- a/include/linux/llist.h
-> +++ b/include/linux/llist.h
-> @@ -53,14 +53,6 @@
->   #include <linux/stddef.h>
->   #include <linux/types.h>
->   
-> -struct llist_head {
-> -	struct llist_node *first;
-> -};
-> -
-> -struct llist_node {
-> -	struct llist_node *next;
-> -};
-> -
->   #define LLIST_HEAD_INIT(name)	{ NULL }
->   #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
->   
-> diff --git a/include/linux/types.h b/include/linux/types.h
-> index 49b79c8bb1a9..c727cc2249e8 100644
-> --- a/include/linux/types.h
-> +++ b/include/linux/types.h
-> @@ -204,6 +204,14 @@ struct hlist_node {
->   	struct hlist_node *next, **pprev;
->   };
->   
-> +struct llist_head {
-> +	struct llist_node *first;
-> +};
-> +
-> +struct llist_node {
-> +	struct llist_node *next;
-> +};
-> +
->   struct ustat {
->   	__kernel_daddr_t	f_tfree;
->   #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
-
+	Byungchul
+> 
+> Cheers,
+> Longman
+> 
+> > dept for tracking dependencies uses llist in its header. To avoid header
+> > dependency, move those to types.h.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >   include/linux/llist.h | 8 --------
+> >   include/linux/types.h | 8 ++++++++
+> >   2 files changed, 8 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/include/linux/llist.h b/include/linux/llist.h
+> > index 2c982ff7475a..3ac071857612 100644
+> > --- a/include/linux/llist.h
+> > +++ b/include/linux/llist.h
+> > @@ -53,14 +53,6 @@
+> >   #include <linux/stddef.h>
+> >   #include <linux/types.h>
+> > -struct llist_head {
+> > -	struct llist_node *first;
+> > -};
+> > -
+> > -struct llist_node {
+> > -	struct llist_node *next;
+> > -};
+> > -
+> >   #define LLIST_HEAD_INIT(name)	{ NULL }
+> >   #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+> > diff --git a/include/linux/types.h b/include/linux/types.h
+> > index 49b79c8bb1a9..c727cc2249e8 100644
+> > --- a/include/linux/types.h
+> > +++ b/include/linux/types.h
+> > @@ -204,6 +204,14 @@ struct hlist_node {
+> >   	struct hlist_node *next, **pprev;
+> >   };
+> > +struct llist_head {
+> > +	struct llist_node *first;
+> > +};
+> > +
+> > +struct llist_node {
+> > +	struct llist_node *next;
+> > +};
+> > +
+> >   struct ustat {
+> >   	__kernel_daddr_t	f_tfree;
+> >   #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
+> 
