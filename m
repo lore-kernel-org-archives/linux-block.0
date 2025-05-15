@@ -1,100 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D582021CC70
-	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 16:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA50419D07E
+	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 16:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747326377; cv=none; b=CYnk4R1UjsyyowAlkyiBaMHRQHTodXmLnNHqkM/Hh2V0/u8UQ2b+tlAKk0agjXXNdW3rF6uUd36cPZnVTXTmjvoqvDOpaf1migm7AmKNXxIVKbqJQRauwSZDq7fyWxKVd1mwYM27gOp47S/d2+3ngcPijwkYjiGvE9JSxBhMny0=
+	t=1747328168; cv=none; b=QII9ZUa4UcJDGddowL/X5MSHbF1kW44WPvvQnzqOltYUZpmY0rcbwSWrbI9/6zQqzRI3Dww+vvuO8C8p0xnjuyIOAWjTVir2ZzrIvIrbVe1BhpmoK1E/fsINnkuSknxdBfMVAXumHCC7/E4H+WFCoDHCBHpoEnzU4BeLie4dmTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747326377; c=relaxed/simple;
-	bh=8im9bz+wFVRemM3Yi3xKVh+cV+0EhVXmpJQbunq6Hi8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uJ/WuT1CBWXXObfHV6C/8d1HxPzX0qqJUKnqkNMNEOn/EYjH+cOKewuiNKjlcKMkIMqhk+LbDk4laxorMuwIMo4SnGhPPZACRaT/r/cGZH38vYwlpD7kQ1Yg0DyJJ+sG1DY+Ftv553Imv0AVCL0F0OJgRRYEoqnSUbngNRz357U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CBMZPlRr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747328168; c=relaxed/simple;
+	bh=rTY2SIiSGVno6lDWP6D/gl62nh7vEUbCGOBEoLm4+nE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=C0ZaKUGu+EzgoLB5S/LKXYxonMNkC792tbd1holsBag2MnRCtiBqf5MNnFZjkJim/6RhTJiLH/6tiQ5q9TlIODQvA4mm6dl3CbEsdgw9LyHeu9J2Vjdx0jOPtgxU0ytIg90BmR6fnEkFPxTq0TtfimkNryLm12+O8N3UV9Nu24w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pzp7J1ev; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBMZPlRr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747326374;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d0di3BD/q2pbid+vun9UScyV72KOyFYQbPTD8NVYJx8=;
-	b=CBMZPlRrbVg0h9mr6MqgIMKvovOlW6np5QJjroxNgUu5tjVZ//4U9CDW42P2sW2tSLc0vV
-	8N6tzF/waH51P+LGbQLxXWWvlxqHYRFyt6isuTMKSoxuO7vkFRjzq86OrrFlBz/BvHHlId
-	T4XPDnP/Nnag1gJMpztIYT894hyby1Q=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-baod9Tk_NjuzDgnBxUMLfg-1; Thu,
- 15 May 2025 12:26:11 -0400
-X-MC-Unique: baod9Tk_NjuzDgnBxUMLfg-1
-X-Mimecast-MFC-AGG-ID: baod9Tk_NjuzDgnBxUMLfg_1747326370
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 26F5E1956086;
-	Thu, 15 May 2025 16:26:10 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.12])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3DB019560A7;
-	Thu, 15 May 2025 16:26:08 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH] ublk: fix dead loop when canceling io command
-Date: Fri, 16 May 2025 00:26:01 +0800
-Message-ID: <20250515162601.77346-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pzp7J1ev"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-8644aa73dfcso34465939f.0
+        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 09:56:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747328164; x=1747932964; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vigVsJ2paaBct9UMm/ucPpQHoDJhZDbvTSf1xWx+3nM=;
+        b=pzp7J1evxALMKa14fN4g2Cfahg8ajVtEDT3xFgSthetfcQxW9s+JUUvbOxjpXGK4nI
+         LJ/qfvFktaWyVTKez5aH9lupRWn5lxIdFPZrQzyycmRx+U5St3onOk1hsvE2fhgWiKZY
+         ovLVQG9LAU1Qc9epwDADqn//97RuV5l08id8aibSm8WYtvFE8KU9lC1Grm943FZ0BS0L
+         SwfAoWMS/yjJUbvsvqHFCP+pXwhsxMSmbPCjRx1KLV2KDj8xvv9sDflK66cAUZ971WGo
+         UIdqQmzlI2NfeH/ubjwgSttzHfWmmHG8vn/ElUIvuSJyWZYcliMRO9dw7hmV8upbIshp
+         QHNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747328164; x=1747932964;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vigVsJ2paaBct9UMm/ucPpQHoDJhZDbvTSf1xWx+3nM=;
+        b=eo3fRg+s5ieFQkQbrxzpVBeq+wX+6mnZHdguOD0F29s6feWABoJ7sSu2+LOq0n31zo
+         aVWu4OBYCoV+KW0+lNipn8SkZa8leRIX9tEl4cLBY+2+Ifv321PvZW0BQ4SsszlKXb3b
+         shRfRN13xhPAJT6BlNeZzL68BC09243dWJMe6xNtGDSCdZtg9ElKCusO3b5U9yJorYvd
+         5bJl367L4+XBARTC0grEeKW/ftHSb7PyU/87iooUXG9u3cwqEWSU/nBrPGW3hx/w0bOG
+         Sf/0aduITXXQc9Er4b1ShYB/mCI539x+SXXlthJvxueK4DlXoWhdgm9bemG9+fzF1x8G
+         Th5Q==
+X-Gm-Message-State: AOJu0YzuCB6ou1ZveOmajKDtmuwkrcqpGNodwhadXiUO4qlXBUhrOGIC
+	1UY9OHfN90E+Uan9b5EyN9vYMxdX8EbPRggqaNuDCqXYAeIv8AClQZAISokVxoWISRU=
+X-Gm-Gg: ASbGncu6p0mFiq6X3MF/Xeb9Fu3MzgROPR/Xh/xcgBKQObmuQ7TP5/RXT4lte7tEsXg
+	D3iVpFEuUNRJj/NoRa22PEKp2eBqnjJ2ux5BofSec0qxjqEl/XdvF5qVxis+ZIXiXhcKOpkninz
+	pAb8Z84sDD3Y/9sGkj+Eh5A8ED09/y+6WWK8HG+UfmyjX2Q7jJvb25HGIkmjkxKw4ou2+pMaZFU
+	ra9yby1HnfZnFBLvAGPsyRim6TwCo7loTEsXLhJOl+mDme66lzSUE55SfzCl11GApQREaHotDli
+	Etkm4ffkyIjKVG7AO6zbdYtgVVVNPyTrrTusl3//2jw=
+X-Google-Smtp-Source: AGHT+IHBJhKlIBVt75TarBzRVDhBretqc5fXY4fZ5Sb319A/frCdBLX/0RpV5W7OtdNiafaVghmC2A==
+X-Received: by 2002:a05:6602:751c:b0:85b:3f8e:f186 with SMTP id ca18e2360f4ac-86a231afb14mr51097239f.6.1747328164604;
+        Thu, 15 May 2025 09:56:04 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-86a235bff42sm854839f.1.2025.05.15.09.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 09:56:03 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>, 
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250515162601.77346-1-ming.lei@redhat.com>
+References: <20250515162601.77346-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] ublk: fix dead loop when canceling io command
+Message-Id: <174732816335.293460.11856059547949881875.b4-ty@kernel.dk>
+Date: Thu, 15 May 2025 10:56:03 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
-adds request state check in ublk_cancel_cmd(), and if the request is
-started, skip canceling this uring_cmd.
 
-However, the current uring_cmd may be in ACTIVE state, without block
-request coming to the uring command. Meantime, the cached request in
-tag_set.tags[tag] is recycled and has been delivered to ublk server,
-then this uring_cmd can't be canceled.
+On Fri, 16 May 2025 00:26:01 +0800, Ming Lei wrote:
+> Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
+> adds request state check in ublk_cancel_cmd(), and if the request is
+> started, skip canceling this uring_cmd.
+> 
+> However, the current uring_cmd may be in ACTIVE state, without block
+> request coming to the uring command. Meantime, the cached request in
+> tag_set.tags[tag] is recycled and has been delivered to ublk server,
+> then this uring_cmd can't be canceled.
+> 
+> [...]
 
-ublk requests are aborted in ublk char device release handler, which
-depends on canceling all ACTIVE uring_cmd. So cause dead loop.
+Applied, thanks!
 
-Fix this issue by not taking stale request into account when canceling
-uring_cmd in ublk_cancel_cmd().
+[1/1] ublk: fix dead loop when canceling io command
+      commit: dd24f87f65c957f30e605e44961d2fd53a44c780
 
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Closes: https://lore.kernel.org/linux-block/mruqwpf4tqenkbtgezv5oxwq7ngyq24jzeyqy4ixzvivatbbxv@4oh2wzz4e6qn/
-Fixes: f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f9032076bc06..dc104c025cd5 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1708,7 +1708,7 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, unsigned tag,
- 	 * that ublk_dispatch_req() is always called
- 	 */
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
--	if (req && blk_mq_request_started(req))
-+	if (req && blk_mq_request_started(req) && req->tag == tag)
- 		return;
- 
- 	spin_lock(&ubq->cancel_lock);
+Best regards,
 -- 
-2.47.1
+Jens Axboe
+
+
 
