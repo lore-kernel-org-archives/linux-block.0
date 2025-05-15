@@ -1,71 +1,70 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA50419D07E
-	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 16:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DCA25C6E5
+	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 18:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747328168; cv=none; b=QII9ZUa4UcJDGddowL/X5MSHbF1kW44WPvvQnzqOltYUZpmY0rcbwSWrbI9/6zQqzRI3Dww+vvuO8C8p0xnjuyIOAWjTVir2ZzrIvIrbVe1BhpmoK1E/fsINnkuSknxdBfMVAXumHCC7/E4H+WFCoDHCBHpoEnzU4BeLie4dmTc=
+	t=1747332893; cv=none; b=iHM6vvyvRiyGhm5okSW+IM1Q60KRLwgKHd9OQwbwKh0XBBjlETEqnjLQn7BvBJ5vAiCfs4XOqcoo4lOThrhksjo3m3oGTneesii1km7vf6WP9lZuD7IMCc0V71OcOQTBW42Ci+Q6XiHtzTZftZ5qpd7xjmmkWfvR9Hd7FPSLa8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747328168; c=relaxed/simple;
-	bh=rTY2SIiSGVno6lDWP6D/gl62nh7vEUbCGOBEoLm4+nE=;
+	s=arc-20240116; t=1747332893; c=relaxed/simple;
+	bh=ZezEdI5zBdFdJv95StwuqYzISHG7jU4JXZpnSnd3HYM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=C0ZaKUGu+EzgoLB5S/LKXYxonMNkC792tbd1holsBag2MnRCtiBqf5MNnFZjkJim/6RhTJiLH/6tiQ5q9TlIODQvA4mm6dl3CbEsdgw9LyHeu9J2Vjdx0jOPtgxU0ytIg90BmR6fnEkFPxTq0TtfimkNryLm12+O8N3UV9Nu24w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pzp7J1ev; arc=none smtp.client-ip=209.85.166.46
+	 MIME-Version:Content-Type; b=E8ACnL0H73FaKV7g4dzd359+4fsnzEIyzh3UuiK/73EcQEIONsoEyTkDcaF8TH+bW2xyzeIf2GAbZWu+Gkfjr+KWTIgejX8GnUwTWGvju2d6czKj5xHjCa2TeEES27V4VDeEixP4JRErmI3S/r2vNMoyvIdC0lnC+eGhcqZ5Wlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OVpAyD3v; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pzp7J1ev"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-8644aa73dfcso34465939f.0
-        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 09:56:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OVpAyD3v"
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3da831c17faso4162815ab.3
+        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 11:14:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747328164; x=1747932964; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747332889; x=1747937689; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vigVsJ2paaBct9UMm/ucPpQHoDJhZDbvTSf1xWx+3nM=;
-        b=pzp7J1evxALMKa14fN4g2Cfahg8ajVtEDT3xFgSthetfcQxW9s+JUUvbOxjpXGK4nI
-         LJ/qfvFktaWyVTKez5aH9lupRWn5lxIdFPZrQzyycmRx+U5St3onOk1hsvE2fhgWiKZY
-         ovLVQG9LAU1Qc9epwDADqn//97RuV5l08id8aibSm8WYtvFE8KU9lC1Grm943FZ0BS0L
-         SwfAoWMS/yjJUbvsvqHFCP+pXwhsxMSmbPCjRx1KLV2KDj8xvv9sDflK66cAUZ971WGo
-         UIdqQmzlI2NfeH/ubjwgSttzHfWmmHG8vn/ElUIvuSJyWZYcliMRO9dw7hmV8upbIshp
-         QHNg==
+        bh=EUk93zwEAV22Yme6WWfyA16vg1NUqJQQlbYAiCn0ePY=;
+        b=OVpAyD3v6QWumVgAQDWUjLP9XJlUZaQNMS1+gAEFme+H3vuqMqfGXEziVgSTN0jroc
+         XLx0GbN4z8bXMfyKy8XEcqXdGkl1BCDuozsMWsE8fiI7QeN8oCfnk6ATMHSbukUTDIGU
+         6RTuP4jqFIYpOHnaPbARsvBcWScOLgseU74lXTE4Os3Krm7rtkZm/KUfo/Rcl/p8vD1J
+         gVka7LoVriazrjAT3ZXttIWVGhZPgqftOB/rRGVxaF2jOnHCdft7NXyU6DtBmu7uzYYM
+         pskFeH0WGehVcY2IZYvRu6fSju61E8a7jL9pvLkc111/UHiWxPqQgKYrAEsnNLlORqUn
+         UdOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747328164; x=1747932964;
+        d=1e100.net; s=20230601; t=1747332889; x=1747937689;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vigVsJ2paaBct9UMm/ucPpQHoDJhZDbvTSf1xWx+3nM=;
-        b=eo3fRg+s5ieFQkQbrxzpVBeq+wX+6mnZHdguOD0F29s6feWABoJ7sSu2+LOq0n31zo
-         aVWu4OBYCoV+KW0+lNipn8SkZa8leRIX9tEl4cLBY+2+Ifv321PvZW0BQ4SsszlKXb3b
-         shRfRN13xhPAJT6BlNeZzL68BC09243dWJMe6xNtGDSCdZtg9ElKCusO3b5U9yJorYvd
-         5bJl367L4+XBARTC0grEeKW/ftHSb7PyU/87iooUXG9u3cwqEWSU/nBrPGW3hx/w0bOG
-         Sf/0aduITXXQc9Er4b1ShYB/mCI539x+SXXlthJvxueK4DlXoWhdgm9bemG9+fzF1x8G
-         Th5Q==
-X-Gm-Message-State: AOJu0YzuCB6ou1ZveOmajKDtmuwkrcqpGNodwhadXiUO4qlXBUhrOGIC
-	1UY9OHfN90E+Uan9b5EyN9vYMxdX8EbPRggqaNuDCqXYAeIv8AClQZAISokVxoWISRU=
-X-Gm-Gg: ASbGncu6p0mFiq6X3MF/Xeb9Fu3MzgROPR/Xh/xcgBKQObmuQ7TP5/RXT4lte7tEsXg
-	D3iVpFEuUNRJj/NoRa22PEKp2eBqnjJ2ux5BofSec0qxjqEl/XdvF5qVxis+ZIXiXhcKOpkninz
-	pAb8Z84sDD3Y/9sGkj+Eh5A8ED09/y+6WWK8HG+UfmyjX2Q7jJvb25HGIkmjkxKw4ou2+pMaZFU
-	ra9yby1HnfZnFBLvAGPsyRim6TwCo7loTEsXLhJOl+mDme66lzSUE55SfzCl11GApQREaHotDli
-	Etkm4ffkyIjKVG7AO6zbdYtgVVVNPyTrrTusl3//2jw=
-X-Google-Smtp-Source: AGHT+IHBJhKlIBVt75TarBzRVDhBretqc5fXY4fZ5Sb319A/frCdBLX/0RpV5W7OtdNiafaVghmC2A==
-X-Received: by 2002:a05:6602:751c:b0:85b:3f8e:f186 with SMTP id ca18e2360f4ac-86a231afb14mr51097239f.6.1747328164604;
-        Thu, 15 May 2025 09:56:04 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-86a235bff42sm854839f.1.2025.05.15.09.56.03
+        bh=EUk93zwEAV22Yme6WWfyA16vg1NUqJQQlbYAiCn0ePY=;
+        b=Dukt6LbgTX9iEGPgqmnBkZw3zVLE3swoBXtlASo1ZdGYU2bsY2QuNA53bfGq2HYKir
+         1vGBYv3mfZZOX1S+sQvNUUx8MZPoR1XyBaIonmcvsrmX5xcQ0DT8l+Y5nRoag+6va7vW
+         RPJQ7HqdQsvBGnwJhenJUOP8jH7d7WRmYQiPvdJaHH4tZZvzhAyTvmcH7QKWIs4nMUgg
+         Bq4jgGBPUVKFUPfEnnP159kzJbYTsdusYeLR3LDRnh7UsjcKOtVoZUmglkcmHsUc+0IR
+         LOQ0m++NWXUYojvvUB5efmLKmGTBr3+WPQ6wVzhy0NKSAsNnvItceUgkTjpeiCpdiqSM
+         X4Fg==
+X-Gm-Message-State: AOJu0YzBMdiaT4iWERM0ajgOFkv7LifF1JrietZ0NBH+qzkJPCnB8M52
+	fq9+oNoCkdjuEQ8Hao4t9w4iYwH/r60eZeNh4KuGkqhXYw8bNy3TEgY9qEFDwAz0iTc=
+X-Gm-Gg: ASbGncuw8BQZ7bQ7Si3sYpk6vBgbsbLzSwHZTGecoeyfYKxa7dNvIJCcIYp1s2OEh4P
+	2Cc1SXMLsewhVsfxdrTswI1sCrlJwMCxfDZD4nezpOtQ3+fc6XW1zgYMQPVy0B5QXfBPo8+0Bro
+	27ec5B5z0iCt1xNrqwcKTiF1KYgJwX6rPK8B0YU16dQB95sI0N0y68MffmP/1qfiXkgQencR7uK
+	d17t8J9YVOpZwIcftz19asrSuUrMOaMKjocEvQmjX5QNhCKCxeXHo9r4kPkHBqUf2KZuA4JRbfy
+	lD6wgMFJTabvS0vA6sR7nIsujgdZ83fgrpmt04fCLKg+pKMQjulW
+X-Google-Smtp-Source: AGHT+IHY7YuqridCl0ICN177h8gnOYdnUER7dTLqKcIK826/PEUrpOfL6YbXCXYQ8i1XApauPhWWCw==
+X-Received: by 2002:a05:6e02:1a48:b0:3da:7c22:6817 with SMTP id e9e14a558f8ab-3db84357436mr11373485ab.18.1747332886709;
+        Thu, 15 May 2025 11:14:46 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fbcc4ea64bsm27642173.139.2025.05.15.11.14.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 09:56:03 -0700 (PDT)
+        Thu, 15 May 2025 11:14:46 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20250515162601.77346-1-ming.lei@redhat.com>
-References: <20250515162601.77346-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: fix dead loop when canceling io command
-Message-Id: <174732816335.293460.11856059547949881875.b4-ty@kernel.dk>
-Date: Thu, 15 May 2025 10:56:03 -0600
+To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
+Cc: ming.lei@redhat.com, hch@lst.de, hare@suse.de, gjoyce@ibm.com
+In-Reply-To: <20250515134511.548270-1-nilay@linux.ibm.com>
+References: <20250515134511.548270-1-nilay@linux.ibm.com>
+Subject: Re: [PATCH] block: fix elv_update_nr_hw_queues() to reattach
+ elevator
+Message-Id: <174733288585.300508.13607812776003416400.b4-ty@kernel.dk>
+Date: Thu, 15 May 2025 12:14:45 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,22 +76,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-7b9b9
 
 
-On Fri, 16 May 2025 00:26:01 +0800, Ming Lei wrote:
-> Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
-> adds request state check in ublk_cancel_cmd(), and if the request is
-> started, skip canceling this uring_cmd.
-> 
-> However, the current uring_cmd may be in ACTIVE state, without block
-> request coming to the uring command. Meantime, the cached request in
-> tag_set.tags[tag] is recycled and has been delivered to ublk server,
-> then this uring_cmd can't be canceled.
+On Thu, 15 May 2025 19:14:39 +0530, Nilay Shroff wrote:
+> When nr_hw_queues is updated, the elevator needs to be switched to
+> ensure that we exit elevator and reattach it to ensure that hctx->
+> sched_tags is correctly allocated for the new hardware queues.
+> However, elv_update_nr_hw_queues() currently only switches the
+> elevator if the queue is not registered. This is incorrect, as it
+> prevents reattaching the elevator after updating nr_hw_queues, which
+> in turn inhibits allocation of sched_tags.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] ublk: fix dead loop when canceling io command
-      commit: dd24f87f65c957f30e605e44961d2fd53a44c780
+[1/1] block: fix elv_update_nr_hw_queues() to reattach elevator
+      commit: 532b9e11b8540eb543ebec9cba851c5691e10b5b
 
 Best regards,
 -- 
