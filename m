@@ -1,117 +1,100 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0E221B91F;
-	Thu, 15 May 2025 15:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D582021CC70
+	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 16:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747324710; cv=none; b=U1y9T/6v9sBwTeJLa2NcArDkYFE2WCEWwg5Pd1T7I6uIThY6fKSPjM70JJD24QwUTosRvoS/8wMIgPPBcko7e0KPVllnsvE0T/n3ZRhxe0+rHVSh9yNY9ez17umm1rvb4cgN5sMtcSK4VITNVh5UWeoocDAWkogjdLlAFISw4zA=
+	t=1747326377; cv=none; b=CYnk4R1UjsyyowAlkyiBaMHRQHTodXmLnNHqkM/Hh2V0/u8UQ2b+tlAKk0agjXXNdW3rF6uUd36cPZnVTXTmjvoqvDOpaf1migm7AmKNXxIVKbqJQRauwSZDq7fyWxKVd1mwYM27gOp47S/d2+3ngcPijwkYjiGvE9JSxBhMny0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747324710; c=relaxed/simple;
-	bh=R1H/UXsGaSYVCvw+5uX0eEYzsRNgloGCKh8AReIPnTs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PGK2avcgsb2f2zkD7WMzq0maCXourJH63GU34+jEbsuE8AN1ohbneJ1bMffCXUKaLIvNFz6SCRKyn+3lF+rxAQRvLk0TQAnEu+oflzg+xiSj1JySDyD9BNdP8POmPAMRzIaGUlKKx26ECDRPDVv1hX1pm1Kk1YJUrDqTTLC8kl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=oJGDMdxX; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1747326377; c=relaxed/simple;
+	bh=8im9bz+wFVRemM3Yi3xKVh+cV+0EhVXmpJQbunq6Hi8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uJ/WuT1CBWXXObfHV6C/8d1HxPzX0qqJUKnqkNMNEOn/EYjH+cOKewuiNKjlcKMkIMqhk+LbDk4laxorMuwIMo4SnGhPPZACRaT/r/cGZH38vYwlpD7kQ1Yg0DyJJ+sG1DY+Ftv553Imv0AVCL0F0OJgRRYEoqnSUbngNRz357U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CBMZPlRr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="oJGDMdxX"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZyvyB4qRzzlgrtN;
-	Thu, 15 May 2025 15:58:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1747324704; x=1749916705; bh=PFeKXxYALnMjUsC7mTWZ7ISJ
-	RXk4tHkOy0Au+85G4pY=; b=oJGDMdxXRBQzD58vhM6a9NGDtDdCffPR2oLbzTaB
-	YRkXquEqkwBu/YwocwCzFYVfLxNA2XelXhMxexC9wjRz9XSpMvs7aVWdC99MMRgS
-	xlRYxZNTqWY5ZOIr34qtxXQybFtVLxR2GQbW5LOQ4r9S1nll12dEoDn1REEqwsec
-	6PEyeIpMRpE5ytNPQ0K/feW1FWAZSjVQKiKTziz7CyJir41743th2fNShr0R4IuY
-	hJhcMrygKIwElFpQAMXl10sGelJuaIdKIXej8yNi2xdEA2eNjrcrPHybDgDXzFrW
-	bKo6ny4vB15wYKpT+Mk1Rbt+JyyiatDWyONjAEclaUbc/A==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id qb34mU40CL_g; Thu, 15 May 2025 15:58:24 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBMZPlRr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747326374;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d0di3BD/q2pbid+vun9UScyV72KOyFYQbPTD8NVYJx8=;
+	b=CBMZPlRrbVg0h9mr6MqgIMKvovOlW6np5QJjroxNgUu5tjVZ//4U9CDW42P2sW2tSLc0vV
+	8N6tzF/waH51P+LGbQLxXWWvlxqHYRFyt6isuTMKSoxuO7vkFRjzq86OrrFlBz/BvHHlId
+	T4XPDnP/Nnag1gJMpztIYT894hyby1Q=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-baod9Tk_NjuzDgnBxUMLfg-1; Thu,
+ 15 May 2025 12:26:11 -0400
+X-MC-Unique: baod9Tk_NjuzDgnBxUMLfg-1
+X-Mimecast-MFC-AGG-ID: baod9Tk_NjuzDgnBxUMLfg_1747326370
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4Zyvxz74l8zlvm7W;
-	Thu, 15 May 2025 15:58:14 +0000 (UTC)
-Message-ID: <6e448a08-d202-414f-8eb6-423a8ed51fcc@acm.org>
-Date: Thu, 15 May 2025 08:58:13 -0700
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 26F5E1956086;
+	Thu, 15 May 2025 16:26:10 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3DB019560A7;
+	Thu, 15 May 2025 16:26:08 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH] ublk: fix dead loop when canceling io command
+Date: Fri, 16 May 2025 00:26:01 +0800
+Message-ID: <20250515162601.77346-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-To: Niklas Cassel <cassel@kernel.org>, NeilBrown <neil@brown.name>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
- stable@vger.kernel.org
-References: <20250514202937.2058598-1-bvanassche@acm.org>
- <20250514202937.2058598-2-bvanassche@acm.org> <aCWVa68kp9vXTqHb@ryzen>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aCWVa68kp9vXTqHb@ryzen>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 5/15/25 12:19 AM, Niklas Cassel wrote:
-> Hello Bart,
-> 
-> On Wed, May 14, 2025 at 01:29:36PM -0700, Bart Van Assche wrote:
->> submit_bio() may be called recursively. To limit the stack depth, recursive
->> calls result in bios being added to a list (current->bio_list).
->> __submit_bio_noacct() sets up that list and maintains two lists with
->> requests:
->> * bio_list_on_stack[0] is the list with bios submitted by recursive
->>    submit_bio() calls from inside the latest __submit_bio() call.
->> * bio_list_on_stack[1] is the list with bios submitted by recursive
->>    submit_bio() calls from inside previous __submit_bio() calls.
->>
->> Make sure that bios are submitted to lower devices in the order these
->> have been submitted by submit_bio() by adding new bios at the end of the
->> list instead of at the front.
->>
->> This patch fixes unaligned write errors that I encountered with F2FS
->> submitting zoned writes to a dm driver stacked on top of a zoned UFS
->> device.
->>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Damien Le Moal <dlemoal@kernel.org>
->> Cc: Yu Kuai <yukuai1@huaweicloud.com>
->> Cc: Ming Lei <ming.lei@redhat.com>
->> Cc: stable@vger.kernel.org
-> 
-> Here you add stable to Cc, but you don't specify either
-> 1) a minimum version e.g.
-> stable@vger.kernel.org # v6.8+
-> or
-> 2) a Fixes tag.
+Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
+adds request state check in ublk_cancel_cmd(), and if the request is
+started, skip canceling this uring_cmd.
 
-Hi Niklas,
+However, the current uring_cmd may be in ACTIVE state, without block
+request coming to the uring command. Meantime, the cached request in
+tag_set.tags[tag] is recycled and has been delivered to ublk server,
+then this uring_cmd can't be canceled.
 
-Let's add the following to this patch:
+ublk requests are aborted in ublk char device release handler, which
+depends on canceling all ACTIVE uring_cmd. So cause dead loop.
 
-Fixes: 79bd99596b73 ("blk: improve order of bio handling in 
-generic_make_request()")
+Fix this issue by not taking stale request into account when canceling
+uring_cmd in ublk_cancel_cmd().
 
-Neil, since that commit was authored by you: the commit message is
-elaborate but the names of the drivers that needed that commit have
-not been mentioned. Which drivers needed that change? Additionally,
-can you please help with reviewing this patch:
+Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Closes: https://lore.kernel.org/linux-block/mruqwpf4tqenkbtgezv5oxwq7ngyq24jzeyqy4ixzvivatbbxv@4oh2wzz4e6qn/
+Fixes: f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://lore.kernel.org/linux-block/20250514202937.2058598-2-bvanassche@acm.org/
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index f9032076bc06..dc104c025cd5 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1708,7 +1708,7 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, unsigned tag,
+ 	 * that ublk_dispatch_req() is always called
+ 	 */
+ 	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+-	if (req && blk_mq_request_started(req))
++	if (req && blk_mq_request_started(req) && req->tag == tag)
+ 		return;
+ 
+ 	spin_lock(&ubq->cancel_lock);
+-- 
+2.47.1
 
-Thanks,
-
-Bart.
