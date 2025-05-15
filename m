@@ -1,109 +1,166 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93CF1EA7D6
-	for <linux-block@vger.kernel.org>; Wed, 14 May 2025 22:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560C9191
+	for <linux-block@vger.kernel.org>; Thu, 15 May 2025 00:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747262040; cv=none; b=f1ADGG/lMcQlhtGpnPThskITQrmOeYP+PkhmMw3s441g5kOfhh7y6DxuuQ1h8XzUAqfwJYnc1cVwMP0L0daEpOcQqnra89PC6QTyouyPGKadvD0yQmrePQnvz1jdFAVUKE7audZJS0GOQxfZ8d9RcLxbud+ubZ2vgtu4MGtGuvE=
+	t=1747268078; cv=none; b=BHqREW+JxXc2EnSkYghUEgYMhof8wm4GX+sjXFWWde8i50S82OvpLo+adAGuPcNEqSmyxfO2tex0pVjOa+wFqqTDbyX0R0LEKydDc9JsaZZTyUnDPbYLtxJIxK7FLTSQmbBirwhD4/5UugXaLWx2g8E/O0lu/9npprLUAWjK7XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747262040; c=relaxed/simple;
-	bh=lVu/mvmpN/FHogkSUMMEiuwAufUrxcktiR/7YV9Kjk8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fRqca8lAloAkDBIL+PobU7sO7ENp+xg4NImtI/BARZxKHGdj8tFccw4BqMStTe6Rv8ldOdZ0MCzoJY3lFCjiHum8UBcLZ6H7AtSo15O1vd9HPDnn7BViZw8HnGtxDg4TVt7113pikkpgz76evdbVjtXUlsZQOa//xoOd2sWP+cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b=WGuAunvL; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
+	s=arc-20240116; t=1747268078; c=relaxed/simple;
+	bh=quYQ44lNL28NGsGxFsC3r6wlm1Y7jznRiSlxIni8Rlc=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dtoTJB8t9XTX+pNNMlKnMJuDtkaVMxv+egKDkhLi8qTVzqpzf+ZK1g+7FrDCflt5mzTueHT2qyYw9sH4lOAP2+3wgYjZGZ818F5K23/WUKMqj6lUrHUjK1f9A+NJXx40Jtiem1rgISct26YXKIr7m7G5cIByn4FeNMa7HQcmsoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICIVapwT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b="WGuAunvL"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a0b7fbdde7so240907f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 15:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1747262036; x=1747866836; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u2PndMj4mpe7tAQgsJWM027dP5YcTE80wQVpszoi90Y=;
-        b=WGuAunvLUbpLIe69aSVlFusv102jjB6rk8sIGjSBMSgZc7561GOyp2ksSIup2+QWQO
-         Rsw018XuFfwRHoftahUpZIh1fZT7ddIT9J7PFkEtyozbuLoQKpr9e69PpBAyi23/iJyG
-         /5gGYDw8bpCMOyIp2uO97a3ZbVPQobSiItNv2ZnagptqZHX0J+7kzgHqtGwobs2Doale
-         8Tiw3eXdmF1SnX8XLVdCWjv1yLMK/SH840bUPKee7GElIlmRxQZRSo8yrgdENJkP8bb3
-         SBDEcvJeQNMoiXc1GOSSjOo6rETIEA9Ole6lgswV8HlSPezLui23ndTewu6KYlETBT8r
-         UJWQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICIVapwT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747268074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kNzHUEUeO2dhjTSVzvgUR5Z+U81BlGK7DOEGqJYrY1c=;
+	b=ICIVapwT+ltb/ndbQX4pHJikd3vnPZvfsaSJrlAUwZNwyBEIyFnMjwaJfuv4NtXrjUyn5N
+	BlW7XCgIGshn3CQAA9JgAqtMxE1mdMrDLDnGsG0gc9iBCwryvsbIk5vi7jzPb+z7CgnG7d
+	KLTqH0DxGlZcEneuCR95/+UAdaOW7pw=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-Z4tWkiRSMvOlK3JZJTMIiw-1; Wed, 14 May 2025 20:14:33 -0400
+X-MC-Unique: Z4tWkiRSMvOlK3JZJTMIiw-1
+X-Mimecast-MFC-AGG-ID: Z4tWkiRSMvOlK3JZJTMIiw_1747268072
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f6e59df2f3so8090646d6.3
+        for <linux-block@vger.kernel.org>; Wed, 14 May 2025 17:14:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747262036; x=1747866836;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u2PndMj4mpe7tAQgsJWM027dP5YcTE80wQVpszoi90Y=;
-        b=nBlVGNeGe4EyI8tt1eO4lHmse1xpslAu3nUYX8z743oyY4+0YtKpuLd/LLnmogOZSM
-         BQmjT/3WXI8E20MIuPwxcWsRVSjCpBnzbn0w95SLZm0+MEmRMA8ypTQbbdk7phroJiLT
-         zsRrMkp64ragCcpxL/6siJ5xItS33FLaRcyI/kavsajTCdfsGcKWaN1yF9A52zCHScwH
-         WaH84MPNejkt4sYTFBbYeNV3LsqxV/+J8pMN8xQuiV5NFZffwCNwGHmTssmJhWY4RZnz
-         R86TrADXPheOhGnUHBqKTO28dhDPmhHDpJQ4o3fu4GqsMZlmFUCZeHaYeX8TMJvR/w1N
-         6yiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvBTmiBWf3ejLdzjvT0j1/zgtSYcssH7s33Wh8whw+1zTNyrKMo/PjPrk8BjRpGbhjnAyNWJb/1ImUUA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yymzm2FD4WPoYjORza2CMnLVw/H9tvZYE0rjAL+euyk39iZHq+O
-	ECENAMDFAMsBz45n3xnREpuEEiG50B+CUmwhR14tkDswhbLVozyzMK0XnIYo/n4=
-X-Gm-Gg: ASbGncszrd6QMd5ByYHzUArnzP/uYj4jfB4Y9PfKPSmj0/Q72sPHfcFUpMQZS1ToMuG
-	DaYof8NdAbRZ9Th301eyouOp5JqiYs6kpvwLB8u71206/qHcplUWn10pofMujRGSXK19R5PO24d
-	50uBc8+OPvsIf/qQoHzR7FQTHiYpjqTT1ZbztRz1Z7Kvo1emKbk6tyZbP8VkDc8e2gFpioLjOZD
-	XOPW2FaHOf/ZyCHKoepiVzfOychHUS3xjT+ueQTbPR7wudyrqv2cHfmci4t4E8cPeA2gDPWEn+q
-	FuJGn19fXG/LFcNAm57IsYYhnAS3yHce+DAsPmPLZRAxmdwEOLyS4GDv933sEyYoMLNcu56su2x
-	B7yn+SbB15BdeEr4j1r4ibUX3lftpTcISBzfIbbmbUAzIclvUfNBM
-X-Google-Smtp-Source: AGHT+IEYoW3Orx1uFnSSmL8X8UcuSYJ4R2xSjZJtM6XytlKsXQpMH2p741e1LRWs7x3TtWZwVoC0KQ==
-X-Received: by 2002:a05:6000:2907:b0:3a0:830a:3d63 with SMTP id ffacd0b85a97d-3a349693050mr4987483f8f.9.1747262036038;
-        Wed, 14 May 2025 15:33:56 -0700 (PDT)
-Received: from localhost.localdomain (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ecccbsm21066994f8f.32.2025.05.14.15.33.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 15:33:55 -0700 (PDT)
-From: Phillip Potter <phil@philpotter.co.uk>
-To: axboe@kernel.dk
-Cc: phil@philpotter.co.uk,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/1] cdrom: Remove unnecessary NULL check before unregister_sysctl_table()
-Date: Wed, 14 May 2025 23:33:54 +0100
-Message-ID: <20250514223354.1429-2-phil@philpotter.co.uk>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250514223354.1429-1-phil@philpotter.co.uk>
-References: <20250514223354.1429-1-phil@philpotter.co.uk>
+        d=1e100.net; s=20230601; t=1747268072; x=1747872872;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kNzHUEUeO2dhjTSVzvgUR5Z+U81BlGK7DOEGqJYrY1c=;
+        b=HkCwOZoAZOTCW9erl/YxY9WBE1Z1ltPihIexrdHZgNz4AXIc88tyCSw0zHrXcyZ2zO
+         2Yip792PP9Z5ppgLR+i+WU/vrtq8jofHyj10fcVQ2Xz520MNJ/M/RgkL+2XQfTvgnszm
+         hdbdrwnHQLBNn6i4QRQNpCfwYEMoQL56QLEVJplLXfETW5ThnF+E1Af5y/5sCPmnDo2n
+         XikOEbq28Up8fkdrQoEFAxarm1fmMyxSia2ihdR0E0ebpT3sD9f7mrMdWrVg1CI86Rvn
+         WiXlVd6aOOthW/SP7kiKhl3vOa3O89+PJdJEIWey/tIQzMsGb/PK6AvhKakenDJ/Tqz+
+         NGEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXKSgFKSD3FvDYybNF6PDmItzhqq0GH+A3LiYFGPCynxeQOiuIo7NKPkCt6eY9P8YOcmdWb+1LjkBj5A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3vKyy5yI8pbwVCVPOChY2V7IYY76mCVY0jQ1iVsHux/6XMQts
+	c+xjoBxKFUQjSWDOvqv5M44Ua+TyMHWBEGaZtvLbOMI7LVg0EG7rCsUddOyUY3En+J+1tZ/akpF
+	Nwe3/qq2NbWrOLIOjcsZl9YmerBF3o/Fy1L7vmFeHdR7QGPQ3lcITq1Jj5jP5
+X-Gm-Gg: ASbGncvpuzVYrdqavK6R5Hse6BBvoT4a/ZrKCMiQi2ImPVZ+aZpsQ21GrEE9L15xbq0
+	EyRDqDSC4sCKtY6kHqeu/UvxJQnLlKPytQKOdcFxSmep2Lj9RQvaSz5ccf3ifbbbaOWRzWQKFrB
+	3Y5EsEt7s4cZKb2gEHQKc8g80iC2Ha5eVQ1oED7NzfAxe+yhtuwCp164dw7T4SsfNi2ltb+jTYp
+	VwX1BMToAa8dIQy9kM7ZwXjDN4fe7pniODtDUP7HmTc7gqzUV8EShirio9fJiQI8QUXQAABLE+K
+	6zqTGe3XL1tp11bbpme6bwo3wz379JyOGubRDu1EVXoQJeuLw3Vf0F0V9Q==
+X-Received: by 2002:a05:6214:d0c:b0:6e8:fe16:4d44 with SMTP id 6a1803df08f44-6f896ea9057mr99475006d6.31.1747268072562;
+        Wed, 14 May 2025 17:14:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsr7IFrS3iOvG8LAJsmK3Z9rLV7eHpX1e12kq9yRd9jWKqc02gH6HkR1aDUM2ojcwgcm4bmg==
+X-Received: by 2002:a05:6214:d0c:b0:6e8:fe16:4d44 with SMTP id 6a1803df08f44-6f896ea9057mr99474556d6.31.1747268072185;
+        Wed, 14 May 2025 17:14:32 -0700 (PDT)
+Received: from ?IPV6:2601:408:c101:1d00:6621:a07c:fed4:cbba? ([2601:408:c101:1d00:6621:a07c:fed4:cbba])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f6e39e0c8csm87119136d6.18.2025.05.14.17.14.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 May 2025 17:14:31 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
+Date: Wed, 14 May 2025 20:14:26 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 01/43] llist: move llist_{head,node} definition to
+ types.h
+To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
+Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
+ damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+ adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
+ peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+ rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+ daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
+ tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+ amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+ linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+ minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+ sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+ penberg@kernel.org, rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+ linux-block@vger.kernel.org, josef@toxicpanda.com,
+ linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+ dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+ dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+ melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+ chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+ max.byungchul.park@gmail.com, boqun.feng@gmail.com, yskelg@gmail.com,
+ yunseong.kim@ericsson.com, yeoreum.yun@arm.com, netdev@vger.kernel.org,
+ matthew.brost@intel.com, her0gyugyu@gmail.com
+References: <20250513100730.12664-1-byungchul@sk.com>
+ <20250513100730.12664-2-byungchul@sk.com>
+Content-Language: en-US
+In-Reply-To: <20250513100730.12664-2-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Chen Ni <nichen@iscas.ac.cn>
+On 5/13/25 6:06 AM, Byungchul Park wrote:
+> llist_head and llist_node can be used by very primitives. For example,
 
-unregister_sysctl_table() checks for NULL pointers internally.
-Remove unneeded NULL check here.
+I suppose you mean "every primitives". Right? However, the term 
+"primitive" may sound strange. Maybe just saying that it is used by some 
+other header files.
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-Link: https://lore.kernel.org/lkml/20250514032139.2317578-1-nichen@iscas.ac.cn
-Reviewed-by: Phillip Potter <phil@philpotter.co.uk>
-Link: https://lore.kernel.org/lkml/aCURuvkmz-fw3Nnp@equinox
-Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
----
- drivers/cdrom/cdrom.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Cheers,
+Longman
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index b163e043c687..21a10552da61 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -3677,8 +3677,7 @@ static void cdrom_sysctl_register(void)
- 
- static void cdrom_sysctl_unregister(void)
- {
--	if (cdrom_sysctl_header)
--		unregister_sysctl_table(cdrom_sysctl_header);
-+	unregister_sysctl_table(cdrom_sysctl_header);
- }
- 
- #else /* CONFIG_SYSCTL */
--- 
-2.49.0
+> dept for tracking dependencies uses llist in its header. To avoid header
+> dependency, move those to types.h.
+>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> ---
+>   include/linux/llist.h | 8 --------
+>   include/linux/types.h | 8 ++++++++
+>   2 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/linux/llist.h b/include/linux/llist.h
+> index 2c982ff7475a..3ac071857612 100644
+> --- a/include/linux/llist.h
+> +++ b/include/linux/llist.h
+> @@ -53,14 +53,6 @@
+>   #include <linux/stddef.h>
+>   #include <linux/types.h>
+>   
+> -struct llist_head {
+> -	struct llist_node *first;
+> -};
+> -
+> -struct llist_node {
+> -	struct llist_node *next;
+> -};
+> -
+>   #define LLIST_HEAD_INIT(name)	{ NULL }
+>   #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+>   
+> diff --git a/include/linux/types.h b/include/linux/types.h
+> index 49b79c8bb1a9..c727cc2249e8 100644
+> --- a/include/linux/types.h
+> +++ b/include/linux/types.h
+> @@ -204,6 +204,14 @@ struct hlist_node {
+>   	struct hlist_node *next, **pprev;
+>   };
+>   
+> +struct llist_head {
+> +	struct llist_node *first;
+> +};
+> +
+> +struct llist_node {
+> +	struct llist_node *next;
+> +};
+> +
+>   struct ustat {
+>   	__kernel_daddr_t	f_tfree;
+>   #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
 
