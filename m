@@ -1,120 +1,117 @@
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEB01EBFE0;
-	Thu, 15 May 2025 14:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0E221B91F;
+	Thu, 15 May 2025 15:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747319026; cv=none; b=XxmSUT9W3BlAqfo6c2HLZGLxFdqFlWUge/NRvpRadYEJJ9tVfZ5zFvR+od+ds0G8vgU1dqXmY2x+ftybzQ1ruE3UCf0oPuvEw86uSIy1rkpGsc56wd8ZXdkLjNDLch45BXmsvTOHPqcE/VizlybwTcgNO2lIH3Pz+2qq2d/0m6U=
+	t=1747324710; cv=none; b=U1y9T/6v9sBwTeJLa2NcArDkYFE2WCEWwg5Pd1T7I6uIThY6fKSPjM70JJD24QwUTosRvoS/8wMIgPPBcko7e0KPVllnsvE0T/n3ZRhxe0+rHVSh9yNY9ez17umm1rvb4cgN5sMtcSK4VITNVh5UWeoocDAWkogjdLlAFISw4zA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747319026; c=relaxed/simple;
-	bh=OVYj5OrIfo0hCfybiV1HY1UX5AWBWt1M6sqG61wAFTY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9iUH2D5TzoFiVyhDIBbWYDJAbd8mQcRAqQTg0QfRC7BHemay3QRnOvUxFWQT8YWLtgacHAFB8foVqtxsf8iji4MPJ5untqh0ZgESIYdFVOC0F2vnPnO7w2a6tgDpztnWhnpPbCH1FMgCFEuhSHYs40A3AvRVC6I14mFP4uuyTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4nsZVDU; arc=none smtp.client-ip=209.85.208.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747324710; c=relaxed/simple;
+	bh=R1H/UXsGaSYVCvw+5uX0eEYzsRNgloGCKh8AReIPnTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PGK2avcgsb2f2zkD7WMzq0maCXourJH63GU34+jEbsuE8AN1ohbneJ1bMffCXUKaLIvNFz6SCRKyn+3lF+rxAQRvLk0TQAnEu+oflzg+xiSj1JySDyD9BNdP8POmPAMRzIaGUlKKx26ECDRPDVv1hX1pm1Kk1YJUrDqTTLC8kl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=oJGDMdxX; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4nsZVDU"
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-5fbda5a8561so1483064a12.2;
-        Thu, 15 May 2025 07:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747319023; x=1747923823; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LT683tMosy0oNpKUwK8IDmqDNbDuA00iOvAYnalXVsU=;
-        b=X4nsZVDUqDNSPvwzd2ZBnew7VT9vN9KECsC3P9bkM0CynS/aEyl2wRvY99DqKbo0hB
-         GybvxLvYd5I0F3mzg9tnau2r9496jLRFIuoOXbArBZH4u5RaQ+8DmrLOF7D8Yl27GFBC
-         W5a0+SpkwanBkoBo1DNM0S2ajPJsYoECzGJdp4rajy+ggvEEQJEZeMuwSQPr59ziw7+P
-         1NXGzaYYQjmZYT25TGPh736F4nd6tp5FyyeaJ2eAOBocgP06ZD63hX3BMP58gh6cNRdd
-         VV6lVadUHykEIoNOcRDJawZ1gAAQSX44Zqgcitd0OY5Xc2roPkME6g9ZXaHQeYFeu+Mn
-         Z0LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747319023; x=1747923823;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LT683tMosy0oNpKUwK8IDmqDNbDuA00iOvAYnalXVsU=;
-        b=lsoDmEVGLIUHiHyC0aQHgoKsVNxaRlwiwt5ZxBRQd1UlXtoPDbOqZedTHbN8od2K+a
-         aVHkdWqjQoI+Wv5NSoMuXLHMPGJGp/ffacz4DsSwr+jIfyVC4Xe8WV4l1cNFrFxli1dJ
-         f+8fEmj8iH021eZnYNSkH4kc+MWYHAUVsVPurwMm9sPIiel5Dh8GSVsehcZ3fkzUyyb6
-         +qDLW3RdcHU+OnZUVXIbSzfRqkOx5ilDVh0UPfIcAURZpmb72aVcbn0PsDm0CCiKXiXR
-         lxFKLxvRoBePaVzviCduBBSH/UqKBBW4NrQiuRcaQCRqwS9tmvjOa8d+GFnSegX9Oqr2
-         jTOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCrB7zH7uts35qnoDLeeWuy2LUXRjxrNiuNH696OGhYa02swGnaa6hpP7NqVnXIgjLjEiIub1HgOoU+hdA@vger.kernel.org, AJvYcCURfcoSyoW4pr489iz37nuN230GAazNUUXpfkN4fc10VxA0SgXj6pgi/iGYRTCdcemkGvZTMxF8hLH5ZRE=@vger.kernel.org, AJvYcCWI3Ex7j0tX/Ma3SKnkeRjnQtHNcSGn+sR7osXCSPOUcArz+D7rXkbtIZygdrN/4Re4vfMO6sm+csms@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIzkuwPRRC6NrdfirEhgpyZm0GudNBvc91j2ndaeC8oAkBk7dl
-	P8z7L1IPljxu3tdPAGYAn/MraTG0RU5FnbIr82Vegcbezb7J7A6xWgVkFAlFRudNRIU1QBadQ+y
-	o/y+1wnXL89faF3S5rr1CS6cN4fM=
-X-Gm-Gg: ASbGncvKdcyRlQe33Ia1NZxgAqy77dDESh/+XxJdxUxTpynB0r/6Lf09bpfIdgzeqPf
-	AwJsB8pURz2fSy7ZLcsPPmwM/rFrLtUo37w1l8vOk2KlpuaUXmx1PziMU1s6eiQGezYyIruja1r
-	8qvxyWZbFLJr3E4todtn6fWtj6bgFUcuhSCyA=
-X-Google-Smtp-Source: AGHT+IFyEAJq81bagI9zZEfc+JJTkgD9y2OwydxnaIK+5su8U5juDUOSuSgm09M2wmLVuHC+zB8LE0qSsQdS2C5gsxI=
-X-Received: by 2002:a05:6402:1e94:b0:5ee:486:9d4b with SMTP id
- 4fb4d7f45d1cf-5ff988def34mr5826953a12.34.1747319022496; Thu, 15 May 2025
- 07:23:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="oJGDMdxX"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4ZyvyB4qRzzlgrtN;
+	Thu, 15 May 2025 15:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1747324704; x=1749916705; bh=PFeKXxYALnMjUsC7mTWZ7ISJ
+	RXk4tHkOy0Au+85G4pY=; b=oJGDMdxXRBQzD58vhM6a9NGDtDdCffPR2oLbzTaB
+	YRkXquEqkwBu/YwocwCzFYVfLxNA2XelXhMxexC9wjRz9XSpMvs7aVWdC99MMRgS
+	xlRYxZNTqWY5ZOIr34qtxXQybFtVLxR2GQbW5LOQ4r9S1nll12dEoDn1REEqwsec
+	6PEyeIpMRpE5ytNPQ0K/feW1FWAZSjVQKiKTziz7CyJir41743th2fNShr0R4IuY
+	hJhcMrygKIwElFpQAMXl10sGelJuaIdKIXej8yNi2xdEA2eNjrcrPHybDgDXzFrW
+	bKo6ny4vB15wYKpT+Mk1Rbt+JyyiatDWyONjAEclaUbc/A==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id qb34mU40CL_g; Thu, 15 May 2025 15:58:24 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4Zyvxz74l8zlvm7W;
+	Thu, 15 May 2025 15:58:14 +0000 (UTC)
+Message-ID: <6e448a08-d202-414f-8eb6-423a8ed51fcc@acm.org>
+Date: Thu, 15 May 2025 08:58:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250514182015.163117-1-siddarthsgml@gmail.com> <9c69fb88-d4e1-4567-93ec-ed303b9ba01a@ieee.org>
-In-Reply-To: <9c69fb88-d4e1-4567-93ec-ed303b9ba01a@ieee.org>
-From: Siddarth Gundu <siddarthsgml@gmail.com>
-Date: Thu, 15 May 2025 19:53:31 +0530
-X-Gm-Features: AX0GCFu78zQ8IorGVkwNh6gSrwg83AW3tOwNEzVPhP1R15BtgpzFD40XhY_AJwg
-Message-ID: <CAKWSiC6avoZNd+3qYMbmaT-ZM4=YpRb8N6frMA5+jbHhd4DyNA@mail.gmail.com>
-Subject: Re: [PATCH] rbd: replace strcpy() with strscpy()
-To: Alex Elder <elder@ieee.org>
-Cc: idryomov@gmail.com, dongsheng.yang@easystack.cn, axboe@kernel.dk, 
-	ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+To: Niklas Cassel <cassel@kernel.org>, NeilBrown <neil@brown.name>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+ Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
+ stable@vger.kernel.org
+References: <20250514202937.2058598-1-bvanassche@acm.org>
+ <20250514202937.2058598-2-bvanassche@acm.org> <aCWVa68kp9vXTqHb@ryzen>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <aCWVa68kp9vXTqHb@ryzen>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 15, 2025 at 12:22=E2=80=AFAM Alex Elder <elder@ieee.org> wrote:
->
-> On 5/14/25 1:20 PM, Siddarth Gundu wrote:
-> > strcpy() is deprecated; use strscpy() instead.
-> >
-> > Both the destination and source buffer are of fixed length
-> > so strscpy with 2-arguments is used.
-> >
-> > Link: https://github.com/KSPP/linux/issues/88
-> > Signed-off-by: Siddarth Gundu <siddarthsgml@gmail.com>
-> > ---
-> >   drivers/block/rbd.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> > index faafd7ff43d6..92b38972db1c 100644
-> > --- a/drivers/block/rbd.c
-> > +++ b/drivers/block/rbd.c
-> > @@ -39,6 +39,7 @@
-> >
-> >   #include <linux/kernel.h>
-> >   #include <linux/device.h>
-> > +#include <linux/string.h>
-> >   #include <linux/module.h>
-> >   #include <linux/blk-mq.h>
-> >   #include <linux/fs.h>
-> > @@ -3654,7 +3655,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev=
-, const char *cookie)
->
-> Could the cookie argument possibly be defined with
-> its size?  I.e.:
->    __rbd_lock(struct rbd_device *rbd_dev, const char cookie[32])
->
-> I see all the callers pass an array that's 32 characters,
-> but the function argument doesn't guarantee that.
->
-> You could also abstract the cookie with a typedef and
-> operations on it.
+On 5/15/25 12:19 AM, Niklas Cassel wrote:
+> Hello Bart,
+> 
+> On Wed, May 14, 2025 at 01:29:36PM -0700, Bart Van Assche wrote:
+>> submit_bio() may be called recursively. To limit the stack depth, recursive
+>> calls result in bios being added to a list (current->bio_list).
+>> __submit_bio_noacct() sets up that list and maintains two lists with
+>> requests:
+>> * bio_list_on_stack[0] is the list with bios submitted by recursive
+>>    submit_bio() calls from inside the latest __submit_bio() call.
+>> * bio_list_on_stack[1] is the list with bios submitted by recursive
+>>    submit_bio() calls from inside previous __submit_bio() calls.
+>>
+>> Make sure that bios are submitted to lower devices in the order these
+>> have been submitted by submit_bio() by adding new bios at the end of the
+>> list instead of at the front.
+>>
+>> This patch fixes unaligned write errors that I encountered with F2FS
+>> submitting zoned writes to a dm driver stacked on top of a zoned UFS
+>> device.
+>>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Damien Le Moal <dlemoal@kernel.org>
+>> Cc: Yu Kuai <yukuai1@huaweicloud.com>
+>> Cc: Ming Lei <ming.lei@redhat.com>
+>> Cc: stable@vger.kernel.org
+> 
+> Here you add stable to Cc, but you don't specify either
+> 1) a minimum version e.g.
+> stable@vger.kernel.org # v6.8+
+> or
+> 2) a Fixes tag.
 
-I see, I will send a v2 patch soon creating a typedef
-local to rbd.c Thanks a lot for the review.
+Hi Niklas,
 
---
-With Gratitude
-Siddarth
+Let's add the following to this patch:
+
+Fixes: 79bd99596b73 ("blk: improve order of bio handling in 
+generic_make_request()")
+
+Neil, since that commit was authored by you: the commit message is
+elaborate but the names of the drivers that needed that commit have
+not been mentioned. Which drivers needed that change? Additionally,
+can you please help with reviewing this patch:
+
+https://lore.kernel.org/linux-block/20250514202937.2058598-2-bvanassche@acm.org/
+
+Thanks,
+
+Bart.
