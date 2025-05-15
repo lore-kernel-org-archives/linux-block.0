@@ -1,190 +1,85 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5B2297114;
-	Thu, 15 May 2025 06:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BF43C00;
+	Thu, 15 May 2025 07:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747289876; cv=none; b=LvrnTIqwhVjPm3Rr7ahIzxUeaB+uxnqOuRPh2lfVAnjdBifLIDsR8gi8/zE2MaEFEfAOl9oH6DATWyU6U5KNAuJQUpAKDR505km5RbS/yqOm9lIrNP26WLFYyTgluLCfAa/PkFoXeNMP7YYu2PJO1OsW9x4Iu5Ubm/50hPjypnA=
+	t=1747293552; cv=none; b=fWBquiQP9anGu+1DJKWnUw4WcEPE1Q7mp2ZyB+Eju7cClRJ30e7XRH4Cr2ZvAcAGPZOnKdk/flcMt8ETiUWvWKvKNmvDCNjJwcbP16EQbr850HQCdhTebsXkV4fH7wDvqS1z6z+fVWHJNCqpGvnXMfr6dRa3rqrFxHQnQmAct7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747289876; c=relaxed/simple;
-	bh=flDc8bAVkxLAs44qfF6t4N4Rjx16rwxIkpiEMioxbzY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V9oa1Z7q1xZuSVGW7PLAF4uWVYJzMeuy/uM3nahehpE50hJeB/KgN0w+PXGN/yCyEd7nYAgFSRwJcorb8fkZpyA7HY4IFFz08F5Fzj1325/m/xp0sxR7wHB0CjcU2tfknMsLbgxSox+sQxdpVyIf/1yQIu9+rmEOak58kBDLV5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNBgvy4H; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747293552; c=relaxed/simple;
+	bh=NkLBdrijFJswBxzpyufasT+pKXDbScVm9q2E/Qb0UZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cheGim2ysDljUSupXz/4wB1NNvPxeRqCoVDsS1jAfDPPRK9p97tM5G2G/u7ihU0RCNhRG0BydJAPJ1F1ZRs5xwy8ePLIX1iGQw/0Pc1vE3Mnfp750eDv+RjeM+itOO3HXNhfr2BL04s8Sd9yMW2vqX4NixeBBr/OdVhrPf7jtdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KnBjGATk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNBgvy4H"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b24f986674fso542714a12.0;
-        Wed, 14 May 2025 23:17:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747289874; x=1747894674; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1qSfFOCQ+vt0X22cZ3R8MKHE8urKkyBJ+4xu5qVxH0=;
-        b=kNBgvy4HoMw1zQixl+XAAXAipvY7PKsyrcddcxPEhLdBrZU/YjQn3h4WMY6zd5cKq0
-         6tcjqCw4RWFha4zDqefWCZ7iIYWIzpgQGs9gHPci4AbZdGCObUMSAo07g5aPRacLtmn2
-         Uy4wglotQIZ8Z9T2UMC4KD+mpQVUpEdYKGQ9A6NnrKKLVwJPKovUv7FmOuhxQLVC6ERd
-         JmhKNkylXn7RDRrWltWK5I2KdkeTdHqfMijWo46MyQ1IxMFeLNwg+Iof6slQpo5shZ/V
-         Yo+P+qF3P//8Op+0NaLYsdRMyhlh++1ynmDQEpurO7av73LhP6VjOc6xny+CsCcvJjdh
-         t/Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747289874; x=1747894674;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g1qSfFOCQ+vt0X22cZ3R8MKHE8urKkyBJ+4xu5qVxH0=;
-        b=b0ezUAIRLLBodgVi8Yd0tjw/CzHgu1+N8WbV/MnjRGqg64/cW7AksJ9SXEId/b0pTT
-         yXaGUf9aScD4aH6PZEpgnY2H/H8RmjfGT0mw9TimecBi0t8+OFBlpLGGyyKVMiFNlrRh
-         2OuPGFguqr4oRBBVCyxGcghkZnZ27BTYzNiN3brOdVOXadb3y7yFIksR4P/m5Zmwkxfz
-         EyEvKoWoqrWHuXOZDG0fqlrPosBtOETj4NSZk2b+k66haI+b/fDMMgOXmF/v0VpzbMMl
-         yTjknkYwtZCWUwlC2yzRrOgMQp0agW8MgGai5ytKAkPV1jJ6NCMIOJULHzyUcYPW0dl/
-         OHYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhwWZ4O8AWlPbSC4MF/HYWAaJOxRfH8DKo+mm7SMm8UrdAau8mbqiBDVODXYFpNzFuI1xh+O0+X1tBtQ==@vger.kernel.org, AJvYcCWP9fcC6xaD7aE2asvOHSTgIhrpC3DwP0QZAkxUpFGFTReZ3yG0RjFyVKKPyCR/ufBvsK2xBfmkrpPSUbKr7FhN0Psj@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYx8blGGYF8XyRzliMsGeqNkyfRkNVmq29iolFvXWJT86DCjnZ
-	pB5mmDlfcdDmv5Cg6ZXBqu4Xnn4z66LQY4MgzswHvdHAKaYV9pR8KOJF7g==
-X-Gm-Gg: ASbGncvTCEzmajx2B+q08wHhdSX1u8FRGmBO3qXJJ5D7n4VB0gD7z8euVIey4Z4M6Co
-	OqK/GjENEmN77EkdMmIwpwp9MW996rx3iwHf/qcbIzvo7+/7S6Tz/hlGUP2zIv+kYhW3MfPbRHC
-	60+CICkwy/eh4SLghdoyeq2ucY/xPzGQadW8utMvWQtEWjk+rlNE6/PSuAqS3MCNyYUUlQD2MMJ
-	nMfAekJx88WddiOCjpMQoJbiFjErqYrCmC2kTT1y6CqU/PUwodpV2jFB7b1f6T/lcOFnriAnLCQ
-	kMYtCHLY4uSqnlAgzHiwdIWWYv/gDfuVzCYIlkF7CyM3wry5c0dL5wV7PDXIigVDY5VnKQ0GFLB
-	eQuist5oofLgCN0CoF3VKm8k=
-X-Google-Smtp-Source: AGHT+IHEKe4Oqr1X9qygACDyoYOsImdnyOQ4k1ePcozQKHquIP8n2jF0IGlTDys4dHqYqrRhMi7T+g==
-X-Received: by 2002:a17:902:d58c:b0:215:a56f:1e50 with SMTP id d9443c01a7336-231b39834bcmr38269855ad.8.1747289874263;
-        Wed, 14 May 2025 23:17:54 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc8273d93sm109242375ad.150.2025.05.14.23.17.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 23:17:53 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: axboe@kernel.dk,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	akpm@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH v2 4/4] relayfs: support a counter tracking if data is too big to write
-Date: Thu, 15 May 2025 14:16:43 +0800
-Message-Id: <20250515061643.31472-5-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250515061643.31472-1-kerneljasonxing@gmail.com>
-References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KnBjGATk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B34C4CEF2;
+	Thu, 15 May 2025 07:19:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747293552;
+	bh=NkLBdrijFJswBxzpyufasT+pKXDbScVm9q2E/Qb0UZg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KnBjGATkzALgMw3pOGBMm1sdR0zCN42fpzszIvO6MSd5rgeJTr9p8XsFQsPWRI2/Z
+	 eCmPweF6o0t4um9xhH8kjtUriOUh5vPDQTwGNtDLSnLv3D7qfL7/4On02Bi0IWrlzV
+	 94XupcNb0RFyO57+DGNgswboERDyUu/mZBskoMPKCypMb7w7oGJICqwH+5s3moMSyx
+	 m9GGEYxXR0++8xkntDAC1f68PgmWh00k3gdj6KnUlYp/zzNQpRbT6D1/KffnOjLJ/X
+	 pVBjOwQ2oqN48F+626lEbTfgg9tkBBsjVOWop5A4O0xWwuQkJDuiLYvjubiF/HyZ1C
+	 jm4WJSClcfvOg==
+Date: Thu, 15 May 2025 09:19:07 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+Message-ID: <aCWVa68kp9vXTqHb@ryzen>
+References: <20250514202937.2058598-1-bvanassche@acm.org>
+ <20250514202937.2058598-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250514202937.2058598-2-bvanassche@acm.org>
 
-From: Jason Xing <kernelxing@tencent.com>
+Hello Bart,
 
-It really doesn't matter if the user/admin knows what the last too
-big value is. Record how many times this case is triggered would be
-helpful.
+On Wed, May 14, 2025 at 01:29:36PM -0700, Bart Van Assche wrote:
+> submit_bio() may be called recursively. To limit the stack depth, recursive
+> calls result in bios being added to a list (current->bio_list).
+> __submit_bio_noacct() sets up that list and maintains two lists with
+> requests:
+> * bio_list_on_stack[0] is the list with bios submitted by recursive
+>   submit_bio() calls from inside the latest __submit_bio() call.
+> * bio_list_on_stack[1] is the list with bios submitted by recursive
+>   submit_bio() calls from inside previous __submit_bio() calls.
+> 
+> Make sure that bios are submitted to lower devices in the order these
+> have been submitted by submit_bio() by adding new bios at the end of the
+> list instead of at the front.
+> 
+> This patch fixes unaligned write errors that I encountered with F2FS
+> submitting zoned writes to a dm driver stacked on top of a zoned UFS
+> device.
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Yu Kuai <yukuai1@huaweicloud.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: stable@vger.kernel.org
 
-Solve the existing issue where relay_reset() doesn't restore
-the value.
+Here you add stable to Cc, but you don't specify either
+1) a minimum version e.g.
+stable@vger.kernel.org # v6.8+
+or
+2) a Fixes tag.
 
-Store the counter in the per-cpu buffer structure instead of the global
-buffer structure. It also solves the racy condition which is likely
-to happen when a few of per-cpu buffers encounter the too big data case
-and then access the global field last_toobig without lock protection.
 
-Remove the printk in relay_close() since kernel module can directly call
-relay_dump() as they want.
-
-Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/linux/relay.h |  5 +++--
- kernel/relay.c        | 12 ++++++------
- 2 files changed, 9 insertions(+), 8 deletions(-)
-
-diff --git a/include/linux/relay.h b/include/linux/relay.h
-index 3fb285716e34..08c1888c9c1a 100644
---- a/include/linux/relay.h
-+++ b/include/linux/relay.h
-@@ -33,13 +33,15 @@
-  */
- enum {
- 	RELAY_DUMP_BUF_FULL = (1 << 0),
-+	RELAY_DUMP_WRT_BIG = (1 << 1),
- 
--	RELAY_DUMP_LAST = RELAY_DUMP_BUF_FULL,
-+	RELAY_DUMP_LAST = RELAY_DUMP_WRT_BIG,
- };
- 
- struct rchan_buf_stats
- {
- 	unsigned int full_count;	/* counter for buffer full */
-+	unsigned int big_count;		/* counter for too big to write */
- };
- 
- /*
-@@ -79,7 +81,6 @@ struct rchan
- 	const struct rchan_callbacks *cb; /* client callbacks */
- 	struct kref kref;		/* channel refcount */
- 	void *private_data;		/* for user-defined data */
--	size_t last_toobig;		/* tried to log event > subbuf size */
- 	struct rchan_buf * __percpu *buf; /* per-cpu channel buffers */
- 	int is_global;			/* One global buffer ? */
- 	struct list_head list;		/* for channel list */
-diff --git a/kernel/relay.c b/kernel/relay.c
-index f47fc750e559..f4d1dcac164a 100644
---- a/kernel/relay.c
-+++ b/kernel/relay.c
-@@ -304,6 +304,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
- 	buf->data = buf->start;
- 	buf->offset = 0;
- 	buf->stats.full_count = 0;
-+	buf->stats.big_count = 0;
- 
- 	for (i = 0; i < buf->chan->n_subbufs; i++)
- 		buf->padding[i] = 0;
-@@ -603,7 +604,7 @@ size_t relay_switch_subbuf(struct rchan_buf *buf, size_t length)
- 	return length;
- 
- toobig:
--	buf->chan->last_toobig = length;
-+	buf->stats.big_count++;
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(relay_switch_subbuf);
-@@ -663,11 +664,6 @@ void relay_close(struct rchan *chan)
- 			if ((buf = *per_cpu_ptr(chan->buf, i)))
- 				relay_close_buf(buf);
- 
--	if (chan->last_toobig)
--		printk(KERN_WARNING "relay: one or more items not logged "
--		       "[item size (%zd) > sub-buffer size (%zd)]\n",
--		       chan->last_toobig, chan->subbuf_size);
--
- 	list_del(&chan->list);
- 	kref_put(&chan->kref, relay_destroy_channel);
- 	mutex_unlock(&relay_channels_mutex);
-@@ -720,11 +716,15 @@ size_t relay_dump(struct rchan *chan, int flags)
- 		rbuf = *per_cpu_ptr(chan->buf, 0);
- 		if (flags & RELAY_DUMP_BUF_FULL)
- 			count = rbuf->stats.full_count;
-+		else if (flags & RELAY_DUMP_WRT_BIG)
-+			count = rbuf->stats.big_count;
- 	} else {
- 		for_each_online_cpu(i) {
- 			if ((rbuf = *per_cpu_ptr(chan->buf, i)))
- 				if (flags & RELAY_DUMP_BUF_FULL)
- 					count += rbuf->stats.full_count;
-+				else if (flags & RELAY_DUMP_WRT_BIG)
-+					count += rbuf->stats.big_count;
- 		}
- 	}
- 
--- 
-2.43.5
-
+Kind regards,
+Niklas
