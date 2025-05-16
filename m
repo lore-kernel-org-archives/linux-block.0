@@ -1,63 +1,64 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A734502BE
-	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 13:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200AC17B425
+	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 14:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747401928; cv=none; b=e/pbMhN3DDhpFSpdH2XpCUELIbz4hsFvdkuETVzffVRgELOGYsGl9c7TvD9cXfKyM3dgF3BJc9vy1tTFkApqaI453rLXML0ewSUf2CsQUM7ELdKi43Rjecp4RbRQkzNTwlJC+Xb1LX0OvXXBoYsWEzGlp0h2kdpFVu58kFkAMHQ=
+	t=1747406610; cv=none; b=Fjze3e6SVv4Xe0uJB92NqX7JZlagIpXVO6n/tndVYHT2Lhy6yWHYk2/KH/RuSceOR3UlYPxWtqbc7ualR8mb63Sau4OBtin5ORAnig/cvN5Yj8I8lWuZ3EQ10KV4XZ74Mt2yCWWegQs5UzohaZ5VhaLd9yhzTAIs2Re2wlc4FuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747401928; c=relaxed/simple;
-	bh=s5k/jNNETxgNeqNzBEbaklAGIBfl8ipKcF5OGaqgvAQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=C9WxJfn5Lm5abZ+fYmGrgzGK7CeyyWsO5bODw2+V+an4w0MQaNxtPnPIWYnzP7pdfPk0TvDn8vLw3YXWwwHkb0KeL/PFAlhw6OKsBgu6WvBA2iHzquyeUYHi4S1g/zkk3YRZ9JEBAtBmg00dUdipH6cDeGC2sNY2Nhp7iwPl6cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Fs3th2/Z; arc=none smtp.client-ip=209.85.166.173
+	s=arc-20240116; t=1747406610; c=relaxed/simple;
+	bh=/NAwgycZl7erk3U9GIadv57Z7cvBUxcnJEGvhZDaVMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g7evxWU08Etgu3AyjNvX1fY5VAMpr3Ng2/agDKOS2l9wHWbI/ud+aCzbJnrCpvtM8o9si3bW2cpC8DkzxbZXzmwbWvUSWB05nKsK5ETTJHwUSoOMoqxUdcH9EnCOUzyq0gsPUslvAY3kPKf1hhtEVmXjPP0ybZbvz8YNDlUVNt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zqgtEmeK; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Fs3th2/Z"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3db6cda65efso11114285ab.1
-        for <linux-block@vger.kernel.org>; Fri, 16 May 2025 06:25:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zqgtEmeK"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-85e1b1f08a5so60392139f.2
+        for <linux-block@vger.kernel.org>; Fri, 16 May 2025 07:43:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747401925; x=1748006725; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/fRnR/n17qD2UBlkwNIKLOJbZGbv5+RE1H+GS/YREEQ=;
-        b=Fs3th2/ZzRcIS/GRbcaqKds/iRJG6DOr2heHSgYQOk1FZ2TiDacgADPJZDxNKZuaNx
-         zzKAWySKuuY//YNsW6bCTOytOnMxJo8Ip8R0ynQMbD/4XIBywcVvSjg2iHmSRzTtJxBW
-         ORVBo4zAU2oZOYV7h9PaD4PbFyI3mT4O/tia1kFrRrBYI0EycN0gUcebNvHidsn4yfD6
-         yfUlmwL4P7cfCn3WqZ0WAj6dDXIFBf6e3w1fS3uB6Y5s1mFdmfC8piHi4t845xt2Mz5a
-         2l1x5bKMDm1qcQNJsE5eHJ0fHiPfgmCi0s6f4RxVp7T8yD5ufhpM20NUbHpw9fe2425N
-         RkwA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747406606; x=1748011406; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=prCdQyvnM/rs+FkK7sDF3PvP4+OFyS4++/OPAvNwpL0=;
+        b=zqgtEmeK+z3iUC2Js/f9POF94PjPnN7RALGdNY3QHsC/BiqS7gV5EmneEGc2atizIu
+         JLUAfyjsrI8bilMpHOd/w+Yuwt5jmIrU+7sqYi5gKwGHzuE5kdhVXO+hanT68i9Lexz4
+         Sjcg6j9GZBJz49z20FRenHRxIXYYuUKYfZ0OT7g2I7/+HwtbCC5kGXG86YAHw+XofgLX
+         cn3uDfqbIRY5Ec6p5uJU1cGgi0YGC0PlUaJl0oRNKZmn3unV9UEoC6DQYM156tJjhRUn
+         /ZG0PmBUliZRYPl0pBPn7oJ3nA7cdsZG3pgZ1hzw3HWmRe7k84GRlOsnp9QQI3kuMFSR
+         L3Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747401925; x=1748006725;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/fRnR/n17qD2UBlkwNIKLOJbZGbv5+RE1H+GS/YREEQ=;
-        b=LaUgv2Rc526Gtx8bQlXt0wVMAK+Vs2nXtXxfPPnPnUnbeypet9JDo3kZ6Qbys00YPH
-         0BljbcPLktArhFCq0IgbJ+5s2xAD/AzovisglwaE4r/K2JaPWJC58XwgrNdPjAcFZAmk
-         5dMMo8hQQKKJjgXEC2vi6T9Z4rKo1nPf0D8nnf6k7YPSZSVB4L0IgGvgXVj321SyKzmN
-         jY+SOm4oeXIFFeYsXUd41p7HlWudMUmKSP8BD932G9U2GSM63fWv56GXZryebFjCbWrZ
-         Zre1GiEZEg0VSlJ1N/Dck7SVrkq15ALzaN2zTv3q72BPoY+ANVOhzdRWinqpfevoqHU5
-         qntQ==
-X-Gm-Message-State: AOJu0YzHR6pbmxak5qPXbKTHz6jQb5NxWtBwDmb3jsr0G5KTuxXxwTlD
-	psNsuZFck9xA0bTMP+ZTm8EWfNT3VYeySpNNRrsNcH6+t5laygldHhvfasKmY5joonPTgzALbSS
-	osuOW
-X-Gm-Gg: ASbGncsz+s9oUjziybINUqSIavc00yl0MLXbFkBINqSCoISr+13Bsyho7RPK2Qb7YOi
-	f+9k/65MxOANCG5qHl4L0BIAq/g32hA1PWg9dUyZnQzLW1mJhJ0yl0lqgWe+3g4VDAs77Kbn4lh
-	V1YUfLIwWHyArCczrVfjUtpEcCyZ7jKqNfC3NSiKQItlqurR2NBTVxuh2bHBQ4trczGubqrjhlD
-	VaBhoalmuEpSUbv8G+CcBrgz/GsoRnJLQEDs5f5AfdrOFHTLGJ+9090hR8CuKAqzNgyp7mf3SF7
-	ICmrfzt7NcfmO9ERstNCzVP+/XXevqTy0Y/6pdqpeuEb98A=
-X-Google-Smtp-Source: AGHT+IEkhyzGf1wO6QJ80cki0bh0zp1lS0kTLt5Mfg5ojErbiM1m2s1sFdk5X3iM3DwcKMLC+c7iXQ==
-X-Received: by 2002:a92:cda5:0:b0:3db:6dd4:c2f0 with SMTP id e9e14a558f8ab-3db778fc5abmr96532365ab.8.1747401925220;
-        Fri, 16 May 2025 06:25:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747406606; x=1748011406;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=prCdQyvnM/rs+FkK7sDF3PvP4+OFyS4++/OPAvNwpL0=;
+        b=ZFSvct62MCWU01fd2nXRyg11OMCeSeVpzPtuGERg8Vb2XnNqkDbdo1DTjuT3JhVigH
+         0+IY4GJ8L+xRLbDPG1cqt2uZF0ZEBlcqrBGbA2kFCwMoeG6PV4oL5o5mW7SXmMaK7nlX
+         VB98h4aeNujzxdmAPvoTuhGFWDONq54Q2NP2jSMhzj8jxdtqQVJbF1rLhIxdpqTTn5E3
+         wH7wohcAjpigLMThzKCeIWGhuAyAAAq69g2SPKtUe0JEpsyB+kmFRjZORQQkhqSYR17i
+         Eqxg0V/FVHIiij5jjffZklbzTtHOlaofe31unx7QAbMEFUpM4kyRFG4xIsV7SftYb/SS
+         z1Nw==
+X-Gm-Message-State: AOJu0YzozHgiWgI1Y5MCTJYW+VQuqzz6O6vdghgpcfo3sdCyCOay/kNu
+	3/lYovChpcSPmZjSm5RJaHea54siMw+AzbYamwXATWycrO65rb4J185/HdWiO6zGPIuEgyeuW+x
+	CkPGy
+X-Gm-Gg: ASbGnctsE3kfwXofxLVkv+g7oUUIsxfzSeL8pFcq0iQtL6BPlKyy3dKZyvDSYT/dMyS
+	PfwtuJp4LOSY1BgrNXdf3axNU6oTx6+Q2zK+RkBb/FtWb/BMm/hXq+hHsX0ek5wBrpD30sMBdMN
+	DtJC428vK6giNq+gNnN20F6+ZtNCRu2EGp2U5qw+8WDCShSvYp4aN7jhI6GTID29SJ6Jw91mE3W
+	RkcaJnAc9v8v2xwfG8oqwz3gQzSjKJZW5hvqqqTU5nXrMwYp3ykV/fQYHkc6vI5tP8ngh70D2uy
+	EgkSDNn9Jtz5e3qfEXMIDpFHVaqRlOgr4l4ivB7lqiurAQg=
+X-Google-Smtp-Source: AGHT+IFLui/5TcNeeGyfjSliH21Rt3SnlD5fOdEShwlWn9BJnqOLtLrqPs/PNsUOaShW9xOztH2YuQ==
+X-Received: by 2002:a5d:8181:0:b0:86a:24a7:cecb with SMTP id ca18e2360f4ac-86a24a7d12dmr347718639f.4.1747406606060;
+        Fri, 16 May 2025 07:43:26 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3db84449204sm4833795ab.69.2025.05.16.06.25.24
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-86a235e14a4sm41905139f.14.2025.05.16.07.43.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 May 2025 06:25:24 -0700 (PDT)
-Message-ID: <23fdc0b1-60ab-4875-9bc5-4b666fe2279f@kernel.dk>
-Date: Fri, 16 May 2025 07:25:24 -0600
+        Fri, 16 May 2025 07:43:25 -0700 (PDT)
+Message-ID: <6cc5fdbc-5515-43f6-81ac-b8ab7cc99684@kernel.dk>
+Date: Fri, 16 May 2025 08:43:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,86 +66,24 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] blk-mq: move the DMA mapping code to a separate file
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+References: <20250513071433.836797-1-hch@lst.de>
+ <20250516054236.GA13922@lst.de>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.15-rc7
+In-Reply-To: <20250516054236.GA13922@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 5/15/25 11:42 PM, Christoph Hellwig wrote:
+> Any comments? I was trying to get this out of the way before converting
+> the metadata mapping to the iterator.
 
-Some fixes for block that should go into the 6.15 kernel release. This
-pull request contains:
-
-- NVMe pull request via Christoph
-	- fixes for atomic writes (Alan Adamson)
-	- fixes for polled CQs in nvmet-epf (Damien Le Moal)
-	- fix for polled CQs in nvme-pci (Keith Busch)
-	- fix compile on odd configs that need to be forced to inline
-	  (Kees Cook)
-	- one more quirk (Ilya Guterman)"
-
-- Fix for missing allocation of an integrity buffer for some cases.
-
-- Fix for a regression with ublk command cancelation.
-
-Please pull!
-
-
-The following changes since commit dd90905d5a8a15a6d4594d15fc8ed626587187ca:
-
-  Merge tag 'nvme-6.15-2025-05-08' of git://git.infradead.org/nvme into block-6.15 (2025-05-08 09:08:23 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.15-20250515
-
-for you to fetch changes up to dd24f87f65c957f30e605e44961d2fd53a44c780:
-
-  ublk: fix dead loop when canceling io command (2025-05-15 10:53:41 -0600)
-
-----------------------------------------------------------------
-block-6.15-20250515
-
-----------------------------------------------------------------
-Alan Adamson (2):
-      nvme: multipath: enable BLK_FEAT_ATOMIC_WRITES for multipathing
-      nvme: all namespaces in a subsystem must adhere to a common atomic write size
-
-Damien Le Moal (5):
-      nvmet: pci-epf: clear completion queue IRQ flag on delete
-      nvmet: pci-epf: do not fall back to using INTX if not supported
-      nvmet: pci-epf: cleanup nvmet_pci_epf_raise_irq()
-      nvmet: pci-epf: improve debug message
-      nvmet: pci-epf: remove NVMET_PCI_EPF_Q_IS_SQ
-
-Ilya Guterman (1):
-      nvme-pci: add NVME_QUIRK_NO_DEEPEST_PS quirk for SOLIDIGM P44 Pro
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.15-2025-05-15' of git://git.infradead.org/nvme into block-6.15
-
-Kees Cook (1):
-      nvme-pci: make nvme_pci_npages_prp() __always_inline
-
-Keith Busch (2):
-      block: always allocate integrity buffer when required
-      nvme-pci: acquire cq_poll_lock in nvme_poll_irqdisable
-
-Ming Lei (1):
-      ublk: fix dead loop when canceling io command
-
- block/bio-integrity-auto.c    | 62 ++++++++++++++++++++++++++++++++-----------
- drivers/block/ublk_drv.c      |  2 +-
- drivers/nvme/host/core.c      | 30 ++++++++++++++++++---
- drivers/nvme/host/multipath.c |  3 ++-
- drivers/nvme/host/nvme.h      |  3 ++-
- drivers/nvme/host/pci.c       |  6 ++++-
- drivers/nvme/target/pci-epf.c | 39 ++++++++++++++++-----------
- 7 files changed, 107 insertions(+), 38 deletions(-)
+Code shuffle looks fine, the only thing that's a bit odd is moving the
+code and adding the copy right. But it does look like you touched most
+of that last, so looks fine. I'll get it applied.
 
 -- 
 Jens Axboe
-
