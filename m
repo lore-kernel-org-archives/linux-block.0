@@ -1,48 +1,32 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28309206F23;
-	Fri, 16 May 2025 04:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA4710E4;
+	Fri, 16 May 2025 04:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747370265; cv=none; b=jrkuPrZnKZvZ+V4JZLtGebJf58lP553urj/F4eqD3PVvRF/FwphxbXvmBt+8oaJUcQ+bXg6k9XjQtZdTlQi/Avf7qcF3KXkWrKrwyC8Kl4r2qv/MkXt2UX3MZtN75BcwA9tb+ZpmXgpkF98cASdX1777HW1g+wFrloS43mMnL68=
+	t=1747370888; cv=none; b=PeQOvHZIkxEkDatFYnyb2h5Alh5xeRU4x+xS7uYVw/GuIWD6kDm09iM7bbJFmfxCa1WB374A8KLezUhFVWc8GJlMLWjiOz+WwtVzlcTOhB19S7D/UBq86WTw6lpMLN2mnI3L7ylufwxlJDeYah/tnSb6ataxRnENaaQtN3wHfsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747370265; c=relaxed/simple;
-	bh=WaKI9gNXth+mQA/2U4+nsTBmttlOm2HrhL0YToOrOkI=;
+	s=arc-20240116; t=1747370888; c=relaxed/simple;
+	bh=db5+y9W9O1XMRw78IbF4CeLjvRbadbhXMXm+aMxAKwM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mONitQtpsoo5VSyErl+fEVexpaEkILx9al8O48c4a4jAwuy/CDNXdA9t9FM/fXQoGi46GjVirVFztnijk5VsZxCbBqn82kIfVILmZK47yQK3doMWsGcM8Rrm+6IOPKLZbo/GDGNZWEtjezRYrY+r42BTjoMukBa0mAbi/qkzS1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RfW1QzMK; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RfW1QzMK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WaKI9gNXth+mQA/2U4+nsTBmttlOm2HrhL0YToOrOkI=; b=RfW1QzMKc75AW7TEflla3wEgfl
-	m0x+kMNPyZO1ExmhXAV12X4wt6xym4lpyr4TTTsuRcYA+svQfX/rYB/LjQMtXtJxf4TCv7hoXK9+o
-	ilsKNNc2RsYlm1H/1rcPIhhA956INYNfv2cKVDH2KAXDTks5Apztw+gPCD1zcajrOONqJlluUrB6c
-	d2BDa12XC0VEcFwgmNeL9/lq2DXYRl6iw17OGBQNpndJSySup2qWfxevW07k1hO9VzVdaUC412bBD
-	tdCVWyB8nw59VZ6bofhBn8MKt6UmI2c45VJYdKp8h55R+3Ara9e9lud1RgD/nCo/v+QYyYAi0ydpa
-	ktF1qfNQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uFmpG-00000002T2z-1yhX;
-	Fri, 16 May 2025 04:37:38 +0000
-Date: Thu, 15 May 2025 21:37:38 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Yushan Zhou <katrinzhou@tencent.com>
-Subject: Re: [PATCH v2 2/4] relayfs: introduce dump of relayfs statistics
- function
-Message-ID: <aCbBEg-DFYvx0Dpa@infradead.org>
-References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
- <20250515061643.31472-3-kerneljasonxing@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sa077xcnrhhox1IpWkpKPPk1OZ/8jKN6M1TMU1wAD+ZsoVXKzDXEV0y+Fx3Hwe2wVD4muz92iNZ5HNnhoWVW7M67S3r3N+sB1gB1f5DnCQYApKLLNUbZvd2PTnCxI+kPZWrRUgDT/vdwt0Bj1WAW/OZGP+ZDUiIQXvHPsxwpTlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id BE12B68AA6; Fri, 16 May 2025 06:47:54 +0200 (CEST)
+Date: Fri, 16 May 2025 06:47:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+Message-ID: <20250516044754.GA12964@lst.de>
+References: <20250514202937.2058598-1-bvanassche@acm.org> <20250514202937.2058598-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,15 +35,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250515061643.31472-3-kerneljasonxing@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250514202937.2058598-2-bvanassche@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, May 15, 2025 at 02:16:41PM +0800, Jason Xing wrote:
-> +extern size_t relay_dump(struct rchan *chan, int flags);
+On Wed, May 14, 2025 at 01:29:36PM -0700, Bart Van Assche wrote:
+>  		/*
+>  		 * Now assemble so we handle the lowest level first.
+>  		 */
+> +		bio_list_on_stack[0] = bio_list_on_stack[1];
+>  		bio_list_merge(&bio_list_on_stack[0], &lower);
+>  		bio_list_merge(&bio_list_on_stack[0], &same);
+> -		bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
 
-Please don't add pointless externs for function prototypes.
+If I read this code correctly, this means that we no keep processing bios
+that already were on bio_list_on_stack[0] and the beginning of the loop
+in the next iteration(s) instead of finishing off the ones created by
+this iteration, which could lead to exhaustion of resources like mempool.
 
-> +EXPORT_SYMBOL_GPL(relay_dump);
+Note that this is a big if - the code is really hard to read, it should
+really grow a data structure for the on-stack list that has named members
+for both lists instead of the array magic.. :(
 
-This export seems unused even with the entire series applied.
-
+I'm still trying to understand your problem given that it wasn't
+described much. What I could think it is that bio_split_to_limits through
+bio_submit_split first re-submits the remainder bio using
+submit_bio_noacct, which the above should place on the same list and then
+later the stacking block drivers also submit the bio split off at the
+beginning, unlike blk-mq drivers that process it directly.  But given
+that this resubmission should be on the lower list above I don't
+see how it causes problems.
