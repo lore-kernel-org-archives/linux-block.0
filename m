@@ -1,153 +1,191 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05153232
-	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 02:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52D11DFE8;
+	Fri, 16 May 2025 02:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747361792; cv=none; b=egGyZiepvPKRebgZ/khE8qV531ORRTVHMahyck1z+iz40zy92ZSUF00fxLgas6Fvy+73ybmeet/mUX89W74SRtCusz6jXhIrG+HDEwGHaJljKiA0HcckIAxDGZKA/IITCg1nKcxAzN+eX9G/7oGQmVdo2NZxFR2CU8qyZLHB5p4=
+	t=1747362789; cv=none; b=PUbYaXhtWdjmtWwQHuQ6BEliuJhbpW2cJgTa1gnzdOZ2T/RggnYBec7wPaz6EH/m64qfWuotukdXmoIN3YO2bGPcv0IR91KH+F4FM/1qJ9rFRKiRz2SsHyoOeJAnqcdpLWexxZ8m0nGZsAj88RBn2N/purKzZcNIysGWBxa6yLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747361792; c=relaxed/simple;
-	bh=iHebLIXopeHKkBU7TNEq7/6La2D5Rc/29g9yp66VsJc=;
+	s=arc-20240116; t=1747362789; c=relaxed/simple;
+	bh=T7qM7dRp59Fy5lY4eb20+paUlrx1Lrk82Cxc+XpO064=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eclOU1k1NCEJMFF8NJySTaRMFEZeX6oEwhUoqqGxc9UKfsHLaxJmhyJ7zicLvFGnmBvIUzkmKRaOdiheCxxWiV2Z4Glx+KilmJ+tGtGfUPfeXyEZQJo+4MyF/xjjtIWBpg6tzJ/dU6zn4Bm/yWKr4oxd+KuDlI8oFKdDaJLXB/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Dffb6dlZ; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=JvEO4Fka+5sTGh6IvW0n5rT8G28WFo039COmXfOujGaL4DdNY61odKBMe6Wmea6O0m7UxYfJVqlVFr/dRYs48Lf95KvEpy8XphSi+Ph7ovzZhyfwVJhv/Qt2+Jlum9AAPiXNuZuhRFWiopGDd2IU6SrEl6UsUqZb+2VYmRBQ2dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i1RiMws0; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Dffb6dlZ"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-231c790d558so1421235ad.2
-        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 19:16:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1RiMws0"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-86135af1045so173432939f.1;
+        Thu, 15 May 2025 19:33:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1747361790; x=1747966590; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747362787; x=1747967587; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LVPLSfmc0os/HPQ/mni5HoLtIlZ3oyybdSI++dqqG8A=;
-        b=Dffb6dlZ/KhYZhXwFxOEsdSP21qeyhj6bhW3hdozuSlNhY1MSWC1VlT4maUneUQdBM
-         FtZU+ta6Uid+5lq7PCicmpNhq1JxJwcmMdiZVoOwcfsOQLBJp/LlxG8aqjG2GPHKh9H6
-         0ds6JSaNkrh1C1W6YtG5bhdDpbFbfHTDe4O1vRqUx8AU3gNylvJ2rq4DJIvQz/2qWSGW
-         Wp8wYfRl1wvLuCccUG/tBUE6Sd45JwOt29nmRSqJZe27A6t4buOmvVuT/912zPFuPDSl
-         4l8xZIoc/80af1ZWEHyLxOA/1AUeGH8FiZV1DIWDdJ/ggc7RNSvGkSIb/JzpUJfbPVcj
-         UWMg==
+        bh=rVGPAcMbIDDAE+CGMGoNk6Yx5l7mc/llgWDfx/5zSXY=;
+        b=i1RiMws0x11N0AqPAPAsj+YFRadWEsTFj78oiWnPFVeJB3GC21Aeg5ZUzValkkpeO5
+         hftVA3m30Em3GN6T63ScYvGMgZu5PMiooDPu9wY3noVm56F+YD4Jxz7T1j2dvdDb8Bc0
+         zd4AvUl1vRfa9/Q+xYkgR1bVSDsD7dWJceIyS8sskyhXjU3vaHGcARsBBNPYwVDxKGqH
+         6kkSioYFPbnGC5Hvz+qGIuVIRk+uKh6FD9X8lkwQeldVQg94O9EEWpQQKQs7Dkg+Xgon
+         hJ9a0gYGX3m8DSnmpXTJkLqhVprIQIG1ORjibWOljPaauVQTmomar56YASZL0WRt0sBk
+         BhMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747361790; x=1747966590;
+        d=1e100.net; s=20230601; t=1747362787; x=1747967587;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LVPLSfmc0os/HPQ/mni5HoLtIlZ3oyybdSI++dqqG8A=;
-        b=O5L0j4voXUMi7yfhGV9S2tHTGp5l0rEInieSwV5fK66jjC0WY0zK4Qmal++YEpQ0Nd
-         dr+kbuBT/pqYvbWyhQ1fNv0Fv79cgURDTP0ZmVV0XmHnojPOziCmx27znj8ej0J44ud2
-         F8wFllahF/wiOTohml11wwF8SrUiMExqhpc91DztNNp+w6SslWL5uoaV9b509Jd8baSw
-         inbsxERfElTJyi7hsAbtbeLp+uRaqEpM6gpzNnhzP9YgLkRw3hR19tCyNlfmgmX4SWec
-         D+Pj5WQDQMoi1eZppf7n5rzK4sad4ZSpw5r9JZGBr40Vo2f00Vomej6anCZyBFRpZfZD
-         u+Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCUD3qUiLiNte8yEH/cbSjhZJHDgCR0LSWOiY2JhRo9xcFRXH8jRUmJZi16xbDtVf4TcnAlvS0TElNRp9g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT0FUJEUpaBM2Y24jIacz69weSuhku5QJhlo/HI/G8iV3Z58Sp
-	rhN04cXhcYhbV50upIPhm9r1/UKqUqCKioM7hFmEWeXBPzbL7Dsq57QGFQPgAZ2kq1NuiUF4Hqk
-	ej7i52peMxxentp6GK1pYUIZFPBzM91jug8ZVe+I8IA==
-X-Gm-Gg: ASbGncuETVompAFDQCepJELHZ8M0zAX9FXzoZF3Il0nq5p2G3eZKbOouB3PhqmE8klh
-	jgG3szAIWMIDkCQPL46qhpxduQNrNjZu1e+Fahy9qhws580fkV/2lIHBcxGI1UtwDlkcxuQnc1C
-	fPZ1z4hcDurMfRrCyCUrH9LSlSFy5suZY=
-X-Google-Smtp-Source: AGHT+IFaiwhjP5aT+J0sYDy75ZBwmNVHs5l9bRXJIep8bvyvVkGcYHMZBbFJnSHBlaam6Ttd4w5hNUo+9kmzV4Wnnwc=
-X-Received: by 2002:a17:903:41d0:b0:224:1005:7281 with SMTP id
- d9443c01a7336-231d43c3d88mr7205945ad.7.1747361789820; Thu, 15 May 2025
- 19:16:29 -0700 (PDT)
+        bh=rVGPAcMbIDDAE+CGMGoNk6Yx5l7mc/llgWDfx/5zSXY=;
+        b=HLNqnIfCRdDhDipmd1/I5sMwZCZOUXr7yPm3JmsnyX2gP0nTVChUTEsdjj/wIfrbCw
+         H6VgJUpKZSTIaW9yUVFym/bxqWDNTWYHn828cqoivyZzQawVGsdcOp/X0Mz529hyhC5a
+         VGvocTGD464KpA4XOqTzQYwws95N/SK0dV8wpMWQ0l0WeAvO5ZH1w6Hezb5UDC6O2gLf
+         DIyAJDhdehjhqFJ2BkuXHpA1nzs8oGvJbbe3JCzjUuKpmt1E/BFQ/h3iKt41pQz8A4hE
+         S3Sd4ov+oUfIj7XbIP/x5aVZrq+djmjzuLscPQYcVTOQl2xNDNgqMjIJLRtjYnQ7waD6
+         mGXA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmnlhlohjoZhsp9BR6jfUH7SQRzrNME0QGO0mRbdUEqJmVMqG0ze6ymvCXj+e4maUU65MHWhRHXq9DOQ==@vger.kernel.org, AJvYcCX5YKiVyHxl79s1INnRl7r65NYK6GukQURxq81vuJFgdefdK7A3VsJN7vqlXt2/ADt6Yr7hbXs086ToHx3U@vger.kernel.org, AJvYcCXPZjQMQ4VaT2rsrBhtxgnngL0UzmeJMcR0br2qpniz0Uh0OWPeXumce7nOiiBgjK4gk0tzhPs6+WftBCPgacho/dV5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrz8OUKXOwoQV2fokabqguHZjdEr0t3UrPNBruEi9gs/lYGS0z
+	w7pCmOfTwuBtB48wCNcAPawYsvcJ9OjjPbB3Bi5Bf/uS5cAmJgwYsxPlE+k3QwCfRUX0+71xrND
+	54L5wI2EBX7YgnppS1Iij4JW3B+51Q7A=
+X-Gm-Gg: ASbGncsDQCIzHuenm4e3sJK/C/6RXjdbyC2t0fg7rbZceL0QtyZkrMDjkGTDqaUB3/d
+	67Sw9x5VFeiQvDNYOSk8qSARRs3hz1JJOm8DmBIeY62a7d8FQC9p+kDopvh+X5+pXlP0SeRHW1C
+	RVJPqIefxP91JN4NL22DNIB9alcW/FE5H+
+X-Google-Smtp-Source: AGHT+IEArUWw7fv+2aLvDYNuJ2lUNmN9w0DfhWr7EyePZ0E/QR1dcxoznx1PWONJdRZnCm99AXsqb1zC2xVwpUD4tyU=
+X-Received: by 2002:a05:6602:3e94:b0:864:4a82:15ec with SMTP id
+ ca18e2360f4ac-86a231b703amr347766039f.6.1747362786828; Thu, 15 May 2025
+ 19:33:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515162601.77346-1-ming.lei@redhat.com> <CADUfDZocCU0NL6HZ+nd5VRkrKyJMNcU-xDBsvq99FiSJ=Lk90A@mail.gmail.com>
-In-Reply-To: <CADUfDZocCU0NL6HZ+nd5VRkrKyJMNcU-xDBsvq99FiSJ=Lk90A@mail.gmail.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Thu, 15 May 2025 19:16:18 -0700
-X-Gm-Features: AX0GCFssJpS1DS7FuEXQebJXbjAb69-if30W23VG0_j88fFTeWItkjR6o_n6E90
-Message-ID: <CADUfDZqg5g-MoG5F8OeeZSndUnFr9At=naZP6mobXdNdPExF5w@mail.gmail.com>
-Subject: Re: [PATCH] ublk: fix dead loop when canceling io command
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
+ <20250515061643.31472-3-kerneljasonxing@gmail.com> <20250516110837.355d963224cf74ea2b020d9d@kernel.org>
+In-Reply-To: <20250516110837.355d963224cf74ea2b020d9d@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 16 May 2025 10:32:30 +0800
+X-Gm-Features: AX0GCFvwEQ1j5Z-FoSMzorQ-dGuNPeoemf9Wczbrn1TtjwBZRE-D6iQkLDrHgM8
+Message-ID: <CAL+tcoB=HYB-EnyYTK=HzpgsosbOwo2VxMw-_mzbkSYnEWAVqw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] relayfs: introduce dump of relayfs statistics function
+To: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: axboe@kernel.dk, rostedt@goodmis.org, mathieu.desnoyers@efficios.com, 
+	akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 15, 2025 at 6:51=E2=80=AFPM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
+On Fri, May 16, 2025 at 10:08=E2=80=AFAM Masami Hiramatsu <mhiramat@kernel.=
+org> wrote:
 >
-> On Thu, May 15, 2025 at 9:26=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wr=
-ote:
-> >
-> > Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_t=
-ask and ublk_cancel_cmd")
-> > adds request state check in ublk_cancel_cmd(), and if the request is
-> > started, skip canceling this uring_cmd.
-> >
-> > However, the current uring_cmd may be in ACTIVE state, without block
-> > request coming to the uring command. Meantime, the cached request in
-> > tag_set.tags[tag] is recycled and has been delivered to ublk server,
-> > then this uring_cmd can't be canceled.
+> On Thu, 15 May 2025 14:16:41 +0800
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
 >
-> To check my understanding, the scenario you're describing is that the
-> request has started but also has already been completed by the ublk
-> server? And this can happen because tag_set.tags[q_id]->rqs[tag] still
-> points to the old request even after it has completed? Reading through
-> blk-mq.c, that does seem possible since rqs[tag] is set in
-> blk_mq_start_request() but not cleared in __blk_mq_end_request().
->
+> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > ublk requests are aborted in ublk char device release handler, which
-> > depends on canceling all ACTIVE uring_cmd. So cause dead loop.
->
-> Do you mean "deadlock"?
->
+> > In this version, only support dumping the counter for buffer full and
+> > implement the framework of how it works.
 > >
-> > Fix this issue by not taking stale request into account when canceling
-> > uring_cmd in ublk_cancel_cmd().
+> > Users can pass certain flag to fetch what field/statistics they expect
+> > to know. Each time it only returns one result. So do not pass multiple
+> > flags.
 > >
-> > Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > Closes: https://lore.kernel.org/linux-block/mruqwpf4tqenkbtgezv5oxwq7ng=
-yq24jzeyqy4ixzvivatbbxv@4oh2wzz4e6qn/
-> > Fixes: f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_t=
-ask and ublk_cancel_cmd")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > > ---
-> >  drivers/block/ublk_drv.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > v2
+> > 1. refactor relay_dump() and make it only return a pure size_t result
+> > of the value that users specifies.
+> > 2. revise the commit log.
+> > ---
+> >  include/linux/relay.h |  7 +++++++
+> >  kernel/relay.c        | 31 +++++++++++++++++++++++++++++++
+> >  2 files changed, 38 insertions(+)
 > >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index f9032076bc06..dc104c025cd5 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -1708,7 +1708,7 @@ static void ublk_cancel_cmd(struct ublk_queue *ub=
-q, unsigned tag,
-> >          * that ublk_dispatch_req() is always called
-> >          */
-> >         req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
-> > -       if (req && blk_mq_request_started(req))
-> > +       if (req && blk_mq_request_started(req) && req->tag =3D=3D tag)
+> > diff --git a/include/linux/relay.h b/include/linux/relay.h
+> > index ce7a1b396872..3fb285716e34 100644
+> > --- a/include/linux/relay.h
+> > +++ b/include/linux/relay.h
+> > @@ -31,6 +31,12 @@
+> >  /*
+> >   * Relay buffer statistics dump
+> >   */
+> > +enum {
+> > +     RELAY_DUMP_BUF_FULL =3D (1 << 0),
+> > +
+> > +     RELAY_DUMP_LAST =3D RELAY_DUMP_BUF_FULL,
+> > +};
+> > +
+> >  struct rchan_buf_stats
+> >  {
+> >       unsigned int full_count;        /* counter for buffer full */
+> > @@ -167,6 +173,7 @@ struct rchan *relay_open(const char *base_filename,
+> >                        void *private_data);
+> >  extern void relay_close(struct rchan *chan);
+> >  extern void relay_flush(struct rchan *chan);
+> > +extern size_t relay_dump(struct rchan *chan, int flags);
+> >  extern void relay_subbufs_consumed(struct rchan *chan,
+> >                                  unsigned int cpu,
+> >                                  size_t consumed);
+> > diff --git a/kernel/relay.c b/kernel/relay.c
+> > index eb3f630f3896..f47fc750e559 100644
+> > --- a/kernel/relay.c
+> > +++ b/kernel/relay.c
+> > @@ -701,6 +701,37 @@ void relay_flush(struct rchan *chan)
+> >  }
+> >  EXPORT_SYMBOL_GPL(relay_flush);
+> >
+> > +/**
+> > + *   relay_dump - dump channel buffer statistics
 >
-> Is it possible that req now belongs to a different hctx (q_id)? From a
-> quick reading of blk-mq.c, it looks like the hctx's requests are
-> always allocated from the hctx's static_rqs, so I don't think that
-> should be a problem. Reading req->tag here is probably racy though, as
-> it's written by blk_mq_rq_ctx_init(), called from
-> *blk_mq_alloc_request*() on the submitting task. How about checking
-> blk_mq_rq_state(req) =3D=3D MQ_RQ_IN_FLIGHT instead of
-> blk_mq_request_started(req) && req->tag =3D=3D tag?
+> nit: relay_dump() can mislead to dump relay channel contents.
+> Can you rename it to relay_stats() or relay_get_stats()?
 
-Ah, never mind, I see what you mean. The struct request could have
-already been reused for a new I/O to the ublk queue and associated
-with a different tag. And that new request could be inflight even
-though the old one has completed. Really this condition intends to ask
-"is this tag active?" I guess you could use
-sbitmap_test_bit(&tag_set.tags[q_id].bitmap_tags, tag) (exposed
-through a blk-mq helper) to determine that more directly. But the
-quick fix probably makes sense. It's technically racy, as the load and
-store of req->state need to use acquire and release ordering to
-synchronize the accesses to req->tag, but it's probably unlikely to
-observe that reordering in practice.
+Sure, both are good names. I would choose relay_stats().
 
-Best,
-Caleb
+Thanks,
+Jason
+
+>
+> Thanks,
+>
+> > + *   @chan: the channel
+> > + *   @flags: select particular information to dump
+> > + *
+> > + *   Returns the count of certain field that caller specifies.
+> > + */
+> > +size_t relay_dump(struct rchan *chan, int flags)
+> > +{
+> > +     unsigned int i, count =3D 0;
+> > +     struct rchan_buf *rbuf;
+> > +
+> > +     if (!chan || flags > RELAY_DUMP_LAST)
+> > +             return 0;
+> > +
+> > +     if (chan->is_global) {
+> > +             rbuf =3D *per_cpu_ptr(chan->buf, 0);
+> > +             if (flags & RELAY_DUMP_BUF_FULL)
+> > +                     count =3D rbuf->stats.full_count;
+> > +     } else {
+> > +             for_each_online_cpu(i) {
+> > +                     if ((rbuf =3D *per_cpu_ptr(chan->buf, i)))
+> > +                             if (flags & RELAY_DUMP_BUF_FULL)
+> > +                                     count +=3D rbuf->stats.full_count=
+;
+> > +             }
+> > +     }
+> > +
+> > +     return count;
+> > +}
+> > +EXPORT_SYMBOL_GPL(relay_dump);
+> > +
+> >  /**
+> >   *   relay_file_open - open file op for relay files
+> >   *   @inode: the inode
+> > --
+> > 2.43.5
+> >
+>
+>
+> --
+> Masami Hiramatsu (Google) <mhiramat@kernel.org>
