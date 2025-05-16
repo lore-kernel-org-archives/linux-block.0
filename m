@@ -1,100 +1,78 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1316136;
-	Fri, 16 May 2025 05:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0771E1FAA;
+	Fri, 16 May 2025 05:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747371818; cv=none; b=gKLa8QCTudy61kgZYIa0tT6Pn/vLMB87RQqmx1I9YQ5Xhir8TJcN9wcc47RYFDbIE26CttgZ5cksWwFuNnUyZX+NRbt7ctraKEsKs2lDgfq3XHdWn8gwnj3MepD2hxw+1VJLZoJ1vogmRkk0nzBUgNt1rnqxrcEbrDvkwCiYNuY=
+	t=1747371995; cv=none; b=q3tn5KBRd2rhXLgIhILiKRp/bHjTWcc1OCrxRkwQuUStKP04Tndb8gf5N3HUkva2M246dIdHCJ8woH404NvBHVxc0jdcYhBMP4h4ZhAJQIOk2N8KYabV27iez2hkwfLbO+IG8S+DVi+oqLEb2Fus4itl1Tq9/QmPcxvm9LEOVRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747371818; c=relaxed/simple;
-	bh=vfHO8Cu806qRwunobDX+1+4PqY/E0h8rmFWKv+QUIVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LaHSFPKBGBfDaQCfQ/adPtxZzAwpZPHsCEnffageIW3e3P/yJkaKLrfaH6EFKz6OuOUYuKvb0Y6gmZaG3u5+uzB5afDwYeZXgnRQ+yOBqlM4F7OeGQwr/v5HfecqaK3r1L543Q4eJkt+8nP4BtZYG1VeTj1JVHXbEszADtmtLlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SLDRMOnq; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747371995; c=relaxed/simple;
+	bh=YdryWNyIKuDW1Oc5I6PriD/WKRFUP15ge9Pd6nr4mVQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tRiTurT5+fUCnazSMpSiyXb0ohvQ6ptSbMwfMXM0VwOOx0AzVZDm8DvnJLeilaMWHWm2g/ASZJGfnRpTdET+LC5DM4QWom+iecW6zup2lM0IbY/s9IDt4wakYx16XbpZStqG2RBNc84Y7GHKIu9DunLv98EmFn9hKt6cFJzwlPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EPPlPlGI; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLDRMOnq"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3db703f0fe7so3717255ab.3;
-        Thu, 15 May 2025 22:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747371815; x=1747976615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vfHO8Cu806qRwunobDX+1+4PqY/E0h8rmFWKv+QUIVk=;
-        b=SLDRMOnqGEC6tPiR4h8GID9bGvf7l83wdO/OFhWGm1DrnXlTLMvsqp9cTLeNcVRwFD
-         y+NsSBQE4JsKQZRruFxqFBkVPDjSrZLPgYpsRFoOHmAUH7xqiY2Ut4/dwOwMilXmp88s
-         Z7YIHWy4VFE2Rj+enMb8oabKRF5fUAZJWi0gtTY744CB2M+NyUvJlGTN8TMJ3Eq/gJ9M
-         36lomP9ijgGtZBk73vmATMzmiqsji8JoLE6O/KsRJYsohQYMHK+/Pinn+Pr8zZ2061C6
-         v9rsf67fmj9TJvSpBhFniiPNNa8cXikT7NF7khCnNOmZ4kexpX5r0SnCM+taNaTrUN/g
-         tYWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747371815; x=1747976615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vfHO8Cu806qRwunobDX+1+4PqY/E0h8rmFWKv+QUIVk=;
-        b=boYJym6CjqSTz+2VOrsfSmFMRW3CMk6GfNByGdvbGQiQhE6XlGyJHH8fDtScEi83p0
-         IIrzhPKU6qXjJIr2UXpK5CivFYvJLF/wmxcE3uMHcAGDGVIJ5VubHyQmmk1+d3YleOsP
-         5Oqc02Tcufe1I4z+9OCjkrjEAC0cQofreHycB/rByfwfnrj6/biGK/0jnNU7UUHVg6sQ
-         Zh6QL8RnypMAxXrp4oOPQhDXwUIDl6j+hMiPCoSh9xv+NI0ZThr0pWdydm36IR2zq+wO
-         PEvDGfCsnzh13ixfcOG1lZeOerMolZn07b5xTnEXBoMSOwdGf67WDdf+yzFIxZhmcPp0
-         YHfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaNtIR//fM9aWb21xaz4/OjMq9/jhGeIG66JlZeSfRgu1vKdQYq0chXN3zKFwhKAGi+APKRgWgpG5Dq2q7skjbeKmP@vger.kernel.org, AJvYcCWQ48z1ZhbuRDvOPFJ8L6LVZsfDWoiMwkS/xwPd4cNsbWcZ0Imxlg1cgbej/RE1lpqoRVkgwsPePhfBCA==@vger.kernel.org, AJvYcCWqlxsfnmQoUUc3B0d7IUi8mTObGc/H+n1gIzrtOjhhZ5kEAKnZ+v49/sR3xZTiva5KKXb82sykxxfVawnM@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+W3EP1I2Kj30wsvtzCZEYLhIyF6YihIAMqRFN2DWk80NUnPKb
-	ZeISSloFxuu0Utz6xwo/oh52yENi2NVoikQKcXcAPak8bUJb1D83GtORGKJ5BbzC8F5/Lamug4f
-	qR65c8ku9w+5kCmYk7hZbIMsxdLqRV4d3N1gq
-X-Gm-Gg: ASbGnctsDvzaCAI4QWIUOwz2+04GUT8emuU6OH9VCvoejf7t2SZId8Nk0PnGbpMeR7S
-	fEdu9OESUY2xB4OFVPnr1sDBL5QQpvWHcVUIPgtwsv3iuMbfMreavJoX8TYZoNiyJsb4vGfzg3+
-	rI9YlNszXqAMjN5MsQ5ScfaDXz7eSeqVLE
-X-Google-Smtp-Source: AGHT+IFYrJOhjTVLzbKs8xnZ9+ArasciV//3bbbyItaQXPVWh6Cx0qVyiAMYxtEdMiKAiN/Zwm51ThRRmW+7HDrvi1Y=
-X-Received: by 2002:a05:6e02:3790:b0:3d8:1a87:89ce with SMTP id
- e9e14a558f8ab-3db842adf09mr27734255ab.3.1747371815436; Thu, 15 May 2025
- 22:03:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EPPlPlGI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=c/kXnQe3xBJvxiLTBwNnRGNRT5ysZ3DFWAv0O+/UyX4=; b=EPPlPlGISmDCej/eoIP/GfC61v
+	auBL/4dTZMPc5zVdfq7mq4ssKnR96MpKhEfNOu7Vo2W1AyVA6tB0IMqrN+9ajUdN1JS6lEc1ZaKWg
+	FNIyYFIhOy0uvxcav7UhhM1Tnhp0/vUUokzZsIRNoZ0o/NkXveE/ZeB87WPWRvjZIbCsM19n7XFDM
+	GNMneNUObX71OdbKfyUvQjtiLILGKmyUNa8h6TqZHNRT9FgRxxBMT4mT+YOml01XWIZ1wHPprzajv
+	E8L+1kdVBHoZF1zKnvT/E3+KvV7YL67g+/BAT23jVR8ALFx6eElHSRo5QuvkGkUT+xC5eil4YakEG
+	8EsHlWog==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uFnHB-00000002Ubj-25zH;
+	Fri, 16 May 2025 05:06:29 +0000
+Date: Thu, 15 May 2025 22:06:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+	rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>,
+	Yushan Zhou <katrinzhou@tencent.com>
+Subject: Re: [PATCH v2 2/4] relayfs: introduce dump of relayfs statistics
+ function
+Message-ID: <aCbH1eA8Iicg_Fq_@infradead.org>
+References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
+ <20250515061643.31472-3-kerneljasonxing@gmail.com>
+ <aCbBEg-DFYvx0Dpa@infradead.org>
+ <CAL+tcoBtLu6_E1qKL9VHOiCe_RVpEGzMiMqA3GpPi1Z88aMiWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515061643.31472-1-kerneljasonxing@gmail.com>
- <20250515061643.31472-3-kerneljasonxing@gmail.com> <aCbBEg-DFYvx0Dpa@infradead.org>
-In-Reply-To: <aCbBEg-DFYvx0Dpa@infradead.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 16 May 2025 13:02:59 +0800
-X-Gm-Features: AX0GCFud7BwCZnFXGGuzCwd6g8Kk4hgoR46sY5ReG_zVqAYJVO2J3Sb54Adzoe8
-Message-ID: <CAL+tcoBtLu6_E1qKL9VHOiCe_RVpEGzMiMqA3GpPi1Z88aMiWw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] relayfs: introduce dump of relayfs statistics function
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, akpm@linux-foundation.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
-	Yushan Zhou <katrinzhou@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL+tcoBtLu6_E1qKL9VHOiCe_RVpEGzMiMqA3GpPi1Z88aMiWw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, May 16, 2025 at 12:37=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
-rg> wrote:
->
-> On Thu, May 15, 2025 at 02:16:41PM +0800, Jason Xing wrote:
-> > +extern size_t relay_dump(struct rchan *chan, int flags);
->
-> Please don't add pointless externs for function prototypes.
+On Fri, May 16, 2025 at 01:02:59PM +0800, Jason Xing wrote:
+> Do you mean make it inline in include/linux/relay.h like how
+> relay_write() works?
+> 
+> Will do that.
 
-Do you mean make it inline in include/linux/relay.h like how
-relay_write() works?
+Just drop the extern, which is not needed:
 
-Will do that.
+size_t relay_dump(struct rchan *chan, int flags);
 
->
-> > +EXPORT_SYMBOL_GPL(relay_dump);
->
-> This export seems unused even with the entire series applied.
+> >
+> > This export seems unused even with the entire series applied.
+> 
+> My initial thought was to provide a symbol for some kernel modules to use.
 
-My initial thought was to provide a symbol for some kernel modules to use.
+The only user is blktrace, which can't be modular.  Or you plan to
+submit a modular user soon, like in the next merge window/  If so
+note that and add a pointer to it in the cover letter.
 
-Thanks,
-Jason
