@@ -1,101 +1,145 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59F02147EA
-	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 01:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230F322D4D1
+	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 01:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747357486; cv=none; b=fmDREZgxFLCSlBw8fSa9+JAUbIbCR+7NSbDiTHUhqbGI7fFqNKWNc93EyvVo7/ms4qBoKDBlfGG3Y5bTULc1oMPTcBg+sL+qG+AOhR4M9CGGm8z9kj7+rNSy5E6oQbY26bYtMcCjXWPWxfOlIyqEE532KnyfYcqWDGQCv46y7dI=
+	t=1747360327; cv=none; b=b0uHvw/k9ZCABUjucsbhEpFWUecCUyrHH+PuDmxhO2Xv3KXYOkfx8xOxgPArZVAFyqiWv2Vdm3ElIIbjrEDmg6/2C5OIxOlt28HrLspGcBmNkcPQlxe8EASnAft0TAH8wWYhfWv967SFT34PVC5Lm9eT+ryprTRwMseSjPUD6mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747357486; c=relaxed/simple;
-	bh=JFGNNGTiUPiTbfxJ/GattBF7DGBjvfS9mOl1QlsZyM4=;
+	s=arc-20240116; t=1747360327; c=relaxed/simple;
+	bh=wf5+FbjqixvjHNb8swHNqfFvTaqSjk76G5GiXe0ZOj0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r916K8otdWaDzObT/N7N3fa5p13QzFzBmqUIzlso18UdD4JF+2yjd99p+Ev4SRAcc594IBZZ0IyuC3za27uGpxVQKUE7M4Fg/lUQ/BoBIH1nzVQC4QRYjkdQDpTkYbwfV72mWb5zyxEcE7CHhjip8DyRZpbSeF9/H6h39QnSRfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jto4Sh0G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=d7icWjvslXtUJp6B9Ugccnb0w/5nt49uESkBP/9quJKzp36vvldsw6sYV1dbj2JGoXQDfXYfbG8nWFIGr0GIm+vGdwRMWIMv2ZMWztdEZgc4XlpG/h0q8XYkl3ckZ6yKC4yei4+vurgxNojzYWfIhfL9W4gfPuKGjaulzQzo9rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=D6/5H8Oc; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jto4Sh0G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747357482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JFGNNGTiUPiTbfxJ/GattBF7DGBjvfS9mOl1QlsZyM4=;
-	b=Jto4Sh0Grarm3XgGRM1ktUL6dOJFwrkxa69o602uOKhFEEiyzd7w+h7OfKut69AtQ+iOSX
-	CxPv7RYOjOut/tDEHsJA7CfFcWZFRj9bdit36r4dd2saK8ybHx2iAHW6CBgn6+z8LykQWN
-	6L0J9qV8AZ96c3NUIkH1IuF5Wv9HZN8=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-fB5U62OOOo-oVzHFEZBeQA-1; Thu, 15 May 2025 21:04:41 -0400
-X-MC-Unique: fB5U62OOOo-oVzHFEZBeQA-1
-X-Mimecast-MFC-AGG-ID: fB5U62OOOo-oVzHFEZBeQA_1747357481
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-4deeef5a8a3so1163304137.1
-        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 18:04:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="D6/5H8Oc"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-231c790d558so1387025ad.2
+        for <linux-block@vger.kernel.org>; Thu, 15 May 2025 18:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1747360324; x=1747965124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Saw/Uwc4ddbEuxXyv57Avq0Co6zLd1WCLUuinqpAosM=;
+        b=D6/5H8OcVOpo+iouq04+GNXv1nL+yKTDOxpZnGYftFSYf3k5MgsM+iOiM5HshsBNw6
+         PFCFjLmQtuKA8R0tQII7J1rowpfWypPBU9ZPahcst3B87qQmhvYeXHCz/zUzOLNJ1OXK
+         hYdUGI80mgU2sPrzjtcKGCDMc3dlcg3DhQB6V1oM+iYTWCylLqykBrF2U3y0OyEZDIUT
+         oSCfO5CAJNS5/OeYdMcu0zFToXH1+7G8TH7r4digZN0yeZet2Yf5i7w1DF5kvsKOAsab
+         xUsqjjo81/en1aGO0hQgNovWoL7sgwAUQH3c994vXZkOmp2LtJzvXILb1u5RsQa5E5sD
+         2jrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747357480; x=1747962280;
+        d=1e100.net; s=20230601; t=1747360324; x=1747965124;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JFGNNGTiUPiTbfxJ/GattBF7DGBjvfS9mOl1QlsZyM4=;
-        b=gACt3XGaX/9sg0pl8ulKh18En2IJO00Cg+mOIeMipZetH8A7ukzeu9UN4a87UeB8t4
-         2BtOZJ3rLvSFV5msmofYG2kXfYER+yr2UkxHBAGQOwFBFeD/B/5wGygadagscal3penx
-         CHjNi6jHdsRy6qPLm2+OAH0E9CAHiZrMrGSMAN+ubN4FUnhhazI0FTwYP+Z76hZAmjTO
-         sfwMGE7EAN3XM+LVHuxauj7ev2dy/w8KKTANROY/01XUzR8r3LRWGH5dlz4FkMPagtqk
-         zkjWFnqd+etvVasodhgu+idEifnz9aY0xXCE3CPualo8+PMrL4TV8/ye+WcW1vQl2HHh
-         SVKw==
-X-Gm-Message-State: AOJu0YyTbx1wog7tVOqD4PFoF0m9ljRDjH5Ob1iZI17a98blbwBTV6sY
-	fiI0TXhhSTgxYmUteqyjnNcBBA5D+Ua2ny5yJamXR8lCQwW+pVX7gF0iCmLXyFkOC/f+UM0T1Q+
-	876MT/YW/IRKLZHnak96rFtXewsI+putM2Rta5u1vSdyABV5sPzxuUGhrEwyQ5XJVfPa4eeUu1O
-	7urZaTYZ8Ta5S90GJoWdIEY/Yy5Aws6SBiWcT0HU0=
-X-Gm-Gg: ASbGncu7x/kz6rG1FB80ojl4LjtxieohlNpvl/Q2YsveOD5/zI97bPdaqJiWii9XwAa
-	p40lY6HPg4OHvnsRBKaPfVpQBERiV8V3fN4BDl2iHt6qNshbNWn2gpAWzFFI8XdsjRKu9QA==
-X-Received: by 2002:a05:6102:2c09:b0:4dd:b3cf:880 with SMTP id ada2fe7eead31-4dfa6bf8bfemr2768505137.16.1747357480676;
-        Thu, 15 May 2025 18:04:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMNH49vjnbojnSNfvHrWf8Eci4vVJldCREp6tkHcGapN6PuGHpAMAADnyFIr43f0JGTsq0RISak03gCWcH/gU=
-X-Received: by 2002:a05:6102:2c09:b0:4dd:b3cf:880 with SMTP id
- ada2fe7eead31-4dfa6bf8bfemr2768477137.16.1747357480360; Thu, 15 May 2025
- 18:04:40 -0700 (PDT)
+        bh=Saw/Uwc4ddbEuxXyv57Avq0Co6zLd1WCLUuinqpAosM=;
+        b=E5HTa4jghJi9ZD+7EK0I6JK7aVpkizy87mcR0PJ2ehSC/NwWq6AmNIXRmbtvFNXKuE
+         hAeknXGjFSCe+PBL3xUNERHX+VkkrZ1Ka9V15ndTTBin4QhIgg0JL34baAQocLzopedA
+         Zz1NzOe1XnjLEF2339vWlNPDKc0pSMiCsuanQVXm3I83LL9rDG2TFhiywyoBFnypHwpi
+         dJBNy46PGBONysg6S/GRUTpn6BMI/4Q4PKbxxVrD5JVpvSzrAmrgMDhd/AVl6yI7fhqN
+         qULbua5OQ8LzNhCl9+0xQ89a5Dg/UxmqeDD87s4WGYcWZvkeuKdaNS5lDSnTbq3i99/A
+         Mltg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSAIv6GG+Gfv0YB73PThGSNew/I5t0J9RNozBUD0jFHEtn0hIQYofOmTdH8gLZ5sthRsP3HjoolEf3tA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIFfroRlwoJx7CdC/+iea3umVdn+fxdOW2pUMyRDtIgOwASyz8
+	845k1aWxYnM0SBfRLfC9/Y8W+eVqvOhDPSm+WUehgS5e0XkZ2wxi/mKQ6CjRnozrZdsr1SzCYm6
+	5sEbjIwycJR1sW/a52aEUnoIwIQM8glCO1PCl3xGNZA==
+X-Gm-Gg: ASbGncsNUeyS1HjRn+Dod3wPF/wXaQ//6G2vJpA/uEHV4oyVcyGf/yuHDao1bfjmdpg
+	LplFhhg13XA0L9uwNvCpSZeFa4/TlsBLMQKPvhAZ+yqdzFbFG1eK+8DOLSyRb2ywvP+Ztfbeihi
+	UWMw6gEO1+Na2iYLHPvfoG8uytsHPmWOc=
+X-Google-Smtp-Source: AGHT+IGQtzehs6YFaC5D46agB/hXyNrQlPBTGMohxgQNZu6nJrQNEVLPxk/tps+7YlUzFXvGfuKo9R5vHj+tVoFbA5w=
+X-Received: by 2002:a17:902:fc48:b0:224:88c:9255 with SMTP id
+ d9443c01a7336-231d438c7f1mr7306635ad.3.1747360324208; Thu, 15 May 2025
+ 18:52:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515134511.548270-1-nilay@linux.ibm.com>
-In-Reply-To: <20250515134511.548270-1-nilay@linux.ibm.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Fri, 16 May 2025 09:04:29 +0800
-X-Gm-Features: AX0GCFs4tWkYVx4tQO06GxG3fZkNUbkGus2hcyICpoqNIIptnbN6vd1WgA4on5Y
-Message-ID: <CAFj5m9L5B8rxfA0fieiNut8F_zOaP1eGgxnwAiYdCw0YKSor=A@mail.gmail.com>
-Subject: Re: [PATCH] block: fix elv_update_nr_hw_queues() to reattach elevator
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, hare@suse.de, axboe@kernel.dk, 
-	gjoyce@ibm.com
+References: <20250515162601.77346-1-ming.lei@redhat.com>
+In-Reply-To: <20250515162601.77346-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 15 May 2025 18:51:52 -0700
+X-Gm-Features: AX0GCFs1FvuGB-BBw4L7CmJShzt8QYvuSdgfGAg-V43tZJcbKYpTw4Qe5iO7N6c
+Message-ID: <CADUfDZocCU0NL6HZ+nd5VRkrKyJMNcU-xDBsvq99FiSJ=Lk90A@mail.gmail.com>
+Subject: Re: [PATCH] ublk: fix dead loop when canceling io command
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 15, 2025 at 9:45=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
-wrote:
+On Thu, May 15, 2025 at 9:26=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> When nr_hw_queues is updated, the elevator needs to be switched to
-> ensure that we exit elevator and reattach it to ensure that hctx->
-> sched_tags is correctly allocated for the new hardware queues.
-> However, elv_update_nr_hw_queues() currently only switches the
-> elevator if the queue is not registered. This is incorrect, as it
-> prevents reattaching the elevator after updating nr_hw_queues, which
-> in turn inhibits allocation of sched_tags.
+> Commit f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_tas=
+k and ublk_cancel_cmd")
+> adds request state check in ublk_cancel_cmd(), and if the request is
+> started, skip canceling this uring_cmd.
 >
-> Fix this by allowing the elevator switch if the queue is registered,
-> ensuring proper reattachment and resource allocation.
+> However, the current uring_cmd may be in ACTIVE state, without block
+> request coming to the uring command. Meantime, the cached request in
+> tag_set.tags[tag] is recycled and has been delivered to ublk server,
+> then this uring_cmd can't be canceled.
+
+To check my understanding, the scenario you're describing is that the
+request has started but also has already been completed by the ublk
+server? And this can happen because tag_set.tags[q_id]->rqs[tag] still
+points to the old request even after it has completed? Reading through
+blk-mq.c, that does seem possible since rqs[tag] is set in
+blk_mq_start_request() but not cleared in __blk_mq_end_request().
+
 >
-> Fixes: 596dce110b7d ("block: simplify elevator reattachment for updating =
-nr_hw_queues")
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> ublk requests are aborted in ublk char device release handler, which
+> depends on canceling all ACTIVE uring_cmd. So cause dead loop.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Do you mean "deadlock"?
 
-Thanks,
+>
+> Fix this issue by not taking stale request into account when canceling
+> uring_cmd in ublk_cancel_cmd().
+>
+> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Closes: https://lore.kernel.org/linux-block/mruqwpf4tqenkbtgezv5oxwq7ngyq=
+24jzeyqy4ixzvivatbbxv@4oh2wzz4e6qn/
+> Fixes: f40139fde527 ("ublk: fix race between io_uring_cmd_complete_in_tas=
+k and ublk_cancel_cmd")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index f9032076bc06..dc104c025cd5 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1708,7 +1708,7 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq,=
+ unsigned tag,
+>          * that ublk_dispatch_req() is always called
+>          */
+>         req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> -       if (req && blk_mq_request_started(req))
+> +       if (req && blk_mq_request_started(req) && req->tag =3D=3D tag)
 
+Is it possible that req now belongs to a different hctx (q_id)? From a
+quick reading of blk-mq.c, it looks like the hctx's requests are
+always allocated from the hctx's static_rqs, so I don't think that
+should be a problem. Reading req->tag here is probably racy though, as
+it's written by blk_mq_rq_ctx_init(), called from
+*blk_mq_alloc_request*() on the submitting task. How about checking
+blk_mq_rq_state(req) =3D=3D MQ_RQ_IN_FLIGHT instead of
+blk_mq_request_started(req) && req->tag =3D=3D tag?
+
+Best,
+Caleb
+
+>                 return;
+>
+>         spin_lock(&ubq->cancel_lock);
+> --
+> 2.47.1
+>
