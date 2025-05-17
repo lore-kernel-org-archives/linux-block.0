@@ -1,260 +1,479 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27A82701B2
-	for <linux-block@vger.kernel.org>; Fri, 16 May 2025 19:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DBF1FC8
+	for <linux-block@vger.kernel.org>; Sat, 17 May 2025 11:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747422879; cv=none; b=mUROrxTfXN2ftHY5ssRMaUozpevJK85XjPmipKnIc7K/Ty5UwBozL64zBOp71i6Ptw7ljTC5iKVrfUCMsKv4npkVCZDEJ3u5N2ufwXkKsqhcrBK4/r9s46S8oJOkGvFPREvaeYG8JNFzoi+ipNvShvR+EwXYnT/oCx4HQiyjEBI=
+	t=1747479781; cv=none; b=nqRQNaahhLcorEGU9La4f1S/1ae18ZnsoG9w+3xbeO6+hezdM4Q6OjZv6HV7GFrszpb6yQfyXQ2jKVr0waMl1XHddLMITAbH/ce7C3dKYI0UE/gH6HNanSaxdYOhocZ/E1KU7d+gpqRrHrkUp7NTitTnJP2GZEO8DOroiB9F7CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747422879; c=relaxed/simple;
-	bh=YqSJ6woo5H1zi5dibdPMxFwRlXf1TjH4+9yExyTdMXw=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=CiolqmAYtntYOSY/bqNWQ0hrBllE9Kello2miXKkKJh7c+7FaVaUw1wlqLfwUIiLP7YkwbkECMKFtx4KFObL2SjSDj2pBrp22Kk7bsjl1JbGp+NqlXaY8nUTngpu6IwsMoW3eIEDjdGWO/rEF8Hk6wmekzSZ3ct6pDbP+2hQ2lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PN4rLugP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747479781; c=relaxed/simple;
+	bh=lP6y9lVfsjsvMx67dPxP750dwHM6RQ2JOvVIcZAPZV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AygoiO0Xi46Gp2gurxUeHQZxWuESKphowl91YAnb929Knvr4GTlxmvdE+F5vikOt3+Ki7xbpCl81d9mL/80Hys6U39nohdhbvcgEfins71A3uQ50l8bIt45AdIgFuWBl64t1pR3hem/YKI0rKoz7xYbdyUrNsRSU3gOO5VgcpPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jtqXEy0p; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PN4rLugP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747422876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Ssb/oCRCb6+ZzFD2fa9qy8bsMNYL4+6JKdv8E1IA3tk=;
-	b=PN4rLugPsYAoe+gNI8KXq8E5lcodcuNCfJR7KYuj9ikwxVVfp9E76r79zbqKdLfW2E1cOp
-	XF123d+nMr2VxkY+5ZkVPIFX4GD3G3DMXzk4jUPntzlWC1oEDg36UG/esC6SuUwq+g+Bsi
-	7jL6mTLwP5LpcTjcHn4LeItbZGbGM6c=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-643-xvI7DCrJPbqg1I8Doohr5Q-1; Fri,
- 16 May 2025 15:14:33 -0400
-X-MC-Unique: xvI7DCrJPbqg1I8Doohr5Q-1
-X-Mimecast-MFC-AGG-ID: xvI7DCrJPbqg1I8Doohr5Q_1747422872
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E84B1956096;
-	Fri, 16 May 2025 19:14:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F059530075D5;
-	Fri, 16 May 2025 19:14:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: dhowells@redhat.com, linux-block@vger.kernel.org
-Subject: Still seeing q->elevator_lock circular locking warning
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jtqXEy0p"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-742c035f2afso87351b3a.2
+        for <linux-block@vger.kernel.org>; Sat, 17 May 2025 04:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747479778; x=1748084578; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MamJ1CmOEzpyvSbfJY3ZiKntD9lsPxLccbbNZ5AYylU=;
+        b=jtqXEy0p1dFZAX+tTCrDZUrIeljC9S4/m9kYl/eaqRLs0cqdnuG5wx/3XghdqeEK4n
+         vk4CZq5qxzd3Rg5inJxmzx6dW9X//KbiEcH1KkteMZmCzc1ogNzXwqNxlW7CckGv6nJu
+         KvrQmL70MgiMeyfdZvu0nKMvItTqu44xaJfVdA0HiZLRy+T9M/dlF2pQq4WGFvIGBgPq
+         vCpFEHOWrylaV4vkZWpbTyKAWIsuzHObNdQJYpA3EfE/SpD5LFoa4FEOL67w5kZmfZWu
+         welS/tesweBXzs8xTtwIyXRT7HZAGg/xFb6Gru5954lGLClj8X9gW8/vSevEfgzd7or7
+         HvZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747479778; x=1748084578;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MamJ1CmOEzpyvSbfJY3ZiKntD9lsPxLccbbNZ5AYylU=;
+        b=FObF1f2qNhIc20NeULVDrKbEjXsZDmJY9mxcybMcnoS04pLUQDrpo7dx8knIt3i2xG
+         GQMkH9gsYKx1kxjpIgYT+fQU0asE6Vm8k5zgOlvKr8BX9YYmjlddIkG3IG1FDIzdBVHI
+         62DwAejglWsGBtyu7yflrv3TslRcpk2ApfasKx1OOKj+hpuLorS0j9418kAyDEeRmVMh
+         FBMzz/Nyy2WVElCeuRCwgUydM4zl/1DVHvHeXh8PpqU7e2+nnQuCiL1oulJCTPez9zHZ
+         WVmDN+qVd7+ZZy4qK+a412Uf8TxEorPKrulQPa0a5JiqDddow+F2Pi/vn6J3ou3EEu3v
+         0tbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUz/n1plikCPS5R/NgHE8x4lQIrTXJxomA+5mkTVOVlgxJY4lJtltmaAGiC3gKmf6mmhwZi/EH8yh6hHg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUvkoGuOqk/525QPeB/4Xa8cXdoCiB5pfNC9nnVIOjrLjw2dKP
+	Cg1wDcVQ/b0hS8uiRNSr/7Ntt3TNhiYewxpzaeFKC+2C/A/yWvFMuKdo
+X-Gm-Gg: ASbGncvKuG9KcNyDqtonEJWKfVjLoaKRwWMqFOnYVnWFwk7bzEDceZkVLshCGD8QfVN
+	ppIDRJOV+hUFC1CppgAnaHYpsy1W66s8kM/xRU0WKTrdS/2vzIStkRCtSAlS+RpeCpz+hfrw83K
+	SYXyFGpfuOhSJlrY7n/LC09PWjlxcuF06t1jNc64l4SDaKIkwI9XzDSc15kJAu5bZ4VlNHNEJXf
+	Wn1QEm1CtoHYT0ULPMTeIP85ynAXQgzbnw6qJz9Pzc1T586iI24ZeVF1Mk869e0d0Iko6NbGKA9
+	wjleC95j0p9M9ku2uDrOJE3/fC/Qz81PMbqW9X2Pn7iqEg77D5c2muSk+XlKOCNgG5na005TUFb
+	uovVhnJ6Fmxu057yUfz4eh/W756wuZlF7fzVunKVJ6iNrbpHo63mzt+zkmFi4
+X-Google-Smtp-Source: AGHT+IFMAHTIo6gq2vgQOE2W9j3Vmy1Q1uVAVtWa0rCwQarY/N+RXzK+L9GEmfINLOLrpw1mwFf/4Q==
+X-Received: by 2002:a05:6a00:3e16:b0:736:53ce:a32c with SMTP id d2e1a72fcca58-742a98a252cmr7960213b3a.17.1747479778348;
+        Sat, 17 May 2025 04:02:58 -0700 (PDT)
+Received: from 172-126-48-156.lightspeed.nsvltn.sbcglobal.net (103-209-254-246.mel.as140952.net. [103.209.254.246])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a98a242asm2942237b3a.164.2025.05.17.04.02.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 May 2025 04:02:57 -0700 (PDT)
+Date: Sat, 17 May 2025 19:02:49 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V3 4/6] ublk: register buffer to local io_uring with
+ provided buf index via UBLK_F_AUTO_BUF_REG
+Message-ID: <aChs2ayEiGa43W_3@172-126-48-156.lightspeed.nsvltn.sbcglobal.net>
+References: <20250509150611.3395206-1-ming.lei@redhat.com>
+ <20250509150611.3395206-5-ming.lei@redhat.com>
+ <CADUfDZqbwsXCqiR0gxPEpcdt+QeBiybmk4HU_Yv=_VFr_ohKFg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2654613.1747422869.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 May 2025 20:14:29 +0100
-Message-ID: <2654614.1747422869@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqbwsXCqiR0gxPEpcdt+QeBiybmk4HU_Yv=_VFr_ohKFg@mail.gmail.com>
 
-Hi Jens,
+On Tue, May 13, 2025 at 12:50:04PM -0700, Caleb Sander Mateos wrote:
+> On Fri, May 9, 2025 at 8:06 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Add UBLK_F_AUTO_BUF_REG for supporting to register buffer automatically
+> > to local io_uring context with provided buffer index.
+> >
+> > Add UAPI structure `struct ublk_auto_buf_reg` for holding user parameter
+> > to register request buffer automatically, one 'flags' field is defined, and
+> > there is still 32bit available for future extension, such as, adding one
+> > io_ring FD field for registering buffer to external io_uring.
+> >
+> > `struct ublk_auto_buf_reg` is populated from ublk uring_cmd's sqe->addr,
+> > and all existing ublk commands are data-less, so it is just fine to reuse
+> > sqe->addr for this purpose.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c      | 71 +++++++++++++++++++++++----
+> >  include/uapi/linux/ublk_cmd.h | 90 +++++++++++++++++++++++++++++++++++
+> >  2 files changed, 151 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 1f98e561dc38..17c41a7fa870 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -66,7 +66,8 @@
+> >                 | UBLK_F_USER_COPY \
+> >                 | UBLK_F_ZONED \
+> >                 | UBLK_F_USER_RECOVERY_FAIL_IO \
+> > -               | UBLK_F_UPDATE_SIZE)
+> > +               | UBLK_F_UPDATE_SIZE \
+> > +               | UBLK_F_AUTO_BUF_REG)
+> >
+> >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> >                 | UBLK_F_USER_RECOVERY_REISSUE \
+> > @@ -80,6 +81,9 @@
+> >
+> >  struct ublk_rq_data {
+> >         refcount_t ref;
+> > +
+> > +       /* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
+> > +       unsigned short buf_index;
+> 
+> Can you use a fixed-size integer, i.e. u16?
 
-I just realised that I'm still seeing a warning about circular locking
-involving q->elevator_lock in -rc6.  Do you know if there's a fix for this
-yet?
+OK.
 
-David
----
+> 
+> >  };
+> >
+> >  struct ublk_uring_cmd_pdu {
+> > @@ -101,6 +105,9 @@ struct ublk_uring_cmd_pdu {
+> >          * setup in ublk uring_cmd handler
+> >          */
+> >         struct ublk_queue *ubq;
+> > +
+> > +       struct ublk_auto_buf_reg buf;
+> > +
+> >         u16 tag;
+> >  };
+> >
+> > @@ -630,7 +637,7 @@ static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
+> >
+> >  static inline bool ublk_support_auto_buf_reg(const struct ublk_queue *ubq)
+> >  {
+> > -       return false;
+> > +       return ubq->flags & UBLK_F_AUTO_BUF_REG;
+> >  }
+> >
+> >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+> > @@ -1175,20 +1182,38 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+> >                 blk_mq_end_request(rq, BLK_STS_IOERR);
+> >  }
+> >
+> > +static void ublk_auto_buf_reg_fallback(struct request *req, struct ublk_io *io,
+> > +                                      unsigned int issue_flags)
+> > +{
+> > +       const struct ublk_queue *ubq = req->mq_hctx->driver_data;
+> 
+> It would be nice to pass ubq into ublk_auto_buf_reg() and
+> ublk_auto_buf_reg_fallback() so it doesn't need to be looked up again.
 
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
- WARNING: possible circular locking dependency detected
- 6.15.0-rc6-build2+ #1293 Not tainted
- ------------------------------------------------------
- (udev-worker)/4602 is trying to acquire lock:
- ffff88810c5585c0 (&q->elevator_lock){+.+.}-{4:4}, at: elv_iosched_store+0=
-xf9/0x210
- =
+ublk_auto_buf_reg_fallback() is called in case of auto-buff-reg failure,
+also the only caller doesn't use 'ubq', so I think it is fine to retrieve
+`ubq` from `req->mq_hctx`.
 
- but task is already holding lock:
- ffff88810c5580a8 (&q->q_usage_counter(io)#9){++++}-{0:0}, at: blk_mq_free=
-ze_queue_nomemsave+0xf/0x20
- =
+> 
+> > +       struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
+> > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > +
+> > +       iod->op_flags |= UBLK_IO_F_NEED_REG_BUF;
+> > +       refcount_set(&data->ref, 1);
+> > +       ublk_complete_io_cmd(io, req, UBLK_IO_RES_OK, issue_flags);
+> 
+> Can this just return true from ublk_auto_buf_reg() in this case? Then
+> ublk_dispatch_req() will call ublk_complete_io_cmd(), as normal.
 
- which lock already depends on the new lock.
+OK.
 
- =
+> 
+> > +}
+> > +
+> >  static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
+> >                               unsigned int issue_flags)
+> >  {
+> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(io->cmd);
+> >         struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> >         int ret;
+> >
+> > -       ret = io_buffer_register_bvec(io->cmd, req, ublk_io_release, 0,
+> > -                                     issue_flags);
+> > +       ret = io_buffer_register_bvec(io->cmd, req, ublk_io_release,
+> > +                                     pdu->buf.index, issue_flags);
+> 
+> Hmm, I find it a bit awkward to add this code in one commit with the
+> wrong arguments and fix it up in a separate commit. I think it would
+> make more sense to combine the commits. If you feel the commit is too
+> large, I think it would make more sense to split out
+> UBLK_AUTO_BUF_REG_FALLBACK to a separate commit. But up to you.
 
- the existing dependency chain (in reverse order) is:
- =
+This way is used often for splitting big patches into small pieces:
 
- -> #2 (&q->q_usage_counter(io)#9){++++}-{0:0}:
-        validate_chain+0x1dc/0x280
-        __lock_acquire+0x5b6/0x720
-        lock_acquire.part.0+0xb4/0x1f0
-        blk_alloc_queue+0x38b/0x420
-        blk_mq_alloc_queue+0xd4/0x150
-        scsi_alloc_sdev+0x47e/0x5e0
-        scsi_probe_and_add_lun+0x15c/0x370
-        __scsi_add_device+0x123/0x190
-        ata_scsi_scan_host+0x94/0x1d0
-        async_run_entry_fn+0x4b/0x130
-        process_one_work+0x485/0x7b0
-        process_scheduled_works+0x73/0x90
-        worker_thread+0x1c8/0x2a0
-        kthread+0x2f9/0x310
-        ret_from_fork+0x24/0x40
-        ret_from_fork_asm+0x1a/0x30
- =
+- patch 3 focuses on generic change
 
- -> #1 (fs_reclaim){+.+.}-{0:0}:
-        validate_chain+0x1dc/0x280
-        __lock_acquire+0x5b6/0x720
-        lock_acquire.part.0+0xb4/0x1f0
-        __fs_reclaim_acquire+0x21/0x30
-        fs_reclaim_acquire+0x2d/0x70
-        might_alloc+0x8/0x40
-        kmem_cache_alloc_noprof+0x42/0x230
-        __kernfs_new_node+0xc6/0x3e0
-        kernfs_new_node+0x89/0xc0
-        kernfs_create_dir_ns+0x27/0xa0
-        sysfs_create_dir_ns+0xf5/0x170
-        kobject_add_internal+0x141/0x2c0
-        kobject_add+0xfd/0x140
-        elv_register_queue+0x74/0x100
-        blk_register_queue+0x16a/0x240
-        add_disk_fwnode+0x371/0x710
-        sd_probe+0x50d/0x620
-        really_probe+0x167/0x320
-        __driver_probe_device+0x121/0x160
-        driver_probe_device+0x4a/0xd0
-        __device_attach_driver+0x99/0xd0
-        bus_for_each_drv+0x104/0x140
-        __device_attach_async_helper+0xdb/0x140
-        async_run_entry_fn+0x4b/0x130
-        process_one_work+0x485/0x7b0
-        process_scheduled_works+0x73/0x90
-        worker_thread+0x1c8/0x2a0
-        kthread+0x2f9/0x310
-        ret_from_fork+0x24/0x40
-        ret_from_fork_asm+0x1a/0x30
- =
+- patch 4 focuses on uapi interface
 
- -> #0 (&q->elevator_lock){+.+.}-{4:4}:
-        check_noncircular+0x96/0xc0
-        check_prev_add+0x115/0x2f0
-        validate_chain+0x1dc/0x280
-        __lock_acquire+0x5b6/0x720
-        lock_acquire.part.0+0xb4/0x1f0
-        __mutex_lock+0x16d/0x5e0
-        elv_iosched_store+0xf9/0x210
-        queue_attr_store+0xcb/0x1c0
-        kernfs_fop_write_iter+0x194/0x210
-        vfs_write+0x220/0x310
-        ksys_write+0xb8/0x120
-        do_syscall_64+0x9f/0x100
-        entry_SYSCALL_64_after_hwframe+0x76/0x7e
- =
+I'd suggest to keep this way for reviewing easily.
 
- other info that might help us debug this:
+> 
+> >         if (ret) {
+> > -               blk_mq_end_request(req, BLK_STS_IOERR);
+> > +               if (pdu->buf.flags & UBLK_AUTO_BUF_REG_FALLBACK)
+> > +                       ublk_auto_buf_reg_fallback(req, io, issue_flags);
+> > +               else
+> > +                       blk_mq_end_request(req, BLK_STS_IOERR);
+> >                 return false;
+> >         }
+> >         /* one extra reference is dropped by ublk_io_release */
+> >         refcount_set(&data->ref, 2);
+> > +       /* store buffer index in request payload */
+> > +       data->buf_index = pdu->buf.index;
+> >         io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
+> >         return true;
+> >  }
+> > @@ -1952,6 +1977,20 @@ static inline void ublk_prep_cancel(struct io_uring_cmd *cmd,
+> >         io_uring_cmd_mark_cancelable(cmd, issue_flags);
+> >  }
+> >
+> > +static inline bool ublk_set_auto_buf_reg(struct io_uring_cmd *cmd)
+> > +{
+> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+> > +
+> > +       pdu->buf = ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->addr));
+> > +
+> > +       if (pdu->buf.reserved0 || pdu->buf.reserved1)
+> > +               return false;
+> > +
+> > +       if (pdu->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
+> > +               return false;
+> > +       return true;
+> > +}
+> > +
+> >  static void ublk_io_release(void *priv)
+> >  {
+> >         struct request *rq = priv;
+> > @@ -2041,9 +2080,13 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+> >         return ret;
+> >  }
+> >
+> > -static void ublk_auto_buf_unreg(struct ublk_io *io, unsigned int issue_flags)
+> > +static void ublk_auto_buf_unreg(struct ublk_io *io, struct request *req,
+> > +                               unsigned int issue_flags)
+> >  {
+> > -       WARN_ON_ONCE(io_buffer_unregister_bvec(io->cmd, 0, issue_flags));
+> > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > +
+> > +       WARN_ON_ONCE(io_buffer_unregister_bvec(io->cmd, data->buf_index,
+> > +                               issue_flags));
+> >         io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
+> >  }
+> >
+> > @@ -2080,7 +2123,7 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> >                 req->__sector = ub_cmd->zone_append_lba;
+> >
+> >         if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG)
+> > -               ublk_auto_buf_unreg(io, issue_flags);
+> > +               ublk_auto_buf_unreg(io, req, issue_flags);
+> >
+> >         if (likely(!blk_should_fake_timeout(req->q)))
+> >                 ublk_put_req_ref(ubq, req);
+> > @@ -2196,6 +2239,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+> >         default:
+> >                 goto out;
+> >         }
+> > +
+> > +       if (ublk_support_auto_buf_reg(ubq) && !ublk_set_auto_buf_reg(cmd))
+> > +               return -EINVAL;
+> 
+> Don't we want to check for this error condition first, before making
+> this ublk I/O available for incoming requests? Otherwise,
+> ublk_dispatch_req() may be called on this command with an invalid
+> pdu->buf.
 
- Chain exists of:
-   &q->elevator_lock --> fs_reclaim --> &q->q_usage_counter(io)#9
+No, the provided uapi parameter is only used for fetching new IO request,
+so we have to use the saved parameter for registering buffer automatically
+first, then store the new parameter for doing it when new io request comes.
 
-  Possible unsafe locking scenario:
+I will document this kind of usage.
 
-        CPU0                    CPU1
-        ----                    ----
-   lock(&q->q_usage_counter(io)#9);
-                                lock(fs_reclaim);
-                                lock(&q->q_usage_counter(io)#9);
-   lock(&q->elevator_lock);
- =
+> 
+> > +
+> >         ublk_prep_cancel(cmd, issue_flags, ubq, tag);
+> >         return -EIOCBQUEUED;
+> >
+> > @@ -2806,8 +2853,11 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+> >                  * For USER_COPY, we depends on userspace to fill request
+> >                  * buffer by pwrite() to ublk char device, which can't be
+> >                  * used for unprivileged device
+> > +                *
+> > +                * Same with zero copy or auto buffer register.
+> >                  */
+> > -               if (info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY))
+> > +               if (info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY |
+> > +                                       UBLK_F_AUTO_BUF_REG))
+> >                         return -EINVAL;
+> >         }
+> >
+> > @@ -2865,7 +2915,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+> >                 UBLK_F_URING_CMD_COMP_IN_TASK;
+> >
+> >         /* GET_DATA isn't needed any more with USER_COPY or ZERO COPY */
+> > -       if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY))
+> > +       if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY |
+> > +                               UBLK_F_AUTO_BUF_REG))
+> >                 ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
+> 
+> Does this logic also need to be updated to allow UBLK_F_AUTO_BUF_REG
+> for zoned ublk devices?
 
-  *** DEADLOCK ***
+This patch switches to use sqe->addr for passing `ublk_auto_buf_reg`, so
+ublk zoned isn't affected.
 
- 5 locks held by (udev-worker)/4602:
-  #0: ffff88810e4a4408 (sb_writers#4){.+.+}-{0:0}, at: vfs_write+0xfc/0x31=
-0
-  #1: ffff888112e2b888 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_it=
-er+0x125/0x210
-  #2: ffff88810c8062d8 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_i=
-ter+0x135/0x210
-  #3: ffff88810c5580a8 (&q->q_usage_counter(io)#9){++++}-{0:0}, at: blk_mq=
-_freeze_queue_nomemsave+0xf/0x20
-  #4: ffff88810c5580e0 (&q->q_usage_counter(queue)){++++}-{0:0}, at: blk_m=
-q_freeze_queue_nomemsave+0xf/0x20
- =
+> 
+> /*
+>  * Zoned storage support requires reuse `ublksrv_io_cmd->addr` for
+>  * returning write_append_lba, which is only allowed in case of
+>  * user copy or zero copy
+>  */
+> if (ublk_dev_is_zoned(ub) &&
+>     (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) || !(ub->dev_info.flags &
+>      (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY)))) {
+>         ret = -EINVAL;
+>         goto out_free_dev_number;
+> }
+> 
+> >
+> >         /*
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > index be5c6c6b16e0..ecd7ab8c00ca 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -219,6 +219,29 @@
+> >   */
+> >  #define UBLK_F_UPDATE_SIZE              (1ULL << 10)
+> >
+> > +/*
+> > + * request buffer is registered automatically to uring_cmd's io_uring
+> > + * context before delivering this io command to ublk server, meantime
+> > + * it is un-registered automatically when completing this io command.
+> > + *
+> > + * For using this feature:
+> > + *
+> > + * - ublk server has to create sparse buffer table
+> > + *
+> > + * - ublk server passes auto buf register data via uring_cmd's sqe->addr,
+> > + *   `struct ublk_auto_buf_reg` is populated from sqe->addr, please see
+> > + *   the definition of ublk_sqe_addr_to_auto_buf_reg()
+> > + *
+> > + * - pass buffer index from `ublk_auto_buf_reg.index`
+> > + *
+> > + * - pass flags from `ublk_auto_buf_reg.flags` if needed
+> > + *
+> > + * This way avoids extra cost from two uring_cmd, but also simplifies backend
+> > + * implementation, such as, the dependency on IO_REGISTER_IO_BUF and
+> > + * IO_UNREGISTER_IO_BUF becomes not necessary.
+> > + */
+> > +#define UBLK_F_AUTO_BUF_REG    (1ULL << 11)
+> > +
+> >  /* device state */
+> >  #define UBLK_S_DEV_DEAD        0
+> >  #define UBLK_S_DEV_LIVE        1
+> > @@ -305,6 +328,17 @@ struct ublksrv_ctrl_dev_info {
+> >  #define                UBLK_IO_F_FUA                   (1U << 13)
+> >  #define                UBLK_IO_F_NOUNMAP               (1U << 15)
+> >  #define                UBLK_IO_F_SWAP                  (1U << 16)
+> > +/*
+> > + * For UBLK_F_AUTO_BUF_REG & UBLK_AUTO_BUF_REG_FALLBACK only.
+> > + *
+> > + * This flag is set if auto buffer register is failed & ublk server passes
+> > + * UBLK_AUTO_BUF_REG_FALLBACK, and ublk server need to register buffer
+> > + * manually for handling the delivered IO command if this flag is observed
+> > + *
+> > + * ublk server has to check this flag if UBLK_AUTO_BUF_REG_FALLBACK is
+> > + * passed in.
+> > + */
+> > +#define                UBLK_IO_F_NEED_REG_BUF          (1U << 17)
+> >
+> >  /*
+> >   * io cmd is described by this structure, and stored in share memory, indexed
+> > @@ -339,6 +373,62 @@ static inline __u32 ublksrv_get_flags(const struct ublksrv_io_desc *iod)
+> >         return iod->op_flags >> 8;
+> >  }
+> >
+> > +/*
+> > + * If this flag is set, fallback by completing the uring_cmd and setting
+> > + * `UBLK_IO_F_NEED_REG_BUF` in case of auto-buf-register failure;
+> > + * otherwise the client ublk request is failed silently
+> > + *
+> > + * If ublk server passes this flag, it has to check if UBLK_IO_F_NEED_REG_BUF
+> > + * is set in `ublksrv_io_desc.op_flags`. If UBLK_IO_F_NEED_REG_BUF is set,
+> > + * ublk server needs to register io buffer manually for handling IO command.
+> > + */
+> > +#define UBLK_AUTO_BUF_REG_FALLBACK     (1 << 0)
+> > +#define UBLK_AUTO_BUF_REG_F_MASK       UBLK_AUTO_BUF_REG_FALLBACK
+> > +
+> > +struct ublk_auto_buf_reg {
+> > +       /* index for registering the delivered request buffer */
+> > +       __u16  index;
+> > +       __u8   flags;
+> > +       __u8   reserved0;
+> > +
+> > +       /*
+> > +        * io_ring FD can be passed via the reserve field in future for
+> > +        * supporting to register io buffer to external io_uring
+> > +        */
+> > +       __u32  reserved1;
+> > +};
+> > +
+> > +/*
+> > + * For UBLK_F_AUTO_BUF_REG, auto buffer register data is carried via
+> > + * uring_cmd's sqe->addr:
+> > + *
+> > + *     - bit0 ~ bit15: buffer index
+> > + *     - bit16 ~ bit23: flags
+> > + *     - bit24 ~ bit31: reserved0
+> > + *     - bit32 ~ bit63: reserved1
+> > + */
+> > +static inline struct ublk_auto_buf_reg ublk_sqe_addr_to_auto_buf_reg(
+> > +               __u64 sqe_addr)
+> > +{
+> > +       struct ublk_auto_buf_reg reg = {
+> > +               .index = sqe_addr & 0xffff,
+> > +               .flags = (sqe_addr >> 16) & 0xff,
+> > +               .reserved0 = (sqe_addr >> 24) & 0xff,
+> > +               .reserved1 = sqe_addr >> 32,
+> > +       };
+> > +
+> > +       return reg;
+> > +}
+> > +
+> > +static inline __u64
+> > +ublk_auto_buf_reg_to_sqe_addr(const struct ublk_auto_buf_reg *buf)
+> 
+> Pass by value since it's only 8 bytes?
 
- stack backtrace:
- CPU: 3 UID: 0 PID: 4602 Comm: (udev-worker) Not tainted 6.15.0-rc6-build2=
-+ #1293 PREEMPT(voluntary) =
+Yes, and we can add build check.
 
- Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x57/0x80
-  print_circular_bug+0xb5/0xd0
-  check_noncircular+0x96/0xc0
-  ? _find_first_zero_bit+0x1e/0x50
-  check_prev_add+0x115/0x2f0
-  validate_chain+0x1dc/0x280
-  __lock_acquire+0x5b6/0x720
-  lock_acquire.part.0+0xb4/0x1f0
-  ? elv_iosched_store+0xf9/0x210
-  ? rcu_is_watching+0x34/0x60
-  ? lock_acquire+0x88/0xf0
-  __mutex_lock+0x16d/0x5e0
-  ? elv_iosched_store+0xf9/0x210
-  ? preempt_count_sub+0x18/0xc0
-  ? elv_iosched_store+0xf9/0x210
-  ? __pfx___mutex_lock+0x10/0x10
-  ? blk_mq_freeze_queue_wait+0xe6/0x130
-  ? lock_acquire.part.0+0xc4/0x1f0
-  ? __pfx_autoremove_wake_function+0x10/0x10
-  ? lock_acquire+0x88/0xf0
-  ? elv_iosched_store+0xf9/0x210
-  elv_iosched_store+0xf9/0x210
-  ? __pfx_elv_iosched_store+0x10/0x10
-  ? __pfx___mutex_trylock_common+0x10/0x10
-  queue_attr_store+0xcb/0x1c0
-  ? mark_lock+0x2e/0x110
-  ? __pfx_queue_attr_store+0x10/0x10
-  ? __lock_acquire+0x5b6/0x720
-  ? lock_is_held_type+0xbe/0x110
-  ? find_held_lock+0x2b/0x80
-  ? sysfs_file_kobj+0x129/0x140
-  ? __lock_release.isra.0+0x5a/0x150
-  ? sysfs_file_kobj+0x129/0x140
-  ? lock_release+0xe3/0x120
-  ? __rcu_read_unlock+0x4c/0x70
-  ? sysfs_file_kobj+0x133/0x140
-  ? __pfx_sysfs_kf_write+0x10/0x10
-  kernfs_fop_write_iter+0x194/0x210
-  vfs_write+0x220/0x310
-  ? __pfx_vfs_write+0x10/0x10
-  ? ktime_get_coarse_real_ts64+0x19/0x70
-  ? files_lookup_fd_raw+0x40/0x50
-  ? __fget_light+0x5b/0x90
-  ksys_write+0xb8/0x120
-  ? __pfx_ksys_write+0x10/0x10
-  ? syscall_trace_enter+0x10c/0x150
-  do_syscall_64+0x9f/0x100
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
- RIP: 0033:0x7f033d80e044
- Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 f=
-3 0f 1e fa 80 3d 65 a0 10 00 00 74 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 f=
-f ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec 20 48 89
- RSP: 002b:00007ffe41add9f8 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
- RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f033d80e044
- RDX: 0000000000000003 RSI: 00007ffe41addd00 RDI: 0000000000000027
- RBP: 00007ffe41adda20 R08: 00007f033d90f1c8 R09: 00007ffe41addad0
- R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
- R13: 00007ffe41addd00 R14: 00005626a9b65980 R15: 00007f033d90ee80
-  </TASK>
+> 
+> > +{
+> > +       __u64 addr = buf->index | buf->flags << 16 | buf->reserved0 << 24 |
+> > +               (__u64)buf->reserved1 << 32;
+> > +
+> > +       return addr;
+> > +}
+> 
+> How about just memcpy()ing between u64 and struct ublk_auto_buf_reg?
+> If you do want to keep these explicit conversions, you could at least
+> omit the unnecessary masking in ublk_sqe_addr_to_auto_buf_reg().
 
+memcpy is one global function, which is slower.
+
+> > +static inline __u64
+> > +ublk_auto_buf_reg_to_sqe_addr(const struct ublk_auto_buf_reg *buf)
+> > +{
+> > +       __u64 addr = buf->index | buf->flags << 16 | buf->reserved0 << 24 |
+>
+> buf->reserved0 should be cast to a u64 (or u32) here. Otherwise,
+> buf->reserved0 << 24 gets promoted to an int and sign-extended to 64
+> bits. It would probably be good to cast the other fields too to avoid
+> assuming a 32-bit int.
+
+OK.
+
+Thanks,
+Ming
