@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E63A4B1E64;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7EA26A0BA;
 	Mon, 19 May 2025 09:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747646330; cv=none; b=U+L744D367UX74egPfI5KIwEeptV/pyf8j/rsY81yWherXntna+IWPE5N3cICKTMod+biCPCDQhB6NzIy9avLD4/za0pfvYQFLMdSsVXopAD4XxpbvC4RmbWGMK/64DZHGTXt9sZN+K6wgAW+uSsU7UrusfeNelsQyuV1GMNmO0=
+	t=1747646331; cv=none; b=CpnHSRhqrVztvKHsLx0MZx6SK25B0PexEZVYHZn3mb4dH0wuqEw+F8dqH+clyifm8liB8qDS65B8zt7iVZNzntorzGBwrOZabU+lHJ8VGAuNqJBybLt5NibGSFWy9UdyzHsiBtYmb5FlT6KE9vhrPuPgqwLUzT9gEGzOS1Fm41o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747646330; c=relaxed/simple;
-	bh=E7HG0KbyHora1Jy7kN4bmYK0Ru8v8roLf/CFToUPmtA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=jORNHJZ5cWTldXXpnWQhm6IfOGOrFbI9PxCGKbvaq5nsfWAvAua1CiELxVo1eX91gE0CPC+HmFv2vrB6qaDIiG6nM94GZPM4cd3fNCSFPVm7nVswHVkU/AfLwxlLmE2C1SDDuXhQB3+98mXjbZPwZKr+SOrVSz8lWBKS4Vpr2mU=
+	s=arc-20240116; t=1747646331; c=relaxed/simple;
+	bh=UPgrUdj2zJuIcM2CRwF3Ndg48wh45GAuitrkG1THTag=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Y2Jd0iqX19oi9SH5Xo4C6mWgqqtxZYQ4UMtjZPTuOsx5lKIqtQd8q+bexlg9xf0XlzfqBuUr2iUDu+h3bzmWPEyBcoIZ1kEHcUsfdvL47Oc3ugVNDuWXap/dwWcqo7L3XyHJUH2cIctdKsKgFE5fls8gdPd20wyMGu6wLfz3CDk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-4d-682af76c7dad
+X-AuditID: a67dfc5b-669ff7000002311f-70-682af76d4e9d
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -75,44 +75,44 @@ Cc: kernel_team@skhynix.com,
 	netdev@vger.kernel.org,
 	matthew.brost@intel.com,
 	her0gyugyu@gmail.com
-Subject: [PATCH v16 01/42] llist: move llist_{head,node} definition to types.h
-Date: Mon, 19 May 2025 18:17:45 +0900
-Message-Id: <20250519091826.19752-2-byungchul@sk.com>
+Subject: [PATCH v16 03/42] dept: add single event dependency tracker APIs
+Date: Mon, 19 May 2025 18:17:47 +0900
+Message-Id: <20250519091826.19752-4-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250519091826.19752-1-byungchul@sk.com>
 References: <20250519091826.19752-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxScRSH+997ufdC0W70dtW2is1ebL1Y2k5btVab3bVe17f6UJS3YCE6
-	VMy2Ni00i8BsqUvNgBwxwTJoRSVlOk0zy4qQzKysWYRms6AsegFbX86e7fx+z/lyaFzSJoil
-	FaosXq2SKaWkiBANTTAvVH5LkC954V8Jwa9FBFRdtpPQdcmGwH41HwN/y3roDg0i+Nn5CIfy
-	0i4Epjcvcbja2ofAbT1CwtN3E8ETHCahvVRHwtELl0l4HAhj0Ft2GgObYxO8sgwQ0HHKjEG5
-	n4TK8qNYZHzAYNRSS4ElLx76rRUUhN8kQnufVwDungVwtrqXhAZ3OwGtrn4Mnt6sIqHP/kcA
-	Ha1tBIQMcdBVohdA3SczCYGQBQdLcJiCJ41GDFqN06BeGxEWfvktgHv6RgwKa65g4Hl+C8Ht
-	otcYOOxeEpqDgxg4HaU4/LjYgqDfMERBwclRCirzDQh0BWUEaHuT4ef3yOVzXxMh/3w9AXW/
-	vGjNKs5ebUdc8+AwzmmdOdyP4DOSc4eMBHffzHI3Kl5SnPZ2D8UZHdmc05rAXWjwY5xpJCjg
-	HLXHSc4xcpriTgx5MO7Tw4fU1hk7RCtTeaVCw6sXr94tkpf6TVSGSXSwzv2NyEN36BNISLNM
-	Ens9cFHwn1uKAyjKJDOX9flG8ShPYWaxTv1AJCOiccY7nu0+93wsNJnZzHY0FGFRJph41tUd
-	JKMsZpLZzyW3qH/SmaytvnFMJGSWsz265rGuJJLx2KqJqJRlKoVsWWMF+a8Qw961+ohTSGxE
-	42qRRKHSpMkUyqRF8lyV4uCivelpDhT5L8vh8E4XGuna3oQYGkkniOvd8+USgUyTmZvWhFga
-	l04R1zrnySXiVFnuIV6dvkudreQzm1AcTUini5eGclIlzH5ZFn+A5zN49f8tRgtj89AZV3tW
-	/4vpiscdccc2zP6u01G+mBWdse+kb7N83Qr9vpsPijU2y+JA53D6umTPnDzzrBjD+vA2y4Dw
-	2h/XpKkj3t05NVpNSlKK7n1KmpW3J6W3ZOhly44UqsJ7txRrD21cRhFtO7Lvrxus2VNS9tG3
-	Kd67r6qnIHFjQrZhrdu0UEpkymWJCbg6U/YXs+vX6FsDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUiTaxiHe57309XibUm9GFGMpDJOJ6Wdc0MRfVA9FEkIFQSRM1/cappn
-	M08GlaaGaVoWJpraNFmyzdLNQk+uZDuullR23NEUtaN0pKVpH25p2cc0+ufmgvt3X/c/P55S
-	mJkwXpuUIumT1DolK6Nl0esyf9F9jNCsyfMsA/94Dg1lt6wstN+0ILA2ZGDwtW6HrsAIgs+P
-	n1JQXNSOoHKgj4IGdz8CR80ZFjpezgWvf4wFT1EeC5nXb7HwbHgKQ++VSxgstl3wwjREQ9vF
-	KgzFPhauFmfi4HiFYdJk5sCUHg6DNaUcTA1Egqe/kwFXuYcBR88qKKnoZaHZ4aHB3TiIoeOv
-	Mhb6rd8YaHM/pCFQsAjaC/MZqB2tYmE4YKLA5B/j4J8WIwa3cQHUZQWtZz98ZeBBfguGs9X1
-	GLzddxHcy/kPg83ayYLLP4LBbiui4NONVgSDBW84yD4/ycHVjAIEedlXaMjqVcHnieDn8vFI
-	yLhWR0Ptl060cQOxVlgRcY2MUSTL/if55P+XJY6AkSaPqkTSVNrHkax7PRwx2o4Re00Eud7s
-	w6TyvZ8hNvM5ltjeX+JI7hsvJqNPnnC7F++XrY+XdNpUSf/rhliZpshXySVXyo7XOj7S6eg+
-	n4tCeFFYK7ZeGEbTzArLxefPJ6lpDhWWivb8ISYXyXhK6JwtdpV3z4TmC9FiW3MOnmZaCBcb
-	u/zsNMsFlfi28C73Q7pEtNS1zIhChN/EnjzXzK0imPFaKuiLSGZEs8woVJuUmqjW6lSrDUc0
-	aUna46sPHU20oWCDTCenChvReMd2JxJ4pJwjr3Os1CgYdaohLdGJRJ5ShsrN9hUahTxenXZC
-	0h89qD+mkwxOtIinlQvlO/ZJsQohQZ0iHZGkZEn/c4v5kLB0NCBEhTe/vr/573bekvJ7yeje
-	+iFqVxhz2f8u9u3aQFv+xJ2vfywff70+Oq609zRJKHsUFYhZnNz0/wJV3NPInVF7Dlcl2Bi7
-	UOM81T2vryl8S4x3/7OtN5VOe5+wqXo4pCn1XI8bn769x8VNbJtXHSpm+5QH5k+WGNNUKQMH
-	H74cVNIGjToygtIb1N8B2g1/pz0DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSWUwTYRDH/Xa3u22huKnXKhq0EQ+MKF6ZGM948Pmg8YoPGpVGVtsI1bSK
+	oMGAHHJ7JEAUrLVIbWiR2qLiUYIQLg9EwXIIKKgEwhXRVkE8CpGXyS8z8//NywhJaZVghlCp
+	OsWrVfIQGS2mxH2e+sWqH36KpfkDc8D5PYGC7AIzDbV3TQjMhdEEdJcHQoOrF8GvV69JyEyv
+	RXCrvZWEwoo2BHbjBRrqPntBvXOAhur0ZBpicgpoeNMzQkBLxlUCTNbt8MHQScGLy3oCMrtp
+	yMqMIdyli4AhQx4Dhihf6DBeZ2CkPQCq2xwCsDcvgmvaFhqe2qspqCjqIKDucTYNbea/AnhR
+	UUWBK80baq+kCiC/X09Dj8tAgsE5wMDbEh0BFbqpYIl1C+O//RFAZWoJAfG37xFQ3/QEQXHC
+	RwKsZgcNZc5eAmzWdBKG75Qj6EjrYyAuZYiBrOg0BMlxGRTEtqyEXz/dl298D4DomxYK8n87
+	0Ia12Kw1I1zWO0DiWNsZPOx8R2O7S0fh53oOP7reyuDY4mYG66ynsc3oh3OedhP41qBTgK15
+	iTS2Dl5lcFJfPYH7a2qYnTP3i9cE8yHKMF69ZF2QWPHtTQF58iUXrm+zUFHINikJiYQcu4Kr
+	evgQjbOzrokaZZqdzzU2DpGjPJmdzdlSOwVJSCwkWYcH13CjaSwwid3G5TpqxgIU68sN2h/Q
+	oyxhV3JV9y79l/pwJkvJmEjEruKak8vG+lL3Tr1JS41KOTZLxP18a/kfmM49MzZSl5FEhybk
+	IalSFRYqV4as8FdEqJTh/kdOhFqR+78MkSMHitBg7Z5SxAqRzFNisS9USAXyME1EaCnihKRs
+	siTPtkAhlQTLI87y6hOH1adDeE0p8hZSsmmSZa4zwVL2mPwUf5znT/Lq8SkhFM2IQtrdre1I
+	XZj7O6txb9S81+8OafdVWjZvvd8/uzgmZjhyy4NkyZevu1ZvGOn+8inFdLD9qGRj4qvlc6Z5
+	SX2au/YGpbV6LnJWn4e5kRfBE3/0PR+XQRsmvt+xPmVWz/3yHecKNjV4G70e25ZNSfWwBSVu
+	tvcY/4iGf+BAqkiT8CzbRyqjNAp5gB+p1sj/AV5ct3JbAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSW0xTaRDH/c6das1JJXq8BdPEqBgvGKtDNIT4IJ+a3bjG4OVFGz3axoLY
+	CopmI9iCLFAQIrCiYEGtWIqUFu+UIChaLwiCRQhWIayCoESkrBUUC8aXyS/zn/nNy3CkzELP
+	4tTRh0VttFIjZySU5M81+iWa/4NVy1uzAbxDKRScL7cy0HitFIG1MpGA3gcR0Drcj2Dk2XMS
+	8nIaERR1viahst6DwFlykoHm7qnQ4h1gwJWTxoD+YjkDTX2jBHTkZhNQav8D3pjfUfDkdDEB
+	eb0MnMvTE/7SQ4DPbGHBnDAfukryWRjtDAGXx01DXYGLBmf7Yjhb2MFAldNFQf2tLgKa75xn
+	wGMdo+FJ/SMKhjNmQ2OWkYayT8UM9A2bSTB7B1h4UWMioN40HWwGvzX5yw8aHhprCEi+VEFA
+	S9tdBNUpbwmwW90M1Hn7CXDYc0j4duUBgq6MjywkpftYOJeYgSAtKZcCQ4cCRr76LxcMhUDi
+	BRsFZd/dKDwMWwutCNf1D5DY4DiCv3lfMtg5bKLw42IB385/zWJDdTuLTfZY7CgJxhereglc
+	NOilsd3yD4Ptg9ksTv3YQuBPDQ3s5rk7JWv3ihp1nKhdFrZbovrSVE7GPBWOFntsVAJyTEtF
+	AZzArxS8zW3UODP8AuHVKx85zoH8PMFhfEenIglH8u7JQmtBGxoPpvEbhMvuhokFip8vDDpv
+	MOMs5RXCo4pM9EsaJJTaaiZEAfwqoT2tbqIv88+0lBZSp5HEhCZZUKA6Oi5KqdYoluoOqOKj
+	1UeX7jkYZUf+DzL/PZp1Cw01R9QinkPyKVKbc5FKRivjdPFRtUjgSHmg1OJYqJJJ9yrjj4na
+	g7u0sRpRV4tmc5R8hnTjNnG3jN+vPCweEMUYUfs7JbiAWQlo/fvH2SVhc9Kn/3V8pjFra9Cm
+	8BlBJ07d69zi6r+Px/IjNpcd8awLtd8c3FHZLSXXNRlWrc46k/6f4qqy73pkQLcvcju3KOlu
+	rr5t/79FxorMrytCZUW96fqx2Ji3oRkjTaNJ+sU+uiL5ekrm2Z6b+w6tGLn6QVHl2Hcq/Pvn
+	7hs9c6rllE6lDAkmtTrlTyrxfgA9AwAA
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -120,54 +120,111 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-llist_head and llist_node can be used by some other header files.  For
-example, dept for tracking dependencies uses llist in its header.  To
-avoid header dependency, move them to types.h.
+Wrapped the base APIs for easier annotation on wait and event.  Start
+with supporting waiters on each single event.  More general support for
+multiple events is a future work.  Do more when the need arises.
+
+How to annotate:
+
+1. Initaialize a map for the interesting wait.
+
+   /*
+    * Place along with the wait instance.
+    */
+   struct dept_map my_wait;
+
+   /*
+    * Place in the initialization code.
+    */
+   sdt_map_init(&my_wait);
+
+2. Place the following at the wait code.
+
+   sdt_wait(&my_wait);
+
+3. Place the following at the event code.
+
+   sdt_event(&my_wait);
+
+That's it!
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/llist.h | 8 --------
- include/linux/types.h | 8 ++++++++
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ include/linux/dept_sdt.h | 65 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+ create mode 100644 include/linux/dept_sdt.h
 
-diff --git a/include/linux/llist.h b/include/linux/llist.h
-index 2c982ff7475a..3ac071857612 100644
---- a/include/linux/llist.h
-+++ b/include/linux/llist.h
-@@ -53,14 +53,6 @@
- #include <linux/stddef.h>
- #include <linux/types.h>
- 
--struct llist_head {
--	struct llist_node *first;
--};
--
--struct llist_node {
--	struct llist_node *next;
--};
--
- #define LLIST_HEAD_INIT(name)	{ NULL }
- #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
- 
-diff --git a/include/linux/types.h b/include/linux/types.h
-index 49b79c8bb1a9..c727cc2249e8 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -204,6 +204,14 @@ struct hlist_node {
- 	struct hlist_node *next, **pprev;
- };
- 
-+struct llist_head {
-+	struct llist_node *first;
-+};
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+new file mode 100644
+index 000000000000..0535f763b21b
+--- /dev/null
++++ b/include/linux/dept_sdt.h
+@@ -0,0 +1,65 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Single-event Dependency Tracker
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2020 LG Electronics, Inc., Byungchul Park
++ *  Copyright (c) 2024 SK hynix, Inc., Byungchul Park
++ */
 +
-+struct llist_node {
-+	struct llist_node *next;
-+};
++#ifndef __LINUX_DEPT_SDT_H
++#define __LINUX_DEPT_SDT_H
 +
- struct ustat {
- 	__kernel_daddr_t	f_tfree;
- #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
++#include <linux/kernel.h>
++#include <linux/dept.h>
++
++#ifdef CONFIG_DEPT
++#define sdt_map_init(m)							\
++	do {								\
++		static struct dept_key __key;				\
++		dept_map_init(m, &__key, 0, #m);			\
++	} while (0)
++
++#define sdt_map_init_key(m, k)		dept_map_init(m, k, 0, #m)
++
++#define sdt_wait(m)							\
++	do {								\
++		dept_request_event(m);					\
++		dept_wait(m, 1UL, _THIS_IP_, __func__, 0);		\
++	} while (0)
++
++/*
++ * sdt_might_sleep() and its family will be committed in __schedule()
++ * when it actually gets to __schedule(). Both dept_request_event() and
++ * dept_wait() will be performed on the commit.
++ */
++
++/*
++ * Use the code location as the class key if an explicit map is not used.
++ */
++#define sdt_might_sleep_start(m)					\
++	do {								\
++		struct dept_map *__m = m;				\
++		static struct dept_key __key;				\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__);\
++	} while (0)
++
++#define sdt_might_sleep_end()		dept_clean_stage()
++
++#define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
++#define sdt_request_event(m)		dept_request_event(m)
++#else /* !CONFIG_DEPT */
++#define sdt_map_init(m)			do { } while (0)
++#define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
++#define sdt_wait(m)			do { } while (0)
++#define sdt_might_sleep_start(m)	do { } while (0)
++#define sdt_might_sleep_end()		do { } while (0)
++#define sdt_ecxt_enter(m)		do { } while (0)
++#define sdt_event(m)			do { } while (0)
++#define sdt_ecxt_exit(m)		do { } while (0)
++#define sdt_request_event(m)		do { } while (0)
++#endif
++#endif /* __LINUX_DEPT_SDT_H */
 -- 
 2.17.1
 
