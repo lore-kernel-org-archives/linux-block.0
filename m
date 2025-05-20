@@ -1,108 +1,170 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D989D2609E6
-	for <linux-block@vger.kernel.org>; Tue, 20 May 2025 15:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7071124EF88
+	for <linux-block@vger.kernel.org>; Tue, 20 May 2025 16:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747756768; cv=none; b=fNWxHiwqmaIxe4w5QzNmyjnaYi0uXL8cIbSSQuotrG15EjTDqdxMXx8v5MD9Ek0ITLMvrrV9Y8a0KHfwOnelWFVsw4ZD6X676xDaSEeIb/+zI6BtQZ0CphvbPt1wJJaDTTtQJTIg5JU/s/xZgPFoxz6CAg/rhDWtBcU21Bmvgfc=
+	t=1747756943; cv=none; b=aijzy2meaKU9MQiCFQ1d2tIwqcRCNRtkH4VKkFqFwJ//xkgqmvqmF40pGvMeXzPLHUfCWRYus8HQwJgIhNwuK1uIo1eTZx6gFqcgYv1dTWtLlb5+0hJzfKlz2kMiAu8Xp0u8YRrX54a+HlxKJ9OxxSLbi1DAitEqikEdefN2kTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747756768; c=relaxed/simple;
-	bh=7fON7TN7jQAdDcJfrs+MB3iFM8C0eGSkz9FF+Cxo/zQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sf8i/JSlTDir4Z+AIqnIahSSUappOhwRT+zHndg+X4H3tgOJsSDC9TRHEBOq8utyg+hHrAk5xM7UtoBnRH+h5FEmY8+pJ6bdE0fJYNpo1m6vnLBZv3fT0A5t99ZLMp7Uwau+X/RGCM7tvby8WfJ9iMlytauaAKsg/VZAIH3/tMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Sxp2ncy/; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1747756943; c=relaxed/simple;
+	bh=yQat2Vyi4Zfb1B/A6dGmgEV+mcncC0+F2mRf0v7tWLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jC4vP3Ie7gii/IdLyY9Re66DZtLGo0la9ofch0qwPpbp6I524J+qmbOXK/gYl15deXYyQX8AdSNtwRgTlhiTtKGVPkdSD2ZyFXAqV1p3bI3OE1kcZvsrSBv3lnun9iTfA4VsQri0Y2znMCiUCmxxSl+hCsu4rQ1H21y5lrgzYJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=octHarzD; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Sxp2ncy/"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-85e751cffbeso404422739f.0
-        for <linux-block@vger.kernel.org>; Tue, 20 May 2025 08:59:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747756765; x=1748361565; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=juqOB3f3EFAzzo89YtJE/wPhoNt5TEljfeEq4uiZNZQ=;
-        b=Sxp2ncy/RHlaXgM5sJarSKjcROrmPfY/9t7fvk0xz9e2OQZpX7e9gzNxHss5vG7M4Y
-         AE0scKG3GGk1JJWa23N/wlTeEHmNo6Ef56wdXksAslSAS24Nur5+Y+rYXOj+nyCRyvck
-         xmY6A0dRoX48CpwxePek9StBJaSnH8rjv0a5yuIATeZ1+STDIKBOofXhWxNa0SirLX5v
-         p82G27c4vXdS6VNlX2KUO9uEPvMOK0EMc7pBFmHoSZd1RsEB8U82mUauYkswl/f2oWWJ
-         RKkhJN+7aZGLO1Lhu7bL19kzIfRCGn8H9SIclf7wAdWH/P+LLXC2hSja2EXsy7tsg5ts
-         /HOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747756765; x=1748361565;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=juqOB3f3EFAzzo89YtJE/wPhoNt5TEljfeEq4uiZNZQ=;
-        b=sxGYSnHUyRa+orytl+X6f+Y/a0JFBzv6+qy9irdDsi5a/VdxHuxRTSRmChkFST81dt
-         4eUgR3riJTg7MWqvZWThEOWf9bIG8/hQ9SrWzEjA/dRwxvXAdbJQhVmVqF/GUX/OVr9/
-         uTnuXcSd7fo2wF3vg9vhhuPWhGH5FzMWh9D2N92PBd/cPOgjXCPm1IyF0qZjMbL0FzO1
-         nDXouOSeBAQiiBAGX6vFsj+LwqG8BVK+wT7tfjqsWVlk+GbcgWm+we3WYD1zQvjmWPZr
-         atOUMKMwaDizVh8UayalsAy+sDaeeC1GJU/Nqz+a9DUbLdG4yQpHQ/QDqDo5W37G6NGg
-         iXqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTsIAS1GlkNI2eioFelR2ZOpmpIRw7DBstNMbcVY4HU1nLa1xnD8e/hjC9BOg2aGDNOoaG3TwVkLNuIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWYx6nTaCE5HspYOB0k3f39wkcL3O7SM7TeFxQYgQ0p+M55iZG
-	Lhl3PYPIstvTnM5Nsurg1CccCw1J3Stmevoz43j8g80WsoQJSYJsKs7zxPndvH3lChk=
-X-Gm-Gg: ASbGncuxKtn0bosLSjeyOvMJmTeslKS0M6FrHbQkfy/TDnqDM7BZ67TSHOd2fwsLlvo
-	TchRRDWXJy93oOhZiOLHHF8pwIDMx4onBrbP/0zQ6Ny4EN0ATBNJja5wfxKhTPyiKnBfWr6Kw9z
-	KWFu3KiL6qAHQk+8S12/cYO54/6OH1XPtS0KDEYh9dT744n/3vsCLA6v01hFxYT/dqzxD1Za/a2
-	swWvbh/ph2Hejn1aScr6nhJJki3cmnGT4KSddhqk/PAKvxMi2a2qonJGRqdFcZ2WoPtFHwBbpft
-	rRGFIQskjAUBrO+Ca+asyrOy1KMBTqUBwhKgXb1Iv9AadY8=
-X-Google-Smtp-Source: AGHT+IFi9UcErwwDdMtK0ZXnNOLhwueIECkH6y0/k5enmWUX3uHiMG4XVug8UWRrOXL5J4Ukgg1Gdg==
-X-Received: by 2002:a05:6e02:3784:b0:3d9:2aa3:fe2e with SMTP id e9e14a558f8ab-3db8574f752mr147921355ab.10.1747756764683;
-        Tue, 20 May 2025 08:59:24 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fbcc4b2f45sm2281905173.126.2025.05.20.08.59.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 08:59:24 -0700 (PDT)
-Message-ID: <d76bbb1b-a7a0-49b5-b34f-3e9acd181411@kernel.dk>
-Date: Tue, 20 May 2025 09:59:23 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="octHarzD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=B7gJftj33Q+f5gyhyPsRGbZTZbMOtVqd6ZE/JG57XvI=; b=octHarzDkx68gfFVhpFEo8+S4B
+	epcIaxu6B0lI1MpDYRLI/W6Ol7CagjgiKsE+RP+yMl/GIxBC88cl7Dnp5pYQTts+Bgwb0dIIqswBU
+	2VRrevoYrJmKCKgj9RKoWtj5v37LYMcHmUojpR997y7bVNbowE57aIjbbGmDptNBv7bwdSErd+YhM
+	8gfcaLzzP+raF9iNsbsc6gOYjTYaGGOv6UQ4zYC/sbwv8vFGWpga6z7hOp2uR8qTHY9JrGW8bWrMX
+	k/SNxLAvWHjspjhMZq34nnotD2xi2JjTgxlxocy5QHlhqANC7R97yZXbednmGyL4+3poRfftnWuBb
+	4yu1VPOQ==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uHPQ4-0000000DRLj-07yR;
+	Tue, 20 May 2025 16:02:20 +0000
+Date: Tue, 20 May 2025 18:02:16 +0200
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org,
+	linux-mm@kvack.org
+Subject: [GIT PULL] nvme updates for Linux 6.16
+Message-ID: <aCyniHQRl2HMjsvu@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 2/6] ublk: prepare for supporting to register request
- buffer automatically
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
- Caleb Sander Mateos <csander@purestorage.com>
-References: <20250520045455.515691-1-ming.lei@redhat.com>
- <20250520045455.515691-3-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20250520045455.515691-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 5/19/25 10:54 PM, Ming Lei wrote:
-> @@ -2014,6 +2064,14 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
->  		return -EINVAL;
->  	}
->  
-> +	if (ublk_support_auto_buf_reg(ubq)) {
-> +		if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
-> +			WARN_ON_ONCE(io_buffer_unregister_bvec(cmd, 0,
-> +						issue_flags));
-> +			io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
-> +		}
-> +	}
-> +
+NOTE: this includes changes to mm/dmapool.c.  We've not managed to
+get any replies from mm folks for it despite repeated pings.
 
-Debug or WARN_ON_ONCE() statements with side effects is generally not a
-good idea, imho. Would be cleaner to do:
 
-	ret = io_buffer_unregister_bvec(cmd, 0, issue_flags);
-	WARN_ON_ONCE(ret);
+The following changes since commit 496a3bc5e46c6485a50730ffbcbc92fc53120425:
 
-and ditto for the next patch that then updates it.
+  blk-mq: add a copyright notice to blk-mq-dma.c (2025-05-16 08:43:41 -0600)
 
-But pretty minor, not worth a respin. This series looks ready to me at
-this point.
+are available in the Git repository at:
 
--- 
-Jens Axboe
+  git://git.infradead.org/nvme.git tags/nvme-6.16-2025-05-20
+
+for you to fetch changes up to 9e221d8cf90b8599a6a3d62a1ebb712468f42a35:
+
+  nvme: rename nvme_mpath_shutdown_disk to nvme_mpath_remove_disk (2025-05-20 05:34:52 +0200)
+
+----------------------------------------------------------------
+nvme updates for Linux 6.16
+
+ - add per-node DMA pools and use them for PRP/SGL allocations
+   (Caleb Sander Mateos, Keith Busch)
+ - nvme-fcloop refcounting fixes (Daniel Wagner)
+ - support delayed removal of the multipath node and optionally support
+   the multipath node for private namespaces (Nilay Shroff)
+ - support shared CQs in the PCI endpoint target code (Wilfred Mallawa)
+ - support admin-queue only authentication (Hannes Reinecke)
+ - use the crc32c library instead of the crypto API (Eric Biggers)
+ - misc cleanups (Christoph Hellwig, Marcelo Moreira, Hannes Reinecke,
+   Leon Romanovsky, Gustavo A. R. Silva)
+
+----------------------------------------------------------------
+Caleb Sander Mateos (2):
+      nvme-pci: factor out a nvme_init_hctx_common() helper
+      nvme-pci: make PRP list DMA pools per-NUMA-node
+
+Christoph Hellwig (6):
+      nvme-pci: don't try to use SGLs for metadata on the admin queue
+      nvme-pci: remove struct nvme_descriptor
+      nvme-pci: rename the descriptor pools
+      nvme-pci: use a better encoding for small prp pool allocations
+      nvme-pci: use struct_size for allocation struct nvme_dev
+      nvme-pci: derive and better document max segments limits
+
+Daniel Wagner (14):
+      nvmet-fcloop: track ref counts for nports
+      nvmet-fcloop: remove nport from list on last user
+      nvmet-fcloop: refactor fcloop_nport_alloc and track lport
+      nvmet-fcloop: refactor fcloop_delete_local_port
+      nvmet-fcloop: update refs on tfcp_req
+      nvmet-fcloop: access fcpreq only when holding reqlock
+      nvmet-fcloop: prevent double port deletion
+      nvmet-fcloop: allocate/free fcloop_lsreq directly
+      nvmet-fcloop: drop response if targetport is gone
+      nvmet-fc: free pending reqs on tgtport unregister
+      nvmet-fc: take tgtport refs for portentry
+      nvmet-fcloop: add missing fcloop_callback_host_done
+      nvmet-fcloop: don't wait for lport cleanup
+      nvme-fc: do not reference lsrsp after failure
+
+Eric Biggers (1):
+      nvmet-tcp: switch to using the crc32c library
+
+Gustavo A. R. Silva (1):
+      nvme-loop: avoid -Wflex-array-member-not-at-end warning
+
+Hannes Reinecke (6):
+      nvme-tcp: remove redundant check to ctrl->opts
+      nvme-tcp: open-code nvme_tcp_queue_request() for R2T
+      nvme-auth: do not re-authenticate queues with no prior authentication
+      nvmet-auth: authenticate on admin queue only
+      nvme-auth: use SHASH_DESC_ON_STACK
+      nvmet-auth: use SHASH_DESC_ON_STACK
+
+Keith Busch (1):
+      dmapool: add NUMA affinity support
+
+Leon Romanovsky (2):
+      nvme-pci: store aborted state in flags variable
+      nvme-pci: add a symolic name for the small pool size
+
+Marcelo Moreira (1):
+      nvmet: replace strncpy with strscpy
+
+Nilay Shroff (3):
+      nvme-multipath: introduce delayed removal of the multipath head node
+      nvme: introduce multipath_always_on module param
+      nvme: rename nvme_mpath_shutdown_disk to nvme_mpath_remove_disk
+
+Wilfred Mallawa (5):
+      nvmet: add a helper function for cqid checking
+      nvmet: cq: prepare for completion queue sharing
+      nvmet: fabrics: add CQ init and destroy
+      nvmet: support completion queue sharing
+      nvmet: simplify the nvmet_req_init() interface
+
+ drivers/nvme/common/auth.c        |  15 +-
+ drivers/nvme/host/auth.c          |  30 ++-
+ drivers/nvme/host/core.c          |  12 +-
+ drivers/nvme/host/fc.c            |  13 +-
+ drivers/nvme/host/multipath.c     | 206 ++++++++++++++++--
+ drivers/nvme/host/nvme.h          |  24 ++-
+ drivers/nvme/host/pci.c           | 300 ++++++++++++++------------
+ drivers/nvme/host/sysfs.c         |   7 +
+ drivers/nvme/host/tcp.c           |  14 +-
+ drivers/nvme/target/admin-cmd.c   |  31 +--
+ drivers/nvme/target/auth.c        |  21 +-
+ drivers/nvme/target/core.c        |  94 ++++++--
+ drivers/nvme/target/discovery.c   |   2 +-
+ drivers/nvme/target/fabrics-cmd.c |  12 +-
+ drivers/nvme/target/fc.c          |  96 +++++++--
+ drivers/nvme/target/fcloop.c      | 439 ++++++++++++++++++++++++--------------
+ drivers/nvme/target/loop.c        |  29 ++-
+ drivers/nvme/target/nvmet.h       |  24 ++-
+ drivers/nvme/target/pci-epf.c     |  14 +-
+ drivers/nvme/target/rdma.c        |   8 +-
+ drivers/nvme/target/tcp.c         | 100 +++------
+ include/linux/dmapool.h           |  21 +-
+ mm/dmapool.c                      |  15 +-
+ 23 files changed, 1001 insertions(+), 526 deletions(-)
