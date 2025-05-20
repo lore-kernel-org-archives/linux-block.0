@@ -1,120 +1,154 @@
-Received: from mx.mylinuxtime.de (mx.mylinuxtime.de [46.4.70.188])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B1B2550A6
-	for <linux-block@vger.kernel.org>; Tue, 20 May 2025 05:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.70.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055E81DB124;
+	Tue, 20 May 2025 06:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747719547; cv=none; b=o3Z25tnT0EBCI0vnDyzQO/ahmzA3EGAjQavq1HumVCMdQofnobgz4aweF4ziwlJgTS6YVSZYXdy/OkdLZDID/eI783IjeCvgTGlhiV8R5a/EmRdEyz/gin2OIyyHIB4Zgx0CuzbJGf5/fZYtTYA1zvpE/a+IW+Lt/txvQWJQf3I=
+	t=1747721411; cv=none; b=uoh1Zw4SHIfRKMOP2mA6622PZMUP5KdyKdB1A12/DNtULLCQ1xGNqYPKN3TFtnxaX7fyTBYPeekjuW0ofcgv2Q96mCiOpl5Nj/jHHnisM5tiLA4z7Beffg212DArCaMqDGDo9uO2+zp2gaqq1/aCPrnEDHdcG+YkqSNox6U06DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747719547; c=relaxed/simple;
-	bh=TZ1bau13uMjZ3xmEGXPxBrb/T6qFcnWWPccxnkdxN8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bu9rRcWGOXeCVSkxIa6G8ArpPS630YujzS4nhtJM44vzxGAsUCLrsVgHe/7Fm+QQoaoLB+pcLYWufti0x8dxazflZg7/cn8/Je6SLiyn/JZNl1/8TmKBKjinv1mxJs2UJFaDZAqzqB7XwFnXmRxQ6+HsYoeKAzlSJ8MaSCfp7k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eworm.de; spf=pass smtp.mailfrom=eworm.de; arc=none smtp.client-ip=46.4.70.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eworm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eworm.de
-Received: from leda.eworm.net (unknown [194.36.25.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx.mylinuxtime.de (Postfix) with ESMTPSA id 59BC425A2AB;
-	Tue, 20 May 2025 07:39:02 +0200 (CEST)
-Authentication-Results: mx.mylinuxtime.de;
-	auth=pass smtp.auth=mail@eworm.de smtp.mailfrom=mail@eworm.de
-Date: Tue, 20 May 2025 07:39:01 +0200
-From: Christian Hesse <mail@eworm.de>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: <axboe@kernel.dk>, <christian@heusel.eu>, <hch@infradead.org>,
- <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <ming.lei@redhat.com>,
- <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>,
- <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH V5] loop: Add sanity check for read/write_iter
-Message-ID: <20250520073901.6fdfbee4@leda.eworm.net>
-In-Reply-To: <20250520030051.177205-1-lizhi.xu@windriver.com>
-References: <20250519175640.2fcac001@leda.eworm.net>
-	<20250520030051.177205-1-lizhi.xu@windriver.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
-X-Face: %O:rCSk<c"<MpJ:yn<>HSKf7^4uF|FD$9$I0}g$nbnS1{DYPvs#:,~e`).mzj\$P9]V!WCveE/XdbL,L!{)6v%x4<jA|JaB-SKm74~Wa1m;|\QFlOg>\Bt!b#{;dS&h"7l=ow'^({02!2%XOugod|u*mYBVm-OS:VpZ"ZrRA4[Q&zye,^j;ftj!Hxx\1@;LM)Pz)|B%1#sfF;s;,N?*K*^)
-Face: iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAAGFBMVEUZFRFENy6KVTKEd23CiGHeqofJvrX4+vdHgItOAAAACXBIWXMAAA3XAAAN1wFCKJt4AAACUklEQVQ4y2VUTZeqMAxNxXG2Io5uGd64L35unbF9ax0b3OLxgFs4PcLff0lBHeb1QIq5uelNCEJNq/TIFGyeC+iugH0WJr+B1MvzWASpuP4CYHOB0VfoDdddwA7OIFQIEHjXDiCtV5e9QX0WMu8AG0mB7g7WP4GqeqVdsi4vv/5kFBvaF/zD7zDquL4DxbrDGDyAsgNYOsJOYzth4Q9ZF6iLV+6TLAT1pi2kuvgAtZxSjoG8cL+8vIn251uoe1OOEWwbIPU04gHsmMsoxyyhYsD2FdIigF1yxaVbBuSOCAlCoX324I7wNMhrO1bhOLsRoA6DC6wQ5eQiSG5BiWQfM4gN+uItQTRDMaJUhVbGyKWCuaaUGSVFVKpl4PdoDn3yY8J+YxQxyhlHfoYOyPgyDcO+cSQK6Bvabjcy2nwRo3pxgA8jslnCuYw23ESOzHAPYwo4ITNQMaOO+RGPEGhSlPEZBh2jmBEjQ5cKbxmr0ruAe/WCriUxW76I8T3h7vqY5VR5wXLdERodg2rHEzdxxk5KpXTL4FwnarvndKM5/MWDY5CuBBdQ+3/0ivsUJHicuHd+Xh3jOdBL+FjSGq4SPCwco+orpWlERRTNo7BHCvbNXFVSIQMp+P5QsIL9upmr8kMTUOfxEHoanwzKRcNAe76WbjBwex/RkdHu48xT5YqP70DaMOhBcTHmAVDxLaBdle93oJy1QKFUh2GXT4am+YH/GGel1CeI98GdMXsytjCKIq/9cMrlgxFCROv+3/BU1fijNpcVD6DxE8VfLBaxUGr1D5usgDYdjwiPAAAAAElFTkSuQmCC
+	s=arc-20240116; t=1747721411; c=relaxed/simple;
+	bh=3inkbt8TL1lFoRCu53H4E/rxKOPuy4Fw9iBX9yfI1EA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uryXOx+GTEr4IhThQkt9u3Cr+8csa1QPZOxjp2vPeRPvfdKV8ZVsgzwXJmjvAbmI39T+cJ36Rjy1rVU+qJxitE8ZkJh8po05p/wHVNEAvvrSfZaKfQAnzvk5lAIX5BV+ukV9GFYw6hThm3hxZW4eg6NtqhXq8Dn+68Wfzmjrtko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IuofMIoD; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="IuofMIoD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=G7Kx0ZtWsfXqw30Vxg8hLBL8MP5DK1Zph4yxRDD3jAc=; b=IuofMIoDA6/GxCoqUO+bj/xGM9
+	/YzUYj2Dm9Xkdu92t6jcUkeX/gyoGdKcpsmBoTttu+WEzuF7rr4eoBQLA5CopLnsVG4gUd3epTFN2
+	iT0q5MDt5QKDnxp3HEZShGLpOiR1oVvAflWmSYT+/5QzFzaHxiWcfnpifZUOivkWzcVVKHeU7FSqi
+	Ve2jA6iXN888dRQcH0RvE2bfMR1a31gCX6FZekP6gPjAACpTzpg+5MHhA+MQLQxdYz/fnK3C1FsGs
+	0CazuZXoc/hOBGvOpkeL4g71qsRkOdXII0wLvEtu9VnqhFhnNFNAKyJYMiHB5Umpyy2ikl/zfdZHA
+	9eNdLXwg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1uHGAv-00GASm-Et; Tue, 20 May 2025 06:10:06 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 929F3BE2DE0; Tue, 20 May 2025 08:10:04 +0200 (CEST)
+Date: Tue, 20 May 2025 08:10:04 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Roland Clobus <rclobus@rclobus.nl>, Lizhi Xu <lizhi.xu@windriver.com>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: 1106070@bugs.debian.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	regressions@lists.linux.dev
+Subject: Re: [6.12.y regression] loosetup: failed to set up loop device:
+ Invalid argument after 184b147b9f7f ("loop: Add sanity check for
+ read/write_iter")
+Message-ID: <aCwcvC4KBu6j4Dqz@eldamar.lan>
+References: <3a333f27-6810-4313-8910-485df652e897@rclobus.nl>
+ <aCwZy6leWNvr7EMd@eldamar.lan>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/fNst24p=Np=ldSTs/mAULnQ";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Spamd-Bar: /
-X-Spamd-Result: default: False [0.00 / 15.00];
-	TAGGED_RCPT(0.00)[6af973a3b8dfd2faefdc]
-X-Rspamd-Server: mx
-X-Rspamd-Queue-Id: 59BC425A2AB
-X-Stat-Signature: khw1e6gszj3qiaabzf4ok9wsrhekzrg3
-X-Rspamd-Action: no action
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aCwZy6leWNvr7EMd@eldamar.lan>
+X-Debian-User: carnil
 
---Sig_/fNst24p=Np=ldSTs/mAULnQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 20, 2025 at 07:57:31AM +0200, Salvatore Bonaccorso wrote:
+> Hi
+> 
+> In Debian Roland Clobus reported a regression with setting up loop
+> devices from a backing squashfs file lying on read-only mounted target
+> directory from a iso.
+> 
+> The original report is at:
+> https://bugs.debian.org/1106070
+> 
+> Quoting the report:
+> 
+> On Mon, May 19, 2025 at 12:15:10PM +0200, Roland Clobus wrote:
+> > Package: linux-image-6.12.29-amd64
+> > Version: 6.12.29-1
+> > Severity: important
+> > X-Debbugs-Cc: debian-amd64@lists.debian.org
+> > User: debian-amd64@lists.debian.org
+> > Usertags: amd64
+> > X-Debbugs-Cc: phil@hands.com
+> > User: debian-qa@lists.debian.org
+> > Usertags: openqa
+> > X-Debbugs-Cc: debian-boot
+> > 
+> > Hello maintainers of the kernel,
+> > 
+> > The new kernel (6.12.29) has a modified behaviour (compared to 6.12.27) for
+> > the loop device.
+> > 
+> > This causes the Debian live images (for sid) to fail to boot.
+> > 
+> > The change happened between 20250518T201633Z and 20250519T021902Z, which
+> > matches the upload of 6.12.29 (https://tracker.debian.org/news/1646619/accepted-linux-signed-amd64-612291-source-into-unstable/)
+> > at 20250518T230426Z.
+> > 
+> > To reproduce:
+> > * Download the daily live image from https://openqa.debian.net/tests/396941/asset/iso/smallest-build_sid_20250519T021902Z.iso
+> > * Boot into the live image (the first boot option)
+> > * Result: an initramfs shell (instead of a live system) -> FAIL
+> > * Try: `losetup -r /dev/loop1 /run/live/medium/live/filesystem.squashfs`
+> > * Result: `failed to set up loop device: invalid argument` -> FAIL
+> > * Try: `cp /run/live/medium/live/filesystem.squashfs /`
+> > * Try: `losetup -r /dev/loop2 /filesystem.squashfs`
+> > * Result: `loop2: detected capacity change from 0 to 1460312` -> PASS
+> > 
+> > It appears that the loopback device cannot be used any more with the mount
+> > /run/live/medium (which is on /dev/sr0).
+> > 
+> > I've verified: the md5sum of the squashfs file is OK.
+> > 
+> > The newer kernel is not in trixie yet.
+> > 
+> > With kind regards,
+> > Roland Clobus
+> 
+> A short reproducer is as follows:
+> 
+> iso="netinst.iso"
+> url="https://openqa.debian.net/tests/396941/asset/iso/smallest-build_sid_20250519T021902Z.iso"
+> if [ ! -e "${iso}" ]; then
+>         wget "${url}" -O "${iso}"
+> fi
+> mountdir="$(mktemp -d)"
+> mount -v "./${iso}" "${mountdir}"
+> losetup -v -r -f "${mountdir}/live/filesystem.squashfs"
+> loosetup -l
+> 
+> resulting in:
+> 
+> mount: /tmp/tmp.HgbNe7ek3h: WARNING: source write-protected, mounted read-only.
+> mount: /dev/loop0 mounted on /tmp/tmp.HgbNe7ek3h.
+> losetup: /tmp/tmp.HgbNe7ek3h/live/filesystem.squashfs: failed to set up loop device: Invalid argument
+> NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE         DIO LOG-SEC
+> /dev/loop0         0      0         1  0 /root/netinst.iso   0     512
+> 
+> Reverting 184b147b9f7f ("loop: Add sanity check for read/write_iter")
+> on top of 6.12.29 fixes the issue:
+> 
+> mount: /tmp/tmp.ACkkdCdYvB: WARNING: source write-protected, mounted read-only.
+> mount: /dev/loop0 mounted on /tmp/tmp.ACkkdCdYvB.
+> NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE                                    DIO LOG-SEC
+> /dev/loop1         0      0         0  1 /tmp/tmp.ACkkdCdYvB/live/filesystem.squashfs   0     512
+> /dev/loop0         0      0         1  0 /root/netinst.iso                              0     512
+> 
+> For completeness, netinst.iso is a iso9660 fstype with mount options
+> "ro,relatime,nojoliet,check=s,map=n,blocksize=2048,iocharset=utf8".
+> 
+> #regzbot introduced: 184b147b9f7f
+> #regzbot link: https://bugs.debian.org/1106070
 
-Lizhi Xu <lizhi.xu@windriver.com> on Tue, 2025/05/20 11:00:
-> On Mon, 19 May 2025 17:56:40 +0200, Christian Hesse wrote:
-> > $ losetup --find --show --read-only --
-> > /run/archiso/bootmnt/arch/x86_64/airootfs.sfs losetup:
-> > /run/archiso/bootmnt/arch/x86_64/airootfs.sfs: failed to set up loop
-> > device: Invalid argument
->
-> I tried to reproduce the problem you mentioned using the kernel containing
-> "commit:f5c84eff", but failed to reproduce it.
-> The complete reproduction steps are as follows:
->=20
-> sudo apt install squashfs-tools debootstrap
-> sudo debootstrap --arch=3Damd64 focal rootfs http://archive.ubuntu.com/ub=
-untu/
-> sudo mksquashfs rootfs rootfs.sfs -comp xz -e boot
-> [...]
+Just tested: The regression exists as well in 6.15-rc7 so it is not
+specific to the stable 6.12.y update.
 
-That's the wrong end of the stack. After all squashfs is not directly
-involved here (that was just an etxra info on why we have a loopback file
-inside iso9660).
-
-The issue is setting up the loopback file inside a mounted iso9660 filesyst=
-em.
-Take these steps for easy reproduction:
-
-root@leda ~ # mkdir iso.d=20
-root@leda ~ # truncate -s 10m iso.d/loopback.img
-root@leda ~ # mkisofs -o iso.iso iso.d/
-Setting input-charset to 'UTF-8' from locale.
- 94,75% done, estimate finish Tue May 20 07:34:52 2025
-Total translation table size: 0
-Total rockridge attributes bytes: 0
-Total directory bytes: 0
-Path table size(bytes): 10
-Max brk space used 0
-5294 extents written (10 MB)
-root@leda ~ # mount -o loop iso.iso /mnt/tmp=20
-mount: /mnt/tmp: WARNING: source write-protected, mounted read-only.
-root@leda ~ # losetup --find --show --read-only -- /mnt/tmp/loopback.img=20
-losetup: /mnt/tmp/loopback.img: failed to set up loop device: Invalid argum=
-ent
-
-Hope that helps, let me know if you need more assistance.
---=20
-Best regards,
-Chris
-
---Sig_/fNst24p=Np=ldSTs/mAULnQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iHQEARYKAB0WIQSmOl3fryo2Nzt8CpJOj8ol/axIVQUCaCwVdQAKCRBOj8ol/axI
-VYovAPjB5lx5KHvbGNCKPXj0KVsTHSS0n7UJ8OGO7WP5FGhkAQD34BN4l3pHwARk
-Z0ZeskSgLWuMZigIxE3Cqty8uJg8BA==
-=ehv3
------END PGP SIGNATURE-----
-
---Sig_/fNst24p=Np=ldSTs/mAULnQ--
+Regards,
+Salvatore
