@@ -1,33 +1,33 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3861D25E81C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB1C25F7A5;
 	Tue, 20 May 2025 22:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747780764; cv=none; b=DRhTtJfszattZ7dc88U/ObwaBqVOrAkX5N4my7lEdYpPvxZcEaUsYFUCt+NeXHecSPi4jZhMtq4Or/9so9oarH3di5EfYRBiGynu0x6IhdIGHZfRY5/suR76d/Ob+niiK5NJXmGZIqiyuFIMZP5TNwID4f5zhgqXfLD7H52gTOA=
+	t=1747780765; cv=none; b=g1qZWqY8VPwkBlZe15UEZfpqf38mfFhfLRygAPvb6MtCQHjEV+OLGrNcX0Sk1jCXKmxQ4jiEkcrP0G/ZLaRXlprzDiYxnaaDGdnGdzmoduzQjToms+wrcoVe3ieJa6Knc8bYWxiwWk7yN4cxzhaxeNHmNz4NQtllx5481NOLbhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747780764; c=relaxed/simple;
-	bh=H1fKq6KVU0acWXKFa8RwyKgXyjjOYp2ODK0LTTISDNo=;
+	s=arc-20240116; t=1747780765; c=relaxed/simple;
+	bh=9P6JkaQzTiNb0JWSd2wAZNgysr/BAAzM2VevHPD5n3w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bo6rRcfsRcZvfpk5R4BdhMrLvxUyxI0jge9wZ9v3uVzy7D/6pPtIeFdj1yB7TOqg0tFQlzViXDHT8R1MVSyfzgRASe6x74MxY/gtPjAKnODtoBTSkKJhGkSwatfwu27UCExbgfAvRaE9bK7AspmSPA9oEZ9ccX0gPh7rqbme/+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=B/Rq81z9; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version:Content-Type; b=QNIX9dHi7k706O6n1DqbpbOQCW7ofqoKx30WQ9urWnADTTDZ5oEm7PKSsFH+ZFXPlAO9JTaIkPaDLCf+2Q2OPI0SasSdI7QBsknp0qGfd5ba/TSMttCSU3XsQj9Kfxu6D5oAXZmEkFedIHk3nRJ9/zk99K7NdxDh+7E6Zk0NjCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mUzhbSyY; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B/Rq81z9"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mUzhbSyY"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=QeKO5WpcdWd/rnQmvvan6zzkNh3NOFrxEjjxYAOl7BU=; b=B/Rq81z9Xzby7o+T2uPzXSmvIy
-	mHdH8FS7ztOeujmoSZMOwnPrEgqE5ccN9QSTU4BafrcKOaH8rSdl8X9FMpmtHVgetuORaBExJ7TuR
-	LffiCeUI85dBk3NnDSDkgwg2xZueDOd1duU6C6jh0HHoq5zwIPjclv/Ne0rKGPoluL1peYwq1tE7e
-	3GSLLtwXnXoWuguzMZA5npaYWS7AHck+ImmJT5Y2wq+2zHL/OvOTP224NppJCrA0Gt2L9I7YcaquG
-	UmGPiA2/3HIAhKgwB/Pi3TZrJ5RQcJgitCbpzisNRy7pxEfPXntU4j3IpPOlLy6fuaaZ33ZXKb2i7
-	hLzUed3g==;
+	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
+	To:From:Reply-To:Content-ID:Content-Description;
+	bh=+7in2ohAhLEsNpO8Gfw2xROmEnRm0I2n1Qm569qhae0=; b=mUzhbSyYTepdLaZHRvbcGy0HY7
+	ELbcDKwxWqzZTmMGjBW8UATj/i2QVivNJ6zHLp2BvRNRJsuBJFl1D6VK1cPY4xd/S4bBoDcSCzS8I
+	/+8NecruA630XXoJl//FlFX+8m3GbQwOQoKdpBBCBR+W5ijbo9TfLgsoT/Ox57l2GrYzMCcFb7QnP
+	CvonidLYIqjAqHr8iiRre2gTnQn2bRjL/6CccmainLHaxIe6VKMVAYS40Pu8GhrVu6A1tqfzZ+5FG
+	zRjM0AyByIH0gmcWSHw866JN3sqcb+EqfdvO+Z3C29za2SE4h31Abrfyq3CT21grkb4KC7KJ5E5s9
+	ljR2anug==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uHVcA-0000000EIMC-0peT;
+	id 1uHVcA-0000000EIML-1TuR;
 	Tue, 20 May 2025 22:39:14 +0000
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: vkoul@kernel.org,
@@ -43,9 +43,9 @@ Cc: iommu@lists.linux.dev,
 	linux-block@vger.kernel.org,
 	gost.dev@samsung.com,
 	mcgrof@kernel.org
-Subject: [PATCH 2/6] dmatest: split dmatest_func() into helpers
-Date: Tue, 20 May 2025 15:39:09 -0700
-Message-ID: <20250520223913.3407136-3-mcgrof@kernel.org>
+Subject: [PATCH 6/6] dma-mapping: benchmark: add IOVA support
+Date: Tue, 20 May 2025 15:39:13 -0700
+Message-ID: <20250520223913.3407136-7-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250520223913.3407136-1-mcgrof@kernel.org>
 References: <20250520223913.3407136-1-mcgrof@kernel.org>
@@ -55,729 +55,769 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Split the core logic of dmatest_func() into helpers so that the routine
-dmatest_func() becomes thin, letting us later add alternative routines
-which use a different preamble setup.
+Add support to use the IOVA DMA API, and allow comparing and contrasting
+to the streaming DMA API. Since the IOVA is intended to be an enhancement
+when using an IOMMU which supports DMA over it only allow the IOVA to be
+used proactively for devices which have this support, that is when
+use_dma_iommu() is true. We don't try a fallback as the goal is clear,
+only to use the IOVA when intended.
 
-This introduces no functional changes.
+Example output, using intel-iommu on qemu against a random number
+generator device, this output is completely artificial as its a VM
+and its using more threads than the guest even has cores, the goal was
+to at least visualize some numerical output on both paths:
+
+./tools/testing/selftests/dma/dma_map_benchmark -t 24 -i 2
+=== DMA Mapping Benchmark Results ===
+Configuration: threads:24 seconds:20 node:-1 dir:BIDIRECTIONAL granule:1 iova:2
+Buffer size: 1 pages (4 KB)
+
+STREAMING DMA RESULTS:
+  Map   latency:    12.3 μs (σ=257.9 μs)
+  Unmap latency:     3.7 μs (σ=142.5 μs)
+  Total latency:    16.0 μs
+
+IOVA DMA RESULTS:
+  Alloc   latency:     0.1 μs (σ= 31.1 μs)
+  Link    latency:     2.5 μs (σ=116.9 μs)
+  Sync    latency:     9.6 μs (σ=227.8 μs)
+  Destroy latency:     3.6 μs (σ=141.2 μs)
+  Total latency:    15.8 μs
+
+PERFORMANCE COMPARISON:
+  Streaming DMA total:    16.0 μs
+  IOVA DMA total:         15.8 μs
+  Performance ratio:      0.99x (IOVA is 1.3% faster)
+  Streaming throughput:    62500 ops/sec
+  IOVA throughput:         63291 ops/sec
+  Streaming bandwidth:     244.1 MB/s
+  IOVA bandwidth:          247.2 MB/s
+
+IOVA OPERATION BREAKDOWN:
+  Alloc:     0.6% (   0.1 μs)
+  Link:     15.8% (   2.5 μs)
+  Sync:     60.8% (   9.6 μs)
+  Destroy:  22.8% (   3.6 μs)
+
+RECOMMENDATIONS:
+  ~ IOVA and Streaming APIs show similar performance
+=== End of Benchmark ===
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/dma/dmatest.c | 607 ++++++++++++++++++++++--------------------
- 1 file changed, 320 insertions(+), 287 deletions(-)
+ include/linux/map_benchmark.h                 |  11 +
+ kernel/dma/Kconfig                            |   4 +-
+ kernel/dma/map_benchmark.c                    | 417 +++++++++++++++++-
+ .../testing/selftests/dma/dma_map_benchmark.c | 145 +++++-
+ 4 files changed, 562 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
-index 91b2fbc0b864..921d89b4d2ed 100644
---- a/drivers/dma/dmatest.c
-+++ b/drivers/dma/dmatest.c
-@@ -238,6 +238,7 @@ struct dmatest_thread {
- 	struct dmatest_done test_done;
- 	bool			done;
- 	bool			pending;
-+	u8			*pq_coefs;
+diff --git a/include/linux/map_benchmark.h b/include/linux/map_benchmark.h
+index 62674c83bde4..da7c9e3ddf21 100644
+--- a/include/linux/map_benchmark.h
++++ b/include/linux/map_benchmark.h
+@@ -7,6 +7,7 @@
+ #define _KERNEL_DMA_BENCHMARK_H
+ 
+ #define DMA_MAP_BENCHMARK       _IOWR('d', 1, struct map_benchmark)
++#define DMA_MAP_BENCHMARK_IOVA	_IOWR('d', 2, struct map_benchmark)
+ #define DMA_MAP_MAX_THREADS     1024
+ #define DMA_MAP_MAX_SECONDS     300
+ #define DMA_MAP_MAX_TRANS_DELAY (10 * NSEC_PER_MSEC)
+@@ -27,5 +28,15 @@ struct map_benchmark {
+ 	__u32 dma_dir; /* DMA data direction */
+ 	__u32 dma_trans_ns; /* time for DMA transmission in ns */
+ 	__u32 granule;  /* how many PAGE_SIZE will do map/unmap once a time */
++	__u32 has_iommu_dma;
++	__u64 avg_iova_alloc_100ns;
++	__u64 avg_iova_link_100ns;
++	__u64 avg_iova_sync_100ns;
++	__u64 avg_iova_destroy_100ns;
++	__u64 iova_alloc_stddev;
++	__u64 iova_link_stddev;
++	__u64 iova_sync_stddev;
++	__u64 iova_destroy_stddev;
++	__u32 use_iova; /* 0=regular, 1=IOVA, 2=both */
+ };
+ #endif /* _KERNEL_DMA_BENCHMARK_H */
+diff --git a/kernel/dma/Kconfig b/kernel/dma/Kconfig
+index 31cfdb6b4bc3..e2d5784f46eb 100644
+--- a/kernel/dma/Kconfig
++++ b/kernel/dma/Kconfig
+@@ -261,10 +261,10 @@ config DMA_API_DEBUG
+ 	  If unsure, say N.
+ 
+ config DMA_MAP_BENCHMARK
+-	bool "Enable benchmarking of streaming DMA mapping"
++	bool "Enable benchmarking of streaming and IOVA DMA mapping"
+ 	depends on DEBUG_FS
+ 	help
+ 	  Provides /sys/kernel/debug/dma_map_benchmark that helps with testing
+-	  performance of dma_(un)map_page.
++	  performance of the streaming DMA dma_(un)map_page and IOVA API.
+ 
+ 	  See tools/testing/selftests/dma/dma_map_benchmark.c
+diff --git a/kernel/dma/map_benchmark.c b/kernel/dma/map_benchmark.c
+index b54345a757cb..3ae34433420b 100644
+--- a/kernel/dma/map_benchmark.c
++++ b/kernel/dma/map_benchmark.c
+@@ -18,6 +18,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/timekeeping.h>
++#include <linux/iommu-dma.h>
+ 
+ struct map_benchmark_data {
+ 	struct map_benchmark bparam;
+@@ -29,9 +30,127 @@ struct map_benchmark_data {
+ 	atomic64_t sum_sq_map;
+ 	atomic64_t sum_sq_unmap;
+ 	atomic64_t loops;
++
++	/* IOVA-specific counters */
++	atomic64_t sum_iova_alloc_100ns;
++	atomic64_t sum_iova_link_100ns;
++	atomic64_t sum_iova_sync_100ns;
++	atomic64_t sum_iova_destroy_100ns;
++	atomic64_t sum_sq_iova_alloc;
++	atomic64_t sum_sq_iova_link;
++	atomic64_t sum_sq_iova_sync;
++	atomic64_t sum_sq_iova_destroy;
++	atomic64_t iova_loops;
  };
  
- struct dmatest_chan {
-@@ -557,377 +558,409 @@ static int dmatest_alloc_test_data(struct dmatest_data *d,
- 	return -ENOMEM;
+-static int map_benchmark_thread(void *data)
++static int benchmark_thread_iova(void *data)
++{
++	void *buf;
++	struct map_benchmark_data *map = data;
++	int npages = map->bparam.granule;
++	u64 size = npages * PAGE_SIZE;
++	int ret = 0;
++	enum dma_data_direction dir = map->dir;
++
++	buf = alloc_pages_exact(size, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	while (!kthread_should_stop()) {
++		struct dma_iova_state iova_state;
++		phys_addr_t phys;
++		ktime_t alloc_stime, alloc_etime, link_stime, link_etime;
++		ktime_t sync_stime, sync_etime, destroy_stime, destroy_etime;
++		ktime_t alloc_delta, link_delta, sync_delta, destroy_delta;
++		u64 alloc_100ns, link_100ns, sync_100ns, destroy_100ns;
++		u64 alloc_sq, link_sq, sync_sq, destroy_sq;
++
++		/* Stain cache if needed */
++		if (map->dir != DMA_FROM_DEVICE)
++			memset(buf, 0x66, size);
++
++		phys = virt_to_phys(buf);
++
++		/* IOVA allocation */
++		alloc_stime = ktime_get();
++		if (!dma_iova_try_alloc(map->dev, &iova_state, phys, size)) {
++			pr_warn_once("IOVA allocation not supported on device %s\n",
++				     dev_name(map->dev));
++			/* IOVA not supported, skip this iteration */
++			cond_resched();
++			continue;
++		}
++		alloc_etime = ktime_get();
++		alloc_delta = ktime_sub(alloc_etime, alloc_stime);
++
++		/* IOVA linking */
++		link_stime = ktime_get();
++		ret = dma_iova_link(map->dev, &iova_state, phys, 0, size, dir, 0);
++		link_etime = ktime_get();
++		link_delta = ktime_sub(link_etime, link_stime);
++
++		if (ret) {
++			pr_err("dma_iova_link failed on %s\n", dev_name(map->dev));
++			dma_iova_free(map->dev, &iova_state);
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		/* IOVA sync */
++		sync_stime = ktime_get();
++		ret = dma_iova_sync(map->dev, &iova_state, 0, size);
++		sync_etime = ktime_get();
++		sync_delta = ktime_sub(sync_etime, sync_stime);
++
++		if (ret) {
++			pr_err("dma_iova_sync failed on %s\n", dev_name(map->dev));
++			dma_iova_unlink(map->dev, &iova_state, 0, size, dir, 0);
++			dma_iova_free(map->dev, &iova_state);
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		/* Pretend DMA is transmitting */
++		ndelay(map->bparam.dma_trans_ns);
++
++		/* IOVA destroy */
++		destroy_stime = ktime_get();
++		dma_iova_destroy(map->dev, &iova_state, size, dir, 0);
++		destroy_etime = ktime_get();
++		destroy_delta = ktime_sub(destroy_etime, destroy_stime);
++
++		/* Calculate sum and sum of squares */
++		alloc_100ns = div64_ul(alloc_delta, 100);
++		link_100ns = div64_ul(link_delta, 100);
++		sync_100ns = div64_ul(sync_delta, 100);
++		destroy_100ns = div64_ul(destroy_delta, 100);
++
++		alloc_sq = alloc_100ns * alloc_100ns;
++		link_sq = link_100ns * link_100ns;
++		sync_sq = sync_100ns * sync_100ns;
++		destroy_sq = destroy_100ns * destroy_100ns;
++
++		atomic64_add(alloc_100ns, &map->sum_iova_alloc_100ns);
++		atomic64_add(link_100ns, &map->sum_iova_link_100ns);
++		atomic64_add(sync_100ns, &map->sum_iova_sync_100ns);
++		atomic64_add(destroy_100ns, &map->sum_iova_destroy_100ns);
++
++		atomic64_add(alloc_sq, &map->sum_sq_iova_alloc);
++		atomic64_add(link_sq, &map->sum_sq_iova_link);
++		atomic64_add(sync_sq, &map->sum_sq_iova_sync);
++		atomic64_add(destroy_sq, &map->sum_sq_iova_destroy);
++
++		atomic64_inc(&map->iova_loops);
++
++		cond_resched();
++	}
++
++out:
++	free_pages_exact(buf, size);
++	return ret;
++}
++
++static int benchmark_thread_streaming(void *data)
+ {
+ 	void *buf;
+ 	dma_addr_t dma_addr;
+@@ -96,7 +215,7 @@ static int map_benchmark_thread(void *data)
+ 		 * we may hangup the kernel in a non-preemptible kernel when
+ 		 * the test kthreads number >= CPU number, the test kthreads
+ 		 * will run endless on every CPU since the thread resposible
+-		 * for notifying the kthread stop (in do_map_benchmark())
++		 * for notifying the kthread stop (in do_streaming_benchmark())
+ 		 * could not be scheduled.
+ 		 *
+ 		 * Note this may degrade the test concurrency since the test
+@@ -112,7 +231,250 @@ static int map_benchmark_thread(void *data)
+ 	return ret;
  }
  
--/*
-- * This function repeatedly tests DMA transfers of various lengths and
-- * offsets for a given operation type until it is told to exit by
-- * kthread_stop(). There may be multiple threads running this function
-- * in parallel for a single channel, and there may be multiple channels
-- * being tested in parallel.
-- *
-- * Before each test, the source and destination buffer is initialized
-- * with a known pattern. This pattern is different depending on
-- * whether it's in an area which is supposed to be copied or
-- * overwritten, and different in the source and destination buffers.
-- * So if the DMA engine doesn't copy exactly what we tell it to copy,
-- * we'll notice.
-- */
--static int dmatest_func(void *data)
-+static int dmatest_setup_test(struct dmatest_thread *thread,
-+			      unsigned int *buf_size,
-+			      u8 *align,
-+			      bool *is_memset)
- {
--	struct dmatest_thread	*thread = data;
--	struct dmatest_done	*done = &thread->test_done;
--	struct dmatest_info	*info;
--	struct dmatest_params	*params;
--	struct dma_chan		*chan;
--	struct dma_device	*dev;
--	struct device		*dma_dev;
--	unsigned int		error_count;
--	unsigned int		failed_tests = 0;
--	unsigned int		total_tests = 0;
--	dma_cookie_t		cookie;
--	enum dma_status		status;
--	enum dma_ctrl_flags	flags;
--	u8			*pq_coefs = NULL;
--	int			ret;
--	unsigned int		buf_size;
--	struct dmatest_data	*src;
--	struct dmatest_data	*dst;
--	int			i;
--	ktime_t			ktime, start, diff;
--	ktime_t			filltime = 0;
--	ktime_t			comparetime = 0;
--	s64			runtime = 0;
--	unsigned long long	total_len = 0;
--	unsigned long long	iops = 0;
--	u8			align = 0;
--	bool			is_memset = false;
--	dma_addr_t		*srcs;
--	dma_addr_t		*dma_pq;
--
--	set_freezable();
--
--	ret = -ENOMEM;
-+	struct dmatest_info *info = thread->info;
-+	struct dmatest_params *params = &info->params;
-+	struct dma_chan *chan = thread->chan;
-+	struct dma_device *dev = chan->device;
-+	struct dmatest_data *src = &thread->src;
-+	struct dmatest_data *dst = &thread->dst;
-+	int ret;
- 
--	smp_rmb();
--	thread->pending = false;
--	info = thread->info;
--	params = &info->params;
--	chan = thread->chan;
--	dev = chan->device;
--	dma_dev = dmaengine_get_dma_device(chan);
--
--	src = &thread->src;
--	dst = &thread->dst;
- 	if (thread->type == DMA_MEMCPY) {
--		align = params->alignment < 0 ? dev->copy_align :
--						params->alignment;
-+		*align = params->alignment < 0 ? dev->copy_align : params->alignment;
- 		src->cnt = dst->cnt = 1;
-+		*is_memset = false;
- 	} else if (thread->type == DMA_MEMSET) {
--		align = params->alignment < 0 ? dev->fill_align :
--						params->alignment;
-+		*align = params->alignment < 0 ? dev->fill_align : params->alignment;
- 		src->cnt = dst->cnt = 1;
--		is_memset = true;
-+		*is_memset = true;
- 	} else if (thread->type == DMA_XOR) {
--		/* force odd to ensure dst = src */
- 		src->cnt = min_odd(params->xor_sources | 1, dev->max_xor);
- 		dst->cnt = 1;
--		align = params->alignment < 0 ? dev->xor_align :
--						params->alignment;
-+		*align = params->alignment < 0 ? dev->xor_align : params->alignment;
-+		*is_memset = false;
- 	} else if (thread->type == DMA_PQ) {
--		/* force odd to ensure dst = src */
- 		src->cnt = min_odd(params->pq_sources | 1, dma_maxpq(dev, 0));
- 		dst->cnt = 2;
--		align = params->alignment < 0 ? dev->pq_align :
--						params->alignment;
-+		*align = params->alignment < 0 ? dev->pq_align : params->alignment;
-+		*is_memset = false;
- 
--		pq_coefs = kmalloc(params->pq_sources + 1, GFP_KERNEL);
--		if (!pq_coefs)
--			goto err_thread_type;
-+		thread->pq_coefs = kmalloc(params->pq_sources + 1, GFP_KERNEL);
-+		if (!thread->pq_coefs)
-+			return -ENOMEM;
- 
--		for (i = 0; i < src->cnt; i++)
--			pq_coefs[i] = 1;
-+		for (int i = 0; i < src->cnt; i++)
-+			thread->pq_coefs[i] = 1;
- 	} else
--		goto err_thread_type;
-+		return -EINVAL;
- 
--	/* Check if buffer count fits into map count variable (u8) */
-+	/* Buffer count check */
- 	if ((src->cnt + dst->cnt) >= 255) {
- 		pr_err("too many buffers (%d of 255 supported)\n",
--		       src->cnt + dst->cnt);
-+		src->cnt + dst->cnt);
-+		ret = -EINVAL;
- 		goto err_free_coefs;
- 	}
- 
--	buf_size = params->buf_size;
--	if (1 << align > buf_size) {
-+	*buf_size = params->buf_size;
-+
-+	if (1 << *align > *buf_size) {
- 		pr_err("%u-byte buffer too small for %d-byte alignment\n",
--		       buf_size, 1 << align);
-+		       *buf_size, 1 << *align);
-+		ret = -EINVAL;
- 		goto err_free_coefs;
- 	}
- 
-+	/* Set GFP flags */
- 	src->gfp_flags = GFP_KERNEL;
- 	dst->gfp_flags = GFP_KERNEL;
-+
- 	if (params->nobounce) {
- 		src->gfp_flags = GFP_DMA;
- 		dst->gfp_flags = GFP_DMA;
- 	}
- 
--	if (dmatest_alloc_test_data(src, buf_size, align) < 0)
-+	/* Allocate test data */
-+	if (dmatest_alloc_test_data(src, *buf_size, *align) < 0) {
-+		ret = -ENOMEM;
- 		goto err_free_coefs;
-+	}
- 
--	if (dmatest_alloc_test_data(dst, buf_size, align) < 0)
-+	if (dmatest_alloc_test_data(dst, *buf_size, *align) < 0) {
-+		ret = -ENOMEM;
- 		goto err_src;
-+	}
- 
--	set_user_nice(current, 10);
-+	return 0;
- 
--	srcs = kcalloc(src->cnt, sizeof(dma_addr_t), GFP_KERNEL);
--	if (!srcs)
--		goto err_dst;
-+err_src:
-+	dmatest_free_test_data(src);
-+err_free_coefs:
-+	kfree(thread->pq_coefs);
-+	return ret;
-+}
- 
--	dma_pq = kcalloc(dst->cnt, sizeof(dma_addr_t), GFP_KERNEL);
--	if (!dma_pq)
--		goto err_srcs_array;
-+static void dmatest_cleanup_test(struct dmatest_thread *thread)
+-static int do_map_benchmark(struct map_benchmark_data *map)
++static int do_iova_benchmark(struct map_benchmark_data *map)
 +{
-+	dmatest_free_test_data(&thread->src);
-+	dmatest_free_test_data(&thread->dst);
-+	kfree(thread->pq_coefs);
-+	thread->pq_coefs = NULL;
-+}
- 
--	/*
--	 * src and dst buffers are freed by ourselves below
--	 */
--	if (params->polled)
--		flags = DMA_CTRL_ACK;
--	else
--		flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
-+static int dmatest_do_dma_test(struct dmatest_thread *thread,
-+			       unsigned int buf_size, u8 align, bool is_memset,
-+			       unsigned int *total_tests,
-+			       unsigned int *failed_tests,
-+			       unsigned long long *total_len,
-+			       ktime_t *filltime,
-+			       ktime_t *comparetime)
-+{
-+	struct dmatest_info *info = thread->info;
-+	struct dmatest_params *params = &info->params;
-+	struct dma_chan *chan = thread->chan;
-+	struct dma_device *dev = chan->device;
-+	struct device *dma_dev = dmaengine_get_dma_device(chan);
-+	struct dmatest_data *src = &thread->src;
-+	struct dmatest_data *dst = &thread->dst;
-+	struct dmatest_done *done = &thread->test_done;
-+	dma_addr_t *srcs;
-+	dma_addr_t *dma_pq;
-+	struct dma_async_tx_descriptor *tx = NULL;
-+	struct dmaengine_unmap_data *um;
-+	dma_addr_t *dsts;
-+	unsigned int len;
-+	unsigned int error_count;
-+	enum dma_ctrl_flags flags;
-+	dma_cookie_t cookie;
-+	enum dma_status status;
-+	ktime_t start, diff;
-+	int ret;
- 
--	ktime = ktime_get();
--	while (!(kthread_should_stop() ||
--	       (params->iterations && total_tests >= params->iterations))) {
--		struct dma_async_tx_descriptor *tx = NULL;
--		struct dmaengine_unmap_data *um;
--		dma_addr_t *dsts;
--		unsigned int len;
--
--		total_tests++;
--
--		if (params->transfer_size) {
--			if (params->transfer_size >= buf_size) {
--				pr_err("%u-byte transfer size must be lower than %u-buffer size\n",
--				       params->transfer_size, buf_size);
--				break;
--			}
--			len = params->transfer_size;
--		} else if (params->norandom) {
--			len = buf_size;
--		} else {
--			len = dmatest_random() % buf_size + 1;
--		}
-+	(*total_tests)++;
- 
--		/* Do not alter transfer size explicitly defined by user */
--		if (!params->transfer_size) {
--			len = (len >> align) << align;
--			if (!len)
--				len = 1 << align;
-+	/* Calculate transfer length */
-+	if (params->transfer_size) {
-+		if (params->transfer_size >= buf_size) {
-+			pr_err("%u-byte transfer size must be lower than %u-buffer size\n",
-+			       params->transfer_size, buf_size);
-+			return -EINVAL;
- 		}
--		total_len += len;
-+		len = params->transfer_size;
-+	} else if (params->norandom)
-+		len = buf_size;
-+	else
-+		len = dmatest_random() % buf_size + 1;
- 
--		if (params->norandom) {
--			src->off = 0;
--			dst->off = 0;
--		} else {
--			src->off = dmatest_random() % (buf_size - len + 1);
--			dst->off = dmatest_random() % (buf_size - len + 1);
-+	/* Align length */
-+	if (!params->transfer_size) {
-+		len = (len >> align) << align;
-+		if (!len)
-+			len = 1 << align;
-+	}
- 
--			src->off = (src->off >> align) << align;
--			dst->off = (dst->off >> align) << align;
--		}
-+	*total_len += len;
- 
--		if (!params->noverify) {
--			start = ktime_get();
--			dmatest_init_srcs(src->aligned, src->off, len,
--					  buf_size, is_memset);
--			dmatest_init_dsts(dst->aligned, dst->off, len,
--					  buf_size, is_memset);
-+	/* Calculate offsets */
-+	if (params->norandom) {
-+		src->off = 0;
-+		dst->off = 0;
-+	} else {
-+		src->off = dmatest_random() % (buf_size - len + 1);
-+		dst->off = dmatest_random() % (buf_size - len + 1);
-+		src->off = (src->off >> align) << align;
-+		dst->off = (dst->off >> align) << align;
-+	}
- 
--			diff = ktime_sub(ktime_get(), start);
--			filltime = ktime_add(filltime, diff);
--		}
-+	/* Initialize buffers */
-+	if (!params->noverify) {
-+		start = ktime_get();
-+		dmatest_init_srcs(src->aligned, src->off, len, buf_size, is_memset);
-+		dmatest_init_dsts(dst->aligned, dst->off, len, buf_size, is_memset);
-+		diff = ktime_sub(ktime_get(), start);
-+		*filltime = ktime_add(*filltime, diff);
-+	}
- 
--		um = dmaengine_get_unmap_data(dma_dev, src->cnt + dst->cnt,
--					      GFP_KERNEL);
--		if (!um) {
--			failed_tests++;
--			result("unmap data NULL", total_tests,
--			       src->off, dst->off, len, ret);
--			continue;
--		}
-+	/* Map buffers */
-+	um = dmaengine_get_unmap_data(dma_dev, src->cnt + dst->cnt, GFP_KERNEL);
-+	if (!um) {
-+		(*failed_tests)++;
-+		result("unmap data NULL", *total_tests, src->off, dst->off, len, ret);
++	struct task_struct **tsk;
++	int threads = map->bparam.threads;
++	int node = map->bparam.node;
++	u64 iova_loops;
++	int ret = 0;
++	int i;
++
++	tsk = kmalloc_array(threads, sizeof(*tsk), GFP_KERNEL);
++	if (!tsk)
 +		return -ENOMEM;
-+	}
- 
--		um->len = buf_size;
--		for (i = 0; i < src->cnt; i++) {
--			void *buf = src->aligned[i];
--			struct page *pg = virt_to_page(buf);
--			unsigned long pg_off = offset_in_page(buf);
-+	um->len = buf_size;
-+	srcs = kcalloc(src->cnt, sizeof(dma_addr_t), GFP_KERNEL);
-+	if (!srcs) {
-+		dmaengine_unmap_put(um);
-+		return -ENOMEM;
-+	}
- 
--			um->addr[i] = dma_map_page(dma_dev, pg, pg_off,
--						   um->len, DMA_TO_DEVICE);
--			srcs[i] = um->addr[i] + src->off;
--			ret = dma_mapping_error(dma_dev, um->addr[i]);
--			if (ret) {
--				result("src mapping error", total_tests,
--				       src->off, dst->off, len, ret);
--				goto error_unmap_continue;
--			}
--			um->to_cnt++;
--		}
--		/* map with DMA_BIDIRECTIONAL to force writeback/invalidate */
--		dsts = &um->addr[src->cnt];
--		for (i = 0; i < dst->cnt; i++) {
--			void *buf = dst->aligned[i];
--			struct page *pg = virt_to_page(buf);
--			unsigned long pg_off = offset_in_page(buf);
--
--			dsts[i] = dma_map_page(dma_dev, pg, pg_off, um->len,
--					       DMA_BIDIRECTIONAL);
--			ret = dma_mapping_error(dma_dev, dsts[i]);
--			if (ret) {
--				result("dst mapping error", total_tests,
--				       src->off, dst->off, len, ret);
--				goto error_unmap_continue;
--			}
--			um->bidi_cnt++;
-+	/* Map source buffers */
-+	for (int i = 0; i < src->cnt; i++) {
-+		void *buf = src->aligned[i];
-+		struct page *pg = virt_to_page(buf);
-+		unsigned long pg_off = offset_in_page(buf);
 +
-+		um->addr[i] = dma_map_page(dma_dev, pg, pg_off, um->len, DMA_TO_DEVICE);
-+		srcs[i] = um->addr[i] + src->off;
-+		ret = dma_mapping_error(dma_dev, um->addr[i]);
-+		if (ret) {
-+			result("src mapping error", *total_tests, src->off, dst->off, len, ret);
-+			goto error_unmap;
- 		}
-+		um->to_cnt++;
-+	}
- 
--		if (thread->type == DMA_MEMCPY)
--			tx = dev->device_prep_dma_memcpy(chan,
--							 dsts[0] + dst->off,
--							 srcs[0], len, flags);
--		else if (thread->type == DMA_MEMSET)
--			tx = dev->device_prep_dma_memset(chan,
--						dsts[0] + dst->off,
--						*(src->aligned[0] + src->off),
--						len, flags);
--		else if (thread->type == DMA_XOR)
--			tx = dev->device_prep_dma_xor(chan,
--						      dsts[0] + dst->off,
--						      srcs, src->cnt,
--						      len, flags);
--		else if (thread->type == DMA_PQ) {
--			for (i = 0; i < dst->cnt; i++)
--				dma_pq[i] = dsts[i] + dst->off;
--			tx = dev->device_prep_dma_pq(chan, dma_pq, srcs,
--						     src->cnt, pq_coefs,
--						     len, flags);
-+	/* Map destination buffers */
-+	dsts = &um->addr[src->cnt];
-+	for (int i = 0; i < dst->cnt; i++) {
-+		void *buf = dst->aligned[i];
-+		struct page *pg = virt_to_page(buf);
-+		unsigned long pg_off = offset_in_page(buf);
++	get_device(map->dev);
 +
-+		dsts[i] = dma_map_page(dma_dev, pg, pg_off, um->len, DMA_BIDIRECTIONAL);
-+		ret = dma_mapping_error(dma_dev, dsts[i]);
-+		if (ret) {
-+			result("dst mapping error", *total_tests, src->off, dst->off, len, ret);
-+			goto error_unmap;
- 		}
-+		um->bidi_cnt++;
-+	}
- 
--		if (!tx) {
--			result("prep error", total_tests, src->off,
--			       dst->off, len, ret);
--			msleep(100);
--			goto error_unmap_continue;
--		}
-+	/* Prepare DMA transaction */
-+	if (params->polled)
-+		flags = DMA_CTRL_ACK;
-+	else
-+		flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
- 
--		done->done = false;
--		if (!params->polled) {
--			tx->callback = dmatest_callback;
--			tx->callback_param = done;
-+	if (thread->type == DMA_MEMCPY) {
-+		tx = dev->device_prep_dma_memcpy(chan, dsts[0] + dst->off,
-+						srcs[0], len, flags);
-+	} else if (thread->type == DMA_MEMSET) {
-+		tx = dev->device_prep_dma_memset(chan, dsts[0] + dst->off,
-+						*(src->aligned[0] + src->off), len, flags);
-+	} else if (thread->type == DMA_XOR) {
-+		tx = dev->device_prep_dma_xor(chan, dsts[0] + dst->off, srcs,
-+					     src->cnt, len, flags);
-+	} else if (thread->type == DMA_PQ) {
-+		dma_pq = kcalloc(dst->cnt, sizeof(dma_addr_t), GFP_KERNEL);
-+		if (!dma_pq) {
-+			ret = -ENOMEM;
-+			goto error_unmap;
- 		}
--		cookie = tx->tx_submit(tx);
-+		for (int i = 0; i < dst->cnt; i++)
-+			dma_pq[i] = dsts[i] + dst->off;
-+		tx = dev->device_prep_dma_pq(chan, dma_pq, srcs,
-+					    src->cnt, thread->pq_coefs,
-+					    len, flags);
-+		kfree(dma_pq);
-+	}
- 
--		if (dma_submit_error(cookie)) {
--			result("submit error", total_tests, src->off,
--			       dst->off, len, ret);
--			msleep(100);
--			goto error_unmap_continue;
--		}
-+	if (!tx) {
-+		result("prep error", *total_tests, src->off, dst->off, len, ret);
-+		ret = -EIO;
-+		goto error_unmap;
-+	}
- 
--		if (params->polled) {
--			status = dma_sync_wait(chan, cookie);
--			dmaengine_terminate_sync(chan);
--			if (status == DMA_COMPLETE)
--				done->done = true;
--		} else {
--			dma_async_issue_pending(chan);
-+	/* Submit transaction */
-+	done->done = false;
-+	if (!params->polled) {
-+		tx->callback = dmatest_callback;
-+		tx->callback_param = done;
-+	}
- 
--			wait_event_freezable_timeout(thread->done_wait,
--					done->done,
--					msecs_to_jiffies(params->timeout));
-+	cookie = tx->tx_submit(tx);
- 
--			status = dma_async_is_tx_complete(chan, cookie, NULL,
--							  NULL);
--		}
-+	if (dma_submit_error(cookie)) {
-+		result("submit error", *total_tests, src->off, dst->off, len, ret);
-+		ret = -EIO;
-+		goto error_unmap;
-+	}
- 
--		if (!done->done) {
--			result("test timed out", total_tests, src->off, dst->off,
--			       len, 0);
--			goto error_unmap_continue;
--		} else if (status != DMA_COMPLETE &&
--			   !(dma_has_cap(DMA_COMPLETION_NO_ORDER,
--					 dev->cap_mask) &&
--			     status == DMA_OUT_OF_ORDER)) {
--			result(status == DMA_ERROR ?
--			       "completion error status" :
--			       "completion busy status", total_tests, src->off,
--			       dst->off, len, ret);
--			goto error_unmap_continue;
--		}
-+	/* Wait for completion */
-+	if (params->polled) {
-+		status = dma_sync_wait(chan, cookie);
-+		dmaengine_terminate_sync(chan);
-+		if (status == DMA_COMPLETE)
-+			done->done = true;
-+	} else {
-+		dma_async_issue_pending(chan);
-+		wait_event_freezable_timeout(thread->done_wait, done->done,
-+				   msecs_to_jiffies(params->timeout));
-+		status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
-+	}
- 
--		dmaengine_unmap_put(um);
-+	if (!done->done) {
-+		result("test timed out", *total_tests, src->off, dst->off, len, 0);
-+		ret = -ETIMEDOUT;
-+		goto error_unmap;
-+	} else if (status != DMA_COMPLETE &&
-+		   !(dma_has_cap(DMA_COMPLETION_NO_ORDER, dev->cap_mask) &&
-+		     status == DMA_OUT_OF_ORDER)) {
-+		result(status == DMA_ERROR ? "completion error status" :
-+		       "completion busy status",
-+		       *total_tests, src->off, dst->off, len, ret);
-+		ret = -EIO;
-+		goto error_unmap;
-+	}
- 
--		if (params->noverify) {
--			verbose_result("test passed", total_tests, src->off,
--				       dst->off, len, 0);
--			continue;
--		}
-+	dmaengine_unmap_put(um);
-+	kfree(srcs);
- 
-+	/* Verify results */
-+	if (!params->noverify) {
- 		start = ktime_get();
--		pr_debug("%s: verifying source buffer...\n", current->comm);
--		error_count = dmatest_verify(src->aligned, 0, src->off,
--				0, PATTERN_SRC, true, is_memset);
-+		error_count = dmatest_verify(src->aligned, 0, src->off, 0,
-+					    PATTERN_SRC, true, is_memset);
- 		error_count += dmatest_verify(src->aligned, src->off,
--				src->off + len, src->off,
--				PATTERN_SRC | PATTERN_COPY, true, is_memset);
-+					     src->off + len, src->off,
-+					     PATTERN_SRC | PATTERN_COPY, true, is_memset);
- 		error_count += dmatest_verify(src->aligned, src->off + len,
--				buf_size, src->off + len,
--				PATTERN_SRC, true, is_memset);
--
--		pr_debug("%s: verifying dest buffer...\n", current->comm);
--		error_count += dmatest_verify(dst->aligned, 0, dst->off,
--				0, PATTERN_DST, false, is_memset);
--
-+					     buf_size, src->off + len, PATTERN_SRC, true, is_memset);
-+		error_count += dmatest_verify(dst->aligned, 0, dst->off, 0,
-+					     PATTERN_DST, false, is_memset);
- 		error_count += dmatest_verify(dst->aligned, dst->off,
--				dst->off + len, src->off,
--				PATTERN_SRC | PATTERN_COPY, false, is_memset);
--
-+					     dst->off + len, src->off,
-+					     PATTERN_SRC | PATTERN_COPY, false, is_memset);
- 		error_count += dmatest_verify(dst->aligned, dst->off + len,
--				buf_size, dst->off + len,
--				PATTERN_DST, false, is_memset);
-+					     buf_size, dst->off + len, PATTERN_DST, false, is_memset);
- 
- 		diff = ktime_sub(ktime_get(), start);
--		comparetime = ktime_add(comparetime, diff);
-+		*comparetime = ktime_add(*comparetime, diff);
- 
- 		if (error_count) {
--			result("data error", total_tests, src->off, dst->off,
--			       len, error_count);
--			failed_tests++;
-+			result("data error", *total_tests, src->off,
-+			       dst->off, len, error_count);
-+			(*failed_tests)++;
-+			ret = -EIO;
- 		} else {
--			verbose_result("test passed", total_tests, src->off,
-+			verbose_result("test passed", *total_tests, src->off,
- 				       dst->off, len, 0);
-+			ret = 0;
- 		}
-+	} else {
-+		verbose_result("test passed", *total_tests, src->off, dst->off, len, 0);
-+		ret = 0;
-+	}
- 
--		continue;
-+	return ret;
- 
--error_unmap_continue:
--		dmaengine_unmap_put(um);
--		failed_tests++;
-+error_unmap:
-+	dmaengine_unmap_put(um);
-+	kfree(srcs);
-+	(*failed_tests)++;
-+	return ret;
-+}
++	/* Create IOVA threads only */
++	for (i = 0; i < threads; i++) {
++		tsk[i] = kthread_create_on_node(benchmark_thread_iova, map,
++				node, "dma-iova-benchmark/%d", i);
++		if (IS_ERR(tsk[i])) {
++			pr_err("create dma_iova thread failed\n");
++			ret = PTR_ERR(tsk[i]);
++			while (--i >= 0)
++				kthread_stop(tsk[i]);
++			goto out;
++		}
 +
-+/*
-+ * This function repeatedly tests DMA transfers of various lengths and
-+ * offsets for a given operation type until it is told to exit by
-+ * kthread_stop(). There may be multiple threads running this function
-+ * in parallel for a single channel, and there may be multiple channels
-+ * being tested in parallel.
-+ *
-+ * Before each test, the source and destination buffer is initialized
-+ * with a known pattern. This pattern is different depending on
-+ * whether it's in an area which is supposed to be copied or
-+ * overwritten, and different in the source and destination buffers.
-+ * So if the DMA engine doesn't copy exactly what we tell it to copy,
-+ * we'll notice.
-+ */
-+static int dmatest_func(void *data)
-+{
-+	struct dmatest_thread *thread = data;
-+	struct dmatest_info *info = thread->info;
-+	struct dmatest_params *params = &info->params;
-+	struct dma_chan *chan = thread->chan;
-+	unsigned int buf_size;
-+	u8 align;
-+	bool is_memset;
-+	unsigned int failed_tests = 0;
-+	unsigned int total_tests = 0;
-+	ktime_t ktime, start;
-+	ktime_t filltime = 0;
-+	ktime_t comparetime = 0;
-+	s64 runtime = 0;
-+	unsigned long long total_len = 0;
-+	unsigned long long iops = 0;
-+	int ret;
++		if (node != NUMA_NO_NODE)
++			kthread_bind_mask(tsk[i], cpumask_of_node(node));
++	}
 +
-+	set_freezable();
-+	smp_rmb();
-+	thread->pending = false;
++	/* Clear previous IOVA benchmark values */
++	atomic64_set(&map->sum_iova_alloc_100ns, 0);
++	atomic64_set(&map->sum_iova_link_100ns, 0);
++	atomic64_set(&map->sum_iova_sync_100ns, 0);
++	atomic64_set(&map->sum_iova_destroy_100ns, 0);
++	atomic64_set(&map->sum_sq_iova_alloc, 0);
++	atomic64_set(&map->sum_sq_iova_link, 0);
++	atomic64_set(&map->sum_sq_iova_sync, 0);
++	atomic64_set(&map->sum_sq_iova_destroy, 0);
++	atomic64_set(&map->iova_loops, 0);
 +
-+	/* Setup test parameters and allocate buffers */
-+	ret = dmatest_setup_test(thread, &buf_size, &align, &is_memset);
++	/* Start all threads */
++	for (i = 0; i < threads; i++) {
++		get_task_struct(tsk[i]);
++		wake_up_process(tsk[i]);
++	}
++
++	msleep_interruptible(map->bparam.seconds * 1000);
++
++	/* Stop all threads */
++	for (i = 0; i < threads; i++) {
++		int kthread_ret = kthread_stop_put(tsk[i]);
++		if (kthread_ret)
++			ret = kthread_ret;
++	}
++
 +	if (ret)
-+		goto err_thread_type;
++		goto out;
 +
-+	set_user_nice(current, 10);
++	/* Calculate IOVA statistics */
++	iova_loops = atomic64_read(&map->iova_loops);
++	if (likely(iova_loops > 0)) {
++		u64 alloc_variance, link_variance, sync_variance, destroy_variance;
++		u64 sum_alloc = atomic64_read(&map->sum_iova_alloc_100ns);
++		u64 sum_link = atomic64_read(&map->sum_iova_link_100ns);
++		u64 sum_sync = atomic64_read(&map->sum_iova_sync_100ns);
++		u64 sum_destroy = atomic64_read(&map->sum_iova_destroy_100ns);
++		u64 sum_sq_alloc = atomic64_read(&map->sum_sq_iova_alloc);
++		u64 sum_sq_link = atomic64_read(&map->sum_sq_iova_link);
++		u64 sum_sq_sync = atomic64_read(&map->sum_sq_iova_sync);
++		u64 sum_sq_destroy = atomic64_read(&map->sum_sq_iova_destroy);
 +
-+	ktime = start = ktime_get();
-+	while (!(kthread_should_stop() ||
-+		(params->iterations && total_tests >= params->iterations))) {
++		/* Average latencies */
++		map->bparam.avg_iova_alloc_100ns = div64_u64(sum_alloc, iova_loops);
++		map->bparam.avg_iova_link_100ns = div64_u64(sum_link, iova_loops);
++		map->bparam.avg_iova_sync_100ns = div64_u64(sum_sync, iova_loops);
++		map->bparam.avg_iova_destroy_100ns = div64_u64(sum_destroy, iova_loops);
 +
-+		ret = dmatest_do_dma_test(thread, buf_size, align, is_memset,
-+					  &total_tests, &failed_tests, &total_len,
-+					  &filltime, &comparetime);
-+		if (ret < 0)
-+			break;
- 	}
++		/* Standard deviations */
++		alloc_variance = div64_u64(sum_sq_alloc, iova_loops) -
++				map->bparam.avg_iova_alloc_100ns * map->bparam.avg_iova_alloc_100ns;
++		link_variance = div64_u64(sum_sq_link, iova_loops) -
++				map->bparam.avg_iova_link_100ns * map->bparam.avg_iova_link_100ns;
++		sync_variance = div64_u64(sum_sq_sync, iova_loops) -
++				map->bparam.avg_iova_sync_100ns * map->bparam.avg_iova_sync_100ns;
++		destroy_variance = div64_u64(sum_sq_destroy, iova_loops) -
++				map->bparam.avg_iova_destroy_100ns * map->bparam.avg_iova_destroy_100ns;
 +
- 	ktime = ktime_sub(ktime_get(), ktime);
- 	ktime = ktime_sub(ktime, comparetime);
- 	ktime = ktime_sub(ktime, filltime);
- 	runtime = ktime_to_us(ktime);
++		map->bparam.iova_alloc_stddev = int_sqrt64(alloc_variance);
++		map->bparam.iova_link_stddev = int_sqrt64(link_variance);
++		map->bparam.iova_sync_stddev = int_sqrt64(sync_variance);
++		map->bparam.iova_destroy_stddev = int_sqrt64(destroy_variance);
++	}
++
++out:
++	put_device(map->dev);
++	kfree(tsk);
++	return ret;
++}
++
++static int do_streaming_iova_benchmark(struct map_benchmark_data *map)
++{
++	struct task_struct **tsk;
++	int threads = map->bparam.threads;
++	int node = map->bparam.node;
++	int regular_threads, iova_threads;
++	u64 loops, iova_loops;
++	int ret = 0;
++	int i;
++
++	tsk = kmalloc_array(threads * 2, sizeof(*tsk), GFP_KERNEL);
++	if (!tsk)
++		return -ENOMEM;
++
++	get_device(map->dev);
++
++	/* Split threads between regular and IOVA testing */
++	regular_threads = threads / 2;
++	iova_threads = threads - regular_threads;
++
++	/* Create streaming DMA threads */
++	for (i = 0; i < regular_threads; i++) {
++		tsk[i] = kthread_create_on_node(benchmark_thread_streaming, map,
++				node, "dma-streaming-benchmark/%d", i);
++		if (IS_ERR(tsk[i])) {
++			pr_err("create dma_map thread failed\n");
++			ret = PTR_ERR(tsk[i]);
++			while (--i >= 0)
++				kthread_stop(tsk[i]);
++			goto out;
++		}
++
++		if (node != NUMA_NO_NODE)
++			kthread_bind_mask(tsk[i], cpumask_of_node(node));
++	}
++
++	/* Create IOVA DMA threads */
++	for (i = regular_threads; i < threads; i++) {
++		tsk[i] = kthread_create_on_node(benchmark_thread_iova, map,
++				node, "dma-iova-benchmark/%d", i - regular_threads);
++		if (IS_ERR(tsk[i])) {
++			pr_err("create dma_iova thread failed\n");
++			ret = PTR_ERR(tsk[i]);
++			while (--i >= 0)
++				kthread_stop(tsk[i]);
++			goto out;
++		}
++
++		if (node != NUMA_NO_NODE)
++			kthread_bind_mask(tsk[i], cpumask_of_node(node));
++	}
++
++	/* Clear previous benchmark values */
++	atomic64_set(&map->sum_map_100ns, 0);
++	atomic64_set(&map->sum_unmap_100ns, 0);
++	atomic64_set(&map->sum_sq_map, 0);
++	atomic64_set(&map->sum_sq_unmap, 0);
++	atomic64_set(&map->loops, 0);
++
++	atomic64_set(&map->sum_iova_alloc_100ns, 0);
++	atomic64_set(&map->sum_iova_link_100ns, 0);
++	atomic64_set(&map->sum_iova_sync_100ns, 0);
++	atomic64_set(&map->sum_iova_destroy_100ns, 0);
++	atomic64_set(&map->sum_sq_iova_alloc, 0);
++	atomic64_set(&map->sum_sq_iova_link, 0);
++	atomic64_set(&map->sum_sq_iova_sync, 0);
++	atomic64_set(&map->sum_sq_iova_destroy, 0);
++	atomic64_set(&map->iova_loops, 0);
++
++	/* Start all threads */
++	for (i = 0; i < threads; i++) {
++		get_task_struct(tsk[i]);
++		wake_up_process(tsk[i]);
++	}
++
++	msleep_interruptible(map->bparam.seconds * 1000);
++
++	/* Stop all threads */
++	for (i = 0; i < threads; i++) {
++		int kthread_ret = kthread_stop_put(tsk[i]);
++		if (kthread_ret)
++			ret = kthread_ret;
++	}
++
++	if (ret)
++		goto out;
++
++	/* Calculate streaming DMA statistics */
++	loops = atomic64_read(&map->loops);
++	if (loops > 0) {
++		u64 map_variance, unmap_variance;
++		u64 sum_map = atomic64_read(&map->sum_map_100ns);
++		u64 sum_unmap = atomic64_read(&map->sum_unmap_100ns);
++		u64 sum_sq_map = atomic64_read(&map->sum_sq_map);
++		u64 sum_sq_unmap = atomic64_read(&map->sum_sq_unmap);
++
++		map->bparam.avg_map_100ns = div64_u64(sum_map, loops);
++		map->bparam.avg_unmap_100ns = div64_u64(sum_unmap, loops);
++
++		map_variance = div64_u64(sum_sq_map, loops) -
++				map->bparam.avg_map_100ns * map->bparam.avg_map_100ns;
++		unmap_variance = div64_u64(sum_sq_unmap, loops) -
++				map->bparam.avg_unmap_100ns * map->bparam.avg_unmap_100ns;
++		map->bparam.map_stddev = int_sqrt64(map_variance);
++		map->bparam.unmap_stddev = int_sqrt64(unmap_variance);
++	}
++
++	/* Calculate IOVA statistics */
++	iova_loops = atomic64_read(&map->iova_loops);
++	if (iova_loops > 0) {
++		u64 alloc_variance, link_variance, sync_variance, destroy_variance;
++		u64 sum_alloc = atomic64_read(&map->sum_iova_alloc_100ns);
++		u64 sum_link = atomic64_read(&map->sum_iova_link_100ns);
++		u64 sum_sync = atomic64_read(&map->sum_iova_sync_100ns);
++		u64 sum_destroy = atomic64_read(&map->sum_iova_destroy_100ns);
++
++		map->bparam.avg_iova_alloc_100ns = div64_u64(sum_alloc, iova_loops);
++		map->bparam.avg_iova_link_100ns = div64_u64(sum_link, iova_loops);
++		map->bparam.avg_iova_sync_100ns = div64_u64(sum_sync, iova_loops);
++		map->bparam.avg_iova_destroy_100ns = div64_u64(sum_destroy, iova_loops);
++
++		alloc_variance = div64_u64(atomic64_read(&map->sum_sq_iova_alloc), iova_loops) -
++				map->bparam.avg_iova_alloc_100ns * map->bparam.avg_iova_alloc_100ns;
++		link_variance = div64_u64(atomic64_read(&map->sum_sq_iova_link), iova_loops) -
++				map->bparam.avg_iova_link_100ns * map->bparam.avg_iova_link_100ns;
++		sync_variance = div64_u64(atomic64_read(&map->sum_sq_iova_sync), iova_loops) -
++				map->bparam.avg_iova_sync_100ns * map->bparam.avg_iova_sync_100ns;
++		destroy_variance = div64_u64(atomic64_read(&map->sum_sq_iova_destroy), iova_loops) -
++				map->bparam.avg_iova_destroy_100ns * map->bparam.avg_iova_destroy_100ns;
++
++		map->bparam.iova_alloc_stddev = int_sqrt64(alloc_variance);
++		map->bparam.iova_link_stddev = int_sqrt64(link_variance);
++		map->bparam.iova_sync_stddev = int_sqrt64(sync_variance);
++		map->bparam.iova_destroy_stddev = int_sqrt64(destroy_variance);
++	}
++
++out:
++	put_device(map->dev);
++	kfree(tsk);
++	return ret;
++}
++
++static int do_streaming_benchmark(struct map_benchmark_data *map)
+ {
+ 	struct task_struct **tsk;
+ 	int threads = map->bparam.threads;
+@@ -128,8 +490,8 @@ static int do_map_benchmark(struct map_benchmark_data *map)
+ 	get_device(map->dev);
  
- 	ret = 0;
--	kfree(dma_pq);
--err_srcs_array:
--	kfree(srcs);
--err_dst:
--	dmatest_free_test_data(dst);
--err_src:
--	dmatest_free_test_data(src);
--err_free_coefs:
--	kfree(pq_coefs);
-+	dmatest_cleanup_test(thread);
+ 	for (i = 0; i < threads; i++) {
+-		tsk[i] = kthread_create_on_node(map_benchmark_thread, map,
+-				map->bparam.node, "dma-map-benchmark/%d", i);
++		tsk[i] = kthread_create_on_node(benchmark_thread_streaming, map,
++				map->bparam.node, "dma-streaming-benchmark/%d", i);
+ 		if (IS_ERR(tsk[i])) {
+ 			pr_err("create dma_map thread failed\n");
+ 			ret = PTR_ERR(tsk[i]);
+@@ -260,6 +622,11 @@ static long map_benchmark_ioctl(struct file *file, unsigned int cmd,
+ 	if (ret)
+ 		return ret;
+ 
++	if (!use_dma_iommu(map->dev))
++		map->bparam.has_iommu_dma = 0;
++	else
++		map->bparam.has_iommu_dma = 1;
 +
- err_thread_type:
- 	iops = dmatest_persec(runtime, total_tests);
- 	pr_info("%s: summary %u tests, %u failures %llu.%02llu iops %llu KB/s (%d)\n",
+ 	switch (cmd) {
+ 	case DMA_MAP_BENCHMARK:
+ 		old_dma_mask = dma_get_mask(map->dev);
+@@ -272,7 +639,7 @@ static long map_benchmark_ioctl(struct file *file, unsigned int cmd,
+ 		}
+ 
+ 		/* Run streaming DMA benchmark */
+-		ret = do_map_benchmark(map);
++		ret = do_streaming_benchmark(map);
+ 
+ 		/*
+ 		 * restore the original dma_mask as many devices' dma_mask are
+@@ -285,6 +652,44 @@ static long map_benchmark_ioctl(struct file *file, unsigned int cmd,
+ 		if (ret)
+ 			return ret;
+ 		break;
++
++	case DMA_MAP_BENCHMARK_IOVA:
++		if (!use_dma_iommu(map->dev)) {
++			pr_info("IOVA API is not supported on this device, lacks IOMMU DMA%s\n",
++				dev_name(map->dev));
++			return -EOPNOTSUPP;
++		}
++		/* Validate IOVA-specific parameters */
++		if (map->bparam.use_iova > 2) {
++			pr_err("invalid IOVA mode, must be 0-2\n");
++			return -EINVAL;
++		}
++
++		/* Save and set DMA mask */
++		old_dma_mask = dma_get_mask(map->dev);
++		ret = dma_set_mask(map->dev, DMA_BIT_MASK(map->bparam.dma_bits));
++		if (ret) {
++			pr_err("failed to set dma_mask on device %s\n",
++				dev_name(map->dev));
++			return -EINVAL;
++		}
++
++		/* Choose benchmark type based on use_iova field */
++		if (map->bparam.use_iova == 2) {
++			/* Both regular and IOVA */
++			ret = do_streaming_iova_benchmark(map);
++		} else if (map->bparam.use_iova == 1) {
++			/* IOVA only */
++			ret = do_iova_benchmark(map);
++		}
++
++		/* Restore original DMA mask */
++		dma_set_mask(map->dev, old_dma_mask);
++
++		if (ret)
++			return ret;
++		break;
++
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/tools/testing/selftests/dma/dma_map_benchmark.c b/tools/testing/selftests/dma/dma_map_benchmark.c
+index b12f1f9babf8..4a2158aa56b6 100644
+--- a/tools/testing/selftests/dma/dma_map_benchmark.c
++++ b/tools/testing/selftests/dma/dma_map_benchmark.c
+@@ -31,10 +31,11 @@ int main(int argc, char **argv)
+ 	int bits = 32, xdelay = 0, dir = DMA_MAP_BIDIRECTIONAL;
+ 	/* default granule 1 PAGESIZE */
+ 	int granule = 1;
++	int use_iova = 0;
+ 
+ 	int cmd = DMA_MAP_BENCHMARK;
+ 
+-	while ((opt = getopt(argc, argv, "t:s:n:b:d:x:g:")) != -1) {
++	while ((opt = getopt(argc, argv, "t:s:n:b:d:x:g:i:")) != -1) {
+ 		switch (opt) {
+ 		case 't':
+ 			threads = atoi(optarg);
+@@ -51,6 +52,11 @@ int main(int argc, char **argv)
+ 		case 'd':
+ 			dir = atoi(optarg);
+ 			break;
++		case 'i':
++			use_iova = atoi(optarg);
++			if (use_iova)
++				cmd = DMA_MAP_BENCHMARK_IOVA;
++			break;
+ 		case 'x':
+ 			xdelay = atoi(optarg);
+ 			break;
+@@ -111,18 +117,143 @@ int main(int argc, char **argv)
+ 	map.dma_dir = dir;
+ 	map.dma_trans_ns = xdelay;
+ 	map.granule = granule;
++	map.use_iova = use_iova;
+ 
+ 	if (ioctl(fd, cmd, &map)) {
+ 		perror("ioctl");
+ 		exit(1);
+ 	}
+ 
+-	printf("dma mapping benchmark: threads:%d seconds:%d node:%d dir:%s granule: %d\n",
+-			threads, seconds, node, dir[directions], granule);
+-	printf("average map latency(us):%.1f standard deviation:%.1f\n",
+-			map.avg_map_100ns/10.0, map.map_stddev/10.0);
+-	printf("average unmap latency(us):%.1f standard deviation:%.1f\n",
+-			map.avg_unmap_100ns/10.0, map.unmap_stddev/10.0);
++	printf("=== DMA Mapping Benchmark Results ===\n");
++	printf("Configuration: threads:%d seconds:%d node:%d dir:%s granule:%d iova:%d, has_iommu_dma:%d\n",
++	       threads, seconds, node, directions[dir], granule, use_iova, map.has_iommu_dma);
++	printf("Buffer size: %d pages (%d KB)\n", granule, granule * 4);
++	printf("\n");
++
++	if (use_iova == 0 || use_iova == 2) {
++	    printf("STREAMING DMA RESULTS:\n");
++	    printf("  Map   latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_map_100ns/10.0, map.map_stddev/10.0);
++	    printf("  Unmap latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_unmap_100ns/10.0, map.unmap_stddev/10.0);
++
++	    double streaming_total = map.avg_map_100ns/10.0 + map.avg_unmap_100ns/10.0;
++	    printf("  Total latency: %7.1f μs\n", streaming_total);
++	    printf("\n");
++	}
++
++	if (map.has_iommu_dma && (use_iova == 1 || use_iova == 2)) {
++	    printf("IOVA DMA RESULTS:\n");
++	    printf("  Alloc   latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_iova_alloc_100ns/10.0, map.iova_alloc_stddev/10.0);
++	    printf("  Link    latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_iova_link_100ns/10.0, map.iova_link_stddev/10.0);
++	    printf("  Sync    latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_iova_sync_100ns/10.0, map.iova_sync_stddev/10.0);
++	    printf("  Destroy latency: %7.1f μs (σ=%5.1f μs)\n",
++		   map.avg_iova_destroy_100ns/10.0, map.iova_destroy_stddev/10.0);
++
++	    double iova_total = map.avg_iova_alloc_100ns/10.0 + map.avg_iova_link_100ns/10.0 +
++				map.avg_iova_sync_100ns/10.0 + map.avg_iova_destroy_100ns/10.0;
++	    printf("  Total latency: %7.1f μs\n", iova_total);
++	    printf("\n");
++	}
++
++	/* Performance comparison for both modes */
++	if (map.has_iommu_dma && use_iova == 2) {
++	    double streaming_total = map.avg_map_100ns/10.0 + map.avg_unmap_100ns/10.0;
++	    double iova_total = map.avg_iova_alloc_100ns/10.0 + map.avg_iova_link_100ns/10.0 +
++				map.avg_iova_sync_100ns/10.0 + map.avg_iova_destroy_100ns/10.0;
++
++	    printf("PERFORMANCE COMPARISON:\n");
++	    printf("  Streaming DMA total: %7.1f μs\n", streaming_total);
++	    printf("  IOVA DMA total:      %7.1f μs\n", iova_total);
++
++	    if (streaming_total > 0) {
++		double performance_ratio = iova_total / streaming_total;
++		double performance_diff = ((iova_total - streaming_total) / streaming_total) * 100.0;
++
++		printf("  Performance ratio:   %7.2fx", performance_ratio);
++		if (performance_ratio < 1.0) {
++		    printf(" (IOVA is %.1f%% faster)\n", -performance_diff);
++		} else {
++		    printf(" (IOVA is %.1f%% slower)\n", performance_diff);
++		}
++
++		// Throughput analysis (operations per second)
++		double streaming_ops_per_sec = 1000000.0 / streaming_total;
++		double iova_ops_per_sec = 1000000.0 / iova_total;
++
++		printf("  Streaming throughput: %8.0f ops/sec\n", streaming_ops_per_sec);
++		printf("  IOVA throughput:      %8.0f ops/sec\n", iova_ops_per_sec);
++
++		/* Memory bandwidth estimate (if applicable) */
++		double buffer_kb = granule * 4.0;
++		double streaming_bw = (streaming_ops_per_sec * buffer_kb) / 1024.0; // MB/s
++		double iova_bw = (iova_ops_per_sec * buffer_kb) / 1024.0; // MB/s
++
++		printf("  Streaming bandwidth:  %8.1f MB/s\n", streaming_bw);
++		printf("  IOVA bandwidth:       %8.1f MB/s\n", iova_bw);
++	    }
++	    printf("\n");
++	}
++
++	/* IOVA breakdown analysis (for IOVA modes) */
++	if (map.has_iommu_dma && (use_iova == 1 || use_iova == 2)) {
++	    double iova_total = map.avg_iova_alloc_100ns/10.0 + map.avg_iova_link_100ns/10.0 +
++				map.avg_iova_sync_100ns/10.0 + map.avg_iova_destroy_100ns/10.0;
++
++	    if (iova_total > 0) {
++		printf("IOVA OPERATION BREAKDOWN:\n");
++		printf("  Alloc:   %5.1f%% (%6.1f μs)\n",
++		       (map.avg_iova_alloc_100ns/10.0 / iova_total) * 100.0, map.avg_iova_alloc_100ns/10.0);
++		printf("  Link:    %5.1f%% (%6.1f μs)\n",
++		       (map.avg_iova_link_100ns/10.0 / iova_total) * 100.0, map.avg_iova_link_100ns/10.0);
++		printf("  Sync:    %5.1f%% (%6.1f μs)\n",
++		       (map.avg_iova_sync_100ns/10.0 / iova_total) * 100.0, map.avg_iova_sync_100ns/10.0);
++		printf("  Destroy: %5.1f%% (%6.1f μs)\n",
++		       (map.avg_iova_destroy_100ns/10.0 / iova_total) * 100.0, map.avg_iova_destroy_100ns/10.0);
++		printf("\n");
++	    }
++	}
++
++	/* Recommendations based on results */
++	if (map.has_iommu_dma && use_iova == 2) {
++	    double streaming_total = map.avg_map_100ns/10.0 + map.avg_unmap_100ns/10.0;
++	    double iova_total = map.avg_iova_alloc_100ns/10.0 + map.avg_iova_link_100ns/10.0 +
++				map.avg_iova_sync_100ns/10.0 + map.avg_iova_destroy_100ns/10.0;
++
++	    printf("RECOMMENDATIONS:\n");
++	    if (iova_total < streaming_total * 0.9) {
++		printf("  ✓ IOVA API shows significant performance benefits\n");
++		printf("  ✓ Consider using IOVA API for this workload\n");
++	    } else if (iova_total < streaming_total * 1.1) {
++		printf("  ~ IOVA and Streaming APIs show similar performance\n");
++	    } else {
++		printf("  ⚠ Streaming API outperforms IOVA API for this benchmark\n");
++
++		/* Identify bottlenecks */
++		double max_iova_op = map.avg_iova_alloc_100ns/10.0;
++		const char* bottleneck = "alloc";
++
++		if (map.avg_iova_link_100ns/10.0 > max_iova_op) {
++		    max_iova_op = map.avg_iova_link_100ns/10.0;
++		    bottleneck = "link";
++		}
++		if (map.avg_iova_sync_100ns/10.0 > max_iova_op) {
++		    max_iova_op = map.avg_iova_sync_100ns/10.0;
++		    bottleneck = "sync";
++		}
++		if (map.avg_iova_destroy_100ns/10.0 > max_iova_op) {
++		    max_iova_op = map.avg_iova_destroy_100ns/10.0;
++		    bottleneck = "destroy";
++		}
++
++		printf("  ➤ Primary bottleneck appears to be IOVA %s operation\n", bottleneck);
++	    }
++	}
++
++	printf("=== End of Benchmark ===\n");
+ 
+ 	return 0;
+ }
 -- 
 2.47.2
 
