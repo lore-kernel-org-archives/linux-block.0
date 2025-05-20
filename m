@@ -1,180 +1,155 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A59424C07A
-	for <linux-block@vger.kernel.org>; Tue, 20 May 2025 16:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B701C8603;
+	Tue, 20 May 2025 16:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747759461; cv=none; b=jWAvaoup2rUQUL6bW5M1buJKw+RNpac82C2GBwdiNN40KH6sTT+rHnJ2IT/wkOMw22Ski5xktBbGSvB2pz74P8TsOQkZbdMdw/mB4dca23IkK/lWOuciUI+HHdx2tju9pUfblor1FsfJI28hyOKLD3/Tc9YCkqgRYkypLv8Rq4w=
+	t=1747760034; cv=none; b=Xya7Wt+VfypHjjZsvnG5tYTYpNL3916Y0bOXDkvj79S8V/zjLe4pmJpYyUBBulT1UC88ibglBHnmu62EFrioUGDJ19wPhadMj8FYHYqc+tX1LkpSpskbjwKvqxAsvRwb6/5rzLxGmUD0u++xHRIqhK11BM3ZZY9LneIJ+IyfORs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747759461; c=relaxed/simple;
-	bh=I8LrWZqIHYlb56pv6j0QfitWQLXKD3XwqYdsmYabKlw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LHwbW8+Ji2jB7Up2jUohWQgLFTi1XtjjaspMk3Q7Ynwx7N80n4EsMIP4YJp9lJTiqaHEUj57JZceStEAgLQ32O2JX5YeW0zribNhBkaTWHud6pDGF2jQ7DdxqK+TsXQZ0Mt3q5HTlXxt8DpExFYjqLrBjkV0LRdVDCckB3QOZC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=TvHMWY1D; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+	s=arc-20240116; t=1747760034; c=relaxed/simple;
+	bh=3UH+ZcUFshEQoIRRVqSxr0uhm208CXi7zM9SCX9eyoM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JasrqxdHmmrpJeBDvdvN1fXe+kNlJuB+hHlZhDpA2OTupvwVR2xe8Abigw9V8AUZtDpLBp0e29B/zG0OOHr5XQhylG6y8KCBuGFJTkjGTJZGrRyOdBdhX7VUJnbMNSh27/VqMVqI61xi3knjuWdeYHK5EMI///f6z1LaIJRUtt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=C+UutEV3; arc=none smtp.client-ip=212.227.126.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="TvHMWY1D"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3dc6a8bc915so8027495ab.1
-        for <linux-block@vger.kernel.org>; Tue, 20 May 2025 09:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1747759457; x=1748364257; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dIhSOsd6KsjfJUD60NW9xxZfhreQZz87ROZ1U+eqjAc=;
-        b=TvHMWY1D5krt6vooVpMoMNrnD3xZC623xhOoO0N0EB6SCfd0JpOc6hqXR6MraworQc
-         TYqXlxDRmhtEZSvs7eG53CUMiak4WiuYgJ9KwPebVnLVpO65soNNo+0f6Vu+gX2U6rY2
-         +YThxTJM67pBxTbrUSjgnuftsKMUr0H/t/a5c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747759457; x=1748364257;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dIhSOsd6KsjfJUD60NW9xxZfhreQZz87ROZ1U+eqjAc=;
-        b=q/vS9MWGxPR3mKRS0iqS1eMd4ZdZeeRwxSAL7UlOsk7kn7z+IN/yDPwe1sV3zklzTN
-         /WHX5X2Redenmsq++fyoktpmycUvLDujo5ZgSJkunZ+dsIPhz4tjUaqHnKwpqtQm0emg
-         vmBRBcGvAk2WOPQJl4MPiDFL3OSqVe0ZAWe/73N+iMGr6Ep3bMkKYjoJWk/UlxgKYm+6
-         4OFFt+mJ7evwvbyiU899NkckCQbPXbOEEl6T3Jp5Rf6gEcyJ7KxQepGU9WQEqkTiM1fs
-         3N/Ryfi7BTG0rrG2ulMnW4IWG9BvlJzzEx64IeaNOqtO9DYkcgQFmUNqIS9qTa06s6U7
-         rHLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxtdSuNLkulEsVAxrQBydWahxzyhyQoysz9cquN/PoR0nF7ZRZs0hAc2eZ5o8I08xvbATOf4VrjjGcgw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0U7DieXKSzFHrN9DjHd36RQ3wEcOKACGCkdqgN2RNX86xTYwF
-	N+oqabVrBK7U3tuDuVAETBTx2cK9zuC1sEkhqFgMuZl/GBzIkrBRteaSpQNDoL36pg==
-X-Gm-Gg: ASbGncvZ+wv/hLDWIM+WUYGzs/YMMGkbZD3rMVMRzshgglSxrdrfz2Hir/esyb/KWPX
-	sqYIt473RkTplts0wfmQKPVMV6oTQs9i5Lf0mDYyBY7wzkBohGMaztYfzg+uRQSumDOIDyFyRcg
-	8fJLs+U4i0vunZMsgjxgpwPbErx7AO+SVjR5XPA4jFjLOrDSxZxk1Vnyd0TlR+0HV7DVJeeb7H5
-	2zd9l9T2x1rruXB6CWVQWL7frc8vvH2FdV/D/DnXmHbAmYBRcSOKTNBARWA/4un5S+g80QAG5JH
-	NFTtHL04PbeZNDVcmmz1dJOr5kCMnXmvLqOufq8I6zsVG8bWIAEm5gZYzCC3RtnwYn7pVm6Td3s
-	HEVrocRL9kw==
-X-Google-Smtp-Source: AGHT+IHY7B5sqXo+CEWbfToCa57PdPA6J2aKxv4nOj0xzwl7zY48v0c2pBUeeGTux6+dhIv/h45ldA==
-X-Received: by 2002:a05:6e02:2191:b0:3dc:6824:53ab with SMTP id e9e14a558f8ab-3dc682457camr98502715ab.8.1747759457395;
-        Tue, 20 May 2025 09:44:17 -0700 (PDT)
-Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4fbcc4ea4d3sm2317814173.134.2025.05.20.09.44.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 09:44:16 -0700 (PDT)
-Message-ID: <f92ddea4-edf1-42f9-a738-51233ce3d45e@ieee.org>
-Date: Tue, 20 May 2025 11:44:15 -0500
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="C+UutEV3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1747760016; x=1748364816; i=christian@heusel.eu;
+	bh=hHynfVSUu1REHbTvVUtKdTkFvVCFs0veYLhTP/QJJYc=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=C+UutEV36iN2ZzCvbfG7cfHqdRdUpa96hSUzFziBC5GwPj591ZoBRW5mR/G8RXS9
+	 HmnFAKhUUjNwIFXQNNpohCHTmsYEOHOvfetK1GGhGMj9bvJgY7mAyuwPGZTrslrli
+	 qe8vej6AdlcQsfl41rxJgURd0TVR+cwYsU+jNbdVJzfSAd8IS3HGrV5q56IHhU+qV
+	 Ozya4fJcUxxhyjkkasZs2JuqcEQqSTnyeZo3yJPonOPAYSLPRI6VmkWVZI7xfquOd
+	 0GrY9hgX0JQBtE+fIl1LA5uxDRaO6L7F/rTgS07Tp37NVo2LiGupAxnI4E6DMOYqc
+	 ITNVY8X7C5YSeYb8kA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([129.206.143.169]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MAORn-1u7Dch0ONv-003qEE; Tue, 20 May 2025 18:53:36 +0200
+Date: Tue, 20 May 2025 18:53:31 +0200
+From: "christian@heusel.eu" <christian@heusel.eu>
+To: "hch@infradead.org" <hch@infradead.org>
+Cc: Christian Hesse <mail@eworm.de>, "Xu, Lizhi" <Lizhi.Xu@windriver.com>, 
+	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>, 
+	"syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com" <syzbot+6af973a3b8dfd2faefdc@syzkaller.appspotmail.com>, 
+	"syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH V5] loop: Add sanity check for read/write_iter
+Message-ID: <f17dfb4c-8c18-4a49-b8f9-532aacd4df8f@heusel.eu>
+References: <20250519175640.2fcac001@leda.eworm.net>
+ <20250520030051.177205-1-lizhi.xu@windriver.com>
+ <20250520073901.6fdfbee4@leda.eworm.net>
+ <BL1PR11MB5979C666DA3BC228C2C30E92869FA@BL1PR11MB5979.namprd11.prod.outlook.com>
+ <aCwlRMEuvvP31UGG@infradead.org>
+ <BL1PR11MB5979EFA72DA54AB231D408CF869FA@BL1PR11MB5979.namprd11.prod.outlook.com>
+ <20250520144622.3fd9592a@leda.eworm.net>
+ <aCx6QFZ1kiyB9ec0@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] rbd: replace strcpy() with strscpy()
-To: Siddarth Gundu <siddarthsgml@gmail.com>, idryomov@gmail.com,
- dongsheng.yang@easystack.cn, axboe@kernel.dk, ceph-devel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250519063840.6743-1-siddarthsgml@gmail.com>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20250519063840.6743-1-siddarthsgml@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jt6awhmybxmxnqwi"
+Content-Disposition: inline
+In-Reply-To: <aCx6QFZ1kiyB9ec0@infradead.org>
+X-Provags-ID: V03:K1:nruTG/GaRtLk9w0k19aoH1F3Hy32HcfS/Zm1t0lud1RSGBzJkem
+ 8UcGhM9A1XTkiCCTf19Ld8t45n6qtZvJy0MwBjdHGz4c4ieYBPtfBY2gZi6E6TyEifp/QNh
+ /VsRgE/1D/XNs0fJqpzrGHs0+/kSQ0z//0fRcRGwBBY6FFXq714UcwIJrPoxR7LhfSBYI8v
+ O09ebSwSjhb8bCG8/qtRg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:KdPONAnUY6U=;XJKJcwB1mTgMxa0mzD8GlFoAtgY
+ dDIGcRBf/CdM0ThP6dTDTjiHpoImeMLnzURkwLpitX5vZo3DLo2AgV73qykyIKoEgBf5QPQPv
+ YAlw7Z7UE6/wWEtL4l2FCtNE5TfegtbhGpSHDqFRXYgqGDXLtDQcMb2hNxCwtBMtBf1ylTUEv
+ BbNyPR0pe05E8cz+DBjlHb7CM6qD1TDEfqNCUT7saB910b18EYiErGPIBcckkOQ3friKDUaH9
+ WKNoiEY7mij5lSjJTr54mNkSZaPtLPDSi6kHCXX1W8tsa1NvkkvaGeD9Emnw8309vHLL5uKtC
+ 3ORjJeKGc7v3D2cwNm86NfVvDTygvzGSOfxDVCBxy14kABOoD/FHS4Hp4rRW6OWk8y3UaoqK9
+ iUiIFR4IN7GG6kZ3tFHLR0XrkRZJRHNL4TYqUs9bhmT5w05AU1K8QOjAB9Dukq6riw0fZDap1
+ YAKlHZXbNMYCVqTpgBYOY0OmRJeahhAQc6z2eo0L9gWXI7RIWH1k/GAiXGFNq6bSnFHaWtU65
+ GzSkQqKP3Ry+6oulLrAMtEZLtdyBGTTz4BSLvJOAFSrnkaw/FfHCvGy/WUKNnYKd29krq6Vhf
+ TnkOUkp2VtNgnb/I9DA8DG8Q2ivH9q1NV4/bCTVb2RUICWxtCgjJqO0aBDZ07QQDAMwBPZfKu
+ CasgkXFvMXpV3wpFWXysq+vvR6Wg2bdPtiehzOmjPvg5yDQIrAEdJqC7Ua/a7q9u1htKm8lA8
+ fNd96G5qhMWDGM8xIdBsSjvFXywfRe6divuDgxPunwsz6IEycrFMSJlPwCQgKY0ViwY542AZR
+ Id36oO1AN2U47YWMD2lyioBXBjmFffUJSFn4AUZn6+lAaK2oXg1p1fs5mcZ9/p8k8JG4eQQAb
+ ABhluMe7UFFYnqvDuq2MCcXGd1KMKxkzZH90b30tU7Y7Aape5/r+yoHW8TTcLgLilv9Hv7jtV
+ ti3V7sBD3Wplnrf25Lfo7Sft2fbCdzJnZcalS/cAqPhJXMPAdS23b9+j2bSV5N86LAvDkbkhU
+ /k17qRmtg+Hqr2dRaoivDMm7sN7/NJLWoaZjEThyPzYHAeQ1qtCPuHkxNkHB+ZGHyP1+qCTkb
+ Y+DgqpFI+J8uNyHByI8ewM2eH7cNfsFYzQZtyGPtnGY7xYoB7c/M29Id7j9iQEiXw19cov/fk
+ cx3CKW+T+S3fp5y1Kf4U00uTq3XwSY/y080MowivFRL1XT11seLleuMJXARdEgf308+dCTvHS
+ 9d9qTu9vpx7FLAKKYOpJ6Xs2+qrBnFx7Bbmofq7RsYZwO2zCF62l0dyt/MDJWaCEIOJmAV1xP
+ KnlarWzzpwbHXA+AtkKeXPmKC2rtMREZWQVVP129RIbwXwz53jmkIeiGfKfQ/hX8enHn5rrjp
+ CskhCXk4UqpnMqp0tAbATfw7BFqIriwQTnPgEpxR8KZgnooOa6g3vredkTUivfIiYKE4x/sUB
+ HVD82Uw==
 
-On 5/19/25 1:38 AM, Siddarth Gundu wrote:
-> strcpy() is deprecated; use strscpy() instead.
-> 
-> Both the destination and source buffer are of fixed length
-> so strscpy with 2-arguments is used.
-> 
-> Introduce a typedef for cookie array to improve code clarity.
-> 
-> Link: https://github.com/KSPP/linux/issues/88
-> Signed-off-by: Siddarth Gundu <siddarthsgml@gmail.com>
-> ---
-> changes since v1
-> - added a typedef for cookie arrays
-> 
-> About the typedef: I was a bit hesitant to add it since the kernel
-> style guide is against adding new typedef but I wanted to follow
-> the review feedback for this.
 
-I personally think the typedef here is the appropriate.  But
-it's really up to Ilya whether he likes this approach.  Get
-his input before you do more.
+--jt6awhmybxmxnqwi
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH V5] loop: Add sanity check for read/write_iter
+MIME-Version: 1.0
 
-There's a basic question about whether this is a useful
-abstraction.  It's used for "lock cookies" but do they
-serve a broader purpose?
+On 25/05/20 05:49AM, hch@infradead.org wrote:
+> On Tue, May 20, 2025 at 02:46:22PM +0200, Christian Hesse wrote:
+> > "Xu, Lizhi" <Lizhi.Xu@windriver.com> on Tue, 2025/05/20 12:27:
+> > > If it is a regular file, generic_ro_fops is used. In this case,
+> > > isofs supports read_iter. When a regular file has a writable attribut=
+e,
+> >=20
+> > Just tested with an iso file where writable flag from loopback file ins=
+ide
+> > was explicitly removed. No change.
+> >=20
+> > > the problem will recur because isofs does not support write_iter.
+> >=20
+> > We have two indications here that setup should happen in read-only mode:
+> >=20
+> > * The underlaying filesystem is read-only
+> > * `losetup` is called with switch `--read-only`
+> >=20
+> > I would expect both to make this happy.
+>=20
+> Can you test this patch?
+>=20
+> We historically allow a writable fd on block devices even when they
+> are read-only.  I suspect your use case is doing that and the new
+> check for write_iter is interfering with that:
 
-The other part of my suggestion was to define functions that
-provide an API.  For example:
+I have tested the patch and can confirm that it fixes the usecase as
+represented by the reproducer that I have used to bisect the bug.
 
-static inline rbd_cookie_t rbd_cookie_set(rbd_cookie_t cookie, u64 id);
-static inline u64 rbd_cookie_get(rbd_cookie_t cookie);
+If you turn this into an actual patch you can add my
 
-Anyway, before I say any more let's see if Ilya even wants
-to go in this direction.  Your original proposal was OK, I
-just thought specifying the length might be safer.
+Tested-by: Christian Heusel <christian@heusel.eu>
 
-					-Alex
+if you want :)
 
->   drivers/block/rbd.c | 13 ++++++++-----
->   1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index faafd7ff43d6..863d9c591aa5 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -46,11 +46,14 @@
->   #include <linux/slab.h>
->   #include <linux/idr.h>
->   #include <linux/workqueue.h>
-> +#include <linux/string.h>
->   
->   #include "rbd_types.h"
->   
->   #define RBD_DEBUG	/* Activate rbd_assert() calls */
->   
-> +typedef char rbd_cookie_t[32];
-> +
->   /*
->    * Increment the given counter and return its updated value.
->    * If the counter is already 0 it will not be incremented.
-> @@ -411,7 +414,7 @@ struct rbd_device {
->   
->   	struct rw_semaphore	lock_rwsem;
->   	enum rbd_lock_state	lock_state;
-> -	char			lock_cookie[32];
-> +	rbd_cookie_t		lock_cookie;
->   	struct rbd_client_id	owner_cid;
->   	struct work_struct	acquired_lock_work;
->   	struct work_struct	released_lock_work;
-> @@ -3649,12 +3652,12 @@ static void format_lock_cookie(struct rbd_device *rbd_dev, char *buf)
->   	mutex_unlock(&rbd_dev->watch_mutex);
->   }
->   
-> -static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
-> +static void __rbd_lock(struct rbd_device *rbd_dev, const rbd_cookie_t cookie)
->   {
->   	struct rbd_client_id cid = rbd_get_cid(rbd_dev);
->   
->   	rbd_dev->lock_state = RBD_LOCK_STATE_LOCKED;
-> -	strcpy(rbd_dev->lock_cookie, cookie);
-> +	strscpy(rbd_dev->lock_cookie, cookie);
->   	rbd_set_owner_cid(rbd_dev, &cid);
->   	queue_work(rbd_dev->task_wq, &rbd_dev->acquired_lock_work);
->   }
-> @@ -3665,7 +3668,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
->   static int rbd_lock(struct rbd_device *rbd_dev)
->   {
->   	struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
-> -	char cookie[32];
-> +	rbd_cookie_t cookie;
->   	int ret;
->   
->   	WARN_ON(__rbd_is_lock_owner(rbd_dev) ||
-> @@ -4581,7 +4584,7 @@ static void rbd_unregister_watch(struct rbd_device *rbd_dev)
->   static void rbd_reacquire_lock(struct rbd_device *rbd_dev)
->   {
->   	struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
-> -	char cookie[32];
-> +	rbd_cookie_t cookie;
->   	int ret;
->   
->   	if (!rbd_quiesce_lock(rbd_dev))
+--jt6awhmybxmxnqwi
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmgss4oACgkQwEfU8yi1
+JYWSgw//SL2gMT/6oUPfkJO4iMYHkkhr83Dwr5DiBxyjd7ryh6oBUBNaKhAV4la5
+NepOZ38QMRp+5B4uxtzh9repJOa8jAJNAn1jt+c9C2tBBQPmFQ2KOWVMsD6o5JKF
+yy1eak/TgiiH29eyCMEWv6zvxN71bBtSuG5PxzHyt3fHofML920/pbTucjihuVl+
+hXL6aKvofeB/nOQhu4Gz1jva+W54URECIZzpjcfjpxQH8kllTebEVnxuAAHnPFZe
+p15pDjytaLbLCcLjQAwT+xnguBh5D5O2UOA3c2w2A8jWuU2klD8qp+7JStfTEdMK
+ezDc+nOzA9IM757VLK65TtzOk4406VbMje4ldrdkB5oSlvlDOStDKf9RdLDHmL+8
+/jj8UcIBUq8P++QJ+0h9x+X5dCF9XLLQFow6OeY4vyMRos2RDXr+JvJqusrKiEMQ
+SjdXGSqB6OGbc9v0hMeZMNmObdptzSLYvGCxmaQ8XHWFKV5SG8vr8spEZeWdytKx
+Nmq0y+Gnv/d67oTI70VNNWVpqw+wTm+jGrk1jfJzq95y/1a261/UukQMv5AgOQL+
+gw0xGmT5DCXqkVL+6wO9NcDynm6KaTjRMMoHXHQw5uDQWDxwk6dq3T8n0o844SKE
+yAGNIoZ3VdTPvkZQ8CtkdaqKViaaivi3fW6wi36XqkxNnI2T8NA=
+=NPHG
+-----END PGP SIGNATURE-----
+
+--jt6awhmybxmxnqwi--
