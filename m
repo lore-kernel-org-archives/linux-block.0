@@ -1,122 +1,225 @@
-Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E514517BB0D
-	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 16:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3010C17C21B;
+	Wed, 21 May 2025 16:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747843645; cv=none; b=YkyIi1qkzU1o+i9VzWrY/H0Efp+OXk088Wt/n/5ORAO8u7v/VuhjosyaA0ldeKDtuToeTCuCv2twfi4sxRGllKLiYjZrdzUdV87T3GKwyZn8RbOKWMzG5IqcZs5XE9GtuXcE66P9zCbgXUrPLNSU+mEFayGiAS2WLj/Itl4PjB4=
+	t=1747843696; cv=none; b=shx/F3J3w//UYTfluH4zB/Iq+RotZCGUOGucREasUIBbT+iQIkqmbXF1MH4iD9EIEEESLvlFtPHn4+C7VDTcwfwDl/gP+6F5XzDEKDIaA/8LY27BjOP6ZQVrkmEkbH2tXAe6fBkHicp/4wVEB1r2oidZXhWbg7rCFOhJjIEogs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747843645; c=relaxed/simple;
-	bh=3ThejoLiMkpabs5CE1WBPTbZj0YfkJafUiYWBh0n+rk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVnXUXjezQYVaniPbpnYKjpMFR0H76oCuvMVWcYrDikaQj4FvTj6P6hftQX5MSm2f6SZHIsnhFGbo/SZ8BPsDkyZPE40VJLqv7LH91jFgQ2UORuXVJ3pxAvT11yOMnhvmfYw8Ea8Q0scSaBg7OCmw3IWoN6IWPp693AKR7j9p80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ROM1aknv; arc=none smtp.client-ip=209.85.214.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ROM1aknv"
-Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-231bfc4600bso7893245ad.1
-        for <linux-block@vger.kernel.org>; Wed, 21 May 2025 09:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1747843642; x=1748448442; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FGAacLh9ZKO/sc4ZekzKsbI6RbRxPuIDS876rsFYht0=;
-        b=ROM1aknvM+SaYX+c5n6KqNQm79ZNACIqE2fApnudDZOEvewj4ZvQ6dWdCsndFLHQMr
-         7E7V+oJlw2NYqGbpSGuNh6AtGyHNhsdsE4yK8trq/NygGpsXUfTcn+Pp8WW6Z3XoPXt/
-         09cKmNfvNZQKkWHMBQLEdjTGdW+6sGBbut6EudT4iAJ/pg9MelqpmDJJXIhjJXP/evEr
-         e9tk7UZ5MgfZsfYDXlwZCk6fyoV2KL4Ms1x3uOPUNOAMKLm6yWteAGntJcnnT/916mEt
-         n4CsQ+6/4obLv7OW3gJ1ObnOqGyly0rSFq22gwS99cy5BsvGL4CSCgVRBSlKf+VkVJVV
-         u48A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747843642; x=1748448442;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FGAacLh9ZKO/sc4ZekzKsbI6RbRxPuIDS876rsFYht0=;
-        b=jYA8eXtbDDGKyqEycBGa8Cmx3es+6xs/GYxH+kSdeSjGKrKNo8iechTqY/gz7XpuX5
-         8tC7An2ix52GSsKswZJsYHwOXtQmGeDjMvB/f0RG5FI5qZQlBM+vCm3c/RGnabPAT+ph
-         AyW46t8Flwx3WAMM1KKOO8/T9cKLvTdV/nh3YwQG9QK+oz/uYw4vlVoYHro3E6nDlgxR
-         ljyEicD0GsetFLwAZKUTlbmtXSxFQP69bXaLY7vwdTezAZKJa7ftx9qoXYUut24FiBFF
-         ildvgCi2YDuO1M4cyWcOnR1Ux/fsY9sEELpifwvqDRCptZ9asnMrJKCzziqyfrLKEB7p
-         2/Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCV+rg52zxPt8mPkJpLWRDNW6aN/XFQCfOff3tlqN8boDw64s/bHGLDigjAiPfyYecudOSVDeLsIxbD1Yg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjhA21E7wkoaZCDmENk2NilG8ef7NcAi/n7KMKmmYJlwF7Ttjx
-	NttDNNpRrlLJqVpB1gUVHbxTqWZCbYSmk0u9sWp41gLuo6vZC7pI32oejG6JpN1BK/QXtwlRa7L
-	A+Yaiyy085ut4VyFazoLDkVeMEVjpG04gBRi5dkJyy5NoQajWCzpi
-X-Gm-Gg: ASbGncsfrEJlIEWpME7RqEkOFU6XUXy32GjgKv49HugnERGx6eMRvJPDprFiQC0onTN
-	8/8w6SfLVEXCgUcaMnho192SDpzM9OA9Vt7oWfwyoNkB2U6lwuZWr4lKqCaKxG50P9UBYPTJwBG
-	g1CATt+M5+ZYy94GSYDlNjc1v1dVxGELtRCaKSTwhn1xtDB5O5fZrKOEsZg/e2QYeep54E/f2Bv
-	X2a1ZfMfcPhyrk9+h1SHI9VoUp4+4Ym2oJ78K0o5EcICfGHRgnmG+gkfPGbqQme8KZ/iI7cb/SM
-	QMGnn+nJiAVXUBW6UoPVOaG7R0rrBg==
-X-Google-Smtp-Source: AGHT+IF2kF1m9LkkoJKrZ/FEcg38Fj39w2AzGUaOy5/vh7l4c0L6fk/PMc5E0B4+fMIoji+2MmlqVClPh6k8
-X-Received: by 2002:a17:902:ea0d:b0:224:1579:b347 with SMTP id d9443c01a7336-231d43c6220mr113533045ad.7.1747843642133;
-        Wed, 21 May 2025 09:07:22 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-231d4ecf61bsm6804655ad.123.2025.05.21.09.07.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 09:07:22 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::418a])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 87F6E3400E9;
-	Wed, 21 May 2025 10:07:21 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 81A95E41D24; Wed, 21 May 2025 10:07:21 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: remove io argument from ublk_auto_buf_reg_fallback()
-Date: Wed, 21 May 2025 10:07:19 -0600
-Message-ID: <20250521160720.1893326-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1747843696; c=relaxed/simple;
+	bh=r+PsOW+3c8fAoEJM7Hiht9PiePv9tWx8sLhz5yI7E0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NeIYux1/Cunt+9QScbGWr2YAHt9Vr7pdOgsKYc+Apke401dF9Gq3egCCw7WBcyhRqHtkmuJIE/8LVc4POerzpt4JcuR2kYwRgnORZ5RnVnq40aqIa2huhZkfl1fA4yrLWv6GGgwEklbbbAD5sbGFwiZ1Gv+CwH53htN7I007phE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 883A71515;
+	Wed, 21 May 2025 09:07:58 -0700 (PDT)
+Received: from [10.57.64.80] (unknown [10.57.64.80])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D6A43F6A8;
+	Wed, 21 May 2025 09:08:10 -0700 (PDT)
+Message-ID: <a1e9c606-0255-4e3b-87d3-dadc3b819622@arm.com>
+Date: Wed, 21 May 2025 17:08:08 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/6] dma-mapping: benchmark: add IOVA support
+To: Luis Chamberlain <mcgrof@kernel.org>, vkoul@kernel.org,
+ chenxiang66@hisilicon.com, m.szyprowski@samsung.com, leon@kernel.org,
+ jgg@nvidia.com, alex.williamson@redhat.com, joel.granados@kernel.org
+Cc: iommu@lists.linux.dev, dmaengine@vger.kernel.org,
+ linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <20250520223913.3407136-1-mcgrof@kernel.org>
+ <20250520223913.3407136-7-mcgrof@kernel.org>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20250520223913.3407136-7-mcgrof@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The argument has been unused since the function was added, so remove it.
+On 2025-05-20 11:39 pm, Luis Chamberlain wrote:
+> Add support to use the IOVA DMA API, and allow comparing and contrasting
+> to the streaming DMA API. Since the IOVA is intended to be an enhancement
+> when using an IOMMU which supports DMA over it only allow the IOVA to be
+> used proactively for devices which have this support, that is when
+> use_dma_iommu() is true. We don't try a fallback as the goal is clear,
+> only to use the IOVA when intended.
+> 
+> Example output, using intel-iommu on qemu against a random number
+> generator device, this output is completely artificial as its a VM
+> and its using more threads than the guest even has cores, the goal was
+> to at least visualize some numerical output on both paths:
+> 
+> ./tools/testing/selftests/dma/dma_map_benchmark -t 24 -i 2
+> === DMA Mapping Benchmark Results ===
+> Configuration: threads:24 seconds:20 node:-1 dir:BIDIRECTIONAL granule:1 iova:2
+> Buffer size: 1 pages (4 KB)
+> 
+> STREAMING DMA RESULTS:
+>    Map   latency:    12.3 μs (σ=257.9 μs)
+>    Unmap latency:     3.7 μs (σ=142.5 μs)
+>    Total latency:    16.0 μs
+> 
+> IOVA DMA RESULTS:
+>    Alloc   latency:     0.1 μs (σ= 31.1 μs)
+>    Link    latency:     2.5 μs (σ=116.9 μs)
+>    Sync    latency:     9.6 μs (σ=227.8 μs)
+>    Destroy latency:     3.6 μs (σ=141.2 μs)
+>    Total latency:    15.8 μs
+> 
+> PERFORMANCE COMPARISON:
+>    Streaming DMA total:    16.0 μs
+>    IOVA DMA total:         15.8 μs
+>    Performance ratio:      0.99x (IOVA is 1.3% faster)
+>    Streaming throughput:    62500 ops/sec
+>    IOVA throughput:         63291 ops/sec
+>    Streaming bandwidth:     244.1 MB/s
+>    IOVA bandwidth:          247.2 MB/s
+> 
+> IOVA OPERATION BREAKDOWN:
+>    Alloc:     0.6% (   0.1 μs)
+>    Link:     15.8% (   2.5 μs)
+>    Sync:     60.8% (   9.6 μs)
+>    Destroy:  22.8% (   3.6 μs)
+> 
+> RECOMMENDATIONS:
+>    ~ IOVA and Streaming APIs show similar performance
+> === End of Benchmark ===
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>   include/linux/map_benchmark.h                 |  11 +
+>   kernel/dma/Kconfig                            |   4 +-
+>   kernel/dma/map_benchmark.c                    | 417 +++++++++++++++++-
+>   .../testing/selftests/dma/dma_map_benchmark.c | 145 +++++-
+>   4 files changed, 562 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/linux/map_benchmark.h b/include/linux/map_benchmark.h
+> index 62674c83bde4..da7c9e3ddf21 100644
+> --- a/include/linux/map_benchmark.h
+> +++ b/include/linux/map_benchmark.h
+> @@ -7,6 +7,7 @@
+>   #define _KERNEL_DMA_BENCHMARK_H
+>   
+>   #define DMA_MAP_BENCHMARK       _IOWR('d', 1, struct map_benchmark)
+> +#define DMA_MAP_BENCHMARK_IOVA	_IOWR('d', 2, struct map_benchmark)
+>   #define DMA_MAP_MAX_THREADS     1024
+>   #define DMA_MAP_MAX_SECONDS     300
+>   #define DMA_MAP_MAX_TRANS_DELAY (10 * NSEC_PER_MSEC)
+> @@ -27,5 +28,15 @@ struct map_benchmark {
+>   	__u32 dma_dir; /* DMA data direction */
+>   	__u32 dma_trans_ns; /* time for DMA transmission in ns */
+>   	__u32 granule;  /* how many PAGE_SIZE will do map/unmap once a time */
+> +	__u32 has_iommu_dma;
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Why would userspace care about this? Either they asked for a streaming 
+benchmark and it's irrelevant, or they asked for an IOVA benchmark, 
+which either succeeded, or failed and this is ignored anyway.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 1800cb14677e..7dffddd3fc7a 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1181,11 +1181,11 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
- 		blk_mq_requeue_request(rq, false);
- 	else
- 		blk_mq_end_request(rq, BLK_STS_IOERR);
- }
- 
--static void ublk_auto_buf_reg_fallback(struct request *req, struct ublk_io *io)
-+static void ublk_auto_buf_reg_fallback(struct request *req)
- {
- 	const struct ublk_queue *ubq = req->mq_hctx->driver_data;
- 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
- 	struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
- 
-@@ -1207,11 +1207,11 @@ static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
- 
- 	ret = io_buffer_register_bvec(io->cmd, req, ublk_io_release,
- 				      pdu->buf.index, issue_flags);
- 	if (ret) {
- 		if (pdu->buf.flags & UBLK_AUTO_BUF_REG_FALLBACK) {
--			ublk_auto_buf_reg_fallback(req, io);
-+			ublk_auto_buf_reg_fallback(req);
- 			return true;
- 		}
- 		blk_mq_end_request(req, BLK_STS_IOERR);
- 		return false;
- 	}
--- 
-2.45.2
+> +	__u64 avg_iova_alloc_100ns;
+> +	__u64 avg_iova_link_100ns;
+> +	__u64 avg_iova_sync_100ns;
+> +	__u64 avg_iova_destroy_100ns;
+> +	__u64 iova_alloc_stddev;
+> +	__u64 iova_link_stddev;
+> +	__u64 iova_sync_stddev;
+> +	__u64 iova_destroy_stddev;
+> +	__u32 use_iova; /* 0=regular, 1=IOVA, 2=both */
 
+Conversely, why should the kernel have to care about this? If userspace 
+wants both benchmarks, they can just run both benchmarks, with whatever 
+number of threads for each they fancy. No need to have all that 
+complexity kernel-side. If there's a valid desire for running multiple 
+different benchmarks *simultaneously* then we should support that in 
+general (I can imagine it being potentially interesting to thrash the 
+IOVA allocator with several different sizes at once, for example.)
+
+That way, I'd also be inclined to give the new ioctl its own separate 
+structure for IOVA results, and avoid impacting the existing ABI.
+
+>   };
+>   #endif /* _KERNEL_DMA_BENCHMARK_H */
+> diff --git a/kernel/dma/Kconfig b/kernel/dma/Kconfig
+> index 31cfdb6b4bc3..e2d5784f46eb 100644
+> --- a/kernel/dma/Kconfig
+> +++ b/kernel/dma/Kconfig
+> @@ -261,10 +261,10 @@ config DMA_API_DEBUG
+>   	  If unsure, say N.
+>   
+>   config DMA_MAP_BENCHMARK
+> -	bool "Enable benchmarking of streaming DMA mapping"
+> +	bool "Enable benchmarking of streaming and IOVA DMA mapping"
+>   	depends on DEBUG_FS
+>   	help
+>   	  Provides /sys/kernel/debug/dma_map_benchmark that helps with testing
+> -	  performance of dma_(un)map_page.
+> +	  performance of the streaming DMA dma_(un)map_page and IOVA API.
+>   
+>   	  See tools/testing/selftests/dma/dma_map_benchmark.c
+> diff --git a/kernel/dma/map_benchmark.c b/kernel/dma/map_benchmark.c
+> index b54345a757cb..3ae34433420b 100644
+> --- a/kernel/dma/map_benchmark.c
+> +++ b/kernel/dma/map_benchmark.c
+> @@ -18,6 +18,7 @@
+>   #include <linux/platform_device.h>
+>   #include <linux/slab.h>
+>   #include <linux/timekeeping.h>
+> +#include <linux/iommu-dma.h>
+
+Nit: these are currently in nice alphabetical order.
+
+>   struct map_benchmark_data {
+>   	struct map_benchmark bparam;
+[...]
+> @@ -112,7 +231,250 @@ static int map_benchmark_thread(void *data)
+>   	return ret;
+>   }
+>   
+> -static int do_map_benchmark(struct map_benchmark_data *map)
+> +static int do_iova_benchmark(struct map_benchmark_data *map)
+> +{
+> +	struct task_struct **tsk;
+> +	int threads = map->bparam.threads;
+> +	int node = map->bparam.node;
+> +	u64 iova_loops;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	tsk = kmalloc_array(threads, sizeof(*tsk), GFP_KERNEL);
+> +	if (!tsk)
+> +		return -ENOMEM;
+> +
+> +	get_device(map->dev);
+> +
+> +	/* Create IOVA threads only */
+> +	for (i = 0; i < threads; i++) {
+> +		tsk[i] = kthread_create_on_node(benchmark_thread_iova, map,
+> +				node, "dma-iova-benchmark/%d", i);
+> +		if (IS_ERR(tsk[i])) {
+> +			pr_err("create dma_iova thread failed\n");
+> +			ret = PTR_ERR(tsk[i]);
+> +			while (--i >= 0)
+> +				kthread_stop(tsk[i]);
+> +			goto out;
+> +		}
+> +
+> +		if (node != NUMA_NO_NODE)
+> +			kthread_bind_mask(tsk[i], cpumask_of_node(node));
+> +	}
+
+Duplicating all the thread-wrangling code seems needlessly horrible - 
+surely it's easy enough to factor out the stats initialisation and final 
+calculation, along with the thread function itself. Perhaps as callbacks 
+in the map_benchmark_data?
+
+Similarly, each "thread function" itself only only actually needs to 
+consist of the respective "while (!kthread_should_stop())" loop - the 
+rest of map_benchmark_thread() could still be used as a common harness 
+to avoid duplicating the buffer management code as well.
+
+Thanks,
+Robin.
