@@ -1,142 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from outbound.pv.icloud.com (p-west1-cluster6-host4-snip4-10.eps.apple.com [57.103.67.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D6421E082;
-	Wed, 21 May 2025 17:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E49C19F42F
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 17:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.67.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747847869; cv=none; b=s4Ael97grlgDT78q9g67hDzy0WReX0lKEUQvdhQNlK9lr0fdW3IJClv+KHXQEdAqdvfW8vlzqDSb9EuQziS1VLHD2sZ4SSbu9cHMJYCjluzkGffrz+WvVHLMEfZyZeKyufXxKZyg+6UgBytqspLYGdKTbeE/Y+96yw1L1VIbMwE=
+	t=1747849663; cv=none; b=uP62YzixJ+Ztd0vG2ooUYot3Xph3+iUmDO8n4WKWbd59IZ8JKHRjsURPq+kSjrcSR0KuEo2LkksvxVn7pLrCkGQbHnYI1xdI0ZFsNkH0kyJW8sDKPA+h+losisjf/IRZShnfcAlBS3hBgOulWKVS2ZWuVioasxerG+S2RV81n2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747847869; c=relaxed/simple;
-	bh=MKq89yheYaWXCaAu9Wm2mo0plEFViL4eGl+jR8/HsEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B7YK7QORt7zZ4W6uAZdnMOye3OidGBD/sq7u/SBEkFG7nCgJTfJr4ochQksl9jm+rzowGUzlweDsJv3Lc2aew2CrNH8TL+LG8HxMfMdd5HAI4GqBKWn7xuUWiz18ACkiEIzilmXuT/g3hhlGs+htI4sK91hRrDetLgqdpTr9bdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEAro79q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747849663; c=relaxed/simple;
+	bh=BkI/MtM2ux1hiNId2JLBQER9HhxxNybNHSPS8v/u+Bo=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Z38yL7J1/kCk28/y5UHl35v9Rz2jbhBL+VvrLw/bCZXSbUtMKT/iVNM5o/hih8bEJpQBFbJRZ6dqalkJWjoWUHfYdc39z+WL/ze6E9gJAIqhs42Fa24ELZ9urmeAYNIci0YrGpUroZdl7qLQ9gFoVv3kK8Kt2jIWHQzvcpx+Huk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com; spf=pass smtp.mailfrom=ai-sast.com; dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b=Ocj2QuM7; arc=none smtp.client-ip=57.103.67.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ai-sast.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEAro79q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47CBFC4CEE4;
-	Wed, 21 May 2025 17:17:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747847868;
-	bh=MKq89yheYaWXCaAu9Wm2mo0plEFViL4eGl+jR8/HsEE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oEAro79qaCcRHl7KC2CUQe9ayiveUW2rblaDCbZA88nruDn/PWlq3bAzfq5gWacvx
-	 GR9tPO4faTWPuQMY2IlVUC/FmYVafeBAuOyeYRt5iaoH+BhaiZhQTujw4/zomEJ4vw
-	 Ue2VI3PR6+i0/cYlTFHC5MNF9fP3ShV2FOFuRepFwK8u7eyNiw+sIAx64zQErWrGhd
-	 DTUk8wA283ScilKEb90GT5Igl/57cDkn8cWBpBDkS2W7RGv4pWZHooq7282FJvWErQ
-	 kUrpmnQvCBLdSUwUPoXqPvDqzizimmrX/qJp8hq5NzcnIBdLxYsLl1GzmIJArLAq1i
-	 zHBP4JdJ0bTww==
-Date: Wed, 21 May 2025 10:17:46 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: vkoul@kernel.org, chenxiang66@hisilicon.com, m.szyprowski@samsung.com,
-	leon@kernel.org, jgg@nvidia.com, alex.williamson@redhat.com,
-	joel.granados@kernel.org, iommu@lists.linux.dev,
-	dmaengine@vger.kernel.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com
-Subject: Re: [PATCH 6/6] dma-mapping: benchmark: add IOVA support
-Message-ID: <aC4KuiiqMyfPoH0N@bombadil.infradead.org>
-References: <20250520223913.3407136-1-mcgrof@kernel.org>
- <20250520223913.3407136-7-mcgrof@kernel.org>
- <a1e9c606-0255-4e3b-87d3-dadc3b819622@arm.com>
+	dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b="Ocj2QuM7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ai-sast.com; s=sig1;
+	bh=BkI/MtM2ux1hiNId2JLBQER9HhxxNybNHSPS8v/u+Bo=;
+	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
+	b=Ocj2QuM70JLOhlh9zhfz/INEW8DlJNHTR4Ls10vU41Y7iLt7swfFDThrejahehMGL
+	 6CMBtjEH1wOYYkBw5e5LNOGyyht4LdMSI7I/EyBw7Wz1HZ9lpDrpbP7KgVAqVJW4GV
+	 y+TlXrPrko0ljGleZHN6Bsfa/j+IGu8feEA9wPFexShyJkgtZYllMVFJQq/r6SMS5f
+	 JIdKfvMNJ+DvCzwOzW4yQTM5KH+pH0mdC7//Is7I65PyYwP3jSWggE9zthlFDRXo4U
+	 d14WnMptkQweWpMQVJ5B/kLVQ11ki2MJKwI3EcbBP1As3X+k6oUJNxM3QaODQz2oL9
+	 kF0eRis9snF5A==
+Received: from outbound.pv.icloud.com (localhost [127.0.0.1])
+	by outbound.pv.icloud.com (Postfix) with ESMTPS id 1344C1800226;
+	Wed, 21 May 2025 17:47:37 +0000 (UTC)
+Received: from smtpclient.apple (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
+	by outbound.pv.icloud.com (Postfix) with ESMTPSA id 72849180020C;
+	Wed, 21 May 2025 17:47:36 +0000 (UTC)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1e9c606-0255-4e3b-87d3-dadc3b819622@arm.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: [PATCH] pktcdvd: fix missing bio_alloc_clone NULL check in
+ pkt_make_request_read
+From: yechey@ai-sast.com
+In-Reply-To: <aC37oAvMagTbRoPt@infradead.org>
+Date: Thu, 22 May 2025 01:47:23 +0800
+Cc: linux-block@vger.kernel.org,
+ axboe@kernel.dk
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <0AD0D024-C122-4F2A-90A0-9992F827F86D@ai-sast.com>
+References: <20250521123019.25282-1-yechey@ai-sast.com>
+ <aC37oAvMagTbRoPt@infradead.org>
+To: Christoph Hellwig <hch@infradead.org>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
+X-Proofpoint-GUID: GYFQn_KI7G5Tjc5DLLLcjN-VwQYMXSFW
+X-Proofpoint-ORIG-GUID: GYFQn_KI7G5Tjc5DLLLcjN-VwQYMXSFW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-21_06,2025-05-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 malwarescore=0 bulkscore=0 mlxscore=0 clxscore=1030
+ mlxlogscore=861 adultscore=0 suspectscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2503310001 definitions=main-2505210176
 
-On Wed, May 21, 2025 at 05:08:08PM +0100, Robin Murphy wrote:
-> On 2025-05-20 11:39 pm, Luis Chamberlain wrote:
-> > diff --git a/include/linux/map_benchmark.h b/include/linux/map_benchmark.h
-> > index 62674c83bde4..da7c9e3ddf21 100644
-> > --- a/include/linux/map_benchmark.h
-> > +++ b/include/linux/map_benchmark.h
-> > @@ -27,5 +28,15 @@ struct map_benchmark {
-> >   	__u32 dma_dir; /* DMA data direction */
-> >   	__u32 dma_trans_ns; /* time for DMA transmission in ns */
-> >   	__u32 granule;  /* how many PAGE_SIZE will do map/unmap once a time */
-> > +	__u32 has_iommu_dma;
-> 
-> Why would userspace care about this? Either they asked for a streaming
-> benchmark and it's irrelevant, or they asked for an IOVA benchmark, which
-> either succeeded, or failed and this is ignored anyway.
+Hi Christoph,
 
-Its so we inform userspace that its not possible to run IOVA tests for a
-good reason, instead of just saying it failed.
+Thank you for your feedback.
 
-> Conversely, why should the kernel have to care about this? If userspace
-> wants both benchmarks, they can just run both benchmarks, with whatever
-> number of threads for each they fancy. No need to have all that complexity
-> kernel-side. 
+While `bio_alloc_clone()` is called with `GFP_NOIO`, there are still
+cases where such allocations can fail under memory pressure, =
+particularly
+on constrained systems or during heavy I/O.
 
-I'm not following about the complexity you are referring to here. The
-point to has_iommu_dma is to simply avoid running the IOVA tests so
-that userspace doesn't get incorrect results for a feature it can't
-possibly support.
+I've noticed that some drivers, such as `dm-zoned`, perform a similar =
+NULL
+check after `bio_alloc_clone()` and handle allocation failures =
+gracefully
+by calling `bio_io_error()`. This suggests that the possibility of =
+failure
+is taken into account in other parts of the kernel.
 
-> If there's a valid desire for running multiple different
-> benchmarks *simultaneously* then we should support that in general (I can
-> imagine it being potentially interesting to thrash the IOVA allocator with
-> several different sizes at once, for example.)
+Given that, I thought it would be prudent to include a NULL check here =
+as
+well, to avoid any risk of dereferencing a NULL pointer=E2=80=94even if =
+the
+probability is low.
 
-Sure, both are supported. However, no point in running IOVA tests if
-you can't possibly run them.
+Please let me know if you think this makes sense, or if I might have
+missed something.
 
-> That way, I'd also be inclined to give the new ioctl its own separate
-> structure for IOVA results, and avoid impacting the existing ABI.
+Best regards,
+Chey
 
-Sure.
+> On 22 May 2025, at 12:13=E2=80=AFAM, Christoph Hellwig =
+<hch@infradead.org> wrote:
+>=20
+> On Wed, May 21, 2025 at 08:30:19PM +0800, Ye Chey wrote:
+>> The bio_alloc_clone() call in pkt_make_request_read() lacks NULL =
+check,
+>> which could lead to NULL pointer dereference. Add NULL check and =
+handle
+>> allocation failure by calling bio_io_error().
+>=20
+> Please explain in detail how this could ever lead to a path in
+> bio_alloc_clone that could return NULL and how you came to that
+> conclusion.
 
-> > -static int do_map_benchmark(struct map_benchmark_data *map)
-> > +static int do_iova_benchmark(struct map_benchmark_data *map)
-> > +{
-> > +	struct task_struct **tsk;
-> > +	int threads = map->bparam.threads;
-> > +	int node = map->bparam.node;
-> > +	u64 iova_loops;
-> > +	int ret = 0;
-> > +	int i;
-> > +
-> > +	tsk = kmalloc_array(threads, sizeof(*tsk), GFP_KERNEL);
-> > +	if (!tsk)
-> > +		return -ENOMEM;
-> > +
-> > +	get_device(map->dev);
-> > +
-> > +	/* Create IOVA threads only */
-> > +	for (i = 0; i < threads; i++) {
-> > +		tsk[i] = kthread_create_on_node(benchmark_thread_iova, map,
-> > +				node, "dma-iova-benchmark/%d", i);
-> > +		if (IS_ERR(tsk[i])) {
-> > +			pr_err("create dma_iova thread failed\n");
-> > +			ret = PTR_ERR(tsk[i]);
-> > +			while (--i >= 0)
-> > +				kthread_stop(tsk[i]);
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (node != NUMA_NO_NODE)
-> > +			kthread_bind_mask(tsk[i], cpumask_of_node(node));
-> > +	}
-> 
-> Duplicating all the thread-wrangling code seems needlessly horrible - surely
-> it's easy enough to factor out the stats initialisation and final
-> calculation, along with the thread function itself. Perhaps as callbacks in
-> the map_benchmark_data?
-
-Could try that.
-
-> Similarly, each "thread function" itself only only actually needs to consist
-> of the respective "while (!kthread_should_stop())" loop - the rest of
-> map_benchmark_thread() could still be used as a common harness to avoid
-> duplicating the buffer management code as well.
-
-If we want to have a separate data structure for IOVA tests there's more
-reason to keep the threads separated as each would be touching different
-data structures, otherwise we end up with a large branch.
-
-  Luis
