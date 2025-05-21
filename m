@@ -1,107 +1,153 @@
-Received: from outbound.pv.icloud.com (p-west1-cluster6-host4-snip4-10.eps.apple.com [57.103.67.63])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E49C19F42F
-	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 17:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.67.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E9E482EB;
+	Wed, 21 May 2025 17:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747849663; cv=none; b=uP62YzixJ+Ztd0vG2ooUYot3Xph3+iUmDO8n4WKWbd59IZ8JKHRjsURPq+kSjrcSR0KuEo2LkksvxVn7pLrCkGQbHnYI1xdI0ZFsNkH0kyJW8sDKPA+h+losisjf/IRZShnfcAlBS3hBgOulWKVS2ZWuVioasxerG+S2RV81n2A=
+	t=1747849979; cv=none; b=QZk3KGG8zer+EJVbh3+tv/ynjy3Ruj3JHfQQdmlP9pAb5iQYxMkT0IIEgszn8K9iNA2EJK4LQUT1jMc8EsizgDuJ4uC28IgTSXhQc0nEupOyhKyNv5PoxuB28bpmI95qY0+IUl3aZYXMg2+r0w1YMA+AXozxoemduYSz+j/LAU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747849663; c=relaxed/simple;
-	bh=BkI/MtM2ux1hiNId2JLBQER9HhxxNybNHSPS8v/u+Bo=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Z38yL7J1/kCk28/y5UHl35v9Rz2jbhBL+VvrLw/bCZXSbUtMKT/iVNM5o/hih8bEJpQBFbJRZ6dqalkJWjoWUHfYdc39z+WL/ze6E9gJAIqhs42Fa24ELZ9urmeAYNIci0YrGpUroZdl7qLQ9gFoVv3kK8Kt2jIWHQzvcpx+Huk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com; spf=pass smtp.mailfrom=ai-sast.com; dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b=Ocj2QuM7; arc=none smtp.client-ip=57.103.67.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ai-sast.com
+	s=arc-20240116; t=1747849979; c=relaxed/simple;
+	bh=ck7QO7Tkzrcu8Mua4xD9wFeA2GEWKuWofSfQBv1C58E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VgHrP5DY+Z2VNtagqs8eXv+N5QZojQBk4elobSooZjAZEvF7ID1aXSkExku4OPTyVo06QEszERyhBs8nuY5J8bc47rj0/wZW9Ia++qGlvbZns47AX2y2uE2SZeWc4jqIPgnokAEbn9IUulrHHxVaM/9MxTyJXv/eBL9jQe2xcRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LG5x+gZy; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b="Ocj2QuM7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ai-sast.com; s=sig1;
-	bh=BkI/MtM2ux1hiNId2JLBQER9HhxxNybNHSPS8v/u+Bo=;
-	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
-	b=Ocj2QuM70JLOhlh9zhfz/INEW8DlJNHTR4Ls10vU41Y7iLt7swfFDThrejahehMGL
-	 6CMBtjEH1wOYYkBw5e5LNOGyyht4LdMSI7I/EyBw7Wz1HZ9lpDrpbP7KgVAqVJW4GV
-	 y+TlXrPrko0ljGleZHN6Bsfa/j+IGu8feEA9wPFexShyJkgtZYllMVFJQq/r6SMS5f
-	 JIdKfvMNJ+DvCzwOzW4yQTM5KH+pH0mdC7//Is7I65PyYwP3jSWggE9zthlFDRXo4U
-	 d14WnMptkQweWpMQVJ5B/kLVQ11ki2MJKwI3EcbBP1As3X+k6oUJNxM3QaODQz2oL9
-	 kF0eRis9snF5A==
-Received: from outbound.pv.icloud.com (localhost [127.0.0.1])
-	by outbound.pv.icloud.com (Postfix) with ESMTPS id 1344C1800226;
-	Wed, 21 May 2025 17:47:37 +0000 (UTC)
-Received: from smtpclient.apple (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
-	by outbound.pv.icloud.com (Postfix) with ESMTPSA id 72849180020C;
-	Wed, 21 May 2025 17:47:36 +0000 (UTC)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LG5x+gZy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747849978; x=1779385978;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ck7QO7Tkzrcu8Mua4xD9wFeA2GEWKuWofSfQBv1C58E=;
+  b=LG5x+gZyfPAoc5OEY1tn4XrtHZ99xK+2d6rvEUnj8jFgwzWeBOcO6asG
+   tYeOkD6F3F1Fo1NrnjqjxdJOnH2aNKO/6/c7W6s+ynWO2jyejcHHNGE3j
+   +YLpkca2Wfdt368jgx7FGcxh/VNkRoqFZsfvyfoUnmkYXIcU6avpoZwF9
+   kuNmUVB+3ELJouEO8w+IQe7nLkmVLweS56A6rUDjbVgGNZNhki/+uv9//
+   rw8WkjqRehzao8WzIcqL0dDrqzzmgGarNUYt7srlCQncinKozToE/jdvF
+   6fQm//+quBd6Ij6AnRMs7XzjsLzaeHwW2qmCcF4fIYIulXFnM11NKu70l
+   g==;
+X-CSE-ConnectionGUID: JSEXTBHKSYqsfnWFtGk3ew==
+X-CSE-MsgGUID: UmkPSB3MR22cGrbuPMPk0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="53511758"
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="53511758"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 10:52:57 -0700
+X-CSE-ConnectionGUID: lrlcPFBWQKmmWfCcdpzpSQ==
+X-CSE-MsgGUID: jy1ohMqXTrWggEDhB6C8Sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="140029698"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa010.jf.intel.com with ESMTP; 21 May 2025 10:52:54 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 9CF50368; Wed, 21 May 2025 20:52:52 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-parisc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Helge Deller <deller@gmx.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Denis Efremov <efremov@linux.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 1/1] floppy: Replace custom SZ_64K constant
+Date: Wed, 21 May 2025 20:50:56 +0300
+Message-ID: <20250521175246.1351596-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: [PATCH] pktcdvd: fix missing bio_alloc_clone NULL check in
- pkt_make_request_read
-From: yechey@ai-sast.com
-In-Reply-To: <aC37oAvMagTbRoPt@infradead.org>
-Date: Thu, 22 May 2025 01:47:23 +0800
-Cc: linux-block@vger.kernel.org,
- axboe@kernel.dk
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <0AD0D024-C122-4F2A-90A0-9992F827F86D@ai-sast.com>
-References: <20250521123019.25282-1-yechey@ai-sast.com>
- <aC37oAvMagTbRoPt@infradead.org>
-To: Christoph Hellwig <hch@infradead.org>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
-X-Proofpoint-GUID: GYFQn_KI7G5Tjc5DLLLcjN-VwQYMXSFW
-X-Proofpoint-ORIG-GUID: GYFQn_KI7G5Tjc5DLLLcjN-VwQYMXSFW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-21_06,2025-05-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 malwarescore=0 bulkscore=0 mlxscore=0 clxscore=1030
- mlxlogscore=861 adultscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.22.0-2503310001 definitions=main-2505210176
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Christoph,
+There are only two headers using the K_64 custom constant. Moreover,
+its usage tangles a code because the constant is defined in the C
+file, while users are in the headers. Replace it with well defined
+SZ_64K from sizes.h.
 
-Thank you for your feedback.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
 
-While `bio_alloc_clone()` is called with `GFP_NOIO`, there are still
-cases where such allocations can fail under memory pressure, =
-particularly
-on constrained systems or during heavy I/O.
+This should be placed on top of
+https://lore.kernel.org/r/20250521174152.1339379-1-andriy.shevchenko@linux.intel.com
+for the dependency reason. In case some changes are needed there,
+this one may be attached to v2 of the series.
 
-I've noticed that some drivers, such as `dm-zoned`, perform a similar =
-NULL
-check after `bio_alloc_clone()` and handle allocation failures =
-gracefully
-by calling `bio_io_error()`. This suggests that the possibility of =
-failure
-is taken into account in other parts of the kernel.
+ arch/parisc/include/asm/floppy.h | 5 +++--
+ arch/x86/include/asm/floppy.h    | 3 ++-
+ drivers/block/floppy.c           | 2 --
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-Given that, I thought it would be prudent to include a NULL check here =
-as
-well, to avoid any risk of dereferencing a NULL pointer=E2=80=94even if =
-the
-probability is low.
-
-Please let me know if you think this makes sense, or if I might have
-missed something.
-
-Best regards,
-Chey
-
-> On 22 May 2025, at 12:13=E2=80=AFAM, Christoph Hellwig =
-<hch@infradead.org> wrote:
->=20
-> On Wed, May 21, 2025 at 08:30:19PM +0800, Ye Chey wrote:
->> The bio_alloc_clone() call in pkt_make_request_read() lacks NULL =
-check,
->> which could lead to NULL pointer dereference. Add NULL check and =
-handle
->> allocation failure by calling bio_io_error().
->=20
-> Please explain in detail how this could ever lead to a path in
-> bio_alloc_clone that could return NULL and how you came to that
-> conclusion.
+diff --git a/arch/parisc/include/asm/floppy.h b/arch/parisc/include/asm/floppy.h
+index df20dbef3ada..f15b69fea901 100644
+--- a/arch/parisc/include/asm/floppy.h
++++ b/arch/parisc/include/asm/floppy.h
+@@ -8,9 +8,9 @@
+ #ifndef __ASM_PARISC_FLOPPY_H
+ #define __ASM_PARISC_FLOPPY_H
+ 
++#include <linux/sizes.h>
+ #include <linux/vmalloc.h>
+ 
+-
+ /*
+  * The DMA channel used by the floppy controller cannot access data at
+  * addresses >= 16MB
+@@ -20,7 +20,8 @@
+  * floppy accesses go through the track buffer.
+  */
+ #define _CROSS_64KB(a,s,vdma) \
+-(!(vdma) && ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64))
++	(!(vdma) && \
++	 ((unsigned long)(a) / SZ_64K != ((unsigned long)(a) + (s) - 1) / SZ_64K))
+ 
+ #define SW fd_routine[use_virtual_dma&1]
+ #define CSW fd_routine[can_use_virtual_dma & 1]
+diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
+index e76cb74bbed2..e7a244051c62 100644
+--- a/arch/x86/include/asm/floppy.h
++++ b/arch/x86/include/asm/floppy.h
+@@ -10,6 +10,7 @@
+ #ifndef _ASM_X86_FLOPPY_H
+ #define _ASM_X86_FLOPPY_H
+ 
++#include <linux/sizes.h>
+ #include <linux/vmalloc.h>
+ 
+ /*
+@@ -22,7 +23,7 @@
+  */
+ #define _CROSS_64KB(a, s, vdma)						\
+ 	(!(vdma) &&							\
+-	 ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64))
++	 ((unsigned long)(a) / SZ_64K != ((unsigned long)(a) + (s) - 1) / SZ_64K))
+ 
+ #define SW fd_routine[use_virtual_dma & 1]
+ #define CSW fd_routine[can_use_virtual_dma & 1]
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index e97432032f01..f4dc46fd25ea 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -233,8 +233,6 @@ static unsigned short virtual_dma_port = 0x3f0;
+ irqreturn_t floppy_interrupt(int irq, void *dev_id);
+ static int set_dor(int fdc, char mask, char data);
+ 
+-#define K_64	0x10000		/* 64KB */
+-
+ /* the following is the mask of allowed drives. By default units 2 and
+  * 3 of both floppy controllers are disabled, because switching on the
+  * motor of these drives causes system hangs on some PCI computers. drive
+-- 
+2.47.2
 
