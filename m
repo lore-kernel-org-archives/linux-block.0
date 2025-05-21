@@ -1,50 +1,50 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B38823958D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FE322FF2B
 	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 22:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747866679; cv=none; b=KNaZvexSBkvtV5wb1nNLdVxMEAcpVNbQm3AGafrJLAUf0bWl4RAEtyNifSKXHdgf5KPXxvcFmHBaeHYQI+Sa/TwcKvjz2ThvHEfZRWvAA9RqkF9pJDX9rml2LQnlZErdVC4PqccbSTCuYFcwcVPyW88e2/2pVv+qJ+KzChjj2BM=
+	t=1747866679; cv=none; b=BQFrsozw6AYHzN2e2cG2dBAwpFiEoz43TW6RGuf4zGj4sAo4gZMwZaDoxp0NNswqIb7fVNeJk3cteN4IuTbFG/SwHWBkRFzb1nMm7URKlGFMoze0PFFSKJKLJ6PVgYeuyFO9IQpd5D7UpNFtXhF7c+FEye+nSY9Ln/1XLmnUVls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747866679; c=relaxed/simple;
-	bh=RBgNaR7H6HTC5uyL+GKmzltg4/smxz7w9un+Rw6hrL8=;
+	bh=lhKWA84o6gMu4gpdx2PiQQtOgJIMkDzMFso6RzGXANE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=coTbSrRW6rWLREizS236d3I7R5/QW/XI07pMkXiUYa0ncO9ykEuLAy7uethOmije4JWby9sf9GH9QydvHZKG3m0/IPGjPA28yPtpdFRrUU3247m8LxSj1aIq2Fh1gOR6MtvjaAx6hfiwKxHKKB2mdIrj11D8/pEen2hKHIKP8Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=jQma/pFI; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=jtYUqp75VHi3WP7cS7OJ0KFl9IchMr+1MmnFJfIKFrUn591IVQOs64ETrzWiRKxQ31HvllQdxHlmKV+JWoQibyEX2FcSWGeE3oXCpqj6oB9vZZNdXWzvxStDq5rTUExYK7HDyYSuRy05xJ3Jcy+0noevONTp3NjmRQo+TE6PqVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=i9qHI8l6; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="jQma/pFI"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="i9qHI8l6"
 Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LMQXcb002432
-	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 15:31:16 -0700
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LMQXcc002432
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 15:31:17 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=mZ20q90cuzIDMnvbv2G/OC471GJ5nYMbY/KN84m1fJ0=; b=jQma/pFI+CHK
-	RlkX/qCoVaXaXreYvTS5/uZh8PFINU8y8Eiybdn1zp5qC5e4pmZQ6EzwuxifCVn2
-	vFXd8AihzpysBsC+K+BSysEB0F4TJ0Xnhp8GOcEQivUkn6QqLFNZHeMNY+UZh5bV
-	4X4DYK2QowvE/qe9reJJJGf9uk/xcmPQA/jesER7SlRuk+tRjIhtDKa9T5JpD577
-	3O68yz6jVIMN/BuFYMZQbl7YI+bPmL1mGiDZsgLDRkS4IT9px6nEOZt/hdZLCJLG
-	MNG9B3c0SwltG30PSB1SRrAgPvz+BUiweMv3oq97/RoL2mcn+7DbM3OB5MplISy/
-	PTfbzVc+dQ==
+	 bh=ADIhLn5VjOQ+8E1c0cuERM2aLwK/zTifB7KESawKdy8=; b=i9qHI8l6y+pr
+	L+zPY33Q6cmW3arDE8EVR/aZ2/3buDK33u3rV8zlKbrYuf19xe0tdWcqLZbRFI7c
+	agYN7PF4vXO+p9BlTsH4pLFKuQFqVBF3yvbhXVlCepqP0yH2A054jR6QoGqd5aLB
+	pMyICemL0pHI55/nyKBMEZoBZP5z8edPAMG10uf2RnAbq0tOBPhjYHfStLexcaOM
+	VmPqNFo9u+74sXsqPUV0WBTWM6kCZDWjLtLb35x0mT7HEIeUqg1JRpYsNzEr4boZ
+	7zmI7SGRoVAFUxzdr/2oLn0VBqE5JWs5+1bF7us8D0tTMpN6SS7p9yY82TFM2qiW
+	92nYUj35gg==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 46rwfgkp1x-7
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 46rwfgkp1x-8
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 15:31:16 -0700 (PDT)
-Received: from twshared18153.09.ash9.facebook.com (2620:10d:c085:108::150d) by
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 15:31:17 -0700 (PDT)
+Received: from twshared24170.03.ash8.facebook.com (2620:10d:c085:108::4) by
  mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.1748.10; Wed, 21 May 2025 22:31:14 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id C91D91BE54AC9; Wed, 21 May 2025 15:31:10 -0700 (PDT)
+	id B02F21BE54AC7; Wed, 21 May 2025 15:31:10 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 4/5] block: add support for vectored copies
-Date: Wed, 21 May 2025 15:31:06 -0700
-Message-ID: <20250521223107.709131-5-kbusch@meta.com>
+Subject: [PATCH 3/5] nvme: add support for copy offload
+Date: Wed, 21 May 2025 15:31:05 -0700
+Message-ID: <20250521223107.709131-4-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250521223107.709131-1-kbusch@meta.com>
 References: <20250521223107.709131-1-kbusch@meta.com>
@@ -57,233 +57,215 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: xYiwOBOVOCFCxrP7UFdrvKwW6IVWWVqQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDIyNCBTYWx0ZWRfXxah0pjszM/yp 1OSckYz7syhtZggY+4/hyWVs79v8DGfUDplGsCYZikaWwxveHKfkehJmk8Fz4lKDBaWUdMuyhPJ g635sdD5tLd4QBGxf/2iHqyuA2+vBk6wt/hc2CpEdE0f/xSa/obJri0qshiQpd8NdHA2zGSWK0x
- o/tmvqD1yxfSe1mop5AKSYqKDupWxZIxZ3TCeiuadcz0cvtIQQlN694sxxEQBP5r6aWr6iM/jUR G8Miwh0SBybUeWNqdHms598KjeEnzLeb7RZE/KtdM3XN8V2Qr4hNjae9dC7iUNL2tTm1bngTFij 5BZcLCLms60IFdE915Vn7kj8RM7qXw4PhrgPxYyCKeTk6EPQxZNjK3rl2ekQI0f9gN5eZ/KACRc
- U27idTYReiu9BEiuLrYVz3B4gB8lRxemnLIiauYPWwWezMNCc6eJW+dKYzw50XAWtP0uSW2s
-X-Authority-Analysis: v=2.4 cv=I9BlRMgg c=1 sm=1 tr=0 ts=682e5434 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=QX-hf833l84o4JQLY-wA:9
-X-Proofpoint-ORIG-GUID: xYiwOBOVOCFCxrP7UFdrvKwW6IVWWVqQ
+X-Proofpoint-GUID: SxCk4xmaQBUpEInTk9gCJbxWbOjeSdth
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDIyNCBTYWx0ZWRfX/l0cVcJcvgaI OkMAgPqRF8/00T/YI5tpxVLrXsPQl66gvuwms49KgQLo72ufyoazVXdqWd9Z/laZ67gb6XNbFbN R+Z/A253Io5zzYUhtPTslPbSdwpNqn2jcDE0KkbHbEB1E/OK/SX4mzRWU/X2q3R211pXAHbqJt9
+ tBhTPGWUROtJhryHJkJucD94viVgPKdJWq6n1/h3BJwu0B2UClAp+IWgyWvCR9SYnCFEhnUE0Ye eOFxpoF7+V6r1lhymbvgPYvSnYd74GmFIqMbvtHG4iGJQx2yeK5Caca110P73AGQF7qm93+S3at 6E9gm3hwLwIOv2Tw0Em7lzBv19ZaA7izNgWTQnhmLd9rPO6Ivl177aA+xwpW/xPzu9IrMaBL3Xf
+ PoATZhgp9NLDeZw6glA5D+3vxLv/5/TpYhmwnw1jRRCkR0ktRePPX8ktEExCRVFIbwAdzcuO
+X-Authority-Analysis: v=2.4 cv=I9BlRMgg c=1 sm=1 tr=0 ts=682e5435 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=p-wV8MGqm0ydJg34uK0A:9
+X-Proofpoint-ORIG-GUID: SxCk4xmaQBUpEInTk9gCJbxWbOjeSdth
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-21_07,2025-05-20_03,2025-03-28_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Copy offload can be used to defrad or garbage collect data spread across
-the disk. Most storage protocols provide a way to specifiy multiple
-sources in a single copy commnd, so introduce kernel and user space
-interfaces to accomplish that.
+Register the nvme namespace copy capablities with the request_queue
+limits and implement support for the REQ_OP_COPY operation.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/blk-lib.c         | 50 ++++++++++++++++++++++++----------
- block/ioctl.c           | 59 +++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h  |  2 ++
- include/uapi/linux/fs.h | 14 ++++++++++
- 4 files changed, 111 insertions(+), 14 deletions(-)
+ drivers/nvme/host/core.c | 61 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/nvme.h     | 42 ++++++++++++++++++++++++++-
+ 2 files changed, 102 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index a538acbaa2cd7..7513b876a5399 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -424,26 +424,46 @@ static int __blkdev_copy(struct block_device *bdev,=
- sector_t dst_sector,
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f69a232a000ac..3134fe85b1abc 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -888,6 +888,52 @@ static blk_status_t nvme_setup_discard(struct nvme_n=
+s *ns, struct request *req,
+ 	return BLK_STS_OK;
  }
 =20
- static int blkdev_copy_offload(struct block_device *bdev, sector_t dst_s=
-ector,
--		sector_t src_sector, sector_t nr_sects, gfp_t gfp)
-+		struct bio_vec *bv, int nr_vecs, gfp_t gfp)
- {
-+	unsigned size =3D 0;
- 	struct bio *bio;
--	int ret;
--
--	struct bio_vec bv =3D {
--		.bv_sector =3D src_sector,
--		.bv_sectors =3D nr_sects,
--	};
-+	int ret, i;
-=20
--	bio =3D bio_alloc(bdev, 1, REQ_OP_COPY, gfp);
--	bio_add_copy_src(bio, &bv);
-+	bio =3D bio_alloc(bdev, nr_vecs, REQ_OP_COPY, gfp);
-+	for (i =3D 0; i < nr_vecs; i++) {
-+		size +=3D bv[i].bv_sectors << SECTOR_SHIFT;
-+		bio_add_copy_src(bio, &bv[i]);
++static inline blk_status_t nvme_setup_copy(struct nvme_ns *ns,
++		struct request *req, struct nvme_command *cmnd)
++{
++	struct nvme_copy_range *range;
++	struct req_iterator iter;
++	struct bio_vec bvec;
++	u16 control =3D 0;
++	int i =3D 0;
++
++	static const size_t alloc_size =3D sizeof(*range) * NVME_COPY_MAX_RANGE=
+S;
++
++	if (WARN_ON_ONCE(blk_rq_nr_phys_segments(req) >=3D NVME_COPY_MAX_RANGES=
+))
++		return BLK_STS_IOERR;
++
++	range =3D kzalloc(alloc_size, GFP_ATOMIC | __GFP_NOWARN);
++	if (!range)
++		return BLK_STS_RESOURCE;
++
++	if (req->cmd_flags & REQ_FUA)
++	        control |=3D NVME_RW_FUA;
++	if (req->cmd_flags & REQ_FAILFAST_DEV)
++	        control |=3D NVME_RW_LR;
++
++	rq_for_each_copy_bvec(bvec, req, iter) {
++		u64 slba =3D nvme_sect_to_lba(ns->head, bvec.bv_sector);
++		u64 nlb =3D nvme_sect_to_lba(ns->head, bvec.bv_sectors) - 1;
++
++		range[i].slba =3D cpu_to_le64(slba);
++		range[i].nlb =3D cpu_to_le16(nlb);
++	        i++;
 +	}
- 	bio->bi_iter.bi_sector =3D dst_sector;
--	bio->bi_iter.bi_size =3D nr_sects << SECTOR_SHIFT;
-+	bio->bi_iter.bi_size =3D size;
-=20
- 	ret =3D submit_bio_wait(bio);
- 	bio_put(bio);
- 	return ret;
++
++	memset(cmnd, 0, sizeof(*cmnd));
++	cmnd->copy.opcode =3D nvme_cmd_copy;
++	cmnd->copy.nsid =3D cpu_to_le32(ns->head->ns_id);
++	cmnd->copy.nr_range =3D i - 1;
++	cmnd->copy.sdlba =3D cpu_to_le64(nvme_sect_to_lba(ns->head,
++						blk_rq_pos(req)));
++	cmnd->copy.control =3D cpu_to_le16(control);
++
++	bvec_set_virt(&req->special_vec, range, alloc_size);
++	req->rq_flags |=3D RQF_SPECIAL_PAYLOAD;
++
++	return BLK_STS_OK;
 +}
 +
-+/**
-+ * blkdev_copy_range - copy range of sectors to a destination
-+ * @dst_sector:	start sector of the destination to copy to
-+ * @bv:		vector of source sectors
-+ * @nr_vecs:	number of source sector vectors
-+ * @gfp:	allocation flags to use
-+ */
-+int blkdev_copy_range(struct block_device *bdev, sector_t dst_sector,
-+		struct bio_vec *bv, int nr_vecs, gfp_t gfp)
-+{
-+	int ret, i;
-=20
-+	if (bdev_copy_sectors(bdev))
-+		return blkdev_copy_offload(bdev, dst_sector, bv, nr_vecs, gfp);
-+
-+	for (i =3D 0, ret =3D 0; i < nr_vecs && !ret; i++)
-+		ret =3D __blkdev_copy(bdev, dst_sector, bv[i].bv_sector,
-+				bv[i].bv_sectors, gfp);
-+	return ret;
- }
-+EXPORT_SYMBOL_GPL(blkdev_copy_range);
-=20
- /**
-  * blkdev_copy - copy source sectors to a destination on the same block =
-device
-@@ -455,9 +475,11 @@ static int blkdev_copy_offload(struct block_device *=
-bdev, sector_t dst_sector,
- int blkdev_copy(struct block_device *bdev, sector_t dst_sector,
- 		sector_t src_sector, sector_t nr_sects, gfp_t gfp)
+ static void nvme_set_app_tag(struct request *req, struct nvme_command *c=
+mnd)
  {
--	if (bdev_copy_sectors(bdev))
--		return blkdev_copy_offload(bdev, dst_sector, src_sector,
--					nr_sects, gfp);
--	return __blkdev_copy(bdev, dst_sector, src_sector, nr_sects, gfp);
-+	struct bio_vec bv =3D {
-+		.bv_sector =3D src_sector,
-+		.bv_sectors =3D nr_sects,
-+	};
+ 	cmnd->rw.lbat =3D cpu_to_le16(bio_integrity(req->bio)->app_tag);
+@@ -1106,6 +1152,9 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, str=
+uct request *req)
+ 	case REQ_OP_DISCARD:
+ 		ret =3D nvme_setup_discard(ns, req, cmd);
+ 		break;
++	case REQ_OP_COPY:
++		ret =3D nvme_setup_copy(ns, req, cmd);
++		break;
+ 	case REQ_OP_READ:
+ 		ret =3D nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
+ 		break;
+@@ -2119,6 +2168,15 @@ static bool nvme_update_disk_info(struct nvme_ns *=
+ns, struct nvme_id_ns *id,
+ 		lim->max_write_zeroes_sectors =3D UINT_MAX;
+ 	else
+ 		lim->max_write_zeroes_sectors =3D ns->ctrl->max_zeroes_sectors;
 +
-+	return blkdev_copy_range(bdev, dst_sector, &bv, 1, gfp);
- }
- EXPORT_SYMBOL_GPL(blkdev_copy);
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 6f03c65867348..4b5095be19e1a 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -241,6 +241,63 @@ static int blk_ioctl_copy(struct block_device *bdev,=
- blk_mode_t mode,
- 	return blkdev_copy(bdev, dst, src, nr, GFP_KERNEL);
- }
-=20
-+static int blk_ioctl_copy_vec(struct block_device *bdev, blk_mode_t mode=
-,
-+		void __user *argp)
-+{
-+	sector_t align =3D bdev_logical_block_size(bdev) >> SECTOR_SHIFT;
-+	struct bio_vec *bv, fast_bv[UIO_FASTIOV];
-+	struct copy_range cr;
-+	int i, nr, ret;
-+	__u64 dst;
++	if (ns->ctrl->oncs & NVME_CTRL_ONCS_NVMCPYS && id->mssrl && id->mcl) {
++		u32 mcss =3D bs * le16_to_cpu(id->mssrl) >> SECTOR_SHIFT;
++		u32 mcs =3D bs * le32_to_cpu(id->mcl) >> SECTOR_SHIFT;
 +
-+	if (!(mode & BLK_OPEN_WRITE))
-+		return -EBADF;
-+	if (copy_from_user(&cr, argp, sizeof(cr)))
-+		return -EFAULT;
-+	if (!(IS_ALIGNED(cr.dst_sector, align)))
-+		return -EINVAL;
-+
-+	nr =3D cr.nr_ranges;
-+	if (nr <=3D UIO_FASTIOV) {
-+		bv =3D fast_bv;
-+	} else {
-+		bv =3D kmalloc_array(nr, sizeof(*bv), GFP_KERNEL);
-+		if (!bv)
-+			return -ENOMEM;
++		lim->max_copy_segment_sectors =3D mcss;
++		lim->max_copy_sectors =3D mcs;
++		lim->max_copy_segments =3D id->msrc + 1;
 +	}
-+
-+	dst =3D cr.dst_sector;
-+	for (i =3D 0; i < nr; i++) {
-+		struct copy_source csrc;
-+		__u64 nr_sects, src;
-+
-+		if (copy_from_user(&csrc,
-+				(void __user *)(cr.sources + i * sizeof(csrc)),
-+				sizeof(csrc))) {
-+			ret =3D -EFAULT;
-+			goto out;
-+		}
-+
-+		nr_sects =3D csrc.nr_sectors;
-+		src =3D csrc.src_sector;
-+		if (!(IS_ALIGNED(src | nr_sects, align)) ||
-+		    (src < dst && src + nr_sects > dst) ||
-+		    (dst < src && dst + nr_sects > src)) {
-+			ret =3D -EINVAL;
-+			goto out;
-+		}
-+
-+		bv[i].bv_sectors =3D nr_sects;
-+		bv[i].bv_sector =3D src;
-+	}
-+
-+	ret =3D blkdev_copy_range(bdev, dst, bv, nr, GFP_KERNEL);
-+out:
-+	if (bv !=3D fast_bv)
-+		kfree(bv);
-+	return ret;
-+}
-+
- static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
- 		unsigned long arg)
- {
-@@ -605,6 +662,8 @@ static int blkdev_common_ioctl(struct block_device *b=
-dev, blk_mode_t mode,
- 		return blk_ioctl_secure_erase(bdev, mode, argp);
- 	case BLKCPY:
- 		return blk_ioctl_copy(bdev, mode, argp);
-+	case BLKCPY_VEC:
-+		return blk_ioctl_copy_vec(bdev, mode, argp);
- 	case BLKZEROOUT:
- 		return blk_ioctl_zeroout(bdev, mode, arg);
- 	case BLKGETDISKSEQ:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e39ba0e91d43e..a77f2298754b5 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1182,6 +1182,8 @@ int blkdev_issue_secure_erase(struct block_device *=
-bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp);
- int blkdev_copy(struct block_device *bdev, sector_t dst_sector,
- 		sector_t src_sector, sector_t nr_sects, gfp_t gfp);
-+int blkdev_copy_range(struct block_device *bdev, sector_t dst_sector,
-+		struct bio_vec *bv, int nr_vecs, gfp_t gfp);
+ 	return valid;
+ }
 =20
- #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
- #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes =
-*/
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 534f157ce22e9..aed965f74ea2c 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -218,6 +218,20 @@ struct fsxattr {
- /* [0] =3D destination lba, [1] =3D source lba, [2] =3D number of sector=
-s */
- #define BLKCPY _IOWR(0x12,142,__u64[3])
+@@ -2526,6 +2584,9 @@ static int nvme_update_ns_info(struct nvme_ns *ns, =
+struct nvme_ns_info *info)
+ 			nvme_init_integrity(ns->head, &lim, info);
+ 		lim.max_write_streams =3D ns_lim->max_write_streams;
+ 		lim.write_stream_granularity =3D ns_lim->write_stream_granularity;
++		lim.max_copy_segment_sectors =3D ns_lim->max_copy_segment_sectors;
++		lim.max_copy_sectors =3D ns_lim->max_copy_sectors;
++		lim.max_copy_segments =3D ns_lim->max_copy_segments;
+ 		ret =3D queue_limits_commit_update(ns->head->disk->queue, &lim);
 =20
-+struct copy_source {
-+	__u64 src_sector;
-+	__u64 nr_sectors;
+ 		set_capacity_and_notify(ns->head->disk, get_capacity(ns->disk));
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 51308f65b72fd..14f46ad1330b6 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -404,6 +404,7 @@ enum {
+ 	NVME_CTRL_ONCS_WRITE_ZEROES		=3D 1 << 3,
+ 	NVME_CTRL_ONCS_RESERVATIONS		=3D 1 << 5,
+ 	NVME_CTRL_ONCS_TIMESTAMP		=3D 1 << 6,
++	NVME_CTRL_ONCS_NVMCPYS                  =3D 1 << 8,
+ 	NVME_CTRL_VWC_PRESENT			=3D 1 << 0,
+ 	NVME_CTRL_OACS_SEC_SUPP                 =3D 1 << 0,
+ 	NVME_CTRL_OACS_NS_MNGT_SUPP		=3D 1 << 3,
+@@ -458,7 +459,10 @@ struct nvme_id_ns {
+ 	__le16			npdg;
+ 	__le16			npda;
+ 	__le16			nows;
+-	__u8			rsvd74[18];
++	__le16			mssrl;
++	__le32			mcl;
++	__u8			msrc;
++	__u8			rsvd81[11];
+ 	__le32			anagrpid;
+ 	__u8			rsvd96[3];
+ 	__u8			nsattr;
+@@ -956,6 +960,7 @@ enum nvme_opcode {
+ 	nvme_cmd_resv_acquire	=3D 0x11,
+ 	nvme_cmd_io_mgmt_recv	=3D 0x12,
+ 	nvme_cmd_resv_release	=3D 0x15,
++	nvme_cmd_copy		=3D 0x19,
+ 	nvme_cmd_zone_mgmt_send	=3D 0x79,
+ 	nvme_cmd_zone_mgmt_recv	=3D 0x7a,
+ 	nvme_cmd_zone_append	=3D 0x7d,
+@@ -978,6 +983,7 @@ enum nvme_opcode {
+ 		nvme_opcode_name(nvme_cmd_resv_acquire),	\
+ 		nvme_opcode_name(nvme_cmd_io_mgmt_recv),	\
+ 		nvme_opcode_name(nvme_cmd_resv_release),	\
++		nvme_opcode_name(nvme_cmd_copy),		\
+ 		nvme_opcode_name(nvme_cmd_zone_mgmt_send),	\
+ 		nvme_opcode_name(nvme_cmd_zone_mgmt_recv),	\
+ 		nvme_opcode_name(nvme_cmd_zone_append))
+@@ -1158,6 +1164,39 @@ struct nvme_dsm_range {
+ 	__le64			slba;
+ };
+=20
++struct nvme_copy_cmd {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__u64			rsvd2;
++	__le64			metadata;
++	union nvme_data_ptr	dptr;
++	__le64			sdlba;
++	__u8			nr_range;
++	__u8			format;
++	__le16			control;
++	__le16			cev;
++	__le16			dspec;
++	__le32			lbtl;
++	__le16			lbat;
++	__le16			lbatm;
 +};
 +
-+struct copy_range {
-+	__u64	dst_sector;
-+	__u16	nr_ranges;
-+	__u8	rsvd[6];
-+	__u64	sources; /* user space pointer to struct copy_source[] */
++#define NVME_COPY_MAX_RANGES   128
++struct nvme_copy_range {
++	__le32			spars;
++	__u32			rsvd4;
++	__le64			slba;
++	__le16			nlb;
++	__le16			cetype;
++	__le16			cev;
++	__le16			sopt;
++	__le32			elbt;
++	__le16			elbat;
++	__le16			elbatm;
 +};
-+#define BLKCPY_VEC _IOWR(0x12,143,struct copy_range)
 +
-+
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
- #define FIGETBSZ   _IO(0x00,2)	/* get the block size used for bmap */
+ struct nvme_write_zeroes_cmd {
+ 	__u8			opcode;
+ 	__u8			flags;
+@@ -1985,6 +2024,7 @@ struct nvme_command {
+ 		struct nvme_download_firmware dlfw;
+ 		struct nvme_format_cmd format;
+ 		struct nvme_dsm_cmd dsm;
++		struct nvme_copy_cmd copy;
+ 		struct nvme_write_zeroes_cmd write_zeroes;
+ 		struct nvme_zone_mgmt_send_cmd zms;
+ 		struct nvme_zone_mgmt_recv_cmd zmr;
 --=20
 2.47.1
 
