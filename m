@@ -1,186 +1,252 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8710ED27E
-	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 00:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B69C148827
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 01:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747786026; cv=none; b=ANpK3mqbJOom5OUEFJOdo2ZfAkVR/S1sEpJ5hCYI6ucWPkfoJyp+J8lQHfRpQwLTGzsAf4cMOhyWDFmupDP8QjAZ/JNKvm2v7AvukMeCXF8i3CF+1qWZdqu6hNTPiVhhw2uOKsolEYkxEPzjT71CbEFZLZIYc8iXn/L/ZSOSno4=
+	t=1747791737; cv=none; b=rXaV4iNDvY5MVl3sIiSKTlgViPTWdE9U6EOURHzAr3tA9T4H4sv/jhrOrR4Bq6JdXVlVtkSnOXaQPHaRQjbHynSvKGi+HDJ0WhF8jsO7VqdqusXn7O8Xw3316uYVte1fT2hHiu81YD67MXAIvajHLtMuCKiQIu3ycmINj08xhOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747786026; c=relaxed/simple;
-	bh=SXecoBR5swnLhEZaNrCt5dHR7f3a7Spqx6PmQSMEDQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dfXEF1gpNA5xoL9YWVnKL+yc90jp/2y0M1iW9qEigyV62vQ9XldpNoTvVu6HHJlcWJQLl4YX6sThHtITWgH0/5tW3k8+2OTEwhq7sSkbU4pkSyMjMJVr61nP0FASf0W4O8RWIFfBjbOUf7r1nL+u5h/iwpacqLK9QSDwAhJ3B7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Zh1Pc4F6; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1747791737; c=relaxed/simple;
+	bh=MhMLsi2eNIZ43j4QiBsTiTUc0Grb7qVaIxPJrSdrGDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XiblVMMaB6gEeoZETY50KV2iPr76pYCtEpVbdV8XcNLgJb9j0LcwaRXCFiVtL/vrNTgtclsjKN1wSbTa+4ZQwMnaddf/gMR313ttnQutxpJUdjfjvrCbYqQ20U91wpXrZOGyl397wuKW9CvgbqKkn/5uCXfl2aTajU2tzqw1KTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3ZAHlz+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Zh1Pc4F6"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4b2BYg47FszlvkTy;
-	Wed, 21 May 2025 00:07:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1747786022; x=1750378023; bh=wmyUr
-	+KKtrVKkkZypa97BQ+f2uNiYgsN5H2RxHGmghw=; b=Zh1Pc4F6MTi2T1HLknbK0
-	LneeSBRBJ1YEVExH1CLF4sJ2KJXSxM2+RIiAAWg2yUkhBFiUtvbw9RNt3IEjppg9
-	PlOTe4VMTkkAdbppjYjixQGgjYLXBw45zBwcplX3nLjhAxm8H6mhr+e395KJLOvx
-	+bHeYBgMSqOtSxARj7ybrhW5KeacrCutGWT6Rk503jcjvu//1eRFVOLa4Y45jIre
-	sqrWDy55eBarlyikgiZs++UxCMmKOQAN7Ccem1PFXkV1h/A85lUdhRkHlquMs7Du
-	0ohaz0T/BtHPJK32LGKOaeQ47YHeyHst34LQNsbocxDjrxWX9/mTzi7Bcus9myLH
-	w==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id C8RG56dR8LB1; Wed, 21 May 2025 00:07:02 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3ZAHlz+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747791734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gek8JT1U5e2kAe6UT9wBM59+Qvm6pXCJ8M1w/o9kzd8=;
+	b=O3ZAHlz+GBvD/fHozfI2yroB39m0KXvfZ77amcdPvl015B6HHLHob/wszuJgCl3ipg+8+A
+	ymteCZKfoS8A6Og140Wn9T/gwkIi+cPNjDuWy/qHpDuDimRPksudVUkhF2e+loTJMefuCF
+	XI4ObAsw8bF4rdkCy4zUwqU4xflqa4w=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-483-00u3mfQUO06Yn4jwAt9W1w-1; Tue,
+ 20 May 2025 21:42:10 -0400
+X-MC-Unique: 00u3mfQUO06Yn4jwAt9W1w-1
+X-Mimecast-MFC-AGG-ID: 00u3mfQUO06Yn4jwAt9W1w_1747791729
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4b2BYZ2xRSzlvqlB;
-	Wed, 21 May 2025 00:06:57 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 3/3] blk-zoned: Do not lock zwplug->lock recursively
-Date: Tue, 20 May 2025 17:06:26 -0700
-Message-ID: <20250521000626.1314859-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-In-Reply-To: <20250521000626.1314859-1-bvanassche@acm.org>
-References: <20250521000626.1314859-1-bvanassche@acm.org>
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B6D0C195608C;
+	Wed, 21 May 2025 01:42:09 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.109])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5ADAA19560A3;
+	Wed, 21 May 2025 01:42:05 +0000 (UTC)
+Date: Wed, 21 May 2025 09:42:01 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V5 2/6] ublk: prepare for supporting to register request
+ buffer automatically
+Message-ID: <aC0vabQ_jm2b8hfq@fedora>
+References: <20250520045455.515691-1-ming.lei@redhat.com>
+ <20250520045455.515691-3-ming.lei@redhat.com>
+ <CADUfDZrLLGDf2yYSuuTnbK_WDNQCxUyCbC2bziUg7_BB3vWAtA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZrLLGDf2yYSuuTnbK_WDNQCxUyCbC2bziUg7_BB3vWAtA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-If zoned block devices are stacked and if a lower driver reports an I/O
-error, this triggers nested locking of spinlocks. Rework the zoned block
-device code such that this doesn't happen anymore. This patch fixes the
-following kernel warning:
+On Tue, May 20, 2025 at 10:40:01AM -0700, Caleb Sander Mateos wrote:
+> On Mon, May 19, 2025 at 9:55 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > UBLK_F_SUPPORT_ZERO_COPY requires ublk server to issue explicit buffer
+> > register/unregister uring_cmd for each IO, this way is not only inefficient,
+> > but also introduce dependency between buffer consumer and buffer register/
+> > unregister uring_cmd, please see tools/testing/selftests/ublk/stripe.c
+> > in which backing file IO has to be issued one by one by IOSQE_IO_LINK.
+> >
+> > Prepare for adding feature UBLK_F_AUTO_BUF_REG for addressing the existing
+> > zero copy limitation:
+> >
+> > - register request buffer automatically to ublk uring_cmd's io_uring
+> >   context before delivering io command to ublk server
+> >
+> > - unregister request buffer automatically from the ublk uring_cmd's
+> >   io_uring context when completing the request
+> >
+> > - io_uring will unregister the buffer automatically when uring is
+> >   exiting, so we needn't worry about accident exit
+> >
+> > For using this feature, ublk server has to create one sparse buffer table
+> >
+> > Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 70 ++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 64 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index ae2f47dc8224..3e56a9d267fb 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -133,6 +133,14 @@ struct ublk_uring_cmd_pdu {
+> >   */
+> >  #define UBLK_IO_FLAG_NEED_GET_DATA 0x08
+> >
+> > +/*
+> > + * request buffer is registered automatically, so we have to unregister it
+> > + * before completing this request.
+> > + *
+> > + * io_uring will unregister buffer automatically for us during exiting.
+> > + */
+> > +#define UBLK_IO_FLAG_AUTO_BUF_REG      0x10
+> > +
+> >  /* atomic RW with ubq->cancel_lock */
+> >  #define UBLK_IO_FLAG_CANCELED  0x80000000
+> >
+> > @@ -205,6 +213,7 @@ struct ublk_params_header {
+> >         __u32   types;
+> >  };
+> >
+> > +static void ublk_io_release(void *priv);
+> >  static void ublk_stop_dev_unlocked(struct ublk_device *ub);
+> >  static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
+> >  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+> > @@ -619,6 +628,11 @@ static inline bool ublk_support_zero_copy(const struct ublk_queue *ubq)
+> >         return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
+> >  }
+> >
+> > +static inline bool ublk_support_auto_buf_reg(const struct ublk_queue *ubq)
+> > +{
+> > +       return false;
+> > +}
+> > +
+> >  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+> >  {
+> >         return ubq->flags & UBLK_F_USER_COPY;
+> > @@ -626,7 +640,8 @@ static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+> >
+> >  static inline bool ublk_need_map_io(const struct ublk_queue *ubq)
+> >  {
+> > -       return !ublk_support_user_copy(ubq) && !ublk_support_zero_copy(ubq);
+> > +       return !ublk_support_user_copy(ubq) && !ublk_support_zero_copy(ubq) &&
+> > +               !ublk_support_auto_buf_reg(ubq);
+> >  }
+> >
+> >  static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
+> > @@ -637,8 +652,13 @@ static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
+> >          *
+> >          * for zero copy, request buffer need to be registered to io_uring
+> >          * buffer table, so reference is needed
+> > +        *
+> > +        * For auto buffer register, ublk server still may issue
+> > +        * UBLK_IO_COMMIT_AND_FETCH_REQ before one registered buffer is used up,
+> > +        * so reference is required too.
+> >          */
+> > -       return ublk_support_user_copy(ubq) || ublk_support_zero_copy(ubq);
+> > +       return ublk_support_user_copy(ubq) || ublk_support_zero_copy(ubq) ||
+> > +               ublk_support_auto_buf_reg(ubq);
+> >  }
+> >
+> >  static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
+> > @@ -1155,6 +1175,35 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+> >                 blk_mq_end_request(rq, BLK_STS_IOERR);
+> >  }
+> >
+> > +static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
+> > +                             unsigned int issue_flags)
+> > +{
+> > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > +       int ret;
+> > +
+> > +       ret = io_buffer_register_bvec(io->cmd, req, ublk_io_release, 0,
+> > +                                     issue_flags);
+> > +       if (ret) {
+> > +               blk_mq_end_request(req, BLK_STS_IOERR);
+> > +               return false;
+> > +       }
+> > +       /* one extra reference is dropped by ublk_io_release */
+> > +       refcount_set(&data->ref, 2);
+> > +       io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
+> > +       return true;
+> > +}
+> > +
+> > +static bool ublk_prep_auto_buf_reg(struct ublk_queue *ubq,
+> > +                                  struct request *req, struct ublk_io *io,
+> > +                                  unsigned int issue_flags)
+> > +{
+> > +       if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req))
+> > +               return ublk_auto_buf_reg(req, io, issue_flags);
+> > +
+> > +       ublk_init_req_ref(ubq, req);
+> > +       return true;
+> > +}
+> > +
+> >  static bool ublk_start_io(const struct ublk_queue *ubq, struct request *req,
+> >                           struct ublk_io *io)
+> >  {
+> > @@ -1180,7 +1229,6 @@ static bool ublk_start_io(const struct ublk_queue *ubq, struct request *req,
+> >                         mapped_bytes >> 9;
+> >         }
+> >
+> > -       ublk_init_req_ref(ubq, req);
+> >         return true;
+> >  }
+> >
+> > @@ -1226,7 +1274,8 @@ static void ublk_dispatch_req(struct ublk_queue *ubq,
+> >         if (!ublk_start_io(ubq, req, io))
+> >                 return;
+> >
+> > -       ublk_complete_io_cmd(io, req, UBLK_IO_RES_OK, issue_flags);
+> > +       if (ublk_prep_auto_buf_reg(ubq, req, io, issue_flags))
+> > +               ublk_complete_io_cmd(io, req, UBLK_IO_RES_OK, issue_flags);
+> >  }
+> >
+> >  static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
+> > @@ -1994,7 +2043,8 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+> >
+> >  static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> >                                  struct ublk_io *io, struct io_uring_cmd *cmd,
+> > -                                const struct ublksrv_io_cmd *ub_cmd)
+> > +                                const struct ublksrv_io_cmd *ub_cmd,
+> > +                                unsigned int issue_flags)
+> >  {
+> >         struct request *req = io->req;
+> >
+> > @@ -2014,6 +2064,14 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> >                 return -EINVAL;
+> >         }
+> >
+> > +       if (ublk_support_auto_buf_reg(ubq)) {
+> > +               if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
+> > +                       WARN_ON_ONCE(io_buffer_unregister_bvec(cmd, 0,
+> > +                                               issue_flags));
+> 
+> Since the io_ring_ctx is determined from the io_uring_cmd, this only
+> works if the UBLK_IO_COMMIT_AND_FETCH_REQ is submitted to the same
+> io_uring as the previous UBLK_IO_(COMMIT_AND_)FETCH_REQ for the ublk
+> I/O. It would be good to document that. And I would probably drop the
+> WARN_ON_ONCE() here, since it can be triggered from userspace.
+> 
+> Otherwise,
+> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-WARNING: possible recursive locking detected
---------------------------------------------
-kworker/6:1H/203 is trying to acquire lock:
-ffffff8881697130 (&zwplug->lock){-...}-{2:2}, at: blk_zone_write_plug_bio=
-_endio+0x144/0x290
+Thanks for the review!
 
-but task is already holding lock:
-ffffff884e99d930 (&zwplug->lock){-...}-{2:2}, at: blk_zone_wplug_bio_work=
-+0x30/0x250
+Yeah, I thought of this thing yesterday when working on TASK_NEUTEAL or
+IO_MIGRATION too, will send one fix later by tracking context id.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
 
-       CPU0
-       ----
-  lock(&zwplug->lock);
-  lock(&zwplug->lock);
 
- *** DEADLOCK ***
+Thanks,
+Ming
 
- May be due to missing lock nesting notation
-
-3 locks held by kworker/6:1H/203:
- #0: ffffff88128ed358 ((wq_completion)sde_zwplugs){+.+.}-{0:0}, at: proce=
-ss_one_work+0x1bc/0x65c
- #1: ffffffc088343d70 ((work_completion)(&zwplug->bio_work)){+.+.}-{0:0},=
- at: process_one_work+0x1e4/0x65c
- #2: ffffff884e99d930 (&zwplug->lock){-...}-{2:2}, at: blk_zone_wplug_bio=
-_work+0x30/0x250
-
-stack backtrace:
-Workqueue: sde_zwplugs blk_zone_wplug_bio_work
-Call trace:
- dump_backtrace+0xfc/0x17c
- show_stack+0x18/0x28
- dump_stack_lvl+0x40/0xa0
- dump_stack+0x18/0x24
- print_deadlock_bug+0x38c/0x398
- __lock_acquire+0x13e8/0x2e1c
- lock_acquire+0x134/0x2b4
- _raw_spin_lock_irqsave+0x5c/0x80
- blk_zone_write_plug_bio_endio+0x144/0x290
- bio_endio+0x9c/0x240
- __dm_io_complete+0x210/0x27c
- clone_endio+0xe8/0x214
- bio_endio+0x218/0x240
- blk_crypto_fallback_encrypt_endio+0x78/0x94
- bio_endio+0x218/0x240
- blk_zone_wplug_bio_work+0xa8/0x250
- process_one_work+0x26c/0x65c
- worker_thread+0x33c/0x498
- kthread+0x110/0x134
- ret_from_fork+0x10/0x20
-
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-zoned.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index ce5604c92fea..4bff76a06204 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -614,12 +614,11 @@ static void disk_zone_wplug_abort(struct blk_zone_w=
-plug *zwplug)
- 	pr_warn_ratelimited("%s: zone %u: Aborting plugged BIOs\n",
- 			    zwplug->disk->disk_name, zwplug->zone_no);
- 	for (;;) {
--		scoped_guard(spinlock_irqsave, &zwplug->lock) {
-+		scoped_guard(spinlock_irqsave, &zwplug->lock)
- 			bio =3D bio_list_pop(&zwplug->bio_list);
--			if (!bio)
--				break;
--			blk_zone_wplug_bio_io_error(zwplug, bio);
--		}
-+		if (!bio)
-+			break;
-+		blk_zone_wplug_bio_io_error(zwplug, bio);
- 	}
- }
-=20
-@@ -1236,8 +1235,9 @@ void blk_zone_write_plug_bio_endio(struct bio *bio)
- 	 * needing a write pointer update.
- 	 */
- 	if (bio->bi_status !=3D BLK_STS_OK) {
--		spin_lock_irqsave(&zwplug->lock, flags);
- 		disk_zone_wplug_abort(zwplug);
-+
-+		spin_lock_irqsave(&zwplug->lock, flags);
- 		zwplug->flags |=3D BLK_ZONE_WPLUG_NEED_WP_UPDATE;
- 		spin_unlock_irqrestore(&zwplug->lock, flags);
- 	}
-@@ -1288,13 +1288,12 @@ static void blk_zone_wplug_bio_work(struct work_s=
-truct *work)
- 	unsigned long flags;
- 	struct bio *bio;
-=20
-+again:
- 	/*
- 	 * Submit the next plugged BIO. If we do not have any, clear
- 	 * the plugged flag.
- 	 */
- 	spin_lock_irqsave(&zwplug->lock, flags);
--
--again:
- 	bio =3D bio_list_pop(&zwplug->bio_list);
- 	if (!bio) {
- 		zwplug->flags &=3D ~BLK_ZONE_WPLUG_PLUGGED;
-@@ -1303,6 +1302,7 @@ static void blk_zone_wplug_bio_work(struct work_str=
-uct *work)
- 	}
-=20
- 	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
-+		spin_unlock_irqrestore(&zwplug->lock, flags);
- 		blk_zone_wplug_bio_io_error(zwplug, bio);
- 		goto again;
- 	}
