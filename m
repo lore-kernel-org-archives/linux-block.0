@@ -1,153 +1,206 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E9E482EB;
-	Wed, 21 May 2025 17:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179D422173C
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 19:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747849979; cv=none; b=QZk3KGG8zer+EJVbh3+tv/ynjy3Ruj3JHfQQdmlP9pAb5iQYxMkT0IIEgszn8K9iNA2EJK4LQUT1jMc8EsizgDuJ4uC28IgTSXhQc0nEupOyhKyNv5PoxuB28bpmI95qY0+IUl3aZYXMg2+r0w1YMA+AXozxoemduYSz+j/LAU4=
+	t=1747855195; cv=none; b=eb+BNDXeOxE8dTs2dr7CSQS2CZOiTINEjETUxSkx1pUaIt2km+xC3/gHLxGkg6Wep+cp8tR5gMbykH9j6vOeThunPOYvnkqoh/24EjI2UgtKFMly1h3co1mKms/QLRmi3mD05t1gOZDjpiqB9+XwXIELNfCg7lEOMOHfv1mQ6wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747849979; c=relaxed/simple;
-	bh=ck7QO7Tkzrcu8Mua4xD9wFeA2GEWKuWofSfQBv1C58E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VgHrP5DY+Z2VNtagqs8eXv+N5QZojQBk4elobSooZjAZEvF7ID1aXSkExku4OPTyVo06QEszERyhBs8nuY5J8bc47rj0/wZW9Ia++qGlvbZns47AX2y2uE2SZeWc4jqIPgnokAEbn9IUulrHHxVaM/9MxTyJXv/eBL9jQe2xcRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LG5x+gZy; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1747855195; c=relaxed/simple;
+	bh=V4P6v1JqRC+f7XWVGOuxiZNIt4j9i7n2VtkG/XZmTpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jxO/q5oka1Wo9oHrN4n7VBW83jsPTY53hpYM6T23xDF6JHDeKUEeAjc4ZeHuD0yWr/vhunOumWTKvWG5ZoWfi2v615vvIqScarFlmpoPgHvwrhsjBsO1JrUovcv6XzKwseSWP/9RbM+/5J3Vi6K97o31h0BrT14ZTCZLD3MtbAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=G+McaRjY; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LG5x+gZy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747849978; x=1779385978;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ck7QO7Tkzrcu8Mua4xD9wFeA2GEWKuWofSfQBv1C58E=;
-  b=LG5x+gZyfPAoc5OEY1tn4XrtHZ99xK+2d6rvEUnj8jFgwzWeBOcO6asG
-   tYeOkD6F3F1Fo1NrnjqjxdJOnH2aNKO/6/c7W6s+ynWO2jyejcHHNGE3j
-   +YLpkca2Wfdt368jgx7FGcxh/VNkRoqFZsfvyfoUnmkYXIcU6avpoZwF9
-   kuNmUVB+3ELJouEO8w+IQe7nLkmVLweS56A6rUDjbVgGNZNhki/+uv9//
-   rw8WkjqRehzao8WzIcqL0dDrqzzmgGarNUYt7srlCQncinKozToE/jdvF
-   6fQm//+quBd6Ij6AnRMs7XzjsLzaeHwW2qmCcF4fIYIulXFnM11NKu70l
-   g==;
-X-CSE-ConnectionGUID: JSEXTBHKSYqsfnWFtGk3ew==
-X-CSE-MsgGUID: UmkPSB3MR22cGrbuPMPk0Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="53511758"
-X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
-   d="scan'208";a="53511758"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 10:52:57 -0700
-X-CSE-ConnectionGUID: lrlcPFBWQKmmWfCcdpzpSQ==
-X-CSE-MsgGUID: jy1ohMqXTrWggEDhB6C8Sw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
-   d="scan'208";a="140029698"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa010.jf.intel.com with ESMTP; 21 May 2025 10:52:54 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 9CF50368; Wed, 21 May 2025 20:52:52 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-parisc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Helge Deller <deller@gmx.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 1/1] floppy: Replace custom SZ_64K constant
-Date: Wed, 21 May 2025 20:50:56 +0300
-Message-ID: <20250521175246.1351596-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="G+McaRjY"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b26ed340399so661000a12.2
+        for <linux-block@vger.kernel.org>; Wed, 21 May 2025 12:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1747855192; x=1748459992; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nBVpdbkDW3ct7PyReZW89EBjBI86YhEftfTXLrbIjdA=;
+        b=G+McaRjYGiqt43FdItV0J79wa3aVFBNx2Iv2XRmPn78qOTU0NCqh/gtiPmkW3X/vv1
+         iqlbKZmAhspSOdM+pQm9cLjYBe1P5W47ttBm5CCYgBZZqRdE/0nY3AT0Vf6gZPGRsL4z
+         RcdwrPP/s0cDDkXerAAk4jUo/vj8V5HrUzwPknzFqR+6vD2hwGSOA4iL+qDK8cbVpio/
+         o6kBqzDj1W94lBVbwhtm1STuyK9c/yp6+OJS+9t2i5OIUXI+ITRo3N5548/+oTJYDCsW
+         2NDDdaLQCvbOQzF4OXMw9L+PxNxH1ow+jXYyNTu4Svuy9nvItro8xcD1rwZwoabhUPyi
+         Ghuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747855192; x=1748459992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nBVpdbkDW3ct7PyReZW89EBjBI86YhEftfTXLrbIjdA=;
+        b=rvRuync0FJ63D8IqsBku5Qpg9D5zB+KsW3w5HJA0EvsfCjiTCpf24EZ6LQYhyXwifR
+         qMw7lMZ/+lNAK3ZAmLQdu/d+O83wHyz5gCgs8AJ4J1DQHcG46mWJvcSssarrkCi7Ec4U
+         fjf0sBlKyu0D5roury2hJ0sIFMYk/p/c/otlIXUGA81ZE2DkKkkuiXaqvx0ZSJIDmb/9
+         Nlf4QUTiwfNDbKEHLXlGvNbQVFgWNsl1iWESWpp3/Xz1q7hTAKsgRJCOmv6evz6xpuGd
+         rMwrsIoNGETm7f+AxoYFHVnOCIqyEOcvi7wvBAqQYSHNXeG8xDwcQQB/MhirhmGvX/wW
+         3HdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVT4YhKoyJCvh6AzkOX8q3ob8mk1+zKUHjxYP3qjtJskIu1uAQqsIrbxRLMEQY7FO7elsAS822ZX+UjoA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcYe+1a05ghYZidYFJC0SIc83NmGJPr0qqDPF4238xw3DCggWm
+	mHqqHc6MxNXAADvoY1X1sVPulT5QYl5OvLlnAow087rdvkprPYjjSsbHwooJqpGQsboVXtthM2F
+	WEsalRQh/NzFZh1RLqLwJXMdigzievKLZ0QHY0bpTaO0i5gpO2G91UPA=
+X-Gm-Gg: ASbGncuxoTsSG3vOUjGJmqEZnInb+P+uvSbDQ1sxwmyU2NCGH2oe8cQgVtPP2TmUVIf
+	rYe2Zr51+ntdMVgC2y7DhET3ZaGcuvdYRVUu/6pBVz65eiT/aUdB9Gq45wIHzQpJdPbI4/wQvam
+	DqgMuyw1dukyhtLd08WNpDt3r/WeZFq5w=
+X-Google-Smtp-Source: AGHT+IHeSzL8NaUoui84uoaBxC8BOdS79eZHCQRKat76o98hQaH03Fy+YoagleByeIWVqtFTO/o4waHzL0s4GRfjQKU=
+X-Received: by 2002:a17:903:3316:b0:231:e331:b7d0 with SMTP id
+ d9443c01a7336-231e331bb9cmr87088265ad.10.1747855192126; Wed, 21 May 2025
+ 12:19:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250521025502.71041-1-ming.lei@redhat.com> <20250521025502.71041-3-ming.lei@redhat.com>
+In-Reply-To: <20250521025502.71041-3-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 21 May 2025 12:19:39 -0700
+X-Gm-Features: AX0GCFsVO3ZPXDJCZray4jREHZ4x_lTnHFK8P93SGPiT5swUc8QVmz_As3MTISo
+Message-ID: <CADUfDZrymgBoEMUgrQEOAA81sti+SDJ3vsdLw6Ky7bJQa2HGCQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ublk: run auto buf unregisgering in same io_ring_ctx
+ with register
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There are only two headers using the K_64 custom constant. Moreover,
-its usage tangles a code because the constant is defined in the C
-file, while users are in the headers. Replace it with well defined
-SZ_64K from sizes.h.
+There's also a typo "unregisgering" in the commit message.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
-
-This should be placed on top of
-https://lore.kernel.org/r/20250521174152.1339379-1-andriy.shevchenko@linux.intel.com
-for the dependency reason. In case some changes are needed there,
-this one may be attached to v2 of the series.
-
- arch/parisc/include/asm/floppy.h | 5 +++--
- arch/x86/include/asm/floppy.h    | 3 ++-
- drivers/block/floppy.c           | 2 --
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/parisc/include/asm/floppy.h b/arch/parisc/include/asm/floppy.h
-index df20dbef3ada..f15b69fea901 100644
---- a/arch/parisc/include/asm/floppy.h
-+++ b/arch/parisc/include/asm/floppy.h
-@@ -8,9 +8,9 @@
- #ifndef __ASM_PARISC_FLOPPY_H
- #define __ASM_PARISC_FLOPPY_H
- 
-+#include <linux/sizes.h>
- #include <linux/vmalloc.h>
- 
--
- /*
-  * The DMA channel used by the floppy controller cannot access data at
-  * addresses >= 16MB
-@@ -20,7 +20,8 @@
-  * floppy accesses go through the track buffer.
-  */
- #define _CROSS_64KB(a,s,vdma) \
--(!(vdma) && ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64))
-+	(!(vdma) && \
-+	 ((unsigned long)(a) / SZ_64K != ((unsigned long)(a) + (s) - 1) / SZ_64K))
- 
- #define SW fd_routine[use_virtual_dma&1]
- #define CSW fd_routine[can_use_virtual_dma & 1]
-diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
-index e76cb74bbed2..e7a244051c62 100644
---- a/arch/x86/include/asm/floppy.h
-+++ b/arch/x86/include/asm/floppy.h
-@@ -10,6 +10,7 @@
- #ifndef _ASM_X86_FLOPPY_H
- #define _ASM_X86_FLOPPY_H
- 
-+#include <linux/sizes.h>
- #include <linux/vmalloc.h>
- 
- /*
-@@ -22,7 +23,7 @@
-  */
- #define _CROSS_64KB(a, s, vdma)						\
- 	(!(vdma) &&							\
--	 ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64))
-+	 ((unsigned long)(a) / SZ_64K != ((unsigned long)(a) + (s) - 1) / SZ_64K))
- 
- #define SW fd_routine[use_virtual_dma & 1]
- #define CSW fd_routine[can_use_virtual_dma & 1]
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index e97432032f01..f4dc46fd25ea 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -233,8 +233,6 @@ static unsigned short virtual_dma_port = 0x3f0;
- irqreturn_t floppy_interrupt(int irq, void *dev_id);
- static int set_dor(int fdc, char mask, char data);
- 
--#define K_64	0x10000		/* 64KB */
--
- /* the following is the mask of allowed drives. By default units 2 and
-  * 3 of both floppy controllers are disabled, because switching on the
-  * motor of these drives causes system hangs on some PCI computers. drive
--- 
-2.47.2
-
+On Tue, May 20, 2025 at 7:55=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> UBLK_F_AUTO_BUF_REG requires that the buffer registered automatically
+> is unregistered in same `io_ring_ctx`, so check it explicitly.
+>
+> Meantime return the failure code if io_buffer_unregister_bvec() fails,
+> then ublk server can handle the failure in consistent way.
+>
+> Also force to clear UBLK_IO_FLAG_AUTO_BUF_REG in ublk_io_release()
+> because ublk_io_release() may be triggered not from handling
+> UBLK_IO_COMMIT_AND_FETCH_REQ, and from releasing the `io_ring_ctx`
+> for registering the buffer.
+>
+> Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provid=
+ed buf index via UBLK_F_AUTO_BUF_REG")
+> Reported-by: Caleb Sander Mateos <csander@purestorage.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c      | 35 +++++++++++++++++++++++++++++++----
+>  include/uapi/linux/ublk_cmd.h |  3 ++-
+>  2 files changed, 33 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index fcf568b89370..2af6422d6a89 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -84,6 +84,7 @@ struct ublk_rq_data {
+>
+>         /* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
+>         u16 buf_index;
+> +       unsigned long buf_ctx_id;
+>  };
+>
+>  struct ublk_uring_cmd_pdu {
+> @@ -1192,6 +1193,11 @@ static void ublk_auto_buf_reg_fallback(struct requ=
+est *req, struct ublk_io *io)
+>         refcount_set(&data->ref, 1);
+>  }
+>
+> +static unsigned long ublk_uring_cmd_ctx_id(struct io_uring_cmd *cmd)
+> +{
+> +       return (unsigned long)(cmd_to_io_kiocb(cmd)->ctx);
+> +}
+> +
+>  static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
+>                               unsigned int issue_flags)
+>  {
+> @@ -1211,6 +1217,8 @@ static bool ublk_auto_buf_reg(struct request *req, =
+struct ublk_io *io,
+>         }
+>         /* one extra reference is dropped by ublk_io_release */
+>         refcount_set(&data->ref, 2);
+> +
+> +       data->buf_ctx_id =3D ublk_uring_cmd_ctx_id(io->cmd);
+>         /* store buffer index in request payload */
+>         data->buf_index =3D pdu->buf.index;
+>         io->flags |=3D UBLK_IO_FLAG_AUTO_BUF_REG;
+> @@ -1994,6 +2002,21 @@ static void ublk_io_release(void *priv)
+>  {
+>         struct request *rq =3D priv;
+>         struct ublk_queue *ubq =3D rq->mq_hctx->driver_data;
+> +       struct ublk_io *io =3D &ubq->ios[rq->tag];
+> +
+> +       /*
+> +        * In case of UBLK_F_AUTO_BUF_REG, the `io_uring_ctx` for registe=
+ring
+> +        * this buffer may be released, so we reach here not from handlin=
+g
+> +        * `UBLK_IO_COMMIT_AND_FETCH_REQ`.
+> +        *
+> +        * Force to clear UBLK_IO_FLAG_AUTO_BUF_REG, so that ublk server
+> +        * still may complete this IO request by issuing uring_cmd from
+> +        * another `io_uring_ctx` in case that the `io_ring_ctx` for
+> +        * registering the buffer is gone
+> +        */
+> +       if (ublk_support_auto_buf_reg(ubq) &&
+> +                       (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG))
+> +               io->flags &=3D ~UBLK_IO_FLAG_AUTO_BUF_REG;
+>
+>         ublk_put_req_ref(ubq, rq);
+>  }
+> @@ -2109,14 +2132,18 @@ static int ublk_commit_and_fetch(const struct ubl=
+k_queue *ubq,
+>         }
+>
+>         if (ublk_support_auto_buf_reg(ubq)) {
+> +               struct ublk_rq_data *data =3D blk_mq_rq_to_pdu(req);
+>                 int ret;
+>
+>                 if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
+> -                       struct ublk_rq_data *data =3D blk_mq_rq_to_pdu(re=
+q);
+>
+> -                       WARN_ON_ONCE(io_buffer_unregister_bvec(cmd,
+> -                                               data->buf_index,
+> -                                               issue_flags));
+> +                       if (data->buf_ctx_id !=3D ublk_uring_cmd_ctx_id(c=
+md))
+> +                               return -EBADF;
+> +
+> +                       ret =3D io_buffer_unregister_bvec(cmd, data->buf_=
+index,
+> +                                                       issue_flags);
+> +                       if (ret)
+> +                               return ret;
+>                         io->flags &=3D ~UBLK_IO_FLAG_AUTO_BUF_REG;
+>                 }
+>
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+> index c4b9942697fc..3db604a3045e 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -226,7 +226,8 @@
+>   *
+>   * For using this feature:
+>   *
+> - * - ublk server has to create sparse buffer table
+> + * - ublk server has to create sparse buffer table on the same `io_ring_=
+ctx`
+> + *   for issuing `UBLK_IO_FETCH_REQ` and `UBLK_IO_COMMIT_AND_FETCH_REQ`
+>   *
+>   * - ublk server passes auto buf register data via uring_cmd's sqe->addr=
+,
+>   *   `struct ublk_auto_buf_reg` is populated from sqe->addr, please see
+> --
+> 2.47.0
+>
