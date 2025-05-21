@@ -1,215 +1,87 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73671D63C2;
-	Wed, 21 May 2025 14:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD24420F081
+	for <linux-block@vger.kernel.org>; Wed, 21 May 2025 14:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747838505; cv=none; b=WJprNakcLsNEttvVPA5NKbpmrEF/KsX+e2IpSQSPQRvXWPI/b1Dt+pKyQxUH1deeHmIbTfxsetxHNkNG+MBlvPSF5QVAmEnqxw+GxcWpUrhrPC58EVNSLh/4wawFbtUyaqO/Eh8m8u3DiYhP9EM5hoEjB92WlgKLcMOYxMLlbhk=
+	t=1747839209; cv=none; b=HN4xQzW2e/T86EdhHL+9+NJOtiUk/lpAMxD2UoKF5oSyU1LZAgznpj4jEfV18WomjZyVjH+e0SPLR1DixD9Q6rXOMQ3tEwNgEXHp8COyUhvWu67MNjzcjby13JlGmSPE+msWW0aKlJ88DHVnvtL1oWDRVm9kTIBmh8FcErmBL8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747838505; c=relaxed/simple;
-	bh=hKLlpeVgOZq4v7+oqNNq1AtZ+j2CGaps4Oa1MUN2Uu0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SFO6m6yM6zYAyrj5FyVBvBev0F8Eu9veN3OGd/hB4Procfm/AUlJuFh/2NhdDNCaQra18Pv3A0DaMHG/sz5Q0hGNQwNB8YwygYWbbkIkqOQ6WLTGYNGnKfV68YulXYVh9es6IQWU84XOTzMKvxDfHt2zpNjgoCYXCRXTLNDnwJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB2AF1515;
-	Wed, 21 May 2025 07:41:27 -0700 (PDT)
-Received: from [10.57.64.80] (unknown [10.57.64.80])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 01AFD3F5A1;
-	Wed, 21 May 2025 07:41:39 -0700 (PDT)
-Message-ID: <ea9543a9-36ec-47e3-9fb9-21ea350cbd93@arm.com>
-Date: Wed, 21 May 2025 15:41:38 +0100
+	s=arc-20240116; t=1747839209; c=relaxed/simple;
+	bh=7mP+gFQRMsj6qgVjfZaqJfNqJdAeHds+P/B5/2eN/dM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pGdyt5HFxykNRktiItOQJE1+yAAJxwGE8byAUPmnNlnidNi//CTkxwyhXsUHNhaaUgGmYFmxUniFy9UJp8MLc382s2rL6fxG3iLQWXyB1CB3F6J5E70pONe2vNkW6DNIhYV+Dyqp+v12iv7+liIeM5LdFvWqDGWTAj8UI/rsJZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=OOvTlXxx; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="OOvTlXxx"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b26fabda6d9so727182a12.1
+        for <linux-block@vger.kernel.org>; Wed, 21 May 2025 07:53:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1747839207; x=1748444007; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7mP+gFQRMsj6qgVjfZaqJfNqJdAeHds+P/B5/2eN/dM=;
+        b=OOvTlXxx6YnQ00EwY3dFw5UFniYiXxEJzlVwO8AnR+1SD08R5jSBXGoxEG2jy70GdB
+         lT+Hxb7sBHCc8CXlKJ/c/O7YQsLpTIRmX5JNPNGBavIPMt5M/3kceHSNOKW91oCoEoF1
+         4uJQzukw1h6TZ4oee3Zz8qEjhybBQVaLbyQsQnH7HHMe99bDM6jRclu73n4HCRtgQup8
+         08ABtItH1CB1UhvC9EbsaPGC2ERyHnHWWY7qT1NPmLn1uba3QYzA0/7TvOU18IKx6lOO
+         uGCEa9cp2OlB7MstFPGA/272nOi2tuacErcIP6+zHYCFVVnm577r4/WyoJRMPFdXvR45
+         9ctA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747839207; x=1748444007;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7mP+gFQRMsj6qgVjfZaqJfNqJdAeHds+P/B5/2eN/dM=;
+        b=dwJRjtpA9jd6QeZefCz8JT3n3qNZWpRH8pfKl+HGL9cpjBjcunDjwAKVO0FLuStwTu
+         VQl0KsZ1JzPkzm7fVwom3c3agRu+VXtD9lVJspfhFcb5KlxXL0OABCXhJRu2iWRXo6Lk
+         uB93rPh4bTkv2sdXy+WxhycMz78vcjHpKtmZP6VLdO3xCk/l5cKWGxiwwQl86FIxsIZo
+         eGAZQsQSSCItUjwhCZ6RzY/KmtCJalcEAP86B8ZgFiFGewMduQgx2ozhDE1wThTjJtUQ
+         CYGGL2nT+QHbhFWFwIM6VExy4LPNEVT1lnb7SR3BSyR5e75i2KsJvm1ke+pIsNQp4wkN
+         yDDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdIjSBVwJjZln8Mx3gW2nlWSvlU/U67seTUYGqJg0w5IxlocqUebnjp9n1HTRoU8hPTrppc814PPkmCg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzqlhi0DyMF1k41TQTlwGGx78A6g+j0TXJ9Uc/vsr5yARgcuCvE
+	qn41gcp4w3zgejYJWEaaxeKDvLOfMeFIsTd3vUQ8UI8ZBxmHWVvZgXZ8EaegGhqHlypphiue6Zh
+	vdUUCm0qYGP685mnM71zcGkp54A5bCRI5zK8mBZrUsQ==
+X-Gm-Gg: ASbGncuNqTZKegk1a4HNIK8whdsYapn9dKPwWjyibdMJvZKdzTPWwG0FiB+w1oCL7cH
+	XY4n9HK4u4oiIaDdHfNWKPw67wzlBAFco54m//KeqiWmrnA8gYAIyERV33Ya6BO4cA34by+HGOY
+	cXSiZNVABjjU3dlLj/13UoRbdaaH5uV1c=
+X-Google-Smtp-Source: AGHT+IE9Kh7474R7xasVle0Xyq5ZI52e4pZ3DRoWy3IeCXbqO/Ck85T7eNlwrRpK/IqejO0a4fBjY18kr3jIx2kp2ts=
+X-Received: by 2002:a17:903:187:b0:223:5124:ee7f with SMTP id
+ d9443c01a7336-231d45341e7mr124785975ad.12.1747839206789; Wed, 21 May 2025
+ 07:53:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] dmatest: move printing to its own routine
-To: Luis Chamberlain <mcgrof@kernel.org>, vkoul@kernel.org,
- chenxiang66@hisilicon.com, m.szyprowski@samsung.com, leon@kernel.org,
- jgg@nvidia.com, alex.williamson@redhat.com, joel.granados@kernel.org
-Cc: iommu@lists.linux.dev, dmaengine@vger.kernel.org,
- linux-block@vger.kernel.org, gost.dev@samsung.com
-References: <20250520223913.3407136-1-mcgrof@kernel.org>
- <20250520223913.3407136-4-mcgrof@kernel.org>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250520223913.3407136-4-mcgrof@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250521025502.71041-1-ming.lei@redhat.com> <20250521025502.71041-2-ming.lei@redhat.com>
+In-Reply-To: <20250521025502.71041-2-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 21 May 2025 07:53:14 -0700
+X-Gm-Features: AX0GCFsEmpt5l2dgKCYn84MZzmE99ODsZf6zbFsaQOoJNXZ7AnZPmjQvr6sD8cw
+Message-ID: <CADUfDZpefsRu1wbv2Hgi8D+ptScBz8=FQyu0YgR_MGtvcG_Wpg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ublk: handle ublk_set_auto_buf_reg() failure
+ correctly in ublk_fetch()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-05-20 11:39 pm, Luis Chamberlain wrote:
-> Move statistics printing to its own routine, and while at it, put
-> the test counters into the struct dmatest_thread for the streaming DMA
-> API to allow us to later add IOVA DMA API support and be able to
-> differentiate.
-> 
-> While at it, use a mutex to serialize output so we don't get garbled
-> messages between different threads.
-> 
-> This makes no functional changes other than serializing the output
-> and prepping us for IOVA DMA API support.
+On Tue, May 20, 2025 at 7:55=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> If ublk_set_auto_buf_reg() fails, we need to unlock and return,
+> otherwise `ub->mutex` is leaked.
+>
+> Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provid=
+ed buf index via UBLK_F_AUTO_BUF_REG")
+> Reported-by: Caleb Sander Mateos <csander@purestorage.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Um, what about subtly changing the test timing and total runtime 
-calculation, and significantly changing the output format enough to 
-almost certainly break any scripts parsing it? What definition of 
-"functional" are we using here, exactly? :/
-
-Yes I know the kernel log is not strictly ABI and parsing it is not 
-advised in general, but per 
-Documentation/driver-api/dmaengine/dmatest.rst this is still the 
-officially documented way to gather dmatest results. Also the mutex 
-doesn't prevent *other* kernel messages from being interspersed, so 
-multi-line output still isn't really stable.
-
-Thanks,
-Robin.
-
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->   drivers/dma/dmatest.c | 77 ++++++++++++++++++++++++++++++++-----------
->   1 file changed, 58 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
-> index 921d89b4d2ed..b4c129e688e3 100644
-> --- a/drivers/dma/dmatest.c
-> +++ b/drivers/dma/dmatest.c
-> @@ -92,6 +92,8 @@ static bool polled;
->   module_param(polled, bool, 0644);
->   MODULE_PARM_DESC(polled, "Use polling for completion instead of interrupts");
->   
-> +static DEFINE_MUTEX(stats_mutex);
-> +
->   /**
->    * struct dmatest_params - test parameters.
->    * @nobounce:		prevent using swiotlb buffer
-> @@ -239,6 +241,12 @@ struct dmatest_thread {
->   	bool			done;
->   	bool			pending;
->   	u8			*pq_coefs;
-> +
-> +	/* Streaming DMA statistics */
-> +	unsigned int streaming_tests;
-> +	unsigned int streaming_failures;
-> +	unsigned long long streaming_total_len;
-> +	ktime_t streaming_runtime;
->   };
->   
->   struct dmatest_chan {
-> @@ -898,6 +906,30 @@ static int dmatest_do_dma_test(struct dmatest_thread *thread,
->   	return ret;
->   }
->   
-> +static void dmatest_print_detailed_stats(struct dmatest_thread *thread)
-> +{
-> +	unsigned long long streaming_iops, streaming_kbs;
-> +	s64 streaming_runtime_us;
-> +
-> +	mutex_lock(&stats_mutex);
-> +
-> +	streaming_runtime_us = ktime_to_us(thread->streaming_runtime);
-> +	streaming_iops = dmatest_persec(streaming_runtime_us, thread->streaming_tests);
-> +	streaming_kbs = dmatest_KBs(streaming_runtime_us, thread->streaming_total_len);
-> +
-> +	pr_info("=== %s: DMA Test Results ===\n", current->comm);
-> +
-> +	/* Streaming DMA statistics */
-> +	pr_info("%s: STREAMINMG DMA: %u tests, %u failures\n",
-> +		current->comm, thread->streaming_tests, thread->streaming_failures);
-> +	pr_info("%s: STREAMING DMA: %llu.%02llu iops, %llu KB/s, %lld us total\n",
-> +		current->comm, FIXPT_TO_INT(streaming_iops), FIXPT_GET_FRAC(streaming_iops),
-> +		streaming_kbs, streaming_runtime_us);
-> +
-> +	pr_info("=== %s: End Results ===\n", current->comm);
-> +	mutex_unlock(&stats_mutex);
-> +}
-> +
->   /*
->    * This function repeatedly tests DMA transfers of various lengths and
->    * offsets for a given operation type until it is told to exit by
-> @@ -921,20 +953,22 @@ static int dmatest_func(void *data)
->   	unsigned int buf_size;
->   	u8 align;
->   	bool is_memset;
-> -	unsigned int failed_tests = 0;
-> -	unsigned int total_tests = 0;
-> -	ktime_t ktime, start;
-> +	unsigned int total_iterations = 0;
-> +	ktime_t start_time, streaming_start;
->   	ktime_t filltime = 0;
->   	ktime_t comparetime = 0;
-> -	s64 runtime = 0;
-> -	unsigned long long total_len = 0;
-> -	unsigned long long iops = 0;
->   	int ret;
->   
->   	set_freezable();
->   	smp_rmb();
->   	thread->pending = false;
->   
-> +	/* Initialize statistics */
-> +	thread->streaming_tests = 0;
-> +	thread->streaming_failures = 0;
-> +	thread->streaming_total_len = 0;
-> +	thread->streaming_runtime = 0;
-> +
->   	/* Setup test parameters and allocate buffers */
->   	ret = dmatest_setup_test(thread, &buf_size, &align, &is_memset);
->   	if (ret)
-> @@ -942,34 +976,39 @@ static int dmatest_func(void *data)
->   
->   	set_user_nice(current, 10);
->   
-> -	ktime = start = ktime_get();
-> +	start_time = ktime_get();
->   	while (!(kthread_should_stop() ||
-> -		(params->iterations && total_tests >= params->iterations))) {
-> +		(params->iterations && total_iterations >= params->iterations))) {
->   
-> +		/* Test streaming DMA path */
-> +		streaming_start = ktime_get();
->   		ret = dmatest_do_dma_test(thread, buf_size, align, is_memset,
-> -					  &total_tests, &failed_tests, &total_len,
-> +					  &thread->streaming_tests, &thread->streaming_failures,
-> +					  &thread->streaming_total_len,
->   					  &filltime, &comparetime);
-> +		thread->streaming_runtime = ktime_add(thread->streaming_runtime,
-> +						    ktime_sub(ktime_get(), streaming_start));
->   		if (ret < 0)
->   			break;
-> +
-> +		total_iterations++;
->   	}
->   
-> -	ktime = ktime_sub(ktime_get(), ktime);
-> -	ktime = ktime_sub(ktime, comparetime);
-> -	ktime = ktime_sub(ktime, filltime);
-> -	runtime = ktime_to_us(ktime);
-> +	/* Subtract fill and compare time from both paths */
-> +	thread->streaming_runtime = ktime_sub(thread->streaming_runtime,
-> +					   ktime_divns(filltime, 2));
-> +	thread->streaming_runtime = ktime_sub(thread->streaming_runtime,
-> +					   ktime_divns(comparetime, 2));
->   
->   	ret = 0;
->   	dmatest_cleanup_test(thread);
->   
->   err_thread_type:
-> -	iops = dmatest_persec(runtime, total_tests);
-> -	pr_info("%s: summary %u tests, %u failures %llu.%02llu iops %llu KB/s (%d)\n",
-> -		current->comm, total_tests, failed_tests,
-> -		FIXPT_TO_INT(iops), FIXPT_GET_FRAC(iops),
-> -		dmatest_KBs(runtime, total_len), ret);
-> +	/* Print detailed statistics */
-> +	dmatest_print_detailed_stats(thread);
->   
->   	/* terminate all transfers on specified channels */
-> -	if (ret || failed_tests)
-> +	if (ret || (thread->streaming_failures))
->   		dmaengine_terminate_sync(chan);
->   
->   	thread->done = true;
-
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
