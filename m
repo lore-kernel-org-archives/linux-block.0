@@ -1,375 +1,410 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE8428C86F;
-	Thu, 22 May 2025 14:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747925764; cv=fail; b=e74zWvBqJeVDm/NZLje4eUdU57eMnE1mos0TZSDYMpcY4PPujXcboiUA+6bghWuysQ1/2feAE4ScZ3lLaLXeFGkIK67TQ2o6rcWyGMuqUlJkoXT/u7cql1yFuuebcojAcGJXFQS06AW9AeG2pn4CRAKuGd+WTMrsDM2nWUBGN+A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747925764; c=relaxed/simple;
-	bh=qaO1+/H7t3CAcQjIR0jYIQjXyd+5iPZ3MyyStgl54U8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lqwNclXA/i5zEkSGBOnmxEaQiSAh9vBTCXhZ+c94ft13vwZi6H/9LZ/5mUa2xC5iKB+xykxlb/9ODmhCv30IGLINRWjPhdOEUhgeSFeYw8ZEENAXRq/Hp4fZoCp9pZJ6hHvbKW8epFHJGSILh2ejmUDt2EtW5Pjdz0rqsuIaFMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KKnUicN6; arc=fail smtp.client-ip=40.107.220.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E0C28F92F
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 15:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747926481; cv=none; b=BnR0FG6dSZ/jNr16z+iaqjC/dYBXGffCN33p/gdzrt2vorHV1XRgG6/iTEtR2G/cG36ZmvGQbkNh9aFvoRn73OPuKUHfvkrFtV43oDeI02ErxtBrkvBSMxr0SEUO8x+0O40EiQcFDmwqcPkmFWmS2ofaaGjaHSqC20LNRZyZ0jM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747926481; c=relaxed/simple;
+	bh=EeuSDgqVKj63XH/BsGOarDmziKxpR2gx3k140iln9W4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Q/njEBTFh82Fud9slhwslfpeMsy4wxcmFV0ky5Iv8OBn0X3EA9hyTyvvCAo4ortFkz+Ik4NIkdxVvSzks5/wdH5jDkpyrL1620KBX7KWLxX73SD0btLNvUoYFTw6ONscu6GteUgHIAGc7MKpNDzYHaaDSI++n7K0BSqXliyWdJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GAtNb+kj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KKnUicN6"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iqfC8ttgX7S/vJMRykRZQivw8NyxR74le83fg2piqezuK6PZ13SXAlOVXBzfR1gBIp470Eg7rznxk3i/3kexx9DkbnuzjtBPedW5M6TXK6ZB4akIfbKIgM3dlCaJ4kbFXEQr6C+SkqqAjMjI2+Bf+j9cgIw83Tq+RtEYIjPjDLsG1/31jKYqG0E01VQlmh9unR6bPy/SFFjOD0ZnOf/qK/QLf24ycygIbyBXf5KlDejMRoUD3iAJUg49g9bvlu3EGU43WC5QkNyXdxoTEo93vXADT+++r1BskBCAdrS3H0aDax0GKnqQbjUMvDwMrgC301XQ/10ehFnZZpsi4K8PiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qaO1+/H7t3CAcQjIR0jYIQjXyd+5iPZ3MyyStgl54U8=;
- b=oTG+2v8ZInJXgzFznkJ87/I6S9Z60pp7RqB4rmefoEH3sxv9N91mtRyjrtLRbWWZQFTdyfWJ/iLnsMp1Ui8CjSOfK++DAh7LG6eszaWLeGsTHF2VRPj7Vk7r/WH1y118EOlQTwTU9780HiN+lPTmucuVWt7lr+3MEnOPjBugDIToHbNZ5cpsEmEFJMgsFKhLcghC8nsHgu2Y36Kr6CSDmEqNf/uYVtHb+czy5+OXnsi6H8HSiqYY6+1CPI+sVJhfKjdavLXY9oIIBVnjsVfgdayZQgzrJpvjeGPe8tJjqIf9zYY6SmIEtzmVRcw67eiEENzqgQycR4EaBMo7gBOh9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qaO1+/H7t3CAcQjIR0jYIQjXyd+5iPZ3MyyStgl54U8=;
- b=KKnUicN6SI14jfun7+dbrm5ePLp0Z/3yyooysBt8xz2H4s6tcDu4OH1Etn+9pe/sVmFYJ7Mwf4V2G1H1nu0S5UJeThcGUfmvN6mTdt4sSuBwA4ofXfxtVhIFV4udgRR6GsLJz3YPLBUseXcnXNaKWu9bgWUHkzLQ3wVF7xMW7RjzNtb9y4wd/o2lJHI40k5pCR7dd7qbla+b28qCZFCSaW1YMKKZ2wM86WUBGugAOktN1a/7OS9tmTRmjsk9yPZlsfs/K3PUjxzIrvlR/WbzRArKU5yJx2UaR1i2RznoG0wmfZetsXDQerdqwcXbXr/GnomzHyGazZ9EF1j5DgbMfw==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by SN7PR12MB6670.namprd12.prod.outlook.com (2603:10b6:806:26e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.21; Thu, 22 May
- 2025 14:55:55 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd%5]) with mapi id 15.20.8699.026; Thu, 22 May 2025
- 14:55:55 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "NBU-Contact-Li Rongqing (EXTERNAL)"
-	<lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, Max Gurtovoy <mgurtovoy@nvidia.com>, Israel Rukshin
-	<israelr@nvidia.com>
-Subject: RE: [PATCH v1] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Topic: [PATCH v1] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Index: AQHbyhrdL96Oqawka0G+Ryv5JzR6PLPdLOKAgADGdwCAAMY0gIAAAtjg
-Date: Thu, 22 May 2025 14:55:55 +0000
-Message-ID:
- <CY8PR12MB71958DFA8D0043DA3842B93ADC99A@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250521062744.1361774-1-parav@nvidia.com>
- <20250521145635.GA120766@fedora>
- <CY8PR12MB7195DE1F8F11675CD2584D22DC99A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CAJSP0QXxspELYnToMuP1w86rayQgPDRccVo892C258y9UbH_Hg@mail.gmail.com>
-In-Reply-To:
- <CAJSP0QXxspELYnToMuP1w86rayQgPDRccVo892C258y9UbH_Hg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|SN7PR12MB6670:EE_
-x-ms-office365-filtering-correlation-id: 9e2b37dd-e6bf-44fc-e7af-08dd9940c15b
-x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZDRIalU2NmN4NTRySGl0cFp5cFArajFOWFFDcENlamM3WnFqQ1luUUF4NE9O?=
- =?utf-8?B?aXlhdkh6d2hybGFoVmhodXhudTVJcHF6SmxBL1h0Y0F4U0RjSkY1ZXViazR4?=
- =?utf-8?B?a052UGJPcUdLT3FDUXROVUd2U1NwdlltbXhoZUtUdTY5djlvWXg3YlM3cVBI?=
- =?utf-8?B?emtTbkdkeFRFUHp1UlIwYVdobm9XcFpmaE12VjlmYmZRT05jNXBta3c2N2lF?=
- =?utf-8?B?b0EyMHpsc0VYZUVFVWJ2Wmg3QnpOdjdaN3dqVWhIU0l5OW9PVVR5OXZFb21Q?=
- =?utf-8?B?RHAxQ1B2NGpsc3U4VUw5SWlibDhkSDRRb2dIVDlIdzR6SUtSOEk5T0s5bnNT?=
- =?utf-8?B?cGhNMmxZTDNEYjJQNWdjbWZiUDJPQ3MwN05SaVNmS1BBemk3dzhWMlNVUDkr?=
- =?utf-8?B?UDZibU5VZUUvcG0zSzUyenVOWFJRR1pNNVQwdW4waUE5SnZvOGl5aU1RQS9T?=
- =?utf-8?B?TFdGdElnRUpCTmNDRnhkYk5GbGR6QnI2SUtPYU85WDBWWFA4SlJoZWJDMVdq?=
- =?utf-8?B?bmtwVWFPT0VMbkFsVDA3anE2RTJSNXVLYlFLd1B4R0pyakVJUlhmWDNTTkU1?=
- =?utf-8?B?NWJTaDB6OU9zRk1tT0xPcmVYTGU1cmlCSFNMTklGajBmUE9QaGhqWkFRRDFh?=
- =?utf-8?B?RUNzN0JJSUV3ODlpVjFYNU1LSThOVDZETXoxWE5WTVJLS211U25ST0hlUHds?=
- =?utf-8?B?dEFrWERVOGZKZVBLQTVLa0o5ZGdrWktNR1hZYjhmZ1lsQUZud2l6d3pLcGRR?=
- =?utf-8?B?cDV4SHQveWVRZDdDQ3ZFTEtGeGJxZHIvV0w3UmNBUzNIWWxhc2hUZGxVVUNV?=
- =?utf-8?B?czR0MDNETmFEaENCdEVIL245UDVJam1COGpXRDNCZ1JzTXJDVmd0ZGdLRWhD?=
- =?utf-8?B?LzZ6UVFUbGgxd1ZlSDZNTC9SdHBNNkxWaFFtcG1ZS29ic0VlM3oyeWprRk8v?=
- =?utf-8?B?bUdMU1U1bDMyY0NvZkdseGI5RS9lblZmVlBwcm00QWd0ajRpWVZFMUlFTldy?=
- =?utf-8?B?RWpEOXRmcmYyS0Y0b29zbG5BQ0g1RTRISm1FNSt6Zjc2QlV3MGkydVJ4Ykpl?=
- =?utf-8?B?N3lGQm5KVlhlaWM0c01ZMjhES1VCN3Z0cjM2TUJneGNVeEZhVDZ5Y1FyNzho?=
- =?utf-8?B?eGdyY3hkQXVLRTJFNGlid0Q4YnVtYzVGUE1KRTVheXRJOGxxVVkxSUNSNnA2?=
- =?utf-8?B?OURwM1IrT25VVm5qK2dMR0dXTVNYallPZ3hick1NY2pQMmp0RzZRUXFoM1NT?=
- =?utf-8?B?L0k2OXRtYlVNdFBwTXEzQ1hJS28xNGloMW4vWkVWVjdEMmxWWUNSbHVjQ1pU?=
- =?utf-8?B?YVZWeVRzWFVzbWo0TnlRUytNRkE4UXBYZGxucnBTSzlZTkNhUXJXd01LR0Nk?=
- =?utf-8?B?aUgrRDRGNm9YQThpeDBUd0ZEUUM1aklQaW5LU1ZBaDZkZHloZ0V6M1N0VDcz?=
- =?utf-8?B?Q3NyTFU3V3ZjTElESTVkYmlYVDdlWG9qMkVLUnJiWXIxWjNpeUNnYjVCbjVM?=
- =?utf-8?B?UGg0WnJieDVoejM5YjkwRlVvQnBZRjlmeEFLTC9vRzM5S2YvbzIvVXA3eFJ6?=
- =?utf-8?B?QVBZV21aTms0R2FZYjhXcENhYWdUWGIwZll5VlBzM1pMZHh4ZlhMdkpjK0VQ?=
- =?utf-8?B?NmRzWTE0WlNjZ0o1K3dFenZmbktIY1lpSDZHUVRlVDRmelVwcFRUUUxYZVNL?=
- =?utf-8?B?U1lZMVY3Z1ozaFNRNmp1UlhGRHQweFdKeWdlcHNsMjg3bk4zMFFVbFVHcmRZ?=
- =?utf-8?B?UCsvUm1VRi9ZNlNveTZ2d2dCb1pUSUY4UEtNZ1h3cnBPMlJPVlk2VUxnN3BK?=
- =?utf-8?B?dUtiNlpMMTdSSGFXWUhRQmkyeWVkUjhRaW5mYkZjMHpid3pZcDdPNk00SGZs?=
- =?utf-8?B?d1pTdUpFN3BNOHdkVU1ublNaOU1wQldVVitkMUwvNktOeS94YitJTVZUWXlh?=
- =?utf-8?B?YkZ6cVVhN2tvaDBhLzhOLzFoY0Q2RkJNdTJPeWtLZElac2tmS2E5RVJIRjlu?=
- =?utf-8?Q?vtpIThHMH3/enWB60Wht6QYkzXsKzY=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?c1FscURSR0k5eXYzNHlaWFdYWjEwOGp5ZVhzZEQraWZRM2JLMnFNTnlWeUtl?=
- =?utf-8?B?TUlBMnczd3ZOSjcvUGh2UmVTRmRpeVlEb0dBQlNZeWJaaDdKYnZER3FRVm42?=
- =?utf-8?B?UlN5R0VYbEZKQlVJTFVmcWpDcC9jQWJSWnQ0S0MrMUwybys5dEhYejRMWmx3?=
- =?utf-8?B?ZXNZVisvUWVmejg1YXViNVpYR1ZHcUkrMGFERTY4MVFNZUZoNk10OUFJcXgz?=
- =?utf-8?B?dzNsQmU5Q3BHbG5xQjE5R0V4a3lRN2hXNEV4TlpYVG1IV3RxODU0REhwYWo1?=
- =?utf-8?B?aFRPVnp5ZlhlMG9STHRpRWk5MjRGeGtRWU5UYkhNd0pnakxsUDA2OWlMYzI0?=
- =?utf-8?B?Q2RNYUViOVVTTUVjQ3p0ODVtKzRDZjRLMXFydENHRmJ4WE82ZWcydlp6MkxK?=
- =?utf-8?B?eTBHMmtYZ1BybXd1QllrVHB0cGNTWTYwaFRCWjgrNE5HWk9SM0NYVHN1cmxx?=
- =?utf-8?B?ZXNOOEhoRkEyd29nL1NZQlJpeTVMeXJtcUtMRlY1NkhCcmFWNFBpSk9GYWtl?=
- =?utf-8?B?Q25HRlBadm0vL1U5aXUyb3cvTU9SYm9IQTUrUGlGSFhTNFZRUXQySVNOMDc0?=
- =?utf-8?B?WkdsajY4NzNRaFVDeU1oSlYvYzBhcGpEVjNSd3prcHpqaCtQSVUyQy9kS3hF?=
- =?utf-8?B?N05ya0FZNkNRaGowdXVLdmFHcmViZ21KS2dSUnliWWVxY2hBaUZqYmQxL3dY?=
- =?utf-8?B?OWxkRGMyelQwT3Azd2JwSk51TG9uTEIxcDBxa25lN3UrdDZIbEhBVHBNMXhE?=
- =?utf-8?B?dDkxaTRLTGxZZi9NVmhqS1ZlTUExOG03VkdFNFd2cUcybVRrRlU2bjFFOCtl?=
- =?utf-8?B?S1p6NDZWUWlhUnBwZ1FrQmMxamNKR0FQcUtSZGNQamtxaFpxRHJhTjl1MitR?=
- =?utf-8?B?RDhqNFMrdDgzWjBEMjNieFcwN29VWWl0MTAydHR0UDB0MVgwVnRkTjhyT2th?=
- =?utf-8?B?bTVSeUJqTWVVdVRmUDNxT2Uvc2RtMnVaaVVTTUxqMHhBYldxaEV6NW1lMUVM?=
- =?utf-8?B?eHdFcktoYWt4SnpiZ3VoYnAvY0tMVGlFcUFCNUZGSkFrMi9LUXI2OTB5MHNo?=
- =?utf-8?B?dHVLTCtLOFJjZS8vRjYwMEZNRHBVMXo1djczOEJkVExEbFhyVkdLTmZMUi9M?=
- =?utf-8?B?bjVDUDdiTUpNcHFXWDZPcS9tS2d1RytvVTROeGJsR09PVmJUN1ZzV3AxSG5S?=
- =?utf-8?B?NDNoakh5Q3Zzd2toa0xLUTE5N1pqVFFjZWNFSkxxRHc5ais4Wkx4REtRdG9u?=
- =?utf-8?B?OU1acDVMWFgyMXJ3UUZlR3ZCQkNPbXJDOXREalZrbjJFUFQxV00rcEhWcTlj?=
- =?utf-8?B?L0lKbHhVa0tWTVFpaXJVQnFhV2V0Wk1ScVd1a0NzU0M4aitWeWZTbDFNYnlj?=
- =?utf-8?B?VUpWZnBCYzBacU5BTzdWUjV3SWtNWE51M0xGR05xQzMxRzlLOS92eFRuL0xs?=
- =?utf-8?B?K2E2dTVLYVVJYjhOTDVEUzlqTlFXS2dFSEI4eXdobnJ5Tm4rZS9MN0ZDcUEx?=
- =?utf-8?B?T3VVc0djcnd3SDVMWGNlMVV4YVVKTDJpUDY4RTE5Y3RZdTBpMlNCOFJNOFdH?=
- =?utf-8?B?SlA2a0x2NENHa2FLRDR5bDl6RGVESHhDYzNvbU5yeGFrZTM5MWtyUUZUL3lI?=
- =?utf-8?B?dmJOa1A0cUxSMFpNSFJvY3lISjVMZFJGZmptQUVOZFhLa25oM2tCRXdNb1BN?=
- =?utf-8?B?Z08wdjZUWkovK3NTMTlwNzd3UEtyRHgxOUZ0bjdLRUdsclBkQU4rNTRFTTNl?=
- =?utf-8?B?dG5qR29pVis0U0dSS0ZIa1ZOcHZHRXVicFRYWmpsY1FSTW1BOEk1M0dMbzBG?=
- =?utf-8?B?d1RocHFDbzlORFpTNnphM3k4WUlOcDZqQkZTQlY3ZjNKWW02TzErMUphZm0y?=
- =?utf-8?B?V29EOVNtVUx3R2FLa2xpYXlQTkNYZDNGaDRzTFpuSjJjK1hWQkNxNDlKS2hG?=
- =?utf-8?B?MzAxUG1HcFl5WVlQUEZlQUJFVTcrSHZ4QlE2RXRxU2NORnBNMHdsSHlxU2c0?=
- =?utf-8?B?UnlDZ0dHTWZnL3NrYXpxVTFhNTZ5WjlHWm8rQkJRVXN3MWltUit2dDMva2Jy?=
- =?utf-8?B?amZsbnFPOCs3emJNdEdGWURMZnlsQyt3Zkp3ekxXQ3UzMmttMnRmUlc5K2dF?=
- =?utf-8?Q?R3lo=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAtNb+kj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747926478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EeuSDgqVKj63XH/BsGOarDmziKxpR2gx3k140iln9W4=;
+	b=GAtNb+kjXpoKlM3U8trmVEvhwOcYnk+wURRW8prw4RFRSIUzvootdlkijFO8sXrszEj1HG
+	Gow0LmG588SbWpYLECR2/tQ92OLZY2C1Htm8R7gDCgRT3tU01Y8y7hdyczDfvtGH6WEBVz
+	tJ5NKE61B3ZWmhTrtspz3f19HtfK9MQ=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-vi3_wTHYMUuo0pAU8WHgrQ-1; Thu, 22 May 2025 11:07:56 -0400
+X-MC-Unique: vi3_wTHYMUuo0pAU8WHgrQ-1
+X-Mimecast-MFC-AGG-ID: vi3_wTHYMUuo0pAU8WHgrQ_1747926476
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-70a5434825cso113050907b3.3
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 08:07:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747926476; x=1748531276;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EeuSDgqVKj63XH/BsGOarDmziKxpR2gx3k140iln9W4=;
+        b=gpat8DzrCts9mwcm56Aq1AgGnaYtgS3/T2wVQ/yst2pPgrrYkzYEJpYSQ4oZd8QHu3
+         nEq6E0RknBwPTRD6k05UCdefa1ZY7Nniv/44GsH6/slE255ANInFyBCAGoHjS8VAhYxK
+         XyoFr5bazL1gA6aroKJO7UjP9GN40+XloV1pKKTpSSAmP+/gNS0POizgSNiDZoRfZZJ3
+         qgy/6qpCMf4r5f69A2XIAD2fdvv0P44nm0HZr+hpLgiWJu4bXAurQBRpACjPW8tF7A2o
+         4KPKvGr6bQH4GYT+BUdUlbEZ9lDzj86QxncqLsjZ/uxzh/dNTkp/7h3fuCCRKMKoIDTq
+         NoWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqynMJ90Q8xl8N3VNlGbnDtJPaO5g80/R1VrSkxo3YEs+u3JpAbz8y/uAPlYJsPmSy9wlQUl6J6lPQZQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsYZokkSjT0STGWtqzXT9WK3ETdnWjDgpdsIukHR853FNsIC+1
+	DTPGzclEkZoiPpSb3ADwfbkHJztPqACNava7UFrtakXL1VTPEns47GeauOFxMxKFaK+SyAAnzPL
+	J+jumeK9QiSw8t81VaUDdl0CzY0IJogqbZn9zHX/MuTol588QzEjdW8WRD0kzJOI1
+X-Gm-Gg: ASbGncvZ06Xt6hSLWrmR7L3YKEZdrpKLwgcH6HNWdGFJtFhnBKkdTUwgY2o4zflAlr3
+	AUS93UUpatC0BjWkZrLjJFS7nkT0avfTxfYoK5JRZPwA6lpTXe0VhT+tQWC8GGuSRdcTxkLB/au
+	uidlPKgKXRNTUHuoe+e7ptx2l5Jf7BourkJMeWCmCRLl5jHuCbB8uLVs6QmA/jdAXFDBnLn9odC
+	gbSeX1glkOPgr6Opobcgb1bRF7Pm+D60ZKnJGKdbsejpy5SlWUHku9fTT06TbCgaiHYsQLBCQFT
+	NnhdTatiUTTMHuab4qZbbg2dutaswfIoJqQVXyvlwhvcPX5cpKa5hm+mEFv9yg==
+X-Received: by 2002:a05:690c:4c13:b0:70c:a57c:94a3 with SMTP id 00721157ae682-70ca7a070b3mr360606437b3.19.1747926476153;
+        Thu, 22 May 2025 08:07:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFEwejxGi9nhRL8K2qREaXlEOIvA5oHyKuV51mEoHSEqpfOw/2WGHKr40KQ8uc0OMSjq9xOjA==
+X-Received: by 2002:a05:690c:4c13:b0:70c:a57c:94a3 with SMTP id 00721157ae682-70ca7a070b3mr360605927b3.19.1747926475650;
+        Thu, 22 May 2025 08:07:55 -0700 (PDT)
+Received: from ?IPv6:2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a? ([2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-70ca82f8d40sm30812717b3.18.2025.05.22.08.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 May 2025 08:07:54 -0700 (PDT)
+Message-ID: <f08554fccd3d5e2c2ec4849b0a8158d63414e356.camel@redhat.com>
+Subject: Re: Sequential read from NVMe/XFS twice slower on Fedora 42 than on
+ Rocky 9.5
+From: Laurence Oberman <loberman@redhat.com>
+To: Dave Chinner <david@fromorbit.com>, Anton Gavriliuk
+ <antosha20xx@gmail.com>
+Cc: linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Date: Thu, 22 May 2025 11:07:53 -0400
+In-Reply-To: <f01719b1901f9d796837669086d7c1cd14c9922c.camel@redhat.com>
+References: 
+	<CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-QzmZBMmtr1oC=fOOgAQ@mail.gmail.com>
+	 <aBaVsli2AKbIa4We@dread.disaster.area>
+	 <CAAiJnjor+=Zn62n09f-aJw2amX2wxQOb-2TB3rea9wDCU7ONoA@mail.gmail.com>
+	 <aBfhDQ6lAPmn81j0@dread.disaster.area>
+	 <7c33f38a52ccff8b94f20c0714b60b61b061ad58.camel@redhat.com>
+	 <a1f322ab801e7f7037951578d289c5d18c6adc4d.camel@redhat.com>
+	 <f01719b1901f9d796837669086d7c1cd14c9922c.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e2b37dd-e6bf-44fc-e7af-08dd9940c15b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2025 14:55:55.6484
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sFKAX+7zRTka2M2qhUI3vNdDMcUkd0shIjhDZRifZD+3JYh7i+FDqz/RsxvcuBEwLWAZlj1Me90FUY1lbzskig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6670
 
-DQo+IEZyb206IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAZ21haWwuY29tPg0KPiBTZW50OiBU
-aHVyc2RheSwgTWF5IDIyLCAyMDI1IDg6MDYgUE0NCj4gDQo+IE9uIFdlZCwgTWF5IDIxLCAyMDI1
-IGF0IDEwOjU34oCvUE0gUGFyYXYgUGFuZGl0IDxwYXJhdkBudmlkaWEuY29tPiB3cm90ZToNCj4g
-PiA+IEZyb206IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4gPiA+IFNl
-bnQ6IFdlZG5lc2RheSwgTWF5IDIxLCAyMDI1IDg6MjcgUE0NCj4gPiA+DQo+ID4gPiBPbiBXZWQs
-IE1heSAyMSwgMjAyNSBhdCAwNjozNzo0MUFNICswMDAwLCBQYXJhdiBQYW5kaXQgd3JvdGU6DQo+
-ID4gPiA+IFdoZW4gdGhlIFBDSSBkZXZpY2UgaXMgc3VycHJpc2UgcmVtb3ZlZCwgcmVxdWVzdHMg
-bWF5IG5vdCBjb21wbGV0ZQ0KPiA+ID4gPiB0aGUgZGV2aWNlIGFzIHRoZSBWUSBpcyBtYXJrZWQg
-YXMgYnJva2VuLiBEdWUgdG8gdGhpcywgdGhlIGRpc2sNCj4gPiA+ID4gZGVsZXRpb24gaGFuZ3Mu
-DQo+ID4gPiA+DQo+ID4gPiA+IEZpeCBpdCBieSBhYm9ydGluZyB0aGUgcmVxdWVzdHMgd2hlbiB0
-aGUgVlEgaXMgYnJva2VuLg0KPiA+ID4gPg0KPiA+ID4gPiBXaXRoIHRoaXMgZml4IG5vdyBmaW8g
-Y29tcGxldGVzIHN3aWZ0bHkuDQo+ID4gPiA+IEFuIGFsdGVybmF0aXZlIG9mIElPIHRpbWVvdXQg
-aGFzIGJlZW4gY29uc2lkZXJlZCwgaG93ZXZlciB3aGVuIHRoZQ0KPiA+ID4gPiBkcml2ZXIga25v
-d3MgYWJvdXQgdW5yZXNwb25zaXZlIGJsb2NrIGRldmljZSwgc3dpZnRseSBjbGVhcmluZw0KPiA+
-ID4gPiB0aGVtIGVuYWJsZXMgdXNlcnMgYW5kIHVwcGVyIGxheWVycyB0byByZWFjdCBxdWlja2x5
-Lg0KPiA+ID4gPg0KPiA+ID4gPiBWZXJpZmllZCB3aXRoIG11bHRpcGxlIGRldmljZSB1bnBsdWcg
-aXRlcmF0aW9ucyB3aXRoIHBlbmRpbmcNCj4gPiA+ID4gcmVxdWVzdHMgaW4gdmlydGlvIHVzZWQg
-cmluZyBhbmQgc29tZSBwZW5kaW5nIHdpdGggdGhlIGRldmljZS4NCj4gPiA+ID4NCj4gPiA+ID4g
-Rml4ZXM6IDQzYmI0MGM1YjkyNiAoInZpcnRpb19wY2k6IFN1cHBvcnQgc3VycHJpc2UgcmVtb3Zh
-bCBvZg0KPiA+ID4gPiB2aXJ0aW8gcGNpIGRldmljZSIpDQo+ID4gPiA+IENjOiBzdGFibGVAdmdl
-ci5rZXJuZWwub3JnDQo+ID4gPiA+IFJlcG9ydGVkLWJ5OiBsaXJvbmdxaW5nQGJhaWR1LmNvbQ0K
-PiA+ID4gPiBDbG9zZXM6DQo+ID4gPiA+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL3ZpcnR1YWxp
-emF0aW9uL2M0NWRkNjg2OThjZDQ3MjM4YzU1ZmI3M2NhOQ0KPiA+ID4gPiBiNDc0DQo+ID4gPiA+
-IDFAYmFpZHUuY29tLw0KPiA+ID4gPiBSZXZpZXdlZC1ieTogTWF4IEd1cnRvdm95IDxtZ3VydG92
-b3lAbnZpZGlhLmNvbT4NCj4gPiA+ID4gUmV2aWV3ZWQtYnk6IElzcmFlbCBSdWtzaGluIDxpc3Jh
-ZWxyQG52aWRpYS5jb20+DQo+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFBhcmF2IFBhbmRpdCA8cGFy
-YXZAbnZpZGlhLmNvbT4NCj4gPiA+ID4gLS0tDQo+ID4gPiA+IGNoYW5nZWxvZzoNCj4gPiA+ID4g
-djAtPnYxOg0KPiA+ID4gPiAtIEZpeGVkIGNvbW1lbnRzIGZyb20gU3RlZmFuIHRvIHJlbmFtZSBh
-IGNsZWFudXAgZnVuY3Rpb24NCj4gPiA+ID4gLSBJbXByb3ZlZCBsb2dpYyBmb3IgaGFuZGxpbmcg
-YW55IG91dHN0YW5kaW5nIHJlcXVlc3RzDQo+ID4gPiA+ICAgaW4gYmlvIGxheWVyDQo+ID4gPiA+
-IC0gaW1wcm92ZWQgY2FuY2VsIGNhbGxiYWNrIHRvIHN5bmMgd2l0aCBvbmdvaW5nIGRvbmUoKQ0K
-PiA+ID4gPg0KPiA+ID4gPiAtLS0NCj4gPiA+ID4gIGRyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5j
-IHwgOTUNCj4gPiA+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4g
-PiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCA5NSBpbnNlcnRpb25zKCspDQo+ID4gPiA+DQo+ID4gPiA+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYw0KPiA+ID4gPiBiL2RyaXZl
-cnMvYmxvY2svdmlydGlvX2Jsay5jIGluZGV4IDdjZmZlYTAxZDg2OC4uNTIxMmFmZGJkM2M3DQo+
-ID4gPiA+IDEwMDY0NA0KPiA+ID4gPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYw0K
-PiA+ID4gPiArKysgYi9kcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYw0KPiA+ID4gPiBAQCAtNDM1
-LDYgKzQzNSwxMyBAQCBzdGF0aWMgYmxrX3N0YXR1c190IHZpcnRpb19xdWV1ZV9ycShzdHJ1Y3QN
-Cj4gPiA+IGJsa19tcV9od19jdHggKmhjdHgsDQo+ID4gPiA+ICAgICBibGtfc3RhdHVzX3Qgc3Rh
-dHVzOw0KPiA+ID4gPiAgICAgaW50IGVycjsNCj4gPiA+ID4NCj4gPiA+ID4gKyAgIC8qIEltbWVk
-aWF0ZWx5IGZhaWwgYWxsIGluY29taW5nIHJlcXVlc3RzIGlmIHRoZSB2cSBpcyBicm9rZW4uDQo+
-ID4gPiA+ICsgICAgKiBPbmNlIHRoZSBxdWV1ZSBpcyB1bnF1aWVzY2VkLCB1cHBlciBibG9jayBs
-YXllciBmbHVzaGVzIGFueQ0KPiA+ID4gcGVuZGluZw0KPiA+ID4gPiArICAgICogcXVldWVkIHJl
-cXVlc3RzOyBmYWlsIHRoZW0gcmlnaHQgYXdheS4NCj4gPiA+ID4gKyAgICAqLw0KPiA+ID4gPiAr
-ICAgaWYgKHVubGlrZWx5KHZpcnRxdWV1ZV9pc19icm9rZW4odmJsay0+dnFzW3FpZF0udnEpKSkN
-Cj4gPiA+ID4gKyAgICAgICAgICAgcmV0dXJuIEJMS19TVFNfSU9FUlI7DQo+ID4gPiA+ICsNCj4g
-PiA+ID4gICAgIHN0YXR1cyA9IHZpcnRibGtfcHJlcF9ycShoY3R4LCB2YmxrLCByZXEsIHZicik7
-DQo+ID4gPiA+ICAgICBpZiAodW5saWtlbHkoc3RhdHVzKSkNCj4gPiA+ID4gICAgICAgICAgICAg
-cmV0dXJuIHN0YXR1czsNCj4gPiA+ID4gQEAgLTUwOCw2ICs1MTUsMTEgQEAgc3RhdGljIHZvaWQg
-dmlydGlvX3F1ZXVlX3JxcyhzdHJ1Y3QgcnFfbGlzdA0KPiAqcnFsaXN0KQ0KPiA+ID4gPiAgICAg
-d2hpbGUgKChyZXEgPSBycV9saXN0X3BvcChycWxpc3QpKSkgew0KPiA+ID4gPiAgICAgICAgICAg
-ICBzdHJ1Y3QgdmlydGlvX2Jsa192cSAqdGhpc192cSA9IGdldF92aXJ0aW9fYmxrX3ZxKHJlcS0N
-Cj4gPiA+ID5tcV9oY3R4KTsNCj4gPiA+ID4NCj4gPiA+ID4gKyAgICAgICAgICAgaWYgKHVubGlr
-ZWx5KHZpcnRxdWV1ZV9pc19icm9rZW4odGhpc192cS0+dnEpKSkgew0KPiA+ID4gPiArICAgICAg
-ICAgICAgICAgICAgIHJxX2xpc3RfYWRkX3RhaWwoJnJlcXVldWVfbGlzdCwgcmVxKTsNCj4gPiA+
-ID4gKyAgICAgICAgICAgICAgICAgICBjb250aW51ZTsNCj4gPiA+ID4gKyAgICAgICAgICAgfQ0K
-PiA+ID4gPiArDQo+ID4gPiA+ICAgICAgICAgICAgIGlmICh2cSAmJiB2cSAhPSB0aGlzX3ZxKQ0K
-PiA+ID4gPiAgICAgICAgICAgICAgICAgICAgIHZpcnRibGtfYWRkX3JlcV9iYXRjaCh2cSwgJnN1
-Ym1pdF9saXN0KTsNCj4gPiA+ID4gICAgICAgICAgICAgdnEgPSB0aGlzX3ZxOw0KPiA+ID4gPiBA
-QCAtMTU1NCw2ICsxNTY2LDg3IEBAIHN0YXRpYyBpbnQgdmlydGJsa19wcm9iZShzdHJ1Y3QNCj4g
-PiA+ID4gdmlydGlvX2RldmljZQ0KPiA+ID4gKnZkZXYpDQo+ID4gPiA+ICAgICByZXR1cm4gZXJy
-Ow0KPiA+ID4gPiAgfQ0KPiA+ID4gPg0KPiA+ID4gPiArc3RhdGljIGJvb2wgdmlydGJsa19yZXF1
-ZXN0X2NhbmNlbChzdHJ1Y3QgcmVxdWVzdCAqcnEsIHZvaWQgKmRhdGEpIHsNCj4gPiA+ID4gKyAg
-IHN0cnVjdCB2aXJ0YmxrX3JlcSAqdmJyID0gYmxrX21xX3JxX3RvX3BkdShycSk7DQo+ID4gPiA+
-ICsgICBzdHJ1Y3QgdmlydGlvX2JsayAqdmJsayA9IGRhdGE7DQo+ID4gPiA+ICsgICBzdHJ1Y3Qg
-dmlydGlvX2Jsa192cSAqdnE7DQo+ID4gPiA+ICsgICB1bnNpZ25lZCBsb25nIGZsYWdzOw0KPiA+
-ID4gPiArDQo+ID4gPiA+ICsgICB2cSA9ICZ2YmxrLT52cXNbcnEtPm1xX2hjdHgtPnF1ZXVlX251
-bV07DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgIHNwaW5fbG9ja19pcnFzYXZlKCZ2cS0+bG9jaywg
-ZmxhZ3MpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICB2YnItPmluX2hkci5zdGF0dXMgPSBWSVJU
-SU9fQkxLX1NfSU9FUlI7DQo+ID4gPiA+ICsgICBpZiAoYmxrX21xX3JlcXVlc3Rfc3RhcnRlZChy
-cSkgJiYgIWJsa19tcV9yZXF1ZXN0X2NvbXBsZXRlZChycSkpDQo+ID4gPiA+ICsgICAgICAgICAg
-IGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KHJxKTsNCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgc3Bp
-bl91bmxvY2tfaXJxcmVzdG9yZSgmdnEtPmxvY2ssIGZsYWdzKTsNCj4gPiA+ID4gKyAgIHJldHVy
-biB0cnVlOw0KPiA+ID4gPiArfQ0KPiA+ID4gPiArDQo+ID4gPiA+ICtzdGF0aWMgdm9pZCB2aXJ0
-YmxrX2Jyb2tlbl9kZXZpY2VfY2xlYW51cChzdHJ1Y3QgdmlydGlvX2JsayAqdmJsaykgew0KPiA+
-ID4gPiArICAgc3RydWN0IHJlcXVlc3RfcXVldWUgKnEgPSB2YmxrLT5kaXNrLT5xdWV1ZTsNCj4g
-PiA+ID4gKw0KPiA+ID4gPiArICAgaWYgKCF2aXJ0cXVldWVfaXNfYnJva2VuKHZibGstPnZxc1sw
-XS52cSkpDQo+ID4gPiA+ICsgICAgICAgICAgIHJldHVybjsNCj4gPiA+DQo+ID4gPiBDYW4gYSBz
-dWJzZXQgb2YgdmlydHF1ZXVlcyBiZSBicm9rZW4/IElmIHNvLCB0aGVuIHRoaXMgY29kZSBkb2Vz
-bid0IGhhbmRsZQ0KPiBpdC4NCj4gPiBPbiBkZXZpY2UgcmVtb3ZhbCBhbGwgdGhlIFZRcyBhcmUg
-YnJva2VuLiBUaGlzIGNoZWNrIG9ubHkgdXNlcyBhIFZRIHRvIGRlY2lkZQ0KPiBvbi4NCj4gPiBJ
-biBmdXR1cmUgbWF5IGJlIG1vcmUgZWxhYm9yYXRlIEFQSSB0byBoYXZlIHZpcnRpb19kZXZfYnJv
-a2VuKCkgY2FuIGJlDQo+IGFkZGVkLg0KPiA+IFByZWZlciB0byBrZWVwIHRoaXMgcGF0Y2ggd2l0
-aG91dCBleHRlbmRpbmcgbWFueSBBUElzIGdpdmVuIGl0IGhhcyBGaXhlcyB0YWcuDQo+IA0KPiB2
-aXJ0YmxrX3JlbW92ZSgpIGlzIGNhbGxlZCBub3QganVzdCB3aGVuIGEgUENJIGRldmljZSBpcyBo
-b3QgdW5wbHVnZ2VkLiBGb3INCj4gZXhhbXBsZSwgcmVtb3ZpbmcgdGhlIHZpcnRpb19ibGsga2Vy
-bmVsIG1vZHVsZSBvciB1bmJpbmRpbmcgYSBzcGVjaWZpYyB2aXJ0aW8NCj4gZGV2aWNlIGluc3Rh
-bmNlIGFsc28gY2FsbHMgaXQuDQo+IA0KVGhpcyBpcyBvay4NCg0KPiBNeSBjb25jZXJuIGlzIHRo
-YXQgdmlydGJsa19icm9rZW5fZGV2aWNlX2NsZWFudXAoKSBpcyBvbmx5IGludGVuZGVkIGZvciB0
-aGUNCj4gY2FzZXMgd2hlcmUgYWxsIHZpcnRxdWV1ZXMgYXJlIGJyb2tlbiBvciBub25lIGFyZSBi
-cm9rZW4uIElmIGp1c3QgdGhlIGZpcnN0DQo+IHZpcnRxdWV1ZSBpcyBicm9rZW4gdGhlbiBpdCBj
-b21wbGV0ZXMgcmVxdWVzdHMgb24gb3BlcmF0aW9uYWwgdmlydHF1ZXVlcyBhbmQNCj4gdGhleSBt
-YXkgc3RpbGwgcmFpc2UgYW4gaW50ZXJydXB0Lg0KPg0KSSBzZWUgdGhhdCB2cSBicm9rZW4gaXMg
-ZXh0ZW5kZWQgZm9yIGVhY2ggcmVzZXQgc2NlbmFyaW8gdG9vIGxhdGVseSBpbiB2cF9tb2Rlcm5f
-ZW5hYmxlX3ZxX2FmdGVyX3Jlc2V0KCkuDQpTbyB5ZXMsIHRoaXMgcGF0Y2ggd2hpY2ggd2FzIGlu
-dGVuZGVkIGZvciBvcmlnaW5hbCBzdXJwcmlzZSByZW1vdmFsIGJ1ZyB3aGVyZSB2cSBicm9rZW4g
-d2FzIG5vdCBkb25lIGZvciByZXNldCBjYXNlcy4NCg0KSSBiZWxpZXZlIGZvciBmaXhpbmcgdGhl
-IGNpdGVkIHBhdGNoLCBkZXZpY2UtPmJyb2tlbiBmbGFnIHNob3VsZCBiZSB1c2VkLg0KTWF4IGlu
-ZGljYXRlZCB0aGlzIGluIGFuIGludGVybmFsIHJldmlldywgYnV0IEkgd2FzIGluY2xpbmVkIHRv
-IGF2b2lkIGFkZGluZyBtYW55IGNoYW5nZXMuDQpBbmQgaGVuY2UgcmV1c2UgdnEgYnJva2VuLg0K
-DQpTbyBvbmUgb3B0aW9uIGlzIHRvIGV4dGVuZCwNCg0KdmlydGlvX2JyZWFrX2RldmljZSgpIHRv
-IGhhdmUgYSBmbGFnIGxpa2UgYmVsb3cgYW5kIGNoZWNrIGR1cmluZyByZW1vdmUoKS4NCiAgZGV2
-LT5icm9rZW4gPSB0cnVlOw0KDQpvciB0byByZXZlcnQgdGhlIHBhdGNoLCA0M2JiNDBjNWI5MjYs
-IHdoaWNoIE1pY2hhZWwgd2FzIG5vdCBsaW5raW5nLg0KDQo+IFRoZSB1c2UtYWZ0ZXItZnJlZSBJ
-J20gdGhpbmtpbmcgYWJvdXQgaXMgd2hlbiB2aXJ0YmxrX3JlcXVlc3RfY2FuY2VsKCkNCj4gLT4g
-Li4uIC0+IGJsa19tcV9lbmRfcmVxdWVzdCgpIGhhcyBiZWVuIGNhbGxlZCBvbiBhIHZpcnRxdWV1
-ZSB0aGF0IGlzDQo+IG5vdCBicm9rZW4sIGZvbGxvd2VkIGJ5IHZpcnRibGtfZG9uZSgpIHVzaW5n
-IHRoZSBzdHJ1Y3QgcmVxdWVzdCBvYnRhaW5lZCBmcm9tDQo+IGJsa19tcV9ycV9mcm9tX3BkdSgp
-Lg0KPiANClRoaXMgY2FuIGhhcHBlbiBmb3IgY2FzZSB3aGVuIG5vbnN1cnByaXNlIHJlbW92YWwg
-aXMgZG9uZSBwb3NzaWJseS4NCg0KPiBNYXliZSBqdXN0IGFkZGluZyBhIHZpcnRxdWV1ZV9pc19i
-cm9rZW4oKSBjaGVjayBpbg0KPiB2aXJ0YmxrX3JlcXVlc3RfY2FuY2VsKCkgaXMgZW5vdWdoIHRv
-IHNraXAgcmVxdWVzdHMgdGhhdCBhcmUgc3RpbGwgaW4tZmxpZ2h0IG9uDQo+IG9wZXJhdGlvbmFs
-IHZpcnRxdWV1ZXMuDQpXZWxsLCB0aGUgaWRlYSBvZiBjYWxsaW5nIHJlcXVlc3RfY2FuY2VsKCkg
-aXRlcmF0b3Igb25seSBpZiB0aGUgVlEgaXMgYnJva2VuLg0KU28gaW4gcmVndWxhciByZW1vdmUo
-KSB0aGlzIHNob3VsZCBub3QgYmUgY2FsbGVkLiBFeGlzdGluZyBmbG93IGlzIGJldHRlci4NCg0K
-PiANCj4gPg0KPiA+ID4NCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgLyogU3RhcnQgZnJlZXppbmcg
-dGhlIHF1ZXVlLCBzbyB0aGF0IG5ldyByZXF1ZXN0cyBrZWVwcyB3YWl0bmcNCj4gPiA+ID4gK2F0
-IHRoZQ0KPiA+ID4NCj4gPiA+IHMvd2FpdG5nL3dhaXRpbmcvDQo+ID4gPg0KPiA+IEFjay4NCj4g
-Pg0KPiA+ID4gPiArICAgICogZG9vciBvZiBiaW9fcXVldWVfZW50ZXIoKS4gV2UgY2Fubm90IGZ1
-bGx5IGZyZWV6ZSB0aGUgcXVldWUNCj4gPiA+IGJlY2F1c2UNCj4gPiA+ID4gKyAgICAqIGZyZWV6
-ZWQgcXVldWUgaXMgYW4gZW1wdHkgcXVldWUgYW5kIHRoZXJlIGFyZSBwZW5kaW5nDQo+ID4gPiA+
-ICsgcmVxdWVzdHMsDQo+ID4gPiBzbw0KPiA+ID4gPiArICAgICogb25seSBzdGFydCBmcmVlemlu
-ZyBpdC4NCj4gPiA+ID4gKyAgICAqLw0KPiA+ID4gPiArICAgYmxrX2ZyZWV6ZV9xdWV1ZV9zdGFy
-dChxKTsNCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgLyogV2hlbiBxdWllc2NpbmcgY29tcGxldGVz
-LCBhbGwgb25nb2luZyBkaXNwYXRjaGVzIGhhdmUgY29tcGxldGVkDQo+ID4gPiA+ICsgICAgKiBh
-bmQgbm8gbmV3IGRpc3BhdGNoIHdpbGwgaGFwcGVuIHRvd2FyZHMgdGhlIGRyaXZlci4NCj4gPiA+
-ID4gKyAgICAqIFRoaXMgZW5zdXJlcyB0aGF0IGxhdGVyIHdoZW4gY2FuY2VsIGlzIGF0dGVtcHRl
-ZCwgdGhlbiBhcmUgbm90DQo+ID4gPiA+ICsgICAgKiBnZXR0aW5nIHByb2Nlc3NlZCBieSB0aGUg
-cXVldWVfcnEoKSBvciBxdWV1ZV9ycXMoKSBoYW5kbGVycy4NCj4gPiA+ID4gKyAgICAqLw0KPiA+
-ID4gPiArICAgYmxrX21xX3F1aWVzY2VfcXVldWUocSk7DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAg
-IC8qDQo+ID4gPiA+ICsgICAgKiBTeW5jaHJvbml6ZSB3aXRoIGFueSBvbmdvaW5nIFZRIGNhbGxi
-YWNrcywgZWZmZWN0aXZlbHkgcXVpZXNjaW5nDQo+ID4gPiA+ICsgICAgKiB0aGUgZGV2aWNlIGFu
-ZCBwcmV2ZW50aW5nIGl0IGZyb20gY29tcGxldGluZyBmdXJ0aGVyIHJlcXVlc3RzDQo+ID4gPiA+
-ICsgICAgKiB0byB0aGUgYmxvY2sgbGF5ZXIuIEFueSBvdXRzdGFuZGluZywgaW5jb21wbGV0ZSBy
-ZXF1ZXN0cyB3aWxsIGJlDQo+ID4gPiA+ICsgICAgKiBjb21wbGV0ZWQgYnkgdmlydGJsa19yZXF1
-ZXN0X2NhbmNlbCgpLg0KPiA+ID4gPiArICAgICovDQo+ID4gPiA+ICsgICB2aXJ0aW9fc3luY2hy
-b25pemVfY2JzKHZibGstPnZkZXYpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICAvKiBBdCB0aGlz
-IHBvaW50LCBubyBuZXcgcmVxdWVzdHMgY2FuIGVudGVyIHRoZSBxdWV1ZV9ycSgpIGFuZA0KPiA+
-ID4gPiArICAgICogY29tcGxldGlvbiByb3V0aW5lIHdpbGwgbm90IGNvbXBsZXRlIGFueSBuZXcg
-cmVxdWVzdHMNCj4gPiA+ID4gKyBlaXRoZXIgZm9yDQo+ID4gPiB0aGUNCj4gPiA+ID4gKyAgICAq
-IGJyb2tlbiB2cS4gSGVuY2UsIGl0IGlzIHNhZmUgdG8gY2FuY2VsIGFsbCByZXF1ZXN0cyB3aGlj
-aCBhcmUNCj4gPiA+ID4gKyAgICAqIHN0YXJ0ZWQuDQo+ID4gPiA+ICsgICAgKi8NCj4gPiA+ID4g
-KyAgIGJsa19tcV90YWdzZXRfYnVzeV9pdGVyKCZ2YmxrLT50YWdfc2V0LA0KPiA+ID4gPiArdmly
-dGJsa19yZXF1ZXN0X2NhbmNlbCwgdmJsayk7DQo+ID4gPg0KPiA+ID4gQWx0aG91Z2ggdmlydGlv
-X3N5bmNocm9uaXplX2NicygpIHdhcyBjYWxsZWQsIGEgYnJva2VuL21hbGljaW91cw0KPiA+ID4g
-ZGV2aWNlIGNhbiBzdGlsbCByYWlzZSBJUlFzLiBXb3VsZCB0aGF0IGxlYWQgdG8gdXNlLWFmdGVy
-LWZyZWUgb3INCj4gPiA+IHNpbWlsYXIgdW5kZWZpbmVkIGJlaGF2aW9yIGZvciByZXF1ZXN0cyB0
-aGF0IGhhdmUgYmVlbiBzdWJtaXR0ZWQgdG8gdGhlDQo+IGRldmljZT8NCj4gPiA+DQo+ID4gSXQg
-c2hvdWxkbid0IGJlY2F1c2UgdnJpbmdfaW50ZXJydXB0KCkgYWxzbyBjaGVja3MgZm9yIHRoZSBi
-cm9rZW4gVlEgYmVmb3JlDQo+IGludm9raW5nIHRoZSBfZG9uZSgpLg0KPiA+IE9uY2UgdGhlIFZR
-IGlzIGJyb2tlbiBhbmQgZXZlbiBpZiBfZG9uZSgpIGlzIGludm9rZWQsIGl0IHdvbnQgcHJvZ3Jl
-c3MNCj4gZnVydGhlciBvbiBnZXRfYnVmKCkuDQo+ID4gQW5kIFZRcyBhcmUgZnJlZWQgbGF0ZXIg
-aW4gZGVsX3ZxKCkgYWZ0ZXIgdGhlIGRldmljZSBpcyByZXNldCBhcyB5b3Ugc3VnZ2VzdGVkLg0K
-PiANCj4gU2VlIGFib3ZlIGFib3V0IGEgc2NlbmFyaW8gd2hlcmUgYSByYWNlIGNhbiBoYXBwZW4u
-DQo+IA0KPiA+DQo+ID4gPiBJdCBzZWVtcyBzYWZlciB0byByZXNldCB0aGUgZGV2aWNlIGJlZm9y
-ZSBtYXJraW5nIHRoZSByZXF1ZXN0cyBhcyBmYWlsZWQuDQo+ID4gPg0KPiA+IFN1Y2ggYWRkaXRp
-b24gc2hvdWxkIGJlIGF2b2lkZWQgYmVjYXVzZSB3aGVuIHRoZSBkZXZpY2UgaXMgc3VycHJpc2UN
-Cj4gcmVtb3ZlZCwgZXZlbiByZXNldCB3aWxsIG5vdCBjb21wbGV0ZS4NCj4gDQo+IFRoZSB2aXJ0
-YmxrX3JlbW92ZSgpIGZ1bmN0aW9uIG1vZGlmaWVkIGJ5IHRoaXMgcGF0Y2ggY2FsbHMNCj4gdmly
-dGlvX3Jlc2V0X2RldmljZSgpLiBJcyB0aGUgZXhwZWN0ZWQgYmVoYXZpb3IgYWZ0ZXIgdGhpcyBw
-YXRjaCB0aGF0DQo+IHZpcnRibGtfcmVtb3ZlKCkgc3BpbnMgZm9yZXZlcj8NCklmIHRoZSBQQ0kg
-ZGV2aWNlIGlzIHRydWx5IHJlbW92ZWQgcGh5c2ljYWxseSwgdGhlbiB5ZXMuDQpUaGlzIHBhdGNo
-IGlzIG5vdCBhZGRyZXNzaW5nIHN1Y2ggcHJvYmxlbSB0aGF0IGV4aXN0ZWQgZXZlbiBiZWZvcmUg
-dGhlIHBhdGNoIGluIGZpeGVzIHRhZy4NCg0KSSBoYXZlIGV4cGVyaWVuY2VkIHRoaXMgYWxyZWFk
-eS4gQWRkaW5nIHRoYXQgc3VwcG9ydCBpcyByZWxhdGl2ZWx5IGJpZ2dlciBjaGFuZ2UgKHRoYW4g
-dGhpcyBmaXgpLg0KDQo+IA0KPiA+DQo+ID4gPiA+ICsgICBibGtfbXFfdGFnc2V0X3dhaXRfY29t
-cGxldGVkX3JlcXVlc3QoJnZibGstPnRhZ19zZXQpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICAv
-KiBBbGwgcGVuZGluZyByZXF1ZXN0cyBhcmUgY2xlYW5lZCB1cC4gVGltZSB0byByZXN1bWUgc28g
-dGhhdCBkaXNrDQo+ID4gPiA+ICsgICAgKiBkZWxldGlvbiBjYW4gYmUgc21vb3RoLiBTdGFydCB0
-aGUgSFcgcXVldWVzIHNvIHRoYXQgd2hlbg0KPiA+ID4gPiArIHF1ZXVlDQo+ID4gPiBpcw0KPiA+
-ID4gPiArICAgICogdW5xdWllc2NlZCByZXF1ZXN0cyBjYW4gYWdhaW4gZW50ZXIgdGhlIGRyaXZl
-ci4NCj4gPiA+ID4gKyAgICAqLw0KPiA+ID4gPiArICAgYmxrX21xX3N0YXJ0X3N0b3BwZWRfaHdf
-cXVldWVzKHEsIHRydWUpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICAvKiBVbnF1aWVzY2luZyB3
-aWxsIHRyaWdnZXIgZGlzcGF0Y2hpbmcgYW55IHBlbmRpbmcgcmVxdWVzdHMgdG8gdGhlDQo+ID4g
-PiA+ICsgICAgKiBkcml2ZXIgd2hpY2ggaGFzIGNyb3NzZWQgYmlvX3F1ZXVlX2VudGVyKCkgdG8g
-dGhlIGRyaXZlci4NCj4gPiA+ID4gKyAgICAqLw0KPiA+ID4gPiArICAgYmxrX21xX3VucXVpZXNj
-ZV9xdWV1ZShxKTsNCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgLyogV2FpdCBmb3IgYWxsIHBlbmRp
-bmcgZGlzcGF0Y2hlcyB0byB0ZXJtaW5hdGUgd2hpY2ggbWF5IGhhdmUgYmVlbg0KPiA+ID4gPiAr
-ICAgICogaW5pdGlhdGVkIGFmdGVyIHVucXVpZXNjaW5nLg0KPiA+ID4gPiArICAgICovDQo+ID4g
-PiA+ICsgICBibGtfbXFfZnJlZXplX3F1ZXVlX3dhaXQocSk7DQo+ID4gPiA+ICsNCj4gPiA+ID4g
-KyAgIC8qIE1hcmsgdGhlIGRpc2sgZGVhZCBzbyB0aGF0IG9uY2UgcXVldWUgdW5mcmVlemUsIHRo
-ZSByZXF1ZXN0cw0KPiA+ID4gPiArICAgICogd2FpdGluZyBhdCB0aGUgZG9vciBvZiBiaW9fcXVl
-dWVfZW50ZXIoKSBjYW4gYmUgYWJvcnRlZA0KPiA+ID4gPiArIHJpZ2h0DQo+ID4gPiBhd2F5Lg0K
-PiA+ID4gPiArICAgICovDQo+ID4gPiA+ICsgICBibGtfbWFya19kaXNrX2RlYWQodmJsay0+ZGlz
-ayk7DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgIC8qIFVuZnJlZXplIHRoZSBxdWV1ZSBzbyB0aGF0
-IGFueSB3YWl0aW5nIHJlcXVlc3RzIHdpbGwgYmUgYWJvcnRlZC4NCj4gPiA+ICovDQo+ID4gPiA+
-ICsgICBibGtfbXFfdW5mcmVlemVfcXVldWVfbm9tZW1yZXN0b3JlKHEpOw0KPiA+ID4gPiArfQ0K
-PiA+ID4gPiArDQo+ID4gPiA+ICBzdGF0aWMgdm9pZCB2aXJ0YmxrX3JlbW92ZShzdHJ1Y3Qgdmly
-dGlvX2RldmljZSAqdmRldikgIHsNCj4gPiA+ID4gICAgIHN0cnVjdCB2aXJ0aW9fYmxrICp2Ymxr
-ID0gdmRldi0+cHJpdjsgQEAgLTE1NjEsNiArMTY1NCw4IEBADQo+ID4gPiA+IHN0YXRpYyB2b2lk
-IHZpcnRibGtfcmVtb3ZlKHN0cnVjdCB2aXJ0aW9fZGV2aWNlICp2ZGV2KQ0KPiA+ID4gPiAgICAg
-LyogTWFrZSBzdXJlIG5vIHdvcmsgaGFuZGxlciBpcyBhY2Nlc3NpbmcgdGhlIGRldmljZS4gKi8N
-Cj4gPiA+ID4gICAgIGZsdXNoX3dvcmsoJnZibGstPmNvbmZpZ193b3JrKTsNCj4gPiA+ID4NCj4g
-PiA+ID4gKyAgIHZpcnRibGtfYnJva2VuX2RldmljZV9jbGVhbnVwKHZibGspOw0KPiA+ID4gPiAr
-DQo+ID4gPiA+ICAgICBkZWxfZ2VuZGlzayh2YmxrLT5kaXNrKTsNCj4gPiA+ID4gICAgIGJsa19t
-cV9mcmVlX3RhZ19zZXQoJnZibGstPnRhZ19zZXQpOw0KPiA+ID4gPg0KPiA+ID4gPiAtLQ0KPiA+
-ID4gPiAyLjM0LjENCj4gPiA+ID4NCj4gPg0K
+On Mon, 2025-05-05 at 13:39 -0400, Laurence Oberman wrote:
+> On Mon, 2025-05-05 at 09:21 -0400, Laurence Oberman wrote:
+> > On Mon, 2025-05-05 at 08:29 -0400, Laurence Oberman wrote:
+> > > On Mon, 2025-05-05 at 07:50 +1000, Dave Chinner wrote:
+> > > > [cc linux-block]
+> > > >=20
+> > > > [original bug report:
+> > > > https://lore.kernel.org/linux-xfs/CAAiJnjoo0--yp47UKZhbu8sNSZN6DZ-Q=
+zmZBMmtr1oC=3DfOOgAQ@mail.gmail.com/
+> > > > =C2=A0]
+> > > >=20
+> > > > On Sun, May 04, 2025 at 10:22:58AM +0300, Anton Gavriliuk
+> > > > wrote:
+> > > > > > What's the comparitive performance of an identical read
+> > > > > > profile
+> > > > > > directly on the raw MD raid0 device?
+> > > > >=20
+> > > > > Rocky 9.5 (5.14.0-503.40.1.el9_5.x86_64)
+> > > > >=20
+> > > > > [root@localhost ~]# df -mh /mnt
+> > > > > Filesystem=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Size=C2=A0 Used Avail Us=
+e% Mounted on
+> > > > > /dev/md127=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 35T=C2=A0 1.3T=C2=
+=A0=C2=A0 34T=C2=A0=C2=A0 4% /mnt
+> > > > >=20
+> > > > > [root@localhost ~]# fio --name=3Dtest --rw=3Dread --bs=3D256k
+> > > > > --filename=3D/dev/md127 --direct=3D1 --numjobs=3D1 --iodepth=3D64=
+ --
+> > > > > exitall
+> > > > > --group_reporting --ioengine=3Dlibaio --runtime=3D30 --time_based
+> > > > > test: (g=3D0): rw=3Dread, bs=3D(R) 256KiB-256KiB, (W) 256KiB-
+> > > > > 256KiB,
+> > > > > (T)
+> > > > > 256KiB-256KiB, ioengine=3Dlibaio, iodepth=3D64
+> > > > > fio-3.39-44-g19d9
+> > > > > Starting 1 process
+> > > > > Jobs: 1 (f=3D1): [R(1)][100.0%][r=3D81.4GiB/s][r=3D334k IOPS][eta
+> > > > > 00m:00s]
+> > > > > test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D43189: Sun May=C2=
+=A0 4
+> > > > > 08:22:12
+> > > > > 2025
+> > > > > =C2=A0 read: IOPS=3D363k, BW=3D88.5GiB/s (95.1GB/s)(2656GiB/30001=
+msec)
+> > > > > =C2=A0=C2=A0=C2=A0 slat (nsec): min=3D971, max=3D312380, avg=3D18=
+17.92,
+> > > > > stdev=3D1367.75
+> > > > > =C2=A0=C2=A0=C2=A0 clat (usec): min=3D78, max=3D1351, avg=3D174.4=
+6, stdev=3D28.86
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0 lat (usec): min=3D80, max=3D1352, avg=3D=
+176.27, stdev=3D28.81
+> > > > >=20
+> > > > > Fedora 42 (6.14.5-300.fc42.x86_64)
+> > > > >=20
+> > > > > [root@localhost anton]# df -mh /mnt
+> > > > > Filesystem=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Size=C2=A0 Used Avail Us=
+e% Mounted on
+> > > > > /dev/md127=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 35T=C2=A0 1.3T=C2=
+=A0=C2=A0 34T=C2=A0=C2=A0 4% /mnt
+> > > > >=20
+> > > > > [root@localhost ~]# fio --name=3Dtest --rw=3Dread --bs=3D256k
+> > > > > --filename=3D/dev/md127 --direct=3D1 --numjobs=3D1 --iodepth=3D64=
+ --
+> > > > > exitall
+> > > > > --group_reporting --ioengine=3Dlibaio --runtime=3D30 --time_based
+> > > > > test: (g=3D0): rw=3Dread, bs=3D(R) 256KiB-256KiB, (W) 256KiB-
+> > > > > 256KiB,
+> > > > > (T)
+> > > > > 256KiB-256KiB, ioengine=3Dlibaio, iodepth=3D64
+> > > > > fio-3.39-44-g19d9
+> > > > > Starting 1 process
+> > > > > Jobs: 1 (f=3D1): [R(1)][100.0%][r=3D41.0GiB/s][r=3D168k IOPS][eta
+> > > > > 00m:00s]
+> > > > > test: (groupid=3D0, jobs=3D1): err=3D 0: pid=3D5685: Sun May=C2=
+=A0 4
+> > > > > 10:14:00
+> > > > > 2025
+> > > > > =C2=A0 read: IOPS=3D168k, BW=3D41.0GiB/s (44.1GB/s)(1231GiB/30001=
+msec)
+> > > > > =C2=A0=C2=A0=C2=A0 slat (usec): min=3D3, max=3D273, avg=3D 5.63, =
+stdev=3D 1.48
+> > > > > =C2=A0=C2=A0=C2=A0 clat (usec): min=3D67, max=3D2800, avg=3D374.9=
+9, stdev=3D29.90
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0 lat (usec): min=3D72, max=3D2914, avg=3D=
+380.62, stdev=3D30.22
+> > > >=20
+> > > > So the MD block device shows the same read performance as the
+> > > > filesystem on top of it. That means this is a regression at the
+> > > > MD
+> > > > device layer or in the block/driver layers below it. i.e. it is
+> > > > not
+> > > > an XFS of filesystem issue at all.
+> > > >=20
+> > > > -Dave.
+> > >=20
+> > > I have a lab setup, let me see if I can also reproduce and then
+> > > trace
+> > > this to see where it is spending the time
+> > >=20
+> >=20
+> >=20
+> > Not seeing 1/2 the bandwidth but also significantly slower on
+> > Fedora42
+> > kernel.
+> > I will trace it
+> >=20
+> > 9.5 kernel - 5.14.0-503.40.1.el9_5.x86_64
+> >=20
+> > Run status group 0 (all jobs):
+> > =C2=A0=C2=A0 READ: bw=3D14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8=
+GB/s-
+> > 15.8GB/s), io=3D441GiB (473GB), run=3D30003-30003msec
+> >=20
+> > Fedora42 kernel - 6.14.5-300.fc42.x86_64
+> >=20
+> > Run status group 0 (all jobs):
+> > =C2=A0=C2=A0 READ: bw=3D10.4GiB/s (11.2GB/s), 10.4GiB/s-10.4GiB/s (11.2=
+GB/s-
+> > 11.2GB/s), io=3D313GiB (336GB), run=3D30001-30001msec
+> >=20
+> >=20
+> >=20
+> >=20
+>=20
+> Fedora42 kernel issue
+>=20
+> While my difference is not as severe we do see a consistently lower
+> performance on the Fedora
+> kernel. (6.14.5-300.fc42.x86_64)
+>=20
+> When I remove the software raid and run against a single NVME we
+> converge to be much closer.
+> Also latest upstream does not show this regression either.
+>=20
+> Not sure yet what is in our Fedora kernel causing this.=20
+> We will work it via the Bugzilla
+>=20
+> Regards
+> Laurence
+>=20
+> TLDR
+>=20
+>=20
+> Fedora Kernel
+> -------------
+> root@penguin9 blktracefedora]# uname -a
+> Linux penguin9.2 6.14.5-300.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Fri
+> May
+> 2 14:16:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> 5 runs of the fio against /dev/md1
+>=20
+> [root@penguin9 ~]# for i in 1 2 3 4 5
+> > do
+> > ./run_fio.sh | grep -A1 "Run status group"
+> > done
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D11.3GiB/s (12.2GB/s), 11.3GiB/s-11.3GiB/s (12.2GB=
+/s-
+> 12.2GB/s), io=3D679GiB (729GB), run=3D60001-60001msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D11.2GiB/s (12.0GB/s), 11.2GiB/s-11.2GiB/s (12.0GB=
+/s-
+> 12.0GB/s), io=3D669GiB (718GB), run=3D60001-60001msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D11.4GiB/s (12.2GB/s), 11.4GiB/s-11.4GiB/s (12.2GB=
+/s-
+> 12.2GB/s), io=3D682GiB (733GB), run=3D60001-60001msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D11.1GiB/s (11.9GB/s), 11.1GiB/s-11.1GiB/s (11.9GB=
+/s-
+> 11.9GB/s), io=3D664GiB (713GB), run=3D60001-60001msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D11.3GiB/s (12.1GB/s), 11.3GiB/s-11.3GiB/s (12.1GB=
+/s-
+> 12.1GB/s), io=3D678GiB (728GB), run=3D60001-60001msec
+>=20
+> RHEL9.5
+> ------------
+> Linux penguin9.2 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC
+> Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> [root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1
+> "Run
+> status group"; done
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.9GiB/s (16.0GB/s), 14.9GiB/s-14.9GiB/s (16.0GB=
+/s-
+> 16.0GB/s), io=3D894GiB (960GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.6GiB/s (15.6GB/s), 14.6GiB/s-14.6GiB/s (15.6GB=
+/s-
+> 15.6GB/s), io=3D873GiB (938GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.9GiB/s (16.0GB/s), 14.9GiB/s-14.9GiB/s (16.0GB=
+/s-
+> 16.0GB/s), io=3D892GiB (958GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.5GiB/s (15.6GB/s), 14.5GiB/s-14.5GiB/s (15.6GB=
+/s-
+> 15.6GB/s), io=3D872GiB (936GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.7GiB/s (15.8GB/s), 14.7GiB/s-14.7GiB/s (15.8GB=
+/s-
+> 15.8GB/s), io=3D884GiB (950GB), run=3D60003-60003msec
+>=20
+>=20
+> Remove software raid from the layers and test just on a single nvme
+> ---------------------------------------------------------------------
+> -
+>=20
+> fio --name=3Dtest --rw=3Dread --bs=3D256k --filename=3D/dev/nvme23n1 --
+> direct=3D1
+> --numjobs=3D1 --iodepth=3D64 --exitall --group_reporting --
+> ioengine=3Dlibaio
+> --runtime=3D60 --time_based
+>=20
+> Linux penguin9.2 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC
+> Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> [root@penguin9 ~]# ./run_nvme_fio.sh
+>=20
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D3207MiB/s (3363MB/s), 3207MiB/s-3207MiB/s (3363MB=
+/s-
+> 3363MB/s), io=3D188GiB (202GB), run=3D60005-60005msec
+>=20
+>=20
+> Back to fedora kernel
+>=20
+> [root@penguin9 ~]# uname -a
+> Linux penguin9.2 6.14.5-300.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Fri
+> May
+> 2 14:16:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> Within the margin of error
+>=20
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D3061MiB/s (3210MB/s), 3061MiB/s-3061MiB/s (3210MB=
+/s-
+> 3210MB/s), io=3D179GiB (193GB), run=3D60006-60006msec
+>=20
+>=20
+> Try recent upstream kernel
+> ---------------------------
+> [root@penguin9 ~]# uname -a
+> Linux penguin9.2 6.13.0-rc7+ #2 SMP PREEMPT_DYNAMIC Mon May=C2=A0 5
+> 10:59:12
+> EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> [root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1
+> "Run
+> status group"; done
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.6GiB/s (15.7GB/s), 14.6GiB/s-14.6GiB/s (15.7GB=
+/s-
+> 15.7GB/s), io=3D876GiB (941GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.8GiB/s (15.9GB/s), 14.8GiB/s-14.8GiB/s (15.9GB=
+/s-
+> 15.9GB/s), io=3D891GiB (957GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.8GiB/s (15.9GB/s), 14.8GiB/s-14.8GiB/s (15.9GB=
+/s-
+> 15.9GB/s), io=3D890GiB (956GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.5GiB/s (15.6GB/s), 14.5GiB/s-14.5GiB/s (15.6GB=
+/s-
+> 15.6GB/s), io=3D871GiB (935GB), run=3D60003-60003msec
+>=20
+>=20
+> Update to latest upstream
+> -------------------------
+>=20
+> [root@penguin9 ~]# uname -a
+> Linux penguin9.2 6.15.0-rc5 #1 SMP PREEMPT_DYNAMIC Mon May=C2=A0 5
+> 12:18:22
+> EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+>=20
+> Single nvme device is once again fine
+>=20
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D3061MiB/s (3210MB/s), 3061MiB/s-3061MiB/s (3210MB=
+/s-
+> 3210MB/s), io=3D179GiB (193GB), run=3D60006-60006msec
+>=20
+>=20
+> [root@penguin9 ~]# for i in 1 2 3 4 5; do ./run_fio.sh | grep -A1
+> "Run
+> status group"; done
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D14.7GiB/s (15.7GB/s), 14.7GiB/s-14.7GiB/s (15.7GB=
+/s-
+> 15.7GB/s), io=3D880GiB (945GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D18.1GiB/s (19.4GB/s), 18.1GiB/s-18.1GiB/s (19.4GB=
+/s-
+> 19.4GB/s), io=3D1087GiB (1167GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D18.0GiB/s (19.4GB/s), 18.0GiB/s-18.0GiB/s (19.4GB=
+/s-
+> 19.4GB/s), io=3D1082GiB (1162GB), run=3D60003-60003msec
+> Run status group 0 (all jobs):
+> =C2=A0=C2=A0 READ: bw=3D18.2GiB/s (19.5GB/s), 18.2GiB/s-18.2GiB/s (19.5GB=
+/s-
+> 19.5GB/s), io=3D1090GiB (1170GB), run=3D60005-60005msec
+>=20
+>=20
+
+This fell of my radar, I aologize and I was on PTO last week.
+Here is the Fedora kernel to install as mentioned
+https://people.redhat.com/loberman/customer/.fedora/
+
+tar hxvf fedora_kernel.tar.xz
+rpm -ivh --force --nodeps *.rpm
+
