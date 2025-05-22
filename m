@@ -1,119 +1,165 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919E113212A;
-	Thu, 22 May 2025 09:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870392882BF
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 10:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747904597; cv=none; b=PFNSXrh10IcV7NYhS+P96pxCoUdEJOUh0whTlNq/vxvOCtRIrrxzgAxwXykJIHyBINwSAOce2jVF3au7f5N8LypM1LSpqKPCusx0V28pQtxuh7645xjNDN2zmRf78pu2Dw2ro7U3q3nmKpziWBvzLuzA7zLvZi9VloRtaNFbA+A=
+	t=1747908142; cv=none; b=e2GYSQM3yP0/iTMagawX/0EytIRyrp4YrBHOrJqw+qdLWYyeDSbBTPOsIb1LYvLHjMNBE1drvVed3PDaPVj/SVHTfd5sRJPzwEKImVuBidnZHWJZtZ5krzRxvEeqnwkYNNIWAReRui5Z1erwaLqQ+TahAlxLqXSPv5o0EoD74E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747904597; c=relaxed/simple;
-	bh=/2FzKQy6N923y+2/aYeRTf7lFGlB3ZaKNCL5XEte00g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LO6ozZayc1buD1UhtWvIy1v1PjZb72C1cDAESYcp5PHqZ2mIpMsxNGbz25UZoG/Mcj9pn/htR3DX2H4kQqEbYgxpQ3Y265y4D0DODWiw2AlX+I6tu8+87TFwT7NzRpsf44kXRkc2+gbU1KiNlKEItpEfK3R+kZvregewiGv7i9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=pankajraghav.com; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	s=arc-20240116; t=1747908142; c=relaxed/simple;
+	bh=YCqKAFDCOu2NN883QMu68eXWbXo9VQyBUVdbQgZgu7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hn7ivLj+fstF9CqyBpyW8St/dmpjlwxbyouxGPTurgzIipchtkHCuCkkzK78CFQ+RmhHi7s0T1ZdVAFqlqDo+V0GITfDdh3tuIhem6ikXKIJBZnxtWD44CCNaLjhlQ+FJ6EdleRc89SXRa31O77+MmVbe90KlfVPlMInxDPfvC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lZJ1sU2S; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Wm1VMAO4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lZJ1sU2S; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Wm1VMAO4; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lZJ1sU2S";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Wm1VMAO4";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lZJ1sU2S";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Wm1VMAO4"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4b32Pq2VNhz9t4X;
-	Thu, 22 May 2025 11:03:11 +0200 (CEST)
-From: Pankaj Raghav <p.raghav@samsung.com>
-To: Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Michal Hocko <mhocko@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nico Pache <npache@redhat.com>,
-	Dev Jain <dev.jain@arm.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Zi Yan <ziy@nvidia.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	gost.dev@samsung.com,
-	kernel@pankajraghav.com,
-	hch@lst.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	willy@infradead.org,
-	x86@kernel.org,
-	mcgrof@kernel.org,
-	Pankaj Raghav <p.raghav@samsung.com>
-Subject: [RFC v2 2/2] block: use mm_huge_zero_folio in __blkdev_issue_zero_pages()
-Date: Thu, 22 May 2025 11:02:43 +0200
-Message-ID: <20250522090243.758943-3-p.raghav@samsung.com>
-In-Reply-To: <20250522090243.758943-1-p.raghav@samsung.com>
-References: <20250522090243.758943-1-p.raghav@samsung.com>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8124C1F7EB;
+	Thu, 22 May 2025 10:02:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747908132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JoDBb4vvSd1zO76DjFxC3AGl0ZhwFnB4a9QXgghf79I=;
+	b=lZJ1sU2ST57MUiC0jr3S9fnW/cZUTJNf3sO6L0P7jkYxqCK5I7kmTILWpws+AC4k8J1Bof
+	cv9VcWPGe1EsUQ/bxAQaCjwKTnvNdcPWyBVRmZKwNBQIYuQXcrkN945r8tK52TySu26Laj
+	ONuKrBE1kpenIFQwVpJ0dnwzPojnSSo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747908132;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JoDBb4vvSd1zO76DjFxC3AGl0ZhwFnB4a9QXgghf79I=;
+	b=Wm1VMAO4npnuhPjVz1ZNKE+yGKi+lMuSlbq+dUnqgRo4ZDmYyx3KnW2hzyAHl/qkDODyTQ
+	5fdXPB06MRHW2qCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747908132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JoDBb4vvSd1zO76DjFxC3AGl0ZhwFnB4a9QXgghf79I=;
+	b=lZJ1sU2ST57MUiC0jr3S9fnW/cZUTJNf3sO6L0P7jkYxqCK5I7kmTILWpws+AC4k8J1Bof
+	cv9VcWPGe1EsUQ/bxAQaCjwKTnvNdcPWyBVRmZKwNBQIYuQXcrkN945r8tK52TySu26Laj
+	ONuKrBE1kpenIFQwVpJ0dnwzPojnSSo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747908132;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JoDBb4vvSd1zO76DjFxC3AGl0ZhwFnB4a9QXgghf79I=;
+	b=Wm1VMAO4npnuhPjVz1ZNKE+yGKi+lMuSlbq+dUnqgRo4ZDmYyx3KnW2hzyAHl/qkDODyTQ
+	5fdXPB06MRHW2qCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 63E75137B8;
+	Thu, 22 May 2025 10:02:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id KHBgFyT2LmhDOgAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 22 May 2025 10:02:12 +0000
+Message-ID: <dc0206b7-1224-409f-960c-11549722482f@suse.de>
+Date: Thu, 22 May 2025 12:02:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] block: new sector copy api
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+Cc: Keith Busch <kbusch@kernel.org>
+References: <20250521223107.709131-1-kbusch@meta.com>
+ <20250521223107.709131-2-kbusch@meta.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250521223107.709131-2-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -1.30
+X-Spamd-Result: default: False [-1.30 / 50.00];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_THREE(0.00)[4]
 
-Use mm_huge_zero_folio in __blkdev_issue_zero_pages(). Fallback to
-ZERO_PAGE if mm_huge_zero_folio is not available.
+On 5/22/25 00:31, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Provide a basic block level api to copy a range of a block device's
+> sectors to a new destination on the same device. This just reads the
+> source data into host memory, then writes it back out to the device at
+> the requested destination.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   block/blk-lib.c         | 62 +++++++++++++++++++++++++++++++++++++++++
+>   block/ioctl.c           | 30 ++++++++++++++++++++
+>   include/linux/blkdev.h  |  2 ++
+>   include/uapi/linux/fs.h |  3 ++
+>   4 files changed, 97 insertions(+)
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 4c9f20a689f7b..a819ded0ed3a9 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -368,3 +368,65 @@ int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+>   	return ret;
+>   }
+>   EXPORT_SYMBOL(blkdev_issue_secure_erase);
+> +
+> +/**
+> + * blkdev_copy - copy source sectors to a destination on the same block device
+> + * @dst_sector:	start sector of the destination to copy to
+> + * @src_sector:	start sector of the source to copy from
+> + * @nr_sects:	number of sectors to copy
+> + * @gfp:	allocation flags to use
+> + */
+> +int blkdev_copy(struct block_device *bdev, sector_t dst_sector,
+> +		sector_t src_sector, sector_t nr_sects, gfp_t gfp)
+> +{
 
-On systems that allocates mm_huge_zero_folio, we will end up sending larger
-bvecs instead of multiple small ones.
+Hmm. This interface is for copies _within_ the same bdev only.
+Shouldn't we rather expand it to have _two_ bdev arguments to
+eventually handle copies between bdevs?
+In the end the function itself wouldn't change...
 
-Noticed a 4% increase in performance on a commercial NVMe SSD which does
-not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
-gains might be bigger if the device supports bigger MDTS.
+Cheers,
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- block/blk-lib.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 4c9f20a689f7..221389412359 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -196,6 +196,12 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
- 		struct bio **biop, unsigned int flags)
- {
-+	struct folio *zero_folio;
-+
-+	zero_folio = mm_get_huge_zero_folio(NULL);
-+	if (!zero_folio)
-+		zero_folio = page_folio(ZERO_PAGE(0));
-+
- 	while (nr_sects) {
- 		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
- 		struct bio *bio;
-@@ -208,11 +214,12 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 			break;
- 
- 		do {
--			unsigned int len, added;
-+			unsigned int len, added = 0;
- 
--			len = min_t(sector_t,
--				PAGE_SIZE, nr_sects << SECTOR_SHIFT);
--			added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
-+			len = min_t(sector_t, folio_size(zero_folio),
-+				    nr_sects << SECTOR_SHIFT);
-+			if (bio_add_folio(bio, zero_folio, len, 0))
-+				added = len;
- 			if (added < len)
- 				break;
- 			nr_sects -= added >> SECTOR_SHIFT;
+Hannes
 -- 
-2.47.2
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
