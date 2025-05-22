@@ -1,138 +1,100 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F001F94D
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 13:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA1C13BAF1
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 14:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747922352; cv=none; b=s3nHHk89Wf6AEqofJqj4XbThfdFCMJjEMH4/nvTf1vMbzsi+6ARq4Ozba7Mc7MkSaImtzGZhxoUct1Z19qsv1uC4CCdbltrcVoKQBW82/b354EhYlhREN0i5Y/gHusns0XKuRalJ1UKIJD6AvSPEuMjrR3IfPatPdA8MN35Q3MM=
+	t=1747923409; cv=none; b=GSfCqvtpPI/tOd2VIQrhJ7KEkYDcyuRNjNBOzNqNCDbQyxA7oFWI3zVYmvQ0sl2KP1ZHM1PNdYAkC/b0IMyYUsdqMBbu68fyMLUEVCvjOiAPZQIseWwsW4rbnp8oTjb8VKwa/P3WVgdKC07axuqFgr59u6JXjmFVwJSwq0WvGuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747922352; c=relaxed/simple;
-	bh=sOw69SMPJxq0Gnf2Oh52R1YNDJ5a7OB7S4uGHzaDwz0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HaaOO4bpURtOwPb+rCBiiUnqzAIBhP3YjlFiBrflnfQCyHIQV4Ay0XEfBSGedzV0tKMGHpEbzx0QpKm2zRvVrrf6QQG4AdWjOKOc6EHbEMgQkuXVSYPcknYNndhWcaUM2YQzkG8yIHIliR35ktoB3yvrOB4ApKCzutxG4tAPIVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sc6TmsmX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=32M51D0T; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sc6TmsmX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=32M51D0T; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1747923409; c=relaxed/simple;
+	bh=avaoqQUXxX9oUMSN+JYXv35pK1GslmAZHtJunApYpO4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ax8AFEjt09u0huzGZ4EaGm1ujwnGtlyyqA/YkG2V0lnMe4PQG2Yakf2y87/GDYJd7nR2SRmHaTYlf6SfkxvCDcavEUNcER3eEbu1sy3UV3dL5Q1zZGliG3zThrGzouKH2pYjHOXJVG2/kD72T4oAHQ6BFKeIhxb7hzi6Pi2otOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UXMSQ13T; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sc6TmsmX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="32M51D0T";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sc6TmsmX";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="32M51D0T"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 83AED1F460;
-	Thu, 22 May 2025 13:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747922348; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kUu2tvAxGUJdCeVnccCqWAoYjCWauMy0PUQ37gdYwaQ=;
-	b=Sc6TmsmX9EYQK0KAffCif9SmbCyu7EvOC+njEM1inB77vTmZpWLhzdzLIpTXsofsS8lQWd
-	GXSwO6KLLe17nsTf3K4Y6HVOEkKgCWkEME05AiKRfvNNE2onojrGSyIcPXvsz3zg+kl0pq
-	ghEt0c7CJXUgudOC2gsq4zrMpOl36s8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747922348;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kUu2tvAxGUJdCeVnccCqWAoYjCWauMy0PUQ37gdYwaQ=;
-	b=32M51D0TPITn6ThDzi7JjYFNbRjfa9z+NnEDRflhjlL3jo98j6sEZQNcxJTAEflmVAVD41
-	fnceVO/Rl2RIh8CA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747922348; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kUu2tvAxGUJdCeVnccCqWAoYjCWauMy0PUQ37gdYwaQ=;
-	b=Sc6TmsmX9EYQK0KAffCif9SmbCyu7EvOC+njEM1inB77vTmZpWLhzdzLIpTXsofsS8lQWd
-	GXSwO6KLLe17nsTf3K4Y6HVOEkKgCWkEME05AiKRfvNNE2onojrGSyIcPXvsz3zg+kl0pq
-	ghEt0c7CJXUgudOC2gsq4zrMpOl36s8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747922348;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kUu2tvAxGUJdCeVnccCqWAoYjCWauMy0PUQ37gdYwaQ=;
-	b=32M51D0TPITn6ThDzi7JjYFNbRjfa9z+NnEDRflhjlL3jo98j6sEZQNcxJTAEflmVAVD41
-	fnceVO/Rl2RIh8CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 679C4137B8;
-	Thu, 22 May 2025 13:59:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id bmJ9GKwtL2h+DQAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 22 May 2025 13:59:08 +0000
-Message-ID: <a67c2d17-216c-4e41-be53-09200f590896@suse.de>
-Date: Thu, 22 May 2025 15:59:08 +0200
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UXMSQ13T"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b16c64b8cbcso1121842a12.3
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 07:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1747923407; x=1748528207; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=avaoqQUXxX9oUMSN+JYXv35pK1GslmAZHtJunApYpO4=;
+        b=UXMSQ13TBu2W20WqZi54ywZHJxKSwEtu8HQrhiBonfIPPBT7G78meY1GMH99N0R0Dp
+         JO9SS4Hfsmj4IhOq20ZF/BflpQ7DUUPrepSZu9bIspmIEoqpYghKV10bi4/eUiCjE7PX
+         cA9zRKvAm4OK74eV+y2NFRNhchstJ4W32kQkAzmOHMdGu01+fHUKKruQ8tDYzbj7yL0B
+         Cm8OOplltRbusGnO0RDlrdwwtx0G/4L97ZCoa8GEpKU3qZ/1t/P3hNPWzVuqkmYBjykP
+         K2MRu/NK/JQJv8ohrGMvdn6rdMUZbp8EZIwALhVxarzwO1Xl+eIYd0zIlqr1a30OFwzl
+         rH8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747923407; x=1748528207;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=avaoqQUXxX9oUMSN+JYXv35pK1GslmAZHtJunApYpO4=;
+        b=PS5UKuND75tTTDKHKOB+VBL590FoVMe8KmDWHxfmPgoayXpSeLWHSarK5NF9DZyccO
+         279WBmw4wgNuSWh9tQFXVeSGFv0yEsnVnUsGLyOBrOVoK6prH64s6BRmxfi6dsMn4Uaj
+         Lj3wo8TobkU6mv4gxJilyCNfPpVvt4HA345Your+SfH3Ptxsb32h53ZncaWqW+Q8DyuI
+         +E+eTrhGMOoZDEEbj8XQcpiyzhR1/MKXMYlD0xnw6nP+JgNnN7vG4XLQtETQGEx3qpMb
+         /CI0AzrNDXlK4cvkz+6P26nrsD8fw6aMcvF4RrLWh1o7KFbBuSJ04YpR0v4u08HNN2lF
+         CmUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmpretqKD19depcgktVr9ilW63eykhOCQqqMua89COUYg7FfLD8msF/IVEVuBt81orzjZLU4nbQ1Wsgw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YysX/8xbN5Ry4kik3Xb89aDUg7vFTWXbRRswiNbcQUIma+B+jdH
+	ePWPV+IC4/X2C2zjQFKYwOU/JwGDr5kLaCOWhoHgxPWk5Lb0AuBo2twEEHW7A8yKNL4mdCQd2W2
+	uil15B6r0N8mdRQQ+jojf5j5CE/jiXSRHNpt6wQgQGrfIGm4Oz6Fc
+X-Gm-Gg: ASbGncu6MHIQyVW9r/L6fZzoil98OZblTL/AmvFbI4PXb71vQwC59vnTLl71FAMTpGf
+	+YgIexhijh6FdQEhyGTVV5E0iPD+opxZv+qPZC6rvQJYqTcwdpekXul+Ng4iz/Blzp8az0XOnnp
+	fYK5wv7U3GWk4ZUyxTTBDN6hyh9WyjKC4=
+X-Google-Smtp-Source: AGHT+IFn230/PKJZsGRuxo11zZ+JeSHOoNGGnfIVQoI+Qv70Y452zzlcAff+q1itAyKInAytfcjBAK7DbbYzYCCyHpM=
+X-Received: by 2002:a17:903:2f43:b0:231:d156:b271 with SMTP id
+ d9443c01a7336-231d43a65e7mr131841975ad.5.1747923406935; Thu, 22 May 2025
+ 07:16:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] nvmet: implement copy support for bdev backed target
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-Cc: Keith Busch <kbusch@kernel.org>
-References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-6-kbusch@meta.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250521223107.709131-6-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
+References: <20250521223107.709131-1-kbusch@meta.com> <20250521223107.709131-4-kbusch@meta.com>
+ <CADUfDZqVeaR=15drRFvdrgGyFhyQ=FtscaZycVrQ0pd-PGei=A@mail.gmail.com>
+ <CADUfDZqC0kiLTDFv3kXNaDr25rb+6RGG3cW3r=mox2vdihpsow@mail.gmail.com>
+ <aC6Ymfrn1cZablbE@kbusch-mbp> <CADUfDZr8DJUPhLvVFK9OPSv015VDSBGNv7z_rrioHFAqOALUOg@mail.gmail.com>
+ <aC6oR90OFDSITndh@kbusch-mbp>
+In-Reply-To: <aC6oR90OFDSITndh@kbusch-mbp>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 22 May 2025 07:16:35 -0700
+X-Gm-Features: AX0GCFvNqnF_XxkcA7L7Svsfe06zE1TUnGBTF3YyWXFV7MLgXmZgc53gSM_Pbfs
+Message-ID: <CADUfDZoA2dRfzEQ-uaTUfVQ+QYa-7RGfUZGYGpCmXDJVSt97UA@mail.gmail.com>
+Subject: Re: [PATCH 3/5] nvme: add support for copy offload
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/22/25 00:31, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The nvme block device target type does not have any particular limits on
-> copy commands, so all the settings are the protocol's max.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   drivers/nvme/target/io-cmd-bdev.c | 52 +++++++++++++++++++++++++++++++
->   1 file changed, 52 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Wed, May 21, 2025 at 9:30=E2=80=AFPM Keith Busch <kbusch@kernel.org> wro=
+te:
+>
+> On Wed, May 21, 2025 at 08:41:40PM -0700, Caleb Sander Mateos wrote:
+> > For the record, that change broke Linux hosts sending DSM commands to
+> > our NVMe controller, which was validating that the SGL length exactly
+> > matches the number of data bytes implied by the command. I'm sure
+> > we're in the minority of NVMe controller vendors in aggressively
+> > validating the NVMe command parameters, but it was unfortunate to
+> > discover this change in Linux's behavior.
+>
+> This is a fabrics target you're talking about? I assume so because pci
+> would use PRP for a 4k payload, which doesn't encode transfer lengths.
+> All the offending controllers were pci, so maybe we could have
+> constrained the DSM over-allocation to that transport if we knew this
+> was causing problems for fabrics.
 
-Cheers,
+Yes, fabrics. I would be fine with always mapping the full 4K data
+length for PCI but using the exact length of the ranges for fabrics.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Best,
+Caleb
