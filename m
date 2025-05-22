@@ -1,303 +1,213 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8CA76025;
-	Thu, 22 May 2025 02:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747881000; cv=fail; b=mx/vUGasFHTAzlQqKEGQk9GProwq7814dwHMCzVjWA0xKd4ypeFEf9GIF2rRBZaQ52Ll/caFKgzvTe+zXq0P7zPHXi4oCLefdHoS3x1GoBnEmbD49qW+Ci5bsWQtiH+QZimPcfh1rvMzpENpFBXS2oJ/XmIYfMzulmRW1pG4BnU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747881000; c=relaxed/simple;
-	bh=FHKApG5/IB5zUPUQXGO5HvnvAb25dUoz10XsYm5B4BM=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:MIME-Version; b=seXI+h3+LwvGhCaeala7+6jHUigGFZguaZ3W0aCkxUE8PetYeG3OWvLEpYUSkuroRnMzIrUT4H+sp5p0kfw/lQZyaB50xa9r7I9QmdzH+vISfC+duSXms//MxRmdBwtAiyH/etIGza/ISU1XzwvwQ1b/Getv5xBVuUxJu0/fte8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SyCgdMxe; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5650645
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 02:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747881483; cv=none; b=UPuc0iN3FJNFWm2+RBlPBlfZQKVsoGrNRIiYgPgDZhn7H16Ib3vaRAEX465ZoS7YmCdJDbKvEo5IO+/UNOp9Agi9N8ie2Ny69DYlT41HR2paExGsfg8mTpkMcfnKh761VZCBwBd1Iu9OPXEzxudYOoSYSxEEsE4GGj9MhhI7ZxI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747881483; c=relaxed/simple;
+	bh=xNJ/gWU686LNShPKkCNloxayBhMCDxhFkpYzNKpfLks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fl2A9W7QT0QyEgi0QrTzAEEkikh+7JnF8Jb6xA1SSHl19kwrZ3Y3FENgO8Cj7UinbMa+si8KKXrq5a2TIc/aKyQ8iw4r57N0lIE0aPoXC/t+TprQBroyF/QJxDLYtGAD6Q6SA3tMumKrQgvLq6R1X9pLm2kU5k9zgrBf2B+ZoL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6KQk29k; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SyCgdMxe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747880999; x=1779416999;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=FHKApG5/IB5zUPUQXGO5HvnvAb25dUoz10XsYm5B4BM=;
-  b=SyCgdMxeDc5kfkDfHlOblRuThXPHW3LMFHb8dJG5sdM4ysvM9C+k8v3A
-   yVz93dGwn0KpjFZdYZFs/XD08Q5xoV9nNE32fzVY4Ms5FiPPa+kqG7a/t
-   h8pKCHZe+NbMYip+ukcfkbT5gdUI49PMoSeS/2EAb059CnPOO2bHnWgmv
-   GVb5EAzcuvzyCmQCkTx1LYiQwpPm2/ECWcSK4ndb2SiBGUu5LFLLboriB
-   uRFcX03I8xrGOvuGWZ83CnwGo0D65ogcAAoaZ4RAsOmz6EshHcK2MQ16W
-   yu25w6B6DFxjCb/BvVQ29txTkKDr/waEDf9uAQxhyHsraxTcCGoE/S3Dw
-   w==;
-X-CSE-ConnectionGUID: /VEBblnJQRWnF1z1pXm6hw==
-X-CSE-MsgGUID: 9NWuCUYhQnKxC2vyVQ+Bvg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="60936779"
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="60936779"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 19:29:59 -0700
-X-CSE-ConnectionGUID: XOxKy/OARnK75r+XgMrHfA==
-X-CSE-MsgGUID: yhmVYi55Q12gerZNgRtIMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="163629413"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 19:29:58 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 21 May 2025 19:29:57 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 21 May 2025 19:29:57 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.45) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Wed, 21 May 2025 19:29:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IOU8B5hMiJCk+HwTKJZTfKBMzdY99qKt6+dwN1qH0HtY5YyZdztRVRcDHlOwuDnjGR1YETYwWLQxNM5mhdFZ/NoZt0wu10SHYJGCWXGpHC33LiFgQMJjv44mwdP/+BNzr+h873bP/k/+H17Zhc79lrao640F3DiHgQBKG1RqoECjoRTIVxRFGyHge5NxyPghpq3c/STHxvKYkIvq3PC0Re9YDIuExg8Yr/yPw1VuvEBEvj5knW9Ivy4R96wa6sg7PExJgjIuonmX8njJQgNtKiaUBYHbKwqenm48XkJot232qTF8HekgPRDUY5tUy352h8LKV8ZIzMDl9X0A3EoDyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eihFRJ036WGABsZ0jfbhurra47veuZJ5ZRyGHBQSkwk=;
- b=TpamW+Y4AIqVW9d+vJ5noCMDnirGPPftkD39+HVMZ1W4EYBQs0MsfU4fD669B/Ie1EgBscZcfgqXGsX7X3sPxzoFoYADHR7JLMndmwIhupMrepqvIA7b9gn/icQIoNEzW9EN86YjZrz5WKjHSEGoaeIJArO2VzOMe1FfsnEBRnrbSKVwtc9Eatrf0CE797rjsU+1/2Uo/OR6zQUypJP9zmz/aj4lRy5D2U3/ixHLUQH92RqlhY5AjNFdbQdEjSaDzdDah4KyQTJhr/PMzlDJJEnndCSOji361s5o8psdc8laoKLrNuSe4ZURJWI0ssFZt23xs5DY5O+sNV+nkfvMng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
- by DM4PR11MB5245.namprd11.prod.outlook.com (2603:10b6:5:388::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.20; Thu, 22 May
- 2025 02:29:22 +0000
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c%5]) with mapi id 15.20.8746.030; Thu, 22 May 2025
- 02:29:21 +0000
-Date: Thu, 22 May 2025 10:29:10 +0800
-From: kernel test robot <oliver.sang@intel.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
-	<hare@suse.de>, Ming Lei <ming.lei@redhat.com>, <cgroups@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <oliver.sang@intel.com>
-Subject: [linus:master] [block]  245618f8e4: stress-ng.fpunch.fail
-Message-ID: <202505221030.760980df-lkp@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-ClientProxiedBy: SI1PR02CA0010.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::17) To LV3PR11MB8603.namprd11.prod.outlook.com
- (2603:10b6:408:1b6::9)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6KQk29k"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747881479;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hMNeWjFEJ1SzHHlKqxCWza0owuEpoGHEqk6xTX56r24=;
+	b=N6KQk29k5ljdxlOLI+OZTIuQDTpM9BXJpOxMybJJX7U50O6vsSk3B6TLpMv5cpm6ed3OKI
+	rCzn5W5vuYXFIkRNtiUox3iEaSRqb938H8BEkqCa1UgX97S5bymHhnMZDxt1kW1JXuu48H
+	dS7cbG/ougKRXZp2FdkQ1OjIlcdnE28=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-335-9108Oh2vPXOD4-Nz8xFRQw-1; Wed,
+ 21 May 2025 22:37:56 -0400
+X-MC-Unique: 9108Oh2vPXOD4-Nz8xFRQw-1
+X-Mimecast-MFC-AGG-ID: 9108Oh2vPXOD4-Nz8xFRQw_1747881475
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C200519560B1;
+	Thu, 22 May 2025 02:37:54 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.78])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D88B1800268;
+	Thu, 22 May 2025 02:37:50 +0000 (UTC)
+Date: Thu, 22 May 2025 10:37:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 2/2] ublk: run auto buf unregisgering in same io_ring_ctx
+ with register
+Message-ID: <aC6N9w4ijVEkHN0l@fedora>
+References: <20250521025502.71041-1-ming.lei@redhat.com>
+ <20250521025502.71041-3-ming.lei@redhat.com>
+ <CADUfDZrh+FYHgPjmF1=RRQiZFx=uYZEBJ+mJGsX-C9jM5dVi9g@mail.gmail.com>
+ <aC5y_FVe4KQoIsJo@fedora>
+ <CADUfDZoY7rC=SxpFnN6bqBg1SiBccSyYTsKAVe2Rx0wAxBdD6Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|DM4PR11MB5245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ffb24e0-5450-4fd8-1600-08dd98d8760a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?PrsRTF7jxbxkGHkRTCPkpnVqcnj2VQ/ktAyNxpnH30LYjpcqYTRtgM2ORmDc?=
- =?us-ascii?Q?AhlfDu7eOiWtXIZ6vYXpni6M8lD2s9EPDk3DxcRrKrsFFfHrZ7Kdp6dT9aF8?=
- =?us-ascii?Q?Pzwn24uSmHfP0o8Asqq5PlxD2jg19UA5VHEZnRlQ6qX53qKHeOfj9+Fqnuu6?=
- =?us-ascii?Q?sLYg9fhuyNBeqdm0mQB37cQtj2tRUITVr2B755QqY6FtKM23fDM3fsQvDDwD?=
- =?us-ascii?Q?2P/07Cdae3vqYPyBebJ62h7mhrD3nEh15uYIQDVPnCWReeNGAegWrZphEl33?=
- =?us-ascii?Q?/p7y6t1awu0gXgpH8gjwy9CpOSij2zINgKmmfKjIOOqTfQmuT/Y62G+7psll?=
- =?us-ascii?Q?KcQp37eem2gqSqUUEvFWhWjajXnNyQIgFN3sERnE4y8GnqfQTbW0XcVRFACz?=
- =?us-ascii?Q?eWZQvOnJRD2tuPSYJ7hI5eJrW5oKcuhmsGKa7GKrTWFnNneR6xEDCR3GOk0x?=
- =?us-ascii?Q?rYVwtd/rw54Gr0e3YtrM0utv6RFsWlxXLJ666XBbOqvJpXjyClBIl7h/+OBy?=
- =?us-ascii?Q?0nv+WIxRNmgp9Zu9bQTT4zkMuNJBnlVmkqAvSmZHK11yojmsjLuoV83lVsgH?=
- =?us-ascii?Q?7ICNKSDhKLZ3MXDDUyunswh2I4u5O5hg3WGgE5SjoPG906bY7f/AgqS0O5jM?=
- =?us-ascii?Q?UNRnHUtKFgZfPKHplegc84JMDsuHNx3KXgt4lrcFRV3a9qCt4x0hIJpAMfu+?=
- =?us-ascii?Q?5OiA4wcoiTFWAGU+oBkNUwW5RUp5ymKGsdm3v2zqyR0K78oVec+9noN5HTi7?=
- =?us-ascii?Q?HdRgU3+CK6GPORPK1o7PrBhvp/zic4VQu1uxAZiey2nIJnuScd+sTgQNdwUt?=
- =?us-ascii?Q?w9MWacjA+jUuFkPuvWzCXZRygMn29ehsv3yJfXIoOnWLDad/CkiQUJvnJbkt?=
- =?us-ascii?Q?/X5kjMiTrJZ2hWL3dJdGXq92Ocx24gMaohilXyGyjVuAB3beiHoYE4MJYjyw?=
- =?us-ascii?Q?u6nAGaaotBra/R4lS8YhbPWC0eqUkS8Cn6okeCY+nUvscRUcYAzZZHMxw8Nj?=
- =?us-ascii?Q?NpAV2SfhmtfblVnb16qHGiYjrlqWLCfZxHF8I1a3GhheLRoiXQnZsTCNx19K?=
- =?us-ascii?Q?q4UT/5kq0TR5RlPsh44dRxPWvQjIG08Am0w+IGlEAAd3d8orVOVCxYuHkxN8?=
- =?us-ascii?Q?HmVyruq3ZCv63T8xE8MF7gJqguGtEdEEPBjOMPgTf13AvPoYtQa+HMlKMCdy?=
- =?us-ascii?Q?fd69UIXn/RDGXOYku1Mek7nzLlhFVD7LmhosuOgsBrsnYmwu7Iug42FkR2jm?=
- =?us-ascii?Q?Udj4DXV1zyzadMOQzkhuDTb6rPObfzFZzNa/8K4BOdiLU0M6ZXqxWh2TBR91?=
- =?us-ascii?Q?0OGoF0e1w6VbiK+RnHWu+YWNMHw6Txl3Xs1jW8rgEvnPjXR7UuSuVV2ppH4v?=
- =?us-ascii?Q?r5Uas1F9OF8OWgQxyVSL2Ltgl3hg?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PfYt4oPHPyIYIyLXdKimvePUJhkiXljtz0j3IgM5YB+hCXubNUg4Lxh/ZoKD?=
- =?us-ascii?Q?TZyXUOOlqLdtEt8Nm5WEBwAGLVz+vzNuYJ4LMqS8lRQ3W9v+gbVPTh7skMU5?=
- =?us-ascii?Q?/gZ5kZZT+y2lMB3rRQOKxXNWj5ilhONb6bTb5Kvd1IjDV7bDROi7uxSEY/Yr?=
- =?us-ascii?Q?IIOoAQ/ylKXtB+1LU4XdVYDFN3znq1tnoXrZA2NlkVItbnC/nslHt4UiujcN?=
- =?us-ascii?Q?UJELNC515SwXzvlojNfMbAdPCJWb3cYlleDM+5pv+xzbjB7VeLEtLKE3EtDK?=
- =?us-ascii?Q?2RiKPaczYqsL0TMKRaSAZY7lm+o/LTii4cOx0mym5/8iXiwzprgXgOWiVDzw?=
- =?us-ascii?Q?4KpQ23Wn0AK8iFxFEgE94FU5CNG4JxR7W3bokKrK7R51cQ/mxq+enJ+t3qxz?=
- =?us-ascii?Q?f3NLAK5ZPQB8OtND1x3Gn4C7DTu3jDqcySxb6g5LI3lPMav93YjX8dfm9LbR?=
- =?us-ascii?Q?A/LDgrWQASmKnVURrkiOS4l0f7TEbJmuF0YAhR5Zv8CMxLES8MFUmK5frl2K?=
- =?us-ascii?Q?kY+1VY3gfCfYVmN4aI203X+Dhs9qc8tPwY0JLjJetzwNP8nH8srr0/qd44Nz?=
- =?us-ascii?Q?CqSoQI+aB2NuRZuTxyol9bIowSiujVkYzVwwtRuyonzLLmhhPVK1G29K7uMe?=
- =?us-ascii?Q?Icf6euFmeoYcGMiW1yo2PxXQbopxQ+z3bCT+gjP23C9DM/XA+j7jb/zqw+6F?=
- =?us-ascii?Q?YZt6uWd3CYmZ5Y51gkTkdqhIZHN2PywlbZkuWf5IxB6FQZwoary3j3tpvWAx?=
- =?us-ascii?Q?t5pCpXLsLSf2KdsI+6kW7n7oQuSESv+/OyoQNiTulpagMjHEhcWaaHJ4C5yr?=
- =?us-ascii?Q?eA5hwvatXDx2w1MveWqIceY+hYbJhwLrFlOqmwYu5UU89ZVu6xe9iJca3/KX?=
- =?us-ascii?Q?IOcG0cYwYktYcMPSBjuCQLwvWezZ+Ng4fmzRGc3dmh/WT1GyEWVszviCD/lT?=
- =?us-ascii?Q?goFrIMIwE3qbppuzQEceTg+QUnJ850XMCU9MneE5zgy1LA2rz21zIIKkMmhL?=
- =?us-ascii?Q?o4K5XsrZ8S0QTtqZFjAW3y80p+DcFL73UUCyBLmxXoFEirFP5RYh9gCT0/Jj?=
- =?us-ascii?Q?ssAXoOaOL0JXydu9Dk47jIDRKzw8yme/LwpSiFaE63X+4N0NWYFgTaKpuX8Q?=
- =?us-ascii?Q?mJMhKhg+7emYGn9D4QOcz+CWbLxJv5h/o/yikOfz9Q42EuF5E4VYu9pMexxw?=
- =?us-ascii?Q?OZloUH4eK2eeAU/7XxGGmux2SV60Sj1uK1jkhoVWobQkHh+3hJZe4XqZExRE?=
- =?us-ascii?Q?su/2/RR06hvWzK4EMeqNbco0Rx2vaGwsFvrCJXi/acs0+7Nm2Zv6kCUgBlX4?=
- =?us-ascii?Q?1eigd6jfAsG6RhG7LRt+gExt//8A8U695/UCfabioM1zBFZmUHfXcV8NolzM?=
- =?us-ascii?Q?O9EElJDxEr9L/PudCl3RJU9nB3oP/VQnZc2FKSrhF5t3Xil/QImBOndGjE7x?=
- =?us-ascii?Q?lJyP8fwqiHE7Ui4soyWgex+HzQrvy+FGdtts2kWPq/CLVkv2PG/3+Mh5ycds?=
- =?us-ascii?Q?NXBO4MK2HcsvZGCIEQ7sBTpRuxLielBrV7o1ZakkoP+pPfPXGzkvh3ZJeyuS?=
- =?us-ascii?Q?hTU+5Cr6FfBq7eybTJvv5DwtEGSw/+O+B1x+WDFZb5sGIDf96kA5v8vdTzu4?=
- =?us-ascii?Q?Mw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ffb24e0-5450-4fd8-1600-08dd98d8760a
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2025 02:29:21.8277
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3E54juvIqyBKoL5zqQBgazmvS4KWKmZDSdYJOjCRj/Ilu5xX+Z4n2k14ydnTP2LzQKIZDdOJZNL2W6CDBu2x5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5245
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZoY7rC=SxpFnN6bqBg1SiBccSyYTsKAVe2Rx0wAxBdD6Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+
+On Wed, May 21, 2025 at 06:05:14PM -0700, Caleb Sander Mateos wrote:
+> On Wed, May 21, 2025 at 5:42 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Wed, May 21, 2025 at 08:58:20AM -0700, Caleb Sander Mateos wrote:
+> > > On Tue, May 20, 2025 at 7:55 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > UBLK_F_AUTO_BUF_REG requires that the buffer registered automatically
+> > > > is unregistered in same `io_ring_ctx`, so check it explicitly.
+> > > >
+> > > > Meantime return the failure code if io_buffer_unregister_bvec() fails,
+> > > > then ublk server can handle the failure in consistent way.
+> > > >
+> > > > Also force to clear UBLK_IO_FLAG_AUTO_BUF_REG in ublk_io_release()
+> > > > because ublk_io_release() may be triggered not from handling
+> > > > UBLK_IO_COMMIT_AND_FETCH_REQ, and from releasing the `io_ring_ctx`
+> > > > for registering the buffer.
+> > > >
+> > > > Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provided buf index via UBLK_F_AUTO_BUF_REG")
+> > > > Reported-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  drivers/block/ublk_drv.c      | 35 +++++++++++++++++++++++++++++++----
+> > > >  include/uapi/linux/ublk_cmd.h |  3 ++-
+> > > >  2 files changed, 33 insertions(+), 5 deletions(-)
+> > > >
+> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > index fcf568b89370..2af6422d6a89 100644
+> > > > --- a/drivers/block/ublk_drv.c
+> > > > +++ b/drivers/block/ublk_drv.c
+> > > > @@ -84,6 +84,7 @@ struct ublk_rq_data {
+> > > >
+> > > >         /* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
+> > > >         u16 buf_index;
+> > > > +       unsigned long buf_ctx_id;
+> > > >  };
+> > > >
+> > > >  struct ublk_uring_cmd_pdu {
+> > > > @@ -1192,6 +1193,11 @@ static void ublk_auto_buf_reg_fallback(struct request *req, struct ublk_io *io)
+> > > >         refcount_set(&data->ref, 1);
+> > > >  }
+> > > >
+> > > > +static unsigned long ublk_uring_cmd_ctx_id(struct io_uring_cmd *cmd)
+> > > > +{
+> > > > +       return (unsigned long)(cmd_to_io_kiocb(cmd)->ctx);
+> > >
+> > > Is the fact that a struct io_uring_cmd * can be passed to
+> > > cmd_to_io_kiocb() an io_uring internal implementation detail? Maybe it
+> > > would be good to add a helper in include/linux/io_uring/cmd.h so ublk
+> > > isn't depending on io_uring internals.
+> >
+> > All this definition is defined in kernel public header, not sure if it is
+> > big deal to add the helper, especially there is just single user.
+> >
+> > But I will do it.
+> >
+> > >
+> > > Also, storing buf_ctx_id as a void * instead would allow this cast to
+> > > be avoided, but not a big deal.
+> > >
+> > > > +}
+> > > > +
+> > > >  static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
+> > > >                               unsigned int issue_flags)
+> > > >  {
+> > > > @@ -1211,6 +1217,8 @@ static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
+> > > >         }
+> > > >         /* one extra reference is dropped by ublk_io_release */
+> > > >         refcount_set(&data->ref, 2);
+> > > > +
+> > > > +       data->buf_ctx_id = ublk_uring_cmd_ctx_id(io->cmd);
+> > > >         /* store buffer index in request payload */
+> > > >         data->buf_index = pdu->buf.index;
+> > > >         io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
+> > > > @@ -1994,6 +2002,21 @@ static void ublk_io_release(void *priv)
+> > > >  {
+> > > >         struct request *rq = priv;
+> > > >         struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+> > > > +       struct ublk_io *io = &ubq->ios[rq->tag];
+> > > > +
+> > > > +       /*
+> > > > +        * In case of UBLK_F_AUTO_BUF_REG, the `io_uring_ctx` for registering
+> > > > +        * this buffer may be released, so we reach here not from handling
+> > > > +        * `UBLK_IO_COMMIT_AND_FETCH_REQ`.
+> > >
+> > > What do you mean by this? That the io_uring was closed while a ublk
+> > > I/O owned by the server still had a registered buffer?
+> >
+> > The buffer is registered to `io_ring_ctx A`, which is closed and the buffer
+> > is used up and un-registered on `io_ring_ctx A`, so this callback is
+> > triggered, but the io command isn't completed yet, which can be run from
+> > `io_ring_ctx B`
+> >
+> > >
+> > > > +        *
+> > > > +        * Force to clear UBLK_IO_FLAG_AUTO_BUF_REG, so that ublk server
+> > > > +        * still may complete this IO request by issuing uring_cmd from
+> > > > +        * another `io_uring_ctx` in case that the `io_ring_ctx` for
+> > > > +        * registering the buffer is gone
+> > > > +        */
+> > > > +       if (ublk_support_auto_buf_reg(ubq) &&
+> > > > +                       (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG))
+> > > > +               io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
+> > >
+> > > This is racy, since ublk_io_release() can be called on a thread other
+> > > than the ubq_daemon.
+> >
+> > Yeah, it can be true.
+> >
+> > > Could we avoid touching io->flags here and
+> > > instead have ublk_commit_and_fetch() check whether the reference count
+> > > is already 1?
+> >
+> > It is still a little racy because the buffer unregister from another thread
+> > can happen just after the check immediately.
+> 
+> True. I think it might be better to just skip the unregister if the
+> contexts don't match rather than returning -EINVAL. Then there is no
+> race. If userspace has already closed the old io_uring context,
+> skipping the unregister is the desired behavior. If userspace hasn't
+> closed the old io_uring, then that's a userspace bug and they get what
+> they deserve (a buffer stuck registered). If userspace wants to submit
+> the UBLK_IO_COMMIT_AND_FETCH_REQ on a different io_uring for some
+> reason, they can always issue an explicit UBLK_IO_UNREGISTER_IO_BUF on
+> the old io_uring to unregister the buffer.
+
+Sounds good, will add the above words on ublk_commit_and_fetch().
+
+Follows two invariants:
+
+- ublk_io_release() is always called once no matter if it is called
+from any thread context, request can't be completed until ublk_io_release()
+is called
+
+- new UBLK_IO_COMMIT_AND_FETCH_REQ can't be issued until old request
+is completed & new request comes
+
+The merged code should work just fine.
+
+But we need to document the feature only works on same io_ring_context.
 
 
-
-Hello,
-
-
-we don't have enough knowledge if this is a kernel issue or test case issue.
-
-=========================================================================================
-tbox_group/testcase/rootfs/kconfig/compiler/nr_threads/disk/testtime/fs/test/cpufreq_governor:
-  lkp-icl-2sp4/stress-ng/debian-12-x86_64-20240206.cgz/x86_64-rhel-9.4/gcc-12/100%/1HDD/60s/xfs/fpunch/performance
-
-3efe7571c3ae2b64 245618f8e45ff4f79327627b474
----------------- ---------------------------
-       fail:runs  %reproduction    fail:runs
-           |             |             |
-           :6          100%           6:6     stress-ng.fpunch.fail
-
-since the failure is persistent, just report what we observed in our tests FYI.
-
-
-kernel test robot noticed "stress-ng.fpunch.fail" on:
-
-commit: 245618f8e45ff4f79327627b474b563da71c2c75 ("block: protect wbt_lat_usec using q->elevator_lock")
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-
-[test failed on linus/master      b36ddb9210e6812eb1c86ad46b66cc46aa193487]
-[test failed on linux-next/master 8566fc3b96539e3235909d6bdda198e1282beaed]
-[test failed on fix commit        9730763f4756e32520cb86778331465e8d063a8f]
-
-in testcase: stress-ng
-version: stress-ng-x86_64-1c71921fd-1_20250212
-with following parameters:
-
-	nr_threads: 100%
-	disk: 1HDD
-	testtime: 60s
-	fs: xfs
-	test: fpunch
-	cpufreq_governor: performance
-
-
-
-config: x86_64-rhel-9.4
-compiler: gcc-12
-test machine: 128 threads 2 sockets Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz (Ice Lake) with 128G memory
-
-(please refer to attached dmesg/kmsg for entire log/backtrace)
-
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <oliver.sang@intel.com>
-| Closes: https://lore.kernel.org/oe-lkp/202505221030.760980df-lkp@intel.com
-
-2025-03-20 08:33:52 mkdir -p /mnt/stress-ng
-2025-03-20 08:33:52 mount /dev/sdc1 /mnt/stress-ng
-2025-03-20 08:33:52 cd /mnt/stress-ng
-  File: "/mnt/stress-ng"
-    ID: 82100000000 Namelen: 255     Type: xfs
-Block size: 4096       Fundamental block size: 4096
-Blocks: Total: 78604800   Free: 78518242   Available: 78518242
-Inodes: Total: 157286400  Free: 157286397
-2025-03-20 08:33:52 stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --fpunch 128
-stress-ng: info:  [4680] setting to a 1 min run per stressor
-stress-ng: info:  [4680] dispatching hogs: 128 fpunch
-stress-ng: info:  [4680] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
-stress-ng: warn:  [4680] metrics-check: all bogo-op counters are zero, data may be incorrect
-stress-ng: metrc: [4680] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
-stress-ng: metrc: [4680]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
-stress-ng: metrc: [4680] fpunch                0    557.92      0.40     19.56         0.00           0.00         0.03          3180
-stress-ng: metrc: [4680] miscellaneous metrics:
-stress-ng: metrc: [4680] fpunch              2049.12 extents per file (geometric mean of 128 instances)
-stress-ng: info:  [4680] for a 620.45s run time:
-stress-ng: info:  [4680]   79418.05s available CPU time
-stress-ng: info:  [4680]       0.40s user time   (  0.00%)
-stress-ng: info:  [4680]      19.59s system time (  0.02%)
-stress-ng: info:  [4680]      19.99s total time  (  0.03%)
-stress-ng: info:  [4680] load average: 250.69 349.62 213.80
-stress-ng: info:  [4680] skipped: 0
-stress-ng: info:  [4680] passed: 128: fpunch (128)
-stress-ng: info:  [4680] failed: 0
-stress-ng: info:  [4680] metrics untrustworthy: 0
-stress-ng: info:  [4680] successful run completed in 10 mins, 20.45 secs
-
-
-we don't observe any abnormal output in dmesg. below is an example from parent
-commit.
-
-2025-03-20 09:12:39 mkdir -p /mnt/stress-ng
-2025-03-20 09:12:39 mount /dev/sdc1 /mnt/stress-ng
-2025-03-20 09:12:39 cd /mnt/stress-ng
-  File: "/mnt/stress-ng"
-    ID: 82100000000 Namelen: 255     Type: xfs
-Block size: 4096       Fundamental block size: 4096
-Blocks: Total: 78604800   Free: 78518242   Available: 78518242
-Inodes: Total: 157286400  Free: 157286397
-2025-03-20 09:12:39 stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --fpunch 128
-stress-ng: info:  [4689] setting to a 1 min run per stressor
-stress-ng: info:  [4689] dispatching hogs: 128 fpunch
-stress-ng: info:  [4689] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
-stress-ng: metrc: [4689] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
-stress-ng: metrc: [4689]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
-stress-ng: metrc: [4689] fpunch             1166     60.31      0.11     34.66        19.33          33.54         0.45          3164
-stress-ng: metrc: [4689] miscellaneous metrics:
-stress-ng: metrc: [4689] fpunch              2051.97 extents per file (geometric mean of 128 instances)
-stress-ng: info:  [4689] for a 60.91s run time:
-stress-ng: info:  [4689]    7796.93s available CPU time
-stress-ng: info:  [4689]       0.11s user time   (  0.00%)
-stress-ng: info:  [4689]      34.68s system time (  0.44%)
-stress-ng: info:  [4689]      34.79s total time  (  0.45%)
-stress-ng: info:  [4689] load average: 325.78 93.83 32.28
-stress-ng: info:  [4689] skipped: 0
-stress-ng: info:  [4689] passed: 128: fpunch (128)
-stress-ng: info:  [4689] failed: 0
-stress-ng: info:  [4689] metrics untrustworthy: 0
-stress-ng: info:  [4689] successful run completed in 1 min
-
-
-from above, parent can finish run in 1 min, then has "bogo ops" and "bogo ops/s"
-
-for 245618f8e4, the test seems run much longer, and the results for "bogo ops"
-and "bogo ops/s" are all 0.
-
-
-
-The kernel config and materials to reproduce are available at:
-https://download.01.org/0day-ci/archive/20250522/202505221030.760980df-lkp@intel.com
-
-
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks, 
+Ming
 
