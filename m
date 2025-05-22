@@ -1,121 +1,110 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47861B0413
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 14:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDCB28DEE8
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 14:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747924466; cv=none; b=qDKxApHgNPuQxs6yUE3YAFpZfzl+vJCyoxvCutdkjrnIC3jJZGXIgGLPriRKi+7hzmY5c8Yudi0UPEzLZhaPLQJd0r5m2DoV0G/jDGpeB720q0+pRKisbHeqK4sz72kmDUWsJTYIEzc9f2Xi767U3n7zsPK5g/TBiCfFKk0yKp0=
+	t=1747924565; cv=none; b=VS/3J2zWDR/IzL0Ud7TMVeKFPk2FKkQYvqDxydBBMN5W5g9SAgm+PtsZsoliBjK+6QpBKvQHc8iN7GJzADxAd7xyYypeTxd00jSDTOHpsXoIs/UJc3LCtKJz29RW3ktDIKuWIMM28fdW3z+4DQMAWxeM+r7OaaVTT8pjqitwb2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747924466; c=relaxed/simple;
-	bh=RaC1uURdOyVfgSvUTIHPl9JVM1ZPrU9Co8xAGlfBA+k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hLRIBlz7oSyM1hdiF2fU6CSoXVfGNY3FDmPFsL68ITisxpFnc7w/QYKdhnz093ZFVNl2sSXmqX7pHzu3OzTqQrly9cArufjzEsUoLQPwOm/m7nhIK1WIubuqPiqyPIXE8ipovM98ls0KDPFpyf4BTMmCq1Q3/NpB7OP/16c09Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eideWIwA; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1747924565; c=relaxed/simple;
+	bh=OlZK/YX5fzH4gdeaGTIfo7UWEtTyE4V8naUP4FWknXo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q4G9HsuID2DG/TSrzSs9bdjhH/Q0LGhSLIQntF9q8gN/GqD70Fz8EiQ4764zdiln5NQB83yJWcI336GYIocMmLKqicCh9Y9CQlFsKR+Nc6aOpShCzeCJDNYQKe4UEa+6NgDpXl0EgasnPMQW+KT8Jrp0oDMXIcSpiMi972G++8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dI6uPAF+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eideWIwA"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-231bfc4600bso9089585ad.1
-        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 07:34:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1747924464; x=1748529264; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZAFxDxcsV+O01UOyfhZfQi7+2P76SbnGLqYLGNFxF6A=;
-        b=eideWIwAjaZu9wBQo6bYLmwMf7NPpdbgGRhBzVLCssB0LlThAsXWsBx3I+w3AWMWQT
-         qSBAnqnfDgWlyJKIyI0p8yKl/04GFnVP1wGypesUXb5he0PbcL7K/0TvckKgU6US2NAt
-         FW4EmZfUf/ubXaSdx/D4mSWFLsBXV86fYqMkvk+kChdz5oRcQAacN2jUSO3if9mi5TCl
-         bWF6wvZTr3sOCezcwni54bdExFXsq3s77X4RQjeH2tEYRV/zYAydOacbVmwML2yNQLIY
-         sDbqLCsdUcfSggtC/dWhShbJnMrBAd44XX3eFmOhLJfjoN9OxMCmegy2uZ1WrWOwqWg4
-         yUmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747924464; x=1748529264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZAFxDxcsV+O01UOyfhZfQi7+2P76SbnGLqYLGNFxF6A=;
-        b=Hlyoe19qxlEWWaQL2y2AgkQ3NpVgB5hI+fxGOze4yADDFlZw9iy8ZPFaBIwCQHel3U
-         Quhx2CsrLBZZV9xZXMxQ/l2UGR5P9GrKasXAzXTbnyG9cgPFn3YXrjZAOVEaMcMGhGMg
-         bMvEM7B14k8eFJ76XypxY0HpE+mNdJvJobwSkMWREjQC3ZOoLg9zmONo+2NktTLhNDRa
-         jXXQXY0XXfOlX2CW2LQ5eV6FvSBGD1vObtvTLmZFTjrp4BL+xG4yiat8vd6OGT5NMMd1
-         p2jZYidEjA6lrIiWh0JXb7I0ftofd8HMGDdsuH/wMdyjzf2w4WaXMwt6NwDNt8dQzcHf
-         M5qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBNHc24RlZhYN+69yVMB5gLaftG4ZtDAnFKjjuwt0V3HH33HIhoZ/x86wRZCOTb4TZUCTapWnOEvbvzA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh2QtGWuZO0ytXDG5gJNYNpog0MPV77+ueyO/fZAniwXjq/ovK
-	VuFmKv+6xFZ3RYDzTEc0r8LUuNmtTpNgGHc6C6u0Mdm4gw4Hp1oG0EtJlj8cUviDRzCTi9L7r6b
-	F89GGXCjra0Ii4VPoE03JHeJoAkPvviAcfRSV6BPntA==
-X-Gm-Gg: ASbGnctoa4GRDY2AM5WHxELun+Blfw1B+QYWE0VuTmdBPQduvTTRDytlwQ3NyAdtfiM
-	DJy8iAom1CfmLX5EdJfWQ5tzByPIjKPtro1jA/G0RKX5fBV50LmndfDg+vj5ctk8KOAczGJT92+
-	XTX6sJHIV9S5Jh51fyWr14sGOgA117rjI=
-X-Google-Smtp-Source: AGHT+IHfVA2dllWqoa1e6AwwdxooDk4eZjcfbtmo8xZnZZG7eMBTZaMm3RZ1l01SXZMe3wwZIjAlXdjS7qv1SvCjhz4=
-X-Received: by 2002:a17:903:1987:b0:22f:b902:fa87 with SMTP id
- d9443c01a7336-231d450f7b1mr138668925ad.10.1747924463942; Thu, 22 May 2025
- 07:34:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dI6uPAF+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747924561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ydV6UEOcswumfu973Fc5tP+cwrCxjXWQovjR/LtdD50=;
+	b=dI6uPAF+PZk5WaHQp7RVtN+PmQwGWMPbOXzYyXuVDnkIHUg2sbkR7I9YNJ3XJOuBP4aVb4
+	o7gIaQEE38U5S3Zb+LIo4P+01PHsFup1ST0DD7ep3+/zRwBIEZag5BieSbOyop/mRy8G/y
+	ayuu2wpnajc9Ur/hKVhOY4yLfrMYq04=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-324-dzaXzWieP7Sd1dljbX-exA-1; Thu,
+ 22 May 2025 10:36:00 -0400
+X-MC-Unique: dzaXzWieP7Sd1dljbX-exA-1
+X-Mimecast-MFC-AGG-ID: dzaXzWieP7Sd1dljbX-exA_1747924559
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBE7E1956089;
+	Thu, 22 May 2025 14:35:58 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.39])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CFBB230001A1;
+	Thu, 22 May 2025 14:35:57 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Jeff Moyer <jmoyer@redhat.com>
+Subject: [PATCH] loop: add fs_start_write() and fs_end_write()
+Date: Thu, 22 May 2025 22:35:47 +0800
+Message-ID: <20250522143547.395304-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250522135045.389102-1-ming.lei@redhat.com> <20250522135045.389102-2-ming.lei@redhat.com>
-In-Reply-To: <20250522135045.389102-2-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Thu, 22 May 2025 07:34:12 -0700
-X-Gm-Features: AX0GCFtx02V3ZXj8RDgeYPnY48s2AdWzi_kc6hpsciFE9vh2CgQTHTaeo-nFVwc
-Message-ID: <CADUfDZq5V=7ah8bHgPosjWk=Pshgw2S5jKuX7LhX8HVGRSH5dQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] io_uring: add helper io_uring_cmd_ctx_handle()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, May 22, 2025 at 6:51=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Add helper io_uring_cmd_ctx_handle() for driver to track per-context
-> resource, such as registered kernel io buffer.
->
-> Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  include/linux/io_uring/cmd.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-> index 0634a3de1782..92d523865df8 100644
-> --- a/include/linux/io_uring/cmd.h
-> +++ b/include/linux/io_uring/cmd.h
-> @@ -140,6 +140,15 @@ static inline struct io_uring_cmd_data *io_uring_cmd=
-_get_async_data(struct io_ur
->         return cmd_to_io_kiocb(cmd)->async_data;
->  }
->
-> +/*
-> + * Return uring_cmd's context reference as its context handle for driver=
- to
-> + * track per-context resource, such as registered kernel IO buffer
-> + */
-> +static inline unsigned long io_uring_cmd_ctx_handle(struct io_uring_cmd =
-*cmd)
-> +{
-> +       return (unsigned long)cmd_to_io_kiocb(cmd)->ctx;
+fs_start_write() and fs_end_write() should be added around ->write_iter().
 
-I would still prefer to return const void *. That would avoid the need
-for a cast.
-Other than that, this looks good.
+Recently we switch to ->write_iter() from vfs_iter_write(), and the
+implied fs_start_write() and fs_end_write() are lost.
 
-Best,
-Caleb
+Also we never add them for dio code path, so add them back for covering
+both.
 
-> +}
-> +
->  int io_buffer_register_bvec(struct io_uring_cmd *cmd, struct request *rq=
-,
->                             void (*release)(void *), unsigned int index,
->                             unsigned int issue_flags);
-> --
-> 2.47.0
->
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Fixes: f2fed441c69b ("loop: stop using vfs_iter_{read,write} for buffered I/O")
+Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/loop.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 46cba261075f..5107cc9a1872 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -308,11 +308,14 @@ static void lo_complete_rq(struct request *rq)
+ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+ {
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
++	struct loop_device *lo = rq->q->queuedata;
+ 
+ 	if (!atomic_dec_and_test(&cmd->ref))
+ 		return;
+ 	kfree(cmd->bvec);
+ 	cmd->bvec = NULL;
++	if (req_op(rq) == REQ_OP_WRITE)
++		file_end_write(lo->lo_backing_file);
+ 	if (likely(!blk_should_fake_timeout(rq->q)))
+ 		blk_mq_complete_request(rq);
+ }
+@@ -387,9 +390,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		cmd->iocb.ki_flags = 0;
+ 	}
+ 
+-	if (rw == ITER_SOURCE)
++	if (rw == ITER_SOURCE) {
++		file_start_write(lo->lo_backing_file);
+ 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
+-	else
++	} else
+ 		ret = file->f_op->read_iter(&cmd->iocb, &iter);
+ 
+ 	lo_rw_aio_do_completion(cmd);
+-- 
+2.47.1
+
