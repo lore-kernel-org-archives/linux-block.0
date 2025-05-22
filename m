@@ -1,120 +1,66 @@
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DA528D826
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 19:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4671EB5D9
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 20:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747943899; cv=none; b=LghV+ZQVdZGQO2MeZuF9bWMFHcutw8dhWYCQE1McAYjQsdCBnMrkNepiEtcAe53hqf9l2BJsWPZRaf4d+jvLayWdxBLCOs43BOCe0t35IFP5y9yAwKj5/RZsUOPmM7d8CJVrh/a7VVllWI5la2LKMIaII4VNbP0j4sCPG6SqpaY=
+	t=1747944269; cv=none; b=MN9sM0Y1ll93rbPyV6mjjaO7jqYZiVG0FDZeG6qpixgyxKeUmH1uwAGkCwmEuMuVxTblKQJrlLbJ1gy40KoZwi7JdY55E5WMf/bhivClotjJb/vkEiojGVHntl0StGX7acGkRc2Q78c0uHb6TdGiomkDjtxwrPUGfo6BvWKhPbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747943899; c=relaxed/simple;
-	bh=gZwB8MhJRtEe60JzpHJf12+knf2Ne87Vu2L7yyaRlAw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jfkue7K5Ln8z8b4z63JXQYFR4gDRuYf1Sw6IcFAl1kwvXUl4I0PMYGK8c8edg64Xlo5p9d1n3HazwQf/vOMhOiosikIiUB6QCf8+g8KLIeSXvX2u3MLooPZrjisVDkMuQabFkZNTGuVrv8KvktFcd2R0Jl9krrKssV32i6Rxymo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jWYkqZ7E; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1747944269; c=relaxed/simple;
+	bh=ujPvrlK6afswZBMUhFP2/Msh5uLTbbmYZGDthbnXzYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=maDIVhZ3RWWoVtjcynoK7O4CcMgHzgEeT5a0knGC88s9h+MfK+V+wRpkkRR5H/d4wB+NqIpqungpwfEt8AMpAceTp0e0Px2Vk7fI1bDYeaVZMPDH3cIVBZCMZT0RN/6X9f1unMtSQ6ICgVWaL8QQDyMIsotZp0USEbWPOkdDspY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYIRLkA3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jWYkqZ7E"
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dc7294716cso33364535ab.2
-        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 12:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747943895; x=1748548695; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EgJeP5+FHbRFCko8KxAI0xgC+raIxMxB16S+tU3+sf8=;
-        b=jWYkqZ7E1f2BTpkHp6laaA3I8mWyVcE/+E1ebu1Mjxqcnye+ZBKMdZ2P/pBLt6l/+J
-         BpBhF/osxB7ZmJfytXp1fBeGxigUCoLTDpDNy21DkBf9UQQosDEcYfEiIbpm/yeOODgN
-         vN0gWMtp632TAsMsDee+l3GqoDIwUq0hKBNzuJV0lbRN7ZH5r3WjBQRohMMK+rWEjZHi
-         gfka6GIiwuCXQlehZWbE5FHaN+sS8nGxicOyr9cHLwQd8+SXYzYkVuYVxcagAqAqPHB/
-         pKg+ZsZlYo0JfgDfqyz1Trl3qDHp03keGUmAkNZFgoR70L74UkeO1BF1JFIp6vJ8WpBv
-         CY2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747943895; x=1748548695;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EgJeP5+FHbRFCko8KxAI0xgC+raIxMxB16S+tU3+sf8=;
-        b=hLdw6/pSE5HkQaTCuiZEoMXO+NHxFFP6T1wcbtiaNfEKu987d6jXwtqGVw8ngYm585
-         8Y0yhtmbF7fkM3GHycdqQQR7DK1j9yC1FZ0d5i2lbGFfpLg2SVHOOQYpoFZAh9hKvy6x
-         YnPgHp01G1VEWiUg6ZzKHFj/52w+PyIjsxv2XSqiAlTpIffM01IfmCBRtRqNRj/SAivo
-         xP3PhxWZG2zDmfNJedPJY8qn4eedRXNyHAXDlQO/gTS99GVKxi83/8SYSH8Cjb3uUYBj
-         kA0pQ1qz0Um/Q51Klqb7+3YWTg7aGVKzSnPXdCLaF6boJnO+Kkpedo1dWpbMyFaKPKUQ
-         lGlg==
-X-Gm-Message-State: AOJu0YyKYLkpFXyruF0pjn7wXjYSzzrG037kZw54X78JHf9Y/5VsxdF8
-	itLOcSKHjgbDaSVYSuaPMZ+ZFGA8QEY7IDE5UVi3INts6ayWjeoqCrxJDlJJiMol6vtl7R3oYjq
-	aS7dA
-X-Gm-Gg: ASbGnctKSoPuFgv7P8B51XSmuxje9/MUUiWJ8ftGOPA85YPUwZBSplBqzpWEvq+GM4t
-	2bXUAxaRoVxstyvDt16KHOFeZRFpzTy8tLH3M7cRQXgAwDVGcT0QMnktaQDTmggRKWv0iKKZ3Nn
-	rG0LbZGJhxbuzGPiOUOi9zBeZ9xRz+LdKpii7XJmfpJmUpRYkxh86bJKv3wp30rOrHXC/TJ/43A
-	TjrqGjwAyYQpug0zIci6YiRxDH8bRqWtDMltd7LGDzHbl63s5nTseCoJ1SrA9/qzTOXWHGe3nyX
-	oXvzRHNL/XlYlheFUpO5p4RXosXzCgWdfyMEi1pwFPO5CIzeL6nhLBVP2Q==
-X-Google-Smtp-Source: AGHT+IF5X23PM5iUggcCli7OOmk0AQrDxn5osG5AqtL8HlWg0BKp2IREMYUlDcKuglCNbrUVdCmjqA==
-X-Received: by 2002:a05:6e02:1527:b0:3dc:8667:3426 with SMTP id e9e14a558f8ab-3dc8667364cmr77249625ab.17.1747943895618;
-        Thu, 22 May 2025 12:58:15 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fbcc3b1a96sm3336768173.51.2025.05.22.12.58.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 12:58:14 -0700 (PDT)
-Message-ID: <75e87d71-b83f-40b1-9f60-dc3747fc5fc0@kernel.dk>
-Date: Thu, 22 May 2025 13:58:14 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYIRLkA3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1310AC4CEED;
+	Thu, 22 May 2025 20:04:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747944268;
+	bh=ujPvrlK6afswZBMUhFP2/Msh5uLTbbmYZGDthbnXzYs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MYIRLkA3ofWRtgwBneRk/csi4yx0dAaY06a0TTBv2S0V0uc0Zg3ptWD02PXTZ8QkP
+	 ZgEFO0b4P8S4tjY2E9a4JIGRUC75N9ohwxfXohquA5nXNUC9keF4rZMkfZZeeObF+4
+	 Q9Q5KLS5hcNeEE9Y8Zrp+PpCM/oW4IZf3Zh4L8D7YUGd9zGCzAYRN48ZMD0J/Mx+xE
+	 pDTkHAK9TwW3OScoirx3t5R+xYiwO8QN/trp7CoomgDcH/CwSzOkSsTrNXNOu1sp1C
+	 +uprQyOUqdL1Te8Tf+Iz3W1cGhoCLDV5RRz77wobPGVQINfGKbn5672q3I/PU/1C49
+	 soniJOr1zqauA==
+Date: Thu, 22 May 2025 14:04:25 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/5] block: new sector copy api
+Message-ID: <aC-DSTUfgBjNH28H@kbusch-mbp>
+References: <20250521223107.709131-1-kbusch@meta.com>
+ <20250521223107.709131-2-kbusch@meta.com>
+ <468be217-40d5-4674-891e-d11cc96b1c2a@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.15-final
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <468be217-40d5-4674-891e-d11cc96b1c2a@acm.org>
 
-Hi Linus,
+On Thu, May 22, 2025 at 12:22:22PM -0700, Bart Van Assche wrote:
+> 
+> Is avoiding code duplication still a goal in the Linux kernel project?
 
-Two fixes for block that should go into the 6.15 kernel release. Both
-introduced in this cycle.
+I feel like that's a generic goal of software development in general.
 
-- Fix for a regression with setting up loop on a file system without
-  ->write_iter().
+> If so, should the above code be consolidated with kcopyd into a single
+> implementation?
 
-- Fix for an nvme sysfs regression.
+This patch provides a synchronous interface, similar to other services
+in blk-lib's APIs, like blkdev_issue_zeroout().  kcopyd, on the other
+hand, is an asynchronous interface with its own zero-out implementation
+(dm_kcopyd_zero). It's not like unifying these operations for different
+use cases was a priority; the implementations don't have much in common,
+so its not really duplicated code anyway.
 
-Please pull!
-
-
-The following changes since commit dd24f87f65c957f30e605e44961d2fd53a44c780:
-
-  ublk: fix dead loop when canceling io command (2025-05-15 10:53:41 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.15-20250522
-
-for you to fetch changes up to 115c011f5db7e5f1a1f4404a8f5b5c87a3534362:
-
-  Merge tag 'nvme-6.15-2025-05-22' of git://git.infradead.org/nvme into block-6.15 (2025-05-22 09:25:47 -0600)
-
-----------------------------------------------------------------
-block-6.15-20250522
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      loop: don't require ->write_iter for writable files in loop_configure
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.15-2025-05-22' of git://git.infradead.org/nvme into block-6.15
-
-Nilay Shroff (1):
-      nvme: avoid creating multipath sysfs group under namespace path devices
-
- drivers/block/loop.c      |  3 ---
- drivers/nvme/host/sysfs.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 3 deletions(-)
-
--- 
-Jens Axboe
-
+Now, if we are able to settle on the REQ_OP_COPY implementation, then it
+wouldn't be a big deal to have kcopyd use it too.
