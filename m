@@ -1,134 +1,172 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F2928A1DC;
-	Thu, 22 May 2025 13:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78B52882BC
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 13:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921886; cv=none; b=LYbXDOsILNk0GWsHVFfmqPAXViWl/GqQCzbBDJ+zJD9e8dz+eRRu/41R7dc04ho12Sb5XZfwL65qpktJxO4ZexJUiHLXBhXVq/mw8WBcf+Vk3hlvsyy3Qkk6+ZdY1rKnVBfX5oDrTgpUpBWVByezm5ipqjkfT77SJULfLJq+YkE=
+	t=1747922090; cv=none; b=qLk7gU4YgUx0iR6c/v6zmR6yBaZNyzwol7bYCuQjJchUfur5lSbDsTRROVZ7bOVuCifhSRaFmt/3l1OXSrhuloROP2MPIR1vnuPP/2xQGEV2O11kuyWrzI3cFo/DGrL958Z/lpdvXyxEcTRRtrKq82ChJm30EeIFkx0F0jwp7L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921886; c=relaxed/simple;
-	bh=IFCHmgpCwvEpsMGGei6Eq3nb3pQrhHESHm77Wp7BOhI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLJP92LubK2zBKC4ruhg6S3flkwW9HrnHgJRPgYwfr+UYXBqDhF1J1kjaRfDPQ+XctliMbZ1wfz2Ggvpmx5Hfa3DX2ovJtxSP8V6ml4qH6Fyo6gxQxDTOmZFIg5DDqEq4RGuZ5+x0odY8cVOtbtl+xD/eD81mjfrhDojbSpZ0LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/rCble6; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747922090; c=relaxed/simple;
+	bh=k30M+rpVlVXkNl/ODF6CVt8+kWK5XeccIa6hBgJH/m0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ffxhUakgSWUrAnDjMQ8MkPl983txNEo6tTQF6etndMyWec673mSYzqjuf5Xre+vP+M6RMxbi1LHcp96g+qOWVNsOPWYhgGic5VN+3aaO1XsF5cIIfr8SFtInDKX7v8muyp7+zStFi6IDDUzMyWVH1pFT6Fgi8J8yMp+8qgyEYPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jAuN7Phx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5xO5nyWP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jAuN7Phx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5xO5nyWP; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/rCble6"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7426c44e014so7817495b3a.3;
-        Thu, 22 May 2025 06:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747921883; x=1748526683; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RobnKU9KOucG9hKxcDzKA3QVziQD4DYIMl/kGFJ+p6I=;
-        b=Z/rCble64FkEISCFMVLbJ7PI/nfWWJSfg0m1UyI8Q0WHDoQlcksm3ou1TnnPs0AHFm
-         w78UJFtUz/tlA7zazovuRwj4+zxjtR/UaagqrRUyFlU4/BV4seYbx5Bzz5p2YyVfNLrL
-         KNxSTeaO7A9aCA7XN6xGNP1WbDaQNbdD2u6Cu1ZDBUsLbdb/G1OarMv+p6B0Ho3cU5kE
-         Rn2iWcFXlZ9E0oD8UJ/I1S4vsUiFsbtrqkjk9sBrAZ43v/f7Ys7GRAD+N6QaNHuc2RRK
-         7qCmRtG52/OAl+VNdoi5IPYcNuyRvb8Va7YVZjY+nEDR6KKDs1Sm+yT0e3qGOkDHuGGG
-         HB8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747921883; x=1748526683;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RobnKU9KOucG9hKxcDzKA3QVziQD4DYIMl/kGFJ+p6I=;
-        b=JzQJQTK77zpm1NMykMOkDla/VFE6OM37woxro8sadIvLvZfHWjykaNDNrbqCuGOVHr
-         ke8KXOwgQgytZOrIa4dcQMGWEJaqZ2ysdpxovMPCkiIvaWQ/hsEKuISEy6UXnGGBgEyv
-         0iCqGbBBmKJliWoALDAlgNku7jrmR3KYUWpyjIZID9mvaZs9+iYY+Exv3fCiooWhMgQH
-         mm6fQxxsjR4evbv+mJehWI0g+fIMSHq/L98K2RohH3m/9z1aqgPCz6sQb4NGHN7XnJ+G
-         Terr1AF9JJZq8WkSQUgmCqTguzu//cP1OpxZbsfu0q34hhXe3pXlAAyKszWHzpgjIAew
-         DiAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVnu+UNj5vnBzJRIJIs9FLQ1fHUZ1GamUNvsb2sMnQkHs9sUqFMgBfSP8rUnxpA3k3lzkSc0GrnAApwq5m@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaRtFeN2hK+3az+eQqKq2Dppp9IE8cc5hQiDER8VggbUEnbuYn
-	hBT+JIc+Vcl2kGTUMgw6BddRtzoICkh7G9dGl3c6Uar2+DWW+9uQ/aRkk1zHDg==
-X-Gm-Gg: ASbGnctHt51t7pBKK16anM+cSljO+TNVaVd5uHWIksUD0i9LU0QFv3au8cpCD8VDe19
-	t92KcPKybC87O854jHolUX+u02nSGOaRqYX3zlL4refvvTCkP6XYt4EhIqqwk0kh7Wp+5dKqxFT
-	HFzHTcwtdTjTivQl2cPo1jYQ/YtivS++BT5qfQHQ803H19lg6yibtEUawtfT5JPiqb1LTLkPIwd
-	vSEQGHFDjnWyV42bQ/egrr1kEolXiBmv1epNxrq+M3aMBE6ly15LmPvTKr9lReKwkoBY60R/mBt
-	vGvsCBj4sjg4BXruQ7S9HfAyWTBWU76RQUa1RmWaLq3eTGYJzTDNf2el7XLibZscUYCw
-X-Google-Smtp-Source: AGHT+IFuY0+8rn07hN2qTZHmYWLQumKlpWDqJzADbMiSlhqlGM9wL4eqJEGTQij+E4PAaz0j/DHcPQ==
-X-Received: by 2002:a17:902:e882:b0:223:65dc:4580 with SMTP id d9443c01a7336-231d45952aamr321983325ad.52.1747921883513;
-        Thu, 22 May 2025 06:51:23 -0700 (PDT)
-Received: from dw-tp.ibmuc.com ([171.76.84.129])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-232044a0a23sm90562105ad.112.2025.05.22.06.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 06:51:22 -0700 (PDT)
-From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: John Garry <john.g.garry@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	djwong@kernel.org,
-	ojaswin@linux.ibm.com,
-	linux-fsdevel@vger.kernel.org,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-Subject: [PATCH v2] traceevent/block: Add REQ_ATOMIC flag to block trace events
-Date: Thu, 22 May 2025 19:21:10 +0530
-Message-ID: <44317cb2ec4588f6a2c1501a96684e6a1196e8ba.1747921498.git.ritesh.list@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jAuN7Phx";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5xO5nyWP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jAuN7Phx";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5xO5nyWP"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 199AC216E4;
+	Thu, 22 May 2025 13:54:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747922087; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtT6KLq9HxZlzAqUdQx6rMNDXcYQ56MDN/QxpYiv4xI=;
+	b=jAuN7PhxZEjd2qTBYfaMg82C3xFJ7V8qkZQE9Y6bATsLdgg2k1XvNgsGdWmKwJfHazu9LR
+	QmRtqziuusbFJhaeDuxzpYJQojBTXD1WlFL07Caj6KZsiD5rUzqDEOCiCnuFYk2M21yp2D
+	8FSq7uVq+04Nnn06b0luKi/74bEVXAc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747922087;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtT6KLq9HxZlzAqUdQx6rMNDXcYQ56MDN/QxpYiv4xI=;
+	b=5xO5nyWP2a22NgLOJJIQnRSpo8Qj+i7Vs/jy089FB0q3UtXj3r18wbvGMpyTnOzeOUFtcw
+	UQtpc36K1FA3NnCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1747922087; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtT6KLq9HxZlzAqUdQx6rMNDXcYQ56MDN/QxpYiv4xI=;
+	b=jAuN7PhxZEjd2qTBYfaMg82C3xFJ7V8qkZQE9Y6bATsLdgg2k1XvNgsGdWmKwJfHazu9LR
+	QmRtqziuusbFJhaeDuxzpYJQojBTXD1WlFL07Caj6KZsiD5rUzqDEOCiCnuFYk2M21yp2D
+	8FSq7uVq+04Nnn06b0luKi/74bEVXAc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1747922087;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtT6KLq9HxZlzAqUdQx6rMNDXcYQ56MDN/QxpYiv4xI=;
+	b=5xO5nyWP2a22NgLOJJIQnRSpo8Qj+i7Vs/jy089FB0q3UtXj3r18wbvGMpyTnOzeOUFtcw
+	UQtpc36K1FA3NnCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ED420137B8;
+	Thu, 22 May 2025 13:54:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OTOhOKYsL2jQCwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 22 May 2025 13:54:46 +0000
+Message-ID: <7aab2c6c-4cd8-4f23-b61b-153f6e9c2ce7@suse.de>
+Date: Thu, 22 May 2025 15:54:46 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/5] nvme: add support for copy offload
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+Cc: Keith Busch <kbusch@kernel.org>
+References: <20250521223107.709131-1-kbusch@meta.com>
+ <20250521223107.709131-4-kbusch@meta.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250521223107.709131-4-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -1.30
+X-Spamd-Result: default: False [-1.30 / 50.00];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
 
-Filesystems like XFS can implement atomic write I/O using either
-REQ_ATOMIC flag set in the bio or via CoW operation. It will be useful
-if we have a flag in trace events to distinguish between the two. This
-patch adds char 'U' (Untorn writes) to rwbs field of the trace events
-if REQ_ATOMIC flag is set in the bio.
+On 5/22/25 00:31, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Register the nvme namespace copy capablities with the request_queue
+> limits and implement support for the REQ_OP_COPY operation.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   drivers/nvme/host/core.c | 61 ++++++++++++++++++++++++++++++++++++++++
+>   include/linux/nvme.h     | 42 ++++++++++++++++++++++++++-
+>   2 files changed, 102 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index f69a232a000ac..3134fe85b1abc 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -888,6 +888,52 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+>   	return BLK_STS_OK;
+>   }
+>   
+> +static inline blk_status_t nvme_setup_copy(struct nvme_ns *ns,
+> +		struct request *req, struct nvme_command *cmnd)
+> +{
+> +	struct nvme_copy_range *range;
+> +	struct req_iterator iter;
+> +	struct bio_vec bvec;
+> +	u16 control = 0;
+> +	int i = 0;
+> +
+> +	static const size_t alloc_size = sizeof(*range) * NVME_COPY_MAX_RANGES;
+> +
+> +	if (WARN_ON_ONCE(blk_rq_nr_phys_segments(req) >= NVME_COPY_MAX_RANGES))
+> +		return BLK_STS_IOERR;
+> +
+> +	range = kzalloc(alloc_size, GFP_ATOMIC | __GFP_NOWARN);
+> +	if (!range)
+> +		return BLK_STS_RESOURCE;
+> +
+> +	if (req->cmd_flags & REQ_FUA)
+> +	        control |= NVME_RW_FUA;
+> +	if (req->cmd_flags & REQ_FAILFAST_DEV)
+> +	        control |= NVME_RW_LR;
 
-<W/ REQ_ATOMIC>
-=================
-xfs_io-4238    [009] .....  4148.126843: block_rq_issue: 259,0 WFSU 16384 () 768 + 32 none,0,0 [xfs_io]
-<idle>-0       [009] d.h1.  4148.129864: block_rq_complete: 259,0 WFSU () 768 + 32 none,0,0 [0]
+FAILFAST_DEV? Is that even set anywhere?
 
-<W/O REQ_ATOMIC>
-===============
-xfs_io-4237    [010] .....  4143.325616: block_rq_issue: 259,0 WS 16384 () 768 + 32 none,0,0 [xfs_io]
-<idle>-0       [010] d.H1.  4143.329138: block_rq_complete: 259,0 WS () 768 + 32 none,0,0 [0]
+Otherwise looks ok.
 
-Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
----
+Cheers,
 
-v1 -> v2:
-=========
-1. Changed char 'a' to 'U' (Untorn Writes)
-
-
- include/trace/events/block.h | 2 +-
- kernel/trace/blktrace.c      | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index bd0ea07338eb..de538b110ea1 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -11,7 +11,7 @@
- #include <linux/tracepoint.h>
- #include <uapi/linux/ioprio.h>
-
--#define RWBS_LEN	8
-+#define RWBS_LEN	9
-
- #define IOPRIO_CLASS_STRINGS \
- 	{ IOPRIO_CLASS_NONE,	"none" }, \
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 3679a6d18934..fc62a9767203 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1896,6 +1896,8 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
- 		rwbs[i++] = 'S';
- 	if (opf & REQ_META)
- 		rwbs[i++] = 'M';
-+	if (opf & REQ_ATOMIC)
-+		rwbs[i++] = 'U';
-
- 	rwbs[i] = '\0';
- }
---
-2.39.5
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
