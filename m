@@ -1,65 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DA32BDC3C;
-	Thu, 22 May 2025 19:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DA528D826
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 19:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747942729; cv=none; b=Rsa3ijRzxcIoQUdCxdUqHxuPDYaGEb5Cr20NS9ZtdPBUWnDYfFBf8bPXdUJPagVRDdDTF8ARH47Is0+aT8ICwKLB6EOAw+/KD9/XuZjd+6gjpDhvBmmaoE50vBoynL/6EgPESiSMDjY9lTSo7+To7KXYtlguyGnMYZt9F5VNd7I=
+	t=1747943899; cv=none; b=LghV+ZQVdZGQO2MeZuF9bWMFHcutw8dhWYCQE1McAYjQsdCBnMrkNepiEtcAe53hqf9l2BJsWPZRaf4d+jvLayWdxBLCOs43BOCe0t35IFP5y9yAwKj5/RZsUOPmM7d8CJVrh/a7VVllWI5la2LKMIaII4VNbP0j4sCPG6SqpaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747942729; c=relaxed/simple;
-	bh=YSTV4nrR9BcWNLjnzTxQXJEJv40M/G97zCOIOpydIcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qSpegQF8tv7gyvbs5Yf3HXSReA4nY9LJejsy+73WAppg1XITkoUibcHI/212V/XGZMV6r5oEWaHWwOyic6zvTEZVHLt/6CzAC0OQ6TKt3bTA362wsvkiK4jk3kjNWG8smscjS/Tkbd43tTM0+WsTGniy5o9j+kP3uswv/sS9SpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BviKpAsn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747943899; c=relaxed/simple;
+	bh=gZwB8MhJRtEe60JzpHJf12+knf2Ne87Vu2L7yyaRlAw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jfkue7K5Ln8z8b4z63JXQYFR4gDRuYf1Sw6IcFAl1kwvXUl4I0PMYGK8c8edg64Xlo5p9d1n3HazwQf/vOMhOiosikIiUB6QCf8+g8KLIeSXvX2u3MLooPZrjisVDkMuQabFkZNTGuVrv8KvktFcd2R0Jl9krrKssV32i6Rxymo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jWYkqZ7E; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BviKpAsn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE94DC4CEE4;
-	Thu, 22 May 2025 19:38:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747942729;
-	bh=YSTV4nrR9BcWNLjnzTxQXJEJv40M/G97zCOIOpydIcc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BviKpAsnwN8/wHsxbVtqMWs6NQegDJNvtPqegexaj6V0gEVc8fklKCohTCjDArvDy
-	 vd0AbInp8fIIpGKgtNzaj2IztrPLKNlTqseo9nSnQr3iWSSp1vtHxih09JbvLf7/23
-	 tqeBqMK0j85D5Wb67Ak3a4bmcGpm/uuW694JJuPefwvQ9WCJWHDMTOz3X8b3e38Bbn
-	 9yiIH31hTt1aauy4ns9RjezhCd+zEWkUTB7I2q5lnbRj2dhCeBDjeOXbkpuOKGnyk5
-	 OR0+e4+q8JKQ3N12DbWS5XsOZDMA/gpd/ld+slatp1XYMTezM+J0jiwZ0E0xrukcbW
-	 7Gny4joijn39Q==
-Date: Thu, 22 May 2025 12:38:47 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Robin Murphy <robin.murphy@arm.com>, vkoul@kernel.org,
-	chenxiang66@hisilicon.com, leon@kernel.org, jgg@nvidia.com,
-	alex.williamson@redhat.com, joel.granados@kernel.org,
-	iommu@lists.linux.dev, dmaengine@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	Haavard.Skinnemoen@google.com,
-	Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH 1/6] fake-dma: add fake dma engine driver
-Message-ID: <aC99RzlvdX0rnTNW@bombadil.infradead.org>
-References: <20250520223913.3407136-1-mcgrof@kernel.org>
- <20250520223913.3407136-2-mcgrof@kernel.org>
- <e3b98f16-2b9f-4cc1-8a54-29c6dfee918f@arm.com>
- <CGME20250521170724eucas1p28e65ef0ade407ce9e2cfe0b72da26d7a@eucas1p2.samsung.com>
- <aC4IRTo_HBxv9dVN@bombadil.infradead.org>
- <fe97e7ba-85d1-44c7-9de8-2082146f335d@samsung.com>
- <aC9X1VFrRJbH4bYm@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jWYkqZ7E"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dc7294716cso33364535ab.2
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 12:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747943895; x=1748548695; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EgJeP5+FHbRFCko8KxAI0xgC+raIxMxB16S+tU3+sf8=;
+        b=jWYkqZ7E1f2BTpkHp6laaA3I8mWyVcE/+E1ebu1Mjxqcnye+ZBKMdZ2P/pBLt6l/+J
+         BpBhF/osxB7ZmJfytXp1fBeGxigUCoLTDpDNy21DkBf9UQQosDEcYfEiIbpm/yeOODgN
+         vN0gWMtp632TAsMsDee+l3GqoDIwUq0hKBNzuJV0lbRN7ZH5r3WjBQRohMMK+rWEjZHi
+         gfka6GIiwuCXQlehZWbE5FHaN+sS8nGxicOyr9cHLwQd8+SXYzYkVuYVxcagAqAqPHB/
+         pKg+ZsZlYo0JfgDfqyz1Trl3qDHp03keGUmAkNZFgoR70L74UkeO1BF1JFIp6vJ8WpBv
+         CY2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747943895; x=1748548695;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EgJeP5+FHbRFCko8KxAI0xgC+raIxMxB16S+tU3+sf8=;
+        b=hLdw6/pSE5HkQaTCuiZEoMXO+NHxFFP6T1wcbtiaNfEKu987d6jXwtqGVw8ngYm585
+         8Y0yhtmbF7fkM3GHycdqQQR7DK1j9yC1FZ0d5i2lbGFfpLg2SVHOOQYpoFZAh9hKvy6x
+         YnPgHp01G1VEWiUg6ZzKHFj/52w+PyIjsxv2XSqiAlTpIffM01IfmCBRtRqNRj/SAivo
+         xP3PhxWZG2zDmfNJedPJY8qn4eedRXNyHAXDlQO/gTS99GVKxi83/8SYSH8Cjb3uUYBj
+         kA0pQ1qz0Um/Q51Klqb7+3YWTg7aGVKzSnPXdCLaF6boJnO+Kkpedo1dWpbMyFaKPKUQ
+         lGlg==
+X-Gm-Message-State: AOJu0YyKYLkpFXyruF0pjn7wXjYSzzrG037kZw54X78JHf9Y/5VsxdF8
+	itLOcSKHjgbDaSVYSuaPMZ+ZFGA8QEY7IDE5UVi3INts6ayWjeoqCrxJDlJJiMol6vtl7R3oYjq
+	aS7dA
+X-Gm-Gg: ASbGnctKSoPuFgv7P8B51XSmuxje9/MUUiWJ8ftGOPA85YPUwZBSplBqzpWEvq+GM4t
+	2bXUAxaRoVxstyvDt16KHOFeZRFpzTy8tLH3M7cRQXgAwDVGcT0QMnktaQDTmggRKWv0iKKZ3Nn
+	rG0LbZGJhxbuzGPiOUOi9zBeZ9xRz+LdKpii7XJmfpJmUpRYkxh86bJKv3wp30rOrHXC/TJ/43A
+	TjrqGjwAyYQpug0zIci6YiRxDH8bRqWtDMltd7LGDzHbl63s5nTseCoJ1SrA9/qzTOXWHGe3nyX
+	oXvzRHNL/XlYlheFUpO5p4RXosXzCgWdfyMEi1pwFPO5CIzeL6nhLBVP2Q==
+X-Google-Smtp-Source: AGHT+IF5X23PM5iUggcCli7OOmk0AQrDxn5osG5AqtL8HlWg0BKp2IREMYUlDcKuglCNbrUVdCmjqA==
+X-Received: by 2002:a05:6e02:1527:b0:3dc:8667:3426 with SMTP id e9e14a558f8ab-3dc8667364cmr77249625ab.17.1747943895618;
+        Thu, 22 May 2025 12:58:15 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fbcc3b1a96sm3336768173.51.2025.05.22.12.58.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 May 2025 12:58:14 -0700 (PDT)
+Message-ID: <75e87d71-b83f-40b1-9f60-dc3747fc5fc0@kernel.dk>
+Date: Thu, 22 May 2025 13:58:14 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aC9X1VFrRJbH4bYm@bombadil.infradead.org>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.15-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 22, 2025 at 09:59:03AM -0700, Luis Chamberlain wrote:
-> I'll try the few knobs suggested by Leon to see if that enables it.
+Hi Linus,
 
-That didn't help, but I'm more intruiged by giving the iommufd mocking a
-shot, so I'll try that next as I think that will ultimately be cleaner
-if possible.
+Two fixes for block that should go into the 6.15 kernel release. Both
+introduced in this cycle.
 
-  Luis
+- Fix for a regression with setting up loop on a file system without
+  ->write_iter().
+
+- Fix for an nvme sysfs regression.
+
+Please pull!
+
+
+The following changes since commit dd24f87f65c957f30e605e44961d2fd53a44c780:
+
+  ublk: fix dead loop when canceling io command (2025-05-15 10:53:41 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.15-20250522
+
+for you to fetch changes up to 115c011f5db7e5f1a1f4404a8f5b5c87a3534362:
+
+  Merge tag 'nvme-6.15-2025-05-22' of git://git.infradead.org/nvme into block-6.15 (2025-05-22 09:25:47 -0600)
+
+----------------------------------------------------------------
+block-6.15-20250522
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      loop: don't require ->write_iter for writable files in loop_configure
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.15-2025-05-22' of git://git.infradead.org/nvme into block-6.15
+
+Nilay Shroff (1):
+      nvme: avoid creating multipath sysfs group under namespace path devices
+
+ drivers/block/loop.c      |  3 ---
+ drivers/nvme/host/sysfs.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 3 deletions(-)
+
+-- 
+Jens Axboe
+
