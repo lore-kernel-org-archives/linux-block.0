@@ -1,103 +1,138 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB5728DB45
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 15:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDA333CFC
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 15:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747927580; cv=none; b=oCwkqzSJlPqsyyMUXortYpP2XzWTiCdRrUwLoxpYlEM2BlcZuDXomqH8fy3wTBz4Ut62+SHeXLSebZuAncmw0jiHYlH7xDfjHv9+L1T0QGg6xF6St7SPlb9tzZtRLjgRp4PNKHlEXUayHDwQ1RgqUS7BALnMN7MrkZNPKf9eSmg=
+	t=1747927916; cv=none; b=mvouxcye6nFpLk+iA7WiArkDSMUqZ5RoX+1SGk2Nc6lje24jF9Fr6Sf40XGuWrEkAzaK2o8pNtZbFwnzNLIUpAD/53ekpmxiiYgwdCRHGpj89T+FeytkhItYfpbQlDNve8OWehe6+2SNYtYkrPC0VrVfzwOAAeofyOP8kxg3lDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747927580; c=relaxed/simple;
-	bh=vGDZhZwllxe4VD983RCC2tiGN0K4ADXxO7QCHyFUze4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NFaHd0umYphi6W+NnCGto84vPIOgm6nA/ibOlkvnPiQ0R6XTuDJluYaA3uUO7lOj/bBzai2Ria8vb/QywTLiKDkhJM8U0d/TvqjO/8qQA2Qxx5NitTNUZtnUNbqpVVFdB4F2y8ZlZRdSunmgQZ24HDmLvj+/UeerzIy20Qarvpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TNbNmYbS; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1747927916; c=relaxed/simple;
+	bh=n2itCzkdu7x63Jjs2usmNwo77pQGcDxFpYkVpIKGGyo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nYAH50WrEzcH5YXOfYAJF/kRmTRPZICzlkkHGyCSqF0P7DeIs2B5i7QzJh3FtuBuC7aLV8LdHp5z+QbdXc7/hyj1k3wk0gNNQlccR0iZEB/cIa+uM0N6AiDRAsQ1LLkUQN/HtWfzXVvSNAFzTKcSlAsi16qPhIz2aF9GsxJeIJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WF993rIr; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TNbNmYbS"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d817bc6eb0so48470255ab.1
-        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 08:26:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WF993rIr"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b2700de85d0so575142a12.2
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 08:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1747927577; x=1748532377; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lx0n5h1cqvuf4X6qJjMPK63d2ae4U83l+nIOQxouVe8=;
-        b=TNbNmYbSlswL5vKrNkKRKLw5kPIhxNXgIbiFwiENJNZwfccd8KeY9rHyYR2AJTGbRU
-         UtavaOTjk66sOflu+jnWVsHX1zXtEYlV4YlVnMJZQLg9nd2+YxC4qkYenIkkghyrPYob
-         ZYMZ+OFGD/C9yVlQIxrmmqPCIA/6oU2VBEZ+k6/KJTJnnh7onjvLvvCYeqvBOU6EKKGP
-         Xm10FSTDxuPKuKWZkCwLZ1H8x6SuDmeqSZcnoQ957hRGQYnz5wzTwqpx6chhZp+Y7hwb
-         TQBBnNbh/602mOX9XsgthaqRBj0j8Odi8djNFeLa+XbzWMNp6Yz7wXpB/ANQlJudmHbi
-         k+TA==
+        d=purestorage.com; s=google2022; t=1747927914; x=1748532714; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c4yCtwwSExh3NU1CA2kRM3Cl8TYPmrnKX4YRo85CGLU=;
+        b=WF993rIrboRbK02uSLO5m3xELsbOUOy4UmsTKoNrhL8dT+1PTykG2lii7oFiU/VvR5
+         HoWFNlUWTRuhFXB1WH43mJxtn7ZEzapmnUtxsQqq2sOEYLvLIrZohTBifMQk75zvJh9t
+         9D3r9C5/+3pMAxw0kHr4KCto/nKWluDZdDg/ecrctuJzLcxxBn2q8DTcMRnC/67/6j25
+         fOjJ/a5plsnRvhfTZsxuwqV4GogSrjWvUfW9iLv79Qt1Rv2exIJ5zf3WYvfFNjSnp+0m
+         ZBkYubsSPrO+TWNZ666XjulBZCdGhG7FiDMhyTPrUG4Xb9Dwo1lXPqMSX56l1ll0Z5rW
+         15Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747927577; x=1748532377;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lx0n5h1cqvuf4X6qJjMPK63d2ae4U83l+nIOQxouVe8=;
-        b=IPmv7lDj6uUcKBLeHSgy2ncAAsUrxCYJgFoPetSCiA+E1BO+opqk+Iy+kRCtsjhioq
-         lNOJ7to8PM2YflBHylPiNoEHSZG85U1ZSDI6Q6nORfcuGirUsdZ8z3Tm+SpmVhijcNR/
-         MKI6L5/RW1Tw8/ZgpWXOFpWbUKFxAgh9lpu5k8ebMcoL5Rz0234TZ45vhgnk1M/+1SsC
-         B47ulilwsu284QcKoRCH44fdQ62LSKa/9ZbeteJQrLu7Hlwvy4nD5CJzRy5XGP/P6OpO
-         L8chgmTG7mXX8H1JMOamo5iXCPe3zrTGFv+aLgwOfQtHwyNypMEoumINlhY17XMcq6aV
-         KNxA==
-X-Gm-Message-State: AOJu0YzwqM+BPP0vvpudNjY2Yu16EN0058K7aT6eh7IycZQteUL2197A
-	j2wkseI9KBh2I2H6dmv0IX9l9NAqymD8x8Onpyx/1C/eaQqtHjrOfv1e0dbIcNsBqDg=
-X-Gm-Gg: ASbGncvhhdiX59pkxDdCCdDIJqCVWt5B3/4KhvO0zt3Ah6C6u1UGTxk51hFUj9TQAyK
-	1miohO+Yq/woJhniRiAK4uV0u0HbWn2k2kQE5sOhbwYJ2vHdvkYoLS/wQUKB9bTKu2rUOPWgfPx
-	K9IOJ6ag98OQW+7fyJcAtOqRjjXD7nEhmRTQh+sqvZ0CCtZzPabHkXNMxEYPE3zWO5SZvVUEgTY
-	97Wkg+ia/OFyyfIPV6Ge+BvcEvgAI65SroHApCUXer3nstjiIZeVD+aSsDFG+GaPGJ+f9m35tMr
-	yPGa/c0xi8zIfn2U4lqrqGM8E2oKTpruYHBs1GwUMa0V8fo=
-X-Google-Smtp-Source: AGHT+IGzhOWXribK1IbycI+KBAw+QEv9gxomT+pM+E+BLOeT4eMJipexX7wJd2Mj6jucYgz00SXFkw==
-X-Received: by 2002:a05:6e02:188d:b0:3dc:7c5d:6372 with SMTP id e9e14a558f8ab-3dc7c5d6637mr117988265ab.7.1747927577052;
-        Thu, 22 May 2025 08:26:17 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc8ad89ecfsm5835255ab.26.2025.05.22.08.26.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 08:26:16 -0700 (PDT)
-Message-ID: <cc3d3809-cb13-4800-8b67-2bb42587dca8@kernel.dk>
-Date: Thu, 22 May 2025 09:26:15 -0600
+        d=1e100.net; s=20230601; t=1747927914; x=1748532714;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c4yCtwwSExh3NU1CA2kRM3Cl8TYPmrnKX4YRo85CGLU=;
+        b=PgR6FcOV/Hz1vGoY7MagFSNfO0u+WwlgmQQOukAU32fI9TZp8WWTVXhx4aAUwVKIGC
+         BFOi/fmu/njw+JioHexy64nki4uVAugcxehL9OYPHCDiGMBEmypMTpOjn20vHyzCo6sT
+         T/LEVtwSQJ5UZYULLyjjbZStXx2eOuKhl7e1Z/AarRJWS6hs4b4+V0Rq5S+/MScgvFrj
+         oCxH9sZ2+QSzA/Zrm1HSczkaM1G4cdHnNIdhd9ds0ajtIbEU8d0EmzhllyEImaGDyZlh
+         XTiemtpR0buxgmozZB9dmfi/ejXdXEgVqWoI1OK62tmQ68hKVNongHornSMD6wc+zIVs
+         2Mzg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+9iox/WixP2+nquTGZf0/Th97xLbwn7RXbfd+sPXtIeNGpQQndZLmPzToFlX9BhjeJO3F0WvJ5z/fNw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFZX9sOYFyl54leXHRk2wIxbgtuEf5A40qJYfS2koj2C8AKvWK
+	zInni9LRhNf7tNK6nxdsOtuYpf+2eftciZ/ypVkc7XB9vZW3H3wk+cnFb313pGE/kb+g6VGroIR
+	NQ2wKWusVpHlLluVpUGTr/GIxw7EH1Bo7+UgrN3oqWA==
+X-Gm-Gg: ASbGncvjRSw7rT2snLNZyW26iyQzDR12d70U8dQfLP4MWNkXxG1Gu3FxSF2YcqATqmu
+	E4OSfknCmj9/pvBibwVVC/kuHbVE6zSRKRmQpim2tvP6aVx1nr7/Ul0LWavgXQafMZGQ/o8LXhp
+	WEFuw1KXFmZNrwtnTFsUeROSJyddIIZWuUJxcWmytN8w==
+X-Google-Smtp-Source: AGHT+IFUw6MMTfQayGVTElPtPhlDQU+FCNoQp23URlq79ACLzvRhKKXBDZcHKTH+//dXjyoLk8j0nXIRYZW8VoDcxDM=
+X-Received: by 2002:a17:903:b4e:b0:224:8bf:6d83 with SMTP id
+ d9443c01a7336-231d43d1938mr138342065ad.8.1747927914017; Thu, 22 May 2025
+ 08:31:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5BGIT_PULL=5D_nvme_f=D1=96x_for_Linux_6=2E15?=
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-References: <aC8x5G4RUjgbAoAc@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aC8x5G4RUjgbAoAc@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250522143547.395304-1-ming.lei@redhat.com>
+In-Reply-To: <20250522143547.395304-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 22 May 2025 08:31:41 -0700
+X-Gm-Features: AX0GCFsUUoyEzzgLU9YR9GemPZyHcrL0iu7esexoSXvvaZ0POrkpU8sESdRbG84
+Message-ID: <CADUfDZo0D4GBEAQSTbaD4Dr-_fUq0oPg8-Tq3njPbFQwfyg7Tw@mail.gmail.com>
+Subject: Re: [PATCH] loop: add fs_start_write() and fs_end_write()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Jeff Moyer <jmoyer@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/22/25 8:17 AM, Christoph Hellwig wrote:
-> The following changes since commit 355341e4359b2d5edf0ed5e117f7e9e7a0a5dac0:
-> 
->   loop: don't require ->write_iter for writable files in loop_configure (2025-05-20 09:16:23 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.15-2025-05-22
-> 
-> for you to fetch changes up to 49b9f86a594a5403641e6e60508788a7310fd293:
-> 
->   nvme: avoid creating multipath sysfs group under namespace path devices (2025-05-21 14:55:46 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 6.15
-> 
->  - do not create the newly added multipath sysfs group for
->    non-multipath nodes (Nilay Shroff)
+On Thu, May 22, 2025 at 7:37=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> fs_start_write() and fs_end_write() should be added around ->write_iter()=
+.
 
-Pulled, thanks.
+Do you mean file_start_write() and file_end_write()?
 
--- 
-Jens Axboe
+Best,
+Caleb
 
+>
+> Recently we switch to ->write_iter() from vfs_iter_write(), and the
+> implied fs_start_write() and fs_end_write() are lost.
+>
+> Also we never add them for dio code path, so add them back for covering
+> both.
+>
+> Cc: Jeff Moyer <jmoyer@redhat.com>
+> Fixes: f2fed441c69b ("loop: stop using vfs_iter_{read,write} for buffered=
+ I/O")
+> Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/loop.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 46cba261075f..5107cc9a1872 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -308,11 +308,14 @@ static void lo_complete_rq(struct request *rq)
+>  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+>  {
+>         struct request *rq =3D blk_mq_rq_from_pdu(cmd);
+> +       struct loop_device *lo =3D rq->q->queuedata;
+>
+>         if (!atomic_dec_and_test(&cmd->ref))
+>                 return;
+>         kfree(cmd->bvec);
+>         cmd->bvec =3D NULL;
+> +       if (req_op(rq) =3D=3D REQ_OP_WRITE)
+> +               file_end_write(lo->lo_backing_file);
+>         if (likely(!blk_should_fake_timeout(rq->q)))
+>                 blk_mq_complete_request(rq);
+>  }
+> @@ -387,9 +390,10 @@ static int lo_rw_aio(struct loop_device *lo, struct =
+loop_cmd *cmd,
+>                 cmd->iocb.ki_flags =3D 0;
+>         }
+>
+> -       if (rw =3D=3D ITER_SOURCE)
+> +       if (rw =3D=3D ITER_SOURCE) {
+> +               file_start_write(lo->lo_backing_file);
+>                 ret =3D file->f_op->write_iter(&cmd->iocb, &iter);
+> -       else
+> +       } else
+>                 ret =3D file->f_op->read_iter(&cmd->iocb, &iter);
+>
+>         lo_rw_aio_do_completion(cmd);
+> --
+> 2.47.1
+>
+>
