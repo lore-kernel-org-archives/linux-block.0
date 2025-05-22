@@ -1,77 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D70EF9DA
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 16:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9086FF9DA
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 16:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747931798; cv=none; b=Cikkp+N9dtQEC5impeXlkbwIdTsZ9chrFp/mFodbJM2BfiD2s+Ndi/zsF+PPI+zHDDf8wayxXA6yWcxKSRqoooS2gMneF9eZ92t5HqAbyj0ldO3MKLtlqn15qtxbVzju49nU6GFym6/p1qs4gtDKgXHnbDwfQ7wJwWFEDod+Ojc=
+	t=1747931800; cv=none; b=YENJMwUHnSc4MUtWFQz4qMi4rwcDMIR49m7YYY9nnA1RyHrO/WekI++j3NA4Fsrsz1cfuGNSqmcsT/vbaBzR5QlsMzMmXUt/BKgJkqUZM751+TepBkvAdT6LdnGeFtp3W7ju77/y9WFKCglzOlNS1Kg+QtBIs2D5tlZ370SfWv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747931798; c=relaxed/simple;
-	bh=E8/QcLlLRZf01wrR3Tv226Ivf2qRsP7sVaDSpN3SQts=;
+	s=arc-20240116; t=1747931800; c=relaxed/simple;
+	bh=japlrBVs3GNvjaE3jTX3f3XSzvTYr+WtDLNY0X32b8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j1g7k+OGnEJ3+cdLGuWdzBjSU+aV+ehm7uT7yKxzThu56iYt+q1bbECyW8TC1e6hqSMMIRkec6SX4bnK8UOa5EB67LpnhKVYjHAc4FlBrOO/RJc3UNS3CnLOA3jHo9GSJjcmHUneYdEvSDoCJsBz5TlTxyw63W+uZcQiW/UzrR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FBmaFJAA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=S6XTvbIG4y/zo2oniwxtysFjt0cQDOlPv8ZESXCXbBWhB5mvmJyF378Xw0FEA/fU7+Wg0AdplN9ZoAr2f+pxujPiweq1lfG6bVklaMNWAz821ylDdP5BW1hGs2Y9CGuNAyn7CyTRw8+HA3sRBkcjmvIdSp5AvshbztdX6c+nOpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMrqPPOl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FBmaFJAA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747931796;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CDGP8EBDLVtel446JgA4i79D48Avvx+YDEeWMkgWhWM=;
-	b=FBmaFJAAykqZYrG9OODM0mZuwpd7ui+nvuHLyuu6/Gl8yCMLqe+rt5RIXF0kslKN1sVaX5
-	jCbFDfJTsMnKUt0g2HAAjLgvJTMhDfW8JS/IDBvgLAXYl/UZpwXtIPZNmobrixMeSdYjy8
-	iaNy5Ef7xEFjnjiultvfG82wMZJ/xvk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-ewzaQSGpPRuv4WBjdA9h-Q-1; Thu,
- 22 May 2025 12:36:34 -0400
-X-MC-Unique: ewzaQSGpPRuv4WBjdA9h-Q-1
-X-Mimecast-MFC-AGG-ID: ewzaQSGpPRuv4WBjdA9h-Q_1747931794
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6E1D1956094;
-	Thu, 22 May 2025 16:36:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.39])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 970C519560AF;
-	Thu, 22 May 2025 16:36:30 +0000 (UTC)
-Date: Fri, 23 May 2025 00:36:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>
-Subject: Re: [PATCH] loop: add fs_start_write() and fs_end_write()
-Message-ID: <aC9SiaBxtf7rHZyS@fedora>
-References: <20250522143547.395304-1-ming.lei@redhat.com>
- <CADUfDZo0D4GBEAQSTbaD4Dr-_fUq0oPg8-Tq3njPbFQwfyg7Tw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMrqPPOl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21B34C4CEE4;
+	Thu, 22 May 2025 16:36:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747931800;
+	bh=japlrBVs3GNvjaE3jTX3f3XSzvTYr+WtDLNY0X32b8M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vMrqPPOlY7AujTvkCW9xVssk05jAKPryx//59+xbISnZtc+Td46xC8emJy3oCRkqj
+	 iMZCeHuE8/vjo2aBGo0eSfE5QUtpKQHNKlT282kjEhbUvUQAKNysE2df/8k1yNu3cm
+	 QC7eBPloWAZDjLJAwEshSuAWhFjwb3NtWwO6L5a/Fa0InqHM7gjLnMKO6m0T0tM8X7
+	 xsfEMTBj/Uu1MNXLmJd9pAy1ttmGDwUWl+Hs1Bav8dnctrS6qwMxZSIrLljnYjLTv5
+	 +rjz6hq3VtoJG7DnTaKzJ4w6olp6yL5ZSlKlH3/P50LOulsTz4hB/MJFe09Vmlj+Sq
+	 gcM4BHJlL7nhA==
+Date: Thu, 22 May 2025 10:36:37 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 4/5] block: add support for vectored copies
+Message-ID: <aC9SlcN6gTIz0F2E@kbusch-mbp>
+References: <20250521223107.709131-1-kbusch@meta.com>
+ <20250521223107.709131-5-kbusch@meta.com>
+ <4fdbe560-d646-496c-be51-49ea49d47449@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZo0D4GBEAQSTbaD4Dr-_fUq0oPg8-Tq3njPbFQwfyg7Tw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <4fdbe560-d646-496c-be51-49ea49d47449@suse.de>
 
-On Thu, May 22, 2025 at 08:31:41AM -0700, Caleb Sander Mateos wrote:
-> On Thu, May 22, 2025 at 7:37 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > fs_start_write() and fs_end_write() should be added around ->write_iter().
+On Thu, May 22, 2025 at 03:58:18PM +0200, Hannes Reinecke wrote:
+> On 5/22/25 00:31, Keith Busch wrote:
+> > ---
+> >   block/blk-lib.c         | 50 ++++++++++++++++++++++++----------
+> >   block/ioctl.c           | 59 +++++++++++++++++++++++++++++++++++++++++
+> >   include/linux/blkdev.h  |  2 ++
+> >   include/uapi/linux/fs.h | 14 ++++++++++
+> >   4 files changed, 111 insertions(+), 14 deletions(-)
+> > 
+> Any specific reason why this is a different patch, and not folded into
+> patch 2? It really feels odd to continuously updating interfaces which
+> have been added with the same patchset...
+
+Sure, I can do that if that's preferred. I just started this as simple
+as possible, and added new capabilities from there. I thought having the
+patch set show the journey might make it easier to review. If the
+evolving interfaces are not helping, though, I don't mind squashing them.
+ 
+> >   	case BLKCPY:
+> >   		return blk_ioctl_copy(bdev, mode, argp);
+> > +	case BLKCPY_VEC:
+> > +		return blk_ioctl_copy_vec(bdev, mode, argp);
+> >   	case BLKZEROOUT:
+> >   		return blk_ioctl_zeroout(bdev, mode, arg);
+> >   	case BLKGETDISKSEQ:
 > 
-> Do you mean file_start_write() and file_end_write()?
+> And that makes it even worse; introducing two ioctls which basically do
+> the same thing (or where one is actually a special case of the other)
+> is probably not what we should be doing.
 
-Yeah, will change it if V2 is needed.
-
-Thanks,
-Ming
-
+There are many interfaces that have a single vs vectored user input.
+It's like read vs readv. The use cases I'm working with are in-kernel
+though so I don't strongly need these user interfaces here, but it's
+been great for testing. I developed some that would work well in
+blktests, for example.
