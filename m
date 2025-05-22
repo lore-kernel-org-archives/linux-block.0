@@ -1,60 +1,73 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2103A22FF2B;
-	Thu, 22 May 2025 12:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281097485
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 12:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747917461; cv=none; b=ogvLWxyrlH1qDWA7LtWfmuyCAvtg863/tWLpZ/XkWf0zcItJy26XpWL9ua+KRDzg5erYFQTtPRqyJ9mCdSuhW99Z7KMl0ckk5q9qQPwJ+s85NcVdA0HTi8Fdwh0DnU0SYxLTBSHfSKt1A7PhKo5K6MPknE0mKEOTOade83CjApY=
+	t=1747918227; cv=none; b=N3hG11o+WggYwa0Fw2oIZFmqacMuC7qB/bGEv5gp/gXxkcLV2dfIylj63rAug8YKaIgqwcjSWneDg5JA9zwv/rAu5aCCLHKTLJrcO/0nnbF3y8pFjyUe6pdr4dIzrZFwTtB8UO2lCqLtLtVUhjvQDR7lKXXJMsD3KzFwXEYXXFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747917461; c=relaxed/simple;
-	bh=7BHIIAUVoOOy0N4+Qaw/456HNKKlG2GRqhkQvFpYOyc=;
+	s=arc-20240116; t=1747918227; c=relaxed/simple;
+	bh=QpkY9r1mt0Qh6PDkfZqElFxquznfMB6ymlK6B2iiEu4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bs4UySUkJfa9yRS9DXwll4bCSBbWKiyDkv2VzNf795JZhPARWrWiIogPPRrfQc4ZK4xDFGTZukUBOhVntVqHZANBHbOy1anW1pTAWphRzKkg4ZSDB/8G8xYm3E5ZRaJNAk3PHLo6cOyRb7hm9I7iBR+0zcoNSfFsuEKwI7rotjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wk3m2a+6; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=bJIFruKXTzFmnOM8XjkEms5jovD8Wi1FqouhmWNtw6S/UfGGGdTyGm8crc5UcH2sPh6S/v3Er6P8QyWmmGSZWHtZJJ+lRYvi/Lrk0JfarZoQh4ifZav/BSGCacMnut8/ofFrp8Iw7U1Y2VTDbBz+nQPD6fe4P2TUlcXCtlWdGe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KDIuJ2G8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wk3m2a+6"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M8FCLc006470;
-	Thu, 22 May 2025 12:37:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=jNmUnM
-	pfYdIVeP+Jb/MjUheQzeyhvoVC0wrvPkXFrVg=; b=Wk3m2a+6lODOpA39vwyvOz
-	Ys5GwZSKCcbeRyCNNQHBb57aZ7gwUm/g0wbLmR0GfLctdOLeMDWO54WVJtJzMU3I
-	ieHNO1NGpUpGd16M1e4c6Vhy2x00MWm22Fk0IaHzzmW+wFs+ximHhW1V6TNWhmZK
-	LFTChsnbMhBZbtO/wj3sFP6sYkQHRC94pui2oODCFYo94iqYlmGAhK6FVDlqyES6
-	KWwYjC/6ph8POBCiR7UyoqJLkKb1FMLqmB6096kDj5MtTc6aMmuMr2dHLeIXG/fz
-	ZG/hKUM1kjfidOsioI5O0nVmMKLzngwO5nV5pN0iECOYwI+j1tz9doTUU+Sh/8IQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46sg235nhe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 12:37:27 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54M9VSRW020693;
-	Thu, 22 May 2025 12:37:27 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46rwkq1eac-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 12:37:27 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54MCbMo624511052
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 12:37:22 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 01A3C58060;
-	Thu, 22 May 2025 12:37:26 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ED9E558059;
-	Thu, 22 May 2025 12:37:22 +0000 (GMT)
-Received: from [9.109.198.223] (unknown [9.109.198.223])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 May 2025 12:37:22 +0000 (GMT)
-Message-ID: <95753732-9714-42e0-8097-e2b4c3dd5820@linux.ibm.com>
-Date: Thu, 22 May 2025 18:07:21 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KDIuJ2G8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747918225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fx6oiSpfXxbM5W7Ps+W13NostgzfLtcsszzWV/K4XTM=;
+	b=KDIuJ2G8cJN2AcfXnyCHNa5oEKoVKfj5qWrbpObAMH4KF0Z1bMxY+IS5l6lq2mdIjCxO1v
+	vyxlEkPd7HAwtYsx9Qb/pNR23V51OZ+Y6/bEPcEQHqlgajvUQhYENiK55nl8V1Yv1GK7Zt
+	3vgl3boMZFDaEIkStnYNfW0N6dxCwHg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-Idv24guxPQioNz44HAThTQ-1; Thu, 22 May 2025 08:50:23 -0400
+X-MC-Unique: Idv24guxPQioNz44HAThTQ-1
+X-Mimecast-MFC-AGG-ID: Idv24guxPQioNz44HAThTQ_1747918223
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a3696a0ce6so2499934f8f.3
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 05:50:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747918222; x=1748523022;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fx6oiSpfXxbM5W7Ps+W13NostgzfLtcsszzWV/K4XTM=;
+        b=EYbCfFvbmuAUgCaP00V+fMrjWZkA9xR8Bk3/9MXvQwUCDTd083kkA8EqPJu0LF3YYw
+         OCxWxt8VpiEIOfumaXsNYGhvejD8LmL/qfvQnTXZe9CUW9Kv31EsvdSRQwxT0JHdL9LY
+         jtyvtFmCcwNe4IXULoLvsg9D2FYbIoO1srJLQ33gNBDQWT9w71Jr0M9Hn/+XlUuyPVl4
+         FDDF+uMIW3aee8oKYmpPMM6nVL6MY8zhIKzHXZRYlvUCbMg32I5Bl8o6rMQrlPmzkaBx
+         cizs0ADQ+JLL/Kxq0tADHeFgUBX0Vv8u6y7jxDzuz+WzIDejQv+bTidQSaH/S5Q1ibPc
+         UaAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTE9KdvJyO+A29+i6Slppu0EqQoNlL0//u3YJOCxirgtZFJLzj/UMR/YnrOOAhXfJQzUBMD+xqO6n9gQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YybOzhoS92gQjWieuk8tgmdIpQpwijQzHYf/4+QaVNvCfUZirS6
+	LVfv9kzkdt6yP/kjfXJbe6mN0QtXIruaNufyaEmUCW89vj8PzO9ieUPXtgYNJgdMOgDEhuVge4g
+	uQQy7zfCy0Ei0xmQIfiNfdBVdZU0RTnnaVkR9fUG++LkoeFPQRjxfnYGSCfoXFQyI
+X-Gm-Gg: ASbGncsZoNroHLv6qdFIeXggtfKbPr/7LQtrcXrLNaTIN/a0ozlFM4Wzbrc1pZ1ano6
+	5d1AL5QMYpx6OAv6oaAg+WcWLiipMtZIuL6tXA9zDSX2uAqonTMSPGUCxi7YbE6zh5sAkm+Y4vN
+	YZ22zbaH/WmetkmR4KXs4vvHIg8v38psLK/5IbriDDa7kDFvSpj281118Gu8ny6LAVnliDQ+jHj
+	AZ9NbHBOrzSrM8A2DfFf5b4fN7kSfDR63/X+8OYTvRK03SmHESCs58AlODpYOgagDyYD2TFqMwW
+	aMBH5uJTNpUfAqYl9z9vTuL4WraGW+W/+2prb+C/SV6kc3HTnibm9DPWwDShFCH5kYJSrfwFd/q
+	l9ut+z6roYspB2WRyYtlCpFaxsWBnYR381C1GTNM=
+X-Received: by 2002:a05:6000:2282:b0:3a3:7bbc:d940 with SMTP id ffacd0b85a97d-3a37bbcdbe0mr11775977f8f.39.1747918222512;
+        Thu, 22 May 2025 05:50:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE+kyGLojq8h/T8VO4XZrWF8YZH8eZH2PYErLG2heEckxcUG749bgICqDS3VcMXObIs6BDDSw==
+X-Received: by 2002:a05:6000:2282:b0:3a3:7bbc:d940 with SMTP id ffacd0b85a97d-3a37bbcdbe0mr11775923f8f.39.1747918222139;
+        Thu, 22 May 2025 05:50:22 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f22:2e00:6e71:238a:de9f:e396? (p200300d82f222e006e71238ade9fe396.dip0.t-ipconnect.de. [2003:d8:2f22:2e00:6e71:238a:de9f:e396])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f7bae847sm100971515e9.36.2025.05.22.05.50.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 May 2025 05:50:21 -0700 (PDT)
+Message-ID: <eab4b461-9717-47df-8d56-c303c3f6012d@redhat.com>
+Date: Thu, 22 May 2025 14:50:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,177 +75,148 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [linus:master] [block] 245618f8e4: stress-ng.fpunch.fail
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-References: <202505221030.760980df-lkp@intel.com>
+Subject: Re: [RFC v2 0/2] add THP_HUGE_ZERO_PAGE_ALWAYS config option
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+Cc: Mike Rapoport <rppt@kernel.org>, Pankaj Raghav <p.raghav@samsung.com>,
+ Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+ Ryan Roberts <ryan.roberts@arm.com>, Michal Hocko <mhocko@suse.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+ Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Zi Yan <ziy@nvidia.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, gost.dev@samsung.com, hch@lst.de,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
+ x86@kernel.org, mcgrof@kernel.org
+References: <20250522090243.758943-1-p.raghav@samsung.com>
+ <aC8LGDwJXvlDl866@kernel.org>
+ <6lhepdol4nlnht7elb7jx7ot5hhckiegyyl6zeap2hmltdwb5t@ywsaklwnakuh>
+ <6894a8b1-a1a7-4a35-8193-68df3340f0ad@redhat.com>
+ <625s5hffr3iz35uv4hts4sxpprwwuxxpbsmbvasy24cthlsj6x@tg2zqm6v2wqm>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <202505221030.760980df-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <625s5hffr3iz35uv4hts4sxpprwwuxxpbsmbvasy24cthlsj6x@tg2zqm6v2wqm>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0BYIBvohkylXjmXVMkU7fnvyw0P-MZXz
-X-Authority-Analysis: v=2.4 cv=RPmzH5i+ c=1 sm=1 tr=0 ts=682f1a87 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=i3X5FwGiAAAA:8 a=shPPcO8FRoZR3bCwaZgA:9
- a=QEXdDO2ut3YA:10 a=mmqRlSCDY2ywfjPLJ4af:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDEyOCBTYWx0ZWRfX7vQ1DvbqR7mX Ro6LhcUCd/NpssiUqx4AmVrXpkevmdxYZAfljNXdWhuqYV5ThTWkxKqn12NUe7wawgqMisVWeNC dob6oEuzX0RJbvmPLi24eFK9fTGSkkbnlOpKguNv3MLkDug4w1c62YA578F2cwASbWq/mZyZk/q
- lSFtmDwc1LwxHnH/sHPoxyBcPFBO45tX8AuW7SBePFeOgnqJhbqH0hcN6jZGB3PpLnj2FMh9KBJ /bmCQyYQXhYHWDQW8hI18dJQUWJ6j7VYZ1zGOBnf/9lYgbuanNtGoWbkQlT3Ct/2tRDsN3Uwv36 oHTy+5COnmkyrMRazEQrj+4OmeFXLQDHwd7C0SyS5FXtomlhbXkyx1jZX684DvSl/mvo5EqdWXA
- ipm6YnTlN6/8E/emBS/BW8O13DPHdhcBEtonBNflDl6rPmTDLKlEsm2BTS5kkmIYngv7iuQZ
-X-Proofpoint-GUID: 0BYIBvohkylXjmXVMkU7fnvyw0P-MZXz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 impostorscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505220128
 
+On 22.05.25 14:34, Pankaj Raghav (Samsung) wrote:
+> Hi David,
+> 
+>>>    config ARCH_WANTS_THP_SWAP
+>>>           def_bool n
+>>> -config ARCH_WANTS_THP_ZERO_PAGE_ALWAYS
+>>> +config ARCH_WANTS_HUGE_ZERO_PAGE_ALWAYS
+>>>           def_bool n
+>>> +config HUGE_ZERO_PAGE_ALWAYS
+>>
+>> Likely something like
+>>
+>> PMD_ZERO_PAGE
+>>
+>> Will be a lot clearer.
+> 
+> Sounds much better :)
 
+And maybe something like
 
-On 5/22/25 7:59 AM, kernel test robot wrote:
+"STATIC_PMD_ZERO_PAGE"
+
+would be even clearer.
+
+The other one would be the dynamic one.
+
 > 
+>>
+>>> +       def_bool y> +       depends on HUGETLB_PAGE &&
+>> ARCH_WANTS_HUGE_ZERO_PAGE_ALWAYS
+>>
+>> I suspect it should then also be independent of HUGETLB_PAGE?
 > 
-> Hello,
+> You are right. So we don't depend on any of these features.
 > 
+>>
+>>> +       help
+>>> +         Typically huge_zero_folio, which is a huge page of zeroes, is allocated
+>>> +         on demand and deallocated when not in use. This option will always
+>>> +         allocate huge_zero_folio for zeroing and it is never deallocated.
+>>> +         Not suitable for memory constrained systems.
+>>
+>> I assume that code then has to live in mm/memory.c ?
 > 
-> we don't have enough knowledge if this is a kernel issue or test case issue.
-> 
-> =========================================================================================
-> tbox_group/testcase/rootfs/kconfig/compiler/nr_threads/disk/testtime/fs/test/cpufreq_governor:
->   lkp-icl-2sp4/stress-ng/debian-12-x86_64-20240206.cgz/x86_64-rhel-9.4/gcc-12/100%/1HDD/60s/xfs/fpunch/performance
-> 
-> 3efe7571c3ae2b64 245618f8e45ff4f79327627b474
-> ---------------- ---------------------------
->        fail:runs  %reproduction    fail:runs
->            |             |             |
->            :6          100%           6:6     stress-ng.fpunch.fail
-> 
-> since the failure is persistent, just report what we observed in our tests FYI.
-> 
-> 
-> kernel test robot noticed "stress-ng.fpunch.fail" on:
-> 
-> commit: 245618f8e45ff4f79327627b474b563da71c2c75 ("block: protect wbt_lat_usec using q->elevator_lock")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> 
-> [test failed on linus/master      b36ddb9210e6812eb1c86ad46b66cc46aa193487]
-> [test failed on linux-next/master 8566fc3b96539e3235909d6bdda198e1282beaed]
-> [test failed on fix commit        9730763f4756e32520cb86778331465e8d063a8f]
-> 
-> in testcase: stress-ng
-> version: stress-ng-x86_64-1c71921fd-1_20250212
-> with following parameters:
-> 
-> 	nr_threads: 100%
-> 	disk: 1HDD
-> 	testtime: 60s
-> 	fs: xfs
-> 	test: fpunch
-> 	cpufreq_governor: performance
-> 
-> 
-> 
-> config: x86_64-rhel-9.4
-> compiler: gcc-12
-> test machine: 128 threads 2 sockets Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz (Ice Lake) with 128G memory
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202505221030.760980df-lkp@intel.com
-> 
-> 2025-03-20 08:33:52 mkdir -p /mnt/stress-ng
-> 2025-03-20 08:33:52 mount /dev/sdc1 /mnt/stress-ng
-> 2025-03-20 08:33:52 cd /mnt/stress-ng
->   File: "/mnt/stress-ng"
->     ID: 82100000000 Namelen: 255     Type: xfs
-> Block size: 4096       Fundamental block size: 4096
-> Blocks: Total: 78604800   Free: 78518242   Available: 78518242
-> Inodes: Total: 157286400  Free: 157286397
-> 2025-03-20 08:33:52 stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --fpunch 128
-> stress-ng: info:  [4680] setting to a 1 min run per stressor
-> stress-ng: info:  [4680] dispatching hogs: 128 fpunch
-> stress-ng: info:  [4680] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
-> stress-ng: warn:  [4680] metrics-check: all bogo-op counters are zero, data may be incorrect
-> stress-ng: metrc: [4680] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
-> stress-ng: metrc: [4680]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
-> stress-ng: metrc: [4680] fpunch                0    557.92      0.40     19.56         0.00           0.00         0.03          3180
-> stress-ng: metrc: [4680] miscellaneous metrics:
-> stress-ng: metrc: [4680] fpunch              2049.12 extents per file (geometric mean of 128 instances)
-> stress-ng: info:  [4680] for a 620.45s run time:
-> stress-ng: info:  [4680]   79418.05s available CPU time
-> stress-ng: info:  [4680]       0.40s user time   (  0.00%)
-> stress-ng: info:  [4680]      19.59s system time (  0.02%)
-> stress-ng: info:  [4680]      19.99s total time  (  0.03%)
-> stress-ng: info:  [4680] load average: 250.69 349.62 213.80
-> stress-ng: info:  [4680] skipped: 0
-> stress-ng: info:  [4680] passed: 128: fpunch (128)
-> stress-ng: info:  [4680] failed: 0
-> stress-ng: info:  [4680] metrics untrustworthy: 0
-> stress-ng: info:  [4680] successful run completed in 10 mins, 20.45 secs
-> 
-> 
-> we don't observe any abnormal output in dmesg. below is an example from parent
-> commit.
-> 
-> 2025-03-20 09:12:39 mkdir -p /mnt/stress-ng
-> 2025-03-20 09:12:39 mount /dev/sdc1 /mnt/stress-ng
-> 2025-03-20 09:12:39 cd /mnt/stress-ng
->   File: "/mnt/stress-ng"
->     ID: 82100000000 Namelen: 255     Type: xfs
-> Block size: 4096       Fundamental block size: 4096
-> Blocks: Total: 78604800   Free: 78518242   Available: 78518242
-> Inodes: Total: 157286400  Free: 157286397
-> 2025-03-20 09:12:39 stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --fpunch 128
-> stress-ng: info:  [4689] setting to a 1 min run per stressor
-> stress-ng: info:  [4689] dispatching hogs: 128 fpunch
-> stress-ng: info:  [4689] note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
-> stress-ng: metrc: [4689] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
-> stress-ng: metrc: [4689]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
-> stress-ng: metrc: [4689] fpunch             1166     60.31      0.11     34.66        19.33          33.54         0.45          3164
-> stress-ng: metrc: [4689] miscellaneous metrics:
-> stress-ng: metrc: [4689] fpunch              2051.97 extents per file (geometric mean of 128 instances)
-> stress-ng: info:  [4689] for a 60.91s run time:
-> stress-ng: info:  [4689]    7796.93s available CPU time
-> stress-ng: info:  [4689]       0.11s user time   (  0.00%)
-> stress-ng: info:  [4689]      34.68s system time (  0.44%)
-> stress-ng: info:  [4689]      34.79s total time  (  0.45%)
-> stress-ng: info:  [4689] load average: 325.78 93.83 32.28
-> stress-ng: info:  [4689] skipped: 0
-> stress-ng: info:  [4689] passed: 128: fpunch (128)
-> stress-ng: info:  [4689] failed: 0
-> stress-ng: info:  [4689] metrics untrustworthy: 0
-> stress-ng: info:  [4689] successful run completed in 1 min
-> 
-> 
-> from above, parent can finish run in 1 min, then has "bogo ops" and "bogo ops/s"
-> 
-> for 245618f8e4, the test seems run much longer, and the results for "bogo ops"
-> and "bogo ops/s" are all 0.
-> 
-> 
-> 
-> The kernel config and materials to reproduce are available at:
-> https://download.01.org/0day-ci/archive/20250522/202505221030.760980df-lkp@intel.com
+> Hmm, then huge_zero_folio should have always been in mm/memory.c to
+> begin with?
 > 
 
-I tried reproducing this issue but I couldn't recreate it. Is it possible
-for you to run this test on your setup using stress-ng option "--iostat 1"
-as shown below ?
+It's complicated. Only do_huge_pmd_anonymous_page() (and fsdax) really 
+uses it, and it may only get mapped into a process under certain 
+conditions (related to THP / PMD handling).
 
-# stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --fpunch 128 --iostat 1
+> I assume probably this was placed in mm/huge_memory.c because the users
+> of this huge_zero_folio has been a part of mm/huge_memory.c?
 
-If you can run test with above option then please collect logs and share it.
-That might help to further debug this.
+Yes.
 
-Thanks,
---Nilay
+> 
+> So IIUC your comment, we should move the huge_zero_page_init() in the
+> first patch to mm/memory.c and the existing shrinker code can be a part
+> where they already are?
+
+Good question. At least the "static" part can easily be moved over. 
+Maybe the dynamic part as well.
+
+Worth trying it out and seeing how it looks :)
+
+-- 
+Cheers,
+
+David / dhildenb
 
