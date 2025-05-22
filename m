@@ -1,133 +1,65 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7141E47A8
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 19:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DA32BDC3C;
+	Thu, 22 May 2025 19:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747941751; cv=none; b=Ct+twj8QntiYUaevWdvcUGTQoPgf8mfb4oMaZSiDX1XGvnACNHXBv3qLc+rWZNdp2uMkxcK6pNZmDv4PdR/BqFXGTAe8vGswaV0HXEEbup2TaBZDayfOuEV8AuAaANhAVff56fWT04INTUk7zxtp8dPz6wP4Ex6v0uHlNaf9ngw=
+	t=1747942729; cv=none; b=Rsa3ijRzxcIoQUdCxdUqHxuPDYaGEb5Cr20NS9ZtdPBUWnDYfFBf8bPXdUJPagVRDdDTF8ARH47Is0+aT8ICwKLB6EOAw+/KD9/XuZjd+6gjpDhvBmmaoE50vBoynL/6EgPESiSMDjY9lTSo7+To7KXYtlguyGnMYZt9F5VNd7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747941751; c=relaxed/simple;
-	bh=0Z26MqgcTOImtc/Rea6ADzYZJmlhrBMtNSggPUWESpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HbjtX8vl5UwqLdOItLuty1O7zUu/EtPspW64i8+ZE9MVz8gYIc3qCfycfte3cCkM3JEmDj07lKRVqxlzHE8aHBM/m5+W8ILMZ34pTqRXcxJ48gvK0PufPgbghyvadmi57uYmDSErr9TnDCJzxrpnSYy1xKcvZKihqNV6SZn78z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=I4KEani9; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1747942729; c=relaxed/simple;
+	bh=YSTV4nrR9BcWNLjnzTxQXJEJv40M/G97zCOIOpydIcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qSpegQF8tv7gyvbs5Yf3HXSReA4nY9LJejsy+73WAppg1XITkoUibcHI/212V/XGZMV6r5oEWaHWwOyic6zvTEZVHLt/6CzAC0OQ6TKt3bTA362wsvkiK4jk3kjNWG8smscjS/Tkbd43tTM0+WsTGniy5o9j+kP3uswv/sS9SpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BviKpAsn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="I4KEani9"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4b3J8N64Fzzlvq4c;
-	Thu, 22 May 2025 19:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1747941747; x=1750533748; bh=Hlsj0CNm0FNhCgCvXMuT7qCE
-	UtEyzcx7IgOufwzD5bo=; b=I4KEani9lRtHMVQz8LZym4oJiZWsUYPwqCqDUkWx
-	oLNdjofBjmy7L4vFMTAj5iDAZwOnhT1uPb+qYEIZbMGr3uQSKIz+kxbmuohMKSy8
-	jtpIfg65ueHQt4dtND2c6C718ENRVh5kwOAJ/GIWFgaDKwGzD+kbaY4aUbDd13b4
-	mhc4X3XSq/VGLoMHB/HnVNgNANjn6WFmlI4j5A5GNrp6isNpRqaUrF89WmYdG8Vt
-	JB7XVVvnyLChSXwG+Cd3hu+4sUBXis+pi5tjz1sS8uBTK3p+SW5+vjGcm1xKY7jV
-	JvgnaaimBk7C8NGnSc8Qjd3Lkr7hb/k3bKTri3i5jHxOLw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 0odirWVGG6U8; Thu, 22 May 2025 19:22:27 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4b3J8K1tWqzlvnMh;
-	Thu, 22 May 2025 19:22:24 +0000 (UTC)
-Message-ID: <468be217-40d5-4674-891e-d11cc96b1c2a@acm.org>
-Date: Thu, 22 May 2025 12:22:22 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BviKpAsn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE94DC4CEE4;
+	Thu, 22 May 2025 19:38:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747942729;
+	bh=YSTV4nrR9BcWNLjnzTxQXJEJv40M/G97zCOIOpydIcc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BviKpAsnwN8/wHsxbVtqMWs6NQegDJNvtPqegexaj6V0gEVc8fklKCohTCjDArvDy
+	 vd0AbInp8fIIpGKgtNzaj2IztrPLKNlTqseo9nSnQr3iWSSp1vtHxih09JbvLf7/23
+	 tqeBqMK0j85D5Wb67Ak3a4bmcGpm/uuW694JJuPefwvQ9WCJWHDMTOz3X8b3e38Bbn
+	 9yiIH31hTt1aauy4ns9RjezhCd+zEWkUTB7I2q5lnbRj2dhCeBDjeOXbkpuOKGnyk5
+	 OR0+e4+q8JKQ3N12DbWS5XsOZDMA/gpd/ld+slatp1XYMTezM+J0jiwZ0E0xrukcbW
+	 7Gny4joijn39Q==
+Date: Thu, 22 May 2025 12:38:47 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, vkoul@kernel.org,
+	chenxiang66@hisilicon.com, leon@kernel.org, jgg@nvidia.com,
+	alex.williamson@redhat.com, joel.granados@kernel.org,
+	iommu@lists.linux.dev, dmaengine@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	Haavard.Skinnemoen@google.com,
+	Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH 1/6] fake-dma: add fake dma engine driver
+Message-ID: <aC99RzlvdX0rnTNW@bombadil.infradead.org>
+References: <20250520223913.3407136-1-mcgrof@kernel.org>
+ <20250520223913.3407136-2-mcgrof@kernel.org>
+ <e3b98f16-2b9f-4cc1-8a54-29c6dfee918f@arm.com>
+ <CGME20250521170724eucas1p28e65ef0ade407ce9e2cfe0b72da26d7a@eucas1p2.samsung.com>
+ <aC4IRTo_HBxv9dVN@bombadil.infradead.org>
+ <fe97e7ba-85d1-44c7-9de8-2082146f335d@samsung.com>
+ <aC9X1VFrRJbH4bYm@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] block: new sector copy api
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-Cc: Keith Busch <kbusch@kernel.org>
-References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-2-kbusch@meta.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250521223107.709131-2-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aC9X1VFrRJbH4bYm@bombadil.infradead.org>
 
-On 5/21/25 3:31 PM, Keith Busch wrote:
-> +/**
-> + * blkdev_copy - copy source sectors to a destination on the same block device
-> + * @dst_sector:	start sector of the destination to copy to
-> + * @src_sector:	start sector of the source to copy from
-> + * @nr_sects:	number of sectors to copy
-> + * @gfp:	allocation flags to use
-> + */
-> +int blkdev_copy(struct block_device *bdev, sector_t dst_sector,
-> +		sector_t src_sector, sector_t nr_sects, gfp_t gfp)
-> +{
-> +	unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
-> +	unsigned int len = (unsigned int)nr_sects << SECTOR_SHIFT;
-> +	unsigned int size = min(len, nr_vecs * PAGE_SIZE);
-> +	struct bio *bio;
-> +	int ret = 0;
-> +	void *buf;
-> +
-> +	if (nr_sects > UINT_MAX >> SECTOR_SHIFT)
-> +		return -EINVAL;
-> +
-> +	buf = kvmalloc(size, gfp);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	nr_vecs = bio_add_max_vecs(buf, size);
-> +	bio = bio_alloc(bdev, nr_vecs, 0, gfp);
-> +
-> +	if (is_vmalloc_addr(buf))
-> +		bio_add_vmalloc(bio, buf, size);
-> +	else
-> +		bio_add_virt_nofail(bio, buf, size);
-> +
-> +	while (len) {
-> +		size = min(len, size);
-> +
-> +		bio_reset(bio, bdev, REQ_OP_READ);
-> +		bio->bi_iter.bi_sector = src_sector;
-> +		bio->bi_iter.bi_size = size;
-> +
-> +		ret = submit_bio_wait(bio);
-> +		if (ret)
-> +			break;
-> +
-> +		bio_reset(bio, bdev, REQ_OP_WRITE);
-> +		bio->bi_iter.bi_sector = dst_sector;
-> +		bio->bi_iter.bi_size = size;
-> +
-> +		ret = submit_bio_wait(bio);
-> +		if (ret)
-> +			break;
-> +
-> +		src_sector += size >> SECTOR_SHIFT;
-> +		dst_sector += size >> SECTOR_SHIFT;
-> +		len -= size;
-> +	}
-> +
-> +	bio_put(bio);
-> +	kvfree(buf);
-> +	return ret;
-> +}
+On Thu, May 22, 2025 at 09:59:03AM -0700, Luis Chamberlain wrote:
+> I'll try the few knobs suggested by Leon to see if that enables it.
 
-Is avoiding code duplication still a goal in the Linux kernel project?
-If so, should the above code be consolidated with kcopyd into a single
-implementation?
+That didn't help, but I'm more intruiged by giving the iommufd mocking a
+shot, so I'll try that next as I think that will ultimately be cleaner
+if possible.
 
-Thanks,
-
-Bart.
+  Luis
