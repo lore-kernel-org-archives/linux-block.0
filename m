@@ -1,72 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962E61DF965
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 12:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946F523371B
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 12:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747915295; cv=none; b=kSFuKdy18Gw0YIV5KiuDBYDXAu2dmjHd3jt8BycijFvG7ZzzllwqgQ4gYrcnhF1Tvjf2mvmC4+RiV0D9q9IcYcjrx0Hodxn+qaM1OVx1zRuTjBUkpZxeqtNj6wihz4x2UY5OzMAul5Py0AYWZjUYrcRLoza9DFwZH/Rgb19AiJk=
+	t=1747915467; cv=none; b=LTqYnaZksCNsmcEXIWruca94FFOuf+lXKccAb52hmUk1dNgmD7r/J6xsToYsrjlM6QGNLyqmzgD7WKkyKQnq5jybpgb68v/b3J4kB+WWFhKUsVf7FcpCvGecLPp1A1qnTgZ9m76AZmMJyxegm1A0Bh1PrP6v9xnuqAwlMcqLw/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747915295; c=relaxed/simple;
-	bh=3cZkJgLKEdh8Znywjyh4tvd6kpRmgvfQ093vzDrlQiE=;
+	s=arc-20240116; t=1747915467; c=relaxed/simple;
+	bh=4wX/3Pa82sfG0nToWe9Rdgbq4x29T+ZV/w+SFWDYNZI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Prb7V3LvCLSS16gsD/gz+sN5BZ5ns1/GTza3HyvHr0B+VErHLXwqwNr7IxjmY+agq5q5AyMBeuczThpqzZCaH5jX/G7d3njMiqqFzmt2BFNNaMaO7Xxl2x2O6CMpPMkb95TkNqJ9lv8J8mkyBygkel9FDYg+2Tks/BA5d8Xo3qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dThDvdcu; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Xf/IeRQwz/tITAGVmeyNkkRsazqA3e9M7H/xKfUnAjtUat41eEbGyD3sKyXgk920RWIsPX92SD3aUmSsSKBNzHpItOfNxKbkvV7u3Y+45dyvgOyCOlTwrWNyrbWQXIeetpNf3QnOfJ8JZNUF+y9p5AS7ABYYDsWY8CG2ZttZVfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YPe3DAwi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dThDvdcu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPe3DAwi"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747915292;
+	s=mimecast20190719; t=1747915464;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iNKHItieFldlVHFOlaztfdsZmomMboRlw+z49HMe4ok=;
-	b=dThDvdcuBB3/HdkPufQ5SH+tTPYtTwio2yCyJUJCeUGgIwskSAmw2YKuCZdVPSzaE1MfMy
-	mvHqZKRShr3FMUJM4HeIah3atqEVvISKejRZuPuQp0pcdP8qUOK3+dDTXCyjRa645ds2oT
-	hYZWnYfaCknZ2/SRkKgsBs5+VboL5tQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SE1l7LwOJdzhSNTpk1qJSyj60i+zwkLVGGrsHxlqMck=;
+	b=YPe3DAwigoGffLDS4GiL/TLKBfnhp/Yjde/tMppnZGAMT5XchVwQrYDGNsXjbTvBu5NeWG
+	sfOEXXCESEiKyN74G/TrFJPhbjVMrxg0cbwbFEKN79OK8oJtNFqflXr0T7i/1C0ymfUCTx
+	13wdN5/yUhvyDBeMbrPJjEsog48Qf/Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-Ftt5UXdBNpG0QTRGDU899g-1; Thu, 22 May 2025 08:01:31 -0400
-X-MC-Unique: Ftt5UXdBNpG0QTRGDU899g-1
-X-Mimecast-MFC-AGG-ID: Ftt5UXdBNpG0QTRGDU899g_1747915290
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4bafbb1abso501223f8f.1
-        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 05:01:31 -0700 (PDT)
+ us-mta-512-_o-ebSuQMJihQPJ9Vhs2PA-1; Thu, 22 May 2025 08:04:23 -0400
+X-MC-Unique: _o-ebSuQMJihQPJ9Vhs2PA-1
+X-Mimecast-MFC-AGG-ID: _o-ebSuQMJihQPJ9Vhs2PA_1747915462
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d007b2c79so59817105e9.2
+        for <linux-block@vger.kernel.org>; Thu, 22 May 2025 05:04:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747915290; x=1748520090;
+        d=1e100.net; s=20230601; t=1747915462; x=1748520262;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=iNKHItieFldlVHFOlaztfdsZmomMboRlw+z49HMe4ok=;
-        b=FxNb2nYov3iOnRq0gfIp/NfJcHTUiTejKAfIWvJnLELA1i50TgVmMGxsULnIYGFgmU
-         zNxUD3p8Oy40JkDBBIAmkAqtAkhLoHfpshcOOiPV8lKyIbnFMWAMmUf8Y+Pj8yuvvOtY
-         nFhUO/xCgE9GigPyKs9ExAnM+kK0pGfeP2An5T71oKKUSfo5RfRkGo9+YutkGzrSOvpE
-         +57dCupY+AWby00Ag4mCKzk09R/MddBFcu4Q8Bd1O5dRZLEi1AisAEQWKxbwWYxhBs3n
-         Z2Qp1GckSGZCNlwxXeibQHSq+LOi5zRhZNajvvWoqOlRqaBi+kJ2TXc61nIjGN4y7nc0
-         60+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWRCA1UiOdm9HPbrnZHhGyaTUbOcFl0KzY9l+xyB8dhHg0XjySaDzrADVXvhRLZ07BUQe+/ex+ZllsT/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy75CHW6SjwJ2jGxBotPTbAf825U+zEY8V09VFeljFE8weKZKY3
-	+N5E22stJBmtNA1VC1nkKvdDhPDij9lDRrBJbUw7ATVRToNTuH+Z6DkQn2Ek0CW8gLTFyNuPwVE
-	DEnYc7LG4FHGGHni/pbq2fq40GwngtUM1mqKNHPoAb2Wh1YJTWkJSgx2R4eqJbb9m
-X-Gm-Gg: ASbGncvn+qSO/KIhpFhpKF3V08ldxUt6W2iliCB55o8kENgMKpmBWgCTT2n+I5a444A
-	kiUBBwToeK1h9cTJMfdyTuO593AKZxFhvPYbXSPqwpKUvTg9EHdkCFQGsHPY7XKhqspuNjFQsKX
-	5ffP0RiPoIkhgTe/oZVZWnk2m390taxWTmenwMKNLQ58WS239/t6ahPtyLYNTbH1XknMKHwp1L2
-	DojOe8KlSUM2JwUva+2j7BU5yXmytv+oE905R89ytEIJuvuBEdRE2xplygYQOBRhfMY/tJ2f5dK
-	+ym+0O2JMZcfwXhnDfW/YCzyeD9JSi41Vuc6P68zfg==
-X-Received: by 2002:a05:6000:1862:b0:3a1:f69f:3341 with SMTP id ffacd0b85a97d-3a35fe929c0mr20912547f8f.26.1747915289971;
-        Thu, 22 May 2025 05:01:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErMUayE2jYtY0hACROYIHryKUvps/DNFcId2ztdIhvw5IaHZ+RDOk4bPfWfqVqksX/ZTFcKA==
-X-Received: by 2002:a05:6000:1862:b0:3a1:f69f:3341 with SMTP id ffacd0b85a97d-3a35fe929c0mr20912491f8f.26.1747915289482;
-        Thu, 22 May 2025 05:01:29 -0700 (PDT)
-Received: from [192.168.3.141] (p4fe0f532.dip0.t-ipconnect.de. [79.224.245.50])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d230sm22458617f8f.4.2025.05.22.05.01.27
+        bh=SE1l7LwOJdzhSNTpk1qJSyj60i+zwkLVGGrsHxlqMck=;
+        b=tblqPOROpzoUBXm7GZRjNa7CmLQE5UobC6c0CcMwatsBNxi++CveMGcucg5UTt6s0f
+         aVJFY1AqwxmYG+EHtRvWtIlhqpcjdznK1SXHmuNHp9MBOjSs5+DnZCs/bMWK+uo1Ey1y
+         GwBsvPplTrxdek6gUHscBY8E52zTKmkGy05JNqNgwtZYXXcWHD3pYtbh2f/TciOXH6Tl
+         twIQTDNeykA/FwxGIUbKcjqHfbDq43+LLM3EKQdIeIbGmiTJKKFbMjM+FNqPzDdKNgG7
+         E8X1KdRf98TLVOOEOFSZzJMEmRDWDq+TwYgl63dxp2Ar/qTw+NmMqiKPdEzQNQ0KzAqn
+         pexQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUunnzXQHsr5kSS3VSOxJdI2qaJAlkrx8k0s6kR+v9zUC4PGUdu22P5PruMRYOlnTLhmszbDQboS8570w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEanRd8ZX4L0GjskAudCG2oRs+zee5Jcl49l9QwqgzvaF34I8Z
+	VblylfQTUboAHUK5Y0apFp8S3STJMMJnJuJ/LIVHZz7hhs2Qxno9MUtdTD2LCEksP4C4FwaTP9i
+	FAz0W1f6iAzRgciiBLqD1dY4e/nGje2LRn3Va12a/mPWF6HfWYR7zeb+xIgm14/Yf
+X-Gm-Gg: ASbGncthQZx2GeYYVeMifgY+YwjhykSgA/uniutZkP477BMeT/wien+nWy/sf2v0YZm
+	F0IvhprI9Dgo7rOcTFRAGGwUIuwgez1nWuQveS0n0hZg3r6k13nVPi3V4kl2R1Z/7umeCP1Og6A
+	q8bmxGP2YFf5YU+kZYqmYByLG2COyMepsaVIWyToR6K19/bA0b95dTKLSJ+AZy2k78cG8EjUEEi
+	e4NEqQHOWkSfQpMibdtUE+0bwREDEhrImeePIgBakeamXXiWw1TcuYiANSkDs4zL16kJ/bT23ic
+	fdDJ+Mg2mjDRIxeMGc3XCSAnhF/NrfX28QgPkwgMAXMWgX5cW3I6dTDD0LyA9MfCPD8LFOEu3Ty
+	gpn/x71595Rx8nnCirtZCnTLT7+CbHNgU+7CbxKc=
+X-Received: by 2002:a05:600c:6748:b0:442:e011:7eb with SMTP id 5b1f17b1804b1-442fd671befmr283747145e9.30.1747915461986;
+        Thu, 22 May 2025 05:04:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBeNOf9p7XQMEo661VsP3lNb83xqKoazNsruCMHoqOB07PdLk122+DzoLdl3opzWhYkLxpDg==
+X-Received: by 2002:a05:600c:6748:b0:442:e011:7eb with SMTP id 5b1f17b1804b1-442fd671befmr283746665e9.30.1747915461561;
+        Thu, 22 May 2025 05:04:21 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f22:2e00:6e71:238a:de9f:e396? (p200300d82f222e006e71238ade9fe396.dip0.t-ipconnect.de. [2003:d8:2f22:2e00:6e71:238a:de9f:e396])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f24b6471sm103717145e9.24.2025.05.22.05.04.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 05:01:28 -0700 (PDT)
-Message-ID: <bb57ac40-5579-455f-be79-f0e373d5569d@redhat.com>
-Date: Thu, 22 May 2025 14:01:27 +0200
+        Thu, 22 May 2025 05:04:21 -0700 (PDT)
+Message-ID: <6894a8b1-a1a7-4a35-8193-68df3340f0ad@redhat.com>
+Date: Thu, 22 May 2025 14:04:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,8 +76,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC v2 0/2] add THP_HUGE_ZERO_PAGE_ALWAYS config option
-To: Mike Rapoport <rppt@kernel.org>, Pankaj Raghav <p.raghav@samsung.com>
-Cc: Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Mike Rapoport <rppt@kernel.org>
+Cc: Pankaj Raghav <p.raghav@samsung.com>,
+ Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
  Ryan Roberts <ryan.roberts@arm.com>, Michal Hocko <mhocko@suse.com>,
  Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
  Dev Jain <dev.jain@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
@@ -87,11 +90,12 @@ Cc: Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
  Andrew Morton <akpm@linux-foundation.org>,
  "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- "Darrick J . Wong" <djwong@kernel.org>, gost.dev@samsung.com,
- kernel@pankajraghav.com, hch@lst.de, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, willy@infradead.org, x86@kernel.org, mcgrof@kernel.org
+ "Darrick J . Wong" <djwong@kernel.org>, gost.dev@samsung.com, hch@lst.de,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
+ x86@kernel.org, mcgrof@kernel.org
 References: <20250522090243.758943-1-p.raghav@samsung.com>
  <aC8LGDwJXvlDl866@kernel.org>
+ <6lhepdol4nlnht7elb7jx7ot5hhckiegyyl6zeap2hmltdwb5t@ywsaklwnakuh>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -139,54 +143,71 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <aC8LGDwJXvlDl866@kernel.org>
+In-Reply-To: <6lhepdol4nlnht7elb7jx7ot5hhckiegyyl6zeap2hmltdwb5t@ywsaklwnakuh>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 22.05.25 13:31, Mike Rapoport wrote:
-> Hi Pankaj,
+On 22.05.25 14:00, Pankaj Raghav (Samsung) wrote:
+> Hi Mike,
 > 
-> On Thu, May 22, 2025 at 11:02:41AM +0200, Pankaj Raghav wrote:
->> There are many places in the kernel where we need to zeroout larger
->> chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
->> is limited by PAGE_SIZE.
+>>> Add a config option THP_HUGE_ZERO_PAGE_ALWAYS that will always allocate
+>>> the huge_zero_folio, and it will never be freed. This makes using the
+>>> huge_zero_folio without having to pass any mm struct and a call to put_folio
+>>> in the destructor.
 >>
->> This concern was raised during the review of adding Large Block Size support
->> to XFS[1][2].
->>
->> This is especially annoying in block devices and filesystems where we
->> attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
->> bvec support in block layer, it is much more efficient to send out
->> larger zero pages as a part of a single bvec.
->>
->> Some examples of places in the kernel where this could be useful:
->> - blkdev_issue_zero_pages()
->> - iomap_dio_zero()
->> - vmalloc.c:zero_iter()
->> - rxperf_process_call()
->> - fscrypt_zeroout_range_inline_crypt()
->> - bch2_checksum_update()
->> ...
->>
->> We already have huge_zero_folio that is allocated on demand, and it will be
->> deallocated by the shrinker if there are no users of it left.
->>
->> But to use huge_zero_folio, we need to pass a mm struct and the
->> put_folio needs to be called in the destructor. This makes sense for
->> systems that have memory constraints but for bigger servers, it does not
->> matter if the PMD size is reasonable (like x86).
->>
->> Add a config option THP_HUGE_ZERO_PAGE_ALWAYS that will always allocate
->> the huge_zero_folio, and it will never be freed. This makes using the
->> huge_zero_folio without having to pass any mm struct and a call to put_folio
->> in the destructor.
+>> I don't think this config option should be tied to THP. It's perfectly
+>> sensible to have a configuration with HUGETLB and without THP.
+>>   
 > 
-> I don't think this config option should be tied to THP. It's perfectly
-> sensible to have a configuration with HUGETLB and without THP.
+> Hmm, that makes sense. You mean something like this (untested):
+> 
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 2e1527580746..d447a9b9eb7d 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -151,8 +151,8 @@ config X86
+>          select ARCH_WANT_OPTIMIZE_DAX_VMEMMAP   if X86_64
+>          select ARCH_WANT_OPTIMIZE_HUGETLB_VMEMMAP       if X86_64
+>          select ARCH_WANT_HUGETLB_VMEMMAP_PREINIT if X86_64
+> +       select ARCH_WANTS_HUGE_ZERO_PAGE_ALWAYS if X86_64
+>          select ARCH_WANTS_THP_SWAP              if X86_64
+> -       select ARCH_WANTS_THP_ZERO_PAGE_ALWAYS  if X86_64
+>          select ARCH_HAS_PARANOID_L1D_FLUSH
+>          select BUILDTIME_TABLE_SORT
+>          select CLKEVT_I8253
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index a2994e7d55ba..83a5b95a2286 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -823,9 +823,19 @@ config ARCH_WANT_GENERAL_HUGETLB
+>   config ARCH_WANTS_THP_SWAP
+>          def_bool n
+>   
+> -config ARCH_WANTS_THP_ZERO_PAGE_ALWAYS
+> +config ARCH_WANTS_HUGE_ZERO_PAGE_ALWAYS
+>          def_bool n
+>   
+> +config HUGE_ZERO_PAGE_ALWAYS
 
-Such configs are getting rarer ...
+Likely something like
 
-I assume we would then simply reuse that page from THP code if available?
+PMD_ZERO_PAGE
+
+Will be a lot clearer.
+
+ > +       def_bool y> +       depends on HUGETLB_PAGE && 
+ARCH_WANTS_HUGE_ZERO_PAGE_ALWAYS
+
+I suspect it should then also be independent of HUGETLB_PAGE?
+
+> +       help
+> +         Typically huge_zero_folio, which is a huge page of zeroes, is allocated
+> +         on demand and deallocated when not in use. This option will always
+> +         allocate huge_zero_folio for zeroing and it is never deallocated.
+> +         Not suitable for memory constrained systems.
+
+I assume that code then has to live in mm/memory.c ?
+
 
 -- 
 Cheers,
