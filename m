@@ -1,59 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F216728BA88
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 13:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F2928A1DC;
+	Thu, 22 May 2025 13:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921872; cv=none; b=oDpRjYCCFyY98fiHcc3ZOuvmM2GVBoAkPyWbSQelIuNdaZTdPE32ubieo9y6DiRqo2wUSmN6bWGRZnjxDS9zHruWSbGDzoHFx2EM8o3KzEXQsIbZtjE4LHaNzhS7CIbHGKU7ocY0+Q2t0dCPo96OBckcq1ZLII8k9WJM8/PucVw=
+	t=1747921886; cv=none; b=LYbXDOsILNk0GWsHVFfmqPAXViWl/GqQCzbBDJ+zJD9e8dz+eRRu/41R7dc04ho12Sb5XZfwL65qpktJxO4ZexJUiHLXBhXVq/mw8WBcf+Vk3hlvsyy3Qkk6+ZdY1rKnVBfX5oDrTgpUpBWVByezm5ipqjkfT77SJULfLJq+YkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921872; c=relaxed/simple;
-	bh=IvTLk0ne+tnJRHNHNtvrMKfkDsnwJqQmiFRotsQFt+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XJxtJxa2oXHGmOT8can9pvZnvsmOuyrl3S5JYh103lnCpjbChpYIdtP9vs7C7QsiJVAfxMIlPo6poZvtFgsGGnfAjyA+xq5O/OXsMpJauOzYLDFv7+tx4xzbtxE/QsRDUhMcigfKR2RUnXBQoweV9BGTCHE2sh5Ec16l948fOSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAnagRsc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747921886; c=relaxed/simple;
+	bh=IFCHmgpCwvEpsMGGei6Eq3nb3pQrhHESHm77Wp7BOhI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLJP92LubK2zBKC4ruhg6S3flkwW9HrnHgJRPgYwfr+UYXBqDhF1J1kjaRfDPQ+XctliMbZ1wfz2Ggvpmx5Hfa3DX2ovJtxSP8V6ml4qH6Fyo6gxQxDTOmZFIg5DDqEq4RGuZ5+x0odY8cVOtbtl+xD/eD81mjfrhDojbSpZ0LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/rCble6; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAnagRsc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747921869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PiLrG9bEpsUO1Ce5rq6VuNkuxwGnEmCexhtvodJCoKY=;
-	b=bAnagRscCYmls4Xj+e5zLgEWIkAPBX82p7cb9lJX3hgFHvNbgt9VcIDrzY7y9LK6iQ5als
-	43HZa7RT2gEbID2qfcrm4+SW2lPeX+TTVXEIEWXmn8C5aSWdL1njCpnedZo66qhcmagE+b
-	SA6TXWAQgmJS0KnvPFlMGThIBzW/zGA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-6OaNHq4PNniw1k6v36FxAQ-1; Thu,
- 22 May 2025 09:51:06 -0400
-X-MC-Unique: 6OaNHq4PNniw1k6v36FxAQ-1
-X-Mimecast-MFC-AGG-ID: 6OaNHq4PNniw1k6v36FxAQ_1747921865
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8040D195608A;
-	Thu, 22 May 2025 13:51:05 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.39])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 59443195608F;
-	Thu, 22 May 2025 13:51:03 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] ublk: run auto buf unregister on same io_ring_ctx with register
-Date: Thu, 22 May 2025 21:50:43 +0800
-Message-ID: <20250522135045.389102-3-ming.lei@redhat.com>
-In-Reply-To: <20250522135045.389102-1-ming.lei@redhat.com>
-References: <20250522135045.389102-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/rCble6"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7426c44e014so7817495b3a.3;
+        Thu, 22 May 2025 06:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747921883; x=1748526683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RobnKU9KOucG9hKxcDzKA3QVziQD4DYIMl/kGFJ+p6I=;
+        b=Z/rCble64FkEISCFMVLbJ7PI/nfWWJSfg0m1UyI8Q0WHDoQlcksm3ou1TnnPs0AHFm
+         w78UJFtUz/tlA7zazovuRwj4+zxjtR/UaagqrRUyFlU4/BV4seYbx5Bzz5p2YyVfNLrL
+         KNxSTeaO7A9aCA7XN6xGNP1WbDaQNbdD2u6Cu1ZDBUsLbdb/G1OarMv+p6B0Ho3cU5kE
+         Rn2iWcFXlZ9E0oD8UJ/I1S4vsUiFsbtrqkjk9sBrAZ43v/f7Ys7GRAD+N6QaNHuc2RRK
+         7qCmRtG52/OAl+VNdoi5IPYcNuyRvb8Va7YVZjY+nEDR6KKDs1Sm+yT0e3qGOkDHuGGG
+         HB8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747921883; x=1748526683;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RobnKU9KOucG9hKxcDzKA3QVziQD4DYIMl/kGFJ+p6I=;
+        b=JzQJQTK77zpm1NMykMOkDla/VFE6OM37woxro8sadIvLvZfHWjykaNDNrbqCuGOVHr
+         ke8KXOwgQgytZOrIa4dcQMGWEJaqZ2ysdpxovMPCkiIvaWQ/hsEKuISEy6UXnGGBgEyv
+         0iCqGbBBmKJliWoALDAlgNku7jrmR3KYUWpyjIZID9mvaZs9+iYY+Exv3fCiooWhMgQH
+         mm6fQxxsjR4evbv+mJehWI0g+fIMSHq/L98K2RohH3m/9z1aqgPCz6sQb4NGHN7XnJ+G
+         Terr1AF9JJZq8WkSQUgmCqTguzu//cP1OpxZbsfu0q34hhXe3pXlAAyKszWHzpgjIAew
+         DiAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVnu+UNj5vnBzJRIJIs9FLQ1fHUZ1GamUNvsb2sMnQkHs9sUqFMgBfSP8rUnxpA3k3lzkSc0GrnAApwq5m@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaRtFeN2hK+3az+eQqKq2Dppp9IE8cc5hQiDER8VggbUEnbuYn
+	hBT+JIc+Vcl2kGTUMgw6BddRtzoICkh7G9dGl3c6Uar2+DWW+9uQ/aRkk1zHDg==
+X-Gm-Gg: ASbGnctHt51t7pBKK16anM+cSljO+TNVaVd5uHWIksUD0i9LU0QFv3au8cpCD8VDe19
+	t92KcPKybC87O854jHolUX+u02nSGOaRqYX3zlL4refvvTCkP6XYt4EhIqqwk0kh7Wp+5dKqxFT
+	HFzHTcwtdTjTivQl2cPo1jYQ/YtivS++BT5qfQHQ803H19lg6yibtEUawtfT5JPiqb1LTLkPIwd
+	vSEQGHFDjnWyV42bQ/egrr1kEolXiBmv1epNxrq+M3aMBE6ly15LmPvTKr9lReKwkoBY60R/mBt
+	vGvsCBj4sjg4BXruQ7S9HfAyWTBWU76RQUa1RmWaLq3eTGYJzTDNf2el7XLibZscUYCw
+X-Google-Smtp-Source: AGHT+IFuY0+8rn07hN2qTZHmYWLQumKlpWDqJzADbMiSlhqlGM9wL4eqJEGTQij+E4PAaz0j/DHcPQ==
+X-Received: by 2002:a17:902:e882:b0:223:65dc:4580 with SMTP id d9443c01a7336-231d45952aamr321983325ad.52.1747921883513;
+        Thu, 22 May 2025 06:51:23 -0700 (PDT)
+Received: from dw-tp.ibmuc.com ([171.76.84.129])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-232044a0a23sm90562105ad.112.2025.05.22.06.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 May 2025 06:51:22 -0700 (PDT)
+From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: John Garry <john.g.garry@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	djwong@kernel.org,
+	ojaswin@linux.ibm.com,
+	linux-fsdevel@vger.kernel.org,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Subject: [PATCH v2] traceevent/block: Add REQ_ATOMIC flag to block trace events
+Date: Thu, 22 May 2025 19:21:10 +0530
+Message-ID: <44317cb2ec4588f6a2c1501a96684e6a1196e8ba.1747921498.git.ritesh.list@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,87 +74,61 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-UBLK_F_AUTO_BUF_REG requires that the buffer registered automatically
-is unregistered in same `io_ring_ctx`, so check it explicitly.
+Filesystems like XFS can implement atomic write I/O using either
+REQ_ATOMIC flag set in the bio or via CoW operation. It will be useful
+if we have a flag in trace events to distinguish between the two. This
+patch adds char 'U' (Untorn writes) to rwbs field of the trace events
+if REQ_ATOMIC flag is set in the bio.
 
-Document this requirement for UBLK_F_AUTO_BUF_REG.
+<W/ REQ_ATOMIC>
+=================
+xfs_io-4238    [009] .....  4148.126843: block_rq_issue: 259,0 WFSU 16384 () 768 + 32 none,0,0 [xfs_io]
+<idle>-0       [009] d.h1.  4148.129864: block_rq_complete: 259,0 WFSU () 768 + 32 none,0,0 [0]
 
-Drop WARN_ON_ONCE() which is triggered from userspace code path.
+<W/O REQ_ATOMIC>
+===============
+xfs_io-4237    [010] .....  4143.325616: block_rq_issue: 259,0 WS 16384 () 768 + 32 none,0,0 [xfs_io]
+<idle>-0       [010] d.H1.  4143.329138: block_rq_complete: 259,0 WS () 768 + 32 none,0,0 [0]
 
-Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provided buf index via UBLK_F_AUTO_BUF_REG")
-Reported-by: Caleb Sander Mateos <csander@purestorage.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
 ---
- drivers/block/ublk_drv.c      | 19 ++++++++++++++++---
- include/uapi/linux/ublk_cmd.h |  6 +++++-
- 2 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 180386c750f7..a56e07ee9d4b 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -84,6 +84,7 @@ struct ublk_rq_data {
- 
- 	/* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
- 	u16 buf_index;
-+	unsigned long buf_ctx_id;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -1211,6 +1212,8 @@ static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
- 	}
- 	/* one extra reference is dropped by ublk_io_release */
- 	refcount_set(&data->ref, 2);
-+
-+	data->buf_ctx_id = io_uring_cmd_ctx_handle(io->cmd);
- 	/* store buffer index in request payload */
- 	data->buf_index = pdu->buf.index;
- 	io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
-@@ -2111,12 +2114,22 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
- 	if (ublk_support_auto_buf_reg(ubq)) {
- 		int ret;
- 
-+		/*
-+		 * `UBLK_F_AUTO_BUF_REG` only works iff `UBLK_IO_FETCH_REQ`
-+		 * and `UBLK_IO_COMMIT_AND_FETCH_REQ` are issued from same
-+		 * `io_ring_ctx`.
-+		 *
-+		 * If this uring_cmd's io_uring_ctx isn't same with the
-+		 * one for registering the buffer, it is ublk server's
-+		 * responsibility for unregistering the buffer, otherwise
-+		 * this ublk request gets stuck.
-+		 */
- 		if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
- 			struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
- 
--			WARN_ON_ONCE(io_buffer_unregister_bvec(cmd,
--						data->buf_index,
--						issue_flags));
-+			if (data->buf_ctx_id == io_uring_cmd_ctx_handle(cmd))
-+				io_buffer_unregister_bvec(cmd, data->buf_index,
-+						issue_flags);
- 			io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
- 		}
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index c4b9942697fc..5203963cd08a 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -226,7 +226,11 @@
-  *
-  * For using this feature:
-  *
-- * - ublk server has to create sparse buffer table
-+ * - ublk server has to create sparse buffer table on the same `io_ring_ctx`
-+ *   for issuing `UBLK_IO_FETCH_REQ` and `UBLK_IO_COMMIT_AND_FETCH_REQ`.
-+ *   If uring_cmd isn't issued on same `io_uring_ctx`, it is ublk server's
-+ *   responsibility to unregister the buffer by issuing `IO_UNREGISTER_IO_BUF`
-+ *   manually, otherwise this ublk request get stuck.
-  *
-  * - ublk server passes auto buf register data via uring_cmd's sqe->addr,
-  *   `struct ublk_auto_buf_reg` is populated from sqe->addr, please see
--- 
-2.47.0
+v1 -> v2:
+=========
+1. Changed char 'a' to 'U' (Untorn Writes)
+
+
+ include/trace/events/block.h | 2 +-
+ kernel/trace/blktrace.c      | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index bd0ea07338eb..de538b110ea1 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -11,7 +11,7 @@
+ #include <linux/tracepoint.h>
+ #include <uapi/linux/ioprio.h>
+
+-#define RWBS_LEN	8
++#define RWBS_LEN	9
+
+ #define IOPRIO_CLASS_STRINGS \
+ 	{ IOPRIO_CLASS_NONE,	"none" }, \
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 3679a6d18934..fc62a9767203 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1896,6 +1896,8 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+ 		rwbs[i++] = 'S';
+ 	if (opf & REQ_META)
+ 		rwbs[i++] = 'M';
++	if (opf & REQ_ATOMIC)
++		rwbs[i++] = 'U';
+
+ 	rwbs[i] = '\0';
+ }
+--
+2.39.5
 
