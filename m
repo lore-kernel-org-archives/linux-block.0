@@ -1,195 +1,310 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2642F3E
-	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 00:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E0817BD9
+	for <linux-block@vger.kernel.org>; Thu, 22 May 2025 00:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747874571; cv=none; b=JZZ3T7do164gSReaIff0+kv3+9XPhYy6fQiXx+ORISynjdx9rc/l5s5O3T3+sdA2T/2cABierMOfzyxvkFSg6FWovsOhJf9K9fi3sezfwpq8yCYER0B7NcNDjsh2JQ1SnE9LkhsjQdRh4RiQtZ636OYi5oT+eV4hctd1ilVtWag=
+	t=1747874870; cv=none; b=D/6fbjmiYJ3VWhkrtztlVb6e46S+/7Ek6Ou8Gv9z8dsdKSkv+KwSTCzXGl78r/cf1wosSgleNaK/8IAxosTrLCBW8w7eMr88SAIkgKqBE57Y0H0YGa9lVtADq2C32oAHM2iTf+Q+AQr40CmHB7aFgSlLhOZy9FFy85JdpqLUIuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747874571; c=relaxed/simple;
-	bh=zH52IWYTLY5aqvf+9YdYMp/fhhTmdgK/Gy/R5eWd7bQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZWaCM1T8BtTOzBBIUf8e8tagP7+JN36HgBcMwmh7+iErSIx/XFB3ZUA4xMVmjBMPfqtPFyovjnfksYI42358bIlC8f4tshcrvUdT/Antnblpf/JrDE7G/UudwLpRsj/friTf7XF2Ipjnyufa26PcBsBTWFQ0NRBh40/ZGnvVWUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hdCUXWTP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747874870; c=relaxed/simple;
+	bh=ayqwJeW5842Wi3V+qc3m4xUAW29XKtJPJbAJ4jp9V44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fIwnurME3Ynaq7tDsGH/UypxYRsaJRRdmaaC8dX5EM6w4BPqitUVNPd2Xj7wdW3EnyEbg7EwRtelyDQQC13XuSDyYYcTVdkO3fF9yQpafRCN0SKde1d1QBMciNy08ViiPquKymWm98qv+IWM6FY1T+mTwn038W6zURwYnAOAWdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RMtAfhfN; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hdCUXWTP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747874567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nPyvzXW9V6KDvCqj6P0ysG4H/HA2c9ZB0yWATfvWb9I=;
-	b=hdCUXWTPNKqfyL/6dFigZvOxsb22pOiYYZf47/DKe9FEq3myJXr/Fu4dz9DtDpjWd4mtTN
-	AgDAZR5EJCzIDglZmjwDeFqUSoLHW9GUMmPUJzJYgOLPrXtx905lufbmAKaInIVld6Ne5l
-	WQxaXJNCDASZmOgenCl+wKl5zs1Yh60=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-464-TdQ91-jGO3-cCmv3_O9Hnw-1; Wed,
- 21 May 2025 20:42:46 -0400
-X-MC-Unique: TdQ91-jGO3-cCmv3_O9Hnw-1
-X-Mimecast-MFC-AGG-ID: TdQ91-jGO3-cCmv3_O9Hnw_1747874565
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2DA281956080;
-	Thu, 22 May 2025 00:42:45 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.65])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B629195608F;
-	Thu, 22 May 2025 00:42:41 +0000 (UTC)
-Date: Thu, 22 May 2025 08:42:36 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH 2/2] ublk: run auto buf unregisgering in same io_ring_ctx
- with register
-Message-ID: <aC5y_FVe4KQoIsJo@fedora>
-References: <20250521025502.71041-1-ming.lei@redhat.com>
- <20250521025502.71041-3-ming.lei@redhat.com>
- <CADUfDZrh+FYHgPjmF1=RRQiZFx=uYZEBJ+mJGsX-C9jM5dVi9g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RMtAfhfN"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-30e7ee5fe74so1171414a91.3
+        for <linux-block@vger.kernel.org>; Wed, 21 May 2025 17:47:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1747874867; x=1748479667; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DFm6VYvt4nCIipBjdMX5whNhULhZ+Ox0rjwTUFTeIpk=;
+        b=RMtAfhfNpCYpJAkeomwrwnBrqgQwbaW2f4+I9Pq0qr2tkw+WE54kYYzn3udltT1QXg
+         BtSbwcvIO31N2fKvslkN3wfUtUsnfVXsATyMdaslVXWMXENxIUmPgsegFZBNDGIZxJ0D
+         iEC+R+uu1jkygkRG6pzFolo20LgP2RObCsi6Xqr2YGaKXHlkF2FNVivSMK2wCtFSmHJA
+         kLuXDzRKMRO/5+m8dVFoRSEL8mHEb3PehDERalPlAbpNrifRBFL+KLEbNcgQhVccW3OO
+         h2kp4bwNfGLT3q0uOGE/2xJzAOHHezzCyMW4E/iK8zeDz8JHCUedA2qv2nE5VosjcvTb
+         GADQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747874867; x=1748479667;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DFm6VYvt4nCIipBjdMX5whNhULhZ+Ox0rjwTUFTeIpk=;
+        b=fpvxGywGZbZCJnFhIF2n0BjuJAOBKnQr3GaYqWKonG42+AcfwaU1nGLvb02bV5FIim
+         33UuLphJRg5RV/2foF+76FoTRP7j1so+Ku2wm5JeN0vKhBz0PKIbZNnrG3RT3NtlXvm0
+         WoCqFPmZWHAc929SMdX+Odzvn+mA0Y91B1q35Osj7SEfcegezwCScZ67VgKZm+xBrmss
+         +l2g+R9vbIfEgB3+6rzVZ2Bx9shMQIAfSVN/TGO7XbXou0leNPizFQ4ayOQukwhsomoS
+         3jGFr0J2RGwwIvNmDgHqjBlzSletogIwC9c8hiQ2uN4JPe4L6bQbPWK7h8jEond/qA0E
+         /WjQ==
+X-Gm-Message-State: AOJu0YxsG5ha6rEwIPRgkZtAUNXP3Oq/hoitugRP4Guan4KcSCS41Nh7
+	avDuKVCcBOj0q/o92Uk9j+Qboc3ekoZKhwi+LvCwP8nC8qDRmAvE8xMksrs5MWL3Qik9AOSS8DV
+	lkuyWYau3evTuveabEIuWCYlavKNU0auJBeo/zhwNDHdKrsrP4CYEsIM=
+X-Gm-Gg: ASbGnctOdn0zC06cdYdKekdqwIGL9IP+wXd9Vxl1+5yMMXjeE9x5N9JauGD5eEE5V39
+	Y+8inkuNOzzuqoDDrcUvuKEjZNcm4WfewVbOXSGgo1uSGR9/k5aczwmUr2NZqNYkxJrXdeg+pZp
+	GAuQVFkIlsk4PynEVCyA7ARfJjYCj/4YY=
+X-Google-Smtp-Source: AGHT+IH/Df+HHabZZ3U6kIjtDxwpcsLkpoBs0yjZNbUvj4VyEnBVF5+JH6RcXPyLfYaxFAe1BXNScE4lLrfQq32++lE=
+X-Received: by 2002:a17:903:1b6d:b0:224:1ed8:40e9 with SMTP id
+ d9443c01a7336-231d453569dmr124758195ad.13.1747874867317; Wed, 21 May 2025
+ 17:47:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrh+FYHgPjmF1=RRQiZFx=uYZEBJ+mJGsX-C9jM5dVi9g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20250521223107.709131-1-kbusch@meta.com> <20250521223107.709131-4-kbusch@meta.com>
+In-Reply-To: <20250521223107.709131-4-kbusch@meta.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 21 May 2025 17:47:36 -0700
+X-Gm-Features: AX0GCFu37TdXY2qh55C4Ohdo2kWmHPDgoRQgZPJosdYcmAkzbqGe-o7G2MKnhx4
+Message-ID: <CADUfDZqVeaR=15drRFvdrgGyFhyQ=FtscaZycVrQ0pd-PGei=A@mail.gmail.com>
+Subject: Re: [PATCH 3/5] nvme: add support for copy offload
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	Keith Busch <kbusch@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 21, 2025 at 08:58:20AM -0700, Caleb Sander Mateos wrote:
-> On Tue, May 20, 2025 at 7:55 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > UBLK_F_AUTO_BUF_REG requires that the buffer registered automatically
-> > is unregistered in same `io_ring_ctx`, so check it explicitly.
-> >
-> > Meantime return the failure code if io_buffer_unregister_bvec() fails,
-> > then ublk server can handle the failure in consistent way.
-> >
-> > Also force to clear UBLK_IO_FLAG_AUTO_BUF_REG in ublk_io_release()
-> > because ublk_io_release() may be triggered not from handling
-> > UBLK_IO_COMMIT_AND_FETCH_REQ, and from releasing the `io_ring_ctx`
-> > for registering the buffer.
-> >
-> > Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provided buf index via UBLK_F_AUTO_BUF_REG")
-> > Reported-by: Caleb Sander Mateos <csander@purestorage.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 35 +++++++++++++++++++++++++++++++----
-> >  include/uapi/linux/ublk_cmd.h |  3 ++-
-> >  2 files changed, 33 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index fcf568b89370..2af6422d6a89 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -84,6 +84,7 @@ struct ublk_rq_data {
-> >
-> >         /* for auto-unregister buffer in case of UBLK_F_AUTO_BUF_REG */
-> >         u16 buf_index;
-> > +       unsigned long buf_ctx_id;
-> >  };
-> >
-> >  struct ublk_uring_cmd_pdu {
-> > @@ -1192,6 +1193,11 @@ static void ublk_auto_buf_reg_fallback(struct request *req, struct ublk_io *io)
-> >         refcount_set(&data->ref, 1);
-> >  }
-> >
-> > +static unsigned long ublk_uring_cmd_ctx_id(struct io_uring_cmd *cmd)
-> > +{
-> > +       return (unsigned long)(cmd_to_io_kiocb(cmd)->ctx);
-> 
-> Is the fact that a struct io_uring_cmd * can be passed to
-> cmd_to_io_kiocb() an io_uring internal implementation detail? Maybe it
-> would be good to add a helper in include/linux/io_uring/cmd.h so ublk
-> isn't depending on io_uring internals.
+On Wed, May 21, 2025 at 3:31=E2=80=AFPM Keith Busch <kbusch@meta.com> wrote=
+:
+>
+> From: Keith Busch <kbusch@kernel.org>
+>
+> Register the nvme namespace copy capablities with the request_queue
 
-All this definition is defined in kernel public header, not sure if it is
-big deal to add the helper, especially there is just single user.
+nit: "capabilities"
 
-But I will do it.
+> limits and implement support for the REQ_OP_COPY operation.
+>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/nvme/host/core.c | 61 ++++++++++++++++++++++++++++++++++++++++
+>  include/linux/nvme.h     | 42 ++++++++++++++++++++++++++-
+>  2 files changed, 102 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index f69a232a000ac..3134fe85b1abc 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -888,6 +888,52 @@ static blk_status_t nvme_setup_discard(struct nvme_n=
+s *ns, struct request *req,
+>         return BLK_STS_OK;
+>  }
+>
+> +static inline blk_status_t nvme_setup_copy(struct nvme_ns *ns,
+> +               struct request *req, struct nvme_command *cmnd)
+> +{
+> +       struct nvme_copy_range *range;
+> +       struct req_iterator iter;
+> +       struct bio_vec bvec;
+> +       u16 control =3D 0;
+> +       int i =3D 0;
 
-> 
-> Also, storing buf_ctx_id as a void * instead would allow this cast to
-> be avoided, but not a big deal.
-> 
-> > +}
-> > +
-> >  static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
-> >                               unsigned int issue_flags)
-> >  {
-> > @@ -1211,6 +1217,8 @@ static bool ublk_auto_buf_reg(struct request *req, struct ublk_io *io,
-> >         }
-> >         /* one extra reference is dropped by ublk_io_release */
-> >         refcount_set(&data->ref, 2);
-> > +
-> > +       data->buf_ctx_id = ublk_uring_cmd_ctx_id(io->cmd);
-> >         /* store buffer index in request payload */
-> >         data->buf_index = pdu->buf.index;
-> >         io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
-> > @@ -1994,6 +2002,21 @@ static void ublk_io_release(void *priv)
-> >  {
-> >         struct request *rq = priv;
-> >         struct ublk_queue *ubq = rq->mq_hctx->driver_data;
-> > +       struct ublk_io *io = &ubq->ios[rq->tag];
-> > +
-> > +       /*
-> > +        * In case of UBLK_F_AUTO_BUF_REG, the `io_uring_ctx` for registering
-> > +        * this buffer may be released, so we reach here not from handling
-> > +        * `UBLK_IO_COMMIT_AND_FETCH_REQ`.
-> 
-> What do you mean by this? That the io_uring was closed while a ublk
-> I/O owned by the server still had a registered buffer?
+Make this unsigned to avoid sign extension when used as an index?
 
-The buffer is registered to `io_ring_ctx A`, which is closed and the buffer
-is used up and un-registered on `io_ring_ctx A`, so this callback is
-triggered, but the io command isn't completed yet, which can be run from
-`io_ring_ctx B`
+> +
+> +       static const size_t alloc_size =3D sizeof(*range) * NVME_COPY_MAX=
+_RANGES;
+> +
+> +       if (WARN_ON_ONCE(blk_rq_nr_phys_segments(req) >=3D NVME_COPY_MAX_=
+RANGES))
 
-> 
-> > +        *
-> > +        * Force to clear UBLK_IO_FLAG_AUTO_BUF_REG, so that ublk server
-> > +        * still may complete this IO request by issuing uring_cmd from
-> > +        * another `io_uring_ctx` in case that the `io_ring_ctx` for
-> > +        * registering the buffer is gone
-> > +        */
-> > +       if (ublk_support_auto_buf_reg(ubq) &&
-> > +                       (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG))
-> > +               io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
-> 
-> This is racy, since ublk_io_release() can be called on a thread other
-> than the ubq_daemon.
+Should be > instead of >=3D?
 
-Yeah, it can be true.
+> +               return BLK_STS_IOERR;
+> +
+> +       range =3D kzalloc(alloc_size, GFP_ATOMIC | __GFP_NOWARN);
+> +       if (!range)
+> +               return BLK_STS_RESOURCE;
+> +
+> +       if (req->cmd_flags & REQ_FUA)
+> +               control |=3D NVME_RW_FUA;
+> +       if (req->cmd_flags & REQ_FAILFAST_DEV)
+> +               control |=3D NVME_RW_LR;
+> +
+> +       rq_for_each_copy_bvec(bvec, req, iter) {
+> +               u64 slba =3D nvme_sect_to_lba(ns->head, bvec.bv_sector);
+> +               u64 nlb =3D nvme_sect_to_lba(ns->head, bvec.bv_sectors) -=
+ 1;
+> +
+> +               range[i].slba =3D cpu_to_le64(slba);
+> +               range[i].nlb =3D cpu_to_le16(nlb);
+> +               i++;
+> +       }
+> +
+> +       memset(cmnd, 0, sizeof(*cmnd));
+> +       cmnd->copy.opcode =3D nvme_cmd_copy;
+> +       cmnd->copy.nsid =3D cpu_to_le32(ns->head->ns_id);
+> +       cmnd->copy.nr_range =3D i - 1;
+> +       cmnd->copy.sdlba =3D cpu_to_le64(nvme_sect_to_lba(ns->head,
+> +                                               blk_rq_pos(req)));
+> +       cmnd->copy.control =3D cpu_to_le16(control);
+> +
+> +       bvec_set_virt(&req->special_vec, range, alloc_size);
 
-> Could we avoid touching io->flags here and
-> instead have ublk_commit_and_fetch() check whether the reference count
-> is already 1?
+alloc_size should be sizeof(*range) * i? Otherwise this exceeds the
+amount of data used by the Copy command, which not all controllers
+support (see bit LLDTS of SGLS in the Identify Controller data
+structure). We have seen the same behavior with Dataset Management
+(always specifying 4 KB of data), which also passes the maximum size
+of the allocation to bvec_set_virt().
 
-It is still a little racy because the buffer unregister from another thread
-can happen just after the check immediately.
+> +       req->rq_flags |=3D RQF_SPECIAL_PAYLOAD;
+> +
+> +       return BLK_STS_OK;
+> +}
+> +
+>  static void nvme_set_app_tag(struct request *req, struct nvme_command *c=
+mnd)
+>  {
+>         cmnd->rw.lbat =3D cpu_to_le16(bio_integrity(req->bio)->app_tag);
+> @@ -1106,6 +1152,9 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, str=
+uct request *req)
+>         case REQ_OP_DISCARD:
+>                 ret =3D nvme_setup_discard(ns, req, cmd);
+>                 break;
+> +       case REQ_OP_COPY:
+> +               ret =3D nvme_setup_copy(ns, req, cmd);
+> +               break;
+>         case REQ_OP_READ:
+>                 ret =3D nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
+>                 break;
+> @@ -2119,6 +2168,15 @@ static bool nvme_update_disk_info(struct nvme_ns *=
+ns, struct nvme_id_ns *id,
+>                 lim->max_write_zeroes_sectors =3D UINT_MAX;
+>         else
+>                 lim->max_write_zeroes_sectors =3D ns->ctrl->max_zeroes_se=
+ctors;
+> +
+> +       if (ns->ctrl->oncs & NVME_CTRL_ONCS_NVMCPYS && id->mssrl && id->m=
+cl) {
 
-Adding one spinlock should cover it.
+Are the checks of MSSRL and MCL necessary? The spec says controllers
+that support Copy are not allowed to set them to 0.
 
-And it shouldn't be one big thing, because anyway the buffer can only be
-released once.
+Best,
+Caleb
 
-> 
-> Also, the ublk_support_auto_buf_reg(ubq) check seems redundant, since
-> UBLK_IO_FLAG_AUTO_BUF_REG is set in ublk_auto_buf_reg(), which is only
-> called if ublk_support_auto_buf_reg(ubq).
-
-It has document benefit at least, so I'd suggest to keep it.
-
-
-Thanks
-Ming
-
+> +               u32 mcss =3D bs * le16_to_cpu(id->mssrl) >> SECTOR_SHIFT;
+> +               u32 mcs =3D bs * le32_to_cpu(id->mcl) >> SECTOR_SHIFT;
+> +
+> +               lim->max_copy_segment_sectors =3D mcss;
+> +               lim->max_copy_sectors =3D mcs;
+> +               lim->max_copy_segments =3D id->msrc + 1;
+> +       }
+>         return valid;
+>  }
+>
+> @@ -2526,6 +2584,9 @@ static int nvme_update_ns_info(struct nvme_ns *ns, =
+struct nvme_ns_info *info)
+>                         nvme_init_integrity(ns->head, &lim, info);
+>                 lim.max_write_streams =3D ns_lim->max_write_streams;
+>                 lim.write_stream_granularity =3D ns_lim->write_stream_gra=
+nularity;
+> +               lim.max_copy_segment_sectors =3D ns_lim->max_copy_segment=
+_sectors;
+> +               lim.max_copy_sectors =3D ns_lim->max_copy_sectors;
+> +               lim.max_copy_segments =3D ns_lim->max_copy_segments;
+>                 ret =3D queue_limits_commit_update(ns->head->disk->queue,=
+ &lim);
+>
+>                 set_capacity_and_notify(ns->head->disk, get_capacity(ns->=
+disk));
+> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+> index 51308f65b72fd..14f46ad1330b6 100644
+> --- a/include/linux/nvme.h
+> +++ b/include/linux/nvme.h
+> @@ -404,6 +404,7 @@ enum {
+>         NVME_CTRL_ONCS_WRITE_ZEROES             =3D 1 << 3,
+>         NVME_CTRL_ONCS_RESERVATIONS             =3D 1 << 5,
+>         NVME_CTRL_ONCS_TIMESTAMP                =3D 1 << 6,
+> +       NVME_CTRL_ONCS_NVMCPYS                  =3D 1 << 8,
+>         NVME_CTRL_VWC_PRESENT                   =3D 1 << 0,
+>         NVME_CTRL_OACS_SEC_SUPP                 =3D 1 << 0,
+>         NVME_CTRL_OACS_NS_MNGT_SUPP             =3D 1 << 3,
+> @@ -458,7 +459,10 @@ struct nvme_id_ns {
+>         __le16                  npdg;
+>         __le16                  npda;
+>         __le16                  nows;
+> -       __u8                    rsvd74[18];
+> +       __le16                  mssrl;
+> +       __le32                  mcl;
+> +       __u8                    msrc;
+> +       __u8                    rsvd81[11];
+>         __le32                  anagrpid;
+>         __u8                    rsvd96[3];
+>         __u8                    nsattr;
+> @@ -956,6 +960,7 @@ enum nvme_opcode {
+>         nvme_cmd_resv_acquire   =3D 0x11,
+>         nvme_cmd_io_mgmt_recv   =3D 0x12,
+>         nvme_cmd_resv_release   =3D 0x15,
+> +       nvme_cmd_copy           =3D 0x19,
+>         nvme_cmd_zone_mgmt_send =3D 0x79,
+>         nvme_cmd_zone_mgmt_recv =3D 0x7a,
+>         nvme_cmd_zone_append    =3D 0x7d,
+> @@ -978,6 +983,7 @@ enum nvme_opcode {
+>                 nvme_opcode_name(nvme_cmd_resv_acquire),        \
+>                 nvme_opcode_name(nvme_cmd_io_mgmt_recv),        \
+>                 nvme_opcode_name(nvme_cmd_resv_release),        \
+> +               nvme_opcode_name(nvme_cmd_copy),                \
+>                 nvme_opcode_name(nvme_cmd_zone_mgmt_send),      \
+>                 nvme_opcode_name(nvme_cmd_zone_mgmt_recv),      \
+>                 nvme_opcode_name(nvme_cmd_zone_append))
+> @@ -1158,6 +1164,39 @@ struct nvme_dsm_range {
+>         __le64                  slba;
+>  };
+>
+> +struct nvme_copy_cmd {
+> +       __u8                    opcode;
+> +       __u8                    flags;
+> +       __u16                   command_id;
+> +       __le32                  nsid;
+> +       __u64                   rsvd2;
+> +       __le64                  metadata;
+> +       union nvme_data_ptr     dptr;
+> +       __le64                  sdlba;
+> +       __u8                    nr_range;
+> +       __u8                    format;
+> +       __le16                  control;
+> +       __le16                  cev;
+> +       __le16                  dspec;
+> +       __le32                  lbtl;
+> +       __le16                  lbat;
+> +       __le16                  lbatm;
+> +};
+> +
+> +#define NVME_COPY_MAX_RANGES   128
+> +struct nvme_copy_range {
+> +       __le32                  spars;
+> +       __u32                   rsvd4;
+> +       __le64                  slba;
+> +       __le16                  nlb;
+> +       __le16                  cetype;
+> +       __le16                  cev;
+> +       __le16                  sopt;
+> +       __le32                  elbt;
+> +       __le16                  elbat;
+> +       __le16                  elbatm;
+> +};
+> +
+>  struct nvme_write_zeroes_cmd {
+>         __u8                    opcode;
+>         __u8                    flags;
+> @@ -1985,6 +2024,7 @@ struct nvme_command {
+>                 struct nvme_download_firmware dlfw;
+>                 struct nvme_format_cmd format;
+>                 struct nvme_dsm_cmd dsm;
+> +               struct nvme_copy_cmd copy;
+>                 struct nvme_write_zeroes_cmd write_zeroes;
+>                 struct nvme_zone_mgmt_send_cmd zms;
+>                 struct nvme_zone_mgmt_recv_cmd zmr;
+> --
+> 2.47.1
+>
+>
