@@ -1,43 +1,43 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42AB1798F
-	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 12:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F431FDD
+	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 12:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748004312; cv=none; b=Oqo5qhoPcpaZWTI2MriWwfIGZ9g7XnE6tT3Jtg2O18+INghoFLrKmKxHgWi51o1JoTxUrk5lVaVPR7v9pkPdIV9Bs76bRlZezgFtWT4PswqHN6dHQIxZfPzb7TfcnTBBgQdMl9emeK6bjnReyQTHB2+qcxmo5vrgDFy8H5XtZd4=
+	t=1748004419; cv=none; b=AWXKChzcWnbHDPgnaB01OlgRcbZOga00lMmH18/I1ku1DH+8zMPkO4bHeVFpY32XHY15DrFR1mY90ktdiIxlawAB3GD+yTSwSiR5b9oVAAPCLlEPEdZ6b/80TVdvg0U49aRoJ6YuKrTIaT93b77mPQS7X9QEr2M7L6rEHna/eYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748004312; c=relaxed/simple;
-	bh=SKxbFZ6OE433woyCGVk11C44GwMu/eZC0uJEcZsSSAk=;
+	s=arc-20240116; t=1748004419; c=relaxed/simple;
+	bh=XSMTqmzHBfEe/utDPYMSQ/LsI5rw989hcAQSKxmHPKg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=omfkGpe9Az8qtk7XUEgPgh4AQYULAJ65h9KSGUf9AFWxLyQoyexpLOnOwNTHWW2OWi45HOpjqovd8Ydz716hPJC2o5T02X+BQFGbo+seCpOebsxo/yIELgWPWuut7iOjB+NnvF2p6ljzKSZ8cM01TPAGFRhP/7xpqMJBMvEf9Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UUiWB+Kj; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rh6p+gPZLWeHR6MdAgbnkHmu3Cuy+m4EsTYc2JD/YvWenLD87KIRuXBeYfnk1b7QbpyGRskCkCPVT9/uHGc7PLhadXuY4CriEPefwMODm1QMV3P5GErzmblDfU10Zibw0iSrEUNUdQ8KEBBuyKY6HQ0n2c78V0U3gzZFSP1FBJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bc+8bFBH; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UUiWB+Kj"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bc+8bFBH"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zQi+/yTSQuFP8AFNEoEKIllKprmzq7/DcSu2cdh8yOo=; b=UUiWB+Kjyk6PrCXRn2rfXmuQgp
-	4HnK2pk6jLltahdtLcwb8hVk0ejanjtWWVFdHpFIylJ/0U0sxGjrHX07fhocYHVU+FE4ztMqr+sCY
-	8iUVBs5gNx+5x80cZbPnJv2UmWNZ87LedFXoGfKb0G3ZEWBJUxLL0MjfJYtfNL1VsVd56X2G0a1z+
-	svek8OLcaRqcQQrlKubUoswIMqwp22IIU+vI3joebnqJy3wRkSEvia9ZkmlcCJnvXnc4NfXMnCsuW
-	ajsjZf/0NoXnmQJp7do7H76E5FmfMjiDVT0bINyJDcF/24P7mpV2TlI3ETimiJZcrR8smwyltULKh
-	wArsvW8Q==;
+	bh=h1KpPzL1dWxSEeKlxImuzJ8AVw4Y8yO1E36HDTirAaI=; b=bc+8bFBHmVYGldys0wYK6MUEmD
+	jvYLe00Uy3mpmCBJF8UFELZ5sFhW23PKa4FaQWjrIWqJmLaxHOPY7uZGGbBC+PJRr2BC98yVRTFNK
+	K4vyt9H1UgWeXUxpT0rY3xpeipAASz0+wyfSEWEO1MuPy8z1zSC77s/p2q2ze4ecqvYL38R83LFNG
+	kHlG7FRMFrdbwPHwwAqXJ8LflABSAGx8l1A3tXyZ1d+tAKBLjrPMrDtM0JAY2Dtju363W4h1RNboX
+	ywcix5hms4D++xuu0SCuJ74nJ3CyoiQKaJDBOLDZALfkCh5Ky3KCi9ZqBWXgr409Y9zwE88e98RlD
+	LCmljSZg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uIRlu-00000003qOW-0f0X;
-	Fri, 23 May 2025 12:45:10 +0000
-Date: Fri, 23 May 2025 05:45:10 -0700
+	id 1uIRnd-00000003qds-49uF;
+	Fri, 23 May 2025 12:46:58 +0000
+Date: Fri, 23 May 2025 05:46:57 -0700
 From: Christoph Hellwig <hch@infradead.org>
 To: Keith Busch <kbusch@meta.com>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
 	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 1/5] block: new sector copy api
-Message-ID: <aDBt1qXj90JO1y2v@infradead.org>
+Subject: Re: [PATCH 2/5] block: add support for copy offload
+Message-ID: <aDBuQbsBRVjOc5wU@infradead.org>
 References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-2-kbusch@meta.com>
+ <20250521223107.709131-3-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,21 +46,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250521223107.709131-2-kbusch@meta.com>
+In-Reply-To: <20250521223107.709131-3-kbusch@meta.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, May 21, 2025 at 03:31:03PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Provide a basic block level api to copy a range of a block device's
-> sectors to a new destination on the same device. This just reads the
-> source data into host memory, then writes it back out to the device at
-> the requested destination.
+On Wed, May 21, 2025 at 03:31:04PM -0700, Keith Busch wrote:
+>  struct bio_vec {
+> -	struct page	*bv_page;
+> -	unsigned int	bv_len;
+> -	unsigned int	bv_offset;
+> +	union {
+> +		struct {
+> +			struct page	*bv_page;
+> +			unsigned int	bv_len;
+> +			unsigned int	bv_offset;
+> +		};
+> +		struct {
+> +			sector_t	bv_sector;
+> +			sector_t	bv_sectors;
+> +		};
+> +	};
 
-As someone who recently spent a lot of time on optimizing such loops:
-having a general API that allocates a buffer for each copy is a bad
-idea.  You'll want some kind of caller provided longer living allocation
-if you do regularly do such copies.
+Urrgg.  Please don't overload the bio_vec. We've been working hard to
+generalize it and share the data structures with more users in the
+block layer.  If having a bio for each source range is too much overhead
+for your user case (but I'd like to numbers for that), we'll need to
+find a way to do that without overloading the actual bio_vec structure.
 
-Maybe having common code is good to avoid copies, but I suspect most
-real users would want their own.
