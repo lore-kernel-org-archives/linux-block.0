@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189177DA8C
-	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 06:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF9C17A2F6;
+	Fri, 23 May 2025 06:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747980163; cv=none; b=Iouyzt/Ri9CFi0NDZfPQqzaMBLCmmlzunC9+ST/3z31M7h/GAoeSFC/3gk887hoF+hfgmkpEpnY7vx6eoPPfcPWwHJNPf0uLd5x+I5ptk6pQYkIWHLWaFRjPUjKWCoLDA0r1jqKv4tR3NB9w3ockrHQFXBsL4M/+Lg9d0ht0cRY=
+	t=1747980403; cv=none; b=sKW+9ypYhw5L1lGKWMWpUZEI9knMx2IWUGTyDgsxtEopxt4yi892P3N6liuhqTg5wIk35wqPFxhNVvTYHMocPIPMwXvKRCY+IQOYvOr270Mc0hRZhlwsgu0ye/LFxBNXsu72Bz+HyfUmbPQEsG1imZlJ+myRqRB2UkOCc1flM98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747980163; c=relaxed/simple;
-	bh=alOf9JAa+z4RPcPNVbok+ZLLpLB1RSCpNBko/OTXvlg=;
+	s=arc-20240116; t=1747980403; c=relaxed/simple;
+	bh=92eAN8csFAkBa/h97hweMHUpwVrSxLPQX1gSWGO2pWY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EWhq4dCKUd8FOMKJT1VazkZTx57XbdxZTyJv4WTQ/9LJlgCyFcHhX0OaT4aJo0VXiVP0aKZmt/NPcLkGUzrelQCcZsNS5atsDTEzV/3sx6v9dg97A4l1z4Bx5pH70LfLlE2kP7pRyXy2HiX0IY+tBOXu1BbaAHfSaNbB/j7KOgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qdaXITpa; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=Wxehl+zWc3CRXi3vq5b6dkOuIRhYrho4ymMn1Ip4DPjdegRAjjzuGmtIPPGt2pxhI8ZqPtIxxbq1++Jfz4I5x+r3zU3EwY9ZEhjgbZvRgvNRNXsGGLT+x+eOERoHkByz6RvPKkueryauy3CLsWWhkeDHubq+M6SkEcQPaBxAwXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV2yyoTc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qdaXITpa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88031C4CEE9;
-	Fri, 23 May 2025 06:02:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GV2yyoTc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CADFBC4CEE9;
+	Fri, 23 May 2025 06:06:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747980162;
-	bh=alOf9JAa+z4RPcPNVbok+ZLLpLB1RSCpNBko/OTXvlg=;
+	s=k20201202; t=1747980402;
+	bh=92eAN8csFAkBa/h97hweMHUpwVrSxLPQX1gSWGO2pWY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qdaXITpaw8CEid6vRlc78VZtkV0JFGwUmxM3S/1gSWFNIhzRWYgBvZg8t61+fl1z0
-	 g4xeGKRb5IvPXtLkEh7gUZuc/7ZJN66OMAjy8E3wt3Nn32BBmzcSni8OjWzjwWlysL
-	 jv1qVD4aeHkFxIaNmfoXBbvKKfKWQ6e88Wp58ZCGr5Pj9ePgdDvDKbT7f6gl65xUk+
-	 PAfECDn9h4Vh7EpF5CTwU8dFhgTHhmDpIJv2tIgxICQkhxjc65F42AlKNx6SVnGnGc
-	 19VGBIKj8E5OtTeHTN3g/m+pyLYaN4EImUHq71dh79KGjDKewhG5DDEBw+0vALcBeg
-	 C024dfcwnG84w==
-Message-ID: <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
-Date: Fri, 23 May 2025 08:02:38 +0200
+	b=GV2yyoTcTNGOfgbctyC/bsDUvh2PxzfK82GvxAZCWIDAiQ8/QTwHAG9ObjB7i79Ep
+	 CdCAElfDbdDvfLiowQ06KQ4DzBrxocBU82de6MVyf5V6nIn9Ey0rbfsiT5aF2v/BfR
+	 a8W8m+nw+4oWIE/hdC41oodBoLfdQSH1lziEH1+YVI7aDfvSFTtqBYs9w+EE6ZWTmc
+	 gAqeEx3UCHFHL3WOypXeaSaFFpjmlZ/BeXIiQBlr8OX/XNHRLMFQd7NlEVhIEfE+Dn
+	 TNLZ3lOAaafvqj+qGTBKDXOTHPCVEZFcaqDgiFADwz9gZ1lv3C/fi4LP+Pq91TaUl8
+	 mwYDDFy1EVyBQ==
+Message-ID: <1359a818-f95f-4827-9f8a-7e5f362b8e87@kernel.org>
+Date: Fri, 23 May 2025 08:06:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,99 +35,99 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: Fix a deadlock related freezing zoned storage
+ devices
+To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <bvanassche@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20250514202937.2058598-1-bvanassche@acm.org>
- <20250514202937.2058598-2-bvanassche@acm.org> <20250516044754.GA12964@lst.de>
- <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de>
- <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de>
- <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org>
- <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
- <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
+ Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>,
+ stable@vger.kernel.org
+References: <20250522171405.3239141-1-bvanassche@acm.org>
+ <b1ea4120-e16a-47c8-b10c-ff6c9d5feb69@kernel.dk>
+ <78244478-3ce3-4671-b28f-c67c5b21dba9@acm.org> <aC_ZFIICdxzSOxCt@fedora>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
+In-Reply-To: <aC_ZFIICdxzSOxCt@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/22/25 19:08, Bart Van Assche wrote:
-> On 5/21/25 10:12 PM, Damien Le Moal wrote:
->> I am still very confused about how this is possible assuming a well behaved user
->> that actually submits write BIOs in sequence for a zone. That means with a lock
->> around submit_bio() calls. Assuming such user, a large write BIO that is split
->> would have its fragments all processed and added to the target zone plug in
->> order. Another context (or the same context) submitting the next write for that
->> zone would have the same happen, so BIO fragments should not be reordered...
+On 5/23/25 04:10, Ming Lei wrote:
+> On Thu, May 22, 2025 at 11:32:58AM -0700, Bart Van Assche wrote:
+>> On 5/22/25 10:38 AM, Jens Axboe wrote:
+>>> On 5/22/25 11:14 AM, Bart Van Assche wrote:
+>>>>   static void __submit_bio(struct bio *bio)
+>>>>   {
+>>>>   	/* If plug is not used, add new plug here to cache nsecs time. */
+>>>> @@ -633,8 +640,12 @@ static void __submit_bio(struct bio *bio)
+>>>>   	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
+>>>>   		blk_mq_submit_bio(bio);
+>>>> -	} else if (likely(bio_queue_enter(bio) == 0)) {
+>>>> +	} else {
+>>>>   		struct gendisk *disk = bio->bi_bdev->bd_disk;
+>>>> +		bool zwp = bio_zone_write_plugging(bio);
+>>>> +
+>>>> +		if (unlikely(!zwp && bio_queue_enter(bio) != 0))
+>>>> +			goto finish_plug;
+>>>>   	
+>>>>   		if ((bio->bi_opf & REQ_POLLED) &&
+>>>>   		    !(disk->queue->limits.features & BLK_FEAT_POLL)) {
+>>>> @@ -643,9 +654,12 @@ static void __submit_bio(struct bio *bio)
+>>>>   		} else {
+>>>>   			disk->fops->submit_bio(bio);
+>>>>   		}
+>>>> -		blk_queue_exit(disk->queue);
+>>>> +
+>>>> +		if (!zwp)
+>>>> +			blk_queue_exit(disk->queue);
+>>>>   	}
+>>>
+>>> This is pretty ugly, and I honestly absolutely hate how there's quite a
+>>> bit of zoned_whatever sprinkling throughout the core code. What's the
+>>> reason for not unplugging here, unaligned writes? Because you should
+>>> presumable have the exact same issues on non-zoned devices if they have
+>>> IO stuck in a plug (and doesn't get unplugged) while someone is waiting
+>>> on a freeze.
+>>>
+>>> A somewhat similar case was solved for IOPOLL and queue entering. That
+>>> would be another thing to look at. Maybe a live enter could work if the
+>>> plug itself pins it?
 >>
->> So to clarify: are we talking about splits of the BIO that the DM device
->> receives ? Or is it about splits of cloned BIOs that are used to process the
->> BIOs that the DM device received ? The clones are for the underlying device and
->> should not have the zone plugging flag set until the DM target driver submits
->> them, even if the original BIO is flagged with zone plugging. Looking at the bio
->> clone code, the bio flags do not seem to be copied from the source BIO to the
->> clone. So even if the source BIO (the BIO received by the DM device) is flagged
->> with zone write plugging, a clone should not have this flag set until it is
->> submitted.
+>> Hi Jens,
 >>
->> Could you clarify the sequence and BIO flags you see that leads to the issue ?
+>> q->q_usage_counter is not increased for bios on current->plug_list.
+>> q->q_usage_counter is increased before a bio is added to the zoned pluglist.
+>> So these two cases are different.
+>>
+>> I think it is important to hold a q->q_usage_counter reference for bios
+>> on the zoned plug list because bios are added to that list after bio
+>> splitting happened. Hence, request queue limits must not change while
+>> any bio is on the zoned plug list.
 > 
-> Hi Damien,
+> Hi Bart,
 > 
-> In the tests that I ran, F2FS submits bios to a dm driver and the dm
-> driver submits these bios to the SCSI disk (sd) driver. F2FS submits
+> Can you share why request queue limit can't be changed after bio is added
+> to zoned plug list?
 
-Which DM driver is it ? Does that DM driver have some special work queue
-handling of BIO submissions ? Or does is simply remap the BIO and send it down
-to the underlying device in the initial submit_bio() context ? If it is the
-former case, then that DM driver must enable zone write plugging. If it is the
-latter, it should not need zone write plugging and ordering will be handled
-correctly throughout the submit_bio() context for the initial DM BIO, assuming
-that the submitter does indeed serialize write BIO submissions to a zone. I have
-not looked at f2fs code in ages. When I worked on it, there was a mutex to
-serialize write issuing to avoid reordering issues...
+Because BIOs on a zone write plug list have already been split according to the
+current request queue limits. So until these BIOs are executed, we cannot change
+the limits as that potentially would require again splitting and that would
+completely messup the zone write pointer tracking of zone write plugging.
 
-> bios at the write pointer. If that wouldn't be the case, the following
-> code in block/blk-zoned.c would reject these bios:
+> If it is really true, we may have to drain zoned plug list when freezing
+> queue.
+
+Yes, that is what we need. But we currently endup deadlocking on a queue freeze
+because the internal issuing of plugged zone write BIOs uses
+submit_bio_noacct_nocheck() which calls __submit_bio() and that function will
+call blk_queue_enter() again for DM device BIOs. We need to somehow cleanly
+avoid calling that queue enter without sprinkling around lots of zone stuff in
+this core block layer submission path.
+
 > 
-> 	/*
-> 	 * Check for non-sequential writes early as we know that BIOs
-> 	 * with a start sector not unaligned to the zone write pointer
-> 	 * will fail.
-> 	 */
-> 	if (bio_offset_from_zone_start(bio) != zwplug->wp_offset)
-> 		return false;
 > 
-> If the bio is larger than 1 MiB, it gets split by the block layer after
-> it passed through the dm driver and before it is submitted to the sd
-> driver. The UFS driver sets max_sectors to 1 MiB. Although UFS host
-> controllers support larger requests, this value has been chosen to
-> minimize the impact of writes on read latency.
-
-As mentioned above, the splitting and adding to the zone write plug should all
-be serialized by the submitter, using whatever mean is appropriate there. As
-long as submit_bio() is ongoing processing a large BIO and splitting it, if the
-submitter is correctly serialzing writes, I do not see how splitting can result
-in reordering...
-
-> Earlier emails in this thread show that the bio splitting below the dm
-> driver can cause bio reordering. See also the call stack that is
-> available here:
+> Thanks, 
+> Ming
 > 
-> https://lore.kernel.org/linux-block/47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org/
-
-I asked for clarification in the first place because I still do not understand
-what is going on reading that lightly explained backtrace you show in that
-email. A more detailed time flow explanation of what is happening and in which
-context would very likely clarify exactly what is gong on.
-
-So far, the only thing I can think of is that maybe we need to split BIOs in DM
-core before submitting them to the DM driver. But I am reluctant to send such
-patch because I cannot justify/expalin its need based on your explanations.
 
 
 -- 
