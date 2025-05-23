@@ -1,135 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF9C17A2F6;
-	Fri, 23 May 2025 06:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7CA28750E;
+	Fri, 23 May 2025 08:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747980403; cv=none; b=sKW+9ypYhw5L1lGKWMWpUZEI9knMx2IWUGTyDgsxtEopxt4yi892P3N6liuhqTg5wIk35wqPFxhNVvTYHMocPIPMwXvKRCY+IQOYvOr270Mc0hRZhlwsgu0ye/LFxBNXsu72Bz+HyfUmbPQEsG1imZlJ+myRqRB2UkOCc1flM98=
+	t=1747987744; cv=none; b=FOhUWoIvNupveVQuADcuSccGexC0FSlT1/pC81a4Q2qLK2ynjMSOVJfiFkKf/4LqNSav6iW94HGhihAYcPWJ6sh4jHI+8AVU+MgwIgSxGEwv2SMItYiyAYtaxuDItbXOkxBxmRjecJwystEvxhdgoQJkIBgKo5lolJgoze+SAJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747980403; c=relaxed/simple;
-	bh=92eAN8csFAkBa/h97hweMHUpwVrSxLPQX1gSWGO2pWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wxehl+zWc3CRXi3vq5b6dkOuIRhYrho4ymMn1Ip4DPjdegRAjjzuGmtIPPGt2pxhI8ZqPtIxxbq1++Jfz4I5x+r3zU3EwY9ZEhjgbZvRgvNRNXsGGLT+x+eOERoHkByz6RvPKkueryauy3CLsWWhkeDHubq+M6SkEcQPaBxAwXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV2yyoTc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747987744; c=relaxed/simple;
+	bh=iQJkAMho/SskmJOoIxabfLjlJSg2YputWPqHToAzR9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=APAjqVbPP7zhVgrQkjKHZ1BbX8Rg7n2bT8whysFXbq0KMsaw4T5OgSBBsl36GIGAxHe5F4W5sXL91FZjgUPcAqZrGWD9513okvGa2u7a62ZMVH9EAS/1TwuijYoiJV7YMJRUWFFlmiCeRsr0P9VneCsEqFVRrEx7XrtBkCo3C0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rHqBApDK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GV2yyoTc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CADFBC4CEE9;
-	Fri, 23 May 2025 06:06:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747980402;
-	bh=92eAN8csFAkBa/h97hweMHUpwVrSxLPQX1gSWGO2pWY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GV2yyoTcTNGOfgbctyC/bsDUvh2PxzfK82GvxAZCWIDAiQ8/QTwHAG9ObjB7i79Ep
-	 CdCAElfDbdDvfLiowQ06KQ4DzBrxocBU82de6MVyf5V6nIn9Ey0rbfsiT5aF2v/BfR
-	 a8W8m+nw+4oWIE/hdC41oodBoLfdQSH1lziEH1+YVI7aDfvSFTtqBYs9w+EE6ZWTmc
-	 gAqeEx3UCHFHL3WOypXeaSaFFpjmlZ/BeXIiQBlr8OX/XNHRLMFQd7NlEVhIEfE+Dn
-	 TNLZ3lOAaafvqj+qGTBKDXOTHPCVEZFcaqDgiFADwz9gZ1lv3C/fi4LP+Pq91TaUl8
-	 mwYDDFy1EVyBQ==
-Message-ID: <1359a818-f95f-4827-9f8a-7e5f362b8e87@kernel.org>
-Date: Fri, 23 May 2025 08:06:38 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rHqBApDK"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MNWJv3031163;
+	Fri, 23 May 2025 08:08:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=NU+rmUVQZVV30gyYlatAr7+b4HlqB5
+	UFbKRrBWUc3Ow=; b=rHqBApDKPtxG23had0TgaFYYUGq9rVsPm68PX8tO56IWrQ
+	kOpynvKjXDRPayKFd6//6xHy9Zqj6/YtBb85IMDlt5H6/gK5KSoPiEy+gQPtfI4j
+	V2bI7Q4KBKVzsPiEYWpxIVAC+2Z7+Mh+zuRXf19yU6wjy1rnEwKVzbfE06ST7VDz
+	xG5wwxm4g1tRoYZAYboQwt2XgndzL6OWNVwkAjFCPuFFxMjWLsxrnrAmbR1tIS6q
+	qgwHvcDqrdu7rDTFci2SWClVJ4fHMYfTdMQkxAf8/cD8a5ZPDpr16mlOzJQnUnnY
+	qDZIMuA3sw7y9hp+krJqbYHBNNOxtmxn6IrV+u0Q==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46t669m3g8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 May 2025 08:08:47 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 54N86fWG004915;
+	Fri, 23 May 2025 08:08:46 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46t669m3g5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 May 2025 08:08:46 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54N6Wcdw031996;
+	Fri, 23 May 2025 08:08:45 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46rwmqdmfj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 May 2025 08:08:45 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54N88hcE52035910
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 23 May 2025 08:08:43 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 958282004E;
+	Fri, 23 May 2025 08:08:43 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2AD7320043;
+	Fri, 23 May 2025 08:08:42 +0000 (GMT)
+Received: from li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com (unknown [9.109.219.249])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 23 May 2025 08:08:41 +0000 (GMT)
+Date: Fri, 23 May 2025 13:38:39 +0530
+From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+To: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Cc: linux-block@vger.kernel.org, John Garry <john.g.garry@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, djwong@kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2] traceevent/block: Add REQ_ATOMIC flag to block trace
+ events
+Message-ID: <aDAtB-lLCDh0C-Fc@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+References: <44317cb2ec4588f6a2c1501a96684e6a1196e8ba.1747921498.git.ritesh.list@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix a deadlock related freezing zoned storage
- devices
-To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>,
- stable@vger.kernel.org
-References: <20250522171405.3239141-1-bvanassche@acm.org>
- <b1ea4120-e16a-47c8-b10c-ff6c9d5feb69@kernel.dk>
- <78244478-3ce3-4671-b28f-c67c5b21dba9@acm.org> <aC_ZFIICdxzSOxCt@fedora>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <aC_ZFIICdxzSOxCt@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <44317cb2ec4588f6a2c1501a96684e6a1196e8ba.1747921498.git.ritesh.list@gmail.com>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=RrPFLDmK c=1 sm=1 tr=0 ts=68302d0f cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=NCqlNMH9hAoYGvFVMsQA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: _LsNRelh7zggaIAP8liKuFWW5UbpRgH8
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDA3MyBTYWx0ZWRfXzXQMe12Z5IIH 9YiBpKehal/YHEBGzXjuB0/I8pta9cFZPtI733LeMu+3awJB9z31WskdAynFEspjv4goD6ECQI3 IPr/ydYmtH1+awHAGk9EKKQtunnkliwsYzT9O1pBwFz8PSOhfyvje/KKlXxgmR23QTcwA/Kn46A
+ NTBAxnvHecyAK6XJwyHoHETAy3uh/VSSAOHZrB5IsO2SfgOmDUNKxMtiu3j7im6sDFH6RmxJmi4 +1J4vEPTSd2wSQ7a0vlIj7ujQ/JPaS6HDwkeiNhFASIWz/5D5sEHlekfgFUnrHUSAcz5JT9fvVS 5FDXOmzrgmXQiAyETDw2Hk38OMfnFHU3fLQSLjPPeFQfdC9KldC4mWIyK7tO/lq5SnvcZOTouoW
+ E0kklOBf0NE+wqvnNNEdaBa4T7Ht0vqT4qflah3KBlCC/lL1mGu4kFZbgip177sWSjnthKNj
+X-Proofpoint-GUID: X4OSvc16wZk2wF7mVFh1HjEaI89EyGnK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-23_02,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ impostorscore=0 mlxlogscore=568 suspectscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0 adultscore=0
+ clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505230073
 
-On 5/23/25 04:10, Ming Lei wrote:
-> On Thu, May 22, 2025 at 11:32:58AM -0700, Bart Van Assche wrote:
->> On 5/22/25 10:38 AM, Jens Axboe wrote:
->>> On 5/22/25 11:14 AM, Bart Van Assche wrote:
->>>>   static void __submit_bio(struct bio *bio)
->>>>   {
->>>>   	/* If plug is not used, add new plug here to cache nsecs time. */
->>>> @@ -633,8 +640,12 @@ static void __submit_bio(struct bio *bio)
->>>>   	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
->>>>   		blk_mq_submit_bio(bio);
->>>> -	} else if (likely(bio_queue_enter(bio) == 0)) {
->>>> +	} else {
->>>>   		struct gendisk *disk = bio->bi_bdev->bd_disk;
->>>> +		bool zwp = bio_zone_write_plugging(bio);
->>>> +
->>>> +		if (unlikely(!zwp && bio_queue_enter(bio) != 0))
->>>> +			goto finish_plug;
->>>>   	
->>>>   		if ((bio->bi_opf & REQ_POLLED) &&
->>>>   		    !(disk->queue->limits.features & BLK_FEAT_POLL)) {
->>>> @@ -643,9 +654,12 @@ static void __submit_bio(struct bio *bio)
->>>>   		} else {
->>>>   			disk->fops->submit_bio(bio);
->>>>   		}
->>>> -		blk_queue_exit(disk->queue);
->>>> +
->>>> +		if (!zwp)
->>>> +			blk_queue_exit(disk->queue);
->>>>   	}
->>>
->>> This is pretty ugly, and I honestly absolutely hate how there's quite a
->>> bit of zoned_whatever sprinkling throughout the core code. What's the
->>> reason for not unplugging here, unaligned writes? Because you should
->>> presumable have the exact same issues on non-zoned devices if they have
->>> IO stuck in a plug (and doesn't get unplugged) while someone is waiting
->>> on a freeze.
->>>
->>> A somewhat similar case was solved for IOPOLL and queue entering. That
->>> would be another thing to look at. Maybe a live enter could work if the
->>> plug itself pins it?
->>
->> Hi Jens,
->>
->> q->q_usage_counter is not increased for bios on current->plug_list.
->> q->q_usage_counter is increased before a bio is added to the zoned pluglist.
->> So these two cases are different.
->>
->> I think it is important to hold a q->q_usage_counter reference for bios
->> on the zoned plug list because bios are added to that list after bio
->> splitting happened. Hence, request queue limits must not change while
->> any bio is on the zoned plug list.
+On Thu, May 22, 2025 at 07:21:10PM +0530, Ritesh Harjani (IBM) wrote:
+> Filesystems like XFS can implement atomic write I/O using either
+> REQ_ATOMIC flag set in the bio or via CoW operation. It will be useful
+> if we have a flag in trace events to distinguish between the two. This
+> patch adds char 'U' (Untorn writes) to rwbs field of the trace events
+> if REQ_ATOMIC flag is set in the bio.
 > 
-> Hi Bart,
+> <W/ REQ_ATOMIC>
+> =================
+> xfs_io-4238    [009] .....  4148.126843: block_rq_issue: 259,0 WFSU 16384 () 768 + 32 none,0,0 [xfs_io]
+> <idle>-0       [009] d.h1.  4148.129864: block_rq_complete: 259,0 WFSU () 768 + 32 none,0,0 [0]
 > 
-> Can you share why request queue limit can't be changed after bio is added
-> to zoned plug list?
-
-Because BIOs on a zone write plug list have already been split according to the
-current request queue limits. So until these BIOs are executed, we cannot change
-the limits as that potentially would require again splitting and that would
-completely messup the zone write pointer tracking of zone write plugging.
-
-> If it is really true, we may have to drain zoned plug list when freezing
-> queue.
-
-Yes, that is what we need. But we currently endup deadlocking on a queue freeze
-because the internal issuing of plugged zone write BIOs uses
-submit_bio_noacct_nocheck() which calls __submit_bio() and that function will
-call blk_queue_enter() again for DM device BIOs. We need to somehow cleanly
-avoid calling that queue enter without sprinkling around lots of zone stuff in
-this core block layer submission path.
-
+> <W/O REQ_ATOMIC>
+> ===============
+> xfs_io-4237    [010] .....  4143.325616: block_rq_issue: 259,0 WS 16384 () 768 + 32 none,0,0 [xfs_io]
+> <idle>-0       [010] d.H1.  4143.329138: block_rq_complete: 259,0 WS () 768 + 32 none,0,0 [0]
 > 
-> 
-> Thanks, 
-> Ming
-> 
+> Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+ 
+ Looks good Ritesh, feel free to add:
 
+ Reviewed-by: Ojaswin Mujoo <ojaswin@linux.ibm.com>
 
--- 
-Damien Le Moal
-Western Digital Research
+ Regards,
+ ojaswin
