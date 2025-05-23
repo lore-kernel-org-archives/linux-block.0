@@ -1,125 +1,129 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC9118DB3D;
-	Thu, 22 May 2025 23:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4D11DF754
+	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 02:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747957376; cv=none; b=fwbvEKAP9EJWlqCNVQPMx1In0PDZIxYqwDreg/I0KzX4VltjrP2rFYmTnlZzHP5k1JdRWX3WrWxlQj/y7k7iD3MYocMK3fPQk6x/JlI2tF/hCokNuCmPawmVubmSM5pHcxnStAn3WVXJG8pLvtL/sh9UazkNbIfop7SrBrR915Q=
+	t=1747966250; cv=none; b=YXAN/66NbK1vhdt4Xcfr2PPI/QdPDmQbwmVf4NS1tC5RP/0ZvWi571bWOkmUNIrYd6tfHbwgQ6Rg9mznNGbExRTnIHuysaIiJqiRAH7AbhckG9wVM9XEECwnh2QqP7Lfo4BL8wg67pUfdKdmpDI3H14Hb8xoZcGu6W8IuNrBU/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747957376; c=relaxed/simple;
-	bh=bOHBqddXS1gSodftBBdQ0VpvTwtlCZ545QEQJ4w2T2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fRsI+F3KhwcyJLzB4Id5rXyY5Vv33VBZqptH/voX7vdCyZbLiNvaQSry9ThgYsRJZQh/UMj4IPBzLclRBhnR5KgXPuOIJgePVldGf3Tg1sBSv9fBDJcFvfEtiGWPqYqI7u/AaqL4XjmJWR6E73bKhyx0RHwrzNYuum0LW/hEXlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ua96R7sW; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747966250; c=relaxed/simple;
+	bh=WScc3Jb3venQUdG3A3pwXOXbFu+pfD8ipZw5q1RUaEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNO3prHfp34iQQSZVP/D3acR0y4mt4eSlyI+nCg/JlK/KFnki15Mu0b2V1mC3S6hmFG1cgaYMWlBlOzMuXMiQboS++pq4VhDPDOZ2W1s17dp0cYdxaXeyoajXsZ5HOtFBVGYryDXVPMSJI7vy15zyHpBvNb8Sq0Ca6vJtlfvoHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmrllPoh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ua96R7sW"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-85e46f5c50fso739496039f.3;
-        Thu, 22 May 2025 16:42:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747957374; x=1748562174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8IxofwsL8T9ReOdXYX7tCLo1899Q9oCBZNmKLml4xN4=;
-        b=Ua96R7sWrWY0I55Pct1BtOyQiMrT6AzWMtC/EAzrMcZRbXDsM3fqgZDdmqBuQp3SxR
-         St3S2XEq34huSeEeRinwkZSX3Sj3h5aCEVfWyfWvJIgBYVXmnRbAfp1xmEd7pAv0jI/I
-         CJNQpfshuf1J4eY8Q5LwzfBsUJDfSzTYUx9Rx8dZEkhaYVvh3GEcn/7DFs0PIejUHJ7f
-         TKBjMcysUxNbj1kHY8jvZKwt8Byv4/K4trLIHdewjLB1G+dZPPkemnzTRXIBigiNjdlc
-         Dy0xuAollRrTinftTbqzLNtbiXBsTPfiWjs1u/WpLaDREVEFOZrPZHUk/CYLsXYgX+db
-         9JAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747957374; x=1748562174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8IxofwsL8T9ReOdXYX7tCLo1899Q9oCBZNmKLml4xN4=;
-        b=tbAiuO8Jg8DLarjTyeII3f2bvvuqIfs9KGdx/HOAXjGjE+e+sjA+jlcid6/Raa7OmI
-         w/ClapvATF6bKeeoRWMmNBCcVekfHsjCztY1f8zrikPLtfuMmzjCotI6ZhH1OC31n71a
-         LWjyVAq+4bjTJxvxPy8LDdzV2KNOU0V1BRjXc8dFTfgbJ1yBd2owxFN28MT+2mOyTVrX
-         w9bN+SwEW/CdgTxu2Euyl81JmTVfPshd+l3zpEGpniYKgaPtT/nKzHQ5Kbaw4q3io9hU
-         SAgOFVdUU0iIwxHsZ1kezedlzICuujLf5v3sVBYNPEODEN6KFwZsVJj1QAn3X0z9SjCP
-         iHqg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6/xTSZflvhLvn0V7bzWtPEq/7zD2x+2KW+0XEITDKFGIRSWrXvg1phsV/khGWAV5wBrYTA2Ar0BtKEzaB@vger.kernel.org, AJvYcCXTcqRxH/cvePIJSKXmYoXTXQ6EM60huTM/H80GsJ3A1qDhiPMt3NkKlsJIdSAh+EipfTcHvpB712n30JyuA5MM6WF5@vger.kernel.org, AJvYcCXuVJWIwIsRzNqoUEJ3zskx0s1He7rxz3dN4uvhHjfwvE6YN1f8PGFbd4lEec+Qph+nolS0jo/lKlpR3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRam5CAzJY4r/YquTsWOejYJmixUHFrB+TES0XeHpdSjgNuQRU
-	pcH+JyE0y/ObptFx8aOCK7JatpsAHhubk2zGheGDj3Pect+rhRvTHLziDEplVr2nKw03jyoed79
-	lH4WmNPHCcWdUuxeBqFHVHtgw240BSjE=
-X-Gm-Gg: ASbGncvXOMgvgfZk0WKUaOWXcTKU/rAr2CZgf/zZEFyUqUJ3YmKieYpO+MpmJfj2Os7
-	EFOo+9b50oaT75s/5ASqYEtqSJTnVolTbp88nrWpbDsv3hoZSgp9db0IsqYaFW457uzWJrHOm/k
-	Ft3H0Kzwo3ph5QdCFtWePo1VarN4kn2frD
-X-Google-Smtp-Source: AGHT+IEinbq6VshxzPfx2TAWHoFrFLw2NkVMJD03BeJ5ym1VzfGxKEexCFrXM8zc0aSeCDGViEDkg3148C1WU35WcPs=
-X-Received: by 2002:a05:6e02:1a4d:b0:3da:7cb7:79c with SMTP id
- e9e14a558f8ab-3dc932879bdmr9785845ab.13.1747957373671; Thu, 22 May 2025
- 16:42:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmrllPoh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747966245;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZD21kWlXVkCXTQ6qIIyjvZ+QVrc2Nl+Bw+5u37lzorw=;
+	b=NmrllPohRIAl/GbKjUFrYpdXGaaWBBXfgyemBTVqNBcB1p+lXqC5rYni6eEZLpODr0jtzR
+	NkU4QpRjLRQG5wxpX8GVCeDZMqt25QjK6LS84jAd0AIRmUejOSePRMYfKi0+utisGVxprw
+	yJhz0ItRiXuEXltFf3qE3bW0gyJXx0w=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-UNJrGfp4OYGpALiuVO3ung-1; Thu,
+ 22 May 2025 22:10:41 -0400
+X-MC-Unique: UNJrGfp4OYGpALiuVO3ung-1
+X-Mimecast-MFC-AGG-ID: UNJrGfp4OYGpALiuVO3ung_1747966239
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 14EB9195608A;
+	Fri, 23 May 2025 02:10:39 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.55])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F185D19560AD;
+	Fri, 23 May 2025 02:10:33 +0000 (UTC)
+Date: Fri, 23 May 2025 10:10:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Yu Kuai <yukuai1@huaweicloud.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] block: Fix a deadlock related freezing zoned storage
+ devices
+Message-ID: <aC_ZFIICdxzSOxCt@fedora>
+References: <20250522171405.3239141-1-bvanassche@acm.org>
+ <b1ea4120-e16a-47c8-b10c-ff6c9d5feb69@kernel.dk>
+ <78244478-3ce3-4671-b28f-c67c5b21dba9@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250518025734.61479-1-kerneljasonxing@gmail.com>
- <CAL+tcoCD5ORW=JqvZg7=uJXkLi-WTG-Szj1k8ya9sX6LcR41jQ@mail.gmail.com> <20250522163418.f14da5eea065296d42ee3497@linux-foundation.org>
-In-Reply-To: <20250522163418.f14da5eea065296d42ee3497@linux-foundation.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 23 May 2025 07:42:17 +0800
-X-Gm-Features: AX0GCFsrufe-PZ6eOiw3-7s_nUfw5rP0iRMlS5z0ArMQRp0iBeyfFG6iZA-Fzvc
-Message-ID: <CAL+tcoBUEpcyt3Vq8_f8Jyo3+1mLtdEH2QEf6nVAOYzRHitfNA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] relayfs: misc changes
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78244478-3ce3-4671-b28f-c67c5b21dba9@acm.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, May 23, 2025 at 7:34=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
-n.org> wrote:
->
-> On Fri, 23 May 2025 07:16:35 +0800 Jason Xing <kerneljasonxing@gmail.com>=
- wrote:
->
-> > On Sun, May 18, 2025 at 10:57=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > The series mostly focuses on the error counters which helps every use=
-r
-> > > debug their own kernel module.
-> > >
-> > > ---
-> > > Note: this series is made on top of this cleanup[1] and unmerged comm=
-it[2]
-> > > [1]: https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/log/=
-?h=3Dmm-nonmm-unstable
-> > > [2]: https://lore.kernel.org/all/20250507134225.63248-1-kerneljasonxi=
-ng@gmail.com/
-> > >
-> > > Jason Xing (4):
-> > >   relayfs: support a counter tracking if per-cpu buffers is full
-> > >   relayfs: introduce getting relayfs statistics function
-> > >   blktrace: use rbuf->stats.full as a drop indicator in relayfs
-> > >   relayfs: support a counter tracking if data is too big to write
-> > >
-> > >  include/linux/relay.h   | 19 ++++++++++++++-
-> > >  kernel/relay.c          | 52 +++++++++++++++++++++++++++++++++++----=
---
-> > >  kernel/trace/blktrace.c | 22 ++---------------
-> > >  3 files changed, 65 insertions(+), 28 deletions(-)
-> >
-> > Hi Andrew,
-> >
-> > Any comments on the series?
-> >
->
-> We're at -rc7 now, so I'll park this for consideration for -rc1.
+On Thu, May 22, 2025 at 11:32:58AM -0700, Bart Van Assche wrote:
+> On 5/22/25 10:38 AM, Jens Axboe wrote:
+> > On 5/22/25 11:14 AM, Bart Van Assche wrote:
+> > >   static void __submit_bio(struct bio *bio)
+> > >   {
+> > >   	/* If plug is not used, add new plug here to cache nsecs time. */
+> > > @@ -633,8 +640,12 @@ static void __submit_bio(struct bio *bio)
+> > >   	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
+> > >   		blk_mq_submit_bio(bio);
+> > > -	} else if (likely(bio_queue_enter(bio) == 0)) {
+> > > +	} else {
+> > >   		struct gendisk *disk = bio->bi_bdev->bd_disk;
+> > > +		bool zwp = bio_zone_write_plugging(bio);
+> > > +
+> > > +		if (unlikely(!zwp && bio_queue_enter(bio) != 0))
+> > > +			goto finish_plug;
+> > >   	
+> > >   		if ((bio->bi_opf & REQ_POLLED) &&
+> > >   		    !(disk->queue->limits.features & BLK_FEAT_POLL)) {
+> > > @@ -643,9 +654,12 @@ static void __submit_bio(struct bio *bio)
+> > >   		} else {
+> > >   			disk->fops->submit_bio(bio);
+> > >   		}
+> > > -		blk_queue_exit(disk->queue);
+> > > +
+> > > +		if (!zwp)
+> > > +			blk_queue_exit(disk->queue);
+> > >   	}
+> > 
+> > This is pretty ugly, and I honestly absolutely hate how there's quite a
+> > bit of zoned_whatever sprinkling throughout the core code. What's the
+> > reason for not unplugging here, unaligned writes? Because you should
+> > presumable have the exact same issues on non-zoned devices if they have
+> > IO stuck in a plug (and doesn't get unplugged) while someone is waiting
+> > on a freeze.
+> > 
+> > A somewhat similar case was solved for IOPOLL and queue entering. That
+> > would be another thing to look at. Maybe a live enter could work if the
+> > plug itself pins it?
+> 
+> Hi Jens,
+> 
+> q->q_usage_counter is not increased for bios on current->plug_list.
+> q->q_usage_counter is increased before a bio is added to the zoned pluglist.
+> So these two cases are different.
+> 
+> I think it is important to hold a q->q_usage_counter reference for bios
+> on the zoned plug list because bios are added to that list after bio
+> splitting happened. Hence, request queue limits must not change while
+> any bio is on the zoned plug list.
 
-Okay. IIUC, it seems probably two or three weeks later. I think I'll
-keep track of the series and remind you at that time just in case you
-might forget it :)
+Hi Bart,
 
-Thanks,
-Jason
+Can you share why request queue limit can't be changed after bio is added
+to zoned plug list?
+
+If it is really true, we may have to drain zoned plug list when freezing
+queue.
+
+
+Thanks, 
+Ming
+
