@@ -1,48 +1,88 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from outbound.pv.icloud.com (p-west1-cluster1-host5-snip4-4.eps.apple.com [57.103.64.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71D628368C;
-	Fri, 23 May 2025 08:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2591A01C6
+	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 08:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.64.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747988582; cv=none; b=HDm0Jysh0Ru42PqVbHv9RzOpQp5/z8ixG6m9CjDRYy/igO+XJch9p9zhtcm/KuHRWigXNWSM45WA1P5wvOE+YOtwR5vpNQmh/dZW75M5PVV4zYxwDHjgSUdfdmq90c95VzO2eSNR4jzHuaqnTvJIs0hkuGgmwMplgY9i7kbhxl8=
+	t=1747990585; cv=none; b=Ey2nFZyrbhWMbcZOp9CkcLqpcVlpQNpXAUobYA4qZEkI1UUuio4jEQswkzEWa2YKnne2mcbwbPqPAeWVSkcqbdeQVlZ/V0iaeO7Pb1vDXOuttOQeS8HH8ozqpcZo34LtQlOz4c2eJYyaMaF+CEPcARebPma/ciM0y7h++pbbYA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747988582; c=relaxed/simple;
-	bh=XjW4guZt3KlYsztLYMJ7Xjv9Lx3A7/m12hvnpFVpW8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mXIuMCiDMoNMSWuhh6w8u4RQvPG1UyyBmZ4iq6+VCuHR+2auFWeAx4lttQ1/Usebohu/sBKD+eP8Y5qZMxUKqaN/4H5uP+FALI0/rSrUJZSwNBZAftpEVoQ89DYzI2Mg13h2Q72wSZ36OSPryuM5q7DmIk+2PI5XsTfErcHs6mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2D46468C4E; Fri, 23 May 2025 10:22:55 +0200 (CEST)
-Date: Fri, 23 May 2025 10:22:55 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] block: Fix a deadlock related freezing zoned storage
- devices
-Message-ID: <20250523082254.GB15587@lst.de>
-References: <20250522171405.3239141-1-bvanassche@acm.org> <b1ea4120-e16a-47c8-b10c-ff6c9d5feb69@kernel.dk> <3cd139d0-5fe0-4ce1-b7a7-36da4fad6eff@kernel.org> <7fd56f2c-a769-4e9e-8168-6896b647087a@kernel.org>
+	s=arc-20240116; t=1747990585; c=relaxed/simple;
+	bh=1iTWbYs077VKyvs3vZv19qAfY6J3LzqMV+LLxQJYbag=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q1J2HlwibATazgitTvs2bbZ/ikBzIBeLhn2dUx1z7n6NGiNnrmDuhppRKlRp3+29I2NOrjXsAJspWyw7Wxxq2q/BT/clpaRhIWX1H489tnWEqysze79VrCA8UN4edEihXu7AghoCJpP2M4pmiSlKAvZ5/ONMa5H9Z6nNQxFsKuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com; spf=pass smtp.mailfrom=ai-sast.com; dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b=D09E9oQj; arc=none smtp.client-ip=57.103.64.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ai-sast.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ai-sast.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ai-sast.com header.i=@ai-sast.com header.b="D09E9oQj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ai-sast.com; s=sig1;
+	bh=BykeWOFG8Ty7ohO6Jd2gflf8OkLQ78fEPhw+xt4LCjE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
+	b=D09E9oQjj2/ot+d5WMgfQJb7ft36rJTXB2iRCzuZL51TYto/Z+c/N0+RPyk9odiKa
+	 50gbdu8v8ulFh/uRvQ+/qEUJwHU/urW7Edixgro8fA7Hc7JavVa011EsZi1KYN2sEl
+	 GpeDstRQz4HmkSWPbtEZgJZYfPMjzNJnZsRYRlhWlzyULgaoC0XM1vVdLTw258se3r
+	 18myxUPSbxSDGnYWWgXSHQpCcEOg6muxlYrLHO4mzEP4FQknqwgGPltYl/jE3N2ckq
+	 KNKrzMfYT+5EcvSN0B19IBPA6mVZAsKVs/oQZL9zACK0+MQK1FVxO9QtZAeAlx2M3B
+	 841FR6tsSZBfA==
+Received: from outbound.pv.icloud.com (localhost [127.0.0.1])
+	by outbound.pv.icloud.com (Postfix) with ESMTPS id 1B1151801EE2;
+	Fri, 23 May 2025 08:56:19 +0000 (UTC)
+Received: from localhost.localdomain (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
+	by outbound.pv.icloud.com (Postfix) with ESMTPSA id 50FDA1801EC1;
+	Fri, 23 May 2025 08:56:17 +0000 (UTC)
+From: Ye Chey <yechey@ai-sast.com>
+To: philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	christoph.boehmwalder@linbit.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ye Chey <yechey@ai-sast.com>
+Subject: [PATCH] drbd: fix potential NULL pointer dereference in drbd_md_sync_page_io
+Date: Fri, 23 May 2025 16:55:29 +0800
+Message-ID: <20250523085529.85368-1-yechey@ai-sast.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7fd56f2c-a769-4e9e-8168-6896b647087a@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: AyTumcuuQawnp_KXmgcN_gJ6zBcgBl3o
+X-Proofpoint-GUID: AyTumcuuQawnp_KXmgcN_gJ6zBcgBl3o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-23_02,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ mlxlogscore=999 phishscore=0 mlxscore=0 adultscore=0 suspectscore=0
+ bulkscore=0 clxscore=1030 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2503310001 definitions=main-2505230079
 
-On Fri, May 23, 2025 at 10:20:35AM +0200, Damien Le Moal wrote:
-> 
-> Looking into this deeper, the regular mq path actually likely has the same issue
-> since it will call blk_queue_enter() if we do not have a cached request. So this
-> solution is only partial and not good enough. We need something else.
+Under memory pressure, bio_alloc_bioset() may fail and return NULL. Add a
+check to handle this case gracefully by returning -ENOMEM instead of
+dereferencing a NULL pointer.
 
-The bio_zone_write_plugging case in blk_mq_submit_bio always
-reused the existing queue reference.
+Signed-off-by: Ye Chey <yechey@ai-sast.com>
+---
+ drivers/block/drbd/drbd_actlog.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
+index 742b2908f..68b925b49 100644
+--- a/drivers/block/drbd/drbd_actlog.c
++++ b/drivers/block/drbd/drbd_actlog.c
+@@ -141,6 +141,10 @@ static int _drbd_md_sync_page_io(struct drbd_device *device,
+ 
+ 	bio = bio_alloc_bioset(bdev->md_bdev, 1, op | op_flags, GFP_NOIO,
+ 			       &drbd_md_io_bio_set);
++	if (!bio) {
++		err = -ENOMEM;
++		goto out;
++	}
+ 	bio->bi_iter.bi_sector = sector;
+ 	err = -EIO;
+ 	if (bio_add_page(bio, device->md_io.page, size, 0) != size)
+-- 
+2.44.0
+
