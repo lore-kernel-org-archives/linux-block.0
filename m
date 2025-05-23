@@ -1,43 +1,41 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF57F2576
-	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 13:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D82D2920A3
+	for <linux-block@vger.kernel.org>; Fri, 23 May 2025 13:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748006314; cv=none; b=SE4wY+pYz3lcB6+JBcBE3cklVYhGCfi+aoZ8ZoNI1LTaWoinJNEAdQmkZB4+M6vHD/gvmtM0cSCVKbGzBjJ/qV1uzMjgMNOKqOVWaRCvVap2tWalBJgo0nHrI+ea1ub0l1VSnHiPXDghMfsT2uGRAzUPWd2QV7KUI3RTjaiUCuY=
+	t=1748006808; cv=none; b=S1clZZECPg/S+iv087wBt/kpLl7Q9ZrC2iIEA/ixQPPDZ5W/fXQsg7cMVI1HnLB4I/mlMCWlL51ZmGpTyKW3+qXhX0RS1vyLHxOS+Db/618f+38MzdJJgtnh1v1ahaJ5BMuTwfk89iDLZZJK0hHLSkLbBAumknnpBUUpWVaUin0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748006314; c=relaxed/simple;
-	bh=uZKGmC5FguoJFrYdsaVtbCcUFfWCpF4q0KOFjmWwkW4=;
+	s=arc-20240116; t=1748006808; c=relaxed/simple;
+	bh=sqRkjVZ3F3dEMt2KHGeZ7+4b/Gt0fBHflzBf81991rY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ssRsrEX1qLDwzXZUB1TGCAllsiKpy9V30QQ63MAhhDBiaM2N/oAVBKcv4zpELWLJ9Disr5H/DcWt6r85uS6oUZtE/Z/2acnvitvaZ8D8Ostr+fHRDlM4kbi06PmXhQqFXTV8T1EktdFBG2wOBK9f0ucNBqqYz4AB1AdU501pIEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=E0Pe1Ky+; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=NPA/TWTPwYhTyBXWdrnyERkybBnnW5QDYwaI05lFzi/stzR9f/5o+J+Go4fEW4P91ls3DjikSObiw5pK93ulnxo7TIl35LqGoeoK+3YGX/FegALB1ra4JyUnAaQJNekFUEtd4NkI23QxmoQHUmP/g/UVAZw2tFl09nsM0QcOvDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KgZHhKUc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="E0Pe1Ky+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=FjIVkrvWcGJqrRoEHsAxET1vwF+UKwgZFhzlHuLr1zM=; b=E0Pe1Ky+ZPxdXJfZatbIuXWjqt
-	if7aVi4csRYPs0vaLsyVdT58pjS843OS7VbUGuObvEsHQgaU0UmG9waVvNEvJ/cu76PDd3UUOxKPu
-	flQQ5OoiHWepvg+59gYogTblT53MiCmMp8jlpPbJM7cpeq2/YKcKq1vJz3D01GeHQgtH/rqPeRasa
-	TmjJrRd13oHDWvfSAxUGyb8GlU4b6eLmv/MLA2bL9Rtr42vRtqsgKnjFHZQHh31mrUJIu2pDage76
-	WAMERtKvbzkGVP8ZmWsdP1wyvGJ9OwsWUhDx368hl3JjNO6/YVhCII6S+F4Jb84WO2HVA/g294eHd
-	jiDAYz9g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uISIC-00000003vdQ-05C1;
-	Fri, 23 May 2025 13:18:32 +0000
-Date: Fri, 23 May 2025 06:18:31 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 5/5] nvmet: implement copy support for bdev backed target
-Message-ID: <aDB1p8XIhsauGFhc@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KgZHhKUc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBEFFC4CEE9;
+	Fri, 23 May 2025 13:26:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748006808;
+	bh=sqRkjVZ3F3dEMt2KHGeZ7+4b/Gt0fBHflzBf81991rY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KgZHhKUc+ge2ysksf5L206+wa9025iWCyWieHRK8uiHNPYyy6GRP2RJQjLHZTQzPF
+	 tWABZQc8UxgKfiHXTQP4oHqJ17jE++1DnPMVEUqJujkDbSHMu7s4I1GdDOTn0cQyy4
+	 6h6CHpQyWLsv6n7CiXy3RZC9jy2b2z/GfTiFVCo5k1vU3C224i3GRpp8YPOYQmhClc
+	 Er4HDmiqpDeLOvFLvxKcn0OANzLzdejQf9ZrEymBf/ZFvHakf9GDCfeF17b02gVmNB
+	 8ADbhb6vFYkurAx4oGWjxoO6c7hIfByjXRMxhkp1BIeIkHuMVWVUT0vI03xYwA4HkH
+	 SvDN/Hbfe1iTg==
+Date: Fri, 23 May 2025 07:26:45 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 2/5] block: add support for copy offload
+Message-ID: <aDB3lSQRLxjDHTSE@kbusch-mbp>
 References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-6-kbusch@meta.com>
+ <20250521223107.709131-3-kbusch@meta.com>
+ <aDBuQbsBRVjOc5wU@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,29 +44,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250521223107.709131-6-kbusch@meta.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aDBuQbsBRVjOc5wU@infradead.org>
 
-On Wed, May 21, 2025 at 03:31:07PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+On Fri, May 23, 2025 at 05:46:57AM -0700, Christoph Hellwig wrote:
+> On Wed, May 21, 2025 at 03:31:04PM -0700, Keith Busch wrote:
+> >  struct bio_vec {
+> > -	struct page	*bv_page;
+> > -	unsigned int	bv_len;
+> > -	unsigned int	bv_offset;
+> > +	union {
+> > +		struct {
+> > +			struct page	*bv_page;
+> > +			unsigned int	bv_len;
+> > +			unsigned int	bv_offset;
+> > +		};
+> > +		struct {
+> > +			sector_t	bv_sector;
+> > +			sector_t	bv_sectors;
+> > +		};
+> > +	};
 > 
-> The nvme block device target type does not have any particular limits on
-> copy commands, so all the settings are the protocol's max.
+> Urrgg.  Please don't overload the bio_vec. We've been working hard to
+> generalize it and share the data structures with more users in the
+> block layer. 
 
-I need this additional bit so that the host code actually see the
-copy support:
+Darn, this part of the proposal is really the core concept of this patch
+set that everything builds around. It's what allows submitting
+arbitrarily large sized copy requests and letting the block layer
+efficiently split a bio to the queue limits later.
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index c7317299078d..355cb67a8b74 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -734,7 +734,8 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
- 	id->mnan = cpu_to_le32(NVMET_MAX_NAMESPACES);
- 	id->oncs = cpu_to_le16(NVME_CTRL_ONCS_DSM |
- 			NVME_CTRL_ONCS_WRITE_ZEROES |
--			NVME_CTRL_ONCS_RESERVATIONS);
-+			NVME_CTRL_ONCS_RESERVATIONS |
-+			NVME_CTRL_ONCS_NVMCPYS);
- 
- 	/* XXX: don't report vwc if the underlying device is write through */
- 	id->vwc = NVME_CTRL_VWC_PRESENT;
+> If having a bio for each source range is too much overhead
+> for your user case (but I'd like to numbers for that), we'll need to
+> find a way to do that without overloading the actual bio_vec structure.
+
+Getting good numbers might be a problem in the near term. The current
+generation of devices I have access to that can do copy offload don't
+have asic support for it, so it is instrumented entirely in firmware.
+The performance is currently underwhelming, but I expect next generation
+to be much better.
