@@ -1,33 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D36EC8F0
-	for <linux-block@vger.kernel.org>; Sat, 24 May 2025 08:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1E923BE
+	for <linux-block@vger.kernel.org>; Sat, 24 May 2025 14:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748076485; cv=none; b=mDHrLbFUxE7QdFRhx7yVEM+JKbsFNKKU/z1rE44k/0qhpl+xg2+uyevA/OalUYRm/pzU6irP8Pf3ewosKfal5xQOvFFzjnuje703nxfcDJC/KPbw3txaoo/vKjvEX955FbEr/fjYY6y3kPjS5aWtvc758jlVWZp9Z6z3wpRLZ/A=
+	t=1748095571; cv=none; b=kgGtzo4Ed/TsZPIp70PorMWx3wfVJMYMFIyrIk1FMZM7T/94GL/Mo6LvEIFIrIAX/ViPK3S/wmNeWp81168ubUy8C/49aVoxlRUMlgqmnUbuGq7ADeon940SeBsnHcdOxxWoiE6lF8Jgmu5EBi6okZDpVW77hp8p+iJC4+szZH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748076485; c=relaxed/simple;
-	bh=flDxqf//8d8l1OigLZnSCiaHac2jtb0MB45xQgidV/k=;
+	s=arc-20240116; t=1748095571; c=relaxed/simple;
+	bh=OEdIkR+Q/JVjvz1WTqBBw8ciDfnX+JYGr37zF56J3Pk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EqolRIjDaHOc20xrJJEvWfcIk0kYRUOBOLQD/K9alodcCFS77GiA9E5bBbaJwXPoIbFz7xgboUic1p4QaWaIPD6l7ne47aTxlabZpfsoinuS4v10yYlFdmesShDJHn8g+y4BKfyNlZtOg2vclJ78H05OlajLuI6QaJupSsMwijI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L73xkmWw; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=WyaL8JnBpUQud+JA7p2xOzsw/msOIbBkpbT68gbOQnhDa1KmrvI6P1Yse4bVAxexIdu4rK3FElFAizU+eLWaWJwEjy8raNMqMZPW+Mx3GQrOcwlJfDrfFeQXOr0MABynbRQeS85HtRQv9ozW3udJ2MyEUyGILvtoutD1QZEL4Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=lavRmuk9; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L73xkmWw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0571C4CEE4;
-	Sat, 24 May 2025 08:48:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748076484;
-	bh=flDxqf//8d8l1OigLZnSCiaHac2jtb0MB45xQgidV/k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=L73xkmWwwaj9D4ra5byK1cyhG4HScHqxowsNAsYKdabHjmOcbcsgmz2DsyS/4Koam
-	 JhhiFQRZ7xfZodM9pmahRjETap5V7Ipk1eHWwqLabgzSD/DEPqoIvABkUJzwGA7794
-	 +wLKBKVUqwigU34/8TW6PePigSgskKPQVHSSMGOZvMNcexJzro2XfRejPsKDUxW6bd
-	 J/nsLpGs5qHQ7Qx406aVhYhE75eaYOVa6yBt/PSAMQjqBk2t2OcxKEEW3Ku85Pwswl
-	 HsZBKXdWmFxiuAkP7hhaHcdyw1NHHaCxyHCSxewPPURvJgrWT7U1wTpi/LcHikqjcq
-	 Hn+rk+KPrVKNQ==
-Message-ID: <4128be53-b3be-48a5-8d53-9e0ef40c6d64@kernel.org>
-Date: Sat, 24 May 2025 10:48:00 +0200
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="lavRmuk9"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4b4P2R6ZQNzm0gcG;
+	Sat, 24 May 2025 14:06:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1748095566; x=1750687567; bh=OEdIkR+Q/JVjvz1WTqBBw8ci
+	DfnX+JYGr37zF56J3Pk=; b=lavRmuk9DSaUk/jQngbT1xKjkBKv0IrlDxZMsaYo
+	pI71BaqCl0AYlPSSvBCf7CA7UClayCzJMU+xo7DY8oGAO1xW5LN/WWj2ufEwEaem
+	FdVuAw9B8ZMrbWAZEv+S38g8UDC/ikLDooUYBWKPEThPUObg59ftSblUSRJ5kWkp
+	oHD6N6WkYJ7/KV4msN1h4Tskg7lQBPgsF6QEI06noaJeQBAXt4mRMUCrAb73W6Hv
+	Heg5bTl/Us280RY+W2iHareZinJR9Ny2D04lN1MD8cY95XfN684GvmJgdNx7S7OE
+	XkDFz6ZO4ZnVFKw0rhZ3zyVZm2ExEgtF2P/gvC+rJvsXyQ==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Qst6ozhDyk0m; Sat, 24 May 2025 14:06:06 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4b4P2J04ZBzm10gB;
+	Sat, 24 May 2025 14:05:58 +0000 (UTC)
+Message-ID: <a67e1ba3-e231-405f-9927-e6c40db3f71e@acm.org>
+Date: Sat, 24 May 2025 07:05:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +52,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
  submission order
-To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
  Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
  Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
@@ -50,51 +65,25 @@ References: <20250514202937.2058598-1-bvanassche@acm.org>
  <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
  <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
  <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
+ <4128be53-b3be-48a5-8d53-9e0ef40c6d64@kernel.org>
 Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4128be53-b3be-48a5-8d53-9e0ef40c6d64@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/23/25 18:30, Bart Van Assche wrote:
-> On 5/22/25 11:02 PM, Damien Le Moal wrote:
->> On 5/22/25 19:08, Bart Van Assche wrote:
->  > [ ... ]
->> Which DM driver is it ? Does that DM driver have some special work queue
->> handling of BIO submissions ? Or does is simply remap the BIO and send it down
->> to the underlying device in the initial submit_bio() context ? If it is the
->> former case, then that DM driver must enable zone write plugging. If it is the
->> latter, it should not need zone write plugging and ordering will be handled
->> correctly throughout the submit_bio() context for the initial DM BIO, assuming
->> that the submitter does indeed serialize write BIO submissions to a zone. I have
->> not looked at f2fs code in ages. When I worked on it, there was a mutex to
->> serialize write issuing to avoid reordering issues...
-> 
-> It is the dm-default-key driver, a driver about which everyone
-> (including the authors of that driver) agree that it should disappear.
-> Unfortunately the functionality provided by that driver has not yet been
-> integrated in the upstream kernel (encrypt filesystem metadata).
-> 
-> How that driver (dm-default-key) works is very similar to how dm-crypt
-> works. I think that the most important difference is that dm-crypt
-> requests encryption for all bios while dm-default-key only sets an
-> encryption key for a subset of the bios it processes.
-> 
-> The source code of that driver is available here:
-> https://android.googlesource.com/kernel/common/+/refs/heads/android16-6.12/drivers/md/dm-default-key.c
+On 5/24/25 1:48 AM, Damien Le Moal wrote:
+> Note that our internal test suite runs *lots* of different zoned devices (SMR
+> HDD, ZNS SSDs, nullblk, tcmu-runner ZBC device, scsi_debug, qemu nvme zns
+> device) against *lots* of configurations for file systems (xfs, btrfs, zonefs)
+> and DM targets (dm-crypt, dm-linear) and we have not seen any reordering issue,
+> We run this test suite weekly against RC kernels and for-next branch.
 
-Well, this is an out of tree driver. Not touching this.
-Unless you can reproduce the issue with dm-crypt (or any other DM target that is
-upstream), I will not even try to debug this.
+Hi Damien,
 
-Note that our internal test suite runs *lots* of different zoned devices (SMR
-HDD, ZNS SSDs, nullblk, tcmu-runner ZBC device, scsi_debug, qemu nvme zns
-device) against *lots* of configurations for file systems (xfs, btrfs, zonefs)
-and DM targets (dm-crypt, dm-linear) and we have not seen any reordering issue,
-We run this test suite weekly against RC kernels and for-next branch.
+Please consider adding this dm-crypt test to the weekly test run:
+https://lore.kernel.org/linux-block/20250523164956.883024-1-bvanassche@acm.org
 
+Thanks,
 
--- 
-Damien Le Moal
-Western Digital Research
+Bart.
