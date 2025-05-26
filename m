@@ -1,56 +1,90 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F22143895
-	for <linux-block@vger.kernel.org>; Mon, 26 May 2025 05:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A431A725A;
+	Mon, 26 May 2025 07:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748237090; cv=none; b=O/skPE5Thpx24sizkQA3cnZwaMQM6TuOX1e1zzMS975yDQXDaBiUTCIRi25Uhe5kb+TwerJ5wCPFBtR+dgHP2fM/bsB4UczurLvpSkMeIYB/wEXWcniXOpPTJGern1ffWvYRoT6a2nWBMp2x9opWTlIwcTTk6sxD/Uu3R3HCeQ4=
+	t=1748245276; cv=none; b=a+bW1M123lzJ3AqzVHyMKIPA0JKn5+C+75feHjNqXQxQXzMHISOt1P9tXsDYX6Q20N3lk1D0Xc0ZMMvddsNR1A4R9iRXrSrKvnzHSyVMQu4JXcXhXZCEkWIsWJoys/xoKMe1QWGxI9A3b9JzNUZ0/JclBw3QBJ2B0/fIh9nURKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748237090; c=relaxed/simple;
-	bh=7WzBLZsW+QOWpB51qcxAL/vN9btnWfcTonr311OLv8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MAzUgiZ+XZvBLrF00rohQq/4wXPVzyXL13rC62Ev+U3uloM0bujoGT8lehwthcxjgdAb49QI3JP7SPukq295WqHuu0OThbJirJybMRy6acDz3xrIuBYCL2BButOCjeVG7HvDRyAxKKewePf45BpcIPeB4LjBVL4weoo3Ug1IaiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id BAAF868AFE; Mon, 26 May 2025 07:24:34 +0200 (CEST)
-Date: Mon, 26 May 2025 07:24:34 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-Message-ID: <20250526052434.GA11639@lst.de>
-References: <20250516044754.GA12964@lst.de> <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de> <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de> <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org> <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org> <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org> <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org> <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
+	s=arc-20240116; t=1748245276; c=relaxed/simple;
+	bh=yg0mxjoN/y9t7wdGun5ZZlQtrUMUvfn1oIMmqQsKpTU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MY3LILP1eYIq53R5QUpkDIuDE8c7tERUahlz44sLP+D+6U5M3AA8q5iqsxREetM5vyAnP2uzxwcR1zvMrqvJ7emSu3rSPqsB7TNttUipreCjwwXXoyWCO6MLb4rHUN2s9z1ikICprRBBx70qmWHr0sbT9p4qpB3skj7q8qs1Y90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpejsJ37; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpejsJ37"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD95AC4CEEE;
+	Mon, 26 May 2025 07:41:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748245275;
+	bh=yg0mxjoN/y9t7wdGun5ZZlQtrUMUvfn1oIMmqQsKpTU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TpejsJ37lMSvDsvEfiyqyeQgdVagEFUb/EBYToJCsQINUx+Gc4tKcMuwm2aA8iNxr
+	 TfBzv1OXOh4jVkaPhTpFZYOxlKMwJVZhiLHEyMS2troTCvj7paCh7kQofBhYbCfhRg
+	 mow3NIBHcRohcALdkt9vACCliVjwqOIlEHk6nhHtoTu3DQcvbdYlx085CYrU1hUEKC
+	 mCB0qksh4RqcVPMMY8lCQkisE8xm0tDoE9xDTlH1sErSJftGRhoZiCHujtw/EsP3N5
+	 naMrjQajW6USmeUzHyBVTi6APsKWGExBRS92o5PpRJckRrUmAoK5WP987aw3NrTD47
+	 mxGGU726/ZyRg==
+Message-ID: <f6b29462-5bd0-4175-a8f8-edd36cd78a2c@kernel.org>
+Date: Mon, 26 May 2025 09:41:11 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix a deadlock related freezing zoned storage
+ devices
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+ linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+ Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org
+References: <20250522171405.3239141-1-bvanassche@acm.org>
+ <b1ea4120-e16a-47c8-b10c-ff6c9d5feb69@kernel.dk>
+ <3cd139d0-5fe0-4ce1-b7a7-36da4fad6eff@kernel.org>
+ <20250523082048.GA15587@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250523082048.GA15587@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 23, 2025 at 09:30:36AM -0700, Bart Van Assche wrote:
-> It is the dm-default-key driver, a driver about which everyone
-> (including the authors of that driver) agree that it should disappear.
-> Unfortunately the functionality provided by that driver has not yet been
-> integrated in the upstream kernel (encrypt filesystem metadata).
->
-> How that driver (dm-default-key) works is very similar to how dm-crypt
-> works. I think that the most important difference is that dm-crypt
-> requests encryption for all bios while dm-default-key only sets an
-> encryption key for a subset of the bios it processes.
+On 5/23/25 10:20, Christoph Hellwig wrote:
+> Something like this completely untested patch:
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 8f15d1aa6eb8..6841af8a989c 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -1306,16 +1306,18 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+>  	spin_unlock_irqrestore(&zwplug->lock, flags);
+>  
+>  	bdev = bio->bi_bdev;
+> -	submit_bio_noacct_nocheck(bio);
+> -
+>  	/*
+>  	 * blk-mq devices will reuse the extra reference on the request queue
+>  	 * usage counter we took when the BIO was plugged, but the submission
+>  	 * path for BIO-based devices will not do that. So drop this extra
+>  	 * reference here.
+>  	 */
+> -	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO))
+> +	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO)) {
+> +		bdev->bd_disk->fops->submit_bio(bio);
+>  		blk_queue_exit(bdev->bd_disk->queue);
+> +	} else {
+> +		blk_mq_submit_bio(bio);
+> +	}
+>  
+>  put_zwplug:
+>  	/* Drop the reference we took in disk_zone_wplug_schedule_bio_work(). */
 
-Umm, Bart I really expected better from you.  You're ducking around
-providing a reproducer for over a week and waste multiple peoples
-time to tell us the only reproducer is your out of tree thingy
-reject upstream before?  That's not really how Linux developement
-works.
+I ran xfs on an SMR drive with this and I had no issues. Will do more test with
+a device mapper added.
+
+-- 
+Damien Le Moal
+Western Digital Research
