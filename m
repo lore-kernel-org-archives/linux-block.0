@@ -1,228 +1,272 @@
-Received: from mail-qt1-f206.google.com (mail-qt1-f206.google.com [209.85.160.206])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9B73D994
-	for <linux-block@vger.kernel.org>; Mon, 26 May 2025 13:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9227220C009;
+	Mon, 26 May 2025 13:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748264744; cv=none; b=A8Yjw8qilEGddQmMY8mIzRIF3KevUBdpw9jyJqbIL0t15yTujA6OhuAJkDVkxqKWtvI8Z60PtqyDoni828ENL/hSr+yv1sHcn6And7teTGyAQUSjLsMbp5vK8FT2+dm/DDI0UQnCT2Tn+SIR+GLiuvAS05o4i4ajO2a1bjTPFuc=
+	t=1748266172; cv=none; b=QM9TGMLQsniX93P/vkDA8I4SugEZ7BZcR3lM3AkgI5IdOcJehYSL/cPzPB5g40K7x+aOwMnM1+DDOdbSfF15BmZ0up87vSskpGqxWPN23KhMCmXg9l0UvIKnCj7rSVkFcwgdL/1mHVt9CFoVvn4hM59pxL40sANWXRBHjiNqgzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748264744; c=relaxed/simple;
-	bh=zCcY6cRVvQXJqG00Q04hZ7naRc+dOEBgBzQijIA4Ud4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dOP2dC3U8tjcHoVRE2lzfj2kvj+KHhn3gQoIdH9vJpr8dEAlpdS9ZLuVkJE1XLiu/1C+rphyzJmq14apn6xlTn4VYMD6roe8b9Qh7zt1Nx6nxv9uRoOHn8DQ7KPAVOyQ2FNkUS9t3WR/k2ii72qEERAEeoBTReDTBqzrT1teD2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-qt1-f206.google.com with SMTP id d75a77b69052e-47682f9e7b9so34802911cf.2
-        for <linux-block@vger.kernel.org>; Mon, 26 May 2025 06:05:42 -0700 (PDT)
+	s=arc-20240116; t=1748266172; c=relaxed/simple;
+	bh=ftqgrdFI1GpSlLjZn+vqEpJ3cfGGNQo5NsWZGQWfDcQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fwSItvdA2OmYOhbmCTBAU1nmEpZQYlO6xmgOeVtWZPF9o8OYZOp9tzMafSbw8dTce2QHOeRAfKZA55pdgjrs3PpjIllRz1sRCW7jmvQXat9HtSJsq/oHh34yy6iU8/JLyqEKhv/+cLM49A6vB24luRBv2Zu150qJzYoec/1J3Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrHCoYs7; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrHCoYs7"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-601f278369bso4679399a12.1;
+        Mon, 26 May 2025 06:29:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748266168; x=1748870968; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ky+DCkhEOyCcqlejBTI455CsOSMLvUBLS4Gb0hfKRHc=;
+        b=XrHCoYs7/og84/GSJkmRUxSpY+td42qTwNGxQ29xBFyTKKaVZZpD84bswigzTo9+uf
+         LmkNL0toqkOV5GEIfOQyvFdkdkrCBP+ElKQey8gO3c4LOxjN+PgxD0IrFBRBfMrVEu9m
+         km+fTz312EUyni+4x4pD5wcz1Nu2gf3TER9VU1ubkuUbLnJ5kxFB/rC2IJbcv1J2ivDk
+         1w35JSjsSVys4kjQB6fZDc9Teitj1ac2B0Lt8anaHjoVp8Pf+rZ5pFhH1DWkVIjagICz
+         TnnqrdYTRKrKGuQhxJC2S3zYxk1IPGY0qExKieQf34PWxLxc3VL7Z90+lsBZVH4FTNzG
+         WeVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748264742; x=1748869542;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2tjIeaqhbjUxk08SItdc4sW30n7YS8azipOHS4/dbGg=;
-        b=qFafWafpRkOKWYUzBOz5QbrlI6HVXlR4PLEX+pLpsXvJOcOS1GrGEvO5FUIz9czLPN
-         ASKSs8ay+GyLwRxcrKL7WuVO62EXZP/BE66KtYj+HSAdIpK89CMnIMuFxqPpT5lWbiBq
-         /8iIrPJKm+jusqyesm+sN7NyRtpjbyceKeKB3M3tOV8KzHBrOuBJCQPnVT2D29QKrVLM
-         IRR3zy8cLeL1wx64YjrwqcnT0y0CiSVs+Y2Hl4kiK7mGr3cOOCOrDNAfAMPImBHWbr12
-         YtzFCbQslsQAAADqh1/Lmm9izkDR1VmTz8Fomhd0kEKXBFrG5ewraN6fWNDmY/zzwuKO
-         8ccw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIk+FV8bTjZypHWOHMJAbGbmFlAfuGvkv8BDPrCrzcyVqp7Yn339/j7ig5Hv0whbVsJj4lNTDsxrNMQA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxySNHU6qQaBOODvLz03sCWzVzns1Khv7OOEIlUcgVuRJTaWze
-	5TLZt9Fd4sNlyAV3MDrl5xivwzHFvzNAHJpoHCATVJqDitcWkGE4VDjN1HuYyo/Hmkl4hEXyu4y
-	W1Iv+AK1jCNHu+Rh8ELOBl9UeJtJ6gRXQTSjvZq+rw9pyPX4cpRXqmrhmxvE=
-X-Google-Smtp-Source: AGHT+IFwhe/7yR6dfKx0iB5eSoM4alWJ8HSB8PkYiw2nhBWt0CjRtDAt2ES1XyarjVttMsOdxXLxZ9tP8FvOP3DIC0pU9g1XHZEP
+        d=1e100.net; s=20230601; t=1748266168; x=1748870968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ky+DCkhEOyCcqlejBTI455CsOSMLvUBLS4Gb0hfKRHc=;
+        b=vj7RrY3n65+WwZgVmdFzd3rZn0MJ6ZulIeSPxeGNeLq88j1QC4pugqGF8fQLfaOXB5
+         zfRl4p0tmc7C5yoQ+xD+XW2CG12ctTL75uqQsk31672TEAXJii2hjqjO0tRv09fFl6IY
+         NCa+eDRhP1FKkJ4pu6+MLbUKHpQ6MSuFVBrc3q68pJ73vcYWw/3oFqzzpHX6NE9oNJ4Y
+         RLTUrozlqfl7CnaG5UKH80lGO5FyX170n2LBjwbWgU0e9UKfLfWSG7igXTg0wH+xuPPv
+         OuOS6xeV+TZg6GeIlhKd/BaAWt2Idt1Z3iTjtRoMTj6eku9TMnmsLhLaq6Lyz5p2XQkY
+         Bv6g==
+X-Forwarded-Encrypted: i=1; AJvYcCU8RY5IPJ58ArZgo/VJwf5Nn8Af/l6D5OCyzNltOi2Ua/2LxYm2TMB0za/uNXfXu14hIIf2VCmV@vger.kernel.org, AJvYcCUUl0x/hWKlTT3y4YDhzof3R1V9ReH0mx65/f4jVN5ZEA4jLQ4NJlOLtWz37ZaLG0Ki+bNrWM7zov+U+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQF3nGCUVtnR9LYGkoHngfbwGbQDPNYz+/WCyLuzfg0VXXdaE9
+	bhsS8rt3c/GDQnn1OJoCVFxmt/1loEYLGV4bCLDT40DM1jTBGQoWx1OuFrLqIbqHJhpsj8X73CQ
+	nbS2GKie7POXnQiwGfVO6Fd4na0BO5Xs=
+X-Gm-Gg: ASbGncsNTyYfa6YGd8pzcshdujynwnytjkNxR3h6DZj60Z6Kj3vWUR3mivKUFpkhbSb
+	Y0YOP/ps1bh6/0St2ilySVsKGtsPYecwagHlqlGAMkf+0csztSYdcCFv+47vrfHuO75zg4fOHe8
+	uWzJ5KWwFCREaevs/KJD+Hpy8XLwVMgJM=
+X-Google-Smtp-Source: AGHT+IFvyx15Wv4KKKNKkL+b/IrI3XgNbs0ShaeDrFV2k6yVufyn/+YNtOoVkbAi0R7bkFeyzpJaGzrINco9iSKSY4w=
+X-Received: by 2002:a05:6402:3486:b0:601:89d4:968e with SMTP id
+ 4fb4d7f45d1cf-602dacbfd7amr7816048a12.27.1748266167610; Mon, 26 May 2025
+ 06:29:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:4c8e:b0:867:667d:18dd with SMTP id
- ca18e2360f4ac-86cbb7befa4mr802900839f.1.1748264730850; Mon, 26 May 2025
- 06:05:30 -0700 (PDT)
-Date: Mon, 26 May 2025 06:05:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6834671a.a70a0220.253bc2.0098.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in __del_gendisk
-From: syzbot <syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20250521062744.1361774-1-parav@nvidia.com> <20250521145635.GA120766@fedora>
+ <CY8PR12MB7195DE1F8F11675CD2584D22DC99A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <CAJSP0QXxspELYnToMuP1w86rayQgPDRccVo892C258y9UbH_Hg@mail.gmail.com>
+ <CY8PR12MB71958DFA8D0043DA3842B93ADC99A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <CY8PR12MB719552B560C843F8CC334EDEDC65A@CY8PR12MB7195.namprd12.prod.outlook.com>
+In-Reply-To: <CY8PR12MB719552B560C843F8CC334EDEDC65A@CY8PR12MB7195.namprd12.prod.outlook.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 26 May 2025 09:29:14 -0400
+X-Gm-Features: AX0GCFuapTTNbi28N7wHTBYiG_3DZOJJw1MIzEKxGOcBFWIlrSs2rlkpolyRhLY
+Message-ID: <CAJSP0QX70Om0Q-yGSN90N-4XJvhOV1XvVER-a0E05BRcd2JBKw@mail.gmail.com>
+Subject: Re: [PATCH v1] virtio_blk: Fix disk deletion hang on device surprise removal
+To: Parav Pandit <parav@nvidia.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>, 
+	"axboe@kernel.dk" <axboe@kernel.dk>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, 
+	"NBU-Contact-Li Rongqing (EXTERNAL)" <lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, Max Gurtovoy <mgurtovoy@nvidia.com>, 
+	Israel Rukshin <israelr@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, May 26, 2025 at 5:23=E2=80=AFAM Parav Pandit <parav@nvidia.com> wro=
+te:
+>
+> Hi Stefan,
+>
+> > From: Parav Pandit <parav@nvidia.com>
+> > Sent: Thursday, May 22, 2025 8:26 PM
+> >
+> >
+> > > From: Stefan Hajnoczi <stefanha@gmail.com>
+> > > Sent: Thursday, May 22, 2025 8:06 PM
+> > >
+> > > On Wed, May 21, 2025 at 10:57=E2=80=AFPM Parav Pandit <parav@nvidia.c=
+om>
+> > wrote:
+> > > > > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > Sent: Wednesday, May 21, 2025 8:27 PM
+> > > > >
+> > > > > On Wed, May 21, 2025 at 06:37:41AM +0000, Parav Pandit wrote:
+> > > > > > When the PCI device is surprise removed, requests may not
+> > > > > > complete the device as the VQ is marked as broken. Due to this,
+> > > > > > the disk deletion hangs.
+> > > > > >
+> > > > > > Fix it by aborting the requests when the VQ is broken.
+> > > > > >
+> > > > > > With this fix now fio completes swiftly.
+> > > > > > An alternative of IO timeout has been considered, however when
+> > > > > > the driver knows about unresponsive block device, swiftly
+> > > > > > clearing them enables users and upper layers to react quickly.
+> > > > > >
+> > > > > > Verified with multiple device unplug iterations with pending
+> > > > > > requests in virtio used ring and some pending with the device.
+> > > > > >
+> > > > > > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of
+> > > > > > virtio pci device")
+> > > > > > Cc: stable@vger.kernel.org
+> > > > > > Reported-by: lirongqing@baidu.com
+> > > > > > Closes:
+> > > > > > https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73=
+c
+> > > > > > a9
+> > > > > > b474
+> > > > > > 1@baidu.com/
+> > > > > > Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > > Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+> > > > > > Signed-off-by: Parav Pandit <parav@nvidia.com>
+> > > > > > ---
+> > > > > > changelog:
+> > > > > > v0->v1:
+> > > > > > - Fixed comments from Stefan to rename a cleanup function
+> > > > > > - Improved logic for handling any outstanding requests
+> > > > > >   in bio layer
+> > > > > > - improved cancel callback to sync with ongoing done()
+> > > > > >
+> > > > > > ---
+> > > > > >  drivers/block/virtio_blk.c | 95
+> > > > > > ++++++++++++++++++++++++++++++++++++++
+> > > > > >  1 file changed, 95 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/block/virtio_blk.c
+> > > > > > b/drivers/block/virtio_blk.c index 7cffea01d868..5212afdbd3c7
+> > > > > > 100644
+> > > > > > --- a/drivers/block/virtio_blk.c
+> > > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > > @@ -435,6 +435,13 @@ static blk_status_t virtio_queue_rq(struct
+> > > > > blk_mq_hw_ctx *hctx,
+> > > > > >     blk_status_t status;
+> > > > > >     int err;
+> > > > > >
+> > > > > > +   /* Immediately fail all incoming requests if the vq is brok=
+en.
+> > > > > > +    * Once the queue is unquiesced, upper block layer flushes
+> > > > > > + any
+> > > > > pending
+> > > > > > +    * queued requests; fail them right away.
+> > > > > > +    */
+> > > > > > +   if (unlikely(virtqueue_is_broken(vblk->vqs[qid].vq)))
+> > > > > > +           return BLK_STS_IOERR;
+> > > > > > +
+> > > > > >     status =3D virtblk_prep_rq(hctx, vblk, req, vbr);
+> > > > > >     if (unlikely(status))
+> > > > > >             return status;
+> > > > > > @@ -508,6 +515,11 @@ static void virtio_queue_rqs(struct rq_lis=
+t
+> > > *rqlist)
+> > > > > >     while ((req =3D rq_list_pop(rqlist))) {
+> > > > > >             struct virtio_blk_vq *this_vq =3D
+> > > > > >get_virtio_blk_vq(req- mq_hctx);
+> > > > > >
+> > > > > > +           if (unlikely(virtqueue_is_broken(this_vq->vq))) {
+> > > > > > +                   rq_list_add_tail(&requeue_list, req);
+> > > > > > +                   continue;
+> > > > > > +           }
+> > > > > > +
+> > > > > >             if (vq && vq !=3D this_vq)
+> > > > > >                     virtblk_add_req_batch(vq, &submit_list);
+> > > > > >             vq =3D this_vq;
+> > > > > > @@ -1554,6 +1566,87 @@ static int virtblk_probe(struct
+> > > > > > virtio_device
+> > > > > *vdev)
+> > > > > >     return err;
+> > > > > >  }
+> > > > > >
+> > > > > > +static bool virtblk_request_cancel(struct request *rq, void *d=
+ata) {
+> > > > > > +   struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
+> > > > > > +   struct virtio_blk *vblk =3D data;
+> > > > > > +   struct virtio_blk_vq *vq;
+> > > > > > +   unsigned long flags;
+> > > > > > +
+> > > > > > +   vq =3D &vblk->vqs[rq->mq_hctx->queue_num];
+> > > > > > +
+> > > > > > +   spin_lock_irqsave(&vq->lock, flags);
+> > > > > > +
+> > > > > > +   vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
+> > > > > > +   if (blk_mq_request_started(rq) &&
+> > !blk_mq_request_completed(rq))
+> > > > > > +           blk_mq_complete_request(rq);
+> > > > > > +
+> > > > > > +   spin_unlock_irqrestore(&vq->lock, flags);
+> > > > > > +   return true;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static void virtblk_broken_device_cleanup(struct virtio_blk *v=
+blk) {
+> > > > > > +   struct request_queue *q =3D vblk->disk->queue;
+> > > > > > +
+> > > > > > +   if (!virtqueue_is_broken(vblk->vqs[0].vq))
+> > > > > > +           return;
+> > > > >
+> > > > > Can a subset of virtqueues be broken? If so, then this code
+> > > > > doesn't handle
+> > > it.
+> > > > On device removal all the VQs are broken. This check only uses a VQ
+> > > > to decide
+> > > on.
+> > > > In future may be more elaborate API to have virtio_dev_broken() can
+> > > > be
+> > > added.
+> > > > Prefer to keep this patch without extending many APIs given it has =
+Fixes
+> > tag.
+> > >
+> > > virtblk_remove() is called not just when a PCI device is hot
+> > > unplugged. For example, removing the virtio_blk kernel module or
+> > > unbinding a specific virtio device instance also calls it.
+> > >
+> > This is ok.
+> >
+> > > My concern is that virtblk_broken_device_cleanup() is only intended
+> > > for the cases where all virtqueues are broken or none are broken. If
+> > > just the first virtqueue is broken then it completes requests on
+> > > operational virtqueues and they may still raise an interrupt.
+> > >
+> > I see that vq broken is extended for each reset scenario too lately in
+> > vp_modern_enable_vq_after_reset().
+> > So yes, this patch which was intended for original surprise removal bug=
+ where
+> > vq broken was not done for reset cases.
+> >
+> > I believe for fixing the cited patch, device->broken flag should be use=
+d.
+> > Max indicated this in an internal review, but I was inclined to avoid a=
+dding
+> > many changes.
+> > And hence reuse vq broken.
+> >
+> > So one option is to extend,
+> >
+> > virtio_break_device() to have a flag like below and check during remove=
+().
+> >   dev->broken =3D true;
+> >
+>
+> I dig further.
+> VQ resize is the only user of dynamically break-unbreak a VQ; and specifi=
+c only to vnet device.
+> So vq[0].broken check in this patch is sufficient in this proposed functi=
+on without adding above dev->broken check.
+>
+> If no further comments, I would like to post v2 addressing your and Micha=
+el's inputs.
+> Please let me know.
 
-syzbot found the following issue on:
+Yes, please go ahead with the next revision.
 
-HEAD commit:    3be1a7a31fbd Add linux-next specific files for 20250526
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1573bad4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9ab703e8a19430df
-dashboard link: https://syzkaller.appspot.com/bug?extid=2e9e529ac0b319316453
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/33e6b012d232/disk-3be1a7a3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f92328298470/vmlinux-3be1a7a3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e5cbdb6f4a5c/bzImage-3be1a7a3.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.15.0-rc7-next-20250526-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.4.1558/11720 is trying to acquire lock:
-ffff888142bb3358 (&disk->open_mutex){+.+.}-{4:4}, at: __del_gendisk+0x129/0x9e0 block/genhd.c:706
-
-but task is already holding lock:
-ffff888142bb2368 (&set->update_nr_hwq_lock){++++}-{4:4}, at: del_gendisk+0xe0/0x160 block/genhd.c:818
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&set->update_nr_hwq_lock){++++}-{4:4}:
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
-       down_write+0x96/0x1f0 kernel/locking/rwsem.c:1577
-       blk_mq_update_nr_hw_queues+0x3b/0x14c0 block/blk-mq.c:5041
-       nbd_start_device+0x16c/0xac0 drivers/block/nbd.c:1476
-       nbd_genl_connect+0x1250/0x1930 drivers/block/nbd.c:2201
-       genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
-       genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
-       genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
-       netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2534
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
-       netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-       netlink_unicast+0x75b/0x8d0 net/netlink/af_netlink.c:1339
-       netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
-       sock_sendmsg_nosec net/socket.c:712 [inline]
-       __sock_sendmsg+0x21c/0x270 net/socket.c:727
-       ____sys_sendmsg+0x505/0x830 net/socket.c:2566
-       ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
-       __sys_sendmsg net/socket.c:2652 [inline]
-       __do_sys_sendmsg net/socket.c:2657 [inline]
-       __se_sys_sendmsg net/socket.c:2655 [inline]
-       __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&nbd->config_lock){+.+.}-{4:4}:
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
-       __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-       __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:747
-       refcount_dec_and_mutex_lock+0x30/0xa0 lib/refcount.c:118
-       nbd_config_put+0x2c/0x790 drivers/block/nbd.c:1423
-       nbd_release+0xfe/0x140 drivers/block/nbd.c:1735
-       bdev_release+0x536/0x650 block/bdev.c:-1
-       blkdev_release+0x15/0x20 block/fops.c:684
-       __fput+0x44c/0xa70 fs/file_table.c:467
-       fput_close_sync+0x119/0x200 fs/file_table.c:572
-       __do_sys_close fs/open.c:1589 [inline]
-       __se_sys_close fs/open.c:1574 [inline]
-       __x64_sys_close+0x7f/0x110 fs/open.c:1574
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&disk->open_mutex){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3168 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3287 [inline]
-       validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3911
-       __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5240
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
-       __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-       __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:747
-       __del_gendisk+0x129/0x9e0 block/genhd.c:706
-       del_gendisk+0xe8/0x160 block/genhd.c:819
-       loop_remove+0x42/0xc0 drivers/block/loop.c:2081
-       loop_control_remove drivers/block/loop.c:2140 [inline]
-       loop_control_ioctl+0x4a6/0x590 drivers/block/loop.c:2178
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:907 [inline]
-       __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &disk->open_mutex --> &nbd->config_lock --> &set->update_nr_hwq_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  rlock(&set->update_nr_hwq_lock);
-                               lock(&nbd->config_lock);
-                               lock(&set->update_nr_hwq_lock);
-  lock(&disk->open_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz.4.1558/11720:
- #0: ffff888142bb2368 (&set->update_nr_hwq_lock){++++}-{4:4}, at: del_gendisk+0xe0/0x160 block/genhd.c:818
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 11720 Comm: syz.4.1558 Not tainted 6.15.0-rc7-next-20250526-syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2046
- check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2178
- check_prev_add kernel/locking/lockdep.c:3168 [inline]
- check_prevs_add kernel/locking/lockdep.c:3287 [inline]
- validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3911
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5240
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
- __mutex_lock_common kernel/locking/mutex.c:602 [inline]
- __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:747
- __del_gendisk+0x129/0x9e0 block/genhd.c:706
- del_gendisk+0xe8/0x160 block/genhd.c:819
- loop_remove+0x42/0xc0 drivers/block/loop.c:2081
- loop_control_remove drivers/block/loop.c:2140 [inline]
- loop_control_ioctl+0x4a6/0x590 drivers/block/loop.c:2178
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f301358e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f30113f6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f30137b5fa0 RCX: 00007f301358e969
-RDX: 0000000000000000 RSI: 0000000000004c81 RDI: 0000000000000003
-RBP: 00007f3013610ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f30137b5fa0 R15: 00007fffe9613fd8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Stefan
