@@ -1,124 +1,292 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF2522E40F;
-	Mon, 26 May 2025 16:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06BF212D9D
+	for <linux-block@vger.kernel.org>; Mon, 26 May 2025 16:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748276129; cv=none; b=su5mKCXGMGvdrz2Gt7Pj0DWEt8u1aoYQDv5+3vyB6H28Zn9WqsQTjscOn8opmXZKjmtcWscevpOCVw3XTNLFWCPlt3XwKLomFopsqTtW+N4xnoPUpWC56Q7L6M6Z4fNXnkCF1obTjfqEOv91tFAmMa5pKoJwjkXHPW8veyK3m8k=
+	t=1748277562; cv=none; b=QoHDcahRloHqzP0P2ZPU6FhDeCQLMu9dSXKYfVq6engeC07poLFrkWCqnWUYKIQ6TYVBuD8QvG6IU1FDJ3XjjBV6iRTjUP5T18ptN3uUyQe7F1o4oG6mMN5E4RCD6Sc9YxIra+i8wt2PrUtsk0b4gBpqmST41PobSrAbTf0bMY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748276129; c=relaxed/simple;
-	bh=DC66KEtFPPf6dRsTAkyJ8ORz4uW/csyD3M/JlX2dpLQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VzMX1Le6KQeX7pLs1ntwlrDQ9D5EKUjxZHptLIb7rAUTPXRF04sjjsubOV48q6Rik3OmfIfKCfPLdz9EUEGwmzGXLiQx8dA+x5M7pnXW80SPrIyz8ygxkazLL99ZAA9w6KMw6C1WHJy0rr1Kkva/z/u3Kz9PCHNfBmaJnXhtB5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OaoFpGaU; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748277562; c=relaxed/simple;
+	bh=9lvhLJx+DPOKx2WKzevKWgEXLT5f72qqudboPBAYaoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqES0sdMiuCLV1H6xgEECInxmVhI2yjdKywXJ+21LzzcKC/3x/cZ+p7A7AldcjwZPdZuUqKKJ0wBoe9IjOx2aUebhqXbQqbw6gY0pTGa1KU/T8s5r7aXimV1BgY+k2Fo4VqD/lb7FlIDXBCIEfXLXv7n3xPD0mecOhoNyH1gy4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MWfc6UXQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=znmz2cSA; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MWfc6UXQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=znmz2cSA; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaoFpGaU"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b1276984386so329094a12.0;
-        Mon, 26 May 2025 09:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748276126; x=1748880926; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IqqBHeb+ye/Ia2+xZyQMqJHybQMTShtOHZU6XZo753Q=;
-        b=OaoFpGaUgnlDA3ra9JqyULkI2Qi0da6dYY4bVK9wKowW4vrHpaj7A3AD4RZfayBEy3
-         q6hh5tkcQXCEWCGsaMqpFpTDxaVFwMtD7Tmm7sTW+JMwB0tRcriD3F5+ECTishNSnuMZ
-         XQ4r0hZefJQBWaQKGlQFg2oB1r70JxVSRqgDDU/2kI7y4J1Lk+b9aPaB8mrfUMezFkSf
-         8rj5y1wfi9WIhvE0C/63VSGLE7aIvuWWeBJkT1dBUXD5HUQ22tMY0MQfFtRbdeAtjhkN
-         K//thMAw/jly2mHIf+SLE4yROfkKI8NzkydHMAI78rS3EUZhhT15MM6GGjKcGtccgL95
-         JLlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748276126; x=1748880926;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IqqBHeb+ye/Ia2+xZyQMqJHybQMTShtOHZU6XZo753Q=;
-        b=A3juX01mS/2MWVA3WhPF45Y/LVGnmMamOH2XvndVR+Yzk2V6LWQrEGQwscjXyL1eDr
-         b+jIaj4oQJP7ahHrPJG/PKnoI0MjLr4JYRY6eEmKW66AF+txQ4Omf4iOYDrx1LdoLc8j
-         DWLv2LxBkPQ5bl8bCMA3wjacJsQS2LXLeGgiMQ/iJxzjrxPp1QC4hYMTb2+dxNLjfN1v
-         66F7SpWprEcnSQYozNuhdfLRY3msj2ADMGWtQX6Ko84TNj1m4CuLDfSBvaZJXVban+Aq
-         swhLdHz2H8zHUdlcmKSnqmKru++IxNHaegvl3vyRVDdrnQB+Z9RD/00Rx89H0oy00077
-         miaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHAJcqZqZMzwTY8gAz2Rl+2/YtGTEFWgCwgNYrsON91EsDNiWpCGX38gZXQn6lRf8ON0qNbyt+5ffDH9Q=@vger.kernel.org, AJvYcCUKAO4cyBdrjl5Z+0VYTs0rKDOdB6cUDfE7sKF9pi7z+GH111XK3JLJWMajzCscqC5K4H4rNbBeOrST23+UZmP4@vger.kernel.org, AJvYcCUZWuqDoSmtmBkvNVSQB2nbobvIJVq7tZuXYhW58W8MSFSW/pLnSalODEq3hUw6qxpGYS5sBnul3gQGPvnHA8Q=@vger.kernel.org, AJvYcCVEIZ8Z8lZ8FjCf3DNgtru1684T9qDmyJ5MxLFAGFDD7izxk0DoVaLeTCoUY/JbRhWV/sM1f4bw@vger.kernel.org, AJvYcCW/eaA2Kbzkvqm9U+mvMOPdPH/auc1PNBWXOrpPWskFPSCg/Zcklr/M9nq5/mGKwPshDMFnVWTVRRrhpwSI@vger.kernel.org, AJvYcCXC96slXCOngaru1ZnOy6HN5JEfxlxjZBnyrZsXCwafKmr87WmgCMUw7rhNfvb6aIeHHuz2UHXVioBn@vger.kernel.org, AJvYcCXyP2eB07mxTjNW1ZMSgeq5X9LmlFvNjGZXnzp1CnLd8TKfjNXWytonN6r5cGhMLbiBX44DtZpMLghc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh8R1ZW6FXnxYnNQqcAUjTyd6J74OYp3Ol+s3eaXTl0b12/lLk
-	zzVkmHs9g3DRGLmeOWwNDt2Os3cxirCVfkoUyhpuUTkBT0t036U/3HGrj+EOQmrbE/ZqrNeNszx
-	UF5P+z+GkGwyLy21CArOrbgNPfCqJItw=
-X-Gm-Gg: ASbGncsLj8pUNKy1W7qgy/Cw/+uED/TPxvSqwF3ctuVhmGleWqEfG5S1wMklhdHZYJL
-	GT/V9PyBfDeR5OI8I+cZSwAnYjkmz/ApgUwzLbFQpFHg5xIdhU+2bI+Sx6qaindcGSQnf3ZnEQ1
-	pZxDC+cNZbO8kPN1Ojzaz8q8b5wlonvyXJ
-X-Google-Smtp-Source: AGHT+IGHSiBqTNM5XKVporfsZuIAk8+0k1ziYJ6wqAO1b1FVW8Ifoco0RVgiuBOzn9y42qT5ODX8sdvF5WeB8wXqxCo=
-X-Received: by 2002:a17:90b:4b06:b0:2ff:7b67:2358 with SMTP id
- 98e67ed59e1d1-3110f0be892mr5688853a91.2.1748276125761; Mon, 26 May 2025
- 09:15:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MWfc6UXQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="znmz2cSA";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MWfc6UXQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="znmz2cSA"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0247C1FB9D;
+	Mon, 26 May 2025 16:39:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748277559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vkPXp4NOCpAdAmof68xdPnbPl/ZdSSV21vmhyw/Tock=;
+	b=MWfc6UXQQSShB1gti/wp7JRDwwhsUknK3kfPlEk8/t6FVRp4GS93gDe1urz4DXav9fqnAd
+	r8kVFyCFGmMmF92dBktaJlk0kWReWJzcI7m31pPyvG7MShH5yBKRQ/+PRo8mATLn9t/r1c
+	qAKJvy78H9zS66XLJjE47tvekCZQKFw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748277559;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vkPXp4NOCpAdAmof68xdPnbPl/ZdSSV21vmhyw/Tock=;
+	b=znmz2cSA5VT07+LkE6SnQt5Sgr9mJCRLw35ved796XkoQoHtDtByhegiUA0g9URk5LW7VV
+	EOnnur9kdnAvQTBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=MWfc6UXQ;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=znmz2cSA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748277559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vkPXp4NOCpAdAmof68xdPnbPl/ZdSSV21vmhyw/Tock=;
+	b=MWfc6UXQQSShB1gti/wp7JRDwwhsUknK3kfPlEk8/t6FVRp4GS93gDe1urz4DXav9fqnAd
+	r8kVFyCFGmMmF92dBktaJlk0kWReWJzcI7m31pPyvG7MShH5yBKRQ/+PRo8mATLn9t/r1c
+	qAKJvy78H9zS66XLJjE47tvekCZQKFw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748277559;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vkPXp4NOCpAdAmof68xdPnbPl/ZdSSV21vmhyw/Tock=;
+	b=znmz2cSA5VT07+LkE6SnQt5Sgr9mJCRLw35ved796XkoQoHtDtByhegiUA0g9URk5LW7VV
+	EOnnur9kdnAvQTBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E384F13964;
+	Mon, 26 May 2025 16:39:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id gEQ8NzaZNGiTeAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 26 May 2025 16:39:18 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 7BFBDA09B7; Mon, 26 May 2025 18:39:18 +0200 (CEST)
+Date: Mon, 26 May 2025 18:39:18 +0200
+From: Jan Kara <jack@suse.cz>
+To: Parav Pandit <parav@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Jan Kara <jack@suse.cz>
+Subject: Re: warning on flushing page cache on block device removal
+Message-ID: <2r4izyzcjxq4ors3u2b6tt4dv4rst4c4exfzhaejrda3jq4nrv@dffea3h4gyaq>
+References: <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com> <20250524-cstr-core-v10-1-6412a94d9d75@gmail.com>
-In-Reply-To: <20250524-cstr-core-v10-1-6412a94d9d75@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 26 May 2025 18:15:12 +0200
-X-Gm-Features: AX0GCFs4zlXhbhwkFm69GRcSGgMcjMarvAu4nWr6-nQj7bz2FlpzmLVkBB1QzB0
-Message-ID: <CANiq72nhNmLMdFTzpSQSxxMLanFA7Od6tBZ+3CrVERv9Spou5Q@mail.gmail.com>
-Subject: Re: [PATCH v10 1/5] rust: retitle "Example" section as "Examples"
-To: Tamir Duberstein <tamird@gmail.com>, Patrick Miller <paddymills@proton.me>, 
-	Hridesh MG <hridesh699@gmail.com>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.01
+X-Rspamd-Queue-Id: 0247C1FB9D
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-On Sat, May 24, 2025 at 10:33=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
-> wrote:
->
-> This title is consistent with all other macros' documentation,
-> regardless of the number of examples contained in their "Examples"
-> sections.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+Hello!
 
-I was going to say that I could take this one independently, but we
-already had #1 of:
+On Sat 24-05-25 05:56:55, Parav Pandit wrote:
+> I am running a basic test of block device driver unbind, bind while the
+> fio is running random write IOs with direct=3D0.  The test hits the WARN_=
+ON
+> assert on:
+>=20
+> void pagecache_isize_extended(struct inode *inode, loff_t from, loff_t to)
+> {
+>         int bsize =3D i_blocksize(inode);
+>         loff_t rounded_from;
+>         struct folio *folio;
+>=20
+>         WARN_ON(to > inode->i_size);
+>=20
+> This is because when the block device is removed during driver unbind,
+> the driver flow is,
+>=20
+> del_gendisk()
+>     __blk_mark_disk_dead()
+>             set_capacity((disk, 0);
+>                 bdev_set_nr_sectors()
+>                     i_size_write() -> This will set the inode's isize to =
+0, while the page cache is yet to be flushed.
+>=20
+> Below is the kernel call trace.
+>=20
+> Can someone help to identify, where should be the fix?
+> Should block layer to not set the capacity to 0?
+> Or page catch to overcome this dynamic changing of the size?
+> Or?
 
-    https://lore.kernel.org/rust-for-linux/20240906164448.2268368-1-paddymi=
-lls@proton.me/
+After thinking about this the proper fix would be for i_size_write() to
+happen under i_rwsem because the change in the middle of the write is
+what's confusing the iomap code. I smell some deadlock potential here but
+it's perhaps worth trying :)
 
-I will take that one (which given the `checkpatch.pl` one got stalled,
-I should have taken it separately as I mentioned at some point).
+								Honza
 
-Patrick/Hridesh: there are new cases arriving (i.e. singular section
-names), so it would be great if the `checkpatch.pl` patch discussion
-could be restarted to see if we can land it, i.e. there is now even
-more justification behind it just after some months. Thanks!
 
-Cheers,
-Miguel
+> WARNING: CPU: 58 PID: 9712 at mm/truncate.c:819 pagecache_isize_extended+=
+0x186/0x2b0
+> Modules linked in: virtio_blk xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_=
+REJECT nf_reject_ipv4 xt_set ip_set xt_tcpudp xt_addrtype nft_compat xfrm_u=
+ser xfrm_algo nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ip=
+v4 nf_tables nfnetlink nfsv3 rpcsec_gss_krb5 nfsv4 nfs netfs nvme_fabrics n=
+vme_core cuse overlay bridge stp llc binfmt_misc intel_rapl_msr intel_rapl_=
+common intel_uncore_frequency intel_uncore_frequency_common skx_edac skx_ed=
+ac_common nfit x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel ipm=
+i_ssif kvm dell_pc dell_smbios platform_profile dcdbas rapl intel_cstate de=
+ll_wmi_descriptor wmi_bmof mei_me mei intel_pch_thermal ipmi_si acpi_power_=
+meter acpi_ipmi nfsd sch_fq_codel auth_rpcgss nfs_acl ipmi_devintf ipmi_msg=
+handler lockd grace dm_multipath msr scsi_dh_rdac scsi_dh_emc scsi_dh_alua =
+parport_pc sunrpc ppdev lp parport efi_pstore ip_tables x_tables autofs4 ra=
+id10 raid456 async_raid6_recov async_memcpy async_pq async_xor xor async_tx=
+ raid6_pq raid1 raid0 linear mlx5_core mgag200
+>  i2c_algo_bit drm_client_lib drm_shmem_helper drm_kms_helper mlxfw ghash_=
+clmulni_intel psample sha512_ssse3 drm sha256_ssse3 i2c_i801 tls sha1_ssse3=
+ ahci i2c_mux megaraid_sas tg3 pci_hyperv_intf i2c_smbus lpc_ich libahci wm=
+i aesni_intel crypto_simd cryptd
+> CPU: 58 UID: 0 PID: 9712 Comm: fio Not tainted 6.15.0-rc7-vblk+ #21 PREEM=
+PT(voluntary)=20
+> Hardware name: Dell Inc. PowerEdge R740/0DY2X0, BIOS 2.11.2 004/21/2021
+> RIP: 0010:pagecache_isize_extended+0x186/0x2b0
+> Code: 04 00 00 00 e8 2b bc 1f 00 f0 41 ff 4c 24 34 75 08 4c 89 e7 e8 ab b=
+d ff ff 48 83 c4 08 5b 41 5c 41 5d 41 5e 5d c3 cc cc cc cc <0f> 0b e9 04 ff=
+ ff ff 48 b8 00 00 00 00 00 fc ff df 49 8d 7c 24 20
+> RSP: 0018:ffff88819a16f428 EFLAGS: 00010287
+> RAX: dffffc0000000000 RBX: ffff88908380c738 RCX: 000000000000000c
+> RDX: 1ffff112107018f1 RSI: 000000002e47f000 RDI: ffff88908380c788
+> RBP: ffff88819a16f450 R08: 0000000000000001 R09: fffff94008933c86
+> R10: 000000002e47f000 R11: 0000000000000000 R12: 0000000000001000
+> R13: 0000000033956000 R14: 000000002e47f000 R15: ffff88819a16f690
+> FS:  00007f1be37fe640(0000) GS:ffff889069680000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f1c05205018 CR3: 000000115d00d001 CR4: 00000000007726f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> PKRU: 55555554
+> Call Trace:
+>  <TASK>
+>  iomap_file_buffered_write+0x763/0xa90
+>  ? aa_file_perm+0x37e/0xd40
+>  ? __pfx_iomap_file_buffered_write+0x10/0x10
+>  ? __kasan_check_read+0x15/0x20
+>  ? __pfx_down_read+0x10/0x10
+>  ? __kasan_check_read+0x15/0x20
+>  ? inode_needs_update_time.part.0+0x15c/0x1e0
+>  blkdev_write_iter+0x628/0xc90
+>  aio_write+0x2f9/0x6e0
+>  ? io_submit_one+0xc98/0x1c20
+>  ? __pfx_aio_write+0x10/0x10
+>  ? kasan_save_stack+0x40/0x60
+>  ? kasan_save_stack+0x2c/0x60
+>  ? kasan_save_track+0x18/0x40
+>  ? kasan_save_free_info+0x3f/0x60
+>  ? kasan_save_track+0x18/0x40
+>  ? kasan_save_alloc_info+0x3c/0x50
+>  ? __kasan_slab_alloc+0x91/0xa0
+>  ? fget+0x17c/0x250
+>  io_submit_one+0xb9c/0x1c20
+>  ? io_submit_one+0xb9c/0x1c20
+>  ? __pfx_aio_write+0x10/0x10
+>  ? __pfx_io_submit_one+0x10/0x10
+>  ? __kasan_check_write+0x18/0x20
+>  ? _raw_spin_lock_irqsave+0x96/0xf0
+>  ? __kasan_check_write+0x18/0x20
+>  __x64_sys_io_submit+0x14e/0x390
+>  ? __pfx___x64_sys_io_submit+0x10/0x10
+>  ? aio_read_events+0x489/0x800
+>  ? read_events+0xc1/0x2f0
+>  x64_sys_call+0x20ad/0x2150
+>  do_syscall_64+0x6f/0x120
+>  ? __pfx_read_events+0x10/0x10
+>  ? __x64_sys_io_submit+0x1c6/0x390
+>  ? __x64_sys_io_submit+0x1c6/0x390
+>  ? __pfx___x64_sys_io_submit+0x10/0x10
+>  ? __x64_sys_io_getevents+0x14c/0x2a0
+>  ? __kasan_check_read+0x15/0x20
+>  ? do_io_getevents+0xfa/0x220
+>  ? __x64_sys_io_getevents+0x14c/0x2a0
+>  ? __pfx___x64_sys_io_getevents+0x10/0x10
+>  ? fpregs_assert_state_consistent+0x25/0xb0
+>  ? __kasan_check_read+0x15/0x20
+>  ? fpregs_assert_state_consistent+0x25/0xb0
+>  ? syscall_exit_to_user_mode+0x5e/0x1d0
+>  ? do_syscall_64+0x7b/0x120
+>  ? __x64_sys_io_getevents+0x14c/0x2a0
+>  ? __pfx___x64_sys_io_getevents+0x10/0x10
+>  ? __kasan_check_read+0x15/0x20
+>  ? fpregs_assert_state_consistent+0x25/0xb0
+>  ? syscall_exit_to_user_mode+0x5e/0x1d0
+>  ? do_syscall_64+0x7b/0x120
+>  ? syscall_exit_to_user_mode+0x5e/0x1d0
+>  ? do_syscall_64+0x7b/0x120
+>  ? syscall_exit_to_user_mode+0x5e/0x1d0
+>  ? clear_bhb_loop+0x40/0x90
+>  ? clear_bhb_loop+0x40/0x90
+>  ? clear_bhb_loop+0x40/0x90
+>  ? clear_bhb_loop+0x40/0x90
+>  ? clear_bhb_loop+0x40/0x90
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7f1c0431e88d
+> Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 8b 0d 73 b5 0f 00 f7 d8 64 89 01 48
+> RSP: 002b:00007f1be37f9628 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
+> RAX: ffffffffffffffda RBX: 00007f1be37fc7a8 RCX: 00007f1c0431e88d
+> RDX: 00007f1bd40032e8 RSI: 0000000000000001 RDI: 00007f1bfa545000
+> RBP: 00007f1bfa545000 R08: 00007f1af0512010 R09: 0000000000000718
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 0000000000000000 R14: 00007f1bd40032e8 R15: 00007f1bd4000b70
+>  </TASK>
+> ---[ end trace 0000000000000000 ]---
+>=20
+> fio: attempt to access beyond end of device
+> vda: rw=3D2049, sector=3D0, nr_sectors =3D 8 limit=3D0
+> Buffer I/O error on dev vda, logical block 0, lost async page write
+>=20
+>=20
+--=20
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
