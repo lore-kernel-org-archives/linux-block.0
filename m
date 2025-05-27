@@ -1,105 +1,204 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EE929A9
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 13:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C922F2DCC0C
+	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 14:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748353114; cv=none; b=bfS5m5Edorxq/+piPsthoLSdHrRV4Ttq3lTTDyVmazz5RIeoGfKmH4hg5yxewzoe++g7HgRo1RW7Ceq60ReUi5qm5JHi7RrlNF8uLSV23dPOzG/0Q6zyCCxmkN80wVSpHsO1gBjrCzi5xROgKsaXNZEsnBtEIIef2BPA7A0zSN4=
+	t=1748355664; cv=none; b=V3hL7DdRc2lWUuDF/GSwcVahNfSuI97b/kvXHzSovJNhxYSQDHCwXGJ+vKnIAUdlT/gplO5Ba7SfFEuiTC1SloUxA3MAX+IeIpw9svtVaewn+fh5DoyLR1jUbYZmHHuitVPUXLn+GjcP5CKoMAkiBJiLWMROgdkCKClGOrx2b90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748353114; c=relaxed/simple;
-	bh=IRnL26yWQubYAmM0trqw8iZN/s8xec1ny+6viPQeVy0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=K/JuMiqvC4i6X3bSB2F1zNDPfUI0vVGeATPjQAi0qKc50o4OBkmxFmITlTdmKf5Zt/LEGP/Ipti0tj8e+9AnLOlwjbS0Ove888g4W+V+rRrCMXA1GxYzp5a4V/vgG4s3VasD53b50vvIUeFCeWGoyuRRNUHzW/SbAAOfZd3BQC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YULFVzmm; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1748355664; c=relaxed/simple;
+	bh=KcMv3Xgw7hqgnDYDyzD38r1s5XVzz3Cjh/ZttPOCTnI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ccePjhxFDhnQncWrtsdoRqrq2EKah6YUrsIM4upK3iszfbhshUva2FncmuyOjmBOED/bvTZD9toVgyVa7pXYbZJ0YiyqvgpmCD0Fi1KLl+cnbNKaN2tVL+P5zOuxaNDRXv0whb5Kahl30xza+g/Q9LZrYQqy0DeCplX31H476IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0zM9SZu1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kuuxuAGd; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rP+YF/Sn; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Vxdtcbch; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YULFVzmm"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85b38fb692fso46632439f.2
-        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 06:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748353112; x=1748957912; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TXdprp2M4n4x/hDHTn7TaL1n02o3UoZxEfZi2MHg6Oo=;
-        b=YULFVzmmBBSBhReT8rBtY/5duSHSFBPe7OthXm6GxkUeQfZKN8xE88n2ojPco/ZA3F
-         kDpwz4Mcm3/ReIUUjhCWfXgTJaDzK7l/XUInlSkfTfGTryCkh5yHzkqs67XNpSG32qnn
-         6Za80s2w0Z7kLGg9ez+zeKPxQV13dLfu3/tUs3URzB7TINszzV9JxcIXq6eWdFy5AumS
-         DDxUub1F+ufYe2IheONEuBhgVmW/9X5oa0FCrp/8TreFYpvai0rW7ABKJeWfKVtJ0cLK
-         /hotddT516MCj1SvsmyerfA8jSrIXJ+e39Rh/2cdqkrmIunEbB0bGp/0ucNZihNptQQl
-         dF1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748353112; x=1748957912;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TXdprp2M4n4x/hDHTn7TaL1n02o3UoZxEfZi2MHg6Oo=;
-        b=Xw/kTq35Hqdp+7wwCiE9PiWterjZQ6f2vPA16F1WgRSrKz2OO1NzbXkJ4o6ompVtl6
-         mxHB2PwCeGEj79Kebs4F3sJs1MdH7agX25bCHLLZHBD2B8n3NvrDaxXBzMeMBW/7hXKZ
-         NS11vK6QfnNYsFL3TqhK0v9q9rO2A5OvJpiNCgvID/YfmRaYU7GsskwU2zsT8vg3QNk0
-         ALS34KSQwKaqQ1Ur69q2fW9bXMqIHW9670UcXnUlkt+DEWKoNhS6B+ciy3TE6LiYUQb+
-         W97QaZbXXn9GAWiqu/wdve/Yb0ioASxipKc0YIbRtMe8/JeyhdrHFZFGaUIaPHUJAvd4
-         viNw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+Ll+CvbpHOGPJDzOnhPp3gQ4pgvyha9GqgATk/XCeArrUinXgI6HtyNfAYMtcwCSF9UsaA+vqJFFDOw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI7igAM8UJY+ev592auvXpJfCrCkGAyebl1FElGYCK9qNj6N8S
-	deVqqgEcWxzIN67gTyFAkE3MzvR99lodyPDeaE8RX81ocu2sN8I/hG5isettrIH2dc36cWjN6NB
-	Jl6Y9
-X-Gm-Gg: ASbGncvKclaKaj7uyeCg4lbY64nbxwwtDgawARZoHJXVpUrs22Mq8keurdCWJOXyhoC
-	toGtLleSAoklaSLeiD/sw5WKOU8j9HWy4R/aAymrlHADaVpX6wtMbq0SNWDn0lAhSQ3M9J7VJ5N
-	SlZ6A/7gmAGLbyS4MUVHk85LkiENtKx90RUGIFIqgFD/Gtzd48MS0/cDE7yusgY7yr0n+NLSFS2
-	6sgwewtZfJQ6ydszNqf6VvxBt5ufYPLENO5EmxG7HY/puZgcfgZEM8a1LVNQtEzuYnE5reYUz++
-	KvUcSkXEdwarqTfJnIYD7j+BPqdHYTK45gZirk5ptA==
-X-Google-Smtp-Source: AGHT+IGqdnA8GXR4KIorpMW2Y8clpddOdkxA/tTng2GsFFAogRkjTZs38r3zpV0pNXTj8mDhdGeBNw==
-X-Received: by 2002:a05:6e02:12c6:b0:3dc:5be8:9695 with SMTP id e9e14a558f8ab-3dc9b663fccmr113230395ab.3.1748353111711;
-        Tue, 27 May 2025 06:38:31 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc84ceeca7sm35685895ab.57.2025.05.27.06.38.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 06:38:31 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: colyli@kernel.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20250527051601.74407-1-colyli@kernel.org>
-References: <20250527051601.74407-1-colyli@kernel.org>
-Subject: Re: [PATCH 0/3] bcache-6.16-20250527
-Message-Id: <174835311090.454262.3692110373889951104.b4-ty@kernel.dk>
-Date: Tue, 27 May 2025 07:38:30 -0600
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0zM9SZu1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kuuxuAGd";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rP+YF/Sn";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Vxdtcbch"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id ABAD321CCD;
+	Tue, 27 May 2025 14:20:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748355660; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CVPbgkQNBewDwfjZQJhl7iJrA9cr59Ay9C7YiqMgTgw=;
+	b=0zM9SZu1GBZKTCsRG70gl9Gfz1CVvVuwvIhEs2QSrhK4odGXJhBI1HiZsCqN8AJ5zCiSGX
+	neK1G/bCuYgDAL3FzjraXoq7UM+KXzmQHFIocuWD3eqjdELgDcKRg+LG+KIp7vMtO5mkBP
+	DMcdnamLL1pqHeYLQgsF/URzBViaom8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748355660;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CVPbgkQNBewDwfjZQJhl7iJrA9cr59Ay9C7YiqMgTgw=;
+	b=kuuxuAGdYvkKRnAFMznb0UuwIy4WjwEmNiNlMJAezLL2w8SzKg2rGXi+s5NewThyOiznWc
+	wc3kQrKjiVwtYaBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748355659; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CVPbgkQNBewDwfjZQJhl7iJrA9cr59Ay9C7YiqMgTgw=;
+	b=rP+YF/SnNmlo/rHlWM6Lqp+PpeO2miC+d0sxEJyzospqWayUrCnvfUg0M8SapY0j+xsQiL
+	EOilfZIvwhhJZej+BbcliOcTfuohwYribSL58tzwdj5hzIstmL8pdvJIZpl/9rPsjnXdYt
+	TA6m02zBp6ugGXPSgZI2HQ19pkrsX/Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748355659;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CVPbgkQNBewDwfjZQJhl7iJrA9cr59Ay9C7YiqMgTgw=;
+	b=Vxdtcbchr8moYxproyc3Ti+g8FcZGPzQkwiO/U+0++fWdHp0M1yM6TRcnjDsWF7zFH7irS
+	jQwCz1iu0dEpEBDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 99548136E0;
+	Tue, 27 May 2025 14:20:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CRRiJUvKNWgOOwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 27 May 2025 14:20:59 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 1CE20A0951; Tue, 27 May 2025 16:20:55 +0200 (CEST)
+Date: Tue, 27 May 2025 16:20:55 +0200
+From: Jan Kara <jack@suse.cz>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Jan Kara <jack@suse.cz>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: warning on flushing page cache on block device removal
+Message-ID: <pkstcm5x54ie466gce7ryaqd6lf767p6r4iin2ufby3swe46sg@3usmpixyeniq>
+References: <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <2r4izyzcjxq4ors3u2b6tt4dv4rst4c4exfzhaejrda3jq4nrv@dffea3h4gyaq>
+ <CY8PR12MB7195BB3A19DAB9584DD2BC84DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <nj4euycpechbg5lz4wo6s36di4u45anbdik4fec2ofolopknzs@imgrmwi2ofeh>
+ <CY8PR12MB7195241146E429EE867BFAF5DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY8PR12MB7195241146E429EE867BFAF5DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.cz:email]
+X-Spam-Level: 
 
-
-On Tue, 27 May 2025 13:15:58 +0800, colyli@kernel.org wrote:
-> Please consider to take these patches for 6.16. They are generated
-> against linux-block tree for-6.16/block branch.
+On Tue 27-05-25 12:07:20, Parav Pandit wrote:
+> > From: Jan Kara <jack@suse.cz>
+> > Sent: Tuesday, May 27, 2025 5:27 PM
+> > 
+> > On Tue 27-05-25 11:00:56, Parav Pandit wrote:
+> > > > From: Jan Kara <jack@suse.cz>
+> > > > Sent: Monday, May 26, 2025 10:09 PM
+> > > >
+> > > > Hello!
+> > > >
+> > > > On Sat 24-05-25 05:56:55, Parav Pandit wrote:
+> > > > > I am running a basic test of block device driver unbind, bind
+> > > > > while the fio is running random write IOs with direct=0.  The test
+> > > > > hits the WARN_ON assert on:
+> > > > >
+> > > > > void pagecache_isize_extended(struct inode *inode, loff_t from,
+> > > > > loff_t
+> > > > > to) {
+> > > > >         int bsize = i_blocksize(inode);
+> > > > >         loff_t rounded_from;
+> > > > >         struct folio *folio;
+> > > > >
+> > > > >         WARN_ON(to > inode->i_size);
+> > > > >
+> > > > > This is because when the block device is removed during driver
+> > > > > unbind, the driver flow is,
+> > > > >
+> > > > > del_gendisk()
+> > > > >     __blk_mark_disk_dead()
+> > > > >             set_capacity((disk, 0);
+> > > > >                 bdev_set_nr_sectors()
+> > > > >                     i_size_write() -> This will set the inode's
+> > > > > isize to 0, while the
+> > > > page cache is yet to be flushed.
+> > > > >
+> > > > > Below is the kernel call trace.
+> > > > >
+> > > > > Can someone help to identify, where should be the fix?
+> > > > > Should block layer to not set the capacity to 0?
+> > > > > Or page catch to overcome this dynamic changing of the size?
+> > > > > Or?
+> > > >
+> > > > After thinking about this the proper fix would be for i_size_write()
+> > > > to happen under i_rwsem because the change in the middle of the
+> > > > write is what's confusing the iomap code. I smell some deadlock
+> > > > potential here but it's perhaps worth trying :)
+> > > >
+> > > Without it, I gave a quick try with inode_lock() unlock() in
+> > > i_size_write() and initramfs level it was stuck.  I am yet to try with
+> > > LOCKDEP.
+> > 
+> > You definitely cannot put inode_lock() into i_size_write(). i_size_write() is
+> > expected to be called under inode_lock. And bdev_set_nr_sectors() is
+> > breaking this rule by not holding it. So what you can try is to do
+> > inode_lock() in bdev_set_nr_sectors() instead of grabbing bd_size_lock.
+> >
+> Ok. will try this.
+> I am off for few days on travel, so earliest I can do is on Sunday.
+>  
+> > > I was thinking, can the existing sequence lock be used for 64-bit case
+> > > as well?
+> > 
+> > The sequence lock is about updating inode->i_size value itself. But we need
+> > much larger scale protection here - we need to make sure write to the block
+> > device is not happening while the device size changes. And that's what
+> > inode_lock is usually used for.
+> > 
+> Other option to explore (with my limited knowledge) is, 
+> When the block device is removed, not to update the size,
 > 
-> Linggang and Mingzhe from Easystack contribute two important fixes, the
-> patches are verified in their production environment for quite long
-> time. This time we have a new contributor Robert Pang from Google who
-> posts a code clean patch.
-> 
-> [...]
+> Because queue dying flag and other barriers are placed to prevent the IOs entering lower layer or to fail them.
+> Can that be the direction to fix?
 
-Applied, thanks!
+Well, that's definitely one line of defense and it's enough for reads but
+for writes you don't want them to accumulate in the page cache (and thus
+consume memory) when you know you have no way to write them out. So there
+needs to be some way for buffered writes to recognize the backing store is
+gone and stop them before dirtying pages. Currently that's achieved by
+reducing i_size, we can think of other mechanisms but reducing i_size is
+kind of elegant if we can synchronize that properly...
 
-[1/3] bcache: fix NULL pointer in cache_set_flush()
-      commit: 1e46ed947ec658f89f1a910d880cd05e42d3763e
-[2/3] bcache: remove unused constants
-      commit: 5a08e49f2359a14629f27da99aaf0f1c3a68b850
-[3/3] bcache: reserve more RESERVE_BTREE buckets to prevent allocator hang
-      commit: 208c1559c5b18894e3380b3807b6364bd14f7584
-
-Best regards,
+								Honza 
 -- 
-Jens Axboe
-
-
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
