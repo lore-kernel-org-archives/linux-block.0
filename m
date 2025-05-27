@@ -1,48 +1,50 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904E827D776
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C245279910;
+	Tue, 27 May 2025 16:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362808; cv=none; b=TKEwQzu/boAExgHsGA1U2my8MJ3dm4vBR+ylMr+I/IFTaF2HeWrsqHAq3JcL5E6jj988waAMR6REK7gOkxbVouBGyAwAudH83wt8UrVgeqe7WWyzrPQ1YJbTcoet9/tx4uGBcm8pZPWF/xDBp29xqSWQOjre5wev70IjdRyH36Q=
+	t=1748363877; cv=none; b=DWiAB7ceuCHJF8AZI7NguH/48Pb/g0KwDg5juDS96WTbj1gbo10RdUhP+ildMQhwvg1aJD2+xwA4WmuLeEosjysnSpGKlddFbV1lwP7P+EYeHahr5Bo4rZ+b0leZI+YJMS0J9woTyZKJn/TDBHT2B4qIXxdNT27Q4vb4Imlsre0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362808; c=relaxed/simple;
-	bh=rnaoUuoPoH/EMUoQjdrKNNgwR5RreyNOCHCyJGN7I7s=;
+	s=arc-20240116; t=1748363877; c=relaxed/simple;
+	bh=cbKKCkqWwj5R3NhfMsFzcH80Kv1e6XNU0rpPm2F+hog=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QkVPgRIODyusBHAiDVbffgUcNd9Np8xIyg0Q5E5Oy/FeHwisJIxI+OA1dOaEC5D4YEU+iom27cnu+U87Onsg0awiuGj0hqQ/m1ypWkdEpxEHLogwaIa20F/XXVC/sOYgiJeBqGxMYb+hQV8bwSYBNIRhhbkN8rqrzSkW1xVT4qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2SGptYMl; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=sVLG7LDGNgeI0zNrmYgRrH51jZiVgcX4774uX7MwUolKgSxUJB0aBDaWmgQX/0Wwk27hrOo61kK/1rR36vk76v3VEOUBk5PC9vTdijubWQJhh/InyxtOYbrVfa+Ekd0ZB14QArmBJu1P3pfdab7mRPYNMaPVa6vDEzbZiK1Gb9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MmZYfj3A; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2SGptYMl"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4b6Hsc74qszm0ysg;
-	Tue, 27 May 2025 16:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1748362803; x=1750954804; bh=93NWBElGA26GSI89t8JXtF5d
-	VdbISdGgyD35xo2WGeE=; b=2SGptYMllI5Pon2HSZoT9FGleui/iLO7KkqaEdqj
-	xFMZkoCjToJl34wCVtlgFtc3CjYdiAcRGlvvoi+fzSMhGqf3xr6WziOjhamCXgNM
-	qENJtZOCLP8/L1Nfz7JsJeDQLD3vRjAV9rcSwC9HeIciWF7Jit9vS+0ZkKHjMzeJ
-	C+0glxRvVk2Bno34TzSb6SvblylpEhr+qlH4E7qud5UL14uiFW/YsEKcp6Ykr/ns
-	MDYDkp/MKFTfgAyADpIHH/c/ElMUnMDy1LDllEVEfpIBSTRtL8hzuwg2bC+BnL8/
-	ip6geE9d/qDmtNkAbrTPk6R9nddcAzMqY6W6Gf5PFMrK6A==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id y9Ky6D63ARvC; Tue, 27 May 2025 16:20:03 +0000 (UTC)
-Received: from [IPV6:2a00:79e0:2e14:8:7a1:9d43:61a4:3dab] (unknown [104.135.204.83])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4b6HsV01jWzm0gbQ;
-	Tue, 27 May 2025 16:19:56 +0000 (UTC)
-Message-ID: <3eae0697-0468-47a6-810a-b97d0f469f79@acm.org>
-Date: Tue, 27 May 2025 09:19:55 -0700
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MmZYfj3A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748363876; x=1779899876;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cbKKCkqWwj5R3NhfMsFzcH80Kv1e6XNU0rpPm2F+hog=;
+  b=MmZYfj3AmSqb5GCgy1+WeVKwkR+1mkPC9CoKMCERwOQpyt4IGc1K2/UN
+   9nN/tkBLfCP6XE6xRUxDnQD5SgkDsIjC227Go/tAqneZj94mrmoPWd0IK
+   Y/PqVNUH0FLtuQIglv96vsbXHZb3VNL/bOnfCdNC30GVsYfbdp5w8YFNz
+   GzYMwGzoUaJajJrmUtt211r/Z4MRrPbM890BF9n5FbkVqI7E5/Ar5aO7b
+   X4SsN7I8M9iNwFvCiLhTnz0k5fbbjs8ylEuFprSCW3TG3mQSJbKWiteUL
+   c36V6ao0NM9jvzVd50hA+dCqtXBW6ULjOQmBcsvnWCk9tdR4W2ZUkzeE/
+   A==;
+X-CSE-ConnectionGUID: n82G4WRoQM6FAic1j1Xs4w==
+X-CSE-MsgGUID: C36ke6zxQ+ypUYW86XDHVg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="61714972"
+X-IronPort-AV: E=Sophos;i="6.15,318,1739865600"; 
+   d="scan'208";a="61714972"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 09:37:54 -0700
+X-CSE-ConnectionGUID: OUcSBdMeQOWnHX/hgemOrg==
+X-CSE-MsgGUID: 5kud2WDqSQK4loLjiAmDkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,318,1739865600"; 
+   d="scan'208";a="180092453"
+Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.109.244]) ([10.125.109.244])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 09:37:50 -0700
+Message-ID: <626be90e-fa54-4ae9-8cad-d3b7eb3e59f7@intel.com>
+Date: Tue, 27 May 2025 09:37:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,50 +52,121 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
- Ming Lei <ming.lei@redhat.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20250516044754.GA12964@lst.de>
- <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de>
- <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de>
- <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org>
- <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
- <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
- <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
- <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
- <20250526052434.GA11639@lst.de>
+Subject: Re: [RFC 2/3] mm: add STATIC_PMD_ZERO_PAGE config option
+To: Pankaj Raghav <p.raghav@samsung.com>,
+ Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Baolin Wang
+ <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, willy@infradead.org, x86@kernel.org,
+ linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
+ mcgrof@kernel.org, gost.dev@samsung.com, kernel@pankajraghav.com, hch@lst.de
+References: <20250527050452.817674-1-p.raghav@samsung.com>
+ <20250527050452.817674-3-p.raghav@samsung.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250526052434.GA11639@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250527050452.817674-3-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/25/25 10:24 PM, Christoph Hellwig wrote:
-> On Fri, May 23, 2025 at 09:30:36AM -0700, Bart Van Assche wrote:
->> It is the dm-default-key driver, a driver about which everyone
->> (including the authors of that driver) agree that it should disappear.
->> Unfortunately the functionality provided by that driver has not yet been
->> integrated in the upstream kernel (encrypt filesystem metadata).
->>
->> How that driver (dm-default-key) works is very similar to how dm-crypt
->> works. I think that the most important difference is that dm-crypt
->> requests encryption for all bios while dm-default-key only sets an
->> encryption key for a subset of the bios it processes.
-> 
-> Umm, Bart I really expected better from you.  You're ducking around
-> providing a reproducer for over a week and waste multiple peoples
-> time to tell us the only reproducer is your out of tree thingy
-> reject upstream before?  That's not really how Linux developement
-> works.
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 055204dc211d..96f99b4f96ea 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -152,6 +152,7 @@ config X86
+>  	select ARCH_WANT_OPTIMIZE_HUGETLB_VMEMMAP	if X86_64
+>  	select ARCH_WANT_HUGETLB_VMEMMAP_PREINIT if X86_64
+>  	select ARCH_WANTS_THP_SWAP		if X86_64
+> +	select ARCH_WANTS_STATIC_PMD_ZERO_PAGE if X86_64
 
-I'm still working on a reproducer for the blktests framework. To my own
-frustration I have not yet found a small reproducer that is easy to run
-by others. I'm convinced that it should be possible to create a
-reproducer that is based on dm-crypt since dm-crypt and the dm-default-
-key driver behave identically with regard to bio splitting.
+I don't think this should be the default. There are lots of little
+x86_64 VMs sitting around and 2MB might be significant to them.
 
-Bart.
+> +config ARCH_WANTS_STATIC_PMD_ZERO_PAGE
+> +	bool
+> +
+> +config STATIC_PMD_ZERO_PAGE
+> +	def_bool y
+> +	depends on ARCH_WANTS_STATIC_PMD_ZERO_PAGE
+> +	help
+> +	  Typically huge_zero_folio, which is a PMD page of zeroes, is allocated
+> +	  on demand and deallocated when not in use. This option will always
+> +	  allocate huge_zero_folio for zeroing and it is never deallocated.
+> +	  Not suitable for memory constrained systems.
+
+"Static" seems like a weird term to use for this. I was really expecting
+to see a 2MB object that gets allocated in .bss or something rather than
+a dynamically allocated page that's just never freed.
+
+>  menuconfig TRANSPARENT_HUGEPAGE
+>  	bool "Transparent Hugepage Support"
+>  	depends on HAVE_ARCH_TRANSPARENT_HUGEPAGE && !PREEMPT_RT
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 11edc4d66e74..ab8c16d04307 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -203,9 +203,17 @@ static void put_huge_zero_page(void)
+>  	BUG_ON(atomic_dec_and_test(&huge_zero_refcount));
+>  }
+>  
+> +/*
+> + * If STATIC_PMD_ZERO_PAGE is enabled, @mm can be NULL, i.e, the huge_zero_folio
+> + * is not associated with any mm_struct.
+> +*/
+
+I get that callers have to handle failure. But isn't this pretty nasty
+for mm==NULL callers to be *guaranteed* to fail? They'll generate code
+for the success case that will never even run.
+
