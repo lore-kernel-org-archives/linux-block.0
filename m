@@ -1,167 +1,105 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3CD26C3A9
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 12:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EE929A9
+	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 13:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748349886; cv=none; b=Z+tuskRK5FupxGNZ/k2olV8eue+EInj17dTLwBCOlJ0K5VAHlCARZLAqF5Hs4FT7HCBLG8ipxC0GVpC/RWape5Qrcm8Yq5X/EhBXW+gvwqs2Whx7HHXCWPt1hIbeell47clSI4GJsvoCeg/kAt/7qGL1jsbdQkFeP78kgEL1DiE=
+	t=1748353114; cv=none; b=bfS5m5Edorxq/+piPsthoLSdHrRV4Ttq3lTTDyVmazz5RIeoGfKmH4hg5yxewzoe++g7HgRo1RW7Ceq60ReUi5qm5JHi7RrlNF8uLSV23dPOzG/0Q6zyCCxmkN80wVSpHsO1gBjrCzi5xROgKsaXNZEsnBtEIIef2BPA7A0zSN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748349886; c=relaxed/simple;
-	bh=10pm6SoapnDJvi5UUh+zwz2m9mE3i07P8POT8yLYzj8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=onechj8AIc5NFQjBC0Duu+Uzk3ihXxCGakpf4NnF3CO+g1zIUup4xpnlSq/vX692ZRzR+7qOpsp8zarLeXYB7lcKM6LIRxxorIc0kHQg15t0cR6dxTPfb3LPBGa7cyKAsqGeAkXRVZW1fKvhVZUIFO1aCeiajRW1cKXGntXbC+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XcvoRoLc; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1748353114; c=relaxed/simple;
+	bh=IRnL26yWQubYAmM0trqw8iZN/s8xec1ny+6viPQeVy0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=K/JuMiqvC4i6X3bSB2F1zNDPfUI0vVGeATPjQAi0qKc50o4OBkmxFmITlTdmKf5Zt/LEGP/Ipti0tj8e+9AnLOlwjbS0Ove888g4W+V+rRrCMXA1GxYzp5a4V/vgG4s3VasD53b50vvIUeFCeWGoyuRRNUHzW/SbAAOfZd3BQC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YULFVzmm; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XcvoRoLc"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so25711345e9.1
-        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 05:44:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YULFVzmm"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85b38fb692fso46632439f.2
+        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 06:38:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748349881; x=1748954681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748353112; x=1748957912; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
-        b=XcvoRoLcCtVUPvy65xJfk1KQG529kbbSSLET2kD3LxtcR1OWq+EO0wGuefGCcCSZvP
-         BNkVRWIgQQi+aqSu2GroQ3HnyNVDr1o5sT8K4drSuez10Cp+jklozf+9UWipo21l4irS
-         Ma2BNmBAcmiDt8Ogc8QFesXS+QX9MIPRtHNZEjrSVXNv1tRyFSsKH1Pt/Djwpyb9QrDc
-         CH0JPjnO8SiZcbllaKVbeQomjd67TgzU8YWdlEtHrWAw7lLMgGJaaHXmMD2SxiiaofTx
-         1psySLAkisHF3Bk1w1auUZvbfqPsPNDbLWPepopvnenbtJNSBxFfDM/t5s4JEffG/ORa
-         2z9g==
+        bh=TXdprp2M4n4x/hDHTn7TaL1n02o3UoZxEfZi2MHg6Oo=;
+        b=YULFVzmmBBSBhReT8rBtY/5duSHSFBPe7OthXm6GxkUeQfZKN8xE88n2ojPco/ZA3F
+         kDpwz4Mcm3/ReIUUjhCWfXgTJaDzK7l/XUInlSkfTfGTryCkh5yHzkqs67XNpSG32qnn
+         6Za80s2w0Z7kLGg9ez+zeKPxQV13dLfu3/tUs3URzB7TINszzV9JxcIXq6eWdFy5AumS
+         DDxUub1F+ufYe2IheONEuBhgVmW/9X5oa0FCrp/8TreFYpvai0rW7ABKJeWfKVtJ0cLK
+         /hotddT516MCj1SvsmyerfA8jSrIXJ+e39Rh/2cdqkrmIunEbB0bGp/0ucNZihNptQQl
+         dF1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748349881; x=1748954681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1748353112; x=1748957912;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
-        b=VFaPuianggE00TniNl3mc+zOUMyAyWPUfv/MA0IdkbzbjOKsGDFaGDTJhukO7BeeZo
-         pwaHfsScTzhF1eS5iESe3jpDduaGmsnt0vLVE3L004rSg+5jmUJo/O/e3YQZ8gcMG/p+
-         3aGvAljtF59zEaYFCuN8UxlkuNKuxv5bUhSNmXEKoqLxA3T400XLmkD5Sns6ocgROPUQ
-         iFdY2PeMmZzJXuCbEVxxU1f+MIosg5uVCbECqzYSWsz23B1wEekUZkLsK466GM/WdD3d
-         jN+Pm3+JPWeoyTfR0hZBsOHPvJAY/extlgION0XXsJP0CscpIBAdu/oXYwlikdN29I+P
-         wsjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBbv8/eVUcDAlSIcfrlPlrU7iImpmXIF3ch/vkSpHM4GOi4TQcwlIHvdT+c7aCUUwPDRdiZgyfkNmafw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHScCFrnYg5k9m6YFv+a5tFT4VNwLANeLF5SVW+Yx0Ecpd0Z0i
-	PeRjEaPxjcK/jhqxWa3+mo/4i3jK40FKV45Rd4jNnRLxGGeYcvA3+GaiB0hM1eLhARCxwhGONDx
-	alkf2GqYllqc7CQFCgDe5VfCUK71u02Y0J3cEbrUj
-X-Gm-Gg: ASbGncvrwEXNsuq+uV3ZYc+VU0xsvpORrEX2YA7Fg96wf0OhAxFBufps+c2ghxwEkii
-	nWYPjtLbDBaaNDmH7A1g8eK/m73lNElzO7x4gSJvCNbcbCCC0CC6/4T7Y8ZuigiuvtvfV5GfLRU
-	6CuEovvUfnZUf0k99mWFLz/1N76m25tMnQHwoAvmq6AhoWEIAdMbSLmllbqNzUrmQUfi8YRAUW
-X-Google-Smtp-Source: AGHT+IEky1d5meo1qHzcDPYMKOo6itgabi6xnmNH55BIUhfTHja5jzKInw1nb+GfsRVDFZjoQp10Sz6+0092+zxkyU8=
-X-Received: by 2002:a05:600c:54cc:b0:442:ea3b:9d72 with SMTP id
- 5b1f17b1804b1-44fd1a229demr3814135e9.5.1748349881244; Tue, 27 May 2025
- 05:44:41 -0700 (PDT)
+        bh=TXdprp2M4n4x/hDHTn7TaL1n02o3UoZxEfZi2MHg6Oo=;
+        b=Xw/kTq35Hqdp+7wwCiE9PiWterjZQ6f2vPA16F1WgRSrKz2OO1NzbXkJ4o6ompVtl6
+         mxHB2PwCeGEj79Kebs4F3sJs1MdH7agX25bCHLLZHBD2B8n3NvrDaxXBzMeMBW/7hXKZ
+         NS11vK6QfnNYsFL3TqhK0v9q9rO2A5OvJpiNCgvID/YfmRaYU7GsskwU2zsT8vg3QNk0
+         ALS34KSQwKaqQ1Ur69q2fW9bXMqIHW9670UcXnUlkt+DEWKoNhS6B+ciy3TE6LiYUQb+
+         W97QaZbXXn9GAWiqu/wdve/Yb0ioASxipKc0YIbRtMe8/JeyhdrHFZFGaUIaPHUJAvd4
+         viNw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+Ll+CvbpHOGPJDzOnhPp3gQ4pgvyha9GqgATk/XCeArrUinXgI6HtyNfAYMtcwCSF9UsaA+vqJFFDOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI7igAM8UJY+ev592auvXpJfCrCkGAyebl1FElGYCK9qNj6N8S
+	deVqqgEcWxzIN67gTyFAkE3MzvR99lodyPDeaE8RX81ocu2sN8I/hG5isettrIH2dc36cWjN6NB
+	Jl6Y9
+X-Gm-Gg: ASbGncvKclaKaj7uyeCg4lbY64nbxwwtDgawARZoHJXVpUrs22Mq8keurdCWJOXyhoC
+	toGtLleSAoklaSLeiD/sw5WKOU8j9HWy4R/aAymrlHADaVpX6wtMbq0SNWDn0lAhSQ3M9J7VJ5N
+	SlZ6A/7gmAGLbyS4MUVHk85LkiENtKx90RUGIFIqgFD/Gtzd48MS0/cDE7yusgY7yr0n+NLSFS2
+	6sgwewtZfJQ6ydszNqf6VvxBt5ufYPLENO5EmxG7HY/puZgcfgZEM8a1LVNQtEzuYnE5reYUz++
+	KvUcSkXEdwarqTfJnIYD7j+BPqdHYTK45gZirk5ptA==
+X-Google-Smtp-Source: AGHT+IGqdnA8GXR4KIorpMW2Y8clpddOdkxA/tTng2GsFFAogRkjTZs38r3zpV0pNXTj8mDhdGeBNw==
+X-Received: by 2002:a05:6e02:12c6:b0:3dc:5be8:9695 with SMTP id e9e14a558f8ab-3dc9b663fccmr113230395ab.3.1748353111711;
+        Tue, 27 May 2025 06:38:31 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc84ceeca7sm35685895ab.57.2025.05.27.06.38.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 06:38:31 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: colyli@kernel.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20250527051601.74407-1-colyli@kernel.org>
+References: <20250527051601.74407-1-colyli@kernel.org>
+Subject: Re: [PATCH 0/3] bcache-6.16-20250527
+Message-Id: <174835311090.454262.3692110373889951104.b4-ty@kernel.dk>
+Date: Tue, 27 May 2025 07:38:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-2-6412a94d9d75@gmail.com> <DA66BBX1PDGI.10NHLG3D4CIT7@kernel.org>
- <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
-In-Reply-To: <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Tue, 27 May 2025 14:44:27 +0200
-X-Gm-Features: AX0GCFs41915HXTpfqcCKH3n_1X5KqqnwxYwkDK8S1yQqomTcDJwCXbrNKkuqdo
-Message-ID: <CAH5fLgiUhvp9P7oSf4Rtv5jK1SNebW9-r5YFHVzCZjEwaR=Mjg@mail.gmail.com>
-Subject: Re: [PATCH v10 2/5] rust: support formatting of foreign types
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Benno Lossin <lossin@kernel.org>, Michal Rostecki <vadorovsky@protonmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On Tue, May 27, 2025 at 12:18=E2=80=AFAM Tamir Duberstein <tamird@gmail.com=
-> wrote:
-> > > +}
-> > > +
-> > > +fn make_ident<'a, T: IntoIterator<Item =3D &'a str>>(
-> > > +    span: Span,
-> > > +    names: T,
-> > > +) -> impl Iterator<Item =3D TokenTree> + use<'a, T> {
-> > > +    names.into_iter().flat_map(move |name| {
-> > > +        [
-> > > +            TokenTree::Punct(Punct::new(':', Spacing::Joint)),
-> > > +            TokenTree::Punct(Punct::new(':', Spacing::Alone)),
-> > > +            TokenTree::Ident(Ident::new(name, span)),
-> > > +        ]
-> > > +    })
-> > > +}
-> > > diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-> > > index d31e50c446b0..fa956eaa3ba7 100644
-> > > --- a/rust/macros/lib.rs
-> > > +++ b/rust/macros/lib.rs
-> > > @@ -10,6 +10,7 @@
-> > >  mod quote;
-> > >  mod concat_idents;
-> > >  mod export;
-> > > +mod fmt;
-> > >  mod helpers;
-> > >  mod kunit;
-> > >  mod module;
-> > > @@ -196,6 +197,24 @@ pub fn export(attr: TokenStream, ts: TokenStream=
-) -> TokenStream {
-> > >      export::export(attr, ts)
-> > >  }
-> > >
-> > > +/// Like [`core::format_args!`], but automatically wraps arguments i=
-n [`kernel::fmt::Adapter`].
-> > > +///
-> > > +/// This macro allows generating `core::fmt::Arguments` while ensuri=
-ng that each argument is wrapped
-> > > +/// with `::kernel::fmt::Adapter`, which customizes formatting behav=
-ior for kernel logging.
-> > > +///
-> > > +/// Named arguments used in the format string (e.g. `{foo}`) are det=
-ected and resolved from local
-> > > +/// bindings. All positional and named arguments are automatically w=
-rapped.
-> > > +///
-> > > +/// This macro is an implementation detail of other kernel logging m=
-acros like [`pr_info!`] and
-> > > +/// should not typically be used directly.
-> > > +///
-> > > +/// [`kernel::fmt::Adapter`]: ../kernel/fmt/struct.Adapter.html
-> > > +/// [`pr_info!`]: ../kernel/macro.pr_info.html
-> > > +#[proc_macro]
-> > > +pub fn fmt(input: TokenStream) -> TokenStream {
-> >
-> > I'm wondering if we should name this `format_args` instead in order to
-> > better communicate that it's a replacement for `core::format_args!`.
->
-> Unfortunately that introduces ambiguity in cases where
-> kernel::prelude::* is imported because core::format_args is in core's
-> prelude.
 
-I'm pretty sure that glob imports are higher priority than the core
-prelude? Or is this because there are macros that now incorrectly use
-kernel::prelude::format_args when they should use the one from core?
+On Tue, 27 May 2025 13:15:58 +0800, colyli@kernel.org wrote:
+> Please consider to take these patches for 6.16. They are generated
+> against linux-block tree for-6.16/block branch.
+> 
+> Linggang and Mingzhe from Easystack contribute two important fixes, the
+> patches are verified in their production environment for quite long
+> time. This time we have a new contributor Robert Pang from Google who
+> posts a code clean patch.
+> 
+> [...]
 
-Alice
+Applied, thanks!
+
+[1/3] bcache: fix NULL pointer in cache_set_flush()
+      commit: 1e46ed947ec658f89f1a910d880cd05e42d3763e
+[2/3] bcache: remove unused constants
+      commit: 5a08e49f2359a14629f27da99aaf0f1c3a68b850
+[3/3] bcache: reserve more RESERVE_BTREE buckets to prevent allocator hang
+      commit: 208c1559c5b18894e3380b3807b6364bd14f7584
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
