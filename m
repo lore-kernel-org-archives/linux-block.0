@@ -1,72 +1,72 @@
-Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD42E218591
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C75218585
 	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 23:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748386901; cv=none; b=HpPzC+WfkL9eGUkG2i6ewOAef+Y/O0fZZzDw8NnnYekdSts6KpBRBBBih+J8hHDq20cHMXu1d5q8d+SXIveZxtoY8SkRyx5dVPWTKIzsHxS7QYYqV1WfzM4VBNytS86RXaPrvH4o2xAac7ufDUHzt+m3F0UeIMbtlBdWCUGFH9o=
+	t=1748386901; cv=none; b=pAabaLgKx/rqlqTYvq5/urMEMLHY0AkWgcB9Og+f59zMeewDkjzs+WoWtx651a5yLPd2ePyM4MPmLDFY85wPabbGL1Up5Ab0wXTCvovHtzbvyoVvbQgBBfIXDxmYyhKnuFbt+ukw08VH7Ohieuqiw9O6I1uRqzCB0ls4+I6qRi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1748386901; c=relaxed/simple;
-	bh=EKaGxiLerpvAhaoj/Bkw2+Qa/D3Fb5aNXt+5i9rRtAc=;
+	bh=3rHro1wLJE18Zb2D20GrmRpItAJxauLD4fDuCVGx4d0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EqYdBQCZ2rrPLsU/BYibPrhNRWiNjiPYOAdwBgSiR0yVRe0QT0bedcivRf06bAIz+8M9gtjDFiUHh0H21XYV1o8L3UKxcjKD75Bt1y2knmaU90PjaQlerwwFxcSOA3nI3xk8Jonu/SAFivrqFWOgxKqJ0cGG4uJRGz+zWL003b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=O1opTv1r; arc=none smtp.client-ip=209.85.214.228
+	 In-Reply-To:To:Cc; b=XTk5rM25R9ORB5tdW7tQdQ8Am1Gp+lAVPDb+5kHSoTfzNNv3VCzXWzV7qFbiIGJxHLNDQ/qf4NMsaXcmBnXeuw6oZ3AOHB9Ax/XhH3rIZlYy2EaZ8TzDNMA6EOimsFNpajGQpfQK9jz2NURL5JB5qTw6bmFFtNdapeVXXGXeBsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dlwcW26P; arc=none smtp.client-ip=209.85.214.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="O1opTv1r"
-Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-23278ce78efso27375905ad.2
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dlwcW26P"
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-231e98e46c0so32556265ad.3
         for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:01:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1748386897; x=1748991697; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s61w6nBl3jhK5oE1Pz/G6m687SNZu5Nj6nJhmHdEi4Y=;
-        b=O1opTv1rmY4/cbKJhoPN3MI/RrIOBddeSNqdh9nkGQ4cEITkISvI/VmZvSIuHSeCVm
-         OdscQs6XDjckCA1HF+CK5kjhPCDnFrkMbzBQ/lGqyeeoKuAL+AeJp/dNz7HVVhg5IY+y
-         0vaJwRVZ//g0YbXqWf1lVaqEEbZQdgTuV6z9h0I91KrxnRzPEq7raPUStIwp3OvNgZrB
-         vd2OGA39NB2mfCLUC+9xWutaHB4i/RZy1dLgQcKR2PmQ/+6m+NvpHOiwCNQ2hvq+1evo
-         fqXiqqv+7ZnD2JeahPUeqE9tbygLUWD6KFEuWeCzeDt9nYUtlzK2J5fOWnPwXII8mzgJ
-         xK7w==
+        bh=FChdrqJlvS/Um1q48dhiagGsD/x85+Wjka9h78yHhKk=;
+        b=dlwcW26PUc9CtC3jTz6+i6bM/EiBbBApqtptz+bEHhPGgizxlRVJiLO9EsZOXVbgGJ
+         KP6sZByid6SBH6BBctEc8SM8lJHYLlEA5qEtbS/L5viKjRjlZquJgr+mKEZs7Kwm2pKZ
+         eQhagvYSOFTXNHpDWnDuYBcnd8FzcG7OzbHthpwKUduWXEetLiJm+umFxEhd0B0HXwil
+         0diTwkFExqOCppsCY6Cr8V7gDDlFcOua2RHDI7TAJKubaTSQcEwSQLr52faeI43/dZnq
+         DxE1+qoBENbFlVy2WDl7KqpWe/aICvoA0vBn0uocmjAqgRySAYxqLPJIv9nlFO/MIiLi
+         5Plg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1748386897; x=1748991697;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s61w6nBl3jhK5oE1Pz/G6m687SNZu5Nj6nJhmHdEi4Y=;
-        b=YYgxHsdww86TUNDNtBAyRwxQ21N/Pzd5jMSkCsfJh14wjV+ov+CJ2qsT0RM6lq8E5s
-         s0IP2o9fMa9JoPjIy3ZNX6UjSiSWyirsXOBcij9Z/Z8TVux4Afhp7TRb1jRVSPK7JSDS
-         b2BfP1/PcrHxOlb6CSUv+/vmQnGtg6g124P2TG0z63wJDnz7JfEC6zhvpsmp2Cf9FVkW
-         J1RPgrzaHdRzizJAzWMl2mSXmXRbEwde9PuO8DQ2ki7vFxYrGP3b/jfKuXTu3MYYPrHv
-         Otdl7tCjm//AMbIUaeuM7Qs94ZEoecRrL2i8nzirnHk9QQqh5HaerIibCHFwb+BWEb+q
-         gfHQ==
-X-Gm-Message-State: AOJu0YxEdG46Q603uTEOvQM5lVxK5fc2xn52BlBzCCJd1z6W8ECR2mXK
-	yiTaBi1w5Y6PyStGxzQwcai3MQYh2pKaj4hY7999L4f4YnDDAbFAqM+FMxPUe1Q3qjI2fw1PZkg
-	yJGaRiWEw8jIE76p9CVjwd5pEKr7O5tGPxkYC
-X-Gm-Gg: ASbGncscrgo5nG0Xc5nfOV0ZPs18P3rd6oMnb/U2QVARLU9JuBlDocwYHnioWtHG5Xu
-	2XhpQA7LDi4LMIuTeyT1VURe46fKF3uL2M1+Rpq8ZN5VGvMWehAr/UoewhG7egQ5Pq1ofam3GOk
-	V21Xh6qkqmLKcoxAJ8LBG8kKzhtSbBbDjNtbd51Ny4rQtdzVou/+oifV9xVsB6FRNCwTtqsXJp0
-	uDvp4YCw5ks2Pd6RKX0qtlTVBfZ6ojRTJ8+qvJWOmhcjMKe+ta6AnuzdgHXbPvLIYYxcPnXeXlt
-	Op16IvG+AglLaMEOGcVbUGB2ZB7sq9edxLJ3EHKN52ffLw==
-X-Google-Smtp-Source: AGHT+IHBgJnJ4t0ZHX1cK5i/ctstGNjkLaCfd1pbaD7diiQqvXBHGlDnwc++pxUSmXvdZ73tM7RbAeZq21nh
-X-Received: by 2002:a17:902:e842:b0:22e:4a2e:8ae7 with SMTP id d9443c01a7336-23414f7d0ebmr273932075ad.22.1748386896905;
+        bh=FChdrqJlvS/Um1q48dhiagGsD/x85+Wjka9h78yHhKk=;
+        b=uUtDLIgnZv3SgOdvbJCjZhrJfPs2HUOqCYJWE4wsfjhE9pa9UQrzukMZzU988g42xu
+         SvsQlJZMCs4z/+jM7beN5eEXwDM144dlEl4dtARVwQrRQOLeHO29HVt/HMY+nmyGBe8i
+         SYqMtxxLfso2B85gkydSRBR4YBQ3G1YnisIbXWMr8cMuhuBuqAMCkKGhMn1c04uX0IGo
+         vLzlowS/edFZbZl8TZU1RJ5sX/z8E/MWErUuKaDHCXgOXKL04ABcRW9lRabqUwHS73CI
+         agf6LmFQ+Vr3nmYCXxLeQ4u8xtgl3l8cOILToYtWMB7gOPUZZPXKiTiEr5sJVHfLMl3S
+         NEfQ==
+X-Gm-Message-State: AOJu0Yz6Ne3Azmkbz6UR1/i9GtRrsyGBAupbhclQduLgvPz0Ooy3IVnO
+	lmf+i1W5DGJhccu7Evb9iY3nsbg3HSVJsrWDHq73ZSjADg+1Dn1Bc6PVMKEbVNwMBAM66s+DJ2W
+	gma+XV6JDd+Wa4c+vpdkdXK7ZUy1CA1yHY/kl3pO32iSO4hIcrXyq
+X-Gm-Gg: ASbGncu65RqJitT2yeFnuSrAZbOIHKvnSAMDQ8qAxHYZcBlPBRP59wtNUsZLSO/fwNV
+	KABY2o9b4caA/yxE/mlwedDZ6JWfFEqCbkQq0U8Pveokzu51LYVySGWhDm8UfRGWwbBGQbmTsrZ
+	x54aEvGsZbUSHBPwwlLBSk1n+9nEpCdj+Z/na1cAJeRzdIJiv+02/pW9mZnPb9m1UcYXfKYWNP/
+	AzeFHl5NlnT3G1kBL08loSHy5l2P3xHlqSDL6o9lSTzxTUVqat4j98FPufYCPouzZTBr0GfGATn
+	5YT/GPpirfvRRIo6iVcxCoIFhUvrURc=
+X-Google-Smtp-Source: AGHT+IFbfuQlBneUEKfWWOvzha1mRVIiwNYpGBloVO3yENVrmdBp/JXiof5qABJEZDQbX9t5JbmcF6RgSudg
+X-Received: by 2002:a17:902:e80e:b0:22e:50e1:73e with SMTP id d9443c01a7336-23414f49fc9mr210199615ad.14.1748386896913;
         Tue, 27 May 2025 16:01:36 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-b2d99e19562sm314a12.12.2025.05.27.16.01.36
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-234cc258d87sm105465ad.106.2025.05.27.16.01.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 May 2025 16:01:36 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 31E01340353;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 34B2A3406AF;
 	Tue, 27 May 2025 17:01:36 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 2E59AE539B9; Tue, 27 May 2025 17:01:36 -0600 (MDT)
+	id 275EFE539BF; Tue, 27 May 2025 17:01:36 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Tue, 27 May 2025 17:01:27 -0600
-Subject: [PATCH v7 4/8] selftests: ublk: kublk: lift queue initialization
- out of thread
+Date: Tue, 27 May 2025 17:01:26 -0600
+Subject: [PATCH v7 3/8] selftests: ublk: kublk: tie sqe allocation to io
+ instead of queue
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250527-ublk_task_per_io-v7-4-cbdbaf283baa@purestorage.com>
+Message-Id: <20250527-ublk_task_per_io-v7-3-cbdbaf283baa@purestorage.com>
 References: <20250527-ublk_task_per_io-v7-0-cbdbaf283baa@purestorage.com>
 In-Reply-To: <20250527-ublk_task_per_io-v7-0-cbdbaf283baa@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -87,189 +87,167 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-Currently, each ublk server I/O handler thread initializes its own
-queue. However, as we move towards decoupled ublk_queues and ublk server
-threads, this model does not make sense anymore, as there will no longer
-be a concept of a thread having "its own" queue. So lift queue
-initialization out of the per-thread ublk_io_handler_fn and into a loop
-in ublk_start_daemon (which runs once for each device).
-
-There is a part of ublk_queue_init (ring initialization) which does
-actually need to happen on the thread that will use the ring; that is
-separated into a separate ublk_thread_init which is still called by each
-I/O handler thread.
+We currently have a helper ublk_queue_alloc_sqes which the ublk targets
+use to allocate SQEs for their own operations. However, as we move
+towards decoupled ublk_queues and ublk server threads, this helper does
+not make sense anymore. SQEs are allocated from rings, and we will have
+one ring per thread to avoid locking. Change the SQE allocation helper
+to ublk_io_alloc_sqes. Currently this still allocates SQEs from the io's
+queue's ring, but when we fully decouple threads and queues, it will
+allocate from the io's thread's ring instead.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/kublk.c | 68 +++++++++++++++++++++++++-----------
- 1 file changed, 47 insertions(+), 21 deletions(-)
+ tools/testing/selftests/ublk/fault_inject.c |  2 +-
+ tools/testing/selftests/ublk/file_backed.c  |  6 +++---
+ tools/testing/selftests/ublk/kublk.c        |  2 +-
+ tools/testing/selftests/ublk/kublk.h        | 16 ++++++++++++----
+ tools/testing/selftests/ublk/null.c         |  4 ++--
+ tools/testing/selftests/ublk/stripe.c       |  4 ++--
+ 6 files changed, 21 insertions(+), 13 deletions(-)
 
+diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
+index 5deff76327b270d2d2d4553c394d95bf27ce8d7e..6e60f7d9712593403ac5547334c86967f0eab8d3 100644
+--- a/tools/testing/selftests/ublk/fault_inject.c
++++ b/tools/testing/selftests/ublk/fault_inject.c
+@@ -46,7 +46,7 @@ static int ublk_fault_inject_queue_io(struct ublk_queue *q, int tag)
+ 		.tv_nsec = (long long)q->dev->private_data,
+ 	};
+ 
+-	ublk_queue_alloc_sqes(q, &sqe, 1);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), &sqe, 1);
+ 	io_uring_prep_timeout(sqe, &ts, 1, 0);
+ 	sqe->user_data = build_user_data(tag, ublksrv_get_op(iod), 0, q->q_id, 1);
+ 
+diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
+index 0e86123e309c77ad946eaca33a8f4680b688cd41..922a87108b9f7bae53098e74602c7b1f3e0246bc 100644
+--- a/tools/testing/selftests/ublk/file_backed.c
++++ b/tools/testing/selftests/ublk/file_backed.c
+@@ -18,7 +18,7 @@ static int loop_queue_flush_io(struct ublk_queue *q, const struct ublksrv_io_des
+ 	unsigned ublk_op = ublksrv_get_op(iod);
+ 	struct io_uring_sqe *sqe[1];
+ 
+-	ublk_queue_alloc_sqes(q, sqe, 1);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 1);
+ 	io_uring_prep_fsync(sqe[0], 1 /*fds[1]*/, IORING_FSYNC_DATASYNC);
+ 	io_uring_sqe_set_flags(sqe[0], IOSQE_FIXED_FILE);
+ 	/* bit63 marks us as tgt io */
+@@ -36,7 +36,7 @@ static int loop_queue_tgt_rw_io(struct ublk_queue *q, const struct ublksrv_io_de
+ 	void *addr = (zc | auto_zc) ? NULL : (void *)iod->addr;
+ 
+ 	if (!zc || auto_zc) {
+-		ublk_queue_alloc_sqes(q, sqe, 1);
++		ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 1);
+ 		if (!sqe[0])
+ 			return -ENOMEM;
+ 
+@@ -52,7 +52,7 @@ static int loop_queue_tgt_rw_io(struct ublk_queue *q, const struct ublksrv_io_de
+ 		return 1;
+ 	}
+ 
+-	ublk_queue_alloc_sqes(q, sqe, 3);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 3);
+ 
+ 	io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, tag);
+ 	sqe[0]->flags |= IOSQE_CQE_SKIP_SUCCESS | IOSQE_IO_HARDLINK;
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 1602cf6f07a02e5dab293b91f301218c38c8f4d9..2d6d163b74483a07066f47fd36781782ce25a16e 100644
+index c3bb52953936134b7ddcf4632b57fdeb57d2d45e..1602cf6f07a02e5dab293b91f301218c38c8f4d9 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -412,6 +412,17 @@ static void ublk_queue_deinit(struct ublk_queue *q)
+@@ -599,7 +599,7 @@ int ublk_queue_io_cmd(struct ublk_queue *q, struct ublk_io *io, unsigned tag)
+ 	if (io_uring_sq_space_left(&q->ring) < 1)
+ 		io_uring_submit(&q->ring);
+ 
+-	ublk_queue_alloc_sqes(q, sqe, 1);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 1);
+ 	if (!sqe[0]) {
+ 		ublk_err("%s: run out of sqe %d, tag %d\n",
+ 				__func__, q->q_id, tag);
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index 424e5d96775fe97b20ad8d5537e468477041ca04..64da26725fe1d840b4c61df38206fb3eecd06c22 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -124,6 +124,8 @@ struct ublk_io {
+ 	unsigned short flags;
+ 	unsigned short refs;		/* used by target code only */
+ 
++	int tag;
++
+ 	int result;
+ 
+ 	unsigned short tgt_ios;
+@@ -289,17 +291,23 @@ static inline void ublk_dbg(int level, const char *fmt, ...)
+ 	}
+ }
+ 
+-static inline int ublk_queue_alloc_sqes(struct ublk_queue *q,
++static inline struct ublk_queue *ublk_io_to_queue(const struct ublk_io *io)
++{
++	return container_of(io, struct ublk_queue, ios[io->tag]);
++}
++
++static inline int ublk_io_alloc_sqes(struct ublk_io *io,
+ 		struct io_uring_sqe *sqes[], int nr_sqes)
+ {
+-	unsigned left = io_uring_sq_space_left(&q->ring);
++	struct io_uring *ring = &ublk_io_to_queue(io)->ring;
++	unsigned left = io_uring_sq_space_left(ring);
  	int i;
- 	int nr_ios = q->q_depth;
  
-+	if (q->io_cmd_buf)
-+		munmap(q->io_cmd_buf, ublk_queue_cmd_buf_sz(q));
-+
-+	for (i = 0; i < nr_ios; i++)
-+		free(q->ios[i].buf_addr);
-+}
-+
-+static void ublk_thread_deinit(struct ublk_queue *q)
-+{
-+	q->tid = 0;
-+
- 	io_uring_unregister_buffers(&q->ring);
+ 	if (left < nr_sqes)
+-		io_uring_submit(&q->ring);
++		io_uring_submit(ring);
  
- 	io_uring_unregister_ring_fd(&q->ring);
-@@ -421,28 +432,20 @@ static void ublk_queue_deinit(struct ublk_queue *q)
- 		close(q->ring.ring_fd);
- 		q->ring.ring_fd = -1;
+ 	for (i = 0; i < nr_sqes; i++) {
+-		sqes[i] = io_uring_get_sqe(&q->ring);
++		sqes[i] = io_uring_get_sqe(ring);
+ 		if (!sqes[i])
+ 			return i;
  	}
--
--	if (q->io_cmd_buf)
--		munmap(q->io_cmd_buf, ublk_queue_cmd_buf_sz(q));
--
--	for (i = 0; i < nr_ios; i++)
--		free(q->ios[i].buf_addr);
+diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
+index c415bf839e87ba35bc87da523a32745584ee2ae4..9acc7e0d271b5ae52d6d31587cc5bfb63b19778d 100644
+--- a/tools/testing/selftests/ublk/null.c
++++ b/tools/testing/selftests/ublk/null.c
+@@ -60,7 +60,7 @@ static int null_queue_zc_io(struct ublk_queue *q, int tag)
+ 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
+ 	struct io_uring_sqe *sqe[3];
+ 
+-	ublk_queue_alloc_sqes(q, sqe, 3);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 3);
+ 
+ 	io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, tag);
+ 	sqe[0]->user_data = build_user_data(tag,
+@@ -82,7 +82,7 @@ static int null_queue_auto_zc_io(struct ublk_queue *q, int tag)
+ 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
+ 	struct io_uring_sqe *sqe[1];
+ 
+-	ublk_queue_alloc_sqes(q, sqe, 1);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, 1);
+ 	__setup_nop_io(tag, iod, sqe[0], q->q_id);
+ 	return 1;
  }
+diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
+index 4fc45f42b02ecfe063d88d78644ffc142e122942..97079c3121ef8d4edc71891a289dd40658ce3f2a 100644
+--- a/tools/testing/selftests/ublk/stripe.c
++++ b/tools/testing/selftests/ublk/stripe.c
+@@ -138,7 +138,7 @@ static int stripe_queue_tgt_rw_io(struct ublk_queue *q, const struct ublksrv_io_
+ 	io->private_data = s;
+ 	calculate_stripe_array(conf, iod, s, base);
  
- static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
- {
- 	struct ublk_dev *dev = q->dev;
- 	int depth = dev->dev_info.queue_depth;
--	int i, ret = -1;
-+	int i;
- 	int cmd_buf_size, io_buf_size;
- 	unsigned long off;
--	int ring_depth = dev->tgt.sq_depth, cq_depth = dev->tgt.cq_depth;
+-	ublk_queue_alloc_sqes(q, sqe, s->nr + extra);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, s->nr + extra);
  
- 	q->tgt_ops = dev->tgt.ops;
- 	q->state = 0;
- 	q->q_depth = depth;
- 	q->cmd_inflight = 0;
--	q->tid = gettid();
+ 	if (zc) {
+ 		io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, tag);
+@@ -182,7 +182,7 @@ static int handle_flush(struct ublk_queue *q, const struct ublksrv_io_desc *iod,
+ 	struct io_uring_sqe *sqe[NR_STRIPE];
+ 	int i;
  
- 	if (dev->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_AUTO_BUF_REG)) {
- 		q->state |= UBLKSRV_NO_BUF;
-@@ -479,6 +482,22 @@ static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
- 		}
- 	}
- 
-+	return 0;
-+ fail:
-+	ublk_queue_deinit(q);
-+	ublk_err("ublk dev %d queue %d failed\n",
-+			dev->dev_info.dev_id, q->q_id);
-+	return -ENOMEM;
-+}
-+
-+static int ublk_thread_init(struct ublk_queue *q)
-+{
-+	struct ublk_dev *dev = q->dev;
-+	int ring_depth = dev->tgt.sq_depth, cq_depth = dev->tgt.cq_depth;
-+	int ret;
-+
-+	q->tid = gettid();
-+
- 	ret = ublk_setup_ring(&q->ring, ring_depth, cq_depth,
- 			IORING_SETUP_COOP_TASKRUN |
- 			IORING_SETUP_SINGLE_ISSUER |
-@@ -508,9 +527,9 @@ static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
- 	}
- 
- 	return 0;
-- fail:
--	ublk_queue_deinit(q);
--	ublk_err("ublk dev %d queue %d failed\n",
-+fail:
-+	ublk_thread_deinit(q);
-+	ublk_err("ublk dev %d queue %d thread init failed\n",
- 			dev->dev_info.dev_id, q->q_id);
- 	return -ENOMEM;
- }
-@@ -778,7 +797,6 @@ struct ublk_queue_info {
- 	struct ublk_queue 	*q;
- 	sem_t 			*queue_sem;
- 	cpu_set_t 		*affinity;
--	unsigned char 		auto_zc_fallback;
- };
- 
- static void *ublk_io_handler_fn(void *data)
-@@ -786,15 +804,11 @@ static void *ublk_io_handler_fn(void *data)
- 	struct ublk_queue_info *info = data;
- 	struct ublk_queue *q = info->q;
- 	int dev_id = q->dev->dev_info.dev_id;
--	unsigned extra_flags = 0;
- 	int ret;
- 
--	if (info->auto_zc_fallback)
--		extra_flags = UBLKSRV_AUTO_BUF_REG_FALLBACK;
--
--	ret = ublk_queue_init(q, extra_flags);
-+	ret = ublk_thread_init(q);
- 	if (ret) {
--		ublk_err("ublk dev %d queue %d init queue failed\n",
-+		ublk_err("ublk dev %d queue %d thread init failed\n",
- 				dev_id, q->q_id);
- 		return NULL;
- 	}
-@@ -813,7 +827,7 @@ static void *ublk_io_handler_fn(void *data)
- 	} while (1);
- 
- 	ublk_dbg(UBLK_DBG_QUEUE, "ublk dev %d queue %d exited\n", dev_id, q->q_id);
--	ublk_queue_deinit(q);
-+	ublk_thread_deinit(q);
- 	return NULL;
- }
- 
-@@ -857,6 +871,7 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- {
- 	const struct ublksrv_ctrl_dev_info *dinfo = &dev->dev_info;
- 	struct ublk_queue_info *qinfo;
-+	unsigned extra_flags = 0;
- 	cpu_set_t *affinity_buf;
- 	void *thread_ret;
- 	sem_t queue_sem;
-@@ -878,14 +893,23 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 	if (ret)
- 		return ret;
- 
-+	if (ctx->auto_zc_fallback)
-+		extra_flags = UBLKSRV_AUTO_BUF_REG_FALLBACK;
-+
- 	for (i = 0; i < dinfo->nr_hw_queues; i++) {
- 		dev->q[i].dev = dev;
- 		dev->q[i].q_id = i;
- 
-+		ret = ublk_queue_init(&dev->q[i], extra_flags);
-+		if (ret) {
-+			ublk_err("ublk dev %d queue %d init queue failed\n",
-+				 dinfo->dev_id, i);
-+			goto fail;
-+		}
-+
- 		qinfo[i].q = &dev->q[i];
- 		qinfo[i].queue_sem = &queue_sem;
- 		qinfo[i].affinity = &affinity_buf[i];
--		qinfo[i].auto_zc_fallback = ctx->auto_zc_fallback;
- 		pthread_create(&dev->q[i].thread, NULL,
- 				ublk_io_handler_fn,
- 				&qinfo[i]);
-@@ -918,6 +942,8 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 	for (i = 0; i < dinfo->nr_hw_queues; i++)
- 		pthread_join(dev->q[i].thread, &thread_ret);
-  fail:
-+	for (i = 0; i < dinfo->nr_hw_queues; i++)
-+		ublk_queue_deinit(&dev->q[i]);
- 	ublk_dev_unprep(dev);
- 	ublk_dbg(UBLK_DBG_DEV, "%s exit\n", __func__);
- 
+-	ublk_queue_alloc_sqes(q, sqe, conf->nr_files);
++	ublk_io_alloc_sqes(ublk_get_io(q, tag), sqe, conf->nr_files);
+ 	for (i = 0; i < conf->nr_files; i++) {
+ 		io_uring_prep_fsync(sqe[i], i + 1, IORING_FSYNC_DATASYNC);
+ 		io_uring_sqe_set_flags(sqe[i], IOSQE_FIXED_FILE);
 
 -- 
 2.34.1
