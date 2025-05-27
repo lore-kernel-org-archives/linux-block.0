@@ -1,102 +1,137 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FF627B519
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D98727E7DE
+	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362215; cv=none; b=prpWLdO9eJIPAyFJu+dHw+O7Jdyxm1UYWFNPZ8uo5JY44HBxxOfCiRRt7jPeNj6hdeU5KRx1SFBfhMMaCIrIonLiNx46XwWY/hi48L3Ni68GPW19tcSdh/u5g7ssZACryq/EQLS3+km+MS6jPa4z5dqhH6Pjc0Pmi+89K5FNg2c=
+	t=1748362438; cv=none; b=Sqkgs2QQU2X2LpbEVtEWYQLOrITDrzs4m4uJ4sUAQSyz/pqmDOJh+RmX8q6+YU+0u0w5KBdkqFzB5Oy5zvkxn5dGhYofL9oWUa5XMx2HFOZ224EKJF+hXV0M/DWHIdO1m8JtU5NwGH74oMGCUAfc8n9XIF+u16R39SgfpSIocI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362215; c=relaxed/simple;
-	bh=1+NV2j0DnzkqfP8LkIHD28H2Lqz7sv+4lacmGZBmgkw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lXMmxJcxLLoFqtGFj2RFd7vwQ3+X5bEwtreiPI3raQbLLKu5ZAqG4OXJLLtGmRcC+JN7luGs/qV8ZqNe7vjza7wLrezin+dVyAEqk2XQ2SIxHGbVeqrSplrkbqzX9aejmW+GnWLOOxnmjvPyDgG2SV1apDuhNGkFAYhElQacLIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LiuMiBSc; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1748362438; c=relaxed/simple;
+	bh=CuxoMbLgPY+5y3NgfY8ymEHz4zM3Tojh9flBTQN0qKo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tBQtVbBPmYUkKJzqYi12uIZ+CQQcSeb1O++uxf+KmdY5hoQTlxrfDOsBMGj9kkMwC7Ck5IuXBppxJEUq3w/aV/KMQ4g5dqpeb0tbmyp6Hrnc15dDCcHbQz/Tt26Yk7pqCqnw8Z80lz82g693QRhlUDsVmntCDMrLXWKGndcDw/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BmXR9Yaa; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LiuMiBSc"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d6d6d82633so9988005ab.0
-        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 09:10:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BmXR9Yaa"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-309f26c68b8so233302a91.2
+        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 09:13:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748362212; x=1748967012; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1748362436; x=1748967236; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kfL4Xd/KXnPhvKftYAuT8JW1iriXDZQImpEWZ/Rbw60=;
-        b=LiuMiBScQKcirLQqpeaPE4icXZ7mjw/d3OSHFyMmoDQ1R29Yk3KhaS9VjvcI3iOA3s
-         u0g1DpqclVFFOM7IY8tNaOAUGGkBUk6ZjtUhfju3Dczl5tNI+ndghqCqaroUlWhxuwSy
-         LFp0M713VBwd1Q4icXoxu2Z66kg4chsl/k4qfcdWyIg9hj91xHuN36alifestqSuQjKr
-         TSbQHLez6bC216cFhop9fo5/JwJd8S2ZYvpX1zzR4IAxIBHj6TMKS/2kgeuVJ+K7b8ku
-         d0vgtBKO0xnAmLVwScsU1xj+JEJDoGS/gnqOOT2FV8duZXCjdX8o5SWPyj3anhouVeFU
-         USyA==
+        bh=mYZKGJT8+zSeROfThZqwZUF3uf9i+TM3WHPwxDT7h9A=;
+        b=BmXR9Yaa0E2J/+VQDT77FCzzIAW1nz06wErpDlOE1D1ZTwXv4Aaz+4vbjfgIMppMMw
+         ZHrnkfiu+qQbq2+S8V6x+ZRgHecbeFTcMrxzA24zkvWBNkAVC09XtnAFLV37N30uKr9L
+         zIMgQaNBOPVK28bxHk3OhJs7+XfWFbAvy8WzTXqxr2hEIDS12mUszfNP14SSPSFFfGkV
+         T98SeJMkBhBCZzdA699TfWAlUUepSrD6Othk/Gwk4cjr1uOr0jAfE6KPruSrzBMJhdYq
+         PIAKHq4uq4qQ1+G56CFYAeclyAyx0RiChnv2D2JIWuaSjIrsDQqRirtg5j1z7pR8ZKte
+         4y4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748362212; x=1748967012;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1748362436; x=1748967236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kfL4Xd/KXnPhvKftYAuT8JW1iriXDZQImpEWZ/Rbw60=;
-        b=mB5Nyfnt+Ff01WyPxJTMuq910ot5jzqtNfqpqsnZg4tyF48JpM0KItDFe/tP4HIdfd
-         GE09PJgLP2lkPSk6ivuXBWVkU4zcsINJWpaYx5YhIWXthzYqwfZvR/U1Qh9jdJfJqZOw
-         WF5nT9914Pppy2AfCS6dBNSznsSoU6vYGeToGqaPmDs7uInZXYyGSPacr6e3o8juMOWI
-         QOXRnoEAEqRfu1c8B108TgwaStfuW/P3AbFUwrOkuiQXjztr33cw/vkZm39DyYM/l5WB
-         tKiPSxERF7LMOi7kTulKoD7hy1981pCLZvHg0eFXRL15W2eT2MHxlmdKvPOaboi7FACD
-         YecA==
-X-Gm-Message-State: AOJu0Yz+kFau+8EnAhgFys5Up1R5q/VaGs9w/Wl14QMRl/ONZ5ZtyV+a
-	DBkgKlZQ8JA1mSAchGLy8to9tcOYuHoVg0NDgTeQm/0I1bLbQu+jEalHL76SaRS6rquWcxSYiou
-	TzF+F
-X-Gm-Gg: ASbGnctTbMEk821Zz+bj5hbTEljpinyabRHZufa8vngo3wOxIlCpZtVDgbQCIf6qOMI
-	iqaUfPbXJ9XswTWeHKOyh5c0B0llFsajRPRmdmQ+xtt0VtOkkiOvOmfrzq4wWgw6b45b9kkV/xt
-	h5GwSKz0fQpP66dhtc5sRk3QCDW4ntyvhDz4JTt2OMbylDVFG7CBpe9aEzIxVAOZNrb9UykOh0V
-	6HVX0vgie7azrwsnfxmdkynBe0+L5AoLVShzi7Waal3mGixTqUttfnUVGqdMKfxVqLOgX9GS4Hr
-	dR40JN5y4bdFzGDgy1o0vfTCA5IeTaIEeKoSPcqxpqdEwLWtTEWs
-X-Google-Smtp-Source: AGHT+IF5EG1Bnm9pQ/vQLMxnMRAwcCuLl6mfxtE3yFyIOyMKjNqizAtxEMAVDBZFkPaJPHHDsTgBBA==
-X-Received: by 2002:a05:6e02:1c25:b0:3dc:8b57:b76c with SMTP id e9e14a558f8ab-3dc9b68e0c3mr101681695ab.9.1748362211627;
-        Tue, 27 May 2025 09:10:11 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc84ceeca7sm36337615ab.57.2025.05.27.09.10.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 09:10:11 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Jeff Moyer <jmoyer@redhat.com>
-In-Reply-To: <20250527153405.837216-1-ming.lei@redhat.com>
-References: <20250527153405.837216-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2 1/1] loop: add file_start_write() and
- file_end_write()
-Message-Id: <174836221080.514522.3194838323394477086.b4-ty@kernel.dk>
-Date: Tue, 27 May 2025 10:10:10 -0600
+        bh=mYZKGJT8+zSeROfThZqwZUF3uf9i+TM3WHPwxDT7h9A=;
+        b=Q7d1DqD72XRla9P9wk5Y69qt8NRbFFzd4KNPB6OCwDMZ9O6mGwOzyt7AaRGpIWBmpM
+         WfdX+XfSfZs0OB75lYBSotxPT0oUhx/pBbNXPNyIxlvswA/fLc/YPmWkvNkk2EE81rLL
+         zMBtWFixuPfmuguyclYz7ETNtI38BxPRIbxokiCDpZmvnafIlzkuXPmlQT6tE1opS52D
+         Io0jwsvr3xMCr3DuirYkjizDWoQoFwXBy/XwAC/Yox8jwiIfb8YPYMACwkH1o2p7qSqY
+         ew/idV2KxQ0PmxgFbmk9H1ZeffTOg4CWw1wBr7Jno3fZP3uVqK8lCVWZ1uRwhyDVHxdd
+         ebOA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2HYpQvK3LSD4r1Nkg4VJ2AimUMsK0XwCtwjo7kadCWcl9iD5AGwnuzf6sTs91rhD7cqYF9seNNSRnPw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhoELWkaJeKcPlBPz+ti7n0mz6PQE5ovJv8dzTaqWEFjEKkE2t
+	WjpmRcR/EGNuUr2hlc0jrZ4kfgKpPPAIat17wIuCdimtCTd2E6OJBevI5lfKUq+CjVzI2MBTEFv
+	aAofPMZABy4UeAbKTDFFz7EEV/zKQ8aulUqu5e89Hzg==
+X-Gm-Gg: ASbGncs3X/fDE7wwHP9y9/tY1LDKT6vTfrOapyk82cMzB0q/00yEmS2Haq5uYTyWXyN
+	FZc6fv6v9dk69TwYi5WNjElB74XmUderHNWU9BTPEjjGjSIOV/kuk37mw0Ki6fVnfnlxma8Fa2p
+	NpF5+ERO70Z2ZpzSljCYI/xxjqKMMXOc4=
+X-Google-Smtp-Source: AGHT+IEo0buBe9XmXmCeL0Z2Pe435pv3trZjWBdDK3HHNt5hLvTaD1Pni7wJn6yRXUVO2Q0/2HijkPGWFPI5vwIAGAw=
+X-Received: by 2002:a17:90a:e7ce:b0:30a:2173:9f16 with SMTP id
+ 98e67ed59e1d1-3110f0bcf33mr8585953a91.1.1748362435756; Tue, 27 May 2025
+ 09:13:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+References: <20250527153405.837216-1-ming.lei@redhat.com>
+In-Reply-To: <20250527153405.837216-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 27 May 2025 09:13:43 -0700
+X-Gm-Features: AX0GCFuxXy0ar2zlZFWI3o-D5XvlWk2JNM92IczYqZtl5fCr1RffktyW-_6XVkE
+Message-ID: <CADUfDZr92uBe1GhVBnVnxt22XCd=uVd-NLj0Kx-3NYmNriJA3A@mail.gmail.com>
+Subject: Re: [PATCH V2 1/1] loop: add file_start_write() and file_end_write()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Jeff Moyer <jmoyer@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On Tue, 27 May 2025 23:34:05 +0800, Ming Lei wrote:
-> file_start_write() and file_end_write() should be added around ->write_iter().
-> 
+On Tue, May 27, 2025 at 8:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> file_start_write() and file_end_write() should be added around ->write_it=
+er().
+>
 > Recently we switch to ->write_iter() from vfs_iter_write(), and the
 > implied fs_start_write() and fs_end_write() are lost.
-> 
+
+Still referring to "fs_start_write()" and "fs_end_write()" here
+
+>
 > Also we never add them for dio code path, so add them back for covering
 > both.
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] loop: add file_start_write() and file_end_write()
-      (no commit info)
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+>
+> Cc: Jeff Moyer <jmoyer@redhat.com>
+> Fixes: f2fed441c69b ("loop: stop using vfs_iter_{read,write} for buffered=
+ I/O")
+> Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+>         - fix commit log & patch title
+>
+>  drivers/block/loop.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index b8ba7de08753..7eca957dc656 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -308,11 +308,14 @@ static void lo_complete_rq(struct request *rq)
+>  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+>  {
+>         struct request *rq =3D blk_mq_rq_from_pdu(cmd);
+> +       struct loop_device *lo =3D rq->q->queuedata;
+>
+>         if (!atomic_dec_and_test(&cmd->ref))
+>                 return;
+>         kfree(cmd->bvec);
+>         cmd->bvec =3D NULL;
+> +       if (req_op(rq) =3D=3D REQ_OP_WRITE)
+> +               file_end_write(lo->lo_backing_file);
+>         if (likely(!blk_should_fake_timeout(rq->q)))
+>                 blk_mq_complete_request(rq);
+>  }
+> @@ -387,9 +390,10 @@ static int lo_rw_aio(struct loop_device *lo, struct =
+loop_cmd *cmd,
+>                 cmd->iocb.ki_flags =3D 0;
+>         }
+>
+> -       if (rw =3D=3D ITER_SOURCE)
+> +       if (rw =3D=3D ITER_SOURCE) {
+> +               file_start_write(lo->lo_backing_file);
+>                 ret =3D file->f_op->write_iter(&cmd->iocb, &iter);
+> -       else
+> +       } else
+>                 ret =3D file->f_op->read_iter(&cmd->iocb, &iter);
+>
+>         lo_rw_aio_do_completion(cmd);
+> --
+> 2.47.0
+>
