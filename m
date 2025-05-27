@@ -1,137 +1,94 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D98727E7DE
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B71227E1C3
+	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362438; cv=none; b=Sqkgs2QQU2X2LpbEVtEWYQLOrITDrzs4m4uJ4sUAQSyz/pqmDOJh+RmX8q6+YU+0u0w5KBdkqFzB5Oy5zvkxn5dGhYofL9oWUa5XMx2HFOZ224EKJF+hXV0M/DWHIdO1m8JtU5NwGH74oMGCUAfc8n9XIF+u16R39SgfpSIocI8=
+	t=1748362498; cv=none; b=JndCn7l3GQDibeF0sIvbUQQL26qysHOKqESM4fqI/u2ba4AOgGsRElLwg/vhxLyTR6mLXMYCiwSuKMCz+ZZT7SLXhgoLFDvkCgkgegyoC2QI27vSb8Ft5KbFoOqXzGAs+Tw7c23TtDDKcjSZ2H9Jyvl7ZEnJIyJhyau0JR21714=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362438; c=relaxed/simple;
-	bh=CuxoMbLgPY+5y3NgfY8ymEHz4zM3Tojh9flBTQN0qKo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tBQtVbBPmYUkKJzqYi12uIZ+CQQcSeb1O++uxf+KmdY5hoQTlxrfDOsBMGj9kkMwC7Ck5IuXBppxJEUq3w/aV/KMQ4g5dqpeb0tbmyp6Hrnc15dDCcHbQz/Tt26Yk7pqCqnw8Z80lz82g693QRhlUDsVmntCDMrLXWKGndcDw/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BmXR9Yaa; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1748362498; c=relaxed/simple;
+	bh=wyq0WyV3vk6nDobAzyt4od48AzygYViaqGEK0s7ehGA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RP69Lhwj4Wzb3mTkMTdAKQaEIK1iTe3O5QqdxegTRTP81Olk+nMBR7eaCk5vZqn2Th8nTgTm0Deh/cJz2A/lHuxqwa0rhxtp1ZrOMqaAtiS5NKgXcwr4JTkjAYWrAbifQ/wwinLY4O0gAPjixKerX2Cf+ZLWrP3bBnSo/Q8L9Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JC2Vf38N; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BmXR9Yaa"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-309f26c68b8so233302a91.2
-        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 09:13:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JC2Vf38N"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d91db4f0c3so11394985ab.3
+        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 09:14:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1748362436; x=1748967236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mYZKGJT8+zSeROfThZqwZUF3uf9i+TM3WHPwxDT7h9A=;
-        b=BmXR9Yaa0E2J/+VQDT77FCzzIAW1nz06wErpDlOE1D1ZTwXv4Aaz+4vbjfgIMppMMw
-         ZHrnkfiu+qQbq2+S8V6x+ZRgHecbeFTcMrxzA24zkvWBNkAVC09XtnAFLV37N30uKr9L
-         zIMgQaNBOPVK28bxHk3OhJs7+XfWFbAvy8WzTXqxr2hEIDS12mUszfNP14SSPSFFfGkV
-         T98SeJMkBhBCZzdA699TfWAlUUepSrD6Othk/Gwk4cjr1uOr0jAfE6KPruSrzBMJhdYq
-         PIAKHq4uq4qQ1+G56CFYAeclyAyx0RiChnv2D2JIWuaSjIrsDQqRirtg5j1z7pR8ZKte
-         4y4Q==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748362496; x=1748967296; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XI8IZpf/AsheQ7AtgxHZPoN0gkBdv3BHK5qNjpj2aXI=;
+        b=JC2Vf38N6bdKm1UWRVJ83Eb55BPPBEPzNgIBlErHIP4f3iszjw17IJ4QVo8x3H5jXB
+         AG5U1eaCq1eZYAT+euvXIWJDqUghtdojIDkx4iQhBT+kWtDjnb52ahjFyudnGe7X96KM
+         PQjvzvckBFE+dvIrBA+ZJRV4p4h4CaUU5s3bwGDbBYotQVUEkl9hmaI1TGd13ZE5pyuN
+         FgFWq5UX+oshP3THm0DwhIqGt53M2F6vbEWU+NDzUNBBOOMcXzjYmfaUwl7G6eQRs01y
+         Uog0MaTgzRyw6YhUFU3t2LcV+013mdxERFQVT8IpMjG6DbxzpCKdW3OX/RTvG66E4ESf
+         6JOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748362436; x=1748967236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mYZKGJT8+zSeROfThZqwZUF3uf9i+TM3WHPwxDT7h9A=;
-        b=Q7d1DqD72XRla9P9wk5Y69qt8NRbFFzd4KNPB6OCwDMZ9O6mGwOzyt7AaRGpIWBmpM
-         WfdX+XfSfZs0OB75lYBSotxPT0oUhx/pBbNXPNyIxlvswA/fLc/YPmWkvNkk2EE81rLL
-         zMBtWFixuPfmuguyclYz7ETNtI38BxPRIbxokiCDpZmvnafIlzkuXPmlQT6tE1opS52D
-         Io0jwsvr3xMCr3DuirYkjizDWoQoFwXBy/XwAC/Yox8jwiIfb8YPYMACwkH1o2p7qSqY
-         ew/idV2KxQ0PmxgFbmk9H1ZeffTOg4CWw1wBr7Jno3fZP3uVqK8lCVWZ1uRwhyDVHxdd
-         ebOA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2HYpQvK3LSD4r1Nkg4VJ2AimUMsK0XwCtwjo7kadCWcl9iD5AGwnuzf6sTs91rhD7cqYF9seNNSRnPw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhoELWkaJeKcPlBPz+ti7n0mz6PQE5ovJv8dzTaqWEFjEKkE2t
-	WjpmRcR/EGNuUr2hlc0jrZ4kfgKpPPAIat17wIuCdimtCTd2E6OJBevI5lfKUq+CjVzI2MBTEFv
-	aAofPMZABy4UeAbKTDFFz7EEV/zKQ8aulUqu5e89Hzg==
-X-Gm-Gg: ASbGncs3X/fDE7wwHP9y9/tY1LDKT6vTfrOapyk82cMzB0q/00yEmS2Haq5uYTyWXyN
-	FZc6fv6v9dk69TwYi5WNjElB74XmUderHNWU9BTPEjjGjSIOV/kuk37mw0Ki6fVnfnlxma8Fa2p
-	NpF5+ERO70Z2ZpzSljCYI/xxjqKMMXOc4=
-X-Google-Smtp-Source: AGHT+IEo0buBe9XmXmCeL0Z2Pe435pv3trZjWBdDK3HHNt5hLvTaD1Pni7wJn6yRXUVO2Q0/2HijkPGWFPI5vwIAGAw=
-X-Received: by 2002:a17:90a:e7ce:b0:30a:2173:9f16 with SMTP id
- 98e67ed59e1d1-3110f0bcf33mr8585953a91.1.1748362435756; Tue, 27 May 2025
- 09:13:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748362496; x=1748967296;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XI8IZpf/AsheQ7AtgxHZPoN0gkBdv3BHK5qNjpj2aXI=;
+        b=chkNKdTOeFpBXE9Mi0MqUDJZmzhZCJjTBECS4TwVzjYrpuaqFBeL513NmHuY1RVrId
+         yVLzC7IBr7+iIrZXBZ+n6GPJ6BpqS3VJoCXwNGTg5yRVpb/LmWyWUnPolWhyV4/oXnNV
+         rP0kBkGGRmlBGx2u4LB9xetyErUfze+A4UkGyXTSfgNk4ZGWhor5V2WvFk8SpJ06XG6G
+         X2pw+YVq6ng1wuLLahWkKYALmBLN0jEttcRoIR3DnCA+InLnqI/KK/vmjMMenRCahbx1
+         dmAor1IWsmc7HvL2Zlhv9SfMatMY7we2dE5CEOJDW1jTkPbwoq0PT4XWlgy5NK9tWwg0
+         wyfQ==
+X-Gm-Message-State: AOJu0YxcVyORcsGSj7dRQqH5QMfW9teyPVUbjqy9JQ+NZ+XKPytblDlH
+	phB4S3hvIOOC/Z5j1erBhPRcwp/iMwDODq4i/E4wbcNXrS2P9hc14D3mayNf6BivgTU=
+X-Gm-Gg: ASbGncvrjF4sUaTeYag3CaPrf75vLj1EjzAJcF0sxqH+XVX5+bml6C0d0sIMwWyEdIk
+	wX2h7D8J+wYE34VV+Hb1EoiSK+GR69xvt5Jhp+zfFlSB88uS4hW4ki5LuaLe6XNDvjISVOuxFxu
+	F4EAdlemmxD22vwuqmf3mvV0AtM5bjg2Zab1uqaVfpo5RQJMTbtkdY09i6quxldsAC4vQERRyQd
+	wYTlXwxJx4IqNykPafD+tt4N/DVmOIZxHaeFW2PFBU0j5xUh4GN9LUBvZCnN+nJVVXnrn7rx3o1
+	CZVOxK+T17oQcVYJX3qcLTLTr/v/zNdkflJoioGnVpfP9TcmYQwPN4rTXg==
+X-Google-Smtp-Source: AGHT+IFVAfz7ZoKJjbTfFmrotL9nbNqGmssQppCA//4ZYg3D/a/MWoH2Kb1RJd1htWX2FdgDZJvjmg==
+X-Received: by 2002:a05:6e02:1547:b0:3dc:6761:4494 with SMTP id e9e14a558f8ab-3dc9b6e7ba3mr140634335ab.18.1748362496068;
+        Tue, 27 May 2025 09:14:56 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dca0409ce3sm20277265ab.58.2025.05.27.09.14.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 09:14:55 -0700 (PDT)
+Message-ID: <8480dacc-9be5-4a7b-b092-4c8fb1bc049d@kernel.dk>
+Date: Tue, 27 May 2025 10:14:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527153405.837216-1-ming.lei@redhat.com>
-In-Reply-To: <20250527153405.837216-1-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 27 May 2025 09:13:43 -0700
-X-Gm-Features: AX0GCFuxXy0ar2zlZFWI3o-D5XvlWk2JNM92IczYqZtl5fCr1RffktyW-_6XVkE
-Message-ID: <CADUfDZr92uBe1GhVBnVnxt22XCd=uVd-NLj0Kx-3NYmNriJA3A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH V2 1/1] loop: add file_start_write() and file_end_write()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Jeff Moyer <jmoyer@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Caleb Sander Mateos <csander@purestorage.com>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>
+References: <20250527153405.837216-1-ming.lei@redhat.com>
+ <CADUfDZr92uBe1GhVBnVnxt22XCd=uVd-NLj0Kx-3NYmNriJA3A@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CADUfDZr92uBe1GhVBnVnxt22XCd=uVd-NLj0Kx-3NYmNriJA3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 27, 2025 at 8:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> file_start_write() and file_end_write() should be added around ->write_it=
-er().
->
-> Recently we switch to ->write_iter() from vfs_iter_write(), and the
-> implied fs_start_write() and fs_end_write() are lost.
+On 5/27/25 10:13 AM, Caleb Sander Mateos wrote:
+> On Tue, May 27, 2025 at 8:34 AM Ming Lei <ming.lei@redhat.com> wrote:
+>>
+>> file_start_write() and file_end_write() should be added around ->write_iter().
+>>
+>> Recently we switch to ->write_iter() from vfs_iter_write(), and the
+>> implied fs_start_write() and fs_end_write() are lost.
+> 
+> Still referring to "fs_start_write()" and "fs_end_write()" here
 
-Still referring to "fs_start_write()" and "fs_end_write()" here
+I fixed it up.
 
->
-> Also we never add them for dio code path, so add them back for covering
-> both.
->
-> Cc: Jeff Moyer <jmoyer@redhat.com>
-> Fixes: f2fed441c69b ("loop: stop using vfs_iter_{read,write} for buffered=
- I/O")
-> Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
->         - fix commit log & patch title
->
->  drivers/block/loop.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index b8ba7de08753..7eca957dc656 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -308,11 +308,14 @@ static void lo_complete_rq(struct request *rq)
->  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
->  {
->         struct request *rq =3D blk_mq_rq_from_pdu(cmd);
-> +       struct loop_device *lo =3D rq->q->queuedata;
->
->         if (!atomic_dec_and_test(&cmd->ref))
->                 return;
->         kfree(cmd->bvec);
->         cmd->bvec =3D NULL;
-> +       if (req_op(rq) =3D=3D REQ_OP_WRITE)
-> +               file_end_write(lo->lo_backing_file);
->         if (likely(!blk_should_fake_timeout(rq->q)))
->                 blk_mq_complete_request(rq);
->  }
-> @@ -387,9 +390,10 @@ static int lo_rw_aio(struct loop_device *lo, struct =
-loop_cmd *cmd,
->                 cmd->iocb.ki_flags =3D 0;
->         }
->
-> -       if (rw =3D=3D ITER_SOURCE)
-> +       if (rw =3D=3D ITER_SOURCE) {
-> +               file_start_write(lo->lo_backing_file);
->                 ret =3D file->f_op->write_iter(&cmd->iocb, &iter);
-> -       else
-> +       } else
->                 ret =3D file->f_op->read_iter(&cmd->iocb, &iter);
->
->         lo_rw_aio_do_completion(cmd);
-> --
-> 2.47.0
->
+-- 
+Jens Axboe
+
