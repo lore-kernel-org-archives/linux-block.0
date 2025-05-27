@@ -1,43 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD7627A131
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 17:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BFE277808;
+	Tue, 27 May 2025 18:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748367929; cv=none; b=E5cRJ525ySJDFhn5Y09MUdFpzpaxdx7cIJ93W6k04T9dRNHnz4eNLqSA5ZjHRrExth1mU9tCmfA1adlzFZmd+1vy31MVLWDJ/JuhK28p/49iRCYC2kfTWECqWceKtPbzMB+wucxrtTd/4duMgiH441w5JBtlfQ0bov6LIa7SNiA=
+	t=1748368884; cv=none; b=c7eblK3a0CTQFAwG4rV5snPjWngampR2Xjq4nJ1UUQVQ2Csb+C57t7UTYMKxUZF5ccydbAU0RSpBrVjwcXbrlNvj5I9zHUKYPWydhv8OBnxMW43GFGHTabz/eKjMA3XMw0jbMSNoWUACgJ9YAfNXT0ZX4F3DDo52gRpoEmMcj3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748367929; c=relaxed/simple;
-	bh=Hg7+II8HEX5zi/FluJO3H7vljaGyCQoWcCtOW5y0tpk=;
+	s=arc-20240116; t=1748368884; c=relaxed/simple;
+	bh=rq45Wd9fN1m/TyZMt5EXiDwB96qCaumIAkssFgFE2Lw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SLmURmVWLV/rrE80qgpyxszB1bPOEk8TgFKbgvGZPdE50do53PBaPZ8bvvgTThHYq1105k9UY/sSxjP5tOiqGJLHikU4A59keLTlFclXVS9zmf6dVtsKIdnuY8OCzIS/lkU9xNNpY4SkKo2zQjGjYWo0bOa58b7+jlpWayqNQHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYxPGptj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=lQmZOgbikKO9Qgr9Pdcmu5i2uSlf+vnGLW5o/yd9RbPxtb/OUIM6TvQov5m7eS0IA93qmM2I79xYww3SZIj7wzgvYi7T6SNVpxenOvsQwaikZWqAyxqV1FywUyks25xTmGly8r78o4aSdUGs7+ZkjpzgE5ZbRI1AqhN7NytA2nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=JAx2E2LP; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYxPGptj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEFE4C4CEE9;
-	Tue, 27 May 2025 17:45:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748367929;
-	bh=Hg7+II8HEX5zi/FluJO3H7vljaGyCQoWcCtOW5y0tpk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fYxPGptj4xyzvLholB4bpFVUA4rlJWG6jnK/pvlYQWKl7O1mfx6czMU2rGI9/E3sl
-	 toRQMnPPwASqJ/0FIASpln8CxbrR2L5cr7K96TRyFM6PhP4H72zYl/f8zpsU/8Q5XU
-	 4HRkc4X9qFGZxd/wTmpu/QNRixK7ZcjD667ZzoCBDaWND3wB6MI75721/KeBZGDxgx
-	 yyrPifQwS6A8Uj8wgHOhq8krJMqjsXL4irnpV1lu6ZnjYy7UYx9C4rD7YO7YGaSphO
-	 xP8PeuCAGloDi5MJVDKIByVzAuN0sse+w81dSpboCAew4DQR0lRgbkInhC11cyL5HY
-	 kJNEGHulPacTQ==
-Date: Tue, 27 May 2025 11:45:26 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/5] block: new sector copy api
-Message-ID: <aDX6NjOuGvxhbw7C@kbusch-mbp>
-References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-2-kbusch@meta.com>
- <aDBt1qXj90JO1y2v@infradead.org>
- <aDCqGLY4irp-6N5M@kbusch-mbp>
- <aDP5o1qb02iwgw-V@infradead.org>
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="JAx2E2LP"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4b6L6G48htz9sRk;
+	Tue, 27 May 2025 20:01:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1748368870;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WDYlu01ERbR/ASESDCpdVLMfWx7Sul+gusj5BFguHbc=;
+	b=JAx2E2LPxX/GiBDVDJWYxbga4OGfdUGa6ljxiOeDxJIaivADn5M8vIIkuB4R6ksdfzLQdy
+	thbZ9KqY9mRXC2nxJPzkD2p6tcE3lLz/plUI0av79uByUYqWdwU3yuDhCPnZ2zie1HrCFP
+	1qwFWtj0HaEzJ3T800KRKKPmTewtI17BfxkFi2fMq4TsfFjsBV/anLEKYpLAlTCCkEM3Jq
+	Ek3UoE7/zHNN4RnOUwGsRUiIcvpUSvVQtXcWw5i7HkcwbcAMMLNCnkjGj9bt9PGEalbbKU
+	jBCbnODDEpfDdHlYSPaKmeRz1Wyceextp9oSaAODxjdccPtcBgFUCkoJz89+xw==
+Date: Tue, 27 May 2025 20:00:50 +0200
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Pankaj Raghav <p.raghav@samsung.com>, 
+	Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>, 
+	David Hildenbrand <david@redhat.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-block@vger.kernel.org, willy@infradead.org, x86@kernel.org, 
+	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
+	gost.dev@samsung.com, hch@lst.de
+Subject: Re: [RFC 2/3] mm: add STATIC_PMD_ZERO_PAGE config option
+Message-ID: <5dv5hsfvbdwyjlkxaeo2g43v6n4xe6ut7pjf6igrv7b25y2m5a@blllpcht5euu>
+References: <20250527050452.817674-1-p.raghav@samsung.com>
+ <20250527050452.817674-3-p.raghav@samsung.com>
+ <626be90e-fa54-4ae9-8cad-d3b7eb3e59f7@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,24 +62,77 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aDP5o1qb02iwgw-V@infradead.org>
+In-Reply-To: <626be90e-fa54-4ae9-8cad-d3b7eb3e59f7@intel.com>
 
-On Sun, May 25, 2025 at 10:18:27PM -0700, Christoph Hellwig wrote:
-> Well, I'd expect most uses cases of things like GC to use the "fallback"
-> for now - because copy isn't actually that often supported, and when it
-> is performance might not be good enough.  So we'll need to optimize
-> for both cases.  Maybe a fallback code is useful, but I'd leave the
-> buffer management for it to the caller so that it can reuse them.  Or
-> maybe don't bother given how trivial the code is anyway.  The use case
-> for common code would be strong if it refactored existing code and
-> showed that existing callers actually have enough common logic that
-> it's worth the effort.
+On Tue, May 27, 2025 at 09:37:50AM -0700, Dave Hansen wrote:
+> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> > index 055204dc211d..96f99b4f96ea 100644
+> > --- a/arch/x86/Kconfig
+> > +++ b/arch/x86/Kconfig
+> > @@ -152,6 +152,7 @@ config X86
+> >  	select ARCH_WANT_OPTIMIZE_HUGETLB_VMEMMAP	if X86_64
+> >  	select ARCH_WANT_HUGETLB_VMEMMAP_PREINIT if X86_64
+> >  	select ARCH_WANTS_THP_SWAP		if X86_64
+> > +	select ARCH_WANTS_STATIC_PMD_ZERO_PAGE if X86_64
+> 
+> I don't think this should be the default. There are lots of little
+> x86_64 VMs sitting around and 2MB might be significant to them.
 
-Just fyi, the initial user I was planning to target with the block
-layer's copy fallback isn't in kernel yet. Just an RFC at this moment on
-btrfs:
+This is the feedback I wanted. I will make it optional.
 
-  https://lore.kernel.org/linux-btrfs/20250515163641.3449017-10-maharmstone@fb.com/
+> > +config ARCH_WANTS_STATIC_PMD_ZERO_PAGE
+> > +	bool
+> > +
+> > +config STATIC_PMD_ZERO_PAGE
+> > +	def_bool y
+> > +	depends on ARCH_WANTS_STATIC_PMD_ZERO_PAGE
+> > +	help
+> > +	  Typically huge_zero_folio, which is a PMD page of zeroes, is allocated
+> > +	  on demand and deallocated when not in use. This option will always
+> > +	  allocate huge_zero_folio for zeroing and it is never deallocated.
+> > +	  Not suitable for memory constrained systems.
+> 
+> "Static" seems like a weird term to use for this. I was really expecting
+> to see a 2MB object that gets allocated in .bss or something rather than
+> a dynamically allocated page that's just never freed.
 
-The blk-lib function could easily replace that patch's "do_copy()"
-without to much refactoring on the btrfs side.
+My first proposal was along those lines[0] (sorry I messed up version
+while sending the patches). David Hilderbrand suggested to leverage the
+infrastructure we already have in huge_memory.
+
+> 
+> >  menuconfig TRANSPARENT_HUGEPAGE
+> >  	bool "Transparent Hugepage Support"
+> >  	depends on HAVE_ARCH_TRANSPARENT_HUGEPAGE && !PREEMPT_RT
+> > diff --git a/mm/memory.c b/mm/memory.c
+> > index 11edc4d66e74..ab8c16d04307 100644
+> > --- a/mm/memory.c
+> > +++ b/mm/memory.c
+> > @@ -203,9 +203,17 @@ static void put_huge_zero_page(void)
+> >  	BUG_ON(atomic_dec_and_test(&huge_zero_refcount));
+> >  }
+> >  
+> > +/*
+> > + * If STATIC_PMD_ZERO_PAGE is enabled, @mm can be NULL, i.e, the huge_zero_folio
+> > + * is not associated with any mm_struct.
+> > +*/
+> 
+> I get that callers have to handle failure. But isn't this pretty nasty
+> for mm==NULL callers to be *guaranteed* to fail? They'll generate code
+> for the success case that will never even run.
+> 
+
+The idea was to still have dynamic allocation possible even if this
+config was disabled.
+
+You are right that if this config is disabled, the callers with NULL mm
+struct are guaranteed to fail, but we are not generating extra code
+because there are still users who want dynamic allocation.
+
+Do you think it is better to have the code with inside an #ifdef instead
+of using the IS_ENABLED primitive?
+
+[1] https://lore.kernel.org/linux-fsdevel/20250516101054.676046-2-p.raghav@samsung.com/
+
+--
+Pankaj
