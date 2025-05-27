@@ -1,100 +1,102 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E57627B4EB
-	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 15:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FF627B519
+	for <linux-block@vger.kernel.org>; Tue, 27 May 2025 16:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748361234; cv=none; b=jCc29IMmq9arxzUzSdFMwlJ+H31EdNwLbSfYduQZk5St4vNIWp+vNEZi2f0aklDHvcSRGh8Uy2/zwghN6j9kUEGz5bZxo2ez5eIitEp137aeXw+77qHZfmrbbEcLc9cdsY90bkQ9S/P4pscDlhs6xre33IvyAuOvCiT8voxELPs=
+	t=1748362215; cv=none; b=prpWLdO9eJIPAyFJu+dHw+O7Jdyxm1UYWFNPZ8uo5JY44HBxxOfCiRRt7jPeNj6hdeU5KRx1SFBfhMMaCIrIonLiNx46XwWY/hi48L3Ni68GPW19tcSdh/u5g7ssZACryq/EQLS3+km+MS6jPa4z5dqhH6Pjc0Pmi+89K5FNg2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748361234; c=relaxed/simple;
-	bh=sYnbHMNRPawubY/d56Yx3EzeY9wok+TDMSfHqlwtQag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BA8arE1kNpt65IYKvYhyFuHePrR+CaK58ZxTkyHXFWkOd15pk3fOkF/rWyJcqnqKnFZLhfBj55emTJ3oMzYF1WWCC3mdGa4P+i6Us3pYOhObJi3zO40RBdikX/eLqZK4myEPqdSk3fpSq1LnINDl2oTlLgkX2aHehTpc9bsS9+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KPcZ1Cm3; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1748362215; c=relaxed/simple;
+	bh=1+NV2j0DnzkqfP8LkIHD28H2Lqz7sv+4lacmGZBmgkw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=lXMmxJcxLLoFqtGFj2RFd7vwQ3+X5bEwtreiPI3raQbLLKu5ZAqG4OXJLLtGmRcC+JN7luGs/qV8ZqNe7vjza7wLrezin+dVyAEqk2XQ2SIxHGbVeqrSplrkbqzX9aejmW+GnWLOOxnmjvPyDgG2SV1apDuhNGkFAYhElQacLIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LiuMiBSc; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KPcZ1Cm3"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4b6HHG2R6zzm0ySQ;
-	Tue, 27 May 2025 15:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1748361225; x=1750953226; bh=m95tE0lbkXUNHz4eywKMcZ8v
-	iQZv/vT0rTyrSozrDC4=; b=KPcZ1Cm3R+T4By82KWT4C0JxXB0aGvA/C0bffh5L
-	SAcZ0hUL16EnA/UIGmY3YIm3PLqdl2Gk0UXzX2EyTcjOHLr+Or/MJLr5lM2weC7C
-	3drTqQAjsFzi0/eUhW82MT5Re6hdBpHOxrIXSyxpNyrkJqjTJMMW2/1sINB6q6Sp
-	Rw79+vzkYl2Brbe/EDuPVsym3e91L+2W+42k1zMDMLYZh8EJD2OvhFEvTAJBqZcp
-	Q5QPJdSkbvYI2N3iZoEIgQYkNbwLgKAXi0eDCZJq7rBspAqmn+Ys4hi5rkUy2J3k
-	dsyxryP92LG/FTiO3QHuDzAHfLRm5xCHgpqTRcvIojJCrw==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id abJYoBlqP0fe; Tue, 27 May 2025 15:53:45 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4b6HHB5X8nzm0jvl;
-	Tue, 27 May 2025 15:53:41 +0000 (UTC)
-Message-ID: <09211213-e9fc-4b59-8260-dd6f8e9d9561@acm.org>
-Date: Tue, 27 May 2025 08:53:40 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LiuMiBSc"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d6d6d82633so9988005ab.0
+        for <linux-block@vger.kernel.org>; Tue, 27 May 2025 09:10:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748362212; x=1748967012; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kfL4Xd/KXnPhvKftYAuT8JW1iriXDZQImpEWZ/Rbw60=;
+        b=LiuMiBScQKcirLQqpeaPE4icXZ7mjw/d3OSHFyMmoDQ1R29Yk3KhaS9VjvcI3iOA3s
+         u0g1DpqclVFFOM7IY8tNaOAUGGkBUk6ZjtUhfju3Dczl5tNI+ndghqCqaroUlWhxuwSy
+         LFp0M713VBwd1Q4icXoxu2Z66kg4chsl/k4qfcdWyIg9hj91xHuN36alifestqSuQjKr
+         TSbQHLez6bC216cFhop9fo5/JwJd8S2ZYvpX1zzR4IAxIBHj6TMKS/2kgeuVJ+K7b8ku
+         d0vgtBKO0xnAmLVwScsU1xj+JEJDoGS/gnqOOT2FV8duZXCjdX8o5SWPyj3anhouVeFU
+         USyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748362212; x=1748967012;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kfL4Xd/KXnPhvKftYAuT8JW1iriXDZQImpEWZ/Rbw60=;
+        b=mB5Nyfnt+Ff01WyPxJTMuq910ot5jzqtNfqpqsnZg4tyF48JpM0KItDFe/tP4HIdfd
+         GE09PJgLP2lkPSk6ivuXBWVkU4zcsINJWpaYx5YhIWXthzYqwfZvR/U1Qh9jdJfJqZOw
+         WF5nT9914Pppy2AfCS6dBNSznsSoU6vYGeToGqaPmDs7uInZXYyGSPacr6e3o8juMOWI
+         QOXRnoEAEqRfu1c8B108TgwaStfuW/P3AbFUwrOkuiQXjztr33cw/vkZm39DyYM/l5WB
+         tKiPSxERF7LMOi7kTulKoD7hy1981pCLZvHg0eFXRL15W2eT2MHxlmdKvPOaboi7FACD
+         YecA==
+X-Gm-Message-State: AOJu0Yz+kFau+8EnAhgFys5Up1R5q/VaGs9w/Wl14QMRl/ONZ5ZtyV+a
+	DBkgKlZQ8JA1mSAchGLy8to9tcOYuHoVg0NDgTeQm/0I1bLbQu+jEalHL76SaRS6rquWcxSYiou
+	TzF+F
+X-Gm-Gg: ASbGnctTbMEk821Zz+bj5hbTEljpinyabRHZufa8vngo3wOxIlCpZtVDgbQCIf6qOMI
+	iqaUfPbXJ9XswTWeHKOyh5c0B0llFsajRPRmdmQ+xtt0VtOkkiOvOmfrzq4wWgw6b45b9kkV/xt
+	h5GwSKz0fQpP66dhtc5sRk3QCDW4ntyvhDz4JTt2OMbylDVFG7CBpe9aEzIxVAOZNrb9UykOh0V
+	6HVX0vgie7azrwsnfxmdkynBe0+L5AoLVShzi7Waal3mGixTqUttfnUVGqdMKfxVqLOgX9GS4Hr
+	dR40JN5y4bdFzGDgy1o0vfTCA5IeTaIEeKoSPcqxpqdEwLWtTEWs
+X-Google-Smtp-Source: AGHT+IF5EG1Bnm9pQ/vQLMxnMRAwcCuLl6mfxtE3yFyIOyMKjNqizAtxEMAVDBZFkPaJPHHDsTgBBA==
+X-Received: by 2002:a05:6e02:1c25:b0:3dc:8b57:b76c with SMTP id e9e14a558f8ab-3dc9b68e0c3mr101681695ab.9.1748362211627;
+        Tue, 27 May 2025 09:10:11 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc84ceeca7sm36337615ab.57.2025.05.27.09.10.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 09:10:11 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Jeff Moyer <jmoyer@redhat.com>
+In-Reply-To: <20250527153405.837216-1-ming.lei@redhat.com>
+References: <20250527153405.837216-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 1/1] loop: add file_start_write() and
+ file_end_write()
+Message-Id: <174836221080.514522.3194838323394477086.b4-ty@kernel.dk>
+Date: Tue, 27 May 2025 10:10:10 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] zbd/013: Test stacked drivers and queue freezing
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, hch <hch@lst.de>
-References: <20250523164956.883024-1-bvanassche@acm.org>
- <vuyvx3nkszifz3prglwbbyx7kekatzxktw2zhrpwsjnvl4zqus@3ouwvtkcekn6>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <vuyvx3nkszifz3prglwbbyx7kekatzxktw2zhrpwsjnvl4zqus@3ouwvtkcekn6>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On 5/26/25 1:25 AM, Shinichiro Kawasaki wrote:
-> On May 23, 2025 / 09:49, Bart Van Assche wrote:
->> [ ... ]
->> +. common/null_blk
+
+On Tue, 27 May 2025 23:34:05 +0800, Ming Lei wrote:
+> file_start_write() and file_end_write() should be added around ->write_iter().
 > 
-> Nit: this line can be removed since tests/zbd/rc sources common/null_blk.
+> Recently we switch to ->write_iter() from vfs_iter_write(), and the
+> implied fs_start_write() and fs_end_write() are lost.
 > 
->> +requires() {
->> +	_have_driver dm-crypt
->> +	_have_fio
->> +	_have_module null_blk
+> Also we never add them for dio code path, so add them back for covering
+> both.
 > 
-> Nit: the line above can be removed since group_requires() zbd/rc checks it.
+> [...]
 
-I prefer to make such dependencies explicit. Relying on indirect
-dependencies is considered a bad practice in multiple coding style
-guides since it makes it almost impossible to remove dependencies
-from dependencies, e.g. removing "_have_module null_blk" from
-"zbd/rc".
+Applied, thanks!
 
->> +test() {
->> +	set -e
-> 
-> Is this required? When I comment out this line and the "set +e" below,
-> still I was able to recreate the deadlock.
+[1/1] loop: add file_start_write() and file_end_write()
+      (no commit info)
 
-I want the entire test to fail if a single command fails. Debugging
-shell scripts is much harder if a script continues after having
-encountered an unexpected error.
+Best regards,
+-- 
+Jens Axboe
 
-I plan to address the other comments.
 
-Thanks,
-
-Bart.
 
