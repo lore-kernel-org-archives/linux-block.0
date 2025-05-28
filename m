@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B56221DAD;
-	Wed, 28 May 2025 21:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB3B23183B;
+	Wed, 28 May 2025 21:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748469382; cv=none; b=qfNCFW/7LXNqXGwh9jXBqUstHTwN+djp915IMsSnOtM4kIzKIzrYnjuiqmg5/yooczYnk2z0DEbXCCKQWQCvIxzg+Lr+th73Q0Y3hAMEnxQvyGJxaZ9IOq3/BZGe/qMt+Hww1Tftz+LqDBJBOUVFCZuSRIlaX+5ycfj1zwPA89s=
+	t=1748469392; cv=none; b=VsmjljEscgVCG/vxUuR4fJ0V5iRBxG+b3pAvD4U0SQeAvKAvVweb1Axgi7BtzvzHm7+n9Ul8HfbBgH4ovUqNTgut0Vxg3VRO1eAbuv/y1BstB0ag+6kcqadrJ7UFL+qChlrrGIVQjGiG0rEnoDnalmT21897k8RdkwKlkiNjBRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748469382; c=relaxed/simple;
-	bh=G4OERUkSBYpc8nh8CkbEbQ1J10NUPAI/Img+V6PXY8Q=;
+	s=arc-20240116; t=1748469392; c=relaxed/simple;
+	bh=JaaW6qnfUmXrbmFUIgHO1/CWZ0FtykmM4JWqgs3M8PI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cYAVgCe8nf3IUFlBk6ASFXEEEQLbSzLQyNvSJ0RvX6a8XOR/J+Eh66oicD1ky/n1jcweFa02liQYexsNqY9Pxj8MNUN0i2vdT9+22Lv6aExKnLo0ienJ04ZpGyDOUepPwzU0mKBDUtxmCfiKwWeZNywWwbKaQhd4Ph7yspU39Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaHtj8bC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VvhSRLbmZOPxmcIL5eJ1ApOOlWA7Vmab4Nsu38P7sqFLsLUSZA0Qbf8AhJ5QeoykdC/3UEZDTurN2du0Ub80Z/xZkA4B7O7DZJPGkFM9pCdpl3qtKSzDB7h18Mk8sJJ5J8frsElQ2ItqmpdAAfpkwCLmMX8y6AFnH/5UvPTpLlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kje8NJV7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaHtj8bC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122D2C4CEF0;
-	Wed, 28 May 2025 21:56:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kje8NJV7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA1A3C4CEED;
+	Wed, 28 May 2025 21:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748469382;
-	bh=G4OERUkSBYpc8nh8CkbEbQ1J10NUPAI/Img+V6PXY8Q=;
+	s=k20201202; t=1748469391;
+	bh=JaaW6qnfUmXrbmFUIgHO1/CWZ0FtykmM4JWqgs3M8PI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HaHtj8bCEGqQlIp4DXEs69AMJIWY48EMAuSmnz9Vvc9RffnjwprN+7FLgIgkVyYo5
-	 v1DdggSUJEZFMX5I02j67lK6TnuRdOVbfk2Qk2qxPzOcBi5yRonOk2+7QhEgV+T3s1
-	 qvRnB7AC7ljKmyE7H2bKrkySa1I01SBVeT4XNi/NH4Szs6Rx8Nc4hpk0j4IiJqJZek
-	 HJhfahpjL5J4PMdVaN4ywOMivklMLZPhFHrhBQ0pIKDk+VecVU/Os5vqm3ewn8nzK0
-	 9z4ccLpTnGat/l0L2LbMcc3wR1XwrUTnUCFILWrH50QH+wT8fPBwvtekw/E0NHI9Tq
-	 ZjL/kVzl0hqWQ==
+	b=kje8NJV78Iw4DWXh/1uX7hsDeuHGnmNvbgrmc27/U/OKbvsxnmUzpgjJiWo9GKryF
+	 +BlRTgzPse+yvRLe4fJoPoXDWQ1GMr7aPOMhxW4pN61gq0FtV823HyuGfuNmbfrTdQ
+	 61YAo1Dp+RhBcdIHe5QJsZyRVQgXgVMHmkk/J/DeHEYvRmWJmWFfAq+6npp5KIxynO
+	 j9UWydUtqPJHrR4D8Ye4TxEFFc0Mh4gEfQavMDueVeIvr9zjuRVlfk2EsOeLWFPIyL
+	 ZpPW0q0H0K50XBKTJZ6Ub542qtD5je/u93trO/hV+mmo08syDNVkXPHRKmto//Nfv+
+	 xVyQKMYs07xAQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -37,12 +37,12 @@ Cc: Ming Lei <ming.lei@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 8/8] block: use q->elevator with ->elevator_lock held in elv_iosched_show()
-Date: Wed, 28 May 2025 17:56:11 -0400
-Message-Id: <20250528215611.1983429-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 7/7] block: use q->elevator with ->elevator_lock held in elv_iosched_show()
+Date: Wed, 28 May 2025 17:56:22 -0400
+Message-Id: <20250528215622.1983622-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250528215611.1983429-1-sashal@kernel.org>
-References: <20250528215611.1983429-1-sashal@kernel.org>
+In-Reply-To: <20250528215622.1983622-1-sashal@kernel.org>
+References: <20250528215622.1983622-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.8
+X-stable-base: Linux 6.12.30
 Content-Transfer-Encoding: 8bit
 
 From: Ming Lei <ming.lei@redhat.com>
@@ -115,10 +115,10 @@ criteria of being an important bugfix with minimal regression risk.
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/block/elevator.c b/block/elevator.c
-index cd2ce49216010..1cc89c49e4cc9 100644
+index 43ba4ab1ada7f..1f76e9efd7717 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -734,7 +734,6 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+@@ -752,7 +752,6 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
  ssize_t elv_iosched_show(struct gendisk *disk, char *name)
  {
  	struct request_queue *q = disk->queue;
@@ -126,7 +126,7 @@ index cd2ce49216010..1cc89c49e4cc9 100644
  	struct elevator_type *cur = NULL, *e;
  	int len = 0;
  
-@@ -742,7 +741,7 @@ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
+@@ -763,7 +762,7 @@ ssize_t elv_iosched_show(struct gendisk *disk, char *name)
  		len += sprintf(name+len, "[none] ");
  	} else {
  		len += sprintf(name+len, "none ");
