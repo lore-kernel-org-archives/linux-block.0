@@ -1,131 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DBE21C16A;
-	Thu, 29 May 2025 22:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BB013633F
+	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 22:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748557731; cv=none; b=sE5O5EcYNcKAr/ujSykowYh1GD012JOmzzkGV/D7vIqRoRfYLzmAWh+2lUolVsHHnmZqJWASts/NGsQubW+K1Y9SFenQ34rJBoKeCBu8M7EV+/HHiUXUtJkXeeeom5OgCegfk5TBTRtKCzWby+x+ObGkrDU1uhg/G2WenLxMoWA=
+	t=1748558029; cv=none; b=OeBIxXfqEPtjc2HTYdgNJlUGKANSbo4C+TJzkr5QH7C+f6b8egeMmkadZse75b8LLTNOHvv0El3YsHCW8EwfcYkH0HRkcPq9XnZ+CrLOMPyKr5h2GyxNBOtvD+M5hAwywoQLR82ggJG7QjAiANnpYudpoI3+Rp0hUvI75JBfNaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748557731; c=relaxed/simple;
-	bh=e8TEEjSp0s5O/t4hPJKOBKjjl39Qm/MlC3Px+bz4X6M=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ENOh+dClhhwED90+EUBH23gT+d1XpTVu44TB1nTKQ/4qmvLVURQBWGBkGYktslBkmecWB2mZg3na+Hzf+TMZ2CabhTPIJkcxOXN9dUNhvJQiERboDOPY8u8YXhp5h0tvKSO58mFV3SQx9JsNzRXmO8IlLwvMIxhTO/XGlvICYxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LSE+Qogj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748558029; c=relaxed/simple;
+	bh=8/ndSRdCQFKs7rSX8PqwJiJYpFKZB81926SOkhqa1CE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mlbtjgnvqtJhOKYcjmTHoRzV/gBXBUX/UcuMNZ8Ip/Wsi8FuF1Ily+axv00xS2y8NaXKWnAlN0PnNZh2vJ/6licsK9QpswwKSEyQpJRXYN9OYQzGel2kPEgM3DdU/9+fGTBVfPLgawKafo0S6UxEeegbMhYEHwvOSBcQDRsgKMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=A4hE2L7J; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LSE+Qogj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3D1BC4CEE7;
-	Thu, 29 May 2025 22:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748557730;
-	bh=e8TEEjSp0s5O/t4hPJKOBKjjl39Qm/MlC3Px+bz4X6M=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=LSE+QogjEYxkiI3sLL/2EWF227oOpNqqRoZADdjan2fcCNc9UUQS4OdWtWVe/ergC
-	 1R1Sx85xFvZXUEYlIzWn1sSyL0FVVMn5ur0w5vTebKCYhUrnk9ONcxoYZssfGFTZc1
-	 jdV+lxkgQI9JODNCb7eV6uxeVlFJxq2wk9EGxpXI7JmY0dhMsy+fFiUZM5Rs+2Zhmz
-	 0Hy2mfoLEHBR0TkPikAF4nJBe4f0f+E2nKvjJx5CG3V5vJSePFppIjZpm0Rsc5IDB7
-	 Pw1TBBR2VABrd6+Goqd0O2vhvtFoR+IlRcGCQHedBRhDomXoDHAAiG1KvUPKMx/JJq
-	 pktQJ6hgr2jUA==
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="A4hE2L7J"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742c9907967so1460793b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 15:33:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1748558027; x=1749162827; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6YSacIhSUe8j0kgUdoeFBNzPh1NsgF2V23hohzX3NnI=;
+        b=A4hE2L7JSwOEjAAM0A38oYEShPGx/2PDM1gFiC5k0h8aVCt6Zq5VmY6Sfmb4fQqd3x
+         fN40VW2UzwM3RFtY7ciNT2b4YOs3LkITe4FCwUZ/s3RtdPZtYmJpHvumJqNdba1BEJ9z
+         wYV0k2r1lIZ3y96AGJg6ccLavLYRZMLk3P/i078w/LdP88TeAMl5SV1m4PO42P22jLg9
+         m/vGcodDvhyDvi/ntJlKY8GIYlcRgdCC2Wyx+3TOOfFyzRg1vhJc0vxNHsiLgZz3rnOz
+         hw/EpZUeEPdVaheOXtPr20uaknOjj5dh4Mf4VnMD9c/5XiOrFhdxauiyJm+ArwwEBrgU
+         +xxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748558027; x=1749162827;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6YSacIhSUe8j0kgUdoeFBNzPh1NsgF2V23hohzX3NnI=;
+        b=shMahNbcDcKMaeleqJswR8gvRG9AO344qlYoWxTblgMigVEqVfjuDtg/kPQjfd/DVZ
+         TavqGtXGqTNjajUoxFdDn188Kp8JbtS23yD5M+q0Cu17ggJIdSWqoCfTAAo8QNVv3Icz
+         DwkBazMaMkqRK+Frsh0W7YF9sE867SqxJfke3gCKlh7YCF+TfO1xmMoElhyqznhRclsl
+         eTi39IjzamHMbvM8a39WfoP2aNGlwv3wC3Z72XffmrpQeyfp8nrhGBbq5PcPFvyjA/uV
+         JiXJ9tmbI8/tTxnrb8j6alnLOb8nFdwQ7yhIXDF2bp6gehmXvJYfNWQawTEexFkG+dcN
+         yIYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJkTs0zi8Y2TyWuTUuQxxf8Fy+UQrCJRBj5a7Timlt9+jKqeKw2m7ZXWxDjPKhUi1hnM4bT/9xaOpNCQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAE+wChV+tugirYPUmrMZO7p6GPK2pWqyC9Plddyfc+9FVB3Nz
+	rgbfSHq+YZnWcfd1SO7mb1Rwx513eJFzKxjaPSFN5MnIlkqPNSNK+DiFieeerclhAW0=
+X-Gm-Gg: ASbGncvSYJroX1mn0RKnFcYUmbm+B/26louFr5NEmulo0CSP3FHHRYx+ndcFJs6Mz7K
+	+jJjSARzBDOQR5deUz2RIia13+D7aXIUPZJzlGlrKwdU9Bj7B0hEOoMw4ZuSj0CHxugwwI+T/ZD
+	ONu6G5K31TxvdHT5hedRQwop56QUVaNuwKsVD81X/2vZxyO9e/Hm5yJ7de7VmXhKuWbiS7ykl9w
+	QTdu5XCU1TVpZCjZadbn4ygzI5O7HHjSbET8CXM7VJ51ucAdhLXPHJmp+ZjzIwuiyp7zGagJ+8O
+	9/3oXHFeJGf3r4EYEQS/HZdtoxzlY9SC6bPnWxAXbKvIB+pNnAioG6oEA0nxpJlj1nxPy0c/x/A
+	0WoY1Ing=
+X-Google-Smtp-Source: AGHT+IHZj/1Shba20OZmM3OFPzAX7htJw4MOn1JwrvwJXkeYQGktsBWAgY05GzRUNgBCepuiRXfRSg==
+X-Received: by 2002:a05:6a00:2d1d:b0:737:678d:fb66 with SMTP id d2e1a72fcca58-747bd94c561mr1395176b3a.5.1748558027606;
+        Thu, 29 May 2025 15:33:47 -0700 (PDT)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-747afeab33dsm1810293b3a.41.2025.05.29.15.33.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 15:33:47 -0700 (PDT)
+Date: Thu, 29 May 2025 15:33:45 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: James Smart <james.smart@broadcom.com>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Michael Liang <mliang@purestorage.com>,
+	Randy Jennings <randyj@purestorage.com>
+Subject: Re: [PATCH] block: Fix blk_sync_queue() to properly stop timeout
+ timer
+Message-ID: <20250529223345.GA2013185-mkhalfella@purestorage.com>
+References: <20250529214928.2112990-1-mkhalfella@purestorage.com>
+ <aDjcA_H7Ec9VICps@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 30 May 2025 00:28:37 +0200
-Message-Id: <DA8ZZA7P2QUW.ODHEX4NB0RTB@kernel.org>
-Cc: "Alice Ryhl" <aliceryhl@google.com>, "Michal Rostecki"
- <vadorovsky@protonmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex
- Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary
- Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Trevor Gross" <tmgross@umich.edu>, "Brendan Higgins"
- <brendan.higgins@linux.dev>, "David Gow" <davidgow@google.com>, "Rae Moar"
- <rmoar@google.com>, "Danilo Krummrich" <dakr@kernel.org>, "Maarten
- Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
- <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
- Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
- <russ.weight@linux.dev>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
- "Rob Herring" <robh@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
- "Peter Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Will Deacon" <will@kernel.org>, "Waiman Long" <longman@redhat.com>,
- "Nathan Chancellor" <nathan@kernel.org>, "Nick Desaulniers"
- <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>,
- "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Jens Axboe" <axboe@kernel.dk>,
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
- <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
- <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v10 4/5] rust: replace `kernel::c_str!` with C-Strings
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>
-X-Mailer: aerc 0.20.1
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-4-6412a94d9d75@gmail.com>
- <DA66NJXU86M4.1HU12P6E79JLO@kernel.org>
- <CAJ-ks9nd6_iGK+ie-f+F0x4kwpyEGJ-kQiQGt-ffdbVN5S6kOg@mail.gmail.com>
- <aDbnLzPIGiAZISOq@google.com> <DA7WJYNAN5AI.2HE6B953GR16A@kernel.org>
- <CAJ-ks9nmxdSKtEuzT=yBU-WEuZXBupr5N6tainzrk=w3U_enXw@mail.gmail.com>
-In-Reply-To: <CAJ-ks9nmxdSKtEuzT=yBU-WEuZXBupr5N6tainzrk=w3U_enXw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aDjcA_H7Ec9VICps@kbusch-mbp>
 
-On Fri May 30, 2025 at 12:21 AM CEST, Tamir Duberstein wrote:
-> On Wed, May 28, 2025 at 11:35=E2=80=AFAM Benno Lossin <lossin@kernel.org>=
- wrote:
->> On Wed May 28, 2025 at 12:36 PM CEST, Alice Ryhl wrote:
->> > On Mon, May 26, 2025 at 06:29:46PM -0400, Tamir Duberstein wrote:
->> >> On Mon, May 26, 2025 at 11:04=E2=80=AFAM Benno Lossin <lossin@kernel.=
-org> wrote:
->> >> >
->> >> > On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
->> >> > > +macro_rules! c_str_avoid_literals {
->> >> >
->> >> > I don't like this name, how about `concat_to_c_str` or
->> >> > `concat_with_nul`?
->> >> >
->> >> > This macro also is useful from macros that have a normal string lit=
-eral,
->> >> > but can't turn it into a `c""` one.
->> >>
->> >> Uh, can you give an example? I'm not attached to the name.
->> >
->> > I also think it should be renamed. Right now it sounds like it creates=
- a
->> > c string while avoiding literals in the input ... whatever that means.
->>
->> Yeah that's a good way to put why the name is weird.
->>
->> > I like Benno's suggestions, but str_to_cstr! could also work?
->>
->> Hmm, I think then people won't know that it can also concat? I don't
->> think it matters too much, the macro probably won't be used that often
->> and if someone needs to use it, they probably wouldn't fine it by name
->> alone.
->
-> What do you mean by "it can also concat"? This macro by itself doesn't
-> concat, it takes only a single expr.
+On 2025-05-29 16:13:23 -0600, Keith Busch wrote:
+> On Thu, May 29, 2025 at 03:49:28PM -0600, Mohamed Khalfella wrote:
+> > nvme-fc initiator hit hung_task with stacktrace above while handling
+> > request timeout call. The work thread is waiting for itself to finish
+> > which is never going to happen. From the stacktrace the nvme controller
+> > was in NVME_CTRL_CONNECTING state when nvme_fc_timeout() was called.
+> > We do not expect to get IO timeout call in NVME_CTRL_CONNECTING state
+> > because blk_sync_queue() must have been called on this queue before
+> > switching from NVME_CTRL_RESETTING to NVME_CTRL_CONNECTING.
+> > 
+> > It turned out that blk_sync_queue() did not stop q->timeout_work from
+> > running as expected. nvme_fc_timeout() returned BLK_EH_RESET_TIMER
+> > causing q->timeout to be rearmed after it was canceled earlier.
+> > q->timeout queued q->timeout_work after the controller switched to
+> > NVME_CTRL_CONNECTING state causing deadlock above.
+> > 
+> > Add QUEUE_FLAG_NOTIMEOUT queue flag to tell q->timeout not to queue
+> > q->timeout_work while queue is being synced. Update blk_sync_queue() to
+> > cancel q->timeout_work first and then cancel q->timeout.
+> 
+> I feel like this is a nvme-fc problem that doesn't need the block layer
+> to handle. Just don't sync the queues within the timeout workqueue
+> context.
 
-Oh right, seems like I thought it took `$($t:tt)*`...
-
-> The example in the docs illustrates:
->
->     const MY_CSTR: &CStr =3D c_str_avoid_literals!(concat!(...));
->
-> I think str_to_cstr is ok - I'll do that in v11.
-
-Sounds good!
-
----
-Cheers,
-Benno
+Agreed on nvme-fc should not sync queues within timeout work, and I am
+testing a patch to fix nvme-fc. At the same time blk_sync_queue() should
+provide a guarantee that q->timeout_work will not run after the function
+returns, no?
