@@ -1,60 +1,89 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6574D2192FC
-	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 10:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EE0A55
+	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 10:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748512817; cv=none; b=oehdbgrde4Tl0wOSdISh9Tfk/zENo09Pjtt4sqFdFvMl9842SAzr5KW3jrtBWhRkHbRXywk34QIdhuT4rboPAzt60d88qzLjgtSRkeIDBv+Q/Tw/KmEoiuUDFTjP3kSYOmYsHUgGPpkllIKKteD4k3p19jUML5OFlpk3F+F3wsc=
+	t=1748513326; cv=none; b=GBetyvd1pgXsNKf0m2yTEMXl09uBWFMz7RNNcoZ/d9q1ANv5//xTwJCbq5XKQ84/df4vUPbj3GvdXM0VMFT93Gpd7kVsXB2reMbUlH4e4zEBL/Br+fjjAidSYlbGtbEA2DSqccpEfPOIZycvgk22L3vKd1AXjdMukL1WYJ4Ru74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748512817; c=relaxed/simple;
-	bh=/o+pGUCJ2E5HoBczbCx4HweIPeWKZgZ3uF4oHA/2+As=;
+	s=arc-20240116; t=1748513326; c=relaxed/simple;
+	bh=iTL8afo3upObsZUfVWgkwONBfVzOhwVSwCc3lUD98ww=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxYYbS1cKNZKswJrEf/BU8LKGlU132xN19g3afEWtpiOxNFJN5GMXDUkk4ozn4S+QO9ZKHz0wMPYqISvDw0kMgLUTOLKQqcJ+Jk/+FQ4TefWtuW9JGGfh//KiPquxs5B3cryz1lgO0RKn8B3LLQhaUwHWkwdGBKbBpduD0B525k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CEHy1S6R; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=CcBojNKPUZAasVmINq9fuIFYVSTJvapHQt9PgwMFf9Eqj5ICnoZ0kqzoOEgv45hAvwEF44nLtIdSuhYvpSbpjBBAUc18uRmrUX/rcJ9VM/L99jKAVoNFdJHrrgIAEZuMKJKP+ld4zMbMiXwM6Yi6Wqa+JSRTw8A8JJEsbBVzVNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P+SGnPOe; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CEHy1S6R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P+SGnPOe"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748512814;
+	s=mimecast20190719; t=1748513321;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zibuTGA0nXBdxoQDJlbPTHKTXU5J45rtDsSqDQ/Mtd0=;
-	b=CEHy1S6RXat+oZpWCoB0C80fvOAoWZcfSSYMGyjTObWwR518CTf0yCiFNaSwjIAiBkTEqd
-	hV3eDcxzwV8nfGjGQTD4kiaTGyTpXeRLPf0IZhFaR0sAzuaNY4ID4MfLXGzgnK4Ozm3SLj
-	QbbmtQP2zyYAvNf3jTpcAv7NXaQvgyM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-633--1up1J2wNLC5Wzxz29HCWg-1; Thu,
- 29 May 2025 06:00:08 -0400
-X-MC-Unique: -1up1J2wNLC5Wzxz29HCWg-1
-X-Mimecast-MFC-AGG-ID: -1up1J2wNLC5Wzxz29HCWg_1748512807
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 616AB19560AE;
-	Thu, 29 May 2025 10:00:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.35])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1FEEF19560AE;
-	Thu, 29 May 2025 09:59:59 +0000 (UTC)
-Date: Thu, 29 May 2025 17:59:54 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 1/8] ublk: have a per-io daemon instead of a per-queue
- daemon
-Message-ID: <aDgwGoGCEpwd1mFY@fedora>
-References: <20250527-ublk_task_per_io-v7-0-cbdbaf283baa@purestorage.com>
- <20250527-ublk_task_per_io-v7-1-cbdbaf283baa@purestorage.com>
+	bh=btRqMMebw6c3jrXfN6v/1i5J68O0mGeiYn75Juwat/E=;
+	b=P+SGnPOe4m1a1NteMIT5aw4scyHuEgcv+E9Qdop20ZRLfTrJ0H1VT8x3pYsbWkGnU9Pb7i
+	hdzZKahv7akpu2t1okK98eI3C7LZwNQogdJuR1zKgZhoMNvuBwxBxdFy7dk4Adu7T1R32+
+	ntodTSMzs/n08MKeGDoCyxePXN+mNT8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-202-3D7C9zBIP72EZJQHLin6wg-1; Thu, 29 May 2025 06:08:39 -0400
+X-MC-Unique: 3D7C9zBIP72EZJQHLin6wg-1
+X-Mimecast-MFC-AGG-ID: 3D7C9zBIP72EZJQHLin6wg_1748513317
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a4eb6fcd88so439693f8f.1
+        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 03:08:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748513317; x=1749118117;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=btRqMMebw6c3jrXfN6v/1i5J68O0mGeiYn75Juwat/E=;
+        b=BGPm0YcAf9NnULbDLV/Ri/4lW1VISgaLNgvvCQpB+4SsjJE6I3/mDsGBsfWvDcUZRS
+         AqP3tZWDM+RCooB130RP0bOA4XIURtUWqN9G+XTUlQ+4kZNNQJUa+AGBZt+XX5nFjFMX
+         6IvQEZY+ICAFe3JwguXugJ1ZceSeuJExZbyGrUUkEuYfFIxe7j3uCmeyH+W+/n8x0S7S
+         UyQF1ac0zsctKek2HqPWwjiXqLajz7SDUM2dl1ytibNbLAdz8GM3rOp5nfmgVddkwivU
+         r/KY95iiMo7hQFZup2/jRGd8EkaBPvk/zd/UofOhPWc0/0ojsJ35+bA7WK3zIYYTmK75
+         ImSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0721vUBsh2XrzsPO1nz5J8dNPa3m9n9F3NcFXh1/p+10TXYmqhwBrTdaZOweimI5/DeHpA0uIPbfuYA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqa8/0La1utXgqj6Q8n/Bshhvzo2E76zUYOsDmVRb0pFE01171
+	Lm9yE1Ri/gmXok14hpwFDYCOQHBa/FHIIPKADjfe/5L2pbkbGLBgkKnnsauxF/Pcc+eqdZgv7On
+	7OWmyd0TeXuLbxZF9cq5PRaA0Y/0yukMQi9qRRrq2DxX7yli+R3xn18ZP/JjXEPtw
+X-Gm-Gg: ASbGnctxkouCw2tX5L0FnZ6TKqomeRRT4swaUveIalfKNUpFic90X5a8ox9EZaiQxZt
+	yIKLbNpzx6i1gE/8FZ69yn/Pyonf2RsnX+KigjO4Pg8yQrK2ZZLWPypx5xG9NUhFUDjMyk1FNKu
+	Guo/C3kOUyIkGg6VD5uS0vce0BtCTxNEyK8X3i6LQjj5XjTekxvQBWID/ymv7bnvzFnIql+cYPT
+	MEqCsh5E9lw3uRRYGRztigXSbvsWvDbQxlSW8GjWF1o1nvBLzk/7PXv6Q0hLwJ4HizTu6EOrRRn
+	BSjAng==
+X-Received: by 2002:a05:6000:2dc1:b0:3a4:dfc1:ecb8 with SMTP id ffacd0b85a97d-3a4dfc1ed20mr10339681f8f.53.1748513317228;
+        Thu, 29 May 2025 03:08:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFjnM7LmvHpgO5lah8oxHxaFhizhn7q6GhcdIvp2FmnsbfEdYot02tUwMUrBXH33LLHSkyXIw==
+X-Received: by 2002:a05:6000:2dc1:b0:3a4:dfc1:ecb8 with SMTP id ffacd0b85a97d-3a4dfc1ed20mr10339646f8f.53.1748513316666;
+        Thu, 29 May 2025 03:08:36 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe5b83dsm1514577f8f.1.2025.05.29.03.08.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 03:08:35 -0700 (PDT)
+Date: Thu, 29 May 2025 06:08:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"NBU-Contact-Li Rongqing (EXTERNAL)" <lirongqing@baidu.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Israel Rukshin <israelr@nvidia.com>
+Subject: Re: [PATCH v3] virtio_blk: Fix disk deletion hang on device surprise
+ removal
+Message-ID: <20250529060716-mutt-send-email-mst@kernel.org>
+References: <20250529061913.28868-1-parav@nvidia.com>
+ <20250529035007-mutt-send-email-mst@kernel.org>
+ <CY8PR12MB71954B0FEBAC97F368EF1EBCDC66A@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,112 +92,257 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250527-ublk_task_per_io-v7-1-cbdbaf283baa@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <CY8PR12MB71954B0FEBAC97F368EF1EBCDC66A@CY8PR12MB7195.namprd12.prod.outlook.com>
 
-On Tue, May 27, 2025 at 05:01:24PM -0600, Uday Shankar wrote:
-> Currently, ublk_drv associates to each hardware queue (hctx) a unique
-> task (called the queue's ubq_daemon) which is allowed to issue
-> COMMIT_AND_FETCH commands against the hctx. If any other task attempts
-> to do so, the command fails immediately with EINVAL. When considered
-> together with the block layer architecture, the result is that for each
-> CPU C on the system, there is a unique ublk server thread which is
-> allowed to handle I/O submitted on CPU C. This can lead to suboptimal
-> performance under imbalanced load generation. For an extreme example,
-> suppose all the load is generated on CPUs mapping to a single ublk
-> server thread. Then that thread may be fully utilized and become the
-> bottleneck in the system, while other ublk server threads are totally
-> idle.
+On Thu, May 29, 2025 at 09:57:51AM +0000, Parav Pandit wrote:
 > 
-> This issue can also be addressed directly in the ublk server without
-> kernel support by having threads dequeue I/Os and pass them around to
-> ensure even load. But this solution requires inter-thread communication
-> at least twice for each I/O (submission and completion), which is
-> generally a bad pattern for performance. The problem gets even worse
-> with zero copy, as more inter-thread communication would be required to
-> have the buffer register/unregister calls to come from the correct
-> thread.
 > 
-> Therefore, address this issue in ublk_drv by allowing each I/O to have
-> its own daemon task. Two I/Os in the same queue are now allowed to be
-> serviced by different daemon tasks - this was not possible before.
-> Imbalanced load can then be balanced across all ublk server threads by
-> having the ublk server threads issue FETCH_REQs in a round-robin manner.
-> As a small toy example, consider a system with a single ublk device
-> having 2 queues, each of depth 4. A ublk server having 4 threads could
-> issue its FETCH_REQs against this device as follows (where each entry is
-> the qid,tag pair that the FETCH_REQ targets):
+> > From: Michael S. Tsirkin <mst@redhat.com>
+> > Sent: Thursday, May 29, 2025 1:34 PM
+> > 
+> > On Thu, May 29, 2025 at 06:19:31AM +0000, Parav Pandit wrote:
+> > > When the PCI device is surprise removed, requests may not complete the
+> > > device as the VQ is marked as broken. Due to this, the disk deletion
+> > > hangs.
+> > >
+> > > Fix it by aborting the requests when the VQ is broken.
+> > >
+> > > With this fix now fio completes swiftly.
+> > > An alternative of IO timeout has been considered, however when the
+> > > driver knows about unresponsive block device, swiftly clearing them
+> > > enables users and upper layers to react quickly.
+> > >
+> > > Verified with multiple device unplug iterations with pending requests
+> > > in virtio used ring and some pending with the device.
+> > >
+> > > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal of virtio
+> > > pci device")
+> > > Cc: stable@vger.kernel.org
+> > > Reported-by: Li RongQing <lirongqing@baidu.com>
+> > > Closes:
+> > > https://lore.kernel.org/virtualization/c45dd68698cd47238c55fb73ca9b474
+> > > 1@baidu.com/
+> > > Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+> > > Signed-off-by: Parav Pandit <parav@nvidia.com>
+> > >
+> > > ---
+> > > v2->v3:
+> > > - Addressed comments from Michael
+> > > - updated comment for synchronizing with callbacks
+> > >
+> > > v1->v2:
+> > > - Addressed comments from Stephan
+> > > - fixed spelling to 'waiting'
+> > > - Addressed comments from Michael
+> > > - Dropped checking broken vq from queue_rq() and queue_rqs()
+> > >   because it is checked in lower layer routines in virtio core
+> > >
+> > > v0->v1:
+> > > - Fixed comments from Stefan to rename a cleanup function
+> > > - Improved logic for handling any outstanding requests
+> > >   in bio layer
+> > > - improved cancel callback to sync with ongoing done()
+> > 
+> > 
+> > Thanks!
+> > Something else small to improve.
+> > 
+> > > ---
+> > >  drivers/block/virtio_blk.c | 82
+> > > ++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 82 insertions(+)
+> > >
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 7cffea01d868..d37df878f4e9 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -1554,6 +1554,86 @@ static int virtblk_probe(struct virtio_device
+> > *vdev)
+> > >  	return err;
+> > >  }
+> > >
+> > > +static bool virtblk_request_cancel(struct request *rq, void *data)
+> > 
+> > it is more
+> > 
+> > virtblk_request_complete_broken_with_ioerr
+> > 
+> > and maybe a comment?
+> > /*
+> >  * If the vq is broken, device will not complete requests.
+> >  * So we do it for the device.
+> >  */
+> > 
+> Ok. will add.
 > 
-> ublk server thread:	T0	T1	T2	T3
-> 			0,0	0,1	0,2	0,3
-> 			1,3	1,0	1,1	1,2
+> > > +{
+> > > +	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+> > > +	struct virtio_blk *vblk = data;
+> > > +	struct virtio_blk_vq *vq;
+> > > +	unsigned long flags;
+> > > +
+> > > +	vq = &vblk->vqs[rq->mq_hctx->queue_num];
+> > > +
+> > > +	spin_lock_irqsave(&vq->lock, flags);
+> > > +
+> > > +	vbr->in_hdr.status = VIRTIO_BLK_S_IOERR;
+> > > +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
+> > > +		blk_mq_complete_request(rq);
+> > > +
+> > > +	spin_unlock_irqrestore(&vq->lock, flags);
+> > > +	return true;
+> > > +}
+> > > +
+> > > +static void virtblk_broken_device_cleanup(struct virtio_blk *vblk)
+> > 
+> > and one goes okay what does it do exactly? cleanup device in a broken way?
+> > turns out no, it cleans up a broken device.
+> > And an overview would be good. Maybe, a small comment will help:
+> > 
+> Virtblk_cleanup_broken_device()?
 > 
-> This setup allows for load that is concentrated on one hctx/ublk_queue
-> to be spread out across all ublk server threads, alleviating the issue
-> described above.
+> Is that name ok?
+
+better, I think.
+
+> > /*
+> >  * if the device is broken, it will not use any buffers and waiting
+> >  * for that to happen is pointless. We'll do it in the driver,
+> >  * completing all requests for the device.
+> >  */
+> >
+> Will add it.
+>  
+> > 
+> > > +{
+> > > +	struct request_queue *q = vblk->disk->queue;
+> > > +
+> > > +	if (!virtqueue_is_broken(vblk->vqs[0].vq))
+> > > +		return;
+> > 
+> > so one has to read it, and understand that we did not need to call it in the 1st
+> > place on a non broken device.
+> > Moving it to the caller would be cleaner.
+> > 
+> Ok. will move.
+> > 
+> > > +
+> > > +	/* Start freezing the queue, so that new requests keeps waiting at
+> > > +the
+> > 
+> > wrong style of comment for blk.
+> > 
+> > /* this is
+> >  * net style
+> >  */
+> > 
+> > /*
+> >  * this is
+> >  * rest of the linux style
+> >  */
+> > 
+> Ok. will fix it.
 > 
-> Add the new UBLK_F_PER_IO_DAEMON feature to ublk_drv, which ublk servers
-> can use to essentially test for the presence of this change and tailor
-> their behavior accordingly.
+> > > +	 * door of bio_queue_enter(). We cannot fully freeze the queue
+> > because
+> > > +	 * freezed queue is an empty queue and there are pending requests,
+> > > +so
+> > 
+> > a frozen queue
+> > 
+> Will fix it.
 > 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-
-This patch looks close to go, just one panic triggered immediately by
-the following steps, I think it needs to be addressed first.
-
-Maybe we need to add one such stress test for UBLK_F_PER_IO_DAEMON too.
-
-
-1) run heavy IO:
-
-[root@ktest-40 ublk]# ./kublk add -t null -q 2 --nthreads 4 --per_io_tasks
-dev id 0: nr_hw_queues 2 queue_depth 128 block size 512 dev_capacity 524288000
-	max rq size 1048576 daemon pid 1283 flags 0x2042 state LIVE
-	queue 0: affinity(0 )
-	queue 1: affinity(8 )
-[root@ktest-40 ublk]#
-[root@ktest-40 ublk]# ~/git/fio/t/io_uring -p 0 -n 8 /dev/ublkb0
-
-Or
-
-`fio -numjobs=8 --ioengine=libaio --iodepth=128 --iodepth_batch_submit=32 \
-	--iodepth_batch_complete_min=32`
-
-2) panic immediately:
-
-[   51.297750] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[   51.298719] #PF: supervisor read access in kernel mode
-[   51.299403] #PF: error_code(0x0000) - not-present page
-[   51.300069] PGD 1161c8067 P4D 1161c8067 PUD 11a793067 PMD 0 
-[   51.300825] Oops: Oops: 0000 [#1] SMP NOPTI
-[   51.301389] CPU: 0 UID: 0 PID: 1285 Comm: kublk Not tainted 6.15.0+ #288 PREEMPT(full) 
-[   51.302375] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-1.fc39 04/01/2014
-[   51.303551] RIP: 0010:io_uring_cmd_done+0xa7/0x1d0
-[   51.304226] Code: 48 89 f1 48 89 f0 48 83 e1 bf 80 cc 01 48 81 c9 00 01 80 00 83 e6 40 48 0f 45 c1 48 89 43 48 44 89 6b 58 c7 43 5c 00 00 00 00 <8b> 07 f6 c4 08 74 12 48 89 93 e8 00 00 0
-[   51.306554] RSP: 0018:ffffd1da436e3a40 EFLAGS: 00010246
-[   51.307253] RAX: 0000000000000100 RBX: ffff8d9cd3737300 RCX: 0000000000000001
-[   51.308178] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[   51.309333] RBP: 0000000000000001 R08: 0000000000000018 R09: 0000000000190015
-[   51.310744] R10: 0000000000190015 R11: 0000000000000035 R12: ffff8d9cd1c7c000
-[   51.311986] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-[   51.313386] FS:  00007f2c293916c0(0000) GS:ffff8da179df6000(0000) knlGS:0000000000000000
-[   51.314899] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   51.315926] CR2: 0000000000000000 CR3: 00000001161c9002 CR4: 0000000000772ef0
-[   51.317179] PKRU: 55555554
-[   51.317682] Call Trace:
-[   51.318040]  <TASK>
-[   51.318355]  ublk_cmd_list_tw_cb+0x30/0x40 [ublk_drv]
-[   51.319061]  __io_run_local_work_loop+0x72/0x80
-[   51.319696]  __io_run_local_work+0x69/0x1e0
-[   51.320274]  io_cqring_wait+0x8f/0x6a0
-[   51.320794]  __do_sys_io_uring_enter+0x500/0x770
-[   51.321422]  do_syscall_64+0x82/0x170
-[   51.321891]  ? __do_sys_io_uring_enter+0x500/0x770
-
-
-
-
-Thanks,
-Ming
+> > > +	 * only start freezing it.
+> > > +	 */
+> > > +	blk_freeze_queue_start(q);
+> > > +
+> > > +	/* When quiescing completes, all ongoing dispatches have completed
+> > > +	 * and no new dispatch will happen towards the driver.
+> > > +	 * This ensures that later when cancel is attempted, then are not
+> > 
+> > they are not?
+> > 
+> Will fix this too.
+> 
+> > > +	 * getting processed by the queue_rq() or queue_rqs() handlers.
+> > > +	 */
+> > > +	blk_mq_quiesce_queue(q);
+> > > +
+> > > +	/*
+> > > +	 * Synchronize with any ongoing VQ callbacks that may have started
+> > > +	 * before the VQs were marked as broken. Any outstanding requests
+> > > +	 * will be completed by virtblk_request_cancel().
+> > > +	 */
+> > > +	virtio_synchronize_cbs(vblk->vdev);
+> > > +
+> > > +	/* At this point, no new requests can enter the queue_rq() and
+> > > +	 * completion routine will not complete any new requests either for
+> > the
+> > > +	 * broken vq. Hence, it is safe to cancel all requests which are
+> > > +	 * started.
+> > > +	 */
+> > > +	blk_mq_tagset_busy_iter(&vblk->tag_set, virtblk_request_cancel,
+> > vblk);
+> > > +	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
+> > > +
+> > > +	/* All pending requests are cleaned up. Time to resume so that disk
+> > > +	 * deletion can be smooth. Start the HW queues so that when queue
+> > is
+> > > +	 * unquiesced requests can again enter the driver.
+> > > +	 */
+> > > +	blk_mq_start_stopped_hw_queues(q, true);
+> > > +
+> > > +	/* Unquiescing will trigger dispatching any pending requests to the
+> > > +	 * driver which has crossed bio_queue_enter() to the driver.
+> > > +	 */
+> > > +	blk_mq_unquiesce_queue(q);
+> > > +
+> > > +	/* Wait for all pending dispatches to terminate which may have been
+> > > +	 * initiated after unquiescing.
+> > > +	 */
+> > > +	blk_mq_freeze_queue_wait(q);
+> > > +
+> > > +	/* Mark the disk dead so that once queue unfreeze, the requests
+> > 
+> > ... once we unfreeze the queue
+> > 
+> > 
+> Ok.
+> 
+> > > +	 * waiting at the door of bio_queue_enter() can be aborted right
+> > away.
+> > > +	 */
+> > > +	blk_mark_disk_dead(vblk->disk);
+> > > +
+> > > +	/* Unfreeze the queue so that any waiting requests will be aborted.
+> > */
+> > > +	blk_mq_unfreeze_queue_nomemrestore(q);
+> > > +}
+> > > +
+> > >  static void virtblk_remove(struct virtio_device *vdev)  {
+> > >  	struct virtio_blk *vblk = vdev->priv; @@ -1561,6 +1641,8 @@ static
+> > > void virtblk_remove(struct virtio_device *vdev)
+> > >  	/* Make sure no work handler is accessing the device. */
+> > >  	flush_work(&vblk->config_work);
+> > >
+> > 
+> > I prefer simply moving the test here:
+> > 
+> > 	if (virtqueue_is_broken(vblk->vqs[0].vq))
+> > 		virtblk_broken_device_cleanup(vblk);
+> > 
+> > makes it much clearer what is going on, imho.
+> > 
+> No strong preference, some maintainers prefer the current way others the way you preferred.
+> So will fix as you proposed here along with above fixes in v4.
+> 
+> Thanks
+> 
+> > 
+> > >  	del_gendisk(vblk->disk);
+> > >  	blk_mq_free_tag_set(&vblk->tag_set);
+> > >
+> > > --
+> > > 2.34.1
 
