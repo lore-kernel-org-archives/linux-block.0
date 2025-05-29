@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3741C269880
-	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 09:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F7F2853E0
+	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 09:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748512097; cv=none; b=qHfznQKx4LkR4dlecW6esjzH5ko1zYbx6eNEmR7NIgUkm9Y7tWFy2AvIPDbTyfKSHp0BUIs0Rfj5aZbIOxdXDoHy5iaPsW8kozUCkKZFJLtVRAx+EPp9u+3ge0ZvizZk/WYdBVQ+c/6zI1rkJfQPPXqQGl61ABu33fKnhZHwUEA=
+	t=1748512131; cv=none; b=ao4tJX7pKH5wW/qHhihwVP5tJJb6LDAmw1FFvi/tU7u1P8ZY7X0s4mx/MwUPvdk1w/TrrlfSl6Ogr2tm+fhL/8ODqYsYALvVxBUOArvQk1aGUIpWPp0beYtAag3wHdKhM39HUXK9+PP4J0sd97pkzJV6Ds5GPfUqJWGKtjk3Wes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748512097; c=relaxed/simple;
-	bh=QSW8yr7Wa8nIzabX+tA183Hg5HQRpsGXIwYwkre3aHE=;
+	s=arc-20240116; t=1748512131; c=relaxed/simple;
+	bh=tJ37GiEQgPK+kXaLSCs5FYz85UyulupB0lEDDibes8Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyR0ys+zbVClsiYvResC8PtKIjp2nhuKy8701WY8LIaZn9JO2UbypmB35M1yHRGKEK4ZNbvvKp3ywpu9CRUh1wgWpm8zvmPYirJSpoXmOfjnTKjrLgq7aBsluI7k0F9gJ1L4L5aa69aCwUj+jfvftZV9Tl1M0gZ1Rhfr5GVcn8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pn6OGJW4; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=gY2PePi0CpCbkK13DW1jiImcF/cZD0W3Wek6wpYJ1wChrRNjMPwGFHvEqQ7VfJeKQoCBjvPdPOUIQPuxVm/ymdPIjxI0ToFoxyZkbzd/Uzu/EHjnE8EzVW25A2ctnU4jtTnyH8D9zHe5UifmrTIoejeA+suSXtlxK3HvBOGY2x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WlC/Rd9C; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pn6OGJW4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlC/Rd9C"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748512095;
+	s=mimecast20190719; t=1748512128;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6ry7WPuUyLkq5CyNjr1ayrOEZ4+99+KqGgcnAG6eR+Q=;
-	b=Pn6OGJW4XS5U1/DS1LsrZoIbhMn23udS8ZZbRZdkJHEA+C9gnYQKs4gSfkeftGhOvzmQUo
-	B2Wax45CPHyGvOH6jYbPiZIf3LkygT4QmMhEBQkfJQk109JEQeB/Fqz0yvWeDjJR1hW7JZ
-	UTpF0A7ZsbVv6l+wZYrJWTlY9CKgprE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Ii9nK1D9ztG0XhbaHqDzvUWqyA0bRZma24ZQouI2Yqw=;
+	b=WlC/Rd9Cwx07sxrJGM0NLsyrjQCO+tPdHa79aH2vjDivK/SML3VZFOv2d/McUhA4NRjFe9
+	pHZVoxvJ0ZrcPUMg5AhuPEAVENqj8vsPHZ0J5DJwcE4sEDrrhu2cRNbfwdjerlvwCkRjNB
+	tSI2Ddc3OZbzm5iVPX6UnaSvb4N9udM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-658-z78Vrh78N5GS2Mn1yMs8qA-1; Thu,
- 29 May 2025 05:48:11 -0400
-X-MC-Unique: z78Vrh78N5GS2Mn1yMs8qA-1
-X-Mimecast-MFC-AGG-ID: z78Vrh78N5GS2Mn1yMs8qA_1748512089
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-413-rPDIT-n7Nf64G3Yl0Bg7FQ-1; Thu,
+ 29 May 2025 05:48:45 -0400
+X-MC-Unique: rPDIT-n7Nf64G3Yl0Bg7FQ-1
+X-Mimecast-MFC-AGG-ID: rPDIT-n7Nf64G3Yl0Bg7FQ_1748512123
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC7891800366;
-	Thu, 29 May 2025 09:48:09 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B7F619560B0;
+	Thu, 29 May 2025 09:48:43 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.35])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D4E21955D82;
-	Thu, 29 May 2025 09:48:03 +0000 (UTC)
-Date: Thu, 29 May 2025 17:47:58 +0800
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F2EC19560AF;
+	Thu, 29 May 2025 09:48:37 +0000 (UTC)
+Date: Thu, 29 May 2025 17:48:32 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Uday Shankar <ushankar@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
@@ -50,10 +50,10 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 7/8] selftests: ublk: add test for per io daemons
-Message-ID: <aDgtTqj-s_SN7wCK@fedora>
+Subject: Re: [PATCH v7 8/8] Documentation: ublk: document UBLK_F_PER_IO_DAEMON
+Message-ID: <aDgtcAoUci9F9ZmR@fedora>
 References: <20250527-ublk_task_per_io-v7-0-cbdbaf283baa@purestorage.com>
- <20250527-ublk_task_per_io-v7-7-cbdbaf283baa@purestorage.com>
+ <20250527-ublk_task_per_io-v7-8-cbdbaf283baa@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,26 +62,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250527-ublk_task_per_io-v7-7-cbdbaf283baa@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <20250527-ublk_task_per_io-v7-8-cbdbaf283baa@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, May 27, 2025 at 05:01:30PM -0600, Uday Shankar wrote:
-> Add a new test test_generic_12 which:
+On Tue, May 27, 2025 at 05:01:31PM -0600, Uday Shankar wrote:
+> Explain the restrictions imposed on ublk servers in two cases:
+> 1. When UBLK_F_PER_IO_DAEMON is set (current ublk_drv)
+> 2. When UBLK_F_PER_IO_DAEMON is not set (legacy)
 > 
-> - sets up a ublk server with per_io_tasks and a different number of ublk
->   server threads and ublk_queues. This is possible now that these
->   objects are decoupled
-> - runs some I/O load from a single CPU
-> - verifies that all the ublk server threads handle some I/O
-> 
-> Before this changeset, this test fails, since I/O issued from one CPU is
-> always handled by the one ublk server thread. After this changeset, the
-> test passes.
-> 
-> In the future, the last check above may be strengthened to "verify that
-> all ublk server threads handle the same amount of I/O." However, this
-> requires some adjustments/bugfixes to tag allocation, so this work is
-> postponed to a followup.
+> Remove most references to per-queue daemons, as the new
+> UBLK_F_PER_IO_DAEMON feature renders that concept obsolete.
 > 
 > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 
