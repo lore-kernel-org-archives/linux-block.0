@@ -1,112 +1,182 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BB013633F
-	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 22:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CEB2586E8
+	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 23:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748558029; cv=none; b=OeBIxXfqEPtjc2HTYdgNJlUGKANSbo4C+TJzkr5QH7C+f6b8egeMmkadZse75b8LLTNOHvv0El3YsHCW8EwfcYkH0HRkcPq9XnZ+CrLOMPyKr5h2GyxNBOtvD+M5hAwywoQLR82ggJG7QjAiANnpYudpoI3+Rp0hUvI75JBfNaI=
+	t=1748562461; cv=none; b=Vf+52VUqigwZyr33rtFbQ+KygAG6tZe+YE3IUsNb8c6/Xm18sMHoEZoLHjI3luL6FDP3Oncnawaba12fnmDV8/AyDjtX5Eb3deKRBy3dfjpTgxMcr12ybu7jkt5KsSD+jGb1u3lSWDCUUtiA57ZFF6XcgC1kEu/dvtuFHqbhdVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748558029; c=relaxed/simple;
-	bh=8/ndSRdCQFKs7rSX8PqwJiJYpFKZB81926SOkhqa1CE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mlbtjgnvqtJhOKYcjmTHoRzV/gBXBUX/UcuMNZ8Ip/Wsi8FuF1Ily+axv00xS2y8NaXKWnAlN0PnNZh2vJ/6licsK9QpswwKSEyQpJRXYN9OYQzGel2kPEgM3DdU/9+fGTBVfPLgawKafo0S6UxEeegbMhYEHwvOSBcQDRsgKMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=A4hE2L7J; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1748562461; c=relaxed/simple;
+	bh=KFzR2R0oE+f8Zx4hoiyK9LWJS5zkAw4p1aYmlL54wbY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=qP3PGpMbUFCO9jokdgshFl+VM6RXM0rKMppCZWELBR2mvrOoBs71FBfckvVD7QTF8w5RYziuIBFNFa0lLOBbhdjlZ33JDD1YCU0AKkVQaaqpJD97tsQEzgv0vl92r1tbPWsJ+EcKgpYg2xGubYvUqraH6Kej0tIJ2giU1wAt04E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HVM4EM5o; arc=none smtp.client-ip=209.85.214.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="A4hE2L7J"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742c9907967so1460793b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 15:33:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HVM4EM5o"
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-23228b9d684so16765435ad.1
+        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 16:47:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1748558027; x=1749162827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6YSacIhSUe8j0kgUdoeFBNzPh1NsgF2V23hohzX3NnI=;
-        b=A4hE2L7JSwOEjAAM0A38oYEShPGx/2PDM1gFiC5k0h8aVCt6Zq5VmY6Sfmb4fQqd3x
-         fN40VW2UzwM3RFtY7ciNT2b4YOs3LkITe4FCwUZ/s3RtdPZtYmJpHvumJqNdba1BEJ9z
-         wYV0k2r1lIZ3y96AGJg6ccLavLYRZMLk3P/i078w/LdP88TeAMl5SV1m4PO42P22jLg9
-         m/vGcodDvhyDvi/ntJlKY8GIYlcRgdCC2Wyx+3TOOfFyzRg1vhJc0vxNHsiLgZz3rnOz
-         hw/EpZUeEPdVaheOXtPr20uaknOjj5dh4Mf4VnMD9c/5XiOrFhdxauiyJm+ArwwEBrgU
-         +xxQ==
+        d=purestorage.com; s=google2022; t=1748562456; x=1749167256; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZpDwixmcLhBwd2X2YXKWEWGwjdFqClV/mbfesZkbLZ4=;
+        b=HVM4EM5o3m5NnyEnDtFVv851YsRsOYFOfvZ5S1meTMdIU7rIo79NCE6BVgQbbJqLw3
+         PIVBnT2YWC8n/NNFeclz3BHE/1/apz4YPqNxoAsg59bmNnoWMAnJdiuMwsretwYUcKHU
+         fffqBc4ghupzcLgrSnVVUAhzC3XvvZ7fJkZuD8R/OHn5unKdzJvMy6X5QZhhzcUFyPrY
+         2dy6o8JtHfaA5SrkN4fSMkpGbhwb7HfotO9us3pei2LYmngGYe4hRGvc3EttEkLEBIeH
+         +t+m0wCV4CrvC62wKOnlhZiXOPWYXG/VW579qtgzAgNuF0QbBDJUELhIvhwZ+YkPaTcU
+         nCbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748558027; x=1749162827;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6YSacIhSUe8j0kgUdoeFBNzPh1NsgF2V23hohzX3NnI=;
-        b=shMahNbcDcKMaeleqJswR8gvRG9AO344qlYoWxTblgMigVEqVfjuDtg/kPQjfd/DVZ
-         TavqGtXGqTNjajUoxFdDn188Kp8JbtS23yD5M+q0Cu17ggJIdSWqoCfTAAo8QNVv3Icz
-         DwkBazMaMkqRK+Frsh0W7YF9sE867SqxJfke3gCKlh7YCF+TfO1xmMoElhyqznhRclsl
-         eTi39IjzamHMbvM8a39WfoP2aNGlwv3wC3Z72XffmrpQeyfp8nrhGBbq5PcPFvyjA/uV
-         JiXJ9tmbI8/tTxnrb8j6alnLOb8nFdwQ7yhIXDF2bp6gehmXvJYfNWQawTEexFkG+dcN
-         yIYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJkTs0zi8Y2TyWuTUuQxxf8Fy+UQrCJRBj5a7Timlt9+jKqeKw2m7ZXWxDjPKhUi1hnM4bT/9xaOpNCQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAE+wChV+tugirYPUmrMZO7p6GPK2pWqyC9Plddyfc+9FVB3Nz
-	rgbfSHq+YZnWcfd1SO7mb1Rwx513eJFzKxjaPSFN5MnIlkqPNSNK+DiFieeerclhAW0=
-X-Gm-Gg: ASbGncvSYJroX1mn0RKnFcYUmbm+B/26louFr5NEmulo0CSP3FHHRYx+ndcFJs6Mz7K
-	+jJjSARzBDOQR5deUz2RIia13+D7aXIUPZJzlGlrKwdU9Bj7B0hEOoMw4ZuSj0CHxugwwI+T/ZD
-	ONu6G5K31TxvdHT5hedRQwop56QUVaNuwKsVD81X/2vZxyO9e/Hm5yJ7de7VmXhKuWbiS7ykl9w
-	QTdu5XCU1TVpZCjZadbn4ygzI5O7HHjSbET8CXM7VJ51ucAdhLXPHJmp+ZjzIwuiyp7zGagJ+8O
-	9/3oXHFeJGf3r4EYEQS/HZdtoxzlY9SC6bPnWxAXbKvIB+pNnAioG6oEA0nxpJlj1nxPy0c/x/A
-	0WoY1Ing=
-X-Google-Smtp-Source: AGHT+IHZj/1Shba20OZmM3OFPzAX7htJw4MOn1JwrvwJXkeYQGktsBWAgY05GzRUNgBCepuiRXfRSg==
-X-Received: by 2002:a05:6a00:2d1d:b0:737:678d:fb66 with SMTP id d2e1a72fcca58-747bd94c561mr1395176b3a.5.1748558027606;
-        Thu, 29 May 2025 15:33:47 -0700 (PDT)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-747afeab33dsm1810293b3a.41.2025.05.29.15.33.46
+        d=1e100.net; s=20230601; t=1748562456; x=1749167256;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZpDwixmcLhBwd2X2YXKWEWGwjdFqClV/mbfesZkbLZ4=;
+        b=tc9j5ZDhb1pghYVI2xhdaAQM7NfQEUyw43Vh+YWFioALohnpZ5YlXIeRGfusFqrm0m
+         fObxgSRo5Vwo9Qu/5EspYwMpCeoxzzFUKKJiFK01fRcAn1r0jl9MmdM6wvjV1KS1DhMr
+         nB/ynHhFhxkKN1Rdr0H6piWtSrBuJ08Lj4WgEfSEEWPHUjHY/cRXUdJMDwQajyI/gLqo
+         HD1/jhzMuLQPLc62T24dwjm4/BXI8sv3vt37UFGCQv1Cna+UN5bbB/64Bmruz51de3bX
+         3uj6J17QlwXhrbHbla7nFkuWhkMfPhAGrL6RYEneOzyvlCxB609bDDsjYP2yk5+3j7lE
+         pQuA==
+X-Gm-Message-State: AOJu0Yz7dGRZym/63nmE9ITnohRXgKANN31P6xQh+4sFznP8/pW+ipAf
+	vXNhw8D5kVZMQCN11bVta986vGO62l53Dsx2tVdjDV/YGe+yFhyxso+dvbbgsAXhVNryxIEu6l5
+	7w3Cp9D/e27moUowhSkJ3UTdOsAdYGNlGsBfz6IeUQpdQJZMG3sK3
+X-Gm-Gg: ASbGncswBFHmVD0HxCmQPmUyD3JZyGGoniph9yay55bp//0uBPrGZapuHDvHGFN893k
+	bZ0Nm0ttwR/OOYVbhE5JmkgsN1ngUGTT74cveON1jvrXP+oJf0wzCxPi51v+srJn4KbvJ0SdXEh
+	yQA05dYs7F4xxH7tzsOsl+vTqeNYSLClKKv3Hq+HmS0LQgCKfxmREdN9+XZg8lky8L8NAQu216w
+	XiLEDB2DxQOxNiVJ7fFKh0F1qn/c+XIsXsbVPYMscQnd5xGyBlHK+b7Hm/1GJTNAlHW0ZFbiEMC
+	8FBzx0EXuQ506iuNzQwZ0uMRZ3XQM63TlJr9StXz3Q==
+X-Google-Smtp-Source: AGHT+IF+JXhCtFUI7qIQoWLQaSp7IslKBmx1r2vGs1hjp44ssVnCEbbybY4kaM+WQWqB2rfGGO71/R3O8mVk
+X-Received: by 2002:a17:902:f652:b0:234:f580:9ed with SMTP id d9443c01a7336-235390e41b7mr1149165ad.21.1748562455933;
+        Thu, 29 May 2025 16:47:35 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-23506d37f6csm1336845ad.83.2025.05.29.16.47.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 15:33:47 -0700 (PDT)
-Date: Thu, 29 May 2025 15:33:45 -0700
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: James Smart <james.smart@broadcom.com>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Michael Liang <mliang@purestorage.com>,
-	Randy Jennings <randyj@purestorage.com>
-Subject: Re: [PATCH] block: Fix blk_sync_queue() to properly stop timeout
- timer
-Message-ID: <20250529223345.GA2013185-mkhalfella@purestorage.com>
-References: <20250529214928.2112990-1-mkhalfella@purestorage.com>
- <aDjcA_H7Ec9VICps@kbusch-mbp>
+        Thu, 29 May 2025 16:47:35 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 223603404BD;
+	Thu, 29 May 2025 17:47:35 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id D603DE4133B; Thu, 29 May 2025 17:47:34 -0600 (MDT)
+From: Uday Shankar <ushankar@purestorage.com>
+Date: Thu, 29 May 2025 17:47:17 -0600
+Subject: [PATCH v8 8/9] selftests: ublk: add stress test for per io daemons
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aDjcA_H7Ec9VICps@kbusch-mbp>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250529-ublk_task_per_io-v8-8-e9d3b119336a@purestorage.com>
+References: <20250529-ublk_task_per_io-v8-0-e9d3b119336a@purestorage.com>
+In-Reply-To: <20250529-ublk_task_per_io-v8-0-e9d3b119336a@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+ Caleb Sander Mateos <csander@purestorage.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Uday Shankar <ushankar@purestorage.com>
+X-Mailer: b4 0.14.2
 
-On 2025-05-29 16:13:23 -0600, Keith Busch wrote:
-> On Thu, May 29, 2025 at 03:49:28PM -0600, Mohamed Khalfella wrote:
-> > nvme-fc initiator hit hung_task with stacktrace above while handling
-> > request timeout call. The work thread is waiting for itself to finish
-> > which is never going to happen. From the stacktrace the nvme controller
-> > was in NVME_CTRL_CONNECTING state when nvme_fc_timeout() was called.
-> > We do not expect to get IO timeout call in NVME_CTRL_CONNECTING state
-> > because blk_sync_queue() must have been called on this queue before
-> > switching from NVME_CTRL_RESETTING to NVME_CTRL_CONNECTING.
-> > 
-> > It turned out that blk_sync_queue() did not stop q->timeout_work from
-> > running as expected. nvme_fc_timeout() returned BLK_EH_RESET_TIMER
-> > causing q->timeout to be rearmed after it was canceled earlier.
-> > q->timeout queued q->timeout_work after the controller switched to
-> > NVME_CTRL_CONNECTING state causing deadlock above.
-> > 
-> > Add QUEUE_FLAG_NOTIMEOUT queue flag to tell q->timeout not to queue
-> > q->timeout_work while queue is being synced. Update blk_sync_queue() to
-> > cancel q->timeout_work first and then cancel q->timeout.
-> 
-> I feel like this is a nvme-fc problem that doesn't need the block layer
-> to handle. Just don't sync the queues within the timeout workqueue
-> context.
+Add a new test_stress_06 for the per io daemons feature. This is just a
+copy of test_stress_01 with the per_io_tasks flag added, with varying
+amounts of nthreads. This test is able to reproduce a panic which was
+caught manually during development [1]; in the current version of this
+patch set, it passes.
 
-Agreed on nvme-fc should not sync queues within timeout work, and I am
-testing a patch to fix nvme-fc. At the same time blk_sync_queue() should
-provide a guarantee that q->timeout_work will not run after the function
-returns, no?
+Note that this commit also makes all stress tests using the
+run_io_and_remove helper more stressful by additionally exercising the
+batch submit (queue_rqs) path.
+
+[1] https://lore.kernel.org/linux-block/aDgwGoGCEpwd1mFY@fedora/
+
+Suggested-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+---
+ tools/testing/selftests/ublk/Makefile          |  1 +
+ tools/testing/selftests/ublk/test_common.sh    |  5 ++++
+ tools/testing/selftests/ublk/test_stress_06.sh | 36 ++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
+
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 5d7f4ecfb81612f919a89eb442f948d6bfafe225..1fb1a95d452c2e9a7ed78cb8b12be2b759074e11 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -38,6 +38,7 @@ TEST_PROGS += test_stress_02.sh
+ TEST_PROGS += test_stress_03.sh
+ TEST_PROGS += test_stress_04.sh
+ TEST_PROGS += test_stress_05.sh
++TEST_PROGS += test_stress_06.sh
+ 
+ TEST_GEN_PROGS_EXTENDED = kublk
+ 
+diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
+index 0145569ee7e9a45b41898c2c789842b4c8380f18..8a4dbd09feb0a885ec7539f1a285ed6f437fe3ab 100755
+--- a/tools/testing/selftests/ublk/test_common.sh
++++ b/tools/testing/selftests/ublk/test_common.sh
+@@ -278,6 +278,11 @@ __run_io_and_remove()
+ 	fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio \
+ 		--rw=randrw --norandommap --iodepth=256 --size="${size}" --numjobs="$(nproc)" \
+ 		--runtime=20 --time_based > /dev/null 2>&1 &
++	fio --name=batchjob --filename=/dev/ublkb"${dev_id}" --ioengine=io_uring \
++		--rw=randrw --norandommap --iodepth=256 --size="${size}" \
++		--numjobs="$(nproc)" --runtime=20 --time_based \
++		--iodepth_batch_submit=32 --iodepth_batch_complete_min=32 \
++		--force_async=7 > /dev/null 2>&1 &
+ 	sleep 2
+ 	if [ "${kill_server}" = "yes" ]; then
+ 		local state
+diff --git a/tools/testing/selftests/ublk/test_stress_06.sh b/tools/testing/selftests/ublk/test_stress_06.sh
+new file mode 100755
+index 0000000000000000000000000000000000000000..3aee8521032e3962b8b070cda8eb295b01e7b124
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_stress_06.sh
+@@ -0,0 +1,36 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++TID="stress_06"
++ERR_CODE=0
++
++ublk_io_and_remove()
++{
++	run_io_and_remove "$@"
++	ERR_CODE=$?
++	if [ ${ERR_CODE} -ne 0 ]; then
++		echo "$TID failure: $*"
++		_show_result $TID $ERR_CODE
++	fi
++}
++
++if ! _have_program fio; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "stress" "run IO and remove device with per_io_tasks"
++
++_create_backfile 0 256M
++_create_backfile 1 128M
++_create_backfile 2 128M
++
++ublk_io_and_remove 8G -t null -q 4 --nthreads 5 --per_io_tasks &
++ublk_io_and_remove 256M -t loop -q 4 --nthreads 3 --per_io_tasks \
++        "${UBLK_BACKFILES[0]}" &
++ublk_io_and_remove 256M -t stripe -q 4 --nthreads 4 --per_io_tasks \
++        "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++wait
++
++_cleanup_test "stress"
++_show_result $TID $ERR_CODE
+
+-- 
+2.34.1
+
