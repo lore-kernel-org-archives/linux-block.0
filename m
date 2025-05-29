@@ -1,86 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B0B2343C0;
-	Thu, 29 May 2025 19:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4208817C211
+	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 21:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748548501; cv=none; b=QhRN3L5klSyUoeKHd5YyQpw2L/+GOXvTjda9QHat4+QE9veNw+fc6mlL0oGBB/ogagGRBUwzHPHtcItVG5xNL/PZBx6EbjYT0Hq8SpzaW7wuIJ4+9NSZjNHjjWLlCilSso5a6RBhNRh5oc6DWVV2aIyH1pJwkvuUWyOTDNFaiy0=
+	t=1748553254; cv=none; b=FSWLH+IMSg226roxQB/Z0PdhLuVpN9brg6PsU0nS29stTtJHslIjn/hnx7zZz1UF/zJi1AT6rBZakdgyxBIa/9sjEDPvteYr6BgdDUD/cY/u+nKbE3PvgUEiBwwvmrkpHTQZ/Xwz4Bz2W4gBtyDh8pZCZxNc0Lhbgo9YDhaXmm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748548501; c=relaxed/simple;
-	bh=D8SsvetF0LkwPwk/o2VLlKNb33N8511Oz+YkmPV8GUY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=DqhpmBVBpvxYSDY/O3GoJGCW7/sm7RwxDtDWbRy4+13ofx15g3iWA9Up8hazjhGKgk6W9iTJdxKDantwIyaF3ANvGG1l5jfvkQDhf6Vv/KHN9sX4uRMj4QFfoc7ceVZ0DwqbPW95kNFQ9zMRJWbPaMK4+eYpmbVuJjb6hZdN2eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oO8snhQs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748553254; c=relaxed/simple;
+	bh=IcWvkHv4EQaW2hd7IC+w6MzT7w6ILDs3isBRTOIkpP8=;
+	h=From:Message-Id:Content-Type:Mime-Version:Subject:Date:
+	 In-Reply-To:Cc:To:References; b=RSmk1i6NDUzeNiopCoRKGlVDQQchFN1dtEmlTPWqqbXfSaDan+TuHv0VXITYaL/OYrWTTwJYlyge5djkefsUGpj+sH4rijaXEhUhSiF2gr18jSbZhhXCJOJk8tWMAt/dW96HvybwSKK8vRbyJ/Wz/hx5GyDpjBSyJJc2QL6voZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dilger.ca; spf=pass smtp.mailfrom=dilger.ca; dkim=pass (2048-bit key) header.d=dilger-ca.20230601.gappssmtp.com header.i=@dilger-ca.20230601.gappssmtp.com header.b=xUPRqjAK; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dilger.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dilger.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oO8snhQs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F34FCC4CEE7;
-	Thu, 29 May 2025 19:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748548501;
-	bh=D8SsvetF0LkwPwk/o2VLlKNb33N8511Oz+YkmPV8GUY=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=oO8snhQswGTgq78meJIA9ZSu9eqOFykj215dnh4QwmSV+epEYU7IN6EzWpf7CZNNJ
-	 7vPEKCAzuq7hYpTn6yZavGV1hJzBXnVsB1G+OzyF8phQ+TmtPQAmfFBzHSJeAndtkh
-	 DHlEig9beK9+TTZtwIgTnbLseZji0SvEZS4ErDh0RqeHnIGR6ESNjhZACG/ydXcuC2
-	 0QfamjvRgYjtiLdMsn4t2hoho0R2KXX+IgRONNvkwQ7YJ2OcPEIHuiyHA3oK+g+y32
-	 EDxAzWY8nRcwV2lQOTU2zL7Uwb3NQl+tAhqAvVfvHX/wMY/y/ILi7TXCtuhAoY9xHr
-	 C8VzEvj6NRxvw==
+	dkim=pass (2048-bit key) header.d=dilger-ca.20230601.gappssmtp.com header.i=@dilger-ca.20230601.gappssmtp.com header.b="xUPRqjAK"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-73bf5aa95e7so1057897b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 14:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dilger-ca.20230601.gappssmtp.com; s=20230601; t=1748553251; x=1749158051; darn=vger.kernel.org;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k13so8TshT1eDVx+t10ev/4ZziKErXzgHkssataT8+c=;
+        b=xUPRqjAKFA1wh6WIda3V42PpS884iIG0GaiS9LQ8ySf1KvnKYzuQ7l2wmjbk180MAL
+         Dia+QwJSK/2Yeivj6M2m68O6oJQ+1xSi2sfW0sG0muzbiD121VblZUMwj3ZWmbFml3ZO
+         9h5Fxh7lzetYND87Y/ID/SOfli71gtbhobm3g5Hvt0mddtTbaA2ylHGtqwki56akeeBC
+         UiwBY1a/P3CeQkz+SdkrnUCaDNUrOgncDmddRUaunoUquPbLo2qMIGrt376Bf4xTQlbo
+         r//a3C8gUMmAsSqvzp7/McgOxR2Mo0tCtYkaSmF0tkKZ7DXqvUWgUH9pXevaty0a/HK3
+         tojg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748553251; x=1749158051;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k13so8TshT1eDVx+t10ev/4ZziKErXzgHkssataT8+c=;
+        b=Yl8IQpfu8mToSzf+T1OzGKOUWZf0G0JWAzJNpDNpRM9gB4++rm3vpMT5PgvSsdd6T5
+         WLFIuIwqUCJV9SC72NUjM1cLAUzoETlHlhwCb0L1O7guqkr+7gofX+/adcdrgZUD02KY
+         WEtaTplTcMP12F30TWBwP4FygXVcV1nnt99lMcVt/+9mEkrLbpXZfkG2zN2zq87Ko3UT
+         sOzftEuOgX43lJsXzxpWV6ohd7UpoajMVa5g3yvKiTM1NkLOwwT0F4rpc6QOpwdU5mi/
+         j2cmrmt/jn7o5pB4BbjzGR4DENPSrX7msPwm9f+PAfLbS2jSpbz/PfNOjghQG6s3OmkZ
+         goEA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1vM8auLgdiccuHIunVUQ0m1YGoMKm0MW+nvTh+S0/FkkOpsKYx3v/jszNtxnR0L+pLBjQgi7El9LAwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY34FCAppIZxpskrNja0dWpVMrGaqmW8nKgJl25ahjYif8q/Ls
+	ifahPwY7J5OIoPliW4+riRLI9OKa8f1/rfTnwZjaFpNwM5wKF1Z8eRh/56CY+tcB8R4=
+X-Gm-Gg: ASbGnctFTYbGn393j1z5J3G0g3gSoOteBfXhGcqWyaplz6DqQaKYNS7W0Z+kBJmgmgM
+	ujAKthrdFXp2TEsECPKKOrKsr83PieEWFQGQEqdiimvO+qzEulaV7+pY/ATDeJPqm2BdYpPQVGz
+	OkbD4A+VvJEKrYw+42rigAusxWFSxIyWLJScWF6DJmNUu06HiZsEA6yfENdrZxi/3O89j4bfrfm
+	0KcFeBBplSxhIdOzrPEROvogg8x4JckrT8EX0hL0FtYBRpQht0gBLZwPe/Krwj3uW6tsGeCt/YE
+	DF5Jo1xAvRTUKSZ8o7sTDoUroHYrVI2/9qgra8AYK0bTFBDjS7ZZuJnfgLvYmSYEbOpVT4aczax
+	ujzbkYF76mcH1V1RepZm+8+xbq6GCu4pzZXY=
+X-Google-Smtp-Source: AGHT+IFZXygM8o2ZP8ClV1PZVjKlGcHa0EumKVgCbBI6DcEFEWHU8NMBYlJWcaU3sD+9lQobu1+E2g==
+X-Received: by 2002:a05:6a21:3a87:b0:218:bbb:c13c with SMTP id adf61e73a8af0-21ad986aec2mr1399879637.38.1748553251303;
+        Thu, 29 May 2025 14:14:11 -0700 (PDT)
+Received: from cabot.adilger.int (S01068c763f81ca4b.cg.shawcable.net. [70.77.200.158])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afe96781sm1764900b3a.29.2025.05.29.14.14.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 29 May 2025 14:14:10 -0700 (PDT)
+From: Andreas Dilger <adilger@dilger.ca>
+Message-Id: <BCCFF489-A00D-4C35-869D-330B17D3E5A3@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_E2DDAFA0-57A7-415A-98D8-F95A6F923FC8";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC] add ioctl to query protection info capabilities
+Date: Thu, 29 May 2025 15:14:07 -0600
+In-Reply-To: <fec86763-dd0e-4099-9347-e85aa4a22277@samsung.com>
+Cc: Martin Petersen <martin.petersen@oracle.com>,
+ jack@suse.cz,
+ anuj1072538@gmail.com,
+ axboe@kernel.dk,
+ viro@zeniv.linux.org.uk,
+ brauner@kernel.org,
+ hch@infradead.org,
+ linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org,
+ joshi.k@samsung.com
+To: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
+References: <CGME20250527105950epcas5p1b53753ab614bf6bde4ffbf5165c7d263@epcas5p1.samsung.com>
+ <20250527104237.2928-1-anuj20.g@samsung.com>
+ <yq1jz60gmyv.fsf@ca-mkp.ca.oracle.com>
+ <fec86763-dd0e-4099-9347-e85aa4a22277@samsung.com>
+X-Mailer: Apple Mail (2.3273)
+
+
+--Apple-Mail=_E2DDAFA0-57A7-415A-98D8-F95A6F923FC8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 29 May 2025 21:54:56 +0200
-Message-Id: <DA8WPLS2R7K3.2T94MJM71BXI0@kernel.org>
-Cc: "Andreas Hindborg" <a.hindborg@kernel.org>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Gary Guo"
- <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Alice Ryhl" <aliceryhl@google.com>, "Trevor
- Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>, "Jens
- Axboe" <axboe@kernel.dk>, "Fiona Behrens" <me@kloenk.dev>, "Christian
- Schrefl" <chrisi.schrefl@gmail.com>, <linux-block@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] change blanket impls for `[Pin]Init` and add one
- for `Result<T, E>`
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Boqun Feng" <boqun.feng@gmail.com>
-X-Mailer: aerc 0.20.1
-References: <20250529081027.297648-1-lossin@kernel.org>
- <20250529081027.297648-2-lossin@kernel.org>
- <aDixS9Fp-fZxet7m@winterfell.localdomain>
-In-Reply-To: <aDixS9Fp-fZxet7m@winterfell.localdomain>
+Content-Type: text/plain;
+	charset=us-ascii
 
-On Thu May 29, 2025 at 9:11 PM CEST, Boqun Feng wrote:
-> On Thu, May 29, 2025 at 10:10:24AM +0200, Benno Lossin wrote:
->> Remove the error from the blanket implementations `impl<T, E> Init<T, E>
->> for T` (and also for `PinInit`). Add implementations for `Result<T, E>`.
->>=20
->> This allows one to easily construct (un)conditional failing
->> initializers. It also improves the compatibility with APIs that do not
->> use pin-init, because users can supply a `Result<T, E>` to a  function
->> taking an `impl PinInit<T, E>`.
->>=20
->> Suggested-by: Alice Ryhl <aliceryhl@google.com>
->> Link: https://github.com/Rust-for-Linux/pin-init/pull/62/commits/5861251=
-4b256c6f4a4a0718be25298410e67387a
->> [ Also fix a compile error in block. - Benno ]
->> Signed-off-by: Benno Lossin <lossin@kernel.org>
->
-> The patch title is missing a "rust:" tag... but you can fix that in PR.
+On May 29, 2025, at 1:12 AM, Anuj Gupta/Anuj Gupta =
+<anuj20.g@samsung.com> wrote:
+> +/* Protection info capability flags */
+> +#define	FILE_PI_CAP_INTEGRITY		(1 << 0)
+> +#define	FILE_PI_CAP_REFTAG		(1 << 1)
+> +
+> +/* Checksum types for Protection Information */
+> +#define FS_PI_CSUM_NONE			0
+> +#define FS_PI_CSUM_IP			1
+> +#define FS_PI_CSUM_CRC			2
+> +#define FS_PI_CSUM_CRC64		3
+> +
+> +/*
+> + * struct fs_pi_cap - protection information(PI) capability =
+descriptor
+> + * @flags:			Bitmask of capability flags
+> + * @interval:			Number of bytes of data per PI =
+tuple
+> + * @csum_type:			Checksum type
+> + * @metadata_size:		Size in bytes of the metadata associated =
+with each
+> interval
+> + * @tag_size:			Size of the tag area within the =
+tuple
+> + * @pi_offset:			Offset of protection information =
+tuple within the metadata
+> + * @ref_tag_size:		Size in bytes of the reference tag
+> + * @storage_tag_size:		Size in bytes of the storage tag
+> + * @rsvd:			Reserved for future use
+> + */
+> +struct fs_pi_cap {
+> +	__u32	flags;
 
-Good catch, I originally ported this patch with my script, but then I
-decided to squash upstream and then copied the commit message from
-there, removing the prefix...
+Minor nits on the struct.
+
+It would be preferable to have a struct prefix on these fields, like =
+"fpc_"
+so that tags for "flags" don't return a million different structs.
+
+> +	__u16	interval;
+> +	__u8	csum_type;
+> +	__u8	tuple_size;
+> +	__u8	tag_size;
+> +	__u8	pi_offset;
+> +	__u8	ref_tag_size;
+> +	__u8	storage_tag_size;
+> +	__u8	rsvd[4];
+> +};
+
+It seems strange to have padding to align this struct to a 20-byte size.
+Having 4 bytes of padding is probably insufficient for future expansion
+(e.g. just a single int if that was needed), and 20 bytes isn't exactly
+a "normal" power-of-two size.
+
+Since ioctls take the size of the struct, you could either remove rsvd
+entirely, and use the struct size to "version" the ioctl if it needs to
+change (at the cost of consuming more ioctls), or expand the struct to
+be large enough to allow proper expansion in the future, like 32 bytes
+with fpc_rsvd[24] (using "flags" to indicate the validity of the new =
+fields).
+
+>  #define FS_IOC_GETFSSYSFSPATH		_IOR(0x15, 1, struct =
+fs_sysfs_path)
+> +/* Get protection info capability details */
+> +#define FS_IOC_GETPICAP			_IOR('f', 3, struct =
+fs_pi_cap)
+
+Note that _IOR('f', 3, int) is already used as EXT4_IOC32_GETVERSION, =
+though
+this does not strictly conflict because of the different struct size.
+
+At a minimum, FS_IOC_GETPICAP should be declared right after =
+FS_IOC_SETFLAGS
+_IOR('f', 2,) so that it is clear that _IOR('f', 3,) is used.
+
+However, in Documentation/userspace-api/ioctl/ioctl-number.rst it =
+reports
+that 'f' 00-1f is reserved for ext4, while 0x15 00-ff is reserved for =
+generic
+FS_IOC_* ioctls, so that would be the better one to use.  Currently only
+_IOR(0x15, 0,) and _IOR(0x15, 1,) are used, so _IOR(0x15, 3) should be =
+safe.
+
+Cheers, Andreas
 
 
-> Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 
-Thanks!
 
----
-Cheers,
-Benno
+
+
+--Apple-Mail=_E2DDAFA0-57A7-415A-98D8-F95A6F923FC8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAmg4zh8ACgkQcqXauRfM
+H+CuuQ//ReiCU3lVfW3j5pXy+ccxld+vI1SDMkl9snP5GKG5m67fu2dAecS1aodt
+erJVStpAPxjFXxAPgB91Q0iB4VcEI2D2U5m44nK44z9SN6jd6Hvw9xs4F+uha/4R
+p/Cz/TxFyB53mofFwpFpbZcovOXhHpFK1KKskUk7FsI5oPMOiSyn/6O1u1vwpKKU
+GFLIUpg5gH0OHiLrOeZKdbqoHnWBZ5q3QVYRtynpsqIeeJDeNXIY156mOrGhPLus
+TAopfeYcq3KvxSvF8Y/f3y1l/85/oC6WXTSDLC5OWzmD20CYldr80PosSJQu0Eip
+J4paeOOLF1IcfMsFh7BEPTLegkelaY4eT6+O6cf2E3ZuWiQ7PtYc2Gi9Wt0uTnQG
+1PMxgnYjSN8f910RLIOMkU3Oyt9jpz4C16f9sTtGU/m1N4JB43mXOMN4RoKLhMF7
+NCt1vnw85VKqrJYqgZwvKfampaTD/BS1mSehGV/Hkn8oD6bunGuC8ccn/RFKoVhA
+y5Kx/yq59pksVJzslcIO91kmsW9hm8cbj63S8jnTp5MtDFD9x4SSL88WdMEPDtMe
+PS65k464r1UV0DYQIgQvtbQyiWGLJk1MVodBsL9E0WBvYxfPLMLzs2ocZcT9gKVe
+LAyupgLpBlI+vMXFMr9x9nL0cEEC5LgmR26L4GSpHmQBxbYCHeg=
+=C2e2
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_E2DDAFA0-57A7-415A-98D8-F95A6F923FC8--
