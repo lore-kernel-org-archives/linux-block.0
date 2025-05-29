@@ -1,212 +1,291 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8E7249E5
-	for <linux-block@vger.kernel.org>; Thu, 29 May 2025 21:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED1C1AF0C8;
+	Thu, 29 May 2025 22:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748555424; cv=none; b=a6z6uVv9s8s7ICNofwng5+Up53DlLyf+L5LYLhcnmC5W180LNJfAJ8/37t6jgV7S4Yjf+uGadoSadgDfHNUauIjxsU5rWke6jGVtsF4YuDvWTSYwpT2A0mx7TPqETQsYLbER/SU/cLGzR0qRFNyD7IEHUwwzHH0LidM40WCkFZQ=
+	t=1748556515; cv=none; b=HymqUhZVzE24jicSVuuQgLwVY/GTbi4EKqvgMJ7P8lPyz0O2j+JDTT4tHY88LPBZ1kiIdap+qkVkzSNyR0bwPl4T/mdXtlmwhChMczcPXN4zE03NEKG5pl6tg/LiF8DbA3TEi/nHoZYxXbrrxvofqOCXQWmPm829f1q4oIS+M4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748555424; c=relaxed/simple;
-	bh=x+sIJSNwulo3ssa5P9RyaxIrMG2iFN9nT6hHod6g0Ho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hIphhISI5UDtWoHv9GmQ+E5Q9H9K+tnIAMSm0XSHQexSGPKnSIQotXtMriU0eFIicwOBJ2q+Sd1iW67MakREogSP1LbE/3X1iHNChtpbNfWdtGdSxcC0bb4V+NfcbBHNpdozAgT57rYJcMy1jOVIdxmwqTHEdAR87SaiWtf0muQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gDiKd1/7; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1748556515; c=relaxed/simple;
+	bh=M0tbtdLApdJAq/4ogJahNv+Hgt/JeFqIHwEJhoEDBdQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BXnLimkf8PpBuMa5tcDgyuZuX1fxQuRHU+/BWMoS4VqhuCHYUAbwAWyhvTE5BwKHBHmQ/72cx8staZLAJ6GJ0jcXJ++aiGImOD88AfTNTZsSt7bb7hLxmQo/tYlTfbVf4jLo0CaLoxDLBizaUSyEkXgBWF5i8KL7jKZZCYM5ZMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eiXfxJ6W; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gDiKd1/7"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-231e8553248so14280955ad.1
-        for <linux-block@vger.kernel.org>; Thu, 29 May 2025 14:50:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiXfxJ6W"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32a63ff3bdfso10096961fa.3;
+        Thu, 29 May 2025 15:08:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1748555420; x=1749160220; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rP04lYlYhCzSKYbIYDEOX6Aw1AXsd7vtsQQ8TB3garM=;
-        b=gDiKd1/7T8j7pDdtqf1JV1RDGO7WzTj4GRjmAA8GThzbNv0gWlGihQufGgKBO4BvkQ
-         +Urvt6zTV6jMRcAmkNo4ekdFmdMNH1vIDNsTztLrJB7K8lFDl61a2JnN8Uz9u4D6FeyK
-         VHkJRPBWuzQYXYAxm59gLxIgHfVUQXiZV7RTQKEgu7PiXS9Th+JZZ8VpmynGvLTNQgdf
-         ddjk9sIt/yZcRoZqYFV8qHejmwnjYid3pEc+U12iSUvu+vY9eoavNjvUpQnSqagH92yF
-         dpDGa3Ja/+CBU0IJz1L1A5WoPFYJ2CF31ZyzZaS0H9l7junNduUHmEn26MundbQrv974
-         xbJw==
+        d=gmail.com; s=20230601; t=1748556510; x=1749161310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rpJVcptDcpTpszgwiBlbfF17mFy9KW509xkzZ9NUjik=;
+        b=eiXfxJ6WeQcEoq232QqFmHB4GXmoObkb0md3lMdmOpYB+3XoubUPt0JSJ5KRnnPkIO
+         tEB0EGwYqgvch37afi+h4w+yLUfIg10Az7chHl87igpdpNtiUB2Anb1t1Wp7fDWE6bDI
+         haGvJWfINY18JtyjOCpAvZEGjCgHWcNr7BGHIM/durFQVA1/DUQJPomMY3HFwvuZTtpZ
+         ZO/OfjYUGp9Dne5SIbYYbadJ2mO4xeDbg24RxW/21glAVMMMKSogUYdD0zp/DKVyFg4u
+         pdx8OpuDKc0TTOjWjpBlSCzf1MkUjZof/cMMvrEHWFJ+L63Rhcyu7RmhezAMAPZloHC7
+         W4fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748555420; x=1749160220;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rP04lYlYhCzSKYbIYDEOX6Aw1AXsd7vtsQQ8TB3garM=;
-        b=fnN8lmYv6OqVGF0/hk6xyBXhmVmbWmtbfT2xSrLlydHrFM+/utgFfYFAT87eGbpwfP
-         mF/Goj3netO/XhxIcawS0S5wrlRhK/FXf3GPzcIN3TyR5pGbpeR8fwY2QHVxpCqC7Pu5
-         hZf3BuNcvyOJNUbHCa/UFOJShx4xJ3B0C/YiiQCqgpZcCXGiY0IXBz0qmxT9LBvaavJo
-         c6DaC5AoZs+aSVl0waZsm1niZZUF7wUZ0uVkOSaXLAnM4Mi/ITdo+4dgl0xZw+bgTePz
-         n+BH/xGgTWLap6K2KGPWTjuheUyO9m5Eh81PmYgxDXv94QEPFAp72SJFMJ9JCJcGvRo8
-         Vlrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcvBvCxE8Tnw+TBvr9WqKXFmz9PHADOQV2JrD56rcFVXtc0W9BIXTKH9ITa5G8UaoB4wT2L+c3ZtzPsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXHCyN8aA2u27NU+a5VVwf2H/GvAVDlzLAyxldeGL7GlGeZJmo
-	fqe0VburQeoCsbIqPrfaSVvTtR9yUVBbYHJgawBEDu/DCroPkYz0WPoRgTyfWHzt+d8=
-X-Gm-Gg: ASbGncs69WiVllE/2XF0l+BNIY9aajy8tfq3vVtN5ItP1a2h6+PMhy13JsfU7JKSgXF
-	yI7yhYrbNI+ipkqAaLIgWK2AQz3KF3PRaodqIgn0Y2/wf49nkkz70mufG/ewnUJ0h4VG3IFvJ4n
-	+CWv1HGV0zfqv2+UDAlESowup2FcMidsKha5ksg8RkZ3x30x3dphkKdVUUYqf0mBBPaimbDi3gh
-	Vdzrs7R/ysEtAzy2vSJ6iTyFgiZeXCx9RnXFR2DJQDMMOqQlfGQLQfQdTPKh0Lv4LzAgGLkZUWy
-	EQwmfFhs3fDMRaeU8Z5obL8zvjQMsaPfryWVhZCmGvAbSXu1rLcUKFsh3V8d3aOfCW00K9QYJQc
-	=
-X-Google-Smtp-Source: AGHT+IG0nN5FxWPpsof9ZPbRsP2V6n/QqXkYMji1Ib8QOq0dFqjz8mtVxzH2o1QOtFy+/EyOLFY7nw==
-X-Received: by 2002:a17:902:d4c1:b0:235:7c6:ebbf with SMTP id d9443c01a7336-23529506db3mr16952215ad.35.1748555420519;
-        Thu, 29 May 2025 14:50:20 -0700 (PDT)
-Received: from dev-mkhalfella.purestorage.com ([2620:125:9007:640:ffff::a2e9])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-23506cf523esm16698255ad.170.2025.05.29.14.50.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 14:50:19 -0700 (PDT)
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: James Smart <james.smart@broadcom.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Mohamed Khalfella <mkhalfella@purestorage.com>,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Michael Liang <mliang@purestorage.com>,
-	Randy Jennings <randyj@purestorage.com>
-Subject: [PATCH] block: Fix blk_sync_queue() to properly stop timeout timer
-Date: Thu, 29 May 2025 15:49:28 -0600
-Message-ID: <20250529214928.2112990-1-mkhalfella@purestorage.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1748556510; x=1749161310;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rpJVcptDcpTpszgwiBlbfF17mFy9KW509xkzZ9NUjik=;
+        b=nOMd6SiZO1z4Tu7tRuirb0lXgZx1jd1jO5CyU2eAvbINkg7CaSLu3dRdnFNipu04Me
+         TNPAyBFeoCis5aUg/3XgZi2hQlISAwfFsTZLvL/Q+pWm99dhSepGxpdHEjBYExK1V/YV
+         dKaFowQs9z/OoGBzqmKkSuS4ennjObXp6iNR0whKztRcLwCympG0f062TVBN6rwpFlCY
+         S19+NWuuSXe6D2fnXe9OUiwWahNqeVD+YH7HLkUWKa4lLhE3GnBcB5TpTgrZA3VdzqV1
+         lGV9b+DEjgCnLUcSaKadurPKZIMzxk05mAH8AuB45DKSQGzIEAiYbimf5ZDJpEUKPcL3
+         Is/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUAQ8pbkFrAk07zJeQHBTkSsF+xnRBvRxRaDHGEXPoksGXZuRkyo2HEnK2BEndz4E32nbXm3MFfaPWOfAoB@vger.kernel.org, AJvYcCULq+o+pmpGHDjuVcwRPZ2Q9zlYGCx+UDw2N38vuHaIB/Cmfskpmi2CbfVZ1goUVPFrEa1YaNne7NVKxYQ=@vger.kernel.org, AJvYcCVQaDcgmS+9wYmzVw7Sskysn0iJir/OJJ03QQ92rSV2bg8ZOAOgOOD32aQYeiELheZaCpSPXVAy@vger.kernel.org, AJvYcCVjSgH9eZZ4bBxaaHurmGPO+TnsM1BO9HpSCwqdHxeUBXwynSKWpmM/NIt8QClHLdW0+YR2PudOZWp0K4dY6bKm@vger.kernel.org, AJvYcCVjcrECEaFBdZtolDUYuXDList+ZPWGUhGarBqPksaFr8ZTxXYFA7SeEfHKWBAi6+LOBwnSP193amY1/y1hXh8=@vger.kernel.org, AJvYcCXGcqIlnB0yF0pk27+sMe4aTiQ5hEjQrBPhEvVA4F1vW0CQcjSOZ5BnKxnC7chlzoPWwVvPB7CEgyp7@vger.kernel.org, AJvYcCXWYhrxbZ2M4QQkbMFx6EVTSC9NiZcdMMdSc+7bpD3hAtFK2hEEbtccub7NmsHae1oirLtmo3mpqVDe@vger.kernel.org
+X-Gm-Message-State: AOJu0Yylq/AdtOfHquUclaUDVUua7ynrBUy++jS57qF6FgD43kH2FjaF
+	/5PoqUU2H4CMnJeXBrxOKeW3FiskNQYH8LDDTOCAWaCv1DzmfvMebWGDo/CiCTnQUWl4+hfeTkt
+	HvY6OwG81Eh+Lh8t67zQjixgPX5uq78E=
+X-Gm-Gg: ASbGnctRZrHEbWRJum7HsqC0X96HB/oIBVp9ZHjuLOCGdGZ6Kxtnhrh/l42atafjbdt
+	JyiCEhInG3f4XZ1/mvHGI6Z0pr6Nrxwzwa+fYqA9DuLS3A0Soau663FJChqoWa9vA28NBPVxgts
+	DSrFx5BVGfsgOTZGd53lVAGuDxNV3yEIPjkjBGtFGhpHjh1s662pSmwop7F2DnTyWgXQ==
+X-Google-Smtp-Source: AGHT+IF7xscUHJvyGi+GvuMMKxSnSgP5AcyU3GpJtxmnO/5KSLUzYGntXscHYyM85fadDL0Kyjmy6YDgmBtNFpFE8dI=
+X-Received: by 2002:a2e:b8c6:0:b0:32a:8916:55a1 with SMTP id
+ 38308e7fff4ca-32a8cd3fd89mr5150041fa.7.1748556509725; Thu, 29 May 2025
+ 15:08:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
+ <20250524-cstr-core-v10-2-6412a94d9d75@gmail.com> <DA66BBX1PDGI.10NHLG3D4CIT7@kernel.org>
+ <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
+ <DA6GSMHMLRFM.YH9RGZWLY2X4@kernel.org> <CAJ-ks9nTf4dCoDdg4+YSkXM1sJsZ-0vuSC7wybc2JMAoGemhXQ@mail.gmail.com>
+ <DA78MDRNCNB8.X69904APMYCB@kernel.org>
+In-Reply-To: <DA78MDRNCNB8.X69904APMYCB@kernel.org>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Thu, 29 May 2025 18:07:52 -0400
+X-Gm-Features: AX0GCFu41pC0z7_KQ2CYQPyB1pil2qNhuH6L70S1ECJZkmQT9P0P8s6oLTTUl3c
+Message-ID: <CAJ-ks9=OsopMhr6Ui3PLD-ZkBo736ha9Ltkw=0ZaBzrQLC60Eg@mail.gmail.com>
+Subject: Re: [PATCH v10 2/5] rust: support formatting of foreign types
+To: Benno Lossin <lossin@kernel.org>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[ 5084.255110] INFO: task kworker/42:1H:914 blocked for more than 917 seconds.
-[ 5084.255563]       Not tainted 5.14.0-503.22.1mk.el9.x86_64 #6
-[ 5084.255966] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[ 5084.256421] task:kworker/42:1H   state:D stack:0     pid:914   tgid:914   ppid:2      flags:0x00004000
-[ 5084.256794] Workqueue: kblockd blk_mq_timeout_work
-[ 5084.257200] Call Trace:
-[ 5084.257557]  <TASK>
-[ 5084.257909]  __schedule+0x229/0x550
-[ 5084.258322]  schedule+0x2e/0xd0
-[ 5084.258665]  schedule_timeout+0x11f/0x160
-[ 5084.259003]  __wait_for_common+0x90/0x1d0
-[ 5084.259414]  ? __pfx_schedule_timeout+0x10/0x10
-[ 5084.259740]  __flush_work.isra.0+0x160/0x230
-[ 5084.260072]  ? __pfx_wq_barrier_func+0x10/0x10
-[ 5084.260390]  __cancel_work_sync+0x104/0x1a0
-[ 5084.260701]  ? __timer_delete_sync+0x2c/0x40
-[ 5084.261008]  nvme_sync_io_queues+0x53/0xa0 [nvme_core]
-[ 5084.261399]  __nvme_fc_abort_outstanding_ios+0x1b8/0x250 [nvme_fc]
-[ 5084.261700]  nvme_fc_error_recovery+0x2d/0x50 [nvme_fc]
-[ 5084.261997]  nvme_fc_timeout.cold+0x12/0x24 [nvme_fc]
-[ 5084.262353]  blk_mq_handle_expired+0x7e/0x160
-[ 5084.262637]  bt_iter+0x8b/0xa0
-[ 5084.262912]  blk_mq_queue_tag_busy_iter+0x2b8/0x590
-[ 5084.263224]  ? __pfx_blk_mq_handle_expired+0x10/0x10
-[ 5084.263490]  ? __pfx_blk_mq_handle_expired+0x10/0x10
-[ 5084.263748]  ? __call_rcu_common.constprop.0+0x210/0x2b0
-[ 5084.264002]  blk_mq_timeout_work+0x162/0x1b0
-[ 5084.264307]  process_one_work+0x194/0x380
-[ 5084.264550]  worker_thread+0x2fe/0x410
-[ 5084.264788]  ? __pfx_worker_thread+0x10/0x10
-[ 5084.265019]  kthread+0xdd/0x100
-[ 5084.265306]  ? __pfx_kthread+0x10/0x10
-[ 5084.265527]  ret_from_fork+0x29/0x50
-[ 5084.265741]  </TASK>
+On Tue, May 27, 2025 at 4:49=E2=80=AFPM Benno Lossin <lossin@kernel.org> wr=
+ote:
+>
+> On Tue May 27, 2025 at 5:02 PM CEST, Tamir Duberstein wrote:
+> > On Mon, May 26, 2025 at 7:01=E2=80=AFPM Benno Lossin <lossin@kernel.org=
+> wrote:
+> >> On Tue May 27, 2025 at 12:17 AM CEST, Tamir Duberstein wrote:
+> >> > On Mon, May 26, 2025 at 10:48=E2=80=AFAM Benno Lossin <lossin@kernel=
+.org> wrote:
+> >> >> On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
+> >> >> > +impl_display_forward!(
+> >> >> > +    bool,
+> >> >> > +    char,
+> >> >> > +    core::panic::PanicInfo<'_>,
+> >> >> > +    crate::str::BStr,
+> >> >> > +    fmt::Arguments<'_>,
+> >> >> > +    i128,
+> >> >> > +    i16,
+> >> >> > +    i32,
+> >> >> > +    i64,
+> >> >> > +    i8,
+> >> >> > +    isize,
+> >> >> > +    str,
+> >> >> > +    u128,
+> >> >> > +    u16,
+> >> >> > +    u32,
+> >> >> > +    u64,
+> >> >> > +    u8,
+> >> >> > +    usize,
+> >> >> > +    {<T: ?Sized>} crate::sync::Arc<T> {where crate::sync::Arc<T>=
+: fmt::Display},
+> >> >> > +    {<T: ?Sized>} crate::sync::UniqueArc<T> {where crate::sync::=
+UniqueArc<T>: fmt::Display},
+> >> >> > +);
+> >> >>
+> >> >> If we use `{}` instead of `()`, then we can format the contents
+> >> >> differently:
+> >> >>
+> >> >>     impl_display_forward! {
+> >> >>         i8, i16, i32, i64, i128, isize,
+> >> >>         u8, u16, u32, u64, u128, usize,
+> >> >>         bool, char, str,
+> >> >>         crate::str::BStr,
+> >> >>         fmt::Arguments<'_>,
+> >> >>         core::panic::PanicInfo<'_>,
+> >> >>         {<T: ?Sized>} crate::sync::Arc<T> {where Self: fmt::Display=
+},
+> >> >>         {<T: ?Sized>} crate::sync::UniqueArc<T> {where Self: fmt::D=
+isplay},
+> >> >>     }
+> >> >
+> >> > Is that formatting better? rustfmt refuses to touch it either way.
+> >>
+> >> Yeah rustfmt doesn't touch macro parameters enclosed in `{}`. I think
+> >> it's better.
+> >
+> > OK, but why? This seems entirely subjective.
+>
+> If more types are added to the list, it will grow over one screen size.
+> With my formatting, leaving related types on a single line, that will
+> only happen much later.
+>
+> >> >> > +/// Please see [`crate::fmt`] for documentation.
+> >> >> > +pub(crate) fn fmt(input: TokenStream) -> TokenStream {
+> >> >> > +    let mut input =3D input.into_iter();
+> >> >> > +
+> >> >> > +    let first_opt =3D input.next();
+> >> >> > +    let first_owned_str;
+> >> >> > +    let mut names =3D BTreeSet::new();
+> >> >> > +    let first_lit =3D {
+> >> >> > +        let Some((mut first_str, first_lit)) =3D (match first_op=
+t.as_ref() {
+> >> >> > +            Some(TokenTree::Literal(first_lit)) =3D> {
+> >> >> > +                first_owned_str =3D first_lit.to_string();
+> >> >> > +                Some(first_owned_str.as_str()).and_then(|first| =
+{
+> >> >> > +                    let first =3D first.strip_prefix('"')?;
+> >> >> > +                    let first =3D first.strip_suffix('"')?;
+> >> >> > +                    Some((first, first_lit))
+> >> >> > +                })
+> >> >> > +            }
+> >> >> > +            _ =3D> None,
+> >> >> > +        }) else {
+> >> >> > +            return first_opt.into_iter().chain(input).collect();
+> >> >> > +        };
+> >> >>
+> >> >> This usage of let-else + match is pretty confusing and could just b=
+e a
+> >> >> single match statement.
+> >> >
+> >> > I don't think so. Can you try rewriting it into the form you like?
+> >>
+> >>     let (mut first_str, first_lit) match first_opt.as_ref() {
+> >>         Some(TokenTree::Literal(lit)) if lit.to_string().starts_with('=
+"') =3D> {
+> >>             let contents =3D lit.to_string();
+> >>             let contents =3D contents.strip_prefix('"').unwrap().strip=
+_suffix('"').unwrap();
+> >>             ((contents, lit))
+> >>         }
+> >>         _ =3D> return first_opt.into_iter().chain(input).collect(),
+> >>     };
+> >
+> > What happens if the invocation is utterly malformed, e.g.
+> > `fmt!("hello)`? You're unwrapping here, which I intentionally avoid.
+>
+> That example won't even survive lexing (macros always will get valid
+> rust tokens as input). If a literal begins with a `"`, it also will end
+> with one AFAIK.
+>
+> >> Yes it will error like that, but if we do the replacement only when th=
+e
+> >> syntax is correct, there also will be compile errors because of a
+> >> missing `Display` impl, or is that not the case?
+> >
+> > I'm not sure - I would guess syntax errors "mask" typeck errors.
+>
+> I checked and it seems to be so, that's good.
 
-nvme-fc initiator hit hung_task with stacktrace above while handling
-request timeout call. The work thread is waiting for itself to finish
-which is never going to happen. From the stacktrace the nvme controller
-was in NVME_CTRL_CONNECTING state when nvme_fc_timeout() was called.
-We do not expect to get IO timeout call in NVME_CTRL_CONNECTING state
-because blk_sync_queue() must have been called on this queue before
-switching from NVME_CTRL_RESETTING to NVME_CTRL_CONNECTING.
+=F0=9F=91=8D
 
-It turned out that blk_sync_queue() did not stop q->timeout_work from
-running as expected. nvme_fc_timeout() returned BLK_EH_RESET_TIMER
-causing q->timeout to be rearmed after it was canceled earlier.
-q->timeout queued q->timeout_work after the controller switched to
-NVME_CTRL_CONNECTING state causing deadlock above.
+>
+> >> >> > +                    first_str =3D rest;
+> >> >> > +                    continue;
+> >> >> > +                }
+> >> >> > +                let name =3D name.split_once(':').map_or(name, |=
+(name, _)| name);
+> >> >> > +                if !name.is_empty() && !name.chars().all(|c| c.i=
+s_ascii_digit()) {
+> >> >> > +                    names.insert(name);
+> >> >> > +                }
+> >> >> > +                break;
+> >> >> > +            }
+> >> >> > +        }
+> >> >> > +        first_lit
+> >> >>
+> >> >> `first_lit` is not modified, so could we just the code above it int=
+o a
+> >> >> block instead of keeping it in the expr for `first_lit`?
+> >> >
+> >> > As above, can you suggest the alternate form you like better? The
+> >> > gymnastics here are all in service of being able to let malformed
+> >> > input fall through to core::format_args which will do the hard work =
+of
+> >> > producing good diagnostics.
+> >>
+> >> I don't see how this is hard, just do:
+> >>
+> >>     let (first_str, first_lit) =3D ...;
+> >
+> > It requires you to unwrap, like you did above, which is what I'm
+> > trying to avoid.
+>
+> How so? What do you need to unwrap?
 
-Add QUEUE_FLAG_NOTIMEOUT queue flag to tell q->timeout not to queue
-q->timeout_work while queue is being synced. Update blk_sync_queue() to
-cancel q->timeout_work first and then cancel q->timeout.
+I was referring to your unwraps above.
 
-Fixes: 287922eb0b18 ("block: defer timeouts to a workqueue")
-Fixes: 4e9b6f20828a ("block: Fix a race between blk_cleanup_queue() and timeout handling")
-Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-Reviewed-by: Yuanyuan Zhong <yzhong@purestorage.com>
-Reviewed-by: Michael Liang <mliang@purestorage.com>
-Reviewed-by: Randy Jennings <randyj@purestorage.com>
----
- block/blk-core.c       | 10 ++++++++--
- block/blk-mq-debugfs.c |  1 +
- include/linux/blkdev.h |  2 ++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+> >> >> > +    };
+> >> >> > +
+> >> >> > +    let first_span =3D first_lit.span();
+> >> >> > +    let adapt =3D |expr| {
+> >> >> > +        let mut borrow =3D
+> >> >> > +            TokenStream::from_iter([TokenTree::Punct(Punct::new(=
+'&', Spacing::Alone))]);
+> >> >> > +        borrow.extend(expr);
+> >> >> > +        make_ident(first_span, ["kernel", "fmt", "Adapter"])
+> >> >> > +            .chain([TokenTree::Group(Group::new(Delimiter::Paren=
+thesis, borrow))])
+> >> >>
+> >> >> This should be fine with using `quote!`:
+> >> >>
+> >> >>     quote!(::kernel::fmt::Adapter(&#expr))
+> >> >
+> >> > Yeah, I have a local commit that uses quote_spanned to remove all th=
+e
+> >> > manual constructions.
+> >>
+> >> I don't think that you need `quote_spanned` here at all. If you do, th=
+en
+> >> let me know, something weird with spans is going on then.
+> >
+> > You need to give idents a span, so each of `kernel`, `fmt`, and
+> > `adapter` need a span. I *could* use `quote!` and get whatever span it
+> > uses (mixed_site) but I'd rather retain control.
+>
+> Please use `quote!` if it works. No need to make this more complex than
+> it already is. If it doesn't work then that's another story.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b862c66018f2..8b70c0202f07 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -219,8 +219,11 @@ EXPORT_SYMBOL_GPL(blk_status_to_str);
-  */
- void blk_sync_queue(struct request_queue *q)
- {
--	timer_delete_sync(&q->timeout);
-+	blk_queue_flag_set(QUEUE_FLAG_NOTIMEOUT, q);
-+	synchronize_rcu();
- 	cancel_work_sync(&q->timeout_work);
-+	timer_delete_sync(&q->timeout);
-+	blk_queue_flag_clear(QUEUE_FLAG_NOTIMEOUT, q);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-@@ -383,7 +386,10 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
- {
- 	struct request_queue *q = from_timer(q, t, timeout);
- 
--	kblockd_schedule_work(&q->timeout_work);
-+	rcu_read_lock();
-+	if (!blk_queue_notimeout(q))
-+		kblockd_schedule_work(&q->timeout_work);
-+	rcu_read_unlock();
- }
- 
- static void blk_timeout_work(struct work_struct *work)
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 29b3540dd180..a98ff6fbf75d 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -81,6 +81,7 @@ static int queue_pm_only_show(void *data, struct seq_file *m)
- #define QUEUE_FLAG_NAME(name) [QUEUE_FLAG_##name] = #name
- static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(DYING),
-+	QUEUE_FLAG_NAME(NOTIMEOUT),
- 	QUEUE_FLAG_NAME(NOMERGES),
- 	QUEUE_FLAG_NAME(SAME_COMP),
- 	QUEUE_FLAG_NAME(FAIL_IO),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 332b56f323d9..c0e6a18f5325 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -633,6 +633,7 @@ struct request_queue {
- /* Keep blk_queue_flag_name[] in sync with the definitions below */
- enum {
- 	QUEUE_FLAG_DYING,		/* queue being torn down */
-+	QUEUE_FLAG_NOTIMEOUT,		/* do not schedule timeout work */
- 	QUEUE_FLAG_NOMERGES,		/* disable merge attempts */
- 	QUEUE_FLAG_SAME_COMP,		/* complete on same CPU-group */
- 	QUEUE_FLAG_FAIL_IO,		/* fake timeout */
-@@ -657,6 +658,7 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
- 
- #define blk_queue_dying(q)	test_bit(QUEUE_FLAG_DYING, &(q)->queue_flags)
- #define blk_queue_init_done(q)	test_bit(QUEUE_FLAG_INIT_DONE, &(q)->queue_flags)
-+#define blk_queue_notimeout(q)	test_bit(QUEUE_FLAG_NOTIMEOUT, &(q)->queue_flags)
- #define blk_queue_nomerges(q)	test_bit(QUEUE_FLAG_NOMERGES, &(q)->queue_flags)
- #define blk_queue_noxmerges(q)	\
- 	test_bit(QUEUE_FLAG_NOXMERGES, &(q)->queue_flags)
--- 
-2.49.0
-
+Let's adjudicate that on v11, where you can see the code.
