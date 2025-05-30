@@ -1,226 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF6019307F
-	for <linux-block@vger.kernel.org>; Fri, 30 May 2025 02:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F812209F46;
+	Fri, 30 May 2025 05:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748571205; cv=none; b=bf40ATSYZKglfe+qBNzvoT+e9m3vzFZ+Upbz+XAJv95Lt4FC45xUGPtSDyXk6I48A/LvZhXMnZnqVVBYl40/G2N4ItGkzWNKsE/hdy1arGXjOyQggHvLpjj+zQpVw+bf/lOZCIOgfYMeiBeqtVKdnPcXnE1h1Ya6FtgzwHYamvA=
+	t=1748582687; cv=none; b=U2O4Bj/5eaxVhEarYfTQxbcDcE0n60fwb1kohbL+Akt+oh/LU7NYx/iRN55+ygeKUOcrcOcjePM87W0HR6C5gcH9kCLjZtdDufGbxiK7exGcRmN5omb4qH711j2xBLqRUlZjOoIL4LNYR+MBOV9TPD3F/N1dCdkKABgxaDLzbYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748571205; c=relaxed/simple;
-	bh=wap4tC67QkTxarLmJrcG2So2hb8DBHqqnT0nUw4uwP4=;
+	s=arc-20240116; t=1748582687; c=relaxed/simple;
+	bh=ec41PG49I/K0HIAeno/rpOnJa0VI0Ixro906bMEYKKw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I+35DJIJDh6OWt2B6hgYjD9WAMk4NSqdv5/nU+/60WHWmGJxY85DsZwDjO8oRHRNqeHsAQNLALgG04MSVQArDZ541B4FzlfEEjkZoI67GwPQ9W2yQDib9HumZcfEy9QlNZJWk07sf2YrS1gY8Nt2RKIilq7jtJGUklZ51pwQ+a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AUIYpv5v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=eDTdqkJFsyC7gLWipR2WXe1BJ+BgGJ/P7cWbQ+xAJ6sqgU42q/zPaAC+XRN1BrbcM5sfNroNtn4Vy6qi8losq87yQFuZHpsk4e6QT14VlW9CWv+xD1//0GtLXqEJ7NjeHUgaoTBjeIun0SQlI3a4hm4P6/q8Wv8R09leUwkQX+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IzUL6wHk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUIYpv5v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748571199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l31e+xj+b8/YAIp7qmIPHsvaoZ+t/aWIeSplxyrBR0s=;
-	b=AUIYpv5vyruTaXZ131Zei5g1uYVYLTsR37xJYl3jZ7+gZU58hUZKPHgHHEeQ09tln4dECV
-	hhI5OVN0fWpDUz0r4uPlITDn6NNsQf0fHk2fGXJGhrrWkUgASD7DpkZrU3nhZ7/K1mBGK6
-	InRHw9pqOgD65mxuo/9JFVNYfIC7Nwg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-1UTFMNcMMMie1Fs1PzqLxA-1; Thu,
- 29 May 2025 22:13:15 -0400
-X-MC-Unique: 1UTFMNcMMMie1Fs1PzqLxA-1
-X-Mimecast-MFC-AGG-ID: 1UTFMNcMMMie1Fs1PzqLxA_1748571193
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07D921800446;
-	Fri, 30 May 2025 02:13:13 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.107])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7051919560B0;
-	Fri, 30 May 2025 02:13:06 +0000 (UTC)
-Date: Fri, 30 May 2025 10:13:00 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 8/9] selftests: ublk: add stress test for per io
- daemons
-Message-ID: <aDkULJG9zwqCWqTk@fedora>
-References: <20250529-ublk_task_per_io-v8-0-e9d3b119336a@purestorage.com>
- <20250529-ublk_task_per_io-v8-8-e9d3b119336a@purestorage.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IzUL6wHk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077FFC4CEED;
+	Fri, 30 May 2025 05:24:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748582686;
+	bh=ec41PG49I/K0HIAeno/rpOnJa0VI0Ixro906bMEYKKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IzUL6wHkolrbfAyxfUMztknnXEm3WD4rqsV5GqZhEkGHtltzL3bjqh+CxOaBFGH2f
+	 eG/b/cvxAohke+eNF2GG/GjNJHiK4wTO8zQ/Ujeg3JZFqvj3LmDgsaqsFyAmLijGh/
+	 SWmAOSXXhD/OiDBQLQIZyflPiUbLtNiW2CvmgBSpfuF4nGiTOM6vu3Cp3fYjG4NDu2
+	 kU39Fs0NcHnCrvztoIRUqgKBiJUE9P01tQx6n7nIIWCO/5DjSQJP9SYkfxsKXGE6HY
+	 8Y1izxG/dHrx4+bX6/cuoTGIQoRac0S20HLmOfZU+9QYxQtAHRD44Xp1CPXkxtCPPZ
+	 woTnX1mQ8ZABQ==
+Date: Fri, 30 May 2025 07:24:41 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>, 
+	Amir Goldstein <amir73il@gmail.com>
+Cc: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, jack@suse.cz, anuj1072538@gmail.com, axboe@kernel.dk, 
+	viro@zeniv.linux.org.uk, hch@infradead.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com
+Subject: Re: [RFC] fs: add ioctl to query protection info capabilities
+Message-ID: <20250530-raumakustik-herren-962a628e1d21@brauner>
+References: <CGME20250527105950epcas5p1b53753ab614bf6bde4ffbf5165c7d263@epcas5p1.samsung.com>
+ <20250527104237.2928-1-anuj20.g@samsung.com>
+ <yq1jz60gmyv.fsf@ca-mkp.ca.oracle.com>
+ <fec86763-dd0e-4099-9347-e85aa4a22277@samsung.com>
+ <20250529175934.GB3840196@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250529-ublk_task_per_io-v8-8-e9d3b119336a@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <20250529175934.GB3840196@google.com>
 
-On Thu, May 29, 2025 at 05:47:17PM -0600, Uday Shankar wrote:
-> Add a new test_stress_06 for the per io daemons feature. This is just a
-> copy of test_stress_01 with the per_io_tasks flag added, with varying
-> amounts of nthreads. This test is able to reproduce a panic which was
-> caught manually during development [1]; in the current version of this
-> patch set, it passes.
+On Thu, May 29, 2025 at 05:59:34PM +0000, Eric Biggers wrote:
+> On Thu, May 29, 2025 at 12:42:45PM +0530, Anuj Gupta/Anuj Gupta wrote:
+> > On 5/29/2025 8:32 AM, Martin K. Petersen wrote:
+> > > 
+> > > Hi Anuj!
+> > > 
+> > > Thanks for working on this!
+> > > 
+> > Hi Martin,
+> > Thanks for the feedback!
+> > 
+> > >> 4. tuple_size: size (in bytes) of the protection information tuple.
+> > >> 6. pi_offset: offset of protection info within the tuple.
+> > > 
+> > > I find this a little confusing. The T10 PI tuple is <guard, app, ref>.
+> > > 
+> > > I acknowledge things currently are a bit muddy in the block layer since
+> > > tuple_size has been transmogrified to hold the NVMe metadata size.
+> > > 
+> > > But for a new user-visible interface I think we should make the
+> > > terminology clear. The tuple is the PI and not the rest of the metadata.
+> > > 
+> > > So I think you'd want:
+> > > 
+> > > 4. metadata_size: size (in bytes) of the metadata associated with each interval.
+> > > 6. pi_offset: offset of protection information tuple within the metadata.
+> > > 
+> > 
+> > Yes, this representation looks better. Will make this change.
+> > 
+> > >> +#define	FILE_PI_CAP_INTEGRITY		(1 << 0)
+> > >> +#define	FILE_PI_CAP_REFTAG		(1 << 1)
+> > > 
+> > > You'll also need to have corresponding uapi defines for:
+> > > 
+> > > enum blk_integrity_checksum {
+> > >          BLK_INTEGRITY_CSUM_NONE         = 0,
+> > >          BLK_INTEGRITY_CSUM_IP           = 1,
+> > >          BLK_INTEGRITY_CSUM_CRC          = 2,
+> > >          BLK_INTEGRITY_CSUM_CRC64        = 3,
+> > > } __packed ;
+> > >
+> > 
+> > Right, I'll add these definitions to the UAPI.
 > 
-> Note that this commit also makes all stress tests using the
-> run_io_and_remove helper more stressful by additionally exercising the
-> batch submit (queue_rqs) path.
-> 
-> [1] https://lore.kernel.org/linux-block/aDgwGoGCEpwd1mFY@fedora/
-> 
-> Suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> ---
->  tools/testing/selftests/ublk/Makefile          |  1 +
->  tools/testing/selftests/ublk/test_common.sh    |  5 ++++
->  tools/testing/selftests/ublk/test_stress_06.sh | 36 ++++++++++++++++++++++++++
->  3 files changed, 42 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-> index 5d7f4ecfb81612f919a89eb442f948d6bfafe225..1fb1a95d452c2e9a7ed78cb8b12be2b759074e11 100644
-> --- a/tools/testing/selftests/ublk/Makefile
-> +++ b/tools/testing/selftests/ublk/Makefile
-> @@ -38,6 +38,7 @@ TEST_PROGS += test_stress_02.sh
->  TEST_PROGS += test_stress_03.sh
->  TEST_PROGS += test_stress_04.sh
->  TEST_PROGS += test_stress_05.sh
-> +TEST_PROGS += test_stress_06.sh
->  
->  TEST_GEN_PROGS_EXTENDED = kublk
->  
-> diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
-> index 0145569ee7e9a45b41898c2c789842b4c8380f18..8a4dbd09feb0a885ec7539f1a285ed6f437fe3ab 100755
-> --- a/tools/testing/selftests/ublk/test_common.sh
-> +++ b/tools/testing/selftests/ublk/test_common.sh
-> @@ -278,6 +278,11 @@ __run_io_and_remove()
->  	fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio \
->  		--rw=randrw --norandommap --iodepth=256 --size="${size}" --numjobs="$(nproc)" \
->  		--runtime=20 --time_based > /dev/null 2>&1 &
-> +	fio --name=batchjob --filename=/dev/ublkb"${dev_id}" --ioengine=io_uring \
-> +		--rw=randrw --norandommap --iodepth=256 --size="${size}" \
-> +		--numjobs="$(nproc)" --runtime=20 --time_based \
-> +		--iodepth_batch_submit=32 --iodepth_batch_complete_min=32 \
-> +		--force_async=7 > /dev/null 2>&1 &
+> Would it make sense to give the CRCs clearer names?  For example CRC16_T10DIF
+> and CRC64_NVME.
 
-I think we can replace job1 with the batchjob simply.
-
->  	sleep 2
->  	if [ "${kill_server}" = "yes" ]; then
->  		local state
-> diff --git a/tools/testing/selftests/ublk/test_stress_06.sh b/tools/testing/selftests/ublk/test_stress_06.sh
-> new file mode 100755
-> index 0000000000000000000000000000000000000000..3aee8521032e3962b8b070cda8eb295b01e7b124
-> --- /dev/null
-> +++ b/tools/testing/selftests/ublk/test_stress_06.sh
-> @@ -0,0 +1,36 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> +TID="stress_06"
-> +ERR_CODE=0
-> +
-> +ublk_io_and_remove()
-> +{
-> +	run_io_and_remove "$@"
-> +	ERR_CODE=$?
-> +	if [ ${ERR_CODE} -ne 0 ]; then
-> +		echo "$TID failure: $*"
-> +		_show_result $TID $ERR_CODE
-> +	fi
-> +}
-> +
-> +if ! _have_program fio; then
-> +	exit "$UBLK_SKIP_CODE"
-> +fi
-> +
-> +_prep_test "stress" "run IO and remove device with per_io_tasks"
-> +
-> +_create_backfile 0 256M
-> +_create_backfile 1 128M
-> +_create_backfile 2 128M
-> +
-> +ublk_io_and_remove 8G -t null -q 4 --nthreads 5 --per_io_tasks &
-> +ublk_io_and_remove 256M -t loop -q 4 --nthreads 3 --per_io_tasks \
-> +        "${UBLK_BACKFILES[0]}" &
-> +ublk_io_and_remove 256M -t stripe -q 4 --nthreads 4 --per_io_tasks \
-> +        "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> +wait
-
-We plan to reuse the test for blktest or liburing test, so feature check
-is needed.
-
-But this patch shouldn't be a blocker, and it can be one follow-up with
-something like the following with above batchjob change, then generic
-feature can be covered completely wrt. stress test.
-
-
-diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testing/selftests/ublk/test_stress_03.sh
-index 7d728ce50774..f5908c1357d2 100755
---- a/tools/testing/selftests/ublk/test_stress_03.sh
-+++ b/tools/testing/selftests/ublk/test_stress_03.sh
-@@ -41,5 +41,13 @@ if _have_feature "AUTO_BUF_REG"; then
- fi
- wait
- 
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks &
-+	ublk_io_and_remove 256M -t loop -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_remove 256M -t stripe -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_remove 8G -t null -q 4 -z --nthreads 8 --per_io_tasks &
-+fi
-+wait
-+
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 9bcfa64ea1f0..be3ecdbe9bb4 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -38,6 +38,13 @@ if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
- fi
-+
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tasks &
-+	ublk_io_and_kill_daemon 256M -t loop -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_kill_daemon 256M -t stripe -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_kill_daemon 8G -t null -q 4 -z --nthreads 8 --per_io_tasks &
-+fi
- wait
- 
- _cleanup_test "stress"
-diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
-index bcfc904cefc6..5634b1db1ded 100755
---- a/tools/testing/selftests/ublk/test_stress_05.sh
-+++ b/tools/testing/selftests/ublk/test_stress_05.sh
-@@ -69,5 +69,12 @@ if _have_feature "AUTO_BUF_REG"; then
- 	done
- fi
- 
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" &
-+	ublk_io_and_remove 256M -t loop -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_remove 8G -t null -q 4 -z --nthreads 8 --per_io_tasks -r 1 -i "$reissue"  &
-+fi
-+wait
-+
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
-
-
-Thanks,
-Ming
-
+Hm, I wonder whether we should just make all of this an extension of the
+new file_getattr() system call we're about to add instead of adding a
+separate ioctl for this.
