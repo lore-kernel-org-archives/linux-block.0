@@ -1,57 +1,40 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2EA211A27
-	for <linux-block@vger.kernel.org>; Fri, 30 May 2025 07:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5264738B;
+	Fri, 30 May 2025 08:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748591672; cv=none; b=HvDI7PqFX+ta4vLZyETnVHA4ZsK86/fW2L1WuL2C0IyK8zyCJyIWtxYhBDG7S927HpD/f1CcfAYuflbCmBt2WirIEHZavEuai/COYPGmdZbQudjg+qAdBJy8IyCxWQYI410K/G3Oo1Rg0sB4YD1ddBOkC7rvn2P9xr3RQ+SERVc=
+	t=1748592549; cv=none; b=HPQdME1PdQKkK3fBpc0A9H26caaR68VcSx308JNABagdYL0CoZvFampJ4A7qSZXYH67QXNtj2WJeTFe6Lje7AyURslR+MGWw88u5W3dgfcZELILQizVfs+FNWyLH4Xy8NtGZBjd89xnLX8cixW+RQKUy2bg9UlpeTANmh8dh4/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748591672; c=relaxed/simple;
-	bh=KY2nrXI/+7Ei3w06A60gKkVCOh0MhWpAplxQd7TH/aw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a6qVaDQiY5R8gCnu8Bvqxmk1OEmLj8HtyRE3z/6Ddm0NUOk08XzkgA1ipZPDm0y8kuDthkAq4MWOelKDpw0J00krUwSVTorzqJ58fQ1q5hkihSfrkA+L03Ko2ZxUmnHx1yx9yjTJZCyGd3xGXVuuC7Ix+HTCiiVJcdY08j5CfRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=UKOxmifl; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UKOxmifl"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1748591669; x=1780127669;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KY2nrXI/+7Ei3w06A60gKkVCOh0MhWpAplxQd7TH/aw=;
-  b=UKOxmifljDpKBLvfVQNbuMBZPuZnjNSDQwhzELzf+hJIfpzcZwas3Tpg
-   poi9Or3oKBQopDgnyxx+wnuw/qmXFPN87WV+1GJi9aeKsLHsMKIRMmk/H
-   YEZVi+7fkWj1yw7QTMUmRF0yHQurlV5GAnVsOhJsLZOnseXR1if55onwR
-   RtxZ5EXmsZG+jlM99Bjd77st6piiQZHbhSX5DfHl8kd5+MafkUxq3JukE
-   R73UiXZfVcR0C32UgYI1q1Isy3aTSKx2Hmx8tGJO8oxrkdQYcx3njAoxU
-   E6XxsCQDv9UrCmzIZYBIWhH6/HBnKLwqoabhYFuksSbdGk2Ja0tWKeLR9
-   g==;
-X-CSE-ConnectionGUID: 9JWl8WFRQDi0unjPca9Rjg==
-X-CSE-MsgGUID: 6EZY3iYkT1W88pTsDmT5yQ==
-X-IronPort-AV: E=Sophos;i="6.16,195,1744041600"; 
-   d="scan'208";a="88625260"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 May 2025 15:54:27 +0800
-IronPort-SDR: 683955de_Cz9237c3WRwrX+ZUtMU9iUGI7V4cbMKk3+gB8zpF9ECwF7L
- IJ8Bk9512H9iMB+mFR1njhJfRiO3p5wIxxXfSdQ==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 May 2025 23:53:19 -0700
-WDCIronportException: Internal
-Received: from 4r6vzh3.ad.shared (HELO shinmob.flets-east.jp) ([10.224.163.85])
-  by uls-op-cesaip02.wdc.com with ESMTP; 30 May 2025 00:54:27 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests RFC 1/2] check: allow strict error-checking by "set -e" in each test case
-Date: Fri, 30 May 2025 16:54:24 +0900
-Message-ID: <20250530075425.2045768-2-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250530075425.2045768-1-shinichiro.kawasaki@wdc.com>
-References: <20250530075425.2045768-1-shinichiro.kawasaki@wdc.com>
+	s=arc-20240116; t=1748592549; c=relaxed/simple;
+	bh=aC7ZZT5vqDvhPiQdxbOwr/UJHbnVRNUppLn4j5pfyOo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mjNlC+zfOmmUYOwIqC1/AcT0tsmIJZytTJBhjDZqBAAYdbUu9GcJx1zf0RB0P9E85XOY+lVmkHl7k5frVWVMVlVmh43PNuihelz4dpDRjwEpxEC3xtN9kUiDmdG4/wwooEFkenAPyacMNEAKOXA9ulSw/xaBBPvJp4+hinNe2pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4b7wqj6KzQzYQvFM;
+	Fri, 30 May 2025 16:09:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id F0DDE1A0D46;
+	Fri, 30 May 2025 16:09:04 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP3 (Coremail) with SMTP id _Ch0CgAne8WfZzloSi3_Ng--.6274S4;
+	Fri, 30 May 2025 16:09:04 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH RFC 0/4] blk-mq-sched: support request batch dispatching for sq elevator
+Date: Fri, 30 May 2025 16:03:51 +0800
+Message-Id: <20250530080355.1138759-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,90 +42,69 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgAne8WfZzloSi3_Ng--.6274S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFyrKF1fuw4DJr1rZrWxXrb_yoW8Gry5pr
+	4fKa9xKr1jqr1fZF1a93W7J34rJws7WasxGrnrJ3W8GFnxCr13JF18K3WkXFyxZrWfAFsr
+	Wr18tF97WFyUCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUU
+	UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-In bash script development, it is a good practices to handle errors
-strictly using "set -e" or "set -o errexit". When this option is
-enabled, bash exits immediately upon encountering an error. There have
-been discussions about implementing this strict error-checking mechanism
-in blktests test cases [1]. Recently, these discussions were revisited,
-and it has been proposed to enable this strict error-checking for a
-limited subset of test cases [2].
+From: Yu Kuai <yukuai3@huawei.com>
 
-However, the error-checking does not work as expected, even when each
-test case does "set -e", because the error-checking has certain
-exceptions relevant to execution contexts. According to the bash man
-page, "The shell doe not exit ... part of the test following the if or
-elif reserved words, ... or if the command's return value is being
-inverted with !". The blktests test case execution context applies to
-these exceptions.
+Lock contention for sq elevator is quite intense when multiple contexts
+are dispatching request, main reason is that a global lock is held and
+release for each request:
 
-To ensure that "set -e" behaves as intended in test cases, avoid the
-if statements and the return value inversions (!) in the test case
-execution context.
+while
+  spin_lock
+  disaptch one request
+  spin_unlock
 
-Link: [1] https://github.com/linux-blktests/blktests/issues/89
-Link: [2] https://lore.kernel.org/linux-block/ckctv7ioomqpxe2iwcg6eh6fvtzamoihnmwxvavd7lanr4y2y6@fbznem3nvw3w/
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- check | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+This set support request batch dispatching to reduce the lock contention
+a bit.
 
-diff --git a/check b/check
-index dad5e70..3cf741a 100755
---- a/check
-+++ b/check
-@@ -502,9 +502,9 @@ _check_and_call_test_device() {
- 			fi
- 		fi
- 		RESULTS_DIR="$OUTPUT/$(basename "$TEST_DEV")""$postfix"
--		if ! _call_test test_device; then
--			ret=1
--		fi
-+		_call_test test_device
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
- 		if (( unset_skip_reason )); then
- 			unset SKIP_REASONS
- 		fi
-@@ -637,9 +637,9 @@ _run_group() {
- 	local ret=0
- 	local test_name
- 	for test_name in "${tests[@]}"; do
--		if ! ( _run_test "$test_name" ); then
--			ret=1
--		fi
-+		( _run_test "$test_name" )
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
- 	done
- 	return $ret
- }
-@@ -695,9 +695,9 @@ _check() {
- 		if [[ $group != "$prev_group" ]]; then
- 			prev_group="$group"
- 			if [[ ${#tests[@]} -gt 0 ]]; then
--				if ! ( _run_group "${tests[@]}" ); then
--					ret=1
--				fi
-+				( _run_group "${tests[@]}" )
-+				# shellcheck disable=SC2181
-+				(($? != 0)) && ret=1
- 				tests=()
- 			fi
- 		fi
-@@ -705,9 +705,9 @@ _check() {
- 	done < <(_find_tests "$@" | sort -zu)
- 
- 	if [[ ${#tests[@]} -gt 0 ]]; then
--		if ! ( _run_group "${tests[@]}" ); then
--			ret=1
--		fi
-+		( _run_group "${tests[@]}" )
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
- 	fi
- 
- 	return $ret
+A simple test for null_blk in my VM:
+32 job randwrite
+
+| elevator                   | bandwidth Mib/s |
+| -------------------------- | --------------- |
+| none                       | 813             |
+| deadline before this patch | 531             |
+| deadline after this patch  | 689             |
+
+The test is one-sided, however, this is just a quick test to show this
+set might be meaningful. I'm sending this RFC and want to get some
+feedbacks before I continue work on this set.
+
+Noted: do not test bfq for this set, it's not changed yet(like patch 2
+for deadline).
+
+Yu Kuai (4):
+  elevator: introduce global lock for sq_shared elevator
+  mq-deadline: switch to use elevator lock
+  blk-mq-sched: refactor __blk_mq_do_dispatch_sched()
+  blk-mq-sched: support request batch dispatching for sq elevator
+
+ block/blk-mq-sched.c | 224 +++++++++++++++++++++++++++++--------------
+ block/blk-mq.c       |   5 +-
+ block/blk-mq.h       |  21 ++++
+ block/elevator.c     |   1 +
+ block/elevator.h     |  62 +++++++++++-
+ block/mq-deadline.c  |  60 +++++-------
+ 6 files changed, 259 insertions(+), 114 deletions(-)
+
 -- 
-2.49.0
+2.39.2
 
