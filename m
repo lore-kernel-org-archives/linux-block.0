@@ -1,84 +1,99 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9E1F4F1
-	for <linux-block@vger.kernel.org>; Sun,  1 Jun 2025 16:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56C72BD11;
+	Sun,  1 Jun 2025 16:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748794864; cv=none; b=jzHb9eAcoRjOyyyFYbG0kjpw8UF/DJivodS89C+wjzmCImk2L+JBYPxtccnMH41AbQJdoQV2yIF/2pY4SQLliNlng9Cho1HplgufhTlzbSA6JC66FjDeMjTa7CxDWe6uIGogyDvbaOX+sdVHhh51LFzcB3TXFFd0APrhZcm9+L4=
+	t=1748795072; cv=none; b=Blqcyl0AQa4S2kpAEN7hcQl5GYxP1qhKpbIiwWcWksymffqGY/Gi8r383anyEnDesw92Gb6SHJ2+41BeZytuFZCRDKp40TznnM/b9izfI+GBPxB1BEsf0zCN9QMzbi0bODV92MZjIL1M8tluWQUAMi3a1kvIKD6adPz2mCS42Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748794864; c=relaxed/simple;
-	bh=h6QoMpVGGZVy60Ef1tMLb7Ks9v3/ZkdGVQ1zpckE/E8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=EcVo7w+XgHuuVtapSu57UVy76HO6zsY0vnlnADyGMRAflA8Q5Xdppbm1E2gI1CwYuL2HgiS2FyN/8oWB55pbant7kAFrSP38QEAyhLw5X+d0M970h5rlLPPzXsg7WMuoBxmxVffvUUvmTtP0IvmOb4Ds8UWBYIDYfmyskZawx2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3dd76ca11easo77655295ab.3
-        for <linux-block@vger.kernel.org>; Sun, 01 Jun 2025 09:21:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748794862; x=1749399662;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BxRCzM24gglLIr7E2yldOZZAcHs1wVBwC6JZOlmfhD8=;
-        b=LvnQUgt3Am22G3RnraGkZlT/ZzdoMyVhoa47/cInZnfzUhzSJnIDCFTyc81oCc+Diw
-         4xid6jRp2llJmlb2N/WQU5N3V4ZnjeMbkY5d4oJxIGIKkokQuXRJVWg6tp5mnz5gSFjO
-         d79PTH0cV0sj9nW/1SxM+kADZ9+sf6KwA4ew9tOqqr2KKt1CjYN1ChjnEAkLcDyP1O3H
-         zb9VN0PI+lnBChPpXlUm7AmhUkyVfi383lfpnTN+t7/sckGMvTQWd+8uZawgBTa+ViEu
-         52dLfZ+fNq36r4MHklqlDL1wT+X7Js25tH72Ar36ZukUY/Q3fgC4x3XvZwqJX68WlXJG
-         ojrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGJ0B9LNkjNk2lRmrXjM/rvwSPQE0WCNPD2Rbg+IIcfaLgVb3PXWDy8hOLmdoW80SiVkaNKB9zvd7M8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKojyqyZQ/dGL1qTUzVA5WPXqeWLJ9l6CAdAnBraKpHW09nGmf
-	xQWlU/d9GL+l9L6he3ayoMc08YoN9Q+4+CuWAloy1sTUDsdSpcLblnR58eVqQlxoacK9irbl33u
-	pvJxA0gyG4L/wjoa1d+poT5MNAZExKphdSXJqFZTK/F0p+PtQexVVrgevxtQ=
-X-Google-Smtp-Source: AGHT+IE6dM+Sri1ig2zWdcwsj1cdNpnH6D5Ew7GCODMXRc5foiZExQDqXF9qiWibFIJGCE3VMwNQPSukaY5jbkheuww0vE49Df77
+	s=arc-20240116; t=1748795072; c=relaxed/simple;
+	bh=PMAkhQy/Nj8Qt7aS/e+j9Xv4t7buO1RGFex1w+i2gQo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=f03FB8NvQFzHf8HUFxW9cAoW1Y5rxgsrZIOPy6dFcvNfxlUsS5x0OL915mcowajxNFUazWyjE2/BnPiN/f3KDqv2VsbOmRkHFZaIKi+b9Jp2jNkj8dIxo6XCzLHY0FpUVTyKGzVlgz9Y9IKp5l8oEnQg0lQx8anychF1jSO/+SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdDYm3ma; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdDYm3ma"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0113C4CEE7;
+	Sun,  1 Jun 2025 16:24:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748795071;
+	bh=PMAkhQy/Nj8Qt7aS/e+j9Xv4t7buO1RGFex1w+i2gQo=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=BdDYm3makofis/Ax9rM0GzHSjQ+tNLU+f0PbFUOY9BF9dLvdOuyAKODKHjXLDjvbP
+	 5lIXeyJX1Xl+VIqXf9pDgFbbwa+bXMlhD/l8wRETbbNVaTT0/++1IFmhMG/96JI24o
+	 cNiilVHw+p2wn++Q3SnqEDr8/FVMKw5nODG2riXGlUux6OwYxsqNRKvlhJsCDxkYzF
+	 ssijqz3/s6CQP9JL+AzW9YgvNLlsseQ8OJKw+7qVKg+DVx3cTb2bFgptyZfSejssMM
+	 uW5xwVxTdstNKC4LvO4wJIsDsux0vx/2U2FLofXrHXcGfGKkW/IeXYjmdwSCap6h7B
+	 mPzWDuxHoh+Qw==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aa6:b0:3ce:8ed9:ca94 with SMTP id
- e9e14a558f8ab-3dd99c2898cmr107808385ab.14.1748794862401; Sun, 01 Jun 2025
- 09:21:02 -0700 (PDT)
-Date: Sun, 01 Jun 2025 09:21:02 -0700
-In-Reply-To: <6751e769.050a0220.b4160.01df.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <683c7dee.a00a0220.d8eae.0032.GAE@google.com>
-Subject: Re: [syzbot] [cgroups?] general protection fault in __cgroup_rstat_lock
-From: syzbot <syzbot+31eb4d4e7d9bc1fc1312@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org, 
-	axboe@kernel.dk, bpf@vger.kernel.org, cgroups@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, hannes@cmpxchg.org, 
-	haoluo@google.com, hawk@kernel.org, inwardvessel@gmail.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, josef@toxicpanda.com, 
-	kpsingh@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, martin.lau@linux.dev, 
-	mhocko@kernel.org, mkoutny@suse.com, muchun.song@linux.dev, mykolal@fb.com, 
-	netdev@vger.kernel.org, roman.gushchin@linux.dev, sdf@fomichev.me, 
-	shakeel.butt@linux.dev, shuah@kernel.org, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 01 Jun 2025 18:24:19 +0200
+Message-Id: <DABC3ZAQ01GG.1VT5NL7PIMTEO@kernel.org>
+Cc: <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v11 1/5] rust: macros: reduce collections in `quote!`
+ macro
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>, "Michal Rostecki"
+ <vadorovsky@protonmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex
+ Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary
+ Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
+ "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
+ <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Danilo Krummrich"
+ <dakr@kernel.org>, "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
+ "Maxime Ripard" <mripard@kernel.org>, "Thomas Zimmermann"
+ <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
+ <simona@ffwll.ch>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
+ "Saravana Kannan" <saravanak@google.com>, "Peter Zijlstra"
+ <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will Deacon"
+ <will@kernel.org>, "Waiman Long" <longman@redhat.com>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
+ "Bill Wendling" <morbo@google.com>, "Justin Stitt"
+ <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
+ <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, "Arnd Bergmann" <arnd@arndb.de>, "Jens
+ Axboe" <axboe@kernel.dk>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com>
+ <20250530-cstr-core-v11-1-cd9c0cbcb902@gmail.com>
+In-Reply-To: <20250530-cstr-core-v11-1-cd9c0cbcb902@gmail.com>
 
-syzbot suspects this issue was fixed by commit:
+On Fri May 30, 2025 at 2:27 PM CEST, Tamir Duberstein wrote:
+> Remove a handful of unncessary intermediate vectors and token streams;
+> mainly the top-level stream can be directly extended with the notable
+> exception of groups.
 
-commit a97915559f5c5ff1972d678b94fd460c72a3b5f2
-Author: JP Kobryn <inwardvessel@gmail.com>
-Date:   Fri Apr 4 01:10:48 2025 +0000
+What's the motivation for this? I wouldn't spend much effort on this
+file, as it'll go away when we add the `quote` crate.
 
-    cgroup: change rstat function signatures from cgroup-based to css-based
+---
+Cheers,
+Benno
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12ca4c82580000
-start commit:   932fc2f19b74 Merge branch 'irq-save-restore'
-git tree:       bpf-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=50c7a61469ce77e7
-dashboard link: https://syzkaller.appspot.com/bug?extid=31eb4d4e7d9bc1fc1312
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161cdfc0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12dfc8df980000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: cgroup: change rstat function signatures from cgroup-based to css-based
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> Remove an unnecessary `#[allow(dead_code)]` added in commit dbd5058ba60c
+> ("rust: make pin-init its own crate").
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+>  rust/macros/quote.rs | 104 ++++++++++++++++++++++++---------------------=
+------
+>  1 file changed, 49 insertions(+), 55 deletions(-)
