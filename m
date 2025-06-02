@@ -1,187 +1,135 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4E114885B
-	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 06:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D171B6D01
+	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 08:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748846320; cv=none; b=Tqx6nnLZGWpLmrD4o87uuNLsAtzRwOL9m0BL2jf9nyMbV+034wTD2Naa6KVcvedkBCjQMv6XlDEB/V9RR+u5NKKQSMdzdjNL1teiRUc6hUo1yEeJDEZOcesjcAkzwJzOezVN8IvZeEbvMBek8UAv5T6+2wmHkLSkJxKlPAyYR0E=
+	t=1748853923; cv=none; b=RiABjqCe01J5sgcv1Er5hAKmZe6mcXRxY3YWSSZL2MJCgQ1sD64UQgN2wrur6G8glEWJxrdeT5H4OCrxPXVWOWk5hcid9Hdu9r6NL/PYEqwX39DrDObCgQSMB+pgPTrKhh++QWHkibEwI94EahYi47qVlEPKJNnZvlXNrKF+7ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748846320; c=relaxed/simple;
-	bh=V2XbkhZ/OgT5Dn+xq8KPe2wx868QYpQrubtW/alxxu4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h7ZOmxj1kUt8ny9BYUalem+mmLmK8PSuwBb9+mu5jj3WyE9igOFX1XPl7AMmsWdfoKnVT0xp4zj4xIhtnaJJlNJhZNt658mzd1oq50ttwugKDJZTwsWpX0+qRWm9iiYTjJ/PMvh7XitwBg0gDg50qeoxa+gJj6DSXM8CoeCZHK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CHxR8tEi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=M0Vy/tb0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CHxR8tEi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=M0Vy/tb0; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1748853923; c=relaxed/simple;
+	bh=FnmJdnnfQEOeXtBs17TTqlpvE/Z6l2P4aZY4NkM4qxc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FcYOYZ3FxXh4+8MbTOePKJAwLEHLgswErlWY2EreFZ33JRp6N5mSXc4HSkVQEURmeKLQ65xJYgxYLs4R28JNoMzPFPWuryGif8FWPgwgh0MdQ8F3FIg2DztOq+FEAQpZNwZrQbEh/wbm3WvpgTrvqloQoppxG7K5YRYvF3+Gi9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aIOjdn0/; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CHxR8tEi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="M0Vy/tb0";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CHxR8tEi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="M0Vy/tb0"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4D5522121B;
-	Mon,  2 Jun 2025 06:38:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1748846316; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x64QjRBCRpirY2fNZf36VUt7jRDj1P8V0N4SrNE88ZU=;
-	b=CHxR8tEiC3M+bbLMGG3OaOwx4gb+Wt1vnHQwrzN9B39+OqVU5MOAt0JzFI1KGSVgRmZvKe
-	bEKVjKqS0AOV1LCWRNIgSwDxOPJbYXGfhgYqaZvnN9LRgigVm9eNmtTFGRu9ERqOCn7NnY
-	onOcCg/mPsuXY67EmtLRqTrHoKSKrgU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1748846316;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x64QjRBCRpirY2fNZf36VUt7jRDj1P8V0N4SrNE88ZU=;
-	b=M0Vy/tb0RR46mHbn3yem+n/QmJPYHL3eESeVSeQfrtzTnaDM+/ZkKN+1+XiBwlzZk3pW5N
-	KcJGysCd9PVq9UDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1748846316; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x64QjRBCRpirY2fNZf36VUt7jRDj1P8V0N4SrNE88ZU=;
-	b=CHxR8tEiC3M+bbLMGG3OaOwx4gb+Wt1vnHQwrzN9B39+OqVU5MOAt0JzFI1KGSVgRmZvKe
-	bEKVjKqS0AOV1LCWRNIgSwDxOPJbYXGfhgYqaZvnN9LRgigVm9eNmtTFGRu9ERqOCn7NnY
-	onOcCg/mPsuXY67EmtLRqTrHoKSKrgU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1748846316;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x64QjRBCRpirY2fNZf36VUt7jRDj1P8V0N4SrNE88ZU=;
-	b=M0Vy/tb0RR46mHbn3yem+n/QmJPYHL3eESeVSeQfrtzTnaDM+/ZkKN+1+XiBwlzZk3pW5N
-	KcJGysCd9PVq9UDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 18BB2136C7;
-	Mon,  2 Jun 2025 06:38:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id I+b7A+xGPWi9SgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 02 Jun 2025 06:38:36 +0000
-Message-ID: <6c201ca2-e288-4f82-a3d8-9a3158948cce@suse.de>
-Date: Mon, 2 Jun 2025 08:38:35 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aIOjdn0/"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a50049f8eeso543171f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 02 Jun 2025 01:45:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748853919; x=1749458719; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6VThKlttpzakaK+gyheH3wNtNAtAxPTgkZTge5fKamo=;
+        b=aIOjdn0/uAGIvgue2rZNxXVyyYtn34qf2+wdYw83h/wiSyICBU6FpJAx7yeu2Otmy7
+         PDdjE99CIEyrE3tCK+4Tp9moDWlygpdD/3Y5HLkH3d4m+pbsy2I47tNLMwXethtqAqkD
+         wbLcujv5avzsXJLY8dE8DEmTwM5jHSsRDWdWBz68Bb0OMSd7DsyBfHGAq5sUoeibiva5
+         aZk+wrdp55qS5xqrAfnXJ9ayEHvfuSCpIWfxUZlmwN/loCWl8ZOQ86hz7QuXJEQ60Y60
+         xo7B1QqcLAL2gWI2dNl+Gj5F8SlZSMwVMy7yXqO7r4+9fnBXLVEM5mSPfTmxexxD1LVa
+         2Lew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748853919; x=1749458719;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6VThKlttpzakaK+gyheH3wNtNAtAxPTgkZTge5fKamo=;
+        b=ZfiqlL3NzD2+iNBThvSeoePzOtK7RPz5B44Sr29TUCJgoQzEua/SsLkHVTvJeH0MEN
+         cytQQXhNcnNIbI74Gay6yDpW72WLyWLAVv7XhuM9lHH4QV8j2ClZefG76HbpZ7O72gHT
+         ED9w+xUdlxaQRnfrQ2D/yu4BlyPvT9flGm71o9qSrCBTwwovw5LCA/ZEBbxLvN9k/Qqn
+         i7gzQPDpeXMuquuflXTef8UgN2ETzByMLZSeuSiBZ7guYEfXpc86KlG2KKLDdqbBA741
+         MwEGWzROzZm4FZqMbCcQBd+RRW6BQ0QwqsR8uRnev35YhnMRBKj3rRJSENX5HCMxeKBw
+         bUmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqnhrmexl4RpAOBR424N+cMGz9E3ztJ1Av4xYMzUaLg07xrlEE5GKWzMJCHo4/cJPIIf6Aa+sW1N7dkw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKiVaapb2qEeDq20or4xa665LIcvx+eetQhJpKQf4U4M78XER3
+	oQZBQRIEA3O38NvosF/OtP+8sL3xL7ZhpbaJehH8kFvqUNYxOle0IXTx7Pkhx6OV0ZZdE9oB+7g
+	1VHK3wb771D7cwEf2Bw==
+X-Google-Smtp-Source: AGHT+IHMPBuyHnbsu1fzojxAvVWoB+t0RQajrCfQEAuCK7B7x+b6pusC9Fc1oNLvaFICxRkoCWW8Tzuvcbz6+Eo=
+X-Received: from wmbdo10.prod.google.com ([2002:a05:600c:680a:b0:450:dcf2:1c36])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:1a8a:b0:3a4:dfc2:b9e1 with SMTP id ffacd0b85a97d-3a4f89a7e71mr9312736f8f.2.1748853918569;
+ Mon, 02 Jun 2025 01:45:18 -0700 (PDT)
+Date: Mon, 2 Jun 2025 08:45:16 +0000
+In-Reply-To: <20250530-cstr-core-v11-4-cd9c0cbcb902@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] nvme/063 failure (tcp transport)
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <6mhxskdlbo6fk6hotsffvwriauurqky33dfb3s44mqtr5dsxmf@gywwmnyh3twm>
- <72a394aa-9ed1-45ec-8aaf-5f5ccf1c18ab@grimberg.me>
- <635f3315-a77b-4e8b-8454-20cb7c9ae2e8@suse.de>
- <3ef6roj5exuktcobnailtjstndhnyyw264y7uwzhtuaaptst5n@gl6id4fhjhcu>
- <f540dd31-75f6-4e1c-9bee-304530984610@suse.de>
- <czrjrtn2q5srlg664xryrzhjifkuz57jip2qx4b7aagky57xpz@fertvxdzaknc>
- <coaws33pv7tw6j7uzd7xzamkpymhczc36nz65dfowrhj4maqb4@55zbe6nqd6bs>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <coaws33pv7tw6j7uzd7xzamkpymhczc36nz65dfowrhj4maqb4@55zbe6nqd6bs>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Level: 
+Mime-Version: 1.0
+References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com> <20250530-cstr-core-v11-4-cd9c0cbcb902@gmail.com>
+Message-ID: <aD1knOuEFxv6VQy1@google.com>
+Subject: Re: [PATCH v11 4/5] rust: replace `kernel::c_str!` with C-Strings
+From: Alice Ryhl <aliceryhl@google.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-On 6/2/25 04:14, Shinichiro Kawasaki wrote:
-> On May 21, 2025 / 20:51, Shin'ichiro Kawasaki wrote:
-> [...]
->> With this fix trial patch, the KASAN sauf is still observed. I guess it has
->> another cause and requires more debug work.
+On Fri, May 30, 2025 at 08:27:45AM -0400, Tamir Duberstein wrote:
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible and rename
+> `kernel::c_str!` to `str_to_cstr!` to clarify its intended use.
 > 
-> I chased down the KASAN suaf, and now I think I understand the cause. When it
-> happens, nvme_tcp_create_ctrl() fails to create the nvme- tcp control in the
-> call chain below:
-> 
-> nvme_tcp_create_ctrl()
->   nvme_tcp_alloc_ctrl() new=true             ... Alloc nvme_tcp_ctrl and admin_tag_set
->   nvme_tcp_setup_ctrl() new=true
->    nvme_tcp_configure_admin_queue() new=true ... Succeed
->     nvme_alloc_admin_tag_set()               ... Alloc the tag set for admin_tag_set
->    nvme_stop_keep_alive()
->    nvme_tcp_teardown_admin_queue() remove=false
->    nvme_tcp_configure_admin_queue() new=false
->     nvme_tcp_alloc_admin_queue()             ... Fail, but do not call nvme_remove_admin_tag_set()
->   nvme_uninit_ctrl()
->   nvme_put_ctrl()                            ... Free up the nvme_tcp_ctrl and admin_tag_set
-> 
-> In this call chain, the first call of nvme_tcp_configure_admin_queue()
-> succeeds with new=true argument. The second call fails with new=false
-> argument. This second call does not call nvme_remove_admin_tag_set(),
-> due to the new=false argument. Then the admin tag set is not removed.
-> nvme_tcp_create_ctrl() assumes that nvme_tcp_setup_ctrl() would call
-> nvme_remove_admin_tag_set(), and frees up struct nvme_tcp_ctrl which has
-> admin_tag_set field. Later on, the timeout handler accesses the
-> admin_tag_set field and causes the BUG KASAN slab-use-after-free.
-> 
-> I created a trial patch below. When the second
-> nvme_tcp_configure_admin_queue() call fails, it jumps to "destroy_admin"
-> go-to label to call nvme_tcp_teardown_admin_queue() which calls
-> nvme_remove_admin_tag_set(). With this fix, the KASAN suaf looks disappearing.
-> I will create a formal patch for review. I will post it as a series, which will
-> have two patches: one for this KASAN suaf, the other for the WARN.
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index d89c89570d11..74a388550995 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -2392,7 +2392,7 @@ static int nvme_tcp_setup_ctrl(struct nvme_ctrl *ctrl, bool new)
->   		nvme_tcp_teardown_admin_queue(ctrl, false);
->   		ret = nvme_tcp_configure_admin_queue(ctrl, false);
->   		if (ret)
-> -			return ret;
-> +			goto destroy_admin;
->   	}
->   
->   	if (ctrl->icdoff) {
+> Closes: https://github.com/Rust-for-Linux/linux/issues/1075
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-Thanks for debugging, that patch looks correct. Please send a patch.
+> -/// Creates a new [`CStr`] from a string literal.
+> +/// Creates a static C string wrapper at compile time.
 
-Cheers,
+A C string *wrapper*? What do you mean? I would drop the word "wrapper"
+here.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> -/// The string literal should not contain any `NUL` bytes.
+> +/// Rust supports C string literals since Rust 1.77, and they should be used instead of this macro
+> +/// where possible. This macro exists to allow static *non-literal* C strings to be created at
+> +/// compile time. This is most often used in other macros.
+> +///
+> +/// # Panics
+> +///
+> +/// This macro panics if the operand contains an interior `NUL` byte.
+>  ///
+>  /// # Examples
+>  ///
+>  /// ```
+> -/// # use kernel::c_str;
+> +/// # use kernel::str_to_cstr;
+>  /// # use kernel::str::CStr;
+> -/// const MY_CSTR: &CStr = c_str!("My awesome CStr!");
+> +/// const MY_CSTR: &CStr = str_to_cstr!(concat!(file!(), ":", line!(), ": My CStr!"));
+>  /// ```
+>  #[macro_export]
+> -macro_rules! c_str {
+> +macro_rules! str_to_cstr {
+> +    // NB: we could write `($str:lit) => compile_error!("use a C string literal instead");` here but
+> +    // that would trigger when the literal is at the top of several macro expansions. That would be
+> +    // too limiting to macro authors, so we rely on the name as a hint instead.
+>      ($str:expr) => {{
+>          const S: &str = concat!($str, "\0");
+>          const C: &$crate::str::CStr = match $crate::str::CStr::from_bytes_with_nul(S.as_bytes()) {
+
+Alice
