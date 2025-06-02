@@ -1,112 +1,100 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52912523A;
-	Mon,  2 Jun 2025 15:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BD6221727
+	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 15:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748878490; cv=none; b=Vn0IByxeEnc4K5sdfLpaoXequbmvzyfrMSf9U2XeD7e7asH8rF3Ffs7KJr4Rr4gxLB5LbRRQf8TXHTIQE7rQ7MnmEMIiNATI1JlmbggIVDqisAyPeqvJk6VRV9xzy171dGeYQGneYtlmElkTtbVANZmRAPW8341GNzn3Y39JAfU=
+	t=1748879706; cv=none; b=A4z4Xv4xZSshRTXYr5UkFOZvY7KDzxnhsvh+5CMTF/l7G3DKCD/Z6ET6z3SJJTkrefVH3d3SbMneBYu1r1VW8gZssMF+MXa1jG7PNW6r7hjMvyN9G5ovQI1UBqp6tcfeDhx7HxYXaqh4D7qJe+q82XPO33dDSEIUvtx1xi9PiAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748878490; c=relaxed/simple;
-	bh=rxSgjePRrDqocTR5PEa49E0emUGdPLDuFJFOaU0vyCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q6SzKM84FVu6bYCSdo5mNV5wLE333vdzhNtDAWDXGwjWWE26eZvL92T99ci0AbwKKeSD/UjEsN7YFnL5o1UE5BnsYXC6Tgr8rZR0yl3divld0MAQrFKobmNNwyRdsH36DNPJ0JC7OryVUlm/YxNkXduPkvmDX+rOSCbRfAnz6WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=JYHa/G6Z; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	s=arc-20240116; t=1748879706; c=relaxed/simple;
+	bh=cGWDQmyIK6KEavRjyqGrhlkBwpD6x5A1LRNYzTiLjBk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=LT348Wrs1qnJr8MlGW5wlHQgKYIhcWqwlw2ws3LZvy3k4GQvb9gSIZzKERSzyFbrcnnIJB0/W6Ss4Ug6mw8Fem+ohs0PoUbb1/TAGxXoO1NsJl7BcOBOZ3hUzAjzK38Uybc4KIlQSBUaAq+yAigxvlW9fC/z+X+/w1WsMpgZ6Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=x/aCgk/0; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="JYHa/G6Z"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4b9yZP6Tt5z9spq;
-	Mon,  2 Jun 2025 17:34:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1748878477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RSWKa5jRWKpvNy5AYCWfE+HSpjMQwSPIzI/OGLplaVE=;
-	b=JYHa/G6ZeQB0yAIfVULn7KaHNi4u8pvPNXSitQ8sgxqIlk+aajfX3BD9W0hQ+kbsx9N+9W
-	4+YpGSR1x/9Gh9Fl4RfwNNQ4F7DMRNJrQ257cm5pEKfOP75SlHLUx0rz4jX2wokT972Hue
-	g/QuoCL9k1F1+UyaQbPWltOLes749bUQfmviBmHvr18Kj9mKw1JygJQklQr7s8ja9pvnm1
-	I/+nRbIjRkCvi6lKJE/Gow/dROVAa1ZqEi/Hc6vgRPJA8MqqiPwY82gJeMLdhQoXKpiyvC
-	ypkNLWhdS2u6RYhoqxkjev30NqlJyBmCOU/r87fIZlVKDRmSrJCbbi/cmjMS1A==
-Message-ID: <2acfe69f-f542-4f74-b671-d5a952d5b205@pankajraghav.com>
-Date: Mon, 2 Jun 2025 17:34:27 +0200
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="x/aCgk/0"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86a52889f45so136299839f.3
+        for <linux-block@vger.kernel.org>; Mon, 02 Jun 2025 08:55:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748879702; x=1749484502; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zJWA462aorYyyZlN9ByrlEvI7nFQWtQZ5+19hR9danM=;
+        b=x/aCgk/0FBMFtkFRfn1lvy7DZccgB6tDRtDcPXAqCeQvn/VtRwQu8ClszL9YKb8rWf
+         y+Vh+FArFnEDIzNZPhErbZCdFUcAQuInVYLadIagglNaS3WWo+OKqVah3ehSaXnbGhs8
+         J7DsTDC1wbkZI5pq1yCc5XdzI03eCu0AoMHnG9Kb55816iYkn7wVTOL5/n7crI2XUbQk
+         PrVFsVyXHR7PQV7tKC/t7bFmULirW95dRr0TzOkybHFeglbxH2hRaVUhgcLZD5YIvNDa
+         FOsBhuqtwPTGiAqkvs0nUgS8hqvWVq3vAYcY8evllrKQitBR+6joOyCt8LNoo3u0MEwR
+         RKOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748879702; x=1749484502;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zJWA462aorYyyZlN9ByrlEvI7nFQWtQZ5+19hR9danM=;
+        b=nVy9PD2FsVpKBLafIKGEPY6EnjDXkCIVObAFIW6DCVd9c6L3xt8g+8y/YhiyuXIxn3
+         rlffzSiR6OtPcnrvOxY90tEInEkUZ8CLCo63G4nmLjOtRn2leWvcSpJEvWaEdquBR1As
+         IrOpAQCFHlOoc3e0nIdaPM9yxfmpJ5GUZfk5XfObMMmvjOSAFREUHu3urgF2E8RyT2pV
+         o1cDGlviYNGW9LXthTvysjE4tRNqa/NqTYsDr5/oyYl+EeP22PXOBIYhgHom0lx2U5gv
+         g6dRFmJ4UvX7+sLEu4gnYY3UDQOeggafi+402BShp7rBNoYKpqbfGsdmrjElsUgJFMZQ
+         R1Xg==
+X-Gm-Message-State: AOJu0Yx4RYi5pXUXifJ0Un72rS9DpnTiwjA4yTk11B6iF4aNtmTM1ndS
+	Qe5CjPnVZKHzpumlQoWTHMu3sylkGGtmF9yTtcuuIzs/V9z7b+Ys0GISS6JB4hZOJeI=
+X-Gm-Gg: ASbGncve8AY1LYffe0Zasp1CKNqmSdky84qaLtS2QLG9nsBB13oLueiv0Q+VtouyEIF
+	gwa7Pyzr+clWI+FPsmbU4BZwgT0/ICLhmwZZNJJiLhP+g3MBsBUwOuuDBxMRO4xXUXDlxW6hstj
+	Q6xi5MI3bdrq3fQBZV87lqMoG995jzxsKJU8xJaZVeD1lYWcpOErD8IrHsjje9L3+bWidnW/Cqh
+	1DsK6XP2JSFp7CYIfrH5Pgfjs6/oPifel+KWv+eDuundhR0qzBwredEuuoIy+yqLFGk3+NvJ7cA
+	ajaQu9k2fd7q5pddYZh5pP6u/bTerJRiY1G++QFfgQ==
+X-Google-Smtp-Source: AGHT+IFfxSbhaLrbPZE0pV/ennFtlwvm8hY2E86HT5p2P3uLKKXmyNSs9DwQY9VIbJOgq3aMDO8zmQ==
+X-Received: by 2002:a92:cd87:0:b0:3dd:8663:d182 with SMTP id e9e14a558f8ab-3dd99bf7148mr125417255ab.13.1748879702340;
+        Mon, 02 Jun 2025 08:55:02 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7e2801esm1824842173.33.2025.06.02.08.55.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 08:55:01 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+In-Reply-To: <20250602132113.1398645-1-ming.lei@redhat.com>
+References: <20250602132113.1398645-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] selftests: ublk: cover PER_IO_DAEMON in more stress
+ tests
+Message-Id: <174887970147.61479.12673912613922445797.b4-ty@kernel.dk>
+Date: Mon, 02 Jun 2025 09:55:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC 3/3] block: use mm_huge_zero_folio in
- __blkdev_issue_zero_pages()
-To: Christoph Hellwig <hch@lst.de>, Pankaj Raghav <p.raghav@samsung.com>
-Cc: Suren Baghdasaryan <surenb@google.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Vlastimil Babka <vbabka@suse.cz>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
- Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
- Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
- David Hildenbrand <david@redhat.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
- Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-block@vger.kernel.org, willy@infradead.org,
- x86@kernel.org, linux-fsdevel@vger.kernel.org,
- "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
- gost.dev@samsung.com
-References: <20250527050452.817674-1-p.raghav@samsung.com>
- <20250527050452.817674-4-p.raghav@samsung.com>
- <20250602050514.GD21716@lst.de>
-Content-Language: en-US
-From: Pankaj Raghav <kernel@pankajraghav.com>
-In-Reply-To: <20250602050514.GD21716@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4b9yZP6Tt5z9spq
+X-Mailer: b4 0.14.3-dev-7b9b9
 
-On 6/2/25 07:05, Christoph Hellwig wrote:
-> On Tue, May 27, 2025 at 07:04:52AM +0200, Pankaj Raghav wrote:
->> Noticed a 4% increase in performance on a commercial NVMe SSD which does
->> not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
->> gains might be bigger if the device supports bigger MDTS.
+
+On Mon, 02 Jun 2025 21:21:13 +0800, Ming Lei wrote:
+> We have stress_03, stress_04 and stress_05 for checking new feature vs.
+> stress IO & device removal & ublk server crash & recovery, so let the
+> three existing stress tests cover PER_IO_DAEMON.
 > 
-> Impressive gain on the one hand - on the other hand what is the macro
-> workload that does a lot of zeroing on an SSD, because avoiding that
-> should yield even better result while reducing wear..
+> Then stress_06 can be removed, since the same test function is included in
+> stress_03.
 > 
+> [...]
 
-Absolutely. I think it is better to use either WRITE_ZEROES or DISCARD. But I wanted
-to have some measurable workload to show the benefits of using a huge page to zero out.
+Applied, thanks!
 
-Interestingly, I have seen many client SSDs not implementing WRITE_ZEROES.
+[1/1] selftests: ublk: cover PER_IO_DAEMON in more stress tests
+      commit: ec8010dd4afde3ebb6457d278a104a2e54deaa32
 
->> +			unsigned int len, added = 0;
->>  
->> +			len = min_t(sector_t, folio_size(zero_folio),
->> +				    nr_sects << SECTOR_SHIFT);
->> +			if (bio_add_folio(bio, zero_folio, len, 0))
->> +				added = len;
->>  			if (added < len)
->>  				break;
->>  			nr_sects -= added >> SECTOR_SHIFT;
-> 
-> Unless I'm missing something the added variable can go away now, and
-> the code using it can simply use len.
-> 
+Best regards,
+-- 
+Jens Axboe
 
-Yes. This should do it.
 
-if (!bio_add_folio(bio, zero_folio, len, 0))
-    break;
 
-nr_sects -= len >> SECTOR_SHIFT;
-
---
-Pankaj
