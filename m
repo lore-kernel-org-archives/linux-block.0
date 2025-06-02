@@ -1,133 +1,82 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488A62288F9
-	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 14:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1E8227EBB;
+	Mon,  2 Jun 2025 14:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748873763; cv=none; b=IslR1AIIB7N0FffQzkPaffJ8CtSFwk2oAcT7KJWMraGvZfeP2eZC7fykqBaily9QZqjysrzkJ+l4juodhUMHtfkRM1Tm8sNZRUcJ3nmnqCCIYB07HFcmDTVK7WqsD4V6xoMZOE/QvSvO2Eq3hcVZ1lr6BufT6VVmear11bnmLsA=
+	t=1748875777; cv=none; b=PrbgsQcudh5xYwjnAtRn8FsAaHcqltfAnIxA15Rj0l4oXWKZgCrgEPwWGONmbopXpMmje/F2Bzr4x8a1xrh7uUs1drs5GDd+wtPRbEtenXD181FuFrXsZrr41cQjwuDRZwiQMyhjOcs6YJisppjAvgYuvzIFTcHfGmmDWt1CYLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748873763; c=relaxed/simple;
-	bh=dF5GAuwDgKDUST16OT0UxWR0Azq7MMy0XSykEj/fkT4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jR5MVuvO58F6ikLOu8MkfICwiQ0AMLHQxKU1LgzOJBiKBLKhLxgQP/HcCSL05k/4nYV4G59pNFIJwJCft0Y2Ho0RJDtXNyLfxX7seBwVEoPbHsmbfWQsB19ZvXd0FheRFYz5rE/wNmFYk1LkowB1OqaHeZgg1tsmRGSmo1t+gjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=K4N6Fdfh; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1748875777; c=relaxed/simple;
+	bh=hz/nI2AX/wZ/Iy+dp0YIupcxgFFbp2hwaHuODFzGROg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RJAl9LyU9NGDs8dkb6G8t05n4CMpjuvqk/KK0AIBfy6ZBCkZFpPImYhKb0Gu0meiSe0XwRX6zqQYHHz5XxUhB9cBnuzqNen46DsG1V8zKLuD+ZYz080rN86ogY+llxWfL63TloCMy26YoxrfngET3vOV64b+WsH5x/RgrmF6Sb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=cyowkGU/; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="K4N6Fdfh"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a4fb9c2436so1327983f8f.1
-        for <linux-block@vger.kernel.org>; Mon, 02 Jun 2025 07:16:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1748873759; x=1749478559; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pasRCSC32VgEjcQb416rK5+EN/XRXvQF7vBXVNk/1Wg=;
-        b=K4N6Fdfh44MAAVtfDadHVtymwVSqSRQTUlsul/VCRKcKGCLB0vvsfs7GKxRzlBR4j1
-         WFJc6/4I2CunWs+BKVvgNRTOW+goTFDQxJPaPdDtiksIOCnZrYuAsKdLT1Bx1laQ2aKC
-         rpyFXyKWpynKJm4fQB/7GLIncOoxe6+5+3aHG51Ql1m/MHg5mQqXlCGBPUzGytiL7woV
-         XpkKKAWFQTZ8zT7SPqGg/qzIB1WEb+tPQhvFz4wr/wAOsysFnTJ3asbh+bDJlJvS3IXX
-         mYrqdH1y1CQS8254J0BmIq9DvF7xONiwI4h4MgVmutVCz01Vt1wKukGRAIpFhhpcdfxt
-         co/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748873759; x=1749478559;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pasRCSC32VgEjcQb416rK5+EN/XRXvQF7vBXVNk/1Wg=;
-        b=AY1jbXp7CUbdmQuTVLMD4LlYR0LRxdD7EKRKyQTdAEjPnjmoAXcgEPyeUbiHkCiHEd
-         iG5OoAUzDWr2r9IXmoK7nSm+f4EKLpumtHhNVjcYK0Xnvbx29pZA/cAkKqosu+2RPTXA
-         zrxUs8jdz1gtdrC/ghndF2u5LXPpH1//uL79qzL0LOZOPJF91Zp5Mw27NBugLHXJIstd
-         XK+DpkLi6V/WV2u+0uKwpCDF7oQGTVlmiy1hBumvma+12xNiGZB+K6vGbDTvGsOjzsS2
-         BMYnnQP6iTuQQr6JsVMR/ES4CKbvkxJIstRMJDG6WcfawLKOh6Hui+7hRKavUhYGpdh7
-         OjBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnELKlUWHK+z9gl4P0yaJR/IpEFpckk0M7QJsozaw4oC7/fKaGpvRwgkwD67kAVS5EdZvw4aoLGdH1vQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEQGejlt0sGOO2zoZfeeZATtoTiC2AIOce5Ah/M+/JEu0RnFAD
-	QGP+uI9ZJW3+o2KW32L8u9j4FSmqsinLEf3SFtF+kXAhVg7aIUucBxIe6Sz/7CeUP3c=
-X-Gm-Gg: ASbGnctUVAW17J4B/BMCEe8EFQJp6hPkDRtFx7nG22dXHQ0FjIMavQiP7ug+Il/XC/A
-	hST4m7vzri1sKfCEKJlAoXqtUZfc8AKbRLAMNL67WAWDksAYq+4g687o71XozwbAx8bpQCNtTGp
-	uogppeCRU96MhwnZYB3yfkRFfVC3so4TcZBMy+9DOiBSk9U+PVSGjLTUK3iaejIw+I9S7mTj2r5
-	mL37ngH1YY6gwM8LOKMoU9I52xBPVoJ/JPRkxbwkHIUE1awn/bjV3syqmd+w5WrMlWd985PmA0z
-	FmYGWc0R7YeAO9JasKPED3GMkdk1lJ0HTvpOw0Y3iapThv9TWEG9kA==
-X-Google-Smtp-Source: AGHT+IGeRpd8VDsT9tzxbCNKifu8MjL161GTIQbbUw44DS6V6JSyR7z1tMRcG6paU3cdSynR/larLQ==
-X-Received: by 2002:a05:6000:2c0d:b0:3a4:e5ea:1ac0 with SMTP id ffacd0b85a97d-3a4f89a7f0bmr10299120f8f.5.1748873759286;
-        Mon, 02 Jun 2025 07:15:59 -0700 (PDT)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7f8f194sm125483535e9.4.2025.06.02.07.15.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 07:15:58 -0700 (PDT)
-Date: Mon, 2 Jun 2025 16:15:56 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: syzbot <syzbot+31eb4d4e7d9bc1fc1312@syzkaller.appspotmail.com>, 
-	inwardvessel@gmail.com
-Cc: akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org, 
-	axboe@kernel.dk, bpf@vger.kernel.org, cgroups@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, hannes@cmpxchg.org, haoluo@google.com, 
-	hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org, josef@toxicpanda.com, 
-	kpsingh@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, martin.lau@linux.dev, mhocko@kernel.org, 
-	muchun.song@linux.dev, mykolal@fb.com, netdev@vger.kernel.org, roman.gushchin@linux.dev, 
-	sdf@fomichev.me, shakeel.butt@linux.dev, shuah@kernel.org, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org, yonghong.song@linux.dev
-Subject: Re: [syzbot] [cgroups?] general protection fault in
- __cgroup_rstat_lock
-Message-ID: <p32ytuin2hmxacacroykhtfxf6l5l7sji33dt4xknnojqm4xh2@hrldb5d6fgfj>
-References: <6751e769.050a0220.b4160.01df.GAE@google.com>
- <683c7dee.a00a0220.d8eae.0032.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="cyowkGU/"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4b9xZF0qx8z9t80;
+	Mon,  2 Jun 2025 16:49:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1748875765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iMxYgHaXBKu5N5I1Lldy3oce7xmHsWSkGql2t4sYdgA=;
+	b=cyowkGU/jVCS9cjdGBivQ1v6MXhSxYZMWG15qOXSfYS1STxVire6pY44QXTqFal0KqbXL8
+	M6oked4PaUd774j5W2y/s6Z8VGHTWBe9LelzfQxvZU49wL+wvMzue0C6+FYEiqKuXo5oeb
+	+Xmg05U3tsrYM25nw5oSCcoTL+/NsmjQ6/6iwlnxnnJVkFGcj58Tsq+qzKkkv0m98Ucn/i
+	xawB2PG131q6qEIQotTLadXw09ZjMilew8Qgiyd27AN1n38Gg5X+N0PfzNlVPf8AcOmCIB
+	ALHJdFYHkQGxhaesjHBhi8kftO67pMMXrx1l14eF148sUURqi8AzQIh5WV5GHg==
+Message-ID: <aa6fcbdd-5b1f-412c-a5db-f503f8a7af72@pankajraghav.com>
+Date: Mon, 2 Jun 2025 16:49:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kzcsf5ktx4jfm6ch"
-Content-Disposition: inline
-In-Reply-To: <683c7dee.a00a0220.d8eae.0032.GAE@google.com>
+Subject: Re: [RFC 2/3] mm: add STATIC_PMD_ZERO_PAGE config option
+To: Christoph Hellwig <hch@lst.de>, Pankaj Raghav <p.raghav@samsung.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Vlastimil Babka <vbabka@suse.cz>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, willy@infradead.org,
+ x86@kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com
+References: <20250527050452.817674-1-p.raghav@samsung.com>
+ <20250527050452.817674-3-p.raghav@samsung.com>
+ <20250602050307.GC21716@lst.de>
+Content-Language: en-US
+From: Pankaj Raghav <kernel@pankajraghav.com>
+In-Reply-To: <20250602050307.GC21716@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4b9xZF0qx8z9t80
 
+On 6/2/25 07:03, Christoph Hellwig wrote:
+> Should this say FOLIO instead of PAGE in the config option to match
+> the symbol protected by it?
+> 
+I am still discussing how the final implementation should be with David. But I will
+change the _PAGE to _FOLIO as that is what we would like to expose at the end.
 
---kzcsf5ktx4jfm6ch
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [syzbot] [cgroups?] general protection fault in
- __cgroup_rstat_lock
-MIME-Version: 1.0
+--
+Pankaj
 
-On Sun, Jun 01, 2025 at 09:21:02AM -0700, syzbot <syzbot+31eb4d4e7d9bc1fc13=
-12@syzkaller.appspotmail.com> wrote:
-> syzbot suspects this issue was fixed by commit:
->=20
-> commit a97915559f5c5ff1972d678b94fd460c72a3b5f2
-> Author: JP Kobryn <inwardvessel@gmail.com>
-> Date:   Fri Apr 4 01:10:48 2025 +0000
->=20
->     cgroup: change rstat function signatures from cgroup-based to css-bas=
-ed
-
-It says: "This non-functional change serves..."
-
-However, it moves the *_rstat_init in cgroup_create() after kernfs dir
-creation and given the reproducer has a fault injected:
-	mkdir(&(0x7f0000000000)=3D'./cgroup/file0\x00', 0xd0939199c36b4d28) (fail_=
-nth: 8)
-
-I'd say this might be relevant (although I don't see the possibly
-incorrect error handlnig path) but it doesn't mean this commit fixes it,
-it'd rather require the reproducer to adjust the N on this path.
-
-0.02=E2=82=AC,
-Michal
-
---kzcsf5ktx4jfm6ch
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCaD2yGgAKCRAt3Wney77B
-SVQoAQDHq+sRBr9VIovCUMvE0lKEciOvnR/BAoR4DPgcg+NOwAD9Fm1hrpnED7c+
-obYDZ0tb/tA0+9khXt2TrVelWDcc/Ao=
-=n7f7
------END PGP SIGNATURE-----
-
---kzcsf5ktx4jfm6ch--
