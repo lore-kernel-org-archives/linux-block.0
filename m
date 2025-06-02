@@ -1,50 +1,47 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DBA2C327C
-	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 04:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFCC2C325B;
+	Mon,  2 Jun 2025 05:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748840337; cv=none; b=sZwZBGlbp9mP82H70fPtEf7/vk7MZq2FtR8FD1wae1ru9FLn63BtiP1lbzj92zvNy7FakelR/Awpay3Xe0nmhwGi5VP/2kmAoA8XzNiOI2M0R2QGZq4+kSDAHC2GVp/kpzfUoEic5gXLcGLpgIJdICW9nrH/0msakoa8kBESs+E=
+	t=1748840593; cv=none; b=rw0jr2BdqkyKt04ejxRaTxJEg7AOX3/yabjabHV6W+9iSdKR0tHpYt/Zl9Csd/VRuAt1TPg+CekIT8S/kjSnLCldBP59mlJt/eljcIQ7O2ocQkiEj60xv1owzLHoOvL37rrv4HqH97mxkXVME4M8WQ8OMBPANlpYPR0mqvIYJM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748840337; c=relaxed/simple;
-	bh=rMNBtxehxSTBZeA7meAYqElvRTffO6QUVbP3gIIZC3E=;
+	s=arc-20240116; t=1748840593; c=relaxed/simple;
+	bh=ZW5f+q6Wbl0Dgpfr0/2chECrrdMKRJgsgaeagUlFSQg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H40NIq+Hz1zFivOO9JZcdOSXbuQb/u/UTvL7x9L0TG3TNsPNPSJ7axQoPsUTwfuixbx3Nqdb/TbCtqLq4NR6BlPjE3asMW4T+Al5Rv4N9AHr/qtN4EFd2Tx8zhPiet3ww/lD/a7esZEi3q1yiVv+3hziHYkQ1g6jkGqymrsU/a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DEDgFb0E; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DEDgFb0E"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kxEvP93Wfl+81a5qScLy9c/kMrzau8pAQI/zcSNv4lE=; b=DEDgFb0EY0ewKUii8VVaI0SDeV
-	WkVrExlWYED7ap6LJzQJGzqNv/6drn6fj5edHTLmPuFJUOKYQI0SQ004zf07dlb+S/+eXcXd7YF4z
-	DNvSdqaaRFre+ytaiOiZroWEh1ras80XmPPhTumroEf4QWJc0VQqXHBegbd5+VLiVw4DaydCzM1lr
-	yhj1CVQtPppeTZ00F9tRUs6Ba9nH+Uumi7MDbmgg9rr66c2mQ9TKw6nhCtUHWamH3OZdJVHQaY6Pl
-	jMId7vJrPqfdQys4xLOyM54LbBHo7oZem6slLH6zgS7L0lwd1kDBdsd4HY/OCvip2vQfY5490NFAY
-	Yx90tO1g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uLxGB-00000006iYQ-07d1;
-	Mon, 02 Jun 2025 04:58:55 +0000
-Date: Sun, 1 Jun 2025 21:58:55 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Mark Harmstone <maharmstone@fb.com>
-Subject: Re: [PATCH 1/5] block: new sector copy api
-Message-ID: <aD0vj0O-4P92Rkqx@infradead.org>
-References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-2-kbusch@meta.com>
- <aDBt1qXj90JO1y2v@infradead.org>
- <aDCqGLY4irp-6N5M@kbusch-mbp>
- <aDP5o1qb02iwgw-V@infradead.org>
- <aDX6NjOuGvxhbw7C@kbusch-mbp>
- <aDa_O4HGWjy_35I7@infradead.org>
- <aDeRNvT5x_qRj3kX@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UJ8LantjiCO3zHSlkCmHDCN/15mgsrVre+jL/veUGJ74txIHbYiQDnXbzEFAU0//DuWTkCiTZOJn8PwfufzDUPgKzU4Twzm8o3GkUgfQhp+LsoGbUHs+ouPWr425NgJCYoia14L2IPdKHF3HMap09dUZPR2IMS3YsGRj9cpUY3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 635A668C7B; Mon,  2 Jun 2025 07:03:07 +0200 (CEST)
+Date: Mon, 2 Jun 2025 07:03:07 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Pankaj Raghav <p.raghav@samsung.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Zi Yan <ziy@nvidia.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Michal Hocko <mhocko@suse.com>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	willy@infradead.org, x86@kernel.org, linux-fsdevel@vger.kernel.org,
+	"Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+	gost.dev@samsung.com, kernel@pankajraghav.com, hch@lst.de
+Subject: Re: [RFC 2/3] mm: add STATIC_PMD_ZERO_PAGE config option
+Message-ID: <20250602050307.GC21716@lst.de>
+References: <20250527050452.817674-1-p.raghav@samsung.com> <20250527050452.817674-3-p.raghav@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,34 +50,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aDeRNvT5x_qRj3kX@kbusch-mbp>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250527050452.817674-3-p.raghav@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, May 28, 2025 at 04:41:58PM -0600, Keith Busch wrote:
-> On Wed, May 28, 2025 at 12:46:03AM -0700, Christoph Hellwig wrote:
-> > On Tue, May 27, 2025 at 11:45:26AM -0600, Keith Busch wrote:
-> > > Just fyi, the initial user I was planning to target with the block
-> > > layer's copy fallback isn't in kernel yet. Just an RFC at this moment on
-> > > btrfs:
-> > > 
-> > >   https://lore.kernel.org/linux-btrfs/20250515163641.3449017-10-maharmstone@fb.com/
-> > > 
-> > > The blk-lib function could easily replace that patch's "do_copy()"
-> > > without to much refactoring on the btrfs side.
-> > 
-> > Well, that code would be much better off using a long living buffer,
-> > because the frequent allocations are worse.  
-> 
-> No argument against that. I'm just adding context for where this blk lib
-> patch was targeted. I'm happy to help on both sides to make it more
-> usable, though refactoring other block copy implementations (splice,
-> kcopyd, xfs gc) to a common api looks like a much longer term project.
-
-FYI, I'm happy to take care of XFS GC, but I don't think we need any
-library code for that.  And I doubt any other async implementation would
-share much code besides the low-level helpers.
-
-So the question is if there are many potential users of sync helpers.
-Maybe the answer is no and we should just not bother with that code for
-now and only add it when/if it actually starts sharing code?
+Should this say FOLIO instead of PAGE in the config option to match
+the symbol protected by it?
 
