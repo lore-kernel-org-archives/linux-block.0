@@ -1,174 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CFE1A9B4C
-	for <linux-block@vger.kernel.org>; Mon,  2 Jun 2025 13:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBF722156B;
+	Mon,  2 Jun 2025 13:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748870616; cv=none; b=dHZF//yhCZr0bV+mo7yo7Hk6CmYvmeVmcSH8EJ1w6L5fc3Nep8HEmN/5o4LoQEnpL3lElsOc6HZ2/BjccccMvc/3bQfZZTNy/Wnmx56fzrQwkuCoz3mNnLYqIdihxQ5VSeHJE8RHX/6SWftZyC+KGjSm/mK1IeL+3sZgR4lO/aA=
+	t=1748872526; cv=none; b=AKzFvFpOvrJiQofyoHkopmXbOtQTrMM/VOOeCBXHW0QL5jiy/7uZfJ+VsoV+dd3juXUteUE0jiyxbixjK+L/joCWzkjZxwSA6d4Yqci9L6386g013EQrx8SBp4gFpvkCWrfEt099achl7KiwHOkrut5ohL6dxzl8V39/kyyy0NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748870616; c=relaxed/simple;
-	bh=Fy8kXoS2tl5VOHJ5gtfuypbNyTwgwoHtq7g7o9O8G5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G+AIOCGkaG4NOj0bk348gmMNP+KPiPFL+09Q0+argkl1iBqimhG96MVNGhBOIixBM+/vbmq2yLxMmBTUWyjKEsrYFOyOyNkNcjy15phPh1p49NLym8TRHfn6KpN1TyhoX3CkyPOhcoWVgIY5zSB7tbDfE+euEz8VaLMZjiut5hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H5zy2v1F; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1748872526; c=relaxed/simple;
+	bh=CE13FvVd/oZWld/RcBibj9PFe0iI8IjGbKlr0iRzhJk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jeG/ffpwN/aiMw+4y1Wmr7PdhuMYScSE47WoIA/1vfWQmf4oQ23/sVxlgLSqZ0jPSgp2xHFDlTmAdj118NPHX47x0f1heyRWo6InbMneuuXsQ+ArW+7ii7lE9sXd20cQ6DgqCRcTGkhcKELcYBMESqHpFtNJcOxxIiD/L6D7ij0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4ShsCKN; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5zy2v1F"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748870613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YUIEYIqCeyWVtkqFGxA7+ydBEYmbUAE9Ilajy3dbYsY=;
-	b=H5zy2v1F0+Zp2InMDVNEIbQvoTeGJTCeBXvUeDs+8oRi3x+wAvgfGwRd4gzETs61MPuHJh
-	q8vwFSYBUZKnwjLDCK0aPKCub4ECS4uQdtuUXA9h1Xw8O7Tucz3bPj5tlkZ/euJkOTzriZ
-	glS/E9WGQWqcs409AJ1asixkXHYg1vA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-195-ooPEV3L2NrebTgSPmHAm6Q-1; Mon,
- 02 Jun 2025 09:21:27 -0400
-X-MC-Unique: ooPEV3L2NrebTgSPmHAm6Q-1
-X-Mimecast-MFC-AGG-ID: ooPEV3L2NrebTgSPmHAm6Q_1748870486
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E30F18001D1;
-	Mon,  2 Jun 2025 13:21:26 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.4])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 20C771955F2C;
-	Mon,  2 Jun 2025 13:21:24 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] selftests: ublk: cover PER_IO_DAEMON in more stress tests
-Date: Mon,  2 Jun 2025 21:21:13 +0800
-Message-ID: <20250602132113.1398645-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4ShsCKN"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30f30200b51so43862661fa.3;
+        Mon, 02 Jun 2025 06:55:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748872522; x=1749477322; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CE13FvVd/oZWld/RcBibj9PFe0iI8IjGbKlr0iRzhJk=;
+        b=l4ShsCKNg7+k7oI0iYW2iMqd72zFVCCjLncJcLa3gBoZCwCTQgArZuB9GI5XzqEW7h
+         Rl8yI7b7sIGmPtiDsi0xEwqMJy72tDRNVERDetHGsdGE+jyZuRdICLp4s0V2uiSd3Ti0
+         0SCWDbV/RWCgdBhxT9N2wdwUoWiqxeH47Wvn9j1riZEeLm7BikagkvaYAIwgsn4RgKT2
+         nLk9revPzlRqsasOj0fKlQ9PjbtUZu84b8SawtANqGSBh/mpTzxaKXjMgKpW45+bihIN
+         MsfajiqRavsgxnjKgafDZNsRx3IbjJ2el6YCgAwieJsgOhhz0kwS2fAwOaQw+z7R3p05
+         OFaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748872522; x=1749477322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CE13FvVd/oZWld/RcBibj9PFe0iI8IjGbKlr0iRzhJk=;
+        b=RPPBw67INP2GAuXWJFINTV4u/8xQMjXAL1gm4QqjE8O9ivPiUHQfY0XIgXcQm3qPyL
+         8hliFKGvXMaW5jBDIZh5kM2EhOJBpk4gSDoaW5ssyvlAhXlVTL6YvS9Q1In7ttRRKFW5
+         qpIE7c16TuCAvulz2qIX944vA5lkHKtcLxHX2Y3yHcydp8ijv53h3Jnppqhr8bAk5Qe0
+         YioEYDyHMfZoNNbUp9fuVKbyZW2qyEBIdrfx43DB1hWQ9kIbJyNfBc62WdvwXDfZHps3
+         xoyNFodRJFiRwLn+YMaoGy5MjJS2VMwIc0on+JMPm7gMESJvKCW4R3/2mcX6hiYPmFMN
+         QK0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUnzd5gDhLQjh4pV5j0EEbumhxt5kjDDalh7rtSlxZQgQ4JrDsRRGHCYDw5yvyKwSkYehUgKkAOEeMZBrU=@vger.kernel.org, AJvYcCV44kj7QDZSNLf0f0MCD+h7f7qqs/ginKvvqlsSPjlLjDIANSc4YysdseRrYuBCPSt5gGJ64GWxbQCa@vger.kernel.org, AJvYcCVmqvgFcFUmFqrkuR3vYFfeW0Vs8NaGyY7gz1wiN6TJKPgdT7GkJ/d4T3ZQ09BirPbqTAyujoQ7Z8XU@vger.kernel.org, AJvYcCVxZuOp6BXvW/7wNx51K2ju1Z9oxirPNYPdSb4OnGkpjwiQfUwo8ECXGhq0M3al3yADB7ssyvqsf2KapKNbjc4=@vger.kernel.org, AJvYcCWlag8hCH6T7f0eLSy5JT01s8PglZFgo1960Qj3rA8y2Y73NoiGxaf4y/+nI65yUZ+k3vxkkNoHNwAggoEgbCzK@vger.kernel.org, AJvYcCXIhX3DFPX0dsZ7doOmmlzNR+IGEQogvcOn8LQf/ZrV1tWM1tI4BjJAFBRk8ak0UUMaSTX36fNxpvpGHx1y@vger.kernel.org, AJvYcCXhAsq6PzohomSjUR5VkB/N233Bd4WHomngaqdLcbgHtUt8S4Lah6ABH+eoS7MXG3S84e2B63+I@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYbJScFfNUjdAWL6HWUGgwwR8/Zq1HcSz9qfwngaf8gxYrn6A7
+	46833FpPNhgOFke8itm0/elxUvHndJJ1yb0fYoCQFH2taFPhpw/h7pU1qZLjTdlHxXakR0k8fg/
+	SB18DVquRc95l+TiTWZC8wGl7//NUtuI=
+X-Gm-Gg: ASbGncsWdqQjWEuhZavoD/Rfrgu6LkbzZs9XfWRkzrBW0qkzAhWC5+IaQN/Eg3kvCIc
+	KXQ/jwrAH5hGhio9Hs3j69cKTawTuozktfYb6khy84JbNmdM+uhI+i376Zz93KOXZhHTkxXkAJt
+	vZOEHql/jb4Ti2JAkx704xS/xQkLlyfJ1Q7bUfTlupXNJNWVJV
+X-Google-Smtp-Source: AGHT+IHz2uBVrN38mqcMJz16ScrK52REQ3KL0NzpCYQfCXahCS+RixLkxRyOA9nPkDFUugfUGTPzmT74dbDRz5uF7Uw=
+X-Received: by 2002:a05:651c:2223:b0:306:10d6:28b0 with SMTP id
+ 38308e7fff4ca-32a9e99cea5mr28582111fa.1.1748872522258; Mon, 02 Jun 2025
+ 06:55:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com>
+ <20250530-cstr-core-v11-4-cd9c0cbcb902@gmail.com> <aD1knOuEFxv6VQy1@google.com>
+In-Reply-To: <aD1knOuEFxv6VQy1@google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 2 Jun 2025 09:54:46 -0400
+X-Gm-Features: AX0GCFttP_CQMaSyNKDR25_XJh3x3vRlTYDuJ8CXsXgGcEC-sRFuWZHUykb5COc
+Message-ID: <CAJ-ks9mmkpvgbQs+EjPeN5N+TwOHKB2-9NV-FauGnymmxhxUrA@mail.gmail.com>
+Subject: Re: [PATCH v11 4/5] rust: replace `kernel::c_str!` with C-Strings
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We have stress_03, stress_04 and stress_05 for checking new feature vs.
-stress IO & device removal & ublk server crash & recovery, so let the
-three existing stress tests cover PER_IO_DAEMON.
+On Mon, Jun 2, 2025 at 4:45=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> wr=
+ote:
+>
+> On Fri, May 30, 2025 at 08:27:45AM -0400, Tamir Duberstein wrote:
+> > C-String literals were added in Rust 1.77. Replace instances of
+> > `kernel::c_str!` with C-String literals where possible and rename
+> > `kernel::c_str!` to `str_to_cstr!` to clarify its intended use.
+> >
+> > Closes: https://github.com/Rust-for-Linux/linux/issues/1075
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>
+> > -/// Creates a new [`CStr`] from a string literal.
+> > +/// Creates a static C string wrapper at compile time.
+>
+> A C string *wrapper*? What do you mean? I would drop the word "wrapper"
+> here.
 
-Then stress_06 can be removed, since the same test function is included in
-stress_03.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- .../testing/selftests/ublk/test_stress_03.sh  |  8 +++++
- .../testing/selftests/ublk/test_stress_04.sh  |  7 ++++
- .../testing/selftests/ublk/test_stress_05.sh  |  7 ++++
- .../testing/selftests/ublk/test_stress_06.sh  | 36 -------------------
- 4 files changed, 22 insertions(+), 36 deletions(-)
- delete mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
-
-diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testing/selftests/ublk/test_stress_03.sh
-index 7d728ce50774..6eef282d569f 100755
---- a/tools/testing/selftests/ublk/test_stress_03.sh
-+++ b/tools/testing/selftests/ublk/test_stress_03.sh
-@@ -41,5 +41,13 @@ if _have_feature "AUTO_BUF_REG"; then
- fi
- wait
- 
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_remove 8G -t null -q 4 --auto_zc --nthreads 8 --per_io_tasks &
-+	ublk_io_and_remove 256M -t loop -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_remove 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
-+fi
-+wait
-+
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 9bcfa64ea1f0..40d1437ca298 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -38,6 +38,13 @@ if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
- fi
-+
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tasks &
-+	ublk_io_and_kill_daemon 256M -t loop -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_kill_daemon 256M -t stripe -q 4 --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tasks &
-+fi
- wait
- 
- _cleanup_test "stress"
-diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
-index bcfc904cefc6..566cfd90d192 100755
---- a/tools/testing/selftests/ublk/test_stress_05.sh
-+++ b/tools/testing/selftests/ublk/test_stress_05.sh
-@@ -69,5 +69,12 @@ if _have_feature "AUTO_BUF_REG"; then
- 	done
- fi
- 
-+if _have_feature "PER_IO_DAEMON"; then
-+	ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" &
-+	ublk_io_and_remove 256M -t loop -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" "${UBLK_BACKFILES[0]}" &
-+	ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue"  &
-+fi
-+wait
-+
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_06.sh b/tools/testing/selftests/ublk/test_stress_06.sh
-deleted file mode 100755
-index 3aee8521032e..000000000000
---- a/tools/testing/selftests/ublk/test_stress_06.sh
-+++ /dev/null
-@@ -1,36 +0,0 @@
--#!/bin/bash
--# SPDX-License-Identifier: GPL-2.0
--
--. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
--TID="stress_06"
--ERR_CODE=0
--
--ublk_io_and_remove()
--{
--	run_io_and_remove "$@"
--	ERR_CODE=$?
--	if [ ${ERR_CODE} -ne 0 ]; then
--		echo "$TID failure: $*"
--		_show_result $TID $ERR_CODE
--	fi
--}
--
--if ! _have_program fio; then
--	exit "$UBLK_SKIP_CODE"
--fi
--
--_prep_test "stress" "run IO and remove device with per_io_tasks"
--
--_create_backfile 0 256M
--_create_backfile 1 128M
--_create_backfile 2 128M
--
--ublk_io_and_remove 8G -t null -q 4 --nthreads 5 --per_io_tasks &
--ublk_io_and_remove 256M -t loop -q 4 --nthreads 3 --per_io_tasks \
--        "${UBLK_BACKFILES[0]}" &
--ublk_io_and_remove 256M -t stripe -q 4 --nthreads 4 --per_io_tasks \
--        "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
--
--_cleanup_test "stress"
--_show_result $TID $ERR_CODE
--- 
-2.47.1
-
+Yeah, I don't remember where this wording came from. I'll change it to
+be mostly the same as it was: "Creates a new [`CStr`] at compile
+time.".
