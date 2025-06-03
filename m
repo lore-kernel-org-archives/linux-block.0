@@ -1,96 +1,119 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC21F21324E
-	for <linux-block@vger.kernel.org>; Tue,  3 Jun 2025 18:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F96C4B5AE
+	for <linux-block@vger.kernel.org>; Tue,  3 Jun 2025 18:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748976370; cv=none; b=bMtT7IXrkmLfim39TqAqmSUYhpV8sWXrc7dnBAPtwNjUJPbtbbrvfj7VBws/IYVfniF56povyMhi38ZjK94Ck2rLvXL+pD31Q8Vj0qqVZZ1DMeuV7W7jEkWToo9p2nUdX5cPR8KQs+E5Z3qsA1PDNXbBEjdcyKsTaPg23YeBnwA=
+	t=1748976478; cv=none; b=eCr29ZfeuZNxVcEglGczf2i7CN9lcqxCZMbmZNpcmUbQUxBArlXP9Saoz+iardrDuR0K1gTTYfUGS7a4pW0lmZR/JNBT4j2JLRw7RQKBI8B/0jKtzDLg5bssaEa74v0mQDkWjpvdTjlOsb1dNmYO/6q0HgBQ/4yWC+j8wvJ+Zg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748976370; c=relaxed/simple;
-	bh=BGGyoOAitopUbOF8JRNp9e7ymTkcBN2zyfb0bX51Xpg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=TPOV4DWK9I5bPWk1sFHDq4IrZ36rSacfUgyt2IS3bV+GTuOk8obJU9LNdXL3eWkPNMdM9LSjbgW7O0SNHtWyjjBQrYNSdmWhKLty+egAYC2SeYnbOWXNUAwqk39eQDtfTVCnFteeD7GulJ5i6uLmvUyv/d2D1UbvYW+7fi/2gkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=B7Q7s2Kk; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1748976478; c=relaxed/simple;
+	bh=T1nJCLcmWXLOe6y4Ii4bdG1cnEHziBxfcWmNxILh2TA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mhmooaytysXlVN8iFjsoALXGvsCDwsJAwVZB/ECcwWXlu9ve5evDTB0H5yDsX3aqy8cT7CB1xJ9jgDnw8w+Eb+ghi3fNouq5d5feMjHyeQwT4GfQcGV+K3oy4zEBwjWUw+yuL3INmxKVqiDQg0K4zg7F5RqHGfb85Qte+Lcuaro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EDNGC76R; arc=none smtp.client-ip=209.85.210.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="B7Q7s2Kk"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-861d7a09c88so155861839f.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Jun 2025 11:46:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EDNGC76R"
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-736c8cee603so657566b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Jun 2025 11:47:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748976367; x=1749581167; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ytv+YWv+S75md5rXeB13AvL/fqgyAAlIGtDQ7fSe6gs=;
-        b=B7Q7s2Kkj6QHX53bh5al5jCj8QpshWVCGlPDoY88fUOhvMtkPbUJc4KyLFj8keoNXM
-         w9RixbUMRL+7fB7oyxH8gG8i1P75qaSN6/dN4YVcxULWxXtLwLKv7Ldx7dlOIiW5dC9w
-         G1LCzO/dietahsMXcI+PjpYRZQ2ru39oJbclFibP/3bK1KLo1koFwGVDpVt1UGEp0Jsw
-         f4INUvbXHt2BTjFWctgxg7F7xHk2g4jV9xGbN7blsFCYkMEUPTM9VVA73EeTNSx+Qiv3
-         pbYvSRbki072xIRr+Hk7kEGoms3ATPnKJiOhEI54iWmZj9g9S4hLU6os+F5Np9AUbr5k
-         YvYQ==
+        d=purestorage.com; s=google2022; t=1748976474; x=1749581274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wleOKjFHw+cNcX4TN+jBCmGoOfaK4yhpbI0lui86FvI=;
+        b=EDNGC76ROYG8mb6RidcHTxSwVsFWN9RJoPQGZQ7mu+uNEO+69BVw/5g9qRPeTAIwu5
+         E4D5HJk9bUe5bz3UN0RNxjwsIMVSXB6yckQVl4X0qTrKU0AOrI2Fo9nmxLszlvGqoRLD
+         eBBOSwyAnW95vkrtUjnNSx8YmWNrLWFm5YhMt5BKw2AYgt4pfDxiW1FlxmWH0HA4wB95
+         +2eHfFBxeLgLf2JeZzmbN9N2lEfjQSYsTTbajALdqFJF8WY6yxz6V8bjqKtcRRX0Ca6g
+         8U7jL3eS4bI1De7oh4KwZ5oSWkCpp/sNjQrKALuIFcOOp1St9NK6Xm3WXM4u5jB+WvDf
+         21bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748976367; x=1749581167;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ytv+YWv+S75md5rXeB13AvL/fqgyAAlIGtDQ7fSe6gs=;
-        b=gQe3un9yNEQ2yyh+iL0zWIjKgYOTPO9ygza48uLEIxfuc10pyzPxnGOM6kRHdEi0tG
-         JZONun5roRMTIxcXU6DRfQKRmkLU5Ct9aOadxT2mMVy04BnY45XANRFWNgdFHRdU16Pz
-         /DGxu9beazoaBWgfYxZamYsPcFqPsSlgEoILIyVU9oq3GZA2jaefLzBEah4xSNSI4oxm
-         h+lO++kOAny/okvehg+cmfd0NRMbGhQJv4Xs6+uQWNZ6qSxpygY1GwGFy1CM15XMrVKI
-         Yf9akfHuoOpW0zIsKkzt0Yxv4oFK8DcyDFol+C6thw8lS9h3JO9JzdqPiJMvpl0PiPsY
-         xbgg==
-X-Gm-Message-State: AOJu0YwGOjEcUrSs2jKzfEI7/swPxPGGARN8PYSSFGuSth6ICfXRXyGm
-	mWoRXEEDTTZWE8LXMBaxU6mSjttn0p2w0yduMeife05AMqknc9/esfx9OcGpDUljJgs=
-X-Gm-Gg: ASbGnctQWwHKIN/Cd7ewHjdqLAVSXrDbeRi5EuM06oBygkwG1o9fCc8NxNvgynin97k
-	EmVFcpxSJ59ZkVsgTe2VHe4f1EOzMazXZbAZUw2c4rScivECZVIIoc845Hc1EKtt/KUZF1Xoku2
-	2emnGDAu2X9BWH1SYrIJco8+FJ+J29LNNUY38obAPb6YqqvdR5hzHCMoGGol16aq4NnHdHMfd82
-	EX316p+pp4SUp72q4MBqJ9p9npqq1dD8Ti/i6if6XrxO1BM9BIR1vldVjKnuiMCoIOELsYhsxvI
-	uWqnBvTqWaflrekume231bv15qU7NSCc75xOkE5B/A==
-X-Google-Smtp-Source: AGHT+IGQVJBhh4r6CbR3SMBMSOpcdLANMW7TJEkb1UHjw6n0V54ffSovSdkLt6VoVn1npFg4sbriNg==
-X-Received: by 2002:a05:6602:721a:b0:86c:f2ea:d8d3 with SMTP id ca18e2360f4ac-8731c643e38mr5739139f.10.1748976366844;
-        Tue, 03 Jun 2025 11:46:06 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-86cf5e51d99sm232212639f.7.2025.06.03.11.46.05
+        d=1e100.net; s=20230601; t=1748976474; x=1749581274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wleOKjFHw+cNcX4TN+jBCmGoOfaK4yhpbI0lui86FvI=;
+        b=ozidfyNz6nTi4L+xx8/9Sz9wA7D5VPiUkd6TLI1JbsjRsG+7Y7ESD8JD5UN/y8ldaR
+         HR0cMikepdwlS+LdJI4Qaw9M9Eb27gpyjEUzsgsDTr3B68voIobos1PsNwTlV/s50eva
+         8QDiqX+24e1QCp0PVmsrnJEmWPJbRreV/cSfSB9MMbtmirecOr+Y1HZKnifpw1EcFR45
+         y3O4sLBU9nWniHbhd4rZt8FErIQaFub7HMnR0AjBLgk4TGQliKWgIdVRFcwfgEWH6RB+
+         YJmxqgeEcr/Z3c6I17fAFU4aem97w2KsfKkNvFcQ/S0XxCJqSoKUpid7nHQm2t25oJqM
+         W0rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkbZVTDIFienTHZ6HJJaTNQMxhxyy3/AqrXIym5RvD7taJZcKpTeH/QdT4VdJzlTgWfu0nEWP9g4/Jqw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6PNO5JRAKlAyqzKZk41NQD73I0b9UnaAPvxR7j5eczbMWISvf
+	i2e+v2aS+QHCmMmVJwDZ3gKRePauwA46WQ45IUAKLh6RRWN4OLxy5MLNhVgR23KYGcfclXGU7Zh
+	+zIsrjmqdjKVyyG7AVcp36eaxb8LPQQG6o2bW
+X-Gm-Gg: ASbGncuMDKmt/7d/Ghka3iLSN95QRIoHLqr4q3j47aIBMCQPrlcCkiKDWF3k4ptU/qI
+	fCzRJC6njNKPlZRUqzwzcmP2rjOHTLXf4YZ+KocMFK1ClZzDwJtzyGLqpKRb/ICguX+u9OYeedD
+	90tAGtGt0Pnb48Db3dVBWFgVaI0j0dYHj2KHJL9L1uSGQQlS2kjnzKkigAtyrehj3282g3sifvc
+	zoUwn0+qGJCr4PCpPzbsPgsOcaGkjj97s9Wz2aZ23REfRbosNaohZ++kjyjFMLziEjTEXj08Ok9
+	/JxUENgEgpIFB2QJvN1pvpZDVudxYYoxoX4vOx4ad2OA
+X-Google-Smtp-Source: AGHT+IF9o/kLaE/7tSmOjOj70ylD0L4dQmAqwISZaTT54uQrF1uMJGXZ/22CdVWSxkBTXdol5aFUQ6VoHoKD
+X-Received: by 2002:a05:6a00:1815:b0:736:4d90:f9c0 with SMTP id d2e1a72fcca58-7480b20132dmr118819b3a.1.1748976474360;
+        Tue, 03 Jun 2025 11:47:54 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-747afe98193sm743791b3a.1.2025.06.03.11.47.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jun 2025 11:46:06 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250603183133.1178062-1-csander@purestorage.com>
-References: <20250603183133.1178062-1-csander@purestorage.com>
-Subject: Re: [PATCH] block: drop direction param from
- bio_integrity_copy_user()
-Message-Id: <174897636598.14684.15850235224325997999.b4-ty@kernel.dk>
-Date: Tue, 03 Jun 2025 12:46:05 -0600
+        Tue, 03 Jun 2025 11:47:54 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 7EAF834027F;
+	Tue,  3 Jun 2025 12:47:53 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 7B4C8E41D2E; Tue,  3 Jun 2025 12:47:53 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: flip iter directions in blk_rq_integrity_map_user()
+Date: Tue,  3 Jun 2025 12:47:51 -0600
+Message-ID: <20250603184752.1185676-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Transfer-Encoding: 8bit
 
+blk_rq_integrity_map_user() creates the ubuf iter with ITER_DEST for
+write-direction operations and ITER_SOURCE for read-direction ones.
+This is backwards; writes use the user buffer as a source for metadata
+and reads use it as a destination. Switch to the rq_data_dir() helper,
+which maps writes to ITER_SOURCE (WRITE) and reads to ITER_DEST(READ).
 
-On Tue, 03 Jun 2025 12:31:32 -0600, Caleb Sander Mateos wrote:
-> direction is determined from bio, which is already passed in. Compute
-> op_is_write(bio_op(bio)) directly instead of converting it to an iter
-> direction and back to a bool.
-> 
-> 
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Fixes: fe8f4ca7107e ("block: modify bio_integrity_map_user to accept iov_iter as argument")
+---
+ block/blk-integrity.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-Applied, thanks!
-
-[1/1] block: drop direction param from bio_integrity_copy_user()
-      commit: c09a8b00f850d3ca0af998bff1fac4a3f6d11768
-
-Best regards,
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index a1678f0a9f81..e4e2567061f9 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -115,17 +115,12 @@ EXPORT_SYMBOL(blk_rq_map_integrity_sg);
+ int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+ 			      ssize_t bytes)
+ {
+ 	int ret;
+ 	struct iov_iter iter;
+-	unsigned int direction;
+ 
+-	if (op_is_write(req_op(rq)))
+-		direction = ITER_DEST;
+-	else
+-		direction = ITER_SOURCE;
+-	iov_iter_ubuf(&iter, direction, ubuf, bytes);
++	iov_iter_ubuf(&iter, rq_data_dir(rq), ubuf, bytes);
+ 	ret = bio_integrity_map_user(rq->bio, &iter);
+ 	if (ret)
+ 		return ret;
+ 
+ 	rq->nr_integrity_segments = blk_rq_count_integrity_sg(rq->q, rq->bio);
 -- 
-Jens Axboe
-
-
+2.45.2
 
