@@ -1,166 +1,75 @@
-Received: from mail-io1-f99.google.com (mail-io1-f99.google.com [209.85.166.99])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1192C1DDC1A
-	for <linux-block@vger.kernel.org>; Tue,  3 Jun 2025 18:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61C82C326F;
+	Tue,  3 Jun 2025 18:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748975528; cv=none; b=bJQQPl/IsoylVgj8DW59cMhk9FxgVDCpF9jzTnEBmRFFiHXylPgq9Xsn5tDEFhVtRvIXdymhKkCs8Ei+xQtKb02/9cIa89g8SRZFKXuX+fDB/Lc3Rj63wytCJu+IyVAUGWKi5N+CH18Q5LYypG3H6J4yUDq64tsyp2Ob/GrEeS4=
+	t=1748975949; cv=none; b=KLkR2OcSaiMpScqd/JoUe+uQ2dbcRpJiySNySez7jQnWRVzYjiSdnP+586AIH2x/X39kARQd0vjUsEGxQkVN2mQYWuITPKMfZZ1WFYFKqKgLN3Q8dUdE1CF4cOXdnjSE9jKfl1ce8KlpFfM/JXx6WYIMeS16IQbeudzIrf2dOGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748975528; c=relaxed/simple;
-	bh=VpCnu/vgkMXoRizxEVcXipW9pE06TvbWDwZZnY+eyHI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bikqCaiZt/ahU69ocGZVqhsGvx13zg7k1GfrV5EW5AtTBkXNSD7WchE5CzpzqRWJEdHX2m1vVvs0Twfp0MXMfLSrfxYzebNzcBcAM6tYceYzheutaZ1h4dnOtA47Aqub7JQnl16cclvbFvnGzWiTXxw9GgRx0qs/ek0SM4M3NG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ACGM6Mix; arc=none smtp.client-ip=209.85.166.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1748975949; c=relaxed/simple;
+	bh=DvF0YtJZCPbcobMdQgE3+ZNHa9Fjrq28Jh3rCZ4Bn5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E1EVVYZUNOfCmHp6pre3jeDbez1B6PIBTIX+ZO0aLHjjH++Cs9nyZCWlgUsSA36Xa1qcdoTjH23xLQQMr6CocMK0xsJkhwcNyPYy5G2CbcQKLgRH7xLmlxf7bxCUS21Ie9+O+hKnP2qgLg2BbB4AfSXIrg78ceujJkqHi3kK+qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZvHnI7lr; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ACGM6Mix"
-Received: by mail-io1-f99.google.com with SMTP id ca18e2360f4ac-86cf36df8bdso22777139f.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Jun 2025 11:32:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZvHnI7lr"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-602346b1997so10285851a12.3;
+        Tue, 03 Jun 2025 11:39:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1748975526; x=1749580326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nSEqmtH8cAoHSrP17Ob/VSrxyz6o4t+D0NIScOXkFbc=;
-        b=ACGM6Mix3TNlXAZ2RDuAUoIiyLd9uTl702TEQiRE1rNSpOyN5U7POcn3qoNV/jbP2y
-         A22nO7s9Hi2lh9TRkk28suEIHsw0XvCUjaH5J7xtlxCjerwXWsg4yjOZ/lKU8tKuNSTD
-         mUsgCwFlclWzJnZadWAj8IvAUkttWtk0Sybq4MMqzYiiT7L7HEvEv+MBDPKEgMVdU9K+
-         5YnxsTSis5rOSFMdQQBuVOEpHj2ec5pb0r46R1xXhEhp50S9v4LbqUeWDJYKjeWWtlYO
-         ngY+AR3haKKEJ9BErtgzo2lmeUFsUgBpKDZv1aDuH1dRrNx1jEmIPpqOKXVsGHawpc1r
-         rZwA==
+        d=gmail.com; s=20230601; t=1748975946; x=1749580746; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DvF0YtJZCPbcobMdQgE3+ZNHa9Fjrq28Jh3rCZ4Bn5k=;
+        b=ZvHnI7lrCZDZIDsTELlT4fxS6/Y+GYHQWjSti0S/Y8Irc+q8060/nwdQKDGFC/9nWg
+         nniHUpKMiqATKi2AMIbtSbSA2zS8eoVCDJhc73x0xp+O5dkQ1B3sv17hQO6gjjLAb9B8
+         +1BTPOhw6UG85q7HITRjfUS5B7W9QbWIIGWj+v/uivi/bv/9ooyLdzSZII8/T1sZsx7y
+         x3opRzY0IEiFknUq6/Gx4e3y3wRgbLb4vvXXsTbKmCSK3vN3L93KiUom43JOLt8RABkE
+         I2NAgekh4B8cA8ZHpZlGojKJcmrWpefKhNdMFanpyHwmimjGfK5sTLu6+k8iZUJSF9Nl
+         zi9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748975526; x=1749580326;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1748975946; x=1749580746;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nSEqmtH8cAoHSrP17Ob/VSrxyz6o4t+D0NIScOXkFbc=;
-        b=Yb1pCpbl9CBmvqGguKbyzDUX6K4TjbiXS7OcNIrfXzM6Q5lo9iVThY1PmOSVL/nGQ1
-         pHmFUgpnh9uYsWZoumwi8GMFYcsXP+fT8dGEs4x3Hhvxg8TIA+vh8iHBirhjQKDNHAyu
-         3OAW5Pfe6+H+1GjoV2jB3s0V1MIL4B4sdloou5p4UpI0EL7uTkVjvngmilq6Bchf+njr
-         +N5qPYv1t/3qOyXm7N8ZRliTBkAEVSIdxOYsItTCZ7pgXKAiQBRXVbrf52arhjNbx+Ne
-         +UMPO1rqEq/rQaYLv/wQQgwwAaIvQ53V12BfilqENKWFA/otOQOxDtZQrpH3DEeOU0tR
-         W/9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPGllilVnp0lkINf+BXb+ufN9VhhnxjGRwEPXo2l0L6EsdhfnmXRvgLG0IcQvHgEQkRaqYl2XjnKSpQw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhzTY/+POcaouy7z+UU3TCnJ/+VCJmxKfFhHfiLlogIyx8sCGs
-	GCzfQF9P1Bd50TAy+keT+8J4ctGKqPhw9FkNPjr2Rh+KmmiNTvq3+tOzHwIgezfvTf5NXmhNNt1
-	3qji0cf2d5m++ExOX6Geqcyqh6oOqcr/G82mgV2hAxhVIKj8/sWz7
-X-Gm-Gg: ASbGnctLRVcmNFiEAmp5ECJPu3eRY7HsvaZorJPdIu1h912X3bF5XiKa7dccMahFJgk
-	baG9Ga1DWMlXcSFSEHdE0O1XhBlWXlnfwez2/updZe1OVyeNHznVQJsrQCQ0M1vUJLfzP7/vODa
-	iPDTViegczwljUkunNbxpMi75b8+30SszYf83ufYAWboLGlZAKXNL84sz0I/SK2vrpOgk990Shs
-	iOJwoQe9RAdDD5+x0zE1DBzqToNz890wEgokfzF/oZ+r9hq2venHGgnc71vkrSLFyu2K6ikYmQF
-	pxZtPBqzzZ5K0BPpqYyZohtOfRWJCg==
-X-Google-Smtp-Source: AGHT+IH1ugbkQ4Bd1c/ELDzPsfBlGebzYbxe7TsT0zkXX3K5ma/cS/EK4OHQptbYEMSeaz4a1vTV0VHHzVR7
-X-Received: by 2002:a05:6e02:1d9a:b0:3dc:811c:db77 with SMTP id e9e14a558f8ab-3dd9bb51700mr53645675ab.5.1748975525910;
-        Tue, 03 Jun 2025 11:32:05 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-4fdd7dffa46sm280255173.4.2025.06.03.11.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jun 2025 11:32:05 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5E45F34027F;
-	Tue,  3 Jun 2025 12:32:05 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 5212DE41E07; Tue,  3 Jun 2025 12:31:35 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: drop direction param from bio_integrity_copy_user()
-Date: Tue,  3 Jun 2025 12:31:32 -0600
-Message-ID: <20250603183133.1178062-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+        bh=DvF0YtJZCPbcobMdQgE3+ZNHa9Fjrq28Jh3rCZ4Bn5k=;
+        b=w1xc2YBZKyzcnmRC05DS9xYgWrcIYiYKu9kOWgY8rAfJas6/9AULyM/UimZb4Zi2nC
+         0x6Niv7A5/w+sPFOtGZKrr7c6BBodakuMnlZLgfK+Ot0TyMYMo7PofI0aChEWVtP+UpF
+         QSeuPvLGeqpkvkZ+w8niYry3ZlMYRVsRxabJX1kIwpMFcFMWFEitXoN+K7w1comaYEMZ
+         0GLSPl9aiaNUUof3l7EWpwsl8Ho9UkCPmcvevvN7vJvEaUKTfpYkxMgOujIns8S8wBiW
+         wb9u7JIswgUKwvqC1MtfOe3OgeDLTqEYbpVLNnjkRHbmon4GU3KyADIfSqd0fo2EQhHA
+         PY1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUHUTs74PEwnFj/xIkI2MC546CHdHzUwMB9vUFI0dIrZrbwgig9Tb3y6zZSbvf5u3W95WSllfp3kMRFzA==@vger.kernel.org, AJvYcCVNdX+2j0IhkkwH98l5tnVQ4fv+VG71agpjvyhHTnSSeALkfRzEzHn6QpuuBew/EjETuH06qFuABRUh3RTg@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKm5fUy3Q3aJtfgdHBdWeG3JTsC3qf0YxWdjeROUCvEbChka+4
+	OqJUCXRkSxWLyoipoqCwcoRdgeh8R7nkeAt8DQxNxlUoYhunWQMhnvG6+6mO0FVwvpm8RNINHcm
+	NmWsbOn0beWdrLFkfLLHUo9o2sLJgBT6UVJxyx5XP
+X-Gm-Gg: ASbGncsUE04AdXrBmNe00imkWRREc/oJ9h+MFPm+G+e4B2o4ZzVUKRhDnVOmAEIu/HY
+	dXEuwh6KCcXW8ovmIuyWcrrlVLDGoNa0a2D0mfAauMW9IYKl7pb4xTMreAfBPy3jMlGCY8HgPHV
+	X1nXEzS4qiL+zw0VJp3QFzo7EAst+WZ/BEPlKSFrfxsCxMkCWgDa4C01fTzlVcNPvpxk9MngN4p
+	g==
+X-Google-Smtp-Source: AGHT+IEgp/H8t8sDlIVXIDA1/FraKwi1oRyldtr5x1vZua2nW4YVnT3NBUszJUfxL2vsAAiNm9j6P2eFL/ZirAIhC8k=
+X-Received: by 2002:a17:907:728a:b0:ad8:9e80:6baf with SMTP id
+ a640c23a62f3a-adb36b4669emr1613991766b.13.1748975945874; Tue, 03 Jun 2025
+ 11:39:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250603183133.1178062-1-csander@purestorage.com>
+In-Reply-To: <20250603183133.1178062-1-csander@purestorage.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Wed, 4 Jun 2025 00:08:26 +0530
+X-Gm-Features: AX0GCFuZoUS8cWsiQh-fsDFI14gLeVU_DVAcKegZPpEd_gCDbRqctwy_P7wpQUM
+Message-ID: <CACzX3AvbOE8CMrDhrJ4=JSd9DDcAdzBxC==jXWPvYQLpSiF2TQ@mail.gmail.com>
+Subject: Re: [PATCH] block: drop direction param from bio_integrity_copy_user()
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-direction is determined from bio, which is already passed in. Compute
-op_is_write(bio_op(bio)) directly instead of converting it to an iter
-direction and back to a bool.
-
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- block/bio-integrity.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index cb94e9be26dc..10912988c8f5 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -152,25 +152,24 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
- 	return len;
- }
- EXPORT_SYMBOL(bio_integrity_add_page);
- 
- static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
--				   int nr_vecs, unsigned int len,
--				   unsigned int direction)
-+				   int nr_vecs, unsigned int len)
- {
--	bool write = direction == ITER_SOURCE;
-+	bool write = op_is_write(bio_op(bio));
- 	struct bio_integrity_payload *bip;
- 	struct iov_iter iter;
- 	void *buf;
- 	int ret;
- 
- 	buf = kmalloc(len, GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
- 
- 	if (write) {
--		iov_iter_bvec(&iter, direction, bvec, nr_vecs, len);
-+		iov_iter_bvec(&iter, ITER_SOURCE, bvec, nr_vecs, len);
- 		if (!copy_from_iter_full(buf, len, &iter)) {
- 			ret = -EFAULT;
- 			goto free_buf;
- 		}
- 
-@@ -262,24 +261,19 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 	unsigned int align = blk_lim_dma_alignment_and_pad(&q->limits);
- 	struct page *stack_pages[UIO_FASTIOV], **pages = stack_pages;
- 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec = stack_vec;
- 	size_t offset, bytes = iter->count;
--	unsigned int direction, nr_bvecs;
-+	unsigned int nr_bvecs;
- 	int ret, nr_vecs;
- 	bool copy;
- 
- 	if (bio_integrity(bio))
- 		return -EINVAL;
- 	if (bytes >> SECTOR_SHIFT > queue_max_hw_sectors(q))
- 		return -E2BIG;
- 
--	if (bio_data_dir(bio) == READ)
--		direction = ITER_DEST;
--	else
--		direction = ITER_SOURCE;
--
- 	nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS + 1);
- 	if (nr_vecs > BIO_MAX_VECS)
- 		return -E2BIG;
- 	if (nr_vecs > UIO_FASTIOV) {
- 		bvec = kcalloc(nr_vecs, sizeof(*bvec), GFP_KERNEL);
-@@ -298,12 +292,11 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 		kvfree(pages);
- 	if (nr_bvecs > queue_max_integrity_segments(q))
- 		copy = true;
- 
- 	if (copy)
--		ret = bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes,
--					      direction);
-+		ret = bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes);
- 	else
- 		ret = bio_integrity_init_user(bio, bvec, nr_bvecs, bytes);
- 	if (ret)
- 		goto release_pages;
- 	if (bvec != stack_vec)
--- 
-2.45.2
-
+Looks ok to me.
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
