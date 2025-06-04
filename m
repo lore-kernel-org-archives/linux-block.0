@@ -1,106 +1,77 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE92171A1;
-	Wed,  4 Jun 2025 02:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E093146447;
+	Wed,  4 Jun 2025 06:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749005966; cv=none; b=EOtcN0HEHJngiBr0x3lkPAGdA41YvemLRjVQlLlVBz0diY1+yzi4KBFzli5s1rQnoPp34YU0SQ4SKbKl47SiVe/3uHB3/ZRFPIbUPVYPqxSZNTogb1J61+IagME9vQll4xD4Qv/tb04efRRyvWfTMFblLfMDn4kHB0Q/3gJKF7E=
+	t=1749019199; cv=none; b=Tj1GwEK3q6vh1dV+IsgzpK91REUTacTPuLsLkAcpQ2TE3VY6vumH9t8JL0VKmiS0TKO+g4wyXJSCDYBWaTXj2k62WT6CKXzRn/FXPorOjk4kuAo094U3RdQ8p0G6rUGx7WBh8WDri6Ae+0bgOnD7csMdPkZgUfNTf0+fcjpSTqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749005966; c=relaxed/simple;
-	bh=TzIfJSQiYccDaSYxU14uxVmwdxaEmC/dXhnVn6Nzsp4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=V+jqy59rQeMHw2lfditLd1EtNRfILM+OBZWLMlHJC/7PjINzDrEgjuRGTWYsRaE20k4StEQcDnWiQZ74Z1FfhGBk3qNK4REQ3F5Vt0e1dl6zGbs6AMJol2XxrFsnw7ERmTxmbidleJzTSEqlEBOCoXG3VwWOFVXhn0JoUT+3p0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfVfYm+K; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749019199; c=relaxed/simple;
+	bh=gAtNlfTa8CjhIyQFjnINER2l/QhNyKuN+O64uD4vOkU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aehTmdeKEIYzDSz+rHp9i0om1GS86zPGyfawFRYP51YYDXHRRphrrZ7ayfT1Id+FyJorpuMnYZhSQ06GkCALL+uM0d6tbLcEdhZhWK5tj8n/XyvY+1Xd+OgqCeigZfJy/R3Y3g9FmgGva1uJ11Tv+HSs9/ZZQZujxe3GOebO08g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NTTkSrUg; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfVfYm+K"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32925727810so55703061fa.0;
-        Tue, 03 Jun 2025 19:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749005963; x=1749610763; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rt+D3Uf3eUUD4HW5vfHTNtXXx2j8DsAepkcRUcCnZqM=;
-        b=RfVfYm+KQyOu7kVFxgwTYXRanrRAp836XE07K6k8r8gy86XBSQTkfZljPJbQYcplR7
-         7/swiIDqY9yLl+kr+W3MKyfm2LOFM1TzsTaIN25ZiQX4RXvC4H69FskffeM5v96CkaFk
-         6MOoustvJNLiDr4lYpIfKKE2rUtE41SMi/sSZWk7aQYNvM8TtKh46lx7DZeMJHGKLbPF
-         T2TT6Xn9/Kff4o/7RExFrF0Knatt/0LWUh0/vpNsvQo8W/nNm1HeQgTjLJ/H+17mDFil
-         N62EidjBo8osHqU/90gFnSM7zCbewIbqBumOZoz0FTRd1Wi+ZyEog2guD4JhwC+q4MQn
-         tLxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749005963; x=1749610763;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rt+D3Uf3eUUD4HW5vfHTNtXXx2j8DsAepkcRUcCnZqM=;
-        b=a3PFRRWfNJgAnnMic9vPr32MFqMpy0HmBAXzW5ez8Y5pFZW6nZ7a87hOD8283uG6bi
-         ZbOnDKF89g62bSZ4D0fEALCqjNMAztzurDqsxVj02aI+w79bVcS4dnjnKzZ0Ci+m7jn9
-         WTk0V1ilaMmijQV4Elum62aW5ANDllqQg4Aj6bwDdBzo28gNBqSDkM9vrOuBR/J/9Kio
-         CG++F8wt+9JYm/Ehx0CY8qq6VAb/U4xNdBslqjHcK/cozrNW2LoA49q6aGHrMYFHMqb9
-         UGL4dzw8G3jbkQOnUizCf7uGgXIow6ZCEXF7HHmlstpYqy81JcbeFSOeYJhL4GESsJ7d
-         iPVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWil84wrJODySdXRC2klcZa0j6UsoEBW49zpe6p5aGzx5mRQHWiPh/jYI6u3HvOwHBWmCc/2eHPdAdu19A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxpkR0/zStfH8oEYMD4r0VuDZsPaEgAg3tNaT3eyLi3PZ9Rx6E
-	PGtzpU8dzvQCBv0EyNTJOp7Z1u77OhRI90IUPHqh1lkP/Q1nPcu3dR0TsvHuzW6i8SDqiR0Fy5O
-	qY0KeqxkHqsZuc3OChiQ7Xl1DvGJatfU4ubgi
-X-Gm-Gg: ASbGncupaoF8t8rbVRdNOM+ErAZZxgIVyAs3ofc5Pa8JTj+7ehp3d98gU7djBOtvGIr
-	MyhLGEeg9Gy/ZO5H2XG6EsdIzFqMs8DUir+IQ2zaRoCcbBYP0XSkXD5FBHYMDLpPhDoYGs6ITvp
-	ZD+x4x4THIYH/QfkWGrBsPhZN0aWuerHN2bvt1n4q7JFBwHw==
-X-Google-Smtp-Source: AGHT+IGpADhxpISd06wLlevlEELZzMgnCLmJDRqqFzQ5oL0RY4VTWQo9W0dhgghHlRtrb6AuTYX9Hap9KM2OapJnhvA=
-X-Received: by 2002:a2e:8a87:0:b0:32a:6ccf:a48b with SMTP id
- 38308e7fff4ca-32ac7258d5bmr2066341fa.38.1749005962528; Tue, 03 Jun 2025
- 19:59:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NTTkSrUg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=pe1qJeegvXBPluoOlMRYoHImqkwDQRENHFRDQIDQpsY=; b=NTTkSrUgpjgM/V/3ioGpL3/x1Z
+	2CxMMtmNvfQCOqeWRlfFKfGVhWrhlWY5gK6pjM79rFwTcVyu9SWSzkHHygVX9cez/zYGNMg6FYOOY
+	TiEg3FAz6BOLfIBKq64da7xdXOuC3ASKfolqOF34fVu7/OqN1+ZzDywnQVlaTMyNw6h2CLX3KTn6T
+	MN43a5PYxj09xbdQvytmRFNFYJUuKRsJUYyj9Ertm97WlaIsXXm6QdYlVOAUykYmZuq93ut0to2xS
+	WeXfa7gTdZ5+fWOAQ991PQdFRY6Ma15CQ/Cvz5MKiCssjbGYiXM1ddnQLwmWhOP4/E2ehYqXPEl9f
+	0zv/dWOg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uMhmx-0000000Ch1g-32G7;
+	Wed, 04 Jun 2025 06:39:51 +0000
+Date: Tue, 3 Jun 2025 23:39:51 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	martin.petersen@oracle.com, asml.silence@gmail.com,
+	anuj1072538@gmail.com, brauner@kernel.org, jack@suse.cz,
+	viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, linux-scsi@vger.kernel.org,
+	vishak.g@samsung.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v11 00/10] Read/Write with meta/integrity
+Message-ID: <aD_qN7pDeYXz10NU@infradead.org>
+References: <CGME20241128113036epcas5p397ba228852b72fff671fe695c322a3ef@epcas5p3.samsung.com>
+ <20241128112240.8867-1-anuj20.g@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Luka <luka.2016.cs@gmail.com>
-Date: Wed, 4 Jun 2025 10:59:10 +0800
-X-Gm-Features: AX0GCFtnwCBZSk-d3y4Qa__7ovIgMlNq_oO-1gBs3-9Di2fZqeckIHPco1_CooE
-Message-ID: <CALm_T+1JyGaNwvZGfue7hDt7q4pk1wdgC6R47GyCZ3exLBSqwg@mail.gmail.com>
-Subject: [Bug] soft lockup in blk_rq_timed_out_timer in Linux v6.12
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241128112240.8867-1-anuj20.g@samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Dear Kernel Maintainers,
+On Thu, Nov 28, 2024 at 04:52:30PM +0530, Anuj Gupta wrote:
+> This adds a new io_uring interface to exchange additional integrity/pi
+> metadata with read/write.
+> 
+> Example program for using the interface is appended below [1].
+> 
+> The patchset is on top of block/for-next.
+> 
+> Testing has been done by modifying fio:
+> https://github.com/SamsungDS/fio/tree/priv/feat/pi-test-v11
 
-I am writing to report a potential vulnerability identified in the
-upstream Linux Kernel version v6.12, corresponding to the following
-commit in the mainline repository:
+It looks like this never got into upstream fio.  Do you plan to submit
+it?  It would also be extremely useful to have a testing using it in
+blktests, because it seems like we don't have any test coverage for the
+read/write with metadata code at the moment.
 
-Git Commit:  adc218676eef25575469234709c2d87185ca223a (tag: v6.12)
+Just bringing this up because I want to be able to properly test the
+metadata side of the nvme/block support for the new DMA mapping API
+and I'm ѕtruggling to come up with good test coverage.
 
-This issue was discovered during the testing of the Android 16 AOSP
-kernel, which is based on Linux kernel version 6.12, specifically from
-the AOSP kernel branch:
-
-AOSP kernel branch: android16-6.12
-Manifest path: kernel/common.git
-Source URL:  https://android.googlesource.com/kernel/common/+/refs/heads/android16-6.12
-
-Although this kernel branch is used in Android 16 development, its
-base is aligned with the upstream Linux v6.12 release. I observed this
-issue while conducting stability and fuzzing tests on the Android 16
-platform and identified that the root cause lies in the upstream
-codebase.
-
-Bug Location:  blk_rq_timed_out_timer+0x40/0x58 block/blk-core.c:392
-
-Bug Report: https://hastebin.com/share/luqeturafo.bash
-
-Entire Log: https://hastebin.com/share/oxihuwisek.perl
-
-Thank you very much for your time and attention. I sincerely apologize
-that I am currently unable to provide a reproducer for this issue.
-However, I am actively working on reproducing the problem, and I will
-make sure to share any findings or reproducing steps with you as soon
-as they are available.
-
-I greatly appreciate your efforts in maintaining the Linux kernel and
-your attention to this matter.
-
-Best regards,
-Luka
