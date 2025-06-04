@@ -1,289 +1,384 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2087.outbound.protection.outlook.com [40.107.236.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6454D291879;
-	Wed,  4 Jun 2025 14:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9371C9DC6;
+	Wed,  4 Jun 2025 15:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749047563; cv=fail; b=Im6gxwdzUb7Rin0BejvUYL+lofMuXSi9+DGhgvPdsnfeEDxYXzIsnFQk7l3Zj8phs3++G6WjF+cOZiopJoSty2WM8JSAo95F3LLAhLJ7JVt6LW+wyTC5e38WLn5lCR1VLDwAvX9RBKKYpM2AkkI0n31HupAmoAighu0JrHbb00w=
+	t=1749049284; cv=fail; b=DDmB5RsKTKoWnGx8jmxZPMy662mIfG8rDVA2Hls0SwKPnsaDov80whhC7/6+dSL9ETthI8b/jpTFgj9aGoQ3MkDiZ3H5hbkR4E99QUON8mIb0eCJHS1lOPfn2FLIeQS+krYuw69NbvTkt5tNvJINrv2KfNhzCJWTgRUGX2IslmI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749047563; c=relaxed/simple;
-	bh=EXheVudv0HRGP+wqoQehAm6xnzCmFB8qd6Wh8TePLkA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YpJfMEMyoCEwtzQ3Obvg5OACeYo2ZrnuElxbS7CUPiABNommSIsO7agQrOe8VVb4IF0seg8cHBbyNkVHqKX9FLeQYG65Lh8ePLgZDspcH4PRLIuIlTYXSmPtNmmCbsDH0DJRW+7ZR+hlznqjJGBazhVHzQJOfSTTa0cAlNhc6mw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CPSePQND; arc=fail smtp.client-ip=40.107.236.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1749049284; c=relaxed/simple;
+	bh=BnGM7O2mDgZe7eibWw6+ib/LLVaAaG9KjpwjMxYmxfQ=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=J8/9bo5ZI/ohGyoaa+PpJDXI3jTQBcEXUgOEu4YF9G5NpY/WZQYKOr9W4QAmnlra6/PHHbA3jmuoqWm+yro820Cy0akM92UJ4xbJQmd8uLzRj4yPsbuIsCL/svjoc/73VMdKnPOIl90idYaeXvZHClolbsl6efIprDSL2aVUbak=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Br4rIxIb; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CPSePQND"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Br4rIxIb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749049282; x=1780585282;
+  h=date:from:to:cc:subject:message-id:
+   content-transfer-encoding:mime-version;
+  bh=BnGM7O2mDgZe7eibWw6+ib/LLVaAaG9KjpwjMxYmxfQ=;
+  b=Br4rIxIbq8kmO1kMAUfnc16RBGfRu9lj+Y8hPNhboSBQtGdQn4zQn7IJ
+   ePoCsaj1AfcUSJy0r4Ux0YalDqU3cLLCokU3WRWjvTHabF6LdM3tNdX+h
+   MW0M8BqYDB0uo5d4KGFCGWrpkC2Bv0BVg78elSJoTrTCSYFlOU7Y85/5K
+   Wp2ZilbDZW3yK0WpnrGwbhyfrwBt4DO2f27gFCrsEHwSHY3Fdk6muExuY
+   F0OEz+cEPTyedTt//iFmxAbcwCtmJhqwTp8TZpcJZW8TFXiz/En+mhQxd
+   EUjc+2gBkDRJz3vv2huvtXXbfXGM6OfZNBww0wrBbDZC2gvwC7rhhJCDY
+   A==;
+X-CSE-ConnectionGUID: /kgbz7+vQ6yLoBrEKszbUg==
+X-CSE-MsgGUID: 6pyGPN4RRVu3B3rM0qm2Dg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="54926644"
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="54926644"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 08:01:20 -0700
+X-CSE-ConnectionGUID: YuWcqe9nQYSvLVUZl/J4wA==
+X-CSE-MsgGUID: EunLOQjMTHmYAsJ/xXjRzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="150494670"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 08:01:20 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 4 Jun 2025 08:01:18 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 4 Jun 2025 08:01:18 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.84) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Wed, 4 Jun 2025 08:01:17 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xVectBEDn7KAe84wuST3Tir7JMzNDaho+N3PgqUnpLTamINLllsYq6+m4OeDQj2H+dXkR8UA2Tpxmd3Vuddem4YGriH13tdyP30VPYnrIDi9xzdrElPt2LU9Ugt69XDmKd2Yb3gi0n47sIk2OESKGrWofOO8ggVryZz3BZRBU3pq3gaFBSTAGv6qxF9fr8gQ0HkpVCa+qOmpD8a58IhroC6SL9RyQmJB8SILvmz3wGtlmFByrSflkxlS3YQVxN2h0hdTrWwMilpWTopjyWugr8yCE8VRpnXFgu2hybhnKkZqcAiKXsxgOkrvWqFpaqHOTR5sfxDCtHtM4XtCRa48lQ==
+ b=Y6MA7yN3PIil+MAKr6Cud3xhiRtBQU+W9GN0NdpDqJb8xmOK7AKdtozhmewlqN5pBTN3FDZEiWyQAo7/4d1auIxOoQOzDVIfl+NEz/ZPjikvExtC0YXiT3wCmxF+DYfbt0dTz27oZiHsEUayJ/lTNWmVOslTijB8dwIo8IUoKDdn9fRr1BGmQqW0+vFiSKAklNcndhc7CUA2epTOy8JtTgmnRlV2qP1+s5qck0M3G9UYaphooCUq1YqbRH7TIQHrBHAWUIyYjol36ioV79lpctCh7XloF/xJbX/2xSrb1UT4Gmusk89rUzhR6CjT7Uu6PvYgfqQCZRrfxeBhz2oTaQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EXheVudv0HRGP+wqoQehAm6xnzCmFB8qd6Wh8TePLkA=;
- b=wkxe3po7qK3e78uwbcohWAUYYNd1eTkzridsB9zMGAnqf3rSw6knumuadzZjbzdofed+vCgNCtTHkRl8TNsz2C4Z1JWRBaEqxgCtjuQzx73cGA/Q05Zh2jbsc3JKQ2Gk0bMnUUPVQa+UYWYePELgBIsigaqJ2NlM56gQLS5Ig22uYDBs/QyxiNEt7L0NokmBk5PngiWgPNFEdPmDSeS9G9jtLOZZgB5A1iB16vZr1DB5ZqKVa7JrfxU0Oq/ZlvdmPcYTWQl/uvkzfYct4oSYdJIS+99TrTnZ8kSJuq2/yrQUqdC8ZUE1DwiIuIR4d6D6nQHe27Q5TxGmPkxclfcvEQ==
+ bh=tUG1SHW0sDWSBFevBiiAxwIRZuevkjC7carZR3WYg0o=;
+ b=UY6DcrybKs2+vrZlCpfsNPLjerow3YEsEP8zVHhPsrK73AEsiT7mlW7vpF9d+AO3DOfb+ocL9362ZYIAPwgpdaIe12VBVTsC3s30RH6P36pGzLBUjt0TB9jtSZrHorYp4gWyDwZRMvdqz/xGMnhofP6BKBeyrwr1KsEXAaRfK1NYUb8apX2wcEl88Vo3y85wfzIyGc49wGYxPBCsYl9GxecCWnlCVKRoWpVzN1Fz9We5cmKLaBBR8pgvkt5Ba1rp4FJ4AYDBcqS7xBvobZA660+SHVIFEaJFcZHZg9mlyWGCeinYf/bNiCq+K/pTJ0jwUuJ67Bz0yLUGJqmNYcUjMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EXheVudv0HRGP+wqoQehAm6xnzCmFB8qd6Wh8TePLkA=;
- b=CPSePQNDdrdo0vTZqV66EW/1T6JLy9OD8KWOSMpOGVR+rL/e7DSfyAmWiaA8S654COZiy6SsxBer30Fgn9/IoNTpJnjSJ+hA5eNs3oQW7zixAfneLDPkMAlJDjJqBvIEYXb20Cpk4wB/NuFFVW4yN889xmo7820CuaoHCRYQouqRsfKOtVd08dFqfsGiXMu0ROcA5U7gRdzTRSKnqCAOuvLmUSSqOBZwV5sAZFAC4pwO4XQNwCTH8FAadtWPfU9jWs7M9NUAviOe2vAq37Dalj/MbpJWWu0Ii/F6ZyiX2ZHuipPdghLzNeiVfDfGa3XmUCIIXz2Zk2kc6zuYkiuNGg==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by CYXPR12MB9339.namprd12.prod.outlook.com (2603:10b6:930:d5::15) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by MW4PR11MB5892.namprd11.prod.outlook.com (2603:10b6:303:16a::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Wed, 4 Jun
- 2025 14:32:34 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd%5]) with mapi id 15.20.8792.033; Wed, 4 Jun 2025
- 14:32:34 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Jan Kara <jack@suse.cz>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: RE: warning on flushing page cache on block device removal
-Thread-Topic: warning on flushing page cache on block device removal
-Thread-Index:
- AdvMbvrhAHapLL5SQLSXHQ+FhiQIJwB7b58AACZikZAAAg9cAAAAQBBwAATDYIAAAA6IoAFeHfSQADQ6hYAAADujIA==
-Date: Wed, 4 Jun 2025 14:32:34 +0000
-Message-ID:
- <CY8PR12MB7195DAD05132B5911B4834C8DC6CA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References:
- <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <2r4izyzcjxq4ors3u2b6tt4dv4rst4c4exfzhaejrda3jq4nrv@dffea3h4gyaq>
- <CY8PR12MB7195BB3A19DAB9584DD2BC84DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <nj4euycpechbg5lz4wo6s36di4u45anbdik4fec2ofolopknzs@imgrmwi2ofeh>
- <CY8PR12MB7195241146E429EE867BFAF5DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <pkstcm5x54ie466gce7ryaqd6lf767p6r4iin2ufby3swe46sg@3usmpixyeniq>
- <CY8PR12MB7195BADB223A5660E2D029C4DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CY8PR12MB719567D0A9EAE47A41EE3AC4DC6DA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <z2qpz2g5wq44ubhuezfv3axwx46btx6bqr4k45k3rs3gsc6ezx@psgsxtoeue2v>
-In-Reply-To: <z2qpz2g5wq44ubhuezfv3axwx46btx6bqr4k45k3rs3gsc6ezx@psgsxtoeue2v>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|CYXPR12MB9339:EE_
-x-ms-office365-filtering-correlation-id: a466ed60-449a-4130-ca66-08dda374a5aa
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?VEZqWWpxbkhSQmQ5VWk3eU5mQWRDbnZlTm5na2p3WnlmVS81bUpZdUxldTA0?=
- =?utf-8?B?bzJHQTJHR2c3eWtIZVVmN3owcjNrcGJRam4zTmpIZUtFM0swRnJscWxGZEc2?=
- =?utf-8?B?emU0YjRzR3BEaTFWdzgrY2JBVytGdytyakJUcFJKaW4vL1hOVFFjcHQvZFQ3?=
- =?utf-8?B?RVZ1UzRmRzFHbHY2MFFkR1dNQUZzbFZqM0dLQnlldzZvOHBQQTN4TlhQZTgz?=
- =?utf-8?B?S1BaWmgrZ29DMC9wS0lwdmduWnlOTFBONWNWWEgySFRkT25uM2RlTXhPSzhX?=
- =?utf-8?B?MHUybnl6VTNMakJxd1pmK2c2bnlRYWZQNzY2NEs3RGhzNUtWMmpEU3BUT3M5?=
- =?utf-8?B?clJjemNtT29jQlJ6aG84QTg2YmMvbnlQY0Qyd3ErL1k1RnhKWE45QWhuOGt2?=
- =?utf-8?B?UDFWeGZOclZwTGc5RFJscHNsek9qcnpBNjZhakUzeHZYZFpkYnZoVlh3VjhD?=
- =?utf-8?B?bnhpNVRwak9OUjZ0Tkd3bXRWaEhwUDg3akZlWU9mR216Z3JLTEpFYmJyWWZQ?=
- =?utf-8?B?Y28vdnNRVUhEK3RESzVqUTdDRjRSVkZ4SHh3eGtSL3c3S0VHN3ZINzd1VEM2?=
- =?utf-8?B?bWlJd3cvdUo4T0hkM21Zb1Q5bkJNdzJseml6TjUyRXJ0YXdaWU5zOWhrZmpt?=
- =?utf-8?B?S00yT3N2TXhDRFVWMW9OdjVBYzN4eVRLR1Vyd3E0c3ZYZjg3Uk42QUczMWVu?=
- =?utf-8?B?SW11TDVDejByblltQzdiOXRuQUtxMWd6aENpTGFBS2JQNWM5WGZPWU9RUlB0?=
- =?utf-8?B?dW5sQUtOeS9VT01ia01mZVJPOTN6OU1mN2FQc3lobkw4TUVBNFRhRmVvV3J3?=
- =?utf-8?B?UnVwY1BYMEloRGwvWENjcTVMRmF6Q3hJMmFrbDcxSDM5WVRqc1o4MWNNcVFN?=
- =?utf-8?B?eWpQWlZwTmkrUTRmdGhCWVhiSnMwdDNLeFFNeWU3UzNpSjdnTlJsT1ArNG1W?=
- =?utf-8?B?U1hSUkM4T0lQRWFTcStoSmdLaFRlWVMxMHZ6YW5iWjkxZ0ZBdGtIT2x2OFZp?=
- =?utf-8?B?NzV6c3o5WHNWMDJMeUh1c1A3MENZWmYwNVB1c3dha05WNFFRa2kzTUFhVTZU?=
- =?utf-8?B?RXVmaWZtMm02b0MvWmlXTVphNjB5N3Evdi9WN1QraEpDQnM5VGhsV2c4UXJ6?=
- =?utf-8?B?RFlhTWRXbENtUGFaMm5PYStXVmtDSGFjb2kwWWtram1ibXN6V04rWCs5Zkg0?=
- =?utf-8?B?ZC91bEFpeG40RGs5K3BNaG5yVkk0TkNBZGlxQXJvZXl0elBXVnM4d1oyamdw?=
- =?utf-8?B?SnB1NUJaVjA4MEp4UlowWUhmUzVveU1Mb3hwWk9BVm8rNVZuWXdycGVvYUI2?=
- =?utf-8?B?U3RXbWRCRFByQW1rcHh6dUJQa3JCUThWandkeXBnVmZLVnlJeW55c1NxMzQ1?=
- =?utf-8?B?cDI5RTN4aVBXOTd3bTduK2FMTmxEMGx1S0pOY2dTeXRxYnJxQXpiMVZkY0E2?=
- =?utf-8?B?NHdlakwyNTZidng3M2V1a04rWlJMbEVHYk5BVjRIVlFvcUdWeXc3a3pNdmxv?=
- =?utf-8?B?NTFXQWdoMjZQV0s1UDg3N093MVdHK2dJaGNKcUF0dFdPSXkwVWdzb0NBWXlt?=
- =?utf-8?B?TnJmUXV6aUwzb1lzRStBekx6aER4ZnQrQkYrU3k2YWRNT1JMRmJYd0hsVERs?=
- =?utf-8?B?Unl4bTdqRTVlVlZuTEdzdDh2TFdveUF1OUphRXEydFdUd3FSNXdndTYybTJx?=
- =?utf-8?B?SjR6Q0pTL01NZ1RHMURMY3FDNlYxRURFZUhuRHcvbWpuWFJoUXRYc3NYdEgy?=
- =?utf-8?B?S2ErcGNxVjZpbS85OFpQaGhTMlFFSDI1Vm9uWmNYd3FkRHd6aXM1YjJ1TDRo?=
- =?utf-8?B?NnVHbWl4bytYeFpXa0RUK0hZNjUvSjVZTXJSdkNtSnM5VEFJNlZlUFJQK2tZ?=
- =?utf-8?B?NjdveHRqZGk4ai9HMDJuaFZVb2hldWxUTlpYdzBRY3NmZlc0U0ZNRVE1RE9y?=
- =?utf-8?B?RzE1MmV0Z01NTW50OEc2THFPWWkxZVZSdjZrUWh1YzBSQk4xbXJ0cWJJWkRr?=
- =?utf-8?Q?Eu8FCtDBhCS3Q4It5uq5DaD/otBfz0=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dGtTK01Ua3BMQVdFNklqRy9QYmtWY0c5OEduRmttOVJNMXVuTHk3RlNwN1ZJ?=
- =?utf-8?B?L215eWpxbEM4U1RtYUxLS0FOSmowMGk0cTVob25KcmZCUHhHZFYxQmYzdTAr?=
- =?utf-8?B?TmthOVkyWlVRWHZhTnRZOElFZXpUaGJSWXBiSm5XSUpHZjgvNHFtRnNBNWhr?=
- =?utf-8?B?MWVaVk9BYzdEejFBVnhGMzkzbHludTNGcnFjQjE2QUpUeE5GMTNzWFhNWU9K?=
- =?utf-8?B?dmFGVm9QUVFUTWVJTlk0ejNTMmF4YUxTWHd4UVBPS1lGQjZyUHExYjNxcGFD?=
- =?utf-8?B?SG5jVHhqOGIrK3FIWlFHL3lmT0UwNW52S3NWVnA0UkVNbURYOGFldHU2MDg4?=
- =?utf-8?B?Nml6Qm4rK0dTVEEwcnpROGxjcTc4eFB0eUtiNnZnOURBZDEvbUY5anZMWEUy?=
- =?utf-8?B?L1FDNkFCeVVSTGdTT2RhWWY0RWJCa1c0SEovZmtFMUxJQUpNRkJ4TUNaM2ds?=
- =?utf-8?B?L3ErNkNEQm1YSWNFbmM2em1lL2loYjUrc1VabzBLV000Ri9BQWJYY3VXTHJa?=
- =?utf-8?B?bGhmMjI5YkRSRXczdnQrdEFESGY3UExSOGppUXhoNzM3RUFicVNnYmIvdmF2?=
- =?utf-8?B?NW5tMFlXWTdXLzFET2w3WklRS1NYU3JKMVF3dzVvdFZQTWNOb1hidE5vcStU?=
- =?utf-8?B?Qjl3OFhKcTUrVm0wZTZKdktMcmFIdTBpR0hJcnp4eDlodGYyak0rZXdTZzZL?=
- =?utf-8?B?NUM2VG5aUmlmQVZleWl3blp2ODlZV0FxTEE0UE8zaGRNaVhtMS9naUQ3bnJG?=
- =?utf-8?B?Mk5JSWszd05pblovcFlNdlRGaHBCY2FqSThFOFF0ZjJWR0pMdnhWZ01Oc1BY?=
- =?utf-8?B?M0ZlaFprSXN0YWZVTmJsQm4rY2poOUVCdVR2cnpORmRzNExVV2Y4Mm4waUU5?=
- =?utf-8?B?Z0dNOWtBa0JkRlpEZjV1cG9pdDFPazByQWc2WktOU0lrdmNyZ0FjTWdUTEg1?=
- =?utf-8?B?NEZJRkZZT3VzK3JUQTZvcjFPTW4xYjY0dEszdE1CRXIrNjhYK2hQYmdBUFpm?=
- =?utf-8?B?Ui9YZUNuNkloSkdycjBlZ1VHeDFjRllsb3pBRDZYYmtJazRmZ0dpa0tWNWll?=
- =?utf-8?B?N21TdWZUWlMyQjk5elF5T3lYSEZVU3IrMHBRdjBSekpEcFlRajY3eE84VXlP?=
- =?utf-8?B?UHJLUHJmRDNxNWxKVDBYVzlTVUsxcjc5UE9CM3VyOU4zQVZZVDBrcEU2Y2gy?=
- =?utf-8?B?Vm5qeEFtZHNQem9ZWk1GdDM1dXlERHNzTk5LbzFTWnkreklWVERPbk5Gc2RL?=
- =?utf-8?B?SStyMzVLTHQ4eUl0UkY0bk9ZT1d3ejRTVDF2dUZBYk9ucDcrR25YZ3F4eFNR?=
- =?utf-8?B?TkhyR2lVcUdJVTErcFZLTi9SVEFUTjd4Ny9hU2RUUnRSckJvRFM0K2RJM2pX?=
- =?utf-8?B?VVc5YkR0TzUzZ1B4dm5EM2dGdXI1aHU0eHh4c1d3UjNyZUJibWxDRGFjMmov?=
- =?utf-8?B?RlNuYkVSbHo1TklZTmtud0hVNUNPTXg1M010NktzNHlVZFhTbXI3YUlDZGR4?=
- =?utf-8?B?T29EWWJGSVBWYzEzQ3JkYXIrQnlzbi9wclByQml4R1hLUkMxL1I5ak1paHZx?=
- =?utf-8?B?bnRlSEdJOFdITXkzdEppYUdzYjNHRTlNRFZzWUlLc04wcC92Z09rRkUyRGxK?=
- =?utf-8?B?Rlp6SmhRSExHbTJqdGxMWGdFWlZMWTJSYlF0RERSUVlCS0QxblpPVm5BOS85?=
- =?utf-8?B?ZlprMlB6czV3MkV0ajd5YmJ2OStKc0l2MDV2cjNOUHhKVVJCb0VmRnh6eWJE?=
- =?utf-8?B?c1lJYTc5UzJqOW9sWmtBaHlMOS9jZEJkanlVNDNFOHRyZXllY3BNQUtvMFBw?=
- =?utf-8?B?czFsNTFvU0o1bU95aWNUbHhKb3hKR0ZETUZsMXczcGxVbkpPQ3RRTHVpVXRD?=
- =?utf-8?B?c3RuT0dSMFUwOTdTejYrMjcvVWlnL2dDUjJ1aXAwVmwxV0VYRlptZEthd29P?=
- =?utf-8?B?MUMzSW9raEk4c1JtM3dKVTJDUER5aXoxQ2xqK25KMTFIZUJPVndBVE5wOGZX?=
- =?utf-8?B?OGQwaXpFcVM3bmxVUW1TRnRPN2szK2g5U09mOEs5dGFxMjhXM2JkMmhlanJ5?=
- =?utf-8?B?MDBLOVRkUlJFQ1VzcU1uY3hSU0FIMUx6SUVOTHp6RExaK3FkZTcvTmMyQzFE?=
- =?utf-8?Q?HMsNDWK4quKn3YxEcRDvuenLt?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.21; Wed, 4 Jun
+ 2025 15:01:10 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%3]) with mapi id 15.20.8792.034; Wed, 4 Jun 2025
+ 15:01:09 +0000
+Date: Wed, 4 Jun 2025 23:01:00 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<oliver.sang@intel.com>
+Subject: [linus:master] [loop]  e7bc0010ce:  stress-ng.loop.ops_per_sec 5.3%
+ improvement
+Message-ID: <202506042201.1d6ccec5-lkp@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SGXP274CA0002.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::14)
+ To LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|MW4PR11MB5892:EE_
+X-MS-Office365-Filtering-Correlation-Id: fce7f94c-2152-4c00-d9c8-08dda378a3a9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?2aCYdj+Kz8UAECoUusycoxoVGmByhy0EgXRlqjCaHCu1JzLlftbQEHvWsG?=
+ =?iso-8859-1?Q?Oma8mXz1kKjOCIOUhguz0o63jL2Re0s9x6RLXHBQW8ubjwBc06e3+yZVsQ?=
+ =?iso-8859-1?Q?MN0slDPI0bPHzHH7JEuIbTMaWk/4og585CHM7hUJ1vCgtzn9PHnoMq4aoI?=
+ =?iso-8859-1?Q?G5GQtqCtFga9naNcXZDYhKCD/xvhF4JqCDPy+CwwIrPufNpQM9Tc8qMqE2?=
+ =?iso-8859-1?Q?v4AVJoBqhc1IRox7hi7HwNQRwj0i6hEa0ls/gqlECOJeO6k+wCiBEM4/hk?=
+ =?iso-8859-1?Q?3al/tEAmhkFt8gZtQKu9TvrZ3bpuWzLyQnN8TnbaDAuuEFvLVBujWzdpUA?=
+ =?iso-8859-1?Q?aUrvID73/zE3WV4kM7i6vS5i2bDYKakOuUtIJaUkuSitd+qrE7xuy19OeG?=
+ =?iso-8859-1?Q?Mtfp2kuOpYCVcL+K5dK54aV4dm01zvJquEYlh8DjDw4A7xgaUE6rAKKFjT?=
+ =?iso-8859-1?Q?wyPk5C6xtVB+UA2vq71HfmVXUNZMQCPISINHIqRRFZZ5Lh5mbnp5zm+LDE?=
+ =?iso-8859-1?Q?2EoGBZcUgrrwnTDS6H8qndwIjuPi2xopU5Zcvj9NkXM90w1E28fjUqPVUJ?=
+ =?iso-8859-1?Q?NWMefi+GNr/1HDD/nGdFsm6lpcNe1RuqbR3EQ+IuOgGLjiFVy56++fSiYh?=
+ =?iso-8859-1?Q?Cl0N607U3e3Xuzr0IBesffCehQc3xr9+q0pHc8MdK0LIrKV1+o7XEdHrWD?=
+ =?iso-8859-1?Q?PuicTvCtxzbXNppkEOepBFEsMVleubHJ4ZwHfizDCGCVarLGpPHCC0K/DP?=
+ =?iso-8859-1?Q?MN4tcPNGEo/R5ImOP1AMV2hsZIZ1Vo8jD0Nvab+jVxfHJo+41rVcVs6HDI?=
+ =?iso-8859-1?Q?NGMTKxZiDjEZ0SoIDhdITI90al3LD8AYyxuePOl+KYIPxl0bODUvf6CkHi?=
+ =?iso-8859-1?Q?kHKOOlpCSFNa9Z5HHiWg/LWFutIjHiPKQ7DvgIhceAWDtZlQJOLqbnvvO1?=
+ =?iso-8859-1?Q?jcWjJF9rtvu+NSVLFl4UiDeMd5ZbTEnpFTQkQQOGR+ZqlrhqlgGfmIIMPb?=
+ =?iso-8859-1?Q?vmsGBmzOLkCF8UmY+oug+IT0+W8zdV8hWrSIwZpG8gYQQreu8OOX2FXan0?=
+ =?iso-8859-1?Q?bJy2B03br5BHdToWk6bY7ick0b6I/0Sx4nMu26W8mdS5PZTffCwscToYxu?=
+ =?iso-8859-1?Q?DrS2IpeOCTa5KD60E9ifFGpxePbTj3ahBfgZ6Q4OOej8a6lFot9ZRxanuE?=
+ =?iso-8859-1?Q?WTnMCgTtYJrVX5x1hFhf3DmwdtKYJKPkJw+0hA+aads/LAn5pYFXw0zUky?=
+ =?iso-8859-1?Q?gkhPqstsF58wV94kuhPPKbQxxskzivBrRleSS7+1hhh502wYpK1ycYFaHZ?=
+ =?iso-8859-1?Q?79ZZYRlCdUj4+7taJQbSNddDhu0tokiIGYaaNfaKXNdPAWSkiyKli+mSVl?=
+ =?iso-8859-1?Q?VLI6A1+CsUB+xuk0Hk8bxyQ40e8T75dVFpQAAoDK7oyYrWBEbEyxjywtTn?=
+ =?iso-8859-1?Q?siCemCqdpuWRWwKe?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?VjgBdTkkHsZoEByLufqVtzkS32pMUWhipHOaP5OgzLg4m21MXKJ+3mrK83?=
+ =?iso-8859-1?Q?DYJnae4ENcLX1IjGTW6GXFCPjUAuqAApj7n0rci5jJTvmnk5KJmjukhwnN?=
+ =?iso-8859-1?Q?N8eCq0LdfiSCdp2skZ6IISwR1DI7tAfHjiFEDO56mxXaS0dVgyX/MJFUNd?=
+ =?iso-8859-1?Q?RUHhXkdQQwxy0rfQUFDgtdguWp0JH0NpHf9kzK+BX8M6B6muBQkr6xO3rk?=
+ =?iso-8859-1?Q?L0+X0Whgjux3nbGC4D8wg3qqs66BLcS1c0Zz+s3p14SiLxWA+rnIx8fLyJ?=
+ =?iso-8859-1?Q?nDimPE5MHsvvEpphZSQIrKanhceQaAKH9CHp/lz28Vj6ixWnMDQJpHXJhU?=
+ =?iso-8859-1?Q?hRAFSTJ9wGV6tt4+A0L4lw9TgOJwDZTkio9+8h/B70aQiqsNTJUaFkfQVt?=
+ =?iso-8859-1?Q?UEfb1Wzf3kEHDXeamQiyMMT4bWqiNxKhdV9S2gqlQdnCijW4Zedbyd5XG/?=
+ =?iso-8859-1?Q?Ed9omNpAAofTfuOHWR3BZwNXWn2pBIu1N3wNDT4aQhv+UrTbY+4g3VVxGj?=
+ =?iso-8859-1?Q?73nrDFSIy5Fu/cQXNmr6Ra7bKZW6rhWAUAandPdohkFETscnJJmNvTjhGA?=
+ =?iso-8859-1?Q?323HXufRNCcn9vVipAnUQho4kVJ0C++gB0xn5tW4xvZ7RkTehYubccVqos?=
+ =?iso-8859-1?Q?ViP8w1Q1NDp/c/x8y/+e0K6B1GfkDMEDp0xHsfVFrq2fgX0I5L7ACasiF5?=
+ =?iso-8859-1?Q?sv/KRhu5i28p5jLdn8sQFmJzIMqWdrIqGm5XEC/M70Drd80sx/b5wrtxur?=
+ =?iso-8859-1?Q?sQTslBBgISDtNY2aRacRaOKOBySumJwZ66/fTHe88rLEIzWWU01XsMSUiW?=
+ =?iso-8859-1?Q?n9Yv8tFGQop4APXy9d4PON8FMdJ+Hz4Thk5l/UmVUcoQIzP8tT4X65+JnU?=
+ =?iso-8859-1?Q?5iqmOtenRoW+5aizZiz+Zs+nSRYAYQwlN5shZ5Mwmc45GHBYnd4NyYoX7V?=
+ =?iso-8859-1?Q?KAMDEz4C6X1AruAup27JUv9kUi1JDt1Vq3EISYzwBfivWw/8nN4fpBcsTB?=
+ =?iso-8859-1?Q?HU7lUJTTCcrD/k0LdvrPa4M6FrnSioJynz2z0KMLPhTd+oFEndHXqQzgr2?=
+ =?iso-8859-1?Q?ii7gQlQ5ZYCjsKj0+L8IMz06i60gCu6d75zKEgJp7Pmy/67lNGGQVm6w7n?=
+ =?iso-8859-1?Q?BvbHv4r+e93SyHE76hoMmYc/5rczSL8WRZNe0rbHl7ITKxi0oqTy+OakTu?=
+ =?iso-8859-1?Q?sAuEeHm8tlUaQ1JHEFg5YhWF2DGC3stJC4hJ6dAc9Z3uxWrwqTo2mr/LbC?=
+ =?iso-8859-1?Q?Jsl+/2wTux4JYIYCDM77uNCYSHU1OhXShwVJp4/QoFwjPrh8yC4rHh6yRE?=
+ =?iso-8859-1?Q?yjOhtWlAiTRskz3KpWTeqcu0g9Gi4SjsmSKY87tJDATIaIfB1WyQs1F/EK?=
+ =?iso-8859-1?Q?bdIzRUQrBMkcboe2SQcaaLnlKU1//yVa+ExJBBaEygZVHiYlCYUc5VGo1y?=
+ =?iso-8859-1?Q?baRLdLyncA+cMF6E4SJX7Owgae9vhwx5rWsA8I6mj6PDRa8B8NOUZbnenA?=
+ =?iso-8859-1?Q?fuFAA7lm7hMDCh+D9qxEJi4BBGw5b6Qe94zOMricJ2DLiuisvU5GH7In7/?=
+ =?iso-8859-1?Q?lQNUSKOfhpVaxx2UM02TvwR1Sj49Erkles9hc/pPv5G+6M/3ZfwqK4IKVG?=
+ =?iso-8859-1?Q?Sf8SSLW4zjmARj4Ypmt8S0PVJsL5MIAVDPwmC59XFTh05sAoqs40ub4Q?=
+ =?iso-8859-1?Q?=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fce7f94c-2152-4c00-d9c8-08dda378a3a9
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a466ed60-449a-4130-ca66-08dda374a5aa
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2025 14:32:34.7216
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 15:01:09.5871
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: C1DoH7FxhzUV7G6xe/oEQHTdXeL4fRYUA4txmdzwHA+x7AoIHjnCS6nMzfMT71lAws2rSWq6mq5uH+QDgy880g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9339
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mDK223SI50UKQSnsDs/eMt+PNjrRoB7bPhnCuOkCTxisPy9lIJXah1jFADGRx9kTzZ/9J9B2Tpgb1Cl6Gf9JZw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5892
+X-OriginatorOrg: intel.com
 
-DQo+IEZyb206IEphbiBLYXJhIDxqYWNrQHN1c2UuY3o+DQo+IFNlbnQ6IFdlZG5lc2RheSwgSnVu
-ZSA0LCAyMDI1IDc6NTMgUE0NCj4gDQo+IEhpIQ0KPiANCj4gT24gVHVlIDAzLTA2LTI1IDEzOjMz
-OjAyLCBQYXJhdiBQYW5kaXQgd3JvdGU6DQo+ID4gPiBGcm9tOiBQYXJhdiBQYW5kaXQgPHBhcmF2
-QG52aWRpYS5jb20+DQo+ID4gPiBTZW50OiBUdWVzZGF5LCBNYXkgMjcsIDIwMjUgNzo1NSBQTQ0K
-PiA+ID4NCj4gPiA+DQo+ID4gPiA+IEZyb206IEphbiBLYXJhIDxqYWNrQHN1c2UuY3o+DQo+ID4g
-PiA+IFNlbnQ6IFR1ZXNkYXksIE1heSAyNywgMjAyNSA3OjUxIFBNDQo+ID4gPiA+DQo+ID4gPiA+
-IE9uIFR1ZSAyNy0wNS0yNSAxMjowNzoyMCwgUGFyYXYgUGFuZGl0IHdyb3RlOg0KPiA+ID4gPiA+
-ID4gRnJvbTogSmFuIEthcmEgPGphY2tAc3VzZS5jej4NCj4gPiA+ID4gPiA+IFNlbnQ6IFR1ZXNk
-YXksIE1heSAyNywgMjAyNSA1OjI3IFBNDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gT24gVHVl
-IDI3LTA1LTI1IDExOjAwOjU2LCBQYXJhdiBQYW5kaXQgd3JvdGU6DQo+ID4gPiA+ID4gPiA+ID4g
-RnJvbTogSmFuIEthcmEgPGphY2tAc3VzZS5jej4NCj4gPiA+ID4gPiA+ID4gPiBTZW50OiBNb25k
-YXksIE1heSAyNiwgMjAyNSAxMDowOSBQTQ0KPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+
-ID4gSGVsbG8hDQo+ID4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gPiBPbiBTYXQgMjQtMDUt
-MjUgMDU6NTY6NTUsIFBhcmF2IFBhbmRpdCB3cm90ZToNCj4gPiA+ID4gPiA+ID4gPiA+IEkgYW0g
-cnVubmluZyBhIGJhc2ljIHRlc3Qgb2YgYmxvY2sgZGV2aWNlIGRyaXZlciB1bmJpbmQsDQo+ID4g
-PiA+ID4gPiA+ID4gPiBiaW5kIHdoaWxlIHRoZSBmaW8gaXMgcnVubmluZyByYW5kb20gd3JpdGUg
-SU9zIHdpdGgNCj4gPiA+ID4gPiA+ID4gPiA+IGRpcmVjdD0wLiAgVGhlIHRlc3QgaGl0cyB0aGUg
-V0FSTl9PTiBhc3NlcnQgb246DQo+ID4gPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiA+ID4g
-dm9pZCBwYWdlY2FjaGVfaXNpemVfZXh0ZW5kZWQoc3RydWN0IGlub2RlICppbm9kZSwNCj4gPiA+
-ID4gPiA+ID4gPiA+IGxvZmZfdCBmcm9tLCBsb2ZmX3QNCj4gPiA+ID4gPiA+ID4gPiA+IHRvKSB7
-DQo+ID4gPiA+ID4gPiA+ID4gPiAgICAgICAgIGludCBic2l6ZSA9IGlfYmxvY2tzaXplKGlub2Rl
-KTsNCj4gPiA+ID4gPiA+ID4gPiA+ICAgICAgICAgbG9mZl90IHJvdW5kZWRfZnJvbTsNCj4gPiA+
-ID4gPiA+ID4gPiA+ICAgICAgICAgc3RydWN0IGZvbGlvICpmb2xpbzsNCj4gPiA+ID4gPiA+ID4g
-PiA+DQo+ID4gPiA+ID4gPiA+ID4gPiAgICAgICAgIFdBUk5fT04odG8gPiBpbm9kZS0+aV9zaXpl
-KTsNCj4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiBUaGlzIGlzIGJlY2F1c2Ug
-d2hlbiB0aGUgYmxvY2sgZGV2aWNlIGlzIHJlbW92ZWQgZHVyaW5nDQo+ID4gPiA+ID4gPiA+ID4g
-PiBkcml2ZXIgdW5iaW5kLCB0aGUgZHJpdmVyIGZsb3cgaXMsDQo+ID4gPiA+ID4gPiA+ID4gPg0K
-PiA+ID4gPiA+ID4gPiA+ID4gZGVsX2dlbmRpc2soKQ0KPiA+ID4gPiA+ID4gPiA+ID4gICAgIF9f
-YmxrX21hcmtfZGlza19kZWFkKCkNCj4gPiA+ID4gPiA+ID4gPiA+ICAgICAgICAgICAgIHNldF9j
-YXBhY2l0eSgoZGlzaywgMCk7DQo+ID4gPiA+ID4gPiA+ID4gPiAgICAgICAgICAgICAgICAgYmRl
-dl9zZXRfbnJfc2VjdG9ycygpDQo+ID4gPiA+ID4gPiA+ID4gPiAgICAgICAgICAgICAgICAgICAg
-IGlfc2l6ZV93cml0ZSgpIC0+IFRoaXMgd2lsbCBzZXQgdGhlDQo+ID4gPiA+ID4gPiA+ID4gPiBp
-bm9kZSdzIGlzaXplIHRvIDAsIHdoaWxlIHRoZQ0KPiA+ID4gPiA+ID4gPiA+IHBhZ2UgY2FjaGUg
-aXMgeWV0IHRvIGJlIGZsdXNoZWQuDQo+ID4gPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiA+
-ID4gQmVsb3cgaXMgdGhlIGtlcm5lbCBjYWxsIHRyYWNlLg0KPiA+ID4gPiA+ID4gPiA+ID4NCj4g
-PiA+ID4gPiA+ID4gPiA+IENhbiBzb21lb25lIGhlbHAgdG8gaWRlbnRpZnksIHdoZXJlIHNob3Vs
-ZCBiZSB0aGUgZml4Pw0KPiA+ID4gPiA+ID4gPiA+ID4gU2hvdWxkIGJsb2NrIGxheWVyIHRvIG5v
-dCBzZXQgdGhlIGNhcGFjaXR5IHRvIDA/DQo+ID4gPiA+ID4gPiA+ID4gPiBPciBwYWdlIGNhdGNo
-IHRvIG92ZXJjb21lIHRoaXMgZHluYW1pYyBjaGFuZ2luZyBvZiB0aGUgc2l6ZT8NCj4gPiA+ID4g
-PiA+ID4gPiA+IE9yPw0KPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gQWZ0ZXIgdGhp
-bmtpbmcgYWJvdXQgdGhpcyB0aGUgcHJvcGVyIGZpeCB3b3VsZCBiZSBmb3INCj4gPiA+ID4gPiA+
-ID4gPiBpX3NpemVfd3JpdGUoKSB0byBoYXBwZW4gdW5kZXIgaV9yd3NlbSBiZWNhdXNlIHRoZSBj
-aGFuZ2UNCj4gPiA+ID4gPiA+ID4gPiBpbiB0aGUgbWlkZGxlIG9mIHRoZSB3cml0ZSBpcyB3aGF0
-J3MgY29uZnVzaW5nIHRoZSBpb21hcA0KPiA+ID4gPiA+ID4gPiA+IGNvZGUuIEkgc21lbGwgc29t
-ZSBkZWFkbG9jayBwb3RlbnRpYWwgaGVyZSBidXQgaXQncw0KPiA+ID4gPiA+ID4gPiA+IHBlcmhh
-cHMgd29ydGggdHJ5aW5nIDopDQo+ID4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gV2l0aG91
-dCBpdCwgSSBnYXZlIGEgcXVpY2sgdHJ5IHdpdGggaW5vZGVfbG9jaygpIHVubG9jaygpIGluDQo+
-ID4gPiA+ID4gPiA+IGlfc2l6ZV93cml0ZSgpIGFuZCBpbml0cmFtZnMgbGV2ZWwgaXQgd2FzIHN0
-dWNrLiAgSSBhbSB5ZXQNCj4gPiA+ID4gPiA+ID4gdG8gdHJ5IHdpdGggTE9DS0RFUC4NCj4gPiA+
-ID4gPiA+DQo+ID4gPiA+ID4gPiBZb3UgZGVmaW5pdGVseSBjYW5ub3QgcHV0IGlub2RlX2xvY2so
-KSBpbnRvIGlfc2l6ZV93cml0ZSgpLg0KPiA+ID4gPiA+ID4gaV9zaXplX3dyaXRlKCkgaXMgZXhw
-ZWN0ZWQgdG8gYmUgY2FsbGVkIHVuZGVyIGlub2RlX2xvY2suIEFuZA0KPiA+ID4gPiA+ID4gYmRl
-dl9zZXRfbnJfc2VjdG9ycygpIGlzIGJyZWFraW5nIHRoaXMgcnVsZSBieSBub3QgaG9sZGluZyBp
-dC4NCj4gPiA+ID4gPiA+IFNvIHdoYXQgeW91IGNhbiB0cnkgaXMgdG8gZG8NCj4gPiA+ID4gPiA+
-IGlub2RlX2xvY2soKSBpbiBiZGV2X3NldF9ucl9zZWN0b3JzKCkgaW5zdGVhZCBvZiBncmFiYmlu
-Zw0KPiBiZF9zaXplX2xvY2suDQo+ID4gPiA+ID4gPg0KPiA+DQo+ID4gSSByZXBsYWNlZCB0aGUg
-YmRfc2l6ZV9sb2NrIHdpdGggaW5vZGVfbG9jaygpLg0KPiA+IFdhcyB1bmFibGUgdG8gcmVwcm9k
-dWNlIHRoZSBpc3N1ZSB5ZXQgd2l0aCB0aGUgZml4Lg0KPiA+DQo+ID4gSG93ZXZlciwgaXQgcmln
-aHQgYXdheSBicmVha3MgdGhlIEF0YXJpIGZsb3BweSBkcml2ZXIgd2hvIGludm9rZXMNCj4gPiBz
-ZXRfY2FwYWNpdHkoKSBpbiBxdWV1ZV9ycSgpIGF0IFsxXS4gISENCj4gPg0KPiA+IFsxXQ0KPiA+
-IGh0dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y2LjE1L3NvdXJjZS9kcml2ZXJzL2Js
-b2NrL2F0YWZsb3AuYyMNCj4gPiBMMTU0NA0KPiANCj4gWWVhaCwgdGhhdCdzIHNvbWV3aGF0IHVu
-ZXhwZWN0ZWQuIEFueXdheSwgQXRhcmkgZmxvcHB5IGRyaXZlciBpc24ndCBleGFjdGx5IGENCj4g
-cmVsaWFibGUgc291cmNlIG9mIHByb3BlciBsb2NraW5nLi4uDQo+IA0KVHJ1ZS4gSSBmaW5kIGl0
-IHdlaXJkIGZvciBvbmUgdG8gY2hhbmdlIHRoZSBjYXBhY2l0eSBpbiBtaWRkbGUgb2Ygc2Vydmlu
-ZyB0aGUgYmxvY2sgcmVxdWVzdC4NCk11c3QgYmUgdmVyeSBvbGQgY29kZS4NCg0KPiA+IFdpdGgg
-bXkgbGltaXRlZCBrbm93bGVkZ2UgSSBmaW5kIHRoZSBmaXggcmlza3kgYXMgYm90dG9tIGJsb2Nr
-IGxheWVyDQo+ID4gaXMgaW52b2tpbmcgdXBwZXIgRlMgbGF5ZXIgaW5vZGUgbG9jay4gIEkgc3Vz
-cGVjdCBpdCBtYXkgbGVhZCB0byBBLT5CLA0KPiA+IEItPkEgbG9ja2luZyBpbiBzb21lIHBhdGgu
-DQo+IA0KPiBXZWxsLCBJJ20gc3VzcGVjdGluZyB0aGF0IGFzIHdlbGwuIFRoYXQncyB3aHkgSSd2
-ZSBhc2tlZCB5b3UgdG8gdGVzdCBpdCA6KSBBcmUgeW91DQo+IHJ1bm5pbmcgd2l0aCBsb2NrZGVw
-IGVuYWJsZWQ/IEJlY2F1c2UgSSdkIGV4cGVjdCBpdCB0byBjb21wbGFpbiByYXRoZXIgcXVpY2ts
-eS4NCj4gUG9zc2libHkgcnVuIGJsa3Rlc3RzIGFzIHdlbGwgdG8gZXhlcmNpc2UgdmFyaW91cyBu
-b3Qtc28tdXN1YWwgcGF0aHMgc28gdGhhdA0KPiBsb2NrZGVwIGxlYXJucyBhYm91dCB2YXJpb3Vz
-IGxvY2sgZGVwZW5kZW5jaWVzLg0KPiANClllcywgd2l0aCBsb2NrZGVwIGVuYWJsZWQuIE5vdGhp
-bmcgcmVwb3J0ZWQgaW4gdGhpcyBhcmVhLg0KQnV0IGl0cyB0ZXN0IHdpdGggb25seSBzaW5nbGUg
-YmxvY2sgZGV2aWNlID0gdmlydGlvIGJsb2NrIGFuZCB3aXRoIExTSSBGdXNpb24gTVBUIFNBUyBz
-Y3NpIGRyaXZlcy4NCg0KU2VlaW5nIGxvY2sgZGVwIGFzc2VydHMgaW4gb3RoZXIgYXJlYXMgbm90
-IG9uIGJsb2NrIHNpZGUgeWV0LiDwn5iKDQoNCj4gPiBPdGhlciB0aGFuIEF0YXJpIGZsb3BweSBk
-cml2ZXIsIEkgZGlkbid0IGZpbmQgYW55IG90aGVyIG9mZmVuZGluZw0KPiA+IGRyaXZlciwgYnV0
-IGl0cyBoYXJkIHRvIHNheSwgaXRzIHNhZmUgZnJvbSBBLT5CLCBCLT5BIGRlYWRsb2NrLg0KPiA+
-IEEgPSBpbm9kZSBsb2NrDQo+ID4gQiA9IGJsb2NrIGRyaXZlciBsZXZlbCBsb2NrDQo+IA0KPiAJ
-CQkJCQkJCUhvbnphDQo+IA0KPiA+ID4gPiA+IE9rLiB3aWxsIHRyeSB0aGlzLg0KPiA+ID4gPiA+
-IEkgYW0gb2ZmIGZvciBmZXcgZGF5cyBvbiB0cmF2ZWwsIHNvIGVhcmxpZXN0IEkgY2FuIGRvIGlz
-IG9uIFN1bmRheS4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBJIHdhcyB0aGlua2luZywgY2Fu
-IHRoZSBleGlzdGluZyBzZXF1ZW5jZSBsb2NrIGJlIHVzZWQgZm9yDQo+ID4gPiA+ID4gPiA+IDY0
-LWJpdCBjYXNlIGFzIHdlbGw/DQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gVGhlIHNlcXVlbmNl
-IGxvY2sgaXMgYWJvdXQgdXBkYXRpbmcgaW5vZGUtPmlfc2l6ZSB2YWx1ZSBpdHNlbGYuDQo+ID4g
-PiA+ID4gPiBCdXQgd2UgbmVlZCBtdWNoIGxhcmdlciBzY2FsZSBwcm90ZWN0aW9uIGhlcmUgLSB3
-ZSBuZWVkIHRvDQo+ID4gPiA+ID4gPiBtYWtlIHN1cmUgd3JpdGUgdG8gdGhlIGJsb2NrIGRldmlj
-ZSBpcyBub3QgaGFwcGVuaW5nIHdoaWxlIHRoZQ0KPiA+ID4gPiA+ID4gZGV2aWNlIHNpemUgY2hh
-bmdlcy4gQW5kIHRoYXQncyB3aGF0IGlub2RlX2xvY2sgaXMgdXN1YWxseSB1c2VkIGZvci4NCj4g
-PiA+ID4gPiA+DQo+ID4gPiA+ID4gT3RoZXIgb3B0aW9uIHRvIGV4cGxvcmUgKHdpdGggbXkgbGlt
-aXRlZCBrbm93bGVkZ2UpIGlzLCBXaGVuIHRoZQ0KPiA+ID4gPiA+IGJsb2NrIGRldmljZSBpcyBy
-ZW1vdmVkLCBub3QgdG8gdXBkYXRlIHRoZSBzaXplLA0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gQmVj
-YXVzZSBxdWV1ZSBkeWluZyBmbGFnIGFuZCBvdGhlciBiYXJyaWVycyBhcmUgcGxhY2VkIHRvDQo+
-ID4gPiA+ID4gcHJldmVudCB0aGUgSU9zDQo+ID4gPiA+IGVudGVyaW5nIGxvd2VyIGxheWVyIG9y
-IHRvIGZhaWwgdGhlbS4NCj4gPiA+ID4gPiBDYW4gdGhhdCBiZSB0aGUgZGlyZWN0aW9uIHRvIGZp
-eD8NCj4gPiA+ID4NCj4gPiA+ID4gV2VsbCwgdGhhdCdzIGRlZmluaXRlbHkgb25lIGxpbmUgb2Yg
-ZGVmZW5zZSBhbmQgaXQncyBlbm91Z2ggZm9yDQo+ID4gPiA+IHJlYWRzIGJ1dCBmb3Igd3JpdGVz
-IHlvdSBkb24ndCB3YW50IHRoZW0gdG8gYWNjdW11bGF0ZSBpbiB0aGUgcGFnZQ0KPiA+ID4gPiBj
-YWNoZSAoYW5kIHRodXMgY29uc3VtZSBtZW1vcnkpIHdoZW4geW91IGtub3cgeW91IGhhdmUgbm8g
-d2F5IHRvDQo+ID4gPiA+IHdyaXRlDQo+ID4gPiB0aGVtDQo+ID4gPiA+IG91dC4gU28gdGhlcmUg
-bmVlZHMgdG8gYmUgc29tZSB3YXkgZm9yIGJ1ZmZlcmVkIHdyaXRlcyB0bw0KPiA+ID4gPiByZWNv
-Z25pemUgdGhlIGJhY2tpbmcgc3RvcmUgaXMgZ29uZSBhbmQgc3RvcCB0aGVtIGJlZm9yZSBkaXJ0
-eWluZyBwYWdlcy4NCj4gPiA+ID4gQ3VycmVudGx5IHRoYXQncyBhY2hpZXZlZCBieSByZWR1Y2lu
-ZyBpX3NpemUsIHdlIGNhbiB0aGluayBvZg0KPiA+ID4gPiBvdGhlciBtZWNoYW5pc21zIGJ1dCBy
-ZWR1Y2luZyBpX3NpemUgaXMga2luZCBvZiBlbGVnYW50IGlmIHdlIGNhbg0KPiA+ID4gPiBzeW5j
-aHJvbml6ZSB0aGF0DQo+ID4gPiBwcm9wZXJseS4uLg0KPiA+ID4gPg0KPiA+ID4gVGhlIGJsb2Nr
-IGRldmljZSBub3RpZmllcyB0aGUgYmlvIGxheWVyIGJ5IGNhbGxpbmcNCj4gPiA+IGJsa19xdWV1
-ZV9mbGFnX3NldChRVUVVRV9GTEFHX0RZSU5HLCBkaXNrLT5xdWV1ZSk7IE1heWJlIHdlIGNhbg0K
-PiBjb21lDQo+ID4gPiB1cCB3aXRoIG5vdGlmaWNhdGlvbiBtZXRob2QgdGhhdCB1cGRhdGVzIHNv
-bWUgZmxhZyB0byBwYWdlIGNhY2hlDQo+ID4gPiBsYXllciB0byBkcm9wIGJ1ZmZlcmVkIHdyaXRl
-cyB0byBmbG9vci4NCj4gPiA+DQo+ID4gPiBPciBvdGhlciBkaXJlY3Rpb24gdG8gZXhwbG9yZSwg
-aWYgdGhlIFdBUl9PTigpIGlzIHN0aWxsIHZhbGlkLCBhcyBpdA0KPiA+ID4gY2FuIGNoYW5nZSBh
-bnl0aW1lPw0KPiA+ID4NCj4gPiA+ID4gCQkJCQkJCQlIb256YQ0KPiA+ID4gPiAtLQ0KPiA+ID4g
-PiBKYW4gS2FyYSA8amFja0BzdXNlLmNvbT4NCj4gPiA+ID4gU1VTRSBMYWJzLCBDUg0KPiAtLQ0K
-PiBKYW4gS2FyYSA8amFja0BzdXNlLmNvbT4NCj4gU1VTRSBMYWJzLCBDUg0K
+
+
+Hello,
+
+kernel test robot noticed a 5.3% improvement of stress-ng.loop.ops_per_sec on:
+
+
+commit: e7bc0010ceb403d025100698586c8e760921d471 ("loop: properly send KOBJ_CHANGED uevent for disk device")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+
+
+testcase: stress-ng
+config: x86_64-rhel-9.4
+compiler: gcc-12
+test machine: 64 threads 2 sockets Intel(R) Xeon(R) Gold 6346 CPU @ 3.10GHz (Ice Lake) with 256G memory
+parameters:
+
+	nr_threads: 100%
+	testtime: 60s
+	test: loop
+	cpufreq_governor: performance
+
+
+Details are as below:
+-------------------------------------------------------------------------------------------------->
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250604/202506042201.1d6ccec5-lkp@intel.com
+
+=========================================================================================
+compiler/cpufreq_governor/kconfig/nr_threads/rootfs/tbox_group/test/testcase/testtime:
+  gcc-12/performance/x86_64-rhel-9.4/100%/debian-12-x86_64-20240206.cgz/lkp-icl-2sp7/loop/stress-ng/60s
+
+commit: 
+  1fdb8188c3 ("loop: aio inherit the ioprio of original request")
+  e7bc0010ce ("loop: properly send KOBJ_CHANGED uevent for disk device")
+
+1fdb8188c3d50545 e7bc0010ceb403d025100698586 
+---------------- --------------------------- 
+         %stddev     %change         %stddev
+             \          |                \  
+      0.13 ±  6%      +0.1        0.19 ±  4%  mpstat.cpu.all.iowait%
+      2.94 ±  2%      +0.8        3.69 ±  3%  mpstat.cpu.all.sys%
+     32546           +30.4%      42443        vmstat.system.cs
+     74083            +4.6%      77510        vmstat.system.in
+      7889 ±118%    +373.6%      37367 ± 45%  numa-meminfo.node0.AnonHugePages
+     21065 ±128%    +220.9%      67589 ± 32%  numa-meminfo.node0.Shmem
+     11373 ±  3%     +21.7%      13841 ±  3%  numa-meminfo.node1.Active(file)
+     22923 ±  5%     +16.8%      26769 ±  4%  meminfo.Active(file)
+    448.71 ±  8%    +106.3%     925.77 ±  9%  meminfo.Inactive
+    448.71 ±  8%    +106.3%     925.77 ±  9%  meminfo.Inactive(file)
+    165282 ±  5%     +23.3%     203822 ±  2%  meminfo.Shmem
+    549441 ±  5%     +18.0%     648129        numa-numastat.node0.local_node
+    591390 ±  2%     +16.7%     690232 ±  2%  numa-numastat.node0.numa_hit
+    614834 ±  5%     +14.1%     701232 ±  2%  numa-numastat.node1.local_node
+    642698 ±  3%     +13.4%     729095 ±  2%  numa-numastat.node1.numa_hit
+      6173 ± 64%     +72.8%      10667 ±  8%  sched_debug.cfs_rq:/.avg_vruntime.min
+      6173 ± 64%     +72.8%      10667 ±  8%  sched_debug.cfs_rq:/.min_vruntime.min
+     12139 ± 61%     +83.0%      22217        sched_debug.cpu.nr_switches.avg
+     22304 ± 45%     +55.3%      34647 ±  6%  sched_debug.cpu.nr_switches.max
+      7497 ± 68%    +100.9%      15063 ±  9%  sched_debug.cpu.nr_switches.min
+    -77.83           +69.3%    -131.75        sched_debug.cpu.nr_uninterruptible.min
+     15.60 ± 44%     +58.1%      24.65 ±  7%  sched_debug.cpu.nr_uninterruptible.stddev
+      5562            +4.7%       5825        stress-ng.loop.ops
+     91.71            +5.3%      96.60        stress-ng.loop.ops_per_sec
+      6139 ±  2%      +8.7%       6671 ±  2%  stress-ng.time.involuntary_context_switches
+    210787            +2.4%     215791        stress-ng.time.minor_page_faults
+    167.83 ±  2%     +20.1%     201.50 ±  4%  stress-ng.time.percent_of_cpu_this_job_got
+    102.43 ±  2%     +19.1%     122.04 ±  4%  stress-ng.time.system_time
+    349026 ±  2%     +50.0%     523587        stress-ng.time.voluntary_context_switches
+      2815 ±  6%     +20.4%       3390 ±  7%  numa-vmstat.node0.nr_active_file
+      5302 ±129%    +219.5%      16943 ± 32%  numa-vmstat.node0.nr_shmem
+      2814 ±  6%     +20.5%       3391 ±  7%  numa-vmstat.node0.nr_zone_active_file
+    591173 ±  2%     +16.7%     689866 ±  2%  numa-vmstat.node0.numa_hit
+    549224 ±  5%     +17.9%     647763        numa-vmstat.node0.numa_local
+      2816 ±  2%     +26.8%       3569 ±  4%  numa-vmstat.node1.nr_active_file
+     38.54 ± 63%    +213.0%     120.63 ± 23%  numa-vmstat.node1.nr_inactive_file
+      2815 ±  2%     +26.9%       3571 ±  4%  numa-vmstat.node1.nr_zone_active_file
+     38.54 ± 63%    +213.1%     120.67 ± 23%  numa-vmstat.node1.nr_zone_inactive_file
+    641841 ±  3%     +13.6%     729026 ±  2%  numa-vmstat.node1.numa_hit
+    613978 ±  5%     +14.2%     701163 ±  2%  numa-vmstat.node1.numa_local
+    222483 ±  2%      +3.8%     230998        proc-vmstat.nr_active_anon
+      5703 ±  4%     +22.3%       6976 ±  6%  proc-vmstat.nr_active_file
+    966262            +1.1%     976967        proc-vmstat.nr_file_pages
+    110.67 ±  6%    +105.8%     227.81 ±  9%  proc-vmstat.nr_inactive_file
+     41661            +2.2%      42580        proc-vmstat.nr_mapped
+     41337 ±  5%     +23.4%      50991 ±  2%  proc-vmstat.nr_shmem
+     30961            +2.2%      31647        proc-vmstat.nr_slab_reclaimable
+     46186            +2.4%      47285        proc-vmstat.nr_slab_unreclaimable
+    222483 ±  2%      +3.8%     230998        proc-vmstat.nr_zone_active_anon
+      5703 ±  4%     +22.3%       6976 ±  6%  proc-vmstat.nr_zone_active_file
+    110.67 ±  6%    +105.8%     227.81 ±  9%  proc-vmstat.nr_zone_inactive_file
+   1234795           +15.0%    1420254        proc-vmstat.numa_hit
+   1164983           +15.9%    1350288        proc-vmstat.numa_local
+   3262158            +4.5%    3407812        proc-vmstat.pgalloc_normal
+   3097627            +3.9%    3219201        proc-vmstat.pgfree
+      3787            +8.7%       4118        proc-vmstat.pgmajfault
+     75121           +17.7%      88386        proc-vmstat.unevictable_pgs_culled
+ 2.333e+09 ±  2%      +8.1%  2.522e+09        perf-stat.i.branch-instructions
+      1.88 ±  2%      -0.1        1.76        perf-stat.i.branch-miss-rate%
+  47022551            +6.9%   50273881        perf-stat.i.cache-references
+     35100           +29.6%      45490        perf-stat.i.context-switches
+      1.63            +2.6%       1.67        perf-stat.i.cpi
+ 1.764e+10 ±  2%     +10.2%  1.944e+10        perf-stat.i.cpu-cycles
+      1372 ±  2%     +22.2%       1676 ±  2%  perf-stat.i.cpu-migrations
+ 1.093e+10 ±  2%      +7.1%  1.171e+10        perf-stat.i.instructions
+      0.01 ±142%    +888.9%       0.08 ± 33%  perf-stat.i.metric.K/sec
+      1.94 ±  2%      -0.1        1.81        perf-stat.overall.branch-miss-rate%
+      1.62            +2.7%       1.66        perf-stat.overall.cpi
+ 2.186e+09            +9.8%  2.401e+09        perf-stat.ps.branch-instructions
+  43719263            +8.4%   47392135        perf-stat.ps.cache-references
+     33090           +30.8%      43266        perf-stat.ps.context-switches
+ 1.651e+10           +11.8%  1.846e+10        perf-stat.ps.cpu-cycles
+      1292 ±  2%     +23.7%       1598 ±  3%  perf-stat.ps.cpu-migrations
+ 1.022e+10            +8.9%  1.113e+10        perf-stat.ps.instructions
+ 6.273e+11            +8.8%  6.824e+11        perf-stat.total.instructions
+      5.40 ± 28%     -48.0%       2.81 ± 31%  perf-sched.sch_delay.avg.ms.__cond_resched.__wait_for_common.affine_move_task.__set_cpus_allowed_ptr.__sched_setaffinity
+      0.01 ± 11%     +37.9%       0.02 ± 10%  perf-sched.sch_delay.avg.ms.__cond_resched.mutex_lock.blk_mq_unfreeze_queue_nomemrestore.loop_set_block_size.lo_simple_ioctl
+      0.09 ± 48%     -73.0%       0.02 ± 69%  perf-sched.sch_delay.avg.ms.schedule_hrtimeout_range_clock.poll_schedule_timeout.constprop.0.do_poll
+      0.49 ± 12%     -25.7%       0.37 ±  9%  perf-sched.sch_delay.avg.ms.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+      0.05 ± 42%  +1.2e+05%      60.77 ±207%  perf-sched.sch_delay.max.ms.__cond_resched.__wait_for_common.__synchronize_srcu.part.0
+    998.14 ± 47%     -54.0%     458.71 ± 44%  perf-sched.sch_delay.max.ms.__cond_resched.__wait_for_common.affine_move_task.__set_cpus_allowed_ptr.__sched_setaffinity
+      0.04 ± 71%   +1978.2%       0.84 ±179%  perf-sched.sch_delay.max.ms.__cond_resched.dput.simple_recursive_removal.debugfs_remove.blk_unregister_queue
+      0.02 ± 69%    +138.1%       0.04 ± 44%  perf-sched.sch_delay.max.ms.__cond_resched.mutex_lock.sync_bdevs.ksys_sync.__x64_sys_sync
+      0.05 ± 27%     +72.4%       0.09 ± 49%  perf-sched.sch_delay.max.ms.blk_mq_freeze_queue_wait.loop_set_status.lo_ioctl.blkdev_ioctl
+      0.00 ±107%   +2770.0%       0.10 ±148%  perf-sched.sch_delay.max.ms.schedule_preempt_disabled.rwsem_down_write_slowpath.down_write.open_last_lookups
+     18.75 ± 12%     -29.8%      13.16 ±  3%  perf-sched.total_wait_and_delay.average.ms
+     95102 ± 15%     +53.4%     145892 ±  4%  perf-sched.total_wait_and_delay.count.ms
+     18.59 ± 12%     -29.8%      13.06 ±  3%  perf-sched.total_wait_time.average.ms
+      9.20 ± 11%    -100.0%       0.00        perf-sched.wait_and_delay.avg.ms.devtmpfs_work_loop.devtmpfsd.kthread.ret_from_fork
+      3.44 ± 20%     -60.5%       1.36 ± 23%  perf-sched.wait_and_delay.avg.ms.do_nanosleep.hrtimer_nanosleep.common_nsleep.__x64_sys_clock_nanosleep
+     18.29 ± 85%    +145.1%      44.83 ± 40%  perf-sched.wait_and_delay.avg.ms.exp_funnel_lock.synchronize_rcu_expedited.bdi_unregister.del_gendisk
+      1.83 ± 30%     +62.1%       2.97 ± 19%  perf-sched.wait_and_delay.avg.ms.io_schedule.folio_wait_bit_common.filemap_update_page.filemap_get_pages
+      8.92 ± 21%     -42.3%       5.15 ±  5%  perf-sched.wait_and_delay.avg.ms.schedule_hrtimeout_range_clock.ep_poll.do_epoll_wait.__x64_sys_epoll_wait
+    467.37 ± 24%     -41.3%     274.21 ± 14%  perf-sched.wait_and_delay.avg.ms.schedule_hrtimeout_range_clock.poll_schedule_timeout.constprop.0.do_poll
+     97.15 ± 37%     -66.7%      32.36 ± 23%  perf-sched.wait_and_delay.avg.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.__lru_add_drain_all
+      2.79 ± 17%     +92.6%       5.37 ± 23%  perf-sched.wait_and_delay.avg.ms.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_find_and_get_ns
+     60.00 ± 10%     -46.0%      32.38 ± 28%  perf-sched.wait_and_delay.avg.ms.schedule_timeout.__wait_for_common.__flush_work.__lru_add_drain_all
+     54.09 ± 11%     -20.3%      43.09 ±  2%  perf-sched.wait_and_delay.avg.ms.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+      6658 ± 12%     +25.6%       8362 ±  4%  perf-sched.wait_and_delay.count.__cond_resched.loop_process_work.process_one_work.worker_thread.kthread
+    539.83 ± 13%    -100.0%       0.00        perf-sched.wait_and_delay.count.devtmpfs_work_loop.devtmpfsd.kthread.ret_from_fork
+     15267 ± 29%    +141.0%      36792 ± 18%  perf-sched.wait_and_delay.count.do_nanosleep.hrtimer_nanosleep.common_nsleep.__x64_sys_clock_nanosleep
+      4141 ± 12%     +67.7%       6944 ±  5%  perf-sched.wait_and_delay.count.io_schedule.folio_wait_bit_common.filemap_update_page.filemap_get_pages
+     10673 ± 14%     +70.0%      18140 ±  3%  perf-sched.wait_and_delay.count.schedule_hrtimeout_range_clock.ep_poll.do_epoll_wait.__x64_sys_epoll_wait
+     29.17 ± 17%     +88.6%      55.00 ±  9%  perf-sched.wait_and_delay.count.schedule_hrtimeout_range_clock.poll_schedule_timeout.constprop.0.do_poll
+    104.50 ± 16%    +119.0%     228.83 ± 12%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.__mutex_lock.constprop.0.__lru_add_drain_all
+     29.33 ± 18%     -73.3%       7.83 ± 34%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.__mutex_lock.constprop.0.bdev_release
+    607.50 ± 48%     +49.9%     910.67 ±  5%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.__mutex_lock.constprop.0.lo_open
+    125.33 ± 42%    +373.4%     593.33 ± 17%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.__mutex_lock.constprop.0.sync_bdevs
+      7635 ± 14%     +68.4%      12861 ± 12%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_dop_revalidate
+    775.50 ± 19%     +40.1%       1086 ±  8%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_find_and_get_ns
+    866.50 ± 15%     +48.2%       1284 ± 12%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_iop_lookup
+      1961 ± 17%     +29.7%       2544 ±  6%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.rwsem_down_write_slowpath.down_write.kernfs_remove
+      2905 ± 22%     +52.3%       4425 ±  6%  perf-sched.wait_and_delay.count.schedule_preempt_disabled.rwsem_down_write_slowpath.down_write.kernfs_remove_by_name_ns
+    229.00 ± 11%     -43.4%     129.50 ± 19%  perf-sched.wait_and_delay.count.schedule_timeout.__wait_for_common.__flush_work.__lru_add_drain_all
+    877.50 ± 14%     +24.1%       1089 ±  4%  perf-sched.wait_and_delay.count.schedule_timeout.__wait_for_common.__synchronize_srcu.part.0
+     10423 ± 13%     +29.2%      13464 ±  4%  perf-sched.wait_and_delay.count.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+     10975 ± 12%     +20.2%      13195 ±  4%  perf-sched.wait_and_delay.count.worker_thread.kthread.ret_from_fork.ret_from_fork_asm
+      1238 ± 24%     -29.2%     876.43 ± 13%  perf-sched.wait_and_delay.max.ms.__cond_resched.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+      1350 ± 30%     -39.9%     811.58 ± 18%  perf-sched.wait_and_delay.max.ms.blk_mq_freeze_queue_wait.loop_set_status.loop_set_status_old.blkdev_ioctl
+      1281 ± 34%    -100.0%       0.00        perf-sched.wait_and_delay.max.ms.devtmpfs_work_loop.devtmpfsd.kthread.ret_from_fork
+      1349 ± 30%     -40.6%     801.82 ± 20%  perf-sched.wait_and_delay.max.ms.io_schedule.folio_wait_bit_common.filemap_fault.__do_fault
+    896.11 ± 53%     -61.3%     347.06 ± 43%  perf-sched.wait_and_delay.max.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.__lru_add_drain_all
+      1324 ± 31%     -60.0%     529.55 ± 32%  perf-sched.wait_and_delay.max.ms.schedule_timeout.__wait_for_common.__flush_work.__lru_add_drain_all
+      1345 ± 30%     -42.5%     773.93 ± 23%  perf-sched.wait_and_delay.max.ms.schedule_timeout.__wait_for_common.devtmpfs_submit_req.devtmpfs_create_node
+      1329 ± 31%     -52.1%     637.20 ± 29%  perf-sched.wait_and_delay.max.ms.schedule_timeout.__wait_for_common.wait_for_completion_state.__wait_rcu_gp
+      0.00 ±147%   +4468.8%       0.12 ±130%  perf-sched.wait_time.avg.ms.__cond_resched.__kmalloc_node_track_caller_noprof.kvasprintf.kobject_set_name_vargs.kobject_add
+      0.07 ±  2%     -33.3%       0.05 ± 21%  perf-sched.wait_time.avg.ms.__cond_resched.__wait_for_common.submit_bio_wait.blkdev_issue_flush.blkdev_fsync
+      0.05 ±101%  +78602.4%      37.91 ±184%  perf-sched.wait_time.avg.ms.__cond_resched.kmem_cache_alloc_noprof.__kernfs_new_node.kernfs_new_node.__kernfs_create_file
+     11.08 ±102%     -99.7%       0.03 ±108%  perf-sched.wait_time.avg.ms.__cond_resched.lo_read_simple.loop_process_work.process_one_work.worker_thread
+      0.02 ± 33%     -73.9%       0.01 ±142%  perf-sched.wait_time.avg.ms.__cond_resched.mutex_lock.bd_abort_claiming.loop_configure.lo_ioctl
+      3.41 ± 21%     -60.4%       1.35 ± 23%  perf-sched.wait_time.avg.ms.do_nanosleep.hrtimer_nanosleep.common_nsleep.__x64_sys_clock_nanosleep
+      1.83 ± 30%     +61.4%       2.95 ± 20%  perf-sched.wait_time.avg.ms.io_schedule.folio_wait_bit_common.filemap_update_page.filemap_get_pages
+      8.86 ± 21%     -42.3%       5.12 ±  5%  perf-sched.wait_time.avg.ms.schedule_hrtimeout_range_clock.ep_poll.do_epoll_wait.__x64_sys_epoll_wait
+    467.29 ± 24%     -41.3%     274.19 ± 14%  perf-sched.wait_time.avg.ms.schedule_hrtimeout_range_clock.poll_schedule_timeout.constprop.0.do_poll
+     96.08 ± 38%     -66.6%      32.11 ± 24%  perf-sched.wait_time.avg.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.__lru_add_drain_all
+      0.07 ± 42%    +494.5%       0.41 ±104%  perf-sched.wait_time.avg.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.dev_pm_qos_constraints_destroy
+      2.38 ±103%   +1749.5%      44.04 ± 42%  perf-sched.wait_time.avg.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.lo_simple_ioctl
+      2.73 ± 16%     +96.2%       5.36 ± 23%  perf-sched.wait_time.avg.ms.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_find_and_get_ns
+      3.18 ± 75%    +171.8%       8.65 ± 24%  perf-sched.wait_time.avg.ms.schedule_preempt_disabled.rwsem_down_read_slowpath.down_read.kernfs_iop_permission
+     59.89 ± 10%     -46.1%      32.26 ± 29%  perf-sched.wait_time.avg.ms.schedule_timeout.__wait_for_common.__flush_work.__lru_add_drain_all
+      0.04 ± 25%     +72.9%       0.07 ± 27%  perf-sched.wait_time.avg.ms.schedule_timeout.__wait_for_common.devtmpfs_submit_req.devtmpfs_delete_node
+      3.13 ± 22%    +116.4%       6.77 ± 59%  perf-sched.wait_time.avg.ms.schedule_timeout.synchronize_rcu_expedited_wait_once.synchronize_rcu_expedited_wait.rcu_exp_wait_wake
+     53.60 ± 11%     -20.3%      42.72 ±  2%  perf-sched.wait_time.avg.ms.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+      0.00 ±150%   +7429.4%       0.21 ±109%  perf-sched.wait_time.max.ms.__cond_resched.__kmalloc_node_track_caller_noprof.kvasprintf.kobject_set_name_vargs.kobject_add
+    236.96 ±105%     -99.7%       0.59 ±182%  perf-sched.wait_time.max.ms.__cond_resched.lo_read_simple.loop_process_work.process_one_work.worker_thread
+      0.16 ± 71%     -96.4%       0.01 ±142%  perf-sched.wait_time.max.ms.__cond_resched.mutex_lock.bd_abort_claiming.loop_configure.lo_ioctl
+      1238 ± 24%     -29.2%     876.42 ± 13%  perf-sched.wait_time.max.ms.__cond_resched.smpboot_thread_fn.kthread.ret_from_fork.ret_from_fork_asm
+      1350 ± 30%     -39.9%     811.55 ± 18%  perf-sched.wait_time.max.ms.blk_mq_freeze_queue_wait.loop_set_status.loop_set_status_old.blkdev_ioctl
+    872.85 ±  8%     -26.5%     641.54 ± 20%  perf-sched.wait_time.max.ms.do_task_dead.do_exit.do_group_exit.__x64_sys_exit_group.x64_sys_call
+      1349 ± 30%     -40.6%     801.76 ± 20%  perf-sched.wait_time.max.ms.io_schedule.folio_wait_bit_common.filemap_fault.__do_fault
+    894.57 ± 53%     -61.2%     347.04 ± 43%  perf-sched.wait_time.max.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.__lru_add_drain_all
+      4.21 ±101%   +1975.4%      87.43 ±134%  perf-sched.wait_time.max.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.dev_pm_qos_constraints_destroy
+      7.31 ±114%   +7928.3%     586.82 ± 40%  perf-sched.wait_time.max.ms.schedule_preempt_disabled.__mutex_lock.constprop.0.lo_simple_ioctl
+      1324 ± 31%     -60.0%     529.52 ± 32%  perf-sched.wait_time.max.ms.schedule_timeout.__wait_for_common.__flush_work.__lru_add_drain_all
+      1345 ± 30%     -42.5%     773.91 ± 23%  perf-sched.wait_time.max.ms.schedule_timeout.__wait_for_common.devtmpfs_submit_req.devtmpfs_create_node
+      1329 ± 31%     -52.5%     630.99 ± 28%  perf-sched.wait_time.max.ms.schedule_timeout.__wait_for_common.wait_for_completion_state.__wait_rcu_gp
+
+
+
+
+Disclaimer:
+Results have been estimated based on internal Intel analysis and are provided
+for informational purposes only. Any difference in system hardware or software
+design or configuration may affect actual performance.
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
