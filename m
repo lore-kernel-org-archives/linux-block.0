@@ -1,107 +1,79 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1591B85C5
-	for <linux-block@vger.kernel.org>; Tue,  3 Jun 2025 23:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E40B1A29A
+	for <linux-block@vger.kernel.org>; Wed,  4 Jun 2025 01:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748994947; cv=none; b=rL0By8YCXa1lMGYy4sAV9j+2bYkIK4GqtSVWqJ0g4YyAhaxEW4PSGpnYCBQNH70mHlY771kAbwi8Aq4NEIQo25rdiejSpXpCu8K4J03pwU0VS3lDoa4F7gY5S4VFrf4lAqDB/rTRGi6xjvTugdQMI08jD23luaseXav0q/goYj8=
+	t=1749000751; cv=none; b=pMnIg2k8i/aC3olnsbkF09yShOU5+upnH/0Tdf9d2ESZAMB3ZRoiJpgUlag+fkDy0/JkjBugjy6zFeY7FUfCMrcbazyp3cj8VwwenQ/ksR3R/LBEOFLbEIEC2wGB0gbT6PGY9xb/Wn8MXcodgcbAbrNcp0/le82y4urEQ2JmHk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748994947; c=relaxed/simple;
-	bh=PdPAtlQv5A9CwmTbNINwENGHvMxU12xV6f481PqLn1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gW4edJZ9KaHpPLdNfuinkpuGavewZfi4+1qZFcpnXSyj6ufaAjtQceuYTGPkZ4xdvkS75izznumFLlr+h23dDTwY7oWk/QxfkryLAcMkeU6XybNJWZRQbmgk1qyONCa0oDv0Qf2dFXx3VYpE2V1/4gFq+YDqp2nMUJOk0LRQDfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GxgAR84C; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1749000751; c=relaxed/simple;
+	bh=g8EG4OO/uAvkCE4/p6iHNot9cBDrmSO26DGJjcm3zrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WShAd2skN8pzIZtYMnKTm36lxd06ax34RPHx9uHQy8UgPcQZu/1hwSmHKKamDFgSM6BOX2nMACNNOvT6Rwih0tw4YM1l91jXUEyyzHnsAryCd7irWtbQvYxCUxpx2Zv2l+YkLKTxPHMbMMDNdnsNugUkD36NdxRvsCTfVTrhAuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lhxt1zNF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GxgAR84C"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86cdf8349ecso147970339f.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Jun 2025 16:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1748994944; x=1749599744; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q0hfwFiTxGC9FvQWGx2emEBLXL8EUZXElvhCJdQUIYM=;
-        b=GxgAR84Ce1TWdhkleqbWYNzNshntHnkt7+Fcoi9klK2VNOnrwNPuNa5AkIRZUT99jX
-         fFrfvgaWi2kU149MJz8UcikGseLjBpaitsyirEsvpzUIbdWt11XvjS9icYpchN3zm6WH
-         uV+V6Q5cfd6uqVkebMzhZ+9HlX8+qBHRH/WxatnfNxsLoBDxn13CNw1RcBW1nQUCXywO
-         DBxPriH4I6x2j9XlrUn8pR+/6nsZLw6FFRce4b+kWDXRVE6lJ5Mekf+lXjOZbhepVjH5
-         XNrKMvghxj7j0G1lSIBR3Hi0b5sUepuWSLcQ4cfCufUWogD6AwA0hglXx78F/SYzkHiy
-         qGrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748994944; x=1749599744;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q0hfwFiTxGC9FvQWGx2emEBLXL8EUZXElvhCJdQUIYM=;
-        b=wi52/aqxZh/vkWtkvfKBnPzSsfjQwbcj619HqVJjfBVnBWgbxYquQLnc/gk4hxZSfz
-         SPOkYqE6fcTyO4tj0P2gL5Sk9FfdtGoeU2QaT2rYmoVAQvlmGkRvirtIw5KQfPhQboeK
-         3W2+SOAVskm+XaKHp8uMkqPh8V9F8FxCm9xFYASELAIo5dR/B9Qi3dIf46bXzGb1B8MW
-         Z3T8AaJd7bSWkY0YP7VZocXCACc07pN4fNOBeiQ+W2wvZl7vUM7TXRkNcA8sSsnrObzG
-         cYlI9mVSqHgOEdbvLMvSWSVIuUHIG3Fw2U958OXpNcgsz4yC5ChAEGJoNi+02VrkaKaL
-         g0nw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2TiXHj71secOHcAJj0ol2vIlMm0q7NPYm+j8RTgwmeOWC2lnUEVp176BLibIZWXLnZKTiMznYIczb8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YydBUMqF3pWIw4x0r6Qg6m8hcsWxkX/XZ8Vja2MT9bkhl1UUJWZ
-	YTxQwjLfdZ+/FWUbA2ESIrn2njH1ZG0wrrzYYSU3psZcYSrv6v5ITZygGwoUPNfyclc=
-X-Gm-Gg: ASbGncvr1fTtmdyjguCqrTqr2xXemke3Vy/cgQuP8RNuw0KCjXyeFGUXx51+KgMlTLt
-	jaOhpEKlT1pWOJac2tHKEur/MVsJ1Xj5FzXO0pCSCBCAKXipYuSUQAdNE+zNK8jdfTqwyo3hjEu
-	T/C2c7U7K7XJQt/eKT04pFpUVQ4kaZTy1mPs/YkpOcXyxFQSYX2tXimtvBK6ejy8kVuuSXd5dYH
-	yqhu+4TgCdCyRN+5O4sX5nV5hJ0XRFmX1bv8Hb9qme3M2bDl3KbyMdYJet4RyAE+eiHLB7TJKNk
-	JiwVWaQsoY3z+xMfhrymiEiZu2srEinJAgeQqNhxUdo23479
-X-Google-Smtp-Source: AGHT+IE6enUA3M4NjhT0Pw4L3o/qCazMTjOaTWGKxET/BY5Vf16s0wPirWMqfzr6RYL2VgBafuZeGg==
-X-Received: by 2002:a05:6602:c8b:b0:873:1ad3:e353 with SMTP id ca18e2360f4ac-8731c5d244bmr101155939f.9.1748994944246;
-        Tue, 03 Jun 2025 16:55:44 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7f22014sm2493485173.136.2025.06.03.16.55.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 16:55:43 -0700 (PDT)
-Message-ID: <5fb5cd79-6744-4d9e-aac7-c0b363ec8cbc@kernel.dk>
-Date: Tue, 3 Jun 2025 17:55:42 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lhxt1zNF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749000748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AKBoAi6FqTWhxAfztHNNXYUuQ67bFZoGcygltsWFPhE=;
+	b=Lhxt1zNFFuIUZiTJBjDfVDL+k/o3OAQb9b2N06hTklrfxc0Qbf3lQF0cy1gUCOEZCz+0bp
+	AXaB8xQYTX7AUhko7cE4IuktDp8EhlxCkOK/d6SVo1+WfaNu9XSdk4vrzaLqs4igQCiS4d
+	OksN92EB96+gf8jJMPyImUOb1/Xbvro=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-578-mAqskQLwMNWuQ9VPlcGSvA-1; Tue,
+ 03 Jun 2025 21:32:25 -0400
+X-MC-Unique: mAqskQLwMNWuQ9VPlcGSvA-1
+X-Mimecast-MFC-AGG-ID: mAqskQLwMNWuQ9VPlcGSvA_1749000744
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0DBC71955DAB;
+	Wed,  4 Jun 2025 01:32:24 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.100])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF01019560A3;
+	Wed,  4 Jun 2025 01:32:20 +0000 (UTC)
+Date: Wed, 4 Jun 2025 09:32:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: ublk: kublk: improve behavior on init failure
+Message-ID: <aD-iH2D4gk6vD9Cw@fedora>
+References: <20250603-ublk_init_fail-v1-1-87c91486230e@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: flip iter directions in
- blk_rq_integrity_map_user()
-To: Keith Busch <kbusch@kernel.org>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250603184752.1185676-1-csander@purestorage.com>
- <e37d8707-8770-4f20-a04a-b77359c5bc32@kernel.dk>
- <aD-J9mzq_bJe26rD@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aD-J9mzq_bJe26rD@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250603-ublk_init_fail-v1-1-87c91486230e@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 6/3/25 5:49 PM, Keith Busch wrote:
-> On Tue, Jun 03, 2025 at 12:54:05PM -0600, Jens Axboe wrote:
->> On 6/3/25 12:47 PM, Caleb Sander Mateos wrote:
->>> blk_rq_integrity_map_user() creates the ubuf iter with ITER_DEST for
->>> write-direction operations and ITER_SOURCE for read-direction ones.
->>> This is backwards; writes use the user buffer as a source for metadata
->>> and reads use it as a destination. Switch to the rq_data_dir() helper,
->>> which maps writes to ITER_SOURCE (WRITE) and reads to ITER_DEST(READ).
->>
->> Was going to ask "how did this ever work without splats", but looks like
->> a fairly recent change AND it's for integrity which isn't widely used.
->> But it does show a gap in testing for sure.
+On Tue, Jun 03, 2025 at 05:38:33PM -0600, Uday Shankar wrote:
+> Some failure modes are handled poorly by kublk. For example, if ublk_drv
+> is built as a module but not currently loaded into the kernel, ./kublk
+> add ... just hangs forever. This happens because in this case (and a few
+> others), the worker process does not notify its parent (via a write to
+> the shared eventfd) that it has tried and failed to initialize, so the
+> parent hangs forever. Fix this by ensuring that we always notify the
+> parent process of any initialization failure, and have the parent print
+> a (not very descriptive) log line when this happens.
 > 
-> The change is good and correct, but it doesn't look like normal tests
-> would find a problem here. The iter direction in this path only adds the
-> FOLL_WRITE flag, which appears to just check for writable access. Unless
-> you're specifically testing something using read-only PTE's, a test
-> wouldn't have triggered an early error. ?
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 
-Ah I missed that - yeah no way we would've spotted this one other than
-under really funky configurations/setups.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
--- 
-Jens Axboe
+Thanks,
+Ming
 
