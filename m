@@ -1,852 +1,409 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2054.outbound.protection.outlook.com [40.107.220.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42152040B6
-	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 10:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749119941; cv=none; b=XZye3UWrvcyiSmt7bfNu7iQvFCMtQg3kUiwciRsIh41PJzy4eT9YBiqX7Ih/Sp06lfZexcXvJ2uC8MyMG+H6vaqW8YO1C/OLZYX+X01Rdl59MkGcuea2L6+O2mL9jZsu/tY24u2vh9h8+xC2Kx+NU+ki1ySBQM6ehm/HJ+hOwF8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749119941; c=relaxed/simple;
-	bh=2WAs0lhlVnhb9ip5CzlONPzV0WTDB1mdue6VeXSYEAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qG7M8LGU9QE7/ocEECn0rnZJyUBkkORPnsmFv/a/gBpKQpikWrUKbSdr/iXeb2NbfJrihMYFhRRVCgzltTw+Ime8j3aBSvEemvm0R///ngFCRH9hiRmz35+Lo9DtEHNx9rWMoAIgwsgmD6bCQrrpquz5ajGo0xzjsU3Te7W3CZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=MGvWbbmE; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAE38488
+	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 12:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749127028; cv=fail; b=MCDh9PpomdvFMITl9fUoln25Ll6dgZR+H5BVJ8KpXoLT+tjDzLHbwGjJUuY6+M5RX3NRH72Y+hUqjpgrcVODwajRjrhb+fLuqen8Rhae2bWx5FgwPb3fUW3oR3R4N2wG+xIytNErKg9FdLSVRzh01re9o/+8lpRsWfPcCOJ9HAg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749127028; c=relaxed/simple;
+	bh=JJin+gom4eHFm2aCXIjCmyNNnDpyH3W58nkNeEGsby0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ee75MWZJ45PfrHQwLl49cHH4o/EHrRgdH7Nv6L32ppBdpf/D9yZCkRcGND8OV5d/zPcAtBjz95XKa4EZUjvHtM2pY1eNr7WTa5hftkAx8OVhq2qf+/AA1+wKv13ZfL+oMGadvpQHGcZiETSnlqADIL9Vf6k4ONIG7H2VRGC+gao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a9Oubj08; arc=fail smtp.client-ip=40.107.220.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="MGvWbbmE"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60702d77c60so1446718a12.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Jun 2025 03:38:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1749119935; x=1749724735; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L1VKVgPyDTD7FcC13I4CKc8IjBxTy3Bp73Mc+aF8JhY=;
-        b=MGvWbbmEXV9m3Pmexet4U8AcUCe0XzuYYPjrXT+vFKoU0QS1VfmsjG3au78Oalp7oq
-         6fm2K7V9hDb9jkZhvdhyg+qw2W1ZUHbc2A43DSy5+S1S+iJ6+Vu8K0xtsJQQ3PKXw4Vm
-         vSFB3B3D83JrMkIT+BKjHs18w+eno6ry7A3gcb6Oh6RSljmRVCShrTWgi7sRorQkHyB2
-         2upEq+H+5/Ibw/WdvrQ9aCPKrn/JuJ3cTQX149y58OMUeYhBCyNPIQBD62hblGwZMFzF
-         Va9+vDbkKMtXrtas5PWiRtkFFSieiF813J5n+Q5kxECwOp1VvVkY9G3UM54pMFMrUO+7
-         AjCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749119935; x=1749724735;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L1VKVgPyDTD7FcC13I4CKc8IjBxTy3Bp73Mc+aF8JhY=;
-        b=M1ieSwQ8GoYQ0USWmnXgU6bLIIQdDJ9/vaLhukinjAHMjB18rtN4lJoTJC7Iesx9Yd
-         Au11I7IC+tOx2kcSl44N15Das4XPjng+4gcxwMkaXDQ883qV033ODVlwf4/Sk3O/kjXy
-         YwwGZZCRwAe5VG8vSTBd+XcAO1XkVHt3hQciqDiu50PQQ503Z2Cim8iYBE56DU9BYcIK
-         A/Xpt4lJ3G2RaTg0rZTpEMiyd939hc8HuEmo1mZ03Yue56aOnHEpoOxl5lZksxygdAGs
-         kfqq8kLeIJd1iUMcmRlZD7Q1QrpbnwPcnuPpTNk/42UBHbvlQwTaljvV+ro+1xe3RfWe
-         50kA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7rwtASouY/L9yWL/eAQq0GDxh3CcJXJbt3uAqzJ7iwxK+H1JqWIRnrv598McWW3dPCsDBqSd0ht0Ukw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQytNNfECWhXPgd1eYVJ+Ho4UsbYUODkCcssjkYzsv2xBtbHlv
-	i9S22aQj4e9GwtQ7y6EXsi2ae2Js1BDML9nmBl+Cs3niePQFVOJyVCuky4cIc0uRP1k=
-X-Gm-Gg: ASbGncu0X/f/RXxUhhVME5Uh6M7MGamO3DsvZZfopuktAhTzxdh06ld72k6LT02/Fwu
-	2GEdbZexUDGWg7WEzpt4o1i9f8Bs+KDBbhLO8zSHuY70B+1OkO2QJllnJpJu3X56e1Dk2Zwwy1V
-	y7Opf+GS8Qc4LSQGIxHuBOl4RsqFXx6luxRKJY9RMHjPEbcD6A7I6tRLqiSeUGBYPtUnxjS4/JN
-	vtSTiP8V6oY5uqB/4dTcHZpAl6Ko7v273vO60ihi0ywzLKm71KfV5xLrZo+zylc4InqYhGZzJHe
-	eFV0WJzX4SNFFLNznT3vYxDLC0E3bc8P3I7VtBUMDRCgKDejecptKz2fkzi7pirdMGhsh04JwMG
-	X6MBoyHgchNKoQ37DlRrYxADyr8eYOcCf9uI=
-X-Google-Smtp-Source: AGHT+IGclUS1k1su+f50C6wj0i365j7X82QoNxAP8m/+UNr7j/+6qGJjOKZSDyUiJpKR/oUHOHZRew==
-X-Received: by 2002:a17:907:9688:b0:ad5:74cd:1824 with SMTP id a640c23a62f3a-addf8e3ecfbmr553565566b.38.1749119934953;
-        Thu, 05 Jun 2025 03:38:54 -0700 (PDT)
-Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada6ad6ac6bsm1234670866b.169.2025.06.05.03.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 03:38:54 -0700 (PDT)
-From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-kernel@vger.kernel.org,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	linux-block@vger.kernel.org,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH] drbd: Remove the open-coded page pool
-Date: Thu,  5 Jun 2025 12:38:52 +0200
-Message-ID: <20250605103852.23029-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a9Oubj08"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Wh3lyModOCS1D0fT/qP9Ua1oAZBqcGJ12mpTVFgkwkQg5j8uVSWI2ZIk2EKKvFkqAzhRlax1GH7XXJDDlpDrl5f41R5VkFZocVwO57w1M7hvjdRSFMFzaYYFvJ5Jk7Fm4jykCtmd291WvVJgbC8CVqugWdxFVanJtLb/mVOwQvyt/DiLMITXfTyU5ckj+4zXVVHYwy51mSgRKbKEkU9c+cmw1XPvM8O0HDOPvU3pPjQZ16OFi02JX96/y1BQp8pZ8STJ/nr+65lG3IRC5nnNjrMLL7PFtff1aqlMOvxxe7DryY70Bfd2FHitC4rRY8eInp9NqYQiyqEvm1LYPpsWBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mMZDgA883/zD4EEE5melFENW2OR5GXSwT6D6RCtW1GM=;
+ b=CBCX8oNtgdKwMcEDD7axaTcpPsfSj8TC3wZkRWrNKZCQJyakUW3heuCMZuJkecGapX9ctNg/rHAni5tu7W9s6IPSNpOZZsWsA8O8Ov2eOUj7EQc37LPuZmqRixn0VK3of+9bRBCdPlTJSFDc+Jc0jJpmsYj9biv+ZF0Ts5/RuGNAHGiYJCnENaIFk6/8li6JVMxQ09pOhIRvWnIL/ssse4rkGYbFF4p0lmkWp1gyljzmyG6nOk8uC1Fvl93cDlIIm9C3DdaVPNOXfyiJoNu2d7umVo0Z12toDx7K9AbytHd/L8JVuZ2+2K9STEQaD3YSjDPrTIRi1ZlUxA9zNS8wdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mMZDgA883/zD4EEE5melFENW2OR5GXSwT6D6RCtW1GM=;
+ b=a9Oubj08QR+O5HaC832N7RAwVgtF0kfGJ4zJ7yRla1iIyNA0FYUlOWt+fxzGvgAXR/zX2Dl2HWic7YYDBIk0Clo9DXnbKujTWkMc74fxHXD09OEVqKBJJtp/JT3v0OdyBKgCBgcBsVN2qxURmHfSPNbsLa+0SCvgtCvWudazuH+iSNK3UAwaLJcdIQr4GaYIeRWOkdYEUX2c32fj0y8U46tKC1aYCVJ65hiXRGYB/vHBxmDdxmPWw3hwB5OJcV6AWg/BMEoKlB8MEL7W6f0OcwAT5Hb26NzN89Bj+J/n5ZmgBtUt/+tucLss1AXYY8usoEtAfgltiv8Vrw+YvjC02g==
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) by
+ DM4PR12MB6496.namprd12.prod.outlook.com (2603:10b6:8:bd::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8792.34; Thu, 5 Jun 2025 12:37:01 +0000
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa]) by DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa%7]) with mapi id 15.20.8769.029; Thu, 5 Jun 2025
+ 12:37:01 +0000
+From: Yoav Cohen <yoav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Uday Shankar <ushankar@purestorage.com>, Caleb Sander Mateos
+	<csander@purestorage.com>
+Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Thread-Topic: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Thread-Index: AQHbyzeSSRaVFqTPg0GnAQDdJHQew7P0ldE6
+Date: Thu, 5 Jun 2025 12:37:01 +0000
+Message-ID:
+ <DM4PR12MB6328039487A411B3AF0C678BA96FA@DM4PR12MB6328.namprd12.prod.outlook.com>
+References: <20250522163523.406289-1-ming.lei@redhat.com>
+ <20250522163523.406289-3-ming.lei@redhat.com>
+In-Reply-To: <20250522163523.406289-3-ming.lei@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR12MB6328:EE_|DM4PR12MB6496:EE_
+x-ms-office365-filtering-correlation-id: e468b68b-4e73-4576-669c-08dda42dabbb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?3+Y1blRoGOK/SDJbRf4huLQ4FGC3EkmPLDcwDwIe0zvUO4D/S0O0Gz6OWu8L?=
+ =?us-ascii?Q?luCimYNTDmL71a+Y2QhETheAC3PJM+mSZi+JlZ63Iw4EeiLF5MpEpHKNgzMg?=
+ =?us-ascii?Q?TZ42uwRgQMOiaF8Q0n1hB/lWjBI3+OO7JYyDre9oZ6tBKihlsSsmXQcH2TE+?=
+ =?us-ascii?Q?mbZdSchWpPMPO0cBaMyD9mdg7Do3tAL5si8dp9ZZF2sNgACPg06VYqzkwFyR?=
+ =?us-ascii?Q?X6a/+5Hb92mn4O2FrrffEkKB6yiVHOvRIb0igAJ3pA+acHOeb4Xadld6gcOc?=
+ =?us-ascii?Q?D6K1JQErGFY/jeuZkXgaUUQ1R9ln1bdCqM3R83zqaFUXcr+pkGjXPDl1W09A?=
+ =?us-ascii?Q?s5SSIdB64NDX3PaljtBawOSyQE93S21sDmhZcxWwj3eqQirt+cmKQ3C1HD4h?=
+ =?us-ascii?Q?VAGO250Bw6Pzpvj05ZOMqJr6VrK6l0bOZW1bGFOHB1TKojaYzdgmZB2rzwUV?=
+ =?us-ascii?Q?/gFZwud6HQ3dX2yM0ANCL4nCS8T76sUHfnMPBM0kjFrknGDbvY+LvYLFCtt3?=
+ =?us-ascii?Q?UUh8V2hZ7JwWnSeGt8SD1SXrnsd27Jvpn4BPRL53rPn+YPqzXfFxsGvqvCGz?=
+ =?us-ascii?Q?YK/irhPsAO1UWXqSDefPht83OBhQ04t70jqV1vCIOwgOe8KNND7H0Ao0lKKm?=
+ =?us-ascii?Q?5m8F1n1IPLj/0BK8KjSIqt+VrKEDL88jjV7kntOmxPCaH9VP2aCev8jAx3dT?=
+ =?us-ascii?Q?ntAn91qujDpFFc4cit+Y2cIYiUqHuzO7cQbjT3+lpY15PUK12Kz0jLA3LbtD?=
+ =?us-ascii?Q?eGXM2Jiiy7juz51TaeVyvSfZ6Iku47n2TpCDHLSSvLMjavnj/rFCvAgyrOBE?=
+ =?us-ascii?Q?kt3nef8TP+MX+sAbDTAfFuiW4ZpqC3ofdam+t4DkWNi2DU/6IQ41Wnnm9Sx6?=
+ =?us-ascii?Q?tr/SJ7rutopPGp7wI0QW6IEuDD6+DFszadr3PP7N/hwyMp5ZiJhdvU0/yd/2?=
+ =?us-ascii?Q?DlC47AOUsfLpBF6AakkaHO1s7kZ5v6Z0iXv3I+gFt1DG1+s69ileMlBo38Am?=
+ =?us-ascii?Q?MMU8qjRijTkb+MluG9sm7oxtzLdFSKstNykn32Nmvqcs65uIo1i5SEwHSvEI?=
+ =?us-ascii?Q?jOSkvveFZ2R2KMtYB2RiEgbhEAIWrhmjas1t7/XiVFjcpeAd9DrAFi00EjxL?=
+ =?us-ascii?Q?jRjf2gxmnpbtbB4Jd2X00qtdxGruIRJL1worEbqaUKj0fhlPA9orTsqSPGWj?=
+ =?us-ascii?Q?LLAmXbSd/H0UDJwIxqEKR5U0/GzhgCbvl+g2Aqv+1/oH74/RLKRvG7vovPCC?=
+ =?us-ascii?Q?BJuMKewaF4jJQj71EXK+PujsukxfY6z5f3TQPolggBIogb3NNITF78kEVwbU?=
+ =?us-ascii?Q?Wq3yfg7+W2EBOjzKb3GyI3g+v601TnKMRbj1izVIB8HFNzQtw+D5jJLh1OQY?=
+ =?us-ascii?Q?nfN+m5qGmtq/pn8AJ/dOzEUihdMhGSEjD5HT5AvrH4QXyK2JHbp3YDVpi1V+?=
+ =?us-ascii?Q?j/zAAyedoNYkMyLKXGlRjLJeIM3sg/Juy8XZJ8yt9422etgd1q8YkhpX2sPz?=
+ =?us-ascii?Q?QQWtFbqTugAxYPE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6328.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?GZ41K1xJAYfqWUvDBuAqDCP2GxrpUx1Kexc++AoM0HRBef03ZBOrD6GeISYK?=
+ =?us-ascii?Q?0G10WSa6xl4+sk5UgepwSiMyQtgy9ZewiSehMYtSgBSMK6mp3EThVMHQQK4q?=
+ =?us-ascii?Q?OCDWAzGvhrdxXoffW0Bet+oi3FPjuEY8KQqt8hvTXF3ZWvc00BFfecD88NCM?=
+ =?us-ascii?Q?DQXSJFM6GE8A0r1u7Hm8O40onbhOhKyRiI4gnjjepmpM9uvXiEXMwCFnVfe7?=
+ =?us-ascii?Q?Bw+aXj1ndcdoumec1r8/fx/OVxSX/E920uMUWZD7FVC+r/lom3jjorO39GS+?=
+ =?us-ascii?Q?e8pY5uknnnDUqMRmO6dj98bsphiUd9y/X9jJAjnL8mFEHIj8mJAvL83Q0OqU?=
+ =?us-ascii?Q?CvBRUpAA1nrjD0C5Yb1K+5mVjjRID72OSpJQMWs5Dg7oT1Z6gmRdOMfF0q+G?=
+ =?us-ascii?Q?M0L0svE/YintWx4/JESe9nyskfiA0qJsCIOHZA822z6unuyRC20QAgdksNQX?=
+ =?us-ascii?Q?5aZXYz7xRPXy9YQzS7SAup6TFyQEFDtjm74V2rH2G3hNiOl31jgTp9YZKk6/?=
+ =?us-ascii?Q?S5EjM78V+jbl9mCrjCOxueTYK8Z4Zs+tKKxyWy33VszQ3D/xXfadxRd2CYRP?=
+ =?us-ascii?Q?1YTBB2Wjk4qszWcJ+vFDdyVpFzso/sfT9G0E28zKGjVIyoFhuCWL6tN5GYSy?=
+ =?us-ascii?Q?RxqMvOug5ZhUsszMmliMVLmv6JVaVbybl9NCYbrpRMVBelq/WBpeAGlsyNRg?=
+ =?us-ascii?Q?j35a6T+AGrJJwWx23hMSVJDqjyAXPf3c9eF4bfhtJDf5i/HtDKnS3t2AmFQY?=
+ =?us-ascii?Q?dIL/CPbwZA+OZKhIEPzyp8VAxc2/+aYCRt0OKsKJkx9CShvvhQ0uPD/uSZsG?=
+ =?us-ascii?Q?dGzy8W7yuf4EqwExN31TW6J5Y2dkCqM2Gnw1dhcg42ZmWbZkCInTLoIz8g6e?=
+ =?us-ascii?Q?Jg7Z9NKsyUPKxOcbDU/LNEjMsNTecbD+0nSijv2+LB7Cq88VmtwkMm9aUrrS?=
+ =?us-ascii?Q?OAN1P/+nweq3NYDIjgh20It2XUITHJeOSTKENx4g7O7w2XGaC0rNhSddyLSZ?=
+ =?us-ascii?Q?PYEYgaO8nmKH0ejhFFIuFNbzdysaWtir9RInGrb6agcybXXxCzjkQVW4qKRJ?=
+ =?us-ascii?Q?AFlIXnUbkLTvEm5+v30ajhYv+oxdcINVpEgQZFr/nP6XPhhiwdD95vjcRyPj?=
+ =?us-ascii?Q?Me8NuWHa2AIB/zfYIfce1A/e3kFl7LIvw1ZbI8Ik/olLhMKXs3QvqQzNytlm?=
+ =?us-ascii?Q?p9Alt1BHgolztndz5GFe0dq5qpn1aJtx5xLpOeyTIJ/JNz/1r/zwI443oa2/?=
+ =?us-ascii?Q?9C+OmuM4F6xJLOztRQP0CpUPhtHKSyA1pUfYWdWpaxY1xjjBmbR0+yzJK5rY?=
+ =?us-ascii?Q?+M4+bu8U+YAvkJIj9Xr5tGOJdzvQc/soZXWiYPq+7BkdjEKH6imyUQjiex/h?=
+ =?us-ascii?Q?2YhI0EjR+7bPAk6pfIku5fWOCSvnEfvcjarS+6swc/j+IspHvqiIJOnA+UB1?=
+ =?us-ascii?Q?mdj76fnfQ+jt23XaN0FoB44rBywXUBZnGBfq1NgtSIQNKjYDQgndcYwV7RQ2?=
+ =?us-ascii?Q?vS6P7I3SE3f0+I/2KsFsRyVZ9u/NtZ96eV5C6eJjKEKbsTAjuVXesF4byfl/?=
+ =?us-ascii?Q?zdfC3n3eQHgjDfDFzNU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6328.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e468b68b-4e73-4576-669c-08dda42dabbb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2025 12:37:01.7671
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ocV+r3HYfJTTKMsNDnUjhmlLDECsmIAOGAkcMzJaaIeXZKFjIh4+5wP7aN24eRWn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6496
 
-From: Philipp Reisner <philipp.reisner@linbit.com>
+Hi Ming,
 
-If the network stack keeps a reference for too long, DRBD keeps
-references on a higher number of pages as a consequence.
+Thank you for that.
+Can you please clarify this
++/* Wait until each hw queue has at least one idle IO */
+what do you exactly wait here? and why it is per io queue?
+As I understand if the wait timedout the operation will be canceled.
 
-Fix all that by no longer relying on page reference counts dropping to
-an expected value. Instead, DRBD gives up its reference and lets the
-system handle everything else. While at it, remove the open-coded
-custom page pool mechanism and use the page_pool included in the
-kernel.
+Thank you
 
-Signed-off-by: Philipp Reisner <philipp.reisner@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+________________________________________
+From: Ming Lei <ming.lei@redhat.com>
+Sent: Thursday, May 22, 2025 7:35 PM
+To: Jens Axboe; linux-block@vger.kernel.org
+Cc: Uday Shankar; Caleb Sander Mateos; Yoav Cohen; Ming Lei
+Subject: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+
+External email: Use caution opening links or attachments
+
+
+Add feature UBLK_F_QUIESCE, which adds control command `UBLK_U_CMD_QUIESCE_=
+DEV`
+for quiescing device, then device state can become `UBLK_S_DEV_QUIESCED`
+or `UBLK_S_DEV_FAIL_IO` finally from ublk_ch_release() with ublk server
+cooperation.
+
+This feature can help to support to upgrade ublk server application by
+shutting down ublk server gracefully, meantime keep ublk block device
+persistent during the upgrading period.
+
+The feature is only available for UBLK_F_USER_RECOVERY.
+
+Suggested-by: Yoav Cohen <yoav@nvidia.com>
+Link: https://lore.kernel.org/linux-block/DM4PR12MB632807AB7CDCE77D1E5AB7D0=
+A9B92@DM4PR12MB6328.namprd12.prod.outlook.com/
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/drbd/drbd_int.h      |  39 +----
- drivers/block/drbd/drbd_main.c     |  59 ++-----
- drivers/block/drbd/drbd_receiver.c | 264 ++++-------------------------
- drivers/block/drbd/drbd_worker.c   |  56 ++----
- 4 files changed, 71 insertions(+), 347 deletions(-)
+ drivers/block/ublk_drv.c      | 124 +++++++++++++++++++++++++++++++++-
+ include/uapi/linux/ublk_cmd.h |  19 ++++++
+ 2 files changed, 142 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index e21492981f7d..f6d6276974ee 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -380,6 +380,9 @@ enum {
- 	/* this is/was a write request */
- 	__EE_WRITE,
- 
-+	/* hand back using mempool_free(e, drbd_buffer_page_pool) */
-+	__EE_RELEASE_TO_MEMPOOL,
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index fbd075807525..6f51072776f1 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -51,6 +51,7 @@
+ /* private ioctl command mirror */
+ #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+ #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
++#define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+
+ #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTER_=
+IO_BUF)
+ #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF=
+)
+@@ -67,7 +68,8 @@
+                | UBLK_F_ZONED \
+                | UBLK_F_USER_RECOVERY_FAIL_IO \
+                | UBLK_F_UPDATE_SIZE \
+-               | UBLK_F_AUTO_BUF_REG)
++               | UBLK_F_AUTO_BUF_REG \
++               | UBLK_F_QUIESCE)
+
+ #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+                | UBLK_F_USER_RECOVERY_REISSUE \
+@@ -2841,6 +2843,11 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ct=
+rl_cmd *header)
+                return -EINVAL;
+        }
+
++       if ((info.flags & UBLK_F_QUIESCE) && !(info.flags & UBLK_F_USER_REC=
+OVERY)) {
++               pr_warn("UBLK_F_QUIESCE requires UBLK_F_USER_RECOVERY\n");
++               return -EINVAL;
++       }
 +
- 	/* this is/was a write same request */
- 	__EE_WRITE_SAME,
- 
-@@ -402,6 +405,7 @@ enum {
- #define EE_IN_INTERVAL_TREE	(1<<__EE_IN_INTERVAL_TREE)
- #define EE_SUBMITTED		(1<<__EE_SUBMITTED)
- #define EE_WRITE		(1<<__EE_WRITE)
-+#define EE_RELEASE_TO_MEMPOOL	(1<<__EE_RELEASE_TO_MEMPOOL)
- #define EE_WRITE_SAME		(1<<__EE_WRITE_SAME)
- #define EE_APPLICATION		(1<<__EE_APPLICATION)
- #define EE_RS_THIN_REQ		(1<<__EE_RS_THIN_REQ)
-@@ -858,7 +862,6 @@ struct drbd_device {
- 	struct list_head sync_ee;   /* IO in progress (P_RS_DATA_REPLY gets written to disk) */
- 	struct list_head done_ee;   /* need to send P_WRITE_ACK */
- 	struct list_head read_ee;   /* [RS]P_DATA_REQUEST being read */
--	struct list_head net_ee;    /* zero-copy network send in progress */
- 
- 	struct list_head resync_reads;
- 	atomic_t pp_in_use;		/* allocated from page pool */
-@@ -1329,24 +1332,6 @@ extern struct kmem_cache *drbd_al_ext_cache;	/* activity log extents */
- extern mempool_t drbd_request_mempool;
- extern mempool_t drbd_ee_mempool;
- 
--/* drbd's page pool, used to buffer data received from the peer,
-- * or data requested by the peer.
-- *
-- * This does not have an emergency reserve.
-- *
-- * When allocating from this pool, it first takes pages from the pool.
-- * Only if the pool is depleted will try to allocate from the system.
-- *
-- * The assumption is that pages taken from this pool will be processed,
-- * and given back, "quickly", and then can be recycled, so we can avoid
-- * frequent calls to alloc_page(), and still will be able to make progress even
-- * under memory pressure.
-- */
--extern struct page *drbd_pp_pool;
--extern spinlock_t   drbd_pp_lock;
--extern int	    drbd_pp_vacant;
--extern wait_queue_head_t drbd_pp_wait;
--
- /* We also need a standard (emergency-reserve backed) page pool
-  * for meta data IO (activity log, bitmap).
-  * We can keep it global, as long as it is used as "N pages at a time".
-@@ -1354,6 +1339,7 @@ extern wait_queue_head_t drbd_pp_wait;
-  */
- #define DRBD_MIN_POOL_PAGES	128
- extern mempool_t drbd_md_io_page_pool;
-+extern mempool_t drbd_buffer_page_pool;
- 
- /* We also need to make sure we get a bio
-  * when we need it for housekeeping purposes */
-@@ -1488,10 +1474,7 @@ extern struct drbd_peer_request *drbd_alloc_peer_req(struct drbd_peer_device *,
- 						     sector_t, unsigned int,
- 						     unsigned int,
- 						     gfp_t) __must_hold(local);
--extern void __drbd_free_peer_req(struct drbd_device *, struct drbd_peer_request *,
--				 int);
--#define drbd_free_peer_req(m,e) __drbd_free_peer_req(m, e, 0)
--#define drbd_free_net_peer_req(m,e) __drbd_free_peer_req(m, e, 1)
-+extern void drbd_free_peer_req(struct drbd_device *device, struct drbd_peer_request *req);
- extern struct page *drbd_alloc_pages(struct drbd_peer_device *, unsigned int, bool);
- extern void _drbd_clear_done_ee(struct drbd_device *device, struct list_head *to_be_freed);
- extern int drbd_connected(struct drbd_peer_device *);
-@@ -1610,16 +1593,6 @@ static inline struct page *page_chain_next(struct page *page)
- 	for (; page && ({ n = page_chain_next(page); 1; }); page = n)
- 
- 
--static inline int drbd_peer_req_has_active_page(struct drbd_peer_request *peer_req)
--{
--	struct page *page = peer_req->pages;
--	page_chain_for_each(page) {
--		if (page_count(page) > 1)
--			return 1;
--	}
--	return 0;
--}
--
- static inline union drbd_state drbd_read_state(struct drbd_device *device)
- {
- 	struct drbd_resource *resource = device->resource;
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index ced2cc5f46f2..96ab63896e90 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -114,20 +114,10 @@ struct kmem_cache *drbd_al_ext_cache;	/* activity log extents */
- mempool_t drbd_request_mempool;
- mempool_t drbd_ee_mempool;
- mempool_t drbd_md_io_page_pool;
-+mempool_t drbd_buffer_page_pool;
- struct bio_set drbd_md_io_bio_set;
- struct bio_set drbd_io_bio_set;
- 
--/* I do not use a standard mempool, because:
--   1) I want to hand out the pre-allocated objects first.
--   2) I want to be able to interrupt sleeping allocation with a signal.
--   Note: This is a single linked list, the next pointer is the private
--	 member of struct page.
-- */
--struct page *drbd_pp_pool;
--DEFINE_SPINLOCK(drbd_pp_lock);
--int          drbd_pp_vacant;
--wait_queue_head_t drbd_pp_wait;
--
- DEFINE_RATELIMIT_STATE(drbd_ratelimit_state, 5 * HZ, 5);
- 
- static const struct block_device_operations drbd_ops = {
-@@ -1611,6 +1601,7 @@ static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *b
- static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
- 			    struct drbd_peer_request *peer_req)
- {
-+	bool use_sendpage = !(peer_req->flags & EE_RELEASE_TO_MEMPOOL);
- 	struct page *page = peer_req->pages;
- 	unsigned len = peer_req->i.size;
- 	int err;
-@@ -1619,8 +1610,13 @@ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
- 	page_chain_for_each(page) {
- 		unsigned l = min_t(unsigned, len, PAGE_SIZE);
- 
--		err = _drbd_send_page(peer_device, page, 0, l,
--				      page_chain_next(page) ? MSG_MORE : 0);
-+		if (likely(use_sendpage))
-+			err = _drbd_send_page(peer_device, page, 0, l,
-+					      page_chain_next(page) ? MSG_MORE : 0);
-+		else
-+			err = _drbd_no_send_page(peer_device, page, 0, l,
-+						 page_chain_next(page) ? MSG_MORE : 0);
+        /*
+         * unprivileged device can't be trusted, but RECOVERY and
+         * RECOVERY_REISSUE still may hang error handling, so can't
+@@ -3233,6 +3240,117 @@ static void ublk_ctrl_set_size(struct ublk_device *=
+ub, const struct ublksrv_ctrl
+        set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
+        mutex_unlock(&ub->mutex);
+ }
 +
- 		if (err)
- 			return err;
- 		len -= l;
-@@ -1962,7 +1958,6 @@ void drbd_init_set_defaults(struct drbd_device *device)
- 	INIT_LIST_HEAD(&device->sync_ee);
- 	INIT_LIST_HEAD(&device->done_ee);
- 	INIT_LIST_HEAD(&device->read_ee);
--	INIT_LIST_HEAD(&device->net_ee);
- 	INIT_LIST_HEAD(&device->resync_reads);
- 	INIT_LIST_HEAD(&device->resync_work.list);
- 	INIT_LIST_HEAD(&device->unplug_work.list);
-@@ -2043,7 +2038,6 @@ void drbd_device_cleanup(struct drbd_device *device)
- 	D_ASSERT(device, list_empty(&device->sync_ee));
- 	D_ASSERT(device, list_empty(&device->done_ee));
- 	D_ASSERT(device, list_empty(&device->read_ee));
--	D_ASSERT(device, list_empty(&device->net_ee));
- 	D_ASSERT(device, list_empty(&device->resync_reads));
- 	D_ASSERT(device, list_empty(&first_peer_device(device)->connection->sender_work.q));
- 	D_ASSERT(device, list_empty(&device->resync_work.list));
-@@ -2055,19 +2049,11 @@ void drbd_device_cleanup(struct drbd_device *device)
- 
- static void drbd_destroy_mempools(void)
- {
--	struct page *page;
--
--	while (drbd_pp_pool) {
--		page = drbd_pp_pool;
--		drbd_pp_pool = (struct page *)page_private(page);
--		__free_page(page);
--		drbd_pp_vacant--;
--	}
--
- 	/* D_ASSERT(device, atomic_read(&drbd_pp_vacant)==0); */
- 
- 	bioset_exit(&drbd_io_bio_set);
- 	bioset_exit(&drbd_md_io_bio_set);
-+	mempool_exit(&drbd_buffer_page_pool);
- 	mempool_exit(&drbd_md_io_page_pool);
- 	mempool_exit(&drbd_ee_mempool);
- 	mempool_exit(&drbd_request_mempool);
-@@ -2086,9 +2072,8 @@ static void drbd_destroy_mempools(void)
- 
- static int drbd_create_mempools(void)
- {
--	struct page *page;
- 	const int number = (DRBD_MAX_BIO_SIZE/PAGE_SIZE) * drbd_minor_count;
--	int i, ret;
-+	int ret;
- 
- 	/* caches */
- 	drbd_request_cache = kmem_cache_create(
-@@ -2125,6 +2110,10 @@ static int drbd_create_mempools(void)
- 	if (ret)
- 		goto Enomem;
- 
-+	ret = mempool_init_page_pool(&drbd_buffer_page_pool, number, 0);
-+	if (ret)
-+		goto Enomem;
++struct count_busy {
++       const struct ublk_queue *ubq;
++       unsigned int nr_busy;
++};
 +
- 	ret = mempool_init_slab_pool(&drbd_request_mempool, number,
- 				     drbd_request_cache);
- 	if (ret)
-@@ -2134,15 +2123,6 @@ static int drbd_create_mempools(void)
- 	if (ret)
- 		goto Enomem;
- 
--	for (i = 0; i < number; i++) {
--		page = alloc_page(GFP_HIGHUSER);
--		if (!page)
--			goto Enomem;
--		set_page_private(page, (unsigned long)drbd_pp_pool);
--		drbd_pp_pool = page;
--	}
--	drbd_pp_vacant = number;
--
- 	return 0;
- 
- Enomem:
-@@ -2169,10 +2149,6 @@ static void drbd_release_all_peer_reqs(struct drbd_device *device)
- 	rr = drbd_free_peer_reqs(device, &device->done_ee);
- 	if (rr)
- 		drbd_err(device, "%d EEs in done list found!\n", rr);
--
--	rr = drbd_free_peer_reqs(device, &device->net_ee);
--	if (rr)
--		drbd_err(device, "%d EEs in net list found!\n", rr);
- }
- 
- /* caution. no locking. */
-@@ -2863,11 +2839,6 @@ static int __init drbd_init(void)
- 		return err;
- 	}
- 
--	/*
--	 * allocate all necessary structs
--	 */
--	init_waitqueue_head(&drbd_pp_wait);
--
- 	drbd_proc = NULL; /* play safe for drbd_cleanup */
- 	idr_init(&drbd_devices);
- 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index e5a2e5f7887b..fe3d0521de0b 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -33,6 +33,7 @@
- #include <linux/string.h>
- #include <linux/scatterlist.h>
- #include <linux/part_stat.h>
-+#include <linux/mempool.h>
- #include "drbd_int.h"
- #include "drbd_protocol.h"
- #include "drbd_req.h"
-@@ -63,182 +64,31 @@ static int e_end_block(struct drbd_work *, int);
- 
- #define GFP_TRY	(__GFP_HIGHMEM | __GFP_NOWARN)
- 
--/*
-- * some helper functions to deal with single linked page lists,
-- * page->private being our "next" pointer.
-- */
--
--/* If at least n pages are linked at head, get n pages off.
-- * Otherwise, don't modify head, and return NULL.
-- * Locking is the responsibility of the caller.
-- */
--static struct page *page_chain_del(struct page **head, int n)
--{
--	struct page *page;
--	struct page *tmp;
--
--	BUG_ON(!n);
--	BUG_ON(!head);
--
--	page = *head;
--
--	if (!page)
--		return NULL;
--
--	while (page) {
--		tmp = page_chain_next(page);
--		if (--n == 0)
--			break; /* found sufficient pages */
--		if (tmp == NULL)
--			/* insufficient pages, don't use any of them. */
--			return NULL;
--		page = tmp;
--	}
--
--	/* add end of list marker for the returned list */
--	set_page_private(page, 0);
--	/* actual return value, and adjustment of head */
--	page = *head;
--	*head = tmp;
--	return page;
--}
--
--/* may be used outside of locks to find the tail of a (usually short)
-- * "private" page chain, before adding it back to a global chain head
-- * with page_chain_add() under a spinlock. */
--static struct page *page_chain_tail(struct page *page, int *len)
--{
--	struct page *tmp;
--	int i = 1;
--	while ((tmp = page_chain_next(page))) {
--		++i;
--		page = tmp;
--	}
--	if (len)
--		*len = i;
--	return page;
--}
--
--static int page_chain_free(struct page *page)
--{
--	struct page *tmp;
--	int i = 0;
--	page_chain_for_each_safe(page, tmp) {
--		put_page(page);
--		++i;
--	}
--	return i;
--}
--
--static void page_chain_add(struct page **head,
--		struct page *chain_first, struct page *chain_last)
--{
--#if 1
--	struct page *tmp;
--	tmp = page_chain_tail(chain_first, NULL);
--	BUG_ON(tmp != chain_last);
--#endif
--
--	/* add chain to head */
--	set_page_private(chain_last, (unsigned long)*head);
--	*head = chain_first;
--}
--
--static struct page *__drbd_alloc_pages(struct drbd_device *device,
--				       unsigned int number)
-+static struct page *__drbd_alloc_pages(unsigned int number)
- {
- 	struct page *page = NULL;
- 	struct page *tmp = NULL;
- 	unsigned int i = 0;
- 
--	/* Yes, testing drbd_pp_vacant outside the lock is racy.
--	 * So what. It saves a spin_lock. */
--	if (drbd_pp_vacant >= number) {
--		spin_lock(&drbd_pp_lock);
--		page = page_chain_del(&drbd_pp_pool, number);
--		if (page)
--			drbd_pp_vacant -= number;
--		spin_unlock(&drbd_pp_lock);
--		if (page)
--			return page;
--	}
--
- 	/* GFP_TRY, because we must not cause arbitrary write-out: in a DRBD
- 	 * "criss-cross" setup, that might cause write-out on some other DRBD,
- 	 * which in turn might block on the other node at this very place.  */
- 	for (i = 0; i < number; i++) {
--		tmp = alloc_page(GFP_TRY);
-+		tmp = mempool_alloc(&drbd_buffer_page_pool, GFP_TRY);
- 		if (!tmp)
--			break;
-+			goto fail;
- 		set_page_private(tmp, (unsigned long)page);
- 		page = tmp;
- 	}
--
--	if (i == number)
--		return page;
--
--	/* Not enough pages immediately available this time.
--	 * No need to jump around here, drbd_alloc_pages will retry this
--	 * function "soon". */
--	if (page) {
--		tmp = page_chain_tail(page, NULL);
--		spin_lock(&drbd_pp_lock);
--		page_chain_add(&drbd_pp_pool, page, tmp);
--		drbd_pp_vacant += i;
--		spin_unlock(&drbd_pp_lock);
-+	return page;
-+fail:
-+	page_chain_for_each_safe(page, tmp) {
-+		set_page_private(page, 0);
-+		mempool_free(page, &drbd_buffer_page_pool);
- 	}
- 	return NULL;
- }
- 
--static void reclaim_finished_net_peer_reqs(struct drbd_device *device,
--					   struct list_head *to_be_freed)
--{
--	struct drbd_peer_request *peer_req, *tmp;
--
--	/* The EEs are always appended to the end of the list. Since
--	   they are sent in order over the wire, they have to finish
--	   in order. As soon as we see the first not finished we can
--	   stop to examine the list... */
--
--	list_for_each_entry_safe(peer_req, tmp, &device->net_ee, w.list) {
--		if (drbd_peer_req_has_active_page(peer_req))
--			break;
--		list_move(&peer_req->w.list, to_be_freed);
--	}
--}
--
--static void drbd_reclaim_net_peer_reqs(struct drbd_device *device)
--{
--	LIST_HEAD(reclaimed);
--	struct drbd_peer_request *peer_req, *t;
--
--	spin_lock_irq(&device->resource->req_lock);
--	reclaim_finished_net_peer_reqs(device, &reclaimed);
--	spin_unlock_irq(&device->resource->req_lock);
--	list_for_each_entry_safe(peer_req, t, &reclaimed, w.list)
--		drbd_free_net_peer_req(device, peer_req);
--}
--
--static void conn_reclaim_net_peer_reqs(struct drbd_connection *connection)
--{
--	struct drbd_peer_device *peer_device;
--	int vnr;
--
--	rcu_read_lock();
--	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
--		struct drbd_device *device = peer_device->device;
--		if (!atomic_read(&device->pp_in_use_by_net))
--			continue;
--
--		kref_get(&device->kref);
--		rcu_read_unlock();
--		drbd_reclaim_net_peer_reqs(device);
--		kref_put(&device->kref, drbd_destroy_device);
--		rcu_read_lock();
--	}
--	rcu_read_unlock();
--}
--
- /**
-  * drbd_alloc_pages() - Returns @number pages, retries forever (or until signalled)
-  * @peer_device:	DRBD device.
-@@ -263,9 +113,8 @@ struct page *drbd_alloc_pages(struct drbd_peer_device *peer_device, unsigned int
- 			      bool retry)
- {
- 	struct drbd_device *device = peer_device->device;
--	struct page *page = NULL;
-+	struct page *page;
- 	struct net_conf *nc;
--	DEFINE_WAIT(wait);
- 	unsigned int mxb;
- 
- 	rcu_read_lock();
-@@ -273,37 +122,9 @@ struct page *drbd_alloc_pages(struct drbd_peer_device *peer_device, unsigned int
- 	mxb = nc ? nc->max_buffers : 1000000;
- 	rcu_read_unlock();
- 
--	if (atomic_read(&device->pp_in_use) < mxb)
--		page = __drbd_alloc_pages(device, number);
--
--	/* Try to keep the fast path fast, but occasionally we need
--	 * to reclaim the pages we lended to the network stack. */
--	if (page && atomic_read(&device->pp_in_use_by_net) > 512)
--		drbd_reclaim_net_peer_reqs(device);
--
--	while (page == NULL) {
--		prepare_to_wait(&drbd_pp_wait, &wait, TASK_INTERRUPTIBLE);
--
--		drbd_reclaim_net_peer_reqs(device);
--
--		if (atomic_read(&device->pp_in_use) < mxb) {
--			page = __drbd_alloc_pages(device, number);
--			if (page)
--				break;
--		}
--
--		if (!retry)
--			break;
--
--		if (signal_pending(current)) {
--			drbd_warn(device, "drbd_alloc_pages interrupted!\n");
--			break;
--		}
--
--		if (schedule_timeout(HZ/10) == 0)
--			mxb = UINT_MAX;
--	}
--	finish_wait(&drbd_pp_wait, &wait);
-+	if (atomic_read(&device->pp_in_use) >= mxb)
-+		schedule_timeout_interruptible(HZ / 10);
-+	page = __drbd_alloc_pages(number);
- 
- 	if (page)
- 		atomic_add(number, &device->pp_in_use);
-@@ -314,29 +135,25 @@ struct page *drbd_alloc_pages(struct drbd_peer_device *peer_device, unsigned int
-  * Is also used from inside an other spin_lock_irq(&resource->req_lock);
-  * Either links the page chain back to the global pool,
-  * or returns all pages to the system. */
--static void drbd_free_pages(struct drbd_device *device, struct page *page, int is_net)
-+static void drbd_free_pages(struct drbd_device *device, struct page *page)
- {
--	atomic_t *a = is_net ? &device->pp_in_use_by_net : &device->pp_in_use;
--	int i;
-+	struct page *tmp;
-+	int i = 0;
- 
- 	if (page == NULL)
- 		return;
- 
--	if (drbd_pp_vacant > (DRBD_MAX_BIO_SIZE/PAGE_SIZE) * drbd_minor_count)
--		i = page_chain_free(page);
--	else {
--		struct page *tmp;
--		tmp = page_chain_tail(page, &i);
--		spin_lock(&drbd_pp_lock);
--		page_chain_add(&drbd_pp_pool, page, tmp);
--		drbd_pp_vacant += i;
--		spin_unlock(&drbd_pp_lock);
--	}
--	i = atomic_sub_return(i, a);
-+	page_chain_for_each_safe(page, tmp) {
-+		set_page_private(page, 0);
-+		if (page_count(page) == 1)
-+			mempool_free(page, &drbd_buffer_page_pool);
-+		else
-+			put_page(page);
-+		i++;
-+	}
-+	i = atomic_sub_return(i, &device->pp_in_use);
- 	if (i < 0)
--		drbd_warn(device, "ASSERTION FAILED: %s: %d < 0\n",
--			is_net ? "pp_in_use_by_net" : "pp_in_use", i);
--	wake_up(&drbd_pp_wait);
-+		drbd_warn(device, "ASSERTION FAILED: pp_in_use: %d < 0\n", i);
- }
- 
++static bool ublk_count_busy_req(struct request *rq, void *data)
++{
++       struct count_busy *idle =3D data;
++
++       if (!blk_mq_request_started(rq) && rq->mq_hctx->driver_data =3D=3D =
+idle->ubq)
++               idle->nr_busy +=3D 1;
++       return true;
++}
++
++/* uring_cmd is guaranteed to be active if the associated request is idle =
+*/
++static bool ubq_has_idle_io(const struct ublk_queue *ubq)
++{
++       struct count_busy data =3D {
++               .ubq =3D ubq,
++       };
++
++       blk_mq_tagset_busy_iter(&ubq->dev->tag_set, ublk_count_busy_req, &d=
+ata);
++       return data.nr_busy < ubq->q_depth;
++}
++
++/* Wait until each hw queue has at least one idle IO */
++static int ublk_wait_for_idle_io(struct ublk_device *ub,
++                                unsigned int timeout_ms)
++{
++       unsigned int elapsed =3D 0;
++       int ret;
++
++       while (elapsed < timeout_ms && !signal_pending(current)) {
++               unsigned int queues_cancelable =3D 0;
++               int i;
++
++               for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
++                       struct ublk_queue *ubq =3D ublk_get_queue(ub, i);
++
++                       queues_cancelable +=3D !!ubq_has_idle_io(ubq);
++               }
++
++               /*
++                * Each queue needs at least one active command for
++                * notifying ublk server
++                */
++               if (queues_cancelable =3D=3D ub->dev_info.nr_hw_queues)
++                       break;
++
++               msleep(UBLK_REQUEUE_DELAY_MS);
++               elapsed +=3D UBLK_REQUEUE_DELAY_MS;
++       }
++
++       if (signal_pending(current))
++               ret =3D -EINTR;
++       else if (elapsed >=3D timeout_ms)
++               ret =3D -EBUSY;
++       else
++               ret =3D 0;
++
++       return ret;
++}
++
++static int ublk_ctrl_quiesce_dev(struct ublk_device *ub,
++                                const struct ublksrv_ctrl_cmd *header)
++{
++       /* zero means wait forever */
++       u64 timeout_ms =3D header->data[0];
++       struct gendisk *disk;
++       int i, ret =3D -ENODEV;
++
++       if (!(ub->dev_info.flags & UBLK_F_QUIESCE))
++               return -EOPNOTSUPP;
++
++       mutex_lock(&ub->mutex);
++       disk =3D ublk_get_disk(ub);
++       if (!disk)
++               goto unlock;
++       if (ub->dev_info.state =3D=3D UBLK_S_DEV_DEAD)
++               goto put_disk;
++
++       ret =3D 0;
++       /* already in expected state */
++       if (ub->dev_info.state !=3D UBLK_S_DEV_LIVE)
++               goto put_disk;
++
++       /* Mark all queues as canceling */
++       blk_mq_quiesce_queue(disk->queue);
++       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
++               struct ublk_queue *ubq =3D ublk_get_queue(ub, i);
++
++               ubq->canceling =3D true;
++       }
++       blk_mq_unquiesce_queue(disk->queue);
++
++       if (!timeout_ms)
++               timeout_ms =3D UINT_MAX;
++       ret =3D ublk_wait_for_idle_io(ub, timeout_ms);
++
++put_disk:
++       ublk_put_disk(disk);
++unlock:
++       mutex_unlock(&ub->mutex);
++
++       /* Cancel pending uring_cmd */
++       if (!ret)
++               ublk_cancel_dev(ub);
++       return ret;
++}
++
  /*
-@@ -380,6 +197,8 @@ drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id, sector_t secto
- 					gfpflags_allow_blocking(gfp_mask));
- 		if (!page)
- 			goto fail;
-+		if (!mempool_is_saturated(&drbd_buffer_page_pool))
-+			peer_req->flags |= EE_RELEASE_TO_MEMPOOL;
- 	}
- 
- 	memset(peer_req, 0, sizeof(*peer_req));
-@@ -403,13 +222,12 @@ drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id, sector_t secto
- 	return NULL;
- }
- 
--void __drbd_free_peer_req(struct drbd_device *device, struct drbd_peer_request *peer_req,
--		       int is_net)
-+void drbd_free_peer_req(struct drbd_device *device, struct drbd_peer_request *peer_req)
- {
- 	might_sleep();
- 	if (peer_req->flags & EE_HAS_DIGEST)
- 		kfree(peer_req->digest);
--	drbd_free_pages(device, peer_req->pages, is_net);
-+	drbd_free_pages(device, peer_req->pages);
- 	D_ASSERT(device, atomic_read(&peer_req->pending_bios) == 0);
- 	D_ASSERT(device, drbd_interval_empty(&peer_req->i));
- 	if (!expect(device, !(peer_req->flags & EE_CALL_AL_COMPLETE_IO))) {
-@@ -424,14 +242,13 @@ int drbd_free_peer_reqs(struct drbd_device *device, struct list_head *list)
- 	LIST_HEAD(work_list);
- 	struct drbd_peer_request *peer_req, *t;
- 	int count = 0;
--	int is_net = list == &device->net_ee;
- 
- 	spin_lock_irq(&device->resource->req_lock);
- 	list_splice_init(list, &work_list);
- 	spin_unlock_irq(&device->resource->req_lock);
- 
- 	list_for_each_entry_safe(peer_req, t, &work_list, w.list) {
--		__drbd_free_peer_req(device, peer_req, is_net);
-+		drbd_free_peer_req(device, peer_req);
- 		count++;
- 	}
- 	return count;
-@@ -443,18 +260,13 @@ int drbd_free_peer_reqs(struct drbd_device *device, struct list_head *list)
- static int drbd_finish_peer_reqs(struct drbd_device *device)
- {
- 	LIST_HEAD(work_list);
--	LIST_HEAD(reclaimed);
- 	struct drbd_peer_request *peer_req, *t;
- 	int err = 0;
- 
- 	spin_lock_irq(&device->resource->req_lock);
--	reclaim_finished_net_peer_reqs(device, &reclaimed);
- 	list_splice_init(&device->done_ee, &work_list);
- 	spin_unlock_irq(&device->resource->req_lock);
- 
--	list_for_each_entry_safe(peer_req, t, &reclaimed, w.list)
--		drbd_free_net_peer_req(device, peer_req);
--
- 	/* possible callbacks here:
- 	 * e_end_block, and e_end_resync_block, e_send_superseded.
- 	 * all ignore the last argument.
-@@ -1975,7 +1787,7 @@ static int drbd_drain_block(struct drbd_peer_device *peer_device, int data_size)
- 		data_size -= len;
- 	}
- 	kunmap(page);
--	drbd_free_pages(peer_device->device, page, 0);
-+	drbd_free_pages(peer_device->device, page);
- 	return err;
- }
- 
-@@ -5220,16 +5032,6 @@ static int drbd_disconnected(struct drbd_peer_device *peer_device)
- 		put_ldev(device);
- 	}
- 
--	/* tcp_close and release of sendpage pages can be deferred.  I don't
--	 * want to use SO_LINGER, because apparently it can be deferred for
--	 * more than 20 seconds (longest time I checked).
--	 *
--	 * Actually we don't care for exactly when the network stack does its
--	 * put_page(), but release our reference on these pages right here.
--	 */
--	i = drbd_free_peer_reqs(device, &device->net_ee);
--	if (i)
--		drbd_info(device, "net_ee not empty, killed %u entries\n", i);
- 	i = atomic_read(&device->pp_in_use_by_net);
- 	if (i)
- 		drbd_info(device, "pp_in_use_by_net = %d, expected 0\n", i);
-@@ -5976,8 +5778,6 @@ int drbd_ack_receiver(struct drbd_thread *thi)
- 	while (get_t_state(thi) == RUNNING) {
- 		drbd_thread_current_set_cpu(thi);
- 
--		conn_reclaim_net_peer_reqs(connection);
--
- 		if (test_and_clear_bit(SEND_PING, &connection->flags)) {
- 			if (drbd_send_ping(connection)) {
- 				drbd_err(connection, "drbd_send_ping has failed\n");
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 4352a50fbb3f..d74064bb64be 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -1029,22 +1029,6 @@ int drbd_resync_finished(struct drbd_peer_device *peer_device)
- 	return 1;
- }
- 
--/* helper */
--static void move_to_net_ee_or_free(struct drbd_device *device, struct drbd_peer_request *peer_req)
--{
--	if (drbd_peer_req_has_active_page(peer_req)) {
--		/* This might happen if sendpage() has not finished */
--		int i = PFN_UP(peer_req->i.size);
--		atomic_add(i, &device->pp_in_use_by_net);
--		atomic_sub(i, &device->pp_in_use);
--		spin_lock_irq(&device->resource->req_lock);
--		list_add_tail(&peer_req->w.list, &device->net_ee);
--		spin_unlock_irq(&device->resource->req_lock);
--		wake_up(&drbd_pp_wait);
--	} else
--		drbd_free_peer_req(device, peer_req);
--}
--
- /**
-  * w_e_end_data_req() - Worker callback, to send a P_DATA_REPLY packet in response to a P_DATA_REQUEST
-  * @w:		work object.
-@@ -1058,9 +1042,8 @@ int w_e_end_data_req(struct drbd_work *w, int cancel)
- 	int err;
- 
- 	if (unlikely(cancel)) {
--		drbd_free_peer_req(device, peer_req);
--		dec_unacked(device);
--		return 0;
-+		err = 0;
-+		goto out;
- 	}
- 
- 	if (likely((peer_req->flags & EE_WAS_ERROR) == 0)) {
-@@ -1073,12 +1056,12 @@ int w_e_end_data_req(struct drbd_work *w, int cancel)
- 		err = drbd_send_ack(peer_device, P_NEG_DREPLY, peer_req);
- 	}
- 
--	dec_unacked(device);
--
--	move_to_net_ee_or_free(device, peer_req);
--
- 	if (unlikely(err))
- 		drbd_err(device, "drbd_send_block() failed\n");
-+out:
-+	dec_unacked(device);
-+	drbd_free_peer_req(device, peer_req);
-+
- 	return err;
- }
- 
-@@ -1119,9 +1102,8 @@ int w_e_end_rsdata_req(struct drbd_work *w, int cancel)
- 	int err;
- 
- 	if (unlikely(cancel)) {
--		drbd_free_peer_req(device, peer_req);
--		dec_unacked(device);
--		return 0;
-+		err = 0;
-+		goto out;
- 	}
- 
- 	if (get_ldev_if_state(device, D_FAILED)) {
-@@ -1154,13 +1136,12 @@ int w_e_end_rsdata_req(struct drbd_work *w, int cancel)
- 		/* update resync data with failure */
- 		drbd_rs_failed_io(peer_device, peer_req->i.sector, peer_req->i.size);
- 	}
--
--	dec_unacked(device);
--
--	move_to_net_ee_or_free(device, peer_req);
--
- 	if (unlikely(err))
- 		drbd_err(device, "drbd_send_block() failed\n");
-+out:
-+	dec_unacked(device);
-+	drbd_free_peer_req(device, peer_req);
-+
- 	return err;
- }
- 
-@@ -1175,9 +1156,8 @@ int w_e_end_csum_rs_req(struct drbd_work *w, int cancel)
- 	int err, eq = 0;
- 
- 	if (unlikely(cancel)) {
--		drbd_free_peer_req(device, peer_req);
--		dec_unacked(device);
--		return 0;
-+		err = 0;
-+		goto out;
- 	}
- 
- 	if (get_ldev(device)) {
-@@ -1219,12 +1199,12 @@ int w_e_end_csum_rs_req(struct drbd_work *w, int cancel)
- 		if (drbd_ratelimit())
- 			drbd_err(device, "Sending NegDReply. I guess it gets messy.\n");
- 	}
--
--	dec_unacked(device);
--	move_to_net_ee_or_free(device, peer_req);
--
- 	if (unlikely(err))
- 		drbd_err(device, "drbd_send_block/ack() failed\n");
-+out:
-+	dec_unacked(device);
-+	drbd_free_peer_req(device, peer_req);
-+
- 	return err;
- }
- 
+  * All control commands are sent via /dev/ublk-control, so we have to chec=
+k
+  * the destination device's permission
+@@ -3319,6 +3437,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk=
+_device *ub,
+        case UBLK_CMD_START_USER_RECOVERY:
+        case UBLK_CMD_END_USER_RECOVERY:
+        case UBLK_CMD_UPDATE_SIZE:
++       case UBLK_CMD_QUIESCE_DEV:
+                mask =3D MAY_READ | MAY_WRITE;
+                break;
+        default:
+@@ -3414,6 +3533,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *c=
+md,
+                ublk_ctrl_set_size(ub, header);
+                ret =3D 0;
+                break;
++       case UBLK_CMD_QUIESCE_DEV:
++               ret =3D ublk_ctrl_quiesce_dev(ub, header);
++               break;
+        default:
+                ret =3D -EOPNOTSUPP;
+                break;
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 1c40632cb164..56c7e3fc666f 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -53,6 +53,8 @@
+        _IOR('u', 0x14, struct ublksrv_ctrl_cmd)
+ #define UBLK_U_CMD_UPDATE_SIZE         \
+        _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_QUIESCE_DEV         \
++       _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
 
-base-commit: b02f5eedbcabe6e1982fdd7ff3f0ac5d1fddc68f
--- 
-2.49.0
+ /*
+  * 64bits are enough now, and it should be easy to extend in case of
+@@ -253,6 +255,23 @@
+  */
+ #define UBLK_F_AUTO_BUF_REG    (1ULL << 11)
+
++/*
++ * Control command `UBLK_U_CMD_QUIESCE_DEV` is added for quiescing device,
++ * which state can be transitioned to `UBLK_S_DEV_QUIESCED` or
++ * `UBLK_S_DEV_FAIL_IO` finally, and it needs ublk server cooperation for
++ * handling `UBLK_IO_RES_ABORT` correctly.
++ *
++ * Typical use case is for supporting to upgrade ublk server application,
++ * meantime keep ublk block device persistent during the period.
++ *
++ * This feature is only available when UBLK_F_USER_RECOVERY is enabled.
++ *
++ * Note, this command returns -EBUSY in case that all IO commands are bein=
+g
++ * handled by ublk server and not completed in specified time period which
++ * is passed from the control command parameter.
++ */
++#define UBLK_F_QUIESCE         (1ULL << 12)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD        0
+ #define UBLK_S_DEV_LIVE        1
+--
+2.47.0
 
