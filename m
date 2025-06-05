@@ -1,106 +1,197 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68F62E40E
-	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 13:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1731DF749;
+	Thu,  5 Jun 2025 14:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749130943; cv=none; b=MfhssPmoy6xIrsIge4D+TsTsXoKIHoH45NXAAAo1lPnbuxWb+ERhdRZGrC/jKAw6SkwlT/3oeMKYt9KVgfFV8J7Z1zgfM46xaTRcTeV2mTWKqRMhQKeaj3bFYK6RSVmv2BvpmJjemWFHgGsHrn302BiFwR5oPmSRqH33iQcXS4o=
+	t=1749133429; cv=none; b=gkXEJX4OVqfUHosyEMG+oSfiZwtyj282aqV2TgqPGmz1q/Amwly0R0oCmUUAErN1G5EVfBljmLox9pdcUbkQ+ZdeQhUwF3KeWsb98udvUAvzSDWoJTKKw/9ChUrS8ak7g12n94Ae7H6HBHwNr09QqDYWUTfDx/jBMjBsk2EPLl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749130943; c=relaxed/simple;
-	bh=uuU17LqMiV4IAFVN+4Ez+vDlX24XbFN/eQfiXdz1JTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OzK9OipU6u5zAZz/zCtZgNQqXrag4QTGPjALj43VrR24cKCNP/dR79lZitmWU1UIsf0IBL3Lxl5x+fX46K9u/jnYBClajIGJtsVilzOJzvP31TLGwaQGr4gOm/1q9gkAalbHh0GGP4ngc6gv5p3PT0O4FOikZ9febPmB0yModbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=S3MFZdF8; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1749133429; c=relaxed/simple;
+	bh=lYRkZhQBY7rM54PhCzUAs0b0+r6IE+g4xglvZLomP+c=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=A48cVjOjrTkbO/x3DzIaGHl6jkXuPdzrYLvh3PQYdNn/F9QcyVQTZUPyeiLMGqSJNvpkgk5lNYDNM5vbPV7qVR214uUDalXwhXYZx3rkCel3sUx7yb7c+8yBIMUZ8HS4ZNfz3KLXpl8aisrwpLRRa7LOcF4z9OZ8Cj37N1UP430=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h1N7JdR/; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="S3MFZdF8"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86d0c598433so28588139f.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Jun 2025 06:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749130938; x=1749735738; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pI8D5AUkm60Fo75qRERIbbgYVvFQrrXFj50MSrANZI4=;
-        b=S3MFZdF8aimJVHZbPUTiqX1DhlW0dWXR7ghhiHG5NTBSR0rOAtSUheIiWMWbPWLAsH
-         MwgcgSoMvV7eiq1qxfOlBT8azks6rMyBIwJrttyRTAH3spUTa4gi/pjMCry4wM8IViZQ
-         TzEbQoTSNgxH0h2AUsliJrotAiCC6I6V+s7W48tuqSMk76PHe/iRX31BoPBGeVavPxc0
-         MjC9wQKucmlSrifWVBg6M226BeEqv+VuBKxQl36lBrVlX2evz5Tso/qWCH3A8DKXZRQR
-         +o7FLMvGTjVoNxEggLP208OwmBch2+ohb7cDs0AYWVRSJJB+cj+KvWTbKMggBmqSjnO3
-         vOAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749130938; x=1749735738;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pI8D5AUkm60Fo75qRERIbbgYVvFQrrXFj50MSrANZI4=;
-        b=O4tKQ9PsJ0bN6WIO9AkQAZx/sJTFc3U/+EQB3hmE0mTDuUn1GyV3WOVPKfA0yHCepq
-         pL1h/FrutDddF7ZAgu8hWgRq759Zx8C10yr+FE+ca43W37Hlz5lllsROUUv41WFPRYZh
-         zgPsGUnOItGHqNQXOl5T1g08qeKVfnA+TX0iG07eJQYMW6FgH+BprEQ1NdSp12tOq/72
-         qit68Uu1MPGmnnf0SY08h0hHHQAHVfw3hOtRD0/kTVCQlWHs7jlI8/gADGQwLOYupvR1
-         aJLieU/wPfHQ9UgOPygAB46z98JXJhSMZc/AEH82xXAyrN4o5NPtdUn/mMv6qVouZm1R
-         4ECg==
-X-Gm-Message-State: AOJu0YzG4aglkotCPDYzJKydyNcT9NZH8vUEaqNsLoE2gt42Qap6yqsE
-	9ML/BpleEF4BdqVx4bA45nI/5z9AT/7gtd1sihbYJbxBfH0WJlzXo8nhuLSg995zA4s=
-X-Gm-Gg: ASbGncsnZzfixZIUgtT0D+tOmIKHVhqkANhvZePi+xWU9wbPueEeGdWSlm/Xv62A0oL
-	CQN7LQDwptiIqwSVhPPGFin++Hqy7JI3TgjoyTenbYyJsViTN5ol5J909ueJJUNRrXvfKxiiLUL
-	qwkRpDXoeiGQE5FNc1vHy2u1jRje35hlF5adiNuqkRH5qucgITRu8vUicek0gxr8XOLEyfXXkbs
-	o+bo6hPFiZdpbmzFGhQnZ7wkH+8QK5jWb4OloTyBvkRArmrB6eYQhTIbM8Cx6xRoZOm+BbWeHv9
-	WuQXeQyBWvJSeHLurbe1d9zmEEb/TcnILlQGdtR8rVbQGsU=
-X-Google-Smtp-Source: AGHT+IGNhE4Q/55V5nWoOcc9q6/ny7tf0HY4NW3rcwPvzDDBGap67w67idXKdSn7t3obEfaI1RhzlA==
-X-Received: by 2002:a05:6602:7218:b0:873:f22:92fb with SMTP id ca18e2360f4ac-8731c502c2fmr826279339f.1.1749130937774;
-        Thu, 05 Jun 2025 06:42:17 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7efce43sm3296048173.117.2025.06.05.06.42.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 06:42:17 -0700 (PDT)
-Message-ID: <cd702850-63b3-423b-b883-7b3737ef5e83@kernel.dk>
-Date: Thu, 5 Jun 2025 07:42:16 -0600
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h1N7JdR/"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749133423;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l1M2tBKBbeKXLu/4cIvcX9m56b7K69DMomtz0rxWRMM=;
+	b=h1N7JdR/z8i7fN6fyDQyTP4xFykrTDLCgE3sGXG529h7G/cm4MZOabq56va9ibi5nYzmFU
+	jjMvPrqIYrFv8myNEwBu4nV8E/uckVRIxvWIzhDar87EgFwppJduht/HfabO66oepwQUf8
+	d9ELrFuv+z3vwgls8y9HvyBd1dLRrPA=
+From: Dongsheng Yang <dongsheng.yang@linux.dev>
+To: mpatocka@redhat.com,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	axboe@kernel.dk,
+	hch@lst.de,
+	dan.j.williams@intel.com,
+	Jonathan.Cameron@Huawei.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-cxl@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	dm-devel@lists.linux.dev,
+	Dongsheng Yang <dongsheng.yang@linux.dev>
+Subject: [RFC PATCH 01/11] dm-pcache: add pcache_internal.h
+Date: Thu,  5 Jun 2025 14:22:56 +0000
+Message-Id: <20250605142306.1930831-2-dongsheng.yang@linux.dev>
+In-Reply-To: <20250605142306.1930831-1-dongsheng.yang@linux.dev>
+References: <20250605142306.1930831-1-dongsheng.yang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] nvme updates for Linux 6.16
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-References: <aEFkj8jfrDVGuG4_@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aEFkj8jfrDVGuG4_@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/5/25 3:34 AM, Christoph Hellwig wrote:
-> The following changes since commit a2f4c1ae163b815dc81e3cab97c3149fdc6639e3:
-> 
->   selftests: ublk: kublk: improve behavior on init failure (2025-06-03 20:19:44 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.16-2025-06-05
-> 
-> for you to fetch changes up to 44e479d7202070c3bc7f084a4951ee8689769f71:
-> 
->   nvme: spelling fixes (2025-06-04 10:23:28 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme updates for Linux 6.16
-> 
->  - TCP error handling fix (Shin'ichiro Kawasaki)
->  - TCP I/O stall handling fixes (Hannes Reinecke)
->  - fix command limits status code (Keith Busch)
->  - support vectored buffers also for passthrough (Pavel Begunkov)
->  - spelling fixes (Yi Zhang)
+Consolidate common PCACHE helpers into a new header so that subsequent
+patches can include them without repeating boiler-plate.
 
-Pulled, thanks.
+- Logging macros with unified prefix and location info.
+- Common constants (KB/MB helpers, metadata replica count, CRC seed).
+- On-disk metadata header definition and CRC helper.
+- Sequence-number comparison that handles wrap-around.
+- pcache_meta_find_latest() to pick the newest valid metadata copy.
 
+Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
+---
+ drivers/md/dm-pcache/pcache_internal.h | 116 +++++++++++++++++++++++++
+ 1 file changed, 116 insertions(+)
+ create mode 100644 drivers/md/dm-pcache/pcache_internal.h
+
+diff --git a/drivers/md/dm-pcache/pcache_internal.h b/drivers/md/dm-pcache/pcache_internal.h
+new file mode 100644
+index 000000000000..389d1fa667c9
+--- /dev/null
++++ b/drivers/md/dm-pcache/pcache_internal.h
+@@ -0,0 +1,116 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _PCACHE_INTERNAL_H
++#define _PCACHE_INTERNAL_H
++
++#include <linux/delay.h>
++#include <linux/crc32.h>
++
++#define pcache_err(fmt, ...)							\
++	pr_err("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
++#define pcache_info(fmt, ...)							\
++	pr_info("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
++#define pcache_debug(fmt, ...)							\
++	pr_debug("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
++
++#define PCACHE_KB			(1024ULL)
++#define PCACHE_MB			(1024 * PCACHE_KB)
++
++/* Maximum number of metadata indices */
++#define PCACHE_META_INDEX_MAX		2
++
++#define PCACHE_CRC_SEED			0x3B15A
++/*
++ * struct pcache_meta_header - PCACHE metadata header structure
++ * @crc: CRC checksum for validating metadata integrity.
++ * @seq: Sequence number to track metadata updates.
++ * @version: Metadata version.
++ * @res: Reserved space for future use.
++ */
++struct pcache_meta_header {
++	__u32 crc;
++	__u8  seq;
++	__u8  version;
++	__u16 res;
++};
++
++/*
++ * pcache_meta_crc - Calculate CRC for the given metadata header.
++ * @header: Pointer to the metadata header.
++ * @meta_size: Size of the metadata structure.
++ *
++ * Returns the CRC checksum calculated by excluding the CRC field itself.
++ */
++static inline u32 pcache_meta_crc(struct pcache_meta_header *header, u32 meta_size)
++{
++	return crc32(PCACHE_CRC_SEED, (void *)header + 4, meta_size - 4);
++}
++
++/*
++ * pcache_meta_seq_after - Check if a sequence number is more recent, accounting for overflow.
++ * @seq1: First sequence number.
++ * @seq2: Second sequence number.
++ *
++ * Determines if @seq1 is more recent than @seq2 by calculating the signed
++ * difference between them. This approach allows handling sequence number
++ * overflow correctly because the difference wraps naturally, and any value
++ * greater than zero indicates that @seq1 is "after" @seq2. This method
++ * assumes 8-bit unsigned sequence numbers, where the difference wraps
++ * around if seq1 overflows past seq2.
++ *
++ * Returns:
++ *   - true if @seq1 is more recent than @seq2, indicating it comes "after"
++ *   - false otherwise.
++ */
++static inline bool pcache_meta_seq_after(u8 seq1, u8 seq2)
++{
++	return (s8)(seq1 - seq2) > 0;
++}
++
++/*
++ * pcache_meta_find_latest - Find the latest valid metadata.
++ * @header: Pointer to the metadata header.
++ * @meta_size: Size of each metadata block.
++ *
++ * Finds the latest valid metadata by checking sequence numbers. If a
++ * valid entry with the highest sequence number is found, its pointer
++ * is returned. Returns NULL if no valid metadata is found.
++ */
++static inline void __must_check *pcache_meta_find_latest(struct pcache_meta_header *header,
++					u32 meta_size, u32 meta_max_size,
++					void *meta_ret)
++{
++	struct pcache_meta_header *meta, *latest = NULL;
++	u32 i, seq_latest = 0;
++	void *meta_addr;
++
++	meta = meta_ret;
++
++	for (i = 0; i < PCACHE_META_INDEX_MAX; i++) {
++		meta_addr = (void *)header + (i * meta_max_size);
++		if (copy_mc_to_kernel(meta, meta_addr, meta_size)) {
++			pcache_err("hardware memory error when copy meta");
++			return ERR_PTR(-EIO);
++		}
++
++		/* Skip if CRC check fails */
++		if (meta->crc != pcache_meta_crc(meta, meta_size))
++			continue;
++
++		/* Update latest if a more recent sequence is found */
++		if (!latest || pcache_meta_seq_after(meta->seq, seq_latest)) {
++			seq_latest = meta->seq;
++			latest = (void *)header + (i * meta_max_size);
++		}
++	}
++
++	if (latest) {
++		if (copy_mc_to_kernel(meta_ret, latest, meta_size)) {
++			pcache_err("hardware memory error");
++			return ERR_PTR(-EIO);
++		}
++	}
++
++	return latest;
++}
++
++#endif /* _PCACHE_INTERNAL_H */
 -- 
-Jens Axboe
+2.34.1
 
