@@ -1,167 +1,106 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BF522578C
-	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 13:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68F62E40E
+	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 13:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749128587; cv=none; b=GpN4u5r321wzgOQWNdHc86ZV5fNQu+4eopoOBKgBaJyu9WP61AbXXjEIfs1A06ZrBXxq5EhsP6pOU9B39qC7S9W2kUpT5KTTLPwH+7p5n7edamA1STTLiU4kAk6MQlUK1GtIV5/j4ll2UWeMf1Mx5W+jyAUOEg+2XiJupjSFPg8=
+	t=1749130943; cv=none; b=MfhssPmoy6xIrsIge4D+TsTsXoKIHoH45NXAAAo1lPnbuxWb+ERhdRZGrC/jKAw6SkwlT/3oeMKYt9KVgfFV8J7Z1zgfM46xaTRcTeV2mTWKqRMhQKeaj3bFYK6RSVmv2BvpmJjemWFHgGsHrn302BiFwR5oPmSRqH33iQcXS4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749128587; c=relaxed/simple;
-	bh=8XhWz1uDUGpc2KEGsQPqoMFu9IbGsBJhR4oTTUhj1g8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KQ7MdPuyc5JvjEvX900qkYJDEIT2aXHpnmgSJbJt56xp+D7cLUXaBXsQ2kYarc7X94wUHtWW1RIYuTCnpLfn4sZc+Qzb1kX1x0Df5YB2eqBtDO0/q92zTw9jhusipOjwZJ7w2bxhTr9Y8/L8ZcfFEckHUvH6qJM+FJVuhWwTJAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IOCIQeVt; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=woLlgr8h; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IOCIQeVt; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=woLlgr8h; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1749130943; c=relaxed/simple;
+	bh=uuU17LqMiV4IAFVN+4Ez+vDlX24XbFN/eQfiXdz1JTM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OzK9OipU6u5zAZz/zCtZgNQqXrag4QTGPjALj43VrR24cKCNP/dR79lZitmWU1UIsf0IBL3Lxl5x+fX46K9u/jnYBClajIGJtsVilzOJzvP31TLGwaQGr4gOm/1q9gkAalbHh0GGP4ngc6gv5p3PT0O4FOikZ9febPmB0yModbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=S3MFZdF8; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IOCIQeVt";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="woLlgr8h";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IOCIQeVt";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="woLlgr8h"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A51E3345B2;
-	Thu,  5 Jun 2025 13:03:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1749128583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FiQfaBUdLpG0izU+n3dwo6IxIx6W2D/15BOpRHmYH38=;
-	b=IOCIQeVtn3JIpKgPBF/6Dud02iAzz3JWYtG2SdpHp+1qCcZ1m4nN0CbFVlF3wNu7NBFYni
-	kEi3N/zmRcADp+nfkm1yMY4WcWZ/nNxKAecjLf0zM8AEd9yWHJy6o1lk16RfkXLLAvA8Cf
-	Zne19P9ERQrlULg0r6jADX6SJDFzGvM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1749128583;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FiQfaBUdLpG0izU+n3dwo6IxIx6W2D/15BOpRHmYH38=;
-	b=woLlgr8ha1Iq6fu8KGJx6OA9UlIWNjM+gZNxEbET5dWYc3AqgyH5tsXsAiiUuZbC7TYyDg
-	ed6hC/HX5zK53fDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=IOCIQeVt;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=woLlgr8h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1749128583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FiQfaBUdLpG0izU+n3dwo6IxIx6W2D/15BOpRHmYH38=;
-	b=IOCIQeVtn3JIpKgPBF/6Dud02iAzz3JWYtG2SdpHp+1qCcZ1m4nN0CbFVlF3wNu7NBFYni
-	kEi3N/zmRcADp+nfkm1yMY4WcWZ/nNxKAecjLf0zM8AEd9yWHJy6o1lk16RfkXLLAvA8Cf
-	Zne19P9ERQrlULg0r6jADX6SJDFzGvM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1749128583;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FiQfaBUdLpG0izU+n3dwo6IxIx6W2D/15BOpRHmYH38=;
-	b=woLlgr8ha1Iq6fu8KGJx6OA9UlIWNjM+gZNxEbET5dWYc3AqgyH5tsXsAiiUuZbC7TYyDg
-	ed6hC/HX5zK53fDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 87D2C137FE;
-	Thu,  5 Jun 2025 13:03:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id YuG/HoeVQWhxKQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 05 Jun 2025 13:03:03 +0000
-Date: Thu, 5 Jun 2025 15:02:54 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.15 kernel
-Message-ID: <7cdceac2-ef72-4917-83a2-703f8f93bd64@flourine.local>
-References: <2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="S3MFZdF8"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86d0c598433so28588139f.3
+        for <linux-block@vger.kernel.org>; Thu, 05 Jun 2025 06:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749130938; x=1749735738; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pI8D5AUkm60Fo75qRERIbbgYVvFQrrXFj50MSrANZI4=;
+        b=S3MFZdF8aimJVHZbPUTiqX1DhlW0dWXR7ghhiHG5NTBSR0rOAtSUheIiWMWbPWLAsH
+         MwgcgSoMvV7eiq1qxfOlBT8azks6rMyBIwJrttyRTAH3spUTa4gi/pjMCry4wM8IViZQ
+         TzEbQoTSNgxH0h2AUsliJrotAiCC6I6V+s7W48tuqSMk76PHe/iRX31BoPBGeVavPxc0
+         MjC9wQKucmlSrifWVBg6M226BeEqv+VuBKxQl36lBrVlX2evz5Tso/qWCH3A8DKXZRQR
+         +o7FLMvGTjVoNxEggLP208OwmBch2+ohb7cDs0AYWVRSJJB+cj+KvWTbKMggBmqSjnO3
+         vOAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749130938; x=1749735738;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pI8D5AUkm60Fo75qRERIbbgYVvFQrrXFj50MSrANZI4=;
+        b=O4tKQ9PsJ0bN6WIO9AkQAZx/sJTFc3U/+EQB3hmE0mTDuUn1GyV3WOVPKfA0yHCepq
+         pL1h/FrutDddF7ZAgu8hWgRq759Zx8C10yr+FE+ca43W37Hlz5lllsROUUv41WFPRYZh
+         zgPsGUnOItGHqNQXOl5T1g08qeKVfnA+TX0iG07eJQYMW6FgH+BprEQ1NdSp12tOq/72
+         qit68Uu1MPGmnnf0SY08h0hHHQAHVfw3hOtRD0/kTVCQlWHs7jlI8/gADGQwLOYupvR1
+         aJLieU/wPfHQ9UgOPygAB46z98JXJhSMZc/AEH82xXAyrN4o5NPtdUn/mMv6qVouZm1R
+         4ECg==
+X-Gm-Message-State: AOJu0YzG4aglkotCPDYzJKydyNcT9NZH8vUEaqNsLoE2gt42Qap6yqsE
+	9ML/BpleEF4BdqVx4bA45nI/5z9AT/7gtd1sihbYJbxBfH0WJlzXo8nhuLSg995zA4s=
+X-Gm-Gg: ASbGncsnZzfixZIUgtT0D+tOmIKHVhqkANhvZePi+xWU9wbPueEeGdWSlm/Xv62A0oL
+	CQN7LQDwptiIqwSVhPPGFin++Hqy7JI3TgjoyTenbYyJsViTN5ol5J909ueJJUNRrXvfKxiiLUL
+	qwkRpDXoeiGQE5FNc1vHy2u1jRje35hlF5adiNuqkRH5qucgITRu8vUicek0gxr8XOLEyfXXkbs
+	o+bo6hPFiZdpbmzFGhQnZ7wkH+8QK5jWb4OloTyBvkRArmrB6eYQhTIbM8Cx6xRoZOm+BbWeHv9
+	WuQXeQyBWvJSeHLurbe1d9zmEEb/TcnILlQGdtR8rVbQGsU=
+X-Google-Smtp-Source: AGHT+IGNhE4Q/55V5nWoOcc9q6/ny7tf0HY4NW3rcwPvzDDBGap67w67idXKdSn7t3obEfaI1RhzlA==
+X-Received: by 2002:a05:6602:7218:b0:873:f22:92fb with SMTP id ca18e2360f4ac-8731c502c2fmr826279339f.1.1749130937774;
+        Thu, 05 Jun 2025 06:42:17 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7efce43sm3296048173.117.2025.06.05.06.42.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Jun 2025 06:42:17 -0700 (PDT)
+Message-ID: <cd702850-63b3-423b-b883-7b3737ef5e83@kernel.dk>
+Date: Thu, 5 Jun 2025 07:42:16 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: A51E3345B2
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.51
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] nvme updates for Linux 6.16
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+ Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
+References: <aEFkj8jfrDVGuG4_@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aEFkj8jfrDVGuG4_@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On Thu, May 29, 2025 at 08:46:35AM +0000, Shinichiro Kawasaki wrote:
-> #1: nvme/023
+On 6/5/25 3:34 AM, Christoph Hellwig wrote:
+> The following changes since commit a2f4c1ae163b815dc81e3cab97c3149fdc6639e3:
 > 
->     When libnvme has version 1.13 or later and built with liburing, nvme-cli
->     command "nvme smart-log" command fails for namespace block devices. This
->     makes the test case nvme/032 fail [2]. Fix in libnvme is expected.
+>   selftests: ublk: kublk: improve behavior on init failure (2025-06-03 20:19:44 -0600)
 > 
->     [2]
->     https://lore.kernel.org/linux-nvme/32c3e9ef-ab3c-40b5-989a-7aa323f5d611@flourine.local/T/#m6519ce3e641e7011231d955d9002d1078510e3ee
-
-Should be fixed now. If you want, I can do another release soon, so the
-fix get packaged up by the distros.
-
-> #2: nvme/041 (fc transport)
+> are available in the Git repository at:
 > 
->     The test case nvme/041 fails for fc transport. Refer to the report for v6.12
->     kernel [3].
+>   git://git.infradead.org/nvme.git tags/nvme-6.16-2025-06-05
 > 
->     [3]
->     https://lore.kernel.org/linux-nvme/6crydkodszx5vq4ieox3jjpwkxtu7mhbohypy24awlo5w7f4k6@to3dcng24rd4/
-
-Is still on my TODO list. Sorry.
-
-> #4: nvme/061 failure (fc transport)
+> for you to fetch changes up to 44e479d7202070c3bc7f084a4951ee8689769f71:
 > 
->     The test case nvme/061 sometimes fails due to a WARN [5]. Just before the
->     WARN, The kernel reported "refcount_t: underflow; use-after-free." This
->     failure can be recreated in stable manner by repeating the test case 10
->     times or so.
+>   nvme: spelling fixes (2025-06-04 10:23:28 +0200)
 > 
->     I tried v6.15-rcX kernels. When I ran v6.15-rc1 kernel, the test case always
->     failed with different symptom. With v6.15-rc2 kernel, the test case passed
->     in most runs, but sometimes it failed with the same symptom as v6.15. I
->     guess the nvme-fc changes in v6.15-rc2 fixed most of the refcounting issue,
->     but still rare refcounting failure scenario is left.
+> ----------------------------------------------------------------
+> nvme updates for Linux 6.16
+> 
+>  - TCP error handling fix (Shin'ichiro Kawasaki)
+>  - TCP I/O stall handling fixes (Hannes Reinecke)
+>  - fix command limits status code (Keith Busch)
+>  - support vectored buffers also for passthrough (Pavel Begunkov)
+>  - spelling fixes (Yi Zhang)
 
-The nvmet-fcloop changes for 6.16 should address this (fingers crossed).
+Pulled, thanks.
 
-Thanks,
-Daniel
+-- 
+Jens Axboe
+
