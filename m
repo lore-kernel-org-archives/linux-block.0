@@ -1,264 +1,225 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6142F5E
-	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 02:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7E71AD3E5
+	for <linux-block@vger.kernel.org>; Thu,  5 Jun 2025 05:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749089735; cv=none; b=u/nV+v8IOcepdj4NvXJUniYVvYPHUX++L4pRsu7QNw7wndcrTYAHzJbEhNCZ5a8O8ZWYifNQIy3lzywIb1Hmth0G22q0TwjP+JudJ9+SPevdBu9NDrlqTu5p4KRUvx1GT5VAQVXIMmgRNXVzlsu9NHN4YkaDO0sLtvZ95vlUUD4=
+	t=1749102752; cv=none; b=nZmDKLGxeccwQXZkm9ildNJKzY5trPQQBjr1hITPwrorjQZRVY180yITR5/AMLI5rq9VtKp5rSyeQ/WF8CplWsB0o0m6xuTvriWvh5t6x/JHT+Kmrz/f0rVRskIkCw6gNuSju/iCRCNmEYZTcSv+jYzaVp+myRWH7SOE+RirnBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749089735; c=relaxed/simple;
-	bh=OKqjIkAt1M0nGu1Bc1K1MhkqVY/36iPWBWVeGXyUdZ8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pAplvfzkLVxLZz/4ib2GkY09L29EVmBH4hqEMDcpm18Rf3HsKV272VGrGNwEdRJfked7w59YG6Sx5EfLh7Plfvuh2JQDWQ0ByuY8yrF86/oBmTZ8/jqLC7njND10B1wlRWIVsnbApIw9hEPaSvC238nGrMsUknBuZAFsnnVTwBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddc47db835so12146645ab.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Jun 2025 19:15:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749089732; x=1749694532;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gaJMOVzCvZ54gdZ0QfQJJiCN1xUxY6OMN696yAOJECU=;
-        b=kj4nieItauQODCsajFufEXVxHMbpLObuudE1RPXI5UB03lnCks4PO5N2k8uyA+9euA
-         1cGIF6E9RO5ettsLLBcwTtlZfb17lPYknISTKuHTPyKBSKBSTRRZx9zfpPlvl3Nk1mut
-         Hx7CZFbEdxo8kZ3CV3jLapP6IKUfM5rkGqn8Pt62VbV20Ane3wiPMk7+e/cyqS2eLNe4
-         fGPHMkpeugHVRCdTur8ZVzEWiD9RUgv4yH12ZABe0XUr0kqwd3p3SmBJO9x44XGozWPj
-         WJXlg1jZp2nnA7JVBo+d+fDMpw8BZ/yvz/SRvVtg3bprf1uqRC4oqjSmTAkYXh3lNMKH
-         9vrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWoPxpRsXOI494NfWu9Lhqz0USaSk3XL17wFAWW/XfW5fUdjvtJw0muc1UxSDVMJdNYt7PU96zy3rjrqw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6gpPi3vTwUvKnfJsPfWYc+EJiOTnlLfe3e5okaD6eaak7CQWv
-	kibgj4uztKrF+w6A+GH8O2wsVUVL/qNbbymucHy3r9CuNSw8sFbm3NFGKLLFzWgPP0baocPmwzp
-	mC2+lToPaydTOqaV7o0uYYAV6tDlY8/zwxqGlegxSnRTRVwDbNXtH4TgHbPE=
-X-Google-Smtp-Source: AGHT+IEHYGZDHF1gzdg0Mx9f90PfT0gX9qo+luirUu1IAxY6W8C9sQzLXiw+fQf2fRa3p1hjEtqbailhoPhTMFN8odA6Kdflr65k
+	s=arc-20240116; t=1749102752; c=relaxed/simple;
+	bh=JciSyiceL5IkFwryjWrxwdk3fSpkIVDd6JyuBGuFrn8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FZkRay1Nc6jKTBqCFsFNkBSLs+N71f5XR3rwSQdvx5lz8kD5F14IFj3zXm3IroQ9KZhQbxp6x/sbB8U0jjMti14I2iRo9ISNFSQ5dXjWqeOZz5h6FEvuqyxpgscp4eszu7Iox8kug5XkAWX850oh6on0JNfmXtqKCZRMRz049XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UU42Hiw/; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UU42Hiw/"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554NJgg7031704;
+	Thu, 5 Jun 2025 05:52:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4SiwDu
+	psQSUvVpGu1n2PLjqQ5OfdvnhHDJiiys9Nrs0=; b=UU42Hiw/gcqTEeTUChciFD
+	lZgaXhEANYnnJwG9oFKJhG6q/gWv6DRKa/3Ve52EYHIy8Yd6W6p/g74c6/ci8VtO
+	6moZVmjnxBp5RlhSQbm8nNw8So6R56j952ItJvfT+XyFS48Cbe53HW9oQGZy+mL7
+	52Y115FZ+PS0A1vRiRn0aIgpgRg2aO7+kkQHBQrpYJA81/Q9f18+FtA83cNanQNN
+	C37dbroP5UxF18AnrYDdrkPH56Ry6hHqDz1D7IXb8mRe2fgkTUJgY9rg3Sh356sh
+	YsyMz1UzIzGmUfOUi2b/VHPCM0ar4gNu9+qyDVdP2b93fN5R8ytcRt5aPaG/eLVA
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyxnhw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 05:52:23 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5553gAjN024883;
+	Thu, 5 Jun 2025 05:52:23 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkmk8uc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 05:52:23 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5555qMKl27263242
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Jun 2025 05:52:22 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0EFE85805B;
+	Thu,  5 Jun 2025 05:52:22 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C23DB5804B;
+	Thu,  5 Jun 2025 05:52:19 +0000 (GMT)
+Received: from [9.109.198.212] (unknown [9.109.198.212])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  5 Jun 2025 05:52:19 +0000 (GMT)
+Message-ID: <9f5b0cbb-10cb-44a7-9565-28673bcbdf84@linux.ibm.com>
+Date: Thu, 5 Jun 2025 11:22:17 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c241:0:b0:3dc:7a9a:44d5 with SMTP id
- e9e14a558f8ab-3ddbedc8c8fmr68982925ab.22.1749089732423; Wed, 04 Jun 2025
- 19:15:32 -0700 (PDT)
-Date: Wed, 04 Jun 2025 19:15:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6840fdc4.a00a0220.68b4a.000d.GAE@google.com>
-Subject: [syzbot] [scsi?] [mm?] [block?] BUG: soft lockup in sys_sendmsg (2)
-From: syzbot <syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-scsi@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    b4432656b36e Linux 6.15-rc4
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=13d76f68580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9a25b7a36123454
-dashboard link: https://syzkaller.appspot.com/bug?extid=4032319a6a907f69e985
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c9ea4f1822ea/disk-b4432656.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c5effc66ca81/vmlinux-b4432656.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/49364ea611a8/bzImage-b4432656.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com
-
-watchdog: BUG: soft lockup - CPU#1 stuck for 120s! [syz.0.1:5966]
-Modules linked in:
-irq event stamp: 19582471
-hardirqs last  enabled at (19582470): [<ffffffff8b55e3c4>] irqentry_exit+0x74/0x90 kernel/entry/common.c:357
-hardirqs last disabled at (19582471): [<ffffffff8b55cdbe>] sysvec_apic_timer_interrupt+0xe/0xc0 arch/x86/kernel/apic/apic.c:1049
-softirqs last  enabled at (17326936): [<ffffffff8185c3fa>] __do_softirq kernel/softirq.c:613 [inline]
-softirqs last  enabled at (17326936): [<ffffffff8185c3fa>] invoke_softirq kernel/softirq.c:453 [inline]
-softirqs last  enabled at (17326936): [<ffffffff8185c3fa>] __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
-softirqs last disabled at (17326939): [<ffffffff8185c3fa>] __do_softirq kernel/softirq.c:613 [inline]
-softirqs last disabled at (17326939): [<ffffffff8185c3fa>] invoke_softirq kernel/softirq.c:453 [inline]
-softirqs last disabled at (17326939): [<ffffffff8185c3fa>] __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
-CPU: 1 UID: 0 PID: 5966 Comm: syz.0.1 Not tainted 6.15.0-rc4-syzkaller-gb4432656b36e #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:rcu_read_unlock_special+0x87/0x4c0 kernel/rcu/tree_plugin.h:694
-Code: f1 f1 f1 00 f2 f2 f2 4a 89 04 2b 66 42 c7 44 2b 09 f3 f3 42 c6 44 2b 0b f3 65 44 8b 35 e2 a3 cd 10 41 f7 c6 00 00 f0 00 74 49 <48> c7 44 24 40 0e 36 e0 45 4a c7 04 2b 00 00 00 00 66 42 c7 44 2b
-RSP: 0018:ffffc90000a08680 EFLAGS: 00000206
-RAX: 1a3e8c94b0fc9100 RBX: 1ffff920001410d8 RCX: 1a3e8c94b0fc9100
-RDX: 0000000000000003 RSI: ffffffff8d749f78 RDI: ffffffff8bc1cde0
-RBP: ffffc90000a08778 R08: ffffffff8f7ed377 R09: 1ffffffff1efda6e
-R10: dffffc0000000000 R11: fffffbfff1efda6f R12: ffffffff8df40c00
-R13: dffffc0000000000 R14: 0000000000000246 R15: 0000000000000002
-FS:  00007fc1f490f6c0(0000) GS:ffff8881261cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555566fd55c8 CR3: 000000002fd82000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- __rcu_read_unlock+0x84/0xe0 kernel/rcu/tree_plugin.h:438
- rcu_read_unlock include/linux/rcupdate.h:873 [inline]
- class_rcu_destructor include/linux/rcupdate.h:1155 [inline]
- unwind_next_frame+0x19ae/0x2390 arch/x86/kernel/unwind_orc.c:680
- arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x62/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2398 [inline]
- slab_free mm/slub.c:4656 [inline]
- kmem_cache_free+0x192/0x3f0 mm/slub.c:4758
- bvec_free block/bio.c:167 [inline]
- bio_free+0x1b7/0x2a0 block/bio.c:236
- blk_update_request+0x5ee/0xe80 block/blk-mq.c:983
- scsi_end_request+0x7c/0x830 drivers/scsi/scsi_lib.c:638
- scsi_io_completion+0x131/0x390 drivers/scsi/scsi_lib.c:1079
- blk_complete_reqs block/blk-mq.c:1220 [inline]
- blk_done_softirq+0x107/0x160 block/blk-mq.c:1225
- handle_softirqs+0x283/0x870 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- invoke_softirq kernel/softirq.c:453 [inline]
- __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
- instr_sysvec_irq_work arch/x86/kernel/irq_work.c:17 [inline]
- sysvec_irq_work+0xa3/0xc0 arch/x86/kernel/irq_work.c:17
- </IRQ>
- <TASK>
- asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:738
-RIP: 0010:__schedule+0x0/0x4cd0 kernel/sched/core.c:6646
-Code: cb f6 45 89 f8 89 d9 48 8b 5c 24 08 e9 ee fe ff ff cc cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f 1e fa 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 e4 e0 48
-RSP: 0018:ffffc90004f66e98 EFLAGS: 00000246
-RAX: 1ffff11005ed429c RBX: ffffffff8b56f5de RCX: 0000000000000000
-RDX: 0000000000000007 RSI: ffffffff8d749f78 RDI: 0000000000000001
-RBP: ffffc90004f66f38 R08: ffffffff8f7ed377 R09: 1ffffffff1efda6e
-R10: dffffc0000000000 R11: fffffbfff1efda6f R12: dffffc0000000000
-R13: ffff888032138000 R14: ffff88802f6a14e0 R15: dffffc0000000000
- preempt_schedule_common+0x83/0xd0 kernel/sched/core.c:6947
- preempt_schedule+0xae/0xc0 kernel/sched/core.c:6971
- preempt_schedule_thunk+0x16/0x30 arch/x86/entry/thunk.S:12
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
- _raw_spin_unlock_irqrestore+0xfd/0x110 kernel/locking/spinlock.c:194
- __debug_check_no_obj_freed lib/debugobjects.c:1108 [inline]
- debug_check_no_obj_freed+0x451/0x470 lib/debugobjects.c:1129
- free_pages_prepare mm/page_alloc.c:1269 [inline]
- __free_frozen_pages+0x403/0xcd0 mm/page_alloc.c:2725
- __slab_free+0x326/0x400 mm/slub.c:4567
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4161 [inline]
- slab_alloc_node mm/slub.c:4210 [inline]
- __do_kmalloc_node mm/slub.c:4340 [inline]
- __kmalloc_noprof+0x224/0x4f0 mm/slub.c:4353
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kmalloc_array_noprof include/linux/slab.h:948 [inline]
- genl_family_rcv_msg_attrs_parse+0xa3/0x2a0 net/netlink/genetlink.c:940
- genl_start+0x180/0x6c0 net/netlink/genetlink.c:980
- __netlink_dump_start+0x466/0x7e0 net/netlink/af_netlink.c:2415
- genl_family_rcv_msg_dumpit+0x1e7/0x2c0 net/netlink/genetlink.c:1076
- genl_family_rcv_msg net/netlink/genetlink.c:1192 [inline]
- genl_rcv_msg+0x5da/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc1f3b8e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc1f490f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fc1f3db6160 RCX: 00007fc1f3b8e969
-RDX: 0000000000000000 RSI: 00002000000000c0 RDI: 0000000000000003
-RBP: 00007fc1f3c10ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fc1f3db6160 R15: 00007fff4aca2068
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 31 Comm: khungtaskd Not tainted 6.15.0-rc4-syzkaller-gb4432656b36e #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:rcu_rdp_cpu_online kernel/rcu/tree.c:3953 [inline]
-RIP: 0010:rcu_lockdep_current_cpu_online+0x87/0x120 kernel/rcu/tree.c:3994
-Code: 3c 30 00 74 08 48 89 df e8 96 87 7a 00 48 8b 03 48 8d 98 00 eb 76 92 48 8d b8 20 eb 76 92 48 89 f8 48 c1 e8 03 42 80 3c 30 00 <74> 05 e8 72 87 7a 00 4c 8b 7b 20 48 83 c3 18 48 89 d8 48 c1 e8 03
-RSP: 0018:ffffc90000a87830 EFLAGS: 00000046
-RAX: 1ffff11017107564 RBX: ffff8880b883ab00 RCX: af84634d00986b00
-RDX: ffff88801dae3c00 RSI: ffffffff8bc1cdc0 RDI: ffff8880b883ab20
-RBP: ffffc90000a87958 R08: 0000000000000000 R09: 0000000000080000
-R10: 0000000000000000 R11: ffffffff81cad457 R12: 0000000000000001
-R13: ffffc90000a878e0 R14: dffffc0000000000 R15: ffffffff8df9be88
-FS:  0000000000000000(0000) GS:ffff8881260cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f397e3da1d0 CR3: 000000002fd82000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rcu_read_lock_held_common kernel/rcu/update.c:113 [inline]
- rcu_read_lock_held+0x1e/0x50 kernel/rcu/update.c:349
- trace_call_bpf+0x1ad/0x850 kernel/trace/bpf_trace.c:146
- perf_trace_run_bpf_submit+0x78/0x170 kernel/events/core.c:10788
- do_perf_trace_preemptirq_template include/trace/events/preemptirq.h:14 [inline]
- perf_trace_preemptirq_template+0x280/0x340 include/trace/events/preemptirq.h:14
- __do_trace_irq_disable include/trace/events/preemptirq.h:36 [inline]
- trace_irq_disable+0xee/0x110 include/trace/events/preemptirq.h:36
- irqentry_enter+0x3d/0x60 kernel/entry/common.c:297
- sysvec_apic_timer_interrupt+0xe/0xc0 arch/x86/kernel/apic/apic.c:1049
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:console_trylock_spinning kernel/printk/printk.c:2061 [inline]
-RIP: 0010:vprintk_emit+0x58f/0x7a0 kernel/printk/printk.c:2449
-Code: 85 32 01 00 00 e8 41 f3 1e 00 41 89 df 4d 85 f6 48 8b 1c 24 75 07 e8 30 f3 1e 00 eb 06 e8 29 f3 1e 00 fb 48 c7 c7 80 fa f2 8d <31> f6 ba 01 00 00 00 31 c9 41 b8 01 00 00 00 45 31 c9 53 e8 f9 3f
-RSP: 0018:ffffc90000a87b80 EFLAGS: 00000293
-RAX: ffffffff81a0cba7 RBX: ffffffff81a0ca64 RCX: ffff88801dae3c00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8df2fa80
-RBP: ffffc90000a87c90 R08: ffffffff8f7ed377 R09: 1ffffffff1efda6e
-R10: dffffc0000000000 R11: fffffbfff1efda6f R12: dffffc0000000000
-R13: 1ffff92000150f74 R14: 0000000000000200 R15: 000000000000003d
- _printk+0xcf/0x120 kernel/printk/printk.c:2475
- check_hung_task kernel/hung_task.c:181 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:265 [inline]
- watchdog+0xb4f/0x1030 kernel/hung_task.c:437
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2] block: fix lock dependency between percpu alloc lock
+ and elevator lock
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
+        sth@linux.ibm.com, gjoyce@ibm.com
+References: <20250528123638.1029700-1-nilay@linux.ibm.com>
+ <aD60SF6QGMSPykq-@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aD60SF6QGMSPykq-@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HiZczpvlhHAZPXqUsVHBYsl0VgPKVt3R
+X-Proofpoint-ORIG-GUID: HiZczpvlhHAZPXqUsVHBYsl0VgPKVt3R
+X-Authority-Analysis: v=2.4 cv=X4dSKHTe c=1 sm=1 tr=0 ts=68413098 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=rN6svEpRv8TEEN-SXq8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA1MDA0NyBTYWx0ZWRfXzgYtP5d3zQrH aqE66eZJoXwXCMUgkWokYw9mY+sH3ISqdWCyj00aUhhiig70iOkaghnxfCNivSnl7stvpAB2OCK Poe53bJyJUvOsqC70UYLMRmT/HJpzEloIu8nWSFsSW8DHqBj0xKrgIs+kM+Dbj5ZGyrD/VbxFQe
+ YurVrmGrgf+N/mNXe6sK2ZEolkayz6e+Ob2jzk6t7C5SfF2U21pke+y62Q3CZumyRlShv4xgcAM DFI30nYtLTdbY60orUkTVawfkkxBjRSUNlaZYy23frXxAmiNHXUrQCGtog60crFkZOHdmacDwee Z1dKme/O/B4GoWFKQ/fkN3iCaYf/5bD2TVvcHqnen9TlF93SP0REEB49VMfJ93RaYkHu/e/nzzQ
+ QBEF7LcSBDP8wv7+xh/e3gjn76WV3lhjF5uieQM4Q1i14uTx30RAff1Rqk3+HZ33bgb8O5CU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-05_01,2025-06-03_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 clxscore=1015 phishscore=0 bulkscore=0
+ malwarescore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506050047
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 6/3/25 2:07 PM, Ming Lei wrote:
+> On Wed, May 28, 2025 at 06:03:58PM +0530, Nilay Shroff wrote:
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 0cb1e9873aab..51d406da4abf 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -7232,17 +7232,12 @@ static void bfq_init_root_group(struct bfq_group *root_group,
+>>  	root_group->sched_data.bfq_class_idle_last_service = jiffies;
+>>  }
+>>  
+>> -static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+>> +static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
+>>  {
+>>  	struct bfq_data *bfqd;
+>> -	struct elevator_queue *eq;
+>>  	unsigned int i;
+>>  	struct blk_independent_access_ranges *ia_ranges = q->disk->ia_ranges;
+>>  
+>> -	eq = elevator_alloc(q, e);
+>> -	if (!eq)
+>> -		return -ENOMEM;
+>> -
+> 
+> Please make the above elevator interface change be one standalone patch if possible,
+> which may help review much.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Yeah you're right, in fact I considered to make elevator interface changes into 
+a separate patch however the changes are so much tightly coupled with block layer
+change that I couldn't make it independent. As you may see here I replaced second
+argument of ->init_sched from "struct elevator_type *" to "struct elevator_queue *".
+And as you might have noticed we allocate the "struct elevator_queue *" very early
+while switching the elevator and that's passed down to this ->init_sched function
+through elv_change_ctx. So making elevator interface change a standalone patch 
+is not possible.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+>>  
+>> +int blk_mq_alloc_elevator_and_sched_tags(struct request_queue *q,
+>> +		struct elv_change_ctx *ctx)
+>> +{
+>> +	unsigned long i;
+>> +	struct elevator_queue *elevator;
+>> +	struct elevator_type *e;
+>> +	struct blk_mq_tag_set *set = q->tag_set;
+>> +	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+>> +
+>> +	if (strncmp(ctx->new.name, "none", 4)) {
+> 
+> You can return early if new name is "none", then all indent in the code
+> block can be avoided.
+Yeah agreed, will do it in the next patch.
 
-If you want to undo deduplication, reply with:
-#syz undup
+> 
+>> +
+>> +		e = elevator_find_get(ctx->new.name);
+>> +		if (!e)
+>> +			return -EINVAL;
+>> +
+>> +		elevator = ctx->new.elevator = elevator_alloc(q, e);
+> 
+> You needn't to allocate elevator queue here, then the big elv_change_ctx change
+> may be avoided by passing sched tags directly.
+
+Hmm, okay so you recommend keeping allocation of elevator queue in ->init_sched
+method as it's today? If so then yes it could be done but then as I see the elvator 
+queue is being freed in elevator_change_done() after we release ->elevator_lock
+So I thought it's also quite possible in theory to allocate elevator queue outside
+of ->elevator_lock. Moreover, we shall not require holding ->elevator_lock or 
+->freeze_lock while allocating elevator queue, and thus probably avoid holding
+block layer locks while perfroming dynamic allocation, isn't it?
+
+> 
+> Also it may be fragile to allocate elevator queue here without holding elevator
+> lock. You may have to document this way is safe by allocating elevator
+> queue with specified elevator type lockless.
+> 
+Yes I'd document it. And looking through this code path it appears safe because
+we first get reference to the elevator type before assiging elevator type to
+the elevator queue in elevator_alloc(). Do you see any potential issue with 
+this, if we were to allocate elevator queue lockless here?
+
+>> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+>> index 1326526bb733..6c0f1936b81c 100644
+>> --- a/block/blk-mq-sched.h
+>> +++ b/block/blk-mq-sched.h
+>> @@ -7,6 +7,26 @@
+>>  
+>>  #define MAX_SCHED_RQ (16 * BLKDEV_DEFAULT_RQ)
+>>  
+>> +/* Holding context data for changing elevator */
+>> +struct elv_change_ctx {
+>> +	/* for unregistering/freeing old elevator */
+>> +	struct {
+>> +		struct elevator_queue *elevator;
+>> +	} old;
+>> +
+>> +	/* for registering/allocating new elevator */
+>> +	struct {
+>> +		const char *name;
+>> +		bool no_uevent;
+>> +		unsigned long nr_requests;
+>> +		struct elevator_queue *elevator;
+>> +		int inited;
+>> +	} new;
+>> +
+>> +	/* elevator switch status */
+>> +	int status;
+>> +};
+>> +
+> 
+> As I mentioned, 'elv_change_ctx' becomes more complicated, which may be
+> avoided.
+Yes I agreed, however as I mentioned above if we choose to allocate 
+elevator queue before we acquire ->elevator_lock or ->freeze_lock
+then we may need to keep this updated elv_change_ctx. So it depends
+on whether we choose to allocate elevator queue befor acquiring locks or
+keeping allocation under ->init_sched.
+
+> Queue is still frozen, so the dependency between freeze lock and
+> the global percpu allocation lock isn't cut completely.
+> 
+Yes correct and so in the commit message I mentioned that this depedency is
+currenlty cut only while calling elevator switch from elv_iosched_store context
+through sysfs. We do need to still cut it in the conetxt of elevator switch 
+being called from blk_mq_update_nr_hw_queues context or called while unregistering 
+queue from del_gendisk. And this I thought should be handled in a seperate patch.
+Anyways, I would explicitly call this out in the commit message.
+
+Thanks,
+--Nilay
