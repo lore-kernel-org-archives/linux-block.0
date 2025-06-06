@@ -1,220 +1,233 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075922882BC
-	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 12:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA5C289355
+	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 13:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749211418; cv=none; b=J1/0hQqbEx15tlufA85Apl8T6yPKIm4ugdlA0QXY/UEdhixQ8gcKChz51GcNNn//eW69h66s13nkoHmV5n33gdb6OYUXzVPdTUDIvFawm5jX3dJzUvS7EWHUPxDuOWQaOzdqnDB+5mgg7UONudFhlGH0fK9Y2QFyEE9SsKQJ4Yw=
+	t=1749217926; cv=none; b=hNM3/tMv4YAznHVWaQK+EQ2vUOUIhg5EbvYz073+ywYNErkbuS3NLve09uSEOH01XeUZrICGSiJ9+USsqBtUF4AJui1ZIZk+gkawiYyNwZo6LSS5jZTT/IvfSXRUUJyKniUFZKgsd+JBqvly2GPi8tJI6lYSA6Bd7nLjpQVJQRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749211418; c=relaxed/simple;
-	bh=h89U6Qw/O7+zWjtR0rRZpwPXVVrxvuHqF05CLmLssdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Exsew/qxJ5dx6zpDjjO7KAKzSJJiRAKq2e3GBYcg1sdFFNzlEkMC1bXY0Zs3kem5Gowa3Nvp3WRY3nuxf2IEwKhUq10rz+Xga7All6g3IkYqlOzmFJZ8B2jW56ZxN6MViVxkTkYlBkUfhvwp/zvdTTkW4NoZPBc7wDkEi8jrRjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KfvBfa/L; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749217926; c=relaxed/simple;
+	bh=sJyQOcZD9jyiphNEekewzIyEc9sev7utdVU2MGBwKZw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=QYKhAepMEohUuPJbjdUwp75/aaRnsf3yiC6CNduk0feY5POyI/jlRWTsidaAFjSqqeGwsevhS0P7mm8bzse1UFUYuFJCnGOcWfZ2+2iEje5VOJeKsuEuFr5cuGUnl6/U32otKFKRYO/BEc1E53uLO44h+QdQFcVATRmvxyyRYQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eFYIOekX; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfvBfa/L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749211412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0rZWMf5A/8ML9Zgbk1gnnvgyhUXpIeGhMtrap/ltBdk=;
-	b=KfvBfa/LgAZgX5AUcRaS7/dROFfSxpLkDUDDK1NzNDkAc+cAdxzUxOeNi56dWhFDiyTqAb
-	IbL2DxtM7DRgCNcqV36IZIaOSK19Ahd2xVFi0RzCFjCEPk75B64+eXEcbEyZznJRUsj7kt
-	BYy2ugfLdfxUuZCFZ+anzsZYJX0ovCQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-8YHooEKpOCOMMsZ-HlVsmQ-1; Fri,
- 06 Jun 2025 08:03:29 -0400
-X-MC-Unique: 8YHooEKpOCOMMsZ-HlVsmQ-1
-X-Mimecast-MFC-AGG-ID: 8YHooEKpOCOMMsZ-HlVsmQ_1749211407
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1DE0619560A2;
-	Fri,  6 Jun 2025 12:03:27 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.163])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D6FE18002A5;
-	Fri,  6 Jun 2025 12:03:20 +0000 (UTC)
-Date: Fri, 6 Jun 2025 20:03:16 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>,
-	Ofer Oshri <ofer@nvidia.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>,
-	Guy Eisenberg <geisenberg@nvidia.com>, Omri Levi <omril@nvidia.com>,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: ublk: RFC fetch_req_multishot
-Message-ID: <aELZBPmYUMHDbusQ@fedora>
-References: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
- <CADUfDZo=uEno=4-3PJAD+_5sLRMaoFvMUGpckbD3tdbhCxTW4A@mail.gmail.com>
- <IA1PR12MB60672D37508D641368D211B8B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
- <CADUfDZqUQ+n5tr=XG+sJWR_q55fzNSzLHvUZXkysOw=c+vfVGg@mail.gmail.com>
- <aAscRPVcTBiBHNe7@fedora>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eFYIOekX"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3ddca4ce408so6421755ab.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Jun 2025 06:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749217922; x=1749822722; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwKx9wzaRm/XpHdjhbWtug59YbXuNcmdcBG+KjNSQT0=;
+        b=eFYIOekXFAS6wT2iIQRImHXnVhTrpHi2rRFlNZ8ychpEoHArhQLExvYlatUsp3LWjq
+         lQlJqmT11WkBlxl/dYOFZrPYkrHVWtC9C+VjdZypDkBYC3D13j27BJKOi4aVQiQmz8Le
+         F2rPAXSMXFBrB01fjs1SItPrndoWgfNdMBMXbDw7DYZ6tGQ1iTYiKmWflQd6THBjmGIM
+         Qay1bEN/JicC7fHoVxGmCN8wSqrmuYRD6WDmjoIviEqGg9BcK3PHYTHHZFxQB9q2vvbF
+         QHnz8FV+REkXYoGo3x/GmoopNnROYndAMPVSmeZBCrvwYW9kUg6olTzb90oN82tY4PX0
+         Znhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749217922; x=1749822722;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cwKx9wzaRm/XpHdjhbWtug59YbXuNcmdcBG+KjNSQT0=;
+        b=Z4alCfrWmfC+SDETBPnwXWJdZV5aUWLk9+X7184Djqo/s5w4amKtL32C92X+dIKOTJ
+         stjsE4ozKhVIabX0L4fI5LJj+n+QhqVYl1pwUzj0oNfrqbAEvLvvtTJk81yA5T6gMQ7q
+         s5sasO06b4zBsJU6bFrJ8+qfZmrgIfVcq4T1UJsxC0q0Udesc+KEumELZe/ZpKoGSDLq
+         HkP0ZnQw9XIUVu3lhHVuoWH4hgjjoVEgRJzbQBRt3UfM/N/d18x/0jaIBvIR7+QMH171
+         4Rqr0rwU/k2C7///2TWgh4hsgQo39DTYkkD5/rgXTLc/PpRDAo4RxFr1TzcC8FzanykK
+         eEFw==
+X-Gm-Message-State: AOJu0YzgK+GUFADL+9VUqSnQFXLvxBjRVuYTW7O2+e0EKbrLpWvto/Ty
+	BCgSwqwskW+rkYD/urQbtkFGODNPK0vz4GP1X/lMs2O4+zRYLPuMl+MBEBSd0raJ6aq4R6IbEPM
+	eWCEa
+X-Gm-Gg: ASbGncsJaasaLLfjUux9A5x7TdWSjH4eLCmOGfvHQ8wFQsWefQG8plq1Y62zccaODt4
+	4SDJuq20GJIgvAuCxgM5mBrGhPDDtvZObvezWjL6i+kHSTq8CrIuFp2Z62zSQ/0YyAd/q3DpkyX
+	zpb6r8WMaf6nEl5W5Ro+o7DzTyuF7bQgfnluHqH8psXU3Z6unyUsRgFc/tA+rOd79fK+MiW8JMe
+	ILOJLpPe+crp/DkwVW4UuJceCk1y/JZ5pI1CkvFfKXpVxR0zvgtYs90HaIFfFiKT1zmIVm0KU7h
+	MMS6bWrY+Sbv5RWNKlElJKJAFcDSraVzCDvW0Z5TYM0a/bY=
+X-Google-Smtp-Source: AGHT+IHCuO17/l6dhzKLw732cYPbG/qZ20qAd96OC6OvLwv8sjbGLfzseMCB921oHiAH7C9ggGYBgQ==
+X-Received: by 2002:a05:6e02:144d:b0:3dc:8423:545c with SMTP id e9e14a558f8ab-3ddce35c750mr37810805ab.0.1749217922327;
+        Fri, 06 Jun 2025 06:52:02 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-500df421bc8sm449001173.35.2025.06.06.06.52.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jun 2025 06:52:01 -0700 (PDT)
+Message-ID: <0c5db2c6-2e28-47f6-ac57-8b9a21415191@kernel.dk>
+Date: Fri, 6 Jun 2025 07:52:00 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aAscRPVcTBiBHNe7@fedora>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes and updates for 6.16-rc1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 01:23:16PM +0800, Ming Lei wrote:
-> On Thu, Apr 24, 2025 at 12:07:32PM -0700, Caleb Sander Mateos wrote:
-> > On Thu, Apr 24, 2025 at 11:58 AM Ofer Oshri <ofer@nvidia.com> wrote:
-> > >
-> > >
-> > >
-> > > ________________________________
-> > > From: Caleb Sander Mateos <csander@purestorage.com>
-> > > Sent: Thursday, April 24, 2025 9:28 PM
-> > > To: Ofer Oshri <ofer@nvidia.com>
-> > > Cc: linux-block@vger.kernel.org <linux-block@vger.kernel.org>; ming.lei@redhat.com <ming.lei@redhat.com>; axboe@kernel.dk <axboe@kernel.dk>; Jared Holzman <jholzman@nvidia.com>; Yoav Cohen <yoav@nvidia.com>; Guy Eisenberg <geisenberg@nvidia.com>; Omri Levi <omril@nvidia.com>
-> > > Subject: Re: ublk: RFC fetch_req_multishot
-> > >
-> > > External email: Use caution opening links or attachments
-> > >
-> > >
-> > > On Thu, Apr 24, 2025 at 11:19 AM Ofer Oshri <ofer@nvidia.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > Our code uses a single io_uring per core, which is shared among all block devices - meaning each block device on a core uses the same io_uring.
-> > > >
-> > > > Let’s say the size of the io_uring is N. Each block device submits M UBLK_U_IO_FETCH_REQ requests. As a result, with the current implementation, we can only support up to P block devices, where P = N / M. This means that when we attempt to support block device P+1, it will fail due to io_uring exhaustion.
-> > >
-> > > What do you mean by "size of the io_uring", the submission queue size?
-> > > Why can't you submit all P * M UBLK_U_IO_FETCH_REQ operations in
-> > > batches of N?
-> > >
-> > > Best,
-> > > Caleb
-> > >
-> > > N is the size of the submission queue, and P is not fixed and unknown at the time of ring initialization....
-> > 
-> > I don't think it matters whether P (the number of ublk devices) is
-> > known ahead of time or changes dynamically. My point is that you can
-> > submit the UBLK_U_IO_FETCH_REQ operations in batches of N to avoid
-> > exceeding the io_uring SQ depth. (If there are other operations
-> > potentially interleaved with the UBLK_U_IO_FETCH_REQ ones, then just
-> > submit each time the io_uring SQ fills up.) Any values of P, M, and N
-> > should work. Perhaps I'm misunderstanding you, because I don't know
-> > what "io_uring exhaustion" refers to.
-> > 
-> > Multishot ublk io_uring operations don't seem like a trivial feature
-> > to implement. Currently, incoming ublk requests are posted to the ublk
-> > server using io_uring's "task work" mechanism, which inserts the
-> > io_uring operation into an intrusive linked list. If you wanted a
-> > single ublk io_uring operation to post multiple completions, it would
-> > need to allocate some structure for each incoming request to insert
-> > into the task work list. There is also an assumption that the ublk
-> > io_uring operations correspond 1-1 with the blk-mq requests for the
-> > ublk device, which would be broken by multishot ublk io_uring
-> > operations.
-> 
-> For delivering ublk io command to ublk server, I feel multishot can be
-> used in the following way:
-> 
-> - use IORING_OP_READ_MULTISHOT to read from ublk char device, do it for
->   each queue, queue id may be passed via offset
-> 
-> - block in ublk_ch_read_iter() if nothing comes from this queue of the
-> ublk block device
-> 
-> - if any ublk block io comes, fill `ublksrv_io_desc` in mmapped area, and
-> push the 'tag' to the read ring buffer(provided buffer)
-> 
-> - wakeup the read IO after one whole IO batch is done
-> 
-> For commit ublk io command result to ublk driver, it can be similar with
-> delivering by writing 'tag' to ublk char device via IORING_OP_WRITE_FIXED or
-> IORING_OP_WRITE, still per queue via ring_buf approach, but need one mmapped
-> buffer for storing the io command result, 4 bytes should be enough for each io.
-> 
-> With the above way:
-> 
-> - use read/write to deliver io command & commit io command result, so
->   single read/write replaces one batch of uring_cmd
-> 
-> - needn't uring command any more, big security_uring_cmd() cost can be avoided
-> 
-> - memory footprint is reduced a lot, no extra uring_cmd for each IO
-> 
-> - extra task work scheduling is avoided
-> 
-> - Probably uring exiting handling can be simplified too.
-> 
-> 
-> Sounds like ublk 2.0 prototype, :-)
+Hi Linus,
 
-I have been working towards this direction:
+Set of fixes and updates for block that should go into the 6.16-rc1
+kernel release. This pull request contains:
 
-https://github.com/ming1/linux/commits/ublk2-cmd-batch/
+- NVMe pull request via Christoph
+	- TCP error handling fix (Shin'ichiro Kawasaki)
+	- TCP I/O stall handling fixes (Hannes Reinecke)
+	- fix command limits status code (Keith Busch)
+	- support vectored buffers also for passthrough (Pavel Begunkov)
+	- spelling fixes (Yi Zhang)
 
-by adding three new batch commands, all are per-queue:
+- MD pull request via Yu
+	- fix REQ_RAHEAD and REQ_NOWAIT IO err handling for raid1/10
+	- fix max_write_behind setting for dm-raid
+	- some minor cleanups
 
-`UBLK_U_IO_FETCH_IO_CMDS`
-	
-	- multishot with provided buffer
+- Integrity data direction fix and cleanup
 
-	- issued once, CQE is posted after new io/io batch is coming by filling
-	io tag into the provided buffer
+- bcache NULL pointer fix
 
-	- re-issue after the whole buffer is used up, so issue cost is reduced
+- Fix for loop missing write start/end handling
 
-	- multiple `UBLK_U_IO_FETCH_IO_CMDS` are allowed to be issued concurrently
-	from different task contexts for supporting load balance
+- Decouple hardware queues and IO threads in ublk
 
-	- each `UBLK_U_IO_FETCH_IO_CMDS` can carry 'priority' info for supporting
-	prioritized schedule, not done yet, should be easier to implement
+- Slew of ublk selftests additions and updates
 
-`UBLK_U_IO_COMMIT_IO_CMDS`
-
-	- this command has a fixed buffer, in which io tag, io command result
-	and other info(buf_index) for FETCH is provided, and multiple IOs or
-	batch IO are covered
-
-`UBLK_U_IO_PREP_IO_CMDS`:
-
-	batch version of `UBLK_IO_FETCH_REQ`, still has one fixed buffer for
-	carrying io tag, info for fetch, similar with `UBLK_U_IO_COMMIT_IO_CMDS`
-
-In this way, lots of existing ublk constraint are relaxed:
-
-- any of the three command can be issued from any task context, there isn't
-  per-io task or ubq_daemon limit any more. But AUTO_BUF_REG is one
-  exception, which requires FETCH and COMMIT command are in same io_ring_ctx.
-
-- easier to support load balance, any IO commands fetched by the command
-of `UBLK_U_IO_FETCH_IO_CMDS` can be handled in the task for issuing
-UBLK_U_IO_FETCH_IO_CMDS
-
-- both FETCH and COMMIT are handled in batch way, communication cost is
-reduced.
-
-One drawback is that cost is added in client IO issue side(ublk_queue_rq() and
-ublk_queue_rqs()), goodness is that communication cost is reduced in ublk server
-side. 
-
-Simple test running on one server shows that performance is good
-
-- kublk(`--batch --auto_zc -q 2` vs. `--auto_zc -q 2`): ~10% IOPS improvement
-
-The feature is still in very early stage, and any comments are welcome!
+Please pull!
 
 
+The following changes since commit 914873bc7df913db988284876c16257e6ab772c6:
 
-Thanks,
-Ming
+  Merge tag 'x86-build-2025-05-25' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2025-05-26 21:41:14 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.16-20250606
+
+for you to fetch changes up to 6f65947a1e684db28b9407ea51927ed5157caf41:
+
+  Merge tag 'nvme-6.16-2025-06-05' of git://git.infradead.org/nvme into block-6.16 (2025-06-05 07:40:38 -0600)
+
+----------------------------------------------------------------
+block-6.16-20250606
+
+----------------------------------------------------------------
+Caleb Sander Mateos (2):
+      block: drop direction param from bio_integrity_copy_user()
+      block: flip iter directions in blk_rq_integrity_map_user()
+
+Hannes Reinecke (2):
+      nvme-tcp: sanitize request list handling
+      nvme-tcp: fix I/O stalls on congested sockets
+
+Jens Axboe (2):
+      Merge tag 'md-6.16-20250530' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.16
+      Merge tag 'nvme-6.16-2025-06-05' of git://git.infradead.org/nvme into block-6.16
+
+Keith Busch (1):
+      nvme: fix command limits status code
+
+Linggang Zeng (1):
+      bcache: fix NULL pointer in cache_set_flush()
+
+Ming Lei (2):
+      loop: add file_start_write() and file_end_write()
+      selftests: ublk: cover PER_IO_DAEMON in more stress tests
+
+Mingzhe Zou (1):
+      bcache: reserve more RESERVE_BTREE buckets to prevent allocator hang
+
+Pavel Begunkov (2):
+      nvme: fix implicit bool to flags conversion
+      nvme: enable vectored registered bufs for passthrough cmds
+
+Robert Pang (1):
+      bcache: remove unused constants
+
+Shin'ichiro Kawasaki (1):
+      nvme-tcp: remove tag set when second admin queue config fails
+
+Uday Shankar (10):
+      ublk: have a per-io daemon instead of a per-queue daemon
+      selftests: ublk: kublk: plumb q_id in io_uring user_data
+      selftests: ublk: kublk: tie sqe allocation to io instead of queue
+      selftests: ublk: kublk: lift queue initialization out of thread
+      selftests: ublk: kublk: move per-thread data out of ublk_queue
+      selftests: ublk: kublk: decouple ublk_queues from ublk server threads
+      selftests: ublk: add functional test for per io daemons
+      selftests: ublk: add stress test for per io daemons
+      Documentation: ublk: document UBLK_F_PER_IO_DAEMON
+      selftests: ublk: kublk: improve behavior on init failure
+
+Yi Zhang (1):
+      nvme: spelling fixes
+
+Yu Kuai (5):
+      md/raid1,raid10: don't handle IO error for REQ_RAHEAD and REQ_NOWAIT
+      md/md-bitmap: fix dm-raid max_write_behind setting
+      md/dm-raid: remove max_write_behind setting limit
+      md/md-bitmap: cleanup bitmap_ops->startwrite()
+      md/md-bitmap: remove parameter slot from bitmap_create()
+
+ Documentation/block/ublk.rst                       |  35 +-
+ block/bio-integrity.c                              |  17 +-
+ block/blk-integrity.c                              |   7 +-
+ drivers/block/loop.c                               |   8 +-
+ drivers/block/ublk_drv.c                           | 111 +++---
+ drivers/md/bcache/btree.c                          |   2 -
+ drivers/md/bcache/super.c                          |  55 ++-
+ drivers/md/dm-raid.c                               |   6 +-
+ drivers/md/md-bitmap.c                             |  35 +-
+ drivers/md/md-bitmap.h                             |  17 +-
+ drivers/md/md.c                                    |  14 +-
+ drivers/md/raid1-10.c                              |  10 +
+ drivers/md/raid1.c                                 |  19 +-
+ drivers/md/raid10.c                                |  11 +-
+ drivers/nvme/common/auth.c                         |   6 +-
+ drivers/nvme/host/Kconfig                          |   2 +-
+ drivers/nvme/host/constants.c                      |   2 +-
+ drivers/nvme/host/core.c                           |   3 +-
+ drivers/nvme/host/fabrics.c                        |   2 +-
+ drivers/nvme/host/fabrics.h                        |   6 +-
+ drivers/nvme/host/fc.c                             |   4 +-
+ drivers/nvme/host/ioctl.c                          |  18 +-
+ drivers/nvme/host/multipath.c                      |   2 +-
+ drivers/nvme/host/nvme.h                           |   2 +-
+ drivers/nvme/host/pci.c                            |   4 +-
+ drivers/nvme/host/pr.c                             |   2 -
+ drivers/nvme/host/rdma.c                           |   4 +-
+ drivers/nvme/host/tcp.c                            |  24 +-
+ drivers/nvme/target/admin-cmd.c                    |   2 +-
+ drivers/nvme/target/core.c                         |  11 +-
+ drivers/nvme/target/fc.c                           |   2 +-
+ drivers/nvme/target/io-cmd-bdev.c                  |  11 +-
+ drivers/nvme/target/passthru.c                     |   2 +-
+ include/linux/nvme.h                               |   2 +-
+ include/uapi/linux/ublk_cmd.h                      |   9 +
+ tools/testing/selftests/ublk/Makefile              |   1 +
+ tools/testing/selftests/ublk/fault_inject.c        |   4 +-
+ tools/testing/selftests/ublk/file_backed.c         |  20 +-
+ tools/testing/selftests/ublk/kublk.c               | 374 ++++++++++++++-------
+ tools/testing/selftests/ublk/kublk.h               |  73 ++--
+ tools/testing/selftests/ublk/null.c                |  22 +-
+ tools/testing/selftests/ublk/stripe.c              |  17 +-
+ tools/testing/selftests/ublk/test_common.sh        |   5 +
+ tools/testing/selftests/ublk/test_generic_12.sh    |  55 +++
+ tools/testing/selftests/ublk/test_stress_03.sh     |   8 +
+ tools/testing/selftests/ublk/test_stress_04.sh     |   7 +
+ tools/testing/selftests/ublk/test_stress_05.sh     |   7 +
+ .../selftests/ublk/trace/count_ios_per_tid.bt      |  11 +
+ 48 files changed, 693 insertions(+), 378 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_12.sh
+ create mode 100644 tools/testing/selftests/ublk/trace/count_ios_per_tid.bt
+
+-- 
+Jens Axboe
 
