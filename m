@@ -1,171 +1,141 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49171126C17;
-	Fri,  6 Jun 2025 15:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58FFA927
+	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 15:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749223495; cv=none; b=TffMidNXug4K/Jv6mTdhi63sLsAtqY/IoAjWClozD+7WAssZ2HKDbIC6EsUB6ZNTARbtS9LqfVbYfRrMPdO+Yi6V/KkCve5EY2ubbW+XPdwMjSexBW3sni0wwtGGe7cMoe2JvR8S1FXxSKV8HjsRBFfFP+8M03gI1aAISipA8aY=
+	t=1749223903; cv=none; b=bbA+0EFpojEVEcH0/lPInm7Q8MbVEd0eL5ntP8MoP3vl1W8jtWICpJ3kuoqMLaGeaJiwYibXk3dUdmRrgvxSZMdbz/jQDozmDtPbdWIcEqVNIxXg5xLFULbf9y++1kfXzUeZNpNOyo0bQwmdCnJFG8SbLSmerbeeZTQGsoqzG/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749223495; c=relaxed/simple;
-	bh=PGxsIoF6XolSXA0yz6NNwiZhEBrLUkM+cSRlgFa4b6w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=evFvnEmpKErByEoxz4dTrFTJX4YWpLF5CpLm+ugJeAnxhDQ8YmCb5VEgx+SzdgNSVa3mtzMd2LP07XOKaGM+4VPEhHew5/zEdmFw1UOsQ3/ZHS5dCvjuwg8NtkCgQEHoALYogGQ0zteTSsZf2aWiBFJ+opMGfSo7DZapgAdBnG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QlKmfyvd; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1749223903; c=relaxed/simple;
+	bh=ts8dwlbbfaDCvJ505Qq6ciBe4/o68ORgX2CetiiL7UQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F8wy+xIRCGvwVY9td1rk67z4nwkr9eeEV15nhCbNatbvHM/+0S4ZtM7ni37nnj9cT8l9Ux+5tbaesqrrDpM3df1YKWSoXldgBQq5cSkh78cw4+4A02Ebkm9p88y+sbGri66VSPw4FBW2cLGxFsOR1jxxauoDyGVnRUvoBTiy7jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kdo2FLY6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0YFAcE5i; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kdo2FLY6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0YFAcE5i; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QlKmfyvd"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 556CZAZx030304;
-	Fri, 6 Jun 2025 15:23:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=71jYEz
-	zkLLgoJ5VbvpTNuDtlu7S8OnwL/GqbGzUT0bA=; b=QlKmfyvdBBpIXkO+fbv8Mo
-	J0bAIS6e1OzWCyU/1M9HwXsjCnh17zKX2ajFv4XpfH5cCcpy3myaefUBzboG4wSn
-	XErxht2lDnaMHsSWoQOLlyw2vYkPfCSmSMZoOGijkLyBANQ1x56I9xKhcNJFQq6k
-	NFiTzfQTLU84F5FWYsv8hwL/nt1OG03Adt+L1MgDdKX3qqnEnkNkUqb+17nYgnxF
-	roAo8ss3uOe9fqUBW/jYr4QpchLdd9dTYu2jkOLaYOuruE4mH46TUWosBN40p7fX
-	RzIWp7Qf9RYLgaAEhxZOi7xbQJ3VYtYt9KBW/9oNcD1WlVVI9hXcdbK5L3gPtwmA
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471gf07ahu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Jun 2025 15:23:26 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 556F0mVN024768;
-	Fri, 6 Jun 2025 15:23:25 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkmsyj7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Jun 2025 15:23:25 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 556FNOXA26280540
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Jun 2025 15:23:24 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DFC05805E;
-	Fri,  6 Jun 2025 15:23:24 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F282258059;
-	Fri,  6 Jun 2025 15:23:17 +0000 (GMT)
-Received: from [9.67.149.38] (unknown [9.67.149.38])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  6 Jun 2025 15:23:17 +0000 (GMT)
-Message-ID: <94718ca7-edb8-4e87-9b2d-586dcbd42690@linux.ibm.com>
-Date: Fri, 6 Jun 2025 20:53:16 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kdo2FLY6";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0YFAcE5i";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kdo2FLY6";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0YFAcE5i"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1FC1C336A1;
+	Fri,  6 Jun 2025 15:31:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749223900; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sTaxRHKwF+vzmXr0h8gchfeJdwPaFIf2cEMCCW/n7+A=;
+	b=kdo2FLY6uImYG5myX98OBi1M5XgqczBq0Pj7pql0UDXaqgIoVf3R531K9uUlUTdyygWzO5
+	GvheP0Nt5TJtxV53GFB/kbLM24NaPDSVCriNYC4BWFHwn8u/pL3Np7E4CkzXsfwML2Afgy
+	LZ7AmLGGC3tuQ7Ke8oZ1dw25q54fQHo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749223900;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sTaxRHKwF+vzmXr0h8gchfeJdwPaFIf2cEMCCW/n7+A=;
+	b=0YFAcE5iTeNsslsFY3deRp4aKNCW6rXvHCWSidKaiIDLu8LWQ+TRPaCBB3vLKq7/MtpHhA
+	vyDej2B7YEVbPxDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749223900; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sTaxRHKwF+vzmXr0h8gchfeJdwPaFIf2cEMCCW/n7+A=;
+	b=kdo2FLY6uImYG5myX98OBi1M5XgqczBq0Pj7pql0UDXaqgIoVf3R531K9uUlUTdyygWzO5
+	GvheP0Nt5TJtxV53GFB/kbLM24NaPDSVCriNYC4BWFHwn8u/pL3Np7E4CkzXsfwML2Afgy
+	LZ7AmLGGC3tuQ7Ke8oZ1dw25q54fQHo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749223900;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sTaxRHKwF+vzmXr0h8gchfeJdwPaFIf2cEMCCW/n7+A=;
+	b=0YFAcE5iTeNsslsFY3deRp4aKNCW6rXvHCWSidKaiIDLu8LWQ+TRPaCBB3vLKq7/MtpHhA
+	vyDej2B7YEVbPxDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0EFA31336F;
+	Fri,  6 Jun 2025 15:31:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mXxgA9wJQ2g7LAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Fri, 06 Jun 2025 15:31:40 +0000
+Date: Fri, 6 Jun 2025 17:31:39 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Yi Zhang <yi.zhang@redhat.com>, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	Tomas Bzatek <tbzatek@redhat.com>
+Subject: Re: blktests failures with v6.15 kernel
+Message-ID: <d1e5aefd-9669-4638-9466-951e69df1176@flourine.local>
+References: <2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk>
+ <7cdceac2-ef72-4917-83a2-703f8f93bd64@flourine.local>
+ <rcirbjhpzv6ojqc5o33cl3r6l7x72adaqp7k2uf6llgvcg5pfh@qy5ii2yfi2b2>
+ <CAHj4cs8SqXUpbT49v29ugG1Q36g5KrGAHtHu6sSjiH19Ct_vJA@mail.gmail.com>
+ <38a8ec1a-dbca-43f1-b0fa-79f0361bbc0b@flourine.local>
+ <14194a5f-e320-45e0-8f6c-019ce3bd4dbe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 4/4] block: use chunk_sectors when evaluating stacked
- atomic write limits
-To: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org,
-        mpatocka@redhat.com, song@kernel.org, yukuai3@huawei.com, hch@lst.de,
-        axboe@kernel.dk
-Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        ojaswin@linux.ibm.com, martin.petersen@oracle.com
-References: <20250605150857.4061971-1-john.g.garry@oracle.com>
- <20250605150857.4061971-5-john.g.garry@oracle.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250605150857.4061971-5-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Pq2TbxM3 c=1 sm=1 tr=0 ts=684307ee cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=yPCof4ZbAAAA:8 a=FRLcGKbqzZ5yKL8xwJUA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA2MDEzMiBTYWx0ZWRfXzd0EnRca5xVc 0uGyd1wyuBCUmYmpt3lJF8TqD/n7XVAFr1kakUSre9tzJhRqudUpqHO+5QVDAvNe2hTDshZLEBC UqkWesWm+fWT/FK0H+WAPly3a+73oagO18tDW9PW0MeIkQ30V62RPbkWuxJMwTaLgDTjUc+Cnad
- k+7cpcbuIkklaySQwf9dyyqkVW5vig03DayEyXRm5xP2a75SjyyokLgSScofh5PdoKsnQ0Vj+tW Fy1/QTR3wxfS+6RnbpcjQqAI8+9N4IFvg4iXcbSassLW35fdGusim5vjpiPrwEXCAXYpOa/OZV/ 6wA7JscWzdD1aKzwGbfO9/L64ijPCayCdArfFA1zQ23Dw7IfZjTy3uC06dYFqBNiKIu4Hg72V7a
- uP7/c2FS2oQvvcuL/93L1Vl8LBm+9b74sIT5ybVegVYDSP7exd9mj3uqjm8QjqG89MYlJr63
-X-Proofpoint-GUID: 8j7_MUFoHJHOYQoVUE6ahr8RJfFrSiP3
-X-Proofpoint-ORIG-GUID: 8j7_MUFoHJHOYQoVUE6ahr8RJfFrSiP3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-06_05,2025-06-05_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 spamscore=0 suspectscore=0 priorityscore=1501
- mlxscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506060132
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14194a5f-e320-45e0-8f6c-019ce3bd4dbe@kernel.dk>
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[flourine.local:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+
+On Fri, Jun 06, 2025 at 09:03:11AM -0600, Jens Axboe wrote:
+> On 6/6/25 8:58 AM, Daniel Wagner wrote:
+> > FWIW, the contributor for the io_uring feature, stated that it improved
+> > the performance for some workloads. Though, I think the whole
+> > integration is sub-optimal, as a new io_uring is created/configured for
+> > each get_log_page call. So only for a large transfers there is going to
+> > help.
+> 
+> That's crazy... What commit is that?
+
+adee4ed1c8c8 ("ioctl: get_log_page by nvme uring cmd")
+
+ioctl: get_log_page by nvme uring cmd
+Use io_uring for fetching log pages.
+
+This showed about a 10% performance improvement for some large log pages.
 
 
+https://github.com/linux-nvme/libnvme/commit/adee4ed1c8c8
 
-On 6/5/25 8:38 PM, John Garry wrote:
-> The atomic write unit max is limited by any stack device stripe size.
-> 
-> It is required that the atomic write unit is a power-of-2 factor of the
-> stripe size.
-> 
-> Currently we use io_min limit to hold the stripe size, and check for a
-> io_min <= SECTOR_SIZE when deciding if we have a striped stacked device.
-> 
-> Nilay reports that this causes a problem when the physical block size is
-> greater than SECTOR_SIZE [0].
-> 
-> Furthermore, io_min may be mutated when stacking devices, and this makes
-> it a poor candidate to hold the stripe size. Such an example would be
-> when the io_min is less than the physical block size.
-> 
-> Use chunk_sectors to hold the stripe size, which is more appropriate.
-> 
-> [0] https://lore.kernel.org/linux-block/888f3b1d-7817-4007-b3b3-1a2ea04df771@linux.ibm.com/T/#mecca17129f72811137d3c2f1e477634e77f06781
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  block/blk-settings.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index a000daafbfb4..5b0f1a854e81 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -594,11 +594,13 @@ static bool blk_stack_atomic_writes_boundary_head(struct queue_limits *t,
->  static bool blk_stack_atomic_writes_head(struct queue_limits *t,
->  				struct queue_limits *b)
->  {
-> +	unsigned int chunk_size = t->chunk_sectors << SECTOR_SHIFT;
-> +
->  	if (b->atomic_write_hw_boundary &&
->  	    !blk_stack_atomic_writes_boundary_head(t, b))
->  		return false;
->  
-> -	if (t->io_min <= SECTOR_SIZE) {
-> +	if (!t->chunk_sectors) {
->  		/* No chunk sectors, so use bottom device values directly */
->  		t->atomic_write_hw_unit_max = b->atomic_write_hw_unit_max;
->  		t->atomic_write_hw_unit_min = b->atomic_write_hw_unit_min;
-> @@ -617,12 +619,12 @@ static bool blk_stack_atomic_writes_head(struct queue_limits *t,
->  	 * aligned with both limits, i.e. 8K in this example.
->  	 */
->  	t->atomic_write_hw_unit_max = b->atomic_write_hw_unit_max;
-> -	while (t->io_min % t->atomic_write_hw_unit_max)
-> +	while (chunk_size % t->atomic_write_hw_unit_max)
->  		t->atomic_write_hw_unit_max /= 2;
->  
->  	t->atomic_write_hw_unit_min = min(b->atomic_write_hw_unit_min,
->  					  t->atomic_write_hw_unit_max);
-> -	t->atomic_write_hw_max = min(b->atomic_write_hw_max, t->io_min);
-> +	t->atomic_write_hw_max = min(b->atomic_write_hw_max, chunk_size);
->  
->  	return true;
->  }
-
-This works well with my NVMe disk which supports atomic writes however the only
-concern is what if in case t->chunk_sectors is also defined for NVMe disk? 
-I see that nvme_set_chunk_sectors() initializes the chunk_sectors for NVMe. 
-The value which is assigned to lim->chunk_sectors in nvme_set_chunk_sectors()
-represents "noiob" (i.e. Namespace Optimal I/O Boundary). My disk has "noiob" 
-set to zero but in case if it's non-zero then would it break the above logic
-for NVMe atomic writes?
-
-Thanks,
---Nilay
-
-
+Should I rip it out? I am not really attached to it.
