@@ -1,206 +1,339 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4817FD;
-	Fri,  6 Jun 2025 07:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749196506; cv=fail; b=KfrRw2YDEMKmI1EcT+o8Ymjai0J/4avyPXgtEekpbxtXoycY+7RQLvxrtLQTCVVg627w+kjmq3k+5AKXgL9rHFxXS6qm5uDH/ocriEUqmMzsBZtssMt96BWyZB9MBJ7ypEAYMIGGccaW2btz071JhLrVOi7es+ATy6sc3Roq96I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749196506; c=relaxed/simple;
-	bh=YICUXt3IYNOgc0stavb8O7gIZjxLncqm7cfJVsXw+2w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qfOst0LuTJX9r9/VGRE9swbMmE1xyE25h4sYBh6oUkANPN90owRIWfzKUz+zizRG4rx22DHVnDQaBfSd49yzqqSUuPNgCo569lSUBbHDTF2inxCi5NA7maZzFKNIOMQE2zByPJZHije41POtRp/oEz8CeIxTjsEfxdPbWm8QGIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=BKGhgaoL; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=PGG2xKV9; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B0413B2A4
+	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 09:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749203660; cv=none; b=Hkx7jcjRJ5Z88Vu9J3YWWWc7m7YLTTnbNaQ3IqKFwum9f//hCexLNnorZxI71CJPnUOvm9uik+nG+1Ls7GteGf/4uASLeZIoP4yFfBxdmRDB60zmGbyAOMwV3H2L7P6xbIk0/zcf7Rzzk9JN/03quAy9S+3+L5wxMWmq3K6GCHU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749203660; c=relaxed/simple;
+	bh=lIfuDV1RrBFwWqSLoAwRYokJ7fRVkIQ3AIQnoA8VDoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o6BZ8p1LJhv2NucZm0mWUJ+sQKzUfNuoDKkBU0CfrKqKIE7cUeXOxS0xJP4NsGbt66mRbyyB6RIcOU7x1kUrIrLvJOSdJ+c0tpGEQMnBjbezwytWh62rwJHsmDUUHHtwLRWShR2NmnpLXuJnevh31SwLKbqyYvdN/wKEEycivrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KqjL1z9K; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BKGhgaoL";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="PGG2xKV9"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1749196504; x=1780732504;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=YICUXt3IYNOgc0stavb8O7gIZjxLncqm7cfJVsXw+2w=;
-  b=BKGhgaoLZ/KG3FGjnGfUtecOxIJbVHBxRuWKUj325YOujBfDNy8OJGlK
-   6mSkJ/p9VbOEfaqvEdEzL4GfIdbNCNWueOCSWl4JbEYrtiCsZAvEQGcXU
-   pmBxuIiP7nNA1rzo3WgW5xZN791rBMNc5/Bk54iA7qLNhiNNbIf4Ege3j
-   jvT24jX1Bx2vthSNnsQOkCFQ8d+qvElIUSMkpNYwRWwOoTW2keoPGnAiq
-   hKpFQLkypaKGoztxJDs/v7rjOxcu4RU3KpvufwUnVlc3k2Ps83/7wokH5
-   SKa6bFmC+RhaD/gLuWU+/ig/CTg3a0qnL04NmUXGu5pXkeCmeBiakfeoP
-   Q==;
-X-CSE-ConnectionGUID: xkecNOAyQLChkhylilYFmQ==
-X-CSE-MsgGUID: t2xaiMUBSlGm4SxGddwXdA==
-X-IronPort-AV: E=Sophos;i="6.16,214,1744041600"; 
-   d="scan'208";a="83553122"
-Received: from mail-sn1nam02on2049.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([40.107.96.49])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jun 2025 15:54:57 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u7zpDv00NQt/BJnUyTJV6ZBeLHi0a87V5z1VE77y5DwT+x/mNPo9L9Xg5W05Sy+qAWzhu0MbwOaDwn7HU7pN4tc8WugtNwztoEzeNnmpBrBHTJrMhp/MsDWvjpxpaeiNa1RJDc2N5seUfhHy8D1o5Hz3idkd6VJU99aEF39AyxDXigbOJ5PDR63Jlmb1hFbA7U9aqVRPOpjcDust8iT4HEZKrRTtlxH9VE4p3jrnA3YXX0debvAckPdfP9LD7yQV2Qg0dqJkk5IHvfF53CDUpGq7QGdmw66yjbsM3izjZiYdVcYTDMONvWiK1g6e9Eo5tUIETEdWjlDBMVNTCc9Pag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rVqUtI9cDEJZLKGzccoSGwW+gukN8EcMJrS8W6JrfSY=;
- b=Vb/nbT38Mo+Se41HLB+5sAKS1yjFNPB0urkr2jcWElF+TEglK60oo3TjcPYrpO2Z+a38b8RQiKzqS2uUpuRUjexaDRJcHgfDNjoY4A5j8QKZ2CMNVaHjd93aAR1JoKF70i2qGckqpIJGc5AlmkmMXSNoGMaLEu4PgQIWuzlAy71Q3HZTAVyosxN1KvQ4hXju4icuUUM/UD+rwp4JyxpJ22wW45/kVN352/Qp3Gku/R6LeRF3SgBgaTvx5Pcuu+7xHiJgQQas/FTT5ILlUVp+QR5xYH8THkcaQ7zBzkRn3m+lepsEbzuDQS36GFo3ciIX86HanmFfjxkny8qiOkXStw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rVqUtI9cDEJZLKGzccoSGwW+gukN8EcMJrS8W6JrfSY=;
- b=PGG2xKV9VY42IfB6vfoO5ioziGIK+iSw1P8hi4t6Tjc3ThkeU3iRqv4v9CdFOxnJff9ZSYKOX9qG7cRXADuXrFaNoMNvvSFAUeMMX12mWFo0Pvb1mL+WxtAHHJBsOWWxlDquStfgq2xpWvhNE5XY7tSgvIDXA2LLb3Krk2urL1E=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by LV8PR04MB9732.namprd04.prod.outlook.com (2603:10b6:408:297::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Fri, 6 Jun
- 2025 07:54:55 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4%5]) with mapi id 15.20.8792.034; Fri, 6 Jun 2025
- 07:54:54 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>, "yizhan@redhat.com" <yizhan@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.15 kernel
-Thread-Topic: blktests failures with v6.15 kernel
-Thread-Index: AQHb0HYvN//Uc3+takahHhtvsJIVubP0k2AAgAE8RwA=
-Date: Fri, 6 Jun 2025 07:54:54 +0000
-Message-ID: <rcirbjhpzv6ojqc5o33cl3r6l7x72adaqp7k2uf6llgvcg5pfh@qy5ii2yfi2b2>
-References: <2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk>
- <7cdceac2-ef72-4917-83a2-703f8f93bd64@flourine.local>
-In-Reply-To: <7cdceac2-ef72-4917-83a2-703f8f93bd64@flourine.local>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|LV8PR04MB9732:EE_
-x-ms-office365-filtering-correlation-id: 19beb01c-da88-4ee5-5a45-08dda4cf6ce3
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?RztYKUeUlgCCOjVhlkDrwERGf9R0+dWPgpj6imC6dqthBzo7ExKnRJKTAz9B?=
- =?us-ascii?Q?jhinUsAbZ+pdz5hVfli9qfUfx6zOkKWcrynn/ZvqZ+oj640ItS7RVAbOo/mD?=
- =?us-ascii?Q?tMQ5kEVV++DYHB0SXXq7Sfof1aZjEm7V9k6Gh8bKN8AOOmuX2vhw1wXNjIcp?=
- =?us-ascii?Q?SiU+0kxk5Ly9j7F4s7tMVQ7DMZB5Ha/7qxz8TgfezjSLpTiJRVBGVCD/80Zz?=
- =?us-ascii?Q?+gN/5LWEsYMgjeRchR+2fWmlSM6voO01AZg2NnvjEIVYtveFwWxznomkUv7E?=
- =?us-ascii?Q?xcsL4QhtBmZOPbQ6aO5jjKT+VVjRuLM16Eu0Gfwe0t7UFkzMWJPFx5qYbTAN?=
- =?us-ascii?Q?MNJlA6PZ+6Z+JsmPKDSknDmAx210BV1vbSUNN+7vYNC38tQX5WGXQgv0gbKT?=
- =?us-ascii?Q?MvcsmCK9IWOtYZto+OaeplYlcYZt2Pd9R9V+9dP2Z7+N5TEPpKspELIB4P3p?=
- =?us-ascii?Q?nbqwhUAl2WBCAk8rH3zJzvxk+lMnrpEkDPBxEfnay+JRFYkM+idu/WWmcgWz?=
- =?us-ascii?Q?wOKSWitY/wAJv6bg8iIRU1tjaSA8JhYh2szXTXJEDUnoEpRqqYNElSPFQd8z?=
- =?us-ascii?Q?PdzQ3rUc4QnSF9LuIlW13l2bIzuYbHLc5RuLhho5SG4VFzuw3/xj0uYLCGe6?=
- =?us-ascii?Q?VLOPWw1yvQtcFQUNRNivv4eEWGoA3EZ5Aj5z8K6wZb+HVqY3kFsFOMvSg3lz?=
- =?us-ascii?Q?utm9ixDPJQVdrKg3VOHg4D2HWEAl72OreS/WwLYlEllKe6fcOSU01iIctGjC?=
- =?us-ascii?Q?b/mm/9OMgtP1Jr/RsBStD87Np2zSvpc83WCIEp7PWWglkpXnhGB8vlJdiPUn?=
- =?us-ascii?Q?b5KPn1V3kXsPjKD0Xyp0QP99P96JUSw5Nb6rBp9ZjGujAAH8hVaGVqQ55lgP?=
- =?us-ascii?Q?7yEEWoQKZvWTTmGukVfE9zXullucGkJrxLo0evqH7l9HypIAr4RuOb8+KfFM?=
- =?us-ascii?Q?4ImUNT/NKAOuKEoiVULqUuEVn4OPDAITyNoGW7+2EMnRvN/QhklIRX7eAQ0+?=
- =?us-ascii?Q?wEWPFq8e8ia3qXdQakevY9WnO0r5d6FJTRdKgvxA4lmlquO8PLHVWaXywzMc?=
- =?us-ascii?Q?3lbPp4grInpH/5cIZP6zc5s82vVBhp1ebskxDcqmHDh0eg1Yu4BGpVmbIBfj?=
- =?us-ascii?Q?l1vHvlpBQi9oOKI9RHriqpOJlU8+a697W/SnFe1jAtoRd8em/kGeazSZlFMv?=
- =?us-ascii?Q?3wt3iDOOreE65x+9sJSAgdr/mTiQIZMzupD0oY6sKRFXmHov//iiHw0xeWnw?=
- =?us-ascii?Q?g3srf9FwHF34SgwCNtTPXTOx6DKeu2GdkxRqMpFln2efiwPO0E3NUHJUoIa1?=
- =?us-ascii?Q?L6eFdk8uVYx2xU1ZNr3fKi4TcvRZV0faJUfbvGLhyGfRlobeffirHMeuGIlX?=
- =?us-ascii?Q?pIMYR0FQaAxn3UFKkUBRXa8i1sASYhItSBYHgnc7tCjEV4t+e6zZpMPJ6pO+?=
- =?us-ascii?Q?18ajiX6aT9BxEmKGhPXik90OerLZw5qk?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ZQjTuCa2dUSzI3aIL5rftxgyNV0TN4+44kkuJQv38ovGlrGqZNbRtDrrVTZu?=
- =?us-ascii?Q?8LFIlWDEqDBAIVAPhd/uoUl4d8lmBcGZZgU3DYrL3HMFAVjkHTxOob9Bj03l?=
- =?us-ascii?Q?jQC3T3VWamfW6Kekfz1MjDvl8Yl2ofAP2ZYHAi5hHiPriHLm/MJEkWKkdMss?=
- =?us-ascii?Q?7OyaG3pN43LZnEgjk6CDbR/NWz/fIK9nRDb0TwtWTJEAiMsIECg1OUARjWBL?=
- =?us-ascii?Q?yGkWutMLt/nUaVrlvvKKmd6d/qo6D6JHXWP2is//z6da8nVPuNptDuyV6sAW?=
- =?us-ascii?Q?2v5U3uWxT6zE5bBEjP7OikRSVn3W3mvZ5T+0ZGIwb9W7q7aVkyCbv5yKyTF3?=
- =?us-ascii?Q?vqoxbCs5IdaAKp4MIJ4srSq2Y7nZ1Yffql+h7DpnnfoobvN1rr2ls1Xc8Jq0?=
- =?us-ascii?Q?yCWVosEy3y9ri31Nj6Fdb68GP+q5UDDQGx9FBzTONkBrhTBSH/SVaJKlKHQb?=
- =?us-ascii?Q?sq1KkQN/hcmQXbgECPNMMa6EKoFSraAZ3rodJavvQcJCHu6XQHJXDCBuKLho?=
- =?us-ascii?Q?le2pAh14onp8FWSK/GGitt2RHQQv2rD+AcI6++1ocSwBJ5PPhI5+myBCDnWY?=
- =?us-ascii?Q?UG47tjW3NTkF3/Di5ORjvzsPYOaEEtNR/hAmqEhnAHy0GEoSEwqtGLK11aUo?=
- =?us-ascii?Q?DLLL+EXQKDhfF87XuG7mpvTCZK1XbWEVVM25xThQ4UhJwjupmJDigv0Xvb6i?=
- =?us-ascii?Q?Ki7OiH45jOp97/uPF0dJwbep2c1vnSsnESMTH4mEWZAXoAKM5GxFoUA9QMKm?=
- =?us-ascii?Q?qC4E+ahGYx7yM7ClgJ7QdXvW+iE1ELfiiWZs/1ih0ZYXbagFCO9TPCSogxBb?=
- =?us-ascii?Q?YsFsWXBKWmYXYHJFWZCzA8GPkIYJ1jRkhe5/nRFguPDDYj1zTK6RNLRHmVg9?=
- =?us-ascii?Q?ZyngMS5/gf+JL07Cg/g5nepT+aILk9ih6ljOkAAZFIuq82WU+s51zVo0x4A3?=
- =?us-ascii?Q?H37rpQGFltfYm228iViGT6b6X+XNMppsvhAi6jgT2tGHDlaHyyb4MPjQnlHd?=
- =?us-ascii?Q?J6Czyyb406D7MSyTZUfpq8uC+GngZ+ZF/2PiJZYHcEQOUM/q81EbUsoAZrsr?=
- =?us-ascii?Q?h2FoxXfffkaCQm5mf/NiOZyNbY5HeM4dNExTWwEB6fbGQHhDGVwva1XRjy1G?=
- =?us-ascii?Q?Yz3grqqT9YehVh7rDjlBe9+nlxjlDD+bRH1S5TkOV3FQiCs+mAritGM9pxiQ?=
- =?us-ascii?Q?okWfGByCWZ38CZVOF453yt6MPjjVshSBu2JJfPgSvOadpvhCimbwXZ5Sz/Q2?=
- =?us-ascii?Q?Ijr2hAI6ZjIj2r9uv8+KtZWc7/qlcaX+/MveJkR0AwvpWKIjgmspvvNnZHri?=
- =?us-ascii?Q?P+CoHYL1fUiUcsnYzzLvBDOjvJ/adZTxQMN1rqLMTHO1rCssqo3+pQfJow5Y?=
- =?us-ascii?Q?bCug+pGXGRNApbuA9fGET66FYbQqciY5wAzNpcXFWIqY4JxEZkVMaNy01emb?=
- =?us-ascii?Q?ARYZz6QUf/txHQe7FMHOOM+biqxq5mEIuBcDVqLAKsbGiyu/eBnYb6yEuLcC?=
- =?us-ascii?Q?TLRKrD++Df2uSnwv2eK8p5Udru7bBSZbs53uvTvBRsQpouHxe04C0YCfgRU2?=
- =?us-ascii?Q?e4/cRE/hnILzSRm7e1aBP5DEhe86hzMDOfzQAxKdEUm/qUtGXSvcfbJWXD+8?=
- =?us-ascii?Q?6LlEmtPJM5Ugk1bqhhzCgIc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2456DEDF0FD730419AC04A6E1BDD037E@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqjL1z9K"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749203655;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EGAiLnb730j6bGurI+GhiQXv4/NcgEujlEQU28kMMAI=;
+	b=KqjL1z9K2s7GA4sjoNH1qvIa3jKyZ+AwFnJ1ZLjZcqNEeLa1Io6aY5btMV8OQdjd7Qg22h
+	r2wpwjH5Bntmc/4w7y7Keg83H77Jh5TDkhTS87NCUnEmS1aCSL31Vwmvflw/eFUvhHGftH
+	QQd8iqylqKWlUQu8A4/uW1dj/yxOFEA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-479-VakCkfWONgipVAHGIYKc3g-1; Fri,
+ 06 Jun 2025 05:54:12 -0400
+X-MC-Unique: VakCkfWONgipVAHGIYKc3g-1
+X-Mimecast-MFC-AGG-ID: VakCkfWONgipVAHGIYKc3g_1749203651
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8CCF818003FD;
+	Fri,  6 Jun 2025 09:54:10 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.163])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD89E1956087;
+	Fri,  6 Jun 2025 09:54:06 +0000 (UTC)
+Date: Fri, 6 Jun 2025 17:54:01 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yoav Cohen <yoav@nvidia.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Message-ID: <aEK6uZBU1qeJLmXe@fedora>
+References: <20250522163523.406289-1-ming.lei@redhat.com>
+ <20250522163523.406289-3-ming.lei@redhat.com>
+ <DM4PR12MB6328039487A411B3AF0C678BA96FA@DM4PR12MB6328.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	OXE28FGxZagZFTplQYjaObi03N0U27DsSGplfHyPmBqvqB6WSEXNsYWFy8sz8LJnpeiRLgLM1gpb10pXPS5c7UrQ9kRtzv3sCEh2Po7bG2G6uJQNTp0YCTphP76DZgjUEVunWlO72N/++T6QfHJO3fFLYkoJMWUymEP04ncuTm1cKCY+IhIbopoHFipyvK2PnXkJV3GBuqAgq1NgZzjiysSxxdCbCJUe6ai8Rf85mGsDPnXRH3kvMZisdESzGy1PZI7ge/xQ5Z1mw6Wn3/yWknapETJkLSn6iYhDYIDbRveJ6+MsWfo5koRaBsTRC+lD1YkMfoT2BCcpAg8r7LFjKHkhVRTrtu7gBQ6+1hsWrJVsa04eB8zpxA+wo9aSDrhcJuC2RK5rfQUUSqGzlarqAoFmTNmOniLDtrvkmHri1ki3U+V/RlQ9eFtV3sJXSm9qBuG2oAW05sxokmXhxZGIXlo3bKonJz8GUnO0Npcfp9wtJOiM31c3iR/EFtgXgVbSLMgMA2VduZLZQFnh1Jtpuf/Hj/jkT+QodbpF2TUzU5rwW3zrtXIk59BpNBbax6EUDTRC5xAQUrrYs8adwdyNGhQFd2ACZGJmoprPW1tOlXNEgYyyLemZRa5KlWgwKEea
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19beb01c-da88-4ee5-5a45-08dda4cf6ce3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2025 07:54:54.7873
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LKmrElIH70GOetbguKRLhXwJIFzGfcghYCR0E4mE80WwV554/DCZlM+qcEYwkoUozJmJjcCWGZdHkCpyVyvVSeL+SIARRMhxc5yXO+osSu8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR04MB9732
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM4PR12MB6328039487A411B3AF0C678BA96FA@DM4PR12MB6328.namprd12.prod.outlook.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-To+: Yi,
+Hi Yoav,
 
-On Jun 05, 2025 / 15:02, Daniel Wagner wrote:
-> Hi,
+On Thu, Jun 05, 2025 at 12:37:01PM +0000, Yoav Cohen wrote:
+> Hi Ming,
+> 
+> Thank you for that.
+> Can you please clarify this
+> +/* Wait until each hw queue has at least one idle IO */
+> what do you exactly wait here? and why it is per io queue?
+> As I understand if the wait timedout the operation will be canceled.
 
-Hi Daniel, thank you for the fix actions!
+One idle IO means one active io_uring cmd, so we can use this command
+for notifying ublk server. Otherwise, ublk server may not get chance to
+know the quiesce action.
 
->=20
-> On Thu, May 29, 2025 at 08:46:35AM +0000, Shinichiro Kawasaki wrote:
-> > #1: nvme/023
-> >=20
-> >     When libnvme has version 1.13 or later and built with liburing, nvm=
-e-cli
-> >     command "nvme smart-log" command fails for namespace block devices.=
- This
-> >     makes the test case nvme/032 fail [2]. Fix in libnvme is expected.
-> >=20
-> >     [2]
-> >     https://lore.kernel.org/linux-nvme/32c3e9ef-ab3c-40b5-989a-7aa323f5=
-d611@flourine.local/T/#m6519ce3e641e7011231d955d9002d1078510e3ee
->=20
-> Should be fixed now. If you want, I can do another release soon, so the
-> fix get packaged up by the distros.
+Because each queue may have standalone task context.
 
-As of today, CKI project keeps on reporting the failure:
+The condition should be satisfied easily in any implementation, but please
+let me if it could be one issue in your ublk server implementation.
 
-  https://datawarehouse.cki-project.org/kcidb/tests/redhat:1851238698-aarch=
-64-kernel_upt_7
+Big reason is that ublk doesn't have one such admin command for
+housekeeping.
 
-Yi, do you think the new libnvme release will help to silence the failure
-reports? I'm guessing the release will help RedHat to pick up and apply to =
-CKI
-blktests runs.
+Thanks,
+Ming
+
+
+> 
+> Thank you
+> 
+> ________________________________________
+> From: Ming Lei <ming.lei@redhat.com>
+> Sent: Thursday, May 22, 2025 7:35 PM
+> To: Jens Axboe; linux-block@vger.kernel.org
+> Cc: Uday Shankar; Caleb Sander Mateos; Yoav Cohen; Ming Lei
+> Subject: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+> 
+> External email: Use caution opening links or attachments
+> 
+> 
+> Add feature UBLK_F_QUIESCE, which adds control command `UBLK_U_CMD_QUIESCE_DEV`
+> for quiescing device, then device state can become `UBLK_S_DEV_QUIESCED`
+> or `UBLK_S_DEV_FAIL_IO` finally from ublk_ch_release() with ublk server
+> cooperation.
+> 
+> This feature can help to support to upgrade ublk server application by
+> shutting down ublk server gracefully, meantime keep ublk block device
+> persistent during the upgrading period.
+> 
+> The feature is only available for UBLK_F_USER_RECOVERY.
+> 
+> Suggested-by: Yoav Cohen <yoav@nvidia.com>
+> Link: https://lore.kernel.org/linux-block/DM4PR12MB632807AB7CDCE77D1E5AB7D0A9B92@DM4PR12MB6328.namprd12.prod.outlook.com/
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c      | 124 +++++++++++++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h |  19 ++++++
+>  2 files changed, 142 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index fbd075807525..6f51072776f1 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -51,6 +51,7 @@
+>  /* private ioctl command mirror */
+>  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> +#define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+> 
+>  #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+>  #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+> @@ -67,7 +68,8 @@
+>                 | UBLK_F_ZONED \
+>                 | UBLK_F_USER_RECOVERY_FAIL_IO \
+>                 | UBLK_F_UPDATE_SIZE \
+> -               | UBLK_F_AUTO_BUF_REG)
+> +               | UBLK_F_AUTO_BUF_REG \
+> +               | UBLK_F_QUIESCE)
+> 
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>                 | UBLK_F_USER_RECOVERY_REISSUE \
+> @@ -2841,6 +2843,11 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+>                 return -EINVAL;
+>         }
+> 
+> +       if ((info.flags & UBLK_F_QUIESCE) && !(info.flags & UBLK_F_USER_RECOVERY)) {
+> +               pr_warn("UBLK_F_QUIESCE requires UBLK_F_USER_RECOVERY\n");
+> +               return -EINVAL;
+> +       }
+> +
+>         /*
+>          * unprivileged device can't be trusted, but RECOVERY and
+>          * RECOVERY_REISSUE still may hang error handling, so can't
+> @@ -3233,6 +3240,117 @@ static void ublk_ctrl_set_size(struct ublk_device *ub, const struct ublksrv_ctrl
+>         set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
+>         mutex_unlock(&ub->mutex);
+>  }
+> +
+> +struct count_busy {
+> +       const struct ublk_queue *ubq;
+> +       unsigned int nr_busy;
+> +};
+> +
+> +static bool ublk_count_busy_req(struct request *rq, void *data)
+> +{
+> +       struct count_busy *idle = data;
+> +
+> +       if (!blk_mq_request_started(rq) && rq->mq_hctx->driver_data == idle->ubq)
+> +               idle->nr_busy += 1;
+> +       return true;
+> +}
+> +
+> +/* uring_cmd is guaranteed to be active if the associated request is idle */
+> +static bool ubq_has_idle_io(const struct ublk_queue *ubq)
+> +{
+> +       struct count_busy data = {
+> +               .ubq = ubq,
+> +       };
+> +
+> +       blk_mq_tagset_busy_iter(&ubq->dev->tag_set, ublk_count_busy_req, &data);
+> +       return data.nr_busy < ubq->q_depth;
+> +}
+> +
+> +/* Wait until each hw queue has at least one idle IO */
+> +static int ublk_wait_for_idle_io(struct ublk_device *ub,
+> +                                unsigned int timeout_ms)
+> +{
+> +       unsigned int elapsed = 0;
+> +       int ret;
+> +
+> +       while (elapsed < timeout_ms && !signal_pending(current)) {
+> +               unsigned int queues_cancelable = 0;
+> +               int i;
+> +
+> +               for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +                       struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> +
+> +                       queues_cancelable += !!ubq_has_idle_io(ubq);
+> +               }
+> +
+> +               /*
+> +                * Each queue needs at least one active command for
+> +                * notifying ublk server
+> +                */
+> +               if (queues_cancelable == ub->dev_info.nr_hw_queues)
+> +                       break;
+> +
+> +               msleep(UBLK_REQUEUE_DELAY_MS);
+> +               elapsed += UBLK_REQUEUE_DELAY_MS;
+> +       }
+> +
+> +       if (signal_pending(current))
+> +               ret = -EINTR;
+> +       else if (elapsed >= timeout_ms)
+> +               ret = -EBUSY;
+> +       else
+> +               ret = 0;
+> +
+> +       return ret;
+> +}
+> +
+> +static int ublk_ctrl_quiesce_dev(struct ublk_device *ub,
+> +                                const struct ublksrv_ctrl_cmd *header)
+> +{
+> +       /* zero means wait forever */
+> +       u64 timeout_ms = header->data[0];
+> +       struct gendisk *disk;
+> +       int i, ret = -ENODEV;
+> +
+> +       if (!(ub->dev_info.flags & UBLK_F_QUIESCE))
+> +               return -EOPNOTSUPP;
+> +
+> +       mutex_lock(&ub->mutex);
+> +       disk = ublk_get_disk(ub);
+> +       if (!disk)
+> +               goto unlock;
+> +       if (ub->dev_info.state == UBLK_S_DEV_DEAD)
+> +               goto put_disk;
+> +
+> +       ret = 0;
+> +       /* already in expected state */
+> +       if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+> +               goto put_disk;
+> +
+> +       /* Mark all queues as canceling */
+> +       blk_mq_quiesce_queue(disk->queue);
+> +       for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +               struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> +
+> +               ubq->canceling = true;
+> +       }
+> +       blk_mq_unquiesce_queue(disk->queue);
+> +
+> +       if (!timeout_ms)
+> +               timeout_ms = UINT_MAX;
+> +       ret = ublk_wait_for_idle_io(ub, timeout_ms);
+> +
+> +put_disk:
+> +       ublk_put_disk(disk);
+> +unlock:
+> +       mutex_unlock(&ub->mutex);
+> +
+> +       /* Cancel pending uring_cmd */
+> +       if (!ret)
+> +               ublk_cancel_dev(ub);
+> +       return ret;
+> +}
+> +
+>  /*
+>   * All control commands are sent via /dev/ublk-control, so we have to check
+>   * the destination device's permission
+> @@ -3319,6 +3437,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+>         case UBLK_CMD_START_USER_RECOVERY:
+>         case UBLK_CMD_END_USER_RECOVERY:
+>         case UBLK_CMD_UPDATE_SIZE:
+> +       case UBLK_CMD_QUIESCE_DEV:
+>                 mask = MAY_READ | MAY_WRITE;
+>                 break;
+>         default:
+> @@ -3414,6 +3533,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+>                 ublk_ctrl_set_size(ub, header);
+>                 ret = 0;
+>                 break;
+> +       case UBLK_CMD_QUIESCE_DEV:
+> +               ret = ublk_ctrl_quiesce_dev(ub, header);
+> +               break;
+>         default:
+>                 ret = -EOPNOTSUPP;
+>                 break;
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> index 1c40632cb164..56c7e3fc666f 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -53,6 +53,8 @@
+>         _IOR('u', 0x14, struct ublksrv_ctrl_cmd)
+>  #define UBLK_U_CMD_UPDATE_SIZE         \
+>         _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
+> +#define UBLK_U_CMD_QUIESCE_DEV         \
+> +       _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
+> 
+>  /*
+>   * 64bits are enough now, and it should be easy to extend in case of
+> @@ -253,6 +255,23 @@
+>   */
+>  #define UBLK_F_AUTO_BUF_REG    (1ULL << 11)
+> 
+> +/*
+> + * Control command `UBLK_U_CMD_QUIESCE_DEV` is added for quiescing device,
+> + * which state can be transitioned to `UBLK_S_DEV_QUIESCED` or
+> + * `UBLK_S_DEV_FAIL_IO` finally, and it needs ublk server cooperation for
+> + * handling `UBLK_IO_RES_ABORT` correctly.
+> + *
+> + * Typical use case is for supporting to upgrade ublk server application,
+> + * meantime keep ublk block device persistent during the period.
+> + *
+> + * This feature is only available when UBLK_F_USER_RECOVERY is enabled.
+> + *
+> + * Note, this command returns -EBUSY in case that all IO commands are being
+> + * handled by ublk server and not completed in specified time period which
+> + * is passed from the control command parameter.
+> + */
+> +#define UBLK_F_QUIESCE         (1ULL << 12)
+> +
+>  /* device state */
+>  #define UBLK_S_DEV_DEAD        0
+>  #define UBLK_S_DEV_LIVE        1
+> --
+> 2.47.0
+> 
+
+-- 
+Ming
+
