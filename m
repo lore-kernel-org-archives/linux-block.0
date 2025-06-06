@@ -1,115 +1,220 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C705288512;
-	Fri,  6 Jun 2025 11:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075922882BC
+	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 12:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749211182; cv=none; b=QvgZEcMN0dnWGttdsBXlwv49LiQ7+ZdgblAkF2gwslA60snHbJAR3ymMysGhk0710IhDvR/zxZ7ZhGYjdnpd/qmSBCgq/ljHLwBttN6oEOHmi7i6BGuyV++G4j3309gSYGGkhiKq79EmJ+38XYQRMf0VGZgf1/D8NuMmcZPjGY4=
+	t=1749211418; cv=none; b=J1/0hQqbEx15tlufA85Apl8T6yPKIm4ugdlA0QXY/UEdhixQ8gcKChz51GcNNn//eW69h66s13nkoHmV5n33gdb6OYUXzVPdTUDIvFawm5jX3dJzUvS7EWHUPxDuOWQaOzdqnDB+5mgg7UONudFhlGH0fK9Y2QFyEE9SsKQJ4Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749211182; c=relaxed/simple;
-	bh=NLvxgLiSwmCva350O7nzLbptINcNkO/BdNtdmPgqvHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ESfQB6NbTPoye4cHtjPkL0gVN5p72+DCh3zWNBQjJm2mbfd0/38XYmLQn5Awi2UH4y2rUMz4h1TifnCaVrPYnkRfNrNwcJNfq/6mY3tpfcrCIt7GXi4162Q45I+3tl4j6VhdSJkIfA9f21qftim/Dba+r0aIzVI2UCH446Mau8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YO/YvlNg; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749211418; c=relaxed/simple;
+	bh=h89U6Qw/O7+zWjtR0rRZpwPXVVrxvuHqF05CLmLssdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Exsew/qxJ5dx6zpDjjO7KAKzSJJiRAKq2e3GBYcg1sdFFNzlEkMC1bXY0Zs3kem5Gowa3Nvp3WRY3nuxf2IEwKhUq10rz+Xga7All6g3IkYqlOzmFJZ8B2jW56ZxN6MViVxkTkYlBkUfhvwp/zvdTTkW4NoZPBc7wDkEi8jrRjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KfvBfa/L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YO/YvlNg"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ade30256175so46055066b.1;
-        Fri, 06 Jun 2025 04:59:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749211179; x=1749815979; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qmUWlsWrraVeinmVRofjXaqZbS/GW/OwgmarsrAe2FY=;
-        b=YO/YvlNgwNiLhuYVEHan+8n0QtsLD/8DzOKnI1HbvTFCWu+w3aKa7+udN4UaTef996
-         vC35GZpcz1HX5NOb+qaazGB5a1e07yF2xZH4CKV8u/zts0ystnEHTWKXiF2fPWK2dQj+
-         U+gp97an2oa+XV6KESBcpyN1o+4f4xoxNDhqMSodKQiDlvoRdFo3CBFGH2D0EC4AoCNB
-         XXJ6X3FNbA9RzXeycm8yujV0DWsJcthSpgrImDO3+Kb0XAGp+iGrrSHViaUIIGDF3Jva
-         6pOymSORvjbJ8gQfWfSdfjquvoDQNu4TUHoL8OYLft0POL95zC3uNr45FWYFIOdt/vFt
-         tY0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749211179; x=1749815979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qmUWlsWrraVeinmVRofjXaqZbS/GW/OwgmarsrAe2FY=;
-        b=txJc4m/ADmTTU99jdmOHRIYX/+5YpG10FG9uk0EJwU2GZcZWI249gAS8ogYE5UWeER
-         PwkNKLSC3/g0yTtnjoJmvxQ09dm4FDJRHklXI/UTU886CgSktURugpYeAV89LG+sKqu2
-         Eg6xGMUOsoAziIfNXbjZoJV9jf21WHd47JU6MnqcYjtbRQkZQlznW1o8jwJxwSPGfVch
-         UN5zJ8bvx5npqT+DTyB4JCcDT31WTznSfbpfrOoVyriXrR9jASlVoJel28w25Bc3wzUy
-         xkFFi/qok5Gcb892jv5HyA+2VxnB59ENlGFrdQqPyV+jQpZsFS3XwTqMqBJ1nPtgPJeL
-         3CtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9642T8h4sP6twZD3n9NS62+UgLz4vnOT5VFegjloxFq0HPzNmUEpkIJyoxj5dX+eTkh6x1sRxPYXl7NYWew==@vger.kernel.org, AJvYcCUnhN0VFrc7FniG9c0wiNPPATNQFMiwioVpCWfgaNc2qByeynwwSL1B/5e6FE7oFDbPInI96xnRkV+wzA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5/qGl6NfiO5pT2DzlTm9LkNc7vmESf/0VGb+7iiTB6BzpC9oQ
-	h6YZHGTUBnneNkQ9kfzGZ73an52oUr/uaIvuV2pGmQgSOUsyPwuN82dME0uPkMnyHRn7DKFtbbE
-	597Yvq+IGFaq/fxYoL1hlytlw+Q2PYQ==
-X-Gm-Gg: ASbGncvEyU2V8HP0j4KP6FlG5+Ta0hAVxsVKgnifcFeJTjPAxfKi34447C1vi2oXblK
-	F65/zjiFmFOaYMxN3W/+4mjlshbqqJ1QmByaqmsOlna3R6Y9X8qc7Ff/JIhwXD/D5YbmSv+HnWM
-	99uW/5oSzxOf/wZEKwXhSHKga2S9by9V1U7/bi+PpRq7EI72HRLaQsc7UygSMr3MbG4up/o/uF7
-	Q==
-X-Google-Smtp-Source: AGHT+IGuAVhDuKk4Tc5pEPCP/53Ju5rt6SIGT5m4MDH2vNfgJIraGRbQvbTKpI053fLTjcMfMcbkBpepZxUJeBvD3TI=
-X-Received: by 2002:a17:907:3f14:b0:ad8:8719:f6f3 with SMTP id
- a640c23a62f3a-ade1a932e69mr253948366b.22.1749211179058; Fri, 06 Jun 2025
- 04:59:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfvBfa/L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749211412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0rZWMf5A/8ML9Zgbk1gnnvgyhUXpIeGhMtrap/ltBdk=;
+	b=KfvBfa/LgAZgX5AUcRaS7/dROFfSxpLkDUDDK1NzNDkAc+cAdxzUxOeNi56dWhFDiyTqAb
+	IbL2DxtM7DRgCNcqV36IZIaOSK19Ahd2xVFi0RzCFjCEPk75B64+eXEcbEyZznJRUsj7kt
+	BYy2ugfLdfxUuZCFZ+anzsZYJX0ovCQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-8YHooEKpOCOMMsZ-HlVsmQ-1; Fri,
+ 06 Jun 2025 08:03:29 -0400
+X-MC-Unique: 8YHooEKpOCOMMsZ-HlVsmQ-1
+X-Mimecast-MFC-AGG-ID: 8YHooEKpOCOMMsZ-HlVsmQ_1749211407
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1DE0619560A2;
+	Fri,  6 Jun 2025 12:03:27 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.163])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D6FE18002A5;
+	Fri,  6 Jun 2025 12:03:20 +0000 (UTC)
+Date: Fri, 6 Jun 2025 20:03:16 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>,
+	Ofer Oshri <ofer@nvidia.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	Jared Holzman <jholzman@nvidia.com>, Yoav Cohen <yoav@nvidia.com>,
+	Guy Eisenberg <geisenberg@nvidia.com>, Omri Levi <omril@nvidia.com>,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: ublk: RFC fetch_req_multishot
+Message-ID: <aELZBPmYUMHDbusQ@fedora>
+References: <IA1PR12MB606744884B96E0103570A1E9B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
+ <CADUfDZo=uEno=4-3PJAD+_5sLRMaoFvMUGpckbD3tdbhCxTW4A@mail.gmail.com>
+ <IA1PR12MB60672D37508D641368D211B8B6852@IA1PR12MB6067.namprd12.prod.outlook.com>
+ <CADUfDZqUQ+n5tr=XG+sJWR_q55fzNSzLHvUZXkysOw=c+vfVGg@mail.gmail.com>
+ <aAscRPVcTBiBHNe7@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605150729.2730-1-anuj20.g@samsung.com> <CGME20250605150746epcas5p1cf96907472d8a27b0d926b9e2f943e70@epcas5p1.samsung.com>
- <20250605150729.2730-3-anuj20.g@samsung.com> <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
-In-Reply-To: <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Fri, 6 Jun 2025 17:29:02 +0530
-X-Gm-Features: AX0GCFsp8juhknUXDp5sOulFNclYQn8fpeoPEV3LFMx8t21OLoGFonqOrOPc3Bo
-Message-ID: <CACzX3AujmHHvzBVta2fjrQvytscv5kS0NSgt4iUq-LtXP167BA@mail.gmail.com>
-Subject: Re: [PATCH for-next v2 2/2] fs: add ioctl to query protection info capabilities
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, jack@suse.cz, 
-	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	hch@infradead.org, ebiggers@kernel.org, adilger@dilger.ca, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	joshi.k@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aAscRPVcTBiBHNe7@fedora>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, Jun 6, 2025 at 7:37=E2=80=AFAM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
->
-> Hi Anuj!
->
-> > A new structure struct fs_pi_cap is introduced, which contains the
-> > following fields:
->
-> Maybe fs_metadata_cap and then fmd_ as prefix in the struct?
->
->
-> > +     case FS_IOC_GETPICAP:
-> > +             return blk_get_pi_cap(bdev, argp);
->
-> FS_IOC_METADATA_CAP?
->
+On Fri, Apr 25, 2025 at 01:23:16PM +0800, Ming Lei wrote:
+> On Thu, Apr 24, 2025 at 12:07:32PM -0700, Caleb Sander Mateos wrote:
+> > On Thu, Apr 24, 2025 at 11:58 AM Ofer Oshri <ofer@nvidia.com> wrote:
+> > >
+> > >
+> > >
+> > > ________________________________
+> > > From: Caleb Sander Mateos <csander@purestorage.com>
+> > > Sent: Thursday, April 24, 2025 9:28 PM
+> > > To: Ofer Oshri <ofer@nvidia.com>
+> > > Cc: linux-block@vger.kernel.org <linux-block@vger.kernel.org>; ming.lei@redhat.com <ming.lei@redhat.com>; axboe@kernel.dk <axboe@kernel.dk>; Jared Holzman <jholzman@nvidia.com>; Yoav Cohen <yoav@nvidia.com>; Guy Eisenberg <geisenberg@nvidia.com>; Omri Levi <omril@nvidia.com>
+> > > Subject: Re: ublk: RFC fetch_req_multishot
+> > >
+> > > External email: Use caution opening links or attachments
+> > >
+> > >
+> > > On Thu, Apr 24, 2025 at 11:19 AM Ofer Oshri <ofer@nvidia.com> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > Our code uses a single io_uring per core, which is shared among all block devices - meaning each block device on a core uses the same io_uring.
+> > > >
+> > > > Let’s say the size of the io_uring is N. Each block device submits M UBLK_U_IO_FETCH_REQ requests. As a result, with the current implementation, we can only support up to P block devices, where P = N / M. This means that when we attempt to support block device P+1, it will fail due to io_uring exhaustion.
+> > >
+> > > What do you mean by "size of the io_uring", the submission queue size?
+> > > Why can't you submit all P * M UBLK_U_IO_FETCH_REQ operations in
+> > > batches of N?
+> > >
+> > > Best,
+> > > Caleb
+> > >
+> > > N is the size of the submission queue, and P is not fixed and unknown at the time of ring initialization....
+> > 
+> > I don't think it matters whether P (the number of ublk devices) is
+> > known ahead of time or changes dynamically. My point is that you can
+> > submit the UBLK_U_IO_FETCH_REQ operations in batches of N to avoid
+> > exceeding the io_uring SQ depth. (If there are other operations
+> > potentially interleaved with the UBLK_U_IO_FETCH_REQ ones, then just
+> > submit each time the io_uring SQ fills up.) Any values of P, M, and N
+> > should work. Perhaps I'm misunderstanding you, because I don't know
+> > what "io_uring exhaustion" refers to.
+> > 
+> > Multishot ublk io_uring operations don't seem like a trivial feature
+> > to implement. Currently, incoming ublk requests are posted to the ublk
+> > server using io_uring's "task work" mechanism, which inserts the
+> > io_uring operation into an intrusive linked list. If you wanted a
+> > single ublk io_uring operation to post multiple completions, it would
+> > need to allocate some structure for each incoming request to insert
+> > into the task work list. There is also an assumption that the ublk
+> > io_uring operations correspond 1-1 with the blk-mq requests for the
+> > ublk device, which would be broken by multishot ublk io_uring
+> > operations.
+> 
+> For delivering ublk io command to ublk server, I feel multishot can be
+> used in the following way:
+> 
+> - use IORING_OP_READ_MULTISHOT to read from ublk char device, do it for
+>   each queue, queue id may be passed via offset
+> 
+> - block in ublk_ch_read_iter() if nothing comes from this queue of the
+> ublk block device
+> 
+> - if any ublk block io comes, fill `ublksrv_io_desc` in mmapped area, and
+> push the 'tag' to the read ring buffer(provided buffer)
+> 
+> - wakeup the read IO after one whole IO batch is done
+> 
+> For commit ublk io command result to ublk driver, it can be similar with
+> delivering by writing 'tag' to ublk char device via IORING_OP_WRITE_FIXED or
+> IORING_OP_WRITE, still per queue via ring_buf approach, but need one mmapped
+> buffer for storing the io command result, 4 bytes should be enough for each io.
+> 
+> With the above way:
+> 
+> - use read/write to deliver io command & commit io command result, so
+>   single read/write replaces one batch of uring_cmd
+> 
+> - needn't uring command any more, big security_uring_cmd() cost can be avoided
+> 
+> - memory footprint is reduced a lot, no extra uring_cmd for each IO
+> 
+> - extra task work scheduling is avoided
+> 
+> - Probably uring exiting handling can be simplified too.
+> 
+> 
+> Sounds like ublk 2.0 prototype, :-)
 
-Hi Martin,
+I have been working towards this direction:
 
-Thanks for the suggestion. I see your point =E2=80=94 especially from the N=
-VMe
-perspective, where integrity buffer can be larger than just the PI
-tuple.
+https://github.com/ming1/linux/commits/ublk2-cmd-batch/
 
-However, since this ioctl is also intended to work on regular files,
-where "metadata" usually refers to inode-level attributes, timestamps,
-permissions, etc., I worry that FS_IOC_METADATA_CAP and fs_metadata_cap
-might be confusing in the broader filesystem context.
+by adding three new batch commands, all are per-queue:
 
-Using  FS_IOC_GETPI_CAP and struct fs_pi_cap seems more narrowly scoped
-and avoids that ambiguity. Do you see this differently? Or if you have a
-better alternative in mind, I=E2=80=99d be happy to consider it.
+`UBLK_U_IO_FETCH_IO_CMDS`
+	
+	- multishot with provided buffer
+
+	- issued once, CQE is posted after new io/io batch is coming by filling
+	io tag into the provided buffer
+
+	- re-issue after the whole buffer is used up, so issue cost is reduced
+
+	- multiple `UBLK_U_IO_FETCH_IO_CMDS` are allowed to be issued concurrently
+	from different task contexts for supporting load balance
+
+	- each `UBLK_U_IO_FETCH_IO_CMDS` can carry 'priority' info for supporting
+	prioritized schedule, not done yet, should be easier to implement
+
+`UBLK_U_IO_COMMIT_IO_CMDS`
+
+	- this command has a fixed buffer, in which io tag, io command result
+	and other info(buf_index) for FETCH is provided, and multiple IOs or
+	batch IO are covered
+
+`UBLK_U_IO_PREP_IO_CMDS`:
+
+	batch version of `UBLK_IO_FETCH_REQ`, still has one fixed buffer for
+	carrying io tag, info for fetch, similar with `UBLK_U_IO_COMMIT_IO_CMDS`
+
+In this way, lots of existing ublk constraint are relaxed:
+
+- any of the three command can be issued from any task context, there isn't
+  per-io task or ubq_daemon limit any more. But AUTO_BUF_REG is one
+  exception, which requires FETCH and COMMIT command are in same io_ring_ctx.
+
+- easier to support load balance, any IO commands fetched by the command
+of `UBLK_U_IO_FETCH_IO_CMDS` can be handled in the task for issuing
+UBLK_U_IO_FETCH_IO_CMDS
+
+- both FETCH and COMMIT are handled in batch way, communication cost is
+reduced.
+
+One drawback is that cost is added in client IO issue side(ublk_queue_rq() and
+ublk_queue_rqs()), goodness is that communication cost is reduced in ublk server
+side. 
+
+Simple test running on one server shows that performance is good
+
+- kublk(`--batch --auto_zc -q 2` vs. `--auto_zc -q 2`): ~10% IOPS improvement
+
+The feature is still in very early stage, and any comments are welcome!
+
+
 
 Thanks,
-Anuj Gupta
+Ming
+
