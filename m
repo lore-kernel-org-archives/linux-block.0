@@ -1,164 +1,115 @@
-Received: from ZRAP278CU002.outbound.protection.outlook.com (mail-switzerlandnorthazon11020089.outbound.protection.outlook.com [52.101.186.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E6C2882A6
-	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 11:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.186.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749209603; cv=fail; b=pmQTcFPmwhp9+PZEoiEAtJL/2uIOLR9+YAFJaUpejMa/ylEYWvpzrWHlSOuZtTyHuqO75Y8fPcJVMKvgWt3Pi9+Ci3dMbXlCCS2NVWIu4JOKTdHNOkdoqpFlcQNhVGPFIS1xtBoCuyMoRV2Oxp83SFHr9lcJPnU+bC1lSX/jhzQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749209603; c=relaxed/simple;
-	bh=Ihy5+JaMOhO12v1drwkGG2Xm09PhcG8xz+Qayia6R9Y=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pLUajeefA6vIEl/Pj17fxTLMZOs2RsC2ktK2Xq/XSdmkfTh13PDTQdQ6VLKY+H22YFv/j2Q9vFMrkjCJOLPtS2d2l1Fi7XxwUv1U2OjF8gAwNhPv+TmvDSFaGWQZyMNqEiGvs9TZ/fvM9J2+3mYPHqDQxCH4p0IRU01Pc17bIaY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konplan.com; spf=pass smtp.mailfrom=konplan.com; dkim=pass (1024-bit key) header.d=konplan.com header.i=@konplan.com header.b=fykEJ7Nf; arc=fail smtp.client-ip=52.101.186.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konplan.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=konplan.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C705288512;
+	Fri,  6 Jun 2025 11:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749211182; cv=none; b=QvgZEcMN0dnWGttdsBXlwv49LiQ7+ZdgblAkF2gwslA60snHbJAR3ymMysGhk0710IhDvR/zxZ7ZhGYjdnpd/qmSBCgq/ljHLwBttN6oEOHmi7i6BGuyV++G4j3309gSYGGkhiKq79EmJ+38XYQRMf0VGZgf1/D8NuMmcZPjGY4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749211182; c=relaxed/simple;
+	bh=NLvxgLiSwmCva350O7nzLbptINcNkO/BdNtdmPgqvHk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ESfQB6NbTPoye4cHtjPkL0gVN5p72+DCh3zWNBQjJm2mbfd0/38XYmLQn5Awi2UH4y2rUMz4h1TifnCaVrPYnkRfNrNwcJNfq/6mY3tpfcrCIt7GXi4162Q45I+3tl4j6VhdSJkIfA9f21qftim/Dba+r0aIzVI2UCH446Mau8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YO/YvlNg; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=konplan.com header.i=@konplan.com header.b="fykEJ7Nf"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HANKD6A8niCuZnDaiO6Z9cZYjonMtLRfUCGPZHBgtmyTWx5l2ZbwTX5TV1LGjoZtkwXqWMhT/RbJLqMf14Rfi9jDSR9W8eDVBFsN4LMvD8DjIXSZEzareTSerTUJcZMj1Mt5XygTVdP1G9FYlOzRw2wNEQIzRYUC2ZlSKojcIApf39IaUH2ndbr4jyU0+39TndzEDygo28TUJ04tTUgHNQMyooF8cesmbweFCqqkslvX8LN1/1QC6uqWD50WdtPM5RdgpyOhSzilH6G9banoFHZkGWgw3eHPPU9Pe4ZOSYddZdcMVNtrRm33wnUT0b5H2P35E1qzlusxd1gZdCb3zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ihy5+JaMOhO12v1drwkGG2Xm09PhcG8xz+Qayia6R9Y=;
- b=VrSeJxIVBgZMgTS7aKbhk679EJArZ3h/vmFdZNhr99/5lNUGhhkjrBemLGnNsJNOh3VRqWn8b5h/vfOKY69vYmj1hKlqqiI+etf/qS7iCGBx2ynTHTKxUQL6xtRGYr5hLy7p9S5PQVEOabb7SPk42FX3piJqvL471RqWzdGuCTJu9kwn0NNfhfhgXupwclG5pR/aB5hSweKu3eHpzDETDGZBcbYvV3aMdHJ/WSdNrEFUyckmBcLoCHZbdyvhor1hufWarCpy0fZ75ibws+nXPHF4ZjHaW2e6V415HFf2tKyzcBpFu1Bp5N1Mw0LEK6q0P18xXc2PBl+gtC2RdVMHkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=konplan.com; dmarc=pass action=none header.from=konplan.com;
- dkim=pass header.d=konplan.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=konplan.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ihy5+JaMOhO12v1drwkGG2Xm09PhcG8xz+Qayia6R9Y=;
- b=fykEJ7Nfze/eZTq+YVkGly+EPt/eFvVMuKO7gHirpcHUhORstcttnKgRz44az1VdVXzySQ4H/jI0H271M78GmVvjnWVBjVzmZeW/hDwI0lEkOQMp76MyQqdwwdm668WnsNDOkYsl8hcqIDPOb7D2K0RUufMEpQH4gtVJD5aOIPk=
-Received: from ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:4f::5) by
- GV1PPF29B75DA31.CHEP278.PROD.OUTLOOK.COM (2603:10a6:718::20a) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8813.23; Fri, 6 Jun 2025 11:33:17 +0000
-Received: from ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM
- ([fe80::5910:34b8:ee79:cdb4]) by ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM
- ([fe80::5910:34b8:ee79:cdb4%6]) with mapi id 15.20.8813.021; Fri, 6 Jun 2025
- 11:33:17 +0000
-From: Sebastian Priebe <sebastian.priebe@konplan.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: BLOCK_LEGACY_AUTOLOAD not default y in Linux 5.15.179+
-Thread-Topic: BLOCK_LEGACY_AUTOLOAD not default y in Linux 5.15.179+
-Thread-Index: AdvW1aaQBxx+HVyZTOy8fPvAxuoYWw==
-Date: Fri, 6 Jun 2025 11:33:17 +0000
-Message-ID:
- <ZR0P278MB074311EF693354CBB59FD5029F6EA@ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-bromium-msgid: 9ebbc266-0686-49ac-a764-d1e5a821a092
-x-codetwoprocessed: true
-x-codetwo-clientsignature-inserted: true
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=konplan.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: ZR0P278MB0743:EE_|GV1PPF29B75DA31:EE_
-x-ms-office365-filtering-correlation-id: 25e15123-91b9-47f6-b27c-08dda4edeea6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|10070799003|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?FncJ/cOYUFWEaKoKWbXB2OfgdGSNIA5WONLM5FiNbLvdQF0O0uJfFXR0PXgF?=
- =?us-ascii?Q?19iu+ZjA6ofPDsfS27ZBy4JUkvbxK1HsMltrV/snaV28Aq/tIIdOKTuvIyRc?=
- =?us-ascii?Q?9Ry2W2UL7y3adJl1pFve+eLBuPyUEWy0Hp7RL+sMfLi6YKLpATHNqomdHeXN?=
- =?us-ascii?Q?MJ6Hx5y/SY/k7tDjzasBICU2mipAZMsEOHD51TsuT6zsb7lpciGPyR0PaK/F?=
- =?us-ascii?Q?fA+wtGnEr3cDWtnD014rZTAVfRH0mf3axrmpRvI2tzK/0yt5XmtWJ7O19KOw?=
- =?us-ascii?Q?/9HY+fzdAeGG/FBf7yf9wiPm1RGMOPJfvlsLxizbEoDUI3+19zKQaOsn0mlD?=
- =?us-ascii?Q?470nDaFXKhDb2yYyfej+QWiXH45HtECXRBWXLIaGZ6rkw2YxvAOLzygK5lX+?=
- =?us-ascii?Q?Qi0p3AcF2atNAfnh34TNnp9vL1IdHhkkmloRQdBlcmI3hw5THvxm33Q6Ouzj?=
- =?us-ascii?Q?1TJbkAON0sqGzyRHKr//9Vs+9O3jWOGLDT+9av/AxtGPCK3QJ7Z3704bjHig?=
- =?us-ascii?Q?xhdMp2eNR/VOnsY3DNeMwIYz5xn39Cu53f3u13tNpm9dNwBnboJ/CMmHOtB3?=
- =?us-ascii?Q?fyIKJeZ+H6VOrWU9+uL8RqYDB9j5RW/tutTvYDB5kVHsxbh9sHhF/fqRE2D3?=
- =?us-ascii?Q?Gs2attU5NDdIj481cYqNFHeReZ347rjM7bbBwBg5YT2XAEcq2djkwaWsjENM?=
- =?us-ascii?Q?9fXdrWiY80eKutMQMLEBWBAohLKLc7fuxgS9/7VlssDjjONrz922yXzAEURa?=
- =?us-ascii?Q?rdp3QHkKocTvLchmuhco7vytI7ZbaI3lnEHIH3PWzPabQMHuyFjKRa7rn6ZX?=
- =?us-ascii?Q?Wpu5CbvckwxuhIktkbwBCY7VCiRNI2vLjSy/d76tKDesE6MMkSR1usTQu8xK?=
- =?us-ascii?Q?6OkSnkIPANbNtHcw57cg1Xy/vhTKQKGbnE12xA2MUD5u3oD7xJ/7JDIr5ZUB?=
- =?us-ascii?Q?BjZHAv6EwqEfLMXttX89rODDpGujfaGSu3sF6qqgFN78DZP5VvGm0+1nHePr?=
- =?us-ascii?Q?2h7oMXTWAnQn0PrVGj2LSZDTQeRevcT8ZAm9gnBHxg1H896uD2DTjvrzr2WF?=
- =?us-ascii?Q?obocz5DepvEjbbxZ8rSM6JMxXGCuTMlq30DvlAb8/zVzFRSF6Y2lw745x6k0?=
- =?us-ascii?Q?v2OTDk1yMbtV2ft4+GcZzKLbTKjS8zY32czRFbXCZ+JD2vv1r2AjzjtXX89d?=
- =?us-ascii?Q?hyWt8N3fuqnj39QDAg5/XoLqzjNuPnPfzltndS3DPP5ZTesh8BBVw5KK1FCV?=
- =?us-ascii?Q?uwbuB/GA4mjllcQZn0lUyuaRdCu4W1yYgXwGzAFkKBTnMP3MdGRKhC1JMT4Y?=
- =?us-ascii?Q?8zUb7AkXyu4l7wCkmI1MlLF278SiEEXFdKV3tPEw8w9KnK3Ghd417XlEvTT2?=
- =?us-ascii?Q?uGHgH8bL8XMkxQqBp3JgVNDwVdUv+uDEYG5+aj3l2t1Ya+S0j6N6Pinuh4fY?=
- =?us-ascii?Q?qGJNDROa3DaRQ19lpamQH3g464M7OIqtIwvbTC9+DElDlxMqyqzg0pitTdXz?=
- =?us-ascii?Q?ScuIIU20TaNsKlI=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(10070799003)(376014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?NrbrxKgBrGRTzuqrPffgDinLp3I27Ym6bQcW/ugbny8nhFOVPmSIvBtpMtHM?=
- =?us-ascii?Q?hpfNDLzO0IuVymTxYA9/MDWDUOLvFvVRhtK9D4StrVQGOx/iiufqECVQYTMi?=
- =?us-ascii?Q?DAi44FQeFQGIf8lqV9u3a2ad0WLa28gY025LTgNB020ngDd/AKXBJryrVBnx?=
- =?us-ascii?Q?pZXt/eYXVXaZLJJYz/PfgMO2eTrQqpofnmF5XmPXNhVALuATCMtw5DF+6d76?=
- =?us-ascii?Q?Pd0yJ0XGitjr52X0mgeEYUrPfjOgI9MZ/vquEURbd7fbrPiT1gmGWe7NgMX3?=
- =?us-ascii?Q?PypATb9mEIPFUX+SQYvSHIh78Yw5j+7SiMyYsVPb8iguY4EqF6btCURHn/jZ?=
- =?us-ascii?Q?vbqhKMADFzCu27wL90/OY5OUarqhpLOpDNn1QSXstVXB2ZPqpRB4ROt5kJyW?=
- =?us-ascii?Q?uEk9pCLV983dCQ7h68dZcDZvG3UZ3e0oIObmO2ZmBA4TskFMAMOsGSG+4hzs?=
- =?us-ascii?Q?ZfwV1mLcikUe5Wy7zu93dJUvOBUuy4zHTuxNuTou6+HRBcMEw28Q9Zyeoswu?=
- =?us-ascii?Q?hrIwqMBGdLLFS9MJPY//wcd+lJnxODZeI0qZLcc5V/oR1h9TnQT2A1EApIvt?=
- =?us-ascii?Q?qEvjUTK2fdP3H0JXXCqTT7wiDRrVQfTVMEEG5/j3Jp+YcEOoIkZ7BSeYjhv7?=
- =?us-ascii?Q?ok+nK3fZrEJ/RjdA8fDF36C/S/VjdWXWltVnitvb34/nALYxx3HUFsgF+sw0?=
- =?us-ascii?Q?Rmn48pRZPrM+1nV3Q6vIqn2tbiZnFpe221Re1TBEHrQ1h5HtqOC5FKJRRtws?=
- =?us-ascii?Q?a3V2aFp1tyExsHoxwlHp1Rj+etDg0Kw0qc0kuFRCPeZOHyerVuo3eUpTcwl1?=
- =?us-ascii?Q?7DITy0U1P1+KBjXfYL3YC4A2k/gNLJIIavB7LkdC1z3rrNhrKQza6zerK+9k?=
- =?us-ascii?Q?SFMgfR4G24Kt8DhcRxukM1awAQCy3fHudhYxISlthj62jLorpiymQWp2i38F?=
- =?us-ascii?Q?ojwTaA8sDjOLJIDwFOnFny6ivcUljo5eYK8T1+8fGAM9P7QtDIsNGzqQgmjv?=
- =?us-ascii?Q?RJ9bJ9gJYgCrB/yHBaYqqKBgKHxFPcA0eQLr8rDSVt5A0cW4Kll4j0XVBTx6?=
- =?us-ascii?Q?J19G4/GW8lqBoZJb5e5tGpFmTHKZtppKbwA2XBrpwxsaxdw0/GLbpDjmzu9J?=
- =?us-ascii?Q?LuLoDGi0raQNdGg2rcN6PRatpLoHZYWv43JAkKrJF+RM978wTJYuC1TEAH0p?=
- =?us-ascii?Q?tkl5a4uhR2bUwKvq8XYWG9uZTRSM1SRQCDb0xz+7HxfKnSwHyX8W+OeMs3hk?=
- =?us-ascii?Q?Jmur3tCZtkTHyv82unmBhsz8ysDqa4UnuSnb2aakDuYL/yogpCiYVj7838FZ?=
- =?us-ascii?Q?lZn+r0iSFtJYlvXdyQGsqDHJDI1/vLlxm1uScFzaSZXjYpFb6Mz0iQDfZJKT?=
- =?us-ascii?Q?Ts0DpuAldEBxeHelK4IEpg6EKLuAE6Nw4YMxF/fn/0X73Lcy9CHGow68hCqc?=
- =?us-ascii?Q?YomDx5X7IMd2S77hjXju0wImoy6TEK9Lmzgp8jWy06djhBJ0tAIUANTCcK9N?=
- =?us-ascii?Q?ev+FgPfIAe+uv44pA8441AU/kL7ZCA05mCbWSTjEs7lIhkEvFba/J1paeOLk?=
- =?us-ascii?Q?aPhYObzU7QdR17FVMnbesuez5+G0hEp15XaQ89P9B+usbbJi2phl7fAyxUJl?=
- =?us-ascii?Q?HfXncvDd054pGrshohLYg3v/2UpZjNVb5Gwn1oUqYPOM3V+CkVmMB1BcVOhK?=
- =?us-ascii?Q?6YGSGA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YO/YvlNg"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ade30256175so46055066b.1;
+        Fri, 06 Jun 2025 04:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749211179; x=1749815979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qmUWlsWrraVeinmVRofjXaqZbS/GW/OwgmarsrAe2FY=;
+        b=YO/YvlNgwNiLhuYVEHan+8n0QtsLD/8DzOKnI1HbvTFCWu+w3aKa7+udN4UaTef996
+         vC35GZpcz1HX5NOb+qaazGB5a1e07yF2xZH4CKV8u/zts0ystnEHTWKXiF2fPWK2dQj+
+         U+gp97an2oa+XV6KESBcpyN1o+4f4xoxNDhqMSodKQiDlvoRdFo3CBFGH2D0EC4AoCNB
+         XXJ6X3FNbA9RzXeycm8yujV0DWsJcthSpgrImDO3+Kb0XAGp+iGrrSHViaUIIGDF3Jva
+         6pOymSORvjbJ8gQfWfSdfjquvoDQNu4TUHoL8OYLft0POL95zC3uNr45FWYFIOdt/vFt
+         tY0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749211179; x=1749815979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qmUWlsWrraVeinmVRofjXaqZbS/GW/OwgmarsrAe2FY=;
+        b=txJc4m/ADmTTU99jdmOHRIYX/+5YpG10FG9uk0EJwU2GZcZWI249gAS8ogYE5UWeER
+         PwkNKLSC3/g0yTtnjoJmvxQ09dm4FDJRHklXI/UTU886CgSktURugpYeAV89LG+sKqu2
+         Eg6xGMUOsoAziIfNXbjZoJV9jf21WHd47JU6MnqcYjtbRQkZQlznW1o8jwJxwSPGfVch
+         UN5zJ8bvx5npqT+DTyB4JCcDT31WTznSfbpfrOoVyriXrR9jASlVoJel28w25Bc3wzUy
+         xkFFi/qok5Gcb892jv5HyA+2VxnB59ENlGFrdQqPyV+jQpZsFS3XwTqMqBJ1nPtgPJeL
+         3CtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9642T8h4sP6twZD3n9NS62+UgLz4vnOT5VFegjloxFq0HPzNmUEpkIJyoxj5dX+eTkh6x1sRxPYXl7NYWew==@vger.kernel.org, AJvYcCUnhN0VFrc7FniG9c0wiNPPATNQFMiwioVpCWfgaNc2qByeynwwSL1B/5e6FE7oFDbPInI96xnRkV+wzA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5/qGl6NfiO5pT2DzlTm9LkNc7vmESf/0VGb+7iiTB6BzpC9oQ
+	h6YZHGTUBnneNkQ9kfzGZ73an52oUr/uaIvuV2pGmQgSOUsyPwuN82dME0uPkMnyHRn7DKFtbbE
+	597Yvq+IGFaq/fxYoL1hlytlw+Q2PYQ==
+X-Gm-Gg: ASbGncvEyU2V8HP0j4KP6FlG5+Ta0hAVxsVKgnifcFeJTjPAxfKi34447C1vi2oXblK
+	F65/zjiFmFOaYMxN3W/+4mjlshbqqJ1QmByaqmsOlna3R6Y9X8qc7Ff/JIhwXD/D5YbmSv+HnWM
+	99uW/5oSzxOf/wZEKwXhSHKga2S9by9V1U7/bi+PpRq7EI72HRLaQsc7UygSMr3MbG4up/o/uF7
+	Q==
+X-Google-Smtp-Source: AGHT+IGuAVhDuKk4Tc5pEPCP/53Ju5rt6SIGT5m4MDH2vNfgJIraGRbQvbTKpI053fLTjcMfMcbkBpepZxUJeBvD3TI=
+X-Received: by 2002:a17:907:3f14:b0:ad8:8719:f6f3 with SMTP id
+ a640c23a62f3a-ade1a932e69mr253948366b.22.1749211179058; Fri, 06 Jun 2025
+ 04:59:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: konplan.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: ZR0P278MB0743.CHEP278.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25e15123-91b9-47f6-b27c-08dda4edeea6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2025 11:33:17.4219
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b76f2463-3edd-4a7d-86dd-7d82ee91fe05
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IqGoA0/QZGAjva0EtQo5ESdDEl+sKVCgx5/Jip4KEYmAwYof9uC26qot62hXC5pu563IxXPSzA8d+Y44MYgeM6fYAHBY24deX9TzehApNas=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PPF29B75DA31
+References: <20250605150729.2730-1-anuj20.g@samsung.com> <CGME20250605150746epcas5p1cf96907472d8a27b0d926b9e2f943e70@epcas5p1.samsung.com>
+ <20250605150729.2730-3-anuj20.g@samsung.com> <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Fri, 6 Jun 2025 17:29:02 +0530
+X-Gm-Features: AX0GCFsp8juhknUXDp5sOulFNclYQn8fpeoPEV3LFMx8t21OLoGFonqOrOPc3Bo
+Message-ID: <CACzX3AujmHHvzBVta2fjrQvytscv5kS0NSgt4iUq-LtXP167BA@mail.gmail.com>
+Subject: Re: [PATCH for-next v2 2/2] fs: add ioctl to query protection info capabilities
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, jack@suse.cz, 
+	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	hch@infradead.org, ebiggers@kernel.org, adilger@dilger.ca, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	joshi.k@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Helllo,
+On Fri, Jun 6, 2025 at 7:37=E2=80=AFAM Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>
+>
+> Hi Anuj!
+>
+> > A new structure struct fs_pi_cap is introduced, which contains the
+> > following fields:
+>
+> Maybe fs_metadata_cap and then fmd_ as prefix in the struct?
+>
+>
+> > +     case FS_IOC_GETPICAP:
+> > +             return blk_get_pi_cap(bdev, argp);
+>
+> FS_IOC_METADATA_CAP?
+>
 
-we're facing a regression after updating to 5.15.179+.
-I've found that fbdee71bb5d8d054e1bdb5af4c540f2cb86fe296 (block: deprecate =
-autoloading based on dev_t) was merged that disabled autoloading of modules=
-.
+Hi Martin,
 
-This broke mounting loopback devices on our side.
+Thanks for the suggestion. I see your point =E2=80=94 especially from the N=
+VMe
+perspective, where integrity buffer can be larger than just the PI
+tuple.
 
-Why wasn't 451f0b6f4c44d7b649ae609157b114b71f6d7875 (block: default BLOCK_L=
-EGACY_AUTOLOAD to y) merged, too?
+However, since this ioctl is also intended to work on regular files,
+where "metadata" usually refers to inode-level attributes, timestamps,
+permissions, etc., I worry that FS_IOC_METADATA_CAP and fs_metadata_cap
+might be confusing in the broader filesystem context.
 
-This commit was merged for 6.1.y, 6.6.y and 6.12y, but not for 5.15.y.
+Using  FS_IOC_GETPI_CAP and struct fs_pi_cap seems more narrowly scoped
+and avoids that ambiguity. Do you see this differently? Or if you have a
+better alternative in mind, I=E2=80=99d be happy to consider it.
 
-This is a regression.
-
-Please consider merging this for 5.15.y soon.
-
-Thanks.
-Sebastian
+Thanks,
+Anuj Gupta
