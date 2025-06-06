@@ -1,54 +1,54 @@
 Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB5A1C5496
-	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 03:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64B11C5F14
+	for <linux-block@vger.kernel.org>; Fri,  6 Jun 2025 03:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749182195; cv=none; b=MbANG9RVEKRjEl3Dr6czs7aA4ZX0yBWnU4AER/Xm8gM7QNiVH3DM5rUFfOklKR1F8TyXfph++bTDTt4yVC9lag9n/eGVz/4cdGi2eYXtiXfSHUhmAyYl0rhFFS6k+7lRJme8oEeSUojRpj7QaMr9L3bicGXnucZQ3JWiSazRZvE=
+	t=1749182197; cv=none; b=KX9dz4egAFQfRYtntdhbNRnCb9pce2SwGLLm8yiFwbpmsNY9tezHe8jshIbVhE3nq6jU9IzH4cPWbzqXBu7YTyI14jvdCXKNTpd/MX4dw8bj2WSkiY1vcJBa1LChQs/v0aO27YJkzLMcYLpkAWJvkWR8xIwHkWeIaYpujZysfV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749182195; c=relaxed/simple;
-	bh=Sx7RYy18a3TE88qkDYTNWJ/VuHNlO2PcJvvQjHCRZ4c=;
+	s=arc-20240116; t=1749182197; c=relaxed/simple;
+	bh=/QB/RH74L4gec/OuO8ACmxpqoGCPh1l4ws/B4U8loOU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r/ePf8XUb9sKQ5XElXvA/PRBND2S+FttGGMW0OfUAWbN4khg4Khc0zCz22b6pyW57OPeXNJ8ga4XMAq7ah4kaFasc25guBhayx6P7BkgTqIE7PFxDGhkC5zEvzks0Mi7eyj9Pdd2oe7GZEo6bCcsj1gZKslAgKHlV/CHLvjVsYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=NxJqbU20; arc=none smtp.client-ip=216.71.154.42
+	 MIME-Version; b=rvp/JQDqhXErMzgwlsXe8S0mMJMIXu+svaAjWCjLR+MSTzxva+SCh/sRGCh38mINUoqZBsC6/eGd9ON2dxYaHxV0rDj3Py39CdVATl0KtGYQF31+p3OBO9GsYlmsBuu2I9pNnt3PduGOBaujLaSZ8uYF7wWreNVmyHgSo1Uwffk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=XurekeQ2; arc=none smtp.client-ip=216.71.154.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NxJqbU20"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XurekeQ2"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1749182194; x=1780718194;
+  t=1749182195; x=1780718195;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Sx7RYy18a3TE88qkDYTNWJ/VuHNlO2PcJvvQjHCRZ4c=;
-  b=NxJqbU20R5bVGEboyKIHWT/w1WzDEMkz4TNp5XJk1QxTtOmriHJ5T2+g
-   fQmjxuYx1r6TylZK81oSsv4LOkeVyjvresw0BvGU6TQ4lLSj4k23zsszx
-   6Fpdfq7RX8lDPybzOgZVjtAHDazvRibrfEAgDaw+XQfwLW0LaT5M+V5sB
-   GxMLdbf0sZvkx+j1Msi9yf9AyriPSryCw5yKdU2BQUh04p/rDg/odgk0T
-   FRXn8fyxym3pIhGim2bWZW9SeRtK1Ucmkk5FTfbwBA1REGcEpxptQmAeT
-   ucz1P2UTCp7MEVAcqrA0bfOY/o7D1e24twFxveB/p1Jg15HKQ7+mGREW1
-   w==;
-X-CSE-ConnectionGUID: eij5vwQEQnOiJv8fZLWlXQ==
-X-CSE-MsgGUID: 4MdyWx2WR4+3pJpub10fHw==
+  bh=/QB/RH74L4gec/OuO8ACmxpqoGCPh1l4ws/B4U8loOU=;
+  b=XurekeQ2Xv6HtYIN0taTN34IovEDsQPoe94n/o8W9lLv6v2gQYeX0AfP
+   yMOVmnZK/ivDEHiuvZGUehvXSnSJUAEvr4MWOkmF8i07XsZ/ylvGYOpyQ
+   zzxrUXKt6Wvlv9q7uAIBEf2M0ZZtGcgqnu78PE8y6py+hi+Ood4L70SbI
+   1/e3rJ4WNmr5h41DsHujdpOhXTNAew8rRQzWc/Vi3vXWbtXP/6KabAi+N
+   W16W8VKyHidAHt4yqt3EkmJMpzrNEPxQ+Zb6a5Rm6YxhMZ9qiB49Z8tCh
+   RER2HbUUb775GtR9zhkXSSw38pMrIVRcLPHXQcsFLJOGxsF3RARUeG3fU
+   g==;
+X-CSE-ConnectionGUID: wpH167SvSQum4NdLpstBHA==
+X-CSE-MsgGUID: gohSiyO6QsqMBPdDSWxSUg==
 X-IronPort-AV: E=Sophos;i="6.16,214,1744041600"; 
-   d="scan'208";a="86114880"
+   d="scan'208";a="86114883"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jun 2025 11:56:33 +0800
-IronPort-SDR: 68425890_XFPNP/4CzgqC9h655TaRLopwISZgNejNFq7Pu/d8btSKaJ1
- AN1rTieksUwg7+ftxGkD8/2ijeRU9HNFBFVahng==
+  by ob1.hgst.iphmx.com with ESMTP; 06 Jun 2025 11:56:34 +0800
+IronPort-SDR: 68425891_qlWkxamhm5sD6CKQGZl5/+xdVOaIGH8Sh30huICstrWwATD
+ s7IK5oODM639trqr3vsq+Bm3XLmJwqIrtvpIM+g==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jun 2025 19:55:12 -0700
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jun 2025 19:55:13 -0700
 WDCIronportException: Internal
 Received: from 5cg21505sl.ad.shared (HELO shinmob.flets-east.jp) ([10.224.163.46])
-  by uls-op-cesaip01.wdc.com with ESMTP; 05 Jun 2025 20:56:32 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 05 Jun 2025 20:56:33 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: Bart Van Assche <bvanassche@acm.org>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 1/2] check: allow strict error-checking by "set -e" in test cases
-Date: Fri,  6 Jun 2025 12:56:29 +0900
-Message-ID: <20250606035630.423035-2-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 2/2] check: introduce ERR_EXIT flag
+Date: Fri,  6 Jun 2025 12:56:30 +0900
+Message-ID: <20250606035630.423035-3-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250606035630.423035-1-shinichiro.kawasaki@wdc.com>
 References: <20250606035630.423035-1-shinichiro.kawasaki@wdc.com>
@@ -60,93 +60,144 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In bash script development, it is a good practice to handle errors
-strictly using "set -e" or "set -o errexit". When this option is
-enabled, bash exits immediately upon encountering an error. There have
-been discussions about implementing this strict error-checking mechanism
-in blktests test cases [1]. Recently, these discussions were revisited,
-and it has been proposed to enable this strict error-checking for a
-limited subset of test cases [2].
+In bash script development, it is a good practice to enable strict
+error-checking using "set -e" or "set -o errexit". However, implementing
+this in blktests has two problems.
 
-However, the error-checking does not work as expected, even when each
-test case does "set -e", because the error-checking has certain
-exceptions relevant to execution contexts. According to the bash man
-page, "The shell doe not exit ... part of the test following the if or
-elif reserved words, ... or if the command's return value is being
-inverted with !". The blktests test case execution context applies to
-these exceptions.
+The first problem is script changes to ignore non-zero status. When the
+error-checking is enabled, any non-zero status immediately terminates
+the script. However, non-zero statuses are often intentional and
+expected. Ignoring these statuses across all test cases would require
+extensive code modifications and weird codes. Therefore, the error-
+checking should be enabled for limited subset of test cases where non-
+zero statuses are not expected.
 
-To ensure that "set -e" behaves as intended in test cases, avoid the
-if statements and the return value inversions (!) in the test case
-execution context.
+The second problem is impact on following test cases. When the error-
+checking is enabled for a test case, the test case script exits
+immediately encountering an error. This skips the cleanup steps in the
+test case, potentially leaving the test system in a dirty state, which
+may affect subsequent test cases.
 
-Link: https://github.com/linux-blktests/blktests/issues/89 [1]
-Link: https://lore.kernel.org/linux-block/ckctv7ioomqpxe2iwcg6eh6fvtzamoihnmwxvavd7lanr4y2y6@fbznem3nvw3w/ [2]
+To address the two problems, introduce the new flag ERR_EXIT. When a
+test case sets ERR_EXIT=1 at the beginning of its file, the blktests
+check script calls "set -e" for the test case. The test case does not
+need to call "set -e". This allows the strict error-checking to be
+applied to test cases selectively.
+
+If a test case with ERR_EXIT=1 exits due to a non-zero status, catch the
+exit in _cleanup(). Then print an error message to the user and stop the
+test script. This ensures the following test cases are not run.
+
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- check | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ check             | 22 ++++++++++++++++++++--
+ common/shellcheck |  4 +++-
+ new               |  6 ++++++
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
 diff --git a/check b/check
-index dad5e70..f11ce74 100755
+index f11ce74..a690e47 100755
 --- a/check
 +++ b/check
-@@ -502,9 +502,10 @@ _check_and_call_test_device() {
- 			fi
+@@ -4,6 +4,8 @@
+ 
+ shopt -s extglob
+ 
++readonly ABORT_RUN=255
++
+ _warning() {
+ 	echo "$0: $*" >&2
+ }
+@@ -332,6 +334,12 @@ _cleanup() {
+ 	fi
+ 
+ 	_exit_cgroup2
++
++	if ((ERR_EXIT)); then
++		echo "${TEST_NAME} should be error free but caused an error."
++		echo "It might have left dirty status. Abort the test run."
++		exit $ABORT_RUN
++	fi
+ }
+ 
+ _call_test() {
+@@ -372,6 +380,7 @@ _call_test() {
  		fi
- 		RESULTS_DIR="$OUTPUT/$(basename "$TEST_DEV")""$postfix"
--		if ! _call_test test_device; then
--			ret=1
--		fi
-+		# Avoid "if" and "!" for errexit in test cases
-+		_call_test test_device
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
- 		if (( unset_skip_reason )); then
- 			unset SKIP_REASONS
- 		fi
-@@ -637,9 +638,10 @@ _run_group() {
+ 
+ 		TIMEFORMAT="%Rs"
++		((ERR_EXIT)) && set -e
+ 		pushd . >/dev/null || return
+ 		{ time "$test_func" >"${seqres}.out" 2>&1; } 2>"${seqres}.runtime"
+ 		TEST_RUN["exit_status"]=$?
+@@ -379,6 +388,12 @@ _call_test() {
+ 		TEST_RUN["runtime"]="$(cat "${seqres}.runtime")"
+ 		rm -f "${seqres}.runtime"
+ 
++		# The test case did not exit due to error for "set -e". Clear
++		# ERR_EXIT flag to not abort in _cleanup(). Also ensure to
++		# disable the error check.
++		unset ERR_EXIT
++		set +e
++
+ 		_cleanup
+ 
+ 		if [[ -v SKIP_REASONS ]]; then
+@@ -523,6 +538,7 @@ _run_test() {
+ 	COND_DESC=""
+ 	FALLBACK_DEVICE=0
+ 	MODULES_TO_UNLOAD=()
++	ERR_EXIT=0
+ 
+ 	local nr_conds cond_i
  	local ret=0
+@@ -635,13 +651,15 @@ _run_group() {
+ 		unset TEST_DEV
+ 	fi
+ 
+-	local ret=0
++	local ret=0 run_test_ret
  	local test_name
  	for test_name in "${tests[@]}"; do
--		if ! ( _run_test "$test_name" ); then
--			ret=1
--		fi
-+		# Avoid "if" and "!" for errexit in test cases
-+		( _run_test "$test_name" )
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
+ 		# Avoid "if" and "!" for errexit in test cases
+ 		( _run_test "$test_name" )
+ 		# shellcheck disable=SC2181
+-		(($? != 0)) && ret=1
++		run_test_ret=$?
++		((run_test_ret != 0)) && ret=1
++		((run_test_ret == ABORT_RUN)) && break
  	done
  	return $ret
  }
-@@ -695,9 +697,10 @@ _check() {
- 		if [[ $group != "$prev_group" ]]; then
- 			prev_group="$group"
- 			if [[ ${#tests[@]} -gt 0 ]]; then
--				if ! ( _run_group "${tests[@]}" ); then
--					ret=1
--				fi
-+				# Avoid "if" and "!" for errexit in test cases
-+				( _run_group "${tests[@]}" )
-+				# shellcheck disable=SC2181
-+				(($? != 0)) && ret=1
- 				tests=()
- 			fi
- 		fi
-@@ -705,9 +708,10 @@ _check() {
- 	done < <(_find_tests "$@" | sort -zu)
+diff --git a/common/shellcheck b/common/shellcheck
+index ac0a51e..a1f8473 100644
+--- a/common/shellcheck
++++ b/common/shellcheck
+@@ -6,5 +6,7 @@
  
- 	if [[ ${#tests[@]} -gt 0 ]]; then
--		if ! ( _run_group "${tests[@]}" ); then
--			ret=1
--		fi
-+		# Avoid "if" and "!" for errexit in test cases
-+		( _run_group "${tests[@]}" )
-+		# shellcheck disable=SC2181
-+		(($? != 0)) && ret=1
- 	fi
+ # Suppress unused global variable warnings.
+ _silence_sc2034() {
+-	echo "$CAN_BE_ZONED $CGROUP2_DIR $CHECK_DMESG $COND_DESC $DESCRIPTION $DMESG_FILTER $FIO_PERF_FIELDS $FIO_PERF_PREFIX $QUICK $SKIP_REASONS ${TEST_RUN[*]} $TIMED" > /dev/null
++	echo "$CAN_BE_ZONED $CGROUP2_DIR $CHECK_DMESG $COND_DESC $DESCRIPTION \
++		$DMESG_FILTER $ERR_EXIT $FIO_PERF_FIELDS $FIO_PERF_PREFIX \
++		$QUICK $SKIP_REASONS ${TEST_RUN[*]} $TIMED" > /dev/null
+ }
+diff --git a/new b/new
+index d84f01d..3664b1b 100755
+--- a/new
++++ b/new
+@@ -149,6 +149,12 @@ DESCRIPTION=""
+ # Alternatively, you can filter out any unimportant messages in dmesg like so:
+ # DMESG_FILTER="grep -v sysfs"
  
- 	return $ret
++# TODO: if you want to enable bash errexit "set -e" feature for strict error
++# check, uncomment the line below. If any command returns non-zero status, the
++# test case stops at that step. For detail, refer to the bash manual "SHELL
++# BUILTIN COMMAND", "set", "-e" section.
++# ERR_EXIT=1
++
+ # TODO: if this test can be run for both regular block devices and zoned block
+ # devices, uncomment the line below.
+ # CAN_BE_ZONED=1
 -- 
 2.49.0
 
