@@ -1,124 +1,275 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2920254852;
-	Sun,  8 Jun 2025 21:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD1C13AC1
+	for <linux-block@vger.kernel.org>; Sun,  8 Jun 2025 22:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749417375; cv=none; b=ET1YQpfB47zBr7K3KAjkSOtZhdPSFizmrxeK64n1CGcYhucZaEPngbACQU9ngjh4sKGL2OjkXv2kBvYSTvmmoWMB2DSeSWszAvYAxTitxGhLOCk3zrrp+zuHWNofEc/0wx1nRc3/jC+O4djrnN59Ey24rvgDsSgJNJI9vRScBJM=
+	t=1749420464; cv=none; b=Zz3qeBHK3XXdwUceDWnprsku4GFbT2/rF7o3a81/O5npub8haDJOsW+jaP9w6iNdx0nUn9EBMc1zccF1H24QsRYtSze5V1+hwD+ZQeGZBSCo0POL08J0Wj2DOAfPQtbYHLeeuG460k5XvyLb0xLqTfPKYifIBnC6dNAXibx0Bzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749417375; c=relaxed/simple;
-	bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nloNUrstlEjnS0q642pixFXWajeoKVkBT0ETi/97hFCe1pmt96cZAp/ibxjKSS5g7kOT4yvc2IYuekqs4uakv1v/wNYOiMILspHlk8doEdtyE2Q8LL2etqQNwXI8XOJr5GOE7lvHEIPrM82hMVBO2niiErEDgavr4uQfo6z2MeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F42ytKTF; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749420464; c=relaxed/simple;
+	bh=ApCBHDOi5uabUqrItkPewtIBfjH1WW8Q0ONooTUPW1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MFx7Apfx9THyrYtFtQ9qThCBQTW1v4RjAgIP0mX/6QFM9ORQMPk7HvaTPn7lK6zXkJb8fibRt8riDO1aDRxENqU4+MrhJXo7aaPvyuex0v2EZ1Wk7nv1HLV7b+2VO7PMPfpliepzLMx86hF3NAb6AhRgckX/kBVhevYiETainE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZmOug12s; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F42ytKTF"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-31306794b30so699029a91.2;
-        Sun, 08 Jun 2025 14:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749417373; x=1750022173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-        b=F42ytKTF/oQgtoz8Bpapn6xX3Cy0wFjRg4Qc2WoCuhhrJnUq3ayfepn9KQ1u3bpQy3
-         J75UgHNPSv3HYDIMt4U9RJqvGcrsVLiK8oJSrFAEL8UvbwN21pS25hMFHZsKAVg8PA4F
-         P+kNyLye1CVl0fRJn3sQxIGY8U53ZkrnMaZ5IYvbqtWgt4WyqdhkKLIHEmYVEH7e8/Mj
-         R6KFp//sctTh4v3tfzVnddCtfXwwfXWGmYnNsMNIRqOP0VO0szy2hPW4P/n7GkcrOaqE
-         q8pAjaR9+8XMtVX9YSBdLdV9UGPijpDsiBCym/6LeseoWlvmgGAWb35uzolw7c1mZeZI
-         rvFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749417373; x=1750022173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-        b=aFdKTwFsdAmPAIQx5mW+hud9i7C3QiWtCmt9WYkCbU+StXDRSsCzwK0awZt+CMwZDI
-         yzJDVjfl1m/vcqrsgeMOBeAeKWYwnGYAWcrTMbcp8d7ZiR2f5ot5ELPabgeLqWp0LK3j
-         IdS3wEefuoWjASg7SGelIXv7XWJUWs8zZT0ofjm4BQKv71TFwD/PuOlyjfUd6ABXr6Uo
-         gzt26+VIYjuvHEvs/oLXrz8Oe5o3pErybJ6J6LeV995MAFrFMEhB8oZIT3Do31X9J1UK
-         ziyhg3ibj5ch8Vk6wPLdbw12TCnV+7eNFU2TRUZr23C0JU/kj9j1LpnOXgODjg1jIY6E
-         pYIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyB8mJrCIUdTF34dWWVEziewMdPqGedKlZLUPkwbB0pEV3XAgTTyzXnyfwQqtUbSGhaVY5vg5ojRTe@vger.kernel.org, AJvYcCVB92/2m//n9o7JpnH2T4Rbd8f0xDgOxESjzLh8bZXguaEFKfz7DJynKTc4pA1tEh/bBiJLTQlvEUecy4AK0Xr1@vger.kernel.org, AJvYcCVgsiBaaPhPC5UtQTXsBtKNf0tuDacxXe2jnv+D1VbUPd7yCapp6ZMiCGIHA0lpVv874qIku+ro1xf936Jr@vger.kernel.org, AJvYcCW4Bz++acQJtaCql2FLXnwKG95pTC8P7GAEws1TzAK4xBWJS/p2cM2aCQbC7xpOqig1ul6csdCwneMpEaIuFgs=@vger.kernel.org, AJvYcCWXczlquP3wUag/KtdImK+qZUmqpfXe0Ah2DxDhIqV3ljLvqmajqrPOiVPJGqJRQXnIv1Ka5tRIKx2D@vger.kernel.org, AJvYcCXLzw8KPCzrnFR26+Z7PF4uVsBMEpWirJDsBcEy9hfOZKDfUgHZgs/1stlBSuRrZzcqJr7tOyRxDY8PS3wV@vger.kernel.org, AJvYcCXPjT5Nb6XPyGiBRff7jiDF8e+BojPAmiQS+S5zGzq9PZ5MxBpYxe8Cn22GVzqAZOKYHQT5esuh8gFYgLY=@vger.kernel.org, AJvYcCXn+ETdiWYuEqc5OlFNyGTJDhqlfn45EE2qpX4h3bGmrYKHgRpaiOTCdCuslwQgkqu3KnRsxFnp@vger.kernel.org
-X-Gm-Message-State: AOJu0YysjLWQvvuSfKMbPC2xy/Cez+k1BULMLGdOANqzrp3fCT9tyM1n
-	WwIJ0HEAuOylNX9/KTe1v/WHQR999beiVlfz8WSpwy/2OyoR/ucyswjlSATWJc8Buf+yLgnO94C
-	IM0TdxsBZvDQ6HLBH5nhGAheq6BUS+sc=
-X-Gm-Gg: ASbGncs41ZQYYEEp68K/V5FVheZMxnBjMIHD9S3LDE95SxwOcrO+xRAb0bgbvYeGgyP
-	AmPtS9cMV9BV/qi57ObZMJHlA0brxiCqvaQXLOOSV5aOzaQtv2MfmuFlMBdRmvfg6bA1xNXnFDa
-	5QUntoX9GGZusiy1fU+SH/iq2+brH5d8QoHDEnHzct5ac=
-X-Google-Smtp-Source: AGHT+IHcnKxE4P/cFhuEWZW0D4lMoOaOrfEZtsoCHwxA4JPSsZt+wbEk5r3gKugcA90wbKi32QwaTUF3LYa15AmI+uM=
-X-Received: by 2002:a17:90b:3c89:b0:310:cf92:7899 with SMTP id
- 98e67ed59e1d1-31347506b75mr5866067a91.3.1749417372649; Sun, 08 Jun 2025
- 14:16:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZmOug12s"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bFq186FhTzm0ySQ;
+	Sun,  8 Jun 2025 22:07:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1749420459; x=1752012460; bh=eo3H3cG/aWUnmDdd3CCQJg9u
+	rkowT1nPqbkCEzSQZY0=; b=ZmOug12sn+NvIIOTG4NJCzl5Jf3S051+L6Mr5cu6
+	sp8hy46132vWF856irHF4rn43ahrGbABUtmcDlUeYNvfCDQGUAIBxMt5az0FlVnn
+	4i1yHKlzdJlCuuNK81Wxf8IJxWYaYgRhaJWW/Gt+MwKToHeK2N1O/PSDupJQKKfg
+	ATzC+0I9iwPrbpGQeL66fF36uI3Fft9NLILCjUvnGHXm0ua/WUcgfldsW/5NEsvR
+	hjFbITxFb7QEUvAPEx5OltFnssqK6JMKWTW5M5jjpJB7AWWdTBrQvgw4e2zgBieu
+	Mc1En7lCsV1xKU8mOb7tb9pYTRCuyaaOtNTjhXum6bieHQ==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id y25I-vIqORhh; Sun,  8 Jun 2025 22:07:39 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bFq116kxxzm0yTG;
+	Sun,  8 Jun 2025 22:07:33 +0000 (UTC)
+Message-ID: <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
+Date: Sun, 8 Jun 2025 15:07:30 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
-In-Reply-To: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 8 Jun 2025 23:15:58 +0200
-X-Gm-Features: AX0GCFu7kEGuuhs8xaCtkzWNC6Znk5oSHyCpfKw_qD8poEL7ZBxhU_Wo9Kw_iYo
-Message-ID: <CANiq72km=RmQcVAkTcs3UoZzSUXKthW0ru8UH4r0KFFmUSjwgQ@mail.gmail.com>
-Subject: Re: [PATCH v10 0/6] rust: reduce `as` casts, enable related lints
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+ Ming Lei <ming.lei@redhat.com>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20250516044754.GA12964@lst.de>
+ <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de>
+ <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de>
+ <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org>
+ <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
+ <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
+ <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
+ <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
+ <20250526052434.GA11639@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250526052434.GA11639@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 18, 2025 at 5:37=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
-> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
-> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
-> lints. It also enables `clippy::as_underscore` which ensures other
-> pointer casts weren't missed.
->
-> As a later addition, `clippy::cast_lossless` and `clippy::ref_as_ptr`
-> are also enabled.
->
-> This series depends on "rust: retain pointer mut-ness in
-> `container_of!`"[1].
->
-> Link: https://lore.kernel.org/all/20250409-container-of-mutness-v1-1-64f4=
-72b94534@gmail.com/ [1]
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On 5/25/25 10:24 PM, Christoph Hellwig wrote:
+> Umm, Bart I really expected better from you.  You're ducking around
+> providing a reproducer for over a week and waste multiple peoples
+> time to tell us the only reproducer is your out of tree thingy
+> reject upstream before?  That's not really how Linux developement
+> works.
 
-Now that -rc1 is out, could you please spin a v11? There are some new
-ones in configfs, drm/device, cpufreq, nova-core and mm/virt.
+A reproducer for the blktests framework is available below. It took me
+more time than I had expected to come up with a reproducer because I was
+initially looking in the wrong direction (device mapper). As one can
+see, the reproducer below does not involve any device mapper driver.
 
-(Please also see my comments in the underscore one).
+Do you plan to work on a fix or do you perhaps expect me to do this?
 
-Thanks!
+Thanks,
 
-Cheers,
-Miguel
+Bart.
+
+$ cat tests/zbd/014
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0+
+# Copyright (C) 2025 Google LLC
+#
+# Trigger multiple splitting of a bio. About the values of the size 
+parameters
+# in this test:
+# - The zone size is 4 MiB and is larger than max_sectors_kb.
+# - The maximum bio size supported by the code in 
+block/blk-crypto-fallback.c
+#   is BIO_MAX_VECS * PAGE_SIZE or 1 MiB if the page size is 4 KiB.
+# - max_sectors_kb has been set to 512 KiB to cause further bio splitting.
+
+. tests/zbd/rc
+. common/null_blk
+
+DESCRIPTION="test multiple bio splitting"
+QUICK=1
+
+requires() {
+	_have_driver f2fs
+	_have_driver null_blk
+	_have_program fscrypt
+	_have_program getconf
+	_have_program mkfs.f2fs
+	for o in BLK_INLINE_ENCRYPTION_FALLBACK FS_ENCRYPTION_INLINE_CRYPT; do
+		if ! _check_kernel_option "$o"; then
+			SKIP_REASONS+=("Kernel option $o has not been enabled")
+		fi
+	done
+}
+
+trace_block_io() {
+	(
+		set -e
+		cd /sys/kernel/tracing
+		lsof -t trace_pipe | xargs -r kill
+		echo 1024 > buffer_size_kb
+		echo nop > current_tracer
+		echo 0 > tracing_on
+		echo > trace
+		echo 0 > events/enable
+		echo 1 > events/block/enable
+		echo 0 > events/block/block_dirty_buffer/enable
+		echo 0 > events/block/block_plug/enable
+		echo 0 > events/block/block_touch_buffer/enable
+		echo 0 > events/block/block_unplug/enable
+		grep -lw 1 events/block/*/enable | while read -r event_path; do
+			filter_path="${event_path%enable}filter"
+			echo "$1" > "$filter_path"
+		done
+		echo 1 > tracing_on
+		echo "Tracing has been enabled" >>"$FULL"
+		cat trace_pipe > "${FULL%.full}-block-trace.txt"
+	)
+}
+
+stop_tracing() {
+	kill "$1"
+	(
+		set -e
+		cd /sys/kernel/tracing
+		echo 0 > tracing_on
+		echo 0 > events/enable
+	)
+}
+
+report_stats() {
+	local pfx=$1 before after
+	read -r -a before <<<"$2"
+	read -r -a after <<<"$3"
+	local reads=$((after[0]-before[0]))
+	local rmerge=$((after[1]-before[1]))
+	local writes=$((after[4]-before[4]))
+	local wmerge=$((after[5]-before[5]))
+	echo "$pfx reads: $reads rmerge: $rmerge writes: $writes wmerge: $wmerge"
+}
+
+devno() {
+	IFS=: read -r maj min <"/sys/class/block/$(basename "$1")/dev"
+	# From <linux/kdev_t.h> MINORBITS = 20
+	echo $(((maj << 20) + min))
+}
+
+test() {
+	echo "Running ${TEST_NAME}"
+
+	local page_size
+	page_size=$(getconf PAGE_SIZE) || return $?
+
+	local mount_dir="$TMPDIR/mnt"
+
+	umount /dev/nullb1 >>"$FULL" 2>&1
+	_remove_null_blk_devices
+
+	# A small conventional block device for the F2FS metadata.
+	local null_blk_params=(
+		blocksize=4096
+		discard=1
+		max_sectors=$(((1 << 32) - 1))
+		memory_backed=1
+		size=64           # MiB
+		submit_queues=1
+		power=1
+	)
+	_configure_null_blk nullb1 "${null_blk_params[@]}"
+	local cdev=/dev/nullb1
+
+	# A larger zoned block device for the data.
+	local null_blk_params=(
+		blocksize=4096
+		completion_nsec=10000000 # 10 ms
+		irqmode=2
+		max_sectors=$(((1 << 32) - 1))
+		memory_backed=1
+		hw_queue_depth=1
+		size=1024         # MiB
+		submit_queues=1
+		zone_size="$((page_size >> 10))" # 1024 times the page size.
+		zoned=1
+		power=1
+	)
+	_configure_null_blk nullb2 "${null_blk_params[@]}" || return $?
+	local zdev_basename=nullb2
+	local zdev=/dev/${zdev_basename}
+	local zdev_devno
+	zdev_devno=$(devno "$zdev")
+
+	{
+		local 
+max_sectors_zdev=/sys/class/block/"${zdev_basename}"/queue/max_sectors_kb
+		echo $((128 * page_size)) > "${max_sectors_zdev}"
+		echo "${zdev_basename}: max_sectors_kb=$(<"${max_sectors_zdev}")"
+
+		ls -ld "${cdev}" "${zdev}"
+		echo "${zdev_basename} settings:"
+		(cd "/sys/class/block/$zdev_basename/queue" && grep -vw 0 ./*)
+	} >>"${FULL}" 2>&1
+
+	trace_block_io "dev == ${zdev_devno}" &
+	local trace_pid=$!
+	while ! grep -q 'Tracing has been enabled' "$FULL"; do
+		sleep .1
+	done
+
+	{
+		mkfs.f2fs -q -O encrypt -m "${cdev}" -c "${zdev}" &&
+		mkdir -p "${mount_dir}" &&
+		mount -o inlinecrypt -t f2fs "${cdev}" "${mount_dir}" &&
+		local encrypted_dir="${mount_dir}/encrypted" &&
+		mkdir -p "${encrypted_dir}"
+		fscrypt setup "${mount_dir}" </dev/null
+		local keyfile=$TMPDIR/keyfile &&
+		dd if=/dev/zero of="$keyfile" bs=32 count=1 status=none &&
+		fscrypt encrypt "${encrypted_dir}" --source=raw_key \
+			--name=protector --key="$keyfile" &&
+		fscrypt status "${encrypted_dir}" &&
+
+		local before after &&
+		read -r -a before <"/sys/class/block/${zdev_basename}/stat" &&
+		echo "Starting IO" &&
+		local cmd="dd if=/dev/zero of=${encrypted_dir}/file bs=64M count=15 
+conv=fdatasync" &&
+		echo "$cmd" &&
+		eval "$cmd" &&
+		ls -ld "${mount_dir}/encrypted/file" &&
+		read -r -a after <"/sys/class/block/${zdev_basename}/stat" &&
+		report_stats "zdev:" "${before[*]}" "${after[*]}"
+	} >>"$FULL" 2>&1 || fail=true
+
+	umount "${mount_dir}" >>"${FULL}" 2>&1
+	[ -n "${trace_pid}" ] && kill "${trace_pid}"
+	_exit_null_blk
+
+	if [ -z "$fail" ]; then
+		echo "Test complete"
+	else
+		echo "Test failed"
+		return 1
+	fi
+}
+
