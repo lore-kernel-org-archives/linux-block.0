@@ -1,103 +1,138 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B41881E
-	for <linux-block@vger.kernel.org>; Sun,  8 Jun 2025 19:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D1F1D7E26;
+	Sun,  8 Jun 2025 21:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749412547; cv=none; b=TWr3AYYPYXDiNsflseCak/Y44zEyIA0eSk2vby3ULINvk1NIKamBozZc1fU3zJyA1/Y2RweST29pK0kDUn0WWC7GzW/0i02Do2/p5UVr+LQw3kEYyvU9eN5Nk5aW+ZIOohaAsIelV0KLzg1m2Ayb89cWEA6sfPMW7nBLGb0++rY=
+	t=1749416809; cv=none; b=RJ337+asIAVq19Z6WH7KmMzVoUh14mIa0pLmyLUSmiY1lqwNB7kCkY75JiWeMmlz5LJIeGIFvH5/eaPptGSo0i4LI+p9nk1E1boA+GbeYyEa3zEk7eTbpFW6egzvcUjOpxuDcqPy8Wa5hNgPSr0Rs2VzQIx9HkO8/bx9mg+rluc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749412547; c=relaxed/simple;
-	bh=hE+oRRutgPV6rgWo+rwQK76ndwS9S8ZF1xQ1IyJ6agE=;
+	s=arc-20240116; t=1749416809; c=relaxed/simple;
+	bh=eRXTMlFFM37HL8dqZWTxuAL+kEE86cK1FaotSq/A8As=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dY0fc697RfTqdUsOFFkPcgpKM0GHo2x8nJo6ggQBv/lTiJOmV3AWwRSHVb2DQYl3ujvmU3GaEC4Q+lqkj0HVJVVA4RKDk9cQCnu/Tl3R8tzcnmX9WLvIrN8oQ8MPqKgLA3oVI5G4Ymvnjzi+a3hEdA8FEyB3nYuOlQZqqTn9OPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J8ra7o4y; arc=none smtp.client-ip=209.85.218.44
+	 To:Cc:Content-Type; b=pdK9j+CDy3CbEWBj0YtY+kWVtAC8l/PsiF9DiPnukLZwDwMXSz78HnXV2LCFhx7MpMHLyswMg1w866k5yBoeV7wBa9HbNOMHi+emFPd14oRU9jkBXoLHd3GKfEDF2VaIu/yZRzSlWk7VVVr3F6LO/fUAyuUqh2m5+CzaQVjCFok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5J7kCyN; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8ra7o4y"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-addfe17ec0bso867885766b.1
-        for <linux-block@vger.kernel.org>; Sun, 08 Jun 2025 12:55:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5J7kCyN"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-313290ea247so560414a91.3;
+        Sun, 08 Jun 2025 14:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749412543; x=1750017343; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749416807; x=1750021607; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hE+oRRutgPV6rgWo+rwQK76ndwS9S8ZF1xQ1IyJ6agE=;
-        b=J8ra7o4yoY3HGpw9N+aB7QPCP4WxDv7qdDzQ+MXTS6sAz1KWyf9bKHuBrLG0kdCnAl
-         kNt/sIO6NgmRh1UxgsGAb9E2wKsKAIkif/bQaqabYudvMh3NZWG2EBN6i3MliTf8BPHm
-         UnkHkMJ+zP88/MRyVbwLbiJFBWbQ9TlrxVIcvcKPMrigFGk5XDxGyAnivh6txLSbHWu8
-         zVs42dEuMjWQkZ9kdT0BLD7EcAsf57loqY87kXGUv3MvbogHa+yFcIQwveAXB72zeDPv
-         U92yPISkbxUlnjGnl10Gyv0oaS5L+MGf6aWEa9FVazYoT+PrGlIInjpYgRheGlFZHuLd
-         tkgA==
+        bh=biTxWw1XUhzgVcSaJ7pNel53LmqsXpVkyjyl/XngF0Y=;
+        b=P5J7kCyNWMQu0xC59DiFCqsYpdY7ehaiIi2a+f4rtg6KgEJo1XjON00G++xpQKBj1L
+         OigQy0mwO6GNA2llYVZT+badovLEyOQ/CdbmxfOHkK/zv5oerjBMi51d5rn8EfRUp/Cq
+         zrfIjUIuAVlTj7nQqyfCZntJcdWX56dX7GZTmNRgHYaaGpiQN8BnO43eMbtzd3B756is
+         +hVz6Wyfx/MFVUwQMKZPkv++C9XqA9z7nP9ajVj493AWCzefiGIOL2dJNPJ2j+Xdt6v5
+         pCRFGxdYltiq8Jpg1EgAAMz8sHmSSx/epp5oecqwdpHgHcz9E76LjFw/KJPDM5eztguv
+         Npow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749412543; x=1750017343;
+        d=1e100.net; s=20230601; t=1749416807; x=1750021607;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hE+oRRutgPV6rgWo+rwQK76ndwS9S8ZF1xQ1IyJ6agE=;
-        b=vtWczyrtULKU8kT7NtCAApPVrShCgZSB8x97x94vNOR0+Fn7YOB0+6moHwzcWHO4SS
-         l9kysp5gUZcpEAtfqqx2pTBkB3leJXs97iXhSNbVK9Yr8tSGeieSnZTkpiJhyDH/42+W
-         bwHsD2QNZec0crXNfIOlMvpyjp9TC2IkdLbL4186u5lAPhsV+SwT1HIQ59ktL1XgqZFs
-         QNUOjd3/0KVYQhLS6+bEaJohinfW6S6lEd2igEbuYtVZzX9xweCOQuwrq0CY/u5ZJt6c
-         nZKcriM/h0TSH18fyvDx6TIhr1U9VkCfVRU0N+eSiWiy/x+JQrsKhQY6GMaO5uhPfTvt
-         /WMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxC/RPzOla27+3LytgSeoAQonUyUzFSPb0jfZOlOxwidk0EwGqB2f0u9qw1bYR8HGniTjsxTyANT74Xg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNtzL/4csvyCDdYHSQXEbxRV74DjURIFc5TxlW8i0Nd4xMmHu4
-	1vxy4bE39tnZGKn3xlE88vegUFL+L4zSBybSGaWoECkTY0SB8NH/d6xdSZvGmYNYc2iMSy3kMw8
-	4qoPtDWbAmJir/zQMqYa1Ma2xQYegRQ==
-X-Gm-Gg: ASbGncvXpFGxY+DpU78OUrwwdfwb1TJwBImurO4Ow0Uw64UtObL1kpPMT7jfFtsWuQs
-	GQeQnLYyZJOcwULmQtBFQnCd8UsdkdBn+Co9Sgp7/5KobK/Z+ldsoHSPnW/5TXDIQSIqOhER2f+
-	tMaOjuMs6GnjCWIIRncsLBeDdcVc1Dqj/lnelpi95QN2p6SvMjWejaP0omJw9Lx/ohnRqjhH5BW
-	Q==
-X-Google-Smtp-Source: AGHT+IGNh7UzWlxJ4Gt73kTF0hEBq6eRb2XddjaPurUJ15JVrSn+IjasAht+wTEijx0Se0nOuyBuYfDZAXewiZcd18k=
-X-Received: by 2002:a17:907:7f29:b0:ad8:5595:ce07 with SMTP id
- a640c23a62f3a-ade1aa8c109mr952954466b.19.1749412542764; Sun, 08 Jun 2025
- 12:55:42 -0700 (PDT)
+        bh=biTxWw1XUhzgVcSaJ7pNel53LmqsXpVkyjyl/XngF0Y=;
+        b=bC8u8aCOTKJzgB1WuBHyfVfQPhuChzDkas8dIPbD2RW/I74wk35WZP1cI+P44zUEPw
+         QTz/DXXqtiS9TE6sZqoK1M9Aa5dUCATyJK5GQHaqGg663vzdD13eS5dnjxE+q/gC5j5f
+         2sy0Hg/RFuDqIKYYNTXW7x1VVEShBsgWubGMo1Jefd1rMq6Q5mbkvLUAEf4aEgP9S/EG
+         VGBIdcwxlZOIhEYlPnXMvk50iuCAVK/95oIoYRzYXkBnPWHp4O2cAhNXp5pRrvU4c3O7
+         4bZMsU7XrhReJoyxgZRkte1QXit/3zBFBMMBYbGjmC9Czc4PxVAb+xnIqseaH014xpvl
+         xg/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVFxXc0oEn+5RpdPLl7RoxrlCXJ0SF5n0VIm89rClfYT1QJGX8KeAQ879p/E+fpGnUniz/TbzASj97F1K2I@vger.kernel.org, AJvYcCVL51OElPgxYwQLXuGEsfD9zgimufY4iKnX17/Pgfii+O+Ulp7GnyJTqLttXVdcu7NrceC9qj/SYdI0@vger.kernel.org, AJvYcCVQkztA4C53byBCSiSQYqeU7bR3hxVjftxt/CjNOI2A1KVLmgUvi5SWPWVPTkEjyqik0UI9IW6K9oG1XbBv9kJn@vger.kernel.org, AJvYcCVxeGg+0gMGIcRat0RSYpcjhB0GnVs2ST9pBMGRyT+NqfuUNl4/TClnOVsOLjlnZi9Guu/nNwsP3BBRj54j1tI=@vger.kernel.org, AJvYcCWQQEdG1nV02tGBLs+4q/KQwwD1s4BdJdOoIbmDZlWKEJdwIV3VuFJK9mcqY0XN/rd+hqQ21d0X@vger.kernel.org, AJvYcCWpm6/d0St9BDJ4YQVK+RKtWt0jzylERGCmPqlCD/tZ4Fz5uEbmn5zFVt5NtUmkyJBcAkCyDTUNaVBs@vger.kernel.org, AJvYcCX6rwlgOg7Ec5yTC2Fy+u/gJosU7heu6GV1+ve0KFsdgIwPySuxEvfB5lDZY9fWQvDAeHOBpeWPOElsxlqY@vger.kernel.org, AJvYcCXXHoEpMpMpYhZz0PuVa7P9Ncyzl2PI9eswXELu6/3T/VZHGtVgl/5X6XxbpRPOWo1fuFLDGtuRnZiQO+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycS/x8gh1zUuTd6KPiJwuhGdxVsRLvdeWpkQZLV17QhzivHG7D
+	+7EldevgueUn7PfABKNiDG8mTYpglFaKpVmcBBUC6tEBqsSxh82K/vN5AOXwFs7IE5mLmokumRl
+	zS0LiC++bO+nJ8x+kXenjztieD6LXcNI=
+X-Gm-Gg: ASbGncshQXbDcy5SN/52D7KL5+goHX4qvuDHKy4ICf1Rwnz4jr/Q49SuP1CeFPqabvY
+	ubz2t/Oqiq+ROLuTjMETra4SoN5pi2jZ9PDqFRSdQjbZHq1G2yErlHVo4wQvhn7e42FVzFmMmCS
+	tcOGP5m8MjyvFMmi5DdxBHjGKtVNna1hwcbiNRS/gORhw=
+X-Google-Smtp-Source: AGHT+IFZoj5H78nminVpVR/Eh5MZKRu2FMUA3tOH8l/xEYd1B6AKUG5XkEb/S2u3ZweF07euOUkBTgoKB1wHH0vNBBM=
+X-Received: by 2002:a17:90b:3a87:b0:312:db8:dbd3 with SMTP id
+ 98e67ed59e1d1-3134e422457mr4671636a91.6.1749416807159; Sun, 08 Jun 2025
+ 14:06:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250606003015.3203624-1-kbusch@meta.com> <brqphgz27tsruoz4jyvvc4x6kwmqv2lkotdwwox2njqfku3kb4@2hpbwsti3rcn>
-In-Reply-To: <brqphgz27tsruoz4jyvvc4x6kwmqv2lkotdwwox2njqfku3kb4@2hpbwsti3rcn>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Mon, 9 Jun 2025 01:25:05 +0530
-X-Gm-Features: AX0GCFs9xe5ni6Am2N_20PzQkxb_CdjA_46QNUL-7LzyYRW0ZMOxdf7ydcfl8xU
-Message-ID: <CACzX3AsFG-aORqNM0oV8TCqotCvnR3fdQD9QvzLHpWFWeYVo_Q@mail.gmail.com>
-Subject: Re: [PATCH blktests] block tests: nvme metadata passthrough
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Keith Busch <kbusch@meta.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>
+References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com> <20250418-ptr-as-ptr-v10-4-3d63d27907aa@gmail.com>
+In-Reply-To: <20250418-ptr-as-ptr-v10-4-3d63d27907aa@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sun, 8 Jun 2025 23:06:34 +0200
+X-Gm-Features: AX0GCFsmqnoEKQUFsySPfR-zWKNBdsKqanc84VNOHBrhPbLWWUXTYAKIeQekh14
+Message-ID: <CANiq72kWtEsXDuoXpbTNRLiZ=c==Ne=v4igxCWMwWFj0LOC-Yw@mail.gmail.com>
+Subject: Re: [PATCH v10 4/6] rust: enable `clippy::as_underscore` lint
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 7, 2025 at 6:25=E2=80=AFPM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
+On Fri, Apr 18, 2025 at 5:37=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
 >
-> On Jun 05, 2025 / 17:30, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> >
-> > Get more coverage on nvme metadata passthrough. Specifically in this
-> > test, read-only metadata is targeted as this had been a gap in previous
-> > test coveraged.
->
-> Thanks for the patch. I ran the test case on the kernel v6.15, and it pas=
-sed.
-> Is this pass result expected? I guess this test case intends to extend te=
-st
-> coverage, and does not intend to recreate the failure reported in the Lin=
-k.
-> So, I'm guessing the test case should pass with v6.15 kernel.
+> -            bindings::BLK_STS_OK as _
+> +            bindings::BLK_STS_OK as u8
 
-As Keith mentioned in that thread [1], this test can catch the issue
-only in the more unusual or corner-case configurations.
+> -        unsafe { bindings::blk_mq_end_request(request_ptr, bindings::BLK=
+_STS_OK as _) };
+> +        unsafe { bindings::blk_mq_end_request(request_ptr, bindings::BLK=
+_STS_OK as u8) };
 
-Additionally, if your NVMe device is not formatted with protection
-information, the test will exit early and report success, as the
-integrity path won't be exercised in that case.
+For these two: `BLK_STS_OK` was discussed in a previous version, but
+why are we not using `blk_status_t` type instead?
 
-[1] https://lore.kernel.org/linux-block/aD-J9mzq_bJe26rD@kbusch-mbp/
+We are even already using it in the first case, and in the second it
+is the parameter's type.
+
+> -/// # use kernel::{bindings, c_str, device::Device, devres::Devres, io::=
+{Io, IoRaw}};
+> +/// # use kernel::{bindings, c_str, device::Device, devres::Devres, ffi:=
+:c_void, io::{Io, IoRaw}};
+
+For v11 this can be removed since it is now in the prelude. There may
+others that can be removed too (I would not add an import just to use
+it in these patches, but if the prelude is already imported, then we
+should use it).
+
+> -        result.minor =3D bindings::MISC_DYNAMIC_MINOR as _;
+> +        result.minor =3D bindings::MISC_DYNAMIC_MINOR as i32;
+
+Similarly here, shouldn't we use `c_int`?
+
+i.e. it is the one in the C side, not the "resolved" `i32` that the
+compiler suggests.
+
+> -                    bindings::wq_misc_consts_WORK_CPU_UNBOUND as _,
+> +                    bindings::wq_misc_consts_WORK_CPU_UNBOUND as i32,
+
+Similarly, this should probably be `c_int` since that is the
+parameter's type, right?
+
+Cheers,
+Miguel
