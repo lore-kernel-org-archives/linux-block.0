@@ -1,160 +1,231 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2A51624DF
-	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 20:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933D61E521B
+	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 22:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749502100; cv=none; b=cNUpQGItx0y25uFNx01DeZ1ytUTcoasY8zu+mUyVlAKAphkdhEpJyHqlAXl1+3WWur/rW3e11LV2OBXDdlFze/dGwf5lGiGoczNOQquOd2jD40YuH4DbgFF2Z6jAjMv+yQJHU9i4yAzL3ZaewQf/+6EjjNX/IECX/LBqN7PiKDM=
+	t=1749508188; cv=none; b=Vu/oqsM7FhynO6jCWlUFGZx6a6g2sc8CC5y16mF5gRZoPVqxlnkNuzh/YEXkpw6jh/ZLJJQ7ha7ImTFKjOHB8nOzpCyIaOtnuso/l2LWE496MbLN3N5f6C5fHc+G9LSA0KXip/79lDkYWf2zTwdjqaLMf+AEpzmX85bphZKBBNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749502100; c=relaxed/simple;
-	bh=A1wDyxbvHHqicVQTTMSZu6KrWiPSDOzNq8DpWzJQtd8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=eXHbsw9FneCKqLBCH3ymeqDECh0p1kOSdp0ldco0JL62/Nmz1G4Gh7rYRuXizaLbCVag9vpOM6fIInJKXjqZKFuF1lLXkhwWhoWeptl3LnG4yrVjurVFIgdC5INwBRO1w/bYlys8h4NEXRFc9m9isg3pT5G2GzoaWS4wcnxXVr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SZbEK6qB; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1749508188; c=relaxed/simple;
+	bh=sr6gAu0q0HzCuNH4yJ5PjSIqG2kTCzVTpUbIRrzjkZg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pc/AgoAiUf6P9xYPOot2vhIjxhPRlhnD7LbfSj/mVTPKNNTVmfSFpbwVNWCUTYwiUyoke6Ug+xn1GhlyFF+AsYFMhXKggoR2zz8yiYirWFzl4QcjgwDGCJLmF6JSA+Dv7Pw4JNADvY0B5A/mJfpMoUBbV5voexK0uKMjLZu9c5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FZcfb6QE; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SZbEK6qB"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bGPC416XfzltPtc;
-	Mon,  9 Jun 2025 20:48:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:content-language:references:subject:subject:from:from
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1749502094; x=1752094095; bh=zpDa7PM8gDIM/x1IAzLXATzr
-	dnEUd6JRHz9OFu6P/9A=; b=SZbEK6qBmwdb0eISlD9zm2WLIY8iItK9df8bCMW2
-	xaIKcZkDm5rh32xjQMmtcR1ZKBjJtITGb6CCTIoynX8h0qApI1FsRLrz7dANu43Z
-	HGK3eBxAAyFGSUI18qapB9RnFGRKVNfeA6CfHajCKDSZjRCKK76wawHJPvU376mH
-	7vZkLo4dDLEUuntCkWk5mzYCZk6+zkcGMQOxtBc4jaMiYOgMZZBKXYJam6PH9ILu
-	E9maW69HR5CQuyGSMWR+I+XCKJgvYzfXWaC0BCF/5GB5OIZteiLnMCbQ+MIpn39Y
-	O/pGlwl4PehktoC3QvVMEnuxZw2WJ9VVWgVyYsAODcdkww==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id cqLFy8ATxkwQ; Mon,  9 Jun 2025 20:48:14 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bGPBw5jKqzlgqyd;
-	Mon,  9 Jun 2025 20:48:07 +0000 (UTC)
-Message-ID: <a0c89df8-4b33-409c-ba43-f9543fb1b091@acm.org>
-Date: Mon, 9 Jun 2025 13:48:06 -0700
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FZcfb6QE"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313862d48e7so267725a91.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Jun 2025 15:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1749508186; x=1750112986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8NLvxJwrldLFtjPyg6+gSgrwzVF6Vwkn6xb0iIUPxjY=;
+        b=FZcfb6QE9tKHQhQNRx/To4NefK16ICz3ZTStnhPIZzFaTkV9V/XcLD1a9vDZn2np05
+         /tYIBcWVy7HnzN6n9m1M5YI9ggzjhepxKnsgEnWtBqiJB/WZIDaac1gd9VKnesheavQC
+         k7WaXPyhsk6ESx6nDJlglfP3fdgHv57c4WTXJbBD8PC/bbu4B5DXz7vwFGIbQvSZqqLV
+         YsSzczLZPQclooCbrAb46LatXJ3OAEKkWBPdQFleeFJEHjrtc8qBJWPstwiD+o4SIaXj
+         OJVD8/jGF4IfZj8dSwOGJ/CFImhvpX2/OsNVG5fpIpzconG/7w1Wi2QauCgAzN6MDbi0
+         +u7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749508186; x=1750112986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8NLvxJwrldLFtjPyg6+gSgrwzVF6Vwkn6xb0iIUPxjY=;
+        b=fUY+49U6azXgyiM14z9kKssCjhLqLNoBPYRYLWwt6cKkEb+wdq2xra8p4WorqxWwPI
+         wypkzV/0+VESZxf+Ed/lAkn77FqEjNUt62M+NLpxFFo6VErbp7PpegUBTZYnEcNcyVkN
+         knUZSaBexMdU6VCne0pP+uHAweN6K030NG7/jwp+oRua5ATYHAuqXZHlmufPOTeLWsJW
+         5FkkAl4b+0zc/MfrBGpf3vz9Tv4FadbMxaGYK5i+Qj8oBrpZNCdTqhmARPwNYjN/vjUC
+         SoWcRb+piIV3DiGgGnCCrF8TfhUfgeXmDysX5jvVFkD0rK5SbNVFtXYHFMAzQnZi36Jr
+         y4yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmyiPo2maKUq1VlCpdFx7swAWJEf+I9a5uI75uLUMfeYXjdYsrBET+skhzKlDPmPCPHY5WRdYjuD494g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBkYS7cUyVzT67FRWQ+CYUKI7o2eVHVnmTAMc9ghxHysj9YvVH
+	cjvr4xfECzPS4FALgVlEm7vcYU96866F8XbRaPqIEcek/yYN31UIz3Cc+rTJiSjqI/KTVQrQjUK
+	uW1CPs87aYwzsFdgQjYm1aehFPeoXELOgJOFCf+/Gmw==
+X-Gm-Gg: ASbGncuNcqAqjw73JtM56Ms11kiNycxywvbTyTBGmddBNGoyHlyAdXYVlTI5MNCy5tR
+	w7Gckw1p1buRQj7hIo+7izardyUTxHTvVx0VxAjR2qnsr6bI3+vl5hwxkdqdNWSdnNVTHwqO4P9
+	L5FnSisP5Hnul7AybHGVnN/O1hyA21o+RxIVlfP47WE1o=
+X-Google-Smtp-Source: AGHT+IHrCBGK55av5S0dxK0AKNraogqaGpegQ+r/MB3JmiTVuFNz5urB72UdPKXPa5J+FkZ0LLYDf5RrOTt/p69bTvQ=
+X-Received: by 2002:a17:90b:53cf:b0:312:e9d:3fff with SMTP id
+ 98e67ed59e1d1-3134e2da3c9mr7342457a91.1.1749508185733; Mon, 09 Jun 2025
+ 15:29:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20250516044754.GA12964@lst.de>
- <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de>
- <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de>
- <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org>
- <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
- <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
- <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
- <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
- <20250526052434.GA11639@lst.de>
- <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
- <d8f5f6eb-42b8-4ce8-ac86-18db6d3d03d0@kernel.org>
-Content-Language: en-US
-In-Reply-To: <d8f5f6eb-42b8-4ce8-ac86-18db6d3d03d0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250609121426.1997271-1-ming.lei@redhat.com>
+In-Reply-To: <20250609121426.1997271-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 9 Jun 2025 15:29:34 -0700
+X-Gm-Features: AX0GCFuFKEtzc4jYIbL6iZEHTs2zpLcD_ThlJlziu3ECl25TMO98HL0WUjnRdC8
+Message-ID: <CADUfDZrHpGFKAEJhDqPNq_WMzWU5v9riN-i8V0dROo2tc=1DyA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/8/25 3:47 PM, Damien Le Moal wrote:
-> So yes, we need a fix. Can you work on one ?
+On Mon, Jun 9, 2025 at 5:14=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> Document recently merged feature auto buffer registration(UBLK_F_AUTO_BUF=
+_REG).
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-The patch below seems to be sufficient but I'm not sure whether this
-approach is acceptable:
+Thanks, this is a nice explanation. Just a few suggestions.
 
-Subject: [PATCH] block: Preserve the LBA order when splitting a bio
+> ---
+>  Documentation/block/ublk.rst | 67 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+>
+> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+> index c368e1081b41..16ffca54eed4 100644
+> --- a/Documentation/block/ublk.rst
+> +++ b/Documentation/block/ublk.rst
+> @@ -352,6 +352,73 @@ For reaching best IO performance, ublk server should=
+ align its segment
+>  parameter of `struct ublk_param_segment` with backend for avoiding
+>  unnecessary IO split, which usually hurts io_uring performance.
+>
+> +Auto Buffer Registration
+> +------------------------
+> +
+> +The ``UBLK_F_AUTO_BUF_REG`` feature automatically handles buffer registr=
+ation
+> +and unregistration for I/O requests, which simplifies the buffer managem=
+ent
+> +process and reduces overhead in the ublk server implementation.
+> +
+> +This is another feature flag for using zero copy, and it is compatible w=
+ith
+> +``UBLK_F_SUPPORT_ZERO_COPY``.
+> +
+> +Feature Overview
+> +~~~~~~~~~~~~~~~~
+> +
+> +This feature automatically registers request buffers to the io_uring con=
+text
+> +before delivering I/O commands to the ublk server and unregisters them w=
+hen
+> +completing I/O commands. This eliminates the need for manual buffer
+> +registration/unregistration via ``UBLK_IO_REGISTER_IO_BUF`` and
+> +``UBLK_IO_UNREGISTER_IO_BUF`` commands, then IO handling in ublk server
+> +can avoid dependency on the two uring_cmd operations.
+> +
+> +This way not only simplifies ublk server implementation, but also makes
+> +concurrent IO handling becomes possible.
 
-Preserve the bio order if bio_split() is called on the prefix returned
-by an earlier bio_split() call. This can happen with fscrypt and the
-inline encryption fallback code if max_sectors is less than the maximum
-bio size supported by the inline encryption fallback code (1 MiB for 4 KiB
-pages) or when using zoned storage and the distance from the start of the
-bio to the next zone boundary is less than 1 MiB.
+I'm not sure what "concurrent IO handling" refers to. Any ublk server
+can handle incoming I/O requests concurrently, regardless of what
+features it has enabled. Do you mean it avoids the need for linked
+io_uring requests to properly order buffer registration and
+unregistration with the I/O operations using the registered buffer?
 
-Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-  block/bio.c               |  8 ++++++++
-  block/blk-core.c          | 12 ++++++++----
-  include/linux/blk_types.h |  5 +++++
-  3 files changed, 21 insertions(+), 4 deletions(-)
+> +
+> +Usage Requirements
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +1. The ublk server must create a sparse buffer table on the same ``io_ri=
+ng_ctx``
+> +   used for ``UBLK_IO_FETCH_REQ`` and ``UBLK_IO_COMMIT_AND_FETCH_REQ``.
+> +
+> +2. If uring_cmd is issued on a different ``io_ring_ctx``, manual buffer
+> +   unregistration is required.
 
-diff --git a/block/bio.c b/block/bio.c
-index 3c0a558c90f5..440ed443545c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1689,6 +1689,14 @@ struct bio *bio_split(struct bio *bio, int sectors,
+nit: don't think this needs to be a separate point, could be combined with =
+(1).
 
-  	bio_advance(bio, split->bi_iter.bi_size);
+> +
+> +3. Buffer registration data must be passed via uring_cmd's ``sqe->addr``=
+ with the
+> +   following structure::
 
-+	/*
-+	 * If bio_split() is called on a prefix from an earlier bio_split()
-+	 * call, adding it at the head of current->bio_list[0] preserves the
-+	 * LBA order. This is essential when writing data to a zoned block
-+	 * device and when using REQ_OP_WRITE instead of REQ_OP_ZONE_APPEND.
-+	 */
-+	bio_set_flag(bio, BIO_ADD_AT_HEAD);
-+
-  	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
-  		bio_set_flag(split, BIO_TRACE_COMPLETION);
+nit: extra ":"
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b862c66018f2..570a14a7bcd4 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -745,12 +745,16 @@ void submit_bio_noacct_nocheck(struct bio *bio)
-  	 * to collect a list of requests submited by a ->submit_bio method while
-  	 * it is active, and then process them after it returned.
-  	 */
--	if (current->bio_list)
--		bio_list_add(&current->bio_list[0], bio);
--	else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO))
-+	if (current->bio_list) {
-+		if (bio_flagged(bio, BIO_ADD_AT_HEAD))
-+			bio_list_add_head(&current->bio_list[0], bio);
-+		else
-+			bio_list_add(&current->bio_list[0], bio);
-+	} else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
-  		__submit_bio_noacct_mq(bio);
--	else
-+	} else {
-  		__submit_bio_noacct(bio);
-+	}
-  }
+> +
+> +    struct ublk_auto_buf_reg {
+> +        __u16 index;      /* Buffer index for registration */
+> +        __u8 flags;       /* Registration flags */
+> +        __u8 reserved0;   /* Reserved for future use */
+> +        __u32 reserved1;  /* Reserved for future use */
+> +    };
 
-  static blk_status_t blk_validate_atomic_write_op_size(struct 
-request_queue *q,
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 3d1577f07c1c..0e2d3fd8d40a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -308,6 +308,11 @@ enum {
-  	BIO_REMAPPED,
-  	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
-  	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
-+	/*
-+	 * make submit_bio_noacct_nocheck() add this bio at the head of
-+	 * current->bio_list[0].
-+	 */
-+	BIO_ADD_AT_HEAD,
-  	BIO_FLAG_LAST
-  };
+Suggest using ublk_auto_buf_reg_to_sqe_addr()? Otherwise, it seems
+ambiguous how this struct is "passed" in sqe->addr.
 
+> +
+> +4. All reserved fields in ``ublk_auto_buf_reg`` must be zeroed.
+> +
+> +5. Optional flags can be passed via ``ublk_auto_buf_reg.flags``.
+> +
+> +Fallback Behavior
+> +~~~~~~~~~~~~~~~~~
+> +
+> +When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
+> +
+> +1. If auto buffer registration fails:
 
+I would switch these. Both (1) and (2) refer to when auto buffer
+registration fails. So I would expect something like:
+
+If auto buffer registration fails:
+
+1. When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
+...
+2. If fallback is not enabled:
+...
+
+> +   - The uring_cmd is completed
+
+Maybe add "without registering the request buffer"?
+
+> +   - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.op_flags``
+> +   - The ublk server must manually register the buffer
+
+Only if it wants a registered buffer for the ublk request. Technically
+the ublk server could decide to fall back on user-copy, for example.
+
+> +
+> +2. If fallback is not enabled:
+> +   - The ublk I/O request fails silently
+
+"silently" is a bit ambiguous. It's certainly not silent to the
+application submitting the ublk I/O. Maybe say that the ublk I/O
+request fails and no uring_cmd is completed to the ublk server?
+
+> +
+> +Limitations
+> +~~~~~~~~~~~
+> +
+> +- Requires same ``io_ring_ctx`` for all operations
+
+Another limitation that prevents us from adopting the auto buffer
+registration feature is the need to reserve a unique buffer table
+index for every ublk tag on the io_ring_ctx. Since the io_ring_ctx
+buffer table has a max size of 16K (could potentially be increased to
+64K), this limit is easily reached when there are a large number of
+ublk devices or the ublk queue depth is large. I think we could remove
+this limitation in the future by adding support for allocating buffer
+indices on demand, analogous to IORING_FILE_INDEX_ALLOC.
+
+Best,
+Caleb
+
+> +- May require manual buffer management in fallback cases
+> +- Reserved fields must be zeroed for future compatibility
+> +
+> +
+>  References
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> --
+> 2.47.0
+>
