@@ -1,76 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C641A24EA85
-	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 09:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49993610D
+	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 12:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749461371; cv=none; b=bOFXzNp7hvFlz0+zD8XIyk/dJODT5079uG6W3792qI6nUh/evshhdDbfp17S6G9PpDfd/I9JYjOlJGLZNZisBTDa1ys3xAelr3homDagzGw801ngTf7UYWzt6tsyvBnsRliqrZZlsZgLdxNuDdmqvUKVdLf1w8hd6p8D78g7aWU=
+	t=1749471279; cv=none; b=KdqihhHem/UjwCQzOlYsOae8Vm63EFXdhN5L4rCjWLXPesZ1RwMmg0dIkBX1L21dfePCkqB8gtP77rHwi0X8YG5GBMsLqPT6+SAezPXHpegJYt+xMweDibrGT6cqkWfyYBwWPHma1hYv2QnuM7QOu0Gs7L2QPabnkknykai76WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749461371; c=relaxed/simple;
-	bh=x/EnJWl/k0jsWW6PMMleDnU0RrJaBN65jDQeKCebf9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zvkm92t+5t6JrpRvpqznv3F8L6hcLVLMpUnrKpq+DE0opsap+QhhkQ/NSJOnmxRJmxlx2yGmlw0jZN3KAuD6WTzi8NyVII2Dwp/Q13/cN1Dwu6u0p3fT9BSr+FqfnafmrwVMLc6vgbZ8bbDifa/O2HY1ZY3HivrjxUgLUf8K0Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcCM6Xef; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749471279; c=relaxed/simple;
+	bh=CnbwAN5CeI4ihKQJftmmx1G7aOLegvfEIDr4jSfodXY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uX4VV2eRaGk9zbSMmwlsxtK3a6fgvhX867YZ8dn7/SYAOutkEgaUaqpzlThoWHaixIcL725bfGQWzs6z8KaPSE2kRqZfKUP5jtefjx024KJQI+Kl7yNIVyyyLEQKsIBQfu0t8g983ZRL/YGtFAcBpgDbn/zciunM05JoAyIOOK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ez7QfnmV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LcCM6Xef"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4007CC4CEEB;
-	Mon,  9 Jun 2025 09:29:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749461371;
-	bh=x/EnJWl/k0jsWW6PMMleDnU0RrJaBN65jDQeKCebf9E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LcCM6Xef1yXTIWZcPmZjtcgsQzFN2XcKqh4ZFgV/ssN08Df0aKJHSfW//3gGknsq4
-	 WAAVwhOUqvFQIwxv3rTywGa505tQWx/zpxsFsZzwo9mD6MGKmnby8DbAQlAXmp9Xg6
-	 eFXBxwvw6SfZbk/imnjKFjU5HvxLFkcz26baZpWESbsVhgp7wWWAlyj0/HDaCxSdPh
-	 AP3oJSH6CU+mTNrtuzcW+tVnuvFC9V8xLGQVhaml2twXc4LLF4iioOMA4i8TBgTU/X
-	 NYSq+NV8ws968V9Peb1nASUuJTkJJrWdIqfwfXLb0+9A8RgPkWWgcWgpx6j4vSJWvz
-	 +qSltiFz1+BLw==
-Date: Mon, 9 Jun 2025 11:29:27 +0200
-From: Niklas Cassel <cassel@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 3/5] nvme: add support for copy offload
-Message-ID: <aEapdy-c6G35Q-vx@ryzen>
-References: <20250521223107.709131-1-kbusch@meta.com>
- <20250521223107.709131-4-kbusch@meta.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ez7QfnmV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749471277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1CfDae3ZYporZeKCrPShL8P1dMIfeXxy+k+zMTwH8/M=;
+	b=ez7QfnmV0fR4+sRUIhp+GYupqA6ShDCRDtrIrQzjXtU6kDB1KPgKlhiz1gEye3mm1Wwi81
+	nrI+pDGMUsMxV5vh8IMUbslaYILVFTgKUVjXyDo3oBaNrkAS+9FaIUOrdOIpahpR0EOyYR
+	ESNwY24eZO/vDgnLwlu/p5JOCXylTOc=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-428-biTBk_znOj2Jed4zFu8G0A-1; Mon,
+ 09 Jun 2025 08:14:36 -0400
+X-MC-Unique: biTBk_znOj2Jed4zFu8G0A-1
+X-Mimecast-MFC-AGG-ID: biTBk_znOj2Jed4zFu8G0A_1749471275
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B96BB1956086;
+	Mon,  9 Jun 2025 12:14:34 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.58])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CE2951956087;
+	Mon,  9 Jun 2025 12:14:33 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)
+Date: Mon,  9 Jun 2025 20:14:26 +0800
+Message-ID: <20250609121426.1997271-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250521223107.709131-4-kbusch@meta.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Hello Keith,
+Document recently merged feature auto buffer registration(UBLK_F_AUTO_BUF_REG).
 
-On Wed, May 21, 2025 at 03:31:05PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Register the nvme namespace copy capablities with the request_queue
-> limits and implement support for the REQ_OP_COPY operation.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ Documentation/block/ublk.rst | 67 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-Since you never initialize Descriptor Format (DESFMT), you will use
-Descriptor Format 0 (No SNSID, 16b Guard PI).
+diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+index c368e1081b41..16ffca54eed4 100644
+--- a/Documentation/block/ublk.rst
++++ b/Documentation/block/ublk.rst
+@@ -352,6 +352,73 @@ For reaching best IO performance, ublk server should align its segment
+ parameter of `struct ublk_param_segment` with backend for avoiding
+ unnecessary IO split, which usually hurts io_uring performance.
+ 
++Auto Buffer Registration
++------------------------
++
++The ``UBLK_F_AUTO_BUF_REG`` feature automatically handles buffer registration
++and unregistration for I/O requests, which simplifies the buffer management
++process and reduces overhead in the ublk server implementation.
++
++This is another feature flag for using zero copy, and it is compatible with
++``UBLK_F_SUPPORT_ZERO_COPY``.
++
++Feature Overview
++~~~~~~~~~~~~~~~~
++
++This feature automatically registers request buffers to the io_uring context
++before delivering I/O commands to the ublk server and unregisters them when
++completing I/O commands. This eliminates the need for manual buffer
++registration/unregistration via ``UBLK_IO_REGISTER_IO_BUF`` and
++``UBLK_IO_UNREGISTER_IO_BUF`` commands, then IO handling in ublk server
++can avoid dependency on the two uring_cmd operations.
++
++This way not only simplifies ublk server implementation, but also makes
++concurrent IO handling becomes possible.
++
++Usage Requirements
++~~~~~~~~~~~~~~~~~~
++
++1. The ublk server must create a sparse buffer table on the same ``io_ring_ctx``
++   used for ``UBLK_IO_FETCH_REQ`` and ``UBLK_IO_COMMIT_AND_FETCH_REQ``.
++
++2. If uring_cmd is issued on a different ``io_ring_ctx``, manual buffer
++   unregistration is required.
++
++3. Buffer registration data must be passed via uring_cmd's ``sqe->addr`` with the
++   following structure::
++
++    struct ublk_auto_buf_reg {
++        __u16 index;      /* Buffer index for registration */
++        __u8 flags;       /* Registration flags */
++        __u8 reserved0;   /* Reserved for future use */
++        __u32 reserved1;  /* Reserved for future use */
++    };
++
++4. All reserved fields in ``ublk_auto_buf_reg`` must be zeroed.
++
++5. Optional flags can be passed via ``ublk_auto_buf_reg.flags``.
++
++Fallback Behavior
++~~~~~~~~~~~~~~~~~
++
++When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
++
++1. If auto buffer registration fails:
++   - The uring_cmd is completed
++   - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.op_flags``
++   - The ublk server must manually register the buffer
++
++2. If fallback is not enabled:
++   - The ublk I/O request fails silently
++
++Limitations
++~~~~~~~~~~~
++
++- Requires same ``io_ring_ctx`` for all operations
++- May require manual buffer management in fallback cases
++- Reserved fields must be zeroed for future compatibility
++
++
+ References
+ ==========
+ 
+-- 
+2.47.0
 
-That is understandable, since your block layer API intentionally does not
-support cross-device copies. But I would have expected you to somehow
-mention the descriptor type format used somewhere in the commit message and
-somewhere in the code (as a comment).
-
-
-I haven't followed all the work that has happened wrt. PI in the block
-layer recently, so I don't know, but I can see that nvme_set_app_tag()
-can set a app tag in the request itself, and that nvme_set_ref_tag()
-supports both 16b Guard PI and 64b Guard PI.
-
-Do we ever want to set the ELBT/ELBAT/ELBATM in the nvme_copy_range struct?
-And if the namespace is using 64b Guard PI, do we want to use Descriptor
-Format 1 (No SNSID, 32b/64b Guard PI) rather than Descriptor Format 0 ?
-
-
-Kind regards,
-Niklas
