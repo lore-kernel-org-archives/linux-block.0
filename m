@@ -1,174 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943722609DD;
-	Mon,  9 Jun 2025 12:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57AD256C7E
+	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 12:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749471880; cv=none; b=dD8+3Zf2RsvOQCJ7sJIAiMHCyQ3AwMiRseKGZWaCUWhshGB3wxOb2ySDvXuHOYauXpRdJ52iVW4enHu9U3Y+/pzteX/oUVLwWgy0ZPXihlmmi4fAKc61OyNfugqHKJbd+kKD4MazFCy2EdUXxRxOuOpsCKiENhzHkoXMQZPNOfk=
+	t=1749472474; cv=none; b=aBeAdw34GOP4t5UFFCbQNuGo/ib89+H/Oj4G5dxrB9WFIWlhxIkIC6TD5SLGkGqbheYMKQA1RS1wzXADfX5Dmvzk8JtxnyxbQAnV8UzWlHl/xm0ng7NMJfdd+vBLIgh4mysKctdJcnf9459qMZQrUme1yFuysQOO024JUCDw9UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749471880; c=relaxed/simple;
-	bh=Hahc+n3Jf7KOUvzlwOx91gFQ+x2DTk5MtNBwOjpizsI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lzdVeSFLL5neLFxQVuLUEdom8jrRX4cIU9TyiS+CJSK8idSG/PywpGncFORdKdxzTmeInOJiKJazBDYDPxb44CNYNWsd1gKYySIgolFnxv9sjXR/L+2nWGjzgH0flS8vmXKs2TPh6rYTvm/0xiRU1UOaJvKI8poAjF776XA0WR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spnJSzm7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749472474; c=relaxed/simple;
+	bh=gmAhRQR/FTDMUhFdA2hfL0IqfGi2Msey+YLwq5tRw0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WZWMVkrF0LIpcaqw8ER83a2Ogkpr5G2wLtay1vYWu62ChZZB25VoHtHXOOOdp90CZ9qndEJ4gwVCaehYsSVcGApTPab0vI5Rmf1pvunKrILx9Ew8e+LA4yCvwQ+HjHD7QmaKYXGzydGBOACTYEWnGp/AKvh1GLNDdVASnN3Bal8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aUEp+F9Z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spnJSzm7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E574C4CEEB;
-	Mon,  9 Jun 2025 12:24:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749471880;
-	bh=Hahc+n3Jf7KOUvzlwOx91gFQ+x2DTk5MtNBwOjpizsI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=spnJSzm7W3rfBeE0jvqI/fgvcxYQk9GJ8ZI178bwuR0bl2DV9J9CRx/sHT+fodmpY
-	 2uzgIS6YbvggxigiaG6ZMI21xz6S4kLttgdmD0yGoJ30Nyxm/GmzOwb4n9iolrUzb9
-	 x5M8IHCizv8cnfVmKVFqH192WQMe9WR1wGWc4A6HShAFggqLt1TKZkPkj5xy3eGVhR
-	 sWd+6KyWIbJM1eww90VNwXqynL/bSUJ7m9eB/+hYvSkg2R7bLjTRU6LZBFnWbD+TLN
-	 3inGFcuD+wgdlPAtUEDQ3+bnOc7kdGiNBl1VfxFwGJx9k8w0iKv1yuSKhVqYtYXUu0
-	 JmrutdnFowUIA==
-Message-ID: <54e0a717-e9fc-4534-bc27-8bc1ee745048@kernel.org>
-Date: Mon, 9 Jun 2025 21:24:36 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUEp+F9Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749472471;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cyl84OY6owBd9abIoWOCou2ET69uVySRRwTbpoB3DdE=;
+	b=aUEp+F9ZoXYeD1gdPicnMa97VCx0t2gu4OEH7dZY3D0een2z2vwLMCk1KJfL0QxyD3BfPq
+	3jr7di0QIoqj8VwuZvvsIfXOrhrFPEnoAtyif2lRDA4lnhpl29Agh3NfSP2zeu0WQbtvvY
+	UfV/uHMc+p3/kuF9m5M/6fXkO3I01sA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-244-jbo9OVt1OxSi13-m4jAxdA-1; Mon,
+ 09 Jun 2025 08:34:30 -0400
+X-MC-Unique: jbo9OVt1OxSi13-m4jAxdA-1
+X-Mimecast-MFC-AGG-ID: jbo9OVt1OxSi13-m4jAxdA_1749472469
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 96F22195609D;
+	Mon,  9 Jun 2025 12:34:29 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.58])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAB43180045B;
+	Mon,  9 Jun 2025 12:34:26 +0000 (UTC)
+Date: Mon, 9 Jun 2025 20:34:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/8] ublk: allow UBLK_IO_(UN)REGISTER_IO_BUF on any task
+Message-ID: <aEbUx51iu6oMkPB7@fedora>
+References: <20250606214011.2576398-1-csander@purestorage.com>
+ <20250606214011.2576398-7-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 08/19] scsi: detect support for command duration limits
-To: Friedrich Weber <f.weber@proxmox.com>,
- Mira Limbeck <m.limbeck@proxmox.com>, Niklas Cassel <nks@flawful.org>,
- Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Sumit Saxena <sumit.saxena@broadcom.com>,
- Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
- Chandrakanth patil <chandrakanth.patil@broadcom.com>,
- Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
- Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
- megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com
-Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
- Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230511011356.227789-1-nks@flawful.org>
- <20230511011356.227789-9-nks@flawful.org>
- <3dee186c-285e-4c1c-b879-6445eb2f3edf@proxmox.com>
- <6fb8499a-b5bc-4d41-bf37-32ebdea43e9a@kernel.org>
- <2e7d6a7e-4a82-4da5-ab39-267a7400ca49@proxmox.com>
- <b1d9e928-a7f3-4555-9c0a-5b83ba87a698@kernel.org>
- <a927b51b-1b34-4d4f-9447-d8c559127707@proxmox.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <a927b51b-1b34-4d4f-9447-d8c559127707@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250606214011.2576398-7-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 6/3/25 20:28, Friedrich Weber wrote:
->>> They provided controller information via `sas3ircu` and `storcli`:
->>>
->>> sas3ircu:
->>>
->>>   Controller type                         : SAS3008
->>>   BIOS version                            : 8.37.00.00
->>>   Firmware version                        : 16.00.16.00
->>
->> Is this the latest available FW for this HBA ? (see below)
+On Fri, Jun 06, 2025 at 03:40:09PM -0600, Caleb Sander Mateos wrote:
+> Currently, UBLK_IO_REGISTER_IO_BUF and UBLK_IO_UNREGISTER_IO_BUF are
+> only permitted on the ublk_io's daemon task. But this restriction is
+> unnecessary. ublk_register_io_buf() calls __ublk_check_and_get_req() to
+> look up the request from the tagset and atomically take a reference on
+> the request without accessing the ublk_io. ublk_unregister_io_buf()
+> doesn't use the q_id or tag at all.
 > 
-> It seems 16.00.16.00 is even newer than the latest version available on
-> the Broadcom website, which is a bit strange -- I only found [1] there
-> which has an older 16.00.14.00 (3008_FW_PH16.00.14.00.rar).
-
-So this is an old/now EOL 9300 series HBA, right ? Or is this a 3008 controller
-chip as part of the server motherboard (e.g. a supermicro HBA ?)
-Looking at the Broadcom support page for legacy products, the latest FW version
-seems to be 16.00.10.00.
-
->>> storcli:
->>>
->>> Firmware Package Build = 24.18.0-0021
->>> Firmware Version = 4.670.00-6500
->>> CPLD Version = 26515-00A
->>> Bios Version = 6.34.01.0_4.19.08.00_0x06160200
->>> HII Version = 03.23.06.00
->>> Ctrl-R Version = 5.18-0400
->>> Preboot CLI Version = 01.07-05:#%0000
->>> NVDATA Version = 3.1611.00-0005
->>> Boot Block Version = 3.07.00.00-0003
->>> Driver Name = megaraid_sas
->>> Driver Version = 07.727.03.00-rc1
->>
->> Unfortunately, I do not have any megaraid model so I cannot test/recreate. I
->> only have mpt3sas (9300, 9400 and 9500 series HBAs) and mpi3mr models (9600 HBA
->> series).
+> So allow these opcodes even on tasks other than io->task.
 > 
-> We just realized this is actually the firmware information for a
-> different unrelated controller on the same host (a LSI MegaRAID SAS-3
-> 3108 using the megaraid_sas driver). But the megaraid_sas one is not
-> used in our tests, so please ignore the storcli output we provided.
-> Sorry for the confusion.
+> Handle UBLK_IO_UNREGISTER_IO_BUF before obtaining the ubq and io since
+> the buffer index being unregistered is not necessarily related to the
+> specified q_id and tag.
 > 
-> The controller we're testing with is the SAS3008 I mentioned initially,
-> with firmware version 16.00.16.00 as reported by sas3ircu above.
-
-I do not have this FW... Not sure what the HBA itself is too. I only have some
-Broadcom 9300-XX HBAs that have the 3008 controller.
-
-> FWIW, the user reports they have also seen the same issue with a
-> SAS3-9500-8e Tri-mode HBA.
-
-This one had a FW update last month or so. So checking the latest is required.
-
->>> And the disk information from `smartctl --xall`
->>>
->>> 20T:
->>>
->>> === START OF INFORMATION SECTION ===
->>> Vendor:               WDC
->>> Product:              WUH722020BL5204
-
-...
-
->>> Product:              WUH721818AL5204
-
-I have these. I will try to check. But again, I seriously doubt this has
-anything to do with the drives since these do not support CDL, nor do the HBAs
-you listed. None of then support CDL so calling scsi_report_opcode() for
-checking CDL, we should always see the HBA SAT return "CDL not supported".
-
-
->> I do not think that the drives are relevant for this issue. How the HBA react
->> to a command error from the drive resulting from the HBA command translation
->> likely is the issue.
+> Add a feature flag UBLK_F_BUF_REG_OFF_DAEMON that userspace can use to
+> determine whether the kernel supports off-daemon buffer registration.
 > 
-> I see, but it is certainly strange that 18T vs 20T drives do seem to
-> make a difference (hotplug works with 18T and doesn't work with 20T).
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c      | 37 +++++++++++++++++++++--------------
+>  include/uapi/linux/ublk_cmd.h |  8 ++++++++
+>  2 files changed, 30 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index a8030818f74a..2084bbdd2cbb 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -68,11 +68,12 @@
+>  		| UBLK_F_ZONED \
+>  		| UBLK_F_USER_RECOVERY_FAIL_IO \
+>  		| UBLK_F_UPDATE_SIZE \
+>  		| UBLK_F_AUTO_BUF_REG \
+>  		| UBLK_F_QUIESCE \
+> -		| UBLK_F_PER_IO_DAEMON)
+> +		| UBLK_F_PER_IO_DAEMON \
+> +		| UBLK_F_BUF_REG_OFF_DAEMON)
+>  
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>  		| UBLK_F_USER_RECOVERY_REISSUE \
+>  		| UBLK_F_USER_RECOVERY_FAIL_IO)
+>  
+> @@ -2018,20 +2019,10 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+>  	}
+>  
+>  	return 0;
+>  }
+>  
+> -static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+> -				  const struct ublk_queue *ubq,
+> -				  unsigned int index, unsigned int issue_flags)
+> -{
+> -	if (!ublk_support_zero_copy(ubq))
+> -		return -EINVAL;
+> -
+> -	return io_buffer_unregister_bvec(cmd, index, issue_flags);
+> -}
+> -
+>  static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+>  		      struct ublk_io *io, __u64 buf_addr)
+>  {
+>  	struct ublk_device *ub = ubq->dev;
+>  	int ret = 0;
+> @@ -2184,10 +2175,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+>  
+>  	ret = ublk_check_cmd_op(cmd_op);
+>  	if (ret)
+>  		goto out;
+>  
+> +	/*
+> +	 * io_buffer_unregister_bvec() doesn't access the ubq or io,
+> +	 * so no need to validate the q_id, tag, or task
+> +	 */
+> +	if (_IOC_NR(cmd_op) == UBLK_IO_UNREGISTER_IO_BUF)
+> +		return io_buffer_unregister_bvec(cmd, ub_cmd->addr,
+> +						 issue_flags);
+> +
+>  	ret = -EINVAL;
+>  	if (ub_cmd->q_id >= ub->dev_info.nr_hw_queues)
+>  		goto out;
+>  
+>  	ubq = ublk_get_queue(ub, ub_cmd->q_id);
+> @@ -2204,12 +2203,21 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+>  
+>  		ublk_prep_cancel(cmd, issue_flags, ubq, tag);
+>  		return -EIOCBQUEUED;
+>  	}
+>  
+> -	if (READ_ONCE(io->task) != current)
+> +	if (READ_ONCE(io->task) != current) {
+> +		/*
+> +		 * ublk_register_io_buf() accesses only the request, not io,
+> +		 * so can be handled on any task
+> +		 */
+> +		if (_IOC_NR(cmd_op) == UBLK_IO_REGISTER_IO_BUF)
+> +			return ublk_register_io_buf(cmd, ubq, tag, ub_cmd->addr,
+> +						    issue_flags);
+> +
+>  		goto out;
+> +	}
+>  
+>  	/* there is pending io cmd, something must be wrong */
+>  	if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)) {
+>  		ret = -EBUSY;
 
-Probably a timing difference since these drives are not the same generation.
-They have different timing on scan.
-
->>> If you need any additional information, please let us know!
->>
->> Adding the Broadcom folks to this thread, since as suspected, this seems to be
->> an HBA issue. I strongly suspect that it relates to a recent very similar issue
->> I have seen with the mpi3mr driver and a 9600 Broadcom HBA: any hotplug of a
->> drive would completely crash the HBA and a full power cycle was needed to
->> recover. A simple reboot would not be sufficient. I think the latest HBA FW
->> version fixes that problem.
->>
->> Broadcom team,
->>
->> Any comment ?
-
-Broadcom ? Would you care to comment ?
-
-At this point, I have no idea what is going on. My hunch is that it is the HBA
-SAT misbehaving. But that is only a hunch. To prove it, we would likely need a
-bus trace and have Broadcom look at HBA logs (which can be extracted using
-storecli). All of this likely means involving the technical support of the vendors.
+It also skips check on UBLK_IO_FLAG_OWNED_BY_SRV for both UBLK_IO_REGISTER_IO_BUF
+and UBLK_IO_UNREGISTER_IO_BUF, :-(
 
 
--- 
-Damien Le Moal
-Western Digital Research
+thanks,
+Ming
+
