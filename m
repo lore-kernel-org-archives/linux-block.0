@@ -1,148 +1,174 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49993610D
-	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 12:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943722609DD;
+	Mon,  9 Jun 2025 12:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749471279; cv=none; b=KdqihhHem/UjwCQzOlYsOae8Vm63EFXdhN5L4rCjWLXPesZ1RwMmg0dIkBX1L21dfePCkqB8gtP77rHwi0X8YG5GBMsLqPT6+SAezPXHpegJYt+xMweDibrGT6cqkWfyYBwWPHma1hYv2QnuM7QOu0Gs7L2QPabnkknykai76WU=
+	t=1749471880; cv=none; b=dD8+3Zf2RsvOQCJ7sJIAiMHCyQ3AwMiRseKGZWaCUWhshGB3wxOb2ySDvXuHOYauXpRdJ52iVW4enHu9U3Y+/pzteX/oUVLwWgy0ZPXihlmmi4fAKc61OyNfugqHKJbd+kKD4MazFCy2EdUXxRxOuOpsCKiENhzHkoXMQZPNOfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749471279; c=relaxed/simple;
-	bh=CnbwAN5CeI4ihKQJftmmx1G7aOLegvfEIDr4jSfodXY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uX4VV2eRaGk9zbSMmwlsxtK3a6fgvhX867YZ8dn7/SYAOutkEgaUaqpzlThoWHaixIcL725bfGQWzs6z8KaPSE2kRqZfKUP5jtefjx024KJQI+Kl7yNIVyyyLEQKsIBQfu0t8g983ZRL/YGtFAcBpgDbn/zciunM05JoAyIOOK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ez7QfnmV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749471880; c=relaxed/simple;
+	bh=Hahc+n3Jf7KOUvzlwOx91gFQ+x2DTk5MtNBwOjpizsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lzdVeSFLL5neLFxQVuLUEdom8jrRX4cIU9TyiS+CJSK8idSG/PywpGncFORdKdxzTmeInOJiKJazBDYDPxb44CNYNWsd1gKYySIgolFnxv9sjXR/L+2nWGjzgH0flS8vmXKs2TPh6rYTvm/0xiRU1UOaJvKI8poAjF776XA0WR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spnJSzm7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ez7QfnmV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749471277;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1CfDae3ZYporZeKCrPShL8P1dMIfeXxy+k+zMTwH8/M=;
-	b=ez7QfnmV0fR4+sRUIhp+GYupqA6ShDCRDtrIrQzjXtU6kDB1KPgKlhiz1gEye3mm1Wwi81
-	nrI+pDGMUsMxV5vh8IMUbslaYILVFTgKUVjXyDo3oBaNrkAS+9FaIUOrdOIpahpR0EOyYR
-	ESNwY24eZO/vDgnLwlu/p5JOCXylTOc=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-428-biTBk_znOj2Jed4zFu8G0A-1; Mon,
- 09 Jun 2025 08:14:36 -0400
-X-MC-Unique: biTBk_znOj2Jed4zFu8G0A-1
-X-Mimecast-MFC-AGG-ID: biTBk_znOj2Jed4zFu8G0A_1749471275
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B96BB1956086;
-	Mon,  9 Jun 2025 12:14:34 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.58])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CE2951956087;
-	Mon,  9 Jun 2025 12:14:33 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)
-Date: Mon,  9 Jun 2025 20:14:26 +0800
-Message-ID: <20250609121426.1997271-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spnJSzm7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E574C4CEEB;
+	Mon,  9 Jun 2025 12:24:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749471880;
+	bh=Hahc+n3Jf7KOUvzlwOx91gFQ+x2DTk5MtNBwOjpizsI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=spnJSzm7W3rfBeE0jvqI/fgvcxYQk9GJ8ZI178bwuR0bl2DV9J9CRx/sHT+fodmpY
+	 2uzgIS6YbvggxigiaG6ZMI21xz6S4kLttgdmD0yGoJ30Nyxm/GmzOwb4n9iolrUzb9
+	 x5M8IHCizv8cnfVmKVFqH192WQMe9WR1wGWc4A6HShAFggqLt1TKZkPkj5xy3eGVhR
+	 sWd+6KyWIbJM1eww90VNwXqynL/bSUJ7m9eB/+hYvSkg2R7bLjTRU6LZBFnWbD+TLN
+	 3inGFcuD+wgdlPAtUEDQ3+bnOc7kdGiNBl1VfxFwGJx9k8w0iKv1yuSKhVqYtYXUu0
+	 JmrutdnFowUIA==
+Message-ID: <54e0a717-e9fc-4534-bc27-8bc1ee745048@kernel.org>
+Date: Mon, 9 Jun 2025 21:24:36 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 08/19] scsi: detect support for command duration limits
+To: Friedrich Weber <f.weber@proxmox.com>,
+ Mira Limbeck <m.limbeck@proxmox.com>, Niklas Cassel <nks@flawful.org>,
+ Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Sumit Saxena <sumit.saxena@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+ Niklas Cassel <niklas.cassel@wdc.com>
+References: <20230511011356.227789-1-nks@flawful.org>
+ <20230511011356.227789-9-nks@flawful.org>
+ <3dee186c-285e-4c1c-b879-6445eb2f3edf@proxmox.com>
+ <6fb8499a-b5bc-4d41-bf37-32ebdea43e9a@kernel.org>
+ <2e7d6a7e-4a82-4da5-ab39-267a7400ca49@proxmox.com>
+ <b1d9e928-a7f3-4555-9c0a-5b83ba87a698@kernel.org>
+ <a927b51b-1b34-4d4f-9447-d8c559127707@proxmox.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <a927b51b-1b34-4d4f-9447-d8c559127707@proxmox.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Document recently merged feature auto buffer registration(UBLK_F_AUTO_BUF_REG).
+On 6/3/25 20:28, Friedrich Weber wrote:
+>>> They provided controller information via `sas3ircu` and `storcli`:
+>>>
+>>> sas3ircu:
+>>>
+>>>   Controller type                         : SAS3008
+>>>   BIOS version                            : 8.37.00.00
+>>>   Firmware version                        : 16.00.16.00
+>>
+>> Is this the latest available FW for this HBA ? (see below)
+> 
+> It seems 16.00.16.00 is even newer than the latest version available on
+> the Broadcom website, which is a bit strange -- I only found [1] there
+> which has an older 16.00.14.00 (3008_FW_PH16.00.14.00.rar).
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- Documentation/block/ublk.rst | 67 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+So this is an old/now EOL 9300 series HBA, right ? Or is this a 3008 controller
+chip as part of the server motherboard (e.g. a supermicro HBA ?)
+Looking at the Broadcom support page for legacy products, the latest FW version
+seems to be 16.00.10.00.
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index c368e1081b41..16ffca54eed4 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -352,6 +352,73 @@ For reaching best IO performance, ublk server should align its segment
- parameter of `struct ublk_param_segment` with backend for avoiding
- unnecessary IO split, which usually hurts io_uring performance.
- 
-+Auto Buffer Registration
-+------------------------
-+
-+The ``UBLK_F_AUTO_BUF_REG`` feature automatically handles buffer registration
-+and unregistration for I/O requests, which simplifies the buffer management
-+process and reduces overhead in the ublk server implementation.
-+
-+This is another feature flag for using zero copy, and it is compatible with
-+``UBLK_F_SUPPORT_ZERO_COPY``.
-+
-+Feature Overview
-+~~~~~~~~~~~~~~~~
-+
-+This feature automatically registers request buffers to the io_uring context
-+before delivering I/O commands to the ublk server and unregisters them when
-+completing I/O commands. This eliminates the need for manual buffer
-+registration/unregistration via ``UBLK_IO_REGISTER_IO_BUF`` and
-+``UBLK_IO_UNREGISTER_IO_BUF`` commands, then IO handling in ublk server
-+can avoid dependency on the two uring_cmd operations.
-+
-+This way not only simplifies ublk server implementation, but also makes
-+concurrent IO handling becomes possible.
-+
-+Usage Requirements
-+~~~~~~~~~~~~~~~~~~
-+
-+1. The ublk server must create a sparse buffer table on the same ``io_ring_ctx``
-+   used for ``UBLK_IO_FETCH_REQ`` and ``UBLK_IO_COMMIT_AND_FETCH_REQ``.
-+
-+2. If uring_cmd is issued on a different ``io_ring_ctx``, manual buffer
-+   unregistration is required.
-+
-+3. Buffer registration data must be passed via uring_cmd's ``sqe->addr`` with the
-+   following structure::
-+
-+    struct ublk_auto_buf_reg {
-+        __u16 index;      /* Buffer index for registration */
-+        __u8 flags;       /* Registration flags */
-+        __u8 reserved0;   /* Reserved for future use */
-+        __u32 reserved1;  /* Reserved for future use */
-+    };
-+
-+4. All reserved fields in ``ublk_auto_buf_reg`` must be zeroed.
-+
-+5. Optional flags can be passed via ``ublk_auto_buf_reg.flags``.
-+
-+Fallback Behavior
-+~~~~~~~~~~~~~~~~~
-+
-+When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
-+
-+1. If auto buffer registration fails:
-+   - The uring_cmd is completed
-+   - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.op_flags``
-+   - The ublk server must manually register the buffer
-+
-+2. If fallback is not enabled:
-+   - The ublk I/O request fails silently
-+
-+Limitations
-+~~~~~~~~~~~
-+
-+- Requires same ``io_ring_ctx`` for all operations
-+- May require manual buffer management in fallback cases
-+- Reserved fields must be zeroed for future compatibility
-+
-+
- References
- ==========
- 
+>>> storcli:
+>>>
+>>> Firmware Package Build = 24.18.0-0021
+>>> Firmware Version = 4.670.00-6500
+>>> CPLD Version = 26515-00A
+>>> Bios Version = 6.34.01.0_4.19.08.00_0x06160200
+>>> HII Version = 03.23.06.00
+>>> Ctrl-R Version = 5.18-0400
+>>> Preboot CLI Version = 01.07-05:#%0000
+>>> NVDATA Version = 3.1611.00-0005
+>>> Boot Block Version = 3.07.00.00-0003
+>>> Driver Name = megaraid_sas
+>>> Driver Version = 07.727.03.00-rc1
+>>
+>> Unfortunately, I do not have any megaraid model so I cannot test/recreate. I
+>> only have mpt3sas (9300, 9400 and 9500 series HBAs) and mpi3mr models (9600 HBA
+>> series).
+> 
+> We just realized this is actually the firmware information for a
+> different unrelated controller on the same host (a LSI MegaRAID SAS-3
+> 3108 using the megaraid_sas driver). But the megaraid_sas one is not
+> used in our tests, so please ignore the storcli output we provided.
+> Sorry for the confusion.
+> 
+> The controller we're testing with is the SAS3008 I mentioned initially,
+> with firmware version 16.00.16.00 as reported by sas3ircu above.
+
+I do not have this FW... Not sure what the HBA itself is too. I only have some
+Broadcom 9300-XX HBAs that have the 3008 controller.
+
+> FWIW, the user reports they have also seen the same issue with a
+> SAS3-9500-8e Tri-mode HBA.
+
+This one had a FW update last month or so. So checking the latest is required.
+
+>>> And the disk information from `smartctl --xall`
+>>>
+>>> 20T:
+>>>
+>>> === START OF INFORMATION SECTION ===
+>>> Vendor:               WDC
+>>> Product:              WUH722020BL5204
+
+...
+
+>>> Product:              WUH721818AL5204
+
+I have these. I will try to check. But again, I seriously doubt this has
+anything to do with the drives since these do not support CDL, nor do the HBAs
+you listed. None of then support CDL so calling scsi_report_opcode() for
+checking CDL, we should always see the HBA SAT return "CDL not supported".
+
+
+>> I do not think that the drives are relevant for this issue. How the HBA react
+>> to a command error from the drive resulting from the HBA command translation
+>> likely is the issue.
+> 
+> I see, but it is certainly strange that 18T vs 20T drives do seem to
+> make a difference (hotplug works with 18T and doesn't work with 20T).
+
+Probably a timing difference since these drives are not the same generation.
+They have different timing on scan.
+
+>>> If you need any additional information, please let us know!
+>>
+>> Adding the Broadcom folks to this thread, since as suspected, this seems to be
+>> an HBA issue. I strongly suspect that it relates to a recent very similar issue
+>> I have seen with the mpi3mr driver and a 9600 Broadcom HBA: any hotplug of a
+>> drive would completely crash the HBA and a full power cycle was needed to
+>> recover. A simple reboot would not be sufficient. I think the latest HBA FW
+>> version fixes that problem.
+>>
+>> Broadcom team,
+>>
+>> Any comment ?
+
+Broadcom ? Would you care to comment ?
+
+At this point, I have no idea what is going on. My hunch is that it is the HBA
+SAT misbehaving. But that is only a hunch. To prove it, we would likely need a
+bus trace and have Broadcom look at HBA logs (which can be extracted using
+storecli). All of this likely means involving the technical support of the vendors.
+
+
 -- 
-2.47.0
-
+Damien Le Moal
+Western Digital Research
