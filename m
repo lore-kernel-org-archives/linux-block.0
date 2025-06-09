@@ -1,49 +1,54 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4311313AC1;
-	Mon,  9 Jun 2025 04:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34CE2571C9
+	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 06:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749442291; cv=none; b=G0wmneRjAs9dgwL9ndzOm6kDyv8JJ58Lx3/8ZaJpuIjDa3tLMAYXpkHkEPi9/ArCbVcRkxQELmgCQtOD5pmcZfFEoBPLCO813iO8YKClIOgKdug3iV3AW4Wog4BaSOfjMlCiU/+W2/LYEGgY73jXi+SSICJPDElNzTXn8ZjzqO8=
+	t=1749452267; cv=none; b=cP0WIwUEs+Jv+fWWkYjcfU6s95IGYq/ewwgLQ/wXXFyyoUTM/cpgVDbklkJ5EjvrAwI1cNRhpGoG4N/q3UrHZGpkgg4KDQ8Xd6kkkf9wQfHdCfZKBUNdBjdr6FlBJCbRtPfXgAYPrzSTL5KbgPRK6BbTI3mKL0D7s2en8qMG9sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749442291; c=relaxed/simple;
-	bh=5k+ptO2Bvp2rDM5eLKk+8ZcnEWW4i7JDYoLWfYvoPec=;
+	s=arc-20240116; t=1749452267; c=relaxed/simple;
+	bh=ARoCqWcofYkGjc10zDqILXHGTaJkQxNAqse3MTdzQ8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBMhBdx7VVg7wIv76KQQ8hpe0iGrhH8+gPa1rO1XEoB30VK+LNFtzNU0x8Ft2lnKNgLYYYbcfG85QtXf9bJPUCPOkndVrM0AwXd1EwIqv5+hmnb0VnMDePVdMej6b6qov3ryIInjvfecGiUvEZAwopQqeL4kMj51sScopKJLZmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TQhULtX7; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=YlTkjPxgIkaJaZKnDWK5/Ga1COkjVJUeGHqUlVH38O3EkQU9byDoaU3mVwnEGipAr3GDhx6ulZuFp0visCD5ytXOjybRFcOP/Nz0edMyjwAbRimJ+Wcnc2mv1AC8H5gWNo/xzlOkpFYVtSWdQVToMaXX0IP41x/LX6aN/yxupuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hT0CEuNn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TQhULtX7"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+A8m+5Nm/85Oh5Q0q7gkcp2AYf9b7B4/4JKgs+UNNm4=; b=TQhULtX7/+G1d1FixKxwy1CuVQ
-	9DRp+JE2XLpCn2Rb8ZZYj6vUXZZztIcDesnSiqcH6bZq3NjIVrZ97PUI9p0h+qoCJKqc0mE3HDgk0
-	9llzjZWqNNUdaNB+fQnjyKEQGE+fNjCsX51Ub6xfbPcbFHZTfUVqHUEjbD0Fn8KPm0CXWOHc7lHkF
-	NZPUohOf/Z1BZsSw6aGQ4gbYpHzklBa3FdHLUqerTowsNQQez0PNR9keH9YWcNfA2vOon0FFeXao8
-	wW0e0mjJU4g1JyePh7Mx4gmhkJOw9IPSc5SeaJc9+nPCo3dhCUZ2NKMSdK8kBVU0kDe0L/lSPwYqt
-	97ZKqkhA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uOTr5-00000003Nk4-1fEs;
-	Mon, 09 Jun 2025 04:11:27 +0000
-Date: Sun, 8 Jun 2025 21:11:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, jack@suse.cz,
-	anuj1072538@gmail.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, hch@infradead.org, ebiggers@kernel.org,
-	adilger@dilger.ca, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com
-Subject: Re: [PATCH for-next v2 2/2] fs: add ioctl to query protection info
- capabilities
-Message-ID: <aEZe79nes2fmJs6N@infradead.org>
-References: <20250605150729.2730-1-anuj20.g@samsung.com>
- <CGME20250605150746epcas5p1cf96907472d8a27b0d926b9e2f943e70@epcas5p1.samsung.com>
- <20250605150729.2730-3-anuj20.g@samsung.com>
- <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hT0CEuNn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749452263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E0MHN7ZtMYMO/keG5XCU1az3m6IvXqs5wUg7/ChdN1Q=;
+	b=hT0CEuNnKhut2itgO8gNTfLsZoJ366dpfGdvqUroGxleR6/Ut6biHrscrOVnIiXeze806K
+	Jx2jWfZ8LeFt+2ZNzrs1RPM6bzNnD0l2E+URLjqy0fwWZhcucS7xz+m5l7E5UVmWibXgkG
+	dnmMDrkADzQeKioMd6H3qkhzStNHdGk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-57-KJUQ7uJdOyaTct1XZQodyA-1; Mon,
+ 09 Jun 2025 02:57:38 -0400
+X-MC-Unique: KJUQ7uJdOyaTct1XZQodyA-1
+X-Mimecast-MFC-AGG-ID: KJUQ7uJdOyaTct1XZQodyA_1749452257
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2ACAC1800283;
+	Mon,  9 Jun 2025 06:57:37 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.58])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C85018003FC;
+	Mon,  9 Jun 2025 06:57:34 +0000 (UTC)
+Date: Mon, 9 Jun 2025 14:57:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/8] ublk: check cmd_op first
+Message-ID: <aEaF2BI289mawdsu@fedora>
+References: <20250606214011.2576398-1-csander@purestorage.com>
+ <20250606214011.2576398-2-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,17 +57,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1a56lbpsc.fsf@ca-mkp.ca.oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250606214011.2576398-2-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Jun 05, 2025 at 10:07:00PM -0400, Martin K. Petersen wrote:
+On Fri, Jun 06, 2025 at 03:40:04PM -0600, Caleb Sander Mateos wrote:
+> In preparation for skipping some of the other checks for certain IO
+> opcodes, move the cmd_op check earlier.
 > 
-> Hi Anuj!
-> 
-> > A new structure struct fs_pi_cap is introduced, which contains the
-> > following fields:
-> 
-> Maybe fs_metadata_cap and then fmd_ as prefix in the struct?
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Yeah, that does sound better.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
 
