@@ -1,212 +1,160 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28D11A841F
-	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 17:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2A51624DF
+	for <linux-block@vger.kernel.org>; Mon,  9 Jun 2025 20:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749491362; cv=none; b=X5Xf2ZEBcAqWlM2egu+B5vC1LpvSHHT1uk+QEuvQc6LLSw/mvDiryI/o/n+6XPHUOI2Mxub/IHd+xeLtiARIH/V8PD5U5k+/vzl88yTAhdYk5560aHhcxvpoVg+1dNxgH6QZScKoJnE5pf43Pwqic68/qJFh3C2tPq9YfpSI3GM=
+	t=1749502100; cv=none; b=cNUpQGItx0y25uFNx01DeZ1ytUTcoasY8zu+mUyVlAKAphkdhEpJyHqlAXl1+3WWur/rW3e11LV2OBXDdlFze/dGwf5lGiGoczNOQquOd2jD40YuH4DbgFF2Z6jAjMv+yQJHU9i4yAzL3ZaewQf/+6EjjNX/IECX/LBqN7PiKDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749491362; c=relaxed/simple;
-	bh=BX8IjBhs93qZ9a0zfy9TBu9/J7STSUPVZq9OTXm578s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YvWjq3jSp7qzhVyDHYFAe4qSnRWyIunAOz9tbq1aMz2A8sJ9ggbfzA1plRV1Yd1g6vK+3IKlT6JTHgLV+p/RoE+ylGuw+jlhp/sj+Ookg6nbvMtykbxxt0OC1L1KkWGhypgUwWyQSYdwQt7a82gT8WrDh62nZxKDNauTX9KzPYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GIzIpjWz; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1749502100; c=relaxed/simple;
+	bh=A1wDyxbvHHqicVQTTMSZu6KrWiPSDOzNq8DpWzJQtd8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=eXHbsw9FneCKqLBCH3ymeqDECh0p1kOSdp0ldco0JL62/Nmz1G4Gh7rYRuXizaLbCVag9vpOM6fIInJKXjqZKFuF1lLXkhwWhoWeptl3LnG4yrVjurVFIgdC5INwBRO1w/bYlys8h4NEXRFc9m9isg3pT5G2GzoaWS4wcnxXVr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SZbEK6qB; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GIzIpjWz"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23496600df1so5287045ad.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Jun 2025 10:49:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1749491360; x=1750096160; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IAKhwCEQCW9zRoxMPrvi+tGcBpKNE4yFbyEigtT5eb4=;
-        b=GIzIpjWz9V4P7WThpM9IhddD/2wMIoRTp9AEsWDJ5inY2AK1QLuTjcjP9Wi2imEBp3
-         VO0DKifCEus7pv+vbLhK+cOos2uTkkZCm1xAeIX0Hu3Khyx3iSsR1qlTL3JkyC5Yqeix
-         A0RsexV0SeqbS8v4dLbD1KA+nbGDXc7LmlOymQXWoqNgx5ppZXXgth8AJGvt/ro1vw98
-         iCfMuQFrG9Aa3H5kIXHzXKF5hIl9PQQFy9bI3PdRA+VtBAepieSW3p36YdlK3aOevYFZ
-         G/EJCb2XO/v+gpuj8lJmSsyOD7Lj2Yimh4CLlWU9Q/n7++90KwukPvkkFg1cdfqqXXzT
-         w0WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749491360; x=1750096160;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IAKhwCEQCW9zRoxMPrvi+tGcBpKNE4yFbyEigtT5eb4=;
-        b=pXHkmLEnChN/b639EFpHrv6RzQSUhxI+WQVPMsKuEiD/fFPr1FTLkF6cJXzw47io6n
-         ZUcEcfE7fhxpM+zKo5yB57AiOeftJowSbt15oyBmzrW4dfoTAdZM1miiVJbT3yvKyBcM
-         qHInM+zViKa9jmwpYS7xtlhavbgvTv+raWJhnD8cRVxKHFb/s29Vgn9Nn/FOUYeeAZ1J
-         P7eUsqPGun8XL6D9n0rF/Vv1NhjPsn+I2OQqjeqCFP+qeRBuR6q5i1WHY+wQ51w0HIDm
-         58d2u5MaNZlBHwIbpJmKrXcdKnup8I1q69h7YofXwLuESwK743FoR8aVOkXcYjLAeZIR
-         gCCA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0BHS8RAGc3ees51UvqoojqGaLw3ARvJM25ZDaCT7+g+GJtUI373peVodBkdeeQ6bqu5f7j1IYjJxXTQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEFYSPnN40pjYmexl46IZVTAe2GUmnf4zeJjJn0w/nFIEqO6cm
-	L/8oFYa9t5uBvp/g10LZ97Pv5CTGgf/hqanIn+oxsFUTVIH3H3yL0XvsUqksey+d6EsWgLWTW/8
-	Rc1+rqMzG6a0GDsaYyIjl5tDgxX78SNVKnf1sNIigrw==
-X-Gm-Gg: ASbGncuKmTnN7K/CNnThzIs1wdQHpwVYFh62Pyq/O6+ptd8tBmN3V4F9H1ZUaek9e8f
-	eK4nLGh6fy2IgsYBD80fHbu+mf8GS+pnfx61fBpWcHLIAkzYXGTITnSsKkm/zXM6WVKpquQKTjn
-	RzR5OfVPjSikzSyGLv/30v+OXt1mvr/3Y5
-X-Google-Smtp-Source: AGHT+IGsMeghNyxtcC0ikK+J/PUZIjyJubbVtpGHHRoKd7YVYLtPJEyF/lpSeTpDy/9jUYkEEkUY/aBz029aneNb3uM=
-X-Received: by 2002:a17:903:1247:b0:234:ef42:5d52 with SMTP id
- d9443c01a7336-23604028ea5mr70508765ad.6.1749491360159; Mon, 09 Jun 2025
- 10:49:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SZbEK6qB"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bGPC416XfzltPtc;
+	Mon,  9 Jun 2025 20:48:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:content-language:references:subject:subject:from:from
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1749502094; x=1752094095; bh=zpDa7PM8gDIM/x1IAzLXATzr
+	dnEUd6JRHz9OFu6P/9A=; b=SZbEK6qBmwdb0eISlD9zm2WLIY8iItK9df8bCMW2
+	xaIKcZkDm5rh32xjQMmtcR1ZKBjJtITGb6CCTIoynX8h0qApI1FsRLrz7dANu43Z
+	HGK3eBxAAyFGSUI18qapB9RnFGRKVNfeA6CfHajCKDSZjRCKK76wawHJPvU376mH
+	7vZkLo4dDLEUuntCkWk5mzYCZk6+zkcGMQOxtBc4jaMiYOgMZZBKXYJam6PH9ILu
+	E9maW69HR5CQuyGSMWR+I+XCKJgvYzfXWaC0BCF/5GB5OIZteiLnMCbQ+MIpn39Y
+	O/pGlwl4PehktoC3QvVMEnuxZw2WJ9VVWgVyYsAODcdkww==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id cqLFy8ATxkwQ; Mon,  9 Jun 2025 20:48:14 +0000 (UTC)
+Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bGPBw5jKqzlgqyd;
+	Mon,  9 Jun 2025 20:48:07 +0000 (UTC)
+Message-ID: <a0c89df8-4b33-409c-ba43-f9543fb1b091@acm.org>
+Date: Mon, 9 Jun 2025 13:48:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250606214011.2576398-1-csander@purestorage.com>
- <20250606214011.2576398-7-csander@purestorage.com> <aEbUx51iu6oMkPB7@fedora>
-In-Reply-To: <aEbUx51iu6oMkPB7@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 9 Jun 2025 10:49:09 -0700
-X-Gm-Features: AX0GCFuGYb7Z1iJyYekjrq_X6p0PtWBefP2lDhP6WpclNqK5piFdDh3CGP3qkzs
-Message-ID: <CADUfDZoCCFs6ZKwxDrgsHGTiCgyehS1uODu+iDmz1+5_k7tLbw@mail.gmail.com>
-Subject: Re: [PATCH 6/8] ublk: allow UBLK_IO_(UN)REGISTER_IO_BUF on any task
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20250516044754.GA12964@lst.de>
+ <47b24ea0-ef8f-441f-b405-a062b986ce93@acm.org> <20250520135624.GA8472@lst.de>
+ <d28b6138-7618-4092-8e05-66be2625ecd9@acm.org> <20250521055319.GA3109@lst.de>
+ <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org>
+ <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
+ <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
+ <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
+ <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
+ <20250526052434.GA11639@lst.de>
+ <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
+ <d8f5f6eb-42b8-4ce8-ac86-18db6d3d03d0@kernel.org>
+Content-Language: en-US
+In-Reply-To: <d8f5f6eb-42b8-4ce8-ac86-18db6d3d03d0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 9, 2025 at 5:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Fri, Jun 06, 2025 at 03:40:09PM -0600, Caleb Sander Mateos wrote:
-> > Currently, UBLK_IO_REGISTER_IO_BUF and UBLK_IO_UNREGISTER_IO_BUF are
-> > only permitted on the ublk_io's daemon task. But this restriction is
-> > unnecessary. ublk_register_io_buf() calls __ublk_check_and_get_req() to
-> > look up the request from the tagset and atomically take a reference on
-> > the request without accessing the ublk_io. ublk_unregister_io_buf()
-> > doesn't use the q_id or tag at all.
-> >
-> > So allow these opcodes even on tasks other than io->task.
-> >
-> > Handle UBLK_IO_UNREGISTER_IO_BUF before obtaining the ubq and io since
-> > the buffer index being unregistered is not necessarily related to the
-> > specified q_id and tag.
-> >
-> > Add a feature flag UBLK_F_BUF_REG_OFF_DAEMON that userspace can use to
-> > determine whether the kernel supports off-daemon buffer registration.
-> >
-> > Suggested-by: Ming Lei <ming.lei@redhat.com>
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 37 +++++++++++++++++++++--------------
-> >  include/uapi/linux/ublk_cmd.h |  8 ++++++++
-> >  2 files changed, 30 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index a8030818f74a..2084bbdd2cbb 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -68,11 +68,12 @@
-> >               | UBLK_F_ZONED \
-> >               | UBLK_F_USER_RECOVERY_FAIL_IO \
-> >               | UBLK_F_UPDATE_SIZE \
-> >               | UBLK_F_AUTO_BUF_REG \
-> >               | UBLK_F_QUIESCE \
-> > -             | UBLK_F_PER_IO_DAEMON)
-> > +             | UBLK_F_PER_IO_DAEMON \
-> > +             | UBLK_F_BUF_REG_OFF_DAEMON)
-> >
-> >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> >               | UBLK_F_USER_RECOVERY_REISSUE \
-> >               | UBLK_F_USER_RECOVERY_FAIL_IO)
-> >
-> > @@ -2018,20 +2019,10 @@ static int ublk_register_io_buf(struct io_uring=
-_cmd *cmd,
-> >       }
-> >
-> >       return 0;
-> >  }
-> >
-> > -static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
-> > -                               const struct ublk_queue *ubq,
-> > -                               unsigned int index, unsigned int issue_=
-flags)
-> > -{
-> > -     if (!ublk_support_zero_copy(ubq))
-> > -             return -EINVAL;
-> > -
-> > -     return io_buffer_unregister_bvec(cmd, index, issue_flags);
-> > -}
-> > -
-> >  static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq=
-,
-> >                     struct ublk_io *io, __u64 buf_addr)
-> >  {
-> >       struct ublk_device *ub =3D ubq->dev;
-> >       int ret =3D 0;
-> > @@ -2184,10 +2175,18 @@ static int __ublk_ch_uring_cmd(struct io_uring_=
-cmd *cmd,
-> >
-> >       ret =3D ublk_check_cmd_op(cmd_op);
-> >       if (ret)
-> >               goto out;
-> >
-> > +     /*
-> > +      * io_buffer_unregister_bvec() doesn't access the ubq or io,
-> > +      * so no need to validate the q_id, tag, or task
-> > +      */
-> > +     if (_IOC_NR(cmd_op) =3D=3D UBLK_IO_UNREGISTER_IO_BUF)
-> > +             return io_buffer_unregister_bvec(cmd, ub_cmd->addr,
-> > +                                              issue_flags);
-> > +
-> >       ret =3D -EINVAL;
-> >       if (ub_cmd->q_id >=3D ub->dev_info.nr_hw_queues)
-> >               goto out;
-> >
-> >       ubq =3D ublk_get_queue(ub, ub_cmd->q_id);
-> > @@ -2204,12 +2203,21 @@ static int __ublk_ch_uring_cmd(struct io_uring_=
-cmd *cmd,
-> >
-> >               ublk_prep_cancel(cmd, issue_flags, ubq, tag);
-> >               return -EIOCBQUEUED;
-> >       }
-> >
-> > -     if (READ_ONCE(io->task) !=3D current)
-> > +     if (READ_ONCE(io->task) !=3D current) {
-> > +             /*
-> > +              * ublk_register_io_buf() accesses only the request, not =
-io,
-> > +              * so can be handled on any task
-> > +              */
-> > +             if (_IOC_NR(cmd_op) =3D=3D UBLK_IO_REGISTER_IO_BUF)
-> > +                     return ublk_register_io_buf(cmd, ubq, tag, ub_cmd=
-->addr,
-> > +                                                 issue_flags);
-> > +
-> >               goto out;
-> > +     }
-> >
-> >       /* there is pending io cmd, something must be wrong */
-> >       if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)) {
-> >               ret =3D -EBUSY;
->
-> It also skips check on UBLK_IO_FLAG_OWNED_BY_SRV for both UBLK_IO_REGISTE=
-R_IO_BUF
-> and UBLK_IO_UNREGISTER_IO_BUF, :-(
+On 6/8/25 3:47 PM, Damien Le Moal wrote:
+> So yes, we need a fix. Can you work on one ?
 
-As we've discussed before[1], accessing io->flags on tasks other than
-the io's daemon would be a race condition. So I don't see how it's
-possible to keep this check for off-daemon
-UBLK_IO_(UN)REGISTER_IO_BUF. What value do you see in checking for
-UBLK_IO_FLAG_OWNED_BY_SRV? My understanding is that the
-refcount_inc_not_zero() already ensures the ublk I/O has been
-dispatched to the ublk server and either hasn't been completed or has
-other registered buffers still in use, which is pretty similar to
-UBLK_IO_FLAG_OWNED_BY_SRV.
-For UBLK_IO_UNREGISTER_IO_BUF, I don't think checking io->flags &
-UBLK_IO_FLAG_OWNED_BY_SRV is sufficient to prevent misuse, since
-there's no requirement that the buffer index (addr) being unregistered
-matches the q_id, tag, or even ublk device specified in the command.
+The patch below seems to be sufficient but I'm not sure whether this
+approach is acceptable:
 
-[1]: https://lore.kernel.org/linux-block/CADUfDZqZ_9O7vUAYtxrrujWqPBuP05nBh=
-CbzNuNsc9kJTmX2sA@mail.gmail.com/
+Subject: [PATCH] block: Preserve the LBA order when splitting a bio
 
-Best,
-Caleb
+Preserve the bio order if bio_split() is called on the prefix returned
+by an earlier bio_split() call. This can happen with fscrypt and the
+inline encryption fallback code if max_sectors is less than the maximum
+bio size supported by the inline encryption fallback code (1 MiB for 4 KiB
+pages) or when using zoned storage and the distance from the start of the
+bio to the next zone boundary is less than 1 MiB.
+
+Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+  block/bio.c               |  8 ++++++++
+  block/blk-core.c          | 12 ++++++++----
+  include/linux/blk_types.h |  5 +++++
+  3 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 3c0a558c90f5..440ed443545c 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1689,6 +1689,14 @@ struct bio *bio_split(struct bio *bio, int sectors,
+
+  	bio_advance(bio, split->bi_iter.bi_size);
+
++	/*
++	 * If bio_split() is called on a prefix from an earlier bio_split()
++	 * call, adding it at the head of current->bio_list[0] preserves the
++	 * LBA order. This is essential when writing data to a zoned block
++	 * device and when using REQ_OP_WRITE instead of REQ_OP_ZONE_APPEND.
++	 */
++	bio_set_flag(bio, BIO_ADD_AT_HEAD);
++
+  	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
+  		bio_set_flag(split, BIO_TRACE_COMPLETION);
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b862c66018f2..570a14a7bcd4 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -745,12 +745,16 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+  	 * to collect a list of requests submited by a ->submit_bio method while
+  	 * it is active, and then process them after it returned.
+  	 */
+-	if (current->bio_list)
+-		bio_list_add(&current->bio_list[0], bio);
+-	else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO))
++	if (current->bio_list) {
++		if (bio_flagged(bio, BIO_ADD_AT_HEAD))
++			bio_list_add_head(&current->bio_list[0], bio);
++		else
++			bio_list_add(&current->bio_list[0], bio);
++	} else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
+  		__submit_bio_noacct_mq(bio);
+-	else
++	} else {
+  		__submit_bio_noacct(bio);
++	}
+  }
+
+  static blk_status_t blk_validate_atomic_write_op_size(struct 
+request_queue *q,
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 3d1577f07c1c..0e2d3fd8d40a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -308,6 +308,11 @@ enum {
+  	BIO_REMAPPED,
+  	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+  	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
++	/*
++	 * make submit_bio_noacct_nocheck() add this bio at the head of
++	 * current->bio_list[0].
++	 */
++	BIO_ADD_AT_HEAD,
+  	BIO_FLAG_LAST
+  };
+
+
