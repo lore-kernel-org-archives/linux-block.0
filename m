@@ -1,115 +1,119 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14359204680;
-	Tue, 10 Jun 2025 16:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582BD230BF5;
+	Tue, 10 Jun 2025 17:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749571674; cv=none; b=jc6YVCLO3NRXOxr/EYvsKiZxGHIw6RIxtGCJVRzD5dyVXyv2/y1tbs9IwVOHeOSzkAlyshg9Ewrzf5TZillRxdHkqC4yepi7Zo48E1zxUk0nmoQTcd3H0QmAy8o2Wt0sHPQveHnIHEK6L3jHxBWkjy2Mnf5eExScUpuxbwjr+yk=
+	t=1749575189; cv=none; b=rX8kdWXKaFyn6BnqTYi2WGv/t8HxLcDm4nDtotSKngvZBAcY1RRCDRllXJsKQ43nM0pv/eWzPWx0xCRANgHGU5gP8Gj9MptcOCSGFABM5Xx8hQYi0/92eIbsC0W6PN5OHNNYlgE8AIxdzlAe4xLxnSK/ywtw0DhioHKK0dSLo+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749571674; c=relaxed/simple;
-	bh=W1BITlzur69yftGlPfm6ex930CZl9IBW3CAWbDhhnEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XkW40XxfP+FtW2sHAlBmbnnQeprCGvbpRR/HR+Ssf6mGP8iBQcqX47VuRWuM0wfkaiB1N0hUboWELokgknotbdQYRUv0RkQ9WM5GVOhXS7FW/OGbAsACBM6R/Osb9VeoW7PUVnZZ6mHT58YkDJPppCM+mVTf5H+rCJmNl0vFtY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOrwjONn; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1749575189; c=relaxed/simple;
+	bh=mP4gb3dWFWly+mPtgYAQn/d03wKupUZ4N6Pl0+DbPfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hTJa41Iadyk/SnoUXIg3kYuR6tBV696B0BVbKizTkvva3Mpba4WuHuzNfUlnaSHE0K+6dQWlN79FuPpcvjdHPM1efCZt1peuHXyS3hxeJGTpsxRg/C5CpCeGuKovvU7jM1ugyY4XuEjGip91TbZFGA2cS9uykw5WKffSbX4va0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWCLAWIO; arc=none smtp.client-ip=209.85.219.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOrwjONn"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234d3103237so7027925ad.0;
-        Tue, 10 Jun 2025 09:07:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWCLAWIO"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e7b4ba530feso4935036276.1;
+        Tue, 10 Jun 2025 10:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749571672; x=1750176472; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W1BITlzur69yftGlPfm6ex930CZl9IBW3CAWbDhhnEo=;
-        b=XOrwjONnbrWHAulz4fzMmIqi/sv/GbSLVYLd/dlMGQtUqW4ymPnnRYCMO8OWLDC+iT
-         mDXCR2toyk7b7PI5sE2Aj+EnuGRv3PdsIkIPXpUc8deAMURhryUMKTEcq6g9DVd8v+mv
-         hZ11UNbc1XCwlp47flEPjyJgQyptG6ozFT1fYcI+wisp37O6d2wwOqQ6D+5Cm4maRCcm
-         O90LO7eb/tI3mhxAyC8vQp41ylQ4ToCPZ4Ads3Nc7KxpdmmLZ7wQRuFf6wMpDcsC3Cig
-         kgsHiRnA7xXE05V+4awVqI0N0jN/0PLDyCHEKujY6L1z/XgrMKHCrJPzFDjQpE6jphKe
-         aIcQ==
+        d=gmail.com; s=20230601; t=1749575187; x=1750179987; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GRHFfN327juvheBTAFy/tSemDTmbHfrjHgV9Lv1ygdo=;
+        b=GWCLAWIOvUPq8oxkpE5qxfr7gHx8645uhx69GrcCQv7kfk5AduIKbRGDUOYy/hoXtX
+         vHRCESV5nGMeg1qIkzUlbeBj1MuCcZdZRx8lAdKm3qdQu5HN0ER4e9mnLeRyg5PiZo8b
+         VjZbzDBv7mJnLtP6st9BbJ+quRktLwoCBlEzgIb0nXt/qwEqis8ZGsXAPATiwyXGNymN
+         zQHZJxjZt3ni+uQV8hxKIjhkpmGljA6I6GFsw/2cmb0hYAKbh2L6pjT7xTdYMgQJiRbB
+         jzWKXAVo0wbeDXpx3Dp3OLGHuWSRDgnakplIlwAU5t2w5J4T5QSQePGPRgU+gqBt/bdD
+         XSug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749571672; x=1750176472;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W1BITlzur69yftGlPfm6ex930CZl9IBW3CAWbDhhnEo=;
-        b=uIecb1XyJNpH+WUADx8DQl3Pi72RGdK6za7XqoHO9ugBVmqZ3pXlEhEJieGCZI3x/n
-         3Vm7bOtjSlIRdqi8NlkeaJkgcwsKyCG/1KKfYKkxYU7TJCyjUM8j1KY64Xi7O2Kdo65g
-         ufSBB6jNrZ9b4wHEecpvhSCpTZRLu+v4cBBuhB1Sfc6M5DJH9hEEXISGy2I/8ejPDmkj
-         xMqPr/a3Wf/VGiN9xx5re9Y1GOiInf47CZdJIQgUcus/0Xo4t+6uzDWsmY2y4ZsGC3bd
-         Bxn/8IjE6jLrCMlu1iQZr7hGUSfAMj+2k71ryj2ZM6nBIAZYVnxiZJFs4pufnaiAWi0c
-         i/ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUywly4tTQqR7LpjXl0zMvF7CRkE+Q8d/gjdthgav+ko67dE1wMcfLOwCxuSmkFir6usB968ZbaW1+PZmYr@vger.kernel.org, AJvYcCVkjX9l3RJBkR0n3fG72QybfCIuUqcAsgMsjho0aMAf2VZB5VCoJ08mdUPJxxrWKoDx8hSOeSIk0nPVO2TP@vger.kernel.org, AJvYcCVwx5dxnACFHHg7yysJA7LyFMYtRn+2L9OpijTuvW/27Bs/CWz5unAn1yrfuWy8BMhWdKbqeXfS3cZl@vger.kernel.org, AJvYcCW6Kwmqya5l4yj8QigGNzSLVTtu/ukjGo0E5r8Yz6OIOWSFAY8lnHQVp4NU4wW44kiAHQIqXmP3rSEj@vger.kernel.org, AJvYcCWDIGFGL0njzfxbuSM2NNUyVXtWTZDSuoERxVQzyt4JhSxh8Ha+dhHo/X++PLrjwbIrCim7ytST@vger.kernel.org, AJvYcCX8wh7J3eV1pVTgs9ne2JQD6vKBoV5HGGkbL0ujrh9Gi9BZ96xvO0CqVsAoniZ+bcJPtHAKCgHdQsHEWgeLwe4=@vger.kernel.org, AJvYcCXE5bOZNlDOkKzSL+ZL5FX1XjL4QuEDG3wvm0wrunNihv19nHoy7j4thZwOG4LMfat39+vI7+VkM+09enAI0iY/@vger.kernel.org, AJvYcCXvPktjcXsfhPOh3L6PXAQ6v0nE2DDueSXtUcE7g295/BPEhEYy+iKoJEjoCOwde1hlsqRSAzedewf/sfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN9DHF3QC/5a8kXkCkdPQnUWbAQXWrQ2D06kFwz+x+28gdtvns
-	kHnb+gJebS+C8N4WkNkExc3oQy0XZd/kiuMOlhHjzxugngQeXpjbJW9yyDdQNj8YrW9yfKmdcFw
-	XizoTZknseMdxKRN2SbYh8xyFck1MEsA=
-X-Gm-Gg: ASbGncsCLH8vBHQCWgD/wZrTP3W1cesZK7xczQ4o9vL+WF0/TovVA9VHnyRHS+FUvkP
-	qQgxy14f2VJpX2aonOLpQDhSz8Tj14B4EBFEZGpfnbazGPjx4O0e2xeLDUN94IvKrr9UkoyMqaQ
-	IyLX4lrx9Vwoq/F5vXAg9KJOGP62aMcW0Eqo79sbvPz0k=
-X-Google-Smtp-Source: AGHT+IEkveDPapEYWYF5Lme4xzYT3aU2PAb3RMnK2FhgBqYClnpHcHMaaMDanexVO7MdhtPZZBHJv9udTG6GaKIHKaY=
-X-Received: by 2002:a17:903:1a67:b0:234:bfe3:c4a3 with SMTP id
- d9443c01a7336-23603fce7aemr92246085ad.0.1749571672166; Tue, 10 Jun 2025
- 09:07:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749575187; x=1750179987;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GRHFfN327juvheBTAFy/tSemDTmbHfrjHgV9Lv1ygdo=;
+        b=DDFMuAU0HbqwlsxXXupH3cUO9ZevPmxtB3OOidf8mKS0RTEU6+Bo2wELNarVmBN7le
+         ZN9Y2CadxhJyfQxHfFNIuZT1f5uUgX8XLF5AzZ3B4CeX/Lbtg0uL5uRuIKuPmviYvuOZ
+         Dc16q8qNNpVD2bITuQJcWO7Nbq2LsFSjqihjAOvy9OdJqEbaDfNvGbT8vCj77KJPx1sN
+         Ux3NKyedvqiw62w/ZR2sv6UFsURWf1WChTy7TbetuAVBCVlJI4dmZn+KD54pC6TgIlhU
+         TAJwb78h5d16br0l7e8YYbwi/qmM+RFUXRUiFzcohd/dXVHvvhLshFjfrPMWpSf6g6Sn
+         XAJg==
+X-Forwarded-Encrypted: i=1; AJvYcCViij6M0ofwFnxDe1o5DbQ5Pn6jXDgolwI286HUcPgimcbWp6AZ5747AS9fEl+XJq2iHWR1K3QciorSuNNo@vger.kernel.org, AJvYcCWztCDVlHozXqsthycdlCxwx3xXNKJbe+3gm+P0Vikb7VuLEa72OJymzgd8+C5l8/3MqyjTfv2SgyhpJg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YygNiFNEAFavWRS9OrPQfzMxMWa1yF4NSJVtLcWatwUrgPMDrhL
+	F92IjxxVL6Xwchvczu5hiIE70HMz8nQlm0OueJTOPxYa69WLAPUozNMSfLBZZHYA
+X-Gm-Gg: ASbGnctjUWwcEi++p/gSkEw/3S0xEY3Osalkyzj2BHRddKmF/J1hbm6lSEiA1zqqACG
+	zywLqjOJfq6c7qyPzhtj6Cjk4JznZvJ5RQci0qgnJvrohdTFwFFURpG02MTqX6DMpCPraZWZIpw
+	z/kRT3RkqHjHbfObO9nLEEMpVAjfCRaosfgTKhBM/UbDKxgAKVUN5OpoCBQ2P0T5V5IkNI9Mpm2
+	2z6g/uxRTU6ajwt8nj1VejS8MWNNOKZjfmg3/sYY1mdHuYDPt4RlrwBRkveAvNn+R7eLrAWJUwq
+	er5tvR6ceDFEebMqexg/340lV4NxaeHtTfTEJkuSIakJaxU/Q5XZjJMhqqQHga2Cm9zyPZIGpGR
+	H4yxSH4Cjg5RC8yxcCFkD14lcHT4dke1fXNzcs0PezLn5vF1onT+/dA==
+X-Google-Smtp-Source: AGHT+IFXmLRSWgTCMuTvF8E5lZNN3DKvVkRsTwGOv0u4BOG3Xoi8OXw1S716YEpLjRjhRyhvezHX/A==
+X-Received: by 2002:a05:6902:cc5:b0:e81:f2c1:6292 with SMTP id 3f1490d57ef6-e81fd960379mr555096276.18.1749575187358;
+        Tue, 10 Jun 2025 10:06:27 -0700 (PDT)
+Received: from archlinux.. (71-146-63-133.lightspeed.tukrga.sbcglobal.net. [71.146.63.133])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e81a4179ca6sm3001390276.42.2025.06.10.10.06.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jun 2025 10:06:26 -0700 (PDT)
+From: Justin Sanders <jsanders.devel@gmail.com>
+To: axboe@kernel.dk,
+	ed.cashin@acm.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Justin Sanders <jsanders.devel@gmail.com>
+Subject: [PATCH 1/2] aoe: clean device rq_list in aoedev_downdev()
+Date: Tue, 10 Jun 2025 17:05:59 +0000
+Message-ID: <20250610170600.869-1-jsanders.devel@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
- <20250418-ptr-as-ptr-v10-4-3d63d27907aa@gmail.com> <CANiq72kWtEsXDuoXpbTNRLiZ=c==Ne=v4igxCWMwWFj0LOC-Yw@mail.gmail.com>
- <CAJ-ks9ny_VNvKM-w04kkk4Yw=UpYEt82TyFZZuXEFK=DxfwcgQ@mail.gmail.com>
-In-Reply-To: <CAJ-ks9ny_VNvKM-w04kkk4Yw=UpYEt82TyFZZuXEFK=DxfwcgQ@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 10 Jun 2025 18:07:38 +0200
-X-Gm-Features: AX0GCFt25dqMhp8iaQDA-26WJJC7gjowsiCCK-_ghe8BM57dzBLtofxE1fBcZ34
-Message-ID: <CANiq72k6MkVGtdgkSuy392T_xxO-5kTJuN7kh41N=UBc0SeFLw@mail.gmail.com>
-Subject: Re: [PATCH v10 4/6] rust: enable `clippy::as_underscore` lint
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 10, 2025 at 4:14=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> Yeah, I think these are good calls - I'll fix it in v11. When would
-> you like me to send it?
+An aoe device's rq_list contains accepted block requests that are
+waiting to be transmitted to the aoe target. This queue was added as
+part of the conversion to blk_mq. However, the queue was not cleaned out
+when an aoe device is downed which caused blk_mq_freeze_queue() to sleep
+indefinitely waiting for those requests to complete, causing a hang. This
+fix cleans out the queue before calling blk_mq_freeze_queue().
 
-Since -rc1 is out, please feel free to send it already if you can. It
-would be nice to see if we can apply it all soon in the cycle, but we
-will see if everyone is OK with the changes in their files.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=212665
+Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
+Signed-off-by: Justin Sanders <jsanders.devel@gmail.com>
+---
+ drivers/block/aoe/aoedev.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Worst case, we can apply as much as possible, and leave the actual
-lint enablement for a final round, like we did in other cases for
-things like this.
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index bba05f0c5bbd..edd4bae3b5a9 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -198,6 +198,7 @@ aoedev_downdev(struct aoedev *d)
+ {
+ 	struct aoetgt *t, **tt, **te;
+ 	struct list_head *head, *pos, *nx;
++	struct request *rq, *rqnext;
+ 	int i;
+ 
+ 	d->flags &= ~DEVFL_UP;
+@@ -223,6 +224,13 @@ aoedev_downdev(struct aoedev *d)
+ 	/* clean out the in-process request (if any) */
+ 	aoe_failip(d);
+ 
++	/* clean out any queued block requests */
++	list_for_each_entry_safe(rq, rqnext, &d->rq_list, queuelist) {
++		list_del_init(&rq->queuelist);
++		blk_mq_start_request(rq);
++		blk_mq_end_request(rq, BLK_STS_IOERR);
++	}
++
+ 	/* fast fail all pending I/O */
+ 	if (d->blkq) {
+ 		/* UP is cleared, freeze+quiesce to insure all are errored */
+-- 
+2.49.0
 
-Thanks!
-
-Cheers,
-Miguel
