@@ -1,63 +1,63 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32D21A238D;
-	Tue, 10 Jun 2025 00:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654001ACE0C;
+	Tue, 10 Jun 2025 00:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749516541; cv=none; b=rl87RcWmMyqHFFxwn4DxMGV7Ubxobgq6yiPIujgzMQSj+OcJT6ooBVfYYuXwcEZ+wV1tVVwjfSJgvqYkTUBnUDIqFZ1nq/23rAazMdY6hU7xLY+qX81rOFlDIUXBsJeKo5+s0IeriTH7HHig/ONhY7r44gXRL+3rQB6tGfXfROg=
+	t=1749516543; cv=none; b=o2FDYtxAUGbiOWr90WNYTeAwH0pXiZnd5p4ZYGi1Tw2ql+7TIUCLGBlj8R1i3rj4oJoM5mZIzhCVFvZavp1A+9rq0/oIRHfDHwh7LU3ZPv9x8YIh9T/kq1Z1q+sqE0opkx+e1JcRcYbfz32q1+ZXisAB4wTykV340IHPd3IS9dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749516541; c=relaxed/simple;
-	bh=lLuZJy5LmIhw6vczV+BjTVeE1qeR4Bfzo8mKouv0f/Q=;
+	s=arc-20240116; t=1749516543; c=relaxed/simple;
+	bh=Ls8LnjItLslINrUUsz6ervmA6XQP3j3UNRh3vdkUe88=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IUrFtKFukWTgHpUlO/hhaiU1CL3UmsuIaRYsvSEFxx/H0oTzfxhkkg00xFjXKK0bgzwl7NRc+a5gpX0RvmZi9JF2/ppgxCUguvUC1mqEHfk8aFd39IgePBLxjPbjfE6tQMBQQqE/HK9t9FxV+Oo1IHA3ppOFD8mGrxyUXpSwMec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i9gwK1Qh; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=b8P8oYvg5qG86kwSLtRiZ81lP4ZBnG/WiDx4qg5X9iK77GcqztYBuP78xxX5XTFVvERQ7Bd2DhVWotXuK394fcOHfjLlRzj8MOC/+QgRugCSig8S89wsR5yozE2C6qhpifQfLCv8INjTASYjzI/qjq7sHhey1vVctywVvHJ2e+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LAFYnLLG; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9gwK1Qh"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2349f096605so58078635ad.3;
-        Mon, 09 Jun 2025 17:48:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAFYnLLG"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-234bfe37cccso59675895ad.0;
+        Mon, 09 Jun 2025 17:49:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749516539; x=1750121339; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749516542; x=1750121342; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l8SVDvWMO2KmJya58rTe/5tn0uw9qn8OeN6AY1Bam6A=;
-        b=i9gwK1QhKvNoD9Na18lAe55FmYFSMooBkL63aucPTAFfCKJt2kPOXHzYtDEy0xEBlO
-         Dkbr3fxnLZ32vJ5qWg2rLHSdo6JgoAj9jDdUlYbHzr+gNqczdiUtYZ1wdhBNlmLmpf5m
-         klMUDMZlnNg4v/06/ZBWidE50JXIF03wuMlOMCctsMgilx/nbT06RPqwMBsU5i+rDdam
-         pwnjmC5WgwbDYimYdxzKY0+UYTktfL8cGl8mEDJ2hnbtgbtF73orlmnpK2F5ZgzoGVN9
-         Ey2Z9hbaUNPMQa6JxA0iBLs8/hfYa9K3sorzkilyOxH8C3u0l2hHTzMIbPbIwmtkqb8Z
-         eHTg==
+        bh=1U9Lvj+tvO4mQdCsqf9w6ZMIuKsVVLMvbnrNfMDlrxM=;
+        b=LAFYnLLGoGzxh9nFHsxq8miYnQZ8JnEzsoXhaqoTdFzBRZv5f6LE3OYB/2tBw/ndWE
+         FhX5aR3Q5O/ZEaEDLBFM2Sqsdm6GOjNnUHW6ctf12tSTCeax+HuxFU8WODCrA8LW44o4
+         KHUnnMnpCYETI2cwtFmCCXdNuUdfJsrCEW8AzC2efu9yMFAVP+Qzo4v3xme033UhiaX3
+         DXPybjhBwfMjjYijPaNQ3TMglDbw3Ebjy6wmoAMzXxCJHUhl3wOD9Vdfb2lJUnIfdIz3
+         dJeGymhjGR7zCpDlwTFvSuK4PBWvvSZx+TOT9ir+4jvOkbqp5dN2oein5MBQS3ZUYP+X
+         649A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749516539; x=1750121339;
+        d=1e100.net; s=20230601; t=1749516542; x=1750121342;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l8SVDvWMO2KmJya58rTe/5tn0uw9qn8OeN6AY1Bam6A=;
-        b=FbPGBXcHi9ekZBQvxUdJMmG2SXTFLsGHP6BUe2Fc1yjErosHJObluZ7fGXrDUVumMi
-         WWeKZmvual0i+2xyhO8zKyoRUtGpcVN885jGLXhJUWpoJFfMcz5L2vwLpl7sVU89M+g/
-         s04UjT90bpxvCC6QMz/8gBlgQSJlu8lssMphxZ6pSgO+CKT916X7pQbM7obBovhLONy4
-         OL97FetwvV1XVGDRlFzZnwEL1NR4rDRVmVoZ5oFdqQb/ipv90DZJSKUbXytjrA/Iv1pW
-         S8FQPLlh2+h0fYRcUNBfFIHUzsgwToqu5URxh3iUcbDu5sUrKrTwjNK1WH1syWAr90hu
-         267g==
-X-Forwarded-Encrypted: i=1; AJvYcCUbgwS4nwxbhTAz9cjC6f3i7f5MpQLpM+pDB4F+mcZmTnEGU92Vtp2N/6AgpUfIauM7cCut9ZGOLMnA9UoGw8pBZU0w@vger.kernel.org, AJvYcCWxf9drbTwsFhxDVymP3Mr+S/RfS+sbZ6i1rXsD91m6tf60bDnIdcbMInB4FLpXTlKmc34YHAmvy/jfTg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8lPQqvzkIcivGyBRlkdW5ThRc2Wf7KpKjkUbDsftPcsJnc6ny
-	/Mp14C7KQqBTVnrcwXnYqepweNfYKWtNkBU2qtI8hC52+dCRdaKW3nC3
-X-Gm-Gg: ASbGncv+jO6XPwg4ZehvJO22M9Ydhggu7j6NfNrmUFOJ5jJKx0IJpDrF2VFYf4Ofz5U
-	VNF31+63lqadqOrQDz6FevDKlDhGpanT0RgnynrPTauwf2gHStmiJCvODvbrPaosrTXMQGUYVKY
-	bB5iN1jXmwCBGKNSLPAd5tRXPO++JiLeAmOFJllOz72NPjYnRxmcIj1wLzAkhQm4hbiZ4qMMn3d
-	XYloM38aAx7cvkcUneIxOsG4K5wn07Z6hZl0h/D6HRfyYXHtd0gDtaHtt26xlXkpCnycB0CQlRg
-	9A79Am/4RUtrKaISjwxFnh4lCIHvHfKPGU+lR+iUYw4w088dzoxJRxSgI4TMPi1bDdguiHWDWKL
-	upFJbAeh+KqwAXjL6gq6UGcMXPE6RS2PM3w==
-X-Google-Smtp-Source: AGHT+IHbZt8udGE0xv+/8ewbIApjkPoddT1BX0UcOwzQArXV7NE9hqbFiFjNI44py8pBjWJPn7V8Vw==
-X-Received: by 2002:a17:903:22c7:b0:234:b123:b4ff with SMTP id d9443c01a7336-23601d08686mr202935695ad.21.1749516538976;
-        Mon, 09 Jun 2025 17:48:58 -0700 (PDT)
+        bh=1U9Lvj+tvO4mQdCsqf9w6ZMIuKsVVLMvbnrNfMDlrxM=;
+        b=C35WTWopEbbVCD0oTTGBBsVtquZL4V71PuE4qB4Gatxc8DdOs2HPyP1OoRLkYvH2vr
+         fPoKs9wd3bzXx9Qc2CIhV75AZEzVWzFxWTk+zQ1Qsr8IOfRaUZPlIC5lOtD5bSeJ3za5
+         u3Fu0xFgYVLroUrbDtbDtCOoNIcl9nypp0v+htEooqNdjh2J1zxksbiA/USV1Qqa8D/+
+         DJ9HRjHfk5fLcIqAi2Xf6OrJvP6LixRN85RgU+wAh/+UeMlIwzbZixhQ5lVx763OSeak
+         OKj4WsqxKWNxJ3BADONLduFzG6SxKZoFcENqYIRjdclQvpexFBufZQgJaZJF9SfpIf1/
+         lJrA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+yk2ZABUoz872IcYLxtWKNt4awwSsnmqupqkGuP2DtcE/obOEdHHfjkBPkfd+jr71xyfA926C/lQXCQ==@vger.kernel.org, AJvYcCWdioXO+dobCI0bYgBgGVf+fCL21HtJ1oJvZPM60F1/LuZxTDO+C9kIATp05rOM9XZu5tMB0L8taRGWkccfwqKEqvlG@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqpLwfVMlQR2rHFWlZtkbV/NzginOsX3XNFS6scMkwd4bU9JYB
+	Am5Ix6n/m5buKYPwziod9mHpP6zZpUCDje0O5LkO8LN/LgOOiwJY6/n4
+X-Gm-Gg: ASbGncsZFNAGOaMBCg2ts7YyhTPNT4EnqQPrvRl+Hfv0fneTg33mzZpgoLcxKYx1xEV
+	wfnG0hMGsEZh3zFbiSDBMvVR8zFiV5GJawXzEzRmVOQtN2SPLkz8Q27PpbEWvdSAbgRKSDlfOLH
+	KfxACmt9Mxv9yWxbJNGGiS09n3MVUJVoXfLTObmf3lBCNttpW+q6UxuVCGr0xqLcL7V6SCCMR+D
+	xodmUg5KEISKcf43JK8gU9jtn6jajUZ6qsjFOCo8htIsqXooUnRw3bmMYMcdLRFhlUV3daaIawz
+	cJfNFt9iG0qCG+JdziiWIQOsiWTylzHCLCPAggK8fMZmph8G+NFV34JixdAd7GF4ZXmX5aKbH2G
+	sBTnXGDhiCLyyZgsm3p3sSqep+2pwEjSZZQ==
+X-Google-Smtp-Source: AGHT+IEo50M6v5LdSQV1gZGT38r0BissbfraxSO9tyxQfQXBzfqhZKpqoQDGqWcVp6Fc1/Ws5FzRCg==
+X-Received: by 2002:a17:902:e744:b0:234:8f5d:e3c0 with SMTP id d9443c01a7336-23601d0415fmr163354445ad.6.1749516541659;
+        Mon, 09 Jun 2025 17:49:01 -0700 (PDT)
 Received: from KERNELXING-MC1.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236032fcd58sm60713845ad.122.2025.06.09.17.48.56
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236032fcd58sm60713845ad.122.2025.06.09.17.48.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 17:48:58 -0700 (PDT)
+        Mon, 09 Jun 2025 17:49:01 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -69,9 +69,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>,
 	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH v4 3/5] relayfs: introduce getting relayfs statistics function
-Date: Tue, 10 Jun 2025 08:48:42 +0800
-Message-Id: <20250610004844.66688-4-kerneljasonxing@gmail.com>
+Subject: [PATCH v4 4/5] blktrace: use rbuf->stats.full as a drop indicator in relayfs
+Date: Tue, 10 Jun 2025 08:48:43 +0800
+Message-Id: <20250610004844.66688-5-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20250610004844.66688-1-kerneljasonxing@gmail.com>
 References: <20250610004844.66688-1-kerneljasonxing@gmail.com>
@@ -85,87 +85,78 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-In this version, only support getting the counter for buffer full and
-implement the framework of how it works.
+Replace internal subbuf_start in blktrace with the default policy
+in relayfs.
 
-Users can pass certain flag to fetch what field/statistics they expect
-to know. Each time it only returns one result. So do not pass multiple
-flags.
+Remove dropped field from struct blktrace. Correspondingly, call the
+common helper in relay. By incrementing full_count to keep track of how
+many times we encountered a full buffer issue, user space will know how
+many events were lost.
 
 Reviewed-by: Yushan Zhou <katrinzhou@tencent.com>
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 Reviewed-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/linux/relay.h |  7 +++++++
- kernel/relay.c        | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ kernel/trace/blktrace.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/include/linux/relay.h b/include/linux/relay.h
-index cd77eb285a48..5310967f9d74 100644
---- a/include/linux/relay.h
-+++ b/include/linux/relay.h
-@@ -31,6 +31,12 @@
- /*
-  * Relay buffer statistics
-  */
-+enum {
-+	RELAY_STATS_BUF_FULL = (1 << 0),
-+
-+	RELAY_STATS_LAST = RELAY_STATS_BUF_FULL,
-+};
-+
- struct rchan_buf_stats
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index d3083c88474e..6f0a776ddd3c 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -415,9 +415,10 @@ static ssize_t blk_dropped_read(struct file *filp, char __user *buffer,
+ 				size_t count, loff_t *ppos)
  {
- 	unsigned int full_count;	/* counter for buffer full */
-@@ -167,6 +173,7 @@ struct rchan *relay_open(const char *base_filename,
- 			 void *private_data);
- extern void relay_close(struct rchan *chan);
- extern void relay_flush(struct rchan *chan);
-+size_t relay_stats(struct rchan *chan, int flags);
- extern void relay_subbufs_consumed(struct rchan *chan,
- 				   unsigned int cpu,
- 				   size_t consumed);
-diff --git a/kernel/relay.c b/kernel/relay.c
-index eb3f630f3896..fd70d0e03216 100644
---- a/kernel/relay.c
-+++ b/kernel/relay.c
-@@ -701,6 +701,36 @@ void relay_flush(struct rchan *chan)
- }
- EXPORT_SYMBOL_GPL(relay_flush);
+ 	struct blk_trace *bt = filp->private_data;
++	size_t dropped = relay_stats(bt->rchan, RELAY_STATS_BUF_FULL);
+ 	char buf[16];
  
-+/**
-+ *	relay_stats - get channel buffer statistics
-+ *	@chan: the channel
-+ *	@flags: select particular information to get
-+ *
-+ *	Returns the count of certain field that caller specifies.
-+ */
-+size_t relay_stats(struct rchan *chan, int flags)
-+{
-+	unsigned int i, count = 0;
-+	struct rchan_buf *rbuf;
-+
-+	if (!chan || flags > RELAY_STATS_LAST)
-+		return 0;
-+
-+	if (chan->is_global) {
-+		rbuf = *per_cpu_ptr(chan->buf, 0);
-+		if (flags & RELAY_STATS_BUF_FULL)
-+			count = rbuf->stats.full_count;
-+	} else {
-+		for_each_online_cpu(i) {
-+			rbuf = *per_cpu_ptr(chan->buf, i);
-+			if (rbuf && flags & RELAY_STATS_BUF_FULL)
-+				count += rbuf->stats.full_count;
-+		}
-+	}
-+
-+	return count;
-+}
-+
- /**
-  *	relay_file_open - open file op for relay files
-  *	@inode: the inode
+-	snprintf(buf, sizeof(buf), "%u\n", atomic_read(&bt->dropped));
++	snprintf(buf, sizeof(buf), "%lu\n", dropped);
+ 
+ 	return simple_read_from_buffer(buffer, count, ppos, buf, strlen(buf));
+ }
+@@ -456,23 +457,6 @@ static const struct file_operations blk_msg_fops = {
+ 	.llseek =	noop_llseek,
+ };
+ 
+-/*
+- * Keep track of how many times we encountered a full subbuffer, to aid
+- * the user space app in telling how many lost events there were.
+- */
+-static int blk_subbuf_start_callback(struct rchan_buf *buf, void *subbuf,
+-				     void *prev_subbuf)
+-{
+-	struct blk_trace *bt;
+-
+-	if (!relay_buf_full(buf))
+-		return 1;
+-
+-	bt = buf->chan->private_data;
+-	atomic_inc(&bt->dropped);
+-	return 0;
+-}
+-
+ static int blk_remove_buf_file_callback(struct dentry *dentry)
+ {
+ 	debugfs_remove(dentry);
+@@ -491,7 +475,6 @@ static struct dentry *blk_create_buf_file_callback(const char *filename,
+ }
+ 
+ static const struct rchan_callbacks blk_relay_callbacks = {
+-	.subbuf_start		= blk_subbuf_start_callback,
+ 	.create_buf_file	= blk_create_buf_file_callback,
+ 	.remove_buf_file	= blk_remove_buf_file_callback,
+ };
+@@ -580,7 +563,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	}
+ 
+ 	bt->dev = dev;
+-	atomic_set(&bt->dropped, 0);
+ 	INIT_LIST_HEAD(&bt->running_list);
+ 
+ 	ret = -EIO;
 -- 
 2.43.5
 
