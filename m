@@ -1,241 +1,141 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DD429A0
-	for <linux-block@vger.kernel.org>; Tue, 10 Jun 2025 02:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FCD19A2A3
+	for <linux-block@vger.kernel.org>; Tue, 10 Jun 2025 02:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749521225; cv=none; b=uRqp91pGlUUEwIvg+BbGsXHKmWfZiz+B0cBZt9jxvadCNPcWlI9MPD7vHXls5FspkYEBZGDg/o5DG/1J2/vFgHhIZCw4ex+cV84K+c39/wgwM26NR2r8XistNPN/7df8dXrBR+ZG2vV9HtPw88HdJbwkb80UDGVssDR5YrrZnM4=
+	t=1749521273; cv=none; b=iS43TSNiu1jNoM8yE5LJHeuAmNIQexOA/66JdkBcCPT1BufNuaSUSMez5fAsteNhtFJlQ7vhuKiz3yAO4DvOwf+w6r5JXi15+bCv3+0NIQEOKVkBNy29UOXcp/RbeoGbK8PeHgX7OQ3oPrGDkzfObkHSXWxnaTTXekATTlkX2RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749521225; c=relaxed/simple;
-	bh=wIKlNmysaL+CfpfhfLTdGqay3oE/6Qimz9MEQLajyyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PDWSFSr89piz4Zm/gaeh7C1/FWHH0v7fnetpK+jykS0tsQQziJbGee6VOKeHZzTnc9BSYfm6M9awCc7bH2UQM8iYiGSQr1PvFfzR8nbt6m1U9l7fYSibD2epnFrf2GAdw9vzpSNDalEsCbvdsTasbiVExtv3bytM9kuDD5gG6vI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WZCGPoQc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZCGPoQc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749521222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GrKywBKCS+uKiKYohFFv7EaRZmQD29ZGnoq/Of9vF3o=;
-	b=WZCGPoQcavWL1xmKDyimQHG0/21RlU7P7qyCkXsm5SCgKxW0dX0LZT16IkmO2SUQiQkkla
-	pbqlVzkeNWjc8t1SksXAxMW1uyMlj4KJQ+y/AC5Yf1BQIn4G9kBUGKt3poWXPypo4SD6Da
-	UNXsIoWJRZDjxSXOsWeiDMCkaVOxLOs=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-577-ovKcRnbbO6ipzo6hJY33Eg-1; Mon,
- 09 Jun 2025 22:07:00 -0400
-X-MC-Unique: ovKcRnbbO6ipzo6hJY33Eg-1
-X-Mimecast-MFC-AGG-ID: ovKcRnbbO6ipzo6hJY33Eg_1749521219
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 39FAF1800287;
-	Tue, 10 Jun 2025 02:06:59 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.15])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2CCA3180045B;
-	Tue, 10 Jun 2025 02:06:55 +0000 (UTC)
-Date: Tue, 10 Jun 2025 10:06:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH] ublk: document auto buffer
- registration(UBLK_F_AUTO_BUF_REG)
-Message-ID: <aEeTO3t8qnBne9ef@fedora>
-References: <20250609121426.1997271-1-ming.lei@redhat.com>
- <CADUfDZrHpGFKAEJhDqPNq_WMzWU5v9riN-i8V0dROo2tc=1DyA@mail.gmail.com>
+	s=arc-20240116; t=1749521273; c=relaxed/simple;
+	bh=6sp/1KMlXkqhBbqXsGeJJhBhzZI3ZPJUvmewtsLMne8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ZQf/iXeiA9JseQpBXKuRhZAAfPD3cNrk943NPOSaUEyqznz5hDUgTGyRPfxd8ypu0VZ1/XtSxW+EwAMvw9hjL08TS0axNMi2JZaSX5RTE+hY+ZFRs35OdbrdxOfU9+D4LQF6fMzVReM+MJA1gg5W0j7ZvIX6dkggjQUy1jVaRjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bGXHn5YGrzYQvHg
+	for <linux-block@vger.kernel.org>; Tue, 10 Jun 2025 10:07:49 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id C40331A13C9
+	for <linux-block@vger.kernel.org>; Tue, 10 Jun 2025 10:07:48 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAni190k0doM1EvPA--.5683S3;
+	Tue, 10 Jun 2025 10:07:48 +0800 (CST)
+Subject: Re: [bug report] WARNING: CPU: 3 PID: 522 at block/genhd.c:144
+ bdev_count_inflight_rw+0x26e/0x410
+To: Breno Leitao <leitao@debian.org>, Yi Zhang <yi.zhang@redhat.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+ "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+ axboe@kernel.dk, "yukuai (C)" <yukuai3@huawei.com>
+References: <CAHj4cs-uWZcgHLLkE8JeDpkd-ddkWiZCQC_HWObS5D3TAKE9ng@mail.gmail.com>
+ <aEal7hIpLpQSMn8+@gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <738f680c-d0e8-b6c0-cfaa-5f420a592c4f@huaweicloud.com>
+Date: Tue, 10 Jun 2025 10:07:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <aEal7hIpLpQSMn8+@gmail.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrHpGFKAEJhDqPNq_WMzWU5v9riN-i8V0dROo2tc=1DyA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-CM-TRANSID:gCh0CgAni190k0doM1EvPA--.5683S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCFy8CF4rWw15Ar17Jr4kXrb_yoWrGFyxpr
+	WUtw4qkr48tr18JF4jyr45Za4rAayvv3W3Zrs7Wry7ZF98WFyaqFy8C3yYgrZxJr4UX3W7
+	t3WDXw4Iqr1YqaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07Upyx
+	iUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Jun 09, 2025 at 03:29:34PM -0700, Caleb Sander Mateos wrote:
-> On Mon, Jun 9, 2025 at 5:14â€¯AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Document recently merged feature auto buffer registration(UBLK_F_AUTO_BUF_REG).
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> 
-> Thanks, this is a nice explanation. Just a few suggestions.
-> 
-> > ---
-> >  Documentation/block/ublk.rst | 67 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 67 insertions(+)
-> >
-> > diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-> > index c368e1081b41..16ffca54eed4 100644
-> > --- a/Documentation/block/ublk.rst
-> > +++ b/Documentation/block/ublk.rst
-> > @@ -352,6 +352,73 @@ For reaching best IO performance, ublk server should align its segment
-> >  parameter of `struct ublk_param_segment` with backend for avoiding
-> >  unnecessary IO split, which usually hurts io_uring performance.
-> >
-> > +Auto Buffer Registration
-> > +------------------------
-> > +
-> > +The ``UBLK_F_AUTO_BUF_REG`` feature automatically handles buffer registration
-> > +and unregistration for I/O requests, which simplifies the buffer management
-> > +process and reduces overhead in the ublk server implementation.
-> > +
-> > +This is another feature flag for using zero copy, and it is compatible with
-> > +``UBLK_F_SUPPORT_ZERO_COPY``.
-> > +
-> > +Feature Overview
-> > +~~~~~~~~~~~~~~~~
-> > +
-> > +This feature automatically registers request buffers to the io_uring context
-> > +before delivering I/O commands to the ublk server and unregisters them when
-> > +completing I/O commands. This eliminates the need for manual buffer
-> > +registration/unregistration via ``UBLK_IO_REGISTER_IO_BUF`` and
-> > +``UBLK_IO_UNREGISTER_IO_BUF`` commands, then IO handling in ublk server
-> > +can avoid dependency on the two uring_cmd operations.
-> > +
-> > +This way not only simplifies ublk server implementation, but also makes
-> > +concurrent IO handling becomes possible.
-> 
-> I'm not sure what "concurrent IO handling" refers to. Any ublk server
-> can handle incoming I/O requests concurrently, regardless of what
-> features it has enabled. Do you mean it avoids the need for linked
-> io_uring requests to properly order buffer registration and
-> unregistration with the I/O operations using the registered buffer?
+Hi,
 
-Yes, if io_uring OPs depends on buffer registering & unregistering, these
-OPs can't be issued concurrently any more, that is one io_uring constraint.
-
-I will add the above words.
-
+ÔÚ 2025/06/09 17:14, Breno Leitao Ð´µÀ:
+> On Fri, Jun 06, 2025 at 11:31:06AM +0800, Yi Zhang wrote:
+>> Hello
+>>
+>> The following WARNING was triggered by blktests nvme/fc nvme/012,
+>> please help check and let me know if you need any info/test, thanks.
+>>
+>> commit: linux-block: 38f4878b9463 (HEAD, origin/for-next) Merge branch
+>> 'block-6.16' into for-next
 > 
-> > +
-> > +Usage Requirements
-> > +~~~~~~~~~~~~~~~~~~
-> > +
-> > +1. The ublk server must create a sparse buffer table on the same ``io_ring_ctx``
-> > +   used for ``UBLK_IO_FETCH_REQ`` and ``UBLK_IO_COMMIT_AND_FETCH_REQ``.
-> > +
-> > +2. If uring_cmd is issued on a different ``io_ring_ctx``, manual buffer
-> > +   unregistration is required.
+> I am seeing a similar issue on Linus' recent tree as e271ed52b344
+> ("Merge tag 'pm-6.16-rc1-3' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm").
+> CCing Jens.
 > 
-> nit: don't think this needs to be a separate point, could be combined with (1).
-
-OK.
-
+> This is my stack, in case it is useful.
 > 
-> > +
-> > +3. Buffer registration data must be passed via uring_cmd's ``sqe->addr`` with the
-> > +   following structure::
-> 
-> nit: extra ":"
+>             WARNING: CPU: 33 PID: 1865 at block/genhd.c:146 bdev_count_inflight_rw+0x334/0x3b0
+>             Modules linked in: sch_fq(E) tls(E) act_gact(E) tcp_diag(E) inet_diag(E) cls_bpf(E) intel_uncore_frequency(E) intel_uncore_frequency_common(E) skx_edac(E) skx_edac_common(E) nfit(E) libnvdimm(E) x86_pkg_temp_thermal(E) intel_powerclamp(E) coretemp(E) kvm_intel(E) kvm(E) mlx5_ib(E) iTCO_wdt(E) iTCO_vendor_support(E) xhci_pci(E) evdev(E) irqbypass(E) acpi_cpufreq(E) ib_uverbs(E) ipmi_si(E) i2c_i801(E) xhci_hcd(E) i2c_smbus(E) ipmi_devintf(E) wmi(E) ipmi_msghandler(E) button(E) sch_fq_codel(E) vhost_net(E) tun(E) vhost(E) vhost_iotlb(E) tap(E) mpls_gso(E) mpls_iptunnel(E) mpls_router(E) fou(E) loop(E) drm(E) backlight(E) drm_panel_orientation_quirks(E) autofs4(E) efivarfs(E)
+>             CPU: 33 UID: 0 PID: 1865 Comm: kworker/u144:14 Kdump: loaded Tainted: G S          E    N  6.15.0-0_fbk701_debugnightly_rc0_upstream_12426_ge271ed52b344 #1 PREEMPT(undef)
+>             Tainted: [S]=CPU_OUT_OF_SPEC, [E]=UNSIGNED_MODULE, [N]=TEST
+>             Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
+>             Workqueue: writeback wb_workfn (flush-btrfs-1)
+>             RIP: 0010:bdev_count_inflight_rw+0x334/0x3b0
+>             Code: 75 5c 41 83 3f 00 78 22 48 83 c4 40 5b 41 5c 41 5d 41 5e 41 5f 5d c3 0f 0b 41 0f b6 06 84 c0 75 54 41 c7 07 00 00 00 00 eb bb <0f> 0b 48 b8 00 00 00 00 00 fc ff df 0f b6 04 03 84 c0 75 4e 41 c7
+>             RSP: 0018:ffff8882ed786f20 EFLAGS: 00010286
+>             RAX: 0000000000000000 RBX: 1ffff1105daf0df3 RCX: ffffffff829739f7
+>             RDX: 0000000000000024 RSI: 0000000000000024 RDI: ffffffff853f79f8
+>             RBP: 0000606f9ff42610 R08: ffffe8ffffd866a7 R09: 1ffffd1ffffb0cd4
+>             R10: dffffc0000000000 R11: fffff91ffffb0cd5 R12: 0000000000000024
+>             R13: 1ffffffff0dd0120 R14: ffffed105daf0df3 R15: ffff8882ed786f9c
+>             FS:  0000000000000000(0000) GS:ffff88905fd44000(0000) knlGS:0000000000000000
+>             CR2: 00007f904bc6d008 CR3: 0000001075c2b001 CR4: 00000000007726f0
+>             PKRU: 55555554
+>             Call Trace:
+>              <TASK>
+>              bdev_count_inflight+0x28/0x50
+>              update_io_ticks+0x10f/0x1b0
+>              blk_account_io_start+0x3a0/0x690
+>              blk_mq_submit_bio+0xc7e/0x1940
 
-In reStructuredText (reST), the double colon :: serves as a literal block marker to
-indicate preformatted text.
+So, this is blk-mq IO accounting, a different problem than nvme mpath.
 
-> 
-> > +
-> > +    struct ublk_auto_buf_reg {
-> > +        __u16 index;      /* Buffer index for registration */
-> > +        __u8 flags;       /* Registration flags */
-> > +        __u8 reserved0;   /* Reserved for future use */
-> > +        __u32 reserved1;  /* Reserved for future use */
-> > +    };
-> 
-> Suggest using ublk_auto_buf_reg_to_sqe_addr()? Otherwise, it seems
-> ambiguous how this struct is "passed" in sqe->addr.
+What kind of test you're running, can you reporduce ths problem? I don't
+have a clue yet after a quick code review.
 
-OK
+Thanks,
+Kuai
 
+>              __submit_bio+0x125/0x3c0
+>              ? lock_release+0x4a/0x3c0
+>              submit_bio_noacct_nocheck+0x3cf/0xa30
+>              btree_write_cache_pages+0x5eb/0x870
+>              do_writepages+0x307/0x4d0
+>              ? rcu_is_watching+0xf/0xa0
+>              __writeback_single_inode+0x106/0xd10
+>              writeback_sb_inodes+0x53d/0xd60
+>              wb_writeback+0x368/0x8d0
+>              wb_workfn+0x3aa/0xcf0
+>              ? rcu_is_watching+0xf/0xa0
+>              ? trace_irq_enable+0x64/0x190
+>              ? process_scheduled_works+0x959/0x1450
+>              process_scheduled_works+0x9fe/0x1450
+>              worker_thread+0x8fd/0xd10
+>              kthread+0x50c/0x630
+>              ? rcu_is_watching+0xf/0xa0
+>              </TASK>
+>             irq event stamp: 0
+>             hardirqs last disabled at (0): [<ffffffff81401f85>] copy_process+0x655/0x32d0
+>             softirqs last  enabled at (0): [<ffffffff81401f85>] copy_process+0x655/0x32d0
 > 
-> > +
-> > +4. All reserved fields in ``ublk_auto_buf_reg`` must be zeroed.
-> > +
-> > +5. Optional flags can be passed via ``ublk_auto_buf_reg.flags``.
-> > +
-> > +Fallback Behavior
-> > +~~~~~~~~~~~~~~~~~
-> > +
-> > +When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
-> > +
-> > +1. If auto buffer registration fails:
+> .
 > 
-> I would switch these. Both (1) and (2) refer to when auto buffer
-> registration fails. So I would expect something like:
-> 
-> If auto buffer registration fails:
-> 
-> 1. When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
-> ...
-> 2. If fallback is not enabled:
-> ...
-> 
-> > +   - The uring_cmd is completed
-> 
-> Maybe add "without registering the request buffer"?
-> 
-> > +   - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.op_flags``
-> > +   - The ublk server must manually register the buffer
-> 
-> Only if it wants a registered buffer for the ublk request. Technically
-> the ublk server could decide to fall back on user-copy, for example.
-
-Good catch!
-
-> 
-> > +
-> > +2. If fallback is not enabled:
-> > +   - The ublk I/O request fails silently
-> 
-> "silently" is a bit ambiguous. It's certainly not silent to the
-> application submitting the ublk I/O. Maybe say that the ublk I/O
-> request fails and no uring_cmd is completed to the ublk server?
-
-Yes, but the document focus on ublk side, and the client is generic
-for every driver, so I guess it may be fine.
-
-> 
-> > +
-> > +Limitations
-> > +~~~~~~~~~~~
-> > +
-> > +- Requires same ``io_ring_ctx`` for all operations
-> 
-> Another limitation that prevents us from adopting the auto buffer
-> registration feature is the need to reserve a unique buffer table
-> index for every ublk tag on the io_ring_ctx. Since the io_ring_ctx
-> buffer table has a max size of 16K (could potentially be increased to
-> 64K), this limit is easily reached when there are a large number of
-> ublk devices or the ublk queue depth is large. I think we could remove
-> this limitation in the future by adding support for allocating buffer
-> indices on demand, analogous to IORING_FILE_INDEX_ALLOC.
-
-OK.
-
-But I guess it isn't big deal in reality since the task context should
-be saturated easily with so big setting.
-
-UBLK_F_PER_IO_DAEMON should alleviate the limit by adding more tasks/io_ring_ctx.
-
-Also I am working on BATCH_IO[1] feature to allow one queue to be served
-by multiple contexts, meantime one context can serve more than one queue
-too in easy & dynamic & batch way. Then the 16K limit can be alleviated
-too.
-
-https://github.com/ming1/linux/commits/ublk2-cmd-batch/
-
-
-Thanks, 
-Ming
 
