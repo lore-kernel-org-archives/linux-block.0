@@ -1,42 +1,34 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE72B18DB3D
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 03:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F1F1E835B
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 03:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749612455; cv=none; b=DpGgXjkJMEBMSr0R1WXYRBJgddKfuOPHzlS1VYpqAHYNJD7cpksmBRqi4Wig8gi75k00214//KQRgIoIUHc9gTo7tldTV1icvkobg5FnlG/WdaAGVBuoGnil+gNeDYw3dt0OBUM0FxIWXGJFEbaO3zOm/mVt80aZNFec+kpKluA=
+	t=1749613241; cv=none; b=mTynb0M7pU+6vTf4hS39KhBa/DXWHwbJiM/aTnXuJeUat5YvO1VeGHdhnFkE7NVeX8iAMnHaKgsYMIPNXBxyTEOvxBPAHn/ZrXvrRDE/svHyqgjRp6PLoLH3iPzHRtfhhitZoxemDAFt1xwbyiuPoTskUafhkkkCNqn9kiOWjrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749612455; c=relaxed/simple;
-	bh=YbfdiYVNj3CWAA62+jwJBgzDeqrrheox7G9ctMyMPYA=;
+	s=arc-20240116; t=1749613241; c=relaxed/simple;
+	bh=wvob4aRj2zs21xlqZsu1cSo43qbCuxvJ/B3mQuaowKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tb7TceLULrFfcq6rSSnK6T9KreNhcbARy9JfcNiUHu1IobCCp2j4qfZIssRtZ7yosXnaziAZciipN1HFYA+lsU7qukFMyffjBPyusvYoCnKoGvjODcSVg37KJG9ozkuFLjzAoPymewN4G5xKeJciLaHcMjjY1NUyHbkvHugdDjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4xc6LqRw; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4xc6LqRw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YbfdiYVNj3CWAA62+jwJBgzDeqrrheox7G9ctMyMPYA=; b=4xc6LqRwZmxKE4PiaoDgK2rX2j
-	60aughi/Yz3hWzk1NChv51se5PCZkBILYDu+IKfyj2IBzNfanO4AxUMLq+CsGqqc34bzUA+0I36TS
-	E3N8TcDs+trl842ssFarklwoBnrNdlzPSByN5+DvYXYZ0ke4hB1A99zeJig1Hbewf5THlUNlxFEvf
-	Df5lY42h+tDhmhC6FYl3waTs0wXli4U2r0AMHUCpfP+ctv55QLNKQV7dpWo+bOnQ2fh6DEH4Q5931
-	JIHi7lFJPynzF+kRhxqUXI9O0bnlXezX6U2QgZa04TQAy2RHw8aInHGWWJkt4r5giVFvNT7juEi2u
-	xWCm3hFQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPC7h-00000008jjY-1udp;
-	Wed, 11 Jun 2025 03:27:33 +0000
-Date: Tue, 10 Jun 2025 20:27:33 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: Clear BIO_EMULATES_ZONE_APPEND flag on BIO
- completion
-Message-ID: <aEj3pfzxUaIY_-jD@infradead.org>
-References: <20250611005915.89843-1-dlemoal@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qlSUd2AT93O1VqNVkO+v0nCPCjed05mAP0W3/4DaEquvALoknE0OdBuiI/L5vdD5IIgVDZU7KF6IKO1B++H8B+Vrr/M+wa+mib0kmlRa6zSMJJ6h3aU673VQWYy43mONxjiFMH1J5mrIwkzg/gEQHQWZCHm+56tPuqS6vxTWFhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 3F8DC68C4E; Wed, 11 Jun 2025 05:40:32 +0200 (CEST)
+Date: Wed, 11 Jun 2025 05:40:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+Message-ID: <20250611034031.GA2704@lst.de>
+References: <24b5163c-1fc2-47a6-9dc7-2ba85d1b1f97@acm.org> <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org> <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org> <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org> <907cf988-372c-4535-a4a8-f68011b277a3@acm.org> <20250526052434.GA11639@lst.de> <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org> <20250609035515.GA26025@lst.de> <83e74dd7-55bb-4e39-b7c6-e2fb952db90b@acm.org> <aEi9KxqQr-pWNJHs@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,17 +37,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250611005915.89843-1-dlemoal@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aEi9KxqQr-pWNJHs@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jun 11, 2025 at 09:59:15AM +0900, Damien Le Moal wrote:
-> When blk_zone_write_plug_bio_endio() is called for a regular write BIO
-> used to emulate a zone append operation, that is, a BIO flagged with
-> BIO_EMULATES_ZONE_APPEND, the BIO operation code is restored to the
-> original REQ_OP_ZONE_APPEND but the BIO_EMULATES_ZONE_APPEND flag is not
-> cleared. Clear it to fully return the BIO to its orginal definition.
+On Tue, Jun 10, 2025 at 05:18:03PM -0600, Keith Busch wrote:
+> I think you could just prep the encryption at the point the bio is split
+> to its queue's limits, and then all you need to do after that is ensure
+> the limits don't exceed what the fallback requires (which appears to
+> just be a simple segment limitation). It looks like most of the bio
+> based drivers split to limits already.
 
-Looks good:
+I'm still a bit confused about the interaction of block-crypto and
+stacking drivers.  For native support you obviously always want to pass
+the crypt context down to the lowest level hardware driver, and dm
+has code to support this.  But if you stacking driver is not dm, or
+the algorithm is not supported by the underlying hardware it looks
+like we might still be able to run the fallback for a stacking
+driver.  Or am I missing something here?  Eric/Bart: any chance to
+get blktests (or xfstets if that's easier to wire up) to exercise all
+these corner cases?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> And if that's all okay, it simplifies quite a lot of things in this path
+> because the crypto fallback doesn't need to concern itself with
+> splitting anymore. Here's a quick shot a it, but compile tested only:
+
+Exactly.  And in the next step we can significantly simply and speed
+up the bio submission recursion protection if __bio_split_to_limits
+is the only place that can split/reinject bios for blk-mq drivers.
+
+> diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+> index 94a155912bf1c..2804843310cc4 100644
+> --- a/block/blk-crypto-profile.c
+> +++ b/block/blk-crypto-profile.c
+> @@ -459,6 +459,16 @@ bool blk_crypto_register(struct blk_crypto_profile *profile,
+>  		pr_warn("Integrity and hardware inline encryption are not supported together. Disabling hardware inline encryption.\n");
+>  		return false;
+>  	}
+> +
+> +	if (queue_max_segments(q) > BIO_MAX_VECS) {
+> +		struct queue_limits lim;
+> +
+> +		lim = queue_limits_start_update(q);
+> +		lim.max_segments = BIO_MAX_VECS;
+> +		if (queue_limits_commit_update(q, &lim))
+> +			return false;
+> +	}
+
+I think this limit actually only exists when using the fallback, i.e.
+when no profile is registered.  And even then only for encrypted bios.
+
+We'll also need to ensure the queue is frozen and deal with limit
+changes after the profile registration.  I suspect we should probably
+integrate the queue profile with the queue limits, so things are don't
+in one place, but that's out of scope for this patch.
+
+It's also not just a segment limit, but also an overall size limit,
+i.e. it must be no more than 256 * 4k.
 
