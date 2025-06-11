@@ -1,64 +1,33 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEB9283CBE
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 12:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298CC1EE033
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 13:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749646620; cv=none; b=f8oU8EvJol46vOfdtc6nFXNQiy/8ZIT7I9dbJH1cIfjyol0IYo13bV471cR06r768Z/f8z9qBcBbAfqcenAoxN0JYD8OWUB548nhn04prF+3gNmZdSdqTetpeZlEC6I8yq2tu6D2n1W2AXpuNJX0cW7Nrz8NuKCzB+y3ze2xqZ4=
+	t=1749649391; cv=none; b=otALFZThJsAVYj2WCz4S2JEKCUaE+gnEuo2cnHAkuE7STy6pm6arHl4UIjlp9VfPC8ed3yDYEHEPT6mSKvkhYVbfq899vWEQY/7dXn5+e5vCVzU+JtazKyalnE9Bg4hfXJGbKKtaR87uvBpIwqCOgQB4OOnx3g6CAAIGNGhmXbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749646620; c=relaxed/simple;
-	bh=WFBUbKMMnKHZdjkqyPfepwRYRaY3PMbvKPZrZUg2BWM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VE8LcOzFaaQISFiK0iM7IloNM4ncV2WY78cQd9kmWJQxjQayE/RkZHUceZi22XN+Mrow0VnICZUcd8iUiIN4p1eRiNpIb1hIVHosfSEgwHZSEW3VDOoaLtOjZuU4g1cSnq0JCMBv2ytS/N0uRnyvB8kbg9HYQp4WujnzEOAHi7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3SNeEW8J; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1749649391; c=relaxed/simple;
+	bh=P6zwvzUUz0B6hR+x2yVh9ikQbfrWHN7UKz34ytW9BGs=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WGIR49xNiy4sF1AAsabwAI1N0uKSMxiRg2kvu1wEL0BPdswWgB3EWz2uUXxNkmwaZFDNqQ52HMV7cAlQXPbNMyXukwhtWVUWtfPn5APmi7tg/1qPt3oXb7hwIklmbbGryqKzpOrIrVa/FBOG3oZI5SrN84KRuRIVASYOUuXja1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Moxy7nJE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3SNeEW8J"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3ddeaad6036so20371325ab.3
-        for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 05:56:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749646617; x=1750251417; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BPGWj6XVqoqMlOowKe5NeP45YX5gIMyOrC/TyjewJiI=;
-        b=3SNeEW8JE6h/oz8q6m6QF2ImTL+tlmycebGzUU801zIFrCEDkbol5VveffiMdaCcVr
-         DR4DtdLs0b+1vL/7V92uya5ywuKnyqGYVSg0ovhGxi0LJoY7dxjooMAxjnoIBEzQXMr+
-         qMeCgAww9N0HEgBHk0ug5O3IF+BFEyTe1ylZYv+Y826rZiB61Q2HaxeJnbGKLVKmd7gE
-         Aeg10w+4veLhgu4Nb+O8L6MkAU1TZQkC7AhlyIGuZtpexzE1kEY4l5aPG9Hz/W2teHnY
-         49kehI159q8ArkYpHFN9doyq3ao1juv/h8HlhUTH3p4/xVB/T2oRSBlwS1sUivjQy8Bs
-         7uQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749646617; x=1750251417;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BPGWj6XVqoqMlOowKe5NeP45YX5gIMyOrC/TyjewJiI=;
-        b=MQzCM2hPtWnNdizNYLU98mPosTFXvEmhhJkdejPJkUUaAGO1ArtDndI4tGE0Qs4/o9
-         1rK20NuI4qBu3UGgIKwP5Q5W/924ibI9pRLHUOh1/g+V4UAzVCztUCIF+r8IqYNJy2Vy
-         XrkfdBleND/+fTl9mxNc9da75Nlqa1gbWjW+dY6iIR2ghQx/OgBItfZxEF6klYgon+9t
-         NJiKhZCR4hQxSuzWmlDkgtaPFJVr9ND6pWdS0lNEvLLs7tw7lZNXThWcDK/kpr2wQOTY
-         ncmUwbYdblkA3pfWxPbDdPbZ9hHkD33bPgqDQiP2/V7EYDjk0L6FTaCLHEdpxlI7qLlD
-         OHxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUscOl3abaQKqHwGmXtWyX3IbNgOEwsci1ehhvbzUTOUk08qxVE99YJtC4ErReWeRTDH+356cJdP0aSWw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGEXlZ5Tn51hUl3gmbJEz+XRSub0GjJGqqOxn7ICXlFrBTLH/C
-	QyY7inWVMQ3+x3EdR6ugln/O/6D4EFycB8enQerFvEkEDjSWbwFKu8OQIWqJ7MWG1/g=
-X-Gm-Gg: ASbGncs93rOcqsllu8p7mRcdZOQYLGjtG1cpNfpBKIrcTgDOIGDvNQkqJ0OSlmtDAz+
-	sWexf9kM2/yBqdXUmJwNAb9rqwUJMz+QwBXzG91lzznuy9ejZraTuLip6tES02GMSLUqxFkzVOP
-	CJbXc+RttwvQoy6LuOJJyJQw1dfAeaqIvhzEwMCsMl45hTGl7x8jMUM6AvNseqgFgxPBZS0LgS2
-	4yfM/Pop1tgCRzNH1BpoUT3aYVG8fBHqgb4oZwiYVWl3RtD6gNXD79/vp4hszE1SdQNBYnZmeKv
-	amy9c3xBtDfS+4twsD9orslns6WoHxf8mEGlcFhwCTJrIS+fwM5dPQV8HM6oEVuLcr9qQw==
-X-Google-Smtp-Source: AGHT+IERz9UEhN3gPoO6s9ZO+TGganlwoJirBS1zd34gle1XGHdmdK7NOLrIX/f0q//+H5iwkCSLYQ==
-X-Received: by 2002:a05:6e02:12e8:b0:3d9:668c:a702 with SMTP id e9e14a558f8ab-3ddf4d5d68emr25015895ab.9.1749646617386;
-        Wed, 11 Jun 2025 05:56:57 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ddf4768c0dsm3851505ab.55.2025.06.11.05.56.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jun 2025 05:56:56 -0700 (PDT)
-Message-ID: <ed33ffb7-31bf-490c-b1ae-304a6e4b9a0f@kernel.dk>
-Date: Wed, 11 Jun 2025 06:56:55 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Moxy7nJE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB67C4CEEE;
+	Wed, 11 Jun 2025 13:43:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749649390;
+	bh=P6zwvzUUz0B6hR+x2yVh9ikQbfrWHN7UKz34ytW9BGs=;
+	h=Date:From:Subject:To:Cc:References:Reply-To:In-Reply-To:From;
+	b=Moxy7nJEE8sgn9ViYdpJER/1vycmZ+sZTA6VU9Q/QwU3AHksf0tHaL+6p0eRecFgI
+	 nDh4tyEqXqsqg/cjtw5iAsCxyYNLyOdrMvSH/oHCCNs1yphjxp8Fali/B/39500tkQ
+	 3U4zLDXkPSbo/wVyyWs1YO9GrCppJkFROCwpbh4Gr2axsVpe/f+D1WGzAEosXeNZ2s
+	 NY2Egsa8na8+MlCJeqcOQVHNHjMhYt7AoP6RiGtmZ5/a3oVUsk8XQzIWCLZFB0rYO+
+	 Hb5csuLxcHpdJdRTTxTjls+69gb9RF8SMYo4+3PCGArmk/90aegTLJFu4WMONQisCy
+	 YQxS5SvL7OCvg==
+Message-ID: <dab07466-a1fe-4fba-b3a8-60da853a48be@kernel.org>
+Date: Wed, 11 Jun 2025 15:43:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,53 +35,148 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Revert "block: don't reorder requests in
- blk_add_rq_to_plug"
-To: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
-Cc: stable@vger.kernel.org, kernel test robot <oliver.sang@intel.com>,
- Hagar Hemdan <hagarhem@amazon.com>, Shaoying Xu <shaoyi@amazon.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-nvme@lists.infradead.org
-References: <20250611121626.7252-1-abuehaze@amazon.com>
+From: Daniel Gomez <da.gomez@kernel.org>
+Subject: Re: [PATCH 2/9] block: add scatterlist-less DMA mapping helpers
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Leon Romanovsky <leon@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20250610050713.2046316-1-hch@lst.de>
+ <20250610050713.2046316-3-hch@lst.de>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250611121626.7252-1-abuehaze@amazon.com>
+Reply-To: Daniel Gomez <da.gomez@kernel.org>
+Organization: kernel.org
+In-Reply-To: <20250610050713.2046316-3-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/11/25 6:14 AM, Hazem Mohamed Abuelfotoh wrote:
-> This reverts commit e70c301faece15b618e54b613b1fd6ece3dd05b4.
+On 10/06/2025 07.06, Christoph Hellwig wrote:
+> Add a new blk_rq_dma_map / blk_rq_dma_unmap pair that does away with
+> the wasteful scatterlist structure.  Instead it uses the mapping iterator
+> to either add segments to the IOVA for IOMMU operations, or just maps
+> them one by one for the direct mapping.  For the IOMMU case instead of
+> a scatterlist with an entry for each segment, only a single [dma_addr,len]
+> pair needs to be stored for processing a request, and for the direct
+> mapping the per-segment allocation shrinks from
+> [page,offset,len,dma_addr,dma_len] to just [dma_addr,len].
 > 
-> Commit <e70c301faece> ("block: don't reorder requests in
-> blk_add_rq_to_plug") reversed how requests are stored in the blk_plug
-> list, this had significant impact on bio merging with requests exist on
-> the plug list. This impact has been reported in [1] and could easily be
-> reproducible using 4k randwrite fio benchmark on an NVME based SSD without
-> having any filesystem on the disk.
+> One big difference to the scatterlist API, which could be considered
+> downside, is that the IOVA collapsing only works when the driver sets
+> a virt_boundary that matches the IOMMU granule.  For NVMe this is done
+> already so it works perfectly.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-mq-dma.c         | 162 +++++++++++++++++++++++++++++++++++++
+>  include/linux/blk-mq-dma.h |  63 +++++++++++++++
+>  2 files changed, 225 insertions(+)
+>  create mode 100644 include/linux/blk-mq-dma.h
+> 
+> diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+> index 82bae475dfa4..37f8fba077e6 100644
+> --- a/block/blk-mq-dma.c
+> +++ b/block/blk-mq-dma.c
 
-Rather than revert this commit, why not just attempt a tail merge?
-Something ala this, totally untested.
+> +static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
+> +		struct dma_iova_state *state, struct blk_dma_iter *iter,
+> +		struct phys_vec *vec)
+> +{
+> +	enum dma_data_direction dir = rq_dma_dir(req);
+> +	unsigned int mapped = 0;
+> +	int error = 0;
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3af1d284add5..708ded67d52a 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -998,6 +998,10 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 	if (!plug || rq_list_empty(&plug->mq_list))
- 		return false;
- 
-+	rq = plug->mq_list.tail;
-+	if (rq->q == q)
-+		return blk_attempt_bio_merge(q, rq, bio, nr_segs, false) == BIO_MERGE_OK;
-+
- 	rq_list_for_each(&plug->mq_list, rq) {
- 		if (rq->q == q) {
- 			if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
+error does not need to be initialized.
 
--- 
-Jens Axboe
+> +/**
+> + * blk_rq_dma_map_iter_start - map the first DMA segment for a request
+> + * @req:	request to map
+> + * @dma_dev:	device to map to
+> + * @state:	DMA IOVA state
+> + * @iter:	block layer DMA iterator
+> + *
+> + * Start DMA mapping @req to @dma_dev.  @state and @iter are provided by the
+> + * caller and don't need to be initialized.  @state needs to be stored for use
+> + * at unmap time, @iter is only needed at map time.
+> + *
+> + * Returns %false if there is no segment to map, including due to an error, or
+> + * %true ft it did map a segment.
+> + *
+> + * If a segment was mapped, the DMA address for it is returned in @iter.addr and
+> + * the length in @iter.len.  If no segment was mapped the status code is
+> + * returned in @iter.status.
+> + *
+> + * The caller can call blk_rq_dma_map_coalesce() to check if further segments
+> + * need to be mapped after this, or go straight to blk_rq_dma_map_iter_next()
+> + * to try to map the following segments.
+> + */
+> +bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
+> +		struct dma_iova_state *state, struct blk_dma_iter *iter)
+> +{
+> +	unsigned int total_len = blk_rq_payload_bytes(req);
+> +	struct phys_vec vec;
+> +
+> +	iter->iter.bio = req->bio;
+> +	iter->iter.iter = req->bio->bi_iter;
+> +	memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
+> +	iter->status = BLK_STS_OK;
+> +
+> +	/*
+> +	 * Grab the first segment ASAP because we'll need it to check for P2P
+> +	 * transfers.
+> +	 */
+> +	if (!blk_map_iter_next(req, &iter->iter, &vec))
+> +		return false;
+> +
+> +	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && (req->cmd_flags & REQ_P2PDMA)) {
+> +		switch (pci_p2pdma_state(&iter->p2pdma, dma_dev,
+> +					 phys_to_page(vec.paddr))) {
+> +		case PCI_P2PDMA_MAP_BUS_ADDR:
+> +			return blk_dma_map_bus(req, dma_dev, iter, &vec);
+> +		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +			/*
+> +			 * P2P transfers through the host bridge are treated the
+> +			 * same as non-P2P transfers below and during unmap.
+> +			 */
+> +			req->cmd_flags &= ~REQ_P2PDMA;
+> +			break;
+> +		default:
+> +			iter->status = BLK_STS_INVAL;
+> +			return false;
+> +		}
+> +	}
+> +
+> +	if (blk_can_dma_map_iova(req, dma_dev) &&
+> +	    dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
+> +		return blk_rq_dma_map_iova(req, dma_dev, state, iter, &vec);
+> +	return blk_dma_map_direct(req, dma_dev, iter, &vec);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
+> +
+
+...
+
+> diff --git a/include/linux/blk-mq-dma.h b/include/linux/blk-mq-dma.h
+> new file mode 100644
+> index 000000000000..c26a01aeae00
+> --- /dev/null
+> +++ b/include/linux/blk-mq-dma.h
+> @@ -0,0 +1,63 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef BLK_MQ_DMA_H
+> +#define BLK_MQ_DMA_H
+> +
+> +#include <linux/blk-mq.h>
+> +#include <linux/pci-p2pdma.h>
+> +
+> +struct blk_dma_iter {
+> +	/* Output address range for this iteration */
+> +	dma_addr_t			addr;
+> +	u32				len;
+> +
+> +	/* Status code. Only valid when blk_rq_dma_map_iter_* returned false */
+> +	blk_status_t			status;
+
+This comment does not match with blk_rq_dma_map_iter_start(). It returns false
+and status is BLK_STS_INVAL.
