@@ -1,217 +1,184 @@
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C3B78F34;
-	Wed, 11 Jun 2025 12:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEB225BEEF;
+	Wed, 11 Jun 2025 12:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749644220; cv=none; b=hyQ5ZRKegvAK6p/wEWX+KvmTeLN77Rjf3uWUCZZEf7Z9snG8VxQwa1ta5IOYAw2WS9mzrIik96NG+zaFLmL9DEQ6muFGdRHxQ9wquLpaNrjRuvZV49Tt4goWviF1ckWlH6rWF8WuronK1HbT3QJmXgavDQ7ymIH70s6fmG4S69k=
+	t=1749644449; cv=none; b=rTti1o03uaRc5DHQJdJN016qdmvOlweCIB7O+XnLA3NGKV4mzft+zTtO8u2PZiD27LpWcfwShqpMlIFK/RNIEpT6UY9be0LI/WJrKcMzbHEerJTB+deK1kGgTY6ESWLcE4jQAvWrbHMEvNZR+j5uLsMuW2xgjBH9Uqgc4ohY4EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749644220; c=relaxed/simple;
-	bh=2fgo+DfYW6hkb8u8dSOtf7+gmhcII4bUlVTgpcygRbs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZZs53l41/2ypuMu81ckoH52AwzbdyCbcpNP6738wd1yFr+DY2Nj/Z/TYp4wV8wcxW0VnaCBxc5XnPLj9ryffH2k4C6qzLxuUTdL31GkHCbG0RaiV+yc3PNZJb9d1y6IPUEtVELn8UlbzSXaZozaeCNrmVI7xbqVsQyvHfw7x2rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ftFRl3nH; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1749644449; c=relaxed/simple;
+	bh=IHppgvzI4syY64UndWNyNk/lcgm8Qzoj/IK3X0IV+MA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ogd9hLs9WIHrECdjcDY+YXBicax3nSMXPJP7dYBK/0iRBAw0GxiaAY+CrhOq24kje481nvptl+28SWe8V/lGnCIWecqCiBFVpFmGqo6VkIeimHvUEPpSSC5mAt8JyhOn9WQPWusbL28Nf269KhI7s+Aoj1NIqBQQNuWqYy0WuVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IEeo1Wvu; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ftFRl3nH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IEeo1Wvu"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d6d6d82633so20000755ab.0;
+        Wed, 11 Jun 2025 05:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749644218; x=1781180218;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=B4ji9po20KtVxaeun/VeETG8Hky3+gtaCUe9OwsWfc0=;
-  b=ftFRl3nHGkMmMMGA7v/gX7WPNBMMKAEx8asCfi+Z9B/8WW3NJ7sfn2OF
-   1v9BE5XL5otu6rJyMUtOli5XVNalb2zRYw+BMZRPUsJrYWl5WNsigM7zK
-   sqERkvCrAixTX/JY4Bg5h15dSPGbO4mcicXyN32go0C/s6DtukOMc7PSm
-   d27W0BIod/AGP9yLp3Jr5vKbln9ri5eYsppRP6IbDYrI7SQsnV2q+olmT
-   EX+jV0a16Q7yY0+g4MopM9E9ejvwHI8YFsfSIUklS8WmIqFeE4j5U1NqY
-   qZ0S/2VPduyjraMDZuSg85eCLu8CoJotmG0CA61dKaxfcXEnvZeJ3ujna
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.16,227,1744070400"; 
-   d="scan'208";a="500409699"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 12:16:55 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:23515]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.131:2525] with esmtp (Farcaster)
- id 59df4382-3cb2-4f51-a171-145e622f87ad; Wed, 11 Jun 2025 12:16:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 59df4382-3cb2-4f51-a171-145e622f87ad
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 12:16:54 +0000
-Received: from dev-dsk-abuehaze-1c-21d23c85.eu-west-1.amazon.com
- (10.13.244.41) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14; Wed, 11 Jun 2025 12:16:48 +0000
-From: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
-To:
-CC: <abuehaze@amazon.com>, <stable@vger.kernel.org>, kernel test robot
-	<oliver.sang@intel.com>, Hagar Hemdan <hagarhem@amazon.com>, Shaoying Xu
-	<shaoyi@amazon.com>, Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Keith Busch <kbusch@kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-nvme@lists.infradead.org>
-Subject: [PATCH] Revert "block: don't reorder requests in blk_add_rq_to_plug"
-Date: Wed, 11 Jun 2025 12:14:54 +0000
-Message-ID: <20250611121626.7252-1-abuehaze@amazon.com>
-X-Mailer: git-send-email 2.47.1
+        d=gmail.com; s=20230601; t=1749644447; x=1750249247; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dBvjnZ90Dp0F8XMlzbkh5jxvl8CN8DeTIwQ3MbTjXNw=;
+        b=IEeo1WvusE9pUMCLPFN2VyqSorod6YrW/VbVZ5LR1WpvYFJA7vP+VmpcSIAbFfPaef
+         OAUKCqrctO9GbUoyghtmtvORy3y8cALfKu28OQLzekN4w28bkM5TFgAUH/Lsc/njbvqj
+         HbK+9S2GNGUYydUV12SNTujdNFNK+fqas5MjUNfDZM7b0mShV7sgQrc9ndLZKzDWa7hn
+         GY1TL29O8NOsc5VHClWsY0NbaBGt2QGAbSFj+9ERkVjHKUGN3SNh9daXDraXZqgB0Ynl
+         cehDieUwxbJWrm83qMPJHVVdwS+xbUnNq01siSjE2qOYY1MKy0VvSVSqC6OexNOFI9pB
+         z+GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749644447; x=1750249247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dBvjnZ90Dp0F8XMlzbkh5jxvl8CN8DeTIwQ3MbTjXNw=;
+        b=EFE4yxLkoly99+AT1vbzwWY5Bvg53A13vaVuw8oCMr8U0XV8BfBzUE1sx94Qog59FV
+         Jo1O7T/547FS8+l3nDneCsnj/d3cwOau1H/kcO9koGokYBW7PyYDli6vDVeoyPy96SO7
+         hcLWbHGQDH/o9esTqcLdqXRvQW8UrvX4ux+sZD+u+bJMOzWYUoEwVvgSpcdojAINcYTB
+         2ebJjtIbYnjnnB9oz4y5J49NnyrS5ykFI/RgAr3LP4IPNJ/ZtmjOVAveBuQ9DRoS0BlM
+         sNyWtMclR/4oDuosjd1NFzdDoqSPs949dL+dNLsoBj9BIR8FX+ByvTMFFM3stqrxQfGb
+         8miw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7nGxvS+3TqfiojeRvkucrnnUGJufhAK63WVofip8LWprKTxDzcxIEzUhHpsLbG+sOHrDIeWUYcBYzGH2v5oYhUQL5@vger.kernel.org, AJvYcCVdDQbrxj7peOGybuWEM30UgIHnuHbqHQzoVkivANKuXLBqSHYa6hKq5ggkPMXBGsheO8+ja5dU+LFHvUH9@vger.kernel.org, AJvYcCVhK2BmvK0pvfbYoKYKeILq4kAI7Udle5nWqVgY+9xMkq3qmDoya4tbTox11zVjoj8p9uZFdJqrb86iMQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCNdkTbvDWQEN/cY5E/RVMyZUPjoaUDdyh6PbPbKRrrX8E88IB
+	LzUdrVYwO7njBL3Dkm6/ePJbYBf6aijpbxvaMIFySI6tt368h+B1tzLYxYF3Z5P0k2S4VN4Wc8Z
+	KJ2Tj+B0Jo/3P529D3RqhWlBv5CfNH+Y=
+X-Gm-Gg: ASbGncu1sPRi3dC4eYIjYJR6lhPV87VGr21hpMNTV+U9XxJCWwv0bW7E5nKXNqr+Dl9
+	BP1pcEuFRm3pQ/NVS6cso9AC1B9ChNaSfjux5PZRAKC40uVjaW0QtLq2ZBKZ4RLsEmCg6XBKTDw
+	5ArgD7VNUETYg8REGjmEFEFne8vmcGLZZ1EunpAv4CNI4=
+X-Google-Smtp-Source: AGHT+IE4k8M34kH1+0to98qZha6YDCpF10uoPuQmWlF7JjAoPYaJi/BRbveOdyY4jpVv3FoTiXKBp/TgaddM4ZbrpUk=
+X-Received: by 2002:a05:6e02:1a6a:b0:3dd:f1bb:da0b with SMTP id
+ e9e14a558f8ab-3ddf423ed49mr34966435ab.7.1749644446692; Wed, 11 Jun 2025
+ 05:20:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
+References: <20250610004844.66688-5-kerneljasonxing@gmail.com>
+ <202506102340.uo7QDaVk-lkp@intel.com> <CAL+tcoARvQVgd68HGoXXiK=+RSH12WQ_rc47B4rgtt2Eb05c0w@mail.gmail.com>
+ <20250611170845.8f88347e3cba51cf15a01b21@kernel.org>
+In-Reply-To: <20250611170845.8f88347e3cba51cf15a01b21@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 11 Jun 2025 20:20:10 +0800
+X-Gm-Features: AX0GCFt9o6cS486F4_y9iaF71LRoSu0_FvAk5vs2fQpwxofQ65dX1xlkNYbdtGU
+Message-ID: <CAL+tcoBDJty6o_-c4__P=BES_uP6emO3TcuUTrFCJ92j2wNWPg@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] blktrace: use rbuf->stats.full as a drop indicator
+ in relayfs
+To: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: kernel test robot <lkp@intel.com>, axboe@kernel.dk, rostedt@goodmis.org, 
+	mathieu.desnoyers@efficios.com, akpm@linux-foundation.org, 
+	oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This reverts commit e70c301faece15b618e54b613b1fd6ece3dd05b4.
+On Wed, Jun 11, 2025 at 4:08=E2=80=AFPM Masami Hiramatsu <mhiramat@kernel.o=
+rg> wrote:
+>
+> On Wed, 11 Jun 2025 13:15:40 +0800
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+>
+> > On Wed, Jun 11, 2025 at 9:42=E2=80=AFAM kernel test robot <lkp@intel.co=
+m> wrote:
+> > >
+> > > Hi Jason,
+> > >
+> > > kernel test robot noticed the following build warnings:
+> > >
+> > > [auto build test WARNING on axboe-block/for-next]
+> > > [also build test WARNING on drm-i915/for-linux-next drm-i915/for-linu=
+x-next-fixes akpm-mm/mm-everything linus/master v6.16-rc1 next-20250610]
+> > > [If your patch is applied to the wrong git tree, kindly drop us a not=
+e.
+> > > And when submitting patch, we suggest to use '--base' as documented i=
+n
+> > > https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > >
+> > > url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/rel=
+ayfs-abolish-prev_padding/20250610-085150
+> > > base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-b=
+lock.git for-next
+> > > patch link:    https://lore.kernel.org/r/20250610004844.66688-5-kerne=
+ljasonxing%40gmail.com
+> > > patch subject: [PATCH v4 4/5] blktrace: use rbuf->stats.full as a dro=
+p indicator in relayfs
+> > > config: arc-randconfig-001-20250610
+> > > compiler: arc-linux-gcc (GCC) 12.4.0
+> > > reproduce (this is a W=3D1 build):
+> > >
+> > > If you fix the issue in a separate patch/commit (i.e. not just a new =
+version of
+> > > the same patch/commit), kindly add following tags
+> > > | Reported-by: kernel test robot <lkp@intel.com>
+> > > | Closes: https://lore.kernel.org/oe-kbuild-all/202506102340.uo7QDaVk=
+-lkp@intel.com/
+> > >
+> > > All warnings (new ones prefixed by >>):
+> > >
+> > >    kernel/trace/blktrace.c: In function 'blk_dropped_read':
+> > > >> kernel/trace/blktrace.c:421:39: warning: format '%lu' expects argu=
+ment of type 'long unsigned int', but argument 4 has type 'size_t' {aka 'un=
+signed int'} [-Wformat=3D]
+> > >      421 |         snprintf(buf, sizeof(buf), "%lu\n", dropped);
+> > >          |                                     ~~^     ~~~~~~~
+> > >          |                                       |     |
+> > >          |                                       |     size_t {aka un=
+signed int}
+> > >          |                                       long unsigned int
+> > >          |                                     %u
+> >
+> > Well, I suppose I will fix it in the re-spin after receiving more
+> > comments so that I don't need to quickly respond to this minor issue.
+>
+> Please update the patch and send series with my reviewed-by on 1/5.
 
-Commit <e70c301faece> ("block: don't reorder requests in
-blk_add_rq_to_plug") reversed how requests are stored in the blk_plug
-list, this had significant impact on bio merging with requests exist on
-the plug list. This impact has been reported in [1] and could easily be
-reproducible using 4k randwrite fio benchmark on an NVME based SSD without
-having any filesystem on the disk.
+Sure, thanks for the review.
 
-My benchmark is:
+> BTW, size_t should use %zu.
+> Please check Documentation/core-api/printk-formats.rst
 
-    fio --time_based --name=benchmark --size=50G --rw=randwrite \
-	--runtime=60 --filename="/dev/nvme1n1" --ioengine=psync \
-	--randrepeat=0 --iodepth=1 --fsync=64 --invalidate=1 \
-	--verify=0 --verify_fatal=0 --blocksize=4k --numjobs=4 \
-	--group_reporting
+Thanks for the pointer :)
 
-On 1.9TiB SSD(180K Max IOPS) attached to i3.16xlarge AWS EC2 instance.
-
-Kernel        |  fio (B.W MiB/sec)  | I/O size (iostat)
---------------+---------------------+--------------------
-6.15.1        |   362               |  2KiB
-6.15.1+revert |   660 (+82%)        |  4KiB
---------------+---------------------+--------------------
-
-I have run iostat while the fio benchmark was running and was able to
-see that the I/O size seen on the disk is shown as 2KB without this revert
-while it's 4KB with the revert. In the bad case the write bandwidth
-is capped at around 362MiB/sec which almost 2KiB * 180K IOPS so we are
-hitting the SSD Disk IOPS limit which is 180K. After the revert the I/O
-size has been doubled to 4KiB hence the bandwidth has been almost doubled
-as we no longer hit the Disk IOPS limit.
-
-I have done some tracing using bpftrace & bcc and was able to conclude that
-the reason behind the I/O size discrepancy with the revert is that this
-fio benchmark is subimitting each 4k I/O as 2 contiguous 2KB bios.
-
-In the good case each 2 bios are merged in a 4KB request that's then been
-submitted to the disk while in the bad case 2K bios are submitted to the
-disk without merging because blk_attempt_plug_merge() failed to merge
-them as seen below.
-
-**Without the revert**
-
-[12:12:28]
-r::blk_attempt_plug_merge():int:$retval
-         COUNT      EVENT
-         5618       $retval = 1
-         176578     $retval = 0
-
-**With the revert**
-
-[12:11:43]
-r::blk_attempt_plug_merge():int:$retval
-        COUNT      EVENT
-        146684     $retval = 0
-        146686     $retval = 1
-
-In blk_attempt_plug_merge() we are iterating ithrought the plug list
-from head to tail looking for a request with which we can merge the
-most recently submitted bio.
-
-With commit <e70c301faece> ("block: don't reorder requests in
-blk_add_rq_to_plug") the most recent request will be at the tail so
-blk_attempt_plug_merge() will fail because it tries to merge bio with
-the plug list head. In blk_attempt_plug_merge() we don't iterate across
-the whole plug list because as we exit the loop once we fail merging in
-blk_attempt_bio_merge().
-
-In commit <bc490f81731> ("block: change plugging to use a singly linked
-list") the plug list has been changed to single linked list so there's
-no way to iterate the list from tail to head which is the only way to
-mitigate the impact on bio merging if we want to keep commit <e70c301faece>
-("block: don't reorder requests in blk_add_rq_to_plug").
-
-Given that moving plug list to a single linked list was mainly for
-performance reason then let's revert commit <e70c301faece> ("block: don't
-reorder requests in blk_add_rq_to_plug") for now to mitigate the
-reported performance regression.
-
-[1] https://lore.kernel.org/lkml/202412122112.ca47bcec-lkp@intel.com/
-
-Cc: stable@vger.kernel.org      # 6.12
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Reported-by: Hagar  Hemdan <hagarhem@amazon.com>
-Reported-and-bisected-by: Shaoying Xu <shaoyi@amazon.com>
-Signed-off-by: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
----
- block/blk-mq.c             | 4 ++--
- drivers/block/virtio_blk.c | 2 +-
- drivers/nvme/host/pci.c    | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c2697db59109..28965cac19fb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1394,7 +1394,7 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	 */
- 	if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
- 		plug->has_elevator = true;
--	rq_list_add_tail(&plug->mq_list, rq);
-+	rq_list_add_head(&plug->mq_list, rq);
- 	plug->rq_count++;
- }
- 
-@@ -2846,7 +2846,7 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
- 			rq_list_add_tail(&requeue_list, rq);
- 			continue;
- 		}
--		list_add_tail(&rq->queuelist, &list);
-+		list_add(&rq->queuelist, &list);
- 		depth++;
- 	} while (!rq_list_empty(&plug->mq_list));
- 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 7cffea01d868..7992a171f905 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -513,7 +513,7 @@ static void virtio_queue_rqs(struct rq_list *rqlist)
- 		vq = this_vq;
- 
- 		if (virtblk_prep_rq_batch(req))
--			rq_list_add_tail(&submit_list, req);
-+			rq_list_add_head(&submit_list, req); /* reverse order */
- 		else
- 			rq_list_add_tail(&requeue_list, req);
- 	}
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f1dd804151b1..5f7da42f9dac 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1026,7 +1026,7 @@ static void nvme_queue_rqs(struct rq_list *rqlist)
- 		nvmeq = req->mq_hctx->driver_data;
- 
- 		if (nvme_prep_rq_batch(nvmeq, req))
--			rq_list_add_tail(&submit_list, req);
-+			rq_list_add_head(&submit_list, req); /* reverse order */
- 		else
- 			rq_list_add_tail(&requeue_list, req);
- 	}
--- 
-2.47.1
-
+Thanks,
+Jason
+>
+> Thank you,
+>
+> >
+> > Thanks,
+> > Jason
+> >
+> > >
+> > >
+> > > vim +421 kernel/trace/blktrace.c
+> > >
+> > >    413
+> > >    414  static ssize_t blk_dropped_read(struct file *filp, char __use=
+r *buffer,
+> > >    415                                  size_t count, loff_t *ppos)
+> > >    416  {
+> > >    417          struct blk_trace *bt =3D filp->private_data;
+> > >    418          size_t dropped =3D relay_stats(bt->rchan, RELAY_STATS=
+_BUF_FULL);
+> > >    419          char buf[16];
+> > >    420
+> > >  > 421          snprintf(buf, sizeof(buf), "%lu\n", dropped);
+> > >    422
+> > >    423          return simple_read_from_buffer(buffer, count, ppos, b=
+uf, strlen(buf));
+> > >    424  }
+> > >    425
+> > >
+> > > --
+> > > 0-DAY CI Kernel Test Service
+> > > https://github.com/intel/lkp-tests/wiki
+>
+>
+> --
+> Masami Hiramatsu (Google) <mhiramat@kernel.org>
