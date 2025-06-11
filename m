@@ -1,53 +1,48 @@
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D580F1AAA11;
-	Wed, 11 Jun 2025 15:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99FA1632D7;
+	Wed, 11 Jun 2025 15:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749655452; cv=none; b=ekdA43jcJ8YPFHuimBTnBR1GiI+mjqoY5Eqm4l6fOJay6zlg3jXAO3CZZvF/y0uo2O5JFzElRqTp+JOYncFysDGMinollTJs90TjTx7MZ9EL79t1XSkaHppUo4YYjaFEUV0io4rTHYeupaoYdfNel6DFOK4255897AVqGrELyzo=
+	t=1749655512; cv=none; b=tl9/qmmYjt7sx2W4JydmwPsWqS/iIkjI7sw/gTgExWvQUCYVYcYVdLv5B4CmNAHjJiQXJbvYdJqNiErveoDTrE5l3fw8fkWzegHhHNBjslQUBEcP8RY0cgg1VA8jox7bdxYfdrhaGfXp++OHebOHi2pPbzwWUP4C4vEe5wFj2hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749655452; c=relaxed/simple;
-	bh=4ZJrxbQD7Wq1zQl7il+htYlEl74rivfaeLej9OYZtSY=;
-	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XlrYQSRdAulNCcvpwKF2wUWllhwvo4tleLOh6RyTOLThNA6hUCPz45qWVxI5OyRwaH5QDOdEgv0vmIOkIgMn9nZ+5vYi0P9X7H6BOb9QOmnSi+HnpqjHWykgANtafL64ThqTBTrEOxvWs5MSoj0szz8zBhsH3BOnL020RxJ2MSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=W/Qwl9S2; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1749655512; c=relaxed/simple;
+	bh=o/kCCEam7x/8zUbez+utqgmB4o0YyAg/VynA3QdbuUk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Aldk+SaHypSJuBD9gWKhwb9asiAKEI/f/fsAxbDT3sHFFV5LBdjYLnz+t5kaeO8SZf93QagDAZt3NzgZvbOVxE2fmjg6BQNqVYOrd72i2AiY+K/AK796xOYW96vOMNcWFnfnW/fUbAAi6HvyC7D5Eg+UZmFnxPmE+8sQnMrXsbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=jLvq96ou; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="W/Qwl9S2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749655450; x=1781191450;
-  h=message-id:date:mime-version:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=T4o6YcPRF1U1tvznrJTs87/iT7vaJoRM/tUg+dY5ocQ=;
-  b=W/Qwl9S2MnJkQDuXGkdsmWpSZMK5NJ/YC8vch2AQMsHRbGReoo8Obl4P
-   piq2FyNxWgKe1w+uiEaGsNDlKcnQ2BTApg9lxVJs+pSIu/lglkdLg4WSp
-   3kYjkwv7OCo7OQK5DLYaWOL4kLyfnn1ZeDBvffPySRNHJjehb2HDzi7xA
-   EC46aMEIStFkz8Fdgnc8uaPCCRASyIcY8pZuCDLWMt+hfpRDDWATduJ4B
-   4GyD/OIuqnsC6KOo52J541bq1u12EPUZ/V8t52zFn4kHeoL5DReiHZtSI
-   fy/9KjC0wEr8WKjlzl3yBBo1lRHe3wsSO+ZKtGnZRwT2q2O3upB0lhzAf
-   g==;
-X-IronPort-AV: E=Sophos;i="6.16,228,1744070400"; 
-   d="scan'208";a="754310820"
-Subject: Re: [PATCH] Revert "block: don't reorder requests in blk_add_rq_to_plug"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 15:24:08 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:34556]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.92:2525] with esmtp (Farcaster)
- id 3f9813e5-609c-48b8-930f-26a74422b933; Wed, 11 Jun 2025 15:24:08 +0000 (UTC)
-X-Farcaster-Flow-ID: 3f9813e5-609c-48b8-930f-26a74422b933
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 15:24:08 +0000
-Received: from [192.168.11.154] (10.106.82.32) by
- EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 15:24:07 +0000
-Message-ID: <32c83d67-1d69-4d69-8d00-274cf0d0ff62@amazon.com>
-Date: Wed, 11 Jun 2025 16:24:06 +0100
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="jLvq96ou"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bHTxD0shbzlgqVW;
+	Wed, 11 Jun 2025 15:25:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1749655500; x=1752247501; bh=o/kCCEam7x/8zUbez+utqgmB
+	4o0YyAg/VynA3QdbuUk=; b=jLvq96ouC1EYZUeID7YXt/1M0bRSdf8h86uWKZ15
+	XLti0O5Fi53JDfmOUKcG0jpc5nKew3nwtrGwMuQZolHZkXs6c/XuC/8YwyedvObZ
+	rKLY/4gXm47PKauc+uXhsGCwOuMNz/170pJ6OM8I84plJujAeYmsjgNcWU0MZc4i
+	5zaIuuBTYbmuihbtMv+BA5Hs3TyJ5G1mh3A10pCBeXZ7MFjehJlWKGc0FxCLUK75
+	uvEpjEyZeNZPgFLkVHHSbkxFBDHRmubEG+mOYjAeZAS/oP8qfhfE57CMaE/MVxPq
+	FOvF86oNvMS03kM3Teuk/6CeJiVNFxN+injUXQAsLedjmw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 4NXAhfY5d2U5; Wed, 11 Jun 2025 15:25:00 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bHTwv59NczlgqVK;
+	Wed, 11 Jun 2025 15:24:46 +0000 (UTC)
+Message-ID: <79d40bb9-ec40-415d-80eb-4ae8ab150737@acm.org>
+Date: Wed, 11 Jun 2025 08:24:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,72 +50,33 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Ming Lei <ming.lei@redhat.com>
-CC: <stable@vger.kernel.org>, kernel test robot <oliver.sang@intel.com>, Hagar
- Hemdan <hagarhem@amazon.com>, Shaoying Xu <shaoyi@amazon.com>, "Jens Axboe"
-	<axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi
-	<stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-nvme@lists.infradead.org>,
-	<linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH] Revert "block: don't reorder requests in
+ blk_add_rq_to_plug"
+To: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
+Cc: stable@vger.kernel.org, kernel test robot <oliver.sang@intel.com>,
+ Hagar Hemdan <hagarhem@amazon.com>, Shaoying Xu <shaoyi@amazon.com>,
+ Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-nvme@lists.infradead.org
 References: <20250611121626.7252-1-abuehaze@amazon.com>
- <aEmcZLGtQFWMDDXZ@fedora>
 Content-Language: en-US
-From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-In-Reply-To: <aEmcZLGtQFWMDDXZ@fedora>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250611121626.7252-1-abuehaze@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D006EUC003.ant.amazon.com (10.252.51.252) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-On 11/06/2025 16:10, Ming Lei wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On Wed, Jun 11, 2025 at 12:14:54PM +0000, Hazem Mohamed Abuelfotoh wrote:
->> This reverts commit e70c301faece15b618e54b613b1fd6ece3dd05b4.
->>
->> Commit <e70c301faece> ("block: don't reorder requests in
->> blk_add_rq_to_plug") reversed how requests are stored in the blk_plug
->> list, this had significant impact on bio merging with requests exist on
->> the plug list. This impact has been reported in [1] and could easily be
->> reproducible using 4k randwrite fio benchmark on an NVME based SSD without
->> having any filesystem on the disk.
->>
->> My benchmark is:
->>
->>      fio --time_based --name=benchmark --size=50G --rw=randwrite \
->>        --runtime=60 --filename="/dev/nvme1n1" --ioengine=psync \
->>        --randrepeat=0 --iodepth=1 --fsync=64 --invalidate=1 \
->>        --verify=0 --verify_fatal=0 --blocksize=4k --numjobs=4 \
->>        --group_reporting
->>
->> On 1.9TiB SSD(180K Max IOPS) attached to i3.16xlarge AWS EC2 instance.
->>
->> Kernel        |  fio (B.W MiB/sec)  | I/O size (iostat)
->> --------------+---------------------+--------------------
->> 6.15.1        |   362               |  2KiB
->> 6.15.1+revert |   660 (+82%)        |  4KiB
->> --------------+---------------------+--------------------
-> 
-> I just run one quick test in my test VM, but can't reproduce it.
+On 6/11/25 5:14 AM, Hazem Mohamed Abuelfotoh wrote:
+> Given that moving plug list to a single linked list was mainly for
+> performance reason then let's revert commit <e70c301faece> ("block: don't
+> reorder requests in blk_add_rq_to_plug") for now to mitigate the
+> reported performance regression.
 
-Possibly you aren't hitting the Disk IOPS limit because you are using 
-more powerful SSD? In this case I am using i3.16xlarge EC2 instance 
-running AL2023 or may be fio has different behavior across Distribution. 
-In AL2023 we have fio-3.32
+Reverting that commit would break zoned storage support and hence is not
+an option.
 
-> Also be curious, why does writeback produce so many 2KiB bios?
-
-Good question unfortunately I don't have a good answer on why we have
-2KB bios although I am specifying 4K as I/O size in fio, this is 
-something we probably should explore further.
-
-Hazem
-
-
-
+Bart.
