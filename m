@@ -1,261 +1,274 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7805695
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 05:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749619785; cv=fail; b=LDWXmg3VLu2gGxn66A5uvF8Jijp2LNnVkM9QC1W4IdbQWAbrIJ/ITQRhgXzRg8Ac1pjW2/LVfPJ67xUCh5vI7HRaaCjR3/7CgrE/L351bLcFoT3MJhOm9MMRfoMxdZvNEWO2CnokQzfudC7ZJLf9RvdoP/n5PnvWfINC1GApCOw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749619785; c=relaxed/simple;
-	bh=7I5JwDkhjAzkGs6TGpCXX49GTCLx8J0b7UgCHEQKLLo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=skm5TDTYoCPomEs+ECOZft1hjaRGyzLxQpzYOg+wkcDZJCF79iGwOmZQQVUmgwIt34LT2DfmZLI03w7Xuwm+V0bhm2uAYYzQiYL+x8sXBe+cRyymzIubI7fcD5Rgc92crQF7c3c0RuoekxFehfCezyq4sjSLPaGUxJWf7Rm1M8U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=oiiK1f5i; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=uPaEwNEA; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916457DA82
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 05:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749620494; cv=none; b=Klj9Qxkeuve4mJKaxaU/0acDbNYkd3owAN+D6VF0sX34/UyeNmy08LyMAPyk24SPItL8sMrXbn56DeMR44FxCLmdFPRuuWq0IHCPslWkaMtshn9aO8Q3ZdCSYfBEJBn/7v/yzPdovfBH3ApbThZe+GyeFt+HDlR9hq403WyMSTM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749620494; c=relaxed/simple;
+	bh=UCcQ6FdJudyHKOV/dxstSlg5Sp5lKAwic5vv80RMZMU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l+pccZlVIcdfvqNgkvv2ai72RpdwZ9Hh9DHngDAZ9DqiX2dRw8ULf31LzAxjDqAkW72P7R7M8bPLiWj8pdw+bXXRO+YTSev87Sn9MoorunEEqewFzDeIZZKmynRsOHZq+AGg5A+V7Qco8mNE65EfYJcedoQWL+5gZEMQ83Iz9gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FuVvENkJ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oiiK1f5i";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="uPaEwNEA"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1749619784; x=1781155784;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=7I5JwDkhjAzkGs6TGpCXX49GTCLx8J0b7UgCHEQKLLo=;
-  b=oiiK1f5iy6Vmuc6WY/mR/rmO9og6h54LuXXSgvKyvbDrHUCFCI7Rk9Ah
-   1vHwd2UWOf+NQku2VZr3jRA3GJ1z4IwEDreRNGcBgFq5nXo/iEt48VOyO
-   19ne12VpTzBwHvPr7hOg3F6ChsiO/eoYLkGzktz0rxjRuwDLMOeO6xwnJ
-   F7Sx9rQaYE2pOUdBNhr0Q84lSPcOsO5mxKwjvLkx/Stl44APTO63/oW83
-   eC3OPSAS1QZDQWsht0LoHG/ame8RISyawdycNJRHYMqgcwIu8pqZZS6Tt
-   iwUtyNCG8du0DRXsMtCjGHF838CxDwuTyMJm1HKb0gsC2B3JB/af9a7iB
-   A==;
-X-CSE-ConnectionGUID: TYH5Sy7jQz6r+7tV6Y3dDg==
-X-CSE-MsgGUID: 8/tRALU6QfSKrb/S0FIwRA==
-X-IronPort-AV: E=Sophos;i="6.16,227,1744041600"; 
-   d="scan'208";a="85105291"
-Received: from mail-bn1nam02on2059.outbound.protection.outlook.com (HELO NAM02-BN1-obe.outbound.protection.outlook.com) ([40.107.212.59])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2025 13:29:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xpC9+ws3CuHxESNdu76EZBAllVLp4iN7HH6aHyWLhcrKzZGMcNSeKfAUXMWH5B1uBb+0dYrFadDkRQMnrXXerdgajn0+fUU6GndlKHea+MF19um4f8LKRT0E3vLpPWcfFODwWLkLprisOQj6kgITB1PB7YvoWAzXWMslgmqZWonaiBfhevdnk157SNEfOR/aVOr9a3iYa2koQZAkC0SFJD8cLG575ESpPLAaaYaBdEOyyxC3i2lp7Hbg7Nyb4+QRb+rRKyyKsxlD9/RoYzz7rIdSgFF2X5v+VqatAiArd5F2h++qhkaC3+UsCInaxnZMh5jnfKLyMwgLNJEyH1RYhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mgo/eygM2k5GYCDd8tkjDLYB8CdXbPlQArFRcMdf7zk=;
- b=or8bniOT4pGjP/kSjjoN0E16J9u7q2K5s2ztyhrDGUJbP9r2dfLb+ze31XDaTiDniuQPhprSJE8PG8MXkHBtSBtj7XFp5WOrbL9RuauCChBMd8byTjI9qIlcsQ868EBrjrup8MrocUTIQihcc4p3fTkdCkJ8KA7P4il1rN08mcwv2iLEGnKYKMCuyaigAzBx19omh4ljLQ8C6VK8siOEHHWhOjR34pu6jiAjQlXZVAMLM7s8GZ3kAMCPJWT8D/P5r1TFgkZ1R1lRvevwP1aW8WSD6chVn6ERWXYMKJZIwl4wao6/ndNTyd0hpoP7WbCz34+jeSAV9ONQNhdcSZH2Ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mgo/eygM2k5GYCDd8tkjDLYB8CdXbPlQArFRcMdf7zk=;
- b=uPaEwNEAN/29PdglC3CJYAIJ8MnYWCRtNIfj7D1WtTBGEonyXhcVyrgnIwoDRDlBNRTaOxW1f/a5+TWK2kgG2rBNnWWArEtA6PwVu/63MG9mhUONwoprmRnRghlCdno7lnihw0b/rhioANZ3wSSQ1Y9HtTYtmN+65YWgPXQ0Pe0=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by IA3PR04MB9306.namprd04.prod.outlook.com (2603:10b6:208:506::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.18; Wed, 11 Jun
- 2025 05:29:35 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4%5]) with mapi id 15.20.8835.018; Wed, 11 Jun 2025
- 05:29:34 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Bart Van Assche <bvanassche@acm.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests 2/2] check: introduce ERR_EXIT flag
-Thread-Topic: [PATCH blktests 2/2] check: introduce ERR_EXIT flag
-Thread-Index: AQHb1pcB8XrHg5kcCUm1uP/dxccmtLP7HeuAgACNQ4CAAOYKAIAA5TmA
-Date: Wed, 11 Jun 2025 05:29:34 +0000
-Message-ID: <3et7jqzna2n2e7henrbr2foiopjqxl64pqxaadszrbmmuqorei@xinbpunqb2ye>
-References: <20250606035630.423035-1-shinichiro.kawasaki@wdc.com>
- <20250606035630.423035-3-shinichiro.kawasaki@wdc.com>
- <a30853d6-5d7c-4697-9bca-926962649254@acm.org>
- <6ov3repiplxgds6jcprle5jhtg33myba2cgf3bt7lsklqlvmy5@igjg7muw2hv4>
- <e9c4235a-1c60-4a61-a152-f65ae973992a@acm.org>
-In-Reply-To: <e9c4235a-1c60-4a61-a152-f65ae973992a@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|IA3PR04MB9306:EE_
-x-ms-office365-filtering-correlation-id: 532e9edf-f9ee-4b4d-81d3-08dda8a8f367
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?TaDhqRy0mGMdN9Vbkjdt7UmYhttlk2hPd6QRZz3je1d0Moms9OlMUi93Z3G7?=
- =?us-ascii?Q?aRIKzxKIJmQv2QmcahTieHTlkgNHbjNYXVD//rThDASzMr/Xk7Za4pDZgZmK?=
- =?us-ascii?Q?M4lZnS3vrb0FTRA/FeKTDfUbbyCO2GxqxXOJ2nxyV6t3Ov5z3ZE5Bj89y6Hc?=
- =?us-ascii?Q?/HKEpF+YoGy2EiEqspEGD0NnCI9BDy+qO4eaR/nJw0W2pJ3JNXPtebEXLjrh?=
- =?us-ascii?Q?ze4a9+5cbGPLL/AWAuI/tTBiR/0pLOOMMjmS4ev/rM/i99eVcea0ig1B7IEi?=
- =?us-ascii?Q?7qTPnqut3MXiqBkyuam7EFYoJolRxujL+qBv6UPoWkUpH8OvptfYWDBm7UTb?=
- =?us-ascii?Q?x/oAw3Xw+RWvEoXieY9LnLHL8kBwv29ucnbeumpZW/ppAU02V3k37JtxuR1Q?=
- =?us-ascii?Q?zdEMilvGGw0Yeugju0UUb6rp7q1QXswtyKwEY1ghqJ5CnlIhZKN2jGdAqEje?=
- =?us-ascii?Q?R1LN01tX8+ItSbL9uKaVxUD+MixE27ORc7KTBq6oYcpdgrYprFtSbipOuwBn?=
- =?us-ascii?Q?QpJup1HuQ2ENEibeM7ExdksCk1RzOM9jqyl7u7GCP44g9UGYs4MksLK92N6A?=
- =?us-ascii?Q?ajeXW4uOYqudOobR4sZDmSfh/Jaa3IXKeqShh4tM2jg+Ol1bGSPau7MkpVrB?=
- =?us-ascii?Q?czCyvDgdgpjL2vLrmeGLuz4KcLYLCYIXwVUsXmPDkhXBzST9wWxNTYXnY/vD?=
- =?us-ascii?Q?WjVOIgtajxx7KX/kYb3EtjZylAbmmebmlvjgs1d0jkoZa0nUJPwlk9V4zFHT?=
- =?us-ascii?Q?hk1ayudib1ZizdvyFwTWG6qI0t6uaNF99pDoAhsLab9yfe3HtchIT/91NRmS?=
- =?us-ascii?Q?gMlfLc1NH8NWj65SBULrdpsFZgqZ0YgTSu28Ij4v2dENvR/120eeEIlvoeLD?=
- =?us-ascii?Q?hhPgzfERzy63XEA/bxJas1rkB9Lx/+RKr9+OhdDtt8Kg6hbq5Oe4SCPiQPVf?=
- =?us-ascii?Q?Sr18rjq/qjboO/mYBxV3/5lDuO8hG9y0BESeh6rvlx47Yyf8E0LkuYkxGDrr?=
- =?us-ascii?Q?wPMqLn82It04oCnKSFy8Go0Bc4vfIypt/9aGr2jYD0Nv5+viNlQG2E3ZX3+M?=
- =?us-ascii?Q?TYiNN8dFkCR1NMXakSdfAn7fN0Bnzju+KjAGuL75wZV3dGND7+/OkLRtcLIw?=
- =?us-ascii?Q?NPjk35PoD8hWn3aIjPvX96xnj90Y98DnrF4KjC8jXX4TTnbk9Jg5+RZ+civ9?=
- =?us-ascii?Q?ZYYoZeTNWEqrs9ynlPV4PGRni5GlI37nRmVmkd4v3A02pBfcFMdQdygLJ5xN?=
- =?us-ascii?Q?TXoDsGYmgMAcNiKapk75Z8hvKgyCll5p6SMNwWnKCMkwzWco9zmFQw706rZh?=
- =?us-ascii?Q?qWkufmj8sFPV0XF4nkKOoJz0Oe1MehZQHKw9NzI8ADuoiUH55trB2nev45XN?=
- =?us-ascii?Q?8wv8hF+Ia0M5QxKOYONM5AsqqzTiriINpGNDishTQiRncY6N1uD5FUdeilyt?=
- =?us-ascii?Q?g5GCwgzvv3y3wr5NqsW7QgQPr61bufjf1qDLPECVb7vFrD8P1Pi4aMJUaszM?=
- =?us-ascii?Q?ZsRpVvPfRB3/084=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?MxWbh59oiqhVyAfDnuoElKRduZKvsO4Kb8E8WxeyZqqkb1saRqmBs5x9iIy3?=
- =?us-ascii?Q?APSHKrwpoHFxr7HxaG3PMe/xx4JPwHQXqbTvugkf1jsjq7Ltklv9ba2hlI01?=
- =?us-ascii?Q?d2gvtRbIWvwszviTvGnYIn8cwK9rQd/iXXNirniJDK7nv32rM18Oiy7TDi1d?=
- =?us-ascii?Q?uE7YvpCAmk8KpnY4Z5VvOAtQEUAPjh6yH0JR8uJef+mM/kt9vTK7OmCvfBM5?=
- =?us-ascii?Q?CF38IqGCE1ot0ipLaGsQAyga5sk9XUvJb49NXBQyRabN2gHV6g6qqsEtQuK9?=
- =?us-ascii?Q?ldCW6sqsYKEpi1Eet9pV7bEOWGhU78Yv0epzcZABHiYwbvQgQjGhqQ8+Hw2v?=
- =?us-ascii?Q?33zwvZizXCUv09vWYoI48qoyvT23LL8jbO+nWtuK3qSFQnmfv6Qr9oBtSazz?=
- =?us-ascii?Q?Foa8D+zkFIqGY4qAsWtl3IkY4C+WZz5GOHBa1pZMGfi6LgBnno+W7bkvHIw7?=
- =?us-ascii?Q?P14cria8ugY3x3rlBp5Yb4Zrph1Db/f0H3RQ2bmfUIzRfvPH+/4B+y90gAgP?=
- =?us-ascii?Q?xdf9pyDULNo6f1ONQ2ph8VJ/bBwubT8PH48hqktgEEFYlBDXmS8hCHMN5Os4?=
- =?us-ascii?Q?RAKhIc1eJxFV88s/Rs1yD2Hx+KZn+5FGwB5zIy3ylxUI1mh5zUTyASdkusKi?=
- =?us-ascii?Q?QAlnRrSbU29vO8CTlndv+AS5PsuAlshxjqGODKb8VszAAumbBavU3c8vKDR9?=
- =?us-ascii?Q?2X+dH/1RZoRAD2oqam43Tkhpu66t/k9BVDS22Lsa9tck5Xw3uLJnAFv/qlOq?=
- =?us-ascii?Q?hoWLj3z9/X7TPJ3YbT4P369iCFFKM/ugZOhxPZ5To8Gd59tfpqPdVNVOOHZz?=
- =?us-ascii?Q?luxa7bI69YYCFPwHAWD0n5W0eRCTbH7nOwg0BUe734XqirQjNBibslb+27ck?=
- =?us-ascii?Q?goszPYTE9EE2YRfRDIQFfF08YhLMvuyZ7nFw6yia6829SM8k+01T+qKjmmjF?=
- =?us-ascii?Q?HGMp2pwfvtwfVDm/8ttfIG3iOn4MNvtRHDu92+CZXEHbjUMr4uX/YFkn/FIp?=
- =?us-ascii?Q?LWAb1hVMlOO1a0Bu0aA9zRRlnh2hR5AsRX7/WP2ihp/GPNuFvVcoQwPRId9S?=
- =?us-ascii?Q?Icm9gldzDVSJMXGlXmn/wVTbeu+m4gQaj8rQtEMo2MM1TL7k+ytiiUqpNYEk?=
- =?us-ascii?Q?fCEGSA51biLaE/sfM77w+QzbPFzNVU0Z9Sb/NAONpAuGaGzOzEHi017wxhcH?=
- =?us-ascii?Q?WtQHdyEtMbMC+oc4+W6F67bkcDNU7eJyCT+pRSXk+6NK8gG9SUtSuiqFJI46?=
- =?us-ascii?Q?eDO89t1EKWH1z6KX/8V1MIhSCOQG/Dh7VY6ig8Ro5d7GWNvttoHqhW5haYZd?=
- =?us-ascii?Q?SZ/7OodsB1TKYagrJiSZoK7ymPj7zx4awEtje/ARe+mJ9tpHwEfC3jM4G5Ws?=
- =?us-ascii?Q?iFX7/8oQfxCRBmqmNny7cJEW9MQQR3zFP/RpZ0jrZDl3NDegAA+LjNUunKnP?=
- =?us-ascii?Q?UfM8m1wPWfJxVJaaGvr525oRNxasrqhbMlFiukCwW16HQT/bdsOhvlIeF8lu?=
- =?us-ascii?Q?HECkWR2hvmBHRQ94BW6I3K/hrY/w07kd6i5J/wAp+rgbiSQJw5gcNK1vqGNp?=
- =?us-ascii?Q?Ys8WciOD1njPd7KgJ06PezB5ZxsdV2JnjWLx4/FXJXhCAACToncO4tYpc5xf?=
- =?us-ascii?Q?iQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4207D558C599DF4E81A8CE5BD8C6EF71@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FuVvENkJ"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55B58mJp000881;
+	Wed, 11 Jun 2025 05:41:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=AB7FqA
+	tU4V4i0TGetWygo1JUh4iaGpF+x9crQPeppUs=; b=FuVvENkJFzVfMoa3ELnDMl
+	2nAApyb2r/Q89jDxUQQ1qOuHqKtoYu9Bz+rTViXdN9mKa8EeUpkQkHsqxDZtHm3V
+	9iQ353LFVGo0eEZ/rIAa3rOZrrbX/q5Bb+t32cpHyFkH/fGIAxaDLEsmKwMiBt+G
+	7XDMYtVv6EwG7GT0IXc3qbbVQKaegcJoPD0oEionfjk5ChOZGTNhOC2DzaWMDzZJ
+	RSE9T+xRoixG3m2EKO4jpDdQDAljOEH3KnnPGz6tV+JnjrLu+yqN0LfP9/jOJNMI
+	TJcayI8/unvzVrpqowReByt6Z08rru33E4UYtAPoLdXm15HroZDbLEWtXOPWaZ5A
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 474bup2hhw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 05:41:27 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55B558Qg015369;
+	Wed, 11 Jun 2025 05:41:26 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4750rp66uc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 05:41:26 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55B5fPaO23069184
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Jun 2025 05:41:25 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2386C58059;
+	Wed, 11 Jun 2025 05:41:25 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9EF5F58058;
+	Wed, 11 Jun 2025 05:41:22 +0000 (GMT)
+Received: from [9.61.37.3] (unknown [9.61.37.3])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 11 Jun 2025 05:41:22 +0000 (GMT)
+Message-ID: <c3ee3c27-6bd2-47ba-bead-5fc859d4b9f0@linux.ibm.com>
+Date: Wed, 11 Jun 2025 11:11:20 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	5WwYpEe0FeJrwT7VNWiR2hzJpax6b/1+GkSenP4dpL80d33v860JutBGY5ZNQt2fJl6CwWrmF8YyPcMUg4rJXZ0CrmnDaL8O9BOzJVcLAzk/DSVXhlsSN040Uiu0jNkw/gVOyCFc35s9CEdtSVbACZB4qW84QpbQe0dzIqAgXlIPN4gNdnDE9qzNdrEjP1bcWNBI7GLj5HvOxXoCvZNltxUS8qh6LNXF6rorCKBARbXY+puh5EPnEJBKFrHBvuDAbdX7NziMOZO4sY6If+ouCxA6JHBzyRM5kGTe936Bdarpvz0ONlx9LUFVDGree9Jr/4jpG1I2alHkU6WNqgSjEhX/CYbg8Ir6c25seh03GfzhR2tXSkC6teDaEfWfWxYrVJbPO98aKd6Txse95dq8KIkxiZzEhBNFyfW4P1SYnU/ju0iUeLsaE/vJNfFzWQBcdY+oIPXKYZfswGHrAOU/FopnIesINgGIH4442a4L8q6dty6xSRPNG+Bb1jD99LA7mn4g9vp0vqSBaQaA5AaUd6u7k6H2aAle1GdTZDnEFnKZE1Q3HP/RW1BP58HDIPN/lnNtLVittMkkBJchvFS2hlyiHRwVnnnzKkjBy+nueRXCwWs0E3eOeTlkXq5bMiQr
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 532e9edf-f9ee-4b4d-81d3-08dda8a8f367
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2025 05:29:34.7681
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OIXi5gHkt+1d8NSE/d8N7+jix7ZZAJq6CPemLWWV4v2SNzUwf0bjekLkgqo1MjvkhyB0GXhPwaxXm5XYzmhRfvuqsAurmDIGfW1BUKsn//Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR04MB9306
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2] block: fix lock dependency between percpu alloc lock
+ and elevator lock
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
+        sth@linux.ibm.com, gjoyce@ibm.com
+References: <20250528123638.1029700-1-nilay@linux.ibm.com>
+ <aD60SF6QGMSPykq-@fedora>
+ <9f5b0cbb-10cb-44a7-9565-28673bcbdf84@linux.ibm.com>
+ <aEZDZJUVnYNPc9Sa@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aEZDZJUVnYNPc9Sa@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=H4Hbw/Yi c=1 sm=1 tr=0 ts=68491707 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=ly_TqxuQc45jG9IK0e4A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDA0NSBTYWx0ZWRfXz7Zd0D4GHSuO fr938Ne6nweeLjEMjiaJO81Mpb7/KJDya9ruUIeVjZKNPQ/wKpGXTVJbknqlV1oLGB9Hpmxxq3e 4xIq9lcM676Kwvuwn+ERw7EAE4eheSk631Dowl1NDbouF9njOqFfmvkgvYeeMnxAOlReOCWRuFM
+ AwhkCG3OdoOqASZD893DPwuBHxK6rjyFJL9pmw5rgS5rLtIXUcII38fi1Z1MsrmTpD0tJifD0R4 WvMEaXE12bUaGlrDkaPnLqjvHIuxeOD3ZfOGEnv4U2GV7+7NXhnw5nq3jFvGVBOYtJkFQHg11lV AX+syIrUmJYVMT1KiKJjtDEt13VfrXWFOug7A+htqIfHHpWwHpUlnMPktQDK2GERu9Qdhw69cac
+ OYCeEnBEg0vDq/XrpfbJ1X6z/ItZt+tFcs6nG5K4BuL9ikvkvJ5DCN4CeqhL2qSj/Gf8TSe6
+X-Proofpoint-GUID: Mox2Dp_mQJiCtH1n0lSIv_2ztELMaWAy
+X-Proofpoint-ORIG-GUID: Mox2Dp_mQJiCtH1n0lSIv_2ztELMaWAy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-11_02,2025-06-10_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 phishscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
+ impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506110045
 
-On Jun 10, 2025 / 08:49, Bart Van Assche wrote:
-> On 6/9/25 7:05 PM, Shinichiro Kawasaki wrote:
-> > On Jun 09, 2025 / 10:40, Bart Van Assche wrote:
-> > > Has the following alternative been considered? Let test script author=
-s add
-> > > "set -e" and "set +e" where appropriate but only in a subshell. If a =
-failure
-> > > occurs, only the subshell will be exited and cleanup code will still =
-be
-> > > executed if it occurs past the subshell. A disadvantage of this
-> > > approach is that global variables can't be set from inside the subshe=
-ll
-> > > and that another mechanism is needed than local variables to pass out=
-put
-> > > from the subshell to the context outside it, e.g. a pipe.
-> >=20
-> > This idea sounds something to consider, but I'm not sure if I fully und=
-erstand
-> > it. The word "subshell" is not clear for me. Do you mean subshells thos=
-e test
-> > case authors create in each test script? If so I'm not sure how to ensu=
-re that
-> > "set -e" and "set +e" only happen in the subshells. Or do you mean to m=
-odify the
-> > check script to create subshells dedicated for each test case run? If s=
-o, I will
-> > need some work to understand its impact.
->=20
-> From https://www.gnu.org/software/bash/manual/bash.html:
-> <quote>
-> ( list )
->=20
-> Placing a list of commands between parentheses forces the shell to create=
- a
-> subshell (see Command Execution Environment), and each of the commands in
-> list is executed in that subshell environment. Since the list is executed=
- in
-> a subshell, variable assignments do not remain in effect after the subshe=
-ll
-> completes.
-> </quote>
->=20
-> Here is an example that shows how a subshell can be used to halt a test
-> with "set -e" if a failure occurs in such a way that error handling is
-> still executed:
->=20
-> $ bash -c '(set -e; false; echo "Skipped because the previous command
-> failed"); echo "Error handling commands outside the subshell are still
-> executed"'
->=20
-> Error handling commands outside the subshell are still executed
 
-Yes, I understand it. I assume that your idea is to ask test case authors t=
-o add
-the subshells in test cases when they want to do "set -e", right? My questi=
-on is
-how to ensure that the "set -e" is done only in the subshells. I think we n=
-eed
-to rely one code reviews. If "set -e" out of subshells are overlooked in th=
-e
-reviews, the impact for the following test cases are left. Maybe this is no=
-t a
-big risk and we can take it, but I wanted to know what you think about it.
 
->=20
-> > > > @@ -372,6 +380,7 @@ _call_test() {
-> > > >    		fi
-> > > >    		TIMEFORMAT=3D"%Rs"
-> > > > +		((ERR_EXIT)) && set -e
-> > > >    		pushd . >/dev/null || return
-> > > >    		{ time "$test_func" >"${seqres}.out" 2>&1; } 2>"${seqres}.runt=
-ime"
-> > > >    		TEST_RUN["exit_status"]=3D$?
-> > >=20
-> > > This change makes it harder to write test code because it forces auth=
-ors
-> > > to surround cleanup code with something like if cleanup_code; then :;=
- fi.
-> >=20
-> > I see, this point makes sense. I'm okay to not call "set -e" in the
-> > _call_test(). If we take this approach, test cases can do "set -e" and =
-"set +e"
-> > wherever in the test scripts, but they must declare ERR_EXIT=3D1.
->=20
-> Do you agree that with the style of the above example ERR_EXIT is not
-> needed at all?
+On 6/9/25 7:43 AM, Ming Lei wrote:
+> On Thu, Jun 05, 2025 at 11:22:17AM +0530, Nilay Shroff wrote:
+>>
+>>
+>> On 6/3/25 2:07 PM, Ming Lei wrote:
+>>> On Wed, May 28, 2025 at 06:03:58PM +0530, Nilay Shroff wrote:
+>>
+>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>>> index 0cb1e9873aab..51d406da4abf 100644
+>>>> --- a/block/bfq-iosched.c
+>>>> +++ b/block/bfq-iosched.c
+>>>> @@ -7232,17 +7232,12 @@ static void bfq_init_root_group(struct bfq_group *root_group,
+>>>>  	root_group->sched_data.bfq_class_idle_last_service = jiffies;
+>>>>  }
+>>>>  
+>>>> -static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+>>>> +static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
+>>>>  {
+>>>>  	struct bfq_data *bfqd;
+>>>> -	struct elevator_queue *eq;
+>>>>  	unsigned int i;
+>>>>  	struct blk_independent_access_ranges *ia_ranges = q->disk->ia_ranges;
+>>>>  
+>>>> -	eq = elevator_alloc(q, e);
+>>>> -	if (!eq)
+>>>> -		return -ENOMEM;
+>>>> -
+>>>
+>>> Please make the above elevator interface change be one standalone patch if possible,
+>>> which may help review much.
+>>
+>> Yeah you're right, in fact I considered to make elevator interface changes into 
+>> a separate patch however the changes are so much tightly coupled with block layer
+>> change that I couldn't make it independent. As you may see here I replaced second
+>> argument of ->init_sched from "struct elevator_type *" to "struct elevator_queue *".
+>> And as you might have noticed we allocate the "struct elevator_queue *" very early
+>> while switching the elevator and that's passed down to this ->init_sched function
+>> through elv_change_ctx. So making elevator interface change a standalone patch 
+>> is not possible.
+> 
+> You can make a patch to move elevator_queue allocation into
+> blk_mq_init_sched() first, then pass it to all ->init_sched()
+> implementation first. And you can avoid to pass 'elevator_queue *'
+> from 'struct elv_change_ctx'.
+> 
+Hmm okay, so we'd allocate elevator_queue, while we're holding ->elevator_lock 
+and ->freeze_lock, from within blk_mq_init_sched(). As you mentioned it's safe
+because elevator_queue dynamic allocation uses a plain kmalloc, I'd change this
+in the next patch.
 
-Generally, yes. I have the one question left as I noted above.=
+>>
+>>>>  
+>>>> +int blk_mq_alloc_elevator_and_sched_tags(struct request_queue *q,
+>>>> +		struct elv_change_ctx *ctx)
+>>>> +{
+>>>> +	unsigned long i;
+>>>> +	struct elevator_queue *elevator;
+>>>> +	struct elevator_type *e;
+>>>> +	struct blk_mq_tag_set *set = q->tag_set;
+>>>> +	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+>>>> +
+>>>> +	if (strncmp(ctx->new.name, "none", 4)) {
+>>>
+>>> You can return early if new name is "none", then all indent in the code
+>>> block can be avoided.
+>> Yeah agreed, will do it in the next patch.
+>>
+>>>
+>>>> +
+>>>> +		e = elevator_find_get(ctx->new.name);
+>>>> +		if (!e)
+>>>> +			return -EINVAL;
+>>>> +
+>>>> +		elevator = ctx->new.elevator = elevator_alloc(q, e);
+>>>
+>>> You needn't to allocate elevator queue here, then the big elv_change_ctx change
+>>> may be avoided by passing sched tags directly.
+>>
+>> Hmm, okay so you recommend keeping allocation of elevator queue in ->init_sched
+>> method as it's today?
+> 
+> I meant you can move elevator queue allocation into blk_mq_init_sched(), then
+> you just need to pass allocated sched tag via `elv_change_ctx` or function
+> parameter.
+
+Yeah got it! Will do it in the next patch.
+
+> 
+>> If so then yes it could be done but then as I see the elvator 
+>> queue is being freed in elevator_change_done() after we release ->elevator_lock
+>> So I thought it's also quite possible in theory to allocate elevator queue outside
+>> of ->elevator_lock. Moreover, we shall not require holding ->elevator_lock or 
+>> ->freeze_lock while allocating elevator queue, and thus probably avoid holding
+>> block layer locks while perfroming dynamic allocation, isn't it?
+>>
+>>>
+>>> Also it may be fragile to allocate elevator queue here without holding elevator
+>>> lock. You may have to document this way is safe by allocating elevator
+>>> queue with specified elevator type lockless.
+>>>
+>> Yes I'd document it. And looking through this code path it appears safe because
+>> we first get reference to the elevator type before assiging elevator type to
+>> the elevator queue in elevator_alloc(). Do you see any potential issue with 
+>> this, if we were to allocate elevator queue lockless here?
+> 
+> The correctness depends that our current implementation disables 
+> updating nr_hw_queues by holding set->update_nr_hwq_lock, otherwise you
+> have to double check nr_hw_queues after grabbing elevator_lock, so this
+> point might need to document.
+> 
+Yep! In fact you might have seen I commented about it in elv_update_nr_hw_queues() 
+just before we call blk_mq_alloc_elevator_and_sched_tags(). But now anyways, as
+discussed above, we're moving elevator_queue allocation under blk_mq_init_sched(),
+we may not need to document this.
+
+>>
+>>>> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+>>>> index 1326526bb733..6c0f1936b81c 100644
+>>>> --- a/block/blk-mq-sched.h
+>>>> +++ b/block/blk-mq-sched.h
+>>>> @@ -7,6 +7,26 @@
+>>>>  
+>>>>  #define MAX_SCHED_RQ (16 * BLKDEV_DEFAULT_RQ)
+>>>>  
+>>>> +/* Holding context data for changing elevator */
+>>>> +struct elv_change_ctx {
+>>>> +	/* for unregistering/freeing old elevator */
+>>>> +	struct {
+>>>> +		struct elevator_queue *elevator;
+>>>> +	} old;
+>>>> +
+>>>> +	/* for registering/allocating new elevator */
+>>>> +	struct {
+>>>> +		const char *name;
+>>>> +		bool no_uevent;
+>>>> +		unsigned long nr_requests;
+>>>> +		struct elevator_queue *elevator;
+>>>> +		int inited;
+>>>> +	} new;
+>>>> +
+>>>> +	/* elevator switch status */
+>>>> +	int status;
+>>>> +};
+>>>> +
+>>>
+>>> As I mentioned, 'elv_change_ctx' becomes more complicated, which may be
+>>> avoided.
+>> Yes I agreed, however as I mentioned above if we choose to allocate 
+>> elevator queue before we acquire ->elevator_lock or ->freeze_lock
+> 
+> Allocating elevator queue is just plain kmalloc(), which can be done
+> under ->elevator_lock or ->freeze_lock, since we have called
+> memalloc_noio_save().
+> 
+Yes agreed!
+
+>> then we may need to keep this updated elv_change_ctx. So it depends
+>> on whether we choose to allocate elevator queue befor acquiring locks or
+>> keeping allocation under ->init_sched.
+>>
+>>> Queue is still frozen, so the dependency between freeze lock and
+>>> the global percpu allocation lock isn't cut completely.
+>>>
+>> Yes correct and so in the commit message I mentioned that this depedency is
+>> currenlty cut only while calling elevator switch from elv_iosched_store context
+>> through sysfs. We do need to still cut it in the conetxt of elevator switch 
+>> being called from blk_mq_update_nr_hw_queues context or called while unregistering 
+>> queue from del_gendisk. And this I thought should be handled in a seperate patch.
+>> Anyways, I would explicitly call this out in the commit message.
+> 
+> OK, looks fine, I'd suggest to address them all in single patchset, because
+> it is same problem, and helps us to review with single context.
+> 
+Alright, I'd make a patchset and handle all cases.
+
+Thanks,
+--Nilay
