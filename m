@@ -1,111 +1,105 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B35F2E6128
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 18:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E2A1A9B32
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 18:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749665740; cv=none; b=lgTxgv7PJ5M/cy+nMyAyvmoCj+OZbfa05clzBuYj5+vEoqiqNTd9VVm90m8Xm8zyT3l25x0zV2oK0dK9jB5pabXXn/aHhrEz6Ou+5/h979nQjOq/fUCzCSxzIYzC4cwdwztXcZ0xZMzzgXOt+mivatezVKWv51RIX9yYxOb2OlM=
+	t=1749665776; cv=none; b=NYKW0eZx6Fs0PQlbPHAo4UchgMMpnseHX+cF1t0eXQyxfj/7/hfYthvIk/VgoTWwL3iJRblV8qEQMIubt5NDHByhVXbmNgfhkLd7+gaw2QdwFE9GsszzKgCxjxV4IFssFzF2BuHvjWSjdnB5OHoD4iyJEnGAcxHtJCVeccmvSZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749665740; c=relaxed/simple;
-	bh=ShxLF+BQufGmHMrV74DXXvxSMTrFEmKWtn9TGUP97OY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MMBUOZsDRfgG1hBZDe+dps8sLXEOhDYfl/a9cgBWVb7XsqY75pPDrtAcIQaQDVSOrc6rjdr51fue2pzp/U/Fs7spDwYE56pxT4NFG9XUlZq2tuaM+EMS51vo8hDkesBqOiFb8jVrjrcIiILfIrP8mj0hWLJgjuH76bjz6aEVZ8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1uPPyh-0004Yh-S0; Wed, 11 Jun 2025 20:15:11 +0200
-Message-ID: <e3e7d5fc-ed5b-4292-bf60-4e536386f3b9@pengutronix.de>
-Date: Wed, 11 Jun 2025 20:15:04 +0200
+	s=arc-20240116; t=1749665776; c=relaxed/simple;
+	bh=EaH6KHiQmhrjHF+PmOyITSEkkZYJGe2a030RQsc4RnA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgZS/JjyA8/ePcVAsI3ygoWZkmEyIaNRF7EHjtZmrAi8GVo1Nie+jMx45dcZ2HkJS5tHUF10D5Tn0xaGY5oIKwXW3X92acHslciCLzD+4+a3EqTfpS8dYSDbfMqidL5ruZATDTIzBNMjQroGtXSKXO7LGvONJh524J0kD9JLRzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGa/W6UJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGa/W6UJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68A70C4CEE3;
+	Wed, 11 Jun 2025 18:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749665775;
+	bh=EaH6KHiQmhrjHF+PmOyITSEkkZYJGe2a030RQsc4RnA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eGa/W6UJXPDy4kEctRgnbAP/zIw+wopsWzEUfJxAgnNAB4WxzDKxMMyu0mDsKUOuT
+	 asI3CGzub/giO5JY2B7oczkiEHjgkR8nxScpXAoocg6aldISK0xdyiFYxAncBuG/Y5
+	 8NuHOERKzej0HF+yEivd3YGB+ABTo6QrONVSIwu14OQnPIFs52s3SABXfJucTdPIqA
+	 rQHF0Ja1PcCw5JN42fMH6DO7VrGdJ5Ll16UJiOmobq2yDInZXpd2Im+MCR5mCgi2XR
+	 ODZ/DwCItcln57OmLqGsq+lENi/VZbhdJcO+RudwFrfrVzMMIrN0ajnLgCGoEOqtai
+	 aPdUHdlw1rCLQ==
+Date: Wed, 11 Jun 2025 11:15:51 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+Message-ID: <20250611181551.GB1254@sol>
+References: <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
+ <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
+ <20250526052434.GA11639@lst.de>
+ <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
+ <20250609035515.GA26025@lst.de>
+ <83e74dd7-55bb-4e39-b7c6-e2fb952db90b@acm.org>
+ <aEi9KxqQr-pWNJHs@kbusch-mbp>
+ <20250611034031.GA2704@lst.de>
+ <20250611042148.GC1484147@sol>
+ <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Co-existence of GPT and fixed partitions (Was: Re: [PATCH v6 5/6]
- block: add support for partition table defined in OF)
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-To: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
- Riyan Dhiman <riyandhiman14@gmail.com>, linux-doc@vger.kernel.org,
- Linus Walleij <linus.walleij@linaro.org>,
- Dominique Martinet <dominique.martinet@atmark-techno.com>,
- Li Zhijian <lizhijian@fujitsu.com>, Daniel Golle <daniel@makrotopia.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>, Christoph Hellwig <hch@lst.de>,
- Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Christoph Hellwig <hch@infradead.org>,
- Jorge Ramirez-Ortiz <jorge@foundries.io>,
- Lorenzo Bianconi <lorenzo@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- linux-block@vger.kernel.org, Avri Altman <avri.altman@wdc.com>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Al Viro <viro@zeniv.linux.org.uk>, Li Lingfeng <lilingfeng3@huawei.com>,
- Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
- INAGAKI Hiroshi <musashino.open@gmail.com>, linux-mmc@vger.kernel.org,
- Adrian Hunter <adrian.hunter@intel.com>, linux-kernel@vger.kernel.org,
- Mikko Rapeli <mikko.rapeli@linaro.org>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, upstream@airoha.com,
- Christian Heusel <christian@heusel.eu>,
- Jens Wiklander <jens.wiklander@linaro.org>
-References: <20241002221306.4403-1-ansuelsmth@gmail.com>
- <20241002221306.4403-6-ansuelsmth@gmail.com>
- <5e9a80d6-6c89-478e-99c9-584647661f5e@pengutronix.de>
- <CA+_ehUwa69Qa96yy0=K9AiCEJbaZt9oGCRf5gJDh-0_14shbtA@mail.gmail.com>
- <4218cdae-07ee-433c-8a68-bb07885e43ab@pengutronix.de>
-Content-Language: en-US, de-DE, de-BE
-In-Reply-To: <4218cdae-07ee-433c-8a68-bb07885e43ab@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
 
-Hi,
+On Wed, Jun 11, 2025 at 09:15:05AM -0700, Bart Van Assche wrote:
+> On 6/10/25 9:21 PM, Eric Biggers wrote:
+> > blk-crypto-fallback runs at the top layer, so yes it's different from native
+> > inline encryption support where the encryption is done at the bottom.  (But the
+> > results are the same from the filesystem's perspective, since native support
+> > only gets passed through and used when it would give the expected result.)
+> 
+> Although I'm not sure Keith realizes this, his patch may move encryption
+> from the top of the block driver stack (a device mapper driver) to the
+> bottom (something else than a device mapper driver). This may happen
+> because device mapper drivers do not split bios unless this is
+> essential, e.g. because the LBA range of a bio spans more than one entry
+> in the mapping table.
+> 
+> Is my understanding correct that this is acceptable because the
+> encryption IV is based on the file offset provided by the filesystem and
+> not on the LBA where the data is written?
 
-On 12/5/24 13:12, Ahmad Fatoum wrote:
->> Or you are telling me you had a downstream patch that declares additional
->> partition in addition to a disk with a GPT partition table?
->> If that's the case, I'm confused of why the additional partition can't
->> be declared
->> directly in GPT.
-> 
-> Many of the older boards supported by barebox used to place the barebox image
-> and the environment prior to the first partition in the unpartitioned area.
-> 
-> To still be able to access them, fixed partitions were used and the rest
-> of the system was described by MBR/GPT partitions.
-> 
-> This was partially made necessary by BootROMs having strange expectations
-> of where the bootloader needs to be placed, which partially overlapped
-> the MBR/GPT itself, making it difficult to define a partition for the bootloader.
-> 
-> For newer boards, it's more common to place the bootloader in a GPT partition
-> now. barebox has no DT binding for generically describing such a GPT partition
-> though, so boards may create a fixed-partition "alias" and use that.
+The IV is provided in the bio_crypt_context.  The encryption can be done at a
+lower layer, like how hardware inline encryption works, if the layers above are
+compatible with it.  (E.g., they must not change the data.)
 
-FTR, starting with barebox v2025.03.0, barebox' default is to fix up a
-partitions container with a barebox,fixed-partition compatible for
-everything that's not an MTD. This avoids clashing with the binding
-added here for MMCs and possibly a future binding for partitioning EEPROMs.
-
-Cheers,
-Ahmad
+Ultimately, the data that's actually written to disk needs to be identical to
+the data that would have been written if the user encrypted the data themselves
+and submitted a pre-encrypted bio.
 
 > 
-> Cheers,
-> Ahmad 
+> > Just keep in mind that blk-crypto-fallback is meant to work on any block device
+> > (even ones that don't have a crypto profile, as the profile is just for the
+> > native support).  So we do need to make sure it always gets invoked when needed.
 > 
+> I propose that we require that bio-based drivers must call
+> bio_split_to_limits() to support inline encryption. Otherwise the
+> approach of Keith's patch can't work. Does this seem reasonable to you?
+> 
+> As far as I can tell upstream bio-based drivers already call
+> bio_split_to_limits().
 
--- 
-Pengutronix e.K.                  |                             |
-Steuerwalder Str. 21              | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany         | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686  | Fax:   +49-5121-206917-5555 |
+Well, again it needs to work on any block device.  If the encryption might just
+not be done and plaintext ends up on-disk, then blk-crypto-fallback would be
+unsafe to use.
 
+It would be preferable to have blk-crypto-fallback continue to be handled in the
+block layer so that drivers don't need to worry about it.
+
+- Eric
