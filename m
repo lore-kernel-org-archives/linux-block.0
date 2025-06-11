@@ -1,52 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12C41FDE02
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 20:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF1C185920
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 20:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749672007; cv=none; b=jB1kmhCh2tjGxDI5dDAQ5IQ1Jb+lURtR74lYh+g75zdHK6JTTNye9uQ+m9BS1h17Q2qVKR86MNZIIuqfuRNAgCavrd8kPgxwqzRMuomM5ay5d+BEs0IVZbsv+8XgUalW+UE1S/o1zd8PZItrc3IJp9YkMrg/R2s8MiuWYASvaeM=
+	t=1749675057; cv=none; b=bnbV1vh9JlcsC0v69kYWLu5rH/MA8MyGqrLQncS5YPS6ZF5ivZXFkBuc2+mCPxYBGC8Mi25Piu6kuCACBuXbxuLOgAdcu1BuyOWTkA/FiTlYhuLAaOnqoqa6G8UjeHtAvPmrJkPVpI1Vrg2Z7/dc7L4CdwqcMbZGBjyPPAkZ5Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749672007; c=relaxed/simple;
-	bh=ooKf35t5Mm4QWKAgMc0QQBD+koQKDB4/2gFAGm9zMdc=;
+	s=arc-20240116; t=1749675057; c=relaxed/simple;
+	bh=gf+hIWT9HhXqRqMoHWdMRBTuwbAJOSl9YndIJ3I3zes=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VTB2LGgkAOpDtZ931bCFBNn+MzeBVHJdCBplk9DQYDf8VIYlSEh2kliHLhU+7oWIunVZZkENz7Nos6w73d5XXBJM8qrm78/2hhaP1DJQ4HTx2zNAmsZGe1bU7Unfiz7E+74PFTwQEanRqImYtokLrP7GRHDt+58IDnFoheXj8E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ck+I2qQ7; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8IIZb2OG52JBvwgmvQSK+seJ36iuljbheJ3B0H+/hI+/pLKDy3calsy+m3SsM4E/1ap1FydAh7oBs6nDP14Opl8gJWxo1jMhkOoBieFh81edwUySR9fbAm6kZLT+orbrk4EtyPBzxvXsp8FWhfIp/p5xBWb8OBfFd3GHxc61ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j7QrJChk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ck+I2qQ7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65EA0C4CEE3;
-	Wed, 11 Jun 2025 20:00:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7QrJChk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E67CDC4CEE3;
+	Wed, 11 Jun 2025 20:50:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749672007;
-	bh=ooKf35t5Mm4QWKAgMc0QQBD+koQKDB4/2gFAGm9zMdc=;
+	s=k20201202; t=1749675056;
+	bh=gf+hIWT9HhXqRqMoHWdMRBTuwbAJOSl9YndIJ3I3zes=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ck+I2qQ7CfveRuzjoUygtQAbhUev9wTDtalXJBJYaeFI1NWp1p3T8m9Lo+XSW51sx
-	 nL6rQT3JKRp/VjpxsW4Xovk+m+1lCN9eF3RB5dcERSzYSKyruti4+i7HTNjMEE5DWv
-	 EtkciBllqF5lL3Q/T69Iy0fa2e1V9BYWz4RbLaTa0nHDMDfAB4GqJiFvYJ3nSbb2/i
-	 aj8ic5bG7WCNsUnVcFHoHSKqvQpXnClUPcVsLxFDnNNgUEgy9o9KlX6jnRQVzw5tAf
-	 u3kuNNzbY2dCkq/R3+gpxQ3n7rWvnTWuMmwJl3WcvVXUuaRcj7UzchCXqdWuSg4fio
-	 cUZ7k8GC32Y0g==
-Date: Wed, 11 Jun 2025 14:00:04 -0600
+	b=j7QrJChkFzVsAw+KF7PRDhHLQXFndOX0uKd0aorRVyzMoe+tPQKuqHDQa3IsdzLaw
+	 c5s33sv5Z4MH+KAwkjhkh2xtJUav98RNFW5LJs69IqCTxAfMHsn94LgljVB61Q3Z35
+	 YjxOcss1faPyrskjewVIXlpGBZqadCVyBYC6ircuDrPzXXpBD2Vlk9IJa/yWgOsgdQ
+	 h6Ja5peuxUqkuSslDEm9RN7N9EgR6dGQfPUYLB5d8l0E1CTJzeOKcOCOI6++VgN13b
+	 IB4VGBKZ+eLjmGlHnv0sd7g2X+tIA5bBX5z5BoPl6qsdSkSJ43OdaEKffhnsQE5Mtv
+	 FwoH0ZWZbcqtQ==
+Date: Wed, 11 Jun 2025 14:50:53 -0600
 From: Keith Busch <kbusch@kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	Leon Romanovsky <leon@kernel.org>,
-	Nitesh Shetty <nj.shetty@samsung.com>, linux-block@vger.kernel.org,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/9] block: don't merge different kinds of P2P transfers
- in a single bio
-Message-ID: <aEngRKqXEYmikcn2@kbusch-mbp>
+Subject: Re: [PATCH 4/9] nvme-pci: refactor nvme_pci_use_sgls
+Message-ID: <aEnsLRDcZ-ykBsVX@kbusch-mbp>
 References: <20250610050713.2046316-1-hch@lst.de>
- <20250610050713.2046316-2-hch@lst.de>
- <aEhROl2D89kFX8C7@kbusch-mbp>
- <20250611034316.GA2869@lst.de>
- <aEmuG1dUDGuci7VW@kbusch-mbp>
- <5cddbda3-02bd-4dc1-9f7f-197279da6279@deltatee.com>
- <aEmxn0K6m34HsZeN@kbusch-mbp>
- <88fe6154-6086-409d-a180-665d62d72d47@deltatee.com>
+ <20250610050713.2046316-5-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,18 +48,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <88fe6154-6086-409d-a180-665d62d72d47@deltatee.com>
+In-Reply-To: <20250610050713.2046316-5-hch@lst.de>
 
-On Wed, Jun 11, 2025 at 01:41:54PM -0600, Logan Gunthorpe wrote:
-> On 2025-06-11 10:41, Keith Busch wrote:
-> > Is there some other mechansim that ensures a host memory mapped IOVA
-> > doesn't collide with a PCI bus address then?
-> 
-> Yes, in the absence of a switch with ACS protection this can be a problem.
-> 
-> I haven't looked at this in a long time, but the iommu drivers reserve
-> regions where the PCI addresses are valid so no iova will be allocated
-> with a similar bus address. After a quick search, I believe today, this
-> is handled by iova_reserve_pci_windows().
+On Tue, Jun 10, 2025 at 07:06:42AM +0200, Christoph Hellwig wrote:
+>  static inline bool nvme_pci_metadata_use_sgls(struct request *req)
+>  {
+>  	return req->nr_integrity_segments > 1 ||
+>  		nvme_req(req)->flags & NVME_REQ_USERCMD;
+>  }
+>  
+> -static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req,
+> -				     int nseg)
+> +static inline enum nvme_use_sgl nvme_pci_use_sgls(struct nvme_dev *dev,
+> +		struct request *req)
+>  {
+>  	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
+> -	unsigned int avg_seg_size;
+>  
+> -	avg_seg_size = DIV_ROUND_UP(blk_rq_payload_bytes(req), nseg);
+> +	if (nvmeq->qid && nvme_ctrl_sgl_supported(&dev->ctrl)) {
+> +		if (nvme_req(req)->flags & NVME_REQ_USERCMD)
+> +			return SGL_FORCED;
+> +		if (nvme_pci_metadata_use_sgls(req))
+> +			return SGL_FORCED;
 
-Excellent, I think that was the piece I was missing. Thanks!
+nvme_pci_metadata_use_sgls() already handles checking for
+NVME_REQ_USERCMD flagged commands, so I don't think you need both of
+these conditions to return FORCED.
+
+> @@ -886,7 +897,9 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+>  		goto out_free_sg;
+>  	}
+>  
+> -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
+> +	if (use_sgl == SGL_FORCED ||
+> +	    (use_sgl == SGL_SUPPORTED &&
+> +	     (!sgl_threshold || nvme_pci_avg_seg_size(req) < sgl_threshold)))
+
+This looks backwards for deciding to use sgls in the non-forced case.
+Shouldn't it be:
+
+	     (sgl_threshold && nvme_pci_avg_seg_size(req) >= sgl_threshold)))
+
+?
+
+>  		ret = nvme_pci_setup_sgls(nvmeq, req, &cmnd->rw);
+>  	else
+>  		ret = nvme_pci_setup_prps(nvmeq, req, &cmnd->rw);
