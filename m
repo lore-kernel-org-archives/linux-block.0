@@ -1,105 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E2A1A9B32
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 18:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D676D1F09B3
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 19:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749665776; cv=none; b=NYKW0eZx6Fs0PQlbPHAo4UchgMMpnseHX+cF1t0eXQyxfj/7/hfYthvIk/VgoTWwL3iJRblV8qEQMIubt5NDHByhVXbmNgfhkLd7+gaw2QdwFE9GsszzKgCxjxV4IFssFzF2BuHvjWSjdnB5OHoD4iyJEnGAcxHtJCVeccmvSZY=
+	t=1749670935; cv=none; b=ktyhiimyHCz9VwVBh8AAXQyjZ+6sqmoUsan4cCbvTDS/UBlNkxSVXYsT1vqLUc3TgnwHVr9ks4Ke6YzJNCpff+FUPW0iNtgb4ep/PpNvUyx5vIJ0oeYJTEEwSuVpFYxuZIc63LJau8ZEN7jTu4VJT9zPQILFbLJ15tkgry4YYWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749665776; c=relaxed/simple;
-	bh=EaH6KHiQmhrjHF+PmOyITSEkkZYJGe2a030RQsc4RnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KgZS/JjyA8/ePcVAsI3ygoWZkmEyIaNRF7EHjtZmrAi8GVo1Nie+jMx45dcZ2HkJS5tHUF10D5Tn0xaGY5oIKwXW3X92acHslciCLzD+4+a3EqTfpS8dYSDbfMqidL5ruZATDTIzBNMjQroGtXSKXO7LGvONJh524J0kD9JLRzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGa/W6UJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749670935; c=relaxed/simple;
+	bh=wNwfZkthuRMPNbOZKFlk10p6MBTua0jJPrBJpjbCgCc=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=FicXoZePtMhhP06XGAE5GmeUwtNCnhw1uboaiofGU8lW//CQuB9l4B63wF3+1fJw6ndoLIdbGHNzxzbrMLEujw3SprBfSSmcsn2L+KJR+G6cBF0aEE/Syq8ouRJtDDxuJ2Fl7GASwMbSai8KTM2qrZZC4QmupwN4PbiHMtr+PZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=KPVQKLdD; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGa/W6UJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68A70C4CEE3;
-	Wed, 11 Jun 2025 18:16:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749665775;
-	bh=EaH6KHiQmhrjHF+PmOyITSEkkZYJGe2a030RQsc4RnA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eGa/W6UJXPDy4kEctRgnbAP/zIw+wopsWzEUfJxAgnNAB4WxzDKxMMyu0mDsKUOuT
-	 asI3CGzub/giO5JY2B7oczkiEHjgkR8nxScpXAoocg6aldISK0xdyiFYxAncBuG/Y5
-	 8NuHOERKzej0HF+yEivd3YGB+ABTo6QrONVSIwu14OQnPIFs52s3SABXfJucTdPIqA
-	 rQHF0Ja1PcCw5JN42fMH6DO7VrGdJ5Ll16UJiOmobq2yDInZXpd2Im+MCR5mCgi2XR
-	 ODZ/DwCItcln57OmLqGsq+lENi/VZbhdJcO+RudwFrfrVzMMIrN0ajnLgCGoEOqtai
-	 aPdUHdlw1rCLQ==
-Date: Wed, 11 Jun 2025 11:15:51 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-Message-ID: <20250611181551.GB1254@sol>
-References: <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
- <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
- <20250526052434.GA11639@lst.de>
- <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
- <20250609035515.GA26025@lst.de>
- <83e74dd7-55bb-4e39-b7c6-e2fb952db90b@acm.org>
- <aEi9KxqQr-pWNJHs@kbusch-mbp>
- <20250611034031.GA2704@lst.de>
- <20250611042148.GC1484147@sol>
- <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="KPVQKLdD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=VSC4VLuuqrdFvSXDA+rlUN6veLmxqQV+QLrJEvwX08Q=; b=KPVQKLdDPsClMuuVGMBe8LXrmh
+	G53AnrgF1N0xpZMb7vXcrT8nZVluJTX4rQ/LRLftfz5UKOqEdL0GBeeuDsTy7tgCFVRzFNyCRXKEO
+	nJvfOePPPlZU55A4uKaElhDrKoGWcpUAE4Fci4V8SiT7YJRF/6BrsEbiQ9q52347jWGSmvw76nv2h
+	MWc7nuD8tRw3MGjeXYz6bhcEqV2sufkKd3YyLExMkLwVSQu3QMWc1zxSouXITaPWKcCAIe8NvsNOG
+	BV/QDRryc6YZ1FDJ4iYDhF/XFyyEc5ymlChDCt/ezgz/wm0P4Q9QN+4fOnQ78+RgxgHcYDAR/9tG7
+	vhbWMdIA==;
+Received: from d172-219-145-75.abhsia.telus.net ([172.219.145.75] helo=[192.168.11.155])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1uPRKo-007k41-1S;
+	Wed, 11 Jun 2025 13:42:05 -0600
+Message-ID: <88fe6154-6086-409d-a180-665d62d72d47@deltatee.com>
+Date: Wed, 11 Jun 2025 13:41:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
+User-Agent: Mozilla Thunderbird
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Leon Romanovsky <leon@kernel.org>,
+ Nitesh Shetty <nj.shetty@samsung.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20250610050713.2046316-1-hch@lst.de>
+ <20250610050713.2046316-2-hch@lst.de> <aEhROl2D89kFX8C7@kbusch-mbp>
+ <20250611034316.GA2869@lst.de> <aEmuG1dUDGuci7VW@kbusch-mbp>
+ <5cddbda3-02bd-4dc1-9f7f-197279da6279@deltatee.com>
+ <aEmxn0K6m34HsZeN@kbusch-mbp>
+Content-Language: en-US
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <aEmxn0K6m34HsZeN@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.219.145.75
+X-SA-Exim-Rcpt-To: kbusch@kernel.org, hch@lst.de, axboe@kernel.dk, sagi@grimberg.me, kch@nvidia.com, joshi.k@samsung.com, leon@kernel.org, nj.shetty@samsung.com, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 1/9] block: don't merge different kinds of P2P transfers
+ in a single bio
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Wed, Jun 11, 2025 at 09:15:05AM -0700, Bart Van Assche wrote:
-> On 6/10/25 9:21 PM, Eric Biggers wrote:
-> > blk-crypto-fallback runs at the top layer, so yes it's different from native
-> > inline encryption support where the encryption is done at the bottom.  (But the
-> > results are the same from the filesystem's perspective, since native support
-> > only gets passed through and used when it would give the expected result.)
+
+
+On 2025-06-11 10:41, Keith Busch wrote:
+> On Wed, Jun 11, 2025 at 10:39:17AM -0600, Logan Gunthorpe wrote:
+>> On 2025-06-11 10:26, Keith Busch wrote:
+>> That is all correct. In order to use P2P on a switch, with the IOMMU
+>> enabled, it is currently required to disable ACS for the devices in
+>> question. This is done with the command line parameter disable_acs_redir
+>> or config_acs.
 > 
-> Although I'm not sure Keith realizes this, his patch may move encryption
-> from the top of the block driver stack (a device mapper driver) to the
-> bottom (something else than a device mapper driver). This may happen
-> because device mapper drivers do not split bios unless this is
-> essential, e.g. because the LBA range of a bio spans more than one entry
-> in the mapping table.
-> 
-> Is my understanding correct that this is acceptable because the
-> encryption IV is based on the file offset provided by the filesystem and
-> not on the LBA where the data is written?
+> Is there some other mechansim that ensures a host memory mapped IOVA
+> doesn't collide with a PCI bus address then?
 
-The IV is provided in the bio_crypt_context.  The encryption can be done at a
-lower layer, like how hardware inline encryption works, if the layers above are
-compatible with it.  (E.g., they must not change the data.)
+Yes, in the absence of a switch with ACS protection this can be a problem.
 
-Ultimately, the data that's actually written to disk needs to be identical to
-the data that would have been written if the user encrypted the data themselves
-and submitted a pre-encrypted bio.
+I haven't looked at this in a long time, but the iommu drivers reserve
+regions where the PCI addresses are valid so no iova will be allocated
+with a similar bus address. After a quick search, I believe today, this
+is handled by iova_reserve_pci_windows().
 
-> 
-> > Just keep in mind that blk-crypto-fallback is meant to work on any block device
-> > (even ones that don't have a crypto profile, as the profile is just for the
-> > native support).  So we do need to make sure it always gets invoked when needed.
-> 
-> I propose that we require that bio-based drivers must call
-> bio_split_to_limits() to support inline encryption. Otherwise the
-> approach of Keith's patch can't work. Does this seem reasonable to you?
-> 
-> As far as I can tell upstream bio-based drivers already call
-> bio_split_to_limits().
-
-Well, again it needs to work on any block device.  If the encryption might just
-not be done and plaintext ends up on-disk, then blk-crypto-fallback would be
-unsafe to use.
-
-It would be preferable to have blk-crypto-fallback continue to be handled in the
-block layer so that drivers don't need to worry about it.
-
-- Eric
+Logan
