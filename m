@@ -1,86 +1,105 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078611C84D5
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 15:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39EB74059
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 16:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749657445; cv=none; b=NoICsImK7WS01JfRaFlpO72Af6bkWwPB3cgW9aDWgAloQVIzfxG0apkNAYPyaO4xu1C8aQMJL0HUEBOPDJ3S/3cWL5fRi2E0HeI0vuD0H28WS44xs5KrwK2LPGnEgOzEgqCqx9Se6PLyG7sldUpdRlIvb3mJV0FA0i0x0iszM00=
+	t=1749658519; cv=none; b=aaW1WbbqJt+C6lCh7Zg5jc0pM86tfTtsqG5eHa9tv3vxVCTXB8HzOxDNhulfAFes3fP8+OMXIPU2ZTQUz0pqhcnzdVNL1Xcvs5rvcMZ0WhGGAFC0FOty7mxskD5xiSyJBztiH3dmfEhp2ImrHwypUR1g3fnDy7zof7TC/dhB1GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749657445; c=relaxed/simple;
-	bh=RJWJyu+0qj/yXkybl49ji3SKEFZSYL4lvsFBjSPUC+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Edc38alwlNYqbiOJuoHWJN4EJLRiEM4W6f/ecXyEvHXEeQ2ju9wbzlih1gfvtRh/67/w1Az1YhhlC+uBXGwPepwrnDoVHCumMSLc2qkLEIKLjRcU2dut+S5WU5FXGIGFS4d5nqU0H867JeJez0Qslh3Adb8PaIik7ClzXdHgFq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=K/ushnW6; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1749658519; c=relaxed/simple;
+	bh=CY72Vno9Fa9424FQVCdJE9m7fS1vG5oWAij52O8uMnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o14ExLd77+GxIwz0ObX/L7ishfq+Rn0SIPPBhcxx5MXCtsYwpA3wZn3SRfzMx6tEMtZTyls1cDOWy/i3W+8sYLpY4tFiYyKAVBOsvvAY4x86aEHGAqFWzEnxYyQJ+HbFVnvhf8yLg+pK72qNNAwLqvYyWvqhFCnkpruEyLu7a74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Zbz1gAS2; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="K/ushnW6"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234d3103237so1098215ad.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 08:57:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1749657443; x=1750262243; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RJWJyu+0qj/yXkybl49ji3SKEFZSYL4lvsFBjSPUC+8=;
-        b=K/ushnW6QaTGYrA7tuvomFwQO3Cp063ezy2c6gIV7o2OGGWWEKtJGdXy3Kp25eMB4j
-         LMBNpF9mYkd4zbChGsCSgL8ixsVKmQqiPxSETBr6I6DHfYAqCOBAfAgCMPBCzwBdKyn6
-         7ofuWOOE/XY4hE35TPASUUineD7ueb2ze2RNzU79wQ6pKprCKqwhoxAsh08aKu3Uve+k
-         7doVzzOuuh0Gx2ynF9Xr+LyF6FErxmjc8HpHGRwqnnlBNvzkwSG1B129hympeJ8q/TKZ
-         yp17tdWWPU1+adS7rJh0fR+ACeePzAtyWNgf0+mVXwnkkjLyTPajNZNNkFwLXTJp4Krs
-         QMMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749657443; x=1750262243;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RJWJyu+0qj/yXkybl49ji3SKEFZSYL4lvsFBjSPUC+8=;
-        b=XS52B/mTqT2yXOmv7fzOKbxH6PL+aKTz39pUNUOCKKveIkUyPIMU8DX/z3cEg8RZxo
-         4DhjOsLhxEvFPXCVfMVY2exEenflzG+d7eZuvdw8q4wZVV9CzoZ4KNC6jcABbpA+WxEp
-         tG6p709e+2NGepXHDH2ZRjHRqUXyLkfKSInX/wJ4RP6qnaNR1ZtWVyQn21AfbE2jDDkG
-         NY4ngxlEndSyoT4mXbfFWNTpbxg55z/W4f6HrlrRLfiatmBy2O3vNfOC4V6W9h7x9ATb
-         MedSuGdhbGm8xu4rjIybhYzpBtw5qjKHYfV8j9nObblmAm4LsyZ8f+ZCayBcY1Oukree
-         Cgpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPA4dSJIcwoXrq8ByiJOPF5CTvaCTkrurAXiaMCZmV3t4+Xz7NjKebVtrYB1rV54lreV5SjNUDS6odng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxggAo2dsWXWlXeEkEKnKfbfAyjl3bAoderL6t1D2vE94bdZc1Q
-	jVRYrCzlf70psdSFq4eBAXpK/sD2oZ21bN26guHsp+WnjtsnnM3C9UzX4A0l67hzbT+rRctVXeQ
-	Zh7yNWdJJ6cDoDsLWDObN7zinr4c9Br+oe6Xm71ljeQ==
-X-Gm-Gg: ASbGnctalgeJvnqtqRIH/2LacxKwL2JdYQO1JLxaRCsUX25Ed/ZSzTLx78CCW11lemg
-	OFCPveDXn/+r1GoIDT+FUGv4JFztBgvS46O8W8Y8blYbJutzIBtOII3YVxRWDARTOFMGBo5SJtw
-	QzLpTxsAgBjFFj0i457dXs7n8Ax9hEXc3mIpSOZ4ua4u4=
-X-Google-Smtp-Source: AGHT+IGX6Gpn74Oumq7JovSVFrWMrcrIVOQJDvoht7U/Y07fmTs5kHS470mfMOcoM1IdykqyPFou7tgvh83g9p9hgF0=
-X-Received: by 2002:a17:902:ea0d:b0:235:f18b:a07c with SMTP id
- d9443c01a7336-23641ab7145mr21480945ad.5.1749657443192; Wed, 11 Jun 2025
- 08:57:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Zbz1gAS2"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bHW383C96zm0pKg;
+	Wed, 11 Jun 2025 16:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1749658514; x=1752250515; bh=PXctWyQLKuoDXq8i6cjHNacY
+	hge7hLLISybZlK5zt7o=; b=Zbz1gAS2D2SD60Pz4qcO6HUdBJbikC3wkvHUBNu+
+	NemQgb2pI959jRIIJjJz6N9Z1wF2/PqhmNQgJ4BqxK2fwIhRLJihN5tDYb0BdwkS
+	EDu/J9RORP/kYwqzvFdAs/5eBycXPGTo8yMkIhdlKPuzD3nkwq8a5EuQSy3Fy7L/
+	vyvnw+sC08d7HPl4Z1KomhbCo7NGcwiDx2BLb/RZMrqaX8FjMyQ5GNEdMnbVZ0J7
+	dKSvIjZ2NVBjvPP7iZvVV+qR7vzcqnvs1uzavf5CCNfQnXo5nDhmKMFCvp+VjfAN
+	S7PN2nl9ngd7FRg80zR8KCyJmNehVCkyo89rrWtByRCLgg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id z-iT8W2wdz-6; Wed, 11 Jun 2025 16:15:14 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bHW2z3lv6zm1Hcf;
+	Wed, 11 Jun 2025 16:15:06 +0000 (UTC)
+Message-ID: <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
+Date: Wed, 11 Jun 2025 09:15:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611085632.109719-1-ming.lei@redhat.com>
-In-Reply-To: <20250611085632.109719-1-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 11 Jun 2025 08:57:11 -0700
-X-Gm-Features: AX0GCFsm6xVotLxAcHSPY4YSdIjCjXfIqz01LrPT7wG6NPajcG4a4PafdQvyjkA
-Message-ID: <CADUfDZpmCNgMP_AtrhyX5mPOh6V67oRBuUP9HpzfUEAk-iO7Tw@mail.gmail.com>
-Subject: Re: [PATCH V2] ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
+ submission order
+To: Eric Biggers <ebiggers@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
+ <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
+ <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
+ <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
+ <20250526052434.GA11639@lst.de>
+ <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
+ <20250609035515.GA26025@lst.de>
+ <83e74dd7-55bb-4e39-b7c6-e2fb952db90b@acm.org> <aEi9KxqQr-pWNJHs@kbusch-mbp>
+ <20250611034031.GA2704@lst.de> <20250611042148.GC1484147@sol>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250611042148.GC1484147@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 11, 2025 at 1:56=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Document recently merged feature auto buffer registration(UBLK_F_AUTO_BUF=
-_REG).
->
-> Cc: Caleb Sander Mateos <csander@purestorage.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On 6/10/25 9:21 PM, Eric Biggers wrote:
+> blk-crypto-fallback runs at the top layer, so yes it's different from native
+> inline encryption support where the encryption is done at the bottom.  (But the
+> results are the same from the filesystem's perspective, since native support
+> only gets passed through and used when it would give the expected result.)
 
-Sorry I'm a little late, but
+Although I'm not sure Keith realizes this, his patch may move encryption 
+from the top of the block driver stack (a device mapper driver) to the
+bottom (something else than a device mapper driver). This may happen
+because device mapper drivers do not split bios unless this is
+essential, e.g. because the LBA range of a bio spans more than one entry
+in the mapping table.
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+Is my understanding correct that this is acceptable because the
+encryption IV is based on the file offset provided by the filesystem and
+not on the LBA where the data is written?
+
+> Just keep in mind that blk-crypto-fallback is meant to work on any block device
+> (even ones that don't have a crypto profile, as the profile is just for the
+> native support).  So we do need to make sure it always gets invoked when needed.
+
+I propose that we require that bio-based drivers must call
+bio_split_to_limits() to support inline encryption. Otherwise the
+approach of Keith's patch can't work. Does this seem reasonable to you?
+
+As far as I can tell upstream bio-based drivers already call
+bio_split_to_limits().
+
+Thanks,
+
+Bart.
