@@ -1,105 +1,86 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39EB74059
-	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 16:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0221E8358
+	for <linux-block@vger.kernel.org>; Wed, 11 Jun 2025 16:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749658519; cv=none; b=aaW1WbbqJt+C6lCh7Zg5jc0pM86tfTtsqG5eHa9tv3vxVCTXB8HzOxDNhulfAFes3fP8+OMXIPU2ZTQUz0pqhcnzdVNL1Xcvs5rvcMZ0WhGGAFC0FOty7mxskD5xiSyJBztiH3dmfEhp2ImrHwypUR1g3fnDy7zof7TC/dhB1GM=
+	t=1749659167; cv=none; b=JHYAm8SFNnxCXwG/vvg7s19cqurB9Qd/FS0c1bSrH/py1RT+NCMQ6iO1UOB3g7DlG1j4gHI66Jhzt+mdBa9dKo9zLxLynOZcwBpJiiiLvZVpQtoGlCuU/DrN49wItsmNNGHWJCXiQjHZx0IE8Wb8amJsG2MIOpzx+jedxhr+9Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749658519; c=relaxed/simple;
-	bh=CY72Vno9Fa9424FQVCdJE9m7fS1vG5oWAij52O8uMnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o14ExLd77+GxIwz0ObX/L7ishfq+Rn0SIPPBhcxx5MXCtsYwpA3wZn3SRfzMx6tEMtZTyls1cDOWy/i3W+8sYLpY4tFiYyKAVBOsvvAY4x86aEHGAqFWzEnxYyQJ+HbFVnvhf8yLg+pK72qNNAwLqvYyWvqhFCnkpruEyLu7a74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Zbz1gAS2; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1749659167; c=relaxed/simple;
+	bh=fKCue/QRAGLJEvsZ48ApXivr3PElq2mFF2q18ziSqeA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wsc6aXWqivHLp3u51yoATjfT/S/AndLL8vsn2vsIhW7FJJerYdRG1F14b58UYgtLV//n5d2a3svQ4Wy7Tb6+kH1cEzVxe35dJdaMZGRnme45ycOqocT5tRM4/ZA89Mzb4PvEmHRg7ZKVLWhSQzM0nrIvHG5idjWoMl86b8KCGrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C1tcDAkU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Zbz1gAS2"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bHW383C96zm0pKg;
-	Wed, 11 Jun 2025 16:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1749658514; x=1752250515; bh=PXctWyQLKuoDXq8i6cjHNacY
-	hge7hLLISybZlK5zt7o=; b=Zbz1gAS2D2SD60Pz4qcO6HUdBJbikC3wkvHUBNu+
-	NemQgb2pI959jRIIJjJz6N9Z1wF2/PqhmNQgJ4BqxK2fwIhRLJihN5tDYb0BdwkS
-	EDu/J9RORP/kYwqzvFdAs/5eBycXPGTo8yMkIhdlKPuzD3nkwq8a5EuQSy3Fy7L/
-	vyvnw+sC08d7HPl4Z1KomhbCo7NGcwiDx2BLb/RZMrqaX8FjMyQ5GNEdMnbVZ0J7
-	dKSvIjZ2NVBjvPP7iZvVV+qR7vzcqnvs1uzavf5CCNfQnXo5nDhmKMFCvp+VjfAN
-	S7PN2nl9ngd7FRg80zR8KCyJmNehVCkyo89rrWtByRCLgg==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id z-iT8W2wdz-6; Wed, 11 Jun 2025 16:15:14 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bHW2z3lv6zm1Hcf;
-	Wed, 11 Jun 2025 16:15:06 +0000 (UTC)
-Message-ID: <1853d37f-b7b1-4266-b47f-8c2063f36b7d@acm.org>
-Date: Wed, 11 Jun 2025 09:15:05 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C1tcDAkU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F112C4CEE3;
+	Wed, 11 Jun 2025 16:26:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749659166;
+	bh=fKCue/QRAGLJEvsZ48ApXivr3PElq2mFF2q18ziSqeA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C1tcDAkUdPJ8BLQiFMQqrOoJlInDmXRG40dxIRDrTuna8Wm1UOs9VNUZpdTo62mm7
+	 4P3xKc01nGq35CE11qepOwBQ8aKO/lTo2C/7NqmB2Ww+y0u/m7Eefp39KlxyqNAff9
+	 H/pE8vi6X5NliSRGC/GbaYZiB/CGFHnyIIW2L7VlAJVbwsnezI+hm3u/2eLeg2ekTq
+	 niJrrHie2h1T3B2kl17ZTHlYSXZG0IC6ko99lFj8FiLBbeNf9d3butB94yhsLi6C7x
+	 Qx9ihtcZbnXBFyCO+WRqUZytAZdw6AVAdWVEchGJz9rb4JkM9MfpWpj5AtifJ3XE//
+	 YVuR0+ywOsypw==
+Date: Wed, 11 Jun 2025 10:26:03 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/9] block: don't merge different kinds of P2P transfers
+ in a single bio
+Message-ID: <aEmuG1dUDGuci7VW@kbusch-mbp>
+References: <20250610050713.2046316-1-hch@lst.de>
+ <20250610050713.2046316-2-hch@lst.de>
+ <aEhROl2D89kFX8C7@kbusch-mbp>
+ <20250611034316.GA2869@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio
- submission order
-To: Eric Biggers <ebiggers@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <b130e8f0-aaf1-47c4-b35d-a0e5c8e85474@kernel.org>
- <4c66936f-673a-4ee6-a6aa-84c29a5cd620@acm.org>
- <e782f4f7-0215-4a6a-a5b5-65198680d9e6@kernel.org>
- <907cf988-372c-4535-a4a8-f68011b277a3@acm.org>
- <20250526052434.GA11639@lst.de>
- <a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org>
- <20250609035515.GA26025@lst.de>
- <83e74dd7-55bb-4e39-b7c6-e2fb952db90b@acm.org> <aEi9KxqQr-pWNJHs@kbusch-mbp>
- <20250611034031.GA2704@lst.de> <20250611042148.GC1484147@sol>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250611042148.GC1484147@sol>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611034316.GA2869@lst.de>
 
-On 6/10/25 9:21 PM, Eric Biggers wrote:
-> blk-crypto-fallback runs at the top layer, so yes it's different from native
-> inline encryption support where the encryption is done at the bottom.  (But the
-> results are the same from the filesystem's perspective, since native support
-> only gets passed through and used when it would give the expected result.)
+On Wed, Jun 11, 2025 at 05:43:16AM +0200, Christoph Hellwig wrote:
+> On Tue, Jun 10, 2025 at 09:37:30AM -0600, Keith Busch wrote:
+> > I may be out of the loop here. Is this an optimization to make something
+> > easier for the DMA layer?
+> 
+> Yes.  P2P that is based on a bus address (i.e. using a switch) uses
+> a completely different way to DMA MAP than the normal IOMMU or
+> direct mapping.  So the optimization of collapsing all host physical
+> addresses into an iova can't work once it is present.
+> 
+> > I don't think there's any fundamental reason
+> > why devices like nvme couldn't handle a command that uses memory mixed
+> > among multiple devices and/or host memory, at least.
+> 
+> Sure, devices don't even see if an IOVA is P2P or not, this is all
+> host side.
 
-Although I'm not sure Keith realizes this, his patch may move encryption 
-from the top of the block driver stack (a device mapper driver) to the
-bottom (something else than a device mapper driver). This may happen
-because device mapper drivers do not split bios unless this is
-essential, e.g. because the LBA range of a bio spans more than one entry
-in the mapping table.
+Sorry for my ignorant questions here, but I'm not sure how this setup
+(P2P transactions with switches and IOMMU enabled) actually works and
+would like to understand better.
 
-Is my understanding correct that this is acceptable because the
-encryption IV is based on the file offset provided by the filesystem and
-not on the LBA where the data is written?
-
-> Just keep in mind that blk-crypto-fallback is meant to work on any block device
-> (even ones that don't have a crypto profile, as the profile is just for the
-> native support).  So we do need to make sure it always gets invoked when needed.
-
-I propose that we require that bio-based drivers must call
-bio_split_to_limits() to support inline encryption. Otherwise the
-approach of Keith's patch can't work. Does this seem reasonable to you?
-
-As far as I can tell upstream bio-based drivers already call
-bio_split_to_limits().
-
-Thanks,
-
-Bart.
+If I recall correctly, the PCIe ACS features will default redirect
+everything up to the root-complex when you have the IOMMU on. A device
+can set its memory request TLP's Address Type field to have the switch
+direct the transaction directly to a peer device instead, but how does
+the nvme device know how to set the it memory request's AT field?
+There's nothing that says a command's addresses are untranslated IOVAs
+vs translated peer addresses, right?  Lacking some mechanism to specify
+what kind of address the nvme controller is dealing with, wouldn't you
+be forced to map peer addresses with the IOMMU, having P2P transactions
+make a round trip through it only using mapped IOVAs?
