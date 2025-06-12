@@ -1,767 +1,522 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4AF21ABB1
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 07:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749714172; cv=none; b=RjedU1TQ4LvwvLN+3q/omu7dEqxC0ZgnohdhXemvBv6PU+GOYJtYTJoNWYEA75SZalm+mihmXjx7Bjj+JIoxJ6POfT/C7tHu5kqzSN6oKklx9NwVR1Qe9C0XgKvcyrkkoXbNP3arGnGMEmv5+Qc/uPu23Bkm3/KJYQ3/5bBIvkg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749714172; c=relaxed/simple;
-	bh=sb4UWIAgMFvtCa+h2KjPkFleaFFpiKRlQKK4XJjzLy4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BWv4qCbNcEWbk+UyJ2R15aetHcPo7VIVEiG7MszCdgOCb0tV8ZlExdTAD6a/uTnkyZLjCcyn0CTiw3FQLOGWxvQbppdAvHKZontwevpmPKzexLL42Epg7S29uUsed+YPev2r54s9jmgfMBHaKzHRLIxuutyYY2GjMhzBNs+NvSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Vj3Wb2wx; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D1242A82
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 08:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749716276; cv=fail; b=PZgE9ujNJXZ32tJnPJFMoXNDG05PPPlvtj4/ZG0oIfzlZXPsXquf37Pol/HAQ8YX/8TIaLSvtJHszsgMFEijV1B/VQ7TutKM5CzMGXdh94D9yq6kOzYWCFY+X+jy/9xDgXsLK8D84zBmVQ8kpoS+/8PdM1a9RjtSpQcg3oam8ek=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749716276; c=relaxed/simple;
+	bh=fpiRFgzi9O1DYz+6jB9+hinELRBHmk/t+EhVMR1/1TA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GcuKh1A/Ut3wC5yCSJVmo04VHaB4zFc1Eb9gZc2fLsNgEnJdtDbsOKVpSW64twPAJ0/iZ6RAKf2gzs5qR9zCI7nc88Ooh+O7AQ4trx3VrshGA8LNM06PQ3a1ZjqbRglL2hBNgagOuGmkIsnFku7AL7V1RChzLYVlidmWQDBFL+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VOj9Trtn; arc=fail smtp.client-ip=40.107.237.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Vj3Wb2wx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=pgO0sELmdmd39auCcMP17xhwBfJw035c38KH2Vqo9+8=; b=Vj3Wb2wx2zjYw3skidqTbRkyPy
-	/u8WCs7v4yMYjJ0ThnCuie9W9KmqqxUBF4I8FR7BygotLZUa/Qw9JUtt/boZ5hhiq5hgeMLCYye1Z
-	Jn2G+2KfLjwvs+EunqE8FjdLo2Nx6vfCZfMldtdw5euKBwKLQ6WY368BWmuFM/XNwTNAVp/aTXAhm
-	XQnlL0mKXIXLEM+uHWN6Lu8atP3D447UHEq//AXJErlTD3dvYBATUb+5e7mFJQYA7YX+fFg4GAiTq
-	hTYOsySoY41Pamk9aDnrgKIk0CLNFQ7BK+rf2YjtOhMa6o+kNrcEv5n3vkUYDKOUUYAEnhh1qmaf6
-	e4778nLw==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPcaG-0000000CToH-48Qo;
-	Thu, 12 Jun 2025 07:42:49 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: abuehaze@amazon.com,
-	linux-block@vger.kernel.org,
-	ming.lei@redhat.com
-Subject: [PATCH, RFC] block: always use a list_head for requests
-Date: Thu, 12 Jun 2025 09:42:38 +0200
-Message-ID: <20250612074245.2718371-1-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VOj9Trtn"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h79o3ze4sBg25MIZCZLfvOjErpvU9IMVdNu1mHIXdca5QK5P8hEryLU22+A8t5WgpIYQfsUdK+THUGbElW4JIkbGuXh0elmNA6kflu/qv6DWswEZCiGEOy0vNdbG1RGmNW149WRsAyhuMp9VyG+zU8UwTeGH3yiRiZqHDj6RCHUbiO27wuaEpyYICascKmmFHGgwtWKWzkiPpcDOX9k4a7Ts/qDJM/0aIQuOfAPnB9lG3nZ0iOXz8hO+G6k9HjA39XER+Bvidyd6QF/GCDl8nJxuFFLaRXEw+gNJXgPBPLiaMkwP+aEOodlTujTOsh4OevkKG3HXigMapaY1nWePsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TyzoXaSj8Wj46KENsTn2wV37jQAxVYmhsznJvsma3a0=;
+ b=N38ka7OEC5kECrvW33kG5Vl0OJ+9LOdHzWGuyjKt0pv7djSr3vnMALeT5gRfZlSHVENwFw13J6gtffkbkOoShhbuAPsnZHCvO3QrvAYPFa/Tr9MXsZoRs3jS/bFe081cNPn6RqYWFFjk2WsJpp7UJiiJkudj+qEUFK3BvHiurkdN0ESLV1y37uhbdhT9Bu7K20WKI9nTjDptUe7PcgQyjuh4v+XjFZejhdqMg9gA7cqlgT03FCWlqFw+CDTaMbwVzgB93T0NvIPLyWwwtA/uc9xy+4sqqFZDXNmdjg8Ai6NqcOhs8e0e5CTG/fxr8JwuiSVRja4XTQ73Pd8XT8CsUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TyzoXaSj8Wj46KENsTn2wV37jQAxVYmhsznJvsma3a0=;
+ b=VOj9TrtnbhxEEeIb81EOCb21fT1wt5odQ7+dQCUGOFkxg107aHCtueBhO6xOO0l0RrSmdC5Hg4Y3IC5eDJohmGQd2VIzNKxFj3TEqUvBoljOQl1EkfT3xVwha3UMeJ7rq+ZMRlfp1nVU8JX8uxlCE+rptCFVjANyiBL2QaJlAEf6AN5x8pvIVgUPodktUt0vLr2n6Lheia0jcABpaQXo2HJk8L7XCfiX10sJIQQ/TQVDI3MuQM8PRNxB2Hhp08PwnPKeo7kCjpegcXnp5n3mrw3d/zaiTN9YmHb5MjzHv4TTgom1tIQdDIT4AhoY8/xLDWzxBLH7LIbuOxgV8LcGLQ==
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) by
+ IA0PR12MB8376.namprd12.prod.outlook.com (2603:10b6:208:40b::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8835.19; Thu, 12 Jun 2025 08:17:49 +0000
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa]) by DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa%7]) with mapi id 15.20.8792.034; Thu, 12 Jun 2025
+ 08:17:49 +0000
+From: Yoav Cohen <yoav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Uday Shankar <ushankar@purestorage.com>, Caleb
+ Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Thread-Topic: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Thread-Index: AQHbyzeSSRaVFqTPg0GnAQDdJHQew7P0ldE6gAFlm4CAAxP3QYAAXvCAgAXfTWQ=
+Date: Thu, 12 Jun 2025 08:17:49 +0000
+Message-ID:
+ <DM4PR12MB63280BC70C29A91E973E8080A974A@DM4PR12MB6328.namprd12.prod.outlook.com>
+References: <20250522163523.406289-1-ming.lei@redhat.com>
+ <20250522163523.406289-3-ming.lei@redhat.com>
+ <DM4PR12MB6328039487A411B3AF0C678BA96FA@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <aEK6uZBU1qeJLmXe@fedora>
+ <DM4PR12MB6328BB31153930B5D0F3A3C7A968A@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <aEWfWynspv75UJlZ@fedora>
+In-Reply-To: <aEWfWynspv75UJlZ@fedora>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR12MB6328:EE_|IA0PR12MB8376:EE_
+x-ms-office365-filtering-correlation-id: 14914724-6011-466d-0d61-08dda9899e90
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?NFa0ziU030tT9eudBA93GaYUtYGbHOmFE/3Z2d4pifnVBzJ20Lh3XYAeKZUA?=
+ =?us-ascii?Q?txcPGSokNaaadMh9mj1tXUY0IB2h0C6c3+gZV66JQnjGp4C8R6Zk3GMCU1Yj?=
+ =?us-ascii?Q?sJjTNNPoMUHT2rS0XURX+fyvBRyZzxeJG6yTK+MnFmLzNcKyU5UpA17qmWAT?=
+ =?us-ascii?Q?8gMKRQqiUikgfIDcJDD57qTTb2BwZ1zZ7RG4SJBzoyyxKdPuguYLB5z+/RHy?=
+ =?us-ascii?Q?codAxZ8SmxvSsGI/3iCsCwiDEDNzf1nO84RZtT3HuCKH3qfiK/CYoJq1Vxp4?=
+ =?us-ascii?Q?csZYCy1OdwV+tKUvbTJ1Ixhb6zMPduBsJ/DLL5hG0SLYqyTZPL8aXelJKDx2?=
+ =?us-ascii?Q?ApaJBVboH0cWvSWnra9OSMK9XK2iJPD9KaDzlBIr5vcjXnz4DcKIhPWWqWY4?=
+ =?us-ascii?Q?rs0nnDSNgpRNUjhGCOUm+SBF/qPUG5z0RzHWN8EHy5dt+Nck0B+Wqz8CnKbH?=
+ =?us-ascii?Q?OvE+h6rJJn18pO2rn2ymfcB7NX7uxzP87ue9DVZnZ/gKOXiNzCYuD4+e6qMz?=
+ =?us-ascii?Q?gB58kr3YLJk9rwqCFQq4Gfj7iC+IbmBk0pS/l8no1u2D4U+gh5d+pvnBofOY?=
+ =?us-ascii?Q?8KbpFQhI9LQJj1Hvf3sUDpZ+NLWE53SvHy7AIasNoVEApU/sFuMfNrFc+FgB?=
+ =?us-ascii?Q?lcmPvpvaytLZffYguD7ympsvpIyfNc5EfiYqT0xFIfCVfZjefyqMFnRFYUEw?=
+ =?us-ascii?Q?dckagf2e5pUSdF/yruxAVytPjr3ucvxBJepAcTC8NUgk7PMGcMg9hi2XJYXk?=
+ =?us-ascii?Q?Bds6TaGkSu50VlZj8v+/fF6RvqtYwlMXUB7RG00s9APu4ggC5fRaVsOToUNC?=
+ =?us-ascii?Q?lpJ0TrUqrygZ5DTq7uwKv+sFgbBijEtUR1D7yC3/9XbhPX/H4Hu0Z+gpT+Mr?=
+ =?us-ascii?Q?9Nhip2/IbLIr8oqeq+BMile95ryskQz4irFbmof7jdTxhrkIs5H54racQzph?=
+ =?us-ascii?Q?ddvnZBM91eQaWHHKfShq8qNjtGgIcYEvtPTpf8NjUqX7Uv1jxzREYb/c9r3i?=
+ =?us-ascii?Q?PNNexjp6bAPL/sJVjS97UfqPeV54VaIl78EQmDE4OwaZIaLtIwHYqAQc16zT?=
+ =?us-ascii?Q?ONLgCD+MQV+p1MuJlAVFsFraSD4fbYIa2w6b0uG0znG+t7LHV9/eRtioAa2O?=
+ =?us-ascii?Q?HCk2ZGChTZFg+qZU5nA49c5jlCuLg+8IoxSwVKjiPPxM51C0iGvmrk7nDR2r?=
+ =?us-ascii?Q?lvQaPJRIqBiUgpNrVpjybQ7/Q4etSbtjO7HgsiiwGf5xbNrAkT3tWNS65RIt?=
+ =?us-ascii?Q?RQOqAvaenZXrTY+4ACyrMJ7K0a7nVoAW4JfeY2R+LP7IcADutg/zEoeMctXw?=
+ =?us-ascii?Q?nRBMZobmJg/l+fYOnfGezgn7hndlFV/f5g6UCpENSa+pDkvRZpFBYLb3VYiW?=
+ =?us-ascii?Q?BbYzBH7hlIBrqO0z//qwCLtLKy8l/kge5xEyYB8EXaPDXBQ5vfAj9DD5C85C?=
+ =?us-ascii?Q?+Z7yQWQRSeD7ZFE8WrZfz1WbY4WDTLWOzBQIzZxCjREQloYUaQ/Wq7k+FvAq?=
+ =?us-ascii?Q?hkAe2c8RWuDmM74=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6328.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?koUpOxS3T640HBMmJGCekIiWOw0qiXRFlNcKTRe1ce7BcEFnsmbebSadCcPK?=
+ =?us-ascii?Q?nfCFId+vOJgj6fXByS0IGMvYPf2dHoG4ahbJG9SDFLW7hUlGdDQ6ezJIZzmO?=
+ =?us-ascii?Q?lQ3oSV9MMKGysXAR9YZKWAQ/od3sNWaq0cd3wpW16GQjF4H1IM1111ROGnxL?=
+ =?us-ascii?Q?DPtwz5amYrOiUmDyKlEimONBtf3PXshXvsrZoCrVG1Noglr9q8WvlQMTSC0E?=
+ =?us-ascii?Q?KzFXh0QmTIsLD1oZ2UB7uH8hKp3LfE9RDLonYHI7FAKLGi5S5yX4sx0NZDtm?=
+ =?us-ascii?Q?HoHg12ywgztDODmJVwGuWcqbG+simqhL+GaoCfwfMqR/Ccnr2QFJYGXm1zK1?=
+ =?us-ascii?Q?3JuQhK1CKDiipc4e7Bfx/RVHSfOrnQ2NJ/4bxo3iU4Gy/QihHyPjuBePpfi6?=
+ =?us-ascii?Q?28l8fb9xnJ/vG0m48jWPheJSACJUQ5jt52e7HG9Ymt0bz11TpW1F0wnJ4YJE?=
+ =?us-ascii?Q?2E6z72yrie3AbA7fq3NaNfwxhl9/tJ5idO1ukwvol5eWULmQiBRLkbyHo0/e?=
+ =?us-ascii?Q?yl+G5IOEnwiWfCjAI4rSlNl2eSmy9kaAM7l3j+FozZVSXQ9OoX8769VtiBrq?=
+ =?us-ascii?Q?siDA/i+JGIhbkhQytWJV6q7CBpbZgqEjP0Oy0zsar1LaFV1FkrOSmm14xJyZ?=
+ =?us-ascii?Q?G2IlZR0JHor+Vt53tqdwxAwwwMJszVHgX/d6Ij6qYL2SBx2a3TlxHKLYtK/A?=
+ =?us-ascii?Q?iaIwQAMdJ6xhqinAGobUuSR16GwBv12fbCph4tW16cL6wGHYcZOfFqDemk3r?=
+ =?us-ascii?Q?5rib7QGT4ShxCrqDr3GIMwiHtr75iUuXgV5w7L+e9uCfmunMHzCtq8t07VDe?=
+ =?us-ascii?Q?zFUQRF6XTHx/H6t8Z7O+wp3WxTOT4sIJ49eGnSbrjAbFZbmR7gjCZi8CYpPf?=
+ =?us-ascii?Q?GUNbwrl1SVueKyhXSO1c/sgdHv7srX1JpYerd2PesC0V0jvBir2IeFAi7aZg?=
+ =?us-ascii?Q?NsmP0QLNHoNJzie6UVMJTSJLs43C2DCQdABR3X6JmfeNhDoJywB1wHvuUmyu?=
+ =?us-ascii?Q?ffKYs3/k8rFKTi3chIXEHTX/8YRK7e1lmLM/bs4LlbQMxnvE/6Bt1KJjRpR7?=
+ =?us-ascii?Q?FrErC0C0r/NSTInhuOyW1UCxfqRZhpO+SgijxbquxkPAs5Mn4kbeSGKopDaQ?=
+ =?us-ascii?Q?8zVmxAA1ypyfBumlumTM1uIhCvHIQ5Q2puUeKOxiBk+VeSESGBfFkLCwFlzi?=
+ =?us-ascii?Q?Keo4sZm7ScIQMwwnSrWkZP3qNtSIge8ZE3c6g6s60Glr57L58CIr6OBhffJ3?=
+ =?us-ascii?Q?57Sgp5Ch6w+8h9ALuw2s3z//YoyT+u1eyuHjeYrTutXYJH+PvBLbqwsSKQGO?=
+ =?us-ascii?Q?n9aUIvvfxMrN78rgxmYXa9Nl4jv9ZbG1DR46M3tfye/9BUsxdGDcjtxgypsI?=
+ =?us-ascii?Q?12tZ0X5LMfRM3e9V+1j1nwmdX301Zqks6qDwUrLK/ODJgEbSbkLWeHwvQX49?=
+ =?us-ascii?Q?wGAfXOx3XdKLWNoMai1M1WEr8sREcdP+b9tRvGJDWiwGbwysAWvztW6HWXbM?=
+ =?us-ascii?Q?u64gZjumKpIcBAfyraxXZqCxGS9vAhKEZVTb4sF3gRlBSXuda15mtsBcPOW9?=
+ =?us-ascii?Q?olIygE4S5YdvUgWOz9o=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6328.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14914724-6011-466d-0d61-08dda9899e90
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2025 08:17:49.1987
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: op3Kk1S45GigfmoEbPovd6Xv6nXVkFc8tKc4B3+lq9IxFyof7P0cW4xuEuahe35B
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8376
 
-Turn the remaining lists of requests into the standard doubly linked
-list.  This removes a lot of hairy list manipulation code and allows
-east reverse walking of the lists, which will be needed to improve
-merging.
+Hi Ming,
 
-XXX: the ublk queue_rqs code is pretty much broken here, because
-it's so different from the other drivers and I don't understand it.
+Thank you very much, I managed to integrate the feature to our application =
+and it seems to work perfectly fine during our update tests.
+Just a double check: when UBLK_F_USER_RECOVERY & UBLK_F_USER_RECOVERY_REISS=
+UE
+and QUIECE_DEV was called - does any IO that will be completed using COMMIT=
+_AND_FETCH with a failure (i.e result=3D-EIO) will be retry after the recov=
+ery stage?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c              |  6 +--
- block/blk-merge.c             |  4 +-
- block/blk-mq.c                | 91 +++++++++++++----------------------
- block/blk-mq.h                |  2 +-
- drivers/block/null_blk/main.c | 10 ++--
- drivers/block/ublk_drv.c      | 42 +++++++---------
- drivers/block/virtio_blk.c    | 29 +++++------
- drivers/nvme/host/nvme.h      |  2 +-
- drivers/nvme/host/pci.c       | 31 ++++++------
- include/linux/blk-mq.h        | 63 ++++--------------------
- include/linux/blkdev.h        | 16 +++---
- io_uring/rw.c                 |  4 +-
- 12 files changed, 113 insertions(+), 187 deletions(-)
+Thank you again!
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fdac48aec5ef..90e84f45d09f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1127,8 +1127,8 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
- 		return;
- 
- 	plug->cur_ktime = 0;
--	rq_list_init(&plug->mq_list);
--	rq_list_init(&plug->cached_rqs);
-+	INIT_LIST_HEAD(&plug->mq_list);
-+	INIT_LIST_HEAD(&plug->cached_rqs);
- 	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
- 	plug->rq_count = 0;
- 	plug->multiple_queues = false;
-@@ -1224,7 +1224,7 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- 	 * queue for cached requests, we don't want a blocked task holding
- 	 * up a queue freeze/quiesce event.
- 	 */
--	if (unlikely(!rq_list_empty(&plug->cached_rqs)))
-+	if (unlikely(!list_empty(&plug->cached_rqs)))
- 		blk_mq_free_plug_rqs(plug);
- 
- 	plug->cur_ktime = 0;
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3af1d284add5..64d1de374bd4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -995,10 +995,10 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 	struct blk_plug *plug = current->plug;
- 	struct request *rq;
- 
--	if (!plug || rq_list_empty(&plug->mq_list))
-+	if (!plug)
- 		return false;
- 
--	rq_list_for_each(&plug->mq_list, rq) {
-+	list_for_each_entry(rq, &plug->mq_list, queuelist) {
- 		if (rq->q == q) {
- 			if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
- 			    BIO_MERGE_OK)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4806b867e37d..254b7d984ac8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -470,7 +470,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
- 		prefetch(tags->static_rqs[tag]);
- 		tag_mask &= ~(1UL << i);
- 		rq = blk_mq_rq_ctx_init(data, tags, tag);
--		rq_list_add_head(data->cached_rqs, rq);
-+		list_add(&rq->queuelist, data->cached_rqs);
- 		nr++;
- 	}
- 	if (!(data->rq_flags & RQF_SCHED_TAGS))
-@@ -605,7 +605,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
- 	if (!plug)
- 		return NULL;
- 
--	if (rq_list_empty(&plug->cached_rqs)) {
-+	if (list_empty(&plug->cached_rqs)) {
- 		if (plug->nr_ios == 1)
- 			return NULL;
- 		rq = blk_mq_rq_cache_fill(q, plug, opf, flags);
-@@ -1177,7 +1177,6 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
- 
- 	while ((rq = rq_list_pop(&iob->req_list)) != NULL) {
- 		prefetch(rq->bio);
--		prefetch(rq->rq_next);
- 
- 		blk_complete_request(rq);
- 		if (iob->need_ts)
-@@ -1398,7 +1397,7 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	 */
- 	if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
- 		plug->has_elevator = true;
--	rq_list_add_tail(&plug->mq_list, rq);
-+	list_add_tail(&rq->queuelist, &plug->mq_list);
- 	plug->rq_count++;
- }
- 
-@@ -2780,7 +2779,7 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- 	return __blk_mq_issue_directly(hctx, rq, last);
- }
- 
--static void blk_mq_issue_direct(struct rq_list *rqs)
-+static void blk_mq_issue_direct(struct list_head *rqs)
- {
- 	struct blk_mq_hw_ctx *hctx = NULL;
- 	struct request *rq;
-@@ -2788,7 +2787,7 @@ static void blk_mq_issue_direct(struct rq_list *rqs)
- 	blk_status_t ret = BLK_STS_OK;
- 
- 	while ((rq = rq_list_pop(rqs))) {
--		bool last = rq_list_empty(rqs);
-+		bool last = list_empty(rqs);
- 
- 		if (hctx != rq->mq_hctx) {
- 			if (hctx) {
-@@ -2819,43 +2818,15 @@ static void blk_mq_issue_direct(struct rq_list *rqs)
- 		blk_mq_commit_rqs(hctx, queued, false);
- }
- 
--static void __blk_mq_flush_list(struct request_queue *q, struct rq_list *rqs)
-+static void __blk_mq_flush_list(struct request_queue *q, struct list_head *rqs)
- {
- 	if (blk_queue_quiesced(q))
- 		return;
- 	q->mq_ops->queue_rqs(rqs);
- }
- 
--static unsigned blk_mq_extract_queue_requests(struct rq_list *rqs,
--					      struct rq_list *queue_rqs)
--{
--	struct request *rq = rq_list_pop(rqs);
--	struct request_queue *this_q = rq->q;
--	struct request **prev = &rqs->head;
--	struct rq_list matched_rqs = {};
--	struct request *last = NULL;
--	unsigned depth = 1;
--
--	rq_list_add_tail(&matched_rqs, rq);
--	while ((rq = *prev)) {
--		if (rq->q == this_q) {
--			/* move rq from rqs to matched_rqs */
--			*prev = rq->rq_next;
--			rq_list_add_tail(&matched_rqs, rq);
--			depth++;
--		} else {
--			/* leave rq in rqs */
--			prev = &rq->rq_next;
--			last = rq;
--		}
--	}
--
--	rqs->tail = last;
--	*queue_rqs = matched_rqs;
--	return depth;
--}
--
--static void blk_mq_dispatch_queue_requests(struct rq_list *rqs, unsigned depth)
-+static void blk_mq_dispatch_queue_requests(struct list_head *rqs,
-+					   unsigned depth)
- {
- 	struct request_queue *q = rq_list_peek(rqs)->q;
- 
-@@ -2869,39 +2840,36 @@ static void blk_mq_dispatch_queue_requests(struct rq_list *rqs, unsigned depth)
- 	 */
- 	if (q->mq_ops->queue_rqs) {
- 		blk_mq_run_dispatch_ops(q, __blk_mq_flush_list(q, rqs));
--		if (rq_list_empty(rqs))
-+		if (list_empty(rqs))
- 			return;
- 	}
- 
- 	blk_mq_run_dispatch_ops(q, blk_mq_issue_direct(rqs));
- }
- 
--static void blk_mq_dispatch_list(struct rq_list *rqs, bool from_sched)
-+static void blk_mq_dispatch_list(struct list_head *rqs, bool from_sched)
- {
- 	struct blk_mq_hw_ctx *this_hctx = NULL;
- 	struct blk_mq_ctx *this_ctx = NULL;
--	struct rq_list requeue_list = {};
-+	LIST_HEAD(requeue_list);
-+	LIST_HEAD(list);
-+	struct request *rq, *n;
- 	unsigned int depth = 0;
- 	bool is_passthrough = false;
--	LIST_HEAD(list);
--
--	do {
--		struct request *rq = rq_list_pop(rqs);
- 
-+	list_for_each_entry_safe(rq, n, rqs, queuelist) {
- 		if (!this_hctx) {
- 			this_hctx = rq->mq_hctx;
- 			this_ctx = rq->mq_ctx;
- 			is_passthrough = blk_rq_is_passthrough(rq);
- 		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx ||
- 			   is_passthrough != blk_rq_is_passthrough(rq)) {
--			rq_list_add_tail(&requeue_list, rq);
- 			continue;
- 		}
--		list_add_tail(&rq->queuelist, &list);
-+		list_move_tail(&rq->queuelist, &list);
- 		depth++;
--	} while (!rq_list_empty(rqs));
-+	}
- 
--	*rqs = requeue_list;
- 	trace_block_unplug(this_hctx->queue, depth, !from_sched);
- 
- 	percpu_ref_get(&this_hctx->queue->q_usage_counter);
-@@ -2921,17 +2889,27 @@ static void blk_mq_dispatch_list(struct rq_list *rqs, bool from_sched)
- 	percpu_ref_put(&this_hctx->queue->q_usage_counter);
- }
- 
--static void blk_mq_dispatch_multiple_queue_requests(struct rq_list *rqs)
-+static void blk_mq_dispatch_multiple_queue_requests(struct list_head *rqs)
- {
- 	do {
--		struct rq_list queue_rqs;
--		unsigned depth;
-+		struct request_queue *this_q = NULL;
-+		struct request *rq, *n;
-+		LIST_HEAD(queue_rqs);
-+		unsigned depth = 0;
-+
-+		list_for_each_entry_safe(rq, n, rqs, queuelist) {
-+			if (!this_q)
-+				this_q = rq->q;
-+			if (this_q == rq->q) {
-+				list_move_tail(&rq->queuelist, &queue_rqs);
-+				depth++;
-+			}
-+		}
- 
--		depth = blk_mq_extract_queue_requests(rqs, &queue_rqs);
- 		blk_mq_dispatch_queue_requests(&queue_rqs, depth);
--		while (!rq_list_empty(&queue_rqs))
-+		while (!list_empty(&queue_rqs))
- 			blk_mq_dispatch_list(&queue_rqs, false);
--	} while (!rq_list_empty(rqs));
-+	} while (!list_empty(rqs));
- }
- 
- void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
-@@ -2955,15 +2933,14 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 			blk_mq_dispatch_multiple_queue_requests(&plug->mq_list);
- 			return;
- 		}
--
- 		blk_mq_dispatch_queue_requests(&plug->mq_list, depth);
--		if (rq_list_empty(&plug->mq_list))
-+		if (list_empty(&plug->mq_list))
- 			return;
- 	}
- 
- 	do {
- 		blk_mq_dispatch_list(&plug->mq_list, from_schedule);
--	} while (!rq_list_empty(&plug->mq_list));
-+	} while (!list_empty(&plug->mq_list));
- }
- 
- static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index affb2e14b56e..1788ff0839c6 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -153,7 +153,7 @@ struct blk_mq_alloc_data {
- 
- 	/* allocate multiple requests/tags in one go */
- 	unsigned int nr_tags;
--	struct rq_list *cached_rqs;
-+	struct list_head *cached_rqs;
- 
- 	/* input & output parameter */
- 	struct blk_mq_ctx *ctx;
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index aa163ae9b2aa..c457e7fd46c5 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1694,10 +1694,10 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--static void null_queue_rqs(struct rq_list *rqlist)
-+static void null_queue_rqs(struct list_head *rqlist)
- {
--	struct rq_list requeue_list = {};
- 	struct blk_mq_queue_data bd = { };
-+	LIST_HEAD(requeue_list);
- 	blk_status_t ret;
- 
- 	do {
-@@ -1706,10 +1706,10 @@ static void null_queue_rqs(struct rq_list *rqlist)
- 		bd.rq = rq;
- 		ret = null_queue_rq(rq->mq_hctx, &bd);
- 		if (ret != BLK_STS_OK)
--			rq_list_add_tail(&requeue_list, rq);
--	} while (!rq_list_empty(rqlist));
-+			list_add_tail(&rq->queuelist, &requeue_list);
-+	} while (!list_empty(rqlist));
- 
--	*rqlist = requeue_list;
-+	list_splice(&requeue_list, rqlist);
- }
- 
- static void null_init_queue(struct nullb *nullb, struct nullb_queue *nq)
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c637ea010d34..73d3164bdddd 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -101,7 +101,7 @@ struct ublk_uring_cmd_pdu {
- 	 */
- 	union {
- 		struct request *req;
--		struct request *req_list;
-+		struct list_head req_list;
- 	};
- 
- 	/*
-@@ -1325,24 +1325,19 @@ static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
--	struct request *rq = pdu->req_list;
--	struct request *next;
-+	struct request *rq;
- 
--	do {
--		next = rq->rq_next;
--		rq->rq_next = NULL;
-+	while ((rq = rq_list_pop(&pdu->req_list)))
- 		ublk_dispatch_req(rq->mq_hctx->driver_data, rq, issue_flags);
--		rq = next;
--	} while (rq);
- }
- 
--static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
-+static void ublk_queue_cmd_list(struct request *req, struct ublk_io *io,
-+		struct list_head *head)
- {
- 	struct io_uring_cmd *cmd = io->cmd;
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
- 
--	pdu->req_list = rq_list_peek(l);
--	rq_list_init(l);
-+	list_cut_before(&pdu->req_list, head, &req->queuelist);
- 	io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
- }
- 
-@@ -1416,30 +1411,27 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--static void ublk_queue_rqs(struct rq_list *rqlist)
-+static void ublk_queue_rqs(struct list_head *rqlist)
- {
--	struct rq_list requeue_list = { };
--	struct rq_list submit_list = { };
- 	struct ublk_io *io = NULL;
--	struct request *req;
-+	struct request *req, *n;
-+	LIST_HEAD(requeue_list);
- 
--	while ((req = rq_list_pop(rqlist))) {
-+	list_for_each_entry_safe(req, n, rqlist, queuelist) {
- 		struct ublk_queue *this_q = req->mq_hctx->driver_data;
- 		struct ublk_io *this_io = &this_q->ios[req->tag];
- 
--		if (io && io->task != this_io->task && !rq_list_empty(&submit_list))
--			ublk_queue_cmd_list(io, &submit_list);
-+		if (io && io->task != this_io->task)
-+			ublk_queue_cmd_list(req, io, rqlist);
- 		io = this_io;
- 
--		if (ublk_prep_req(this_q, req, true) == BLK_STS_OK)
--			rq_list_add_tail(&submit_list, req);
--		else
--			rq_list_add_tail(&requeue_list, req);
-+		if (ublk_prep_req(this_q, req, true) != BLK_STS_OK)
-+			list_move_tail(&req->queuelist, &requeue_list);
- 	}
- 
--	if (!rq_list_empty(&submit_list))
--		ublk_queue_cmd_list(io, &submit_list);
--	*rqlist = requeue_list;
-+	if (!list_empty(rqlist))
-+		ublk_queue_cmd_list(io, rqlist);
-+	list_splice(&requeue_list, rqlist);
- }
- 
- static int ublk_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 30bca8cb7106..7bea94e17817 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -471,7 +471,7 @@ static bool virtblk_prep_rq_batch(struct request *req)
- }
- 
- static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
--		struct rq_list *rqlist)
-+		struct list_head *rqlist)
- {
- 	struct request *req;
- 	unsigned long flags;
-@@ -498,29 +498,30 @@ static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
- 		virtqueue_notify(vq->vq);
- }
- 
--static void virtio_queue_rqs(struct rq_list *rqlist)
-+static void virtio_queue_rqs(struct list_head *rqlist)
- {
--	struct rq_list submit_list = { };
--	struct rq_list requeue_list = { };
- 	struct virtio_blk_vq *vq = NULL;
--	struct request *req;
-+	LIST_HEAD(requeue_list);
-+	struct request *req, *n;
- 
--	while ((req = rq_list_pop(rqlist))) {
-+	list_for_each_entry_safe(req, n, rqlist, queuelist) {
- 		struct virtio_blk_vq *this_vq = get_virtio_blk_vq(req->mq_hctx);
- 
--		if (vq && vq != this_vq)
-+		if (vq && vq != this_vq) {
-+			LIST_HEAD(submit_list);
-+
-+			list_cut_before(&submit_list, rqlist, &req->queuelist);
- 			virtblk_add_req_batch(vq, &submit_list);
-+		}
- 		vq = this_vq;
- 
--		if (virtblk_prep_rq_batch(req))
--			rq_list_add_tail(&submit_list, req);
--		else
--			rq_list_add_tail(&requeue_list, req);
-+		if (!virtblk_prep_rq_batch(req))
-+			list_move_tail(&req->queuelist, &requeue_list);
- 	}
- 
- 	if (vq)
--		virtblk_add_req_batch(vq, &submit_list);
--	*rqlist = requeue_list;
-+		virtblk_add_req_batch(vq, rqlist);
-+	list_splice(&requeue_list, rqlist);
- }
- 
- #ifdef CONFIG_BLK_DEV_ZONED
-@@ -1187,7 +1188,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- {
- 	struct request *req;
- 
--	rq_list_for_each(&iob->req_list, req) {
-+	list_for_each_entry(req, &iob->req_list, queuelist) {
- 		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
- 		virtblk_cleanup_cmd(req);
- 	}
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a468cdc5b5cb..d5a99a73474a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -789,7 +789,7 @@ static __always_inline void nvme_complete_batch(struct io_comp_batch *iob,
- {
- 	struct request *req;
- 
--	rq_list_for_each(&iob->req_list, req) {
-+	list_for_each_entry(req, &iob->req_list, queuelist) {
- 		fn(req);
- 		nvme_complete_batch_req(req);
- 	}
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 8ff12e415cb5..5d34a00512fb 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1051,11 +1051,11 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct rq_list *rqlist)
-+static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct list_head *rqlist)
- {
- 	struct request *req;
- 
--	if (rq_list_empty(rqlist))
-+	if (list_empty(rqlist))
- 		return;
- 
- 	spin_lock(&nvmeq->sq_lock);
-@@ -1082,27 +1082,28 @@ static bool nvme_prep_rq_batch(struct nvme_queue *nvmeq, struct request *req)
- 	return nvme_prep_rq(nvmeq->dev, req) == BLK_STS_OK;
- }
- 
--static void nvme_queue_rqs(struct rq_list *rqlist)
-+static void nvme_queue_rqs(struct list_head *rqlist)
- {
--	struct rq_list submit_list = { };
--	struct rq_list requeue_list = { };
- 	struct nvme_queue *nvmeq = NULL;
--	struct request *req;
-+	LIST_HEAD(requeue_list);
-+	struct request *req, *n;
- 
--	while ((req = rq_list_pop(rqlist))) {
--		if (nvmeq && nvmeq != req->mq_hctx->driver_data)
-+	list_for_each_entry_safe(req, n, rqlist, queuelist) {
-+		if (nvmeq && nvmeq != req->mq_hctx->driver_data) {
-+			LIST_HEAD(submit_list);
-+
-+			list_cut_before(&submit_list, rqlist, &req->queuelist);
- 			nvme_submit_cmds(nvmeq, &submit_list);
-+		}
- 		nvmeq = req->mq_hctx->driver_data;
- 
--		if (nvme_prep_rq_batch(nvmeq, req))
--			rq_list_add_tail(&submit_list, req);
--		else
--			rq_list_add_tail(&requeue_list, req);
-+		if (!nvme_prep_rq_batch(nvmeq, req))
-+			list_move_tail(&req->queuelist, &requeue_list);
- 	}
- 
- 	if (nvmeq)
--		nvme_submit_cmds(nvmeq, &submit_list);
--	*rqlist = requeue_list;
-+		nvme_submit_cmds(nvmeq, rqlist);
-+	list_splice(&requeue_list, rqlist);
- }
- 
- static __always_inline void nvme_unmap_metadata(struct nvme_dev *dev,
-@@ -1245,7 +1246,7 @@ static irqreturn_t nvme_irq(int irq, void *data)
- 	DEFINE_IO_COMP_BATCH(iob);
- 
- 	if (nvme_poll_cq(nvmeq, &iob)) {
--		if (!rq_list_empty(&iob.req_list))
-+		if (!list_empty(&iob.req_list))
- 			nvme_pci_complete_batch(&iob);
- 		return IRQ_HANDLED;
- 	}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index de8c85a03bb7..592e87472229 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -120,10 +120,7 @@ struct request {
- 	struct bio *bio;
- 	struct bio *biotail;
- 
--	union {
--		struct list_head queuelist;
--		struct request *rq_next;
--	};
-+	struct list_head queuelist;
- 
- 	struct block_device *part;
- #ifdef CONFIG_BLK_RQ_ALLOC_TIME
-@@ -230,61 +227,21 @@ static inline unsigned short req_get_ioprio(struct request *req)
- #define rq_dma_dir(rq) \
- 	(op_is_write(req_op(rq)) ? DMA_TO_DEVICE : DMA_FROM_DEVICE)
- 
--static inline int rq_list_empty(const struct rq_list *rl)
--{
--	return rl->head == NULL;
--}
--
--static inline void rq_list_init(struct rq_list *rl)
-+static inline struct request *rq_list_peek(struct list_head *rl)
- {
--	rl->head = NULL;
--	rl->tail = NULL;
-+	return list_first_entry_or_null(rl, struct request, queuelist);
- }
- 
--static inline void rq_list_add_tail(struct rq_list *rl, struct request *rq)
-+static inline struct request *rq_list_pop(struct list_head *rl)
- {
--	rq->rq_next = NULL;
--	if (rl->tail)
--		rl->tail->rq_next = rq;
--	else
--		rl->head = rq;
--	rl->tail = rq;
--}
--
--static inline void rq_list_add_head(struct rq_list *rl, struct request *rq)
--{
--	rq->rq_next = rl->head;
--	rl->head = rq;
--	if (!rl->tail)
--		rl->tail = rq;
--}
--
--static inline struct request *rq_list_pop(struct rq_list *rl)
--{
--	struct request *rq = rl->head;
--
--	if (rq) {
--		rl->head = rl->head->rq_next;
--		if (!rl->head)
--			rl->tail = NULL;
--		rq->rq_next = NULL;
--	}
-+	struct request *rq;
- 
-+	rq = list_first_entry_or_null(rl, struct request, queuelist);
-+	if (rq)
-+		list_del(&rq->queuelist);
- 	return rq;
- }
- 
--static inline struct request *rq_list_peek(struct rq_list *rl)
--{
--	return rl->head;
--}
--
--#define rq_list_for_each(rl, pos)					\
--	for (pos = rq_list_peek((rl)); (pos); pos = pos->rq_next)
--
--#define rq_list_for_each_safe(rl, pos, nxt)				\
--	for (pos = rq_list_peek((rl)), nxt = pos->rq_next;		\
--		pos; pos = nxt, nxt = pos ? pos->rq_next : NULL)
--
- /**
-  * enum blk_eh_timer_return - How the timeout handler should proceed
-  * @BLK_EH_DONE: The block driver completed the command or will complete it at
-@@ -574,7 +531,7 @@ struct blk_mq_ops {
- 	 * empty the @rqlist completely, then the rest will be queued
- 	 * individually by the block layer upon return.
- 	 */
--	void (*queue_rqs)(struct rq_list *rqlist);
-+	void (*queue_rqs)(struct list_head *rqlist);
- 
- 	/**
- 	 * @get_budget: Reserve budget before queue request, once .queue_rq is
-@@ -897,7 +854,7 @@ static inline bool blk_mq_add_to_batch(struct request *req,
- 	else if (iob->complete != complete)
- 		return false;
- 	iob->need_ts |= blk_mq_need_time_stamp(req);
--	rq_list_add_tail(&iob->req_list, req);
-+	list_add_tail(&req->queuelist, &iob->req_list);
- 	return true;
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a59880c809c7..2e9f371b2bf5 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1065,11 +1065,6 @@ extern void blk_put_queue(struct request_queue *);
- 
- void blk_mark_disk_dead(struct gendisk *disk);
- 
--struct rq_list {
--	struct request *head;
--	struct request *tail;
--};
--
- #ifdef CONFIG_BLOCK
- /*
-  * blk_plug permits building a queue of related requests by holding the I/O
-@@ -1083,10 +1078,10 @@ struct rq_list {
-  * blk_flush_plug() is called.
-  */
- struct blk_plug {
--	struct rq_list mq_list; /* blk-mq requests */
-+	struct list_head mq_list; /* blk-mq requests */
- 
- 	/* if ios_left is > 1, we can batch tag/rq allocations */
--	struct rq_list cached_rqs;
-+	struct list_head cached_rqs;
- 	u64 cur_ktime;
- 	unsigned short nr_ios;
- 
-@@ -1762,7 +1757,7 @@ int bdev_thaw(struct block_device *bdev);
- void bdev_fput(struct file *bdev_file);
- 
- struct io_comp_batch {
--	struct rq_list req_list;
-+	struct list_head req_list;
- 	bool need_ts;
- 	void (*complete)(struct io_comp_batch *);
- };
-@@ -1807,6 +1802,9 @@ bdev_atomic_write_unit_max_bytes(struct block_device *bdev)
- 	return queue_atomic_write_unit_max_bytes(bdev_get_queue(bdev));
- }
- 
--#define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
-+#define DEFINE_IO_COMP_BATCH(name)				\
-+struct io_comp_batch name = {					\
-+	.req_list	= LIST_HEAD_INIT((name).req_list),	\
-+}
- 
- #endif /* _LINUX_BLKDEV_H */
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 710d8cd53ebb..e767e08fee4a 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -1344,12 +1344,12 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
- 			poll_flags |= BLK_POLL_ONESHOT;
- 
- 		/* iopoll may have completed current req */
--		if (!rq_list_empty(&iob.req_list) ||
-+		if (!list_empty(&iob.req_list) ||
- 		    READ_ONCE(req->iopoll_completed))
- 			break;
- 	}
- 
--	if (!rq_list_empty(&iob.req_list))
-+	if (!list_empty(&iob.req_list))
- 		iob.complete(&iob);
- 	else if (!pos)
- 		return 0;
--- 
-2.47.2
+________________________________________
+From: Ming Lei <ming.lei@redhat.com>
+Sent: Sunday, June 8, 2025 5:34 PM
+To: Yoav Cohen
+Cc: Jens Axboe; linux-block@vger.kernel.org; Uday Shankar; Caleb Sander Mat=
+eos
+Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+
+External email: Use caution opening links or attachments
+
+
+On Sun, Jun 08, 2025 at 10:20:25AM +0000, Yoav Cohen wrote:
+> Hi Ming,
+>
+> Thank you for the reply.
+> I understand now the requirement for the idle IO but needs your advice.
+> On our case the backing IOPS are going over the network, when switching t=
+o upgrade mode we are shorting the timeout of each IO in order that the app=
+lication will really finish as soon as possible.
+> On this case (until now) we used to prevent COMMIT_AND_FETCH on the IOP/s=
+ that are fail due to timeout to prevent the user for seeing the failed IOP=
+/s only because we are on upgrade mode.
+> Checking the code I don't see how we can do it now as there may be a situ=
+ation where all IOP/s are failed due to it while calling QUIECE_DEV.
+
+If the network IO takes too long, you may provide bigger timeout parameter
+to QUIECE_DEV or even wait forever, and any one of inflight IO is supposed =
+to
+complete during limited time, then QUIECE_DEV can move on.
+
+>
+> I saw that ublk prevent zeroed read but allow zeroed write(__ublk_complet=
+e_rq), is that just for supporting devices with backing file or a real requ=
+irement for every ublk device?
+> Any tips if there is other way to make the kernel retry this commands?
+> Thank you.
+
+Please set UBLK_F_USER_RECOVERY and UBLK_F_USER_RECOVERY_REISSUE which
+won't fail IO during the period, and all should be requeued after device
+is recovered to LIVE after your upgrade is done, and all won't be timed out
+too.
+
+Please check if the two above flags with QUIECE_DEV  work for your case.
+
+Thanks,
+Ming
+
+>
+> ________________________________________
+> From: Ming Lei <ming.lei@redhat.com>
+> Sent: Friday, June 6, 2025 12:54 PM
+> To: Yoav Cohen
+> Cc: Jens Axboe; linux-block@vger.kernel.org; Uday Shankar; Caleb Sander M=
+ateos
+> Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+>
+> External email: Use caution opening links or attachments
+>
+>
+> Hi Yoav,
+>
+> On Thu, Jun 05, 2025 at 12:37:01PM +0000, Yoav Cohen wrote:
+> > Hi Ming,
+> >
+> > Thank you for that.
+> > Can you please clarify this
+> > +/* Wait until each hw queue has at least one idle IO */
+> > what do you exactly wait here? and why it is per io queue?
+> > As I understand if the wait timedout the operation will be canceled.
+>
+> One idle IO means one active io_uring cmd, so we can use this command
+> for notifying ublk server. Otherwise, ublk server may not get chance to
+> know the quiesce action.
+>
+> Because each queue may have standalone task context.
+>
+> The condition should be satisfied easily in any implementation, but pleas=
+e
+> let me if it could be one issue in your ublk server implementation.
+>
+> Big reason is that ublk doesn't have one such admin command for
+> housekeeping.
+>
+> Thanks,
+> Ming
+>
+>
+> >
+> > Thank you
+> >
+> > ________________________________________
+> > From: Ming Lei <ming.lei@redhat.com>
+> > Sent: Thursday, May 22, 2025 7:35 PM
+> > To: Jens Axboe; linux-block@vger.kernel.org
+> > Cc: Uday Shankar; Caleb Sander Mateos; Yoav Cohen; Ming Lei
+> > Subject: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+> >
+> > External email: Use caution opening links or attachments
+> >
+> >
+> > Add feature UBLK_F_QUIESCE, which adds control command `UBLK_U_CMD_QUIE=
+SCE_DEV`
+> > for quiescing device, then device state can become `UBLK_S_DEV_QUIESCED=
+`
+> > or `UBLK_S_DEV_FAIL_IO` finally from ublk_ch_release() with ublk server
+> > cooperation.
+> >
+> > This feature can help to support to upgrade ublk server application by
+> > shutting down ublk server gracefully, meantime keep ublk block device
+> > persistent during the upgrading period.
+> >
+> > The feature is only available for UBLK_F_USER_RECOVERY.
+> >
+> > Suggested-by: Yoav Cohen <yoav@nvidia.com>
+> > Link: https://lore.kernel.org/linux-block/DM4PR12MB632807AB7CDCE77D1E5A=
+B7D0A9B92@DM4PR12MB6328.namprd12.prod.outlook.com/
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c      | 124 +++++++++++++++++++++++++++++++++-
+> >  include/uapi/linux/ublk_cmd.h |  19 ++++++
+> >  2 files changed, 142 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index fbd075807525..6f51072776f1 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -51,6 +51,7 @@
+> >  /* private ioctl command mirror */
+> >  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+> >  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> > +#define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+> >
+> >  #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGIS=
+TER_IO_BUF)
+> >  #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO=
+_BUF)
+> > @@ -67,7 +68,8 @@
+> >                 | UBLK_F_ZONED \
+> >                 | UBLK_F_USER_RECOVERY_FAIL_IO \
+> >                 | UBLK_F_UPDATE_SIZE \
+> > -               | UBLK_F_AUTO_BUF_REG)
+> > +               | UBLK_F_AUTO_BUF_REG \
+> > +               | UBLK_F_QUIESCE)
+> >
+> >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> >                 | UBLK_F_USER_RECOVERY_REISSUE \
+> > @@ -2841,6 +2843,11 @@ static int ublk_ctrl_add_dev(const struct ublksr=
+v_ctrl_cmd *header)
+> >                 return -EINVAL;
+> >         }
+> >
+> > +       if ((info.flags & UBLK_F_QUIESCE) && !(info.flags & UBLK_F_USER=
+_RECOVERY)) {
+> > +               pr_warn("UBLK_F_QUIESCE requires UBLK_F_USER_RECOVERY\n=
+");
+> > +               return -EINVAL;
+> > +       }
+> > +
+> >         /*
+> >          * unprivileged device can't be trusted, but RECOVERY and
+> >          * RECOVERY_REISSUE still may hang error handling, so can't
+> > @@ -3233,6 +3240,117 @@ static void ublk_ctrl_set_size(struct ublk_devi=
+ce *ub, const struct ublksrv_ctrl
+> >         set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
+> >         mutex_unlock(&ub->mutex);
+> >  }
+> > +
+> > +struct count_busy {
+> > +       const struct ublk_queue *ubq;
+> > +       unsigned int nr_busy;
+> > +};
+> > +
+> > +static bool ublk_count_busy_req(struct request *rq, void *data)
+> > +{
+> > +       struct count_busy *idle =3D data;
+> > +
+> > +       if (!blk_mq_request_started(rq) && rq->mq_hctx->driver_data =3D=
+=3D idle->ubq)
+> > +               idle->nr_busy +=3D 1;
+> > +       return true;
+> > +}
+> > +
+> > +/* uring_cmd is guaranteed to be active if the associated request is i=
+dle */
+> > +static bool ubq_has_idle_io(const struct ublk_queue *ubq)
+> > +{
+> > +       struct count_busy data =3D {
+> > +               .ubq =3D ubq,
+> > +       };
+> > +
+> > +       blk_mq_tagset_busy_iter(&ubq->dev->tag_set, ublk_count_busy_req=
+, &data);
+> > +       return data.nr_busy < ubq->q_depth;
+> > +}
+> > +
+> > +/* Wait until each hw queue has at least one idle IO */
+> > +static int ublk_wait_for_idle_io(struct ublk_device *ub,
+> > +                                unsigned int timeout_ms)
+> > +{
+> > +       unsigned int elapsed =3D 0;
+> > +       int ret;
+> > +
+> > +       while (elapsed < timeout_ms && !signal_pending(current)) {
+> > +               unsigned int queues_cancelable =3D 0;
+> > +               int i;
+> > +
+> > +               for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
+> > +                       struct ublk_queue *ubq =3D ublk_get_queue(ub, i=
+);
+> > +
+> > +                       queues_cancelable +=3D !!ubq_has_idle_io(ubq);
+> > +               }
+> > +
+> > +               /*
+> > +                * Each queue needs at least one active command for
+> > +                * notifying ublk server
+> > +                */
+> > +               if (queues_cancelable =3D=3D ub->dev_info.nr_hw_queues)
+> > +                       break;
+> > +
+> > +               msleep(UBLK_REQUEUE_DELAY_MS);
+> > +               elapsed +=3D UBLK_REQUEUE_DELAY_MS;
+> > +       }
+> > +
+> > +       if (signal_pending(current))
+> > +               ret =3D -EINTR;
+> > +       else if (elapsed >=3D timeout_ms)
+> > +               ret =3D -EBUSY;
+> > +       else
+> > +               ret =3D 0;
+> > +
+> > +       return ret;
+> > +}
+> > +
+> > +static int ublk_ctrl_quiesce_dev(struct ublk_device *ub,
+> > +                                const struct ublksrv_ctrl_cmd *header)
+> > +{
+> > +       /* zero means wait forever */
+> > +       u64 timeout_ms =3D header->data[0];
+> > +       struct gendisk *disk;
+> > +       int i, ret =3D -ENODEV;
+> > +
+> > +       if (!(ub->dev_info.flags & UBLK_F_QUIESCE))
+> > +               return -EOPNOTSUPP;
+> > +
+> > +       mutex_lock(&ub->mutex);
+> > +       disk =3D ublk_get_disk(ub);
+> > +       if (!disk)
+> > +               goto unlock;
+> > +       if (ub->dev_info.state =3D=3D UBLK_S_DEV_DEAD)
+> > +               goto put_disk;
+> > +
+> > +       ret =3D 0;
+> > +       /* already in expected state */
+> > +       if (ub->dev_info.state !=3D UBLK_S_DEV_LIVE)
+> > +               goto put_disk;
+> > +
+> > +       /* Mark all queues as canceling */
+> > +       blk_mq_quiesce_queue(disk->queue);
+> > +       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
+> > +               struct ublk_queue *ubq =3D ublk_get_queue(ub, i);
+> > +
+> > +               ubq->canceling =3D true;
+> > +       }
+> > +       blk_mq_unquiesce_queue(disk->queue);
+> > +
+> > +       if (!timeout_ms)
+> > +               timeout_ms =3D UINT_MAX;
+> > +       ret =3D ublk_wait_for_idle_io(ub, timeout_ms);
+> > +
+> > +put_disk:
+> > +       ublk_put_disk(disk);
+> > +unlock:
+> > +       mutex_unlock(&ub->mutex);
+> > +
+> > +       /* Cancel pending uring_cmd */
+> > +       if (!ret)
+> > +               ublk_cancel_dev(ub);
+> > +       return ret;
+> > +}
+> > +
+> >  /*
+> >   * All control commands are sent via /dev/ublk-control, so we have to =
+check
+> >   * the destination device's permission
+> > @@ -3319,6 +3437,7 @@ static int ublk_ctrl_uring_cmd_permission(struct =
+ublk_device *ub,
+> >         case UBLK_CMD_START_USER_RECOVERY:
+> >         case UBLK_CMD_END_USER_RECOVERY:
+> >         case UBLK_CMD_UPDATE_SIZE:
+> > +       case UBLK_CMD_QUIESCE_DEV:
+> >                 mask =3D MAY_READ | MAY_WRITE;
+> >                 break;
+> >         default:
+> > @@ -3414,6 +3533,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cm=
+d *cmd,
+> >                 ublk_ctrl_set_size(ub, header);
+> >                 ret =3D 0;
+> >                 break;
+> > +       case UBLK_CMD_QUIESCE_DEV:
+> > +               ret =3D ublk_ctrl_quiesce_dev(ub, header);
+> > +               break;
+> >         default:
+> >                 ret =3D -EOPNOTSUPP;
+> >                 break;
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cm=
+d.h
+> > index 1c40632cb164..56c7e3fc666f 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -53,6 +53,8 @@
+> >         _IOR('u', 0x14, struct ublksrv_ctrl_cmd)
+> >  #define UBLK_U_CMD_UPDATE_SIZE         \
+> >         _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
+> > +#define UBLK_U_CMD_QUIESCE_DEV         \
+> > +       _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
+> >
+> >  /*
+> >   * 64bits are enough now, and it should be easy to extend in case of
+> > @@ -253,6 +255,23 @@
+> >   */
+> >  #define UBLK_F_AUTO_BUF_REG    (1ULL << 11)
+> >
+> > +/*
+> > + * Control command `UBLK_U_CMD_QUIESCE_DEV` is added for quiescing dev=
+ice,
+> > + * which state can be transitioned to `UBLK_S_DEV_QUIESCED` or
+> > + * `UBLK_S_DEV_FAIL_IO` finally, and it needs ublk server cooperation =
+for
+> > + * handling `UBLK_IO_RES_ABORT` correctly.
+> > + *
+> > + * Typical use case is for supporting to upgrade ublk server applicati=
+on,
+> > + * meantime keep ublk block device persistent during the period.
+> > + *
+> > + * This feature is only available when UBLK_F_USER_RECOVERY is enabled=
+.
+> > + *
+> > + * Note, this command returns -EBUSY in case that all IO commands are =
+being
+> > + * handled by ublk server and not completed in specified time period w=
+hich
+> > + * is passed from the control command parameter.
+> > + */
+> > +#define UBLK_F_QUIESCE         (1ULL << 12)
+> > +
+> >  /* device state */
+> >  #define UBLK_S_DEV_DEAD        0
+> >  #define UBLK_S_DEV_LIVE        1
+> > --
+> > 2.47.0
+> >
+>
+> --
+> Ming
+>
+
+--
+Ming
 
