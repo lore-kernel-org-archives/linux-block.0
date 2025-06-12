@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C73723CEE5;
-	Thu, 12 Jun 2025 13:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BDD248F6F;
+	Thu, 12 Jun 2025 14:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749736223; cv=none; b=adVWEt6VDHMJ7zHCMYbL2crhzEBQaxnnlaIIHSnkv04yVgbhqx9Du613xuyIL+3H9f1qjJV0X5VCaW1b9m82kbwlKuiMRm2aBjw88zfTo3vX82+qAzDm8AKmHwZktS+5ci0al/ifEAKUgb08ywsIRSSnrzcJ4MrFsHR4iAYRjQ4=
+	t=1749737378; cv=none; b=mhHdwozdNnklyT21j7fsB+xdzdoYVayboz5mOZfAG1PCaO75C1xMltZ8wNhXD25unNkFYcVxmaRXiOWTK8Mi+7KmMwmNdlYsiDtIOUqh7CJqClwTR+rXw7haZH2V0Z5MhB1N20PWDp1wjcBVqz86NtAL1sq6Ympj47y03RSzyuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749736223; c=relaxed/simple;
-	bh=oIBpX/GR/d6iEZePAjLKI7DJKIn8Lix1Fu3jd4gxJUI=;
+	s=arc-20240116; t=1749737378; c=relaxed/simple;
+	bh=kdkVV2FGMOSgAFU+V5temNkk1TA2PJJ7nYDpbTdZuw0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dh5a9zO2KQH0x01S6jQBxI8B/vx3yP4XZVZIeBtTJcoBSTCAMJGDM8xkSSAJBYBwgv4OvokiIvfgacaylyal0oU1wRqfSmCjtH92G6Qa0IsLT0fJ0X/KEcfjWVctuoEkyytkSEyJ0QdB1/7lN16WLG5sXP2o++usiUL9eh2qs3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jOr7YQ6X; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=rUxdon4K9at5tkX1A38Pw5Y/ucyRvOpO+UwsHDCc9qwN231OVIopYJgBbn5zPcB0o4nOuMPOPHzFNkP56w+9rzrwHvsY1saGIzbQcuq/Pp0onR0MaBil2axZA4CgUNJMmfPr7rlofxPUxtdYfsI6dHnyp0eomW4rFeMb7oikEyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NHEAoLKC; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jOr7YQ6X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NHEAoLKC"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749736222; x=1781272222;
+  t=1749737377; x=1781273377;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=oIBpX/GR/d6iEZePAjLKI7DJKIn8Lix1Fu3jd4gxJUI=;
-  b=jOr7YQ6Xu6meBOnkcHsYOTgaYzgLUz5d7E4hcD0RyAg4aRbsaRSaqbwq
-   oEBuIEENSyh88d3AEXa9hhFBx2QQs/2u6C501By8XKh8FXwHycOIlZnAJ
-   qovL20/5+LhK88KBwSuODtVPMA1dhHAYvvymU7s2Q/YMnzaKforeuD0dI
-   reOnOy3U5/0FSh5XBuaKNyU10daToqwW3t1kGBsZFOvMzNK74gIE3q/mu
-   b5M9BZ0RgynhyV2hA8LAJ9LDlZh5bmDL6II6AruIyDEs5fCSb5r45g1Zg
-   5ZlMFv1gZI1AHdI/z/ou2XxbPO/G4b1Hos1ywr4hoLKKf72G9m7mDJ4TG
-   Q==;
-X-CSE-ConnectionGUID: kxVvOc5DQfyPNhzEpc9oLw==
-X-CSE-MsgGUID: QDT2E+GwSkSHkw4XMUjtRw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="54544796"
+  bh=kdkVV2FGMOSgAFU+V5temNkk1TA2PJJ7nYDpbTdZuw0=;
+  b=NHEAoLKCY9eMbMvyrktQa8LtOyOKRk3cTGfMPIEQVsCOGHkpGbvz/AFF
+   0+K7PNi5EfrojbqPuUM3ERhTiZ6Zyeg/LGYJi860qyepFv8SGTHGyfDqk
+   VKIIT8Z7jiMLjCcZ5H2aPgYwz/HKEK4bf4YVSi4ePlYPD1QsaDAPFwjmK
+   VNwx0Z7uaYg76az624aJNkD4oNVDtCxGfYgS6TqHzjy6v7LswAtsX79W4
+   WVLw30UwrvhS2sLyRXROXOKKe5wNx3IkX0GBcA74DHCFFzDIVFghkGLFm
+   EyN7/Spb0t7PXMlTZUMD+Ny/FlPp4URjnjz+2Nv+RAmyUleWoqqDdoKYj
+   g==;
+X-CSE-ConnectionGUID: sbxAvL3LQxSUW1rVkvb5kA==
+X-CSE-MsgGUID: T09uEs14R3Cywqb4Zkpe3g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="77323439"
 X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="54544796"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 06:50:10 -0700
-X-CSE-ConnectionGUID: IsYavwqjREqHO9+0j/jeVw==
-X-CSE-MsgGUID: fo/ynzeLQK2Ge2thxGeyEQ==
+   d="scan'208";a="77323439"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 07:09:35 -0700
+X-CSE-ConnectionGUID: uXkU0nvlR9yZhAhwkLy+EA==
+X-CSE-MsgGUID: b77Tdni3R3i8puDUUZrwVQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="148019040"
+   d="scan'208";a="148086031"
 Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.111.188]) ([10.125.111.188])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 06:50:08 -0700
-Message-ID: <30a3048f-efbe-4999-a051-d48056bafe0b@intel.com>
-Date: Thu, 12 Jun 2025 06:50:07 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 07:09:35 -0700
+Message-ID: <e3075e27-93d2-4a11-a174-f05a7497870e@intel.com>
+Date: Thu, 12 Jun 2025 07:09:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] add STATIC_PMD_ZERO_PAGE config option
+Subject: Re: [PATCH 4/5] mm: add mm_get_static_huge_zero_folio() routine
 To: Pankaj Raghav <p.raghav@samsung.com>,
  Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
  Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>,
@@ -70,6 +70,7 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
  "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
  gost.dev@samsung.com, kernel@pankajraghav.com, hch@lst.de
 References: <20250612105100.59144-1-p.raghav@samsung.com>
+ <20250612105100.59144-5-p.raghav@samsung.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -115,18 +116,64 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250612105100.59144-1-p.raghav@samsung.com>
+In-Reply-To: <20250612105100.59144-5-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 6/12/25 03:50, Pankaj Raghav wrote:
-> But to use huge_zero_folio, we need to pass a mm struct and the
-> put_folio needs to be called in the destructor. This makes sense for
-> systems that have memory constraints but for bigger servers, it does not
-> matter if the PMD size is reasonable (like in x86).
+> +/*
+> + * mm_get_static_huge_zero_folio - Get a PMD sized zero folio
 
-So, what's the problem with calling a destructor?
+Isn't that a rather inaccurate function name and comment?
 
-In your last patch, surely bio_add_folio() can put the page/folio when
-it's done. Is the real problem that you don't want to call zero page
-specific code at bio teardown?
+The third line of the function literally returns a non-PMD-sized zero folio.
+
+> + * This function will return a PMD sized zero folio if CONFIG_STATIC_PMD_ZERO_PAGE
+> + * is enabled. Otherwise, a ZERO_PAGE folio is returned.
+> + *
+> + * Deduce the size of the folio with folio_size instead of assuming the
+> + * folio size.
+> + */
+> +static inline struct folio *mm_get_static_huge_zero_folio(void)
+> +{
+> +	if(IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
+> +		return READ_ONCE(huge_zero_folio);
+> +	return page_folio(ZERO_PAGE(0));
+> +}
+
+This doesn't tell us very much about when I should use:
+
+	mm_get_static_huge_zero_folio()
+vs.
+	mm_get_huge_zero_folio(mm)
+vs.
+	page_folio(ZERO_PAGE(0))
+
+What's with the "mm_" in the name? Usually "mm" means "mm_struct" not
+Memory Management. It's really weird to prefix something that doesn't
+take an "mm_struct" with "mm_"
+
+Isn't the "get_" also a bad idea since mm_get_huge_zero_folio() does its
+own refcounting but this interface does not?
+
+Shouldn't this be something more along the lines of:
+
+/*
+ * pick_zero_folio() - Pick and return the largest available zero folio
+ *
+ * mm_get_huge_zero_folio() is preferred over this function. It is more
+ * flexible and can provide a larger zero page under wider
+ * circumstances.
+ *
+ * Only use this when there is no mm available.
+ *
+ * ... then other comments
+ */
+static inline struct folio *pick_zero_folio(void)
+{
+	if (IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
+		return READ_ONCE(huge_zero_folio);
+	return page_folio(ZERO_PAGE(0));
+}
+
+Or, maybe even name it _just_: zero_folio()
