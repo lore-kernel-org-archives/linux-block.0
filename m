@@ -1,40 +1,40 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442EB2580E2
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 14:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0A4258CF9
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 14:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749739291; cv=none; b=M74Bxskpxo/Ie8DQw7Uo0yr2R8q2Kxixn0VyyrckNq8BqHhprw2FkNqHZxh8DJQTk7NP1k1psQwsq+aJ0+9zABHVQ34XbuU8CaD4Umcfj52kNCdIT1RALOajTIHFyirGFwNBIiP7IAOY9Nk+3lrus+kAFIVgbC4qEUj6fK9y9rQ=
+	t=1749739380; cv=none; b=Cq+hdog775X6kyyTFglxZqgxZI4f/BexqHbEDqBtRAa9huSEt+Q7bVlwvN5Jj8cuqI6A8QQ+sJtDDruDT+xnfUSMy2727MH2jJEtRhcl7NUDOROBAeV6wyYn4ARblpRuZX3pOgPkIU5rOXDGyxEfJi434t/EN7uC2uMKiRzLZms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749739291; c=relaxed/simple;
-	bh=uNWFJLxGhZdR8etDRqRhag19KxqNtD6WJc2DvNGfTXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TaVVhqSjDBKJdM08kGnicLJuVUSj3k60HDdbUMdPjKV7Pwsc6oa9y7js/hQA0Nc732yhpsObOvSwbQb25Hw129A1WGYZTwZEqx3OwUffn4a3znwEya43cHiMTml/ORsx/w8RKONzrD2KAB/hX1CY6cjZBga2HEyD0Lm8xr77y4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lVIKBl3J; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1749739380; c=relaxed/simple;
+	bh=OtKcJCMIlm0cfrus8AJhVUNnKToTjFAPxcTkRr8MIUo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTIfDim5N8OA+KyD9s2NXqpqC6VfVgDMY7OXcSK/roOUpdMHBktzfljpXOrVN2+WRyEMZ0w5UaO5Zua9u330j/xqWv/sqkbVGfWuFKTlhD7OQzNtsDkJKyTQXARLR3eNqJfE8IsSn7DDrvjQSN/lyOACLTpBGebJrcc7haa+2VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QK9sd3BI; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lVIKBl3J"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QK9sd3BI"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
 	Content-Description:In-Reply-To:References;
-	bh=aWPPrtc/M23XmK4ZHe0j7BG+RUBYT982UIgUQspKsxU=; b=lVIKBl3Jq4gwcoQ49JUnUN+OLg
-	7z0xa0pY0NyqX5fs3bRxDHtQpox5Muo9Fg900Dcxy1sppwBVEaarx9tlZdEF2nBbxlifV4r55fzxS
-	BzHnUvrVBut4YSyzfxPftnppE0oJTyP+TO15vzzvLsAriMQmr+GvY8fo7TdY2kugOLSNNtFPWEdQd
-	lI8T6kUtNKbb8qfs+NqnuOc+honBiuvpz9FJiJXt1p0i+fRxN4OYzEK40wDqssaUC8VGK4MVFArTf
-	rc+3QB1Rw21HDSVTWxWqSw+8JGZGNQwJLvUpNGobMBPe64qhvOeOKZAG4ZLt+SQaxckg6nUPXcOAb
-	JHzo9WUw==;
+	bh=4weoIdCA4ir4aLw1LaB2Ju10UufAmBSl+2YlXa6wuco=; b=QK9sd3BIAIi0CWECOZoxbhPU0u
+	DGFg8VJ4V/Ndm0I+0jfwFK5trZbnkye/RP8c/kjYNJXfdJWAQRtHFvOxCk22i96P7khl1IaZGOGCH
+	mgV4fhhLY7HKPokBLBz0UsFNZtgobEXbXqGrWtjvynC4Y6itzq92tosRqgzVeg4me3/ITRqMD3KHm
+	QQZM3qvPpajLRlLYPQQibjhO9mjhUY2jOJEPrTuvMEG4070sArZJurMNQLF3bOVIvVb5FYqtJ79co
+	NQWKx9eUiwE0kS5u9X+kdwOuV3DahPyQfyDOb76i3m8T8sNTxOmh4guENfZiVdahZl09DJX+4WL8R
+	u1OP79xQ==;
 Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPj7Q-0000000BxPX-1kus;
-	Thu, 12 Jun 2025 14:41:28 +0000
+	id 1uPj8r-0000000BxUR-3Z1M;
+	Thu, 12 Jun 2025 14:42:57 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH] bio: Fix bio_first_folio() for SPARSEMEM without VMEMMAP
-Date: Thu, 12 Jun 2025 15:41:25 +0100
-Message-ID: <20250612144126.2849931-1-willy@infradead.org>
+Subject: [PATCH] block: Fix bvec_set_folio() for very large folios
+Date: Thu, 12 Jun 2025 15:42:53 +0100
+Message-ID: <20250612144255.2850278-1-willy@infradead.org>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -44,30 +44,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It is possible for physically contiguous folios to have discontiguous
-struct pages if SPARSEMEM is enabled and SPARSEMEM_VMEMMAP is not.
-This is correctly handled by folio_page_idx(), so remove this open-coded
-implementation.
+Similarly to 26064d3e2b4d ("block: fix adding folio to bio"), if
+we attempt to add a folio that is larger than 4GB, we'll silently
+truncate the offset and len.  Widen the parameters to size_t, assert
+that the length is less than 4GB and set the first page that contains
+the interesting data rather than the first page of the folio.
 
-Fixes: 640d1930bef4 (block: Add bio_for_each_folio_all())
+Fixes: 26db5ee15851 (block: add a bvec_set_folio helper)
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- include/linux/bio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/bvec.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 9c37c66ef9ca..46ffac5caab7 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -291,7 +291,7 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 204b22a99c4b..0a80e1f9aa20 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -57,9 +57,12 @@ static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
+  * @offset:	offset into the folio
+  */
+ static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
+-		unsigned int len, unsigned int offset)
++		size_t len, size_t offset)
+ {
+-	bvec_set_page(bv, &folio->page, len, offset);
++	unsigned long nr = offset / PAGE_SIZE;
++
++	WARN_ON_ONCE(len > UINT_MAX);
++	bvec_set_page(bv, folio_page(folio, nr), len, offset % PAGE_SIZE);
+ }
  
- 	fi->folio = page_folio(bvec->bv_page);
- 	fi->offset = bvec->bv_offset +
--			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
-+			PAGE_SIZE * folio_page_idx(fi->folio, bvec->bv_page);
- 	fi->_seg_count = bvec->bv_len;
- 	fi->length = min(folio_size(fi->folio) - fi->offset, fi->_seg_count);
- 	fi->_next = folio_next(fi->folio);
+ /**
 -- 
 2.47.2
 
