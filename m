@@ -1,80 +1,105 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0A4258CF9
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 14:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662F0279795;
+	Thu, 12 Jun 2025 15:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749739380; cv=none; b=Cq+hdog775X6kyyTFglxZqgxZI4f/BexqHbEDqBtRAa9huSEt+Q7bVlwvN5Jj8cuqI6A8QQ+sJtDDruDT+xnfUSMy2727MH2jJEtRhcl7NUDOROBAeV6wyYn4ARblpRuZX3pOgPkIU5rOXDGyxEfJi434t/EN7uC2uMKiRzLZms=
+	t=1749740628; cv=none; b=WzfBwLkBLUuOb5Vzqax3mCt1WPq+AHFtgQ5jAPtGv+/DbBveZXLvoarIOr5IghKmsUU4VxEtzdD8/kUeVokcX6IDnaqnQaG3mH39Jk81WmiLc3cI4F97Goe1QshcNJRKg6Ku1ghl185An1MbBBEta9/kSbM6F2hsRLZ3rD92NIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749739380; c=relaxed/simple;
-	bh=OtKcJCMIlm0cfrus8AJhVUNnKToTjFAPxcTkRr8MIUo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTIfDim5N8OA+KyD9s2NXqpqC6VfVgDMY7OXcSK/roOUpdMHBktzfljpXOrVN2+WRyEMZ0w5UaO5Zua9u330j/xqWv/sqkbVGfWuFKTlhD7OQzNtsDkJKyTQXARLR3eNqJfE8IsSn7DDrvjQSN/lyOACLTpBGebJrcc7haa+2VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QK9sd3BI; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1749740628; c=relaxed/simple;
+	bh=ONyFbl7eR0QXU3CRaThaUkea18g1Bd2HJqzSu8H2F5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nVwdg6vIKF1xXsMiRSIRaSzB79GN8FbI2279dR5cLXr4bZVv0UIU/i789xnTwkcMjU6ud8IPiiocrIjnabH8BvyyuiQf5hjjvmx+ygS6MpJYiWjKjyvJ5fBBg7+m5lQglVPKeM+ZPG43Lsnk4v8F6rpnFGFU46wxjIHEWRM3IUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m74s/H9b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QK9sd3BI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=4weoIdCA4ir4aLw1LaB2Ju10UufAmBSl+2YlXa6wuco=; b=QK9sd3BIAIi0CWECOZoxbhPU0u
-	DGFg8VJ4V/Ndm0I+0jfwFK5trZbnkye/RP8c/kjYNJXfdJWAQRtHFvOxCk22i96P7khl1IaZGOGCH
-	mgV4fhhLY7HKPokBLBz0UsFNZtgobEXbXqGrWtjvynC4Y6itzq92tosRqgzVeg4me3/ITRqMD3KHm
-	QQZM3qvPpajLRlLYPQQibjhO9mjhUY2jOJEPrTuvMEG4070sArZJurMNQLF3bOVIvVb5FYqtJ79co
-	NQWKx9eUiwE0kS5u9X+kdwOuV3DahPyQfyDOb76i3m8T8sNTxOmh4guENfZiVdahZl09DJX+4WL8R
-	u1OP79xQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPj8r-0000000BxUR-3Z1M;
-	Thu, 12 Jun 2025 14:42:57 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: Fix bvec_set_folio() for very large folios
-Date: Thu, 12 Jun 2025 15:42:53 +0100
-Message-ID: <20250612144255.2850278-1-willy@infradead.org>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m74s/H9b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C65BDC4CEEB;
+	Thu, 12 Jun 2025 15:03:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749740627;
+	bh=ONyFbl7eR0QXU3CRaThaUkea18g1Bd2HJqzSu8H2F5E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m74s/H9bViol79YmIelbep7cXyzEw47hdktzg1MN6vCsg0S24VQ/KqSDwpigubKeE
+	 i41PpwJYbao8dKkGyE2Qqe80rDBt1KLstr08lFXyM7NrBpY5+1GLMitIsyHPH9pCI1
+	 RYqA94+q4srgJ820hmzPT2j5D4utw51hYyphDzfmQ9/qugstzZiKxhOn3D8GrAvQ8j
+	 X4Jo/C2BGR8LyZw47KY7cK2I3lFCTccQP4dr8up2k8RWnzpbNifNYM9Yn3+F7UHZR0
+	 qapgcqmD42kiSJv9F9eFn76HvvhT8koJ4G37SFjrSwz0usnG0i9ighP1aKYvjTYnul
+	 8U9pYzGL/Kbhg==
+Date: Thu, 12 Jun 2025 08:03:47 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tytso@mit.edu,
+	john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
+	shinichiro.kawasaki@wdc.com, brauner@kernel.org,
+	martin.petersen@oracle.com, yi.zhang@huawei.com,
+	chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH 01/10] block: introduce BLK_FEAT_WRITE_ZEROES_UNMAP to
+ queue limits features
+Message-ID: <20250612150347.GK6138@frogsfrogsfrogs>
+References: <20250604020850.1304633-1-yi.zhang@huaweicloud.com>
+ <20250604020850.1304633-2-yi.zhang@huaweicloud.com>
+ <20250611060900.GA4613@lst.de>
+ <343f7f06-9bf6-442f-8e77-0a774203ec3f@huaweicloud.com>
+ <20250612044744.GA12828@lst.de>
+ <41c21e20-5439-4157-ad73-6f133df42d28@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <41c21e20-5439-4157-ad73-6f133df42d28@huaweicloud.com>
 
-Similarly to 26064d3e2b4d ("block: fix adding folio to bio"), if
-we attempt to add a folio that is larger than 4GB, we'll silently
-truncate the offset and len.  Widen the parameters to size_t, assert
-that the length is less than 4GB and set the first page that contains
-the interesting data rather than the first page of the folio.
+On Thu, Jun 12, 2025 at 07:20:45PM +0800, Zhang Yi wrote:
+> On 2025/6/12 12:47, Christoph Hellwig wrote:
+> > On Wed, Jun 11, 2025 at 03:31:21PM +0800, Zhang Yi wrote:
+> >>>> +/* supports unmap write zeroes command */
+> >>>> +#define BLK_FEAT_WRITE_ZEROES_UNMAP	((__force blk_features_t)(1u << 17))
+> >>>
+> >>>
+> >>> Should this be exposed through sysfs as a read-only value?
+> >>
+> >> Uh, are you suggesting adding another sysfs interface to expose
+> >> this feature?
+> > 
+> > That was the idea.  Or do we have another way to report this capability?
+> > 
+> 
+> Exposing this feature looks useful, but I think adding a new interface
+> might be somewhat redundant, and it's also difficult to name the new
+> interface. What about extend this interface to include 3 types? When
+> read, it exposes the following:
+> 
+>  - none     : the device doesn't support BLK_FEAT_WRITE_ZEROES_UNMAP.
+>  - enabled  : the device supports BLK_FEAT_WRITE_ZEROES_UNMAP, but the
+>               BLK_FLAG_WRITE_ZEROES_UNMAP_DISABLED is not set.
+>  - disabled : the device supports BLK_FEAT_WRITE_ZEROES_UNMAP, and the
+>               BLK_FLAG_WRITE_ZEROES_UNMAP_DISABLED is set.
+> 
+> Users can write '0' and '1' to disable and enable this operation if it
+> is not 'none', thoughts?
 
-Fixes: 26db5ee15851 (block: add a bvec_set_folio helper)
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/bvec.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Perhaps it should reuse the enumeration pattern elsewhere in sysfs?
+For example,
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 204b22a99c4b..0a80e1f9aa20 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -57,9 +57,12 @@ static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
-  * @offset:	offset into the folio
-  */
- static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
--		unsigned int len, unsigned int offset)
-+		size_t len, size_t offset)
- {
--	bvec_set_page(bv, &folio->page, len, offset);
-+	unsigned long nr = offset / PAGE_SIZE;
-+
-+	WARN_ON_ONCE(len > UINT_MAX);
-+	bvec_set_page(bv, folio_page(folio, nr), len, offset % PAGE_SIZE);
- }
- 
- /**
--- 
-2.47.2
+# cat /sys/block/sda/queue/scheduler
+none [mq-deadline]
+# echo none > /sys/block/sda/queue/scheduler
+# cat /sys/block/sda/queue/scheduler
+[none] mq-deadline
 
+(Annoying that this seems to be opencoded wherever it appears...)
+
+--D
+
+> Best regards,
+> Yi.
+> 
+> 
