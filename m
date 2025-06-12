@@ -1,59 +1,63 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3861AAA1F
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 05:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB2E8F40
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 05:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749704507; cv=none; b=rgPUQt3UQ8vA8nkwFyNM6ybsXOqG2bg8IXrUC1Tbe2U46gRze7kGBhkW95k0TDQJ5FW9CKd8TZ3vHkZ3lx2NWK7gP+IMr3RmBs2DhkGZNUbCC90QqqfNUBzcRHxGGtVdzmWOOd02DgkkrEMTkB7zGaQQO2+f2YrSrVXS4nrxlFs=
+	t=1749704582; cv=none; b=Bei9NEbJlnhytgqcwGF3bwSbf75fMpNRGAG4ts0LlMhPtdjLRUTXiDcix6z1LxA+ySNjF5gYGLAwf/vRTZIJMD15dvU7MTcmPYWQ3ThjSuxdkwIqtJStdjaf0oykam+rbfX32OlE2KAbGNiVB71UFMAcrF1hpbcsNSHt46QlLrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749704507; c=relaxed/simple;
-	bh=S8J2nDkYUvkKi2BljjzOowstaQ1me8TK4eKM0k1SMvY=;
+	s=arc-20240116; t=1749704582; c=relaxed/simple;
+	bh=xMxsZI7Rml5sONJtu1vxFszxdHNgRJ8SPZ+TXz1dg6c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVAsc8p+fIyp109oMFI6QlBxJmLp/Zbosqbi990gRuUCQZFS20iO3quYZH4e1Jk+Ikl+JKqOLsCgdCF4OS6FbSD17/DVMBJbPeZEIOL3V5LW6yyuMofB2iYRr/fkfRoGioWckmQBWCk+5acHaUKgaBuiXKuHpTQE83QEi2YuoEY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=G1f3ILWR1+1cV0s8uDfpUwmi91Lv46oe4OJU7Du92PRAtXXzpo3pvwRidk2HDP9xbJjOGP45usf+JFh5D0rdcLdfz0GTM+AcM0p1dtZmO0cVovZNBVbr2yM1f050w1ciLdpSSMwBgD7nJThWOeRmlS2al0BVDa5jeYd8Mt8W9EY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id BDD2868D09; Thu, 12 Jun 2025 07:01:42 +0200 (CEST)
-Date: Thu, 12 Jun 2025 07:01:42 +0200
+	id 27A4E68D09; Thu, 12 Jun 2025 07:02:57 +0200 (CEST)
+Date: Thu, 12 Jun 2025 07:02:56 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
+To: Daniel Gomez <da.gomez@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	Leon Romanovsky <leon@kernel.org>,
 	Nitesh Shetty <nj.shetty@samsung.com>,
 	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 5/9] nvme-pci: merge the simple PRP and SGL setup into
- a common helper
-Message-ID: <20250612050142.GG12863@lst.de>
-References: <20250610050713.2046316-1-hch@lst.de> <20250610050713.2046316-6-hch@lst.de> <aEnvJ6V3F0Z_pO1U@kbusch-mbp>
+Subject: Re: [PATCH 7/9] nvme-pci: convert the data mapping blk_rq_dma_map
+Message-ID: <20250612050256.GH12863@lst.de>
+References: <20250610050713.2046316-1-hch@lst.de> <20250610050713.2046316-8-hch@lst.de> <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aEnvJ6V3F0Z_pO1U@kbusch-mbp>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jun 11, 2025 at 03:03:35PM -0600, Keith Busch wrote:
-> On Tue, Jun 10, 2025 at 07:06:43AM +0200, Christoph Hellwig wrote:
-> > -	iod->dma_len = bv->bv_len;
-> > +		iod->cmd.common.dptr.prp1 = cpu_to_le64(dma_addr);
-> > +		iod->cmd.common.dptr.prp2 = 0;
-> > +		if (bv.bv_len > first_prp_len)
-> > +			iod->cmd.common.dptr.prp2 =
-> > +				cpu_to_le64(dma_addr + first_prp_len);
+On Wed, Jun 11, 2025 at 02:15:10PM +0200, Daniel Gomez wrote:
+> >  #define NVME_MAX_SEGS \
+> > -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
+> > -	    (PAGE_SIZE / sizeof(struct scatterlist)))
+> > +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
 > 
-> Nit, set prp2 to 0 in an 'else' case instead of unconditionally before
-> overwriting it?
+> The 8 MiB max transfer size is only reachable if host segments are at least 32k.
+> But I think this limitation is only on the SGL side, right?
 
-unconditionally setting it actually generates slightly better code,
-assuming the compiler won't just optimize the other form to it anyway.
-But if you think it is more readable I can change it around.
+Yes, PRPs don't really have the concept of segments to start with.
+
+> Adding support to
+> multiple SGL segments should allow us to increase this limit 256 -> 2048.
+> 
+> Is this correct?
+
+Yes.  Note that plenty of hardware doesn't really like chained SGLs too
+much and you might get performance degradation.
+
