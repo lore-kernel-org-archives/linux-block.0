@@ -1,33 +1,33 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF12824C07F;
-	Thu, 12 Jun 2025 14:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF353248888;
+	Thu, 12 Jun 2025 14:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749738905; cv=none; b=EwNmbaP2V4/7DDwwyYa1If66F0a71jS/vnjwbCfKRrPmdTAMNCED1Hwppr9CJX4xiWO3+/uPHdmE6X1zGzZZX6NnfdYp4PQNjWBvJQ4nzIktmjLu2bM2lKTESsNasha3b2Pc8z2loJm2W3jbUUyjuh0zZwxvo2S1UfOztWeZIl0=
+	t=1749738908; cv=none; b=FgYIE/azWgp1oc7gGXNYd7CeXdV1vMqE5TMacHxv4cmRbrEvuHMRI05FtqyTjVQ0YXVaxL+TCKCiF0ZjqhCbiBqdekqmiuWXaL3qpHNWgMUOyNpFB1ErGtMFlH4Z7Ci6vkKLskHx5z8/B8ujnInZSTRaZqB7/jXJE0KsyqAbJkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749738905; c=relaxed/simple;
-	bh=/wBPfTYhsR8bD++3AMho+FO72wFGN9A4d4VwwUOtXvQ=;
+	s=arc-20240116; t=1749738908; c=relaxed/simple;
+	bh=gRQfVCY9GjMwU+ZM5yJJd7a/2FGxatoteh4ZgkNoh80=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GpwTpgGXIxYQkEzhepAJIuMiJpmf4GESy9Rtu8OFnRP+xvDiM+AcUjZsQk8/Adi6OH5jxsmKIUz2O4MvUVY4FuOm8hCGaY0zbcozBAzjcAwUqdPHEDX/tjsSFdBVyrFrA7sIaDvvVtIkP1XZI/EZNtOPqGv2JpM0vSZA+d2URz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MPMcgDdG; arc=none smtp.client-ip=90.155.50.34
+	 MIME-Version; b=DSD7pOKoX4IRN3P8qg19LQ5uRTbt172VfZ9qx/vDj/9XtSzTc7+VhXf5jhJyBo2ra0ZW/Cktia9/3UtQvOBzW8Dy69CqTpXFcFC7L9Hg64yqL74mGgvRk3k9ox7uQhsbLsWZF3DkZFZveIfiKaGhT+c/0mkTZrFzKwnmNc8BHKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J12ndiLq; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MPMcgDdG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J12ndiLq"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=F7O+qEqSWYuJ9K47PPf3wKY8hNXy10Wqu63XI23RWYg=; b=MPMcgDdGzeOByBj5zugTSsssYO
-	u2aAkV/If+T9VkgEZo3NKmGQ8xSmcKqSpSE3vHS6d7J9vXZyD6i0N1QbSs4rAuIYGBm24vkooT8iG
-	P8LuqIWv9Y8gpGM/hXh2Y1/fLJQhtVk4QcPDam4oz5CLb7es79y7fsuJtK6YG7Xy01gBkXLR4GX/m
-	Cyb7cZ/CxmGOoCO0Q01B5HBepgsgpgJG4uNw7gfM3CV+etV3f8DfauPtpLQmpyG45ffskHysmAg9m
-	8rRcrGRVA9EOLH90ArKJE4DTWj1w8unSK8qkrg8ix4I9PZOQIbXD9Vaik0cdvSgGzN3HLeZmQgHFC
-	KFjb/nHA==;
+	bh=Q4ZIiG9hyUUXtN5leWGJRb9X1Nx/fDwxr9B6Ufma5qU=; b=J12ndiLqKqj30Lx29OqyPPB1GZ
+	AXR3xlbD3Nghzjfm/iOsMSh8/0tHv7+7OaTeJ7rVRE2MRB9MOy/KgiXCtgJbyAYaXfFNG0L/hXCns
+	qt1lGA43veMKi+zlzHpjbs27uFdycd+4UJY8DM6EqdTe2qkixwPW09tW2awwa67oGgCw2054aggBH
+	zV6Au25HhLf6xiTS6dfr/F6WgIOIPXdjKjT/4ItHWU8xage0KoLf1Z2KywqbXLUeNosYEekfP8/M3
+	duBjvlFQ6OfJ1KSnGIunN5evrcJsSg7ZHwwbc55R7GIhOI/OJd8FNVZDYY3m+mrVV4gSVfClmmqBO
+	FdfRMemw==;
 Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPj0y-0000000Bwwy-1HXc;
+	id 1uPj0y-0000000BwxE-23mQ;
 	Thu, 12 Jun 2025 14:34:48 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: Andrew Morton <akpm@linux-foundation.org>
@@ -38,9 +38,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-block@vger.kernel.org,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org
-Subject: [PATCH 1/5] bio: Use memzero_page() in bio_truncate()
-Date: Thu, 12 Jun 2025 15:34:37 +0100
-Message-ID: <20250612143443.2848197-2-willy@infradead.org>
+Subject: [PATCH 3/5] direct-io: Use memzero_page()
+Date: Thu, 12 Jun 2025 15:34:39 +0100
+Message-ID: <20250612143443.2848197-4-willy@infradead.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250612143443.2848197-1-willy@infradead.org>
 References: <20250612143443.2848197-1-willy@infradead.org>
@@ -56,29 +56,22 @@ memzero_page() is the new name for zero_user().
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- block/bio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/direct-io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 3c0a558c90f5..ce16c34ec6de 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -653,13 +653,13 @@ static void bio_truncate(struct bio *bio, unsigned new_size)
- 
- 	bio_for_each_segment(bv, bio, iter) {
- 		if (done + bv.bv_len > new_size) {
--			unsigned offset;
-+			size_t offset;
- 
- 			if (!truncated)
- 				offset = new_size - done;
- 			else
- 				offset = 0;
--			zero_user(bv.bv_page, bv.bv_offset + offset,
-+			memzero_page(bv.bv_page, bv.bv_offset + offset,
- 				  bv.bv_len - offset);
- 			truncated = true;
- 		}
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index bbd05f1a2145..111958634def 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -996,7 +996,7 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+ 					dio_unpin_page(dio, page);
+ 					goto out;
+ 				}
+-				zero_user(page, from, 1 << blkbits);
++				memzero_page(page, from, 1 << blkbits);
+ 				sdio->block_in_file++;
+ 				from += 1 << blkbits;
+ 				dio->result += 1 << blkbits;
 -- 
 2.47.2
 
