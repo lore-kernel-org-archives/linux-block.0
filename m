@@ -1,69 +1,86 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6C6183CA6
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D99246778;
+	Thu, 12 Jun 2025 12:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749730982; cv=none; b=MnyBKppzHLJTkvD1xvxW/UJoTeypLBUEjAPHqkIPDnk1ZBJKT6A+1DU4X+liRX8jyxvjc9RHkqxYNISFRoqJBzzi4/2DR0Do6UdI7HoBJeLMpJQo/h+vqj+ZzzsQ0WaCztFM3znTreRm81O9JGFWoI7aeOIdOw1wV7uKIdHAnWQ=
+	t=1749731095; cv=none; b=U+OhtwZxuKuHw43H07qfBU8nCxzGL5wntel45MVf8eTJ5PyBHJkjqRpP4O6IEOTD5SeCqYaDdWQwEMlvfGuKY8UBzQEErN8JhPU5W34TVgZXtabPONIQ2FOewou/OXStaf8KegzWkX53WvTeQhH/zCyKoif4xH1FtDaBM8RQLhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749730982; c=relaxed/simple;
-	bh=R7fiw18KFaC+ydgxJ99RdUFN4AZj6Eiraj7ACYY5yZA=;
+	s=arc-20240116; t=1749731095; c=relaxed/simple;
+	bh=Kh0BauZCv2szn+k+sksxRHBW6YDi8uQ2kLg7HMon5o0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lIv0v8JI2DYQfZfC1VOommWWnfTbPIET5Q+S//VYz6fwqfrAGiEQkj/SKVV46k+uGMD0mKlkm7zxCkzgKbRj3gp5jHcsUBN0CirQnUjSCqP9Zp/n548QiaIEOwFllmq9B2KlBn5itNOtG3voI1oxPM0OmF9OyRXu8qwvGkOCjqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sRgDlUB2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ih3+M7XWEMfZTWdu29RNW1QXzLkjM+jEE+oR3Cr4/YTi7R6FwishdXWtYz+6r4Dif/KU6uOfqyXcGPNIdHDAK+yDALwD20FN+X31wKPQ0K3O5wN/KTg+IjTEsVPaa7i3I+x8Tyw2Caakq0vNCxFa/lGJGs1ILatwob+jcdA6UzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7dmY/19; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sRgDlUB2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=R9iXmNo70wFagHxjbWOlzebsUOjkG7VJgtdusCP+k38=; b=sRgDlUB2nTuSJCTLuvTdbpeefK
-	CgSP/+eSxWrnM1yzv2yFmIRVE9NhhWykyoFUT3YVAb6nwHCtsiV3jJpw4t85Ha5yYYw4qvSpJ6ZWy
-	QMnXfP95V5IWFwYsq/IkWc6jFkhxWyFp2gOtAwGXV10uAwZtXaZZ0CFJKhhDhkRjzn/iR6kv65Zj0
-	iCsoVSsY855gSnGz9wPolKbmRuwTN6wqVmzsmCPS0cNvpK+vHQq1i+lwfwr4MqETu0qp61BH6zPRk
-	qm1RCCQ5nZRoqbF7RedDasX14+3+BhwLXBIUjmLgNWEyvuwQ+9NQ4YRcD8F6jIVgZsVG+AdwnNqBU
-	7tQLdY4A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPgxQ-0000000DF7X-1dX9;
-	Thu, 12 Jun 2025 12:23:00 +0000
-Date: Thu, 12 Jun 2025 05:23:00 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge
- attempt
-Message-ID: <aErGpBWAMPyT2un9@infradead.org>
-References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
- <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com>
- <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
- <aEpkIxvuTWgY5BnO@infradead.org>
- <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
- <aErAYSg6f10p_WJK@infradead.org>
- <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7dmY/19"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC58AC4CEED;
+	Thu, 12 Jun 2025 12:24:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749731094;
+	bh=Kh0BauZCv2szn+k+sksxRHBW6YDi8uQ2kLg7HMon5o0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I7dmY/19DJlvo17pq5dXNQ+0pzFczuG5+XQnYIuz0GcB5ETkA+Sh92Y8773hYgF0q
+	 zVzZagzB1iC1vb2YquNmmVBw9QoBnjOOrO46NdcO8VrsgfXY45ZCeDUOaZ8j+/B0oF
+	 kkdPMgttOWGt+SRz/4F++0nK3msPhau+Q0eNH9I0cZ5SuCbn/w7DQeYP/cE3vf8BlX
+	 56O50FSewropP1rldr/1rWBN8vLprGDLWZpwQwukREFudY1m474VnfY8qZRhX6jQGE
+	 U1mUy4326vP6VBk/BSolCI3BN9lCueNRdexyq3hyd+o5vlVHFBcUlulnR5a3zw0/Rr
+	 FREE8bFhbu75g==
+Date: Thu, 12 Jun 2025 14:24:48 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, 
+	jack@suse.cz, anuj1072538@gmail.com, axboe@kernel.dk, viro@zeniv.linux.org.uk, 
+	martin.petersen@oracle.com, ebiggers@kernel.org, adilger@dilger.ca, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, joshi.k@samsung.com
+Subject: Re: [PATCH for-next v3 2/2] fs: add ioctl to query metadata and
+ protection info capabilities
+Message-ID: <20250612-umfassen-visite-00afcaa151b1@brauner>
+References: <20250610132254.6152-1-anuj20.g@samsung.com>
+ <CGME20250610132317epcas5p442ce20c039224fb691ab0ba03fcb21e7@epcas5p4.samsung.com>
+ <20250610132254.6152-3-anuj20.g@samsung.com>
+ <20250611-saufen-wegfielen-487ca3c70ba6@brauner>
+ <aEpieXeQ-ow3k1ke@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aEpieXeQ-ow3k1ke@infradead.org>
 
-On Thu, Jun 12, 2025 at 06:21:14AM -0600, Jens Axboe wrote:
-> It's certainly going to make the cached handling more expensive, as the
-> doubly linked behavior there is just pointless. Generally LIFO behavior
-> there is preferable. I'd strongly suggest we use the doubly linked side
-> for dispatch, and retain singly linked for cached + completion. If not
-> I'm 100% sure we're going to be revisiting this again down the line, and
-> redo those parts yet again.
+On Wed, Jun 11, 2025 at 10:15:37PM -0700, Christoph Hellwig wrote:
+> On Wed, Jun 11, 2025 at 12:23:00PM +0200, Christian Brauner wrote:
+> > > +struct logical_block_metadata_cap {
+> > > +	__u32	lbmd_flags;
+> > > +	__u16	lbmd_interval;
+> > > +	__u8	lbmd_size;
+> > > +	__u8	lbmd_opaque_size;
+> > > +	__u8	lbmd_opaque_offset;
+> > > +	__u8	lbmd_pi_size;
+> > > +	__u8	lbmd_pi_offset;
+> > > +	__u8	lbmd_guard_tag_type;
+> > > +	__u8	lbmd_app_tag_size;
+> > > +	__u8	lbmd_ref_tag_size;
+> > > +	__u8	lbmd_storage_tag_size;
+> > > +	__u8	lbmd_rsvd[17];
+> > 
+> > Don't do this hard-coded form of extensiblity. ioctl()s are inherently
+> > extensible because they encode the size. Instead of switching on the
+> > full ioctl, switch on the ioctl number. See for example fs/pidfs:
+> 
+> Umm, yes and no.  The size encoding in the ioctl is great.  But having
+> a few fields in a structure that already has flags allows for much
+> easier extensions for small amounts of data.  Without the reserved
+> fields, this structure is 15 bytes long.  So we'll need at least 1
+> do pad to a natural alignment.  I think adding another 16 (aka
+> two u64s) seems pretty reasonable for painless extensions.
 
-Yeah.  For cached requests and completions it might even make sense
-to have a simple fixed size array FIFO buffer..
-
+I'm really against having structures that can't simply grow as needed in
+2025. That has bitten us so often I don't see the point in perpetuating
+this fixed-size stuff especially since userspace is very very used to
+this extensibility by now. And also because you don't have to
+pointlessly copy data you don't need in and out of the kernel on
+principle alone.
