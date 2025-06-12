@@ -1,53 +1,64 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB01135A53
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A981117A303
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749730260; cv=none; b=Whz+jmSLJOasOGlZC6tWH2XfItHpPEjoWTiYpb3p5HqRRYlYM6IvWs/ggUpptkwZxNODfmkfiLzTYjLKMmLYv+T9lha0RvnMRVmGvdtK80MCelj85dDO6IWHBiG8vW1yuMCSHhJ06I97p2DaKToPTeG8JXpgLK6Gdt3I9/h4jQA=
+	t=1749730884; cv=none; b=GeE5hviu6VQzgdavrpCpko6rEACbkPxFqAt8q8GBVL0TRrOQT6LRUnp7uSmhtveuJR36H0AXXXxNXyb4fjOIb06nL8L1jikbaia3zLMM4YC31Yv2qpCUYRvVG06imhEu198Jnu9kIqXNm31PLvH7XMQB86KO97HK7peiCxiKpXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749730260; c=relaxed/simple;
-	bh=Axfrr0aXqPxUQ6jYyD1Wf2MEZpP1zVXhNVYqtLy/mos=;
-	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WLVT+NoK2ctiN9jkSc84wBqGbsHyHAd+4RiCaRU+RGH53gyundG0oOIQ1WcH67NG1xZvc9uBDr7tK/l44GI8eNRRsQcQJI8XM4d4oxQmlG+BiLDvzJqgs9EtFBLUTiPFDWBIZCrN2+c4YcNZvMsDFlNDxaKOLrVkI/4a+bvAGUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=J84lw8fp; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1749730884; c=relaxed/simple;
+	bh=IGlMLqT42xNNOp0ODzwgiqGNc2Hp7U8opvMrVoJgHUQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZwhS2EsKR8+fE43/uikNJFOTZJlYqWYCeroe25xzi92xv1p+whCAJP2jCJuuKyD1WzmDIi8xmJU0KkzACWejg0QfdGHp9+yIYAOwkxUXKoJPmyjpaejqivNKbOt414AxGkgFerGIpuHdB17Hpb1P4RI461d2WNKQlwUR5pMEHAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=satbWaZE; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="J84lw8fp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="satbWaZE"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-86cdb34a56cso28806139f.3
+        for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 05:21:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749730260; x=1781266260;
-  h=message-id:date:mime-version:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=bvlvF4gFIy9Jl6a4i0g++a3bfkzufh8J+DkgLaTweow=;
-  b=J84lw8fpspA3+23JhrdVNbtHSMQbHPr5lGkqcxGGUq6gOKxxZSXWmz++
-   ku+wsxGajXwymCtr7hsYFQ1kLghB16jaIirKRlpgQRLcEOE4BsT4juplb
-   ufuM8Uqq7gjpn8oae08HMKUM5TvbQsbGoVLLxUZgUxfEYQmCC6WrDmeyR
-   oT5T6Oh5bPzlJP78+byY+VMnZzvkJcFdWy+kbSouf3Xv0z66PJ+taqEvi
-   Mg2tDU1Kog//EYMkEp6K/AfBHst+eB/TFkuJ/R41DXKT7fe6mQzBh6S1C
-   D7neMjro1A1jNngtVI4G3xXVBCwRFFTUnVwCNyb4lN95GWkenyrK5dzj+
-   A==;
-X-IronPort-AV: E=Sophos;i="6.16,230,1744070400"; 
-   d="scan'208";a="103430363"
-Subject: Re: [PATCH, RFC] block: always use a list_head for requests
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 12:10:56 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:48232]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.148:2525] with esmtp (Farcaster)
- id 841b79f1-9273-4b1b-9c1d-b425628bbc17; Thu, 12 Jun 2025 12:10:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 841b79f1-9273-4b1b-9c1d-b425628bbc17
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 12 Jun 2025 12:10:53 +0000
-Received: from [10.95.108.147] (10.95.108.147) by
- EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 12 Jun 2025 12:10:53 +0000
-Message-ID: <bd131ac3-df20-4a60-8e3d-926b8509ab85@amazon.com>
-Date: Thu, 12 Jun 2025 13:10:52 +0100
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749730876; x=1750335676; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8bn0cm5WbpLPMdTw6LaFVooR1H1zspygg6frAPenZbI=;
+        b=satbWaZESOvuMcGAV7qyZt9RzwwQXtZNWGm85AGMEuKNnbfCjFMjvXKcYZyE20Ae6H
+         rCdKCDs5ijN7g0XHD3aOo0xke7rnCJKwp0L3jmiOYuBIn0WWOlzFs6GG2WcdoglgsHE5
+         RBh+Hp6rjBT28flDObohQyUCWrdCDyjzOjc5SilIRUJno/cqLOjQqYUnrru7Fbb9HZQC
+         9Anld05NqgrvnEFWz037NpneD+Ad3IRlzJmBpcaZYFQQ1MRSAyh/7iJqwtM3XhsZ1a51
+         qiMo2JOrSGMQjILGDZ8iejlMYKi0Z4OHEs5A6YHq9Hu0kRMQLkMzwUBKqK6FO6EDgOYs
+         HVKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749730876; x=1750335676;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8bn0cm5WbpLPMdTw6LaFVooR1H1zspygg6frAPenZbI=;
+        b=q/1dJ1wyJj84zOOGE3MJwJ5E7M2q9MmecBjZimYt1vLg55ELVkgDdDG0WGy6xbTj+y
+         lWt8DLTbmqmiG8Mx0G1HG8xOGU4Xh4mmq349YXT/LWejcM+A4IyBWqKH7LqGPca/2I7w
+         P2qy2RCF3+mLGK9ubITkERej3+lz3Cx6F3z9Hzph5oEahDhZr14EcONXDBNWqT8Vo7k/
+         +ChouqqOkEfUyuV4VnYhk2QoRAWm+A7jqj2EwyzmBTrrV5iMraImcLkRSHtOrSw8y/nl
+         dF/WrOQeXPADv04FHpnJ3AYtnoqMWEU/VS4zIVZIm3GwFO9nHgMdLqnzbrTTdWZeMYwR
+         n1vg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9sVyzDMIoxBIY8GtKnElzZ3SAGlp3FlK4XGhcu+NIRAADwJ6YaJasYAGJby57qv4oOu51x+Oln3PCKg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2ja/hgdOPRzuBDr9ugtrnfeN84xke3gvO277q/Vrr/SXDMa41
+	FnOtGHXQAfnB8uKh6KGbqyuR13WVxe6clq2uU5XkDNJRmxA8qNw89x9iBtsdxfekzv0=
+X-Gm-Gg: ASbGnctPgG1AZwDRiyNY0W2HLQ5HfpPfS6ls8cEcYeBhZUed9M1JVB4RviTk/Kij+Vs
+	7/syGas0TdNdpCk4a/VJKrSMOFCT8ZULrhnRUvzKYxSNooexq0ZrEWHQs4aJRnlH1w/5CfV6kZ7
+	x6OTakrBKB8h9GUyH7EJ8ry/bA0jBifKMbI/FhT1upt+CehbHbQfOaEBzycc82xcZO03LXPb1YI
+	SDi4M8kmZXp30u/L1yTox6se7DgjYcFyKwuJTVGVXhF07bS92OW4DOQTbK/aUBAjfNAFHVMDZlN
+	MrqcNqoDu0we4CkCJt1THXsTnjEibSkEMntF/vEUWt2FL5A5vrl5luopTPE=
+X-Google-Smtp-Source: AGHT+IFWd8PFlCXIhUBE8jOLJn2I4s19fr9C0+OlX3upvmQMqGdbQR8Zhaz6SqEL7avEGDSYJnCLMQ==
+X-Received: by 2002:a05:6602:3e8b:b0:873:de29:612f with SMTP id ca18e2360f4ac-875c7c7a799mr305325539f.3.1749730875898;
+        Thu, 12 Jun 2025 05:21:15 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-875c7f9d25esm33444939f.45.2025.06.12.05.21.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jun 2025 05:21:15 -0700 (PDT)
+Message-ID: <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
+Date: Thu, 12 Jun 2025 06:21:14 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,53 +66,50 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-CC: <linux-block@vger.kernel.org>, <ming.lei@redhat.com>
-References: <20250612074245.2718371-1-hch@lst.de>
- <ab5bd614-a873-4228-968f-e9086ad1ba38@kernel.dk>
+Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge
+ attempt
+To: Christoph Hellwig <hch@infradead.org>
+Cc: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
+ <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com>
+ <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
+ <aEpkIxvuTWgY5BnO@infradead.org>
+ <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
+ <aErAYSg6f10p_WJK@infradead.org>
 Content-Language: en-US
-From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-In-Reply-To: <ab5bd614-a873-4228-968f-e9086ad1ba38@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aErAYSg6f10p_WJK@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D003EUA002.ant.amazon.com (10.252.50.206) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-On 12/06/2025 12:53, Jens Axboe wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On 6/12/25 1:42 AM, Christoph Hellwig wrote:
->> Turn the remaining lists of requests into the standard doubly linked
->> list.  This removes a lot of hairy list manipulation code and allows
->> east reverse walking of the lists, which will be needed to improve
->> merging.
+On 6/12/25 5:56 AM, Christoph Hellwig wrote:
+> On Thu, Jun 12, 2025 at 05:49:16AM -0600, Jens Axboe wrote:
+>>> Maybe byte the bullet and just make the request lists doubly linked?
+>>> Unlike the bio memory usage for request should not be quite as
+>>> critical.  Right now in my config the las cacheline in struct request
+>>> only has a single 8 byte field anyway, so in practive we won't even
+>>> bloat it.
 >>
->> XXX: the ublk queue_rqs code is pretty much broken here, because
->> it's so different from the other drivers and I don't understand it.
-
-For me this looks like reverting bc490f81731 ("block: change plugging to 
-use a singly linked list") which was mainly to save space and avoid the 
-manipulation overhead for next & prev pointers during list modification.
-
+>> The space isn't a concern, as you found as well. It's the fact that
+>> doubly linked lists suck in terms of needing to touch both prev
+>> and next for removal.
 > 
-> First of all, we're definitely not doing this for 6.16-rc, and secondly
-> it'd need to be properly tested in terms of performance implications as
-> well.
-> 
-> I'm somewhat annoyed that ordered plug lists turned into this, which I
-> already strongly suspected would be the case back then. And doubly so
-> that a really basic performance regression was also caused by that, and
-> then the proposed "fix" is to go further into the "let's slow down the
-> fast path" of code. Yes deleting some code is nice, but let's not
-> pretend that it's free.
-> 
-> --
-> Jens Axboe
+> But is that actually a concern here?  If you look at my patch we can
+> now use the list_cut helper for the queue_rqs submission sorting,
+> and for the actual submission we walk each request anyway (and might
+> get along without removal entirely if we dare to leave the dangling
+> pointers around).  The multi-queue dispatch could probably use the
+> cut as well.  For the cached rqs and completion  we could st?ck to the
+> singly linked list as they don't really mix up with the submission
+> IFF that shows up as an issue there.
 
-I agree this requires some testing to make sure the benefit of having 
-list iteration flexibility actually overcomes the overhead of list 
-manipulation.
+It's certainly going to make the cached handling more expensive, as the
+doubly linked behavior there is just pointless. Generally LIFO behavior
+there is preferable. I'd strongly suggest we use the doubly linked side
+for dispatch, and retain singly linked for cached + completion. If not
+I'm 100% sure we're going to be revisiting this again down the line, and
+redo those parts yet again.
 
-Hazem
+-- 
+Jens Axboe
