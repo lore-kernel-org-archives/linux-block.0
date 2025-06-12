@@ -1,39 +1,39 @@
 Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6925B2D8773;
-	Thu, 12 Jun 2025 20:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE7F2BE7D7;
+	Thu, 12 Jun 2025 20:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749760628; cv=none; b=BIeleUsEaAeyPoC1vDnFOFqSOc5HcWjdHjeB0t/ircDGM68FpW2jDwPXHI+W8NPWJD7muldwNLOojLRG2r1Ub29CAtJXM1QibAKlO0tiqkCp6n1AH65iPFPqPv7A0Hq3SwmZx/lTZkVc6dcFfzbxA6XawlPrnrHU29bVLHQw2jA=
+	t=1749761681; cv=none; b=eo2VR3UYY7fWZmBReEzIbWrDIdm7WG1IGFIQv64vJIL+OtYQzsTs9mbRLBM8S4v5/Kftsi4g6sRnFr2B4Yp8KX7DKBjmbAqcRzku8qSRzVc8lxa8B/FGWA2q8JVwkktZskBGMOxsyoxRB0QF6LWJte0EQ1RXYpdfyB30G6Jgou8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749760628; c=relaxed/simple;
-	bh=9bR2YbjDcKulL5hNBeUJr73babSsUOTOMmhT4wUFqnY=;
+	s=arc-20240116; t=1749761681; c=relaxed/simple;
+	bh=6P5cbaAl8rTt1XMIQMPvx6uTYWL/JwGk967YHx7eCtE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSlbG5l/xpouAIPRlee4lstuHG39DirTs343CmFEuozJMFWxh2xOvWn5izai1RFV25SvSrfWKaBVSXF4oN2TrixGThVdwnpENnS9GKaeoo1CVK8zZr7dUtZjdoZA4V89aX0v/rT3ibNXPo0OS28QVFrKAlNkhY8JPWr0rJfx7gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=R4LaJXdj; arc=none smtp.client-ip=80.241.56.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vs/CBqJ1v03I2VNSiz6JbCPZzhy7y5EYzmxuuBIinJW7tWLgraWXL7DgWJ9YeZ2P1Fne0IiBoi5lMuiDrrwWxtR1f1Qx+6jSa8wtdVA2JOS/H2xBhCdGDy+HcFhjDwDGDn/Z3PfrNFxQwjnKBq01sFgg7ZjJz8wXnwXuDh09aJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=iZwhEzvY; arc=none smtp.client-ip=80.241.56.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="R4LaJXdj"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="iZwhEzvY"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4bJDpk5BGyz9t5Y;
-	Thu, 12 Jun 2025 22:37:02 +0200 (CEST)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4bJFBz4y5Jz9t7n;
+	Thu, 12 Jun 2025 22:54:35 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1749760622;
+	s=MBO0001; t=1749761675;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7Smza2Jc4Jwl4Da5lRMks2Zjvr0wRUWchDcyc8CJiMs=;
-	b=R4LaJXdjSwMzUkY7g817Vq/lRyAaIBH3jcKGIh7tWnoqeown1ttyXDuiZ3nabREK7v9XHw
-	ycPTaxOzRz1qNET38XoBmQrfxk3NzK9NAxaTGLMHjSWjAwvtd7MxSvkbxp1VIOaaMP5DZE
-	Byzvv5fxey/X9IFFTI5HPyGIgiMDIAcg6pfLG52GYWH8NVHJ5bthwJwL9aYMSMQlR/J3IP
-	E30fKoibQSosM97GRjxFsckpEWYAEezBI+osesLhmBdWKdFPoTEVgIg2F2N5eic3cFBHCK
-	4U7HoT/g5YhSxT117sCaYTkH6p15140lyOmGr94ba7fhb+algNv2I1TZ7ZZVfQ==
-Date: Thu, 12 Jun 2025 22:36:48 +0200
+	bh=jMqfz5QP21cfg2NCOI8fXNl9RMD8SNqZRc2zFgJBMAw=;
+	b=iZwhEzvYWF83q7vfuMaVVdkC7ni+BF6LjRTCNacgi7U44mGZxBYd2q/TXF7Ca3rRKYdItU
+	NUgz7qHGRZMfSmTVAKhe3TxmO+Qk05M9l9tGcoW/2QwmlBvVxX64taW30RoE/wW+D11NOM
+	djFNftsO30QF7YJfCkQ/GplV4f4hky6I9UiUH2Z+x1YSc8njtD4/CYqoiGHiakIvAc+dsK
+	wAo6UxQlsBF1xc8KbSmLDnd8QliEucrqrX5UyPsP1s0nN/eW/4vkykI9RDo334phcgRNbq
+	rTXu+RytbxrtPM8jeGB1yOpaJV3cAC0V4C6sFCmQXSnH4w3d8viTGkZ+Mr0R+g==
+Date: Thu, 12 Jun 2025 22:54:28 +0200
 From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
 To: Dave Hansen <dave.hansen@intel.com>
 Cc: Pankaj Raghav <p.raghav@samsung.com>, 
@@ -48,10 +48,11 @@ Cc: Pankaj Raghav <p.raghav@samsung.com>,
 	linux-mm@kvack.org, willy@infradead.org, x86@kernel.org, linux-block@vger.kernel.org, 
 	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
 	gost.dev@samsung.com, hch@lst.de
-Subject: Re: [PATCH 0/5] add STATIC_PMD_ZERO_PAGE config option
-Message-ID: <nsquvkkywghoeloxexlgqman2ks7s6o6isxzvkehaipayaxnth@6er73cdqopmo>
+Subject: Re: [PATCH 4/5] mm: add mm_get_static_huge_zero_folio() routine
+Message-ID: <cglmujb275faqkpqmb75mz4tt5dtruvhntpe5t4qyzjr363qyr@vluzyx4hukap>
 References: <20250612105100.59144-1-p.raghav@samsung.com>
- <30a3048f-efbe-4999-a051-d48056bafe0b@intel.com>
+ <20250612105100.59144-5-p.raghav@samsung.com>
+ <e3075e27-93d2-4a11-a174-f05a7497870e@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,43 +61,80 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30a3048f-efbe-4999-a051-d48056bafe0b@intel.com>
-X-Rspamd-Queue-Id: 4bJDpk5BGyz9t5Y
+In-Reply-To: <e3075e27-93d2-4a11-a174-f05a7497870e@intel.com>
 
-On Thu, Jun 12, 2025 at 06:50:07AM -0700, Dave Hansen wrote:
+On Thu, Jun 12, 2025 at 07:09:34AM -0700, Dave Hansen wrote:
 > On 6/12/25 03:50, Pankaj Raghav wrote:
-> > But to use huge_zero_folio, we need to pass a mm struct and the
-> > put_folio needs to be called in the destructor. This makes sense for
-> > systems that have memory constraints but for bigger servers, it does not
-> > matter if the PMD size is reasonable (like in x86).
+> > +/*
+> > + * mm_get_static_huge_zero_folio - Get a PMD sized zero folio
 > 
-> So, what's the problem with calling a destructor?
+> Isn't that a rather inaccurate function name and comment?
+I agree. I also felt it was not a good name for the function.
+
 > 
-> In your last patch, surely bio_add_folio() can put the page/folio when
-> it's done. Is the real problem that you don't want to call zero page
-> specific code at bio teardown?
+> The third line of the function literally returns a non-PMD-sized zero folio.
+> 
+> > + * This function will return a PMD sized zero folio if CONFIG_STATIC_PMD_ZERO_PAGE
+> > + * is enabled. Otherwise, a ZERO_PAGE folio is returned.
+> > + *
+> > + * Deduce the size of the folio with folio_size instead of assuming the
+> > + * folio size.
+> > + */
+> > +static inline struct folio *mm_get_static_huge_zero_folio(void)
+> > +{
+> > +	if(IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
+> > +		return READ_ONCE(huge_zero_folio);
+> > +	return page_folio(ZERO_PAGE(0));
+> > +}
+> 
+> This doesn't tell us very much about when I should use:
+> 
+> 	mm_get_static_huge_zero_folio()
+> vs.
+> 	mm_get_huge_zero_folio(mm)
+> vs.
+> 	page_folio(ZERO_PAGE(0))
+> 
+> What's with the "mm_" in the name? Usually "mm" means "mm_struct" not
+> Memory Management. It's really weird to prefix something that doesn't
+> take an "mm_struct" with "mm_"
 
-Yeah, it feels like a lot of code on the caller just to use a zero page.
-It would be nice just to have a call similar to ZERO_PAGE() in these
-subsystems where we can have guarantee of getting huge zero page.
+Got it. Actually, I was not aware of this one.
 
-Apart from that, these are the following problems if we use
-mm_get_huge_zero_folio() at the moment:
+> 
+> Isn't the "get_" also a bad idea since mm_get_huge_zero_folio() does its
+> own refcounting but this interface does not?
+> 
 
-- We might end up allocating 512MB PMD on ARM systems with 64k base page
-  size, which is undesirable. With the patch series posted, we will only
-  enable the static huge page for sane architectures and page sizes.
+Agree.
 
-- In the current implementation we always call mm_put_huge_zero_folio()
-  in __mmput()[1]. I am not sure if model will work for all subsystems. For
-  example bio completions can be async, i.e, we might need a reference
-  to the zero page even if the process is no longer alive.
+> Shouldn't this be something more along the lines of:
+> 
+> /*
+>  * pick_zero_folio() - Pick and return the largest available zero folio
+>  *
+>  * mm_get_huge_zero_folio() is preferred over this function. It is more
+>  * flexible and can provide a larger zero page under wider
+>  * circumstances.
+>  *
+>  * Only use this when there is no mm available.
+>  *
+>  * ... then other comments
+>  */
+> static inline struct folio *pick_zero_folio(void)
+> {
+> 	if (IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
+> 		return READ_ONCE(huge_zero_folio);
+> 	return page_folio(ZERO_PAGE(0));
+> }
+> 
+> Or, maybe even name it _just_: zero_folio()
 
-I will try to include these motivations in the cover letter next time.
+I think zero_folio() sounds like a good and straightforward name. In
+most cases it will return a ZERO_PAGE() folio. If
+CONFIG_STATIC_PMD_ZERO_PAGE is enabled, then we return a PMD page.
 
-Thanks
-
-[1] 6fcb52a56ff6 ("thp: reduce usage of huge zero page's atomic counter")
+Thanks for all your comments Dave.
 
 --
 Pankaj
