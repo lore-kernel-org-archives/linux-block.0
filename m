@@ -1,62 +1,53 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FDD20C485
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB01135A53
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749730114; cv=none; b=jeIMeS1FYfQkwQCcaZ4NhyVa5ONzSTaWWAc6y0qG603t8SWmbLVF+T8qkDaJb759aI+UIBf/s7zsyOhoIKHhnkuh7s4ZJ56xw+Sfd81AG5B/KdZvR2JOLRUOIAzRxagpV9ApmXVtKHeXOdBIT7lhkIgvLrxPOOitjZXy7iork9k=
+	t=1749730260; cv=none; b=Whz+jmSLJOasOGlZC6tWH2XfItHpPEjoWTiYpb3p5HqRRYlYM6IvWs/ggUpptkwZxNODfmkfiLzTYjLKMmLYv+T9lha0RvnMRVmGvdtK80MCelj85dDO6IWHBiG8vW1yuMCSHhJ06I97p2DaKToPTeG8JXpgLK6Gdt3I9/h4jQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749730114; c=relaxed/simple;
-	bh=/5hkVOPMuKNYyP5pXqAuGWYICPyX3micXgythDTEnfM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=juDYXEbWcykwN3ZuJVcOaUJudulfusr+Mg9Z/NDKacotnyY+Pt1OcRawHY3AAdXQbOKmu4l3MaCAReQ3kpu15565H4lAYVyp1/kuL9xzObkO/MbhvXu71jISrygXlVJDzae476GRJccumZgDoOql9mIEH2z3sUqrwjKAmnmof8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=b/+EWrU0; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+	s=arc-20240116; t=1749730260; c=relaxed/simple;
+	bh=Axfrr0aXqPxUQ6jYyD1Wf2MEZpP1zVXhNVYqtLy/mos=;
+	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WLVT+NoK2ctiN9jkSc84wBqGbsHyHAd+4RiCaRU+RGH53gyundG0oOIQ1WcH67NG1xZvc9uBDr7tK/l44GI8eNRRsQcQJI8XM4d4oxQmlG+BiLDvzJqgs9EtFBLUTiPFDWBIZCrN2+c4YcNZvMsDFlNDxaKOLrVkI/4a+bvAGUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=J84lw8fp; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="b/+EWrU0"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-874a68f6516so75799739f.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 05:08:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="J84lw8fp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1749730111; x=1750334911; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oiQC+W0yjIGVwcsiN86fhi+gjf0lk8z+cPeuP0rwwk8=;
-        b=b/+EWrU00bjwqoqDBfgmYPWOhkSYPf9t6JvmX8kXLzj1ZrUUYHgzKK7TZc6ZTCIm+u
-         kPgS+I65OIuGFHJxyqvt7BuJ47EADr8r/3NM6rNo0FaA4y1G8LzTtpQ6EGxttSF5B24P
-         /hTX0C/8paMgK9MgwJ57jgm3Pm5KPjA0ypCzA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749730111; x=1750334911;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oiQC+W0yjIGVwcsiN86fhi+gjf0lk8z+cPeuP0rwwk8=;
-        b=ZpGF8XUgUpbc0Vt0+z+IRwVDzFVX2gurHtr5I8QB63b/gMsIQ5LYRcyRDG5FYZvZz2
-         LEDcxUpBae+kmqWcn6dZO4851Ey0gsmVD5DvoO33q6YoAJkl3CNYN7Ui6G0vUJSsfE03
-         8uQGcDkbabuCw15icfyVi9Ai/QVCQQ8ySHY/zmIaWpIn/RvF/cDXroTia+hR+s5xk29h
-         q+zUDiROwu3mUl+gjR4Wg3OKKtNXJMd1HwA1uoL0xmRASmON7MUPCy//gB46vkRihUZL
-         48ZYKJrELksXIXtUjjJnD1aC5EBJTqIe5Zbskz7Ra8gaBfU0ZjPfTFijo4FdWlrdBUHp
-         e6Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRv35BgJZB8oGrvzKjm8yynSlNiCqK0tOezxznM+/uDib9pYCYu/QAanyFYgGPahg3uaQGXRklgZ5MFQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX2yvzM5Mu5oCKjiKF/L8gEGF8asqlucuIVoRf7FbGYnKgaUwQ
-	COBC/xL2TcFGv3cJR2m4OeBvvrtF3X7R9p1PFDYrNlTQFS2L4bk4qigAmZjIkVjU/A==
-X-Gm-Gg: ASbGncvGdY58eQ1M89HtfRJNAJRQbowrFARowMVZ51qIRcj840RJ5HgT0W4UqpDbEAe
-	H0Qwi3y6PnutoeRibE+Ty4wy88IOfwajrWW7xbT2bpNXrkiRbyyeJet/tgUdqa1fWaZODyyF70t
-	TfCz4uz//xqVngHb+161POh1kPU7oRS8uDbEF5P/8Sn3cQLx6jV93GP1nk+PsrqQDIqx+DMAWbE
-	MfPkSc1dNARSGed1LYVES3fA0nhw0tTzmAaKrAx4tFDkUNJReGtnGbKi9flpovHU4tOXAy9MVno
-	O59tx/3MYpSVDB+1rYA8cL93XpLnww2DNG120D8iy1XL7+3PjDty0/EqhFP+ZPQAKj8QI671CmK
-	tL4KhNDa7X/XrCY0cJ/ID
-X-Google-Smtp-Source: AGHT+IFE6LoaIDSTbR2+Z49WPjvrD6HagrivYIZlBUHlPLtFW8Kl3MBn0+M7fl7SQRHeC/DZIkrMcg==
-X-Received: by 2002:a05:6602:3719:b0:864:a3d0:ddef with SMTP id ca18e2360f4ac-875bc410f92mr880203339f.6.1749730111300;
-        Thu, 12 Jun 2025 05:08:31 -0700 (PDT)
-Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-5013b75604esm260578173.8.2025.06.12.05.08.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 05:08:30 -0700 (PDT)
-Message-ID: <28c3f551-c1a2-4bc0-a263-a27576335317@ieee.org>
-Date: Thu, 12 Jun 2025 07:08:28 -0500
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1749730260; x=1781266260;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=bvlvF4gFIy9Jl6a4i0g++a3bfkzufh8J+DkgLaTweow=;
+  b=J84lw8fpspA3+23JhrdVNbtHSMQbHPr5lGkqcxGGUq6gOKxxZSXWmz++
+   ku+wsxGajXwymCtr7hsYFQ1kLghB16jaIirKRlpgQRLcEOE4BsT4juplb
+   ufuM8Uqq7gjpn8oae08HMKUM5TvbQsbGoVLLxUZgUxfEYQmCC6WrDmeyR
+   oT5T6Oh5bPzlJP78+byY+VMnZzvkJcFdWy+kbSouf3Xv0z66PJ+taqEvi
+   Mg2tDU1Kog//EYMkEp6K/AfBHst+eB/TFkuJ/R41DXKT7fe6mQzBh6S1C
+   D7neMjro1A1jNngtVI4G3xXVBCwRFFTUnVwCNyb4lN95GWkenyrK5dzj+
+   A==;
+X-IronPort-AV: E=Sophos;i="6.16,230,1744070400"; 
+   d="scan'208";a="103430363"
+Subject: Re: [PATCH, RFC] block: always use a list_head for requests
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 12:10:56 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:48232]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.148:2525] with esmtp (Farcaster)
+ id 841b79f1-9273-4b1b-9c1d-b425628bbc17; Thu, 12 Jun 2025 12:10:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 841b79f1-9273-4b1b-9c1d-b425628bbc17
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 12 Jun 2025 12:10:53 +0000
+Received: from [10.95.108.147] (10.95.108.147) by
+ EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 12 Jun 2025 12:10:53 +0000
+Message-ID: <bd131ac3-df20-4a60-8e3d-926b8509ab85@amazon.com>
+Date: Thu, 12 Jun 2025 13:10:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,53 +55,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] rbd: convert to use secs_to_jiffies
-To: Yuesong Li <liyuesong@vivo.com>, Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>,
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com
-References: <20250612110705.91353-1-liyuesong@vivo.com>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+CC: <linux-block@vger.kernel.org>, <ming.lei@redhat.com>
+References: <20250612074245.2718371-1-hch@lst.de>
+ <ab5bd614-a873-4228-968f-e9086ad1ba38@kernel.dk>
 Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20250612110705.91353-1-liyuesong@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+In-Reply-To: <ab5bd614-a873-4228-968f-e9086ad1ba38@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D003EUA002.ant.amazon.com (10.252.50.206) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-On 6/12/25 6:07 AM, Yuesong Li wrote:
-> Since secs_to_jiffies()(commit:b35108a51cf7) has been introduced, we can
-> use it to avoid scaling the time to msec.
+On 12/06/2025 12:53, Jens Axboe wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
 > 
-> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
-
-Looks good.
-
-Reviewed-by: Alex Elder <elder@riscstar.com>
-
-> ---
->   drivers/block/rbd.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index faafd7ff43d6..92d04a60718f 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -4162,7 +4162,7 @@ static void rbd_acquire_lock(struct work_struct *work)
->   		dout("%s rbd_dev %p requeuing lock_dwork\n", __func__,
->   		     rbd_dev);
->   		mod_delayed_work(rbd_dev->task_wq, &rbd_dev->lock_dwork,
-> -		    msecs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT * MSEC_PER_SEC));
-> +		    secs_to_jiffies(2 * RBD_NOTIFY_TIMEOUT));
->   	}
->   }
->   
-> @@ -6285,7 +6285,7 @@ static int rbd_parse_param(struct fs_parameter *param,
->   		/* 0 is "wait forever" (i.e. infinite timeout) */
->   		if (result.uint_32 > INT_MAX / 1000)
->   			goto out_of_range;
-> -		opt->lock_timeout = msecs_to_jiffies(result.uint_32 * 1000);
-> +		opt->lock_timeout = secs_to_jiffies(result.uint_32);
->   		break;
->   	case Opt_pool_ns:
->   		kfree(pctx->spec->pool_ns);
+> 
+> On 6/12/25 1:42 AM, Christoph Hellwig wrote:
+>> Turn the remaining lists of requests into the standard doubly linked
+>> list.  This removes a lot of hairy list manipulation code and allows
+>> east reverse walking of the lists, which will be needed to improve
+>> merging.
+>>
+>> XXX: the ublk queue_rqs code is pretty much broken here, because
+>> it's so different from the other drivers and I don't understand it.
 
+For me this looks like reverting bc490f81731 ("block: change plugging to 
+use a singly linked list") which was mainly to save space and avoid the 
+manipulation overhead for next & prev pointers during list modification.
+
+> 
+> First of all, we're definitely not doing this for 6.16-rc, and secondly
+> it'd need to be properly tested in terms of performance implications as
+> well.
+> 
+> I'm somewhat annoyed that ordered plug lists turned into this, which I
+> already strongly suspected would be the case back then. And doubly so
+> that a really basic performance regression was also caused by that, and
+> then the proposed "fix" is to go further into the "let's slow down the
+> fast path" of code. Yes deleting some code is nice, but let's not
+> pretend that it's free.
+> 
+> --
+> Jens Axboe
+
+I agree this requires some testing to make sure the benefit of having 
+list iteration flexibility actually overcomes the overhead of list 
+manipulation.
+
+Hazem
