@@ -1,253 +1,227 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495DE221DA8
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 16:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749747468; cv=none; b=snE33WIkPpZWE1jEdzTY8Uq/AHRR2nQ2CU2T0jVkjFCIUCNxsYDlUcUk80+jEzi9sCJgatAA08LBr220x6AIVImGCu7SSwFJIXwauDJl7r9lO94sOPrW7MbV3dZNHHe3L5Dr//Jgwf/2yI+RSRPbouJ7mHNksax8USVwpl3Rmo8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749747468; c=relaxed/simple;
-	bh=QSG7D5Ee+lqB7uIngTksC2+r3e40S16X7xs0+Vyolpw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=fuyH6EoLLbqrRDLsF3xBhbTMaSVu+n2jWeN1iuu6AjNDZjA+z3fM8Oj+OHbtcZP3112xBTU45xI3+12EROfCcRcKk0BZQJlyXZWLwHFgi3kzKpCQbhrr0mQaT2JlbfdsPQ4Qv5Wy+m5b45F25+dvjV4JkBca+qQ+bDJ2rE2shvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P3C/SMzG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CDF2F4309;
+	Thu, 12 Jun 2025 19:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.156.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749756993; cv=fail; b=jzVRl322ZDCIqjOfkSeyE8dAZqkelM5v9Q92BdMVdCzq9irxgEbwjfasyVCZ7CwZL/I1AjGwNAB3eLoeMCYOFl40y55RtYXDddoBq/lUt5oH4DMhe0ko/d6IrBUsWbycBcCDlIzLn8wPKNod9AHLSv9+sO8ntGLfj/hMooPrQ/E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749756993; c=relaxed/simple;
+	bh=TBDmbU6yz1c/A/pAf2+NpcXcKA0nCwyKsIT7Njq2TNM=;
+	h=From:To:CC:Date:Message-ID:References:In-Reply-To:Content-Type:
+	 MIME-Version:Subject; b=DNDHl2+xNh1Catqux6GGsJa8GlY63fpniw+fxqXwD8fyf5J5idV5e1VQMRM9C18+gyc//INYznJUH2Q9J1oe8mrQXGzcZHZx3/V4LSjSxRzMUrHjVdjdFtaMw6WmYaHkGJzxPB8MtAJlg4kw68skSPZZpizHDv1hyqkI2b2m2KY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ibm.com; spf=pass smtp.mailfrom=ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y+stGjDR; arc=fail smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3C/SMzG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749747465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O8RJTG+npCgJlg7Z/HdtOQxD67RTMJOSk9i98l6Xl/c=;
-	b=P3C/SMzG0FJzjheccJ8mGya0V95OdPIZ985F/Ty2h2JWWlvZXdT5Qr0Xy9bks22P2FlHHd
-	0BDsQ/1OeHVfoFx/oT+KPL0ojSIat/r8hcQtcNP8fJLD04p6f2m8+xH9lNXRFih5S7G+Vz
-	LouBi6dOTctR9bs2VhEyI9QrA7/RElM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-670-OAXpt8UsPryVjKMYBUTIOA-1; Thu,
- 12 Jun 2025 12:57:40 -0400
-X-MC-Unique: OAXpt8UsPryVjKMYBUTIOA-1
-X-Mimecast-MFC-AGG-ID: OAXpt8UsPryVjKMYBUTIOA_1749747458
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 528EF19560B3;
-	Thu, 12 Jun 2025 16:57:37 +0000 (UTC)
-Received: from [10.22.80.249] (unknown [10.22.80.249])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2875E180045C;
-	Thu, 12 Jun 2025 16:57:31 +0000 (UTC)
-Date: Thu, 12 Jun 2025 18:57:26 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Dongsheng Yang <dongsheng.yang@linux.dev>
-cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de, 
-    dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com, 
-    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, 
-    dm-devel@lists.linux.dev
-Subject: =?UTF-8?Q?Re=3A_=5BRFC_v2_00=2F11=5D_dm-pcache_=E2=80=93_pers?=
- =?UTF-8?Q?istent-memory_cache_for_block_devices?=
-In-Reply-To: <20250605142306.1930831-1-dongsheng.yang@linux.dev>
-Message-ID: <dc019764-5128-526e-d8ea-effa78e37b39@redhat.com>
-References: <20250605142306.1930831-1-dongsheng.yang@linux.dev>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y+stGjDR"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55CBGvgI000783;
+	Thu, 12 Jun 2025 19:36:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	pp1; bh=TBDmbU6yz1c/A/pAf2+NpcXcKA0nCwyKsIT7Njq2TNM=; b=Y+stGjDR
+	x99DBh+5XGBA3zmbzl0l9y2DbSGI2Eke5TLdUYs/96Z7ge/1KjoQynI7fnpNYuHI
+	eNy7HDSJGDeAvqniObYQsj7aO41oASQnQrkubve+jfjVd9S1zAnkdazKXrpAyPpm
+	bEOGS8QnkvvHPRMVV63D83fJBJqEJIlQt4+eQaR2PLD00WzCYlALtLpXoPyG0xCv
+	+Kr7F9Anads+1+0ECEskQFy+uZQvEBTnn9vdGkBqrP3b55eZIaIXfa6Ny/mQpDDT
+	GAPzDCNefPfLyuayf1r6w34eIYgcY4cCx7OuopFED1DiBr2F6zgF9a1KypP6a5CQ
+	um6m2OT+Dk/Lqw==
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4769x01kyu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Jun 2025 19:36:14 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SKLJ4RKPgvYFqZCL6YRGuOSNdpiUU0hDXhfEXwPU8ctxh6jD1Mx0tTRjpN/gKtW6mYgIDLpg5hYsMzUGHyxxC2k/+ZYJR64HRH/b40ub5FiobnosZZxs43vE13njw6w/YWEebTxT17SJ28P1fP5Bwh4pRQs6BVG0JmXGO8pEW39ubY6UATn/SIVRid4eF8tF/a1mYy5HN8PzmZlTtJzKX5wsQyItZGue2HbcwEH8/fIy+FC2NUv1cBypq4HOTFyUlH2JJDdh2xzCWXxSEUYEhG4RMZtO1a3SUnvOOPGCWk/5VV5MqYUGntID/mrZAwoKoYBSidTnzS/CEe0VbCgxFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TBDmbU6yz1c/A/pAf2+NpcXcKA0nCwyKsIT7Njq2TNM=;
+ b=uPwEqYvJbw1PR58vinw+lmXyiUFgPNubaM/FS3hnhsY+lk/g1pHYKdEaqoo/uz6McA+zIVZ+o5I1IEyOYBJ0TvLKvd5sOQb0P/2O4cK8m+9hVcrRfNdKS/Y69CR9ReNWw//O6kr2IaqyQHAsjktWnnNI+w6hqQnnuNnQVQEn2/jbSqbnIsH8nFNvrx0LNLvpDPU6zwwiFrmfHxl1fJNWoxBc9m0m3I0K9ateycIr0Uxr/0dsyx0N1dbkySVTxUo4hGOXyRjbQqCK/pVLZJ1p1FwMgdHo8INlqz4QIKsx9Bt/N0+hp0anJs/AnSEEx35NGxowa5COA5IiELB1VziBDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ibm.com; dmarc=pass action=none header.from=ibm.com; dkim=pass
+ header.d=ibm.com; arc=none
+Received: from SA1PR15MB5819.namprd15.prod.outlook.com (2603:10b6:806:338::8)
+ by IA3PR15MB6722.namprd15.prod.outlook.com (2603:10b6:208:51b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.23; Thu, 12 Jun
+ 2025 19:36:12 +0000
+Received: from SA1PR15MB5819.namprd15.prod.outlook.com
+ ([fe80::6fd6:67be:7178:d89b]) by SA1PR15MB5819.namprd15.prod.outlook.com
+ ([fe80::6fd6:67be:7178:d89b%7]) with mapi id 15.20.8813.018; Thu, 12 Jun 2025
+ 19:36:12 +0000
+From: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+To: "willy@infradead.org" <willy@infradead.org>,
+        "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>
+CC: "hch@lst.de" <hch@lst.de>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ira.weiny@intel.com" <ira.weiny@intel.com>
+Thread-Topic: [EXTERNAL] [PATCH 4/5] ceph: Convert ceph_zero_partial_page() to
+ use a folio
+Thread-Index: AQHb26ffIYbDsrgK+k6JSmW9loNoQrP/6zCA
+Date: Thu, 12 Jun 2025 19:36:12 +0000
+Message-ID: <80277dc7220fa255044d3d90109866aeb46a52da.camel@ibm.com>
+References: <20250612143443.2848197-1-willy@infradead.org>
+	 <20250612143443.2848197-5-willy@infradead.org>
+In-Reply-To: <20250612143443.2848197-5-willy@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR15MB5819:EE_|IA3PR15MB6722:EE_
+x-ms-office365-filtering-correlation-id: 25b5cfb7-2c46-4b07-bc44-08dda9e86375
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|10070799003|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d045ZlpNa255RUpMNTZKL2lQYnlPWFRZaldyZEo0eXUzd2Q3NDdXZlNrLzdJ?=
+ =?utf-8?B?eXZMT1dMT290cC9EYlNNNy9SMUVGWEtxS2gxUWRvMVA5TW9FeTg4bzZkQmpW?=
+ =?utf-8?B?VVRNUytqVDhmSWpvTFVDdktZSkFXRWo3UGt2VjhlRUdEd25ncWZZeHIzWGM5?=
+ =?utf-8?B?MkZ4ZUluL212RmwzanhhRkhIek94YWlhMUVEaVAwc28yTXVMTS9LZmx4L3A3?=
+ =?utf-8?B?UjFDaThKbFhPQTJ4enZXU2xJOHNXbnNNTGtNOTRld2trbXJERHI1bFA4Zkc4?=
+ =?utf-8?B?ZnFhSU1qR2JnY3U3Ull6eGhHelBraHFBYkhJbnRiNjB3Zk9mWm1JUVVCZ0dG?=
+ =?utf-8?B?VCtIcGRheXFBaDk4SkQyTmFvUlVjREJXM3BUMXlaRnNKei9IZk9WTWRwR1ZG?=
+ =?utf-8?B?MHFJVXkrQ3R1SDhsbnphRWxLMzhUZFdOUXYwbi84MXBTZ1YvK3BWUWRtU2Zx?=
+ =?utf-8?B?N29TQkVJWmI2Y2VoT0tWelhMVHJTOGRyTjVxU1RHbFpYMkZRMlcxSnhPVGZF?=
+ =?utf-8?B?VlF2eGVDY0pLOGhRQnF3TFZFdjdVRjdQTXBDMWxVZVE3NjV4ZTc4MlMvOUpV?=
+ =?utf-8?B?eFBjMVorU051R05xMGtvNUZlOHRoU0hOUUlyT1NyU3dnbjBtRW16a0ZNY0c1?=
+ =?utf-8?B?V0RnTEIyaFFZRXRJVGpHZUtsaVM4dW9XS1lOc0lqZUpFYVJ6OUVlc0hNY2oy?=
+ =?utf-8?B?S2R4SWtYZCtWS1RzUXd6YkZnbEZJcmZZV0thWHRXTVJ3V1QvL0gxN1FjZ20r?=
+ =?utf-8?B?VVZEZWZXU0ZPYmZsY2tLZGNTbnpPTE42NE5UblgxTHIwSG1DTUVmSVRMcGhL?=
+ =?utf-8?B?Wm5mWFNNMXpZQ0htSHlCdFVEeDV0bWZPZTdkMW9EdlZyRjg1RmIvcENzQ3A1?=
+ =?utf-8?B?RjRoZ3ZYdE03c2NHNWxkTG5XTmFEdUZ4WnJqa04xclhVL0hJNCsrVGJXT1o1?=
+ =?utf-8?B?QWM2cjJEb0FHeVZXdjRYYzFkUmF6L3owS01zTGdsUzR2NUdYYms2M3FrMDBE?=
+ =?utf-8?B?Nmh5cnQ3QUZ4bkR4VGVEZkFUWnQyZXlhU3l5bEc5TzhaU0hGdnFBVG9WNlRN?=
+ =?utf-8?B?b1IySm1WR2tFSFBGVUNhQ3ArNUE2OVpwQkdWUTRsUlJvNWVGSHFMOFNjNnpB?=
+ =?utf-8?B?UU9US082cG5MRVpkVWliQk1zaEg3NG84SG5qS25rcXJPQWluNzYxWjBFWWVM?=
+ =?utf-8?B?eGlwMlRZYnl2S2NkTEdna2IzYmNZUi9LMmM1R3dPNTFTWjdaalQxdVNWTHNF?=
+ =?utf-8?B?RUx2QnI1UGErL3JrcVJsTUVMVUYzakJOTkZ0cGNVWjZBYytZWUtDQTI3STZq?=
+ =?utf-8?B?Z2x3ZENOUi9uZnc4NnJWYUZTVkNSbG01QXRYcUphZVEvSWNQK0pQYlFrZWpI?=
+ =?utf-8?B?SUQxYXhYWVlTU3EyQis5VHk3aGRQTzlyN245aGpwbjRHdGZlVVlHZFk0RXp1?=
+ =?utf-8?B?a2NEWGkwSmM1aVFJUVFqU01KbTExbDVtUWlBemczNFUvRjUyaEt2aFFPWnFl?=
+ =?utf-8?B?TjV5Z3g5bCtEVnJOUjUwbmkyMXFZN3d4a0FSMEdkdDFSTVhpT2J3RE9SbFJp?=
+ =?utf-8?B?L1VFUHp6Zm5tUjZ1QmxHTVUvbEhWTFpqT3BYQXlKREpEZFo1SjZJMGc2N3lq?=
+ =?utf-8?B?MWNNTVZWcHRhRlFsQmxpUHFSbC96Q3owVjV1b3NoYndBTlUxMWFrU0RZSnpr?=
+ =?utf-8?B?QkoxZEk1R01MVTlmZElTNnNRbHBPeHlLWERFWWhuZ3NHK09sTmJERVRjZHlW?=
+ =?utf-8?B?d1JFTTFaYnBQVExpckZwTng5dm5xcTc0Qlg0UjJFeTJtSyt5MHVWWWhXR2lQ?=
+ =?utf-8?B?bHhBeUZDRWh5eERsNkVMeHVLeUZFMWxOV282YmJ1OVN0aExkUGorQ01ia0pR?=
+ =?utf-8?B?anBPbldodzZqQWdMclAvcVJSOHM4OWlDSnA2cmRleTlyNHBDWXpiMlZ2bzd4?=
+ =?utf-8?B?dUU2eWNXV2JTQ21sbDFEdk0wc2RPRmxtSFZlQ29MVEhYRUd2aGZwQ1Y0aTYy?=
+ =?utf-8?B?Y1gwMVIweHl3PT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR15MB5819.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WWhNNzg4NVB6eTFNSXhlclpHT0dadWE4VEhPM0ZVODBXK05pQVl4Q0FZYWds?=
+ =?utf-8?B?UUp4cHJiSXFIdjR6b3NKUWE1enBkNjJWanFqTjRPMUw4VXhPYTBidGlpY1Zx?=
+ =?utf-8?B?bzYrRFdRZENKbTBHU1FySjJHR3VBcDZFMnhmSW5VUTc3NzJlcFZIK1huS3hQ?=
+ =?utf-8?B?bU5zRFVRdk9acjRnTG9SbEN5RUdVWDJoZC9BOXMxaHVwNUtJYVRSSGlLTzNn?=
+ =?utf-8?B?UzRjS05IeGtySGVUTXk0U2ZOSTllb0hOOTllSHJGTk5pVFBXSm1JNHI3YXRP?=
+ =?utf-8?B?YkZpRGwxTlNqaEJ6WXhJUmg2YWErdmxIWmJUdkJoUjYxYUFpVUdmZXJtaDg0?=
+ =?utf-8?B?NE5WL3RrT09IY3dZYmEzbzlsY1NKTTFTVVBDWmFocmdYWXAvWXFSRHY2L2l3?=
+ =?utf-8?B?b204M0tIUUZPdmswVXlLZ3g1ODlNaGtzVmRJMlVSbXZNdklmek02c1JEVDEx?=
+ =?utf-8?B?Um42MWM2bkZIR2Z2NjY2T1FTU3UxNXdDNVQwSUVpUms5YUo4cGcraWFpUnVP?=
+ =?utf-8?B?Y25aSGw3aVVtZjliYTc4VmpGMitQK3Y3eFAvd0J5MVJRaHE2eWU0ZDJOdFRw?=
+ =?utf-8?B?eHV2V1VzWGZITXFpd05DRHNHaVhaRTdJblFLdkIzcGtYaXMrenViSXNoeXla?=
+ =?utf-8?B?SFdxRC9BR3owZ3l0ajRFK1U5WkpieWN1YndaOWhZMFlLYjlNdU45Qnl0cFpk?=
+ =?utf-8?B?bVZuTzJXWjNSeUVzcnZBbUFIQzhxYnB4Q05rMlJnTk1UTUVad1J1WDI2dlpK?=
+ =?utf-8?B?ejVlakhGeEFOdndMRHdQbnZDbmVUWk9PeXBMdGsrMDFacDRyU3JuaC9QenBr?=
+ =?utf-8?B?STNhWHdvT1JjQmdTMndqaW92bXNITVRpUUxNbTFmY21aQ09hNU1LVVRDanFE?=
+ =?utf-8?B?b3VQNlhweFpZTlVGbHI4d2NuZTU2bnRyN0pXNmc0TVNCcXAxZHkyT05yUkNT?=
+ =?utf-8?B?Q1duVlBxaFpWSVN0RzNaRkIwbVByU2svTURsOXFDdUY4bTBWSFVDcjY1Ni9B?=
+ =?utf-8?B?YzlvajAxVFpnb2RtTVVERlZHVzB4VGR6d1QyZXlKWTJZNC9XWks0ZTNsMWJM?=
+ =?utf-8?B?WEV4RWxWL3BjTzJvQTB0TTJDaWtxN3BwcTJSSmgzbXh2MXZaNWU1RTlyYTAz?=
+ =?utf-8?B?Z0JtVG4xa0UvVC9TZDZVSzZxcS9sVDNsRkhoazE3ZnhKTytFc2xrOVo0Sk1q?=
+ =?utf-8?B?SE5NNFVCUkwrRVhHbFBiM1puNjdEODB5cTU2ZnBJb1kxQWpBSW9YTjBjSXZU?=
+ =?utf-8?B?TUNsK2dQUTJaMnNuNHJFamQyTGJVV0RiLzVaYm9tMUorb0ZSQ2pUYnVCZFpo?=
+ =?utf-8?B?UkxGQzFkV2FZUlpQMXlvRysyQXZiR2YxdVdYc3A4Z21wTVUzUmdCTzE4Y3RZ?=
+ =?utf-8?B?T2Rrekpkemoxd0Y4QlZncHRCaGkrT3lxK08rbm45R0hnNlNFSkxSaFJuUWFi?=
+ =?utf-8?B?M0FJdXdYdmxLNTc0WmZOSmVvMGZGc1VuS1ZDOFdYaUR0clVCWXNXMVhsNXo4?=
+ =?utf-8?B?VlZkVkc0T3c5L3BRWXNGZnNaUjlZUGhqR1UwbmV6UmtlemlYbmpSWHRzZU9O?=
+ =?utf-8?B?TGVTRGh3UVRmOG1jYmtsempKZ20rOGpGRkhsUUN0SCtONmdIMkd0Q3BySURz?=
+ =?utf-8?B?elVvTm5hREJvTXRHRW5vVUFaNEdWZ1h1RzFGRmJHYUpxOUh2QnpIVjVHRklx?=
+ =?utf-8?B?TzVjdkJvR2RZRzFDdWFDcFNmZWF2bGN6NlJzaFY3a1RVTExDMzNianRrRFB0?=
+ =?utf-8?B?YUpWS3ZjcFV6dzlGTXhIcUNDMytrUWdhcXo1QW9VNnliMXZ3Y2kzNUk0cm95?=
+ =?utf-8?B?WWhncjFpTU9ZME9nc2FGbW1yeU8zT3A5NEkzMDNUVGp5YjRsVGtuUVJaU243?=
+ =?utf-8?B?cmpXN3RMeWZHM3M3U00wRjFKRXJDYk10aENQeTJRTzBMRjUxdmNTbElVOVFy?=
+ =?utf-8?B?YjMrSjgyV1U5NlpsTm81RzVnb1J6dUNmdklIb2hUMDRFUnU5dFg3SVhPK1lt?=
+ =?utf-8?B?VWdFZGoyRm9IeitkZkNaNmNZOUJwdUdPTkcxTmVpSHlqWFhLcWZrSnlPYm9p?=
+ =?utf-8?B?Mi92cTJ5Z0diOGVlQjg4Rk5lVWsxN0gxVnVzQkhWQWdjYmlseTB1OWlIaU11?=
+ =?utf-8?B?MUFnME5pRE91TVRQZGFHTmxXQitVd0NOSmNDTGh4bUVWdFBHTHlGTkxFc2J3?=
+ =?utf-8?Q?z7xqech15M+s9I/K3JbaMJM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BEE25C0D52FFF24E94C04FAF910B8C90@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-OriginatorOrg: ibm.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR15MB5819.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25b5cfb7-2c46-4b07-bc44-08dda9e86375
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2025 19:36:12.2396
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: fcf67057-50c9-4ad4-98f3-ffca64add9e9
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rOCydhJjEVJNRg34CqrsULjwLeiY95O8QBuoje/YyXKlzrp5+z4ASfSgmSPWqYD7v1+BBcowxnzBsEebttVlzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR15MB6722
+X-Proofpoint-ORIG-GUID: 0r5KPyh9kTCxtTHmr8ShzaZL9aAcwkAE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEyMDE0OSBTYWx0ZWRfX5Jmj/IsIUXCN wVWTHoe6ISFtzfjKKOvte8MjDvKA327LMUJrpCpSPuxsGbxyrGmIaEnM7gAWzXr8XkJX2Oh9R0K Q/gN/iWt2PJD+RxKCuExuNUTj5k5A601amsvqt/a9YsNxsnDBsaJDLFDnSwnsII5/vk8YqBStAZ
+ r6bEljuHrIOqrnN9MbXQykT4N4M7+cRC+9d4fZ3OzI3VHFhrRsKBVcpX5OIvGSJDnQ15dqG0U6n CBe7Itodf/1dgAItfUzSkG6KuXxFCHOu7K1+zeP8jsYQsG5uXMw/9IJoOOz0BgGBcrEmqcsGG9B 9v3Bs4tlpF8xgOyRz8HNwijI7F3bv5iE9DEntV1tjtuUMt7Tk2CQcPWDxLftNoODJzoc/P0cT/d
+ G3KDPoZhclzFrTT+mfmZV8aEUYr5kDNb+B06ohYgbqdX051a0Nyf4LFZ6c/an+ThexusTuPi
+X-Authority-Analysis: v=2.4 cv=YKGfyQGx c=1 sm=1 tr=0 ts=684b2c2e cx=c_pps a=qYMZzBO7ydizK6UiZNNFIA==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=6IFa9wvqVegA:10 a=JfrnYn6hAAAA:8 a=VnNF1IyMAAAA:8 a=yblNkXvDgx5R9Dp-HPEA:9 a=QEXdDO2ut3YA:10 a=1CNFftbPRP8L7MoqJWF3:22
+X-Proofpoint-GUID: 0r5KPyh9kTCxtTHmr8ShzaZL9aAcwkAE
+Subject: Re:  [PATCH 4/5] ceph: Convert ceph_zero_partial_page() to use a folio
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_10,2025-06-12_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ malwarescore=0 bulkscore=0 priorityscore=1501 phishscore=0 mlxscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506120149
 
-Hi
-
-
-On Thu, 5 Jun 2025, Dongsheng Yang wrote:
-
-> Hi Mikulas and all,
-> 
-> This is *RFC v2* of the *pcache* series, a persistent-memory backed cache.
-> Compared with *RFC v1* 
-> <https://lore.kernel.org/lkml/20250414014505.20477-1-dongsheng.yang@linux.dev/>  
-> the most important change is that the whole cache has been *ported to
-> the Device-Mapper framework* and is now exposed as a regular DM target.
-> 
-> Code:
->     https://github.com/DataTravelGuide/linux/tree/dm-pcache
-> 
-> Full RFC v2 test results:
->     https://datatravelguide.github.io/dtg-blog/pcache/pcache_rfc_v2_result/results.html
-> 
->     All 962 xfstests cases passed successfully under four different
-> pcache configurations.
-> 
->     One of the detailed xfstests run:
->         https://datatravelguide.github.io/dtg-blog/pcache/pcache_rfc_v2_result/test-results/02-._pcache.py_PcacheTest.test_run-crc-enable-gc-gc0-test_script-xfstests-a515/debug.log
-> 
-> Below is a quick tour through the three layers of the implementation,
-> followed by an example invocation.
-> 
-> ----------------------------------------------------------------------
-> 1. pmem access layer
-> ----------------------------------------------------------------------
-> 
-> * All reads use *copy_mc_to_kernel()* so that uncorrectable media
->   errors are detected and reported.
-> * All writes go through *memcpy_flushcache()* to guarantee durability
->   on real persistent memory.
-
-You could also try to use normal write and clflushopt for big writes - I 
-found out that for larger regions it is better - see the function 
-memcpy_flushcache_optimized in dm-writecache. Test, which way is better.
-
-> ----------------------------------------------------------------------
-> 2. cache-logic layer (segments / keys / workers)
-> ----------------------------------------------------------------------
-> 
-> Main features
->   - 16 MiB pmem segments, log-structured allocation.
->   - Multi-subtree RB-tree index for high parallelism.
->   - Optional per-entry *CRC32* on cached data.
-
-Would it be better to use crc32c because it has hardware support in the 
-SSE4.2 instruction set?
-
->   - Background *write-back* worker and watermark-driven *GC*.
->   - Crash-safe replay: key-sets are scanned from *key_tail* on start-up.
-> 
-> Current limitations
->   - Only *write-back* mode implemented.
->   - Only FIFO cache invalidate; other (LRU, ARC...) planned.
-> 
-> ----------------------------------------------------------------------
-> 3. dm-pcache target integration
-> ----------------------------------------------------------------------
-> 
-> * Table line  
->     `pcache <pmem_dev> <origin_dev> writeback <true|false>`
-> * Features advertised to DM:
->   - `ti->flush_supported = true`, so *PREFLUSH* and *FUA* are honoured
->     (they force all open key-sets to close and data to be durable).
-> * Not yet supported:
->   - Discard / TRIM.
->   - dynamic `dmsetup reload`.
-
-If you don't support it, you should at least try to detect that the user 
-did reload and return error - so that there won't be data corruption in 
-this case.
-
-But it would be better to support table reload. You can support it by a 
-similar mechanism to "__handover_exceptions" in the dm-snap.c driver.
-
-> Runtime controls
->   - `dmsetup message <dev> 0 gc_percent <0-90>` adjusts the GC trigger.
-> 
-> Status line reports super-block flags, segment counts, GC threshold and
-> the three tail/head pointers (see the RST document for details).
-
-Perhaps these are not real bugs (I didn't analyze it thoroughly), but 
-there are some GFP_NOWAIT and GFP_KERNEL allocations.
-
-GFP_NOWAIT can fail anytime (for example, if the machine receives too many 
-network packets), so you must handle the error gracefully.
-
-GFP_KERNEL allocation may recurse back into the I/O path through swapping 
-or file writeback, thus they may cause deadlocks. You should use 
-GFP_KERNEL in the target constructor or destructor because there is no I/O 
-to be processed in this time, but they shouldn't be used in the I/O 
-processing path.
-
-I see that when you get ENOMEM, you retry the request in 100ms - putting 
-arbitrary waits in the code is generally bad practice - this won't work if 
-the user is swapping to the dm-pcache device. It may be possible that 
-there is no memory free, thus retrying won't help and it will deadlock.
-
-I suggest to use mempools to guarantee forward progress in out-of-memory 
-situation. A mempool_alloc(GFP_IO) will never return NULL, it will just 
-wait until some other process frees some entry into the mempool.
-
-Generally, a convention among device mapper targets is that the have a few 
-fixed parameters first, then there is a number of optional parameters and 
-then there are optional parameters (either in "parameter:123" or 
-"parameter 123" format). You should follow this convention, so that it can 
-be easily extended with new parameters later.
-
-The __packed attribute causes performance degradation on risc machines 
-without hardware support for unaligned accesses - the compiled will 
-generate byte-by-byte accesses - I suggest to not use it and instead make 
-sure that the members in the structures are naturally aligned (and 
-inserting explicit padding if needed).
-
-The function "memcpy_flushcache" in arch/x86/include/asm/string_64.h is 
-optimized for 4, 8 and 16-byte accesess (because that's what dm-writecache 
-uses) - I suggest to add more optimizations to it for constant sizes that 
-fit the usage pattern of dm-pcache,
-
-I see that you are using "queue_delayed_work(cache_get_wq(cache), 
-&cache->writeback_work, 0);" and "queue_delayed_work(cache_get_wq(cache), 
-&cache->writeback_work, delay);" - the problem here is that if the entry 
-is already queued with a delay and you attempt to queue it again with zero 
-again, this new queue attempt will be ignored - I'm not sure if this is 
-intended behavior or not.
-
-req_complete_fn: this will never run with interrupts disabled, so you can 
-replace spin_lock_irqsave/spin_unlock_irqrestore with 
-spin_lock_irq/spin_unlock_irq.
-
-backing_dev_bio_end: there's a bug in this function - it may be called 
-both with interrupts disabled and interrupts enabled, so you should not 
-use spin_lock/spin_unlock. You should be called 
-spin_lock_irqsave/spin_unlock_irqrestore.
-
-queue_work(BACKING_DEV_TO_PCACHE - i would move it inside the spinlock - 
-see the commit 829451beaed6165eb11d7a9fb4e28eb17f489980 for a similar 
-problem.
-
-bio_map - bio vectors can hold arbitrarily long entries - if the "base" 
-variable is not from vmalloc, you can just add it one bvec entry.
-"backing_req->kmem.bvecs = kcalloc" - you can use kmalloc_array instead of 
-kcalloc, there's no need to zero the value.
-
-> +                if (++wait_count >= PCACHE_WAIT_NEW_CACHE_COUNT)
-> +                        return NULL;
-> +
-> +                udelay(PCACHE_WAIT_NEW_CACHE_INTERVAL);
-> +                goto again;
-
-This is not good practice to insert arbitrary waits (here, the wait is 
-burning CPU power, which makes it even worse). You should add the process 
-to a wait queue and wake up the queue.
-
-See the functions writecache_wait_on_freelist and writecache_free_entry 
-for an example, how to wait correctly.
-
-> +static int dm_pcache_map_bio(struct dm_target *ti, struct bio *bio)
-> +{
-> +     struct pcache_request *pcache_req = dm_per_bio_data(bio, sizeof(struct pcache_request));
-> +     struct dm_pcache *pcache = ti->private;
-> +     int ret;
-> +
-> +     pcache_req->pcache = pcache;
-> +     kref_init(&pcache_req->ref);
-> +     pcache_req->ret = 0;
-> +     pcache_req->bio = bio;
-> +     pcache_req->off = (u64)bio->bi_iter.bi_sector << SECTOR_SHIFT;
-> +     pcache_req->data_len = bio->bi_iter.bi_size;
-> +     INIT_LIST_HEAD(&pcache_req->list_node);
-> +     bio->bi_iter.bi_sector = dm_target_offset(ti, bio->bi_iter.bi_sector);
-
-This looks suspicious because you store the original bi_sector to
-pcache_req->off and then subtract the target offset from it. Shouldn't
-"bio->bi_iter.bi_sector = dm_target_offset(ti, bio->bi_iter.bi_sector);"
-be before "pcache_req->off = (u64)bio->bi_iter.bi_sector << 
-SECTOR_SHIFT;"?
-
-Generally, the code doesn't seem bad. After reworking the out-of-memory 
-handling and replacing arbitrary waits with wait queues, I can merge it.
-
-Mikulas
-
+T24gVGh1LCAyMDI1LTA2LTEyIGF0IDE1OjM0ICswMTAwLCBNYXR0aGV3IFdpbGNveCAoT3JhY2xl
+KSB3cm90ZToNCj4gUmV0cmlldmUgYSBmb2xpbyBmcm9tIHRoZSBwYWdlY2FjaGUgaW5zdGVhZCBv
+ZiBhIHBhZ2UgYW5kIG9wZXJhdGUgb24gaXQuDQo+IFJlbW92ZXMgc2V2ZXJhbCBoaWRkZW4gY2Fs
+bHMgdG8gY29tcG91bmRfaGVhZCgpIGFsb25nIHdpdGggY2FsbHMgdG8NCj4gZGVwcmVjYXRlZCBm
+dW5jdGlvbnMgbGlrZSB3YWl0X29uX3BhZ2Vfd3JpdGViYWNrKCkgYW5kIGZpbmRfbG9ja19wYWdl
+KCkuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBNYXR0aGV3IFdpbGNveCAoT3JhY2xlKSA8d2lsbHlA
+aW5mcmFkZWFkLm9yZz4NCj4gLS0tDQo+ICBmcy9jZXBoL2ZpbGUuYyB8IDIxICsrKysrKysrKyst
+LS0tLS0tLS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDExIGRlbGV0
+aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2ZzL2NlcGgvZmlsZS5jIGIvZnMvY2VwaC9maWxl
+LmMNCj4gaW5kZXggYTcyNTRjYWI0NGNjLi5kNWM2NzRkMmJhOGEgMTAwNjQ0DQo+IC0tLSBhL2Zz
+L2NlcGgvZmlsZS5jDQo+ICsrKyBiL2ZzL2NlcGgvZmlsZS5jDQo+IEBAIC0yNTMwLDE4ICsyNTMw
+LDE3IEBAIHN0YXRpYyBsb2ZmX3QgY2VwaF9sbHNlZWsoc3RydWN0IGZpbGUgKmZpbGUsIGxvZmZf
+dCBvZmZzZXQsIGludCB3aGVuY2UpDQo+ICAJcmV0dXJuIGdlbmVyaWNfZmlsZV9sbHNlZWsoZmls
+ZSwgb2Zmc2V0LCB3aGVuY2UpOw0KPiAgfQ0KPiAgDQo+IC1zdGF0aWMgaW5saW5lIHZvaWQgY2Vw
+aF96ZXJvX3BhcnRpYWxfcGFnZSgNCj4gLQlzdHJ1Y3QgaW5vZGUgKmlub2RlLCBsb2ZmX3Qgb2Zm
+c2V0LCB1bnNpZ25lZCBzaXplKQ0KPiArc3RhdGljIGlubGluZSB2b2lkIGNlcGhfemVyb19wYXJ0
+aWFsX3BhZ2Uoc3RydWN0IGlub2RlICppbm9kZSwNCj4gKwkJbG9mZl90IG9mZnNldCwgc2l6ZV90
+IHNpemUpDQo+ICB7DQo+IC0Jc3RydWN0IHBhZ2UgKnBhZ2U7DQo+IC0JcGdvZmZfdCBpbmRleCA9
+IG9mZnNldCA+PiBQQUdFX1NISUZUOw0KPiAtDQo+IC0JcGFnZSA9IGZpbmRfbG9ja19wYWdlKGlu
+b2RlLT5pX21hcHBpbmcsIGluZGV4KTsNCj4gLQlpZiAocGFnZSkgew0KPiAtCQl3YWl0X29uX3Bh
+Z2Vfd3JpdGViYWNrKHBhZ2UpOw0KPiAtCQl6ZXJvX3VzZXIocGFnZSwgb2Zmc2V0ICYgKFBBR0Vf
+U0laRSAtIDEpLCBzaXplKTsNCj4gLQkJdW5sb2NrX3BhZ2UocGFnZSk7DQo+IC0JCXB1dF9wYWdl
+KHBhZ2UpOw0KPiArCXN0cnVjdCBmb2xpbyAqZm9saW87DQo+ICsNCj4gKwlmb2xpbyA9IGZpbGVt
+YXBfbG9ja19mb2xpbyhpbm9kZS0+aV9tYXBwaW5nLCBvZmZzZXQgPj4gUEFHRV9TSElGVCk7DQo+
+ICsJaWYgKGZvbGlvKSB7DQo+ICsJCWZvbGlvX3dhaXRfd3JpdGViYWNrKGZvbGlvKTsNCj4gKwkJ
+Zm9saW9femVyb19yYW5nZShmb2xpbywgb2Zmc2V0X2luX2ZvbGlvKGZvbGlvLCBvZmZzZXQpLCBz
+aXplKTsNCj4gKwkJZm9saW9fdW5sb2NrKGZvbGlvKTsNCj4gKwkJZm9saW9fcHV0KGZvbGlvKTsN
+Cj4gIAl9DQo+ICB9DQo+ICANCg0KTG9va3MgcmVhbGx5IGdvb2QuIEFuZCBmaWxlbWFwX2xvY2tf
+Zm9saW8oKSBpcyBtb3JlIGVmZmljaWVudCB0aGFuDQpmaW5kX2xvY2tfcGFnZSgpIG5vdy4NCg0K
+UmV2aWV3ZWQtYnk6IFZpYWNoZXNsYXYgRHViZXlrbyA8U2xhdmEuRHViZXlrb0BpYm0uY29tPg0K
+DQpUaGFua3MsDQpTbGF2YS4NCg==
