@@ -1,100 +1,77 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636CF22423F
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 11:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85010223714
+	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 11:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749729192; cv=none; b=Yvl1W/knTRKOOZCIKE7CLqMldDAJlZ7VY5FygBeIghN1mnxLsI6ij1ELmXBnc7p1xqeze6h4l91X+4ev89GdA4fqgDeWMo/C38hMpo8sxL/Xe9GeN+MH0Vp1dckGRVdKbJeCzWgY8L2pKJSZ+6ffwTosmFLWk0STziUvEw/nrCs=
+	t=1749729381; cv=none; b=NPUqP9GxCU00cPW1PoUWXBEkWiRB3VR4fDvRgkszrhH50uZKupmrtvRdiK6PsSGdX1TxpFZAtDGvwRiCZgaVy2IXpOAWbLh1hPCY+TFHqbr4Uhy2fAv0pgbjxH9D2kaNV5LtKVe6skveoZrisfob6Jf8VZV4HhsheOuSNw9hiAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749729192; c=relaxed/simple;
-	bh=fIizwEmflkg3UUQXY8k/0K+rU2xRQg0yItsdvb2iPWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RjGCEYm8l/R2c7LrV+kwFjIh3ZIUw1yq+ZNZzJpAP7GF+C4Ldfp+c9ZgBKD4Sqgx4ENOkMYK/2KOFGWNJAhDys8GtUUpzXZcJzKc2ZWuGcmRUbK4UEOQgXxV00vQElUzp1JvRmCKCfderNqwII5//2uGsgrJXHPTYDA4WcXJ/zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2ZozmZCD; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1749729381; c=relaxed/simple;
+	bh=Shx1H3NdIX0TrKgcF20Klc45+a3qDcf6R2gMUFB0YZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jc/oRMAUr+6x6vL+mOkAQZom9hlz8V40upZK0xzM6d8hIvVXBXyU0pxV0qi+tT9u3G9GVVLNzGE3xxF7NCajAC+0GBLpG6ZwxZByMOq1OIWKa0B1vE9KwsebaBV/7vv8+GwWmZOEOYCLaJJs4NvcP+oc9G6C3WkBWr9Afl3fesE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0MJbo4EU; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2ZozmZCD"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-875b52a09d1so25312139f.0
-        for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 04:53:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749729188; x=1750333988; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rBq1OUn0hIrn5Sd0JC6MpZrZIvTHBLTazREmpjS45xw=;
-        b=2ZozmZCDcm1PQDiuEhEtlS6b3MBKC20zjafWBe1c5ZKmk1OSQCmEehPJYF9O/A3Uqq
-         ZRhjJ/m+a5ZZMmXCKckEwIo9utYQtCtb+5in+ybzF2tfK8moR0Ll/zQ4pFQr9WoNmejx
-         rqbAEZek0gvzLA+t8EPjHgaM127x7Jcq4dT0L9bvYjjGIJTLPMlQHc8oaId8cT31pb/c
-         3nif/TZNyLkLOwQnNqT8VyduqQaBMquBjb8uQ5EeAjeIk32SxzAn1d9oraWGRj4kASvz
-         yfItzstUuUbDtfxubJAqLaAPiw+psEThOWFah/8aH/CWsTVnV8EYpCpNjBDRQDKAvFAU
-         gB6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749729188; x=1750333988;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBq1OUn0hIrn5Sd0JC6MpZrZIvTHBLTazREmpjS45xw=;
-        b=QgVMMP+cJReLWgy0w3+uucbIkuiYLewu8yTLPbIZMAN1O3mCxvDExn49THJBmUHDYt
-         M723GMWTY9FGX6M2VJLysN2Z1JHtOsB8RqU+WUAjmtsfMnmWx6u+PN5HmtHT20sJmS4o
-         4ioMXlRy5ErK9hqjkpL5h985H0p4GpFtGZpJLjUrHufNAB/F2ZRMvkdNmTb25GBsupD3
-         A7yGCiegLuqLq1KYZWEDljuGeMkOS8Qk5IiZmeW6YZCPDUTFJYyqh7xHS0j0xxg3CiNc
-         UkI1nJDMxVZSGviyHICta/2jWYSWVexxMmFKJXELhgKqvWen88/th3sOv7gx/KpIun5K
-         4+Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBCG2RsxtAJ4yGvtHDz9oanEn8aXmY6gkF1eHAmuH61tbU25WcijWAXYB1Omq7Yc88QMl2YaY1+gC2Dg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz61nfCyzrmz8L7xhEuhUcvBcwrvnfcTXT8xgXNl3UUzY7Pta5n
-	2rOaIvv3A0Vc1m9/AMZ+M54Z61kw8yutVAAlrl2shbhVIYGnnwY2CoZfO3BZ4jknsNM=
-X-Gm-Gg: ASbGncsv+p29bFq7KP638jQjna5Gab+B8rF5kcHXad3iV3UPMJGf9p7f/FnjowrgxTL
-	nfcTVS45ObfWZW29xrE2P9hodLCGtIhQDY0ShsrcN5Tdn292rk7POzZSLiAiM1QrjUH5Te4rjbt
-	R7agCPsWoHhCmIhK+CduGbTUUiWeb4eZOerCaUsBYeKe7R1r61aHAskWNrwjd4j+bv/S4K6EoCj
-	J33zeClxmnkzQa0qwXG+ojhlib8Vz+qTlHQtjicq9oZSVhZu7Y6W3yvITl0UWSJVhyIkXdBtNDW
-	qd/GGZeLmo8RtUq4jBhyCPvHBoUJ6q1DjCyuA6IlEdlZ4ucBbGp1iasmBAI=
-X-Google-Smtp-Source: AGHT+IFJgA38ImH+vSy+7vuk0UQScCcE2MUYyhqqJE/sFKOFT19SRN5sU5pRhkYZ1mpeOJ9AgyaSHQ==
-X-Received: by 2002:a05:6602:7504:b0:875:bc7e:26ce with SMTP id ca18e2360f4ac-875c798acd6mr266415039f.0.1749729188183;
-        Thu, 12 Jun 2025 04:53:08 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5013b79657asm265335173.50.2025.06.12.04.53.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 04:53:07 -0700 (PDT)
-Message-ID: <ab5bd614-a873-4228-968f-e9086ad1ba38@kernel.dk>
-Date: Thu, 12 Jun 2025 05:53:06 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0MJbo4EU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=gaTW6gUOfIZbZ3K8pT4B7LjJxmq4pq6+GLmaQhox4hU=; b=0MJbo4EUZxF75RmJvea16VXfM8
+	qxhvheEyfdQxlJJWg+66mgthLsvY4tYerz5ObKU3UsIVHFoaXITYE7WB+NnRWcLHGXcv/rnip5jcv
+	fV9c9HdnqsayzQ0dF3xxQlH/UdL9zsxsP7vLZjmnt/saVbhcheThtoZXSKHwDMLA5MBaCGBwg0tkg
+	IrrE9czE3rVYns62saQra7iNMvVUkUOVq4rG+XVbqItMF8y5ZnECIKRWAXP2R3YrF5GZLVCoND0Y5
+	NS7FG8iktxydd6qRcbu1YMZylZp5jKE1E5X2gp9C2DTpx4kJ5M0uwEe5M0pcFmDm4OMkrcIXCOVzD
+	9xZOAy4A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uPgXZ-0000000DCOw-1rt0;
+	Thu, 12 Jun 2025 11:56:17 +0000
+Date: Thu, 12 Jun 2025 04:56:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge
+ attempt
+Message-ID: <aErAYSg6f10p_WJK@infradead.org>
+References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
+ <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com>
+ <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
+ <aEpkIxvuTWgY5BnO@infradead.org>
+ <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH, RFC] block: always use a list_head for requests
-To: Christoph Hellwig <hch@lst.de>
-Cc: abuehaze@amazon.com, linux-block@vger.kernel.org, ming.lei@redhat.com
-References: <20250612074245.2718371-1-hch@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250612074245.2718371-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 6/12/25 1:42 AM, Christoph Hellwig wrote:
-> Turn the remaining lists of requests into the standard doubly linked
-> list.  This removes a lot of hairy list manipulation code and allows
-> east reverse walking of the lists, which will be needed to improve
-> merging.
+On Thu, Jun 12, 2025 at 05:49:16AM -0600, Jens Axboe wrote:
+> > Maybe byte the bullet and just make the request lists doubly linked?
+> > Unlike the bio memory usage for request should not be quite as
+> > critical.  Right now in my config the las cacheline in struct request
+> > only has a single 8 byte field anyway, so in practive we won't even
+> > bloat it.
 > 
-> XXX: the ublk queue_rqs code is pretty much broken here, because
-> it's so different from the other drivers and I don't understand it.
+> The space isn't a concern, as you found as well. It's the fact that
+> doubly linked lists suck in terms of needing to touch both prev
+> and next for removal.
 
-First of all, we're definitely not doing this for 6.16-rc, and secondly
-it'd need to be properly tested in terms of performance implications as
-well.
+But is that actually a concern here?  If you look at my patch we can
+now use the list_cut helper for the queue_rqs submission sorting,
+and for the actual submission we walk each request anyway (and might
+get along without removal entirely if we dare to leave the dangling
+pointers around).  The multi-queue dispatch could probably use the
+cut as well.  For the cached rqs and completion  we could stіck to the
+singly linked list as they don't really mix up with the submission
+IFF that shows up as an issue there.
 
-I'm somewhat annoyed that ordered plug lists turned into this, which I
-already strongly suspected would be the case back then. And doubly so
-that a really basic performance regression was also caused by that, and
-then the proposed "fix" is to go further into the "let's slow down the
-fast path" of code. Yes deleting some code is nice, but let's not
-pretend that it's free.
-
--- 
-Jens Axboe
