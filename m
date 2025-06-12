@@ -1,111 +1,142 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0CF218E9F
-	for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 12:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1416623E229;
+	Thu, 12 Jun 2025 13:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749731331; cv=none; b=EvSUDJB4VDJaykIwmXIfJ0a0Yg7sytzx89J+JUK3ziQXErb7aTU+WhLDWHkMmVK0YzbP2kVRbHmD568g7TfOHbS62lpf5M2tuDbSTZfvZNFme09cDHTUHPCbv2OPl+XG05XILlBNn93HkCTz6WJAO9BwdvQh2da4y2desvpi4Oc=
+	t=1749735009; cv=none; b=VBuDZyE9AcAo3hRg/mww0og+EOrsCetrU3J2n9PwsmMIh9FcdxRMK3zmzZJoU06IasrwN6lZhcnHVC372R3jJ+KCrDmkMecSzhrMPKCRGNDPao6BNRVlRpOfvCriwyTPEgojXRd4Oy2SqU6ym5r/T4o44gsHyaZ3fmpn4WcSl8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749731331; c=relaxed/simple;
-	bh=LKWu0A9zcTmfDPWAQ/ocK7Rl7FIrHKCadlCszRPsuzE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mGVJzKS5xZTKtd6I/goK+jnL1zT3NscRSer54wGCMKoOANY2JrVYFz4oARgeFyshdYWZs9gVaiJU8Vh3gcShuGgjJ/+SFQKwssFkqAtuNOgefzkYasQJ+Mz+i5aKsqi2teO9H1iZ0sHW8powe+koxd95sA8vpU/NOuMb7IC+Th4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AGLuhTyE; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AGLuhTyE"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3dc6f6530c5so7812135ab.3
-        for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 05:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749731328; x=1750336128; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UImZZoXMl6EH/HjzqcIe4x4dgx13eahuhyrGyyVP2dM=;
-        b=AGLuhTyE17KkqkSjLsX8eKG//D6/ffcYwHJndB6XDcjGuxvqHbae8c+nuuPwbRbFeg
-         szTmodZ3cN3pLmvPSeB7NlZGdxmlG5ss6p1GSlW0EzpHYvK5iSt8J80VcjrC6QkZGQoM
-         tNJ7jYqiT1ePDD9GOb57M+rOe8oxZtZfSfuifJE+nvz1SFP8x8dqo9t8qxdLtrCMIgD6
-         LwepuwedqdOO7J94e95VenUBtE8edUr2gnTtupfSIdc2l1nvnmuSSECHK0GgQq/duiN4
-         ZIlNEb5uCy6M4yaAw2OrPG9Acz2w5MR/YtH0epfeEID0fiiW2CTGxhpGdVpIWAcF7y9r
-         tKpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749731328; x=1750336128;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UImZZoXMl6EH/HjzqcIe4x4dgx13eahuhyrGyyVP2dM=;
-        b=pZKxtAo4/UcLudZk8K142W1AOKmywfQq/YTuRQtVQOyyt7P0oj0n4XvXmaUjjfmB5X
-         xIkhL3uZaqnzTUfOn4pNZgrh5L/I63exkfNbSsF/+/ShfcVV9FeHnW1W2rVU6N8CQv5e
-         t74MQDkrcbb+zrJB1zfWzO87uaUT9n/Qu8zE+FYP24IEYqF/qJ+ocQp7o8hYJm4UZdI6
-         wP1FItf6m7Eq5tfYN7ybw9IRBIgTm00fWo/FoAoaxdeSTogqQi2BxkoaOxMcu/nfWA2n
-         Jsgq6dxYJ8Vp2oCinMThmTw9zXC5TSMKyrxcHfS3pCTf4lVeEjpdCYRSQ319IWy/Wyfh
-         kcFA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1jcoxSFsM39Hh36nQYbUhXrArC7KD5AGPklV3/ATCWKvucfrrDxLcYZ0SZtT5jO2KgCWRKv4WhB7+DQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVeywMReZ++L0THnZhItTlWXGieHyugeZHf6a7ysNa8Uolclse
-	x0sNU5zvQJcqQU3lIdS0mlyMilsVnVROVDsm8VBjSZbdQH2Fd2M8uYqodHXFieFgOs0=
-X-Gm-Gg: ASbGncsnrTs1jPRo/EA+InEM3bgdU7/dUXC/NrYqf7wct3zsUKLYb870jHxqbDyUVdG
-	mTEmy5Nw5KPwLDI4j04W/VI5/hEfzB1ikZNqdE97s0Smn43XvNmtSbTz0dMaZIMC/A6Q8OBNCMy
-	Ghiskilb5qR02aTV1mQswhNRR3dx7ucsESMSvgBdEeNzM6wBgpUEwEkydAcB1nD3zVx2RXb34T3
-	4+iCq95+LWa1p5AidKIoW6rNsB6QUMHDEPIgNDuFxGDBl7S8TPF4cQ83VjJmylqNipZAh0n0rVu
-	ms7YFX/HkvBQl/x4tAHGQe8cCbERl6x27LwRkontVXVVSGFQ2BBefuUbmdE=
-X-Google-Smtp-Source: AGHT+IFkBhSvZIx1vTcq+k3YA7sUCU2iiR0CIQdLiCvZ4z6pvMgM8nNsfnKa/k0Wou/bu0ArxoY+cA==
-X-Received: by 2002:a05:6e02:1525:b0:3dc:87c7:a5b5 with SMTP id e9e14a558f8ab-3ddf42261cbmr82655865ab.3.1749731328149;
-        Thu, 12 Jun 2025 05:28:48 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5013b758323sm269650173.11.2025.06.12.05.28.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 05:28:47 -0700 (PDT)
-Message-ID: <2de604b5-0f57-4f41-84a1-aa6f3130d7c8@kernel.dk>
-Date: Thu, 12 Jun 2025 06:28:47 -0600
+	s=arc-20240116; t=1749735009; c=relaxed/simple;
+	bh=xX9ZZLz6dt8kHVgaW+ZLN6eqeYZjADOTT+Qoes0duhQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cSxpBxceuXIXGdyH4zDwMQAgqMF4inLQoDoFwcxvOQEar0/slfbot/btL0ir551byDQO6VQ7PRiE0YEUc1TbRFE9zP7sOLsaYe1IzyIxGRgCNSnuVViuCpO3acZU+2R9NuDHGn0bMROr3NgiR7Q4R73qrJXj9Cmnz/Q5ARv0WHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bJ3L437VszKHNP7;
+	Thu, 12 Jun 2025 21:30:04 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id C31E81A1232;
+	Thu, 12 Jun 2025 21:30:02 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgBXul5Z1kpoBZgwPQ--.19631S4;
+	Thu, 12 Jun 2025 21:30:02 +0800 (CST)
+From: Zheng Qixing <zhengqixing@huaweicloud.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	xiubli@redhat.com,
+	prasanna.kalever@redhat.com,
+	ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	zhengqixing@huawei.com
+Subject: [PATCH] nbd: fix uaf in nbd_genl_connect() error path
+Date: Thu, 12 Jun 2025 21:24:05 +0800
+Message-Id: <20250612132405.364904-1-zhengqixing@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge
- attempt
-To: Christoph Hellwig <hch@infradead.org>
-Cc: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
- <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com>
- <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
- <aEpkIxvuTWgY5BnO@infradead.org>
- <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
- <aErAYSg6f10p_WJK@infradead.org>
- <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
- <aErGpBWAMPyT2un9@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aErGpBWAMPyT2un9@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXul5Z1kpoBZgwPQ--.19631S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFWktw4ktr4Uuw4DZry5urg_yoW5ZF18pF
+	sxGFZ7CrW8ua40gFWkAw18ZFy5t3W5Xry7Kr97Gw1YvryfAr4j9F9YkF90qF98KryrCF9r
+	AF1qqry8KF1UGrDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
+	0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
+	tVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
+	CY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU0rhL5UUUUU==
+X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
 
-On 6/12/25 6:23 AM, Christoph Hellwig wrote:
-> On Thu, Jun 12, 2025 at 06:21:14AM -0600, Jens Axboe wrote:
->> It's certainly going to make the cached handling more expensive, as the
->> doubly linked behavior there is just pointless. Generally LIFO behavior
->> there is preferable. I'd strongly suggest we use the doubly linked side
->> for dispatch, and retain singly linked for cached + completion. If not
->> I'm 100% sure we're going to be revisiting this again down the line, and
->> redo those parts yet again.
-> 
-> Yeah.  For cached requests and completions it might even make sense
-> to have a simple fixed size array FIFO buffer..
+From: Zheng Qixing <zhengqixing@huawei.com>
 
-I did ponder that in the past too, as that's clearly better.
-Experimentally we need ~32 slots in there though, which is 256b of
-storage. Pretty sure I have patches laying around somewhere that did
-that, but didn't like the plug and batch size growth on the stack. Maybe
-overthinking that part...
+There is a use-after-free issue in nbd:
 
-But ideally we'd have that, and just a plain doubly linked list on the
-queue/dispatch side. Which makes the list handling there much easier to
-follow, as per your patch.
+block nbd6: Receive control failed (result -104)
+block nbd6: shutting down sockets
+==================================================================
+BUG: KASAN: slab-use-after-free in recv_work+0x694/0xa80 drivers/block/nbd.c:1022
+Write of size 4 at addr ffff8880295de478 by task kworker/u33:0/67
 
+CPU: 2 UID: 0 PID: 67 Comm: kworker/u33:0 Not tainted 6.15.0-rc5-syzkaller-00123-g2c89c1b655c0 #0 PREEMPT(full)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: nbd6-recv recv_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:408 [inline]
+ print_report+0xc3/0x670 mm/kasan/report.c:521
+ kasan_report+0xe0/0x110 mm/kasan/report.c:634
+ check_region_inline mm/kasan/generic.c:183 [inline]
+ kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
+ recv_work+0x694/0xa80 drivers/block/nbd.c:1022
+ process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c2/0x780 kernel/kthread.c:464
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+nbd_genl_connect() does not properly stop the device on certain
+error paths after nbd_start_device() has been called. This causes
+the error path to put nbd->config while recv_work continue to use
+the config after putting it, leading to use-after-free in recv_work.
+
+This patch moves nbd_start_device() after the backend file creation.
+
+Reported-by: syzbot+48240bab47e705c53126@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/68227a04.050a0220.f2294.00b5.GAE@google.com/T/
+Fixes: 6497ef8df568 ("nbd: provide a way for userspace processes to identify device backends")
+Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+---
+ drivers/block/nbd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7bdc7eb808ea..2592bd19ebc1 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2198,9 +2198,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 				goto out;
+ 		}
+ 	}
+-	ret = nbd_start_device(nbd);
+-	if (ret)
+-		goto out;
++
+ 	if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
+ 		nbd->backend = nla_strdup(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
+ 					  GFP_KERNEL);
+@@ -2216,6 +2214,8 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		goto out;
+ 	}
+ 	set_bit(NBD_RT_HAS_BACKEND_FILE, &config->runtime_flags);
++
++	ret = nbd_start_device(nbd);
+ out:
+ 	mutex_unlock(&nbd->config_lock);
+ 	if (!ret) {
 -- 
-Jens Axboe
+2.39.2
+
