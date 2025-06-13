@@ -1,30 +1,30 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398062522BA
-	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 03:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2320E70C;
+	Fri, 13 Jun 2025 03:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749784421; cv=none; b=QmwF5p9i53cJqe5AfpKEgJmZTDq8SDBBPScJPJF0JTDah9boMfmEP/Hmd+ciJM33y0y8tvrM+if6IJiMBHo3IXpGCmpfdZmlqYFHsRLpOcDKR/jfJfN3JI0kAb697vx7gc4+Mvc82oRlDI4movlksXo4KloMqC8Ku2wrYt11kQE=
+	t=1749784549; cv=none; b=lF9Wakv2w/ThDufJYWIBmX3L7MycqUa0NRVtAVF8Pf7lyzIIMoDsbHtyL4wkSmXBigmyvzBl4vspWe+hELrCGOY03waEYioGA8Qhx076oQleHi1uEa/sEmm1drHASIacIG9pcaibaEs4tvaDpgunb/0s/MZxPkJc0TDm02olxYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749784421; c=relaxed/simple;
-	bh=OfD1MH6MkkaOH6ktP+83qM22Keu9ZLwEjYFA1yo+uwo=;
+	s=arc-20240116; t=1749784549; c=relaxed/simple;
+	bh=wiWZ2dzLQqc4OfpRI+E8bl3uA461tgzyLh2UFnwyaAI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pGY722HywaLKzD4F+44XPdeGshg80XM1y5QIlPJAPe1qsMa5x3TH8oxNR/n8Ex8VTTCdxuiDKmGLySbgImZmXCG79TVYfv/Me6+wz/2Vw/mwhY60If+SQ6J+dJUm/j0a0XWze9r34Re40UMQH6mIFKf2KlUGKNFxw6jUdpvuWjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 In-Reply-To:Content-Type; b=GheMIyNuTe+cAnMFkBm/O47OAIxvKfRWncwOzF6hwSI7tiy528Hdan2dCK+AwJfUBmVwOAn8btlWXz1FwT+wfkJZVEq+4UCnBXfH6oioGpS/xxO1j1HgeDIYHr8XMtckqCoonEY1/B+XSyLku3GhYBkpZ2U51RJ5oSIPViuuN+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bJPcG54HRzYQv6X
-	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 11:13:34 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bJPfn3RlhzKHN5T;
+	Fri, 13 Jun 2025 11:15:45 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id AE47F1A0E23
-	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 11:13:33 +0800 (CST)
-Received: from [10.174.176.88] (unknown [10.174.176.88])
-	by APP4 (Coremail) with SMTP id gCh0CgBXul5cl0to8GxsPQ--.28950S3;
-	Fri, 13 Jun 2025 11:13:33 +0800 (CST)
-Message-ID: <593e7a1b-058b-4ef9-a6a0-214c90b72971@huaweicloud.com>
-Date: Fri, 13 Jun 2025 11:13:32 +0800
+	by mail.maildlp.com (Postfix) with ESMTP id CBD201A1911;
+	Fri, 13 Jun 2025 11:15:43 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgD3W2Ddl0to15NsPQ--.28263S3;
+	Fri, 13 Jun 2025 11:15:43 +0800 (CST)
+Message-ID: <3569a77f-1f38-4764-b1e3-d0075775c7bb@huaweicloud.com>
+Date: Fri, 13 Jun 2025 11:15:41 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,134 +32,111 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tests/throtl: add a new test 007
-To: Yu Kuai <yukuai1@huaweicloud.com>, shinichiro.kawasaki@wdc.com,
- linux-block@vger.kernel.org, ming.lei@redhat.com
-Cc: yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250613023538.2900008-1-wozizhi@huaweicloud.com>
- <6e302504-ff4f-e689-dbff-d13d464734bc@huaweicloud.com>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <6e302504-ff4f-e689-dbff-d13d464734bc@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXul5cl0to8GxsPQ--.28950S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxArWktFW8Jw15GFy7WF4fGrg_yoW5Xryrpr
-	y8CFZ0kFW7JFn7Ar1ft3ZrCFWFvr48Z3WUA34xXF15ArsFk34UKF1Ivr1qgFZ3JFs7ur1j
-	vw1qqF93CF17ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkq14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r126r1D
-	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
-	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUUU==
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Subject: Re: [PATCH 01/10] block: introduce BLK_FEAT_WRITE_ZEROES_UNMAP to
+ queue limits features
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tytso@mit.edu, john.g.garry@oracle.com,
+ bmarzins@redhat.com, chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
+ brauner@kernel.org, martin.petersen@oracle.com, yi.zhang@huawei.com,
+ chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250604020850.1304633-1-yi.zhang@huaweicloud.com>
+ <20250604020850.1304633-2-yi.zhang@huaweicloud.com>
+ <20250611060900.GA4613@lst.de>
+ <343f7f06-9bf6-442f-8e77-0a774203ec3f@huaweicloud.com>
+ <20250612044744.GA12828@lst.de>
+ <41c21e20-5439-4157-ad73-6f133df42d28@huaweicloud.com>
+ <20250612150347.GK6138@frogsfrogsfrogs>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250612150347.GK6138@frogsfrogsfrogs>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgD3W2Ddl0to15NsPQ--.28263S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww45Gr4fJw4UWr13Zw4DXFb_yoW5Jr43pF
+	W8GF1vyFWDKF15Gw1q93W0qr1Fvrs2ywsxXws5CrWUAwn0qr17WF1kKFWjkF97Z3Wxu3y5
+	Xa15G343ua15C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIa
+	0PDUUUU
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-
-
-在 2025/6/13 10:52, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2025/06/13 10:35, Zizhi Wo 写道:
->> From: Zizhi Wo <wozizhi@huawei.com>
+On 2025/6/12 23:03, Darrick J. Wong wrote:
+> On Thu, Jun 12, 2025 at 07:20:45PM +0800, Zhang Yi wrote:
+>> On 2025/6/12 12:47, Christoph Hellwig wrote:
+>>> On Wed, Jun 11, 2025 at 03:31:21PM +0800, Zhang Yi wrote:
+>>>>>> +/* supports unmap write zeroes command */
+>>>>>> +#define BLK_FEAT_WRITE_ZEROES_UNMAP	((__force blk_features_t)(1u << 17))
+>>>>>
+>>>>>
+>>>>> Should this be exposed through sysfs as a read-only value?
+>>>>
+>>>> Uh, are you suggesting adding another sysfs interface to expose
+>>>> this feature?
+>>>
+>>> That was the idea.  Or do we have another way to report this capability?
+>>>
 >>
->> Test change config while IO is throttled, for IO splitting scenario.
->> Regression test for commit d1ba22ab2bec ("blk-throttle: Prevents the bps
->> restricted io from entering the bps queue again").
+>> Exposing this feature looks useful, but I think adding a new interface
+>> might be somewhat redundant, and it's also difficult to name the new
+>> interface. What about extend this interface to include 3 types? When
+>> read, it exposes the following:
 >>
->> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
->> ---
->>   tests/throtl/007     | 41 +++++++++++++++++++++++++++++++++++++++++
->>   tests/throtl/007.out |  6 ++++++
->>   2 files changed, 47 insertions(+)
->>   create mode 100755 tests/throtl/007
->>   create mode 100644 tests/throtl/007.out
+>>  - none     : the device doesn't support BLK_FEAT_WRITE_ZEROES_UNMAP.
+>>  - enabled  : the device supports BLK_FEAT_WRITE_ZEROES_UNMAP, but the
+>>               BLK_FLAG_WRITE_ZEROES_UNMAP_DISABLED is not set.
+>>  - disabled : the device supports BLK_FEAT_WRITE_ZEROES_UNMAP, and the
+>>               BLK_FLAG_WRITE_ZEROES_UNMAP_DISABLED is set.
 >>
->> diff --git a/tests/throtl/007 b/tests/throtl/007
->> new file mode 100755
->> index 0000000..98ba4ea
->> --- /dev/null
->> +++ b/tests/throtl/007
->> @@ -0,0 +1,41 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-3.0+
->> +# Copyright (C) 2025 Zizhi Wo
->> +#
->> +# Test change config while IO is throttled, for IO splitting scenario.
+>> Users can write '0' and '1' to disable and enable this operation if it
+>> is not 'none', thoughts?
 > 
-> This test do not change config while IO is throttled, it's iops limit
-> over io split.
-
-Oh, there was something wrong with my understanding before..
-
+> Perhaps it should reuse the enumeration pattern elsewhere in sysfs?
+> For example,
 > 
->> +# Regression test for commit d1ba22ab2bec ("blk-throttle: Prevents 
->> the bps
->> +# restricted io from entering the bps queue again")
->> +
->> +. tests/throtl/rc
->> +
->> +DESCRIPTION="bps limit with iops limit over io split"
->> +QUICK=1
->> +
->> +test() {
->> +    echo "Running ${TEST_NAME}"
->> +
->> +    if ! _set_up_throtl max_sectors=8; then
->> +        return 1;
->> +    fi
+> # cat /sys/block/sda/queue/scheduler
+> none [mq-deadline]
+> # echo none > /sys/block/sda/queue/scheduler
+> # cat /sys/block/sda/queue/scheduler
+> [none] mq-deadline
 > 
-> And this should be updated, please take a look at
-> 60fa2e3 ("throtl/{002,003}: update max_sectors setting").
+> (Annoying that this seems to be opencoded wherever it appears...)
 > 
 
-Yes, I didn't notice this. I will modify it.
+Yeah, this solution looks good to me. However, we currently have only
+two selections (none and unmap). What if we keep it as is and simply
+hide this interface if BLK_FEAT_WRITE_ZEROES_UNMAP is not set, making
+it visible only when the device supports this feature? Something like
+below:
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index e918b2c93aed..204ee4d5f63f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -747,6 +747,9 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+             attr == &queue_max_active_zones_entry.attr) &&
+            !blk_queue_is_zoned(q))
+                return 0;
++       if (attr == &queue_write_zeroes_unmap_entry.attr &&
++           !(q->limits.features & BLK_FEAT_WRITE_ZEROES_UNMAP))
++               return 0;
+
+        return attr->mode;
+ }
 
 Thanks,
-Zizhi Wo
-
-
-> Thanks,
-> Kuai
-> 
->> +
->> +    local bps_limit=$((1024 * 1024))
->> +    local iops_limit=1000000
->> +
->> +    # just set bps limit first
->> +    _throtl_set_limits wbps=$bps_limit
->> +    _throtl_test_io write 1M 1 &
->> +    _throtl_test_io write 1M 1 &
->> +    wait
->> +    _throtl_remove_limits
->> +
->> +    # set the same bps limit and a high iops limit
->> +    # should behave the same as no iops limit
->> +    _throtl_set_limits wbps=$bps_limit wiops=$iops_limit
->> +    _throtl_test_io write 1M 1 &
->> +    _throtl_test_io write 1M 1 &
->> +    wait
->> +    _throtl_remove_limits
->> +
->> +    _clean_up_throtl
->> +    echo "Test complete"
->> +}
->> diff --git a/tests/throtl/007.out b/tests/throtl/007.out
->> new file mode 100644
->> index 0000000..d28cdef
->> --- /dev/null
->> +++ b/tests/throtl/007.out
->> @@ -0,0 +1,6 @@
->> +Running throtl/007
->> +1
->> +2
->> +1
->> +2
->> +Test complete
->>
+Yi.
 
