@@ -1,366 +1,206 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E382F4317
-	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 01:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749778615; cv=none; b=IzEgzorBqvfkxy4szi9JSURYj01bkEBZg6KrTP44/lhwcvHAWWxh8Teuq3TTLrKbx7NdgpLPYYPgITCGmpxHzy0Xr5Vt7j//IvmCCTp16NmfTnpdP6YowiB6YuAygOypx/SuGSVVfuPweG2nAcyYPS7VwThjurfGlU/g4+TBw0M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749778615; c=relaxed/simple;
-	bh=AHsPeXkz5Diy+MbW88Ivm4A4sFqQdytEh11dPoIBVng=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IYPQ4JFfU0JS4JV4oa2CAwNW9XjxmC9oA2AU00HBATWO7pmAi6/rwqTAOdg2hYE22k/oFnuDTMf45qmVHrP7MZDJuvJ16oKRl/ce+QmJw33GnEXOQswi89B0XYPJ8U8i/ZIrWwTIl051LdiwKExD1XjWpWGkY33zn+nCoHLtyjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=DdFJVeT2; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9927D1E1E19;
+	Fri, 13 Jun 2025 01:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749779521; cv=fail; b=XnpgB0sCwoez/KEe1QUPQuBwLrUVVfyFpuA3qnV2IFt95zvwQPMYc6DUNSCngAao+f6T/3N9zBvvinqV4C8oZtXYnDihGrLm2yohp6Ho3UDelBK2ypD3OYx/wbURQfmjJJuWwTb4XSb3mDE2tQg1smZdhEEi4xtFiWI6QZ4RkQA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749779521; c=relaxed/simple;
+	bh=s7+gj/DFE6ZC6mZcS8Ix120qs0cxfA6vN6FSAiQxXIg=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=MRvNjDuIon2AQ5mZaK3RFOAiOd9BrdBUGdRbL8RrHcwSQKNylOx2JdQe0TkMY6awAC8ZmPUz7Z3GeBbCqrXyQVNu+43s1UWO4ng1AEvvTaWPOd6TMTiy2isbGHYgXwb0TIGAyi6sBKi7pCqHzK9sD3DdjK8sCT6Oi9Y6y5Tj70s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gx7q4SFm; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Qi5vfJrV; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="DdFJVeT2"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-312a806f002so189264a91.3
-        for <linux-block@vger.kernel.org>; Thu, 12 Jun 2025 18:36:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gx7q4SFm";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Qi5vfJrV"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55CMCE9Q006182;
+	Fri, 13 Jun 2025 01:51:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=Dk/ALYYV9JApK8rX6j
+	tTDhCEha8btmDqVquQMSuIOyQ=; b=gx7q4SFmp8pl8Tmo+6yAau2hBQLhFHxsWa
+	xoSiwvu0Cg5YCBnJ3du3d8u2MWuOsa76Sf8Mif+yACGutmgORWjjgd9OIzFwaU0F
+	nmBKzUwTZnTrw6m/PEljN5Gkiu1sS6f6dKEK8Ta573GNxjqLObuA//JMRtA8M8rr
+	6jcXtzDkolOaP8aTF0fhLjb62VfhZ+7qYN7Oz+lPRbntjmKaB2fQXKRxNuqTR9dt
+	y66OLXw8aotKbx4P6gPULYaqDFOS3znJe+/smRRdKFwD5VTsw8rp1EZ+tFIoVbJy
+	uKx3/nouJC9/gXDZcEiigjzsFGZotCo4qMlB7POVFgYcBTNr7wVQ==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 474dyx2vmn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Jun 2025 01:51:42 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55D0SuX3009270;
+	Fri, 13 Jun 2025 01:51:41 GMT
+Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazon11013031.outbound.protection.outlook.com [40.107.201.31])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 474bvd1vgs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Jun 2025 01:51:41 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bgpIgv9wO7F3RicLnFAaztHfUE9Co+InvnbhOmKxf1dHh9DCFecK9DuRz+TntsArhfeaJFXYxkUR0QXj2CIUzbuuZv46uIQkUWmpUhq5XkVlNlABeWlnFstxbFdT90yoheh3j7r0Wm9tKNPfxICyIjiYvbem+EHZslW6MFRHSxHyniE5Ie+ggdyMuYRuOUbnoQqZjiSyN9vcjsfFIPgHrgoYxGMPu8Iub8RyvCD61GQqQ7LDiA7XATvSJ6UZxTa4bsiM6viL3rOVnJ+H4gWmBNYe67vNkTtU8bqhyeyKHNv7kBBBBJcvOnHDLq+CmMPw8RUSqCw8B2zfoexXtNarWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Dk/ALYYV9JApK8rX6jtTDhCEha8btmDqVquQMSuIOyQ=;
+ b=UG+mlUtfskZ49kdfalR+SO9fILTzoVPH+GIf7EBlHYQzPpl02PTHVO8DmqRX0rI6BFXl4EpYUzdigygDps/4H8qZV5taCXD1SNF+E6cprVL4L06LGTAWiHLZMAmPQtEWy4HoBy4q4i9Zg1Ri8pZMH0UGGxUTEyYtBpjvl8Tv8KXgHkosTmrH6ByzalpMWlJPtYQ/T11alxkuD1RYq0hTWHm2drSQwTUwhuA2LHMC0zzZECphgGfFIavucbpRQEBFNifejiq1yyT1FVNALS1yAMiumOe5UlBfudriG5g7bE0D3IKBYR/rBkNXTVLXeIHQB5YGiOC9iHSYqgIkj5l2NQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1749778613; x=1750383413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2CfN5tIScXY6QW50fI8mKTAxAfcecM3ZmCeqI06+eHo=;
-        b=DdFJVeT2mI4zXXG4+E0StIrMTL7QBhvHcdJXkxiTCMCKvhPOvQapPjsmW2ipYH2FX6
-         ARrXWnoW4W94PcR68gMOnzVTX090Nsc/atd19CrtFJYpSeCrSIPnVPQgAz0xXJ1G36v7
-         rcskoIMO1SxsimJNOddc8c4+o4/0vyaBHw9zhNSzeTbEsookeyreEWGOG6gRH/rJ2LEk
-         eNEjchgXwpuCeL6VuKy+2BNVpwfuuZeduLFTX3/6cqfQofAwQ6t/5sceAPpbHsRynhaA
-         QDFd3pShEbNfGZcMq/FXQvwOSblACnVwEew7Fagm9X9zpea/4Ls3B2rq7IqVXIX/hg5h
-         mYYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749778613; x=1750383413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2CfN5tIScXY6QW50fI8mKTAxAfcecM3ZmCeqI06+eHo=;
-        b=MB00sk1xX99Uuo/nqytuVogrcStSbsMdDov3yWAo0cCFaXvWeSCjm2T3Qpv1wsfOGw
-         Fntdwpe0m6dL2Q61LTIXknD8B9MwwxjpGnv56hk4XLJDQhbTKDDgZ364f9GYIkVOaYzL
-         DiyOkE6wfnRDWyQ46O12ZZ8qV0MXzJRkrx5MXza5Efezl3j6FzXI0KeeM7qlCzVNkV6g
-         Z3kdqDTtJT8cu6CV6EiRNWDHKWDID4RTzy3R35SanXU3oGVFOffeM/k4fDtTT69yVm14
-         +4LvpXk4VL1BlJYd/5z3ZocdrQ9PQW8eV4Oj/G1nZtEXLUsEChgLpscUBiqlWx+bKnyX
-         zDkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYWcMvOUJTnWAxeGiOXO8j6/EhSlEv+LAGi7Lzu8sMK6NvQ4ULkyxCjq/WLkqocly1zWEM2WYqTGMI+g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUI6Z564Mq7EIw4qoAgPzsoeH+BJzekTQUEjcYYXiiT+uuCLOd
-	tnLqwTzyPOMvND7rHg15Mm3iZS3ZnlCFrMxoks5UAcgt/eWynGpA+qd5Q107iNqDDLYLYHPD231
-	tN4Vn/IKNh3JN0utqD7tb5WTQzv4L+Eb/uylzOI4wxA==
-X-Gm-Gg: ASbGncucL0j5ncCldmDLkDl1YAOqDh8RLosUVf12vBhbVsKTnCu1Dq3eOligFPE1u9u
-	4Est0ZP1WsJYW287vvjmK8l20obiuw8/SuGgy3v3tQEvx4O1hPJ9sz4DGiwyY49EYwgPEScJd7O
-	dF023GiqFb2p+zi5fxCXeup8JC0vWJR+1PjdPcouwN3Lo=
-X-Google-Smtp-Source: AGHT+IE1DVH0noMXsEEjSOu5y5s+PXLL632/fuHGPaXOI4KxOBsW+GkWyc1UuImFLSFdy9WuYVJak7XZhcr/d17zbwU=
-X-Received: by 2002:a17:902:c94c:b0:234:d7b2:2aaf with SMTP id
- d9443c01a7336-2365d8c61bemr6381985ad.7.1749778612694; Thu, 12 Jun 2025
- 18:36:52 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dk/ALYYV9JApK8rX6jtTDhCEha8btmDqVquQMSuIOyQ=;
+ b=Qi5vfJrVL4QZrsuhakwmGi1iZZZRDBOn5mBEfbXA+g/nuYL+eTaguJoOApgvXmxEDi03MbYzE7FnNidDplCbBIsvCCanQvujaqZBUX3CWngPzf/zISd3bRmSinPr2u1cl/oiXZQJA9Qz+M6DLBAYhxwFlq7+h9HtAR5gtAIuL5k=
+Received: from DS7PR10MB5344.namprd10.prod.outlook.com (2603:10b6:5:3ab::6) by
+ SA1PR10MB6448.namprd10.prod.outlook.com (2603:10b6:806:29e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.22; Fri, 13 Jun
+ 2025 01:51:38 +0000
+Received: from DS7PR10MB5344.namprd10.prod.outlook.com
+ ([fe80::b527:ca1f:1129:a680]) by DS7PR10MB5344.namprd10.prod.outlook.com
+ ([fe80::b527:ca1f:1129:a680%5]) with mapi id 15.20.8835.018; Fri, 13 Jun 2025
+ 01:51:38 +0000
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: vincent.fu@samsung.com, jack@suse.cz, anuj1072538@gmail.com,
+        axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
+        hch@infradead.org, martin.petersen@oracle.com, ebiggers@kernel.org,
+        adilger@dilger.ca, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
+        Christoph Hellwig
+ <hch@lst.de>
+Subject: Re: [PATCH for-next v3 1/2] block: introduce pi_size field in
+ blk_integrity
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20250610132254.6152-2-anuj20.g@samsung.com> (Anuj Gupta's
+	message of "Tue, 10 Jun 2025 18:52:53 +0530")
+Organization: Oracle Corporation
+Message-ID: <yq1jz5g2z3u.fsf@ca-mkp.ca.oracle.com>
+References: <20250610132254.6152-1-anuj20.g@samsung.com>
+	<CGME20250610132312epcas5p20cdd1a3119df8ffc68770f06745e8481@epcas5p2.samsung.com>
+	<20250610132254.6152-2-anuj20.g@samsung.com>
+Date: Thu, 12 Jun 2025 21:51:35 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: BY5PR04CA0012.namprd04.prod.outlook.com
+ (2603:10b6:a03:1d0::22) To DS7PR10MB5344.namprd10.prod.outlook.com
+ (2603:10b6:5:3ab::6)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609121426.1997271-1-ming.lei@redhat.com> <CADUfDZrHpGFKAEJhDqPNq_WMzWU5v9riN-i8V0dROo2tc=1DyA@mail.gmail.com>
- <aEeTO3t8qnBne9ef@fedora> <CADUfDZo-5ft7Krx==YLYbabPE+3Z1Yjrw2zcmn7VRqfx5XyFgg@mail.gmail.com>
- <aEpGh41uV3AJF-dG@fedora> <CADUfDZowptAiBxQ2w6NPJ4Bz0uCuJs3HsZ3pH1Q1J9wUmTXQ8g@mail.gmail.com>
- <aEt8Tu1mgjQerFuy@fedora>
-In-Reply-To: <aEt8Tu1mgjQerFuy@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Thu, 12 Jun 2025 18:36:41 -0700
-X-Gm-Features: AX0GCFsvWxUL9BT8nmJUmkifcs2VW_zowryR6e3b7JIbAWLA9PT76CzQQxjKd_c
-Message-ID: <CADUfDZr9t4gipcSaimv1kg21++kh-g49fKk92wPDzRvT3F+43A@mail.gmail.com>
-Subject: Re: [PATCH] ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5344:EE_|SA1PR10MB6448:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4e96b1d1-07fe-462f-bfd3-08ddaa1cd5b1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7uWLFbVWmRz4DiSwOLCfodV9bs37blq3LmeVO0r8IhxKPdDs9gkas2k3O+np?=
+ =?us-ascii?Q?N1jILHQXAVxhpbKDcUpqVfuvZz7V1x9K03IpEqVxsLV5bzfQKuVv6N1Hshg4?=
+ =?us-ascii?Q?21dFLXXFGGnBB87iyl3tmjV1x+U8FdDl2CuLWV+YcmU2hRuRarXessCGYbjn?=
+ =?us-ascii?Q?1f8r46WR8E0RLP8gYT7q0CD2YJtopmGOiCWTiSJ1pCr1SP4woT6iVY5Iaxva?=
+ =?us-ascii?Q?lXF4ESFbtlVZkvpEAcrCWEE+snPFF/5hogvWy4T+CqT1l7iL2TC8AgQEjsj/?=
+ =?us-ascii?Q?i4mrA2wACL6roalWcYs9sxCDs3LmVcUrtjXaq9nVGi0KXuSdQzgU942FUUYM?=
+ =?us-ascii?Q?I5/m4HxWI3GdSzZn0725Xhi1j6M6MMrES7o1iKs9G1oNpQwRBUPjaNcEZD5B?=
+ =?us-ascii?Q?GkJ1jnJrDeNa25h53z2W3pUZ79p7AQC4k2U6lOnYEOugo+eknqWoJZCXuziM?=
+ =?us-ascii?Q?UuUAAAR2GISjDMXMzMhTstQIbb29EfISK5c7Xd/YcVHJP/e1PF8B/x6NMwX5?=
+ =?us-ascii?Q?f0iod2L6O2QDJOPtYMI0Amz/FUpkBVx0p78chLGWsw8DgEJkX6US8nWmt76d?=
+ =?us-ascii?Q?NwXShZO/DEcs6S3hI26MkJHgihEYWYXr1dL1rpq7Zna5tS7ZUMbdZGRU2Owc?=
+ =?us-ascii?Q?7xglV5GbVWUMFq40iSmXfNLf3IhfkrS9iny7G5Y5LRvCLgNQv8ELWYbcwSkf?=
+ =?us-ascii?Q?sDgg8mEQ9BUlCtZ6ikLm1jqJJ042+8Xd9e7Dn2doQUPonZaSMMFXV2gN33xY?=
+ =?us-ascii?Q?eC7QRAUGjFBE5ZYeLXGI0x6QM/TpOvMcbxt7/SnmJ/EHw43EqEVX9F3iBsQm?=
+ =?us-ascii?Q?W2DBdAEbNeG19inPAswzIXPmx8Bof9Nyhgdtskyj/NLYup2ai+R7NSG+wm+5?=
+ =?us-ascii?Q?cJjUdO1GFFtBwMpqjnnlTSOhHmj1/D2zFDJQnLPf26XSYN8CxdfuTqM/CFud?=
+ =?us-ascii?Q?g4caJCK8JwO3WkGDdpKV8ffknkHf6xWdkLUDmPD7EIoUkbSy7Ylgq8RXyG3T?=
+ =?us-ascii?Q?aIfBbydMe+FrP35JojRtjPnQRQ/B1Af7tSKMWIty4oUOTHk7oFJ4b2swpU3i?=
+ =?us-ascii?Q?bbtVl3LBWrKBL1TvU6QphUkTVJi2W97zzPKNtphGTVqfiQAbqNlwom03tjrk?=
+ =?us-ascii?Q?30AB4cAjx2UuGtcNJU2kzCjUZRZpesAyF4fW3jAL8Ac1U4nvhLRvPRTOCuK+?=
+ =?us-ascii?Q?EJSIsgOsOvn64KVK4Jpzz2mqDk+by9LGWRziBP/LaL73+dYYQ1cQaGzki08S?=
+ =?us-ascii?Q?RaSM+7jziJ/Lnk9Ufdtg0vmtGNgiSDa9txoTtnZMojI+MMQWgjcJgs3UkqHt?=
+ =?us-ascii?Q?gy5xWwbouy+T0ypTFgJ6vjhQUzTYAhTXZXad7XeoHgP0FdCs7xoyQHojp6Bf?=
+ =?us-ascii?Q?x5Co9qjQeTEZ1xxtgsQ0U6IdtRdJxbVivDLQU4+8jr9XDNZqpfZDjV3dBMLs?=
+ =?us-ascii?Q?96NoSDQ2M5Y=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5344.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?YfMhz4EZFtpDEhahQIMDdvA8x8Sm2WRvHHOkg3r4n3tHixO+Wia4Fk6bD2CI?=
+ =?us-ascii?Q?W7tXUkZqsavgv9V0fo64edpo6pd4nTMOICl4rHpH26QX5oWoHylncxk40Fxm?=
+ =?us-ascii?Q?+n4yhE+IumaMt8yIxcik9+GqWAPD4b7a8FIVn7i41oFcERx54kyFE5ZgeTjn?=
+ =?us-ascii?Q?mF7n0C2BtIYIjqQzDmwIxqGPeUe+Uj7M8Eg3YhvRwMs4fXV7xS8r/16HZS7b?=
+ =?us-ascii?Q?bfCYyFcvk2D6LOrskfnNAJlxQm8VoXg9IwzYsM0XZ26u+eiW4TbXDAZ+uXTL?=
+ =?us-ascii?Q?Evp4hSMC5UkkIKhtQjPhzRyAfgO58NJ0cHOpXhB0TP/CrCdIoRJosHk9EmVL?=
+ =?us-ascii?Q?wUXK1jiq6gZDRKpfjkc4/uytvFMR2v5cavzNR3BrWvVuQ8e30hUckN6yhvry?=
+ =?us-ascii?Q?C9FGK1qBG9mn3PV/Yb2RSvSlyJI9jz3DBKZLrhdpeAFFsaXtEez99Vz/0hB4?=
+ =?us-ascii?Q?7RvrEunHmc3v4A02ipFY3HLqpsOFJMxPV7xnEeWLVS74iM0dIzrygRDC1cUo?=
+ =?us-ascii?Q?zJlVVaQ8z1+nCI49aVUff4kk4SixybJ+gp9s98g1pWyhrF9uaVjHoy3/LmOz?=
+ =?us-ascii?Q?YaeZbupAJuRG1Og3zrGPnIX6z9JA6HZ8EnwlFZW7rRH6jyZvLiSnIPRn9cCD?=
+ =?us-ascii?Q?xYIirqO5WuLmGPsxGkEFy/eR5L+OEGOE3RCTtGgnUM8CAJVBYKKuQpkU87jT?=
+ =?us-ascii?Q?S1J97SzVzIAnTUsvgm+9vMtjYP7VJ7eAVehJzhDGLPriAHVkEzvwEyLhV2a9?=
+ =?us-ascii?Q?5qOEliUncm+G3r/gVPbbebPs38ASTmYgfLqlLhZC7TbakLT+FicgXyP1RHxj?=
+ =?us-ascii?Q?9yHR5LgpDM2ArvDQcaZyYFhcWFbdCkxbqTAPZhBk4Uq8OnVhB39L6HpdOnHT?=
+ =?us-ascii?Q?fkGdXUyp0sfmoKtxQ3ngfRmKlMlqGjRq0tzxiVI2ZbSbsI1xtiD6Yfi23V92?=
+ =?us-ascii?Q?yCnN6pwzWM0kzywoue6LxaRzq8sBG9Xi3TloG186U3ItflTmG56A94rVkmOF?=
+ =?us-ascii?Q?u6xMLiv0WLjw+jPSb/ghKd5cMJ95QHSJ8utL1ghZVswo+FEMGYXp1Rksc5LI?=
+ =?us-ascii?Q?TXns4sSGbgS/ROrkcKnXSV+nzvliz7nlZmcgnfzCiYHkB+eegERiiNn0Bofl?=
+ =?us-ascii?Q?29T4gWjCTJKeC+IZotrimRmzNXP4WfqkIrguaTomeHbZyErzfgKhNqjZOrZB?=
+ =?us-ascii?Q?vOlsxu0u5HgL3sCTt70uoi7KkKdlvkQhRV+1lU6nUW1EjIywJLEGvFteRhhy?=
+ =?us-ascii?Q?9wq1YcXbgegXknDasc2yrRdcY4vlNwDVOcXnCfr1v0FREfDfRVBW1sC4nO2/?=
+ =?us-ascii?Q?ajqnqu4D3msHh6biewuD3ZWnRdTZy1mUaEvu5YhCbTD8xA1/Ulq0KNk7XRr6?=
+ =?us-ascii?Q?2WcTjKEDc3s+M2ahrn6F3TPxkQ25epYMMV+z+TCvvgR3bqQ6HX9hY5pzcYlP?=
+ =?us-ascii?Q?/UyljNlamzkr2B8bRt/0MwsZb9UXYY7eQgJ1gm6U9xHNceiWGjznNnfNtG26?=
+ =?us-ascii?Q?vPWLjkw2Oc47NE+9ci+GMvEfqBOlBIurgnk+6UK39RXOBgFwBXwtE/IuneZ7?=
+ =?us-ascii?Q?z/E31R/FAebYOx8zsAEdHyyvBcPg2fxj6igzaxBnbTjcRtS/4KzvPVjDYqSd?=
+ =?us-ascii?Q?HQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	dNuRKebnNChIuDQawsjA1Cm8bmoT963SNbwZETL8C5ixjITyh7kAFHP9lrzy1QGFc13XdnlDJxxzK575tvDEz7MufQAH8JpD/gOzjyxLopUv1JEvWq0UmT0o8G4OhVnSRYe4JlzS8yhMXOwDb2a0Isu29RTiL3GhkZQT/L1krj37nIpPVwFkVZzzMjOswQO+bLwTcyavgVj6ONhGGxBJFFLN5ZtRF0y5zg4+NFJMrN2P7/ZRyeyFyJq6QJ0noC//a3slzHV2OpWoh4PUj1ilJa5cFshYTTQ3FiD/Im4FSPUf3zjLoXap65oSJ01kbrL6tZm/Hzs0/VzAzPjrbLU1UklSbLTRS1BafFm/6d/nL9JCntC1NwueIkpiREytUU8nHySSmvUohaUrjTv27gpeooKRvHRiC+bYAUUo6lu97ARH3yq0jAQzkifmmH9Qk8ZOJawf0QQUydt76jmG3uOHpIcQXrz9CIELLPHIUbxpyHKRQU+Pzx3+S4OMQ/EaNKrDAX8asgkjP0m/Rb5BYMXZ0CPILz6mxUrx93IqI6rchPYtnOowt5iiAaLJDt9eYs1dGSqZT/DALSGUx1+yVEyE/TyN85GI5FmIk+bUnaTMEec=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e96b1d1-07fe-462f-bfd3-08ddaa1cd5b1
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5344.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2025 01:51:37.9141
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TuxtkHuy62VAHCBs5fCB+0RuNeVtZh7HsH/SilzfY6MBuVFGsYTUCBiCYWqh2yedp99HI/Ft6GJg4/SV/E/nimvd3N0VtBGIoemYo5sgVE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6448
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_10,2025-06-12_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=897 bulkscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506130013
+X-Authority-Analysis: v=2.4 cv=fdaty1QF c=1 sm=1 tr=0 ts=684b842e b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=H6_HBJHk608_68Q0peMA:9 cc=ntf awl=host:13206
+X-Proofpoint-ORIG-GUID: LUzcp1alU8QjN1d7kAI5OhNlEItJbWN8
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEzMDAxMyBTYWx0ZWRfXxbdW/+zlRzxs HnG0mGi89ZAGiln7Rbw1/UB7hzBJQQExDdMRqftRYOrcSLHSKTTopjugpJ/dKhzHC10XrRdXcDL gc2th+wIHJPApQC5tyyIlWKzRJMYj6q3xmbc5jdl6RjlxCYIE233h/hufq3Mp5nE9jDBmY2SRxe
+ PBLhXZw5uWP9jZgvaNT7gffDvMMTmZXIAXPlmoZzT/28iloQA1iFvx8jWFBDNHo5BkS/t1NBpac ODCgnZ9/jakqsL1DovePNSOOj1Ck/yOYGkI0mqHyuQ6sChwlAOAy3uTvPAzQNajqTG+SGJVvJp4 agynSPTt09a/D1+H5wA3gKi23cUI4uZoj8vtoisvV4n7f5RluARRaWnHJOcDdm2R2XNzX+XiMFn
+ D+PMJbA1g+1/iqOMIB61EwWP9GbppCRh8H5BLv8x4DKzRpBawo4QPIs6H/GpCz2u4bEnyIus
+X-Proofpoint-GUID: LUzcp1alU8QjN1d7kAI5OhNlEItJbWN8
 
-On Thu, Jun 12, 2025 at 6:18=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Thu, Jun 12, 2025 at 07:38:01AM -0700, Caleb Sander Mateos wrote:
-> > On Wed, Jun 11, 2025 at 8:16=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
-> > >
-> > > On Wed, Jun 11, 2025 at 08:54:53AM -0700, Caleb Sander Mateos wrote:
-> > > > On Mon, Jun 9, 2025 at 7:07=E2=80=AFPM Ming Lei <ming.lei@redhat.co=
-m> wrote:
-> > > > >
-> > > > > On Mon, Jun 09, 2025 at 03:29:34PM -0700, Caleb Sander Mateos wro=
-te:
-> > > > > > On Mon, Jun 9, 2025 at 5:14=E2=80=AFAM Ming Lei <ming.lei@redha=
-t.com> wrote:
-> > > > > > >
-> > > > > > > Document recently merged feature auto buffer registration(UBL=
-K_F_AUTO_BUF_REG).
-> > > > > > >
-> > > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > >
-> > > > > > Thanks, this is a nice explanation. Just a few suggestions.
-> > > > > >
-> > > > > > > ---
-> > > > > > >  Documentation/block/ublk.rst | 67 ++++++++++++++++++++++++++=
-++++++++++
-> > > > > > >  1 file changed, 67 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/Documentation/block/ublk.rst b/Documentation/blo=
-ck/ublk.rst
-> > > > > > > index c368e1081b41..16ffca54eed4 100644
-> > > > > > > --- a/Documentation/block/ublk.rst
-> > > > > > > +++ b/Documentation/block/ublk.rst
-> > > > > > > @@ -352,6 +352,73 @@ For reaching best IO performance, ublk s=
-erver should align its segment
-> > > > > > >  parameter of `struct ublk_param_segment` with backend for av=
-oiding
-> > > > > > >  unnecessary IO split, which usually hurts io_uring performan=
-ce.
-> > > > > > >
-> > > > > > > +Auto Buffer Registration
-> > > > > > > +------------------------
-> > > > > > > +
-> > > > > > > +The ``UBLK_F_AUTO_BUF_REG`` feature automatically handles bu=
-ffer registration
-> > > > > > > +and unregistration for I/O requests, which simplifies the bu=
-ffer management
-> > > > > > > +process and reduces overhead in the ublk server implementati=
-on.
-> > > > > > > +
-> > > > > > > +This is another feature flag for using zero copy, and it is =
-compatible with
-> > > > > > > +``UBLK_F_SUPPORT_ZERO_COPY``.
-> > > > > > > +
-> > > > > > > +Feature Overview
-> > > > > > > +~~~~~~~~~~~~~~~~
-> > > > > > > +
-> > > > > > > +This feature automatically registers request buffers to the =
-io_uring context
-> > > > > > > +before delivering I/O commands to the ublk server and unregi=
-sters them when
-> > > > > > > +completing I/O commands. This eliminates the need for manual=
- buffer
-> > > > > > > +registration/unregistration via ``UBLK_IO_REGISTER_IO_BUF`` =
-and
-> > > > > > > +``UBLK_IO_UNREGISTER_IO_BUF`` commands, then IO handling in =
-ublk server
-> > > > > > > +can avoid dependency on the two uring_cmd operations.
-> > > > > > > +
-> > > > > > > +This way not only simplifies ublk server implementation, but=
- also makes
-> > > > > > > +concurrent IO handling becomes possible.
-> > > > > >
-> > > > > > I'm not sure what "concurrent IO handling" refers to. Any ublk =
-server
-> > > > > > can handle incoming I/O requests concurrently, regardless of wh=
-at
-> > > > > > features it has enabled. Do you mean it avoids the need for lin=
-ked
-> > > > > > io_uring requests to properly order buffer registration and
-> > > > > > unregistration with the I/O operations using the registered buf=
-fer?
-> > > > >
-> > > > > Yes, if io_uring OPs depends on buffer registering & unregisterin=
-g, these
-> > > > > OPs can't be issued concurrently any more, that is one io_uring c=
-onstraint.
-> > > > >
-> > > > > I will add the above words.
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +Usage Requirements
-> > > > > > > +~~~~~~~~~~~~~~~~~~
-> > > > > > > +
-> > > > > > > +1. The ublk server must create a sparse buffer table on the =
-same ``io_ring_ctx``
-> > > > > > > +   used for ``UBLK_IO_FETCH_REQ`` and ``UBLK_IO_COMMIT_AND_F=
-ETCH_REQ``.
-> > > > > > > +
-> > > > > > > +2. If uring_cmd is issued on a different ``io_ring_ctx``, ma=
-nual buffer
-> > > > > > > +   unregistration is required.
-> > > > > >
-> > > > > > nit: don't think this needs to be a separate point, could be co=
-mbined with (1).
-> > > > >
-> > > > > OK.
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +3. Buffer registration data must be passed via uring_cmd's `=
-`sqe->addr`` with the
-> > > > > > > +   following structure::
-> > > > > >
-> > > > > > nit: extra ":"
-> > > > >
-> > > > > In reStructuredText (reST), the double colon :: serves as a liter=
-al block marker to
-> > > > > indicate preformatted text.
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +    struct ublk_auto_buf_reg {
-> > > > > > > +        __u16 index;      /* Buffer index for registration *=
-/
-> > > > > > > +        __u8 flags;       /* Registration flags */
-> > > > > > > +        __u8 reserved0;   /* Reserved for future use */
-> > > > > > > +        __u32 reserved1;  /* Reserved for future use */
-> > > > > > > +    };
-> > > > > >
-> > > > > > Suggest using ublk_auto_buf_reg_to_sqe_addr()? Otherwise, it se=
-ems
-> > > > > > ambiguous how this struct is "passed" in sqe->addr.
-> > > > >
-> > > > > OK
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +4. All reserved fields in ``ublk_auto_buf_reg`` must be zero=
-ed.
-> > > > > > > +
-> > > > > > > +5. Optional flags can be passed via ``ublk_auto_buf_reg.flag=
-s``.
-> > > > > > > +
-> > > > > > > +Fallback Behavior
-> > > > > > > +~~~~~~~~~~~~~~~~~
-> > > > > > > +
-> > > > > > > +When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
-> > > > > > > +
-> > > > > > > +1. If auto buffer registration fails:
-> > > > > >
-> > > > > > I would switch these. Both (1) and (2) refer to when auto buffe=
-r
-> > > > > > registration fails. So I would expect something like:
-> > > > > >
-> > > > > > If auto buffer registration fails:
-> > > > > >
-> > > > > > 1. When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
-> > > > > > ...
-> > > > > > 2. If fallback is not enabled:
-> > > > > > ...
-> > > > > >
-> > > > > > > +   - The uring_cmd is completed
-> > > > > >
-> > > > > > Maybe add "without registering the request buffer"?
-> > > > > >
-> > > > > > > +   - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.=
-op_flags``
-> > > > > > > +   - The ublk server must manually register the buffer
-> > > > > >
-> > > > > > Only if it wants a registered buffer for the ublk request. Tech=
-nically
-> > > > > > the ublk server could decide to fall back on user-copy, for exa=
-mple.
-> > > > >
-> > > > > Good catch!
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +2. If fallback is not enabled:
-> > > > > > > +   - The ublk I/O request fails silently
-> > > > > >
-> > > > > > "silently" is a bit ambiguous. It's certainly not silent to the
-> > > > > > application submitting the ublk I/O. Maybe say that the ublk I/=
-O
-> > > > > > request fails and no uring_cmd is completed to the ublk server?
-> > > > >
-> > > > > Yes, but the document focus on ublk side, and the client is gener=
-ic
-> > > > > for every driver, so I guess it may be fine.
-> > > > >
-> > > > > >
-> > > > > > > +
-> > > > > > > +Limitations
-> > > > > > > +~~~~~~~~~~~
-> > > > > > > +
-> > > > > > > +- Requires same ``io_ring_ctx`` for all operations
-> > > > > >
-> > > > > > Another limitation that prevents us from adopting the auto buff=
-er
-> > > > > > registration feature is the need to reserve a unique buffer tab=
-le
-> > > > > > index for every ublk tag on the io_ring_ctx. Since the io_ring_=
-ctx
-> > > > > > buffer table has a max size of 16K (could potentially be increa=
-sed to
-> > > > > > 64K), this limit is easily reached when there are a large numbe=
-r of
-> > > > > > ublk devices or the ublk queue depth is large. I think we could=
- remove
-> > > > > > this limitation in the future by adding support for allocating =
-buffer
-> > > > > > indices on demand, analogous to IORING_FILE_INDEX_ALLOC.
-> > > > >
-> > > > > OK.
-> > > > >
-> > > > > But I guess it isn't big deal in reality since the task context s=
-hould
-> > > > > be saturated easily with so big setting.
-> > > >
-> > > > I don't know about your "reality" but it's certainly a big deal for=
- us :)
-> > > > To reduce contention on the blk-mq queues for the application
-> > > > submitting I/O to the ublk devices, we want a large number of queue=
-s
-> > > > for each ublk device. But we also want a large queue depth for each
-> > > > individual queue to avoid the async request allocation path in case
-> > > > any one application thread issues a lot of concurrent I/O to a sing=
-le
-> > > > ublk device. And we have 128 ublk devices, which again all want lar=
-ge
-> > > > queue depths in case the application sends a lot of I/O to a single
-> > > > ublk device. The result is that concurrently each ublk server threa=
-d
-> > > > fetches 512K ublk I/Os, which is significantly above the io_ring_ct=
-x
-> > > > buffer table limit.
-> > >
-> > > Yes, you can setup 512K I/Os in single task/io_uring context, but how=
- many
-> > > can be actively handled during unit time? The number could be much le=
-ss than
-> > > 512k or 16K, because it is a single pthread/io_uring/cpu core, which =
-may be
-> > > saturated easily, so most of these IOs may wait somewhere for cpu or =
-whatever
-> > > resource.
-> >
-> > Yes, that's exactly my point. Our ublk server only allocates enough
-> > resources to handle 4K concurrent I/Os per thread. But since we don't
-> > know which ublk devices or queues might receive the I/Os, we have to
-> > fetch a queue depth of 4K on *every* ublk device queue. Perhaps the
-> > batched approach you're working on will help here. But for now, the
-> > total number of fetched ublk I/Os is an obstacle to adopting auto
-> > buffer registration.
->
-> oops, I forget the point that buffer index has to be provided beforehand,
-> that is really one limit for your case with too many IOs in single uring
-> context.
->
-> The batched approach may not help too because the model is to issue comma=
-nd
-> beforehand for fetching new io command.
->
-> > And waiting to allocate the buffer index until an
-> > incoming I/O actually needs to register a buffer seems like a
-> > straightforward way to avoid this obstacle.
->
-> One way is to rely on bpf program to allocate & provide buffer index via
-> struct_ops, which can be called exactly before registering & unregisterin=
-g
-> io buffer. The concept should be simple, but the whole implementation may
-> take some effort(most are boiler plate).
 
-A BPF program feels overly complex. Ideally the ublk server could
-create a sparse buffer table and just let io_uring allocate an unused
-buffer index for each incoming ublk I/O and return it in the io_uring
-CQE. This is basically identical to IORING_FILE_INDEX_ALLOC, except
-for registered buffers instead of registered files. It would require a
-change in io_uring to support allocating a registered buffer index on
-demand, but hopefully not too much work to leverage what already
-exists for registered files. And the ublk server would of course have
-to set UBLK_AUTO_BUF_REG_FALLBACK to gracefully handle buffer index
-allocation failures if the client application issues more concurrent
-I/Os than there are available buffer indices.
+Hi Anuj!
 
-Best,
-Caleb
+> Introduce a new pi_size field in struct blk_integrity to explicitly
+> represent the size (in bytes) of the protection information (PI)
+> tuple. This is a prep patch.
+
+Instead of introducing a new thing which means what the old thing was
+supposed to mean, I'd prefer to change the existing tuple_size to
+metadata_size. There aren't that many occurrences in the code so it
+would be a largely mechanical change.
+
+This patch would then become the second in the series introducing a
+pi_tuple_size member to explicitly define the size of the PI tuple (if
+any).
+
+-- 
+Martin K. Petersen
