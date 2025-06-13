@@ -1,123 +1,137 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE4E238C26;
-	Fri, 13 Jun 2025 02:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3118E244681
+	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 02:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749782350; cv=none; b=a0uO754L65C/oJkt/UTJTXxj2wYdqZzJPBsPoLHOB9LhgcA0kP1uCmGMh5PY8KR1f7+GKeiLOISLv7U5Ccan/lgyv0w02CCANqed65ut7U4+Db0N12iQyKy4VU06AbNnEaq0kJ7jaBdtzRdyuGoeVslULiqyH9ehKbfbGNzjVi8=
+	t=1749782504; cv=none; b=i7kPWZhWk7oOx//TPVUQihiMcUtX1ZInN8be0wgW+88gKe1kVq/l+2nuRfcpVbYW9jpQZkqsUR/P2V3oUyHgHeJBmH/lDIhOS8uMO8eoW9//A/LmQ5tCvQXGV4KEPXCw/aHIJn4jueEN7h1DKkDCoXruwXVXKmU8yNfczNxtu5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749782350; c=relaxed/simple;
-	bh=33fE4qM3TNcAYqTzrr/Jfqt+YCnE9SPassKdwYIkyCg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YZ0NgaECX8V6X5aY/VSaJBcu7jeLw5I8GN7VxQCnTEbW0NQDVCEIb45jdS4+cygmtZ3KzR5daCLjaMHAX5Cqiz9UsOy8XSeZvyvbZzJflE94m+TqoWFozyCVlvTebm5GPZI8/I+dBM5vVXqnpo+yBgs/Fj4xIML9sozBcD02JRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgdN+X2k; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgdN+X2k"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-742c7a52e97so1570929b3a.3;
-        Thu, 12 Jun 2025 19:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749782348; x=1750387148; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=r+trFmWQdd5NKDjPst/9tr7cgjEOjUmMLk9lwPDh7fA=;
-        b=OgdN+X2k3I8E1TXYNFaEFmt0Z+c9gTxJ5dCw+Tc63C8bx2Ocmot0+K2jK245vXWRy/
-         UVIqWfLA7POf4uHOXglBzO3GyzXZiPpggrR7LxOJJ2ysUF7EY78Im4f9UzxHUBXBCycC
-         nkAvXYUwlRy3cXDZ0BPltsLJXbdZ1b7VL//j1vCuFvV/aGss9e5vQBRic4r+3CkQijGH
-         JXFOhV4TPKTDahkiit59UD6mxoqiXis0D5SxHAm+vAkmIf0jXnjrH8l/jF7yLehGh8XC
-         eHFPH3tzfrNs7b2RRSIaoABaz2G0Jqqel/N4lFMgQ+Q1jURt31tWqveOWs9hUigXprKR
-         /TpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749782349; x=1750387149;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r+trFmWQdd5NKDjPst/9tr7cgjEOjUmMLk9lwPDh7fA=;
-        b=anH8HbrkTM7rHigTDV0ezUMzcpQUgmjKiIrYU766XkWIaTgm9Il9HhQ/pn2vmiww9H
-         otWfxzX+sEuTygtuuNyy8eYF8WoxGIlBhpr/YnuUlTwwILu5cNnoRJrX31lLq+HjGC4W
-         suXkzIpoi1gmXD6c0L/3WyK7vjLiFXVkCNhYWI9J3MgA94ATbVll0Nybi4tpMr31PiKH
-         yw8ClyRIi8zxKyBlmVpfK4Q3mrzb0ZvVlrZl+ndQaduWGxpu0+lUTsEB3qgeAAAEmSmH
-         1anAHPMUFWE3KNBHeuEFz/lev8Fo/0woZvNVzb0ML4oJ6wQoZN4lqnIMAXgOaMIWLYYY
-         cPRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVhdKuOK87YiYAaidGohqkxaKQz9+7lsqo4DO9G/CRW065jAPc1UoXv0qKz5SCSc7u0iamB/rU6wH2I@vger.kernel.org, AJvYcCXtT20wm2dz1BBUl0YJl4lLPdnEi67NQQqzf6IqIQ44aHiO9QZ4WGbeRXNPxJJnBH100xwZVtd1qMIxhA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW1kMaBY+dW7ymzaM2aTjEPKiBU4VTmSEC7pjxH+tLTYq6W3GP
-	q3hydt0Ev81QGfqCHYr4gNCkxGsUHUAHttqM0ItURxeJ848KjytHrTy3
-X-Gm-Gg: ASbGncu61vVBY5g0Nbppio+xY6B/ddmcSGAK5jdC0ORi3eBJzxcL9d7NVImwj0iw5nV
-	DhRWoEuqXIj+g5sU0aRCl3onKFobwIguQ6J6amVk823OkUJcGPoRzXsPtv4GWH2Ed/ZSH73/6SN
-	BAKyjTy+NVoGI//0DiHT3Mp8kp8dyYTtiUVpcGTR0NE2J/a3ExeXuq8sDcTblcYIv/NP49ncxPY
-	fq5H2w1ZTXpUs6z4pcJKr3YjpdjbzBzZy7V8RuRtef2KSKfst75DRHSrTTIjjxK0d7dyCwTXN30
-	Z3Rc8E/sRApq9QPdliXi9vcIUBhvZlf77F1cgodlwJ0ydbrqEXPR/YIHy7FCoQ==
-X-Google-Smtp-Source: AGHT+IEbubMI4RmYSUIGqk47Q5mLBabSCGqHgDmP/0ShfWK12ZGZtXtevJ+X3QRTX3ppWikFOiOliw==
-X-Received: by 2002:aa7:930c:0:b0:748:33f3:8da3 with SMTP id d2e1a72fcca58-7488f716f1amr2192369b3a.19.1749782348532;
-        Thu, 12 Jun 2025 19:39:08 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900d0becsm479785b3a.154.2025.06.12.19.39.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 19:39:07 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id D675A4209E8D; Fri, 13 Jun 2025 09:39:05 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Block Devices <linux-block@vger.kernel.org>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] Documentation: ublk: Separate UBLK_F_AUTO_BUF_REG fallback behavior sublists
-Date: Fri, 13 Jun 2025 09:38:57 +0700
-Message-ID: <20250613023857.15971-1-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749782504; c=relaxed/simple;
+	bh=cwg05hHPG0IKtD6GFhPq501oDyRMUDwmVrVl3GuPNMo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CpXCJuZ/7URg3As6AfGySkH3PqdO88jGaF5HOSbkq8fnIs+nJkOUJturSdgW/42NKZbxU2ZDGEsYD96EEdMXozc3tuJHEs6SOIX6Gf9jo9uq2c1zLoflhrt3KWQygGb/cSrGPEpgAfHQQB0vUyHyG5RVAEr6kjd1QkaAAyi3AFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bJNvR6RrQzKHNGN
+	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 10:41:39 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 445E21A0D60
+	for <linux-block@vger.kernel.org>; Fri, 13 Jun 2025 10:41:38 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAXe1_gj0to6SlqPQ--.32372S4;
+	Fri, 13 Jun 2025 10:41:38 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: shinichiro.kawasaki@wdc.com,
+	linux-block@vger.kernel.org,
+	ming.lei@redhat.com
+Cc: yangerkun@huawei.com,
+	yukuai3@huawei.com,
+	wozizhi@huaweicloud.com
+Subject: [PATCH] tests/throtl: add a new test 007
+Date: Fri, 13 Jun 2025 10:35:38 +0800
+Message-Id: <20250613023538.2900008-1-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1463; i=bagasdotme@gmail.com; h=from:subject; bh=33fE4qM3TNcAYqTzrr/Jfqt+YCnE9SPassKdwYIkyCg=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBnefadmbHx3keWlxVVerpD9ap++2k+bGr20bq6ncEz4u qniKX4nOkpZGMS4GGTFFFkmJfI1nd5lJHKhfa0jzBxWJpAhDFycAjARZReGvxIWqYsSJuffLl3G LdvBp7r+8WK+lvOG/7hZ0xVePyrfeZ/hn7WWxJLHD5MbVp/2uX31xKFL7JJ6f1uZvvktqdNVKgx cyQgA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXe1_gj0to6SlqPQ--.32372S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zry8JFWUWr4kuw4ruF1DAwb_yoW8CFW8pr
+	yUCa9YkF4xX3ZrGrn3Ga17CFWFyws7uF1UJ3sIgr15Ar1jq34UKF1I9r1ayF93JFnrur10
+	v3WqqF95GF47AFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUU
+	UU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Stephen Rothwell reports htmldocs warning on ublk docs:
+From: Zizhi Wo <wozizhi@huawei.com>
 
-Documentation/block/ublk.rst:414: ERROR: Unexpected indentation. [docutils]
+Test change config while IO is throttled, for IO splitting scenario.
+Regression test for commit d1ba22ab2bec ("blk-throttle: Prevents the bps
+restricted io from entering the bps queue again").
 
-Fix the warning by separating sublists of auto buffer registration
-fallback behavior from their appropriate parent list item.
-
-Fixes: ff20c516485e ("ublk: document auto buffer registration(UBLK_F_AUTO_BUF_REG)")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Closes: https://lore.kernel.org/linux-next/20250612132638.193de386@canb.auug.org.au/
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
- Documentation/block/ublk.rst | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/throtl/007     | 41 +++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/007.out |  6 ++++++
+ 2 files changed, 47 insertions(+)
+ create mode 100755 tests/throtl/007
+ create mode 100644 tests/throtl/007.out
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index abec524a04edfd..8c4030bcabb634 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -408,6 +408,7 @@ Fallback Behavior
- If auto buffer registration fails:
- 
- 1. When ``UBLK_AUTO_BUF_REG_FALLBACK`` is enabled:
+diff --git a/tests/throtl/007 b/tests/throtl/007
+new file mode 100755
+index 0000000..98ba4ea
+--- /dev/null
++++ b/tests/throtl/007
+@@ -0,0 +1,41 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Zizhi Wo
++#
++# Test change config while IO is throttled, for IO splitting scenario.
++# Regression test for commit d1ba22ab2bec ("blk-throttle: Prevents the bps
++# restricted io from entering the bps queue again")
 +
-    - The uring_cmd is completed
-    - ``UBLK_IO_F_NEED_REG_BUF`` is set in ``ublksrv_io_desc.op_flags``
-    - The ublk server must manually deal with the failure, such as, register
-@@ -415,6 +416,7 @@ If auto buffer registration fails:
-      for handling ublk IO
- 
- 2. If fallback is not enabled:
++. tests/throtl/rc
 +
-    - The ublk I/O request fails silently
-    - The uring_cmd won't be completed
- 
-
-base-commit: c73e4b8bde5f2defecef6a3df792971f83841bd8
++DESCRIPTION="bps limit with iops limit over io split"
++QUICK=1
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _set_up_throtl max_sectors=8; then
++		return 1;
++	fi
++
++	local bps_limit=$((1024 * 1024))
++	local iops_limit=1000000
++
++	# just set bps limit first
++	_throtl_set_limits wbps=$bps_limit
++	_throtl_test_io write 1M 1 &
++	_throtl_test_io write 1M 1 &
++	wait
++	_throtl_remove_limits
++
++	# set the same bps limit and a high iops limit
++	# should behave the same as no iops limit
++	_throtl_set_limits wbps=$bps_limit wiops=$iops_limit
++	_throtl_test_io write 1M 1 &
++	_throtl_test_io write 1M 1 &
++	wait
++	_throtl_remove_limits
++
++	_clean_up_throtl
++	echo "Test complete"
++}
+diff --git a/tests/throtl/007.out b/tests/throtl/007.out
+new file mode 100644
+index 0000000..d28cdef
+--- /dev/null
++++ b/tests/throtl/007.out
+@@ -0,0 +1,6 @@
++Running throtl/007
++1
++2
++1
++2
++Test complete
 -- 
-An old man doll... just what I always wanted! - Clara
+2.39.2
 
