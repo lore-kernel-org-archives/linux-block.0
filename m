@@ -1,131 +1,129 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5BE2E11B4;
-	Sat, 14 Jun 2025 04:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CA2E11B1;
+	Sat, 14 Jun 2025 09:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749876514; cv=none; b=C0RUzzQzaoYvxlLTBHaEHmtq3kpnipjYu5D7GO99LLpYP0IMl3Kq7CUV/908TohLvUP2+gRTdmZR3+StVExqLT87MuAXPIaJHsUq+HTtsSuKG8F0glHMZenQeLVSwYEMtiTXwnc5fUaIoi4lMY13HWeZh5krz7NQDt9XKHb4q48=
+	t=1749893507; cv=none; b=Lnkig/O2FTE4H2pkESgAEl4EA3LRiY7I5OWdHeeBGl1htbboHJqYbirvALcaKptpUdWTzSnmI+d3AsQESlHnH8F6ZrqCzvZpcaQu/1ervzgYIqheqI9u8Z3QFBjuG5BBsCbqmVvtbQBtU+lEFibynJDVJuXLCKkIWk2C7Vhx1qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749876514; c=relaxed/simple;
-	bh=lygWowa6guLMhQzlm7uWnDHP6s+JxGl/+Zxvm0cojAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xb0CwOOum4CbZMen1P0TwwNbbS7PT1LItKYBP1CKmNqAgRbRuXs8t5Y9dIyQcINwhYS4lpBX5RE3JyWeeZvkQWCnSJO0RpLvmWVRucXFIc8HBkQdd+lNXIpMn6Lm6xL9I5ubJNnguP4isz+VksLiNOw11vMskbnuqBzD1U2mxaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1749893507; c=relaxed/simple;
+	bh=JshamBfwvE68wdRFcf5ss03G78d6bXwNFx1IUnHVYcI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HCnmiinMPdJeDPBuvl+l8DoLhG4yqCOr7yuUekd4rQHGseSn9EFBTzjSFlfKM3gTGbPfg7glnPVbUF3Rl3c+RwstJg6jHG6Dww1RVSaOXRqSEBaI4TzBUPeqsgpEGs9I7Pw8M5KdpxzYSlx+0Vcg5HkcMXVVz24UK9yT6lOjfi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bK3gL25lkzKHN2h;
-	Sat, 14 Jun 2025 12:48:30 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bK9y71XjZzYQv24;
+	Sat, 14 Jun 2025 17:31:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 9C4381A17DF;
-	Sat, 14 Jun 2025 12:48:28 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgBXvGAa_0xoKqTaPQ--.42646S3;
-	Sat, 14 Jun 2025 12:48:28 +0800 (CST)
-Message-ID: <3d749264-6fdd-458f-a3a8-35d2320193b3@huaweicloud.com>
-Date: Sat, 14 Jun 2025 12:48:26 +0800
+	by mail.maildlp.com (Postfix) with ESMTP id 2F2C21A0F46;
+	Sat, 14 Jun 2025 17:31:42 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAni19zQU1oHxfvPQ--.9099S4;
+	Sat, 14 Jun 2025 17:31:41 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: ming.lei@redhat.com,
+	yukuai3@huawei.com,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH RFC v2 0/5] blk-mq-sched: support request batch dispatching for sq elevator
+Date: Sat, 14 Jun 2025 17:25:23 +0800
+Message-Id: <20250614092528.2352680-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/10] block: introduce BLK_FEAT_WRITE_ZEROES_UNMAP to
- queue limits features
-To: "Darrick J. Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, tytso@mit.edu,
- john.g.garry@oracle.com, bmarzins@redhat.com, chaitanyak@nvidia.com,
- shinichiro.kawasaki@wdc.com, brauner@kernel.org, martin.petersen@oracle.com,
- yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com,
- yangerkun@huawei.com
-References: <20250604020850.1304633-1-yi.zhang@huaweicloud.com>
- <20250604020850.1304633-2-yi.zhang@huaweicloud.com>
- <20250611060900.GA4613@lst.de>
- <343f7f06-9bf6-442f-8e77-0a774203ec3f@huaweicloud.com>
- <20250612044744.GA12828@lst.de>
- <41c21e20-5439-4157-ad73-6f133df42d28@huaweicloud.com>
- <20250612150347.GK6138@frogsfrogsfrogs>
- <3569a77f-1f38-4764-b1e3-d0075775c7bb@huaweicloud.com>
- <20250613055630.GA9119@lst.de> <20250613145433.GF6134@frogsfrogsfrogs>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20250613145433.GF6134@frogsfrogsfrogs>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgBXvGAa_0xoKqTaPQ--.42646S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr15uw47uryUJF4kCryxGrg_yoW8tF47pF
-	yjgFyxKrWDtF1UA3s5Aa10gF1Fq3y3Ga4xCrn7Wryku3s8WrnrWFs2g343XFyxC3s3Wa1j
-	vayxC3sI9ayvvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIa
-	0PDUUUU
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAni19zQU1oHxfvPQ--.9099S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw17Kry8uFWrJF1DAw47Jwb_yoW8AF4Upr
+	WfG3ZxKr1DWFnIqryS9w17Jw1rG3y8Wry3JrsxJF48tr17Ar17XF1vq3W8ZFW7XryfJFsr
+	W3WDJF93GFyUC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUoWlkDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 2025/6/13 22:54, Darrick J. Wong wrote:
-> On Fri, Jun 13, 2025 at 07:56:30AM +0200, Christoph Hellwig wrote:
->> On Fri, Jun 13, 2025 at 11:15:41AM +0800, Zhang Yi wrote:
->>> Yeah, this solution looks good to me. However, we currently have only
->>> two selections (none and unmap). What if we keep it as is and simply
->>> hide this interface if BLK_FEAT_WRITE_ZEROES_UNMAP is not set, making
->>> it visible only when the device supports this feature? Something like
->>> below:
->>
->> I really hate having all kinds of different interfaces for configurations.
-> 
-> I really hate the open-coded string parsing nonsense that is sysfs. ;)
-> 
->> Maybe we should redo this similar to the other hardware/software interfaces
->> and have a hw_ limit that is exposed by the driver and re-only in
->> sysfs, and then the user configurable one without _hw.  Setting it to
->> zero disables the feature.
-> 
-> Yeah, that fits the /sys/block/foo/queue model better.
-> 
+From: Yu Kuai <yukuai3@huawei.com>
 
-OK, well. Please let me confirm, are you both suggesting adding
-max_hw_write_zeores_unmap_sectors and max_write_zeroes_unmap_sectors to
-the queue_limits instead of adding BLK_FEAT_WRITE_ZEROES_UNMAP to the
-queue_limits->features. Something like the following.
+Before this patch, each dispatch context will hold a global lock to
+dispatch one request at a time, which introduce intense lock competition:
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 378d3a1a22fc..14394850863c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -376,7 +376,9 @@ struct queue_limits {
-        unsigned int            max_hw_discard_sectors;
-        unsigned int            max_user_discard_sectors;
-        unsigned int            max_secure_erase_sectors;
--       unsigned int            max_write_zeroes_sectors;
-+       unsigned int            max_hw_write_zeroes_sectors;
-+       unsigned int            max_hw_write_zeores_unmap_sectors;
-+       unsigned int            max_write_zeroes_unmap_sectors;
-        unsigned int            max_hw_zone_append_sectors;
-        unsigned int            max_zone_append_sectors;
-        unsigned int            discard_granularity;
+lock
+ops.dispatch_request
+unlock
 
-Besides, we should also rename max_write_zeroes_sectors to
-max_hw_write_zeroes_sectors since it is a hardware limitation reported
-by the driver.  If the device supports unmap write zeroes,
-max_hw_write_zeores_unmap_sectors should be equal to
-max_hw_write_zeroes_sectors, otherwise it should be 0.
+Hence support dispatch a batch of requests while holding the lock to
+reduce lock contention.
 
-Right?
+nullblk setup:
+modprobe null_blk nr_devices=0 &&
+    udevadm settle &&
+    cd /sys/kernel/config/nullb &&
+    mkdir nullb0 &&
+    cd nullb0 &&
+    echo 0 > completion_nsec &&
+    echo 512 > blocksize &&
+    echo 0 > home_node &&
+    echo 0 > irqmode &&
+    echo 128 > submit_queues &&
+    echo 1024 > hw_queue_depth &&
+    echo 1024 > size &&
+    echo 0 > memory_backed &&
+    echo 2 > queue_mode &&
+    echo 1 > power ||
+    exit $?
 
-Best regards,
-Yi.
+Test script:
+fio -filename=/dev/$disk -name=test -rw=randwrite -bs=4k -iodepth=32 \
+  -numjobs=16 --iodepth_batch_submit=8 --iodepth_batch_complete=8 \
+  -direct=1 -ioengine=io_uring -group_reporting -time_based -runtime=30
+
+Test result(elevator is deadline): iops
+|                 | null_blk | scsi hdd |
+| --------------- | -------- | -------- |
+| before this set | 263k     | 24       |
+| after this set  | 475k     | 272      |
+
+Yu Kuai (5):
+  elevator: introduce global lock for sq_shared elevator
+  mq-deadline: switch to use elevator lock
+  block, bfq: switch to use elevator lock
+  blk-mq-sched: refactor __blk_mq_do_dispatch_sched()
+  blk-mq-sched: support request batch dispatching for sq elevator
+
+ block/bfq-cgroup.c   |   4 +-
+ block/bfq-iosched.c  |  53 ++++------
+ block/bfq-iosched.h  |   2 +-
+ block/blk-mq-sched.c | 226 +++++++++++++++++++++++++++++--------------
+ block/blk-mq.c       |   5 +-
+ block/blk-mq.h       |  21 ++++
+ block/elevator.c     |   1 +
+ block/elevator.h     |  61 +++++++++++-
+ block/mq-deadline.c  |  58 +++++------
+ 9 files changed, 282 insertions(+), 149 deletions(-)
+
+-- 
+2.39.2
 
