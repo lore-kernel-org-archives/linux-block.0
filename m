@@ -1,196 +1,696 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC42F17C219;
-	Mon, 16 Jun 2025 14:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750085879; cv=fail; b=ewfKMhOQRfwFsJcFvQXHYrOiIff9Nn+lE4xMxfiqbgJudcPpciiX/XG/XXSEYT0lv/1n42BiymMX3ARRDXQ5I6BDjbQstJrb0fgWHny7hFbjC0hk1isjwJW8ZbdE4hmYM6E+mLZRExC0rqKiSwTUshVFZzFe9ke9Svc/yV0eLo4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750085879; c=relaxed/simple;
-	bh=seqMN7UaEe16YZccIMzERPQmRpzkxuGHpuLxWgSJo8U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QvUUbEnR9vGkYNo8EP3TAGtuDW6AquRIGlEGpFG3l8VqNnerKlNKApTEgLR4h9OrfRbFB8Ba8BXYIkCAHAU45KMbJ46SecIsQVkOCggIKaGXvi1cLGGtWSJ7ZJDA+Hs1R0MAio1engK1fI7LwkVIGdjPrSghnQcc+9fWDTTg/CE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=bjLV0q6U; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=LOqGAKSL; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52C61D90DD
+	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 16:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750089734; cv=none; b=P8SAs+7IlrjEXkQqb7mgd2y6Q/5CVnGkkod/d4rGwmCrd3DjqU3AlH45yppx8csVzuLrP1497JyeNk6TxNkvKJ192upsVBetEYqLY+df+6ag1mT6lBt2vb9839WTGcQyj6dx895CxHvoAGrUQqR4enjmM6fb5++sYeUIqrmvsEo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750089734; c=relaxed/simple;
+	bh=10Xz1Stad7SLhFWOUMkXTWZpQtQsVMdQurDF/XUJe3w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k4YLW8eSwEgdqlAmx8HzfPyy2rRM8X6A7u7Cof1hdaGgji/Av6s4aRFFlQlWERmfMbQ+bBUYwX18xXOKMIe/PVe1ntXKv4wTDtbcyaZMmqc1WmV0cNAZCerr3nghtJ6ZXZO3KKsp0vfTyqfthRB5znxjZB09UmgDyXG32wVClAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=CZr2tAzU; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bjLV0q6U";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="LOqGAKSL"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1750085878; x=1781621878;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=seqMN7UaEe16YZccIMzERPQmRpzkxuGHpuLxWgSJo8U=;
-  b=bjLV0q6UcwyKp1tSZi5nV4+pX+8UdoSz3pfgWX6unbMq6hFoRFgiKOBu
-   NDUBAcnYZBDUCXNf43SN1zfTElW1EZdT3dwXUtOQaGyoX6o9XpKdRfOND
-   +DpY89WvRSIIGg/b2CFM3jBvo/0xVN5qJCKvzOxiFagViQqLNukTzaIJA
-   eU8csjUcuKvMAOALTZBT4OskiH+IA0pQtxUjQ63ExruMpX6p6sAhcGJew
-   2A7RNiNYKAQ8fRULwjX8YItjG5mLVukDgmI0CfKqX4IYi0cFfax+U0AQm
-   kDMWdp5pEr5w4hD+7s7R6Zh11Ld4E6faY++AxzGdHHt8fjfVYkf9csUNy
-   w==;
-X-CSE-ConnectionGUID: CMp5sB2WRFqxDDlAOOzkTw==
-X-CSE-MsgGUID: sMY9QKbHQ9aZcZnk/t2DGw==
-X-IronPort-AV: E=Sophos;i="6.16,241,1744041600"; 
-   d="scan'208";a="85410858"
-Received: from mail-dm6nam10on2081.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([40.107.93.81])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2025 22:56:49 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cnUh7tLM0deJuSG0Mjcw+3wLWKRsFFiAwBkxEwWd+Sn8JKh/3fr6P8oR2k+I1iCiU2x2P44QsWzuAlsmWkrWdgnxUBtGk9jrH79BjxpXwPrf/LYTQRXpIBHuO4rBHg+4ymrwJv4OJ1jsTAbbh+MfQ5J+J+cPCCti8UnHUeVtyd2MVLph6p2Q0jyPyzg9um7iCOX+LHrlRAv9HI4KRVARZv3xpXZimRVJ5M9unKlSIaC5GHYfIwwhI14SgUBNl2bwq7Br9x5xosp/aTYCFDWEyPdi0qZlNuAexwlp7/RwpCk9ZJAYPd0oA8P4MDaV2O+SyAeh/82VOuIsYKaa9DczFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=seqMN7UaEe16YZccIMzERPQmRpzkxuGHpuLxWgSJo8U=;
- b=C8cPx9O4blCXRrHpZfL4iNjaCskDSfcSeCKM0uvCKMljDTyteZz+ItIr/xahX9yJ7tf0xR6H8HaC439KgRX91n6ZCTx//cj4nZYcfvh3pvqU7Uv7VtfILoa6o5p61X8u0AkfxZgd2HYCmVdxP7gO3QEn5VkfQb+pR/6sWdSNkH1XVlED3zpwXPElWventHWIfHYCDrGjDcyNg5ibqvJs3HIan6x68E7W4nHjyPPJwLVLecUhY3hW73KQAkw1A5OkJenkVXGHUGd/h7axpJ0AT7NR5OtJgVJnW7QQOYQYc3LGBv9Yi+BqjIer2f+ua/RBNxqXiF0WuHiM8Ji7OzUKvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="CZr2tAzU"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-31305ee3281so796907a91.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 09:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=seqMN7UaEe16YZccIMzERPQmRpzkxuGHpuLxWgSJo8U=;
- b=LOqGAKSLqJkmyApP/JyrktY9kTVXXlKTsir0B4QA3QuYzbG2KpdhhLkr/LcxUC8MQ+rmsvmILYgkNk9aht7rwRPAs0dzpSxS6h4ncYbWGOiBq82NCuQ7Ms57y9FaCG6a0V+Gbym5hm26f8uM9nnRSa2Jt8GCO6rJSWrbnI27eLo=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by PH0PR04MB8573.namprd04.prod.outlook.com (2603:10b6:510:296::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Mon, 16 Jun
- 2025 14:56:46 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%6]) with mapi id 15.20.8835.027; Mon, 16 Jun 2025
- 14:56:46 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Christian Brauner <brauner@kernel.org>
-CC: "Darrick J. Wong" <djwong@kernel.org>, Joanne Koong
-	<joannelkoong@gmail.com>, "linux-xfs@vger.kernel.org"
-	<linux-xfs@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "gfs2@lists.linux.dev" <gfs2@lists.linux.dev>
-Subject: Re: [PATCH 6/6] iomap: move all ioend handling to ioend.c
-Thread-Topic: [PATCH 6/6] iomap: move all ioend handling to ioend.c
-Thread-Index: AQHb3r7NhL10uTqoAEen+6MgJpWXLbQF4EQA
-Date: Mon, 16 Jun 2025 14:56:46 +0000
-Message-ID: <77ece589-9639-488d-b230-7dd257572227@wdc.com>
-References: <20250616125957.3139793-1-hch@lst.de>
- <20250616125957.3139793-7-hch@lst.de>
-In-Reply-To: <20250616125957.3139793-7-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|PH0PR04MB8573:EE_
-x-ms-office365-filtering-correlation-id: 231e8a59-c04b-434a-0194-08ddace603fc
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?NEE0QUxCSnlocnc3UkJPd0ZzSHZxV0FSVHdiZ3JZbndjU0RObE0vUXRJby92?=
- =?utf-8?B?TTlMYjMzMFVTYkJjbkVwZlk2RXhhT1FqNkd5K3RQanRIbFh2WG5RN3ByWmwz?=
- =?utf-8?B?cVpEY0wvUEtzQmY2NjRKYlFpank3Tk1ONngxdnZ0ZjFSaDljY1pXY211anpx?=
- =?utf-8?B?L0d3MWp1TkJDeHdIbG9Ebm5vR3ZDWkFpbUppZGhxVUx1UFl5c1hMOWR1dGQ5?=
- =?utf-8?B?cFpnaDJBS3pzQ2dNWUl6RFFwdHNVS3JaaTNqYmc4RzdOdHJ6QU5uam9pbUlp?=
- =?utf-8?B?aWlpaW5NVVNiQ1RKQ0hLdFRTQ2xaWU9aaFVJUzhvWGNuQVJtY0JRdVRYU0kv?=
- =?utf-8?B?c1FueXFKcHpMSWdqbTR5TXdzQTNFY0VqMlVRUjExWXhvRy9NeklYWUhvT0li?=
- =?utf-8?B?Z1RtZE1qVUZjeEN4ZTB5NG9PcG5sOWZtV2NrUURkRzBIV2VMZXU5MW90bXJm?=
- =?utf-8?B?T3pib3FVYmNDY2ZibitlUjh2eUE3OEZPcU1qbmNkakxJMjA2bU5IenQ3Nzdj?=
- =?utf-8?B?M1F6SDAyQlRrdng4OCtMTHY2K3daMi9xUVVpM3VmZTNCcUJWc0FDeTJpbU5k?=
- =?utf-8?B?TWVuakNKQjdZYlBEam5jS3A1M282Tkg2UFZDb01Eb1NScnZuMEFyZi9NY2k5?=
- =?utf-8?B?eSt0U1NzOGgvakFSUjRYQWo4QkFaVEZDUyt5M2VaNDkxVWZxRFVobmxkSkhK?=
- =?utf-8?B?VndIb0hZdndyL3krZ3pMYWlKSERzYjZOWlBYa05Qb3ZHNjJKNlIxVzNzWUZk?=
- =?utf-8?B?dURHeit1dmpGQVB6TkUzRHcrUlJqa3BxMzZWU0hsR0dEdmN1VGQ2RWFaa2Iv?=
- =?utf-8?B?N3NocHBsS2FyRlgvWGhHYzFCTFdacVErVlYydXlteDN6ZXMvdDRlVGRzVkth?=
- =?utf-8?B?S2NqeW53bjFjRWtOSTVPbGp1NzZIMXpZOENkdGdxeDhVcUhkMkJNODNRc3k1?=
- =?utf-8?B?RTJoeTFIeDE3ZUpHcU0wa2xzb281SVlNNjIxV3NlZGw4bU5oS0FQWng2alpH?=
- =?utf-8?B?UENRWE13dUw4M0d6K0tDWElMSkdmeFJOVWxoVXM4K3NseW9HS0lLK1FzemVl?=
- =?utf-8?B?c284SVEzVjZqckhsb0swbWlaOFFsNkVIbXNTR2dVMWVMcmlibmtnOGZ0U3Bj?=
- =?utf-8?B?YmJQcVVxYzhuQ2tRNVBsRjUzM09CK2JLQkkwNFNLK3FEaHFBZ3ExZlBTcW5q?=
- =?utf-8?B?dXV3Y05GN1dJYkZkcnVCN053eU1RZHp4NlQ3ZE1ZUVUzQ0NMLzQ3RDA0QWQy?=
- =?utf-8?B?U3NFSlZxVlRjU1VRMEJ0MDlsTlc3MU1ySm5kalA0Q0JpQ0l3VTdvbkMzMkFw?=
- =?utf-8?B?YXB4U2ZGQ2tyNkFRL0ZickxYUEtqc2Urc3BnT3l3UEc4elBMOThhMU5ReU9i?=
- =?utf-8?B?YUZBMWhaa3ZJMlhVcEJtazYvRUZPK1gzYzVvbVBJdm1DbmMwVFJtaGlDVUIy?=
- =?utf-8?B?UDB3azZ3bjY0ZGZJdWdheENDeXVzUnJOcHNNRzF5b0pRYWVIdkp1UVV4RmVp?=
- =?utf-8?B?cnNwM1ozaHJEM2hNcGpwbnB1RzdrWEpQcmg3dmhWdTVzTTY1SE5DQUN0R1lR?=
- =?utf-8?B?N0tyNUVMazBLeEdKRGd6eHpCQW5XKzJFWTh2WHFpZm1Ua0ZDOTF3Q2Vscncv?=
- =?utf-8?B?NURtQVllNXdVT1oxMmpyYStLNktqREVhWDVoWGNkOWY4THZrVzI3Z2pFSHJH?=
- =?utf-8?B?Rll2VGNkWjV6WHZhdVlkcnR0Qm03cjVHZEtTK2FoQXRmOUQ1eUZZbXAxKzdZ?=
- =?utf-8?B?MEpBQ012MWdrdWZEc3JpMEJOUlNUdXkvcjZlMzk2MG5NUFMzWk1pUk9vVDdJ?=
- =?utf-8?B?MHJOSGtsUGJxTm9tQ1VHL2xvby9ra3dxSUdXMU5oaUxJU0RTNWFHSnJ0cE83?=
- =?utf-8?B?cXFXcWZrUzZvU1puSHVRa1lHYjc1UzNwOHZkUCt1b0JZL25oVFZMU1lnODVh?=
- =?utf-8?B?N04vckdQbndORTNMYndnY0V3L09NLytaeFdyMk9ZZkk2bVF0Q1M4anBrMDlW?=
- =?utf-8?B?YUJ6djRCaGdRPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?K3ZQdVRKc2x3dEFRb2xObVJjRHFJWTZSWEgzamIvTXFYY2g2SkRJU3h1RjVD?=
- =?utf-8?B?SHdhWXdqcFdiSTJsUDQ2UlFxOHErT3B4UG0wdTB2alFvQlVvc1EraElrTlZk?=
- =?utf-8?B?TlFWNW9ZeGIzbFV0YmlENFFSdEptMzFFMXZ1YjZjWGRjK29veXJldmhCMitE?=
- =?utf-8?B?WHJINXFUTGJHdkx1Vlh3cHRuS25PTTNHWkpjU2ZUc05LdTFsa2xlSWdpcUI5?=
- =?utf-8?B?TndZMkhoTnZUNjN5Y0pJWDR4SXJZOHYyWHZZRXp5ZEJoZW1FVEQyVmh0dTkr?=
- =?utf-8?B?ODdWTXpkN1d1QUNEU3pQRHAxUDJlcDB3WERyc1kyOE4yVjBPVGEyMU5kNjd0?=
- =?utf-8?B?Q3o1eEYyem5tKzIzSEp4S3o2M3lsVzBhMy9RNW1NK1hNYTZvM05ad1ZmcTNR?=
- =?utf-8?B?dy9RZysyYkpDK3lxU3lwaHMwNHpCQVhndUtrVWQ4OVFWWVUwY1pFMFN6WWor?=
- =?utf-8?B?RWhIdTgwQXEvZVZVKzNKMmhnc0sra2UvdExLdnF2dXEvdEhJVC9vRlBkREJP?=
- =?utf-8?B?bGZMZWxmZ1R0M1hXZ2VORStRRXc4b2FFUFN6KzJRT2hmYWRaUVFQMjI5VFpY?=
- =?utf-8?B?NjNSVGZpYmZlQVYwWTRVcTh4VVRtOEdidEdqZnA3bWtCRU8rakN4eEFnS0xF?=
- =?utf-8?B?R3M1cGF3UzhKeVVsYXVJK2NyRkIzd1lYTmtqQUpoN3AweWh1TEVBcG05Uk9Z?=
- =?utf-8?B?VFpZRjNndXRpWFFnOHJpVjRwemRhR3BSRlk4Rm1jYzRkdTh5Ui90NEFsSlBH?=
- =?utf-8?B?YVFxV25ZYjNsUHFiOFFhSkhPYmhydzlvVlAvMlNYd21ZcFBkcGY5eG1TWnI2?=
- =?utf-8?B?Rmdyek9MSytpRlJBQVNEUDBFeU54NHlMaGtZVFJGblBwTlBlVUpScmEyRmFk?=
- =?utf-8?B?aWxQeE1TV1hRZjYrZXVOb20ySkxEQ29RZER6bytOcUMyUkUrdm5aR0J0TkMv?=
- =?utf-8?B?cFdBTnl3bUU4TTBMd3p0dDRrbmwwdmIzaTVDckQ1bndnSHYvaWNYdHFZcEU5?=
- =?utf-8?B?b2FWSXhuY0xpbDNSazM1d1gzd25zQWZ5U3FTdDNoS2toZGZLWE40WEtKOXU5?=
- =?utf-8?B?Q1BtMjNaSFAyTkJqaU9Nb04rNnk2ZE1rY3JRa1RnWEI4YmZWZUFJdTNsQm9Q?=
- =?utf-8?B?b01hL2gxczRmK2xzVUZBWVlnbFpnWWgvWnN1YndJRGFKTlA1cTV3bWx6Zm5I?=
- =?utf-8?B?Um5WemxCTjgxVEdQcEszMEN1bmt1cE9XVVR0NWEwZERQN3Z2U1k3VjhyZ0VY?=
- =?utf-8?B?ZGtTS2lPbWk4U0FuRDAweG9RT1ZQSVcyTHVwSHdhQWoxbkVVYnJnMXdOS0tP?=
- =?utf-8?B?aHJDeUN1WHFzdlp5SENFdlc1bWhYN1oyTEhHYjRWaGRlQXZLWlVRRTBER2ps?=
- =?utf-8?B?SEhWZ0h4RGt1MHdNRmo4QnhsNU0ySkh0OC9rVlRNZ0dZRjd1WW5CR0diWTlx?=
- =?utf-8?B?dEU3UmRPcmlkQjc3ajFldTE1c2VyOGl6cExHWnowR1krYTJyajR6b3JGcW10?=
- =?utf-8?B?MHYxNVBOMkl5V2hrVWJTRmhKUzhHSHkvY2FvMHYzVFhIWHRjVjN5YnlXTDFU?=
- =?utf-8?B?enN3bzdtZDYzVmlNTnN2dWlTbEZLLzc2LzlmWG5vbmdzbGxkY3NzYUVBMjRP?=
- =?utf-8?B?LzFhVDVPejZXY1U1TVZjVjZEa2tOdDR1amJLVmhaWmtHaHZwbmFKWkNUbjk1?=
- =?utf-8?B?YUZ4dWVDVmxsc0NNaWh6M1dTY2dKZmd2aVBzVldkMXNDUlFBL0diNERrakc0?=
- =?utf-8?B?bTdyNng1cXdKWHVkdThoS1VCYXZBWkVka0h3YVRrUi9IM1ZWdWlISzQzemVY?=
- =?utf-8?B?OUlOUmdDZGhpSldIZHFsQy82VnkrOThmbDNrdUZNclJmWDV4MGtaeVBBbWsz?=
- =?utf-8?B?a29oSVV0NVJVcC9nd3Qrb2R4OG5LeUgySHdLanMrWkNHQ3d6Z0RpbE9ZYnhM?=
- =?utf-8?B?dWlkak1XRXpqNU1vSS9hYmJvc1lhSXYrbzF1MHBzZmlROHhZNC92ZVc3dmNI?=
- =?utf-8?B?empPQ2lmaGZMUUV6TDZUS3hYLy9LV1l6eEZ0V3RFYlc0Z285NzFyWnVuM0I0?=
- =?utf-8?B?Z1NwVEtqZEQzYmtGMGt2NlViTGdpYVhOK3YyNUhjYUN2M1NYcVR3am1UMDMw?=
- =?utf-8?B?a04yUVIvTE04dFJaa2N2aUllZW5MNTdDMm4zNWdyL0VZK3ZnSzFTUjB2ZHM1?=
- =?utf-8?B?ZUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <97B196DF25D1E04A8BF6E069F2142196@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=purestorage.com; s=google2022; t=1750089731; x=1750694531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eaSjeo7bbATdndprCLQnjsDfDUJDERfqYi1V5ELMjlg=;
+        b=CZr2tAzUBblKJO94E8+o0caq2OT7JbFas6flZvNghzUR6w/3HpCIGTXsQ7zI80mRtj
+         bayTHB9o/ErGWeRK1B/zH6sReVvPPvEy+p/PGDu6vNcg9wYuhmdFRieuB30sicNX0uAr
+         xpWMZB6gqtNzqWKVDS4oEyam24ttcVRh49SAKCIdRLvLdG4bwUFJGQiXPHnTBPnUwJP5
+         q2DX3J5n85N5eMaBpuzJcCPe9XnWZ3K+sIPLa58AGarDN1J4By4yeSf40fsqX/KvYB2p
+         6YnG8onPAGytrfXNErpcihYa5bXRFLcETc1YxU3UTP5bewdIabuNYAf8T8oSQr3AfP3k
+         ndrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750089731; x=1750694531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eaSjeo7bbATdndprCLQnjsDfDUJDERfqYi1V5ELMjlg=;
+        b=ECbz+RqsltBKSQfFLEXphPwJ7RwdkgwKtqlTdmKCeiBcLkpKmr9bL1o0CEpJtQjwi9
+         DeAE65xo05hPVwCPeLHjSjwT3FmzsMp0pTRXoYR1BVULTcYhDo1KGslXQ78K1BunHpC3
+         Ta7nbg9N2riQttagidLMeMaTNZpOEuoSsyOVLv5HK3w5aurRRNRkGSlQwFsQ7kjEjyW1
+         /130/zt3OQyia2jF/+68tC76MCBBbFut8MoDGfhemxSGwUE+4YnB+H/f1CBaZUXd09Pk
+         gvBLZ6oh4Np5eVwSV43ZMSP5xLyJFYocZGYrJwZpvkjCCa4Sdvkg4yV0ogfa4lJEIBTV
+         Ja3g==
+X-Forwarded-Encrypted: i=1; AJvYcCWVeAu2VJpmUS9QKdMf/J1uAIcCg62W/xWqB3b0TFQiJj67de85XFB+zG6bRrXxyidKDY6S1DNZubAlIw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI9f5Nux3dezap08GC2BfQ1NxiaWicD9868qnQ9rIi7s6kIETp
+	pfVuSWnVsXvXCqu2DprBEznF+bLMWdlFWl8XbUlQNAjwmPdpEonf6/CgJl+Cp9CZNmu7qWSgB08
+	3wsPrBQ7IkH2fVCsJGzfxwQwPedylFaq8a8D6LqWcfQ==
+X-Gm-Gg: ASbGncsN+vqFluWnxEmRjqVLEKLmWG9SGlHpXjWseMynF2T4RsQu6fDWr7rOoRMM4Mt
+	FeTT6uR14JzYQcbdsyGCzwsmpA9JRvlmrHpyoT4g7B4Hc5UFPHVk/8N1YeYqgv7IusBtV07Vbvx
+	HtXy5pS2W8XzMb/xrIwoAK4qJftg+XnCsWO0zEcO5gmfAy7PSIuzP3fw==
+X-Google-Smtp-Source: AGHT+IGQY/5pYEXhhUiRFPMj372tlyX0x50jhD7f1brU/hEVI/Pioa+2xFaz3vPi2CDT2tELlneT3sXkDKcsod7hrQQ=
+X-Received: by 2002:a17:90a:d890:b0:312:e987:11b0 with SMTP id
+ 98e67ed59e1d1-313f1da99e5mr5742095a91.6.1750089727212; Mon, 16 Jun 2025
+ 09:02:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	YKIguwDTW3i6Jtfw12sa5pvhML4FNfeFmM07f58ujgbqY7YTYtrqCs8OHp+rhNrtkLQCw7OKTMETV3zqExxXC5vKNkeUOO4UjV2FfMM2sK3GV9GCQ2YDGMwaVNBL4ciqJzzniyztl4rbDCh4Ix/SYl7kr3DNOepmuPv8YDvYziy+XdBq7KYk04NugUOXjuW8lAJwuoOlk7AsT48B+EvpPorKyxtfAgxnSjkCzqgxYWoXEEljBUgtVRepsTvAQg1NsmGbH+ygHiikUc3gxzWe4JEcMpLYRbv7D8ohIozc+SPpB6iVWYl7tuYVvXgVMWI00l1LXo0XnZNyO9T+sah9FNTz6QloWcgWJhTbnXDN2M1TdfG22a9hlZ56xRT70Mg0dDL+AHm+pqMeaUsrqKmhFwsqK50oI4T6NeVJsu6UAFz+dJ3f0ubZXH2Rvz/nUP0jsptmWhK+7oPyw7XXm2/kQDHvFI9PWmjI+qrBScJqVu9aHPrcR+6XNqokzFFigWA9wExllYRVs5t8n09FHCGFqXPAB67mKGht8aYdZGda7xJ1oeAZGUSaNYqYluWghjbl9FJ5mMUhp7iQerl3VH2zvKRGgRUD9xxA2CJUkMoLFIB/k+nt7WTHVE7T5wwOtdQ2
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 231e8a59-c04b-434a-0194-08ddace603fc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2025 14:56:46.5737
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uJ4lpuxtETiF2PtQlE1b783sedwOLEbgpo3rWf2vSuBDYY4XCviGRemhLcLqPZOyTKq7AhPfJn7NXNI3yGSwYD1wmMS9h+VFNWRG0uuKPjg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB8573
+References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
+ <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com> <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
+ <aEpkIxvuTWgY5BnO@infradead.org> <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
+ <aErAYSg6f10p_WJK@infradead.org> <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
+ <aErGpBWAMPyT2un9@infradead.org> <2de604b5-0f57-4f41-84a1-aa6f3130d7c8@kernel.dk>
+ <aFAYDPrW4THB0ga7@infradead.org>
+In-Reply-To: <aFAYDPrW4THB0ga7@infradead.org>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 16 Jun 2025 09:01:54 -0700
+X-Gm-Features: AX0GCFuklNGcw6RoNUf4SoZ0zhMACfCa7lwkSw9HrtNWoP85M3r-Rh-RBq0WJr8
+Message-ID: <CADUfDZqie84nJeBVJn94UvYqNhY73n41L+tbXOnXdMBqesLDWA@mail.gmail.com>
+Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge attempt
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gMTYuMDYuMjUgMTU6MDEsIENocmlzdG9waCBIZWxsd2lnIHdyb3RlOg0KPiBjb2RlIGNhbiBi
-ZSBzZWxmLWNvbnRhaW5lZCBpbiBpb21hcC5jLg0KDQpzL2lvbWFwLmMvaW9lbmQuYy8NCg==
+On Mon, Jun 16, 2025 at 6:11=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+g> wrote:
+>
+> On Thu, Jun 12, 2025 at 06:28:47AM -0600, Jens Axboe wrote:
+> > But ideally we'd have that, and just a plain doubly linked list on the
+> > queue/dispatch side. Which makes the list handling there much easier to
+> > follow, as per your patch.
+>
+> Quick hack from the weekend.  This also never deletes the requests from
+> the submission list for the queue_rqs case, so depending on the workload
+> it should touch either the same amount of less cache lines as the
+> existing version.  Only very lightly tested, and ublk is broken and
+> doesn't even compile as it's running out space in the io_uring pdu.
+> I'll need help from someone who knows ublk for that.
+>
+> ---
+> From 07e283303c63fcb694e828380a24ad51f225a228 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Fri, 13 Jun 2025 09:48:40 +0200
+> Subject: block: always use a list_head for requests
+>
+> Use standard double linked lists for the remaining lists of queued up
+> requests. This removes a lot of hairy list manipulation code and allows
+> east reverse walking of the lists, which is used in
+> blk_attempt_plug_merge to improve the merging, and in blk_add_rq_to_plug
+> to look at the correct request.
+>
+> XXX: ublk is broken right now, because there is no space in the io_uring
+> pdu for the list backpointer.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c              |  2 +-
+>  block/blk-merge.c             | 11 +---
+>  block/blk-mq.c                | 97 ++++++++++++++---------------------
+>  drivers/block/null_blk/main.c | 16 +++---
+>  drivers/block/ublk_drv.c      | 43 +++++++---------
+>  drivers/block/virtio_blk.c    | 31 +++++------
+>  drivers/nvme/host/pci.c       | 32 ++++++------
+>  include/linux/blk-mq.h        |  2 +-
+>  include/linux/blkdev.h        |  2 +-
+>  9 files changed, 103 insertions(+), 133 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index b862c66018f2..29aad939a1e3 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1127,7 +1127,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, u=
+nsigned short nr_ios)
+>                 return;
+>
+>         plug->cur_ktime =3D 0;
+> -       rq_list_init(&plug->mq_list);
+> +       INIT_LIST_HEAD(&plug->mq_list);
+>         rq_list_init(&plug->cached_rqs);
+>         plug->nr_ios =3D min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_CO=
+UNT);
+>         plug->rq_count =3D 0;
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 70d704615be5..223941e9ec08 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -995,17 +995,10 @@ bool blk_attempt_plug_merge(struct request_queue *q=
+, struct bio *bio,
+>         struct blk_plug *plug =3D current->plug;
+>         struct request *rq;
+>
+> -       if (!plug || rq_list_empty(&plug->mq_list))
+> +       if (!plug)
+>                 return false;
+>
+> -       rq =3D plug->mq_list.tail;
+> -       if (rq->q =3D=3D q)
+> -               return blk_attempt_bio_merge(q, rq, bio, nr_segs, false) =
+=3D=3D
+> -                       BIO_MERGE_OK;
+> -       else if (!plug->multiple_queues)
+> -               return false;
+> -
+> -       rq_list_for_each(&plug->mq_list, rq) {
+> +       list_for_each_entry_reverse(rq, &plug->mq_list, queuelist) {
+>                 if (rq->q !=3D q)
+>                         continue;
+>                 if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) =3D=
+=3D
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4806b867e37d..6d56471d4346 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1378,7 +1378,8 @@ static inline unsigned short blk_plug_max_rq_count(=
+struct blk_plug *plug)
+>
+>  static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq=
+)
+>  {
+> -       struct request *last =3D rq_list_peek(&plug->mq_list);
+> +       struct request *last =3D
+> +               list_last_entry(&plug->mq_list, struct request, queuelist=
+);
+>
+>         if (!plug->rq_count) {
+>                 trace_block_plug(rq->q);
+> @@ -1398,7 +1399,7 @@ static void blk_add_rq_to_plug(struct blk_plug *plu=
+g, struct request *rq)
+>          */
+>         if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
+>                 plug->has_elevator =3D true;
+> -       rq_list_add_tail(&plug->mq_list, rq);
+> +       list_add_tail(&rq->queuelist, &plug->mq_list);
+>         plug->rq_count++;
+>  }
+>
+> @@ -2780,15 +2781,15 @@ static blk_status_t blk_mq_request_issue_directly=
+(struct request *rq, bool last)
+>         return __blk_mq_issue_directly(hctx, rq, last);
+>  }
+>
+> -static void blk_mq_issue_direct(struct rq_list *rqs)
+> +static void blk_mq_issue_direct(struct list_head *rqs)
+>  {
+>         struct blk_mq_hw_ctx *hctx =3D NULL;
+> -       struct request *rq;
+> +       struct request *rq, *n;
+>         int queued =3D 0;
+>         blk_status_t ret =3D BLK_STS_OK;
+>
+> -       while ((rq =3D rq_list_pop(rqs))) {
+> -               bool last =3D rq_list_empty(rqs);
+> +       list_for_each_entry_safe(rq, n, rqs, queuelist) {
+> +               list_del_init(&rq->queuelist);
+>
+>                 if (hctx !=3D rq->mq_hctx) {
+>                         if (hctx) {
+> @@ -2798,7 +2799,7 @@ static void blk_mq_issue_direct(struct rq_list *rqs=
+)
+>                         hctx =3D rq->mq_hctx;
+>                 }
+>
+> -               ret =3D blk_mq_request_issue_directly(rq, last);
+> +               ret =3D blk_mq_request_issue_directly(rq, list_empty(rqs)=
+);
+>                 switch (ret) {
+>                 case BLK_STS_OK:
+>                         queued++;
+> @@ -2819,45 +2820,18 @@ static void blk_mq_issue_direct(struct rq_list *r=
+qs)
+>                 blk_mq_commit_rqs(hctx, queued, false);
+>  }
+>
+> -static void __blk_mq_flush_list(struct request_queue *q, struct rq_list =
+*rqs)
+> +static void __blk_mq_flush_list(struct request_queue *q, struct list_hea=
+d *rqs)
+>  {
+>         if (blk_queue_quiesced(q))
+>                 return;
+>         q->mq_ops->queue_rqs(rqs);
+>  }
+>
+> -static unsigned blk_mq_extract_queue_requests(struct rq_list *rqs,
+> -                                             struct rq_list *queue_rqs)
+> -{
+> -       struct request *rq =3D rq_list_pop(rqs);
+> -       struct request_queue *this_q =3D rq->q;
+> -       struct request **prev =3D &rqs->head;
+> -       struct rq_list matched_rqs =3D {};
+> -       struct request *last =3D NULL;
+> -       unsigned depth =3D 1;
+> -
+> -       rq_list_add_tail(&matched_rqs, rq);
+> -       while ((rq =3D *prev)) {
+> -               if (rq->q =3D=3D this_q) {
+> -                       /* move rq from rqs to matched_rqs */
+> -                       *prev =3D rq->rq_next;
+> -                       rq_list_add_tail(&matched_rqs, rq);
+> -                       depth++;
+> -               } else {
+> -                       /* leave rq in rqs */
+> -                       prev =3D &rq->rq_next;
+> -                       last =3D rq;
+> -               }
+> -       }
+> -
+> -       rqs->tail =3D last;
+> -       *queue_rqs =3D matched_rqs;
+> -       return depth;
+> -}
+> -
+> -static void blk_mq_dispatch_queue_requests(struct rq_list *rqs, unsigned=
+ depth)
+> +static void blk_mq_dispatch_queue_requests(struct list_head *rqs,
+> +                                          unsigned depth)
+>  {
+> -       struct request_queue *q =3D rq_list_peek(rqs)->q;
+> +       struct request *rq =3D list_first_entry(rqs, struct request, queu=
+elist);
+> +       struct request_queue *q =3D rq->q;
+>
+>         trace_block_unplug(q, depth, true);
+>
+> @@ -2869,39 +2843,35 @@ static void blk_mq_dispatch_queue_requests(struct=
+ rq_list *rqs, unsigned depth)
+>          */
+>         if (q->mq_ops->queue_rqs) {
+>                 blk_mq_run_dispatch_ops(q, __blk_mq_flush_list(q, rqs));
+> -               if (rq_list_empty(rqs))
+> +               if (list_empty(rqs))
+>                         return;
+>         }
+>
+>         blk_mq_run_dispatch_ops(q, blk_mq_issue_direct(rqs));
+>  }
+>
+> -static void blk_mq_dispatch_list(struct rq_list *rqs, bool from_sched)
+> +static void blk_mq_dispatch_list(struct list_head *rqs, bool from_sched)
+>  {
+>         struct blk_mq_hw_ctx *this_hctx =3D NULL;
+>         struct blk_mq_ctx *this_ctx =3D NULL;
+> -       struct rq_list requeue_list =3D {};
+> +       LIST_HEAD(list);
+> +       struct request *rq, *n;
+>         unsigned int depth =3D 0;
+>         bool is_passthrough =3D false;
+> -       LIST_HEAD(list);
+> -
+> -       do {
+> -               struct request *rq =3D rq_list_pop(rqs);
+>
+> +       list_for_each_entry_safe(rq, n, rqs, queuelist) {
+>                 if (!this_hctx) {
+>                         this_hctx =3D rq->mq_hctx;
+>                         this_ctx =3D rq->mq_ctx;
+>                         is_passthrough =3D blk_rq_is_passthrough(rq);
+>                 } else if (this_hctx !=3D rq->mq_hctx || this_ctx !=3D rq=
+->mq_ctx ||
+>                            is_passthrough !=3D blk_rq_is_passthrough(rq))=
+ {
+> -                       rq_list_add_tail(&requeue_list, rq);
+>                         continue;
+>                 }
+> -               list_add_tail(&rq->queuelist, &list);
+> +               list_move_tail(&rq->queuelist, &list);
+>                 depth++;
+> -       } while (!rq_list_empty(rqs));
+> +       }
+>
+> -       *rqs =3D requeue_list;
+>         trace_block_unplug(this_hctx->queue, depth, !from_sched);
+>
+>         percpu_ref_get(&this_hctx->queue->q_usage_counter);
+> @@ -2921,17 +2891,27 @@ static void blk_mq_dispatch_list(struct rq_list *=
+rqs, bool from_sched)
+>         percpu_ref_put(&this_hctx->queue->q_usage_counter);
+>  }
+>
+> -static void blk_mq_dispatch_multiple_queue_requests(struct rq_list *rqs)
+> +static void blk_mq_dispatch_multiple_queue_requests(struct list_head *rq=
+s)
+>  {
+>         do {
+> -               struct rq_list queue_rqs;
+> -               unsigned depth;
+> +               struct request_queue *this_q =3D NULL;
+> +               struct request *rq, *n;
+> +               LIST_HEAD(queue_rqs);
+> +               unsigned depth =3D 0;
+> +
+> +               list_for_each_entry_safe(rq, n, rqs, queuelist) {
+> +                       if (!this_q)
+> +                               this_q =3D rq->q;
+> +                       if (this_q =3D=3D rq->q) {
+> +                               list_move_tail(&rq->queuelist, &queue_rqs=
+);
+> +                               depth++;
+> +                       }
+> +               }
+>
+> -               depth =3D blk_mq_extract_queue_requests(rqs, &queue_rqs);
+>                 blk_mq_dispatch_queue_requests(&queue_rqs, depth);
+> -               while (!rq_list_empty(&queue_rqs))
+> +               while (!list_empty(&queue_rqs))
+>                         blk_mq_dispatch_list(&queue_rqs, false);
+> -       } while (!rq_list_empty(rqs));
+> +       } while (!list_empty(rqs));
+>  }
+>
+>  void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+> @@ -2955,15 +2935,14 @@ void blk_mq_flush_plug_list(struct blk_plug *plug=
+, bool from_schedule)
+>                         blk_mq_dispatch_multiple_queue_requests(&plug->mq=
+_list);
+>                         return;
+>                 }
+> -
+>                 blk_mq_dispatch_queue_requests(&plug->mq_list, depth);
+> -               if (rq_list_empty(&plug->mq_list))
+> +               if (list_empty(&plug->mq_list))
+>                         return;
+>         }
+>
+>         do {
+>                 blk_mq_dispatch_list(&plug->mq_list, from_schedule);
+> -       } while (!rq_list_empty(&plug->mq_list));
+> +       } while (!list_empty(&plug->mq_list));
+>  }
+>
+>  static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c
+> index aa163ae9b2aa..ce3ac928122f 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1694,22 +1694,22 @@ static blk_status_t null_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+>         return BLK_STS_OK;
+>  }
+>
+> -static void null_queue_rqs(struct rq_list *rqlist)
+> +static void null_queue_rqs(struct list_head *rqlist)
+>  {
+> -       struct rq_list requeue_list =3D {};
+>         struct blk_mq_queue_data bd =3D { };
+> +       LIST_HEAD(requeue_list);
+> +       struct request *rq, *n;
+>         blk_status_t ret;
+>
+> -       do {
+> -               struct request *rq =3D rq_list_pop(rqlist);
+> -
+> +       list_for_each_entry_safe(rq, n, rqlist, queuelist) {
+>                 bd.rq =3D rq;
+>                 ret =3D null_queue_rq(rq->mq_hctx, &bd);
+>                 if (ret !=3D BLK_STS_OK)
+> -                       rq_list_add_tail(&requeue_list, rq);
+> -       } while (!rq_list_empty(rqlist));
+> +                       list_move_tail(&rq->queuelist, &requeue_list);
+> +       }
+>
+> -       *rqlist =3D requeue_list;
+> +       INIT_LIST_HEAD(rqlist);
+> +       list_splice(&requeue_list, rqlist);
+>  }
+>
+>  static void null_init_queue(struct nullb *nullb, struct nullb_queue *nq)
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c637ea010d34..4d5b88ca7b1b 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -101,7 +101,7 @@ struct ublk_uring_cmd_pdu {
+>          */
+>         union {
+>                 struct request *req;
+> -               struct request *req_list;
+> +               struct list_head req_list;
+>         };
+>
+>         /*
+> @@ -1325,24 +1325,18 @@ static void ublk_cmd_list_tw_cb(struct io_uring_c=
+md *cmd,
+>                 unsigned int issue_flags)
+>  {
+>         struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
+> -       struct request *rq =3D pdu->req_list;
+> -       struct request *next;
+> +       struct request *rq, *n;
+>
+> -       do {
+> -               next =3D rq->rq_next;
+> -               rq->rq_next =3D NULL;
+> +       list_for_each_entry_safe(rq, n, &pdu->req_list, queuelist)
+>                 ublk_dispatch_req(rq->mq_hctx->driver_data, rq, issue_fla=
+gs);
+> -               rq =3D next;
+> -       } while (rq);
+>  }
+>
+> -static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+> +static void ublk_queue_cmd_list(struct ublk_io *io, struct list_head *rq=
+list)
+>  {
+>         struct io_uring_cmd *cmd =3D io->cmd;
+>         struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
+>
+> -       pdu->req_list =3D rq_list_peek(l);
+> -       rq_list_init(l);
+> +       list_splice(&pdu->req_list, rqlist);
+>         io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
+
+ublk_cmd_list_tw_cb() doesn't need a doubly-linked list. It should be
+fine to continue storing just the first struct request * of the list
+in struct ublk_uring_cmd_pdu. That would avoid growing
+ublk_uring_cmd_pdu past the 32-byte limit.
+
+Best,
+Caleb
+
+>  }
+>
+> @@ -1416,30 +1410,31 @@ static blk_status_t ublk_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+>         return BLK_STS_OK;
+>  }
+>
+> -static void ublk_queue_rqs(struct rq_list *rqlist)
+> +static void ublk_queue_rqs(struct list_head *rqlist)
+>  {
+> -       struct rq_list requeue_list =3D { };
+> -       struct rq_list submit_list =3D { };
+>         struct ublk_io *io =3D NULL;
+> -       struct request *req;
+> +       struct request *req, *n;
+> +       LIST_HEAD(requeue_list);
+>
+> -       while ((req =3D rq_list_pop(rqlist))) {
+> +       list_for_each_entry_safe(req, n, rqlist, queuelist) {
+>                 struct ublk_queue *this_q =3D req->mq_hctx->driver_data;
+>                 struct ublk_io *this_io =3D &this_q->ios[req->tag];
+>
+> -               if (io && io->task !=3D this_io->task && !rq_list_empty(&=
+submit_list))
+> +               if (io && io->task !=3D this_io->task) {
+> +                       LIST_HEAD(submit_list);
+> +
+> +                       list_cut_before(&submit_list, rqlist, &req->queue=
+list);
+>                         ublk_queue_cmd_list(io, &submit_list);
+> +               }
+>                 io =3D this_io;
+>
+> -               if (ublk_prep_req(this_q, req, true) =3D=3D BLK_STS_OK)
+> -                       rq_list_add_tail(&submit_list, req);
+> -               else
+> -                       rq_list_add_tail(&requeue_list, req);
+> +               if (ublk_prep_req(this_q, req, true) !=3D BLK_STS_OK)
+> +                       list_move_tail(&req->queuelist, &requeue_list);
+>         }
+>
+> -       if (!rq_list_empty(&submit_list))
+> -               ublk_queue_cmd_list(io, &submit_list);
+> -       *rqlist =3D requeue_list;
+> +       if (!list_empty(rqlist))
+> +               ublk_queue_cmd_list(io, rqlist);
+> +       list_splice(&requeue_list, rqlist);
+>  }
+>
+>  static int ublk_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 30bca8cb7106..29f900eada0f 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -471,15 +471,14 @@ static bool virtblk_prep_rq_batch(struct request *r=
+eq)
+>  }
+>
+>  static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
+> -               struct rq_list *rqlist)
+> +               struct list_head *rqlist)
+>  {
+>         struct request *req;
+>         unsigned long flags;
+>         bool kick;
+>
+>         spin_lock_irqsave(&vq->lock, flags);
+> -
+> -       while ((req =3D rq_list_pop(rqlist))) {
+> +       list_for_each_entry(req, rqlist, queuelist) {
+>                 struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(req);
+>                 int err;
+>
+> @@ -498,29 +497,31 @@ static void virtblk_add_req_batch(struct virtio_blk=
+_vq *vq,
+>                 virtqueue_notify(vq->vq);
+>  }
+>
+> -static void virtio_queue_rqs(struct rq_list *rqlist)
+> +static void virtio_queue_rqs(struct list_head *rqlist)
+>  {
+> -       struct rq_list submit_list =3D { };
+> -       struct rq_list requeue_list =3D { };
+>         struct virtio_blk_vq *vq =3D NULL;
+> -       struct request *req;
+> +       LIST_HEAD(requeue_list);
+> +       struct request *req, *n;
+>
+> -       while ((req =3D rq_list_pop(rqlist))) {
+> +       list_for_each_entry_safe(req, n, rqlist, queuelist) {
+>                 struct virtio_blk_vq *this_vq =3D get_virtio_blk_vq(req->=
+mq_hctx);
+>
+> -               if (vq && vq !=3D this_vq)
+> +               if (vq && vq !=3D this_vq) {
+> +                       LIST_HEAD(submit_list);
+> +
+> +                       list_cut_before(&submit_list, rqlist, &req->queue=
+list);
+>                         virtblk_add_req_batch(vq, &submit_list);
+> +               }
+>                 vq =3D this_vq;
+>
+> -               if (virtblk_prep_rq_batch(req))
+> -                       rq_list_add_tail(&submit_list, req);
+> -               else
+> -                       rq_list_add_tail(&requeue_list, req);
+> +               if (!virtblk_prep_rq_batch(req))
+> +                       list_move_tail(&req->queuelist, &requeue_list);
+>         }
+>
+>         if (vq)
+> -               virtblk_add_req_batch(vq, &submit_list);
+> -       *rqlist =3D requeue_list;
+> +               virtblk_add_req_batch(vq, rqlist);
+> +       INIT_LIST_HEAD(rqlist);
+> +       list_splice(&requeue_list, rqlist);
+>  }
+>
+>  #ifdef CONFIG_BLK_DEV_ZONED
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 8ff12e415cb5..7bcb4b33e154 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -1051,15 +1051,15 @@ static blk_status_t nvme_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+>         return BLK_STS_OK;
+>  }
+>
+> -static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct rq_list *r=
+qlist)
+> +static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct list_head =
+*rqlist)
+>  {
+>         struct request *req;
+>
+> -       if (rq_list_empty(rqlist))
+> +       if (list_empty(rqlist))
+>                 return;
+>
+>         spin_lock(&nvmeq->sq_lock);
+> -       while ((req =3D rq_list_pop(rqlist))) {
+> +       list_for_each_entry(req, rqlist, queuelist) {
+>                 struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
+>
+>                 nvme_sq_copy_cmd(nvmeq, &iod->cmd);
+> @@ -1082,27 +1082,29 @@ static bool nvme_prep_rq_batch(struct nvme_queue =
+*nvmeq, struct request *req)
+>         return nvme_prep_rq(nvmeq->dev, req) =3D=3D BLK_STS_OK;
+>  }
+>
+> -static void nvme_queue_rqs(struct rq_list *rqlist)
+> +static void nvme_queue_rqs(struct list_head *rqlist)
+>  {
+> -       struct rq_list submit_list =3D { };
+> -       struct rq_list requeue_list =3D { };
+>         struct nvme_queue *nvmeq =3D NULL;
+> -       struct request *req;
+> +       LIST_HEAD(requeue_list);
+> +       struct request *req, *n;
+> +
+> +       list_for_each_entry_safe(req, n, rqlist, queuelist) {
+> +               if (nvmeq && nvmeq !=3D req->mq_hctx->driver_data) {
+> +                       LIST_HEAD(submit_list);
+>
+> -       while ((req =3D rq_list_pop(rqlist))) {
+> -               if (nvmeq && nvmeq !=3D req->mq_hctx->driver_data)
+> +                       list_cut_before(&submit_list, rqlist, &req->queue=
+list);
+>                         nvme_submit_cmds(nvmeq, &submit_list);
+> +               }
+>                 nvmeq =3D req->mq_hctx->driver_data;
+>
+> -               if (nvme_prep_rq_batch(nvmeq, req))
+> -                       rq_list_add_tail(&submit_list, req);
+> -               else
+> -                       rq_list_add_tail(&requeue_list, req);
+> +               if (!nvme_prep_rq_batch(nvmeq, req))
+> +                       list_move_tail(&req->queuelist, &requeue_list);
+>         }
+>
+>         if (nvmeq)
+> -               nvme_submit_cmds(nvmeq, &submit_list);
+> -       *rqlist =3D requeue_list;
+> +               nvme_submit_cmds(nvmeq, rqlist);
+> +       INIT_LIST_HEAD(rqlist);
+> +       list_splice(&requeue_list, rqlist);
+>  }
+>
+>  static __always_inline void nvme_unmap_metadata(struct nvme_dev *dev,
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index de8c85a03bb7..76c7ec906481 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -574,7 +574,7 @@ struct blk_mq_ops {
+>          * empty the @rqlist completely, then the rest will be queued
+>          * individually by the block layer upon return.
+>          */
+> -       void (*queue_rqs)(struct rq_list *rqlist);
+> +       void (*queue_rqs)(struct list_head *rqlist);
+>
+>         /**
+>          * @get_budget: Reserve budget before queue request, once .queue_=
+rq is
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 332b56f323d9..1cc87e939b40 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1083,7 +1083,7 @@ struct rq_list {
+>   * blk_flush_plug() is called.
+>   */
+>  struct blk_plug {
+> -       struct rq_list mq_list; /* blk-mq requests */
+> +       struct list_head mq_list; /* blk-mq requests */
+>
+>         /* if ios_left is > 1, we can batch tag/rq allocations */
+>         struct rq_list cached_rqs;
+> --
+> 2.47.2
+>
+>
