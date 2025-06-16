@@ -1,56 +1,108 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93AF17BA6;
-	Mon, 16 Jun 2025 05:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B0972626;
+	Mon, 16 Jun 2025 06:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750052441; cv=none; b=nBumbYhLWcu98Y7ExxtFhN3OL1URwxGVnhmDV+tO5+RsLWoI7LLXVGADh5ue3D52bHctt3iH+0yY74aBN6dz4MkSxSSwA52iT71RSmEkKADmaLeJ551WIDRM5KL+gIHeB7bbJNb7RAN6OBgmFQOetsW2hhJYAoPhBOtMb0dbYkQ=
+	t=1750055444; cv=none; b=dPKZ+KyRuCYPWDcbf20TMeHLz9s0Muietd16isTyVFvYvrVLvnuGYeEEbYf3KdU+Fli2mDEiK7MIw7TKf3/9YePbE0bQOUgTNaP6Y+7H3JpZyYOu1xhv9FwGG4uzWBQRvlGK+YltZ/Zf6Xn/KyYpFhQGle1Cga+xm5Vvi5GYJCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750052441; c=relaxed/simple;
-	bh=zM9L3jCsYS9otA53EROIFxm91VKU6Dqzm/0PSoIh4Kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qjUv0BHd6jCmMrjL+w4YA6TepB5qV805W7wDd9K7ykrtkCdE24emn3xEDhoyteF8goTK3sucnu94QKwlX5rEn0ArTEJXXGn5DSdhlSE12NnboG498PiLWh5WKed6pdbjswGUdjAnGEkqmSzOIOm3r9YICaqgQTOhRNgFWTdYE58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2157468BFE; Mon, 16 Jun 2025 07:40:35 +0200 (CEST)
-Date: Mon, 16 Jun 2025 07:40:34 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pankaj Raghav <p.raghav@samsung.com>
-Cc: Suren Baghdasaryan <surenb@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>,
-	Zi Yan <ziy@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, willy@infradead.org, x86@kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
-	gost.dev@samsung.com, kernel@pankajraghav.com, hch@lst.de
-Subject: Re: [PATCH 0/5] add STATIC_PMD_ZERO_PAGE config option
-Message-ID: <20250616054034.GA1559@lst.de>
-References: <20250612105100.59144-1-p.raghav@samsung.com>
+	s=arc-20240116; t=1750055444; c=relaxed/simple;
+	bh=/CwtFfDuVXOHXbw7WvrWwerepPdxp0HV/s2hw8G1vGA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=t3eUpXYbZsHJou73d/airFpJaioTI0lOZ28eoj4giACV/hrK3xvc9eYB5iT9wEPQ08WJnkmADRk9zeFsASuKqz3KFwHFgEc3SsFSlGNeFAiJ9yr3Z3Z7H/t+0uyefaPK36NW+OSdH3x+ZPP7u+sGCa0a0xz1v7hc81TkTytCoZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzTxUX8Z; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzTxUX8Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A202C4CEEA;
+	Mon, 16 Jun 2025 06:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750055443;
+	bh=/CwtFfDuVXOHXbw7WvrWwerepPdxp0HV/s2hw8G1vGA=;
+	h=From:To:Subject:Date:From;
+	b=VzTxUX8ZhEgBkywNza7SWYPPCHO6CQ7b+FJX0ZpeR4LLj3LhtT/AGmR5b2JdI+lqj
+	 p8oLLAzdPb78qqEm9Qgelj2vdZIaV8E6IA8/cX8zid1k3cZzNIzU0m1CyiI9tWpEWT
+	 5q1xgIf36PaxZ7xaFZ0WZn7OvhKWl+hlavnXEMZ/hGUkxFv0z6I+Ldu/KifWcFMNLW
+	 +M62kruP+z0cV+65ycGyfQc//WSOJ+nn2PRGUuA5ksbAUdtJlVG1jpix3FjL/9wsJT
+	 zoej005D9ve3U4acCXj2y+AK32IB2ugGCT99mpScnOGgkoSKaYwma/cs4M1Yf4XPHF
+	 c0vBblQlIZKtA==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@vger.kernel.org
+Subject: [PATCH] block: Improve read ahead size for rotational devices
+Date: Mon, 16 Jun 2025 15:28:56 +0900
+Message-ID: <20250616062856.1629897-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250612105100.59144-1-p.raghav@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-Just curious: why doesn't this series get rid of the iomap zero_page,
-which would be really low hanging fruit?
+For a device that does not advertize an optimal I/O size, the function
+blk_apply_bdi_limits() defaults to an initial setting of the ra_pages
+field of struct backing_dev_info to VM_READAHEAD_PAGES, that is, 128 KB.
+
+This low I/O size value is far from being optimal for hard-disk devices:
+when reading files from multiple contexts using buffered I/Os, the seek
+overhead between the small read commands generated to read-ahead
+multiple files will significantly limit the performance that can be
+achieved.
+
+This fact applies to all ATA devices as ATA does not define an optimal
+I/O size and the SCSI SAT specification does not define a default value
+to expose to the host.
+
+Modify blk_apply_bdi_limits() to use a device max_sectors limit to
+calculate the ra_pages field of struct backing_dev_info, when the device
+is a rotational one (BLK_FEAT_ROTATIONAL feature is set). For a SCSI
+disk, this defaults to 2560 KB, which significantly improve performance
+for buffered reads. Using XFS and sequentially reading randomly selected
+(large) files stored on a SATA HDD, the maximum throughput achieved with
+8 readers reading files with 1MB buffered I/Os increases from 122 MB/s
+to 167 MB/s (+36%). The improvement is even larger when reading files
+using 128 KB buffered I/Os, with a throughput increasing from 57 MB/s to
+165 MB/s (+189%).
+
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ block/blk-settings.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index a000daafbfb4..66d402de9026 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -58,16 +58,24 @@ EXPORT_SYMBOL(blk_set_stacking_limits);
+ void blk_apply_bdi_limits(struct backing_dev_info *bdi,
+ 		struct queue_limits *lim)
+ {
++	u64 io_opt = lim->io_opt;
++
+ 	/*
+ 	 * For read-ahead of large files to be effective, we need to read ahead
+-	 * at least twice the optimal I/O size.
++	 * at least twice the optimal I/O size. For rotational devices that do
++	 * not report an optimal I/O size (e.g. ATA HDDs), use the maximum I/O
++	 * size to avoid falling back to the (rather inefficient) small default
++	 * read-ahead size.
+ 	 *
+ 	 * There is no hardware limitation for the read-ahead size and the user
+ 	 * might have increased the read-ahead size through sysfs, so don't ever
+ 	 * decrease it.
+ 	 */
++	if (!io_opt && (lim->features & BLK_FEAT_ROTATIONAL))
++		io_opt = (u64)lim->max_sectors << SECTOR_SHIFT;
++
+ 	bdi->ra_pages = max3(bdi->ra_pages,
+-				lim->io_opt * 2 / PAGE_SIZE,
++				io_opt * 2 >> PAGE_SHIFT,
+ 				VM_READAHEAD_PAGES);
+ 	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
+ }
+-- 
+2.49.0
 
