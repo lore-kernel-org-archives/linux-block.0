@@ -1,234 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E76C273812
-	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 09:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFCD2737E1;
+	Mon, 16 Jun 2025 09:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750065256; cv=none; b=u6fhPMq3Vfh6boPc9ft+k2hfHuxFOSmYbLPA3L5BXjcMTdz5cZcyp54L5lDZH5W8XNRZ//SkHV6OMNmg53CPsJ7F6yI+Ng+M9W97URRQpyC9F1sYNp2Ql6C3Hp6mfu6994JvcskyZM5iqmum6y92kqXGBLq7C5S3DGuBMUD/SH4=
+	t=1750065304; cv=none; b=cQe6d941gz8+58Kk1CiKV2vHcTHwfjcoPziG0nPO3jTtVj9z/Xqjotf2MwQhESLW/viNxxTMZSOnRgNYgJgesqUF/OOvlulCMTDS+5Y7xOgmHX/8Bza3ZuMJvMtef7klzbC5a9AgNKyS0oRf39F7VW8oCtKBk8KcwYtJ5kOJPPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750065256; c=relaxed/simple;
-	bh=aHvslj4u0YmVjl6caLmXcxjAEu5IMNlDH3uwp1kYvck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PXIiRWZgv7e7blZbuy8e25VC9Yxs9J5+vV55ijZDS8Z4sdwlJJo6L9+fFTr1g+ga1yOeFX0M43XFWRhNkj/57CR+aEDaCyYmBfRMcdPEtgZpkC15qOFCLTSPPH1X0OMGLUybeVgU7NI0vHLbSTXg1sbtYYmXDgNpm/sjNQ4TUfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K0s57Of2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0s57Of2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750065253;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Wuv2mA62fcjoUn35N/C8umkBOU3qJG3E1wudHQl3vVY=;
-	b=K0s57Of2TEEBxM2VMJ+kz4AadYSVfFRKe8ZQZG4mZTYWDFN4bkCRFnu1C6roorSp0MJD9M
-	SCB8c526SkvkxFLFrrqTOw+c8O+SmmUuV/9b18NB5bIL1pkaB2Y2MXDRvqaXzS1wrFGhNN
-	RY1aqALBkuP2kfuxt7ANGvI4gdbiTP4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-39-aAzcEw6CPfSzQXtxCMKwug-1; Mon, 16 Jun 2025 05:14:12 -0400
-X-MC-Unique: aAzcEw6CPfSzQXtxCMKwug-1
-X-Mimecast-MFC-AGG-ID: aAzcEw6CPfSzQXtxCMKwug_1750065251
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a579728319so477909f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 02:14:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750065251; x=1750670051;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Wuv2mA62fcjoUn35N/C8umkBOU3qJG3E1wudHQl3vVY=;
-        b=FiVSSdq+utG47WDEHKpajvR8T9Q1f3E2kmnt1zs6CqdVUFm0FqtqZSGM8r8KJiZdM0
-         HGcV0mqNysJJTGkYXhkbY98bCHThXT3iRBpYf/Rm/9G4Y41pxakgdeipD6ZjFMCN6Jrq
-         ZR/1WZ3lpB/nKYyV6eORxuiXUs9SUBDeJYyLdfghnnszA6yDtL8dhSC1DhjzVKOkmQwa
-         3Ol8uRsQIwtz9ZgUSX4yD3eALomCsbVr1wvEZB60FvlSf+RU6okMElEpaGvrxBP0vpZK
-         wdDZ19yQenEeeffiEUIKzM0x1BTeroJf6pBzqYatw/AteKeygYNYoC1ZdO6nsnz+BDcO
-         BNxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUT84ODsPNu7fBytLzuptZA0iL+hLhu8TDF1UV7VQGfqCHpnvqoO2utGKi5dcwvyiMKyKrAU8bxiuYe+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8sAkM2n7c1Ky6tu1sqIDU7GyAKtOEP141E9WxuCQeksCSvqR0
-	Oq9cyzQjXaUBkJIZCD0bEFxCcY3wuqmeAwgRg5jmC/IXfvF6I9G3CxzP0tqUKhqXe2HHJf/RoEC
-	ZAYDEKFJKfuezD7xvCbvmidXmyje25koIWWpc2FO3FVSz4NeoBFjz9mCa1FBucyve
-X-Gm-Gg: ASbGncs0aw4ce7SVhyr5ugEBWxQRCOsPCZxBjd8noffcYtpE8ljiDIdoPKiLuDVsAnq
-	LB9BkV2gSf6FeH+//qn961wkV12nKQgwznfjhQrjnsiAJ/lJdZAINSZCf80z7c2dO2D8wFhmERo
-	B5w0I4EmEpZ98cUdh9v4E4A5zphRaLOF5y8fUtzm9hDwkucwPUBnUNZ81YTsZrzfJ2i3L7YShKE
-	h7bknIisTjSKjXKX+ldr0XxtlNiERldGevYh7FUnIvy4TtWur57AYY1ckUhYHrAcrjNIzHIGq9q
-	uBowZ4oXeqVwMiox+6xnKVVCVhQFxmxbl8QtxW3c/qhcka/cuFD33y3zVcyjW6/4WHQ5QCGkDCE
-	5mZLpoXDsyN8Ic+wuSkpygvOz0CgwZAe1f9A8/ZXbKI7w0Xk=
-X-Received: by 2002:a05:6000:22c1:b0:3a5:276b:1ec0 with SMTP id ffacd0b85a97d-3a572e8c5dbmr6274573f8f.45.1750065250774;
-        Mon, 16 Jun 2025 02:14:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1eku5C1wKEWMA/zLh1Kb+dGj72gg4ERn3ZZ3O6rewQsnKxfuyXv1A1iI5gYDDemL/53xxLg==
-X-Received: by 2002:a05:6000:22c1:b0:3a5:276b:1ec0 with SMTP id ffacd0b85a97d-3a572e8c5dbmr6274538f8f.45.1750065250350;
-        Mon, 16 Jun 2025 02:14:10 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f25:bd00:949:b5a9:e02a:f265? (p200300d82f25bd000949b5a9e02af265.dip0.t-ipconnect.de. [2003:d8:2f25:bd00:949:b5a9:e02a:f265])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a7f8f9sm10462943f8f.42.2025.06.16.02.14.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jun 2025 02:14:09 -0700 (PDT)
-Message-ID: <a65ee315-23b7-4058-895a-69045829bd01@redhat.com>
-Date: Mon, 16 Jun 2025 11:14:07 +0200
+	s=arc-20240116; t=1750065304; c=relaxed/simple;
+	bh=2HRrz5CjnU8wZIMFr5D7DyrHO5tkX2e1sFACMrY04Vs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c0a2YAb3smVnhcpwyVCrj+XAX52hSgn0DldpMjXRMMgA1kwNEXfoWzzTDvU16kspxQasxLPkPYGgmxfk7Qm5e5Fw6DFdmvcEhEzT47IU7atEJ70zlja6cW5bVlyuggJlRLFQ9kQwrDhjITNUCevtmlSzmmnwx1C0g31Xw7ZznUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bLPTp172WzYQvRL;
+	Mon, 16 Jun 2025 17:14:54 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 1E19F1A1DE0;
+	Mon, 16 Jun 2025 17:14:53 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAni1+L4E9o9F+9Pg--.37809S3;
+	Mon, 16 Jun 2025 17:14:52 +0800 (CST)
+Subject: Re: [PATCH RFC v2 0/5] blk-mq-sched: support request batch
+ dispatching for sq elevator
+To: Damien Le Moal <dlemoal@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250614092528.2352680-1-yukuai1@huaweicloud.com>
+ <9d3aee10-9eb3-4f2d-bb9a-1721c05ec3aa@kernel.org>
+ <16fd5432-36b0-0a92-0caa-7374ce1464a5@huaweicloud.com>
+ <27d2cd23-1c0e-4a21-975c-68be727220ec@kernel.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <54c6a041-8937-3d8c-24f4-7cd7f15cdaca@huaweicloud.com>
+Date: Mon, 16 Jun 2025 17:14:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] mm: add mm_get_static_huge_zero_folio() routine
-To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
- Dave Hansen <dave.hansen@intel.com>
-Cc: Pankaj Raghav <p.raghav@samsung.com>,
- Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
- Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>,
- Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
- Dev Jain <dev.jain@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
- Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>,
- Zi Yan <ziy@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
- x86@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
- gost.dev@samsung.com, hch@lst.de
-References: <20250612105100.59144-1-p.raghav@samsung.com>
- <20250612105100.59144-5-p.raghav@samsung.com>
- <e3075e27-93d2-4a11-a174-f05a7497870e@intel.com>
- <cglmujb275faqkpqmb75mz4tt5dtruvhntpe5t4qyzjr363qyr@vluzyx4hukap>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <cglmujb275faqkpqmb75mz4tt5dtruvhntpe5t4qyzjr363qyr@vluzyx4hukap>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <27d2cd23-1c0e-4a21-975c-68be727220ec@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAni1+L4E9o9F+9Pg--.37809S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7trW3tw43KFWfZry8uF1kuFg_yoW8GFW7pF
+	WrtFWayws0gFn2y34v934rKr1Uu34kWFyfJrn8JrW2g3s8Jr1SkrsxKFZ8ZFW7Arn3GFsF
+	9FW0qFyFqrn2qFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 12.06.25 22:54, Pankaj Raghav (Samsung) wrote:
-> On Thu, Jun 12, 2025 at 07:09:34AM -0700, Dave Hansen wrote:
->> On 6/12/25 03:50, Pankaj Raghav wrote:
->>> +/*
->>> + * mm_get_static_huge_zero_folio - Get a PMD sized zero folio
->>
->> Isn't that a rather inaccurate function name and comment?
-> I agree. I also felt it was not a good name for the function.
-> 
->>
->> The third line of the function literally returns a non-PMD-sized zero folio.
->>
->>> + * This function will return a PMD sized zero folio if CONFIG_STATIC_PMD_ZERO_PAGE
->>> + * is enabled. Otherwise, a ZERO_PAGE folio is returned.
->>> + *
->>> + * Deduce the size of the folio with folio_size instead of assuming the
->>> + * folio size.
->>> + */
->>> +static inline struct folio *mm_get_static_huge_zero_folio(void)
->>> +{
->>> +	if(IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
->>> +		return READ_ONCE(huge_zero_folio);
->>> +	return page_folio(ZERO_PAGE(0));
->>> +}
->>
->> This doesn't tell us very much about when I should use:
->>
->> 	mm_get_static_huge_zero_folio()
->> vs.
->> 	mm_get_huge_zero_folio(mm)
->> vs.
->> 	page_folio(ZERO_PAGE(0))
->>
->> What's with the "mm_" in the name? Usually "mm" means "mm_struct" not
->> Memory Management. It's really weird to prefix something that doesn't
->> take an "mm_struct" with "mm_"
-> 
-> Got it. Actually, I was not aware of this one.
-> 
->>
->> Isn't the "get_" also a bad idea since mm_get_huge_zero_folio() does its
->> own refcounting but this interface does not?
->>
-> 
-> Agree.
-> 
->> Shouldn't this be something more along the lines of:
->>
->> /*
->>   * pick_zero_folio() - Pick and return the largest available zero folio
->>   *
->>   * mm_get_huge_zero_folio() is preferred over this function. It is more
->>   * flexible and can provide a larger zero page under wider
->>   * circumstances.
->>   *
->>   * Only use this when there is no mm available.
->>   *
->>   * ... then other comments
->>   */
->> static inline struct folio *pick_zero_folio(void)
->> {
->> 	if (IS_ENABLED(CONFIG_STATIC_PMD_ZERO_PAGE))
->> 		return READ_ONCE(huge_zero_folio);
->> 	return page_folio(ZERO_PAGE(0));
->> }
->>
->> Or, maybe even name it _just_: zero_folio()
-> 
-> I think zero_folio() sounds like a good and straightforward name. In
-> most cases it will return a ZERO_PAGE() folio. If
-> CONFIG_STATIC_PMD_ZERO_PAGE is enabled, then we return a PMD page.
+Hi,
 
-"zero_folio" would be confusing I'm afraid.
+在 2025/06/16 15:37, Damien Le Moal 写道:
+> On 6/16/25 16:22, Yu Kuai wrote:
+>> I agree that lock contention here will not affect HDD performance.
+>> What I suspect the difference in my environment is that the order of rqs
+>> might be changed from elevator dispatching them and the disk handling
+>> them.
+>>
+>> For example, the order can be easily revised if more than one context
+>> dispatch one request at a time:
+>>
+>> t1:
+>>
+>> lock
+>> rq1 = dd_dispatch_request
+>> unlock
+>> 			t2:
+>> 			lock
+>> 			rq2 = dd_dispatch_request
+>> 			unlock
+>>
+>> lock
+>> rq3 = dd_dispatch_request
+>> unlock
+>>
+>> 			lock
+>> 			rq4 = dd_dispatch_request
+>> 			unlock
+>>
+>> //rq1,rq3 issue to disk
+>> 			// rq2, rq4 issue to disk
+>>
+>> In this case, the elevator dispatch order is rq 1-2-3-4, however,
+>> such order in disk is rq 1-3-2-4.
+>>
+>> And with batch requests dispatch, will this less likely to happen?
+> 
+> If you are running a write test with the HDD write cache enabled, such
+> reordering will most liley not matter at all. Running the same workload with
+> "none" and I get the same IOPS for writes.
+> 
+> Check your disk. If you do have the HDD write cache disabled, then sure, the
+> order will matter more depending on how your drive handles WCD writes (recent
+> drives have very similar performance with WCE and WCD).
+> 
+Thanks for the explanation, I'll test more workload on more disks, and
+of corese, explain details more in the formal version as you suggested.
 
-At least with current "is_zero_folio" etc.
-
-"largest_zero_folio" or sth. like that might make it clearer that the 
-size we are getting back might actually differ.
-
--- 
-Cheers,
-
-David / dhildenb
+Kuai
 
