@@ -1,74 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B595F42AB0
-	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 07:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D553213B7AE;
+	Mon, 16 Jun 2025 09:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750060191; cv=none; b=BUxVr04/qTOggYB4/fwMZZzFIAcF4Rwnjfu/MgVPbNaL23kAh7aqmxyH6oeyoWteUi+LVcvv2d9/NMsslD9SEYz6jIw/78x8diuWhMSCYgIi77+RnEoF0VJ9W9mcP9G7/V7DPenp0f9vp7U2pQYop6IGGBPipoLqXfKk/deLy28=
+	t=1750064441; cv=none; b=aHdoSqvUadbMSg+/Bpcd+vhn7Wbsh7be1bgdNUQjzJXc8hSqIhhQ4ViBPEktLQBL1q4l1zDZzCU3E2KjOUq7jj44TbiY8PbUmb/r65lmX9zIL99OuyPs5B07LMepUj+c05AoSxMM81UXSSe7qrIiFu9+esHh+6CiGairbBJzyrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750060191; c=relaxed/simple;
-	bh=Cz3lDHFGJJSCBLHfEjRzh8NozUVsGBREjmVm7AlWgfQ=;
+	s=arc-20240116; t=1750064441; c=relaxed/simple;
+	bh=Twhxm9i9eQ6EcYvXRHiKqWBNcMUl5h9BDTHkxOKskFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EMP5GvBwIc3aCohiMfW4XH2jhVt4p2JhKm5mJU1UxdaKRQxpqc7tEQGr5TkKpN4IHc5E+sMruwEq5YjMX9AOfZnIqFruDMVq38UIyoNd7BaRZDKDRrF1sLqeHsU8ExdDcPSjXULdpU0WZ9KsMe5ayIpJQx23ngpyufJE2g9l5pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sgi6QPQq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=APBcjoNqUFt9Og0AX6SpyGd3If+U+4YWyCQrANOaizDt86ogcTHhKtX+08r44DkVab0iNA1K0VeEL2tKu3WryHzWEXHVDWEEpQ3ZOmCSWhh7UjTV2zXMw3YB8Eohl59/w7QJ1TYeS82FXtbjafyhukAhMhlF9XjX8fBeeGSPM80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=OqlXNCcq; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sgi6QPQq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF61C4CEEA;
-	Mon, 16 Jun 2025 07:49:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750060191;
-	bh=Cz3lDHFGJJSCBLHfEjRzh8NozUVsGBREjmVm7AlWgfQ=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Sgi6QPQqndZXcORblP7IP7+rNuZyWjLXtq2bx8op6hhJIxjguGdlkzWEK2llVQDDr
-	 u7iGf2lsdfKC9nsfwi1eNWxt9ggCo+NzoPCkT0JkxOuO6kvH5XQxEVEY0RovkfkEgV
-	 HMbB7j+VpJ0sI3nMCD5f2kfV0mGNpMl3xr/7nyGt8HEIQWQXzXzLFUwWBYBv5opdNa
-	 0b9/YYpKsDhSgNd15CH7GLpVBLp/3mmNOgHRJsTCjiZ38V9IqZLGqCzrKcpYb1I0gW
-	 QhEZZrI+/k8Wlb/5lzi6wXoJQWkkNVD2e3ANonU5qGjUCDzMmO8NQ8Ur4BUbPkpX4b
-	 ODo0n4R2OpsHw==
-Message-ID: <871b014b-e308-4f20-9701-5581beee91ed@kernel.org>
-Date: Mon, 16 Jun 2025 09:49:47 +0200
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="OqlXNCcq"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4bLP9B2tMfz9t8h;
+	Mon, 16 Jun 2025 11:00:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1750064430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sw2JUl1JyK0AiB+kHg6y3aGB9TupL2wuBZlKDT9xIUM=;
+	b=OqlXNCcq5xwQy/VyRXIHl3E2kCchNOQE7Dcl6aMs2EakarUOioTLwx8VFqjfOqz7kgfEZ7
+	GuZvoL9nRscZG80pgL1sgWi95/LI+DlmGUUmQojySyi+LJaKo9VkbXCzmi1ZhAClUReZor
+	tQVowIrwk81n99mpgOz7CZkobuQTUSEdP5LPGs2dHuTerloJEKwEGek2t6UNW1FIs76TXw
+	ic4jejg2YfKwqNPryd3k6RH/pAZgDL9Uk7fTtFeUNZCmnV0K/bHej1AynSaRw5eJHYLTK8
+	FSZeL3FwRTkoabpCfXFZDzspd79fdfGDquAtihhCE4QzgrVRoaUSEXlzWtcL7g==
+Message-ID: <9de7fbb6-63de-40eb-b2c0-cbf9fb084bee@pankajraghav.com>
+Date: Mon, 16 Jun 2025 11:00:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Daniel Gomez <da.gomez@kernel.org>
-Subject: Re: [PATCH 7/9] nvme-pci: convert the data mapping blk_rq_dma_map
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Leon Romanovsky <leon@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>,
- Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <20250610050713.2046316-1-hch@lst.de>
- <20250610050713.2046316-8-hch@lst.de>
+Subject: Re: [PATCH 0/5] add STATIC_PMD_ZERO_PAGE config option
+To: Christoph Hellwig <hch@lst.de>, Pankaj Raghav <p.raghav@samsung.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Mike Rapoport <rppt@kernel.org>,
+ Michal Hocko <mhocko@suse.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
+ x86@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com
+References: <20250612105100.59144-1-p.raghav@samsung.com>
+ <20250616054034.GA1559@lst.de>
 Content-Language: en-US
-From: Daniel Gomez <da.gomez@kernel.org>
-Organization: kernel.org
-In-Reply-To: <20250610050713.2046316-8-hch@lst.de>
+From: Pankaj Raghav <kernel@pankajraghav.com>
+In-Reply-To: <20250616054034.GA1559@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4bLP9B2tMfz9t8h
 
-On 10/06/2025 07.06, Christoph Hellwig wrote:
-> @@ -46,13 +45,11 @@
->  #define NVME_MAX_NR_DESCRIPTORS	5
->  
->  /*
-> - * For data SGLs we support a single descriptors worth of SGL entries, but for
-> - * now we also limit it to avoid an allocation larger than PAGE_SIZE for the
-> - * scatterlist.
-> + * For data SGLs we support a single descriptors worth of SGL entries.
-> + * For PRPs, segments don't matter at all.
->   */
->  #define NVME_MAX_SEGS \
-> -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
-> -	    (PAGE_SIZE / sizeof(struct scatterlist)))
-> +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
 
-IIRC, I've seen in the commit history going from PAGE_SIZE to CC.MPS for
-different cases in the driver. PRPs requires contiguous regions to be CC.MPS,
-i.e use NVME_CTRL_PAGE_SIZE for PRP lists and entries. But I think that is not a
-limit for SGLs. Can we use PAGE_SIZE here?
+On 6/16/25 07:40, Christoph Hellwig wrote:
+> Just curious: why doesn't this series get rid of the iomap zero_page,
+> which would be really low hanging fruit?
+> 
+
+I did the conversion in my first RFC series [1]. But the implementation and API for the zero
+page was still under heavy discussion. So I decided to focus on that instead and leave the
+conversion for later as I mentioned in the cover letter. I included blkdev_issue_zero_pages() as it
+is a more straight forward conversion.
+
+--
+Pankaj
+
+
+[1] https://lore.kernel.org/linux-mm/20250516101054.676046-4-p.raghav@samsung.com/
