@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA5A1EF375
-	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 07:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B595F42AB0
+	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 07:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750059680; cv=none; b=QKryoVwre2rQ+3KLucyE8efn5IL/BfZAJ/gj3HmoOG2lbTe18no3qXGvAPAzLfTn4rdF4ahZCgrOL/rcJtM6LipRAjTBGdbTBMGXTFdDTqEkzuNJgdeG+5lkuIHZGbD/lKM82hQSj29T8KS0j6xt/9Bd5EeKSOQJ2K5JexgL4nI=
+	t=1750060191; cv=none; b=BUxVr04/qTOggYB4/fwMZZzFIAcF4Rwnjfu/MgVPbNaL23kAh7aqmxyH6oeyoWteUi+LVcvv2d9/NMsslD9SEYz6jIw/78x8diuWhMSCYgIi77+RnEoF0VJ9W9mcP9G7/V7DPenp0f9vp7U2pQYop6IGGBPipoLqXfKk/deLy28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750059680; c=relaxed/simple;
-	bh=4qU8ClQ4yBhkxU4l0YkzThkfCL5eedXdhm9zUwLsjLI=;
+	s=arc-20240116; t=1750060191; c=relaxed/simple;
+	bh=Cz3lDHFGJJSCBLHfEjRzh8NozUVsGBREjmVm7AlWgfQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N8KON8QzSmpslG9TZY0RXVQ+Q6PVVz6y8lbbSqGP6AmwtRta4mCyZ2jyNWg4pUpCB1TsD5b34z1DMEli0a1ZCe9PwzKZG9L5dI7qINzOX1//S05kFoqGNq66hPApEba2f7ryyIetXrrch8Am379LwiWD1wZ1/68jbTNI+AvbsU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJszM4j2; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=EMP5GvBwIc3aCohiMfW4XH2jhVt4p2JhKm5mJU1UxdaKRQxpqc7tEQGr5TkKpN4IHc5E+sMruwEq5YjMX9AOfZnIqFruDMVq38UIyoNd7BaRZDKDRrF1sLqeHsU8ExdDcPSjXULdpU0WZ9KsMe5ayIpJQx23ngpyufJE2g9l5pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sgi6QPQq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJszM4j2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF93C4CEEA;
-	Mon, 16 Jun 2025 07:41:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sgi6QPQq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF61C4CEEA;
+	Mon, 16 Jun 2025 07:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750059679;
-	bh=4qU8ClQ4yBhkxU4l0YkzThkfCL5eedXdhm9zUwLsjLI=;
+	s=k20201202; t=1750060191;
+	bh=Cz3lDHFGJJSCBLHfEjRzh8NozUVsGBREjmVm7AlWgfQ=;
 	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZJszM4j2hv9Uil+UZI6LuhLWN1rAsEhNnJzlcBky+ZwyAHyBu0gRXw6mZNTVNGYqI
-	 /38AZCNfLxnNdA+vMoc7Nr7aqr/Wd2BfCdASh+yne76rfMSNK8pmqm5ZNJFNVIyZyW
-	 9+f4zHKbG9bMQavXY5TuCDGapLgVH4S8rMb8jeiDlkiLPOE1TFL57zU099YZI+Gna+
-	 TxDHzRKXqw7+CxCbZSXSlDLtD3qbZxV3VoLSjG9MDgzEu/CEuU89eDILrKJFt6kXLw
-	 CGObaJdoKSgWabBQgmWjhsdlrEgljzgBTJp0hpE3NCdgULLaMhL4RGF5vGBrVDsFUa
-	 fbe1Z30hcagKw==
-Message-ID: <4af8a37c-68ca-4098-8572-27e4b8b35649@kernel.org>
-Date: Mon, 16 Jun 2025 09:41:15 +0200
+	b=Sgi6QPQqndZXcORblP7IP7+rNuZyWjLXtq2bx8op6hhJIxjguGdlkzWEK2llVQDDr
+	 u7iGf2lsdfKC9nsfwi1eNWxt9ggCo+NzoPCkT0JkxOuO6kvH5XQxEVEY0RovkfkEgV
+	 HMbB7j+VpJ0sI3nMCD5f2kfV0mGNpMl3xr/7nyGt8HEIQWQXzXzLFUwWBYBv5opdNa
+	 0b9/YYpKsDhSgNd15CH7GLpVBLp/3mmNOgHRJsTCjiZ38V9IqZLGqCzrKcpYb1I0gW
+	 QhEZZrI+/k8Wlb/5lzi6wXoJQWkkNVD2e3ANonU5qGjUCDzMmO8NQ8Ur4BUbPkpX4b
+	 ODo0n4R2OpsHw==
+Message-ID: <871b014b-e308-4f20-9701-5581beee91ed@kernel.org>
+Date: Mon, 16 Jun 2025 09:49:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,50 +37,38 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: Daniel Gomez <da.gomez@kernel.org>
 Subject: Re: [PATCH 7/9] nvme-pci: convert the data mapping blk_rq_dma_map
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Leon Romanovsky <leon@kernel.org>,
- Nitesh Shetty <nj.shetty@samsung.com>, Logan Gunthorpe
- <logang@deltatee.com>, linux-block@vger.kernel.org,
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Leon Romanovsky <leon@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
  linux-nvme@lists.infradead.org
 References: <20250610050713.2046316-1-hch@lst.de>
  <20250610050713.2046316-8-hch@lst.de>
- <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
- <20250612050256.GH12863@lst.de>
 Content-Language: en-US
 From: Daniel Gomez <da.gomez@kernel.org>
 Organization: kernel.org
-In-Reply-To: <20250612050256.GH12863@lst.de>
+In-Reply-To: <20250610050713.2046316-8-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 12/06/2025 07.02, Christoph Hellwig wrote:
-> On Wed, Jun 11, 2025 at 02:15:10PM +0200, Daniel Gomez wrote:
->>>  #define NVME_MAX_SEGS \
->>> -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
->>> -	    (PAGE_SIZE / sizeof(struct scatterlist)))
->>> +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
->>
->> The 8 MiB max transfer size is only reachable if host segments are at least 32k.
->> But I think this limitation is only on the SGL side, right?
-> 
-> Yes, PRPs don't really have the concept of segments to start with.
-> 
->> Adding support to
->> multiple SGL segments should allow us to increase this limit 256 -> 2048.
->>
->> Is this correct?
-> 
-> Yes.  Note that plenty of hardware doesn't really like chained SGLs too
-> much and you might get performance degradation.
->
+On 10/06/2025 07.06, Christoph Hellwig wrote:
+> @@ -46,13 +45,11 @@
+>  #define NVME_MAX_NR_DESCRIPTORS	5
+>  
+>  /*
+> - * For data SGLs we support a single descriptors worth of SGL entries, but for
+> - * now we also limit it to avoid an allocation larger than PAGE_SIZE for the
+> - * scatterlist.
+> + * For data SGLs we support a single descriptors worth of SGL entries.
+> + * For PRPs, segments don't matter at all.
+>   */
+>  #define NVME_MAX_SEGS \
+> -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
+> -	    (PAGE_SIZE / sizeof(struct scatterlist)))
+> +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
 
-I see the driver assumes better performance on SGLs over PRPs when I/Os are
-greater than 32k (this is the default sgl threshold). But what if chaining SGL
-is needed, i.e. my host segments are between 4k and 16k, would PRPs perform
-better than chaining SGLs?
-
-Also, if host segments are between 4k and 16k, PRPs would be able to support it
-but this limit prevents that use case. I guess the question is if you see any
-blocker to enable this path?
+IIRC, I've seen in the commit history going from PAGE_SIZE to CC.MPS for
+different cases in the driver. PRPs requires contiguous regions to be CC.MPS,
+i.e use NVME_CTRL_PAGE_SIZE for PRP lists and entries. But I think that is not a
+limit for SGLs. Can we use PAGE_SIZE here?
