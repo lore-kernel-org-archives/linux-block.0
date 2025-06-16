@@ -1,108 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B0972626;
-	Mon, 16 Jun 2025 06:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CEB20330
+	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 06:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750055444; cv=none; b=dPKZ+KyRuCYPWDcbf20TMeHLz9s0Muietd16isTyVFvYvrVLvnuGYeEEbYf3KdU+Fli2mDEiK7MIw7TKf3/9YePbE0bQOUgTNaP6Y+7H3JpZyYOu1xhv9FwGG4uzWBQRvlGK+YltZ/Zf6Xn/KyYpFhQGle1Cga+xm5Vvi5GYJCk=
+	t=1750056206; cv=none; b=RuXXKJiOCYABU+XhyZSlK5oIcB/bLe37s6mo25GBzvq8Yd2uJVK6HVR40N9/dXqMge8sxZhbP9APrzHdtf6+KfeMeYJIeAMdRnq1LgLksEBMLibCJ29/SkO0XZm6cLv067GlRqiCUCe+F2B6zLDQh2mEJPufy6WZdTZnr8C1QFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750055444; c=relaxed/simple;
-	bh=/CwtFfDuVXOHXbw7WvrWwerepPdxp0HV/s2hw8G1vGA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=t3eUpXYbZsHJou73d/airFpJaioTI0lOZ28eoj4giACV/hrK3xvc9eYB5iT9wEPQ08WJnkmADRk9zeFsASuKqz3KFwHFgEc3SsFSlGNeFAiJ9yr3Z3Z7H/t+0uyefaPK36NW+OSdH3x+ZPP7u+sGCa0a0xz1v7hc81TkTytCoZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzTxUX8Z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750056206; c=relaxed/simple;
+	bh=i8eZ5db7jwLf3O2OU4sJwtCvyGnyULzOXR46Z6sekOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DBEbvo2/HI7mZzlD0TH/wQdwxFlLbP2cKq9+ucbggi8mzGoe8vNH8BzU9o2HQhBzBgCPUemmEQULFIjmGlSYcqGpda8np2h06yD3Uw4+sSt8aZ1RgfxTmZbuJlbCPQEUpqlealfg40ZpZKMzQKzOKI5qLRvtFqN5809kbZwdXb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ea2GD93o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzTxUX8Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A202C4CEEA;
-	Mon, 16 Jun 2025 06:30:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ea2GD93o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCCDC4CEEA;
+	Mon, 16 Jun 2025 06:43:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750055443;
-	bh=/CwtFfDuVXOHXbw7WvrWwerepPdxp0HV/s2hw8G1vGA=;
-	h=From:To:Subject:Date:From;
-	b=VzTxUX8ZhEgBkywNza7SWYPPCHO6CQ7b+FJX0ZpeR4LLj3LhtT/AGmR5b2JdI+lqj
-	 p8oLLAzdPb78qqEm9Qgelj2vdZIaV8E6IA8/cX8zid1k3cZzNIzU0m1CyiI9tWpEWT
-	 5q1xgIf36PaxZ7xaFZ0WZn7OvhKWl+hlavnXEMZ/hGUkxFv0z6I+Ldu/KifWcFMNLW
-	 +M62kruP+z0cV+65ycGyfQc//WSOJ+nn2PRGUuA5ksbAUdtJlVG1jpix3FjL/9wsJT
-	 zoej005D9ve3U4acCXj2y+AK32IB2ugGCT99mpScnOGgkoSKaYwma/cs4M1Yf4XPHF
-	 c0vBblQlIZKtA==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@vger.kernel.org
-Subject: [PATCH] block: Improve read ahead size for rotational devices
-Date: Mon, 16 Jun 2025 15:28:56 +0900
-Message-ID: <20250616062856.1629897-1-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1750056206;
+	bh=i8eZ5db7jwLf3O2OU4sJwtCvyGnyULzOXR46Z6sekOg=;
+	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ea2GD93oQhfMVYrQqOBlhv16244neKYQsZ5tMJvqX4kKmN7Cu7dUxD6fMUJhdufGQ
+	 D6iPWyjHsx48zcXJTnZtaOuAupGhsUInQzo5yhmnnqm1VvfdYVdNCTlG4CRmnC594E
+	 cqI9WHBK0swPEqvw05iJgLssF6bWQUi3GLFIR31MO+9vGN6c2gR8zP7Jfsu3b4/v7V
+	 /IMHMQlqFoRNYu9BprdLtUt5hKiobkNmnPPokSQm0OcNOaWzE7XUQh2KXtb7FXIkw4
+	 ROJrXWpn78imzqt/xuKQU0bgd/DbXvwHEWBCs7p96qNzE59E20ZLC/a1mrnde4DxT+
+	 Rkj2ZwzBNG2uA==
+Message-ID: <2105172c-5540-40d0-9573-15001b745648@kernel.org>
+Date: Mon, 16 Jun 2025 08:43:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Reply-To: Daniel Gomez <da.gomez@kernel.org>
+Subject: Re: [PATCH 2/9] block: add scatterlist-less DMA mapping helpers
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Leon Romanovsky <leon@kernel.org>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Logan Gunthorpe
+ <logang@deltatee.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20250610050713.2046316-1-hch@lst.de>
+ <20250610050713.2046316-3-hch@lst.de>
+ <dab07466-a1fe-4fba-b3a8-60da853a48be@kernel.org>
+ <20250616050247.GA860@lst.de>
+Content-Language: en-US
+From: Daniel Gomez <da.gomez@kernel.org>
+Organization: kernel.org
+In-Reply-To: <20250616050247.GA860@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-For a device that does not advertize an optimal I/O size, the function
-blk_apply_bdi_limits() defaults to an initial setting of the ra_pages
-field of struct backing_dev_info to VM_READAHEAD_PAGES, that is, 128 KB.
 
-This low I/O size value is far from being optimal for hard-disk devices:
-when reading files from multiple contexts using buffered I/Os, the seek
-overhead between the small read commands generated to read-ahead
-multiple files will significantly limit the performance that can be
-achieved.
 
-This fact applies to all ATA devices as ATA does not define an optimal
-I/O size and the SCSI SAT specification does not define a default value
-to expose to the host.
+On 16/06/2025 07.02, Christoph Hellwig wrote:
+> On Wed, Jun 11, 2025 at 03:43:07PM +0200, Daniel Gomez wrote:
+>>> +struct blk_dma_iter {
+>>> +	/* Output address range for this iteration */
+>>> +	dma_addr_t			addr;
+>>> +	u32				len;
+>>> +
+>>> +	/* Status code. Only valid when blk_rq_dma_map_iter_* returned false */
+>>> +	blk_status_t			status;
+>>
+>> This comment does not match with blk_rq_dma_map_iter_start(). It returns false
+>> and status is BLK_STS_INVAL.
+> 
+> I went over you comment a few times and still don't understand it.
 
-Modify blk_apply_bdi_limits() to use a device max_sectors limit to
-calculate the ra_pages field of struct backing_dev_info, when the device
-is a rotational one (BLK_FEAT_ROTATIONAL feature is set). For a SCSI
-disk, this defaults to 2560 KB, which significantly improve performance
-for buffered reads. Using XFS and sequentially reading randomly selected
-(large) files stored on a SATA HDD, the maximum throughput achieved with
-8 readers reading files with 1MB buffered I/Os increases from 122 MB/s
-to 167 MB/s (+36%). The improvement is even larger when reading files
-using 128 KB buffered I/Os, with a throughput increasing from 57 MB/s to
-165 MB/s (+189%).
+The way I read the comment is that status is only valid when
+blk_rq_dma_map_iter_* returns false.
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- block/blk-settings.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+But blk_rq_dma_map_iter_start() can return false and an invalid status (in the
+default switch case).
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a000daafbfb4..66d402de9026 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -58,16 +58,24 @@ EXPORT_SYMBOL(blk_set_stacking_limits);
- void blk_apply_bdi_limits(struct backing_dev_info *bdi,
- 		struct queue_limits *lim)
- {
-+	u64 io_opt = lim->io_opt;
-+
- 	/*
- 	 * For read-ahead of large files to be effective, we need to read ahead
--	 * at least twice the optimal I/O size.
-+	 * at least twice the optimal I/O size. For rotational devices that do
-+	 * not report an optimal I/O size (e.g. ATA HDDs), use the maximum I/O
-+	 * size to avoid falling back to the (rather inefficient) small default
-+	 * read-ahead size.
- 	 *
- 	 * There is no hardware limitation for the read-ahead size and the user
- 	 * might have increased the read-ahead size through sysfs, so don't ever
- 	 * decrease it.
- 	 */
-+	if (!io_opt && (lim->features & BLK_FEAT_ROTATIONAL))
-+		io_opt = (u64)lim->max_sectors << SECTOR_SHIFT;
-+
- 	bdi->ra_pages = max3(bdi->ra_pages,
--				lim->io_opt * 2 / PAGE_SIZE,
-+				io_opt * 2 >> PAGE_SHIFT,
- 				VM_READAHEAD_PAGES);
- 	bdi->io_pages = lim->max_sectors >> PAGE_SECTORS_SHIFT;
- }
--- 
-2.49.0
+Assuming the comment is the right thing, I'd expect a valid status for that
+case:
 
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -179,7 +179,6 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
+                        req->cmd_flags &= ~REQ_P2PDMA;
+                        break;
+                default:
+-                       iter->status = BLK_STS_INVAL;
+                        return false;
+                }
+        }
