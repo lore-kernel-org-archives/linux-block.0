@@ -1,93 +1,194 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CEB20330
-	for <linux-block@vger.kernel.org>; Mon, 16 Jun 2025 06:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0A7EAFA;
+	Mon, 16 Jun 2025 07:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750056206; cv=none; b=RuXXKJiOCYABU+XhyZSlK5oIcB/bLe37s6mo25GBzvq8Yd2uJVK6HVR40N9/dXqMge8sxZhbP9APrzHdtf6+KfeMeYJIeAMdRnq1LgLksEBMLibCJ29/SkO0XZm6cLv067GlRqiCUCe+F2B6zLDQh2mEJPufy6WZdTZnr8C1QFU=
+	t=1750058538; cv=none; b=jNX2AAodi27KlX4LIsXKXsKSWNkj20qROfK9XxROmS5p41zEp9MlsYKsIThj+EITqPKCgqdHXB3R6kwJ+HqGB1cP/X5RU15jbfb/Bq1caCfU8ha67bYtcbgOOTOuY7MpCaHqFkizZHT31ub1+NzB5MhkOi3PaW7wTFCL4PjjaNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750056206; c=relaxed/simple;
-	bh=i8eZ5db7jwLf3O2OU4sJwtCvyGnyULzOXR46Z6sekOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DBEbvo2/HI7mZzlD0TH/wQdwxFlLbP2cKq9+ucbggi8mzGoe8vNH8BzU9o2HQhBzBgCPUemmEQULFIjmGlSYcqGpda8np2h06yD3Uw4+sSt8aZ1RgfxTmZbuJlbCPQEUpqlealfg40ZpZKMzQKzOKI5qLRvtFqN5809kbZwdXb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ea2GD93o; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ea2GD93o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCCDC4CEEA;
-	Mon, 16 Jun 2025 06:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750056206;
-	bh=i8eZ5db7jwLf3O2OU4sJwtCvyGnyULzOXR46Z6sekOg=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ea2GD93oQhfMVYrQqOBlhv16244neKYQsZ5tMJvqX4kKmN7Cu7dUxD6fMUJhdufGQ
-	 D6iPWyjHsx48zcXJTnZtaOuAupGhsUInQzo5yhmnnqm1VvfdYVdNCTlG4CRmnC594E
-	 cqI9WHBK0swPEqvw05iJgLssF6bWQUi3GLFIR31MO+9vGN6c2gR8zP7Jfsu3b4/v7V
-	 /IMHMQlqFoRNYu9BprdLtUt5hKiobkNmnPPokSQm0OcNOaWzE7XUQh2KXtb7FXIkw4
-	 ROJrXWpn78imzqt/xuKQU0bgd/DbXvwHEWBCs7p96qNzE59E20ZLC/a1mrnde4DxT+
-	 Rkj2ZwzBNG2uA==
-Message-ID: <2105172c-5540-40d0-9573-15001b745648@kernel.org>
-Date: Mon, 16 Jun 2025 08:43:22 +0200
+	s=arc-20240116; t=1750058538; c=relaxed/simple;
+	bh=WYJBgBE5OoKfdnIg3dSfEmExU5NkhwbCPGfNjh4VGbI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QKVExhspAOd/Jb57gTPDS2HV940eFIYfsYOqKd6Ct70dELLFMLgjbFARQ0H59+jLrmssHd+U+/JUFkQfVytyulesI2jCONZ4w7focXVKeJC8BowecC+pDpx1LJclfXy4x/P7HZO8W8eUF8KLXpS1mnp+JCzJPFwmqyHyWnLBd4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bLLzn5NYbzKHMp3;
+	Mon, 16 Jun 2025 15:22:13 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 1C5AA1A0AD6;
+	Mon, 16 Jun 2025 15:22:12 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP3 (Coremail) with SMTP id _Ch0CgAXacMixk9ohQO+PQ--.53163S3;
+	Mon, 16 Jun 2025 15:22:11 +0800 (CST)
+Subject: Re: [PATCH RFC v2 0/5] blk-mq-sched: support request batch
+ dispatching for sq elevator
+To: Damien Le Moal <dlemoal@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250614092528.2352680-1-yukuai1@huaweicloud.com>
+ <9d3aee10-9eb3-4f2d-bb9a-1721c05ec3aa@kernel.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <16fd5432-36b0-0a92-0caa-7374ce1464a5@huaweicloud.com>
+Date: Mon, 16 Jun 2025 15:22:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Daniel Gomez <da.gomez@kernel.org>
-Subject: Re: [PATCH 2/9] block: add scatterlist-less DMA mapping helpers
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Leon Romanovsky <leon@kernel.org>,
- Nitesh Shetty <nj.shetty@samsung.com>, Logan Gunthorpe
- <logang@deltatee.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <20250610050713.2046316-1-hch@lst.de>
- <20250610050713.2046316-3-hch@lst.de>
- <dab07466-a1fe-4fba-b3a8-60da853a48be@kernel.org>
- <20250616050247.GA860@lst.de>
-Content-Language: en-US
-From: Daniel Gomez <da.gomez@kernel.org>
-Organization: kernel.org
-In-Reply-To: <20250616050247.GA860@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <9d3aee10-9eb3-4f2d-bb9a-1721c05ec3aa@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgAXacMixk9ohQO+PQ--.53163S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFWrZr4UJFy5KrW7tF1xAFb_yoWrGF15pr
+	Wft3ZIyF1DJ3ZFqFn2v34DXr1Utw4kJw4fJFyrtr4ktwn8Zr13Ar4kXFy0va9rt3s5WFWD
+	ZwsrXF95XFyUC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-
-On 16/06/2025 07.02, Christoph Hellwig wrote:
-> On Wed, Jun 11, 2025 at 03:43:07PM +0200, Daniel Gomez wrote:
->>> +struct blk_dma_iter {
->>> +	/* Output address range for this iteration */
->>> +	dma_addr_t			addr;
->>> +	u32				len;
->>> +
->>> +	/* Status code. Only valid when blk_rq_dma_map_iter_* returned false */
->>> +	blk_status_t			status;
+在 2025/06/16 12:03, Damien Le Moal 写道:
+> On 6/14/25 18:25, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
 >>
->> This comment does not match with blk_rq_dma_map_iter_start(). It returns false
->> and status is BLK_STS_INVAL.
+>> Before this patch, each dispatch context will hold a global lock to
+>> dispatch one request at a time, which introduce intense lock competition:
+>>
+>> lock
+>> ops.dispatch_request
+>> unlock
+>>
+>> Hence support dispatch a batch of requests while holding the lock to
+>> reduce lock contention.
+>>
+>> nullblk setup:
+>> modprobe null_blk nr_devices=0 &&
+>>      udevadm settle &&
+>>      cd /sys/kernel/config/nullb &&
+>>      mkdir nullb0 &&
+>>      cd nullb0 &&
+>>      echo 0 > completion_nsec &&
+>>      echo 512 > blocksize &&
+>>      echo 0 > home_node &&
+>>      echo 0 > irqmode &&
+>>      echo 128 > submit_queues &&
+>>      echo 1024 > hw_queue_depth &&
+>>      echo 1024 > size &&
+>>      echo 0 > memory_backed &&
+>>      echo 2 > queue_mode &&
+>>      echo 1 > power ||
+>>      exit $?
+>>
+>> Test script:
+>> fio -filename=/dev/$disk -name=test -rw=randwrite -bs=4k -iodepth=32 \
+>>    -numjobs=16 --iodepth_batch_submit=8 --iodepth_batch_complete=8 \
+>>    -direct=1 -ioengine=io_uring -group_reporting -time_based -runtime=30
+>>
+>> Test result(elevator is deadline): iops
+>> |                 | null_blk | scsi hdd |
+>> | --------------- | -------- | -------- |
+>> | before this set | 263k     | 24       |
+>> | after this set  | 475k     | 272      |
 > 
-> I went over you comment a few times and still don't understand it.
+> For the HDD, these numbers are very low, and I do not understand how you can get
+> any improvement from reducing lock contention, since contention should not be an
+> issue with this kind of performance. What HW did you use for testing ? Was this
+> a VM ?
+> 
 
-The way I read the comment is that status is only valid when
-blk_rq_dma_map_iter_* returns false.
+Thanks for reviewing this RFC set! I'm curious why there are improvement
+as well, I didn't have the answer when I sent this set.
 
-But blk_rq_dma_map_iter_start() can return false and an invalid status (in the
-default switch case).
+I'm testing on 256-core Kunpeng-920 server, with MG04ACA600E, 5TB HDD,
+attched to hisi_sas_v3, and the disk have beed used for testing for more
+than 5 years, perhaps this is why randwrite numbers are so low.
 
-Assuming the comment is the right thing, I'd expect a valid status for that
-case:
+> I tested this null_blk setup and your fio command on a bare-metal 16-cores Xeon
+> machine. For the scsi disk, I used a 26TB SATA HDD connected to an AHCI port).
+> With this setup, results are like this:
+> 
+> |                 | null_blk | hdd (write) | hdd (read) |
+> | --------------- | -------- | ----------- | ---------- |
+> | before this set | 613k     | 1088        | 211        |
+> | after this set  | 940k     | 1093        | 212        |
+> 
+> So not surprisingly, there is no improvement for the SATA HDD because of the low
+> max IOPS these devices can achieve: lock contention is not really an issue when
+> you are dealing with a slow device. And a SAS HDD will be the same. Gains may
+> likely be more significant with a fast SAS/FC RAID array but I do not have
+> access to that.
+> 
+> But the improvement for a fast device like null_blk is indeed excellent (+53%).
+> 
+> With LOCKDEP & KASAN disabled, the results are like this:
+> 
+> |                 | null_blk | hdd (write) | hdd (read) |
+> | --------------- | -------- | ----------- | ---------- |
+> | before this set | 625k     | 1092        | 213        |
+> | after this set  | 984k     | 1095        | 215        |
+> 
+> No real changes for the HDD, as expected, and the improvement for null_blk is
+> still good.
 
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -179,7 +179,6 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
-                        req->cmd_flags &= ~REQ_P2PDMA;
-                        break;
-                default:
--                       iter->status = BLK_STS_INVAL;
-                        return false;
-                }
-        }
+I agree that lock contention here will not affect HDD performance.
+What I suspect the difference in my environment is that the order of rqs
+might be changed from elevator dispatching them and the disk handling
+them.
+
+For example, the order can be easily revised if more than one context
+dispatch one request at a time:
+
+t1:
+
+lock
+rq1 = dd_dispatch_request
+unlock
+			t2:
+			lock
+			rq2 = dd_dispatch_request
+			unlock
+
+lock
+rq3 = dd_dispatch_request
+unlock
+
+			lock
+			rq4 = dd_dispatch_request
+			unlock
+
+//rq1,rq3 issue to disk
+			// rq2, rq4 issue to disk
+
+In this case, the elevator dispatch order is rq 1-2-3-4, however,
+such order in disk is rq 1-3-2-4.
+
+And with batch requests dispatch, will this less likely to happen?
+> 
+> So maybe drop the RFC tag on these patches and repost after cleaning things up ?
+
+Sure, thanks again for reviewing this RFC set.
+Kuai
+
+> 
+> 
+
