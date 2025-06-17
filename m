@@ -1,86 +1,90 @@
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF951A5B85
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 20:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFE71514F6;
+	Tue, 17 Jun 2025 22:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750193833; cv=none; b=VIvatpCc2+eiMlQv1yTHAKew96Nu4rSDiZFMobHovwMDO2X1GtCAYL4jTag554BOBEw6wBRGEe0gJMguJldm1q6DUH3EObWVmLyD48PvriTSH0W+9OTQFu2rv3IqJu1ilxKBISV1N7Ch1u50KWzI90Poa8sSfz4PkejyADrm2uM=
+	t=1750197624; cv=none; b=C5KeDCdAE5RfHbN5cLrZy0sSx19qP7fMAP89Y5X+3UttRgYdFFxk0/ArvvYmXgiWT5y3T28QYYnDouVNXcuqJ++4ew6CM4N3Z3XewPyCja96TknzaFevNPIUVUvpBohU8PRfdnZRCr8Ya7uJ5Kf7bDm3G1UO4aDQrclE7mDUZFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750193833; c=relaxed/simple;
-	bh=q1WReagZnzvzLf0u6KtZw3grzUy2y3+mQ1XcaFzMDek=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t3A440ub5tnCz82z6rAeT0TQBZ49ZuR2FmJQZdRYGHmb3X7R1nm3A3xIXWSvtBWrZl/UFXpInBLIz4lKDpGwmC6k2+oDGQXp36FcUPHKo3ryRmU1cqwwo/MP7mOBK1wXoew0EHYTj5objQ6W7AmNvueNtc+2AwVLvYh0xQsV2YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=elijahs.space; spf=pass smtp.mailfrom=elijahs.space; dkim=pass (2048-bit key) header.d=elijahs.space header.i=@elijahs.space header.b=LH5qRhZx; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=F88z+jGS; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=elijahs.space
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=elijahs.space
+	s=arc-20240116; t=1750197624; c=relaxed/simple;
+	bh=zgs35h9EtiQj2gsIkYN3K/XBSu+19KdaRfCI+ceSC2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ChHVk03qlcYocNOYfwIO7tDzbjHnFxc4dVAZp+zKM3fU9OF6nLrmzHku0naeY1KO3k14lmK2FFhjFn1k2GjcEUnKjhLM4lxsMC2zoMh+U12mJ0nkuctjQ2ObQlpgX4M5xjH0OQTVagG/CL1GMBNM9b/IY+OnqROBIfKu440oYAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3h7SjuU; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=elijahs.space header.i=@elijahs.space header.b="LH5qRhZx";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="F88z+jGS"
-Authentication-Results: purelymail.com; auth=pass
-DKIM-Signature: a=rsa-sha256; b=LH5qRhZxffljidtb1scdSsxoXb6j6IxM3yZFgue5zSfUnJMaTQYy2rDQK3DD//aHydzxHrHNIPGXoT30EfvT8Q213mjUcQm4Es7WYtOU8qLqHidmh7+JpicH4jsKrhCOhiTAe3xhXHdgIKDZwWZRdhMaq0OGyINDkONggwtC2MFWqHt1QiwwfGtWdmApIBABqRZ8by1x3dO2fUBbW0Uq3OLOsl3zsNBX+zcg9BpQxMdEEc8zSh7jutggi3b2nkeipRUi8W4u8MclCndr7naiI+gm7H6YO9W4Je/y8fqxO7LBlDodm5dL18Yl0r0gzZWPrYxndJlykUQclmrS7ozKeQ==; s=purelymail3; d=elijahs.space; v=1; bh=q1WReagZnzvzLf0u6KtZw3grzUy2y3+mQ1XcaFzMDek=; h=Received:From:To:Subject:Date;
-DKIM-Signature: a=rsa-sha256; b=F88z+jGSZt41JguVZDcGK3vhgYapyYSJW0thN3+gjrhhr5FqHELWNoX52HA7+cAu/d8wJ3zwWr/KgkbjhPGeKt2eqLWwy3fthnoi6KxxLDoghZWmiF0d5lpRwhSwgcieFJWgsPHZdBGkSgVKP4+5vc/yditfjCX3s3Z6zuRFYLfF/l2ZxEvR8k3Cmam3M+Sen9Ws/Rn79qMiE8+fTL7VCkrfEcxMaM/nDt2cKZDFWu7tlgqEGNfvOTHre1ISN4j97hjzrnkU871MuxE7SpZVcxrXb/NrnchR8866QHSiByKdfIDxfU9Gllls5BwYbDrsKzm+fMnFM2ZHhdVP6A8jMA==; s=purelymail3; d=purelymail.com; v=1; bh=q1WReagZnzvzLf0u6KtZw3grzUy2y3+mQ1XcaFzMDek=; h=Feedback-ID:Received:From:To:Subject:Date;
-Feedback-ID: 147366:4866:null:purelymail
-X-Pm-Original-To: linux-block@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id -1931553863;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Tue, 17 Jun 2025 20:56:58 +0000 (UTC)
-From: Elijah Wright <git@elijahs.space>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Elijah Wright <git@elijahs.space>
-Subject: [PATCH] block: mq-deadline: check if elevator is attached to queue in dd_finish_request
-Date: Tue, 17 Jun 2025 13:56:08 -0700
-Message-ID: <20250617205630.207696-1-git@elijahs.space>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3h7SjuU"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a6f3f88613so62408441cf.1;
+        Tue, 17 Jun 2025 15:00:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750197621; x=1750802421; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=txIUBFwdzlJtz0AE1b03VDLXigNRDHeYfG75FQwge3Y=;
+        b=L3h7SjuUgWAaDW8vzkxusq8aYrIRojyFyXzyfTW8nq8RkIxqFVjNrXw/2SimpMnXqn
+         ZGgEfunmIiZEysIq7vTpNY8UYgirZ4/OPa3tT5xO5bfETkC/RFIVlxSm+FwQokqyqS6q
+         1o0+dDGTywivCmXkvT/xlhU/XlZPTganVqSvElbwvCJpx3Ocxzc6Yp/2Ngx+lnxM2Ebs
+         CSUQQEFgug0lAeydn1NtDyWh3bHoyrxk/7zmYCHj24Sxk6+zxbPmkVTNq88ZIVjIlKYd
+         jTFrlG7NsR3697jPCOCy3re6b8r2MiiBiPHTP0nwqhGGyWrlkppAdtuyS75ZZ38oD+zy
+         jutw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750197621; x=1750802421;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=txIUBFwdzlJtz0AE1b03VDLXigNRDHeYfG75FQwge3Y=;
+        b=ALhLYb0GuvbXNjggBDOVhOKWqVoDPZkuQ32cMcNVzn0urjDZg/kWfz6rNYuRjv37sp
+         WqiibIBceR2jtL+CV7FmbXVgQjxRs7dN/RVrNxxSbSSpu8wQvJR3ykfJnNkfbalkaXBd
+         tg7nkky2dsDUL9oaqwdwMyqDFLPyDiuGba2oNqclWbjJTgsgQgLH7/Yt99N5xNgU5Zxc
+         fVKv098OKmxmAkLv2fzrhPg3XnSsG/iM0n7YR8D0HfoNAZ0NfVLgC+4DzSJv+96yfXRa
+         en9bTKs8r8yH0TtB44n0wSUMv3rwNt6EvDOaxXhOEUFqJhZLvLDIWcsoLg9iOp2BtHxl
+         DZtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWk4LZY8fids6T1H7SvMdJeahd03IH9NJQ3DBQZJoAPX/TqzKlm5eUdIPEP1KBWq9pp3v/pAX6nhOAu@vger.kernel.org, AJvYcCWnVyDLKIM8ePlisIDl2p9wCHlKgYAp3b8K6tqbh4M1msRFVmd/893EYf7DzUeLdloPUevRnOVLFl3VK3Y4LQ==@vger.kernel.org, AJvYcCWp61cnXNJMTv0JFwv7EUm8A3HCUUhRqTytZSxxmYvrIAcT2k1b0jmBglDK5MsWA8txuoAmfmFiUN7tbg==@vger.kernel.org, AJvYcCXms3dbTkYX++WSKxGU0ere0GYbSR06SUaamWp6Rlxonjhfxq22vb5Fzg82ss9oXPQn/uXlQyt+uSYp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1Cned1rJgWMqtsG+kvEFDD2HLLtLuil1KTjo9RehA0wTJ6JDH
+	fM9LlT+0xyGUnWVuVyxgETpNMXNMOhmNesdZnWEatLc+zIwOf5n1+19rM1WzapSZQaZJqhAIWfy
+	AL3hptCEUCVMfYiQfB7uqxQ6enfqKy5E=
+X-Gm-Gg: ASbGncsNCg9bVYU7Fz18j2HNm3XXdm2WGFHOs611VEEkQjwqwW/XjSq1Xl33lYcpet4
+	sOmA6KvX+zySyXGCn5sm8GOQHVF9Y/XYEbBWsLisLYpd68ye1xSp7/4Hm1rI4mD3xQC4YGhz3js
+	U0HHi0Cu9QTJRWoKBzIwgFUG0qAJmh9Blm0R3ZSoP/CwsTl7G3uw5v7sIkP4g=
+X-Google-Smtp-Source: AGHT+IH0hdfYxpLNGLi3uEo213Cw3XqtMJ0PMjt6sD7nPMBUnc5OJF7u+w4++qwD5412WYS8skQhFb31RzNJBQ9+/x4=
+X-Received: by 2002:ac8:5949:0:b0:4a5:a4e9:132b with SMTP id
+ d75a77b69052e-4a73c658c18mr221573461cf.48.1750197620736; Tue, 17 Jun 2025
+ 15:00:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-10-hch@lst.de>
+In-Reply-To: <20250617105514.3393938-10-hch@lst.de>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Tue, 17 Jun 2025 15:00:09 -0700
+X-Gm-Features: AX0GCFvVfukB4jEEL0QyWt5wn8Z0d6yaU1T1xsjz2NFs3U_hou4mX4F2ZU4QqYc
+Message-ID: <CAJnrk1bkZGBnRcY5kXoxrqt0OoGZTu_ouWa=h6mF2Q97StT4Qw@mail.gmail.com>
+Subject: Re: [PATCH 09/11] iomap: export iomap_writeback_folio
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
-Content-Type: text/plain; charset=UTF-8
 
-in dd_finish_request(), per_prio points to a rq->elv.priv[0], which could b=
-e
-free memory if an in-flight requests completes after its associated schedul=
-er
-has been freed
+On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> Allow fuse to use iomap_writeback_folio for folio laundering.  Note
+> that the caller needs to manually submit the pending writeback context.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Elijah Wright <git@elijahs.space>
----
- block/mq-deadline.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+Reviewed-by: Joanne Koong <joannelkoong@gmail.com>
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 2edf1cac06d5..4d7b21b144d3 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -751,13 +751,15 @@ static void dd_finish_request(struct request *rq)
- {
- =09struct dd_per_prio *per_prio =3D rq->elv.priv[0];
-=20
--=09/*
--=09 * The block layer core may call dd_finish_request() without having
--=09 * called dd_insert_requests(). Skip requests that bypassed I/O
--=09 * scheduling. See also blk_mq_request_bypass_insert().
--=09 */
--=09if (per_prio)
--=09=09atomic_inc(&per_prio->stats.completed);
-+=09if (rq->q->elevator) {
-+=09=09/*
-+=09=09* The block layer core may call dd_finish_request() without having
-+=09=09* called dd_insert_requests(). Skip requests that bypassed I/O
-+=09=09* scheduling. See also blk_mq_request_bypass_insert().
-+=09=09*/
-+=09=09if (per_prio)
-+=09=09=09atomic_inc(&per_prio->stats.completed);
-+=09}
- }
-=20
- static bool dd_has_work_for_prio(struct dd_per_prio *per_prio)
---=20
-2.43.0
-
+> ---
+>  fs/iomap/buffered-io.c | 4 ++--
+>  include/linux/iomap.h  | 1 +
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>
