@@ -1,103 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F3628C5AF
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 07:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8072F28FA9E;
+	Tue, 17 Jun 2025 08:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750145142; cv=none; b=aMJPpEqsTrdgpG+dpJwY3ZR+WkTLgbbAc9mp+mLwBlZGkXAOOIhnA4NvsTvSasqSU0Awlo6Alq1cpCcLY7XdOn2FoxUcG3CGb3rGQnPdjJKXZYl0suTWskQCE1FpspjTsq4965Ed4uPJwoPeF1lmDtxfuWZvDEY190qwwOiaOoE=
+	t=1750147707; cv=none; b=duTwxAMSaW400TuxVmzgqBfkcfCZdg2UQeo8tS9SSypEIHoobM75ePMZUivRIMTR4Z83jxOY3X54PQNo5J2gzp+brp94ZF0sEhYfSkaJhFd3fCojr0W0WQtQhYsR0aS+u9fMccf84muGzRWqi8gNUCwzRIp06r6Rb+kQaFkgEdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750145142; c=relaxed/simple;
-	bh=Pbj3vJHvkhc3w1ktwr4/JfCbq1mnFSis2rU+He7Fek8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fxLa3yaAGYtBSTGTIL8HNx0MbsJExXXfjMNCnZ9kUSKWXShnARrKTxC7fFqaoQS5qm+/u4jmym7fnF5CeJ6bEHV58Vjcv6Wt1E4vshlhMAr+SQy/NjoMcWLbz1ArXZZDol4JyCrMpFqjFSU+F3+vUbWf+675ME74pANZsiv9Q/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G2bc68Y0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750147707; c=relaxed/simple;
+	bh=VRMaUDETe6ZIVApAGqRg9acRfkODjIcR6Fz/uyGEimk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TCWrqqBB5KxTFfZQnLI+Q+2aZMlfbezALVBiCnDubU+4k6pY3I2ZGaORiaGlCsxxElj3OfSTONLmcCfMJ3HJ4+PQba94Oz64S9YPEG8P5/CH4A+0bEONvsstc60XsQlyGPXTk77g/PduzyAC513mof/uWXGm/YdeZthHy8PSa3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bp9CshIc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2bc68Y0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750145138;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tRhdOYnZijUDFTbLchYF+k1cCB2nXXbuhiNRlKP9kcA=;
-	b=G2bc68Y0IFAOmGZ+kpkKiE6UD8j0xjJFZxcw0wJGBrmooSmKkfdeqteWiEgCwmumV7hxcY
-	GW2hmOb2ImVQxkAuf6Ehfd08XyKyR985uZkLgDZBDnqbkY4/HnJKN4YhC69/qJ5+nnP0Py
-	wFkXcwtIzwrNSaxKKvlWlGYfUfgTt2A=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-259-dzcPNCogMRuMAz-WLh7S6g-1; Tue,
- 17 Jun 2025 03:25:34 -0400
-X-MC-Unique: dzcPNCogMRuMAz-WLh7S6g-1
-X-Mimecast-MFC-AGG-ID: dzcPNCogMRuMAz-WLh7S6g_1750145133
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3CDA195609F;
-	Tue, 17 Jun 2025 07:25:32 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.143])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6064530002C3;
-	Tue, 17 Jun 2025 07:25:26 +0000 (UTC)
-Date: Tue, 17 Jun 2025 15:25:21 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, "Ewan D. Milne" <emilne@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>
-Subject: Re: [PATCH] scsi: storvsc: set max_segment_size as UINT_MAX
- explicitly
-Message-ID: <aFEYYSCREiCMGBAH@fedora>
-References: <20250616160509.52491-1-ming.lei@redhat.com>
- <20250617050240.GA2178@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bp9CshIc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 612F6C4CEE3;
+	Tue, 17 Jun 2025 08:08:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750147707;
+	bh=VRMaUDETe6ZIVApAGqRg9acRfkODjIcR6Fz/uyGEimk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=bp9CshIc9H7RhpRBRZBtyIrCqCEoI8B+ZXV6e5PRj70ZxN5d1nI8JAum4ljdDiFcT
+	 256mr1K86U/XE6GXOEz/t88tnho7YL0UKNtUGnYHS0y2e2Sjw/E87yRRWdeYPaH+4x
+	 wGP64iuqCL5bmsNKTvH5XX/ZMWHmqrdRSdr4IuLGI8YQjwwCSAMZb4l5tBhl+nxg2c
+	 o0XhsdTN8D12iMtxyrd+yLhdw+u9H4pb1eCFGx53Ie5CrVhiNH+Q2u8HagcA36C1li
+	 TG7g8S4mznllqjTkj8u69S3c6BUDQfg7NcA8QJExu3aSRUguODSoaFA1FHrrVHTPiG
+	 n1G30HCMuY5SA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: "Johannes Thumshirn" <Johannes.Thumshirn@wdc.com>
+Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
+  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
+ Lossin"
+ <lossin@kernel.org>,  "Alice Ryhl" <aliceryhl@google.com>,  "Trevor Gross"
+ <tmgross@umich.edu>,  "Danilo Krummrich" <dakr@kernel.org>,  "Jens Axboe"
+ <axboe@kernel.dk>,  "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 9/9] rnull: add soft-irq completion support
+In-Reply-To: <2399a39e-a4e5-4f19-a5c7-2582b584e9d7@wdc.com> (Johannes
+	Thumshirn's message of "Mon, 16 Jun 2025 13:56:16 +0000")
+References: <20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org>
+	<20250616-rnull-up-v6-16-v1-9-a4168b8e76b2@kernel.org>
+	<5Mb2NxReiXPkSFjrUdLfq-5bzuvoWJyGLqgZlnc05SLScI4ezIlnWZ--jl6zZeCBNEG4KkuUQxDp2qt8GiwTsw==@protonmail.internalid>
+	<2399a39e-a4e5-4f19-a5c7-2582b584e9d7@wdc.com>
+User-Agent: mu4e 1.12.9; emacs 30.1
+Date: Tue, 17 Jun 2025 10:08:17 +0200
+Message-ID: <87bjqmbxji.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250617050240.GA2178@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain
 
-On Tue, Jun 17, 2025 at 07:02:40AM +0200, Christoph Hellwig wrote:
-> Please try this proper fix instead:
-> 
-> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-> index e021f1106bea..09f5fb5b2fb1 100644
-> --- a/drivers/scsi/hosts.c
-> +++ b/drivers/scsi/hosts.c
-> @@ -473,7 +473,9 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
->  	else
->  		shost->max_sectors = SCSI_DEFAULT_MAX_SECTORS;
->  
-> -	if (sht->max_segment_size)
-> +	if (sht->virt_boundary_mask)
-> +		shost->virt_boundary_mask = sht->virt_boundary_mask;
-> +	else if (sht->max_segment_size)
->  		shost->max_segment_size = sht->max_segment_size;
->  	else
->  		shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
+"Johannes Thumshirn" <Johannes.Thumshirn@wdc.com> writes:
 
-This way works, but I prefer to set it explicitly in driver, instead of
-making block layer more fragile to deal with def ->max_segment_size
-if ->virt_boundary_mask is defined
+> On 16.06.25 15:28, Andreas Hindborg wrote:
+>> rnull currently only supports direct completion. Add option for completing
+>> requests across CPU nodes via soft IRQ or IPMI.
+>
+> No idea about the Rust stuff but I think you ment IPI not IPMI.
 
-- for low level driver, if ->virt_boundary_mask is defined, ->max_segment_size
-should be UINT_MAX obviously since it implies single `virt segment`.
-Setting UINT_MAX in driver has document benefit too.
-
-- for logical block device(md, dm, ...), both ->virt_boundary_mask and
-->max_segment_size may be set, and it is fine since logical block device
-driver needn't to deal with sg
+Absolutely, thanks! Sneaky little M got in there.
 
 
-Thanks,
-Ming
+Best regards,
+Andreas Hindborg
+
+
 
