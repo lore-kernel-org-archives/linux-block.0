@@ -1,78 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921372EF2B5
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 17:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C763BBF2;
+	Tue, 17 Jun 2025 17:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750182314; cv=none; b=oJ24Z0tmbd9lkTIYA6gy97pupkbXuFzkOsaVPBydXzDdkxZV+V+4209ZzgquAOx1KM9GJlLCNbmoEq46KC25qXdLIw+ZGvM3WtLscmgbMDFPK78qEmeUYpmHrm8Egps0Vgfdq47OlEsmF1y22qpoBWJWCi7JdiUeycWT1PipH5U=
+	t=1750182880; cv=none; b=k0dfqnUcq2mi6qpAgoDMi+7LUuGweu+a76VTtlG2SqRiSR86Q04Cb4IkY6zIzMX5bwHJTZ+j4PXfSoYhhCT8VmOWcfqmMVMJ75SH316IlvQUZjsE4jnU5pe9t8IRH4NBJdjP1B4sSdkmU27wY0gwFwzaQt24ckw95R/i+hHpYks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750182314; c=relaxed/simple;
-	bh=mwuIS3TH6Iy2vwJYNmaVexGdaQqfvGHQnUF4HVL6WXY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cGZBhroO/U0HGGZecst7kvbGL10QW1YDUyV5d/7aGNRGZTBqCmlOH3FGU7yI114aOkXC11ag/HUBE5EYyhjkr7e6DZtLk+2XxvjYTEOx80mo7716IX7W/9BmFtBJy5iEdO1UqGyaPYr+aoLiJDz0Yyd2KiybNMJfYDFXd1RhjUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4nzq0Hl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750182880; c=relaxed/simple;
+	bh=bgxfn7vE3uVcZL4Z/4Xgrg5I++5k5UcZdX3exMfLzn4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BQ6XKglC8jKqBzjpWSDjVHh45/a9urkJ5Q9jvw8V577n0sqN5D2l4Zr7bqzDVha0OyVvBI/UrFN3dQgySxuyVaq+04NU+cxHL+bWDe85VvlO0MR/aNDdExGbFjr9Nd4mOYooKPZx6XE/cRXxvkQgVftrIkb4G+95UmfbPY1WOes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bl28H49y; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4nzq0Hl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04FBEC4CEE3;
-	Tue, 17 Jun 2025 17:45:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750182314;
-	bh=mwuIS3TH6Iy2vwJYNmaVexGdaQqfvGHQnUF4HVL6WXY=;
-	h=Date:Reply-To:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=c4nzq0Hlzi9wxXW6ihJTpfUwpXJVjDnWYqP7qGYT2jvZoS6oyXzhOOHm2dUnbiqQW
-	 1PFbYsfW1pG/d1RfuVapbQQYoxCfOAYulxUX/rpXFDt8khZ8/4nnF/asTQ4rWTvYYb
-	 bdSpDDJJocUpEq3NQ3W3gddAmlvPSoPntEyPQOBdHa0erzhXBNq1fnZbxojgRdNWBn
-	 kjnhJ1zfWfXD8rC6koeRkaxE0pLQ9yPY7dPqrqXBaAT6EUKBdfMtpULEFf+r2G6hyT
-	 pSQBFnWBqL+T+0k7CPePUWDy4DIVosFTHSvI/z49yfevdQ7IM8b04L7NCvCgCpd7oE
-	 UW0lUVBDc5A+A==
-Message-ID: <4e3eec2b-bd74-452f-880f-b1ad4f35bd79@kernel.org>
-Date: Tue, 17 Jun 2025 19:45:10 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bl28H49y"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4a58f79d6e9so74439051cf.2;
+        Tue, 17 Jun 2025 10:54:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750182878; x=1750787678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OTi4WuiI5rSn4d0VdM5D16B62aIH3ZTDCOZvLTT0owQ=;
+        b=bl28H49ygnqhyLaSjZSoas5k74rbqyepz5ij3cxt3sdyl6QOwcUbAiENyF7O3fQbzD
+         i8rvicdk9RRmmjoujhP+J9Q4A7DOdE23BvRvvvDX9r7TrxzTgXdjMXTgjYXooV+KQr0i
+         1N5lXR2j8GA/0OWTdEOnECaHJBdorYYK+SRiMbmRI1MqhhX7eLPE+6LV0cbH6lG/ceeV
+         iktbI4L9EbtP2dM3wdpJvtkvT505rACRkVxKH9H73pSpN5jw9KUqB4cQe8GFmrSA5Sq3
+         /LZXp/O9STs6XCGcXpXEwJThttvX7n0T/OCy2khD5gtWYyormoN81I8MTOZFvDOPRW8d
+         3JDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750182878; x=1750787678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OTi4WuiI5rSn4d0VdM5D16B62aIH3ZTDCOZvLTT0owQ=;
+        b=Q4i02eEJvG/8VZhFBMpsqGF2pX3DmyrhLDnpzJf+wj7Setmy8odTnr2vO4KygvokCf
+         WNzhMPcYssLu8gyaY4CUdQ9m5s2cMPxFPClMos+YIgTh+x8I0OTtL4Inu51EJe+eNGtr
+         mEKXx2WORDk8RLKe7n7Rxt2o+upLLbFXfZhCgDjwf0EV5G6AoWLRIFnJPbRJ0Yhu5j2q
+         CX2cpS0zdPxrCCemjpSyCMGveumQOvNKvTHNtGd7S6TrCHWGE7OnQlULYW66fvlrBxa9
+         kcMrZ8xybr4bqfPEWz7opS3e6mSUlG90DV/QBPsoN9hK3R1OzMp1s+hzNozTJ3FMjwXP
+         9tvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmyg6rDd4NACPSaT7aQ3btfyrHDcfyGddEtw8ovB5ayEdA1Vzel1EHG7ibRDQALI3LhhsACoAUQsSMRg==@vger.kernel.org, AJvYcCWaZZfDXQ9MQuPKiqDZey/0ePxIQZ1cCOtWqwuwLqFf5BW0TDOeU6I+FBxes6k+7ufrdxfgMbwZfkC6@vger.kernel.org, AJvYcCWv7O5yx95Ism81Hzx5T44dLqg1+Rnyn6fMhf186Q0WP8KE9Q3Jltn7ljrEQ03C4agUQtEOayRf9qPt@vger.kernel.org, AJvYcCXPidGJTuFoRqLBPdO7CaEW3SAspt4ueekyMglfcfwCYi7OZps9SoxpaVgcKyK4BEG9+0w1sJtdxR+zcQN3Aw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWIxCRsdC3c9sudO5jkkUVi3lJKmnhQChg5Ixv/OIVcSYu2IeZ
+	im5Ihif2WklpQnNqqNv9BvMugmVlhuXLkHFHdlbjOd/ZFCftb9kDSH2pcSSsLIrRcPmxTHmIBZS
+	4WI8gBBR4xA+tbdi+ob2Sqr76vtvm9xI=
+X-Gm-Gg: ASbGncueH4EjHZS9mhnWMFKrp3GvWdUGOgV7AFC5uocBZDElza1EVquwFD9LgclT4iH
+	CTe5xnPas18lcmhWvoIQSAdoMUMtImCgaKg8NNAQZ8UyA1gWS/oxMHtUfAI5pplakhS1sL7Dkcm
+	+S6Iq/ZMdOHhbFfa1Huh215yiiC2sILOgtL5VfFfrpdxng68jSrSAKXkGHUS0CUMSKBTMvHA==
+X-Google-Smtp-Source: AGHT+IGex4UWv+HoV/9Li0Bva7BreKI2nwwf5CqKk1rUMlIevgG5vGMpxGPPINpdgZlO5LfDN26J5rEEDluUxSQJBGM=
+X-Received: by 2002:a05:622a:18a1:b0:476:7b0b:30fb with SMTP id
+ d75a77b69052e-4a73c560deamr198293591cf.22.1750182877938; Tue, 17 Jun 2025
+ 10:54:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Daniel Gomez <da.gomez@kernel.org>
-Subject: Re: [PATCH 7/9] nvme-pci: convert the data mapping blk_rq_dma_map
-From: Daniel Gomez <da.gomez@kernel.org>
+References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-2-hch@lst.de>
+In-Reply-To: <20250617105514.3393938-2-hch@lst.de>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Tue, 17 Jun 2025 10:54:26 -0700
+X-Gm-Features: AX0GCFsDdji5vutx2f9J16YcANLgGsyfwdscogvNs6WP3czKu7_D_i2PrHBn32E
+Message-ID: <CAJnrk1YZyuAX+OjuGdRWq1QpNj7R2BU5+Zx8mam6k+VfT9bULQ@mail.gmail.com>
+Subject: Re: [PATCH 01/11] iomap: pass more arguments using struct iomap_writepage_ctx
 To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Leon Romanovsky <leon@kernel.org>,
- Nitesh Shetty <nj.shetty@samsung.com>, Logan Gunthorpe
- <logang@deltatee.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <20250610050713.2046316-1-hch@lst.de>
- <20250610050713.2046316-8-hch@lst.de>
- <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
- <20250612050256.GH12863@lst.de>
- <edf056c9-ab8d-4b55-9e61-25a29916d55c@kernel.org>
-Content-Language: en-US
-Organization: kernel.org
-In-Reply-To: <edf056c9-ab8d-4b55-9e61-25a29916d55c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> Add inode and wpc fields to pass the inode and writeback context that
+> are needed in the entire writeback call chain, and let the callers
+> initialize all fields in the writeback context before calling
+> iomap_writepages to simplify the argument passing.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
+Reviewed-by: Joanne Koong <joannelkoong@gmail.com>
 
-On 17/06/2025 19.43, Daniel Gomez wrote:
-> On 12/06/2025 07.02, Christoph Hellwig wrote:
->> On Wed, Jun 11, 2025 at 02:15:10PM +0200, Daniel Gomez wrote:
->>>>  #define NVME_MAX_SEGS \
->>>> -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
->>>> -	    (PAGE_SIZE / sizeof(struct scatterlist)))
->>>> +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
->>>
->>> The 8 MiB max transfer size is only reachable if host segments are at least 32k.
->>> But I think this limitation is only on the SGL side, right?
->>
->> Yes, PRPs don't really have the concept of segments to start with.
-> 
-> SGLs don't have the same MPS limitation we have in PRPs. So I think the correct
-> calculation for NVME_MAX_SEGS is PAGE_SIZE / sizeof(struct nvme_sgl_desc).
-> 
+> ---
+>  block/fops.c           |  8 +++++--
+>  fs/gfs2/aops.c         |  8 +++++--
+>  fs/iomap/buffered-io.c | 52 +++++++++++++++++++-----------------------
+>  fs/xfs/xfs_aops.c      | 24 +++++++++++++------
+>  fs/zonefs/file.c       |  8 +++++--
+>  include/linux/iomap.h  |  6 ++---
+>  6 files changed, 61 insertions(+), 45 deletions(-)
+>
+> diff --git a/block/fops.c b/block/fops.c
+> index 1309861d4c2c..3394263d942b 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -558,9 +558,13 @@ static const struct iomap_writeback_ops blkdev_write=
+back_ops =3D {
+>  static int blkdev_writepages(struct address_space *mapping,
+>                 struct writeback_control *wbc)
+>  {
+> -       struct iomap_writepage_ctx wpc =3D { };
+> +       struct iomap_writepage_ctx wpc =3D {
+> +               .inode          =3D mapping->host,
+> +               .wbc            =3D wbc,
+> +               .ops            =3D &blkdev_writeback_ops
 
-Please, ignore. I forgot I already made this point.
+Would it be worth defining the writeback ops inside the wpc struct as
+well instead of having that be in a separate "static const struct
+iomap_writeback_ops" definition outside the function? imo it makes it
+easier to follow to just have everything listed in one place
+
+> +       };
+>
+> -       return iomap_writepages(mapping, wbc, &wpc, &blkdev_writeback_ops=
+);
+> +       return iomap_writepages(&wpc);
+>  }
