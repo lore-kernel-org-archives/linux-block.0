@@ -1,54 +1,31 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E47A15D1
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 04:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA561AAA1E;
+	Tue, 17 Jun 2025 04:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750135201; cv=none; b=AS2+Wok+Qjcow9hTbIr4E3KkcDCgN9YtzLUCh0uWlUSseAFONP9rDOVWlFoceY+6A8k8cFagXSbkmErgAXXCYVJyYEkLTuO5+j/hUZ2GYdtnDmtX2igiaARVPnk9tKuP1rccUCkDt07bLZI1V3kWJ3QHuQ6WRrUiAf3bLTRIzEM=
+	t=1750135342; cv=none; b=hEYaWWP3I+CZBEPd3hjwLTt0/e0z4PYdQPkb9+WMd3SXXuzEQQTBEft/aV+oEo/h3XSUZAOdr874L3Y3NRCLgzsBqCUxujv1sINrCPAwa/nFJfiegojgq8+U/feI7w2eMiJ0IHnqmLAa8QJ8UZc1Wu6GaeW9TmKhl+g4tJ2aS1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750135201; c=relaxed/simple;
-	bh=3nh5L7iPIsUx0zUfs98qLa0UUoHYjC5rXzn2MViv8L4=;
+	s=arc-20240116; t=1750135342; c=relaxed/simple;
+	bh=TYLI+FXOM2ZRSFIY4//MnpgO5JrwEz89pltvLKC6mHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a96P46oyyNfgkenlTHUqwzQ6sTDH/SJ5P/U4y+sh0ilpDKyB/uULopK8vzK+Kbgj/WYnCxuE6Fwg5iBgiuvE+eFAwG/dsm2nybA8Y+djJUWFe1RWXPTuPy9a12U1EooTENND8vJEdxL2vVgUwnlpKjb78U19TuUS4Ipmyy+iDWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nxwFOw+i; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nxwFOw+i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=MNM4kV+A6F/UHTs5MZt4D4Jc7133C1H/8+7BqWG7YPM=; b=nxwFOw+iMuTbJj9X7olnrnS+p2
-	ECZLs4q5NXQvjDke5LwaCnmfHotWj6J1FfJ25rnLbkrSAzEszdMTxzrY582XsW2NrOgNkexlxSCTA
-	l7VUHgeIRDO/Ea+08Dkx79i9tcbX96zrWvzQaWfhA/oXlr7/HWD1XqsVvQvIOM6PyLO7V2hXfqWzM
-	7zPLqounNhOM21tkycry0JKo7MsjVPGztcJsyoL+oDwcxvFjfuRV10/Rfxhovr+AMINTn6QtRtTrC
-	+IhDDZJ8gyCGNQyirOqRf8Oy0ykUE7iwyAkE2aMvfxJYBl6C+0CWRqMFpL1Pc6LDUVJDQC2tTfiQH
-	6+P0UG+Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uRO75-00000006BV4-2Rhz;
-	Tue, 17 Jun 2025 04:39:59 +0000
-Date: Mon, 16 Jun 2025 21:39:59 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge
- attempt
-Message-ID: <aFDxnwsLz8Mri3xr@infradead.org>
-References: <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
- <aEpkIxvuTWgY5BnO@infradead.org>
- <045d300e-9b52-4ead-8664-2cea6354f5bf@kernel.dk>
- <aErAYSg6f10p_WJK@infradead.org>
- <505e4900-b814-47cd-9572-c0172fa0d01e@kernel.dk>
- <aErGpBWAMPyT2un9@infradead.org>
- <2de604b5-0f57-4f41-84a1-aa6f3130d7c8@kernel.dk>
- <aFAYDPrW4THB0ga7@infradead.org>
- <CADUfDZqie84nJeBVJn94UvYqNhY73n41L+tbXOnXdMBqesLDWA@mail.gmail.com>
- <aFDUlnKVHLJC6VuE@fedora>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xw5cFpdZM26bO0L0UCXQAiYau6kyyev+F11ghrqGmegLz4SiA6pkpqhiYfeSEELsWrGZi5WmKOINmAlnEryIUf6b+9Xevt01L7uOl9WRwJUh/8HG58DcM7nRl7SPgBM297f+dnTbxe3VszH48lYHefSLxbLMoLgqf/r96/Oro+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2A1DB68D05; Tue, 17 Jun 2025 06:42:16 +0200 (CEST)
+Date: Tue, 17 Jun 2025 06:42:15 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Subject: Re: [PATCH 3/6] iomap: refactor the writeback interface
+Message-ID: <20250617044215.GA1824@lst.de>
+References: <20250616125957.3139793-1-hch@lst.de> <20250616125957.3139793-4-hch@lst.de> <CAJnrk1bFxRj=CF7g0YswktsPS=2oSBuHX6T3cyvTRRJjuAFyfw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,24 +34,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFDUlnKVHLJC6VuE@fedora>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAJnrk1bFxRj=CF7g0YswktsPS=2oSBuHX6T3cyvTRRJjuAFyfw@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jun 17, 2025 at 10:36:06AM +0800, Ming Lei wrote:
+On Mon, Jun 16, 2025 at 03:41:12PM -0700, Joanne Koong wrote:
+> I'm not acquainted with the block io / bio layer so please do ignore
+> this if my analysis here is wrong, but AFAICT we do still need to add
+> this range to the ioend in the case where the mapping is already
+> valid? Should this be "return iomap_add_to_ioend(wpc, folio, offset,
+> end_pos, len)" instead of return 0?
 
-[full quote deleted, please fix your mailer]
+Yes, absolutely.  That's what the XFS code does, which is the only thing
+I tested at this point.  All the other conversion look pretty broken
+right now, and I'm glad you spotted this before I'd run into when testing.
 
-> > ublk_cmd_list_tw_cb() doesn't need a doubly-linked list. It should be
-> > fine to continue storing just the first struct request * of the list
-> > in struct ublk_uring_cmd_pdu. That would avoid growing
-> > ublk_uring_cmd_pdu past the 32-byte limit.
+> > -       } while (dirty_len && !error);
+> > +               ret = wpc->ops->writeback_range(wpc, folio, pos, rlen, end_pos);
+> > +               if (WARN_ON_ONCE(ret == 0))
+> > +                       return -EIO;
+> > +               if (ret < 0)
+> > +                       return ret;
 > 
-> Agree.
-> 
-> ublk needn't re-order, and doubly-linked list is useless here.
+> Should we also add a warn check here for if ret > rlen?
 
-No driver needs to reorder, it just needs to consume the list passed to
-it, for which using list_cut_before is really useful.  Just passing it
-on would be optimal, but if that can't work the frankenlist proposed by
-Caleb might work.
+Yes, that's a good idea.
 
