@@ -1,86 +1,138 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736772EBB8C;
-	Tue, 17 Jun 2025 19:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8172EFD80
+	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 20:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750189458; cv=none; b=OU6GeuQz53TlCn7Pd8ch1MpyjE9YvXf2Ra0FMR1ZLzLeuHFBorbsEL54/TbSaQUoMCzJDC0NkK5SOS8hpU3z/ILxWd8FWPROAHn6KkkFepXx4PT4UlI3nhAXqhcwJWHlraM4j475YcRuNzLhUn+WZzYCAQGZdHu7Ttk+mAr10Ss=
+	t=1750190956; cv=none; b=V/ye7eN80c7m6WonnIL+dCMkH8aJPmpCQ5VbRiFSSsUK4cSQgWRpQ1gEENMuJ8Eu68SVgPjA7I/OMyJ7ETYNVrSd0YcYvEbu4pe9FGWhkW4JbrDbGZDLBesH5SW8YN+vGlaxreNZj0LZB3E69oM+lPASqfjtXb0GPIG5r4sJVuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750189458; c=relaxed/simple;
-	bh=WtRi0Xw2Twgw40N7BsMXWRD7K0MQidwWcJ60lfUYY90=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NrsAdNPVr6oHJtRNSoB/EPNCLxuZevkqtSteFxJJkcOJwc85ci5VdBHqcN4z5q+o2y0zWLRJo+0T6PZlTNMPeml42xaCTnAXwIOFNOP6oTofjgmX6nBgYaMzfMijwI809CuU79W0y1KUsDJCsOr6yD+8giL9SwOxGEYzBUdePaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5YXN5Ob; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750190956; c=relaxed/simple;
+	bh=VxCVGL0P21DSn2hPLKqNFWl7T0ihWR229SxIKSht+co=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BdRfNcfJ2Xy+N1XbpGMiEGFeppDRTjFieDw42VcsPnIonuoyUcs9II+EMIk6IPvRhbrNBx2/AV5syktvGA8a5hJRT3xBwxCUvqROvxrjm5iXPegC0aUwrq+R+gm8vipbPTDKOlV9t5NobQeJj16FeJVtQbvWyDx/BYSdl4BdnRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FkCimV+p; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5YXN5Ob"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7d3900f90f6so661222385a.1;
-        Tue, 17 Jun 2025 12:44:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750189455; x=1750794255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WtRi0Xw2Twgw40N7BsMXWRD7K0MQidwWcJ60lfUYY90=;
-        b=E5YXN5Obm582GbfI9FOMtTgUdCmShtSsAWCRc/66k+VbDOUCJPQOSvSEvMeVgAkiLE
-         rdBitRc+cr0kjzj1KaEF8lR93TtH4OkUvIlsqKFhUMPGVVyr3CprkWF9Ic/5GtLC5tLP
-         cYVn9+iH0bYvsUmkLblk3XGtWH4UmaTJlyMfYXdvzOjVN3T4mCjnAG5ibMeKIpITfnzZ
-         15dSKnJIxZGVSgDpNfFXWFu3bc+NhD8Djm5c7Pz4FwZuIz8Lp/ZzfYJAbOo3i4veTkkU
-         FMRXd2r45WP/IVMeeFLxA9cv82GdzszzAWF3GOK7cUHtwMj3JdQ+9RtJrq/OS/MSyhli
-         Tx6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750189455; x=1750794255;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WtRi0Xw2Twgw40N7BsMXWRD7K0MQidwWcJ60lfUYY90=;
-        b=IvsBIoJ4roe2Eb/qNWLip1oz5dEBjDedNDKbAEWxzp3ryqKd9uJXUrSrQTIvQszOzY
-         JfuxqBjKcg3IXGfxi3WlLqBFkDXKEQ2h0FUV2zbEGifdJi7pX88V7STozAXmH0C+DxcB
-         aBY4Dvjw0CQ2qkaWfyp2vKMndWNEqVK82lg15pBwDzuD5egf9ieMK5WLHpP286EOFS3A
-         FY53Qh+dXkKtd0S0t+YKwSHVkx76LY5v5Wp3kNmnSifpAK0k12JWpDF2tZKfjK2WzSkP
-         acj631ysQ3sm5p9dBSdeHGPwK37uWX0KIXyjxvPTBfQ42XKlB9r6A9TgAm/5GbJyjYEz
-         ky2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUZOv07xjccPm32JJcFwaqx5HgoszwjxtX9pRLKlcPcPlOs2As6XTPqcO4zhY9jfhsJrz7BVRRFxBRN@vger.kernel.org, AJvYcCW2yuZHNKmEq5oypi2sYg4Jfxaukwcrj+XNkTn9jeapW3MfDRbKu5jfSJocIJp8VsRwbkKo/TNF3zrVQw==@vger.kernel.org, AJvYcCX/ZTNazOwwNRjO50LLIJUK+7A9i7IMPfGd9GzckCMktAiimtFxXaA9l/RYEjV4K+uuNi8olx4Vjy9X@vger.kernel.org, AJvYcCXJ+m/ADQ1jzzUa9bZyMpRgQ4ULqYPWjeM1WiI7IVD3BmPhoNa2MBW32FdRQF1WCl6zU8gwzBNnpGLt0UfGXQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YycC+k799UJvQ5MQ3CevILPRRUtSA2KMVvgRIWDtIzys2ykGADo
-	OcJYU0NiKDC308YVAwYl5oxopO42RPgwJT0Whmq5UsgLi+bE4yfbNvp+dqU+Q5uYNii55thubx9
-	AbdozO6F7NgVI5Oe91iGW+GzB2SfQtEOd9GcW
-X-Gm-Gg: ASbGncuhcmRWZxVXOJ8gbIC2SKrN/5wLirmUeGjxetRloJstD+/nPUfjlMRpT3Ktwiy
-	u8SUm+/v1yYArzowJfux3qQtzDc+TRPWQXpR1OHSpNmrdCkALpUaU3Qesnr6HyrKMiKUcdsLP1T
-	uMJmfhTz1N1Fk9RCynNrrJV617UCCMe/iLKvbBwiu13nA9h4esx//h+I+Vi9w=
-X-Google-Smtp-Source: AGHT+IGguM90A5WxxBaJKHgMpi7W4GY/IAJU72MFE1HdL/TGwi0nyeWd9Ec3aNenmuUCOhCzBRC++OpmIdkKrJt7+34=
-X-Received: by 2002:a05:620a:3727:b0:7c5:4278:d15e with SMTP id
- af79cd13be357-7d3c6cdeecamr2004479285a.33.1750189455435; Tue, 17 Jun 2025
- 12:44:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FkCimV+p"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bMHyK4f9VzlgqVx;
+	Tue, 17 Jun 2025 20:09:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1750190952; x=1752782953; bh=MbwAx93LVko8xTuWA3X4lzig
+	Fm0x+Cv0+TJ60rhRvtI=; b=FkCimV+pxxtZ+vGN8P2lzyygxvxgPAdJ2It40M1v
+	Du++Ot4GA4YMstowFgCPqgJOApUbjuMq+gmviEIWtbJyKjw8IKbzwnWRZregI4Q4
+	AF4eHxDLA7UlgXxNGeQxH9qGYQIkfWhOnpdtYu1xZXxKU5WbSThIVdCDrt85rKpT
+	xXyjsrIICC17MllaHp/whcolA5LVY9QYrmFUMnZ/jzsomDzpWd157fJXxb74vJTB
+	JCJvW6bF/W9c55PrDDaAK6zzAOVSda76UoHO8NmSTWlKTO1pgmdlzxs4tBII/sfx
+	If6HH4tvO8aN80OXVMJwTggilirl7aXNsG3GrqMwlJuFqg==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id zlt32Z4GqW1C; Tue, 17 Jun 2025 20:09:12 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bMHyF5TkXzlgqVk;
+	Tue, 17 Jun 2025 20:09:08 +0000 (UTC)
+Message-ID: <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
+Date: Tue, 17 Jun 2025 13:09:07 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-8-hch@lst.de>
-In-Reply-To: <20250617105514.3393938-8-hch@lst.de>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Tue, 17 Jun 2025 12:44:04 -0700
-X-Gm-Features: AX0GCFtyYBSleZJx9jXRFkbq-wNgS1gcTjSW6ILPiwvxDyVA37lLb6eefOFCCuA
-Message-ID: <CAJnrk1bdps-eetwZOu_2Sri7oeVAa7F+22LOjo=Z+Bh86drWwA@mail.gmail.com>
-Subject: Re: [PATCH 07/11] iomap: rename iomap_writepage_map to iomap_writeback_folio
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: don't use submit_bio_noacct_nocheck in
+ blk_zone_wplug_bio_work
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20250611044416.2351850-1-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250611044416.2351850-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> ->writepage is gone, and our naming wasn't always that great to start
-> with.
+On 6/10/25 9:44 PM, Christoph Hellwig wrote:
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 8f15d1aa6eb8..45c91016cef3 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -1306,7 +1306,6 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+>   	spin_unlock_irqrestore(&zwplug->lock, flags);
+>   
+>   	bdev = bio->bi_bdev;
+> -	submit_bio_noacct_nocheck(bio);
+>   
+>   	/*
+>   	 * blk-mq devices will reuse the extra reference on the request queue
+> @@ -1314,8 +1313,12 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+>   	 * path for BIO-based devices will not do that. So drop this extra
+>   	 * reference here.
+>   	 */
+> -	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO))
+> +	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO)) {
+> +		bdev->bd_disk->fops->submit_bio(bio);
+>   		blk_queue_exit(bdev->bd_disk->queue);
+> +	} else {
+> +		blk_mq_submit_bio(bio);
+> +	}
+>   
+>   put_zwplug:
+>   	/* Drop the reference we took in disk_zone_wplug_schedule_bio_work(). */
 
-Should iomap_writepage_ctx be renamed too then?
+This patch is necessary but not sufficient. With this patch applied, if
+I run the deadlock reproducer (tests/zbd/013) with Jens' for-next
+branch, the deadlock shown below is reported. The first call stack shows
+the familiar queue_ra_store() invocation. The second call stack is new
+and shows a dm_split_and_process_bio() invocation.
 
-Not trying to be pedantic, but the commit title only mentions
-iomap_writepage_map, but this also has stuff for
-iomap_writepage_handle_eof, so maybe the title should be reworded?
+sysrq: Show Blocked State
+task:check           state:D stack:27208 pid:2728  tgid:2728  ppid:2697 
+  task_flags:0x480040 flags:0x00004002
+Call Trace:
+  __schedule+0x8be/0x1c10
+  schedule+0xdd/0x270
+  blk_mq_freeze_queue_wait+0xfd/0x140
+  blk_mq_freeze_queue_nomemsave+0x1e/0x30
+  queue_ra_store+0x155/0x2a0
+  queue_attr_store+0x24d/0x2d0
+  sysfs_kf_write+0xdc/0x120
+  kernfs_fop_write_iter+0x39f/0x5a0
+  vfs_write+0x4fa/0x1300
+  ksys_write+0x109/0x1f0
+  __x64_sys_write+0x76/0xb0
+  x64_sys_call+0x276/0x17d0
+  do_syscall_64+0x94/0x3a0
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+task:kworker/52:2H   state:D stack:26528 pid:2873  tgid:2873  ppid:2 
+  task_flags:0x4208060 flags:0x00004000
+Workqueue: dm-0_zwplugs blk_zone_wplug_bio_work
+Call Trace:
+  __schedule+0x8be/0x1c10
+  schedule+0xdd/0x270
+  __bio_queue_enter+0x32d/0x7c0
+  __submit_bio+0x1dd/0x6c0
+  __submit_bio_noacct+0x147/0x580
+  submit_bio_noacct_nocheck+0x4de/0x620
+  submit_bio_noacct+0x8f4/0x1a50
+  dm_split_and_process_bio+0x8a1/0x1c00 [dm_mod 
+14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
+  dm_submit_bio+0x137/0x490 [dm_mod 
+14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
+  blk_zone_wplug_bio_work+0x455/0x630
+  process_one_work+0xe29/0x1420
+  worker_thread+0x5ed/0xff0
+  kthread+0x3cd/0x840
+  ret_from_fork+0x412/0x520
+  ret_from_fork_asm+0x11/0x20
+
+Bart.
