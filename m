@@ -1,123 +1,109 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162CB202C48;
-	Tue, 17 Jun 2025 22:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1068F295DBA
+	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 22:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750199157; cv=none; b=FDzc/lRoFpGp3HPSr/DzpRLJtZJf/NH+3P996z35TbqrUQx+SDqSQ8J/LAAS0pKIgEoA2+VHe/zq/MPg5IJiPghE7QDzzP5IeRs/XDDIIIGCfcXPJi4HjxbXZcD3EhWVJA9Bw19XlZ8XJKyOIDFWQ84hqP2O3m9+gYcMZp5dRxQ=
+	t=1750200768; cv=none; b=Retf/AkPZolGA206zxeB0tz+bZ6zzIy05xvVjybkHGumJoDINA+vUfpCrFasJ67g6QJo0Gp1a1RnhxEp6QPyQ1cfrk9Q6cT2u0nQ7tsvtVtb80dDM20id83nWlSy3Z78x+USRQnHwH5ACpelp1AAU0BKgg7a0er5v5sMRF+qyR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750199157; c=relaxed/simple;
-	bh=IkHODsj3LMl6DlIAGg//NNU39NjtBqCmQQsRmb27n4s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pGF7TvQYXHRCUjecT1xNA4aXh7HMntY2k2vidQ62FT/7OjmEbPsibYYJk2uB5KnRe33aaJ8pqjNQyquDN/SM+bAlTCI6zhAw2lSHkt7gV6R9CcXkYZw285lXqvYjJpshgGa+t9hWocJylZw6Nn/GvkczXnPSnXT6kWJydGzojD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+1Ybjnk; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750200768; c=relaxed/simple;
+	bh=A0ZxN9aZ5KdP0dwFmuWSkqKp5m+dIkABM5Qg/UoFprs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=WrUcUsq6UQnGkRSaCU8prw5ArY9++8gkEsMc8ZzHXZY7JUK75zTdNY275mGQxfy6YQRIDz5CmCTwYTgCxy04KsJKAArGboNZf/0nCHmQyTnK+9mpnpT+l2pTezf1nhasKEA2x9K93rPHK5GiCxZwSReJlO9dJJhqEWWMWZdPxK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=elijahs.space; spf=pass smtp.mailfrom=elijahs.space; dkim=pass (2048-bit key) header.d=elijahs.space header.i=@elijahs.space header.b=KBN2S6J3; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=Em0VfFx5; arc=none smtp.client-ip=34.202.193.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=elijahs.space
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=elijahs.space
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+1Ybjnk"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a43972dcd7so79800801cf.3;
-        Tue, 17 Jun 2025 15:25:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750199155; x=1750803955; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NOHudB3qWFtr4TV/okRv6w4AxszP8orrjoIXfZSBLrg=;
-        b=g+1YbjnkQ5KanzCYrF6em9UwZKyPuE1+sAUa7/1R7LJHDYhEnMUAdR9OlaapdU08uB
-         r93kQcsUEomKT3rOcjvVYr431Q+ItYTKKwKRxl/3yWI7uTQRic41CjRRxqJ6weGDipm8
-         2dx1fPlc2d3JLNr0Oxl1lqNBRaYwT/hVSTHL/AoR743w8D2aUgnMkeHZb89Ls5CcCFjf
-         PlPMV8A/nlr9iBHqs/EJXKs5exQZ4HV9fxOncesiOrfDc18U+bzdRurGsqEZtaWF3PRr
-         p2eX0VY/xJ9abnpC6jsjtMCKJsTM7YR/dMGCKXUvootR1xNjh1Arql4ZcDYuSZl+H27E
-         zU5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750199155; x=1750803955;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NOHudB3qWFtr4TV/okRv6w4AxszP8orrjoIXfZSBLrg=;
-        b=IGgclu/UsNq0Wgy6EMnSn/YhJAlJ9ktJxaEMnIbJCiYGlME/+AX0NrfNg3sTsgkwBV
-         dzrOfZXzQMM5CyEb9LDWzJX0x7bAxHFarSsovU00g3JljxtfBxnCSF7IAD3cVhgtZQiD
-         NDLEJ+bCfsQFVSOvJZB/dCykH90JzwUvI4eJ349n20/rAuNUUvHmY9nSvhUB//8Opz7H
-         +AbQwfNcd19m0NQbRP+Leroi1LQpG5eE/HXb75FefRvNuUSB8c7/jv657VAWchRbTuXY
-         w4/Xx6wJQoW1J52FWOwSrJkn1Pg+uiB3pZN1yqqR7igyo8cIjIqgvPEb0DOajSR9mQXf
-         qjFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOAEhtkVApKd05bDdGSQfgoV0rclyKa/MrWZA8jz47bmS3GisJtsDgp29FLHDn90zvxx53I7YR7pri@vger.kernel.org, AJvYcCXKX0Y/RCn7HsYTol394N1Cu0alPvIjvsDWuHYTUDrH0/BNwmkHROzgUIexF4sBGf5xli6aOfmCvfrWRt40kA==@vger.kernel.org, AJvYcCXar8ty/VBPFrFzX50GIPvcOI72p/QIqG8g1p9PEek6OAtnmSaKTw+kh4GIokuxPhItIxKoSICapxgu@vger.kernel.org, AJvYcCXu/yF8EpvpNJRBMg30lY3bDX/MXM0ts4+R09crx9EaMNIKAG1aDsa3AwR2hDSvE+TTLr27hemgTZlVNA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7C10F7DGsnedm/VrItoUTodWY8PNpNXQq1CfIhzCUWMrEaTc2
-	+9UnBMdMVWY5DrswQYP2NttdE74cjD0IxU62sX7oP4us/DsLf0/NCxJP6OMKakA71IHe00ZGZnJ
-	ONYCNj85AXhoKoT4D8R8//gUmHpvBjY4=
-X-Gm-Gg: ASbGnctgV3vw7+InpjxRFQ8PaYPkQ2Tc89vUxDoMr63J7UwBgf3ZaukPxO4jkqWJgkd
-	CGRzMchwPGjqnTgdVtRlE5iQsIxKUiIU/FtiYB1obKUM/0KTM/EVRa0Em/8yS2HZkJD4J0VZThh
-	7fAi0HV/dIJCzP6kIKZlBfh/fMamvgS3DxBoqKemXzm6+T6OJ9DeE9Y3WX90c=
-X-Google-Smtp-Source: AGHT+IFT2IbS7IY/ZG8utAx1TX8YtZX4KzeTFUBS4g3I5+hjckINK4fFIkyAX5117p/bYpzRPLh6P82Wyv/n/vAtbzc=
-X-Received: by 2002:a05:622a:d1:b0:4a3:4d46:c2a6 with SMTP id
- d75a77b69052e-4a73c51f790mr202374651cf.7.1750199154958; Tue, 17 Jun 2025
- 15:25:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=elijahs.space header.i=@elijahs.space header.b="KBN2S6J3";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="Em0VfFx5"
+DKIM-Signature: a=rsa-sha256; b=KBN2S6J3FfQ02LL+cDATLQtsENXBtZzsjiiVnFofZ3sS/vqCuzXvYoFOAnE1peGIMosoQDZzmENhiU0qU55Q+CuTeDTmsGOTPedN+uZIRNwEbTjsc9cTK5ATW5HSzuWsADxTgsuq5iesC7SxAGh5TXgVPDtM53twC2ASz1tGGm0PQRmC0Mdo3nZEmWF8DvwiKttqD13qgzvGgH0T68JRaL83i3rgtUww8vURca5gquG13NQ0a8scqnhni6zRghkHzawlBDJjslCF2VGNvvR59RkOmHE9dTXt3iWK2cGj4VHLYT75gC4drTla7PsaFaHae1AOgONhc141KkXkKvgRbg==; s=purelymail3; d=elijahs.space; v=1; bh=A0ZxN9aZ5KdP0dwFmuWSkqKp5m+dIkABM5Qg/UoFprs=; h=Received:Date:Subject:To:From;
+DKIM-Signature: a=rsa-sha256; b=Em0VfFx5rItcOwhidEMJKTId6c8XgJMxS/rC92O03l6t7gKrgIqxSLhJYGcobmmi4X5NrUBjJPMi/m6sODoTKFlQq16UkUyJaVb+8YOiHhnPgdWGzRRrw51rcqhn95YTRUizVf6WfNi91YN4TuzFiFaQylcuHHV+IQWsST0FHD6NtKxMGyU546127OCYfMRN8Stb7/A40teZ0gy+fewSp54tj3de7w70GW7t+uEQEnMHYtUyB++QrekD1Sx50cP/OOD1iNsADfVkZtpcxj9zM45fGOn8g5+92j1NBUSeIuNJL8gHvJBHtXd3JuE2EUL/JuylnV9NP1CbB4AVErzJrQ==; s=purelymail3; d=purelymail.com; v=1; bh=A0ZxN9aZ5KdP0dwFmuWSkqKp5m+dIkABM5Qg/UoFprs=; h=Feedback-ID:Received:Date:Subject:To:From;
+Feedback-ID: 147366:4866:null:purelymail
+X-Pm-Original-To: linux-block@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id -738148538;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Tue, 17 Jun 2025 22:52:30 +0000 (UTC)
+Message-ID: <b2644203-b1cd-4bc9-9afe-bd0ae0390ae4@elijahs.space>
+Date: Tue, 17 Jun 2025 15:52:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-11-hch@lst.de>
-In-Reply-To: <20250617105514.3393938-11-hch@lst.de>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Tue, 17 Jun 2025 15:25:43 -0700
-X-Gm-Features: AX0GCFsI21gwIMPwJfdvUohzFbNWXhMjQxHEzcHQpvBVMKKQzS8fPtvEOYy6xzg
-Message-ID: <CAJnrk1YOtCnAD2R5G1sYipG=aTkWBdYfm-F0iioV55sE5A_HYQ@mail.gmail.com>
-Subject: Re: [PATCH 10/11] iomap: replace iomap_folio_ops with iomap_write_ops
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: mq-deadline: check if elevator is attached to
+ queue in dd_finish_request
+To: Bart Van Assche <bvanassche@acm.org>
+References: <20250617205630.207696-1-git@elijahs.space>
+ <1e25d17b-f481-485c-85a6-d5a8440c1c96@acm.org>
+Content-Language: en-US
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Elijah Wright <git@elijahs.space>
+In-Reply-To: <1e25d17b-f481-485c-85a6-d5a8440c1c96@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
 
-On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
->  ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *f=
-rom,
-> -               const struct iomap_ops *ops, void *private);
-> +               const struct iomap_ops *ops,
-> +               const struct iomap_write_ops *write_ops, void *private);
->  int iomap_read_folio(struct folio *folio, const struct iomap_ops *ops);
->  void iomap_readahead(struct readahead_control *, const struct iomap_ops =
-*ops);
->  bool iomap_is_partially_uptodate(struct folio *, size_t from, size_t cou=
-nt);
-> @@ -344,11 +337,14 @@ bool iomap_release_folio(struct folio *folio, gfp_t=
- gfp_flags);
->  void iomap_invalidate_folio(struct folio *folio, size_t offset, size_t l=
-en);
->  bool iomap_dirty_folio(struct address_space *mapping, struct folio *foli=
-o);
->  int iomap_file_unshare(struct inode *inode, loff_t pos, loff_t len,
-> -               const struct iomap_ops *ops);
-> +               const struct iomap_ops *ops,
-> +               const struct iomap_write_ops *write_ops);
->  int iomap_zero_range(struct inode *inode, loff_t pos, loff_t len,
-> -               bool *did_zero, const struct iomap_ops *ops, void *privat=
-e);
-> +               bool *did_zero, const struct iomap_ops *ops,
-> +               const struct iomap_write_ops *write_ops, void *private);
->  int iomap_truncate_page(struct inode *inode, loff_t pos, bool *did_zero,
-> -               const struct iomap_ops *ops, void *private);
-> +               const struct iomap_ops *ops,
-> +               const struct iomap_write_ops *write_ops, void *private);
->  vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_o=
-ps *ops,
->                 void *private);
+I see. would it be possible to detach the elevator from the queue in=20
+elevator_exit instead?
 
-Maybe you'll hate this idea but what about just embedding struct
-iomap_ops inside iomap_write_ops?
+On 6/17/2025 3:25 PM, Bart Van Assche wrote:
+> On 6/17/25 1:56 PM, Elijah Wright wrote:
+>> in dd_finish_request(), per_prio points to a rq->elv.priv[0], which=20
+>> could be
+>> free memory if an in-flight requests completes after its associated=20
+>> scheduler
+>> has been freed
+>>
+>> Signed-off-by: Elijah Wright <git@elijahs.space>
+>> ---
+>> =C2=A0 block/mq-deadline.c | 16 +++++++++-------
+>> =C2=A0 1 file changed, 9 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+>> index 2edf1cac06d5..4d7b21b144d3 100644
+>> --- a/block/mq-deadline.c
+>> +++ b/block/mq-deadline.c
+>> @@ -751,13 +751,15 @@ static void dd_finish_request(struct request *rq)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct dd_per_prio *per_prio =3D rq->elv.=
+priv[0];
+>> -=C2=A0=C2=A0=C2=A0 /*
+>> -=C2=A0=C2=A0=C2=A0=C2=A0 * The block layer core may call dd_finish_requ=
+est() without having
+>> -=C2=A0=C2=A0=C2=A0=C2=A0 * called dd_insert_requests(). Skip requests t=
+hat bypassed I/O
+>> -=C2=A0=C2=A0=C2=A0=C2=A0 * scheduling. See also blk_mq_request_bypass_i=
+nsert().
+>> -=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> -=C2=A0=C2=A0=C2=A0 if (per_prio)
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_inc(&per_prio->stats.=
+completed);
+>> +=C2=A0=C2=A0=C2=A0 if (rq->q->elevator) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The block layer core may c=
+all dd_finish_request() without=20
+>> having
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * called dd_insert_requests(=
+). Skip requests that bypassed I/O
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * scheduling. See also blk_m=
+q_request_bypass_insert().
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (per_prio)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atom=
+ic_inc(&per_prio->stats.completed);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 }
+>=20
+> The warnings in dd_exit_sched() will be triggered if dd_finish_request()
+> is ever called with rq->q->elevator =3D=3D NULL.
+>=20
+> If this can happen, it should be fixed in the block layer core instead
+> of in the mq-deadline scheduler.
+>=20
+> Thanks,
+>=20
+> Bart.
 
-eg
- struct iomap_write_ops {
-        struct iomap_ops iomap_ops;
-        struct folio *(*get_folio)(struct iomap_iter *iter, loff_t pos,
-                        unsigned len);
-       ...
-}
-
-and then only having to pass in iomap_write_ops?
