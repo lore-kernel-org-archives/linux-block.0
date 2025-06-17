@@ -1,151 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B6E2E2EED;
-	Tue, 17 Jun 2025 12:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FA32D130C
+	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 12:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750161613; cv=none; b=Fs/uJGexitASToujes1COkDDwMnIFxKXTlqTMadwGmfb29cEmJv8owNZX9WBdmKu+sNbe8h+3trujKTezUZjlRIDokDYzgNRUjrCCHe8n6cPuqaw2YjnOuxeIW7UVu2tH1bQJH0m3RqVtYBd2aEwYGI+rapOZgXFkSsq1I7XVxE=
+	t=1750162328; cv=none; b=V/35vhwfaRav3IEPtDdyanyTG6l3ku/BsEaOQ+wWcV5sknKm0iryrTNP58oelHGyQwySeY84XtW+TzjT/FXu20wW+dU3lx/uIuEuKnNnRm+EPIe1LhlxViH8IdRuMZjV0GKcw/bHDV+EQZDIlFMKY/tBwEMJBHrnPobvPXjvdfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750161613; c=relaxed/simple;
-	bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TpoxnDu7k7Zh0jsZP89zkOSHC40Q6MNfKBXNp4X8xu/Oka5Ml1WdAuFLBzDzXGrl1pr7xPq7TTxS1KxiplImQK3YFc5/N1j5wty6mzbfdkSHtnv2Xse7GJVbzCv6PJ6NvdJUKHZBepvCPjY3D1DYVDr2WZxIB9R/36VlehvrqW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbm6eSpO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750162328; c=relaxed/simple;
+	bh=jtjGkx7PbcE2vHDnfHVl0N+SZYB2VE9WYKDSXkb4WjQ=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=e0KMuwIXJtRA4rLFDbFrH97+luIhHQPFMFn//B8iQ74vCnk05KUR93VXXzoY8yfQCh/ciwaR2rY+75s+cTzG4XKrxlgkcoYn7YyB3nx/SiyN2diZ+5LiBK6OUmyiNJiUwHoQme7gbr714tFuEIdbr7utjP1uQGpu+Yu24PGjr0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mGmT086r; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbm6eSpO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F729C4CEE3;
-	Tue, 17 Jun 2025 11:59:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750161613;
-	bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cbm6eSpOXnYTKVf24fD5wSecYeYAtaJSPLtzA/cg7YuA4PJRPYSNZqoHGrOB9vedO
-	 xE+Kw4QDbA/4jdsP7oXbPhVrMP5XKHSj57b+LizHRuDadEPqGBM+ZxF2QhTJG4KKld
-	 niMYuWEWwMHm5apCVpkqg1uA/sm57a3OJs6XP47Q03JuvcLdBMJ4BZLJME8mGFpquF
-	 OAV54y1YNZFqwgygvgnolLyQkxdfAP1bT54VMRT4yd/LwvYOK0H78h2s/9FU+jHgJZ
-	 /1P5yb/ScvLTgMkRASvu83CdtUFgXaGEFmmqSgC4JGFIOk41SmtzQEJEUL45wKXKIE
-	 copUCuL9W6X/w==
-From: Christian Brauner <brauner@kernel.org>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Tigran A . Aivazian" <aivazian.tigran@gmail.com>,
-	Kees Cook <kees@kernel.org>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu,
-	Tyler Hicks <code@tyhicks.com>,
-	Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Yangtao Li <frank.li@vivo.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-aio@kvack.org,
-	linux-unionfs@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	ecryptfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-xfs@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 00/10] convert the majority of file systems to mmap_prepare
-Date: Tue, 17 Jun 2025 13:58:21 +0200
-Message-ID: <20250617-neugliederung-erarbeiten-58c2ad93db83@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
-References: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mGmT086r"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-86d0c5981b3so193971939f.3
+        for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 05:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750162325; x=1750767125; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f/qjREJUOIJxRz7QxQVVE+iucFdBwBB5lgjEmSZXzLo=;
+        b=mGmT086rDSv7DqoRsYsm4hr01t+EewawRqPgaSFQ7wJ8WbFVCNAgAXCiF8xgAAX3sc
+         pdQILmDjv45bpSIS+NgKuIoSZ/cNchEEr7GO8ILikEADqb4iXlk5LHssXe0/Eyt5lI7B
+         v3KOFuX+CJ0RC4pT3fOI53UICL/+eJOGvTZ/w3uCe0J5g7MbPF0QOwexLd1jyjNU9CzB
+         JQEcOrdfA0EPcaxWrOJqwdwpiavmBJ7yQeOLLxVi8UKhyrIeT8iVjSi7G4L95Qf9lQgu
+         XAtuvf7HLPdHAE0R/hkoeIEi2Bno+KqGPCG6nFerdz1P3INH3Xef3FZQdY1fDLYepG3A
+         IGPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750162325; x=1750767125;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f/qjREJUOIJxRz7QxQVVE+iucFdBwBB5lgjEmSZXzLo=;
+        b=VxYYMMC7tdVHLR3JLQrUWHvSB7RT8Zrkf7bqvb6/pZ7bVXOcMB2Nh/wnPozgHWvBQJ
+         aFisyshE58UoNM1ULeZmn3IIAB98fpBADrBeO3eekTrTuWwYpDtdWKq9R9wKTNv01rG7
+         mUNVWniTzoV6aOp9k+RRewdc4b3EpLlcZc7yDf7WNK+88s4lJy4Kn+FW7u02XNRPeojl
+         Bhl5krhJs9xjoX++zINYsXp/ab9IwZaFcQqH9IR/1IuTNLBEe6fYuFSVBRJKBmiu4hSW
+         674Lmp0NMmlOR55KNI9dEJ6ABQsOZAgZ0M8peMcI+rlJuU72kW0/wl+YvrhNLVWr8ln1
+         AECQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlaeqH2on900jeLcKranKY7jM1TWYlfrCE0iwkeUrrAdVKBiYJyMCOreFyhxlgKotzkTpS7zmHVNUG5A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLYFktLY32sY85pmY57pqGIGanP8eb+9cn4La/6RpeKjWHBqVB
+	ArjrprNp6WwyCsTJYDdvbpE5pbq2ztcaLNdFVN42aabvwx36uuUDVznkXFJfdvtrNJKIYTuCNEQ
+	u9xhS
+X-Gm-Gg: ASbGncsuspElWfY7woNcuCHySkB0BCigGSu4aapYe1tb4BYNJmYut7U8M7yDPKhtkrn
+	NwcNNhLhBRBVOf+lVS45SXYWU11WCUT0KaB7PT+IbCDBZmTQFKuYZrgn41UE8gjMorjRCi1O4pY
+	3Hw1YD+86vv5eZqC7MED1ctWNAKgwcRRw/mTbUSmL81ygXqTKSyQq8Nv14NreeCDwzZg7xJUb08
+	91Tw/goSNZl+dLddHkuK11lydxCcHSE15Q+v+22FlBQHiSMD4wm1yYCJHmY6AMCOP29nFur5THj
+	pCjNHjTo9jU5S/y+lgodDG5lll2i7uJBKvM1pVcvhBsK0rcHYdH+Lg==
+X-Google-Smtp-Source: AGHT+IG0w7oJnEhc9SyJVK6zFLHv3cqGyVrecWmvAPvfn0VzcgjB1pecE+hhN3zMhmzyPcnm5FRGeQ==
+X-Received: by 2002:a05:6e02:184a:b0:3db:7c22:303c with SMTP id e9e14a558f8ab-3de07cfe991mr128241535ab.8.1750162324822;
+        Tue, 17 Jun 2025 05:12:04 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3de01a502b8sm24901745ab.66.2025.06.17.05.12.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 05:12:04 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: ed.cashin@acm.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Justin Sanders <jsanders.devel@gmail.com>
+In-Reply-To: <20250610170600.869-1-jsanders.devel@gmail.com>
+References: <20250610170600.869-1-jsanders.devel@gmail.com>
+Subject: Re: [PATCH 1/2] aoe: clean device rq_list in aoedev_downdev()
+Message-Id: <175016232389.1144398.4390914425439308132.b4-ty@kernel.dk>
+Date: Tue, 17 Jun 2025 06:12:03 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -153,58 +73,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2454; i=brauner@kernel.org; h=from:subject:message-id; bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQERqz1Wd3by3g/duuF6rmP/N/MPRV+t8Tf5qpaV67t4 jKOJ7rXO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACaysIiRYfKb1+w2vf8O/mdg vPFO8PHqRzML+F0vTZYp4bqm1fwkeyXDP4PuJqblPl9UmcRtf/n65jge6ap97PLc+43T4+kid/k fMgMA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-d7477
 
-On Mon, 16 Jun 2025 20:33:19 +0100, Lorenzo Stoakes wrote:
-> REVIEWER'S NOTES
-> ================
-> 
-> I am basing this on the mm-new branch in Andrew's tree, so let me know if I
-> should rebase anything here. Given the mm bits touched I did think perhaps
-> we should take it through the mm tree, however it may be more sensible to
-> take it through an fs tree - let me know!
+
+On Tue, 10 Jun 2025 17:05:59 +0000, Justin Sanders wrote:
+> An aoe device's rq_list contains accepted block requests that are
+> waiting to be transmitted to the aoe target. This queue was added as
+> part of the conversion to blk_mq. However, the queue was not cleaned out
+> when an aoe device is downed which caused blk_mq_freeze_queue() to sleep
+> indefinitely waiting for those requests to complete, causing a hang. This
+> fix cleans out the queue before calling blk_mq_freeze_queue().
 > 
 > [...]
 
-This looks good. I fixed up the minor review comments.
-Looking forward to further cleanups in this area.
+Applied, thanks!
 
----
+[1/2] aoe: clean device rq_list in aoedev_downdev()
+      commit: a847c4a41630b38136e069aad82dd619c03e95b6
+[2/2] aoe: defer rexmit timer downdev work to workqueue
+      commit: 71437cf6208c63af6ba99cb42074d13d7b56b669
 
-Applied to the vfs-6.17.mmap_prepare branch of the vfs/vfs.git tree.
-Patches in the vfs-6.17.mmap_prepare branch should appear in linux-next soon.
+Best regards,
+-- 
+Jens Axboe
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.17.mmap_prepare
-
-[01/10] mm: rename call_mmap/mmap_prepare to vfs_mmap/mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/20ca475d9860
-[02/10] mm/nommu: use file_has_valid_mmap_hooks() helper
-        https://git.kernel.org/vfs/vfs/c/c6900f227f89
-[03/10] fs: consistently use file_has_valid_mmap_hooks() helper
-        https://git.kernel.org/vfs/vfs/c/b013ed403197
-[04/10] fs/dax: make it possible to check dev dax support without a VMA
-        https://git.kernel.org/vfs/vfs/c/0335f6afd348
-[05/10] fs/ext4: transition from deprecated .mmap hook to .mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/8c90ae8fe5e3
-[06/10] fs/xfs: transition from deprecated .mmap hook to .mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/6528d29b46d8
-[07/10] mm/filemap: introduce generic_file_*_mmap_prepare() helpers
-        https://git.kernel.org/vfs/vfs/c/5b44297bcfa4
-[08/10] fs: convert simple use of generic_file_*_mmap() to .mmap_prepare()
-        https://git.kernel.org/vfs/vfs/c/951ea2f4844c
-[09/10] fs: convert most other generic_file_*mmap() users to .mmap_prepare()
-        https://git.kernel.org/vfs/vfs/c/a5ee9a82981d
-[10/10] fs: replace mmap hook with .mmap_prepare for simple mappings
-        https://git.kernel.org/vfs/vfs/c/a1e5b36c4034
