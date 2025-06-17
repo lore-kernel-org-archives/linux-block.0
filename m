@@ -1,149 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB582DBF44
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 13:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6960F2F365E
+	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 14:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750168700; cv=none; b=ECCt6AA7Vtlq7FEjHYyc2lTaEsi1GurILA7Uos/wQGAG1br/VrhXaYvmvIFhB8ZVWEh3P0U/dWrCuPDDhIF9pGh/c6YvIDTRmEJ0m+ejhDwORcysgcsgOK731vRml/dV07/1DbnXBUbAKi3gkSQ1zNf566tbcizYSiCzOph0iL4=
+	t=1750169234; cv=none; b=mTnGA3zNwL+ci6e2oquaPPcK0GshFftuVEkX28rPB6hd3yKv97XYczQiCEnBk44NAsitVRgnjuVHZ51IfaNgONDeSNzh0mkP0YVC7CqSLz73+FdtuP03it8FS4NPKo0xQAovpZOvwDemOfSlQMT5ke1LtpxYSkadlprkdEYwgbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750168700; c=relaxed/simple;
-	bh=8KOI5xyxym04Su+Y1cshyyjm3OqlNZRmsZPFqtfguek=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZmQAJmzW3CIVHi3aGJJ0YBpyrHicbTN+hF3gKfT4L2fnpbCnDEjiaw2fgIKz1Ewj+rlmugF39jXUbD44JhBOIA4P7qvctRKbV0VmC2bvHM0CjUjRbZRIJ80NJ/xuDGYGcLHtoMnIksCLMJ0hv53t90CtG618upBP2qdOUD0iw8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0DY1wyS; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1750169234; c=relaxed/simple;
+	bh=lh4Wu179zCLjOtNueJK/Sz96qfLF/PqNel8O0RNTt9E=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=s7yEvtLBowJShr+uz/52zC83To6JPsHd9ZLxnIGkGJlXIxwAHcXS1tL4FMEDJeVpCGJuv4jAVFoH5rr3NwY5WYD08GkHfwXaVlEYQiH9rlvfJG4/85EO4ZbdHi/Wotu6cguV4P+qqlD4wzkfgdAHtyiEHsjG42HZz8/cwte///g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZOmMVIfg; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0DY1wyS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZOmMVIfg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750168698;
+	s=mimecast20190719; t=1750169231;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bENOsIRAxg+jMcMN0GOm+0hWN/lXpSKL+NP33siNQU8=;
-	b=e0DY1wyS0k39iv4vALFfoW5EJ9+XnqPZRNumPKZXI8CY8LspVB7gWOkZdkVqcjDQu6POHY
-	AWJ3gFu2yY3SwAEfwku4qHh1x9hnBrcuvWC1JEJ+RAZCo2UlpYxxujnuLDPn09SwjYcUfw
-	XmAhTTiH0fyY2NjqSndabTdz80eGZd8=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-XFpWAuuRMLuOoVUz2C3pqw-1; Tue, 17 Jun 2025 09:58:16 -0400
-X-MC-Unique: XFpWAuuRMLuOoVUz2C3pqw-1
-X-Mimecast-MFC-AGG-ID: XFpWAuuRMLuOoVUz2C3pqw_1750168696
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-7111c6e53a6so81153657b3.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 06:58:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750168696; x=1750773496;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bENOsIRAxg+jMcMN0GOm+0hWN/lXpSKL+NP33siNQU8=;
-        b=SuFMRI2l20BzOEtFaJZbRkBpFX/VTXm2ZlToygyjrKmnumzh1g36hGSp5J4j5JouzN
-         DNcjR4XEqsp+qY/FCH83aklPw7J8jbcdTNLzf1dozKHKxdbaGdqjtPBDblIiaVWGNICh
-         /dAzscmhiLHqp5l1DLHyR5X4SnZn/Jo52LB3BFNXi7KGNcmjyw8H32YQ5YcV5aeSE3Zm
-         AYNzO0beT92mshaK1nfuSqhFcSxiZe56eJTZL4uQyiNgTDELtVcwQ9iHhRTxF+TiZR9K
-         4tfiO4AXfiTichmWU5GdCp+VcaQojUnzlkOPsAq4VV/U8r14FYVcKt3H+C6ZYnPgYYfg
-         uo6Q==
-X-Gm-Message-State: AOJu0Yz3dpJxWV6hIdJdXNpIWTxmtSKw1mOAo/K/yzIkwOKEIA9pPrUt
-	rTC+wH5q5c20a0efQyff3sMDAemDdChRvzM8Q3yNy0HhIZtN5b2xHiiwtXtUYrBfc0NAnvvsmXU
-	qylTcF3qA2S9c5DVh0lhGRQWieLYSCWWEHg4VOlh2kVGuTRiJ7MGggEOEcgXBrbHf
-X-Gm-Gg: ASbGnctRqKGFcukW0Jk1iLyvyC1xnAv+CRTjRZKf9rTXuNhSexk+tbFVHzhu72nCo55
-	zZqertL6AkX+1mXdW9E5PXn1cRn/n7vuQPlMMqyBk8WA9usTPaDcXsw0PQhU5Uk2yv4Iw86uWxN
-	5QKTJMOaYpaHRiDbx5IR4rFnw8SZTdyOHitU6eurkU1u4lwmM2p89Al2lBA7At1IUfKwaLg/wyD
-	O55pQXwf3t3Fywwd4JTt5B0ZUM33Pmh7aSEC/6SuKo3JmBoU9T3nBCoFctfaBSFzkbMdIS9SLIw
-	XMVN6Zc5rlsHxDmlhj0+EzyX3RM8B8HMgOrEFc52Sfvz0tTYTR01xF2Gytssq6pO+ILvB4OM
-X-Received: by 2002:a05:690c:688f:b0:70f:83af:7db1 with SMTP id 00721157ae682-711754dfc11mr196238377b3.19.1750168696135;
-        Tue, 17 Jun 2025 06:58:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8BpLzZz4BKXDeh8JDK9hwMCQUTeKIwgrAeTc5hbfFEez9niTNWRIj2BpaXVbdmcugQvSmfQ==
-X-Received: by 2002:a05:690c:688f:b0:70f:83af:7db1 with SMTP id 00721157ae682-711754dfc11mr196238067b3.19.1750168695804;
-        Tue, 17 Jun 2025 06:58:15 -0700 (PDT)
-Received: from ?IPv6:2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a? ([2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7119e3758e6sm5223547b3.101.2025.06.17.06.58.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 06:58:15 -0700 (PDT)
-Message-ID: <aa8e177c053a91452f6dde4b31b876453d481077.camel@redhat.com>
-Subject: Re: [PATCH] scsi: storvsc: set max_segment_size as UINT_MAX
- explicitly
-From: Laurence Oberman <loberman@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>, "Martin K . Petersen"
-	 <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org
-Cc: linux-block@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Christoph Hellwig <hch@lst.de>, "Ewan D. Milne" <emilne@redhat.com>
-Date: Tue, 17 Jun 2025 09:58:13 -0400
-In-Reply-To: <20250616160509.52491-1-ming.lei@redhat.com>
-References: <20250616160509.52491-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	bh=lh4Wu179zCLjOtNueJK/Sz96qfLF/PqNel8O0RNTt9E=;
+	b=ZOmMVIfgcrsN03Cu2JGA3GlAQNog/8HjYRn7lW5Ln707JE37HwObxvlcgIWIHcRfGPBJmB
+	3HXJKs+O6bWfAKEMXkAxn1wGl5ryC/o4ksu629asReCj5qSIurzFFsNM0kFdTmzojgIWap
+	K1IDRqtBlXg4u+K6Zh6QanTQlFRwz/8=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-526-TESfps40ObWOGtY2RnRx3A-1; Tue,
+ 17 Jun 2025 10:07:07 -0400
+X-MC-Unique: TESfps40ObWOGtY2RnRx3A-1
+X-Mimecast-MFC-AGG-ID: TESfps40ObWOGtY2RnRx3A_1750169217
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9793B1809C9B;
+	Tue, 17 Jun 2025 14:06:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C81A19560B0;
+	Tue, 17 Jun 2025 14:06:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
+References: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+    "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+    Jens Axboe <axboe@kernel.dk>,
+    Jani Nikula <jani.nikula@linux.intel.com>,
+    Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+    Rodrigo Vivi <rodrigo.vivi@intel.com>,
+    Tvrtko Ursulin <tursulin@ursulin.net>,
+    David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Latchesar Ionkov <lucho@ionkov.net>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>,
+    David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+    Benjamin LaHaise <bcrl@kvack.org>,
+    Miklos Szeredi <miklos@szeredi.hu>,
+    Amir Goldstein <amir73il@gmail.com>,
+    Kent Overstreet <kent.overstreet@linux.dev>,
+    "Tigran A
+ . Aivazian" <aivazian.tigran@gmail.com>,
+    Kees Cook <kees@kernel.org>, Chris Mason <clm@fb.com>,
+    Josef Bacik <josef@toxicpanda.com>, Xiubo Li <xiubli@redhat.com>,
+    Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
+    coda@cs.cmu.edu, Tyler Hicks <code@tyhicks.com>,
+    Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+    Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+    Sandeep Dhavale <dhavale@google.com>,
+    Hongbo Li <lihongbo22@huawei.com>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Sungjong Seo <sj1557.seo@samsung.com>,
+    Yuezhang Mo <yuezhang.mo@sony.com>, Theodore Ts'o <tytso@mit.edu>,
+    Andreas Dilger <adilger.kernel@dilger.ca>,
+    Jaegeuk Kim <jaegeuk@kernel.org>,
+    OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+    Viacheslav Dubeyko <slava@dubeyko.com>,
+    John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+    Yangtao Li <frank.li@vivo.com>, Richard Weinberger <richard@nod.at>,
+    Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+    Johannes Berg <johannes@sipsolutions.net>,
+    Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+    David Woodhouse <dwmw2@infradead.org>,
+    Dave Kleikamp <shaggy@kernel.org>,
+    Trond Myklebust <trondmy@kernel.org>,
+    Anna Schumaker <anna@kernel.org>,
+    Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+    Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+    Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+    Joseph Qi <joseph.qi@linux.alibaba.com>,
+    Bob Copeland <me@bobcopeland.com>,
+    Mike Marshall <hubcap@omnibond.com>,
+    Martin Brandenburg <martin@omnibond.com>,
+    Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+    Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Bharath SM <bharathsm@microsoft.com>,
+    Zhihao Cheng <chengzhihao1@huawei.com>,
+    Hans de Goede <hdegoede@redhat.com>,
+    Carlos Maiolino <cem@kernel.org>,
+    Damien Le Moal <dlemoal@kernel.org>,
+    Naohiro Aota <naohiro.aota@wdc.com>,
+    Johannes Thumshirn <jth@kernel.org>,
+    Dan Williams <dan.j.williams@intel.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Vlastimil Babka <vbabka@suse.cz>, Jann Horn <jannh@google.com>,
+    Pedro Falcato <pfalcato@suse.de>, linux-block@vger.kernel.org,
+    linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+    dri-devel@lists.freedesktop.org, v9fs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+    linux-aio@kvack.org, linux-unionfs@vger.kernel.org,
+    linux-bcachefs@vger.kernel.org, linux-mm@kvack.org,
+    linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+    linux-f2fs-devel@lists.sourceforge.net, linux-um@lists.infradead.org,
+    linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+    linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+    ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+    linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+    linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+    linux-xfs@vger.kernel.org, nvdimm@lists.linux.dev
+Subject: Re: [PATCH 00/10] convert the majority of file systems to mmap_prepare
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <644215.1750169159.1@warthog.procyon.org.uk>
+Date: Tue, 17 Jun 2025 15:05:59 +0100
+Message-ID: <644216.1750169159@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, 2025-06-17 at 00:05 +0800, Ming Lei wrote:
-> Set max_segment_size as UINT_MAX explicitly:
->=20
-> - storvrc uses virt_boundary to define `segment`
->=20
-> - strovrc does not define max_segment_size
->=20
-> So define max_segment_size as UINT_MAX, otherwise __blk_rq_map_sg()
-> takes
-> default 64K max segment size and splits one virtual segment into two
-> parts,
-> then breaks virt_boundary limit.
->=20
-> Before commit ec84ca4025c0 ("scsi: block: Remove now unused queue
-> limits helpers"),
-> max segment size is set as UINT_MAX in case that virt_boundary is
-> defined.
->=20
-> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Wei Liu <wei.liu@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ewan D. Milne <emilne@redhat.com>
-> Cc: Laurence Oberman <loberman@redhat.com>
-> Fixes: ec84ca4025c0 ("scsi: block: Remove now unused queue limits
-> helpers")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> =C2=A0drivers/scsi/storvsc_drv.c | 1 +
-> =C2=A01 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/scsi/storvsc_drv.c b/drivers/scsi/storvsc_drv.c
-> index 2e6b2412d2c9..1e7ad85f4ba3 100644
-> --- a/drivers/scsi/storvsc_drv.c
-> +++ b/drivers/scsi/storvsc_drv.c
-> @@ -1897,6 +1897,7 @@ static struct scsi_host_template scsi_driver =3D
-> {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.no_write_same =3D=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.track_queue_depth =3D=C2=
-=A0=C2=A0=C2=A0=C2=A01,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.change_queue_depth =3D=
-=C2=A0=C2=A0=C2=A0storvsc_change_queue_depth,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.max_segment_size=C2=A0=C2=A0 =
-=3D 0xffffffff,
-> =C2=A0};
-> =C2=A0
-> =C2=A0enum {
+Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
 
-Hello=20
-For what it is worth, I tested Ming's patch in our lab and at our
-customers and it fixed a very serious corruption in Oracle REDO logs.
+> This is preferred to the existing f_op->mmap() hook as it does require a
+> VMA to be established yet,
 
-Tested-by: Laurence Oberman  <loberman@redhat.com>
+Did you mean ".. doesn't require a VMA to be established yet, ..."
 
-I will test what Christoph share dbut our initial way to deal with this
-in RHEL will be the point fix in storvsc as its a critical issue
-needing an urgent fix.
-
-Thanks
-Laurence
+David
 
