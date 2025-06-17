@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21102356CE
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 17:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57802EE289
+	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 17:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750181630; cv=none; b=Ospy07aQDjp9KKzEqaLZesKkDiKx36D217hLLfCmz6hNEaBMMJrUqzSwShA22OhoNvg3w1fpFqeKbb0bMGNUfD4tRmAyFTldq0qavVbT54Tzkk0zNYByU397KMSHQD3+GRverYo6DNWekwg4RsAePmnA4DrcngNxTMpfwWf0SZU=
+	t=1750182210; cv=none; b=Zy6jy1uaFVuoxSCxHpiH9RNMHN4gffjyFkmjSA4NqAPJ/mn0Gq+6ERgwZ+S2vEJhcqOs38MCoIbMjujehOrpmFIqF8M9eysTUtNFEVL3q3Ok8eLbDwJ+a35jt0OYdJf7SID2KcWeo4y/v9tc97nctIQVAN++Cizihxkid201hoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750181630; c=relaxed/simple;
-	bh=Zp21o8ResSkQXCqervR5Dp0pKb5AqFj/c5jJefTfVOk=;
+	s=arc-20240116; t=1750182210; c=relaxed/simple;
+	bh=tL4Obeun7WLXku3bH1nDHcp84HwzWMUN+lnTlkMMSaM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dq/YPb7HnRi3C6ue4TY0fTltB9qbXnHYY12BufN3yYzOzJdvOvRZUnvhEnlGXyXXyxmo+JJtf6vnTMrp8kfnPwofI8TbyobnOfun/d3mLG9SIeM0kt1NPA4Gp/wIzQbhZfU1u1phNoyQosYGmDsNyjwOHFH7ZXfPQbbhk3BIiMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IVR+pYe+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=E0WOX73ULW1EDcWHaRWn16lIi5Gvz2P/1GckRI+vd1NnmStSxLwso0HnqTOhR16eJi/3C/sApveE02KU7prLRmE0wwwF+uO1r7iZuhmbTmB7Le1HB49aIO86Z1hu+UC2nHnnINBiIr2ksKWcNWBRk2ifArboD9JQp2FtVT5eUhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3KJB7CY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IVR+pYe+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E0F0C4CEE3;
-	Tue, 17 Jun 2025 17:33:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3KJB7CY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 495F1C4CEE3;
+	Tue, 17 Jun 2025 17:43:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750181630;
-	bh=Zp21o8ResSkQXCqervR5Dp0pKb5AqFj/c5jJefTfVOk=;
+	s=k20201202; t=1750182210;
+	bh=tL4Obeun7WLXku3bH1nDHcp84HwzWMUN+lnTlkMMSaM=;
 	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IVR+pYe+nAtQrorraWGMsmGCwN3EmEtpyU5blxkJwzQ9qmnLnlGJOPEe7lthmh6eY
-	 bHN1omymjyDtrxoaOvvRjtl29KhL48hkB9KmKEFRptZHZkV/YbzJpZaH87+aelD7Pm
-	 pdoywMvk4TCZY1cxE5Z2zic71JOKu2XZVUIFIDfirggYH2F73gwvKOWta9Efq8xg3d
-	 g+yiaiYIYE1TFxp10i2uJ7kEkLeOveY3yfd5Slny2//LUyHB/jYaGj8dUKkvanOUak
-	 s89bKrGDEPCiBwtAgdHRIcBP37DiXp+UidTvi5+PzUaM5CA8oSxVQw4k3md8uW/5Z8
-	 0b7vQ5t9iaVNQ==
-Message-ID: <500dedd7-4e66-49d2-8c63-91d6a07f2e43@kernel.org>
-Date: Tue, 17 Jun 2025 19:33:46 +0200
+	b=G3KJB7CYWESu9oKkyxh952HvUEkc2yvJy7mVv7U1sQ53lysK+HIcOn200qbVO4eiO
+	 SmqEMiuxrTy0gVYVtIXAkPx6iBgsSKLIH1GOtYak2EXgGOMiS3mKiFjcWwmX3nHzQh
+	 hS2Agh/lVKp1SjC5lnYKL1RpLYFaZgzJDolq7XArOOZMOByIul5BqEmtEPN/45emWr
+	 /3bmhJcLjahZqv0n7CFMn9smTftFNlTzxono7jas7ElmGaW0M9UYxX4VZD7QWwEZPd
+	 irs/7gCLn5w00nzfo/CJVVgMYT/DJFy5J5JkPciY08RjWauefhr1dRDXkt2kYdaVbo
+	 hp6lfnJhGakQg==
+Message-ID: <edf056c9-ab8d-4b55-9e61-25a29916d55c@kernel.org>
+Date: Tue, 17 Jun 2025 19:43:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,23 +48,24 @@ References: <20250610050713.2046316-1-hch@lst.de>
  <20250610050713.2046316-8-hch@lst.de>
  <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
  <20250612050256.GH12863@lst.de>
- <4af8a37c-68ca-4098-8572-27e4b8b35649@kernel.org>
- <20250616113355.GA21945@lst.de>
 Content-Language: en-US
 From: Daniel Gomez <da.gomez@kernel.org>
 Organization: kernel.org
-In-Reply-To: <20250616113355.GA21945@lst.de>
+In-Reply-To: <20250612050256.GH12863@lst.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 16/06/2025 13.33, Christoph Hellwig wrote:
-> On Mon, Jun 16, 2025 at 09:41:15AM +0200, Daniel Gomez wrote:
->> Also, if host segments are between 4k and 16k, PRPs would be able to support it
->> but this limit prevents that use case. I guess the question is if you see any
->> blocker to enable this path?
+On 12/06/2025 07.02, Christoph Hellwig wrote:
+> On Wed, Jun 11, 2025 at 02:15:10PM +0200, Daniel Gomez wrote:
+>>>  #define NVME_MAX_SEGS \
+>>> -	min(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc), \
+>>> -	    (PAGE_SIZE / sizeof(struct scatterlist)))
+>>> +	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
+>>
+>> The 8 MiB max transfer size is only reachable if host segments are at least 32k.
+>> But I think this limitation is only on the SGL side, right?
 > 
-> Well, if you think it's worth it give it a spin on a wide variety of
-> hardware.
+> Yes, PRPs don't really have the concept of segments to start with.
 
-I'm not sure if I understand this. Can you clarify why hardware evaluation would
-be required? What exactly?
+SGLs don't have the same MPS limitation we have in PRPs. So I think the correct
+calculation for NVME_MAX_SEGS is PAGE_SIZE / sizeof(struct nvme_sgl_desc).
