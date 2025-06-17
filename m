@@ -1,90 +1,108 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFE71514F6;
-	Tue, 17 Jun 2025 22:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F162F5312;
+	Tue, 17 Jun 2025 22:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750197624; cv=none; b=C5KeDCdAE5RfHbN5cLrZy0sSx19qP7fMAP89Y5X+3UttRgYdFFxk0/ArvvYmXgiWT5y3T28QYYnDouVNXcuqJ++4ew6CM4N3Z3XewPyCja96TknzaFevNPIUVUvpBohU8PRfdnZRCr8Ya7uJ5Kf7bDm3G1UO4aDQrclE7mDUZFU=
+	t=1750199146; cv=none; b=UMn/T3IBnnFFiu8XdN6Tza4//yHh5sxQUnxhPTdRiMttGywMRapeRmKkyIBnvt+9k9lzJlNpSmGdpFaahJPgSjt/5uxtJL8BLBv7A4xJkPwtzshNkjgjcHQzGBMpwzCWcCnMQWjnL32cmQhD0UBd5b7l9AIvTgiKIZRJ7aRY4HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750197624; c=relaxed/simple;
-	bh=zgs35h9EtiQj2gsIkYN3K/XBSu+19KdaRfCI+ceSC2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ChHVk03qlcYocNOYfwIO7tDzbjHnFxc4dVAZp+zKM3fU9OF6nLrmzHku0naeY1KO3k14lmK2FFhjFn1k2GjcEUnKjhLM4lxsMC2zoMh+U12mJ0nkuctjQ2ObQlpgX4M5xjH0OQTVagG/CL1GMBNM9b/IY+OnqROBIfKu440oYAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3h7SjuU; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750199146; c=relaxed/simple;
+	bh=ldx27R1+iMR7oFThnP3SG77yVAaWUBoN1GCRNm+wX6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Uus2yqyKNmkCPDJ/qIpI502eQnsyy+aD7Kv0zaIp0pOqVe4tGPyQaHUajlk/6E1DYP2F7iUR/PyCAfoGgz7cWCFuR+LEdea7GoznfZhWEfja1qGkbN2/eyPxs2wKM1LrGW2kWUybfWUzJZOCqxZmS4JiahhhUl3L+awiagMydHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=XdNktgi3; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3h7SjuU"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a6f3f88613so62408441cf.1;
-        Tue, 17 Jun 2025 15:00:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750197621; x=1750802421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=txIUBFwdzlJtz0AE1b03VDLXigNRDHeYfG75FQwge3Y=;
-        b=L3h7SjuUgWAaDW8vzkxusq8aYrIRojyFyXzyfTW8nq8RkIxqFVjNrXw/2SimpMnXqn
-         ZGgEfunmIiZEysIq7vTpNY8UYgirZ4/OPa3tT5xO5bfETkC/RFIVlxSm+FwQokqyqS6q
-         1o0+dDGTywivCmXkvT/xlhU/XlZPTganVqSvElbwvCJpx3Ocxzc6Yp/2Ngx+lnxM2Ebs
-         CSUQQEFgug0lAeydn1NtDyWh3bHoyrxk/7zmYCHj24Sxk6+zxbPmkVTNq88ZIVjIlKYd
-         jTFrlG7NsR3697jPCOCy3re6b8r2MiiBiPHTP0nwqhGGyWrlkppAdtuyS75ZZ38oD+zy
-         jutw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750197621; x=1750802421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=txIUBFwdzlJtz0AE1b03VDLXigNRDHeYfG75FQwge3Y=;
-        b=ALhLYb0GuvbXNjggBDOVhOKWqVoDPZkuQ32cMcNVzn0urjDZg/kWfz6rNYuRjv37sp
-         WqiibIBceR2jtL+CV7FmbXVgQjxRs7dN/RVrNxxSbSSpu8wQvJR3ykfJnNkfbalkaXBd
-         tg7nkky2dsDUL9oaqwdwMyqDFLPyDiuGba2oNqclWbjJTgsgQgLH7/Yt99N5xNgU5Zxc
-         fVKv098OKmxmAkLv2fzrhPg3XnSsG/iM0n7YR8D0HfoNAZ0NfVLgC+4DzSJv+96yfXRa
-         en9bTKs8r8yH0TtB44n0wSUMv3rwNt6EvDOaxXhOEUFqJhZLvLDIWcsoLg9iOp2BtHxl
-         DZtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWk4LZY8fids6T1H7SvMdJeahd03IH9NJQ3DBQZJoAPX/TqzKlm5eUdIPEP1KBWq9pp3v/pAX6nhOAu@vger.kernel.org, AJvYcCWnVyDLKIM8ePlisIDl2p9wCHlKgYAp3b8K6tqbh4M1msRFVmd/893EYf7DzUeLdloPUevRnOVLFl3VK3Y4LQ==@vger.kernel.org, AJvYcCWp61cnXNJMTv0JFwv7EUm8A3HCUUhRqTytZSxxmYvrIAcT2k1b0jmBglDK5MsWA8txuoAmfmFiUN7tbg==@vger.kernel.org, AJvYcCXms3dbTkYX++WSKxGU0ere0GYbSR06SUaamWp6Rlxonjhfxq22vb5Fzg82ss9oXPQn/uXlQyt+uSYp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1Cned1rJgWMqtsG+kvEFDD2HLLtLuil1KTjo9RehA0wTJ6JDH
-	fM9LlT+0xyGUnWVuVyxgETpNMXNMOhmNesdZnWEatLc+zIwOf5n1+19rM1WzapSZQaZJqhAIWfy
-	AL3hptCEUCVMfYiQfB7uqxQ6enfqKy5E=
-X-Gm-Gg: ASbGncsNCg9bVYU7Fz18j2HNm3XXdm2WGFHOs611VEEkQjwqwW/XjSq1Xl33lYcpet4
-	sOmA6KvX+zySyXGCn5sm8GOQHVF9Y/XYEbBWsLisLYpd68ye1xSp7/4Hm1rI4mD3xQC4YGhz3js
-	U0HHi0Cu9QTJRWoKBzIwgFUG0qAJmh9Blm0R3ZSoP/CwsTl7G3uw5v7sIkP4g=
-X-Google-Smtp-Source: AGHT+IH0hdfYxpLNGLi3uEo213Cw3XqtMJ0PMjt6sD7nPMBUnc5OJF7u+w4++qwD5412WYS8skQhFb31RzNJBQ9+/x4=
-X-Received: by 2002:ac8:5949:0:b0:4a5:a4e9:132b with SMTP id
- d75a77b69052e-4a73c658c18mr221573461cf.48.1750197620736; Tue, 17 Jun 2025
- 15:00:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="XdNktgi3"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bMLzm6dGrzlvX7p;
+	Tue, 17 Jun 2025 22:25:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1750199139; x=1752791140; bh=Xc+WhlkMlI+pcVbRXrb20qA1
+	G39pU4szZWRw6M3elb4=; b=XdNktgi3VEUbIIAXW3fj45mu74LrFsjTJ5SWp03N
+	vprNEtC086dLQnR763wK3yV4qPHtocrLLn5mYDeqz+wnhPbx3r9+YGPkRpiIy9nO
+	584rSrWm8KXjaia26nb4PeOp054vYqQjenqWMlr80ootiPrBqeY09JlDmPK+82p6
+	FfL65nSh93sfmoc0VV4jzMTUK7h8HSyzINbEWhD9eNjlwCT48QnT1wOuS3znaael
+	RV+oOm40I5oSHRPEWn6QGtw9T8uky7olicxuGk6DDaCH4q+B67ZZURRwhsXtzVOr
+	VtoikIorEkOxyoM1uKSW9Jq17icFG1jvwNsnZy7tjUBGYw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id l1_sIaQCi6vK; Tue, 17 Jun 2025 22:25:39 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bMLzh6P13zlgn8k;
+	Tue, 17 Jun 2025 22:25:35 +0000 (UTC)
+Message-ID: <1e25d17b-f481-485c-85a6-d5a8440c1c96@acm.org>
+Date: Tue, 17 Jun 2025 15:25:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-10-hch@lst.de>
-In-Reply-To: <20250617105514.3393938-10-hch@lst.de>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Tue, 17 Jun 2025 15:00:09 -0700
-X-Gm-Features: AX0GCFvVfukB4jEEL0QyWt5wn8Z0d6yaU1T1xsjz2NFs3U_hou4mX4F2ZU4QqYc
-Message-ID: <CAJnrk1bkZGBnRcY5kXoxrqt0OoGZTu_ouWa=h6mF2Q97StT4Qw@mail.gmail.com>
-Subject: Re: [PATCH 09/11] iomap: export iomap_writeback_folio
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: mq-deadline: check if elevator is attached to
+ queue in dd_finish_request
+To: Elijah Wright <git@elijahs.space>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250617205630.207696-1-git@elijahs.space>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250617205630.207696-1-git@elijahs.space>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> Allow fuse to use iomap_writeback_folio for folio laundering.  Note
-> that the caller needs to manually submit the pending writeback context.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Reviewed-by: Joanne Koong <joannelkoong@gmail.com>
-
+On 6/17/25 1:56 PM, Elijah Wright wrote:
+> in dd_finish_request(), per_prio points to a rq->elv.priv[0], which could be
+> free memory if an in-flight requests completes after its associated scheduler
+> has been freed
+> 
+> Signed-off-by: Elijah Wright <git@elijahs.space>
 > ---
->  fs/iomap/buffered-io.c | 4 ++--
->  include/linux/iomap.h  | 1 +
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
+>   block/mq-deadline.c | 16 +++++++++-------
+>   1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 2edf1cac06d5..4d7b21b144d3 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -751,13 +751,15 @@ static void dd_finish_request(struct request *rq)
+>   {
+>   	struct dd_per_prio *per_prio = rq->elv.priv[0];
+>   
+> -	/*
+> -	 * The block layer core may call dd_finish_request() without having
+> -	 * called dd_insert_requests(). Skip requests that bypassed I/O
+> -	 * scheduling. See also blk_mq_request_bypass_insert().
+> -	 */
+> -	if (per_prio)
+> -		atomic_inc(&per_prio->stats.completed);
+> +	if (rq->q->elevator) {
+> +		/*
+> +		* The block layer core may call dd_finish_request() without having
+> +		* called dd_insert_requests(). Skip requests that bypassed I/O
+> +		* scheduling. See also blk_mq_request_bypass_insert().
+> +		*/
+> +		if (per_prio)
+> +			atomic_inc(&per_prio->stats.completed);
+> +	}
+>   }
+
+The warnings in dd_exit_sched() will be triggered if dd_finish_request()
+is ever called with rq->q->elevator == NULL.
+
+If this can happen, it should be fixed in the block layer core instead
+of in the mq-deadline scheduler.
+
+Thanks,
+
+Bart.
