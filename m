@@ -1,70 +1,108 @@
-Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE41E2E4270;
-	Tue, 17 Jun 2025 12:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.60.8.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCAF2C08B8;
+	Tue, 17 Jun 2025 13:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750163216; cv=none; b=e86OVYa3pSVhXKaEYqNegCyx+EZc7YrjqSQvNmKUr+wcZOOz//sGvtMOxUxeVe07Ocr3Big2TVtonYG/OGmtLaA88yzOIHckXeX6f5akecZr5k20o4i/1rBjbfI508ShRIB92nb43FSIHAk6A3ZezDxzBPVGBwCg4rQrJBb3Ifo=
+	t=1750167810; cv=none; b=ZKHcMvTO7ZNyyakWgbjpERQY2GJGNpaTYuRAWsBQLOTslfNw/NnVkdPRfB3Ua+Bi/HH25UZ3eP6MeHPX8eBY/EgFxjzys6ntZlBGzcuEfx2X+OZDmLCe+0KDBnp/6YxqzPz/yS7r0o1m4HVfkMttM+ejTV5yKDrKyVOUqFCEfpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750163216; c=relaxed/simple;
-	bh=+KcDYPHd+lFgy+PyxN98VCtQE/RUTNx3gwg72OyuATQ=;
-	h=Message-ID:Date:MIME-Version:Cc:To:References:From:In-Reply-To:
-	 Content-Type:Subject; b=oD6rc+uLUOMWGFIF8z5Ei4HSBCH2yvvsh2lxWpzOfs0AZXMf/2GA+l0Z/gBYzdmIwckuDbSoB9o9RB6hscUaywE2EoTCI/ceX/OeAJbfsUs9Nv5qnO5nS0vKwdmJInKNUaZ5Iax7qrgfhf3dhS5r3pcxX97Bk2XztqM22vWnnuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vrvis.at; spf=pass smtp.mailfrom=vrvis.at; arc=none smtp.client-ip=92.60.8.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vrvis.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vrvis.at
-Received: from whiskey.org.vrvis.lan ([10.42.2.171])
-	by iris.vrvis.at with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(ESMPT Server)
-	(envelope-from <valentin@vrvis.at>)
-	id 1uRUuN-0002zm-2B;
-	Tue, 17 Jun 2025 13:55:24 +0200
-Message-ID: <46323554-0ccf-4fce-855f-84e06f8fc7b3@vrvis.at>
-Date: Tue, 17 Jun 2025 13:55:19 +0200
+	s=arc-20240116; t=1750167810; c=relaxed/simple;
+	bh=Tq5rUOpjXriBkipN8jcjoOeGSv4ICYoTA0fxuVN9H94=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VSTv3D0YOrjjGVNYqblO3AMZxhvT25Q/pLiaZDpP6TpS/gYR2ODLeyvMamxDBhqlezpdHuYoYZ8tJzPBNhy45naX+LXCctdvoRCLHnGUc5Qqu5N0yW2POEpNcxcEkNjcYeQ4bqqw45DzwLPh4Ame0ntSG1SpBBi78h78Ld4+WvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H2VMXZuy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H2VMXZuy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A4E8C4CEE3;
+	Tue, 17 Jun 2025 13:43:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750167809;
+	bh=Tq5rUOpjXriBkipN8jcjoOeGSv4ICYoTA0fxuVN9H94=;
+	h=From:Subject:Date:To:Cc:From;
+	b=H2VMXZuyU6kbuxsnxDZ0TmEkSbKr3URfhjt3ZDdyNXdL6ivkgmgNDPNrOX9KpE8un
+	 67xPRwP+Ax/wzJc2Ag4PN0uQU0cP705b5qy8C4qngTFaBEQa1rH+Kzsv8IM6Vn+LEz
+	 8CSQ9N0XBnKfvE5wmCJA7G0B8JA8f1RlR0EFVTmL5PUsJkpbPJXpnRcihFHL4WjTOf
+	 sh6EN8lf7ZZku7gd9SslC/G2sikDNq5IMhqoNJJBKGmx43LT1noz6/VO4ojstrL4Vc
+	 y/uoWybaf86e/LHNiEjgDrNXwLqD6NK2POmZIlEW+001ads1kk7oiwhiuB9jH9oZFZ
+	 SdYtNHiRhxS/Q==
+From: Daniel Wagner <wagi@kernel.org>
+Subject: [PATCH 0/5] blk: introduce block layer helpers to calculate num of
+ queues
+Date: Tue, 17 Jun 2025 15:43:22 +0200
+Message-Id: <20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: linux-kernel@vger.kernel.org, axboe@kernel.dk, ed.cashin@acm.org,
- linux-block@vger.kernel.org
-To: Justin Sanders <jsanders.devel@gmail.com>
-References: <20250610170600.869-1-jsanders.devel@gmail.com>
-Content-Language: en-US, de-AT-frami
-From: Valentin Kleibel <valentin@vrvis.at>
-In-Reply-To: <20250610170600.869-1-jsanders.devel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	* -4.5 BAYES_00 BODY: Bayes spam probability is 0 to 1%
-	*      [score: 0.0000]
-	* -0.1 GREYLIST_ISWHITE The incoming server has been whitelisted for this
-	*      receipient and sender
-Subject: Re: [PATCH 1/2] aoe: clean device rq_list in aoedev_downdev()
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-B4-Tracking: v=1; b=H4sIAPpwUWgC/x3MQQrCMBBG4auUWTuQxGpor1Jc1PirA5KkmUaE0
+ rs3uPwW722kKAKlsduo4CsqKTbYU0fhPccXWB7N5Iy7mKv1LJo+IVflpaKCQ6pxRVHu3X02gPf
+ nwVCrc8FTfv/zdNv3A/LaqlZpAAAA
+X-Change-ID: 20250617-isolcpus-queue-counters-42ba0ee77390
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Thomas Gleixner <tglx@linutronix.de>, 
+ Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+ Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
+ Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+ Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+ storagedev@microchip.com, virtualization@lists.linux.dev, 
+ GR-QLogic-Storage-Upstream@marvell.com, Daniel Wagner <wagi@kernel.org>
+X-Mailer: b4 0.14.2
 
-On 10/06/2025 19.05, Justin Sanders wrote:
-> An aoe device's rq_list contains accepted block requests that are
-> waiting to be transmitted to the aoe target. This queue was added as
-> part of the conversion to blk_mq. However, the queue was not cleaned out
-> when an aoe device is downed which caused blk_mq_freeze_queue() to sleep
-> indefinitely waiting for those requests to complete, causing a hang. This
-> fix cleans out the queue before calling blk_mq_freeze_queue().
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=212665
-> Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
-> Signed-off-by: Justin Sanders <jsanders.devel@gmail.com>
+I am still working on the change request for the "blk: honor isolcpus
+configuration" series [1]. Teaching group_cpus_evenly to use the
+housekeeping mask depending on the context is not a trivial change.
 
-Thank you very much for the patches to fix this issue.
-We have tested them in our environment and can confirm that they work as 
-expected.
+The first part of the series has already been reviewed and doesn't
+contain any controversial changes, so let's get them processed
+independely.
 
-Tested-By: Valentin Kleibel <valentin@vrvis.at>
+[1] https://patch.msgid.link/20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org
 
-Best Regards,
-	Valentin
+Signed-off-by: Daniel Wagner <wagi@kernel.org>
+---
+Changes in from https://patch.msgid.link/20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org
+- limit number of allocated masks to the max allocated number of masks
+- commit message improvements
+- typo fixes
+- formatting fixed
+- collected tags
+
+---
+Daniel Wagner (5):
+      lib/group_cpus: Let group_cpu_evenly() return the number of initialized masks
+      blk-mq: add number of queue calc helper
+      nvme-pci: use block layer helpers to calculate num of queues
+      scsi: use block layer helpers to calculate num of queues
+      virtio: blk/scsi: use block layer helpers to calculate num of queues
+
+ block/blk-mq-cpumap.c                     | 46 +++++++++++++++++++++++++++++--
+ drivers/block/virtio_blk.c                |  5 ++--
+ drivers/nvme/host/pci.c                   |  5 ++--
+ drivers/scsi/megaraid/megaraid_sas_base.c | 15 ++++++----
+ drivers/scsi/qla2xxx/qla_isr.c            | 10 +++----
+ drivers/scsi/smartpqi/smartpqi_init.c     |  5 ++--
+ drivers/scsi/virtio_scsi.c                |  1 +
+ drivers/virtio/virtio_vdpa.c              |  9 +++---
+ fs/fuse/virtio_fs.c                       |  6 ++--
+ include/linux/blk-mq.h                    |  2 ++
+ include/linux/group_cpus.h                |  2 +-
+ kernel/irq/affinity.c                     | 11 ++++----
+ lib/group_cpus.c                          | 16 +++++------
+ 13 files changed, 89 insertions(+), 44 deletions(-)
+---
+base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
+change-id: 20250617-isolcpus-queue-counters-42ba0ee77390
+
+Best regards,
+-- 
+Daniel Wagner <wagi@kernel.org>
+
