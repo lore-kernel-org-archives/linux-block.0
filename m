@@ -1,108 +1,123 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F162F5312;
-	Tue, 17 Jun 2025 22:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162CB202C48;
+	Tue, 17 Jun 2025 22:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750199146; cv=none; b=UMn/T3IBnnFFiu8XdN6Tza4//yHh5sxQUnxhPTdRiMttGywMRapeRmKkyIBnvt+9k9lzJlNpSmGdpFaahJPgSjt/5uxtJL8BLBv7A4xJkPwtzshNkjgjcHQzGBMpwzCWcCnMQWjnL32cmQhD0UBd5b7l9AIvTgiKIZRJ7aRY4HI=
+	t=1750199157; cv=none; b=FDzc/lRoFpGp3HPSr/DzpRLJtZJf/NH+3P996z35TbqrUQx+SDqSQ8J/LAAS0pKIgEoA2+VHe/zq/MPg5IJiPghE7QDzzP5IeRs/XDDIIIGCfcXPJi4HjxbXZcD3EhWVJA9Bw19XlZ8XJKyOIDFWQ84hqP2O3m9+gYcMZp5dRxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750199146; c=relaxed/simple;
-	bh=ldx27R1+iMR7oFThnP3SG77yVAaWUBoN1GCRNm+wX6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Uus2yqyKNmkCPDJ/qIpI502eQnsyy+aD7Kv0zaIp0pOqVe4tGPyQaHUajlk/6E1DYP2F7iUR/PyCAfoGgz7cWCFuR+LEdea7GoznfZhWEfja1qGkbN2/eyPxs2wKM1LrGW2kWUybfWUzJZOCqxZmS4JiahhhUl3L+awiagMydHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=XdNktgi3; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750199157; c=relaxed/simple;
+	bh=IkHODsj3LMl6DlIAGg//NNU39NjtBqCmQQsRmb27n4s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pGF7TvQYXHRCUjecT1xNA4aXh7HMntY2k2vidQ62FT/7OjmEbPsibYYJk2uB5KnRe33aaJ8pqjNQyquDN/SM+bAlTCI6zhAw2lSHkt7gV6R9CcXkYZw285lXqvYjJpshgGa+t9hWocJylZw6Nn/GvkczXnPSnXT6kWJydGzojD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+1Ybjnk; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="XdNktgi3"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bMLzm6dGrzlvX7p;
-	Tue, 17 Jun 2025 22:25:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750199139; x=1752791140; bh=Xc+WhlkMlI+pcVbRXrb20qA1
-	G39pU4szZWRw6M3elb4=; b=XdNktgi3VEUbIIAXW3fj45mu74LrFsjTJ5SWp03N
-	vprNEtC086dLQnR763wK3yV4qPHtocrLLn5mYDeqz+wnhPbx3r9+YGPkRpiIy9nO
-	584rSrWm8KXjaia26nb4PeOp054vYqQjenqWMlr80ootiPrBqeY09JlDmPK+82p6
-	FfL65nSh93sfmoc0VV4jzMTUK7h8HSyzINbEWhD9eNjlwCT48QnT1wOuS3znaael
-	RV+oOm40I5oSHRPEWn6QGtw9T8uky7olicxuGk6DDaCH4q+B67ZZURRwhsXtzVOr
-	VtoikIorEkOxyoM1uKSW9Jq17icFG1jvwNsnZy7tjUBGYw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id l1_sIaQCi6vK; Tue, 17 Jun 2025 22:25:39 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bMLzh6P13zlgn8k;
-	Tue, 17 Jun 2025 22:25:35 +0000 (UTC)
-Message-ID: <1e25d17b-f481-485c-85a6-d5a8440c1c96@acm.org>
-Date: Tue, 17 Jun 2025 15:25:34 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+1Ybjnk"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a43972dcd7so79800801cf.3;
+        Tue, 17 Jun 2025 15:25:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750199155; x=1750803955; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NOHudB3qWFtr4TV/okRv6w4AxszP8orrjoIXfZSBLrg=;
+        b=g+1YbjnkQ5KanzCYrF6em9UwZKyPuE1+sAUa7/1R7LJHDYhEnMUAdR9OlaapdU08uB
+         r93kQcsUEomKT3rOcjvVYr431Q+ItYTKKwKRxl/3yWI7uTQRic41CjRRxqJ6weGDipm8
+         2dx1fPlc2d3JLNr0Oxl1lqNBRaYwT/hVSTHL/AoR743w8D2aUgnMkeHZb89Ls5CcCFjf
+         PlPMV8A/nlr9iBHqs/EJXKs5exQZ4HV9fxOncesiOrfDc18U+bzdRurGsqEZtaWF3PRr
+         p2eX0VY/xJ9abnpC6jsjtMCKJsTM7YR/dMGCKXUvootR1xNjh1Arql4ZcDYuSZl+H27E
+         zU5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750199155; x=1750803955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NOHudB3qWFtr4TV/okRv6w4AxszP8orrjoIXfZSBLrg=;
+        b=IGgclu/UsNq0Wgy6EMnSn/YhJAlJ9ktJxaEMnIbJCiYGlME/+AX0NrfNg3sTsgkwBV
+         dzrOfZXzQMM5CyEb9LDWzJX0x7bAxHFarSsovU00g3JljxtfBxnCSF7IAD3cVhgtZQiD
+         NDLEJ+bCfsQFVSOvJZB/dCykH90JzwUvI4eJ349n20/rAuNUUvHmY9nSvhUB//8Opz7H
+         +AbQwfNcd19m0NQbRP+Leroi1LQpG5eE/HXb75FefRvNuUSB8c7/jv657VAWchRbTuXY
+         w4/Xx6wJQoW1J52FWOwSrJkn1Pg+uiB3pZN1yqqR7igyo8cIjIqgvPEb0DOajSR9mQXf
+         qjFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOAEhtkVApKd05bDdGSQfgoV0rclyKa/MrWZA8jz47bmS3GisJtsDgp29FLHDn90zvxx53I7YR7pri@vger.kernel.org, AJvYcCXKX0Y/RCn7HsYTol394N1Cu0alPvIjvsDWuHYTUDrH0/BNwmkHROzgUIexF4sBGf5xli6aOfmCvfrWRt40kA==@vger.kernel.org, AJvYcCXar8ty/VBPFrFzX50GIPvcOI72p/QIqG8g1p9PEek6OAtnmSaKTw+kh4GIokuxPhItIxKoSICapxgu@vger.kernel.org, AJvYcCXu/yF8EpvpNJRBMg30lY3bDX/MXM0ts4+R09crx9EaMNIKAG1aDsa3AwR2hDSvE+TTLr27hemgTZlVNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7C10F7DGsnedm/VrItoUTodWY8PNpNXQq1CfIhzCUWMrEaTc2
+	+9UnBMdMVWY5DrswQYP2NttdE74cjD0IxU62sX7oP4us/DsLf0/NCxJP6OMKakA71IHe00ZGZnJ
+	ONYCNj85AXhoKoT4D8R8//gUmHpvBjY4=
+X-Gm-Gg: ASbGnctgV3vw7+InpjxRFQ8PaYPkQ2Tc89vUxDoMr63J7UwBgf3ZaukPxO4jkqWJgkd
+	CGRzMchwPGjqnTgdVtRlE5iQsIxKUiIU/FtiYB1obKUM/0KTM/EVRa0Em/8yS2HZkJD4J0VZThh
+	7fAi0HV/dIJCzP6kIKZlBfh/fMamvgS3DxBoqKemXzm6+T6OJ9DeE9Y3WX90c=
+X-Google-Smtp-Source: AGHT+IFT2IbS7IY/ZG8utAx1TX8YtZX4KzeTFUBS4g3I5+hjckINK4fFIkyAX5117p/bYpzRPLh6P82Wyv/n/vAtbzc=
+X-Received: by 2002:a05:622a:d1:b0:4a3:4d46:c2a6 with SMTP id
+ d75a77b69052e-4a73c51f790mr202374651cf.7.1750199154958; Tue, 17 Jun 2025
+ 15:25:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: mq-deadline: check if elevator is attached to
- queue in dd_finish_request
-To: Elijah Wright <git@elijahs.space>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250617205630.207696-1-git@elijahs.space>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250617205630.207696-1-git@elijahs.space>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-11-hch@lst.de>
+In-Reply-To: <20250617105514.3393938-11-hch@lst.de>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Tue, 17 Jun 2025 15:25:43 -0700
+X-Gm-Features: AX0GCFsI21gwIMPwJfdvUohzFbNWXhMjQxHEzcHQpvBVMKKQzS8fPtvEOYy6xzg
+Message-ID: <CAJnrk1YOtCnAD2R5G1sYipG=aTkWBdYfm-F0iioV55sE5A_HYQ@mail.gmail.com>
+Subject: Re: [PATCH 10/11] iomap: replace iomap_folio_ops with iomap_write_ops
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/17/25 1:56 PM, Elijah Wright wrote:
-> in dd_finish_request(), per_prio points to a rq->elv.priv[0], which could be
-> free memory if an in-flight requests completes after its associated scheduler
-> has been freed
-> 
-> Signed-off-by: Elijah Wright <git@elijahs.space>
-> ---
->   block/mq-deadline.c | 16 +++++++++-------
->   1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 2edf1cac06d5..4d7b21b144d3 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -751,13 +751,15 @@ static void dd_finish_request(struct request *rq)
->   {
->   	struct dd_per_prio *per_prio = rq->elv.priv[0];
->   
-> -	/*
-> -	 * The block layer core may call dd_finish_request() without having
-> -	 * called dd_insert_requests(). Skip requests that bypassed I/O
-> -	 * scheduling. See also blk_mq_request_bypass_insert().
-> -	 */
-> -	if (per_prio)
-> -		atomic_inc(&per_prio->stats.completed);
-> +	if (rq->q->elevator) {
-> +		/*
-> +		* The block layer core may call dd_finish_request() without having
-> +		* called dd_insert_requests(). Skip requests that bypassed I/O
-> +		* scheduling. See also blk_mq_request_bypass_insert().
-> +		*/
-> +		if (per_prio)
-> +			atomic_inc(&per_prio->stats.completed);
-> +	}
->   }
+On Tue, Jun 17, 2025 at 3:55=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+>  ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *f=
+rom,
+> -               const struct iomap_ops *ops, void *private);
+> +               const struct iomap_ops *ops,
+> +               const struct iomap_write_ops *write_ops, void *private);
+>  int iomap_read_folio(struct folio *folio, const struct iomap_ops *ops);
+>  void iomap_readahead(struct readahead_control *, const struct iomap_ops =
+*ops);
+>  bool iomap_is_partially_uptodate(struct folio *, size_t from, size_t cou=
+nt);
+> @@ -344,11 +337,14 @@ bool iomap_release_folio(struct folio *folio, gfp_t=
+ gfp_flags);
+>  void iomap_invalidate_folio(struct folio *folio, size_t offset, size_t l=
+en);
+>  bool iomap_dirty_folio(struct address_space *mapping, struct folio *foli=
+o);
+>  int iomap_file_unshare(struct inode *inode, loff_t pos, loff_t len,
+> -               const struct iomap_ops *ops);
+> +               const struct iomap_ops *ops,
+> +               const struct iomap_write_ops *write_ops);
+>  int iomap_zero_range(struct inode *inode, loff_t pos, loff_t len,
+> -               bool *did_zero, const struct iomap_ops *ops, void *privat=
+e);
+> +               bool *did_zero, const struct iomap_ops *ops,
+> +               const struct iomap_write_ops *write_ops, void *private);
+>  int iomap_truncate_page(struct inode *inode, loff_t pos, bool *did_zero,
+> -               const struct iomap_ops *ops, void *private);
+> +               const struct iomap_ops *ops,
+> +               const struct iomap_write_ops *write_ops, void *private);
+>  vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_o=
+ps *ops,
+>                 void *private);
 
-The warnings in dd_exit_sched() will be triggered if dd_finish_request()
-is ever called with rq->q->elevator == NULL.
+Maybe you'll hate this idea but what about just embedding struct
+iomap_ops inside iomap_write_ops?
 
-If this can happen, it should be fixed in the block layer core instead
-of in the mq-deadline scheduler.
+eg
+ struct iomap_write_ops {
+        struct iomap_ops iomap_ops;
+        struct folio *(*get_folio)(struct iomap_iter *iter, loff_t pos,
+                        unsigned len);
+       ...
+}
 
-Thanks,
-
-Bart.
+and then only having to pass in iomap_write_ops?
