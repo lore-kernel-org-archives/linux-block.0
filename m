@@ -1,160 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40EC522F
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 05:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F9A522F;
+	Wed, 18 Jun 2025 05:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750226199; cv=none; b=kZmRhYCb+wOto2k3IETMb+tNXMvx5RPO0yv01jVxPUNUQA3mdnkpyiMM+XJEjl+4OZr8Wt2CpJBSxBPfL7xgoXf2HcDynLWQN6qj+IL9i9U/7/8SIz2PrO+rpMGibh0BaJwBtB2DMFBnd4zqaiSBAFCXPKjJkrccG5hY7LFFaj4=
+	t=1750226258; cv=none; b=avPL1pqswuZoZ2Cfaxawx737qxWSZWH/+/0bmeDXHEw77p1nDMe8GD08X1y4tDvVAqeoU1gGDU3ygtF4DdFIgNyHXKvkHkd54yvB0Ye01VwY0/6hmPqLm32CvdRxXxIqF5k/VFY30jsleCmam8yCAHdS++PHJrqdCNhp+Z3UcTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750226199; c=relaxed/simple;
-	bh=TXe/4LOe48SD/e205lz/1b7Cy5Tcw7k2ZxHTycQfLb4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J8k5Zu6x9fgxZ6CLfZHXBqCeIOJVkgo43cYmoN3pKu3JvTUbbBMBqzJn4WwxM7BqQnqr6qqmKBEkOyRDlEfEnz2QnQyjxyDtUkj4T3wbdnD0GiotZPnvd2qpJFZm2Ta34EbYO/d3yb6UhYmZ4s4iWXvjKaiqRVAopGrHaAPsigM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNvRw4bl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750226258; c=relaxed/simple;
+	bh=ZnYL99bXoNewCT10OfyVgaJPz9Lm465lrY52yWRHNOI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K28cJf24e/uzAq5TDz26fDR0dtZPy+F9g94vPBz3XGe1L4u3MuEzWsicscsjHO6wzu8dUiK5Cu6114VF5uWomjA0RGJge8qNc9RwedzDDKEH+v+mrNbK5ybqTRGj3QCtr3q2jcejIXHGLKUeiuR0Tb4lajPOj4kCmDAJKF5QIM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJDM6eZa; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNvRw4bl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E34C4CEE7;
-	Wed, 18 Jun 2025 05:56:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750226199;
-	bh=TXe/4LOe48SD/e205lz/1b7Cy5Tcw7k2ZxHTycQfLb4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cNvRw4blXZEEVPMujI/9VJmrtIvqTTIkuuL9NpQd+AeMhV9KGJhMSiufLZPt4QSyv
-	 Z8CLu4XJ59PDB8FNsIEfCoqLdpiyEWBO6DMt2nLevE7+HPd1+GQaV4bGBAsJ2h9WrZ
-	 dX6Kt8aECGrcIpcL5hY3+3rCQvEHHkQiuD0FLW4QUikJ1kHlkVeNn36iCJykdH9kcr
-	 PBlzAv3pMNOx9FkltOXrkZAekR7rMRlJCkKbbK9uYKXEhf4H3kyL/euD37eS6yHpx5
-	 an67thRu/9Ew0HkldLESifA6CmIh8gkLpS/hYfB9F0VpPp/k27yuLGaKbblFVaL5/k
-	 +K12pWRqeL7Sw==
-Message-ID: <d18b6d7a-b2eb-4eb5-a526-a5619e50a1a0@kernel.org>
-Date: Wed, 18 Jun 2025 14:56:37 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJDM6eZa"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6084dfb4cd5so786355a12.0;
+        Tue, 17 Jun 2025 22:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750226255; x=1750831055; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fc+ErnKOJ231laZc6TDP0EBrheoh8TUtV1LEQn5EjgM=;
+        b=eJDM6eZahy0Vc4LTsJm4k2fLXJsHmIkkY3aQlB+sshjAR/dgyun2o4Pi2hdBNJmhcW
+         xYzOiLvEsHwMWb5JBuRzauCxx/KOzq29BnbH/CTWvvQL6yy81+3U5qvC9K3B0V9fm2LV
+         i8IUTwNSPrq3mKvgV0ELLJ01l10NJC31k9o1MPSSzuhsMqs37rcZ/BCrnyqO3nFMmcDd
+         a3B/EJhgYxFlz7zMrNzx7/w/9r/MJ9znFmLv0MmQVnBa/uJGCG9DPxQ2oLnxLoSf/ZmX
+         u01YFqW31A+4EWgU+c82Y5dglrZkXetG4mWuRf/yWV08/Yhd1nIE01qhznEL5IKwrQHi
+         0eJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750226255; x=1750831055;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fc+ErnKOJ231laZc6TDP0EBrheoh8TUtV1LEQn5EjgM=;
+        b=erjFJAo0uGZ3irIlhPqOb1fZQqTdnZgMzrYP/gGqk18JdEIsmkzhV+S2W3dFG9n3uZ
+         IaGGv+SyuOzDG75Kfqog1CQ/pQeL7bafXdEfV+oz5ZUa/WpM4iOko2E2Zi1Sl2IB4YLj
+         koRJXGsSoYGEHCkBnbTbrhCfzHYmRJDop9PkPpR27y3tkrRj9rn8JtBWGzvEo8cnWWEf
+         Pz5MO3OpPiePF++hzXcc7s6sKI48sxWs7f/e6IK/vCkSMV0KmWM4pmn5ldV2awC8dgVK
+         sskFJCkzK5SRzSJp2awm/KiAzZ8PAW7gxMDeHfN9nPQG4qheBiP+ZUqsVL+qX7vC//It
+         YlpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnMqiyLGUTWznTLiB0eXgx7mx91mXP4IYlghvtg2heQHVzduQuNXeLbUKINQYW10JENlWCLt9rDyeLUQ==@vger.kernel.org, AJvYcCXHpvZ8gkW52mwNFo5o1OCJR/EDVXRqXQFAwzymzS8FSNm5kFKEvtI9C6bt5p71wHGVNZ6YUx3rhADjegxWGg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI3SEqH2bIT1744B/4ylC9qBwMG9WCRaGL2I+wENFkxokdV5Z0
+	GUJaDtmiuKoqX9Kxk0j3TP3QeCYdkpQ1PQOx7HzMcZNKdNfccpbLU092G/QXI8REMi4SDncM3UK
+	W5mvWRpT373ANy+UVrhSkCwK9HTKrMw==
+X-Gm-Gg: ASbGncso152r5Zj+CJJfZe0p0cAEcaJyI7rNVOmYVYdWoyBXgNB3/TN/AFJkI+M7NWf
+	LvM/v9VWDRa3x7TzpxHoetIxzqLZhS8+jae1M8HbXTHCkXUkm51d5Qutj5V2M65QkN+B6k42R0q
+	6OE3cq1W6SZXUgNO3LGvmzKEeZLoLx8l+l8lOl+WKgu5BADUvKdldypb+qdTczJmAMVOe+vrIl0
+	a32WLqpURM=
+X-Google-Smtp-Source: AGHT+IFoV/eGulbcbjRmiPG5NUq8dU4aRQiFaCZemJBnjeMxct1lWN84Nr6xgfseoijcHq3hPbpbNTAoct4nnDSaHks=
+X-Received: by 2002:a17:907:d15:b0:ad8:942b:1d53 with SMTP id
+ a640c23a62f3a-ae01f869b06mr94698766b.27.1750226255148; Tue, 17 Jun 2025
+ 22:57:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: don't use submit_bio_noacct_nocheck in
- blk_zone_wplug_bio_work
-To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20250611044416.2351850-1-hch@lst.de>
- <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250610132254.6152-1-anuj20.g@samsung.com> <CGME20250610132317epcas5p442ce20c039224fb691ab0ba03fcb21e7@epcas5p4.samsung.com>
+ <20250610132254.6152-3-anuj20.g@samsung.com> <20250611-saufen-wegfielen-487ca3c70ba6@brauner>
+In-Reply-To: <20250611-saufen-wegfielen-487ca3c70ba6@brauner>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Wed, 18 Jun 2025 11:26:59 +0530
+X-Gm-Features: AX0GCFtxrH8tnfrbMXmImLdHz46u4RB2qOus_QZ6oX8blRvuXoel21PBq156ey0
+Message-ID: <CACzX3AtOVQokJmp9hOo_BZrF=kqkrJLeh3nLeY3bkWNgKL_m+A@mail.gmail.com>
+Subject: Re: [PATCH for-next v3 2/2] fs: add ioctl to query metadata and
+ protection info capabilities
+To: Christian Brauner <brauner@kernel.org>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, jack@suse.cz, 
+	axboe@kernel.dk, viro@zeniv.linux.org.uk, hch@infradead.org, 
+	martin.petersen@oracle.com, ebiggers@kernel.org, adilger@dilger.ca, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	joshi.k@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/18/25 05:09, Bart Van Assche wrote:
-> On 6/10/25 9:44 PM, Christoph Hellwig wrote:
->> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->> index 8f15d1aa6eb8..45c91016cef3 100644
->> --- a/block/blk-zoned.c
->> +++ b/block/blk-zoned.c
->> @@ -1306,7 +1306,6 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
->>   	spin_unlock_irqrestore(&zwplug->lock, flags);
->>   
->>   	bdev = bio->bi_bdev;
->> -	submit_bio_noacct_nocheck(bio);
->>   
->>   	/*
->>   	 * blk-mq devices will reuse the extra reference on the request queue
->> @@ -1314,8 +1313,12 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
->>   	 * path for BIO-based devices will not do that. So drop this extra
->>   	 * reference here.
->>   	 */
->> -	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO))
->> +	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO)) {
->> +		bdev->bd_disk->fops->submit_bio(bio);
->>   		blk_queue_exit(bdev->bd_disk->queue);
->> +	} else {
->> +		blk_mq_submit_bio(bio);
->> +	}
->>   
->>   put_zwplug:
->>   	/* Drop the reference we took in disk_zone_wplug_schedule_bio_work(). */
-> 
-> This patch is necessary but not sufficient. With this patch applied, if
-> I run the deadlock reproducer (tests/zbd/013) with Jens' for-next
-> branch, the deadlock shown below is reported. The first call stack shows
-> the familiar queue_ra_store() invocation. The second call stack is new
-> and shows a dm_split_and_process_bio() invocation.
+> Don't do this hard-coded form of extensiblity. ioctl()s are inherently
+> extensible because they encode the size. Instead of switching on the
+> full ioctl, switch on the ioctl number. See for example fs/pidfs:
+>
+>         /* Extensible IOCTL. */
+>         if (_IOC_NR(cmd) =3D=3D _IOC_NR(PIDFD_GET_INFO))
+>                 return pidfd_info(file, cmd, arg);
+>
+> static long pidfd_info(struct file *file, unsigned int cmd, unsigned long=
+ arg)
+> {
+>         struct pidfd_info __user *uinfo =3D (struct pidfd_info __user *)a=
+rg;
+> <snip>
+>         size_t usize =3D _IOC_SIZE(cmd);
+>         struct pidfd_info kinfo =3D {};
+>
+>         if (!uinfo)
+>                 return -EINVAL;
+>         if (usize < PIDFD_INFO_SIZE_VER0)
+>                 return -EINVAL; /* First version, no smaller struct possi=
+ble */
+>
+> pidfs uses a mask field to allow request-response modification:
 
-That function may call bio_split_to_limits() which trigger the call chain
+Thanks for the detailed feedback =E2=80=94 very helpful.
+For now, I'll keep it simple and skip adding a mask field since all
+fields in the struct are always returned.
 
-__bio_split_to_limits() -> bio_split_xxx() -> bio_submit_split() ->
-submit_bio_noacct() -> submit_bio_noacct_nocheck()
+> (Only requirement is that a zero value means "no info", i.e., can't be a
+> valid value. If you want zero to be a valid value then a mask member
+> might be helpful where the info that was available is raised.)
 
-And we then should endup doing:
+To clarify on the zero values: the fields in this struct are
+capability fields, where a zero value indicates that the hardware
+doesn=E2=80=99t support the corresponding feature. None of the fields have =
+zero
+as a valid value when the feature is supported, so a mask isn=E2=80=99t
+necessary.
 
-	if (current->bio_list)
-		bio_list_add(&current->bio_list[0], bio);
+I sent another version [1] with your feedback applied. Please see if it
+aligns with what you had in mind.
 
-Since this is a split from within the original submitter context... Well, I
-think we should be. If we endup calling again __submit_bio_noacct() directly
-here, we would be reentering the submission path, at the risk of a stack
-overflow, which is what the current->bio_list tries to avoid.
-So I am confused why you endup seeing this issue... Can you check exactly the
-path that is being followed ? (your backtrace does not seem to have everything)
+[1] https://lore.kernel.org/linux-block/20250618055153.48823-1-anuj20.g@sam=
+sung.com/
 
-Depending on the BIO, dm_split_and_process_bio may also trigger the path:
-
-__split_and_process_bio() -> __map_bio() -> dm_submit_bio_remap() ->
-submit_bio_noacct()
-
-But that should be for submission of cloned BIOs to the block device used as the
-backing dev of the DM device. So that should not cause an issue since that is a
-different bdev. Or is this maybe confusing lockdep ?
-
-> 
-> sysrq: Show Blocked State
-> task:check           state:D stack:27208 pid:2728  tgid:2728  ppid:2697 
->   task_flags:0x480040 flags:0x00004002
-> Call Trace:
->   __schedule+0x8be/0x1c10
->   schedule+0xdd/0x270
->   blk_mq_freeze_queue_wait+0xfd/0x140
->   blk_mq_freeze_queue_nomemsave+0x1e/0x30
->   queue_ra_store+0x155/0x2a0
->   queue_attr_store+0x24d/0x2d0
->   sysfs_kf_write+0xdc/0x120
->   kernfs_fop_write_iter+0x39f/0x5a0
->   vfs_write+0x4fa/0x1300
->   ksys_write+0x109/0x1f0
->   __x64_sys_write+0x76/0xb0
->   x64_sys_call+0x276/0x17d0
->   do_syscall_64+0x94/0x3a0
->   entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> task:kworker/52:2H   state:D stack:26528 pid:2873  tgid:2873  ppid:2 
->   task_flags:0x4208060 flags:0x00004000
-> Workqueue: dm-0_zwplugs blk_zone_wplug_bio_work
-> Call Trace:
->   __schedule+0x8be/0x1c10
->   schedule+0xdd/0x270
->   __bio_queue_enter+0x32d/0x7c0
->   __submit_bio+0x1dd/0x6c0
->   __submit_bio_noacct+0x147/0x580
->   submit_bio_noacct_nocheck+0x4de/0x620
->   submit_bio_noacct+0x8f4/0x1a50
->   dm_split_and_process_bio+0x8a1/0x1c00 [dm_mod 
-> 14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
->   dm_submit_bio+0x137/0x490 [dm_mod 
-> 14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
->   blk_zone_wplug_bio_work+0x455/0x630
->   process_one_work+0xe29/0x1420
->   worker_thread+0x5ed/0xff0
->   kthread+0x3cd/0x840
->   ret_from_fork+0x412/0x520
->   ret_from_fork_asm+0x11/0x20
-> 
-> Bart.
-> 
-
-
--- 
-Damien Le Moal
-Western Digital Research
+--
+Anuj Gupta
