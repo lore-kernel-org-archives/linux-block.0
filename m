@@ -1,124 +1,155 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080301FC7E7
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 06:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F58156C6F
+	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 06:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750227281; cv=none; b=dOt4TeV+VJz/POcRj+GLP9iKVdpu6JUTzB36vum9XTjvWsEjVEDugaSnFAxA124leIN8U8IkUeMMgv9bBnn7IOU4DlOOpTE4vBlZ5pfe99GWzZygF9i67EYPVc3sxE6SN+FZNesSQXvVsfd5qW+YjO+r/+2E1rbMzQJVrKY1BgI=
+	t=1750227432; cv=none; b=NKT58eb4Mf+ebi/T1mUrI0i0pcfu4NWF2+g9Oalafc5dX1yw7jFZ3DOuevXJHbDdnbP2vuu5CAg46rjPN81fb6S2mOfMZxyIBfhA6tSmf3CXb4IHqi88bQCgPYq36CBcA+gdjlFLRqBSMsXxkwSxn8gZEYitCvTqq0MFceNQEGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750227281; c=relaxed/simple;
-	bh=GISdvLlhB4wq5Zikg2XZlMze4njclW/mJXKXxKeLpQc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 References; b=iU4LEhhVRb1Ueue+J+/Vn7lx/maHEZPRRpP050+qFkOnHgURi96qrGfJcx8hgGj7lPlSxTgfyQi1jl/jBF4ZrXGPe5EBxA9d98Tzxdi7mMUGn6JTTrK0u36q1zibExV8WSlJIuvfTgJkqZf15khgWfOUg3/tNoe6r8X3luGdl90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=JdCASgnK; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1750227432; c=relaxed/simple;
+	bh=bqlywIVZSJ2LOim2NGRmakW8XCyOpJIREPGxZIDtyJY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TLhSIaWY0IYWusnMFswa7O9Waylk3P5qCj3vhclJmMs6AZIyuhE9Na2kskl0Y2FMvUwLnhkn4QJyEs3aAXdrRRx6dhEyHz5BDUTQ4wrYQhCKXecedsGeZqyrx0fOPXt0gAc7+32rjWPx92hMta14MoX435ZMG+qMIflunHlg4R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=K3c2rlmf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=l6cTBmU7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=K3c2rlmf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=l6cTBmU7; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="JdCASgnK"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250618061436epoutp04ccda5bcef21f9e373acee02f01e8277b~KDm9sL1bP2408924089epoutp04J
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 06:14:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250618061436epoutp04ccda5bcef21f9e373acee02f01e8277b~KDm9sL1bP2408924089epoutp04J
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1750227276;
-	bh=eqyhFyOn+tXYm2eBjD+rNBRRmBhCV6qEMFxuXTHI0Mo=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=JdCASgnKk31/NedIFp1EmUu6maaYQiB/U2GAKN4KJnR6IxnxXhy9CpP2kljarMpc2
-	 fwuFTOXT1QIAPqQATqdqS7cZveYsc9cDqVO9iVv4P2FlQi50LnxKFBPvhyQGj+T5Zl
-	 MXq1yLhfh+cbM8+iA6oLS2d65FbybEEaXpEueWH4=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20250618061436epcas5p27bd2e571fe77d3bf1dab83faf7758c20~KDm9Wt4Fg1383113831epcas5p29;
-	Wed, 18 Jun 2025 06:14:36 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4bMYNp1HQxz6B9mJ; Wed, 18 Jun
-	2025 06:14:34 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca~KCpcVkUtz2632626326epcas5p42;
-	Wed, 18 Jun 2025 05:04:09 +0000 (GMT)
-Received: from testpc11818.samsungds.net (unknown [109.105.118.18]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250618050408epsmtip24d9afc45a9affc3e1ce2476b6eca1905~KCpbxKp9W0227102271epsmtip2O;
-	Wed, 18 Jun 2025 05:04:08 +0000 (GMT)
-From: hexue <xue01.he@samsung.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC] block: The Effectiveness of Plug Optimization?
-Date: Wed, 18 Jun 2025 13:04:01 +0800
-Message-ID: <20250618050401.507344-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="K3c2rlmf";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="l6cTBmU7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="K3c2rlmf";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="l6cTBmU7"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C8A35211A7;
+	Wed, 18 Jun 2025 06:17:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750227428; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn77OAOZlVwUpfQYKw/7qjF2lfXIheMBmHwDQq4Iv6U=;
+	b=K3c2rlmfBOY8yztCY3x801/x0D/eELxluHo/YmPzx7eG279slQoBpMBQLERC3gJ2205E6g
+	C5Q1z5qb6pEbVnqPxcdD8TVQeXc8TO6D5apRTFAQREGxCPLnH5ADBQsnBrIrAxtMPTc7I3
+	T7qCxvH6dhmfrwn3q2W325pcmL8U/gM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750227428;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn77OAOZlVwUpfQYKw/7qjF2lfXIheMBmHwDQq4Iv6U=;
+	b=l6cTBmU7TgkB2naESuC90JSLH+yvyZBwwq4PuUCYMT4b+OM0SXJ1htLS3dYmxjMcNwKqa5
+	vo2058eskgRMrjCg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750227428; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn77OAOZlVwUpfQYKw/7qjF2lfXIheMBmHwDQq4Iv6U=;
+	b=K3c2rlmfBOY8yztCY3x801/x0D/eELxluHo/YmPzx7eG279slQoBpMBQLERC3gJ2205E6g
+	C5Q1z5qb6pEbVnqPxcdD8TVQeXc8TO6D5apRTFAQREGxCPLnH5ADBQsnBrIrAxtMPTc7I3
+	T7qCxvH6dhmfrwn3q2W325pcmL8U/gM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750227428;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn77OAOZlVwUpfQYKw/7qjF2lfXIheMBmHwDQq4Iv6U=;
+	b=l6cTBmU7TgkB2naESuC90JSLH+yvyZBwwq4PuUCYMT4b+OM0SXJ1htLS3dYmxjMcNwKqa5
+	vo2058eskgRMrjCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 87EDA13721;
+	Wed, 18 Jun 2025 06:17:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id GfBwH+RZUmh8YQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 18 Jun 2025 06:17:08 +0000
+Message-ID: <0512cd79-8c61-4e62-bc22-988c478a1064@suse.de>
+Date: Wed, 18 Jun 2025 08:17:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: Increase BLK_DEF_MAX_SECTORS_CAP
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20250618060045.37593-1-dlemoal@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250618060045.37593-1-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca
-References: <CGME20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca@epcas5p4.samsung.com>
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-The plug mechanism uses the merging of block I/O (bio) to reduce the frequency of
-I/O submission to improve throughput. This mechanism can greatly reduce the disk
-seek overhead of the HDD and plays a key role in optimizing the speed of IO. However,
-with the improvement of storage device speed, high-performance SSD combined with
-asynchronous processing mechanisms such as io_uring has achieved very fast I/O
-processing speed. The delay introduced by flow control and bio merging may reduced
-the throughput to a certain extent.
+On 6/18/25 08:00, Damien Le Moal wrote:
+> Back in 2015, commit d2be537c3ba3 ("block: bump BLK_DEF_MAX_SECTORS to
+> 2560") increased the default maximum size of a block device I/O to 2560
+> sectors (1280 KiB) to "accommodate a 10-data-disk stripe write with
+> chunk size 128k". This choice is rather arbitrary and since then,
+> improvements to the block layer have software RAID drivers correctly
+> advertize their stripe width through chunk_sectors and abuses of
+> BLK_DEF_MAX_SECTORS_CAP by drivers (to set the HW limit rather than the
+> default user controlled maximum I/O size) have been fixed.
+> 
+> Since many block devices can benefit from a larger value of
+> BLK_DEF_MAX_SECTORS_CAP, and in particular HDDs, increase this value to
+> be 4MiB, or 8192 sectors.
+> 
+> And given that BLK_DEF_MAX_SECTORS_CAP is only used in the block layer
+> and should not be used by drivers directly, move this macro definition
+> to the block layer internal header file block/blk.h.
+> 
+> Suggested-by: Martin K . Petersen <martin.petersen@oracle.com>
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> ---
+> Changes from v1:
+>   - Move BLK_DEF_MAX_SECTORS_CAP definition to block/blk.h
+>   - Define the macro value using SZ_4M to make it more readable
+>   - Added review tag
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-After testing, I found that plug increases the burden of high concurrency of SSD on
-random IO and 128K sequential IO. But it still has a certain optimization effect on
-small block (4k) sequential IO, of course small sequential IO is the most suitable
-application for merging scenarios, but the current plug does not distinguish between
-different usage scenarios.
+Cheers,
 
-I have made aggressive modifications to the kernel code to disable the plug mechanism
-during I/O submission, the following are the random performance differences after
-disabling only merging and completely disabling plug (merging and flow control):
-
-------------------------------------------------------------------------------------
-PCIe Gen4 SSD 
-16GB Mem
-Seq 128K
-Random 4K
-cmd: 
-taskset -c 0 ./t/io_uring -b 131072 -d128 -c32 -s32 -R0 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
-taskset -c 0 ./t/io_uring -b 4096 -d128 -c32 -s32 -R1 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
-data unit: IOPS
-------------------------------------------------------------------------------------
-             Enable plug          disable merge           disable plug
-Seq IO       50100                50133                   50125
-Random IO    821K                 824K                    836K           -1.83%
-------------------------------------------------------------------------------------
-
-I used a higher-speed device (PCIe Gen5 server and PCIe Gen5 SSD) to verify the hypothesis
-and found that the gap widened further.
-
-------------------------------------------------------------------------------------
-             Enable plug          disable merge           disable plug
-Seq IO       88938                89832                   89869
-Random IO    1.02M                1.022M                  1.06M          -3.92%
-------------------------------------------------------------------------------------
-
-In the current kernel, there is a certain flag (REQ_NOMERGE_FLAGS) to control whether
-IO operations can be merged. However, the decision for plug selection is determined
-solely by whether batch submission is enabled (state->need_plug = max_ios > 2;).
-I'm wondering whether this judgment mechanism is still applicable to high-speed SSDs.
-
-So the discussion points are:
-	- Will plugs gradually disappear as hardware devices develop?
-	- Is it reasonable to make flow control an optional configuration? Or could
-          we change the criteria for determining when to apply plug?
-	- Are there other thoughts about plug that we can talk now?
-
-Thanks,
-Xue He
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
