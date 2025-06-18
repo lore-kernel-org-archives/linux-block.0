@@ -1,307 +1,160 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB3E1F4192
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 05:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40EC522F
+	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 05:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750225979; cv=none; b=P6HkrtL/OVjk8uTPO9woFkm5himO69WYEPoDxEWBsOMkaAYZqzh3jX21c6XDoX1iof/3WWYYicYU997sd0jrJDKnFXXeg6vVngzQHoGkFVIDSBaT5wb2ROmUAbAdZ7k/aTKa39pUNOjbSxdwFEVLASVV2vxQjXky9Oo7UcP5QFg=
+	t=1750226199; cv=none; b=kZmRhYCb+wOto2k3IETMb+tNXMvx5RPO0yv01jVxPUNUQA3mdnkpyiMM+XJEjl+4OZr8Wt2CpJBSxBPfL7xgoXf2HcDynLWQN6qj+IL9i9U/7/8SIz2PrO+rpMGibh0BaJwBtB2DMFBnd4zqaiSBAFCXPKjJkrccG5hY7LFFaj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750225979; c=relaxed/simple;
-	bh=XJv27zegpe17BX3UrVVhJKoo1TOEheAqnvScquDkfbs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=Axq7eNautTBarGOZWYhy1n6uLHjWEkupMy5bLccMdL7TOjbphvn8Ps4Fpd4svIW90ErkJbv0G5NJV0IQux4CEmg5Kkt1QGhFpcaRzs5ybrmnBeOnYjWqFkfAlh+qxI9rIALc8XmgCjBhencorsb2rpCACwkhiPEFsbqRPvZBr4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=mVWpRfHX; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1750226199; c=relaxed/simple;
+	bh=TXe/4LOe48SD/e205lz/1b7Cy5Tcw7k2ZxHTycQfLb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J8k5Zu6x9fgxZ6CLfZHXBqCeIOJVkgo43cYmoN3pKu3JvTUbbBMBqzJn4WwxM7BqQnqr6qqmKBEkOyRDlEfEnz2QnQyjxyDtUkj4T3wbdnD0GiotZPnvd2qpJFZm2Ta34EbYO/d3yb6UhYmZ4s4iWXvjKaiqRVAopGrHaAPsigM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNvRw4bl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="mVWpRfHX"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250618055253epoutp02a81f9c16ca75ea90936db947005a2576~KDUAEmUT-0268302683epoutp02O
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 05:52:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250618055253epoutp02a81f9c16ca75ea90936db947005a2576~KDUAEmUT-0268302683epoutp02O
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1750225973;
-	bh=HkFJFYExivd8h2V9s5N8v40IqKz3rKiH6l5ADBPgByg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mVWpRfHXb+jKT47/AesrqNThtzaVngRAdSKRSUpxO9UcaCUOSY7xc25iSf5/OHRNV
-	 Kw//tyV3I8dXu5bemiEFEc2ZS3hQla4L8kGxWJVCKPDHbKAWVfzXO/eLubQZYGlRUK
-	 HZ53SeAZgZcWJQBq/BalZaeUlDrmQ0v76KUabmfk=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20250618055252epcas5p1e6c68f7656667726851b2188dce52f36~KDT-GkRy-1001910019epcas5p1m;
-	Wed, 18 Jun 2025 05:52:52 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4bMXvl0B3Mz6B9m9; Wed, 18 Jun
-	2025 05:52:51 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250618055220epcas5p3e806eb6636542bb344c1a08cb9d9fd0f~KDThPKXnP2512525125epcas5p3b;
-	Wed, 18 Jun 2025 05:52:20 +0000 (GMT)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250618055218epsmtip2125fabe3a880118e24edb363cbe1d3b8~KDTfG2NBs3153731537epsmtip2e;
-	Wed, 18 Jun 2025 05:52:18 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: vincent.fu@samsung.com, jack@suse.cz, anuj1072538@gmail.com,
-	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	hch@infradead.org, martin.petersen@oracle.com, ebiggers@kernel.org,
-	adilger@dilger.ca
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	joshi.k@samsung.com, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
-Subject: [PATCH for-next v4 4/4] fs: add ioctl to query metadata and
- protection info capabilities
-Date: Wed, 18 Jun 2025 11:21:53 +0530
-Message-Id: <20250618055153.48823-5-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250618055153.48823-1-anuj20.g@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNvRw4bl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E34C4CEE7;
+	Wed, 18 Jun 2025 05:56:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750226199;
+	bh=TXe/4LOe48SD/e205lz/1b7Cy5Tcw7k2ZxHTycQfLb4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cNvRw4blXZEEVPMujI/9VJmrtIvqTTIkuuL9NpQd+AeMhV9KGJhMSiufLZPt4QSyv
+	 Z8CLu4XJ59PDB8FNsIEfCoqLdpiyEWBO6DMt2nLevE7+HPd1+GQaV4bGBAsJ2h9WrZ
+	 dX6Kt8aECGrcIpcL5hY3+3rCQvEHHkQiuD0FLW4QUikJ1kHlkVeNn36iCJykdH9kcr
+	 PBlzAv3pMNOx9FkltOXrkZAekR7rMRlJCkKbbK9uYKXEhf4H3kyL/euD37eS6yHpx5
+	 an67thRu/9Ew0HkldLESifA6CmIh8gkLpS/hYfB9F0VpPp/k27yuLGaKbblFVaL5/k
+	 +K12pWRqeL7Sw==
+Message-ID: <d18b6d7a-b2eb-4eb5-a526-a5619e50a1a0@kernel.org>
+Date: Wed, 18 Jun 2025 14:56:37 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250618055220epcas5p3e806eb6636542bb344c1a08cb9d9fd0f
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250618055220epcas5p3e806eb6636542bb344c1a08cb9d9fd0f
-References: <20250618055153.48823-1-anuj20.g@samsung.com>
-	<CGME20250618055220epcas5p3e806eb6636542bb344c1a08cb9d9fd0f@epcas5p3.samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: don't use submit_bio_noacct_nocheck in
+ blk_zone_wplug_bio_work
+To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+ axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20250611044416.2351850-1-hch@lst.de>
+ <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a new ioctl, FS_IOC_GETLBMD_CAP, to query metadata and protection
-info (PI) capabilities. This ioctl returns information about the files
-integrity profile. This is useful for userspace applications to
-understand a files end-to-end data protection support and configure the
-I/O accordingly.
+On 6/18/25 05:09, Bart Van Assche wrote:
+> On 6/10/25 9:44 PM, Christoph Hellwig wrote:
+>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+>> index 8f15d1aa6eb8..45c91016cef3 100644
+>> --- a/block/blk-zoned.c
+>> +++ b/block/blk-zoned.c
+>> @@ -1306,7 +1306,6 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+>>   	spin_unlock_irqrestore(&zwplug->lock, flags);
+>>   
+>>   	bdev = bio->bi_bdev;
+>> -	submit_bio_noacct_nocheck(bio);
+>>   
+>>   	/*
+>>   	 * blk-mq devices will reuse the extra reference on the request queue
+>> @@ -1314,8 +1313,12 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+>>   	 * path for BIO-based devices will not do that. So drop this extra
+>>   	 * reference here.
+>>   	 */
+>> -	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO))
+>> +	if (bdev_test_flag(bdev, BD_HAS_SUBMIT_BIO)) {
+>> +		bdev->bd_disk->fops->submit_bio(bio);
+>>   		blk_queue_exit(bdev->bd_disk->queue);
+>> +	} else {
+>> +		blk_mq_submit_bio(bio);
+>> +	}
+>>   
+>>   put_zwplug:
+>>   	/* Drop the reference we took in disk_zone_wplug_schedule_bio_work(). */
+> 
+> This patch is necessary but not sufficient. With this patch applied, if
+> I run the deadlock reproducer (tests/zbd/013) with Jens' for-next
+> branch, the deadlock shown below is reported. The first call stack shows
+> the familiar queue_ra_store() invocation. The second call stack is new
+> and shows a dm_split_and_process_bio() invocation.
 
-For now this interface is only supported by block devices. However the
-design and placement of this ioctl in generic FS ioctl space allows us
-to extend it to work over files as well. This maybe useful when
-filesystems start supporting  PI-aware layouts.
+That function may call bio_split_to_limits() which trigger the call chain
 
-A new structure struct logical_block_metadata_cap is introduced, which
-contains the following fields:
+__bio_split_to_limits() -> bio_split_xxx() -> bio_submit_split() ->
+submit_bio_noacct() -> submit_bio_noacct_nocheck()
 
-1. lbmd_flags: bitmask of logical block metadata capability flags
-2. lbmd_interval: the amount of data described by each unit of logical
-block metadata
-3. lbmd_size: size in bytes of the logical block metadata associated
-with each interval
-4. lbmd_opaque_size: size in bytes of the opaque block tag associated
-with each interval
-5. lbmd_opaque_offset: offset in bytes of the opaque block tag within
-the logical block metadata
-6. lbmd_pi_size: size in bytes of the T10 PI tuple associated with each
-interval
-7. lbmd_pi_offset: offset in bytes of T10 PI tuple within the logical
-block metadata
-8. lbmd_pi_guard_tag_type: T10 PI guard tag type
-9. lbmd_pi_app_tag_size: size in bytes of the T10 PI application tag
-10. lbmd_pi_ref_tag_size: size in bytes of the T10 PI reference tag
-11. lbmd_pi_storage_tag_size: size in bytes of the T10 PI storage tag
+And we then should endup doing:
 
-The internal logic to fetch the capability is encapsulated in a helper
-function blk_get_meta_cap(), which uses the blk_integrity profile
-associated with the device. The ioctl returns -EOPNOTSUPP, if
-CONFIG_BLK_DEV_INTEGRITY is not enabled.
+	if (current->bio_list)
+		bio_list_add(&current->bio_list[0], bio);
 
-Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- block/blk-integrity.c         | 52 +++++++++++++++++++++++++++++++++++
- block/ioctl.c                 |  4 +++
- include/linux/blk-integrity.h |  7 +++++
- include/uapi/linux/fs.h       | 45 ++++++++++++++++++++++++++++++
- 4 files changed, 108 insertions(+)
+Since this is a split from within the original submitter context... Well, I
+think we should be. If we endup calling again __submit_bio_noacct() directly
+here, we would be reentering the submission path, at the risk of a stack
+overflow, which is what the current->bio_list tries to avoid.
+So I am confused why you endup seeing this issue... Can you check exactly the
+path that is being followed ? (your backtrace does not seem to have everything)
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index c1102bf4cd8d..9d9dc9c32083 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -13,6 +13,7 @@
- #include <linux/scatterlist.h>
- #include <linux/export.h>
- #include <linux/slab.h>
-+#include <linux/t10-pi.h>
- 
- #include "blk.h"
- 
-@@ -54,6 +55,57 @@ int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
- 	return segments;
- }
- 
-+int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
-+		     struct logical_block_metadata_cap __user *argp)
-+{
-+	struct blk_integrity *bi = blk_get_integrity(bdev->bd_disk);
-+	struct logical_block_metadata_cap meta_cap = {};
-+	size_t usize = _IOC_SIZE(cmd);
-+
-+	if (!argp)
-+		return -EINVAL;
-+	if (usize < LBMD_SIZE_VER0)
-+		return -EINVAL;
-+	if (!bi)
-+		goto out;
-+
-+	if (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE)
-+		meta_cap.lbmd_flags |= LBMD_PI_CAP_INTEGRITY;
-+	if (bi->flags & BLK_INTEGRITY_REF_TAG)
-+		meta_cap.lbmd_flags |= LBMD_PI_CAP_REFTAG;
-+	meta_cap.lbmd_interval = 1 << bi->interval_exp;
-+	meta_cap.lbmd_size = bi->metadata_size;
-+	meta_cap.lbmd_pi_size = bi->pi_tuple_size;
-+	meta_cap.lbmd_pi_offset = bi->pi_offset;
-+	meta_cap.lbmd_opaque_size = bi->metadata_size - bi->pi_tuple_size;
-+	if (meta_cap.lbmd_opaque_size && !bi->pi_offset)
-+		meta_cap.lbmd_opaque_offset = bi->pi_tuple_size;
-+
-+	meta_cap.lbmd_guard_tag_type = bi->csum_type;
-+	if (bi->csum_type != BLK_INTEGRITY_CSUM_NONE)
-+		meta_cap.lbmd_app_tag_size = 2;
-+
-+	if (bi->flags & BLK_INTEGRITY_REF_TAG) {
-+		switch (bi->csum_type) {
-+		case BLK_INTEGRITY_CSUM_CRC64:
-+			meta_cap.lbmd_ref_tag_size =
-+				sizeof_field(struct crc64_pi_tuple, ref_tag);
-+			break;
-+		case BLK_INTEGRITY_CSUM_CRC:
-+		case BLK_INTEGRITY_CSUM_IP:
-+			meta_cap.lbmd_ref_tag_size =
-+				sizeof_field(struct t10_pi_tuple, ref_tag);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+out:
-+	return copy_struct_to_user(argp, usize, &meta_cap, sizeof(meta_cap),
-+				   NULL);
-+}
-+
- /**
-  * blk_rq_map_integrity_sg - Map integrity metadata into a scatterlist
-  * @rq:		request to map
-diff --git a/block/ioctl.c b/block/ioctl.c
-index e472cc1030c6..9ad403733e19 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -13,6 +13,7 @@
- #include <linux/uaccess.h>
- #include <linux/pagemap.h>
- #include <linux/io_uring/cmd.h>
-+#include <linux/blk-integrity.h>
- #include <uapi/linux/blkdev.h>
- #include "blk.h"
- #include "blk-crypto-internal.h"
-@@ -566,6 +567,9 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- {
- 	unsigned int max_sectors;
- 
-+	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-+		return blk_get_meta_cap(bdev, cmd, argp);
-+
- 	switch (cmd) {
- 	case BLKFLSBUF:
- 		return blkdev_flushbuf(bdev, cmd, arg);
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-index d27730da47f3..e04c6e5bf1c6 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -29,6 +29,8 @@ int blk_rq_map_integrity_sg(struct request *, struct scatterlist *);
- int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
- int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
- 			      ssize_t bytes);
-+int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
-+		     struct logical_block_metadata_cap __user *argp);
- 
- static inline bool
- blk_integrity_queue_supports_integrity(struct request_queue *q)
-@@ -92,6 +94,11 @@ static inline struct bio_vec rq_integrity_vec(struct request *rq)
- 				 rq->bio->bi_integrity->bip_iter);
- }
- #else /* CONFIG_BLK_DEV_INTEGRITY */
-+static inline int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
-+				   struct logical_block_metadata_cap __user *argp)
-+{
-+	return -EOPNOTSUPP;
-+}
- static inline int blk_rq_count_integrity_sg(struct request_queue *q,
- 					    struct bio *b)
- {
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 0098b0ce8ccb..267efbc17d48 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -91,6 +91,49 @@ struct fs_sysfs_path {
- 	__u8			name[128];
- };
- 
-+/* Protection info capability flags */
-+#define	LBMD_PI_CAP_INTEGRITY		(1 << 0)
-+#define	LBMD_PI_CAP_REFTAG		(1 << 1)
-+
-+/* Checksum types for Protection Information */
-+#define LBMD_PI_CSUM_NONE		0
-+#define LBMD_PI_CSUM_IP			1
-+#define LBMD_PI_CSUM_CRC16_T10DIF	2
-+#define LBMD_PI_CSUM_CRC64_NVME		4
-+
-+/* sizeof first published struct */
-+#define LBMD_SIZE_VER0			16
-+
-+/*
-+ * struct logical_block_metadata_cap - Logical block metadata capability
-+ * If the device does not support metadata, all the fields will be zero.
-+ * Applications must check lbmd_flags to determine whether metadata is supported or not.
-+ */
-+struct logical_block_metadata_cap {
-+	/* Bitmask of logical block metadata capability flags */
-+	__u32	lbmd_flags;
-+	/* The amount of data described by each unit of logical block metadata */
-+	__u16	lbmd_interval;
-+	/* Size in bytes of the logical block metadata associated with each interval */
-+	__u8	lbmd_size;
-+	/* Size in bytes of the opaque block tag associated with each interval */
-+	__u8	lbmd_opaque_size;
-+	/* Offset in bytes of the opaque block tag within the logical block metadata */
-+	__u8	lbmd_opaque_offset;
-+	/* Size in bytes of the T10 PI tuple associated with each interval */
-+	__u8	lbmd_pi_size;
-+	/* Offset in bytes of T10 PI tuple within the logical block metadata */
-+	__u8	lbmd_pi_offset;
-+	/* T10 PI guard tag type */
-+	__u8	lbmd_guard_tag_type;
-+	/* Size in bytes of the T10 PI application tag */
-+	__u8	lbmd_app_tag_size;
-+	/* Size in bytes of the T10 PI reference tag */
-+	__u8	lbmd_ref_tag_size;
-+	/* Size in bytes of the T10 PI storage tag */
-+	__u8	lbmd_storage_tag_size;
-+};
-+
- /* extent-same (dedupe) ioctls; these MUST match the btrfs ioctl definitions */
- #define FILE_DEDUPE_RANGE_SAME		0
- #define FILE_DEDUPE_RANGE_DIFFERS	1
-@@ -247,6 +290,8 @@ struct fsxattr {
-  * also /sys/kernel/debug/ for filesystems with debugfs exports
-  */
- #define FS_IOC_GETFSSYSFSPATH		_IOR(0x15, 1, struct fs_sysfs_path)
-+/* Get logical block metadata capability details */
-+#define FS_IOC_GETLBMD_CAP		_IOWR(0x15, 2, struct logical_block_metadata_cap)
- 
- /*
-  * Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
+Depending on the BIO, dm_split_and_process_bio may also trigger the path:
+
+__split_and_process_bio() -> __map_bio() -> dm_submit_bio_remap() ->
+submit_bio_noacct()
+
+But that should be for submission of cloned BIOs to the block device used as the
+backing dev of the DM device. So that should not cause an issue since that is a
+different bdev. Or is this maybe confusing lockdep ?
+
+> 
+> sysrq: Show Blocked State
+> task:check           state:D stack:27208 pid:2728  tgid:2728  ppid:2697 
+>   task_flags:0x480040 flags:0x00004002
+> Call Trace:
+>   __schedule+0x8be/0x1c10
+>   schedule+0xdd/0x270
+>   blk_mq_freeze_queue_wait+0xfd/0x140
+>   blk_mq_freeze_queue_nomemsave+0x1e/0x30
+>   queue_ra_store+0x155/0x2a0
+>   queue_attr_store+0x24d/0x2d0
+>   sysfs_kf_write+0xdc/0x120
+>   kernfs_fop_write_iter+0x39f/0x5a0
+>   vfs_write+0x4fa/0x1300
+>   ksys_write+0x109/0x1f0
+>   __x64_sys_write+0x76/0xb0
+>   x64_sys_call+0x276/0x17d0
+>   do_syscall_64+0x94/0x3a0
+>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> task:kworker/52:2H   state:D stack:26528 pid:2873  tgid:2873  ppid:2 
+>   task_flags:0x4208060 flags:0x00004000
+> Workqueue: dm-0_zwplugs blk_zone_wplug_bio_work
+> Call Trace:
+>   __schedule+0x8be/0x1c10
+>   schedule+0xdd/0x270
+>   __bio_queue_enter+0x32d/0x7c0
+>   __submit_bio+0x1dd/0x6c0
+>   __submit_bio_noacct+0x147/0x580
+>   submit_bio_noacct_nocheck+0x4de/0x620
+>   submit_bio_noacct+0x8f4/0x1a50
+>   dm_split_and_process_bio+0x8a1/0x1c00 [dm_mod 
+> 14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
+>   dm_submit_bio+0x137/0x490 [dm_mod 
+> 14a6a78a54cd51bfc1d6559d48b0c80b677774ec]
+>   blk_zone_wplug_bio_work+0x455/0x630
+>   process_one_work+0xe29/0x1420
+>   worker_thread+0x5ed/0xff0
+>   kthread+0x3cd/0x840
+>   ret_from_fork+0x412/0x520
+>   ret_from_fork_asm+0x11/0x20
+> 
+> Bart.
+> 
+
+
 -- 
-2.25.1
-
+Damien Le Moal
+Western Digital Research
