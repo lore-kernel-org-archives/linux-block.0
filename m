@@ -1,32 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE9B1E832A;
-	Wed, 18 Jun 2025 04:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1402F5300
+	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 04:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750221829; cv=none; b=EfO/IA1BmUocGCFl7tJ0gyV/HWSrd2+5aaqXBunO+XHuhguRY/EQkljWc+Rttk6PNraX3wEgPeZ60SbOlecwTdnT8A46UxT6VNbQNUvMV0qdYceRJSeeviuxd5C0cWOFiFIbhPcE1JIH2789p7e9hiEQggGTgDkQoz7L6fZywEs=
+	t=1750222774; cv=none; b=E9QtRFpaANz7zKxY1FyBqdfIz8frmT3b6+0eZzCowykx4xz9Go9p0iVpP64s3B0PtI8Fvv6rRqiAYfqTxIfwmeLuuhYbRbYOwjWMcfT7YYmyQHW7JSDBkz6+3tBjVXOd+JdOo8t/wj5bfXgfMnrTueMpYQOpfLshJv8rPpGJJME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750221829; c=relaxed/simple;
-	bh=AOQ86z9+nFnTXf57Z8R4fmoJUJmagNG7yIggknqNc0A=;
+	s=arc-20240116; t=1750222774; c=relaxed/simple;
+	bh=BnU97py2cQnOGygqw1rMhDx7wNIsRP4f3Tv47qAGlQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F34mPAJeYsfbRnSPFPdEpAL+eprd0raEhL46q8TKdxlXalDIpmihjmYFS4ahfyz9E9sA1jVEyQ+hyBTd25qTYgdVIYsSHE8IDwTrZfCIhd8xCJSUjSNLuEh8riOU2TfkRv6CI5ZNqlMRMtIC+WkP6kaGZRap+uhxp7ekN+NbFPg=
+	 Content-Type:Content-Disposition:In-Reply-To; b=p7d7k99tJQJToDNFhbbrW6r2jxWRXJPEje8HeSilO+p8R9bPp8QqYXx1sCtuxi+EJmExA7gfPC3+XD635JA9UEgv9xTjlmttWM8Rc3NQqqqbjTB28Bgi+WJwi0ANkcjMTA1OfaT65swy9IX4lyWHZ4vnpSFCRKFD54D6P5FZC60=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 68E6E68D15; Wed, 18 Jun 2025 06:43:44 +0200 (CEST)
-Date: Wed, 18 Jun 2025 06:43:44 +0200
+	id 52B9F68D0E; Wed, 18 Jun 2025 06:59:28 +0200 (CEST)
+Date: Wed, 18 Jun 2025 06:59:28 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev
-Subject: Re: [PATCH 10/11] iomap: replace iomap_folio_ops with
- iomap_write_ops
-Message-ID: <20250618044344.GE28041@lst.de>
-References: <20250617105514.3393938-1-hch@lst.de> <20250617105514.3393938-11-hch@lst.de> <CAJnrk1YOtCnAD2R5G1sYipG=aTkWBdYfm-F0iioV55sE5A_HYQ@mail.gmail.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: Increase BLK_DEF_MAX_SECTORS_CAP
+Message-ID: <20250618045927.GA28260@lst.de>
+References: <20250617063430.668899-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,26 +33,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJnrk1YOtCnAD2R5G1sYipG=aTkWBdYfm-F0iioV55sE5A_HYQ@mail.gmail.com>
+In-Reply-To: <20250617063430.668899-1-dlemoal@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jun 17, 2025 at 03:25:43PM -0700, Joanne Koong wrote:
-> >  vm_fault_t iomap_page_mkwrite(struct vm_fault *vmf, const struct iomap_ops *ops,
-> >                 void *private);
+On Tue, Jun 17, 2025 at 03:34:30PM +0900, Damien Le Moal wrote:
+> Since many block devices can benefit from a larger value of
+> BLK_DEF_MAX_SECTORS_CAP, and in particular HDDs, increase this value to
+> be 4MiB, or 8192 sectors.
 > 
-> Maybe you'll hate this idea but what about just embedding struct
-> iomap_ops inside iomap_write_ops?
+> Suggested-by: Martin K . Petersen <martin.petersen@oracle.com>
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>  include/linux/blkdev.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> eg
->  struct iomap_write_ops {
->         struct iomap_ops iomap_ops;
->         struct folio *(*get_folio)(struct iomap_iter *iter, loff_t pos,
->                         unsigned len);
->        ...
-> }
-> 
-> and then only having to pass in iomap_write_ops?
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 85aab8bc96e7..7c35b2462048 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1238,7 +1238,7 @@ enum blk_default_limits {
+>   * Not to be confused with the max_hw_sector limit that is entirely
+>   * controlled by the driver, usually based on hardware limits.
+>   */
+> -#define BLK_DEF_MAX_SECTORS_CAP	2560u
+> +#define BLK_DEF_MAX_SECTORS_CAP	8192u
 
-That would only help use with the first layer of calls, as that already
-"consumes" the iomap_ops.  So I'm not sure if that's really all that
-useful.
+While we're at nitpicking, maybe define this as
+
+	(SZ_4M >> SECTOR_SHIFT)
+
+to make it a bit more readable?
+
+Otherwise this looks good, the odd number was always rather weird.
+
