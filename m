@@ -1,81 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D1F2F532C
-	for <linux-block@vger.kernel.org>; Tue, 17 Jun 2025 23:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665001372;
+	Wed, 18 Jun 2025 00:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750202713; cv=none; b=Y5/0ijiUFEHR47YWm1YbqAlDx8gipDQB9XdUfrPm/t6B453iaoGmQfs9R5s6tNUXSaVSv3XkCxXgW4yBm7kb9C0BRb/J5oB0v4fpJnIQv1+dg2oZOYQmnJjVJJwfiqkQn3pdB6gdmYc0Fd2Z3BYkkHkKooIITS4moiZX7MXWINM=
+	t=1750205973; cv=none; b=Hqm1ulDmdwyZMxIMvEeXQIwJup/szlP5LqIWyPMCowm12mQJJQzoUjHrRqXSbTWZGsrMEXEQ/xwRaL1ex+m/e3YezhOu0BFRI24ZX9Qe2ufaoLwivsUaqmyBAyfsG2HPtS153fIM1snlfVWH7L0iMKQfznD4irzv9c8iIEy7zcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750202713; c=relaxed/simple;
-	bh=qqFswnpIxhYZQgewi5QxadeBTH00J2KIIOkErfxrV+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KPE4mDCcd88eNx5be8mtAkOtWLmSZSBiCR6iyZOsz6ctrOusAFSbZAFs0PFi5akkmXvFfSP8TsfBNC5FzByuwm5BokpGF70M88vlbcKbczdr10BzQiYCmO8G102Jc9HeJk9Jmjpgb+fZyxiopXdAmpfKeJFE7agm4xwtqmTqDUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i86wVHcg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750205973; c=relaxed/simple;
+	bh=icjYBfoK1conaL18TuKYZ97I3FET2WfZbndAKc8Ht6c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gr6ZUhopSLQRdaG4zwuJMd1lD7/AV7n3BXW0T5MSkkk1iTV0sHVqLvHT1rDYuMCzDHqjOuOsw7dIXpbJGs6/oKmgzp8ZC0pkJzZogEe3TBKNt7uXOuhOBC/ZAFV5tISPQfjgyAjoKuzSo5HNaB6cgQlZ9Qwoxkx0hopREGKpZKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=1gi0s1uB; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i86wVHcg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 641ABC4CEE3;
-	Tue, 17 Jun 2025 23:25:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750202713;
-	bh=qqFswnpIxhYZQgewi5QxadeBTH00J2KIIOkErfxrV+A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i86wVHcgdAqNEzrlwzGF2mkErWaNlK1OhryWPWbZ71omd+6A7vevw/Dn2hz850Rdk
-	 vHyQlXwtxpRVzENHvJeqxUJvJyAbPs6imrPnx9GdAgolw4mGOSrLtVJqUIJYfsK2ru
-	 WjsSUWs6QkgHvRJVuoNCuSkhYQ1EjDi4WtYwahj+mB2QNXbUGGtBpzaR3suOWDVANL
-	 xSqK/ZbvtRsJHIl6rsGFgs6K0NjoQzizqEU2tI+nfIpUP2tiBXDmnZ6O9TaA0I2JNn
-	 MNEz4P3N32uiTq+vNfhDoN9jFIariP8Rcr95ObyCND02D1ahf+mmUEEJOwAaigcFVh
-	 W0K9pD2KkhC0w==
-Date: Tue, 17 Jun 2025 17:25:09 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Daniel Gomez <da.gomez@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 7/9] nvme-pci: convert the data mapping blk_rq_dma_map
-Message-ID: <aFH5VXKwoWE3Eq5V@kbusch-mbp>
-References: <20250610050713.2046316-1-hch@lst.de>
- <20250610050713.2046316-8-hch@lst.de>
- <5c4f1a7f-b56f-4a97-a32e-fa2ded52922a@kernel.org>
- <20250612050256.GH12863@lst.de>
- <4af8a37c-68ca-4098-8572-27e4b8b35649@kernel.org>
- <20250616113355.GA21945@lst.de>
- <500dedd7-4e66-49d2-8c63-91d6a07f2e43@kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="1gi0s1uB"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bMPW62TgMzm1HbY;
+	Wed, 18 Jun 2025 00:19:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1750205969; x=1752797970; bh=5BDRtoaYC7pOiogJOv1dRMkx
+	6/Lvg6YOlAmKmtoA/xQ=; b=1gi0s1uBys4zPl/mezcHdVI7rz4kYCrUmq5aGeJT
+	wfRR0XxkLbqLUHmVe5D/uDB6HkbxIKSD4looZUDdeHs7Yh2gG9z82tJi6Z82O33I
+	z4ZKRIIW6M4OweJIqeVHt+INbYRDTw2bWPCJBlqCDTk4IRho+QSSdQQQY3PKKOwG
+	UZSlarZn+nyqNPOnioHfNTqSfcBiTvvXvRUaGJDKKbzPZQNXosVOnj6VX9R50j85
+	zg2YhpSn7BTsIAAzBQteISuyvl2gd9PtkaBVSb0EsejGBYrpYr4KJJC/QVCpH2te
+	jcAK4fP4QkW374cy8J0XRVSVpY4q53BWlvLSIDsaIkZskw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id G4JOddGAgTwZ; Wed, 18 Jun 2025 00:19:29 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bMPW21BPqzm1HbX;
+	Wed, 18 Jun 2025 00:19:24 +0000 (UTC)
+Message-ID: <23f31e20-e58f-44e9-b81f-18811ce5c19c@acm.org>
+Date: Tue, 17 Jun 2025 17:19:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <500dedd7-4e66-49d2-8c63-91d6a07f2e43@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: mq-deadline: check if elevator is attached to
+ queue in dd_finish_request
+To: Elijah Wright <git@elijahs.space>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250617205630.207696-1-git@elijahs.space>
+ <1e25d17b-f481-485c-85a6-d5a8440c1c96@acm.org>
+ <b2644203-b1cd-4bc9-9afe-bd0ae0390ae4@elijahs.space>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <b2644203-b1cd-4bc9-9afe-bd0ae0390ae4@elijahs.space>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 07:33:46PM +0200, Daniel Gomez wrote:
-> On 16/06/2025 13.33, Christoph Hellwig wrote:
-> > On Mon, Jun 16, 2025 at 09:41:15AM +0200, Daniel Gomez wrote:
-> >> Also, if host segments are between 4k and 16k, PRPs would be able to support it
-> >> but this limit prevents that use case. I guess the question is if you see any
-> >> blocker to enable this path?
-> > 
-> > Well, if you think it's worth it give it a spin on a wide variety of
-> > hardware.
-> 
-> I'm not sure if I understand this. Can you clarify why hardware evaluation would
-> be required? What exactly?
+On 6/17/25 3:52 PM, Elijah Wright wrote:
+> I see. would it be possible to detach the elevator from the queue in 
+> elevator_exit instead?
 
-This is about chaining SGL's so I think the request is benchmarking if
-that's faster than splitting commands. Splitting hand been quicker for
-much hardware because they could process SQE's in parallel easier than
-walking a single command's SG List.
+elevator_switch() is called with the request queue frozen.
+q_usage_counter is dropped after the blk_mq_finish_request() call
+returned. So what you described in your patch description can't happen.
 
-On a slightly related topic, NVMe SGL's don't need the
-"virt_boundary_mask". So for devices are optimized for SGL, then that
-queue limit could go away, and I've recently heard use cases for the
-passthrough interface where that would be useful on avoiding kernel copy
-bounce buffers (sorry for the digression).
+Bart.
