@@ -1,252 +1,231 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860FE21578F
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 06:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750229585; cv=none; b=nRFv5qP0J0jKvQ1vQIcbs7yPcXcSTInVG6IkqAkPqTBVeRDlcKP1f0/oZ6R5n/YjkhX76QoaKaEBS1FKt9ct4K3+Bymm6T90gSvDUMoJ0O22L0y4AvtCiICUFEXWoXp6ih0LJQkz9E/+PVSVtmPANp2C6wqUIvKurzkRmYigAxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750229585; c=relaxed/simple;
-	bh=DOcwZEafvgAuNd6TFzD+3qb27pMPrpxNx9N0oZReOE8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bszoo6jHKNSECIesdUk6V3gzliD+lZb77A7bf8OzAPNZP7YgqlW85csI92zOU0Aja6GhsN9CKO3bYtsu1NlSp9qzNKLcyDzWmmGpA/jsxVEwciSDGMYMTIVWM6zCwMHHlclMqQ8a3l2C/jtZoYwqkNu8qpo3ACaGZ8ROFn8aBB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V12eBzq2; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B8E27F01C;
+	Wed, 18 Jun 2025 08:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750235898; cv=fail; b=aZzRqDUf1V5IvhtL4E5QoVtGi3Bx20Tt4odOiMOOgor3i6hlUHag3TfWRmK1j3dpd3OU/zR9iHa7zp/C7MHs5HqblYl9hAtCJ4NF1K1Bf2Q/HmqqnpYPZvorSNJoP+m7MqDUPd51mgZLD8ELPhOs/MSonVW/uqQMDQlcp6hfSaw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750235898; c=relaxed/simple;
+	bh=e6x4pPWxXZM5vnYFXBEKzzpbnd0+jlijr0mD0FYlKZ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WHYhWRDeV1431tFvlA362mVJqhJp2P9KS3Xt/5KZ29f8ymYozKVVpi5UCP1f57ER2xXAP5zwDnopJyIsiLsc5xTMyN66/bSkAkmleaXo1r1gpLsQboer4RxbuyP9Z5WauROX/BOHz3kr5qv51YJQn1FSYfcxgSQTstzSEB7lCqY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=mjZaiz14; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=jNM3ZV+b; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V12eBzq2"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I3Kc7Z017100;
-	Wed, 18 Jun 2025 06:52:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mjZaiz14";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="jNM3ZV+b"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I7Godc006043;
+	Wed, 18 Jun 2025 08:37:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Wa3R9P
-	qLDfzCrYRB4n0xQG9X/FN4e8OpxOoFwf9pVNc=; b=V12eBzq2+7kxwBMpz6YTfr
-	7WKqBXpMoxn4zFm0UO/yJN2qVhhJsyE+HnDyDi18uNNQXg116bcU7VJQO81IDRYr
-	x1Q2/tW3DK/KHC9ggV0hb+5uOeojrfChDVPV1IC6d9ABCcyZSXMM3OspBrd2X0ja
-	DP2qQGSYOTNXPPyGB4gxRLKk8wmlaI36idOsPtSQ5RWyFWF3y3e5fzcSbrFPH4//
-	8a7ngGE4V0Sr1IEWvp317VTGz1BVe+ZvJQOE0yp1pBawmVa+vmFNiUNEI1JSY2SO
-	cOZ0vn8efPmie11PzaBx2DKPVmBBU9Mp3Sr8LWxW3GzJgXOGHpHIV4eUnuB2O2Tg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 478ygncuq3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Jun 2025 06:52:57 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55I5OLls014247;
-	Wed, 18 Jun 2025 06:52:56 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 479p42fa61-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Jun 2025 06:52:56 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55I6qnbc29622884
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 06:52:50 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F5A658062;
-	Wed, 18 Jun 2025 06:52:54 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8D1965805A;
-	Wed, 18 Jun 2025 06:52:52 +0000 (GMT)
-Received: from [9.61.55.75] (unknown [9.61.55.75])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 18 Jun 2025 06:52:52 +0000 (GMT)
-Message-ID: <085835ca-a2fb-4e10-82c2-3a7778431345@linux.ibm.com>
-Date: Wed, 18 Jun 2025 12:22:50 +0530
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=gk5iKLAaga/QtTUm/zseTShADYTBgfgA5BKSj/NP9ls=; b=
+	mjZaiz14cgnm68hhwLbAu9l6FU83Iu2gdVHTI+pBcfwqkT8+RosQFd+A0nNANbap
+	J//8GdnbppYVDQxO07SG/JnG8Ui7Y5yYNhSfyYGcwYzmdCNMLTP9H3jAkCDoxGxl
+	wqSucoBt3LeT0mhVq6/Ujkn+sVeUM6AodzUmTJJq/XZ4cLxhrHrE4K/T9ge1R8Ry
+	cKYc9D2C3jG2xAa8V2kC1KlxIA+fTmPIZ/qYtZLl3ozwr+eC46WXEO98UvkzydzP
+	6/UD2YdHEKPk1r+tRtU74nPn0M8bvcmvy9uHzfwvWFlH9jk7YoOMlaLhJK1uFtqw
+	n0wZfPB4a839YttFlaCQ3w==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47b23xtsx7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Jun 2025 08:37:59 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55I8bCND034444;
+	Wed, 18 Jun 2025 08:37:58 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12on2063.outbound.protection.outlook.com [40.107.243.63])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 478yha4as7-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Jun 2025 08:37:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KK6P3MjdWH9LRzDSM93LKjoo0GEKfSZXZQBCWRaEq+O/WQD05fXsR9G/mbiNVqhW/8ixSB0P4ftSIUx+a9ZyXqnp6ybgdFlg+I9aqCyXXIJ+y+7lm0TQ9MuMD0+nvoU55ngarqExOsOHrrvS58XDAqsFE1//xXyt2vpjCMREWkWZaVN9I4tF+Wb/pLtMZOuuV7QRcP3lcSsetES5CF8vRCNl2yuU/peDaRKuD5AGkcN8R074P/PGlr0wbMMil7Ajy7zPukxx5/6vVrgUX2AOd7oP3k581NLfqiDOwtaBo6MFkIh3WxH607JA6860SUz5sL1lgjs022/qoLxHkVJSmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gk5iKLAaga/QtTUm/zseTShADYTBgfgA5BKSj/NP9ls=;
+ b=vzmSHYrm3lGi9/iFs4gp2srt5GpbUpPbleSnh4YvmgWiSpYOzTrtBcdG5+E2ZaNwcYW3OCic0x4oBWrEUFQ+t39PuMQIE0eDhTjpXA3Vqww0NtULg2rr7PtDDJK/skM7MnY8iKSbPe5R9f5KUH2opdmqZZo8g/SUyH2NLYHWDmwwaQ5aqSelV8V8l0OEfMCpyNrzW45Z+rNbg1rdvZZmWXzV5rWZMpK1prQe187kVEYhkmL1jQCPSDd3pYGocs+guHi+NOWutUblObA2sg8TdmIUgy9Kq6zs6OE6nPQigv5t0dFQn69QZMNkdsYwsd5IAvxEC2awcoGkbT/Eoyc6JQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gk5iKLAaga/QtTUm/zseTShADYTBgfgA5BKSj/NP9ls=;
+ b=jNM3ZV+byMBFm/3kP9g9yvMXFmhX4Qq10OlOPbYViByNd5vMMx0jQposK2yTys/+V54yQzadpAOOCJaZRgGY0PUkXLfn1xxaIkzgr5KI6elleN5/x2pPNzgi+gbFXJsKwqyNKtmHityb6UtVfzVxKvWcmL9YbJePFtCnvOFf4/Q=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by LV3PR10MB7769.namprd10.prod.outlook.com (2603:10b6:408:1b7::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Wed, 18 Jun
+ 2025 08:37:57 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%6]) with mapi id 15.20.8835.027; Wed, 18 Jun 2025
+ 08:37:57 +0000
+From: John Garry <john.g.garry@oracle.com>
+To: agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
+        yukuai3@huawei.com, hch@lst.de, nilay@linux.ibm.com, axboe@kernel.dk
+Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        ojaswin@linux.ibm.com, martin.petersen@oracle.com,
+        John Garry <john.g.garry@oracle.com>
+Subject: [PATCH v2 1/5] block: sanitize chunk_sectors for atomic write limits
+Date: Wed, 18 Jun 2025 08:37:33 +0000
+Message-Id: <20250618083737.4084373-2-john.g.garry@oracle.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20250618083737.4084373-1-john.g.garry@oracle.com>
+References: <20250618083737.4084373-1-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0141.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::26) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 2/2] block: fix lock dependency between percpu alloc
- lock and elevator lock
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        sth@linux.ibm.com, gjoyce@ibm.com
-References: <20250616173233.3803824-1-nilay@linux.ibm.com>
- <20250616173233.3803824-3-nilay@linux.ibm.com> <aFItNzzr-4iQbjyY@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aFItNzzr-4iQbjyY@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA1NyBTYWx0ZWRfX+iPhIDvpYbDd B0bM8XLql/pKwi0SG2EQLBn543iOVKOiWeLoftQ/szuOJUkC+wpPoV61gtgIb3U7GkzaMxg/lO+ Uympwy/COysNRIHdrcqHsurEs9KyG04qgTczZInkI8yJdiVjVS9I12toxqS38zOebWoxDixy4ag
- ssqndD+QWrEfF8pW3SgZrt0t3+1Yzh+43phPsquVP9eNcWXMuKHPdhkXYnDo/JId/6JwFK85ahS Iroh8RYBNcj3qTc+aVNhNE8pLwVUeoUqI4Cq9jwptMhQemSRVgoJwZwVlgZdyCP8qQWVpY+NuMA v9gjcgXWZzJFkyrdWLNMVRPxYUucAwiMSNhGxJZXTu+DFPsEkgwfUhr7Ncgm+aYj/cjt01KopwT
- n6XnuYLkloJOTALq2ztu/9v+TqiqizfUXHWjijG3Fqe0LXd+dVVbqATrtezoifOSiXJCF0Gd
-X-Authority-Analysis: v=2.4 cv=fYSty1QF c=1 sm=1 tr=0 ts=68526249 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=kIOJ_G1Yg4J84UdusMsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: Y7Y9GPC1cf2SwTWnhImz88ufu99bwdDf
-X-Proofpoint-GUID: Y7Y9GPC1cf2SwTWnhImz88ufu99bwdDf
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|LV3PR10MB7769:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87f9d9d4-b0ab-4bda-c80d-08ddae436ccb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/964nOelBHAEwadgoeJthrfCUuCYsrsXAwRAm12QGIfOEPp3KHRI4SZXP3HP?=
+ =?us-ascii?Q?lN1ZNma1GB64q0jmzZG9gpyC6xJmfGivpIZJxDC+lkp0qsgK83nWlOl6I8bS?=
+ =?us-ascii?Q?rilRA/Q4h4f2Vzw1S6QIp/HiwZ6ygl0gJ6O6Evdk0E7ryvHLZ2WqzcO+zafN?=
+ =?us-ascii?Q?B0dMLBY4XHhYsx7BZYkHm1QmTD9h3MB8WhLj/abG7AOvttjRyqU3RgkTNB86?=
+ =?us-ascii?Q?RRL/fWoqrRv3U4IUS3J0HozZGYmuI+yNWKKWzLNIv2MxqThNQgqSOiwlN9Pg?=
+ =?us-ascii?Q?pP/20ETSqkerzk6M/IdI0f0moY5P1UagDuLE/6zCwQz2cXNAuEq5hztkY64H?=
+ =?us-ascii?Q?PVos4XyLKl3togsqeWGX4EY4REWqdJmRjERxe3x2Q0PuFwW2Q2ebMwsD2jVC?=
+ =?us-ascii?Q?Dczcc6DvdhoLDFgeUVpnyo7od3YGL/T9onWkfjwRirBwbF5Hh38iI70bpSbw?=
+ =?us-ascii?Q?U7UbF58rfrMSkCpmwMaYYV9fQLUgcNVpJlUDoMg8AHq1lBhi9nh12XNtNZuk?=
+ =?us-ascii?Q?PS0bqH6OPIN5Htp1pVkxqTKQuZSKYWWqARPqXbq++vod7l5EAOhJqFsrft+u?=
+ =?us-ascii?Q?soKCh8Wok6U18C0cUK/b7q6buPMe55HJCaorknjcy4nZx7Y/Yh/nuaeNDree?=
+ =?us-ascii?Q?S18o9NqUpzL2T8BHRtEGP94d8PJSiQPreZKXfVnT0k5SnxAdBjSmmyaSghqo?=
+ =?us-ascii?Q?ptgCjqR90fr99yjgBUiWp6FiLj7NRX4kimTyBsMRjrZmhV0CCKFME1hHYjiv?=
+ =?us-ascii?Q?3UnChKr20NZIs4Y+qLf5XWy59h8e3Yh+m2pMCBj/6Grkcnbqv2vVebyrZOSy?=
+ =?us-ascii?Q?+4XfnOEOVG6SMPDvtQKVjm3pXXEF3I/MXe1U1Q7iymzixfiA9XToRiiMxqYs?=
+ =?us-ascii?Q?f729/fZyG1qeu4OKY6s6gs9wBJBSzHD1OMWTfdf7acIihVEDBqBBm9fPGd64?=
+ =?us-ascii?Q?2lkB9aVLJwRRhU53+1vmIGmmmQacV2oKhG3p340rU03h74Y0IU0ntB1ZFXnS?=
+ =?us-ascii?Q?otCPMK97JyZeoMzvDqIVX4Xqi7lXKfXu/nVWGuXMjKxUX6Srndl6PRD3Kkax?=
+ =?us-ascii?Q?jBEf62lzdIhXs3Ot+MAHnPjN6UFykSXL0mJYG6SVsixR2EUNDCWbSjZqd3hV?=
+ =?us-ascii?Q?y/3FCshwWP86OOF53p7meP+42/uZLfb1dnOrlBYTyCcma0gbOJ1NfdnndaRG?=
+ =?us-ascii?Q?RN7Bvy3ExfcnGbk5H07aKo0edHu9cJ1ovYBOJ+c2Tb3nvlpFC11tybFbyNHU?=
+ =?us-ascii?Q?OK3p9y3X2KaUQiivq4zpJoSoUUDRq/wXrx49JaQ/zZBJzTV/tQMeVG9+sRmo?=
+ =?us-ascii?Q?wnONMKafkImEbU/Zn4MRccpTAsdOt14um7+qpreFkUk7rarjPKpVwYrhKhJ5?=
+ =?us-ascii?Q?NOIMQj3lLV+dMbEXmAs9UHThy/FS6QDXJtq/AG7RCJfw9ptDTGLnAC7lU8aY?=
+ =?us-ascii?Q?7A/NXAd8Ank=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ssh6X+ICJSatdI9r7PBZ/SSsyqmRzYrs8wcGTjcJsejtD8edza4qfZFxRpWG?=
+ =?us-ascii?Q?Pk1d1/ZpGPIyH1koOP40PVuQ8obFLpUauKNdC5bc0KlotDiDJnIauBdR8MiT?=
+ =?us-ascii?Q?lZ32corjdqhX25tiD4WPP0R2/GjYoOyzSsjHNl/kISImm272GkMVwoPj1lmh?=
+ =?us-ascii?Q?DX4Ln0Twp8tV0SLkEQLKsEL7Hmt5C+fweSBO+u2Nk81lR+8nkI5fYLSlNizS?=
+ =?us-ascii?Q?5/pn67eWNzEF8Lbe02vVoVYiKBSyC+Io8CIhC+/H+16VzXQtcfpbf6HUKKbH?=
+ =?us-ascii?Q?jGKdEaVhn5c3tvZIz/edoJbVgFwtEqskpZmFMWE3ZL7QkqpRjM65l7onKMPM?=
+ =?us-ascii?Q?ngeFtWvnVLuOmaf88rpYB+2+DUeApjOcCby5ZnHBFGFUuERWkaxSb8hKZly4?=
+ =?us-ascii?Q?lRw5Ck2F4tQaQlA8HXhzm4CXGbUv06sMyFjA9qBnoI8FcWd95ctzUg1cr8B0?=
+ =?us-ascii?Q?dUA3/ahy8ZmoyLMdd2wOuRNp61uKNa7K9EDYG2fRx0pmM+CLMA0vJ61GFzEN?=
+ =?us-ascii?Q?LrSVaV6UTDNt5HBia3ImR41RGQgr4Ard9TVxanE0fCsqm3bmJi/9pbgDC0yF?=
+ =?us-ascii?Q?x0sBgZF3eMn04OjB/1m0WIhHdjBDTBo7KS+kPqWnQOMdD5R36NMhuLK6Iw4W?=
+ =?us-ascii?Q?QDdX1b9zsRvPVRrmtvzLkRZdURnZZAqEGLz8TkYU78cxIJKCbLw00Wh/tCeP?=
+ =?us-ascii?Q?P4a6OZ69WZzBsvTfh2xh4OTx4ovOfYAA67qf77Im3VAkjUbp35mmZMaGvtMr?=
+ =?us-ascii?Q?+1k6zYE/+zDzLfAjUbpAMQagjS28/Ad29IIGDn5VvLgv0YmwUNCAmoUYptnm?=
+ =?us-ascii?Q?J7HfcVUOyTlRVB1jlEoY0qKTo2o3+P6zatKqHn0qprisVQUiQ36Wgoo0ZPP2?=
+ =?us-ascii?Q?87IflPLy5jlEHMfszgDdzWC86BXHVWPNJ4OPKqeiKx4VRReIIM+Thvt1EU07?=
+ =?us-ascii?Q?bBZ2LipwiIW3n3efkOvVPQFoR26hil+KvzWutPStHy9mkS6f9jEnW+Ayr0yQ?=
+ =?us-ascii?Q?zvEFZinE7eHh+B2Eg9QuUkMKO2nNmgoJccwHUAZUjqf19mibQE9Kl4QViuyc?=
+ =?us-ascii?Q?mgaDztp5zTmKUXd98nMdZ//Auq08Os5IOUVFG8L1m0g3Z2EE4yed9EffJQBT?=
+ =?us-ascii?Q?3K/iU54ckqx+jSvdS7DDLAG/cfoE8sIYAmuG0+1+rLyRknBGAytZi+Pdr3Be?=
+ =?us-ascii?Q?9E/Od+/ZImBmRBBw8NLbViZZkrnUIMgDzIeUCsPAUdXUPat+folAwS62+8A9?=
+ =?us-ascii?Q?BAdqDXGFAnS6Jg2hUmdkSRfs85OH2TOtB5Hqi37hSQM+psPDxlHImzndUmrP?=
+ =?us-ascii?Q?Jpr8I5L+NoWLYMY8oTcuwn30nIl/ejGzjpyBzFnEG9VMFBs6JqR2APhZ1zcj?=
+ =?us-ascii?Q?G9C3khn23LCTL3grjVhdHuJpQn2lEfedFkyCs9X1gVfJpZREeIbtnujgdUjQ?=
+ =?us-ascii?Q?eCxyW5oEj7RGbUVjca4XWeaztD7Ursm3OBUxe/SoTMs1nzvTf/i3Dx2B+w2W?=
+ =?us-ascii?Q?bHdO2+O9HHRG7BP3sdHrX684Bgj+1mf2BgpqR+CtQyLKLL0I+8CHhyhrZu+l?=
+ =?us-ascii?Q?kn7grZBBh3qzwmgYUB45VASKs9utExBy/5bz3gIOSVXOIDsdQ9wi6h88aBRO?=
+ =?us-ascii?Q?nQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	uVvYqDvPp0GbouWqwJEE1voOEd/0nGZRempX1cju/AwzC+CtAuYvfsM+vAy3WWy1VbfvmVYuaGkex7UTmdonfCu2BW8kYST1h2a+91GZ/qPj3ljon1OArjaDs5bZrJCVYDqzetx9cLGnoz8Q4hdpgjSkXK0OEy4GaaEheSYwQgfXROCO8oO+iW1jFGi7Aa2gva94fCsTn98+AQ5QuEqWtH9sFjFN0n4AzihkWJ9nNBWW8o1w+XROl/i1tooQfLVsimaQpgrxGbE/BSXgC1pUQkJbrXZJQQLVRLKP9uHxXXhhR/BL5lggZJ3tNK6urVpMcgPw0oLy2dLDwCla+6pqI2BKsi4GzUuvFcywRmBtO+tuv34+ygAjyTQ5QnsOXBMhpVbtPC/RlA2/1bY6ZQn3n3XV64EUG5gs7Ja5/zxxB+MNs0onOIUpgJ5JnrcrOb/tOoVeKDJojHzQNzgfoPtkDM6rsGe7Brb/YvP0WJf3nUkkqr77CpdWprwy4ExCyVoITFNdaIjMDoUQdi1gaQcxp/JJoyRfSP1ozXgVZNROggSASg8STrvAdSxvqhbw4Jh5Xewpgj9OgdbIZ97JSzkOz6/m/ug+XobaF1yqjKBsiWM=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87f9d9d4-b0ab-4bda-c80d-08ddae436ccb
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 08:37:57.1096
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6Z0cjPxoKg8gyh8cmY499eHFjhMnnE68rcFRRSnerakoPC9NovNn6iCVWHr1/zUW6wkz+/xdfmym0dOlns4gWw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB7769
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-18_02,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 phishscore=0 clxscore=1015 priorityscore=1501
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506180057
+ definitions=2025-06-18_03,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
+ malwarescore=0 adultscore=0 phishscore=0 suspectscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506180073
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA3MyBTYWx0ZWRfX/9MFbkmQGh0D 4zUZ6pvl5uXAhsc7B4IdXNmG4QhIWrnFbQXTl7NDyoAn3sg3rox39ktVzgfkEJvkU/dKzK/1OcC TtrgYTOLyXkioqPZOUf88hHTCEo+N51UD3kxKgSDwPiebDn5AvHJ4TaqaCAEmUjiI4o5WTdqndd
+ JeXxwedv0OqUwQ8A5IEKk/1PBXjvth1wC/K0ljBMbBv9SBvCHpNQtkqCRuKugJ0gwnnMHii6zvb QdBLLTooo00xWCQXvjotyjNFfHjDlsRxlGjS5zrqlhLN1LqNA2oaSYUTjk2xD4C2asuIvvJx5rE /2CgfzEyfn2o44y7DrXlgJRgqPIZgqj5sZM8QE6B6NHun7PDhiu9ZphAlyqGLgBtZLD0ZXl+BeM
+ dufLD1L7HPnEvPQRiK0r4WoTVhILECGk1grZDOWKW9yI99c6uZ1Yv23YyQYlMXnEzwrAVLDP
+X-Authority-Analysis: v=2.4 cv=DM2P4zNb c=1 sm=1 tr=0 ts=68527ae7 cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8 a=DqzVqx8i_IFAgmWpyL4A:9
+X-Proofpoint-GUID: xi7thNPY0QS7HDXqA2XF8S9xDihOXR7s
+X-Proofpoint-ORIG-GUID: xi7thNPY0QS7HDXqA2XF8S9xDihOXR7s
 
+Currently we just ensure that a non-zero value in chunk_sectors aligns
+with any atomic write boundary, as the blk boundary functionality uses
+both these values.
 
+However it is also improper to have atomic write unit max > chunk_sectors
+(for non-zero chunk_sectors), as this would lead to splitting of atomic
+write bios (which is disallowed).
 
-On 6/18/25 8:36 AM, Ming Lei wrote:
+Sanitize atomic write unit max against chunk_sectors to avoid any
+potential problems.
 
->> +int blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->> +			    unsigned int nr_hw_queues,
->> +			    struct elevator_tags ***elv_tags)
-> 
-> We seldom see triple indirect pointers in linux kernel, :-) 
+Fixes: d00eea91deaf3 ("block: Add extra checks in blk_validate_atomic_write_limits()")
+Signed-off-by: John Garry <john.g.garry@oracle.com>
+---
+ block/blk-settings.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Yeah lets see if we could avoid it by using xarray as you suggested.
-> 
->> +{
->> +	unsigned long idx = 0, count = 0;
->> +	struct request_queue *q;
->> +	struct elevator_tags **tags;
->> +	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
->> +
->> +	lockdep_assert_held_write(&set->update_nr_hwq_lock);
->> +	/*
->> +	 * Accessing q->elevator without holding q->elevator_lock is safe
->> +	 * because we're holding here set->update_nr_hwq_lock in the writer
->> +	 * context. So, scheduler update/switch code (which acquires the same
->> +	 * lock but in the reader context) can't run concurrently.
->> +	 */
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->> +		if (q->elevator)
->> +			count++;
->> +	}
->> +
->> +	if (!count)
->> +		return 0;
->> +
->> +	tags = kcalloc(count, sizeof(struct elevator_tags *), gfp);
->> +	if (!tags)
->> +		return -ENOMEM;
->> +
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->> +		if (q->elevator) {
->> +			tags[idx] = __blk_mq_alloc_sched_tags(set, nr_hw_queues,
->> +					q->id);
->> +			if (!tags[idx])
->> +				goto out;
->> +
->> +			idx++;
->> +		}
->> +	}
->> +
->> +	*elv_tags = tags;
->> +	return count;
->> +out:
->> +	blk_mq_free_sched_tags(set, tags);
->> +	return -ENOMEM;
->> +}
-> 
-> I believe lots of code can be saved if you take xarray to store the
-> allocated 'struct elevator_tags', and use q->id as the key.
-> 
-I think using xarray is a nice idea! I will rewrite this code 
-using xarray in the next revision.
-
-> Also the handling for updating_nr_hw_queues has new batch alloc & free logic
-> and should be done in standalone patch. Per my experience, bug is easier to
-> hide in the big patch, which is more hard to review.
-> 
-Sure, I'd further split the patch in the next revision.
-
->> @@ -676,11 +690,16 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
->>  	blk_mq_cancel_work_sync(q);
->>  	mutex_lock(&q->elevator_lock);
->>  	if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
->> -		ret = elevator_switch(q, ctx);
->> +		ret = elevator_switch(q, ctx, tags);
-> 
-> tags may be passed via 'ctx'.
-Hmm ok we can do that. I will add @tags in @ctx.
-
-> 
->>  	mutex_unlock(&q->elevator_lock);
->>  	blk_mq_unfreeze_queue(q, memflags);
->>  	if (!ret)
->>  		ret = elevator_change_done(q, ctx);
->> +	/*
->> +	 * Free sched tags if it's allocated but we couldn't switch elevator.
->> +	 */
->> +	if (tags && !ctx->new)
->> +		__blk_mq_free_sched_tags(set, tags);
-> 
-> Maybe you can let elevator_change_done() cover failure handling, and
-> move the above two line into elevator_change_done().
-Yes precisely I thought about it, but then later realized that 
-elevator_change_done() may not be called always. For instance, in 
-case elevator_switch() fails and hence returns non-zero value 
-then in that case elevator_change_done() would be skipped. But 
-still in the elvator_switch() failure case, we'd have allocated 
-sched_tags and so we have to free it.
-
-> 
->> diff --git a/block/elevator.h b/block/elevator.h
->> index a4de5f9ad790..0b92121005cf 100644
->> --- a/block/elevator.h
->> +++ b/block/elevator.h
->> @@ -23,6 +23,17 @@ enum elv_merge {
->>  struct blk_mq_alloc_data;
->>  struct blk_mq_hw_ctx;
->>  
->> +/* Holding context data for changing elevator */
->> +struct elv_change_ctx {
->> +	const char *name;
->> +	bool no_uevent;
->> +
->> +	/* for unregistering old elevator */
->> +	struct elevator_queue *old;
->> +	/* for registering new elevator */
->> +	struct elevator_queue *new;
->> +};
->> +
-> 
-> 'elv_change_ctx' is only used in block/elevator.c, not sure why you
-> move it to the header.
-Oh yes, in the previous version of this patch it was used outside of
-the elevator.c and so I moved it into  a common header but later in
-this patch I missed to move it back into the elevator.h file as now
-the only user of 'elv_change_ctx' exists in elevator.c file. I will
-fix this in the next revision.
-
->>  struct elevator_mq_ops {
->>  	int (*init_sched)(struct request_queue *, struct elevator_queue *);
->>  	void (*exit_sched)(struct elevator_queue *);
->> @@ -107,12 +118,27 @@ void elv_rqhash_add(struct request_queue *q, struct request *rq);
->>  void elv_rqhash_reposition(struct request_queue *q, struct request *rq);
->>  struct request *elv_rqhash_find(struct request_queue *q, sector_t offset);
->>  
->> +struct elevator_tags {
->> +	/* num. of hardware queues for which tags are allocated */
->> +	unsigned int nr_hw_queues;
->> +	/* depth used while allocating tags */
->> +	unsigned int nr_requests;
->> +	/* request queue id (q->id) used during elevator_tags_lookup() */
->> +	int id;
->> +	union {
->> +		/* tags shared across all queues */
->> +		struct blk_mq_tags *shared_tags;
->> +		/* array of blk_mq_tags pointers, one per hardware queue. */
->> +		struct blk_mq_tags **tags;
->> +	} u;
->> +};
-> 
-> I feel it is simpler to just save shared tags in the 1st item
-> of the array, then you can store 'struct blk_mq_tags' in flex array of
-> 'struct elevator_tags', save one extra allocation & many failure handling
-> code.
-> 
-Yes sounds good! I will send out another patchset with above 
-suggested changes.
-
-Thanks,
---Nilay
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index a000daafbfb4..7ca21fb32598 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -180,7 +180,7 @@ static void blk_atomic_writes_update_limits(struct queue_limits *lim)
+ 
+ static void blk_validate_atomic_write_limits(struct queue_limits *lim)
+ {
+-	unsigned int boundary_sectors;
++	unsigned int boundary_sectors, chunk_bytes;
+ 
+ 	if (!(lim->features & BLK_FEAT_ATOMIC_WRITES))
+ 		goto unsupported;
+@@ -202,6 +202,13 @@ static void blk_validate_atomic_write_limits(struct queue_limits *lim)
+ 			 lim->atomic_write_hw_max))
+ 		goto unsupported;
+ 
++	chunk_bytes = lim->chunk_sectors << SECTOR_SHIFT;
++	if (chunk_bytes) {
++		if (WARN_ON_ONCE(lim->atomic_write_hw_unit_max >
++			chunk_bytes))
++			goto unsupported;
++	}
++
+ 	boundary_sectors = lim->atomic_write_hw_boundary >> SECTOR_SHIFT;
+ 
+ 	if (boundary_sectors) {
+-- 
+2.31.1
 
