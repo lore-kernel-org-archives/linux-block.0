@@ -1,90 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634B97DA6D
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 05:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB9013E02D;
+	Wed, 18 Jun 2025 05:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750223482; cv=none; b=FaYkzxrWG3HjN8ruRnjPoPP/om17L6tpaCMcwBLxYvVI+Gds4Zo9bdNuMzNLo+6ab0BOXGDe/95RuWHz44Z6fyw8nytIkCaZY8QNdROXSY8OzeH6YMey4L8S1lp1e/hHYwCR4U6TkY6lPO/XGpPn2TCokJ8ZZ5EEkMZpy0qavNU=
+	t=1750225491; cv=none; b=LAjqsl52dFs6De076F6k40d8un2uG4PjNC7c3UUbjP6fjS1tFiE3hqbGPVD04Yxcow1DJYHk+NeaCd4I2GEYly/mp5YoUHiijiiUGxUOCKSPLPrSBWAyUn5x3jh+3+4Z9F7V4ZHnyWZNMwP1wDTjbwItFeGMXGdRp9ex0UKLHlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750223482; c=relaxed/simple;
-	bh=m1vrQHbjhVWKdhWyeUocfEzuVoRyPnOaZTV0CkY5kJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SvR7GlvWEYni58PJV4YTnIA7knKOTXIMNgfSUaxRw6PM5Aa6DavC7JWMeSH05hmAxChUGVE5La2269eL6Nd5R8mxJ3SxETB0HEPkWLgN5k+viiqe4z3JpVy0NdK1qRTh/Q7Q/bYFZx8pgQ5JskFaEgFy1mbvOxdWRDDpEQeY7V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RWlFtOGu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWlFtOGu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60443C4CEE7;
-	Wed, 18 Jun 2025 05:11:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750223482;
-	bh=m1vrQHbjhVWKdhWyeUocfEzuVoRyPnOaZTV0CkY5kJU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RWlFtOGuzzMsZSlZ/gOYRbINrNsemYfP5QR8+PNubAPGQlhEt2utvCERFfYLnkyYs
-	 +nQ+b79osIPqJNmbdlzWkQ3/Bjo8yQYRz3UOd0VYqrErB30L6Uq/yZxNGbmnB2TI+S
-	 1XHjBG6HElVhlMQ6YgBTNn9MkWv3j1FzVjMFsBRRMOSlq3CnSkQODR5e6JRJLUxb6o
-	 D18yUZmVO9NJoZn+F7smxRsSR1Nv0WVAIDJ3TJc8Gp9f7p8DwhPDUtM8qbCqYaktw3
-	 OXOzNbKPJlKa7/CrYaXunyHsFDx8zy4zdB1DksYqx92xtirVyVsZK+JgulzkZ78hTC
-	 /ZvOTugUIpHeQ==
-Message-ID: <d23b7e4d-3678-4b04-9427-778557275979@kernel.org>
-Date: Wed, 18 Jun 2025 14:11:20 +0900
+	s=arc-20240116; t=1750225491; c=relaxed/simple;
+	bh=oqbCLNf9FDlc1EYgqNMbz+08gM+1Nm+dhYlBy1mdxJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r9gsMXZ/QCEEmznqqfKy/TvpfR8qj6twfR95S0WaFOSSc3ai4Yf84frKAeBAWzqgsW1zmaNW9vb8s6ZQsjDVMDh6QDuhRJpxav8LaC1cCYnqe0MDSe96HrHAV58Syo8smR+XRsw1+kSQPwVAa5a0wrwLhkEeNvniFhYTBG+Bu64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1304268D0E; Wed, 18 Jun 2025 07:44:45 +0200 (CEST)
+Date: Wed, 18 Jun 2025 07:44:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, "Ewan D. Milne" <emilne@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH] scsi: storvsc: set max_segment_size as UINT_MAX
+ explicitly
+Message-ID: <20250618054444.GA28826@lst.de>
+References: <20250616160509.52491-1-ming.lei@redhat.com> <20250617050240.GA2178@lst.de> <aFEYYSCREiCMGBAH@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Increase BLK_DEF_MAX_SECTORS_CAP
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20250617063430.668899-1-dlemoal@kernel.org>
- <20250618045927.GA28260@lst.de>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20250618045927.GA28260@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFEYYSCREiCMGBAH@fedora>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 6/18/25 13:59, Christoph Hellwig wrote:
-> On Tue, Jun 17, 2025 at 03:34:30PM +0900, Damien Le Moal wrote:
->> Since many block devices can benefit from a larger value of
->> BLK_DEF_MAX_SECTORS_CAP, and in particular HDDs, increase this value to
->> be 4MiB, or 8192 sectors.
->>
->> Suggested-by: Martin K . Petersen <martin.petersen@oracle.com>
->> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->> ---
->>  include/linux/blkdev.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 85aab8bc96e7..7c35b2462048 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -1238,7 +1238,7 @@ enum blk_default_limits {
->>   * Not to be confused with the max_hw_sector limit that is entirely
->>   * controlled by the driver, usually based on hardware limits.
->>   */
->> -#define BLK_DEF_MAX_SECTORS_CAP	2560u
->> +#define BLK_DEF_MAX_SECTORS_CAP	8192u
+On Tue, Jun 17, 2025 at 03:25:21PM +0800, Ming Lei wrote:
+> > @@ -473,7 +473,9 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
+> >  	else
+> >  		shost->max_sectors = SCSI_DEFAULT_MAX_SECTORS;
+> >  
+> > -	if (sht->max_segment_size)
+> > +	if (sht->virt_boundary_mask)
+> > +		shost->virt_boundary_mask = sht->virt_boundary_mask;
+> > +	else if (sht->max_segment_size)
+> >  		shost->max_segment_size = sht->max_segment_size;
+> >  	else
+> >  		shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
 > 
-> While we're at nitpicking, maybe define this as
-> 
-> 	(SZ_4M >> SECTOR_SHIFT)
-> 
-> to make it a bit more readable?
+> This way works, but I prefer to set it explicitly in driver, instead of
+> making block layer more fragile to deal with def ->max_segment_size
+> if ->virt_boundary_mask is defined
 
-Sure thing.
+The block layer already enforces this as it is a requirement.  It is
+just the SCSI wrapper that broke it.  Without this proper fix iser
+is still broken, and srp might or might not.
 
-> 
-> Otherwise this looks good, the odd number was always rather weird.
-> 
-> 
+> - for low level driver, if ->virt_boundary_mask is defined, ->max_segment_size
+> should be UINT_MAX obviously since it implies single `virt segment`.
+> Setting UINT_MAX in driver has document benefit too.
 
+No, it doesn't.  It means you need to cargo cult copy and paste code
+instead of solving the problem in the proper place.
 
--- 
-Damien Le Moal
-Western Digital Research
+> - for logical block device(md, dm, ...), both ->virt_boundary_mask and
+> ->max_segment_size may be set, and it is fine since logical block device
+> driver needn't to deal with sg
+
+Stacked devices should not inherit the hardware limits at all because
+we split below them, but that's a separate story.  Either way this is
+not relevant here as we don't have stacking drivers that use the
+SCSI layer.
+
