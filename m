@@ -1,298 +1,166 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A692EE96F
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 15:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C13E2ECD17
+	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 16:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750259364; cv=none; b=REV1NtDP7v+iCcbrsvu3FPfLKMFUSHjOavNX+STcHw+Pa8GV4+gYzzojoXUjwl4qXwtB4y0LhnjHckIso+6ObyNnrwZE3891OImTTKFASTXZeQrrYlTmM2o/reClqVAbEKVpVrxcGleFZ4w8/HkcHdZLty/Jsq/F6J7OcVj+EbA=
+	t=1750263942; cv=none; b=DQAkvgLyL0uIc3lc/lI9AGSO3fNtuPOiZwEPbhdBYAQLoSQzTG9EFd4H90txHok1L1aIo1nYF+hfHL2I4iy874Dzv0L4V7jWG9gzafrDqsNFkMHTgI2QG4Frt505ubYCg1S1+GT/blwBS0j5w+f7YVYVT6f9RCEOPkzDZOnhvFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750259364; c=relaxed/simple;
-	bh=14NkrdCvY4Q+niLTtoWL/AKOSwBfwwX+l9rdMrcK1To=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/10SYGN6u2GYTYElny2J+PjmO6SkVHwyn2R/byglfg5R2fM1Xt0p+/28pses3jA6my0d9DrDFaxKgkbCuqnmRDpAxHS6oKGZiGVdkWMyLiyDQb7k0FALZV2/3riaBjlpoie31NmPaP/SeJEOqZFFmU8azEDpWV9KDf8IZSFpH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OprzOL3a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/BFOemFf; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OprzOL3a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/BFOemFf; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1750263942; c=relaxed/simple;
+	bh=ShRjdsaq0YSJizLisN8l/yg/jEDPS2vZH5tSHQicCvs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m3TGBeTAXOFdBTearn/VHEqjqcEhcIjUqJF6ioGFIEiEzfXTTsamGdXeVR6Q4axu98BO+1xeJEyqUzcSx8k3Yrl6Hp9RqMCM1CAOY8zuF443B2vVC/R9ql/jgdDXg+2zlvIxvWz3G4EetlVZfNvI7hE18FXXww3nWhIvatWlhIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DF5TRUd3; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OprzOL3a";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/BFOemFf";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OprzOL3a";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/BFOemFf"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A26A71F7BD;
-	Wed, 18 Jun 2025 15:09:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750259360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vh+iX7MhwALae2lZDksDfr4ypQNbatZuhDTjeHvZ7Ag=;
-	b=OprzOL3aQabJ3cVXBphetiBXANxXnQtDkBqiKxuqa+kk5vrRjX1VH/nf7iIiR6/J35y9MD
-	NG2zHs/N1Ds3/ST9uuXRECGajFGKQysWbbc7/OJhonOk66+YP9D/NvZRNyQwEGoLPSuBA5
-	Z+fzz21HewgvQieAVsm+oKUCUAKsayg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750259360;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vh+iX7MhwALae2lZDksDfr4ypQNbatZuhDTjeHvZ7Ag=;
-	b=/BFOemFfOT2i+ydDSEaQ0hN2f/93EctAZZz39XCDvf2nipTh+aFWmdIujpwu5LsHS5d/lt
-	YGXt0G2bZILwMJAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=OprzOL3a;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="/BFOemFf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750259360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vh+iX7MhwALae2lZDksDfr4ypQNbatZuhDTjeHvZ7Ag=;
-	b=OprzOL3aQabJ3cVXBphetiBXANxXnQtDkBqiKxuqa+kk5vrRjX1VH/nf7iIiR6/J35y9MD
-	NG2zHs/N1Ds3/ST9uuXRECGajFGKQysWbbc7/OJhonOk66+YP9D/NvZRNyQwEGoLPSuBA5
-	Z+fzz21HewgvQieAVsm+oKUCUAKsayg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750259360;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vh+iX7MhwALae2lZDksDfr4ypQNbatZuhDTjeHvZ7Ag=;
-	b=/BFOemFfOT2i+ydDSEaQ0hN2f/93EctAZZz39XCDvf2nipTh+aFWmdIujpwu5LsHS5d/lt
-	YGXt0G2bZILwMJAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9829913721;
-	Wed, 18 Jun 2025 15:09:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zrkgJaDWUmguCwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 18 Jun 2025 15:09:20 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 077B6A09DC; Wed, 18 Jun 2025 17:09:19 +0200 (CEST)
-Date: Wed, 18 Jun 2025 17:09:19 +0200
-From: Jan Kara <jack@suse.cz>
-To: Parav Pandit <parav@nvidia.com>
-Cc: Jan Kara <jack@suse.cz>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: warning on flushing page cache on block device removal
-Message-ID: <vwgktqvzekzi6wjlxwzuumxvl4sxbfrtzzd2ltbvlfuqtmpkv6@xvgvey56l76z>
-References: <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <2r4izyzcjxq4ors3u2b6tt4dv4rst4c4exfzhaejrda3jq4nrv@dffea3h4gyaq>
- <CY8PR12MB7195BB3A19DAB9584DD2BC84DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <nj4euycpechbg5lz4wo6s36di4u45anbdik4fec2ofolopknzs@imgrmwi2ofeh>
- <CY8PR12MB7195241146E429EE867BFAF5DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <pkstcm5x54ie466gce7ryaqd6lf767p6r4iin2ufby3swe46sg@3usmpixyeniq>
- <CY8PR12MB7195BADB223A5660E2D029C4DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CY8PR12MB719567D0A9EAE47A41EE3AC4DC6DA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CY8PR12MB71955E93B47608497B4504FEDC72A@CY8PR12MB7195.namprd12.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DF5TRUd3"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-86d0c5981b3so243384139f.3
+        for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 09:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750263939; x=1750868739; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ozpCgMsPDzzzXs9t/hf8mAtpedDuadFmlDFWjP16SDg=;
+        b=DF5TRUd3kBQyQ6YtxeRrJ31DtO88Iw0BPeNklKib/O19jANENdTcNv4ZgYjNgOqhe/
+         wMDpOciYzG1Ffko1KsL+SNa54MX3tV5EhcgKI00nPVSIxl7/sRN/pqV65TDAR4GV42a4
+         KZ8js4tMGYNO8UGs++D/cS4WzTR3wg2NdsVwG/tKOroitN6yR0le+FR9lx8gJTVKrfCD
+         sp1+JPHaUqfMC6/qZXhMjg0T7bmzH49JOvTQCqpDrPxOhihwO5ygx0KhusC38FyXMQNg
+         wMnzTKbwnCR4rUlLKNHLpEoDpn9cZV3SQnZ3kY3GiA+D74oeQRZ49IulYmapAyztcQvf
+         BVgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750263939; x=1750868739;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ozpCgMsPDzzzXs9t/hf8mAtpedDuadFmlDFWjP16SDg=;
+        b=WlCsYUsrJmWEnmAeits1amVTSYeE+BQrgGTYfBOYdWqBfSFOGsRgCJU1DlEZkbtTg3
+         A5VmgFedOxGWaUOKFU4eciZlDTugVFG96RNe2trg1Dlv1AUtdV2u/aAzdCM0aVsg04fJ
+         35D6jUBqBRo6ouikN078yWrwS3iwg8y4gSZwBZS71jwU0wh0Nh6SuCzkjlZqgdAp3ZKu
+         kIJ6zn5Dhptc3yQexb6PVvpCNkhav4YUGs8OuOlELwkwkzx+f8s3c6BSAhhTrA5YUFhE
+         vLyIMdKW9gGB2Zbdyv+/ZHCHWf94bpPk2BIhCpfPxvOEKqne2k+fgN+izxUH7zBv3ue7
+         4z4A==
+X-Gm-Message-State: AOJu0Yx9PEZVp6XBX6d/Yy8SsYAdBKwUZ9bZRF2slX83O2lAmzEYiQSR
+	1OZ+qMn5AnlfFO0kEd7hRi82BuF/QEJCPYny8Egsz7CSVpKQWq7F07SVV5zWUMiCQaPZN+RMkB+
+	6eBz1
+X-Gm-Gg: ASbGncuCWzG0qZ6Z6kZDWZ4m+vxpMJi8aK9L9RbkdYEbw8rsw/DLK5luzh+3JapGfsS
+	yqFM9AXoryip23mXM3tx3LBd/KphL8r5vtOxKGsKVP81TJ8LuVTAwGVcDPFxlRgkasiZPQK8F5q
+	l/OHUHNIxxLq8SXRVQVAkENiDY8pRVszVEUcykjIETXuGKKOZ+M6UcQ/8O7gTAfzMEalVpDV/fP
+	FH1Y283Nf/QLo03ss8In3BhwIOrgwVXFbeb8lPk4zVUIrhTdatJAa4I0jm1P2X+DZ/w/DcPLUNC
+	blRenVdbbhDW8yt8pQH3hoT6sDz7MSjsyXwP8/Pavth/+6FuNVSRyewVZw==
+X-Google-Smtp-Source: AGHT+IGYvc7KmhpVgw8CUbD9OCxWguWmto2GTymeiOYZAJ4lER5z1gHVRFjhbAlh/tDcwdwrNsbtSA==
+X-Received: by 2002:a05:6e02:2583:b0:3dd:d18c:126f with SMTP id e9e14a558f8ab-3de07d50c73mr187517625ab.10.1750263939115;
+        Wed, 18 Jun 2025 09:25:39 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3de01a4f3c0sm30305685ab.57.2025.06.18.09.25.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jun 2025 09:25:38 -0700 (PDT)
+Message-ID: <0bbb87cb-5774-4d50-86d3-eb118ebd3f1d@kernel.dk>
+Date: Wed, 18 Jun 2025 10:25:37 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY8PR12MB71955E93B47608497B4504FEDC72A@CY8PR12MB7195.namprd12.prod.outlook.com>
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:email]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: A26A71F7BD
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] block: The Effectiveness of Plug Optimization?
+To: hexue <xue01.he@samsung.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CGME20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca@epcas5p4.samsung.com>
+ <20250618050401.507344-1-xue01.he@samsung.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250618050401.507344-1-xue01.he@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed 18-06-25 09:27:47, Parav Pandit wrote:
-> Hi Jan and others,
+On 6/17/25 11:04 PM, hexue wrote:
+> The plug mechanism uses the merging of block I/O (bio) to reduce the
+> frequency of I/O submission to improve throughput. This mechanism can
+> greatly reduce the disk seek overhead of the HDD and plays a key role
+> in optimizing the speed of IO. However, with the improvement of
+> storage device speed, high-performance SSD combined with asynchronous
+> processing mechanisms such as io_uring has achieved very fast I/O
+> processing speed. The delay introduced by flow control and bio merging
+> may reduced the throughput to a certain extent.
 > 
-> > From: Parav Pandit
-> > Sent: 03 June 2025 07:03 PM
-> > To: Jan Kara <jack@suse.cz>
-> > Cc: linux-block@vger.kernel.org; linux-fsdevel@vger.kernel.org
-> > Subject: RE: warning on flushing page cache on block device removal
-> > 
-> > Hi Jan,
-> > 
-> > > From: Parav Pandit <parav@nvidia.com>
-> > > Sent: Tuesday, May 27, 2025 7:55 PM
-> > >
-> > >
-> > > > From: Jan Kara <jack@suse.cz>
-> > > > Sent: Tuesday, May 27, 2025 7:51 PM
-> > > >
-> > > > On Tue 27-05-25 12:07:20, Parav Pandit wrote:
-> > > > > > From: Jan Kara <jack@suse.cz>
-> > > > > > Sent: Tuesday, May 27, 2025 5:27 PM
-> > > > > >
-> > > > > > On Tue 27-05-25 11:00:56, Parav Pandit wrote:
-> > > > > > > > From: Jan Kara <jack@suse.cz>
-> > > > > > > > Sent: Monday, May 26, 2025 10:09 PM
-> > > > > > > >
-> > > > > > > > Hello!
-> > > > > > > >
-> > > > > > > > On Sat 24-05-25 05:56:55, Parav Pandit wrote:
-> > > > > > > > > I am running a basic test of block device driver unbind,
-> > > > > > > > > bind while the fio is running random write IOs with
-> > > > > > > > > direct=0.  The test hits the WARN_ON assert on:
-> > > > > > > > >
-> > > > > > > > > void pagecache_isize_extended(struct inode *inode, loff_t
-> > > > > > > > > from, loff_t
-> > > > > > > > > to) {
-> > > > > > > > >         int bsize = i_blocksize(inode);
-> > > > > > > > >         loff_t rounded_from;
-> > > > > > > > >         struct folio *folio;
-> > > > > > > > >
-> > > > > > > > >         WARN_ON(to > inode->i_size);
-> > > > > > > > >
-> > > > > > > > > This is because when the block device is removed during
-> > > > > > > > > driver unbind, the driver flow is,
-> > > > > > > > >
-> > > > > > > > > del_gendisk()
-> > > > > > > > >     __blk_mark_disk_dead()
-> > > > > > > > >             set_capacity((disk, 0);
-> > > > > > > > >                 bdev_set_nr_sectors()
-> > > > > > > > >                     i_size_write() -> This will set the
-> > > > > > > > > inode's isize to 0, while the
-> > > > > > > > page cache is yet to be flushed.
-> > > > > > > > >
-> > > > > > > > > Below is the kernel call trace.
-> > > > > > > > >
-> > > > > > > > > Can someone help to identify, where should be the fix?
-> > > > > > > > > Should block layer to not set the capacity to 0?
-> > > > > > > > > Or page catch to overcome this dynamic changing of the size?
-> > > > > > > > > Or?
-> > > > > > > >
-> > > > > > > > After thinking about this the proper fix would be for
-> > > > > > > > i_size_write() to happen under i_rwsem because the change in
-> > > > > > > > the middle of the write is what's confusing the iomap code.
-> > > > > > > > I smell some deadlock potential here but it's perhaps worth
-> > > > > > > > trying :)
-> > > > > > > >
-> > > > > > > Without it, I gave a quick try with inode_lock() unlock() in
-> > > > > > > i_size_write() and initramfs level it was stuck.  I am yet to
-> > > > > > > try with LOCKDEP.
-> > > > > >
-> > > > > > You definitely cannot put inode_lock() into i_size_write().
-> > > > > > i_size_write() is expected to be called under inode_lock. And
-> > > > > > bdev_set_nr_sectors() is breaking this rule by not holding it.
-> > > > > > So what you can try is to do
-> > > > > > inode_lock() in bdev_set_nr_sectors() instead of grabbing bd_size_lock.
-> > > > > >
-> > 
-> > I replaced the bd_size_lock with inode_lock().
-> > Was unable to reproduce the issue yet with the fix.
-> > 
-> > However, it right away breaks the Atari floppy driver who invokes
-> > set_capacity() in queue_rq() at [1]. !!
-> > 
-> > [1]
-> > https://elixir.bootlin.com/linux/v6.15/source/drivers/block/ataflop.c#L1544
-> > 
-> > With my limited knowledge I find the fix risky as bottom block layer is invoking
-> > upper FS layer inode lock.
-> > I suspect it may lead to A->B, B->A locking in some path.
-> > 
-> > Other than Atari floppy driver, I didn't find any other offending driver, but its
-> > hard to say, its safe from A->B, B->A deadlock.
-> > A = inode lock
-> > B = block driver level lock
-> > 
-> > > > > Ok. will try this.
-> > > > > I am off for few days on travel, so earliest I can do is on Sunday.
-> > > > >
-> > > > > > > I was thinking, can the existing sequence lock be used for
-> > > > > > > 64-bit case as well?
-> > > > > >
-> > > > > > The sequence lock is about updating inode->i_size value itself.
-> > > > > > But we need much larger scale protection here - we need to make
-> > > > > > sure write to the block device is not happening while the device
-> > > > > > size changes. And that's what inode_lock is usually used for.
-> > > > > >
-> > > > > Other option to explore (with my limited knowledge) is, When the
-> > > > > block device is removed, not to update the size,
-> > > > >
-> > > > > Because queue dying flag and other barriers are placed to prevent
-> > > > > the IOs
-> > > > entering lower layer or to fail them.
-> > > > > Can that be the direction to fix?
-> > > >
-> > > > Well, that's definitely one line of defense and it's enough for
-> > > > reads but for writes you don't want them to accumulate in the page
-> > > > cache (and thus consume memory) when you know you have no way to
-> > > > write
-> > > them
-> > > > out. So there needs to be some way for buffered writes to recognize
-> > > > the backing store is gone and stop them before dirtying pages.
-> > > > Currently that's achieved by reducing i_size, we can think of other
-> > > > mechanisms but reducing i_size is kind of elegant if we can
-> > > > synchronize that
-> > > properly...
-> > > >
-> > > The block device notifies the bio layer by calling
-> > > blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue); Maybe we can
-> > come
-> > > up with notification method that updates some flag to page cache layer
-> > > to drop buffered writes to floor.
-> > >
-> > > Or other direction to explore, if the WAR_ON() is still valid, as it
-> > > can change anytime?
-> > >
+> After testing, I found that plug increases the burden of high
+> concurrency of SSD on random IO and 128K sequential IO. But it still
+> has a certain optimization effect on small block (4k) sequential IO,
+> of course small sequential IO is the most suitable application for
+> merging scenarios, but the current plug does not distinguish between
+> different usage scenarios.
 > 
-> Is below WARN_ON() still valid, given the disk size can change any time?
+> I have made aggressive modifications to the kernel code to disable the
+> plug mechanism during I/O submission, the following are the random
+> performance differences after disabling only merging and completely
+> disabling plug (merging and flow control):
 > 
-> void pagecache_isize_extended(struct inode *inode, loff_t from, loff_t to) {
->         int bsize = i_blocksize(inode);
->         loff_t rounded_from;
->         struct folio *folio;
+> ------------------------------------------------------------------------------------
+> PCIe Gen4 SSD 
+> 16GB Mem
+> Seq 128K
+> Random 4K
+> cmd: 
+> taskset -c 0 ./t/io_uring -b 131072 -d128 -c32 -s32 -R0 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
+> taskset -c 0 ./t/io_uring -b 4096 -d128 -c32 -s32 -R1 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
+> data unit: IOPS
+> ------------------------------------------------------------------------------------
+>              Enable plug          disable merge           disable plug
+> Seq IO       50100                50133                   50125
+> Random IO    821K                 824K                    836K           -1.83%
+> ------------------------------------------------------------------------------------
 > 
->         WARN_ON(to > inode->i_size);
+> I used a higher-speed device (PCIe Gen5 server and PCIe Gen5 SSD) to verify the hypothesis
+> and found that the gap widened further.
+> 
+> ------------------------------------------------------------------------------------
+>              Enable plug          disable merge           disable plug
+> Seq IO       88938                89832                   89869
+> Random IO    1.02M                1.022M                  1.06M          -3.92%
+> ------------------------------------------------------------------------------------
+> 
+> In the current kernel, there is a certain flag (REQ_NOMERGE_FLAGS) to
+> control whether IO operations can be merged. However, the decision for
+> plug selection is determined solely by whether batch submission is
+> enabled (state->need_plug = max_ios > 2;). I'm wondering whether this
+> judgment mechanism is still applicable to high-speed SSDs.
 
-Yes, the WARN_ON is valid. It complains that the zeroing of tail pages on
-extension of the file didn't do it's work properly. This is important for
-regular files. For block devices the situation is different as they cannot
-really be extended by writes so this code shouldn't ever trigger (but it
-does because the device invalidation trims i_size to 0 in the middle of the
-write).
+1M isn't really high speed, it's "normal" speed. When I did my previous
+testing, I used gen2 optane, which does 5M per device. But even flash
+based devices these days do 3M+ IOPS.
 
-One relatively easy workaround would be to teach iomap_write_iter() to not
-touch i_size (and call pagecache_isize_extended()) for S_ISBLK inodes. That
-will at least fix the immediate problems you can hit without too much pain
-but the underlying problem that block device code should be holding i_rwsem
-when modifying i_size remains and can bite us in other places...
+> So the discussion points are:
+> 	- Will plugs gradually disappear as hardware devices develop?
+> 	- Is it reasonable to make flow control an optional
+> 	configuration? Or could we change the criteria for determining
+> 	when to apply plug?
+> 	- Are there other thoughts about plug that we can talk now?
 
-								Honza
+Those results are odd. For plugging, the main wins should be grabbing
+batches of tags and using ->queue_rqs for queueing the IO on the device
+side. In my past testing, those are a major win. It's also been a while
+since I've run peak testing, so it's also very possible that we've
+regressed there, unknowingly, and that's why you're not seeing any wins
+from plugging.
 
+For your test case, we should allocate 32 tags once, and then use those
+32 tags for submission. That's a lot more efficient that allocating tags
+one-by-one as IO gets queued. And on the NVMe side, we should be
+submitting batches of 32 requests per doorbell write.
+
+Timestamp reductions are also generally a nice win. But without knowing
+what your profiles look like, it's impossible to say what's going on at
+your end. A lot more details on your runs would be required.
+
+Rather than pontificate on getting rid of plugging, I'd much rather see
+some investigation going into whether these optimizations are still
+happening as they should be. And if the answer is no, then what broken
+it? If the answer is yes, then why isn't it providing the speedup that
+it should.
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
