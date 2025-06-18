@@ -1,166 +1,116 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C13E2ECD17
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 16:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB411D5AB7;
+	Wed, 18 Jun 2025 16:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750263942; cv=none; b=DQAkvgLyL0uIc3lc/lI9AGSO3fNtuPOiZwEPbhdBYAQLoSQzTG9EFd4H90txHok1L1aIo1nYF+hfHL2I4iy874Dzv0L4V7jWG9gzafrDqsNFkMHTgI2QG4Frt505ubYCg1S1+GT/blwBS0j5w+f7YVYVT6f9RCEOPkzDZOnhvFg=
+	t=1750265172; cv=none; b=DOUyzvRD1vFAybnZ04lcEAwlkzIBkK36SgenJC3Eh2pta0/Hm5kL3+m7Rx9QoQQHTnlMIIkomYMsWBFYJis43bMRktleOaDkb/wlcS6b2ljDOjhfcLCrXxrUktf44T2P/FMNzUeYoXwM0XNQn3s8PCeCBOxL0Ku+oeYKPkx/qTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750263942; c=relaxed/simple;
-	bh=ShRjdsaq0YSJizLisN8l/yg/jEDPS2vZH5tSHQicCvs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m3TGBeTAXOFdBTearn/VHEqjqcEhcIjUqJF6ioGFIEiEzfXTTsamGdXeVR6Q4axu98BO+1xeJEyqUzcSx8k3Yrl6Hp9RqMCM1CAOY8zuF443B2vVC/R9ql/jgdDXg+2zlvIxvWz3G4EetlVZfNvI7hE18FXXww3nWhIvatWlhIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DF5TRUd3; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1750265172; c=relaxed/simple;
+	bh=TWzALV9LPqlus+Az62QmQW8i9ILqyK/dHFh5EdSLL0k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bb/xzrlYRQ4DUEt41mvacgWKDnYCoZWR+P6E1PmEbdm+uF738QOJaefylC+t2xiEo4OUMQx+ORTafhfcikt77QNTd8ttOHbO1Pt8lLPlEsgrCZIZI82fOdF8DUthHe5RGRisznrftFznoBdfUSfflsoVe09XYYCZ3+rwC7d05OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aGCZuuqi; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DF5TRUd3"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-86d0c5981b3so243384139f.3
-        for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 09:25:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGCZuuqi"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-313dc7be67aso951739a91.0;
+        Wed, 18 Jun 2025 09:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750263939; x=1750868739; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ozpCgMsPDzzzXs9t/hf8mAtpedDuadFmlDFWjP16SDg=;
-        b=DF5TRUd3kBQyQ6YtxeRrJ31DtO88Iw0BPeNklKib/O19jANENdTcNv4ZgYjNgOqhe/
-         wMDpOciYzG1Ffko1KsL+SNa54MX3tV5EhcgKI00nPVSIxl7/sRN/pqV65TDAR4GV42a4
-         KZ8js4tMGYNO8UGs++D/cS4WzTR3wg2NdsVwG/tKOroitN6yR0le+FR9lx8gJTVKrfCD
-         sp1+JPHaUqfMC6/qZXhMjg0T7bmzH49JOvTQCqpDrPxOhihwO5ygx0KhusC38FyXMQNg
-         wMnzTKbwnCR4rUlLKNHLpEoDpn9cZV3SQnZ3kY3GiA+D74oeQRZ49IulYmapAyztcQvf
-         BVgA==
+        d=gmail.com; s=20230601; t=1750265170; x=1750869970; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TWzALV9LPqlus+Az62QmQW8i9ILqyK/dHFh5EdSLL0k=;
+        b=aGCZuuqipaBcL3m1lLCsYwzFJD+5VHQvR2GZ7WB/eGF1g9StLSoP8elXIXbm+z9uJ3
+         kTmlzZY6pTZH4iUczsD5VNbHhx1UvY+h4Chgo6KdimwupPPAOUO8OaZE0Kv5qcd5mHj3
+         rRFHR8Dsg/yAtKs3J1BNATgQmli9oUp8dssE63fx3J96JKViACTFj7g253RZTnUqR4yX
+         s8ar4y8VwQ3IUJV9bRiUQRgZeaDmdx4tJql2zwvWNPIhj/xVfGCceRaYYxw1dziMpzPf
+         tp/DYKB+xo+UH+JnifYUoWZARd2bRgi2guTFOUEt8Ldw9PmpySyF6KeCUuih/iXa4sx/
+         y6Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750263939; x=1750868739;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ozpCgMsPDzzzXs9t/hf8mAtpedDuadFmlDFWjP16SDg=;
-        b=WlCsYUsrJmWEnmAeits1amVTSYeE+BQrgGTYfBOYdWqBfSFOGsRgCJU1DlEZkbtTg3
-         A5VmgFedOxGWaUOKFU4eciZlDTugVFG96RNe2trg1Dlv1AUtdV2u/aAzdCM0aVsg04fJ
-         35D6jUBqBRo6ouikN078yWrwS3iwg8y4gSZwBZS71jwU0wh0Nh6SuCzkjlZqgdAp3ZKu
-         kIJ6zn5Dhptc3yQexb6PVvpCNkhav4YUGs8OuOlELwkwkzx+f8s3c6BSAhhTrA5YUFhE
-         vLyIMdKW9gGB2Zbdyv+/ZHCHWf94bpPk2BIhCpfPxvOEKqne2k+fgN+izxUH7zBv3ue7
-         4z4A==
-X-Gm-Message-State: AOJu0Yx9PEZVp6XBX6d/Yy8SsYAdBKwUZ9bZRF2slX83O2lAmzEYiQSR
-	1OZ+qMn5AnlfFO0kEd7hRi82BuF/QEJCPYny8Egsz7CSVpKQWq7F07SVV5zWUMiCQaPZN+RMkB+
-	6eBz1
-X-Gm-Gg: ASbGncuCWzG0qZ6Z6kZDWZ4m+vxpMJi8aK9L9RbkdYEbw8rsw/DLK5luzh+3JapGfsS
-	yqFM9AXoryip23mXM3tx3LBd/KphL8r5vtOxKGsKVP81TJ8LuVTAwGVcDPFxlRgkasiZPQK8F5q
-	l/OHUHNIxxLq8SXRVQVAkENiDY8pRVszVEUcykjIETXuGKKOZ+M6UcQ/8O7gTAfzMEalVpDV/fP
-	FH1Y283Nf/QLo03ss8In3BhwIOrgwVXFbeb8lPk4zVUIrhTdatJAa4I0jm1P2X+DZ/w/DcPLUNC
-	blRenVdbbhDW8yt8pQH3hoT6sDz7MSjsyXwP8/Pavth/+6FuNVSRyewVZw==
-X-Google-Smtp-Source: AGHT+IGYvc7KmhpVgw8CUbD9OCxWguWmto2GTymeiOYZAJ4lER5z1gHVRFjhbAlh/tDcwdwrNsbtSA==
-X-Received: by 2002:a05:6e02:2583:b0:3dd:d18c:126f with SMTP id e9e14a558f8ab-3de07d50c73mr187517625ab.10.1750263939115;
-        Wed, 18 Jun 2025 09:25:39 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3de01a4f3c0sm30305685ab.57.2025.06.18.09.25.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jun 2025 09:25:38 -0700 (PDT)
-Message-ID: <0bbb87cb-5774-4d50-86d3-eb118ebd3f1d@kernel.dk>
-Date: Wed, 18 Jun 2025 10:25:37 -0600
+        d=1e100.net; s=20230601; t=1750265170; x=1750869970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TWzALV9LPqlus+Az62QmQW8i9ILqyK/dHFh5EdSLL0k=;
+        b=jrZswja+t/bCK8WUS4aTh6/eOOQm90CJds9j/HJsVgJsBdy0DDlED5LinTC1AYiq+K
+         +wdEV4R2Q9SlSMt6Y+tlP6Ghos3/LLz+BCwfFKb17e5MXxS5JscwyI8DLqmOcu5v5DkF
+         HS994zY+OnEK+G3suuILEDWRSHqX/KY4SFJeIMmFrhwIacNegtPrl5nfeDye+EiGwcAp
+         YRGqJAZFjb67fxuCQJ9G385zc8yXJrSgZXxQs2440pkkX5RV8nxU+nPbdBqAkMtCZu70
+         uauqeeXA8Isc+PQk+jIKgS2nfBNm7vJrr+mTibgaheESnOz5BY5zJyGe5ObNUZjjSYlt
+         P75Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU9Bmd6euUAqB+vISlGDriKVjpl08iq+SIoAz0iF6lWd17Qu1RRnUAPRa3bc3n89cQ8NNtxhAQE6Kb8Cxo=@vger.kernel.org, AJvYcCUW+vFFtyCWMNx2h2ZUboiwRCLeEVB5AgaQ3yHaIvlXrgooTRS/uDHwmexajhdRsC/Y7D+swm1d47M=@vger.kernel.org, AJvYcCUv0SMyo+0bc58606Wy+V6lVa1eoxMyp1DQB2E+KVN7vV8XvSKcgMaED1bWsfnXwRYx37ikmKseB36Z@vger.kernel.org, AJvYcCV9vnWtAXQUuEcHaqnTINav6myGZWGKc3WvdkXaQIbBet9iO+EYEAYo1G0uF8wWbUiPqXn0e5WlmDc8+wfn@vger.kernel.org, AJvYcCVPEJmoybRkd5IiwJMWuGBS9234MPYlsaF07d2ExfBM3ctoJg2G5s3yAkZ+pKwId/vEwUJhhtBFmPw7eHVi@vger.kernel.org, AJvYcCVevuNZzRC1k4WLJEZPiROzOIwk2Yg1hGiQcd6KYuE81CjAZjjxjsvpnHV3qRSgs0SAdsjjzHudWln5KNsf4Rg=@vger.kernel.org, AJvYcCVv1XT1vWGqNxruaHtfPbKZGiJl3beFyfGK7f/bYf7A12UFgKUuSSR41joEZGUJvd2y7EnqvsJr@vger.kernel.org, AJvYcCX6prJ6pnc8fxIPUYXaucbOLimk/j76q8InFNZo3HXhGHDmFpiLPcoKzqxEdbvDSn7O3eM9XASPmtzt@vger.kernel.org, AJvYcCXvKpZ8uYoMyZV6rEldKHpLnWsvZwdyS8fRlUrHkpGepf3SujeCs2xcx5fJhRaACMRAxkthtr5DstyN0FcFz1A4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0QJpKFciLn8qcO2evtXRhmvVIPyLbxVThy6vkVS0kpWiLHo7k
+	ValFjAfXj+2j9WpqqK/uBjIN2tPcoGP22et7TUais/DKZhZqjVj9Rye6TzClqVHlMpRF1fnp5nY
+	GhB+KZtfjl+Kh1ThuTgUeHd4zjbOmMzc=
+X-Gm-Gg: ASbGncsj878HpFmROhLOj07Bj+vU3zavbYtwOOIxw9psaOKO29EKNB/YTBTtwIx0Efq
+	Q07KWd8SHjTAaNyZ4EOzksuYgYrV9BAQGGrhh/Tf5M1vFbSfz2NJnfVIqDfIamPkCDnnpsC6RIy
+	D/DAvlOd5tpBXzB7kUa++hbh20oEcHoF1djvrS9dH5u6I=
+X-Google-Smtp-Source: AGHT+IH4x/Zjj/Cn6AIOjbJXWQhaDWLSiy8g/xgpU0nYUpfFSqLNbZ8aoqW6DTm7BekXvLqQRHOksCgncGYgycyl5qg=
+X-Received: by 2002:a17:90b:2dcd:b0:312:e9d:3fff with SMTP id
+ 98e67ed59e1d1-3158bb43769mr25041a91.1.1750265170069; Wed, 18 Jun 2025
+ 09:46:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] block: The Effectiveness of Plug Optimization?
-To: hexue <xue01.he@samsung.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <CGME20250618050409epcas5p48f60d6022d148a22fc9fd4a025cc45ca@epcas5p4.samsung.com>
- <20250618050401.507344-1-xue01.he@samsung.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250618050401.507344-1-xue01.he@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+ <20250615-ptr-as-ptr-v12-1-f43b024581e8@gmail.com> <CAJ-ks9=6RSaLmNmDBv-TzJfGF8WzEi9Vd-s=1wyqBcF7_f7qQQ@mail.gmail.com>
+In-Reply-To: <CAJ-ks9=6RSaLmNmDBv-TzJfGF8WzEi9Vd-s=1wyqBcF7_f7qQQ@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 18 Jun 2025 18:45:56 +0200
+X-Gm-Features: Ac12FXwfspeQ5n1WfjhtITwDVCEc5U5DXhUfzAvB1x6rILKw_9XGVLNl3gdX3Es
+Message-ID: <CANiq72kgnKH2SSp76EdPeysExBWasqhTyf1JyReR65g6FMsidA@mail.gmail.com>
+Subject: Re: [PATCH v12 1/6] rust: enable `clippy::ptr_as_ptr` lint
+To: Tamir Duberstein <tamird@gmail.com>, Christian Brauner <brauner@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, David Gow <davidgow@google.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tejun Heo <tj@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/17/25 11:04 PM, hexue wrote:
-> The plug mechanism uses the merging of block I/O (bio) to reduce the
-> frequency of I/O submission to improve throughput. This mechanism can
-> greatly reduce the disk seek overhead of the HDD and plays a key role
-> in optimizing the speed of IO. However, with the improvement of
-> storage device speed, high-performance SSD combined with asynchronous
-> processing mechanisms such as io_uring has achieved very fast I/O
-> processing speed. The delay introduced by flow control and bio merging
-> may reduced the throughput to a certain extent.
-> 
-> After testing, I found that plug increases the burden of high
-> concurrency of SSD on random IO and 128K sequential IO. But it still
-> has a certain optimization effect on small block (4k) sequential IO,
-> of course small sequential IO is the most suitable application for
-> merging scenarios, but the current plug does not distinguish between
-> different usage scenarios.
-> 
-> I have made aggressive modifications to the kernel code to disable the
-> plug mechanism during I/O submission, the following are the random
-> performance differences after disabling only merging and completely
-> disabling plug (merging and flow control):
-> 
-> ------------------------------------------------------------------------------------
-> PCIe Gen4 SSD 
-> 16GB Mem
-> Seq 128K
-> Random 4K
-> cmd: 
-> taskset -c 0 ./t/io_uring -b 131072 -d128 -c32 -s32 -R0 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
-> taskset -c 0 ./t/io_uring -b 4096 -d128 -c32 -s32 -R1 -p1 -F1 -B1 -n1 -r5 /dev/nvme0n1
-> data unit: IOPS
-> ------------------------------------------------------------------------------------
->              Enable plug          disable merge           disable plug
-> Seq IO       50100                50133                   50125
-> Random IO    821K                 824K                    836K           -1.83%
-> ------------------------------------------------------------------------------------
-> 
-> I used a higher-speed device (PCIe Gen5 server and PCIe Gen5 SSD) to verify the hypothesis
-> and found that the gap widened further.
-> 
-> ------------------------------------------------------------------------------------
->              Enable plug          disable merge           disable plug
-> Seq IO       88938                89832                   89869
-> Random IO    1.02M                1.022M                  1.06M          -3.92%
-> ------------------------------------------------------------------------------------
-> 
-> In the current kernel, there is a certain flag (REQ_NOMERGE_FLAGS) to
-> control whether IO operations can be merged. However, the decision for
-> plug selection is determined solely by whether batch submission is
-> enabled (state->need_plug = max_ios > 2;). I'm wondering whether this
-> judgment mechanism is still applicable to high-speed SSDs.
+On Wed, Jun 18, 2025 at 3:54=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
+>
+> @Andreas Hindborg could you please have a look for configfs?
+>
+> @Rafael J. Wysocki @Viresh Kumar could you please have a look for cpufreq=
+?
 
-1M isn't really high speed, it's "normal" speed. When I did my previous
-testing, I used gen2 optane, which does 5M per device. But even flash
-based devices these days do 3M+ IOPS.
+Thanks Tamir.
 
-> So the discussion points are:
-> 	- Will plugs gradually disappear as hardware devices develop?
-> 	- Is it reasonable to make flow control an optional
-> 	configuration? Or could we change the criteria for determining
-> 	when to apply plug?
-> 	- Are there other thoughts about plug that we can talk now?
+Christian, Danilo, David, Greg, Tejun: It would also be nice to get
+Acked-by's for your bits. Thanks!
 
-Those results are odd. For plugging, the main wins should be grabbing
-batches of tags and using ->queue_rqs for queueing the IO on the device
-side. In my past testing, those are a major win. It's also been a while
-since I've run peak testing, so it's also very possible that we've
-regressed there, unknowingly, and that's why you're not seeing any wins
-from plugging.
-
-For your test case, we should allocate 32 tags once, and then use those
-32 tags for submission. That's a lot more efficient that allocating tags
-one-by-one as IO gets queued. And on the NVMe side, we should be
-submitting batches of 32 requests per doorbell write.
-
-Timestamp reductions are also generally a nice win. But without knowing
-what your profiles look like, it's impossible to say what's going on at
-your end. A lot more details on your runs would be required.
-
-Rather than pontificate on getting rid of plugging, I'd much rather see
-some investigation going into whether these optimizations are still
-happening as they should be. And if the answer is no, then what broken
-it? If the answer is yes, then why isn't it providing the speedup that
-it should.
-
--- 
-Jens Axboe
+Cheers,
+Miguel
