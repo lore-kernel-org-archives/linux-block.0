@@ -1,237 +1,309 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C61210FB
-	for <linux-block@vger.kernel.org>; Wed, 18 Jun 2025 09:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E17A28468D;
+	Wed, 18 Jun 2025 09:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750237606; cv=fail; b=F0OI5YIwwxbK16kXUn9iF6oO5YHs9hVMgDBrf6FoJF58+DXT1Tx5fJ05uFDj5guUcSpGiCTZB64WyIXRn5+5QV42QyTQ9hTHi4VPYY0PYuU7cuOrPRvEGsyqypwGtEnPfMsA6meWAhf8Z/OHhY0FCUlt6zd+rqPegnwMyc/ffgs=
+	t=1750238873; cv=fail; b=ubhUcR/RFS06fJdPSdE/ggeE7sOB+ox/GfRqQjn2vh2gCswkRB/Q7Pj+1Y47E8znqLNuf1+hTeOJ93mumA5hsLMU7a9H2zCaS5PUkCLKnSQnO4EVi+LsTMbxoKer/YLQLm4AiHI34SntMbwgf6eRFDalhllYmAY3vLaO6S4Ij/M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750237606; c=relaxed/simple;
-	bh=PfY6rXGrsBMVZ4jw75lUH98DPtjNW1sVvEdc6pmF0pE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LOxyHLVsoNqrDqRJMw/c4jMYQb+ySOV4KdGz/cEBTMAwx0DIQvxC+oVstM5z7+NKmOjM/Eq1VG33MXVflPoK/ztOYBXLkzccROzTI51W46OfRkHtyHM6SrtjgPGEqM96nCKeFA1DXeS29rJMaidYkgQwUiIP4nve3reft5FVN2E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Xi7pqXBq; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ShGESJu1; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1750238873; c=relaxed/simple;
+	bh=/adNQdBnExvu2hARO/wjmjMzXVm6bDqL4bH7epVXkZc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=j1VqDUObCLhTeKo/AdqXMyth2BvK8ocRnBXENEPscFx0MYJ16oa1fULnQQRq8VRh5+AW5kavxZNf3K3/l4U4tu13m04YlxcRSsFvctD1u5+o4ndvBCnAatULc9xTy/KJaz7g4Mla7jFlqdt6+4UXb7AxMQMJe8pMBIDs1gw/LmY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W8mdruqZ; arc=fail smtp.client-ip=40.107.237.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Xi7pqXBq";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ShGESJu1"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I8fdpi002724;
-	Wed, 18 Jun 2025 09:06:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=98jtuaafSQj1M1o815hkwT0MfNqKFHUagfKAjamAQpA=; b=
-	Xi7pqXBqsJMVNhaV5pFeRymt8b4aCpIqzLuuPNHZIeN8uYl7gNZXlkxqcp/RN5hX
-	GK2RCHHI3PT+FnLV5DtHQ4NOc8Ta3nlnSl+QYDPWz5jkqPDcJ9WTT8LNnOeg8+EQ
-	begqCNhldP7nm95m5jMQuXJ8D0m09YjzG5grtkMSCXQ8IpHBjN3Qyn3u1t2q0S9P
-	vzxssJ4kbgjH8+L3mmrLmXUDObt2B/NvS4iEgD3TcOhU3XkLBdo+Aza0MfA4HBjt
-	xrQACrCdmB/Qnv2/vrZdslG03x/WWWYQYclYsX1rfulRUyk/DOQ659z+07vRfczl
-	GVYzKEcODDZ7xHhcOmxRXg==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4790yd7b90-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 09:06:36 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55I7WNMI026041;
-	Wed, 18 Jun 2025 09:06:35 GMT
-Received: from cy7pr03cu001.outbound.protection.outlook.com (mail-westcentralusazon11012018.outbound.protection.outlook.com [40.93.200.18])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 478yhgnert-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 09:06:35 +0000
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W8mdruqZ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u5UqtWf6skwFbbhHMtcmv82kLiPD8fK+laAYu4aAUX9XamHRma7SwOIMHYH4dAu6k1DcAPqb11sIiADHpeJZudFXnw4Zj32uNBH+MIgJeeQcQGUblOfw7/v0NJNTj+IG89Pd7PNtA+kv782UbUitrRCwXeyRg2UNN28j5xPZaFuU2amRhmlGzG0MCE3FosF//VJ/8Pcl90qlJ11obtTRaHYk16el8Aba9j+/aHquxwQBpUiA7UNFdRPZczKKfoaBmn7E1gvL4gqH414zOc+/4YodE3UqnwdBxRcDIPbTc2fZjEc92oFiLmsYvVvf0wAATQpx93GwjBZ3+jQFqwnW3Q==
+ b=kGEABTUc6Koe+G0y7yKrFHcl9zTU32EP1kMS967yCB7EYscCnxFayfoDwvhoQo0LIP0WFTL/xEEDgd3qyEiwug5H4ZruPt87e9iufdvgAqmvqvkLTIQAqKpdvUhuSasaeu+NoHh13BmuiFIhS3xtRoq9c0NHW+/5rJPs8X0z+M9RIVYlMskLLfpq7mk62e9lXmNG5HnJiSqe0W/k6ysffJCiUgerPHwCMoPYAgiM23Pn9Fu6AQm72wX/KeK2MjIC8BgRzmwPTCaTu82YlBBWTFISg1jRLgAneUCRXU9UVi0e+3R3H97NM3Zdw5IwwsT5jYf9B5M1chyqcwW1LovGpA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=98jtuaafSQj1M1o815hkwT0MfNqKFHUagfKAjamAQpA=;
- b=Y4CrCdHHvybPn6eW8F0SXAyceQl0CLxyB/OwcvkoyYVDltN7XTk+ES+v1Lg5u02NcTKLOe7hQu6U17nCz1AnYx2eAm5cmbOpiZ900WIyyFkK4HTmJxIo3Hts9vg9sCxbj+5drJtZda96UmSzLzJoRpl6KDexF/usmnV2j6MXbDK7+zM8k9pUM1wC9fYP+QGEWsOW8FODsDgawfTNvaBNskJXBLktUky572+EXZT/oaileKCT2iZl5eJxMYDqdhXsXQ/oIKXCaejYzyFpaVzDEIf+vUwG7uWrU6HCTNTNfjdR4w/OeReo27m00e5JwssyR1p+N9JLXUUDNNfzWDJFVg==
+ bh=nAcbXOQ7GidEIwb6g0mYqsPLn3sqQP0jr7rGkBXQDOo=;
+ b=klulHncgS1vaZpY+YqHtVaTS8m9nb0TNctTCAR4NFjc+Dghy7p56qsgTfV3jU8J3xYy5HSvNA86rh+f+yMUAmfHmaHULAvqSJCHKDYvrDOKHfBRyvbWA86TgbvaUmdf2So8Qe8AXy2uyv4weYGLU70jTuNCuMz/qKXNfj5nvt3eIo7Z9+aKIcIcxFRJdm4g9PbIUiwkiHKFeguPVDlnnj3C03vTBlgnmOjC/24Zc8AAV9DrnjDDodSg6ccG8Iytm6he25r8Q9A1+XSSUALThIH/UcyYMgD9Izn8eY1zLCio/sodaIcAIK64yI7b+kQiyHpjQPyRRcsOtk49PatUubQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98jtuaafSQj1M1o815hkwT0MfNqKFHUagfKAjamAQpA=;
- b=ShGESJu1GztZ+KEfA313Twbd6Zgj7LXDSlsfMfIXcS651ut69SY2UH2Mz4SGBC6klap1ryAAPndgKX9Fjhxt9/o/2k8h+J4sU0wHP4pMku957nMG1wM9fBNJOdOOIh/b+ioKPnPzHfGRZ1n6eh+GDRw37i2pV7OuGI/SSv0iX0c=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by SJ1PR10MB5979.namprd10.prod.outlook.com (2603:10b6:a03:45e::6) with
+ bh=nAcbXOQ7GidEIwb6g0mYqsPLn3sqQP0jr7rGkBXQDOo=;
+ b=W8mdruqZCksY74lTeO+dxyJWhIWn75mRMVXoubraEh4mHWrwV65dCdwSLrezNkvTesCHBWgKPRJNLgL4di0BxyBqmdBUkUcLal93ftydvDrnxZz6PDVKuQ0zBiVMg7tRLjnokaPchHIwHKn2VfAPnPEi4H2so4i44pDTmSelmtwbcef2RRrMSSWY87bMIHNRf1HxAhhzXN3Qyhyjzz5kmz1ksOIvSWtpEB2/bfJV25Rx89p4gARC/dzW5XmCdg1DGlC+Tl9OHGEue3u8OgC01MEahTb+dF8AucUFYbD9N/4Q2b34QqzMBewRItwXRgK00686wjMBNhX/IpXXF9Rz5g==
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
+ by DM6PR12MB4172.namprd12.prod.outlook.com (2603:10b6:5:212::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Wed, 18 Jun
- 2025 09:06:32 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%6]) with mapi id 15.20.8835.027; Wed, 18 Jun 2025
- 09:06:32 +0000
-Message-ID: <acc347c6-5b75-40e0-b9c0-ba70819bdcd9@oracle.com>
-Date: Wed, 18 Jun 2025 10:06:26 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: Increase BLK_DEF_MAX_SECTORS_CAP
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20250618060045.37593-1-dlemoal@kernel.org>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Wed, 18 Jun
+ 2025 09:27:48 +0000
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::c06c:905a:63f8:9cd]) by CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::c06c:905a:63f8:9cd%5]) with mapi id 15.20.8792.033; Wed, 18 Jun 2025
+ 09:27:48 +0000
+From: Parav Pandit <parav@nvidia.com>
+To: Jan Kara <jack@suse.cz>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: RE: warning on flushing page cache on block device removal
+Thread-Topic: warning on flushing page cache on block device removal
+Thread-Index:
+ AdvMbvrhAHapLL5SQLSXHQ+FhiQIJwB7b58AACZikZAAAg9cAAAAQBBwAATDYIAAAA6IoAFeHfSQAunx63A=
+Date: Wed, 18 Jun 2025 09:27:47 +0000
+Message-ID:
+ <CY8PR12MB71955E93B47608497B4504FEDC72A@CY8PR12MB7195.namprd12.prod.outlook.com>
+References:
+ <CY8PR12MB7195CF4EB5642AC32A870A08DC9BA@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <2r4izyzcjxq4ors3u2b6tt4dv4rst4c4exfzhaejrda3jq4nrv@dffea3h4gyaq>
+ <CY8PR12MB7195BB3A19DAB9584DD2BC84DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <nj4euycpechbg5lz4wo6s36di4u45anbdik4fec2ofolopknzs@imgrmwi2ofeh>
+ <CY8PR12MB7195241146E429EE867BFAF5DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <pkstcm5x54ie466gce7ryaqd6lf767p6r4iin2ufby3swe46sg@3usmpixyeniq>
+ <CY8PR12MB7195BADB223A5660E2D029C4DC64A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <CY8PR12MB719567D0A9EAE47A41EE3AC4DC6DA@CY8PR12MB7195.namprd12.prod.outlook.com>
+In-Reply-To:
+ <CY8PR12MB719567D0A9EAE47A41EE3AC4DC6DA@CY8PR12MB7195.namprd12.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20250618060045.37593-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0014.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:150::19) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|DM6PR12MB4172:EE_
+x-ms-office365-filtering-correlation-id: 33fc8778-d857-4f40-cc32-08ddae4a63ad
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?tKPtf1JgzO4tcE4yCRE4j6ridbnHnqxkXkpCMRHk/YL6/X50eMRRv9lPzqmY?=
+ =?us-ascii?Q?hkiv2YhlNbIxlqicVkN1jrIu4MIRKTKf4nWFjCAB48DILD3ibkgc0Q5OngzC?=
+ =?us-ascii?Q?iuYFO8O2YKMHaMw9PFAS9B1+lbhDrKTF51p7f6vuKIxuSSLTm/yH1nsgOaxu?=
+ =?us-ascii?Q?5QMYT4JsEFx5gXn0Y5+52cO8ARlKeKSS7QwKSkDOMp4pbD7UibKofACe2VtM?=
+ =?us-ascii?Q?ewLD6TrdJYPQX6NrF6QNZatWUkI5dAkKuu1bQg5bMes6m5b1HSL97Fvx3G7C?=
+ =?us-ascii?Q?03Ni2Eq8madSpIXlncnDbtJVQK7Af2Efnm5HtB6ik/YCTxGqGdfHFTsfHX/M?=
+ =?us-ascii?Q?FwAGMkIWXQqXXyDlk8FO0GnNT3CzbCFuAhankEKHa/y8imxyT13aFMg6POzt?=
+ =?us-ascii?Q?qK+XreqXZS35unrlA8DIwQBHk+vQtW7igEW1GJjjnUsqTnU5i7CdzKkBCG09?=
+ =?us-ascii?Q?CMD6DgaeNtk3yW2wxFemsupJOybJsf4W+fHHV9h1TeLcFM8ziv6Y+QL4oAVt?=
+ =?us-ascii?Q?rCWqUtEg6uAYNVHhQQUXKSjH6Nl/haq9/DKwLio54b2oInWYfuAK0Mp51g/m?=
+ =?us-ascii?Q?rK6Y2X/XpzfoYPII6SOAdktFvLS7PF0eVFaU5VfUzYH5jxFN4jX5ZK27Y9CT?=
+ =?us-ascii?Q?bYwKEl0wkd+6f2yS1i8npMat6VMiINLGdV6ZqStMGJ54Xdv0RLHe7fnw9Oax?=
+ =?us-ascii?Q?IAiJCH+YYeMrNpNcr4gmGqJjU2JSCuxdDhS8EU2yczQb767WM9E9GetNzlbL?=
+ =?us-ascii?Q?6joYxjV0YmFieMwd0i3Xq738065FDDascxze0gaqAA6sjBttc3EO7gCui/QR?=
+ =?us-ascii?Q?M4UXqNz30quhR8eV534hRcJ0wkqnDOyR1L51u9GceeMiIjYUjSk47utjospM?=
+ =?us-ascii?Q?ZTojUJSkrxTZ+T3y//SysZrjhIlJ7+2PIeF2cNGWlhlV6EP2+EL7U9Omn3PR?=
+ =?us-ascii?Q?GNzXKImbZRLbk3D6vhqDsbWTQquS2tF6j2rYHFIl1eQxqnWgzs48OP0qaOQP?=
+ =?us-ascii?Q?RaPPbEsrS9Lbo6Yt3EnyBdEzMqmp4ZAZw9ngZVULllMLJ2VRSdpk9Gpx7dAS?=
+ =?us-ascii?Q?sMf1o5TWNGb/PxgpUD1X11OVHps52Kk+5oXRoh2DZKOiVbsDcOm3oY8/bZ2B?=
+ =?us-ascii?Q?0tE4IulgnjTd5ApBmqNXDjbgiSq+94GDnZobQM5HINADPR11iqtLJu3n2mkc?=
+ =?us-ascii?Q?RXL+xfAX8bYA2pqEdUOttagusfjkohQmWrQXMqyjYpQ4sdI9Nw9VJdkWNKz1?=
+ =?us-ascii?Q?xdLD1fWRkTImryipY0dz6I45QUMQjaAgW5IPeLtW8zWp3P1DEPvInccup5Bp?=
+ =?us-ascii?Q?TsVnJOBxAfajS1EMSI/tWhWXFhcMoPpBnrVS2Y6LFlRHpR2IP3Q+Ddi8+Zkz?=
+ =?us-ascii?Q?MPPyrOOPsL8/0PVW3xvqpBXrXCYlP+2tG7hhkRZtgZi5cT0yhrjcCA2GUnhh?=
+ =?us-ascii?Q?SYWqDa9Ijt7Jk7DMrP7Zps+FciR4SrIwz6YY2Gd/Vq77h7Y3P+l+lzSkAOYE?=
+ =?us-ascii?Q?dwQTD8QZYDi4gTA=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?DyoetNGtlwwc274mvH87SM5m8CEskhG8ZtID4YcfkXad8yB9o2b0gX4rDnuj?=
+ =?us-ascii?Q?w2pF2wA1O52M/hUItpKNWMlIgj2S5DC04KyeukhueS2PAgw8coUiwvLL+8eq?=
+ =?us-ascii?Q?sCkRWw2oBBRBqBI8TVpz3adamQ3BkjDMe6vcLI/RX+baOvq6VrG6eXVmEbgh?=
+ =?us-ascii?Q?JihkQ6LhkmejnN9Lu1Crjpz3v78M4aBfFVUyAfAScc7zZ/YoKDC/y/V5meEZ?=
+ =?us-ascii?Q?XsC5eWRLiBXUzfb6mflbvOK1/NLASZclcpEDiUP6ugn5mi9S/CoPAcehclDd?=
+ =?us-ascii?Q?U0KgD1guqZyA3GpD71p8k1D5M4w9fkur3gV82gF1Ep0noIAXL44SiWSckh58?=
+ =?us-ascii?Q?fLTNW3c6uktRxmgoEBXoQf/0qfvkr1dyVOL4kNQrr3DP8+EXJEODws2SXKyl?=
+ =?us-ascii?Q?XHfnjYAsgJBHWFxCfiHjoFPPZEfbNKikBZsbETCi9UPr7Wq4t70nTTjMJlqy?=
+ =?us-ascii?Q?C27NQil1Gg0hIoaVd4k8CvpDB+zRKoXGiWBRqkh6EaQmZlyQTtip5EUfcUxX?=
+ =?us-ascii?Q?xfiLFxMyWOtktLkKNkj+Cr9hO1SA17UUYUTfqqV2YSZKtXu8xhkHxd/yE2Yw?=
+ =?us-ascii?Q?AzGkJtBLpgAArLUONfkpgHF3a3lxm2JSogAvYPBOM1lncY2bZX2d/WqRgRZb?=
+ =?us-ascii?Q?KqdmbXRSD7xleGKgaKgCPn/Geew6por+ZRjg7FbXyyNHYx7LUtXFqML18tWp?=
+ =?us-ascii?Q?9SFKIapR+K1vTEcEsyUkajBX15G1/b0sXYMIlWLG/V61dNYklPLT3Wcevwa9?=
+ =?us-ascii?Q?v2vT8Tr8hEJmeV2Xb3pPUrk1L5YUxTUN13TSbNW5eMmd40Nk/AIW3/xOLklm?=
+ =?us-ascii?Q?CCsHa7CJh541rh9HQKQCzVJ/OxB/LZIkJ+3rrFgYLv8hdaYk4iye0eBLj32C?=
+ =?us-ascii?Q?UEFXH7NnSZH+Asxs4IEq85B9vCES4ehu0aZuKgW6/3ZB7HkVcE11J802E5G4?=
+ =?us-ascii?Q?nZJEgyPeKaCWMw8cFKKncG7ii1HF6EGUV41u/lqdqOoF+SE3uc49/+Mij5k/?=
+ =?us-ascii?Q?OqgOCBRO6CEL7PEpb9Kwhmk6EidYzJfYe3u8dQmvFYiQOB4aFx4EqCdKl8mw?=
+ =?us-ascii?Q?t3qr6x1gWO2FIi4u05MIA9P8OCrtBWXCH1l+r/bmsvFxvhhRU6SBEmByc3RH?=
+ =?us-ascii?Q?yVvjajwMvf7wt1SoUichpatFHj/KjUz3DTllMCMp5ZoGtNWWP+UremP4IdWp?=
+ =?us-ascii?Q?UQpKfz9W+9ScdRNRH/zZmJz/ZUs2MDFw4VjMxobAeTZYdrZutk3pA9rHsZIV?=
+ =?us-ascii?Q?QvqF7y59v/kTJk2RroyHDXgplEzzb054ki87/NOalU0Oa8fP+ys4j/ypVSK5?=
+ =?us-ascii?Q?saHjb1x2PC5cLPKO2o2liYTb8vYwjPdNqk9UyPdO2/1aR1Fhe+p/vMrkHdWd?=
+ =?us-ascii?Q?E5UwbKrtcyXGz/V77eq94Mo3LauEv/voY6880R4JPhYD7/q6Xc6OSJFlBJgZ?=
+ =?us-ascii?Q?bwM8Pco8ZtjSlVLH0LxohaULBm0ETNrS6i5Xzl1LadGyjbeQg5mO/ANB4Pu9?=
+ =?us-ascii?Q?uPx+AMy9aqsyZVfHXNaDqsvx5Ml0wWBFIdd/Ve1U+JjW48EI9T1vbubWPx7d?=
+ =?us-ascii?Q?Luoy3YVbEOGi7env5RQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|SJ1PR10MB5979:EE_
-X-MS-Office365-Filtering-Correlation-Id: feab330e-3a2a-4134-a6d9-08ddae476b1b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MEN0b2V3RkJkb1JoK29CZktDTmsyWXR4bVJMRXZ5WmtoWU02ZytKbGRJWTl6?=
- =?utf-8?B?YTlZb3pjWXlEMk5ZY2c1anZTUU9qY1pybWloV0VVV1cxVUVpSXppdWk5SWZW?=
- =?utf-8?B?OTNoSnFZelVZZEN2NTRMMTBrc3k4dnkvTzh2VnpZOHJRMlo0dzhMdDg2SU5w?=
- =?utf-8?B?U2lmL1EreXBwSndEajd6OFI0SHVELzI1SmpkUC9kVVIxZjVaMkVpTWg3TUhw?=
- =?utf-8?B?eEtqWHdmZHowT2hQUVRxaEVZeERMaTUwSzFKcHlwZFJhOUkwWFl5WXk3NWY3?=
- =?utf-8?B?TmpIb3EvTS9MVE44R2NUREFQMWUwci9hSkRqYnhQNXpPRmVFQzZMTDEvV3l3?=
- =?utf-8?B?REN5S2FGcTdBZ01MaDBHT0QxSHZqQlowL2JTNVhCSHBsTWE1dkw1bXJITzNI?=
- =?utf-8?B?Tnh3YW1TcEtvN08yZVdDa2N3K0xZemZnK3BRMEVLV05sQ01XMzdsa3FmeEEw?=
- =?utf-8?B?MTVzYzkzV3BWNHBtL29tSWZZNkdyR2xHQTdMaHE3bmJkMUluK3E4eUh1enhh?=
- =?utf-8?B?SnY0MTVjU3RmY21lZWdrQjE1NDA2dEN4R0F5S1J0UW5icWpRSldOK2l1cEJa?=
- =?utf-8?B?OElxWkxRdlBUYXYvcWNhS1R1MDBMTUE4SUg5U1I1cFROd2MyNTF3K00va2pn?=
- =?utf-8?B?RVpOUGNGTEd5YURhdVZsZlplZTR4eTRuM2NncVZYYThHWmZoZWlhZUFSZ3k1?=
- =?utf-8?B?TW5HM0kyaUxPTWVJZmcrcnArMlNJYnRCckl5NW1JbGlPVFRsbjBxaXpmQXVX?=
- =?utf-8?B?YlBNcXU5b2dmcmhmN3NTZjFQTjRHZTNteVZRWHNCQm45SGlyVGhrVThQRWFy?=
- =?utf-8?B?YVBsT2pETGtPNERYWkttUzVyYnNaS01tLzFFczg3K0VDR2djSnhzNjVmUTcz?=
- =?utf-8?B?M2tjTVh2RDV0Q29abWdSOU1yUUE3NFVqa015OWZUb2FVK3VvY2o2M1BENENJ?=
- =?utf-8?B?YVRWNFRYbkNCQ0xBWnZJNGg3cm40VlAvem1kTS9SMisyMU5keWpacWFjNm1n?=
- =?utf-8?B?WDNYc2RnQnVqSFBhU0hIMG91TWMvdTJEMW9SdnhlcDUyNTlBWkNNQjUvVURL?=
- =?utf-8?B?eVdmeGtyZjdvWERzQWI1bjJ0V011aDI4dXgrSTRyZm9tNnZtdmw3SEpMQzRU?=
- =?utf-8?B?Y2p5UlZjUk5iRXVGNEVuRklzRkZNRElvSUYvc3pySmZPUU1QSkZtaVU4MEpQ?=
- =?utf-8?B?elI5dFpPRVhOSG9JOGFJM21BcStRWE1xSWY0Z2pIam51UXNSQkp6SGIvV1pa?=
- =?utf-8?B?Njd0MW1UdGtQazNhdWNRd0tLcDFIVVJKTTRXNWlxaU9rd3RIb3k2c2k3ZnVL?=
- =?utf-8?B?RVRuZ3ZnMFBqRGJOOWg2SW9MZVdlQktMLzd5TlJQTTRqMEpJbUV1dy9kUSto?=
- =?utf-8?B?SGtlT3ZFK1lBQjhNcTBtcGVDd3VEZTN3V1pua2lPdndKeWFYMWY1TlRHREQ0?=
- =?utf-8?B?UHFnUGIwQmdEdmFXOFVFL3BIMmh5SE5CTDlkWjVqV3ZwSkNPUGllam90N0hZ?=
- =?utf-8?B?bGZGcjQxdE4vTVNrRERzd25GSHlJZkhITzZCcy9XdDM2RFYwWXcram0wNWIr?=
- =?utf-8?B?NisrK2NRQzhuamFYZlUyQjloaFhQMGxpUVBuTFNyQ0Z5WkljdGJJZmRlT2lJ?=
- =?utf-8?B?RFRiNVJVMnVic0MyZ0xiNkVGcjNZOVlZK2dXN0ZsTXJUSGxncU5rdVc2KzRS?=
- =?utf-8?B?bUFGNHFvVDRoNDdJZzhSaEloTGx1bFFxajIxMWd1VDZjeUtWWWlWRldmS2JD?=
- =?utf-8?B?ck12SVZjc2t5RGppNzA0SWN4N3JQNnlVQldtZE53aE4rSnU3UzUrNit1ZFZS?=
- =?utf-8?B?NWt3L2JDQlNIdzdEM2p0Tm0zUnR1ZHo1T2pVU2EzWU5WVGZYWE0yUnhSVVgz?=
- =?utf-8?B?SXhCZXlWN3ZJRzhUYUl1MCt6QWVic0ZzYUczZE9zQlRFWFE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d0pkNndvZENiZ1hZZ21KQzVWc01vVUd4UFptWUhVbkE5R3VoczUzczBEbjhl?=
- =?utf-8?B?bWdEMm1EMGlJWWE4ZUNmVUVuMnZQN1lCb2hQbzlHcW0wRCtTY1VkV3BrRExT?=
- =?utf-8?B?VG15SXVMcC9ocmhDa3pvQXlGSFJYbVZXdWJoSHJwWERJaUdiTTY5elZ0TFJs?=
- =?utf-8?B?azkyZE5PWmtLa1IyY3JzTWpVaHl1QUpEOFRGNUJGdkRWa0JzaHhmTExaN0dI?=
- =?utf-8?B?eThTdlFOU3ZnN2h4MjhwT2s2UDFyWGtxSmIySDNRUnU3Ny8xUk1pV0NOSEtZ?=
- =?utf-8?B?RHJNTFpoNGs1S00wSGE4SmNWMGdvN0tSUmNJamYxdzVTTmZtbEwxbVRFRU1r?=
- =?utf-8?B?N2U5ekMyMC82UW1MT2o3ZmFNdWpJVitzL3dJTWxNYjE0K3VBQmV0U2tLYnB5?=
- =?utf-8?B?emdnUmNrNjF5YlptQU1CR2pTa0IyODBhTkFMNTM1V3hPN0N4VjhXRWlTUnho?=
- =?utf-8?B?UkRvdnpvOG5qRTRINjkweUZsRVdhMlRIU0VXNjVaaHUySGt5VHNTd1orVExh?=
- =?utf-8?B?Q3ZGUEx6eElZd04vUkFxUHhYVUNrVHdzb2QybkhEVGdHN1NJQWp4cnFnRHpK?=
- =?utf-8?B?MmJMSlNOaVpZOW01Sy9OSWpIWFdPY2Y3KzRVVU5KL2R1dVRHTGdPUjdGSDRj?=
- =?utf-8?B?dzJMWVdRSG1qVCtQUmdEMFJaMDViK3ZVU21DZFZxbk5ENiswRUhMakdYa2Q1?=
- =?utf-8?B?eGFKQk95bC9xNWN4M3JzRGRGS1dRT2hVNlgwbFNBT2gvc0tZcnlUaysyeCtN?=
- =?utf-8?B?ZC9pTXpzaG94dWpjUXU5aE03ODl4T1J4TWtBVTd5MmVOdEcyV29VUGdzeWhV?=
- =?utf-8?B?RVpYRHZoVC9PVVhwbk9sNndQR0FrSTRsM2ZTTG1iZ2RKa1FxZHl1d2N2aEpQ?=
- =?utf-8?B?bFljQ1cydy82UjV4dTdOSUEzVXVHSmR3MmJsT1pQU08yUkFGaEFxYW5kL0lk?=
- =?utf-8?B?Y05pRytDR2k4dUo3SmxDYUlyRVpySkxyWGJ5TVFuM3ZKRWpmSlhIOUsyM3Zq?=
- =?utf-8?B?NVZyTFh2eEdXSVNVbldEaE1LN2xVR1pNV3RxeWhUY0VqQm1vTmlEMFlxMk1t?=
- =?utf-8?B?c25RNG5UOEF3NFV0MHI4RkQwaGtrRzVmY1FZS0FUUi9vVmNwVHRteUhJVG5s?=
- =?utf-8?B?ai8xVzBXNncwUDl2UkdhUyt4WTVBNWxVRkk1VHZwS09ocUdjcEdWcU92cHRQ?=
- =?utf-8?B?ZFJDT1RtS1FyelZDSDl4blc3UWE3VTBtbkxhZDBVYldUcTRLQ2ZTaSt2R0pB?=
- =?utf-8?B?b0xYVHM2Uk9LV0JFKzNKY3MxZnk3UGVWbUlSMkJJa0d0bDBQSnB4UG1tZ1NS?=
- =?utf-8?B?V1kzd0VMbzc4YUV1eWczNWExbzIzVklITk5seXl5Sk9TSlpmS3VwVm11Y21u?=
- =?utf-8?B?ODUveDl3N2lDd3pJVWQxYlBmbXcwa0NJQ0RGZ1VRQkc1ZGRka25KTVBkVW1W?=
- =?utf-8?B?R0RkMVlMUHdiK0Zsc3c2THhVcDQ0bVkzM1ROK0VXMWsvYUEza1F6aDFLUVpw?=
- =?utf-8?B?MXBrVW4wd2ZFMmRLZDFoeFNyMTY2K09xQmJwT292MWMzS3RLZVc4eE5MeWMy?=
- =?utf-8?B?WTEwbEFxU2lZWk1JcnhZVVVpcHpxTEc5cnl1Y3E2cFhoWkRrb2l4NWhnZ2k2?=
- =?utf-8?B?Q0JBbEs4aW50Wm9oSFNSV25ycXIrUW5uTkJYblF0eitQalpzMjlmQ0Z4MFpW?=
- =?utf-8?B?SXU2ZmdNbXpZZjFLVlF2UWNRMExoRVBvV0s4cS9od2d0MVlvNWZCdUtzMGhO?=
- =?utf-8?B?dll3ampWVy9KbDgyai8xdlRXYmVsazJkeERGUVBYY25TOWlJUE5PTVhnZnJW?=
- =?utf-8?B?b1cyT3FkY3g5RnJWVUpaYVhLNXJOV0Vxdk9NNjJxZG1mMFVtOUlFbEZMUGov?=
- =?utf-8?B?aU5mNExlZ2pGOGVybm1GeHNOOW9pTDAweE9iK1VoZ3AxUldPSlN3c0NSSnNB?=
- =?utf-8?B?WGxJblk4SmRXdWJKV0lmTmpHc0pERm1US28vRnlLQzROWVRRL0FsRFJJcnor?=
- =?utf-8?B?ZkRwS0FOWVVmRWZBemdTaS9WRzZhU2w3R1ZsbnlNK0FYMGZ3a1llNU50VlRK?=
- =?utf-8?B?dE9FeUptQkdTR3kyZTBvUU5IYkJTUG4yZmNTbU9XVlErOENWUEczUXVUb2x1?=
- =?utf-8?B?aXFwUzlDZnpGVnk0eUpsTTRia3QrZ1p0MURtbndOVFQycFdGSitVek9SWm9K?=
- =?utf-8?B?RVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	PpMNQImnFs+hSxNyVr/t/RFzGqjHgZl6BTy38p4mHjL3O7Bi+E8zcLo7Wh9a7Zepde52J586svJ83rLoDpcVtfZwz/Me/efUQt+KImwB0HHLhQWHqQpY1LCuVZIFOnN6gTR+v+aqy6fibZlaJXnuZl23OhgOK9q1tlV3MfL4QQFuoPNl/3wZrCVj+BnkqYq30c5mXQ028ZPX3hqR8CdbEy4iIzKozQCPT5Q7vL1AjVxSsnajuiDMtlB27Cdkdn7veTDGSaaUCzmUkQukshwLholN9LKhpeOUhViYZ940ccoHKB5k8jIoxGLEJJejnbUCYFmfPyrq5g9c43KbqOSIY10drGKs40ISPlEf5ELC/ryLvXv8+WLar/hVT+gEE5Q3d3T589KkDDH0ZL874a1jyY/sUQKdt9JDvvsh2OyDoDl3LOtIOgwbWj3Eplx8Pnfb3811jKjXO+b/5lOD2uOlWjX5B4o4TL5+YNgQsA/4mVjCl8dbbobKb8CAJ/2X9A6ABnNfEyebvL4d7K23XTehe791WZxnIZUwZV2BkkEjISZPOxMkvt5M+7XOmmvu5hClEldoJX+w7oa6d4F4SHUwNO2Opi2alflZfsoig3MgXU4=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: feab330e-3a2a-4134-a6d9-08ddae476b1b
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 09:06:32.5087
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33fc8778-d857-4f40-cc32-08ddae4a63ad
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2025 09:27:47.9306
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: faegJuacYvtMdJ9QW8w0jNbRnPVNWfDlWVvM4ruejpVMlhz3O9Nreq+uBwZMzJ6WC6lIP+qa36KaCznYFMhY1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR10MB5979
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-18_03,2025-06-18_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 phishscore=0
- adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506180078
-X-Proofpoint-GUID: 0iJiR-fQ6hr-_HvaVhviaG2K2mJZ8W3z
-X-Proofpoint-ORIG-GUID: 0iJiR-fQ6hr-_HvaVhviaG2K2mJZ8W3z
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA3OCBTYWx0ZWRfX+/Ro2zly2egL tpb1FWtp5WvRK69UXkAUCC1PcEXgdZSvBXBSX8/B/iLVQYJre1Vw64fep9XBO4VF3XBV7g/lmFd E7jTE3E06K2fYFNegPISeLLMU5kYbfPzhJhC+B9TnleREf2TIvfQrOLRv7OyB0fnRlTx8ucSVnz
- vn2MHohbzN4nhJlpHmU44ePJqLW2tMCVDTEhTTVSUraWuFj5Y8amD0WIMnLEjdI5JQhKXAFyU8E c227YiGTB8zOXG2pOzQP6Se2Z/a+3zbomziv2GIxrrnxkuV+KVc9IttRzuZ06hDsFTjD79k4foc 0tZ5PC/i4yrwIo9nPQmOW5O69e3nH8vdaa+M6SeT9LwdKlQ/RHkV1s0eNCq+ItX0he1SdAgH1W0
- 0KzHQdvhy31RRPxOKcua4M215mtAOUg+5/urw2f8i9J0IfWfeF0xIPS96vSvdT+zL8GiQeDz
-X-Authority-Analysis: v=2.4 cv=XZGJzJ55 c=1 sm=1 tr=0 ts=6852819d b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8 a=T9EhDzJh97HtSWJvMMkA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13207
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tFwfBM5WTXeQziDG4crVfvlHvgwbuPgA2Wp7LEGPNLzDnKWKiEwZU22BKbuHCntQcdlp2L4NYj0+2DyEhJRhbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4172
 
-On 18/06/2025 07:00, Damien Le Moal wrote:
-> Back in 2015, commit d2be537c3ba3 ("block: bump BLK_DEF_MAX_SECTORS to
-> 2560") increased the default maximum size of a block device I/O to 2560
-> sectors (1280 KiB) to "accommodate a 10-data-disk stripe write with
-> chunk size 128k". This choice is rather arbitrary and since then,
-> improvements to the block layer have software RAID drivers correctly
-> advertize their stripe width through chunk_sectors and abuses of
-> BLK_DEF_MAX_SECTORS_CAP by drivers (to set the HW limit rather than the
-> default user controlled maximum I/O size) have been fixed.
-> 
-> Since many block devices can benefit from a larger value of
-> BLK_DEF_MAX_SECTORS_CAP, and in particular HDDs, increase this value to
-> be 4MiB, or 8192 sectors.
-> 
-> And given that BLK_DEF_MAX_SECTORS_CAP is only used in the block layer
-> and should not be used by drivers directly, move this macro definition
-> to the block layer internal header file block/blk.h.
-> 
-> Suggested-by: Martin K . Petersen <martin.petersen@oracle.com>
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Hi Jan and others,
 
-Regardless of comment below:
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+> From: Parav Pandit
+> Sent: 03 June 2025 07:03 PM
+> To: Jan Kara <jack@suse.cz>
+> Cc: linux-block@vger.kernel.org; linux-fsdevel@vger.kernel.org
+> Subject: RE: warning on flushing page cache on block device removal
+>=20
+> Hi Jan,
+>=20
+> > From: Parav Pandit <parav@nvidia.com>
+> > Sent: Tuesday, May 27, 2025 7:55 PM
+> >
+> >
+> > > From: Jan Kara <jack@suse.cz>
+> > > Sent: Tuesday, May 27, 2025 7:51 PM
+> > >
+> > > On Tue 27-05-25 12:07:20, Parav Pandit wrote:
+> > > > > From: Jan Kara <jack@suse.cz>
+> > > > > Sent: Tuesday, May 27, 2025 5:27 PM
+> > > > >
+> > > > > On Tue 27-05-25 11:00:56, Parav Pandit wrote:
+> > > > > > > From: Jan Kara <jack@suse.cz>
+> > > > > > > Sent: Monday, May 26, 2025 10:09 PM
+> > > > > > >
+> > > > > > > Hello!
+> > > > > > >
+> > > > > > > On Sat 24-05-25 05:56:55, Parav Pandit wrote:
+> > > > > > > > I am running a basic test of block device driver unbind,
+> > > > > > > > bind while the fio is running random write IOs with
+> > > > > > > > direct=3D0.  The test hits the WARN_ON assert on:
+> > > > > > > >
+> > > > > > > > void pagecache_isize_extended(struct inode *inode, loff_t
+> > > > > > > > from, loff_t
+> > > > > > > > to) {
+> > > > > > > >         int bsize =3D i_blocksize(inode);
+> > > > > > > >         loff_t rounded_from;
+> > > > > > > >         struct folio *folio;
+> > > > > > > >
+> > > > > > > >         WARN_ON(to > inode->i_size);
+> > > > > > > >
+> > > > > > > > This is because when the block device is removed during
+> > > > > > > > driver unbind, the driver flow is,
+> > > > > > > >
+> > > > > > > > del_gendisk()
+> > > > > > > >     __blk_mark_disk_dead()
+> > > > > > > >             set_capacity((disk, 0);
+> > > > > > > >                 bdev_set_nr_sectors()
+> > > > > > > >                     i_size_write() -> This will set the
+> > > > > > > > inode's isize to 0, while the
+> > > > > > > page cache is yet to be flushed.
+> > > > > > > >
+> > > > > > > > Below is the kernel call trace.
+> > > > > > > >
+> > > > > > > > Can someone help to identify, where should be the fix?
+> > > > > > > > Should block layer to not set the capacity to 0?
+> > > > > > > > Or page catch to overcome this dynamic changing of the size=
+?
+> > > > > > > > Or?
+> > > > > > >
+> > > > > > > After thinking about this the proper fix would be for
+> > > > > > > i_size_write() to happen under i_rwsem because the change in
+> > > > > > > the middle of the write is what's confusing the iomap code.
+> > > > > > > I smell some deadlock potential here but it's perhaps worth
+> > > > > > > trying :)
+> > > > > > >
+> > > > > > Without it, I gave a quick try with inode_lock() unlock() in
+> > > > > > i_size_write() and initramfs level it was stuck.  I am yet to
+> > > > > > try with LOCKDEP.
+> > > > >
+> > > > > You definitely cannot put inode_lock() into i_size_write().
+> > > > > i_size_write() is expected to be called under inode_lock. And
+> > > > > bdev_set_nr_sectors() is breaking this rule by not holding it.
+> > > > > So what you can try is to do
+> > > > > inode_lock() in bdev_set_nr_sectors() instead of grabbing bd_size=
+_lock.
+> > > > >
+>=20
+> I replaced the bd_size_lock with inode_lock().
+> Was unable to reproduce the issue yet with the fix.
+>=20
+> However, it right away breaks the Atari floppy driver who invokes
+> set_capacity() in queue_rq() at [1]. !!
+>=20
+> [1]
+> https://elixir.bootlin.com/linux/v6.15/source/drivers/block/ataflop.c#L15=
+44
+>=20
+> With my limited knowledge I find the fix risky as bottom block layer is i=
+nvoking
+> upper FS layer inode lock.
+> I suspect it may lead to A->B, B->A locking in some path.
+>=20
+> Other than Atari floppy driver, I didn't find any other offending driver,=
+ but its
+> hard to say, its safe from A->B, B->A deadlock.
+> A =3D inode lock
+> B =3D block driver level lock
+>=20
+> > > > Ok. will try this.
+> > > > I am off for few days on travel, so earliest I can do is on Sunday.
+> > > >
+> > > > > > I was thinking, can the existing sequence lock be used for
+> > > > > > 64-bit case as well?
+> > > > >
+> > > > > The sequence lock is about updating inode->i_size value itself.
+> > > > > But we need much larger scale protection here - we need to make
+> > > > > sure write to the block device is not happening while the device
+> > > > > size changes. And that's what inode_lock is usually used for.
+> > > > >
+> > > > Other option to explore (with my limited knowledge) is, When the
+> > > > block device is removed, not to update the size,
+> > > >
+> > > > Because queue dying flag and other barriers are placed to prevent
+> > > > the IOs
+> > > entering lower layer or to fail them.
+> > > > Can that be the direction to fix?
+> > >
+> > > Well, that's definitely one line of defense and it's enough for
+> > > reads but for writes you don't want them to accumulate in the page
+> > > cache (and thus consume memory) when you know you have no way to
+> > > write
+> > them
+> > > out. So there needs to be some way for buffered writes to recognize
+> > > the backing store is gone and stop them before dirtying pages.
+> > > Currently that's achieved by reducing i_size, we can think of other
+> > > mechanisms but reducing i_size is kind of elegant if we can
+> > > synchronize that
+> > properly...
+> > >
+> > The block device notifies the bio layer by calling
+> > blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue); Maybe we can
+> come
+> > up with notification method that updates some flag to page cache layer
+> > to drop buffered writes to floor.
+> >
+> > Or other direction to explore, if the WAR_ON() is still valid, as it
+> > can change anytime?
+> >
 
-> ---
-> Changes from v1:
->   - Move BLK_DEF_MAX_SECTORS_CAP definition to block/blk.h
+Is below WARN_ON() still valid, given the disk size can change any time?
 
-it's only referenced in blk-settings.c, so I don't know why it doesn't 
-live there.
+void pagecache_isize_extended(struct inode *inode, loff_t from, loff_t to) =
+{
+        int bsize =3D i_blocksize(inode);
+        loff_t rounded_from;
+        struct folio *folio;
 
-However it is co-located with enum blk_default_limits and the same 
-comment goes for members of enum blk_default_limits. I think all those 
-in enum blk_default_limits could potentially be moved to blk-settings.c 
-after Christoph's work for atomic queue limit updates.
+        WARN_ON(to > inode->i_size);
 
+
+> > > 								Honza
+> > > --
+> > > Jan Kara <jack@suse.com>
+> > > SUSE Labs, CR
