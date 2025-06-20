@@ -1,249 +1,114 @@
-Received: from mail-vk1-f228.google.com (mail-vk1-f228.google.com [209.85.221.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A56C2BDC0A
-	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 15:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E5A83A14
+	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 15:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750432221; cv=none; b=N5qQp2SQ5t49CtkalxZvA2QBZnMEjH6VNrf8ec2LWATYlDH9EjIGPZq6/HcXXEWSmSjGkRgPbtBIhTJGqOftsbVeetlg4OfqzY1hf+W7AC/YU93tTl1o3GQBXaI/6iLNB/k9xpCkkWwo95IB25KzfnqBWqV9W6sDeQ/JXMzYhCI=
+	t=1750432672; cv=none; b=rQEoGVJA+LRSa3qdp1BfKfye7m3b70VFcsg2Gea78c0JMfRmL1Drk/F9dT4aOO93hyqC7T1a5PhhxspdLVApGnOfENVc3+kNwONTsLyR8ARwf+T0OfM9KeI7KX4utFE1S0mj/O2vmLiGhz+lsDPefe3FIpWoyK10K1IqGmxku2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750432221; c=relaxed/simple;
-	bh=O40UOqFTCrkBURI0ChAMn5y0WF2s2tRY0UNcvaUtbtg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LzbtvRV55bcgk1NrRyJLMkfLAZDH5wJSfvf8q/GgkNKrMifN1PUxj+I19xXLTYujaS/ruilspz/Do1ODlftHCjS+lE7w+fNanT8DaKk4XQImG0Ca/Jfd0DftL0/5EAfYahZzwuArkbN8Dx3xg9XMJYBtnRRWRisXy3cI9yByZNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fi6/QII2; arc=none smtp.client-ip=209.85.221.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1750432672; c=relaxed/simple;
+	bh=e5ATNsy3jOC4Gu92fK3f80EMuwFDMq1+axycp/lKEr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qey2I7WWRu87iHRnUAySImjRYA9Yo7BENl9Xma31vHYKsZTRPiMdcAIKYtUHkeeoOO0cGrxEnlX0aAAJGhxz8lse2cOQQDS7RPznP6UfYpeiioLdjQp9WmYmH8M7QX6IoOxT/XYOViuJPLHdaxuUylMY2SwDFfxsiUymWAEwJ3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HV065x+2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fi6/QII2"
-Received: by mail-vk1-f228.google.com with SMTP id 71dfb90a1353d-531618a6023so82929e0c.3
-        for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 08:10:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1750432219; x=1751037019; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E3UWa2lAIILllH4GbKNaBWHGkAbq2xR+lFp7v8Tz9vY=;
-        b=fi6/QII28fB0BVnjjoI5cHj8jf8VZ3cDrl5YRS45g0+wEQLU3n6/e7+o97N3zZ355u
-         Sg0yiq+nrPP6DExpDRF1MJ7dVJfKBt20CBITZpGWCOEpAcgjWg9/lfZdSpDbR48sxpb4
-         1pKmP+Ogirg6MaJQBRp3m+UhmQjlwF4Dg+bxaEdpdXFvbBT69LV3uutil+TIFLYSBUHX
-         SJAdx3kwdgYpc47WKrxngD/UG9Z8BQgLTuwlYwPXmporct6+ctMH7tpObavMis4pzPfP
-         B5GkFr7iVXEQ2WAe1L63hDgXA1DE14vc76m0LZUreo78dnQ05UzaRpXVJENTWp6yShlA
-         T0Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750432219; x=1751037019;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E3UWa2lAIILllH4GbKNaBWHGkAbq2xR+lFp7v8Tz9vY=;
-        b=X4+ikQV9JKhLvJwEpTehiMWSGpxYcb+Q1LitOLtzy0zShpDz9UvlfoChAsryTxmm2m
-         LAb57YfaKXNKQpyj3YSCPLKK1Ah3AYuoul2Oej+Zp4aMhD7bQG8K5htdnzwNQySkBI95
-         k3hTV2/Lfyjr11jVqvUzJoJpsaTNmwX4JhIE3rhHo+oM8eP0eHzmyL8KAoVbJgQuA+8c
-         M8bLfvquT5NjW+sgNH7LOooPK/nWzYRRSCXg+lXVPMOadK6KjmsNx8HrnOHyvDdHz7SN
-         qOcNHjYqcOW+76H9GnEDFIvzd4bVn3mzJ/VztY4JBjRyJhKFBCoOGOx+spkDo4q6Nke6
-         bVfA==
-X-Gm-Message-State: AOJu0YxykZF9YgkLi0PeLlqvNyVU0HaCZAI4tyW/tZKAyXMXpE9OnqXY
-	xffAXx0X982QbmPeg4I/MtIT16J/NDyLenERYeJH4hVJLjsLCySOn2QcK0AHBRst1AfuVpBjYfX
-	sute7TquaBikmXX8fk/TlyKWDwNrScMLD4ANgY2AuOwtMV8vnnWmr
-X-Gm-Gg: ASbGncunP9tmOhuaU1C9RfTfK/d+IK4smulEz86lHh4NrRVDTzMU9kL9wk5ajQuipJs
-	PPF82oioTmcV10q1yGApqTQ9GtjM7T1J5cTdmbjA36itzqlc01Xue4pCTlOdxgVnrwnQdO0bkiU
-	0MHImxgq8LXd8BLRVw2sEatPYN5MnaWBxUDec4FZWyG5tO/FXOrRohmFpx8fh80ECU3Hvgde/KC
-	og0JiC1zOJd+RTSQsJv1WfRxcRLxERtC9mc1ZKi5J+SbF43OjZhwcED44F9gKB6pHTgNxHz9KXE
-	UF+24Gf8FpjOM9BWUmEXkuuRku/I5XtQbGDyPqjJ
-X-Google-Smtp-Source: AGHT+IH3CKXKHwhMsjGTTsRR0g9Z4ILQOrJnP+cUfDJs5r10Mo0fQeXS9yik1VEqVwfHh2FruWZCgOIMnyKg
-X-Received: by 2002:a05:6122:549:b0:531:9088:8d57 with SMTP id 71dfb90a1353d-531ad6f97eamr624695e0c.3.1750432218216;
-        Fri, 20 Jun 2025 08:10:18 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-531ab25134asm145005e0c.9.2025.06.20.08.10.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 08:10:18 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id D0312340D6A;
-	Fri, 20 Jun 2025 09:10:16 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id CEC9FE4548E; Fri, 20 Jun 2025 09:10:16 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v2 13/14] ublk: remove ubq checks from ublk_{get,put}_req_ref()
-Date: Fri, 20 Jun 2025 09:10:07 -0600
-Message-ID: <20250620151008.3976463-14-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250620151008.3976463-1-csander@purestorage.com>
-References: <20250620151008.3976463-1-csander@purestorage.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HV065x+2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750432670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qXOTvLMRylZK+H/fGvZaqBAySADzncjmEf4USLMDpkc=;
+	b=HV065x+2bUCdbzv5e44YXZxiySsPKJtH42ivLTQ5IPtxGe1FY44SejLYIgi7sCDwHujl8H
+	rAzh9kQSmtZZUgm0/Z8+sdb20cZJE4xEa5M+e2Y/oNKNM34zamf6Hle9IcPgzfev+bCOJi
+	7GoDbwrpaWUmDwvXm7rUKLg3k6fUfgQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-478-nuqvylJmOOau74u3bXgSyQ-1; Fri,
+ 20 Jun 2025 11:17:44 -0400
+X-MC-Unique: nuqvylJmOOau74u3bXgSyQ-1
+X-Mimecast-MFC-AGG-ID: nuqvylJmOOau74u3bXgSyQ_1750432663
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 228DC1828AC3;
+	Fri, 20 Jun 2025 15:17:41 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.24])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B888319560A3;
+	Fri, 20 Jun 2025 15:17:35 +0000 (UTC)
+Date: Fri, 20 Jun 2025 23:17:29 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
+	sth@linux.ibm.com, gjoyce@ibm.com
+Subject: Re: [PATCHv3 1/2] block: move elevator queue allocation logic into
+ blk_mq_init_sched
+Message-ID: <aFV7iSUpCdgqX1Sh@fedora>
+References: <20250616173233.3803824-1-nilay@linux.ibm.com>
+ <20250616173233.3803824-2-nilay@linux.ibm.com>
+ <aFGEzN5c0-b5VdcM@fedora>
+ <a1644c15-2a9a-4fc1-a762-b153d167cd1f@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1644c15-2a9a-4fc1-a762-b153d167cd1f@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-ublk_get_req_ref() and ublk_put_req_ref() currently call
-ublk_need_req_ref(ubq) to check whether the ublk device features require
-reference counting of its requests. However, all callers already know
-that reference counting is required:
-- __ublk_check_and_get_req() is only called from
-  ublk_check_and_get_req() if user copy is enabled, and from
-  ublk_register_io_buf() if zero copy is enabled
-- ublk_io_release() is only called for requests registered by
-  ublk_register_io_buf(), which requires zero copy
-- ublk_ch_read_iter() and ublk_ch_write_iter() only call
-  ublk_put_req_ref() if ublk_check_and_get_req() succeeded, which
-  requires user copy to be enabled
+On Fri, Jun 20, 2025 at 08:09:01PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 6/17/25 8:37 PM, Ming Lei wrote:
+> > On Mon, Jun 16, 2025 at 11:02:25PM +0530, Nilay Shroff wrote:
+> >> In preparation for allocating sched_tags before freezing the request
+> >> queue and acquiring ->elevator_lock, move the elevator queue allocation
+> >> logic from the elevator ops ->init_sched callback into blk_mq_init_sched.
+> >>
+> >> This refactoring provides a centralized location for elevator queue
+> >> initialization, which makes it easier to store pre-allocated sched_tags
+> >> in the struct elevator_queue during later changes.
+> >>
+> >> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> >> ---
+> 
+> [...]
+> 
+> >> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> >> index 55a0fd105147..d914eb9d61a6 100644
+> >> --- a/block/blk-mq-sched.c
+> >> +++ b/block/blk-mq-sched.c
+> >> @@ -475,6 +475,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+> >>  	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+> >>  				   BLKDEV_DEFAULT_RQ);
+> >>  
+> >> +	eq = elevator_alloc(q, e);
+> >> +	if (!eq)
+> >> +		return -ENOMEM;
+> >> +
+> >>  	if (blk_mq_is_shared_tags(flags)) {
+> >>  		ret = blk_mq_init_sched_shared_tags(q);
+> >>  		if (ret)
+> > 
+> > The above failure needs to be handled by kobject_put(&eq->kobj).
+> 
+> I think here the elevator_alloc() failure occurs before we initialize 
+> eq->kobj. So we don't need to handle it with kobject_put(&eq->kobj)
+> and instead simply returning -ENOMEM should be sufficient. Agree?
 
-So drop the ublk_need_req_ref() check and the ubq argument in
-ublk_get_req_ref() and ublk_put_req_ref().
+I meant the failure from blk_mq_init_sched_shared_tags(), which has to
+call kobject_put() for correct cleanup.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 35 +++++++++++------------------------
- 1 file changed, 11 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 199028f36ec8..ebc56681eb68 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -697,28 +697,19 @@ static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
- {
- 	if (ublk_need_req_ref(ubq))
- 		refcount_set(&io->ref, UBLK_REFCOUNT_INIT);
- }
- 
--static inline bool ublk_get_req_ref(const struct ublk_queue *ubq,
--		struct ublk_io *io)
-+static inline bool ublk_get_req_ref(struct ublk_io *io)
- {
--	if (ublk_need_req_ref(ubq))
--		return refcount_inc_not_zero(&io->ref);
--
--	return true;
-+	return refcount_inc_not_zero(&io->ref);
- }
- 
--static inline void ublk_put_req_ref(const struct ublk_queue *ubq,
--		struct ublk_io *io, struct request *req)
-+static inline void ublk_put_req_ref(struct ublk_io *io, struct request *req)
- {
--	if (ublk_need_req_ref(ubq)) {
--		if (refcount_dec_and_test(&io->ref))
--			__ublk_complete_rq(req);
--	} else {
-+	if (refcount_dec_and_test(&io->ref))
- 		__ublk_complete_rq(req);
--	}
- }
- 
- static inline void ublk_sub_req_ref(struct ublk_io *io, struct request *req)
- {
- 	unsigned sub_refs = UBLK_REFCOUNT_INIT - io->task_registered_buffers;
-@@ -2019,11 +2010,11 @@ static void ublk_io_release(void *priv)
- 	 * but unregistered on task. Or after UBLK_IO_COMMIT_AND_FETCH_REQ.
- 	 */
- 	if (current == io->task && io->task_registered_buffers)
- 		io->task_registered_buffers--;
- 	else
--		ublk_put_req_ref(ubq, io, rq);
-+		ublk_put_req_ref(io, rq);
- }
- 
- static int ublk_register_io_buf(struct io_uring_cmd *cmd,
- 				const struct ublk_queue *ubq,
- 				struct ublk_io *io,
-@@ -2041,11 +2032,11 @@ static int ublk_register_io_buf(struct io_uring_cmd *cmd,
- 		return -EINVAL;
- 
- 	ret = io_buffer_register_bvec(cmd, req, ublk_io_release, index,
- 				      issue_flags);
- 	if (ret) {
--		ublk_put_req_ref(ubq, io, req);
-+		ublk_put_req_ref(io, req);
- 		return ret;
- 	}
- 
- 	return 0;
- }
-@@ -2338,11 +2329,11 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
- 	 */
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
- 	if (!req)
- 		return NULL;
- 
--	if (!ublk_get_req_ref(ubq, io))
-+	if (!ublk_get_req_ref(io))
- 		return NULL;
- 
- 	if (unlikely(!blk_mq_request_started(req) || req->tag != tag))
- 		goto fail_put;
- 
-@@ -2352,11 +2343,11 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
- 	if (offset > blk_rq_bytes(req))
- 		goto fail_put;
- 
- 	return req;
- fail_put:
--	ublk_put_req_ref(ubq, io, req);
-+	ublk_put_req_ref(io, req);
- 	return NULL;
- }
- 
- static inline int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
-@@ -2468,48 +2459,44 @@ static struct request *ublk_check_and_get_req(struct kiocb *iocb,
- 		goto fail;
- 
- 	*off = buf_off;
- 	return req;
- fail:
--	ublk_put_req_ref(ubq, *io, req);
-+	ublk_put_req_ref(*io, req);
- 	return ERR_PTR(-EACCES);
- }
- 
- static ssize_t ublk_ch_read_iter(struct kiocb *iocb, struct iov_iter *to)
- {
--	struct ublk_queue *ubq;
- 	struct request *req;
- 	struct ublk_io *io;
- 	size_t buf_off;
- 	size_t ret;
- 
- 	req = ublk_check_and_get_req(iocb, to, &buf_off, ITER_DEST, &io);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
- 	ret = ublk_copy_user_pages(req, buf_off, to, ITER_DEST);
--	ubq = req->mq_hctx->driver_data;
--	ublk_put_req_ref(ubq, io, req);
-+	ublk_put_req_ref(io, req);
- 
- 	return ret;
- }
- 
- static ssize_t ublk_ch_write_iter(struct kiocb *iocb, struct iov_iter *from)
- {
--	struct ublk_queue *ubq;
- 	struct request *req;
- 	struct ublk_io *io;
- 	size_t buf_off;
- 	size_t ret;
- 
- 	req = ublk_check_and_get_req(iocb, from, &buf_off, ITER_SOURCE, &io);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
- 	ret = ublk_copy_user_pages(req, buf_off, from, ITER_SOURCE);
--	ubq = req->mq_hctx->driver_data;
--	ublk_put_req_ref(ubq, io, req);
-+	ublk_put_req_ref(io, req);
- 
- 	return ret;
- }
- 
- static const struct file_operations ublk_ch_fops = {
--- 
-2.45.2
+
+Thanks,
+Ming
 
