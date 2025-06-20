@@ -1,147 +1,119 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9359E2DF3CF
-	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 16:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B9A21FF51
+	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 18:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750436044; cv=none; b=gZMT2xi1hTE9XkksOplxhnA/RfRC0Rb9AbJClpcW7vrTRGwzLyjFC3er4WYaGNk6SO8M+EvcRYUvxkHDJdt45h+QE+DFabsonmo51JDduNFgxcr7sSCfNRS4kgKJhn9EeVPsa3rjZsOZNL4QuA0/rNLpn8+Kfz5miOKFDs/Jsv4=
+	t=1750444464; cv=none; b=dbDNRfUbbEJ7QLBMzKq0BkQ9Ah86tRKh11etGODl7WeTgBEHIKmK69uP3epkOmG+VkIXPyOpoKLwosN1XIs+o4IvMcAUtMB7cLakpqyAQ/bnV4pSP1eIl1HpfJBVlO1sdI+IvnehPTm/EdPaviuoUXg4owPy8lwnlASgkMRDH9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750436044; c=relaxed/simple;
-	bh=dNRwtGARTf80nzNBfRtwY3LqFc3CxiBpqxpJRoJKpXQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=leJwmnEox5BuCU18NiiwEVc4eff7FZ1lHegvT5a1no3gTEdh4my5wudYYkTMMHgARdfxMVKr9O/akrvfK8lS8T+E/vlZ9EUxrixXcTPBk2WaYL1g9XQkRB5DJLNoGrOWvjiFFKIlrxEcDRYBgjhufkX9uWJea6ySMK3V4mbL9AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=annjDTwp; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1750444464; c=relaxed/simple;
+	bh=8XsYzikH0OK5Hpl7wAKc0SWisccif2lNEEKDrwVeCXY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cbod+J1AdnISI0s7Us65jWpAq+TTJxy3gAJLmZWPbV6RLQE+BncyrL830dixk/kqDQ1mFz1eTRAhDX+b3mBaseoAh3e9/kwwGgrF5ERvpLzzgHCiE4pP0ChHVJo3WYAYzSdp1o+L3NQ7n4JGAfx4kCJjiXZobPuxARTnw1XnXVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PHCUpLBc; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="annjDTwp"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55K8RIwv028388;
-	Fri, 20 Jun 2025 16:13:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=zRCBxf
-	zzW8xHQkhcF4kWDF7KtK+7r3cHGnV2XyufIw4=; b=annjDTwpz6VijWjFpRqEB5
-	NnoG6rtXQLNu95Jc28lpgTPEOY4bWF9BMdEe+6AIImT2KasqKBwNRaIDTKloBwEf
-	gZOT/eanGjo1qWoco9U8xLAF1HU4kXLLeFjlYCpVL/BjA3zZ6wdFwWdMma7R53gI
-	w35P0MP63gw4291HttgLwS/mXQ4JCeDDf3ZzNzOBXYi8WrX1loWNoEQbUvXiKb8W
-	aUKzm3glsdUTurLybcanYQKtYKM6LOUn6/+Z/Ei2rEP8dq0XeZ+8z9Eu57eIUGnZ
-	hUbIOiJRxUVb6a/1d1sly5f9QOAwN6P3zGrx1oooDa1C/M6N+rLyYc52l797ny7g
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r2ky5r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Jun 2025 16:13:57 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55KDLOWx027480;
-	Fri, 20 Jun 2025 16:13:56 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 479kt0c4bn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Jun 2025 16:13:56 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55KGDtkf57147852
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Jun 2025 16:13:55 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 24F4F5803F;
-	Fri, 20 Jun 2025 16:13:55 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D22245804E;
-	Fri, 20 Jun 2025 16:13:52 +0000 (GMT)
-Received: from [9.61.191.218] (unknown [9.61.191.218])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 20 Jun 2025 16:13:52 +0000 (GMT)
-Message-ID: <cc62b691-b034-419e-ac24-6c90061d8572@linux.ibm.com>
-Date: Fri, 20 Jun 2025 21:43:51 +0530
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PHCUpLBc"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-747abb3cd0bso1584149b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 11:34:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1750444462; x=1751049262; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vDt9Tud6S9Roh6W5bYJpXYlaicNuFd+r8htTFd4j9Iw=;
+        b=PHCUpLBczp8WlIRTMVhRMjZrKHIgetey+N1/WJRlVxWx3jOGwIlz+AodkFiyEA36/e
+         tiL2l/uumpMvlZncDBt+mDTPY/7wHGiQT4aoTqQl6HQtI+SCbZ6/Jqa+or3IHoMsL72i
+         HUwq3Bdsicu/qrRTCG1iW8mymHaaGsdYO1tZMcytv4QvvEu4kjejp4xg7EMzoOtqCShZ
+         c6Sf09ktxaFtXyfqsgWDs46RHcdRwpy26IN7JgOq0HFCLSGdxAxhC2YBfB0aovuP+FMJ
+         hbi1IzaFXHw3q8/KJHHzfXhIZZ7IqM/lje93m+2Gvb7MnoA6OjQCjfJ4eEgmVg8UYmhZ
+         UF+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750444462; x=1751049262;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vDt9Tud6S9Roh6W5bYJpXYlaicNuFd+r8htTFd4j9Iw=;
+        b=YDTafUq+jxpHnsKUQsP/2TqgY/aa7HXs1x2MZnb2LNz7Y43/pNLjqmY2zhQyXaoTxw
+         e0tgLtra0paoM6/rZth9Z50veL3B3jAJgmlwvtE7ah3HrVQW9dKEje4mvYgkeY6Nng2h
+         VYXnwCXhJCisji65a688hpUkCqrhTL4LQxhxYzbi9kTISjG9De9o7CR6r80hYhUj8kyn
+         BNBWZ4dln2P0MYEobkJzx1eZhy69zXn8ir8aQb/Xww7v5rmjUE3F79WlcWWkkMLewJxh
+         fqDURMPyBvkHM0UAMPn5CbOHU9J2+tzMiQ/Or33V7RKn2acBcHAucdc0kK+qLSc8lZiI
+         rEkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSbW0c96b3egGbXV/fj+mFdu1rpGThcfjEf8DpFjKu506C5UW0TyrxMr2HQSfJ0INwzHUAKF69nlSAOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL4DZZjoNI5YeyrptHyjpWB/uvUNLUUH/8LVkFz+2GonDBLWsR
+	BeVBq1ZZYru6Mz+N0rqCyxc/LWYiCxYLql+rWj/Mxcn8Zcw6OkGjdWsc5qlOmzMVBBk=
+X-Gm-Gg: ASbGncsXTxGx3cgkKL/MLiQAW8Yr7RKJPGoGogOfhoXu73rfHCeHPvPkStL2kBhe5I/
+	/oXoktNS9hrSFMVwttN6VrljvDoH66X++42gMGrx/KTX0MzOsV8YWLarkNTF9tML16DEBkykp/T
+	tcQ5KJrFUmPLd1QU+sph7k0T+btOm5lJxsl+rC9uQJ/F2q+6Lq07OmQxjatnJ3Woz7vY+e/YELw
+	0jAesWaTxjt/1h2H9SqLl1zp3QPZwmiPHQvapRhLs+2l2W58rx+jN0BPXGnLf8nNFSFc/2TMKHf
+	3oMOsmUvXvU385kT15zz55JcYyUzEW185i+vMXOTxtmN5bT/kTWAdwjiHeAKej9qjSkpGshmFgC
+	YloH6crk/EhDWDgKYBw==
+X-Google-Smtp-Source: AGHT+IGUb3KaVzKScxOQe9ijMlNd3nszvLLdCk8NMLmcsF4xnEod7cES0/O1shuIaHHP3sZwlCs2Cw==
+X-Received: by 2002:a05:6a20:1593:b0:21f:54e0:b0a3 with SMTP id adf61e73a8af0-22029176202mr5488182637.2.1750444461926;
+        Fri, 20 Jun 2025 11:34:21 -0700 (PDT)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a6bd5c7sm2588559b3a.165.2025.06.20.11.34.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 11:34:21 -0700 (PDT)
+Date: Fri, 20 Jun 2025 11:34:19 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Keith Busch <kbusch@kernel.org>, James Smart <james.smart@broadcom.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Michael Liang <mliang@purestorage.com>,
+	Randy Jennings <randyj@purestorage.com>
+Subject: Re: [PATCH] block: Fix blk_sync_queue() to properly stop timeout
+ timer
+Message-ID: <20250620183419.GC4836-mkhalfella@purestorage.com>
+References: <20250529214928.2112990-1-mkhalfella@purestorage.com>
+ <aDjcA_H7Ec9VICps@kbusch-mbp>
+ <20250529223345.GA2013185-mkhalfella@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 1/2] block: move elevator queue allocation logic into
- blk_mq_init_sched
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        sth@linux.ibm.com, gjoyce@ibm.com
-References: <20250616173233.3803824-1-nilay@linux.ibm.com>
- <20250616173233.3803824-2-nilay@linux.ibm.com> <aFGEzN5c0-b5VdcM@fedora>
- <a1644c15-2a9a-4fc1-a762-b153d167cd1f@linux.ibm.com>
- <aFV7iSUpCdgqX1Sh@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aFV7iSUpCdgqX1Sh@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: EIdjmm6vzIdgKtQprs5Ek8sH9ZP3xRcj
-X-Proofpoint-ORIG-GUID: EIdjmm6vzIdgKtQprs5Ek8sH9ZP3xRcj
-X-Authority-Analysis: v=2.4 cv=AqTu3P9P c=1 sm=1 tr=0 ts=685588c5 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=wZl93I-Y6oexVpGIjmQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIwMDExMiBTYWx0ZWRfX70Q+svpfa5kK VT+hFCZz0Z/XbQPsjwbmujrEcGTpVV/7V/g9XLUhOJlU3GP+I7C80UJAGkEP+5JOmd+SQ2zC3vV ZnTeXh2w7LCzqg9RxQzozq0Jj+vHpwinuxu6wL87is85j0GQb02EsDrD88GRwX9d2dOsuU/ajVs
- hzaFSTsNj/LHDX8J2Q2rQGyUe6mLQrbqwSIKp/IKUm6l+XJ1ggBT57C0CigZ0Oc2D4az6dGENO2 v753Ri0yYczmzITJJcrz3R/VmW91H3EQ2UBpB0biFNXnq96NZZDF72FmIdES2tqRWXyFfVXcGc4 WqFtHa8fJr6Fktv5/2pQR/hkjHQtzf/EsR1A8MNZ9dVAZ7GgVHsIGYzMTMvn9+zBd03fo+FJTJX
- sObJRQ/xDsCBBiFZLj/AAh3mP3F3T5aV4284O/yrZ/aVQnKQVvVTsW1nfF+iU05r42ApveGD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-20_06,2025-06-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- bulkscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506200112
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250529223345.GA2013185-mkhalfella@purestorage.com>
 
-
-
-On 6/20/25 8:47 PM, Ming Lei wrote:
-> On Fri, Jun 20, 2025 at 08:09:01PM +0530, Nilay Shroff wrote:
->>
->>
->> On 6/17/25 8:37 PM, Ming Lei wrote:
->>> On Mon, Jun 16, 2025 at 11:02:25PM +0530, Nilay Shroff wrote:
->>>> In preparation for allocating sched_tags before freezing the request
->>>> queue and acquiring ->elevator_lock, move the elevator queue allocation
->>>> logic from the elevator ops ->init_sched callback into blk_mq_init_sched.
->>>>
->>>> This refactoring provides a centralized location for elevator queue
->>>> initialization, which makes it easier to store pre-allocated sched_tags
->>>> in the struct elevator_queue during later changes.
->>>>
->>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->>>> ---
->>
->> [...]
->>
->>>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
->>>> index 55a0fd105147..d914eb9d61a6 100644
->>>> --- a/block/blk-mq-sched.c
->>>> +++ b/block/blk-mq-sched.c
->>>> @@ -475,6 +475,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>>>  	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
->>>>  				   BLKDEV_DEFAULT_RQ);
->>>>  
->>>> +	eq = elevator_alloc(q, e);
->>>> +	if (!eq)
->>>> +		return -ENOMEM;
->>>> +
->>>>  	if (blk_mq_is_shared_tags(flags)) {
->>>>  		ret = blk_mq_init_sched_shared_tags(q);
->>>>  		if (ret)
->>>
->>> The above failure needs to be handled by kobject_put(&eq->kobj).
->>
->> I think here the elevator_alloc() failure occurs before we initialize 
->> eq->kobj. So we don't need to handle it with kobject_put(&eq->kobj)
->> and instead simply returning -ENOMEM should be sufficient. Agree?
+On 2025-05-29 15:33:47 -0700, Mohamed Khalfella wrote:
+> On 2025-05-29 16:13:23 -0600, Keith Busch wrote:
+> > On Thu, May 29, 2025 at 03:49:28PM -0600, Mohamed Khalfella wrote:
+> > > nvme-fc initiator hit hung_task with stacktrace above while handling
+> > > request timeout call. The work thread is waiting for itself to finish
+> > > which is never going to happen. From the stacktrace the nvme controller
+> > > was in NVME_CTRL_CONNECTING state when nvme_fc_timeout() was called.
+> > > We do not expect to get IO timeout call in NVME_CTRL_CONNECTING state
+> > > because blk_sync_queue() must have been called on this queue before
+> > > switching from NVME_CTRL_RESETTING to NVME_CTRL_CONNECTING.
+> > > 
+> > > It turned out that blk_sync_queue() did not stop q->timeout_work from
+> > > running as expected. nvme_fc_timeout() returned BLK_EH_RESET_TIMER
+> > > causing q->timeout to be rearmed after it was canceled earlier.
+> > > q->timeout queued q->timeout_work after the controller switched to
+> > > NVME_CTRL_CONNECTING state causing deadlock above.
+> > > 
+> > > Add QUEUE_FLAG_NOTIMEOUT queue flag to tell q->timeout not to queue
+> > > q->timeout_work while queue is being synced. Update blk_sync_queue() to
+> > > cancel q->timeout_work first and then cancel q->timeout.
+> > 
+> > I feel like this is a nvme-fc problem that doesn't need the block layer
+> > to handle. Just don't sync the queues within the timeout workqueue
+> > context.
 > 
-> I meant the failure from blk_mq_init_sched_shared_tags(), which has to
-> call kobject_put() for correct cleanup.
-> 
-Oh I see... yes we need to call kobject_put() here. 
-Will do it in the next series.
+> Agreed on nvme-fc should not sync queues within timeout work, and I am
+> testing a patch to fix nvme-fc. At the same time blk_sync_queue() should
+> provide a guarantee that q->timeout_work will not run after the function
+> returns, no?
 
-Thanks,
---Nilay
-
+Following up on this patch. I think the issue with blk_sync_queue()
+needs to be addressed. If adding a queue flag is not the preferred way
+to do it, please let me know what do you suggest and I will make the
+code changes.
