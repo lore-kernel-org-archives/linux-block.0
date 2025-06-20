@@ -1,142 +1,132 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1893F293B42
-	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 14:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0F294A12
+	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 15:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750430356; cv=none; b=lkaoMThjXKgk3pIAvEre58T58/VNYGrtjBQ5BIHtL5aMXvZM1bOeTUWRGdQIsUPEcEuQUbk/vf9cYUgP4kAA2Nh56zqJX0VkBKGAr5LUp0BliBkzhA95VPJX71BDT0AH4XJL3CVicNavLsEWENZJ/GvacDizkqFuu7uIWXP8N3U=
+	t=1750432217; cv=none; b=L0c3QbFNYXUG9eGpwEd72wbF0r23IDAe1LwsOBV2B1I0gfymbNQVbd8i7JygA3FFTS2xCGYOEhuje8jdxXhcA8Qin/bZUmmMiqndANKzqhlg3us3triYfrBqLIML46cISTMIHyiuj4Tfng5KUFr5ymFu9x6EqO667lf4LApWoRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750430356; c=relaxed/simple;
-	bh=H3kMZwujEA3C5/ERdd4iRZ4IVqhcNjpSajUNMLNdh10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QClTK02pNUFQVV4x7Qm3SelJKDsplisix22s627DCREYvUFg94HX+i1EM+R1IaAPCeaMguI82ulI49z6ctbS7SMmDz5R7uF97a4Fv/srzCTNl7tSZAbzNxuJhfbLPi1TeY2ET6HU7ZBwehVNySdjYT7oXhFPRTDxHA8xcnx6wpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WdG/NOX8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1750432217; c=relaxed/simple;
+	bh=IQDgBnKlOWBV2ew9VaW/IvgKZzWIEis6/rSV0TjgzwY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PsrlDtsEoWLH2t1DjlGGvQnBkbCPRqZb4Dpw+WaRpk6m5m5FdyGQOxceVljiACOvEmSK1OMjsVYzaFKfH6Lc4DWMXwCXhgwqwAeCYW/ZDQuanJ6/cQpyyDfYouw3j1SGyNgh3z2MyOqh1KqB+KKk99uKwmzd/SzXsrN+BF2EN5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=LZ+jBifU; arc=none smtp.client-ip=209.85.210.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WdG/NOX8"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55KDmXIx004659;
-	Fri, 20 Jun 2025 14:39:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=MG+KGc
-	mHfqWHodR9js8pcJ270N5h2zpOUteSbVa9T6g=; b=WdG/NOX8xgi/3CDt5Iab+z
-	GOE5ETmXmojSvuHumSH7ykktLlatnVUdVMS8UTWJuYtYqCdvXq08zInLcESn9z13
-	hL8BixsXvDOTglkA8LEVbxMMJ/soWX+RIJu7bY0gYFDLv8r7t1ZdLJyDpdjVO8hj
-	yYJweAqh3CxObP1RkBL0VQT4dalJgBP3d5z/O0XUGkO+2zZxk0asKObe1ZvfUpg6
-	OIbzTPESiFSb7znk7kcaWk1ejSoWWyJ61g1FRoe0EgmUcuP/0ApRcH9AXrDfC4eJ
-	ga9ikxYApidIsC2zKU2mafdyvJnQK/djDQdkvEeVup1UFmdMowZzEnv9cCiOVfbw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47cy4jua40-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Jun 2025 14:39:08 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55KDCOlF027466;
-	Fri, 20 Jun 2025 14:39:07 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 479kt0bqph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Jun 2025 14:39:07 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55KEd6us59834784
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Jun 2025 14:39:06 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 010A158064;
-	Fri, 20 Jun 2025 14:39:06 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8501258055;
-	Fri, 20 Jun 2025 14:39:03 +0000 (GMT)
-Received: from [9.61.191.218] (unknown [9.61.191.218])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 20 Jun 2025 14:39:03 +0000 (GMT)
-Message-ID: <a1644c15-2a9a-4fc1-a762-b153d167cd1f@linux.ibm.com>
-Date: Fri, 20 Jun 2025 20:09:01 +0530
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="LZ+jBifU"
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-748e60725fcso165081b3a.3
+        for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 08:10:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1750432215; x=1751037015; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1RIq0ZfKc+yHLLGUITosmMN617sTFwTIizfo+cwqxPo=;
+        b=LZ+jBifUXajjm++PTwVay5OKZxTwsQoUWhiwx9aO3a3ZDhOiUoKGy4Y23FP/zp3iXL
+         8VOXgaJFQ9gbMpIsz52IBSDrCX+62hFUOpRjKH5YzEDW1hS81UwfRZRZ98ODTr8rXugj
+         WN2DaPW2NFDwz3SNX+w42pX0Bus5egMSr3D0RMhm8xnFooweOmk8+0a5fqEZVi3HYioL
+         0mJQvDc6RS3DC2yjrG3Ps4c8t8kPV2BCUziJez/1wm32Cb1+rsa2ER6sNTAE+IHFRSQr
+         bBG1QxUqYtSkcxb/J2ADT/1dBC/+YWU+L5Ui3Aq2uFLrHjD3cDoQHTXYSiMNdooNSCj8
+         tEeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750432215; x=1751037015;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1RIq0ZfKc+yHLLGUITosmMN617sTFwTIizfo+cwqxPo=;
+        b=IFSifceV+yYPJBij2HzG3RMO6SyRwEswf7mdHGlArALQclWHN6/RiUq4Psc2raAuMK
+         lTaUyCqVg16GcsvoVWY5AhxrIOo8rp02dEDPcRULjEShEu6EGGpVRnDJ00+dEiIVty0b
+         BUN2G8eaQrdwgKibs4NMapcGjh1CvfaxAWU2dCrKqr+DetvACLoAs+QuvboxsvJSZGVU
+         cY+ephUIhEg1JosARhnCLF+d8oV7F453zH3+zbSRfOpC/2xHO/UDSCFcbVc+VWzDW3Yd
+         /5TCjOp0xwQy52cL87Tgpy0x0aSQjvsehVYrAfHdtfVBeFOQ92xZEcwTfaJV62QHHPjV
+         K6Hg==
+X-Gm-Message-State: AOJu0YzAfeOaeMNBIusSfJoc8LkYkaP33yeLeZ4QTfO0b8ZFYdSjnQw0
+	8chhjXYe3LdaZRT3+mtdP7U8GgVWG5Qc9a89g+X2HClcDB7qTnxVSkqjrEYQc/Guzrbk/3FhsTD
+	d0T1rKyLEdqSL4U+t0yT23GHrqAvx0F+PRWJw
+X-Gm-Gg: ASbGncvoIDivLs5z2ApL2QmNQUnIvnQLTb5rJVDUsm2fYsq6YBI4SuyJq3X1RFW0tne
+	TdmMwgPGl6tY7VKDUHuTzipzLK9qszfRws+xFt2INjkyjWizlqqge+ykEo94wGVUuXI6gQoVQvU
+	oLWksFOXYmOF95WaHGcJjTZ9MMgUV05N/SkopLC2cx75mIFawsV+g3oGBl6k7U15T/Y5p/PyOt1
+	ECeOO8+JRmcc+2v+viiYr7m0fpx1W07i4GppcoRCtvy2Q0i7+dZQ7uBoc0WH0KY9erpl+xQg8GK
+	pV6pOHla+LjGIurGIAdJABTGWtcfK5oaP7FoALb9ksXuwUlsXdef0Fw=
+X-Google-Smtp-Source: AGHT+IES/XldM6S90tGLggidsk/u7O7S96uu0t+QbeDBfq7jKunZ4xeJ3gs6IPDlJd/jpI370FBeR1jE+0jy
+X-Received: by 2002:a05:6a21:3298:b0:1ee:d6a7:e333 with SMTP id adf61e73a8af0-22026fca5demr1802671637.8.1750432214401;
+        Fri, 20 Jun 2025 08:10:14 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-7490a413d7asm114334b3a.3.2025.06.20.08.10.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 08:10:14 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id C9C283403AF;
+	Fri, 20 Jun 2025 09:10:13 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id C90F9E4548E; Fri, 20 Jun 2025 09:10:13 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH v2 01/14] ublk: use vmalloc for ublk_device's __queues
+Date: Fri, 20 Jun 2025 09:09:55 -0600
+Message-ID: <20250620151008.3976463-2-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250620151008.3976463-1-csander@purestorage.com>
+References: <20250620151008.3976463-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 1/2] block: move elevator queue allocation logic into
- blk_mq_init_sched
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        sth@linux.ibm.com, gjoyce@ibm.com
-References: <20250616173233.3803824-1-nilay@linux.ibm.com>
- <20250616173233.3803824-2-nilay@linux.ibm.com> <aFGEzN5c0-b5VdcM@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aFGEzN5c0-b5VdcM@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wllElTPpAt1NH6ibpd1r6bOkVZGaN3aQ
-X-Authority-Analysis: v=2.4 cv=a7ww9VSF c=1 sm=1 tr=0 ts=6855728c cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=20KFwNOVAAAA:8 a=aK0vNgL49R0hWWOO1ycA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIwMDEwMiBTYWx0ZWRfX1j6EniGvmgOV EmS5RV4wT6Jpv0d7ne0IiMkKil2XZYO5ZU3CjWxif0IsrTlTSHG5pNzIVBhtgL3Asr4ZcjtnfBg j0EU9uuyXADM7VjChy2iz0d/SAaq+uFPoobvfcxQDqg/ZjIwShDvZzXDEJrbIAID3WBFBXzN193
- 7clJB5VFwEoQiMTiTMhZLyX3nvlsLZTyBpawFdrLR793GkHW3Ma7kH9bG+vy8l7l4Zb4cPkaphY CppzmQXBhMPB0otp79hNr3o0ZlSfCsV0HWlEYtsk5KnpSNY0yGpECu4lNtD7JJKGyueTfpvmY4M kOdoBACcvRmluVTWkbFfz56BELudqDi0rKXNLJ9Etca/5xhr579kNsXeOMoCTiR6MBdnGGYZjby
- eOMVP1mcX05E5a9oVjK+s0NyKb9uu1+vFbo+kqfHnjCMziTPQ+w9BZiFjIyMyA8gckBab7hA
-X-Proofpoint-ORIG-GUID: wllElTPpAt1NH6ibpd1r6bOkVZGaN3aQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-20_05,2025-06-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- adultscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506200102
+Content-Transfer-Encoding: 8bit
 
+struct ublk_device's __queues points to an allocation with up to
+UBLK_MAX_NR_QUEUES (4096) queues, each of which have:
+- struct ublk_queue (48 bytes)
+- Tail array of up to UBLK_MAX_QUEUE_DEPTH (4096) struct ublk_io's,
+  32 bytes each
+This means the full allocation can exceed 512 MB, which may well be
+impossible to service with contiguous physical pages. Switch to
+kvcalloc() and kvfree(), since there is no need for physically
+contiguous memory.
 
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+---
+ drivers/block/ublk_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 6/17/25 8:37 PM, Ming Lei wrote:
-> On Mon, Jun 16, 2025 at 11:02:25PM +0530, Nilay Shroff wrote:
->> In preparation for allocating sched_tags before freezing the request
->> queue and acquiring ->elevator_lock, move the elevator queue allocation
->> logic from the elevator ops ->init_sched callback into blk_mq_init_sched.
->>
->> This refactoring provides a centralized location for elevator queue
->> initialization, which makes it easier to store pre-allocated sched_tags
->> in the struct elevator_queue during later changes.
->>
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
-
-[...]
-
->> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
->> index 55a0fd105147..d914eb9d61a6 100644
->> --- a/block/blk-mq-sched.c
->> +++ b/block/blk-mq-sched.c
->> @@ -475,6 +475,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>  	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
->>  				   BLKDEV_DEFAULT_RQ);
->>  
->> +	eq = elevator_alloc(q, e);
->> +	if (!eq)
->> +		return -ENOMEM;
->> +
->>  	if (blk_mq_is_shared_tags(flags)) {
->>  		ret = blk_mq_init_sched_shared_tags(q);
->>  		if (ret)
-> 
-> The above failure needs to be handled by kobject_put(&eq->kobj).
-
-I think here the elevator_alloc() failure occurs before we initialize 
-eq->kobj. So we don't need to handle it with kobject_put(&eq->kobj)
-and instead simply returning -ENOMEM should be sufficient. Agree?
-
-> 
-> Otherwise, feel free to add:
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> 
-
-Thanks,
---Nilay
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index d36f44f5ee80..467769fc388f 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2486,22 +2486,22 @@ static void ublk_deinit_queues(struct ublk_device *ub)
+ 	if (!ub->__queues)
+ 		return;
+ 
+ 	for (i = 0; i < nr_queues; i++)
+ 		ublk_deinit_queue(ub, i);
+-	kfree(ub->__queues);
++	kvfree(ub->__queues);
+ }
+ 
+ static int ublk_init_queues(struct ublk_device *ub)
+ {
+ 	int nr_queues = ub->dev_info.nr_hw_queues;
+ 	int depth = ub->dev_info.queue_depth;
+ 	int ubq_size = sizeof(struct ublk_queue) + depth * sizeof(struct ublk_io);
+ 	int i, ret = -ENOMEM;
+ 
+ 	ub->queue_size = ubq_size;
+-	ub->__queues = kcalloc(nr_queues, ubq_size, GFP_KERNEL);
++	ub->__queues = kvcalloc(nr_queues, ubq_size, GFP_KERNEL);
+ 	if (!ub->__queues)
+ 		return ret;
+ 
+ 	for (i = 0; i < nr_queues; i++) {
+ 		if (ublk_init_queue(ub, i))
+-- 
+2.45.2
 
