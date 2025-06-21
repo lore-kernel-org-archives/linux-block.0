@@ -1,119 +1,139 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B9A21FF51
-	for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 18:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85225173
+	for <linux-block@vger.kernel.org>; Sat, 21 Jun 2025 00:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750444464; cv=none; b=dbDNRfUbbEJ7QLBMzKq0BkQ9Ah86tRKh11etGODl7WeTgBEHIKmK69uP3epkOmG+VkIXPyOpoKLwosN1XIs+o4IvMcAUtMB7cLakpqyAQ/bnV4pSP1eIl1HpfJBVlO1sdI+IvnehPTm/EdPaviuoUXg4owPy8lwnlASgkMRDH9U=
+	t=1750464743; cv=none; b=Oy86hQ/gWJ0+ffDyat1pdM7wuB1aA2skMI8QuXyoHD9W6BDoZk0Lt9eYDEyVXwegR/OIhaS4mIUxZEaYcJaESmhcMfCJN0Rcb63mhumVcP8T+Stn9n/a1Eo8hSYs+EzxnbEoOtA8yW2L+9LuPsFVgmV/PEMru4YtlnMK1ikMxTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750444464; c=relaxed/simple;
-	bh=8XsYzikH0OK5Hpl7wAKc0SWisccif2lNEEKDrwVeCXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cbod+J1AdnISI0s7Us65jWpAq+TTJxy3gAJLmZWPbV6RLQE+BncyrL830dixk/kqDQ1mFz1eTRAhDX+b3mBaseoAh3e9/kwwGgrF5ERvpLzzgHCiE4pP0ChHVJo3WYAYzSdp1o+L3NQ7n4JGAfx4kCJjiXZobPuxARTnw1XnXVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PHCUpLBc; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1750464743; c=relaxed/simple;
+	bh=CqT2SNnxBIj3x4HSqPtguLFPwbeprOG1GveLCwU33W8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VlZMAIbZJFhBRdeZH104nYky+VCb5uEDlQA4u/zKgPSE/wc3LqKRRR8yBYGJIB9uzxuK7doIa8CPxHp2PYx19+8KVlrTnOhsn+vRpml7c0oeOxcxcIJBrmT0AgBe2UqOq4ztn7t/u0eFaRxxDKIZGADwgUtyGf13fB1yxO4RYbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h6sp7r9V; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PHCUpLBc"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-747abb3cd0bso1584149b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 11:34:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1750444462; x=1751049262; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vDt9Tud6S9Roh6W5bYJpXYlaicNuFd+r8htTFd4j9Iw=;
-        b=PHCUpLBczp8WlIRTMVhRMjZrKHIgetey+N1/WJRlVxWx3jOGwIlz+AodkFiyEA36/e
-         tiL2l/uumpMvlZncDBt+mDTPY/7wHGiQT4aoTqQl6HQtI+SCbZ6/Jqa+or3IHoMsL72i
-         HUwq3Bdsicu/qrRTCG1iW8mymHaaGsdYO1tZMcytv4QvvEu4kjejp4xg7EMzoOtqCShZ
-         c6Sf09ktxaFtXyfqsgWDs46RHcdRwpy26IN7JgOq0HFCLSGdxAxhC2YBfB0aovuP+FMJ
-         hbi1IzaFXHw3q8/KJHHzfXhIZZ7IqM/lje93m+2Gvb7MnoA6OjQCjfJ4eEgmVg8UYmhZ
-         UF+A==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6sp7r9V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750464740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3ud8RjfWGNSaD0QBA8zWhPwNXyDJG8YP7ft/4E/heu0=;
+	b=h6sp7r9Vi9K2LK+9gC7Sa49BVnP3fhFe89GsEjvLF7fkI3gm9HdBCMLbvIkggJcfAD0MQs
+	NtHTFC8pWza5Ni67StTqu9wVhCxKGOyEL8yJcammDBaccTILHwg8wVM3XcvlkqvUjJxVY6
+	5cycIihM6uoEwMDwRJaSYibnydzDclc=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-owIqI5EdNRKqrftbwxs99A-1; Fri, 20 Jun 2025 20:12:18 -0400
+X-MC-Unique: owIqI5EdNRKqrftbwxs99A-1
+X-Mimecast-MFC-AGG-ID: owIqI5EdNRKqrftbwxs99A_1750464738
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7c791987cf6so454824185a.0
+        for <linux-block@vger.kernel.org>; Fri, 20 Jun 2025 17:12:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750444462; x=1751049262;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vDt9Tud6S9Roh6W5bYJpXYlaicNuFd+r8htTFd4j9Iw=;
-        b=YDTafUq+jxpHnsKUQsP/2TqgY/aa7HXs1x2MZnb2LNz7Y43/pNLjqmY2zhQyXaoTxw
-         e0tgLtra0paoM6/rZth9Z50veL3B3jAJgmlwvtE7ah3HrVQW9dKEje4mvYgkeY6Nng2h
-         VYXnwCXhJCisji65a688hpUkCqrhTL4LQxhxYzbi9kTISjG9De9o7CR6r80hYhUj8kyn
-         BNBWZ4dln2P0MYEobkJzx1eZhy69zXn8ir8aQb/Xww7v5rmjUE3F79WlcWWkkMLewJxh
-         fqDURMPyBvkHM0UAMPn5CbOHU9J2+tzMiQ/Or33V7RKn2acBcHAucdc0kK+qLSc8lZiI
-         rEkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSbW0c96b3egGbXV/fj+mFdu1rpGThcfjEf8DpFjKu506C5UW0TyrxMr2HQSfJ0INwzHUAKF69nlSAOA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL4DZZjoNI5YeyrptHyjpWB/uvUNLUUH/8LVkFz+2GonDBLWsR
-	BeVBq1ZZYru6Mz+N0rqCyxc/LWYiCxYLql+rWj/Mxcn8Zcw6OkGjdWsc5qlOmzMVBBk=
-X-Gm-Gg: ASbGncsXTxGx3cgkKL/MLiQAW8Yr7RKJPGoGogOfhoXu73rfHCeHPvPkStL2kBhe5I/
-	/oXoktNS9hrSFMVwttN6VrljvDoH66X++42gMGrx/KTX0MzOsV8YWLarkNTF9tML16DEBkykp/T
-	tcQ5KJrFUmPLd1QU+sph7k0T+btOm5lJxsl+rC9uQJ/F2q+6Lq07OmQxjatnJ3Woz7vY+e/YELw
-	0jAesWaTxjt/1h2H9SqLl1zp3QPZwmiPHQvapRhLs+2l2W58rx+jN0BPXGnLf8nNFSFc/2TMKHf
-	3oMOsmUvXvU385kT15zz55JcYyUzEW185i+vMXOTxtmN5bT/kTWAdwjiHeAKej9qjSkpGshmFgC
-	YloH6crk/EhDWDgKYBw==
-X-Google-Smtp-Source: AGHT+IGUb3KaVzKScxOQe9ijMlNd3nszvLLdCk8NMLmcsF4xnEod7cES0/O1shuIaHHP3sZwlCs2Cw==
-X-Received: by 2002:a05:6a20:1593:b0:21f:54e0:b0a3 with SMTP id adf61e73a8af0-22029176202mr5488182637.2.1750444461926;
-        Fri, 20 Jun 2025 11:34:21 -0700 (PDT)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a6bd5c7sm2588559b3a.165.2025.06.20.11.34.21
+        d=1e100.net; s=20230601; t=1750464738; x=1751069538;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3ud8RjfWGNSaD0QBA8zWhPwNXyDJG8YP7ft/4E/heu0=;
+        b=wFQmC3NmY24CZH12pXgc1kDtRlUM2/jjEuFkzZAj2kNzOJv9JyjyQgt46XlXeEmY8s
+         A7Beug5EJ5B4laY+65kPmc2Mrlg8CYgiIzHTd8cxZFivtY6yE84c5gDgQ34GW4G/AZFi
+         kYP4i+eoRcXMmJNrLisBjEAtbey0NLuuFiE1Qqbnikw6CnxzZHR9KJTgXzyPQY4pAAvr
+         IV+j7RCZKyuzMnfUlZZyxi54JqOnXY07YHVGxFqlW2jAMrzZCxjBdPOt9uudVUemY/A7
+         IXvV/kehX7oS8qS28zNq7cZhr56TXKIJQUZMojMMDtw4VpSjYNNOVr/QQQcyRPDDvRkW
+         MaAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXd9S/W7nPrccO9ZZ1fUI46RIthDEkEQczA9rRRBSDooZu3B6gFsRNRJ4Am/lbZkprjkRaCdfrHqcX6ow==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP5cKQsJDBBARTfx14rWt60C3sSB6CMmasa6nMaRtDMoTLBR33
+	cx/TrhliQH0bBNCpBKncTVo4wV+UZgiNDTR/oI1xCKPFenUl0PDDpZgjaBDrsTV+buUpeeqz5CC
+	awWpsdm3ROuBmFnI7rpk6aDEIt7E/ihL2aHr/BquorBaE0t4jelK6AHg+TRNU7SSH
+X-Gm-Gg: ASbGncst1ulcLqqzncfxMHaPrr4tfgeGUUZqmXym5V4VDo22tJDDzQJK4mA4Hs4NiOf
+	sfY2iAXhlozNoqDZSsPFWsF+EJRsnSWeQLmEQr7zSbdNmQiIwkUGtH4ccwSeoCF9rYlXyVvDvx9
+	0vPvx8KkgItSYZGDR0w3IBG/z1j3674hwPP5+YFonCrfvNSW33JwUUqZk0sMqzQ0hAVo/CJLpLI
+	WpCJ+dRs8DF2i0ep/i1/OW1zXwrx+6iyFksIqh3O5j7L0r7Nj2ychL7VXUg/z+kRVdi1h6vuHkS
+	sNO8B7k92dqdB8cF9zQ5kD7HfOQuFQP9JUBbefsfUSceGXA2nnc47KXYQML5gAtaxgtXdRXBE3x
+	t/PkARa9lr+8eChyW
+X-Received: by 2002:a05:620a:84c8:b0:7d3:9113:78f6 with SMTP id af79cd13be357-7d3f995622bmr806683685a.49.1750464738257;
+        Fri, 20 Jun 2025 17:12:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDiGAV6LwHQJTBlNF+heRdcF87AJlNZ8NkAe9KufaDq2/2Ds6tfLhWfwz/EG8PBgTg3byLjw==
+X-Received: by 2002:a05:620a:84c8:b0:7d3:9113:78f6 with SMTP id af79cd13be357-7d3f995622bmr806680885a.49.1750464737904;
+        Fri, 20 Jun 2025 17:12:17 -0700 (PDT)
+Received: from syn-2600-6c64-4e7f-603b-9b92-b2ac-3267-27e9.biz6.spectrum.com ([2600:6c64:4e7f:603b:9b92:b2ac:3267:27e9])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3f99fbdfasm144854585a.85.2025.06.20.17.12.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 11:34:21 -0700 (PDT)
-Date: Fri, 20 Jun 2025 11:34:19 -0700
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Keith Busch <kbusch@kernel.org>, James Smart <james.smart@broadcom.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Michael Liang <mliang@purestorage.com>,
-	Randy Jennings <randyj@purestorage.com>
-Subject: Re: [PATCH] block: Fix blk_sync_queue() to properly stop timeout
- timer
-Message-ID: <20250620183419.GC4836-mkhalfella@purestorage.com>
-References: <20250529214928.2112990-1-mkhalfella@purestorage.com>
- <aDjcA_H7Ec9VICps@kbusch-mbp>
- <20250529223345.GA2013185-mkhalfella@purestorage.com>
+        Fri, 20 Jun 2025 17:12:17 -0700 (PDT)
+Message-ID: <d122346c3aea794087da7d9f166a412349517503.camel@redhat.com>
+Subject: Re: [PATCH] scsi: storvsc: set max_segment_size as UINT_MAX
+ explicitly
+From: Laurence Oberman <loberman@redhat.com>
+To: Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org, "K. Y. Srinivasan"
+	 <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+	 <wei.liu@kernel.org>, "Ewan D. Milne" <emilne@redhat.com>
+Date: Fri, 20 Jun 2025 20:12:15 -0400
+In-Reply-To: <20250617050240.GA2178@lst.de>
+References: <20250616160509.52491-1-ming.lei@redhat.com>
+	 <20250617050240.GA2178@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-11.el9) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250529223345.GA2013185-mkhalfella@purestorage.com>
+Content-Transfer-Encoding: 8bit
 
-On 2025-05-29 15:33:47 -0700, Mohamed Khalfella wrote:
-> On 2025-05-29 16:13:23 -0600, Keith Busch wrote:
-> > On Thu, May 29, 2025 at 03:49:28PM -0600, Mohamed Khalfella wrote:
-> > > nvme-fc initiator hit hung_task with stacktrace above while handling
-> > > request timeout call. The work thread is waiting for itself to finish
-> > > which is never going to happen. From the stacktrace the nvme controller
-> > > was in NVME_CTRL_CONNECTING state when nvme_fc_timeout() was called.
-> > > We do not expect to get IO timeout call in NVME_CTRL_CONNECTING state
-> > > because blk_sync_queue() must have been called on this queue before
-> > > switching from NVME_CTRL_RESETTING to NVME_CTRL_CONNECTING.
-> > > 
-> > > It turned out that blk_sync_queue() did not stop q->timeout_work from
-> > > running as expected. nvme_fc_timeout() returned BLK_EH_RESET_TIMER
-> > > causing q->timeout to be rearmed after it was canceled earlier.
-> > > q->timeout queued q->timeout_work after the controller switched to
-> > > NVME_CTRL_CONNECTING state causing deadlock above.
-> > > 
-> > > Add QUEUE_FLAG_NOTIMEOUT queue flag to tell q->timeout not to queue
-> > > q->timeout_work while queue is being synced. Update blk_sync_queue() to
-> > > cancel q->timeout_work first and then cancel q->timeout.
-> > 
-> > I feel like this is a nvme-fc problem that doesn't need the block layer
-> > to handle. Just don't sync the queues within the timeout workqueue
-> > context.
+On Tue, 2025-06-17 at 07:02 +0200, Christoph Hellwig wrote:
+> Please try this proper fix instead:
 > 
-> Agreed on nvme-fc should not sync queues within timeout work, and I am
-> testing a patch to fix nvme-fc. At the same time blk_sync_queue() should
-> provide a guarantee that q->timeout_work will not run after the function
-> returns, no?
+> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+> index e021f1106bea..09f5fb5b2fb1 100644
+> --- a/drivers/scsi/hosts.c
+> +++ b/drivers/scsi/hosts.c
+> @@ -473,7 +473,9 @@ struct Scsi_Host *scsi_host_alloc(const struct
+> scsi_host_template *sht, int priv
+>         else
+>                 shost->max_sectors = SCSI_DEFAULT_MAX_SECTORS;
+>  
+> -       if (sht->max_segment_size)
+> +       if (sht->virt_boundary_mask)
+> +               shost->virt_boundary_mask = sht->virt_boundary_mask;
+> +       else if (sht->max_segment_size)
+>                 shost->max_segment_size = sht->max_segment_size;
+>         else
+>                 shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
+> @@ -492,9 +494,6 @@ struct Scsi_Host *scsi_host_alloc(const struct
+> scsi_host_template *sht, int priv
+>         else
+>                 shost->dma_boundary = 0xffffffff;
+>  
+> -       if (sht->virt_boundary_mask)
+> -               shost->virt_boundary_mask = sht->virt_boundary_mask;
+> -
+>         device_initialize(&shost->shost_gendev);
+>         dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
+>         shost->shost_gendev.bus = &scsi_bus_type;
+> 
 
-Following up on this patch. I think the issue with blk_sync_queue()
-needs to be addressed. If adding a queue flag is not the preferred way
-to do it, please let me know what do you suggest and I will make the
-code changes.
+Hello
+
+Not sure what you folks will decide as the final fix but Christoph's
+patch prevents the REDO corruption as well.
+Ran it long enough to know its clean from corruption with this patch
+above
+
+Tested-by: Laurence Oberman <loberman@redhat.com>
+
+Thanks vey mauch as always folks
+
+Regards
+Laurence
+
+
+
+
