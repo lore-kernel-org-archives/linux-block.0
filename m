@@ -1,76 +1,75 @@
-Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
+Received: from mail-ot1-f97.google.com (mail-ot1-f97.google.com [209.85.210.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D79A19D884
-	for <linux-block@vger.kernel.org>; Sat, 21 Jun 2025 16:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE71197A8E
+	for <linux-block@vger.kernel.org>; Sat, 21 Jun 2025 17:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750523336; cv=none; b=YfUdm7f2Sv0RU8qXFh2aRb+1UzDTtdRdqbPJ+EOFdplp/tmnSYDP8yEReYyhgfjPbyfVXimJmyB3zuZEfkrO62cgsAmBhYxXoElksvSZV9wBDbQJDUhjfbmJz9UeLQYsoigHhbG7levre5j3Z5POF+Um4/T27DBDNQH/y+DQT50=
+	t=1750525823; cv=none; b=XuxFZjBeWhyZWJk5hplF5+xEP7wAqxeItB4eJtgczVVbnI0IKE9nOx8wYAc9joNzlK210XJL5rZbHtbxKoPViqolW8Bm3NiLU4MUmyFjVP9teVX+wf4MwBL+iFpI0si5rr3uho/cLRYYFDAe4PXuFXSMFQe/NRaD0U3WRNZ8nYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750523336; c=relaxed/simple;
-	bh=Br/AjUiqPK7kWS3d/p1T4f7jWJcitMJB/k21O5avM0M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ei95QNgaA7uV8bj4TpYH/Do53h0PWeOEegqLFiEMQYdN7XkH5vPIWf84ToYxDEBkae9AQ0DDQjc8yzBYOJmH0HWxQYGJ/12yiupGWnco549+q1p6A8fjQJLfgRk57KPlaOGbFqH5YBeFS4asSRZtwxARtUDm6nfiUUTCzw6SR2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NW5GhdnB; arc=none smtp.client-ip=209.85.215.228
+	s=arc-20240116; t=1750525823; c=relaxed/simple;
+	bh=4LWfGCi1nLtG/kbGQapjEjSBYdAEFTpn1lP+T/exZYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pgy/5FdOTt/K9Y/Usl0kDdi9bdiJ0m1urdaP5kUBdpCMQ3W8MXwSIYLNujor17h6CLjws6c7Hjc9Iha0oPm5PBygKnhy+Y9OUlmAVKT/aRagWOhd45XPxNqnDpPTTeqpufavOkYi1YoqDh3lPfxeNw4Br4NXFqjlTM6RrSp5N+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=f86w9FIN; arc=none smtp.client-ip=209.85.210.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NW5GhdnB"
-Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-b26ed911f4cso386548a12.3
-        for <linux-block@vger.kernel.org>; Sat, 21 Jun 2025 09:28:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="f86w9FIN"
+Received: by mail-ot1-f97.google.com with SMTP id 46e09a7af769-739f122a82aso391077a34.0
+        for <linux-block@vger.kernel.org>; Sat, 21 Jun 2025 10:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1750523332; x=1751128132; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1750525819; x=1751130619; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jqc1pNioaqt03KwmwQ7jb1MxVBLMpBdNgYbtBd1e3XU=;
-        b=NW5GhdnBwU0xlJ5NsLYEEsg4VZeJbHAfcGzBOEmuGPMTCwIAD46mTXiAZzPy/z7W7r
-         vrROsgrJZ5x6FDzX0H0SsBT8ImbiNToj8BSQYfA50WGBGm0uw2BeJI+cMp73CPYSdXMx
-         2emtcemFp+Gqpfa2e3MxGkMW5Xjfc8GT+5OywsUHkD4KBriO/N33oZwxLlFZHnqbAEbx
-         UXgDKrg23LuJOISYYoLH/w4EQEc7+W+D06A4c8L3uH5afFP0osb/miGzC+MRUx7oD0fW
-         1e3kgvqhmD/zVKxdXgTZmF2QONZwCEjKXVQkgbjp9DVoGcHRdMwk4GOYyFjg0xyXrxw8
-         R2aA==
+        bh=ODKnPeH6lQjDP3d4evNmKT0fMs6HDWUxZMY80qS+CZs=;
+        b=f86w9FINqhxPtwSVYH/Vxk/pjxnGafqRJdKRXJp2Ljp8+1VtBOf9csX8p3ptC0sP/e
+         qwag1cvhQtWax2XQgJqXPPhHlN8PLRik137N/Tp7fKqt6QQPBMdrO8ZNcnEHycUnlbBs
+         b8Zi9gEpUrqR6/GwkvVk1BhW95q9f6oxYyQ0B9LdNBCTC2/ybeKyPpy+9cLumVyFi0nj
+         qOfL1CjCQgzQS3fzQockbDyRMIXqiZJ0Nd4YH2EUpvpcotCCfzlO1xhT2Kpxc1qdpN2e
+         aNj7TrYbF8n+ascBl1CFKrdMRYg9PGTv0J5k0W5T2KK3OfeHQhhAbcImOFTnIbo1IMPm
+         nquw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750523332; x=1751128132;
+        d=1e100.net; s=20230601; t=1750525819; x=1751130619;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jqc1pNioaqt03KwmwQ7jb1MxVBLMpBdNgYbtBd1e3XU=;
-        b=iWLBxpDiSWvUWEhxjodoiyFF4EsY8tNo4u8b+kWznf8cNVu5R2nazxQks3doSnTDHn
-         FY+9w69Jvyh18usJpHT7ohjf2/H1e1Qu1DHokdTOh02yqYpfYBhiofSjyjcesj3k7ecU
-         CkDY33lFii2Yu+FeEWmE8y4vuEv0NZXLGhcPQuv5mGHydDRvkVRmvcpjzYJw6O7F40jP
-         7lBMSdVTPR/ahQMUGKEO+KkD3g6jJugpErRRa3a9j03tKym6bfmLYFvqagJ5osX15Mbb
-         OQAOEK9h7lrhu1BXbM+kR3xv9Nczu0MV+ifaAFa0OpmXEtQ6zyzmN7O4/BquP9XSxLTb
-         S2ag==
-X-Forwarded-Encrypted: i=1; AJvYcCULy99cSQzhBYyQIWHzG2T9B/cofDvGyOLATdwfsoNRD2WFUwPjF7DVM6A2X6ehwaA4zV6TbmQs0gPN9w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzF3ane/wvutRp5TbRANyxuhICjsZOQlIEKFQEOF77s5u4DMHq
-	lUwI1zVaCbD+lakLe5XxwogHae3sy5V1zSR0RJfvL1Gi1hgkNgyWAkOBEXzqXFFQdOfURxtSxkn
-	ZDnYQVUox7DeHl449j01Phm4yaMRLwqApF/03
-X-Gm-Gg: ASbGncspeoIIZUZtR75zXnuyIIKBGP69fa8dhxkeSmMTG0MUMy9d/596UUfVxa1QYrp
-	tM4RFCGCjCNAII0eFv3lkThjKYg/JjCTdKDEFu7qFQBph1fuWoRjcyvTIfNrYO70AKTsAGKHrq1
-	/FNQ92R1+UbIYo/EwHVQG851jA9+tb5sjd24sppd9TnXS0Dic8Au1OiZtuM2qS0D+aTJqihB1SA
-	clYULgmdbDKyYFbO50ZDMCJcg+2C+avWbg3bEtPF7i2AAgwPqqaEilvne1d+GD6obxTIyyJJP6I
-	h88GtbDgcnA9LSo4u4uKdaMXlyUeh7RyPQ8dj5mej+ezCAAs4FTideg=
-X-Google-Smtp-Source: AGHT+IEBFdypyH71FaCNERa1yO+D1fgnOThDQ8WvWeH0QQB+6Sdy5Xr31fsXZ/ez38hI2Xk/wp4CgKkZkJ4t
-X-Received: by 2002:a05:6a00:a1f:b0:736:559f:eca9 with SMTP id d2e1a72fcca58-7490d6117damr4263850b3a.3.1750523332468;
-        Sat, 21 Jun 2025 09:28:52 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-b31f1259cfcsm222403a12.26.2025.06.21.09.28.52
+        bh=ODKnPeH6lQjDP3d4evNmKT0fMs6HDWUxZMY80qS+CZs=;
+        b=bTxV2/VsFLJRAuU+O8kMCFvDgrczDYq+ow0ywcCYax4sSzgUCA3YBtsId1q5gn8LPz
+         GTV2JMvxHPs3K2V6iizoPx7sOv0PWdnlXHhKcJthZxVzPe4C8jJnl7GBm3dTIz7f1Xbx
+         VwJG0ZWgw24uhy9ulxUJKU8QMQG1sKTTPFVIxAyOPGSHYpjw3CpPhe0E8xPuh/DwN7vb
+         7MQ86Kzo9ly5yhW8nW/HrQ+APW+HP7EszzMXNg/7VaIBosWrClRKg/d5V0Wr7IyFJMSr
+         Cg6Co8z/TMjUK2akZrBaHSf1tYNFX3oC3a3lX9QHa4V7kH1vu2p2dHx846ch+yRC22Xf
+         ypKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUv+ERJJRy+wFFlroYwJ9xaP8+nj+5gf2fsl+r2AiXudYtB9RvzqpIFS/a+OF618HC455rTz49L5V2woA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhtawwlf+WV2X3x0zLBu1FDmz3o1zBTHqICQfuXPOCUbkcrRgs
+	91hP1meesXGY6rOpSVYxJwvlczP9UtL1qiRNVLVyzbCe4iA68LnsfzmDYrmz1I+fTp86/VUD1hR
+	awgTHcg0GwDnsETqlhgJE+Fq+F14YXHZwStJj
+X-Gm-Gg: ASbGncvyh+ql2N2cgrntQ70O0GDHMB+lFyeade6846EnIRHvQLxTtmRWqGYHKwlh/XN
+	s5cm7e6lyQY7JCd8+zT9p3nAcdMAQ5dYdbyhatry057FXvyMxIokGGF9Q3h5CENRFylaxNYkD7W
+	xNQIULVnskPY3uGMspm/G52BiGNL1bgPnrhBa87JqZFU9BebS3Mk5RP1L5WLbLBIF4S9OONUE4d
+	p0R0cxioBRBMqrdcpRs8wGCoCax9e2P/78VkXCD0JKEU1yh/911qkgeUxd47E/KHOAWg1L4ILoa
+	JTI3Bd7gl9IoTUictyt9E9LkTD5RV9U6w6nrgusPMFjYRsz1daYSDAk=
+X-Google-Smtp-Source: AGHT+IHf8GUT8X9P1v61r8Wg3nG5BNMKExX+Olc0ps7UyKoekod4H18jPb5pBrWghJeHzbugL58NdV31JC7s
+X-Received: by 2002:a05:6870:b622:b0:2ea:b84:295d with SMTP id 586e51a60fabf-2eec574d648mr1621484fac.0.1750525819147;
+        Sat, 21 Jun 2025 10:10:19 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2ee8a707d30sm249439fac.24.2025.06.21.10.10.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Jun 2025 09:28:52 -0700 (PDT)
+        Sat, 21 Jun 2025 10:10:19 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id D48AF3400D0;
-	Sat, 21 Jun 2025 10:28:51 -0600 (MDT)
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4037A340363;
+	Sat, 21 Jun 2025 11:10:18 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id B7A81E42425; Sat, 21 Jun 2025 10:28:51 -0600 (MDT)
+	id 375EEE42425; Sat, 21 Jun 2025 11:10:18 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: fix narrowing warnings in UAPI header
-Date: Sat, 21 Jun 2025 10:28:41 -0600
-Message-ID: <20250621162842.337452-1-csander@purestorage.com>
+Subject: [PATCH] ublk: update UBLK_F_SUPPORT_ZERO_COPY comment in UAPI header
+Date: Sat, 21 Jun 2025 11:10:14 -0600
+Message-ID: <20250621171015.354932-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -80,42 +79,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When a C++ file compiled with -Wc++11-narrowing includes the UAPI header
-linux/ublk_cmd.h, ublk_sqe_addr_to_auto_buf_reg()'s assignments of u64
-values to u8, u16, and u32 fields result in compiler warnings. Add
-explicit casts to the intended types to avoid these warnings. Drop the
-unnecessary bitmasks.
+UBLK_F_SUPPORT_ZERO_COPY has a very old comment describing the initial
+idea for how zero-copy would be implemented. The actual implementation
+added in commit 1f6540e2aabb ("ublk: zc register/unregister bvec") uses
+io_uring registered buffers rather than shared memory mapping.
+Remove the inaccurate remarks about mapping ublk request memory into the
+ublk server's address space and requiring 4K block size. Replace them
+with a description of the current zero-copy mechanism.
 
-Reported-by: Uday Shankar <ushankar@purestorage.com>
 Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provided buf index via UBLK_F_AUTO_BUF_REG")
 ---
- include/uapi/linux/ublk_cmd.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/uapi/linux/ublk_cmd.h | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 77d9d6af46da..c062109cb686 100644
+index 77d9d6af46da..a8718075b15c 100644
 --- a/include/uapi/linux/ublk_cmd.h
 +++ b/include/uapi/linux/ublk_cmd.h
-@@ -448,14 +448,14 @@ struct ublk_auto_buf_reg {
+@@ -133,12 +133,32 @@
+ 
+ #define UBLKSRV_IO_BUF_TOTAL_BITS	(UBLK_QID_OFF + UBLK_QID_BITS)
+ #define UBLKSRV_IO_BUF_TOTAL_SIZE	(1ULL << UBLKSRV_IO_BUF_TOTAL_BITS)
+ 
+ /*
+- * zero copy requires 4k block size, and can remap ublk driver's io
+- * request into ublksrv's vm space
++ * ublk server can register data buffers for incoming I/O requests with a sparse
++ * io_uring buffer table. The request buffer can then be used as the data buffer
++ * for io_uring operations via the fixed buffer index.
++ * Note that the ublk server can never directly access the request data memory.
++ *
++ * To use this feature, the ublk server must first register a sparse buffer
++ * table on an io_uring instance.
++ * When an incoming ublk request is received, the ublk server submits a
++ * UBLK_U_IO_REGISTER_IO_BUF command to that io_uring instance. The
++ * ublksrv_io_cmd's q_id and tag specify the request whose buffer to register
++ * and addr is the index in the io_uring's buffer table to install the buffer.
++ * SQEs can now be submitted to the io_uring to read/write the request's buffer
++ * by enabling fixed buffers (e.g. using IORING_OP_{READ,WRITE}_FIXED or
++ * IORING_URING_CMD_FIXED) and passing the registered buffer index in buf_index.
++ * Once the last io_uring operation using the request's buffer has completed,
++ * the ublk server submits a UBLK_U_IO_UNREGISTER_IO_BUF command with q_id, tag,
++ * and addr again specifying the request buffer to unregister.
++ * The ublk request is completed when its buffer is unregistered from all
++ * io_uring instances and the ublk server issues UBLK_U_IO_COMMIT_AND_FETCH_REQ.
++ *
++ * Not available for UBLK_F_UNPRIVILEGED_DEV, as a ublk server can leak
++ * uninitialized kernel memory by not reading into the full request buffer.
   */
- static inline struct ublk_auto_buf_reg ublk_sqe_addr_to_auto_buf_reg(
- 		__u64 sqe_addr)
- {
- 	struct ublk_auto_buf_reg reg = {
--		.index = sqe_addr & 0xffff,
--		.flags = (sqe_addr >> 16) & 0xff,
--		.reserved0 = (sqe_addr >> 24) & 0xff,
--		.reserved1 = sqe_addr >> 32,
-+		.index = (__u16)sqe_addr,
-+		.flags = (__u8)(sqe_addr >> 16),
-+		.reserved0 = (__u8)(sqe_addr >> 24),
-+		.reserved1 = (__u32)(sqe_addr >> 32),
- 	};
+ #define UBLK_F_SUPPORT_ZERO_COPY	(1ULL << 0)
  
- 	return reg;
- }
- 
+ /*
+  * Force to complete io cmd via io_uring_cmd_complete_in_task so that
 -- 
 2.45.2
 
