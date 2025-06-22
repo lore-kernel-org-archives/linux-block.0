@@ -1,284 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C336BA34;
-	Sun, 22 Jun 2025 12:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4489C1A23AD;
+	Sun, 22 Jun 2025 22:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750597149; cv=none; b=h6kQwwnHQ8DEFJk/0woVfK9w+OwtD6K6yh3/oZPpuze2m7CHB/MdzAgLJ3OyO3z9bQ5lOaMubqKcjWMimWFBN1kiIdYpZ9/6NJwdd6tFRlRqn6PTKZ356Jby7nP46UnxSXwJpKO7dajUWmQW35w8T2uJccrmzmFbq1hF2EgjkRA=
+	t=1750632648; cv=none; b=M0Arz5Bbp6imEMdsUYbXnn6sz+S+q36Uy8U9leyy+ZCJ1aaWXVEZERiwovc7R1CNErCGRmQ6Gaf4LRZ4vRwLdS3CSfg/S6XNI71/mB3JYZC8M7zqg3YZNcj+KUiuQw+TfCVmISIh5e7mCL1ae3s6iWxomgwdSDian13GqExD1CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750597149; c=relaxed/simple;
-	bh=CVzVcjv/dVsCjXVqz0Dv1hVrWg56ty5UCjDYUtYTFp0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s5MIxSOmXHib5YsoVSPWR9xmhpf0KmmTIjbE16FVCXJ3WXj8sxMbKX3Embg17WMbPRsXhGAhsKIFF3wU+UKF+H8WSHviB0Z7FKWcjAdqoIlh2pBSTfLpp1NhWTRKnnQh418rqW08+y48sZwDEPsqxoL0AUMw8XbrIhUBA8uz/nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SN6Lpd1/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750632648; c=relaxed/simple;
+	bh=wHATzHUwOUqRKn8FAzkIwW1jHvvvptGIND35VrXnmho=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P72Any4WIK4YBuExuB5gNVk43vGc4O3aKCqi0XbzJC+EYY3KjAzq/ZRqp3aXsyPFhYE2Ro8AWa9/2rNfdaXksG9JNiSFq3i2WOk1zBIs+8QpYHTZtXFu4JqOd2e5XL0DBuGNwoTtqsx/4EUYqi97gE9Bx5irUHuAPBPAKZkyPt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z24MCgov; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SN6Lpd1/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C457C4CEE3;
-	Sun, 22 Jun 2025 12:59:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750597149;
-	bh=CVzVcjv/dVsCjXVqz0Dv1hVrWg56ty5UCjDYUtYTFp0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SN6Lpd1/kT0JKwi1SsioFqoG3JnTL0GFgmy8Zs6i6dPYv87MgdxsdTXp5y4qw/ls4
-	 1CHHEtVJP8hPPkNyt7VqfwNngkjaLO6l1RIR/DTmvdDH7TJQHBw8iCl1bsNC61hQ5L
-	 2R4etNpP7Id81WSa6ib8i6if2wnsjmesVGxN/CTlW5N3jGS5yDno1zSva9P009rtrj
-	 OurkwoW1nuIfUL6y5atoiOJuwrEMm2GbFIEz1h7eUHgsr1Pb3LWdxOn22HLPCv9wZk
-	 4192doaNkzXCk0xq9NyXM9FlMeWgzNRoAWUhtYRX7FkKoKncpCinl4mBLNlYocyilN
-	 oFjpnrfPJmdtA==
-From: Gary Guo <gary@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Francesco Zardi <frazar00@gmail.com>,
-	Antonio Hickey <contact@antoniohickey.com>
-Cc: rust-for-linux@vger.kernel.org,
-	David Gow <davidgow@google.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/5] rust: block: convert `block::mq` to use `Refcount`
-Date: Sun, 22 Jun 2025 13:57:30 +0100
-Message-ID: <20250622125802.3224264-5-gary@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250622125802.3224264-1-gary@kernel.org>
-References: <20250622125802.3224264-1-gary@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z24MCgov"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-313fab41fd5so362917a91.1;
+        Sun, 22 Jun 2025 15:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750632645; x=1751237445; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
+        b=Z24MCgovbvwdu5n6jAqRkIfOw5jJCQh+oGKuaMUqMdBngf2wlsnuQWeLU66LmYDq2z
+         6hw7k23vBiA2Y9WuCa2LHytHLhd9AjZCjDBYpLw/RNAwXGL5c2mSoHy9TiL+VM9waIWQ
+         hDDjsBKeKgFNJCIAXkEATw409Ao0BZSGqcsTo+fFphI/QG5t+2oSD8pDGNin+K932gqC
+         z/P5x7yi/CqYodSlDqqF2yruBkSdWLEqHmnkxIilqRicDH6SNM/tjvQEKaPEUmceIY6i
+         fPISg5bChuNKbTM72LhZXi8DT/WNv8XICieRk96EMqb7/V5PU5R7oeMc5ckw1tm8No+q
+         Ll+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750632645; x=1751237445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
+        b=Yg7/oxQXPUcbQiJO0o35CqnlRRn8etlZslogx2PoB6trsSH9on4vh6dgHXtBiq6vbY
+         Xj1IuRtczyoB7hPH9LYgRvGUw0jjj5vxPzily6IyQQT5F8DEc23nXXx3JNcij5InQP9B
+         e5GwQQj6ZIu95g6vzlbZqaHFr4UX5FUNZ/mL6ObMimUpuGRZbZUU0Xy8ygQnVBjwKNZP
+         g1Bk/9VyfUlkEdUeUjg7yWYj1EoODnYtF+ZG51v4l2DOqMX4Ke2OUYt3E33g8N8T1qsY
+         4/Q/GhaeMC12g0BA7t52iB1T7N3EQnwuhzLSwRtOFQ3goroO+L60CDwrIxFr+AsWW2+h
+         iiZg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/3qW77tmh1yrHZyZWo2xoTl1aKWR0X3VUOXrNNvD7MQ3UBWva+GjfOvgrN8q083j5J6XZam38U3Yq@vger.kernel.org, AJvYcCU9/aLQ6N3XtilWzy42Hl2kDaZfewDBjkBRXcUv6h/6K3U3K6cVUodVaxwkYel5zxmsirk4VDBjKkJBOjQ=@vger.kernel.org, AJvYcCUXkjfTbBqigvhBjPWJAyVoJeZL4CoZI/CzPkssHcgfMGObinklldaldxAkDcHVNbVWuW98Mk8Es4kWBgN9@vger.kernel.org, AJvYcCV6qWXGP9zRMjakK++6HjOOKcEW9Dk8BYH8Hj9kY0DHw3IMnLMAJZVJSybYfGRc3NVbQ92JIsJYVX6pMu/sTu/1@vger.kernel.org, AJvYcCVWwFnqkXP1G9F6rX5trqeDXF6UwKUTouONx9hHwoSQ1wW4wNtZ6BPoGURjFs6JvAj8GDiSWA50iWIkb/Es@vger.kernel.org, AJvYcCW2umB5Sr62u6StURP0ZDgjAr5gkVfvDh2IjIIIRuKj/ZTnk7FpQujXt2cw5GyDqpDeeNeYqFUyqfDU2b2xSJc=@vger.kernel.org, AJvYcCWdRCugot5CvTHpnyoUm7lIWYhVQeQfHiKvhtyjnfNM+wpLU46FqIExHB1rYi/QgIBMkhgt9nYViqw=@vger.kernel.org, AJvYcCWsn6WJszPgG5oopu5HeV9Uo43Gs/6uFI2WqmJkkpozh5BEa61aowbV0ZgsogMpcHoC8fvxIa2j@vger.kernel.org, AJvYcCWuflZVxkRW8bJKLega5V/K9Nk9Tx9mMfJHEa18k0ZQVPPxuI6Luef+K5nwxvU/cRtKYyf7GrowUOuK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0by8/QbRy/n6Foebc+H8e7D18JjyY4F4w8bfu3VyYgFeNZTyq
+	g72Oy0OvHD1cPzoy2igZbkt+l7iyFfiX1gIw17wwLcnEMzQ7JqruhEJSX6GO8H5nAhLtD1S01wj
+	Pg8CSRgriwy14+OD6BCCSi7fO6aH6KHk=
+X-Gm-Gg: ASbGnctKm2hQIZtlwxmlnN/lid4QSFMRQAdE/ddYLmW2Ky1GY5PaGYX6pji4qnzgXys
+	kKCuDCpwvDBPfXMyrMtMCTcZgIOkGYsEaAae8jzSb7v4S/HBntsFwFY7NrCtXBxlc5fMvmYhn7I
+	hvxOsKUqA3gvzn1VGky9UKhiPS68PZttkCQ65fYQ6s3Iwo0llWTk3Qdw==
+X-Google-Smtp-Source: AGHT+IHkK5VxbDTzDH+78CGWNybiQ0lflBEpMpSVRH6uwkYDUKXtQuR/kJbEABJn7CeEMEkyXPjXtmArCfcPAjxsRNU=
+X-Received: by 2002:a17:90b:3a43:b0:311:fde5:c4ae with SMTP id
+ 98e67ed59e1d1-3159d8e2be9mr5684021a91.6.1750632645432; Sun, 22 Jun 2025
+ 15:50:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+In-Reply-To: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 23 Jun 2025 00:50:31 +0200
+X-Gm-Features: Ac12FXzAp4qUKl_aNT741tylL3I37tb5s--GlJccgcY1EV1oeXS1Teju6Ztan0w
+Message-ID: <CANiq72=xmyHuBYEGbCMi=Um_NvNbf5TfMmJB5YPpVp41FcPdJA@mail.gmail.com>
+Subject: Re: [PATCH v12 0/6] rust: reduce `as` casts, enable related lints
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Gary Guo <gary@garyguo.net>
+On Sun, Jun 15, 2025 at 10:55=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+>
+> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
+> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
+> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
+> lints. It also enables `clippy::as_underscore` which ensures other
+> pointer casts weren't missed.
+>
+> As a later addition, `clippy::cast_lossless` and `clippy::ref_as_ptr`
+> are also enabled.
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-Currently there's a custom reference counting in `block::mq`, which uses
-`AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
-architectures. We cannot just change it to use 32-bit atomics, because
-doing so will make it vulnerable to refcount overflow. So switch it to
-use the kernel refcount `kernel::sync::Refcount` instead.
+Applied to `rust-next` -- thanks everyone!
 
-There is an operation needed by `block::mq`, atomically decreasing
-refcount from 2 to 0, which is not available through refcount.h, so
-I exposed `Refcount::as_atomic` which allows accessing the refcount
-directly.
+    [ Added `.cast()` for `opp`. - Miguel ]
 
-Tested-by: David Gow <davidgow@google.com>
-Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
-Signed-off-by: Gary Guo <gary@garyguo.net>
----
- rust/kernel/block/mq/operations.rs |  7 ++--
- rust/kernel/block/mq/request.rs    | 63 ++++++++----------------------
- rust/kernel/sync/refcount.rs       | 14 +++++++
- 3 files changed, 34 insertions(+), 50 deletions(-)
+    [ Changed `isize` to `c_long`. - Miguel ]
 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 864ff379dc91..c399dcaa6740 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -10,9 +10,10 @@
-     block::mq::Request,
-     error::{from_result, Result},
-     prelude::*,
-+    sync::Refcount,
-     types::ARef,
- };
--use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering};
-+use core::marker::PhantomData;
- 
- /// Implement this trait to interface blk-mq as block devices.
- ///
-@@ -78,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
-         let request = unsafe { &*(*bd).rq.cast::<Request<T>>() };
- 
-         // One refcount for the ARef, one for being in flight
--        request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
-+        request.wrapper_ref().refcount().set(2);
- 
-         // SAFETY:
-         //  - We own a refcount that we took above. We pass that to `ARef`.
-@@ -187,7 +188,7 @@ impl<T: Operations> OperationsVTable<T> {
- 
-             // SAFETY: The refcount field is allocated but not initialized, so
-             // it is valid for writes.
--            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU64::new(0)) };
-+            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(Refcount::new(0)) };
- 
-             Ok(0)
-         })
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index 4a5b7ec914ef..683b5f32c620 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -8,13 +8,10 @@
-     bindings,
-     block::mq::Operations,
-     error::Result,
-+    sync::Refcount,
-     types::{ARef, AlwaysRefCounted, Opaque},
- };
--use core::{
--    marker::PhantomData,
--    ptr::NonNull,
--    sync::atomic::{AtomicU64, Ordering},
--};
-+use core::{marker::PhantomData, ptr::NonNull, sync::atomic::Ordering};
- 
- /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
- ///
-@@ -37,6 +34,9 @@
- /// We need to track 3 and 4 to ensure that it is safe to end the request and hand
- /// back ownership to the block layer.
- ///
-+/// Note that the driver can still obtain new `ARef` even if there is no `ARef`s in existence by
-+/// using `tag_to_rq`, hence the need to distinguish B and C.
-+///
- /// The states are tracked through the private `refcount` field of
- /// `RequestDataWrapper`. This structure lives in the private data area of the C
- /// [`struct request`].
-@@ -98,8 +98,11 @@ pub(crate) unsafe fn start_unchecked(this: &ARef<Self>) {
-     ///
-     /// [`struct request`]: srctree/include/linux/blk-mq.h
-     fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
--        // We can race with `TagSet::tag_to_rq`
--        if let Err(_old) = this.wrapper_ref().refcount().compare_exchange(
-+        // To hand back the ownership, we need the current refcount to be 2.
-+        // Since we can race with `TagSet::tag_to_rq`, this needs to atomically reduce
-+        // refcount to 0. `Refcount` does not provide a way to do this, so use the underlying
-+        // atomics directly.
-+        if let Err(_old) = this.wrapper_ref().refcount().as_atomic().compare_exchange(
-             2,
-             0,
-             Ordering::Relaxed,
-@@ -168,13 +171,13 @@ pub(crate) struct RequestDataWrapper {
-     /// - 0: The request is owned by C block layer.
-     /// - 1: The request is owned by Rust abstractions but there are no [`ARef`] references to it.
-     /// - 2+: There are [`ARef`] references to the request.
--    refcount: AtomicU64,
-+    refcount: Refcount,
- }
- 
- impl RequestDataWrapper {
-     /// Return a reference to the refcount of the request that is embedding
-     /// `self`.
--    pub(crate) fn refcount(&self) -> &AtomicU64 {
-+    pub(crate) fn refcount(&self) -> &Refcount {
-         &self.refcount
-     }
- 
-@@ -184,7 +187,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
-     /// # Safety
-     ///
-     /// - `this` must point to a live allocation of at least the size of `Self`.
--    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
-+    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut Refcount {
-         // SAFETY: Because of the safety requirements of this function, the
-         // field projection is safe.
-         unsafe { &raw mut (*this).refcount }
-@@ -200,47 +203,13 @@ unsafe impl<T: Operations> Send for Request<T> {}
- // mutate `self` are internally synchronized`
- unsafe impl<T: Operations> Sync for Request<T> {}
- 
--/// Store the result of `op(target.load())` in target, returning new value of
--/// target.
--fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64 {
--    let old = target.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| Some(op(x)));
--
--    // SAFETY: Because the operation passed to `fetch_update` above always
--    // return `Some`, `old` will always be `Ok`.
--    let old = unsafe { old.unwrap_unchecked() };
--
--    op(old)
--}
--
--/// Store the result of `op(target.load)` in `target` if `target.load() !=
--/// pred`, returning [`true`] if the target was updated.
--fn atomic_relaxed_op_unless(target: &AtomicU64, op: impl Fn(u64) -> u64, pred: u64) -> bool {
--    target
--        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
--            if x == pred {
--                None
--            } else {
--                Some(op(x))
--            }
--        })
--        .is_ok()
--}
--
- // SAFETY: All instances of `Request<T>` are reference counted. This
- // implementation of `AlwaysRefCounted` ensure that increments to the ref count
- // keeps the object alive in memory at least until a matching reference count
- // decrement is executed.
- unsafe impl<T: Operations> AlwaysRefCounted for Request<T> {
-     fn inc_ref(&self) {
--        let refcount = &self.wrapper_ref().refcount();
--
--        #[cfg_attr(not(CONFIG_DEBUG_MISC), allow(unused_variables))]
--        let updated = atomic_relaxed_op_unless(refcount, |x| x + 1, 0);
--
--        #[cfg(CONFIG_DEBUG_MISC)]
--        if !updated {
--            panic!("Request refcount zero on clone")
--        }
-+        self.wrapper_ref().refcount().inc();
-     }
- 
-     unsafe fn dec_ref(obj: core::ptr::NonNull<Self>) {
-@@ -252,10 +221,10 @@ unsafe fn dec_ref(obj: core::ptr::NonNull<Self>) {
-         let refcount = unsafe { &*RequestDataWrapper::refcount_ptr(wrapper_ptr) };
- 
-         #[cfg_attr(not(CONFIG_DEBUG_MISC), allow(unused_variables))]
--        let new_refcount = atomic_relaxed_op_return(refcount, |x| x - 1);
-+        let is_zero = refcount.dec_and_test();
- 
-         #[cfg(CONFIG_DEBUG_MISC)]
--        if new_refcount == 0 {
-+        if is_zero {
-             panic!("Request reached refcount zero in Rust abstractions");
-         }
-     }
-diff --git a/rust/kernel/sync/refcount.rs b/rust/kernel/sync/refcount.rs
-index 8e7b9b0c1979..bea063ef3fe3 100644
---- a/rust/kernel/sync/refcount.rs
-+++ b/rust/kernel/sync/refcount.rs
-@@ -4,6 +4,8 @@
- //!
- //! C header: [`include/linux/refcount.h`](srctree/include/linux/refcount.h)
- 
-+use core::sync::atomic::AtomicI32;
-+
- use crate::types::Opaque;
- 
- /// Atomic reference counter.
-@@ -30,6 +32,18 @@ fn as_ptr(&self) -> *mut bindings::refcount_t {
-         self.0.get()
-     }
- 
-+    /// Get the underlying atomic counter that backs the refcount.
-+    ///
-+    /// NOTE: This will be changed to LKMM atomic in the future.
-+    #[inline]
-+    pub fn as_atomic(&self) -> &AtomicI32 {
-+        let ptr = self.0.get().cast();
-+        // SAFETY: `refcount_t` is a transparent wrapper of `atomic_t`, which is an atomic 32-bit
-+        // integer that is layout-wise compatible with `AtomicI32`. All values are valid for
-+        // `refcount_t`, despite some of the values being considered saturated and "bad".
-+        unsafe { &*ptr }
-+    }
-+
-     /// Set a refcount's value.
-     #[inline]
-     pub fn set(&self, value: i32) {
--- 
-2.49.0
+It would still be nice to get the couple remaining Acked-bys (happy to
+rebase to apply them), but I feel we are in good shape, and it is a
+good time to put it into linux-next so that people see the lint before
+they start applying new code into their branches.
 
+Cheers,
+Miguel
