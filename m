@@ -1,67 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EFF2882A9
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6038F1F94A;
+	Mon, 23 Jun 2025 15:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750692453; cv=none; b=sHZfU13SgEfFTPBjPSLGgFA0Xv65czrCeuRKIr5je/GE++CvT4uKIPgObjG6X4zrQSYmQjgt76n+LI2TcEgrbd1JK33xnVS8/ts4twYwjET63RPsVAQA1POeLBmwAHCUCyxJycvHQm8QaYyzjejJNZ0k3lBvsc0EfFtSJEgkVMY=
+	t=1750692713; cv=none; b=m2T+NN2H5z66fnFEnZ401ZVWmz3kSZeIyiEpiZyjAa1JY5AJ6RzfdpCTIW4ILeVwnrsK9W+E9wTVupNxLwtdiA1dPzVJM0H0vRVczH/Fa/gYmamAVHKWxV8yc00Y+qvhFRKsCh09gjILTNmoVRYTR3PnEme3FGOAoUBUrHAmmPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750692453; c=relaxed/simple;
-	bh=joX8RW2I71piMAp33vBoXEKsMPja6dSHkMWvCKOCIkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nn2xzRvhRFoG/4h1scECuuKVHI+Ex5QfpNt0wCqhByZL9ipOJh0y5Z93+C19fumpuZtNwq8N0ojQDU0pNl1eSoKXqArrQx/h5CxdzujScSzm1Sbzm1AuigIccrA9DdcSSTtTh/pjShyImfSKB3QBQfFmZGOdIrstFLhUX9OXoBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1BtWkZO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750692713; c=relaxed/simple;
+	bh=G6wrqc9lN2Z5Thmk3+XuaIFvHY2mEtO+5WPLfjlHn8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s34W6UJQUrslbT9sIK8qYn+Q3w3VgLxaWQl/gAt4/WMOydF1R48l6PnzPG0e6lulbywwypusPKhfmhi9oYCN1IpMPKIEhYIYyfNjeIJHF3p2Why/DlFRZ0dlAxKU6BjlZy9Ap0PRl2sc1hF6P8szDRQes27fVI+wo6pcROc5zGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=eZL+NQZG; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1BtWkZO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A131C4CEEA;
-	Mon, 23 Jun 2025 15:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750692452;
-	bh=joX8RW2I71piMAp33vBoXEKsMPja6dSHkMWvCKOCIkk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E1BtWkZOw1oszg7cK+LkvSPJBc4VzqzqZPe87GeEwmc/ha8yUgrsgOo8+XcCqXmmc
-	 JQ9gUWYdqmOjOiYUem1CtvIr2YquiFPjg9ZvGwt0Jv96fhrCAFZKhga5Dw57D91C0K
-	 wbLeanlVIl4qIHThXOPmJWg+JpN6tvHJscEphqwwzgH9Rga6O41qCLdAo4V2UsnKxb
-	 R1R/4QSj0+cedkdCSU0xUEIEyCWbkR8iT607NTogbX2zMPnIrhLztOoeQaophfnrK0
-	 ZBmSn4bUnoOyQqWeA3uhJdOhajPIAR2pWfQ/6Xq1PSY4u99dEXfMYawkSqZv3lug7e
-	 EsfVR22zxMZhw==
-Date: Mon, 23 Jun 2025 09:27:30 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 3/8] nvme-pci: refactor nvme_pci_use_sgls
-Message-ID: <aFlyYjALviyhQ-IE@kbusch-mbp>
-References: <20250623141259.76767-1-hch@lst.de>
- <20250623141259.76767-4-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="eZL+NQZG"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bQsWW2v7TzlgqVb;
+	Mon, 23 Jun 2025 15:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1750692709; x=1753284710; bh=LUZ0qEHJJTDt+6aIIR3vZylC
+	zvIVqJUC6YYRJKPqtSM=; b=eZL+NQZGZLsNiCK2wIV4/2FRBKRTCcqq4hr38jhb
+	hig3Bu82/hSmX0cfUVv4LEle0upeK3RVUw5x28RB355aJ/9uzz20RFWmrkwWVXXA
+	FrI5i8VTlfTW8BkN2c1FWgr9FsehDWIHoIXYt+xld1bjdJfwVTdbWtTb1RbjKHAT
+	X1zdJXvPihAlyKKNvOMKntdhpfqR/M4tNaJFUMe2R7RACJHyEDn8/ZMmra0uuXGs
+	39Y23hW2Czpa/DbYjFCOqXopQiVh4RjEU5UqjPQXGkU33pZIpKtAddJjGIfm1A/2
+	ZiSpkK2oPXtSIBGmI1G2BV+fnOq9JEFRbfIhRS3zZUedZA==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id qfbmONVdDI45; Mon, 23 Jun 2025 15:31:49 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bQsWH1z25zlgqVY;
+	Mon, 23 Jun 2025 15:31:38 +0000 (UTC)
+Message-ID: <8eae59ce-1d46-4c9c-af6f-0f6bb39a8286@acm.org>
+Date: Mon, 23 Jun 2025 08:31:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250623141259.76767-4-hch@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] RDMA/srp: don't set a max_segment_size when
+ virt_boundary_mask is set
+To: Christoph Hellwig <hch@lst.de>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ "Ewan D. Milne" <emilne@redhat.com>, Laurence Oberman <loberman@redhat.com>,
+ linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20250623080326.48714-1-hch@lst.de>
+ <20250623080326.48714-2-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250623080326.48714-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025 at 04:12:25PM +0200, Christoph Hellwig wrote:
-> @@ -888,7 +899,9 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->  		goto out_free_sg;
->  	}
->  
-> -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
-> +	if (use_sgl == SGL_FORCED ||
-> +	    (use_sgl == SGL_SUPPORTED &&
-> +	     (!sgl_threshold || nvme_pci_avg_seg_size(req) >= sgl_threshold)))
->  		ret = nvme_pci_setup_sgls(nvmeq, req, &cmnd->rw);
+On 6/23/25 1:02 AM, Christoph Hellwig wrote:
+> virt_boundary_mask implies an unlimited max_segment_size.  Setting both
+> can lead to data corruption, and we're going to check for this in the
+> SCSI midlayer soon.
 
-We historically interpreted sgl_threshold set to 0 to mean disable SGL
-usage, maybe because the controller is broken or something. It might be
-okay to have 0 mean to not consider segment sizes, but I just wanted to
-point out this is a different interpretation of the user parameter.
+Please make this patch description more detailed and mention that
+__blk_rq_map_sg() may split sg-lists such that the virt_boundary_mask is
+not respected if max_segment_size != UINT_MAX.
+
+Thanks,
+
+Bart.
