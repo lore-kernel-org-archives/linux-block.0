@@ -1,71 +1,64 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08BE1993B9
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 02:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890C2B663
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 02:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750644575; cv=none; b=oLUvWz+4XhL4Wzwg6qAB1O+QSn1ruOer0gCJnjz7/GSFM0Itnuw5YzWrccfHz96RCVOL02HzCkpFmo/ZYjj+DLws+pKimIqITYFsGWx0vCT92UhCZHIE4WkryRyIFvWiz4g7HVUBVlHj5tJpSvEad+8FZWosTpb0L7B+C4mE3Y0=
+	t=1750644830; cv=none; b=ExX/sn17rW55bTX/urua22nXyJU3rO5OqOeN5kd5t2QFF+FmG7y0Pob3gnbePX0M78iiaU/L4QjtWZFENuKYOocN+HgBjRs8n0/KXumucCg54X2vcFynwtmy7i13kHJa7via8X1BMvoRGOaijeFqbrzUWcVpXcRSphsqRpRB9P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750644575; c=relaxed/simple;
-	bh=x7hpiDR4qKglD7Ir5DagYi1QENn/t1iu+UDVk8rRHpw=;
+	s=arc-20240116; t=1750644830; c=relaxed/simple;
+	bh=wHfg+4KacDx3C2EUrMoqez3JE327RNb2BGSNw+aBXTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VsEPK+Lo82vZk0FNyLi067l1pl5/0maxt86Np6/emM/34/NGtAIaXzetMxl1nN5Y8ZLysj+xu4pVD8OnNobEPgbIP9f/fpgkpxlG1U6Rk7QNddet1PSbQAMd77VhCpMoxYE2EFo0uB1hJIGldSpSIh0Go4EBVLQ7JfCA/5sqmLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RIaoyvH4; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=bVDDPzC+z/ygl+irwjO/cypmWwUYOYj+1uS+K7wVJiHuQcqOHBCl9mJq5Jk68p9ntBngmrhCZL455Hk+j3iXZ6+k0y7X/io5MfqdpGLA8EPdg7x50wB7EGj1MWwY3XxjcIw0cktX4rJNjQ5VrthPvI5NOfhSZG0rYmRPk9R/L64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aswetLir; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RIaoyvH4"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7490702fc7cso1729652b3a.1
-        for <linux-block@vger.kernel.org>; Sun, 22 Jun 2025 19:09:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1750644573; x=1751249373; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RJgHAjKlP+uQglnNSL7ta3bomofU87c73wx7U9vhabo=;
-        b=RIaoyvH49HBPs51B7bkGzae8O9K1clEqpohUcrM1j6roxkDRlVpQCX9HxvuknTl2Ko
-         ENSfqWHT7rKYOD82dOXgaMDLekgna6hGz+lq82MP3SbaORVmUDkleiYLgK0nFC5axq4a
-         b38G2d70+tzhvW/q2Zk9Jw3oJcQEu/rxvtp1s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750644573; x=1751249373;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RJgHAjKlP+uQglnNSL7ta3bomofU87c73wx7U9vhabo=;
-        b=JADNTFt/HuXCIUs+1xRwQ9OhTLjkH1tTeVOMp3B1JEI89QSYsw9IQaEI/QQfXX/GCX
-         2GiYYpWXIwj8eUaTdg2TdShog/2X2YBUjjVu3SBLqPmd15nMvrXezBHbHUMNsfJZluYZ
-         uC907s+WUcLS8JxMhn+xvMSk63XGbYelKnRYsZhzoTn1P0ZFsCFOGwyewBeLT+Lug0O7
-         6YAxn5XvqIfwPGeO8ZNZGrZRYkIinZZ/Hntd4rvH+jbv7bLYsZX6k40Dhguny0YpLw1G
-         kVYwOpF3dXGRxmUtBCqe9vuOpAHWYV6AUBkIdn5z3LiWL3UgkofHMnrdE8gbGK++d+vT
-         EdJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUG2lqB502aWQY0ARTvbSDey10hx1Gb2UsH44HhugSRGv3ReqPiX8NaVCxbXQn9d+Z8//nSzwY4oAsH5w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwohBKNuP/NJUaGtWCNYvZFVUI5RdatPkLl3KtVEgaU7skF+mxD
-	p3Ho+TmqHbf23FKAx+pCm6+cki1p5PXh50c1ZGwXZ5LZTJ+JY5ImYCFYl5mFNl6zeA==
-X-Gm-Gg: ASbGncsCiGlRECjy9kdtZ2aenLIn3kK277N1TKoZSc/iKWFHeDOCyhxVdbTC4yim1wa
-	z7hT84PsohkE/iUTK+10SklLsF0EbQQhcfRiLO5tgbnrDn2M046b+Ji8igrNAMJ2MUfCYy+1EDa
-	BOrCpQOKPe0GjBzHabTk02QOXqvN/NdyB6H6FlqoombgVn0yueS+Gsx0ES4doB0Ius7oc7njHm5
-	s+3Njo24szEzMLt/BqagQilprcxqkuE4QpJAnxa8v7ZfhNFOpeM2z6czVLD43x5S3kSGrDJ8EqU
-	fxOqw1gL5OPPl+cRUa03fWPL3eS42Ax5umiNbxf9qiYkLk8Yanrbiby/LK4qQUfO
-X-Google-Smtp-Source: AGHT+IG6cUGGcE1aPZGXsILZBQLtYk0/qTh3KpldgGraVWjCXgnv13V8iaPuV2aRqOBbSlL69Z4D7A==
-X-Received: by 2002:a05:6a21:7a47:b0:216:1fc7:5d51 with SMTP id adf61e73a8af0-22026e9ca83mr17370601637.37.1750644572967;
-        Sun, 22 Jun 2025 19:09:32 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:b9f:1985:9000:6db2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a46b8c8sm7353540b3a.18.2025.06.22.19.09.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Jun 2025 19:09:32 -0700 (PDT)
-Date: Mon, 23 Jun 2025 11:09:28 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Richard Chang <richardycc@google.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, bgeffon@google.com, 
-	liumartin@google.com, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: support asynchronous writeback
-Message-ID: <jpj6huz4rqophy6xpgvfnlydhajzal6fbxfteydl7ihzanpqn4@e7esbgc75gss>
-References: <20250618132622.3730219-1-richardycc@google.com>
- <n6sls56srw265fmyuebz6ciqyxqshxyqb53th23kr5d64rwmub@ibdehcnedro6>
- <CALC_0q8-98y0v_jV6QOFTKRAGhJ4nCXZ=q9wutLZPCE0KnKymw@mail.gmail.com>
- <x54netqswex6fpv46nlmeea3ebnm32xnwask4zxw7nmcn7tqdz@4mu4hwsa7hsb>
- <CALC_0q-aRtNS8c00nCD0key27UH9-_2kW=PoXQKrLQ5bg6MU_A@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aswetLir"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750644827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sj+OxDIqRQWvvPOtCRF3f1c+T40zaAeLU0Ma+vTjujc=;
+	b=aswetLiri1Jtkl23CKVRA1T91xyLNr4ryeK6Y2M7ppL/pi8sgpXL3dor70usFmOtnpJOJ6
+	3dNcjeOVxvebVioEPThAwgSZw96C+1sbwmlzw0JtHFBt7A9HgqzA/k3YxhflVu3Bp9r5dG
+	3aXY4f9JWH7YRiN0jkFjNMdmjOLOeUs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-426-NSpttJjBP1eRHtCF2tVqTQ-1; Sun,
+ 22 Jun 2025 22:13:44 -0400
+X-MC-Unique: NSpttJjBP1eRHtCF2tVqTQ-1
+X-Mimecast-MFC-AGG-ID: NSpttJjBP1eRHtCF2tVqTQ_1750644823
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7CA9D19560AE;
+	Mon, 23 Jun 2025 02:13:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.88])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 82509195608D;
+	Mon, 23 Jun 2025 02:13:38 +0000 (UTC)
+Date: Mon, 23 Jun 2025 10:13:33 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yoav Cohen <yoav@nvidia.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 2/3] ublk: add feature UBLK_F_QUIESCE
+Message-ID: <aFi4TYy2q5BoaoPl@fedora>
+References: <20250522163523.406289-1-ming.lei@redhat.com>
+ <20250522163523.406289-3-ming.lei@redhat.com>
+ <DM4PR12MB6328039487A411B3AF0C678BA96FA@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <aEK6uZBU1qeJLmXe@fedora>
+ <DM4PR12MB6328BB31153930B5D0F3A3C7A968A@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <aEWfWynspv75UJlZ@fedora>
+ <DM4PR12MB63280BC70C29A91E973E8080A974A@DM4PR12MB6328.namprd12.prod.outlook.com>
+ <aEqanYVjHgVOjcwR@fedora>
+ <DM4PR12MB63285592EDAA9C03DB1D6BFCA974A@DM4PR12MB6328.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,17 +67,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALC_0q-aRtNS8c00nCD0key27UH9-_2kW=PoXQKrLQ5bg6MU_A@mail.gmail.com>
+In-Reply-To: <DM4PR12MB63285592EDAA9C03DB1D6BFCA974A@DM4PR12MB6328.namprd12.prod.outlook.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On (25/06/20 13:56), Richard Chang wrote:
-> Hi Sergey,
-> I copied three linux-6.16-rc2.tar.gz tarball files as the data set.
+On Thu, Jun 12, 2025 at 12:04:39PM +0000, Yoav Cohen wrote:
 > 
-> Test Flow:
-> - mkfs on the zram device, mount it
-> - cp tarball files
-> - do idle writeback
-> - check bd_stat writes 185072 pages
+> Hi Ming,
+> 
+> So I know it's a radical situation but my only concern is that:
+> 
+> 0) On our application timeout of IO may be set to few minutes as it is goes over the network.
+> 1) Let's assume we have 1 queue with QD=1.
+> 2) the Only IO is in the userspace application but as we send the IOs over the network it may be stuck due to connectivy issues.
+> 3) User trying to upgrade/stop the application so we issue Quiesce_DEV with infinite timeout as we want to ensure it works.
+> 4) We are stuck now until network connection will recover or Our datapath will somehow Issue the COMMIT_AND_FETCH back to to the kernel so it we can get the ABORT later and QUICESE_DEV can finish.
+> 
+> Problem is that I don't want to wait for this IO until recovery but on the other end I don't want to complete the IO with error to the user.
+> So on this case I guess we can abort the application or something but maybe it will be cleaner that on Quiesce_DEV will need to issue another SQE per queue or something so we can notify the application this way about it.
+> 
+> Anyway also on our case it will be super rare to happen where there is a queue without an idle operation + network is currently down but we try to be complete as possible.
+> What do you think?
 
-Sounds good enough.  Please add as many details/numbers/etc.
-as possible to the future commit messages.
+Hi Yoav,
+
+The multishot approach for fetching io command should address the issue
+wrt. single queue depth case:
+
+https://github.com/ming1/linux/commits/ublk2-cmd-batch.v3/
+
+In which there is always one multishot FETCH_IO_CMDS for notifying ublk
+server for new io commands(requests) in batch way.
+
+
+Thanks, 
+Ming
+
