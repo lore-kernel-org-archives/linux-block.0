@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B820C276024
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D234326D4ED
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750693388; cv=none; b=PrJgy2kdtzNfjOD5EH0AjCWFyGQ+QX6CthsV6OY4y+97dkCFT+HWxcfChVwU8BDFRwQ6Wb65ZRl2f4TsozaveMn0fZsNkcuirfymrYwtlcnt1HN5SAXa4vEJmLZ9xriOMN3WwbgU/ADyYzXyH7SkMyVM/NIqLmGgG70Kzf4g8wQ=
+	t=1750693402; cv=none; b=WW8WjQ2ln2vJz2D3LXaaCznkYu3o2K70Ab6/VzjuGWjefDnzdv4LoApYASzf53xjbj9gs1FzLDjyhyllu14sqk3kRtzPS9qb2v12Gh761wPO93Idl2B6CPkGYpx7vBqhSrRFjGhsAWgN/Uv8fvus5LCd/8mbcTomx77Bpmd3qUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750693388; c=relaxed/simple;
-	bh=0eaGEA1wt6jq4T6sIubQFT2smAr+omb1CgShoBvET0w=;
+	s=arc-20240116; t=1750693402; c=relaxed/simple;
+	bh=VcRWjYMSJw03/dks5fmNXEVRgkYNfRhBtD8HoaYy0Wk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NEvnhnu+2LT3KZTE7i/z5koh68rQreSDBOuxTvZBxg2OJSFP17F+rnVYKZG/Ob0Z6MltWB/K6JdjD85lYslT2iLjbVBFPSnQVqlp3BXwX3wuj/lMP/q+tIb89A/r3ONZ3sunmyfQCchBc51jxf4Z6QZnvZtFiGeNaEE7Ptd1px4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfbMtAAn; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3gSCWsOkVToZq4az4zM58QJbPYOi5f8pxPo8Cg2MZojBuBtiXSStNSEJZ5aaYgyMLmllZXu6jSVpo5y5DHfmzwhMqqEDdbYmhyl+p9dxxN8N1ub010zXU01TNrwQ302kEZElReEhTDchFSJNA2pBtl4Jgn75N2gFspHGlkv/rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zh2Ue8Oo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfbMtAAn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B700AC4CEEA;
-	Mon, 23 Jun 2025 15:43:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zh2Ue8Oo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC8E1C4CEEA;
+	Mon, 23 Jun 2025 15:43:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750693388;
-	bh=0eaGEA1wt6jq4T6sIubQFT2smAr+omb1CgShoBvET0w=;
+	s=k20201202; t=1750693402;
+	bh=VcRWjYMSJw03/dks5fmNXEVRgkYNfRhBtD8HoaYy0Wk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cfbMtAAn4mryyrMA98mi6BHTTiOmVBjiy5mXbLojnyny316jTf4WItkT0Sdzd804g
-	 F9f3kKvBsw3zipxgJMBB8RNGrbLulaXQMAsC0TBezd/Ep+pxF57KQMOcTQpY/51Jai
-	 Dg8NicADXWuL0pZY+kTyqoLOVH5rbzYcBxj0p2gr9kMb48Q5ZfKSj1E4Aje7PszuML
-	 l1GX/tHjPSoi6FavmikH1ewuwtzK5PByjDdXLcVdZrA9FcCjEyK/G5LLtxmrGQQPTX
-	 tJZyO6ZIGBlfJ5eutJRQSr/vf915nb3K92zf3dowEYG4kwzNa2jXaQS/USqX57qLsW
-	 0WoI6ARIyfADQ==
-Date: Mon, 23 Jun 2025 09:43:05 -0600
+	b=Zh2Ue8OomNtBloDplx1kd1zOkpJ09KIl7feACNXNxKEdjIIFp4qb/K2eJrW+u5O4S
+	 wvSDh55jisc21Yk8eA02p/2rZeuasIUk6iwxis4sE06dqr6TJoEbBmKwMGffl0H9Ur
+	 ld6FusCNzzP5pW9VCjQ547CtlMe+B7NOn+hduEwgTKQWA/lVQKl0VoNdevTqzgei7p
+	 mAhC3BR1PdbnW1aoUAZMyNcJamI5sJY0C7T+9wvRucjYbYZEXJ4wyKQwX4j3buZy9X
+	 w5ji8fYeNp1ihS8mrk/mImaRwnNqMTBx3/ugTrRfojLEh6FN44bQrYjRViC36T5dx7
+	 akO4ZVqqvaE2Q==
+Date: Mon, 23 Jun 2025 09:43:20 -0600
 From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
@@ -36,11 +36,10 @@ Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
 	Nitesh Shetty <nj.shetty@samsung.com>,
 	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org, Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH 1/8] block: don't merge different kinds of P2P transfers
- in a single bio
-Message-ID: <aFl2CT8rIC-MgvK3@kbusch-mbp>
+Subject: Re: [PATCH 2/8] block: add scatterlist-less DMA mapping helpers
+Message-ID: <aFl2GJskYNdvZDDo@kbusch-mbp>
 References: <20250623141259.76767-1-hch@lst.de>
- <20250623141259.76767-2-hch@lst.de>
+ <20250623141259.76767-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,17 +48,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250623141259.76767-2-hch@lst.de>
+In-Reply-To: <20250623141259.76767-3-hch@lst.de>
 
-On Mon, Jun 23, 2025 at 04:12:23PM +0200, Christoph Hellwig wrote:
-> To get out of the DMA mapping helpers having to check every segment for
-> it's P2P status, ensure that bios either contain P2P transfers or non-P2P
-> transfers, and that a P2P bio only contains ranges from a single device.
+On Mon, Jun 23, 2025 at 04:12:24PM +0200, Christoph Hellwig wrote:
+> Add a new blk_rq_dma_map / blk_rq_dma_unmap pair that does away with
+> the wasteful scatterlist structure.  Instead it uses the mapping iterator
+> to either add segments to the IOVA for IOMMU operations, or just maps
+> them one by one for the direct mapping.  For the IOMMU case instead of
+> a scatterlist with an entry for each segment, only a single [dma_addr,len]
+> pair needs to be stored for processing a request, and for the direct
+> mapping the per-segment allocation shrinks from
+> [page,offset,len,dma_addr,dma_len] to just [dma_addr,len].
 > 
-> This means we do the page zone access in the bio add path where it should
-> be still page hot, and will only have do the fairly expensive P2P topology
-> lookup once per bio down in the DMA mapping path, and only for already
-> marked bios.
+> One big difference to the scatterlist API, which could be considered
+> downside, is that the IOVA collapsing only works when the driver sets
+> a virt_boundary that matches the IOMMU granule.  For NVMe this is done
+> already so it works perfectly.
 
 Looks good.
 
