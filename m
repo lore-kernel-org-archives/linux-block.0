@@ -1,30 +1,115 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5A97261A
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 06:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129FA1DFDA5
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 06:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750659022; cv=none; b=J/i5RaCyeY31kUcZzc/nP8hZELtqf3IzTtbfrmQFhLAVhcO6UAVoDhcU6UkMfCkyGsc3L0UWoZC/xbKrVL5fDZZA/kdz+R/F80+PqJiUZ4VYNPO9cDv7QGkNdOYZwNIsKHGvVnyeLOAOnI8mH17nfyEIh0yVwHjxaViiLU7Bpxc=
+	t=1750659736; cv=none; b=C2iHeirIPfIHrk1MbDY1GLq2q76NsKA5li445/CQnCX5XC6XBYr3KCiz7G9Qba7/ubF6bNyGq2Rl6Cp3PbPksFgyf68U7DuH1qKhvQwzPCrlD4KsAQmSM7fLBwsGDlqGbIHhKyZETLrvKwnWWpFV2jHa5DuQe0M7UNiHO18SFEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750659022; c=relaxed/simple;
-	bh=ZLIOX+FOkQSmH5CkFuGG+QZwBy4IrSkzLrHQLLTHMRw=;
+	s=arc-20240116; t=1750659736; c=relaxed/simple;
+	bh=0GviJ4C43LDU6PSrh2071vRUi2rtBfBORn6lykbuEsE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KL90iathxmpuZ268TENYdp9s5JItBO6LjBjGqEGSzOOeuiN63rw3n/UOXO8sjeidB+tgyHoNNFfvKV6035evslj6E4ldMw4u6evJzTyKgfoYA9bXwffu8Cn/WTQgo1jimnChFw8gilP06v9mn4vMeF1oPkuvfIeAjM8SwDAbYsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id E896168AFE; Mon, 23 Jun 2025 08:10:15 +0200 (CEST)
-Date: Mon, 23 Jun 2025 08:10:15 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, hch@lst.de,
-	axboe@kernel.dk, sth@linux.ibm.com, gjoyce@ibm.com
-Subject: Re: [PATCHv3 2/2] block: fix lock dependency between percpu alloc
- lock and elevator lock
-Message-ID: <20250623061015.GA30266@lst.de>
-References: <20250616173233.3803824-1-nilay@linux.ibm.com> <20250616173233.3803824-3-nilay@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TvFnMGl+dAca73KiAspENyWGpvH2TqK0T19ZbzUC025P7vnvxXKs/TUUmPBExaZCSsFZDR3ZzYjKSAIcp1kY3OMC5fsxYt/jvJa4cwEK1hxZDiLkYHusnYfn3/lcm/MHHkP9zo+DqQ3e+0Q/U959mytcm/CMAttyCFIN7B8DuyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=u+oJqfox; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u+oJqfox"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3137c20213cso3796486a91.3
+        for <linux-block@vger.kernel.org>; Sun, 22 Jun 2025 23:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750659733; x=1751264533; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZjaVo7z5thcmzA/Idtk2W4NhEJVEWcJtCaNKpGwgS2c=;
+        b=u+oJqfoxE1BDc1eJwUUis1/T12Yqa9kCGnmN2ISJ6NGL4Y90YTjNpLcrHWi2vC7sRN
+         V7k7BJyQhMSUMtHnH7VwPrTi0ApD257hQSBDPWlbwRnnmV8VWzNUqcZH8U11ZKU+pE6D
+         hW1qhi+Kr7GNBRRFQi35gamyh6WI7ysOV4gxCoI2xvX0CiY24IsIjPSklaXOQyTBaDYC
+         knHRmrkvJebx7VBrgNq6a2PDzN/2Bx/t52idVdQU1St5ukmK1HArRMG54H3zBrnzHQV4
+         QECnIgveaWKpT8qVfotGB5w3LBcIoVxWX+EHnrjCPB5r7gRk42Uw1BMb7mGARpZN5WKx
+         mqAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750659733; x=1751264533;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZjaVo7z5thcmzA/Idtk2W4NhEJVEWcJtCaNKpGwgS2c=;
+        b=wzoqmmss2SQJjjbWIG6iiboMuScLJf4jecbyK5xGxjK6q5gz7v/qkH63xfFnK7vCCN
+         JaLoUbln6j9L3Cb0qVq8Cl4ZfRUpQWXhXOl19dR96p+5cQipRKdIsJ5iPTqK5baDE5qU
+         tOYT0HVpjORe7X3Hh2jufRVFOHRHoL+hude1dIbKkYgxpgRbI80Ed9y+tHzish7AXVf4
+         9GxQtYzp7HGyrXTYagma13DtvcC1wd5X0zgAG3dIHmWwsV+mUZ6GVhSQxoLLZYS9e6WV
+         2pjcyrNsf0ehknFI2VaEDAB9QEiGkhCux0kIS6np3sqVfSXHa56ngeWPBaHkYH9BoULD
+         +ZDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZg3U1YVUN3gRB4dCcc9QVei18u0pD3F6vr6AKF3Ht3mKxquseMEYVHRmXESwFjeXKeJbaU0bLJy/dYA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiqvPHpnuV1L2PN5biicelt6k0zeNZ/QgzLEVseDqYYnEcwIQe
+	aT5N8o3hIV1axafLXpjr6QII1ems0te+Hl+hIoM+YHbrmamFcY0KcQ33PVmGvC5ojyw=
+X-Gm-Gg: ASbGncsjn+FBZAvR5KFvp8cGuA5RhEdzksETEukFkslAlr+6LOICZ5s7RgOk+yzkNPX
+	ETy9tyQFV4dRJ6pkTbXfGauajECgowqVTB/mlR1GnAlFuwJQx3ixnHdjyUWYxk//rNWdKPIzlmO
+	mU+YDrh5mqAjhWd4D7/p2L0jyFwLiKDEM9zTAkzzmNPnoA9dt1UYmhejHNJPW2yYQFz3xu6IEeI
+	YhwcBZDYeOimWHePV5VvFfxELIk0+51z7MmA0+QP31CVgPBfb1mGaIJQ+JZe1d2+83NKzgkwIrf
+	EigkIp34gQuEH6i4s6AypYtBdbp0fompWdMnT1CjuDxiLYP2GJ/FU0F6dlh7cJg=
+X-Google-Smtp-Source: AGHT+IHTC8DDc643Bby1AguMJbpjpU8RoaZSO7asfpNMZjv5HFpnG7zervZfVFZEkHAcEV/Plpb2eg==
+X-Received: by 2002:a17:90b:1fcc:b0:311:b0ec:135b with SMTP id 98e67ed59e1d1-3159d8d6282mr19886141a91.24.1750659733212;
+        Sun, 22 Jun 2025 23:22:13 -0700 (PDT)
+Received: from localhost ([122.172.81.72])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d860a3c9sm75875175ad.95.2025.06.22.23.22.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Jun 2025 23:22:12 -0700 (PDT)
+Date: Mon, 23 Jun 2025 11:52:10 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	llvm@lists.linux.dev, linux-pci@vger.kernel.org,
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v12 4/5] rust: replace `kernel::c_str!` with C-Strings
+Message-ID: <20250623062210.she33z5hfouu5jgj@vireshk-i7>
+References: <20250619-cstr-core-v12-0-80c9c7b45900@gmail.com>
+ <20250619-cstr-core-v12-4-80c9c7b45900@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,151 +118,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250616173233.3803824-3-nilay@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250619-cstr-core-v12-4-80c9c7b45900@gmail.com>
 
-On Mon, Jun 16, 2025 at 11:02:26PM +0530, Nilay Shroff wrote:
-> +static void blk_mq_init_sched_tags(struct request_queue *q,
-> +				   struct blk_mq_hw_ctx *hctx,
-> +				   unsigned int hctx_idx,
-> +				   struct elevator_queue *eq)
->  {
->  	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
->  		hctx->sched_tags = q->sched_shared_tags;
-> +		return;
->  	}
->  
-> +	hctx->sched_tags = eq->tags->u.tags[hctx_idx];
->  }
+On 19-06-25, 11:06, Tamir Duberstein wrote:
+>  drivers/cpufreq/rcpufreq_dt.rs        |  5 ++---
+>  rust/kernel/clk.rs                    |  6 ++----
+>  rust/kernel/cpufreq.rs                |  3 +--
 
-Given how trivial this function now is, please inline it in the only
-caller.  That should also allow moving the blk_mq_is_shared_tags
-shared out of the loop over all hw contexts, and merge it with the
-check right next to it.
+Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
 
-> +static void blk_mq_init_sched_shared_tags(struct request_queue *queue,
-> +		struct elevator_queue *eq)
->  {
-> +	queue->sched_shared_tags = eq->tags->u.shared_tags;
->  	blk_mq_tag_update_sched_shared_tags(queue);
->  }
-
-This helper can also just be open coded in the caller now.
-
-> +	if (blk_mq_is_shared_tags(set->flags)) {
-> +		if (tags->u.shared_tags) {
-> +			blk_mq_free_rqs(set, tags->u.shared_tags,
-> +					BLK_MQ_NO_HCTX_IDX);
-> +			blk_mq_free_rq_map(tags->u.shared_tags);
-> +		}
-> +		goto out;
-> +	}
-> +
-> +	if (!tags->u.tags)
-> +		goto out;
-> +
-> +	for (i = 0; i < tags->nr_hw_queues; i++) {
-> +		if (tags->u.tags[i]) {
-> +			blk_mq_free_rqs(set, tags->u.tags[i], i);
-> +			blk_mq_free_rq_map(tags->u.tags[i]);
-> +		}
-> +	}
-
-Maybe restructucture this a bit:
-
-	if (blk_mq_is_shared_tags(set->flags)) {
-		..
-	} else if (tags->u.tags) {
-	}
-
-	kfree(tags);
-
-to have a simpler flow and remove the need for the "goto out"?
-
-> +	tags = kcalloc(1, sizeof(struct elevator_tags), gfp);
-
-This can use plain kzalloc.
-
-> +	if (blk_mq_is_shared_tags(set->flags)) {
-> +
-> +		tags->u.shared_tags = blk_mq_alloc_map_and_rqs(set,
-
-The empty line above is a bit odd.
-
-> +					BLK_MQ_NO_HCTX_IDX,
-> +					MAX_SCHED_RQ);
-> +		if (!tags->u.shared_tags)
-> +			goto out;
-> +
-> +		return tags;
-> +	}
-> +
-> +	tags->u.tags = kcalloc(nr_hw_queues, sizeof(struct blk_mq_tags *), gfp);
-> +	if (!tags->u.tags)
-> +		goto out;
-> +
-> +	tags->nr_hw_queues = nr_hw_queues;
-> +	for (i = 0; i < nr_hw_queues; i++) {
-> +		tags->u.tags[i] = blk_mq_alloc_map_and_rqs(set, i,
-> +				tags->nr_requests);
-> +		if (!tags->u.tags[i])
-> +			goto out;
-> +	}
-> +
-> +	return tags;
-> +
-> +out:
-> +	__blk_mq_free_sched_tags(set, tags);
-
-Is __blk_mq_free_sched_tags really the right thing here vs just unwinding
-what this function did?
-
-> +	/*
-> +	 * Accessing q->elevator without holding q->elevator_lock is safe
-> +	 * because we're holding here set->update_nr_hwq_lock in the writer
-> +	 * context. So, scheduler update/switch code (which acquires the same
-> +	 * lock but in the reader context) can't run concurrently.
-> +	 */
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		if (q->elevator)
-> +			count++;
-> +	}
-
-Maybe add a helper for this code and the comment?
-
-> -	lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
-> +	lockdep_assert_held(&set->update_nr_hwq_lock);
-> +
-> +	if (strncmp(ctx->name, "none", 4)) {
-
-This is a check for not having an elevator so far, right?  Wouldn't
-!q->elevator be the more obvious check for that?  Or am I missing
-something why that's not safe here?
-
-> diff --git a/block/elevator.h b/block/elevator.h
-> index a4de5f9ad790..0b92121005cf 100644
-> --- a/block/elevator.h
-> +++ b/block/elevator.h
-> @@ -23,6 +23,17 @@ enum elv_merge {
->  struct blk_mq_alloc_data;
->  struct blk_mq_hw_ctx;
->  
-> +/* Holding context data for changing elevator */
-> +struct elv_change_ctx {
-> +	const char *name;
-> +	bool no_uevent;
-> +
-> +	/* for unregistering old elevator */
-> +	struct elevator_queue *old;
-> +	/* for registering new elevator */
-> +	struct elevator_queue *new;
-> +};
-
-No need to move this, it is still only used in elevator.c.
-
->  extern struct elevator_queue *elevator_alloc(struct request_queue *,
-> -					struct elevator_type *);
-> +		struct elevator_type *, struct elevator_tags *);
-
-Drop the extern while you're at it.
-
+-- 
+viresh
