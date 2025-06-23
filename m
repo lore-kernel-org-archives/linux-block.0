@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AE827AC32
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7BF27C15B
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750693421; cv=none; b=gXDo4TCQuzsC1cfokn/MPYT3BZNb7X3iv+BQKhNC4EiKOwnpalWhFg0/zqldYzfmjhXG/ZsrrXXlYPXtaAbX+200fzrQdLBR+gx+zl1v2SUv6HufaWrrEg/lj1xJXbBjZkjUTDfG9RwwYyY32izlTcNjtM6Ic84NdV0gwkTABAo=
+	t=1750693448; cv=none; b=peltxsPBTj/Bx29BHuUjM98Mfw+dz/DZU5MfKehOf2EGUsBdsRC/JKLaszMiupfPKWb4GHv6GMIIVOKVPpm0/PVPSggIlR0PgxWlEGsu1NolcdnJbZESYcsCshZs5qPdeO7UaeaiG1S7l0kUs+gyNms5Iaxg7SWTcgEfwhifFPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750693421; c=relaxed/simple;
-	bh=DgxHhxGSOqk7/F4ZYb7xhjpNoEwH1U0mLixQqgnCkPM=;
+	s=arc-20240116; t=1750693448; c=relaxed/simple;
+	bh=OSSbYV4s1eA20gHgWKrDQn++rtQfoP6FQbDvciPIb2M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfSBzA0GK2D/SDc9GVPPRFyWblfl5UVaou8rDv9kh9VRxR1r+ylK+FXv77NMa2KkyXCSdADXU2DPMVQ0dcWTS7eRv4dDIMvxI5wlVO5DKEYXKMBf8v7S2Uel1Rl16wAkVZwXgfYriLh+Lan9KP2ZfUQV6tWueFyisVgj/jqn+DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzdrUO8O; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=cfKjUJJ/fasHGnEZ3owfJUmQ9uSE/pJvarpHw4AgWy1HjNd90tcbQGY95IB4gZlvxFgVMsltJDX9Jb0P8G9ZyHpstS5/5LdGdkkflin5cLN57xHh0msyHMScgevELWofa8H7LunNlNe8aoZC+gPsjHhWn0qG73vYDPiLnOoI6X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=po+Ewlzk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzdrUO8O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6ADC4CEEA;
-	Mon, 23 Jun 2025 15:43:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="po+Ewlzk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08CA0C4CEEA;
+	Mon, 23 Jun 2025 15:44:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750693421;
-	bh=DgxHhxGSOqk7/F4ZYb7xhjpNoEwH1U0mLixQqgnCkPM=;
+	s=k20201202; t=1750693447;
+	bh=OSSbYV4s1eA20gHgWKrDQn++rtQfoP6FQbDvciPIb2M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kzdrUO8ObmqmFHgl/QwuHHYxp0KwSPu/8D4bnAiH5r7BjuVDyceoxRQ6jviRJvPp+
-	 yimXdrXJcNKbpwVrlMz5MozoCzfyb6P74DtNHzsJKSU4Uw4bVS1LjFXdk078lpUApI
-	 d1yUIUDTqJe2dhZS2/NF1p5sVG9vnXo3nDu+vgEw9pzeUQ+ZDfH5JoWPmapdT3jAjm
-	 A9DZsStfZtuv06tOPnv6wi+YRGL1tppXWYpoEAIF6Aqxac+nA4oDUogDVAsL7FZXxc
-	 iGiZfUIRcyfTsooT1BHKG34Z0UjBbb7+F+6ylBCrukru98iQ5Nl5Q5ioI+yn5lYsbh
-	 q0bPVT0XD4gdA==
-Date: Mon, 23 Jun 2025 09:43:38 -0600
+	b=po+EwlzkjKODiK24Pe5UW52fGQ13j43yKEuP9BMperlgXeqCEvhS8y+YNv0MC22a3
+	 8AaOCytka3W+DtMqjVJD6ovYd79eZtha/kkSMBfuPMEUOlYPAsD5mkhwBGHKqKHjZo
+	 bXN2wGSEmEvvJXHxg04IbVyknPE2v0SWZ/E6O3UgZXB710xlnbjcKG5798FPi6hcjB
+	 RmvBTppWY9DEnOOU+eGgR6oItZLiJ46HbWeTF5+EuQyWEnujcrg0NtfCbVZBO4o8y1
+	 5I7zkOVk1xHrTqvQKNuRVoQuOtHWccqvARLxvX6b+Buw8Wg6cd9NEcWw638Kovr8UX
+	 KOdTchTKnhluA==
+Date: Mon, 23 Jun 2025 09:44:05 -0600
 From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
@@ -35,12 +35,11 @@ Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
 	Leon Romanovsky <leon@kernel.org>,
 	Nitesh Shetty <nj.shetty@samsung.com>,
 	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 4/8] nvme-pci: merge the simple PRP and SGL setup into a
- common helper
-Message-ID: <aFl2Ktb7gioMLEl_@kbusch-mbp>
+	linux-nvme@lists.infradead.org, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH 6/8] nvme-pci: convert the data mapping to blk_rq_dma_map
+Message-ID: <aFl2RWQWaldHce4x@kbusch-mbp>
 References: <20250623141259.76767-1-hch@lst.de>
- <20250623141259.76767-5-hch@lst.de>
+ <20250623141259.76767-7-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,12 +48,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250623141259.76767-5-hch@lst.de>
+In-Reply-To: <20250623141259.76767-7-hch@lst.de>
 
-On Mon, Jun 23, 2025 at 04:12:26PM +0200, Christoph Hellwig wrote:
-> nvme_setup_prp_simple and nvme_setup_sgl_simple share a lot of logic.
-> Merge them into a single helper that makes use of the previously added
-> use_sgl tristate.
+On Mon, Jun 23, 2025 at 04:12:28PM +0200, Christoph Hellwig wrote:
+> Use the blk_rq_dma_map API to DMA map requests instead of scatterlists.
+> This removes the need to allocate a scatterlist covering every segment,
+> and thus the overall transfer length limit based on the scatterlist
+> allocation.
+> 
+> Instead the DMA mapping is done by iterating the bio_vec chain in the
+> request directly.  The unmap is handled differently depending on how
+> we mapped:
+> 
+>  - when using an IOMMU only a single IOVA is used, and it is stored in
+>    iova_state
+>  - for direct mappings that don't use swiotlb and are cache coherent,
+>    unmap is not needed at all
+>  - for direct mappings that are not cache coherent or use swiotlb, the
+>    physical addresses are rebuild from the PRPs or SGL segments
+> 
+> The latter unfortunately adds a fair amount of code to the driver, but
+> it is code not used in the fast path.
+> 
+> The conversion only covers the data mapping path, and still uses a
+> scatterlist for the multi-segment metadata case.  I plan to convert that
+> as soon as we have good test coverage for the multi-segment metadata
+> path.
 
 Looks good.
 
