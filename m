@@ -1,65 +1,74 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AE676410;
-	Mon, 23 Jun 2025 14:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E0D76C61
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 14:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750687563; cv=none; b=a24XMc6ITBqi/D2kNy1vYwiTX9EZRKNK6oGggxzd16Wp+nz7odywqLg5ubrjxdzupl+PpKgyWaiPdCduOZB1TAc0DCc7KaHPNwBSF4MdhtbFDhCevPWXovwpGRb6OXvbRjmdr32iEzPZLqonWDtcFWPh2uw4GLuSjUayqvprWyE=
+	t=1750687989; cv=none; b=iwyk80TzQQeIL4HcW92tePQmNHpSBiIFExMCsWOHeOw55z8AUQva2ecYYRJN6999RLxAVk69C9O/lnXkbo4GIazm4K0859LLUS07LYj4jwyIhZTupZ0OTOxUcuiA7jaAn5nSEP7xa1fBBdGBCzF1UNjCHxkgb1be9IC5uOQwb6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750687563; c=relaxed/simple;
-	bh=pPFsSr/HF259Qv5RYzoni9W0+hMMj3aZgoKC2GjdHv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NtSEEyNYXTtOrJ3J9nInGLCduXKN79u1wzdvfatvOnAo+kem3IrDntMQ+1vN9Dd3x5weNDMx9wiW+Nbix/wsMmz/wZgZ9fFZH/02E45pFKZ0T21+oS3kgInHPc55vWDq0IFwiROxy9O2E4+5i8/TtvLyp+VmLKG1z475ODLjToc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 650C768BEB; Mon, 23 Jun 2025 16:05:53 +0200 (CEST)
-Date: Mon, 23 Jun 2025 16:05:52 +0200
+	s=arc-20240116; t=1750687989; c=relaxed/simple;
+	bh=9uWRHairGuzG4eQaRfvpePihHdXzvdIwFzCfZe6VTFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WOM/UYTqqbIVEnv5CLX9AVG08GBi/lLKl549NGiBgcNX7+DwI9E1dmOgAl8XaqQj8sRwpfe5Cv/hw1HZo40xFxu0K6+9DOVgqh2dAzLTxqe55bXE+niLm31Y4KOxIAjeUpj5tKCDYUGVmqx+e1wSsx36gEFLALZ/WZaZMLlb/bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3l9J+0YK; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3l9J+0YK"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Q097w0ZyqCvrAzlM9OmfT43N2f+DOIgOZ476YQyVkRM=; b=3l9J+0YKZy3F76xtYL8a3DMpDe
+	qFioPaYXPXfIRXR8GyRfGAxMSqZQjCDrFCjaMhcuOeMQGHcrsQatzl5UpGbqbpMjEmu8pyr9y0Hf0
+	kM2OhyU4tcmunNZLx6n6QIih6CpBWoO6utB6bQ1XVeof0Ry/cpmASPC+SDhcxWXZsa0cnmnxKaJYv
+	EzKczPBKNItnXVwat0OqrD2gxH+1K9/6EHiq6ZNCJZrplL78LJbmXKl7nAG66gt3LWB3zCt0kxoh4
+	tcimSy5zpNJto/e8Ejn32sz7Lwf8akA1DB0UPv9SV/tXTyIs5Dk24yTRAg2SpHEH5Xj4ciSm6MOmz
+	d1yLv5dw==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uThuy-00000002zn3-0oc2;
+	Mon, 23 Jun 2025 14:13:04 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, "Ewan D. Milne" <emilne@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>, linux-rdma@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] scsi: enforce unlimited max_segment_size when
- virt_boundary_mask is set
-Message-ID: <20250623140552.GA27893@lst.de>
-References: <20250623080326.48714-1-hch@lst.de> <20250623080326.48714-3-hch@lst.de> <447ba437-9742-4686-b159-bc2086c9b814@oracle.com> <20250623133542.GA27271@lst.de> <63895c91-47d3-400b-a32a-093342b95cca@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: new DMA API conversion for nvme-pci v2
+Date: Mon, 23 Jun 2025 16:12:22 +0200
+Message-ID: <20250623141259.76767-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <63895c91-47d3-400b-a32a-093342b95cca@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 23, 2025 at 03:03:27PM +0100, John Garry wrote:
-> On 23/06/2025 14:35, Christoph Hellwig wrote:
->> On Mon, Jun 23, 2025 at 09:37:10AM +0100, John Garry wrote:
->>>> -	else
->>>> -		shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
->>>> +	if (sht->virt_boundary_mask)
->>>> +		shost->virt_boundary_mask = sht->virt_boundary_mask;
->>> nit: you could just always set shost->virt_boundary_mask =
->>> sht->virt_boundary_mask
->> I could, but it would change behavior and break drivers.  The SCSI
->> midlayer allows overriding the template provided values in the host
->> itself after allocating and before adding it.  For the
->> virt_boundary_mask that features is used by iser and srp.
->
-> Since shost is zero-init'ed, I did not think that my suggestion for this 
-> minor simplification in scsi_host_alloc() logically changes anything.
+Hi all,
 
-Oh, you're right - I thought we did the sht assignments in scsi_add_host.
-So the changes would be fine.  But that also means we don't catch
-conflicts added by the direct shost manipulation.
+this series converts the nvme-pci driver to the new IOVA-based DMA API
+for the data path.
+
+Chances since v1:
+ - minor cleanups to the block dma mapping helpers
+ - fix the metadata SGL supported check for bisectability
+ - fix SGL threshold check
+ - fix/simplify metadata SGL force checks
+
+Diffstat:
+ block/bio-integrity.c      |    3 
+ block/bio.c                |   20 -
+ block/blk-mq-dma.c         |  161 +++++++++++
+ drivers/nvme/host/pci.c    |  615 +++++++++++++++++++++++++--------------------
+ include/linux/blk-mq-dma.h |   63 ++++
+ include/linux/blk_types.h  |    2 
+ 6 files changed, 597 insertions(+), 267 deletions(-)
