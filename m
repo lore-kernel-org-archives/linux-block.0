@@ -1,289 +1,179 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8592D1F4CB3;
-	Mon, 23 Jun 2025 08:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750667863; cv=fail; b=lg6q5SwauUyq9Bfr5zy3LkN+RuJx6tWzNPIA4lTB5KfQzxdIcdu+VUgyhBK7yxZIBlimuzn7PWSSkSPGlVrdmOxLftJkH2T2I1Wxl1Ngw8w5r5Tj4yCUeT5zV/LFy2R/RCy7VRShMZpUWuEuX0QpJTPzcCIli76xDpufCxIK6ww=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750667863; c=relaxed/simple;
-	bh=Hr6KkaDFExYGurxyFmGJVrn0zW8RPOOlBm9oujUJudA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ec18/x6OCk+K+nYVMWJnPyR9n2iboIFXC+QQ5vKRVG8E808F+eagwyh570ddIe7bEGABSpZn1laUL4M5Hifk01nxrR4b2TfzS0VH+Ud3aCq9GFZlTqgN46rDrHIVZQxsvXiJZXL/t15r38jrDZdDs5/KcUQJF7Y+Jx4D22nCUjI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=dAd8JwYp; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=kE6tSI0b; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518AB231832
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 08:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750668898; cv=none; b=O5PNke5UAe+2D0pcL+ptyX6t1TnDMMKF0MJpTsSh1LScN+HJ5qgFaJIt57cf/MfNPjqKmzCdGds98NDLPtOCY0p2OkqbaruVduDOpOcJuNPQwNiDW15wX5mhMbAyjK4IRfSQ2e/1TVvc2AD2zaHkoxzE2EWLzurAzF93G+Gi6ZI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750668898; c=relaxed/simple;
+	bh=lY2QS4dQb2iYp5v1xQS0WMPryqi+ThmF7cUhLG85Ap0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HGsyPfIRAaP+bQqD1OsiGrY00BXhbeoRDkCLEUAagjtnvy2ITC2bMHjnj3u6dV2BVyS80g9Vbve32NDAqTxS3h+FJXJ0R8f9THwLDjHSGygjbfKXFvHQMSrQQGXmDNZtHRImy7ibN1eIEwK+I7B+S09fGK9Q/4L2/PSV/DDHzTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DoX4iEtg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dAd8JwYp";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="kE6tSI0b"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55N7tjHB003209;
-	Mon, 23 Jun 2025 08:37:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=AILeD6NA13JK7DEnSqRJXYjaSvMhsDJ0jvYGi70Sj88=; b=
-	dAd8JwYpu2DjHUZcKk0YzDb4p293foM+Ef2WqJXkTUbjAX1zyJFjjOPJrUxB+p/C
-	vQ6JGGQC8ydnun9ErNTe6eshUoo8F3ya7whKUaQGzSXxjzh8U8wyX9+T9409beZy
-	Xg13UkWpUvfPHCLNHD/PA/be2hFxSH2V+fz8z5LV6zXZ0x0NXXWNww4sgyYGEnhW
-	r84PjWeIIaYs599Be1JR8nQDUeUUv1C8gFA5wy50IrMBTQ6niIv9aN5NJTvEUeVY
-	2kyXncjHnJz8tlHuDk8eREEqnLAEVqIp+TEWC43U8CxPmwvP+vkwTPm8V6CwSALy
-	NvCx0x9UJEJb+k8yZvJZig==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47ds8y276j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 08:37:18 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55N7AsQ6026181;
-	Mon, 23 Jun 2025 08:37:16 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ehvujmgh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 08:37:16 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sFaUH9l4jIAAYjS5k1rNJDtFhpWebnMe1wVAz5bXK5chn5jYXgh3mglgMEeiDD8RP25KDlrPejdW/GKz2tmi1wUruuAeGBOFAybDiorAWkYb2bnftu8RLj690xtqZmWmdp8PJxWuRLJdP9mjLr+zs82EKrlDXUVvZ3pUH/1URGjf0k7FEXGWeUbU9rQhMfhHwFka2E4zhndPEnVdkrSATinxguwbh1Kp49JtF2v/5y3rda2t0m4RKySiD3BYphByhbC+qwTTq/z0wvDh4ePN7Jy8AjFpyAuvA0NNnHu1k99tGzSu+cdgoZ1ji9cRUpSlMLKs5BzrgUKLOKJk+7jXeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AILeD6NA13JK7DEnSqRJXYjaSvMhsDJ0jvYGi70Sj88=;
- b=N8UsPoRSgqGl7eGDpsE4Eg3YH1W9GBYsXIaHKAC8XhngACtBdhkRKg+GpcdbA6ZtWHR5BY+3etLONcWJoP1NB9uZajvalOL9tJYxwlIYX78Dama3dThYwCXfS3OLMRUnA+o6yvAfYvYUkCaEAL+kazHcHYJ1wibNtFgo55N1+LVcBdThiqCiB5TYN7h0dFowubcfOgVtLHB8nj6GQCDVOpsNPxXesYWV5MhiZukZutPzMhtpjaHfJ1Eq47g4eaXt6ibbJuueghCBkFojVSz7R28hF7HZNWKoCflryZgrNu6KKTb3ZpEXfpPcLIJRHyImutzDtLtxycwtafY5fmUh5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AILeD6NA13JK7DEnSqRJXYjaSvMhsDJ0jvYGi70Sj88=;
- b=kE6tSI0bGw53sSNQEWdfhpgYCPSNbbSBdjMy52D4Is2iVNty5DW1Mk2eVzmjp3rNYwGy2+/YKWP9mmAlYysgjLOS3VyjwZe7WiB2UX4cQnUfmtOxjXjenbUNXz/+91A7MgyttF1cyWKov2XKDomQOBjwJoGoSXX7tl/t1HGCqvg=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by DS0PR10MB6152.namprd10.prod.outlook.com (2603:10b6:8:c4::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Mon, 23 Jun
- 2025 08:37:15 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%7]) with mapi id 15.20.8857.022; Mon, 23 Jun 2025
- 08:37:14 +0000
-Message-ID: <447ba437-9742-4686-b159-bc2086c9b814@oracle.com>
-Date: Mon, 23 Jun 2025 09:37:10 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] scsi: enforce unlimited max_segment_size when
- virt_boundary_mask is set
-To: Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-        "Ewan D. Milne" <emilne@redhat.com>,
-        Laurence Oberman <loberman@redhat.com>, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20250623080326.48714-1-hch@lst.de>
- <20250623080326.48714-3-hch@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20250623080326.48714-3-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0124.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2c6::14) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DoX4iEtg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750668895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pXbelryVBx/8q6dFqPAgas4iiuOu8DdXNurnM1JuKEk=;
+	b=DoX4iEtgVy+jTjG61yxQ17pmZe1tqmHoHFTlgJqta8ztAWnzMRqsvQ6nbvY8q5gyaBK6tz
+	Bg2fUGJNw9DgBTx4Mdct9J/CHK9tRLcwR8AXIzfErbcEN7arb86O82mazBd3mpE9mS8U6K
+	Fd+jAPpGpadCcdnSeoIIJExWd4xT6yc=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-Ew4j2IMKPzGk9cqqtobp7g-1; Mon, 23 Jun 2025 04:54:53 -0400
+X-MC-Unique: Ew4j2IMKPzGk9cqqtobp7g-1
+X-Mimecast-MFC-AGG-ID: Ew4j2IMKPzGk9cqqtobp7g_1750668892
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b31cc625817so3038411a12.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 01:54:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750668892; x=1751273692;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pXbelryVBx/8q6dFqPAgas4iiuOu8DdXNurnM1JuKEk=;
+        b=BeRPQB47JCr699iil/1ZNfr5GSWDA9YOIFspBZFPABUVajPsEXDZwuRXIIgLzZkB7Z
+         kB5ZgmUoNPs0IjXoTdE9tJm1hsJaHyyu5Kc+8qDH4I6QhikYQayEk0ewSPG01rBbYMEQ
+         RrVq87b1JG374leDwV6m5QRv5vktHh6zGsRWCnjuXM6I2sdupbLJSHZ8xrpYWWvHvWyW
+         NAG0X+ngnAQjH6L07PXBxTGqEv/fxgjClbs5t2rsrI9WFM9RjrKgMJtf8gA0psQILJuU
+         WresauMAeJskJYm+xerWuv57Rthjrgcut20ll/PN8eUVj2yWs7DyCR+t3j3HhLCDPoks
+         eF7A==
+X-Gm-Message-State: AOJu0YyiF74slVGJejxUzTRW140ITh1gnhiqXqtUF8cPnP114YdsIJDc
+	nAvpAAV+2x0dgBNd54WV9LRT+Hdk/aYbvn4WJWDkEpLa1dCTCg6nDDjlEyV1tzxL9GgTL2QFbNh
+	DaehAii/l94si3w6hykuWjaqk/lizeuBt0YaUcw9zSrNHH9mWDTJVgqrBVdZ/ah5YrQBgV6c2Pq
+	EQVI8NFbX4PlTy18fnVOYZhr96Gi1AF5p8KEGi0VO/zo1lu/A=
+X-Gm-Gg: ASbGncsLtPMJKLjR6kCQaoHKrIyFxsPLkgJ8PCBdDoJzetmLZNlbpn8WZctqWm8+gOg
+	DjIXpyZss8BTL3bcwYoIhREF6mzO1Auwz/i3molcN9eP2NrF/s+iKvzTC9txJRqhqSOGcarLaMS
+	Vhg6kv
+X-Received: by 2002:a17:90b:3850:b0:311:b5ac:6f7d with SMTP id 98e67ed59e1d1-3159f46cf94mr14961298a91.6.1750668891838;
+        Mon, 23 Jun 2025 01:54:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEPWecigVWaXCnZFJhBNVfm0oP/qdN8Q9W+faRtvENy9ek/7Vwj4aY+6LHaA1VA2VQAgFt/nKwMAj23lfeGUSo=
+X-Received: by 2002:a17:90b:3850:b0:311:b5ac:6f7d with SMTP id
+ 98e67ed59e1d1-3159f46cf94mr14961265a91.6.1750668891350; Mon, 23 Jun 2025
+ 01:54:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DS0PR10MB6152:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0794ba62-ff74-478c-c072-08ddb2312786
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?b0p4Z3lDUVZ1NHAyRlIzdVBpQ0dNUlNBbXlsR01qbC8zOE5Say90R3pUb1dC?=
- =?utf-8?B?R00reEVkR0ZaL0dNdVg3dnJHMWhXNWtjb3BiZ0hpS2hrUXlIcHBjZTErbm5U?=
- =?utf-8?B?YTFiaTErUnhuS1FKN2FnRDVrclRFM3lLK3NzTlZwK2s3d24ram9nVkE5eU05?=
- =?utf-8?B?VUo5L2h6V09TeTRYT2hJdVNZNkRmS1lTRDNJZXo1VVNyQklYMWRBdWJXRXgr?=
- =?utf-8?B?YmRoM2VjYnF1VVBBaUtUYzk3REhBUkJyNXBYUEVDU2hkMS9FditHOTdiRWQx?=
- =?utf-8?B?K243MkxmVU82YlVaOHZ4VFI4c1pPdWhPNFJvT2J6bjdvcmcra2pybDJ3a0xi?=
- =?utf-8?B?clNFZUNWZ21mbjM4bFVzaXlBVTI0S2tDQUJYMVFDZVRqcnR4L3NlcklCcW9t?=
- =?utf-8?B?eUpDeGRhWnNTMFlJT2dNRWFOZ3RoN0Y2QkJuODNUdm9sK3BuamRTZzdHMHJn?=
- =?utf-8?B?d0laREZSdll6SlpUUWhNa0ZJV2dnWkhNZzNqRm0zMGlYNmdGSThkT0ZzTTho?=
- =?utf-8?B?WkZOSWNKaG1XK0d5b3pHd3Z3RnVDMXYzbVNPejVmdFhnRnZGT3VoNGhEY1ZN?=
- =?utf-8?B?UmJCWkxFMHU4SndqdmV2TmpqZitRVFQ3WG52TWhGVzhpL1FVcnBHVEFidUJn?=
- =?utf-8?B?MTJZTmpkYk15N25uVHptVSsxbjJxRmh5Y09OZlV6ZXpBZmlZdGhnc1hnVWJR?=
- =?utf-8?B?dUVndWMrR2dpV1pnN2Ewc3JXeEFZYUJWNnhmRjNLelJYc2F3Nm5vV0xPRVJM?=
- =?utf-8?B?WkxqMGdrUFVLVEtydFFoOEwwT3l3UzlTVFlJUkdnaklOOTdpckV0QkU3Z0p0?=
- =?utf-8?B?RnFBMDc3eHh2ZDlPbmdkbVJHQTJsK014R3llUkVhOUpOR1dnM0tSblhaZ0VS?=
- =?utf-8?B?VmpXOEtQRnBOR3AwWm9XN3hmR0Rvam1TN3lpdVZ1TnZ5RlZyU1IzaXl3N1B5?=
- =?utf-8?B?VUNjVGNPNEFJQ0ZpVEk1Q1RtbjhjaXYzQzY0RFFoMFVkNUVjTjlUSVFqYkVi?=
- =?utf-8?B?KzAvaXJ5MnBtQ1kwdEd3c2xIZkVzKzV4NHFXYURuakpRL1N6TmlVcHNxUlZi?=
- =?utf-8?B?WUo0M2tXaE0yRFpzY3c0czRZYjBTdVl3elhyb2xBU1lvWGRsb091ZFlZNDcz?=
- =?utf-8?B?WXFaNENQNEdENStxSTFiMjB5aU02eDk4NU93SDZmQTBpS0k4KzlGZ2ZJRXVl?=
- =?utf-8?B?RFdIc1dRUWpxdTZ0QnJVTVZuclJiOGRPUzJGMDVESUs5VzZXNUZkYjZ1M2FL?=
- =?utf-8?B?MXNsTHRSUFdLWHltdmxQcHhEYWZjUFovRFZsVHkvd0h6ZThoK2ZLZVViQU5M?=
- =?utf-8?B?QW10TW5tbm5IMEtxREZEN2RUMjFCYVhSU2hTdUgzbkdTRTZuM2RYWHhSZ3RB?=
- =?utf-8?B?TVlPVGdBbkorRkhwelBFMk5BcEFnQ2FvSkF5MkRKaVJtVUtHbTFUcENFSnQr?=
- =?utf-8?B?QzdTOW81Q2RZWXNBV3dLWnRSVU5KRVpLOUoreW41WmlwSHVQUTRLUTEyd1Zt?=
- =?utf-8?B?c2s2WWdYTDlnalRhbEZWckVmODFxQXBoOTc5NTRCM3dZOGZ5K0lqS1VXNHJu?=
- =?utf-8?B?ZWdkUTdWNnZBRVNxMTRPdVpjMmpJLzluOVRoTTNKQ0V3b3RXMWlYbVZrZi9q?=
- =?utf-8?B?K09GZzlUaTdQUk9Bc3NLOWgwU1RuMk84OGlldUpqcHBmZnYzS25jM0U4ZFdM?=
- =?utf-8?B?dHZ3YjR4WG9FUlJlSDZZakVDUlhHQUFjOEZheGt6V2d4bEFRdGdwUGlmaW13?=
- =?utf-8?B?c2xic0VBSlYyOVRkZHhhK2k5RCtoY0RQamJwTlMvMXBwQmlNaWMwa091NWlq?=
- =?utf-8?B?NWNVeUF0Y3oweXJyV3hhVVZibXUzWGdZWXZ2c2N0a040RVUxNWNLUWxRTStG?=
- =?utf-8?B?TkRFcjFpcVNPeTE3QVJzWmZ3dnd1bmVGaHZ4SUFOMzB6bW5RblFVa0JyL1Mv?=
- =?utf-8?Q?4GwhU5uISHk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T1VMbzBvNmc0c0hUaSs1NENqSWtvRlB1aWozcE9ZTVA1eXdoakxwWUxvUHRi?=
- =?utf-8?B?Wm1xOGFwNHZUS2VpWUZrR3E0VENvSEwva2Uyd000YzdkRURhV1JiRitBSjZO?=
- =?utf-8?B?d3VmQ3hINTNoczRhblpHYkdNSi9BMVlaR3hCYUQ1ZVo1T2Z4NStLZm1wUE5u?=
- =?utf-8?B?a1lZQlM0U0lIZzNQVTlyZzZrTEJRS1U1d3lWc0tyWmJrbFRub2kyaHFZOHVY?=
- =?utf-8?B?azBQUERYelB6OXFNNlRURWc5NmhGQ2ZDVGN1U3lEc2xJSzdTdnd5QTBDdjdp?=
- =?utf-8?B?bjBOcDN2aVZ4ZVJVY3ViUTdCOFdlWlBFd0lzdjN6QUE4UzJwcGdpZ0VhUjNz?=
- =?utf-8?B?RjRmcTZzS2xEdTlwV2dzd1I3MVVwR0U1M0hUVGtmK3lScTd2L0pmQlNoSnFB?=
- =?utf-8?B?bkJ6NUh1MmNxYmJxYmZXNWpaY2FhL2tpTVA0QWdrU0JlSTJNWEt2bEtNVG9n?=
- =?utf-8?B?L0xtcjVQazdzMm5RSnk4RnhQRzR0TVRHN0cybWdRVENZTTF4Zm4rRktsRE4y?=
- =?utf-8?B?WExETEZXdGxrOC81KzN2R2xWUWJCRWx0SjZKVFo1R3VJb3hOOUZ5VEg1M2J4?=
- =?utf-8?B?aU10dGpBd2pqMUR6eFpEcUhuZzlOdHFwS3RDdGtBSWtLb2s2MXIrRVFNZ0ps?=
- =?utf-8?B?cXhrY3lvYUd2K1hlL2dPQytxbzNLUllqSXRHR0IyRWxTcnhUdWlhMm9WOGYx?=
- =?utf-8?B?WGRId0hraGdZVDRZTkdTdG9EcVY1dGJybWFNejVMdGlVK0dhVkNJNzFFajQy?=
- =?utf-8?B?azBoeFpYOVU0M3RDV0VnTEF1MU11LytQYXRIQ0ZnbWNURmVXTWkyK01tcFlv?=
- =?utf-8?B?enBkMW1lM2dOMTVra0lVbG9rMzNaVFFKVU9ZanNLREtKa0FOc2NLSi9Wd1I5?=
- =?utf-8?B?QTNrcUxVM2dYTEl2czdORncwQTZlck5QcXBsdDNKREorNWVHaDYrS2lhRjU2?=
- =?utf-8?B?ak52eDFPREZMWE5QUjV6dkl2MURoZVZTeElhbWxzcWZINEMvb3ZPQmhaSkFH?=
- =?utf-8?B?U0V2ajkxcHJad1lYRGh4cnQyRWxpSk8ySlNqYlpMUUNzYUNlSTE3a1h4UUJY?=
- =?utf-8?B?THpwWkZOa24zVDlMcC9XbFM4UGVsMllER2FrTFgxZHRNRENtT0l4ZmxkUGgv?=
- =?utf-8?B?bmNOSHZUamFxbk8zQU1kbjNtZG9KQ0Qvc2lZeitvT0gwU3BuL25sVWh5WTVK?=
- =?utf-8?B?VVJiODdTRC9NRm9VUVhhR2dJRUlOMllvZ0NjTWJqWnlPQmpYNU1rakkrdTRQ?=
- =?utf-8?B?TnV5V3p6TDRTa1NVWkc0ZFBXSk4ySWkxa3cwRUF2Z3JzQkJXaFBsekg4TUxM?=
- =?utf-8?B?YVRnWUE5cXNoYWVyWkhBRll4QUY2cGlZT0M0MGc2ZXJMUFA1c0Fvc29JZzV1?=
- =?utf-8?B?bU83eVgzT05mOTZNbDZGREhpeUFRTTR6KzdYemNZaUc0RkkyME1CSThHRVB5?=
- =?utf-8?B?U2IwQW52UFlDZUdqa2ZLWFpxM09jdEh5THMraWxNTUUycWVzczV6NzkyZkts?=
- =?utf-8?B?TWxCdC8xNGYrbFp4MHpacHl2VmUrMmZqMDFrb1kzY0s0VEtpQUdUek9zc0lt?=
- =?utf-8?B?WmVERThTRVhhTjdQSThEa0pTbDUxZXZWK2txbFNjdUdtc1hvd1J3OC9uMGQ2?=
- =?utf-8?B?dmh0U245ai9pUG44U1hEeS9hbmZNT0dPK3MrS01yVWtJUWpGUk9yRmFpTnI5?=
- =?utf-8?B?dXE4WWpqUGMybEpZNXNxTFVHSWZQd0VQMWU0djR5dTJzV25kWG4wNy8xeUh4?=
- =?utf-8?B?dWVCeDFYUUFQek1xemExNVYrdWZpS1R3aTE3cUFqWnBzb3pvRGU1RlhsTTI5?=
- =?utf-8?B?UllRMVQ3SUt1MXg3cXoweUFDY3hVZnZURGxsS2llejVKN3BYU3JIZ01ISUJB?=
- =?utf-8?B?Z0VOcTQ0eUkwdFU4QVBRZWl0dzFXN3phVWtETzlZNXEvVWgreExNSU1ZUmpO?=
- =?utf-8?B?aVFOWjZZbjhxU01BUGFhbVNUR3hCaCsxU29OWDdiWUl3QWI1SENSOFl5aW5a?=
- =?utf-8?B?UVcvdVI0WlZNZnNiR3EvTWlrc1FiVVBwRTFkK2VXd0V4VVVXcjhGblN0SGJK?=
- =?utf-8?B?cWVQRzYrNGlPT3ZnVlhKM2tNYmZNU3UyY2JzcG52bEd3VEpQcEdxV2RDcDZF?=
- =?utf-8?Q?80/2z5aChIDe9tln4sTh1vr38?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	pTIiaAntJKrnrXgKqIsmQ74/TCzbp+i/T/CSt7wIwBTBsBJv+/+MN2/cunh7zLA6bQ6HNZqzCv8M7WaJnH7PW8JB/ebRR7fb9n33ymi/T5pC+YUu58vEkVsd8qFMyF7YLNtauJbmEmxkUV/BGZi3YVt0FpRLq9c/nQeVoMQqIWExpo5hntHhJiObFTkXv0AP/S4n8eEogVl/ZhfLPfHLF+phRZNPnLePHUKkGWRSxXBd7M/2/EHtLrDLq8qac0GFvd+D2lrqxvJ3CjjC+ALYSz7S8ROaFTe9f5cQcFAzW6xdLZK5DJcVUDmbJimT6zf+ZtWQVGtpinxePHoXr5mB/NSlAhwvTDHK8iNQCrFG6dOS6lGwXQMsPRogtEMHtfvKnBaL1haAr3QxeWwUocYoQAlSqmI/wrlhnNP1SfV+x2QYy7pMsWinjo14bANmJPVe+s4xAYb8iF9Kaz8wJ0U6N+SWIjeNYh9c262E2ElCBjGICNZNcriWwAkjAPJ3QYWIBeulQSLFjWNvwhG9u6aRVgMkK3EfqAmdGwaDwO4uvJmXjQSyFPEtbQ2ZACK2MO7hVrmROBqwGgc9Yk9bHz8NTpbmdQOFbg3LlP5DwtallVQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0794ba62-ff74-478c-c072-08ddb2312786
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2025 08:37:14.5069
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oqF4dZQfU+HNV7AZHvoIRU3AqCJVs96KZOUX1BLYSD4IEnsz20/yVi1kMdQCcEliiTT64QJpGp2yOAU4r/HIzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6152
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-23_03,2025-06-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506230050
-X-Proofpoint-ORIG-GUID: kHSEwYOfbgPOe0mFVNDvVhB5coWzdioC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA1MCBTYWx0ZWRfX+mykrtAL23gm qT/1PM+g0ex6Qd7IeC/8w3ltoFG01M2xowIOZIMSWQ1I4YJrPoX78Pgaso/025y0IOgypMvVa9Y Q34f5f6DfYiWu/xQNn0t/Z2umWQXXVZ9Yw9sxO7KkByEdoXvWPER8fu1A20nzKC8CZ32fgkp2g8
- cfXMJmu9mX06f3EU1+filUuPLD6C5IFOI0QITR7sHvSulirZr/mWAjJ8ygFz4wd2XMPmxrbNeQv wU3fCBszKvzvZRSenPDfNFnzlT0Q5Qa448Z7oyCxOv7XhkwAYlHnZMbjZXZEpEssdZEXSsfHEq+ dtsigcxt0JfKwfvwTHvWJNdV0zSRJ1+EGZk/S1iZDbTz7J5TX3/HnoUaVHwXNRSRUFMIGFN+Mza
- DN+XB+hiKNJhI5vlakbLdRLHsM0m9dfzF3taBJeN2zoR8+7Va0mP89ejVInQrNncMDIAJJTH
-X-Proofpoint-GUID: kHSEwYOfbgPOe0mFVNDvVhB5coWzdioC
-X-Authority-Analysis: v=2.4 cv=PqSTbxM3 c=1 sm=1 tr=0 ts=6859123e b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=20KFwNOVAAAA:8 a=yPCof4ZbAAAA:8 a=R3EMDY-R3WB0tekgzK4A:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:14714
+References: <CAGVVp+VN9QcpHUz_0nasFf5q9i1gi8H8j-G-6mkBoqa3TyjRHA@mail.gmail.com>
+ <aFjR1M2RwGn8y9Rs@fedora> <CAGVVp+UEQ2XWrNpAz4-+SuyoHybrQ3-Uv5hE-SLQAdSpVw-kgQ@mail.gmail.com>
+In-Reply-To: <CAGVVp+UEQ2XWrNpAz4-+SuyoHybrQ3-Uv5hE-SLQAdSpVw-kgQ@mail.gmail.com>
+From: Changhui Zhong <czhong@redhat.com>
+Date: Mon, 23 Jun 2025 16:54:39 +0800
+X-Gm-Features: Ac12FXz0BgFETc9AdmEsTuBE3-bisP_vqmJRVMv0q4odJxksqAg6g1K1ZulySLY
+Message-ID: <CAGVVp+WVm-9YNM9rK2_87KKsF59vpi+gO2weLywiqs-ayDQ9wA@mail.gmail.com>
+Subject: Fwd: [bug report] BUG: kernel NULL pointer dereference, address: 0000000000000001
+To: Linux Block Devices <linux-block@vger.kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 23/06/2025 09:02, Christoph Hellwig wrote:
-> The virt_boundary_mask limit requires an unlimited max_segment_size for
-> bio splitting to not corrupt data.  Historically, the block layer tried
-> to validate this, although the check was half-hearted until the addition
-> of the atomic queue limits API.  The full blown check than triggered
-> issues with stacked devices incorrectly inheriting limits such as the
-> virt boundary and got disabled in commit b561ea56a264 ("block: allow
-> device to have both virt_boundary_mask and max segment size") instead of
-> fixing the issue properly.
-> 
-> Ensure that the SCSI mid layer doesn't set the default low
-> max_segment_size limit for this case, and check for invalid
-> max_segment_size values in the host template, similar to the original
-> block layer check given that SCSI devices can't be stacked.
-> 
-> This fixes reported data corruption on storvsc, although as far as I can
-> tell storvsc always failed to properly set the max_segment_size limit as
-> the SCSI APIs historically applied that when setting up the host, while
-> storvsc only set the virt_boundary_mask when configuring the scsi_device.
-> 
-> Fixes: 81988a0e6b03 ("storvsc: get rid of bounce buffer")
-> Fixes: b561ea56a264 ("block: allow device to have both virt_boundary_mask and max segment size")
-> Reported-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+---------- Forwarded message ---------
+From: Changhui Zhong <czhong@redhat.com>
+Date: Mon, Jun 23, 2025 at 4:48=E2=80=AFPM
+Subject: Re: [bug report] BUG: kernel NULL pointer dereference,
+address: 0000000000000001
+To: Ming Lei <ming.lei@redhat.com>
 
-Regardless of nitpicking of coding style, FWIW:
 
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+On Mon, Jun 23, 2025 at 12:02=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> Hi Changhui,
+>
+> On Mon, Jun 23, 2025 at 10:58:24AM +0800, Changhui Zhong wrote:
+> > Hello,
+> >
+> > the following kernel panic was triggered by ubdsrv  generic/002,
+> > please help check and let me know if you need any info/test, thanks.
+> >
+> > commit HEAD:
+> >
+> > commit 2589cd05008205ee29f5f66f24a684732ee2e3a3
+> > Merge: 98d0347fe8fb e1c75831f682
+> > Author: Jens Axboe <axboe@kernel.dk>
+> > Date:   Wed Jun 18 05:11:50 2025 -0600
+> >
+> >     Merge branch 'io_uring-6.16' into for-next
+> >
+> >     * io_uring-6.16:
+> >       io_uring: fix potential page leak in io_sqe_buffer_register()
+> >       io_uring/sqpoll: don't put task_struct on tctx setup failure
+> >       io_uring: remove duplicate io_uring_alloc_task_context() definiti=
+on
+>
+> The above branch has been merged to v6.16-rc3, can you reproduce it with =
+-rc3?
+>
+> I tried to duplicate in my test VM, not succeed with -rc3.
+>
 
-> ---
->   drivers/scsi/hosts.c | 20 +++++++++++++-------
->   1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-> index e021f1106bea..6ca7be197dfe 100644
-> --- a/drivers/scsi/hosts.c
-> +++ b/drivers/scsi/hosts.c
-> @@ -473,10 +473,19 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
->   	else
->   		shost->max_sectors = SCSI_DEFAULT_MAX_SECTORS;
->   
-> -	if (sht->max_segment_size)
-> -		shost->max_segment_size = sht->max_segment_size;
-> -	else
-> -		shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
-> +	if (sht->virt_boundary_mask)
-> +		shost->virt_boundary_mask = sht->virt_boundary_mask;
+Hi=EF=BC=8CMing
 
-nit: you could just always set shost->virt_boundary_mask = 
-sht->virt_boundary_mask
+I hit this issue with repo
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?=
+h=3Dfor-next.
+it is not a 100% reproducible issue. I triggered it in the run
+T=3Dgeneric as loop,  =E2=80=98for i in {0..10};do make test T=3Dgeneric; d=
+one=E2=80=99
 
-> +
-> +	if (shost->virt_boundary_mask) {
+and later I tried it with repo https://github.com/torvalds/linux,
+branch v6.16-rc3, but have not been able to reproduce it  so far.
 
-Or combine into a single if-else statement.
+> ...
+>
+> > [ 7044.064528] BUG: kernel NULL pointer dereference, address: 000000000=
+0000001
+> > [ 7044.071507] #PF: supervisor read access in kernel mode
+> > [ 7044.076653] #PF: error_code(0x0000) - not-present page
+> > [ 7044.081801] PGD 462c42067 P4D 462c42067 PUD 462c43067 PMD 0
+> > [ 7044.087488] Oops: Oops: 0000 [#1] SMP NOPTI
+> > [ 7044.091685] CPU: 13 UID: 0 PID: 367 Comm: kworker/13:1H Not tainted
+> > 6.16.0-rc2+ #1 PREEMPT(voluntary)
+> > [ 7044.100991] Hardware name: Dell Inc. PowerEdge R640/0X45NX, BIOS
+> > 2.22.2 09/12/2024
+> > [ 7044.108565] Workqueue: kblockd blk_mq_requeue_work
+> > [ 7044.113374] RIP: 0010:__io_req_task_work_add+0x18/0x1f0
+>
+> Can you share where the above line points to source line if it can be
+> reproduced in -rc3?
+>
+> gdb> l *(__io_req_task_work_add+0x18)
+>
+>
 
-> +		WARN_ON_ONCE(sht->max_segment_size &&
-> +			     sht->max_segment_size != UINT_MAX);
-> +		shost->max_segment_size = UINT_MAX;
-> +	} else {
+vmlinux is compiled by repo
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+=EF=BC=8Cbranch for-next=EF=BC=8C
 
-else if might be nicer, by maybe not as (I think) {} should be used and 
-that is not pretty for single line statements.
+(gdb) l *(__io_req_task_work_add+0x18)
+0xffffffff819075e8 is in __io_req_task_work_add (io_uring/io_uring.c:1251).
+1246            io_fallback_tw(tctx, false);
+1247    }
+1248
+1249    void __io_req_task_work_add(struct io_kiocb *req, unsigned flags)
+1250    {
+1251            if (req->ctx->flags & IORING_SETUP_DEFER_TASKRUN)
+1252                    io_req_local_work_add(req, flags);
+1253            else
+1254                    io_req_normal_work_add(req);
+1255    }
+(gdb)
 
-> +		if (sht->max_segment_size)
- > +			shost->max_segment_size = sht->max_segment_size;> +		else
-> +			shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
-> +	}
->   
->   	/* 32-byte (dword) is a common minimum for HBAs. */
->   	if (sht->dma_alignment)
-> @@ -492,9 +501,6 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
->   	else
->   		shost->dma_boundary = 0xffffffff;
->   
-> -	if (sht->virt_boundary_mask)
-> -		shost->virt_boundary_mask = sht->virt_boundary_mask;
-> -
->   	device_initialize(&shost->shost_gendev);
->   	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
->   	shost->shost_gendev.bus = &scsi_bus_type;
+> Thanks,
+> Ming
+>
+
+Thanks=EF=BC=8C
+Changhui
 
