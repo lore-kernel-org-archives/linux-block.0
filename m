@@ -1,77 +1,111 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEC51C3C08
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 04:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6D6442C
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 04:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750651205; cv=none; b=fshCkcBp67Va5brsNVFPqPG1IwK+Wj6av31Xp4HcRjayPivCdphVUqccTstxlVULj/hrz0/rreOwpCN5ufW2nExpc9QAIehI+QMJWp2yRaV2IKcjKVVxt4yXoUeCSXhQSgRXiBnIujgNLPARPCFDK41q2L7END9VksPBa0GSn/8=
+	t=1750651362; cv=none; b=HU73kkJvXNZ/Pi+WQymUKV7BW5bsshUoTa+W5nCK4R9UgzR3yA7BR+Crl1oc5VymuzPti6VnwaHFdyiepkXTJqSvvt8cQEyYK0idCnmW1ANNv0CpML3IYx6DvtPuLeU4qAWP8R28TeClHoX7E7gez8hYomHpCNFydlmHRt2rLms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750651205; c=relaxed/simple;
-	bh=pPylR7SsFpH7/9lpOqaCWDfdB08fmgj3mQjIVObOh7M=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=dCpIYELDQpe0S5MYdHnyyRZqPw257NbYnyXYBiRfmjGYX6FBJ5EVqU8umf/mNnO26vI1MNlueEWSA0K9RtcEqMcTHXiw7Ir+b1LZDg6iTIROCwg+Hus8DTpuObeNBMfMcyvCa12R5SIdL4sMAUw6YUu+ZW5aEiN8HTMx0qemQFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ddafe52d04so123563845ab.1
-        for <linux-block@vger.kernel.org>; Sun, 22 Jun 2025 21:00:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750651202; x=1751256002;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tp5owW5nwFpu5Jnkrm8smrXMQm3hRvUBzgn0oCSlZLE=;
-        b=TEbwrlsf9Tnzm8dIkqG97BU5CddDOtTz9lkANxKJBxOrrByz+ObS2nzM+SOTkTOgSn
-         vO7HgYvc5Z096gWv4zr4gln3OAEWvV5RfaIZbndI6bDEdlNj5h3NrpiGjqyy0fQyvy30
-         nCL1Hn2Sb/zpltpWWHVtmcEMq+m+uZSWGg6IWocpHrhQxtASTev92fwbeMfsLKin1ED0
-         EzsTRIuLLWZZaYp743eYQG6l+YysvWE9mzAIDFaF3wpUJOcWMyvii7o+rr/2okM6kbAj
-         BvdglRJxi6QIZOTCh6OA+NbLvtY9si+3TgjaIApUFgOwi2L7wc7qtxtvzCUNIfcC5enE
-         IFAg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8Jbt5ztUdMTXXHWNqA67AdpljhfilRSWwWAGaUYpUGTZNaIwKI5LpQ+TLulEnHVdWDs7fnrEEQZZHtg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOaCw0Fvk1ideriNqNb7A3SBnA424Be5avDdpt5yyDOHv//Gtm
-	E1VVEcJ5HF0cFLaHWC64U9yg2Ujmfnsor1pnkN9b19ktxVZ7h8c8I0ygX1XYnbKPh5HuB49boVH
-	fPJe3pk8ljI//TNlhJwTXAfVbr8r4fEQv/GH6/wi42aEgx6l9gcXmxdhTrr0=
-X-Google-Smtp-Source: AGHT+IGzI3eiBVL0NMFR35KWAlUrxUfo0LV4hyzVNWz6hxCoaIHFjj6zXT0kapv92iCI4EFb+pZdLBWvpe4EvqMzAC+zavsATS4M
+	s=arc-20240116; t=1750651362; c=relaxed/simple;
+	bh=a3Xh+Gbzbc6EFlC9zJai9Y+prJRIoMEowqMnCM5K/wg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TmpHF+ZXYcIUptFUosnIy5wSw20LPsQ1CsuxAyqfgXX8liCghDd8Rz9Lo03qLg/N6bmI0NmLFQvyazNnGHH8+09USmYOhQRNB8uAwaAXU6FPoUYV6wmfMvp6PAxDLWUEQ/Dnd3KeZ5jMNeTzsJcJV4SefL+wDF9DiMZ5076CTpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MXF6r27Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXF6r27Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750651359;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FwTdDa7+zOPfvJA4M4KhEnaQ5IkSI7g91Kvc5pb6pEk=;
+	b=MXF6r27QzKdgsnG34wInhyreaySnzTl3sMGwGgLPhB3JdDXw2Dfh6UEoN+EByXNZ9Y/kPq
+	m64yblTrHUmgNAYZ2G7bKUXbMNO+/fTbDDTuPitUUmdoGXF3sPU7VE3fiWFPlHWskxi4lx
+	z3rKq8W92MrKZ4OaFZg7bo47yzz5CTo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-UsU3UsrSM0adT42XZp27Yg-1; Mon,
+ 23 Jun 2025 00:02:37 -0400
+X-MC-Unique: UsU3UsrSM0adT42XZp27Yg-1
+X-Mimecast-MFC-AGG-ID: UsU3UsrSM0adT42XZp27Yg_1750651356
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 613EE1956089
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 04:02:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.88])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 01A77180045C;
+	Mon, 23 Jun 2025 04:02:33 +0000 (UTC)
+Date: Mon, 23 Jun 2025 12:02:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Changhui Zhong <czhong@redhat.com>
+Cc: Linux Block Devices <linux-block@vger.kernel.org>
+Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address:
+ 0000000000000001
+Message-ID: <aFjR1M2RwGn8y9Rs@fedora>
+References: <CAGVVp+VN9QcpHUz_0nasFf5q9i1gi8H8j-G-6mkBoqa3TyjRHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:308f:b0:3dc:8667:3426 with SMTP id
- e9e14a558f8ab-3de38cca231mr119111035ab.17.1750651202731; Sun, 22 Jun 2025
- 21:00:02 -0700 (PDT)
-Date: Sun, 22 Jun 2025 21:00:02 -0700
-In-Reply-To: <6834671a.a70a0220.253bc2.0098.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6858d142.a00a0220.2e5631.0004.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in __del_gendisk
-From: syzbot <syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, hdanton@sina.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGVVp+VN9QcpHUz_0nasFf5q9i1gi8H8j-G-6mkBoqa3TyjRHA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-syzbot has bisected this issue to:
+Hi Changhui,
 
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
+On Mon, Jun 23, 2025 at 10:58:24AM +0800, Changhui Zhong wrote:
+> Hello,
+> 
+> the following kernel panic was triggered by ubdsrv  generic/002,
+> please help check and let me know if you need any info/test, thanks.
+> 
+> commit HEAD:
+> 
+> commit 2589cd05008205ee29f5f66f24a684732ee2e3a3
+> Merge: 98d0347fe8fb e1c75831f682
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Wed Jun 18 05:11:50 2025 -0600
+> 
+>     Merge branch 'io_uring-6.16' into for-next
+> 
+>     * io_uring-6.16:
+>       io_uring: fix potential page leak in io_sqe_buffer_register()
+>       io_uring/sqpoll: don't put task_struct on tctx setup failure
+>       io_uring: remove duplicate io_uring_alloc_task_context() definition
 
-    block: model freeze & enter queue as lock for supporting lockdep
+The above branch has been merged to v6.16-rc3, can you reproduce it with -rc3?
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1024db0c580000
-start commit:   e0fca6f2cebf net: mana: Record doorbell physical address i..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1224db0c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1424db0c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d11f52d3049c3790
-dashboard link: https://syzkaller.appspot.com/bug?extid=2e9e529ac0b319316453
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=132f8dd4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14aac182580000
+I tried to duplicate in my test VM, not succeed with -rc3.
 
-Reported-by: syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
+...
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> [ 7044.064528] BUG: kernel NULL pointer dereference, address: 0000000000000001
+> [ 7044.071507] #PF: supervisor read access in kernel mode
+> [ 7044.076653] #PF: error_code(0x0000) - not-present page
+> [ 7044.081801] PGD 462c42067 P4D 462c42067 PUD 462c43067 PMD 0
+> [ 7044.087488] Oops: Oops: 0000 [#1] SMP NOPTI
+> [ 7044.091685] CPU: 13 UID: 0 PID: 367 Comm: kworker/13:1H Not tainted
+> 6.16.0-rc2+ #1 PREEMPT(voluntary)
+> [ 7044.100991] Hardware name: Dell Inc. PowerEdge R640/0X45NX, BIOS
+> 2.22.2 09/12/2024
+> [ 7044.108565] Workqueue: kblockd blk_mq_requeue_work
+> [ 7044.113374] RIP: 0010:__io_req_task_work_add+0x18/0x1f0
+
+Can you share where the above line points to source line if it can be
+reproduced in -rc3?
+
+gdb> l *(__io_req_task_work_add+0x18)
+
+
+Thanks,
+Ming
+
