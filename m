@@ -1,40 +1,37 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC4081741
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 14:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBC8275AED
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750688219; cv=none; b=P65QABln55HhhyqKMSfSkwS8sZAxjlggJm8ayUSCrpFlnnHEUEc/p9ZGLPJuT+v686w8dr+76ImV9Pe/o9mAdhkUCwajy9iFqtwOfFdk1ORyOnCRdK1eBVjKhD7yKrYHYjS/9/qbsyneklyKa1ndp1E0OIrg9Ftv5JpkrdGeNp4=
+	t=1750691340; cv=none; b=LGulmk+coPJwl5MqcEyvSMqs8w28UuV4U+xDLox/q28CeKX2TcDDymygxEFEBiSNbb8p3n5jg684x6YpgM5cndMAmdd0/lYQY/XjKwSw1oR9YosNvejVlkueSlbC5FzysLSgLH7hrgJqhnPdF/7KLQUC+5pbmPsWuR8kyvByJjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750688219; c=relaxed/simple;
-	bh=I0AfeWQcC3GUaz5pYaA5G5RpqFt1KMHKWG+jONXINCc=;
+	s=arc-20240116; t=1750691340; c=relaxed/simple;
+	bh=WTLi4NhbtW53bfGC4bVmvYSJGLX6tkPNywywR7CkLZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GKio0XINcIiUctmEShhov9TajkeqGmDC2HPXRGjvv3N/N1Pf4v+Kp8vKySb7rkI0XqOkMgWP9GaFvveboXkDCsQ7xhfeR8CoIFR9p91EZgjmN+e0IjgmpP492WB5uNtYdmaK5v+6EcYFzpkvE0vM+y07lsF6SEEccGoe41D0VmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=29egg6Kw; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=F03N/nhpAGSk9vf6Oj/CyYRwGWkDEqyen14xeIuX44LH6UGlIJjfG/53w1bFqRjViEneBF0BU8l28xC7B2X3t660fK5Q2iZGhjaKS1NSnZTdb+sdrwOjyMXrJdEVlOcVPan2JhLGVn107XuCT0fa840Bflff/vxfkh+OHqOdLZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFEbk8Dh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="29egg6Kw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=I0AfeWQcC3GUaz5pYaA5G5RpqFt1KMHKWG+jONXINCc=; b=29egg6Kwfpzr/C2PYg0J6pR+W1
-	kK10MdTb6mpE/08lQFhLMJMrmjebv0Ffq8hWBUcLVcejG7GBsYlDsEcNteQebYjAKhZ0kH6C2sHOe
-	y4uJnyg6eKcAa+f752vWm+xqxDAoPVAQ8pwHlJXUP9p2D3Wa1Ak7KgIXUK6Ezl0xiwOWMp+HZyB1l
-	v+U1Z0AOs6NLeuKQvCsZQC0uer0RJwc33RTCpr6cat0tztvOu751x5A3V1c1fVPUKUUA0iRM5TQB0
-	JxUHLmPwKaxeqUNLmLA87bzdtIKyKwOQrGWLl4viFsh72BBdft1932VmMBkefiyOnLlATsINUJT+J
-	IVNH4o1w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uThyj-000000030er-3l0F;
-	Mon, 23 Jun 2025 14:16:57 +0000
-Date: Mon, 23 Jun 2025 07:16:57 -0700
-From: Christoph Hellwig <hch@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFEbk8Dh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15C72C4CEEA;
+	Mon, 23 Jun 2025 15:08:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750691339;
+	bh=WTLi4NhbtW53bfGC4bVmvYSJGLX6tkPNywywR7CkLZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BFEbk8Dh933EADKYtIasH6y3lFw9CE4hU1GcJkYAUp5vO8Ij0PfW1+1qPzJ5JG36O
+	 iS0oKxQ+dsTZJIfOPTbqIg1O7hrul4pHDD6N59MN8T5W1x39d/OB82mqThauLk8SoI
+	 qG/mN+GqWB1F0lmv2FRXEGAJxxsqxAXw8dPUlD3xOaEFHmE2NuUAc0fbU7aBgWsUE5
+	 GusNrEFubdBfPKUekVjlSUIngY6GH6LQL2IrGvR01icayjFT8TifvDJH29QDW74OcL
+	 +tK3F+SoXzkt6cEqqzzaRHJnMTz+3JeeP0/uJXf2kdBBkE5UUf1FzFsmP/OSoxdcpa
+	 d1qyH0Ju9GBaA==
+Date: Mon, 23 Jun 2025 09:08:57 -0600
+From: Keith Busch <kbusch@kernel.org>
 To: Fengnan Chang <changfengnan@bytedance.com>
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org
 Subject: Re: [RFC PATCH] block: Add a workaround for the miss wakeup problem
-Message-ID: <aFlh2Ya8qWsV5LCB@infradead.org>
+Message-ID: <aFluCdqZ-QYXOKf_@kbusch-mbp>
 References: <20250623111021.64094-1-changfengnan@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -45,10 +42,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20250623111021.64094-1-changfengnan@bytedance.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
 On Mon, Jun 23, 2025 at 07:10:21PM +0800, Fengnan Chang wrote:
-> Some io hang problems are caused by miss wakeup,
+> Some io hang problems are caused by miss wakeup, and these cases could
 
-Please fix the missing wakeup instead.
-
+Wait a second, what's the cause of the missed wakeup? I don't think that
+should ever happen, so let's get the details on that first.
