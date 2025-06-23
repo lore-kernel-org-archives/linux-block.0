@@ -1,80 +1,67 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4E7279DBC
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EFF2882A9
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 15:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750692024; cv=none; b=mVPeCBPHde7Dpdui0ZEsTPG+Dqc2SSUj6pj6sf0e+cQ/gcrGaoxnLYBP4ygRjVdJEQL8IJXsngKrEGlUa+DDnMWXAODIwcTU3W+wC5bULbGvGF+h4ea4menWW70I7N8LrLg5kAV6MhAQNOdEKmndjS8p/rolvJSzNH9/0Pt22B8=
+	t=1750692453; cv=none; b=sHZfU13SgEfFTPBjPSLGgFA0Xv65czrCeuRKIr5je/GE++CvT4uKIPgObjG6X4zrQSYmQjgt76n+LI2TcEgrbd1JK33xnVS8/ts4twYwjET63RPsVAQA1POeLBmwAHCUCyxJycvHQm8QaYyzjejJNZ0k3lBvsc0EfFtSJEgkVMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750692024; c=relaxed/simple;
-	bh=T241F5rFx1+wRJKDvrverWW11YcQKph8dHY7KAwqbtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pcVC+ACed9Z2vbJxHQhXJC62GF3VIbBqPkyIFeuRc3haJ4VK7cq9smFgsqD1biT8Cuc2/zucUZMlZtihsp3MCrfygw+xf63N0gSJWqD9Zjc5YtZWazl75Ppy9i509hFTLrw8pZ+GLIph/t7MhBd74DfZBPBxIJjupKorQF4RYIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=nzLQvAtb; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750692453; c=relaxed/simple;
+	bh=joX8RW2I71piMAp33vBoXEKsMPja6dSHkMWvCKOCIkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nn2xzRvhRFoG/4h1scECuuKVHI+Ex5QfpNt0wCqhByZL9ipOJh0y5Z93+C19fumpuZtNwq8N0ojQDU0pNl1eSoKXqArrQx/h5CxdzujScSzm1Sbzm1AuigIccrA9DdcSSTtTh/pjShyImfSKB3QBQfFmZGOdIrstFLhUX9OXoBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1BtWkZO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="nzLQvAtb"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bQs9x0TGpzlgqTr;
-	Mon, 23 Jun 2025 15:16:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750691795; x=1753283796; bh=rLtZYBm/Mbhs8YTzk7xRLTo0
-	+TLvEx9li8/ucTQzXhg=; b=nzLQvAtbd6j/chEz4Gqvg6SJWTzad5rPmMS61Osx
-	sxtiUy3gcFYNqE4BGkZPgNc4f0q8gy4jEvpldDGNser7lqPrgq5tO7lPRm3ZHajt
-	3IuIcshZ6LBG55AmvquOV5esJ88lVbJowKdU5KG3Iazqd2WRIKevpetBrA3bCC9B
-	MvutI5T8BfBsmuIscctUESpGk1CRMfLdqpV+RykZVdzlsvS2JgCjdCkBc2dL9Wp7
-	i1RrClJQh2gsfL/qMUoFuqm+b01lYPqGbs7u2gyrdJn8C0Ufc92debIMDwQzpQSs
-	Cuqc/KSMmCcIOq2VbRT8ZZiOANBmuorE1NyEaVuccurefw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id fKbclv6GtDKm; Mon, 23 Jun 2025 15:16:35 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bQs9s134vzlgqV5;
-	Mon, 23 Jun 2025 15:16:31 +0000 (UTC)
-Message-ID: <ab941c5e-43da-4421-a90c-c7efb73ed8ce@acm.org>
-Date: Mon, 23 Jun 2025 08:16:30 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1BtWkZO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A131C4CEEA;
+	Mon, 23 Jun 2025 15:27:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750692452;
+	bh=joX8RW2I71piMAp33vBoXEKsMPja6dSHkMWvCKOCIkk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E1BtWkZOw1oszg7cK+LkvSPJBc4VzqzqZPe87GeEwmc/ha8yUgrsgOo8+XcCqXmmc
+	 JQ9gUWYdqmOjOiYUem1CtvIr2YquiFPjg9ZvGwt0Jv96fhrCAFZKhga5Dw57D91C0K
+	 wbLeanlVIl4qIHThXOPmJWg+JpN6tvHJscEphqwwzgH9Rga6O41qCLdAo4V2UsnKxb
+	 R1R/4QSj0+cedkdCSU0xUEIEyCWbkR8iT607NTogbX2zMPnIrhLztOoeQaophfnrK0
+	 ZBmSn4bUnoOyQqWeA3uhJdOhajPIAR2pWfQ/6Xq1PSY4u99dEXfMYawkSqZv3lug7e
+	 EsfVR22zxMZhw==
+Date: Mon, 23 Jun 2025 09:27:30 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 3/8] nvme-pci: refactor nvme_pci_use_sgls
+Message-ID: <aFlyYjALviyhQ-IE@kbusch-mbp>
+References: <20250623141259.76767-1-hch@lst.de>
+ <20250623141259.76767-4-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] block: Add a workaround for the miss wakeup problem
-To: Keith Busch <kbusch@kernel.org>,
- Fengnan Chang <changfengnan@bytedance.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-References: <20250623111021.64094-1-changfengnan@bytedance.com>
- <aFluCdqZ-QYXOKf_@kbusch-mbp>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aFluCdqZ-QYXOKf_@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250623141259.76767-4-hch@lst.de>
 
-On 6/23/25 8:08 AM, Keith Busch wrote:
-> On Mon, Jun 23, 2025 at 07:10:21PM +0800, Fengnan Chang wrote:
->> Some io hang problems are caused by miss wakeup, and these cases could
-> 
-> Wait a second, what's the cause of the missed wakeup? I don't think that
-> should ever happen, so let's get the details on that first.
+On Mon, Jun 23, 2025 at 04:12:25PM +0200, Christoph Hellwig wrote:
+> @@ -888,7 +899,9 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+>  		goto out_free_sg;
+>  	}
+>  
+> -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
+> +	if (use_sgl == SGL_FORCED ||
+> +	    (use_sgl == SGL_SUPPORTED &&
+> +	     (!sgl_threshold || nvme_pci_avg_seg_size(req) >= sgl_threshold)))
+>  		ret = nvme_pci_setup_sgls(nvmeq, req, &cmnd->rw);
 
-+1
-
-Additionally, there is not enough information in the patch description
-to conclude whether the root cause is in the block layer core or in an
-(out-of-tree?) block driver.
-
-Bart.
-
-
+We historically interpreted sgl_threshold set to 0 to mean disable SGL
+usage, maybe because the controller is broken or something. It might be
+okay to have 0 mean to not consider segment sizes, but I just wanted to
+point out this is a different interpretation of the user parameter.
