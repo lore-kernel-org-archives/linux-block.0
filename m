@@ -1,114 +1,166 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AA04A2D
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 17:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126D7299AB3
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 17:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750698752; cv=none; b=DzYkVs8mrfIQNo/uJrEq8RAe5tYAR1K4tvh+aSf2GHXNcrMj3SAX1Mhx1JXkNl9SHoO659QjshIVl5Hx99FpJ+VaJzVzBAtxVTUKfqiTeLlf9OoDky59xYp94w6qR9RUpxgH+jng0AEinqotsNCkxQCDWvGheG1Uby8n26QjwwI=
+	t=1750701074; cv=none; b=HhUAxHeeuZW+5q3PJJPtsZ9Jcs+r39qJHxXvq02+93UpoMtst0FRObKojAzk/wcZua0ehUYrrBEuFSdjzCeWzxxAZ+9zVFfawcwTYdI09pIkn9QyBUGrY179tyrC8qBRabWZI/qFzoWq5Db1s66afi7sSADEK1HcYxH+7vbdnOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750698752; c=relaxed/simple;
-	bh=+8eS0yzqANhrdUUdDxmtWhUVQ//7uY4UWBWsBeymWT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sLUyfaTL94BkQDMB2Zx1YfZ1iMF499bFq/6gKgTvx+Lq6IOSp8zgKXEvcJooOjSzosh2dG4wkFnAEhfJC8ipuTlQx1GhsyWJJo9sFdJw805S/OWMxaJyZs7hAP1fBhnAyR8zmRDp+HwHYLOsDhSuY4Xmc/TQkKxa3szavmosFZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=eo9iOsTo; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750701074; c=relaxed/simple;
+	bh=vDSfcGgDSNhGw35osaiLcYhlBHkO+SgsmakU9ub3PhU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fWvetkd8LI5Am6pDouMUPfaqEFMZuz5d5iJNUGRCy3IXnSh9rPYDq0mLz1obwHf6cJx17RsTLvZTlIHw0I92MWxUc/E3CrVrtT5u1lZ6aFmYDKqFWCrgau3Ok0jztwVl592rIHWzwez7UG7xYnsiFj8EI7GvYwtQLiuLgNWSWio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XCWXzsZN; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="eo9iOsTo"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bQvld3pfBzlgqV3;
-	Mon, 23 Jun 2025 17:12:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750698748; x=1753290749; bh=hCipjCtBsI3oppbCmcHQ1+zK
-	+ZZ6cUHFUfMITmpwt0A=; b=eo9iOsToDy87qxYLGQ0pPo0rvJK2rD4V+CLH/v2f
-	UyD/p7Yx8auldW39PPYFwofZAiDaeRc60JFEtuqTHlnhRvlsa1hrwmfakFvf1gHE
-	5Eed/eDv9JPRhzpVHq7WisdOv5MF8hGbNR4EqElPTgjt409nFudK2v9f6ytNdhH8
-	tZEGExItfd+aYH0q2rVtykeolIaY70HnIvBQA+OSbK81XMLw7xE02eTmyP2q+Qzx
-	oL0C9SOdhVgW82/VeqW4+dFw8sEqMjpNKxHY12HleE4e9H3qfCRND8lKFHVxjKDW
-	Ip5Pkn/02Jw8UlVHGY/KznqTYV2D1ULRwfjomlAxWPQtcg==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id vleq4iM76QgN; Mon, 23 Jun 2025 17:12:28 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bQvlX4wfvzlgqTv;
-	Mon, 23 Jun 2025 17:12:23 +0000 (UTC)
-Message-ID: <cb62c949-db47-4d09-9846-8e02476d6aa9@acm.org>
-Date: Mon, 23 Jun 2025 10:12:22 -0700
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XCWXzsZN"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313336f8438so560165a91.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 10:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1750701072; x=1751305872; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZSGTbaSUTphTlNgLaG+uQKsE9OQD6r3l23T4XwIYFSA=;
+        b=XCWXzsZNoiy01FMdTO1JQH8qBqsnrgJzdKgboQ22LCrzX91w4DOTuHDGmtZbfxbIsV
+         koWQGBttN7psW2PQFDXDR+7jH7o7ac+oFEuHf4qyaOFOhNZFH4e0AZwKI66Cs7sI1msV
+         h/B4+XDbjF01aRu7iANhEn0ozevFsihhr7OJFzk5B1KIG4QFeR4dlOqflwZbin0744CF
+         cMzt4YpjIPhKmjPDx1LaJPdhoonRht43TBchCLTKKE+mVNufR7HmzulEcfVDQE7x6MHW
+         wcXXVpPMYFibn4Oky+77sgzUM78jZ7UzoyYybZm1w8vXI2LN3owcS/ZKlsP/+Xw7qCzK
+         98kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750701072; x=1751305872;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZSGTbaSUTphTlNgLaG+uQKsE9OQD6r3l23T4XwIYFSA=;
+        b=iC+DV9MgZxws4nuOoYApUHEobLjqM7WTrdwArRo82nuplkjDcIF/vB2+pu7+qnUvFG
+         vdCUMrqPGmH8QiYBlp+k0Y0lt/BDlXcvKYvTsuMPD8eWYv6rrATeqmdxfV339kPDkjmX
+         5GApHx1mf7xuyR+POl7QRq69heeM4aAQYb41KcdsO/zuNaRlykxwdSrne58zuEQPYiZA
+         qUgwIUAt7ZRNtEVo3yo+DaHW0zmXSavQnLYhCcB34kxDsTT/eRKvEPv1dh7aRugIEyhW
+         9rnmkJyKb+Si9VdMIVE5LJR+Z4M97T4KyqjufPEvpivCDzFAqePQbzEjbg6mNsPVzQOB
+         Hh4g==
+X-Forwarded-Encrypted: i=1; AJvYcCV2pPrSpBqplsY7PEcjNXe0I4UDXVXeBwLGXIF+Lg/93x8DmnTuaMQBf5dQ3/yxdG86HKSXjEb2megyvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6AWSn3L5uGeTKji3NyvAUeVQAX859lERkX7BkECDXtSB04uqz
+	SFxJ6GSTR4oGDADKydZ68059uXDNkjE1PCWgPO7k74kvZj48IgsmspqO4WvFnnGcTDvq8HR6M5p
+	WI9Ob4+a44Dzc6Btuo5RoQHRwgMqFd/2v/rYAKGC2BmJMvNIcdxMH
+X-Gm-Gg: ASbGncurpKcFphPk0C2u/dgTkSK7CZ8gae2X3C2wrBo7tLy0T8Xfh8+iAAqR8AczDhI
+	jZxD6vWO1Eh1ox3JOQPYxryVGz5QQ0FPBYdtFlnDycE0htQPOOzoT5Gn9diYZ322ELCuEJnDJ8I
+	dOWGhnluust4pJpGcb2ikm1MntxnIHA+uL9nB60dqVmQ==
+X-Google-Smtp-Source: AGHT+IFGZpuTgz+fHD99KSnnuWfYYiIKvRkQPXvrFMJNbyd+pOyw5zE7yNo7NPCxl9uMQ8nakl9GJwDmgxERP0nDILE=
+X-Received: by 2002:a17:90b:3a43:b0:311:fde5:c4ae with SMTP id
+ 98e67ed59e1d1-3159d8e2be9mr7295280a91.6.1750701072235; Mon, 23 Jun 2025
+ 10:51:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: don't use submit_bio_noacct_nocheck in
- blk_zone_wplug_bio_work
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20250611044416.2351850-1-hch@lst.de>
- <ea187ee4-378e-4c59-afdd-3ecd8ed57243@acm.org>
- <d18b6d7a-b2eb-4eb5-a526-a5619e50a1a0@kernel.org>
- <547d462a-1681-4a6d-af4a-10d0013e6af1@acm.org>
- <ea9c6463-f602-4fcb-b343-dd1973304abf@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ea9c6463-f602-4fcb-b343-dd1973304abf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250623011934.741788-1-ming.lei@redhat.com> <20250623011934.741788-2-ming.lei@redhat.com>
+In-Reply-To: <20250623011934.741788-2-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 23 Jun 2025 10:51:00 -0700
+X-Gm-Features: AX0GCFuJ0BB6stWu_FTER7aw6CA6cQRcC7fbnE3xKjxOHefyya0Yz0PCKrq2vX4
+Message-ID: <CADUfDZp=69+ZpJ5vc7c9qGmA3zLU+eYdYd2PfeiDwFvxYQ+0nQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ublk: build per-io-ring-ctx batch list
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/19/25 6:29 PM, Damien Le Moal wrote:
-> On 6/19/25 02:13, Bart Van Assche wrote:
->>
->> On 6/17/25 10:56 PM, Damien Le Moal wrote:
->>> Can you check exactly the path that is being followed ? (your
->>   > backtrace does not seem to have everything)
->>
->> Hmm ... it is not clear to me why this information is required? My
->> understanding is that the root cause is the same as for the deadlock
->> fixed by Christoph:
->> 1. A bio is queued onto zwplug->bio_list. Before this happens, the
->>      queue reference count is increased by one.
->> 2. A value is written into a block device sysfs attribute and queue
->>      freezing starts. The queue freezing code waits for completion of
->>      all bios on zwplug->bio_list because the reference count owned by
->>      these bios is only released when these bios complete.
->> 3. blk_zone_wplug_bio_work() dequeues a bio from zwplug->bio_list,
->>      calls dm_submit_bio() through a function pointer, dm_submit_bio()
->>      calls submit_bio_noacct() indirectly and submit_bio_noacct() calls
->>      bio_queue_enter() indirectly. bio_queue_enter() sees that queue
->>      freezing has started and waits until the queue is unfrozen.
->> 4. A deadlock occurs because (2) and (3) wait for each other
->>      indefinitely.
-> 
-> Then we need to split DM BIOs immediately on submission, always.
-> So something like this totally untested patch should solve the issue.
-> Care to test ?
+On Sun, Jun 22, 2025 at 6:19=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> ublk_queue_cmd_list() dispatches the whole batch list by scheduling task
+> work via the tail request's io_uring_cmd, this way is fine even though
+> more than one io_ring_ctx are involved for this batch since it is just
+> one running context.
+>
+> However, the task work handler ublk_cmd_list_tw_cb() takes `issue_flags`
+> of tail uring_cmd's io_ring_ctx for completing all commands. This way is
+> wrong if any uring_cmd is issued from different io_ring_ctx.
+>
+> Fixes it by always building per-io-ring-ctx batch list.
+>
+> For typical per-queue or per-io daemon implementation, this way shouldn't
+> make difference from performance viewpoint, because single io_ring_ctx is
+> often taken in each daemon.
+>
+> Fixes: d796cea7b9f3 ("ublk: implement ->queue_rqs()")
+> Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue d=
+aemon")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c637ea010d34..e79b04e61047 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1336,9 +1336,8 @@ static void ublk_cmd_list_tw_cb(struct io_uring_cmd=
+ *cmd,
+>         } while (rq);
+>  }
+>
+> -static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+> +static void ublk_queue_cmd_list(struct io_uring_cmd *cmd, struct rq_list=
+ *l)
+>  {
+> -       struct io_uring_cmd *cmd =3D io->cmd;
+>         struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
+>
+>         pdu->req_list =3D rq_list_peek(l);
+> @@ -1420,16 +1419,18 @@ static void ublk_queue_rqs(struct rq_list *rqlist=
+)
+>  {
+>         struct rq_list requeue_list =3D { };
+>         struct rq_list submit_list =3D { };
+> -       struct ublk_io *io =3D NULL;
+> +       struct io_uring_cmd *cmd =3D NULL;
+>         struct request *req;
+>
+>         while ((req =3D rq_list_pop(rqlist))) {
+>                 struct ublk_queue *this_q =3D req->mq_hctx->driver_data;
+> -               struct ublk_io *this_io =3D &this_q->ios[req->tag];
+> +               struct io_uring_cmd *this_cmd =3D this_q->ios[req->tag].c=
+md;
+>
+> -               if (io && io->task !=3D this_io->task && !rq_list_empty(&=
+submit_list))
+> -                       ublk_queue_cmd_list(io, &submit_list);
+> -               io =3D this_io;
+> +               if (cmd && io_uring_cmd_ctx_handle(cmd) !=3D
+> +                               io_uring_cmd_ctx_handle(this_cmd) &&
+> +                               !rq_list_empty(&submit_list))
+> +                       ublk_queue_cmd_list(cmd, &submit_list);
 
-(back in the office after four days off work)
+I don't think we can assume that ublk commands submitted to the same
+io_uring have the same daemon task. It's possible for multiple tasks
+to submit to the same io_uring, even though that's not a common or
+performant way to use io_uring. Probably we need to check that both
+the task and io_ring_ctx match.
 
-Hi Damien,
+Best,
+Caleb
 
-Hmm ... it is not clear to me how a patch that modifies when bios are
-split could address the deadlock scenario described above? What am I
-missing? Additionally, hadn't Christoph requested not to split bios at
-the top of the device driver stack?
-
-The patch that I posted one month ago is sufficient to fix this
-deadlock. See also
-https://lore.kernel.org/linux-block/20250522171405.3239141-1-bvanassche@acm.org/
-
-Thanks,
-
-Bart.
-
-
+> +               cmd =3D this_cmd;
+>
+>                 if (ublk_prep_req(this_q, req, true) =3D=3D BLK_STS_OK)
+>                         rq_list_add_tail(&submit_list, req);
+> @@ -1438,7 +1439,7 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
+>         }
+>
+>         if (!rq_list_empty(&submit_list))
+> -               ublk_queue_cmd_list(io, &submit_list);
+> +               ublk_queue_cmd_list(cmd, &submit_list);
+>         *rqlist =3D requeue_list;
+>  }
+>
+> --
+> 2.47.0
+>
