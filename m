@@ -1,137 +1,98 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2592BD030
-	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 17:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACBC1CBE8C
+	for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 18:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750701313; cv=none; b=PM03+38ChoFVymNpN4X70rpaVEJiS3FH28zMlonuTClQkFGk35Z0TEGD5GZHjJpFQhdjJEEygYkGAYbsw6LYc9FqseKv5SrGsCkxqlrnd9WvagbUv+XgDleaeO7mGU7Nhw/YU3M32rAgSj6oOoRGerU6HjRpbGucT4V0hWOTPis=
+	t=1750704746; cv=none; b=QUj2EKIPtZPc2oqdenC05JyFNTBOGY0SAWqsBa3jePeZuutaanlQkyjKoAPtAG79ocknHoEILeKHcUynLKFcIQUwa26JbYlIVAy0fwW1NQHekU5Szn57Wlj4LeicDS3tmz2xQv1KbLOr3XRrhMmJcXRcWToSZrv4Z8rL/4GRx/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750701313; c=relaxed/simple;
-	bh=TGBpV5oULML4Z1a+dy4g44Lzc6dMl0RK8w2iyF/3oeE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OoSdbIZoRZI1FA+kfsygaqnyvq7YSA313J1HtstsfmXLaZF5Q7Li4EYWfNLjg6XfidaGD0z7OqQrV5nxoAFHNPn8SEBymlyFZtLFmyj2L+Zmk4M4DKTVuAaSIDbdmSUZPp3cTaIPpIgypkjoR/g0cPkCC9IBnEon/I147lDy25o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ejX7fFke; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1750704746; c=relaxed/simple;
+	bh=gv1G9Z96EFrbQZ1cbL33lVjm9HQLDsqF7DO+CEeipwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BAP1payRj7V/4C60d4STget3D6N1GHcNWT2Odd34HppYnfljoBrrIUGIC0F0wOECBkmMUp/hB56lRPAYVgdYnDp4+T00k+HjiclZjCIoekkVOzNn9U1js8NPpAJEHFDBhROCSXIGzoAiWdz9vede5CoxMXt6LvDqo4ECqRux6JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IPGSpriB; arc=none smtp.client-ip=209.85.128.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ejX7fFke"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-313336f8438so560862a91.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 10:55:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IPGSpriB"
+Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-70a57a8ffc3so39240987b3.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 11:52:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1750701311; x=1751306111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96FPfMZWCGqLJ9ZyWXBqoa6PuTvXzBWkUXOsD/Ztgto=;
-        b=ejX7fFkeQCr8FwY6wdWxLuFQRUX3jABt4/Bxvc6JZFVB+obSlLIQc84oojkaZos9aq
-         2rg8IPfOLLd6yrkg0ki2ZCdKoEPXpxgwH2I0duhIdXCFzvuw+t0ErGdNqn6gVZQuPc8b
-         kF0webXpPExlPr8prMUpeZ6etMoLVEiR+Q9ZMLP7QC4vnVPxoI4uI3dO6+w338fV2ftu
-         TBzcededYGCkRFENbpHxZJq3UlCSxSuNYbSaiPvU1gZWGvoLm3tgwTQDjhteZOzylDOz
-         puMjDCfaSvdu2RN8rKCny8uVE13XE2X2FUn48fpnicPYd2RndGRiXLQ0wUuWM+j8Sne4
-         qQVA==
+        d=purestorage.com; s=google2022; t=1750704744; x=1751309544; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sSdtfcO6yct73s8jNNwzmEbNNWfSJFlnXgpHHlfXObs=;
+        b=IPGSpriB6GCWEeVCrU+cwSjFwPgBoPb9vO/iCH2hVghOb7ChU0aEtjjCppYr00MngO
+         bxHBcg1tf2wzShARuh7r1nZLRYi29pdrHgKq2vvIGcPmejywWw8rScADIlPByuVHU51S
+         qDMAUsvZBpBszK1WLcm2eVZIsIHTXqHbE1c4pMRSApZjK5xlC3hnOP7AoPkcKPwT8GiD
+         K+hYQwDhc0l6yo+n7no77tOkh3k6okWU1AiPQHH4jQ+JEaJ4s5C4/cSpuuag1pvshnP4
+         JVHe1/se8G6qOrRNNpjiJhq3t9i4SI27LGCR/z3yhDejpgJ0hB1Q9MfXK5hgm7kxwZMh
+         NErA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750701311; x=1751306111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=96FPfMZWCGqLJ9ZyWXBqoa6PuTvXzBWkUXOsD/Ztgto=;
-        b=ShuBobAK4M9BJpnVS1JKXE6zNsSM9YEStNckE2G8ZRY0RkMxeBUldPq+UtDs9ytQKg
-         WtBCZOOFWeqo3cj8ivdT9QR/JBagrTkG9NQKBS643Bj8BQ1PGf3ZRXIfG0f8o7FRNmyz
-         nEaGAI9HX/ed22gprEnRUKbectdYWH2CpVIwSg7MwrylOpBRJXZWRRO3anv0B1w5+YBh
-         dtS11rQEuoDPwGZliPGpvz/H/HkgFUZzV2FQWU5rEp3X/lu5JnkVv0yMI3jPos5AnXA6
-         iqYtqGLBknIg5fgTcqngAAoC8fAeKs9XxbqtmIxCjhiq5RoyQLFZ2LnxWuFuLTXYwlF8
-         CRNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUN7bMjUmZ5OQcOwATtqmwCoxt/NPL1YwMJ+siqfW8AuBlczuJ5PvAZeLl8TwihOeDYtX04QxwEHGmSYg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKvbCC+Ku51DWmjGnnj1d99I809OLHpcgnKtZYkL4E77cNtAZc
-	rVca6RyjYgh2rmEXxasRwK9ZACuGTyHP9AElBYlBsM6TpfoYrz4h9Hj0kK9E6a7rFNE5fRVi+eY
-	xTalcdnPJfOfzuy1k5SxD4wNDBAEhghfwlhPcPAvDgA==
-X-Gm-Gg: ASbGncvAbrPNdWBK+HbE3mtp/KT9k/xHZ2qJUuWnn8duWDg1CNxOyRrgN2PHP2ElL1X
-	mfybQ/epnpxkJsQ+Y+cmWSWdgmnMCfO6aK/3IZYO2muesdGb2ylhdqNEiVacWrIP40tUfcKn78g
-	dUKfl11yUJHJFYOAMnvd0sl9Fci4EYuTBhr5hijm8vmUt/EPZDnS0v
-X-Google-Smtp-Source: AGHT+IGfyk0z44pdh1sFfJu14XhKV72gabAiQjUE4fc8prUgN08vVYNzJPCr3Wlchk5EMe1wFJizpQF14M7zR+uvR3o=
-X-Received: by 2002:a17:90b:57ec:b0:311:9c9a:58e2 with SMTP id
- 98e67ed59e1d1-3159d9140e6mr6859482a91.7.1750701311132; Mon, 23 Jun 2025
- 10:55:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750704744; x=1751309544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sSdtfcO6yct73s8jNNwzmEbNNWfSJFlnXgpHHlfXObs=;
+        b=HcEJsgSC7ejoyL2Bq8sCwLeEsEk/3nWm5bXaF9m2nE3z9Xmk2D8qUPnG2mDoSaMWsw
+         ItOE+E6LbYUa8OK2POlkpAQ+DF8RIQ6EukcmFK8pRfasVdvpXsNHf4XMRyHNrfRpHWKN
+         m8wY8xH4clDOiRAo4kIge1aA64707aJcNaHHrWHFoklmr9sy+KVNRjhpu8x+urP3Twn/
+         N8HvTGvnZQqbQbsRTthvz4iRLak5EuRgALhOHB4vbyjqUIf4bKcHG8c84dEJy8ulBoqP
+         EPreDM3h4IJaSCvnYGq/UBI1xyU0iUrptZl0sQi9phWkABpLJB6szM3LwGg8+Rc4pyW3
+         kCEA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/rNXVfxiN2oH8t5Ik3kmUN0bc89QtSjCY2JOldAJDJQI/OA12og83u09/ygQ1kHLabTjGFzHRI51S0w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXsgopnT4udXjVd3O0PZ+wETvFXS2WaR6ifYeBF4bNcS/BCN69
+	HPFipxBInvorBULHsZaWD7DN55Da4YTpmRyhi2QKeT771c0J7uTa6IqrcCgqYyFKY18jJmC28ca
+	Z/FQZ6bniwa/OhhS/67yT9/GUoHCbIMMzGJ4wtfLA8D+D585emxcv
+X-Gm-Gg: ASbGncuQRANMydpbOlRh4kK0KJagBwQQNwsQ6PNpFlFSx3UiHMD8/EsKsvQNh8u2OFG
+	xj0Im3jbxP2/stohmKzXkW5ZBvAI6ZkUPk+nyUC2tCEK87PH8nWfPn70KZnrvNKkIi8uduyTVsu
+	uetcAH6MrFeTQ/OSMjZkEXNcdqvfnJ4Rj5T7HwmwKth2FY0DfrcRGqHPR+8B/G1w51Skg4RoO8U
+	c5MUUC9DxwWOZHhKsTwLoJC7TSJoXC7EX7d7f4Gsaaz9J+qpST9O9X/A5a/Vj2n1Kw0Go3HAmxl
+	BCaUr6cMzLfTJAsi2UslCMf46JR8a7gZZF7773AY8g==
+X-Google-Smtp-Source: AGHT+IGDE6E8898w1M/iljDhBprZ95zKNBS1+iC+DsKwuQBLxDeFFN8qYAWUvZfADpnnp5LjhZ+kFacbcEyY
+X-Received: by 2002:a05:690c:6086:b0:711:6419:5ce1 with SMTP id 00721157ae682-712c67610bdmr211314147b3.31.1750704743909;
+        Mon, 23 Jun 2025 11:52:23 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-712c4a38e96sm1589957b3.22.2025.06.23.11.52.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 11:52:23 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id D817A34014A;
+	Mon, 23 Jun 2025 12:52:22 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id C93D1E40278; Mon, 23 Jun 2025 12:52:22 -0600 (MDT)
+Date: Mon, 23 Jun 2025 12:52:22 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: fix narrowing warnings in UAPI header
+Message-ID: <aFmiZpTDrJ5GSGty@dev-ushankar.dev.purestorage.com>
+References: <20250621162842.337452-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250623011934.741788-1-ming.lei@redhat.com> <20250623011934.741788-3-ming.lei@redhat.com>
-In-Reply-To: <20250623011934.741788-3-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 23 Jun 2025 10:54:58 -0700
-X-Gm-Features: AX0GCFs1ZkKiV-xos-674OJMpd0KRjKKbhZdTqkFeazZxgBQAKsVW2AcaPmFygA
-Message-ID: <CADUfDZq4_463nageZgzH8hMtr_gTMhvMxHfVCSuzVoBCWbgsww@mail.gmail.com>
-Subject: Re: [PATCH 2/2] selftests: ublk: don't take same backing file for
- more than one ublk devices
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250621162842.337452-1-csander@purestorage.com>
 
-On Sun, Jun 22, 2025 at 6:19=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Don't use same backing file for more than one ublk devices, and avoid
-> concurrent write on same file from more ublk disks.
->
-> Fixes: 8ccebc19ee3d ("selftests: ublk: support UBLK_F_AUTO_BUF_REG")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  tools/testing/selftests/ublk/test_stress_03.sh | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testi=
-ng/selftests/ublk/test_stress_03.sh
-> index 6eef282d569f..3ed4c9b2d8c0 100755
-> --- a/tools/testing/selftests/ublk/test_stress_03.sh
-> +++ b/tools/testing/selftests/ublk/test_stress_03.sh
-> @@ -32,22 +32,23 @@ _create_backfile 2 128M
->  ublk_io_and_remove 8G -t null -q 4 -z &
->  ublk_io_and_remove 256M -t loop -q 4 -z "${UBLK_BACKFILES[0]}" &
->  ublk_io_and_remove 256M -t stripe -q 4 -z "${UBLK_BACKFILES[1]}" "${UBLK=
-_BACKFILES[2]}" &
-> +wait
+On Sat, Jun 21, 2025 at 10:28:41AM -0600, Caleb Sander Mateos wrote:
+> When a C++ file compiled with -Wc++11-narrowing includes the UAPI header
+> linux/ublk_cmd.h, ublk_sqe_addr_to_auto_buf_reg()'s assignments of u64
+> values to u8, u16, and u32 fields result in compiler warnings. Add
+> explicit casts to the intended types to avoid these warnings. Drop the
+> unnecessary bitmasks.
+> 
+> Reported-by: Uday Shankar <ushankar@purestorage.com>
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> Fixes: 99c1e4eb6a3f ("ublk: register buffer to local io_uring with provided buf index via UBLK_F_AUTO_BUF_REG")
 
-Why is wait necessary here? It looks like __run_io_and_remove, which
-is called from run_io_and_remove, already ends with a wait. Am I
-missing something?
+Looks good: https://godbolt.org/z/qovrerdhd
 
-Best,
-Caleb
+Reviewed-by: Uday Shankar <ushankar@purestorage.com>
 
->
->  if _have_feature "AUTO_BUF_REG"; then
->         ublk_io_and_remove 8G -t null -q 4 --auto_zc &
->         ublk_io_and_remove 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[=
-0]}" &
->         ublk_io_and_remove 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILE=
-S[1]}" "${UBLK_BACKFILES[2]}" &
->         ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallbac=
-k &
-> +       wait
->  fi
-> -wait
->
->  if _have_feature "PER_IO_DAEMON"; then
->         ublk_io_and_remove 8G -t null -q 4 --auto_zc --nthreads 8 --per_i=
-o_tasks &
->         ublk_io_and_remove 256M -t loop -q 4 --auto_zc --nthreads 8 --per=
-_io_tasks "${UBLK_BACKFILES[0]}" &
->         ublk_io_and_remove 256M -t stripe -q 4 --auto_zc --nthreads 8 --p=
-er_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
->         ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallbac=
-k --nthreads 8 --per_io_tasks &
-> +       wait
->  fi
-> -wait
->
->  _cleanup_test "stress"
->  _show_result $TID $ERR_CODE
-> --
-> 2.47.0
->
