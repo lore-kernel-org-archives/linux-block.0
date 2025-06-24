@@ -1,272 +1,170 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A1A229B38
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 05:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9E1231A55
+	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 05:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750744448; cv=none; b=duruJM6N4Y2jah4DXrmGxPyYqYAsyd7kFPy8lvH7U865ens1QKKGpfQXI9pMSzUiJqTTqE7bW47kGUGONSKRC0Kz4/tdE9gmb386SpNMhXROwVF7tnj8s1F7LjDyGP6AkkiPbD+wAFBycRCNTCsZbtwxbri/irtAOQBWO65UxgY=
+	t=1750744650; cv=none; b=AsoeBb/ivQ/sb3UMqH4HVur9tOf+g1TG0B0AkdnJmjk2s5hWb7lX0g4wt+PX4ez5axq88ruC+H32CDRsJ4LIguEkl395aZgFqRKvZ+kYwhJMb4ZQYDvNKjbPq4ezU67z7yE01xo9R7j7v7HPEG7o/U5OwVwfPbosaTpaPtXHRNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750744448; c=relaxed/simple;
-	bh=wlAB5NDAdD+QkQfIQ9BTPcth0W54hvF1QoH3dhn3NUM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AzLWKB74A5lowzZ/msUZrvF/HyBkys/gfntU5cnrEGdMnCItW2aa6y9rwHR5TopYiki89FI4oDs6G8yxUkWLDwlijN0n5/PzILTOI5vsVug/ibzDfUPPA2CBpq2Wo1CtIe1BkNUCuH8VCAHMuIjna3kO0lf4WZVaR1WJaHwd7sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S+BrGj9B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750744650; c=relaxed/simple;
+	bh=ZCEaHHbvGFmHlhEgMB1oY0uHtx1+FRxydCL277Vh1yk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bgd7Ta1KnXbe2dAzXwUMJBqLZBk1baZZfb7rzvanJcaNDwXqdLX9U7nhvvmLUTAj2aZf1EIUGAJdjrs7UVwThg7dcynWJyi5Ay3gvQbVi06t9ZFpxoF7Jr+vmAXeUSnUWpG8Ce5oSxvmGl9m8FA6b4EPzVlMb1FiO2ZD8htg/Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b43uv2/H; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U0xAvH2c; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yDW7BEbV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hEyMtFRo; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+BrGj9B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750744444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b43uv2/H";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="U0xAvH2c";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yDW7BEbV";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hEyMtFRo"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DB084211AC;
+	Tue, 24 Jun 2025 05:57:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750744646; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ldTJ++NY09AF8FWS17VLHNa6AyTSeOZ6LGzIrEiIzT4=;
-	b=S+BrGj9BGzohVBNBfjV1H5NCbdq3hVIbn9f3fl5BEa5ZXmd6z9dDvEU71wCI6zU2KUgHjX
-	5/6c44lL1rZZ1owOP3fTy4oVRHM2PfR6IknMmKI8arwBMyQXSmC2rEG41eXJNHumo1qPy3
-	irKhSpkSmge93R7jjBigX9/PDWBAqTo=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-ypcDBMl5PHaLgcaDjwYacw-1; Tue, 24 Jun 2025 01:54:02 -0400
-X-MC-Unique: ypcDBMl5PHaLgcaDjwYacw-1
-X-Mimecast-MFC-AGG-ID: ypcDBMl5PHaLgcaDjwYacw_1750744441
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-235e3f93687so77421095ad.2
-        for <linux-block@vger.kernel.org>; Mon, 23 Jun 2025 22:54:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750744440; x=1751349240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ldTJ++NY09AF8FWS17VLHNa6AyTSeOZ6LGzIrEiIzT4=;
-        b=sb50fidwqPHIqFFLKzTuX5XEuM/J3ZLR6e1tOtXhKoCkZ8UB7LrTEdgwlAoj6KqKUv
-         KG3uHFF6tnw3Oy/nV8neahMsp1BCcknpHUmh/34gu3JdJMjvIMPRuuh77d6OTwiG7ckT
-         QjPT2ffitGQL/ygqAEftoMsa3IdtuIW6K6JMctH/6uiaHC/PXWmFaFC7ZtxzUld46CCt
-         bYXdm1qAdsDK+wji01nGBN20aWXHBd4Xg0aEL1CQRgqhl6GTXv2e6BWTkSXwWSXmcrLI
-         q/Fzm9NRJAGav9wmLlJhASFiZK7/T9c8NogA/k7BNS5VKxIIGj6CFER2RCQ436B5qGyU
-         MwzA==
-X-Gm-Message-State: AOJu0Yz+glXRIbbj+Xv9pELjnioSiEXWsZuAODILCvi7YhF31/7UxFLq
-	ZpON8fYprLG3CsSv29iEocM9wWwoOzOtJ50tJO2hx2UCs1nF4ROHM/9Oqa2KrdJ09jwuV3FrSLj
-	96WbTPiHs52lOG55/pG4c9+EtVzIs28QR8Ulk18y3ldb2UU+SsDQvoadskQVlNDDEs7p5iN0UsT
-	Y16IoPAwm5Fa6vKW/RZqFM4L9JExHiOoZGGjTZ3QIS1I8h79ZTUg==
-X-Gm-Gg: ASbGnctcDg+P0kd0O8uqc2IhaYpMB5eC6YC0gBUD5MU26KVckOSK7G105VsJhf+zw74
-	eqLa6siOXNfd2DTTFzLdFpVL1OByfpUmsw3DmBXFzQUIg+OHA17UAIJvvE8owdZsOAlh1UWw7Uy
-	KDrWvE
-X-Received: by 2002:a17:902:f652:b0:235:be0:db53 with SMTP id d9443c01a7336-237d9bf5707mr246655225ad.51.1750744440542;
-        Mon, 23 Jun 2025 22:54:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFcFjni5MgH7eh9xiqRF53hG3zQb1/n2bkMLTONyk80NI8w7PYPpFKKuGKh8LWgpUHhIPF/srIFJzu7LgSvRyk=
-X-Received: by 2002:a17:902:f652:b0:235:be0:db53 with SMTP id
- d9443c01a7336-237d9bf5707mr246654925ad.51.1750744440096; Mon, 23 Jun 2025
- 22:54:00 -0700 (PDT)
+	bh=maxTRfu8agyldfpH8NN8W68ZTiSlasbnmecpZeLiTuc=;
+	b=b43uv2/HFTDU5U6EpLO1KaO/tAd0PGXx8cWvAwJioEIugRvTqwNm+eNu1svO8056zKClh+
+	RHYD80WJLpgB1L6zCzUoD6/aL7VIxmBAqeGrHsak1AzglHrsoTSsqYh0AMf0mMF0LGUmwR
+	4ZleTVQWq3EKoaAVLuwWYYMtSrS0O1A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750744646;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=maxTRfu8agyldfpH8NN8W68ZTiSlasbnmecpZeLiTuc=;
+	b=U0xAvH2cXdAusgaGwCnJYSdDf8q29EG+LRPXvJl/Idm7DdTniGyjH9r2GzDcDQwrmeQscL
+	0X+li8cEKsvwYCDA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=yDW7BEbV;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=hEyMtFRo
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750744645; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=maxTRfu8agyldfpH8NN8W68ZTiSlasbnmecpZeLiTuc=;
+	b=yDW7BEbVYhnsdAklK8dyNF6MYgZ9JAYUcsPfMVowYIISHTvDe57IujR4e0snKTX/uidmSm
+	hjmO+zQiz99vLKo/mmVIwmWa1xeJUGMGPF6H+AdoVKnDoUNWaHX/4rJV/UbmIRabqMV6t3
+	n7WtoosnFEtS90CjSqu0nVsLPCkoNSQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750744645;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=maxTRfu8agyldfpH8NN8W68ZTiSlasbnmecpZeLiTuc=;
+	b=hEyMtFRoe3MZv6Q7gB43VbKGco/8jsAGLbpeaWEWBAZj4c9DF4RroITQb1RbrJkxvKAJaR
+	j0gyTqjFLamPMwAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6CCBD13751;
+	Tue, 24 Jun 2025 05:57:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id g1ZJF0U+WmhbXAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 24 Jun 2025 05:57:25 +0000
+Message-ID: <00e46f70-0976-43be-a8c7-ffe690c5d677@suse.de>
+Date: Tue, 24 Jun 2025 07:57:24 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGVVp+UFKKb4ydw1+zWX9Bre6vt9TUFt9FY2qOx0LMv+8VaVoA@mail.gmail.com>
-In-Reply-To: <CAGVVp+UFKKb4ydw1+zWX9Bre6vt9TUFt9FY2qOx0LMv+8VaVoA@mail.gmail.com>
-From: Changhui Zhong <czhong@redhat.com>
-Date: Tue, 24 Jun 2025 13:53:47 +0800
-X-Gm-Features: Ac12FXymQQrL_cpI5Z0_j62nFEpCTL6e0re7dkIY5CEG-J6ZlIVj0IjSgaorAMM
-Message-ID: <CAGVVp+UMOVUqAyRFBpCUxHxsuxpoTr8w7cOX-QcgwC9GabW9ww@mail.gmail.com>
-Subject: Re: [bug report] WARNING: CPU: 3 PID: 175811 at io_uring/io_uring.c:2921
- io_ring_exit_work+0x155/0x288
-To: Linux Block Devices <linux-block@vger.kernel.org>, io-uring@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] RDMA/srp: don't set a max_segment_size when
+ virt_boundary_mask is set
+To: Christoph Hellwig <hch@lst.de>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ "Ewan D. Milne" <emilne@redhat.com>, Laurence Oberman <loberman@redhat.com>,
+ linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20250623080326.48714-1-hch@lst.de>
+ <20250623080326.48714-2-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250623080326.48714-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,lst.de:email];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: DB084211AC
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.51
 
-On Tue, Jun 24, 2025 at 1:37=E2=80=AFPM Changhui Zhong <czhong@redhat.com> =
-wrote:
->
-> Hello,
->
-> the following warnning info was triggered by ubdsrv  generic/004 tests,
-> please help check and let me know if you need any info/test, thanks.
->
-> repo: https://github.com/torvalds/linux.git
-> branch: master
-> INFO: HEAD of cloned kernel
-> commit 86731a2a651e58953fc949573895f2fa6d456841
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Sun Jun 22 13:30:08 2025 -0700
->
->     Linux 6.16-rc3
->
->
-> reproducer:
-> # echo 0 > /proc/sys/kernel/io_uring_disabled
-> # modprobe ublk_drv
-> # for i in {0..30};do make test T=3Dgeneric; done
->
-> dmesg log:
-> [61128.578684] running generic/004
-> [61133.356428] blk_print_req_error: 525 callbacks suppressed
-> [61133.356435] I/O error, dev ublkb0, sector 230760 op 0x0:(READ)
-> flags 0x0 phys_seg 3 prio class 0
-> [61133.372322] I/O error, dev ublkb0, sector 233744 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
-> [61133.382529] I/O error, dev ublkb0, sector 230384 op 0x0:(READ)
-> flags 0x0 phys_seg 2 prio class 0
-> [61133.392341] I/O error, dev ublkb0, sector 233752 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
-> [61133.402540] I/O error, dev ublkb0, sector 230400 op 0x0:(READ)
-> flags 0x0 phys_seg 6 prio class 0
-> [61133.412354] I/O error, dev ublkb0, sector 233760 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
-> [61133.422556] I/O error, dev ublkb0, sector 230448 op 0x0:(READ)
-> flags 0x0 phys_seg 3 prio class 0
-> [61133.432370] I/O error, dev ublkb0, sector 233768 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 2 prio class 0
-> [61133.442571] I/O error, dev ublkb0, sector 233816 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 2 prio class 0
-> [61133.452773] I/O error, dev ublkb0, sector 230568 op 0x0:(READ)
-> flags 0x0 phys_seg 2 prio class 0
-> [61133.474450] buffer_io_error: 2 callbacks suppressed
-> [61133.474456] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61133.487907] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61133.495823] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61133.503706] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61133.511584] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61133.519459] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61135.776566] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61135.784574] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61135.792489] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61135.800385] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [-- MARK -- Tue Jun 24 05:10:00 2025]
-> [61140.252443] blk_print_req_error: 761 callbacks suppressed
-> [61140.252450] I/O error, dev ublkb0, sector 229072 op 0x0:(READ)
-> flags 0x0 phys_seg 1 prio class 0
-> [61140.268331] I/O error, dev ublkb0, sector 229192 op 0x0:(READ)
-> flags 0x0 phys_seg 2 prio class 0
-> [61140.278151] I/O error, dev ublkb0, sector 228992 op 0x0:(READ)
-> flags 0x0 phys_seg 2 prio class 0
-> [61140.287963] I/O error, dev ublkb0, sector 229344 op 0x0:(READ)
-> flags 0x0 phys_seg 3 prio class 0
-> [61140.297777] I/O error, dev ublkb0, sector 229080 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
-> [61140.307977] I/O error, dev ublkb0, sector 229080 op 0x0:(READ)
-> flags 0x0 phys_seg 1 prio class 0
-> [61140.317793] I/O error, dev ublkb0, sector 229008 op 0x0:(READ)
-> flags 0x0 phys_seg 2 prio class 0
-> [61140.327604] I/O error, dev ublkb0, sector 229208 op 0x0:(READ)
-> flags 0x0 phys_seg 4 prio class 0
-> [61140.337419] I/O error, dev ublkb0, sector 229208 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 6 prio class 0
-> [61140.347636] I/O error, dev ublkb0, sector 229088 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
-> [61140.368546] buffer_io_error: 8 callbacks suppressed
-> [61140.368550] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61140.381994] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61140.389904] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61140.397794] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61140.405676] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [61140.413552] Buffer I/O error on dev ublkb0, logical block 0, async pag=
-e read
-> [-- MARK -- Tue Jun 24 05:15:00 2025]
-> [61449.365065] ------------[ cut here ]------------
-> [61449.370245] WARNING: CPU: 3 PID: 175811 at io_uring/io_uring.c:2921
-> io_ring_exit_work+0x155/0x288
-> [61449.380178] Modules linked in: ublk_drv rpcsec_gss_krb5 auth_rpcgss
-> nfsv4 dns_resolver nfs lockd grace nfs_localio netfs sunrpc rfkill
-> intel_rapl_msr intel_rapl_common intel_uncore_frequency
-> intel_uncore_frequency_common i10nm_edac skx_edac_common nfit
-> libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm
-> irqbypass dax_hmem rapl cxl_acpi cxl_port intel_cstate ipmi_ssif
-> cdc_ether iTCO_wdt cxl_core iTCO_vendor_support usbnet mgag200 mii
-> intel_uncore tg3 ioatdma einj i2c_i801 pcspkr intel_th_gth
-> isst_if_mbox_pci mei_me isst_if_mmio i2c_algo_bit acpi_power_meter
-> intel_th_pci mei i2c_smbus isst_if_common intel_vsec intel_th
-> intel_pch_thermal dca ipmi_si acpi_ipmi ipmi_devintf ipmi_msghandler
-> acpi_pad sg fuse loop dm_multipath nfnetlink xfs sd_mod ahci libahci
-> libata ghash_clmulni_intel wmi dm_mirror dm_region_hash dm_log dm_mod
-> [last unloaded: ublk_drv]
-> [61449.465875] CPU: 3 UID: 0 PID: 175811 Comm: kworker/u96:2 Tainted:
-> G S                  6.16.0-rc3 #1 PREEMPT(voluntary)
-> [61449.478116] Tainted: [S]=3DCPU_OUT_OF_SPEC
-> [61449.482501] Hardware name: Lenovo ThinkSystem SR650 V2/7Z73CTO1WW,
-> BIOS AFE118M-1.32 06/29/2022
-> [61449.492218] Workqueue: iou_exit io_ring_exit_work
-> [61449.497476] RIP: 0010:io_ring_exit_work+0x155/0x288
-> [61449.502929] Code: e8 00 76 6f 00 4c 89 f7 e8 68 d2 6e 00 4c 89 e7
-> e8 a0 e9 ff ff 31 c9 48 89 4c 24 10 48 8b 05 a2 0e 9e 01 48 39 44 24
-> 08 79 08 <0f> 0b 41 bd 60 ea 00 00 48 8d 7b 30 4c 89 ee e8 b7 d1 e4 00
-> 48 85
-> [61449.523892] RSP: 0018:ff8b5fc9cd4b3db0 EFLAGS: 00010297
-> [61449.529732] RAX: 0000000103a50f19 RBX: ff43740b38f6f410 RCX: 000000000=
-0000000
-> [61449.537702] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff43740b3=
-8f6f040
-> [61449.545673] RBP: ff8b5fc9cd4b3e40 R08: ff43740a80400790 R09: ffffffffa=
-42588e0
-> [61449.553645] R10: 0000000000000000 R11: 0000000000000000 R12: ff43740b3=
-8f6f000
-> [61449.561615] R13: 0000000000000032 R14: 0000000000000000 R15: ff43740b3=
-8f6f040
-> [61449.569588] FS:  0000000000000000(0000) GS:ff43740e0a985000(0000)
-> knlGS:0000000000000000
-> [61449.578627] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [61449.585045] CR2: 00007fbc9c500790 CR3: 00000002ce024002 CR4: 000000000=
-0773ef0
-> [61449.593017] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-> [61449.600993] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
-0000400
-> [61449.608964] PKRU: 55555554
-> [61449.611989] Call Trace:
-> [61449.614724]  <TASK>
-> [61449.617070]  process_one_work+0x188/0x340
-> [61449.621556]  worker_thread+0x257/0x3a0
-> [61449.625747]  ? __pfx_worker_thread+0x10/0x10
-> [61449.630519]  kthread+0xfc/0x240
-> [61449.634031]  ? __pfx_kthread+0x10/0x10
-> [61449.638221]  ? __pfx_kthread+0x10/0x10
-> [61449.642412]  ret_from_fork+0xed/0x110
-> [61449.646507]  ? __pfx_kthread+0x10/0x10
-> [61449.650696]  ret_from_fork_asm+0x1a/0x30
-> [61449.655084]  </TASK>
-> [61449.657526] ---[ end trace 0000000000000000 ]---
-> [61730.255363] running generic/005
-> [61732.466565] blk_print_req_error: 397 callbacks suppressed
-> [61732.466573] I/O error, dev ublkb1, sector 2094968 op 0x1:(WRITE)
-> flags 0x8800 phys_seg 1 prio class 0
->
->
-> Best Regards,
-> Changhui
+On 6/23/25 10:02, Christoph Hellwig wrote:
+> virt_boundary_mask implies an unlimited max_segment_size.  Setting both
+> can lead to data corruption, and we're going to check for this in the
+> SCSI midlayer soon.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/infiniband/ulp/srp/ib_srp.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/infiniband/ulp/srp/ib_srp.c b/drivers/infiniband/ulp/srp/ib_srp.c
+> index 1378651735f6..23ed2fc688f0 100644
+> --- a/drivers/infiniband/ulp/srp/ib_srp.c
+> +++ b/drivers/infiniband/ulp/srp/ib_srp.c
+> @@ -3705,9 +3705,10 @@ static ssize_t add_target_store(struct device *dev,
+>   	target_host->max_id      = 1;
+>   	target_host->max_lun     = -1LL;
+>   	target_host->max_cmd_len = sizeof ((struct srp_cmd *) (void *) 0L)->cdb;
+> -	target_host->max_segment_size = ib_dma_max_seg_size(ibdev);
+>   
+> -	if (!(ibdev->attrs.kernel_cap_flags & IBK_SG_GAPS_REG))
+> +	if (ibdev->attrs.kernel_cap_flags & IBK_SG_GAPS_REG)
+> +		target_host->max_segment_size = ib_dma_max_seg_size(ibdev);
+> +	else
+>   		target_host->virt_boundary_mask = ~srp_dev->mr_page_mask;
+>   
+>   	target = host_to_target(target_host);
 
-looks this is a timeout warning, the io_ring's exit worker process
-execution time exceeds the expected timeout threshold
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-(gdb) l *(io_ring_exit_work+0x155)
-0xffffffff81228b25 is in io_ring_exit_work (io_uring/io_uring.c:2921).
-2916                            io_sq_thread_unpark(sqd);
-2917                    }
-2918
-2919                    io_req_caches_free(ctx);
-2920
-2921                    if (WARN_ON_ONCE(time_after(jiffies, timeout))) {
-2922                            /* there is little hope left, don't
-run it too often */
-2923                            interval =3D HZ * 60;
-2924                    }
-2925                    /*
-(gdb)
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
