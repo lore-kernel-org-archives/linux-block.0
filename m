@@ -1,317 +1,218 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C694291C34
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 13:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750771056; cv=none; b=BLWVdwPgLcArEhMzPNTorjGWoI6EGhKWVhL2Kf/tatbugsevWxjZvsgV714vr2OcQiUUQ4j2QGNkRkjXeetm77bgEnJcnMAyYoy7ZiQ3o+8AakgH4yWpVWGPKInMo0pRikd38y8JEDymZ8ZzpSAOjlaAT8wCFxJqFnl4wZuhihE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750771056; c=relaxed/simple;
-	bh=LYM+ZzYIi7Vo+GN3pS7piNFIgfmyQhMORbD/zUvcj5M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IN70PJcMnUyZki0PQC0KKuH0tBnWUP/1bzGNuflG0nnJV64yJcBlKo/UpDviNamyoQx9CzPr0JGIv/h3m1d3m8VWd4y9CVRmyW/CK+k1Cw5JRztwG+rBbhDp84eSaXJKqF0kCSealN2sHc9YIKDRJ6cmDej5YhpfYwlxL9fn2m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ipJ6iE01; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D702C08A5;
+	Tue, 24 Jun 2025 13:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750771565; cv=fail; b=kp3USTkvZEpPQ81ifYfPaXx8f9Fbg+0OaECKJaPQwktIwI0POK+mcRVjeu8z+F/TQbXitjDU5SJhYQz+yF0LA1/W9BvKqjeNNe6LnZvV5t5MatJE5BKDas6oPmNg/lmqLC4fiaqF9tF94emydn0jte9+QZJvowZHszNJ+u66w+Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750771565; c=relaxed/simple;
+	bh=lrgOBvUC0X/MoLIP3dr3b+wwZ3QVWGFKg15Dm0rhGAU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HhSh0C3gzQoZsN4HZzOOEJfTU4GQOkroa3mjBo7pqdgVo0Hi2S9G2D/vS1I7OcISPx9qsRfD78Hkx9ySp0UIyHAhElKYZ+8OomVzcqsqPIeN3EPq9WRVNtRX3ZDn3665ad21UyNA0qx1LyGJHy09AVub9JbRyZO7uhCHtWInhI8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=koYkmVbw; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=dQDvarBN; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ipJ6iE01"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OD4A7K002256;
-	Tue, 24 Jun 2025 13:17:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=rJbtq9ZND0KSFv/B+
-	W7QBl8myoe9JYO4GrFVkfoftSw=; b=ipJ6iE01QjDRlu3xFKfWUd+42vMiHW1n3
-	O4gIfh8GeI6VjeHHTvb5tCpUuZnKFTC2Ro0P+prMbSRAu1JXr1WayMsFnUvFYE65
-	/AavU9qV010vVvWIRsmDazNo3/JPyN2YVDsG+YOF94zzRaf9PwsrYd4YFw//GS85
-	4uKF13VvT6zJUVq/Ek80faUyjxIm6zBzUaiPdBFRYu18DdHoetUBbTg289MqIgQ9
-	48NcJQ1DIzAGNL+/5qbWrlDTEbTKxausD/ls9HUOi5euY/pal4mfXkDKsP3lN6T7
-	wZUuwgXuL0ak334pPD2Isgs+MwKxVd2PdUKcuwc1L69+0JCyPd4Uw==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dm8j8uxy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Jun 2025 13:17:27 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55OAeeXg002471;
-	Tue, 24 Jun 2025 13:17:26 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e8jm4128-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Jun 2025 13:17:26 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55ODHOql28574254
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Jun 2025 13:17:24 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 12A5220043;
-	Tue, 24 Jun 2025 13:17:24 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A31F520040;
-	Tue, 24 Jun 2025 13:17:22 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.209])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Jun 2025 13:17:22 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk, sth@linux.ibm.com,
-        gjoyce@ibm.com
-Subject: [PATCHv4 3/3] block: fix potential deadlock while running nr_hw_queue update
-Date: Tue, 24 Jun 2025 18:47:05 +0530
-Message-ID: <20250624131716.630465-4-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250624131716.630465-1-nilay@linux.ibm.com>
-References: <20250624131716.630465-1-nilay@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="koYkmVbw";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="dQDvarBN"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OCiHgA006386;
+	Tue, 24 Jun 2025 13:25:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=gUbzMeedX8vwWGoM7K7GQis8uWtgoJChE+QvNQP1Icw=; b=
+	koYkmVbwJMN7icykNLxtwJ1gx4ptYhsw4S7WEXbUz+ILn7MDx7VFLM2qWs9mO49i
+	GG/QB8Ig2H26RHPAcFBVlpPIZARv12O/9z47ZKkBD+qV212v2OQrBXJf4b7BEXOU
+	alcYYJh6HEH+IWA44mCRGArjPW+7UPZ7mmAuZFQ0ZaLi0w1lsbS0ZLgnnbGH+a2V
+	Ono+51EJnqmJ9LGIHIBPxSmSr/+x9pePKQQwopy05dWm2i4dVXeEl5+2Mxee7EJl
+	SHDuOvppwEqjS2chRixIiINXpI8DHfP1+mmOa2DdfkC5C1KxgeWKow9oTPf0Posa
+	lD9daRUkxDd/sniFRHn6dw==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47ds8mw24q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Jun 2025 13:25:39 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55OCqr1D029046;
+	Tue, 24 Jun 2025 13:25:38 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11on2063.outbound.protection.outlook.com [40.107.220.63])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47ehpq4uxb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Jun 2025 13:25:38 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eMilWaUog3fhA174tn/sKGkGMdSBPc4LsWiLIkXLChhns7NEFFFQ9BUjcknkjkikHvYwIWPvX53YmEM8TUhjXJbg5ys6LUZ05K95yw2k9BFwR+gALzBnlfUWT/0+ZrOwq1hCeN+xa5wHNyldaELilmaeKs/vUOo7qt0okFJRxhgo8mobTPDv3z5ZvsSFjW4PC2ggVuEY8+eohyKBup2k/Sk25kRefBtZ3fl/kXNFt7HyFQJBQ76pEL2cx+Exlh6viuInMNvasg0CV9axjSBpfdl/kF/hxPxDdEymPEx6+uLO1S5V43rQn/EbyUgZ5js0qhVOgbeV/KGCep9vGmz6DA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gUbzMeedX8vwWGoM7K7GQis8uWtgoJChE+QvNQP1Icw=;
+ b=PSTwNNQg6AGny+pwP3Af6DTu2VuF6rFrsqdlCiSU/UIWQ+kZPavx5NHRzNbuIleZs0hPTXI+eHx0KlB7J4JF5lcmZqHKEEM8oHvRD4He++rQdBz0nUq1PAmUARuxwfd8zPvY8q7L7paxwyuln0eThuoHcsxr/TYcpEKpVU/LKS5WooeWzR5uG2F8IvlzVuonICU0N1qhEgmrpobgwXJwEWtEC63XIUzIYPTWyo3cXJohqazUOcM+0CjsJNl1z2sZW4SdPYHC5i30L7sWCfzGZkd7UcxBpcBR9p+xaOe8iw1xwEyW9hikizTTxAso1i05P7ZpXdYH5335NvO65QxGvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gUbzMeedX8vwWGoM7K7GQis8uWtgoJChE+QvNQP1Icw=;
+ b=dQDvarBNDcQyMkD1XnA3hmQc5iR7inUwUHlvaBsO8FaB4vPU+mECL1HTPcY+4SAZsdehNAztThhhqP3ucEpJnYpCQTp8HgN5gQJobhYAyJedw3A/NYntTcMYULSkMOtoR7SRfgAqEcOsHnlD0KVFAOfrUnYsMkSoWtLZ2wc9hgQ=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by IA0PR10MB7207.namprd10.prod.outlook.com (2603:10b6:208:408::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Tue, 24 Jun
+ 2025 13:25:35 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%7]) with mapi id 15.20.8857.022; Tue, 24 Jun 2025
+ 13:25:34 +0000
+Message-ID: <2abd3273-2b23-43f7-955f-144da4ed29a4@oracle.com>
+Date: Tue, 24 Jun 2025 14:25:23 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] RDMA/srp: don't set a max_segment_size when
+ virt_boundary_mask is set
+To: Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+        "Ewan D. Milne" <emilne@redhat.com>,
+        Laurence Oberman <loberman@redhat.com>, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+References: <20250624125233.219635-1-hch@lst.de>
+ <20250624125233.219635-2-hch@lst.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20250624125233.219635-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR03CA0102.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::30) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDExMiBTYWx0ZWRfXylskjvy73zQZ DZMEQ74kPtabGdhQ4R2m6blhVXqlpyRzJSEAkxIdQAqsEFX1IaIvYno7pp0po7HfIX2IePhW8tY WsOJ5aY/+HXn9/8zS69Ck1Nr/5XMaInFu00XZI8Eziyr6H716E4hjuseaYK5jZVeb+HycHsrx/0
- n4HXJ2zwDk0Ur1igq1DYI3epMoY/6Nf2FRbt73sXbOBVzVtlEUzFQ9RqivT92NmH9Nh4UtS39Nm u7YRhIWfGgZPTAA9nlovd3TJbcud8vmd0kmj0G6NDuFfkAH+xDMIu5uIAuzDZmEK6Wq3wWp2Mcy CjdakPi2nMf/V2Bbr36WVIKRNqesAYAj2bTb9M3SX4BJloG6pCRKGbX3E8kS+U/IkpgtH/iUh9j
- pLes6PiXlPrQVQjHG+fvTkoALFWa9irGz/D0QYd3EFzOJxrfZymjY0uGhC9WrjlwlAvAcNrC
-X-Proofpoint-GUID: lpnOAUWhF4NOYfxMqbYr_27gr5BjL-LE
-X-Proofpoint-ORIG-GUID: lpnOAUWhF4NOYfxMqbYr_27gr5BjL-LE
-X-Authority-Analysis: v=2.4 cv=combk04i c=1 sm=1 tr=0 ts=685aa567 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=Tz36AgOCWGy_ESXodBQA:9
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|IA0PR10MB7207:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd63ef72-0d2e-48db-0933-08ddb322993e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?dlJNcklYVDJhY1doV0ZHNlpJMWIzV0hEZEZRaHBNYWJTWS9SU042VFhnNnlJ?=
+ =?utf-8?B?TXZWdUlqVHhvQUJENk1WQStnQ01ZUHU3YkZDbUtxWTAxSzJpVE5PVUR6aG1P?=
+ =?utf-8?B?djZKcDVHNVEwZG9pUjFFQzlUdjV3RXlqNGZNQjlHbGVCMWo0N2xLZnJGQWFF?=
+ =?utf-8?B?ZDhCV0tybFdYQ2tpQ0pob2szV04vNXpWUE1IOXRnOFN4OWlQNDR3UDhsSXlT?=
+ =?utf-8?B?dXd0cXNPTHdKb2FMeU9Ib2dmTXc5SkJoRGYvUU5KYjBSZ1oyd0s2dktxWWtM?=
+ =?utf-8?B?ajRaejNxdGZXNEtROTZTdE1BZTQ2TGxqYU5iNWFLeDYrdXdEbnpEVDFMdmJO?=
+ =?utf-8?B?YUpRQVc5bmZxYTVHL0l2a2hjeWxIeFVCL3JDcURZT2JJODlDT215aFFYSHdz?=
+ =?utf-8?B?NXdHcjVRVUtsbmNTSnl2WmVmKytma1NEYnVJeXd0cjRPSkwyb3pWdlh1NWxv?=
+ =?utf-8?B?QWNYTDh4ZzRvNms1ZWUwdCt5Q3BraUJRcW16T1NOdnBCZE1YRVQ0aUVsTTV6?=
+ =?utf-8?B?bmxaMmlHcFk2WklqVUFKZ2xad0RocnYwM2ZyMFdtK2dTN3F2M3hMaCsyNnh0?=
+ =?utf-8?B?Y0RFTURQZXBjVW94RDdIUENNbGNQbEx1b2k3Y29RdVNwem1SZGlqLzJsclNu?=
+ =?utf-8?B?L0Fnd3BtMUE0S3JXOEdDeERpUVJWbFAxd0NjMk52MnQyNlJVMTJxeS9LSU9a?=
+ =?utf-8?B?QTYrUG1WOFluaWkwQXBmWE5RcUNlM3lJekJHVmNkZjAyK255eHZIT1BsRnc5?=
+ =?utf-8?B?ZDQvc1FselowMmx6cDB5R0tBWDRTQmtRU3FEMWNRK0dkVGVRRzZKYmc1SmFM?=
+ =?utf-8?B?ZXN2U1IwY1ZJRktsUmM0eU5aOWxzVTVQUkJsZ2JVNjg1Q1VyaTZxamMvaXpa?=
+ =?utf-8?B?cERhOGYremp0M1ZGNnVPU2EyMFUzbDAweVVRcmo5MW04VnBwc2Rhb2hWUXgw?=
+ =?utf-8?B?RGV6bWV6VWVRcnlGNERRUE5tY1RLVUxSd3l1d25qOHEwY0hkTW8rcTZlY0Ji?=
+ =?utf-8?B?YXozUWZjMys0a08rUHNRT1lzTG1PUWsvWm93czJTNVRndnp1eVlKbTRPaHBI?=
+ =?utf-8?B?UzJxYlBPU1JyQVZ4RzA4SlZvcGU5UDBUb0ZDcktpMythQmVrUHZzYXk0WCtK?=
+ =?utf-8?B?SG5CeG0ybjN1aS9Ed2ZBRVpXNVdxbnQvUkFwTHdGMmlMZ3RSaUQ1NVVLWkdl?=
+ =?utf-8?B?ME1pSWZPbkpYNE5uZmloa2hnQzhFMUVNcXBrakpCVUx0ZlpXWURRVFRjbElI?=
+ =?utf-8?B?ZXIrTFRyNkVYVjRJSVB0ZU12TFBQengyTlZWeU1CTWpKTWlxanBKWU81OHg3?=
+ =?utf-8?B?VjB1UXc1QWIwN2JaNHNEMEFtSCtoQnorOVZ3NTRnSDRVN0xobis5UXJDMEhJ?=
+ =?utf-8?B?ajE5VjdwRVF0cVZ5RFg0TVZySjJlcHp4TDdkNEdXbjl5WlRHM3JBdUlwYmtt?=
+ =?utf-8?B?b1NZOVFiamd1TngremhWM1J2SUliWExwa0hoMVVGTS9pTEFuenZhVEMxOW9E?=
+ =?utf-8?B?R1g1QnpoY1RvQThJMXY3azUvdldJRHVLSnRmcVhhaEdlVkQwL3E4UWNidW9h?=
+ =?utf-8?B?R21Mckt4TlVqNVV4cW1jVXkzUzB4TjFwOEZBL2UxWjE2QStmY2o4Q2NKNWlB?=
+ =?utf-8?B?NU5KUWcvZzVVQ3VxYmtXUlVQVERyYlZIS2sxVGx6SS96RSt4ZHI2Z1VLcHIy?=
+ =?utf-8?B?MXk3ZzhCbldQSFgrUmFXL0hPczY4SzB2QUZvVmdiM1M4QnBFcnlWeTJYVjNx?=
+ =?utf-8?B?djNjNlpiTVBRMDA5M0xsM09PeDFIOFVaVklDQVptbFFzVzZuMWJlejQ5bzNw?=
+ =?utf-8?B?MjcrdnZvQlNNdWxNZXM4dTUxTHVObFJ4T0JXL2Z5QUxRTlMxSlMydlZyWDFW?=
+ =?utf-8?B?djZITTZVcEJjVVVjWHJGZzlYdzFLYnZwYmJFVzhtbzJucjJOdFgrQUQvRER3?=
+ =?utf-8?Q?dVr2A7X4gOg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aGp1RlE2U3JjWVhFbGVYM09KVGJscVlKNmlvdksrZk83NlAxbVcxM3A4RFZY?=
+ =?utf-8?B?NUVsVEJ6dFhRd1RVNHhtYTF3cXFpamVIN3h3K3BHSGNEQm5GOFJhNmsyN2tM?=
+ =?utf-8?B?WUxnaHFyRmlmTnF0VGpKcTBRQXBPMjJkVFZzbGJpdWpIT282TW1pVHRuaWpi?=
+ =?utf-8?B?bnljcTh6bnlWNnlYRkVtbEEzblVNeUdFZVp1c01OclpZZU9vVEUwaVFOQy96?=
+ =?utf-8?B?clZlaUhnd01mMm5KSFlEMVkyVjdaU3RGVnhRVVloTjVBam1ENjZoaTU1dW9h?=
+ =?utf-8?B?cVliQ1dwZXNtUjhHbkk2K2pESHQ2VEQ0ZWMwRWxLOGZyWmdxOXJUeW9ZTkQz?=
+ =?utf-8?B?bUUzOEpsZDNBOUtDcDRoY013QmRhc0VQK05QSkEzOUw5N0ZWZjY0dTZtdC9R?=
+ =?utf-8?B?SkdpcnJQZ0dZSFk1S29BNjgxRXhHV0xPNnJxQ2J4ZldXRCt6aGVBMkMzRjg2?=
+ =?utf-8?B?SFZtZ2F2ckVDQ0ZDQSs1c2FqS2ZZVEhqUTNQVnBJOVlhTEp3bFNsS3NCSGxV?=
+ =?utf-8?B?UC9Tak1BeUYrbG9KdythQkZSUTRRUGkvZ2l1Vllzc0JPYjQ2U3lsUTI2bE54?=
+ =?utf-8?B?Uzd2cVZHYWo3bHNqVHUxeVR3VGlnUWZaQmNaS1NtcUk5UnpaeTRMaTJoUmxM?=
+ =?utf-8?B?L1lXblpDelVsTlUwM3VwNWZ1azV3eDZIS1k1Ym91ZWpOYVlYTG5xYTkzejd5?=
+ =?utf-8?B?WUtQYlJBTThRYUFKUmFZVC85L0pEUnl6YmNVM2NrQnFTc25EY1I3UmJGbFR6?=
+ =?utf-8?B?N3Jzd05qcGxQZzhKd1RuN2FoS1pRUWIwR3FXWUJ0b04wZTdSUkZsbjFGZUll?=
+ =?utf-8?B?dk1rNkRGa3BzRWM4S0h5bjdSNmtnbUNZYVV4WUVRczk1SmlaNDZuOGVBUy9L?=
+ =?utf-8?B?ZVhWb1BPM0tZVXBxeUc0SWUvSHBWM3I4TWZsV2JGTUdpOGJDMmkrLzNZeXFI?=
+ =?utf-8?B?V0RLcE9tdlZaS0dTMjZGNWFiUjRCVkdYbStRMUhWcTcxeFFwNVJkUDZiQjRj?=
+ =?utf-8?B?VkZQV2ZrUFdMcStJd2Y3YitJT1ljRDlMdWpUSDk1UlRYV1Nod3Fra0dRWk00?=
+ =?utf-8?B?engwV1BBMTJEVWd4NUtWZEw4aHdGSmt3STU5S1RKMlgyQTk3V3ZzYWoyK0Nj?=
+ =?utf-8?B?THNQMUlvQnJod0I1dldHYWFlaTRKQ1oyZkpLN2pLR3FJbStiY2pCRmZQdDN6?=
+ =?utf-8?B?QmFmcng4UUdld05BZEdZQTNHUmtjMDRtN3VrUUE1RGprZ0czdW9mNzhXelRT?=
+ =?utf-8?B?WExkOTVrcGpVN1Q2cG4yWjZxVHhBclU5STJjcnQwc3BJb2wyWFhndDg5VlRH?=
+ =?utf-8?B?UmxFNERHb0ZoVUMrNTRPQWc3NDJhK0kyaUZVQmJjUElTZHQ1WEsvOGJhblFt?=
+ =?utf-8?B?ZCtsVDJoWXMzK0Z5UE1zR2dlbGpIM1ZjQXREMThYWk1manh2NDJNelJscEIz?=
+ =?utf-8?B?Rm8xZVhrZm0wUmVkSUVIV1BjSW9tbFE2WHhkY0ExMmppaUM2SHRsbHY0RVlw?=
+ =?utf-8?B?T3h0SWo3NmZnQklCTjdhdkNxeGRnNEdtMVJxY0xRKzB0SGFTeHJ5ejVYZDJS?=
+ =?utf-8?B?V1lxMEtwanROTzFWQzJBQTBCL1J1b3NJb3Zmb3YvcG5xQ2RINDJGNFllY3ZS?=
+ =?utf-8?B?YnRLbldoNzVSdExTMmJXTitwaXEyTU5reVJRSFBXT3RaaE1GbHo4TVpsK0Jj?=
+ =?utf-8?B?WlVXdThyb29WRlY1MDFLbGhjNVIwM2FaWnNIeWdic29WNjlnV3IvTVg1TXVm?=
+ =?utf-8?B?TUZhOCtsTWg1dHdrMHd2T2RkYzVTWERQQ0tmU01MS0dHMFEvMXQ5cFFRZ2lx?=
+ =?utf-8?B?czR5QmYyZ3UzTEhSN0FreFlFT3dZZWRiWnZUZzJRNEo2Q1FOU284OGpIc29Y?=
+ =?utf-8?B?NmFycHdMbk9EVkhVL2tvTXZZUHhWcFFObTRhTjFVZUtlaktESVplRDBYcjBX?=
+ =?utf-8?B?dnlCaXFrZnhzanJZUlIrUEIvVTJndFNva3Q5aUVLdXd3a1FFL3lYWkM5L2ZK?=
+ =?utf-8?B?SDEweWVXODFSZXVod2tOUlJlTUp0a3ViVkRIcTVYSjFKWXRqMUpOL0xVWjV0?=
+ =?utf-8?B?dXhpd29pOXQ5aEJUL0JaNjIrQWh6YWtYNytBb0l3Vm9VbG1lTHBwQzFHc1A5?=
+ =?utf-8?Q?lPvml3Ga9Sz0AbBSWAcNRAzPa?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	RQpVY6TA2nSb6GCZ1ZlDyzFkYK1DCKszQBKW1ibdK9Xn5IR/KwJirodntro+cnHjQoUz6YP8wkg+wNr19b0zrOfYlF36q3QA5z8q++k7VPX9XYCrdirl4poWzsX0NDuijZnESn9mDF362ToopXiR5yhl8AEOUXcc41bEi/fYD9wM6cIOwy7iRC8I6P/5o9MzxI8/g3kJseSEQgmUBLxJ8Pit0Tur1HeseoB04yAY2wmJk9q9oo0X4TYd/AB40Kbu00ZQocqmHRCqhpeK+37YGOaDcWiMkWT83nyXTG9538QPe8wcOyGDKdeB9i6xOtVz6y2XWitcaWBzybNQqYmzPWwpgpmRImyPsdKwo0n8s3tjvKkVBOEWoABSq2rdZbECSd4Kd5bcnggUedwMRnTHEsRtk8RtxRIq3/wNuGVV/FQ9bWD2L6fX+nlJSn5OZ+3L8jQOmBCuvrOWvENP6sn4X0CMJIpfclrlWqz5hKtnVS3RlWcaoiGTbCfMHFcCL3hAEwBixbzyL0+X7aHV+tSvbk1eAjSRTiqjN+/dj20Wzuc+7nd19V6fTo4InrPfaDTwv3Gnkw89PqTEuX0LqivhA7OR1Vi4OhZ2ktXL4AQjmwA=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd63ef72-0d2e-48db-0933-08ddb322993e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 13:25:34.3447
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fRzTKXsVluX0cKywnwsHAnk5xbInCPDtMpoUgDxEkMBNeEg4sQCOhC0wqGFYRvrCJm8WnVD64SD4Q32yb5SmxA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7207
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-06-24_05,2025-06-23_07,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=999 clxscore=1015
- impostorscore=0 suspectscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506240112
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506240113
+X-Authority-Analysis: v=2.4 cv=IcWHWXqa c=1 sm=1 tr=0 ts=685aa753 cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8 a=7ZIXepkyh-VqiltsLZkA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: 0aMYN0tb4Vvr-xtCJz5TZEBhUWsa70dL
+X-Proofpoint-GUID: 0aMYN0tb4Vvr-xtCJz5TZEBhUWsa70dL
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDExMiBTYWx0ZWRfX4H6icbRQqsmI FCeafc3LntQyZyp1SmKySh8mmpFp3cU3aRXnvQJKf1zbGkAY5lnQQCXwNPAqpYUEyytCyv+vB/m 62s8eKJhwoM0A782Ju6rX37eyzj7zKymoiFy95sRcZ5QR8HRM5FslAC2m9yotw4KINub8Je9eny
+ GjDnhhLrz69WgRR7Ka8k4eoJqc7DPAuKjClI9Guu6gPsW2y8K1jr0HpqXvSAhjs3a+eM88jRQYV R/ETqE0qZAjUe9BVKQzNe33yO+6z6aR9r2Q6xEILWWkzmWBVfr7jLOxbX21k23vwK3nps5VGXlq xaU3IL7ItWi20fwzmsNqiBAl651es7gwaM65Y7mk/fXeZFpjHe1rzzB01zobCW93eAjp2AdTRxz
+ RtKEfT4y9GYephBlSNFnApDEbkcOn9IoH/4wrbSYV6Qll2Vzrz7X5SzEVtOOULlGRkZHgSOo
 
-Move scheduler tags (sched_tags) allocation and deallocation outside
-both the ->elevator_lock and ->freeze_lock when updating nr_hw_queues.
-This change breaks the dependency chain from the percpu allocator lock
-to the elevator lock, helping to prevent potential deadlocks, as
-observed in the reported lockdep splat[1].
+On 24/06/2025 13:52, Christoph Hellwig wrote:
+> virt_boundary_mask implies an unlimited max_segment_size.  Setting both
+> can lead to data corruption because __blk_rq_map_sg() can split requests
+> so that the virt_boundary_mask is not respected if max_segment_size is
+> not UINT_MAX.
+> 
+> Signed-off-by: Christoph Hellwig<hch@lst.de>
+> Reviewed-by: Hannes Reinecke<hare@suse.de>
 
-This commit introduces batch allocation and deallocation helpers for
-sched_tags, which are now used from within __blk_mq_update_nr_hw_queues
-routine while iterating through the tagset.
-
-With this change, all sched_tags memory management is handled entirely
-outside the ->elevator_lock and the ->freeze_lock context, thereby
-eliminating the lock dependency that could otherwise manifest during
-nr_hw_queues updates.
-
-[1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
-
-Reported-by: Stefan Haberland <sth@linux.ibm.com>
-Closes: https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
- block/blk-mq-sched.c | 51 ++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-sched.h |  5 +++++
- block/blk-mq.c       | 12 ++++++++++-
- block/blk.h          |  3 ++-
- block/elevator.c     | 23 ++------------------
- 5 files changed, 71 insertions(+), 23 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 5d3132ac7777..acdc03718ebd 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -508,6 +508,57 @@ int blk_mq_alloc_sched_tags(struct elevator_tags *et,
- 	return -ENOMEM;
- }
- 
-+int blk_mq_alloc_sched_tags_batch(struct elevator_tags *et,
-+		struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	lockdep_assert_held_write(&set->update_nr_hwq_lock);
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		/*
-+		 * Accessing q->elevator without holding q->elevator_lock is
-+		 * safe because we're holding here set->update_nr_hwq_lock in
-+		 * the writer context. So, scheduler update/switch code (which
-+		 * acquires the same lock but in the reader context) can't run
-+		 * concurrently.
-+		 */
-+		if (q->elevator) {
-+			if (blk_mq_alloc_sched_tags(et, set, q->id))
-+				goto out_unwind;
-+		}
-+	}
-+	return 0;
-+
-+out_unwind:
-+	list_for_each_entry_continue_reverse(q, &set->tag_list, tag_set_list) {
-+		if (q->elevator)
-+			blk_mq_free_sched_tags(et, set, q->id);
-+	}
-+
-+	return -ENOMEM;
-+}
-+
-+void blk_mq_free_sched_tags_batch(struct elevator_tags *et,
-+		struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	lockdep_assert_held_write(&set->update_nr_hwq_lock);
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		/*
-+		 * Accessing q->elevator without holding q->elevator_lock is
-+		 * safe because we're holding here set->update_nr_hwq_lock in
-+		 * the writer context. So, scheduler update/switch code (which
-+		 * acquires the same lock but in the reader context) can't run
-+		 * concurrently.
-+		 */
-+		if (q->elevator)
-+			blk_mq_free_sched_tags(et, set, q->id);
-+	}
-+}
-+
- /* caller must have a reference to @e, will grab another one if successful */
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
- 		struct elevator_tags *et)
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 92aa50b8376a..4b3bf8946ae2 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -29,6 +29,11 @@ struct blk_mq_tags **__blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
- void __blk_mq_free_sched_tags(struct blk_mq_tag_set *set,
- 		struct blk_mq_tags **tags, unsigned int nr_hw_queues);
- 
-+int blk_mq_alloc_sched_tags_batch(struct elevator_tags *et,
-+		struct blk_mq_tag_set *set);
-+void blk_mq_free_sched_tags_batch(struct elevator_tags *et,
-+		struct blk_mq_tag_set *set);
-+
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
- 		struct elevator_tags *et);
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4806b867e37d..a06f184f1d9a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4970,6 +4970,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 							int nr_hw_queues)
- {
- 	struct request_queue *q;
-+	struct elevator_tags et;
- 	int prev_nr_hw_queues = set->nr_hw_queues;
- 	unsigned int memflags;
- 	int i;
-@@ -4984,6 +4985,12 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		return;
- 
- 	memflags = memalloc_noio_save();
-+
-+	et.nr_hw_queues = nr_hw_queues;
-+	xa_init(&et.tags_table);
-+	if (blk_mq_alloc_sched_tags_batch(&et, set) < 0)
-+		goto memalloc_restore;
-+
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_debugfs_unregister_hctxs(q);
- 		blk_mq_sysfs_unregister_hctxs(q);
-@@ -4995,6 +5002,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
- 		list_for_each_entry(q, &set->tag_list, tag_set_list)
- 			blk_mq_unfreeze_queue_nomemrestore(q);
-+		blk_mq_free_sched_tags_batch(&et, set);
- 		goto reregister;
- 	}
- 
-@@ -5019,7 +5027,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	/* elv_update_nr_hw_queues() unfreeze queue for us */
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		elv_update_nr_hw_queues(q);
-+		elv_update_nr_hw_queues(q, &et);
- 
- reregister:
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-@@ -5029,7 +5037,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_remove_hw_queues_cpuhp(q);
- 		blk_mq_add_hw_queues_cpuhp(q);
- 	}
-+memalloc_restore:
- 	memalloc_noio_restore(memflags);
-+	xa_destroy(&et.tags_table);
- 
- 	/* Free the excess tags when nr_hw_queues shrink. */
- 	for (i = set->nr_hw_queues; i < prev_nr_hw_queues; i++)
-diff --git a/block/blk.h b/block/blk.h
-index 37ec459fe656..a312518fb8f3 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -12,6 +12,7 @@
- #include "blk-crypto-internal.h"
- 
- struct elevator_type;
-+struct elevator_tags;
- 
- #define	BLK_DEV_MAX_SECTORS	(LLONG_MAX >> 9)
- #define	BLK_MIN_SEGMENT_SIZE	4096
-@@ -321,7 +322,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- 
- bool blk_insert_flush(struct request *rq);
- 
--void elv_update_nr_hw_queues(struct request_queue *q);
-+void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_tags *et);
- void elevator_set_default(struct request_queue *q);
- void elevator_set_none(struct request_queue *q);
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index 1408894c0396..4272f9bc7e11 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -717,31 +717,14 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
-  * The I/O scheduler depends on the number of hardware queues, this forces a
-  * reattachment when nr_hw_queues changes.
-  */
--void elv_update_nr_hw_queues(struct request_queue *q)
-+void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_tags *et)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
--	struct elevator_tags et;
--	struct elv_change_ctx ctx = {};
-+	struct elv_change_ctx ctx = {.et = et};
- 	int ret = -ENODEV;
- 
- 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 
--	et.nr_hw_queues = set->nr_hw_queues;
--	xa_init(&et.tags_table);
--	ctx.et = &et;
--	/*
--	 * Accessing q->elevator without holding q->elevator_lock is safe here
--	 * because nr_hw_queue update is protected by set->update_nr_hwq_lock
--	 * in the writer context. So, scheduler update/switch code (which
--	 * acquires same lock in the reader context) can't run concurrently.
--	 */
--	if (q->elevator) {
--		if (blk_mq_alloc_sched_tags(ctx.et, set, q->id)) {
--			WARN_ON_ONCE(1);
--			goto out;
--		}
--	}
--
- 	mutex_lock(&q->elevator_lock);
- 	if (q->elevator && !blk_queue_dying(q) && blk_queue_registered(q)) {
- 		ctx.name = q->elevator->type->elevator_name;
-@@ -758,8 +741,6 @@ void elv_update_nr_hw_queues(struct request_queue *q)
- 	 */
- 	if (!xa_empty(&ctx.et->tags_table) && !ctx.new)
- 		blk_mq_free_sched_tags(ctx.et, set, q->id);
--out:
--	xa_destroy(&ctx.et->tags_table);
- }
- 
- /*
--- 
-2.49.0
-
+Reviewed-by: John Garry <john.g.garry@oracle.com>
