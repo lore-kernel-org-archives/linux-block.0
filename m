@@ -1,109 +1,92 @@
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0601F5617
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 12:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750767073; cv=pass; b=sTxh+st19296Y90+GSNzTlnslkUBKAACV8XXBOR1WMz8m1XEC6L9TbyYadSe77E6/AcQqz9ZQKzvRv1QrlCKJy4SPkOR1hnzfcy5CwGMrMqwmm7+xT3nDZu0EfZeD1GZqljnUicsjH66B3Mg20lLXT1r9PRsvWy2rmftkcFACrk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750767073; c=relaxed/simple;
-	bh=cSeDcDctjIkmGITPtpUkoj63CtRlmHFsmwKva5ihsTM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mP0IM/ed651/mixHXTuVm/SEw0a9pZ/ZsD761VOk7XtuV7xwKJzR3yuP50yKV3/BDjgG61857UYZs8SLfc4jQlqebytY9CnolKrwS0Ksjp1P4RsKnWZPcerzaqBD2MTMNs7KIUK/7Llo96mzm1iez8HwOVyyHHyTYKDYK98bpVg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=O3raY3Q0; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
+Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 98FF722CBC6;
+	Tue, 24 Jun 2025 12:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.125
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750767160; cv=none; b=bMmM5M30Oe1O3t98mpUyMn1b8GjYYYWALKWYmhCUbnSz1NgJ+gltLXl9GxxsVHgi17azK5YnTKH/gQm9xoH3xCLMrWBqnqrj5JAALRJFC3rUpbFaRpWqO0lmEdWRZVMSgbTntWO+cdGV2jzoRQpt2dsrpXsd6pXs6RV79awsruw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750767160; c=relaxed/simple;
+	bh=iuF1ZOur63OjUvd6ybvJnLgKwbJ3U/NzwPXRo3n32rY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version; b=SS5AkFix8Cyu8iw9MmoHgPV5VY3hTtic3ey1Sd1GVebT1DRRDf2sLSbW8qYq8qQ6iNxPV8a4Qa8vibkbCb39VDXSBqIB/4n1+29JA6Rm6SelDIIsrWlNjCZPuV3SVmiPK7YEmUBXiSZojjbZKPzOw/Q3hy9Y6gZ/wsx058BE+Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b=jG1fTpFZ; arc=none smtp.client-ip=111.202.70.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="O3raY3Q0"
-ARC-Seal: i=1; a=rsa-sha256; t=1750767067; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=EaxPV5JcN0JVubzHnGQk3iOwDkPKkv3kKzRqNS5ocDjY1J2mP4mS7mr9kiKBQQh0yAW6Hl7nrDaXdbpquB0B4cwokx85x/1CYjk4EjkSV3qS4w2kmmlBZbA494yEcVjAZ1EeLY/5TxSKQ9hekGRAHmrGPZhsDndXzI4GIDVd7Ns=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1750767067; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=yYAMgREgdBLKgk4gAGrkwwX0mLQ3K95UHZGNEtxJQJM=; 
-	b=dKzZyuM+bEYlHKLo39FlepkkV/6sn9RikfDfKf9A91aGjoIDoMGmOseV55Jmx0j2RgkxOi2JvLoS3vWzCaRMlLLqnon+k2DaJZZKq+EZ+fLb8JrhQsLWGyFDP0Xe1hIzESUrGshaHQQRmeai0b7uhpMNLvg3NfEmb5PVq6RMdSY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=linux.beauty;
-	spf=pass  smtp.mailfrom=me@linux.beauty;
-	dmarc=pass header.from=<me@linux.beauty>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1750767067;
-	s=zmail; d=linux.beauty; i=me@linux.beauty;
-	h=From:From:To:To:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=yYAMgREgdBLKgk4gAGrkwwX0mLQ3K95UHZGNEtxJQJM=;
-	b=O3raY3Q0ISWct9CKnErqdAnCNPHMd9nh6OZ9FujcTnbPE90PTMeRKjuGxzuLhbgF
-	0Y8XeLJRsQnAycnXg+opXXfXddPP2y3iwgGixHD0ZyQ6SnHG2P1/yGj3AB86+fjFUmt
-	5kIxuR9XlTwmMeVv8Pzrzgy9DDDn4Z9NEjntvhyI=
-Received: by mx.zohomail.com with SMTPS id 1750767064110204.62192849232622;
-	Tue, 24 Jun 2025 05:11:04 -0700 (PDT)
-From: Li Chen <me@linux.beauty>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH blktests] block/005|008: double timeout on machines with more than 128 CPUs
-Date: Tue, 24 Jun 2025 20:10:56 +0800
-Message-ID: <20250624121057.85689-1-me@linux.beauty>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b="jG1fTpFZ"
+Received: from mail.didiglobal.com (unknown [10.79.65.20])
+	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 3B0B71808ACADD;
+	Tue, 24 Jun 2025 20:11:29 +0800 (CST)
+Received: from BJ02-ACTMBX-08.didichuxing.com (10.79.65.15) by
+ BJ02-ACTMBX-02.didichuxing.com (10.79.65.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Tue, 24 Jun 2025 20:12:11 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
+ BJ02-ACTMBX-08.didichuxing.com (10.79.65.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Tue, 24 Jun 2025 20:12:11 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com ([fe80::b00b:de35:2067:9787]) by
+ BJ03-ACTMBX-07.didichuxing.com ([fe80::b00b:de35:2067:9787%7]) with mapi id
+ 15.02.1748.010; Tue, 24 Jun 2025 20:12:11 +0800
+X-MD-Sfrom: chentaotao@didiglobal.com
+X-MD-SrcIP: 10.79.65.20
+From: =?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+To: "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>, "willy@infradead.org"
+	<willy@infradead.org>, "brauner@kernel.org" <brauner@kernel.org>,
+	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>, "tursulin@ursulin.net"
+	<tursulin@ursulin.net>, "airlied@gmail.com" <airlied@gmail.com>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "chentao325@qq.com" <chentao325@qq.com>,
+	=?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+Subject: [PATCH v2 5/5] ext4: declare support for FOP_DONTCACHE
+Thread-Topic: [PATCH v2 5/5] ext4: declare support for FOP_DONTCACHE
+Thread-Index: AQHb5QE2ZjIKcQrU5kGPOqcDpxUbGg==
+Date: Tue, 24 Jun 2025 12:12:10 +0000
+Message-ID: <20250624121149.2927-6-chentaotao@didiglobal.com>
+In-Reply-To: <20250624121149.2927-1-chentaotao@didiglobal.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=didiglobal.com;
+	s=2025; t=1750767111;
+	bh=iuF1ZOur63OjUvd6ybvJnLgKwbJ3U/NzwPXRo3n32rY=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
+	b=jG1fTpFZ5DZ3tvJBBpHiw+NcCQv4XiH7nagDsfHKhol3W/U+kb7vKldOhO7jBL3pp
+	 RxJTpSe2q3R/f5c6cru5v8cqEeQmrQEfxebUH3R6/qe2L9xn1IfGNMxKbvlG0CMej/
+	 MWF3ZmON8QiK9ShSKWFSJqmAkMqCtXz1mbNVHfOg=
 
-From: Li Chen <chenl311@chinatelecom.cn>
-
-The current hard-coded timeout for block/005 and 008 is 900 s.  On large systems
-(e.g. 256 C) the test spawns one fio job per CPU and therefore
-issues 1 GiB of random I/O per job.  Total workload scales linearly with
-the CPU-count, so the original 900 s window is often insufficient for
-high-core machines and causes false failures:
-
-    fio did not finish after 900 seconds!
-
-To keep the logic simple while avoiding unnecessary test flakiness, bump
-the timeout to 1800 s whenever the system has more than 128 online CPUs.
-Smaller systems continue to use the original 900 s limit.
-
-Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
----
- tests/block/005 | 5 +++++
- tests/block/008 | 5 +++++
- 2 files changed, 10 insertions(+)
-
-diff --git a/tests/block/005 b/tests/block/005
-index 6a58da0..0bc7625 100755
---- a/tests/block/005
-+++ b/tests/block/005
-@@ -39,6 +39,11 @@ test_device() {
- 	# overall test.
- 	start_time=$(date +%s)
- 	timeout=${TIMEOUT:=900}
-+    # if CPU cores >128, then timeout×2
-+    if (( $(nproc) > 128 )); then
-+            timeout=$(( timeout * 2 ))
-+    fi
-+
- 	while kill -0 $! 2>/dev/null; do
- 		idx=$((RANDOM % ${#scheds[@]}))
- 		_test_dev_queue_set scheduler "${scheds[$idx]}"
-diff --git a/tests/block/008 b/tests/block/008
-index 859c0fe..d67c5b7 100755
---- a/tests/block/008
-+++ b/tests/block/008
-@@ -53,6 +53,11 @@ test_device() {
- 	# overall test.
- 	start_time=$(date +%s)
- 	timeout=${TIMEOUT:=900}
-+    # if CPU cores >128, then timeout×2
-+    if (( $(nproc) > 128 )); then
-+            timeout=$(( timeout * 2 ))
-+    fi
-+
- 	while sleep .2; kill -0 $! 2> /dev/null; do
- 		if (( offlining && ${#offline_cpus[@]} == max_offline )); then
- 			offlining=0
--- 
-2.49.0
-
+RnJvbTogVGFvdGFvIENoZW4gPGNoZW50YW90YW9AZGlkaWdsb2JhbC5jb20+DQoNClNldCB0aGUg
+Rk9QX0RPTlRDQUNIRSBmbGFnIGluIGV4dDRfZmlsZV9vcGVyYXRpb25zIHRvIGluZGljYXRlIHRo
+YXQNCmV4dDQgc3VwcG9ydHMgSU9DQl9ET05UQ0FDSEUgaGFuZGxpbmcgaW4gYnVmZmVyZWQgd3Jp
+dGUgcGF0aHMuDQoNClBhcnQgb2YgYSBzZXJpZXMgcmVmYWN0b3JpbmcgYWRkcmVzc19zcGFjZV9v
+cGVyYXRpb25zIHdyaXRlX2JlZ2luIGFuZA0Kd3JpdGVfZW5kIGNhbGxiYWNrcyB0byB1c2Ugc3Ry
+dWN0IGtpb2NiIGZvciBwYXNzaW5nIHdyaXRlIGNvbnRleHQgYW5kDQpmbGFncy4NCg0KU2lnbmVk
+LW9mZi1ieTogVGFvdGFvIENoZW4gPGNoZW50YW90YW9AZGlkaWdsb2JhbC5jb20+DQotLS0NCiBm
+cy9leHQ0L2ZpbGUuYyB8IDMgKystDQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvZnMvZXh0NC9maWxlLmMgYi9mcy9leHQ0L2Zp
+bGUuYw0KaW5kZXggMjFkZjgxMzQ3MTQ3Li4yNzRiNDFhNDc2YzggMTAwNjQ0DQotLS0gYS9mcy9l
+eHQ0L2ZpbGUuYw0KKysrIGIvZnMvZXh0NC9maWxlLmMNCkBAIC05NzcsNyArOTc3LDggQEAgY29u
+c3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyBleHQ0X2ZpbGVfb3BlcmF0aW9ucyA9IHsNCiAJLnNw
+bGljZV93cml0ZQk9IGl0ZXJfZmlsZV9zcGxpY2Vfd3JpdGUsDQogCS5mYWxsb2NhdGUJPSBleHQ0
+X2ZhbGxvY2F0ZSwNCiAJLmZvcF9mbGFncwk9IEZPUF9NTUFQX1NZTkMgfCBGT1BfQlVGRkVSX1JB
+U1lOQyB8DQotCQkJICBGT1BfRElPX1BBUkFMTEVMX1dSSVRFLA0KKwkJCSAgRk9QX0RJT19QQVJB
+TExFTF9XUklURSB8DQorCQkJICBGT1BfRE9OVENBQ0hFLA0KIH07DQogDQogY29uc3Qgc3RydWN0
+IGlub2RlX29wZXJhdGlvbnMgZXh0NF9maWxlX2lub2RlX29wZXJhdGlvbnMgPSB7DQotLSANCjIu
+MzQuMQ0K
