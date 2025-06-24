@@ -1,126 +1,221 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30DF2D3204
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 15:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D342D8DC6
+	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 15:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750777378; cv=none; b=AjqU2uzXOE0Dks/CqM4jLUT5CrkfYhkUvk8Sd/L8r3CVOPleLpHni3OGQZHisJD6j5U8A/paw8eDhzxx17F7P7lXg3iqAu5hp3g9EFrvqRBk9CU/no0laZeNRe9OVwcPW7YmMHVK3cTPvFCdWkCZTkxwcMv3kaezz4omloykaw4=
+	t=1750778183; cv=none; b=GhYJgSvbCkXXQU4TE5o16M4EUo9/zp4iDQaMs/vvhdYlAa1TMaYgKfxFTJ9sNn6s2cddpZCiiUaPAqkTK+GYbI97diWjs+f482xXi4sRKTB31GKgwlakO1cGs3ET45RMSjFM2W9GoGN8e/zQpIXhjD9YVDnSm1THUT7bS2Tte5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750777378; c=relaxed/simple;
-	bh=aZ6d2ww+sAxXhhU8DObEXMjD5Yjx9X+/HeWN0awnxJs=;
+	s=arc-20240116; t=1750778183; c=relaxed/simple;
+	bh=ABLLb+PdCkDiltTGjIHZDtG5VzNZq8uFV9NMcmQKq0s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a9/OpZBRrISwqdGCxqlwDi1vpogdNZRXRH7IxFzVV2iUh77O+p3UhoEz2BBpTPYslVJjuup4uj3FUuCTyNubV7uJ20MQNJpdWB/tkaMAl/ikmtAeJOlVfg1VIKWfCiki5XZtLvv8RvHqo53I5LYIT5otNh1pW45n/xei4mpDjjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T4/In0n+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=nEkE2OocnMW5NyxsftNke5zoABe3wU5Wa0ynZAczWbc8khynko7UbrhvBkoXaYTNGGBv7zsQ/CryHOLTRXhdi/gECzEC071Ah2VW8N/t2EHSvHM+1UsKG4oF8TAyC/cAANmNWuq3cG6V9Se+ydyeUf9hktaqh7QJTMLae8Vtis8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=W99UEzoL; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4/In0n+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750777375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=26knUQsm6IfAjeqD8XI9QpiX0JprUBMdNcpaBL6aJPw=;
-	b=T4/In0n+PAICdSzTOYKgVrFFR+HmjTLt6gz7hisjlTQPuawra1VsL/HDsIEPOvpGG/Ares
-	4fZ5f9korUiXA/nvK9XPn829yoLJsUQhKrw16cTT479XWQ1bM/saEQAccyLgHuySbkikgf
-	qwwjMcHpWvOCS5wzxMoOjgDknlBBqJY=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-418-4xfrj-j5NPCSzOgQNVPdbw-1; Tue, 24 Jun 2025 11:02:53 -0400
-X-MC-Unique: 4xfrj-j5NPCSzOgQNVPdbw-1
-X-Mimecast-MFC-AGG-ID: 4xfrj-j5NPCSzOgQNVPdbw_1750777372
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-312df02acf5so4125377a91.1
-        for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 08:02:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="W99UEzoL"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235248ba788so4602445ad.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 08:16:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1750778180; x=1751382980; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5aL5AYIz5y40klzf1LUvkSiLJNQCJ4UGDciaoMAIy44=;
+        b=W99UEzoLgK3vSWpiGlCqDWUp3n4QCgu853Fw9enKd2zaJGlAy44ToJtwuizpOHGYvw
+         WLtjtrd7quf6YffhMnM7uC38wMuuxPqhf7xEiAxg+4Wd9AsaBMkDSdZy6yLk+Tm/8vXx
+         PtuiBK82XeDoHVCBxftciZ8wPqtWNS4RgjEl2xSAgs9fAp/wP9xkXRnyg/w/LNBIpBqt
+         vAJ/Syhya+SY19Fe2nHPBaZaBYD5SO8LbiuJjPszVZiyDvOWPEtqeCZxD6dWZ+p0r56v
+         D4axLoaYV5oVPYxffBiEZoEIGj4rDMgKmmjIsoYnVY02mZhTt7yUdZ6ye+fkkxdzlSQr
+         oVSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750777372; x=1751382172;
+        d=1e100.net; s=20230601; t=1750778180; x=1751382980;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=26knUQsm6IfAjeqD8XI9QpiX0JprUBMdNcpaBL6aJPw=;
-        b=QPeJ9FqKY/o5LuVQsRyfA5So8sx4obV1LBsDkOe6CXcF6Pmd2uZ2MhaLfO6BHknxZC
-         kR8JEYI9yooJFuMKcOZms0CSwrCMqafvrW8ZAhBwNRMW3k665LpFgfwOvb9dYaLmBiMi
-         uy6lWD1mta3LcYVyGvxpeUq69Zr182B3z5GbWtAL1MLYaEzmySSXMD+njtU7KBNFE2EE
-         /URuxloSRwY/7SsHoyi++KC/AFa2dkwvUW+oNNN3SQLcKlhWb0DzKHaNqXnePRBpcB5B
-         MfL5ep1qrcciS2ojn8fj68D03yFkYgJXdmdgIhRGOjBpeOBOWVYFYf89VFKDYOYBehvN
-         643Q==
-X-Gm-Message-State: AOJu0Yw2SQeHGRA6Birb3NLLK8zwyXk3ucCZ4d5VEdkMM9Edikxn0RWm
-	1TkidvNpWW7AplEYRSzurB8kDC8KzbF7pkWnm4sOaH4oGDUlW6fN79fhvBulEAxecmQQ0FlVd8R
-	uFXy4xx51CgIRGQd1tjmy3/JZy3XF7x6sQ+KgPQB5LM+BlC7Z3vF8h6WwUT96iscNSWI129hZvf
-	wcs0ybKO9+AE5gp8vGC+6UlE7OtUCwj4K/ecp1zLA=
-X-Gm-Gg: ASbGnctJJIyjlB1MRXxjXZh3qo5bVHQPBl7h+lgncz/MkjSgO7yg9IusNvrofja2jey
-	asdfjF2dFEP/3tu87PvHanJGmTdX/TUdlVTUwSqJjr3NtwYjoLhV/sMTzk/gN/gPrEUYOckuJxW
-	OhklHd
-X-Received: by 2002:a17:90b:2e07:b0:30e:3737:7c87 with SMTP id 98e67ed59e1d1-315ccc94eabmr5231072a91.5.1750777371794;
-        Tue, 24 Jun 2025 08:02:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHUoxnJOmDWOiFN6+y0j0WjolvSI3k0vnLz5GanKeKUeNgZzu6/9x1t8stmhncEliSTG7rQEkKF9/x2jTX0AqA=
-X-Received: by 2002:a17:90b:2e07:b0:30e:3737:7c87 with SMTP id
- 98e67ed59e1d1-315ccc94eabmr5230998a91.5.1750777371158; Tue, 24 Jun 2025
- 08:02:51 -0700 (PDT)
+        bh=5aL5AYIz5y40klzf1LUvkSiLJNQCJ4UGDciaoMAIy44=;
+        b=AVPWb1bZuUh4b77LsIfK3hNTbkTZXAXn7YMlxVyQtOv8b5kP2KOav9AMmCD+zr50/+
+         NlbIzLrZkZuszHZ8GVxaAnEaOJMUrfnUCCZp6JzFPWEL1xEXq2snjglIVImuQuok2NhF
+         TdxQhMQ/xFWmsQhKZtXBwQfS1Han5pDps+pHHp8Nnq1QfrttcWADVEMHTCs014ErStkJ
+         qail4DVkN6jEeJq25rhpu21lFlamgCkjB48qCGGCwW4vPAd+vL9FAeJ2j+8Ap5g3u73J
+         riRoBPe5UIvWV3wd3ZwKL2Owqu7beW5HK0Ke+qEjejHxP9cYJksSPsKqp7hrKa/E0+qA
+         9b8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXg6XePiZ2L4a96VS5OU4yW0i23UiMHNyLdClJyMPyxnOYaxFo1JSwPifM5PAYlO0JbF2O4DxNa1XVUjA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxajjNWbh4Hg+MYVyyQprjsZwRs/JaY7V4Y33Ci8YIzuAQt9MXL
+	EWEa0QI0IaoQHJG202TKCJ4X2EDKg1fI6JdoxM31hzCp3XNyMBhSNZXNSl17HPawtMYjPNSw0h8
+	MSLGXVnjj9Vy7rDaDyv6Q+93voo49d0VIiP/Cs5RPug==
+X-Gm-Gg: ASbGncunJuqSoSK+XCgi9PeeZj5Cv1WpDuK+zrAII06z/qHFQl/8NTCbphDy/FqeoEv
+	00e29Q2QYjmUoT4ZZtXIPauYoZVoZ/yePTmFWCEGkRuPHjQqUddhrI+31GMTjWGONxw54hMxZko
+	P4opJDoVHVk+far04gmUZY2XjYW+69tnQa2Gwdve2zouesFi82ItbK
+X-Google-Smtp-Source: AGHT+IGf+ihj8j8kan3wfdMh6oQPWYTe6eeE0qBJeCcFt4OptcPTLJC4fMZ67nPH9HCvoU7R+CWYmHzAu3rkR482h8M=
+X-Received: by 2002:a17:902:e884:b0:236:7333:f1a0 with SMTP id
+ d9443c01a7336-237d9a75160mr92497835ad.14.1750778180076; Tue, 24 Jun 2025
+ 08:16:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGVVp+UFKKb4ydw1+zWX9Bre6vt9TUFt9FY2qOx0LMv+8VaVoA@mail.gmail.com>
- <aFpb3BjH4T8q8KAY@fedora>
-In-Reply-To: <aFpb3BjH4T8q8KAY@fedora>
-From: Changhui Zhong <czhong@redhat.com>
-Date: Tue, 24 Jun 2025 23:02:39 +0800
-X-Gm-Features: Ac12FXwnHZkJcRl6FvYU6yXk_BvQss7qEWIOp8lSPnfnln_4oRxx-uvcIcMYZG8
-Message-ID: <CAGVVp+VNFCUt68A1-P+Rx85kKJpVioJt7U-=hKyw6ji7_5OzZA@mail.gmail.com>
-Subject: Re: [bug report] WARNING: CPU: 3 PID: 175811 at io_uring/io_uring.c:2921
- io_ring_exit_work+0x155/0x288
+References: <20250624104121.859519-1-ming.lei@redhat.com>
+In-Reply-To: <20250624104121.859519-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 24 Jun 2025 08:16:08 -0700
+X-Gm-Features: AX0GCFsULQKcyjHmbCcqpdfUnVk35_8gpWNuWvDuZsyL2HgjPupKS0dQD4y25RY
+Message-ID: <CADUfDZo4+roZtoMJWBDemrJi7fzkzYEPWMN4zD=kC0ainvALPQ@mail.gmail.com>
+Subject: Re: [PATCH V2] ublk: setup ublk_io correctly in case of
+ ublk_get_data() failure
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Linux Block Devices <linux-block@vger.kernel.org>, io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Changhui Zhong <czhong@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 24, 2025 at 4:03=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+On Tue, Jun 24, 2025 at 3:41=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
-> On Tue, Jun 24, 2025 at 01:37:55PM +0800, Changhui Zhong wrote:
-> > Hello,
-> >
-> > the following warnning info was triggered by ubdsrv  generic/004 tests,
-> > please help check and let me know if you need any info/test, thanks.
-> >
-> > repo: https://github.com/torvalds/linux.git
-> > branch: master
-> > INFO: HEAD of cloned kernel
-> > commit 86731a2a651e58953fc949573895f2fa6d456841
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Sun Jun 22 13:30:08 2025 -0700
-> >
-> >     Linux 6.16-rc3
-> >
-> >
-> > reproducer:
-> > # echo 0 > /proc/sys/kernel/io_uring_disabled
-> > # modprobe ublk_drv
-> > # for i in {0..30};do make test T=3Dgeneric; done
+> If ublk_get_data() fails, -EIOCBQUEUED is returned and the current comman=
+d
+> becomes ASYNC. And the only reason is that mapping data can't move on,
+> because of no enough pages or pending signal, then the current ublk reque=
+st
+> has to be requeued.
 >
-> Hi Changhui,
+> Once the request need to be requeued, we have to setup `ublk_io` correctl=
+y,
+> including io->cmd and flags, otherwise the request may not be forwarded t=
+o
+> ublk server successfully.
 >
-> Please try the fix for your yesterday's report:
->
-> https://lore.kernel.org/linux-block/20250624022049.825370-1-ming.lei@redh=
-at.com/
->
-> The same test can survive for hours in my VM with the fix.
->
->
-> Thanks,
-> Ming
->
+> Fixes: 9810362a57cb ("ublk: don't call ublk_dispatch_req() for NEED_GET_D=
+ATA")
 
-Hi=EF=BC=8CMing
+Don't think this is the right Fixes tag; the issue predates this
+refactoring. I pointed out this existing issue when we discussed that
+patch: https://lore.kernel.org/linux-block/CADUfDZroQ4zHanPjytcEUhn4tQc3BYM=
+PZD2uLOik7jAXvOCjGg@mail.gmail.com/
 
-I ran the test 'make test T=3Dgeneric' 50 times with your patch V2 and
-not hit this issue.
+Looks like the correct commit would be c86019ff75c1 ("ublk_drv: add
+support for UBLK_IO_NEED_GET_DATA").
 
-Thanks=EF=BC=8C
+> Reported-by: Changhui Zhong <czhong@redhat.com>
+> Closes: https://lore.kernel.org/linux-block/CAGVVp+VN9QcpHUz_0nasFf5q9i1g=
+i8H8j-G-6mkBoqa3TyjRHA@mail.gmail.com/
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+>         - move io->addr assignment into ublk_fill_io_cmd()
+>
+>  drivers/block/ublk_drv.c | 35 +++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index d36f44f5ee80..3566d7c36b8d 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1148,8 +1148,8 @@ static inline void __ublk_complete_rq(struct reques=
+t *req)
+>         blk_mq_end_request(req, res);
+>  }
+>
+> -static void ublk_complete_io_cmd(struct ublk_io *io, struct request *req=
+,
+> -                                int res, unsigned issue_flags)
+> +static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
+> +                                                    struct request *req)
 
+nit: don't think the underscores are necessary
+
+>  {
+>         /* read cmd first because req will overwrite it */
+>         struct io_uring_cmd *cmd =3D io->cmd;
+> @@ -1164,6 +1164,13 @@ static void ublk_complete_io_cmd(struct ublk_io *i=
+o, struct request *req,
+>         io->flags &=3D ~UBLK_IO_FLAG_ACTIVE;
+>
+>         io->req =3D req;
+> +       return cmd;
+> +}
+> +
+> +static void ublk_complete_io_cmd(struct ublk_io *io, struct request *req=
+,
+> +                                int res, unsigned issue_flags)
+> +{
+> +       struct io_uring_cmd *cmd =3D __ublk_prep_compl_io_cmd(io, req);
+>
+>         /* tell ublksrv one io request is coming */
+>         io_uring_cmd_done(cmd, res, 0, issue_flags);
+> @@ -2148,10 +2155,9 @@ static int ublk_commit_and_fetch(const struct ublk=
+_queue *ubq,
+>         return 0;
+>  }
+>
+> -static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *=
+io)
+> +static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *=
+io,
+> +                         struct request *req)
+>  {
+> -       struct request *req =3D io->req;
+> -
+>         /*
+>          * We have handled UBLK_IO_NEED_GET_DATA command,
+>          * so clear UBLK_IO_FLAG_NEED_GET_DATA now and just
+> @@ -2178,6 +2184,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
+*cmd,
+>         u32 cmd_op =3D cmd->cmd_op;
+>         unsigned tag =3D ub_cmd->tag;
+>         int ret =3D -EINVAL;
+> +       struct request *req;
+>
+>         pr_devel("%s: received: cmd op %d queue %d tag %d result %d\n",
+>                         __func__, cmd->cmd_op, ub_cmd->q_id, tag,
+> @@ -2236,11 +2243,19 @@ static int __ublk_ch_uring_cmd(struct io_uring_cm=
+d *cmd,
+>                         goto out;
+>                 break;
+>         case UBLK_IO_NEED_GET_DATA:
+> -               io->addr =3D ub_cmd->addr;
+> -               if (!ublk_get_data(ubq, io))
+> -                       return -EIOCBQUEUED;
+> -
+> -               return UBLK_IO_RES_OK;
+> +               /*
+> +                * ublk_get_data() may fail and fallback to requeue, so k=
+eep
+> +                * uring_cmd active first and prepare for handling new re=
+queued
+> +                * request
+> +                */
+> +               req =3D io->req;
+> +               ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+> +               io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV;
+> +               if (likely(ublk_get_data(ubq, io, req))) {
+> +                       __ublk_prep_compl_io_cmd(io, req);
+
+Isn't __ublk_prep_compl_io_cmd() basically undoing the
+ublk_fill_io_cmd() and io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV? How
+about something like this instead?
+
+io->addr =3D ub_cmd->addr;
+if (likely(ublk_get_data(ubq, io)))
+        return UBLK_IO_RES_OK;
+
+ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV;
+break;
+
+Best,
+Caleb
+
+> +                       return UBLK_IO_RES_OK;
+> +               }
+> +               break;
+>         default:
+>                 goto out;
+>         }
+> --
+> 2.49.0
+>
