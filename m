@@ -1,57 +1,100 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3A0294A14
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 12:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC5329551B;
+	Tue, 24 Jun 2025 12:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750769201; cv=none; b=QFfQPWi9KcXWKCHc1dyBLlxEh/K+M6Ysa8VHGIdAvtP0khEdtwM9+JZjsaDT65YYWard4jXAOSZpAbNP/9LuK25YxfGU8TXhz6ze38GFh29IRaobYXaKxtB3fBYOjn7eW0PZbnzZMVBalTyuNUokV/Njuvp5tFzFsMhX4zUmmQE=
+	t=1750769521; cv=none; b=JRu/AJv6X/86YjQL2iZeup5d4LpGm1pnrkymVyUpG55U8VjgE0TP4kQkDh8jKSsX/jMGVOP3F2sEjwboAxqlGPVG20nlClfk7MmrrB0k54KoCdw8ta+J7Zcgkal7zA23is1RtF6qF+PDSYZpDklmIw96/J0Mpp7MJUusRnopPNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750769201; c=relaxed/simple;
-	bh=noO0TXo+Bzs2RoFDOO1d0fvClmXOZpW8U9l/BTWKr80=;
+	s=arc-20240116; t=1750769521; c=relaxed/simple;
+	bh=6H/6DkhwBEk6xZXj6xYuHV8A9YsL6O4OURI3iBlHbWI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqvK3EJaSSj3UfVqiUNLSwKp8gWpzIpWqB7gZvLC8UHR8bqzUX9tc2ftUxtSJzjG3ghqlfB/kM80gRbywCqbIm+XzAVZCLhAqa+Ka83c0DPqm7Ao0+PmgFVMFM1FJXBJerUVumbWTgaFDuI3apO/K0FTuxEorvRLI1T95Mt4adE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3D54268AFE; Tue, 24 Jun 2025 14:46:26 +0200 (CEST)
-Date: Tue, 24 Jun 2025 14:46:25 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 3/8] nvme-pci: refactor nvme_pci_use_sgls
-Message-ID: <20250624124625.GA19239@lst.de>
-References: <20250623141259.76767-1-hch@lst.de> <20250623141259.76767-4-hch@lst.de> <aFlyYjALviyhQ-IE@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mCtUVDsQSSjwS1Oth8iwCrUXDeXNiUxqf3O1cAY7RKDnkH5XZ2f6VnFpAOGlTotTEoYalrAei5/uDOzgp+JSiLvaQSA+SGyxu00K3pkEsqVK/phaLxc5waiNTDs4YFxNY0tADgGBqZXhO2eozCzgin7e2daSNExgjb21qdm6m/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O0ORMoVA; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O0ORMoVA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=YOojs8ETOh0nTkI9FVoRaG17pTblKI2h/qJphUDsFTg=; b=O0ORMoVA2HBFIa95a4tYoOnfak
+	MlNH1yfUbdVu/C/pxQlWEsaEhdAx3u7SfeayvsOe9NUYSILkqFBRqkm4yIBf1E8pvaYTgHU8nzzvY
+	y9JJ10OQ6HASMGlWlOnmVsnklPeMvsR+pzbKqhpAlJa+iKEYdPU8j+FtVvU+WBWkAqRtHAbbtF8t5
+	eudvW7VJjfuSDpm7I/N24ZvaqCI5U+9SFvyDByBHQRUA97w0vqSV8Uv9Q4aWCqg4RF3hVL5G4FTxB
+	yxwniFZbWrdvugPLzzqFJ9gn1vfOSJd+Vr5DzpRRDd0fnpYhXAZqoPh4iXN99K8hUZRhmK4+AG+Vl
+	uuV/Unfw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uU37w-00000006bv4-0Kku;
+	Tue, 24 Jun 2025 12:51:52 +0000
+Date: Tue, 24 Jun 2025 13:51:51 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: =?utf-8?B?6ZmI5rab5rab?= Taotao Chen <chentaotao@didiglobal.com>
+Cc: "tytso@mit.edu" <tytso@mit.edu>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
+	"tursulin@ursulin.net" <tursulin@ursulin.net>,
+	"airlied@gmail.com" <airlied@gmail.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"chentao325@qq.com" <chentao325@qq.com>
+Subject: Re: [PATCH v2 3/5] fs: change write_begin/write_end interface to
+ take struct kiocb *
+Message-ID: <aFqfZ9hiiW4qnYtO@casper.infradead.org>
+References: <20250624121149.2927-1-chentaotao@didiglobal.com>
+ <20250624121149.2927-4-chentaotao@didiglobal.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aFlyYjALviyhQ-IE@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250624121149.2927-4-chentaotao@didiglobal.com>
 
-On Mon, Jun 23, 2025 at 09:27:30AM -0600, Keith Busch wrote:
-> > -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
-> > +	if (use_sgl == SGL_FORCED ||
-> > +	    (use_sgl == SGL_SUPPORTED &&
-> > +	     (!sgl_threshold || nvme_pci_avg_seg_size(req) >= sgl_threshold)))
-> >  		ret = nvme_pci_setup_sgls(nvmeq, req, &cmnd->rw);
-> 
-> We historically interpreted sgl_threshold set to 0 to mean disable SGL
-> usage, maybe because the controller is broken or something. It might be
-> okay to have 0 mean to not consider segment sizes, but I just wanted to
-> point out this is a different interpretation of the user parameter.
+On Tue, Jun 24, 2025 at 12:12:08PM +0000, 陈涛涛 Taotao Chen wrote:
+> -static int blkdev_write_end(struct file *file, struct address_space *mapping,
+> +static int blkdev_write_end(struct kiocb *iocb, struct address_space *mapping,
+>  		loff_t pos, unsigned len, unsigned copied, struct folio *folio,
+>  		void *fsdata)
+>  {
+>  	int ret;
+> -	ret = block_write_end(file, mapping, pos, len, copied, folio, fsdata);
+> +	ret = block_write_end(iocb->ki_filp, mapping, pos, len, copied, folio, fsdata);
 
-This is still a leftover from the threshold mess in the first version.
-I'll fix it for the next one.
+... huh.  I thought block_write_end() had to have the same prototype as
+->write_end because it was used by some filesystems as the ->write_end.
+I see that's not true (any more?).  Maybe I was confused with
+generic_write_end().  Anyway, block_write_end() doesn't use it's file
+argument, and never will, so we can just remove it.
+
+> +++ b/include/linux/fs.h
+> @@ -446,10 +446,10 @@ struct address_space_operations {
+>  
+>  	void (*readahead)(struct readahead_control *);
+>  
+> -	int (*write_begin)(struct file *, struct address_space *mapping,
+> +	int (*write_begin)(struct kiocb *, struct address_space *mapping,
+>  				loff_t pos, unsigned len,
+>  				struct folio **foliop, void **fsdata);
+> -	int (*write_end)(struct file *, struct address_space *mapping,
+> +	int (*write_end)(struct kiocb *, struct address_space *mapping,
+>  				loff_t pos, unsigned len, unsigned copied,
+>  				struct folio *folio, void *fsdata);
+
+Should we make this a 'const struct kiocb *'?  I don't see a need for
+filesystems to be allowed to modify the kiocb in future, but perhaps
+other people have different opinions.
