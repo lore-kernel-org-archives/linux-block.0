@@ -1,100 +1,71 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC5329551B;
-	Tue, 24 Jun 2025 12:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1C02989AC;
+	Tue, 24 Jun 2025 12:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750769521; cv=none; b=JRu/AJv6X/86YjQL2iZeup5d4LpGm1pnrkymVyUpG55U8VjgE0TP4kQkDh8jKSsX/jMGVOP3F2sEjwboAxqlGPVG20nlClfk7MmrrB0k54KoCdw8ta+J7Zcgkal7zA23is1RtF6qF+PDSYZpDklmIw96/J0Mpp7MJUusRnopPNQ=
+	t=1750769564; cv=none; b=R0vQOQ767cs9dWK+YtSyk3FukBciejXKHSK8Ebqb1vG/SAqqfpoBeG9cdvdWrVQ20Qu/L/QNLyN5hkaZf9oe7m0hfnYnjOVqaY8Z87C1W5FPOiPdH0SmKYlIQr/Qn2I8J9vAe0xYsfjtpfmL+w8CnBYlF0ujGABVHUo5Stxr3ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750769521; c=relaxed/simple;
-	bh=6H/6DkhwBEk6xZXj6xYuHV8A9YsL6O4OURI3iBlHbWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mCtUVDsQSSjwS1Oth8iwCrUXDeXNiUxqf3O1cAY7RKDnkH5XZ2f6VnFpAOGlTotTEoYalrAei5/uDOzgp+JSiLvaQSA+SGyxu00K3pkEsqVK/phaLxc5waiNTDs4YFxNY0tADgGBqZXhO2eozCzgin7e2daSNExgjb21qdm6m/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O0ORMoVA; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1750769564; c=relaxed/simple;
+	bh=FbA/TYMucNCBfZZNrCca42Q4/4ZhWu7F6LfzMnQUCmQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWbqXX5+QBFaoFG4z0DFVC/6PT+o31rx/xLSfERwVmVakFvMdzGRgaC2wLWtsESIVtej31IvS0GLoJbiAjTs/4uHheZJToWEhYHCJ+M+kkhsQL4BZVoGHNIQMJ+3hNO5/D5UlPoj/HWeYSJtLvP1pctpcCplVdNgm5P5jCZQR1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=iLxvAMwZ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O0ORMoVA"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iLxvAMwZ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=YOojs8ETOh0nTkI9FVoRaG17pTblKI2h/qJphUDsFTg=; b=O0ORMoVA2HBFIa95a4tYoOnfak
-	MlNH1yfUbdVu/C/pxQlWEsaEhdAx3u7SfeayvsOe9NUYSILkqFBRqkm4yIBf1E8pvaYTgHU8nzzvY
-	y9JJ10OQ6HASMGlWlOnmVsnklPeMvsR+pzbKqhpAlJa+iKEYdPU8j+FtVvU+WBWkAqRtHAbbtF8t5
-	eudvW7VJjfuSDpm7I/N24ZvaqCI5U+9SFvyDByBHQRUA97w0vqSV8Uv9Q4aWCqg4RF3hVL5G4FTxB
-	yxwniFZbWrdvugPLzzqFJ9gn1vfOSJd+Vr5DzpRRDd0fnpYhXAZqoPh4iXN99K8hUZRhmK4+AG+Vl
-	uuV/Unfw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uU37w-00000006bv4-0Kku;
-	Tue, 24 Jun 2025 12:51:52 +0000
-Date: Tue, 24 Jun 2025 13:51:51 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: =?utf-8?B?6ZmI5rab5rab?= Taotao Chen <chentaotao@didiglobal.com>
-Cc: "tytso@mit.edu" <tytso@mit.edu>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
-	"tursulin@ursulin.net" <tursulin@ursulin.net>,
-	"airlied@gmail.com" <airlied@gmail.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"chentao325@qq.com" <chentao325@qq.com>
-Subject: Re: [PATCH v2 3/5] fs: change write_begin/write_end interface to
- take struct kiocb *
-Message-ID: <aFqfZ9hiiW4qnYtO@casper.infradead.org>
-References: <20250624121149.2927-1-chentaotao@didiglobal.com>
- <20250624121149.2927-4-chentaotao@didiglobal.com>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=SgSnp6jT3yDmnCE63WVs5cKLX8hIMpg3ImbKMxGBDuc=; b=iLxvAMwZbPH7UUQxoS234Ajpr6
+	B3WUcczFPHG6XRZRmPJAPO5+Yao/aSRmlhKXjsvQFDQJXpWrXYaEGVyqVb7VF1LQ2vgt648QJG+cq
+	Uf1j55Wt3VInL8pkbynWGb5I2E5rx1/tiGFR19h0+fwdIzRu5SkkAGeY8jeQLixdNvHzLLfb6tb9h
+	aU+9rKm1lrjpmoyuksiRJTNYhZbNWB/ljaaBIDEBxB5Dcb58wksz1POeKsy2sCxpuiEZrX3zAS8BJ
+	slT5Ju2CYlSNuRIqVLj3Pn0ZQoqI3PEplWS13Xj0OyGJ827eyHHYUQJXjZifV+iwx625TABmBjCBQ
+	kGIdvQeA==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uU38f-00000005dtd-0YOU;
+	Tue, 24 Jun 2025 12:52:37 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"Ewan D. Milne" <emilne@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	linux-rdma@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: fix virt_boundary_mask handling in SCSI v2
+Date: Tue, 24 Jun 2025 14:52:26 +0200
+Message-ID: <20250624125233.219635-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250624121149.2927-4-chentaotao@didiglobal.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jun 24, 2025 at 12:12:08PM +0000, 陈涛涛 Taotao Chen wrote:
-> -static int blkdev_write_end(struct file *file, struct address_space *mapping,
-> +static int blkdev_write_end(struct kiocb *iocb, struct address_space *mapping,
->  		loff_t pos, unsigned len, unsigned copied, struct folio *folio,
->  		void *fsdata)
->  {
->  	int ret;
-> -	ret = block_write_end(file, mapping, pos, len, copied, folio, fsdata);
-> +	ret = block_write_end(iocb->ki_filp, mapping, pos, len, copied, folio, fsdata);
+Hi all,
 
-... huh.  I thought block_write_end() had to have the same prototype as
-->write_end because it was used by some filesystems as the ->write_end.
-I see that's not true (any more?).  Maybe I was confused with
-generic_write_end().  Anyway, block_write_end() doesn't use it's file
-argument, and never will, so we can just remove it.
+this series fixes a corruption when drivers using virt_boundary_mask set
+a limited max_segment_size by accident, which Red Hat reported as causing
+data corruption with storvsc.  I did audit the tree and also found that
+this can affect SRP and iSER as well.
 
-> +++ b/include/linux/fs.h
-> @@ -446,10 +446,10 @@ struct address_space_operations {
->  
->  	void (*readahead)(struct readahead_control *);
->  
-> -	int (*write_begin)(struct file *, struct address_space *mapping,
-> +	int (*write_begin)(struct kiocb *, struct address_space *mapping,
->  				loff_t pos, unsigned len,
->  				struct folio **foliop, void **fsdata);
-> -	int (*write_end)(struct file *, struct address_space *mapping,
-> +	int (*write_end)(struct kiocb *, struct address_space *mapping,
->  				loff_t pos, unsigned len, unsigned copied,
->  				struct folio *folio, void *fsdata);
+Changes since v1:
+ - improve the srp commit log
+ - slightly simplify the limits assignment in hosts.c
 
-Should we make this a 'const struct kiocb *'?  I don't see a need for
-filesystems to be allowed to modify the kiocb in future, but perhaps
-other people have different opinions.
+Diffstat:
+ infiniband/ulp/srp/ib_srp.c |    5 +++--
+ scsi/hosts.c                |   18 +++++++++++-------
+ 2 files changed, 14 insertions(+), 9 deletions(-)
