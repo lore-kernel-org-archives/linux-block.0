@@ -1,159 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55CE27C150
-	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 10:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E7F35961
+	for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 10:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750761710; cv=none; b=NFlFHhj1b7JnRAu8IKnYCrZJ83yfU5eUbK1CZyYUQ4PjBmgDL/nNV2bXNSWT38c1SShPNo11yAGVCXub7QdNKSmNA68JJZxQ+mKoNUZUolbkBDlU1Xx+9ss82viJjlgxA41eJWhxQhYc6LMGsGT/Pd+5yasdxkzTXlWFTbUPNsk=
+	t=1750761970; cv=none; b=ocm0jSokaXcEC3jH4FBDkXhSpsqAi0ETfRSrCZrDdHMm3spDZ6pmrNNffGGTO/6S/BDEnvV2vHuZu2yPe55ceGpXoWh5ZXDFyEaQSJta+vuYq8wciN9xEdKYodpnujQhyI63MgKW3V2Fo7ws7TeyMPb+UPhQu3KgNk+ECRSCts0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750761710; c=relaxed/simple;
-	bh=3wuhtDUw1kNi9npQEZkOLCTDfTaGWSxTF8DLYN0xceA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=orxTsPeIO2TtlevOF6oVtpRiu6W35DkpfszolPirhpzWUdTHi2ar787bgU3y/pFHRXs9Oqp8m8DfLDyh2RfJg94GzrnPpIP16P0W0rDsEFH0NZIe18XZwsgUYQxBShRMAcGLzGese7mEMqW5zOoBNcFp7AFQun7Th73p9iNH91w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RlkbVomC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750761970; c=relaxed/simple;
+	bh=3uMxTFi8ki/2Td4/4rO+nztBLmmD5YFvOkEU13uDsUA=;
+	h=Subject:Message-ID:Date:MIME-Version:To:References:From:
+	 In-Reply-To:Content-Type; b=YNWx4jnOqmlyuzCa2OGwzEQQfutt5pvHozDwIuPiJyoza4t9DPgrR4oA4LELNOeTzxmdSvJAD7hRsGSPtzIykm5BogbtQwCoq3dXZQOVVbnwe/XpxW83QaU0+tov4chDBATKDLMEs/gL05uNfxlJTkRIfCVbifZ3I29RVqTLxto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hxBf/cwI; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlkbVomC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750761707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Mq/t7Ey9awl+yl1ip35oxrfrAp30tV9ta6L6Yx0CODo=;
-	b=RlkbVomC/0kVUYvu5WX4OyUT98HNt7XuKVbKqzZP2wn4/cR/8hgccWDyG7PV1Q4jj7ELXU
-	5zLR50YtmG9L70Lrff6z2nHs9lJMMDvcxtn6qu+MBbjHU1JFDBzpm9p2wXqkFbNNUWHgj7
-	9FyezzEUMiS5AnHUKHM9SRAVqB0fXq8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-671-KNrWg_eLNSCae1kif6KLlA-1; Tue,
- 24 Jun 2025 06:41:33 -0400
-X-MC-Unique: KNrWg_eLNSCae1kif6KLlA-1
-X-Mimecast-MFC-AGG-ID: KNrWg_eLNSCae1kif6KLlA_1750761692
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F06AE1800287;
-	Tue, 24 Jun 2025 10:41:31 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.49])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B334630001A1;
-	Tue, 24 Jun 2025 10:41:30 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH V2] ublk: setup ublk_io correctly in case of ublk_get_data() failure
-Date: Tue, 24 Jun 2025 18:41:21 +0800
-Message-ID: <20250624104121.859519-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hxBf/cwI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1750761969; x=1782297969;
+  h=message-id:date:mime-version:to:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=NKjSkzFzBlLzs8kCs/Xp0XEbSYmzzfjPSpjWy1g834Y=;
+  b=hxBf/cwIOJxMSsay0pxcSAIpECciSutcHVTE1QJlL9PsmPWKcFEyHGk7
+   ilG/z3G+KAHvyrTZkC9JRqkGozPjnNqeN5YnLGP7jW0vUnMjKpDWZ666O
+   rqHTEjiOS1PuFCCkfQc+cOewdgiNIKVL0dHGSYlDNWD4O6Gxn6q3IqmOY
+   bqB2S4YuvCR+L6jkxRU22WMgQtP52wLBFP8s5/XPVdcUKs8KAEoAo3F9e
+   018ZTrXrKDz7CSx7AdB7Y0mzwyCgUGtNdlKhoVEpf6c7n7WxtQieDIlkU
+   VN2myQsm+Hr0khSS2Gj8M8WILpEtvSMQ4L3dHJTWubZ6TdpfrdG31yRG+
+   g==;
+X-IronPort-AV: E=Sophos;i="6.16,261,1744070400"; 
+   d="scan'208";a="838102643"
+Subject: Re: [PATCH] block: use plug request list tail for one-shot backmerge attempt
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 10:46:03 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:39000]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.41.233:2525] with esmtp (Farcaster)
+ id d473aeec-8ee9-43a8-b357-b7f97d8caa48; Tue, 24 Jun 2025 10:46:02 +0000 (UTC)
+X-Farcaster-Flow-ID: d473aeec-8ee9-43a8-b357-b7f97d8caa48
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 24 Jun 2025 10:46:01 +0000
+Received: from [192.168.29.246] (10.106.83.32) by
+ EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 24 Jun 2025 10:46:01 +0000
+Message-ID: <d9d623e5-4247-4dce-9aaa-d78e1d648f10@amazon.com>
+Date: Tue, 24 Jun 2025 11:45:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+To: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
+References: <4856d1fc-543d-4622-9872-6ca66e8e7352@kernel.dk>
+ <82020a7f-adbc-4b3e-8edd-99aba5172510@amazon.com>
+ <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
+Content-Language: en-US
+From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+In-Reply-To: <f4ed489d-af31-4ca0-bfc1-a340034c61f5@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D006EUA003.ant.amazon.com (10.252.50.176) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-If ublk_get_data() fails, -EIOCBQUEUED is returned and the current command
-becomes ASYNC. And the only reason is that mapping data can't move on,
-because of no enough pages or pending signal, then the current ublk request
-has to be requeued.
+On 11/06/2025 18:53, Jens Axboe wrote:
+> Yes we can't revert it, and honestly I would not want to even if that
+> was an option. If the multi-queue case is particularly important, you
+> could just do something ala the below - keep scanning until you a merge
+> _could_ have happened but didn't. Ideally we'd want to iterate the plug
+> list backwards and then we could keep the same single shot logic, where
+> you only attempt one request that has a matching queue. And obviously we
+> could just doubly link the requests, there's space in the request
+> linkage code to do that. But that'd add overhead in general, I think
+> it's better to shove a bit of that overhead to the multi-queue case.
+> 
+> I suspect the below would do the trick, however.
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 70d704615be5..4313301f131c 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -1008,6 +1008,8 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+>          rq_list_for_each(&plug->mq_list, rq) {
+>                  if (rq->q != q)
+>                          continue;
+> +               if (blk_try_merge(rq, bio) == ELEVATOR_NO_MERGE)
+> +                       continue;
+>                  if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
+>                      BIO_MERGE_OK)
+>                          return true;
+> 
+> --
+> Jens Axboe
 
-Once the request need to be requeued, we have to setup `ublk_io` correctly,
-including io->cmd and flags, otherwise the request may not be forwarded to
-ublk server successfully.
+Sorry for my delayed reply here as I was on business trip for the last 
+couple of weeks. I have done some testing on 6 SSDs aggregated as raid0 
+to simulate the multi-queue case but I haven't seen measurable impact 
+from that change at least on the random write test case. Looks like the 
+patch has been queued to 6.15 & 6.12 stable without this change so I 
+assume we are dropping it?
 
-Fixes: 9810362a57cb ("ublk: don't call ublk_dispatch_req() for NEED_GET_DATA")
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Closes: https://lore.kernel.org/linux-block/CAGVVp+VN9QcpHUz_0nasFf5q9i1gi8H8j-G-6mkBoqa3TyjRHA@mail.gmail.com/
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- move io->addr assignment into ublk_fill_io_cmd()
+Kernel         |  fio (B.W MiB/sec)  | I/O size (iostat)
+-------------- +---------------------+--------------------
+6.15.2         |   639               |  4KiB
+6.15.2+patchv1 |   648               |  4KiB
+6.15.2+patchv2 |   665               |  4KiB
+--------------+----------------------+--------------------
 
- drivers/block/ublk_drv.c | 35 +++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index d36f44f5ee80..3566d7c36b8d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1148,8 +1148,8 @@ static inline void __ublk_complete_rq(struct request *req)
- 	blk_mq_end_request(req, res);
- }
- 
--static void ublk_complete_io_cmd(struct ublk_io *io, struct request *req,
--				 int res, unsigned issue_flags)
-+static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
-+						     struct request *req)
- {
- 	/* read cmd first because req will overwrite it */
- 	struct io_uring_cmd *cmd = io->cmd;
-@@ -1164,6 +1164,13 @@ static void ublk_complete_io_cmd(struct ublk_io *io, struct request *req,
- 	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
- 
- 	io->req = req;
-+	return cmd;
-+}
-+
-+static void ublk_complete_io_cmd(struct ublk_io *io, struct request *req,
-+				 int res, unsigned issue_flags)
-+{
-+	struct io_uring_cmd *cmd = __ublk_prep_compl_io_cmd(io, req);
- 
- 	/* tell ublksrv one io request is coming */
- 	io_uring_cmd_done(cmd, res, 0, issue_flags);
-@@ -2148,10 +2155,9 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
- 	return 0;
- }
- 
--static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *io)
-+static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *io,
-+			  struct request *req)
- {
--	struct request *req = io->req;
--
- 	/*
- 	 * We have handled UBLK_IO_NEED_GET_DATA command,
- 	 * so clear UBLK_IO_FLAG_NEED_GET_DATA now and just
-@@ -2178,6 +2184,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 	u32 cmd_op = cmd->cmd_op;
- 	unsigned tag = ub_cmd->tag;
- 	int ret = -EINVAL;
-+	struct request *req;
- 
- 	pr_devel("%s: received: cmd op %d queue %d tag %d result %d\n",
- 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
-@@ -2236,11 +2243,19 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 			goto out;
- 		break;
- 	case UBLK_IO_NEED_GET_DATA:
--		io->addr = ub_cmd->addr;
--		if (!ublk_get_data(ubq, io))
--			return -EIOCBQUEUED;
--
--		return UBLK_IO_RES_OK;
-+		/*
-+		 * ublk_get_data() may fail and fallback to requeue, so keep
-+		 * uring_cmd active first and prepare for handling new requeued
-+		 * request
-+		 */
-+		req = io->req;
-+		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
-+		io->flags &= ~UBLK_IO_FLAG_OWNED_BY_SRV;
-+		if (likely(ublk_get_data(ubq, io, req))) {
-+			__ublk_prep_compl_io_cmd(io, req);
-+			return UBLK_IO_RES_OK;
-+		}
-+		break;
- 	default:
- 		goto out;
- 	}
--- 
-2.49.0
-
+Hazem
