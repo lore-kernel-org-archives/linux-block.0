@@ -1,86 +1,114 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0414D2D320B
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 16:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E73E280CE0
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 16:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750869306; cv=none; b=fdGGJ8S+7CzXJEyRRA4nK9F0e4X3ev9z/HwWsY3Za2qOvlMr9QzWuFMU6tY3gmTL3P0/r3sudv94nh87PIP1tuZw9tcq1OQJJyu06WeWYH+R2T7clLUEVGude/NvzItPreYprJ+BEdWrUp6rBv1y4mNDZjBykLojsrGIO8azeCI=
+	t=1750869459; cv=none; b=Q1B9gcGKxI2R1anB17uwee4H/leRpdhMuP6ipVP/9NTZMGlgdrNF7t5OUwdt+bbcBtP1WVHayTKGNKydXlm/JOTuxnKcezU0VxBad2RulPdZeDG+KoFlZhnCEWu2pvmdXFkl0zVJEW1hBDh4OcEo4ljF8Sk+hJpPV+nOGAP36fA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750869306; c=relaxed/simple;
-	bh=uSU+CVRzDhuBCrylHIKqb/5LynTGVouo2ht+0eBU3mk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Vr3gx1OKaz4d2EEKF7PTo7fbYUCizo+GKm1WCJ+7+bYuCIYIyJwEn3Lfv3k6DRQ6cFyhJNBiHRuy36BWMeAc0P5I4XRj9yhKDY3DaTkiWOc+BZg/bS4oPplVzvmDYPxblwnKUdVnC+eTGz5ucliv7Z8O+PyT01NPVnOCm949d/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TArdKjsv; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750869459; c=relaxed/simple;
+	bh=zNzBR/wZgvBggmWQ/khF4OFSadbAA0TH9VheG6vvXsI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=AnHG1Map9xg2bSZkxdKdg0B+JhOLucOj74ODPPw9J/87FC4zpujQYy4aUEZbL5O09Jljgfm00o0Cj5HEbJBP7tQpe6CPxfKoq8t0MWWh+fqUwiXOGNcoKgFCAHaP3B34n7PuXJ6eCIu/YXUxGiA3Ro2hwnVSbLA2YrJ03s9aeG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Bv3B+j7q; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TArdKjsv"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bS6qQ1LDqzlgqyQ;
-	Wed, 25 Jun 2025 16:34:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750869296; x=1753461297; bh=6TsA/MXe2+bDQ40v8gre2JKK
-	Le1cqMtu6plLxc69bWY=; b=TArdKjsvDF9MxIEMy1QZ7AbtmsUkdsJoNpep1fCc
-	jzMEWJ5NE3wyC2/GX8Yic7uLwV3L4bfnW34Rp0hmfBmE+/PD+EF6Ec6NUW1TVrMP
-	CyinjmTdFx8JlJJY8aa5YqUeTFPtWu3eWkVikFvQ0qKW84jMtje2LIM1gX+3qpAE
-	2s3+GtCfftzl0e4kuR2qrCqEMyJ9N2ox1J8JiHr9S+WfiZBvlks+1iDE16rFuF9f
-	3Mik/9SRs2344xvxDQnnj0bHHVr/OkT6inRWjm3QiHZWwI8VZGflcTQc0JKLeJfZ
-	fR27Sx2P8YeXf1nY8ay0/dVmAqfSBZcTWR9aTh7+rYpZ7Q==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id mBI3-OVvIk-e; Wed, 25 Jun 2025 16:34:56 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bS6qK02vQzlgqVH;
-	Wed, 25 Jun 2025 16:34:52 +0000 (UTC)
-Message-ID: <654fed1e-ce53-4386-a966-97c50931e9b5@acm.org>
-Date: Wed, 25 Jun 2025 09:34:51 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Bv3B+j7q"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b2fd091f826so121393a12.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 09:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750869456; x=1751474256; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AMwMCyth2Egg/1nTuhCUVlgm1lii2/x1O3UKYqxEFzk=;
+        b=Bv3B+j7qpdJTPRa8SgVj2KWg2RYTTyVlOk9KYCt0kw0V3+rtYLpHzuObT9xV+nMCFE
+         CPhGIpcFnj6IBLuRMfktb/1G1HxrgbsgX5x0faNT8S0j6Iaf3u9XC875z5+U8SduahI1
+         Wvgde+kHae044buXCq05zDAlblbvgeoWcOhkfo6GRyyBQywI+zvYgABvelV5sXi3dIKM
+         SvjGOoSSs2MKkw1t7/6rjrTqmMd2Ac2w4zQM8TL/IRafzSoMtKKRCJkAiE7mu9rbV+7Q
+         TybcOTaFHSOpWL8V3Ve8jWGEbmfPaL4xDgrksFOIqIBpReQPI77chN23+rSZkEl2FqoX
+         nYGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750869456; x=1751474256;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AMwMCyth2Egg/1nTuhCUVlgm1lii2/x1O3UKYqxEFzk=;
+        b=d1d/Xc7+IW/DB0yDo/9VlITknaiczKmJTAUXcOHbMqN1pxCBYPjUUBmGzd5k1vlA5W
+         jw2WqOPAXigHFir71e4heirEWD+lw18i6Tx8xCT6phputkLnm7riGzaq57+YCcP8niAA
+         0HZd0HuF15WfTMbmFn71SV0ZGGgczl31JYcpHwC0K0ZQNY4CJ3xjXe35aGzmAg6rbpvn
+         P2EQ85f0vdOXEHc62CAjK/d0xzJsG1mE+5uXz+/Ck1jVUEbSZbDoElulMmqHvvoMbXbc
+         EV/Zm+751qdKrVIs5g1NBGrqCDPcg5ABWzPABUIffx09uvysM1iJNBTDlc2TG1naUakW
+         HFBg==
+X-Gm-Message-State: AOJu0Ywso385WOM1iXp+AeMBxkPkDc2IxICTZs7AJwnErSjhgK6RDfNf
+	750ZOJqjA44UucmU9xyUKUWZ0Vs1i44tuW15McWBCLqJiLArDtffia+56bPMnsYq0I3pdwxZiUP
+	GBMji
+X-Gm-Gg: ASbGncvewgKvEkZaIfZ8QqQlfzKJ7e7ogVueaJnJOwrzWmiEq673npQClEIqqe82jww
+	RqUC3zGY/T1YIjyqhphxOBlIwwIZaLVgIchy8TB1XncOjNsutitiZIo7LSLXNVBVBytZ+2xPWmg
+	57ew5hBMdGTjemLAMecrtuv3jBXygKtOHlaXejt/7MCqbQa3aimzLGbGdxA3Ns3ZeigYApacdi+
+	RLW3slomFhzgqbtkebVycyx+fadbnOpKvwSjS5siKeDTKTjm93GxaxdXhxbYo3+N8ZKtktkOete
+	rLSa9BV7TlB1mk5kE4hZ+uTkErcm+2nEIHpC21vv/TeU2qm4d8yRSg==
+X-Google-Smtp-Source: AGHT+IHKOBchkezkuA+yfLjfRpwjTNZtL5mBB+DBwdFO61OhOjFAEdtxhj2u3PMvrGVSnuNB6Jh+VA==
+X-Received: by 2002:a17:903:23c3:b0:236:8b70:191b with SMTP id d9443c01a7336-238c8755cd0mr3022235ad.0.1750869456370;
+        Wed, 25 Jun 2025 09:37:36 -0700 (PDT)
+Received: from [127.0.0.1] ([12.48.65.201])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d81fbcb2sm134519865ad.0.2025.06.25.09.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 09:37:35 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
+ Damien Le Moal <dlemoal@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250625093327.548866-1-dlemoal@kernel.org>
+References: <20250625093327.548866-1-dlemoal@kernel.org>
+Subject: Re: [PATCH v3 0/5] Fix write operation handling for zoned DM
+ devices
+Message-Id: <175086945525.168912.13714943214288580323.b4-ty@kernel.dk>
+Date: Wed, 25 Jun 2025 10:37:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/5] dm: Always split write BIOs to zoned device limits
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-References: <20250625093327.548866-1-dlemoal@kernel.org>
- <20250625093327.548866-4-dlemoal@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250625093327.548866-4-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-d7477
 
-On 6/25/25 2:33 AM, Damien Le Moal wrote:
-> +	/*
-> +	 * Mapped devices that require zone append emulation will use the block
-> +	 * layer zone write plugging. In such case, we must split any large BIO
-> +	 * to the mapped device limits to avoid potential deadlocks with queue
-> +	 * freeze operations.
-> +	 */
-> +	if (!dm_emulate_zone_append(md))
-> +		return false;
-> +	return bio_needs_zone_write_plugging(bio) || bio_straddles_zones(bio);
 
-Changing the dm_emulate_zone_append() call into a
-disk_need_zone_resources() call or a disk->zone_wplugs_hash test
-probably would make the intention of the if-statement more clear.
+On Wed, 25 Jun 2025 18:33:22 +0900, Damien Le Moal wrote:
+> Jens, Mike, Mikulas,
+> 
+> Any zoned DM device using target drivers that internally split BIOs
+> using dm_accept_partial_bio() can cause deadlocks with concurrent queue
+> freeze operations. Furthermore, target splitting write operations used
+> to emulate zone append requests break the emulation. This patch series
+> addresses both issues by forcing DM to split BIOs to the DM device
+> limits before passing the BIOs to the target map() function, and by
+> avoiding calls to dm_accept_partial_bio() for Zoned DM targets that use
+> zone append emulation.
+> 
+> [...]
 
-Additionally, bio_needs_zone_write_plugging() already tests
-disk->zone_wplugs_hash. Isn't the dm_emulate_zone_append() call
-superfluous because of this?
+Applied, thanks!
 
-Thanks,
+[1/5] block: Make REQ_OP_ZONE_FINISH a write operation
+      commit: 24cb7af081023bbb7a25ae514e6e2b398d4ab25c
+[2/5] block: Introduce bio_needs_zone_write_plugging()
+      commit: bf7a8b5cbbb2d531f3336be2186af0c5590d157c
+[3/5] dm: Always split write BIOs to zoned device limits
+      commit: 74e93dbcd320a8e9d5f7b3f238eedc7da6d6ca7e
+[4/5] dm: dm-crypt: Do not partially accept write BIOs with zoned targets
+      commit: 0277a0d91194b79b4a3db0c53ba205a933554695
+[5/5] dm: Check for forbidden splitting of zone write operations
+      commit: e04a33a18fdb259d7ad3673ddfce6112f5ce30fd
 
-Bart.
+Best regards,
+-- 
+Jens Axboe
+
+
+
