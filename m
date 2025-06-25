@@ -1,193 +1,426 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7585125C704
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 11:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750851772; cv=fail; b=q48Dl8oEtGxn4S0ip0S81+gxG9cQLXMLNA48i9Ii3+CGhICdlSin2s5Cm1cfVL3PZliw/f9AYnYX0Ub2BfWKU8Ht26/RaMS3n1BQ4XJBLCkiRhvqEuCk+Fv0xRlrZqKzOQgu73Z7mweOEmClgPBspB7LT7XWWE7CHEf4nvb7XBs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750851772; c=relaxed/simple;
-	bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qUkxKzyIp1AqFXqIgLopbfarOaindBKS3CStAmr2zsF+ah+dzvULtOBc7ZZZSLk/OissaY+cVoqoO2nj7xygyojTiwYZtL6PKP7k5t/cDUSyR98W3sFA09O/94WeG6kOzCFkOPySczI6+KilhfDrpCwSOMX2DJcIcn4zcYvwPrQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Z1cZ/C/M; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=PLPFdtJO; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A9F25C702
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 11:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750851891; cv=none; b=VW2Sh+iDOwBf2ORswnLu2ZPA8HoLjdWUFbqVXkOgQHDYN7+QVNKtUe1q/Vf3s1m1SrAozZJELWvvE2g+VqDo9IdMTN8VPLvvThdkGc6kQO/jLPnnLueq6b2U450vKagClXlOFCqgzSpXUUZCAaT+1eMsoozRX1piSxH89XdjxtA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750851891; c=relaxed/simple;
+	bh=EbNIsfrmAZkrndwEZjq7e5aA3eEJpyRlElb12KOXufw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cq3grmCJ+3ozyhH9xCIAeA84SqdKgExWOmR4awC4cisM3viDg/AKAPi8u8KGAAOkO8G5uktHmhjmKu08T9QbF9g/zChboPtXowmBXcEUi6S/frBFtDg7gPNyeE9lZjjAID6widHT+DbsQI0Db4Aa/hvzHn5GngE9RcFyxWRbMtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YzGaQ/lC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Z1cZ/C/M";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="PLPFdtJO"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1750851771; x=1782387771;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=Z1cZ/C/MgVkKQ18AfFjj2sXwN01bxU+PShrk9YxzgZblga0fknACqvas
-   iD4FtXHl2+SHYMe0XkpRVNHpc+wv3tJqecnC1SGiaZyHhPz3UTGGcibFK
-   pFLrJcjWYmETXBzbDWX6pNFCMmXc3zQ/AU/7aVd2dbu4gZpbjUmbBRJwj
-   o3X7DhLWUirjdrrw98rIRQy99ufJv4pIZBP3FfdorAywJ3Ms44/4iYWss
-   BzbZKNqGlKxJ7aj7WKoaFWb09HVBhyQLNc0ET8N6jj/vPM2sV/o/6jOw3
-   jSkfmNq95sbcXcbKAA7Gq/eaWTMEsGbM2sokpVUkp9nX0r7zmz7gNufK2
-   g==;
-X-CSE-ConnectionGUID: m7pZ49r0QDegFKeoHup5MA==
-X-CSE-MsgGUID: MI6q4ZnXT662MQKIykrPNw==
-X-IronPort-AV: E=Sophos;i="6.16,264,1744041600"; 
-   d="scan'208";a="85954316"
-Received: from mail-bn7nam10on2044.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([40.107.92.44])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Jun 2025 19:42:44 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kOvVzIwwYCZtIXwd+uwFNX3zKsN7LALTe9iu/2kIVH2oOPN29WgFl111ZHdEuPpx/qwXcrA6PLtBxc/+afS/XCJ9uicFYz1lSL+a9mH8acjcIYGa/rb2iMP6TOhrc/xF+TJwGzK1FKXGCxCFyWFcAos+gIFH2Ap90oMqVH4kJ8ttnHnU7R8qV7kiPgl9vB7kka7SMEwRpQcpY2pFMInz5Y8Mj15U6M/freMReEshqUaDykkuDywfK4TOgngp18WNpdEAlf19hdQ9B25qpofuhZ2dRd1NpQ+1Gcd9V8b9O+beO0ohyUZYIHm7UEtwaHR+/IWVXgiV0fAOQ4T+FdvxKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=T67qJjEq/PtT6i5GN4cykP7NnAljXmssaBQX1+EKqRhSgIWtvbxA5jBw7OpU+rkEMSt8dEtBagCbeisnS8n3F2fve+AJCrgRtri92mVT35c9KnfnvK4pGe9fuckNGprAF9ejs//Tq10f02rbO+MPhOVTANwnlsUO3gN/RkRBl4KckqKAEEd0Ly7/NF7mwbHT+T4tXtLdCmYokDioBA2fquxR0yFIJ9H1M5jL1UrcVah1AI0tXMyZTPZnq82iD+e588/THGh7lvS28FeDPC3gNwZ2/yt09dMPhY5wOp98R+fotf+tZdhqH/ZHdbka4i29xmM4EttPtZEqStSiYDHXHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=PLPFdtJO6Lh4JLsOAezFmY2zBB0dMzeopY68a+/4q0QtJFy1GRFwCOOnGRLZYck+RAu5Se9QgZlytpqZNtg2gzQY0cO4ex8RccU0KUtVMa8dHvWnfWlpMXRx+av0FCzrFANxmbq96XYVd7ei2iyVkHRSGLo226yxBww9DJthwdQ=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by DM6PR04MB6857.namprd04.prod.outlook.com (2603:10b6:5:249::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.30; Wed, 25 Jun
- 2025 11:42:43 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%7]) with mapi id 15.20.8857.026; Wed, 25 Jun 2025
- 11:42:43 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: Damien Le Moal <dlemoal@kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, Mike Snitzer
-	<snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-CC: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v3 1/5] block: Make REQ_OP_ZONE_FINISH a write operation
-Thread-Topic: [PATCH v3 1/5] block: Make REQ_OP_ZONE_FINISH a write operation
-Thread-Index: AQHb5bXyEGE/+V9Pk0Cdo4zHNzGnX7QTwRkA
-Date: Wed, 25 Jun 2025 11:42:43 +0000
-Message-ID: <bccd25a3-bc8f-474f-8df2-1aa94536a24e@wdc.com>
-References: <20250625093327.548866-1-dlemoal@kernel.org>
- <20250625093327.548866-2-dlemoal@kernel.org>
-In-Reply-To: <20250625093327.548866-2-dlemoal@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DM6PR04MB6857:EE_
-x-ms-office365-filtering-correlation-id: 59f2952c-2010-4a1a-7f6a-08ddb3dd659d
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZVZwbkJJYlRTL3VvVzAySzlzZzBJb0hITWFBUWwycHdKMktvUzdueVhEWVJm?=
- =?utf-8?B?bWNzL0VHMVZMVU5yVUlEclY3UytCUm5WQmh6ZjBDMHh5am15cnRvNjRVNFUx?=
- =?utf-8?B?SnFoZkFXd1pLVnQrN1VhODMxVk9CT3BaYzdOZmdWTUFYL3d3RWN2RlJ1Rkk3?=
- =?utf-8?B?RFlTNmpyQ0RyenVTUDFKMkhUU2NHR1RSQnhpNmxNeG1GZXl1YWRnZlU1SFhR?=
- =?utf-8?B?RlFrZHNUc3dyVGdReWU3TGZkbFE1dDBOQnFZSFNZYnZoVk5adkJ5Q1YxR3JT?=
- =?utf-8?B?QjRrT1hjUHF3T09RQzBsSUQ2TGkwN3NkUmVZT0ZmUXY0ampxVUJjQkg3MHkr?=
- =?utf-8?B?ditYeTV5QWgzOTFPTC9CcUNSSndraDdRbnpVS0swMXBXVHRhRFRTcC92VmZK?=
- =?utf-8?B?bFJKZ1ZMUVJPQ3ZvZlA4NFFLcnMxTmFORGpOckFkZ0FYOXkxb3o4TXR4WUZx?=
- =?utf-8?B?U1VvSkIzTW12Y2JPajJwd1lVaElSUThtdjIxWmkwUUlLdlRHSTZ3T1RNWkVO?=
- =?utf-8?B?K3VGYXdjRUR3bUk3OUVZcXQ5TFhrUWt0bWdaYWRPdEpNTk5MYzVVbjA1a0FW?=
- =?utf-8?B?YTN2VlcwZlpwWjUzYzlzWjN5WkxXTGw1UWhuK3NSaDlHM3dCNnJzOWVnUHdq?=
- =?utf-8?B?YWJaZFRYdjZvaGUyNHpmQStWY0Jmc1Z2ZkhtNzh1V21wRnhmbDk2emU4dWNh?=
- =?utf-8?B?OHgxdjBLYXl4TVVhdEpObVBVTHF3bSt3bEFobmRRTExVcGpzc1p3bmJXU1I0?=
- =?utf-8?B?YUpNY29WVXV4N2NYSDNHWGdSL3ZOQTdVak9paGFOcC82Mmh5SHpGd3F4K1NE?=
- =?utf-8?B?MFNicUZzdXdlZ0NjclFyWUlDMWNFY3N4ODBLTjBhSHlRMS9qMVZCVTN6Q1h4?=
- =?utf-8?B?RmdNZHE0RUJGZVc4T0t6eXdjK3dzSDg3TWtMRUlpSHdWdmpPRDBkOWZJMllq?=
- =?utf-8?B?S3NwK0ZIVGRDZGxyUFloRmVHbDgvek1aT2FibmFWMlY5MUxTeS9HN2o2MjBY?=
- =?utf-8?B?b0NzN1VadXV2eTBCamM0UWtGQjJKTFJhS0hDUWp4MHB4VytSNWlWVmcxemor?=
- =?utf-8?B?M3E1VVJMYTlJdkY3Z1ZCOGtWSG9Zb1psWnhzRS9nc1NIaGFaaTJFOE1pcGFL?=
- =?utf-8?B?Y2hMU0p2V21VOWk4NG56TmNENkdLK201WjZ3bXc0aHZpU0ZYa25DVGd0c0c0?=
- =?utf-8?B?cG91dFhha20zRXo0RktvbDA4aUw1OHdzNjM4ZEFyd3R2S1pMK3RRT3V1czYr?=
- =?utf-8?B?M1RXTDl0em91a3lXa0ZhMllhTUVTU2pnUlRJVlAwYkcvWkJYU2RqTTdUNXh2?=
- =?utf-8?B?VHRqOGFvSHMrWGZmaWF2ZFJyVmlUTENoUmM3VGNHcWdHRFBOSFU4dk4rTmRN?=
- =?utf-8?B?YnZ4azltL1htMkhrZ0JrNmVRR20ycFd1TmowU0hQKzVqc21YQmhidW1wN0FM?=
- =?utf-8?B?T0ZOdHBIdjFTMHdKZEE5N1R4eTR2aU5XcTZzMCs5SHJTQnd2YzVqMnIxdDEr?=
- =?utf-8?B?Qy9DaHN1aUhrK0FReU11SVZPWDU1SmNxM2tMQmtZeHVKRU14SnE5djBlYm81?=
- =?utf-8?B?dGR3M1U4ZUJkTFFjVVZ5SUxNOXptWmhDeGFoTWFuRE5uOU1sRzNBRmVvOUFK?=
- =?utf-8?B?RG5hYWFxL2xIcklhSWJETlFGc09XYlFDdHJFL296QS95R2pNaDlLNGMrS1hh?=
- =?utf-8?B?L0dPWDQrVGM3VkFNdEpka0dDR1RJZnpyalQ4L2w3ZHNpbENrZ2IrY3huZEZ4?=
- =?utf-8?B?MnQ1S3E2UVowT1Jhem5SZ2ZwMWRoeldDbWtPaXdlb0k1bE5TWVdmNmFjMVVx?=
- =?utf-8?B?Q2JFRXNMN2FQR3N6dnkyWEZZdUYva0hMRHN1d1NxUGF6c3hwVnhadHhCcjRa?=
- =?utf-8?B?cUFFRHJkZktCZXg3QmhIT2NWNjZiVFdqTzZQMDlYMlE1d3RmUTJNMlQ5UlFY?=
- =?utf-8?B?UUxaak1NN3lsaEF4ZWRsMFhzTm9EOGg5L3lxQXNIczh5Q1pEeWtoV05CMWFz?=
- =?utf-8?Q?eJPOXFaDoRil6CT0b5yCpTTem9xOIE=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MzNZUVRINDVlTmQwMDFtdXNsaXY5NG1kaTVzTTFnRGJuZ2grYjdUWHFEZURi?=
- =?utf-8?B?cklDMVVKZkNTYzRMdWNsdUxQd0NzQ3VXTjZSeDNXYm9JOFVoWEhyenlVK0Nn?=
- =?utf-8?B?REpYRWhkNEx6MG9HMnFpWjdWY2RxTmEvK1phWURZUmIvZDZJN0YrSnlIYkRz?=
- =?utf-8?B?Y0NxalFCci9FaWZUSzNZNU9ybTBtOHlQSloyWWsxK1QvMWFhMTViRGRUenJu?=
- =?utf-8?B?bjRhd3d2cDNOZ1cwN1MzVVdIOUJBbUxSdnVOL3ljZEpvZkUwNU1vU2NNT0Zu?=
- =?utf-8?B?STN5bSt5RUFUVWoxUlhkRzRIYXlLSnA5bEV0a3J2bUtUdUhIK28zdFlWTFVJ?=
- =?utf-8?B?d0grQXpDZVBmMlhPWXRNOUlQMWFGbHF6VlVEeHZmTmZqaWxYR3V1NEpSM0Ru?=
- =?utf-8?B?OXVvWWVORVdraWI0N2VqcndlcDg2NnlwbG9yVWdxS3dVL1hYemMway9tME12?=
- =?utf-8?B?cVY4REdzVkZ1Q2szSGdKYnBHbTI3clE5ZGMxcHIvOW5hSlJ3d2ljL0cyR0FX?=
- =?utf-8?B?RWVJOXQzVUx1NURCTVFqUm4xNDNqMGVSQTlIUFYydWN6UmhHalpnTDFoYVRC?=
- =?utf-8?B?S3gyZkZDa1J0TnA1SS80RlpSMTljR21PZDZ3MTJTdjgxLzRxMUhyd1UxcGJn?=
- =?utf-8?B?UW1SVDkvUnhOWjMyN3FDcnRCc0FNMGZ1c2lrQVFJenpHMmlWMVhtVytCT3FQ?=
- =?utf-8?B?QlB3QUV4enZZWFJ6SER5V3UzZTA3dXVRY1JydkdIb1hLVmZnMXMvMWgwZXhV?=
- =?utf-8?B?WUpGSXhROGhlYkxXay9SUTREWGRlRWtMdEROdlp0UkFhYUtKQ0xpdmdzd0Vo?=
- =?utf-8?B?bDVjNnVvK2gxWmgwamhoMGVoa2JTT0pMNEhqRnlXUHJQSTUxZW1sN3BoTDNX?=
- =?utf-8?B?REZneHZGOVhOd1c0UlY2Tm5uTk9VTE80ZndwKy9GS1ozZzd0ZFZ4VHRyRjdu?=
- =?utf-8?B?ZHRFUFhnU0QrWWpvVGJETXRqMTJ5Z29Oa2RHNldQSG9wUm0zZXlzaTRQK2lY?=
- =?utf-8?B?cHR2RVR1cTdVNzF6ZTBxbktON3dqQ2Y0UkVTdjdiL1MrUlRGaEpFOEJ6bHk0?=
- =?utf-8?B?QjV3L1BNQXc1SUg2R3JXM0JwdzFhcGtxV2p4Y2NybWlhS3UwaHNwTjBOZVZS?=
- =?utf-8?B?U3FqeWkyVFdNNUl0VTZIVHlCbU9YZEZINkxsa3VTTWVCbW10cy96WmFOM0xX?=
- =?utf-8?B?emNsbWxpeEx6WS9CU05jRjJjUEgvdWRWNHpESWpPUk1TRXd1ZC9SMjZrUVRz?=
- =?utf-8?B?bDkydFZUVXd6UXdIaU0yTjZjaktxQ2hkYnk5QTZtbEY2eHQ5QTdrRHFjNjNP?=
- =?utf-8?B?VVEyaStZQXFJOExTNGJDWUlmSStGaXhJQVlnV1VCSGlGVWx1QmIyZ2lYK0Zj?=
- =?utf-8?B?c011VlN5dGtMLzFZYm4yRWdqQ2Z4V1prKzZoZEk1cnhWditObU5FWXBiM1JI?=
- =?utf-8?B?ZzFueC9zMkk4ZEFURmhqUnJBZXNEM3BJZUlhVEJ5ZmVIVU9yOWpmNzhPdVNJ?=
- =?utf-8?B?cWNzbWtrL2pITmpDRmlmQ1hSRU9FKzhPOWN5UGdxWS9uVC90WEVxVUZGNllN?=
- =?utf-8?B?aHNmUUpWUm9pMWM3RXdDbmsxaDQ2bUFVMERFWUU2VllqbVp3MFRySWRPTlRD?=
- =?utf-8?B?d1Q2UktKL08rNUNHaWpFN0tTK0dEMEovT0JrRzBRdk82TFA4RUxTYmZTU3pl?=
- =?utf-8?B?VENMMXQyak1UT2R5SkVQMlptQTY3dXFpM1FXSSsrRzd4VW5pSmxzZ2RtUlRm?=
- =?utf-8?B?MkNtc2s5cERzQ2Z1enRjZXo1MmhrQmRmTUFSZWFkYVFOK1VqZ3Vnek1GKzM1?=
- =?utf-8?B?RWNJUU9Mak1RU29RSkF1UVArVmYxQzlFK2Z5ZGl6Z1VKc0dWZTZWOGZJMWg1?=
- =?utf-8?B?WDNkWFRocEdCOGNjOGRTUXZzM2FXdk9SS0hDcU5JT2RUblNRc0pqQzdyb2dh?=
- =?utf-8?B?QVpNRnpaNy9hZUdqOXlhRzRhUkUzU0ZnV0RFYlR6Z24xd3VzaG5sTXBjblpY?=
- =?utf-8?B?WXI5Qm4yTGpQYlpTbEFnS1ZxUkVacFhNMnk0OWtoZ2luZGRqQnJucHpZd21X?=
- =?utf-8?B?Z1A5QzF4TDkrRWJwclpJT1BRMURpYnovN05ob0RibW1YclpUVXRIZE9QSDIr?=
- =?utf-8?B?TVNlM0k3UllJNmFDRktOTG1nYWg4WThyRXh2WlZBZDUwMkowT2xhaVhNQmFS?=
- =?utf-8?B?SFE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4DD699ED691F1746B91FA884F64ADBA6@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YzGaQ/lC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750851887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k7DB0M+XZEXpWtzl3X/ZrT9+loEBDTTEz/btHO9PtKE=;
+	b=YzGaQ/lCE/dRgST//8jv4VsnweO/OUjf/HohoGkNgH6STf1ucHR6yKRXG3iqYvPtZDKfTa
+	n+zvD9NMu3OLxNUcI9Nt5k1dPGaskRM+4OOXtioCyJ6e5DDJtsM9SiDH5dXUsBpHyVRvJn
+	6dmY1TrWsF0mIpHL97F8gaFuqGQCG74=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-33-k4laZxy5M0yy-km0XsdsNg-1; Wed, 25 Jun 2025 07:44:46 -0400
+X-MC-Unique: k4laZxy5M0yy-km0XsdsNg-1
+X-Mimecast-MFC-AGG-ID: k4laZxy5M0yy-km0XsdsNg_1750851885
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae0ba0eb825so79938066b.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 04:44:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750851885; x=1751456685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k7DB0M+XZEXpWtzl3X/ZrT9+loEBDTTEz/btHO9PtKE=;
+        b=YKkOv+1sR1kRPhLFgX8uSap7OglKvpLK+yg/FbSFIwgiAR8EoFr2dJLYxLo+snO8NB
+         knguqWvd6zGT4cVJmMe+ki1z0EVRsePFjV5YX9E14fF0WQiPeVUEnQoNzzUMAQ6U3GXa
+         PW9U+52X8AneQUN//Yq3Sprp82kviOhB72r1hsq4HNad7wde9hxOGJPOcttdBOjNKgoo
+         ZMvSDg6GdX4oRvaTiKeWRyE36Y7ldwFkUio8/xhXRq2lAXPK24xpzGc7t+yFjsOedUq/
+         OdfYUWJrOM+QsRhg0cQdKVKzDHC/r904UCK5uxZLvY6VJUiy17jtT4UIHQiODejSxc5s
+         cFuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWZcSRmgLdNAV2s0c65IyvrhR0HjC+jTqeNuXi0sRGBcauyNKw7wHvMeuDrQ03UTRJqPXPcgtOm1hqQtA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQnuDJb+dKQ3Q2LQznm8bXA3007LVou+EOWfyRqyX4WlpkLwXN
+	9JXK87G/6oMhlQ+lo6F3WfdB2hESucZ4YGThK2yiIPPNjLTKS35FS2JYlmu7D1Uyj/cu0/D9zZO
+	nvmtZOnft9/mwRA890YYysMqA2EvV1b6pfWndRCct4wbqHQrnaKUIk2tD39EXVlm48OJ+LWpq
+X-Gm-Gg: ASbGnctc+CakA97w45nDK0xvtxrNPJCXQg6QYQMOiF0rt+XCbmEH8Xq0iWKs9X3x/Mp
+	dVt9wswSJpZKssXkwn3VsNan2nKT7TyqLJMtIgJ/ndsb6E3da63//lHMfR/QG8ZV1NN9fs8otF0
+	7qUoQxpgkZkRzrDdy+3bGI+sEdkZSvadCl53RCXUYy2zEpYMQcoVn1VaUJGqAbRH/RFjQhBMK+p
+	RnzZ4Jj9/GmA/Mh+1+Ih3tbwNGXL55se/0p6A36tlBl50FhYT4oHmt6NCr9kluSjOIHG8XiQKBf
+	tc8AuNtL4Kg=
+X-Received: by 2002:a17:907:9447:b0:ae0:cccd:3e7d with SMTP id a640c23a62f3a-ae0cccd6667mr39299766b.33.1750851884612;
+        Wed, 25 Jun 2025 04:44:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0tg5rtdPZNJkQBFwtpTQY99Q02pZ9j+qthvcbP3Q1RGnnnHKHcxH0x4kHVE92NcOHkdubZA==
+X-Received: by 2002:a17:907:9447:b0:ae0:cccd:3e7d with SMTP id a640c23a62f3a-ae0cccd6667mr39296466b.33.1750851884038;
+        Wed, 25 Jun 2025 04:44:44 -0700 (PDT)
+Received: from redhat.com ([31.187.78.69])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0b4fb52dbsm201758666b.123.2025.06.25.04.44.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 04:44:43 -0700 (PDT)
+Date: Wed, 25 Jun 2025 07:44:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"NBU-Contact-Li Rongqing (EXTERNAL)" <lirongqing@baidu.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Israel Rukshin <israelr@nvidia.com>
+Subject: Re: [PATCH v5] virtio_blk: Fix disk deletion hang on device surprise
+ removal
+Message-ID: <20250625074112-mutt-send-email-mst@kernel.org>
+References: <20250602024358.57114-1-parav@nvidia.com>
+ <20250624185622.GB5519@fedora>
+ <CY8PR12MB719579F7DAD8B0C0A98CBC7FDC78A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20250624150635-mutt-send-email-mst@kernel.org>
+ <CY8PR12MB71953552AE196A592A1892DDDC78A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20250624155157-mutt-send-email-mst@kernel.org>
+ <CY8PR12MB71953EFA4BD60651BFD66BD7DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20250625070228-mutt-send-email-mst@kernel.org>
+ <CY8PR12MB7195AF9E34DF2A4821F590A8DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	JQkPBESvUWFw1sPNgi7fUTOb5gBhFIB2Uj7EbJU82MPL1z/bgTTFkSFql3MXppETv8tRv+ZpD9Pc1965FPCGhWPi8d4vo29Bhpk/BBsC425LQYfQa2ENSQUxWA95qGTgAXC/8FZNNxl2BowoUTWwP78xN8sheCqxToF+8+GbzBogjRV/zevTxBPA1GXj2Ypg0oKLrZmbozNXAdxY+bespkDotQqjiYJkZAB5sc51XfmDHxGQvk+Fhizd0ILZm9UiNp/Lf4SKenAtS0RBDpDwxZHmJrQMTYgDJL61j/YeEoML2O0pr7DQbj8OZ/Cy1jugOciOstEMJCi125I/x6HX0m7Lic1jWeMjNCPHwyL7pRqF1gcfHQYXUDQixparACsk3HAmT5F0O4gOpmzVIYG8ZzJ0W9RyXLPNTQ1RTxGK/GmxqCrB6MRqFbMKRctU33evlF9T1Dc2danP1ev+c8hG6Nxtp0i7tuJX0ypqv7UoBMfkBK3Osng9Dk/MCuH6FpM2Lh87mdMKEudxeUZLGL7oktfrYFclj/EfN2qyllDDfiFN7zSwUmYjZDkfnIa+Jr/TNoKjMfX9B26mRh1h0+Vii1enBWUrDsVIQ/64XoCKrXWm06BsgwUMCv54zRHrEYHP
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59f2952c-2010-4a1a-7f6a-08ddb3dd659d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2025 11:42:43.0278
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5p9qPcOfkwaKm0XTwW1w0xfQn99RkR8LnYzdAF6fpP7IuCzBkF6rYSlhmiZzcRrWyDhzu6XrFkP5RyYGbh8wBXR83jwrvffroXLisau5wKE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6857
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY8PR12MB7195AF9E34DF2A4821F590A8DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+On Wed, Jun 25, 2025 at 11:08:42AM +0000, Parav Pandit wrote:
+> 
+> > From: Michael S. Tsirkin <mst@redhat.com>
+> > Sent: 25 June 2025 04:34 PM
+> > 
+> > On Wed, Jun 25, 2025 at 02:55:27AM +0000, Parav Pandit wrote:
+> > >
+> > > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > > Sent: 25 June 2025 01:24 AM
+> > > >
+> > > > On Tue, Jun 24, 2025 at 07:11:29PM +0000, Parav Pandit wrote:
+> > > > >
+> > > > >
+> > > > > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > Sent: 25 June 2025 12:37 AM
+> > > > > >
+> > > > > > On Tue, Jun 24, 2025 at 07:01:44PM +0000, Parav Pandit wrote:
+> > > > > > >
+> > > > > > >
+> > > > > > > > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > > > > Sent: 25 June 2025 12:26 AM
+> > > > > > > >
+> > > > > > > > On Mon, Jun 02, 2025 at 02:44:33AM +0000, Parav Pandit wrote:
+> > > > > > > > > When the PCI device is surprise removed, requests may not
+> > > > > > > > > complete the device as the VQ is marked as broken. Due to
+> > > > > > > > > this, the disk deletion hangs.
+> > > > > > > >
+> > > > > > > > There are loops in the core virtio driver code that expect
+> > > > > > > > device register reads to eventually return 0:
+> > > > > > > > drivers/virtio/virtio_pci_modern.c:vp_reset()
+> > > > > > > > drivers/virtio/virtio_pci_modern_dev.c:vp_modern_set_queue_r
+> > > > > > > > eset
+> > > > > > > > ()
+> > > > > > > >
+> > > > > > > > Is there a hang if these loops are hit when a device has
+> > > > > > > > been surprise removed? I'm trying to understand whether
+> > > > > > > > surprise removal is fully supported or whether this patch is
+> > > > > > > > one step in that
+> > > > direction.
+> > > > > > > >
+> > > > > > > In one of the previous replies I answered to Michael, but
+> > > > > > > don't have the link
+> > > > > > handy.
+> > > > > > > It is not fully supported by this patch. It will hang.
+> > > > > > >
+> > > > > > > This patch restores driver back to the same state what it was
+> > > > > > > before the fixes
+> > > > > > tag patch.
+> > > > > > > The virtio stack level work is needed to support surprise
+> > > > > > > removal, including
+> > > > > > the reset flow you rightly pointed.
+> > > > > >
+> > > > > > Have plans to do that?
+> > > > > >
+> > > > > Didn't give enough thoughts on it yet.
+> > > >
+> > > > This one is kind of pointless then? It just fixes the specific race
+> > > > window that your test harness happens to hit?
+> > > >
+> > > It was reported by Li from Baidu, whose tests failed.
+> > > I missed to tag "reported-by" in v5. I had it until v4. :(
+> > >
+> > > > Maybe it's better to wait until someone does a comprehensive fix..
+> > > >
+> > > >
+> > > Oh, I was under impression is that you wanted to step forward in discussion
+> > of v4.
+> > > If you prefer a comprehensive support across layers of virtio, I suggest you
+> > should revert the cited patch in fixes tag.
+> > >
+> > > Otherwise, it is in degraded state as virtio never supported surprise removal.
+> > > By reverting the cited patch (or with this fix), the requests and disk deletion
+> > will not hang.
+> > 
+> > But they will hung in virtio core on reset, will they not? The tests just do not
+> > happen to trigger this?
+> > 
+> It will hang if it a true surprise removal which no device did so far because it never worked.
+> (or did, but always hung that no one reported yet)
+> 
+> I am familiar with 2 or more PCI devices who reports surprise removal, which do not complete the requests but yet allows device reset flow.
+> This is because device is still there on the PCI bus. Only via side band signals device removal was reported.
+
+So why do we care about it so much? I think it's great this patch
+exists, for example it makes it easier to test surprise removal
+and find more bugs. But is it better to just have it hang
+unconditionally? Are we now making a commitment that it's working -
+one we don't seem to intend to implement?
+
+> But I agree that for full support, virtio all layer changes would be needed as new functionality (without fixes tag  :) ).
+
+
+Or with a fixes tag - lots of people just use it as a signal to mean
+"where can this be reasonably backported to".
+
+
+> > > Please let me know if I should re-send to revert the patch listed in fixes tag.
+> > >
+> > > > > > > > Apart from that, I'm happy with the virtio_blk.c aspects of the
+> > patch:
+> > > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > > > >
+> > > > > > > Thanks.
+> > > > > > >
+> > > > > > > > >
+> > > > > > > > > Fix it by aborting the requests when the VQ is broken.
+> > > > > > > > >
+> > > > > > > > > With this fix now fio completes swiftly.
+> > > > > > > > > An alternative of IO timeout has been considered, however
+> > > > > > > > > when the driver knows about unresponsive block device,
+> > > > > > > > > swiftly clearing them enables users and upper layers to react
+> > quickly.
+> > > > > > > > >
+> > > > > > > > > Verified with multiple device unplug iterations with
+> > > > > > > > > pending requests in virtio used ring and some pending with the
+> > device.
+> > > > > > > > >
+> > > > > > > > > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise removal
+> > > > > > > > > of virtio pci device")
+> > > > > > > > > Cc: stable@vger.kernel.org
+> > > > > > > > > Reported-by: Li RongQing <lirongqing@baidu.com>
+> > > > > > > > > Closes:
+> > > > > > > > > https://lore.kernel.org/virtualization/c45dd68698cd47238c5
+> > > > > > > > > 5fb7
+> > > > > > > > > 3ca9
+> > > > > > > > > b474
+> > > > > > > > > 1@baidu.com/
+> > > > > > > > > Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > > > > > Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+> > > > > > > > > Signed-off-by: Parav Pandit <parav@nvidia.com>
+> > > > > > > > >
+> > > > > > > > > ---
+> > > > > > > > > v4->v5:
+> > > > > > > > > - fixed comment style where comment to start with one
+> > > > > > > > > empty line at start
+> > > > > > > > > - Addressed comments from Alok
+> > > > > > > > > - fixed typo in broken vq check
+> > > > > > > > > v3->v4:
+> > > > > > > > > - Addressed comments from Michael
+> > > > > > > > > - renamed virtblk_request_cancel() to
+> > > > > > > > >   virtblk_complete_request_with_ioerr()
+> > > > > > > > > - Added comments for virtblk_complete_request_with_ioerr()
+> > > > > > > > > - Renamed virtblk_broken_device_cleanup() to
+> > > > > > > > >   virtblk_cleanup_broken_device()
+> > > > > > > > > - Added comments for virtblk_cleanup_broken_device()
+> > > > > > > > > - Moved the broken vq check in virtblk_remove()
+> > > > > > > > > - Fixed comment style to have first empty line
+> > > > > > > > > - replaced freezed to frozen
+> > > > > > > > > - Fixed comments rephrased
+> > > > > > > > >
+> > > > > > > > > v2->v3:
+> > > > > > > > > - Addressed comments from Michael
+> > > > > > > > > - updated comment for synchronizing with callbacks
+> > > > > > > > >
+> > > > > > > > > v1->v2:
+> > > > > > > > > - Addressed comments from Stephan
+> > > > > > > > > - fixed spelling to 'waiting'
+> > > > > > > > > - Addressed comments from Michael
+> > > > > > > > > - Dropped checking broken vq from queue_rq() and queue_rqs()
+> > > > > > > > >   because it is checked in lower layer routines in virtio
+> > > > > > > > > core
+> > > > > > > > >
+> > > > > > > > > v0->v1:
+> > > > > > > > > - Fixed comments from Stefan to rename a cleanup function
+> > > > > > > > > - Improved logic for handling any outstanding requests
+> > > > > > > > >   in bio layer
+> > > > > > > > > - improved cancel callback to sync with ongoing done()
+> > > > > > > > > ---
+> > > > > > > > >  drivers/block/virtio_blk.c | 95
+> > > > > > > > > ++++++++++++++++++++++++++++++++++++++
+> > > > > > > > >  1 file changed, 95 insertions(+)
+> > > > > > > > >
+> > > > > > > > > diff --git a/drivers/block/virtio_blk.c
+> > > > > > > > > b/drivers/block/virtio_blk.c index
+> > > > > > > > > 7cffea01d868..c5e383c0ac48
+> > > > > > > > > 100644
+> > > > > > > > > --- a/drivers/block/virtio_blk.c
+> > > > > > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > > > > > @@ -1554,6 +1554,98 @@ static int virtblk_probe(struct
+> > > > > > > > > virtio_device
+> > > > > > > > *vdev)
+> > > > > > > > >  	return err;
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > +/*
+> > > > > > > > > + * If the vq is broken, device will not complete requests.
+> > > > > > > > > + * So we do it for the device.
+> > > > > > > > > + */
+> > > > > > > > > +static bool virtblk_complete_request_with_ioerr(struct
+> > > > > > > > > +request *rq, void *data) {
+> > > > > > > > > +	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+> > > > > > > > > +	struct virtio_blk *vblk = data;
+> > > > > > > > > +	struct virtio_blk_vq *vq;
+> > > > > > > > > +	unsigned long flags;
+> > > > > > > > > +
+> > > > > > > > > +	vq = &vblk->vqs[rq->mq_hctx->queue_num];
+> > > > > > > > > +
+> > > > > > > > > +	spin_lock_irqsave(&vq->lock, flags);
+> > > > > > > > > +
+> > > > > > > > > +	vbr->in_hdr.status = VIRTIO_BLK_S_IOERR;
+> > > > > > > > > +	if (blk_mq_request_started(rq) &&
+> > > > !blk_mq_request_completed(rq))
+> > > > > > > > > +		blk_mq_complete_request(rq);
+> > > > > > > > > +
+> > > > > > > > > +	spin_unlock_irqrestore(&vq->lock, flags);
+> > > > > > > > > +	return true;
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > > +/*
+> > > > > > > > > + * If the device is broken, it will not use any buffers
+> > > > > > > > > +and waiting
+> > > > > > > > > + * for that to happen is pointless. We'll do the cleanup
+> > > > > > > > > +in the driver,
+> > > > > > > > > + * completing all requests for the device.
+> > > > > > > > > + */
+> > > > > > > > > +static void virtblk_cleanup_broken_device(struct virtio_blk *vblk)
+> > {
+> > > > > > > > > +	struct request_queue *q = vblk->disk->queue;
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * Start freezing the queue, so that new requests keeps
+> > > > waiting at the
+> > > > > > > > > +	 * door of bio_queue_enter(). We cannot fully freeze the
+> > > > > > > > > +queue
+> > > > > > > > because
+> > > > > > > > > +	 * frozen queue is an empty queue and there are pending
+> > > > requests, so
+> > > > > > > > > +	 * only start freezing it.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_freeze_queue_start(q);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * When quiescing completes, all ongoing dispatches have
+> > > > completed
+> > > > > > > > > +	 * and no new dispatch will happen towards the driver.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mq_quiesce_queue(q);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * Synchronize with any ongoing VQ callbacks that may
+> > > > > > > > > +have
+> > > > started
+> > > > > > > > > +	 * before the VQs were marked as broken. Any outstanding
+> > > > requests
+> > > > > > > > > +	 * will be completed by
+> > > > virtblk_complete_request_with_ioerr().
+> > > > > > > > > +	 */
+> > > > > > > > > +	virtio_synchronize_cbs(vblk->vdev);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * At this point, no new requests can enter the
+> > > > > > > > > +queue_rq()
+> > > > and
+> > > > > > > > > +	 * completion routine will not complete any new requests
+> > > > > > > > > +either for
+> > > > > > > > the
+> > > > > > > > > +	 * broken vq. Hence, it is safe to cancel all requests which are
+> > > > > > > > > +	 * started.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mq_tagset_busy_iter(&vblk->tag_set,
+> > > > > > > > > +				virtblk_complete_request_with_ioerr,
+> > > > vblk);
+> > > > > > > > > +	blk_mq_tagset_wait_completed_request(&vblk->tag_set);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * All pending requests are cleaned up. Time to resume
+> > > > > > > > > +so
+> > > > that disk
+> > > > > > > > > +	 * deletion can be smooth. Start the HW queues so that
+> > > > > > > > > +when queue
+> > > > > > > > is
+> > > > > > > > > +	 * unquiesced requests can again enter the driver.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mq_start_stopped_hw_queues(q, true);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * Unquiescing will trigger dispatching any pending
+> > > > > > > > > +requests
+> > > > to the
+> > > > > > > > > +	 * driver which has crossed bio_queue_enter() to the driver.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mq_unquiesce_queue(q);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * Wait for all pending dispatches to terminate which
+> > > > > > > > > +may
+> > > > have been
+> > > > > > > > > +	 * initiated after unquiescing.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mq_freeze_queue_wait(q);
+> > > > > > > > > +
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * Mark the disk dead so that once we unfreeze the
+> > > > > > > > > +queue,
+> > > > requests
+> > > > > > > > > +	 * waiting at the door of bio_queue_enter() can be
+> > > > > > > > > +aborted right
+> > > > > > > > away.
+> > > > > > > > > +	 */
+> > > > > > > > > +	blk_mark_disk_dead(vblk->disk);
+> > > > > > > > > +
+> > > > > > > > > +	/* Unfreeze the queue so that any waiting requests will
+> > > > > > > > > +be
+> > > > aborted. */
+> > > > > > > > > +	blk_mq_unfreeze_queue_nomemrestore(q);
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > >  static void virtblk_remove(struct virtio_device *vdev)  {
+> > > > > > > > >  	struct virtio_blk *vblk = vdev->priv; @@ -1561,6 +1653,9
+> > > > > > > > > @@ static void virtblk_remove(struct virtio_device *vdev)
+> > > > > > > > >  	/* Make sure no work handler is accessing the device. */
+> > > > > > > > >  	flush_work(&vblk->config_work);
+> > > > > > > > >
+> > > > > > > > > +	if (virtqueue_is_broken(vblk->vqs[0].vq))
+> > > > > > > > > +		virtblk_cleanup_broken_device(vblk);
+> > > > > > > > > +
+> > > > > > > > >  	del_gendisk(vblk->disk);
+> > > > > > > > >  	blk_mq_free_tag_set(&vblk->tag_set);
+> > > > > > > > >
+> > > > > > > > > --
+> > > > > > > > > 2.34.1
+> > > > > > > > >
+
