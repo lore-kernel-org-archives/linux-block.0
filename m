@@ -1,57 +1,77 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333BD2C2ABF;
-	Wed, 25 Jun 2025 11:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C9725F99F
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 11:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750850940; cv=none; b=fQoOraP6JcH60gkbYEl57ZuFTI7+OPO2kpp19uIy/R5IrNjNJEJTkJbv0JeytjPacC98nwGp/C0IRNHgY9Lahk78WTgpwLoIK5KG6AKl4cR7GwDk0Hsi6V2f44BAjV3rQ19t6N4w6fDbvdApK+FhlpouPClTOy+BqT/roUQDZRc=
+	t=1750851340; cv=none; b=SyLBeyFgGafohrtA8P/Zd4gasuTZ6PfpiH5IcTH851tZ0tqBVG84+2n9suQ/j4eANNOnnJtSk/bBei+2gc7v5LWRcQsu9OohUEksOM05E/pojL+784/SXccM7VuiqZc1wERSAI+JivDPak73RrbQl3qxRf0Ea5h5m5DqiSFEH1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750850940; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IzJaM1gIZ6tfGT73KXSVWGDkhl2n2bPaylUn6Z/J7N65uM/3Q/VYZlDSTkXXd8/gSYnnnef4XnjI6nPQ2RmVbWzaJJl31pCn0OJR3nFrpLZqKmSF4IyzHxQXn2vVjqyiEM9GJS83JcU8gJ1pj/0siF310tJMpnows/+KCSxVRUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=n4Qd4OWz; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	s=arc-20240116; t=1750851340; c=relaxed/simple;
+	bh=Sh47LFpnAMWCB7fC217TanCpuO2b9d7LEz9ILH9r/co=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S9Pr4MdMGZ2InafQ9cPItokc21mLOl3GmrX16hp61ihrJzNMErI+LtjdUmvVT3rvSy7fSx1ipjOkFirDuQeIMvj0CGqQzJvrDQPKPA775QDHuWR+IM6CTuDHJLZeDY2zHD4IjlQg+PxFguqsSRAoD90gmdrwm/HYJqmajGoAlEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=R2S/Cpxi; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n4Qd4OWz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R2S/Cpxi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=n4Qd4OWz4Iq3rGGB82wxu4dTW3
-	Bw9icNYUn82QYhthSbOUG9eoddcIJ21kQUb1PsR5z8tiA7G5lcxsAJsmHA9opItr+Wi6VhQBKt+hL
-	aQHpMCDYXvCFmKd6bsae5RuA2dbaJXgTqWpc4+0gEzy/yRetWJivQhfJvRZdvXaRW7u2nci9UTVV7
-	fEGPyEN98B92AEBiIWKaAb/QCwl7p7BVAWIv+N4109UwsmwihecOOHfznQ+GzSq0gC3Yg1HUOCMyJ
-	tdDxuKPMCG5ikKzT5FWOYogfLZuDSL3PULE30QcK3q6ddv4o1r3l2a9pI2wyLneiThDEjoUPpJNln
-	lNNAEwWg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uUOJG-00000008TUN-41J8;
-	Wed, 25 Jun 2025 11:28:58 +0000
-Date: Wed, 25 Jun 2025 04:28:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v3 2/5] block: Introduce bio_needs_zone_write_plugging()
-Message-ID: <aFvdehsI45OSi9Tz@infradead.org>
-References: <20250625093327.548866-1-dlemoal@kernel.org>
- <20250625093327.548866-3-dlemoal@kernel.org>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=c29CYBpAPPEOfpJB62td/zLaZYqQJd0Dmy9+pT82Gfs=; b=R2S/Cpxi84jSPRcbZ7UCBc0nn7
+	ToyXwzfrKQmSk2ZBc11BY2AaXXMzJ9qgHRY21QcPX14+ca3FB472jH2FzuSflwxNV0/A1sYeII+qQ
+	cqDg6Wgfb4cXU1Y6eaQg0QUrEwq9x76Uqwgqb9oFnP1tiQ3gTMY+wCmZm0JANdGCV26H5KREO2Wp/
+	MbHpyYAM0T8I71EHpSVX6AYMaYXGe+oE7C8aTlJpWC8qCLVdVNPzoPm6VrKTpXRzpny/pAI3bbFl/
+	7WraVB8WBglULog+Yot4HX1c+mhEJPcKYhYR/JM8gM678QTTrNfkMPAAAdlGsll13mDj9gJtxVFIg
+	fJ9Lrzdw==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUOPe-00000008Uxc-3IKi;
+	Wed, 25 Jun 2025 11:35:35 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: new DMA API conversion for nvme-pci v3
+Date: Wed, 25 Jun 2025 13:34:57 +0200
+Message-ID: <20250625113531.522027-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625093327.548866-3-dlemoal@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+Hi all,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+this series converts the nvme-pci driver to the new IOVA-based DMA API
+for the data path.
 
+Chances since v2:
+ - fix handling of sgl_threshold=0
+
+Chances since v1:
+ - minor cleanups to the block dma mapping helpers
+ - fix the metadata SGL supported check for bisectability
+ - fix SGL threshold check
+ - fix/simplify metadata SGL force checks
+
+Diffstat:
+ block/bio-integrity.c      |    3 
+ block/bio.c                |   20 -
+ block/blk-mq-dma.c         |  161 +++++++++++
+ drivers/nvme/host/pci.c    |  615 +++++++++++++++++++++++++--------------------
+ include/linux/blk-mq-dma.h |   63 ++++
+ include/linux/blk_types.h  |    2 
+ 6 files changed, 597 insertions(+), 267 deletions(-)
