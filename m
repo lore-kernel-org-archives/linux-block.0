@@ -1,121 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out203-205-221-245.mail.qq.com (out203-205-221-245.mail.qq.com [203.205.221.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCAB2BCF75
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 10:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950FB1DB958;
+	Wed, 25 Jun 2025 10:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750848100; cv=none; b=PhVUOKyg0GffoPUrfThuqgaTKrdaJCFb2QgOYt93CsCOkGrOkKq+82r+SehW/5CjtNdADuAAhkpfeAT/8HpmmpX92ltccYYARGHsb3Z6QtBkQajSLoCwu9Mh3uEMIIOi+EGNAwhNc1469MlhS5+q86gpWuZ8OWCUOrekVM/DBfk=
+	t=1750848685; cv=none; b=R4Em3sLFSQ/zYSl86ScnOKhWFVEOQljP3eTHFFhS5Jr2VpSnKUSMhaiLg2TP48VYDlp1wQRPTLvZekhbozUakP8Wj8wLBNW+8IHJwqjVMKQpoGEAVvC8i1HbEQzltVApw76ae8LO0zSYaIB4K3EEkEWiCEnTIXcQa1Lua2vAuHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750848100; c=relaxed/simple;
-	bh=lOruoolLdTMrM1hsoH9Ovds3ZTDlEFaydFSeZp1B4V8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mgKvBWm+DLI60sCkFBwSS2Z77VJrXnvaWfU3Q8w0cwdFrclhibVb+j7Y3Ojwyj86nmmK04fGpEzHm26lZOe52rpLGszqkklcjkaCcClP41kht9VLxnfYDXcpXQgZ8lmpE1xO3G9mZA3dUkk/6J1YmZMG4t0lWJCGmmjjHswa1RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A2U7MUvr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750848685; c=relaxed/simple;
+	bh=fRZQe4nl0zKEUEJnNAJ903ZecOWgKWBEK13lijK2btU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YgZII/6CPaTqEcvHoo+fkrf08wTXK7hoK8bKaIBszWfT8n0uKTYWW1g8CM3o2tjeEf8I7QGi6mtjefhqRVVcCpaNaEg/uWzpTvMugIVOfGKxVEuFiFtOLlnyAcfI1/YrIttaHx7bDta3knsv6JCicUX6mrrll/jur1bNiZZGov8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=hEJNCM6Z; arc=none smtp.client-ip=203.205.221.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A2U7MUvr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750848098;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AXzJ6BG9oFnQy0s13phUi78sKWJpBfX2ctrsD+v2g/I=;
-	b=A2U7MUvrI3KIaWQqTzho6cR68uaiCFCjNvk1e/In8g7QRXZjy2zuQMvHgA5fue64PEeBEY
-	887X6B4JWEg8/32ZjPLBngb8ybxaXftbaCecvbJbfswke3Fc0lPTxtaeBDApj5lunJT3/s
-	5VO6ZKoJBuPlgCxGpMbbZC4fQSYLRBI=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-316-q7sZCPs8M3m9f_wTN9nHpw-1; Wed, 25 Jun 2025 06:41:36 -0400
-X-MC-Unique: q7sZCPs8M3m9f_wTN9nHpw-1
-X-Mimecast-MFC-AGG-ID: q7sZCPs8M3m9f_wTN9nHpw_1750848096
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-4e9b4898ff5so1172451137.3
-        for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 03:41:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750848096; x=1751452896;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AXzJ6BG9oFnQy0s13phUi78sKWJpBfX2ctrsD+v2g/I=;
-        b=h8ug+FJHQVM2rToqO1y9QrwxVRXe0o78raEb4aWXt6dP6Cx6A4/XeOSDdP3Ei+CR1n
-         k4dgm3p1bdUaZfUngSaJP6HhAvdVnO50t/kymZQMMWCRXrnKMD7RPB98uj347MSf/Sa1
-         FjqtwErcVopa+dwnZhDSyDu7+p25la9uSCDFn5Xit3weBtbfd5WITpftNDgne9C+pNXu
-         vFsmYlP5Q3vpMW/Dm3BUYPuVQ6ennbrg67Mnle/8tFKivKlUc1HaE/oAO4vqRrSOWof1
-         k8NG0eFnl26Sb06RcEp7FkunEooi3ygQhG+qW7opjMQKqTGE4ReNnR5YK3EAe7SMysjM
-         ndvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCfMkzmeYfJ0Du72QCTCcmlsz5pnTm7Rh4t8sGoIDyuO+S7m7RjYST+/64FPrZ/ppr9X+QajtdBzLJqA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG0Wt9Ec4C5qmkokffzW1VY8gjxAz+Sq4tHCguyneVZ09ZeGS6
-	lS1Uq7zuY1hy7KEyOPTmICvTEPjK9Wu678e3c7Rxemn7bQiUf5EKuug+6mlVTHSfLBv0YaOkZ34
-	qR07dZWxXAa/tjcdUJ+K4pYXfofWeAxMeYE5WsfSaVFpjwHCx/LP3SCvB7OmLhxCb3hZM6PDoSV
-	1VXL4qqkwN6oWWr/h0b1pI6xB8iIkkJqKG/LhvQ2Q=
-X-Gm-Gg: ASbGncsHKdrpB6chYvmkiJ/ya6LP1opnMDE/uskA9n/u7dTqyDEzmZFQPRu3uO4ybMm
-	BjYNa3orTHss3XslsPyD9qq4ubNQ/PECdWSXxOcjICZG27uD55ewJ7YA10A66Cbru0qFXSdHQm1
-	bV
-X-Received: by 2002:a05:6102:e0b:b0:4e5:a316:6ee6 with SMTP id ada2fe7eead31-4ecc769c5d5mr977807137.18.1750848096261;
-        Wed, 25 Jun 2025 03:41:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF3rRMb8Kv0RHeqhtdNcN4p/j7yM7WdX52zFHAZihqFaG1oWPDvEzBZJHq9Wbj3VxPRs3mj3K9chbZ2rnwyba8=
-X-Received: by 2002:a05:6102:e0b:b0:4e5:a316:6ee6 with SMTP id
- ada2fe7eead31-4ecc769c5d5mr977794137.18.1750848095914; Wed, 25 Jun 2025
- 03:41:35 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="hEJNCM6Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1750848367; bh=fRZQe4nl0zKEUEJnNAJ903ZecOWgKWBEK13lijK2btU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=hEJNCM6ZEPHh6f84t10y6/by9x0fWak3Pg9UI1wSeVixF2e96t+9lZzISUpkB7/oW
+	 ZOwPaYVVCY9jGWIszJiUsThrXfIqnwG2fLmdrEWiQFs+RlY6sH8/cL6BKv+1ob1qUm
+	 i9wjf4H+1nts5RYGFmb/NO4yI/UR56vE5e70r0EM=
+Received: from [172.25.20.158] ([111.202.154.66])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id B839CC3E; Wed, 25 Jun 2025 18:46:03 +0800
+X-QQ-mid: xmsmtpt1750848363tmxew2sy5
+Message-ID: <tencent_FB9C854A6AB8D1CF28C88A8642B297A59C07@qq.com>
+X-QQ-XMAILINFO: MT46X0n0UCeM4y5W26Ag/ADFG1DHi9F9CHyqbj6DSfeO3dtcmIBOE1oh2UcVZP
+	 ZMmQ68mcMehwhUbLUnc07Zn9RGz6F2suZwRJOeyiIzICBfgm0V2+5cregthy5C7I8MB6FhVvNcYM
+	 /VYkFzpfdEChNh1ny0qa/KKLXtV+MtsrADzq4s7xqMxPy7INKe9X7UTI8B30l2IDWVuhCLBivAB/
+	 KpDHHHEgbPHLOTlKPIWS+VeUSKe0p858cK9CT24Fk/cVWieuHQr8ktv6F80EJcbM+1S/A2ggowY6
+	 fAb4V4CaUZGL0XfnXbcLYb6LQmmw+A5CVdgTwLZAnVSKd0mwEH7Z7pmaiJiOydAd+niM/H3cdnq1
+	 rOkrq8lQR55XrWjPx6gZ/EFejSqH8DoRxc5WJMO4+TBv4qGCLjkGxCLhfzpfNWMA8RomFYbRvWrD
+	 6xwkMLEpPnGJXjxpwo0483KUAhbHlVgxJPUoWax2HkTNHkIBqD2j7ccHzxxGpye4OildalBIIxay
+	 J8znfIlVeLvpwBSMKx5L/dMMyldBbPzxX+CEr1l9/weUIrqiRVImt6MOFUDOlunpBV7QPxUklf6e
+	 CQvXxLC5C5gBdKfW7Amei+h97GCDgKpfJBIpvH0s06O9iBzMr5JOBv8vnfdC9scfGJIYymZ3iHWM
+	 8a+CKbZBw8NCA+65oAHoE15MX1UdBCdnXi39kjjEPdDJxqNl0vUWfCKAdnGACYxu7dc3IA8WzeYG
+	 t83PPzmGaZZysMJnUHhsday1qRc0X4xe1rkKegzSK3hnBQgHu9LTEGpy19ILw0Uo5i+dLyw22WC+
+	 o60brkozWdLySFo0VMzrZoSZxjebVnDOYd46LeGlXEI3ApHoWbtH5gX9qdOmXHpDuXY0YRuqAi1i
+	 YyETv+GdRIAh7F7kT9T8xtYBssGRzq52KheHTFTcSRV6Y2jZHXfqJkiLRTtyNhFI5Jhet2ohBjyw
+	 xJIvTnxoRcyK6Hsx4wo61Ymi6SJV4FfufqOKeFAABoMNiHKEgteeWdTwi/nC9lwdKRit1VdVs=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-OQ-MSGID: <a9c446ff-d51a-40bf-a243-350de1e6e613@qq.com>
+Date: Wed, 25 Jun 2025 18:46:03 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250612143443.2848197-1-willy@infradead.org> <20250612143443.2848197-6-willy@infradead.org>
-In-Reply-To: <20250612143443.2848197-6-willy@infradead.org>
-From: Alex Markuze <amarkuze@redhat.com>
-Date: Wed, 25 Jun 2025 13:41:25 +0300
-X-Gm-Features: Ac12FXwFWhOETzcvDHbBzNovjF_5IML_YC5DRczUGY04YVAWJAwP94hRxUpsl0Q
-Message-ID: <CAO8a2Sg5Q7iYTSjR2iD3R+EXHe5O735zp4V=Ur17q8AgkJFCcA@mail.gmail.com>
-Subject: Re: [PATCH 5/5] mm: Remove zero_user()
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
-	Ira Weiny <ira.weiny@intel.com>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/5] ext4: declare support for FOP_DONTCACHE
+To: Matthew Wilcox <willy@infradead.org>,
+ =?UTF-8?B?6ZmI5rab5rabIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+Cc: "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
+ "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+ "brauner@kernel.org" <brauner@kernel.org>,
+ "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+ "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
+ "tursulin@ursulin.net" <tursulin@ursulin.net>,
+ "airlied@gmail.com" <airlied@gmail.com>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+ "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20250624121149.2927-1-chentaotao@didiglobal.com>
+ <20250624121149.2927-6-chentaotao@didiglobal.com>
+ <aFqfwHofm_eXb5zw@casper.infradead.org>
+From: Chen Taotao <chentao325@qq.com>
+In-Reply-To: <aFqfwHofm_eXb5zw@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Good cleanup.
 
-Reviewed-by: Alex Markuze amarkuze@redhat.com
+在 2025/6/24 20:53, Matthew Wilcox 写道:
+> On Tue, Jun 24, 2025 at 12:12:10PM +0000, 陈涛涛 Taotao Chen wrote:
+>> From: Taotao Chen<chentaotao@didiglobal.com>
+>>
+>> Set the FOP_DONTCACHE flag in ext4_file_operations to indicate that
+>> ext4 supports IOCB_DONTCACHE handling in buffered write paths.
+> I think this patch should be combined with the previous patch so we
+> see all the change needed to support DONTCACHE in one patch.
 
-On Thu, Jun 12, 2025 at 5:35=E2=80=AFPM Matthew Wilcox (Oracle)
-<willy@infradead.org> wrote:
->
-> All users have now been converted to either memzero_page() or
-> folio_zero_range().
->
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  include/linux/highmem.h | 6 ------
->  1 file changed, 6 deletions(-)
->
-> diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-> index e48d7f27b0b9..a30526cc53a7 100644
-> --- a/include/linux/highmem.h
-> +++ b/include/linux/highmem.h
-> @@ -292,12 +292,6 @@ static inline void zero_user_segment(struct page *pa=
-ge,
->         zero_user_segments(page, start, end, 0, 0);
->  }
->
-> -static inline void zero_user(struct page *page,
-> -       unsigned start, unsigned size)
-> -{
-> -       zero_user_segments(page, start, start + size, 0, 0);
-> -}
-> -
->  #ifndef __HAVE_ARCH_COPY_USER_HIGHPAGE
->
->  static inline void copy_user_highpage(struct page *to, struct page *from=
-,
-> --
-> 2.47.2
->
->
+I’ll merge the patches to keep the DONTCACHE support self-contained. Thanks!
+
+
 
