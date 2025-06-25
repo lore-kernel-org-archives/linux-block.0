@@ -1,63 +1,43 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7238929ACF9;
-	Wed, 25 Jun 2025 11:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A0E2D9EC7;
+	Wed, 25 Jun 2025 11:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750849893; cv=none; b=hsygjHZunpiZ96mZEWIEPBJUQstb/Wdkd5teZMlteuD07rrM4i8hIrM8oI2hUylYFYAWvLXzh1AteFbcrYanI1ncwhBvNN64LC/km5svoNgM4OJSeFVU4rF0uUMatWDlbToFvZxOC6zsZALTAEwmtxo1pDm80K8WyHo9I7N8+Bc=
+	t=1750850888; cv=none; b=jT8VttQa0d2UgVUQKac9U/lgdoW4E29L0YbJUTa/7JWiB3sb00pJpqqen0kQTiYW9mlmOWwezniNkWwDd3aMny5DilTjKqOV589KXQoLl3sFMxmQn+Dxt2xSNCGZnDFIq/clGlGkfFFDl4YazROa06ZjHFf+LT02JQQ4ojKroP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750849893; c=relaxed/simple;
-	bh=P4G3trloAWpcB1GNXQBtfIed3GuOFg6SZBVv40Mj4BI=;
+	s=arc-20240116; t=1750850888; c=relaxed/simple;
+	bh=PZohJwpBIiCNc2Tr1Bh0rGo7QQJ9my1Yi3uRkhj6vXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AlQnTznTSvrQZY+WbNfDEOiBbUBXeRVbvatcuvAHHkjRK7JEd0DupLnbPEUrPZLsTPjB2oUb7KH6n4GBP+rMY1lA2vfALtIPQIb8vxmneSeH9MVjju2w2zLN+BdjWvXqSD9l0PCDXhwp4EyhCjvmggylU8ad8/ihAOmiRsKDV58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBWXkvij; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVExuHCj5GW+6x7YjR5iH7aFYPjI/8QBR5xvJRy1Drkzq64Iz/tPSy3bOgcHXOmmTP9hu4efyrOWX862u3kik83SYxcPvMguGevkEBFisCyxtkANOGx5z8BL08YzJaWPxJHOobgH9BQ/d9WU7l15docGx1CcBk8FKsYBYP5eP6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jJhUI/lU; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBWXkvij"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750849892; x=1782385892;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=P4G3trloAWpcB1GNXQBtfIed3GuOFg6SZBVv40Mj4BI=;
-  b=fBWXkvij12kXhZu9oxoK/CP/wuxRca84yA3qj8BRbF80bfcyuRGj5Puu
-   vKJr8hzZPR2jI7YrZwSKT9eIuktoEy9CC1VtW8ttv78D3SOnJyVlht+jW
-   Da6GVx1lIislx1nW5cNTF8sgtmN2wBCNBB444ahjASVpy5LwwTB0I63CF
-   UGvvnV2Rawm14I2F/9ZMOEv12jWl52AZqVWBh2ftPEOu7gwnfEbPBc0af
-   kAFg9qmwcnt8HZwEn2lCLtQAhE4dQjkFgFItyuxQaLutiKA9whvhyXQrJ
-   t34Q6AzFGEqROucHKKD5CKtsjNuKGWJjDOsgLLMsJM1l4MoH1T1Szovcv
-   g==;
-X-CSE-ConnectionGUID: Z8+0V3uCRbOb0a1hZrTmuw==
-X-CSE-MsgGUID: FMWgKP3MSd2cTeBdC1LVmQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="53180219"
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="53180219"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 04:11:31 -0700
-X-CSE-ConnectionGUID: 3E/jnHXVQRmZNSmNFnk2kQ==
-X-CSE-MsgGUID: zFE+wDJOSUGEa8J01jfj2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="152318891"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 25 Jun 2025 04:11:28 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUO2I-000T2o-0E;
-	Wed, 25 Jun 2025 11:11:26 +0000
-Date: Wed, 25 Jun 2025 19:10:31 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joanne Koong <joannelkoong@gmail.com>, linux-fsdevel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, hch@lst.de, miklos@szeredi.hu,
-	brauner@kernel.org, djwong@kernel.org, anuj20.g@samsung.com,
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
-	kernel-team@meta.com
-Subject: Re: [PATCH v3 12/16] fuse: use iomap for buffered writes
-Message-ID: <202506251857.gt3y42uZ-lkp@intel.com>
-References: <20250624022135.832899-13-joannelkoong@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jJhUI/lU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PZohJwpBIiCNc2Tr1Bh0rGo7QQJ9my1Yi3uRkhj6vXU=; b=jJhUI/lUdi8vlHY9+a9f8Umza7
+	4yf7SWwv4BcRiglUZVHnUTAJTXaya2Ohx/Z5Pp2fBI5hG694fvaamCkVokA0DnOFqD6b/l1ogODaG
+	Y0crl+bWutOOMbSeRrXIc+N6Bwp1muGZspp4GkaMtWIj5SV5mt0yxyYpSWd19+6XyMvd09ikZEEaM
+	F+AzrXNNE8AOuAn0oVMJmbCCE1VHrl8Jt+NgCVt5rmMkHNFqt6AzDcTZpRnXi4HVqZSYA/iLrFeuc
+	rPEH4+FWNAvT6blr7mAN0MzYs42umqjBAtzWB2VXuJRtfzZ75XRQLhvAqbx1tzPOhKK8tGKxiMW5p
+	2yWuC7oQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUOIQ-00000008TIe-1Y8n;
+	Wed, 25 Jun 2025 11:28:06 +0000
+Date: Wed, 25 Jun 2025 04:28:06 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev
+Subject: Re: [WARN 6.16-rc3] warning in bdev_count_inflight()
+Message-ID: <aFvdRm4Ec8Oi3uBT@infradead.org>
+References: <aFuypjqCXo9-5_En@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,39 +46,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250624022135.832899-13-joannelkoong@gmail.com>
+In-Reply-To: <aFuypjqCXo9-5_En@dread.disaster.area>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi Joanne,
+There's a test patch for this on the list:
 
-kernel test robot noticed the following build errors:
+https://lore.kernel.org/linux-block/aFtUXy-lct0WxY2w@mozart.vkv.me/T/#t
 
-[auto build test ERROR on brauner-vfs/vfs.all]
-[also build test ERROR on xfs-linux/for-next linus/master v6.16-rc3 next-20250625]
-[cannot apply to gfs2/for-next mszeredi-fuse/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Joanne-Koong/iomap-pass-more-arguments-using-struct-iomap_writepage_ctx/20250624-102709
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-patch link:    https://lore.kernel.org/r/20250624022135.832899-13-joannelkoong%40gmail.com
-patch subject: [PATCH v3 12/16] fuse: use iomap for buffered writes
-config: arm64-randconfig-003-20250625 (https://download.01.org/0day-ci/archive/20250625/202506251857.gt3y42uZ-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506251857.gt3y42uZ-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506251857.gt3y42uZ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   aarch64-linux-ld: fs/fuse/file.o: in function `fuse_cache_write_iter':
->> file.c:(.text+0x880c): undefined reference to `iomap_file_buffered_write'
->> file.c:(.text+0x880c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_file_buffered_write'
->> aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x360): undefined reference to `iomap_release_folio'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
