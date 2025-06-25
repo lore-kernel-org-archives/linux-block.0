@@ -1,118 +1,182 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBA61A5BAE
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 02:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBDF1C84AB
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 02:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750818373; cv=none; b=O8vMOeB5ryXM/cDDnILjmJe4NeMdIpX3NClNLhsaQDM+ZsWpfL2dHq8BbCvIENE/n/Bfp3NPIW5zL2FG7wYcBoA4BaOaMQJANpww2aN4tuEOOmi7+n17opOpMUkdbQ679wvUY/6W5EIJdElrv+e2Wn3sGNQql2J8qZ0KMdRETkY=
+	t=1750819487; cv=none; b=BZbVN8nlnj6jjksc4pRcCwDtTgcNvzqNF7SX6ZRFqnnhuskn6ynI5UqBPsus8j7BwdfsfxfGAr07sDyJQrTfeJ1pKI2NkZ53DcDMFI4QseSW0C3ihdnsvXkNXUb+9W8Ol+y2fe6M4FGvHBwFfWehy1kuHe8E4aKWgWbXKS9I+rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750818373; c=relaxed/simple;
-	bh=XgZAm2YKn0RDLGM+IYhiB4mlE6GfDEhzTXxW8Lkr9oI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=euN/F31qH1KzXa+ic5JaU8y8X4Ak7n1SabiJBdQYy3RAq7tZVa9BZLiRwa6b/hXfWhoAne28D2nHAMFWhrPa6KdU78RtwYX9ZJT6nZ0C199fr6Og92pPvYrGypmorqpABFIObKINvSkeJTMnnjZfrV98DAU+kb1sTW66RSDSlV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QykVajoX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750819487; c=relaxed/simple;
+	bh=rLajZTmMJEgAxVeJ/wCF7h7cfrMsLq2/SiKbV3siYw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BQv31IC4S9Bm2gtbYrkj7K8WOXP8JBPrT1hlNkgUD7ZLPCcdSC5osQSTK57YG8yM4ofgHiCHFZ9u7HwC+g9nFB9PCFy0UEAFP90iNt6ymk1Yxusro9zuubmFUXiEVOayp+XitnItwYRDL2ubVpXYFfOMS+3dPwlYYXoLbo9ZtMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aWbM/oYg; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QykVajoX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750818368;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bmeKsN/UJG3jIi3BNFXZOuIOXEMjf4u+/01VOVmcxYw=;
-	b=QykVajoXpQF5w4cZie3dmVoA9VzS7O8ECWiMbzLsNKuZX79PwMpBUTuuyNPvi28ITqtWGi
-	hNuhNWH58KiPKx38dKsA/fOGi4IEIRvk4k231YnI435KVH0br4OY5w7OQbBNb8eaybvf6X
-	yPMj1MRpyfkCDIPKQYwqzYGKTHkEHrQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-586-h-iVgmQaOROsyNDtC3_2SQ-1; Tue,
- 24 Jun 2025 22:26:04 -0400
-X-MC-Unique: h-iVgmQaOROsyNDtC3_2SQ-1
-X-Mimecast-MFC-AGG-ID: h-iVgmQaOROsyNDtC3_2SQ_1750818363
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C074195608B;
-	Wed, 25 Jun 2025 02:26:03 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.109])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 069E4195608F;
-	Wed, 25 Jun 2025 02:26:01 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] ublk: build batch from IOs in same io_ring_ctx and io task
-Date: Wed, 25 Jun 2025 10:25:54 +0800
-Message-ID: <20250625022554.883571-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aWbM/oYg"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-748da522e79so2935227b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 19:44:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750819480; x=1751424280; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=krnaXgCt7FGwFNgUY8fBOpyKd6sWF6OHxZmIJdnQpY0=;
+        b=aWbM/oYgipB3MnAnG6w25HXkw7Keuh7ewZKrJFsJqUPo/eC3OsO4gdBRWsECFHuk/E
+         osBO6CcPRkrluCVnRoMlOnIcOu1JGU9We7uPRaD9HIFVR/X2abbClJ9UrOLh2/6cyiVQ
+         TrLszUgDJwWrQod2rMkAR2ATL9nSdzLwqquZ/zKsxRHSRhFI8Ee9r/zj0zi3bdxLYHxh
+         QQ1k9vgUiUhf6/bY0uOBe3kJnXZ0wyxCxOgoNaPZeqcdDko05ajMkfNal5scN3FWx1B3
+         H+Ev3qfQwmDX+o2o6lLhnT4eR7W6+ObqTOUtNixJoF5UjJFack2d6qfRH8aAZcIxQc/H
+         4UFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750819480; x=1751424280;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=krnaXgCt7FGwFNgUY8fBOpyKd6sWF6OHxZmIJdnQpY0=;
+        b=rqOSow+IeC897mtcAHDBoBszDAnaQqSwcRTD57Ekm/4cfWpf8DkcFNPZxrNinzWMlr
+         FURL7ggivNidyQDOTzjEh95MD07f3EB7Tc5iM07Qkvk361ARqsJlRStI8hfrNuWh+9FW
+         uaPOzYo7re9ht3N4QEYM2Z/YsC0caP0X/oqqg5S9VS476hwSR/NsB9vzkBz7Y5MyXyY/
+         aISyrKJqbNHV6H7L+yu51TXjce/A/fLhDa23Z1AHjoSny2x06DhELjgCNmGvf0RjDC0R
+         RNt6LSPpqEkpZCcnXIrXyFuSN1jXJ4OiNpho6PhcGSJxfpC7h3AxJLitF7jHrIVPhi5N
+         n7tw==
+X-Gm-Message-State: AOJu0Yy7Sdxmd24CRCCFELaxLwDV4ZziNZTZaOVT4UpivcsBia1U5sUk
+	Ce+lt9To2JIp0W/JK9ISBvzbWf3jrlxkqYnNDHa1xuUORwu9f0EYY8z3SLg4ffka0Uw=
+X-Gm-Gg: ASbGncs2UKb2I2ry9Mx5gIrBsoeQWav7hxOmluk1V3fk1lNFJlZD9Az1RTc9zRLaou8
+	KyRn6tC2083eF/eFNYmDeUsQxCSGM2v26jHUBkmIjFKb5T29Dl3M8dbPtx8f6DqaiGjRr+KCWsp
+	mE7ovDtgqUShbrsWA5OSw7VKvNBoMxm4H6Ko6wpMK5jQdo7QvFrkpA0yNCdXVEVGieUo7Ggne+j
+	R2ztZFfRvbTD/fjvIwY2JapxyDTsB1cD/MsV1F78c9/UQ0mUNKmQTmo9ASEXm1wbXNqVB+AiK7T
+	UyB+NF9AB7MTAFccT1K/4QPSw2XxgEVTf0PbG+dTQLmsJ6CtBfK917tvfg==
+X-Google-Smtp-Source: AGHT+IGYrK7nJVX4i3aYN3s2EV/3JJzxO1iou1zLbA+BU4UenhWgSqWcgEosHGY+7YyOEGnh2ZWGyQ==
+X-Received: by 2002:a05:6a00:464f:b0:732:2923:b70f with SMTP id d2e1a72fcca58-74ad45645f4mr2076345b3a.11.1750819480004;
+        Tue, 24 Jun 2025 19:44:40 -0700 (PDT)
+Received: from [172.20.0.228] ([12.48.65.201])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e21472sm3069937b3a.48.2025.06.24.19.44.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 19:44:38 -0700 (PDT)
+Message-ID: <895556ee-43d5-4bfa-adc5-20c35f4e3e84@kernel.dk>
+Date: Tue, 24 Jun 2025 20:44:37 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] ublk: build per-io-ring-ctx batch list
+To: Ming Lei <ming.lei@redhat.com>,
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
+References: <20250623011934.741788-1-ming.lei@redhat.com>
+ <20250623011934.741788-2-ming.lei@redhat.com>
+ <CADUfDZp=69+ZpJ5vc7c9qGmA3zLU+eYdYd2PfeiDwFvxYQ+0nQ@mail.gmail.com>
+ <aFn-RNJxWFl5Vz-G@fedora>
+ <CADUfDZq3CN+i2d9sX+79n-Si4UWad-2n2_9E+-vkj0vfb7pVGg@mail.gmail.com>
+ <aFtPShUlUwGLWvqF@fedora>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aFtPShUlUwGLWvqF@fedora>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-ublk_queue_cmd_list() dispatches the whole batch list by scheduling task
-work via the tail request's io_uring_cmd, this way is fine even though
-more than one io_ring_ctx are involved for this batch since it is just
-one running context.
+On 6/24/25 7:22 PM, Ming Lei wrote:
+> On Tue, Jun 24, 2025 at 08:26:51AM -0700, Caleb Sander Mateos wrote:
+>> On Mon, Jun 23, 2025 at 6:24 PM Ming Lei <ming.lei@redhat.com> wrote:
+>>>
+>>> On Mon, Jun 23, 2025 at 10:51:00AM -0700, Caleb Sander Mateos wrote:
+>>>> On Sun, Jun 22, 2025 at 6:19 PM Ming Lei <ming.lei@redhat.com> wrote:
+>>>>>
+>>>>> ublk_queue_cmd_list() dispatches the whole batch list by scheduling task
+>>>>> work via the tail request's io_uring_cmd, this way is fine even though
+>>>>> more than one io_ring_ctx are involved for this batch since it is just
+>>>>> one running context.
+>>>>>
+>>>>> However, the task work handler ublk_cmd_list_tw_cb() takes `issue_flags`
+>>>>> of tail uring_cmd's io_ring_ctx for completing all commands. This way is
+>>>>> wrong if any uring_cmd is issued from different io_ring_ctx.
+>>>>>
+>>>>> Fixes it by always building per-io-ring-ctx batch list.
+>>>>>
+>>>>> For typical per-queue or per-io daemon implementation, this way shouldn't
+>>>>> make difference from performance viewpoint, because single io_ring_ctx is
+>>>>> often taken in each daemon.
+>>>>>
+>>>>> Fixes: d796cea7b9f3 ("ublk: implement ->queue_rqs()")
+>>>>> Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
+>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>>>> ---
+>>>>>  drivers/block/ublk_drv.c | 17 +++++++++--------
+>>>>>  1 file changed, 9 insertions(+), 8 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>>>>> index c637ea010d34..e79b04e61047 100644
+>>>>> --- a/drivers/block/ublk_drv.c
+>>>>> +++ b/drivers/block/ublk_drv.c
+>>>>> @@ -1336,9 +1336,8 @@ static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
+>>>>>         } while (rq);
+>>>>>  }
+>>>>>
+>>>>> -static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+>>>>> +static void ublk_queue_cmd_list(struct io_uring_cmd *cmd, struct rq_list *l)
+>>>>>  {
+>>>>> -       struct io_uring_cmd *cmd = io->cmd;
+>>>>>         struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+>>>>>
+>>>>>         pdu->req_list = rq_list_peek(l);
+>>>>> @@ -1420,16 +1419,18 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
+>>>>>  {
+>>>>>         struct rq_list requeue_list = { };
+>>>>>         struct rq_list submit_list = { };
+>>>>> -       struct ublk_io *io = NULL;
+>>>>> +       struct io_uring_cmd *cmd = NULL;
+>>>>>         struct request *req;
+>>>>>
+>>>>>         while ((req = rq_list_pop(rqlist))) {
+>>>>>                 struct ublk_queue *this_q = req->mq_hctx->driver_data;
+>>>>> -               struct ublk_io *this_io = &this_q->ios[req->tag];
+>>>>> +               struct io_uring_cmd *this_cmd = this_q->ios[req->tag].cmd;
+>>>>>
+>>>>> -               if (io && io->task != this_io->task && !rq_list_empty(&submit_list))
+>>>>> -                       ublk_queue_cmd_list(io, &submit_list);
+>>>>> -               io = this_io;
+>>>>> +               if (cmd && io_uring_cmd_ctx_handle(cmd) !=
+>>>>> +                               io_uring_cmd_ctx_handle(this_cmd) &&
+>>>>> +                               !rq_list_empty(&submit_list))
+>>>>> +                       ublk_queue_cmd_list(cmd, &submit_list);
+>>>>
+>>>> I don't think we can assume that ublk commands submitted to the same
+>>>> io_uring have the same daemon task. It's possible for multiple tasks
+>>>> to submit to the same io_uring, even though that's not a common or
+>>>> performant way to use io_uring. Probably we need to check that both
+>>>> the task and io_ring_ctx match.
+>>>
+>>> Here the problem is in 'issue_flags' passed from io_uring, especially for
+>>> grabbing io_ring_ctx lock.
+>>>
+>>> If two uring_cmd are issued via same io_ring_ctx from two tasks, it is
+>>> fine to share 'issue_flags' from one of tasks, what matters is that the
+>>> io_ring_ctx lock is handled correctly when calling io_uring_cmd_done().
+>>
+>> Right, I understand the issue you are trying to solve. I agree it's a
+>> problem for submit_list to contain commands from multiple
+>> io_ring_ctxs. But it's also a problem if it contains commands with
+>> different daemon tasks, because ublk_queue_cmd_list() will schedule
+>> ublk_cmd_list_tw_cb() to be called in the *last command's task*. But
+>> ublk_cmd_list_tw_cb() will call ublk_dispatch_req() for all the
+>> commands in the list. So if submit_list contains commands with
+>> multiple daemon tasks, ublk_dispatch_req() will fail on the current !=
+>> io->task check. So I still feel we need to call
+>> ublk_queue_cmd_list(io, &submit_list) if io->task != this_io->task (as
+>> well as if the io_ring_ctxs differ).
+> 
+> Indeed, I will send a V2 for covering different task case.
+> 
+> Jens, can you drop this patch?
 
-However, the task work handler ublk_cmd_list_tw_cb() takes `issue_flags`
-of tail uring_cmd's io_ring_ctx for completing all commands. This way is
-wrong if any uring_cmd is issued from different io_ring_ctx.
+Done
 
-Fixes it by always building batch IOs from same io_ring_ctx and io task
-because ublk_dispatch_req() does validate task context, and IO needs to
-be aborted in case of running from fallback task work context.
-
-For typical per-queue or per-io daemon implementation, this way shouldn't
-make difference from performance viewpoint, because single io_ring_ctx is
-taken in each daemon for normal use case.
-
-Fixes: d796cea7b9f3 ("ublk: implement ->queue_rqs()")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- build batch list from same io_uring_ctx and io task(Caleb Sander Mateos)
-
- drivers/block/ublk_drv.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3566d7c36b8d..d441d3259edb 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1423,6 +1423,14 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+static inline bool ublk_belong_to_same_batch(const struct ublk_io *io,
-+					     const struct ublk_io *io2)
-+{
-+	return (io_uring_cmd_ctx_handle(io->cmd) ==
-+		io_uring_cmd_ctx_handle(io2->cmd)) &&
-+		(io->task == io2->task);
-+}
-+
- static void ublk_queue_rqs(struct rq_list *rqlist)
- {
- 	struct rq_list requeue_list = { };
-@@ -1434,7 +1442,8 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
- 		struct ublk_queue *this_q = req->mq_hctx->driver_data;
- 		struct ublk_io *this_io = &this_q->ios[req->tag];
- 
--		if (io && io->task != this_io->task && !rq_list_empty(&submit_list))
-+		if (io && !ublk_belong_to_same_batch(io, this_io) &&
-+				!rq_list_empty(&submit_list))
- 			ublk_queue_cmd_list(io, &submit_list);
- 		io = this_io;
- 
 -- 
-2.47.1
+Jens Axboe
 
