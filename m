@@ -1,198 +1,225 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDB42E659
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 01:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750815768; cv=fail; b=cxcG8E57hAf2+fDrbjH2f1buGmKlgMG+XTPoY0raxOf0Ayp3pG2cwkldTdANi/egtSQha+Psk34VN51inGWNupr2sf+nnniDjvuXKPqGj/jseToFhE5KUiiu9ST2IKVqEIfTKBuSlq/oL96jNXYezUrjMlJ994x0qZZfsi58n/Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750815768; c=relaxed/simple;
-	bh=c4yPeUALkOB3wd3H/m9HcXv/IFxC62EGtGYs+wZh8DI=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=YIVVuVM35S2khTe63wsAMGZTVQj5/qVsiS7P5vhWTcIWhH5Gxka35NLT1fTjsQlUWP+Ca6IgieHsKijtvTf3UhLA+l73E6kvbjD/3a56JOCqLTPvhSho31ZoSjR40k9MTYVNnRDG6rHZYtAWQ687LqSqMaWcn+P5JP+OYP8/fp0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QujmvRhP; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=t+TaCXPT; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291197FBA2
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 01:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750815845; cv=none; b=XtAcHXQPXrPcJKRYFerMquq97AgVW4wHMEZXHbhSkMMBapz9usogxMzSdmhyMCPYkuXoEYEwNB7N6oTaEexwn+VGJm1Y+LUWX1jMvfe8ScMLpLP4yE47UdZDm+MhFlPy97Pm3eds2LKuf15IRMLm1BVo6fzHiQnGStpRkQ2oRK8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750815845; c=relaxed/simple;
+	bh=qHr4lua66RMHDKJ45Zc9ZwWWMzvkDHarOiXGw3nxvAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qLQERw4mzhdEiTrvjMlWemwQN3Bb6yYInnwVxwSTELuSe4HiBkICRHVNDnLXwZxI8rRiVCkV8NSwQzGHHPNSh9IEzSN1YIe69C1ycJbxN2V6LF0FRfYn5c3HWvj8i02T98xT7VGwpR9t/GeBP4y73aDgyLqo5yyQ583tXTXgyPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=DVZnWA4Y; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QujmvRhP";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="t+TaCXPT"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OMifNN027078;
-	Wed, 25 Jun 2025 01:42:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=/omE/MUWNlUMSi1gOm
-	JdJosHRwKpI0el5n0sCkRfRgY=; b=QujmvRhPWp+9SdCg6uiQFWb+/t6u6/hy98
-	ynnBOZ5Fwj8FeFOJhcsVm4Z3hT2m8ZVb2r5csIvD9pWFnftcll1UenqanpdKVSc/
-	kqQJb8L2wJDYzB4cmmc8Vmj3juIvWwXxgB1aJdvPRko5u00AME/IuK+8Eq+3WBKi
-	tINsJ3zubjo3BxQRnfZMsGG/tE4Fj18pOXO46uNXXUfZQTu+KRSBcRb/GxMZf8/m
-	rvly7tGPygPfCtBn/3N4ccy1kOzKnC3mzeDDYBwSn7VZE29JrvjJ9Qqp6e4A6m/x
-	DB+lv6Z4LXSKjEMDL9EHrgElgh0z4sojVfl306lkhHGucRqRbLnA==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47egt1d7s3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Jun 2025 01:42:42 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55ONl6Dm031889;
-	Wed, 25 Jun 2025 01:42:41 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47ehpqwnv8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Jun 2025 01:42:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e+NXgA2DXO8RGJdN8CjcLU/7glAicyRr+yLZHFaQX3sxqVyFowaTX4qOl7OPkdYBVisr8UxYEa2r3XQJfITBzx+hWUYL9KZ+q2I4U3/LVWPxAS2Z4C7vOOyiMv0B2pTy+T3QkX32Rpgw4sgm7CHjPz626zJggu7n89kSyb828L4cifqVdeViejpEUfXAkIP6mM2VKDmNLGjkTPzy9a2wBa9/m7uEicQigrdltSuPyDA2ryMpvUzMunGDdU/jLF+3TiGOZ6dHEQ50lWKueRNU8oHpIyjMoxk0bATDjUsw9R5sC4A1hSI+BnL+qyJmEaQtJkKrl/BsWXWQNiS0094iQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/omE/MUWNlUMSi1gOmJdJosHRwKpI0el5n0sCkRfRgY=;
- b=u/pC32KGyWU9dix9S4Sx0WhQoLvOYZo9EnRI5L1qX85rZLvBqxfZJ0Oa+VPhfvYopgH9UeqxwD3HbjoJaNx15nMMVt0V4RA8mJsyzIpnAdmcTQSyiHrTxtRk2muOvp3upd5UYdc6WQ1hajujv2xEC7gjdO4GgH/8QUPXozd+mS2zHYqk9FbyxwfknW8dOA0i9pCD1oz/JpaqmWNC50MrwWOhEu6qacjNcFk72fAn5+3iDHqc/wYzoxm/R/sEAEnbbIdcrqtGVbVZgjfFyWTFZQYUuSk88IWzMT9A9N5mJsFZ2c7x+OndVdsiRLTlpSEG/sAi64mDRhzqeHR9DJY7FA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="DVZnWA4Y"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2353a2bc210so53890905ad.2
+        for <linux-block@vger.kernel.org>; Tue, 24 Jun 2025 18:44:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/omE/MUWNlUMSi1gOmJdJosHRwKpI0el5n0sCkRfRgY=;
- b=t+TaCXPTfwbHvnak8uanBMYtWXkMY2AtX2OFCLrC3mouFKU+UTMOlr5ajnSDtz9vIjo+8IsQnUhQXsl/bJrbH/+Td8ovCPYaVGDjkS9CC//vaduhLI9WwLbeidfNzolaA9ymBEnpeJtfxqdiohMaQYtmnheyitk+k63oDsQmp84=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by SJ0PR10MB4414.namprd10.prod.outlook.com (2603:10b6:a03:2d0::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.28; Wed, 25 Jun
- 2025 01:42:38 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%7]) with mapi id 15.20.8857.026; Wed, 25 Jun 2025
- 01:42:37 +0000
-To: Wang Yugui <wangyugui@e16-tech.com>
-Cc: linux-block@vger.kernel.org
-Subject: Re: scsi optimal_io_size changed from 0 on kernel 6.6, to
- 16773120(32760*512, 4095*4096) on kernel 6.12/6.16
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20250624091020.071E.409509F4@e16-tech.com> (Wang Yugui's message
-	of "Tue, 24 Jun 2025 09:10:21 +0800")
-Organization: Oracle Corporation
-Message-ID: <yq15xgkoayn.fsf@ca-mkp.ca.oracle.com>
-References: <20250624091020.071E.409509F4@e16-tech.com>
-Date: Tue, 24 Jun 2025 21:42:34 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0277.namprd03.prod.outlook.com
- (2603:10b6:a03:39e::12) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+        d=wbinvd.org; s=wbinvd; t=1750815842; x=1751420642; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QIsP3rIT20WkjzGLGzVyHnhUMjCoAAIVWQlR2AtO0K4=;
+        b=DVZnWA4YiE7k0Fd5BR4LXSJ68Oi0bixKA5rotLroCt+PB3aT+N8tWqm+4EG7xI/Zyz
+         GyydobGdzzMNTDG4VkZjLJwtS0Ru9eSAAOoAM+m99uKP+rmPk68WQdHH4o7g1gbUawN0
+         5EaWP9EsNSzXevjXAW9SB0lV/P9OJim1HknaSct7XvXbADeNYUGkEPxXeKSLdun7WHoV
+         pb61oNhmUqA0mQ8/RpijuRlWiWCo9bK4B/snx/VBfzSS3bC8Uav9PgO+CbSdG56icY0R
+         HxIHgFS1uy/XntGGQ8JeQySp4iWHeth0oSEkyOs/Q6ZOB4koskzczcaJITlR8THXzgg+
+         BGZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750815842; x=1751420642;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QIsP3rIT20WkjzGLGzVyHnhUMjCoAAIVWQlR2AtO0K4=;
+        b=v3Kzr9LfONM7krZAauLCzWI4jiEBD7nR6hYDp246nDRGawN6cU3Xjv/IKjNy5uld7L
+         XIBYt6V5GpVCg2yQjGJJ8ZhD+Nqsi+CB2lhZb3Bjy0E9Gi4yhYEVAzijHrZOglceiZb4
+         Y5f8Pl3Px5ZmPA2KC83+00L1p8JHDg9WGtaLOKVErplTFhvGwfwWg3gwStdiSyV9gCPF
+         Ozxy/7sjF7Q4LIgFdfyAAYv2qF7XATUYhC39kyQ7LaVzhsa9msrTBj6gmJJQwuhS9vGs
+         /mSnJCy4jVvkCei1D/U5rN3m8rSwCOSDK3sgjMOmQQyny/PYgRB3mm6jIA52FRjJHlwT
+         akVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUijslgTqj0HXCA3Uzg7apRm5DK0rie1VLVPO5Jbch6glUPLPUp45P2kuJN5b0CBya1tnALyGFa15GUug==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcC76NGbZwbE6Pz/OUc7awqkoufQrYv/yNWI74SNXQ5GcCbqbx
+	vPjkHfyj1gZw2hYvYATfAEfkJGZNjjcEuZmL5gmQWaALkQKCkRE9xoViJaVcPbstboQ=
+X-Gm-Gg: ASbGncvdyt/KjV6YXYeRtWODB7PansQrwJxERGX7XMw4bd72UJzq6r3l43iwHkGdtfi
+	UjdVS+2Hn1LnN5AE4sklpOszSRVRQ9jY5ht7IW8L4FFScEfrXLHqLXQ2wQ+wUvp8/ILbFIXG30K
+	RPgQCZ3MPJrO7W0bqwge51m/tHEh32hxm9qEcyYqNd+q7keXzKKL9bcg+caBgM/QDlYii701bh3
+	g33/IP4HDbm2vNisR/D2YRTILCTLgGvS9rbP3vl8SJ5VoIedEwg1XcDTXH59ul+h0+jpPDlz200
+	xA2t9jRUPmyN0yFKHpALgPepVqSQYlfBnoB1zMJ/xzka1obTIVRKnUqKGTkFRx5CkHI4imJwNNG
+	sot1yJzdBBnfiUb70ArDiqM4FV1xQbrY5GvjiBiy7AA==
+X-Google-Smtp-Source: AGHT+IHoDqUOYTCnE2gceYTiiXbnq2K/SlA10HDt9RUO5WPvnN8jozjol3hPLkjrrrxWz9hN/gbLRA==
+X-Received: by 2002:a17:903:f90:b0:234:e3b7:5d0f with SMTP id d9443c01a7336-23823d5682bmr23697475ad.0.1750815842318;
+        Tue, 24 Jun 2025 18:44:02 -0700 (PDT)
+Received: from mozart.vkv.me (192-184-162-253.fiber.dynamic.sonic.net. [192.184.162.253])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d8393893sm119389915ad.25.2025.06.24.18.44.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jun 2025 18:44:01 -0700 (PDT)
+Date: Tue, 24 Jun 2025 18:43:59 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Breno Leitao <leitao@debian.org>, Yi Zhang <yi.zhang@redhat.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+	axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [bug report] WARNING: CPU: 3 PID: 522 at block/genhd.c:144
+ bdev_count_inflight_rw+0x26e/0x410
+Message-ID: <aFtUXy-lct0WxY2w@mozart.vkv.me>
+References: <CAHj4cs-uWZcgHLLkE8JeDpkd-ddkWiZCQC_HWObS5D3TAKE9ng@mail.gmail.com>
+ <aEal7hIpLpQSMn8+@gmail.com>
+ <738f680c-d0e8-b6c0-cfaa-5f420a592c4f@huaweicloud.com>
+ <aFTfQpsUiD1Hw3zU@mozart.vkv.me>
+ <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|SJ0PR10MB4414:EE_
-X-MS-Office365-Filtering-Correlation-Id: 72aa67b0-1f1b-47a2-74c6-08ddb3899077
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?V2JnxXYWZQ2hohbO9YxRfR3AsbvVaenizGaKWWnE5de26rczEQE7nVXo5bLV?=
- =?us-ascii?Q?jI5zjzI8tZ/hkV6ZJVtHu6huofzvvgbdZanFJXKq+Jt/FXXm9PTa7tWHnHqG?=
- =?us-ascii?Q?HsQw8jk9RzNK9qmsSpzPF3bWs4LxNhqp8Yl43xkUSSClZO/wIbZfsMMkNeGa?=
- =?us-ascii?Q?lNDJ39w6TH4Pp9PTwhD2I3TxNI26+4mXCIiq4CktiS6eNKORHtCwsCQ4ofAJ?=
- =?us-ascii?Q?8aZH7NqD/Ch+/ebeJbeXhQqWDURX18hKB914zxG6R9Nd3xUzo7EFFFtydEYq?=
- =?us-ascii?Q?22cib+FWZQqyM7JEQ7gEvnsIapMhYSby+kTYzk+AhnlRQThq5oFI/axnvfzu?=
- =?us-ascii?Q?Nl7xGm7X3wNzDkK+NCpB4H8XneiCwPpiTDa8IVBJa9tXCYs81/6QgcbCTOTz?=
- =?us-ascii?Q?Y0ZiTtUoUQm0WxrdRqwOFDQ1oob17spETMa3AIjsq4A2T9y6NDi1NK9e5I9c?=
- =?us-ascii?Q?bpJ4ifUnNlnM6pw15Bw+cc9usCL57tyWmhXtrvutvxMeKMOFjzUMHt5g0KZc?=
- =?us-ascii?Q?TwkXbd4yGYvUvZo/Jmg1OGdG2al86QUTXb9L3cYH6CHT+/pygXKpBGKZUmNs?=
- =?us-ascii?Q?zw84IwqaTEGL9AATNW5FbAdCujUZ+eaHQ46HmFnPV/LphZuiIjPri3gin2BF?=
- =?us-ascii?Q?YUAyua+eZPkmlVu8KvJ6et5ONLMszUsp51HyFG2KEcSnYUn306Ytip/YamTx?=
- =?us-ascii?Q?TEfzndCuP5Brq5wgGnasOKSjeM4VsqbVZHtFsLiUr55XB9vJnXgSLCxnozde?=
- =?us-ascii?Q?WpUztb0q3N4kTwe/Hd+of1ee33uMBWJC5ikFW5SJ3hhxwWUomW9cuMLn6fpY?=
- =?us-ascii?Q?OG4zyeAVagOARKVwq9XcSBUAwa5lVpcaEFmtS6HQ4XlBHW6EfJKy0rlr7njS?=
- =?us-ascii?Q?N9WpRa0mduSaqgVrkdGIO11CTlEeGiBUnp9DS2ZxmphhHO/Co5wn1qhvustm?=
- =?us-ascii?Q?bg72792W3o2qt/NltgdiffLOMBBJ3lTBbjCHE/umDX1QY8oaGToYxn6V19EB?=
- =?us-ascii?Q?fYAmog5e6FOfKibv4ih+ezC2fm0vfcYGAOHYW6kKUEI0ioT8LjeyFZQfz5nF?=
- =?us-ascii?Q?CZbvw2pW677qppSTk/3nlXyNH0jXkZEs2hUSSDjfmycfgbv1ZMc7VUBUPGcp?=
- =?us-ascii?Q?b50vVv1HMUUuhVL2nzh36gqv1jTHhxevQqjTLav8mPjXT9gtaCZbSYwSCLmf?=
- =?us-ascii?Q?K1dXsEJhMvceCGRLVIxYBRoOY4F9cm0LI7OKMQ1ELF0Z0SJbc4eODhataXsF?=
- =?us-ascii?Q?CQqFEIpbwcU5IC+CRIHXgv/g/NEcjHLhhoWfE74r5NpnSW+MrOSZC7MBOhzf?=
- =?us-ascii?Q?9pjiEMMEYkObQ7tE9EPgff31mrJyVvP3Hkn+B1Bez0Oz5kkbvNXvaeHF++on?=
- =?us-ascii?Q?NRSfAMEwKkcwfrbi32x36NQna9e7CKkqwSFTsd8loEQ/sViIsvpgtKz2UL9d?=
- =?us-ascii?Q?4Lj5gKGmFIs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?maNUgRTeCis88Ax+WXPf1nKB5i+P1y/fAnVd3ZFGGIvAg+8L7057AAbhf+lJ?=
- =?us-ascii?Q?5AG2IhIMbmIyvbsarhHGHcOhoVJu+Cid9zGYzT4IPhe5XuO0+I+II9OZtJbQ?=
- =?us-ascii?Q?1slGmbH35KxJ6tCOrbl8/HFQN0u9nrDAmOcITa5EpZX/Bhw73i54rgrimpL+?=
- =?us-ascii?Q?5malNE63EQUTb1tRbPgOOBtM3VwP46QHC0ol7usjWdcSUpGAi5wDfWB3uRg3?=
- =?us-ascii?Q?kq3QdUDd1bZG9v8z6H2eWB4jeqAW/ZJMi8orIMXX+7vk7oMSCc56KCRcPNe7?=
- =?us-ascii?Q?Xu48j5niZDaQ2zIBwioVHqqKCYgkY+mFjS7UWFDYmx2hgrgj/LuCLOK82EJm?=
- =?us-ascii?Q?Rjj0T4IHsKWjzoYV9SpPtBi2+qO1d0krlSBll7kMpgUWYAayX++yPNMmdgsc?=
- =?us-ascii?Q?mI0nsW88vZohOB5tVRTt7kMeR7vKrh5rCeLJ/0DTo/MnELelgsmiLGR+Ju49?=
- =?us-ascii?Q?wyrunv3GL4zMrBvJwB2s8hGpjxQS8PUv61xPdjSf6WcrwPvzld4P5CMJOVtw?=
- =?us-ascii?Q?US/GadWdwZ9hifNP0qy0KG9yDtUXk9dF/bU22AAqWZN4Tm73M0KeBn8hhmZX?=
- =?us-ascii?Q?wAW9gPqZVVhCUgiAUUlKqX7aods2xfMqzOqIczapt7lOWt2NiUEB57hTq/p/?=
- =?us-ascii?Q?Vy4F10+4EAITUkUK/H87zsr2Ad/phs54yoMte0FnZNuUzfCyDC+IJTJTT/1b?=
- =?us-ascii?Q?+yOvEoFFpb8uX1b3YQNs6dvUFlc9bhX5vMUrwHXjGP7wCxaIU8p7ZHwjWKYI?=
- =?us-ascii?Q?y0Sw1NhcXap6sODGSnWol4rs1k0Z6X0JZzoNlD9dl7VwFKzTS+12DTBeEMem?=
- =?us-ascii?Q?BhDCiLG7Txlzb+Jx654NQunI466A4CIC20KwczmvvlSqk4jgA9YXekEV7y/L?=
- =?us-ascii?Q?sn3OR+aPZxyvX0nR5TcRHYAkDCCgsSyHOv0fEpxEeYoXwWjgSbqKeZBP0j0L?=
- =?us-ascii?Q?kkevZUkhwfvcp+daMSI5+ma/FDJjgfnf61jzIJ4LvKCAPBcH0cjn/NCxwNLk?=
- =?us-ascii?Q?LADa20sFR1jd1uspUR5uEjVSf7ql+MbvlTCOFoRkF47CYpOsMcekD+6FUNZF?=
- =?us-ascii?Q?uPF+DXKG9/6VGdGle6W2uthkLcYlMycth3tWnCFvoOE2M0GpK68l4N9EYb/1?=
- =?us-ascii?Q?6fYXJlLU2atK0V8BPIMznCSk+oVp8T4/DQ8GaFBtZHNI6tpXHOE1eKgvYcs2?=
- =?us-ascii?Q?rKnfYgNQSx6Um0f2/zOYqirZBXS/L3+0u9GHkrFUi5qWQU+vxEESOjNwJuPy?=
- =?us-ascii?Q?VK1eXK7VO9FlSm2k2ZKLN1m5uBqBr3B/yPQfpmdxFn4KUTeV3PEXtG2Gtixd?=
- =?us-ascii?Q?5N77FzZoYl3jKKenrNjbJNOs5Zkblmb+pKmq/6CFR4kL3gXeWl7ut1otikls?=
- =?us-ascii?Q?ZuHROkdouvGMLZkRLoPnbzm1MgsBqHjA03ojZQ8mw8lWlLw0fyW1BC4XJo/M?=
- =?us-ascii?Q?hkkE0bmQdYqXQev+2CIEBHYjB9XAMyawg+uPtcwA3/d33eGpYfPIsI9I8yIm?=
- =?us-ascii?Q?Aa3ctICEUNs/lgdR3Fuq/hoJzE/8a8QoEjNq3Vu6Exl7PdW0c20R3QCyB1/n?=
- =?us-ascii?Q?FrPGLIkKn6Z308OTMxnw/iqL2AarhRI1xPfN8tvoHgeqOTadXPwSi960uGA1?=
- =?us-ascii?Q?eA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	75KDz87qaGHAM4aRwx2Jw246ioB7Pst23mu78XPGjDQ36LQka4zYKZOIwcLKvYcc3kijaEQ+xEe3F+MDmGea3ClRzo/j7bwwI6Tlwksxt42lPa4RnuPE2julJF00+iADkgIXv6RzUdUVX65IDmEKdVL0fgYr9D/CuDiySRvUcVf8fwMW2XKSCA8f5HPQv4R6FiY05WCi5sexq3HTHIcH9h+LuhZrBIXdjRWFVnTIeLd0YRUfJbBS6vNK+ptx5qYMe40uZ77W9p78C28JOCkJMvF66aGpteFqslbe6K5y6Db8Qxfmarry5xyMuAeRLKNzatAdbOAWH/dmlAXy+C7yb2yei3GENZU6mDr+CPZ4QkmdpkGm6B5YPSeMjxpSyKFtphPUA4/uUV5N2N0cb6YEr2pSG3wYF5YYIVgRWK9L1GCpM/kqoO61sH4Zh7swi4+Bv6wbvAkXTrJzbi3he8mj/sCtsXMCfbOe+KNsMoZ20LYfEK414bdGJ19eqYA6XVfvJFqSu/LQ9GSFuDEFZcBWKMsi7IY57eY610+/kc6YoOpTisbA7sw/6q9pJM+rWV4UGlApvP+7Hoz1C0JkQcUh8IE2AKvqxLpeMHOl+843n6Q=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72aa67b0-1f1b-47a2-74c6-08ddb3899077
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 01:42:37.6396
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MV12tqBIgn09xfyfSErrHOPHwxJV/bEXiVPDEOZSVHJKB1XdJlX7mbEJzm7J9bA3Dsfpcj4ncK47MPyDJbeiVPZZFwyD9lppOxDPRX29od8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4414
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-24_06,2025-06-23_07,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 bulkscore=0
- malwarescore=0 phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=796
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506250012
-X-Proofpoint-GUID: 25-pPhH-9WSAET9XXA2RpJZYoJKw1jvN
-X-Proofpoint-ORIG-GUID: 25-pPhH-9WSAET9XXA2RpJZYoJKw1jvN
-X-Authority-Analysis: v=2.4 cv=cpebk04i c=1 sm=1 tr=0 ts=685b5412 cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=XsThDU9uBpSvB1x01mYA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI1MDAxMiBTYWx0ZWRfX0WQQ80BK4sac dPrwUFfK7Li9caIw8nvX5tfyV4FU0jvk5BCIQaP3omlRcJImk3ki8/kSTUQTrl3GlidDUwe1OOc ioZcyxqZETFHM3CSpOvaGfxFsaNqdHJc7vVvzipMiUb8tLRWEJK48xnnkjpd+Jh6dBi5MV1/G/p
- Y9CyzQFehtOaArYilS5iHeBizYbwbTcHdDd2Jr1RnckUQYFkmmuQqsJfUkIfnpOYeF9CCMe4CzN CvbS24ZUwsVFB0sbL0fZ06zilXdJjEYv/DYz6IQhHFNhl6HW9prmXFrvOzknsk2Vi2Rw99KOzxD ugRKyg/XBlIw7Dndp8++W4WReRZL9a7WmMKtOHKevlx0PqRvP+11IvfKCRD7cksEzltX3DriRuA
- 9w84TZ2sTQG9OXwGvCxAW9JtsbFPqrRyhJtob6wjsdWTgywUYrJtU5L8VV44aaG69yHq7KKi
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
 
+On Friday 06/20 at 14:47 +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/06/20 12:10, Calvin Owens 写道:
+> > I dumped all the similar WARNs I've seen here (blk-warn-%d.txt):
+> > 
+> >      https://github.com/jcalvinowens/lkml-debug-616/tree/master
+> 
+> These reports also contain both request-based and bio-based disk, I
+> think perhaps following concurrent scenario is possible:
+> 
+> While bdev_count_inflight is interating all cpu, some IOs are issued
+> from traversed cpu and then completed from the cpu that is not traversed
+> yet.
+> 
+> cpu0
+> 		cpu1
+> 		bdev_count_inflight
+> 		 //for_each_possible_cpu
+> 		 // cpu0 is 0
+> 		 infliht += 0
+> // issue a io
+> blk_account_io_start
+> // cpu0 inflight ++
+> 
+> 				cpu2
+> 				// the io is done
+> 				blk_account_io_done
+> 				// cpu2 inflight --
+> 		 // cpu 1 is 0
+> 		 inflight += 0
+> 		 // cpu2 is -1
+> 		 inflight += -1
+> 		 ...
+> 
+> In this case, the total inflight will be -1.
+> 
+> Yi and Calvin,
+> 
+> Can you please help testing the following patch, it add a WARN_ON_ONCE()
+> using atomic operations, if the new warning is not reporduced while
+> the old warning is reporduced, I think it can be confirmed the above
+> analyze is correct, and I will send a revert for the WARN_ON_ONCE()
+> change in bdev_count_inflight().
 
-Wang,
+Hi Kuai,
 
-> scsi optimal_io_size changed from 0 on kernel 6.6, to
-> 16773120(32760*512, 4095*4096) on kernel 6.12/6.16
+I can confirm it's what you expected, I've reproduced the original
+warning with your patch while not seeing any of the new ones.
 
-Peculiar value. Please share the output of:
+If you like, for the revert:
 
-# sg_readcap -l /dev/sdN
+Tested-By: Calvin Owens <calvin@wbinvd.org>
 
-and
+Thanks,
+Calvin
 
-# sg_vpd -p bl /dev/sdN
-
-Thanks!
-
--- 
-Martin K. Petersen
+> Thanks,
+> Kuai
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index b862c66018f2..2b033caa74e8 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1035,6 +1035,8 @@ unsigned long bdev_start_io_acct(struct block_device
+> *bdev, enum req_op op,
+>         part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
+>         part_stat_unlock();
+> 
+> +       atomic_inc(&bdev->inflight[op_is_write(op)]);
+> +
+>         return start_time;
+>  }
+>  EXPORT_SYMBOL(bdev_start_io_acct);
+> @@ -1065,6 +1067,8 @@ void bdev_end_io_acct(struct block_device *bdev, enum
+> req_op op,
+>         part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
+>         part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
+>         part_stat_unlock();
+> +
+> +       WARN_ON_ONCE(atomic_dec_return(&bdev->inflight[op_is_write(op)]) <
+> 0);
+>  }
+>  EXPORT_SYMBOL(bdev_end_io_acct);
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 70d704615be5..ff15276d277f 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -658,6 +658,8 @@ static void blk_account_io_merge_request(struct request
+> *req)
+>                 part_stat_local_dec(req->part,
+>                                     in_flight[op_is_write(req_op(req))]);
+>                 part_stat_unlock();
+> +
+> + WARN_ON_ONCE(atomic_dec_return(&req->part->inflight[op_is_write(req_op(req))])
+> < 0);
+>         }
+>  }
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4806b867e37d..94e728ff8bb6 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1056,6 +1056,8 @@ static inline void blk_account_io_done(struct request
+> *req, u64 now)
+>                 part_stat_local_dec(req->part,
+>                                     in_flight[op_is_write(req_op(req))]);
+>                 part_stat_unlock();
+> +
+> + WARN_ON_ONCE(atomic_dec_return(&req->part->inflight[op_is_write(req_op(req))])
+> < 0);
+>         }
+>  }
+> 
+> @@ -1116,6 +1118,8 @@ static inline void blk_account_io_start(struct request
+> *req)
+>         update_io_ticks(req->part, jiffies, false);
+>         part_stat_local_inc(req->part, in_flight[op_is_write(req_op(req))]);
+>         part_stat_unlock();
+> +
+> +       atomic_inc(&req->part->inflight[op_is_write(req_op(req))]);
+>  }
+> 
+>  static inline void __blk_mq_end_request_acct(struct request *rq, u64 now)
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 3d1577f07c1c..a81110c07426 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -43,6 +43,7 @@ struct block_device {
+>         sector_t                bd_nr_sectors;
+>         struct gendisk *        bd_disk;
+>         struct request_queue *  bd_queue;
+> +       atomic_t                inflight[2];
+>         struct disk_stats __percpu *bd_stats;
+>         unsigned long           bd_stamp;
+>         atomic_t                __bd_flags;     // partition number + flags
+> 
