@@ -1,54 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C011DE4DC
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 21:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536C0202C46;
+	Wed, 25 Jun 2025 23:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750886301; cv=none; b=p3MuJdWsiDCNqW6ryldHPqNzNxRKvhLQA6fSOz1odvsRo3XiWjwSBa3FdBRf0/qNW3I1G5+KfF4ZV9BBgi3STMeR0Bq+N43dbOAq2cvtkO2iOwiijHdODmjxh2PJ6BS2H3iN7h038uzruvHJdTLAFp8MdojqzgpbeAJ4z2jI4OM=
+	t=1750894593; cv=none; b=dG+c1k9y6aUhpZDgYFJZ32V8+DML/1SyCbQaFe15DDY1SOwoiMaM/OB8L4Ti1GSKe6C/JiOLA/rnmDF1asVPqjBRB9sdbFaa1uH0kRIlrFDodGuYnSiO0ZtE3r+hMEM8OUhnG+KYSRN1JxjzzmHvCKDF3Pt4kecEcg5qch8rLnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750886301; c=relaxed/simple;
-	bh=m5dQzTuvbbtJR8qBze1MieINz4Shsgq0Ke6bwVMXZXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mpd1thbVEtt5myKhR5Q0Fx0PQ9C4r2/KOanwcwOb5gky7Tus75zHVbBDs1DL+YOzhvCF1kut9gmqGTdByCuhgdiRk8GM8jMpwOfBovT+icEo//vLPl913/JxTinnDYIIt9D53gvXSRW0HmuqYmrMQrgowpHm0L2PbvvNjr7egJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvlapTTo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750894593; c=relaxed/simple;
+	bh=dHeAbvNT7Gg/RURyvYMojUzvoQTP7FyN/Rb6GKk74j0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=En+oDomFkwjrLiDuLewjckTnGoQS75LQ7BaZY9NUhBzdbCB55oEXyEl1A4u0VFsF1fy1VzcBfgcD/ACGEahXonRFogH0kVxRoLFVjjD6nJxQeLgx1tNUeDBg0hNGHaotG/ds5WugIoKgjRtQ51IdR4JaKMdFEGf4ubWnN0pME/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqJvWHmT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvlapTTo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA48FC4CEEA;
-	Wed, 25 Jun 2025 21:18:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqJvWHmT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA06C4CEEA;
+	Wed, 25 Jun 2025 23:36:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750886301;
-	bh=m5dQzTuvbbtJR8qBze1MieINz4Shsgq0Ke6bwVMXZXc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AvlapTToZQxcbDnOyv9k9jp1u5tVw0L2Q3WnZ6SwsIe0JdvJ4UQetIj1AQVl4Pc7B
-	 ZawU90p4NVsBN3VzCwlanCBJI+k29ukaw2GnjrWcRJMCsKzHshDg3pZwgSgprnuDr3
-	 TAcfB3NT1ggDzQwv9Xr3FDQxK2I6ed8bcPBba2yed753IB2S0eFR4Hinf15Q7eKC8W
-	 sLvOHwa+vvo+mx6dVYh3gKwYCal94jHMbmKON1iIkSX1NTiEnwf5PyJbNnNUw6hEnY
-	 jTBBlViOfaOW+QVV2KQy3jFa7qRy6QRt+nHN2iZtncuUb9wnaUGkHp5I7L2VZIdjO7
-	 jAuywK4s40VmA==
-Date: Wed, 25 Jun 2025 15:18:19 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk, leon@kernel.org, joshi.k@samsung.com,
-	sagi@grimberg.me
-Subject: Re: [PATCH 2/2] nvme: convert metadata mapping to dma iter
-Message-ID: <aFxnm0MX0G7Knzcg@kbusch-mbp>
-References: <20250625204445.1802483-1-kbusch@meta.com>
- <20250625204445.1802483-2-kbusch@meta.com>
+	s=k20201202; t=1750894592;
+	bh=dHeAbvNT7Gg/RURyvYMojUzvoQTP7FyN/Rb6GKk74j0=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=ZqJvWHmTaunm+wRfs6HiSWfatW7LaEXt5HT/Ss/EEnxvsOImugEDCN98sK2MqPjkx
+	 7832Xwdr2RhI9l1B6a2Rx2mtqoIhBVpp0pkFwECGtg6yOzMczWbFsn9GpSupSZkMAw
+	 lPae0ub6+sQWfQgimwdEBOLsrfL6InpdlfCf+63K0QWleZusx2edKiREKQcFioBEsW
+	 nj8SahK3H3FlRd8a2pM6C5tV0SJw3lVWjAqaruG4U1UsUVIblbjakgP4vIJYlX7Dnr
+	 6ciOtnWmIUZ0WTg8BKDNzpcSa/1l0eF/vQMk10nAV5wagWOS0RwP+gvAD+zal/P7HT
+	 RKg/y3EFa9mQg==
+Message-ID: <d0ae85c4-8fd7-49e2-96b1-a08f01154cf2@kernel.org>
+Date: Thu, 26 Jun 2025 08:36:30 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625204445.1802483-2-kbusch@meta.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/5] block: Make REQ_OP_ZONE_FINISH a write operation
+To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
+References: <20250625093327.548866-1-dlemoal@kernel.org>
+ <20250625093327.548866-2-dlemoal@kernel.org>
+ <3f292307-30ac-442c-a694-5fc3560036a4@acm.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <3f292307-30ac-442c-a694-5fc3560036a4@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 25, 2025 at 01:44:45PM -0700, Keith Busch wrote:
-> Aligns data and metadata to the similar dma mapping scheme and removes
-> one more user of the scatter-gather dma mapping.
+On 6/26/25 01:29, Bart Van Assche wrote:
+> On 6/25/25 2:33 AM, Damien Le Moal wrote:
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 3d1577f07c1c..930daff207df 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -350,11 +350,11 @@ enum req_op {
+>>   	/* Close a zone */
+>>   	REQ_OP_ZONE_CLOSE	= (__force blk_opf_t)11,
+>>   	/* Transition a zone to full */
+>> -	REQ_OP_ZONE_FINISH	= (__force blk_opf_t)12,
+>> +	REQ_OP_ZONE_FINISH	= (__force blk_opf_t)13,
+>>   	/* reset a zone write pointer */
+>> -	REQ_OP_ZONE_RESET	= (__force blk_opf_t)13,
+>> +	REQ_OP_ZONE_RESET	= (__force blk_opf_t)15,
+>>   	/* reset all the zone present on the device */
+>> -	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)15,
+>> +	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)17,
+>>   
+>>   	/* Driver private requests */
+>>   	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
+> 
+> Since we are renumbering operation types, how about also
+> renumbering REQ_OP_ZONE_OPEN and/or REQ_OP_ZONE_CLOSE? Neither operation
+> modifies data on the storage medium nor any write pointers so these
+> operations shouldn't be considered as write operations, isn't it?
 
-One thing missing from this patch, it should have removed all the iod
-mempool's since we're not using them anymore after this.
+Open and close change the zone condition and act on the drive count of
+explicitly open zone resources which impacts the ability to write to zones. So I
+would rather consider these also write operations given the changes they imply.
+
+
+-- 
+Damien Le Moal
+Western Digital Research
