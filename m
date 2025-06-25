@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE80D2E0B72;
-	Wed, 25 Jun 2025 09:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EA92DFA2F;
+	Wed, 25 Jun 2025 09:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750844137; cv=none; b=hamupPaQZA/vAkIwH+q7QOuM5yf2wKgTRxm2UCzO0NaKj2oDrL/nZ8AYmFkveDZ918HqBUVX/Iuw4UInBaEBdBHja3WH755UIXS9bBgZvxsjFTvsy99MP9azPE8XcSLcYIBgsycj+l/Kx7WOutigj1df9CVssDfgb5gEGSc0YRc=
+	t=1750844139; cv=none; b=Ek6SdOwmF8zQtG+etyNh3fi4UkBgdXXUiEtCsBnU/Fqgc1qhFTXNCXgDbez5lJK/Kjkpg/sc0raiKfVGYEyDDuVoiOB8Z1oYyF02BL0WKKatu+AtnzR6t7TSNURVUGSYD1LHBLwiG6vhZVFkouT804JIc4CtGgyv7nKdxNIayGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750844137; c=relaxed/simple;
-	bh=eHPP3rvvh3/5BnnmvkOsb2rmtKQ3bHqJw3heyHto5o4=;
+	s=arc-20240116; t=1750844139; c=relaxed/simple;
+	bh=Ib8xlgtRgLHP3I0038y8eG6QJibB5hQxTpwY4tpZGic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hotvJn7mIfKciCA5plzGtpZGmYS4cm2okFl+CldUPpCbwCgpmvrmeXPCEn+w8uFEv7MPOxTUVlWsD1BlkVKwcWYGW9sN5gf0sNd17LuGfcAoVNMMAhJxXMwSsHRZEXxNm9UVDuZfNhcr99IGwFhkNdY2tWllFu9g57BK0StSxm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qaysViao; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MoPl3aBUYM6v1TIZiNNflqBHEm4cYBFNA7ZPv3Q/tiFAwYe+2CNVyX+Umfrfs/Qfgnz+msqP1MMeB85tLKbi1/cYNJiBZLbhwOxUWfEN2hoE8iosEp5IFFdwBr04PfL2oRudetXi0BYWGk0eI0SE48z6fHrpjDqh5Cb/2vPzO2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+kt2kxb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qaysViao"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42C0C4CEEA;
-	Wed, 25 Jun 2025 09:35:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+kt2kxb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9FB4C4CEF1;
+	Wed, 25 Jun 2025 09:35:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750844135;
-	bh=eHPP3rvvh3/5BnnmvkOsb2rmtKQ3bHqJw3heyHto5o4=;
+	s=k20201202; t=1750844137;
+	bh=Ib8xlgtRgLHP3I0038y8eG6QJibB5hQxTpwY4tpZGic=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qaysViao+I//eKeqY+Zm53JuyQTh8B6d/jhn8SfkGW+S+XF+JxoqYYxHclVOpT03q
-	 opz89al0S1nl0lIUo4yHXd9sgUlHyhkW/+iws4LoTqF+DE3+x6uN8PTZYVU/homeq1
-	 qRlCZlbVSO3Xj8/0B5n1sECc5NjYQ2Jf9ps99a8xWThhqOUif8XlkSxTwlHqD6v7Bz
-	 rj0Y1yPV8mWYYKUT92QN6JBexKatPHZAPsRndV19y25xygnJe38HUAJ5XzgE0o0Lfp
-	 0RYzOOq1B29G8FQZjVCHwUl56iSFx2BuJB5e3NXUAetIkGD187xmOkFguWxYBwLDfx
-	 HIOa51IlCMXmQ==
+	b=Z+kt2kxb6cnQng7iIpIyfzFqKajufUWPiwytblVXYEhuaUmgS9lXPjuNYMLrpLLet
+	 GI7Cmx4RzllbvyjKLSssXsTYxlyLdhZbPPyblXV1T0wft1Z/gB7W2rk+D2jTeiAAIO
+	 9R3aHZtAVtRJxrZ9ixdib+VZthJDZjtUUnPK98iK0JEomFIwCtj/CDnVivCkv5pDWZ
+	 xIvAzwY1oc3glHu6ZWtqzum37ldUqJdVbvJ4uaAAMCNxoNrArWd2Q3CmlYqSYauPe5
+	 PIdPllduJLrc3DQ/b9fgazzvB2Hf4To6XhMcs+j8X1L7sUXWnCVUPikwXPakue+ECJ
+	 Fl83BzjVFygMg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>,
@@ -33,9 +33,9 @@ To: linux-block@vger.kernel.org,
 	Mike Snitzer <snitzer@kernel.org>,
 	Mikulas Patocka <mpatocka@redhat.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v3 3/5] dm: Always split write BIOs to zoned device limits
-Date: Wed, 25 Jun 2025 18:33:25 +0900
-Message-ID: <20250625093327.548866-4-dlemoal@kernel.org>
+Subject: [PATCH v3 5/5] dm: Check for forbidden splitting of zone write operations
+Date: Wed, 25 Jun 2025 18:33:27 +0900
+Message-ID: <20250625093327.548866-6-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250625093327.548866-1-dlemoal@kernel.org>
 References: <20250625093327.548866-1-dlemoal@kernel.org>
@@ -47,95 +47,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Any zoned DM target that requires zone append emulation will use the
-block layer zone write plugging. In such case, DM target drivers must
-not split BIOs using dm_accept_partial_bio() as doing so can potentially
-lead to deadlocks with queue freeze operations. Regular write operations
-used to emulate zone append operations also cannot be split by the
-target driver as that would result in an invalid writen sector value
-return using the BIO sector.
+DM targets must not split zone append and write operations using
+dm_accept_partial_bio() as doing so is forbidden for zone append BIOs,
+breaks zone append emulation using regular write BIOs and potentially
+creates deadlock situations with queue freeze operations.
 
-In order for zoned DM target drivers to avoid such incorrect BIO
-splitting, we must ensure that large BIOs are split before being passed
-to the map() function of the target, thus guaranteeing that the
-limits for the mapped device are not exceeded.
-
-dm-crypt and dm-flakey are the only target drivers supporting zoned
-devices and using dm_accept_partial_bio().
-
-In the case of dm-crypt, this function is used to split BIOs to the
-internal max_write_size limit (which will be suppressed in a different
-patch). However, since crypt_alloc_buffer() uses a bioset allowing only
-up to BIO_MAX_VECS (256) vectors in a BIO. The dm-crypt device
-max_segments limit, which is not set and so default to BLK_MAX_SEGMENTS
-(128), must thus be respected and write BIOs split accordingly.
-
-In the case of dm-flakey, since zone append emulation is not required,
-the block layer zone write plugging is not used and no splitting of BIOs
-required.
-
-Modify the function dm_zone_bio_needs_split() to use the block layer
-helper function bio_needs_zone_write_plugging() to force a call to
-bio_split_to_limits() in dm_split_and_process_bio(). This allows DM
-target drivers to avoid using dm_accept_partial_bio() for write
-operations on zoned DM devices.
+Modify dm_accept_partial_bio() to add missing BUG_ON() checks for all
+these cases, that is, check that the BIO is a write or write zeroes
+operation. This change packs all the zone related checks together under
+a static_branch_unlikely(&zoned_enabled) and done only if the target is
+a zoned device.
 
 Fixes: f211268ed1f9 ("dm: Use the block layer zone append emulation")
 Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- drivers/md/dm.c | 29 ++++++++++++++++++++++-------
- 1 file changed, 22 insertions(+), 7 deletions(-)
+ drivers/md/dm.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index e477765cdd27..f1e63c1808b4 100644
+index f1e63c1808b4..f82457e7eed1 100644
 --- a/drivers/md/dm.c
 +++ b/drivers/md/dm.c
-@@ -1773,12 +1773,29 @@ static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
- 					   struct bio *bio)
- {
- 	/*
--	 * For mapped device that need zone append emulation, we must
--	 * split any large BIO that straddles zone boundaries.
-+	 * Special case the zone operations that cannot or should not be split.
- 	 */
--	return dm_emulate_zone_append(md) && bio_straddles_zones(bio) &&
--		!bio_flagged(bio, BIO_ZONE_WRITE_PLUGGING);
-+	switch (bio_op(bio)) {
-+	case REQ_OP_ZONE_APPEND:
-+	case REQ_OP_ZONE_FINISH:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_RESET_ALL:
-+		return false;
-+	default:
-+		break;
+@@ -1286,8 +1286,9 @@ static size_t dm_dax_recovery_write(struct dax_device *dax_dev, pgoff_t pgoff,
+ /*
+  * A target may call dm_accept_partial_bio only from the map routine.  It is
+  * allowed for all bio types except REQ_PREFLUSH, REQ_OP_ZONE_* zone management
+- * operations, REQ_OP_ZONE_APPEND (zone append writes) and any bio serviced by
+- * __send_duplicate_bios().
++ * operations, zone append writes (native with REQ_OP_ZONE_APPEND or emulated
++ * with write BIOs flagged with BIO_EMULATES_ZONE_APPEND) and any bio serviced
++ * by __send_duplicate_bios().
+  *
+  * dm_accept_partial_bio informs the dm that the target only wants to process
+  * additional n_sectors sectors of the bio and the rest of the data should be
+@@ -1320,11 +1321,19 @@ void dm_accept_partial_bio(struct bio *bio, unsigned int n_sectors)
+ 	unsigned int bio_sectors = bio_sectors(bio);
+ 
+ 	BUG_ON(dm_tio_flagged(tio, DM_TIO_IS_DUPLICATE_BIO));
+-	BUG_ON(op_is_zone_mgmt(bio_op(bio)));
+-	BUG_ON(bio_op(bio) == REQ_OP_ZONE_APPEND);
+ 	BUG_ON(bio_sectors > *tio->len_ptr);
+ 	BUG_ON(n_sectors > bio_sectors);
+ 
++	if (static_branch_unlikely(&zoned_enabled) &&
++	    unlikely(bdev_is_zoned(bio->bi_bdev))) {
++		enum req_op op = bio_op(bio);
++
++		BUG_ON(op_is_zone_mgmt(op));
++		BUG_ON(op == REQ_OP_WRITE);
++		BUG_ON(op == REQ_OP_WRITE_ZEROES);
++		BUG_ON(op == REQ_OP_ZONE_APPEND);
 +	}
 +
-+	/*
-+	 * Mapped devices that require zone append emulation will use the block
-+	 * layer zone write plugging. In such case, we must split any large BIO
-+	 * to the mapped device limits to avoid potential deadlocks with queue
-+	 * freeze operations.
-+	 */
-+	if (!dm_emulate_zone_append(md))
-+		return false;
-+	return bio_needs_zone_write_plugging(bio) || bio_straddles_zones(bio);
- }
-+
- static inline bool dm_zone_plug_bio(struct mapped_device *md, struct bio *bio)
- {
- 	if (!bio_needs_zone_write_plugging(bio))
-@@ -1927,9 +1944,7 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 	*tio->len_ptr -= bio_sectors - n_sectors;
+ 	bio->bi_iter.bi_size = n_sectors << SECTOR_SHIFT;
  
- 	is_abnormal = is_abnormal_io(bio);
- 	if (static_branch_unlikely(&zoned_enabled)) {
--		/* Special case REQ_OP_ZONE_RESET_ALL as it cannot be split. */
--		need_split = (bio_op(bio) != REQ_OP_ZONE_RESET_ALL) &&
--			(is_abnormal || dm_zone_bio_needs_split(md, bio));
-+		need_split = is_abnormal || dm_zone_bio_needs_split(md, bio);
- 	} else {
- 		need_split = is_abnormal;
- 	}
 -- 
 2.49.0
 
