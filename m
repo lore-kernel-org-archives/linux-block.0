@@ -1,55 +1,51 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9291B0F1E;
-	Wed, 25 Jun 2025 19:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388D420E031
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 20:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750881305; cv=none; b=FADESYQCxqcRTBos4my0FBGRqa9NPefuY/Etk71BWCbnikh/wJc1v472hDiS3js7pW0d8728QYGf2q/jT2zflMD4yyzYOmwooh5w/v1z3hcBVN7eEidEdhDPpYzc3notrpJ7U/X/y3eM0B9n+VwyXLRwKuP6DgDyZkQgcQIiftE=
+	t=1750884295; cv=none; b=EDSFOArAY+rnniEcaSTqDsvVR21zGp/7cz/kSq8sTQlwiA1DfaFpnYbVqTTx48/9lkU/Hskuiy2yW5Do9wb/KE7MI1DJjg/2C7dPpp/7n6B4IJn0ED7KkskrgJLpwegSsz569eU/a/BSg/tPsVeWlzwCj7rrLNCq2mTI/zN5HVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750881305; c=relaxed/simple;
-	bh=lPft7lKt5j2aR58iai8vitRl6Uz0VaNS2yjdHj/yw/4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LnEp4+0c4HKHI1lolw8Xau8WSvtTp/yj9EmCixVj8Z8eRmEpjJHl+jaG3d87DpacQOYLjEp2YD73jrgZsZUYclLCWN4+XpOuEKWs8d5I8BZbDWKysgjPye1W+nuHFwBHoR0HrN8GtIkR44M5c66gQIUlEgdtViBhByvgAVC+BYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=UdBZGu0t; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750884295; c=relaxed/simple;
+	bh=XeoWWUKmumZ8ynOtL2//IbtRw6xjLJByq00I40xOzck=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G620Y0yvjmd0+ZSiF3J9yOyK3nY2tNOsFtct5m4mfwSJmHAI6mRqKsKrdARGa9GsyZWHaXsE5Q6edTtAUAoJqjyhgIiswih8GWwDc+sh+ucVFcsqnlT9ax39K/vNzR/dR4CbMcEJI+fH0kBdkMHWQFOsflDKIMHXtGkqoPRiSmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=AMJXwp0d; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="UdBZGu0t"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bSCGG2d4Wzm0yQb;
-	Wed, 25 Jun 2025 19:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1750881300; x=1753473301; bh=SkQKOpB5FWxJSFAatFHzlElwlfkVrt+xd27
-	8AKd8OiU=; b=UdBZGu0tAc1we7MI2Pj2fcVPOtm5kDDTofDawPQQBh6KedrPHGS
-	XlmutgLx/2lG7kI4dJ/Ta01I3WTiQtzUJID9uPL2E4X94ErVbE11iXQlHtD+X7HD
-	XIlkwda9IrRc2NmfzujPr5mhdX0I1WlfIoKix5Als8ceTO4nNZj4FnX29eBULlda
-	VfDTaAKH0MbDUrFi+fHA4xlVDmErlWLjXWKA9e+5HWvcJmT45Y5ECh6Yw5r5VWka
-	Wcusw1DLNggsNpbp91LAOMy0FI4EpNobkj3CgNRLS3wHWwf0j9C4yh+RQGHmcjN3
-	AP6Xeos4TSLFLD9XMRxPK+O++0awImz7r1w==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id R3eBYWaB1CxQ; Wed, 25 Jun 2025 19:55:00 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bSCG81wh7zm0pKN;
-	Wed, 25 Jun 2025 19:54:55 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Fix a deadlock related to modifying the readahead attribute
-Date: Wed, 25 Jun 2025 12:54:50 -0700
-Message-ID: <20250625195450.1172740-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="AMJXwp0d"
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55PJMJbH016284
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 13:44:53 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=L5RtRyeSuYZjNvCCAI
+	rZfZ0wTr6RWPvM785jVZwUc2k=; b=AMJXwp0dndU7l0AygcuFkbJbH5C9Ewn/J6
+	+qZTWvcAcDdhNmU9WHf7w1g9Cf7GR78eJXnePjq3h+h+HGiLkjWxcTnnAG7jmuar
+	hh4TugGLahInCkC7wymL1DII6hIBhPBwKm3xrO1BFWJ9C/re84DiL0Jjot87gR5z
+	Vg45+f4niE6Ji9KWX7BULFFeHb5h2zFPYRmhuV0rHx661w2Sv1RuX59ezlVp4Xkt
+	KXISUe2Ra+CfJfgiRFQHLJCm66SArjWQjHLueXKppEeeSpZfdCebfY6Tbs/IFfXJ
+	aJQob4NOZA7efxN5rL+lRKs2UQH81nkrzj57Ua7reU3Wq+AD50JA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 47gevm4es6-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 13:44:52 -0700 (PDT)
+Received: from twshared57752.46.prn1.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1748.24; Wed, 25 Jun 2025 20:44:49 +0000
+Received: by devbig1708.prn1.facebook.com (Postfix, from userid 544533)
+	id C5B538C48C8; Wed, 25 Jun 2025 13:44:46 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <hch@lst.de>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <leon@kernel.org>, <joshi.k@samsung.com>,
+        <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 1/2] blk-integrity: add scatter-less DMA mapping helpers
+Date: Wed, 25 Jun 2025 13:44:44 -0700
+Message-ID: <20250625204445.1802483-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,82 +53,234 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI1MDE1OSBTYWx0ZWRfX9hNblVeCwFQb hqLmovcNFVAqTuSRj9Wmi3L6kZR6Xx0djMMk5vmRKZm4FywwxBWVF/qUr6lH1LmqkHfTe/2MwLl f+j+Nc37H1x5tyUatlICp6bx6AXcnw4o2ITZKFnpBHh0xrTO3/sXVQlGClZGAg7DLRLXLvhS03y
+ 9eBbvSGN868oOJ8AuZEXTi377//7Lo+q46re1GR3P8dx/4oSNf10L8XggyMzXBFI0zSCtRr28HB qjWUs2tYDGUP2YQJdSlh/CkOdCKbrAKwA/G1FAgcPXgScTWatxH5iFNXwwdMk/RjZSvNGEI5dB9 4HnRYNiYynYyE8EpKzM3yIJC/kr0MW8vYSL3NRlscj7ZTZvL+EAAe89rXJtqyXxLwgvarejkWsP
+ +a4oQNRHKDuHHPkSx0Hj9xIzAWzCqPhiSzt5Yoci3kyE8N+gx07PYAU3mLRm2AfVqQybPqqC
+X-Proofpoint-ORIG-GUID: VbPHLTRTTVGkHH3YSNRSGL8AJk1wtVQY
+X-Proofpoint-GUID: VbPHLTRTTVGkHH3YSNRSGL8AJk1wtVQY
+X-Authority-Analysis: v=2.4 cv=Ud9RSLSN c=1 sm=1 tr=0 ts=685c5fc4 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=YbswHzic5SfKCEL6b6MA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-25_07,2025-06-25_01,2025-03-28_01
 
-Every time I run test srp/002 the following deadlock is triggered:
+From: Keith Busch <kbusch@kernel.org>
 
-task:multipathd
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- schedule_preempt_disabled+0x1c/0x30
- __mutex_lock+0xb89/0x1650
- mutex_lock_nested+0x1f/0x30
- dm_table_set_restrictions+0x823/0xdf0
- __bind+0x166/0x590
- dm_swap_table+0x2a7/0x490
- do_resume+0x1b1/0x610
- dev_suspend+0x55/0x1a0
- ctl_ioctl+0x3a5/0x7e0
- dm_ctl_ioctl+0x12/0x20
- __x64_sys_ioctl+0x127/0x1a0
- x64_sys_call+0xe2b/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-task:(udev-worker)
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- blk_mq_freeze_queue_wait+0xf2/0x140
- blk_mq_freeze_queue_nomemsave+0x23/0x30
- queue_ra_store+0x14e/0x290
- queue_attr_store+0x23e/0x2c0
- sysfs_kf_write+0xde/0x140
- kernfs_fop_write_iter+0x3b2/0x630
- vfs_write+0x4fd/0x1390
- ksys_write+0xfd/0x230
- __x64_sys_write+0x76/0xc0
- x64_sys_call+0x276/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
+This is much like the scatter-less DMA helpers for request data, but for
+integrity metadata instead. This one only subscribes to the direct
+mapping as the virt boundary queue limit used to check for iova
+coalescing possibilities doesn't apply to metadata.
 
-Fix this by removing the superfluous queue freezing/unfreezing code from
-queue_ra_store().
-
-Cc: Nilay Shroff <nilay@linux.ibm.com>
-Cc: stable@vger.kernel.org
-Fixes: b07a889e8335 ("block: move q->sysfs_lock and queue-freeze under sh=
-ow/store method")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/blk-sysfs.c | 3 ---
- 1 file changed, 3 deletions(-)
+ block/blk-integrity.c         | 94 +++++++++++++++++++++++++++++++++++
+ block/blk-mq-dma.c            |  9 +---
+ block/blk.h                   | 10 ++++
+ include/linux/blk-integrity.h |  6 +++
+ 4 files changed, 112 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index b2b9b89d6967..1f63b184c6e9 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -105,7 +105,6 @@ queue_ra_store(struct gendisk *disk, const char *page=
-, size_t count)
- {
- 	unsigned long ra_kb;
- 	ssize_t ret;
--	unsigned int memflags;
- 	struct request_queue *q =3D disk->queue;
-=20
- 	ret =3D queue_var_store(&ra_kb, page, count);
-@@ -116,10 +115,8 @@ queue_ra_store(struct gendisk *disk, const char *pag=
-e, size_t count)
- 	 * calculated from the queue limits by queue_limits_commit_update.
- 	 */
- 	mutex_lock(&q->limits_lock);
--	memflags =3D blk_mq_freeze_queue(q);
- 	disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10);
- 	mutex_unlock(&q->limits_lock);
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return ret;
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index e4e2567061f9d..e79df07d1151a 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -112,6 +112,100 @@ int blk_rq_map_integrity_sg(struct request *rq, str=
+uct scatterlist *sglist)
  }
+ EXPORT_SYMBOL(blk_rq_map_integrity_sg);
+=20
++static void bio_integrity_advance_iter_single(struct bio *bio,
++						struct bvec_iter *iter,
++						struct bio_vec *bvec,
++						unsigned int bytes)
++{
++	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
++
++	iter->bi_sector +=3D bytes / bi->tuple_size;
++	bvec_iter_advance(bvec, iter, bytes);
++}
++
++static bool blk_rq_integrity_map_iter_next(struct request *req,
++		struct req_iterator *iter, struct phys_vec *vec)
++{
++	struct bio_integrity_payload *bip =3D bio_integrity(iter->bio);
++	unsigned int max_size;
++	struct bio_vec bv;
++
++	if (!iter->iter.bi_size)
++		return false;
++
++	bv =3D mp_bvec_iter_bvec(bip->bip_vec, iter->iter);
++	vec->paddr =3D bvec_phys(&bv);
++	max_size =3D get_max_segment_size(&req->q->limits, vec->paddr, UINT_MAX=
+);
++	bv.bv_len =3D min(bv.bv_len, max_size);
++
++	bio_integrity_advance_iter_single(iter->bio, &iter->iter, &bv, bv.bv_le=
+n);
++	while (!iter->iter.bi_size || !iter->iter.bi_bvec_done) {
++		struct bio_vec next;
++
++		if (!iter->iter.bi_size) {
++			if (!iter->bio->bi_next)
++				break;
++			iter->bio =3D iter->bio->bi_next;
++			iter->iter =3D iter->bio->bi_iter;
++		}
++
++		next =3D mp_bvec_iter_bvec(iter->bio->bi_io_vec, iter->iter);
++		if (bv.bv_len + next.bv_len > max_size ||
++		    !biovec_phys_mergeable(req->q, &bv, &next))
++			break;
++
++		bv.bv_len +=3D next.bv_len;
++		bio_integrity_advance_iter_single(iter->bio, &iter->iter, &bv,
++							next.bv_len);
++	}
++
++	vec->len =3D bv.bv_len;
++	return true;
++}
++
++bool blk_rq_integrity_dma_map_iter_start(struct request *req,
++		struct device *dma_dev, struct blk_dma_iter *iter)
++{
++	struct bio_integrity_payload *bip =3D bio_integrity(req->bio);
++	struct phys_vec vec;
++
++	iter->iter.bio =3D req->bio;
++	iter->iter.iter =3D bip->bip_iter;
++	memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
++	iter->status =3D BLK_STS_OK;
++
++	if (!blk_rq_integrity_map_iter_next(req, &iter->iter, &vec))
++		return false;
++
++	switch (pci_p2pdma_state(&iter->p2pdma, dma_dev,
++				phys_to_page(vec.paddr))) {
++	case PCI_P2PDMA_MAP_BUS_ADDR:
++		return blk_dma_map_bus(iter, &vec);
++	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
++	case PCI_P2PDMA_MAP_NONE:
++		break;
++	default:
++		iter->status =3D BLK_STS_INVAL;
++		return false;
++	}
++
++	return blk_dma_map_direct(req, dma_dev, iter, &vec);
++}
++EXPORT_SYMBOL_GPL(blk_rq_integrity_map_iter_start);
++
++bool blk_rq_integrity_dma_map_iter_next(struct request *req,
++		struct device *dma_dev, struct blk_dma_iter *iter)
++{
++	struct phys_vec vec;
++
++	if (!blk_rq_integrity_map_iter_next(req, &iter->iter, &vec))
++		return false;
++	if (iter->p2pdma.map =3D=3D PCI_P2PDMA_MAP_BUS_ADDR)
++		return blk_dma_map_bus(iter, &vec);
++	return blk_dma_map_direct(req, dma_dev, iter, &vec);
++}
++EXPORT_SYMBOL_GPL(blk_rq_integrity_dma_map_iter_next);
++
+ int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+ 			      ssize_t bytes)
+ {
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index ad283017caef2..54c25e5e60d78 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -5,11 +5,6 @@
+ #include <linux/blk-mq-dma.h>
+ #include "blk.h"
+=20
+-struct phys_vec {
+-	phys_addr_t	paddr;
+-	u32		len;
+-};
+-
+ static bool blk_map_iter_next(struct request *req, struct req_iterator *=
+iter,
+ 			      struct phys_vec *vec)
+ {
+@@ -77,14 +72,14 @@ static inline bool blk_can_dma_map_iova(struct reques=
+t *req,
+ 		dma_get_merge_boundary(dma_dev));
+ }
+=20
+-static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *=
+vec)
++bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
+ {
+ 	iter->addr =3D pci_p2pdma_bus_addr_map(&iter->p2pdma, vec->paddr);
+ 	iter->len =3D vec->len;
+ 	return true;
+ }
+=20
+-static bool blk_dma_map_direct(struct request *req, struct device *dma_d=
+ev,
++bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
+ 		struct blk_dma_iter *iter, struct phys_vec *vec)
+ {
+ 	iter->addr =3D dma_map_page(dma_dev, phys_to_page(vec->paddr),
+diff --git a/block/blk.h b/block/blk.h
+index 1141b343d0b5c..755975ddc3046 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -4,6 +4,7 @@
+=20
+ #include <linux/bio-integrity.h>
+ #include <linux/blk-crypto.h>
++#include <linux/blk-mq-dma.h>
+ #include <linux/lockdep.h>
+ #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
+ #include <linux/sched/sysctl.h>
+@@ -727,6 +728,15 @@ int bdev_open(struct block_device *bdev, blk_mode_t =
+mode, void *holder,
+ 	      const struct blk_holder_ops *hops, struct file *bdev_file);
+ int bdev_permission(dev_t dev, blk_mode_t mode, void *holder);
+=20
++struct phys_vec {
++	phys_addr_t	paddr;
++	u32		len;
++};
++
++bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec);
++bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
++		struct blk_dma_iter *iter, struct phys_vec *vec);
++
+ void blk_integrity_generate(struct bio *bio);
+ void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
+iter);
+ void blk_integrity_prepare(struct request *rq);
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.=
+h
+index c7eae0bfb013f..8e2aeb5c13864 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -4,6 +4,7 @@
+=20
+ #include <linux/blk-mq.h>
+ #include <linux/bio-integrity.h>
++#include <linux/blk-mq-dma.h>
+=20
+ struct request;
+=20
+@@ -30,6 +31,11 @@ int blk_rq_count_integrity_sg(struct request_queue *, =
+struct bio *);
+ int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+ 			      ssize_t bytes);
+=20
++bool blk_rq_integrity_dma_map_iter_start(struct request *req,
++		struct device *dma_dev, struct blk_dma_iter *iter);
++bool blk_rq_integrity_dma_map_iter_next(struct request *req,
++		struct device *dma_dev, struct blk_dma_iter *iter);
++
+ static inline bool
+ blk_integrity_queue_supports_integrity(struct request_queue *q)
+ {
+--=20
+2.47.1
+
